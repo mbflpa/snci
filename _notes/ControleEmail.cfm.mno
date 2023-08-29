@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_rsPesq" value="name:Pos_Inspecao;datatype:,name:Und_Descricao;datatype:" />
+	<infoitem key="UD_rsQuest" value="name:numero;datatype:" />
+</info>

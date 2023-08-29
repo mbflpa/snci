@@ -1,0 +1,40 @@
+a:link {
+	font-family: verdana;
+	font-size: 10px;
+	color: #FFFFFF;
+	text-decoration: none;
+}
+a:visited {
+	font-family: verdana;
+	font-size: 10px;
+	color: #FFFFFF;
+	text-decoration: none;
+}
+a:hover {
+	font-family: verdana;
+	font-size: 10px;
+	color: #FFFFFF;
+	text-decoration: underline;
+}
+a:active {
+	font-family: verdana;
+	font-size: 10px;
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.menu {
+	font-family: verdana;
+	font-size: 10px;
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 00px;
+}
+
+

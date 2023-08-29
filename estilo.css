@@ -1,0 +1,41 @@
+<STYLE TYPE="text/css">
+<!--
+BODY {
+	scrollbar-face-color: #5F7797;
+	scrollbar-base-color: #5F7797;
+	scrollbar-highlight-color: #5F7797;
+	scrollbar-3dlight-color: #354463;
+	scrollbar-darkshadow-color: #354463;
+	scrollbar-shadow-color: #354463;
+	scrollbar-arrow-color: #dcdcdc;
+	scrollbar-track-color: #dcdcdc;
+	
+}
+b { text-decoration:none; font-weight: bold; color: #e5e5ff}
+u { text-decoration:none; font-weight: normal; color: #336699}
+A { text-decoration: none; color: #354463;}
+A:hover {font-weight: bold; color: #354463;}
+input, textarea, select {
+ background-color: #dcdcdc;
+ border-style: solid;
+ border-width: 1px;
+ font-family: verdana, arial, sans-serif;
+ font-size: 10px;
+ color: #354463;
+ padding: 0px;
+}
+
+.texto { font-size:12px; font-family: Verdana, Arial, Helvetica, sans-serif;}
+
+.destaque { font-size:12px; font-family: Verdana, Arial, Helvetica, sans-serif; font-weight:bold;}
+
+.alerta_vermelho {font-size: 16px; font-family: Verdana, Arial, Helvetica, sans-serif; font-weight:bold; color: #CC0000}
+
+.alerta_azul {font-size: 16px; font-family: Verdana, Arial, Helvetica, sans-serif; font-weight:bold; color: #0000CC}
+
+.titulo { font-size: 16px; font-family: Verdana, Arial, Helvetica, sans-serif; font-weight:bold;}
+
+.obs { color: #3300ff; font-size: 10px; font-family: Verdana, Arial, Helvetica, sans-serif;}
+
+-->
+</style>

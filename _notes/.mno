@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="MM_ConnectionVar1" value="dsn_inspecao;DBINS" />
+	<infoitem key="MM_ConnectionVar_Count" value="2" />
+	<infoitem key="MM_ConnectionVar2" value="dsn_pesquisa;DBPESQUISA_INSPECAO" />
+</info>

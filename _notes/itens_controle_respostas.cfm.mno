@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_rsItem" value="name:RIP_Unidade;datatype:,name:RIP_NumInspecao;datatype:,name:RIP_NumGrupo;datatype:,name:RIP_NumItem;datatype:,name:RIP_DtUltAtu;datatype:,name:Itn_Descricao;datatype:,name:Grp_Descricao;datatype:,name:Und_Descricao;datatype:,name:INP_DtInicInspecao;datatype:" />
+</info>

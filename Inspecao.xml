@@ -1,0 +1,3050 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<rootelement>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em confronto do numerário físico total existente na unidade com o saldo escriturado no Balancete do Caixa Retaguarda registrado Sistema de Automação da Rede de Atendimento (SARA), realizado no dia xxx/xx/20xx, constatou-se falta de numerário em um valor total de R$ x.xxx,xx, conforme demonstrado a seguir:
+
+Valor Escriturado                     Valor Encontrado                 Diferença
+R$  xxx.xxx,xx                          R$ xx.xxxx,xxx                     R$ xx.xxx,xx
+
+Ref. Normativa: MANAFI 19/1 - 2.2.8; MANCAT 19/3 - 2.12.1.5.2, "e" e "h"; MANORG 13/11 - 4.3.1, "g" e "q".
+Possíveis Consequências da situação encontrada: xxxxxxxxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>5275,00</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em inspeção física realizada na unidade em xx/xx/xxxx não foram encontrados documentos que evidenciassem a realização de Conferência Quinzenal do Numerário e/ou do Estoque de Produtos em poder do CRE nos meses de xxxxxxxx, xxxxxxxxx e xxxxxxx.
+
+Ref. Normativa: MANAFI 19/1 - 2.1.5 e 2.2.9; MANCAT 19/3 - 2.12.1.9, "a", "m" e "o"; MANORG 13/11 - 4.1.3, "i";  MANORG 13/11 - 4.1.3, "k".
+
+Possíveis Consequências da situação encontrada: xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>451234,67 (VALOR EM RISCO)</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>4</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>5</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>6</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>7</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em conferência ao numerário em poder da unidade e entrevista com o responsável pelo CRE, constatou-se a prática de retenção de numerário fixo de R$ xxx,xx ao final do expediente em todos os guichês.
+O valor total encontrado em poder dos Caixas de Atendimento na data da inspeção era de R$ x.xxx,xx.
+
+Ref. Normativa: MANAFI 19/1 - 2.3.13 e 2.3.14.1 - "a"
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>1202,00 (VALOR EM RISCO)</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>8</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>E</RIP_Resposta>
+<RIP_Comentario></RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>9</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>V</RIP_Resposta>
+<RIP_Comentario>NONONONONONONONONONO</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>10</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>11</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>12</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>13</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>14</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>1</RIP_NumGrupo>
+<RIP_NumItem>15</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em análise aos dados do Relatório de "Arme e Desarme" do Sistema de Alarme do mês de xxxxxxxxx/20xx, constatou-se que o sistema de alarme da unidade permaneceu desativado no período de xx/xx a xx/xx/20xx durante todo o dia e (ou) horário de almoço.
+
+Ref. Normativa: MANSEG 4/4 - 2.1.2.1, 2.1.2.2 e 2.1.4.
+Possíveis Consequências da Situação Encontrada: xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em análise aos dados do Relatório de Arme/Desarme do Sistema de Alarme dos meses de xxxxxxxxxxxxxxxx, constatou-se a utilização da senha do empregado de matrícula 8.xxx.xxx-x, para abertura e fechamento da unidade no período de xx/xx a xx/xx/20xx, entretanto, no período mencionado o empregado não se encontrava na unidade por motivo de xxxxxxxxxxxxxxxxxxxxx (férias, atestado, etc.), o que indicava a prática de compartilhamento de senha de alarme para acesso à unidade.
+
+Ref. Normativa: MANSEG 4/4 - 2.1.3; MANCAT 19/3 2.1.5,"b", MANORG 13/11 - 4.1.4, "f"
+Possíveis Consequências da Situação Encontrada: xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>4</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>5</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em inspeção física realizada na unidade em xx/xx/xxx, constatou-se que o sistema de imagens (CFTV) não estava funcionando adequadamente, conforme relatado a seguir:
+
+a)	xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx;
+b)	Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+c)	xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Ref. Normativa: MANSEG 4/5 - 2.1.1.3 e 2.1.1.6
+Possíveis Consequências da Situação Encontrada: xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>6</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>7</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>8</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>9</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>10</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>11</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Durante a inspeção física verificou-se que as etiquetas dos serviços xxxxxxxxxx, xxxxxxxxxx, xxxxxxxxxxxxxx, xxxxxxxxxxxxxxx, utilizadas na prestação de serviços à vista e (ou) faturar e (ou) interno eram mantidas xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.
+
+
+
+Ref. Normativa: MANCAT 19/3 - 2.12.1.7
+Possíveis Consequências da Situação Encontrada: xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICADO</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>2</RIP_NumGrupo>
+<RIP_NumItem>12</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>3</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>3</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em inspeção física realizada na unidade, constatou-se a utilização indevida de unitizadores, o que caracterizava desvio de finalidade, conforme relacionado a seguir:
+a)	Xx Caixetas utilizados para outra finalidade. XXXXXXXXXXX
+  
+b)	Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+c)	xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Total de itens com uso indevido - xxxx unidades.
+
+Ref. Normativa: MANENC 4/1 - Anexo 2 - 2.1; MANENC 4/1 - Anexo 3 - 2.15
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>3</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>3</RIP_NumGrupo>
+<RIP_NumItem>4</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>3</RIP_NumGrupo>
+<RIP_NumItem>5</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em inspeção física realizada em xx/xx/20xx, constatou-se que a Caixa de coleta instalada na frente da unidade apresentava mau estado de conservação e (ou) limpeza, conforme descrito a seguir:
+a)	Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+b)	Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+c)	Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+Ref. Normativa: MANCAT 19/2 -2.1.2
+
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>3</RIP_NumGrupo>
+<RIP_NumItem>6</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em inspeção física realizada em xx/xx/20xx, constatou-se o descumprimento dos procedimentos de embarque e desembarque da carga, conforme relatado a seguir:
+ 
+
+a)	Xxxxxxxxxxxxxxxxxxxxxx;
+b)	Xxxxxxxxxxxxxxxxxxxxxx;
+c)	Xxxxxxxxxxxxxxxxxxxxxx;
+
+ Ref. Normativa: MANDIS 3/1 - 2.4
+
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>3</RIP_NumGrupo>
+<RIP_NumItem>7</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>3</RIP_NumGrupo>
+<RIP_NumItem>8</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em inspeção física e entrevista com xxxxxxxxxxxxxxxx, constatou-se que não era cumprido o procedimento de emissão de CIE Eletrônica para a unidade de tratamento em caso de com a compactação da carga OU o lançamento no SGDO.
+
+Ref. Normativa: MANDIS 3/1 - 2.5.3.2 
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>3</RIP_NumGrupo>
+<RIP_NumItem>9</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>..</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>4</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>4</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>4</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>4</RIP_NumGrupo>
+<RIP_NumItem>4</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>5</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>Em inspeção física realizada na unidade, constatou-se que os Objetos simples e (ou) avisos de retirada/LDI dos Objetos Qualificados não eram disponibilizados nas Caixas Postais após o recebimento da carga de forma a garantir o cumprimento do prazo de entrega, conforme descrito a seguir:
+
+a)	Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.
+b)	Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.
+c)	Xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.
+
+Foi avaliado o conteúdo de xx Caixas Postais para Objetos Simples/Qualificados, o que representava xx% do total de CP existente na unidade, sendo que xx apresentaram irregularidade.
+
+Ref. Normativa: MANCAT 19/3 - 2.13.3.1.4 e 2.13.4.8.
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>5</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>5</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>6</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>6</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>6</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>E</RIP_Resposta>
+<RIP_Comentario></RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>6</RIP_NumGrupo>
+<RIP_NumItem>4</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>V</RIP_Resposta>
+<RIP_Comentario>NONONONNOOOO</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>7</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>7</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>7</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em análise aos registros do sistema SGDO (Relatório Detalhado das Distribuições), período de xx/xx/xxxx a xx/xx/xxxx, constatou-se a falta de lançamentos dos Carteiros relativos à saída e/ou retorno da distribuição e/ou término das atividades, conforme relacionado a seguir:
+Data		Evento		Matrícula
+xx/xx/xxxx	xxxxx		xxxxxxx
+
+Ref. Normativa: MANDIS 3/2 - 2.9 e MANDIS 3/9 - 2.1
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>4</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>E</RIP_Resposta>
+<RIP_Comentario></RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>5</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em acompanhamento do retorno dos Carteiros e (ou) análise dos registros das LOECs, do período de xx/xx a xx/xx/xxxx, constataram-se as seguintes inconsistência que indicavam falha no processo de Prestação de Contas dos Carteiros:
+a)	Xxxxxxxx
+b)	Xxxxxxxx
+c)	xxxxxxxxxxx
+
+Foram avaliadas/acompanhadas as prestações de contas de XX carteiros, o que representava xx% do total existente na Unidade.
+Ref. Normativa: MANDIS 3/9 e MANDIS 3/9 - Anexo 2, subitem 2
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>6</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>7</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em análise aos arquivos de conferência eletrônica (Pré-Alerta), do período de xx/xx/xxxx a xx/xx/20xx, e dados do Sistema SRO, constatou-se que não era realizada a gestão diária do Pré-Alerta, conforme relatado a seguir:  
+a)	Xxxxxxxxxxxxxxxxxxxx
+b)	Xxxxxxxxxxxxxxxxxx
+
+Ref. Normativa: MANENC 16/3
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>8</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>9</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>8</RIP_NumGrupo>
+<RIP_NumItem>10</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em análise, por amostragem, aos cartões de ponto dos empregados lotados na unidade do período de xx/xx/xxxx a xx/xx/xxxx, constataram-se as seguintes irregularidades:
+Data		Matrícula                                 Irregularidade
+xx/xxxx		nononononon                         xxxxxxxxxxxxxxxx 
+
+Foram avaliados xx cartões de ponto relativos ao período mencionado, o que representava xx% do total do período, sendo que em xx% foram constatadas irregularidades.
+
+Ref. Normativa: MANPES 19/1 - 2.1.13 e 2.1.15; MANPES 19/02 - 1.1 e 2.1.5
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>4</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>5</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>6</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>ooooooooo</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>7</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>lllllllllllll</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>8</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>gggggggggg</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>9</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>ttttttttttt</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>10</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>ssssssssss</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>11</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>ooooooooooooo</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>9</RIP_NumGrupo>
+<RIP_NumItem>12</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>ppppppp</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>10</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em verificação aos exames médicos periódicos dos empregados e dos jovens aprendizes lotados na unidade, constatou-se que tais exames não estavam sendo realizados na frequência estabelecida, conforme relação adiante apresentada:
+
+Matrícula	Tipo		      		Frequência Prevista	Data Último Exame
+0.000.000-0	Empregado/Jovem Aprendiz	xxxxx			xx/xx/xxxx
+
+Ref. Normativa: MANPES 31/2 - 2.2, 2.3 e 2.4
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>10</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>uuuuu</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>10</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>zzzzzz</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>10</RIP_NumGrupo>
+<RIP_NumItem>4</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>hhhh</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>10</RIP_NumGrupo>
+<RIP_NumItem>5</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>Em avaliação aos PPRAs apresentados pelo Gerente da unidade na data de inspeção, constataram-se as seguintes irregularidade quanto à atualização/vigência e/ou arquivamento do PPRA:
+a)	Xxxxxxxxxxxxxx
+b)	Xxxxxxxxxxxxxx
+
+Ref. Normativa: MANPES 20/3 - 2.1.2.1 e Anexo 2 - 4.1; NR-9
+Possíveis Consequências da Situação Encontrada: Xxxxxxxxxxxxxxxxxxx
+</RIP_Comentario>
+<RIP_Causas>.</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>Seguir os procedimentos estabelecidos nos normativos referenciados neste apontamento; OUTROS: XXXXXXXXX.</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>10</RIP_NumGrupo>
+<RIP_NumItem>6</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>E</RIP_Resposta>
+<RIP_Comentario></RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>10</RIP_NumGrupo>
+<RIP_NumItem>7</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>V</RIP_Resposta>
+<RIP_Comentario>NONONONONONONO</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>10</RIP_NumGrupo>
+<RIP_NumItem>8</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>xxxxxx</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>10</RIP_NumGrupo>
+<RIP_NumItem>9</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>C</RIP_Resposta>
+<RIP_Comentario>ttttt</RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>11</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>E</RIP_Resposta>
+<RIP_Comentario></RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>11</RIP_NumGrupo>
+<RIP_NumItem>2</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>E</RIP_Resposta>
+<RIP_Comentario></RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>11</RIP_NumGrupo>
+<RIP_NumItem>3</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>E</RIP_Resposta>
+<RIP_Comentario></RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>11</RIP_NumGrupo>
+<RIP_NumItem>4</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>E</RIP_Resposta>
+<RIP_Comentario></RIP_Comentario>
+<RIP_Causas></RIP_Causas>
+<RIP_Valor></RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes></RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+<Dados>
+<RIP_Unidade>74303651</RIP_Unidade>
+<RIP_NumInspecao>7400032017</RIP_NumInspecao>
+<RIP_NumGrupo>12</RIP_NumGrupo>
+<RIP_NumItem>1</RIP_NumItem>
+<RIP_CodDiretoria>74</RIP_CodDiretoria>
+<RIP_CodReop>74430933</RIP_CodReop>
+<RIP_Ano>2018</RIP_Ano>
+<RIP_Resposta>N</RIP_Resposta>
+<RIP_Comentario>NONONONONONONONONONONONONONONONONO
+NONONONONONONONONONONONONONO</RIP_Comentario>
+<RIP_Causas>,</RIP_Causas>
+<RIP_Valor>NÃO QUANTIFICAVEL</RIP_Valor>
+<RIP_DtUltAtu>26/03/2018</RIP_DtUltAtu>
+<RIP_UserName>81062117</RIP_UserName>
+<RIP_Recomendacoes>NONONONONONONONON</RIP_Recomendacoes>
+<INP_HrsPreInspecao>8</INP_HrsPreInspecao>
+<INP_DtInicDeslocamento>26/03/2018</INP_DtInicDeslocamento>
+<INP_DtFimDeslocamento>27/03/2018</INP_DtFimDeslocamento>
+<INP_HrsDeslocamento>8</INP_HrsDeslocamento>
+<INP_DtInicInspecao>26/03/2018</INP_DtInicInspecao>
+<INP_DtFimInspecao>26/03/2018</INP_DtFimInspecao>
+<INP_HrsInspecao>16</INP_HrsInspecao>
+<INP_Situacao>CO</INP_Situacao>
+<INP_DtEncerramento>26/03/2018</INP_DtEncerramento>
+<INP_Coordenador>87512793</INP_Coordenador>
+<INP_Responsavel>JOSE DA SILVA JUNIOR </INP_Responsavel>
+<INP_Motivo></INP_Motivo>
+<INP_Introducao></INP_Introducao>
+<INP_Conclusao></INP_Conclusao>
+<IPT_MatricInspetor>8107190681092245</IPT_MatricInspetor>
+<IPT_NumHrsPreInsp> 4 4</IPT_NumHrsPreInsp>
+<IPT_NumHrsDesloc> 4 4</IPT_NumHrsDesloc>
+<IPT_NumHrsInsp> 8 8</IPT_NumHrsInsp>
+</Dados>
+</rootelement>

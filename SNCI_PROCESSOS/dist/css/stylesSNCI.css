@@ -1,0 +1,236 @@
+.table-hover > tbody > tr:hover {
+        background-color: #FFD400;
+        z-index:1000!important;
+        position:relative!important;
+        top:4px!important;
+        left:4px!important;
+        box-shadow: 0 7px 14px rgb(0 0 0 / 25%), 0 3px 6px rgb(0 0 0 / 22%) !important;
+}
+
+div.dataTables_wrapper div.dataTables_length div.dataTables_filter select,label{
+    color:#0083ca!important;
+    border-color: #0083ca!important;
+}
+
+div.datatables_info{
+    color:#0083ca!important;
+}
+
+
+table.dataTable tbody>tr.selected{
+    background-color: #e83e8c!important;
+    z-index:1000!important;
+    font-weight: bold!important;   
+    color: #fff!important; 
+    position:relative!important;
+        top:4px!important;
+        left:4px!important;
+    box-shadow: 0 7px 14px rgb(0 0 0 / 25%), 0 3px 6px rgb(0 0 0 / 22%) !important;
+}
+
+
+table.dataTable tbody>tr.selected textarea, tr.selected pre{
+    color:#fff!important;
+}
+
+.custom-select-sm {
+    height: calc(1.8125rem + 2px);
+    padding-top: 0rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.5rem;
+    font-size: 100%;
+}
+
+.textareaTabMelhorias {
+    background: transparent;
+    border: 0;
+    outline: 0;
+    text-align: left;
+    width: 100%;
+    max-width: 100%;
+    vertical-align:middle!important;
+    text-align: justify;
+    color:#000;
+    
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    grid-gap: 2px;
+    background-color: #fff;
+}
+
+
+
+
+
+
+.textareaTab{
+    background: transparent;
+    border: 0;
+    outline: 0;
+    text-align: left;
+    width: 100%;
+    max-width: 100%;
+    vertical-align:middle!important;
+    text-align: justify;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+
+
+
+    
+
+.icoAnalise{
+    background-color: #6c757d;
+    color:#fff;
+    border-radius: 50%;
+    font-size: 16px;
+    height: 30px;
+    left: 18px;
+    line-height: 30px;
+    position: absolute;
+    text-align: center;
+    top: 0;
+    width: 30px;
+}
+
+.icoAnalise:before {
+    top: 7px;
+    position: relative;
+}
+
+.bg-blue {
+    background-color: #0083ca !important;
+}
+
+
+/* .dateSpanTimeline{
+    float:right;
+    border-radius: 4px;
+    display: inline-block;
+    font-weight: 600;
+    padding: 5px;
+    background-color:red;
+}
+
+.dateSpanPosic{
+    //float:right;
+    border-radius: 4px;
+    display: inline-block;
+    font-weight: 600;
+    padding: 5px;
+    background-color:#fff;
+} */
+
+.dataSpanPosic{
+    float:right;
+    color:#000;
+    position:relative;
+}
+
+.form-control{
+    font-size:0.8rem!important;
+}
+pre{
+    font-size: 1em;
+    white-space: pre-line;  
+    font-family: sans-serif;
+    --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+}
+
+.btExcel {
+    background: none;
+    padding: 0;
+    border: 0;
+    color:green;
+} 
+.btExcel:hover{
+    color:green;
+    background-color: transparent!important;
+}
+
+.btFiltro {
+    background: none;
+    padding: 0;
+    border: 0;
+    color:#0083ca;
+} 
+.btFiltro:hover{
+    color:#0083ca!important;
+    background-color: #fff!important;
+}
+
+
+.btSelecionarColuna {
+    background: #0083ca;
+    margin-left: 30px;
+    padding: 4px;
+    border: 0;
+    color:#fff;
+    border-radius: 5px!important;
+} 
+
+
+.statusOrientacoes{
+    -webkit-box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+    padding:4px;
+    border-radius:5px;
+}
+
+td{
+    vertical-align: middle!important;
+}
+
+.text-limita2linhas{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+.grow-icon {
+    transition: transform 0.2s ease; /* Define a transição para a animação */
+    cursor:pointer;
+}
+
+.grow-icon:hover {
+    transform: scale(1.4); /* Aumenta o tamanho do ícone em 40% */
+}
+.clickable-icon {
+    cursor: pointer; /* Altera o cursor para indicar que o ícone é clicável */
+}
+
+.clickable-icon:active {
+    transform: scale(0.9); /* Reduz o tamanho do ícone em 10% quando pressionado */
+}
+
+/*Para o Tour*/
+.grow-icon-tour{
+    transform: scale(1.4); /* Aumenta o tamanho do ícone em 40% */
+}
+
+
+/* Estilizando o scroll vertical */
+.body::-webkit-scrollbar {
+    width: 8px;
+}
+.body::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+.body::-webkit-scrollbar-thumb {
+    background: rgba(118, 117, 125, 0.7);
+    border-radius: 5px;
+}
+.body::-webkit-scrollbar-thumb:hover {
+    background: rgba(118, 117, 125, 0.7);
+}
+           

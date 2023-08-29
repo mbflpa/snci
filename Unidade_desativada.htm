@@ -1,0 +1,24 @@
+<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
+  <cfinclude template="aviso_sessao_encerrada.htm">
+	  <cfabort> 
+</cfif>
+<html>
+<head>
+<title>Sistema de Acompanhamento das Respostas das Auditorias</title>
+<style type="text/css">
+<!--
+.style1 {
+	color: #FF0000;
+	font-weight: bold;
+}
+-->
+</style>
+</head>
+<table>
+<body>
+     <br><br><br><br><br><br><br>	 
+     <div align="center" class="style1">Caro Analista, a agência está desativada no cadastro de unidades!!! </div><br><br>
+	 <tr><td  width="5%" align="center"><input type="button" class="botao" onClick="window.close()" value="Fechar"></td></tr>
+</body> 
+</table>
+</html>

@@ -1,0 +1,108 @@
+/* Estilo para o Control Sidebar */
+.control-sidebar {
+    background-image: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.3));
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    border-left: 1px solid #e1e1e1;
+}
+.control-sidebar h4 {
+    color: #0083ca;
+}
+.control-sidebar .btn-close-sidebar {
+    font-size: 0.675rem;
+    padding: 0.25rem 0.5rem;
+    color: #aaa;
+    transition: color 0.3s ease;
+}
+.control-sidebar .btn-close-sidebar:hover {
+    color: #777;
+}
+
+/* Estilos para o SearchPanes */
+div.dtsp-topRow.dtsp-bordered{
+    border: none!important;
+}
+div.dtsp-panesContainer {
+    background-color: rgba(255, 255, 255);
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d1d3e2;
+    padding: 10px!important;
+    border-radius: 10px;
+}
+div.dtsp-panesContainer div.dtsp-searchPanes div.dtsp-searchPane {
+    font-size: 12px !important;
+    padding: 10px;
+    border-bottom: 1px solid #e1e1e1;
+    background-color: rgba(255, 255, 255);
+    color: #333;
+    transition: background-color 0.3s ease;
+    border-radius: 10px;
+}
+div.dtsp-panesContainer div.dtsp-searchPanes div.dtsp-searchPane:hover {
+    background-color: #e1e1e1;
+}
+input.dtsp-paneInputButton {
+    background-color: #6c757d !important;
+    color: #fff !important;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    transition: background-color 0.3s ease;
+}
+input.dtsp-paneInputButton::placeholder {
+    color: #fff !important;
+    opacity: 0.8;
+}
+input.dtsp-paneInputButton:hover {
+    background-color: #0069a8 !important;
+}
+
+/* Estilo para as linhas selecionadas nos painéis de filtro */
+div.dtsp-panesContainer div.dtsp-searchPanes div.dataTables_scrollBody tr.selected {
+    background-color: #0083ca!important; /* Cor de fundo da linha selecionada */
+    font-weight: bold!important;
+    color: #fff!important;
+    box-shadow: 0 7px 14px rgb(0 0 0 / 25%), 0 3px 6px rgb(0 0 0 / 22%)!important;
+}
+
+/* Estilizando o scroll vertical */
+.control-sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+.control-sidebar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+.control-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(118, 117, 125, 0.7);
+    border-radius: 5px;
+}
+.control-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(118, 117, 125, 0.7);
+}
+
+/* Estilo para quando a tabela estiver filtrada */
+.tabelaFiltrada {
+    color: #fff;
+    font-weight: bold;
+    font-size: 12px;
+    background-color: #dc3545;
+    padding: 5px 10px 7px 10px;
+    border-radius: 5px;
+    display: inline-block;
+    margin-left: -8px;
+    float: none;
+    padding-top: 0.6em!important;
+    box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+}
+
+/* Estilo para a tabela. Posiciona a paginação na esquerda */
+.pagination {
+    float: left!important;
+}
+.dataTables_length{
+    margin-right: 34px!important;
+}
+.dataTables_length label {
+    display: flex;
+    align-items: center;
+}

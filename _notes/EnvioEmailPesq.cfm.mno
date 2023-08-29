@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_rsQuest" value="name:numero;datatype:" />
+	<infoitem key="UD_rsEmail" value="name:Und_Descricao;datatype:,name:Und_Email;datatype:,name:Pos_Parecer;datatype:" />
+</info>

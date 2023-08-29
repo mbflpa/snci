@@ -1,0 +1,37 @@
+<cfprocessingdirective pageencoding = "utf-8">
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>SNCI</title>
+		<link rel="icon" type="image/x-icon" href="dist/img/icone_sistema_standalone_ico.png">  
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+        <!-- Theme style -->
+        <link rel="stylesheet" href="dist/css/adminlte.css">
+       
+	</head>	
+
+	<body style="overflow:hidden">
+		<div style="position:relative;display:flex;flex-direction:column;align-items: center;margin-top:100px;overflow:hidden">
+			<i class="fa fa-exclamation-triangle fa-6x " style="color:red" aria-hidden="true"></i><br>
+			<span id="pagina" style="font-size:25px"></span><br>
+			<span style="font-size:25px">Você não tem acesso a esta página do SNCI (Módulo: Processos).</span><br>
+			<span style="font-size:20px">Provavelmente o seu perfil não permite a visualização desta página.</span>
+			<span style="font-size:20px">Caso necessite de acesso a esta página, contate a área de controle interno da sua SE ou CS.</span>
+		</div>
+	</body>
+	<script src="plugins/jquery/jquery.min.js"></script>
+	
+<script>
+	$(window).on("load",function(){
+		const urlParams = new URLSearchParams(window.location.search)
+		$('#pagina').html('Página: <strong>' + urlParams.get("pagina") + '</strong>');
+	});
+</script>
+					 
+
+</html>

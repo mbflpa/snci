@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_rsSint" value="name:RIP_Unidade;datatype:,name:RIP_NumInspecao;datatype:,name:total;datatype:,name:Und_Descricao;datatype:" />
+	<infoitem key="UD_rsSint2" value="name:total;datatype:" />
+</info>

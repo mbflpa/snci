@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<info>
+	<infoitem key="UD_rsTipoC" value="name:TotalC;datatype:" />
+	<infoitem key="UD_rsTipoE" value="name:TotalE;datatype:" />
+	<infoitem key="UD_rsTipoN" value="name:TotalN;datatype:" />
+	<infoitem key="UD_rsTipoV" value="name:TotalV;datatype:" />
+	<infoitem key="UD_rsTodos" value="name:INP_DtInicInspecao;datatype:,name:Und_Descricao;datatype:,name:RIP_NumInspecao;datatype:,name:INP_Unidade;datatype:,name:TotalC;datatype:" />
+</info>
