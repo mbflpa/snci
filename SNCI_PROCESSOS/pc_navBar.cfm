@@ -8,7 +8,7 @@
 					<a class="nav-link " data-widget="pushmenu" data-enable-remember="true" href="#" role="button"><i class="fas fa-bars"  style="font-size:2rem;"></i></a>
 				</li>
 
-				<cfif auxsite neq "intranetsistemaspe">
+				<cfif auxsite neq "intranetsistemaspe...">
 					<div >
 						<cfif auxsite eq "desenvolvimentope">
 							<h3 class="nav-link" style="position:relative;top:5px;color:red"><cfoutput>SERVIDOR DE DESENVOLVIMENTO...</cfoutput></h3>
