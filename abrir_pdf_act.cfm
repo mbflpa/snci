@@ -14,7 +14,7 @@
 <body>
 
 <cftry>
-<!--- <cfoutput>#ucase(left(trim(url.arquivo),29))#<BR></cfoutput> --->
+<!--- <cfoutput>#ucase(left(trim(url.arquivo),29))#<BR></cfoutput> teste--->
 <cfif isDefined("url.arquivo")>
     <cfif ucase(left(trim(url.arquivo),24)) is "\\SAC0424\SISTEMAS\SNCI\" >
 	  <cfset vArquivo = url.arquivo>
