@@ -13,7 +13,7 @@
 						<cfif auxsite eq "desenvolvimentope">
 							<h3 class="nav-link" style="position:relative;top:5px;color:red"><cfoutput>SERVIDOR DE DESENVOLVIMENTO</cfoutput></h3>
 						<cfelse>
-							<h3 class="nav-link" style="position:relative;top:5px;color:red"><cfoutput>SERVIDOR DE HOMOLOGAÇÃO...</cfoutput></h3>
+							<h3 class="nav-link" style="position:relative;top:5px;color:red"><cfoutput>SERVIDOR DE HOMOLOGAÇÃO</cfoutput></h3>
 						</cfif>
 					</div>
 				</cfif>
