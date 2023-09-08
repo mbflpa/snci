@@ -9,7 +9,7 @@
 
 <!--- Criação do registro de log em formato CSV --->
 <cfset sdata = dateformat(now(),"YYYYMMDDHH")>
-<cfset diretorio ="\\sac1887\sistemas$\GMAT01\Pernambuco\SNCI\">
+<cfset diretorio ="\\sac3162\PERNAMBUCO\SNCI\">
 <cfset slocal = #diretorio# & 'Dados\'>
 <cfset sarquivo = 'REG_LOG_SNCI.csv'>
 <cfif fileExists(#slocal# & sarquivo)>
