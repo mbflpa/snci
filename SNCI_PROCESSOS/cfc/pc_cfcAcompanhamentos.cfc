@@ -2781,11 +2781,12 @@
 											<div id="actions" class="row" >
 												<div class="col-lg-12" align="left">
 													<div class="btn-group w-30">
-													
-															<span id="anexosAcomp" class="btn btn-success col fileinput-button" style="background:#0083CA">
-																<i class="fas fa-upload"></i>
-																<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
-															</span>
+													        <cfif directoryExists(diretorio_anexos)>
+																<span id="anexosAcomp" class="btn btn-success col fileinput-button" style="background:#0083CA">
+																	<i class="fas fa-upload"></i>
+																	<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
+																</span>
+															</cfif>
 														
 													</div>
 												</div>
@@ -3612,12 +3613,12 @@
 										<div id="actions" class="row" >
 											<div class="col-lg-12" align="left">
 												<div class="btn-group w-30">
-												
+												    <cfif directoryExists(diretorio_anexos)>
 														<span id="anexosAcomp" class="btn btn-success col fileinput-button" style="background:#0083CA">
 															<i class="fas fa-upload"></i>
 															<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
 														</span>
-													
+													</cfif>
 												</div>
 											</div>
 										</div>
