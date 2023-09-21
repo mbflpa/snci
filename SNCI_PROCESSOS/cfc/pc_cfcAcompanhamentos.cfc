@@ -425,7 +425,7 @@
 									$('#informacoesItensAcompanhamentoDiv').html('')	
 									var mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">'+idOrientacao+'</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla+'</span> com sucesso!<br><br><span style="color:#00416B;font-size:0.8em;"><strong>Atenção:</strong> Como a gerência que analisará esta orientação não é a sua gerência de lotação, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
 									$('#modalOverlay').delay(1000).hide(0, function() {
-										Swal.fire(mensagemSucessos,'','success')
+										toastr.success('Operação realizada com sucesso!');
 										$('#modalOverlay').modal('hide');
 									});	
 													
@@ -544,6 +544,7 @@
 		<cfquery datasource="#dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#"> 
 		</cfquery>
+		
 
 		<session class="content-header"  >
 					
@@ -579,6 +580,13 @@
 						WHERE  pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#"> 
 						and pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idOrientacao#">	 													
 					</cfquery>	
+
+					<cfquery name="rs_OrgAvaliado" datasource="#dsn_processos#">
+						SELECT pc_orgaos.*FROM pc_orgaos
+						WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#'  
+								or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#'))
+						ORDER BY pc_org_sigla
+					</cfquery>
 
 
 				
@@ -809,15 +817,89 @@
 					</div>
 				
 				</form><!-- fim formCadAvaliacao -->
-			</session><!-- fim card-body2 -->	
 					
-			<cfobject component = "pc_cfcAcompanhamentos" name = "timeline">
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
-				<cfinvoke component="#timeline#" method="timelineViewAcomp" returnVariable="timeline" pc_aval_orientacao_id = "#arguments.idOrientacao#">
-			<cfelse>
-				<cfinvoke component="#timeline#" method="timelineViewAcompOrgaoAvaliado" returnVariable="timeline" pc_aval_orientacao_id = "#arguments.idOrientacao#">
-			</cfif>
+				<!--Inseri as tab de acompanhamento e distribuição se o a lotação do usuário for um órgão-->	
+				<cfif rsUsuario.pc_org_controle_interno eq 'S'>
+					<cfset timelineViewAcomp(arguments.idOrientacao)>
+				<cfelse>
+					<cfif rsUsuario.pc_org_mcu eq rsProcAval.pc_num_orgao_avaliado>
+						<cfset timelineViewAcompOrgaoAvaliado(arguments.idOrientacao)>
+						<div class="row" style="margin-bottom:50px">
+							<div class="col-md-12">
+							<div class="card-header col-md-8 alertaDivMagenta"  >
+										
+									<p>Senhor(a) gestor(a),</p>
+									<p>Escolha a seguir entre as opções MANIFESTAÇÃO ou DISTRIBUIÇÃO.<br>
+										A opção "MANIFESTAÇÃO" possibilita o registro da resposta diretamente por esse gestor para envio ao Controle Interno.<br>
+										A opção de “DISTRIBUIÇÃO” possibilita o encaminhamento da ORIENTAÇÃO/MEDIDA DE REGULARIZAÇÃO e/ou PROPOSTA DE MELHORIA para 
+										manifestação das áreas subordinadas a essa SE/Departamento. Essa distribuição poderá ser feita para até quatro áreas se a situação
+										envolver órgãos distintos. Nesse caso o acompanhamento será desdobrado conforme encaminhamento realizado. Não havendo a necessidade 
+										de distribuição, escolher a opção MANIFESTAÇÃO.
+									</p>
+								</div>
+								<div class="card card-primary card-tabs" style="widht:100%">
+									
+									<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+									
+										<ul class="nav nav-tabs">
+										<li class="nav-item">
+											<a class="nav-link" id="tab-manifestacao" data-toggle="tab" href="#content-manifestacao" style="font-size:20px">Manifestação</a>
+										</li>
+										<li class="nav-item">
+											<a class="nav-link" id="tab-distribuicao" data-toggle="tab" href="#content-distribuicao" style="font-size:20px">Distribuição</a>
+										</li>
+										</ul>
+									</div>
+									<div class="card-body">
+										<div class="tab-content">
+											<div class="tab-pane fade " id="content-manifestacao">
+												<cfset formPosicionamentoOrgaoAvaliado(arguments.idOrientacao)>
+											</div>
+											<div class="tab-pane fade" id="content-distribuicao">
+												<div id="pcOrgaoRespDistribuicaoDiv" class="col-sm-8" >
+													<div class="form-group">
+														<label    for="pcOrgaoRespDistribuicao">
+															<div class="alertaDivMagenta" >Senhor(a) gestor(a), <br>
+																Selecione, a seguir, as áreas para as quais pretende distribuir esse item para 
+																manifestação. Antes da distribuição orientamos a ler atentamente a situação encontrada 
+																de modo a melhor identificar a área responsável para tratamento do item. Se necessário, 
+																o mesmo pode ser direcionado, simultaneamente, para até 04 áreas.<br>
+																Informe, também, suas orientações para resposta da(s) área(s) subordinada(s).<br>
+															</div>
+																<i style="font-weight: normal;">Dica: Para selecionar mais de uma área, mantenha a tecla "Ctrl" pressionada enquanto seleciona.</i>
+														</label>
+														<select id="pcOrgaoRespDistribuicao" required="" name="pcOrgaoRespDistribuicao" class="form-control" multiple="multiple"  >
+															<cfoutput query="rs_OrgAvaliado">
+																<option value="#pc_org_mcu#">#pc_org_sigla#</option>
+															</cfoutput>
+														</select>
+													</div>
+												</div>
+												<div  class="col-sm-12" >
+													<div class="form-group">
+														<label   for="pcOrientacaoResposta">Orientações para resposta:</label>
+														<textarea class="form-control" id="pcOrientacaoResposta" rows="4" required=""  name="pcOrientacaoResposta" class="form-control"></textarea>
+													</div>										
+												</div>
+												<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
+													<div >
+														<button id="btEnviarDistribuicao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Distribuir</button>
+													</div>
+												</div>	
+											</div>
+										</div>
+									</div>
+							</div>
+						</div>
+					<cfelse>
+						<cfset timelineViewAcompOrgaoAvaliado(arguments.idOrientacao)>
+						<cfset formPosicionamentoOrgaoAvaliado(arguments.idOrientacao)>
+					</cfif>
 
+
+					
+				</cfif>
+			</session><!-- fim card-body2 -->	
 					
 		</session>
 
@@ -826,15 +908,43 @@
 		
 
 			$(document).ready(function() {	
-				 
+				//Initialize Select2 Elements
+				$('select').select2({
+					theme: 'bootstrap4',
+					placeholder: 'Selecione...'
+				});
+				// Monitora o select de distribuição para permitir a seleção de até 4 órgãos
+				// Monitora o evento de mudança no elemento com id "pcOrgaoRespDistribuicao"
+				$('#pcOrgaoRespDistribuicao').on('change', function(e) {
+					var selectedOptions = $(this).val();
+					var maxAllowedOptions = 4;
+
+					if ((!e.ctrlKey && selectedOptions.length > maxAllowedOptions) || (e.ctrlKey && selectedOptions.length >= maxAllowedOptions)) {
+						// Desabilita as opções não selecionadas se exceder o limite
+						$(this).find('option:not(:selected)').prop('disabled', true);
+
+						// Verifica se excedeu o limite após o change
+						if (selectedOptions.length > maxAllowedOptions) {
+							// Remove a última opção selecionada
+							var lastSelectedOption = selectedOptions[selectedOptions.length - 1];
+							$(this).find('option[value="' + lastSelectedOption + '"]').prop('selected', false);
+
+							// Exibe um alerta
+							Swal.fire('Você não pode selecionar mais do que ' + maxAllowedOptions + ' áreas.', '', 'error');
+						}
+					} else {
+						// Ativa todas as opções
+						$(this).find('option').prop('disabled', false);
+					}
+
+					$(this).trigger('change.select2');
+				});
+
 				<cfoutput>
 					var pc_aval_status = '#rsProcAval.pc_aval_status#'
 				</cfoutput>
 				mostraRelatoPDF();
 				mostraTabAnexos();
-				//mostraTabOrientacoes();
-				//mostraTabMelhorias();
-
 
 				$('#start-tour2').on('click', function() {
 					hopscotch.endTour();
@@ -1128,15 +1238,78 @@
 
 			})
 
-			$(function () {
-				$('[data-mask]').inputmask()
-			})
+			// $(function () {
+			// 	$('[data-mask]').inputmask()
+			// })
+
+			
+
 
 
 			<cfoutput>
 				var pc_aval_id = '#rsProcAval.pc_aval_id#'
 				var pc_orientacao_id = '#rsProcAval.pc_aval_orientacao_id#'
 			</cfoutput>
+
+			$('#btEnviarDistribuicao').on('click', function (event)  {
+				event.preventDefault()
+				event.stopPropagation()
+                
+				if ($('#pcOrgaoRespDistribuicao').val().length == 0){
+					Swal.fire('Informe, pelo menos, uma área para distribuição.', '', 'error')
+					return false;
+				}
+
+				if ($('#pcOrientacaoResposta').val().length == 0){
+					Swal.fire('Informe uma orientação para a resposta da(s) área(s).', '', 'error')
+					return false;
+				}
+				swalWithBootstrapButtons.fire({//sweetalert2
+					html: logoSNCIsweetalert2("Deseja distribuir a orientação para as áreas selecionadas?"),
+					showCancelButton: true,
+					confirmButtonText: 'Sim!',
+					cancelButtonText: 'Cancelar!',
+					}).then((result) => {
+						if (result.isConfirmed) {
+							$('#modalOverlay').modal('show');
+							setTimeout(function() {
+								//inicio ajax
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									data:{
+										method: "distribuirOrientacoes",
+										pc_aval_orientacao_id: pc_orientacao_id,
+										pcAreasDistribuir: $('#pcOrgaoRespDistribuicao').val().join(','),
+										pcOrientacaoResposta: $('#pcOrientacaoResposta').val()
+									},
+									async: false
+								})//fim ajax
+								.done(function(result) {
+									
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										toastr.success('Distribuição realizada com sucesso!');
+										$('#modalOverlay').modal('hide');
+										location.reload();
+									});
+									
+								})//fim done
+								.fail(function(xhr, ajaxOptions, thrownError) {
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+									$('#modal-danger').modal('show')
+									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+									$('#modal-danger').find('.modal-body').text(thrownError)
+
+								})//fim fail
+							}, 1000);		
+						} else if (result.dismiss === Swal.DismissReason.cancel) {
+							Swal.fire('Operação cancelada!', '', 'error')
+						}
+					})//fim sweetalert2		
+
+			});
 
 			function mostraTabAnexos(){
 				$.ajax({
@@ -1199,9 +1372,98 @@
 
     </cffunction>
 
+	<cffunction name="distribuirOrientacoes" returntype="any" access="remote" hint="Distribui as oreintações para áreas selecionadas pelo órgão avaliado.">
+		<cfargument name="pc_aval_orientacao_id" type="string" required="true" />
+		<cfargument name="pcAreasDistribuir" type="any" required="true" />
+		<cfargument name="pcOrientacaoResposta" type="string" required="true" />
+
+		<cfquery name="rsOrientacao" datasource="#dsn_processos#">
+			SELECT * FROM pc_avaliacao_orientacoes
+			WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+		</cfquery>
+
+		<cfquery name="rsPosicionamentosParaReplicacao" datasource="#dsn_processos#">
+			SELECT * FROM pc_avaliacao_posicionamentos
+			WHERE pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+		</cfquery>
+
+		<cftransaction>
+
+			<cfquery datasource="#dsn_processos#">
+				UPDATE pc_avaliacao_orientacoes
+				SET pc_aval_orientacao_distribuido = 1
+				WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+			</cfquery>
 
 
-	<cffunction name="tabMelhoriasPendentes" returntype="any" access="remote" hint="Criar a tabela das propostas de melhoria e envia para a página pcAcompanhamento.cfm">
+			
+
+			<cfset firstItem = ListFirst(arguments.pcAreasDistribuir)><!-- Primeiro elemento da lista -->
+			<cfset dataPrevista = rsOrientacao.pc_aval_orientacao_dataPrevistaResp>
+			<cfset posic_status = rsOrientacao.pc_aval_orientacao_status>
+			<cfloop list="#arguments.pcAreasDistribuir#" index="i">
+				<!-- Atualização para o primeiro elemento -->
+				<cfif i eq firstItem>
+					<!-- Atualização para a priemira área selecionada -->
+					<cfquery datasource="#dsn_processos#">
+						UPDATE pc_avaliacao_orientacoes
+						SET
+							pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
+							pc_aval_orientacao_atualiz_login = '#cgi.REMOTE_USER#',
+							pc_aval_orientacao_status_datahora = CONVERT(char, GETDATE(), 120),
+							pc_aval_orientacao_distribuido = 1
+						WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+					</cfquery>
+					
+					<!--Insere a manifestação inicial do controle interno para a orientação com a mesma data prevista e status da orientação original do órgão avaliado -->
+					<cfset orgaoResp = '#i#'>
+					<cfquery datasource="#dsn_processos#">
+						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
+						VALUES (<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,CONVERT(char, GETDATE(), 120),'#rsUsuario.pc_usu_matricula#','#rsUsuario.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#',#posic_status#)
+					</cfquery>
+
+				
+				<cfelse>
+					<!-- Inserção para as outras áreas selecionadas -->
+					<cfquery datasource="#dsn_processos#" name="rsInserirOrientacao">
+						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_dataPrevistaResp, pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login, pc_aval_orientacao_distribuido)
+						VALUES ('#dataPrevista#', #posic_status#, CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#',#rsOrientacao.pc_aval_orientacao_num_aval#, '#rsOrientacao.pc_aval_orientacao_descricao#','#i#',  CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#', 1)
+						SELECT SCOPE_IDENTITY() AS idOrientacao;
+					</cfquery>
+					 <cfset insertedIdOrientacao = rsInserirOrientacao.idOrientacao> <!-- Obtém o ID gerado -->
+
+					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
+					<cfset orgaoResp = '#i#'>
+					<cfquery datasource="#dsn_processos#">
+						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
+						VALUES (#insertedIdOrientacao#, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,CONVERT(char, GETDATE(), 120),'#rsUsuario.pc_usu_matricula#','#rsUsuario.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#', #posic_status#)
+					</cfquery>
+					<!-- Replica as manifestações da orientação original para as orientações distribuídas -->
+					<cfoutput query = "rsPosicionamentosParaReplicacao">
+						<cfquery datasource="#dsn_processos#">
+							INSERT pc_avaliacao_posicionamentos (pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
+							VALUES (#insertedIdOrientacao#, '#pc_aval_posic_texto#', '#pc_aval_posic_datahora#', '#pc_aval_posic_matricula#', '#pc_aval_posic_num_orgao#', '#pc_aval_posic_num_orgaoResp#', '#pc_aval_posic_dataPrevistaResp#', #pc_aval_posic_status#)
+						</cfquery>
+					</cfoutput>
+						
+					
+				</cfif>
+
+			</cfloop>
+
+		</cftransaction>
+
+
+	</cffunction>
+
+
+
+
+
+
+
+
+	<cffunction name="tabMelhoriasPendentes" access="remote" hint="Criar a tabela das propostas de melhoria e envia para a página pcAcompanhamento.cfm">
 		
 		<cfquery name="rsMelhoriasPendentes" datasource="#dsn_processos#">
 			SELECT pc_avaliacao_melhorias.*, pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_num_sei
@@ -1421,7 +1683,7 @@
 		<div class="card-header" style="background-color:#ececec;" >
 			<div class="row" style="font-size: 1em;">
 
-				<div class="col-sm-3">
+				<div class="col-sm-2">
 					<div class="form-group">
 						<label  for="pcStatusMelhoria">Status:</label>
 						<select id="pcStatusMelhoria" required="" name="pcStatusMelhoria" class="form-control"  >
@@ -1441,12 +1703,12 @@
 						</div>
 					</div>
 				</div>
-
-				<div id="pcOrgaoRespSugeridoMelhoriaDiv" class="col-sm-4" hidden>
+				<br>
+				<div id="pcOrgaoRespSugeridoMelhoriaDiv" class="col-sm-7" hidden>
 					<div class="form-group">
-						<label    for="pcOrgaoRespSugeridoMelhoria">Órgão Responsável Sugerido pelo órgão:</label>
-						<select id="pcOrgaoRespSugeridoMelhoria" required="" name="pcOrgaoRespSugeridoMelhoria" class="form-control"  >
-							<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
+						<label    for="pcOrgaoRespSugeridoMelhoria">Selecione, a seguir, as áreas para as quais pretende distribuir (04 no máximo):</label>
+						
+						<select id="pcOrgaoRespSugeridoMelhoria" required="" name="pcOrgaoRespSugeridoMelhoria" class="form-control" multiple="multiple"  >
 							<cfoutput query="rs_OrgAvaliado">
 								<option value="#pc_org_mcu#">#pc_org_sigla#</option>
 							</cfoutput>
@@ -1482,9 +1744,37 @@
 		</div>
 
 		<script language="JavaScript">
-			$(function () {
-				$('[data-mask]').inputmask()
-			})
+
+
+			
+			
+
+			// Monitora o select de distribuição para permitir a seleção de até 4 órgãos
+			// Monitora o evento de mudança no elemento com id "pcOrgaoRespSugeridoMelhoria"
+			$('#pcOrgaoRespSugeridoMelhoria').on('change', function(e) {
+				var selectedOptions = $(this).val();
+				var maxAllowedOptions = 4;
+
+				if ((!e.ctrlKey && selectedOptions.length > maxAllowedOptions) || (e.ctrlKey && selectedOptions.length >= maxAllowedOptions)) {
+					// Desabilita as opções não selecionadas se exceder o limite
+					$(this).find('option:not(:selected)').prop('disabled', true);
+
+					// Verifica se excedeu o limite após o change
+					if (selectedOptions.length > maxAllowedOptions) {
+						// Remove a última opção selecionada
+						var lastSelectedOption = selectedOptions[selectedOptions.length - 1];
+						$(this).find('option[value="' + lastSelectedOption + '"]').prop('selected', false);
+
+						// Exibe um alerta
+						Swal.fire('Você não pode selecionar mais do que ' + maxAllowedOptions + ' áreas.', '', 'error');
+					}
+				} else {
+					// Ativa todas as opções
+					$(this).find('option').prop('disabled', false);
+				}
+
+				$(this).trigger('change.select2');
+			});
 
 			$('#pcStatusMelhoria').on('change', function (event)  {
 
@@ -1520,6 +1810,10 @@
 						$('#pcOrgaoRespSugeridoMelhoriaDiv').attr('hidden', false)	
 					}
 					$('#pcRecusaJustMelhoria').val('')
+					$('#pcOrgaoRespSugeridoMelhoria').select2({
+						theme: 'bootstrap4',
+						placeholder: 'Selecione, no máximo, 04 áreas para distribuir esta Prop. de Melhoria...'
+					});
 				}
 				
 
@@ -1578,7 +1872,7 @@
 							pc_aval_melhoria_status:$('#pcStatusMelhoria').val(),
 							pc_aval_melhoria_dataPrev: $('#pcDataPrev').val(),
 							pc_aval_melhoria_sugestao: $('#pcNovaAcaoMelhoria').val(),
-							pc_aval_melhoria_sug_orgao_mcu:$('#pcOrgaoRespSugeridoMelhoria').val(),
+							pc_aval_melhoria_sug_orgao_mcu:$('#pcOrgaoRespSugeridoMelhoria').val().join(','),
 							pc_aval_melhoria_naoAceita_justif:$('#pcRecusaJustMelhoria').val()
 						},
 						async: false
@@ -1996,9 +2290,9 @@
 				
 			})
 
-			$(function () {
-				$('[data-mask]').inputmask()
-			})
+			// $(function () {
+			// 	$('[data-mask]').inputmask()
+			// })
 
 
 		</script>
@@ -2021,23 +2315,56 @@
 		<cfargument name="pc_aval_melhoria_naoAceita_justif" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_status" type="string"  required="false"  default=""/>
 		
-	
-		<cfquery datasource="#dsn_processos#" >
-			UPDATE pc_avaliacao_melhorias
-			SET 				
-				pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
-				pc_aval_melhoria_sug_orgao_mcu = <cfqueryparam value="#arguments.pc_aval_melhoria_sug_orgao_mcu#" cfsqltype="cf_sql_varchar">,
-				pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
-				pc_aval_melhoria_sug_matricula = <cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-				pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
-				pc_aval_melhoria_sug_datahora = CONVERT(char, GETDATE(), 120),
-				<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
-					pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
-				<cfelse>
-					pc_aval_melhoria_dataPrev = null
-				</cfif>
-			WHERE  pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">	
-		</cfquery>
+	    <cfset firstItem = ListFirst(arguments.pc_aval_melhoria_sug_orgao_mcu)><!-- Primeiro elemento da lista -->
+		
+		<cfloop list="#arguments.pc_aval_melhoria_sug_orgao_mcu#" index="i">
+			<!-- Atualização para o primeiro elemento -->
+			<cfif i eq firstItem>
+
+				<cfquery datasource="#dsn_processos#" >
+					UPDATE pc_avaliacao_melhorias
+					SET 				
+						pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_sug_orgao_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_sug_matricula = <cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_sug_datahora = CONVERT(char, GETDATE(), 120),
+						<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
+							pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
+						<cfelse>
+							pc_aval_melhoria_dataPrev = null
+						</cfif>
+					WHERE  pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">	
+				</cfquery>
+
+			<cfelse>
+				<!-- Inserção para as outras áreas selecionadas -->
+				<cfquery datasource="#dsn_processos#" >
+					insert pc_avaliacao_melhorias (pc_aval_melhoria_num_aval, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif, pc_aval_melhoria_sug_matricula, pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora, pc_aval_melhoria_dataPrev)
+					value( 	
+						pc_aval_melhoria_num_aval = <cfqueryparam value="#arguments.pc_aval_id#" cfsqltype="cf_sql_numeric">,			
+						pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_sug_orgao_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_sug_matricula = <cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_sug_datahora = CONVERT(char, GETDATE(), 120),
+						<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
+							pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
+						<cfelse>
+							pc_aval_melhoria_dataPrev = null
+						</cfif>
+					)
+				</cfquery>
+
+
+			</cfif>
+
+		</cfloop>
+
+
+
 		
   	</cffunction>
 
@@ -2959,6 +3286,7 @@
 								, pc_classificacoes.pc_class_descricao,  pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu, pc_avaliacao_orientacoes.*,
 								pc_orgao_OrientacaoResp.pc_org_sigla as orgaoRespOrientacao, pc_orgao_OrientacaoResp.pc_org_mcu as mcuOrgaoRespOrientacao
 								,pc_orgaos_heranca.*, pc_orgaos_2.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_2.pc_org_se_sigla as seOrgRespHerdeiro
+								
 						
 
 			FROM        pc_processos INNER JOIN
@@ -3119,7 +3447,12 @@
 														<div class="card-header" style="background-color: ##ececec;">
 														<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
-															</button></i>De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+															</button></i>
+																<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0'>
+															   		De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+																<cfelse>
+																	De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
+																</cfif>
 														</a>
 														
 														</div>
@@ -3198,6 +3531,55 @@
 				
             </div>
 			
+
+		<script language="JavaScript">
+
+			
+			
+
+			$('#btRecolherPosic').on('click', function (event)  {
+
+				if($('#btRecolherPosic').hasClass('fa-eye-slash')){
+					$('.posicContInterno').CardWidget('collapse')
+					$('.posicOrgAvaliado').CardWidget('collapse')
+					$('#btRecolherPosic').removeClass('fa-eye-slash')
+					$('#btRecolherPosic').addClass('fa-eye')
+					$('#btRecolherPosic').attr('title','Expandir todos os posicionamentos')
+				}else{
+					$('.posicContInterno').CardWidget('expand')
+					$('.posicOrgAvaliado').CardWidget('expand')
+					$('#btRecolherPosic').removeClass('fa-eye')
+					$('#btRecolherPosic').addClass('fa-eye-slash')
+					$('#btRecolherPosic').attr('title','Recolher todos os posicionamentos')
+
+				}
+		    });
+
+			
+
+
+			$(document).ready(function() {
+
+				$('.posicContInterno').CardWidget('expand')
+				$('.posicOrgAvaliado').CardWidget('expand')
+				$('#btRecolherPosic').removeClass('fa-eye')
+				$('#btRecolherPosic').addClass('fa-eye-slash')
+				
+				
+				
+			})
+				
+			
+		</script>
+
+
+
+
+
+	</cffunction>
+
+	<cffunction name="formPosicionamentoOrgaoAvaliado"   access="remote" hint="enviar o componente para a páginas pc_Acompanhamento chama pela função tabAvaliacoesAcompanhamento">
+		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 			
 				<div id="accordionCadItemPainel" style="margin-top:30px;hright:100vh">
 					<div class="card card-success" style="margin-bottom:10px">
@@ -3208,14 +3590,7 @@
 								</a>
 							</h4>
 						</div>
-						<div id="collapseTwo" class="" data-parent="#accordion">
-							<div class="card-body" >
-							<div class="tab-content" id="custom-tabs-one-tabContent">
-								<!--Editor-->
-								
-								<!--Fim Editor-->
-							</div> 
-						</div>
+						
 						<div class="row" style="margin-left:8px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
@@ -3224,30 +3599,7 @@
 								</div>										
 							</div>
 
-							<!--
-							<cfquery datasource="#dsn_processos#" name="rsOrientacaoStatus">
-								SELECT pc_orientacao_status.pc_orientacao_status_id, pc_orientacao_status.pc_orientacao_status_descricao FROM pc_orientacao_status WHERE pc_orientacao_status_id =5
-							</cfquery>
-							<div class="col-sm-3" >
-								<div class="form-group">
-								<label for="pcOrientacaoStatus">Status</label>
-								<select id="pcOrientacaoStatus" required="" name="pcOrientacaoStatus" class="form-control" style="height:35px">
-									<option selected=""  value="">Selecione o status...</option>
-									<cfoutput query="rsOrientacaoStatus">
-										<option value="#pc_orientacao_status_id#">#pc_orientacao_status_descricao#</option>
-									</cfoutput>
-								</select>
-								</div>
-							</div>
-
-							<div id ="pcDataPrevRespAcompDiv" class="col-md-2" hidden>
-								<div class="form-group">
-								<label for="pcDataPrevRespAcomp">Prazo Resposta:</label>
-								<div class="input-group date" id="reservationdate" data-target-input="nearest">
-									<input  id="pcDataPrevRespAcomp"  name="pcDataPrevRespAcomp" required=""  type="date" class="form-control" placeholder="dd/mm/aaaa" style="height:35px" >
-								</div>
-								</div>
-							</div>-->
+						
 							
 						</div>
 
@@ -3338,23 +3690,7 @@
 			}
 			
 
-			$('#btRecolherPosic').on('click', function (event)  {
-
-				if($('#btRecolherPosic').hasClass('fa-eye-slash')){
-					$('.posicContInterno').CardWidget('collapse')
-					$('.posicOrgAvaliado').CardWidget('collapse')
-					$('#btRecolherPosic').removeClass('fa-eye-slash')
-					$('#btRecolherPosic').addClass('fa-eye')
-					$('#btRecolherPosic').attr('title','Expandir todos os posicionamentos')
-				}else{
-					$('.posicContInterno').CardWidget('expand')
-					$('.posicOrgAvaliado').CardWidget('expand')
-					$('#btRecolherPosic').removeClass('fa-eye')
-					$('#btRecolherPosic').addClass('fa-eye-slash')
-					$('#btRecolherPosic').attr('title','Recolher todos os posicionamentos')
-
-				}
-		    });
+			
 
 			$('#pcOrientacaoStatus').on('change', function (event)  {
 				if ($('#pcOrientacaoStatus').val() == 5 ){
@@ -3367,10 +3703,7 @@
 
 			$(document).ready(function() {
 
-				$('.posicContInterno').CardWidget('expand')
-				$('.posicOrgAvaliado').CardWidget('expand')
-				$('#btRecolherPosic').removeClass('fa-eye')
-				$('#btRecolherPosic').addClass('fa-eye-slash')
+			
 				mostraTabAnexosOrientacoes();
 				<cfoutput>
 					var pc_anexo_avaliacao_id = '#rsProc.pc_aval_id#';
