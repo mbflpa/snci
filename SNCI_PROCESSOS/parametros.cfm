@@ -3,17 +3,19 @@
 <cfset dsn_processos = 'DBSNCI'>
 <!--- Diretório onde serão armazenados arquivos anexados a avaliações --->
 <cfset auxsite =  cgi.server_name>
-	  <cfif auxsite eq "intranetsistemaspe">
-			<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
-			<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
-			<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_FAQS\'>
-			<cfset url_relatorio = 'http://intranetsistemaspe/snci/GeraRelatorio/gerador/dsp'>
-	  <cfelse>
-			<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-			<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-			<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-			<cfset url_relatorio = 'http://desenvolvimentope/snci/GeraRelatorio/gerador/dsp'>
-	  </cfif>
+	<cfif auxsite eq "intranetsistemaspe">
+		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
+		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
+		<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_FAQS\'>
+	<cfelseif auxsite eq "desenvolvimentope" OR auxsite eq "homologacaope" >
+		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
+		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
+		<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
+	<cfelse>
+	  	<cfset diretorio_anexos = 'D:\'>
+		<cfset diretorio_avaliacoes = 'D:\'>
+		<cfset diretorio_faqs = 'D:\'>
+	</cfif>
 
 
 <!--- Listas de permissões --->
@@ -28,7 +30,11 @@
 	SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
 	INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
 	INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-	WHERE pc_usu_login = '#cgi.REMOTE_USER#'
+	<cfif '#cgi.REMOTE_USER#' neq '' and auxsite neq "intranetsistemaspe" and auxsite neq "homologacaope" and auxsite neq "desenvolvimentope">
+		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
+	<cfelse>
+		WHERE pc_usu_login = 'CORREIOSNET\80859992'
+	</cfif>
 </cfquery>
 <cfquery name="qControleAcessoParametros" datasource="#dsn_processos#">
 	SELECT '/snci/snci_processos/'+pc_controle_acesso_pagina as pagina FROM pc_controle_acesso

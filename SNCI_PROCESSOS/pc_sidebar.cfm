@@ -2,13 +2,13 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
 
-<cfif Not ListContains(Lista_usuariosCad,UCase(cgi.REMOTE_USER))>
+<cfif Not ListContains(Lista_usuariosCad,UCase(rsUsuarioParametros.pc_usu_login))>
   <cflocation url = "sem_acesso_sistema.html" addToken = "no">
 </cfif>  
 <!--cgi.script_name retorna a página atual e verifica na tabela pc_controle_acesso se u perfil do usuario atual tem acesso a essa página -->
-<cfif NOT ListContains(Lista_paginasPerfilUsuario,cgi.script_name) and cgi.script_name neq '/snci/snci_processos/index.cfm'>
+<cfif NOT ListContains(UCase(Lista_paginasPerfilUsuario),UCase(cgi.script_name)) and UCase(cgi.script_name) neq '/snci/snci_processos/index.cfm'>
   <cflocation url = "sem_acesso_pagina.html?pagina=#cgi.script_name#" addToken = "no">
-</cfif>  
+</cfif> 
  
 
 
@@ -439,7 +439,7 @@
       }
     } else {
       // Caso não encontre nenhum link correspondente na navegação, redireciona para uma página de acesso negado.
-      if (url.pathname !== '/snci/snci_processos/index.cfm') {
+      if (url.pathname.toLowerCase() !== '/snci/snci_processos/index.cfm') {
         window.location.href = "sem_acesso_pagina.html?pagina=" + url.pathname;  
       }
     }

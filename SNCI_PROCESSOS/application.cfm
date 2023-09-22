@@ -5,5 +5,5 @@ name="conteudo"
 sessionmanagement="Yes" 
 clientmanagement="Yes" 
 sessiontimeout="#createtimespan(0,1,0,0)#" 
-applicationtimeout="#createtimespan(0,0,0,60)#">
+applicationtimeout="#createtimespan(0,6,0,0)#">
 <cfinclude template="parametros.cfm"> 
