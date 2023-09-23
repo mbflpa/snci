@@ -1,8 +1,8 @@
 <cfprocessingdirective pageencoding = "utf-8">	
 
 <cfset application.dsn_processos = 'DBSNCI'>
-<cfset application.SESSIONTIMEOUT = 60><!-- Tempo em minutos -->
-<!--- Diretório onde serão armazenados arquivos anexados a avaliações --->
+<cfset application.SESSIONTIMEOUT = 60>
+
 <cfset application.auxsite =  cgi.server_name>
 	<cfif application.auxsite eq "intranetsistemaspe">
 		<cfset application.diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
@@ -19,14 +19,14 @@
 	</cfif>
 
 
-<!--- Listas de permissões --->
+
 <cfquery name="qUsuariosSNCIProc" datasource="#application.dsn_processos#">
 	SELECT pc_usuarios.* FROM pc_usuarios WHERE pc_usu_status='A'
 </cfquery>
 
 <cfset application.Lista_usuariosCad = UCase(ValueList(qUsuariosSNCIProc.pc_usu_login))>
 
- <!--- Consulta Páginas por Perfil do Usuario --->
+
 <cfquery name="application.rsUsuarioParametros" datasource="#application.dsn_processos#">
 	SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
 	INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
