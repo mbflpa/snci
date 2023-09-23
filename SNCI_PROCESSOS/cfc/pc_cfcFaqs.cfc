@@ -4,40 +4,15 @@
 	<!-- iCheck -->
 	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">	
 
-	<!--- Diretório onde serão armazenados arquivos anexados a avaliações --->
-	<cfset auxsite =  cgi.server_name>
-	<cfif auxsite eq "intranetsistemaspe">
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
-		<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_FAQS\'>
-	<cfelse>
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-	</cfif>
-
-	<cfset dsn_processos = 'DBSNCI'>
 	
-
-	
-
-	<cfquery name="rsUsuario" datasource="#dsn_processos#">
-		SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
-		INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
-		INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
-	</cfquery>
-	
-
-
 	<cffunction name="FormCadFaq"   access="remote" hint="mostra form de cadastro do FAQ.">
         <cfargument name="pc_faq_id" type="numeric" required="false" default=0/>
 
-		<cfquery name="rsPerfis" datasource="#dsn_processos#">
+		<cfquery name="rsPerfis" datasource="#application.dsn_processos#">
 			SELECT pc_perfil_tipos.* from pc_perfil_tipos where pc_perfil_tipo_status='A' ORDER BY pc_perfil_tipo_descricao
 		</cfquery>
 
-		<cfquery name="rsFaqEdit" datasource="#dsn_processos#">
+		<cfquery name="rsFaqEdit" datasource="#application.dsn_processos#">
 			SELECT pc_faqs.* FROM pc_faqs where pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
 		</cfquery>
 
@@ -272,25 +247,25 @@
 		<cfargument name="pc_faq_texto" type="string" required="true"/>
 
 		<cfif '#arguments.pc_faq_id#' eq 0 or '#arguments.pc_faq_id#' eq '' >
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				INSERT INTO pc_faqs
 								(pc_faq_titulo, pc_faq_perfis,pc_faq_status,pc_faq_texto,pc_faq_atualiz_datahora,pc_faq_matricula_atualiz)
 				VALUES     		(<cfqueryparam value="#arguments.pc_faq_titulo#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_perfis#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_status#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_texto#" cfsqltype="cf_sql_varchar">,
-								 CONVERT(char, GETDATE(), 120),
-								 '#rsUsuario.pc_usu_matricula#')
+								 <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+								 '#application.rsUsuarioParametros.pc_usu_matricula#')
 			</cfquery>
 		<cfelse>
-		    <cfquery datasource="#dsn_processos#" >
+		    <cfquery datasource="#application.dsn_processos#" >
 				UPDATE pc_faqs
 				SET    pc_faq_titulo = <cfqueryparam value="#arguments.pc_faq_titulo#" cfsqltype="cf_sql_varchar">,
 				       pc_faq_perfis = <cfqueryparam value="#arguments.pc_faq_perfis#" cfsqltype="cf_sql_varchar">,
 					   pc_faq_status = <cfqueryparam value="#arguments.pc_faq_status#" cfsqltype="cf_sql_varchar">,
 					   pc_faq_texto  = <cfqueryparam value="#arguments.pc_faq_texto#" cfsqltype="cf_sql_varchar">,
-				       pc_faq_atualiz_datahora = CONVERT(char, GETDATE(), 120),
-					   pc_faq_matricula_atualiz =  <cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+				       pc_faq_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+					   pc_faq_matricula_atualiz =  <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
 				WHERE  pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
 
 			</cfquery>
@@ -302,13 +277,13 @@
 	<cffunction name="formFaq"   access="remote" hint="exibe os FAQs na página pc_faq.cfm.">
         <cfargument name="cadastro" type="string" required="false" default="S"/>
 		
-		<cfquery datasource="#dsn_processos#" name="rsFaqs">
+		<cfquery datasource="#application.dsn_processos#" name="rsFaqs">
 			SELECT pc_faqs.*, pc_usu_nome FROM  pc_faqs
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_faq_matricula_atualiz
-			<cfif ('#rsUsuario.pc_usu_perfil#' eq '3' or '#rsUsuario.pc_usu_perfil#' eq '11') and '#arguments.cadastro#' eq 'S'>
+			<cfif ('#application.rsUsuarioParametros.pc_usu_perfil#' eq '3' or '#application.rsUsuarioParametros.pc_usu_perfil#' eq '11') and '#arguments.cadastro#' eq 'S'>
 				order by  pc_faq_status asc, pc_faq_atualiz_datahora desc
 			<cfelse>
-				where pc_faq_perfis like '%(#rsUsuario.pc_usu_perfil#)%' and pc_faq_status = 'A'
+				where pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and pc_faq_status = 'A'
 				order by  pc_faq_titulo
 			</cfif>
 		</cfquery>
@@ -334,7 +309,7 @@
 									</h4>
 
 									<div  class="card-tools">
-										<cfif (#rsUsuario.pc_usu_perfil# eq 3 or #rsUsuario.pc_usu_perfil# eq 11) and '#arguments.cadastro#' eq 'S'>
+										<cfif (#application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11) and '#arguments.cadastro#' eq 'S'>
 										    <cfset titulo_codificado = urlEncodedFormat(pc_faq_titulo)>
 											<button type="button"  id="btEditar" class="btn btn-tool  " style="font-size:20px" onclick="javascript:mostraFormEditFaq(<cfoutput>#pc_faq_id#,'#titulo_codificado#'</cfoutput>);"  ><i class="fas fa-edit"></i></button>
 											<button type="button"  id="btExcluir" class="btn btn-tool  " style="font-size:20px" onclick="javascript:excluirFaq(<cfoutput>#pc_faq_id#</cfoutput>);"  ><i class="fas fa-trash-alt"></i></button>
@@ -347,7 +322,7 @@
 								<div class="card-body">
 									
 									<div>#pc_faq_texto#</div>
-									<cfif (#rsUsuario.pc_usu_perfil# eq 3 or #rsUsuario.pc_usu_perfil# eq 11) and '#arguments.cadastro#' eq 'S'>
+									<cfif (#application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11) and '#arguments.cadastro#' eq 'S'>
 										<div align="center" style="margin-top:30px;font-size:10px"><div>Última atualização: #pc_faq_matricula_atualiz# - #pc_usu_nome# (#dataFaq#)</div></div>
 									</cfif>
 								</div>
@@ -459,13 +434,13 @@
 	<cffunction name="tabFaq"   access="remote" hint="exibe os FAQs na página pc_faq.cfm.">
         <cfargument name="cadastro" type="string" required="false" default="S"/>
 		
-		<cfquery datasource="#dsn_processos#" name="rsFaqs">
+		<cfquery datasource="#application.dsn_processos#" name="rsFaqs">
 			SELECT pc_faqs.*, pc_usu_nome FROM  pc_faqs
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_faq_matricula_atualiz
-			<cfif ('#rsUsuario.pc_usu_perfil#' eq '3' or '#rsUsuario.pc_usu_perfil#' eq '11') and '#arguments.cadastro#' eq 'S'>
+			<cfif ('#application.rsUsuarioParametros.pc_usu_perfil#' eq '3' or '#application.rsUsuarioParametros.pc_usu_perfil#' eq '11') and '#arguments.cadastro#' eq 'S'>
 				order by  pc_faq_status asc, pc_faq_atualiz_datahora desc
 			<cfelse>
-				where pc_faq_perfis like '%(#rsUsuario.pc_usu_perfil#)%' and pc_faq_status = 'A'
+				where pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and pc_faq_status = 'A'
 				order by pc_faq_id desc
 			</cfif>
 		</cfquery>
@@ -636,7 +611,7 @@
 	<cffunction name="delFaq"   access="remote" returntype="boolean">
 		<cfargument name="pc_faq_id" type="numeric" required="true" />
 
-		<cfquery datasource="#dsn_processos#" >
+		<cfquery datasource="#application.dsn_processos#" >
 			DELETE FROM pc_faqs
 			WHERE pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
 		</cfquery> 
@@ -656,7 +631,7 @@
 		<cfset thisDir = expandPath(".")>
 
 		
-		<cffile action="upload" filefield="file" destination="#diretorio_faqs#" nameconflict="skip" accept="application/pdf">
+		<cffile action="upload" filefield="file" destination="#application.diretorio_faqs#" nameconflict="skip" accept="application/pdf">
 		
 
 
@@ -670,7 +645,7 @@
 		<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
 		
 		
-		<cfset destino = cffile.serverdirectory & '\Anexo_faq_id_' & '_'  & '#rsUsuario.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
+		<cfset destino = cffile.serverdirectory & '\Anexo_faq_id_' & '_'  & '#application.rsUsuarioParametros.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
 		
 
 
@@ -685,11 +660,11 @@
         </cfif>
 
 		        
-		<cfset mcuOrgao = "#rsUsuario.pc_org_mcu#">
+		<cfset mcuOrgao = "#application.rsUsuarioParametros.pc_org_mcu#">
 		<cfif FileExists(destino)>
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 					INSERT pc_anexos(pc_anexo_avaliacao_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF )
-					VALUES (#pc_aval_id#, '#CGI.REMOTE_USER#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', '#pc_anexo_avaliacaoPDF#')
+					VALUES (#pc_aval_id#, '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', '#pc_anexo_avaliacaoPDF#')
 			</cfquery>
 		</cfif>
 

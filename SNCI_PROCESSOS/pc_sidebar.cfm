@@ -2,25 +2,25 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
 
-<cfif Not ListContains(Lista_usuariosCad,UCase(rsUsuarioParametros.pc_usu_login))>
+<cfif Not ListContains(application.Lista_usuariosCad,UCase(application.rsUsuarioParametros.pc_usu_login))>
   <cflocation url = "sem_acesso_sistema.html" addToken = "no">
 </cfif>  
 <!--cgi.script_name retorna a página atual e verifica na tabela pc_controle_acesso se u perfil do usuario atual tem acesso a essa página -->
-<cfif NOT ListContains(UCase(Lista_paginasPerfilUsuario),UCase(cgi.script_name)) and UCase(cgi.script_name) neq '/snci/snci_processos/index.cfm'>
+<cfif NOT ListContains(UCase(application.Lista_paginasPerfilUsuario),UCase(cgi.script_name)) and UCase(cgi.script_name) neq '/snci/snci_processos/index.cfm'>
   <cflocation url = "sem_acesso_pagina.html?pagina=#cgi.script_name#" addToken = "no">
 </cfif> 
  
 
 
   <!--- Consulta Permissões --->
-	<cfquery name="qPermissões" datasource="#dsn_processos#">
+	<cfquery name="qPermissões" datasource="#application.dsn_processos#">
 	  	SELECT DISTINCT pc_perfil_tipo_id, pc_perfil_tipo_descricao
       FROM   pc_perfil_tipos
       where  pc_perfil_tipo_status = 'A'
       ORDER BY pc_perfil_tipo_descricao
 	</cfquery>
 
-  <cfquery name="qAreas" datasource="#dsn_processos#">
+  <cfquery name="qAreas" datasource="#application.dsn_processos#">
     SELECT pc_org_mcu, pc_org_sigla
     FROM pc_orgaos
     WHERE  (pc_org_Status in ('A', 'O'))
@@ -92,6 +92,8 @@
     </style>
 </head>
 <body>
+
+
       <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4" style="overflow:hidden!important;">
         <!-- Brand Logo -->
@@ -107,13 +109,13 @@
           <a href="index.cfm" class="user-panel brand-link user-panel" style="height: auto; display: flex; align-items: center;">
             <img src="dist/img/avatardefault.png" class="img-circle elevation-2" alt="User Image" style="width: 3rem;">
             <span class="brand-text font-weight-light" style="font-size: 10px !important; word-wrap: break-word; max-width: calc(100% - 3rem - 10px);"> <!-- Ajuste o valor 10px conforme necessário para o espaçamento -->
-              <cfoutput>#rsUsuarioParametros.pc_org_sigla#<br>#CGI.REMOTE_USER# <br> #rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>
+              <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#<br>#application.rsUsuarioParametros.pc_usu_login# <br> #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>
             </span>
           </a>
           <!---verifica de qual servidor a rotina está sendo disparada--->
           <cfset servidor =  cgi.server_name>
           <!---Se servidor não for de produção, aparecerá o select para alteração de perfil e lotação --->
-          <cfif '#servidor#' neq "intranetsistemaspe" or #rsUsuarioParametros.pc_usu_matricula# eq '80859992'>
+          <cfif '#servidor#' neq "intranetsistemaspe" or #application.rsUsuarioParametros.pc_usu_matricula# eq '80859992'>
             <div style="font-size:10px !important;">
               <div class="form-group" style="width:auto;margin-top:10px;index-z:1000;position:relative">
                 <select id="mudarPerfil" name="mudarPerfil" class="form-control" style="height:35px;">
@@ -133,9 +135,9 @@
             </div>
           </cfif>
 
-          <cfquery datasource="#dsn_processos#" name="rsControleAcesso">
+          <cfquery datasource="#application.dsn_processos#" name="rsControleAcesso">
 	          SELECT pc_controle_acesso.* FROM   pc_controle_acesso
-            where pc_controle_acesso_perfis like '%(#rsUsuarioParametros.pc_usu_perfil#)%'
+            where pc_controle_acesso_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%'
             ORDER BY pc_controle_acesso_grupoMenu, pc_controle_acesso_subgrupoMenu, pc_controle_acesso_ordem 
           </cfquery>
 
@@ -161,7 +163,7 @@
                     </a>
                     <ul class="nav nav-treeview" >
                       <cfoutput>
-                        <cfif #pc_controle_acesso_subgrupoMenu# eq '' and ListContains(pc_controle_acesso_perfis,rsUsuarioParametros.pc_usu_perfil)>
+                        <cfif #pc_controle_acesso_subgrupoMenu# eq '' and ListContains(pc_controle_acesso_perfis,application.rsUsuarioParametros.pc_usu_perfil)>
                           <cfset id2 = REReplace(pc_controle_acesso_nomeMenu, "[\(\)\s]+", "", "ALL")>
                           <cfset id2 = ReplaceNoCase(id2, "ç", "c", "ALL")>
                           <cfset id2 = REReplace(id2, "[áàâã]", "a", "ALL")>
@@ -197,7 +199,7 @@
                           
                             <ul class="nav nav-treeview" >
                               <cfoutput>
-                                <cfif ListContains(pc_controle_acesso_perfis,rsUsuarioParametros.pc_usu_perfil)>
+                                <cfif ListContains(pc_controle_acesso_perfis,application.rsUsuarioParametros.pc_usu_perfil)>
                                     <cfset id4 = REReplace(pc_controle_acesso_nomeMenu, "[\(\)\s]+", "", "ALL")>
                                     <cfset id4 = ReplaceNoCase(id4, "ç", "c", "ALL")>
                                     <cfset id4 = REReplace(id4, "[áàâã]", "a", "ALL")>
@@ -221,7 +223,7 @@
                   </li>
                 <cfelse>
                   <cfoutput group = "pc_controle_acesso_nomeMenu" >
-                    <cfif ListContains(pc_controle_acesso_perfis,rsUsuarioParametros.pc_usu_perfil)>
+                    <cfif ListContains(pc_controle_acesso_perfis,application.rsUsuarioParametros.pc_usu_perfil)>
                       <cfset id5 = REReplace(pc_controle_acesso_nomeMenu, "[\(\)\s]+", "", "ALL")>
                       <cfset id5 = ReplaceNoCase(id5, "ç", "c", "ALL")>
                       <cfset id5 = REReplace(id5, "[áàâã]", "a", "ALL")>
@@ -446,7 +448,7 @@
 
 
     <cfoutput>
-      var #toScript(sessionTimeout*60*1000,"sTimeout")#
+      var #toScript(application.sessionTimeout*60*1000,"sTimeout")#
     </cfoutput>
     setTimeout('sessionWarning()', sTimeout);
 
@@ -464,5 +466,8 @@
 
 		
   </script>
+
+    
+	
   </body>
 </html>

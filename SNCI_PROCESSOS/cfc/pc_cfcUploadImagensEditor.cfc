@@ -1,17 +1,6 @@
 <cfcomponent  >
 <cfprocessingdirective pageencoding = "utf-8">	
 
-	<!--- Diretório onde serão armazenados arquivos anexados a avaliações --->
-	<cfset auxsite =  cgi.server_name>
-	<cfif auxsite eq "intranetsistemaspe">
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
-		<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_FAQS\'>
-	<cfelse>
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-	</cfif>
 
 	<!--- Diretório onde serão armazenadas as imagens --->
 <cfset thisDir = expandPath(".")>
@@ -19,16 +8,6 @@
 <cfset imagensDirFaq = "#thisDir#\IMAGENS_FAQ" />
 <!--- fim: Diretório onde serão armazenadas as imagens --->
 
-	<cfset dsn_processos = 'DBSNCI'>
-	
-
-	<cfquery name="rsUsuario" datasource="#dsn_processos#">
-		SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
-		INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
-		INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
-	</cfquery>
-	
 
    
 	<cffunction name="uploadImagensAvaliacoes" access="remote"  returntype="boolean" output="false" hint="realiza o upload de imagens inseridas no editor de texto">
@@ -44,7 +23,7 @@
 		<cfset data = DateFormat(now(),'DD-MM-YYYY') & '-' & TimeFormat(Now(),'HH') & 'h' & TimeFormat(Now(),'MM') & 'min' & TimeFormat(Now(),'ss.SSSSS') & 's'>
 		<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
 
-		<cfset destino = cffile.serverdirectory & '\Imagem_Aval_id_' & #pc_aval_id# &'_PC' & '#pc_aval_processo#' & '_'  & '#rsUsuario.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
+		<cfset destino = cffile.serverdirectory & '\Imagem_Aval_id_' & #pc_aval_id# &'_PC' & '#pc_aval_processo#' & '_'  & '#application.rsUsuarioParametros.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
 
 	    <cfobject component = "pc_cfcAvaliacoes" name = "tamanhoArquivo">
 		<cfinvoke component="#tamanhoArquivo#" method="renderFileSize" returnVariable="tamanhoDoArquivo" size ='#cffile.fileSize#' type='bytes'>
@@ -62,13 +41,13 @@
         </cfif>
 		
 
-		<cfset mcuOrgao = "#rsUsuario.pc_org_mcu#">
+		<cfset mcuOrgao = "#application.rsUsuarioParametros.pc_org_mcu#">
 		<cfif FileExists(destino)>
 
 		    <cftry>
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 						INSERT pc_anexos(pc_anexo_avaliacao_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF )
-						VALUES (#pc_aval_id#, '#CGI.REMOTE_USER#', '#destino#', '#nomeDaImagem#','#mcuOrgao#', 'N')
+						VALUES (#pc_aval_id#, '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDaImagem#','#mcuOrgao#', 'N')
 				</cfquery>
 				<cfcatch type="any">
 					<cffile action="delete" file="#destino#" /> 
@@ -95,7 +74,7 @@
 		<cfset data = DateFormat(now(),'DD-MM-YYYY') & '-' & TimeFormat(Now(),'HH') & 'h' & TimeFormat(Now(),'MM') & 'min' & TimeFormat(Now(),'ss.SSSSS') & 's'>
 		<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
 
-		<cfset destino = cffile.serverdirectory & '\FAQ_ID_' & #pc_imagem_tipo_id# & '_' & '#rsUsuario.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
+		<cfset destino = cffile.serverdirectory & '\FAQ_ID_' & #pc_imagem_tipo_id# & '_' & '#application.rsUsuarioParametros.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
 
 	    <cfobject component = "pc_cfcAvaliacoes" name = "tamanhoArquivo">
 		<cfinvoke component="#tamanhoArquivo#" method="renderFileSize" returnVariable="tamanhoDoArquivo" size ='#cffile.fileSize#' type='bytes'>
@@ -116,9 +95,9 @@
 		
 		<cfif FileExists(destino)>
 		    <cftry>
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 						INSERT pc_imagens(pc_imagem_tipo, pc_imagem_tipo_id, pc_imagem_caminho, pc_imagem_nome, pc_imagem_dataHora, pc_imagem_login)
-						VALUES ('faq',#pc_imagem_tipo_id#, '#destino#', '#nomeDaImagem#',CONVERT(char, GETDATE(), 120) ,'#CGI.REMOTE_USER#')
+						VALUES ('faq',#pc_imagem_tipo_id#, '#destino#', '#nomeDaImagem#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp"> ,'#application.rsUsuarioParametros.pc_usu_login#')
 				</cfquery>
 				<cfcatch type="any">
 					<cffile action="delete" file="#destino#" /> 
@@ -198,7 +177,7 @@
 								<cfset alturaImg = "#info.height#">  
 								<cfset ImageSetAntialiasing(myImage,"on")>
 								<cfset ImageScaleToFit(myImage,260,130)>
-								<cfquery name="rsImagens" datasource="#dsn_processos#">
+								<cfquery name="rsImagens" datasource="#application.dsn_processos#">
 									SELECT pc_imagens.* from pc_imagens
 									WHERE pc_imagem_caminho like '%#myList.name#' and 
 								</cfquery>
@@ -271,7 +250,7 @@
    	<cffunction name="delImagem"   access="remote" returntype="boolean">
 		<cfargument name="pc_imagem_id" type="numeric" required="true" default=""/>
 
-		<cfquery datasource="#dsn_processos#" name="rsPc_imagens"> 
+		<cfquery datasource="#application.dsn_processos#" name="rsPc_imagens"> 
 			SELECT pc_imagens.*   FROM  pc_imagens
 			WHERE pc_imagem_id = <cfquerypara value="#arguments.pc_imagem_id#" cfsqltype="cf_sql_integer">
 		</cfquery>
@@ -280,7 +259,7 @@
 			<cffile action = "delete" File = "#rsPc_imagens.pc_imagem_caminho#">
 		</cfif>
 
-		<cfquery datasource="#dsn_processos#">
+		<cfquery datasource="#application.dsn_processos#">
 			DELETE FROM pc_imagens
 			WHERE pc_imagem_id = <cfquerypara value="#arguments.pc_imagem_id#" cfsqltype="cf_sql_integer">
 		</cfquery> 	

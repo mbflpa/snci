@@ -3,42 +3,42 @@
 
 
 <!-- 'A' ATIVO, 'O' ORIGEM DE PROCESSOS, 'D' DESATIVADO -->
-<cfquery name="rsOrigem" datasource="#dsn_processos#">
+<cfquery name="rsOrigem" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
 	FROM pc_orgaos
 	WHERE pc_org_Status = 'O' 
 	ORDER BY pc_org_sigla
 </cfquery>
 
-<cfquery name="rsAvaliacaoTipo" datasource="#dsn_processos#">
+<cfquery name="rsAvaliacaoTipo" datasource="#application.dsn_processos#">
 	SELECT pc_aval_tipo_id, pc_aval_tipo_descricao
 	FROM pc_avaliacao_tipos
 	WHERE pc_aval_tipo_status = 'A'
 	ORDER BY pc_aval_tipo_descricao
 </cfquery> 
 
-<cfquery name="rsClas" datasource="#dsn_processos#">
+<cfquery name="rsClas" datasource="#application.dsn_processos#">
 	SELECT pc_class_id, pc_class_descricao
 	FROM pc_classificacoes
 	WHERE pc_class_status ='A'
 	ORDER BY pc_class_descricao
 </cfquery>
 
-<cfquery name="rs_OrgAvaliado" datasource="#dsn_processos#">
+<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
 	FROM pc_orgaos
 	WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A')
 	ORDER BY pc_org_sigla
 </cfquery>
 
-<cfquery datasource="#dsn_processos#" name="rsAvaliadores">
+<cfquery datasource="#application.dsn_processos#" name="rsAvaliadores">
 	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios 
 	INNER JOIN pc_orgaos ON  pc_org_mcu = pc_usu_lotacao
 	WHERE pc_org_controle_interno = 'S' AND pc_usu_status ='A'
 	ORDER BY pc_org_se_sigla ASC,  pc_usu_nome ASC
 </cfquery>
 
-<cfquery name="rsAno" datasource="#dsn_processos#" timeout="120" >
+<cfquery name="rsAno" datasource="#application.dsn_processos#" timeout="120" >
 	SELECT distinct   right(pc_processos.pc_processo_id,4) as ano
 
 	FROM        pc_processos INNER JOIN
@@ -129,7 +129,7 @@
 													<select id="pcModalidade" required name="pcModalidade" class="form-control">
 														<option selected="" disabled="" value=""></option>
 														<!--Se a gerência do usuário for GINS-->
-                                                        <cfif '#rsUsuarioParametros.pc_usu_lotacao#' eq '00437407'>
+                                                        <cfif '#application.rsUsuarioParametros.pc_usu_lotacao#' eq '00437407'>
 															<option value="E">ENTREGA DO RELATÓRIO</option>
 														<cfelse>
 															<option value="A">ACOMPANHAMENTO</option>

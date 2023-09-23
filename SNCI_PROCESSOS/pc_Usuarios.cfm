@@ -179,7 +179,7 @@
 											</div>
 										</div>
 
-										<cfquery name="rsLotacao" datasource="#dsn_processos#">
+										<cfquery name="rsLotacao" datasource="#application.dsn_processos#">
 											SELECT pc_orgaos.* FROM pc_orgaos WHERE pc_org_status in ('A','O') ORDER BY pc_org_sigla
 										</cfquery>
 										<div class="col-sm-6">
@@ -194,7 +194,7 @@
 											</div>
 										</div>
 
-										<cfquery name="rsPerfil" datasource="#dsn_processos#">
+										<cfquery name="rsPerfil" datasource="#application.dsn_processos#">
 											SELECT pc_perfil_tipos.* FROM pc_perfil_tipos 
 											WHERE pc_perfil_tipo_status = 'A' and not pc_perfil_tipo_id = 3
 											ORDER BY pc_perfil_tipo_descricao
@@ -271,7 +271,7 @@
 
 		// Obtém o perfil do usuário do servidor (usando ColdFusion)
 		<cfoutput>
-			var perfilUsuario = #rsUsuarioParametros.pc_usu_perfil#;
+			var perfilUsuario = #application.rsUsuarioParametros.pc_usu_perfil#;
 		</cfoutput>
 
 		// Inicializa o DataTable com configurações e dados via AJAX

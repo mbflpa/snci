@@ -1,30 +1,9 @@
 <cfcomponent >
 <cfprocessingdirective pageencoding = "utf-8">	
-
-	<!--- Diretório onde serão armazenados arquivos anexados a avaliações --->
-	<cfset auxsite =  cgi.server_name>
-	<cfif auxsite eq "intranetsistemaspe">
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
-	<cfelse>
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-	</cfif>
-
-	<cfset dsn_processos = 'DBSNCI'>
-	
-
-	<cfquery name="rsUsuario" datasource="#dsn_processos#">
-		SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
-		INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
-		INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
-	</cfquery>
-
 	
    	<cffunction name="tabAcompanhamento" returntype="any" access="remote" hint="Criar a tabela das orientacoes pendentes e envia para a página pcAcompanhamento.cfm">
 		
-		<cfquery name="rsProcTab" datasource="#dsn_processos#">
+		<cfquery name="rsProcTab" datasource="#application.dsn_processos#">
 			SELECT      pc_processos.*, pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_descricao as descOrgAvaliado
 						, pc_usuarios.pc_usu_nome
 						, pc_usuCoodNacional.pc_usu_nome as nome_coordenadorNacional
@@ -51,12 +30,12 @@
 						LEFT JOIN pc_orgaos AS pc_orgaos_5 ON pc_orgaos_5.pc_org_mcu = pc_num_orgao_origem
 						LEFT JOIN pc_avaliacao_tipos on pc_num_avaliacao_tipo = pc_aval_tipo_id
 
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 			        <!---Processos em acompanhamento ou bloqueados--->
 					WHERE pc_num_status in(4,6)
 
 					<!---Se o perfil do usuário não for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4) ou 3 -DESENVOLVEDOR--->
-					<cfif rsUsuario.pc_usu_perfil neq 11 and rsUsuario.pc_usu_perfil neq 3>
+					<cfif application.rsUsuarioParametros.pc_usu_perfil neq 11 and application.rsUsuarioParametros.pc_usu_perfil neq 3>
 						and (pc_aval_orientacao_status in (1,14) or (pc_aval_orientacao_status = 3 and pc_aval_orientacao_id in (
 							SELECT 	pc_aval_posic_num_orientacao FROM pc_avaliacao_posicionamentos
 							INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_id = pc_aval_posic_num_orientacao
@@ -72,32 +51,32 @@
 							HAVING Count(pc_aval_posic_status)>=2) OR pc_modalidade = 'A'))  
 					</cfif>
 					<!---Se o perfil do usuário  for 8 - CI - GESTOR MASTER (EXECUÇÃO) e o órgão de lotação não for origem do processo, não aparecerá nenhum processo para acompanhamento--->
-					<cfif rsUsuario.pc_usu_perfil eq 8  and '#rsUsuario.pc_org_status#' neq 'O'>
+					<cfif application.rsUsuarioParametros.pc_usu_perfil eq 8  and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'>
 						and pc_num_status = 0	
 					</cfif>
 
 					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4) --->
-					<cfif '#rsUsuario.pc_org_status#' eq 'O' and #rsUsuario.pc_usu_perfil# neq 11>
-						and pc_num_orgao_origem = '#rsUsuario.pc_usu_lotacao#' OR (pc_aval_orientacao_status in (13) and pc_orgaos_2.pc_org_mcu = '#rsUsuario.pc_usu_lotacao#')
+					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+						and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_aval_orientacao_status in (13) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
 					</cfif>
 					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4)--->
-					<cfif '#rsUsuario.pc_org_status#' eq 'O' and #rsUsuario.pc_usu_perfil# eq 11>
-							OR (pc_num_orgao_origem = '#rsUsuario.pc_usu_lotacao#' and pc_aval_orientacao_status in (1,3,14)) OR (pc_aval_orientacao_status in (13) and pc_orgaos_2.pc_org_mcu = '#rsUsuario.pc_usu_lotacao#')
+					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
+							OR (pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_aval_orientacao_status in (1,3,14)) OR (pc_aval_orientacao_status in (13) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
 					</cfif>
 					<!---Se a lotação do usuario não for um orgao origem de processos e não estiver desativado(status 'AD) e o perfil for 4 - 'AVALIADOR') --->
-					<cfif #rsUsuario.pc_usu_perfil# eq 4 and '#rsUsuario.pc_org_status#' neq 'D'>
-						and pc_avaliador_matricula = #rsUsuario.pc_usu_matricula#	or pc_usu_matricula_coordenador = #rsUsuario.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #rsUsuario.pc_usu_matricula#
+					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' neq 'D'>
+						and pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
 					</cfif>
 					<!---Se o perfil for 7 - 'GESTOR' --->
-					<cfif #rsUsuario.pc_usu_perfil# eq 7 and '#rsUsuario.pc_org_status#' neq 'D'>
-							and (pc_orgaos.pc_org_se = 	'#rsUsuario.pc_org_se#' OR pc_orgaos.pc_org_se = '#rsUsuario.pc_org_se_abrangencia#') and pc_processos.pc_num_orgao_origem IN('00436698')
+					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'D'>
+							and (pc_orgaos.pc_org_se = 	'#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se_abrangencia#') and pc_processos.pc_num_orgao_origem IN('00436698')
 					</cfif>
 					
 
 
 				
 			<cfelse>
-				WHERE pc_aval_orientacao_status in (2,4,5) and (pc_aval_orientacao_mcu_orgaoResp = '#rsUsuario.pc_usu_lotacao#' OR (pc_orgHerancaMcuPara = '#rsUsuario.pc_usu_lotacao#' and pc_orgHerancaDataInicio <= CONVERT (date, GETDATE())))
+				WHERE pc_aval_orientacao_status in (2,4,5) and (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_orgHerancaMcuPara = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_orgHerancaDataInicio <= CONVERT (date, GETDATE())))
 			</cfif>
 				
 			ORDER BY 	pc_processo_id, pc_aval_numeracao
@@ -111,7 +90,7 @@
 					<!-- /.card-header -->
 					<div class="card-body" >
 						<cfif #rsProcTab.recordcount# eq 0 >
-							<h5 align="center">Nenhuma Orientação para acompanhamento foi localizada para <cfoutput>#rsUsuario.pc_org_sigla# e perfil: #rsUsuario.pc_perfil_tipo_descricao#</cfoutput>.</h5>
+							<h5 align="center">Nenhuma Orientação para acompanhamento foi localizada para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
 						<cfelse>
 						
 							<div id="filtroSpan" style="display: none;text-align:right;font-size:18px;position:absolute;top:-54px;right:24px;"><span class="statusOrientacoes" style="background:#008000;color:#fff;">Atenção! Um filtro foi aplicado.</span><br><i class="fa fa-2x fa-hand-point-down" style="color:#008000;position:relative;top:8px;right:117px"></i></div>
@@ -120,14 +99,14 @@
 								<thead style="background: #0083ca;color:#fff">
 									<tr style="font-size:14px">
 									    <th id="colunaMaisInfo" style="" ></th>
-									    <cfif #rsUsuario.pc_usu_perfil# eq 3 or #rsUsuario.pc_usu_perfil# eq 11>
+									    <cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 											<th id="colunaEmAnalise" style="text-align: center!important;width: 20px!important;">Colocar<br>em análise</th>
 										</cfif>
 										<th id="colunaStatus" style="width: 30px!important;">Status:</th>
 										<th style="text-align: center!important;width: 20px!important;">N° Processo<br>SNCI</th>
 										<th >N° Item:</th>
 										<th style="text-align: center!important;width: 20px!important;">ID da<br>Orientação</th>
-										<cfif #rsUsuario.pc_org_controle_interno# eq 'N' >
+										<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N' >
 											<th style="text-align: center!important;width: 20px!important;">Data Prevista<br>p/ Resposta</th>
 										</cfif>
 										<th>Órgão Responsável: </th>
@@ -146,7 +125,7 @@
 										<cfoutput>					
 											<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
 											        <td class="selecionar"></td>
-													<cfif #rsUsuario.pc_usu_perfil# eq 3 or #rsUsuario.pc_usu_perfil# eq 11>
+													<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 														<td align="center">
 															<cfif #pc_aval_orientacao_status# eq 2 or #pc_aval_orientacao_status# eq 3 or #pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5 or (#pc_aval_orientacao_status# eq 13 && '#orgaoOrigem#' neq '#mcuOrgResp#')>
 																<i onclick="javascript:colocarEmAnalise('#pc_processo_id#',#pc_aval_id#,#pc_aval_orientacao_id#,'#orgaoOrigem#','#orgaoOrigemSigla#','#mcuOrgResp#',#pc_aval_orientacao_status#)"class="fas fa-file-medical-alt grow-icon clickable-icon" style="color:##0083ca;font-size:20px;margin-right:10px;z-index:10000"> </i>
@@ -154,13 +133,13 @@
 														</td>
 													</cfif>
 													<cfif #pc_aval_orientacao_dataPrevistaResp# neq '' and DATEFORMAT(#pc_aval_orientacao_dataPrevistaResp#,"yyyy-mm-dd")  lt DATEFORMAT(Now(),"yyyy-mm-dd") and (#pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5)>
-														<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;" >PENDENTE</span></td>
 														<cfelse>
 															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >PENDENTE</span></td>
 														</cfif>
 													<cfelseif #pc_aval_orientacao_status# eq 3>
-														<cfif #rsUsuario.pc_org_controle_interno# eq 'N'>
+														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
 															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##FFA500;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
 														<cfelse>
 															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
@@ -173,7 +152,7 @@
 													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_numeracao#</td>	
 													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_orientacao_id#</td>	
 													
-													<cfif #rsUsuario.pc_org_controle_interno# eq 'N' >
+													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N' >
 														<cfif #pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5>
 															<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
 															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#dataPrev#</td>
@@ -232,7 +211,7 @@
 
 			$(function () {
 				<cfoutput>	
-					 var controleInterno = '#rsUsuario.pc_org_controle_interno#';
+					 var controleInterno = '#application.rsUsuarioParametros.pc_org_controle_interno#';
 				</cfoutput>
 
 				if ($('#colunaEmAnalise').is(':visible')) {
@@ -371,8 +350,8 @@
 
 			function colocarEmAnalise(idProcesso, idAvaliacao, idOrientacao, orgaoOrigem, orgaoOrigemSigla, orgaoResp, statusOrientacao){
 				<cfoutput>	
-					 var lotacaoUsuario = '#rsUsuario.pc_usu_lotacao#';
-					 var lotacaoUsuarioSigla = '#rsUsuario.pc_org_sigla#';
+					 var lotacaoUsuario = '#application.rsUsuarioParametros.pc_usu_lotacao#';
+					 var lotacaoUsuarioSigla = '#application.rsUsuarioParametros.pc_org_sigla#';
 				</cfoutput>
 
 				// Dividir a sequência usando a barra (/) como delimitador epegar a última
@@ -541,7 +520,7 @@
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="idOrientacao" type="numeric" required="true" />
 
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#"> 
 		</cfquery>
 		
@@ -555,7 +534,7 @@
 
 					<div id="idAvaliacao" hidden></div>
 
-					<cfquery name="rsProcAval" datasource="#dsn_processos#">
+					<cfquery name="rsProcAval" datasource="#application.dsn_processos#">
 						SELECT      pc_processos.*, pc_avaliacoes.*,pc_avaliacao_orientacoes.*,pc_aval_orientacao_mcu_orgaoResp as mcuOrgaoResp
 									,pc_aval_orientacao_mcu_orgaoResp as mcuOrgResp, pc_orgaos.pc_org_sigla as siglaOrgResp
 									,pc_num_orgao_avaliado as mcuOrgAvaliado,  pc_orgaos2.pc_org_sigla as siglaOrgAvaliado
@@ -581,7 +560,7 @@
 						and pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idOrientacao#">	 													
 					</cfquery>	
 
-					<cfquery name="rs_OrgAvaliado" datasource="#dsn_processos#">
+					<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
 						SELECT pc_orgaos.*FROM pc_orgaos
 						WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#'  
 								or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#'))
@@ -602,7 +581,7 @@
 						
 					<div class="card-header" style="background-color: #0083CA;border-bottom:solid 2px #fff" >
 						<cfoutput>
-							<p id="descricaoItem" style="font-size: 1.3em;color:##fff"><strong>Item: #rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong><cfif #rsUsuario.pc_org_controle_interno# eq 'N'><i id="start-tour2" style="color:##8cc63f;margin-left:20px;font-size: 1.3em;" class="fas fa-question-circle grow-icon"></i></cfif></p>
+							<p id="descricaoItem" style="font-size: 1.3em;color:##fff"><strong>Item: #rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong><cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'><i id="start-tour2" style="color:##8cc63f;margin-left:20px;font-size: 1.3em;" class="fas fa-question-circle grow-icon"></i></cfif></p>
 						</cfoutput>	
 					</div>
 					<div class="card card-primary card-tabs"  style="widht:100%">
@@ -683,7 +662,7 @@
 																
 																<p style="font-size: 1em;">
 																	Classificação: <strong style="color:##0692c6;margin-right:50px">#rsProcAval.pc_class_descricao#</strong>
-																	<cfif #rsUsuario.pc_org_controle_interno# eq 'S' >	
+																	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
 																		Modalidade: 
 																		<cfif #rsProcAval.pc_modalidade# eq 'N'>
 																			<strong style="color:##0692c6">Normal</strong>
@@ -697,18 +676,18 @@
 																	</cfif>
 																</p>
 
-																<cfquery datasource="#dsn_processos#" name="rsCoordenadorRegional">
+																<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorRegional">
 																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
 																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
 																	WHERE pc_usu_matricula = '#rsProcAval.pc_usu_matricula_coordenador#'
 																</cfquery>
-																<cfquery datasource="#dsn_processos#" name="rsCoordenadorNacional">
+																<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorNacional">
 																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
 																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
 																	WHERE pc_usu_matricula = '#rsProcAval.pc_usu_matricula_coordenador_nacional#'
 																</cfquery>
 
-																<cfquery datasource="#dsn_processos#" name="rsAvaliadores">
+																<cfquery datasource="#application.dsn_processos#" name="rsAvaliadores">
 																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_avaliadores
 																	INNER JOIN pc_usuarios on pc_usu_matricula = pc_avaliador_matricula
 																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
@@ -767,7 +746,7 @@
 															
 																<p style="font-size: 1.3em;">Item: <span style="color:##0692c6;">#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</span></p>
 																<p style="font-size: 1.3em;">Classificação: <span style="color:##0692c6;">#classifRisco#</span></p>
-															<cfif #rsUsuario.pc_org_controle_interno# eq 'S' >	
+															<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
 																	<cfif #rsProcAval.pc_aval_vaFalta# gt 0 or  #rsProcAval.pc_aval_vaSobra# gt 0 or  #rsProcAval.pc_aval_vaRisco# gt 0 >
 																 		<p style="font-size: 1.3em;">Valor Envolvido: 
 																			<cfif #rsProcAval.pc_aval_vaFalta# gt 0>
@@ -819,10 +798,10 @@
 				</form><!-- fim formCadAvaliacao -->
 					
 				<!--Inseri as tab de acompanhamento e distribuição se o a lotação do usuário for um órgão-->	
-				<cfif rsUsuario.pc_org_controle_interno eq 'S'>
+				<cfif application.rsUsuarioParametros.pc_org_controle_interno eq 'S'>
 					<cfset timelineViewAcomp(arguments.idOrientacao)>
 				<cfelse>
-					<cfif rsUsuario.pc_org_mcu eq rsProcAval.pc_num_orgao_avaliado>
+					<cfif application.rsUsuarioParametros.pc_org_mcu eq rsProcAval.pc_num_orgao_avaliado>
 						<cfset timelineViewAcompOrgaoAvaliado(arguments.idOrientacao)>
 						<div class="row" style="margin-bottom:50px">
 							<div class="col-md-12">
@@ -1377,19 +1356,19 @@
 		<cfargument name="pcAreasDistribuir" type="any" required="true" />
 		<cfargument name="pcOrientacaoResposta" type="string" required="true" />
 
-		<cfquery name="rsOrientacao" datasource="#dsn_processos#">
+		<cfquery name="rsOrientacao" datasource="#application.dsn_processos#">
 			SELECT * FROM pc_avaliacao_orientacoes
 			WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
 		</cfquery>
 
-		<cfquery name="rsPosicionamentosParaReplicacao" datasource="#dsn_processos#">
+		<cfquery name="rsPosicionamentosParaReplicacao" datasource="#application.dsn_processos#">
 			SELECT * FROM pc_avaliacao_posicionamentos
 			WHERE pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
 		</cfquery>
 
 		<cftransaction>
 
-			<cfquery datasource="#dsn_processos#">
+			<cfquery datasource="#application.dsn_processos#">
 				UPDATE pc_avaliacao_orientacoes
 				SET pc_aval_orientacao_distribuido = 1
 				WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
@@ -1405,44 +1384,44 @@
 				<!-- Atualização para o primeiro elemento -->
 				<cfif i eq firstItem>
 					<!-- Atualização para a priemira área selecionada -->
-					<cfquery datasource="#dsn_processos#">
+					<cfquery datasource="#application.dsn_processos#">
 						UPDATE pc_avaliacao_orientacoes
 						SET
 							pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
-							pc_aval_orientacao_atualiz_login = '#cgi.REMOTE_USER#',
-							pc_aval_orientacao_status_datahora = CONVERT(char, GETDATE(), 120),
+							pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#',
+							pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 							pc_aval_orientacao_distribuido = 1
 						WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
 					</cfquery>
 					
 					<!--Insere a manifestação inicial do controle interno para a orientação com a mesma data prevista e status da orientação original do órgão avaliado -->
 					<cfset orgaoResp = '#i#'>
-					<cfquery datasource="#dsn_processos#">
+					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-						VALUES (<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,CONVERT(char, GETDATE(), 120),'#rsUsuario.pc_usu_matricula#','#rsUsuario.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#',#posic_status#)
+						VALUES (<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#',#posic_status#)
 					</cfquery>
 
 				
 				<cfelse>
 					<!-- Inserção para as outras áreas selecionadas -->
-					<cfquery datasource="#dsn_processos#" name="rsInserirOrientacao">
+					<cfquery datasource="#application.dsn_processos#" name="rsInserirOrientacao">
 						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_dataPrevistaResp, pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login, pc_aval_orientacao_distribuido)
-						VALUES ('#dataPrevista#', #posic_status#, CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#',#rsOrientacao.pc_aval_orientacao_num_aval#, '#rsOrientacao.pc_aval_orientacao_descricao#','#i#',  CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#', 1)
+						VALUES ('#dataPrevista#', #posic_status#, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#rsOrientacao.pc_aval_orientacao_num_aval#, '#rsOrientacao.pc_aval_orientacao_descricao#','#i#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#', 1)
 						SELECT SCOPE_IDENTITY() AS idOrientacao;
 					</cfquery>
 					 <cfset insertedIdOrientacao = rsInserirOrientacao.idOrientacao> <!-- Obtém o ID gerado -->
 
 					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
 					<cfset orgaoResp = '#i#'>
-					<cfquery datasource="#dsn_processos#">
+					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-						VALUES (#insertedIdOrientacao#, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,CONVERT(char, GETDATE(), 120),'#rsUsuario.pc_usu_matricula#','#rsUsuario.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#', #posic_status#)
+						VALUES (#insertedIdOrientacao#, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#', #posic_status#)
 					</cfquery>
 					<!-- Replica as manifestações da orientação original para as orientações distribuídas -->
 					<cfoutput query = "rsPosicionamentosParaReplicacao">
-						<cfquery datasource="#dsn_processos#">
+						<cfquery datasource="#application.dsn_processos#">
 							INSERT pc_avaliacao_posicionamentos (pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-							VALUES (#insertedIdOrientacao#, '#pc_aval_posic_texto#', '#pc_aval_posic_datahora#', '#pc_aval_posic_matricula#', '#pc_aval_posic_num_orgao#', '#pc_aval_posic_num_orgaoResp#', '#pc_aval_posic_dataPrevistaResp#', #pc_aval_posic_status#)
+							VALUES (#insertedIdOrientacao#, '#pc_aval_posic_texto#', <cfqueryparam value="#pc_aval_posic_datahora#" cfsqltype="cf_sql_timestamp">, '#pc_aval_posic_matricula#', '#pc_aval_posic_num_orgao#', '#pc_aval_posic_num_orgaoResp#', '#pc_aval_posic_dataPrevistaResp#', #pc_aval_posic_status#)
 						</cfquery>
 					</cfoutput>
 						
@@ -1465,7 +1444,7 @@
 
 	<cffunction name="tabMelhoriasPendentes" access="remote" hint="Criar a tabela das propostas de melhoria e envia para a página pcAcompanhamento.cfm">
 		
-		<cfquery name="rsMelhoriasPendentes" datasource="#dsn_processos#">
+		<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_melhorias.*, pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_num_sei
 			,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu
 			,pc_orgaos_heranca.*, pc_orgaos_2.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_2.pc_org_se_sigla as seOrgRespHerdeiro
@@ -1475,7 +1454,7 @@
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
 			LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_num_orgao_avaliado
 			LEFT JOIN pc_orgaos AS pc_orgaos_2 ON pc_orgaos_2.pc_org_mcu = pc_orgHerancaMcuPara
-			WHERE pc_aval_melhoria_status = 'P' and pc_aval_melhoria_num_orgao = '#rsUsuario.pc_usu_lotacao#' and pc_num_status in(4,5)
+			WHERE pc_aval_melhoria_status = 'P' and pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_num_status in(4,5)
 		</cfquery>
 		
 		<div class="row" >
@@ -1486,7 +1465,7 @@
 					<div class="card-body" >
 
 						<cfif #rsMelhoriasPendentes.recordcount# eq 0 >
-							<h5 align="center">Nenhuma Proposta de Melhoria pendente foi localizada para <cfoutput>#rsUsuario.pc_org_sigla# e perfil: #rsUsuario.pc_perfil_tipo_descricao#</cfoutput>.</h5>
+							<h5 align="center">Nenhuma Proposta de Melhoria pendente foi localizada para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
 						<cfelse>
 							<table id="tabMelhoriasPendentes" class="table table-bordered table-striped table-hover text-nowrap">
 								<thead style="background: #0083ca;color:#fff">
@@ -1655,7 +1634,7 @@
 
 		<cfargument name="idMelhoria" type="numeric" required="true" />
 
-		<cfquery name="rsMelhoriaPosic" datasource="#dsn_processos#">
+		<cfquery name="rsMelhoriaPosic" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_melhorias.*, pc_processos.*,pc_avaliacoes.pc_aval_numeracao,pc_avaliacoes.pc_aval_descricao 
 			, pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla
 			FROM pc_avaliacao_melhorias
@@ -1666,7 +1645,7 @@
 			WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.idMelhoria#" cfsqltype="cf_sql_numeric">
 		</cfquery>
 
-		<cfquery name="rs_OrgAvaliado" datasource="#dsn_processos#">
+		<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
 			SELECT pc_orgaos.*FROM pc_orgaos
 			WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsMelhoriaPosic.pc_num_orgao_avaliado#' or pc_org_mcu = '#rsMelhoriaPosic.pc_num_orgao_avaliado#' 
 					or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#rsMelhoriaPosic.pc_num_orgao_avaliado#'))
@@ -1933,7 +1912,7 @@
 
 
 
-					<cfquery name="rsProcAval" datasource="#dsn_processos#">
+					<cfquery name="rsProcAval" datasource="#application.dsn_processos#">
 						SELECT      pc_processos.*, pc_avaliacoes.*,pc_avaliacao_melhorias.*
 									,pc_orgaos.pc_org_mcu as mcuOrgResp,pc_orgaos.pc_org_sigla as siglaOrgResp
 									,pc_orgaos1.pc_org_mcu as mcuOrgRespSugerido, pc_orgaos1.pc_org_sigla as siglaOrgRespSugerido
@@ -2033,7 +2012,7 @@
 																
 																<p style="font-size: 1em;">
 																	Classificação: <strong style="color:##0692c6;margin-right:50px">#rsProcAval.pc_class_descricao#</strong>
-																	<cfif #rsUsuario.pc_org_controle_interno# eq 'S' >	
+																	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
 																		Modalidade: 
 																		<cfif #rsProcAval.pc_modalidade# eq 'N'>
 																			<strong style="color:##0692c6">Normal</strong>
@@ -2048,18 +2027,18 @@
 																	</cfif>
 																</p>
 
-																<cfquery datasource="#dsn_processos#" name="rsCoordenadorRegional">
+																<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorRegional">
 																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
 																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
 																	WHERE pc_usu_matricula = '#rsProcAval.pc_usu_matricula_coordenador#'
 																</cfquery>
-																<cfquery datasource="#dsn_processos#" name="rsCoordenadorNacional">
+																<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorNacional">
 																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
 																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
 																	WHERE pc_usu_matricula = '#rsProcAval.pc_usu_matricula_coordenador_nacional#'
 																</cfquery>
 
-																<cfquery datasource="#dsn_processos#" name="rsAvaliadores">
+																<cfquery datasource="#application.dsn_processos#" name="rsAvaliadores">
 																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_avaliadores
 																	INNER JOIN pc_usuarios on pc_usu_matricula = pc_avaliador_matricula
 																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
@@ -2119,7 +2098,7 @@
 																<p style="font-size: 1.3em;">Item: <span style="color:##0692c6;">#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</span></p>
 																<p style="font-size: 1.3em;">Classificação: <span style="color:##0692c6;">#classifRisco#</span></p>
 																
-																<cfif #rsUsuario.pc_org_controle_interno# eq 'S' >	
+																<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
 																	<cfif #rsProcAval.pc_aval_vaFalta# gt 0 or  #rsProcAval.pc_aval_vaSobra# gt 0 or  #rsProcAval.pc_aval_vaRisco# gt 0 >
 																 		<p style="font-size: 1.3em;">Valor Envolvido: 
 																			<cfif #rsProcAval.pc_aval_vaFalta# gt 0>
@@ -2321,15 +2300,15 @@
 			<!-- Atualização para o primeiro elemento -->
 			<cfif i eq firstItem>
 
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 					UPDATE pc_avaliacao_melhorias
 					SET 				
 						pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
 						pc_aval_melhoria_sug_orgao_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
 						pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_matricula = <cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_sug_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 						pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_datahora = CONVERT(char, GETDATE(), 120),
+						pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
 							pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
 						<cfelse>
@@ -2340,16 +2319,16 @@
 
 			<cfelse>
 				<!-- Inserção para as outras áreas selecionadas -->
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 					insert pc_avaliacao_melhorias (pc_aval_melhoria_num_aval, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif, pc_aval_melhoria_sug_matricula, pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora, pc_aval_melhoria_dataPrev)
 					value( 	
 						pc_aval_melhoria_num_aval = <cfqueryparam value="#arguments.pc_aval_id#" cfsqltype="cf_sql_numeric">,			
 						pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
 						pc_aval_melhoria_sug_orgao_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
 						pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_matricula = <cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						pc_aval_melhoria_sug_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 						pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_datahora = CONVERT(char, GETDATE(), 120),
+						pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
 							pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
 						<cfelse>
@@ -2374,7 +2353,7 @@
 	<cffunction name="timelineViewAcomp"   access="remote" hint="enviar o componente timeline dos processos em acompanhamento para a páginas pc_Acompanhamento chama pela função tabAvaliacoesAcompanhamento">
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 
-		<cfquery name="rsProc" datasource="#dsn_processos#">
+		<cfquery name="rsProc" datasource="#application.dsn_processos#">
 
 			SELECT  pc_processos.*
 			,pc_avaliacoes.*
@@ -2411,7 +2390,7 @@
 
 		</cfquery>		
 
-		<cfquery name="rsSe_Area" datasource="#dsn_processos#">
+		<cfquery name="rsSe_Area" datasource="#application.dsn_processos#">
 			SELECT pc_orgaos.pc_org_mcu, pc_orgaos.pc_org_sigla
 			FROM pc_orgaos
 			WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') 
@@ -2423,7 +2402,7 @@
 
 		<cfset areasDaSE= valueList(rsSe_Area.pc_org_mcu) >
 
-		<cfquery name="rsAreasTodas" datasource="#dsn_processos#">
+		<cfquery name="rsAreasTodas" datasource="#application.dsn_processos#">
 			SELECT pc_orgaos.pc_org_mcu, pc_orgaos.pc_org_sigla
 			FROM pc_orgaos
 			WHERE pc_org_controle_interno ='N' AND pc_org_Status = 'A' and not pc_org_mcu in (<cfqueryparam cfsqltype="cf_sql_string" value="#areasDaSE#" list="true">)
@@ -2436,7 +2415,7 @@
 
 
 
-		<cfquery name="rsPosicionamentos" datasource="#dsn_processos#">
+		<cfquery name="rsPosicionamentos" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_posicionamentos.*, pc_orgaos.* , pc_usuarios.*,  pc_orgaos2.pc_org_sigla as orgaoResp, pc_orgaos2.pc_org_mcu as mcuOrgaoResp, CONVERT(char, pc_aval_posic_datahora, 103) as dataPosic
 			FROM pc_avaliacao_posicionamentos
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
@@ -2537,7 +2516,7 @@
 																	</cfif>
 																	<!--Inicio TabAnexosPosic-->
 																	<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
-																		<cfquery datasource="#dsn_processos#" name="rsAnexosPosic">
+																		<cfquery datasource="#application.dsn_processos#" name="rsAnexosPosic">
 																			Select pc_anexo_nome,pc_anexo_caminho  FROM pc_anexos 
 																			WHERE pc_anexo_aval_posic = #pc_aval_posic_id# 
 																			order By pc_anexo_id desc
@@ -2619,7 +2598,7 @@
 																	</cfif>
 																	<!--Inicio TabAnexosPosic-->
 																	<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
-																		<cfquery datasource="#dsn_processos#" name="rsAnexosPosic">
+																		<cfquery datasource="#application.dsn_processos#" name="rsAnexosPosic">
 																			Select pc_anexo_nome,pc_anexo_caminho  FROM pc_anexos 
 																			WHERE pc_anexo_aval_posic = #pc_aval_posic_id# 
 																			order By pc_anexo_id desc
@@ -2715,14 +2694,14 @@
 									</cfif>
 								</div>										
 							</div>
-							<cfquery datasource="#dsn_processos#" name="rsOrientacaoStatus">
+							<cfquery datasource="#application.dsn_processos#" name="rsOrientacaoStatus">
 								SELECT pc_orientacao_status.pc_orientacao_status_id,pc_orientacao_status.pc_orientacao_status_descricao  
 								FROM pc_orientacao_status 
 								WHERE (pc_orientacao_status_id = 5 OR pc_orientacao_status_finalizador = 'S' ) and pc_orientacao_status_status = 'A'
 								order by pc_orientacao_status_id  asc
 							</cfquery>
 
-							<cfquery datasource="#dsn_processos#" name="rsUltimaDataPrevistaResp">
+							<cfquery datasource="#application.dsn_processos#" name="rsUltimaDataPrevistaResp">
 								Select TOP 1 pc_aval_posic_dataPrevistaResp as ultimaDataPrevistaResp, pc_aval_posic_status 
 								from pc_avaliacao_posicionamentos
 								WHERE pc_aval_posic_num_orientacao = #rsProc.pc_aval_orientacao_id# 
@@ -2781,7 +2760,7 @@
 											<div id="actions" class="row" >
 												<div class="col-lg-12" align="left">
 													<div class="btn-group w-30">
-													        <cfif directoryExists(diretorio_anexos)>
+													        <cfif directoryExists(application.diretorio_anexos)>
 																<span id="anexosAcomp" class="btn btn-success col fileinput-button" style="background:#0083CA">
 																	<i class="fas fa-upload"></i>
 																	<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
@@ -3280,7 +3259,7 @@
 
 		
 
-		<cfquery name="rsProc" datasource="#dsn_processos#">
+		<cfquery name="rsProc" datasource="#application.dsn_processos#">
 			SELECT      pc_processos.*, pc_avaliacoes.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_mcu as mcuAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 								pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 								pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -3309,7 +3288,7 @@
 
 		
 
-		<cfquery name="rsPosicionamentos" datasource="#dsn_processos#">
+		<cfquery name="rsPosicionamentos" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_posicionamentos.*, pc_orgaos.* , pc_usuarios.*,  pc_orgaos2.pc_org_sigla as orgaoResp, pc_orgaos2.pc_org_mcu as mcuOrgaoResp, CONVERT(char, pc_aval_posic_datahora, 103) as dataPosic
 			FROM pc_avaliacao_posicionamentos
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
@@ -3388,7 +3367,7 @@
 															</cfif>
 															<!--Inicio TabAnexosPosic-->
 															<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
-																<cfquery datasource="#dsn_processos#" name="rsAnexosPosic">
+																<cfquery datasource="#application.dsn_processos#" name="rsAnexosPosic">
 																	Select pc_anexo_nome,pc_anexo_caminho  FROM pc_anexos 
 																	WHERE pc_anexo_aval_posic = #pc_aval_posic_id# 
 																	order By pc_anexo_id desc
@@ -3466,7 +3445,7 @@
 															</cfif>
 															<!--Inicio TabAnexosPosic-->
 															<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
-																<cfquery datasource="#dsn_processos#" name="rsAnexosPosic">
+																<cfquery datasource="#application.dsn_processos#" name="rsAnexosPosic">
 																	Select pc_anexo_nome,pc_anexo_caminho  FROM pc_anexos 
 																	WHERE pc_anexo_aval_posic = #pc_aval_posic_id# 
 																	order By pc_anexo_id desc
@@ -3587,7 +3566,7 @@
 						<div class="card-header" style="background-color:#ececec;">
 							<h4 class="card-title ">
 								<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:gray;font-weight: bold;"> 
-									<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">INSERIR MANIFESTAÇÃO DO ÓRGÃO: <cfoutput>#rsUsuario.pc_org_sigla#</cfoutput></span>
+									<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">INSERIR MANIFESTAÇÃO DO ÓRGÃO: <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></span>
 								</a>
 							</h4>
 						</div>
@@ -3613,7 +3592,7 @@
 										<div id="actions" class="row" >
 											<div class="col-lg-12" align="left">
 												<div class="btn-group w-30">
-												    <cfif directoryExists(diretorio_anexos)>
+												    <cfif directoryExists(application.diretorio_anexos)>
 														<span id="anexosAcomp" class="btn btn-success col fileinput-button" style="background:#0083CA">
 															<i class="fas fa-upload"></i>
 															<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
@@ -4010,21 +3989,21 @@
 		<cfargument name="idAnexos" type="string" required="true">
 		
     	<cftransaction>
-			<cfquery datasource = "#dsn_processos#" name="rsOrgao">
+			<cfquery datasource = "#application.dsn_processos#" name="rsOrgao">
 				SELECT 	pc_orgaos.* FROM pc_orgaos WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
 			</cfquery>
 			<cfif '#arguments.pc_aval_orientacao_mcu_orgaoResp#' neq ''>
 				<cfset data="#DateFormat(arguments.pc_aval_orientacao_dataPrevistaResp,'DD-MM-YYYY')#">
 				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
-				<cfquery datasource = "#dsn_processos#" name="rsCadPosic">
+				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
 					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
 				
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
-						CONVERT(char, GETDATE(), 120),
-						<cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#rsUsuario.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
@@ -4032,12 +4011,12 @@
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				</cfquery>
 
-				<cfquery datasource = "#dsn_processos#" >
+				<cfquery datasource = "#application.dsn_processos#" >
 					UPDATE 	pc_avaliacao_orientacoes
 					SET 
 						pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-						pc_aval_orientacao_status_datahora = CONVERT(char, GETDATE(), 120),
-						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#cgi.REMOTE_USER#" cfsqltype="cf_sql_varchar">,
+						pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
 						pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
 						pc_aval_orientacao_dataPrevistaResp = <cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">
 					WHERE 
@@ -4050,26 +4029,26 @@
 
 				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 
-				<cfquery datasource = "#dsn_processos#" name="rsCadPosic">
+				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
 					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
-						CONVERT(char, GETDATE(), 120),
-						<cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#rsUsuario.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				
 				</cfquery>
 
-				<cfquery datasource = "#dsn_processos#" >
+				<cfquery datasource = "#application.dsn_processos#" >
 					UPDATE 	pc_avaliacao_orientacoes
 					SET 
 						pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-						pc_aval_orientacao_status_datahora = CONVERT(char, GETDATE(), 120),
-						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#cgi.REMOTE_USER#" cfsqltype="cf_sql_varchar">
+						pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">
 					WHERE 
 						pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 				</cfquery>
@@ -4077,14 +4056,14 @@
 
 			</cfif>
 			<!--- Verifica se ainda existem no item orientação com status que não é finalizador--->
-			<cfquery datasource = "#dsn_processos#" name="rsItem" >
+			<cfquery datasource = "#application.dsn_processos#" name="rsItem" >
 				SELECT pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval FROM  pc_avaliacao_orientacoes WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 			</cfquery>
-			<cfquery datasource = "#dsn_processos#" name="rsProcesso" >
+			<cfquery datasource = "#application.dsn_processos#" name="rsProcesso" >
 				SELECT pc_avaliacoes.pc_aval_processo FROM pc_avaliacoes where pc_aval_id = #rsItem.pc_aval_orientacao_num_aval#
 			</cfquery>
 
-			<cfquery datasource = "#dsn_processos#" name="quantStatusNaoFinalizItem" >
+			<cfquery datasource = "#application.dsn_processos#" name="quantStatusNaoFinalizItem" >
 				SELECT pc_processos.pc_processo_id, pc_avaliacao_orientacoes.pc_aval_orientacao_id
 				FROM    pc_processos LEFT JOIN
 						pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo LEFT JOIN
@@ -4094,14 +4073,14 @@
 			</cfquery>
 			
 			<cfif quantStatusNaoFinalizItem.recordcount eq 0>
-				<cfquery datasource = "#dsn_processos#" >
+				<cfquery datasource = "#application.dsn_processos#" >
 					UPDATE 	pc_avaliacoes
 					SET    	pc_aval_status = '7'
 					WHERE 	pc_aval_id = #rsItem.pc_aval_orientacao_num_aval#
 				</cfquery>
 			</cfif>
 
-			<cfquery datasource = "#dsn_processos#" name="quantStatusNaoFinalizProcesso" >
+			<cfquery datasource = "#application.dsn_processos#" name="quantStatusNaoFinalizProcesso" >
 				SELECT pc_processos.pc_processo_id, pc_avaliacao_orientacoes.pc_aval_orientacao_id
 				FROM    pc_processos LEFT JOIN
 						pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo LEFT JOIN
@@ -4111,10 +4090,10 @@
 			</cfquery>
 
 			<cfif quantStatusNaoFinalizProcesso.recordcount eq 0>
-				<cfquery datasource = "#dsn_processos#" >
+				<cfquery datasource = "#application.dsn_processos#" >
 					UPDATE 	pc_processos
 					SET    	pc_num_status = '5',
-							pc_data_finalizado = CONVERT(char, GETDATE(), 120)
+							pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
 					WHERE 	pc_processo_id = '#rsProcesso.pc_aval_processo#'
 				</cfquery>
 			</cfif>
@@ -4124,7 +4103,7 @@
 			<cfset idArray = ListToArray(arguments.idAnexos)>
 			<cfif IsArray(#idArray#) AND ArrayLen(#idArray#) gt 0>
 				<cfloop array="#idArray#" index="id">
-					<cfquery datasource = "#dsn_processos#" >
+					<cfquery datasource = "#application.dsn_processos#" >
 						UPDATE 	pc_anexos set
 							pc_anexo_aval_posic = #idPosicCadastrado#
 						where pc_anexo_id = #id# and pc_anexo_aval_posic is null
@@ -4144,37 +4123,37 @@
 	<cffunction name="cadPosicOrgaoAvaliado"   access="remote" hint="cadastra a manifestação do avaliador do controle interno">
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 		<cfargument name="pc_aval_posic_texto" type="string" required="true" />
-		<cfargument name="pc_aval_orientacao_status" type="numeric" required="false" default=3 /><!-- O padrão é o status RESPOSTA DO ÓRGÃO AVALIADO-->
+		<cfargument name="pc_aval_orientacao_status" type="numeric" required="false" default="3" />
 		<cfargument name="pc_aval_orientacao_dataPrevistaResp" type="string" required="false" default=''/>
 		<cfargument name="idAnexos" type="string" required="true">
 
 		<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 		<cftransaction>
 			<cfif '#arguments.pc_aval_orientacao_dataPrevistaResp#' neq ''>
-				<cfquery datasource = "#dsn_processos#" name="rsCadPosic">
+				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
 					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
-						CONVERT(char, GETDATE(), 120),
-						<cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#rsUsuario.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
+						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_integer">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				</cfquery>
 			<cfelse>
 
-				<cfquery datasource = "#dsn_processos#" name="rsCadPosic">
+				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
 					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
-						CONVERT(char, GETDATE(), 120),
-						<cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#rsUsuario.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
+						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_integer">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				
@@ -4182,11 +4161,11 @@
 
 			</cfif>
 			
-			<cfquery datasource = "#dsn_processos#" >
+			<cfquery datasource = "#application.dsn_processos#" >
 				UPDATE 	pc_avaliacao_orientacoes
 				SET pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-					pc_aval_orientacao_status_datahora = CONVERT(char, GETDATE(), 120),
-					pc_aval_orientacao_atualiz_login = <cfqueryparam value="#cgi.REMOTE_USER#" cfsqltype="cf_sql_varchar">
+					pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+					pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">
 				WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 
 			</cfquery>
@@ -4195,7 +4174,7 @@
 			<cfset idArray = ListToArray(arguments.idAnexos)>
 			<cfif IsArray(#idArray#) AND ArrayLen(#idArray#) gt 0>
 				<cfloop array="#idArray#" index="id">
-					<cfquery datasource = "#dsn_processos#" >
+					<cfquery datasource = "#application.dsn_processos#" >
 						UPDATE 	pc_anexos set
 							pc_anexo_aval_posic = #idPosicCadastrado#
 						where pc_anexo_id = #id# and pc_anexo_aval_posic is null
@@ -4218,7 +4197,7 @@
 		
 		<cfset thisDir = expandPath(".")>
 
-		<cffile action="upload" filefield="file" destination="#diretorio_anexos#" nameconflict="skip" >
+		<cffile action="upload" filefield="file" destination="#application.diretorio_anexos#" nameconflict="skip" >
 	
 		<cfscript>
 			thread = CreateObject("java","java.lang.Thread");
@@ -4229,7 +4208,7 @@
 
 		<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
 				
-		<cfset destino = cffile.serverdirectory & '\Anexo_processo_orientacao_id_' & #pc_anexo_orientacao_id# & '_AVAL_' & #pc_anexo_avaliacao_id# &'_PC_' & '#pc_aval_processo#' & '_'  & '#rsUsuario.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
+		<cfset destino = cffile.serverdirectory & '\Anexo_processo_orientacao_id_' & #pc_anexo_orientacao_id# & '_AVAL_' & #pc_anexo_avaliacao_id# &'_PC_' & '#pc_aval_processo#' & '_'  & '#application.rsUsuarioParametros.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
 
 	    <cfobject component = "pc_cfcAvaliacoes" name = "tamanhoArquivo">
 		<cfinvoke component="#tamanhoArquivo#" method="renderFileSize" returnVariable="tamanhoDoArquivo" size ='#cffile.fileSize#' type='bytes'>
@@ -4240,12 +4219,12 @@
 			<cffile action="rename" source="#origem#" destination="#destino#">
         </cfif>
 		        
-		<cfset mcuOrgao = "#rsUsuario.pc_org_mcu#">
+		<cfset mcuOrgao = "#application.rsUsuarioParametros.pc_org_mcu#">
 		<cfif FileExists(destino)>
             
-		<cfquery datasource="#dsn_processos#" >
+		<cfquery datasource="#application.dsn_processos#" >
 				INSERT pc_anexos(pc_anexo_avaliacao_id,pc_anexo_orientacao_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF )
-				VALUES (#pc_anexo_avaliacao_id#,#pc_anexo_orientacao_id#, '#CGI.REMOTE_USER#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', 'N')
+				VALUES (#pc_anexo_avaliacao_id#,#pc_anexo_orientacao_id#, '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', 'N')
 		</cfquery>
 			
 		</cfif>

@@ -3,48 +3,48 @@
 
 
 <!-- 'A' ATIVO, 'O' ORIGEM DE PROCESSOS, 'D' DESATIVADO -->
-<cfquery name="rsOrigem" datasource="#dsn_processos#">
+<cfquery name="rsOrigem" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
 	FROM pc_orgaos
 	WHERE pc_org_Status = 'O' 
 	ORDER BY pc_org_sigla
 </cfquery>
-<cfquery name="rsOrigemGCOP" datasource="#dsn_processos#">
+<cfquery name="rsOrigemGCOP" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
 	FROM pc_orgaos
 	WHERE pc_org_Status = 'O' and pc_org_mcu = '00436698'
 	ORDER BY pc_org_sigla
 </cfquery>
 
-<cfquery name="rsAvaliacaoTipo" datasource="#dsn_processos#">
+<cfquery name="rsAvaliacaoTipo" datasource="#application.dsn_processos#">
 	SELECT pc_aval_tipo_id, pc_aval_tipo_descricao
 	FROM pc_avaliacao_tipos
 	WHERE pc_aval_tipo_status = 'A'
 	ORDER BY pc_aval_tipo_descricao
 </cfquery> 
 
-<cfquery name="rsClas" datasource="#dsn_processos#">
+<cfquery name="rsClas" datasource="#application.dsn_processos#">
 	SELECT pc_class_id, pc_class_descricao
 	FROM pc_classificacoes
 	WHERE pc_class_status ='A'
 	ORDER BY pc_class_descricao
 </cfquery>
 
-<cfquery name="rs_OrgAvaliado" datasource="#dsn_processos#">
+<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
 	FROM pc_orgaos
 	WHERE pc_org_controle_interno ='N' AND pc_org_Status = 'A' AND pc_org_orgaoAvaliado = 1
 	ORDER BY pc_org_sigla
 </cfquery>
 
-<cfquery name="rs_OrgAvaliadoSE_usuario" datasource="#dsn_processos#">
+<cfquery name="rs_OrgAvaliadoSE_usuario" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
 	FROM pc_orgaos
-	WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') AND (pc_org_se = '#rsUsuarioParametros.pc_org_se#' OR pc_org_se = '#rsUsuarioParametros.pc_org_se_abrangencia#')
+	WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') AND (pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_org_se = '#application.rsUsuarioParametros.pc_org_se_abrangencia#')
 	ORDER BY pc_org_sigla
 </cfquery>
 
-<cfquery datasource="#dsn_processos#" name="rsAvaliadores">
+<cfquery datasource="#application.dsn_processos#" name="rsAvaliadores">
 	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios 
 	INNER JOIN pc_orgaos ON  pc_org_mcu = pc_usu_lotacao
 	WHERE pc_org_controle_interno = 'S' AND pc_usu_status ='A'
@@ -111,7 +111,7 @@
 													<select id="pcModalidade" required name="pcModalidade" class="form-control">
 														<option selected="" disabled="" value=""></option>
 														<!--Se a gerência do usuário for GINS-->
-                                                        <cfif '#rsUsuarioParametros.pc_usu_lotacao#' eq '00437407' or '#rsUsuarioParametros.pc_usu_perfil#' eq 7>
+                                                        <cfif '#application.rsUsuarioParametros.pc_usu_lotacao#' eq '00437407' or '#application.rsUsuarioParametros.pc_usu_perfil#' eq 7>
 															<option value="E">ENTREGA DO RELATÓRIO</option>
 														<cfelse>
 															<option value="A">ACOMPANHAMENTO</option>
@@ -146,9 +146,9 @@
 													<select id="pcOrigem" required  name="pcOrigem" class="form-control" >
 														<option selected="" disabled="" value=""></option>
 
-														<cfif #rsUsuarioParametros.pc_usu_perfil# eq 8>
-															<cfoutput><option selected value="#rsUsuarioParametros.pc_org_mcu#"> #rsUsuarioParametros.pc_org_sigla#</option></cfoutput>
-														<cfelseif #rsUsuarioParametros.pc_usu_perfil# eq 7>
+														<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 8>
+															<cfoutput><option selected value="#application.rsUsuarioParametros.pc_org_mcu#"> #application.rsUsuarioParametros.pc_org_sigla#</option></cfoutput>
+														<cfelseif #application.rsUsuarioParametros.pc_usu_perfil# eq 7>
 														    <cfoutput><option selected value="#rsOrigemGCOP.pc_org_mcu#">#rsOrigemGCOP.pc_org_sigla#</option></cfoutput>
 														<cfelse>
 															<cfoutput query="rsOrigem" >
@@ -224,7 +224,7 @@
 													<label for="pcOrgaoAvaliado">Órgão Avaliado:</label>
 													<select id="pcOrgaoAvaliado" required name="pcOrgaoAvaliado" class="form-control">
 														<option selected="" disabled="" value=""></option>
-														<cfif #rsUsuarioParametros.pc_usu_perfil# eq 7>
+														<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7>
 															<cfoutput query="rs_OrgAvaliadoSE_usuario">
 																<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
 															</cfoutput>
@@ -330,7 +330,7 @@
 							
 					</div>	<!-- fim card-body -->
 							
-				<!--<cfquery datasource="#dsn_processos#" name="rsAvaliadoresCadastrados">
+				<!--<cfquery datasource="#application.dsn_processos#" name="rsAvaliadoresCadastrados">
 					SELECT pc_avaliadores.* FROM pc_avaliadores WHERE pc_avaliador_id_processo = '0300032022'
 					
 				</cfquery>			

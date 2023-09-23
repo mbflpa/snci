@@ -1,30 +1,6 @@
 <cfcomponent >
 <cfprocessingdirective pageencoding = "utf-8">	
 
-	<!--- Diretório onde serão armazenados arquivos anexados a avaliações --->
-	<cfset auxsite =  cgi.server_name>
-	<cfif auxsite eq "intranetsistemaspe">
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
-	<cfelse>
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-	</cfif>
-
-	<cfset dsn_processos = 'DBSNCI'>
-	
-	
-
-	<cfquery name="rsUsuario" datasource="#dsn_processos#">
-		SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
-		INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
-		INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
-	</cfquery>
-	
-
-
-
 
     <cffunction name="cardsPerfis"   access="remote" hint="enviar os cards dos perfis para a páginas pc_Pefis">
 		<!DOCTYPE html>
@@ -39,7 +15,7 @@
 		</head>
 		<body>
 					<div class="card-body" style="border: solid 3px #ffD400;">
-							<cfquery name="rsPerfisCards" datasource="#dsn_processos#">
+							<cfquery name="rsPerfisCards" datasource="#application.dsn_processos#">
 								SELECT pc_perfil_tipos.* from pc_perfil_tipos 
 							</cfquery>	
 							
@@ -58,7 +34,7 @@
 
 											<td style="background: none;border:none">
 
-												<cfquery name="rsQuantUsuariosPorPerfil" datasource="#dsn_processos#">
+												<cfquery name="rsQuantUsuariosPorPerfil" datasource="#application.dsn_processos#">
 													SELECT pc_usuarios.pc_usu_perfil from pc_usuarios 
 													INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
 													where pc_usu_perfil = #pc_perfil_tipo_id# and pc_usu_status = 'A'
@@ -70,7 +46,7 @@
 														<div class="small-box " style="font-weight: normal;background: <cfif '#pc_perfil_tipo_status#' eq 'A'>#0083CA<cfelse>gray</cfif>;color: #fff;font-weight: normal;">
 															
 															<div class="card-header" style="height:130px;width:250px;border-bottom:none; font-weight: normal!important">
-																<cfif #rsUsuario.pc_usu_perfil# eq 3>
+																<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3>
 																	<p style="font-size:14px;margin-bottom: 0.3rem!important;"><strong><cfoutput>#pc_perfil_tipo_descricao#</strong> (id:#pc_perfil_tipo_id#)</cfoutput></p>
 																<cfelse>
 																	<p style="font-size:14px;margin-bottom: 0.3rem!important;"><strong><cfoutput>#pc_perfil_tipo_descricao#</strong></cfoutput></p>
@@ -192,7 +168,7 @@
 		<cfargument name="pc_perfil_tipo_status" type="string" required="false"  default='A'/>
 		
 
-		<cfquery datasource="#dsn_processos#" >
+		<cfquery datasource="#application.dsn_processos#" >
 			<cfif #arguments.pc_perfil_tipo_id# eq ''>
 				INSERT pc_perfil_tipos (pc_perfil_tipo_descricao, pc_perfil_tipo_comentario)
 				VALUES (<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_perfil_tipo_descricao#">
@@ -221,12 +197,12 @@
         
 	    <cfargument name="pc_perfil_tipo_id" type="numeric" required="true"/>
 
-		 <cfquery datasource="#dsn_processos#" name="rsPerfilSelecionado">
+		 <cfquery datasource="#application.dsn_processos#" name="rsPerfilSelecionado">
 			Select pc_perfil_tipos.pc_perfil_tipo_descricao from pc_perfil_tipos
 			WHERE pc_perfil_tipo_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_perfil_tipo_id#">
 		</cfquery>
 
-        <cfquery datasource="#dsn_processos#" name="rsUsuariosPerfis">
+        <cfquery datasource="#application.dsn_processos#" name="rsUsuariosPerfis">
 			Select pc_usuarios.*, pc_perfil_tipos.*, pc_orgaos.pc_org_sigla from pc_usuarios
 			INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
 			INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
@@ -322,7 +298,7 @@
 		<cfargument name="pc_usu_perfil" type="numeric" required="true"/>
 		<cfset login = 'CORREIOSNET\' & #arguments.pc_usu_matricula#>
 
-		<cfquery datasource="#dsn_processos#" >
+		<cfquery datasource="#application.dsn_processos#" >
 			<cfif #arguments.usuarioEditar# eq ''>
 				INSERT pc_usuarios (pc_usu_matricula, pc_usu_Nome, pc_usu_login, pc_usu_lotacao, pc_usu_perfil, pc_usu_atualiz_datahora, pc_usu_atualiz_matricula)
 				VALUES (
@@ -331,8 +307,8 @@
 					<cfqueryparam value="#login#" cfsqltype="cf_sql_varchar">,
 					<cfqueryparam value="#arguments.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 					<cfqueryparam value="#arguments.pc_usu_perfil#" cfsqltype="cf_sql_integer">,
-					CONVERT(char, GETDATE(), 120),
-					<cfqueryparam value="#rsUsuario.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+					<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+					<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
 				)
 
 			
@@ -361,7 +337,7 @@
 		
 		<cfargument name="pc_usu_matricula" type="string" required="true"/>
 
-		<cfquery datasource="#dsn_processos#" >
+		<cfquery datasource="#application.dsn_processos#" >
 			DELETE FROM pc_usuarios
 			WHERE pc_usu_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
 		</cfquery>
@@ -370,7 +346,7 @@
 
 	
 	<cffunction name="getUsuariosJSON" access="remote" returntype="any" returnformat="json" output="false">
-		<cfquery name="rsCadUsuarios" datasource="#dsn_processos#">
+		<cfquery name="rsCadUsuarios" datasource="#application.dsn_processos#">
 			SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
 			left JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
 			INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
@@ -405,7 +381,7 @@
 
 		<cfargument name="pc_usu_matricula" type="string" required="true"/>
 
-		<cfquery datasource="#dsn_processos#" name="rsExisteMatricula">
+		<cfquery datasource="#application.dsn_processos#" name="rsExisteMatricula">
 			Select pc_usuarios.pc_usu_matricula from pc_usuarios
 			WHERE pc_usu_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
 		</cfquery>
@@ -437,9 +413,9 @@
 			</head>
 			<body>
 				<div class="card-body" style="border: solid 3px #ffD400;">
-						<cfquery name="rsControleCards" datasource="#dsn_processos#">
+						<cfquery name="rsControleCards" datasource="#application.dsn_processos#">
 							SELECT pc_controle_acesso.* from pc_controle_acesso 
-							<cfif #rsUsuario.pc_usu_matricula# neq '80859992'>
+							<cfif #application.rsUsuarioParametros.pc_usu_matricula# neq '80859992'>
 								where not pc_controle_acesso_pagina = 'pc_ApoioDeletaProcessos.cfm'
 							</cfif>
 						</cfquery>	
@@ -559,7 +535,7 @@
 		<cfargument name="pc_controle_acesso_menu_icone" type="string" required="false"  default=''/>
 		<cfargument name="pc_controle_acesso_ordem" type="numeric" required="false"  default=1/>
 
-		<cfquery datasource="#dsn_processos#" >
+		<cfquery datasource="#application.dsn_processos#" >
 			<cfif #arguments.pc_controle_acesso_id# eq ''>
 				INSERT pc_controle_acesso (pc_controle_acesso_nomeMenu,pc_controle_acesso_pagina,pc_controle_acesso_perfis,pc_controle_acesso_grupoMenu
 				        ,pc_controle_acesso_subgrupoMenu,pc_controle_acesso_grupo_icone,pc_controle_acesso_subgrupo_icone
@@ -606,7 +582,7 @@
 	<cffunction name="delLink"   access="remote"  returntype="any" hint="exclui links do menu">
 		<cfargument name="pc_controle_acesso_id" type="string" required="false"/>
 
-		<cfquery datasource="#dsn_processos#" >
+		<cfquery datasource="#application.dsn_processos#" >
 			DELETE FROM pc_controle_acesso
 			WHERE pc_controle_acesso_id = <cfqueryparam value="#arguments.pc_controle_acesso_id#" cfsqltype="cf_sql_integer">
 		</cfquery>
@@ -624,7 +600,7 @@
 		<cfset nCont = 1>
 		<cfset nDiasSomar = 0>
 		<cfloop condition="nCont lt Prazo">
-			<cfquery name="rsFeriado" datasource="#dsn_processos#">
+			<cfquery name="rsFeriado" datasource="#application.dsn_processos#">
 				SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
 			</cfquery>
 			<cfdump var= '#rsFeriado#' />
@@ -650,7 +626,7 @@
 			<cfif '#nCont#' eq '#Prazo#'>
 					<cfset Prazo2 = Prazo + nDiasSomar>
 					<cfset dtnovoprazo2 = DateAdd("d", #Prazo2#, #dtatual#)>
-					<cfquery name="rsFeriado" datasource="#dsn_processos#">
+					<cfquery name="rsFeriado" datasource="#application.dsn_processos#">
 						SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo2#
 					</cfquery>
 					<cfset vDiaSem = DayOfWeek(dtnovoprazo2)>
@@ -727,7 +703,7 @@
 		
 		<cfset isFeriado = false>
 		
-		<cfquery name="rsFeriado" datasource="#dsn_processos#">
+		<cfquery name="rsFeriado" datasource="#application.dsn_processos#">
 			SELECT Fer_Data FROM FeriadoNacional WHERE Fer_Data = <cfqueryparam cfsqltype="cf_sql_date" value="#data#">
 		</cfquery>
 		

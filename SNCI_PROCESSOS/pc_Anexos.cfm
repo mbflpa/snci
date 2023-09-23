@@ -17,7 +17,7 @@
     <cfif ucase(left(trim(url.arquivo),24)) is "\\SAC0424\SISTEMAS\SNCI\" >
 	  <cfset vArquivo = url.arquivo>
 	<cfelse>
-	  <cfset vArquivo = #diretorio_anexos# & url.arquivo>
+	  <cfset vArquivo = #application.diretorio_anexos# & url.arquivo>
 	</cfif>
 	
 	<cfif right(#varquivo#,3) eq 'pdf'>

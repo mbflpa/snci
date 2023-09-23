@@ -1,37 +1,6 @@
 <cfcomponent  >
 <cfprocessingdirective pageencoding = "utf-8">	
 
-	<!--- Diretório onde serão armazenados arquivos anexados a avaliações --->
-	<cfset auxsite =  cgi.server_name>
-	<cfif auxsite eq "intranetsistemaspe">
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
-		<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_FAQS\'>
-	<cfelse>
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-	</cfif>
-
-	<cfset dsn_processos = 'DBSNCI'>
-
-	<!-- iCheck -->
-	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-
-
-	<cfquery name="rsUsuario" datasource="#dsn_processos#">
-		SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
-		INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
-		INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
-	</cfquery>
-
-
-	
-
-
-
-
 
 	
 	<cffunction name="cadProc"   access="remote" returntype="any">
@@ -54,13 +23,13 @@
 		<cfargument name="pcAnoPacin" type="string" required="true"/>
 		
 		<cfset ano = year(#arguments.pcDataInicioAvaliacao#)>
-		<cfset login = '#cgi.REMOTE_USER#'>
+		<cfset login = '#application.rsUsuarioParametros.pc_usu_login#'>
 
-		<cfquery name="rsSEorgAvaliado" datasource="#dsn_processos#">
+		<cfquery name="rsSEorgAvaliado" datasource="#application.dsn_processos#">
 		  SELECT pc_org_se from pc_orgaos where pc_org_mcu = #arguments.pcOrgaoAvaliado#
         </cfquery>
 
-		<cfquery name="rsSeq" datasource="#dsn_processos#">
+		<cfquery name="rsSeq" datasource="#application.dsn_processos#">
 			SELECT Max(pc_processo_id) AS Max
 			FROM pc_processos 
 			WHERE pc_processo_id like '%#ano#' AND pc_processo_id like '#rsSEorgAvaliado.pc_org_se#%'
@@ -95,7 +64,7 @@
 
 		
 		<!--Se o ano da data de início da avaliação, um novo processo é cadastrado e o processo antigo é excluído-->
-		<cfquery datasource="#dsn_processos#" name="qProcessoEditar">
+		<cfquery datasource="#application.dsn_processos#" name="qProcessoEditar">
 			SELECT pc_data_inicioAvaliacao, pc_usu_matricula_cadastro, pc_num_status, pc_org_se,pc_num_orgao_avaliado  FROM pc_processos 
 			INNER JOIN pc_orgaos ON pc_orgaos.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
 			WHERE pc_processo_id = '#arguments.pcProcessoId#'
@@ -104,16 +73,16 @@
 		
 
 		<cfif anoAntes neq ano >
-			<cfquery datasource="#dsn_processos#">
+			<cfquery datasource="#application.dsn_processos#">
 				INSERT pc_processos (pc_processo_id, pc_usu_matricula_cadastro, pc_datahora_cadastro, pc_num_sei, pc_num_orgao_origem, pc_num_rel_sei, pc_num_orgao_avaliado, pc_num_avaliacao_tipo, pc_aval_tipo_nao_aplica_descricao,pc_num_classificacao, pc_data_inicioAvaliacao, pc_data_fimAvaliacao, pc_num_status, pc_alteracao_datahora, pc_alteracao_login, pc_usu_matricula_coordenador,pc_usu_matricula_coordenador_nacional, pc_Modalidade,pc_tipo_demanda, pc_ano_pacin)
-				VALUES ('#NumID#', '#qProcessoEditar.pc_usu_matricula_cadastro#', CONVERT(char, GETDATE(), 120), '#aux_sei#', '#arguments.pcOrigem#', '#arguments.pcNumRelatorio#', '#arguments.pcOrgaoAvaliado#', '#arguments.pcTipoAvaliado#','#arguments.pcTipoAvalDescricao#','#arguments.pcTipoClassif#', '#arguments.pcDataInicioAvaliacao#', '#arguments.pcDataFimAvaliacao#', '#qProcessoEditar.pc_num_status#', CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#', '#arguments.pcCoordenador#',  '#arguments.pcCoordNacional#', '#arguments.pcModalidade#', '#arguments.pcTipoDemanda#', '#arguments.pcAnoPacin#')
+				VALUES ('#NumID#', '#qProcessoEditar.pc_usu_matricula_cadastro#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#aux_sei#', '#arguments.pcOrigem#', '#arguments.pcNumRelatorio#', '#arguments.pcOrgaoAvaliado#', '#arguments.pcTipoAvaliado#','#arguments.pcTipoAvalDescricao#','#arguments.pcTipoClassif#', '#arguments.pcDataInicioAvaliacao#', '#arguments.pcDataFimAvaliacao#', '#qProcessoEditar.pc_num_status#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#', '#arguments.pcCoordenador#',  '#arguments.pcCoordNacional#', '#arguments.pcModalidade#', '#arguments.pcTipoDemanda#', '#arguments.pcAnoPacin#')
 			</cfquery> 	
 	
             <cftransaction>
 				<!--Cadastra avaliadores -->
 				<cfloop list="#arguments.pcAvaliadores#" index="i">  
 					<cfset matriculaAvaliador = '#i#'>
-					<cfquery datasource="#dsn_processos#">
+					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliadores (pc_avaliador_matricula,  pc_avaliador_id_processo)
 						VALUES ('#matriculaAvaliador#',  '#NumID#')
 					</cfquery>
@@ -121,7 +90,7 @@
 				<!--Fim Cadastra avaliadores -->
 
 				<!--Edita todos os registros nas outras tabelas com o novo ID do processo-->
-				<cfquery datasource="#dsn_processos#" name="EditaTabelas">
+				<cfquery datasource="#application.dsn_processos#" name="EditaTabelas">
 					UPDATE pc_avaliacoes
 					SET pc_avaliacoes.pc_aval_processo = '#NumID#'
 					WHERE pc_avaliacoes.pc_aval_processo = '#arguments.pcProcessoId#'
@@ -134,14 +103,14 @@
 
 				
 				<!--Exclui avaliadores antigos-->
-				<cfquery datasource="#dsn_processos#" name="DeletaAvaliadores">
+				<cfquery datasource="#application.dsn_processos#" name="DeletaAvaliadores">
 					DELETE FROM pc_avaliadores
 					WHERE pc_avaliadores.pc_avaliador_id_processo = '#arguments.pcProcessoId#'
 				</cfquery> 
 				<!--Fim Exclui avaliadores antigos-->
 
 				<!--Exclui processo antigo-->
-				<cfquery datasource="#dsn_processos#" name="DeletaProcessos">
+				<cfquery datasource="#application.dsn_processos#" name="DeletaProcessos">
 					DELETE FROM pc_processos
 					WHERE pc_processos.pc_processo_id = '#arguments.pcProcessoId#'
 				</cfquery>
@@ -150,7 +119,7 @@
 		<!--Se nem o ano de início da avaliação for alterado, editar o processo normalmente-->
 		<cfelse>
 			<cftransaction>
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 					UPDATE pc_processos
 					SET 
 						pc_num_orgao_origem = '#arguments.pcOrigem#',
@@ -161,8 +130,8 @@
 						pc_num_classificacao = '#arguments.pcTipoClassif#',
 						pc_data_inicioAvaliacao = '#arguments.pcDataInicioAvaliacao#',
 						pc_data_fimAvaliacao = '#arguments.pcDataFimAvaliacao#',
-						pc_alteracao_datahora = CONVERT(char, GETDATE(), 120),
-						pc_alteracao_login = '#cgi.REMOTE_USER#',
+						pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#',
 						pc_usu_matricula_coordenador =  '#arguments.pcCoordenador#',
 						pc_usu_matricula_coordenador_nacional =  '#arguments.pcCoordNacional#',
 						pc_tipo_demanda = '#arguments.pcTipoDemanda#',
@@ -170,7 +139,7 @@
 					WHERE pc_processo_id = '#arguments.pcProcessoId#'
 				</cfquery> 	
 
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 					DELETE FROM pc_avaliadores
 					WHERE pc_avaliador_id_processo= '#arguments.pcProcessoId#'
 				</cfquery> 	
@@ -184,7 +153,7 @@
 						<cfset coordena ='N'>
 					</cfif>
 
-					<cfquery datasource="#dsn_processos#">
+					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliadores (pc_avaliador_matricula, pc_avaliador_id_processo)
 						VALUES ('#matriculaAvaliador#', '#arguments.pcProcessoId#')
 					</cfquery>
@@ -208,17 +177,17 @@
 	   
 		<cfargument name="ano" type="string" required="true" />
 
-		<cfquery name="rsProcCard" datasource="#dsn_processos#">
+		<cfquery name="rsProcCard" datasource="#application.dsn_processos#">
 			SELECT DISTINCT pc_processos.*,pc_orgaos.pc_org_descricao,pc_orgaos.pc_org_sigla, pc_status.*,pc_avaliacao_tipos.pc_aval_tipo_descricao
 			FROM   pc_processos 
 			INNER JOIN pc_avaliacao_tipos on pc_num_avaliacao_tipo = pc_aval_tipo_id
 			INNER JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado =pc_orgaos.pc_org_mcu
 			INNER JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id
-			<cfif rsUsuario.pc_usu_perfil eq 11 OR rsUsuario.pc_usu_perfil eq 3>
+			<cfif application.rsUsuarioParametros.pc_usu_perfil eq 11 OR application.rsUsuarioParametros.pc_usu_perfil eq 3>
 				WHERE not pc_status_id IN ('2') 
 			</cfif>
-			<cfif rsUsuario.pc_usu_perfil eq 8>
-                WHERE not pc_status_id IN ('2','5') and pc_num_orgao_origem = '#rsUsuario.pc_usu_lotacao#'	
+			<cfif application.rsUsuarioParametros.pc_usu_perfil eq 8>
+                WHERE not pc_status_id IN ('2','5') and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'	
 			</cfif>
 			<cfif '#arguments.ano#' neq 'TODOS'>
 				AND right(pc_processo_id,4) = '#arguments.ano#'
@@ -268,7 +237,7 @@
 															
 															<tbody class="grid-container" >
 																<cfloop query="rsProcCard" >
-																	<cfquery name="rsAvaliadores" datasource="#dsn_processos#">
+																	<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 																		SELECT pc_avaliadores.pc_avaliador_matricula FROM pc_avaliadores WHERE pc_avaliador_id_processo = '#pc_processo_id#' 
 																	</cfquery>
 																	<cfset avaliadores = ValueList(rsAvaliadores.pc_avaliador_matricula,',')>
@@ -422,7 +391,7 @@
         
        
 
-		<cfquery name="rsProcForm" datasource="#dsn_processos#">
+		<cfquery name="rsProcForm" datasource="#application.dsn_processos#">
 			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado, pc_orgaos.pc_org_mcu,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -438,7 +407,7 @@
 		</cfquery>
 	
 
-		<cfquery name="rs_OrgAvaliado" datasource="#dsn_processos#">
+		<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
 			SELECT pc_orgaos.*
 			FROM pc_orgaos
 			WHERE  (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProcForm.pc_num_orgao_avaliado#' or pc_org_mcu ='#rsProcForm.pc_num_orgao_avaliado#')
@@ -988,7 +957,7 @@
 	<cffunction name="anexoRelatorio"   access="remote" hint="retorna os anexos que contem informação do processo no campo pc_anexo_processo_id indicando que é um anexo para todos os itens">
 		<cfargument name="pc_anexo_processo_id" type="string" required="true"/>
 
-		<cfquery datasource="#dsn_processos#" name="rsPc_anexos" > 
+		<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos" > 
 			SELECT pc_anexos.*   FROM  pc_anexos
 			WHERE pc_anexo_processo_id = '#arguments.pc_anexo_processo_id#'
 		</cfquery>
@@ -1084,9 +1053,9 @@
 	
 
 		<cfif pc_anexo_avaliacaoPDF eq 'S'>
-			<cffile action="upload" filefield="file" destination="#diretorio_avaliacoes#" nameconflict="skip">
+			<cffile action="upload" filefield="file" destination="#application.diretorio_avaliacoes#" nameconflict="skip">
         <cfelse>
-			<cffile action="upload" filefield="file" destination="#diretorio_anexos#" nameconflict="skip" >
+			<cffile action="upload" filefield="file" destination="#application.diretorio_anexos#" nameconflict="skip" >
 		</cfif>
 
 
@@ -1101,12 +1070,12 @@
 		
 		<cfif pc_anexo_avaliacaoPDF eq 'S'>
 			<cfif arquivoParaTodosOsItens eq 'N'>
-				<cfset destino = cffile.serverdirectory & '\Avaliacao_id_' & #pc_aval_id# &'PC' & '#pc_aval_processo#' & '_'  & '#rsUsuario.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
+				<cfset destino = cffile.serverdirectory & '\Avaliacao_id_' & #pc_aval_id# &'PC' & '#pc_aval_processo#' & '_'  & '#application.rsUsuarioParametros.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
 			<cfelse>
-				<cfset destino = cffile.serverdirectory & '\Relatorio_processo_'&'PC' & '#pc_aval_processo#' & '_'  & '#rsUsuario.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
+				<cfset destino = cffile.serverdirectory & '\Relatorio_processo_'&'PC' & '#pc_aval_processo#' & '_'  & '#application.rsUsuarioParametros.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
 			</cfif>
 		<cfelse>
-			<cfset destino = cffile.serverdirectory & '\Anexo_processo_avaliacao_id_' & #pc_aval_id# &'PC' & '#pc_aval_processo#' & '_'  & '#rsUsuario.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
+			<cfset destino = cffile.serverdirectory & '\Anexo_processo_avaliacao_id_' & #pc_aval_id# &'PC' & '#pc_aval_processo#' & '_'  & '#application.rsUsuarioParametros.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
 		</cfif>
 
 
@@ -1121,17 +1090,17 @@
         </cfif>
 
 		        
-		<cfset mcuOrgao = "#rsUsuario.pc_org_mcu#">
+		<cfset mcuOrgao = "#application.rsUsuarioParametros.pc_org_mcu#">
 		<cfif FileExists(destino)>
             <cfif arquivoParaTodosOsItens eq 'N'>
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 						INSERT pc_anexos(pc_anexo_avaliacao_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF )
-						VALUES (#pc_aval_id#, '#CGI.REMOTE_USER#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', '#pc_anexo_avaliacaoPDF#')
+						VALUES (#pc_aval_id#, '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', '#pc_anexo_avaliacaoPDF#')
 				</cfquery>
 			<cfelse>
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 						INSERT pc_anexos(pc_anexo_processo_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF )
-						VALUES ('#pc_aval_processo#', '#CGI.REMOTE_USER#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', '#pc_anexo_avaliacaoPDF#')
+						VALUES ('#pc_aval_processo#', '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', '#pc_anexo_avaliacaoPDF#')
 				</cfquery>
 			</cfif>
 		</cfif>
@@ -1147,7 +1116,7 @@
 	<cffunction name="delAnexos"   access="remote" returntype="boolean">
 		<cfargument name="pc_anexo_id" type="numeric" required="true" default=""/>
 
-		<cfquery datasource="#dsn_processos#" name="rsPc_anexos"> 
+		<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos"> 
 			SELECT pc_anexos.*   FROM  pc_anexos
 			WHERE pc_anexo_id = #arguments.pc_anexo_id#
 		</cfquery>
@@ -1156,7 +1125,7 @@
 			<cffile action = "delete" File = "#rsPc_anexos.pc_anexo_caminho#">
 		</cfif>
 
-		<cfquery datasource="#dsn_processos#">
+		<cfquery datasource="#application.dsn_processos#">
 			DELETE FROM pc_anexos
 			WHERE(pc_anexo_id = #arguments.pc_anexo_id#)
 		</cfquery> 	
@@ -1182,15 +1151,15 @@
 
         <cfif '#arguments.pc_aval_id#' eq '' >
 			<cftransaction>
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 					INSERT INTO pc_avaliacoes
 									(pc_aval_processo, pc_aval_numeracao, pc_aval_datahora, pc_aval_atualiz_datahora,pc_aval_atualiz_login,
 									pc_aval_avaliador_matricula, pc_aval_descricao, pc_aval_status, pc_aval_vaFalta, pc_aval_vaRisco, pc_aval_vaSobra, pc_aval_classificacao)
-					VALUES     		('#arguments.pc_aval_processo#', '#arguments.pc_aval_numeracao#', CONVERT(char, GETDATE(), 120), CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#',#rsUsuario.pc_usu_matricula#, '#arguments.pc_aval_descricao#', '1',  '#arguments.pc_aval_vaFalta#', '#arguments.pc_aval_vaRisco#','#arguments.pc_aval_vaSobra#','#arguments.pc_aval_classificacao#')
+					VALUES     		('#arguments.pc_aval_processo#', '#arguments.pc_aval_numeracao#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#application.rsUsuarioParametros.pc_usu_matricula#, '#arguments.pc_aval_descricao#', '1',  '#arguments.pc_aval_vaFalta#', '#arguments.pc_aval_vaRisco#','#arguments.pc_aval_vaSobra#','#arguments.pc_aval_classificacao#')
 			
 				</cfquery>
 
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 					UPDATE pc_processos
 					SET pc_num_status = 3
 					WHERE  pc_processo_id = '#arguments.pc_aval_processo#'
@@ -1198,7 +1167,7 @@
 			</cftransaction>
 		<cfelse>
 			<cftransaction>
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 					UPDATE pc_avaliacoes
 					SET pc_aval_numeracao = '#arguments.pc_aval_numeracao#',
 						pc_aval_descricao =  '#arguments.pc_aval_descricao#',
@@ -1206,14 +1175,14 @@
 						pc_aval_vaFalta =  '#arguments.pc_aval_vaFalta#',
 						pc_aval_vaRisco =  '#arguments.pc_aval_vaRisco#',
 						pc_aval_vaSobra =  '#arguments.pc_aval_vaSobra#',
-						pc_aval_atualiz_datahora = CONVERT(char, GETDATE(), 120),
-						pc_aval_atualiz_login = '#cgi.REMOTE_USER#'
+						pc_aval_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
 
 					WHERE  pc_aval_id = #arguments.pc_aval_id#
 				</cfquery> 	
 				<!--Se a classificação for modificada para Leve, todas as orientações e propostas de melhoria do item serão excluídas-->
 				<cfif '#arguments.pc_aval_classificacao#' eq 'L'>
-					<cfquery datasource="#dsn_processos#" >
+					<cfquery datasource="#application.dsn_processos#" >
 						Delete from pc_avaliacao_orientacoes WHERE  pc_aval_orientacao_num_aval = #arguments.pc_aval_id#
 						Delete from pc_avaliacao_melhorias WHERE  pc_aval_melhoria_num_aval = #arguments.pc_aval_id#
 					</cfquery>
@@ -1234,7 +1203,7 @@
 		<cfargument name="numProcesso" type="string" required="true"/>
 
 
-		<cfquery name="rsAvalTab" datasource="#dsn_processos#">
+		<cfquery name="rsAvalTab" datasource="#application.dsn_processos#">
 			SELECT      pc_avaliacoes.* 
 			FROM        pc_avaliacoes 
 			WHERE       pc_aval_processo = '#arguments.numProcesso#'
@@ -1269,15 +1238,15 @@
 									<tbody>
 										<cfloop query="rsAvalTab" >
 
-											<cfquery datasource="#dsn_processos#" name="rsAnexoAvaliacao">
+											<cfquery datasource="#application.dsn_processos#" name="rsAnexoAvaliacao">
 												SELECT pc_anexos.pc_anexo_avaliacao_id FROM pc_anexos WHERE pc_anexo_avaliacao_id = #pc_aval_id# 
 											</cfquery> 
 
-											<cfquery datasource="#dsn_processos#" name="rsMelhorias">
+											<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
 												SELECT pc_avaliacao_melhorias.pc_aval_melhoria_num_aval FROM pc_avaliacao_melhorias WHERE pc_aval_melhoria_num_aval = #pc_aval_id#
 											</cfquery>
 
-											<cfquery datasource="#dsn_processos#" name="rsOrientacoes">
+											<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 												SELECT pc_avaliacao_orientacoes.pc_aval_orientacao_id FROM pc_avaliacao_orientacoes WHERE pc_aval_orientacao_num_aval = #pc_aval_id#
 											</cfquery>
 
@@ -1547,15 +1516,15 @@
 		<cfargument name="pc_aval_id" type="numeric" required="true" />
 		<cfargument name="pc_aval_processo" type="string" required="true" />
 
-		<cfquery datasource="#dsn_processos#" name="rsAnexoAvaliacao">
+		<cfquery datasource="#application.dsn_processos#" name="rsAnexoAvaliacao">
 			SELECT pc_anexos.pc_anexo_avaliacao_id FROM pc_anexos WHERE pc_anexo_avaliacao_id = #arguments.pc_aval_id# 
 		</cfquery> 
 
-		<cfquery datasource="#dsn_processos#" name="rsMelhorias">
+		<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
 			SELECT pc_avaliacao_melhorias.pc_aval_melhoria_num_aval FROM pc_avaliacao_melhorias WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id#
 		</cfquery>
 
-		<cfquery datasource="#dsn_processos#" >
+		<cfquery datasource="#application.dsn_processos#" >
 			DELETE FROM pc_validacoes_chat
 			WHERE pc_validacao_chat_num_aval= '#arguments.pc_aval_id#'
 		</cfquery>
@@ -1563,7 +1532,7 @@
    
 
 		<cfif #rsAnexoAvaliacao.RecordCount# eq 0 && #rsMelhorias.RecordCount# eq 0>
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				DELETE FROM pc_avaliacoes
 				WHERE pc_aval_id= '#arguments.pc_aval_id#'
 			</cfquery> 
@@ -1571,14 +1540,14 @@
 
 
 
-		<cfquery datasource="#dsn_processos#" name="rsAvaliacoes">
+		<cfquery datasource="#application.dsn_processos#" name="rsAvaliacoes">
 			SELECT pc_avaliacoes.pc_aval_id FROM pc_avaliacoes WHERE pc_aval_processo = '#arguments.pc_aval_processo#'
 		</cfquery>
 
 
 
 		<cfif #rsAvaliacoes.recordCount#  eq 0>
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE pc_processos
 				SET pc_num_status = 2
 				WHERE  pc_processo_id = '#arguments.pc_aval_processo#'
@@ -1594,7 +1563,7 @@
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
 
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.idAvaliacao#
 		</cfquery>
 
@@ -1607,7 +1576,7 @@
 
 					<div id="idAvaliacao" hidden></div>
 
-					<cfquery name="rsProcAval" datasource="#dsn_processos#">
+					<cfquery name="rsProcAval" datasource="#application.dsn_processos#">
 						SELECT  pc_processos.*
 						,pc_orgaos.pc_org_descricao   				AS descOrgAvaliado
 						,pc_orgaos.pc_org_sigla      				AS siglaOrgAvaliado
@@ -1631,7 +1600,7 @@
 						WHERE pc_aval_id = #arguments.idAvaliacao# 													
 					</cfquery>	
 
-					<cfquery name="rsAvalStatusTipos" datasource="#dsn_processos#">
+					<cfquery name="rsAvalStatusTipos" datasource="#application.dsn_processos#">
 						SELECT pc_avaliacao_status.* FROM pc_avaliacao_status 
 						WHERE  pc_aval_status_id = #rsProcAval.pc_aval_status#
 					</cfquery>
@@ -1640,7 +1609,7 @@
 				
 					<input id="pcProcessoId"  required="" hidden  value="#arguments.idAvaliacao#">
 
-					<cfquery name="rs_OrgAvaliado" datasource="#dsn_processos#">
+					<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
 						SELECT pc_orgaos.*
 						FROM pc_orgaos
 						WHERE pc_org_controle_interno ='N' AND pc_org_Status = 'A'
@@ -1652,7 +1621,7 @@
 						ORDER BY pc_org_sigla
 					</cfquery>
 
-					<cfquery datasource="#dsn_processos#" name="rsModalidadeProcesso">
+					<cfquery datasource="#application.dsn_processos#" name="rsModalidadeProcesso">
 						SELECT pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_processo_id, pc_processos.pc_num_status FROM pc_processos
 						Right JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
 						WHERE pc_avaliacoes.pc_aval_id = #arguments.idAvaliacao# 
@@ -1660,7 +1629,7 @@
 
 		
 
-					<cfquery datasource="#dsn_processos#" name="rsProcessoComOrientacoes">
+					<cfquery datasource="#application.dsn_processos#" name="rsProcessoComOrientacoes">
 						SELECT pc_avaliacao_orientacoes.pc_aval_orientacao_id from pc_avaliacao_orientacoes
 						LEFT JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
 						LEFT JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
@@ -1668,7 +1637,7 @@
 					</cfquery>
 
 					
-					<cfquery datasource="#dsn_processos#" name="rsAvaliacoesValidadas">
+					<cfquery datasource="#application.dsn_processos#" name="rsAvaliacoesValidadas">
 						SELECT      pc_avaliacoes.pc_aval_status FROM pc_avaliacoes
 						WHERE       pc_aval_processo = '#rsModalidadeProcesso.pc_processo_id#' and  pc_aval_status in (1,2,3)
 					</cfquery>
@@ -2741,21 +2710,21 @@
 
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
 
-        <cfquery datasource="#dsn_processos#" name="rsMelhorias">
+        <cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
 			Select pc_avaliacao_melhorias.* , pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
 			FROM pc_avaliacao_melhorias 
 			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id# 
 			<cfelse>
-				WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id# and pc_aval_melhoria_num_orgao = '#rsUsuario.pc_usu_lotacao#'
+				WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id# and pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 			</cfif>
 			order By pc_aval_melhoria_id desc
 			
 		</cfquery>
 
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
 		
@@ -2976,21 +2945,21 @@
 
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
 
-        <cfquery datasource="#dsn_processos#" name="rsOrientacoes">
+        <cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 			Select pc_avaliacao_orientacoes.* , pc_orgaos.pc_org_sigla, pc_processos.pc_num_status
 			FROM pc_avaliacao_orientacoes 
 			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 			    WHERE pc_aval_id = #arguments.pc_aval_id# 
 			<cfelse>
-                 WHERE pc_aval_id = #arguments.pc_aval_id#  and pc_aval_orientacao_mcu_orgaoResp = '#rsUsuario.pc_usu_lotacao#' and pc_aval_orientacao_status in (2,4,5) 
+                 WHERE pc_aval_id = #arguments.pc_aval_id#  and pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_aval_orientacao_status in (2,4,5) 
 			</cfif>
 			order By pc_aval_orientacao_id desc
 		</cfquery>
 
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
             
@@ -3104,7 +3073,7 @@
 		<cfargument name="pc_orientacao_id" type="string" required="false" default=""/>
 		
 
-        <cfquery datasource="#dsn_processos#" name="rsAnexos">
+        <cfquery datasource="#application.dsn_processos#" name="rsAnexos">
 			Select pc_anexos.*, pc_orgaos.*, pc_usu_nome FROM pc_anexos 
 			Left JOIN pc_orgaos on pc_org_mcu = pc_anexo_mcu_orgao
 			LEFT JOIN pc_usuarios ON pc_usu_matricula = RIGHT(pc_anexo_login,8)
@@ -3114,7 +3083,7 @@
 			order By pc_anexo_id desc
 		</cfquery>
 
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
 			
@@ -3166,7 +3135,7 @@
 															</cfif>												
 															#pc_anexo_nome#
 														</td>
-														<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 															<td >#pc_org_sigla#</td>
 														<cfelse>
 														    <cfif #pc_org_controle_interno# eq 'S'>
@@ -3285,11 +3254,11 @@
 		<cfargument name="pc_aval_id" type="numeric" required="true" returntype="any"/>
 		<cfargument name="todosOsRelatorios" type="string" required="false" default="N"/>
 		
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status, pc_avaliacoes.pc_aval_processo FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
 
-		<cfquery datasource="#dsn_processos#" name="rsPc_anexos" > 
+		<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos" > 
 			SELECT pc_anexos.*   FROM  pc_anexos
 			<cfif #arguments.todosOsRelatorios# eq "N">
 				WHERE pc_anexo_avaliacao_id = #arguments.pc_aval_id# and pc_anexo_avaliacaoPDF = 'S'
@@ -3393,7 +3362,7 @@
 		<!--Se pc_aval_orientacao_id igual a '' significa que é um cadastro de orientação-->
 		<!--Se for um cadastro de orientação-->
 		<cfif #arguments.pc_aval_orientacao_id# eq ''>
-			<cfquery datasource="#dsn_processos#" name="rsProcesso">
+			<cfquery datasource="#application.dsn_processos#" name="rsProcesso">
 				SELECT pc_num_status,pc_modalidade FROM   pc_processos
 				INNER JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
 				WHERE  pc_aval_id = #arguments.pc_aval_id#
@@ -3404,9 +3373,9 @@
 			<cfif rsProcesso.pc_modalidade eq 'A' >
 				<!--Se o processo estiver bloqueado-->
 				<cfif rsProcesso.pc_num_status eq 6>
-					<cfquery datasource="#dsn_processos#" name="qCadastraOrientacao">
+					<cfquery datasource="#application.dsn_processos#" name="qCadastraOrientacao">
 						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login)
-						VALUES (14, CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#')
+						VALUES (14, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
 						SELECT SCOPE_IDENTITY() AS NewID;
 					</cfquery>
 					<cfset IDdaOriencaoCadastrada = qCadastraOrientacao.NewID>
@@ -3414,24 +3383,24 @@
 					<cfset orgaoResp = ''>
 					<cfset posic_status = 14>
 					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
-					<cfquery datasource="#dsn_processos#">
+					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',CONVERT(char, GETDATE(), 120),'#rsUsuario.pc_usu_matricula#','#rsUsuario.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#)
+						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#)
 					</cfquery>
 				<cfelse>
 					<!--Se o processo não estiver bloqueado, a orientação ficará pendente de posicionamento inicial do controle interno-->
-					<cfquery datasource="#dsn_processos#" >
+					<cfquery datasource="#application.dsn_processos#" >
 						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login)
-						VALUES (1, CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#')
+						VALUES (1, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
 					</cfquery>
 				</cfif>
 			<cfelse>
 				<!--Se o processo for da modalidade ENTREGA DO RELATÓRIO-->
 				<!--Se o processo estiver bloqueado-->
 				<cfif rsProcesso.pc_num_status eq 6>
-					<cfquery datasource="#dsn_processos#"  name="qCadastraOrientacao">
+					<cfquery datasource="#application.dsn_processos#"  name="qCadastraOrientacao">
 						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login)
-						VALUES (14, CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#')
+						VALUES (14, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
 						SELECT SCOPE_IDENTITY() AS NewID;
 					</cfquery>
 					<cfset IDdaOriencaoCadastrada = qCadastraOrientacao.NewID>
@@ -3439,14 +3408,14 @@
 					<cfset orgaoResp = ''>
 					<cfset posic_status = 14>
 					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
-					<cfquery datasource="#dsn_processos#">
+					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',CONVERT(char, GETDATE(), 120),'#rsUsuario.pc_usu_matricula#','#rsUsuario.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#)
+						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#)
 					</cfquery>
 				<cfelse>
-					<cfquery datasource="#dsn_processos#"  name="qCadastraOrientacao">
+					<cfquery datasource="#application.dsn_processos#"  name="qCadastraOrientacao">
 						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login,pc_aval_orientacao_dataPrevistaResp)
-						VALUES (4, CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#','#dataCFQUERY#')
+						VALUES (4, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#dataCFQUERY#')
 						SELECT SCOPE_IDENTITY() AS NewID;
 					</cfquery>
 					<cfset IDdaOriencaoCadastrada = qCadastraOrientacao.NewID>
@@ -3454,18 +3423,18 @@
 					<cfset orgaoResp = '#arguments.pc_aval_orientacao_mcu_orgaoResp#'>
 					<cfset posic_status = 4>
 					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
-					<cfquery datasource="#dsn_processos#">
+					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',CONVERT(char, GETDATE(), 120),'#rsUsuario.pc_usu_matricula#','#rsUsuario.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#)
+						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#)
 					</cfquery>
 				</cfif>
 			</cfif>
 		<!--Se for edição de uma orientação-->		
 		<cfelse>
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE 	pc_avaliacao_orientacoes
 				SET    	pc_aval_orientacao_descricao = '#arguments.pc_aval_orientacao_descricao#',
-						pc_aval_orientacao_atualiz_login = '#cgi.REMOTE_USER#'
+						pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
 				WHERE  	pc_aval_orientacao_id = #arguments.pc_aval_orientacao_id#	
 			</cfquery>	
 		</cfif>
@@ -3492,15 +3461,15 @@
 		<cfargument name="pc_aval_melhoria_status" type="string"  required="false"  default=""/>
 		
 	
-		<cfquery datasource="#dsn_processos#" >
+		<cfquery datasource="#application.dsn_processos#" >
 			<cfif '#arguments.modalidade#' eq 'A' OR '#arguments.modalidade#' eq 'E'>
 				<cfif #arguments.pc_aval_melhoria_id# eq ''>
 					<cfif '#arguments.pc_aval_melhoria_dataPrev#' eq "">
 						INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif, pc_aval_melhoria_sug_matricula, pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora)
-						VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#', '#rsUsuario.pc_usu_matricula#', '#arguments.pc_aval_melhoria_status#',CONVERT(char, GETDATE(), 120))
+						VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#', '#application.rsUsuarioParametros.pc_usu_matricula#', '#arguments.pc_aval_melhoria_status#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">)
 					<cfelse>
 						INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login,pc_aval_melhoria_dataPrev, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif, pc_aval_melhoria_sug_matricula, pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora)
-						VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#','#arguments.pc_aval_melhoria_dataPrev#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#', '#rsUsuario.pc_usu_matricula#', '#arguments.pc_aval_melhoria_status#',CONVERT(char, GETDATE(), 120))
+						VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#arguments.pc_aval_melhoria_dataPrev#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#', '#application.rsUsuarioParametros.pc_usu_matricula#', '#arguments.pc_aval_melhoria_status#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">)
 					
 					</cfif>
 				<cfelse>
@@ -3515,16 +3484,16 @@
 						pc_aval_melhoria_sugestao = '#arguments.pc_aval_melhoria_sugestao#',
 						pc_aval_melhoria_sug_orgao_mcu = '#arguments.pc_aval_melhoria_sug_orgao_mcu#',
 						pc_aval_melhoria_naoAceita_justif = '#arguments.pc_aval_melhoria_naoAceita_justif#',
-						pc_aval_melhoria_sug_matricula = '#rsUsuario.pc_usu_matricula#',
+						pc_aval_melhoria_sug_matricula = '#application.rsUsuarioParametros.pc_usu_matricula#',
 						pc_aval_melhoria_status = '#arguments.pc_aval_melhoria_status#',
-						pc_aval_melhoria_sug_datahora = CONVERT(char, GETDATE(), 120)
+						pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
 
 					WHERE  pc_aval_melhoria_id = #arguments.pc_aval_melhoria_id#	
 				</cfif>
 			<cfelse>
 				<cfif #arguments.pc_aval_melhoria_id# eq ''>
 					INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login)
-					VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  CONVERT(char, GETDATE(), 120), '#cgi.REMOTE_USER#')
+					VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
 				<cfelse>
 					UPDATE pc_avaliacao_melhorias
 					SET    pc_aval_melhoria_descricao = '#arguments.pc_aval_melhoria_descricao#',
@@ -3542,7 +3511,7 @@
 
 		<cfargument name="pc_aval_melhoria_id" type="numeric" required="true" default=""/>
 
-		<cfquery datasource="#dsn_processos#" > 
+		<cfquery datasource="#application.dsn_processos#" > 
 			DELETE FROM pc_avaliacao_melhorias
 			WHERE(pc_aval_melhoria_id = #arguments.pc_aval_melhoria_id#)
 		</cfquery>

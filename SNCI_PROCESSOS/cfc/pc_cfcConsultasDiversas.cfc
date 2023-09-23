@@ -1,31 +1,12 @@
 <cfcomponent >
 <cfprocessingdirective pageencoding = "utf-8">	
 
-	<!--- Diretório onde serão armazenados arquivos anexados a avaliações --->
-	<cfset auxsite =  cgi.server_name>
-	<cfif auxsite eq "intranetsistemaspe">
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
-	<cfelse>
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-	</cfif>
 
-	<cfset dsn_processos = 'DBSNCI'>
-	
-
-	<cfquery name="rsUsuario" datasource="#dsn_processos#">
-		SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
-		INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
-		INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
-	</cfquery>
-
-	<cfquery name="rsHerancaUnion" datasource="#dsn_processos#">
+	<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
 		SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' 
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
 
 		union
 
@@ -33,10 +14,10 @@
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
 		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' )) 
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
 
 		union
 
@@ -47,10 +28,10 @@
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
 		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' )))
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
 	</cfquery>
 
 	<cfquery dbtype="query" name="rsHeranca"> 
@@ -65,7 +46,7 @@
 		
 		
 
-		<cfquery name="rsProcTab" datasource="#dsn_processos#" timeout="120" >
+		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -86,22 +67,22 @@
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#"> 
 			</cfif>	
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
-				<cfif '#rsUsuario.pc_org_status#' eq 'O' and #rsUsuario.pc_usu_perfil# neq 11>
-					AND pc_num_orgao_origem = '#rsUsuario.pc_usu_lotacao#'
+				<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+					AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 				</cfif>
 				<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-				<cfif #rsUsuario.pc_usu_perfil# eq 4 and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_avaliador_matricula = #rsUsuario.pc_usu_matricula#	or pc_usu_matricula_coordenador = #rsUsuario.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #rsUsuario.pc_usu_matricula#
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
 				</cfif>
 				<!---Se o perfil for 7 - 'GESTOR' --->
-				<cfif #rsUsuario.pc_usu_perfil# eq 7 and '#rsUsuario.pc_org_status#' neq 'O'  and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_orgaos.pc_org_se = 	#rsUsuario.pc_org_se#
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_orgaos.pc_org_se = 	#application.rsUsuarioParametros.pc_org_se#
 				</cfif>
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
-				<cfif #rsUsuario.pc_usu_perfil# eq 13 >
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
 						AND pc_num_status not in(6)
 				</cfif>
 			</cfif>
@@ -147,7 +128,7 @@
 									<tbody>
 										<cfloop query="rsProcTab" >
 											<cfset status = "#pc_status_id#"> 
-											<cfquery name="rsAvaliadores" datasource="#dsn_processos#">
+											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 												SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
 												FROM    pc_avaliadores 
 														INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
@@ -362,7 +343,7 @@
 		
 		
 
-		<cfquery name="rsProcTabInicio" datasource="#dsn_processos#" timeout="120" >
+		<cfquery name="rsProcTabInicio" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -390,22 +371,22 @@
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
-				<cfif '#rsUsuario.pc_org_status#' eq 'O' and #rsUsuario.pc_usu_perfil# neq 11>
-					AND pc_num_orgao_origem = '#rsUsuario.pc_usu_lotacao#'
+				<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+					AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 				</cfif>
 				<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-				<cfif #rsUsuario.pc_usu_perfil# eq 4 and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_avaliador_matricula = #rsUsuario.pc_usu_matricula#	or pc_usu_matricula_coordenador = #rsUsuario.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #rsUsuario.pc_usu_matricula#
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
 				</cfif>
 				<!---Se o perfil for 7 - 'GESTOR' --->
-				<cfif #rsUsuario.pc_usu_perfil# eq 7 and '#rsUsuario.pc_org_status#' neq 'O'  and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_orgaos.pc_org_se = 	#rsUsuario.pc_org_se#
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_orgaos.pc_org_se = 	#application.rsUsuarioParametros.pc_org_se#
 				</cfif>
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
-				<cfif #rsUsuario.pc_usu_perfil# eq 13>
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13>
 					AND pc_aval_status_id not in(8)	AND pc_num_status not in(6)
 				</cfif>
 			
@@ -464,7 +445,7 @@
 									<tbody>
 										<cfloop query="rsProcTab" >
 											<cfset status = "#pc_status_id#"> 
-											<cfquery name="rsAvaliadores" datasource="#dsn_processos#">
+											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 												SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
 												FROM    pc_avaliadores 
 														INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
@@ -712,7 +693,7 @@
     <cffunction name="tabConsultaExportarOrientacoes"   access="remote" hint="gera a consulta para exportação de qualquer informação sobre os processos">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
 		
-		<cfquery name="rsProcTabInicio" datasource="#dsn_processos#" timeout="120" >
+		<cfquery name="rsProcTabInicio" datasource="#application.dsn_processos#" timeout="120" >
 
 			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
@@ -749,37 +730,37 @@
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
-				<cfif '#rsUsuario.pc_org_status#' eq 'O' and #rsUsuario.pc_usu_perfil# neq 11>
-					AND pc_num_orgao_origem = '#rsUsuario.pc_usu_lotacao#'
+				<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+					AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 				</cfif>
 				<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-				<cfif #rsUsuario.pc_usu_perfil# eq 4 and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_avaliador_matricula = #rsUsuario.pc_usu_matricula#	or pc_usu_matricula_coordenador = #rsUsuario.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #rsUsuario.pc_usu_matricula#
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
 				</cfif>
 				<!---Se o perfil for 7 - 'GESTOR' --->
-				<cfif #rsUsuario.pc_usu_perfil# eq 7 and '#rsUsuario.pc_org_status#' neq 'O'  and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_orgaos.pc_org_se = 	#rsUsuario.pc_org_se#
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_orgaos.pc_org_se = 	#application.rsUsuarioParametros.pc_org_se#
 				</cfif>
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
-				<cfif #rsUsuario.pc_usu_perfil# eq 13 >
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
 						AND  pc_aval_orientacao_status not in (9,12,14) and pc_num_status not in(6)
 				<cfelse>
-					AND ((pc_aval_orientacao_mcu_orgaoResp = '#rsUsuario.pc_usu_lotacao#' 
-					or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+					AND ((pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''>or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>)
 
-					or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_num_orgao =  '#rsUsuario.pc_usu_lotacao#' 
-					or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+					or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>)
 
-					or (pc_aval_melhoria_sug_orgao_mcu =  '#rsUsuario.pc_usu_lotacao#' 
-					or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+					or (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>))
 				</cfif>
 			</cfif>
@@ -843,7 +824,7 @@
 									<tbody>
 										<cfloop query="rsProcTab" >
 											<cfset status = "#pc_status_id#"> 
-											<cfquery name="rsAvaliadores" datasource="#dsn_processos#">
+											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 												SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
 												FROM    pc_avaliadores 
 														INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
@@ -1114,7 +1095,7 @@
 		
 		
 
-		<cfquery name="rsProcTab" datasource="#dsn_processos#" timeout="120" >
+		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -1148,23 +1129,23 @@
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
-				<cfif '#rsUsuario.pc_org_status#' eq 'O' and #rsUsuario.pc_usu_perfil# neq 11>
-					AND pc_num_orgao_origem = '#rsUsuario.pc_usu_lotacao#'
+				<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+					AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 				</cfif>
 				<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-				<cfif #rsUsuario.pc_usu_perfil# eq 4 and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_avaliador_matricula = #rsUsuario.pc_usu_matricula#	or pc_usu_matricula_coordenador = #rsUsuario.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #rsUsuario.pc_usu_matricula#
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
 				</cfif>
 				<!---Se o perfil for 7 - 'GESTOR' --->
-				<cfif #rsUsuario.pc_usu_perfil# eq 7 and '#rsUsuario.pc_org_status#' neq 'O'  and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_orgaos.pc_org_se = 	#rsUsuario.pc_org_se#
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_orgaos.pc_org_se = 	#application.rsUsuarioParametros.pc_org_se#
 				</cfif>
 
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO), não mostra processos e melhorias bloqueadas--->
-				<cfif #rsUsuario.pc_usu_perfil# eq 13 >
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
 					AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
 				</cfif>
 			
@@ -1230,7 +1211,7 @@
 									<tbody>
 										<cfloop query="rsProcTab" >
 											<cfset status = "#pc_status_id#"> 
-											<cfquery name="rsAvaliadores" datasource="#dsn_processos#">
+											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 												SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
 												FROM    pc_avaliadores 
 														INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 

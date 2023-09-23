@@ -14,8 +14,11 @@
 </head>
 
 
+
+
+
 <body class="layout-footer-fixed hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
-		
+	
 	<div class="wrapper">
 
 		<cfinclude template="pc_Modal_preloader.cfm">
@@ -30,16 +33,16 @@
                 <div class="container-fluid">
                     <div class="row mb-2" style="margin-top:20px;margin-bottom:80px;">
                         <div class="col-sm-6">
-                            <h5 >Bem vindo ao SNCI, <span id="nomeUsuario"><cfoutput>#rsUsuarioParametros.pc_usu_nome#</cfoutput></span> !</h5>
-                            <h4>Módulo: Processos  <cfif rsUsuarioParametros.pc_org_controle_interno eq 'N' and rsUsuarioParametros.pc_usu_perfil neq 13><i id="start-tour" style="color:#8cc63f" class="fas fa-question-circle grow-icon"></i></cfif></h4>
+                            <h5 >Bem vindo ao SNCI, <span id="nomeUsuario"><cfoutput>#application.rsUsuarioParametros.pc_usu_nome#</cfoutput></span> !</h5>
+                            <h4>Módulo: Processos  <cfif application.rsUsuarioParametros.pc_org_controle_interno eq 'N' and application.rsUsuarioParametros.pc_usu_perfil neq 13><i id="start-tour" style="color:#8cc63f" class="fas fa-question-circle grow-icon"></i></cfif></h4>
                         </div>
                        
                     </div>
-                    <cfif #rsUsuarioParametros.pc_org_controle_interno# eq 'N'>     
+                    <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>     
                         <div  id="alertasOAdiv"></div>
                     </cfif>
 
-                    <cfif #rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
+                    <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
                         <div  id="alertasCIdiv"></div>
                     </cfif>
                 </div><!-- /.container-fluid -->
@@ -58,9 +61,9 @@
 
     <script language="JavaScript">
 
-        // Obtém o valor de rsUsuarioParametros.pc_org_controle_interno e armazena na variável 'ci'
+        // Obtém o valor de application.rsUsuarioParametros.pc_org_controle_interno e armazena na variável 'ci'
         <cfoutput>
-            var ci = '#rsUsuarioParametros.pc_org_controle_interno#';
+            var ci = '#application.rsUsuarioParametros.pc_org_controle_interno#';
         </cfoutput>
         
         // Espera até que o documento esteja totalmente carregado
@@ -308,8 +311,8 @@
 			}
 
             <cfoutput>
-                var usuarioControleInterno = '#rsUsuarioParametros.pc_org_controle_interno#';
-                var usuarioPerfil = '#rsUsuarioParametros.pc_usu_perfil#';
+                var usuarioControleInterno = '#application.rsUsuarioParametros.pc_org_controle_interno#';
+                var usuarioPerfil = '#application.rsUsuarioParametros.pc_usu_perfil#';
             </cfoutput>
 
 			// Chame a função para iniciar o tour após a página ser carregada

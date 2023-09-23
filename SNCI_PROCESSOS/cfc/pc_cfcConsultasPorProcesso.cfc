@@ -1,34 +1,12 @@
 <cfcomponent >
 <cfprocessingdirective pageencoding = "utf-8">	
 
-	<!--- Diretório onde serão armazenados arquivos anexados a avaliações --->
-	<cfset auxsite =  cgi.server_name>
-	<cfif auxsite eq "intranetsistemaspe">
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
-	<cfelse>
-		<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-	</cfif>
 
-	<cfset dsn_processos = 'DBSNCI'>
-	
-	
-					
-
-
-	<cfquery name="rsUsuario" datasource="#dsn_processos#">
-		SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
-		INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
-		INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
-	</cfquery>
-
-	<cfquery name="rsHerancaUnion" datasource="#dsn_processos#">
+	<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
 		SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' 
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
 
 		union
 
@@ -36,10 +14,10 @@
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
 		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' )) 
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
 
 		union
 
@@ -50,10 +28,10 @@
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
 		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
 		FROM pc_orgaos_heranca
 		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#rsUsuario.pc_usu_lotacao#' )))
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
 	</cfquery>
 
 	<cfquery dbtype="query" name="rsHeranca"> 
@@ -104,7 +82,7 @@
 					<div class="row" style="justify-content: space-around;">
 								
 						
-						<cfquery name="rsProcCard" datasource="#dsn_processos#" timeout="120" >
+						<cfquery name="rsProcCard" datasource="#application.dsn_processos#" timeout="120" >
 							SELECT DISTINCT pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 										pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 										pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -125,7 +103,7 @@
 								<cfif '#arguments.ano#' neq 'TODOS'>
 									AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 								</cfif>		
-								<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+								<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 									<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->
 									<cfif '#arguments.processoEmAcompanhamento#' eq true>
 											AND pc_num_status in(4,6)
@@ -133,16 +111,16 @@
 											AND pc_num_status in(5)
 									</cfif>
 									<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
-									<cfif '#rsUsuario.pc_org_status#' eq 'O' and #rsUsuario.pc_usu_perfil# neq 11>
-										AND pc_num_orgao_origem = '#rsUsuario.pc_usu_lotacao#'
+									<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+										AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 									</cfif>
 									<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-									<cfif #rsUsuario.pc_usu_perfil# eq 4 and '#rsUsuario.pc_org_status#' eq 'A'>
-										AND pc_avaliador_matricula = #rsUsuario.pc_usu_matricula#	or pc_usu_matricula_coordenador = #rsUsuario.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #rsUsuario.pc_usu_matricula#
+									<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+										AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
 									</cfif>
 									<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
-									<cfif #rsUsuario.pc_usu_perfil# eq 7 and '#rsUsuario.pc_org_status#' neq 'O'  and '#rsUsuario.pc_org_status#' eq 'A'>
-										AND pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#rsUsuario.pc_org_se#' OR pc_orgaos.pc_org_se = '#rsUsuario.pc_org_se_abrangencia#')
+									<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+										AND pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se_abrangencia#')
 									</cfif>
 								<cfelse>
 							        <!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento, caso contrário, mostra processos finalizados--->
@@ -152,20 +130,20 @@
 											AND pc_num_status in(5)
 									</cfif>	
 									<!---Se o perfil não for 13 - 'CONSULTA' (AUDIT e RISCO)--->
-									<cfif #rsUsuario.pc_usu_perfil# neq 13 >
-										AND not pc_processos.pc_num_status in(6) AND ((pc_aval_orientacao_mcu_orgaoResp = '#rsUsuario.pc_usu_lotacao#' 
-										or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-										or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+									<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
+										AND not pc_processos.pc_num_status in(6) AND ((pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+										or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+										or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 										<cfif #mcusHeranca# neq ''>or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>)
 
-										or (pc_aval_melhoria_num_orgao =  '#rsUsuario.pc_usu_lotacao#' 
-										or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-										or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+										or (pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+										or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+										or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 										<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>)
 
-										or ((pc_aval_melhoria_sug_orgao_mcu =  '#rsUsuario.pc_usu_lotacao#' 
-										or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-										or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+										or ((pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+										or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+										or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 										<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_sug_orgao_mcu in (#mcusHeranca#)</cfif>) and not pc_aval_melhoria_sug_orgao_mcu = null) )
 									</cfif>
 							</cfif>	
@@ -175,7 +153,7 @@
 						
 						
 						<cfif #rsProcCard.recordcount# eq 0 >
-							<h5>Nenhum processo para acompanhamento foi localizado para <cfoutput>#rsUsuario.pc_org_sigla# e perfil: #rsUsuario.pc_perfil_tipo_descricao#</cfoutput>.</h5>
+							<h5>Nenhum processo para acompanhamento foi localizado para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
 						</cfif>
 						<cfif #rsProcCard.recordcount# neq 0 >
 							<div class="col-sm-12">
@@ -245,7 +223,7 @@
 																</div>
 															</a>
 															<!--Verifica se existem posicionamentos de órgãos avaliados-->
-															<cfquery name="rsProcComPosicOrgAvaliado" datasource="#dsn_processos#" timeout="120">
+															<cfquery name="rsProcComPosicOrgAvaliado" datasource="#application.dsn_processos#" timeout="120">
 																SELECT pc_aval_posic_status from pc_avaliacao_posicionamentos
 																INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_id = pc_aval_posic_num_orientacao
 																INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
@@ -254,7 +232,7 @@
 															</cfquery>
 
 															<!--Verifica se existem orientações-->
-															<cfquery name="rsProcComOrientações" datasource="#dsn_processos#" timeout="120">
+															<cfquery name="rsProcComOrientações" datasource="#application.dsn_processos#" timeout="120">
 																SELECT pc_aval_orientacao_id from pc_avaliacao_orientacoes
 																INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
 																INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
@@ -262,7 +240,7 @@
 															</cfquery>
 
 															<!--Verifica se existem Propostas de Melhoria com status diferente de P - PENDENTE-->
-															<cfquery name="rsProcComPropMelhoriaAvaliada" datasource="#dsn_processos#" timeout="120">
+															<cfquery name="rsProcComPropMelhoriaAvaliada" datasource="#application.dsn_processos#" timeout="120">
 																SELECT pc_aval_melhoria_id FROM pc_avaliacao_melhorias
 																INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 																WHERE pc_aval_processo = '#pc_processo_id#' AND pc_aval_melhoria_status not in('P')
@@ -271,11 +249,11 @@
 															
 																<div style="position: relative;display: inline-block;">
 																	<div style="position: absolute;bottom:22px;left: 0;z-index: 1">
-																		<cfif #pc_num_status# eq 6 and #rsUsuario.pc_usu_perfil# neq 13>
+																		<cfif #pc_num_status# eq 6 and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
 																			<i id="btDesbloquear" onclick="<cfoutput>javascript:desbloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-unlock grow-icon" style="color: #fff; cursor:pointer; margin-left: 2px;margin-bottom:14px" title="Desbloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Desbloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
 																		<cfelse>
 																		<!--O botão bloquear só será visível para os processos com orientações, orientações sem posicionamento do órgão avaliado e propostas de melhoria sem o status Pendente-->
-																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComOrientações.recordcount neq 0 AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0  and #rsUsuario.pc_org_controle_interno# eq 'S' and #rsUsuario.pc_usu_perfil# neq 13>
+																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComOrientações.recordcount neq 0 AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0  and #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
 																				<i id="btBloquear" onclick="<cfoutput>javascript:bloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-lock grow-icon" style="color: #cd0316; cursor:pointer; margin-left: 2px;margin-bottom:14px" title="Bloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Bloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
 																			</cfif>
 																		</cfif>
@@ -560,7 +538,7 @@
 
 		
 
-		<cfquery name="rsProcTab" datasource="#dsn_processos#" timeout="120" >
+		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT DISTINCT pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -581,7 +559,7 @@
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->
 				<cfif '#arguments.processoEmAcompanhamento#' eq true>
 						AND pc_num_status in(4,6)
@@ -589,16 +567,16 @@
 						AND pc_num_status in(5)
 				</cfif>
 				<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
-				<cfif '#rsUsuario.pc_org_status#' eq 'O' and #rsUsuario.pc_usu_perfil# neq 11>
-					AND pc_num_orgao_origem = '#rsUsuario.pc_usu_lotacao#'
+				<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+					AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 				</cfif>
 				<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-				<cfif #rsUsuario.pc_usu_perfil# eq 4 and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_avaliador_matricula = '#rsUsuario.pc_usu_matricula#'	or pc_usu_matricula_coordenador = '#rsUsuario.pc_usu_matricula#' or pc_usu_matricula_coordenador_nacional = '#rsUsuario.pc_usu_matricula#'
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_avaliador_matricula = '#application.rsUsuarioParametros.pc_usu_matricula#'	or pc_usu_matricula_coordenador = '#application.rsUsuarioParametros.pc_usu_matricula#' or pc_usu_matricula_coordenador_nacional = '#application.rsUsuarioParametros.pc_usu_matricula#'
 				</cfif>
 				<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
-				<cfif #rsUsuario.pc_usu_perfil# eq 7 and '#rsUsuario.pc_org_status#' neq 'O'  and '#rsUsuario.pc_org_status#' eq 'A'>
-					AND pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#rsUsuario.pc_org_se#' OR pc_orgaos.pc_org_se = '#rsUsuario.pc_org_se_abrangencia#')
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+					AND pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se_abrangencia#')
 				</cfif>
 			<cfelse>
 			    <!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento, caso contrário, mostra processos finalizados--->
@@ -608,20 +586,20 @@
 						AND pc_num_status in(5)
 				</cfif>
 				<!---Se o perfil não for 13 - 'CONSULTA' (AUDIT e RISCO)--->
-				<cfif #rsUsuario.pc_usu_perfil# neq 13 >
-					AND not pc_processos.pc_num_status in(6) AND ((pc_aval_orientacao_mcu_orgaoResp = '#rsUsuario.pc_usu_lotacao#' 
-					or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
+					AND not pc_processos.pc_num_status in(6) AND ((pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''>or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>)
 
-					or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_num_orgao =  '#rsUsuario.pc_usu_lotacao#' 
-					or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+					or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>)
 
-					or (pc_aval_melhoria_sug_orgao_mcu =  '#rsUsuario.pc_usu_lotacao#' 
-					or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+					or (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>))
 				</cfif>
 			</cfif>
@@ -638,7 +616,7 @@
 						    <div id="filtroSpan" style="display: none;text-align:right;font-size:18px;position:absolute;top:-55px;right:24px;"><span class="statusOrientacoes" style="background:#008000;color:#fff;">Atenção! Um filtro foi aplicado.</span><br><i class="fa fa-2x fa-hand-point-down" style="color:#008000;position:relative;top:8px;right:117px"></i></div>
 
 							<cfif #rsProcTab.recordcount# eq 0 >
-								<h5 align="center">Nenhum processo para acompanhamento foi localizado para <cfoutput>#rsUsuario.pc_org_sigla# e perfil: #rsUsuario.pc_perfil_tipo_descricao#</cfoutput>.</h5>
+								<h5 align="center">Nenhum processo para acompanhamento foi localizado para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
 							</cfif>
 							<cfif #rsProcTab.recordcount# neq 0 >
 								<table id="tabProcessos" class="table table-bordered table-striped table-hover text-nowrap">
@@ -654,7 +632,7 @@
 											<th>Órgão Origem: </th>
 											<th>Órgão Avaliado: </th>
 											<th>Tipo de Avaliação: </th>
-											<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+											<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 												<th>Modalidade:</th>
 											</cfif>
 											<th>Classificação: </th>
@@ -666,7 +644,7 @@
 									<tbody>
 										<cfloop query="rsProcTab" >
 											<cfset status = "#pc_status_id#"> 
-											<cfquery name="rsAvaliadores" datasource="#dsn_processos#">
+											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 												SELECT  pc_avaliadores.* ,  pc_orgaos.pc_org_se_sigla + '-' + pc_usuarios.pc_usu_nome + '(' + pc_usuarios.pc_usu_matricula + ')' as avaliadores
 												FROM    pc_avaliadores 
 														INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
@@ -704,7 +682,7 @@
 															<td>#pc_aval_tipo_nao_aplica_descricao#</td>
 														</cfif>
 
-														<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 															<td>
 																<cfif #pc_Modalidade# eq 'A'>
 																	Acompanhamento
@@ -887,7 +865,7 @@
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
 
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
 		</cfquery>
 
@@ -900,7 +878,7 @@
 
 					<div id="idAvaliacao" hidden></div>
 
-					<cfquery name="rsProcAval" datasource="#dsn_processos#">
+					<cfquery name="rsProcAval" datasource="#application.dsn_processos#">
 						SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 									pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado, pc_orgaos.pc_org_mcu,
 									pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -918,7 +896,7 @@
 
 				
 
-					<cfquery name="rsAvalStatusTipos" datasource="#dsn_processos#">
+					<cfquery name="rsAvalStatusTipos" datasource="#application.dsn_processos#">
 						SELECT pc_avaliacao_status.* FROM pc_avaliacao_status 
 						WHERE  pc_aval_status_id = #rsProcAval.pc_aval_status#
 					</cfquery>
@@ -927,7 +905,7 @@
 				
 					<input id="pcProcessoId"  required="" hidden  value="#arguments.idAvaliacao#">
 
-					<cfquery name="rs_OrgAvaliado" datasource="#dsn_processos#">
+					<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
 						SELECT pc_orgaos.*
 						FROM pc_orgaos
 						WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#' or pc_org_mcu = '#rsProcAval.pc_num_orgao_avaliado#' 
@@ -937,7 +915,7 @@
 
 					
 
-					<cfquery datasource="#dsn_processos#" name="rsMelhorias">
+					<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
 						Select  pc_avaliacao_melhorias.*, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_aval_melhoria_num_orgao ELSE pc_aval_melhoria_sug_orgao_mcu END as mcuOrgaoResp, 
 								CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_orgaos.pc_org_sigla ELSE pc_orgaoSug.pc_org_sigla END as siglaOrgaoResp,
 								pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
@@ -945,16 +923,16 @@
 						LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
 						LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
 						WHERE pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#"> 
-						<cfif #rsUsuario.pc_org_controle_interno# neq 'S' and #rsUsuario.pc_usu_perfil# neq 13>
+						<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
 							and ((pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">   
-								and ((pc_aval_melhoria_num_orgao = '#rsUsuario.pc_usu_lotacao#' 
-								or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'))	
-								or (pc_aval_melhoria_sug_orgao_mcu = '#rsUsuario.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+								and ((pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+								or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))	
+								or (pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 								)
 								
-								or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_sug_orgao_mcu =  '#rsUsuario.pc_usu_lotacao#' 
-								or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-								or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+								or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+								or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 								) <cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#) or pc_aval_melhoria_sug_orgao_mcu in (#mcusHeranca#)</cfif>)
 						</cfif>
 						order By pc_aval_melhoria_id 
@@ -1213,7 +1191,7 @@
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
 
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
 		</cfquery>
 
@@ -1226,7 +1204,7 @@
 
 					<div id="idAvaliacao" hidden></div>
 
-					<cfquery name="rsProcAval" datasource="#dsn_processos#">
+					<cfquery name="rsProcAval" datasource="#application.dsn_processos#">
 						SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 									pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado, pc_orgaos.pc_org_mcu,
 									pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -1242,7 +1220,7 @@
 						WHERE  pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">													
 					</cfquery>	
 
-					<cfquery name="rsAvalStatusTipos" datasource="#dsn_processos#">
+					<cfquery name="rsAvalStatusTipos" datasource="#application.dsn_processos#">
 						SELECT pc_avaliacao_status.* FROM pc_avaliacao_status 
 						WHERE  pc_aval_status_id = #rsProcAval.pc_aval_status#
 					</cfquery>
@@ -1251,7 +1229,7 @@
 				
 					<input id="pcProcessoId"  required="" hidden  value="#arguments.idAvaliacao#">
 
-					<cfquery name="rs_OrgAvaliado" datasource="#dsn_processos#">
+					<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
 						SELECT pc_orgaos.*
 						FROM pc_orgaos
 						WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#' or pc_org_mcu = '#rsProcAval.pc_num_orgao_avaliado#' 
@@ -1261,7 +1239,7 @@
 
 					
 
-					<cfquery datasource="#dsn_processos#" name="rsMelhorias">
+					<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
 						Select  pc_avaliacao_melhorias.*, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_aval_melhoria_num_orgao ELSE pc_aval_melhoria_sug_orgao_mcu END as mcuOrgaoResp, 
 								CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_orgaos.pc_org_sigla ELSE pc_orgaoSug.pc_org_sigla END as siglaOrgaoResp,
 								pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
@@ -1269,15 +1247,15 @@
 						LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
 						LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
 						WHERE pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
-						<cfif #rsUsuario.pc_org_controle_interno# neq 'S' and #rsUsuario.pc_usu_perfil# neq 13>
+						<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
 							and ((pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
-								and ((pc_aval_melhoria_num_orgao = '#rsUsuario.pc_usu_lotacao#' or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'))	
-								or (pc_aval_melhoria_sug_orgao_mcu = '#rsUsuario.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+								and ((pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))	
+								or (pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 								)
 								
-								or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_sug_orgao_mcu =  '#rsUsuario.pc_usu_lotacao#' 
-								or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-								or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+								or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+								or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 								) <cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#) or pc_aval_melhoria_sug_orgao_mcu in (#mcusHeranca#)</cfif>)
 						</cfif>
 						order By pc_aval_melhoria_id 
@@ -1542,7 +1520,7 @@
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
 
 	
-        <cfquery datasource="#dsn_processos#" name="rsOrientacoes">
+        <cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 			Select pc_avaliacao_orientacoes.* , pc_orgaos.pc_org_sigla, pc_processos.pc_num_status, pc_orientacao_status.*
 			, pc_orgaos_heranca.*, pc_orgaos_2.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_2.pc_org_se_sigla as seOrgRespHerdeiro
 
@@ -1553,25 +1531,25 @@
 			INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
 			LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_aval_orientacao_mcu_orgaoResp
 			LEFT JOIN pc_orgaos AS pc_orgaos_2 ON pc_orgaos_2.pc_org_mcu = pc_orgHerancaMcuPara
-			<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 			    WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
-			<cfelseif  #rsUsuario.pc_usu_perfil# eq 13 ><!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
+			<cfelseif  #application.rsUsuarioParametros.pc_usu_perfil# eq 13 ><!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 			    WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#"> AND  pc_aval_orientacao_status not in (9,12,14)
 			<cfelse>
                 WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
-				AND (pc_aval_orientacao_mcu_orgaoResp = '#rsUsuario.pc_usu_lotacao#' 
-				or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-				or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+				AND (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+				or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+				or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 				<cfif #mcusHeranca# neq ''>or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>) 
 			</cfif>
 			order By pc_aval_orientacao_id 
 		</cfquery>
 
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status, pc_aval_classificacao FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
 		</cfquery>
 
-		<cfquery datasource="#dsn_processos#" name="rsEmAnalise">
+		<cfquery datasource="#application.dsn_processos#" name="rsEmAnalise">
 			SELECT pc_avaliacao_orientacoes.pc_aval_orientacao_id FROM  pc_avaliacao_orientacoes
 			WHERE pc_aval_orientacao_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
 				  AND pc_aval_orientacao_status = 13
@@ -1605,13 +1583,13 @@
 														
 
 														<cfif #pc_aval_orientacao_dataPrevistaResp# lt DATEFORMAT(Now(),"yyyy-mm-dd") and (#pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5)>
-															<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+															<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 																<td align="center" ><span class="statusOrientacoes" style="background:##FFA500;color:##fff;">PENDENTE</span></td>
 															<cfelse>
 																<td align="center" ><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;">PENDENTE</span></td>
 															</cfif>
 														<cfelseif #pc_aval_orientacao_status# eq 3>
-															<cfif #rsUsuario.pc_org_controle_interno# eq 'N'>
+															<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
 																<td align="center" ><span  class="statusOrientacoes" style="background:##FFA500;color:##fff;">#pc_orientacao_status_descricao#</span></td>
 															<cfelse>
 																<td align="center" ><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;">#pc_orientacao_status_descricao#</span></td>
@@ -1640,13 +1618,13 @@
 											
 										
 									</table>
-									<cfif rsEmAnalise.recordcount neq 0 and #rsUsuario.pc_org_controle_interno# neq 'S' and #rsUsuario.pc_usu_perfil# neq 13>
+									<cfif rsEmAnalise.recordcount neq 0 and #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
 										<br><h7 style="color:#ff0080"><i>Prezado gestor,<br>Informamos que existem Medidas/Orientações para Regularização e Manifestações vinculados a este item que estão sob análise da equipe de controle interno. Assim que essa análise for finalizada, as Medidas/Orientações para Regularização e Manifestações retornarão para o processo de acompanhamento e ficarão disponíveis para manifestação e consulta no Sistema SNCI por parte desse gestor.</i></h6>
 									</cfif>
 								<cfelse>
                                     <cfif rsStatus.pc_aval_classificacao neq 'L'>
 										<h6 style="color:#ff0080">Não existem medidas/orientações para regularização para este item. Verifique a aba "Propostas de Melhoria".</h6>
-										<cfif rsEmAnalise.recordcount neq 0 and #rsUsuario.pc_org_controle_interno# neq 'S' and #rsUsuario.pc_usu_perfil# neq 13>
+										<cfif rsEmAnalise.recordcount neq 0 and #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
 											<br><h7 style="color:#ff0080"><i>Prezado gestor,<br>Informamos que existem Medidas/Orientações para Regularização e Manifestações vinculados a este item que estão sob análise da equipe de controle interno. Assim que essa análise for finalizada, as Medidas/Orientações para Regularização e Manifestações retornarão para o processo de acompanhamento e ficarão disponíveis para manifestação e consulta no Sistema SNCI por parte desse gestor.</i></h6>
 										</cfif>
 									<cfelse>
@@ -1702,7 +1680,7 @@
 				$('#timelineViewAcompDiv').html('');
 
 				var funcCFC ='timelineViewAcompOrgaoAvaliado';
-				<cfif '#rsUsuario.pc_org_controle_interno#' eq 'S' >
+				<cfif '#application.rsUsuarioParametros.pc_org_controle_interno#' eq 'S' >
 					funcCFC ='timelineViewAcomp';
 				</cfif>
 
@@ -1763,7 +1741,7 @@
 
 		
 
-        <cfquery datasource="#dsn_processos#" name="rsMelhorias">
+        <cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
 			Select  pc_avaliacao_melhorias.*, 
 			        CASE  WHEN LEN(pc_aval_melhoria_sug_orgao_mcu) > 0 THEN pc_aval_melhoria_sug_orgao_mcu ELSE pc_aval_melhoria_num_orgao END as mcuOrgaoResp, 
 		            CASE  WHEN LEN(pc_aval_melhoria_sug_orgao_mcu) > 0 THEN pc_orgaoSug.pc_org_sigla ELSE pc_orgaos.pc_org_sigla  END as siglaOrgaoResp,
@@ -1772,22 +1750,22 @@
 			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
 			WHERE pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
-			<cfif #rsUsuario.pc_org_controle_interno# neq 'S'and #rsUsuario.pc_usu_perfil# neq 13>
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S'and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
 				and ((pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
-					and ((pc_aval_melhoria_num_orgao = '#rsUsuario.pc_usu_lotacao#' or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'))	
-					or (pc_aval_melhoria_sug_orgao_mcu = '#rsUsuario.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+					and ((pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))	
+					or (pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''> or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>)
 					
-					or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_sug_orgao_mcu =  '#rsUsuario.pc_usu_lotacao#' 
-					or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+					or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_sug_orgao_mcu in (#mcusHeranca#)</cfif>))
 			</cfif>
 			order By pc_aval_melhoria_id 
 			
 		</cfquery>
 
-		<cfquery datasource="#dsn_processos#" name="rsStatus">
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
 		</cfquery>
 		<!DOCTYPE html>
@@ -2009,7 +1987,7 @@
 		
 
 
-		<cfquery name="rsAvalTab" datasource="#dsn_processos#">
+		<cfquery name="rsAvalTab" datasource="#application.dsn_processos#">
 			SELECT DISTINCT pc_processos. pc_processo_id, pc_avaliacoes.pc_aval_id, pc_avaliacoes.pc_aval_numeracao, pc_avaliacoes.pc_aval_descricao,
 							pc_avaliacoes.pc_aval_classificacao, 
 							pc_avaliacoes.pc_aval_vaFalta, pc_avaliacoes.pc_aval_vaRisco, pc_avaliacoes.pc_aval_vaSobra,
@@ -2020,18 +1998,18 @@
 			LEFT JOIN  pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
 			LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 			WHERE  pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProcesso#">
-			<cfif #rsUsuario.pc_org_controle_interno# neq 'S' and #rsUsuario.pc_usu_perfil# neq 13>
-				 AND ((pc_aval_orientacao_mcu_orgaoResp = '#rsUsuario.pc_usu_lotacao#' 
-							or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-							or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))) 
-			    or (pc_aval_melhoria_num_orgao =  '#rsUsuario.pc_usu_lotacao#' 
-				or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-				or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
+				 AND ((pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+							or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))) 
+			    or (pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+				or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+				or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 				)
 
-				or (pc_aval_melhoria_sug_orgao_mcu =  '#rsUsuario.pc_usu_lotacao#' 
-				or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#'
-				or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#rsUsuario.pc_usu_lotacao#')))
+				or (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+				or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+				or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 				) <cfif #mcusHeranca# neq ''>or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>
 				or pc_aval_classificacao='L')
 			    
@@ -2041,7 +2019,7 @@
 		</cfquery>
 
 
-		<cfquery name="rsProcForm" datasource="#dsn_processos#">
+		<cfquery name="rsProcForm" datasource="#application.dsn_processos#">
 			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado, pc_orgaos.pc_org_mcu,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -2106,7 +2084,7 @@
 
 												<p style="font-size: 1em;">
 													Classificação: <strong style="color:##0692c6;margin-right:50px">#rsProcForm.pc_class_descricao#</strong>
-													<cfif #rsUsuario.pc_org_controle_interno# eq 'S' >	
+													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
 														Modalidade: 
 														<cfif #rsProcForm.pc_modalidade# eq 'N'>
 															<strong style="color:##0692c6;margin-right:50px">NORMAL</strong>
@@ -2136,18 +2114,18 @@
 
 												
 
-												<cfquery datasource="#dsn_processos#" name="rsCoordenadorRegional">
+												<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorRegional">
 													SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
 													INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
 													WHERE pc_usu_matricula = '#rsProcForm.pc_usu_matricula_coordenador#'
 												</cfquery>
-												<cfquery datasource="#dsn_processos#" name="rsCoordenadorNacional">
+												<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorNacional">
 													SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
 													INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
 													WHERE pc_usu_matricula = '#rsProcForm.pc_usu_matricula_coordenador_nacional#'
 												</cfquery>
 
-												<cfquery datasource="#dsn_processos#" name="rsAvaliadores">
+												<cfquery datasource="#application.dsn_processos#" name="rsAvaliadores">
 													SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_avaliadores
 													INNER JOIN pc_usuarios on pc_usu_matricula = pc_avaliador_matricula
 													INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
@@ -2197,7 +2175,7 @@
 											<th align="center">Item N°:</th>
 											<th>Situação Encontrada </th>
 											<th>Classificação: </th>
-											<cfif #rsUsuario.pc_org_controle_interno# eq 'S' >
+											<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >
 												<th>Valor Envolvido:</th>
 											</cfif>
 										</tr>
@@ -2222,14 +2200,14 @@
 
 											<cfoutput>	
 												<cfset controleInterno = 'N'>
-												<cfif #rsUsuario.pc_org_controle_interno# eq 'S'>
+												<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 													<cfset controleInterno = 'S'>
 												</cfif>				
 												<tr onclick="javascript:mostraInfoAval(#pc_aval_id#,'#controleInterno#')" style="font-size:16px;cursor: pointer;">
 													<td>#pc_aval_numeracao# </td>
 													<td>#pc_aval_descricao#</td>
 													<td>#classifRisco#</td>
-													<cfif #rsUsuario.pc_org_controle_interno# eq 'S' >
+													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >
 														<cfif #vaFalta# eq 'R$ 0,00' and #vaRisco# eq 'R$ 0,00' and #vaSobra# eq 'R$ 0,00' >
 															<td>Não Quantificado</td>
 														<cfelse>
@@ -2370,7 +2348,7 @@
 	<cffunction name="timelineViewAcomp"   access="remote" hint="enviar o componente timeline dos processos em acompanhamento para a páginas pc_Consulta chama pela função tabAvaliacoesConsulta">
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 
-		<cfquery name="rsProc" datasource="#dsn_processos#">
+		<cfquery name="rsProc" datasource="#application.dsn_processos#">
 
 			SELECT      pc_processos.*, pc_avaliacoes.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_mcu as mcuAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 								pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
@@ -2397,7 +2375,7 @@
 
 		</cfquery>		
 
-		<cfquery name="rsSe_Area" datasource="#dsn_processos#">
+		<cfquery name="rsSe_Area" datasource="#application.dsn_processos#">
 			SELECT pc_orgaos.pc_org_mcu, pc_orgaos.pc_org_sigla
 			FROM pc_orgaos
 			WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProc.pc_org_mcu#' or pc_org_mcu = '#rsProc.pc_org_mcu#' 
@@ -2407,7 +2385,7 @@
 
 		<cfset areasDaSE= valueList(rsSe_Area.pc_org_mcu) >
 
-		<cfquery name="rsAreasTodas" datasource="#dsn_processos#">
+		<cfquery name="rsAreasTodas" datasource="#application.dsn_processos#">
 			SELECT pc_orgaos.pc_org_mcu, pc_orgaos.pc_org_sigla
 			FROM pc_orgaos
 			WHERE pc_org_controle_interno ='N' AND pc_org_Status = 'A' and not pc_org_mcu in (<cfqueryparam cfsqltype="cf_sql_string" value="#areasDaSE#" list="true">)
@@ -2420,7 +2398,7 @@
 
 
 
-		<cfquery name="rsPosicionamentos" datasource="#dsn_processos#">
+		<cfquery name="rsPosicionamentos" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_posicionamentos.*, pc_orgaos.* , pc_usuarios.*,  pc_orgaos2.pc_org_sigla as orgaoResp, pc_orgaos2.pc_org_mcu as mcuOrgaoResp, CONVERT(char, pc_aval_posic_datahora, 103) as dataPosic
 			FROM pc_avaliacao_posicionamentos
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
@@ -2542,7 +2520,7 @@
 																	</cfif>
 																	<!--Inicio TabAnexosPosic-->
 																	<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
-																		<cfquery datasource="#dsn_processos#" name="rsAnexosPosic">
+																		<cfquery datasource="#application.dsn_processos#" name="rsAnexosPosic">
 																			Select pc_anexo_nome,pc_anexo_caminho  FROM pc_anexos 
 																			WHERE pc_anexo_aval_posic = #pc_aval_posic_id# 
 																			order By pc_anexo_id desc
@@ -2623,7 +2601,7 @@
 																	</cfif>
 																	<!--Inicio TabAnexosPosic-->
 																	<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
-																		<cfquery datasource="#dsn_processos#" name="rsAnexosPosic">
+																		<cfquery datasource="#application.dsn_processos#" name="rsAnexosPosic">
 																			Select pc_anexo_nome,pc_anexo_caminho  FROM pc_anexos 
 																			WHERE pc_anexo_aval_posic = #pc_aval_posic_id# 
 																			order By pc_anexo_id desc
@@ -2759,7 +2737,7 @@
 
 		
 
-		<cfquery name="rsProc" datasource="#dsn_processos#">
+		<cfquery name="rsProc" datasource="#application.dsn_processos#">
 			SELECT      pc_processos.*, pc_avaliacoes.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_mcu as mcuAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 								pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 								pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
@@ -2788,7 +2766,7 @@
 
 		
 
-		<cfquery name="rsPosicionamentos" datasource="#dsn_processos#">
+		<cfquery name="rsPosicionamentos" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_posicionamentos.*, pc_orgaos.* , pc_usuarios.*,  pc_orgaos2.pc_org_sigla as orgaoResp, pc_orgaos2.pc_org_mcu as mcuOrgaoResp, CONVERT(char, pc_aval_posic_datahora, 103) as dataPosic
 			FROM pc_avaliacao_posicionamentos
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
@@ -2902,7 +2880,7 @@
 															</cfif>
 															<!--Inicio TabAnexosPosic-->
 															<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
-																<cfquery datasource="#dsn_processos#" name="rsAnexosPosic">
+																<cfquery datasource="#application.dsn_processos#" name="rsAnexosPosic">
 																	Select pc_anexo_nome,pc_anexo_caminho  FROM pc_anexos 
 																	WHERE pc_anexo_aval_posic = #pc_aval_posic_id# 
 																	order By pc_anexo_id desc
@@ -2980,7 +2958,7 @@
 															</cfif>
 															<!--Inicio TabAnexosPosic-->
 															<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
-																<cfquery datasource="#dsn_processos#" name="rsAnexosPosic">
+																<cfquery datasource="#application.dsn_processos#" name="rsAnexosPosic">
 																	Select pc_anexo_nome,pc_anexo_caminho  FROM pc_anexos 
 																	WHERE pc_anexo_aval_posic = #pc_aval_posic_id# 
 																	order By pc_anexo_id desc
@@ -3111,39 +3089,39 @@
 		<cftransaction>
 
 			<!--Coloca todas a propostas de melhoria do processo com status B (BLOQUEADA)-->
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE pc_avaliacao_melhorias set 
 					pc_aval_melhoria_status = 'B',
-					pc_aval_melhoria_datahora =  CONVERT(char, GETDATE(), 120),
-					pc_aval_melhoria_login = '#cgi.REMOTE_USER#'
+					pc_aval_melhoria_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+					pc_aval_melhoria_login = '#application.rsUsuarioParametros.pc_usu_login#'
 				WHERE pc_aval_melhoria_num_aval in (select pc_aval_id from pc_avaliacoes where pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">)
 			</cfquery>
 			
 			<!--fim Coloca todas a propostas de melhoria do processo com status B (BLOQUEADA)-->
 
 			<!--COLOCA O PROCESSO EM STATUS 6 - BLOQUEADO-->
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE 		pc_processos
 				SET         pc_num_status = 6,
-							pc_alteracao_datahora =  CONVERT(char, GETDATE(), 120),
-							pc_alteracao_login = '#cgi.REMOTE_USER#'
+							pc_alteracao_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#'
 				WHERE       pc_processo_id = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
 			</cfquery>
 			<!--fim COLOCA O PROCESSO EM STATUS 6 - BLOQUEADO-->
 
 			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE 	pc_avaliacoes
 				SET 	pc_aval_status=8,
-						pc_aval_atualiz_datahora = CONVERT(char, GETDATE(), 120),
-						pc_aval_atualiz_login = '#cgi.REMOTE_USER#' 
+						pc_aval_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#' 
 				WHERE 	pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> AND pc_aval_status not in (7)
 			</cfquery>
 			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 8 - BLOQUEADO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 
 			
 			<!--LISTA TODAS AS ORIENTAÇÕES DO PROCESSO-->
-			<cfquery datasource="#dsn_processos#" name="rsOrientacoes">
+			<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 				SELECT pc_aval_orientacao_id, pc_aval_orientacao_num_aval, pc_aval_orientacao_status FROM pc_avaliacao_orientacoes
 				WHERE pc_aval_orientacao_num_aval in (select pc_aval_id from pc_avaliacoes where pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">)
 			</cfquery>
@@ -3152,12 +3130,12 @@
 			<!--COLOCA AS ORIENTAÇÕES COM STATUS 14 - BLOQUEADA-->
 			<!-- LOOP EM CADA ORIENTAÇÃO DO PROCESSO-->
 			<cfloop query="rsOrientacoes">
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 					UPDATE	pc_avaliacao_orientacoes 
 					SET 	pc_aval_orientacao_status = 14,
 							pc_aval_orientacao_dataPrevistaResp = '',
-							pc_aval_orientacao_status_datahora =  CONVERT(char, GETDATE(), 120),
-							pc_aval_orientacao_atualiz_login = '#cgi.REMOTE_USER#'
+							pc_aval_orientacao_status_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
 					WHERE 	pc_aval_orientacao_id = #pc_aval_orientacao_id#
 				</cfquery>
 				<!--fim COLOCA AS ORIENTAÇÕES COM STATUS 14 - BLOQUEADA-->
@@ -3165,9 +3143,9 @@
 				<!--Texto padrão manifestação-->
 				<cfset posicaoInicial = "Processo BLOQUEADO.<br>Este relatório aguarda a finalização de análises complementares do controle interno e/ou outros órgãos da empresa para liberação ao ÓRGÃO AVALIADO. Favor aguardar.">
 				<!--Insere a manifestação inicial do controle interno para a orientação bloqueada-->
-				<cfquery datasource="#dsn_processos#">
+				<cfquery datasource="#application.dsn_processos#">
 					INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-					VALUES ('#pc_aval_orientacao_id#', '#posicaoInicial#',CONVERT(char, GETDATE(), 120),'#rsUsuario.pc_usu_matricula#','#rsUsuario.pc_usu_lotacao#', null,'',14)
+					VALUES ('#pc_aval_orientacao_id#', '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', null,'',14)
 				</cfquery>
 			</cfloop>
 			<!--fim LOOP EM CADA ORIENTAÇÃO DO PROCESSO-->
@@ -3186,39 +3164,39 @@
 		<cftransaction>
 
 			<!--Coloca todas a propostas de melhoria do processo com status P (PENDENTE)-->
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE pc_avaliacao_melhorias set 
 					pc_aval_melhoria_status = 'P',
-					pc_aval_melhoria_datahora =  CONVERT(char, GETDATE(), 120),
-					pc_aval_melhoria_login = '#cgi.REMOTE_USER#'
+					pc_aval_melhoria_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+					pc_aval_melhoria_login = '#application.rsUsuarioParametros.pc_usu_login#'
 				WHERE pc_aval_melhoria_num_aval in (select pc_aval_id from pc_avaliacoes where pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">)
 			</cfquery>
 			
 			<!--fim Coloca todas a propostas de melhoria do processo com status P (PENDENTE)-->
 
 			<!--COLOCA O PROCESSO EM STATUS 4 - ACOMPANHAMENTO-->
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE 		pc_processos
 				SET         pc_num_status = 4,
-							pc_alteracao_datahora =  CONVERT(char, GETDATE(), 120),
-							pc_alteracao_login = '#cgi.REMOTE_USER#'
+							pc_alteracao_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#'
 				WHERE       pc_processo_id = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
 			</cfquery>
 			<!--fim COLOCA O PROCESSO EM STATUS 4 - ACOMPANHAMENTO-->
 
 			<!--COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 - ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
-			<cfquery datasource="#dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" >
 				UPDATE 	pc_avaliacoes
 				SET 	pc_aval_status=6,
-						pc_aval_atualiz_datahora = CONVERT(char, GETDATE(), 120),
-						pc_aval_atualiz_login = '#cgi.REMOTE_USER#' 
+						pc_aval_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#' 
 				WHERE 	pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> AND pc_aval_status not in (7)
 			</cfquery>
 			<!--fim COLOCA TODOS OS ITENS DO PROCESSO COM STATUS 6 -  ACOMPANHAMENTO, EXCETO OS ITENS COM STATUS 7 - FINALIZADO (POIS A FINALIZAÇÃO DO ITEM JÁ FOI TRATADA NA FINALIZAÇÃO DO CADASTRO DO PROCESSO - 6° PASSO)-->
 
 			
 			<!--LISTA TODAS AS ORIENTAÇÕES DO PROCESSO-->
-			<cfquery datasource="#dsn_processos#" name="rsOrientacoes">
+			<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 				SELECT pc_aval_orientacao_id, pc_aval_orientacao_num_aval, pc_aval_orientacao_status, pc_aval_orientacao_mcu_orgaoResp FROM pc_avaliacao_orientacoes
 				WHERE pc_aval_orientacao_num_aval in (select pc_aval_id from pc_avaliacoes where pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">)
 			</cfquery>
@@ -3232,12 +3210,12 @@
 			<cfset dataPTBR = obterDataPrevista.Data_Prevista_Formatada>
 			<cfset dataCFQUERY = "#DateFormat(obterDataPrevista.Data_Prevista,'YYYY-MM-DD')#">	
 			<cfloop query="rsOrientacoes">
-				<cfquery datasource="#dsn_processos#" >
+				<cfquery datasource="#application.dsn_processos#" >
 					UPDATE	pc_avaliacao_orientacoes 
 					SET 	pc_aval_orientacao_status = 4,
 							pc_aval_orientacao_dataPrevistaResp = '#dataCFQUERY#',
-							pc_aval_orientacao_status_datahora =  CONVERT(char, GETDATE(), 120),
-							pc_aval_orientacao_atualiz_login = '#cgi.REMOTE_USER#'
+							pc_aval_orientacao_status_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
 					WHERE 	pc_aval_orientacao_id = #pc_aval_orientacao_id#
 				</cfquery>
 				<!--fim COLOCA AS ORIENTAÇÕES COM STATUS 4 - NÃO RESPONDIDO-->
@@ -3247,9 +3225,9 @@
 				
 				
 				<!--Insere a manifestação inicial do controle interno para a orientação bloqueada-->
-				<cfquery datasource="#dsn_processos#">
+				<cfquery datasource="#application.dsn_processos#">
 					INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-					VALUES ('#pc_aval_orientacao_id#', '#posicaoInicial#',CONVERT(char, GETDATE(), 120),'#rsUsuario.pc_usu_matricula#','#rsUsuario.pc_usu_lotacao#', '#pc_aval_orientacao_mcu_orgaoResp#','#dataCFQUERY#',4)
+					VALUES ('#pc_aval_orientacao_id#', '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#pc_aval_orientacao_mcu_orgaoResp#','#dataCFQUERY#',4)
 				</cfquery>
 			</cfloop>
 			<!--fim LOOP EM CADA ORIENTAÇÃO DO PROCESSO-->

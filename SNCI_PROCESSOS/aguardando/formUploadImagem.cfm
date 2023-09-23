@@ -5,7 +5,7 @@
 </cfif>
 <!---<cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	select Usu_DR,Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena from usuarios 
-	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_login#">)
 </cfquery>--->
 <cfset limiteImagens = false>
 <cfif isDefined('form.grupo')>

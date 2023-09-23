@@ -40,7 +40,7 @@
 
 				<div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
 					<div class="col-sm-6">
-						<h4>Acompanhamento <cfif #rsUsuarioParametros.pc_org_controle_interno# eq 'N'><i id="start-tour" style="color:#8cc63f" class="fas fa-question-circle grow-icon"></i></cfif></h4>
+						<h4>Acompanhamento <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'><i id="start-tour" style="color:#8cc63f" class="fas fa-question-circle grow-icon"></i></cfif></h4>
 					</div>
 				</div>
 			</div><!-- /.container-fluid -->
@@ -58,7 +58,7 @@
 							<li class="nav-item" style="">
 								<a  class="nav-link  active" id="custom-tabs-one-OrientacaoAcomp-tab" onClick="javascript:ocultaInformacoes()"  data-toggle="pill" href="#custom-tabs-one-OrientacaoAcomp" role="tab" aria-controls="custom-tabs-one-OrientacaoAcomp" aria-selected="true">MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO</a>
 							</li>
-							<cfif #rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
+							<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
 								<li class="nav-item" style="">
 									<a  class="nav-link " id="custom-tabs-one-MelhoriaAcomp-tab" onClick="javascript:ocultaInformacoes();"  data-toggle="pill" href="#custom-tabs-one-MelhoriaAcomp" role="tab" aria-controls="custom-tabs-one-MelhoriaAcomp" aria-selected="true">PROPOSTAS DE MELHORIA</a>
 								</li>
@@ -70,7 +70,7 @@
 							<div disable class="tab-pane fade  active show" id="custom-tabs-one-OrientacaoAcomp"  role="tabpanel" aria-labelledby="custom-tabs-one-OrientacaoAcomp-tab" >														
 								<div id="exibirTab"></div>
 							</div>
-							<cfif #rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
+							<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
 								<div disable class="tab-pane fade " id="custom-tabs-one-MelhoriaAcomp"  role="tabpanel" aria-labelledby="custom-tabs-one-MelhoriaAcomp-tab" >								
 									<div id="exibirTabMelhoriasPendentes"></div>
 								</div>			
@@ -315,7 +315,7 @@
         });
 
 		$(window).on("load",function(){
-           <cfoutput> var contIterno = '#rsUsuarioParametros.pc_org_controle_interno#'</cfoutput>
+           <cfoutput> var contIterno = '#application.rsUsuarioParametros.pc_org_controle_interno#'</cfoutput>
 			if(contIterno =='N'){
 				exibirTabelaMelhoriasPendentes()
 			}
