@@ -50,3 +50,11 @@ applicationtimeout="#createtimespan(0,6,0,0)#">
 </cfquery>
 
 <cfset application.Lista_paginasPerfilUsuario = ValueList(qControleAcessoParametros.pagina)>
+
+<cfquery name="application.rsOrgaoSubordinados" datasource="#application.dsn_processos#">
+	SELECT pc_orgaos.* FROM pc_orgaos
+	WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'  
+								or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))
+						
+</cfquery>
+

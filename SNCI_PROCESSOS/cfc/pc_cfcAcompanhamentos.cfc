@@ -801,7 +801,7 @@
 				<cfif application.rsUsuarioParametros.pc_org_controle_interno eq 'S'>
 					<cfset timelineViewAcomp(arguments.idOrientacao)>
 				<cfelse>
-					<cfif application.rsUsuarioParametros.pc_org_mcu eq rsProcAval.pc_num_orgao_avaliado>
+					<cfif application.rsOrgaoSubordinados.recordcount neq 0>
 						<cfset timelineViewAcompOrgaoAvaliado(arguments.idOrientacao)>
 						<div class="row" style="margin-bottom:50px">
 							<div class="col-md-12">
@@ -848,7 +848,7 @@
 																<i style="font-weight: normal;">Dica: Para selecionar mais de uma área, mantenha a tecla "Ctrl" pressionada enquanto seleciona.</i>
 														</label>
 														<select id="pcOrgaoRespDistribuicao" required="" name="pcOrgaoRespDistribuicao" class="form-control" multiple="multiple"  >
-															<cfoutput query="rs_OrgAvaliado">
+															<cfoutput query="application.rsOrgaoSubordinados">
 																<option value="#pc_org_mcu#">#pc_org_sigla#</option>
 															</cfoutput>
 														</select>
@@ -2683,11 +2683,10 @@
 								<!--Fim Editor-->
 							</div> 
 						</div>
-						<div class="row" style="margin-left:8px;font-size:16px">
+						<div class="row" style="margin-top:20px;margin-left:8px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
 									<cfif rsProc.pc_num_status neq 6>
-									    <label for="pcPosicAcomp">Manifestação:</label>
 										<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" ></textarea>
 									<cfelse>
 										<h6 style="color:red;">ORIENTAÇÃO BLOQUEADA. NÃO É PERMITIDO MANIFESTAÇÃO.</h6>
@@ -3571,16 +3570,12 @@
 							</h4>
 						</div>
 						
-						<div class="row" style="margin-left:8px;font-size:16px">
+						<div class="row" style="margin-top:20px;margin-left:8px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
-									<label for="pcPosicAcomp">Manifestação:</label>
 									<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" ></textarea>
 								</div>										
 							</div>
-
-						
-							
 						</div>
 
 						<!--ANEXOS -->
