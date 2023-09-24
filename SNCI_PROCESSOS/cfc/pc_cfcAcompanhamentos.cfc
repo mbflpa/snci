@@ -821,12 +821,12 @@
 									<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
 									
 										<ul class="nav nav-tabs">
-										<li class="nav-item">
-											<a class="nav-link" id="tab-manifestacao" data-toggle="tab" href="#content-manifestacao" style="font-size:20px">Manifestação</a>
-										</li>
-										<li class="nav-item">
-											<a class="nav-link" id="tab-distribuicao" data-toggle="tab" href="#content-distribuicao" style="font-size:20px">Distribuição</a>
-										</li>
+											<li class="nav-item">
+												<a class="nav-link" id="tab-manifestacao" data-toggle="tab" href="#content-manifestacao" style="font-size:20px;border-color: #fff;"><i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Manifestação</span></a>
+											</li>
+											<li class="nav-item">
+												<a class="nav-link" id="tab-distribuicao" data-toggle="tab" href="#content-distribuicao" style="font-size:20px;border-color: #fff;"><i class="fas fa-sitemap" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Distribuição</span></a>
+											</li>
 										</ul>
 									</div>
 									<div class="card-body">
@@ -2683,7 +2683,7 @@
 								<!--Fim Editor-->
 							</div> 
 						</div>
-						<div class="row" style="margin-top:20px;margin-left:8px;font-size:16px">
+						<div class="row" style="margin-top:20px;margin:8px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
 									<cfif rsProc.pc_num_status neq 6>
@@ -3560,7 +3560,7 @@
 	<cffunction name="formPosicionamentoOrgaoAvaliado"   access="remote" hint="enviar o componente para a páginas pc_Acompanhamento chama pela função tabAvaliacoesAcompanhamento">
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 			
-				<div id="accordionCadItemPainel" style="margin-top:30px;hright:100vh">
+				<div id="accordionCadItemPainel" style="margin-top:0px;hright:100vh">
 					<div class="card card-success" style="margin-bottom:10px">
 						<div class="card-header" style="background-color:#ececec;">
 							<h4 class="card-title ">
@@ -3570,7 +3570,7 @@
 							</h4>
 						</div>
 						
-						<div class="row" style="margin-top:20px;margin-left:8px;font-size:16px">
+						<div class="row" style="margin-top:20px;margin:8px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
 									<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" ></textarea>
