@@ -805,27 +805,26 @@
 						<cfset timelineViewAcompOrgaoAvaliado(arguments.idOrientacao)>
 						<div class="row" style="margin-bottom:50px">
 							<div class="col-md-12">
-							<div class="card-header col-md-8 alertaDivMagenta"  >
-										
-									<p>Senhor(a) gestor(a),</p>
-									<p>Escolha a seguir entre as opções MANIFESTAÇÃO ou DISTRIBUIÇÃO.<br>
-										A opção "MANIFESTAÇÃO" possibilita o registro da resposta diretamente por esse gestor para envio ao Controle Interno.<br>
-										A opção de “DISTRIBUIÇÃO” possibilita o encaminhamento da ORIENTAÇÃO/MEDIDA DE REGULARIZAÇÃO e/ou PROPOSTA DE MELHORIA para 
-										manifestação das áreas subordinadas a essa SE/Departamento. Essa distribuição poderá ser feita para até quatro áreas se a situação
-										envolver órgãos distintos. Nesse caso o acompanhamento será desdobrado conforme encaminhamento realizado. Não havendo a necessidade 
-										de distribuição, escolher a opção MANIFESTAÇÃO.
-									</p>
-								</div>
+							    
 								<div class="card card-primary card-tabs" style="widht:100%">
 									
-									<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
-									
+									<div class="card-header p-0 pt-1" style="">
+									    <div class="col-md-12"  style="border-bottom: 1px solid; padding: 10px;">
+											<p>Senhor(a) gestor(a),</p>
+											<li>Escolha a seguir entre as opções: <strong><i class="fas fa-user-pen"></i> Manifestação</strong> ou <strong><i class="fas fa-sitemap"></i> Distribuição</strong>;</li>
+											<li>A opção "MANIFESTAÇÃO" possibilita o registro da resposta diretamente por esse gestor para envio ao Controle Interno;</li>
+											<li>A opção de “DISTRIBUIÇÃO” possibilita o encaminhamento da ORIENTAÇÃO/MEDIDA DE REGULARIZAÇÃO e/ou PROPOSTA DE MELHORIA para 
+												manifestação das áreas subordinadas a essa SE/Departamento. Essa distribuição poderá ser feita para até quatro áreas se a situação
+												envolver órgãos distintos. Nesse caso o acompanhamento será desdobrado conforme encaminhamento realizado. Não havendo a necessidade 
+												de distribuição, escolher a opção MANIFESTAÇÃO.</li>
+											
+										</div>
 										<ul class="nav nav-tabs">
 											<li class="nav-item">
-												<a class="nav-link" id="tab-manifestacao" data-toggle="tab" href="#content-manifestacao" style="font-size:20px;border-color: #fff;"><i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Manifestação</span></a>
+												<a class="nav-link" id="tab-manifestacao" data-toggle="tab" href="#content-manifestacao" style="font-size:20px;"><i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Manifestação</span></a>
 											</li>
 											<li class="nav-item">
-												<a class="nav-link" id="tab-distribuicao" data-toggle="tab" href="#content-distribuicao" style="font-size:20px;border-color: #fff;"><i class="fas fa-sitemap" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Distribuição</span></a>
+												<a class="nav-link" id="tab-distribuicao" data-toggle="tab" href="#content-distribuicao" style="font-size:20px;"><i class="fas fa-sitemap" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Distribuição</span></a>
 											</li>
 										</ul>
 									</div>
@@ -857,7 +856,7 @@
 												<div  class="col-sm-12" >
 													<div class="form-group">
 														<label   for="pcOrientacaoResposta">Orientações para resposta:</label>
-														<textarea class="form-control" id="pcOrientacaoResposta" rows="4" required=""  name="pcOrientacaoResposta" class="form-control"></textarea>
+														<textarea class="form-control" id="pcOrientacaoResposta" rows="4" required=""  name="pcOrientacaoResposta" class="form-control" placeholder="Digite aqui sua orientação para a(s) área(s) subordinada(s) selecionada(s) acima..."></textarea>
 													</div>										
 												</div>
 												<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
@@ -891,6 +890,11 @@
 				$('select').select2({
 					theme: 'bootstrap4',
 					placeholder: 'Selecione...'
+				});
+				$('#pcOrgaoRespDistribuicao').select2({
+					theme: 'bootstrap4',
+					placeholder: 'Selecione as áreas para distribuição da orientação...',
+					allowClear: true // Opcional - permite desmarcar a seleção
 				});
 				// Monitora o select de distribuição para permitir a seleção de até 4 órgãos
 				// Monitora o evento de mudança no elemento com id "pcOrgaoRespDistribuicao"
@@ -2683,11 +2687,11 @@
 								<!--Fim Editor-->
 							</div> 
 						</div>
-						<div class="row" style="margin-top:20px;margin:8px;font-size:16px">
+						<div class="row" style="margin-left:8px;margin-right:8px;margin-top:-30px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
 									<cfif rsProc.pc_num_status neq 6>
-										<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" ></textarea>
+										<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui a manifestação do Controle Interno..." ></textarea>
 									<cfelse>
 										<h6 style="color:red;">ORIENTAÇÃO BLOQUEADA. NÃO É PERMITIDO MANIFESTAÇÃO.</h6>
 									</cfif>
@@ -3305,9 +3309,9 @@
 								
 					<div class="card card-success" >
 					
-					<div class="card-header" style="background-color: #ececec;" >
+					<div class="card-header" style="background-color: #0083ca;" >
 						<h4 class="card-title ">	
-							<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:gray;font-weight: bold;"> 
+							<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#fff;font-weight: bold;"> 
 								<i class="fas fa-clock" style="margin-top:4px;"></i><span style="margin-left:10px;font-size:16px;">
 								<cfif #rsProc.pc_orgHerancaMcuPara# neq '' and (DateFormat(rsProc.pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(rsProc.pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
 									MANIFESTAÇÕES: <cfoutput>Orientação (ID: #rsProc.pc_aval_orientacao_id#) para #rsProc.siglaOrgRespHerdeiro# (item: #rsProc.pc_aval_numeracao# - Processo: #rsProc.pc_processo_id# )</cfoutput></span>
@@ -3317,7 +3321,7 @@
 							</a>	
 						</h4>
 						<div class="card-tools" align="center">
-							<i id="btRecolherPosic"  class="fas fa-eye-slash fa-2x" style="color:gray;cursor:pointer;margin-right:20px" title="Recolher todos os posicionamentos" ></i>	
+							<i id="btRecolherPosic"  class="fas fa-eye-slash fa-2x" style="color:#fff;cursor:pointer;margin-right:20px" title="Recolher todos os posicionamentos" ></i>	
 						</div>
 					</div>
 					
@@ -3561,19 +3565,22 @@
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 			
 				<div id="accordionCadItemPainel" style="margin-top:0px;hright:100vh">
-					<div class="card card-success" style="margin-bottom:10px">
-						<div class="card-header" style="background-color:#ececec;">
-							<h4 class="card-title ">
-								<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:gray;font-weight: bold;"> 
-									<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">INSERIR MANIFESTAÇÃO DO ÓRGÃO: <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></span>
-								</a>
-							</h4>
-						</div>
-						
+					<cfif application.rsOrgaoSubordinados.recordcount neq 0>
+						<div  style="margin-bottom:10px">
+					<cfelse>
+						<div class="card card-success" style="margin-bottom:10px">
+							<div class="card-header" style="background-color:#0083CA;">
+								<h4 class="card-title ">
+									<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:#fff;font-weight: bold;"> 
+										<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">INSERIR MANIFESTAÇÃO DO ÓRGÃO: <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></span>
+									</a>
+								</h4>
+							</div>	
+					</cfif>	
 						<div class="row" style="margin-top:20px;margin:8px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
-									<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" ></textarea>
+									<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui sua manifestação..." ></textarea>
 								</div>										
 							</div>
 						</div>
@@ -3581,7 +3588,7 @@
 						<!--ANEXOS -->
 						<div class="row">
 							<div class="col-md-12">
-								<div class="card card-default">
+								<div >
 									
 									<div class="card-body">
 										<div id="actions" class="row" >
