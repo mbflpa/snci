@@ -1150,7 +1150,7 @@
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_aval_posic_num_orgaoResp
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
-			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> 
+			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 1
 			ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc		
 		</cfquery>
 
@@ -1505,7 +1505,7 @@
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_aval_posic_num_orgaoResp
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
-			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#" > and not pc_aval_posic_status IN(13,14)
+			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#" > and not pc_aval_posic_status IN(13,14) and pc_aval_posic_enviado = 1
 			ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc		
 		</cfquery>
 

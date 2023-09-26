@@ -1,19 +1,24 @@
 
 <cfprocessingdirective pageencoding = "utf-8">	
 
-<cfmail from="mbflpa@yahoo.com.br" to="marceloferreira@correios.com.br" subject="Bem-vindo ao SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-    <div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 600px; margin: 0 auto; float: left;">
-       <p style="font-size:20px">SNCI - Processos</p> 
-        <p>Prezado Usuário,</p>
-        <p style="text-align: justify;">Estamos felizes em tê-lo como parte da nossa comunidade no SNCI. Você agora faz parte do nosso sistema de controle interno, onde pode gerenciar e monitorar atividades importantes.</p>
-        <p>Para começar, faça login na sua conta usando suas credenciais.</p>
-        <p><strong>Link de Acesso:</strong> <a href="https://www.snci.com.br" style="color: ##007bff;">https://www.snci.com.br</a></p>
-        <p>Obrigado por se juntar a nós!</p>
-        <p>Atenciosamente,</p>
-        <p>A Equipe do SNCI</p>
-        <p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
-    </div>
-</cfmail>
+<!--Consulta a tabela pc_avaliacao_posicionamentos com where sendo a coluna pc_aval_posic_num_orientacao = 2619 E pc_aval_posic_enviado = 0 -->
+<cfquery name="qAvaliacaoPosicionamentos" datasource="#application.dsn_processos#">
+    SELECT * FROM pc_avaliacao_posicionamentos WHERE pc_aval_posic_num_orientacao = 2619 AND pc_aval_posic_enviado = 0
+</cfquery>
+<cfquery name="qAvaliacaoPosicionamentosEnviados" datasource="#application.dsn_processos#">
+    SELECT * FROM pc_avaliacao_posicionamentos WHERE pc_aval_posic_num_orientacao = 2619 AND pc_aval_posic_enviado = 1
+</cfquery>
+<cfquery name="qAnexos" datasource="#application.dsn_processos#">
+    SELECT * FROM pc_anexos WHERE pc_anexo_orientacao_id = 2619 and pc_anexo_enviado = 0
+</cfquery>
+<cfquery name="qAnexosEnviados" datasource="#application.dsn_processos#">
+    SELECT * FROM pc_anexos WHERE pc_anexo_orientacao_id = 2619 and pc_anexo_enviado = 1
+</cfquery>
+
+<cfdump var = "#qAvaliacaoPosicionamentos#">
+<cfdump var = "#qAvaliacaoPosicionamentosEnviados#">
+<cfdump var = "#qAnexos#">
+<cfdump var = "#qAnexosEnviados#">
 
 
 

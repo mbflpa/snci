@@ -1119,7 +1119,7 @@
 							{
 								title: '<p style="font-size:20px">Enviar Manifestação</p>',
 								content: 'Clicando em "Enviar", seu posicionamento será cadastrado e ficará disponível para avaliação do Controle Interno.',
-								target: 'btSalvar',
+								target: 'btEnviar',
 								placement: 'top',
 								width: 400,
 								onNext: function() {
@@ -1354,6 +1354,9 @@
 		</script>
 
     </cffunction>
+
+
+
 
 	<cffunction name="distribuirOrientacoes" returntype="any" access="remote" hint="Distribui as oreintações para áreas selecionadas pelo órgão avaliado.">
 		<cfargument name="pc_aval_orientacao_id" type="string" required="true" />
@@ -2425,7 +2428,7 @@
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_aval_posic_num_orgaoResp
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
-			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> AND pc_aval_posic_enviado = 1
 			ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc		
 		</cfquery>
 
@@ -2687,11 +2690,22 @@
 								<!--Fim Editor-->
 							</div> 
 						</div>
+						<cfquery datasource="#application.dsn_processos#" name="rsManifestacaoSalva">
+							Select pc_avaliacao_posicionamentos.*, pc_orgaos.pc_org_sigla, pc_usuarios.pc_usu_nome FROM pc_avaliacao_posicionamentos 
+							INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
+							INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
+							WHERE pc_aval_posic_num_orientacao = #rsProc.pc_aval_orientacao_id# and pc_aval_posic_enviado = 0
+						</cfquery>
 						<div class="row" style="margin-left:8px;margin-right:8px;margin-top:-30px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
 									<cfif rsProc.pc_num_status neq 6>
-										<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui a manifestação do Controle Interno..." ></textarea>
+										<cfif rsManifestacaoSalva.recordcount neq 0>
+											<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
+										    <cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
+											<span style = "font-size:11px; color:#e83e8c"><cfoutput>Texto da manifestação salvo em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_org_sigla# (#rsManifestacaoSalva.pc_usu_nome#)</strong></cfoutput></span>
+										</cfif>
+										<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui a manifestação do Controle Interno..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
 									<cfelse>
 										<h6 style="color:red;">ORIENTAÇÃO BLOQUEADA. NÃO É PERMITIDO MANIFESTAÇÃO.</h6>
 									</cfif>
@@ -2809,11 +2823,14 @@
 						
 						
 							<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px">
+								<div class="form-group" style="margin-right:150px;">
+									<button id="btSalvar" class="btn btn-block btn-primary " style="background-color: #28a745;"> <i class="fas fa-floppy-disk" style="margin-right:5px"></i>Salvar manifestação p/ envio posterior</button>
+								</div>
 								<div class="form-group">
-								<button id="btSalvar" class="btn btn-block btn-primary " >Enviar</button>
+									<button id="btEnviar" class="btn btn-block btn-primary " > <i class="fas fa-share-from-square" style="margin-right:5px"></i>Enviar manifestação agora</button>
 								</div>
 							</div>
-						
+	
 						</cfif>
 					</div>
 
@@ -2994,8 +3011,94 @@
 
 			})
 
-
 			$('#btSalvar').on('click', function (event)  {
+				//cancela e  não propaga o event click original no botão
+				event.preventDefault()
+				event.stopPropagation()
+
+				const idAnexos = []; // Array para armazenar os valores da coluna ID da tabela anexos
+				if ($(".idColumn").length > 0) {
+					// Iterar sobre cada elemento da coluna ID
+					$(".idColumn").each(function() {
+						var idValue = $(this).text();
+						idAnexos.push(idValue);
+					});
+				}
+				var idAnexosString = idAnexos.join(","); // Converta o array para uma string de IDs separados por vírgula
+				
+				//verifica se os campos necessários foram preenchidos
+				if (
+					!$('#pcPosicAcomp').val() 
+				)
+				{   
+					//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
+					toastr.error('Informe o texto da manifestação.');
+					return false;
+				}
+
+				
+				<cfoutput>let dataRespValidacao = '#rsUltimaDataPrevistaResp.ultimaDataPrevistaResp#';</cfoutput>
+				
+
+				var mensagem = "Deseja salvar esta manifestação?"
+				
+							
+				<cfoutput>
+					var pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
+				</cfoutput>
+
+				swalWithBootstrapButtons.fire({//sweetalert2
+					html: logoSNCIsweetalert2(mensagem), 
+
+
+					showCancelButton: true,
+					confirmButtonText: 'Sim!',
+					cancelButtonText: 'Cancelar!'
+					}).then((result) => {
+						if (result.isConfirmed) {	
+							setTimeout(function() {	
+								$('#modalOverlay').modal('show');
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									data:{
+										method:"salvarPosic",
+										pc_aval_orientacao_id: pc_aval_orientacao_id,
+										pc_aval_posic_texto: $('#pcPosicAcomp').val(),
+										pc_aval_orientacao_status:$('#pcOrientacaoStatus').val(),
+										idAnexos: idAnexosString
+									},
+						
+									async: false
+									
+								})//fim ajax
+								.done(function(result) {	
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+										toastr.success('Manifestação e anexo(s) salvos com sucesso!');
+									});			
+
+								})//fim done
+								.fail(function(xhr, ajaxOptions, thrownError) {
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});	
+									$('#modal-danger').modal('show')
+									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+									$('#modal-danger').find('.modal-body').text(thrownError)
+
+								});//fim fail
+							}, 500);
+						}else {
+							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+							$('#modalOverlay').modal('hide');
+							Swal.fire('Operação Cancelada', '', 'info');
+						}
+					})
+
+			});		
+
+			$('#btEnviar').on('click', function (event)  {
 				
 				//cancela e  não propaga o event click original no botão
 				event.preventDefault()
@@ -3048,8 +3151,8 @@
 				
 							
 				<cfoutput>
-					var   pc_aval_id = '#rsProc.pc_aval_id#';
-					var   pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
+					var pc_aval_id = '#rsProc.pc_aval_id#';
+					var pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
 					var numProcesso = "#rsProc.pc_processo_id#";
 				</cfoutput>
 				if ($('#pcOrientacaoStatus').val() == 5){//se a o status escolhido for tratamento
@@ -3067,7 +3170,8 @@
 					cancelButtonText: 'Cancelar!'
 					}).then((result) => {
 						if (result.isConfirmed) {	
-							setTimeout(function() {		
+							setTimeout(function() {	
+								$('#modalOverlay').modal('show');	
 								$.ajax({
 									type: "post",
 									url: "cfc/pc_cfcAcompanhamentos.cfc",
@@ -3297,7 +3401,7 @@
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_aval_posic_num_orgaoResp
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
-			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#" > and not pc_aval_posic_status IN(13,14)
+			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#" > and not pc_aval_posic_status IN(13,14) AND pc_aval_posic_enviado = 1
 			ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc		
 		</cfquery>
 
@@ -3642,7 +3746,8 @@
 
 						<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px">
 							<div class="form-group">
-							<button id="btSalvar" class="btn btn-block btn-primary " >Enviar</button>
+								<button id="btSalvar" class="btn btn-block btn-primary " >Salvar p/ envio posterior</button>
+								<button id="btEnviar" class="btn btn-block btn-primary " >Enviar</button>
 							</div>
 						</div>
 					
@@ -3756,7 +3861,7 @@
 
 			})
 
-			$('#btSalvar').on('click', function (event)  {
+			$('#btEnviar').on('click', function (event)  {
 				
 				//cancela e  não propaga o event click original no botão
 				event.preventDefault()
@@ -3991,6 +4096,12 @@
 		<cfargument name="idAnexos" type="string" required="true">
 		
     	<cftransaction>
+
+			<cfquery datasource = "#application.dsn_processos#" >
+				DELETE FROM pc_avaliacao_posicionamentos 
+				WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 0
+			</cfquery>
+
 			<cfquery datasource = "#application.dsn_processos#" name="rsOrgao">
 				SELECT 	pc_orgaos.* FROM pc_orgaos WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
 			</cfquery>
@@ -3998,7 +4109,7 @@
 				<cfset data="#DateFormat(arguments.pc_aval_orientacao_dataPrevistaResp,'DD-MM-YYYY')#">
 				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
 				
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
@@ -4008,7 +4119,8 @@
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
+						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="1" cfsqltype="cf_sql_integer">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				</cfquery>
@@ -4032,14 +4144,15 @@
 				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_enviado)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
+						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="1" cfsqltype="cf_sql_integer">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				
@@ -4107,11 +4220,70 @@
 				<cfloop array="#idArray#" index="id">
 					<cfquery datasource = "#application.dsn_processos#" >
 						UPDATE 	pc_anexos set
-							pc_anexo_aval_posic = #idPosicCadastrado#
-						where pc_anexo_id = #id# and pc_anexo_aval_posic is null
+								pc_anexo_aval_posic = #idPosicCadastrado#,
+								pc_anexo_enviado = 1
+						where pc_anexo_id = #id# 
 					</cfquery>
 				</cfloop>
 			</cfif>
+		</cftransaction>			
+		
+
+	</cffunction>
+
+	<cffunction name="salvarPosic"   access="remote" hint="salva a manifestação de qualquer usuário">
+	   
+		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
+		<cfargument name="pc_aval_posic_texto" type="string" required="true" />
+		<cfargument name="pc_aval_orientacao_status" type="numeric" required="true" />
+		<cfargument name="idAnexos" type="string" required="true">
+
+		<cfquery datasource = "#application.dsn_processos#" name="rsPosicNaoEnviada">
+			SELECT pc_aval_posic_id, pc_aval_posic_enviado FROM pc_avaliacao_posicionamentos 
+			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 0
+		</cfquery>
+		
+    	<cftransaction>
+			<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
+
+			<cfif rsPosicNaoEnviada.recordcount eq 0>
+				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status)
+					VALUES (
+						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
+						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
+					)
+					SELECT SCOPE_IDENTITY() AS idPosic;
+				
+				</cfquery>
+		
+			<cfelse>
+				<cfquery datasource = "#application.dsn_processos#" >
+					UPDATE 	pc_avaliacao_posicionamentos
+					SET 
+						pc_aval_posic_texto = <cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
+						pc_aval_posic_dataHora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_aval_posic_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+						pc_aval_posic_num_orgao = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+						pc_aval_posic_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
+					WHERE 
+						pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
+						and pc_aval_posic_enviado = 0
+				</cfquery>
+
+				
+
+			</cfif>
+
+
+			
+
+
+			
 		</cftransaction>			
 		
 
@@ -4133,7 +4305,7 @@
 		<cftransaction>
 			<cfif '#arguments.pc_aval_orientacao_dataPrevistaResp#' neq ''>
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
@@ -4141,21 +4313,23 @@
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_integer">
+						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_integer">,
+						<cfqueryparam value="1" cfsqltype="cf_sql_integer">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				</cfquery>
 			<cfelse>
 
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status,  pc_aval_posic_enviado)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_integer">
+						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_integer">,
+						<cfqueryparam value="1" cfsqltype="cf_sql_integer">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				
@@ -4178,8 +4352,9 @@
 				<cfloop array="#idArray#" index="id">
 					<cfquery datasource = "#application.dsn_processos#" >
 						UPDATE 	pc_anexos set
-							pc_anexo_aval_posic = #idPosicCadastrado#
-						where pc_anexo_id = #id# and pc_anexo_aval_posic is null
+								pc_anexo_aval_posic = #idPosicCadastrado#,
+								pc_anexo_enviado = 1
+						where pc_anexo_id = #id# 
 					</cfquery>
 				</cfloop>
 			</cfif>

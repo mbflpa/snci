@@ -4057,7 +4057,7 @@
 			Select pc_anexos.*, pc_orgaos.*, pc_usu_nome  FROM pc_anexos 
 			Left JOIN pc_orgaos on pc_org_mcu = pc_anexo_mcu_orgao
 			LEFT JOIN pc_usuarios ON pc_usu_matricula = RIGHT(pc_anexo_login,8)
-			WHERE pc_anexo_avaliacaoPDF ='N'
+			WHERE pc_anexo_avaliacaoPDF ='N' and pc_anexo_enviado=1
 			<cfif #arguments.pc_orientacao_id# eq "">
 				AND pc_anexo_avaliacao_id = #arguments.pc_aval_id# 
 			<cfelse>
@@ -4066,7 +4066,7 @@
 			</cfif>
 
 			<cfif #arguments.passoapasso# eq "false">
-               and CONVERT(char, pc_anexo_datahora , 103) = CONVERT(char, GETDATE() , 103) and pc_anexo_mcu_orgao = #application.rsUsuarioParametros.pc_usu_lotacao#
+               and CONVERT(char, pc_anexo_datahora , 103) = CONVERT(char, GETDATE() , 103) and pc_anexo_mcu_orgao = #application.rsUsuarioParametros.pc_usu_lotacao# 
 			</cfif>
 			order By pc_anexo_id desc
 		</cfquery>
@@ -4159,18 +4159,18 @@
 					</cfif>
 				<cfelse>
 					<h5 style="color:red">Servidor de arquivos não localizado.</h5>
-						
 				</cfif>
 
 
 		<script >
 			$(function () {
 				$("#tabAnexos").DataTable({
-					"destroy": true,
-			    	"stateSave": false,
-					"responsive": true, 
-					"lengthChange": false, 
-					"autoWidth": false
+					destroy: true,
+			    	stateSave: false,
+					responsive: true, 
+					lengthChange: false, 
+					autoWidth: false,
+					searching: false
 				})
 					
 			});
@@ -4251,118 +4251,214 @@
 
 
 
-	<cffunction name="tabAnexosOrientacoes" returntype="any" access="remote" hint="Criar a tabela dos anexos e envia para a páginas pc_CadastroRelato">
+	<cffunction name="tabAnexosOrientacoes" returntype="any" access="remote" hint="Criar a tabela dos anexos e envia para a página Acompanhamento">
 
 	    
 		<cfargument name="pc_orientacao_id" type="string" required="false" default=null/>
 	
 
-        <cfquery datasource="#application.dsn_processos#" name="rsAnexos">
+        <cfquery datasource="#application.dsn_processos#" name="rsAnexosEnviados">
 			Select pc_anexos.*, pc_orgaos.*, pc_usu_nome FROM pc_anexos 
 			Left JOIN pc_orgaos on pc_org_mcu = pc_anexo_mcu_orgao
 			LEFT JOIN pc_usuarios ON pc_usu_matricula = RIGHT(pc_anexo_login,8)
-			WHERE pc_anexo_orientacao_id = #arguments.pc_orientacao_id# and pc_anexo_avaliacaoPDF ='N'
+			WHERE pc_anexo_orientacao_id = #arguments.pc_orientacao_id# and pc_anexo_avaliacaoPDF ='N' and pc_anexo_enviado=1
                    and CONVERT(char, pc_anexo_datahora , 103) = CONVERT(char, GETDATE() , 103) and pc_anexo_mcu_orgao = #application.rsUsuarioParametros.pc_usu_lotacao#
 			order By pc_anexo_id desc
 		</cfquery>
 
-            <cfif rsAnexos.recordcount neq 0>
-				<div class="row">
-					<div class="col-12">
-						<div class="card">
-						
-							<!-- /.card-header -->
-							<div class="card-body">
-							    
-								<h6>Arquivos anexados hoje por <cfoutput>#application.rsUsuarioParametros.pc_usu_nome#</cfoutput></h6>
-								
-								<table id="tabAnexos" class="table table-bordered table-striped table-hover text-nowrap">
-									<thead style="background: #0083ca;color:#fff">
-										<tr style="font-size:14px">
-											<th>Controles:</th>
-											<th>ID:</th>
-											<th style="width:25%">Arquivo: </th>
-											<th>Anexado por: </th>
-											<th style="width:10px">Data: </th>
-										</tr>
-									</thead>
-									
-									<tbody>
-										<cfloop query="rsAnexos" >
-											<cfif FileExists(pc_anexo_caminho)>
-												<cfoutput>					
-													<cfset arquivo = ListLast(pc_anexo_caminho,'\')>
-													<tr style="font-size:12px" >
-														<td style="width:10%">	
-															<div style="display:flex;justify-content:space-around;">
-																
-																<cfif datediff("n",  #pc_anexo_datahora#,now()) lt 5 and #application.rsUsuarioParametros.pc_usu_lotacao# eq #pc_org_mcu#>
-																	<i id="btExcluir" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:18px" onclick="javascript:excluirAnexo(#pc_anexo_id#);"   title="Excluir" ></i>
-																</cfif>
-															
-																<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
-																	<i id="btAbrirAnexo" class="fas fa-eye efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:10px" onClick="window.open('pc_Anexos.cfm?arquivo=#arquivo#&nome=#pc_anexo_nome#','_blank')"   title="Visualizar" ></i>
-																<cfelse>
-																	<i id="btAbrirAnexo" class="fas fa-download efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:10px" onClick="window.open('pc_Anexos.cfm?arquivo=#arquivo#&nome=#pc_anexo_nome#','_self')"   title="Baixar" ></i>
-																</cfif>
-															
-															</div>
-														</td>
-														<td class="idColumn">#pc_anexo_id#</td>
+		<cfquery datasource="#application.dsn_processos#" name="rsAnexosNaoEnviados">
+			Select pc_anexos.*, pc_orgaos.*, pc_usu_nome FROM pc_anexos 
+			Left JOIN pc_orgaos on pc_org_mcu = pc_anexo_mcu_orgao
+			LEFT JOIN pc_usuarios ON pc_usu_matricula = RIGHT(pc_anexo_login,8)
+			WHERE pc_anexo_orientacao_id = #arguments.pc_orientacao_id# and pc_anexo_avaliacaoPDF ='N' and pc_anexo_enviado=0
+			order By pc_anexo_id desc
+		</cfquery>
 
-														<cfset data = DateFormat(#pc_anexo_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_anexo_datahora#,'HH:mm:ss') & ')'>
-															<td >
-															<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
-																<i class="fas fa-file-pdf " style="margin-right:10px;color:red;font-size:20px"></i>
-															<cfelseif right(#pc_anexo_caminho#,3) eq 'zip'>
-																<i class="fas  fa-file-zipper" style="margin-right:10px;color:blue;font-size:20px"></i>
-															<cfelse>
-																<i class="fas fa-file-excel" style="margin-right:10px;color:green;font-size:20px"></i>
-															</cfif>												
-															#pc_anexo_nome#
-														</td>
-														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-															<td >#pc_org_sigla#</td>
-														<cfelse>
-														    <cfif #pc_org_controle_interno# eq 'S'>
-																<td >Controle Interno</td> 
-															<cfelse>
-																<td >#pc_org_sigla#/#pc_usu_nome#</td>
-															</cfif>
-														</cfif>
-														<td  style="width:100px">#data#</td>
-													</tr>
-												</cfoutput>
-											</cfif>
-											 
-										</cfloop>	
-									</tbody>
-										
-									
-								</table>
-							</div>
-
+		<cfif rsAnexosEnviados.recordcount neq 0>
+			<div class="row">
+				<div class="col-12">
+					<div class="card">
+					
+						<!-- /.card-header -->
+						<div class="card-body">
 							
-							<!-- /.card-body -->
+							<h6>Arquivos anexados hoje por <cfoutput>#application.rsUsuarioParametros.pc_usu_nome#</cfoutput></h6>
+							
+							<table id="tabAnexos" class="table table-bordered table-striped table-hover text-nowrap">
+								<thead style="background: #0083ca;color:#fff">
+									<tr style="font-size:14px">
+										<th>Controles:</th>
+										<th>ID:</th>
+										<th style="width:25%">Arquivo: </th>
+										<th>Anexado por: </th>
+										<th style="width:10px">Data: </th>
+									</tr>
+								</thead>
+								
+								<tbody>
+									<cfloop query="rsAnexosEnviados" >
+										<cfif FileExists(pc_anexo_caminho)>
+											<cfoutput>					
+												<cfset arquivo = ListLast(pc_anexo_caminho,'\')>
+												<tr style="font-size:12px" >
+													<td style="width:10%">	
+														<div style="display:flex;justify-content:space-around;">
+															
+															<cfif datediff("n",  #pc_anexo_datahora#,now()) lt 5 and #application.rsUsuarioParametros.pc_usu_lotacao# eq #pc_org_mcu#>
+																<i id="btExcluir" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:18px" onclick="javascript:excluirAnexo(#pc_anexo_id#);"   title="Excluir" ></i>
+															</cfif>
+														
+															<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
+																<i id="btAbrirAnexo" class="fas fa-eye efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:10px" onClick="window.open('pc_Anexos.cfm?arquivo=#arquivo#&nome=#pc_anexo_nome#','_blank')"   title="Visualizar" ></i>
+															<cfelse>
+																<i id="btAbrirAnexo" class="fas fa-download efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:10px" onClick="window.open('pc_Anexos.cfm?arquivo=#arquivo#&nome=#pc_anexo_nome#','_self')"   title="Baixar" ></i>
+															</cfif>
+														
+														</div>
+													</td>
+													<td class="idColumn">#pc_anexo_id#</td>
+
+													<cfset data = DateFormat(#pc_anexo_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_anexo_datahora#,'HH:mm:ss') & ')'>
+														<td >
+														<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
+															<i class="fas fa-file-pdf " style="margin-right:10px;color:red;font-size:20px"></i>
+														<cfelseif right(#pc_anexo_caminho#,3) eq 'zip'>
+															<i class="fas  fa-file-zipper" style="margin-right:10px;color:blue;font-size:20px"></i>
+														<cfelse>
+															<i class="fas fa-file-excel" style="margin-right:10px;color:green;font-size:20px"></i>
+														</cfif>												
+														#pc_anexo_nome#
+													</td>
+													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
+														<td >#pc_org_sigla#</td>
+													<cfelse>
+														<cfif #pc_org_controle_interno# eq 'S'>
+															<td >Controle Interno</td> 
+														<cfelse>
+															<td >#pc_org_sigla#/#pc_usu_nome#</td>
+														</cfif>
+													</cfif>
+													<td  style="width:100px">#data#</td>
+												</tr>
+											</cfoutput>
+										</cfif>
+											
+									</cfloop>	
+								</tbody>
+									
+								
+							</table>
 						</div>
-						<!-- /.card -->
+
+						
+						<!-- /.card-body -->
 					</div>
-				<!-- /.col -->
+					<!-- /.card -->
 				</div>
-				<!-- /.row -->
-			<cfelse>
-				<h5>Nenhum anexo foi adicionado.</h5>
-			</cfif>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+		</cfif>
+
+		<cfif rsAnexosNaoEnviados.recordcount neq 0>
+			<div class="row">
+				<div class="col-12">
+					<div class="card">
+					
+						<!-- /.card-header -->
+						<div class="card-body">
+							
+							<h6>Arquivo(s) anexado(s) e ainda não enviado(s):</h6>
+							
+							<table id="tabAnexosNaoEnviados" class="table table-bordered table-striped table-hover text-nowrap">
+								<thead style="background: #0083ca;color:#fff">
+									<tr style="font-size:14px">
+										<th>Controles:</th>
+										<th>ID:</th>
+										<th style="width:25%">Arquivo: </th>
+										<th>Anexado por: </th>
+										<th style="width:10px">Data: </th>
+									</tr>
+								</thead>
+								
+								<tbody>
+									<cfloop query="rsAnexosNaoEnviados" >
+										<cfif FileExists(pc_anexo_caminho)>
+											<cfoutput>					
+												<cfset arquivo = ListLast(pc_anexo_caminho,'\')>
+												<tr style="font-size:12px" >
+													<td style="width:10%">	
+														<div style="display:flex;justify-content:space-around;">
+
+															<i id="btExcluir" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:18px" onclick="javascript:excluirAnexo(#pc_anexo_id#);"   title="Excluir" ></i>
+
+															<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
+																<i id="btAbrirAnexo" class="fas fa-eye efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:10px" onClick="window.open('pc_Anexos.cfm?arquivo=#arquivo#&nome=#pc_anexo_nome#','_blank')"   title="Visualizar" ></i>
+															<cfelse>
+																<i id="btAbrirAnexo" class="fas fa-download efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:10px" onClick="window.open('pc_Anexos.cfm?arquivo=#arquivo#&nome=#pc_anexo_nome#','_self')"   title="Baixar" ></i>
+															</cfif>
+														
+														</div>
+													</td>
+													<td class="idColumn">#pc_anexo_id#</td>
+
+													<cfset data = DateFormat(#pc_anexo_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_anexo_datahora#,'HH:mm:ss') & ')'>
+														<td >
+														<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
+															<i class="fas fa-file-pdf " style="margin-right:10px;color:red;font-size:20px"></i>
+														<cfelseif right(#pc_anexo_caminho#,3) eq 'zip'>
+															<i class="fas  fa-file-zipper" style="margin-right:10px;color:blue;font-size:20px"></i>
+														<cfelse>
+															<i class="fas fa-file-excel" style="margin-right:10px;color:green;font-size:20px"></i>
+														</cfif>												
+														#pc_anexo_nome#
+													</td>
+													
+													<td >#pc_org_sigla# (#pc_usu_nome#)</td>
+														
+													
+													<td  style="width:100px">#data#</td>
+												</tr>
+											</cfoutput>
+										</cfif>
+											
+									</cfloop>	
+								</tbody>
+									
+								
+							</table>
+						</div>
+
+						
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+		
+		</cfif>
 
 
 		<script >
 			$(function () {
 				$("#tabAnexos").DataTable({
-					"destroy": true,
-			    	"stateSave": false,
-					"responsive": true, 
-					"lengthChange": false, 
-					"autoWidth": false
+					destroy: true,
+			    	stateSave: false,
+					responsive: true, 
+					lengthChange: false, 
+					autoWidth: false,
+					searching: false
+				})
+
+				$("#tabAnexosNaoEnviados").DataTable({
+					destroy: true,
+			    	stateSave: false,
+					responsive: true, 
+					lengthChange: false, 
+					autoWidth: false,
+					searching: false
 				})
 					
 			});
