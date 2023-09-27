@@ -46,8 +46,8 @@
 
 		    <cftry>
 				<cfquery datasource="#application.dsn_processos#" >
-						INSERT pc_anexos(pc_anexo_avaliacao_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF )
-						VALUES (#pc_aval_id#, '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDaImagem#','#mcuOrgao#', 'N')
+						INSERT pc_anexos(pc_anexo_avaliacao_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF, pc_anexo_enviado )
+						VALUES (#pc_aval_id#, '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDaImagem#','#mcuOrgao#', 'N', 1)
 				</cfquery>
 				<cfcatch type="any">
 					<cffile action="delete" file="#destino#" /> 

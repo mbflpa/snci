@@ -646,6 +646,7 @@
 					, pc_aval_posic_num_orgao
 					, pc_aval_posic_num_orgaoResp
 					, pc_aval_posic_status
+					, pc_aval_posic_enviado
 				)
 			
 				VALUES (
@@ -655,7 +656,8 @@
 					<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 					<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 					<cfqueryparam value="#orgaoRespOrientacao#" cfsqltype="cf_sql_varchar">,
-					<cfqueryparam value="13" cfsqltype="cf_sql_integer">
+					<cfqueryparam value="13" cfsqltype="cf_sql_integer">,
+					<cfqueryparam value="1" cfsqltype="cf_sql_integer">
 				)
 
 			</cfquery>
@@ -1310,7 +1312,11 @@
 																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
 																		</button></i>
 																		
-																			De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+																			<cfif orgaoResp eq ''>
+																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+																			<cfelse>
+																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
+																			</cfif>
 																			<span style="margin-left:20px;float:right">(id: #pc_aval_posic_id#)</span>
 																	</a>
 
@@ -1642,7 +1648,7 @@
 														<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
 															</button></i>
-															<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0'>
+															<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0' or orgaoResp eq ''>
 																De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
 															<cfelse>
 																De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 

@@ -1404,8 +1404,8 @@
 					<!--Insere a manifestação inicial do controle interno para a orientação com a mesma data prevista e status da orientação original do órgão avaliado -->
 					<cfset orgaoResp = '#i#'>
 					<cfquery datasource="#application.dsn_processos#">
-						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-						VALUES (<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#',#posic_status#)
+						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
+						VALUES (<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#',#posic_status#,1)
 					</cfquery>
 
 				
@@ -1421,14 +1421,14 @@
 					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
 					<cfset orgaoResp = '#i#'>
 					<cfquery datasource="#application.dsn_processos#">
-						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-						VALUES (#insertedIdOrientacao#, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#', #posic_status#)
+						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
+						VALUES (#insertedIdOrientacao#, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#', #posic_status#,1)
 					</cfquery>
 					<!-- Replica as manifestações da orientação original para as orientações distribuídas -->
 					<cfoutput query = "rsPosicionamentosParaReplicacao">
 						<cfquery datasource="#application.dsn_processos#">
-							INSERT pc_avaliacao_posicionamentos (pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status)
-							VALUES (#insertedIdOrientacao#, '#pc_aval_posic_texto#', <cfqueryparam value="#pc_aval_posic_datahora#" cfsqltype="cf_sql_timestamp">, '#pc_aval_posic_matricula#', '#pc_aval_posic_num_orgao#', '#pc_aval_posic_num_orgaoResp#', '#pc_aval_posic_dataPrevistaResp#', #pc_aval_posic_status#)
+							INSERT pc_avaliacao_posicionamentos (pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
+							VALUES (#insertedIdOrientacao#, '#pc_aval_posic_texto#', <cfqueryparam value="#pc_aval_posic_datahora#" cfsqltype="cf_sql_timestamp">, '#pc_aval_posic_matricula#', '#pc_aval_posic_num_orgao#', '#pc_aval_posic_num_orgaoResp#', '#pc_aval_posic_dataPrevistaResp#', #pc_aval_posic_status#, 1)
 						</cfquery>
 					</cfoutput>
 						
@@ -2587,8 +2587,11 @@
 																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;" data-card-widget="collapse">
 																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
 																		</button></i>
-																		
-																			De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+																		    <cfif orgaoResp eq ''>
+																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+																			<cfelse>
+																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
+																			</cfif>
 																		    <span style="margin-left:20px;float:right">(id: #pc_aval_posic_id#)</span>
 																	</a>
 
@@ -3535,7 +3538,7 @@
 														<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
 															</button></i>
-																<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0'>
+																<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0' or orgaoResp eq ''>
 															   		De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
 																<cfelse>
 																	De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
@@ -3665,6 +3668,8 @@
 
 	</cffunction>
 
+
+
 	<cffunction name="formPosicionamentoOrgaoAvaliado"   access="remote" hint="enviar o componente para a páginas pc_Acompanhamento chama pela função tabAvaliacoesAcompanhamento">
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 			
@@ -3681,10 +3686,21 @@
 								</h4>
 							</div>	
 					</cfif>	
+					    <cfquery datasource="#application.dsn_processos#" name="rsManifestacaoSalva">
+							Select pc_avaliacao_posicionamentos.*, pc_orgaos.pc_org_sigla, pc_usuarios.pc_usu_nome FROM pc_avaliacao_posicionamentos 
+							INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
+							INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
+							WHERE pc_aval_posic_num_orientacao = #rsProc.pc_aval_orientacao_id# and pc_aval_posic_enviado = 0
+						</cfquery>
 						<div class="row" style="margin-top:20px;margin:8px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
-									<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui sua manifestação..." ></textarea>
+								    <cfif rsManifestacaoSalva.recordcount neq 0>
+										<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
+										<cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
+										<span style = "font-size:11px; color:#e83e8c"><cfoutput>Texto da manifestação salvo em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_org_sigla# (#rsManifestacaoSalva.pc_usu_nome#)</strong></cfoutput></span>
+									</cfif>
+									<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui sua manifestação..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
 								</div>										
 							</div>
 						</div>
@@ -3745,9 +3761,11 @@
 						
 
 						<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px">
+							<div class="form-group" style="margin-right:150px;">
+								<button id="btSalvar" class="btn btn-block btn-primary " style="background-color: #28a745;"> <i class="fas fa-floppy-disk" style="margin-right:5px"></i>Salvar manifestação p/ envio posterior</button>
+							</div>
 							<div class="form-group">
-								<button id="btSalvar" class="btn btn-block btn-primary " >Salvar p/ envio posterior</button>
-								<button id="btEnviar" class="btn btn-block btn-primary " >Enviar</button>
+								<button id="btEnviar" class="btn btn-block btn-primary " > <i class="fas fa-share-from-square" style="margin-right:5px"></i>Enviar manifestação agora</button>
 							</div>
 						</div>
 					
@@ -3860,6 +3878,95 @@
 
 
 			})
+
+			$('#btSalvar').on('click', function (event)  {
+				//cancela e  não propaga o event click original no botão
+				event.preventDefault()
+				event.stopPropagation()
+
+				const idAnexos = []; // Array para armazenar os valores da coluna ID da tabela anexos
+				if ($(".idColumn").length > 0) {
+					// Iterar sobre cada elemento da coluna ID
+					$(".idColumn").each(function() {
+						var idValue = $(this).text();
+						idAnexos.push(idValue);
+					});
+				}
+				var idAnexosString = idAnexos.join(","); // Converta o array para uma string de IDs separados por vírgula
+				
+				//verifica se os campos necessários foram preenchidos
+				if (
+					!$('#pcPosicAcomp').val() 
+				)
+				{   
+					//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
+					toastr.error('Informe o texto da manifestação.');
+					return false;
+				}
+
+
+				var mensagem = "Deseja salvar esta manifestação?"
+				
+							
+				<cfoutput>
+					var pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
+				</cfoutput>
+
+				var statusOrientacao = 3; //staus RESPOSTA DO ÓRGÃO SUBORDINADOR
+				if($('#pcOrientacaoStatus').val()){
+					statusOrientacao = 	$('#pcOrientacaoStatus').val()
+				}
+
+				swalWithBootstrapButtons.fire({//sweetalert2
+					html: logoSNCIsweetalert2(mensagem), 
+
+
+					showCancelButton: true,
+					confirmButtonText: 'Sim!',
+					cancelButtonText: 'Cancelar!'
+					}).then((result) => {
+						if (result.isConfirmed) {	
+							setTimeout(function() {	
+								$('#modalOverlay').modal('show');
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									data:{
+										method:"salvarPosic",
+										pc_aval_orientacao_id: pc_aval_orientacao_id,
+										pc_aval_posic_texto: $('#pcPosicAcomp').val(),
+										pc_aval_orientacao_status:statusOrientacao,
+										idAnexos: idAnexosString
+									},
+						
+									async: false
+									
+								})//fim ajax
+								.done(function(result) {	
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+										toastr.success('Manifestação e anexo(s) salvos com sucesso!');
+									});			
+
+								})//fim done
+								.fail(function(xhr, ajaxOptions, thrownError) {
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});	
+									$('#modal-danger').modal('show')
+									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+									$('#modal-danger').find('.modal-body').text(thrownError)
+
+								});//fim fail
+							}, 500);
+						}else {
+							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+							$('#modalOverlay').modal('hide');
+							Swal.fire('Operação Cancelada', '', 'info');
+						}
+					})
+
+			});
 
 			$('#btEnviar').on('click', function (event)  {
 				
@@ -4009,16 +4116,15 @@
 			function mostraTabAnexosOrientacoes(){
 				////$('#modalOverlay').modal('show')
 				<cfoutput>
-					var  pc_aval_id = '#rsProc.pc_aval_id#';
+					var  pc_orientacao_id = '#rsProc.pc_aval_orientacao_id#';
 				</cfoutput>
 					setTimeout(function() {	
 						$.ajax({
 							type: "post",
 							url: "cfc/pc_cfcAvaliacoes.cfc",
 							data:{
-								method: "tabAnexos",
-								pc_aval_id: pc_aval_id,
-								passoapasso:"false"
+								method: "tabAnexosOrientacoes",
+								pc_orientacao_id: pc_orientacao_id
 							},
 							async: false
 						})//fim ajax
@@ -4222,7 +4328,7 @@
 						UPDATE 	pc_anexos set
 								pc_anexo_aval_posic = #idPosicCadastrado#,
 								pc_anexo_enviado = 1
-						where pc_anexo_id = #id# 
+						where pc_anexo_id = #id# and pc_anexo_aval_posic is null
 					</cfquery>
 				</cfloop>
 			</cfif>
@@ -4230,6 +4336,8 @@
 		
 
 	</cffunction>
+
+
 
 	<cffunction name="salvarPosic"   access="remote" hint="salva a manifestação de qualquer usuário">
 	   
@@ -4278,18 +4386,11 @@
 				
 
 			</cfif>
-
-
-			
-
-
 			
 		</cftransaction>			
 		
 
 	</cffunction>
-
-
 
 
 
@@ -4303,6 +4404,10 @@
 
 		<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 		<cftransaction>
+			<cfquery datasource = "#application.dsn_processos#" >
+				DELETE FROM pc_avaliacao_posicionamentos 
+				WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 0
+			</cfquery>
 			<cfif '#arguments.pc_aval_orientacao_dataPrevistaResp#' neq ''>
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
 					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
@@ -4354,7 +4459,7 @@
 						UPDATE 	pc_anexos set
 								pc_anexo_aval_posic = #idPosicCadastrado#,
 								pc_anexo_enviado = 1
-						where pc_anexo_id = #id# 
+						where pc_anexo_id = #id# and pc_anexo_aval_posic is null
 					</cfquery>
 				</cfloop>
 			</cfif>
