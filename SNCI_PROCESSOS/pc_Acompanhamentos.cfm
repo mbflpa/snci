@@ -68,10 +68,12 @@
 						<div class="tab-content" id="custom-tabs-one-tabContent" >
 							<div disable class="tab-pane fade  active show" id="custom-tabs-one-OrientacaoAcomp"  role="tabpanel" aria-labelledby="custom-tabs-one-OrientacaoAcomp-tab" >														
 								<div id="exibirTab"></div>
+								
 							</div>
 							<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
 								<div disable class="tab-pane fade " id="custom-tabs-one-MelhoriaAcomp"  role="tabpanel" aria-labelledby="custom-tabs-one-MelhoriaAcomp-tab" >								
 									<div id="exibirTabMelhoriasPendentes"></div>
+
 								</div>			
 							</cfif>
 						</div>
@@ -327,6 +329,7 @@
 			
 				$('#custom-tabs-one-MelhoriaAcomp-tab').text = "dhfjjdksfhjds";
 		});
+		
 
 
 		function exibirTabela(){

@@ -1218,6 +1218,23 @@
 				if(hopscotch.getState()==="orgaoAvaliado-acompanhamento-tour:7"){
 					$('#start-tour2').click();
 				}
+				// Monitora o evento de mudança de aba para exibir o botão de início do tour
+				$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+					var target = $(e.target).attr("href") // activated tab
+					if (target == '#content-manifestacao') {
+						$('html, body').animate({
+							scrollTop: $("#btSalvar").offset().top
+						}, 1000);
+					}
+				});
+				$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+					var target = $(e.target).attr("href") // activated tab
+					if (target == '#content-distribuicao') {
+						$('html, body').animate({
+							scrollTop: $("#btEnviarDistribuicao").offset().top
+						}, 1000);
+					}
+				});
 
 			})
 
@@ -1228,11 +1245,12 @@
 			
 
 
-
 			<cfoutput>
 				var pc_aval_id = '#rsProcAval.pc_aval_id#'
 				var pc_orientacao_id = '#rsProcAval.pc_aval_orientacao_id#'
 			</cfoutput>
+
+			
 
 			$('#btEnviarDistribuicao').on('click', function (event)  {
 				event.preventDefault()
@@ -1355,8 +1373,40 @@
 
     </cffunction>
 
+	<cffunction name="distribuirMelhoria" returntype="any" access="remote" hint="Distribui as Propostas de Melhoria para áreas selecionadas pelo órgão avaliado.">
+		<cfargument name="pc_aval_melhoria_id" type="string" required="true" />
+		<cfargument name="pcAreasDistribuir" type="any" required="true" />
 
+		<cfquery name="rsMelhoria" datasource="#application.dsn_processos#">
+			SELECT * FROM pc_avaliacao_melhorias
+			WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">
+		</cfquery>
 
+		<cftransaction>
+			<cfloop list="#arguments.pcAreasDistribuir#" index="i">
+				<cfquery  datasource="#application.dsn_processos#">
+					INSERT pc_avaliacao_melhorias(pc_aval_melhoria_num_aval, pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao,pc_aval_melhoria_datahora,pc_aval_melhoria_login, pc_aval_melhoria_status, pc_aval_melhoria_distribuido )
+                    VALUES (
+							<cfqueryparam value="#rsMelhoria.pc_aval_melhoria_num_aval#" cfsqltype="cf_sql_numeric">, 
+							<cfqueryparam value="#rsMelhoria.pc_aval_melhoria_descricao#" cfsqltype="cf_sql_varchar">, 
+							<cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">, 
+							<cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">, 
+							'#application.rsUsuarioParametros.pc_usu_login#', 
+							'P', 
+							1
+						)
+				</cfquery>
+
+			</cfloop>
+
+			<cfquery datasource="#application.dsn_processos#">
+				DELETE FROM pc_avaliacao_melhorias
+				WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">
+			</cfquery>
+
+		</cftransaction>
+
+	</cffunction>
 
 	<cffunction name="distribuirOrientacoes" returntype="any" access="remote" hint="Distribui as oreintações para áreas selecionadas pelo órgão avaliado.">
 		<cfargument name="pc_aval_orientacao_id" type="string" required="true" />
@@ -1604,7 +1654,7 @@
 						$('#informacoesItensAcompanhamentoDiv').html(result)
 						$(".content-wrapper").css("height","auto");//para o background cinza da div content-wrapper se estender até o final do timeline
 						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('html, body').animate({ scrollTop: ($('#formCadItem').offset().top-80)} , 500);
+							$('html, body').animate({ scrollTop: ($('#formCadItem').offset().top-80)} , 1000);
 							$('#modalOverlay').modal('hide');
 						});	
 					})//fim done
@@ -1660,11 +1710,7 @@
 		</cfquery>
 
 	
-		<div class="small-box" style="" >
-			<cfoutput>
-				<pre style="font-size: 1em;">#rsMelhoriaPosic.pc_aval_melhoria_descricao#</pre>
-			</cfoutput>
-		</div>
+		
 
 		<div class="card-header" style="background-color:#ececec;" >
 			<div class="row" style="font-size: 1em;">
@@ -1690,17 +1736,7 @@
 					</div>
 				</div>
 				<br>
-				<div id="pcOrgaoRespSugeridoMelhoriaDiv" class="col-sm-7" hidden>
-					<div class="form-group">
-						<label    for="pcOrgaoRespSugeridoMelhoria">Selecione, a seguir, as áreas para as quais pretende distribuir (04 no máximo):</label>
-						
-						<select id="pcOrgaoRespSugeridoMelhoria" required="" name="pcOrgaoRespSugeridoMelhoria" class="form-control" multiple="multiple"  >
-							<cfoutput query="rs_OrgAvaliado">
-								<option value="#pc_org_mcu#">#pc_org_sigla#</option>
-							</cfoutput>
-						</select>
-					</div>
-				</div>
+				
 
 				<div id="pcRecusaJustMelhoriaDiv" class="col-sm-12" hidden>
 					<div class="form-group">
@@ -1711,11 +1747,9 @@
 
 				<div id="pcNovaAcaoMelhoriaDiv" class="col-sm-12" hidden>
 					<div class="form-group">
-						<cfif rsMelhoriaPosic.pc_num_orgao_avaliado eq rsMelhoriaPosic.pc_aval_melhoria_num_orgao>
-							<label   id="labelPcRecusaJustMelhoria" for="pcNovaAcaoMelhoria">Informe as ações que o órgão julga necessárias (caso concorde com a proposta do controle interno, copie e cole aqui a proposta informada acima):</label>
-						<cfelse>
-							<label   id="labelPcRecusaJustMelhoria" for="pcNovaAcaoMelhoria">Informe as ações que o órgão julga necessárias:</label>
-						</cfif>
+					   
+						<label   id="labelPcRecusaJustMelhoria" for="pcNovaAcaoMelhoria">Informe as ações que o órgão julga necessárias:</label>
+						
 						<textarea class="form-control" id="pcNovaAcaoMelhoria" rows="4" required=""  name="pcNovaAcaoMelhoria" class="form-control"></textarea>
 					</div>										
 				</div>
@@ -1732,36 +1766,6 @@
 		<script language="JavaScript">
 
 
-			
-			
-
-			// Monitora o select de distribuição para permitir a seleção de até 4 órgãos
-			// Monitora o evento de mudança no elemento com id "pcOrgaoRespSugeridoMelhoria"
-			$('#pcOrgaoRespSugeridoMelhoria').on('change', function(e) {
-				var selectedOptions = $(this).val();
-				var maxAllowedOptions = 4;
-
-				if ((!e.ctrlKey && selectedOptions.length > maxAllowedOptions) || (e.ctrlKey && selectedOptions.length >= maxAllowedOptions)) {
-					// Desabilita as opções não selecionadas se exceder o limite
-					$(this).find('option:not(:selected)').prop('disabled', true);
-
-					// Verifica se excedeu o limite após o change
-					if (selectedOptions.length > maxAllowedOptions) {
-						// Remove a última opção selecionada
-						var lastSelectedOption = selectedOptions[selectedOptions.length - 1];
-						$(this).find('option[value="' + lastSelectedOption + '"]').prop('selected', false);
-
-						// Exibe um alerta
-						Swal.fire('Você não pode selecionar mais do que ' + maxAllowedOptions + ' áreas.', '', 'error');
-					}
-				} else {
-					// Ativa todas as opções
-					$(this).find('option').prop('disabled', false);
-				}
-
-				$(this).trigger('change.select2');
-			});
-
 			$('#pcStatusMelhoria').on('change', function (event)  {
 
 				<cfoutput>
@@ -1772,34 +1776,29 @@
 					$('#pcDataPrevDiv').attr('hidden', false)
 					$('#pcRecusaJustMelhoriaDiv').attr('hidden', true)
 					$('#pcNovaAcaoMelhoriaDiv').attr('hidden', true)			
-					$('#pcOrgaoRespSugeridoMelhoriaDiv').attr('hidden', true)	
+					
 
 					$('#pcRecusaJustMelhoria').val('')
 					$('#pcNovaAcaoMelhoria').val('')			
-					$('#pcOrgaoRespSugeridoMelhoria').val('')	
+				
 				}
 				if($('#pcStatusMelhoria').val()=='R'){
 					$('#pcDataPrevDiv').attr('hidden', true)
 					$('#pcRecusaJustMelhoriaDiv').attr('hidden', false)
 					$('#pcNovaAcaoMelhoriaDiv').attr('hidden', true)
-					$('#pcOrgaoRespSugeridoMelhoriaDiv').attr('hidden', true)		
+						
 
 					$('#pcDataPrev').val('')
 					$('#pcNovaAcaoMelhoria').val('')
-					$('#pcOrgaoRespSugeridoMelhoria').val('')
+				
 				}
 				if($('#pcStatusMelhoria').val()=='T'){
 					$('#pcDataPrevDiv').attr('hidden', false)
 					$('#pcRecusaJustMelhoriaDiv').attr('hidden', true)
 					$('#pcNovaAcaoMelhoriaDiv').attr('hidden', false)
-					if(orgAvaliado === orgResp){
-						$('#pcOrgaoRespSugeridoMelhoriaDiv').attr('hidden', false)	
-					}
+					
 					$('#pcRecusaJustMelhoria').val('')
-					$('#pcOrgaoRespSugeridoMelhoria').select2({
-						theme: 'bootstrap4',
-						placeholder: 'Selecione, no máximo, 04 áreas para distribuir esta Prop. de Melhoria...'
-					});
+					
 				}
 				
 
@@ -1808,12 +1807,12 @@
 					$('#pcDataPrevDiv').attr('hidden', true)
 					$('#pcRecusaJustMelhoriaDiv').attr('hidden', true)
 					$('#pcNovaAcaoMelhoriaDiv').attr('hidden', true)
-					$('#pcOrgaoRespSugeridoMelhoriaDiv').attr('hidden', true)	
+				
 
 					$('#pcDataPrev').val('')
 					$('#pcRecusaJustMelhoria').val('')
 					$('#pcNovaAcaoMelhoria').val('')
-					$('#pcOrgaoRespSugeridoMelhoria').val('')	
+						
 				}
 
 				$('html, body').animate({ scrollTop: ($('#pcStatusMelhoria').offset().top)} , 500);
@@ -1836,9 +1835,7 @@
 					$('#pcStatusMelhoria').val() == null ||
 					($('#pcStatusMelhoria').val()=='A' && !$('#pcDataPrev').val())||
 					($('#pcStatusMelhoria').val()=='R' && $('#pcRecusaJustMelhoria').val().length == 0 )||
-					($('#pcStatusMelhoria').val()=='T' && orgAvaliado==orgResp && (!$('#pcDataPrev').val()||$('#pcNovaAcaoMelhoria').val().length == 0 ||!$('#pcOrgaoRespSugeridoMelhoria').val()))||
-				    ($('#pcStatusMelhoria').val()=='T' && orgAvaliado!=orgResp && (!$('#pcDataPrev').val()||$('#pcNovaAcaoMelhoria').val().length == 0))
-				
+					($('#pcStatusMelhoria').val()=='T' && (!$('#pcDataPrev').val()||$('#pcNovaAcaoMelhoria').val().length == 0))
 				){   
 					//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
 					toastr.error('Todos os campos devem ser preenchidos!');
@@ -1858,7 +1855,6 @@
 							pc_aval_melhoria_status:$('#pcStatusMelhoria').val(),
 							pc_aval_melhoria_dataPrev: $('#pcDataPrev').val(),
 							pc_aval_melhoria_sugestao: $('#pcNovaAcaoMelhoria').val(),
-							pc_aval_melhoria_sug_orgao_mcu:$('#pcOrgaoRespSugeridoMelhoria').val().join(','),
 							pc_aval_melhoria_naoAceita_justif:$('#pcRecusaJustMelhoria').val()
 						},
 						async: false
@@ -1867,7 +1863,6 @@
 						$('#pcDataPrev').val('')
 						$('#pcRecusaJustMelhoria').val('')
 						$('#pcNovaAcaoMelhoria').val('')
-						$('#pcOrgaoRespSugeridoMelhoria').val('')		
 						$('#pcStatusMelhoria').val('').trigger('change')
 						$('#informacoesItensAcompanhamentoDiv').html('')
 						exibirTabelaMelhoriasPendentes()
@@ -1983,7 +1978,67 @@
 						<div class="card-body">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Melhoria"  role="tabpanel" aria-labelledby="custom-tabs-one-Melhoria-tab" >														
-									<div id="informacoesMelhoriasDiv"></div>
+									<div class="col-md-12">
+							            <div class="small-box" style="" >
+											<cfoutput>
+												<pre style="font-size: 1em;">#rsProcAval.pc_aval_melhoria_descricao#</pre>
+											</cfoutput>
+										</div>
+										<cfif application.rsOrgaoSubordinados.recordcount gt 0>
+											<div class="card card-primary card-tabs" style="widht:100%">
+												
+												<div class="card-header p-0 pt-1" style="">
+													
+													<ul class="nav nav-tabs">
+														<li class="nav-item">
+															<a class="nav-link" id="tab-responder" data-toggle="tab" href="#content-responder" style="font-size:20px;"><i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Responder</span></a>
+														</li>
+														
+														<li class="nav-item">
+															<a class="nav-link" id="tab-distribuicao" data-toggle="tab" href="#content-distribuicao" style="font-size:20px;"><i class="fas fa-sitemap" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Distribuir</span></a>
+														</li>
+
+													</ul>
+												</div>
+												<div class="card-body">
+													<div class="tab-content">
+														<div class="tab-pane fade " id="content-responder">
+															<div id="informacoesMelhoriasDiv"></div>
+														</div>
+
+														<div class="tab-pane fade" id="content-distribuicao">
+															<div id="pcOrgaoRespDistribuicaoDiv" class="col-sm-8" >
+																<div class="form-group">
+																	<label    for="pcOrgaoRespDistribuicao">
+																		<div class="alertaDivMagenta" >Senhor(a) gestor(a), <br>
+																			Selecione, a seguir, as áreas para as quais pretende distribuir essa Proposta de Melhoria. Antes da distribuição orientamos a ler atentamente a situação encontrada 
+																			de modo a melhor identificar a área para direcionamento. Se necessário, a mesma pode ser direcionada, simultaneamente, para até 04 áreas.
+																		</div>
+																			<i style="font-weight: normal;">Dica: Para selecionar mais de uma área, mantenha a tecla "Ctrl" pressionada enquanto seleciona.</i>
+																	</label>
+																	<select id="pcOrgaoRespDistribuicao" required="" name="pcOrgaoRespDistribuicao" class="form-control" multiple="multiple"  >
+																		<cfoutput query="application.rsOrgaoSubordinados">
+																			<option value="#pc_org_mcu#">#pc_org_sigla#</option>
+																		</cfoutput>
+																	</select>
+																</div>
+															</div>
+															
+															<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
+																<div >
+																	<button id="btEnviarDistribuicaoMelhoria"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Distribuir</button>
+																</div>
+															</div>	
+														</div>
+													</div>
+												</div>
+
+											</div>	
+										<cfelse>
+											<div id="informacoesMelhoriasDiv"></div>
+										</cfif>
+									</div>
+
 								</div>
 
 								<div disable class="tab-pane fade" id="custom-tabs-one-InfProcesso"  role="tabpanel" aria-labelledby="custom-tabs-one-InfProcesso-tab" >								
@@ -2242,7 +2297,7 @@
 						$('#informacoesMelhoriasDiv').html(result)
 						$(".content-wrapper").css("height","auto");//para o background cinza da div content-wrapper se estender até o final do timeline
 						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('html, body').animate({ scrollTop: ($('#informacoesMelhoriasDiv').offset().top-80)} , 1000);
+							//$('html, body').animate({ scrollTop: ($('#informacoesMelhoriasDiv').offset().top-80)} , 1000);
 							$('#modalOverlay').modal('hide');
 							
 						});	
@@ -2273,12 +2328,118 @@
 				mostraRelatoPDF();
 				mostraTabAnexos();
 				mostraInformacoesMelhoria(idMelhoria)
+
+				$('#pcOrgaoRespDistribuicao').select2({
+					theme: 'bootstrap4',
+					placeholder: 'Selecione as áreas para distribuição da orientação...',
+					allowClear: true // Opcional - permite desmarcar a seleção
+				});
+
+				// Monitora o select de distribuição para permitir a seleção de até 4 órgãos
+				// Monitora o evento de mudança no elemento com id "pcOrgaoRespDistribuicao"
+				$('#pcOrgaoRespDistribuicao').on('change', function(e) {
+					var selectedOptions = $(this).val();
+					var maxAllowedOptions = 4;
+
+					if ((!e.ctrlKey && selectedOptions.length > maxAllowedOptions) || (e.ctrlKey && selectedOptions.length >= maxAllowedOptions)) {
+						// Desabilita as opções não selecionadas se exceder o limite
+						$(this).find('option:not(:selected)').prop('disabled', true);
+
+						// Verifica se excedeu o limite após o change
+						if (selectedOptions.length > maxAllowedOptions) {
+							// Remove a última opção selecionada
+							var lastSelectedOption = selectedOptions[selectedOptions.length - 1];
+							$(this).find('option[value="' + lastSelectedOption + '"]').prop('selected', false);
+
+							// Exibe um alerta
+							Swal.fire('Você não pode selecionar mais do que ' + maxAllowedOptions + ' áreas.', '', 'error');
+						}
+					} else {
+						// Ativa todas as opções
+						$(this).find('option').prop('disabled', false);
+					}
+
+					$(this).trigger('change.select2');
+				});
+
+				//Monitora o evento de mudança de aba para exibir o botão de início do tour
+				$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+					var target = $(e.target).attr("href") // activated tab
+					if (target == '#content-responder') {
+						$('html, body').animate({
+							scrollTop: $("#btSalvarMelhoriaPosic").offset().top
+						}, 1000);
+					}
+				});
+
+				$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+					var target = $(e.target).attr("href") // activated tab
+					if (target == '#content-distribuicao') {
+						$('html, body').animate({
+							scrollTop: $("#btEnviarDistribuicaoMelhoria").offset().top
+						}, 1000);
+					}
+				});
 				
 			})
 
-			// $(function () {
-			// 	$('[data-mask]').inputmask()
-			// })
+			$('#btEnviarDistribuicaoMelhoria').on('click', function (event)  {
+				event.preventDefault()
+				event.stopPropagation()
+				<cfoutput>
+					var idMelhoria = #arguments.idMelhoria#;
+				</cfoutput>	
+                
+				if ($('#pcOrgaoRespDistribuicao').val().length == 0){
+					Swal.fire('Informe, pelo menos, uma área para distribuição.', '', 'error')
+					return false;
+				}
+
+				swalWithBootstrapButtons.fire({//sweetalert2
+					html: logoSNCIsweetalert2("Deseja distribuir a Proposta de Melhoria para as áreas selecionadas?"),
+					showCancelButton: true,
+					confirmButtonText: 'Sim!',
+					cancelButtonText: 'Cancelar!',
+					}).then((result) => {
+						if (result.isConfirmed) {
+							$('#modalOverlay').modal('show');
+							setTimeout(function() {
+								//inicio ajax
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									data:{
+										method: "distribuirMelhoria",
+										pc_aval_melhoria_id: idMelhoria,
+										pcAreasDistribuir: $('#pcOrgaoRespDistribuicao').val().join(',')
+									},
+									async: false
+								})//fim ajax
+								.done(function(result) {
+									
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										toastr.success('Distribuição realizada com sucesso!');
+										$('#modalOverlay').modal('hide');
+										location.reload();
+									});
+									
+								})//fim done
+								.fail(function(xhr, ajaxOptions, thrownError) {
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+									$('#modal-danger').modal('show')
+									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+									$('#modal-danger').find('.modal-body').text(thrownError)
+
+								})//fim fail
+							}, 1000);		
+						} else if (result.dismiss === Swal.DismissReason.cancel) {
+							Swal.fire('Operação cancelada!', '', 'error')
+						}
+					})//fim sweetalert2		
+
+			});
 
 
 		</script>
@@ -2297,61 +2458,27 @@
 		<cfargument name="pc_aval_melhoria_id" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_dataPrev" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_sugestao" type="string" required="false" default=""/>
-		<cfargument name="pc_aval_melhoria_sug_orgao_mcu" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_naoAceita_justif" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_status" type="string"  required="false"  default=""/>
 		
-	    <cfset firstItem = ListFirst(arguments.pc_aval_melhoria_sug_orgao_mcu)><!-- Primeiro elemento da lista -->
-		
-		<cfloop list="#arguments.pc_aval_melhoria_sug_orgao_mcu#" index="i">
-			<!-- Atualização para o primeiro elemento -->
-			<cfif i eq firstItem>
 
-				<cfquery datasource="#application.dsn_processos#" >
-					UPDATE pc_avaliacao_melhorias
-					SET 				
-						pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_orgao_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
-							pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
-						<cfelse>
-							pc_aval_melhoria_dataPrev = null
-						</cfif>
-					WHERE  pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">	
-				</cfquery>
+		<cfquery datasource="#application.dsn_processos#" >
+			UPDATE pc_avaliacao_melhorias
+			SET 				
+				pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
+				pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
+				pc_aval_melhoria_sug_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+				pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
+				pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+				<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
+					pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
+				<cfelse>
+					pc_aval_melhoria_dataPrev = null
+				</cfif>
+			WHERE  pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">	
+		</cfquery>
 
-			<cfelse>
-				<!-- Inserção para as outras áreas selecionadas -->
-				<cfquery datasource="#application.dsn_processos#" >
-					insert pc_avaliacao_melhorias (pc_aval_melhoria_num_aval, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif, pc_aval_melhoria_sug_matricula, pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora, pc_aval_melhoria_dataPrev)
-					value( 	
-						pc_aval_melhoria_num_aval = <cfqueryparam value="#arguments.pc_aval_id#" cfsqltype="cf_sql_numeric">,			
-						pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_orgao_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
-						pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
-							pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
-						<cfelse>
-							pc_aval_melhoria_dataPrev = null
-						</cfif>
-					)
-				</cfquery>
-
-
-			</cfif>
-
-		</cfloop>
-
-
-
-		
+					
   	</cffunction>
 
 
@@ -2825,7 +2952,7 @@
 							<!--FIM ANEXOS-->
 						
 						
-							<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px">
+							<div id = "divBtSalvarEnviar"style="justify-content:center; display: flex; width: 100%;margin-bottom:50px;border-top:1px solid #ced4da; padding:20px">
 								<div class="form-group" style="margin-right:150px;">
 									<button id="btSalvar" class="btn btn-block btn-primary " style="background-color: #28a745;"> <i class="fas fa-floppy-disk" style="margin-right:5px"></i>Salvar manifestação p/ envio posterior</button>
 								</div>
@@ -3760,7 +3887,7 @@
 						<!--FIM ANEXOS-->
 						
 
-						<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px">
+						<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px;border-top:1px solid #ced4da;padding:20px">
 							<div class="form-group" style="margin-right:150px;">
 								<button id="btSalvar" class="btn btn-block btn-primary " style="background-color: #28a745;"> <i class="fas fa-floppy-disk" style="margin-right:5px"></i>Salvar manifestação p/ envio posterior</button>
 							</div>

@@ -16,3 +16,9 @@
 	UPDATE pc_avaliacao_posicionamentos SET pc_aval_posic_enviado = 1
 </cfquery>
 
+<cfquery datasource="#application.dsn_processos#">
+	ALTER TABLE pc_avaliacao_melhorias ADD pc_aval_melhoria_distribuido bit NOT NULL DEFAULT 0
+</cfquery>
+
+
+

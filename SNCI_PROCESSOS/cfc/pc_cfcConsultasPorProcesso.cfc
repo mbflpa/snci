@@ -1953,7 +1953,7 @@
 						
 
 						pc_aval_melhoria_descricao = 'Órgão Responsável: ' +  $(linha).closest("tr").children("td:nth-child(3)").text() + '\n\n' + pc_aval_melhoria_descricao;
-						pc_aval_melhoria_sugestao = 'Órgão Responsável: ' +  $(linha).closest("tr").children("td:nth-child(4)").text() + '\n\n' + pc_aval_melhoria_sugestao;
+						pc_aval_melhoria_sugestao = 'Órgão Responsável: ' +  $(linha).closest("tr").children("td:nth-child(3)").text() + '\n\n' + pc_aval_melhoria_sugestao;
 						$('#pcMelhoria').val(pc_aval_melhoria_descricao);
 						$('#pcDataPrev').html(pc_aval_melhoria_dataPrev);
 						$('#pcRecusaJustMelhoria').val(pc_aval_melhoria_naoAceita_justif);
