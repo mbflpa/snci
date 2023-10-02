@@ -1599,10 +1599,17 @@
 														</cfif>
 
 														<cfif #pc_orgHerancaMcuPara# neq '' and (#pc_orientacao_status_finalizador# neq 'S' or DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
-															<td style="vertical-align:middle !important;white-space: pre-wrap;">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla#</span></td>
+															<cfif pc_aval_orientacao_distribuido eq 1>
+																<td style="vertical-align:middle !important;white-space: pre-wrap;">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (Distribuído)</span></td>
+															<cfelse>
+																<td style="vertical-align:middle !important;white-space: pre-wrap;">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla#</span></td>
+															</cfif>
 														<cfelse>
-															<td style="vertical-align:middle !important;white-space: pre-wrap;">#pc_org_sigla#</td>
-
+															<cfif pc_aval_orientacao_distribuido eq 1>
+																<td style="vertical-align:middle !important;white-space: pre-wrap;">#pc_org_sigla# (Distribuído)</td>
+															<cfelse>
+																<td style="vertical-align:middle !important;white-space: pre-wrap;">#pc_org_sigla#</td>
+															</cfif>
 														</cfif>
 
 														<cfif #pc_aval_orientacao_status# eq 4 || #pc_aval_orientacao_status# eq 5>
@@ -1752,7 +1759,8 @@
 			WHERE pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S'and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
 				and ((pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
-					and ((pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))	
+					and ((pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))))	
 					or (pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''> or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>)
 					
@@ -1786,6 +1794,7 @@
 				</style>
             </head>
 			<body>
+
 				<div class="row">
 					<div class="col-5">
 						<div class="card">
@@ -1843,7 +1852,7 @@
 													<td align="center" style="vertical-align:middle !important;white-space: pre-wrap;">#pc_aval_melhoria_id#</td>
 													<td style="vertical-align:middle !important;white-space: pre-wrap;">#siglaOrgaoResp# (#mcuOrgaoResp#)</td>
 													<td align="center" style="vertical-align:middle !important;white-space: pre-wrap;">#statusMelhoria#</td>
-													
+													<td hidden >#pc_aval_melhoria_distribuido#</td>
 												
 												</tr>
 											</cfoutput>
@@ -1860,20 +1869,18 @@
 								Caso o status seja 'PENDENTE', o órgão responsável necessita selecionar um status (Aceita / Troca / Recusa), em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".</h6>
 							<cfelse>
 								<h6 style="color:#ff0080;padding:10px;line-height:1.7;">Obs.: A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
-								Caso o status seja 'PENDENTE', o órgão responsável necessita selecionar a aba "Propostas de Melhoria" em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span> e
-								selecionar umas das abas: "Responder" (e selecionar um status: Aceita / Troca / Recusa) ou "Distribuir".</h6>
+								Caso o status seja 'PENDENTE', o órgão responsável, se for um órgão subordinador, necessita selecionar a aba "Propostas de Melhoria" em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span> e
+								selecionar umas das abas: "Responder" (e selecionar um status: Aceita / Troca / Recusa) ou "Distribuir". Caso o órgão responsável não seja um órgão subordinador, o mesmo necessita selecionar um status (Aceita / Troca / Recusa), em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".</h6>
+								
+								</h6>
 							</cfif>
 						</div>
 						<!-- /.card -->
 					</div>
 					<div id = "detalhesDiv" class="col-7" hidden>
 						<div class="col-sm-12">
-							<div class="form-group">
-								<cfif rsMelhorias.pc_aval_melhoria_distribuido eq 1>
-									<label id="labelMelhoria" for="pcMelhoria">Proposta de Melhoria Sugerida pelo Controle Interno e distribuída pelo Órgão Subordinador:</label>
-								<cfelse>
-									<label id="labelMelhoria" for="pcMelhoria">Proposta de Melhoria Sugerida pelo Controle Interno:</label>
-								</cfif>
+							<div class="form-group">	
+								<label id="labelMelhoria" for="pcMelhoria"></label>
 								<textarea class="form-control" id="pcMelhoria" rows="6" required=""  name="pcMelhoria" class="form-control"></textarea>
 							</div>										
 						</div>
@@ -1949,6 +1956,7 @@
 						
 						var pc_aval_melhoria_naoAceita_justif = $(linha).closest("tr").children("td:nth-child(6)").text();
 						var pc_aval_melhoria_status = $(linha).closest("tr").children("td:nth-child(8)").text();
+						var pc_aval_melhoria_distribuido = $(linha).closest("tr").children("td:nth-child(10)").text();
 
 						
 						if(!pc_aval_melhoria_sugestao == '' ){
@@ -1968,6 +1976,15 @@
 						$('#pcDataPrev').html(pc_aval_melhoria_dataPrev);
 						$('#pcRecusaJustMelhoria').val(pc_aval_melhoria_naoAceita_justif);
 						$('#pcNovaAcaoMelhoria').val(pc_aval_melhoria_sugestao);
+
+						//colocar um texto no label labelMelhoria conforme valor da coluna pc_aval_melhoria_distribuido
+						if(pc_aval_melhoria_distribuido == 1){
+							$('#labelMelhoria').html('Proposta de Melhoria Sugerida pelo Controle Interno <span style="color:#e83e8c">(distribuída pelo Órgão Subordinador)</span>:');
+						}else{	
+							$('#labelMelhoria').html('Proposta de Melhoria Sugerida pelo Controle Interno:');
+						}
+							
+
 
 					};	
 
