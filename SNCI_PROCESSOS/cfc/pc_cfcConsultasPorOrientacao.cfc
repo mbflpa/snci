@@ -1162,7 +1162,7 @@
             <!--timeline -->
             <div id="accordionCadItemPainel" >
 								
-					<div class="card card-success" >
+					<div class="card card-success"  style="padding-bottom: 20px;">
 					    
 						<div class="card-header" style="background-color: #ececec;" >
 						     
@@ -1521,7 +1521,7 @@
             <!--timeline -->
             <div id="accordionCadItemPainel" >
 								
-					<div class="card card-success" >
+					<div class="card card-success"  style="padding-bottom: 20px;">
 					
 					<div class="card-header" style="background-color: #ececec;" >
 						<h4 class="card-title ">	

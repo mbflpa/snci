@@ -1266,7 +1266,7 @@
 					return false;
 				}
 				swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2("Deseja distribuir a orientação para as áreas selecionadas?"),
+					html: logoSNCIsweetalert2("Deseja distribuir essa Medida/Orientação para Regularização às áreas selecionadas?"),
 					showCancelButton: true,
 					confirmButtonText: 'Sim!',
 					cancelButtonText: 'Cancelar!',
@@ -1290,8 +1290,12 @@
 									
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										toastr.success('Distribuição realizada com sucesso!');
+										ocultaInformacoes()
+										exibirTabela();
 										$('#modalOverlay').modal('hide');
-										location.reload();
+										//location.reload();
+										
+
 									});
 									
 								})//fim done
@@ -1979,6 +1983,11 @@
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Melhoria"  role="tabpanel" aria-labelledby="custom-tabs-one-Melhoria-tab" >														
 									<div class="col-md-12">
+										<cfoutput>
+											<cfif rsProcAval.pc_aval_melhoria_distribuido eq 1>
+												<div style=" display: inline;background-color: ##e83e8c;color:##fff;padding: 3px;">Proposta de melhoria distribuída pelo seu órgão subordinador:</div>
+											</cfif>
+										</cfoutput>
 							            <div class="small-box" style="" >
 											<cfoutput>
 												<pre style="font-size: 1em;">#rsProcAval.pc_aval_melhoria_descricao#</pre>
@@ -2418,9 +2427,11 @@
 								.done(function(result) {
 									
 									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#informacoesItensAcompanhamentoDiv').html('')
+										exibirTabelaMelhoriasPendentes()
+										$('#custom-tabs-one-MelhoriaAcomp-tab').html("PROPOSTAS DE MELHORIA");
+										$('html, body').animate({ scrollTop: ($('#custom-tabs-one-tabAcomp').offset().top)} , 500);	
 										toastr.success('Distribuição realizada com sucesso!');
-										$('#modalOverlay').modal('hide');
-										location.reload();
 									});
 									
 								})//fim done
@@ -2565,7 +2576,7 @@
             <!--timeline -->
             <div id="accordionCadItemPainel" >
 								
-					<div class="card card-success" >
+					<div class="card card-success" style="padding-bottom: 20px;">
 					
 						<div class="card-header" style="background-color: #ececec;" >
 							<h4 class="card-title ">	
@@ -2833,7 +2844,7 @@
 										<cfif rsManifestacaoSalva.recordcount neq 0>
 											<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
 										    <cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
-											<span style = "font-size:11px; color:#e83e8c"><cfoutput>Texto da manifestação salvo em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_org_sigla# (#rsManifestacaoSalva.pc_usu_nome#)</strong></cfoutput></span>
+											<span style = "font-size:11px; color:#e83e8c"><cfoutput>Texto da manifestação salvo em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
 										</cfif>
 										<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui a manifestação do Controle Interno..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
 									<cfelse>
@@ -3541,7 +3552,7 @@
             <!--timeline -->
             <div id="accordionCadItemPainel" >
 								
-					<div class="card card-success" >
+					<div class="card card-success"  style="padding-bottom: 20px;">
 					
 					<div class="card-header" style="background-color: #0083ca;" >
 						<h4 class="card-title ">	
@@ -3825,7 +3836,7 @@
 								    <cfif rsManifestacaoSalva.recordcount neq 0>
 										<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
 										<cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
-										<span style = "font-size:11px; color:#e83e8c"><cfoutput>Texto da manifestação salvo em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_org_sigla# (#rsManifestacaoSalva.pc_usu_nome#)</strong></cfoutput></span>
+										<span style = "font-size:11px; color:#e83e8c"><cfoutput>Texto da manifestação salvo em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
 									</cfif>
 									<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui sua manifestação..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
 								</div>										

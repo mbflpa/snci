@@ -1855,15 +1855,25 @@
 							</div>
 
 							<!-- /.card-body -->
-							<h6 style="color:#ff0080;padding:10px;line-height:1.7;">Obs.: A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
-							Caso o status seja 'PENDENTE', o órgão responsável necessita selecionar um status (Aceita / Troca / Recusa), em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".</h6>
+							<cfif application.rsOrgaoSubordinados.recordcount eq 0>	
+								<h6 style="color:#ff0080;padding:10px;line-height:1.7;">Obs.: A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
+								Caso o status seja 'PENDENTE', o órgão responsável necessita selecionar um status (Aceita / Troca / Recusa), em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".</h6>
+							<cfelse>
+								<h6 style="color:#ff0080;padding:10px;line-height:1.7;">Obs.: A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
+								Caso o status seja 'PENDENTE', o órgão responsável necessita selecionar a aba "Propostas de Melhoria" em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span> e
+								selecionar umas das abas: "Responder" (e selecionar um status: Aceita / Troca / Recusa) ou "Distribuir".</h6>
+							</cfif>
 						</div>
 						<!-- /.card -->
 					</div>
 					<div id = "detalhesDiv" class="col-7" hidden>
 						<div class="col-sm-12">
 							<div class="form-group">
-								<label id="labelMelhoria" for="pcMelhoria">Proposta de Melhoria Sugerida pelo Controle Interno:</label>
+								<cfif rsMelhorias.pc_aval_melhoria_distribuido eq 1>
+									<label id="labelMelhoria" for="pcMelhoria">Proposta de Melhoria Sugerida pelo Controle Interno e distribuída pelo Órgão Subordinador:</label>
+								<cfelse>
+									<label id="labelMelhoria" for="pcMelhoria">Proposta de Melhoria Sugerida pelo Controle Interno:</label>
+								</cfif>
 								<textarea class="form-control" id="pcMelhoria" rows="6" required=""  name="pcMelhoria" class="form-control"></textarea>
 							</div>										
 						</div>
@@ -2433,7 +2443,7 @@
             <!--timeline -->
             <div id="accordionCadItemPainel" >
 					
-					<div class="card card-success" >
+					<div class="card card-success"  style="padding-bottom: 20px;">
 					
 						<div class="card-header" style="background-color: #ececec;" >
 							<h4 class="card-title ">	
@@ -2817,7 +2827,7 @@
 				
 				
 									
-					<div class="card card-success" >
+					<div class="card card-success"  style="padding-bottom: 20px;">
 					
 					<div class="card-header" style="background-color: #ececec;" >
 						<h4 class="card-title ">	
