@@ -464,6 +464,27 @@
       window.location.href = "navegadorNaoSuportado.html";
     }
 
+    $(document).ready(function() {	//executa quando a página terminar de carregar
+      //verifica se o órgão é subordinador
+      <cfoutput>
+        var subordinador = '#application.rsOrgaoSubordinados.recordcount#';
+      </cfoutput>
+
+      if (subordinador === '0') {//se não for subordinador, remove o menu de controle das distribuições
+        console.log(subordinador);
+        // Encontre o elemento com id "ControledasDistribuicoes"
+        var controledasDistribuicoesElement = document.getElementById("ControledasDistribuicoes");
+        
+        // Verifique se o elemento existe antes de tentar removê-lo
+        if (controledasDistribuicoesElement) {
+          // Remova o elemento
+          controledasDistribuicoesElement.parentNode.removeChild(controledasDistribuicoesElement);
+        }
+      }
+
+    });
+
+
 		
   </script>
 

@@ -804,7 +804,10 @@
 						</div>
 						<div class="card-body">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
-								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >								
+								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >		
+										<cfif rsProcAval.pc_aval_orientacao_distribuido eq 1>
+											<div style=" display: inline;background-color: #e83e8c;color:#fff;padding: 3px;margin-left: 10px;">Orientação distribuída pelo seu órgão subordinador:</div>
+										</cfif>						
 										<pre style="color:#0083ca!important"><cfoutput><strong>#rsProcAval.pc_aval_orientacao_descricao#</strong></cfoutput></pre>
 								</div>
 

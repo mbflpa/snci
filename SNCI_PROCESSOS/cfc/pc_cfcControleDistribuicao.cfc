@@ -1,7 +1,7 @@
 <cfcomponent >
 <cfprocessingdirective pageencoding = "utf-8">	
 	
-   	<cffunction name="tabAcompanhamento" returntype="any" access="remote" hint="Criar a tabela das orientacoes pendentes e envia para a página pcAcompanhamento.cfm">
+   	<cffunction name="tabOrientacoesDistribuidas" returntype="any" access="remote" hint="Criar a tabela das orientacoes pendentes e envia para a página pcAcompanhamento.cfm">
 		
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#">
 			SELECT      pc_processos.*, pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_descricao as descOrgAvaliado
@@ -30,55 +30,12 @@
 						LEFT JOIN pc_orgaos AS pc_orgaos_5 ON pc_orgaos_5.pc_org_mcu = pc_num_orgao_origem
 						LEFT JOIN pc_avaliacao_tipos on pc_num_avaliacao_tipo = pc_aval_tipo_id
 
-			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-			        <!---Processos em acompanhamento ou bloqueados--->
-					WHERE pc_num_status in(4,6)
-
-					<!---Se o perfil do usuário não for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4) ou 3 -DESENVOLVEDOR--->
-					<cfif application.rsUsuarioParametros.pc_usu_perfil neq 11 and application.rsUsuarioParametros.pc_usu_perfil neq 3>
-						and (pc_aval_orientacao_status in (1,14) or (pc_aval_orientacao_status = 3 and pc_aval_orientacao_id in (
-							SELECT 	pc_aval_posic_num_orientacao FROM pc_avaliacao_posicionamentos
-							INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_id = pc_aval_posic_num_orientacao
-							WHERE pc_aval_posic_status=3 and pc_aval_orientacao_status = 3
-							GROUP BY pc_aval_posic_num_orientacao
-							HAVING Count(pc_aval_posic_status)<2)) and pc_modalidade <> 'A')  
-					<cfelse>
-						and (pc_aval_orientacao_status = 3 and (pc_aval_orientacao_id in (
-							SELECT 	pc_aval_posic_num_orientacao FROM pc_avaliacao_posicionamentos
-							INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_id = pc_aval_posic_num_orientacao
-							WHERE pc_aval_posic_status=3 and pc_aval_orientacao_status = 3
-							GROUP BY pc_aval_posic_num_orientacao
-							HAVING Count(pc_aval_posic_status)>=2) OR pc_modalidade = 'A'))  
-					</cfif>
-					<!---Se o perfil do usuário  for 8 - CI - GESTOR MASTER (EXECUÇÃO) e o órgão de lotação não for origem do processo, não aparecerá nenhum processo para acompanhamento--->
-					<cfif application.rsUsuarioParametros.pc_usu_perfil eq 8  and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'>
-						and pc_num_status = 0	
-					</cfif>
-
-					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4) --->
-					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-						and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_aval_orientacao_status in (13) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
-					</cfif>
-					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4)--->
-					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
-							OR (pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_aval_orientacao_status in (1,3,14)) OR (pc_aval_orientacao_status in (13) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
-					</cfif>
-					<!---Se a lotação do usuario não for um orgao origem de processos e não estiver desativado(status 'AD) e o perfil for 4 - 'AVALIADOR') --->
-					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' neq 'D'>
-						and pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-					</cfif>
-					<!---Se o perfil for 7 - 'GESTOR' --->
-					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'D'>
-							and (pc_orgaos.pc_org_se = 	'#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se_abrangencia#') and pc_processos.pc_num_orgao_origem IN('00436698')
-					</cfif>
-					
-
-
-				
-			<cfelse>
-				WHERE pc_aval_orientacao_status in (2,4,5) and (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_orgHerancaMcuPara = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_orgHerancaDataInicio <= CONVERT (date, GETDATE())))
-			</cfif>
-				
+			<!---Só mostra orientações distribuídas --->
+			WHERE pc_aval_orientacao_status in (2,4,5) AND pc_aval_orientacao_distribuido = 1
+			<!---Não exibe processos bloqueados--->
+			AND not pc_processos.pc_num_status in(6) and (pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+			or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))))
+	
 			ORDER BY 	pc_processo_id, pc_aval_numeracao
 		</cfquery>	
 
@@ -90,7 +47,7 @@
 					<!-- /.card-header -->
 					<div class="card-body" >
 						<cfif #rsProcTab.recordcount# eq 0 >
-							<h5 align="center">Nenhuma Orientação para acompanhamento foi localizada para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
+							<h5 align="center">Nenhuma Orientação Distribuída pelo órgão <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput> foi localizada.</h5>
 						<cfelse>
 						
 							<div id="filtroSpan" style="display: none;text-align:right;font-size:18px;position:absolute;top:-54px;right:24px;"><span class="statusOrientacoes" style="background:#008000;color:#fff;">Atenção! Um filtro foi aplicado.</span><br><i class="fa fa-2x fa-hand-point-down" style="color:#008000;position:relative;top:8px;right:117px"></i></div>
@@ -134,28 +91,28 @@
 													</cfif>
 													<cfif #pc_aval_orientacao_dataPrevistaResp# neq '' and DATEFORMAT(#pc_aval_orientacao_dataPrevistaResp#,"yyyy-mm-dd")  lt DATEFORMAT(Now(),"yyyy-mm-dd") and (#pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5)>
 														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;" >PENDENTE</span></td>
+															<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;" >PENDENTE</span></td>
 														<cfelse>
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >PENDENTE</span></td>
+															<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >PENDENTE</span></td>
 														</cfif>
 													<cfelseif #pc_aval_orientacao_status# eq 3>
 														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##FFA500;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
+															<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##FFA500;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
 														<cfelse>
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
+															<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
 														</cfif>
 											
 													<cfelse>
-														<td  align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;"  >#pc_orientacao_status_descricao#</span></td>
+														<td  align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)"><span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;"  >#pc_orientacao_status_descricao#</span></td>
 													</cfif>
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_processo_id#</td>
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_numeracao#</td>	
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_orientacao_id#</td>	
+													<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_processo_id#</td>
+													<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_numeracao#</td>	
+													<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_orientacao_id#</td>	
 													
 													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N' >
 														<cfif #pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5>
 															<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#dataPrev#</td>
+															<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#dataPrev#</td>
 														<cfelse>
 															<td></td>
 														</cfif>
@@ -163,30 +120,30 @@
 													
 													<cfif #pc_orgHerancaMcuPara# neq '' and (#pc_orientacao_status_finalizador# neq 'S' or DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
 														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#) (Distribuído)</span></td>
+															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#) (Distribuído)</span></td>
 														<cfelse>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
+															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
 														</cfif>
-														<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgRespHerdeiro#</td>
+														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgRespHerdeiro#</td>
 													<cfelse>
 														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#) (Distribuído)</td>
+															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#) (Distribuído)</td>
 														<cfelse>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
+															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
 														</cfif>
-														<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgResp#</td>
+														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgResp#</td>
 													</cfif>
 
 													<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#sei#</td>
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_num_rel_sei#</td>
+													<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#sei#</td>
+													<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_num_rel_sei#</td>
 													
 													<cfif pc_num_avaliacao_tipo neq 2>
-														<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_tipo_descricao#</td>
+														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_tipo_descricao#</td>
 													<cfelse>
-														<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_tipo_nao_aplica_descricao#</td>
+														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_tipo_nao_aplica_descricao#</td>
 													</cfif>
-													<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy")# - #TimeFormat(pc_aval_orientacao_status_datahora,"HH:mm")#</td>	
+													<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy")# - #TimeFormat(pc_aval_orientacao_status_datahora,"HH:mm")#</td>	
 													
 													<td>#orgaoOrigemSigla#</td>	
 													<td>#orgaoAvaliado#</td>	
@@ -312,7 +269,7 @@
 			});
 
 			
-			function mostraInformacoesItensAcompanhamento(idAvaliacao, idOrientacao){
+			function mostrainfItensOrientacoesDistribuidas(idAvaliacao, idOrientacao){
 				$('#tabProcessos tr').each(function () {
 					$(this).removeClass('selected');
 				}); 
@@ -321,23 +278,23 @@
 				});
 				$('#modalOverlay').modal('show')
 				
-				$('#informacoesItensAcompanhamentoDiv').html('');
+				$('#infItensOrientacoesDistribuidasDiv').html('');
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcAcompanhamentos.cfc",
+						url: "cfc/pc_cfcControleDistribuicao.cfc",
 						data:{
-							method: "informacoesItensAcompanhamento",
+							method: "infItensOrientacoesDistribuidas",
 							idAvaliacao: idAvaliacao,
 							idOrientacao: idOrientacao
 						},
 						async: false
 					})//fim ajax
 					.done(function(result) {
-						$('#informacoesItensAcompanhamentoDiv').html(result)
+						$('#infItensOrientacoesDistribuidasDiv').html(result)
 						$(".content-wrapper").css("height","auto");//para o background cinza da div content-wrapper se estender até o final do timeline
 						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('html, body').animate({ scrollTop: ($('#informacoesItensAcompanhamentoDiv').offset().top-80)} , 1000);
+							$('html, body').animate({ scrollTop: ($('#infItensOrientacoesDistribuidasDiv').offset().top-80)} , 1000);
 							$('#modalOverlay').modal('hide');
 							
 						});	
@@ -409,7 +366,7 @@
 								.done(function(result) {
 									
 									exibirTabela();
-									$('#informacoesItensAcompanhamentoDiv').html('')	
+									$('#infItensOrientacoesDistribuidasDiv').html('')	
 									var mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">'+idOrientacao+'</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla+'</span> com sucesso!<br><br><span style="color:#00416B;font-size:0.8em;"><strong>Atenção:</strong> Como a gerência que analisará esta orientação não é a sua gerência de lotação, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										toastr.success('Operação realizada com sucesso!');
@@ -468,7 +425,7 @@
 								.done(function(result) {
 									
 									exibirTabela();
-									$('#informacoesItensAcompanhamentoDiv').html('')	
+									$('#infItensOrientacoesDistribuidasDiv').html('')	
 									var mensagemSucessos ='';
 									if(!enviaOrgaoOrigem){
 										mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">' + idOrientacao + '</span> foi enviada para análise da <span style="color:#00416B">'+lotacaoUsuarioSigla+'</span> com sucesso!</p>';
@@ -524,7 +481,7 @@
 
 
 
-	<cffunction name="informacoesItensAcompanhamento"   access="remote" hint="envia para a página acomanhamento.cfm tabs com informações do item.">
+	<cffunction name="infItensOrientacoesDistribuidas"   access="remote" hint="envia para a página acomanhamento.cfm tabs com informações do item.">
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="idOrientacao" type="numeric" required="true" />
 
@@ -629,12 +586,7 @@
 						</div>
 						<div class="card-body">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
-								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >	
-									
-									<cfif rsProcAval.pc_aval_orientacao_distribuido eq 1>
-										<div style=" display: inline;background-color: #e83e8c;color:#fff;padding: 3px;margin-left: 10px;">Orientação distribuída pelo seu órgão subordinador:</div>
-									</cfif>
-																						
+								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >														
 									<pre style="color:#0083ca!important"><cfoutput><strong>#rsProcAval.pc_aval_orientacao_descricao#</strong></cfoutput></pre>
 								</div>
 
@@ -809,87 +761,13 @@
 					</div>
 				
 				</form><!-- fim formCadAvaliacao -->
+				<cfset timelineViewAcompOrgaoAvaliado(arguments.idOrientacao)>
+				<cfset formPosicionamentoOrgaoAvaliado(arguments.idOrientacao)>
 					
-				<!--Inseri as tab de acompanhamento e distribuição se o a lotação do usuário for um órgão-->	
-				<cfif application.rsUsuarioParametros.pc_org_controle_interno eq 'S'>
-					<cfset timelineViewAcomp(arguments.idOrientacao)>
-				<cfelse>
-					<cfif application.rsOrgaoSubordinados.recordcount neq 0>
-						<cfset timelineViewAcompOrgaoAvaliado(arguments.idOrientacao)>
-						<div class="row" style="margin-bottom:50px">
-							<div class="col-md-12">
-							    
-								<div class="card card-primary card-tabs" style="widht:100%">
-									
-									<div class="card-header p-0 pt-1" style="">
-									    <div class="col-md-12"  style="border-bottom: 1px solid; padding: 10px;">
-											<p>Senhor(a) gestor(a),</p>
-											<li>Escolha a seguir entre as opções: <strong><i class="fas fa-user-pen"></i> Manifestação</strong> ou <strong><i class="fas fa-sitemap"></i> Distribuição</strong>;</li>
-											<li>A opção "MANIFESTAÇÃO" possibilita o registro da resposta diretamente por esse gestor para envio ao Controle Interno;</li>
-											<li>A opção de “DISTRIBUIÇÃO” possibilita o encaminhamento da ORIENTAÇÃO/MEDIDA DE REGULARIZAÇÃO e/ou PROPOSTA DE MELHORIA para 
-												manifestação das áreas subordinadas a essa SE/Departamento. Essa distribuição poderá ser feita para até quatro áreas se a situação
-												envolver órgãos distintos. Nesse caso o acompanhamento será desdobrado conforme encaminhamento realizado. Não havendo a necessidade 
-												de distribuição, escolher a opção MANIFESTAÇÃO.</li>
-											
-										</div>
-										<ul class="nav nav-tabs">
-											<li class="nav-item">
-												<a class="nav-link" id="tab-manifestacao" data-toggle="tab" href="#content-manifestacao" style="font-size:20px;"><i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Manifestação</span></a>
-											</li>
-											<li class="nav-item">
-												<a class="nav-link" id="tab-distribuicao" data-toggle="tab" href="#content-distribuicao" style="font-size:20px;"><i class="fas fa-sitemap" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Distribuição</span></a>
-											</li>
-										</ul>
-									</div>
-									<div class="card-body">
-										<div class="tab-content">
-											<div class="tab-pane fade " id="content-manifestacao">
-												<cfset formPosicionamentoOrgaoAvaliado(arguments.idOrientacao)>
-											</div>
-											<div class="tab-pane fade" id="content-distribuicao">
-												<div id="pcOrgaoRespDistribuicaoDiv" class="col-sm-8" >
-													<div class="form-group">
-														<label    for="pcOrgaoRespDistribuicao">
-															<div class="alertaDivMagenta" >Senhor(a) gestor(a), <br>
-																Selecione, a seguir, as áreas para as quais pretende distribuir esse item para 
-																manifestação. Antes da distribuição orientamos a ler atentamente a situação encontrada 
-																de modo a melhor identificar a área responsável para tratamento do item. Se necessário, 
-																o mesmo pode ser direcionado, simultaneamente, para até 04 áreas.<br>
-																Informe, também, suas orientações para resposta da(s) área(s) subordinada(s).<br>
-															</div>
-																<i style="font-weight: normal;">Dica: Para selecionar mais de uma área, mantenha a tecla "Ctrl" pressionada enquanto seleciona.</i>
-														</label>
-														<select id="pcOrgaoRespDistribuicao" required="" name="pcOrgaoRespDistribuicao" class="form-control" multiple="multiple"  >
-															<cfoutput query="application.rsOrgaoSubordinados">
-																<option value="#pc_org_mcu#">#pc_org_sigla#</option>
-															</cfoutput>
-														</select>
-													</div>
-												</div>
-												<div  class="col-sm-12" >
-													<div class="form-group">
-														<label   for="pcOrientacaoResposta">Orientações para resposta:</label>
-														<textarea class="form-control" id="pcOrientacaoResposta" rows="4" required=""  name="pcOrientacaoResposta" class="form-control" placeholder="Digite aqui sua orientação para a(s) área(s) subordinada(s) selecionada(s) acima..."></textarea>
-													</div>										
-												</div>
-												<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
-													<div >
-														<button id="btEnviarDistribuicao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Distribuir</button>
-													</div>
-												</div>	
-											</div>
-										</div>
-									</div>
-							</div>
-						</div>
-					<cfelse>
-						<cfset timelineViewAcompOrgaoAvaliado(arguments.idOrientacao)>
-						<cfset formPosicionamentoOrgaoAvaliado(arguments.idOrientacao)>
-					</cfif>
 
 
 					
-				</cfif>
+				
 			</session><!-- fim card-body2 -->	
 					
 		</session>
@@ -1290,7 +1168,7 @@
 								//inicio ajax
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									url: "cfc/pc_cfcControleDistribuicao.cfc",
 									data:{
 										method: "distribuirOrientacoes",
 										pc_aval_orientacao_id: pc_orientacao_id,
@@ -1528,7 +1406,9 @@
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
 			LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_num_orgao_avaliado
 			LEFT JOIN pc_orgaos AS pc_orgaos_2 ON pc_orgaos_2.pc_org_mcu = pc_orgHerancaMcuPara
-			WHERE pc_aval_melhoria_status = 'P' and pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_num_status in(4,5)
+			WHERE pc_aval_melhoria_status = 'P' and pc_num_status in(4,5) and pc_aval_melhoria_distribuido = 1
+			      and pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+			or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 		</cfquery>
 		
 		<div class="row" >
@@ -1539,7 +1419,7 @@
 					<div class="card-body" >
 
 						<cfif #rsMelhoriasPendentes.recordcount# eq 0 >
-							<h5 align="center">Nenhuma Proposta de Melhoria pendente foi localizada para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
+							<h5 align="center">Nenhuma Proposta de Melhoria Distribuída pelo órgão <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>, com status PENDENTE, foi localizada.</h5>
 						<cfelse>
 							<table id="tabMelhoriasPendentes" class="table table-bordered table-striped table-hover text-nowrap">
 								<thead style="background: #0083ca;color:#fff">
@@ -1565,20 +1445,10 @@
 												<td align="center">#pc_processo_id#</td>
 												<td align="center">#pc_aval_numeracao#</td>
 												<cfif #pc_orgHerancaMcuPara# neq '' and  DateFormat(Now(),"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy")>
-												
-													<cfif rsMelhoriasPendentes.pc_aval_melhoria_distribuido eq 1>
-														<td align="center">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (#pc_org_mcu#) (Distribuído)</span></td>
-													<cfelse>
-														<td align="center">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (#pc_org_mcu#)</span></td>
-
-													</cfif>
+													<td align="center">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (#pc_org_mcu#)</span></td>
 													<td align="center">#seOrgRespHerdeiro#</td>
 												<cfelse>
-													<cfif rsMelhoriasPendentes.pc_aval_melhoria_distribuido eq 1>
-														<td align="center">#pc_org_sigla# (#pc_org_mcu#) (Distribuído)</td>
-													<cfelse>
-														<td align="center">#pc_org_sigla# (#pc_org_mcu#)</td>
-													</cfif>
+													<td align="center">#pc_org_sigla# (#pc_org_mcu#)</td>
 													<td align="center">#pc_org_se_sigla#</td>
 												</cfif>
 
@@ -1666,19 +1536,19 @@
 				});
 				$('#modalOverlay').modal('show')
 				
-				$('#informacoesItensAcompanhamentoDiv').html('');
+				$('#infItensOrientacoesDistribuidasDiv').html('');
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcAcompanhamentos.cfc",
+						url: "cfc/pc_cfcControleDistribuicao.cfc",
 						data:{
-							method: "informacoesItensAcompanhamentoMelhoria",
+							method: "infItensMelhoriasDistribuidas",
 							idMelhoria: idMelhoria
 						},
 						async: false
 					})//fim ajax
 					.done(function(result) {
-						$('#informacoesItensAcompanhamentoDiv').html(result)
+						$('#infItensOrientacoesDistribuidasDiv').html(result)
 						$(".content-wrapper").css("height","auto");//para o background cinza da div content-wrapper se estender até o final do timeline
 						$('#modalOverlay').delay(1000).hide(0, function() {
 							$('html, body').animate({ scrollTop: ($('#formCadItem').offset().top-80)} , 1000);
@@ -1874,7 +1744,7 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcAcompanhamentos.cfc",
+						url: "cfc/pc_cfcControleDistribuicao.cfc",
 						data:{
 							method: "cadMelhoriasPosic",
 							pc_aval_id: pc_aval_id,
@@ -1891,7 +1761,7 @@
 						$('#pcRecusaJustMelhoria').val('')
 						$('#pcNovaAcaoMelhoria').val('')
 						$('#pcStatusMelhoria').val('').trigger('change')
-						$('#informacoesItensAcompanhamentoDiv').html('')
+						$('#infItensOrientacoesDistribuidasDiv').html('')
 						exibirTabelaMelhoriasPendentes()
 						$('#custom-tabs-one-MelhoriaAcomp-tab').html("PROPOSTAS DE MELHORIA");
 						$('html, body').animate({ scrollTop: ($('#custom-tabs-one-tabAcomp').offset().top)} , 500);	
@@ -1929,7 +1799,7 @@
 
 
 
-	<cffunction name="informacoesItensAcompanhamentoMelhoria"   access="remote" hint="envia para a página acomanhamento.cfm tabs com informações do item.">
+	<cffunction name="infItensMelhoriasDistribuidas"   access="remote" hint="envia para a página acomanhamento.cfm tabs com informações do item.">
 		<cfargument name="idMelhoria" type="numeric" required="true" />
 
 
@@ -2006,69 +1876,14 @@
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Melhoria"  role="tabpanel" aria-labelledby="custom-tabs-one-Melhoria-tab" >														
 									<div class="col-md-12">
-										<cfoutput>
-											<cfif rsProcAval.pc_aval_melhoria_distribuido eq 1>
-												<div style=" display: inline;background-color: ##e83e8c;color:##fff;padding: 3px;">Proposta de melhoria distribuída pelo seu órgão subordinador:</div>
-											</cfif>
-										</cfoutput>
+										
 							            <div class="small-box" style="" >
 											<cfoutput>
 												<pre style="font-size: 1em;">#rsProcAval.pc_aval_melhoria_descricao#</pre>
 											</cfoutput>
 										</div>
-										<cfif application.rsOrgaoSubordinados.recordcount gt 0>
-											<div class="card card-primary card-tabs" style="widht:100%">
-												
-												<div class="card-header p-0 pt-1" style="">
-													
-													<ul class="nav nav-tabs">
-														<li class="nav-item">
-															<a class="nav-link" id="tab-responder" data-toggle="tab" href="#content-responder" style="font-size:20px;"><i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Responder</span></a>
-														</li>
-														
-														<li class="nav-item">
-															<a class="nav-link" id="tab-distribuicao" data-toggle="tab" href="#content-distribuicao" style="font-size:20px;"><i class="fas fa-sitemap" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Distribuir</span></a>
-														</li>
-
-													</ul>
-												</div>
-												<div class="card-body">
-													<div class="tab-content">
-														<div class="tab-pane fade " id="content-responder">
-															<div id="informacoesMelhoriasDiv"></div>
-														</div>
-
-														<div class="tab-pane fade" id="content-distribuicao">
-															<div id="pcOrgaoRespDistribuicaoDiv" class="col-sm-8" >
-																<div class="form-group">
-																	<label    for="pcOrgaoRespDistribuicao">
-																		<div class="alertaDivMagenta" >Senhor(a) gestor(a), <br>
-																			Selecione, a seguir, as áreas para as quais pretende distribuir essa Proposta de Melhoria. Antes da distribuição orientamos a ler atentamente a situação encontrada 
-																			de modo a melhor identificar a área para direcionamento. Se necessário, a mesma pode ser direcionada, simultaneamente, para até 04 áreas.
-																		</div>
-																			<i style="font-weight: normal;">Dica: Para selecionar mais de uma área, mantenha a tecla "Ctrl" pressionada enquanto seleciona.</i>
-																	</label>
-																	<select id="pcOrgaoRespDistribuicao" required="" name="pcOrgaoRespDistribuicao" class="form-control" multiple="multiple"  >
-																		<cfoutput query="application.rsOrgaoSubordinados">
-																			<option value="#pc_org_mcu#">#pc_org_sigla#</option>
-																		</cfoutput>
-																	</select>
-																</div>
-															</div>
-															
-															<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
-																<div >
-																	<button id="btEnviarDistribuicaoMelhoria"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Distribuir</button>
-																</div>
-															</div>	
-														</div>
-													</div>
-												</div>
-
-											</div>	
-										<cfelse>
-											<div id="informacoesMelhoriasDiv"></div>
-										</cfif>
+										
+										
 									</div>
 
 								</div>
@@ -2318,7 +2133,7 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcAcompanhamentos.cfc",
+						url: "cfc/pc_cfcControleDistribuicao.cfc",
 						data:{
 							method: "formMelhoriaPosic",
 							idMelhoria: idMelhoria
@@ -2439,7 +2254,7 @@
 								//inicio ajax
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									url: "cfc/pc_cfcControleDistribuicao.cfc",
 									data:{
 										method: "distribuirMelhoria",
 										pc_aval_melhoria_id: idMelhoria,
@@ -2450,7 +2265,7 @@
 								.done(function(result) {
 									
 									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#informacoesItensAcompanhamentoDiv').html('')
+										$('#infItensOrientacoesDistribuidasDiv').html('')
 										exibirTabelaMelhoriasPendentes()
 										$('#custom-tabs-one-MelhoriaAcomp-tab').html("PROPOSTAS DE MELHORIA");
 										$('html, body').animate({ scrollTop: ($('#custom-tabs-one-tabAcomp').offset().top)} , 500);	
@@ -3099,7 +2914,7 @@
 				previewNode.parentNode.removeChild(previewNode)
 
 				var myDropzoneAcomp = new Dropzone("div#tabAnexosAcompDiv", { // Make the whole body a dropzone
-					url: "cfc/pc_cfcAcompanhamentos.cfc?method=uploadArquivosOrientacao", // Set the url
+					url: "cfc/pc_cfcControleDistribuicao.cfc?method=uploadArquivosOrientacao", // Set the url
 					autoProcessQueue :true,
 					thumbnailWidth: 80,
 					thumbnailHeight: 80,
@@ -3224,7 +3039,7 @@
 								$('#modalOverlay').modal('show');
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									url: "cfc/pc_cfcControleDistribuicao.cfc",
 									data:{
 										method:"salvarPosic",
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
@@ -3338,7 +3153,7 @@
 								$('#modalOverlay').modal('show');	
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									url: "cfc/pc_cfcControleDistribuicao.cfc",
 									data:{
 										method:"cadPosicControleInterno",
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
@@ -3359,7 +3174,7 @@
 									
 								
 									exibirTabela()
-									$('#informacoesItensAcompanhamentoDiv').html('')
+									$('#infItensOrientacoesDistribuidasDiv').html('')
 									$('#timelineViewAcompDiv').html('')
 
 									
@@ -3396,7 +3211,7 @@
 							setTimeout(function() {	
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									url: "cfc/pc_cfcControleDistribuicao.cfc",
 									data:{
 										method:"cadPosicControleInterno",
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
@@ -3414,7 +3229,7 @@
 									$('#pcDataPrevRespAcomp').val('')
 									
 									exibirTabela()
-									$('#informacoesItensAcompanhamentoDiv').html('')
+									$('#infItensOrientacoesDistribuidasDiv').html('')
 									$('#timelineViewAcompDiv').html('')
 
 									$('#modalOverlay').delay(1000).hide(0, function() {
@@ -3484,9 +3299,9 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcAcompanhamentos.cfc",
+						url: "cfc/pc_cfcControleDistribuicao.cfc",
 						data:{
-							method: "tabAcompanhamento",
+							method: "tabOrientacoesDistribuidas",
 						},
 						async: false,
 						success: function(result) {
@@ -3835,18 +3650,16 @@
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 			
 				<div id="accordionCadItemPainel" style="margin-top:0px;hright:100vh">
-					<cfif application.rsOrgaoSubordinados.recordcount neq 0>
-						<div  style="margin-bottom:10px">
-					<cfelse>
-						<div class="card card-success" style="margin-bottom:10px">
-							<div class="card-header" style="background-color:#0083CA;">
-								<h4 class="card-title ">
-									<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:#fff;font-weight: bold;"> 
-										<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">INSERIR MANIFESTAÇÃO DO ÓRGÃO: <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></span>
-									</a>
-								</h4>
-							</div>	
-					</cfif>	
+					
+					<div class="card card-success" style="margin-bottom:10px">
+						<div class="card-header" style="background-color:#0083CA;">
+							<h4 class="card-title ">
+								<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:#fff;font-weight: bold;"> 
+									<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">INSERIR MANIFESTAÇÃO DO ÓRGÃO: <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></span>
+								</a>
+							</h4>
+						</div>	
+					
 					    <cfquery datasource="#application.dsn_processos#" name="rsManifestacaoSalva">
 							Select pc_avaliacao_posicionamentos.*, pc_orgaos.pc_org_sigla, pc_usuarios.pc_usu_nome FROM pc_avaliacao_posicionamentos 
 							INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
@@ -3988,7 +3801,7 @@
 				previewNode.parentNode.removeChild(previewNode)
 
 				var myDropzoneAcomp = new Dropzone("div#tabAnexosAcompDiv", { // Make the whole body a dropzone
-					url: "cfc/pc_cfcAcompanhamentos.cfc?method=uploadArquivosOrientacao", // Set the url
+					url: "cfc/pc_cfcControleDistribuicao.cfc?method=uploadArquivosOrientacao", // Set the url
 					autoProcessQueue :true,
 					thumbnailWidth: 80,
 					thumbnailHeight: 80,
@@ -4091,7 +3904,7 @@
 								$('#modalOverlay').modal('show');
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									url: "cfc/pc_cfcControleDistribuicao.cfc",
 									data:{
 										method:"salvarPosic",
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
@@ -4186,7 +3999,7 @@
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									url: "cfc/pc_cfcControleDistribuicao.cfc",
 									data:{
 										method:"cadPosicOrgaoAvaliado",
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
@@ -4204,7 +4017,7 @@
 									$('#pcPosicAcomp').val('')
 									
 									exibirTabela()
-									$('#informacoesItensAcompanhamentoDiv').html('')
+									$('#infItensOrientacoesDistribuidasDiv').html('')
 									$('#timelineViewAcompDiv').html('')
 
 									$('#modalOverlay').delay(1000).hide(0, function() {
@@ -4236,7 +4049,7 @@
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									url: "cfc/pc_cfcControleDistribuicao.cfc",
 									data:{
 										method:"cadPosicOrgaoAvaliado",
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
@@ -4250,7 +4063,7 @@
 								.done(function(result) {	
 									$('#pcPosicAcomp').val('')
 									exibirTabela()
-									$('#informacoesItensAcompanhamentoDiv').html('')
+									$('#infItensOrientacoesDistribuidasDiv').html('')
 									$('#timelineViewAcompDiv').html('')
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide');
@@ -4314,9 +4127,9 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcAcompanhamentos.cfc",
+						url: "cfc/pc_cfcControleDistribuicao.cfc",
 						data:{
-							method: "tabAcompanhamento",
+							method: "tabOrientacoesDistribuidas",
 						},
 						async: false,
 						success: function(result) {
