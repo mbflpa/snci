@@ -546,7 +546,11 @@
 						
 					<div class="card-header" style="background-color: #0083CA;border-bottom:solid 2px #fff" >
 						<cfoutput>
-							<p id="descricaoItem" style="font-size: 1.3em;color:##fff"><strong>Item: #rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong><cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'><i id="start-tour2" style="color:##8cc63f;margin-left:20px;font-size: 1.3em;" class="fas fa-question-circle grow-icon"></i></cfif></p>
+							<p id="descricaoItem" style="font-size: 1.3em;color:##fff"><strong>Item: #rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong>
+							<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
+							<!--<i id="start-tour2" style="color:##8cc63f;margin-left:20px;font-size: 1.3em;" class="fas fa-question-circle grow-icon"></i>-->
+							</cfif>
+							</p>
 						</cfoutput>	
 					</div>
 					<div class="card card-primary card-tabs"  style="widht:100%">

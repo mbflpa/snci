@@ -64,6 +64,8 @@
         // Obtém o valor de application.rsUsuarioParametros.pc_org_controle_interno e armazena na variável 'ci'
         <cfoutput>
             var ci = '#application.rsUsuarioParametros.pc_org_controle_interno#';
+            var orgao = '#application.rsUsuarioParametros.pc_org_sigla#';
+            var orgaoSubordinador = '#application.rsOrgaoSubordinados.recordcount#';
         </cfoutput>
         
         // Espera até que o documento esteja totalmente carregado
@@ -177,16 +179,42 @@
                         placement: 'bottom',
                         width: 450,
                         onNext: function() {
-                            $("#ConsultasEmAcomp").addClass("menu-is-opening menu-open");
-                            $("#ConsultasEmAcomp #ConsultaporOrientacao a").addClass("active");
-                            $("#FAQperguntasfrequentes").removeClass("menu-is-opening menu-open");
+                            if(orgaoSubordinador==='0'){
+                                $("#ConsultasEmAcomp").addClass("menu-is-opening menu-open");
+                                $("#ConsultasEmAcomp #ConsultaporOrientacao a").addClass("active");
+                                $("#FAQperguntasfrequentes").removeClass("menu-is-opening menu-open");
+                            }else{
+
+                                $("#ControledasDistribuicoes").addClass("menu-is-opening menu-open");
+                                $("#FAQperguntasfrequentes").removeClass("menu-is-opening menu-open");
+                            }
                         },
                         onPrev: function() {
                             $("#Acompanhamento").addClass("menu-is-opening menu-open");
                             $("#FAQperguntasfrequentes").removeClass("menu-is-opening menu-open");    
                         }
                     },
-
+                    //se application.rsOrgaoSubordinados for maior que 0, exibe o tour do target ControledasDistribuicoes
+                    
+                       
+                        {
+                            title: 'Controle das Distribuições',
+                            content: 'Clicando aqui, você poderá visualizar e controlar as Orientações e Propostas de Melhoria distribuídas pelo órgão ' + orgao + ' para seus órgãos subordinados.',
+                            target: 'ControledasDistribuicoes',
+                            placement: 'bottom',
+                            width: 450,
+                            onNext: function() {
+                                $("#ConsultasEmAcomp").addClass("menu-is-opening menu-open");
+                                $("#ConsultasEmAcomp #ConsultaporOrientacao a").addClass("active");
+                                $("#ControledasDistribuicoes").removeClass("menu-is-opening menu-open");
+                               
+                            },
+                            onPrev: function() {
+                                $("#ControledasDistribuicoes").removeClass("menu-is-opening menu-open");
+                                $("#FAQperguntasfrequentes").addClass("menu-is-opening menu-open");
+                            }
+                        },
+                   
                     
 
                     {
@@ -196,12 +224,15 @@
                         placement: 'bottom',
                         width: 550,
                         onNext: function() {
-                           // $("#ConsultasEmAcomp").addClass("menu-is-opening menu-open");
                             $("#ConsultasEmAcomp #ConsultaporProcesso a").addClass("active");
                             $("#ConsultasEmAcomp #ConsultaporOrientacao a").removeClass("active");
                         },
                         onPrev: function() {
-                            $("#FAQperguntasfrequentes").addClass("menu-is-opening menu-open");
+                            if(orgaoSubordinador==='0'){
+                                 $("#FAQperguntasfrequentes").addClass("menu-is-opening menu-open");
+                            }else{
+                                $("#ControledasDistribuicoes").addClass("menu-is-opening menu-open");
+                            }
                             $("#ConsultasEmAcomp").removeClass("menu-is-opening menu-open");
                             $("#ConsultasEmAcomp #ConsultaporOrientacao a").removeClass("active");    
                         }

@@ -39,7 +39,12 @@
 
 				<div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
 					<div class="col-sm-6">
-						<h4>Acompanhamento <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'><i id="start-tour" style="color:#8cc63f" class="fas fa-question-circle grow-icon"></i></cfif></h4>
+						<h4>Acompanhamento 
+						<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
+						
+							<!--<i id="start-tour" style="color:#8cc63f" class="fas fa-question-circle grow-icon"></i>-->
+						
+						</cfif></h4>
 					</div>
 				</div>
 			</div><!-- /.container-fluid -->
