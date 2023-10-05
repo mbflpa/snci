@@ -1429,6 +1429,10 @@
 
 	</cffunction>
 
+
+
+
+
 	<cffunction name="distribuirOrientacoes" returntype="any" access="remote" hint="Distribui as oreintações para áreas selecionadas pelo órgão avaliado.">
 		<cfargument name="pc_aval_orientacao_id" type="string" required="true" />
 		<cfargument name="pcAreasDistribuir" type="any" required="true" />
@@ -1442,22 +1446,22 @@
 		<cfquery name="rsPosicionamentosParaReplicacao" datasource="#application.dsn_processos#">
 			SELECT * FROM pc_avaliacao_posicionamentos
 			WHERE pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+			      and pc_aval_posic_enviado = 1
 		</cfquery>
 
 		<cftransaction>
-
+			<!-- Exclui o posicionamento salvo (se existir) -->
 			<cfquery datasource="#application.dsn_processos#">
-				UPDATE pc_avaliacao_orientacoes
-				SET pc_aval_orientacao_distribuido = 1
-				WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+				DELETE pc_avaliacao_posicionamentos
+				WHERE pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+			      and pc_aval_posic_enviado = 0
 			</cfquery>
-
-
-			
+					
 
 			<cfset firstItem = ListFirst(arguments.pcAreasDistribuir)><!-- Primeiro elemento da lista -->
 			<cfset dataPrevista = rsOrientacao.pc_aval_orientacao_dataPrevistaResp>
 			<cfset posic_status = rsOrientacao.pc_aval_orientacao_status>
+
 			<cfloop list="#arguments.pcAreasDistribuir#" index="i">
 				<!-- Atualização para o primeiro elemento -->
 				<cfif i eq firstItem>
@@ -1467,7 +1471,6 @@
 						SET
 							pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
 							pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#',
-							pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 							pc_aval_orientacao_distribuido = 1
 						WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
 					</cfquery>
@@ -1484,7 +1487,7 @@
 					<!-- Inserção para as outras áreas selecionadas -->
 					<cfquery datasource="#application.dsn_processos#" name="rsInserirOrientacao">
 						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_dataPrevistaResp, pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login, pc_aval_orientacao_distribuido)
-						VALUES ('#dataPrevista#', #posic_status#, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#rsOrientacao.pc_aval_orientacao_num_aval#, '#rsOrientacao.pc_aval_orientacao_descricao#','#i#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#', 1)
+						VALUES ('#dataPrevista#', #posic_status#, <cfqueryparam value="#rsOrientacao.pc_aval_orientacao_status_datahora#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#rsOrientacao.pc_aval_orientacao_num_aval#, '#rsOrientacao.pc_aval_orientacao_descricao#','#i#',  <cfqueryparam value="#rsOrientacao.pc_aval_orientacao_datahora#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#', 1)
 						SELECT SCOPE_IDENTITY() AS idOrientacao;
 					</cfquery>
 					 <cfset insertedIdOrientacao = rsInserirOrientacao.idOrientacao> <!-- Obtém o ID gerado -->
@@ -2683,7 +2686,12 @@
 																		<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																	    <pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 																	<cfelse>	
-																		<pre >#pc_aval_posic_texto#</pre>
+																		<pre >
+																			#pc_aval_posic_texto#
+																			<cfif pc_aval_posic_status eq 15 and pc_aval_posic_numProcJudicial neq ''>
+																				<br><p><span>N° Processo Judicial: <strong>#pc_aval_posic_numProcJudicial#</strong></p></span></pre>
+																			</cfif>
+																		</pre>
 																		<div id="tabAnexosPosicDiv" style="margin-top:20px"></div>	
 																	</cfif>
 																	<!--Inicio TabAnexosPosic-->
@@ -2768,8 +2776,12 @@
 																		<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																	    <pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 																	<cfelse>	
-																		<pre >#pc_aval_posic_texto#</pre>
-																			
+																		<pre >
+																			#pc_aval_posic_texto#
+																			<cfif pc_aval_posic_status eq 15 and pc_aval_posic_numProcJudicial neq ''>
+																				<br><p><span>N° Processo Judicial: <strong>#pc_aval_posic_numProcJudicial#</strong></p></span></pre>
+																			</cfif>
+																		</pre>
 																	</cfif>
 																	<!--Inicio TabAnexosPosic-->
 																	<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
@@ -2871,7 +2883,7 @@
 										<cfif rsManifestacaoSalva.recordcount neq 0>
 											<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
 										    <cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
-											<span style = "font-size:11px; color:#e83e8c"><cfoutput>Texto da manifestação salvo em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
+											<span style = "font-size:11px; color:#e83e8c"><cfoutput>Manifestação salva em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
 										</cfif>
 										<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui a manifestação do Controle Interno..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
 									<cfelse>
@@ -2896,16 +2908,20 @@
 						    <cfif rsProc.pc_num_status neq 6>
 								<div class="col-sm-3" >
 									<div class="form-group">
-									<label for="pcOrientacaoStatus">Status</label>
-									<select id="pcOrientacaoStatus" required="" name="pcOrientacaoStatus" class="form-control" style="height:35px">
-										<option selected=""  value="">Selecione o status...</option>
-										<!--<cfif #rsUltimaDataPrevistaResp.ultimaDataPrevistaResp# lt DATEFORMAT(Now(),"yyyy-mm-dd") and #rsUltimaDataPrevistaResp.pc_aval_posic_status# neq 4>
-											<option value="5" selected>PENDENTE</option>		
-										</cfif>-->
-										<cfoutput query="rsOrientacaoStatus">
-											<option value="#pc_orientacao_status_id#" <cfif #pc_orientacao_status_id# eq 5>selected</cfif>>#pc_orientacao_status_descricao#</option>
-										</cfoutput>
-									</select>
+										<label for="pcOrientacaoStatus">Status</label>
+										<select id="pcOrientacaoStatus" required="" name="pcOrientacaoStatus" class="form-control" style="height:35px">
+											<option selected=""  value="">Selecione o status...</option>
+											<!--<cfif #rsUltimaDataPrevistaResp.ultimaDataPrevistaResp# lt DATEFORMAT(Now(),"yyyy-mm-dd") and #rsUltimaDataPrevistaResp.pc_aval_posic_status# neq 4>
+												<option value="5" selected>PENDENTE</option>		
+											</cfif>-->
+											<cfoutput query="rsOrientacaoStatus">
+											    <cfif rsManifestacaoSalva.recordcount eq 0>
+													<option value="#pc_orientacao_status_id#" <cfif pc_orientacao_status_id eq 5>selected</cfif>>#pc_orientacao_status_descricao#</option>
+												<cfelse>
+													<option value="#pc_orientacao_status_id#" <cfif pc_orientacao_status_id eq rsManifestacaoSalva.pc_aval_posic_status>selected</cfif>>#pc_orientacao_status_descricao#</option>
+												</cfif>
+											</cfoutput>
+										</select>
 									</div>
 								</div>
 								<div id ="pcOrgaoRespAcompDiv" class="col-sm-4" hidden>
@@ -2916,7 +2932,11 @@
 											<option selected=""  value="">Selecione o Órgão p/ envio...</option>
 											
 											<cfoutput query="rsAreasUnion">
-												<option <cfif '#pc_org_mcu#' eq '#rsproc.mcuOrgaoRespOrientacao#'>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+											    <cfif rsManifestacaoSalva.recordcount eq 0>
+													<option <cfif '#pc_org_mcu#' eq '#rsproc.mcuOrgaoRespOrientacao#'>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+												<cfelse>
+													<option <cfif '#pc_org_mcu#' eq rsManifestacaoSalva.pc_aval_posic_num_orgaoResp>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+												</cfif>	
 											</cfoutput>
 
 
@@ -2925,15 +2945,19 @@
 								</div>
 								<div id ="pcDataPrevRespAcompDiv" class="col-md-2" hidden>
 									<div class="form-group">
-									<label for="pcDataPrevRespAcomp">Prazo Resposta:</label>
-									<div class="input-group date" id="reservationdate" data-target-input="nearest">
-										<input id="pcDataPrevRespAcomp"  name="pcDataPrevRespAcomp" required=""  type="date" class="form-control" placeholder="dd/mm/aaaa" style="height:35px"> 
+										<label for="pcDataPrevRespAcomp">Prazo Resposta:</label>
+										<div class="input-group date" id="reservationdate" data-target-input="nearest">
+											<input id="pcDataPrevRespAcomp"  name="pcDataPrevRespAcomp" required=""  type="date" class="form-control" placeholder="dd/mm/aaaa" style="height:35px"> 
+										</div>
 									</div>
+								</div>
+								<div id ="pcNumProcJudicialDiv" class="col-md-2" hidden>
+									<div class="form-group">
+										<label for="pcNumProcJudicial">N° Processo Judicial:</label>
+										<input id="pcNumProcJudicial"  name="pcNumProcJudicial" required="" class="form-control" style="height:35px">
 									</div>
 								</div>
 								
-
-
 							</div>
 						
 							<!--ANEXOS -->
@@ -3011,22 +3035,21 @@
 
 
 		<script language="JavaScript">
-		    <cfoutput>
-				var quantAnexoPosic = '#rsAnexosPosic.recordcount#';
-			</cfoutput>
-			if(quantAnexoPosic > 0){
+		   
 				$(function () {
-					$("#tabAnexosPosic").DataTable({
-						"destroy": true,
-						"stateSave": false,
-						"responsive": true, 
-						"lengthChange": false, 
-						"autoWidth": false,
-						"searching": false
-					})
-						
+					 // Verifique se a tabela com o ID 'tabAnexosPosic' existe no DOM
+					if (document.getElementById('tabAnexosPosic')) {
+						$("#tabAnexosPosic").DataTable({
+							"destroy": true,
+							"stateSave": false,
+							"responsive": true, 
+							"lengthChange": false, 
+							"autoWidth": false,
+							"searching": false
+						})
+					}	
 				});
-			}
+			
 					
 			 //Initialize Select2 Elements
 			 // Seleciona os elementos <select> pelos IDs desejados e aplica o Select2
@@ -3069,16 +3092,46 @@
 					
 					var dataPrev = new Date('#dateFormat(obterDataPrevista.Data_Prevista, "yyyy-mm-dd")#');
 					var dataPrevista = dataPrev.toISOString().split('T')[0];
-
+                    var manifestacaoSalva = '#rsManifestacaoSalva.recordcount#';
 					var dataPrevistaFormatada = '#obterDataPrevista.Data_Prevista_Formatada#';
+					var numProcJudicial = '#rsManifestacaoSalva.pc_aval_posic_numProcJudicial#';
 				</cfoutput>
-				
+
+				if(manifestacaoSalva === '0'){
 					$('#pcOrientacaoStatus').val(5)
 					$("#pcOrgaoRespAcompDiv").attr("hidden",false)
 					$("#pcDataPrevRespAcompDiv").attr("hidden",false)	
 					$("#pcDataPrevRespAcomp").val(dataPrevista)
-
 					$("#pcDataPrevRespAcompDiv").append("<span style='font-size:11px;color:blue'>Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</span></br>");
+				}else{
+					if ($('#pcOrientacaoStatus').val() == 5){
+						$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
+						$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+						$("#pcNumProcJudicialDiv").attr("hidden",true)
+						$("#pcDataPrevRespAcomp").val(dataPrevista)
+						$("#pcNumProcJudicial").val(null)
+						$("#pcDataPrevRespAcompDiv").append("<span style='font-size:11px;color:blue'>Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</span></br>");
+					
+					}else if ($('#pcOrientacaoStatus').val() == 15){
+						$("#pcNumProcJudicialDiv").attr("hidden",false)
+						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
+						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
+						$("#pcDataPrevRespAcomp").val(null)	
+						$("#pcOrgaoRespAcomp").val(null)	
+						$("#pcPosicAcomp").prop("disabled", true)
+						$("#pcNumProcJudicial").val(numProcJudicial)
+						
+					}else{
+						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
+						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
+						$("#pcNumProcJudicialDiv").attr("hidden",true)
+						$("#pcOrgaoRespAcomp").val(null)	
+						$("#pcDataPrevRespAcomp").val(null)	
+						$("#pcNumProcJudicial").val(null)	
+					}
+
+				}
+					
 					
 					
 
@@ -3167,14 +3220,32 @@
 					var dataPrevista = dataPrev.toISOString().split('T')[0];
 					var dataPrevistaFormatada = '#obterDataPrevista.Data_Prevista_Formatada#';
 				</cfoutput>
+
 				if ($('#pcOrientacaoStatus').val() == 5){
 					$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
 					$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+					$("#pcNumProcJudicialDiv").attr("hidden",true)
 					$("#pcDataPrevRespAcomp").val(dataPrevista)
-				}else{
+					$("#pcNumProcJudicial").val(null)	
+				}else if ($('#pcOrientacaoStatus').val() == 15){
+					$("#pcNumProcJudicialDiv").attr("hidden",false)
 					$("#pcDataPrevRespAcompDiv").attr("hidden",true)
 					$("#pcOrgaoRespAcompDiv").attr("hidden",true)
 					$("#pcDataPrevRespAcomp").val(null)	
+					$("#pcOrgaoRespAcomp").val(null)
+					$("#pcPosicAcomp").val('Orientação baixada para efeitos de acompanhamento no Sistema SNCI – Módulo Acompanhamento de Processos, tendo em vista a existência de Processo Judicial relacionado ao tema.')
+					$("#pcPosicAcomp").prop("disabled", true);
+				}else{
+					$("#pcDataPrevRespAcompDiv").attr("hidden",true)
+					$("#pcOrgaoRespAcompDiv").attr("hidden",true)
+					$("#pcNumProcJudicialDiv").attr("hidden",true)
+					$("#pcDataPrevRespAcomp").val(null)	
+					$("#pcNumProcJudicial").val(null)
+					$("#pcOrgaoRespAcomp").val(null)	
+				}
+
+				if($('#pcOrientacaoStatus').val() != 15){
+					$("#pcPosicAcomp").prop("disabled", false);
 				}
 
 			})
@@ -3234,6 +3305,8 @@
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
 										pc_aval_posic_texto: $('#pcPosicAcomp').val(),
 										pc_aval_orientacao_status:$('#pcOrientacaoStatus').val(),
+										pc_aval_posic_num_orgaoResp: $('#pcOrgaoRespAcomp').val(),
+										pc_aval_posic_numProcJudicial: $('#pcNumProcJudicial').val(),
 										idAnexos: idAnexosString
 									},
 						
@@ -3312,6 +3385,11 @@
 					//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
 					toastr.error('Todos os campos devem ser preenchidos!');
 					return false;
+				}
+
+				if ($('#pcOrientacaoStatus').val() == 15 & !$('#pcNumProcJudicial').val()){
+					toastr.error('Informe o N° do Processo Judicial!');
+					return false;	
 				}
 
 				
@@ -3406,6 +3484,7 @@
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
 										pc_aval_posic_texto: $('#pcPosicAcomp').val(),
 										pc_aval_orientacao_status:$('#pcOrientacaoStatus').val(),
+										pc_aval_orientacao_numProcJudicial: $('#pcNumProcJudicial').val(),
 										idAnexos: idAnexosString
 									},
 						
@@ -3638,7 +3717,12 @@
 																<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																<pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 															<cfelse>	
-																<pre >#pc_aval_posic_texto#</pre>	
+																<pre >
+																	#pc_aval_posic_texto#
+																	<cfif pc_aval_posic_status eq 15 and pc_aval_posic_numProcJudicial neq ''>
+																		<br><p><span>N° Processo Judicial: <strong>#pc_aval_posic_numProcJudicial#</strong></p></span></pre>
+																	</cfif>
+																</pre>	
 															</cfif>
 															<!--Inicio TabAnexosPosic-->
 															<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
@@ -3716,7 +3800,14 @@
 																<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																<pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 															<cfelse>	
-																<pre >#pc_aval_posic_texto#</pre>	
+																<pre >
+																	#pc_aval_posic_texto#
+																	<cfif pc_aval_posic_status eq 15 and pc_aval_posic_numProcJudicial neq ''>
+																		<br><p><span>N° Processo Judicial: <strong>#pc_aval_posic_numProcJudicial#</strong></p></span></pre>
+																	</cfif>
+																</pre>
+																
+
 															</cfif>
 															<!--Inicio TabAnexosPosic-->
 															<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
@@ -3863,7 +3954,7 @@
 								    <cfif rsManifestacaoSalva.recordcount neq 0>
 										<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
 										<cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
-										<span style = "font-size:11px; color:#e83e8c"><cfoutput>Texto da manifestação salvo em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
+										<span style = "font-size:11px; color:#e83e8c"><cfoutput>Manifestação salva em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
 									</cfif>
 									<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui sua manifestação..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
 								</div>										
@@ -3942,11 +4033,9 @@
 
 		<script language="JavaScript">
 
-			<cfoutput>
-				var quantAnexoPosic = '#rsAnexosPosic.recordcount#';
-			</cfoutput>
-			if(quantAnexoPosic > 0){
-				$(function () {
+			$(function () {
+					// Verifique se a tabela com o ID 'tabAnexosPosic' existe no DOM
+				if (document.getElementById('tabAnexosPosic')) {
 					$("#tabAnexosPosic").DataTable({
 						"destroy": true,
 						"stateSave": false,
@@ -3955,9 +4044,8 @@
 						"autoWidth": false,
 						"searching": false
 					})
-						
-				});
-			}
+				}	
+			});
 			
 
 			
@@ -4364,6 +4452,7 @@
 		<cfargument name="pc_aval_orientacao_mcu_orgaoResp" type="string" required="false" default=''/>
 		<cfargument name="pc_aval_orientacao_dataPrevistaResp" type="string" required="false"  default=null/>
 		<cfargument name="pc_aval_orientacao_status" type="numeric" required="true" />
+		<cfargument name="pc_aval_orientacao_numProcJudicial" type="string" required="false" default=''/>
 		<cfargument name="idAnexos" type="string" required="true">
 		
     	<cftransaction>
@@ -4380,7 +4469,7 @@
 				<cfset data="#DateFormat(arguments.pc_aval_orientacao_dataPrevistaResp,'DD-MM-YYYY')#">
 				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado, pc_aval_posic_numProcJudicial)
 				
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
@@ -4391,7 +4480,8 @@
 						<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="1" cfsqltype="cf_sql_integer">
+						<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
+						<cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				</cfquery>
@@ -4403,7 +4493,8 @@
 						pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
 						pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
-						pc_aval_orientacao_dataPrevistaResp = <cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">
+						pc_aval_orientacao_dataPrevistaResp = <cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
+					    pc_aval_orientacao_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
 					WHERE 
 						pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 
@@ -4415,7 +4506,7 @@
 				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_enviado)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_enviado, pc_aval_posic_numProcJudicial)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
@@ -4423,7 +4514,8 @@
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="1" cfsqltype="cf_sql_integer">
+						<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
+						<cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				
@@ -4434,7 +4526,8 @@
 					SET 
 						pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
 						pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">
+						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
+						pc_aval_orientacao_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
 					WHERE 
 						pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 				</cfquery>
@@ -4509,6 +4602,8 @@
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 		<cfargument name="pc_aval_posic_texto" type="string" required="true" />
 		<cfargument name="pc_aval_orientacao_status" type="numeric" required="true" />
+		<cfargument name="pc_aval_posic_num_orgaoResp" type="string" required="false" default=''/>
+		<cfargument name="pc_aval_posic_numProcJudicial" type="string" required="false" default=''/>
 		<cfargument name="idAnexos" type="string" required="true">
 
 		<cfquery datasource = "#application.dsn_processos#" name="rsPosicNaoEnviada">
@@ -4521,14 +4616,16 @@
 
 			<cfif rsPosicNaoEnviada.recordcount eq 0>
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_num_orgaoResp, pc_aval_posic_numProcJudicial)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
+						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#arguments.pc_aval_posic_num_orgaoResp#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#arguments.pc_aval_posic_numProcJudicial#" cfsqltype="cf_sql_varchar">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				
@@ -4542,7 +4639,9 @@
 						pc_aval_posic_dataHora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						pc_aval_posic_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 						pc_aval_posic_num_orgao = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
-						pc_aval_posic_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">
+						pc_aval_posic_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+					    pc_aval_posic_num_orgaoResp = <cfqueryparam value="#arguments.pc_aval_posic_num_orgaoResp#" cfsqltype="cf_sql_varchar">,
+						pc_aval_posic_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_posic_numProcJudicial#" cfsqltype="cf_sql_varchar">
 					WHERE 
 						pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 						and pc_aval_posic_enviado = 0

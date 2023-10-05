@@ -2543,7 +2543,12 @@
 																		<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																	    <pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 																	<cfelse>	
-																		<pre >#pc_aval_posic_texto#</pre>	
+																		<pre >
+																			#pc_aval_posic_texto#
+																			<cfif pc_aval_posic_status eq 15 and pc_aval_posic_numProcJudicial neq ''>
+																				<br><p><span>N° Processo Judicial: <strong>#pc_aval_posic_numProcJudicial#</strong></p></span></pre>
+																			</cfif>
+																		</pre>		
 																	</cfif>
 																	<!--Inicio TabAnexosPosic-->
 																	<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
@@ -2628,7 +2633,12 @@
 																		<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																	    <pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 																	<cfelse>	
-																		<pre >#pc_aval_posic_texto#</pre>	
+																		<pre >
+																			#pc_aval_posic_texto#
+																			<cfif pc_aval_posic_status eq 15 and pc_aval_posic_numProcJudicial neq ''>
+																				<br><p><span>N° Processo Judicial: <strong>#pc_aval_posic_numProcJudicial#</strong></p></span></pre>
+																			</cfif>
+																		</pre>		
 																	</cfif>
 																	<!--Inicio TabAnexosPosic-->
 																	<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
@@ -2700,15 +2710,9 @@
 			
 
 		<script language="JavaScript">
-			<cfoutput>
-			    var quantAnexoPosic = 0;
-				<cfif isDefined("rsAnexosPosic") >
-					quantAnexoPosic = '#rsAnexosPosic.recordcount#';
-				</cfif>
-			</cfoutput>
-			
-			if(quantAnexoPosic > 0 ){
-				$(function () {
+			$(function () {
+				// Verifique se a tabela com o ID 'tabAnexosPosic' existe no DOM
+				if (document.getElementById('tabAnexosPosic')) {
 					$("#tabAnexosPosic").DataTable({
 						"destroy": true,
 						"stateSave": false,
@@ -2717,9 +2721,8 @@
 						"autoWidth": false,
 						"searching": false
 					})
-						
-				});
-			}
+				}	
+			});
 
 			$(document).ready(function() {
 				$('.posicContInterno').CardWidget('expand')
@@ -2907,7 +2910,12 @@
 																<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																<pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 															<cfelse>	
-																<pre >#pc_aval_posic_texto#</pre>	
+																<pre >
+																	#pc_aval_posic_texto#
+																	<cfif pc_aval_posic_status eq 15 and pc_aval_posic_numProcJudicial neq ''>
+																		<br><p><span>N° Processo Judicial: <strong>#pc_aval_posic_numProcJudicial#</strong></p></span></pre>
+																	</cfif>
+																</pre>	
 															</cfif>
 															<!--Inicio TabAnexosPosic-->
 															<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
@@ -2985,7 +2993,12 @@
 																<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																<pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 															<cfelse>	
-																<pre >#pc_aval_posic_texto#</pre>	
+																<pre >
+																	#pc_aval_posic_texto#
+																	<cfif pc_aval_posic_status eq 15 and pc_aval_posic_numProcJudicial neq ''>
+																		<br><p><span>N° Processo Judicial: <strong>#pc_aval_posic_numProcJudicial#</strong></p></span></pre>
+																	</cfif>
+																</pre>	
 															</cfif>
 															<!--Inicio TabAnexosPosic-->
 															<div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
@@ -3056,11 +3069,9 @@
             </div>
 		
 		<script language="JavaScript">
-			<cfoutput>
-				var quantAnexoPosic = '#rsAnexosPosic.recordcount#';
-			</cfoutput>
-			if(quantAnexoPosic > 0){
-				$(function () {
+			$(function () {
+				// Verifique se a tabela com o ID 'tabAnexosPosic' existe no DOM
+				if (document.getElementById('tabAnexosPosic')) {
 					$("#tabAnexosPosic").DataTable({
 						"destroy": true,
 						"stateSave": false,
@@ -3069,9 +3080,8 @@
 						"autoWidth": false,
 						"searching": false
 					})
-						
-				});
-			}
+				}	
+			});
 
 			$(document).ready(function() {
 				$('.posicContInterno').CardWidget('expand')

@@ -471,7 +471,6 @@
       </cfoutput>
 
       if (subordinador === '0') {//se não for subordinador, remove o menu de controle das distribuições
-        console.log(subordinador);
         // Encontre o elemento com id "ControledasDistribuicoes"
         var controledasDistribuicoesElement = document.getElementById("ControledasDistribuicoes");
         

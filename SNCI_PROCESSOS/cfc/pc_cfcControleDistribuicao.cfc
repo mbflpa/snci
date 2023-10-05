@@ -2826,11 +2826,9 @@
 
 
 		<script language="JavaScript">
-		    <cfoutput>
-				var quantAnexoPosic = '#rsAnexosPosic.recordcount#';
-			</cfoutput>
-			if(quantAnexoPosic > 0){
-				$(function () {
+		   $(function () {
+				// Verifique se a tabela com o ID 'tabAnexosPosic' existe no DOM
+				if (document.getElementById('tabAnexosPosic')) {
 					$("#tabAnexosPosic").DataTable({
 						"destroy": true,
 						"stateSave": false,
@@ -2839,9 +2837,8 @@
 						"autoWidth": false,
 						"searching": false
 					})
-						
-				});
-			}
+				}	
+			});
 					
 			 //Initialize Select2 Elements
 			 // Seleciona os elementos <select> pelos IDs desejados e aplica o Select2
@@ -3755,11 +3752,9 @@
 
 		<script language="JavaScript">
 
-			<cfoutput>
-				var quantAnexoPosic = '#rsAnexosPosic.recordcount#';
-			</cfoutput>
-			if(quantAnexoPosic > 0){
-				$(function () {
+			$(function () {
+				// Verifique se a tabela com o ID 'tabAnexosPosic' existe no DOM
+				if (document.getElementById('tabAnexosPosic')) {
 					$("#tabAnexosPosic").DataTable({
 						"destroy": true,
 						"stateSave": false,
@@ -3768,9 +3763,8 @@
 						"autoWidth": false,
 						"searching": false
 					})
-						
-				});
-			}
+				}	
+			});
 			
 
 			
