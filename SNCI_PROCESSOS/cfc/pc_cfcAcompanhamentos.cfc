@@ -2894,7 +2894,7 @@
 							<cfquery datasource="#application.dsn_processos#" name="rsOrientacaoStatus">
 								SELECT pc_orientacao_status.pc_orientacao_status_id,pc_orientacao_status.pc_orientacao_status_descricao  
 								FROM pc_orientacao_status 
-								WHERE (pc_orientacao_status_id = 5 OR pc_orientacao_status_finalizador = 'S' ) and pc_orientacao_status_status = 'A'
+								WHERE (pc_orientacao_status_id in(5,16) OR pc_orientacao_status_finalizador = 'S' ) and pc_orientacao_status_status = 'A'
 								order by pc_orientacao_status_id  asc
 							</cfquery>
 
@@ -2950,6 +2950,7 @@
 											<input id="pcDataPrevRespAcomp"  name="pcDataPrevRespAcomp" required=""  type="date" class="form-control" placeholder="dd/mm/aaaa" style="height:35px"> 
 										</div>
 									</div>
+									<span id="dataPrevistaCalculada" style='font-size:11px;color:blue'></span>
 								</div>
 								<div id ="pcNumProcJudicialDiv" class="col-md-2" hidden>
 									<div class="form-group">
@@ -3086,14 +3087,34 @@
 				$('.posicOrgAvaliado').CardWidget('expand')
 				$('#btRecolherPosic').removeClass('fa-eye')
 				$('#btRecolherPosic').addClass('fa-eye-slash')
+
+				var dataPrev = '';
+				var dataPrevista='';
+				var dataPrevistaFormatada ='';
+				if($('#pcOrientacaoStatus').val() == 5){
+					<cfoutput>
+						<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio"/>
+						<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias='15' />
+						dataPrev = new Date('#dateFormat(obterDataPrevista.Data_Prevista, "yyyy-mm-dd")#');
+						dataPrevista = dataPrev.toISOString().split('T')[0];
+						dataPrevistaFormatada = '#obterDataPrevista.Data_Prevista_Formatada#';
+					</cfoutput>
+				} 
+				
+				if($('#pcOrientacaoStatus').val() == 16){
+					    dataPrevista  = new Date();
+						dataPrevista.setDate(dataPrevista .getDate() + 90);
+						// Obter o ano, mês e dia
+						var ano = dataPrevista.getFullYear();
+						var mes = (dataPrevista.getMonth() + 1).toString().padStart(2, '0'); // +1 porque o mês é baseado em zero
+						var dia = dataPrevista.getDate().toString().padStart(2, '0');
+						// Criar a string no formato yyyy-mm-dd
+						dataPrevista = ano + '-' + mes + '-' + dia;
+						dataPrevistaFormatada = dia + '/' + mes + '/' + ano;
+				}	
+				
 				<cfoutput>
-					<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio">
-					<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias='15' />
-					
-					var dataPrev = new Date('#dateFormat(obterDataPrevista.Data_Prevista, "yyyy-mm-dd")#');
-					var dataPrevista = dataPrev.toISOString().split('T')[0];
                     var manifestacaoSalva = '#rsManifestacaoSalva.recordcount#';
-					var dataPrevistaFormatada = '#obterDataPrevista.Data_Prevista_Formatada#';
 					var numProcJudicial = '#rsManifestacaoSalva.pc_aval_posic_numProcJudicial#';
 				</cfoutput>
 
@@ -3102,7 +3123,8 @@
 					$("#pcOrgaoRespAcompDiv").attr("hidden",false)
 					$("#pcDataPrevRespAcompDiv").attr("hidden",false)	
 					$("#pcDataPrevRespAcomp").val(dataPrevista)
-					$("#pcDataPrevRespAcompDiv").append("<span style='font-size:11px;color:blue'>Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</span></br>");
+					$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
+
 				}else{
 					if ($('#pcOrientacaoStatus').val() == 5){
 						$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
@@ -3110,17 +3132,23 @@
 						$("#pcNumProcJudicialDiv").attr("hidden",true)
 						$("#pcDataPrevRespAcomp").val(dataPrevista)
 						$("#pcNumProcJudicial").val(null)
-						$("#pcDataPrevRespAcompDiv").append("<span style='font-size:11px;color:blue'>Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</span></br>");
-					
+						$("#dataPrevistaCalculada").html("Prazo de 15 dias úteis: " + dataPrevistaFormatada + "</br>");
 					}else if ($('#pcOrientacaoStatus').val() == 15){
 						$("#pcNumProcJudicialDiv").attr("hidden",false)
 						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
 						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
 						$("#pcDataPrevRespAcomp").val(null)	
 						$("#pcOrgaoRespAcomp").val(null)	
-						$("#pcPosicAcomp").prop("disabled", true)
 						$("#pcNumProcJudicial").val(numProcJudicial)
-						
+						$("#pcPosicAcomp").prop("disabled", true);
+					}else if ($('#pcOrientacaoStatus').val() == 16){
+						$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
+						$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+						$("#pcNumProcJudicialDiv").attr("hidden",true)
+						$("#pcDataPrevRespAcomp").val(dataPrevista)
+						$("#pcNumProcJudicial").val(null)
+						$("#dataPrevistaCalculada").html("Prazo de 90 dias corridos: " + dataPrevistaFormatada + "</br>");
+						$("#pcPosicAcomp").prop("disabled", true);
 					}else{
 						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
 						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
@@ -3207,46 +3235,84 @@
 				
 				// DropzoneJS Demo Code End
 
-
 		})
 
 
 			
-			$('#pcOrientacaoStatus').on('change', function (event)  {
-				<cfoutput>
-					<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio">
-					<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias='15' />
-					var dataPrev = new Date('#dateFormat(obterDataPrevista.Data_Prevista, "yyyy-mm-dd")#');
-					var dataPrevista = dataPrev.toISOString().split('T')[0];
-					var dataPrevistaFormatada = '#obterDataPrevista.Data_Prevista_Formatada#';
-				</cfoutput>
 
+			$('#pcOrientacaoStatus').on('change', function (event)  {
+				
+				var dataPrev = '';
+				var dataPrevista='';
+				var dataPrevistaFormatada ='';
+				if($('#pcOrientacaoStatus').val() == 5){
+					<cfoutput>
+						<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio"/>
+						<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias='15' />
+						dataPrev = new Date('#dateFormat(obterDataPrevista.Data_Prevista, "yyyy-mm-dd")#');
+						dataPrevista = dataPrev.toISOString().split('T')[0];
+						dataPrevistaFormatada = '#obterDataPrevista.Data_Prevista_Formatada#';
+					</cfoutput>
+				} 
+				if($('#pcOrientacaoStatus').val() == 16){
+					    dataPrevista  = new Date();
+						dataPrevista.setDate(dataPrevista .getDate() + 90);
+						// Obter o ano, mês e dia
+						var ano = dataPrevista.getFullYear();
+						var mes = (dataPrevista.getMonth() + 1).toString().padStart(2, '0'); // +1 porque o mês é baseado em zero
+						var dia = dataPrevista.getDate().toString().padStart(2, '0');
+						// Criar a string no formato yyyy-mm-dd
+						dataPrevista = ano + '-' + mes + '-' + dia;
+						dataPrevistaFormatada = dia + '/' + mes + '/' + ano;
+				}	
+				 
+				
+				
+                
 				if ($('#pcOrientacaoStatus').val() == 5){
 					$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
 					$("#pcDataPrevRespAcompDiv").attr("hidden",false)
 					$("#pcNumProcJudicialDiv").attr("hidden",true)
 					$("#pcDataPrevRespAcomp").val(dataPrevista)
-					$("#pcNumProcJudicial").val(null)	
+					$("#dataPrevistaCalculada").html("Prazo de 15 dias corridos: " + dataPrevistaFormatada + "</br>");
+					$("#pcNumProcJudicial").val(null)
+						
 				}else if ($('#pcOrientacaoStatus').val() == 15){
 					$("#pcNumProcJudicialDiv").attr("hidden",false)
 					$("#pcDataPrevRespAcompDiv").attr("hidden",true)
 					$("#pcOrgaoRespAcompDiv").attr("hidden",true)
 					$("#pcDataPrevRespAcomp").val(null)	
-					$("#pcOrgaoRespAcomp").val(null)
+					//$("#pcOrgaoRespAcomp").val(null)
 					$("#pcPosicAcomp").val('Orientação baixada para efeitos de acompanhamento no Sistema SNCI – Módulo Acompanhamento de Processos, tendo em vista a existência de Processo Judicial relacionado ao tema.')
 					$("#pcPosicAcomp").prop("disabled", true);
+												
+				}else if ($('#pcOrientacaoStatus').val() == 16){
+					$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
+					$("#pcDataPrevRespAcompDiv").attr("hidden",false)
+					$("#pcNumProcJudicialDiv").attr("hidden",true)
+					$("#pcDataPrevRespAcomp").val(dataPrevista)
+					$("#dataPrevistaCalculada").html("Prazo de 90 dias corridos: " + dataPrevistaFormatada + "</br>");
+					$("#pcNumProcJudicial").val(null)	
+					$("#pcPosicAcomp").val('Orientação suspensa por 90 (noventa) dias corridos para aguardar as tratativas dos Correios com o órgão externo, conforme registrado no histórico das manifestações.')
+					$("#pcPosicAcomp").prop("disabled", true);
+
 				}else{
 					$("#pcDataPrevRespAcompDiv").attr("hidden",true)
 					$("#pcOrgaoRespAcompDiv").attr("hidden",true)
 					$("#pcNumProcJudicialDiv").attr("hidden",true)
 					$("#pcDataPrevRespAcomp").val(null)	
 					$("#pcNumProcJudicial").val(null)
-					$("#pcOrgaoRespAcomp").val(null)	
+					//$("#pcOrgaoRespAcomp").val(null)	
 				}
 
-				if($('#pcOrientacaoStatus').val() != 15){
+				if($('#pcOrientacaoStatus').val() != 15 && $('#pcOrientacaoStatus').val() != 16){
+					if ($("#pcPosicAcomp").prop("disabled") === true) {
+						$("#pcPosicAcomp").val(null);
+					}
 					$("#pcPosicAcomp").prop("disabled", false);
 				}
+
+				
 
 			})
 
@@ -3368,7 +3434,7 @@
 				}
 
 				if (
-					$('#pcOrientacaoStatus').val() == 5 & $('#pcOrientacaoStatus option:selected').text() =='TRATAMENTO' &
+					$('#pcOrientacaoStatus').val() == 5 && $('#pcOrientacaoStatus option:selected').text() =='TRATAMENTO' &&
 					(!$('#pcDataPrevRespAcomp').val()||
 					!$('#pcOrgaoRespAcomp').val())
 				){   
@@ -3376,20 +3442,29 @@
 					toastr.error('Todos os campos devem ser preenchidos!');
 					return false;
 				}
+				
+
+
+
 				<cfoutput>let dataRespValidacao = '#rsUltimaDataPrevistaResp.ultimaDataPrevistaResp#';</cfoutput>
 				if (
 					
-					$('#pcOrientacaoStatus').val() == 5 & $('#pcOrientacaoStatus option:selected').text() =='PENDENTE' & dataRespValidacao == '' &
-					(!$('#pcDataPrevRespAcomp').val()||	!$('#pcOrgaoRespAcomp').val())
+					$('#pcOrientacaoStatus').val() == 5 && $('#pcOrientacaoStatus option:selected').text() =='PENDENTE' & dataRespValidacao == '' &&
+					(!$('#pcDataPrevRespAcomp').val() ||	!$('#pcOrgaoRespAcomp').val())
 					){   
 					//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
 					toastr.error('Todos os campos devem ser preenchidos!');
 					return false;
 				}
 
-				if ($('#pcOrientacaoStatus').val() == 15 & !$('#pcNumProcJudicial').val()){
+				if ($('#pcOrientacaoStatus').val() == 15 && !$('#pcNumProcJudicial').val()){
 					toastr.error('Informe o N° do Processo Judicial!');
 					return false;	
+				}
+
+				if ($('#pcOrientacaoStatus').val() == 16 && (!$('#pcDataPrevRespAcomp').val() || $('#pcOrgaoRespAcomp').val().length==0)){	//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
+					toastr.error('Todos os campos devem ser preenchidos!');
+					return false;
 				}
 
 				
@@ -3401,19 +3476,14 @@
 					var pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
 					var numProcesso = "#rsProc.pc_processo_id#";
 				</cfoutput>
-				if ($('#pcOrientacaoStatus').val() == 5){//se a o status escolhido for tratamento
-					if($('#pcOrientacaoStatus option:selected').text() =='PENDENTE' && $('#pcDataPrevRespAcomp').val() == ''){
-						<cfoutput>var dataResp = '#rsUltimaDataPrevistaResp.ultimaDataPrevistaResp#';</cfoutput>
-					}else{
-						var dataResp = $('#pcDataPrevRespAcomp').val();
-					}
+				
+				if ($('#pcOrientacaoStatus').val() == 5 || $('#pcOrientacaoStatus').val() == 16){//se a o status escolhido for tratamento ou Ponto Suspenso
+					var dataResp = $('#pcDataPrevRespAcomp').val();
 					swalWithBootstrapButtons.fire({//sweetalert2
 					html: logoSNCIsweetalert2(mensagem), 
-
-
 					showCancelButton: true,
 					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
+					cancelButtonText: 'Cancelar!'  
 					}).then((result) => {
 						if (result.isConfirmed) {	
 							setTimeout(function() {	
@@ -4247,7 +4317,7 @@
 					return false;
 				}
 
-				if ($('#pcOrientacaoStatus').val() == 5 & !$('#pcDataPrevRespAcomp').val())
+				if ($('#pcOrientacaoStatus').val() == 5 && !$('#pcDataPrevRespAcomp').val())
 				{   
 					//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
 					toastr.error('Todos os campos devem ser preenchidos!');
