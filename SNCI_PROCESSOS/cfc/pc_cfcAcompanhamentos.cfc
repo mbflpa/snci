@@ -2880,11 +2880,7 @@
 							<div class="col-sm-12">
 								<div class="form-group">
 									<cfif rsProc.pc_num_status neq 6>
-										<cfif rsManifestacaoSalva.recordcount neq 0>
-											<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
-										    <cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
-											<span style = "font-size:11px; color:#e83e8c"><cfoutput>Manifestação salva em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
-										</cfif>
+										<div id="divTextoPosicSalvo"></div>
 										<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui a manifestação do Controle Interno..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
 									<cfelse>
 										<h6 style="color:red;">ORIENTAÇÃO BLOQUEADA. NÃO É PERMITIDO MANIFESTAÇÃO.</h6>
@@ -3172,7 +3168,7 @@
 					var pc_anexo_orientacao_id = '#rsProc.pc_aval_orientacao_id#';
 					var pc_aval_processo = '#rsProc.pc_processo_id#';
 				</cfoutput>
-				
+				mostraDataHoraPosicSalvo(pc_anexo_orientacao_id)
 				
 				// DropzoneJS 2 Demo Code Start
 				Dropzone.autoDiscover = false
@@ -3381,6 +3377,7 @@
 								})//fim ajax
 								.done(function(result) {	
 									$('#modalOverlay').delay(1000).hide(0, function() {
+										mostraDataHoraPosicSalvo(pc_aval_orientacao_id)
 										$('#modalOverlay').modal('hide');
 										toastr.success('Manifestação e anexo(s) salvos com sucesso!');
 									});			
@@ -3659,6 +3656,33 @@
 				
 					
 				
+
+			}
+
+			function mostraDataHoraPosicSalvo(pc_aval_orientacao_id){
+								
+				$.ajax({
+						type: "post",
+						url: "cfc/pc_cfcAcompanhamentos.cfc",
+						data:{
+							method: "dataHoraPosicSalvo",
+							pc_aval_orientacao_id: pc_orientacao_id
+						},
+						async: true
+					})//fim ajax
+					.done(function(result) {
+						$('#divTextoPosicSalvo').html(result)
+					})//fim done
+					.fail(function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+						$('#modal-danger').find('.modal-body').text(thrownError)
+
+					});//fim fail
+					
 
 			}
 
@@ -4021,12 +4045,8 @@
 						<div class="row" style="margin-top:20px;margin:8px;font-size:16px">
 							<div class="col-sm-12">
 								<div class="form-group">
-								    <cfif rsManifestacaoSalva.recordcount neq 0>
-										<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
-										<cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
-										<span style = "font-size:11px; color:#e83e8c"><cfoutput>Manifestação salva em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
-									</cfif>
-									<textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui sua manifestação..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
+									<div id="divTextoPosicSalvo" ></div>
+								    <textarea class="form-control" id="pcPosicAcomp" rows="3" required="" style=""  name="pcPosicAcomp" class="form-control" placeholder="Digite aqui sua manifestação..." ><cfoutput>#rsManifestacaoSalva.pc_aval_posic_texto#</cfoutput></textarea>
 								</div>										
 							</div>
 						</div>
@@ -4138,7 +4158,7 @@
 					var pc_anexo_orientacao_id = '#rsProc.pc_aval_orientacao_id#';
 					var pc_aval_processo = '#rsProc.pc_processo_id#';
 				</cfoutput>
-				
+				mostraDataHoraPosicSalvo(pc_anexo_orientacao_id)
 				
 				// DropzoneJS 2 Demo Code Start
 				Dropzone.autoDiscover = false
@@ -4267,6 +4287,7 @@
 								})//fim ajax
 								.done(function(result) {	
 									$('#modalOverlay').delay(1000).hide(0, function() {
+										mostraDataHoraPosicSalvo(pc_aval_orientacao_id)
 										$('#modalOverlay').modal('hide');
 										toastr.success('Manifestação e anexo(s) salvos com sucesso!');
 									});			
@@ -4496,6 +4517,33 @@
 					});
 				}, 500);	
 				
+
+			}
+
+			function mostraDataHoraPosicSalvo(pc_aval_orientacao_id){
+								
+				$.ajax({
+						type: "post",
+						url: "cfc/pc_cfcAcompanhamentos.cfc",
+						data:{
+							method: "dataHoraPosicSalvo",
+							pc_aval_orientacao_id: pc_orientacao_id
+						},
+						async: true
+					})//fim ajax
+					.done(function(result) {
+						$('#divTextoPosicSalvo').html(result)
+					})//fim done
+					.fail(function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+						$('#modal-danger').find('.modal-body').text(thrownError)
+
+					});//fim fail
+					
 
 			}
 
@@ -4849,9 +4897,24 @@
     </cffunction>
 
 
+	<cffunction name="dataHoraPosicSalvo" access="remote"  hint="Mostra a data/hora e nome do usuário que salvou o posicionamento">
+		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 
+		<cfquery datasource="#application.dsn_processos#" name="rsManifestacaoSalva">
+			Select pc_avaliacao_posicionamentos.*, pc_orgaos.pc_org_sigla, pc_usuarios.pc_usu_nome FROM pc_avaliacao_posicionamentos 
+			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
+			INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
+			WHERE pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
+					and pc_aval_posic_enviado = 0
+		</cfquery>
+		
+		<cfif rsManifestacaoSalva.recordcount neq 0>
+			<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
+			<cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
+			<span style = "font-size:11px; color:#e83e8c"><cfoutput>Manifestação salva em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
+		</cfif>
 
-
+ 	</cffunction>
 
 
 
