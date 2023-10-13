@@ -1,9 +1,9 @@
 <cfprocessingdirective pageencoding = "utf-8">	
 
 
-<cfmail from="mbflpa@yahoo.com.br" to="marceloferreira@correios.com.br" subject="Bem-vindo ao SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+<cfmail from="SNCI@correios.com.br" to="marceloferreira@correios.com.br" subject="Bem-vindo ao SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
     <div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 600px; margin: 0 auto; float: left;">
-       <p style="font-size:20px">SNCI - Processos - SERVIDOR LOCAL</p> 
+       <p style="font-size:20px">SNCI - Processos - SERVIDOR DESENVOLVIMENTO</p> 
         <p>Prezado Usuário,</p>
         <p style="text-align: justify;">Estamos felizes em tê-lo como parte da nossa comunidade no SNCI. Você agora faz parte do nosso sistema de controle interno, onde pode gerenciar e monitorar atividades importantes.</p>
         <p>Para começar, faça login na sua conta usando suas credenciais.</p>
