@@ -297,8 +297,13 @@
 				{
 					extend: 'excel', // Botão de exportação para Excel
 					text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
-					title: 'SNCI_Orientacoes_Pendentes_Acao_Controle_interno_' + d, // Título do arquivo Excel
+					title: 'SNCI_Usuarios_Cadastrados_' + d, // Título do arquivo Excel
 					className: 'btExcel',
+					customize: function( xlsx ) {
+						var sheet = xlsx.xl.worksheets['sheet1.xml'];
+						// Oculta a primeira coluna na exportação
+						$('col:first', sheet).attr('width', 0);
+					}
 				},
 				{// Botão abertura do ctrol-sidebar com os filtros
 					text: '<i class="fas fa-filter fa-2x grow-icon" style="margin-right:30px" data-widget="control-sidebar"></i>',
