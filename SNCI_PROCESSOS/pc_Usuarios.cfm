@@ -323,18 +323,17 @@
 					// Coluna dos cards
 					data: null, // Não há dados associados à coluna
 				},
-				{ data: 'PC_USU_MATRICULA', className: 'matricula-column' }, // Coluna de matrícula
-				{ data: 'PC_USU_NOME', className: 'nome-column' }, // Coluna de nome
-				{ data: 'PC_PERFIL_TIPO_DESCRICAO', className: 'perfil-column' }, // Coluna de perfil
-				{ data: 'PC_ORG_SIGLA', className: 'lotacao-column' }, // Coluna de lotação
-				{ data: "PC_USU_LOGIN" }, // Coluna de login
+				{ data: 'PC_USU_MATRICULA', title: 'Matrícula', className: 'matricula-column' },
+				{ data: 'PC_USU_NOME', title: 'Nome', className: 'nome-column' },
+				{ data: 'PC_PERFIL_TIPO_DESCRICAO', title: 'Perfil', className: 'perfil-column' },
+				{ data: 'PC_ORG_SIGLA', title: 'Lotação', className: 'lotacao-column' },
+				{ data: 'PC_USU_LOGIN', title: 'Login' },
 				{
-					// Coluna de status do usuário
 					data: 'PC_USU_STATUS',
+					title: 'Status',
 					render: function (data) {
 						return data === 'A' ? 'Ativo' : 'Desativado';
-					},
-					
+					}
 				}
 			],
 			createdRow: function (row, data, dataIndex) {
