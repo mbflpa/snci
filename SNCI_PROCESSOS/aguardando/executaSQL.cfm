@@ -1,5 +1,5 @@
 <cfprocessingdirective pageencoding = "utf-8">	
-
+<cfset this.loginRequired="false" />
 
 <cfmail from="SNCI@correios.com.br" to="marceloferreira@correios.com.br" subject="Bem-vindo ao SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
     <div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 600px; margin: 0 auto; float: left;">

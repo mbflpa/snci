@@ -3666,7 +3666,7 @@
 						url: "cfc/pc_cfcAcompanhamentos.cfc",
 						data:{
 							method: "dataHoraPosicSalvo",
-							pc_aval_orientacao_id: pc_orientacao_id
+							pc_aval_orientacao_id: pc_aval_orientacao_id
 						},
 						async: true
 					})//fim ajax
@@ -4527,7 +4527,7 @@
 						url: "cfc/pc_cfcAcompanhamentos.cfc",
 						data:{
 							method: "dataHoraPosicSalvo",
-							pc_aval_orientacao_id: pc_orientacao_id
+							pc_aval_orientacao_id: pc_aval_orientacao_id
 						},
 						async: true
 					})//fim ajax

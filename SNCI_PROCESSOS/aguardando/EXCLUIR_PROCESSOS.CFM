@@ -1,7 +1,7 @@
 
 <cfprocessingdirective pageencoding = "utf-8">	
 
-<cfset taskName = "EnviaEmailTeste"> <!-- Nome da tarefa -->
+<cfset taskName = "EnviaEmailMarcelo"> <!-- Nome da tarefa -->
 <cfschedule
   action="update"
   task="#taskName#"
@@ -11,6 +11,9 @@
   startTime="#timeFormat(now(), 'hh:mm tt')#" 
   interval="once"
   resolveURL="yes"
+  path="E:/LogsCF/PE/"
+  file="EnviaEmailMarcelo2.txt"
+  publish="yes"
 />
 <cfschedule action="list" result="taskQuery">
 <cfdump var="#taskQuery#">
