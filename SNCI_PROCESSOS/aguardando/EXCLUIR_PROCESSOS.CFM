@@ -1,12 +1,12 @@
 
 <cfprocessingdirective pageencoding = "utf-8">	
-
+<cfset rotina = "http://#application.auxsite#/snci/snci_processos/aguardando/executaSQL.cfm">
 <cfset taskName = "EnviaEmailMarcelo"> <!-- Nome da tarefa -->
 <cfschedule
   action="update"
   task="#taskName#"
   operation="httprequest"
-  url="http://desenvolvimentope/snci/snci_processos/aguardando/executaSQL.cfm"
+  url="#rotina#"
   startDate="#dateFormat(now(), 'yyyy/mm/dd')#" 
   startTime="#timeFormat(now(), 'hh:mm tt')#" 
   interval="once"
