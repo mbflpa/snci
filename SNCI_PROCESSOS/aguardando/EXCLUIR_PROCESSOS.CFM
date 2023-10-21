@@ -18,8 +18,8 @@
 <cfschedule action="list" result="taskQuery">
 <cfdump var="#taskQuery#">
 
-<cfobject component = "pc_cfcEmails" name = "pc_cfcEmails"/>
-<cfinvoke component="#pc_cfcEmails#" method="EnviaEmails" returnVariable="sucessoEmail" 
+<cfobject component = "pc_cfcEmails" name = "enviarEmail"/>
+<cfinvoke component="#enviarEmail#" method="EnviaEmails" returnVariable="sucessoEmail" 
     para = "marceloferreira@correios.com.br"
     copiaPara = "marceloferreira@correios.com.br"
     pronomeTratamento = "Senhor(a) Superintendente Estadual da SE/BA"
