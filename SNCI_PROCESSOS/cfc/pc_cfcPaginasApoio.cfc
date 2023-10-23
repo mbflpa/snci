@@ -713,6 +713,50 @@
 		
 		<cfreturn isFeriado>
 	</cffunction>
+
+	<cffunction name="EnviaEmails" access="public" returntype="string" hint="Cria o formado dos e-mails e envia.">
+            
+        <cfargument name="para" type="string" required="true">
+        <cfargument name="copiaPara" type="string" required="false">
+        <cfargument name="pronomeTratamento" type="string" required="true">
+        <cfargument name="texto" type="string" required="true">
+        <cfset to = "#arguments.para#">
+        <cfif application.auxsite neq "intranetsistemaspe">
+            <cfset to = "#application.rsUsuarioParametros.pc_usu_nome#">
+        </cfif>
+        <cfset cc = "">
+        <cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "">
+            <cfset cc = "#arguments.copiaPara#">
+        </cfif>
+		<cftry>
+			<cfmail from="SNCI@correios.com.br" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
+					<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;text-align: center;">
+						<p style="font-size:20px">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</p> 
+					</div> 
+					<cfoutput>
+						<p>#arguments.pronomeTratamento#,</p>
+						<pre style="text-align: justify;text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">#texto#</pre>
+						<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;">
+							<p>Estamos à disposição para prestar informações adicionais a respeito do 
+							assunto, caso seja necessário.</p>
+						
+							<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
+							
+							<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
+						</div>
+					</cfoutput>
+				</div>
+			</cfmail>
+			<cfset sucesso = true>
+			<cfcatch type="any">
+				<cfset sucesso = false>
+			</cfcatch>
+
+			
+    </cftry>
+		<cfreturn #sucesso# />
+    </cffunction>
 		
 
 </cfcomponent>
