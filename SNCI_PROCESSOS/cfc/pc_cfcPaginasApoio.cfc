@@ -717,26 +717,42 @@
 	<cffunction name="EnviaEmails" access="public" returntype="string" hint="Cria o formado dos e-mails e envia.">
             
         <cfargument name="para" type="string" required="true">
-        <cfargument name="copiaPara" type="string" required="false">
+        <cfargument name="copiaPara" type="string" required="false" default="">
         <cfargument name="pronomeTratamento" type="string" required="true">
         <cfargument name="texto" type="string" required="true">
+
         <cfset to = "#arguments.para#">
+		<cfset cc = "">
+		<cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "">
+			<cfset cc = "#arguments.copiaPara#">
+		</cfif> 
+
         <cfif application.auxsite neq "intranetsistemaspe">
-            <cfset to = "#application.rsUsuarioParametros.pc_usu_nome#">
+			<cfif #cc# neq "" >
+				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão avaliado, com cópia para <strong>#cc#</strong> pois são e-mails dos órgãos subordinados ao órgão avaliado que são resposnsáveis por alguma orientação ou proposta de melhoria.">
+			<cfelse>
+				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>. <br>Não iria com cópia para nenhum outro órgão por um ou mais destes motivos:<br>
+- todas as orientações e propostas de melhoria estão sob responsabilidade do órgão avaliado;<br>
+- não há e-mail cadastrado para os órgãos subordinados que são responsáveis pelas orientações e/ou propostas de melhoria;<br>
+- os e-mails cadastrados para os órgãos subordinados que são responsáveis pelas orientações e/ou propostas de melhoria são iguais ao e-mail do órgão avaliado;<br>
+- trata-se de uma distribuição de orientações ou propostas de melhoria, portanto, só é encaminhada ao órgão reponsável.">
+			</cfif>
+			<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
+			<cfset cc = "">
         </cfif>
-        <cfset cc = "">
-        <cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "">
-            <cfset cc = "#arguments.copiaPara#">
-        </cfif>
+
 		<cftry>
 			<cfmail from="SNCI@correios.com.br" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+			    <cfif application.auxsite neq "intranetsistemaspe">
+					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
+				</cfif>
 				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
 					<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;text-align: center;">
 						<p style="font-size:20px">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</p> 
 					</div> 
 					<cfoutput>
-						<p>#arguments.pronomeTratamento#,</p>
-						<pre style="text-align: justify;text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">#texto#</pre>
+						<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#arguments.pronomeTratamento#,</pre>
+						<pre style="text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">#texto#</pre>
 						<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;">
 							<p>Estamos à disposição para prestar informações adicionais a respeito do 
 							assunto, caso seja necessário.</p>

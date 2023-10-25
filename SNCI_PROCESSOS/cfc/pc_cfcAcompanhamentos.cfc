@@ -1418,6 +1418,36 @@
 						)
 				</cfquery>
 
+			<cftry>
+				<!--Informações do órgão responsável-->
+				<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
+					SELECT pc_org_emaiL, pc_org_sigla FROM pc_orgaos
+					WHERE pc_org_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">
+				</cfquery>
+
+				<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
+				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
+			    <cfset pronomeTrat = "Senhor(a) Gestor da #siglaOrgaoResponsavel#">
+				
+				<cfset textoEmail = 'Seu órgão subordinador distribuiu novas Propostas de Melhoria para conhecimento e providências. Favor atentar para o prazo de resposta. 
+
+Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:
+
+<a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a>'>
+							
+				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
+				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
+							para = "#to#"
+							pronomeTratamento = "#pronomeTrat#"
+							texto="#textoEmail#"
+				/>
+				<cfcatch type="any">
+					<cfmail from="SNCI@correios.com.br" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+					</cfmail>
+				</cfcatch>
+			</cftry>
+
 			</cfloop>
 
 			<cfquery datasource="#application.dsn_processos#">
@@ -1463,6 +1493,7 @@
 			<cfset posic_status = rsOrientacao.pc_aval_orientacao_status>
 
 			<cfloop list="#arguments.pcAreasDistribuir#" index="i">
+			    <cfset orgaoResp = i>
 				<!-- Atualização para o primeiro elemento -->
 				<cfif i eq firstItem>
 					<!-- Atualização para a priemira área selecionada -->
@@ -1476,7 +1507,7 @@
 					</cfquery>
 					
 					<!--Insere a manifestação inicial do controle interno para a orientação com a mesma data prevista e status da orientação original do órgão avaliado -->
-					<cfset orgaoResp = '#i#'>
+				
 					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
 						VALUES (<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#',#posic_status#,1)
@@ -1493,7 +1524,7 @@
 					 <cfset insertedIdOrientacao = rsInserirOrientacao.idOrientacao> <!-- Obtém o ID gerado -->
 
 					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
-					<cfset orgaoResp = '#i#'>
+					
 					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
 						VALUES (#insertedIdOrientacao#, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#', #posic_status#,1)
@@ -1509,9 +1540,87 @@
 					
 				</cfif>
 
+			<cftry>
+				<!--Informações do órgão responsável-->
+				<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
+					SELECT pc_org_emaiL, pc_org_sigla FROM pc_orgaos
+					WHERE pc_org_mcu = <cfqueryparam value="#orgaoResp#" cfsqltype="cf_sql_varchar">
+				</cfquery>
+
+				<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
+				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
+			    <cfset pronomeTrat = "Senhor(a) Gestor da #siglaOrgaoResponsavel#">
+				
+				<cfset textoEmail = 'Seu órgão subordinador distribuiu novas orientações para conhecimento e providências. Favor atentar para o prazo de resposta. 
+
+Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e inserir sua resposta:
+
+<a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a>'>
+							
+				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
+				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
+							para = "#to#"
+							pronomeTratamento = "#pronomeTrat#"
+							texto="#textoEmail#"
+				/>
+				<cfcatch type="any">
+					<cfmail from="SNCI@correios.com.br" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+						<cfoutput>Erro rotina "distribuirOrientacoes" de distribuição de orientações: #cfcatch.message#</cfoutput>
+					</cfmail>
+				</cfcatch>
+			</cftry>
+
 			</cfloop>
 
 		</cftransaction>
+
+
+	</cffunction>
+
+	<cffunction name="distribuirOrientacoesTeste" returntype="any" access="remote" hint="Distribui as oreintações para áreas selecionadas pelo órgão avaliado.">
+		<cfargument name="pc_aval_orientacao_id" type="string" required="true" />
+		<cfargument name="pcAreasDistribuir" type="any" required="true" />
+		<cfargument name="pcOrientacaoResposta" type="string" required="true" />
+
+
+			<cfloop list="#arguments.pcAreasDistribuir#" index="i">
+			<cftry>
+			    <cfset orgaoResp = "#i#">
+				
+
+				<!--Informações do órgão responsável-->
+				<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
+					SELECT * FROM pc_orgaos
+					WHERE pc_org_mcu = <cfqueryparam value="#orgaoResp#" cfsqltype="cf_sql_varchar">
+				</cfquery>
+
+				<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
+				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
+			    <cfset pronomeTrat = "Senhor(a) Gestor da #siglaOrgaoResponsavel#">
+				
+				<cfset textoEmail = 'Seu órgão subordinador distribuiu novas orientações e/ou Propostas de Melhoria para conhecimento e providências. Favor atentar para o prazo de resposta. 
+
+Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:
+
+<a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a>'>
+							
+				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
+				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
+							para = "#to#"
+							pronomeTratamento = "#pronomeTrat#"
+							texto="#textoEmail#"
+				/>
+				 <cfcatch type="any">
+       <cfmail from="SNCI@correios.com.br" to="marceloferreira@correios.com.br" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+	   			<cfoutput>#cfcatch.message# <cfdump var ="#rsOrgaoResp#"></cfoutput>
+	   </cfmail>
+	   
+     
+    </cfcatch>
+</cftry>
+			</cfloop>
+
+	
 
 
 	</cffunction>
