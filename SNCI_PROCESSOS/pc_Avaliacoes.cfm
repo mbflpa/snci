@@ -9,7 +9,7 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
   		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>SNCI</title>
-		<link rel="icon" type="image/x-icon" href="dist/img/icone_sistema_standalone_ico.png">
+		<link rel="icon" type="image/x-icon" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">
 	</head>	
 
 	<body id="bodyAvaliacoes" class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">

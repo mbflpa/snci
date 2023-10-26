@@ -20,9 +20,9 @@ applicationtimeout="#createtimespan(0,6,0,0)#">
 		<cfset application.diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
 		<cfset application.diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
 	<cfelse>
-	  	<cfset application.diretorio_anexos = 'D:\SNCI_TESTE\'>
-		<cfset application.diretorio_avaliacoes = 'D:\SNCI_TESTE\'>
-		<cfset application.diretorio_faqs = 'D:\SNCI_TESTE\'>
+	  	<cfset application.diretorio_anexos = 'C:\SNCI_TESTE\'>
+		<cfset application.diretorio_avaliacoes = 'C:\SNCI_TESTE\'>
+		<cfset application.diretorio_faqs = 'C:\SNCI_TESTE\'>
 	</cfif>
 
 

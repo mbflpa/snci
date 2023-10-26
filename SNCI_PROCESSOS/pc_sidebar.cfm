@@ -35,48 +35,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>SNCI</title>
-    <link rel="icon" type="image/x-icon" href="dist/img/icone_sistema_standalone_ico.png">
+    <link rel="icon" type="image/x-icon" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">
 
   
 	<!-- Font Awesome -->
-	<link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
-	<link rel="stylesheet" href="plugins/fontawesome-free/css/fontawesome.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/fontawesome-free/css/all.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/fontawesome-free/css/fontawesome.min.css">
 	<!-- Tempusdominus Bootstrap 4 -->
-	<link rel="stylesheet" href="plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
 	<!-- iCheck -->
-	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
 	
 	<!-- overlayScrollbars -->
-	<link rel="stylesheet" href="plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
 	<!-- Daterange picker -->
-	<link rel="stylesheet" href="plugins/daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/daterangepicker/daterangepicker.css">
 
 	<!-- SweetAlert2 -->
-	<link rel="stylesheet" href="plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.css">
 	<!-- Toastr -->
-	<link rel="stylesheet" href="plugins/toastr/toastr.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/toastr/toastr.css">
 	<!-- Bootstrap4 Duallistbox -->
-	<link rel="stylesheet" href="plugins/bootstrap4-duallistbox/bootstrap-duallistbox.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.css">
 	<!-- dropzonejs -->
-	<link rel="stylesheet" href="plugins/dropzone/min/dropzone.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/dropzone/min/dropzone.min.css">
 	<!-- DataTables -->
-	<link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-	<link rel="stylesheet" href="plugins/datatables-select/css/select.bootstrap4.min.css">
-	<link rel="stylesheet" href="plugins/datatables-scroller/css/scroller.bootstrap4.min.css">
-	<link rel="stylesheet" href="plugins/datatables-searchpanes/css/searchPanes.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-select/css/select.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-scroller/css/scroller.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-searchpanes/css/searchPanes.bootstrap4.min.css">
 	
 	
 	<!-- Select2 -->
-	<link rel="stylesheet" href="plugins/select2/css/select2.min.css">
-	<link rel="stylesheet" href="plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2/css/select2.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
 
-	<link rel="stylesheet" href="dist/css/stylesSNCI.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
 
 
 	<!-- Tour -->
-	<link rel="stylesheet" href="plugins/tour/dist/css/hopscotch.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">
 
 
 
@@ -98,16 +98,16 @@
       <aside class="main-sidebar sidebar-dark-primary elevation-4" style="overflow:hidden!important;">
         <!-- Brand Logo -->
       
-          <a href="index.cfm" class="brand-link" style="background-color:#f4f6f9;height: auto;" >
-            <img src="dist/img/icone_sistema_standalone_ico.png" class="brand-image" style="position:relative;left:-5px;top:2px">
+          <a href="../SNCI_PROCESSOS/index.cfm" class="brand-link" style="background-color:#f4f6f9;height: auto;" >
+            <img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png" class="brand-image" style="position:relative;left:-5px;top:2px">
             <span class="brand-text font-weight-light" style="font-size:20px!important;color:#00416B">SNCI - Processos</span>
           </a>
   
         <!-- Sidebar -->
         <div class="sidebar os-host os-theme-light os-host-overflow os-host-resize-disabled os-host-transition os-host-overflow-y os-host-scrollbar-horizontal-hidden" style="background-color:#00416B;">
           <!-- Sidebar user panel (optional) -->
-          <a href="index.cfm" class="user-panel brand-link user-panel" style="height: auto; display: flex; align-items: center;">
-            <img src="dist/img/avatardefault.png" class="img-circle elevation-2" alt="User Image" style="width: 3rem;">
+          <a href="../SNCI_PROCESSOS/index.cfm" class="user-panel brand-link user-panel" style="height: auto; display: flex; align-items: center;">
+            <img src="../SNCI_PROCESSOS/dist/img/avatardefault.png" class="img-circle elevation-2" alt="User Image" style="width: 3rem;">
             <span class="brand-text font-weight-light" style="font-size: 10px !important; word-wrap: break-word; max-width: calc(100% - 3rem - 10px);"> <!-- Ajuste o valor 10px conforme necessário para o espaçamento -->
               <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#<br>#application.rsUsuarioParametros.pc_usu_login# <br> #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>
             </span>
@@ -154,7 +154,7 @@
                   <cfset id1 = REReplace(id1, "[óòôõ]", "o", "ALL")>
                   <cfset id1 = REReplace(id1, "[úùû]", "u", "ALL")>
                   <li id="#id1#" class="nav-item ">
-                    <a href="##" class="nav-link ">
+                    <a href="../SNCI_PROCESSOS/##" class="nav-link ">
                       <i class="nav-icon fas #pc_controle_acesso_grupo_icone#"></i>
                       <p >
                         #pc_controle_acesso_grupoMenu#
@@ -172,7 +172,7 @@
                           <cfset id2 = REReplace(id2, "[óòôõ]", "o", "ALL")>
                           <cfset id2 = REReplace(id2, "[úùû]", "u", "ALL")>
                           <li id="#id2#" class="nav-item">
-                            <a href="./#pc_controle_acesso_pagina#" class="nav-link ">
+                            <a href="../SNCI_PROCESSOS/./#pc_controle_acesso_pagina#" class="nav-link ">
                               <i class="<cfif #pc_controle_acesso_menu_icone# eq ''>far fa-circle nav-icon<cfelse>fas #pc_controle_acesso_menu_icone# nav-icon</cfif>"></i>
                               <p >#pc_controle_acesso_nomeMenu#</p>
                             </a>
@@ -189,7 +189,7 @@
                           <cfset id3 = REReplace(id3, "[óòôõ]", "o", "ALL")>
                           <cfset id3 = REReplace(id3, "[úùû]", "u", "ALL")>
                           <li id="#id3#" class="nav-item">  
-                              <a href="##" class="nav-link">
+                              <a href="../SNCI_PROCESSOS/##" class="nav-link">
                                 <i class="far <cfif #pc_controle_acesso_subgrupo_icone# eq ''>fa-circle <cfelse>fas #pc_controle_acesso_subgrupo_icone#</cfif> nav-icon"></i>
                                 <p >
                                   #pc_controle_acesso_subgrupoMenu#
@@ -208,7 +208,7 @@
                                     <cfset id4 = REReplace(id4, "[óòôõ]", "o", "ALL")>
                                     <cfset id4 = REReplace(id4, "[úùû]", "u", "ALL")>
                                     <li id="#id4#" class="nav-item">
-                                      <a href="./#pc_controle_acesso_pagina#" class="nav-link">
+                                      <a href="../SNCI_PROCESSOS/./#pc_controle_acesso_pagina#" class="nav-link">
                                         <i class=" <cfif #pc_controle_acesso_menu_icone# eq ''>far fa-circle<cfelse>fas #pc_controle_acesso_menu_icone#</cfif> nav-icon"></i>
                                         <p >#pc_controle_acesso_nomeMenu#</p>
                                       </a>
@@ -232,7 +232,7 @@
                       <cfset id5 = REReplace(id5, "[óòôõ]", "o", "ALL")>
                       <cfset id5 = REReplace(id5, "[úùû]", "u", "ALL")>
                       <li id="#id5#" class="nav-item">
-                        <a href="./#pc_controle_acesso_pagina#" class="nav-link">
+                        <a href="../SNCI_PROCESSOS/./#pc_controle_acesso_pagina#" class="nav-link">
                           <i class="nav-icon fas <cfif #pc_controle_acesso_menu_icone# eq ''>fa-circle<cfelse>#pc_controle_acesso_menu_icone#</cfif>"></i>
                           <p >#pc_controle_acesso_nomeMenu#</p>
                         </a>
@@ -251,13 +251,13 @@
       </aside>
     
     <!-- jQuery -->
-		<script src="plugins/jquery/jquery.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/jquery/jquery.min.js"></script>
 
 		<!-- Bootstrap 4 -->
-		<script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 		<!-- jQuery UI 1.11.4 -->
-		<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/jquery-ui/jquery-ui.min.js"></script>
  
 
 		<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
@@ -266,75 +266,75 @@
 		</script>
 
     <!-- jspdf -->
-		<script src="plugins/jspdf/jspdf.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/jspdf/jspdf.min.js"></script>
 
    <!-- html2pdf-->
-    <script src="plugins/html2pdf/html2pdf.bundle.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/html2pdf/html2pdf.bundle.min.js"></script>
 
  		<!-- Sparkline -->
-		<script src="plugins/sparklines/sparkline.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/sparklines/sparkline.js"></script>
 
 		<!-- daterangepicker -->
-		<script src="plugins/moment/moment.min.js"></script>
-		<script src="plugins/daterangepicker/daterangepicker.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/moment/moment.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/daterangepicker/daterangepicker.js"></script>
 
 		<!-- Tempusdominus Bootstrap 4 -->
-		<script src="plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 
 		<!-- overlayScrollbars -->
-		<script src="plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
 
 		<!-- bs-custom-file-input -->
-		<script src="plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 
 		<!-- Select2 -->
-		<script src="plugins/select2/js/select2.full.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/select2/js/select2.full.min.js"></script>
 
 		<!-- InputMask -->
-		<script src="plugins/inputmask/jquery.inputmask.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/inputmask/jquery.inputmask.min.js"></script>
 
 		<!-- dropzonejs -->
-		<script src="plugins/dropzone/min/dropzone.min.js"></script>
+		<script src="../SNCI_PROCESSOS/plugins/dropzone/min/dropzone.min.js"></script>
 
     <!-- AdminLTE App -->
-		<script src="dist/js/adminlte.js"></script>
+		<script src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
 	
     <!-- jquery-validation -->
-    <script src="plugins/jquery-validation/jquery.validate.min.js"></script>
-    <script src="plugins/jquery-validation/additional-methods.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/jquery-validation/additional-methods.min.js"></script>
 
     <!-- SweetAlert2 -->
-    <script src="plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- Toastr -->
-    <script src="plugins/toastr/toastr.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/toastr/toastr.min.js"></script>
 
     <!-- DataTables  & Plugins -->
-    <script src="plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="plugins/datatables-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-    <script src="plugins/datatables-fixedheader/js/fixedHeader.bootstrap4.min.js"></script>
-    <script src="plugins/datatables-rowreorder/js/dataTables.rowReorder.min.js"></script>
-    <script src="plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <script src="plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <script src="plugins/jszip/jszip.min.js"></script>
-    <script src="plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-    <script src="plugins/datatables-buttons/js/buttons.print.min.js"></script>
-    <script src="plugins/datatables-buttons/js/buttons.colVis.min.js"></script>	
-    <script src="plugins/datatables-select/js/dataTables.select.min.js"></script>	
-    <script src="plugins/datatables-searchpanes/js/dataTables.searchPanes.js"></script>	
-    <script src="plugins/datatables-searchpanes/js/searchPanes.bootstrap4.min.js"></script>	
+    <script src="../SNCI_PROCESSOS/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-fixedheader/js/fixedHeader.bootstrap4.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-rowreorder/js/dataTables.rowReorder.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/jszip/jszip.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>	
+    <script src="../SNCI_PROCESSOS/plugins/datatables-select/js/dataTables.select.min.js"></script>	
+    <script src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/dataTables.searchPanes.js"></script>	
+    <script src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/searchPanes.bootstrap4.min.js"></script>	
 
     
 
     <!-- SNCI -->
-    <script src="dist/js/snciProcesso.js"></script>
+    <script src="../SNCI_PROCESSOS/dist/js/snciProcesso.js"></script>
   
 
     <!-- Tour -->
-    <script src="plugins/tour/dist/js/hopscotch.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/tour/dist/js/hopscotch.min.js"></script>
 
 
    <script language="JavaScript">
@@ -349,7 +349,7 @@
       //fim const sweetalert2
 
       function logoSNCIsweetalert2(mens){
-        const logo= '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
+        const logo= '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
               + '<span class="font-weight-light" style="font-size:20px!important;color:#00416B">SNCI - Processos</span></div>'
               +'<div class="font-weight-light" style="color:#00416B;margin-top:20px">'+ mens + '</div>'
             
