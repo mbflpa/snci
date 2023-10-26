@@ -7,7 +7,7 @@
   		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<!-- Theme style -->
-		<link rel="stylesheet" href="dist/css/adminlte.css">
+		<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
 		
 		
 		
@@ -96,7 +96,7 @@
 
 		<!-- Preloader -->
 		<div class="preloader flex-column justify-content-center align-items-center">
-			<img class="animation__shake" src="dist/img/correios.png"  width="100" >
+			<img class="animation__shake" src="../SNCI_PROCESSOS/dist/img/correios.png"  width="100" >
 			<BR>
 			<span style="font-size:30px">SNCI -  Sistema Nacional de Controle Interno</span>
 			<span style="font-size:20px">AGUARDE...</span>

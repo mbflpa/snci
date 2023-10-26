@@ -39,7 +39,7 @@
 		<div class="wrapper">
 			<!-- Preloader -->
 			<div class="preloader flex-column justify-content-center align-items-center">
-				<img class="animation__shake" src="dist/img/correios.png" alt="AdminLTELogo" width="100" >
+				<img class="animation__shake" src="../SNCI_PROCESSOS/dist/img/correios.png" alt="AdminLTELogo" width="100" >
 				<BR>
 				<span style="font-size:30px">SNCI -  Sistema Nacional de Controle Interno</span>
 				<span style="font-size:20px">AGUARDE...</span>
@@ -53,7 +53,7 @@
 				<div class="content-header">
 					<div class="container-fluid" style="display: flex;justify-content: center;height: 100%;align-items: center;">
 						<div style="position:relative;display:flex;flex-direction:column;">
-						<img src="dist/img/em_construcao.png" width="261"  /><br>
+						<img src="../SNCI_PROCESSOS/dist/img/em_construcao.png" width="261"  /><br>
 						<span style="font-size:30px">Página em Construção</span>
 					</div>
 					</div>
