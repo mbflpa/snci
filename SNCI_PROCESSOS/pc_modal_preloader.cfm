@@ -8,7 +8,11 @@
 
 		<!-- Theme style -->
 		<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
-		
+	    <link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/fontawesome-free/css/all.min.css">
+		<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/fontawesome-free/css/fontawesome.min.css">
+			
 		
 		
     </head>
@@ -101,5 +105,17 @@
 			<span style="font-size:30px">SNCI -  Sistema Nacional de Controle Interno</span>
 			<span style="font-size:20px">AGUARDE...</span>
 		</div>
+
+		<!-- jQuery -->
+		<script src="../SNCI_PROCESSOS/plugins/jquery/jquery.min.js"></script>
+
+		<!-- Bootstrap 4 -->
+		<script src="../SNCI_PROCESSOS/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+		<!-- jQuery UI 1.11.4 -->
+		<script src="../SNCI_PROCESSOS/plugins/jquery-ui/jquery-ui.min.js"></script>
+		 <!-- AdminLTE App -->
+		<script src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
     </body>
+	
 </html>

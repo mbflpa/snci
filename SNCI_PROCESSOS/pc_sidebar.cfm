@@ -71,7 +71,10 @@
 	<!-- Select2 -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2/css/select2.min.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/">
+  <link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/">
+
+	<!-- Theme style -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
 
 
