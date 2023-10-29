@@ -29,7 +29,7 @@ applicationtimeout="#createtimespan(0,6,0,0)#">
 
 
 <cfquery name="qUsuariosSNCIProc" datasource="#application.dsn_processos#">
-	SELECT pc_usuarios.* FROM pc_usuarios WHERE pc_usu_status='A'
+	SELECT pc_usu_login FROM pc_usuarios WHERE pc_usu_status='A'
 </cfquery>
 
 <cfset application.Lista_usuariosCad = UCase(ValueList(qUsuariosSNCIProc.pc_usu_login))>
