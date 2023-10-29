@@ -105,7 +105,9 @@
 			<span style="font-size:30px">SNCI -  Sistema Nacional de Controle Interno</span>
 			<span style="font-size:20px">AGUARDE...</span>
 		</div>
-
+ 		
+		<!-- AdminLTE App -->
+		<script src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
 		<!-- jQuery -->
 		<script src="../SNCI_PROCESSOS/plugins/jquery/jquery.min.js"></script>
 
@@ -114,8 +116,7 @@
 
 		<!-- jQuery UI 1.11.4 -->
 		<script src="../SNCI_PROCESSOS/plugins/jquery-ui/jquery-ui.min.js"></script>
-		 <!-- AdminLTE App -->
-		<script src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
+		
     </body>
 	
 </html>
