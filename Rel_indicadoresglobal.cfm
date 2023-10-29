@@ -1,5 +1,5 @@
 <!--- #se#  === #frmano#<br> --->
-<!--- <cfprocessingdirective pageEncoding ="utf-8"/> --->
+<cfprocessingdirective pageEncoding ="utf-8"/> 
   <!--- <cfif day(now()) lte 10>
 	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Favor aguardar ate o dia 11 do mes para gerar o relatorio de METAS com os dados atualizados ao mes anterior!">
   </cfif> --->
@@ -100,7 +100,7 @@ dtlimit: #dtlimit#<br>
 <cfset gil = gil>  --->
 
 <!--- exibicao em tela --->
-<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' OR ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GOVERNANCA'>
+<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER'>
 	<cfquery name="rsMetas" datasource="#dsn_inspecao#">
 		SELECT Met_Codigo, Met_Ano, Dir_Sigla, Met_SE_STO, Met_SLNC, Met_SLNC_Mes, Met_PRCI, Met_PRCI_Mes, Met_PRCI_Acum, Met_DGCI, Met_SLNC_Acum, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_DGCI_Mes, Met_DGCI_Acum, Met_DGCI_AcumPeriodo 
 		FROM Metas INNER JOIN Diretoria ON Met_Codigo = Dir_Codigo
@@ -117,7 +117,7 @@ dtlimit: #dtlimit#<br>
 </cfif>
 
 
-<!--- Criação do arquivo CSV --->
+<!--- Criaï¿½ï¿½o do arquivo CSV --->
 <cfset sdata = dateformat(now(),"YYYYMMDDHH")>
 <cfset diretorio =#GetDirectoryFromPath(GetTemplatePath())#>
 <cfset slocal = #diretorio# & 'Fechamento\'>
@@ -131,10 +131,10 @@ dtlimit: #dtlimit#<br>
 	</cfif>
 </cfloop>
 <cffile action="write" addnewline="no" file="#slocal##sarquivo#" output=''>
-<cfset auxcab = 'RESULTADO EM RELAÇÃO À META ' & #ucase(cabec)#>
+<cfset auxcab = 'RESULTADO EM RELAÃ‡ÃƒO Ã€ META ' & #ucase(cabec)#>
 <cffile action="Append" file="#slocal##sarquivo#" output=';;#auxcab#'>
 <cffile action="Append" file="#slocal##sarquivo#" output=';PRCI;;;;;SLNC;;;;;DGCI;;;;;'>
-<cffile action="Append" file="#slocal##sarquivo#" output='SE;Meta Mensal;Realizado;Resultado Mensal;Acumulado Realizado;Resultado Acumulado Realizado;Meta Mensal;Realizado;Resultado Mensal;Acumulado Realizado;Resultado Acumulado Realizado;Meta Mensal;Realizado;Resultado Mensal;Acumulado Realizado;Resultado Acumulado Realizado;Resultado em Relação à Meta Mensal'>
+<cffile action="Append" file="#slocal##sarquivo#" output='SE;Meta Mensal;Realizado;Resultado Mensal;Acumulado Realizado;Resultado Acumulado Realizado;Meta Mensal;Realizado;Resultado Mensal;Acumulado Realizado;Resultado Acumulado Realizado;Meta Mensal;Realizado;Resultado Mensal;Acumulado Realizado;Resultado Acumulado Realizado;Resultado em RelaÃ§Ã£o Ã  Meta Mensal'>
 <!--- <cfset auxRazao = (rsMetas.Met_SLNC/12)> --->
 <!--- <cfset auxRazao = numberFormat((rsMetas.Met_SLNC/12),999.0)>  --->
 <!--- <cfset auxRazao = rsMetas.Met_SLNC_Mes> --->
@@ -283,9 +283,9 @@ dtlimit: #dtlimit#<br>
     <cfset permeta = numberFormat((DGCIAM/DGCIm)*100,999.0)>
     
     <cfif cla lt 10>
-	  <cfset cl = '0' & cla & 'º'>
+	  <cfset cl = '0' & cla & 'Âº'>
 	<cfelse>
-	  <cfset cl = cla & 'º'>
+	  <cfset cl = cla & 'Âº'>
 	</cfif>
     <tr>
       <td class="exibir"><div align="center">#cl#</div></td>
@@ -458,7 +458,7 @@ frmmes: #frmmes#  mesantes: #mesantes# day(now()): #day(now())#<br>
     <cffile action="Append" file="#slocal##sarquivo#" output=';Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;;'>
     <!---    <CFSET RESMETnac = numberFormat((DGCIAPnac/DGCInac)*100,999.0)> --->
     
-    <cffile action="Append" file="#slocal##sarquivo#" output=';#PRCInac#%;#PRCIAPnac#%;#PRCIRes#;#prciacurealnac#%;#prciacurealnacres#;#SLNCnac#%;#SLNCAPnac#%;#SLNCRes#;#slncacurealnac#%;#slncacurealnacres#;#DGCInac#%;#DGCIAPnac#%;#DGCIRes#;#dgciacurealnac#%;#dgciacurealnacres#;#RESMETnac#%'>
+<cffile action="Append" file="#slocal##sarquivo#" output=';#PRCInac#%;#PRCIAPnac#%;#PRCIResNac#;#prciacurealnac#%;#prciacurealnacres#;#SLNCnac#%;#SLNCAPnac#%;#SLNCResNac#;#slncacurealnac#%;#slncacurealnacres#;#DGCInac#%;#DGCIAPnac#%;#DGCIResNac#;#dgciacurealnac#%;#dgciacurealnacres#;#RESMETnac#%'>
   </cfoutput>
 </table>
 <!--- fim exibicao --->

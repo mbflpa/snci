@@ -157,7 +157,7 @@
 <cfquery name="rsResumo" datasource="#dsn_inspecao#">
     SELECT Dir_Codigo, Dir_Sigla, Dir_Descricao, Andt_Unid, Und_Descricao, Andt_tpunid, TUN_Descricao, Andt_Mes, Andt_Insp, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, STO_Descricao, Andt_Uteis, Andt_Area, Andt_DTEnvio, Andt_NomeOrgCondutor, Andt_Prazo, Andt_DTRefer 
 	FROM (Tipo_Unidades INNER JOIN ((Andamento_Temp INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo) INNER JOIN (Diretoria INNER JOIN Unidades ON Dir_Codigo = Und_CodDiretoria) ON Andt_Unid = Und_Codigo) ON TUN_Codigo = Andt_tpunid) 
-	WHERE Dir_Codigo ='#form.lis_se#' AND 
+	WHERE Andt_CodSE ='#form.lis_se#' AND 
 	<cfif form.lis_grpace is "un">
 		Andt_Resp in (1,14,2,15,17,18,20)
 	<cfelseif form.lis_grpace is "ge">
@@ -179,7 +179,7 @@
 <cfset total=0>
 
  <cfif rsResumo.recordcount lte 0>
-  Não Há dados a serem relatados para o período informado!<br>
+  Nï¿½o Hï¿½ dados a serem relatados para o perï¿½odo informado!<br>
   <input type="button" class="botao" onClick="window.close()" value="Fechar">
   <cfabort> 
 </cfif> 
@@ -495,7 +495,7 @@ function valida_form(a,b) {
     FilePath = ExpandPath( "./Fechamento/" & sarquivo ),
     Query = rsXLS,            
 	ColumnList = "Mes,Und_Descricao,Andt_NomeOrgCondutor,Andt_Insp,Andt_Grp,Andt_Item,AndtDTEnvio,AndtDPosic,STO_Descricao,AndtDTRefer,Andt_Uteis,Andt_Prazo",
-	ColumnNames = "MÊS,UNIDADE,ÓRGÃO CONDUTOR,RELATÓRIO,GRUPO,ITEM,DT.ENVIO,DT.AÇÃO,AÇÃO,DT.REFERÊNCIA,DIAS ÚTEIS,PRAZO",
+	ColumnNames = "MÃŠS,UNIDADE,Ã“RGÃƒO CONDUTOR,RELATÃ“RIO,GRUPO,ITEM,DT.ENVIO,DT.AÃ‡ÃƒO,AÃ‡ÃƒO,DT.REFERÃŠNCIA,DIAS ÃšTEIS,PRAZO",
 	SheetName = "Prazo_Respostas"
     ) />
 

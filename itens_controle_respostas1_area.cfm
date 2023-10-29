@@ -78,7 +78,7 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
 	<cfset aux_obs = Replace(aux_obs,'>','','All')>		
 	<!---	 <cfset aux_obs = Replace(aux_obs,'&','','All')>
 		     <cfset aux_obs = Replace(aux_obs,'%','','All')> --->
-    <cfset pos_obs = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #aux_obs# & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+    <cfset pos_obs = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #aux_obs# & CHR(13) & 'ResponsÃ¡vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
   '#pos_obs#'
   </cfif>
   , Pos_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
@@ -88,7 +88,7 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
   , Pos_DtUltAtu = CONVERT(char, GETDATE(), 120)
   WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem# 
   </cfquery>
-  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Responsï¿½vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
  <cfquery datasource="#dsn_inspecao#">
     insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#url.reop#', convert(char, getdate(), 108), '#and_obs#')
  </cfquery>
@@ -112,7 +112,7 @@ str = str.substr(0,str.length-1);
 return str;
 } 
 
-//Validação de campos vazios em formulário
+//Validaï¿½ï¿½o de campos vazios em formulï¿½rio
 function valida_form(form) {
  var frm = document.forms[form];
  var quant = frm.elements.length;
@@ -130,9 +130,9 @@ function valida_form(form) {
  }
 }
 
-//Função que abre uma página em Popup
+//Funï¿½ï¿½o que abre uma pï¿½gina em Popup
 function popupPage() {
-<cfoutput>  //página chamada, seguida dos parâmetros número, unidade, grupo e item
+<cfoutput>  //pï¿½gina chamada, seguida dos parï¿½metros nï¿½mero, unidade, grupo e item
 var page = "itens_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
 </cfoutput>
 windowprops = "location=no,"
@@ -143,7 +143,7 @@ window.open(page, "Popup", windowprops);
 
 <html>
 <head>
-<title>Sistema de Acompanhamento das Respostas das Inspeções</title>
+<title>Sistema de Acompanhamento das Respostas das Inspeï¿½ï¿½es</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
@@ -153,7 +153,7 @@ window.open(page, "Popup", windowprops);
 <table width="800" height="450">
 <tr>
 	  <td width="96%" valign="top">
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 	<form name="form1" method="post" onSubmit="return valida_form(this.name)" action="<cfoutput>#CurrentPage#?#CGI.QUERY_STRING#</cfoutput>">
   <table width="98%" align="center">
     <tr>
@@ -185,7 +185,7 @@ window.open(page, "Popup", windowprops);
       <td width="81" bgcolor="eeeeee">Unidade      </td>
       <td width="71" bgcolor="f7f7f7"><cfoutput>#URL.Unid#</cfoutput></td>
       <td width="205" bgcolor="f7f7f7"><cfoutput><strong>#rsMOd.Und_Descricao#</strong></cfoutput></td>
-      <td width="45" bgcolor="eeeeee">Órgão Subordinador</td>
+      <td width="45" bgcolor="eeeeee">ï¿½rgï¿½o Subordinador</td>
       <td width="138" bgcolor="f7f7f7"><cfoutput><strong>#rsMOd.Und_CodReop#</strong></cfoutput></td>
     </tr>
 	<tr class="exibir">
@@ -221,7 +221,7 @@ window.open(page, "Popup", windowprops);
       <td valign="middle" bgcolor="eeeeee" class="exibir">Resposta &Aacute;rea </td>
       <td colspan="4" bgcolor="f7f7f7">
 	  <cfif Not IsDefined("FORM.MM_UpdateRecord") And Trim(qResposta.Pos_Parecer) neq ''><textarea name="H_obs" cols="120" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.Pos_Parecer#</cfoutput></textarea></cfif>
-	  <textarea name="observacao" cols="120" rows="6" nome="Observação" vazio="false" wrap="VIRTUAL" class="form" id="observacao"></textarea>
+	  <textarea name="observacao" cols="120" rows="6" nome="Observaï¿½ï¿½o" vazio="false" wrap="VIRTUAL" class="form" id="observacao"></textarea>
 	  </td>
     </tr>
     <tr>
@@ -238,7 +238,7 @@ window.open(page, "Popup", windowprops);
   <input type="hidden" name="scodresp" id="scodresp" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
 </form>
 
-<!--- Fim Área de conteúdo --->
+<!--- Fim ï¿½rea de conteï¿½do --->
 	  </td>
   </tr>
 </table>

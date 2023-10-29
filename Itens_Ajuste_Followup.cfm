@@ -1,6 +1,8 @@
 <!--- <cfoutput>#dtlimit#</cfoutput> --->
+<cfprocessingdirective pageEncoding ="utf-8"/> 
  <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>Sistema Nacional de Controle Interno</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">

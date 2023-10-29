@@ -1,5 +1,5 @@
-   <cfparam name="opcao" default="vazio"> 
-   <cfset vAcesso = true>
+<cfparam name="opcao" default="vazio"> 
+  <cfset vAcesso = true>
    <cfif Not ListContains(Lista_SINS,UCase(cgi.REMOTE_USER))>
    <table width="100%" border="0" cellpadding="0" cellspacing="0">
      <tr>
@@ -128,9 +128,6 @@
 			<cfinclude template="Itens_Analise_Manifestacao_ref.cfm">
 	  	</cfcase>
 		
-		<cfcase value="inspecao17">
-	  		<cfinclude template="itens_Gestao_Andamento_ref.cfm">
-	  	</cfcase>
 		<cfcase value="inspecao18">
 	  		<cfinclude template="itens_controle_revisliber_ref.cfm">
 	  	</cfcase>
@@ -142,6 +139,10 @@
 		<cfcase value="inspecao20">
 	  		<cfinclude template="Rel_Indicadores_Solucao_Ref.cfm">
 	  	</cfcase>
+		
+		<cfcase value="inspecao17">
+			<cfinclude template="itens_Gestao_Andamento_ref.cfm">
+		</cfcase>
 		
 		<cfcase value="inspecao21">
 	  		<cfinclude template="Rel_ClassifInspecao_Ref.cfm">

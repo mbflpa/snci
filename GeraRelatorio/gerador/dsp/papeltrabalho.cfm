@@ -91,7 +91,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 
   <cfset emReavaliacaoReavaliado = "#rsItemEmReanalise.recordcount#" + "#rsItemReanalisado.recordcount#" >
 
-<!---InspeÁıes NA = n„o avaliadas, ER = em reavaliaÁ„o, RA =reavaliado, CO = concluÌda--->
+<!---inspe√ßoes NA = n√£o avaliadas, ER = em reavalia√ß√£o, RA =reavaliado, CO = concluÔøΩda--->
   <cfquery name="rsInspecaoNaoFinalizada" datasource="#dsn_inspecao#">
         SELECT INP_Situacao, INP_DtUltAtu, Pos_Situacao_Resp  FROM Inspecao
         LEFT JOIN  ParecerUnidade ON INP_NumInspecao = Pos_Inspecao
@@ -100,7 +100,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
   </cfquery>
 
 
-  <!--- Valida itens individuais (todos os N√O VERIFICADO e os N¬O EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1 ) --->
+  <!--- Valida itens individuais (todos os N√£o VERIFICADO e os N√£o EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1 ) --->
   <cfif isDefined("form.acao") and '#form.acao#' is 'validarItem'>
 	
 	<cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
@@ -115,18 +115,18 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
    
    
 
-    <!---InÌcio do processo de liberaÁ„o da avaliaÁ„o--->
-			    <!---Veirifica se esta inspeÁ„o possui algum item Em Revis„o --->	
+    <!---InÔøΩcio do processo de libera√ß√£o da avaliaÔøΩÔøΩo--->
+			    <!---Veirifica se esta inspe√ß√£o possui algum item Em RevisÔøΩo --->	
 				<cfquery name="qInspecaoLiberada" datasource="#dsn_inspecao#">
 					SELECT * FROM ParecerUnidade 
 					WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 0
 				</cfquery>
-				<!---Veirifica se esta inspeÁ„o possui algum item em rean·lise --->
+				<!---Veirifica se esta inspe√ß√£o possui algum item em Rean√°lise --->
 				<cfquery datasource="#dsn_inspecao#" name="qVerifEmReanalise">
 					SELECT RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao 
 					WHERE (RTRIM(RIP_Recomendacao)='S' OR RTRIM(RIP_Recomendacao)='R') and RIP_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' 
 				</cfquery>
-				<!---Verifica se esta inspeÁ„o possui algum item n„o avaliado (todos os N√O VERIFICADO e os N¬O EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1) --->
+				<!---Verifica se esta inspe√ß√£o possui algum item n√£o avaliado (todos os N√£o VERIFICADO e os N√£o EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1) --->
 				<cfquery datasource="#dsn_inspecao#" name="qVerifValidados">
 					SELECT RIP_Resposta, RIP_Recomendacao 
 					FROM ((Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade) 
@@ -138,11 +138,11 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 					WHERE ((RTRIM(RIP_Resposta)= 'E' AND Itn_ValidacaoObrigatoria=1) OR RTRIM(RIP_Resposta)= 'V') AND   RTRIM(RIP_Recomendacao) IS NULL AND RIP_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' and RIP_Unidade='#qryPapelTrabalho.RIP_Unidade#' 
 				</cfquery>
    
-				<!---InÌcio - Se n„o existirem itens em revis„o e n„o existirem itens em reavaliaÁ„o,
-				     inicia o processo de liberaÁ„o de todos os itens--->	
+				<!---InÔøΩcio - Se n√£o existirem itens em revis√£o e n√£o existirem itens em reavalia√ß√£o,
+				     inicia o processo de libera√ß√£o de todos os itens--->	
 					<cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0>
 
-						<!---Salva a matricula do gestor na tabela Inspecao para sinalisar o gestor que liberou a verificaÁ„o --->
+						<!---Salva a matricula do gestor na tabela Inspecao para sinalisar o gestor que liberou a verificaÔøΩÔøΩo --->
 						<cfquery datasource="#dsn_inspecao#">
 							UPDATE Inspecao SET INP_Situacao = 'CO', INP_UserName = '#CGI.REMOTE_USER#', INP_DtEncerramento = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, INP_DTUltAtu = CONVERT(DATETIME, getdate(), 103)
 							WHERE INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
@@ -157,7 +157,17 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 							INNER JOIN Unidades ON (Und_TipoUnidade = Itn_TipoUnidade) AND (Pos_Unidade = Und_Codigo)
 							WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 11
 						</cfquery>
-						<cfloop query="rs11">
+						<!--- <cfquery name="rs11" datasource="#dsn_inspecao#">
+							SELECT Und_TipoUnidade, Und_Centraliza, Itn_TipoUnidade, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Itn_Pontuacao, Itn_Classificacao, Itn_PTC_Seq
+							FROM Itens_Verificacao 
+							INNER JOIN (ParecerUnidade 
+							INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+							inner join inspecao on inspecao.INP_NumInspecao = Pos_Inspecao) ON (right(Pos_Inspecao,4)= Itn_Ano) and (Itn_NumItem = Pos_NumItem) 
+							AND (Itn_NumGrupo = Pos_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) and (INP_Modalidade = Itn_Modalidade)
+							WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 11
+						</cfquery> ---> 
+
+							<cfloop query="rs11">
 								<cfset auxposarea = rs11.Pos_Area>
 								<cfset auxnomearea = rs11.Pos_NomeArea>
 								
@@ -246,10 +256,10 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 								</cfquery>
 							</cfloop>
                      
-						<!---Fim -Se existirem itens em liberaÁ„o, executa a rotina para mudanÁa do status de todos os itens
-							em liberaÁ„o para n„o respondido--->
+						<!---Fim -Se existirem itens em libera√ß√£o, executa a rotina para mudanÔøΩa do status de todos os itens
+							em libera√ß√£o para n√£o respondido--->
 
-						<!--- InÌcio - e-mail autom·tico por unidade --->
+						<!--- InÔøΩcio - e-mail automÔøΩtico por unidade --->
 							<cfquery name="rsEmail" datasource="#dsn_inspecao#">
 								SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Und_TipoUnidade, Und_Descricao, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Und_CodReop, INP_DtInicInspecao
 								FROM Inspecao INNER JOIN (Unidades INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade) ON (INP_NumInspecao = Pos_Inspecao) AND (INP_Unidade = Pos_Unidade)
@@ -273,7 +283,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 											<cfset emailunid = #rsPosUnidEmail.Und_Email#>
 											<!--- adquirir o email do OrgaoSubordiador --->
 											<cfquery name="rsReopunidEmail" datasource="#dsn_inspecao#">
-											SELECT Rep_Email FROM Reops WHERE Rep_Codigo = '#rsEmail.Pos_Unidade#'
+											  SELECT Rep_Email FROM Reops WHERE Rep_Codigo = '#rsEmail.Und_CodReop#'
 											</cfquery>
 											<cfset emailreopunid = #rsReopunidEmail.Rep_Email# >
 										</cfif>
@@ -281,13 +291,13 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 										<cfif rsEmail.Pos_Area neq rsEmail.Pos_Unidade and emailcdd eq "">
 										<!--- adquirir o email dos registro do Pos_Area --->
 											<cfquery name="rsPosAreaEmail" datasource="#dsn_inspecao#">
-											SELECT Und_Descricao, Und_Email FROM Unidades WHERE Und_Codigo = '#rsEmail.Pos_Area#'
+											SELECT Und_Descricao, Und_Email, Und_CodReop FROM Unidades WHERE Und_Codigo = '#rsEmail.Pos_Area#'
 											</cfquery>
 											<cfset emailcdd = #rsPosAreaEmail.Und_Email#>
 
 											<!--- adquirir o email do OrgaoSubordiador --->
 											<cfquery name="rsReopcddEmail" datasource="#dsn_inspecao#">
-											SELECT Rep_Email FROM Reops WHERE Rep_Codigo = '#rsEmail.Pos_Area#'
+											SELECT Rep_Email FROM Reops WHERE Rep_Codigo = '#rsPosAreaEmail.Und_CodReop#'
 											</cfquery>
 											<cfset emailreopcdd = #rsReopcddEmail.Rep_Email# >
 										</cfif>
@@ -310,57 +320,57 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 									<cfset sdestina = #sdestina# & ';' & #emailreopcdd#>
 									</cfif>
 								    
-
-									<cfset sdestina = #sdestina# & ';' & #qAcesso.Usu_Email# & ';' & 'gilvanm@correios.com.br'>
-								
+									<!--- adquirir o email do SCOI da SE --->
+<!--- <cfset sdestina = #sdestina# & ';' & #qAcesso.Usu_Email# & ';' & 'edimir@correios.com.br;danilloviana@correios.com.br;gilvanm@correios.com.br'> --->								
 									<cfif findoneof("@", trim(sdestina)) eq 0>
 										<cfset sdestina = "gilvanm@correios.com.br">
 									</cfif>
-			 							
-									<cfset assunto = 'Relatorio de Controle Interno - ' & #trim(rsEmail.Und_Descricao)# & ' - Avaliacao de Controle Interno ' & '#qryPapelTrabalho.INP_NumInspecao#'>
+                  <cfset sdestina = #sdestina# & ';' & #qAcesso.Usu_Email# & ';teciogomes@correios.com.br;gilvanm@correios.com.br'>
+
+									<cfset assunto = 'Relatorio de Controle Interno - ' & #trim(rsEmail.Und_Descricao)# & ' - Avaliacao de Controle Interno ' & #qryPapelTrabalho.INP_NumInspecao#>
 									<cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
-										Mensagem autom·tica. N„o precisa responder!<br><br>
+										Mensagem autom√°tica. N√£o precisa responder!<br><br>
 										<strong>
-										Prezado(a) Gerente do(a) #trim(Ucase(rsEmail.Und_Descricao))#, informamos que est· disponÌvel na intranet o RelatÛrio de Controle Interno: N∞ '#qryPapelTrabalho.INP_NumInspecao#', realizada nessa Unidade na Data: #dateformat(rsEmail.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br><br>
+										Prezado(a) Gerente do(a) #trim(Ucase(rsEmail.Und_Descricao))#, informamos que est√° dispon√≠vel na intranet o Relat√≥rio de Controle Interno: N¬∫ '#qryPapelTrabalho.INP_NumInspecao#', realizada nessa Unidade na Data: #dateformat(rsEmail.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br><br>
 
-									&nbsp;&nbsp;&nbsp;Solicitamos acess·-lo para registro de sua resposta, conforme orientaÁıes a seguir:<br><br>
+									&nbsp;&nbsp;&nbsp;Solicitamos acess√°-lo para registro de sua resposta, conforme orienta√ß√µes a seguir:<br><br>
 
-									&nbsp;&nbsp;&nbsp;a) Informar a Justificativa para ocorrÍncia da falha: o que ocasionou o Problema (CAUSA); <br>
+									&nbsp;&nbsp;&nbsp;a) Informar a Justificativa para ocorr√™ncia da falha: o que ocasionou o Problema (CAUSA); <br>
 
-									&nbsp;&nbsp;&nbsp;b) Informar o Plano de AÁıes adotado para regularizaÁ„o da falha detectada, com prazo de implementaÁ„o;<br>
+									&nbsp;&nbsp;&nbsp;b) Informar o Plano de A√ß√µes adotado para regulariza√ß√£o da falha detectada, com prazo de implementa√ß√£o;<br>
 
-									&nbsp;&nbsp;&nbsp;c) Anexar no sistema os Comprovantes de regularizaÁ„o da situaÁ„o encontrada e/ou das AÁıes implementadas (em PDF).<br><br>
+									&nbsp;&nbsp;&nbsp;c) Anexar no sistema os Comprovantes de regulariza√ß√£o da situa√ß√£o encontrada e/ou das A√ß√µes implementadas (em PDF).<br><br>
 
-									&nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias ˙teis, contados a partir da data de entrega do RelatÛrio. <br>
-									&nbsp;&nbsp;&nbsp;O N„o cumprimento desse prazo ensejar· comunicaÁ„o ao Ûrg„o subordinador dessa unidade.<br><br>
+									&nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias √∫teis, contados a partir da data de entrega do Relat√≥rio. <br>
+									&nbsp;&nbsp;&nbsp;O N√£o cumprimento desse prazo ensejar√° comunica√ß√£o ao √≥rg√£o subordinador dessa unidade.<br><br>
 
-									&nbsp;&nbsp;&nbsp;Acesse o SNCI endereÁo: 'http://intranetsistemaspe/snci/rotinas_inspecao.cfm' ou clique no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">RelatÛrio de Controle Interno.</a><br><br>
+									&nbsp;&nbsp;&nbsp;Acesse o SNCI endere√ßo: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relat√≥rio de Controle Interno.</a><br><br>
 
-									&nbsp;&nbsp;&nbsp;Atentar para as orientaÁıes deste e-mail para registro de sua manifestaÁ„o no SNCI. Respostas incompletas ser„o devolvidas para complementaÁ„o. <br><br>
+									&nbsp;&nbsp;&nbsp;Atentar para as orienta√ß√µes deste e-mail para registro de sua manifesta√ß√£o no SNCI. Respostas incompletas ser√£o devolvidas para complementa√ß√£o. <br><br>
 
-									&nbsp;&nbsp;&nbsp;Em caso de d˙vidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereÁo eletrÙnico:  #qAcesso.Usu_Email#.<br><br>
+									&nbsp;&nbsp;&nbsp;Em caso de d√∫vidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endere√ßo eletr√¥nico:  #qAcesso.Usu_Email#.<br><br>
 
 									<table>
 									<tr>
 									<td><strong>Unidade : #rsEmail.Pos_Unidade# - #rsEmail.Und_Descricao#</strong></td>
 									</tr>
 									<tr>
-									<td><strong>RelatÛrio: #rsEmail.Pos_Inspecao#</strong></td>
+									<td><strong>Relat√≥rio: #rsEmail.Pos_Inspecao#</strong></td>
 									</tr>
 									<tr>
 									<td><strong>------------------------------------------</strong></td>
 									</tr>
 									</table>
 									<br>
-									&nbsp;&nbsp;&nbsp;Desde j· agradecemos a sua atenÁ„o.
+									&nbsp;&nbsp;&nbsp;Desde j√° agradecemos a sua aten√ß√£o.
 									</strong>
 									</cfmail>
 								</cfif>
 							</cfoutput>
-						<!--- Fim - e-mail autom·tico por unidade --->
+						<!--- Fim - e-mail automÔøΩtico por unidade --->
 					</cfif>
-				<!---Fim do processo de liberaÁ„o de todos os itens--->	
-				<!--- InÌcio VerificaÁ„o dos registros que est„o na situaÁ„o 14(N„o Respondido) na tabela ParecerUnidade --->
+				<!---Fim do processo de libera√ß√£o de todos os itens--->	
+				<!--- InÔøΩcio VerificaÔøΩÔøΩo dos registros que estÔøΩo na situaÔøΩÔøΩo 14(n√£o Respondido) na tabela ParecerUnidade --->
 					<cfquery name="qNaoRespondido" datasource="#dsn_inspecao#">
 						SELECT Pos_Inspecao, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp FROM ParecerUnidade
 						WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 14
@@ -380,9 +390,9 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 							</cfquery>
 						</cfif>
 					</cfoutput>
-				<!--- fim VerificaÁaı dos registros que est„o na situaÁ„o 14(N„o Respondido) na tabela ParecerUnidade --->
+				<!--- fim VerificaÔøΩaÔøΩ dos registros que estÔøΩo na situaÔøΩÔøΩo 14(n√£o Respondido) na tabela ParecerUnidade --->
 					
-			<!---Fim do prcesso de liberaÁ„o da avaliaÁ„o--->
+			<!---Fim do prcesso de libera√ß√£o da avaliaÔøΩÔøΩo--->
 
 
     <script language="javascript" >
@@ -391,11 +401,9 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
     </script>
     
 
-
-
   </cfif>
 
-  <!--- Valida todos os itens de uma avaliaÁ„o sem itens NC --->
+  <!--- Valida todos os itens de uma avaliaÔøΩÔøΩo sem itens NC --->
   <cfif isDefined("form.acao") and '#form.acao#' is 'validarSemNC'>
 	  <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
 	  <cfif listfind('#qryPapelTrabalho.Itn_PTC_Seq#','10')>
@@ -416,7 +424,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
       
       <script language="javascript" >
         window.opener.location.reload() ;
-        alert('AvaliaÁ„o sem Itens "N√O CONFORME" Validada com sucesso!');
+        alert('Avalia√ß√£o sem Itens "n√£o CONFORME" Validada com sucesso!');
         <cfoutput>
           window.open(window.location,'_self');
         </cfoutput>
@@ -425,14 +433,14 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
   </cfif>
 
   
-<!---Veirifica se esta inspeÁ„o possui algum item Em Revis„o --->	
+<!---Veirifica se esta inspe√ß√£o possui algum item Em RevisÔøΩo --->	
 	<cfquery name="qInspecaoEmRevisao" datasource="#dsn_inspecao#">
 		SELECT * FROM ParecerUnidade 
 		WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 0
 	</cfquery>
 
   <cfset semNCvalidado = false>
-   <!---Verifica se È uma verifcaÁ„o n„o tem itens n„o conforme e se foi validada--->
+   <!---Verifica se ÔøΩ uma verifcaÔøΩÔøΩo n√£o tem itens n√£o conforme e se foi validada--->
   <cfquery datasource="#dsn_inspecao#" name="rsSemNC" >
 			SELECT Count(RIP_NumInspecao) as total, Count(CASE WHEN LTRIM(RTRIM(RIP_Recomendacao))='V' THEN 1 END) AS validado
       ,Count(CASE WHEN LTRIM(RTRIM(RIP_Resposta))='N' THEN 1 END) AS itemNC, Count(RIP_MatricAvaliador) as totalAvaliadores
@@ -441,7 +449,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
   </cfquery>
 
 
-  <!---FIM - Verifica se È uma verificaÁ„o sem itens n„o conforme--->
+  <!---FIM - Verifica se ÔøΩ uma verificaÔøΩÔøΩo sem itens n√£o conforme--->
   <cfif "#rsSemNC.total#" eq "#rsSemNC.validado#" >
     <cfset semNCvalidado = true>
   </cfif>
@@ -457,11 +465,11 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
   </cfquery>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="pt-br">
 <head>
 <title>Sistema Nacional de Controle Interno</title>
 <link href="../../../css.css" rel="stylesheet" type="text/css" />
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <cfif structKeyExists(url,'pg') and '#url.pg#' eq 'controle' and "#rsItemEmReanalise.recordcount#" neq 0>
     <meta http-equiv="refresh" content="60">
 </cfif>
@@ -474,13 +482,13 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 
   <script language="javascript" >
    
-    //captura a posiÁ„o do scroll (usado nos botıes que chamam outras p·ginas)
+    //captura a posiÔøΩÔøΩo do scroll (usado nos botÔøΩes que chamam outras p√°ginas)
     //e salva no sessionStorage
     function capturaPosicaoScroll() {
       sessionStorage.setItem('scrollpos', document.body.scrollTop);
     }
 
-    //apÛs o onload recupera a posiÁ„o do scroll armazenada no sessionStorage e reposiciona-o conforme ˙ltima localizaÁ„o
+    //apÔøΩs o onload recupera a posiÔøΩÔøΩo do scroll armazenada no sessionStorage e reposiciona-o conforme ÔøΩltima localizaÔøΩÔøΩo
     window.onload = function () {
       var scrollpos = sessionStorage.getItem('scrollpos');
       if (scrollpos) window.scrollTo(0, scrollpos);
@@ -488,7 +496,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
       capturaPosicaoScroll();
     };
 
-    //ao fechar, atualiza a p·gina de controle de verificaÁıes
+    //ao fechar, atualiza a p√°gina de controle de verificaÔøΩÔøΩes
     window.onbeforeunload = function () {
       window.opener.location.reload();
     }
@@ -530,7 +538,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 
     }
 
-    //para bot„o voltar ao topo
+    //para botÔøΩo voltar ao topo
     window.onscroll = function () {
       scrollFunction()
     };
@@ -603,7 +611,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
       }
 
     }
-    //fim script bot„o voltar ao topo
+    //fim script botÔøΩo voltar ao topo
 
 
   </script>
@@ -624,7 +632,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
 
       <div id="mainDiv" align="right" class="noprint">
         <div id="subDiv">
-        <a onClick="scrollToY(0, 10000, 'easeInOutSine');" style="cursor:pointer"><img   alt="Ir para o topo da p·gina" src="../../../figuras/topo.png" width="50"   border="0" ></img>
+        <a onClick="scrollToY(0, 10000, 'easeInOutSine');" style="cursor:pointer"><img   alt="Ir para o topo da p√°gina" src="../../../figuras/topo.png" width="50"   border="0" ></img>
         <br>
         <span style="background-color:#fff;color:darkblue;position:relative;left:-8px;top:-7px">Topo</span></a>
         </div>
@@ -632,7 +640,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
       <table border="0" widtd="100%">
         <cfif qryPapelTrabalho.recordcount is 0>
         <tr>
-          <td  valign="baseline" bordercolor="999999" bgcolor="" class="red_titulo"><div align="center"><span class="style2">Caro colaborador n&atilde;o h&aacute; registros para AvaliaÁ„o solicitada</span></div></td>
+          <td  valign="baseline" bordercolor="999999" bgcolor="" class="red_titulo"><div align="center"><span class="style2">Caro colaborador n&atilde;o h&aacute; registros para Avalia√ß√£o solicitada</span></div></td>
         </tr>
       </table>
         <cfabort>
@@ -665,9 +673,9 @@ z-index:1000;visibility:hidden;position:absolute;" >
             <td width="663" colspan="6" valign="top" bordercolor="999999" bgcolor="" scope="row">
 			<table width="100%" border="0">
               <tr>
-                <td width="25%" bordercolor="999999"> <div align="center">Classifica&ccedil;&atilde;o Inicial:</div></td>
+                <td width="25%" bordercolor="999999"> <div align="center">Classifica√ß√£o Inicial:</div></td>
                 <td width="25%" bordercolor="999999"><div align="left"><cfoutput>#auxclaini#</cfoutput></div></td>
-                <td width="23%" bordercolor="999999"> <div align="center">Classifica&ccedil;&atilde;o Atual:</div></td>
+                <td width="23%" bordercolor="999999"> <div align="center">Classifica√ß√£o Atual:</div></td>
                 <td width="27%" bordercolor="999999"><div align="left"><cfoutput>#auxclaatu#</cfoutput></div></td>
               </tr>
             </table>
@@ -686,28 +694,28 @@ z-index:1000;visibility:hidden;position:absolute;" >
             <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">N&ordm; do Relat&oacute;rio:</div></th>
             <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="justify"><cfoutput>#Num_Insp#</cfoutput>
                     <cfif '#rsSituacoes.recordCount#' neq 0 and '#rsSemNC.totalAvaliadores#' neq 0>
-                      <cfif '#rsInspecaoNaoFinalizada.recordcount#' eq 0 and rsVerifValidados.recordcount eq 0 and rsQuatEmRevisao.recordcount eq 0>
-                        <cfset dataHora = '#DateFormat(qryPapelTrabalho.INP_DtUltAtu,"DD/MM/YYYY")#'>
-                        <span style="font-family:arial;font-size:12px;color:blue"><strong>AVALIA&Ccedil;&Atilde;O LIBERADA</strong></span> <span style="font-family:arial;font-size:10px;color:blue"> (por: <cfoutput>#rsLiberadaValidadaPor.Usu_Apelido# - em: #dataHora#)</cfoutput></span>
-                        <cfif structKeyExists(url,'pg') and '#url.pg#' eq 'controle' >
-                          <script>
-                                  var mens = 'Avalia&ccedil;&atilde;o de Controle liberada para Manifesta&ccedil;&atilde;o da unidade:\n<cfoutput>#qryPapelTrabalho.Und_Descricao#</cfoutput>\n\nLibera&ccedil;&atilde;o realizada por:\n<cfoutput>#trim(rsLiberadaValidadaPor.Usu_Apelido)#</cfoutput> em <cfoutput>#dataHora#</cfoutput>.'; 
-                                    alert(mens);
-                                </script>
-                        </cfif>
-                        <cfelse>
-                        <span class="noprint" style="font-family:arial;font-size:12px;color:red"><strong>AVALIA&Ccedil;&Atilde;O N&Atilde;O LIBERADA</strong></span> <span class="noprint" style="font-family:arial;font-size:10px;color:red"> (Ainda existem itens EM REVIS&Atilde;O ou EM REAN&Aacute;LISE, REANALISADOS, N&Atilde;O VERIFICADO ou N&Atilde;O EXECUTA sem valida&ccedil;&atilde;o.)</span>
+                        <cfif '#rsInspecaoNaoFinalizada.recordcount#' eq 0 and rsVerifValidados.recordcount eq 0 and rsQuatEmRevisao.recordcount eq 0>
+                          <cfset dataHora = '#DateFormat(qryPapelTrabalho.INP_DtUltAtu,"DD/MM/YYYY")#'>
+                          <span style="font-family:arial;font-size:12px;color:blue"><strong>AVALIA√á√ÉO LIBERADA</strong></span> <span style="font-family:arial;font-size:10px;color:blue"> (por: <cfoutput>#rsLiberadaValidadaPor.Usu_Apelido# - em: #dataHora#)</cfoutput></span>
+                          <cfif structKeyExists(url,'pg') and '#url.pg#' eq 'controle' >
+                            <script>
+                                    var mens = 'Avalia√ß√£o de Controle liberada para Manifesta√ß√£o da unidade:\n<cfoutput>#qryPapelTrabalho.Und_Descricao#</cfoutput>\n\nLibera√ß√£o realizada por:\n<cfoutput>#trim(rsLiberadaValidadaPor.Usu_Apelido)#</cfoutput> em <cfoutput>#dataHora#</cfoutput>.'; 
+                                      alert(mens);
+                                  </script>
+                          </cfif>
+                      <cfelse>
+                          <span class="noprint" style="font-family:arial;font-size:12px;color:red"><strong>AVALIA√á√ÉO N√ÉO LIBERADA</strong></span> <span class="noprint" style="font-family:arial;font-size:10px;color:red"> (Ainda existem itens EM REVIS√ÉO ou EM REAN√ÅLISE, REANALISADOS, N√ÉO VERIFICADO ou N√ÉO EXECUTA sem valida√ß√£o.)</span>
                       </cfif>
                     </cfif>
                     <cfif '#semNCvalidado#' is false and '#emReavaliacaoReavaliado#' eq 0 and '#rsSemNC.itemNC#' eq 0 and "#rsSemNC.totalAvaliadores#" neq 0>
-                      <span class="noprint" style="font-family:arial;font-size:12px;color:red"><strong>AVALIA«√O SEM ITENS "N&Atilde;O CONFORME"</strong></span> <span class="noprint" style="font-family:arial;font-size:12px;color:red;"> - Prezado Gestor, ap&oacute;s confer&ecirc;ncia de todos os itens desta AvaliaÁ„o, valide-a clicando no bot&atilde;o no final desta p&aacute;gina.</span>
+                      <span class="noprint" style="font-family:arial;font-size:12px;color:red"><strong>AVALIA√á√ÉO SEM ITENS "N√ÉO CONFORME"</strong></span> <span class="noprint" style="font-family:arial;font-size:12px;color:red;"> - Prezado Gestor, ap√≥s confer√™ncia de todos os itens desta Avalia√ß√£o, valide-a clicando no bot&atilde;o no final desta p&aacute;gina.</span>
                       <cfelse>
                       <cfif '#rsSemNC.itemNC#' eq 0 and '#semNCvalidado#' is true and "#rsSemNC.totalAvaliadores#" neq 0>
-                        <span style="font-family:arial;font-size:12px;color:blue"><strong>AVALIA«√O SEM ITENS "N&Atilde;O CONFORME" VALIDADA</strong></span> <span style="font-family:arial;font-size:10px;color:blue"> (por: <cfoutput>#rsLiberadaValidadaPor.Usu_Apelido#)</cfoutput></span>
+                        <span style="font-family:arial;font-size:12px;color:blue"><strong>AVALIA√á√ÉO SEM ITENS "N√ÉO CONFORME" VALIDADA</strong></span> <span style="font-family:arial;font-size:10px;color:blue"> (por: <cfoutput>#rsLiberadaValidadaPor.Usu_Apelido#)</cfoutput></span>
                       </cfif>
                     </cfif>
                     <cfif #rsItemEmReanalise.recordcount# neq 0>
-                      <div style="margin-bottom:10px"><span style="font-family:arial;margin-right:2px;background:red;color:#fff;padding:3px;font-size:14px;">EM REAN&Aacute;LISE PELO INSPETOR:&nbsp;</span><cfoutput query="rsItemEmReanalise">
+                      <div style="margin-bottom:10px"><span style="font-family:arial;margin-right:2px;background:red;color:#fff;padding:3px;font-size:14px;">EM REAN√ÅLISE PELO INSPETOR:&nbsp;</span><cfoutput query="rsItemEmReanalise">
                           <button class="botaoCadReanalise botaoPT" style="position:relative;top:3px" onClick="location.href='###rsItemEmReanalise.RIP_NumGrupo#.#rsItemEmReanalise.RIP_NumItem#'" type="button">#rsItemEmReanalise.RIP_NumGrupo#.#rsItemEmReanalise.RIP_NumItem#</button>
                       </cfoutput></div>
                     </cfif>
@@ -731,12 +739,28 @@ z-index:1000;visibility:hidden;position:absolute;" >
           <cfset numGrav = 0>
           <cfset muitoGrav = 0>
           <cfset CP = 0>
+          <cfoutput>	
+           <!--- 
+            <cfdump  var="#qryPapelTrabalho#">
+            <cfabort>
+            --->
+						<cfquery dbtype="query" name="rsLink">
+							SELECT GRP_CODIGO, ITN_NUMITEM FROM qryPapelTrabalho order by GRP_CODIGO, ITN_NUMITEM
+						</cfquery>
+            <div class="noprint" align="center" style="background:##5d5e63">
+						<cfloop query="rsLink"> 
+              <a href="##GI#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#">[#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#]&nbsp;</a>
+<!---            <button onClick="location.href='##GI#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#'" type="button">#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#</button> --->
+            </cfloop>
+          </div>  
+        </cfoutput>
           <cfoutput query="qryPapelTrabalho" group="Grp_Codigo">
             <tr>
               <td valign="top" bordercolor="999999" bgcolor="" scope="row"><label class="labelcell"> </label>
                   <div align="left"></div></td>
               <th valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">GRUPO: #Grp_Codigo#</div></th>
               <td colspan="7" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify"><strong>#Grp_Descricao#</strong></div></td>
+        
             </tr>
             <cfoutput>
               <tr>
@@ -744,11 +768,11 @@ z-index:1000;visibility:hidden;position:absolute;" >
               </tr>
               <tr>
                 <td valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
-                <!---   ID para ‚ncora     --->
+                <!---   ID para ÔøΩncora     --->
 				<cfset grp = Grp_Codigo>
 				<cfset Ite = Itn_NumItem>
                 <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div id="#Grp_Codigo#.#Itn_NumItem#" align="left">Item: #grp#.#ite#</div></th>
-                <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"><strong>#Itn_Descricao#</strong></div></td>
+                <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"><strong>#Itn_Descricao#</strong></div><a name="GI#Grp_Codigo#.#Itn_NumItem#"></td>
               </tr>
              <tr>
 			 <cfset auxpontua = qryPapelTrabalho.Itn_Pontuacao>
@@ -758,9 +782,9 @@ z-index:1000;visibility:hidden;position:absolute;" >
 				 <cfset auxclassif = qryPapelTrabalho.Pos_ClassificacaoPonto>
 			 </cfif>
                 <td valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
-                <!---   ID para ‚ncora     --->
-                <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div id="#Grp_Codigo#.#Itn_NumItem#" align="left">Relev&acirc;ncia Ponto: </div></th>
-                <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Pontua&ccedil;&atilde;o<strong>:&nbsp; #auxpontua# &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>Classifica&ccedil;&atilde;o<strong>: &nbsp;#auxclassif#</strong></div></td>
+                <!---   ID para ÔøΩncora     --->
+                <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div id="#Grp_Codigo#.#Itn_NumItem#" align="left">Relev√¢ncia Ponto: </div></th>
+                <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Pontua√ß√£o<strong>:&nbsp; #auxpontua# &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</strong>Classifica√ß√£o<strong>: &nbsp;#auxclassif#</strong></div></td>
               </tr> 
               <cfif RIP_Resposta neq 'E'>
                 <tr>
@@ -779,7 +803,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
 				     <cfset numReincInsp = Left(RIP_ReincInspecao,2) & '.' & Mid(RIP_ReincInspecao,3,4) & '/' & Right(RIP_ReincInspecao,4)>
                     <tr class="red_titulo">
                       <td valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
-                      <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left" class="style2">Reincid&ecirc;ncia:</div></th>
+                      <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left" class="style2">Reincid√™ncia:</div></th>
                       <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><span class="style2">#numReincInsp#&nbsp;-&nbsp;#RIP_ReincGrupo#.#RIP_ReincItem#</span></td>
                     </tr>
                   </cfif>
@@ -801,7 +825,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                   <cfset recom = Replace(recom,"-----------------------------------------------------------------------------------------------------------------------","<BR>-----------------------------------------------------------------------------------------------------------------------<BR>" ,"All")>
                   <tr>
                     <td valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left" class="labelcell"></div></td>
-                    <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Orienta&ccedil;&otilde;es:</div></th>
+                    <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Orienta√ß√µes:</div></th>
                     <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row">#recom#</td>
                   </tr>
                 </cfif>
@@ -820,12 +844,12 @@ z-index:1000;visibility:hidden;position:absolute;" >
         SELECT Pos_Situacao_Resp, Pos_NCISEI, Pos_NCISEI, STO_Codigo, STO_Descricao, STO_Cor FROM ParecerUnidade INNER JOIN Situacao_Ponto ON STO_Codigo = Pos_Situacao_Resp WHERE Pos_Unidade ='#qryPapelTrabalho.RIP_Unidade#' and Pos_NumGrupo ='#qryPapelTrabalho.Grp_Codigo#' and Pos_NumItem='#qryPapelTrabalho.Itn_NumItem#' and Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#'
                 </cfquery>
                 <td valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left" class="labelcell"></div></td>
-                <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Avalia&ccedil;&atilde;o:</div></th>
+                <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Avalia√ß√£o:</div></th>
                 <cfset SEI = "#trim(qSituacao.Pos_NCISEI)#">
                 <cfset SEI = "#left(SEI,5)#" & '.' & "#mid(SEI,6,6)#" & '/' & "#mid(SEI,12,4)#" & '-' & "#right(SEI,2)#">
                 <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><strong <cfif #RIP_Resposta# eq 'N'>style="color:red"</cfif>>#avaliacao#
                       <cfif '#trim(qSituacao.Pos_NCISEI)#' neq ''>
-                        <span style="color:red">com NCI - N∞ SEI: #SEI#</span>
+                        <span style="color:red">com NCI - NÔøΩ SEI: #SEI#</span>
                       </cfif>
                   </strong>
                     <cfquery name="qAvaliador" datasource="#dsn_inspecao#">
@@ -840,7 +864,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
               <cfif RIP_Resposta eq 'N' or '#TRIM(RIP_Recomendacao)#' neq ''>
                 <tr class="noprint">
                   <td valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left" class="labelcell"></div></td>
-                  <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Situa&ccedil;&atilde;o:</div></th>
+                  <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left">Situa√ß√£o:</div></th>
                   <td colspan="2" ><cfif '#qSituacao.recordcount#' neq 0>
                       <cfif '#qSituacao.STO_Codigo#' neq 0 and '#qSituacao.STO_Codigo#' neq 11>
                         <div style="margin-bottom:10px">
@@ -856,10 +880,10 @@ z-index:1000;visibility:hidden;position:absolute;" >
                     </cfif>
                       <span class="noprint" style="background:###TRIM(qSituAcao.STO_Cor)#;padding:2px;color:##fff">
                       <cfif '#TRIM(RIP_Recomendacao)#' eq 'S'>
-                        <div ><span style="font-family:arial;background:red;padding:2px;color:##fff">EM REAN&Aacute;LISE PELO INSPETOR</span></div>
+                        <div ><span style="font-family:arial;background:red;padding:2px;color:##fff">EM REAN√ÅLISE PELO INSPETOR</span></div>
                         <div class="noprint" align="center" style="margin-top:10px;float: left;"> <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?cancelar=s&pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&tpunid=#qryPapelTrabalho.TUN_Codigo#&modal=#qryPapelTrabalho.INP_Modalidade#',800,600)">
-                          <div><img alt="Cancelar Rean&Aacute;LISE do item" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
-                          <div style="color:darkred;position:relative;font-size:12px">Cancelar Rean&aacute;lise</div>
+                          <div><img alt="Cancelar Rean√°LISE do item" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
+                          <div style="color:darkred;position:relative;font-size:12px">Cancelar Rean√°lise</div>
                         </a> </div>
                       </cfif>
                       <cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores')>
@@ -898,18 +922,18 @@ z-index:1000;visibility:hidden;position:absolute;" >
                 <td colspan="2"><!---                           <cfif '#rsSemNC.itemNC#' neq 0  and '#semNCvalidado#' is false and  '#TRIM(RIP_Recomendacao)#' neq 'S' and  ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores') and #trim(RIP_MatricAvaliador)# neq '' and structKeyExists(url,'pg') and '#url.pg#' eq 'controle'> 
                                   <div class="noprint" align="center" style="margin-top:10px;float: left;">
                                         <a style="cursor:pointer;"  onClick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#',700,380)">
-                                        <div><img alt="Enviar p/ Rean·lise do Inspetor ou Validar Rean·lise" src="../../../figuras/reavaliar.png" width="25"   border="0" ></img></div>
-                                        <div style="color:darkred;position:relative;font-size:12px"><cfif '#TRIM(RIP_Recomendacao)#' eq 'R'>Validar Rean·lise<cfelse>Reanalisar</cfif></div></a>	
+                                        <div><img alt="Enviar p/ Rean√°lise do Inspetor ou Validar Rean√°lise" src="../../../figuras/reavaliar.png" width="25"   border="0" ></img></div>
+                                        <div style="color:darkred;position:relative;font-size:12px"><cfif '#TRIM(RIP_Recomendacao)#' eq 'R'>Validar Rean√°lise<cfelse>Reanalisar</cfif></div></a>	
                                   </div>
       
                           </cfif>--->
                     <cfif ('#qSituacao.Pos_Situacao_Resp#' eq 0 or '#qSituacao.Pos_Situacao_Resp#' eq 11 or '#qSituacao.recordcount#' eq 0 or '#rsVerifValidados.recordcount#' neq 0 or '#rsSemNC.itemNC#' eq 0 or rsQuatEmRevisao.recordcount neq 0) and  '#TRIM(RIP_Recomendacao)#' neq 'S' and  ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores') and #trim(RIP_MatricAvaliador)# neq '' and structKeyExists(url,'pg') and '#url.pg#' eq 'controle'  >
                       <cfif '#rsInspecaoNaoFinalizada.recordcount#' neq 0 or '#rsVerifValidados.recordcount#' neq 0 or '#rsSemNC.itemNC#' eq 0 or rsQuatEmRevisao.recordcount neq 0>
                         <div class="noprint" align="center" style="margin-top:10px;float: left;"> <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&tpunid=#qryPapelTrabalho.TUN_Codigo#&modal=#qryPapelTrabalho.INP_Modalidade#',800,600)">
-                          <div><img alt="Enviar p/ Rean&Aacute;LISE do Inspetor ou Validar Rean&aacute;lise" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
+                          <div><img alt="Enviar p/ Rean√°lise do Inspetor ou Validar Rean√°lise" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">
                             <cfif '#TRIM(RIP_Recomendacao)#' eq 'R'>
-                              Validar Rean&aacute;lise
+                              Validar Rean√°lise
                               <cfelse>
                               Reanalisar
                             </cfif>
@@ -917,13 +941,13 @@ z-index:1000;visibility:hidden;position:absolute;" >
                         </a> </div>
                         <cfif  (RIP_Resposta eq 'V' or (RIP_Resposta eq 'E' and '#Itn_ValidacaoObrigatoria#' eq 1)) and '#TRIM(RIP_Recomendacao)#' eq '' and '#rsSemNC.itemNC#' neq 0>
                           <cfif '#qSituacao.Pos_Situacao_Resp#' le 0 and '#rsQuatEmRevisao.quantEmRevisao#' le 0 and '#rsItemEmReanalise.recordcount#' le 0 and '#rsItemReanalisado.recordcount#' le 0 and '#rsVerifValidados.recordcount#' eq '1' >
-                            <div class="noprint" align="center" style="margin-top:10px;margin-left:60px;float:left;"> <a style="cursor:pointer;"  onclick="if(confirm('AtenÁ„o! ApÛs a validaÁ„o, esta AvaliaÁ„o ser· liberada e n„o ser· possÌvel revisar outros itens.\n\nClique em OK se todos os itens CONFORME e N√O EXECUTA j· tiverem sido revisados, caso contr·rio, clique em Cancelar e realize a revis„o dos itens.')){document.formPT.acao.value = 'validarItem';document.formPT.grupo.value = '#qryPapelTrabalho.Grp_Codigo#';document.formPT.item.value = '#qryPapelTrabalho.Itn_NumItem#';document.formPT.submit();}">
-                              <div><img alt="Validar AvaliaÁ„o" src="../../../figuras/checkVerde.png" width="25" border="0" /></div>
+                            <div class="noprint" align="center" style="margin-top:10px;margin-left:60px;float:left;"> <a style="cursor:pointer;"  onclick="if(confirm('Aten√ß√£o! Ap√≥s a valida√ß√£o, esta Avalia√ß√£o ser√° liberada e n√£o ser√° poss√≠vel revisar outros itens.\n\nClique em OK se todos os itens CONFORME e N√£o EXECUTA j√° tiverem sido revisados, caso contr√°rio, clique em Cancelar e realize a revis√£o dos itens.')){document.formPT.acao.value = 'validarItem';document.formPT.grupo.value = '#qryPapelTrabalho.Grp_Codigo#';document.formPT.item.value = '#qryPapelTrabalho.Itn_NumItem#';document.formPT.submit();}">
+                              <div><img alt="Validar Avalia√ß√£o" src="../../../figuras/checkVerde.png" width="25" border="0" /></div>
                               <div style="color:darkred;position:relative;font-size:12px">Validar</div>
                             </a> </div>
                             <cfelse>
-                            <div class="noprint" align="center" style="margin-top:10px;margin-left:60px;float:left;"> <a style="cursor:pointer;"  onclick="if(confirm('Deseja validar a Avalia&ccedil;&atilde;o deste item?')){document.formPT.acao.value = 'validarItem';document.formPT.grupo.value = '#qryPapelTrabalho.Grp_Codigo#';document.formPT.item.value = '#qryPapelTrabalho.Itn_NumItem#';document.formPT.submit();}">
-                              <div><img alt="Validar Avalia&ccedil;&atilde;o" src="../../../figuras/checkVerde.png" width="25" border="0" /></div>
+                            <div class="noprint" align="center" style="margin-top:10px;margin-left:60px;float:left;"> <a style="cursor:pointer;"  onclick="if(confirm('Deseja validar a Avalia√ß√£o deste item?')){document.formPT.acao.value = 'validarItem';document.formPT.grupo.value = '#qryPapelTrabalho.Grp_Codigo#';document.formPT.item.value = '#qryPapelTrabalho.Itn_NumItem#';document.formPT.submit();}">
+                              <div><img alt="Validar Avalia√ß√£o" src="../../../figuras/checkVerde.png" width="25" border="0" /></div>
                               <div style="color:darkred;position:relative;font-size:12px">Validar</div>
                             </a> </div>
                           </cfif>
@@ -933,12 +957,12 @@ z-index:1000;visibility:hidden;position:absolute;" >
                         <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:60px" >
                           <cfif '#qSituacao.Pos_Situacao_Resp#' eq 0 and '#rsQuatEmRevisao.quantEmRevisao#' eq 1 and '#rsItemEmReanalise.recordcount#' eq 0 and '#rsItemReanalisado.recordcount#' eq 0 and '#rsVerifValidados.recordcount#' eq '0'>
                             <!---                                       <cfset M = M> --->
-                            <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Aten&ccedil;&atilde;o! ApÛs a revis„o deste item, esta Avalia&ccedil;&atilde;o ser· liberada e n„o ser· possÌvel revisar outros itens.\n\nClique em OK se todos os itens CONFORME e N√O EXECUTA j· tiverem sido revisados, caso contr·rio, clique em Cancelar e realize a revis„o dos itens.')){
+                            <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Aten√£o! Ap√≥s a revis√£o deste item, esta Avalia√ß√£o ser√° liberada e n√£o ser√° poss√≠vel revisar outros itens.\n\nClique em OK se todos os itens CONFORME e N√ÉO EXECUTA j√° tiverem sido revisados, caso contr√°rio, clique em Cancelar e realize a revis√£o dos itens.')){
                                          window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#','_self');}">
                             <cfelse>
                             </a>
                           </cfif>
-                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Aten&ccedil;&atilde;o! ApÛs a revis„o deste item, esta Avalia&ccedil;&atilde;o ser· liberada e n„o ser· possÌvel revisar outros itens.\n\nClique em OK se todos os itens CONFORME e N√O EXECUTA j· tiverem sido revisados, caso contr·rio, clique em Cancelar e realize a revis„o dos itens.')){
+                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Aten√£o! Ap√≥s a revis√£o deste item, esta Avalia√ß√£o ser√° liberada e n√£o ser√° poss√≠vel revisar outros itens.\n\nClique em OK se todos os itens CONFORME e N√ÉO EXECUTA j√° tiverem sido revisados, caso contr√°rio, clique em Cancelar e realize a revis√£o dos itens.')){
                                          window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#','_self');}"><a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#','_self')">
                           <div ><img  alt="Revisar" src="../../../figuras/revisar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">Revisar</div>
@@ -1018,7 +1042,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
     </table>
         <cfif ('#semNCvalidado#' is false) and ('#emReavaliacaoReavaliado#' eq 0) and ('#rsSemNC.itemNC#' eq 0)>
         <div align="center">
-		<input name="submit" type="submit" type="button" class="botao" onClick="if(confirm('Deseja validar esta Avalia&ccedil;&atilde;o sem itens N√O CONFORME?\n\nTodos os itens foram analisados?')){document.formPT.acao.value = 'validarSemNC';}" value="Validar Avalia&ccedil;&atilde;o sem Itens N„o Conforme"></div>
+		<input name="submit" type="submit" type="button" class="botao" onClick="if(confirm('Deseja validar esta Avalia√ß√£o sem itens N√ÉO CONFORME?\n\nTodos os itens foram analisados?')){document.formPT.acao.value = 'validarSemNC';}" value="Validar Avalia√ß√£o sem Itens N√£o Conforme"></div>
       </cfif>
 					
   </form>

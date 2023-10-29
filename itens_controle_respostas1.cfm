@@ -1,11 +1,13 @@
+
 <cfprocessingdirective pageEncoding ="utf-8"/>  
+
 <!--- <cfdump var="#form#"> <cfdump var="#session#"> --->
 <!---  <cfdump var="#url#">  --->
  
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
-</cfif>      
+</cfif>     
 <cfset houveProcSN = 'N'>
 <cfif not isDefined("Form.Submit")>
 	<cfset numncisei = "">
@@ -28,7 +30,7 @@
 
 <cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
 
-<cfif (grpacesso neq 'GESTORES') and (grpacesso neq 'DESENVOLVEDORES') and (grpacesso neq 'GESTORMASTER') and (grpacesso neq 'ANALISTAS') and (grpacesso neq 'GOVERNANCA')>
+<cfif (grpacesso neq 'GESTORES') and (grpacesso neq 'DESENVOLVEDORES') and (grpacesso neq 'GESTORMASTER') and (grpacesso neq 'ANALISTAS')>
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>   
 </cfif>                 
@@ -1096,13 +1098,13 @@
 			<strong>
 			   Ao Gestor do(a) #nomedestino#. <br><br><br>
 
-	&nbsp;&nbsp;&nbsp;Para conhecimento deste Orgao.<br><br>
+	&nbsp;&nbsp;&nbsp;Para conhecimento deste Órgão.<br><br>
 
 	&nbsp;&nbsp;&nbsp;Comunicamos que há pontos de Controle Interno "Em Tratamento" de manifestação/Solução.<br><br>
 
 	&nbsp;&nbsp;&nbsp;Unidade: #FORM.unid# - #rsMod.Und_Descricao#, Avaliação: #form.ninsp#, Grupo: #form.Ngrup#, Item: #form.Nitem# e Data de Previsão Solução: #DateFormat(dtnovoprazo,"DD/MM/YYYY")#.<br><br>
 
-	&nbsp;&nbsp;&nbsp;O registro da manifestação estão disponível no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório Item Em Tratamento.</a><br><br>
+	&nbsp;&nbsp;&nbsp;O registro da manifestação está disponível no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório Item Em Tratamento.</a><br><br>
 
 	&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
 	</strong>
@@ -1111,8 +1113,8 @@
   </cfif>
   <cfif Form.frmResp is 3 or Form.frmResp is 12 or Form.frmResp is 13 or Form.frmResp is 25>
   <cfoutput>
-     <cflocation url="Pacin_ClassificacaoUnidades.cfm?&pagretorno=itens_controle_respostas1.cfm&Unid=#Unid#&Ninsp=#Ninsp#&Ngrup=#Ngrup#&Nitem=#Nitem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&reop=#reop#&vlrdec=#vlrdec#&situacao=#Form.frmResp#&posarea=&modal=">
-	 </cfoutput>
+     <cflocation url="Pacin_ClassificacaoUnidades.cfm?&pagretorno=itens_controle_respostas1.cfm&Unid=#Unid#&Ninsp=#Ninsp#&Ngrup=#Ngrup#&Nitem=#Nitem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&selstatus=#selstatus#&StatusSE=#StatusSE#&reop=#reop#&vlrdec=#vlrdec#&situacao=#Form.frmResp#&posarea=&modal=">
+	</cfoutput>
   </cfif>  
 </cfif>
 <!---  --->
@@ -1175,7 +1177,7 @@ left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidad
 
 <cfif trim(qResposta.TNC_ClassifInicio) eq ''>
   <cfoutput>
-     <cflocation url="Pacin_ClassificacaoUnidades.cfm?&pagretorno=itens_controle_respostas1.cfm&Unid=#Unid#&Ninsp=#Ninsp#&Ngrup=#Ngrup#&Nitem=#Nitem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&reop=#reop#&vlrdec=#vlrdec#&situacao=#situacao#&posarea=#posarea#&modal=#modal#">
+     <cflocation url="Pacin_ClassificacaoUnidades.cfm?&pagretorno=itens_controle_respostas1.cfm&Unid=#Unid#&Ninsp=#Ninsp#&Ngrup=#Ngrup#&Nitem=#Nitem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&selstatus=#selstatus#&StatusSE=#StatusSE#&reop=#reop#&vlrdec=#vlrdec#&situacao=#situacao#&posarea=#posarea#&modal=#modal#">
 	 </cfoutput>
 </cfif>
 	 
@@ -1341,7 +1343,7 @@ left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidad
 <head>
 <title>Sistema Nacional de Controle Interno</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <script type="text/javascript" src="ckeditor\ckeditor.js"></script>
 
 <script type="text/javascript">
@@ -2288,7 +2290,7 @@ window.open(page, "Popup", windowprops);
 		<input type="hidden" name="dias90decorridos" id="dias90decorridos" value="#dateformat(DateAdd( "d", 90, now()),"DD/MM/YYYY")#">
 	</cfoutput>
 <cfset halbtgeral =''> 
-<cfif resp eq 3 or grpacesso eq 'GOVERNANCA'>
+<cfif resp eq 3>
 <cfset halbtgeral ='disabled'>
 </cfif>	
     <tr>
@@ -2516,9 +2518,9 @@ window.open(page, "Popup", windowprops);
 		   <cfset numsei = trim(SEI_NumSEI)>
 		  <cfset numsei = left(numsei,5) & '.' & mid(numsei,6,6) & '/' & mid(numsei,12,4) & '-' & right(numsei,2)>
           <tr bgcolor="f7f7f7">
-			<td colspan="5" bgcolor="eeeeee" valign="left" class="exibir"><strong>N.SEI: #numsei#</strong></td>
+			<td colspan="5" bgcolor="eeeeee" valign="left" class="exibir"><strong>N. SEI: #numsei#</strong></td>
 			<cfif (resp neq 24) and (qSeiApur.recordcount gt 0)>
-				<td bgcolor="eeeeee"><input name="btn_ExcluirSei" id="btn_ExcluirSei" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Sei';document.form1.dbfrmnumsei.value='#qSeiApur.SEI_NumSEI#'" value="Excluir N. SEI" codigo="#qSeiApur.SEI_NumSEI#" #halbtgeral#></td>
+				<td bgcolor="eeeeee"><input name="btn_ExcluirSei" id="btn_ExcluirSei" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Sei';document.form1.dbfrmnumsei.value='#qSeiApur.SEI_NumSEI#'" value="Excluir N. SEI" codigo="#qSeiApur.SEI_NumSEI#" <cfoutput>#halbtgeral#</cfoutput>></td>
 				                     
 			<cfelse>
 				<td bgcolor="eeeeee"><input name="btn_ExcluirSei" id="btn_ExcluirSei" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Sei';document.form1.dbfrmnumsei.value='#qSeiApur.SEI_NumSEI#'" value="Excluir N. SEI" codigo="#qSeiApur.SEI_NumSEI#" disabled></td>
@@ -2971,11 +2973,11 @@ window.open(page, "Popup", windowprops);
 <!---    <input name="button" type="button" class="botao" onClick="window.open('itens_controle_respostas.cfm?ckTipo=inspecao&txtNum_Inspecao=#URL.Ninsp#&Submit2=Confirmar','_self')" value="Voltar"> --->
 	   <cfset auxdtini = dateformat(dtinic,"dd/mm/yyyy")>
 	   <cfset auxdtfim = dateformat(dtfim,"dd/mm/yyyy")>
-<!--- 	   <cfif houveProcSN neq "S"> --->
-	     <input name="button" type="button" class="botao" onClick="window.open('itens_controle_respostas.cfm?ninsp=#URL.Ninsp#&unid=#URL.Unid#&ngrup=#URL.Ngrup#&nitem=#URL.Nitem#&dtfim=#auxdtfim#&dtinic=#auxdtini#&SE=#url.SE#&cktipo=#url.cktipo#&selstatus=#url.situacao#&StatusSE=#url.StatusSE#','_self')" value="Voltar">
-<!---        <cfelse>
+	   <cfif houveProcSN neq "S">
+	     <input name="button" type="button" class="botao" onClick="window.open('itens_controle_respostas.cfm?ninsp=#URL.Ninsp#&unid=#URL.Unid#&ngrup=#URL.Ngrup#&nitem=#URL.Nitem#&dtfim=#auxdtfim#&dtinic=#auxdtini#&SE=#url.SE#&cktipo=#url.cktipo#&selstatus=#selstatus#&StatusSE=#StatusSE#','_self')" value="Voltar">
+       <cfelse>
          <input name="button" type="button" class="botao" value="Voltar" disabled>       
-       </cfif> --->
+       </cfif>
       </cfoutput> &nbsp;&nbsp;&nbsp;&nbsp;
 
 	<!---   <cfoutput>sn:#habslvsn#</cfoutput> --->

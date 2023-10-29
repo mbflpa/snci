@@ -722,28 +722,28 @@ background:#6699CC;
 
 <cfif isdefined("url.acao")>
     <cfif "#url.acao#" eq "validar">
-             <!--- Rotina de finalização da avaliação--->
-			<cfquery name="rsInspecaoFinalizar" datasource="#dsn_inspecao#">
-				SELECT  RIP_NumInspecao,INP_Situacao 
-				FROM Resultado_Inspecao 
-				INNER JOIN Inspecao ON INP_NumInspecao = RIP_NumInspecao
-				WHERE RIP_NumInspecao='#url.numInspecao#' and RIP_Resposta='A'
-			</cfquery>
-			<!---Seleciona os itens não conformes da tabela Resultado_Inspecao--->
-			<cfquery name="rsInspecaoFinalizarNC" datasource="#dsn_inspecao#">
-				SELECT  RIP_NumInspecao FROM Resultado_Inspecao WHERE RIP_NumInspecao='#url.numInspecao#' and RIP_Resposta='N'
-			</cfquery>
+		<!--- Rotina de finalização da avaliação--->
+		<cfquery name="rsInspecaoFinalizar" datasource="#dsn_inspecao#">
+			SELECT  RIP_NumInspecao,INP_Situacao 
+			FROM Resultado_Inspecao 
+			INNER JOIN Inspecao ON INP_NumInspecao = RIP_NumInspecao
+			WHERE RIP_NumInspecao='#url.numInspecao#' and RIP_Resposta='A'
+		</cfquery>
+		<!---Seleciona os itens não conformes da tabela Resultado_Inspecao--->
+		<cfquery name="rsInspecaoFinalizarNC" datasource="#dsn_inspecao#">
+			SELECT  RIP_NumInspecao FROM Resultado_Inspecao WHERE RIP_NumInspecao='#url.numInspecao#' and RIP_Resposta='N'
+		</cfquery>
 			
-			 <!---Se não existirem mais itens não avaliados para esta Avaliação, inicializa o cadastro nas tabelas ProcessoParecerUnidade, ParecerUnidade e Andamento e atualiza a tabela Inspecao de 'NA' para 'CO' --->
-			 <!--- Se ocorrerem erros em uma das query a seguir, será feitoum rollback dos registros--->
-			<cftransaction>
-            <!---exclui os inspetores de Inspetor_Inspecao que estão na lista e somar as horas de pre-inspeção e inspeção da tabela inspetor_inspecao e faz um update na tabela inspecao com a nova soma--->
-			
+		<!---Se não existirem mais itens não avaliados para esta Avaliação, inicializa o cadastro nas tabelas ProcessoParecerUnidade, ParecerUnidade e Andamento e atualiza a tabela Inspecao de 'NA' para 'CO' --->
+		<!--- Se ocorrerem erros em uma das query a seguir, será feitoum rollback dos registros--->
+		<cftransaction>
+		<!---exclui os inspetores de Inspetor_Inspecao que estão na lista e somar as horas de pre-inspeção e inspeção da tabela inspetor_inspecao e faz um update na tabela inspecao com a nova soma--->
+		
 			<cfif '#quantListaInspSemAval#' gte 1>
 				<cfquery  datasource="#dsn_inspecao#">
 				DELETE FROM Inspetor_Inspecao WHERE IPT_NumInspecao = convert(varchar,'#url.numInspecao#') and IPT_MatricInspetor in(#listaInspSemAval#)
 				</cfquery>
-            </cfif>
+			</cfif>
 			<cfquery datasource="#dsn_inspecao#" name="rsResumo">
 					SELECT min(IPT_DtInicDesloc)  as dtInicDeslocMin, 
 						   max(IPT_DtFimDesloc)   as dtFimDesloclMax,
@@ -809,7 +809,7 @@ background:#6699CC;
 						<cfset posarea_cod = #rsUnid.Und_Centraliza#>
 						<cfset posarea_nome = #rsCDD.Und_Descricao#>
 					</cfif>
-<!--- inicio classificacao do ponto --->
+					<!--- inicio classificacao do ponto --->
 
 					<cfset composic = rsItem2.Itn_PTC_Seq>	
 					<cfset ItnPontuacao = rsItem2.Itn_Pontuacao>

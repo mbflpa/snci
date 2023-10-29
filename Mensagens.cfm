@@ -9,16 +9,14 @@
 
 <!--- Criação do registro de log em formato CSV --->
 <cfset sdata = dateformat(now(),"YYYYMMDDHH")>
-<cfset diretorio ="\\sac3162\PERNAMBUCO\SNCI\">
+<!--- <cfset diretorio ="\\sac1887\sistemas$\GMAT01\Pernambuco\SNCI\">
 <cfset slocal = #diretorio# & 'Dados\'>
 <cfset sarquivo = 'REG_LOG_SNCI.csv'>
 <cfif fileExists(#slocal# & sarquivo)>
-<!--- 	<cffile action="write" addnewline="no" file="#slocal##sarquivo#" output=''> --->
 <cfelse>
-	<!--- <cffile action="write" addnewline="no" file="#slocal##sarquivo#" output=''> --->
 	<cffile action="Append" file="#slocal##sarquivo#" output='DTHORA_ATUALIZ;NOME DA TELA;AÇÃO;RESULTADO DA AÇÃO'>
 </cfif>
-
+ --->
 
 <cfsetting requesttimeout="15000">
 
@@ -92,7 +90,29 @@
 <cfif not isDefined("url.rotina")>
  <cfset rotina = 1>
 </cfif> 
-
+<cfif rotinaSN is 'S'>
+	<!--- Obter o a data util para 10(dez) dias --->
+	<cfset dtdezdiasuteis = CreateDate(year(now()),month(now()),day(now()))>
+	<cfset nCont = 0>
+	<cfloop condition="nCont lt 10">
+		<cfset nCont = nCont + 1>
+		<cfset dtdezdiasuteis = DateAdd( "d", 1, dtdezdiasuteis)>
+		<cfset vDiaSem = DayOfWeek(dtdezdiasuteis)>
+		<cfif vDiaSem neq 1 and vDiaSem neq 7>
+			<!--- verificar se Feriado Nacional --->
+			<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+				 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtdezdiasuteis#
+			</cfquery>
+			<cfif rsFeriado.recordcount gt 0>
+			   <cfset nCont = nCont - 1>
+			</cfif>
+		</cfif>
+		<!--- Verifica se final de semana  --->
+		<cfif vDiaSem eq 1 or vDiaSem eq 7>
+			<cfset nCont = nCont - 1>
+		</cfif>	
+	</cfloop>
+</cfif>
  
 <cfloop condition="rotina lte 28">   
 	<!--- copiar Parecerunidade  --->
@@ -248,7 +268,7 @@
 						</cfquery>		
 				</cfloop>		 
 		 </cfif>  
-	<cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 1;GERAR INDICADORES SLNC e PRCI SALVAR PARACERUNIDADE para SLNCPRCIDCGIMES'>		 
+	<!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 1;GERAR INDICADORES SLNC e PRCI SALVAR PARACERUNIDADE para SLNCPRCIDCGIMES'> --->		 
  </cfif>
 </cfif>
 <!---  --->
@@ -299,7 +319,7 @@
 		   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs14NR2PU20PF.Pos_Inspecao#', '#rs14NR2PU20PF.Pos_Unidade#', #rs14NR2PU20PF.Pos_NumGrupo#, #rs14NR2PU20PF.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', #rot2_IDStatus#, convert(char, getdate(), 108), '#and_obs#', '#aux_posarea#')
 		 </cfquery>
 	</cfoutput> 
-	  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 2;Mudar o Status de 14 para 2(Proprias) ou 20(AGF) cuja Pos_DtPrev_Solucao esta vencida'>		
+	  <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 2;Mudar o Status de 14 para 2(Proprias) ou 20(AGF) cuja Pos_DtPrev_Solucao esta vencida'> --->		
   </cfif> 
 
 	<!--- DE 15-TU - TRATAMENTO PARA 2-PU-PENDENTE OU 16-TS-Órgão SUBORDINADOR--->
@@ -343,47 +363,21 @@
 				  FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop 
 				  WHERE Und_Codigo = '#rs15TU_2PU16TS.Pos_Area#'
 				</cfquery>
-				  
-				<cfset dtnovoprazo = DateAdd("d", 10, #dtatual#)>
 				
-				<cfset nCont = 1>
-				<cfloop condition="nCont eq 1">
-				<cfset nCont = 0>
-				<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-				 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
-				</cfquery>
-				<cfif rsFeriado.recordcount gt 0>
-					<cfset dtnovoprazo = DateAdd("d", 1, #dtnovoprazo#)>
-					<cfset nCont = 1>
-				</cfif>
-				<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
-				<cfswitch expression="#vDiaSem#">
-					   <cfcase value="1">
-							<!--- domingo --->
-							<cfset dtnovoprazo = DateAdd("d", 1, #dtnovoprazo#)>
-							<cfset nCont = 1>
-					   </cfcase>
-						<cfcase value="7">
-							<cfset dtnovoprazo = DateAdd("d", 2, #dtnovoprazo#)>
-							<cfset nCont = 1>
-						</cfcase>
-				</cfswitch>
-				</cfloop> 	  
-				<!--- fim loop --->
-				<cfset sinformes = 'Em virtude da ausência de conclusão do Item da Avaliação no Status EM TRATAMENTO pelo(a) Gestor(a) da unidade: ' & #trim(rs15TU_2PU16TS.Und_Descricao)# & CHR(13) & ', no prazo solicitado até ' & #DateFormat(rs15TU_2PU16TS.Pos_DtPrev_Solucao,"DD/MM/YYYY")# & ', estamos modificando-o para o Status de TRATAMENTO ORGAO SUBORDINADOR e no aguardo do Aprimoramento para às devidas providências até ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & '.'>
+				<cfset sinformes = 'Em virtude da ausência de conclusão do Item da Avaliação no Status TRATAMENTO UNIDADE pelo(a) Gestor(a) da unidade: ' & #trim(rs15TU_2PU16TS.Und_Descricao)# & CHR(13) & ', no prazo solicitado até ' & #DateFormat(rs15TU_2PU16TS.Pos_DtPrev_Solucao,"DD/MM/YYYY")# & ', estamos modificando-o para o Status de TRATAMENTO ORGAO SUBORDINADOR e no aguardo do Aprimoramento para às devidas providências até ' & #DateFormat(dtdezdiasuteis,"DD/MM/YYYY")# & '.'>
 							 				
-				<cfset aux_obs = #rs15TU_2PU16TS.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+				<cfset aux_obs = #rs15TU_2PU16TS.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtdezdiasuteis,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 			  <cfquery datasource="#dsn_inspecao#">
-			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 16, Pos_Situacao = 'TS', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtnovoprazo#, Pos_Area = '#rsOrg.Rep_Codigo#', Pos_NomeArea = '#rsOrg.Rep_Nome#', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 15 WHERE Pos_Unidade='#rs15TU_2PU16TS.Pos_Unidade#' AND Pos_Inspecao='#rs15TU_2PU16TS.Pos_Inspecao#' AND Pos_NumGrupo=#rs15TU_2PU16TS.Pos_NumGrupo# AND Pos_NumItem=#rs15TU_2PU16TS.Pos_NumItem#
+			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 16, Pos_Situacao = 'TS', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtdezdiasuteis#, Pos_Area = '#rsOrg.Rep_Codigo#', Pos_NomeArea = '#rsOrg.Rep_Nome#', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 15 WHERE Pos_Unidade='#rs15TU_2PU16TS.Pos_Unidade#' AND Pos_Inspecao='#rs15TU_2PU16TS.Pos_Inspecao#' AND Pos_NumGrupo=#rs15TU_2PU16TS.Pos_NumGrupo# AND Pos_NumItem=#rs15TU_2PU16TS.Pos_NumItem#
 			 </cfquery>
-			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtdezdiasuteis,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 			 <cfquery datasource="#dsn_inspecao#">
 			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs15TU_2PU16TS.Pos_Inspecao#', '#rs15TU_2PU16TS.Pos_Unidade#', #rs15TU_2PU16TS.Pos_NumGrupo#, #rs15TU_2PU16TS.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 16, convert(char, getdate(), 108), '#and_obs#', '#rsOrg.Rep_Codigo#')
 			 </cfquery>				  		   
 				  
 		   <cfelse>
 				   <!--- MUDAR PARA PENDENTE DE UNIDADE --->
-				   <cfset sinformes = 'Em virtude da ausência de conclusão do Item da Avaliação no Status EM TRATAMENTO pelo(a) Gestor(a) desta unidade, no prazo solicitado até ' & #DateFormat(rs15TU_2PU16TS.Pos_DtPrev_Solucao,"DD/MM/YYYY")# & ', estamos modificando-o para o Status de PENDENTE DA UNIDADE e no aguardo do Aprimoramento para às devidas providências.'>
+				   <cfset sinformes = 'Em virtude da ausência de conclusão do Item da Avaliação no Status TRATAMENTO UNIDADE pelo(a) Gestor(a) desta unidade, no prazo solicitado até ' & #DateFormat(rs15TU_2PU16TS.Pos_DtPrev_Solucao,"DD/MM/YYYY")# & ', estamos modificando-o para o Status de PENDENTE DA UNIDADE e no aguardo do Aprimoramento para às devidas providências.'>
 				  <cfset aux_obs = #rs15TU_2PU16TS.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rs15TU_2PU16TS.Pos_NomeArea# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: PENDENTE DA UNIDADE' & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 			     <cfquery datasource="#dsn_inspecao#">
 				   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 2, Pos_Situacao = 'PU', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_Area = '#rs15TU_2PU16TS.Pos_Area#', Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtatual#, Pos_NomeArea = '#trim(rs15TU_2PU16TS.Pos_NomeArea)#', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 15
@@ -395,7 +389,7 @@
 				</cfquery>				 	
 		   </cfif>  
 		</cfoutput> 
-    	<cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 3;Mudar de Status 15-TU para o Status 2-PU OU 16-TS'>		
+    	<!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 3;Mudar de Status 15-TU para o Status 2-PU OU 16-TS'>	 --->	
 	</cfif>	
 	<cfif rotina eq 4 and rotinaSN is 'S'>
 		<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
@@ -433,45 +427,19 @@
 				  WHERE Und_Codigo = '#rs2PU_16TS.Pos_Area#'
 				</cfquery>
 				  
-				<cfset dtnovoprazo = DateAdd("d", 10, #dtatual#)>
-				
-				<cfset nCont = 1>
-				<cfloop condition="nCont eq 1">
-				<cfset nCont = 0>
-				<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-				 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
-				</cfquery>
-				<cfif rsFeriado.recordcount gt 0>
-					<cfset dtnovoprazo = DateAdd("d", 1, #dtnovoprazo#)>
-					<cfset nCont = 1>
-				</cfif>
-				<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
-				<cfswitch expression="#vDiaSem#">
-					   <cfcase value="1">
-							<!--- domingo --->
-							<cfset dtnovoprazo = DateAdd("d", 1, #dtnovoprazo#)>
-							<cfset nCont = 1>
-					   </cfcase>
-						<cfcase value="7">
-							<cfset dtnovoprazo = DateAdd("d", 2, #dtnovoprazo#)>
-							<cfset nCont = 1>
-						</cfcase>
-				</cfswitch>
-				</cfloop> 	  
-				<!--- fim loop ---> --->
-				<cfset sinformes = 'Em virtude da ausência de conclusão do Item da Avaliação no Status EM PENDENTE pelo(a) Gestor(a) da unidade: ' & #trim(rs2PU_16TS.Und_Descricao)# & CHR(13) & ', no prazo solicitado, estamos modificando-o para o Status de TRATAMENTO ORGAO SUBORDINADOR e no aguardo do Aprimoramento para às devidas providências até ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & '.'>
+				<cfset sinformes = 'Em virtude da ausência de conclusão do Item da Avaliação no Status PENDENTE DA UNIDADE pelo(a) Gestor(a) da unidade: ' & #trim(rs2PU_16TS.Und_Descricao)# & CHR(13) & ', no prazo solicitado, estamos modificando-o para o Status de TRATAMENTO ORGAO SUBORDINADOR e no aguardo do Aprimoramento para às devidas providências até ' & #DateFormat(dtdezdiasuteis,"DD/MM/YYYY")# & '.'>
 							 				
-				<cfset aux_obs = #rs2PU_16TS.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+				<cfset aux_obs = #rs2PU_16TS.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtdezdiasuteis,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 			  <cfquery datasource="#dsn_inspecao#">
-			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 16, Pos_Situacao = 'TS', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtnovoprazo#, Pos_Area = '#rsOrg.Rep_Codigo#', Pos_NomeArea = '#rsOrg.Rep_Nome#', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 2 WHERE Pos_Unidade='#rs2PU_16TS.Pos_Unidade#' AND Pos_Inspecao='#rs2PU_16TS.Pos_Inspecao#' AND Pos_NumGrupo=#rs2PU_16TS.Pos_NumGrupo# AND Pos_NumItem=#rs2PU_16TS.Pos_NumItem#
+			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 16, Pos_Situacao = 'TS', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtdezdiasuteis#, Pos_Area = '#rsOrg.Rep_Codigo#', Pos_NomeArea = '#rsOrg.Rep_Nome#', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 2 WHERE Pos_Unidade='#rs2PU_16TS.Pos_Unidade#' AND Pos_Inspecao='#rs2PU_16TS.Pos_Inspecao#' AND Pos_NumGrupo=#rs2PU_16TS.Pos_NumGrupo# AND Pos_NumItem=#rs2PU_16TS.Pos_NumItem#
 			 </cfquery>
-			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtdezdiasuteis,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 			 <cfquery datasource="#dsn_inspecao#">
 			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs2PU_16TS.Pos_Inspecao#', '#rs2PU_16TS.Pos_Unidade#', #rs2PU_16TS.Pos_NumGrupo#, #rs2PU_16TS.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 16, convert(char, getdate(), 108), '#and_obs#', '#rsOrg.Rep_Codigo#')
 			 </cfquery>				  		   				 	
 		   </cfif>  
 		</cfoutput> 
-    	<cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 4;Mudar de Status 2-PU para 16-TS'>		
+    	<!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 4;Mudar de Status 2-PU para 16-TS'>	 --->	
 	</cfif>	
 	<!--- DE 18-TF - TRATAMENTO PARA 20-PF-PENDENTE OU 26-NC GERAT OU GEOPE --->
 	<!--- TERCEIRAS --->	
@@ -579,7 +547,7 @@
 				</cfquery>				 	
 		   </cfif>  
 		</cfoutput> 
-    	<cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 5;DE 18-TF - TRATAMENTO PARA 20-PF-PENDENTE OU 26-NC GERAT OU GEOPE'>		
+    	<!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 5;DE 18-TF - TRATAMENTO PARA 20-PF-PENDENTE OU 26-NC GERAT OU GEOPE'>	 --->	
 	</cfif>
 	<cfif rotina eq 6 and rotinaSN is 'S'>
 		<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
@@ -671,7 +639,7 @@
 			 </cfquery>				  		   			 	
 		   </cfif>  
 		</cfoutput> 
-    	<cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 6;Mudar 20 - PENDENTE DE TERCEIRIZADA para 26-NC Não Regularizado(Aplicar CFP)'>		
+    	<!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 6;Mudar 20 - PENDENTE DE TERCEIRIZADA para 26-NC Não Regularizado(Aplicar CFP)'> --->		
 	</cfif>
 	<!--- ###### FIM UNIDADES ###### --->
 	<!--- ###### SUBORDINADORES ###### --->
@@ -701,7 +669,7 @@
 			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs16TS4PO.Pos_Inspecao#', '#rs16TS4PO.Pos_Unidade#', '#rs16TS4PO.Pos_NumGrupo#', '#rs16TS4PO.Pos_NumItem#', convert(char, getdate(), 102), 'Rotina_Automatica', 4, convert(char, getdate(), 108), '#and_obs#', '#rs16TS4PO.Pos_Area#')
 			 </cfquery>
 		</cfoutput> 
-   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 7;aptos a mudarem status 16 para 4 quando estiverem com a Pos_DtPrev_Solucao vencida nos 10 dias oferecidos'>			
+ <!---   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 7;aptos a mudarem status 16 para 4 quando estiverem com a Pos_DtPrev_Solucao vencida nos 10 dias oferecidos'>		 --->	
 	</cfif>
 	<!--- ###### FIM SUBORDINADORES ###### --->	
 	<!--- ###### AREAS ###### --->
@@ -727,7 +695,7 @@
 		  insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs19TA5PA.Pos_Inspecao#', '#rs19TA5PA.Pos_Unidade#', #rs19TA5PA.Pos_NumGrupo#, #rs19TA5PA.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 5, convert(char, getdate(), 108), '#and_obs#', '#rs19TA5PA.Pos_Area#')
 		 </cfquery>	 
 	</cfoutput> 
-   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 8;aptos a mudarem de status de 19, quando data Pos_DtPrev_Solucao for maior em 45 dias, para status = 5-PA-PENDENTE DE AREA'>
+   <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 8;aptos a mudarem de status de 19, quando data Pos_DtPrev_Solucao for maior em 45 dias, para status = 5-PA-PENDENTE DE AREA'> --->
 	</cfif>
 	<!--- ###### FIM - AREAS ###### --->
 	<!--- ###### SUPERINTENDENTE ###### --->
@@ -753,7 +721,7 @@
 		   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs23TO8SE.Pos_Inspecao#', '#rs23TO8SE.Pos_Unidade#', #rs23TO8SE.Pos_NumGrupo#, #rs23TO8SE.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 8, convert(char, getdate(), 108), '#and_obs#', '#rs23TO8SE.Pos_Area#')
 		</cfquery>
 	</cfoutput> 
-    <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 9;Mudar o Status de 23-TO Tratamento Superintendencia para 8-SE Pendente Superintendencia'>	
+    <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 9;Mudar o Status de 23-TO Tratamento Superintendencia para 8-SE Pendente Superintendencia'>	 --->
 	</cfif>	
 	<!--- ###### FIM - SUPERINTENDENTE ###### --->
 	<!--- ************** FIM - MUDAR STATUS ****************** --->
@@ -790,13 +758,13 @@
 		  	<cfmail from="SNCI@correios.com.br" to="#rot10_sdestina#" subject="Avaliação - NÃO RESPONDIDO" type="HTML">
 			 Mensagem automática. Não precisa responder!<br><br>
 			<strong>
-			   Ao Gestor do(a) #Ucase(rs14NR.Und_Descricao)#. <br><br><br>
+			   Ao Gestor(a) do(a) #Ucase(rs14NR.Und_Descricao)#. <br><br><br>
 	
 	&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  "NÃO RESPONDIDO"  para  manifestação desse Órgão.<br><br>
 	
 	&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas no prazo solicitado.<br><br>
 	
-	&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+	&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 				<table>
 				<tr>
 				<td><strong>Unidade</strong></td>
@@ -834,7 +802,7 @@
 		</cfif>		 
 	  </cfoutput> 
 	<!--- fim e-mail status 14-NR --->
-	  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 10;Aviso por e-mail agrupado para os status 14-NR Quando da falta  DE 5 a 1 dias do vencto na  Pos_DtPrev_Solucao para PROPRIAS e TERCEIRIZADAS'>		 
+	  <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 10;Aviso por e-mail agrupado para os status 14-NR Quando da falta  DE 5 a 1 dias do vencto na  Pos_DtPrev_Solucao para PROPRIAS e TERCEIRIZADAS'> --->		 
 	</cfif> 
 	<cfif rotina eq 11 and rotinaSN is 'S'>
 		<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
@@ -866,16 +834,16 @@
 <!--- 	      <cfset rot11_sdestina = #rot11_sdestina# & ';gilvanm@correios.com.br'> --->
 	   <!--- <cfset rot11_sdestina = "gilvanm@correios.com.br">  --->
 	   <cfif rs15TU.recordcount gt 0>
-	   <cfmail from="SNCI@correios.com.br" to="#rot11_sdestina#" subject="AVALIAÇÃO EM TRATAMENTO DE UNIDADE" type="HTML">
+	   <cfmail from="SNCI@correios.com.br" to="#rot11_sdestina#" subject="Avaliação TRATAMENTO UNIDADE" type="HTML">
 			 Mensagem automática. Não precisa responder!<br><br>
 			<strong>
-			   Ao Gestor do(a) #Ucase(rs15TU.Und_Descricao)#. <br><br><br>
+			   Ao Gestor(a) do(a) #Ucase(rs15TU.Und_Descricao)#. <br><br><br>
 	
-	&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno EM TRATAMENTO DE UNIDADE para  manifestação desse Órgão.<br><br>
+	&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno em TRATAMENTO UNIDADE para  manifestação desse Órgão.<br><br>
 	
 	&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 	
-	&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+	&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 	<table>
 				<tr>
 				<td><strong>Unidade</strong></td>
@@ -912,7 +880,7 @@
 	   	   </cfif>
 
 	</cfoutput> 
-	   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 11;Pré-alerta por e-mail para Unidade para os status = (15-TU) e que a data Pos_DtPrev_Solucao esteja apenas a 5(cinco) dias do vencimento'>	
+	  <!---  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 11;Pré-alerta por e-mail para Unidade para os status = (15-TU) e que a data Pos_DtPrev_Solucao esteja apenas a 5(cinco) dias do vencimento'> --->	
 	</cfif>
 <cfif rotina eq 12 and rotinaSN is 'S'>
 		<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput>
@@ -945,16 +913,16 @@
 	   <!--- <cfset rot12_sdestina = "gilvanm@correios.com.br">  --->
 	   <cfif rs18TF.recordcount gt 0>
 	   
-	   <cfmail from="SNCI@correios.com.br" to="#rot12_sdestina#" subject="AVALIAÇÃO EM TRATAMENTO TERCEIRIZADA" type="HTML">
+	   <cfmail from="SNCI@correios.com.br" to="#rot12_sdestina#" subject="Avaliação TRATAMENTO TERCEIRIZADA" type="HTML">
 			 Mensagem automática. Não precisa responder!<br><br>
 			<strong>
-			   Ao Gestor do(a) #Ucase(rs18TF.Und_Descricao)#. <br><br><br>
+			   Ao Gestor(a) do(a) #Ucase(rs18TF.Und_Descricao)#. <br><br><br>
 	
-	&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno EM TRATAMENTO TERCEIRIZADA para  manifestação desse Órgão.<br><br>
+	&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno em TRATAMENTO TERCEIRIZADA para  manifestação desse Órgão.<br><br>
 	
 	&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 	
-	&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+	&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 	<table>
 				<tr>
 				<td><strong>Unidade</strong></td>
@@ -990,7 +958,7 @@
 	   </cfmail>
 	   </cfif>  
 	</cfoutput> 
-	   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 12;Pré-alerta por e-mail para Unidade para os status = (18-TF) e que a data Pos_DtPrev_Solucao esteja apenas a 5(cinco) dias do vencimento'>	
+<!--- 	   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 12;Pré-alerta por e-mail para Unidade para os status = (18-TF) e que a data Pos_DtPrev_Solucao esteja apenas a 5(cinco) dias do vencimento'>	 --->
 	</cfif>	
 	<!--- ###### FIM - UNIDADES ###### --->
 	<!--- ###### SUBORDINADORES ###### --->
@@ -1024,16 +992,16 @@
 
 <!--- 				 <cfset rot13_sdestina = #rot13_sdestina# & ';gilvanm@correios.com.br'> --->
 				 <!---   <cfset rot13_sdestina = "gilvanm@correios.com.br">  --->
-				 <cfmail from="SNCI@correios.com.br" to="#rot13_sdestina#" subject="AVALIAÇÃO TRATAMENTO ÓRGÃO SUBORDINADOR" type="HTML">
+				 <cfmail from="SNCI@correios.com.br" to="#rot13_sdestina#" subject="Avaliação TRATAMENTO ÓRGÃO SUBORDINADOR" type="HTML">
 					 Mensagem automática. Não precisa responder!<br><br>
 					<strong>
-					   Ao Gestor do(a) #Ucase(rs16TSGRP.Rep_Nome)#. <br><br><br>
+					   Ao Gestor(a) do(a) #Ucase(rs16TSGRP.Rep_Nome)#. <br><br><br>
 			
-			&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  Em TRATAMENTO ÓRGÃO SUBORDINADOR para  manifestação  desse Órgão.<br><br>
+			&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  em TRATAMENTO ÓRGÃO SUBORDINADOR para  manifestação  desse Órgão.<br><br>
 			
 			&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 			
-			&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+			&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 			<table>
 				<tr>
 				<td><strong>Unidade</strong></td>
@@ -1070,7 +1038,7 @@
 		</cfif>  			
 	</cfoutput> 
 	 <!--- Fim da rotina de Pré-Alerta --->
-	   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 13; pré-alerta Orgao subordinador com e-mail agrupado e classif. (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem) status 16 e data Pos_DtPrev_Solucao já ultrapassa o 5º neste status'>
+	  <!---  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 13; pré-alerta Orgao subordinador com e-mail agrupado e classif. (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem) status 16 e data Pos_DtPrev_Solucao já ultrapassa o 5º neste status'> --->
 	</cfif>	
 	<!--- ###### FIM - SUBORDINADORES ###### --->
 	<!--- ###### AREAS ###### --->
@@ -1111,16 +1079,16 @@
 			<!---  	   ---> 
 <!--- 			<cfset rot14_sdestina = #rot14_sdestina# & ';gilvanm@correios.com.br'> --->
 			<!--- <cfset rot14_sdestina = "gilvanm@correios.com.br"> --->
-			  <cfmail from="SNCI@correios.com.br" to="#rot14_sdestina#" subject="AVALIAÇÃO TRATAMENTO DA ÁREA" type="HTML">
+			  <cfmail from="SNCI@correios.com.br" to="#rot14_sdestina#" subject="Avaliação TRATAMENTO DA ÁREA" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
-				   Ao Gestor do(a) #Ucase(rs19TAGRP.Ars_Descricao)#. <br><br><br>
+				   Ao Gestor(a) do(a) #Ucase(rs19TAGRP.Ars_Descricao)#. <br><br><br>
 		
 		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  em TRATAMENTO DA ÁREA para  manifestação  desse Órgão.<br><br>
 		
 		&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 		
-		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 				<table>
 				<tr>
 				<td><strong>Unidade</strong></td>
@@ -1156,7 +1124,7 @@
 		  </cfif>
 	<!--- fim e-mail para status = 19 --->
 	</cfoutput> 
-    <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 14;rotina PRÉ-ALERTA status 19 e data Pos_DtPrev_Solucao ESTÁ DE 0 A 5 DIAS DO VENCTO'>		
+    <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 14;rotina PRÉ-ALERTA status 19 e data Pos_DtPrev_Solucao ESTÁ DE 0 A 5 DIAS DO VENCTO'>	 --->	
 	</cfif>	
 	<!--- ###### FIM - AREAS ###### --->
 	<!--- ###### SUPERINTENDENTE ###### --->
@@ -1197,16 +1165,16 @@
 			<!---  	   ---> 
 <!--- 			<cfset rot15_sdestina = #rot15_sdestina# & ';gilvanm@correios.com.br'> --->
 			<!--- <cfset rot15_sdestina = "gilvanm@correios.com.br"> --->
-			  <cfmail from="SNCI@correios.com.br" to="#rot15_sdestina#" subject="AVALIAÇÃO TRATAMENTO SUPERINTENDÊNCIA ESTADUAL" type="HTML">
+			  <cfmail from="SNCI@correios.com.br" to="#rot15_sdestina#" subject="Avaliação TRATAMENTO SE" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
-				   Ao Gestor do(a) #Ucase(rs23TOGRP.Dir_Descricao)#. <br><br><br>
+				   Ao Gestor(a) do(a) #Ucase(rs23TOGRP.Dir_Descricao)#. <br><br><br>
 		
 		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  em TRATAMENTO SUPERINTENDÊNCIA ESTADUAL para  manifestação  desse Órgão.<br><br>
 		
 		&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 		
-		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 				<table>
 				<tr>
 				<td><strong>Unidade</strong></td>
@@ -1242,7 +1210,7 @@
 		  </cfif>
 	<!--- fim e-mail para status = 19 --->
 	</cfoutput> 
-    <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 15;rotina PRÉ-ALERTA status 23 e data Pos_DtPrev_Solucao ESTÁ DE 0 A 5 DIAS DO VENCTO'>		
+    <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 15;rotina PRÉ-ALERTA status 23 e data Pos_DtPrev_Solucao ESTÁ DE 0 A 5 DIAS DO VENCTO'>		 --->
 	</cfif>		
 	<!--- ###### FIM - SUPERINTENDENTE ###### --->	
 	<!--- ************** FIM - PRÉ- ALERTA ****************** --->
@@ -1283,16 +1251,16 @@
 				<!---    ---> 
 <!--- 				<cfset rot16_sdestina = #rot16_sdestina# & ';gilvanm@correios.com.br'> --->
 				<!--- <cfset rot16_sdestina = "gilvanm@correios.com.br"> --->
-			    <cfmail from="SNCI@correios.com.br" to="#rot16_sdestina#" subject="AVALIAÇÃO PENDENTE DO ÓRGÃO SUBORDINADOR" type="HTML">
+			    <cfmail from="SNCI@correios.com.br" to="#rot16_sdestina#" subject="Avaliação PENDENTE DO ÓRGÃO SUBORDINADOR" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
-				   Ao Gestor do(a) #Ucase(rs4POGRP.Rep_Nome)#. <br><br><br>
+				   Ao Gestor(a) do(a) #Ucase(rs4POGRP.Rep_Nome)#. <br><br><br>
 		
 		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  em PENDENTE DO ÓRGÃO SUBORDINADOR  para  manifestação  desse Órgão.<br><br>
 		
 		&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 		
-		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 		<table>
 		<tr>
 		<td><strong>Unidade</strong></td>
@@ -1326,7 +1294,7 @@
 		</cfoutput>
 	</cfif> 
 	<!--- fim email diarios --->
-    <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 16; Rotinas de cobranças semanal por email semanal ao Orgao Subordinador de forma agrupado para o Status = 4-PO'>	
+    <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 16; Rotinas de cobranças semanal por email semanal ao Orgao Subordinador de forma agrupado para o Status = 4-PO'>	 --->
 	</cfif>
 	<!--- ###### FIM - SUBORDINADORES ###### --->
 	<!--- ###### UNIDADES ###### --->
@@ -1370,13 +1338,13 @@
 			   		<cfmail from="SNCI@correios.com.br" to="#rot17_sdestina#" subject="#rot17_assunto#" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
-				   Ao Gestor do(a) #Ucase(rs2PU20PF.Und_Descricao)#. <br><br><br>
+				   Ao Gestor(a) do(a) #Ucase(rs2PU20PF.Und_Descricao)#. <br><br><br>
 		
 		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  em #rot17_assunto#  para  manifestação  desse Órgão.<br><br>
 		
 		&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 		
-		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 		<table>
 		<tr>
 		<td><strong>Unidade</strong></td>
@@ -1410,7 +1378,7 @@
 		</cfoutput>
 
 	<!--- fim email diarios --->
-    <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 17; Rotinas de cobranças semanal por email as UNIDADES agrupado para o Status = 2-PU e 20-PF'>	
+<!---     <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 17; Rotinas de cobranças semanal por email as UNIDADES agrupado para o Status = 2-PU e 20-PF'>	 --->
 	</cfif>
 	<!--- ###### FIM - UNIDADES ###### --->
 	<!--- ###### AREAS ###### --->
@@ -1448,16 +1416,16 @@
 				<!---    ---> 
 <!--- 				<cfset rot18_sdestina = #rot18_sdestina# & ';gilvanm@correios.com.br'> --->
 				<!--- <cfset rot18_sdestina = "gilvanm@correios.com.br"> --->
-			    <cfmail from="SNCI@correios.com.br" to="#rot18_sdestina#" subject="AVALIAÇÃO PENDENTE DA ÁREA" type="HTML">
+			    <cfmail from="SNCI@correios.com.br" to="#rot18_sdestina#" subject="Avaliação PENDENTE DA ÁREA" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
-				   Ao Gestor do(a) #Ucase(rs5PAGRP.Ars_Descricao)#. <br><br><br>
+				   Ao Gestor(a) do(a) #Ucase(rs5PAGRP.Ars_Descricao)#. <br><br><br>
 		
 		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  em PENDENTE DA ÁREA  para  manifestação  desse Órgão.<br><br>
 		
 		&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 		
-		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 		<table>
 		<tr>
 		<td><strong>Unidade</strong></td>
@@ -1491,7 +1459,7 @@
 		</cfoutput>
 	</cfif> 
 	<!--- fim email diarios --->
-    <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 18; Rotinas de cobranças semanal por email semanal às Àreas de forma agrupado para o Status = 5-PA'>	
+    <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 18; Rotinas de cobranças semanal por email semanal às Àreas de forma agrupado para o Status = 5-PA'>	 --->
 	</cfif>	
 	<!--- ###### FIM - AREAS ###### --->
 	<!--- ###### SUPERINTENDENTES ###### --->
@@ -1529,16 +1497,16 @@
 				<!---    ---> 
 <!--- 				<cfset rot19_sdestina = #rot19_sdestina# & ';gilvanm@correios.com.br'> --->
 				<!--- <cfset rot19_sdestina = "gilvanm@correios.com.br"> --->
-			    <cfmail from="SNCI@correios.com.br" to="#rot19_sdestina#" subject="AVALIAÇÃO PENDENTE SUPERINTENDÊNCIA ESTADUAL" type="HTML">
+			    <cfmail from="SNCI@correios.com.br" to="#rot19_sdestina#" subject="Avaliação PENDENTE SE" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
-				   Ao Gestor do(a) #Ucase(rs08SEGRP.Dir_Descricao)#. <br><br><br>
+				   Ao Gestor(a) do(a) #Ucase(rs08SEGRP.Dir_Descricao)#. <br><br><br>
 		
 		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  em PENDENTE SUPERINTENDÊNCIA ESTADUAL  para  manifestação  desse Órgão.<br><br>
 		
 		&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 		
-		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 		<table>
 		<tr>
 		<td><strong>Unidade</strong></td>
@@ -1572,7 +1540,7 @@
 		</cfoutput>
 	</cfif> 
 	<!--- fim email diarios --->
-    <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 19; Rotinas de cobranças semanal por email semanal às Àreas de forma agrupado para o Status = 5-PA'>	
+   <!---  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 19; Rotinas de cobranças semanal por email semanal às Àreas de forma agrupado para o Status = 5-PA'> --->	
 	</cfif>		
 	<!--- ###### FIM - SUPERINTENDENTES ###### --->
 	<!--- ************** FIM - COBRANÇAS POR E-MAIL AOS PENDENTES ****************** --->
@@ -1623,14 +1591,14 @@
 					 <cfset rot20_sdestina = "gilvanm@correios.com.br">
 				</cfif>
 			
-				<cfmail from="SNCI@correios.com.br" to="#rot20_sdestina#" subject="Revisões dos SCOI´S" type="HTML"> 
+				<cfmail from="SNCI@correios.com.br" to="#rot20_sdestina#" subject="Revisões dos SCOIs" type="HTML"> 
 		
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
-				   Ao Gestor do(a) #Ucase(auxnomearea)#. <br><br><br>
+				   Ao Gestor(a) da #Ucase(auxnomearea)#. <br><br><br>
 		
-		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  para  REVISÃO ou LIBERAÇÃO ou RESPOSTA DA TERCEIRIZADA desse Órgão.<br><br>
-		&nbsp;&nbsp;&nbsp;Para registro de suas Análises ou encaminhamentos acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">SNCI</a><br><br>
+		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  para  REVISÃO, LIBERAÇÃO ou RESPOSTA DA TERCEIRIZADA desse Órgão.<br><br>
+		&nbsp;&nbsp;&nbsp;Para registro de suas Análises ou encaminhamentos acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">SNCI</a><br><br>
 				
 					<table>
 					<tr>
@@ -1654,7 +1622,7 @@
 			    </cfmail>
 			 </cfif>     
 		  </cfoutput> 
-   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 20;aviso por e-mail aos Status 0-RE ou 11-EL com 1(um) ou mais dias no SNCI'>	   		   
+<!---    <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 20;aviso por e-mail aos Status 0-RE ou 11-EL com 1(um) ou mais dias no SNCI'>	 --->   		   
 	</cfif>
 	<!--- ###### FIM 0-RE e 11-EL ###### --->
 	<!--- ###### INICIO REPOSTAS ###### --->
@@ -1747,10 +1715,10 @@
 			
 						 Mensagem automática. Não precisa responder!<br><br>
 						<strong>
-						   Ao Gestor do(a) #Ucase(auxnomearea)#. <br><br><br>
+						   Ao Gestor(a) do(a) #Ucase(auxnomearea)#. <br><br><br>
 				
 				&nbsp;&nbsp;&nbsp;Comunicamos que há itens com manifestação dos órgãos e que encontram-se pendentes de tratamento dessa SGCIN/SCOI.<br><br>
-				&nbsp;&nbsp;&nbsp;Para registro de suas Análises acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">SNCI</a><br><br>
+				&nbsp;&nbsp;&nbsp;Para registro de suas Análises acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">SNCI</a><br><br>
 						
 						<table>
 						<tr>
@@ -1799,7 +1767,7 @@
 				 </cfif>
 				</cfif>      
 			  </cfoutput>  
-   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 21;aviso por e-mail aos Status 1-RU, 6-RA, 7-RS, 21-RV, 22-RO que Pos_DtPosic possui mais de 14 dias corridos'>	   	  			  
+<!---    <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 21;aviso por e-mail aos Status 1-RU, 6-RA, 7-RS, 21-RV, 22-RO que Pos_DtPosic possui mais de 14 dias corridos'>	 --->   	  			  
 		</cfif> 
 	<!--- ###### FIM REPOSTAS ###### --->
 	<!--- ###### INICIO Em Análise ###### --->
@@ -1862,10 +1830,10 @@
 		
 						 Mensagem automática. Não precisa responder!<br><br>
 						<strong>
-						   Ao Gestor do(a) #Ucase(auxnomearea)#. <br><br><br>
+						   Ao Gestor(a) do(a) #Ucase(auxnomearea)#. <br><br><br>
 				
 				&nbsp;&nbsp;&nbsp;Comunicamos que há itens respondidos aguardando ratificação pelas equipes das SGCIN/SCIA quanto as ações informadas pelo gestor em sua última manifestação.<br><br>
-				&nbsp;&nbsp;&nbsp;Para registro de suas Análises acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">SNCI</a><br><br>
+				&nbsp;&nbsp;&nbsp;Para registro de suas Análises acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">SNCI</a><br><br>
 						
 						<table>
 						<tr>
@@ -1962,7 +1930,7 @@
 					</cfif> 
 				<!--- </cfloop>	 --->						    
 		  </cfoutput> 
-   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 22;Aviso por e-mail aos Status 28-EA = EM ANALISE aos seus respectivos SGCIN/SCIA'>	   	  				   
+ <!---   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 22;Aviso por e-mail aos Status 28-EA = EM ANALISE aos seus respectivos SGCIN/SCIA'>	 --->   	  				   
 	</cfif>
 	<!--- ###### FIM Em Análise ###### --->
 <!--- ************** MUDAR STATUS conforme Demanda nº 58 ****************** --->
@@ -2093,7 +2061,7 @@
 		   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs10PS_TRAT.Pos_Inspecao#', '#rs10PS_TRAT.Pos_Unidade#', #rs10PS_TRAT.Pos_NumGrupo#, #rs10PS_TRAT.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', #rot23_StatusID#, convert(char, getdate(), 108), '#and_obs#', '#aux_posarea#')
 		 </cfquery>
 	</cfoutput> 
-	  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 23;Mudar o Status de 10 para TRATAMENTO'>
+	<!---   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 23;Mudar o Status de 10 para TRATAMENTO'> --->
 		
   </cfif> 	
   <cfif rotina eq 24 and rotinaSN is 'S'>
@@ -2271,7 +2239,7 @@
 				
 					
 		<!--- 	</cfif>     ---> 
-	  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 24;Resgate do limbo - desabilitada'>		
+	 <!---  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 24;Resgate do limbo - desabilitada'>	 --->	
   </cfif> 
   <!---  --->
 	<cfif rotina eq 25>
@@ -2280,7 +2248,7 @@
 		  UPDATE Mensagem SET MSG_Status = 'D' WHERE MSG_Codigo = 1
 		 </cfquery> ---> 
 <!--- 		 <cflocation url="http://intranetsistemaspe/snci/rotinas_inspecao.cfm"> --->
-	  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 25;Desabilitado'>	
+	<!---   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 25;Desabilitado'>	 --->
 	</cfif>
 
 <!--- alerta quanto a necessidade de realizar Pesquisa_Pos_Avaliacao das Avaliações--->
@@ -2303,11 +2271,11 @@
 			<cfmail from="SNCI@correios.com.br" to="#rsAviso1_destina#" subject="Pesquisa de Opinião" type="HTML">
 					 Mensagem automática. Não precisa responder!<br><br>
 					<strong>
-					   Ao Gestor do(a) #Ucase(rsAviso1.Und_Descricao)#. <br><br><br>
+					   Ao Gestor(a) do(a) #Ucase(rsAviso1.Und_Descricao)#. <br><br><br>
 			
 			&nbsp;&nbsp;&nbsp;Comunicamos ao Gestor(a) #rsAviso1.INP_Responsavel# que está disponível a Pesquisa de Opinião ref. a verificação do controle interno realizada nessa unidade sob o nº de avaliação #rsAviso1.Pes_Inspecao#.<br><br>
 			
-			&nbsp;&nbsp;&nbsp;Para registro de sua Opinião acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/Pesquisa.cfm?ninsp=#rsAviso1.Pes_Inspecao#&consulta=N">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+			&nbsp;&nbsp;&nbsp;Para registro de sua Opinião acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/Pesquisa.cfm?ninsp=#rsAviso1.Pes_Inspecao#&consulta=N">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 
 			&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
 			
@@ -2334,11 +2302,11 @@
 			<cfmail from="SNCI@correios.com.br" to="#rsAviso2_destina#" subject="Pesquisa de Opinião" type="HTML">
 					 Mensagem automática. Não precisa responder!<br><br>
 					<strong>
-					   Ao Gestor do(a) #Ucase(rsAviso2.Und_Descricao)#. <br><br><br>
+					   Ao Gestor(a) do(a) #Ucase(rsAviso2.Und_Descricao)#. <br><br><br>
 			
 			&nbsp;&nbsp;&nbsp;Comunicamos ao Gestor(a) #rsAviso2.INP_Responsavel# que está disponível a Pesquisa de Opinião ref. a verificação do controle interno realizada nessa unidade sob o nº de avaliação #rsAviso2.Pes_Inspecao#.<br><br>
 			
-			&nbsp;&nbsp;&nbsp;Para registro de sua Opinião acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/Pesquisa.cfm?ninsp=#rsAviso2.Pes_Inspecao#&consulta=N">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+			&nbsp;&nbsp;&nbsp;Para registro de sua Opinião acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/Pesquisa.cfm?ninsp=#rsAviso2.Pes_Inspecao#&consulta=N">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 
 			&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
 			
@@ -2365,11 +2333,11 @@
 			<cfmail from="SNCI@correios.com.br" to="#rsAviso3_destina#" subject="Pesquisa de Opinião" type="HTML">
 					 Mensagem automática. Não precisa responder!<br><br>
 					<strong>
-					   Ao Gestor do(a) #Ucase(rsAviso3.Und_Descricao)#. <br><br><br>
+					   Ao Gestor(a) do(a) #Ucase(rsAviso3.Und_Descricao)#. <br><br><br>
 			
 			&nbsp;&nbsp;&nbsp;Comunicamos ao Gestor(a) #rsAviso3.INP_Responsavel# que está disponível a Pesquisa de Opinião ref. a verificação do controle interno realizada nessa unidade sob o nº de avaliação #rsAviso3.Pes_Inspecao#.<br><br>
 			
-			&nbsp;&nbsp;&nbsp;Para registro de sua Opinião acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/Pesquisa.cfm?ninsp=#rsAviso3.Pes_Inspecao#&consulta=N">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+			&nbsp;&nbsp;&nbsp;Para registro de sua Opinião acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/Pesquisa.cfm?ninsp=#rsAviso3.Pes_Inspecao#&consulta=N">Sistema Nacional de Controle Interno - SNCI</a><br><br>
 
 			&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
 			
@@ -2381,21 +2349,21 @@
 			</cfquery>					
 		</cfloop>	
 		</cfoutput>		
-	  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 26;alerta quanto a necessidade de realizar Pesquisa_Pos_Avaliacao das Avaliações'>	
+	 <!---  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 26;alerta quanto a necessidade de realizar Pesquisa_Pos_Avaliacao das Avaliações'> --->	
 	</cfif>
 	<!---  --->
 	<cfif rotina eq 27>
 		 <cfquery datasource="#dsn_inspecao#">
 		  UPDATE AvisosGrupos SET AVGR_status = 'D', AVGR_DT_DES = convert(char, getdate(), 102) WHERE AVGR_status = 'A' and AVGR_DT_FINAL < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00')
 		 </cfquery> 
-	  <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 27;ajuste na tela de avisos gerais'>	
+	  <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 27;ajuste na tela de avisos gerais'>	 --->
 	</cfif>	
 	<cfif rotina eq 28>
 		<cfset auxdt = dateformat(now(),"YYYYMMDD")>
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Mensagem SET MSG_Realizado = '#auxdt#', MSG_Status = 'D' WHERE MSG_Codigo = 1
 		</cfquery>	
-		<cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 28;Fim processamento de mensagem.cfm'>
+		<!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 28;Fim processamento de mensagem.cfm'> --->
 		<cflocation url="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">	
 	</cfif>		
 	<!---  --->

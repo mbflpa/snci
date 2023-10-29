@@ -904,6 +904,7 @@ N&ordm; Relat&oacute;rio:
 		<input type="hidden" name="scodresp" id="scodresp" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
 	</form>
 <!--- Fim Área de conteúdo --->
+
   </tr>
 </table>
 </body>

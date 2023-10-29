@@ -273,7 +273,7 @@ WHERE (Pos_Situacao_Resp in (0,11))
 <head>
 <title>Sistema Nacional de Controle Interno</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link href="css.css" rel="stylesheet" type="text/css">
  <cfquery name="rsSPnt" datasource="#dsn_inspecao#">
   SELECT STO_Codigo, STO_Sigla, STO_Cor, STO_Conceito FROM Situacao_Ponto where sto_status = 'A'

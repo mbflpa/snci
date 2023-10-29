@@ -1,39 +1,43 @@
-<!--- 
-<cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Prezados Usuarios, por motivos tecnicos estamos fazendo uma manutencao urgentissima no Sistema SNCI, previsao de retorno no dia 28/03/2022, as 13:00h!">
- --->
 
- <script>
-var txt = navigator.appName;
-if (txt != 'Microsoft Internet Explorer')
-{
-// alert('Senhor(a) Usuário(a), O Sistema Nacional de Controle Interno - SNCI \ndeve ser utilizado apenas com o navegador: Microsoft Internet Explorer');
- alert('Senhor(a) Usuário(a), O Sistema Nacional de Controle Interno - SNCI \ndeve ser utilizado apenas com o navegador: Microsoft Internet Explorer\n em outro navegador algum recurso de página poderá ter o seu funcionamento inadequado!');
+<cfoutput>
+	<cfset auxnaveg = ''>
+	<cfif find('Edg', '#cgi.HTTP_USER_AGENT#') gt 0>
+	<cfelseif  find('MSIE', '#cgi.HTTP_USER_AGENT#') gt 0>
+	<cfelse>
+		<cfset auxnaveg = 'Ao UsuÃ¡rio(a), O Sistema Nacional de Controle Interno - SNCI \ndeve ser utilizado com os Browser: \nMicrosoft Internet Explorer(IE) ou Microsoft EDGE\n em outro navegador algum recurso de pÃ¡gina poderÃ¡ ter o seu funcionamento inadequado!'>
+	</cfif>
+</cfoutput>
 
-// window.location.href = "http://intranetsistemaspe/snci/";
-}
-//================
-function abrirPopup(url,w,h) {
-var newW = w + 100;
-var newH = h + 100;
-var left = (screen.width-newW)/2;
-var top = (screen.height-newH)/2;
-var newwindow = window.open(url, 'name', 'width='+newW+',height='+newH+',left='+left+',top='+top+ ',toolbar=no,location=no, directories=no, status=no, menubar=no, scrollbars=1, resizable=yes, copyhistory=no');
-newwindow.resizeTo(newW, newH);
- 
-//posiciona o popup no centro da tela
-newwindow.moveTo(left, top);
-newwindow.focus();
-return false;
-}
-//================
-function pesquisa() {
-//alert(document.formx.ninsp.value);
-if (document.formx.ninsp.value != ''){
-	document.formx.submit();
+ <cfprocessingdirective pageEncoding ="utf-8"/>
+<script>
+	var txt = <cfoutput>'#auxnaveg#'</cfoutput>;
+	if (txt.length > 0)
+	{
+	alert(txt);
 	}
-}
-</script>
 
+	//================
+	function abrirPopup(url,w,h) {
+		var newW = w + 100;
+		var newH = h + 100;
+		var left = (screen.width-newW)/2;
+		var top = (screen.height-newH)/2;
+		var newwindow = window.open(url, 'name', 'width='+newW+',height='+newH+',left='+left+',top='+top+ ',toolbar=no,location=no, directories=no, status=no, menubar=no, scrollbars=1, resizable=yes, copyhistory=no');
+		newwindow.resizeTo(newW, newH);
+	
+		//posiciona o popup no centro da tela
+		newwindow.moveTo(left, top);
+		newwindow.focus();
+		return false;
+	}
+	//================
+	function pesquisa() {
+		//alert(document.formx.ninsp.value);
+		if (document.formx.ninsp.value != ''){
+			document.formx.submit();
+			}
+	}
+</script>
 
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
    SELECT DISTINCT Usu_GrupoAcesso, Usu_Matricula, Usu_Lotacao FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
@@ -65,7 +69,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 </cfquery>
 
 <cfif rsDia.MSG_Status is 'A'>
-	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Sr(a) USUARIO(a), AGUARDE! EM POUCOS MINUTOS SERÁ LIBERADO O ACESSO, SNCI EM MANUTENCAO.">
+	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Sr(a) USUARIO(a), AGUARDE! EM POUCOS MINUTOS SERï¿½ LIBERADO O ACESSO, SNCI EM MANUTENCAO.">
 </cfif>
 
 <cfset auxdt = dateformat(now(),"YYYYMMDD")>
@@ -89,7 +93,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 
 </head>
 
-<!--- Listas de permissões --->
+<!--- Listas de permissï¿½es --->
 		<cfquery name="qLista_Unid_Oper" datasource="#dsn_inspecao#">
 			SELECT Usu_Login FROM usuarios WHERE RTrim(Usu_GrupoAcesso) = 'UNIDADES';
 		</cfquery>
@@ -134,11 +138,6 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 			SELECT Usu_Login FROM usuarios WHERE RTrim(Usu_GrupoAcesso) = 'DEPARTAMENTO';
 		</cfquery>
 		<cfset Lista_Departamento = UCase(ValueList(qLista_Departamento.Usu_Login))>
-		
-		<cfquery name="qLista_Governa" datasource="#dsn_inspecao#">
-			SELECT Usu_Login FROM usuarios WHERE RTrim(Usu_GrupoAcesso) = 'GOVERNANCA';
-		</cfquery>
-		<cfset Lista_Governanca = UCase(ValueList(qLista_Governa.Usu_Login))>
 		
 		<cfquery name="qLista_Dcint" datasource="#dsn_inspecao#">
 			SELECT Usu_Login FROM usuarios WHERE RTrim(Usu_GrupoAcesso) = 'GESTORMASTER';
@@ -186,7 +185,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 		
 		
 	</style>
-	<a class="titulos" style="color:#fff;position:absolute;z-index: 10000;top:90px;right:15px">Versão: 2.3.1</a>	
+	<a class="titulos" style="color:#fff;position:absolute;z-index: 10000;top:90px;right:15px">Versï¿½o: 2.3.1</a>	
 <div id="div1" align="center" name ="div1" >
 
 <div id="div2" align="center" name ="div2">
@@ -368,12 +367,8 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('index.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/gerenciamento_de_inspecoes.jpg" width="200" height="90" border="0" /></a></div>	  </tr>
 	  <cfset Session.vPermissao = True>
     </cfif>
-	<cfif ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(cgi.REMOTE_USER))>
-	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('index.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/ConsultaAvaliacao.png" width="200" height="90" border="0" /></a></div>	  </tr>
-	  <cfset Session.vPermissao = True>
-    </cfif>	
 
- 	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) or ListContains(ListQualify(Lista_Reop,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) or ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(cgi.REMOTE_USER))>
+ 	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) or ListContains(ListQualify(Lista_Reop,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(cgi.REMOTE_USER)) or ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(cgi.REMOTE_USER))>
 
 	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('Rel_indicadoresglobal_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Metas.png" width="200" height="90" border="0" /></a></div>
 
@@ -443,7 +438,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	  <cfset Session.vPermissao = True>
     </cfif>	 --->
 	<cfif not Session.vPermissao>
-	    <div class="icones" colspan="2" align="center" class="red_titulo style5">Caro colaborador, você não tem permissão para acessar essa página. Procure o administrador do sistema no Departamento de Controle Interno - DCINT.</div>
+	    <div class="icones" colspan="2" align="center" class="red_titulo style5">Caro colaborador, vocÃª nÃ£o tem permissÃ£o para acessar essa pÃ¡gina. Procure o administrador do sistema no Departamento de Controle Interno - DCINT.</div>
     </cfif>
 
 	<cfquery name="qData" datasource="#dsn_inspecao#">
@@ -464,12 +459,12 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 			    	<img id="imgAtencao" name="imgAtencao"src="figuras/atencao.png" width="50px"  border="0" ></img>
 				</div>
 				<div style="float: left;">
-			    	<span style="font-size:10px;position:relative;top:11px"><strong>Sr. Inspetor! Existem Avaliações de Controle com itens pendentes de REANÁLISE. <br>Favor priorizar os ajustes solicitados!</strong></span> 							
+			    	<span style="font-size:10px;position:relative;top:11px"><strong>Sr. Inspetor! Existem Avaliaï¿½ï¿½es de Controle com itens pendentes de REANï¿½LISE. <br>Favor priorizar os ajustes solicitados!</strong></span> 							
 				</div>							
 			</div>
 		</div>
 	</cfif>
-<!--- rotina para aviso  às unidades ref. pesquisa de Opinião --->
+<!--- rotina para aviso  ï¿½s unidades ref. pesquisa de Opiniï¿½o --->
 <cfset pesquisa = ''>
 <cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'UNIDADES'>
 <cfoutput>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="SEI" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="sei"/>
+			<item value="&lt;cfset resp = qResposta.Pos_Situacao_Resp&gt;"/>
+			<item value="resp"/>
+			<item value="resp= (qresposta.pos_situacao_resp)"/>
+			<item value="resp= qresposta.pos_situacao_resp"/>
+			<item value="Voltar"/>
+			<item value="voltar"/>
+			<item value="arquivo"/>
+		</list>
+		<list key="replacehistory">
+			<item value="andamento"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="257" key="DIALOG_WIDTH"/>
+		<item value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI" key="DIALOG_FONT_NAME"/>
+		<item value="380" key="DIALOG_HEIGHT"/>
+		<item value="1017" key="DIALOG_X_ORIGIN"/>
+		<item value="236" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>
