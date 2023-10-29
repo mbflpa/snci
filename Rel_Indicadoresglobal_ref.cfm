@@ -18,7 +18,7 @@ WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_U
 SELECT Andt_AnoExerc
 FROM Andamento_Temp
 GROUP BY Andt_AnoExerc
-HAVING Andt_AnoExerc  < '#auxanoatu#'
+HAVING Andt_AnoExerc  < '#auxanoatu#' and Andt_AnoExerc <> '2021'
 ORDER BY Andt_AnoExerc DESC
 </cfquery>
 <!--- =========================== --->
@@ -42,12 +42,12 @@ function validarform() {
 	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
 	{
 	if (eval(messelec) >= eval(mesatual)){
-	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
+	alert('Gestor(a), o mï¿½s selecionado para o ano selecionado ainda nï¿½o gerado!');
 	return false;
 	}
 
     if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmdia.value <= 10){
-	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
+	alert('Gestor(a), o mï¿½s selecionado para o ano selecionado ainda nï¿½o gerado!');
 	return false;
 	}	
 	} 
@@ -66,7 +66,7 @@ function validarform() {
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 	<form action="Rel_Indicadoresglobal.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return validarform()">
 	  <table width="24%" align="center">
        
@@ -102,16 +102,17 @@ function validarform() {
             <td>&nbsp;</td>
             <td width="23%" class="exibir"><strong>Ano : </strong></td>
             <td colspan="2">
-			<select name="frmano" class="exibir" id="frmano">
+			  <select name="frmano" class="exibir" id="frmano">
 			  <cfoutput> <option value="#year(now())#">#year(now())#</option></cfoutput>
-             <cfoutput query="rsAno">
-			  <option value="#rsAno.Andt_AnoExerc#" <cfif rsAno.Andt_AnoExerc eq year(now())>selected</cfif>>#rsAno.Andt_AnoExerc#</option>
-			  </cfoutput>
-            </select></td>
+        <cfoutput query="rsAno">
+        <option value="#rsAno.Andt_AnoExerc#" <cfif rsAno.Andt_AnoExerc eq year(now())>selected</cfif>>#rsAno.Andt_AnoExerc#</option>
+        </cfoutput>
+        </select>
+      </td>
           </tr>
 		      <tr>
             <td>&nbsp;</td>
-            <td width="23%" class="exibir"><strong>Mês : </strong></td>
+            <td width="23%" class="exibir"><strong>Mï¿½s : </strong></td>
             <td colspan="2"><select name="frmmes" class="exibir" id="frmmes">
                 <option value="1">Jan</option>
 				<option value="2">Fev</option>

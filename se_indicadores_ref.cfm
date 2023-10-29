@@ -1,17 +1,17 @@
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
-SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+	SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 
-<cfif TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'ANALISTAS' and TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GESTORMASTER' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GESTORES' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'DESENVOLVEDORES' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'SUPERINTENDENTE' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GERENTES' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'ORGAOSUBORDINADOR' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'SUBORDINADORREGIONAL' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GOVERNANCA'>
+<cfif TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'ANALISTAS' and TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GESTORMASTER' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GESTORES' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'DESENVOLVEDORES' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'SUPERINTENDENTE' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GERENTES' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'ORGAOSUBORDINADOR' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'SUBORDINADORREGIONAL'>
 	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=PAGINA DE INDICADORES EM MANUTENCAO ATE 12h">
 </cfif>   
 <cfset auxanoatu = year(now())>
 <cfquery name="rsAno" datasource="#dsn_inspecao#">
-SELECT Andt_AnoExerc
-FROM Andamento_Temp
-GROUP BY Andt_AnoExerc
-HAVING Andt_AnoExerc > '2021' and Andt_AnoExerc < '#auxanoatu#'
-ORDER BY Andt_AnoExerc DESC
+	SELECT Andt_AnoExerc
+	FROM Andamento_Temp
+	GROUP BY Andt_AnoExerc
+	HAVING Andt_AnoExerc > '2021' and Andt_AnoExerc < '#auxanoatu#'
+	ORDER BY Andt_AnoExerc DESC
 </cfquery>
 
 <!--- =========================== --->
@@ -83,7 +83,7 @@ ORDER BY Andt_AnoExerc DESC
 	<title>Sistema Nacional de Controle Interno</title>
 	<link href="css.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
-// função que transmite as rotinas de alt, exc, etc...
+// funï¿½ï¿½o que transmite as rotinas de alt, exc, etc...
 function trocar(a){
 //alert('aaa');
     a = a.toUpperCase();
@@ -98,20 +98,23 @@ function trocar(a){
 function valida_form() {
     var frm = document.forms[0];
     if (frm.dr.value=='---'){
-	  alert('Informar a Superintendência!');
+	  alert('Informar a Superintendï¿½ncia!');
 	  frm.dr.focus();
 	  return false;
 	}	
 	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	frm.anoexerc.value = frm.frmano.value;
-	var auxdt = frm.dtlimitatual.value; 
-	//frm.dtlimit.value = frm.frmano.value + auxdt.substring(4,10);
-	
+	 
+	var auxdt = frm.dtlimit.value; 
+	if (frm.frmano.value < 2023) {
+		frm.dtlimit.value = frm.frmano.value + auxdt.substring(4,10);
+	}	
 	if (frm.frmano.value < frm.anoatual.value)
 	{
 	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	//frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 
+
 }
 </script>
 </head>
@@ -149,7 +152,7 @@ function valida_form() {
 		      <td colspan="2"><div align="center"><span class="titulos">&nbsp;&nbsp;&nbsp;&nbsp;</span></div></td>
 	  </tr>
 
-	   <cfif (UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' or UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GOVERNANCA')>
+	   <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' AND qAcesso.Usu_DR eq '01'>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where dir_codigo <> '01'
 			</cfquery>
@@ -158,7 +161,7 @@ function valida_form() {
 			 <td width="97%">
 		       <div align="center">
 			       <select name="dr" id="dr" class="form">
-                    <!---  <option selected="selected" value="---">---</option> --->
+                     <option selected="selected" value="---">---</option>
                      <cfoutput query="qSE">
                        <option value="#qSE.Dir_Codigo#">#Ucase(trim(qSE.Dir_Sigla))#</option>
                      </cfoutput>
@@ -173,7 +176,7 @@ function valida_form() {
 			 <td width="97%">
 		       <div align="center">
 			       <select name="dr" id="dr" class="form">
-                    <!---  <option selected="selected" value="---">---</option> --->
+                     <option selected="selected" value="---">---</option>
                      <cfoutput query="qSE">
                        <option value="#qSE.Dir_Codigo#">#Ucase(trim(qSE.Dir_Sigla))#</option>
                      </cfoutput>
@@ -338,12 +341,13 @@ function valida_form() {
 	  <input name="dtlimitatual" type="hidden" value="<cfoutput>#dtlimit#</cfoutput>">
 	  <input name="anoexerc" type="hidden" value="<cfoutput>#year(dtLimit)#</cfoutput>">
 	  <input name="anoatual" type="hidden" value="<cfoutput>#year(now())#</cfoutput>">
-<!--- <cfoutput>#dtlimit#</cfoutput><br>
-<cfoutput>#dtlimit#</cfoutput><br>
+<!--- 	  
+<cfoutput>dtlimit:#dtlimit#</cfoutput><br>
 <cfoutput>#year(dtLimit)#</cfoutput><br>
-<cfoutput>#year(now())#</cfoutput>	 ---> 
+<cfoutput>#year(now())#</cfoutput>	  
+--->
 </form>
-  <!--- Término da área de conteúdo --->
+  <!--- Tï¿½rmino da ï¿½rea de conteï¿½do --->
 </body>
 </html>
 

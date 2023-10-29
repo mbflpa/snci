@@ -1,5 +1,8 @@
+<cfprocessingdirective pageEncoding ="utf-8"/>  
 <cfsetting requesttimeout="15000">
- <!--- <cfoutput>#url.dr#  === #anoexerc#  === #dtlimit#<br></cfoutput>
+<!--- 
+<cfdump  var="#url#">
+ <cfoutput>#url.dr#  === #anoexerc#  === #dtlimit#<br></cfoutput>
  <CFSET GIL = GIL>  --->
  
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
@@ -36,7 +39,7 @@ SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<c
 		<cfset mes = "Fevereiro">
 	</cfcase>
 	<cfcase value="3">
-		<cfset mes = "Março">
+		<cfset mes = "MarÃ§o">
 	</cfcase>
 	<cfcase value="4">
 		<cfset mes = "Abril">
@@ -113,7 +116,7 @@ Result_AcumPeriodo: #Result_AcumPeriodo#<br>--->
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="css.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
-// função que transmite as rotinas de alt, exc, etc...
+// funï¿½ï¿½o que transmite as rotinas de alt, exc, etc...
 function trocar(a){
 //alert(a);
 	if (a == 1) {
@@ -243,7 +246,7 @@ function Hint(objNome, action){
 		<cfset mesantes = "Fevereiro">
 	</cfcase>
 	<cfcase value="3">
-		<cfset mesantes = "Março">
+		<cfset mesantes = "MarÃ§o">
 	</cfcase>
 	<cfcase value="4">
 		<cfset mesantes = "Abril">

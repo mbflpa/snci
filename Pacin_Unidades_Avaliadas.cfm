@@ -190,7 +190,7 @@
         </tr>
 		
 		<tr bgcolor="f7f7f7">
-			<td colspan="19" align="center" bgcolor="#B4B4B4" class="titulo1">LISTAS DAS UNIDADES  AVALIADAS nO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
+			<td colspan="19" align="center" bgcolor="#B4B4B4" class="titulo1">LISTAS DAS UNIDADES  AVALIADAS NO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
 		</tr>
         <tr class="titulosClaro">
           <td colspan="25" bgcolor="eeeeee" class="exibir"><cfoutput>Qtd. #rsUnidade.recordcount#</cfoutput></td>
@@ -204,7 +204,8 @@
             <td width="5%">Modal</td>
             <td width="9%">Início Avaliação</td>
             <td width="8%">Final Avaliação</td>
-            <td width="10%">Horas Avaliação</td>
+            <td width="10%"><div align="center">Horas Avaliação</div></td>
+			<td width="5%"><div align="center">Pontuação</div></td>
             <td width="15%"><div align="left">Gestor da Unidade</div></td>
             <td width="19%">Avaliações realizadas </td>
           </tr>
@@ -249,7 +250,9 @@
             <td width="5%">#modal#</td>
             <td width="9%">#INPDtInic#</td>
             <td width="8%">#INPDtFim#</td>
-            <td width="10%">#INP_HrsInspecao#</td>
+            <td width="10%"><div align="center">#INP_HrsInspecao#</div></td>
+			<cfset pontos = numberFormat(Und_Ano_Pontos_Avaliar,99.00)>
+			<td width="5%"><div align="center">#pontos#</div></td>
             <td width="15%"><div align="left">#INPResp#</div></td>
             <td width="19%">#auxano#</td>
           </tr>

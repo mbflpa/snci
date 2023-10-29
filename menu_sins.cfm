@@ -145,7 +145,7 @@
 </cfif>	
  <!---	   <tr>
             <td width="7%"><img src="smallArrow.gif" width="16" height="5" /></td>
-            <td><a href="index.cfm?opcao=inspecao5">Pontos Controle Interno - Estatística</td>
+            <td><a href="index.cfm?opcao=inspecao5">Pontos Controle Interno - Estatï¿½stica</td>
           </tr>
           <tr>
             <td><img src="smallArrow.gif" width="16" height="5" /></td>
@@ -177,7 +177,7 @@
           </tr>
 		  <tr>
             <td><img src="smallArrow.gif" width="16" height="5" /></td>
-            <td><a href="index.cfm?opcao=inspecao12">Tempo de Solução por Gerências</a> </td>
+            <td><a href="index.cfm?opcao=inspecao12">Tempo de Soluï¿½ï¿½o por Gerï¿½ncias</a> </td>
           </tr>
 		  <tr>
 		    <td><img src="smallArrow.gif" width="16" height="5" /></td>
@@ -191,7 +191,7 @@
 	       <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
-          <td colspan="2" rowspan=""><a href="#">Relatórios</a></td>
+          <td colspan="2" rowspan=""><a href="#">Relatï¿½rios</a></td>
        </tr>
 	    <tr>
 	       <td colspan="2">&nbsp;</td>
@@ -210,11 +210,11 @@
         </tr>
 	    <tr>
 	      <td><img src="smallArrow.gif" width="16" height="5" /></td>
-	      <td><a href="index.cfm?opcao=permissao9">Acompanhamento - Área</a></td>
+	      <td><a href="index.cfm?opcao=permissao9">Acompanhamento - ï¿½rea</a></td>
         </tr>
 		<tr>
 	      <td><img src="smallArrow.gif" width="16" height="5" /></td>
-	      <td><a href="index.cfm?opcao=permissao10">Preliminar - Área</a></td>
+	      <td><a href="index.cfm?opcao=permissao10">Preliminar - ï¿½rea</a></td>
         </tr>
 		<tr>
 	      <td><img src="smallArrow.gif" width="16" height="5" /></td>
@@ -297,11 +297,6 @@
        <tr>
         <td>&nbsp;</td>
       </tr>
-
-	   <tr>
-		<td><img src="smallArrow.gif" width="16" height="5" /></td>
-		<td width="94%"><a href="index.cfm?opcao=inspecao20">SLNC - Solu&ccedil;&atilde;o de N&atilde;o Conformidades</a></td>
-	   </tr>	
 <!--- 	   <tr>
         <td>&nbsp;</td>
       </tr> --->
@@ -309,6 +304,11 @@
 		<td><img src="smallArrow.gif" width="16" height="5" /></td>
 		<td width="94%"><a href="index.cfm?opcao=inspecao17">PRCI - Atend. ao Prazo de Resposta do Controle Interno</a></td>
 	   </tr>
+
+    <tr>
+      <td><img src="smallArrow.gif" width="16" height="5" /></td>
+      <td width="94%"><a href="index.cfm?opcao=inspecao20">SLNC - Solu&ccedil;&atilde;o de N&atilde;o Conformidades</a></td>
+    </tr>	
 <!--- 	   <tr>
         <td>&nbsp;</td>
       </tr> --->

@@ -414,30 +414,9 @@
 						</cfif>	
 					</cfif>	
 					<cfset ItnPontuacao =  (ItnPontuacao * fator)>
-	                <cfif impactosn eq 'S'>
-							<!--- Ajustes para os campos: Pos_ClassificacaoPonto --->
-							<!--- Obter a pontuacao max pelo ano e tipo da unidade --->
-							<cfquery name="rsPtoMax" datasource="#dsn_inspecao#">
-								SELECT TUP_PontuacaoMaxima 
-								FROM Tipo_Unidade_Pontuacao 
-								WHERE TUP_Ano = '#right(FORM.Ninsp,4)#' AND TUP_Tun_Codigo = #rs11.Itn_TipoUnidade#
-							</cfquery>
-							<!--- calcular o perc de classificacao do item --->	
-							<cfset PercClassifPonto = NumberFormat(((ItnPontuacao / rsPtoMax.TUP_PontuacaoMaxima) * 100),999.00)>	
-							
-							<!--- calculo da descricao do item a saber GRAVE, MEDIANO ou LEVE --->
-							
-							<cfif PercClassifPonto gt 50.01>
-							<cfset ClasItem_Ponto = 'GRAVE'> 
-							<cfelseif PercClassifPonto gt 10 and PercClassifPonto lte 50.01>
-							<cfset ClasItem_Ponto = 'MEDIANO'> 
-							<cfelseif PercClassifPonto lte 10>
-							<cfset ClasItem_Ponto = 'LEVE'> 
-							</cfif>	
-						</cfif>						
-						<cfif len(trim(rs11.RIP_REINCINSPECAO)) gt 0 and ClasItem_Ponto eq 'LEVE'>
-							<cfset ClasItem_Ponto = 'MEDIANO'> 
-						</cfif>
+					<cfif len(trim(rs11.RIP_REINCINSPECAO)) gt 0 and ClasItem_Ponto eq 'LEVE'>
+						<cfset ClasItem_Ponto = 'MEDIANO'> 
+					</cfif>
 <!---  --->						
 					<cfquery datasource="#dsn_inspecao#">
 						UPDATE ParecerUnidade SET Pos_Area = '#auxposarea#'
@@ -467,121 +446,6 @@
 					</cfquery>
 					
 			    </cfloop>
-
-				<!--- inicio - e-mail automático por unidade --->
-				<cfquery name="rsEmail" datasource="#dsn_inspecao#">
-					SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Und_TipoUnidade, Und_Descricao, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Und_CodReop, INP_DtInicInspecao
-					FROM Inspecao INNER JOIN (Unidades INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade) ON (INP_NumInspecao = Pos_Inspecao) AND (INP_Unidade = Pos_Unidade)
-					WHERE (Pos_Unidade = '#unid#') AND (Pos_Inspecao = '#ninsp#') AND (Pos_Situacao_Resp = 14)
-				</cfquery>
-
-		        <cfoutput>
-					<cfset emailunid = "">
-					<cfset emailreopunid = "">
-					<cfset emailcdd = "">
-					<cfset emailreopcdd = "">
-
-					<cfif rsEmail.recordcount gt 0>
-						<!--- Busca de email da Unidade --->
-						<cfloop query="rsEmail">
-						    <cfif rsEmail.Pos_Area eq rsEmail.Pos_Unidade and emailunid eq "">
-							  <!--- adquirir o email dos registro do Pos_Area --->
-								<cfquery name="rsPosUnidEmail" datasource="#dsn_inspecao#">
-								   SELECT Und_Descricao, Und_Email FROM Unidades WHERE Und_Codigo = '#rsEmail.Pos_Unidade#'
-								</cfquery>
-								<cfset emailunid = #rsPosUnidEmail.Und_Email#>
-				                <!--- adquirir o email do OrgaoSubordiador --->
-								<cfquery name="rsReopunidEmail" datasource="#dsn_inspecao#">
-								 SELECT Rep_Email FROM Reops WHERE Rep_Codigo = '#rsEmail.Pos_Unidade#'
-								</cfquery>
-								<cfset emailreopunid = #rsReopunidEmail.Rep_Email# >
-						    </cfif>
-						    <!--- Busca de email do CDD --->
-						    <cfif rsEmail.Pos_Area neq rsEmail.Pos_Unidade and emailcdd eq "">
-							  <!--- adquirir o email dos registro do Pos_Area --->
-								<cfquery name="rsPosAreaEmail" datasource="#dsn_inspecao#">
-								   SELECT Und_Descricao, Und_Email FROM Unidades WHERE Und_Codigo = '#rsEmail.Pos_Area#'
-								</cfquery>
-								<cfset emailcdd = #rsPosAreaEmail.Und_Email#>
-
-								<!--- adquirir o email do OrgaoSubordiador --->
-								<cfquery name="rsReopcddEmail" datasource="#dsn_inspecao#">
-								 SELECT Rep_Email FROM Reops WHERE Rep_Codigo = '#rsEmail.Pos_Area#'
-								</cfquery>
-								<cfset emailreopcdd = #rsReopcddEmail.Rep_Email# >
-						    </cfif>
-						</cfloop>
-
-						<cfset sdestina = "">
-                        <cfif emailunid neq "">
-                          <cfset sdestina = #sdestina# & ';' & #emailunid#>
-                        </cfif>
-
-                        <cfif emailreopunid neq "">
-                          <cfset sdestina = #sdestina# & ';' & #emailreopunid#>
-                        </cfif>
-
-                        <cfif emailcdd neq "">
-                          <cfset sdestina = #sdestina# & ';' & #emailcdd#>
-                        </cfif>
-
-                        <cfif emailreopcdd neq "">
-                          <cfset sdestina = #sdestina# & ';' & #emailreopcdd#>
-                        </cfif>
-
-		  			    <cfif findoneof("@", trim(sdestina)) eq 0>
-							  <cfset sdestina = "gilvanm@correios.com.br">
-						 </cfif>
-
-			
-						<!--- adquirir o email do SCOI da SE --->
-						<cfquery name="rsSCOIEmail" datasource="#dsn_inspecao#">
-							SELECT Ars_Email
-							FROM Areas
-							WHERE (Ars_Codigo Like 'left(#ninsp#,2)%') AND 
-							(Ars_Sigla Like '%CCOP/SCOI%' OR Ars_Sigla Like '%DCINT/GCOP/SGCIN/SCOI') AND (Ars_Status='A')
-						</cfquery>
-						 <cfset assunto = 'Relatório de Controle Interno - ' & #trim(rsEmail.Und_Descricao)# & ' - Avaliação de Controle Interno ' & #ninsp#>
-						<cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
-							Mensagem autom?tica. Não precisa responder!<br><br>
-							<strong>
-							   Prezado(a) Gerente do(a) #trim(Ucase(rsEmail.Und_Descricao))#, informamos que estão disponível na intranet o Relatório de Controle Interno: N° #ninsp#, realizada nessa Unidade na Data: #dateformat(rsEmail.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br><br>
-
-						&nbsp;&nbsp;&nbsp;Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:<br><br>
-
-						&nbsp;&nbsp;&nbsp;a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA); <br>
-
-						&nbsp;&nbsp;&nbsp;b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;<br>
-
-						&nbsp;&nbsp;&nbsp;c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).<br><br>
-
-						&nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório. <br>
-						&nbsp;&nbsp;&nbsp;O Não cumprimento desse prazo ensejará comunicação ao órgão subordinador dessa unidade.<br><br>
-
-						&nbsp;&nbsp;&nbsp;Acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a><br><br>
-
-						&nbsp;&nbsp;&nbsp;Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação. <br><br>
-
-						&nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #rsSCOIEmail.Ars_Email#.<br><br>
-
-						<table>
-						<tr>
-						<td><strong>Unidade : #rsEmail.Pos_Unidade# - #rsEmail.Und_Descricao#</strong></td>
-						</tr>
-						<tr>
-						<td><strong>Relatório: #rsEmail.Pos_Inspecao#</strong></td>
-						</tr>
-						<tr>
-						<td><strong>------------------------------------------</strong></td>
-						</tr>
-						</table>
-						<br>
-						&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
-						</strong>
-						</cfmail>
-			    	</cfif>
-		        </cfoutput>
-
             </cfif>
 
 			<!--- Verificar registro estão na situação 14(Não Respondido) na tabela ParecerUnidade --->
@@ -789,7 +653,7 @@
 					Ao Gestor do(a) #Ucase(auxsigla)#. <br><br><br>
 					&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  "#situacao#" para  manifestação  desse órgão.<br><br>
 					&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
-					&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a>Relatório N° #FORM.ninsp#, Grupo: #FORM.ngrup#  e Item: #FORM.nitem#.<br><br>
+					&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Acesse o SNCI endereço: 'http://intranetsistemaspe/snci/rotinas_inspecao.cfm'</a>Relatório N° #FORM.ninsp#, Grupo: #FORM.ngrup#  e Item: #FORM.nitem#.<br><br>
 				</cfmail>
 				<!--- Fim da Intencao de passar a area --->
 				<!--- *****************************************************************************  --->
@@ -801,37 +665,40 @@
 					<cfif qInspecaoLiberada.recordCount Eq 0>
 						<!--- Os demais já foram analisados estão no status 11- EL --->
 						<cfquery name="rs11" datasource="#dsn_inspecao#">
-						SELECT Und_TipoUnidade, Und_Centraliza, Itn_TipoUnidade, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea 
-						FROM ((Inspecao INNER JOIN ParecerUnidade ON (INP_NumInspecao = Pos_Inspecao) AND (INP_Unidade = Pos_Unidade)) INNER JOIN Unidades ON Pos_Unidade = Und_Codigo)
-						INNER JOIN Itens_Verificacao ON (Pos_NumItem = Itn_NumItem) AND (Pos_NumGrupo = Itn_NumGrupo) 
-						AND (INP_Modalidade = Itn_Modalidade) AND (Und_TipoUnidade = Itn_TipoUnidade) and right(Pos_Inspecao,4)= Itn_Ano
+						SELECT Und_TipoUnidade, Und_Centraliza, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Itn_PTC_Seq, Itn_TipoUnidade, Itn_Pontuacao, Itn_Classificacao, RIP_Falta, RIP_Sobra
+						FROM (((Inspecao 
+						INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)) 
+						INNER JOIN ParecerUnidade ON (RIP_NumItem = Pos_NumItem) 
+						AND (RIP_NumGrupo = Pos_NumGrupo) AND (RIP_NumInspecao = Pos_Inspecao) AND (RIP_Unidade = Pos_Unidade)) 
+						INNER JOIN Unidades ON Pos_Unidade = Und_Codigo) 
+						INNER JOIN Itens_Verificacao ON (INP_Modalidade = Itn_Modalidade) AND (Und_TipoUnidade = Itn_TipoUnidade) AND (Pos_NumItem = Itn_NumItem) AND (Pos_NumGrupo = Itn_NumGrupo) and (convert(char(4),RIP_Ano) = Itn_Ano)
 						WHERE Pos_Unidade='#unid#' AND Pos_Inspecao='#ninsp#' AND Pos_Situacao_Resp = 11
 						</cfquery> 
 
-					<!--- inicio 10 (dez) dias uteis para status 14-NR --->
-					<cfif rs11.recordcount gt 0>
-						
-						<cfset auxdtprev = CreateDate(year(now()),month(now()),day(now()))>
-						<cfset nCont = 0>
-						<cfloop condition="nCont lte 9">
-						   <cfset nCont = nCont + 1>
-						   <cfset auxdtprev = DateAdd( "d", 1, auxdtprev)>
-						   <cfset vDiaSem = DayOfWeek(auxdtprev)>
-						   <cfif vDiaSem neq 1 and vDiaSem neq 7>
-								<!--- verificar se Feriado Nacional --->
-								<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-									 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #auxdtprev#
-								</cfquery>
-								<cfif rsFeriado.recordcount gt 0>
-								   <cfset nCont = nCont - 1>
+						<!--- inicio 10 (dez) dias uteis para status 14-NR --->
+						<cfif rs11.recordcount gt 0>
+							
+							<cfset auxdtprev = CreateDate(year(now()),month(now()),day(now()))>
+							<cfset nCont = 0>
+							<cfloop condition="nCont lte 9">
+							<cfset nCont = nCont + 1>
+							<cfset auxdtprev = DateAdd( "d", 1, auxdtprev)>
+							<cfset vDiaSem = DayOfWeek(auxdtprev)>
+							<cfif vDiaSem neq 1 and vDiaSem neq 7>
+									<!--- verificar se Feriado Nacional --->
+									<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+										SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #auxdtprev#
+									</cfquery>
+									<cfif rsFeriado.recordcount gt 0>
+									<cfset nCont = nCont - 1>
+									</cfif>
 								</cfif>
-							</cfif>
-							<!--- Verifica se final de semana  --->
-							<cfif vDiaSem eq 1 or vDiaSem eq 7>
-								<cfset nCont = nCont - 1>
-							</cfif>
-						</cfloop>					
-					</cfif>
+								<!--- Verifica se final de semana  --->
+								<cfif vDiaSem eq 1 or vDiaSem eq 7>
+									<cfset nCont = nCont - 1>
+								</cfif>
+							</cfloop>					
+						</cfif>
 					<!--- fim 10 (dez) dias uteis para status 14-NR --->
 					
 						<cfloop query="rs11">
@@ -845,6 +712,66 @@
 									<cfset auxposarea = rs11.Und_Centraliza>
 									<cfset auxnomearea = rsCDD.Und_Descricao>
 							</cfif>
+							<!--- inicio classificacao do ponto --->
+							<cfset composic = rs11.Itn_PTC_Seq>	
+							<cfset ItnPontuacao = rs11.Itn_Pontuacao>
+							<cfset ClasItem_Ponto = ucase(trim(rs11.Itn_Classificacao))>
+							<cfset somafaltasobra=0>
+									
+							<cfset impactosn = 'N'>
+							<cfif left(composic,2) eq '10'>
+								<cfset impactosn = 'S'>
+							</cfif>
+							<cfset fator = 1>
+
+							<cfif impactosn eq 'S'>
+								<cfquery name="rsRelev" datasource="#dsn_inspecao#">
+									SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
+									FROM ValorRelevancia
+									WHERE VLR_Ano = right('#FORM.Ninsp#',4))
+								</cfquery
+								><cfset somafaltasobra = rs11.RIP_Falta>
+								<cfif (FORM.Nitem eq 1 and (FORM.Ngrup eq 53 or FORM.Ngrup eq 72 or FORM.Ngrup eq 214 or FORM.Ngrup eq 284))>
+									<cfset somafaltasobra = somafaltasobra + rs11.RIP_Sobra>
+								</cfif>
+								<cfif somafaltasobra gt 0>
+									<cfloop query="rsRelev">
+										<cfif rsRelev.VLR_FaixaInicial is 0 and rsRelev.VLR_FaixaFinal lte somafaltasobra>
+											<cfset fator = rsRelev.VLR_Fator>
+										<cfelseif rsRelev.VLR_FaixaInicial neq 0 and VLR_FaixaFinal neq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial and somafaltasobra lte rsRelev.VLR_FaixaFinal>
+											<cfset fator = rsRelev.VLR_Fator>									
+										<cfelseif VLR_FaixaFinal eq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial>
+											<cfset fator = rsRelev.VLR_Fator> 								
+										</cfif>
+									</cfloop>
+								</cfif>	
+							</cfif>	
+							<cfset ItnPontuacao =  (ItnPontuacao * fator)>	
+							<cfif impactosn eq 'S'>
+									<!--- Ajustes para os campos: Pos_ClassificacaoPonto --->
+									<!--- Obter a pontuacao max pelo ano e tipo da unidade --->
+									<cfquery name="rsPtoMax" datasource="#dsn_inspecao#">
+										SELECT TUP_PontuacaoMaxima 
+										FROM Tipo_Unidade_Pontuacao 
+										WHERE TUP_Ano = '#right(url.numInspecao,4)#' AND TUP_Tun_Codigo = #rsItem2.Itn_TipoUnidade#
+									</cfquery> 
+									<!--- calcular o perc de classificacao do item --->	
+									<cfset PercClassifPonto = NumberFormat(((ItnPontuacao / rsPtoMax.TUP_PontuacaoMaxima) * 100),999.00)>	
+									
+									<!--- calculo da descricao do item a saber GRAVE, MEDIANO ou LEVE --->
+									
+									<cfif PercClassifPonto gt 50.01>
+									<cfset ClasItem_Ponto = 'GRAVE'> 
+									<cfelseif PercClassifPonto gt 10 and PercClassifPonto lte 50.01>
+									<cfset ClasItem_Ponto = 'MEDIANO'> 
+									<cfelseif PercClassifPonto lte 10>
+									<cfset ClasItem_Ponto = 'LEVE'> 
+									</cfif>	
+							</cfif>	
+							<cfif ClasItem_Ponto eq 'LEVE'	and len(trim(rsVerificaItem.RIP_REINCINSPECAO)) gt 0>
+								<cfset ClasItem_Ponto = 'MEDIANO'>
+							</cfif>				
+							<!--- fim classificacao do ponto --->								
 							
 							<cfquery datasource="#dsn_inspecao#">
 								UPDATE ParecerUnidade SET Pos_Area = '#auxposarea#'
@@ -859,119 +786,6 @@
 								WHERE Pos_Unidade='#unid#' AND Pos_Inspecao='#ninsp#' and Pos_NumGrupo = #rs11.Pos_NumGrupo# and Pos_NumItem = #rs11.Pos_NumItem# and Pos_Situacao_Resp = 11
 							</cfquery>
 						</cfloop>
-						<!--- inicio - e-mail automatico por unidade --->
-						<cfquery name="rsEmail" datasource="#dsn_inspecao#">
-						SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Und_TipoUnidade, Und_Descricao, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Und_CodReop, INP_DtInicInspecao
-						FROM Inspecao INNER JOIN (Unidades INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade) ON (INP_NumInspecao = Pos_Inspecao) AND (INP_Unidade = Pos_Unidade)
-						WHERE (Pos_Unidade = '#unid#') AND (Pos_Inspecao = '#ninsp#') AND (Pos_Situacao_Resp = 14)
-						</cfquery>
-
-						<cfoutput>
-							<cfset emailunid = "">
-							<cfset emailreopunid = "">
-							<cfset emailcdd = "">
-							<cfset emailreopcdd = "">
-
-							<cfif rsEmail.recordcount gt 0>
-								<!--- Busca de email da Unidade --->
-								<cfloop query="rsEmail">
-									<cfif rsEmail.Pos_Area eq rsEmail.Pos_Unidade>
-									<!--- adquirir o email dos registro do Pos_Area --->
-										<cfquery name="rsPosUnidEmail" datasource="#dsn_inspecao#">
-										SELECT Und_Descricao, Und_Email FROM Unidades WHERE Und_Codigo = '#rsEmail.Pos_Unidade#'
-										</cfquery>
-										<cfset emailunid = #trim(rsPosUnidEmail.Und_Email)#>
-										<!--- adquirir o email do OrgaoSubordiador --->
-										<cfquery name="rsReopunidEmail" datasource="#dsn_inspecao#">
-										SELECT Rep_Email FROM Reops WHERE Rep_Codigo = '#rsEmail.Pos_Unidade#'
-										</cfquery>
-										<cfset emailreopunid = #trim(rsReopunidEmail.Rep_Email)# >
-									</cfif>
-									<!--- Busca de email do CDD --->
-									<cfif rsEmail.Pos_Area neq rsEmail.Pos_Unidade and emailcdd eq "">
-									<!--- adquirir o email dos registro do Pos_Area --->
-										<cfquery name="rsPosAreaEmail" datasource="#dsn_inspecao#">
-										SELECT Und_Descricao, Und_Email FROM Unidades WHERE Und_Codigo = '#rsEmail.Pos_Area#'
-										</cfquery>
-										<cfset emailcdd = #trim(rsPosAreaEmail.Und_Email)#>
-
-										<!--- adquirir o email do OrgaoSubordiador --->
-										<cfquery name="rsReopcddEmail" datasource="#dsn_inspecao#">
-										SELECT Rep_Email FROM Reops WHERE Rep_Codigo = '#rsEmail.Pos_Area#'
-										</cfquery>
-										<cfset emailreopcdd = #trim(rsReopcddEmail.Rep_Email)# >
-									</cfif>
-								</cfloop>
-
-								<cfset sdestina = "">
-								<cfif emailunid neq "">
-								<cfset sdestina = #sdestina# & ';' & #emailunid#>
-								</cfif>
-
-								<cfif emailreopunid neq "">
-								<cfset sdestina = #sdestina# & ';' & #emailreopunid#>
-								</cfif>
-
-								<cfif emailcdd neq "">
-								<cfset sdestina = #sdestina# & ';' & #emailcdd#>
-								</cfif>
-
-								<cfif emailreopcdd neq "">
-								<cfset sdestina = #sdestina# & ';' & #emailreopcdd#>
-								</cfif>
-
-								<cfif findoneof("@", trim(sdestina)) eq 0>
-									<cfset sdestina = "gilvanm@correios.com.br">
-								</cfif>
-
-								<!--- adquirir o email do SCOI da SE --->
-								<cfquery name="rsSCOIEmail" datasource="#dsn_inspecao#">
-									SELECT Ars_Email
-									FROM Areas
-									WHERE (Ars_Codigo Like 'left(#ninsp#,2)%') AND 
-									(Ars_Sigla Like '%CCOP/SCOI%' OR Ars_Sigla Like '%DCINT/GCOP/SGCIN/SCOI') AND (Ars_Status='A')
-								</cfquery>
-								
-								<cfset assunto = 'Relatório de Controle Interno - ' & #trim(rsEmail.Und_Descricao)# & ' - Avaliação de Controle Interno ' & #ninsp#>
-								<cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
-									Mensagem automática. Não precisa responder!<br><br>
-									<strong>
-									Prezado(a) Gerente do(a) #trim(Ucase(rsEmail.Und_Descricao))#, informamos que está disponível na intranet o Relatório de Controle Interno: N° #ninsp#, realizada nessa Unidade na Data: #dateformat(rsEmail.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br><br>
-
-									&nbsp;&nbsp;&nbsp;Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:<br><br>
-
-									&nbsp;&nbsp;&nbsp;a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA); <br>
-
-									&nbsp;&nbsp;&nbsp;b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;<br>
-
-									&nbsp;&nbsp;&nbsp;c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).<br><br>
-
-									&nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório. <br>
-									&nbsp;&nbsp;&nbsp;O Não cumprimento desse prazo ensejará comunicação ao órgão subordinador dessa unidade.<br><br>
-
-									&nbsp;&nbsp;&nbsp;Acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a><br><br>
-
-									&nbsp;&nbsp;&nbsp;Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação. <br><br>
-
-									&nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #rsSCOIEmail.Ars_Email#.<br><br>
-
-									<table>
-									<tr>
-									<td><strong>Unidade : #rsEmail.Pos_Unidade# - #rsEmail.Und_Descricao#</strong></td>
-									</tr>
-									<tr>
-									<td><strong>Relatório: #rsEmail.Pos_Inspecao#</strong></td>
-									</tr>
-									<tr>
-									<td><strong>------------------------------------------</strong></td>
-									</tr>
-									</table>
-									<br>
-									&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
-									</strong>
-								</cfmail>
-							</cfif>
-						</cfoutput>
 					</cfif>
 					<!--- *****************************************************************************  --->	 
 	</cfif>
@@ -1235,7 +1049,7 @@
 <head>
 <title>Sistema Nacional de Controle Interno</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 
 
 <script type="text/javascript">

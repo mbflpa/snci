@@ -52,7 +52,7 @@
 	  INNER JOIN Unidades ON INP_Unidade = Und_Codigo ON Rep_Codigo = Und_CodReop 
 	  INNER JOIN Grupos_Verificacao 
 	  INNER JOIN Itens_Verificacao ON Grp_Ano = Itn_Ano and Grp_Codigo = Itn_NumGrupo ON RIP_NumGrupo = Itn_NumGrupo 
-	  AND RIP_NumItem = Itn_NumItem and right(RIP_NumInspecao, 4) = Grp_Ano and (Itn_TipoUnidade = Und_TipoUnidade) 
+	  AND RIP_NumItem = Itn_NumItem and convert(char,RIP_Ano) = Grp_Ano and (Itn_TipoUnidade = Und_TipoUnidade) 
 	  AND (INP_Modalidade = Itn_Modalidade)
 	  left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidade = TNC_Unidade)
 	  WHERE RIP_NumInspecao='#ninsp#' AND (RIP_Unidade='#qUsuario.Usu_Lotacao#' or '#posarea#'='#qUsuario.Usu_Lotacao#') AND RIP_NumGrupo= #ngrup# AND RIP_NumItem=#nitem#
@@ -91,7 +91,7 @@
 	  INNER JOIN Unidades ON INP_Unidade = Und_Codigo ON Rep_Codigo = Und_CodReop 
 	  INNER JOIN Grupos_Verificacao 
 	  INNER JOIN Itens_Verificacao ON Grp_Ano = Itn_Ano and Grp_Codigo = Itn_NumGrupo ON RIP_NumGrupo = Itn_NumGrupo 
-	  AND RIP_NumItem = Itn_NumItem and right(RIP_NumInspecao, 4) = Grp_Ano and (Itn_TipoUnidade = Und_TipoUnidade) 
+	  AND RIP_NumItem = Itn_NumItem and convert(char,RIP_Ano) = Grp_Ano and (Itn_TipoUnidade = Und_TipoUnidade) 
 	  AND (INP_Modalidade = Itn_Modalidade)
 	  left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidade = TNC_Unidade)
 	  WHERE RIP_NumInspecao='#ninsp#' AND RIP_Unidade='#unid#' AND RIP_NumGrupo= #ngrup# AND RIP_NumItem=#nitem#
@@ -445,7 +445,7 @@
 			<cfcase value=18>
 			  , Pos_Situacao = 'TF'
 			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-			  <cfset Encaminhamento = 'A Unidade TERCEIRIZADA'>
+			  <cfset Encaminhamento = 'A UNIDADE TERCEIRIZADA'>
 			  <cfset situacao = 'TRATAMENTO DE TERCEIRIZADA'>
 			</cfcase>
 	  </cfswitch>
@@ -736,7 +736,7 @@ function validaForm() {
 
 	if (document.form1.frmReinccb.value == 'S' && (reincInsp.length != 10 || reincGrup == 0 || reincItem == 0))
 		{
-		// alert('Para o reincidência: Sim ? preciso informar Avalia�o, Grupo e Item!');
+		// alert('Para o reincidência: Sim ? preciso informar Avaliação, Grupo e Item!');
 		// return false;
 		} else {
 			document.form1.frmreincInsp.disabled = false;
@@ -775,7 +775,7 @@ if (document.form1.acao.value == 'Salvar'){
 
   if(strmanifesto.length < 100)
    {
-   alert('Caro Usuário, Sua manisfestação deverá conter no m�nimo 100(cem) caracteres');
+   alert('Caro Usuário, Sua manisfestação deverá conter no mínimo 100(cem) caracteres');
    return false;
    }
    
@@ -797,7 +797,7 @@ if (document.form1.acao.value == 'Salvar'){
 	var dtprevdig = document.form1.cbData.value;
 
 	if (dtprevdig.length != 10){
-		alert('Preencher campo: Data da Previsão da Solu�o ex. DD/MM/AAAA');
+		alert('Preencher campo: Data da Previsão da Solução ex. DD/MM/AAAA');
 		return false;
 	}
 /*
@@ -889,7 +889,7 @@ if (document.form1.acao.value == 'Salvar'){
 	return false;
 	}
 	// var sit = document.form1.frmResp.value;
-	  if (sit == 1) {var auxcam = '\n\nRESPOSTA DA UNIDADE\n\n - Essa opçãoRESPONDE o item e o encaminha para Equipe de Controle Interno da Regional (SGCIN)'};
+	  if (sit == 1) {var auxcam = '\n\nRESPOSTA DA UNIDADE\n\n - Essa opção RESPONDE o item e o encaminha para Equipe de Controle Interno da Regional (SGCIN)'};
 	  if (sit == 17) {var auxcam = '\n\nRESPOSTA DA TERCEIRIZADA\n\n - Essa opção RESPONDE o item e o encaminha para Equipe de Controle Interno da Regional (SGCIN)'};
 	  if (sit == 15) {var auxcam = '\n\nTRATAMENTO UNIDADE\n\n - Essa opção mantém o item a Unidade para desenvolvimento de ação que necessita de maior prazo da regularização ou resposta.\n Nesse caso deve indicar o prazo necessário no campo Data de Previsão da Solução.\n até essa data sua resposta devera ser complementada'};
 	  if (sit == 18) {var auxcam = '\n\nTRATAMENTO TERCEIRIZADA\n\n - Essa opção mantém o item a Unidade para desenvolvimento de ação que necessita de maior prazo da regularização ou resposta.\n Nesse caso deve indicar o prazo necessário no campo Data de Previsão da Solução.\n até essa data sua resposta devera ser complementada'};
@@ -913,7 +913,7 @@ if (document.form1.acao.value == 'Salvar'){
   //==============================
    if (document.form1.acao.value == 'Incluir_Causa'){
        if (document.form1.causaprovavel.value == '') {
-	   alert('Selecione uma Causa Provável a ser incluida.');
+	   alert('Selecione uma Causa Provável a ser incluída.');
 	   return false;
 	   }
 	   if (document.form1.causaprovavel.value != '') {
@@ -1406,7 +1406,7 @@ function mensagem(){
 		</cfquery>
 		<cfset dt30diasuteis = CreateDate(year(rs14NR.And_DtPosic),month(rs14NR.And_DtPosic),day(rs14NR.And_DtPosic))>
 		<cfset nCont = 0>
-		<cfloop condition="nCont lte 29">
+		<cfloop condition="nCont lte 30">
 			<cfset nCont = nCont + 1>
 			<cfset dt30diasuteis = DateAdd( "d", 1, dt30diasuteis)>
 			<cfset vDiaSem = DayOfWeek(dt30diasuteis)>
@@ -1439,7 +1439,7 @@ function mensagem(){
 			</cfquery>
 		<cfelse>
 	
-			<!--- possui direitode tratamento e de resposta --->	
+			<!--- possui direito de tratamento e de resposta --->	
 			<!--- Contar os possiveis dez dias uteis para tratamento --->	
 			<cfquery name="rsPonto" datasource="#dsn_inspecao#">
 				SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo in (17,18)
@@ -1448,7 +1448,7 @@ function mensagem(){
 			<!--- inicio 10 (dez) dias uteis para tratamento --->
 			<!--- <cfset auxdtprev = CreateDate(year(now()),month(now()),day(now()))> --->
 			<cfset nCont = 0>
-			<cfloop condition="(nCont lte 9) and (dttratam lte dtbase)">
+			<cfloop condition="(nCont lte 10) and (dttratam lte dtbase)">
 			<cfset nCont = nCont + 1>
 			<cfset dttratam = DateAdd( "d", 1, dttratam)>
 			<cfset vDiaSem = DayOfWeek(dttratam)>
@@ -1533,7 +1533,7 @@ function mensagem(){
 			<!--- <cfset auxdtprev = CreateDate(year(now()),month(now()),day(now()))> --->
 			<cfset nCont = 0>
 			<!--- <cfloop condition="(nCont lte #auxQtdDias# and #dtbase# lte #dateformat(dttratam,'YYYYMMDD')#)"> --->
-			<cfloop condition="(nCont lte 9 and #dtbase# gt #dateformat(dttratam,'YYYYMMDD')#)">
+			<cfloop condition="(nCont lte 10 and #dtbase# gt #dateformat(dttratam,'YYYYMMDD')#)">
 			    <cfset nCont = nCont + 1>
 				<cfset dttratam = DateAdd( "d", 1, dttratam)>
 				<cfset vDiaSem = DayOfWeek(dttratam)>
@@ -1566,7 +1566,7 @@ function mensagem(){
       <td colspan="5" class="titulos">&nbsp;</td>
       </tr>
     <tr>
-            <td align="center" bgcolor="eeeeee" class="titulos">Situa&ccedil;&atilde;o:</td>
+            <td align="center" bgcolor="eeeeee" class="titulos">Situação:</td>
 				<td colspan="5" bgcolor="eeeeee" class="exibir">
 				<div align="left">
 			  <select name="frmResp" class="exibir" id="frmResp" onChange="dtprazo(this.value)">
@@ -1594,7 +1594,7 @@ function mensagem(){
 	      </tr>
 	
 		  <tr>
-			 <td colspan="5" bgcolor="eeeeee" class="exibir"><div id="dData" class="titulos">Data de Previs&atilde;o da Solu&ccedil;&atilde;o:&nbsp;
+			 <td colspan="5" bgcolor="eeeeee" class="exibir"><div id="dData" class="titulos">Data de Previsão da Solução:
 			   <input name="cbData" type="text" class="form" onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" size="14" maxlength="10" value="#dateformat(now(),"dd/mm/yyyy")#" readonly="yes">
 			</div>			</td>
 		  </tr>

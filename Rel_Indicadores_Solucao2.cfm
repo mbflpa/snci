@@ -10,7 +10,7 @@
 <cfset total=0>
 
 <!---  <cfif rsResumo.recordcount lte 0>
-  Não Há dados a serem relatados para o período informado!<br>
+  Nï¿½o Hï¿½ dados a serem relatados para o perï¿½odo informado!<br>
   <input type="button" class="botao" onClick="window.close()" value="Fechar">
   <cfabort> 
 </cfif>  --->
@@ -23,7 +23,7 @@
 <cfset auxfilta = #qAcesso.Dir_Descricao#>
 <cfset auxfiltb = 'SE/' & #qAcesso.Dir_Sigla#>
 <!---  --->
-<!--- Criação do arquivo CSV --->
+<!--- Criaï¿½ï¿½o do arquivo CSV --->
 <cfset sdata = dateformat(now(),"YYYYMMDDHH")>
 <cfset diretorio =#GetDirectoryFromPath(GetTemplatePath())#>
 <cfset slocal = #diretorio# & 'Fechamento\'>
@@ -39,9 +39,9 @@
 </cfloop>
 <cffile action="write" addnewline="no" file="#slocal##sarquivo#" output=''>
 <cffile action="Append" file="#slocal##sarquivo#" output='#auxfilta#'>
-<cffile action="Append" file="#slocal##sarquivo#" output='SOLUÇÃO DE NÃO CONFORMIDADES(SLNC)'>
+<cffile action="Append" file="#slocal##sarquivo#" output='SOLUï¿½ï¿½O DE Nï¿½O CONFORMIDADES(SLNC)'>
 <!--- <cffile action="Append" file="#slocal##sarquivo#" output=';;A;B;C;D;E=((C*100)/D);'>
-<cffile action="Append" file="#slocal##sarquivo#" output='SE;Mês;Quantidade (Solucionados);Total;% de SL do mês;Meta Mensal;% Em Relação à meta Mensal;Resultado'> --->
+<cffile action="Append" file="#slocal##sarquivo#" output='SE;Mï¿½s;Quantidade (Solucionados);Total;% de SL do mï¿½s;Meta Mensal;% Em Relaï¿½ï¿½o ï¿½ meta Mensal;Resultado'> --->
 <!---  --->
 
 
@@ -156,7 +156,7 @@ function valida_form(a,b) {
 		WHERE (Andt_Resp = 3) and 
 		(Andt_TipoRel = 2) and 
 		Andt_RespAnt in (1,17,2,15,18,20) AND 
-		(Und_CodDiretoria = '#lis_se#') and
+		(Andt_CodSE = '#lis_se#') and
 		Andt_AnoExerc = '#form.lis_anoexerc#'
 		<cfif lis_mes neq 0>
 		  and Andt_Mes = #lis_mes#
@@ -173,7 +173,7 @@ function valida_form(a,b) {
 		WHERE (Andt_Resp = 3) and 
 		(Andt_TipoRel = 2) and 
 		Andt_RespAnt in (6,5,19) AND 
-		(Und_CodDiretoria = '#lis_se#') and 
+		(Andt_CodSE = '#lis_se#') and 
 		Andt_AnoExerc = '#form.lis_anoexerc#'
 		<cfif lis_mes neq 0>
 		  and Andt_Mes = #lis_mes#
@@ -190,7 +190,7 @@ function valida_form(a,b) {
 		WHERE (Andt_Resp = 3) and 
 		(Andt_TipoRel = 2) and 
 		Andt_RespAnt in (7,4,16) AND 
-		(Und_CodDiretoria = '#lis_se#') and
+		(Andt_CodSE = '#lis_se#') and
 		Andt_AnoExerc = '#form.lis_anoexerc#'
 		<cfif lis_mes neq 0>
 		  and Andt_Mes = #lis_mes#
@@ -207,7 +207,7 @@ function valida_form(a,b) {
 		WHERE (Andt_Resp = 3) and 
 		(Andt_TipoRel = 2) and 
 		Andt_RespAnt in(22,8,23) AND 
-		(Und_CodDiretoria = '#lis_se#') and
+		(Andt_CodSE = '#lis_se#') and
 		Andt_AnoExerc = '#form.lis_anoexerc#'
 		<cfif lis_mes neq 0>
 		  and Andt_Mes = #lis_mes#
@@ -342,7 +342,7 @@ function valida_form(a,b) {
 		INNER JOIN Unidades ON Andt_Area = Und_Codigo
 		INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo 
 		INNER JOIN Diretoria ON Dir_Codigo = Und_CodDiretoria 
-		WHERE Dir_Codigo ='#form.lis_se#' AND 
+		WHERE Andt_CodSE ='#form.lis_se#' AND 
 		Andt_AnoExerc = '#form.lis_anoexerc#' and
 		(Andt_Resp = 3 and Andt_RespAnt in(1,2,15,17,18,20) or Andt_Resp in (2,15,18,20)) and 
 		Andt_TipoRel = 2 
@@ -361,7 +361,7 @@ function valida_form(a,b) {
 		INNER JOIN Unidades ON Andt_Unid = Und_Codigo
 		INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo 
 		INNER JOIN Diretoria ON Dir_Codigo = Und_CodDiretoria 
-		WHERE Dir_Codigo ='#form.lis_se#' and 
+		WHERE Andt_CodSE ='#form.lis_se#' and 
 		Andt_AnoExerc = '#form.lis_anoexerc#' AND 
 		(Andt_Resp = 3 and Andt_RespAnt in(5,6,19) or Andt_Resp in (5,19)) and
 		Andt_TipoRel = 2 and
@@ -382,7 +382,7 @@ function valida_form(a,b) {
 		INNER JOIN Unidades ON Andt_Unid = Und_Codigo
 		INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo 
 		INNER JOIN Diretoria ON Dir_Codigo = Und_CodDiretoria 
-		WHERE Dir_Codigo ='#form.lis_se#' AND 
+		WHERE Andt_CodSE ='#form.lis_se#' AND 
 		Andt_AnoExerc = '#form.lis_anoexerc#' and
 		(Andt_Resp = 3 and Andt_RespAnt in(4,7,16) or Andt_Resp in (4,16)) and 
 		Andt_TipoRel = 2 
@@ -400,8 +400,8 @@ function valida_form(a,b) {
 		INNER JOIN Diretoria ON Andt_Area = Dir_Sto
 		INNER JOIN Unidades ON Andt_Unid = Und_Codigo
 		INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo 
-		WHERE Dir_Codigo ='#form.lis_se#' AND 
-		Andt_AnoExerc = '#form.lis_anoexerc#'
+		WHERE Andt_CodSE ='#form.lis_se#' AND 
+		Andt_AnoExerc = '#form.lis_anoexerc#' AND
 		(Andt_Resp = 3 and Andt_RespAnt in(8,22,23) or Andt_Resp in (8,23)) and 
 		Andt_TipoRel = 2 
 		<cfif form.lis_mes neq 0>
@@ -418,13 +418,13 @@ function valida_form(a,b) {
 		<cfset grpace = "Unidades">
  		<cfset relgpac = "UNSO">
 	<cfelseif form.lis_grpace is "ge">
-		<cfset grpace = "Gerências Regionais e Áreas de Suporte">
+		<cfset grpace = "Gerï¿½ncias Regionais e ï¿½reas de Suporte">
 		<cfset relgpac = "GRSO">
 	<cfelseif form.lis_grpace is "sb">
-		<cfset grpace = "Órgãos Subordinadores">
+		<cfset grpace = "ï¿½rgï¿½os Subordinadores">
 		<cfset relgpac = "OSSO">
 	<cfelseif form.lis_grpace is "su">
-		<cfset grpace = "Superintendência">
+		<cfset grpace = "Superintendï¿½ncia">
 		<cfset relgpac = "SUSO">
 	</cfif>  
   <table width="90%" border="1" align="center" cellpadding="0" cellspacing="0">
@@ -451,7 +451,7 @@ function valida_form(a,b) {
         <td colspan="12"><div align="center" class="exibir"><span class="titulo1"><strong>Solu&Ccedil;&Atilde;o de N&Atilde;o Conformidades (SLNC)</strong></span></div></td>
       </tr>
 <!---       <tr>
-        <td colspan="10" class="titulos">#grpace# &nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;(&nbsp;Aç&otilde;es de : SOLUCIONADO)   <strong>&nbsp;&nbsp;-&nbsp;Exerc&iacute;cio: #form.lis_anoexerc# </strong></td>
+        <td colspan="10" class="titulos">#grpace# &nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;(&nbsp;Aï¿½&otilde;es de : SOLUCIONADO)   <strong>&nbsp;&nbsp;-&nbsp;Exerc&iacute;cio: #form.lis_anoexerc# </strong></td>
 		 <cfset auxqtd = rsResumo.recordcount> 
         <td colspan="2" class="titulos"><div align="right">Qtd.:&nbsp; #auxqtd#</div></td>
       </tr>	   --->
@@ -470,7 +470,7 @@ function valida_form(a,b) {
 	      <div align="center"></div></td>
         <td width="16%" class="titulos"><div align="left">Unidade</div>
         <div align="center"></div></td>
-        <td width="20%" class="titulos">&Oacute;rgão Solucionador (*)</td>
+        <td width="20%" class="titulos">&Oacute;rgï¿½o Solucionador (*)</td>
         <td width="6%" class="titulos">Relat&oacute;rio</td>
         <td width="5%" class="titulos"><div align="center">Grupo</div></td>
         <td width="4%" class="titulos"><div align="center">Item</div></td>
@@ -482,7 +482,7 @@ function valida_form(a,b) {
         <td width="10%" class="titulos"><div align="center">Tempo de Solu&ccedil;&atilde;o(dias &uacute;teis) (***)</div></td>
 <!---         <td width="7%" class="titulos"><div align="center">Prazo</div></td> --->
       </tr>
-	<cffile action="Append" file="#slocal##sarquivo#" output='Mês;Unidade;Órgão Solucionador(*);Relatório;Grupo;Item;Dt. Liberação(**);Dt. Solução;Ação;Dt. refer.:;Tempo de Solução(dias úteis)(***)'>
+	<cffile action="Append" file="#slocal##sarquivo#" output='Mï¿½s;Unidade;ï¿½rgï¿½o Solucionador(*);Relatï¿½rio;Grupo;Item;Dt. Liberaï¿½ï¿½o(**);Dt. Soluï¿½ï¿½o;Aï¿½ï¿½o;Dt. refer.:;Tempo de Soluï¿½ï¿½o(dias ï¿½teis)(***)'>
 <cfoutput query="rsResumo">
 <!--- Dir_Codigo, Dir_Sigla, Dir_Descricao, Andt_Unid, Und_Descricao, Andt_Mes, , , , , Andt_HPosic, Andt_Resp, STO_Descricao, Andt_Uteis, Andt_Area, Andt_DTEnvio, Andt_NomeOrgCondutor, , Andt_DTRefer  --->
 <!---  --->
@@ -568,27 +568,27 @@ function valida_form(a,b) {
       <tr class="exibir">
         <td colspan="12" class="titulos">(*) &Oacute;rg&atilde;o Solucionador:  &nbsp;&nbsp;&Oacute;rg&atilde;o respons&aacute;vel pela solu&ccedil;&atilde;o do ponto.</td>
       </tr>
-	  <cffile action="Append" file="#slocal##sarquivo#" output='(*) Órgão Solucionador:   Órgão responsável pela solução do ponto.'>
+	  <cffile action="Append" file="#slocal##sarquivo#" output='(*) ï¿½rgï¿½o Solucionador:   ï¿½rgï¿½o responsï¿½vel pela soluï¿½ï¿½o do ponto.'>
 	   <tr class="exibir">
         <td colspan="12" class="titulos">(**) <strong>Dt. Libera&ccedil;&atilde;o</strong>:&nbsp;&nbsp;&Eacute; a data de envio do relat&oacute;rio de avalia&ccedil;&atilde;o de controle interno para unidade.</td>
       </tr>
-	  <cffile action="Append" file="#slocal##sarquivo#" output='(**) Dt. Liberação:  É a data de envio do relatório de avaliação de controle interno para unidade.'>
+	  <cffile action="Append" file="#slocal##sarquivo#" output='(**) Dt. Liberaï¿½ï¿½o:  ï¿½ a data de envio do relatï¿½rio de avaliaï¿½ï¿½o de controle interno para unidade.'>
 	   <tr class="exibir">
         <td colspan="12" class="titulos">(***) Tempo de Solu&ccedil;&atilde;o(dias &uacute;teis): &nbsp;&nbsp;&Eacute; o intervalo entre a data de libera&ccedil;&atilde;o e a data de solu&ccedil;&atilde;o.</td>
       </tr>	
-	  <cffile action="Append" file="#slocal##sarquivo#" output='(***) Tempo de Solução(dias úteis):   É o intervalo entre a data de liberação e a data de solução.'>  
+	  <cffile action="Append" file="#slocal##sarquivo#" output='(***) Tempo de Soluï¿½ï¿½o(dias ï¿½teis):   ï¿½ o intervalo entre a data de liberaï¿½ï¿½o e a data de soluï¿½ï¿½o.'>  
       <tr class="exibir">
         <td colspan="12">
 		<table width="1179" border="0">
           <tr>
             <td colspan="12"><p align="center" class="titulos"><strong> CRIT&Eacute;RIOS DE MENSURA&Ccedil;&Atilde;O </strong></p></td>
           </tr>
-<cffile action="Append" file="#slocal##sarquivo#" output='CRITÉRIOS DE MENSURAÇÃO'>  		  
+<cffile action="Append" file="#slocal##sarquivo#" output='CRITï¿½RIOS DE MENSURAï¿½ï¿½O'>  		  
          <tr class="exibir">
             <td width="121" class="exibir"><strong>SOLUCIONADO</strong></td>
             <td width="1048"><p> A situa&ccedil;&atilde;o apontada foi regularizada pelo gestor. </p></td>
           </tr>
-<cffile action="Append" file="#slocal##sarquivo#" output='SOLUCIONADO A situação apontada foi regularizada pelo gestor. 
+<cffile action="Append" file="#slocal##sarquivo#" output='SOLUCIONADO A situaï¿½ï¿½o apontada foi regularizada pelo gestor. 
  '> 		  
         </table></td>
       </tr>  

@@ -237,17 +237,17 @@ FORM.avalItem : #FORM.avalItem#<br>
 			, RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
 			, RIP_DtUltAtu = CONVERT(char, GETDATE(), 120)
 			, RIP_Resposta ='#FORM.avalItem#'
-          <cfquery name="qRecomendacao" datasource="#dsn_inspecao#">
-	        SELECT RIP_Recomendacao, RIP_Critica_Inspetor FROM Resultado_Inspecao WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_NumItem=#FORM.nitem#
-          </cfquery>
-		  
-		  <cfif Form.acao is 'Salvar' and '#qRecomendacao.RIP_Recomendacao#' eq 'S' and '#trim(qRecomendacao.RIP_Critica_Inspetor)#' neq ''>
-		  , RIP_Recomendacao = 'R'
-		  </cfif>
+		<cfquery name="qRecomendacao" datasource="#dsn_inspecao#">
+		SELECT RIP_Recomendacao, RIP_Critica_Inspetor FROM Resultado_Inspecao WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_NumItem=#FORM.nitem#
+		</cfquery>
+		
+		<cfif Form.acao is 'Salvar' and '#qRecomendacao.RIP_Recomendacao#' eq 'S' and '#trim(qRecomendacao.RIP_Critica_Inspetor)#' neq ''>
+		, RIP_Recomendacao = 'R'
+		</cfif>
 		  
 		<!--- N° SEI da NCI --->
 		<cfset aux_sei_nci = "">
-			   , RIP_NCISEI =
+			, RIP_NCISEI =
 		<cfif IsDefined("FORM.nci") AND FORM.nci EQ "S">
 		<!--- As linhas abaixo servem para substituir o uso de aspas simples e duplas, a fim de evitar erros em instruções SQL --->
 		  <cfset aux_sei_nci = Trim(FORM.frmnumseinci)>
@@ -274,7 +274,7 @@ FORM.avalItem : #FORM.avalItem#<br>
 			</cfquery>	
 		</cfif>
 			
-<!--- 	</cfif>
+	<!--- 	</cfif>
 
     <cfif Form.acao is "Salvar" >  --->
          <!---    Se nenhum item tiver sido avaliado salva a data atual no inicio da inspecao na tabela Inspecao       --->
@@ -399,25 +399,25 @@ FORM.avalItem : #FORM.avalItem#<br>
 					</cfif>	
 					<cfset ItnPontuacao =  (ItnPontuacao * fator)>
 	                <cfif impactosn eq 'S'>
-							<!--- Ajustes para os campos: Pos_ClassificacaoPonto --->
-							<!--- Obter a pontuacao max pelo ano e tipo da unidade --->
-							<cfquery name="rsPtoMax" datasource="#dsn_inspecao#">
-								SELECT TUP_PontuacaoMaxima 
-								FROM Tipo_Unidade_Pontuacao 
-								WHERE TUP_Ano = '#right(FORM.Ninsp,4)#' AND TUP_Tun_Codigo = #rsItem2.Itn_TipoUnidade#
-							</cfquery>
-							<!--- calcular o perc de classificacao do item --->	
-							<cfset PercClassifPonto = NumberFormat(((ItnPontuacao / rsPtoMax.TUP_PontuacaoMaxima) * 100),999.00)>	
-							
-							<!--- calculo da descricao do item a saber GRAVE, MEDIANO ou LEVE --->
-							
-							<cfif PercClassifPonto gt 50.01>
-								<cfset ClasItem_Ponto = 'GRAVE'> 
-							<cfelseif PercClassifPonto gt 10 and PercClassifPonto lte 50.01>
-								<cfset ClasItem_Ponto = 'MEDIANO'> 
-							<cfelseif PercClassifPonto lte 10>
-								<cfset ClasItem_Ponto = 'LEVE'> 
-							</cfif>	
+						<!--- Ajustes para os campos: Pos_ClassificacaoPonto --->
+						<!--- Obter a pontuacao max pelo ano e tipo da unidade --->
+						<cfquery name="rsPtoMax" datasource="#dsn_inspecao#">
+							SELECT TUP_PontuacaoMaxima 
+							FROM Tipo_Unidade_Pontuacao 
+							WHERE TUP_Ano = '#right(FORM.Ninsp,4)#' AND TUP_Tun_Codigo = #rsItem2.Itn_TipoUnidade#
+						</cfquery>
+						<!--- calcular o perc de classificacao do item --->	
+						<cfset PercClassifPonto = NumberFormat(((ItnPontuacao / rsPtoMax.TUP_PontuacaoMaxima) * 100),999.00)>	
+						
+						<!--- calculo da descricao do item a saber GRAVE, MEDIANO ou LEVE --->
+						
+						<cfif PercClassifPonto gt 50.01>
+							<cfset ClasItem_Ponto = 'GRAVE'> 
+						<cfelseif PercClassifPonto gt 10 and PercClassifPonto lte 50.01>
+							<cfset ClasItem_Ponto = 'MEDIANO'> 
+						<cfelseif PercClassifPonto lte 10>
+							<cfset ClasItem_Ponto = 'LEVE'> 
+						</cfif>	
 					</cfif>	 
 					<cfif len(trim(rsVerificaAvaliador.RIP_REINCINSPECAO)) gt 0 and ClasItem_Ponto eq 'LEVE'>
 						<cfset ClasItem_Ponto = 'MEDIANO'> 
@@ -432,14 +432,13 @@ FORM.avalItem : #FORM.avalItem#<br>
 					</cfquery>
 					<cfif rsExistePaUn.recordcount lte 0>
 						<cfquery datasource="#dsn_inspecao#">
-							INSERT INTO ParecerUnidade (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_NomeResp, Pos_Situacao, Pos_Parecer, Pos_co_ci, Pos_dtultatu, Pos_username, Pos_aval_dinsp, Pos_Situacao_Resp, Pos_Area, Pos_NomeArea, Pos_NCISEI, Pos_PontuacaoPonto, Pos_ClassificacaoPonto) 
-							VALUES ('#FORM.unid#', '#FORM.Ninsp#', #FORM.Ngrup#, #FORM.Nitem#, 
-									CONVERT(char, GETDATE(), 102), '#CGI.REMOTE_USER#', 'RE', '', 'INTRANET', CONVERT(char, GETDATE(), 120), '#CGI.REMOTE_USER#', NULL, 0,
-									'#posarea_cod#','#posarea_nome#','#aux_sei_nci#',#ItnPontuacao#,'#ClasItem_Ponto#')
+							INSERT INTO ParecerUnidade (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_NomeResp, Pos_Situacao, Pos_Parecer, Pos_co_ci, Pos_dtultatu, Pos_username, Pos_aval_dinsp, Pos_Situacao_Resp, 
+							Pos_Area, Pos_NomeArea, Pos_NCISEI, Pos_PontuacaoPonto, Pos_ClassificacaoPonto) VALUES ('#FORM.unid#', '#FORM.Ninsp#', #FORM.Ngrup#, #FORM.Nitem#, CONVERT(char, GETDATE(), 102), '#CGI.REMOTE_USER#', 'RE', '', 'INTRANET', CONVERT(char, GETDATE(), 120), '#CGI.REMOTE_USER#', NULL, 0,'#posarea_cod#','#posarea_nome#','#aux_sei_nci#',#ItnPontuacao#,'#ClasItem_Ponto#')
 						</cfquery>
 					<cfelse>							
 						    <cfquery datasource="#dsn_inspecao#">
-								update ParecerUnidade set Pos_DtPosic=CONVERT(char, GETDATE(), 102), Pos_NomeResp='#CGI.REMOTE_USER#', Pos_Situacao='RE', Pos_Parecer='', Pos_co_ci='INTRANET', Pos_dtultatu=CONVERT(char, GETDATE(), 120), Pos_username='#CGI.REMOTE_USER#', Pos_aval_dinsp=NULL, Pos_Situacao_Resp=0, Pos_Area='#posarea_cod#', Pos_NomeArea='#posarea_nome#', Pos_NCISEI='#aux_sei_nci#', Pos_PontuacaoPonto=#ItnPontuacao#, Pos_ClassificacaoPonto='#ClasItem_Ponto#'
+								update ParecerUnidade set Pos_DtPosic=CONVERT(char, GETDATE(), 102), Pos_NomeResp='#CGI.REMOTE_USER#', Pos_Situacao='RE', Pos_Parecer='', Pos_co_ci='INTRANET', Pos_dtultatu=CONVERT(char, GETDATE(), 120), 
+								Pos_username='#CGI.REMOTE_USER#', Pos_aval_dinsp=NULL, Pos_Situacao_Resp=0, Pos_Area='#posarea_cod#', Pos_NomeArea='#posarea_nome#', Pos_NCISEI='#aux_sei_nci#', Pos_PontuacaoPonto=#ItnPontuacao#, Pos_ClassificacaoPonto='#ClasItem_Ponto#'
 								where Pos_Unidade='#FORM.unid#' and Pos_Inspecao='#FORM.Ninsp#' and Pos_NumGrupo=#FORM.Ngrup# and Pos_NumItem=#FORM.Nitem#
 							</cfquery>					
 					</cfif>							
@@ -465,8 +464,8 @@ FORM.avalItem : #FORM.avalItem#<br>
 						<cflocation url = "itens_inspetores_avaliacao.cfm" addToken = "no">
 				</cfif>
 	    </cfif>
-			<!--- voltar --->
-			<cflocation url = "itens_inspetores_avaliacao.cfm?numInspecao=#form.Ninsp#&Unid=#form.unid#" addToken = "no">		
+		<!--- voltar --->
+		<cflocation url = "itens_inspetores_avaliacao.cfm?numInspecao=#form.Ninsp#&Unid=#form.unid#" addToken = "no">		
 	</cfif>	
 
 	<cfif isDefined("Session.E01")>
@@ -561,21 +560,21 @@ FORM.avalItem : #FORM.avalItem#<br>
 		SELECT Fun_Matric,RTRIM(LTRIM(Fun_Nome)) AS Fun_Nome FROM Funcionarios WHERE Fun_Matric = '#rsVerificaAvaliador.RIP_MatricAvaliador#'
 	</cfquery>
 	<cfif rsNomeAvaliador.recordcount neq 0 and '#rsNomeAvaliador.Fun_Matric#' neq '#qAcesso.Usu_Matricula#'  and Trim(qAcesso.Usu_GrupoAcesso) eq 'INSPETORES'>
-				<cfif '#rsVerificaAvaliador.RIP_Resposta#' eq 'A'>
-				
-					<script>
-						var avaliador1 = 'Atenção!\n\nEste Item já está sendo avaliado por:\n\n<cfoutput>#rsNomeAvaliador.Fun_Nome# (#rsNomeAvaliador.Fun_Matric#)</cfoutput>';
-						alert(avaliador1);
-					</script>
-				<cfelse>
-					<!---Se for um item em Reavaliação--->
-					<cfif '#rsVerificaAvaliador.RIP_Recomendacao#' neq 'S'>
-						<script>
-							var avaliador2 = 'Atenção!\n\nEste Item já foi avaliado por:\n\n<cfoutput>#rsNomeAvaliador.Fun_Nome# (#rsNomeAvaliador.Fun_Matric#)</cfoutput>';
-							alert(avaliador2);
-						</script>
-					</cfif>
-                </cfif>
+		<cfif '#rsVerificaAvaliador.RIP_Resposta#' eq 'A'>
+		
+			<script>
+				var avaliador1 = 'Atenção!\n\nEste Item já está sendo avaliado por:\n\n<cfoutput>#rsNomeAvaliador.Fun_Nome# (#rsNomeAvaliador.Fun_Matric#)</cfoutput>';
+				alert(avaliador1);
+			</script>
+		<cfelse>
+			<!---Se for um item em Reavaliação--->
+			<cfif '#rsVerificaAvaliador.RIP_Recomendacao#' neq 'S'>
+				<script>
+					var avaliador2 = 'Atenção!\n\nEste Item já foi avaliado por:\n\n<cfoutput>#rsNomeAvaliador.Fun_Nome# (#rsNomeAvaliador.Fun_Matric#)</cfoutput>';
+					alert(avaliador2);
+				</script>
+			</cfif>
+		</cfif>
 	 </cfif>
 
 </cfif>
