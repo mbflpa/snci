@@ -1,5 +1,6 @@
 <cfprocessingdirective pageencoding = "utf-8">
 <!--- <cfapplication name="conteudo" sessionmanagement="yes" clientmanagement="yes" sessiontimeout="#createtimespan(0,0,45,0)#" applicationtimeout="120"> --->
+<cfset SetLocale("pt_BR")>
 <cfapplication 
 name="conteudo" 
 sessionmanagement="Yes" 
