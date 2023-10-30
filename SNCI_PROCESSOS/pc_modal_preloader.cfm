@@ -107,15 +107,15 @@
 		</div>
  		
 		<!-- AdminLTE App -->
-		<script src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
 		<!-- jQuery -->
-		<script src="../SNCI_PROCESSOS/plugins/jquery/jquery.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/jquery/jquery.min.js"></script>
 
 		<!-- Bootstrap 4 -->
-		<script src="../SNCI_PROCESSOS/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 		<!-- jQuery UI 1.11.4 -->
-		<script src="../SNCI_PROCESSOS/plugins/jquery-ui/jquery-ui.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/jquery-ui/jquery-ui.min.js"></script>
 		
     </body>
 	

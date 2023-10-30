@@ -269,66 +269,66 @@
 		</script>
 
     <!-- jspdf -->
-		<script src="../SNCI_PROCESSOS/plugins/jspdf/jspdf.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/jspdf/jspdf.min.js"></script>
 
    <!-- html2pdf-->
-    <script src="../SNCI_PROCESSOS/plugins/html2pdf/html2pdf.bundle.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/html2pdf/html2pdf.bundle.min.js"></script>
 
  		<!-- Sparkline -->
-		<script src="../SNCI_PROCESSOS/plugins/sparklines/sparkline.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/sparklines/sparkline.js"></script>
 
 		<!-- daterangepicker -->
-		<script src="../SNCI_PROCESSOS/plugins/moment/moment.min.js"></script>
-		<script src="../SNCI_PROCESSOS/plugins/daterangepicker/daterangepicker.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/moment/moment.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/daterangepicker/daterangepicker.js"></script>
 
 		<!-- Tempusdominus Bootstrap 4 -->
-		<script src="../SNCI_PROCESSOS/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
 
 		<!-- overlayScrollbars -->
-		<script src="../SNCI_PROCESSOS/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
 
 		<!-- bs-custom-file-input -->
-		<script src="../SNCI_PROCESSOS/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/bs-custom-file-input/bs-custom-file-input.min.js"></script>
 
 		<!-- Select2 -->
-		<script src="../SNCI_PROCESSOS/plugins/select2/js/select2.full.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/select2/js/select2.full.min.js"></script>
 
 		<!-- InputMask -->
-		<script src="../SNCI_PROCESSOS/plugins/inputmask/jquery.inputmask.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/inputmask/jquery.inputmask.min.js"></script>
 
 		<!-- dropzonejs -->
-		<script src="../SNCI_PROCESSOS/plugins/dropzone/min/dropzone.min.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/plugins/dropzone/min/dropzone.min.js"></script>
 
     <!-- AdminLTE App -->
-		<script src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
+		<script  type="module" defer src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
 	
     <!-- jquery-validation -->
-    <script src="../SNCI_PROCESSOS/plugins/jquery-validation/jquery.validate.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/jquery-validation/additional-methods.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/jquery-validation/additional-methods.min.js"></script>
 
     <!-- SweetAlert2 -->
-    <script src="../SNCI_PROCESSOS/plugins/sweetalert2/sweetalert2.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- Toastr -->
-    <script src="../SNCI_PROCESSOS/plugins/toastr/toastr.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/toastr/toastr.min.js"></script>
 
     <!-- DataTables  & Plugins -->
-    <script src="../SNCI_PROCESSOS/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-fixedheader/js/fixedHeader.bootstrap4.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-rowreorder/js/dataTables.rowReorder.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/jszip/jszip.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>	
-    <script src="../SNCI_PROCESSOS/plugins/datatables-select/js/dataTables.select.min.js"></script>	
-    <script src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/dataTables.searchPanes.js"></script>	
-    <script src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/searchPanes.bootstrap4.min.js"></script>	
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-fixedheader/js/dataTables.fixedHeader.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-fixedheader/js/fixedHeader.bootstrap4.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-rowreorder/js/dataTables.rowReorder.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/jszip/jszip.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>	
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-select/js/dataTables.select.min.js"></script>	
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/dataTables.searchPanes.js"></script>	
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/searchPanes.bootstrap4.min.js"></script>	
 
     
 
@@ -337,7 +337,7 @@
   
 
     <!-- Tour -->
-    <script src="../SNCI_PROCESSOS/plugins/tour/dist/js/hopscotch.min.js"></script>
+    <script  type="module" defer src="../SNCI_PROCESSOS/plugins/tour/dist/js/hopscotch.min.js"></script>
 
 
    <script language="JavaScript">
