@@ -10,7 +10,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SNCI</title>
     <link rel="icon" type="image/x-icon" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">
-
+     <!-- CKeditor -->
+    <script src="../SNCI_PROCESSOS/ckeditor/ckeditor.js"></script>
      
 </head>
 
@@ -56,8 +57,7 @@
     </div>
 
 	    <cfinclude template="pc_Sidebar.cfm">
-    <!-- CKeditor -->
-    <script src="ckeditor/ckeditor.js"></script>
+   
     <script language="JavaScript">
 
 

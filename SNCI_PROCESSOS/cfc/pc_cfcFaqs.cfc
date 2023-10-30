@@ -108,12 +108,6 @@
 				placeholder: 'Selecione...'
 			});
 
-			CKEDITOR.replace( 'faqTexto', {
-				width: '100%',
-				height: 300,
-				removeButtons: 'Save'
-			});
-
 			$(document).ready(function() {	
 				CKEDITOR.replace( 'faqTexto', {
 					width: '100%',
