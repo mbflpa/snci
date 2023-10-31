@@ -75,7 +75,7 @@ ON Pos_Situacao_Resp = STO_Codigo
 	     <cfif  '#frmResp#' neq '' >
             <cfswitch expression='#frmResp#'>
              <cfcase value="N">WHERE  ((Und_CodReop = '#qAcesso.Usu_Lotacao#' AND Pos_Area = Pos_Unidade)  or Pos_Area = '#qAcesso.Usu_Lotacao#') AND pos_situacao_resp in (2,4,5,14,15,16,19) </cfcase>
-             <cfcase value="S">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND Pos_Area = Pos_Unidade AND pos_situacao_resp in (3)) a</cfcase>
+             <cfcase value="S">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND Pos_Area = Pos_Unidade AND pos_situacao_resp in (3))</cfcase>
              <cfcase value="A">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND pos_situacao_resp in (24))</cfcase>
              <cfcase value="R">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND pos_situacao_resp in (14,18,20,25,26,27) AND Unidades.Und_TipoUnidade=12)</cfcase>
              <cfcase value="C">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND pos_situacao_resp in (9))</cfcase>
@@ -137,7 +137,7 @@ ON Pos_Situacao_Resp = STO_Codigo
 	     <cfif  '#frmResp#' neq '' >
             <cfswitch expression='#frmResp#'>
              <cfcase value="N">WHERE  ((Und_CodReop = '#qAcesso.Usu_Lotacao#' AND Pos_Area = Pos_Unidade)  or Pos_Area = '#qAcesso.Usu_Lotacao#') AND pos_situacao_resp in (2,4,5,14,15,16,19) </cfcase>
-             <cfcase value="S">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND Pos_Area = Pos_Unidade AND pos_situacao_resp in (3)) a</cfcase>
+             <cfcase value="S">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND Pos_Area = Pos_Unidade AND pos_situacao_resp in (3))</cfcase>
              <cfcase value="A">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND pos_situacao_resp in (24))</cfcase>
              <cfcase value="R">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND pos_situacao_resp in (14,18,20,25,26,27) AND Unidades.Und_TipoUnidade=12)</cfcase>
              <cfcase value="C">WHERE  (Und_CodReop = '#qAcesso.Usu_Lotacao#' AND pos_situacao_resp in (9))</cfcase>
