@@ -258,7 +258,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
-							title : 'SNCI_Orientacoes_Pendentes_Acao_Controle_interno_' + d,
+							title : 'SNCI_Orientacoes_Pendentes_Acompanhamento_' + d,
 							className: 'btExcel',
 						},
 						{// Botão abertura do ctrol-sidebar com os filtros
