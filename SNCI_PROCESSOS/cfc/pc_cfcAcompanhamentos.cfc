@@ -952,7 +952,7 @@
 						nextBtn: 'Próximo',
 						prevBtn: 'Anterior',
 						doneBtn: 'Concluir',
-						skipBtn: 'Pular',
+						skipBtn: 'Pulartab-manifestacao#',
 						closeTooltip: 'Fechar',
 						stepNums: ['7','8', '9','10','11','12', '13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33',],
 					
@@ -1235,22 +1235,14 @@
 				if(hopscotch.getState()==="orgaoAvaliado-acompanhamento-tour:7"){
 					$('#start-tour2').click();
 				}
-				// Monitora o evento de mudança de aba para exibir o botão de início do tour
-				$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-					var target = $(e.target).attr("href") // activated tab
-					if (target == '#content-manifestacao') {
-						$('html, body').animate({
-							scrollTop: $("#btSalvar").offset().top
-						}, 1000);
-					}
+				
+				$('#tab-manifestacao').click(function() {
+					$('html, body').animate({ scrollTop: ($('#tab-manifestacao').offset().top)-60} , 1000);
 				});
-				$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-					var target = $(e.target).attr("href") // activated tab
-					if (target == '#content-distribuicao') {
-						$('html, body').animate({
-							scrollTop: $("#btEnviarDistribuicao").offset().top
-						}, 1000);
-					}
+
+
+				$('#tab-distribuicao').click(function() {
+					$('html, body').animate({ scrollTop: ($('#tab-distribuicao').offset().top)-60} , 1000);
 				});
 
 			})
@@ -2510,23 +2502,28 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					$(this).trigger('change.select2');
 				});
 
-				//Monitora o evento de mudança de aba para exibir o botão de início do tour
-				$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-					var target = $(e.target).attr("href") // activated tab
-					if (target == '#content-responder') {
-						$('html, body').animate({
-							scrollTop: $("#btSalvarMelhoriaPosic").offset().top
-						}, 1000);
-					}
+				
+
+				$('#custom-tabs-one-InfProcesso-tab').click(function() {
+					$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfProcesso-tab').offset().top)-60} , 1000);
+				});
+				$('#custom-tabs-one-InfItem-tab').click(function() {
+					$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfItem-tab').offset().top)-60} , 1000);
+				});
+				$('#custom-tabs-one-Avaliacao-tab').click(function() {
+					$('html, body').animate({ scrollTop: ($('#custom-tabs-one-Avaliacao-tab').offset().top)-60} , 1000);
+				});
+				$('#custom-tabs-one-Anexos-tab').click(function() {
+					$('html, body').animate({ scrollTop: ($('#custom-tabs-one-Anexos-tab').offset().top)-60} , 1000);
 				});
 
-				$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-					var target = $(e.target).attr("href") // activated tab
-					if (target == '#content-distribuicao') {
-						$('html, body').animate({
-							scrollTop: $("#btEnviarDistribuicaoMelhoria").offset().top
-						}, 1000);
-					}
+			
+				$('#tab-responder').click(function() {
+					$('html, body').animate({ scrollTop: ($('#tab-responder').offset().top)-60} , 1000);
+				});
+
+				$('#tab-distribuicao').click(function() {
+					$('html, body').animate({ scrollTop: ($('#tab-distribuicao').offset().top)-60} , 1000);
 				});
 				
 			})

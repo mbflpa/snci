@@ -781,6 +781,7 @@
 		
 
 			$(document).ready(function() {	
+				
 				//Initialize Select2 Elements
 				$('select').select2({
 					theme: 'bootstrap4',
@@ -2172,6 +2173,18 @@
 			}
 
 			$(document).ready(function() {
+				$('#custom-tabs-one-InfProcesso-tab').click(function() {
+					$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfProcesso-tab').offset().top)-60} , 1000);
+				});
+				$('#custom-tabs-one-InfItem-tab').click(function() {
+					$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfItem-tab').offset().top)-60} , 1000);
+				});
+				$('#custom-tabs-one-Avaliacao-tab').click(function() {
+					$('html, body').animate({ scrollTop: ($('#custom-tabs-one-Avaliacao-tab').offset().top)-60} , 1000);
+				});
+				$('#custom-tabs-one-Anexos-tab').click(function() {
+					$('html, body').animate({ scrollTop: ($('#custom-tabs-one-Anexos-tab').offset().top)-60} , 1000);
+				});
 				<cfoutput>
 					var idMelhoria = #arguments.idMelhoria#;
 				</cfoutput>	
