@@ -216,14 +216,14 @@
 													</cfif>
 													<cfif #pc_orgHerancaMcuPara# neq '' and (#pc_orientacao_status_finalizador# neq 'S' or DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
 														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostraInformacoesItensConsulta(<cfoutput>#rsProcTab.pc_aval_id#, #rsProcTab.pc_aval_orientacao_id#</cfoutput>)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#) (Distribuído)</span></td>
+															<td onclick="javascript:mostraInformacoesItensConsulta(<cfoutput>#rsProcTab.pc_aval_id#, #rsProcTab.pc_aval_orientacao_id#</cfoutput>)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
 														<cfelse>
 															<td onclick="javascript:mostraInformacoesItensConsulta(<cfoutput>#rsProcTab.pc_aval_id#, #rsProcTab.pc_aval_orientacao_id#</cfoutput>)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
 														</cfif>
 														<td onclick="javascript:mostraInformacoesItensConsulta(<cfoutput>#rsProcTab.pc_aval_id#, #rsProcTab.pc_aval_orientacao_id#</cfoutput>)">#seOrgRespHerdeiro#</td>
 													<cfelse>
 														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostraInformacoesItensConsulta(<cfoutput>#rsProcTab.pc_aval_id#, #rsProcTab.pc_aval_orientacao_id#</cfoutput>)">#siglaOrgResp# (#mcuOrgResp#) (Distribuído)</td>
+															<td onclick="javascript:mostraInformacoesItensConsulta(<cfoutput>#rsProcTab.pc_aval_id#, #rsProcTab.pc_aval_orientacao_id#</cfoutput>)">#siglaOrgResp# (#mcuOrgResp#)</td>
 														<cfelse>
 															<td onclick="javascript:mostraInformacoesItensConsulta(<cfoutput>#rsProcTab.pc_aval_id#, #rsProcTab.pc_aval_orientacao_id#</cfoutput>)">#siglaOrgResp# (#mcuOrgResp#)</td>
 														</cfif>

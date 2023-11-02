@@ -1600,13 +1600,13 @@
 
 														<cfif #pc_orgHerancaMcuPara# neq '' and (#pc_orientacao_status_finalizador# neq 'S' or DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
 															<cfif pc_aval_orientacao_distribuido eq 1>
-																<td style="vertical-align:middle !important;white-space: pre-wrap;">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (Distribuído)</span></td>
+																<td style="vertical-align:middle !important;white-space: pre-wrap;">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla#</span></td>
 															<cfelse>
 																<td style="vertical-align:middle !important;white-space: pre-wrap;">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla#</span></td>
 															</cfif>
 														<cfelse>
 															<cfif pc_aval_orientacao_distribuido eq 1>
-																<td style="vertical-align:middle !important;white-space: pre-wrap;">#pc_org_sigla# (Distribuído)</td>
+																<td style="vertical-align:middle !important;white-space: pre-wrap;">#pc_org_sigla#</td>
 															<cfelse>
 																<td style="vertical-align:middle !important;white-space: pre-wrap;">#pc_org_sigla#</td>
 															</cfif>

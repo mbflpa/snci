@@ -163,14 +163,14 @@
 													
 													<cfif #pc_orgHerancaMcuPara# neq '' and (#pc_orientacao_status_finalizador# neq 'S' or DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
 														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#) (Distribuído)</span></td>
+															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
 														<cfelse>
 															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
 														</cfif>
 														<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgRespHerdeiro#</td>
 													<cfelse>
 														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#) (Distribuído)</td>
+															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
 														<cfelse>
 															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
 														</cfif>
@@ -1675,7 +1675,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 												<cfif #pc_orgHerancaMcuPara# neq '' and  DateFormat(Now(),"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy")>
 												
 													<cfif rsMelhoriasPendentes.pc_aval_melhoria_distribuido eq 1>
-														<td align="center">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (#pc_org_mcu#) (Distribuído)</span></td>
+														<td align="center">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (#pc_org_mcu#)</span></td>
 													<cfelse>
 														<td align="center">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (#pc_org_mcu#)</span></td>
 
@@ -1683,7 +1683,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 													<td align="center">#seOrgRespHerdeiro#</td>
 												<cfelse>
 													<cfif rsMelhoriasPendentes.pc_aval_melhoria_distribuido eq 1>
-														<td align="center">#pc_org_sigla# (#pc_org_mcu#) (Distribuído)</td>
+														<td align="center">#pc_org_sigla# (#pc_org_mcu#)</td>
 													<cfelse>
 														<td align="center">#pc_org_sigla# (#pc_org_mcu#)</td>
 													</cfif>
