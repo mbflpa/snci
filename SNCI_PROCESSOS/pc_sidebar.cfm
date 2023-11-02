@@ -262,8 +262,7 @@
 		<!-- jQuery UI 1.11.4 -->
 		<script src="../SNCI_PROCESSOS/plugins/jquery-ui/jquery-ui.min.js"></script>
  
-  <!-- AdminLTE App -->
-		<script  src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
+  
     
 		<!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 		<script language="JavaScript">
@@ -336,12 +335,13 @@
     <script  src="../SNCI_PROCESSOS/plugins/tour/dist/js/hopscotch.min.js"></script>
 
     
- 
     <!-- SNCI -->
     <script src="../SNCI_PROCESSOS/dist/js/snciProcesso.js"></script>
   
 
-    
+    <!-- AdminLTE App -->
+		<script  src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
+ 
 
 
    <script language="JavaScript">
