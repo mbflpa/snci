@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="row mb-2" style="position:relative; left:-15px">
                 <div class="col-sm-6">
-                    <h4>Notas de Versão</h4>
+                    <h4 style="color:#2675fb">Notas de Versão</h4>
                 </div>
             </div>
         </div><!-- /.container-fluid -->
