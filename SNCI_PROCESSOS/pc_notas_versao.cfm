@@ -28,7 +28,7 @@
                             <ul>
                                 <li>Na seção “Acompanhamento”, será possível salvar uma manifestação para envio posterior;</li>
                                 <li>Adicionada a funcionalidade "Distribuição", que permite ao órgão avaliado a distribuição das orientações e propostas de melhoria, na seção “Acompanhamento”;</li>
-                                <li>Implementado o "Controle das Distribuições". O órgão avaliado poderá visualizar, alterar e enviar as orientações distribuídas e poderá visualizar o status das propostas de melhoria distribuídas. Também, os órgãos avaliados poderão visualizar e editar as manifestações salvas, e ainda não enviadas, pelos seus órgãos subordinados;</li>
+                                <li>Implementado o "Controle das Distribuições". O órgão avaliado poderá acompanhar as orientações e propostas de melhoria distribuídas. Também, os órgãos avaliados poderão visualizar e editar as manifestações salvas, e ainda não enviadas, pelos seus órgãos subordinados;</li>
                                 <li>Envio de e-mails de alerta, aos órgão responsáveis pelas orientações e propostas de melhoria e aos órgãos avaliados, após a disponibilização de um novo processo;</li>
                                 <li>Envio de e-mail de alerta, ao órgão responsável, quando ocorrer a distribuição de uma orientação e ou proposta de melhoria.</li>
                             </ul>
