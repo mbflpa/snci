@@ -45,6 +45,10 @@
                     <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
                         <div  id="alertasCIdiv"></div>
                     </cfif>
+                    
+                    <cfinclude template="pc_notas_versao.cfm">
+
+
                 </div><!-- /.container-fluid -->
             </section>
 
