@@ -741,8 +741,12 @@
 			<cfset cc = "">
         </cfif>
 
-		<cftry>
-			<cfmail from="SNCI@correios.com.br" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+		<cftry> 
+			<cfset de="SNCI@correios.com.br">
+		    <cfif application.auxsite eq "localhost">
+				<cfset de="mbflpa@yahoo.com.br">
+			</cfif>
+			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
 			    <cfif application.auxsite neq "intranetsistemaspe">
 					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 				</cfif>

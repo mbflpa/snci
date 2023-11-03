@@ -1434,7 +1434,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Mel
 							texto="#textoEmail#"
 				/>
 				<cfcatch type="any">
-					<cfmail from="SNCI@correios.com.br" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+				<cfset de="SNCI@correios.com.br">
+				<cfif application.auxsite eq "localhost">
+					<cfset de="mbflpa@yahoo.com.br">
+				</cfif>
+					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
 						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
 					</cfmail>
 				</cfcatch>
