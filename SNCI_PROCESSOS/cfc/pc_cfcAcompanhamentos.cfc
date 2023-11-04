@@ -5009,7 +5009,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 	<cffunction name="dataHoraPosicSalvo" access="remote"  hint="Mostra a data/hora e nome do usuário que salvou o posicionamento">
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
-
+        <!-- Verifica se existe manifestação salva -->
 		<cfquery datasource="#application.dsn_processos#" name="rsManifestacaoSalva">
 			Select pc_avaliacao_posicionamentos.*, pc_orgaos.pc_org_sigla, pc_usuarios.pc_usu_nome FROM pc_avaliacao_posicionamentos 
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
@@ -5021,11 +5021,81 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 		<cfif rsManifestacaoSalva.recordcount neq 0>
 			<cfset data = DateFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'DD-MM-YYYY') >
 			<cfset hora = TimeFormat(#rsManifestacaoSalva.pc_aval_posic_datahora#,'HH:mm') >
-			<span style = "font-size:11px; color:#e83e8c"><cfoutput>Manifestação salva em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput></span>
+			<span style = "font-size:11px; color:#e83e8c"><cfoutput>Manifestação salva em <strong>#data# às #hora#h</strong> por <strong>#rsManifestacaoSalva.pc_usu_nome# (#rsManifestacaoSalva.pc_org_sigla#)</strong></cfoutput>
+				<i id="btExcluirManifestacao" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:15px;margin-left:10px;margin-bottom:2px" ></i>
+ 			</span>
 		</cfif>
+
+		<script>
+			//ao clicar no botão btExcluirManifestacao exclui a manifestação salva utlizando ajax
+            $('#btExcluirManifestacao').click(function(){
+				<cfoutput>		
+					var pc_aval_posic_id = '#rsManifestacaoSalva.pc_aval_posic_id#';
+				</cfoutput>
+
+				swalWithBootstrapButtons.fire({//sweetalert2
+					html: logoSNCIsweetalert2('Deseja excluir a manifestação salva?'), 
+					showCancelButton: true,
+					confirmButtonText: 'Sim!',
+					cancelButtonText: 'Cancelar!'
+					}).then((result) => {
+						if (result.isConfirmed) {	
+							$('#modalOverlay').modal('show')
+							setTimeout(function() {
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									data:{
+										method:"excluirManifestacaoSalva",
+										pc_aval_posic_id: pc_aval_posic_id
+									},
+									async: false
+									
+								})//fim ajax
+								.done(function(result) {	
+									$('#pcPosicAcomp').val('')
+									$('#divTextoPosicSalvo').html('')
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+										toastr.success('Operação realizada com sucesso!');
+									});			
+								})//fim done
+								.fail(function(xhr, ajaxOptions, thrownError) {
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+										var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
+													+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
+										const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
+										swalWithBootstrapButtons.fire(
+											{...erroSistema}
+										)
+									})
+								})//fim fail
+							}, 500);
+						}else{
+							$('#modalOverlay').modal('hide');
+							Swal.fire('Operação Cancelada', '', 'info');			
+						}
+
+					})
+			});
+
+
+			
+
+		</script>
 
  	</cffunction>
 
+	<cffunction name="excluirManifestacaoSalva" access="remote"  hint="Exclui a manifestação salvar.">
+		<cfargument name="pc_aval_posic_id" type="numeric" required="true" />
 
-
+		<cftransaction>
+			<cfquery datasource="#application.dsn_processos#" >
+				DELETE FROM pc_avaliacao_posicionamentos 
+				WHERE pc_aval_posic_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_posic_id#">
+			</cfquery>
+		</cftransaction>
+		
+	</cffunction>
 </cfcomponent>
