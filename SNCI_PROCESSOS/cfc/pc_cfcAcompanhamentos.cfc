@@ -76,7 +76,7 @@
 
 				
 			<cfelse>
-				WHERE pc_aval_orientacao_status in (2,4,5) and (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_orgHerancaMcuPara = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_orgHerancaDataInicio <= CONVERT (date, GETDATE())))
+				WHERE pc_aval_orientacao_status in (2,4,5,16) and (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_orgHerancaMcuPara = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_orgHerancaDataInicio <= CONVERT (date, GETDATE())))
 			</cfif>
 				
 			ORDER BY 	pc_processo_id, pc_aval_numeracao
@@ -153,7 +153,7 @@
 													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_orientacao_id#</td>	
 													
 													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N' >
-														<cfif #pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5>
+														<cfif ListFind("4,5,16", #pc_aval_orientacao_status#)>
 															<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
 															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#dataPrev#</td>
 														<cfelse>
@@ -2756,10 +2756,12 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 															<cfset icone = "fa-user-cog">
 														<cfelseif #pc_aval_posic_status# eq 14>
 															<cfset icone = "fa-user-lock">
+														<cfelseif #pc_aval_posic_status# eq 16>
+															<cfset icone = "fa-user-clock">
 														<cfelse>
 														 	<cfset icone = "fa-user">
 														</cfif>
-														<cfif #pc_aval_posic_status# eq 13 or #pc_aval_posic_status# eq 14>
+														<cfif ListFind("13,14,16", #pc_aval_posic_status#)>
 															<cfset cor = "bg-red">
 														<cfelse>
 														 	<cfset cor = "bg-gray">
@@ -3399,7 +3401,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					$("#pcDataPrevRespAcomp").val(dataPrevista)
 					$("#dataPrevistaCalculada").html("Prazo de 90 dias corridos: " + dataPrevistaFormatada + "</br>");
 					$("#pcNumProcJudicial").val(null)	
-					$("#pcPosicAcomp").val('Orientação suspensa por 90 (noventa) dias corridos para aguardar as tratativas dos Correios com o órgão externo, conforme registrado no histórico das manifestações.')
+					$("#pcPosicAcomp").val('Orientação suspensa por 90 (noventa) dias corridos para aguardar as tratativas dos Correios com o órgão externo, conforme registrado no histórico das manifestações. O Módulo de Acompanhamento de Processos - SNCI permite ao órgão responsável inserir manifestação antes do prazo, é só acessar a tela "Acompanhamento", localizar a orientação desejada e inserir a manifestação normalmente.')
 					$("#pcPosicAcomp").prop("disabled", true);
 
 				}else{
@@ -3897,13 +3899,31 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 										<!-- timeline item -->
 										<cfif #pc_org_controle_interno# eq 'S' >
 											<div>
-												<i class="fas fa-user bg-green"  style="margin-top:6px"></i>
+												<cfif #pc_aval_posic_status# eq 13>
+													<cfset icone = "fa-user-cog">
+												<cfelseif #pc_aval_posic_status# eq 14>
+													<cfset icone = "fa-user-lock">
+												<cfelseif #pc_aval_posic_status# eq 16>
+													<cfset icone = "fa-user-clock">
+												<cfelse>
+													<cfset icone = "fa-user">
+												</cfif>
+												<cfif ListFind("13,14,16", #pc_aval_posic_status#)>
+													<cfset cor = "bg-red">
+												<cfelse>
+													<cfset cor = "bg-gray">
+												</cfif>
+
+
+												<cfoutput>
+													<i class="fas #icone# #cor#"  style="margin-top:6px"></i>
+												</cfoutput>
 												<div class="timeline-item" >
 													<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
 													<span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
 															
 													<div class="card card-primary collapsed-card posicContInterno" >
-														<div class="card-header" style="background-color: ##28a745;">
+														<div class="card-header" style="background-color: <cfif ListFind('13,14,16', #pc_aval_posic_status#)>red<cfelse> ##28a745;</cfif>">
 														<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;" data-card-widget="collapse">
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" ></i>
 															</button></i>

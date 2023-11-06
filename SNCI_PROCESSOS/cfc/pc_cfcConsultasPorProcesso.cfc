@@ -2503,10 +2503,12 @@
 															<cfset icone = "fa-user-cog">
 														<cfelseif #pc_aval_posic_status# eq 14>
 															<cfset icone = "fa-user-lock">
+														<cfelseif #pc_aval_posic_status# eq 16>
+															<cfset icone = "fa-user-clock">
 														<cfelse>
 														 	<cfset icone = "fa-user">
 														</cfif>
-														<cfif #pc_aval_posic_status# eq 13 or #pc_aval_posic_status# eq 14>
+														<cfif ListFind("13,14,16", #pc_aval_posic_status#)>
 															<cfset cor = "bg-red">
 														<cfelse>
 														 	<cfset cor = "bg-gray">
@@ -2524,9 +2526,9 @@
 															<span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
 															
 															<div class="card card-primary collapsed-card posicContInterno" >
-																<div class="card-header" style="background-color: <cfif #pc_aval_posic_status# eq 13 or #pc_aval_posic_status# eq 14>red<cfelse>##ececec;</cfif>">
-																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;<cfif #pc_aval_posic_status# eq 13 or #pc_aval_posic_status# eq 14>##fff<cfelse>color:##00416b</cfif>" data-card-widget="collapse">
-																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:<cfif #pc_aval_posic_status# eq 13 or #pc_aval_posic_status# eq 14>##fff<cfelse>gray</cfif>"></i>
+																<div class="card-header" style="background-color: <cfif ListFind('13,14,16', #pc_aval_posic_status#)> red <cfelse> ##ececec; </cfif>">
+																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;<cfif ListFind('13,14,16', #pc_aval_posic_status#)> ##fff <cfelse> color:##00416b </cfif>" data-card-widget="collapse">
+																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:<cfif ListFind('13,14,16', #pc_aval_posic_status#)>##fff<cfelse>gray</cfif>"></i>
 																		</button></i>
 																			<!-- O para: só será visualizado se a orientação não tiver órgão responsável e não estiver em análise e não estiver bloqueada-->
 																			<cfif orgaoResp neq '' and pc_aval_posic_status neq 13 and pc_aval_posic_status neq 14>
@@ -2886,13 +2888,31 @@
 										<!-- timeline item -->
 										<cfif #pc_org_controle_interno# eq 'S' >
 											<div>
-												<i class="fas fa-user bg-green"  style="margin-top:6px"></i>
+												<cfif #pc_aval_posic_status# eq 13>
+													<cfset icone = "fa-user-cog">
+												<cfelseif #pc_aval_posic_status# eq 14>
+													<cfset icone = "fa-user-lock">
+												<cfelseif #pc_aval_posic_status# eq 16>
+													<cfset icone = "fa-user-clock">
+												<cfelse>
+													<cfset icone = "fa-user">
+												</cfif>
+												<cfif ListFind("13,14,16", #pc_aval_posic_status#)>
+													<cfset cor = "bg-red">
+												<cfelse>
+													<cfset cor = "bg-gray">
+												</cfif>
+
+
+												<cfoutput>
+													<i class="fas #icone# #cor#"  style="margin-top:6px"></i>
+												</cfoutput>
 												<div class="timeline-item" >
 													<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
 													<span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
 															
 													<div class="card card-primary collapsed-card posicContInterno" >
-														<div class="card-header" style="background-color: ##28a745;">
+														<div class="card-header" style="background-color: <cfif ListFind('13,14,16', #pc_aval_posic_status#)>red<cfelse> ##28a745;</cfif>">
 														<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;" data-card-widget="collapse">
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" ></i>
 															</button></i>
