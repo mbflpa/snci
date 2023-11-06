@@ -2455,7 +2455,7 @@
 														
 														</div>
 														<div class="card-body" >
-															<cfif (pc_aval_posic_status eq 4 or pc_aval_posic_status eq 5) and pc_aval_posic_dataPrevistaResp neq ''>
+															<cfif ListFind("4,5,16", #pc_aval_posic_status#) and pc_aval_posic_dataPrevistaResp neq ''>
 																<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																<pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 															<cfelse>	
@@ -2533,7 +2533,7 @@
 														
 														</div>
 														<div class="card-body" >
-															<cfif (pc_aval_posic_status eq 4 or pc_aval_posic_status eq 5) and pc_aval_posic_dataPrevistaResp neq ''>
+															<cfif ListFind("4,5,16", #pc_aval_posic_status#) and pc_aval_posic_dataPrevistaResp neq ''>
 																<cfset dataPrev = DateFormat(#pc_aval_posic_dataPrevistaResp#,'DD-MM-YYYY') >
 																<pre >#pc_aval_posic_texto#<br><br><p><span>Prazo para resposta: <strong>#dataPrev#</strong></p></pre>
 															<cfelse>	

@@ -735,7 +735,7 @@
 - todas as orientações e propostas de melhoria estão sob responsabilidade do órgão avaliado;<br>
 - não há e-mail cadastrado para os órgãos subordinados que são responsáveis pelas orientações e/ou propostas de melhoria;<br>
 - os e-mails cadastrados para os órgãos subordinados que são responsáveis pelas orientações e/ou propostas de melhoria são iguais ao e-mail do órgão avaliado;<br>
-- trata-se de uma distribuição de orientações ou propostas de melhoria, portanto, só é encaminhada ao órgão reponsável.">
+- trata-se de uma distribuição de orientações ou propostas de melhoria, ou um Ponto Suspenso com prazo de 90 dias expirado, portanto, só é encaminhada ao órgão reponsável.">
 			</cfif>
 			<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 			<cfset cc = "">
