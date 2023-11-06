@@ -731,11 +731,7 @@
 			<cfif #cc# neq "" >
 				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão avaliado, com cópia para <strong>#cc#</strong> pois são e-mails dos órgãos subordinados ao órgão avaliado que são resposnsáveis por alguma orientação ou proposta de melhoria.">
 			<cfelse>
-				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>. <br>Não iria com cópia para nenhum outro órgão por um ou mais destes motivos:<br>
-- todas as orientações e propostas de melhoria estão sob responsabilidade do órgão avaliado;<br>
-- não há e-mail cadastrado para os órgãos subordinados que são responsáveis pelas orientações e/ou propostas de melhoria;<br>
-- os e-mails cadastrados para os órgãos subordinados que são responsáveis pelas orientações e/ou propostas de melhoria são iguais ao e-mail do órgão avaliado;<br>
-- trata-se de uma distribuição de orientações ou propostas de melhoria, ou um Ponto Suspenso com prazo de 90 dias expirado, portanto, só é encaminhada ao órgão reponsável.">
+				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>.">
 			</cfif>
 			<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 			<cfset cc = "">
