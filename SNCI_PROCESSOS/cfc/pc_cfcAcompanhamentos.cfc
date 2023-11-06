@@ -2779,9 +2779,9 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 															<span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
 															
 															<div class="card card-primary collapsed-card posicContInterno" >
-																<div class="card-header" style="background-color: ##ececec;">
-																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;color:##00416b" data-card-widget="collapse">
-																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
+																<div class="card-header" style="background-color:<cfif ListFind('13,14,16', #pc_aval_posic_status#)>red<cfelse>##ececec;</cfif>">
+																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;<cfif ListFind('13,14,16', #pc_aval_posic_status#)>##fff<cfelse>color:##00416b</cfif>" data-card-widget="collapse">
+																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:<cfif ListFind('13,14,16', #pc_aval_posic_status#)>##fff<cfelse>gray</cfif>"></i>
 																		</button></i>
 																			<!-- O para: só será visualizado se a orientação não tiver órgão responsável não estiver bloqueada-->
 																			<cfif orgaoResp neq '' and pc_aval_posic_status neq 14>
