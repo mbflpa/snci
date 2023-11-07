@@ -412,7 +412,11 @@
 									$('#informacoesItensAcompanhamentoDiv').html('')	
 									var mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">'+idOrientacao+'</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla+'</span> com sucesso!<br><br><span style="color:#00416B;font-size:0.8em;"><strong>Atenção:</strong> Como a gerência que analisará esta orientação não é a sua gerência de lotação, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
 									$('#modalOverlay').delay(1000).hide(0, function() {
-										Swal.fire(mensagemSucessos,'','success')
+										Swal.fire({
+											title: mensagemSucessos,
+											html: logoSNCIsweetalert2(''),
+											icon: 'success'
+										});
 										$('#modalOverlay').modal('hide');
 									});	
 													
@@ -480,7 +484,11 @@
 										mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">' + idOrientacao + '</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla +'</span> com sucesso!<br><br><span style="color:#00416B;font-size:0.8em;"><strong>Atenção:</strong> Como a gerência que analisará esta orientação não é a sua gerência de lotação, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
 									}
 									$('#modalOverlay').delay(1000).hide(0, function() {
-										Swal.fire(mensagemSucessos,'','success')
+										Swal.fire({
+											title: mensagemSucessos,
+											html: logoSNCIsweetalert2(''),
+											icon: 'success'
+										});
 										$('#modalOverlay').modal('hide');
 										
 									});	

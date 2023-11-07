@@ -485,7 +485,11 @@
 										var mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">'+idOrientacao+'</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla+'</span> com sucesso!</p>';
 									}
 									$('#modalOverlay').delay(1000).hide(0, function() {
-										Swal.fire(mensagemSucessos,'','success')
+										Swal.fire({
+											title: mensagemSucessos,
+											html: logoSNCIsweetalert2(''),
+											icon: 'success'
+										});
 										$('#modalOverlay').modal('hide');
 									});	
 													
@@ -553,7 +557,11 @@
 										mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">' + idOrientacao + '</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla +'</span> com sucesso!</p>';
 									}
 									$('#modalOverlay').delay(1000).hide(0, function() {
-										Swal.fire(mensagemSucessos,'','success')
+										Swal.fire({
+								title: mensagemSucessos,
+								html: logoSNCIsweetalert2(''),
+								icon: 'success'
+							});
 										$('#modalOverlay').modal('hide');
 										
 									});	

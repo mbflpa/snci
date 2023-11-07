@@ -400,7 +400,11 @@ async function exportarTimelineParaPDF() {
                 pdf.save(nomeArquivo);
                 var mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;">PDF criado com sucesso!</p><p class="font-weight-light" style="color:#0083CA;text-align: justify;"><strong>Atenção!</strong> Aguarde o seu navegador informar o fim do download.</p>';
                 $('#modalOverlay').delay(500).hide(0, function() {
-                    Swal.fire(mensagemSucessos,'','success')
+                    Swal.fire({
+								title: mensagemSucessos,
+								html: logoSNCIsweetalert2(''),
+								icon: 'success'
+							});
                     $('#modalOverlay').modal('hide');
                 });
     
