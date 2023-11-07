@@ -825,7 +825,7 @@
 
 					<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
 					<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
-					<cfset pronomeTrat = "Senhor(a) Gestor da #siglaOrgaoResponsavel#">
+					<cfset pronomeTrat = "Senhor(a) Gestor(a) da #siglaOrgaoResponsavel#">
 					
 					<cfset textoEmail = 'Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas. 
 
