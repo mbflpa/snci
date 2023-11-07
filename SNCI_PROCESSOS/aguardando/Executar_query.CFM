@@ -36,7 +36,7 @@
 
 <cfquery datasource="#application.dsn_processos#">
     SET IDENTITY_INSERT pc_orientacao_status ON 
-    INSERT pc_orientacao_status (pc_orientacao_status_id, pc_orientacao_status_descricao, pc_orientacao_status_status, pc_orientacao_status_comentario, pc_orientacao_status_card_style_header, pc_orientacao_status_card_style_body, pc_orientacao_status_card_style_ribbon, pc_orientacao_status_card_ribbon_nome, pc_orientacao_status_finalizador) VALUES (16, N'PONTO SUSPENSO', N'A', N'A solução da situação depende de órgão externo à empresa.', N'background:rgb(189, 149, 237);color: rgb(255, 255, 255);', N'background:##000;color:##fff;', N'background:##000;color:##fff;', N'PONTO SUSPENSO', N'S')
+    INSERT pc_orientacao_status (pc_orientacao_status_id, pc_orientacao_status_descricao, pc_orientacao_status_status, pc_orientacao_status_comentario, pc_orientacao_status_card_style_header, pc_orientacao_status_card_style_body, pc_orientacao_status_card_style_ribbon, pc_orientacao_status_card_ribbon_nome, pc_orientacao_status_finalizador) VALUES (16, N'PONTO SUSPENSO', N'A', N'A solução da situação depende de órgão externo à empresa.', N'background:rgb(189, 149, 237);color: rgb(255, 255, 255);', N'background:##000;color:##fff;', N'background:##000;color:##fff;', N'PONTO SUSPENSO', N'N')
     SET IDENTITY_INSERT pc_orientacao_status OFF 
 </cfquery>
 
