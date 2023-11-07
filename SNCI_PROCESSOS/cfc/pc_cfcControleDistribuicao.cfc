@@ -388,7 +388,11 @@
 						} else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 						
 					})
@@ -453,7 +457,11 @@
 						} else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					
 					})
@@ -1206,7 +1214,11 @@
 								})//fim fail
 							}, 1000);		
 						} else if (result.dismiss === Swal.DismissReason.cancel) {
-							Swal.fire('Operação cancelada!', '', 'error')
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})//fim sweetalert2		
 
@@ -2301,7 +2313,11 @@
 								})//fim fail
 							}, 1000);		
 						} else if (result.dismiss === Swal.DismissReason.cancel) {
-							Swal.fire('Operação cancelada!', '', 'error')
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})//fim sweetalert2		
 
@@ -2940,7 +2956,11 @@
 						}else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})
 

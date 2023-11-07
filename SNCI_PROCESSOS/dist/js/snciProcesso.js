@@ -409,7 +409,12 @@ async function exportarTimelineParaPDF() {
     } else {
         // Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
         $('#modalOverlay').modal('hide');
-        Swal.fire('Operação Cancelada', '', 'info');
+        Swal.fire({
+								title: 'Operação Cancelada',
+								html: '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
+                                + '<span class="font-weight-light" style="font-size:20px!important;color:#00416B">SNCI - Processos</span></div>',
+								icon: 'info'
+							});
     }
  
 }

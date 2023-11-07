@@ -529,7 +529,11 @@
 				}else {
 					// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 					$('#modalOverlay').modal('hide');
-					Swal.fire('Operação Cancelada', '', 'info');
+					Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 				}
 			})
 
@@ -610,7 +614,11 @@
 				}else {
 					// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 					$('#modalOverlay').modal('hide');
-					Swal.fire('Operação Cancelada', '', 'info');
+					Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 				}
 			})
 		}

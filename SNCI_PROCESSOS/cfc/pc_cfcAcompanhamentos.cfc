@@ -431,7 +431,11 @@
 						} else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 						
 					})
@@ -496,7 +500,11 @@
 						} else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					
 					})
@@ -1319,7 +1327,11 @@
 								})//fim fail
 							}, 1000);		
 						} else if (result.dismiss === Swal.DismissReason.cancel) {
-							Swal.fire('Operação cancelada!', '', 'error')
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})//fim sweetalert2		
 
@@ -2586,7 +2598,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 								})//fim fail
 							}, 1000);		
 						} else if (result.dismiss === Swal.DismissReason.cancel) {
-							Swal.fire('Operação cancelada!', '', 'error')
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})//fim sweetalert2		
 
@@ -3508,7 +3524,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						}else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})
 
@@ -3643,7 +3663,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						}else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})
 				}else{
@@ -3698,7 +3722,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						}else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})
 				}	
@@ -4436,7 +4464,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						}else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})
 
@@ -5094,7 +5126,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 							}, 500);
 						}else{
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');			
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});			
 						}
 
 					})

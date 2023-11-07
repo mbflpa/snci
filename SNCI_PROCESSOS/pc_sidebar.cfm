@@ -356,10 +356,21 @@
       //fim const sweetalert2
 
       function logoSNCIsweetalert2(mens){
-        const logo= '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
+        let logo='';
+        if(mens == ''){
+          logo= '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
+              + '<span class="font-weight-light" style="font-size:20px!important;color:#00416B">SNCI - Processos</span></div>';
+
+        }else{
+          logo= '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
               + '<span class="font-weight-light" style="font-size:20px!important;color:#00416B">SNCI - Processos</span></div>'
-              +'<div class="font-weight-light" style="color:#00416B;margin-top:20px">'+ mens + '</div>'
+              +'<div class="font-weight-light" style="color:#00416B;margin-top:20px">'+ mens + '</div>';
+
+        }
+
+        
             
+
         return logo;
       }
 

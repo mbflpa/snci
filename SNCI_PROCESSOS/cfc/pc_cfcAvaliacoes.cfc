@@ -745,7 +745,11 @@
 					}else {
 						// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 						$('#modalOverlay').modal('hide');
-						Swal.fire('Operação Cancelada', '', 'info');
+						Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 					} 
 				})
 					
@@ -1079,7 +1083,11 @@
 						}else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})
 				$('#modalOverlay').delay(1000).hide(0, function() {
@@ -1212,7 +1220,11 @@
 						}else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação Cancelada', '', 'info');
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})
 					$('#modalOverlay').delay(1000).hide(0, function() {
@@ -2579,7 +2591,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					}else {
 						// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 						$('#modalOverlay').modal('hide');
-						Swal.fire('Operação Cancelada', '', 'info');
+						Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 					} 
 				})
 				$('#modalOverlay').delay(1000).hide(0, function() {
@@ -3563,7 +3579,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					}else {
 						// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 						$('#modalOverlay').modal('hide');
-						Swal.fire('Operação Cancelada', '', 'info');
+						Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 					}
 				})
 				
