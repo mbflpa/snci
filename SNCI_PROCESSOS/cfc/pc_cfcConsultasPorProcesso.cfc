@@ -3377,13 +3377,17 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 <a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a>'>
 							
-			<cfelse>
+				<cfelse>
 
-				<cfset textoEmail = 'Em cumprimento ao Plano Anual de Controle Interno – PACIN #anoPacin#, que consolida o planejamento das ações a serem realizadas pelo Departamento de Controle Interno – DCINT, encaminhamos o Relatório - SEI e seus respectivos anexos, referentes à avaliação de controles no processo "#tipoAvaliacao#", para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.
+				<cfset textoEmail = 'A par de cumprimentá-lo, informa-se que o Departamento de Controle Interno (DCINT), no cumprimento de suas atribuições, realiza avaliações de controles extraordinárias, de acordo com as normas internas. 
 
-Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.<br><br>O plano de ação deverá apresentar providências focadas nas "Situações Encontradas" registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III.
+Nesse sentido, em consonância com o MANORG, Módulo 04, Capítulo 08, subitem 4.10, foi realizada avaliação de controle interno no processo "#tipoAvaliacao#".  
+ 
+Após a finalização dos trabalhos, encaminha-se o Relatório de Avaliação de Controles Internos e seus respectivos anexos, referentes a essa avaliação de controles, para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.  
 
-O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.
+Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA” apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.   
+
+O plano de ação deverá apresentar providências focadas nas “Situações Encontradas registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III. O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.  
 
 Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno. 
 
