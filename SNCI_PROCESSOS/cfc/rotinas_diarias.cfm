@@ -81,13 +81,6 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Mel
         SELECT pc_avaliacao_posicionamentos.* FROM pc_avaliacao_posicionamentos
         where pc_aval_posic_num_orientacao = #pc_aval_orientacao_id#
     </cfquery>
-<cfdump var="#rsStatusTrocado#">
+
 </cfoutput>
 
-
-<cfquery name="rsPontoSuspenso" datasource="#application.dsn_processos#">
-    SELECT pc_aval_orientacao_id, pc_aval_orientacao_dataPrevistaResp, pc_aval_orientacao_status
-    FROM pc_avaliacao_orientacoes
-    WHERE pc_aval_orientacao_status = 16 
-</cfquery>
-<cfdump var="#rsPontoSuspenso#">
