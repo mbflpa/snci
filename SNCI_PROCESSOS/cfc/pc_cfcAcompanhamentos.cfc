@@ -946,7 +946,11 @@
 							$(this).find('option[value="' + lastSelectedOption + '"]').prop('selected', false);
 
 							// Exibe um alerta
-							Swal.fire('Você não pode selecionar mais do que ' + maxAllowedOptions + ' áreas.', '', 'error');
+							Swal.fire({
+								title: 'Você não pode selecionar mais do que ' + maxAllowedOptions + ' áreas.',
+								html: logoSNCIsweetalert2(''),
+								icon: 'error'
+							});
 						}
 					} else {
 						// Ativa todas as opções
@@ -1282,12 +1286,20 @@
 				event.stopPropagation()
                 
 				if ($('#pcOrgaoRespDistribuicao').val().length == 0){
-					Swal.fire('Informe, pelo menos, uma área para distribuição.', '', 'error')
+					Swal.fire({
+								title: 'Informe, pelo menos, uma área para distribuição.',
+								html: logoSNCIsweetalert2(''),
+								icon: 'error'
+							});
 					return false;
 				}
 
 				if ($('#pcOrientacaoResposta').val().length == 0){
-					Swal.fire('Informe uma orientação para a resposta da(s) área(s).', '', 'error')
+					Swal.fire({
+								title: 'Informe uma orientação para a resposta da(s) área(s).',
+								html: logoSNCIsweetalert2(''),
+								icon: 'error'
+							});
 					return false;
 				}
 				swalWithBootstrapButtons.fire({//sweetalert2
@@ -2516,7 +2528,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 							$(this).find('option[value="' + lastSelectedOption + '"]').prop('selected', false);
 
 							// Exibe um alerta
-							Swal.fire('Você não pode selecionar mais do que ' + maxAllowedOptions + ' áreas.', '', 'error');
+							Swal.fire({
+								title: 'Você não pode selecionar mais do que ' + maxAllowedOptions + ' áreas.',
+								html: logoSNCIsweetalert2(''),
+								icon: 'error'
+							});
 						}
 					} else {
 						// Ativa todas as opções
@@ -2560,7 +2576,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 				</cfoutput>	
                 
 				if ($('#pcOrgaoRespDistribuicao').val().length == 0){
-					Swal.fire('Informe, pelo menos, uma área para distribuição.', '', 'error')
+					Swal.fire({
+								title: 'Informe, pelo menos, uma área para distribuição.',
+								html: logoSNCIsweetalert2(''),
+								icon: 'error'
+							});
 					return false;
 				}
 

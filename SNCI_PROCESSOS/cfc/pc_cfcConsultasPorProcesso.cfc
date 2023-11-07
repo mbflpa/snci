@@ -468,7 +468,12 @@
 						} else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Bloqueio <span style="color:red">cancelado</span> pelo usuário.', '', 'info');
+							Swal.fire({
+								title: 'Bloqueio <span style="color:red">cancelado</span> pelo usuário.',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
+							
 						}
 					})
 					
@@ -515,7 +520,11 @@
 						} else {
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Desbloqueio <span style="color:red">cancelado</span> pelo usuário.', '', 'info');
+							Swal.fire({
+								title: 'Desbloqueio <span style="color:red">cancelado</span> pelo usuário.',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 						}
 					})
 					
