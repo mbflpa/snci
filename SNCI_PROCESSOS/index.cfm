@@ -11,6 +11,50 @@
     <title>SNCI</title>
     <link rel="icon" type="image/x-icon" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">
 
+    <!-- Font Awesome -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/fontawesome-free/css/all.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/fontawesome-free/css/fontawesome.min.css">
+	<!-- Tempusdominus Bootstrap 4 -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+	<!-- iCheck -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+	
+	<!-- overlayScrollbars -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+	<!-- Daterange picker -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/daterangepicker/daterangepicker.css">
+
+	<!-- SweetAlert2 -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.css">
+	<!-- Toastr -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/toastr/toastr.css">
+	<!-- Bootstrap4 Duallistbox -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.css">
+	<!-- dropzonejs -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/dropzone/min/dropzone.min.css">
+	<!-- DataTables -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-select/css/select.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-scroller/css/scroller.bootstrap4.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-searchpanes/css/searchPanes.bootstrap4.min.css">
+	
+	
+	<!-- Select2 -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2/css/select2.min.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+ 
+
+	
+
+	<!-- Tour -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">
+
+  <!-- Theme style -->
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
+
 </head>
 
 
