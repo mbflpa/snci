@@ -2797,11 +2797,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 													<div>
 
 														<cfif #pc_aval_posic_status# eq 13>
-															<cfset icone = "fa-user-cog">
+															<cfset icone = "fa-gear">
 														<cfelseif #pc_aval_posic_status# eq 14>
-															<cfset icone = "fa-user-lock">
+															<cfset icone = "fa-lock">
 														<cfelseif #pc_aval_posic_status# eq 16>
-															<cfset icone = "fa-user-clock">
+															<cfset icone = "fa-clock">
 														<cfelse>
 														 	<cfset icone = "fa-user">
 														</cfif>
@@ -3956,11 +3956,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 										<cfif #pc_org_controle_interno# eq 'S' >
 											<div>
 												<cfif #pc_aval_posic_status# eq 13>
-													<cfset icone = "fa-user-cog">
+													<cfset icone = "fa-gear">
 												<cfelseif #pc_aval_posic_status# eq 14>
-													<cfset icone = "fa-user-lock">
+													<cfset icone = "fa-lock">
 												<cfelseif #pc_aval_posic_status# eq 16>
-													<cfset icone = "fa-user-clock">
+													<cfset icone = "fa-clock">
 												<cfelse>
 													<cfset icone = "fa-user">
 												</cfif>
