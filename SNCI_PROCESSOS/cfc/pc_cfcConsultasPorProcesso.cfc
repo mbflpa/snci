@@ -1823,6 +1823,7 @@
 											<th>ID</th>
 											<th>Órgão Responsável</th>
 											<th>Status</th>
+											<th hidden></th>
 										</tr>
 									</thead>
 								
