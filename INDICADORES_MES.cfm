@@ -1,19 +1,18 @@
-    <cfsetting requesttimeout="15000">
 	<cfquery name="rsFer" datasource="#dsn_inspecao#">
 		SELECT Fer_Data FROM FeriadoNacional 
 		where Fer_Data between #dtini# and #dtfim#
 		order by Fer_Data
 	</cfquery>
 	<!---  --->
-    <cfset dtlimitst14NR = #dtfim#>
+    <cfset dt30diasuteis14NR = #dtfim#>
 	<cfset nCont = 1>
 	<cfset dsusp = 0>
 	<cfloop condition="nCont lte 30"> 
-		<cfset vDiaSem = DayOfWeek(dtlimitst14NR)>
+		<cfset vDiaSem = DayOfWeek(dt30diasuteis14NR)>
 		<cfif (vDiaSem neq 1) and (vDiaSem neq 7)>
 			<cfif rsFer.recordcount gt 0> 
 					<cfloop query="rsFer">
-						<cfif dateformat(rsFer.Fer_Data,"YYYYMMDD") eq dateformat(dtlimitst14NR,"YYYYMMDD")>
+						<cfif dateformat(rsFer.Fer_Data,"YYYYMMDD") eq dateformat(dt30diasuteis14NR,"YYYYMMDD")>
 							<cfset nCont = nCont - 1>
 						</cfif>
 					</cfloop> 
@@ -23,15 +22,15 @@
 			  <cfset nCont = nCont - 1>
 			 </cfif> 
 		</cfif>
-		<cfset dtlimitst14NR = DateAdd("d", -1, #dtlimitst14NR#)>
+		<cfset dt30diasuteis14NR = DateAdd("d", -1, #dt30diasuteis14NR#)>
 		<cfset nCont = nCont + 1> 
 	</cfloop> 
-<!--- <cfoutput>data marco inicio:#dtlimitst14NR# time format: #TimeFormat(now(),"hh:mm:ssss")#</cfoutput>	
+<!--- <cfoutput>data marco inicio:#dt30diasuteis14NR# time format: #TimeFormat(now(),"hh:mm:ssss")#</cfoutput>	
 <cfset gil = gil> --->
 	<!---  --->
 <!---    <cfif rotina eq 0>  --->
 	   <!--- VALIDAR PONTOS NA TABELA: SLNCPRCIDCGIMES  --->
-	   <!--- GRUPOS E ITENS NÃO PERMITIDOS  --->
+	   <!--- GRUPOS E ITENS NÃƒO PERMITIDOS  --->
 	    <cfquery name="rsGRPITEM" datasource="#dsn_inspecao#">
 			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Pos_Situacao_Resp
 			FROM SLNCPRCIDCGIMES 
@@ -50,7 +49,7 @@
 				 </cfquery>		
 	        </cfif>
 		</cfoutput>
-<!--- <cfoutput>linha 228 GRUPOS E ITENS NÃO PERMITIDOS ok</cfoutput><br>	 --->	   
+<!--- <cfoutput>linha 228 GRUPOS E ITENS Nï¿½O PERMITIDOS ok</cfoutput><br>	 --->	   
 	   <!--- FAZER AJUSTES DE CAMPOS NA TABELA: SLNCPRCIDCGIMES  --->
 	   <!--- NO CAMPO POS_NOMEAREA NA TABELA: SLNCPRCIDCGIMES  --->
 	   <cfquery name="rsPosNArea" datasource="#dsn_inspecao#">
@@ -114,7 +113,7 @@
 		</cfoutput>
 <!--- <cfoutput>linha 290 ajustea CAMPO POS_NOMEAREA ok</cfoutput><br> --->			
 		<!---  --->
-		<!--- POS_NOMEAREA NÃO PERMITIDOS  --->
+		<!--- POS_NOMEAREA NÃƒO PERMITIDOS  --->
 		 <cfquery name="rsPosNmArea" datasource="#dsn_inspecao#">
 			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Pos_Situacao_Resp
 			FROM SLNCPRCIDCGIMES 
@@ -131,7 +130,7 @@
 			 </cfquery>		
 		</cfoutput>
 		<!---  --->
-<!--- <cfoutput>linha 309 POS_NOMEAREA NÃO PERMITIDOS ok</cfoutput><br> --->	
+<!--- <cfoutput>linha 309 POS_NOMEAREA Nï¿½O PERMITIDOS ok</cfoutput><br> --->	
 <!---  --->
 		<!--- obter campo HHMMSS da andamento para compor PRCI  --->
 

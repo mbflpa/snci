@@ -103,7 +103,7 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
     <cfset aux_obs = Replace(aux_obs,'>','','All')>		
 	<!---	 <cfset aux_obs = Replace(aux_obs,'&','','All')>
 		     <cfset aux_obs = Replace(aux_obs,'%','','All')> --->
-    <cfset pos_obs = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & '  ' & '-' & '  ' & #aux_obs# & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+    <cfset pos_obs = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & '  ' & '-' & '  ' & #aux_obs# & CHR(13) & CHR(13) & 'ResponsÃ¡vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
   '#pos_obs#'
   </cfif> 
   , Pos_DtPosic=#CreateDate(Year(Now()),Month(Now()),Day(Now()))#
@@ -115,9 +115,11 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
  </cfif> 
  <!--- Inserindo dados dados na tabela Andamento --->
   <cfif IsDefined("FORM.MM_UpdateRecord") AND FORM.MM_UpdateRecord EQ "form1" And IsDefined("FORM.acao") And Form.acao is "Salvar2">
- <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'À(O)' & '  ' & Gestor & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+ <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'Ã€(o)' & '  ' & Gestor & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'SituaÃ§Ã£o: ' & situacao & CHR(13) & CHR(13) &  'ResponsÃ¡vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+ <cfset hhmmssd = timeFormat(now(), "HH:mm:ssl")>
+<cfset hhmmssd = left(hhmmssd,2) & mid(hhmmssd,4,2) & mid(hhmmssd,7,2) & mid(hhmmssd,9,1)>
  <cfquery datasource="#dsn_inspecao#">
-    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#qUsuario.Usu_Lotacao#', convert(char, getdate(), 108), '#and_obs#')
+    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#qUsuario.Usu_Lotacao#', '#hhmmssd#', '#and_obs#')
  </cfquery>
      
  
@@ -141,7 +143,7 @@ str = str.substr(0,str.length-1);
 return str;
 } 
 
-//Validação de campos vazios em formulário
+//Validaï¿½ï¿½o de campos vazios em formulï¿½rio
 function valida_form(form) {
  var frm = document.forms[form];
  var quant = frm.elements.length;
@@ -159,9 +161,9 @@ function valida_form(form) {
  } 
 }
 
-//Função que abre uma página em Popup
+//Funï¿½ï¿½o que abre uma pï¿½gina em Popup
 function popupPage() {
-<cfoutput>  //página chamada, seguida dos parâmetros número, unidade, grupo e item
+<cfoutput>  //pï¿½gina chamada, seguida dos parï¿½metros nï¿½mero, unidade, grupo e item
 var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
 </cfoutput>
 windowprops = "location=no,"
@@ -183,7 +185,7 @@ window.open(page, "Popup", windowprops);
 <table width="77%" height="60%">
 <tr>
 	  <td width="74%" valign="top">
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 	<form name="form1" method="post" onSubmit="return valida_form(this.name)" action="<cfoutput>#CurrentPage#?#CGI.QUERY_STRING#</cfoutput>">
       <div align="right">
         <table width="74%" align="center">
@@ -241,13 +243,13 @@ window.open(page, "Popup", windowprops);
         <!---  <tr class="exibir">
             <td bgcolor="eeeeee">&nbsp;</td>
             <td colspan="5" bgcolor="f7f7f7"><cfoutput>
-                <input name="comentarios" type="button" class="botao" onClick="window.open('itens_unidades_controle_respostas_comentarios.cfm?numero=#URL.ninsp#&unidade=<cfoutput>#URL.unid#</cfoutput>&numgrupo=<cfoutput>#URL.ngrup#</cfoutput>&numitem=<cfoutput>#URL.nitem#</cfoutput>','','scrollbars=yes, resizable=yes, width=600, height=460, left=120, top=100')" value="Situação Encontrada">
+                <input name="comentarios" type="button" class="botao" onClick="window.open('itens_unidades_controle_respostas_comentarios.cfm?numero=#URL.ninsp#&unidade=<cfoutput>#URL.unid#</cfoutput>&numgrupo=<cfoutput>#URL.ngrup#</cfoutput>&numitem=<cfoutput>#URL.nitem#</cfoutput>','','scrollbars=yes, resizable=yes, width=600, height=460, left=120, top=100')" value="SituaÃ§Ã£o Encontrada">
             </cfoutput></td>
           </tr> --->
           <input type="hidden" name="frmResp" value="7">
           <input type="hidden" name="obs" value="<cfoutput>#qResposta.Pos_Parecer#</cfoutput>">
           <tr>
-            <td valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Situação Encontrada:</span></td>
+            <td valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">SituaÃ§Ã£o Encontrada:</span></td>
             <td colspan="6" bgcolor="f7f7f7"><span class="exibir">
               <textarea name="Melhoria" cols="120" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.RIP_Comentario#</cfoutput></textarea>
             </span></td>
@@ -257,7 +259,7 @@ window.open(page, "Popup", windowprops);
             <td valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Hist&oacute;rico:</span> <span class="titulos">Manifesta&ccedil;&atilde;o/An&aacute;lise da Auditoria</span><span class="titulos">:</span></td>
             <td colspan="6" bgcolor="f7f7f7"><cfif Not IsDefined("FORM.MM_UpdateRecord") And Trim(qResposta.Pos_Parecer) neq ''>
               <textarea name="H_obs" cols="120" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.Pos_Parecer#</cfoutput></textarea></cfif>
-               <!--- <textarea name="observacao" cols="120" rows="5" nome="Observação" vazio="false" wrap="VIRTUAL" class="form" id="observacao"></textarea></td>--->
+               <!--- <textarea name="observacao" cols="120" rows="5" vazio="false" wrap="VIRTUAL" class="form" id="observacao"></textarea></td>--->
           </tr>
           <tr>
             <td bgcolor="eeeeee"><span class="exibir"><span class="titulos">Recomenda&ccedil;&otilde;es:</span></span></td>
@@ -308,7 +310,7 @@ window.open(page, "Popup", windowprops);
       </div>
 	</form>
 
-<!--- Fim Área de conteúdo --->
+<!--- Fim ï¿½rea de conteï¿½do --->
 	  </td>
   </tr>
 </table>

@@ -1,111 +1,136 @@
+<!--- Windows Example  --->
+<!--- Check to see if the Form variable exists. ---> 
+
+<cfif isDefined("Form.envio") > 
+   <cfoutput>
+   Nome do arquivo de upload: #form.arquivo# <br>
+   Caminho destinado: #form.dir#
+   </cfoutput>
+<!--- If TRUE, upload the file.  --->
+
+	<cffile action = "upload" 
+	fileField = "form.arquivo" 
+	<!--- destination = "\\sac3162\PERNAMBUCO\SNCI\Dados\"  --->
+	destination = "#form.dir#"
+	accept = "text/html,application/pdf" 
+	nameConflict = "MakeUnique"> 
+	
+</cfif> 
+<!--- If FALSE, show the Form. ---> 
+<!doctype html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <title>Envio de arquivo coldfusion desenvolvimento</title>
+		<style>
+            html, body, h1, h2, h3, h4, p {
+                margin:0;
+                padding:0;
+            }
+
+            html {
+                background:rgb(255,255,255);
+            }
+
+            article, aside, section, header, footer, nav {
+                display:block;
+            }
+
+            main {
+                width:960px;
+                background-color:rgb(255,255,255);
+                font-family:Arial, Helvetica, sans-serif;
+                font-size:14px;
+                box-shadow: 0 0 10px #666;
+                margin:10px auto;
+                padding:10px;
+            }
+
+            header {
+                padding:25px;
+                background-color:rgb(255,102,51);
+                text-align:center;
+                margin-bottom:20px;
+            }
+
+            header h1 {
+                font-size:1.3em;
+                color:rgb(255,255,255);
+            }
+
+            .janela1 {
+                background-color:rgb(153,204,51);
+                height:500px;
+            }
+
+            .janela2 {
+                background-color:rgb(255,204,51);
+                height:500px;
+            }
+
+            select, input {
+                padding:5px;
+                background-color:rgb(204,153,51);
+                text-align:center;
+				font-size:1.3em;
+                color:rgb(255,255,255);
+            }
+        </style>
+    </head>
+
+    <body>
+	<main>
+<br>
+	<div>
+		<form method="post" action="Gilvan_teste.cfm" name="form1" enctype="multipart/form-data"> 
+		<label for="Tipo"><h4>Escolher formato (PDF)</h4></label><br>
+		<input name="arquivo" type="file" accept = "application/pdf"> 
+		<br>
+		<br> 
+		<label for="Local"><h4>(Local de Destino pasta SNCI_TESTE NO SAC0424)</h4></label><br>
+		<select id="dir" name="dir"> 
+			<option value="\\sac0424\SISTEMAS$\SNCI\SNCI_TESTE\">"Com simbolo $ \\sac0424\SISTEMAS$\SNCI\SNCI_TESTE\"</option>
+			<option value="\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\">"Sem simbolo $ \\sac0424\SISTEMAS\SNCI\SNCI_TESTE\"</option>
+        </select>
+		<br><br><br><br>
+		<input name="envio" type="submit" value="Salvar Arquivo - Clique Aqui"> 
+	</div>
+	</main>
+</form> 
+</body>
+</html>
+
+
+<!--- 
 <cfoutput>
-<cfquery name="rsRecomCrit" datasource="#dsn_inspecao#">
-	select RIP_Recomendacao_Inspetor, RIP_Critica_Inspetor, RIP_Falta, RIP_Sobra
-	from Resultado_Inspecao 
-	WHERE RIP_NumInspecao = '3200102023' and RIP_NumGrupo =207 and RIP_NumItem = 1
-</cfquery>
-
-<cfquery datasource="#dsn_inspecao#" name="rsVerificaItem">
-	SELECT  RIP_Resposta, RIP_Unidade, RIP_NCISEI, RIP_Falta, RIP_REINCINSPECAO, INP_Modalidade
-	FROM Resultado_Inspecao INNER JOIN Inspecao ON (RIP_NumInspecao = INP_NumInspecao) AND (RIP_Unidade = INP_Unidade)
-	WHERE RIP_NumInspecao='3200102023' And RIP_NumGrupo = 207 and RIP_NumItem = 1 
-</cfquery>
-
-<cfparam name="FORM.unid" default="#rsVerificaItem.RIP_Unidade#">
-
-<!--- 	Verifica se ainda existem itens em reanálise.	 --->
-<cfquery datasource="#dsn_inspecao#" name="rsVerifItensEmReanalise">
-SELECT RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao 
-WHERE  RIP_Recomendacao='S' and RIP_NumInspecao='3200102023'     
-</cfquery>
-<cfquery name="rsRelev" datasource="#dsn_inspecao#">
-	SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
-	FROM ValorRelevancia
-	WHERE VLR_Ano = '2023'
-</cfquery>
-<!--- Dado default para registro no campo Pos_Area --->
-<cfset posarea_cod = '#FORM.unid#'>	
-<!--- Obter o tipo da Unidade e sua descrição para alimentar o Pos_AreaNome --->
-<cfquery name="rsUnid" datasource="#dsn_inspecao#">
-	SELECT Und_Centraliza, Und_Descricao, Und_TipoUnidade FROM Unidades WHERE Und_Codigo = '32014701'
-</cfquery>
-<!--- Dado default para registro no campo Pos_AreaNome --->
-<cfset posarea_nome = rsUnid.Und_Descricao>
-<!--- Buscar o tipo de TipoUnidade que pertence a resposta do item --->
-<cfquery name="rsItem2" datasource="#dsn_inspecao#">
-	SELECT Itn_TipoUnidade, Itn_Pontuacao, Itn_Classificacao, Itn_PTC_Seq
-	FROM (Unidades 
-	INNER JOIN Inspecao ON Und_Codigo = INP_Unidade) 
-	INNER JOIN Itens_Verificacao ON (Und_TipoUnidade = Itn_TipoUnidade) AND (INP_Modalidade = Itn_Modalidade)
-	WHERE (Itn_Ano = '2023') and (Itn_NumGrupo = 207) AND (Itn_NumItem = 1) and (INP_NumInspecao='3200102023')
-</cfquery>
-
-<!--- Se a valição for não conforme, iniciar um insert na tabela parecer unidade --->
-<cfif rsVerificaItem.RIP_Resposta eq 'N'>
-	<!--- inicio classificacao do ponto --->
-	<cfset composic = rsItem2.Itn_PTC_Seq>	
-	<cfset ItnPontuacao = rsItem2.Itn_Pontuacao>
-	<cfset ClasItem_Ponto = ucase(trim(rsitem2.Itn_Classificacao))>
-
-	<cfset impactosn = 'N'>
-	<cfif left(composic,2) eq '10'>
-		<cfset impactosn = 'S'>
-	</cfif>
-	<cfset fator = 1>
-	<cfif impactosn eq 'S'>
-		<cfquery name="rsRelev" datasource="#dsn_inspecao#">
-			SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
-			FROM ValorRelevancia
-			WHERE VLR_Ano = '2023'
-		</cfquery>	
-		 <cfset somafaltasobra = rsRecomCrit.RIP_Falta>
-		 <cfif (1 eq 1 and (207 eq 53 or 207 eq 72 or 207 eq 214 or 207 eq 284))>
-			<cfset somafaltasobra = somafaltasobra + rsRecomCrit.RIP_Sobra>
-		 </cfif>
-		 <cfif somafaltasobra gt 0>
-			<cfloop query="rsRelev">
-				 <cfif rsRelev.VLR_FaixaInicial is 0 and rsRelev.VLR_FaixaFinal lte somafaltasobra>
-					<cfset fator = rsRelev.VLR_Fator>
-				 <cfelseif rsRelev.VLR_FaixaInicial neq 0 and VLR_FaixaFinal neq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial and somafaltasobra lte rsRelev.VLR_FaixaFinal>
-					<cfset fator = rsRelev.VLR_Fator>
-				 <cfelseif VLR_FaixaFinal eq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial>
-					<cfset fator = rsRelev.VLR_Fator> 
-				 </cfif>
-			</cfloop>
-		</cfif>	
-	</cfif>	
-
-	<cfset ItnPontuacao =  (ItnPontuacao * fator)>
-	<cfif impactosn eq 'S'>
-		<!--- Ajustes para os campos: Pos_ClassificacaoPonto --->
-		<!--- Obter a pontuacao max pelo ano e tipo da unidade --->
-		<cfquery name="rsPtoMax" datasource="#dsn_inspecao#">
-		SELECT TUP_PontuacaoMaxima 
-		FROM Tipo_Unidade_Pontuacao 
-		WHERE TUP_Ano = '2023' AND TUP_Tun_Codigo = #rsItem2.Itn_TipoUnidade#
+<!--- Obter o a data util para 10(dez) dias --->
+<cfset dtdezdiasuteis = CreateDate(2023,11,10)>
+<cfset nCont = 0>
+data inicial: #dtdezdiasuteis#  contador: #ncont#<br>
+<cfloop condition="nCont lt 32">
+	<cfset nCont = nCont + 1>
+	<cfset dtdezdiasuteis = DateAdd( "d", 1, dtdezdiasuteis)>
+	<cfset vDiaSem = DayOfWeek(dtdezdiasuteis)>
+	<cfif vDiaSem neq 1 and vDiaSem neq 7>
+		<!--- verificar se Feriado Nacional --->
+		<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+				SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtdezdiasuteis#
 		</cfquery>
-		<!--- calcular o perc de classificacao do item --->	
-		<cfset PercClassifPonto = NumberFormat(((ItnPontuacao / rsPtoMax.TUP_PontuacaoMaxima) * 100),999.00)>	
-	
-		<!--- calculo da descricao do item a saber GRAVE, MEDIANO ou LEVE --->
-		
-		<cfif PercClassifPonto gt 50.01>
-			<cfset ClasItem_Ponto = 'GRAVE'> 
-		<cfelseif PercClassifPonto gt 10 and PercClassifPonto lte 50.01>
-			<cfset ClasItem_Ponto = 'MEDIANO'> 
-		<cfelseif PercClassifPonto lte 10>
-			<cfset ClasItem_Ponto = 'LEVE'> 
-		</cfif>	
-	</cfif>	 	
-	composic #composic#  ItnPontuacao: #ItnPontuacao# ClasItem_Ponto: #ClasItem_Ponto# rsPtoMax.TUP_PontuacaoMaxima: #rsPtoMax.TUP_PontuacaoMaxima#<br>
-	PercClassifPonto: #PercClassifPonto#  ClasItem_Ponto: #ClasItem_Ponto# <br>
-
-	<cfif ClasItem_Ponto eq 'LEVE'	and len(trim(rsVerificaItem.RIP_REINCINSPECAO)) gt 0>
-		<cfset ClasItem_Ponto = 'MEDIANO'>
+		<cfif rsFeriado.recordcount gt 0>
+			<cfset nCont = nCont - 1>
+			feriado nacional : #dtdezdiasuteis#   contador: #ncont# <br>
+		<cfelse>
+		    dia valido ====================================================: #dtdezdiasuteis#   contador: #ncont# <br>
+		</cfif>
+	</cfif>
+	<!--- Verifica se final de semana  --->
+	<cfif vDiaSem eq 1 or vDiaSem eq 7>
+		<cfset nCont = nCont - 1>
+		final de semana: #dtdezdiasuteis#   contador: #ncont#<br>
 	</cfif>	
+</cfloop>
 
-	
-	PercClassifPonto: #PercClassifPonto#  ClasItem_Ponto: #ClasItem_Ponto# 
-	
-</cfif>	
+
+dtdezdiasuteis: #dtdezdiasuteis#
 </cfoutput>
+--->

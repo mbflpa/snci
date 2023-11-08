@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -36,7 +37,7 @@ function valida_acao(a) {
 //return false;
 var   grpacesso = '<cfoutput>#ucase(trim(qAcesso.Usu_GrupoAcesso))#</cfoutput>';
 if (a=='S' && (grpacesso=='GESTORES' || grpacesso=='ANALISTAS' || grpacesso=='INSPETORES')){
-alert('Atenção!\n\nPrezado usuário, o plano de testes analítico é pra utilização restrita do controle interno.\n\nNão deverá ser divulgado/disponibilizado aos demais órgãos dos correios');
+alert('Atenï¿½ï¿½o!\n\nPrezado usuï¿½rio, o plano de testes analï¿½tico ï¿½ pra utilizaï¿½ï¿½o restrita do controle interno.\n\nNï¿½o deverï¿½ ser divulgado/disponibilizado aos demais ï¿½rgï¿½os dos correios');
 }
 var frm = document.forms[0];
 frm.frmacao.value=a;
@@ -58,7 +59,7 @@ frm.frmacao.value=a;
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 <form name="frm1" method="get" action="rel_itensverificacao.cfm" target="_blank">
   <table width="31%" align="center" bordercolor="#000000">
         <tr>

@@ -469,8 +469,10 @@
 
  <!--- Inserindo dados dados na tabela Andamento --->
 	 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'A(o) ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+	<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
+	<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>	 
 	 <cfquery datasource="#dsn_inspecao#">
-		insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#auxposarea#', convert(char, getdate(), 108), '#and_obs#')
+		insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#auxposarea#', '#hhmmss#', '#and_obs#')
 	 </cfquery>
 
 	<cfif Form.frmResp eq 1 and rsItem.Und_TipoUnidade neq 12 and rsItem.Und_TipoUnidade neq 16>
@@ -495,9 +497,11 @@
 					, Pos_Sit_Resp_Antes = #rsObserv.Pos_Situacao_Resp#
 					WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
 	           </cfquery> 
-  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>Opinião do Controle Interno' & CHR(13) & CHR(13) & 'A(O) CS/DIGOV/DCINT' & CHR(13) & CHR(13) & '   A partir da adoções de metodologia que classifica os itens avaliados como não Conformes em GRAVE, MEDIANO ou LEVE, foi estabelecido pelo Departamento de Controle Interno (DCINT) que o acompanhamento da' & CHR(13) & 'regularização será realizado pelo Controle Interno somente para os itens de relev?ncia GRAVE e MEDIANO.' & CHR(13) & '   Em decorrência disso, este item teve seu acompanhamento ENCERRADO após o registro da manifestação do gestor da unidade avaliada, uma vez que apresenta relevância LEVE.' & CHR(13) & CHR(13) & '   IMPORTANTE:' & CHR(13) & '   O não acompanhamento da regularização do item pelo Controle Interno não exime o gestor da unidade avaliada de adotar ações imediatas para regularizar a não Conformidade registrada.' & CHR(13) & '   Em caso de reincidência dessa não Conformidade em Avaliações de controles futuras, o item será considerado como MEDIANO e passará a ter acompanhamento até a sua regularização.' & CHR(13) & CHR(13) & 'Situação: ENCERRADO' & CHR(13) & CHR(13) &  'Responsável: SEC AVAL CONT INTERNO/SGCIN ' & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+  				<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>Opinião do Controle Interno' & CHR(13) & CHR(13) & 'A(O) CS/DIGOV/DCINT' & CHR(13) & CHR(13) & '   A partir da adoções de metodologia que classifica os itens avaliados como não Conformes em GRAVE, MEDIANO ou LEVE, foi estabelecido pelo Departamento de Controle Interno (DCINT) que o acompanhamento da' & CHR(13) & 'regularização será realizado pelo Controle Interno somente para os itens de relev?ncia GRAVE e MEDIANO.' & CHR(13) & '   Em decorrência disso, este item teve seu acompanhamento ENCERRADO após o registro da manifestação do gestor da unidade avaliada, uma vez que apresenta relevância LEVE.' & CHR(13) & CHR(13) & '   IMPORTANTE:' & CHR(13) & '   O não acompanhamento da regularização do item pelo Controle Interno não exime o gestor da unidade avaliada de adotar ações imediatas para regularizar a não Conformidade registrada.' & CHR(13) & '   Em caso de reincidência dessa não Conformidade em Avaliações de controles futuras, o item será considerado como MEDIANO e passará a ter acompanhamento até a sua regularização.' & CHR(13) & CHR(13) & 'Situação: ENCERRADO' & CHR(13) & CHR(13) &  'Responsável: SEC AVAL CONT INTERNO/SGCIN ' & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+				<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+				<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>				
 				  <cfquery datasource="#dsn_inspecao#">
-					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 29, '#auxposarea#', '#TimeFormat(Now(),'HH:MM:SS')#.9', '#and_obs#')
+					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 29, '#auxposarea#', '#hhmmssdc#', '#and_obs#')
 				 </cfquery> 
 		  </cfif>
 	 </cfif> 
@@ -827,7 +831,7 @@ if (document.form1.acao.value == 'Salvar'){
 
 	 if (dt_hoje_yyyymmdd > dtprevdig_yyyymmdd)
 	 {
-	  alert('Data de Previsão da Solu�o ? inferior a data de hoje!')
+	  alert('Data de Previsão da Solução ? inferior a data de hoje!')
 	  dtprazo(sit);
 	  return false;
 	 }
@@ -843,7 +847,7 @@ if (document.form1.acao.value == 'Salvar'){
 		 {
 		  var auxdtedit = document.form1.dtdezddtrat.value;
 		  auxdtedit = auxdtedit.substring(6,8) + '/' + auxdtedit.substring(4,6) + '/' + auxdtedit.substring(0,4)
-		  alert('Para Tratamento a Data de Previsão esta menor que os 10(dez) dias �teis ou Data Previsão concedida para: ' + auxdtedit)
+		  alert('Para Tratamento a Data de Previsão esta menor que os 10(dez) dias úteis ou Data Previsão concedida para: ' + auxdtedit)
 		// dtprazo(sit);
 		 // exibe(sit);
 	//	  document.form1.cbData.disabled = false;
@@ -952,7 +956,7 @@ str = str.substr(0,str.length-1);
 return str;
 }
 
-//Fun�o que abre uma p?gina em Popup
+//Função que abre uma p?gina em Popup
 function popupPage() {
 <cfoutput>  //p?gina chamada, seguida dos par?metros n?mero, unidade, grupo e item
 var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
@@ -1151,9 +1155,9 @@ function mensagem(){
 		   <cfset db_reincItem = #rsItem.RIP_ReincItem#>
 
 		<tr class="red_titulo">
-			<td bgcolor="eeeeee">Reincid&ecirc;ncia</td>
+			<td bgcolor="eeeeee">Reincidência</td>
 
-		<td colspan="4" bgcolor="eeeeee">N&ordm; Relat&oacute;rio:
+		<td colspan="4" bgcolor="eeeeee">Nº Relatório:
 			 <input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" onKeyPress="numericos(this.value)">
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&ordm; Grupo:
 			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" onKeyPress="numericos(this.value)">
@@ -1196,7 +1200,7 @@ function mensagem(){
 	 </tr>
        <!--- <input type="hidden" name="recom" value="<cfoutput>#qResposta.RIP_Recomendacoes#</cfoutput>"> --->
     <tr>
-       <td height="38"  bgcolor="eeeeee" align="center"><span class="titulos">Orienta&ccedil;&otilde;es:</span></td>
+       <td height="38"  bgcolor="eeeeee" align="center"><span class="titulos">Orientações:</span></td>
 	   <td colspan="4" bgcolor="eeeeee">
        <cfif (qResposta.Pos_Situacao_Resp is 0) or (qResposta.Pos_Situacao_Resp is 11)>
        <textarea name="recomendacao" cols="200" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#strRecomendacao#</cfoutput></textarea>
@@ -1274,10 +1278,10 @@ function mensagem(){
 			<input type="hidden" name="frmDescSituResp" value="<cfoutput>#qResposta.Pos_Situacao#</cfoutput>">
            <!---  <input type="hidden" name="obs" value="<cfoutput>#qResposta.Pos_Parecer#</cfoutput>"> --->
           <tr>
-            <td height="38" align="center" bgcolor="eeeeee" class="exibir"><strong>Hist&oacute;rico das<br> 
-            Manifesta&ccedil;&otilde;es e<br> 
+            <td height="38" align="center" bgcolor="eeeeee" class="exibir"><strong>Histórico das<br> 
+            Manifestações e<br> 
             Plano de<br> 
-            A&atilde;o/An&aacute;lise do<br> 
+            A&atilde;o/Análise do<br> 
             Controle Interno</strong></td>
 
 			<td colspan="4" bgcolor="eeeeee">
@@ -1289,9 +1293,12 @@ function mensagem(){
 		  <cfif qCausaProcesso.recordcount gte 3>
 		  	<cfset habIncCausa = 'disabled'>
 		  </cfif>
-
+		  <cfset resp = qResposta.Pos_Situacao_Resp>
+		  <cfif resp eq 3 or resp eq 28 or resp eq 29>
+			<cfset habIncCausa = 'disabled'>
+		  </cfif>
 		  <tr bgcolor="eeeeee">
-      <td bgcolor="eeeeee" align="center"><span class="titulos">Causas Prov&aacute;veis:</span></td>
+      <td bgcolor="eeeeee" align="center"><span class="titulos">Causas Prováveis:</span></td>
       <td colspan="3" valign="middle" bgcolor="eeeeee" class="exibir">
 	  <select name="causaprovavel" id="causaprovavel" class="form">
         <option selected="selected" value="">---</option>
@@ -1299,7 +1306,7 @@ function mensagem(){
           <option value="#Cpr_Codigo#">#Cpr_Descricao#</option>
         </cfoutput>
       </select></td>
-      <td><input name="btn_inc_causa" id="btn_inc_causa" type="Submit" class="botao" value="Incluir" onClick="document.form1.acao.value='Incluir_Causa';" <cfoutput>#habIncCausa#</cfoutput>></td>
+      <td><input name="btn_inc_causa" id="btn_inc_causa" type="Submit" class="botao" value="Incluir Causa" onClick="document.form1.acao.value='Incluir_Causa';" <cfoutput>#habIncCausa#</cfoutput>></td>
 	</tr>
 	<cfset resp = qResposta.Pos_Situacao_Resp>
 	<cfoutput query="qCausaProcesso">
@@ -1319,7 +1326,7 @@ function mensagem(){
       <td colspan="5">&nbsp;</td>
     </tr>
 		<cfset resp = qResposta.Pos_Situacao_Resp>
-          <cfif (resp eq 1 or resp eq 2 or resp eq 14 or resp eq 15 or resp eq 17 or resp eq 18 or resp eq 20) or (resp eq 4 and url.perdaprzsn eq 'S') or (resp eq 16 and url.perdaprzsn eq 'S')>
+          <cfif (resp eq 1 or resp eq 2 or resp eq 14 or resp eq 15 or resp eq 17 or resp eq 18 or resp eq 20 or resp eq 28) or (resp eq 4 and url.perdaprzsn eq 'S') or (resp eq 16 and url.perdaprzsn eq 'S')>
           <tr>
             <td bgcolor="eeeeee" align="center"><span class="titulos">Manifestar-se:</span></td>
             <td colspan="4" bgcolor="eeeeee"><span class="exibir">
@@ -1333,15 +1340,15 @@ function mensagem(){
 	        <td colspan="4" align="left" valign="middle" bgcolor="eeeeee" class="exibir">&nbsp;</td>
           </tr>
 		  <cfset resp = qResposta.Pos_Situacao_Resp>
-		  <cfif (qResposta.Pos_Situacao_Resp eq 1 or qResposta.Pos_Situacao_Resp eq 2 or qResposta.Pos_Situacao_Resp eq 14 or qResposta.Pos_Situacao_Resp eq 15 or qResposta.Pos_Situacao_Resp eq 17 or qResposta.Pos_Situacao_Resp eq 18 or qResposta.Pos_Situacao_Resp eq 20)
+		  <cfif (qResposta.Pos_Situacao_Resp eq 1 or qResposta.Pos_Situacao_Resp eq 2 or qResposta.Pos_Situacao_Resp eq 14 or qResposta.Pos_Situacao_Resp eq 15 or qResposta.Pos_Situacao_Resp eq 17 or qResposta.Pos_Situacao_Resp eq 18 or qResposta.Pos_Situacao_Resp eq 20 or qResposta.Pos_Situacao_Resp eq 28)
 		     or (qResposta.Pos_Situacao_Resp eq 4 and url.perdaprzsn eq 'S') or (qResposta.Pos_Situacao_Resp eq 16 and url.perdaprzsn eq 'S')>
 
-		  <tr><td bgcolor="eeeeee" class="titulos"><div align="center">Arquivo:		    </div></td>
+		  <tr><td bgcolor="eeeeee" class="titulos"><div align="center">Arquivo:</div></td>
 	        <td bgcolor="eeeeee" class="exibir"><input name="arquivo" class="botao" type="file" size="120"></td>
 	        <td colspan="3" bgcolor="eeeeee" class="exibir">            
 		      <div align="center">
 			      <cfif (resp neq 21)>
-		          <input name="submit" id="Submit" type="submit" class="botao" onClick="document.form1.acao.value='Anexar'" value="Anexar">
+		          <input name="submit" id="Submit" type="submit" class="botao" onClick="document.form1.acao.value='Anexar'" value="Anexar" #habIncCausa#>
 		          <cfelse>
 		          <input name="submit" id="Submit" type="submit" class="botao" onClick="document.form1.acao.value='Anexar'" value="Anexar" disabled>
                 </cfif>

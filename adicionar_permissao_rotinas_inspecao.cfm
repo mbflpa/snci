@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/>  
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena 
 FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR 
@@ -11,13 +12,13 @@ WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_U
 	<link href="../../estilo.css" rel="stylesheet" type="text/css">
 	<link href="css.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
-// função que transmite as rotinas de alt, exc, etc...
+// funï¿½ï¿½o que transmite as rotinas de alt, exc, etc...
 function trocar(a,b){
     a = a.toUpperCase();
     b = b.toUpperCase();
 					
 	if (a == "---") {
-	   alert("Selecionar uma Superintendencia!");
+	   alert("Selecionar uma SuperintendÃªncia!");
 	   return false;
 	}
 	if (b == "---") {
@@ -42,11 +43,11 @@ function trocar(a,b){
 
 	    <table width="80%" border="0" align="center">
 	      <tr valign="baseline">
-	        <td colspan="3" class="exibir"><div align="center"><span class="titulo1"><strong>Permiss&Otilde;es</strong></span></div></td>
+	        <td colspan="3" class="exibir"><div align="center"><span class="titulo1"><strong>PermissÃµes</strong></span></div></td>
 	      </tr>
  
 	     <tr valign="baseline">
-		      <td colspan="3"><span class="titulos">Superintendência:</span></td>
+		      <td colspan="3"><span class="titulos">SuperintendÃªncia:</span></td>
 	  </tr>
 
 	   <cfif (UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' or UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GOVERNANCA') AND qAcesso.Usu_DR eq '01'>
@@ -69,27 +70,20 @@ function trocar(a,b){
 <!--- 			 <cfset seprinc= '04'>
 	         <cfset sesubor= '70'> --->
 		<cfelseif (UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORES' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'ANALISTAS') AND len(TRIM(qAcesso.Usu_Coordena)) gt 0> 
-            <cfset auxtam_lista = len(TRIM(qAcesso.Usu_Coordena))>
 			<cfset aux_lista = TRIM(qAcesso.Usu_Coordena)>
-			<cfset aux_codse = "">			
-			
+	
 			 <tr valign="baseline">
 		     <td colspan="3">
 			    <select name="dr" id="dr" class="form">
 		          <option selected="selected" value="---">---</option>
 <cfoutput>
-				  <cfloop from="1" to="#val(auxtam_lista) + 1# " index="i">
-				     <cfif len(aux_codse) eq 2>
-					   <cfquery name="qCDR" datasource="#dsn_inspecao#">
-						SELECT Dir_Sigla FROM Diretoria  WHERE Dir_Codigo = '#aux_codse#'
-					   </cfquery> 
-		               <option value="#aux_codse#">#Ucase(trim(qCDR.Dir_Sigla))#</option>
-					   <cfset aux_codse = "">
-					</cfif>
-					<cfif mid(aux_lista,i,1) neq ",">
-					  <cfset aux_codse = #aux_codse# & #mid(aux_lista,i,1)#>
-					</cfif>
-				  </cfloop>
+				<cfloop list="#aux_lista#" index="i">
+					<cfquery name="qCDR" datasource="#dsn_inspecao#">
+						SELECT Dir_Sigla FROM Diretoria  WHERE Dir_Codigo = '#i#'
+					</cfquery>
+					<option value="#i#">#Ucase(trim(qCDR.Dir_Sigla))#</option>
+				</cfloop>
+
 </cfoutput>				  				  
 		        </select></td>
 
@@ -184,9 +178,9 @@ function trocar(a,b){
 	      <td colspan="3">&nbsp;</td>
 		</tr>
 
-<!--- Áreas para seleção de permissão --->
+<!--- ï¿½reas para seleï¿½ï¿½o de permissï¿½o --->
 	
-	<!--- ÁREA DE CONTEÚDO --->
+	<!--- ï¿½REA DE CONTEï¿½DO --->
 	<cfinvoke component="SNCI.cfc.rotinas_permissoes" method="rsqArea" returnvariable="request.qArea">
 	</cfinvoke>
 
@@ -210,14 +204,14 @@ function trocar(a,b){
 	      </td>
 	      </tr>
 			 <tr valign="baseline" align="center">
-			   <td><button type="button" class="botao" onClick="trocar(dr.value,area_usu.value);">Confirmar Permissão</button></td>
+			   <td><button type="button" class="botao" onClick="trocar(dr.value,area_usu.value);">Confirmar PermissÃ£o</button></td>
 	      </tr>
 	</table>
 	<input name="frmgrpacessologin" type="hidden" value="<cfoutput>#trim(qAcesso.Usu_GrupoAcesso)#</cfoutput>">
 	<input name="frmcoordena" type="hidden" value="<cfoutput>#TRIM(qAcesso.Usu_Coordena)#</cfoutput>">
 	<input name="frmse" type="hidden" value="<cfoutput>#TRIM(qAcesso.Usu_DR)#</cfoutput>">
 </form>
-  <!--- Término da área de conteúdo --->
+  <!--- Tï¿½rmino da ï¿½rea de conteï¿½do --->
 </body>
 </html>
 

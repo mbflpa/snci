@@ -593,7 +593,7 @@ function listar(a,b,c,d,e){
       </tr>
 	        <tr>
 	          <td colspan="17"><div align="center">
-	            <p><span class="titulo1"><strong>Solu&Ccedil;&Atilde;o de N&Atilde;o Conformidades (SLNC)</strong></span></p>
+	            <p><span class="titulo1"><strong>Solução de Não Conformidades (SLNC)</strong></span></p>
 	            </div></td>
       </tr>
 	  	        <tr>
@@ -608,9 +608,9 @@ function listar(a,b,c,d,e){
 	      <td colspan="17" class="titulos"><div align="center">Unidades</div></td>
       </tr>
 	  <tr class="exibir">
-        <td width="10%"><div align="center"><strong>M&Ecirc;S</strong></div></td>
+        <td width="10%"><div align="center"><strong>Mês</strong></div></td>
         <td width="30%"><div align="center"><strong>Quantidade (Solucionados)</strong></div></td> 
-		<td width="16%"><div align="center"><strong>Total (*)</strong></div></td>
+		<td width="16%"><div align="center"><strong>Total(*)</strong></div></td>
         <td width="10%"><div align="center">%</div></td>
         <td class="exibir">&nbsp;</td></tr>
 	  <CFIF aux_mes gte 1>

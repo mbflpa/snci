@@ -1,9 +1,9 @@
-<cfset DR = 'Departamento de Governança, Riscos e Compliance'>
+<cfset DR = 'Departamento de Governanï¿½a, Riscos e Compliance'>
 <cfset siglaDR = 'DCINT'>
 <cfset Sigla_Gerencia = 'CCOP'>
 <cfset Gerencia = 'COORD CONTR INT OPER/CCOP'>
-<cfset rodape = '.: CCOP :. Av. Guararapes, 250 - 3º Andar - Santo Antônio - Recife-PE'>
-<cfset sto_gerencia = '32050'> <!--- Cinco dígitos iniciais --->
+<cfset rodape = '.: CCOP :. Av. Guararapes, 250 - 3ï¿½ Andar - Santo Antï¿½nio - Recife-PE'>
+<cfset sto_gerencia = '32050'> <!--- Cinco dï¿½gitos iniciais --->
 <cfset cod_dr = '32'>
 <cfset Local = SetLocale("Portuguese (Brazilian)")>
 <cfset evento = ''>
@@ -13,12 +13,11 @@
 <cfset vMenu = ''>
 <!---<cfset dsn_pesquisa = 'DBPESQUISA_INSPECAO'>--->
 <cfset dsn_inspecao = 'DBSNCI'>
-<cfset Login_Agencia = 'PE\PEAC'> <!--- Parte inicial do login das agências (comum a todas as agências) --->
+<cfset Login_Agencia = 'PE\PEAC'> <!--- Parte inicial do login das agï¿½ncias (comum a todas as agï¿½ncias) --->
 <cfset Login_CDD = 'PE\PECDD'> <!--- Parte inicial do login dos CDDs (comum a todos os CDDs) --->
 <script type="text/javascript" src="ckeditor\ckeditor.js"></script>
 
-
-<!--- Diretório onde serão armazenados arquivos anexados a inspeção --->
+<!--- Diretï¿½rio onde serï¿½o armazenados arquivos anexados a inspeï¿½ï¿½o --->
 <cfset auxsite =  trim(ucase(cgi.server_name))>
 <cfif FIND("INTRANETSISTEMASPE", "#auxsite#") >
 	<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_ANEXOS\'>
@@ -34,24 +33,27 @@
 	<cfset url_csvxls = 'http://homologacaope/snci/fechamento/'>
 </cfif>
 
-<!--- Diretório onde serão armazenadas as imagens --->
+    <cfset agenda.email="Gilvanm@correios.com.br">
+    <cfset agenda.telefone="(81) 9 8572-6313">
+
+<!--- Diretï¿½rio onde serï¿½o armazenadas as imagens --->
 <cfset thisDir = expandPath(".")>
 <cfset imagesDirOrientacoes = "#thisDir#/IMAGENS_ORIENTACOES" />
 <cfset imagesDirAvaliacoes = "#thisDir#/IMAGENS_AVALIACOES" />
 <cfset imagesDirIcones = "#thisDir#/IMAGENS_ICONES" />
-<!--- fim: Diretório onde serão armazenadas as imagens --->
+<!--- fim: Diretï¿½rio onde serï¿½o armazenadas as imagens --->
 
 <cfset vRelatorio = 'SNCI'>
 
-<!--- Listas de permissões --->
+<!--- Listas de permissï¿½es --->
 <cfquery name="qSINS" datasource="#dsn_inspecao#">
-	SELECT Usu_Login FROM Usuarios WHERE RTrim(Usu_GrupoAcesso) in ('GESTORES','DESENVOLVEDORES','GESTORMASTER', 'INSPETORES', 'ANALISTAS','GOVERNANCA')
+	SELECT Usu_Login FROM Usuarios WHERE RTrim(Usu_GrupoAcesso) in ('GESTORES','DESENVOLVEDORES','GESTORMASTER', 'INSPETORES', 'ANALISTAS')
 </cfquery>
 
 <cfset Lista_SINS = UCase(ValueList(qSINS.Usu_Login))>
 
 
-<!--- Função de confirmação de ação --->
+<!--- Funï¿½ï¿½o de confirmaï¿½ï¿½o de aï¿½ï¿½o --->
 <script language="JavaScript">
 function confirmThis(message)
 {

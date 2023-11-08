@@ -16,7 +16,7 @@
 <cfset total=0>
 <cfset url.dtInicio = CreateDate(Right(dtinic,4), Mid(dtinic,4,2), Left(dtinic,2))>
 <cfset url.dtFinal = CreateDate(Right(url.dtfim,4), Mid(url.dtfim,4,2), Left(url.dtfim,2))>
-<cfset auxfiltro = "Periodo/Superintendencia  -  Data Inicial : " & DateFormat(url.dtInicio,"dd/mm/yyyy") & "  -  Data Final : " & DateFormat(url.dtFinal,"dd/mm/yyyy") & "         Superintendência : " & url.SE & " - " & #qDR.Dir_Sigla#>
+<cfset auxfiltro = "Periodo/Superintendencia  -  Data Inicial : " & DateFormat(url.dtInicio,"dd/mm/yyyy") & "  -  Data Final : " & DateFormat(url.dtFinal,"dd/mm/yyyy") & "         Superintendï¿½ncia : " & url.SE & " - " & #qDR.Dir_Sigla#>
 <cfset auxdtmaxlimit = dateformat(url.dtFinal,"YYYYMMDD")>
 <cfset auxdtmaxlimit = CreateDate(Left(auxdtmaxlimit,4), Mid(auxdtmaxlimit,5,2), Right(auxdtmaxlimit,2))>
 <cfoutput>
@@ -41,7 +41,7 @@ WHERE (And_DtPosic BETWEEN #url.dtInicio# AND #url.dtFinal#) and (And_Situacao_R
 </cfoutput>
 
  <cfif rsItem.recordcount lte 0>
-  Não Há dados a serem relatados para o período informado!<br>
+  Nï¿½o Hï¿½ dados a serem relatados para o perï¿½odo informado!<br>
   <input type="button" class="botao" onClick="window.close()" value="Fechar">
   <cfabort> 
 </cfif> 
@@ -81,7 +81,7 @@ bIsNav = sAgent.indexOf("Mozilla") > -1 && !bIsIE;
 <!--- <table width="100%" align="center">
 <tr>
 <td valign="top" align="center"> --->
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 <table width="1455" height="10%" border="1" align="center" cellspacing="0">
   <tr>
     <td height="20" colspan="17">&nbsp;</td>
@@ -122,7 +122,7 @@ bIsNav = sAgent.indexOf("Mozilla") > -1 && !bIsIE;
 	     <td height="5" colspan="14" class="exibir">&nbsp;</td>
         </tr>
 	   <tr bgcolor="##D9ECFA" class="titulosClaro">
-	    <td colspan="14" bgcolor="##BFDAFC" class="exibir">&nbsp;Analista: #Usu_Apelido#&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp; #Usu_LotacaoNome# &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Qtd. Reg.: #rsGestor.totaGestor#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Itens_Analise_Manifestacao2.cfm?UsuApelido=#Usu_Apelido#&auxusername=#trim(Usu_Login)#&dtinic=#dtinic#&dtfim=#dtfim#&gestor=#gestor#" target="_blank"><span class="link1">(Clicar aqui => para Visualizar em Gráfico)</span></a></td>
+	    <td colspan="14" bgcolor="##BFDAFC" class="exibir">&nbsp;Analista: #Usu_Apelido#&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp; #Usu_LotacaoNome# &nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;Qtd. Reg.: #rsGestor.totaGestor#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="Itens_Analise_Manifestacao2.cfm?UsuApelido=#Usu_Apelido#&auxusername=#trim(Usu_Login)#&dtinic=#dtinic#&dtfim=#dtfim#&gestor=#gestor#" target="_blank"><span class="link1">(Clicar aqui => para Visualizar em Grï¿½fico)</span></a></td>
 	    </tr>
 	  <tr bgcolor="##BFDAFC" class="titulosClaro">
 	  <td width="54" class="exibir">Data <br>
@@ -185,8 +185,8 @@ bIsNav = sAgent.indexOf("Mozilla") > -1 && !bIsIE;
     FilePath = ExpandPath( "./Fechamento/" & sarquivo ),
     Query = rsItem,
 	ColumnList = "Usu_DR,Dir_Sigla,And_username,Usu_Apelido,Usu_Lotacao,And_NumInspecao,And_Unidade,Und_Descricao,TUN_Descricao,And_NumGrupo,Grp_Descricao,And_NumItem,Itn_Descricao,AndDtPosic,And_HrPosic,And_Situacao_Resp,STO_Descricao",
-	ColumnNames = "Cod_SE,Sigla_SE,Gestor_Login,Gestor_Nome,Gestor_Lotação,Nº da Avaliação,Unidade,Nome Unidade,Tipo Unidade,Grupo,Grupo Descrição,Item,Item Descrição,Posição,Hora,Situação,Situação Descrição",
-	SheetName = "Gestão_Manifestacoes"
+	ColumnNames = "Cod_SE,Sigla_SE,Gestor_Login,Gestor_Nome,Gestor_LotaÃ§Ã£oo,AvaliaÃ§Ã£o,Unidade,Nome Unidade,Tipo Unidade,Grupo,Grupo DescriÃ§Ã£o,Item,Item DescriÃ§Ã£o,PosiÃ§Ã£o,Hora,SituaÃ§Ã£o,SituaÃ§Ã£o DescriÃ§Ã£o",
+	SheetName = "GestÃ£o_Manifestacoes"
     ) />
 <cfinclude template="rodape.cfm">
 </body>

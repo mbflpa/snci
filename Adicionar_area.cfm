@@ -4,11 +4,7 @@
 <cfinclude template="cabecalho.cfm">
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <style type="text/css">
-<!--
-    font-size: 14px;
-	font-weight: bold;
 
--->
 </style>
 </head>
 <body>

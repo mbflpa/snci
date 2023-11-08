@@ -189,7 +189,7 @@ function listar(a,b,c){
 		ORDER BY Met_DGCI_AcumPeriodo DESC
 	</cfquery>
 </cfif>
-<!--- Criação do arquivo CSV --->
+<!--- Criaï¿½ï¿½o do arquivo CSV --->
 <cfset sdata = dateformat(now(),"YYYYMMDDHH")>
 <cfset diretorio =#GetDirectoryFromPath(GetTemplatePath())#>
 <cfset slocal = #diretorio# & 'Fechamento\'>
@@ -203,10 +203,10 @@ function listar(a,b,c){
 	</cfif>
 </cfloop>
 <cffile action="write" addnewline="no" file="#slocal##sarquivo#" output=''>
-<cfset auxcab = 'RESULTADO EM RELAÇÃO À META ' & #ucase(cabec)#>
+<cfset auxcab = 'RESULTADO EM RELAï¿½ï¿½O ï¿½ META ' & #ucase(cabec)#>
 <cffile action="Append" file="#slocal##sarquivo#" output='#auxcab#'>
-<cffile action="Append" file="#slocal##sarquivo#" output=';PRCI;;;SLNC;;;DGCI;;;Diferença em'>
-<cffile action="Append" file="#slocal##sarquivo#" output='SE;Meta;Resultado;Parcial;Meta;Resultado;Parcial;Meta;Resultado;Parcial;Relação à Meta'>
+<cffile action="Append" file="#slocal##sarquivo#" output=';PRCI;;;SLNC;;;DGCI;;;Diferenï¿½a em'>
+<cffile action="Append" file="#slocal##sarquivo#" output='SE;Meta;Resultado;Parcial;Meta;Resultado;Parcial;Meta;Resultado;Parcial;Relaï¿½ï¿½o ï¿½ Meta'>
 <!--- <cfset auxRazao = (rsMetas.Met_SLNC/12)> --->
 <cfset auxRazao = numberFormat((rsMetas.Met_SLNC/12),999.0)> 
 <!--- <cfset auxRazao = rsMetas.Met_SLNC_Mes> --->
@@ -422,7 +422,7 @@ function listar(a,b,c){
     <td bgcolor="#scord#" width="12%" class="titulos"><div align="center">#DGCIRes#</div></td>
 	<td width="12%" class="titulos"><div align="center">#RESMETnac#%</div></td>
     </tr>
-   <cffile action="Append" file="#slocal##sarquivo#" output=';#PRCInac#%;#PRCIAPnac#%;#PRCIRes#;#SLNCnac#%;#SLNCAPnac#%;#SLNCRes#;#DGCInac#%;#DGCIAPnac#%;#DGCIRes#;#RESMETnac#%'>	
+   <cffile action="Append" file="#slocal##sarquivo#" output=';#PRCInac#%;#PRCIAPnac#%;#PRCIRes#;#SLNCnac#%;#SLNCAPnac#%;#SLNCRes#;#DGCInac#%;#DGCIAPnac#%;#DGCIRes#;#RESMETnac#%'>
 	</cfoutput>
 </table>
 

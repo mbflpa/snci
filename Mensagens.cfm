@@ -315,8 +315,10 @@
 		   UPDATE ParecerUnidade SET Pos_Area = '#aux_posarea#', Pos_NomeArea = '#aux_posnomearea#', Pos_Situacao_Resp = #rot2_IDStatus#, Pos_Situacao = '#rot2_SglStatus#', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtatual#, Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 14 WHERE Pos_Unidade='#rs14NR2PU20PF.Pos_Unidade#' AND Pos_Inspecao='#rs14NR2PU20PF.Pos_Inspecao#' AND Pos_NumGrupo=#rs14NR2PU20PF.Pos_NumGrupo# AND Pos_NumItem=#rs14NR2PU20PF.Pos_NumItem#
 		 </cfquery>
 		 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: ' & #rot2_DescStatus# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+		<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+		<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>		 
 		 <cfquery datasource="#dsn_inspecao#">
-		   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs14NR2PU20PF.Pos_Inspecao#', '#rs14NR2PU20PF.Pos_Unidade#', #rs14NR2PU20PF.Pos_NumGrupo#, #rs14NR2PU20PF.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', #rot2_IDStatus#, convert(char, getdate(), 108), '#and_obs#', '#aux_posarea#')
+		   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs14NR2PU20PF.Pos_Inspecao#', '#rs14NR2PU20PF.Pos_Unidade#', #rs14NR2PU20PF.Pos_NumGrupo#, #rs14NR2PU20PF.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', #rot2_IDStatus#, '#hhmmssdc#', '#and_obs#', '#aux_posarea#')
 		 </cfquery>
 	</cfoutput> 
 	  <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 2;Mudar o Status de 14 para 2(Proprias) ou 20(AGF) cuja Pos_DtPrev_Solucao esta vencida'> --->		
@@ -371,8 +373,10 @@
 			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 16, Pos_Situacao = 'TS', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtdezdiasuteis#, Pos_Area = '#rsOrg.Rep_Codigo#', Pos_NomeArea = '#rsOrg.Rep_Nome#', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 15 WHERE Pos_Unidade='#rs15TU_2PU16TS.Pos_Unidade#' AND Pos_Inspecao='#rs15TU_2PU16TS.Pos_Inspecao#' AND Pos_NumGrupo=#rs15TU_2PU16TS.Pos_NumGrupo# AND Pos_NumItem=#rs15TU_2PU16TS.Pos_NumItem#
 			 </cfquery>
 			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtdezdiasuteis,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+			<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+			<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>				 
 			 <cfquery datasource="#dsn_inspecao#">
-			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs15TU_2PU16TS.Pos_Inspecao#', '#rs15TU_2PU16TS.Pos_Unidade#', #rs15TU_2PU16TS.Pos_NumGrupo#, #rs15TU_2PU16TS.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 16, convert(char, getdate(), 108), '#and_obs#', '#rsOrg.Rep_Codigo#')
+			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs15TU_2PU16TS.Pos_Inspecao#', '#rs15TU_2PU16TS.Pos_Unidade#', #rs15TU_2PU16TS.Pos_NumGrupo#, #rs15TU_2PU16TS.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 16, '#hhmmssdc#', '#and_obs#', '#rsOrg.Rep_Codigo#')
 			 </cfquery>				  		   
 				  
 		   <cfelse>
@@ -384,8 +388,10 @@
 				   WHERE Pos_Unidade='#rs15TU_2PU16TS.Pos_Unidade#' AND Pos_Inspecao='#rs15TU_2PU16TS.Pos_Inspecao#' AND Pos_NumGrupo=#rs15TU_2PU16TS.Pos_NumGrupo# AND Pos_NumItem=#rs15TU_2PU16TS.Pos_NumItem#
 				 </cfquery>	 
 				<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rs15TU_2PU16TS.Pos_NomeArea# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: PENDENTE DA UNIDADE' & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP'  & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>				 
+				<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+				<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>						
 				<cfquery datasource="#dsn_inspecao#">
-					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs15TU_2PU16TS.Pos_Inspecao#', '#rs15TU_2PU16TS.Pos_Unidade#', #rs15TU_2PU16TS.Pos_NumGrupo#, #rs15TU_2PU16TS.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 2, convert(char, getdate(), 108), '#and_obs#', '#rs15TU_2PU16TS.Pos_Area#')
+					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs15TU_2PU16TS.Pos_Inspecao#', '#rs15TU_2PU16TS.Pos_Unidade#', #rs15TU_2PU16TS.Pos_NumGrupo#, #rs15TU_2PU16TS.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 2, '#hhmmssdc#', '#and_obs#', '#rs15TU_2PU16TS.Pos_Area#')
 				</cfquery>				 	
 		   </cfif>  
 		</cfoutput> 
@@ -434,8 +440,10 @@
 			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 16, Pos_Situacao = 'TS', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtdezdiasuteis#, Pos_Area = '#rsOrg.Rep_Codigo#', Pos_NomeArea = '#rsOrg.Rep_Nome#', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 2 WHERE Pos_Unidade='#rs2PU_16TS.Pos_Unidade#' AND Pos_Inspecao='#rs2PU_16TS.Pos_Inspecao#' AND Pos_NumGrupo=#rs2PU_16TS.Pos_NumGrupo# AND Pos_NumItem=#rs2PU_16TS.Pos_NumItem#
 			 </cfquery>
 			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rsOrg.Rep_Nome# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: TRATAMENTO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtdezdiasuteis,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+			<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+			<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>			 
 			 <cfquery datasource="#dsn_inspecao#">
-			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs2PU_16TS.Pos_Inspecao#', '#rs2PU_16TS.Pos_Unidade#', #rs2PU_16TS.Pos_NumGrupo#, #rs2PU_16TS.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 16, convert(char, getdate(), 108), '#and_obs#', '#rsOrg.Rep_Codigo#')
+			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs2PU_16TS.Pos_Inspecao#', '#rs2PU_16TS.Pos_Unidade#', #rs2PU_16TS.Pos_NumGrupo#, #rs2PU_16TS.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 16, '#hhmmssdc#', '#and_obs#', '#rsOrg.Rep_Codigo#')
 			 </cfquery>				  		   				 	
 		   </cfif>  
 		</cfoutput> 
@@ -529,8 +537,10 @@
 			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 26, Pos_Situacao = 'NC', Pos_DtUltAtu = CONVERT(varchar, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtatual#, Pos_Area = '#rot5_posarea#', Pos_NomeArea = '#rot5_posnomearea#', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 18 WHERE Pos_Unidade='#rs18TF_20PF26NC.Pos_Unidade#' AND Pos_Inspecao='#rs18TF_20PF26NC.Pos_Inspecao#' AND Pos_NumGrupo=#rs18TF_20PF26NC.Pos_NumGrupo# AND Pos_NumItem=#rs18TF_20PF26NC.Pos_NumItem#
 			 </cfquery>
 			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rot5_posnomearea# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: NÃO REGULARIZADO - APLICAR O CONTRATO' & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+			<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+			<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>				 
 			 <cfquery datasource="#dsn_inspecao#">
-			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs18TF_20PF26NC.Pos_Inspecao#', '#rs18TF_20PF26NC.Pos_Unidade#', #rs18TF_20PF26NC.Pos_NumGrupo#, #rs18TF_20PF26NC.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 26, convert(char, getdate(), 108), '#and_obs#', '#rot5_posarea#')
+			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs18TF_20PF26NC.Pos_Inspecao#', '#rs18TF_20PF26NC.Pos_Unidade#', #rs18TF_20PF26NC.Pos_NumGrupo#, #rs18TF_20PF26NC.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 26, '#hhmmssdc#', '#and_obs#', '#rot5_posarea#')
 			 </cfquery>				  		   
 				  
 		   <cfelse>
@@ -542,8 +552,10 @@
 				   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 20, Pos_Situacao = 'PF', Pos_DtUltAtu = CONVERT(varchar, getdate(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtatual#, Pos_Area = '#rs18TF_20PF26NC.Pos_Area#', Pos_NomeArea = '#trim(rs18TF_20PF26NC.Pos_NomeArea)#', Pos_Parecer= '#aux_obs#', Pos_Sit_Resp_Antes = 18 WHERE Pos_Unidade='#rs18TF_20PF26NC.Pos_Unidade#' AND Pos_Inspecao='#rs18TF_20PF26NC.Pos_Inspecao#' AND Pos_NumGrupo=#rs18TF_20PF26NC.Pos_NumGrupo# AND Pos_NumItem=#rs18TF_20PF26NC.Pos_NumItem#
 				 </cfquery>	 
 				<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & "-" & TimeFormat(Now(),'HH:MM') & ">" & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & "À(O) " & #rs18TF_20PF26NC.Pos_NomeArea# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & "Situação: PENDENTE DE TERCEIRIZADA" & CHR(13) & CHR(13) & "Responsável: SUBG CONTR INT OPER/GCOP"  & CHR(13) & "--------------------------------------------------------------------------------------------------------------">				 
+				<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+				<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>						
 				<cfquery datasource="#dsn_inspecao#">
-					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs18TF_20PF26NC.Pos_Inspecao#', '#rs18TF_20PF26NC.Pos_Unidade#', #rs18TF_20PF26NC.Pos_NumGrupo#, #rs18TF_20PF26NC.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 20, convert(char, getdate(), 108), '#and_obs#', '#rs18TF_20PF26NC.Pos_Area#')
+					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs18TF_20PF26NC.Pos_Inspecao#', '#rs18TF_20PF26NC.Pos_Unidade#', #rs18TF_20PF26NC.Pos_NumGrupo#, #rs18TF_20PF26NC.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 20, '#hhmmssdc#', '#and_obs#', '#rs18TF_20PF26NC.Pos_Area#')
 				</cfquery>				 	
 		   </cfif>  
 		</cfoutput> 
@@ -634,8 +646,10 @@
 			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 26, Pos_Situacao = 'NC', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtatual#, Pos_Area = '#rot6__posarea#', Pos_NomeArea = '#rot6__posnomearea#', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 20 WHERE Pos_Unidade='#rs20PF_26NC.Pos_Unidade#' AND Pos_Inspecao='#rs20PF_26NC.Pos_Inspecao#' AND Pos_NumGrupo=#rs20PF_26NC.Pos_NumGrupo# AND Pos_NumItem=#rs20PF_26NC.Pos_NumItem#
 			 </cfquery>
 			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #rot6__posnomearea# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: NÃO REGULARIZADO - APLICAR O CONTRATO' & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+				<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+				<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>				 
 			 <cfquery datasource="#dsn_inspecao#">
-			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs20PF_26NC.Pos_Inspecao#', '#rs20PF_26NC.Pos_Unidade#', #rs20PF_26NC.Pos_NumGrupo#, #rs20PF_26NC.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 26, convert(char, getdate(), 108), '#and_obs#', '#rot6__posarea#')
+			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs20PF_26NC.Pos_Inspecao#', '#rs20PF_26NC.Pos_Unidade#', #rs20PF_26NC.Pos_NumGrupo#, #rs20PF_26NC.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 26, '#hhmmssdc#', '#and_obs#', '#rot6__posarea#')
 			 </cfquery>				  		   			 	
 		   </cfif>  
 		</cfoutput> 
@@ -665,8 +679,10 @@
 			   UPDATE ParecerUnidade SET Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtatual#, Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_Situacao_Resp = 4, Pos_Situacao = 'PO', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 16 WHERE Pos_Unidade='#rs16TS4PO.Pos_Unidade#' AND Pos_Inspecao='#rs16TS4PO.Pos_Inspecao#' AND Pos_NumGrupo=#rs16TS4PO.Pos_NumGrupo# AND Pos_NumItem=#rs16TS4PO.Pos_NumItem#
 			 </cfquery>
 			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(rs16TS4PO.Pos_NomeArea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: PENDENTE DO ORGAO SUBORDINADOR' & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+				<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+				<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>			 
 			 <cfquery datasource="#dsn_inspecao#">
-			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs16TS4PO.Pos_Inspecao#', '#rs16TS4PO.Pos_Unidade#', '#rs16TS4PO.Pos_NumGrupo#', '#rs16TS4PO.Pos_NumItem#', convert(char, getdate(), 102), 'Rotina_Automatica', 4, convert(char, getdate(), 108), '#and_obs#', '#rs16TS4PO.Pos_Area#')
+			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs16TS4PO.Pos_Inspecao#', '#rs16TS4PO.Pos_Unidade#', '#rs16TS4PO.Pos_NumGrupo#', '#rs16TS4PO.Pos_NumItem#', convert(char, getdate(), 102), 'Rotina_Automatica', 4, '#hhmmssdc#', '#and_obs#', '#rs16TS4PO.Pos_Area#')
 			 </cfquery>
 		</cfoutput> 
  <!---   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 7;aptos a mudarem status 16 para 4 quando estiverem com a Pos_DtPrev_Solucao vencida nos 10 dias oferecidos'>		 --->	
@@ -691,8 +707,10 @@
 		   UPDATE ParecerUnidade SET Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtatual#, Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_Situacao_Resp = 5, Pos_Situacao = 'PA', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 19 WHERE Pos_Unidade='#rs19TA5PA.Pos_Unidade#' AND Pos_Inspecao='#rs19TA5PA.Pos_Inspecao#' AND Pos_NumGrupo=#rs19TA5PA.Pos_NumGrupo# AND Pos_NumItem=#rs19TA5PA.Pos_NumItem#
 		 </cfquery>
 		 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(rs19TA5PA.Pos_NomeArea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: PENDENTE DE AREA' & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+		<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+		<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>			 
 		 <cfquery datasource="#dsn_inspecao#">
-		  insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs19TA5PA.Pos_Inspecao#', '#rs19TA5PA.Pos_Unidade#', #rs19TA5PA.Pos_NumGrupo#, #rs19TA5PA.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 5, convert(char, getdate(), 108), '#and_obs#', '#rs19TA5PA.Pos_Area#')
+		  insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs19TA5PA.Pos_Inspecao#', '#rs19TA5PA.Pos_Unidade#', #rs19TA5PA.Pos_NumGrupo#, #rs19TA5PA.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 5, '#hhmmssdc#', '#and_obs#', '#rs19TA5PA.Pos_Area#')
 		 </cfquery>	 
 	</cfoutput> 
    <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 8;aptos a mudarem de status de 19, quando data Pos_DtPrev_Solucao for maior em 45 dias, para status = 5-PA-PENDENTE DE AREA'> --->
@@ -717,8 +735,10 @@
 		  UPDATE ParecerUnidade SET Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dtatual#, Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_Situacao_Resp = 8, Pos_Situacao = 'SE', Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 23 WHERE Pos_Unidade='#rs23TO8SE.Pos_Unidade#' AND Pos_Inspecao='#rs23TO8SE.Pos_Inspecao#' AND Pos_NumGrupo=#rs23TO8SE.Pos_NumGrupo# AND Pos_NumItem=#rs23TO8SE.Pos_NumItem#
 		</cfquery>
 		<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À ' & #trim(rs23TO8SE.Pos_NomeArea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: PENDENTE SUPERINTENDENCIA' & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+		<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+		<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>			
 		<cfquery datasource="#dsn_inspecao#">
-		   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs23TO8SE.Pos_Inspecao#', '#rs23TO8SE.Pos_Unidade#', #rs23TO8SE.Pos_NumGrupo#, #rs23TO8SE.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 8, convert(char, getdate(), 108), '#and_obs#', '#rs23TO8SE.Pos_Area#')
+		   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs23TO8SE.Pos_Inspecao#', '#rs23TO8SE.Pos_Unidade#', #rs23TO8SE.Pos_NumGrupo#, #rs23TO8SE.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', 8, '#hhmmssdc#', '#and_obs#', '#rs23TO8SE.Pos_Area#')
 		</cfquery>
 	</cfoutput> 
     <!--- <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 9;Mudar o Status de 23-TO Tratamento Superintendencia para 8-SE Pendente Superintendencia'>	 --->
@@ -2057,8 +2077,10 @@
 		   UPDATE ParecerUnidade SET Pos_Area = '#aux_posarea#', Pos_NomeArea = '#aux_posnomearea#', Pos_Situacao_Resp = #rot23_StatusID#, Pos_Situacao = '#rot23_StatusSGL#', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = convert(char, getdate(), 102), Pos_DtPrev_Solucao = #PosDtPrevSolucao#, Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 10 WHERE Pos_Unidade='#rs10PS_TRAT.Pos_Unidade#' AND Pos_Inspecao='#rs10PS_TRAT.Pos_Inspecao#' AND Pos_NumGrupo=#rs10PS_TRAT.Pos_NumGrupo# AND Pos_NumItem=#rs10PS_TRAT.Pos_NumItem#
 		 </cfquery>
 		 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: ' & #rot23_StatusDESC# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+		<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+		<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>			 
 		 <cfquery datasource="#dsn_inspecao#">
-		   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs10PS_TRAT.Pos_Inspecao#', '#rs10PS_TRAT.Pos_Unidade#', #rs10PS_TRAT.Pos_NumGrupo#, #rs10PS_TRAT.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', #rot23_StatusID#, convert(char, getdate(), 108), '#and_obs#', '#aux_posarea#')
+		   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs10PS_TRAT.Pos_Inspecao#', '#rs10PS_TRAT.Pos_Unidade#', #rs10PS_TRAT.Pos_NumGrupo#, #rs10PS_TRAT.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', #rot23_StatusID#, '#hhmmssdc#', '#and_obs#', '#aux_posarea#')
 		 </cfquery>
 	</cfoutput> 
 	<!---   <cffile action="Append" file="#slocal##sarquivo#" output='#dateformat(now(),"DD/MM/YYYY HH:MM")#;Mensagens.cfm;rotina 23;Mudar o Status de 10 para TRATAMENTO'> --->
@@ -2221,18 +2243,19 @@
 						</cfmail>
 					</cfif>
 					<!--- Ajuste de linhas na tabela andamento --->
-				
+					<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+					<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>					
 					<cfquery datasource="#dsn_inspecao#">
 						INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-						VALUES ('#rsRESINSP_14NR.RIP_NumInspecao#', '#rsRESINSP_14NR.RIP_Unidade#', #rsRESINSP_14NR.RIP_NumGrupo#, #rsRESINSP_14NR.RIP_NumItem#, convert(char, getdate(), 102), 'Rotina_24-mensagem.cfm', 0, left(convert(char, getdate(), 114),10),'#auxposarea#')
+						VALUES ('#rsRESINSP_14NR.RIP_NumInspecao#', '#rsRESINSP_14NR.RIP_Unidade#', #rsRESINSP_14NR.RIP_NumGrupo#, #rsRESINSP_14NR.RIP_NumItem#, convert(char, getdate(), 102), 'Rotina_24-mensagem.cfm', 0, '#hhmmssdc#','#auxposarea#')
 					</cfquery>	
 					<cfquery datasource="#dsn_inspecao#">
 						INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-						VALUES ('#rsRESINSP_14NR.RIP_NumInspecao#', '#rsRESINSP_14NR.RIP_Unidade#', #rsRESINSP_14NR.RIP_NumGrupo#, #rsRESINSP_14NR.RIP_NumItem#, convert(char, getdate(), 102), 'Rotina_24-mensagem.cfm', 11, left(convert(char, getdate(), 114),10),'#auxposarea#')
+						VALUES ('#rsRESINSP_14NR.RIP_NumInspecao#', '#rsRESINSP_14NR.RIP_Unidade#', #rsRESINSP_14NR.RIP_NumGrupo#, #rsRESINSP_14NR.RIP_NumItem#, convert(char, getdate(), 102), 'Rotina_24-mensagem.cfm', 11, '#hhmmssdc#','#auxposarea#')
 					</cfquery>	
 					<cfquery datasource="#dsn_inspecao#">
 						INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-						VALUES ('#rsRESINSP_14NR.RIP_NumInspecao#', '#rsRESINSP_14NR.RIP_Unidade#', #rsRESINSP_14NR.RIP_NumGrupo#, #rsRESINSP_14NR.RIP_NumItem#, convert(char, getdate(), 102), 'Rotina_24-mensagem.cfm', 14, left(convert(char, getdate(), 114),10),'#auxposarea#')
+						VALUES ('#rsRESINSP_14NR.RIP_NumInspecao#', '#rsRESINSP_14NR.RIP_Unidade#', #rsRESINSP_14NR.RIP_NumGrupo#, #rsRESINSP_14NR.RIP_NumItem#, convert(char, getdate(), 102), 'Rotina_24-mensagem.cfm', 14, '#hhmmssdc#','#auxposarea#')
 					</cfquery>										
 				</cfoutput>  --->
 				<!--- Fim - e-mail automático por unidade --->				

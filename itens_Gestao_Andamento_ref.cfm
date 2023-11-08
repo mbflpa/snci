@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/>  
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -43,7 +44,7 @@ ORDER BY Andt_AnoExerc DESC
 	<cfset aux_mes = 12>
 	<cfset aux_ano = (aux_ano - 1)>
 <cfelse>
-	 <cfif UCASE(TRIM(qAcesso.Usu_GrupoAcesso)) neq 'GESTORMASTER' AND UCASE(TRIM(qAcesso.Usu_GrupoAcesso)) neq 'GOVERNANCA'>
+	 <cfif UCASE(TRIM(qAcesso.Usu_GrupoAcesso)) neq 'GESTORMASTER'>
 	<!---  <cfset aux_mes = (aux_mes - 1)> --->
 		<cfif auxdia gte 11>
 		 	<cfset aux_mes = (aux_mes - 1)>
@@ -108,7 +109,7 @@ ORDER BY Andt_AnoExerc DESC
 function valida_form() {
     var frm = document.forms[0];
     if (frm.se.value=='---'){
-	  alert('Informar a Superintendência!');
+	  alert('Informar a Superintendï¿½ncia!');
 	  frm.se.focus();
 	  return false;
 	}	
@@ -123,7 +124,7 @@ function valida_form() {
 	} 	
 //=========================================	
 	if (frm.mes.value=='---'){
-	  alert('Informar o Mês!');
+	  alert('Informar o Mï¿½s!');
 	  frm.mes.focus();
 	  return false;
 	}
@@ -165,7 +166,7 @@ function mudar(a){
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 	<form action="itens_Gestao_Andamento.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return valida_form()">
 	  <table width="59%" align="center">
 	  <cfif UCASE(trim(qAcesso.Usu_GrupoAcesso)) eq "SUPERINTENDENTE">
@@ -206,7 +207,7 @@ function mudar(a){
           <td width="23%"><strong><span class="exibir">Superintend&ecirc;ncia :</span></strong> </td>
           <td width="76%" colspan="3">
 		  <!---  --->
-		   <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GOVERNANCA'>
+		   <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' AND qAcesso.Usu_DR eq '01'>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where dir_codigo <> '01'
 			</cfquery>
@@ -218,25 +219,16 @@ function mudar(a){
 		        </select>
 		<cfelseif (UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORES' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'ANALISTAS') AND len(TRIM(qAcesso.Usu_Coordena)) gt 0> 
 		
-            <cfset auxtam_lista = len(TRIM(qAcesso.Usu_Coordena))>
-			<cfset aux_lista = TRIM(qAcesso.Usu_Coordena)>
-			<cfset aux_codse = "">			
+            	<cfset aux_lista = TRIM(qAcesso.Usu_Coordena)>
 			    <select name="se" id="se" class="form">
 		          <option selected="selected" value="---">---</option>
 <cfoutput>
-
-				  <cfloop from="1" to="#val(auxtam_lista) + 1# " index="i">
-				     <cfif len(aux_codse) eq 2>
-					   <cfquery name="qCDR" datasource="#dsn_inspecao#">
-						SELECT Dir_Sigla FROM Diretoria  WHERE Dir_Codigo = '#aux_codse#'
-					   </cfquery> 
-		               <option value="#aux_codse#">#Ucase(trim(qCDR.Dir_Sigla))#</option>
-					   <cfset aux_codse = "">
-					</cfif>
-					<cfif mid(aux_lista,i,1) neq ",">
-					  <cfset aux_codse = #aux_codse# & #mid(aux_lista,i,1)#>
-					</cfif>
-				  </cfloop>
+				<cfloop list="#aux_lista#" index="i">
+					<cfquery name="qCDR" datasource="#dsn_inspecao#">
+						SELECT Dir_Sigla FROM Diretoria  WHERE Dir_Codigo = '#i#'
+					</cfquery>
+					<option value="#i#">#Ucase(trim(qCDR.Dir_Sigla))#</option>
+				</cfloop>
 </cfoutput>				  				  
 		        </select>
 

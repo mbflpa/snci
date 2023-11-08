@@ -115,7 +115,7 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
 	  <cfset aux_obs = Replace(aux_obs,'>','','All')>		
 	  <!---	 <cfset aux_obs = Replace(aux_obs,'&','','All')>
 		     <cfset aux_obs = Replace(aux_obs,'%','','All')> --->  
-     <cfset pos_obs = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & '  ' & '-' & '  ' & #aux_obs# & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+     <cfset pos_obs = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & '  ' & '-' & '  ' & #aux_obs# & CHR(13) & CHR(13) & 'Responsï¿½vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 	'#pos_obs#'
     </cfif>
     , Pos_DtPrev_Solucao = 
@@ -141,10 +141,11 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
   WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
  </cfquery>
  <!--- Inserindo dados dados na tabela Andamento --->
-  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & '  ' & '-' & '  ' & #aux_obs# & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
-
+  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & '  ' & '-' & '  ' & #aux_obs# & CHR(13) & CHR(13) & 'Responsï¿½vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+  <cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
+	<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
  <cfquery datasource="#dsn_inspecao#">
-    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Orgao_Solucao, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', convert(char, getdate(), 108), '#FORM.unid#', '#and_obs#')  
+    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Orgao_Solucao, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#hhmmss#', '#FORM.unid#', '#and_obs#')  
  </cfquery>  
   <cflocation url="itens_controle_respostas_solucionados.cfm?#CGI.QUERY_STRING#">
 </cfif>
@@ -179,7 +180,7 @@ str = str.substr(0,str.length-1);
 return str;
 } 
 
-//Validação de campos vazios em formulário
+//Validaï¿½ï¿½o de campos vazios em formulï¿½rio
 function valida_form(form) {
  var frm = document.forms[form];
  var quant = frm.elements.length;
@@ -197,9 +198,9 @@ function valida_form(form) {
  }
 }
 
-//Função que abre uma página em Popup
+//Funï¿½ï¿½o que abre uma pï¿½gina em Popup
 function popupPage(){
-<cfoutput>  //página chamada, seguida dos parâmetros número, unidade, grupo e item
+<cfoutput>  //pï¿½gina chamada, seguida dos parï¿½metros nï¿½mero, unidade, grupo e item
 var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
 </cfoutput>
 windowprops = "location=no,"
@@ -210,10 +211,10 @@ window.open(page, "Popup", windowprops);
 <html>
 <head>
 <script>
-//permite digitaçao apenas de valores numéricos
+//permite digitaï¿½ao apenas de valores numï¿½ricos
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitaï¿½ï¿½o das teclas numï¿½ricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 	
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -231,7 +232,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia inválido!');
+		      alert('Valor para o dia invï¿½lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -241,7 +242,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o Mês inválido!');
+		      alert('Valor para o Mï¿½s invï¿½lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -275,25 +276,25 @@ function exibirData(dat){
 function validaForm(){
  if (document.form1.frmResp[5].checked){
     if(document.form1.cbData.value == ''){
-      alert('Sr. Analista, informe a Área e a Data de previsão para a solução da Situação Encontrada!');
+      alert('Sr. Analista, informe a ï¿½rea e a Data de previsï¿½o para a soluï¿½ï¿½o da Situaï¿½ï¿½o Encontrada!');
 	  return false;
 	}  
   }  
   if ((document.form1.frmResp[4].checked) || (document.form1.frmResp[5].checked) || (document.form1.frmResp[6].checked)){
     if(document.form1.cbArea.value == ''){
-       alert('Sr. Analista, informe a Área para encaminhamento!');
+       alert('Sr. Analista, informe a ï¿½rea para encaminhamento!');
 	   return false;
 	}  
   }
   if (document.form1.frmResp[1].checked){    
 	 if ((document.form1.cbunid[0].checked=='') && (document.form1.cbunid[1].checked=='') && (document.form1.cbOrgao.value=='')){ 
-      alert('Sr. Analista, informe o Órgão solucionador da Situação Encontrada!');
+      alert('Sr. Analista, informe o ï¿½rgï¿½o solucionador da Situaï¿½ï¿½o Encontrada!');
 	  return false;
 	 }   
   }
   if (document.form1.frmResp[0].checked){    
 	 if ((document.form1.frmResp[2].checked==0) && (document.form1.frmResp[3].checked==0) && (document.form1.frmResp[4].checked==0) && (document.form1.frmResp[5].checked==0) && (document.form1.frmResp[6].checked==0)){ 
-      alert('Sr. Analista, Escolha o órgão Pendente!');
+      alert('Sr. Analista, Escolha o ï¿½rgï¿½o Pendente!');
 	  return false;
 	 }   
   }     
@@ -308,7 +309,7 @@ function validaForm(){
 <table width="95%" height="450">
 <tr>
 	  <td width="96%" valign="top">
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 <form name="form1" method="post" onSubmit="return valida_form(this.value)" action="<cfoutput>#CurrentPage#?#CGI.QUERY_STRING#</cfoutput>">  
   <table width="78%" align="center">
     <tr>
@@ -414,13 +415,13 @@ Unidade</span>&nbsp;&nbsp;
       </tr>
     <!---<tr class="exibir">
       <td colspan="7" bgcolor="eeeeee"><div align="center">
-        <input name="comentarios" type="button" class="botao" onClick="window.open('itens_unidades_controle_respostas_comentarios.cfm?numero=<cfoutput>#URL.ninsp#</cfoutput>&unidade=<cfoutput>#URL.unid#</cfoutput>&numgrupo=<cfoutput>#URL.ngrup#</cfoutput>&numitem=<cfoutput>#URL.nitem#</cfoutput>','','scrollbars=yes, resizable=yes, width=600, height=460, left=120, top=100')" value="Situação Encontrada">
+        <input name="comentarios" type="button" class="botao" onClick="window.open('itens_unidades_controle_respostas_comentarios.cfm?numero=<cfoutput>#URL.ninsp#</cfoutput>&unidade=<cfoutput>#URL.unid#</cfoutput>&numgrupo=<cfoutput>#URL.ngrup#</cfoutput>&numitem=<cfoutput>#URL.nitem#</cfoutput>','','scrollbars=yes, resizable=yes, width=600, height=460, left=120, top=100')" value="Situaï¿½ï¿½o Encontrada">
       </div></td>
       </tr>--->    
 	 <!--- <input type="hidden" name="frmResp" value="5">--->
 	 <!--- <input type="hidden" name="obs" value="<cfoutput>#qResposta.Pos_Parecer#</cfoutput>"> --->
      <tr>
-       <td valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Situação Encontrada:</span></td>
+       <td valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Situaï¿½ï¿½o Encontrada:</span></td>
        <td colspan="4" bgcolor="f7f7f7"><textarea name="Melhoria" cols="120" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.RIP_Comentario#</cfoutput></textarea></td>
      </tr>
      <tr>
@@ -477,7 +478,7 @@ Unidade</span>&nbsp;&nbsp;
   <input type="hidden" name="scodresp" id="scodresp" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
 </form>
 
-<!--- Fim Área de conteúdo --->
+<!--- Fim ï¿½rea de conteï¿½do --->
 	  </td>
   </tr>
 </table>

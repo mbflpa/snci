@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
@@ -90,7 +91,7 @@ WHERE Und_Codigo = '#URL.Unid#'
 		FROM Areas
 		WHERE Ars_CodGerencia = '#Form.cbArea#'
 	</cfquery>
-	<cfset Encaminhamento = 'À(O) ' & qArea2.Ars_Sigla>
+	<cfset Encaminhamento = 'ï¿½(O) ' & qArea2.Ars_Sigla>
 	  , Pos_Situacao = 'AN'
 	</cfcase>
 	<cfdefaultcase> <cfset Encaminhamento = ''>
@@ -99,7 +100,7 @@ WHERE Und_Codigo = '#URL.Unid#'
   </cfswitch> 
   <cfif IsDefined("FORM.observacao") AND FORM.observacao NEQ "">
   , Pos_Parecer=
-         <cfset aux_obs = Form.H_obs & CHR(13) & CHR(13) & Trim(Encaminhamento) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(FORM.observacao) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+         <cfset aux_obs = Form.H_obs & CHR(13) & CHR(13) & Trim(Encaminhamento) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(FORM.observacao) & CHR(13) & 'Responsï¿½vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 	     <cfset aux_obs = Replace(aux_obs,'"','','All')>
 	     <cfset aux_obs = Replace(aux_obs,"'","","All")>
 		 <cfset aux_obs = Replace(aux_obs,'*','','All')>
@@ -144,6 +145,8 @@ WHERE Und_Codigo = '#URL.Unid#'
 	<cfelse>
 		<cfset maskcgiusu = left(maskcgiusu,12) & mid(maskcgiusu,13,4) & '***' & right(maskcgiusu,1)>	
 	</cfif> 
+  <cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
+	<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
    <cfquery datasource="#dsn_inspecao#">
    INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer)
    VALUES (   
@@ -186,7 +189,7 @@ WHERE Und_Codigo = '#URL.Unid#'
 	   '#form.unid#' 
 	 </cfcase>	
 	 <cfcase value="3">	   
-	     <!--- Tratamento da área solucionadora--->
+	     <!--- Tratamento da ï¿½rea solucionadora--->
        <cfif IsDefined("FORM.cbunid") AND FORM.cbunid NEQ "">
          '#Form.cbunid#'
        <cfelse>
@@ -218,10 +221,10 @@ WHERE Und_Codigo = '#URL.Unid#'
 	 </cfcase>	 	 
    </cfswitch> 
    ,      
-  convert(char, getdate(), 108)
+  '#hhmmss#'
   ,
   <cfif IsDefined("FORM.observacao") AND FORM.observacao NEQ "">
-     <cfset and_obs = trim(Encaminhamento) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(FORM.observacao) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+     <cfset and_obs = trim(Encaminhamento) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(FORM.observacao) & CHR(13) & 'Responsï¿½vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 	      <cfset and_obs = Replace(and_obs,'"','','All')>
 		  <cfset and_obs = Replace(and_obs,"'","","All")>
 		  <cfset and_obs = Replace(and_obs,'*','','All')>
@@ -301,14 +304,14 @@ AND Pos_DtPrev_Solucao <= GETDATE() --->
 </cfquery>
 <html>
 <head>
-<title>Sistema de Acompanhamento das Respostas das Inspeções</title>
+<title>Sistema de Acompanhamento das Respostas das Inspeï¿½ï¿½es</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <script>
-//permite digitaçao apenas de valores numéricos
+//permite digitaï¿½ao apenas de valores numï¿½ricos
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitaï¿½ï¿½o das teclas numï¿½ricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 	
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -326,7 +329,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia inválido!');
+		      alert('Valor para o dia invï¿½lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -336,7 +339,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o Mês inválido!');
+		      alert('Valor para o Mï¿½s invï¿½lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -379,19 +382,19 @@ function exibirData(dat){
 function validaForm(){
  if (document.form1.frmResp[5].checked){
     if(document.form1.cbData.value == ''){
-      alert('Sr. Inspetor(a), informe a Área e a Data de previsão para a solução da não-conformidade!');
+      alert('Sr. Inspetor(a), informe a ï¿½rea e a Data de previsï¿½o para a soluï¿½ï¿½o da nï¿½o-conformidade!');
 	  return false;
 	}  
   } 
   if ((document.form1.frmResp[4].checked) || (document.form1.frmResp[5].checked) || (document.form1.frmResp[6].checked)){
     if(document.form1.cbArea.value == ''){
-       alert('Sr. Inspetor(a), informe a Área para encaminhamento!');
+       alert('Sr. Inspetor(a), informe a ï¿½rea para encaminhamento!');
 	   return false;
 	}  
   }
   if (document.form1.frmResp[1].checked){    
 	 if ((document.form1.cbunid[0].checked=='') && (document.form1.cbunid[1].checked=='') && (document.form1.cbOrgao.value=='')){ 
-      alert('Sr. Inspetor(a), informe o Órgão solucionador da não-conformidade!');
+      alert('Sr. Inspetor(a), informe o ï¿½rgï¿½o solucionador da nï¿½o-conformidade!');
 	  return false;
 	 }   
   } 
@@ -401,7 +404,7 @@ function validaForm(){
 	 return false;
   }*/
   if (document.form1.tipoUrg.value == ''){
-     alert('Sr. Inspetor(a), falta informar Análise do Impacto da não Conformidade!');
+     alert('Sr. Inspetor(a), falta informar Anï¿½lise do Impacto da nï¿½o Conformidade!');
 	return false;
   }
   return true;
@@ -434,7 +437,7 @@ function mostra(a,b,c)
   if (parseInt(document.form1.frmsoma.value) > 15 && parseInt(document.form1.frmsoma.value) <= 31)
   {
      document.form1.frmurgencia.value = 2;
-	 document.form1.tipoUrg.value='Médio'
+	 document.form1.tipoUrg.value='Mï¿½dio'
   }
   if (parseInt(document.form1.frmsoma.value) > 31 && parseInt(document.form1.frmsoma.value) <= 46)
   {
@@ -473,7 +476,7 @@ function mostra(a,b,c)
   if (parseInt(document.form1.frmsoma.value) > 15 && parseInt(document.form1.frmsoma.value) <= 31)
   {
      document.form1.frmurgencia.value = 2;
-	 document.form1.tipoUrg.value='Médio'
+	 document.form1.tipoUrg.value='Mï¿½dio'
   }
   if (parseInt(document.form1.frmsoma.value) > 31 && parseInt(document.form1.frmsoma.value) <= 46)
   {
@@ -488,9 +491,9 @@ function mostra(a,b,c)
  document.form1.frmprioridade.value = parseInt(document.form1.frmsoma.value) * parseInt(document.form1.frmurgencia.value)
 }
 }
-//Função que abre uma página em Popup
+//Funï¿½ï¿½o que abre uma pï¿½gina em Popup
 function popupPage() {
-<cfoutput>  //página chamada, seguida dos parâmetros número, unidade, grupo e item
+<cfoutput>  //pï¿½gina chamada, seguida dos parï¿½metros nï¿½mero, unidade, grupo e item
 var page = "itens_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
 </cfoutput>
 windowprops = "location=no,"
@@ -580,7 +583,7 @@ SELECT Ana_Col01, Ana_Col02, Ana_Col03, Ana_Col04, Ana_Col05, Ana_Col06, Ana_Col
       </table>
     </td>
 	  <td valign="top">
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 <!--- <form name="form1" method="post" onSubmit="return validaForm()" action="<cfoutput>#CurrentPage#?#CGI.QUERY_STRING#</cfoutput>"> --->
 <form name="form1" method="post" onSubmit="return validaForm()" action="itens_controle_respostas_solucionados.cfm"> 
   <table width="100%" align="center">
@@ -610,7 +613,7 @@ SELECT Ana_Col01, Ana_Col02, Ana_Col03, Ana_Col04, Ana_Col05, Ana_Col06, Ana_Col
       <td width="84" bgcolor="eeeeee">Unidade      </td>
       <td width="241" bgcolor="f7f7f7"><cfoutput>#URL.Unid#</cfoutput><input type="hidden" name="hUnidade" value="<cfoutput>#rsMOd.Und_Descricao#</cfoutput>"></td>
       <td width="143" bgcolor="f7f7f7"><cfoutput><strong>#rsMOd.Und_Descricao#</strong></cfoutput></td>
-      <td width="74" bgcolor="eeeeee">Órgão Subordinador</td>
+      <td width="74" bgcolor="eeeeee">ï¿½rgï¿½o Subordinador</td>
       <td width="151" bgcolor="f7f7f7"><cfoutput>#URL.reop#</cfoutput><input type="hidden" name="hReop" value="<cfoutput>#URL.reop#</cfoutput>"></td>	  
     </tr>
 	<tr class="exibir">
@@ -715,7 +718,7 @@ SELECT Ana_Col01, Ana_Col02, Ana_Col03, Ana_Col04, Ana_Col05, Ana_Col06, Ana_Col
 		  <td align="center"><a href="Ajuda/descumprimento_de_norma_interna.cfm" target="_blank" class="exibir"><img border="0" src="interro.jpg"></a></td>
         </tr>
         <tr bgcolor="f7f7f7">
-          <td height="1" valign="top" class="exibir">Reincidência </td>
+          <td height="1" valign="top" class="exibir">Reincidï¿½ncia </td>
           <td height="1" valign="middle" class="exibir"><div align="center">10</div></td>
           <td height="1" valign="top" class="exibir">
 		  <input name="cbox09" type="checkbox" id="cbox09" value="10" onClick="mostra(this.value, this.checked, this.name)"></td>
@@ -740,7 +743,7 @@ SELECT Ana_Col01, Ana_Col02, Ana_Col03, Ana_Col04, Ana_Col05, Ana_Col06, Ana_Col
       </table></td>
     </tr>
   <!--- <tr bgcolor="f7f7f7">
-      <td height="22" colspan="4" valign="top" class="exibir">Marque se a não-conformidade compromete todo o processo auditado <span class="style4">&nbsp;&nbsp;
+      <td height="22" colspan="4" valign="top" class="exibir">Marque se a nï¿½o-conformidade compromete todo o processo auditado <span class="style4">&nbsp;&nbsp;
         <input name="relevancia" type="checkbox" class="form" size="8" value="1" <cfif qResposta.Pos_Relevancia eq 1> checked </cfif>>
       </span></td>
       <td height="22" align="center" colspan="1" valign="top" class="red_titulo"><cfif qResposta.Pos_Relevancia eq 1>Item compromete o processo!</cfif> </td>
@@ -770,7 +773,7 @@ Unidade</span>&nbsp;&nbsp;
         <strong><label><input type="radio" name="frmResp" value="4" onClick="exibirArea(this.value);exibirOrgao(this.value);exibirData(this.value)">
   </label>
 </strong>
-<label>Órgão Subordinador</label>
+<label>ï¿½rgï¿½o Subordinador</label>
 <strong><strong>
 <label>
 <input type="radio" name="frmResp" value="5" onClick="exibirArea(this.value);exibirOrgao(this.value);exibirData(this.value)">
@@ -821,7 +824,7 @@ Unidade</span>&nbsp;&nbsp;
                 </strong>
         <label>&Oacute;rg&atilde;o Subordinador</label></div></td>	  	     
       </tr>	
-	  <!--- Visualização de anexos --->
+	  <!--- Visualizaï¿½ï¿½o de anexos --->
 	  <cfquery name="qAnexos" datasource="#dsn_inspecao#">
 		SELECT     Ane_NumInspecao, Ane_Unidade, Ane_NumGrupo, Ane_NumItem, Ane_Codigo, Ane_Caminho
 		FROM       Anexos
@@ -857,7 +860,7 @@ Unidade</span>&nbsp;&nbsp;
     <tr>
       <td height="38" valign="middle" bgcolor="eeeeee" class="exibir">&nbsp;</td>
       <td colspan="4" rowspan="2" bgcolor="f7f7f7"><cfif Not IsDefined("FORM.MM_UpdateRecord") And Trim(qResposta.Pos_Parecer) neq ''><textarea name="H_obs" cols="120" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.Pos_Parecer#</cfoutput></textarea></cfif>
-	  <textarea name="observacao" cols="120" rows="5" nome="Observação" vazio="false" wrap="VIRTUAL" class="form" id="observacao"></textarea></td>
+	  <textarea name="observacao" cols="120" rows="5" nome="Observaï¿½ï¿½o" vazio="false" wrap="VIRTUAL" class="form" id="observacao"></textarea></td>
     </tr>
     <tr>
       <td valign="middle" bgcolor="eeeeee" class="exibir">An&aacute;lise do Inspetor:</td>
@@ -894,7 +897,7 @@ function atribuir()
  </cfif>
 }
 </script>--->
-<!--- Fim Área de conteúdo --->
+<!--- Fim ï¿½rea de conteï¿½do --->
     </td>
   </tr>
 </table>

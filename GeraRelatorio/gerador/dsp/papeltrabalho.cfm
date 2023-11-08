@@ -250,16 +250,18 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 								</cfquery>
 								<!--- Inserindo dados dados na tabela Andamento --->
 								<cfset andparecer = #auxposarea#  & " --- " & #auxnomearea#>
+                <cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+                <cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
 								<cfquery datasource="#dsn_inspecao#">
 									insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
-									values ('#qryPapelTrabalho.INP_NumInspecao#', '#rs11.Pos_Unidade#', #rs11.Pos_NumGrupo#, #rs11.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, CONVERT(char, GETDATE(), 108), '#andparecer#', '#auxposarea#')
+									values ('#qryPapelTrabalho.INP_NumInspecao#', '#rs11.Pos_Unidade#', #rs11.Pos_NumGrupo#, #rs11.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#', '#andparecer#', '#auxposarea#')
 								</cfquery>
 							</cfloop>
                      
 						<!---Fim -Se existirem itens em liberação, executa a rotina para mudan�a do status de todos os itens
 							em liberação para não respondido--->
 
-						<!--- In�cio - e-mail autom�tico por unidade --->
+						<!--- Início - e-mail automático por unidade --->
 							<cfquery name="rsEmail" datasource="#dsn_inspecao#">
 								SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Und_TipoUnidade, Und_Descricao, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Und_CodReop, INP_DtInicInspecao
 								FROM Inspecao INNER JOIN (Unidades INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade) ON (INP_NumInspecao = Pos_Inspecao) AND (INP_Unidade = Pos_Unidade)
@@ -384,15 +386,17 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 						</cfquery> 
 						
 						<cfif qNaoRespondido.Pos_Situacao_Resp eq 14 and rs14SN.recordcount lte 0>
+                <cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+                <cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-								VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #qNaoRespondido.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, CONVERT(char, GETDATE(), 108),'#qryPapelTrabalho.RIP_Unidade#')
+								VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #qNaoRespondido.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#','#qryPapelTrabalho.RIP_Unidade#')
 							</cfquery>
 						</cfif>
 					</cfoutput>
-				<!--- fim Verifica�a� dos registros que est�o na situa��o 14(não Respondido) na tabela ParecerUnidade --->
+				<!--- fim Verificação dos registros que estão na situação 14(não Respondido) na tabela ParecerUnidade --->
 					
-			<!---Fim do prcesso de liberação da avalia��o--->
+			<!---Fim do prcesso de liberação da avaliação--->
 
 
     <script language="javascript" >
@@ -403,7 +407,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 
   </cfif>
 
-  <!--- Valida todos os itens de uma avalia��o sem itens NC --->
+  <!--- Valida todos os itens de uma avaliação sem itens NC --->
   <cfif isDefined("form.acao") and '#form.acao#' is 'validarSemNC'>
 	  <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
 	  <cfif listfind('#qryPapelTrabalho.Itn_PTC_Seq#','10')>
@@ -433,7 +437,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
   </cfif>
 
   
-<!---Veirifica se esta inspeção possui algum item Em Revis�o --->	
+<!---Veirifica se esta inspeção possui algum item Em Revisão --->	
 	<cfquery name="qInspecaoEmRevisao" datasource="#dsn_inspecao#">
 		SELECT * FROM ParecerUnidade 
 		WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 0
@@ -458,10 +462,10 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
     SELECT Fun_Matric, Fun_Nome FROM Funcionarios
     WHERE Fun_Matric = '#qryPapelTrabalho.INP_Username#'
   </cfquery> --->
-   <cfquery name="rsLiberadaValidadaPor" datasource="#dsn_inspecao#">
-	SELECT Usu_Matricula, Usu_Apelido
-	FROM Usuarios
-	WHERE Usu_Login = '#qryPapelTrabalho.INP_Username#'
+  <cfquery name="rsLiberadaValidadaPor" datasource="#dsn_inspecao#">
+    SELECT Usu_Matricula, Usu_Apelido
+    FROM Usuarios
+    WHERE Usu_Login = '#qryPapelTrabalho.INP_Username#'
   </cfquery>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -957,12 +961,12 @@ z-index:1000;visibility:hidden;position:absolute;" >
                         <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:60px" >
                           <cfif '#qSituacao.Pos_Situacao_Resp#' eq 0 and '#rsQuatEmRevisao.quantEmRevisao#' eq 1 and '#rsItemEmReanalise.recordcount#' eq 0 and '#rsItemReanalisado.recordcount#' eq 0 and '#rsVerifValidados.recordcount#' eq '0'>
                             <!---                                       <cfset M = M> --->
-                            <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenão! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
+                            <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenção! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
                                          window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#','_self');}">
                             <cfelse>
                             </a>
                           </cfif>
-                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenão! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
+                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenção! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
                                          window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#','_self');}"><a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#','_self')">
                           <div ><img  alt="Revisar" src="../../../figuras/revisar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">Revisar</div>

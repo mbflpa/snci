@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
@@ -88,9 +89,11 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
   , Pos_DtUltAtu = CONVERT(char, GETDATE(), 120)
   WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem# 
   </cfquery>
-  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Respons�vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+  <cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
+	<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
  <cfquery datasource="#dsn_inspecao#">
-    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#url.reop#', convert(char, getdate(), 108), '#and_obs#')
+    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#url.reop#', '#hhmmss#', '#and_obs#')
  </cfquery>
   <cflocation url="itens_controle_respostas_area.cfm?#CGI.QUERY_STRING#">
 </cfif>
@@ -132,7 +135,7 @@ function valida_form(form) {
 
 //Fun��o que abre uma p�gina em Popup
 function popupPage() {
-<cfoutput>  //p�gina chamada, seguida dos par�metros n�mero, unidade, grupo e item
+<cfoutput>  //página chamada, seguida dos parametros número, unidade, grupo e item
 var page = "itens_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
 </cfoutput>
 windowprops = "location=no,"
@@ -143,7 +146,7 @@ window.open(page, "Popup", windowprops);
 
 <html>
 <head>
-<title>Sistema de Acompanhamento das Respostas das Inspe��es</title>
+<title>Sistema de Acompanhamento das Respostas das Avaliações</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 </head>
@@ -157,7 +160,7 @@ window.open(page, "Popup", windowprops);
 	<form name="form1" method="post" onSubmit="return valida_form(this.name)" action="<cfoutput>#CurrentPage#?#CGI.QUERY_STRING#</cfoutput>">
   <table width="98%" align="center">
     <tr>
-      <td colspan="5"><p align="center"><span class="titulo1">Relat&oacute;rio de Inspe&ccedil;&atilde;o </span></p>
+      <td colspan="5"><p align="center"><span class="titulo1">Relatório de Avaliação </span></p>
         <p>            <br>
             <input name="unid" type="hidden" id="unid" value="<cfoutput>#URL.Unid#</cfoutput>">
             <input name="ninsp" type="hidden" id="ninsp" value="<cfoutput>#URL.Ninsp#</cfoutput>">
@@ -185,7 +188,7 @@ window.open(page, "Popup", windowprops);
       <td width="81" bgcolor="eeeeee">Unidade      </td>
       <td width="71" bgcolor="f7f7f7"><cfoutput>#URL.Unid#</cfoutput></td>
       <td width="205" bgcolor="f7f7f7"><cfoutput><strong>#rsMOd.Und_Descricao#</strong></cfoutput></td>
-      <td width="45" bgcolor="eeeeee">�rg�o Subordinador</td>
+      <td width="45" bgcolor="eeeeee">Órgão Subordinador</td>
       <td width="138" bgcolor="f7f7f7"><cfoutput><strong>#rsMOd.Und_CodReop#</strong></cfoutput></td>
     </tr>
 	<tr class="exibir">
@@ -221,7 +224,7 @@ window.open(page, "Popup", windowprops);
       <td valign="middle" bgcolor="eeeeee" class="exibir">Resposta &Aacute;rea </td>
       <td colspan="4" bgcolor="f7f7f7">
 	  <cfif Not IsDefined("FORM.MM_UpdateRecord") And Trim(qResposta.Pos_Parecer) neq ''><textarea name="H_obs" cols="120" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.Pos_Parecer#</cfoutput></textarea></cfif>
-	  <textarea name="observacao" cols="120" rows="6" nome="Observa��o" vazio="false" wrap="VIRTUAL" class="form" id="observacao"></textarea>
+	  <textarea name="observacao" cols="120" rows="6" vazio="false" wrap="VIRTUAL" class="form" id="observacao"></textarea>
 	  </td>
     </tr>
     <tr>

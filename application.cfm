@@ -3,8 +3,8 @@
 name="conteudo" 
 sessionmanagement="Yes" 
 clientmanagement="Yes" 
-sessiontimeout="#createtimespan(0,2,0,0)#" 
-applicationtimeout="#createtimespan(0,0,0,59)#">
+sessiontimeout="#createtimespan(0,0,45,0)#" 
+applicationtimeout="#createtimespan(0,0,30,0)#">
 <cfinclude template="parametros.cfm"> 
 <!--- 
 <cfset dsn_inspecao = 'DBSNCI'> --->

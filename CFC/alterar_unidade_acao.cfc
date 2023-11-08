@@ -1,27 +1,29 @@
 <cfcomponent >
-<cffunction name="acao">
-	<cftransaction>  <!--- Inclusão: Marcelo Bittencourt em 14/07/2020; DEMANDA: Update na unidade centralizadora; Se um UPDATE ou INSERT falhar, todas as alterações feitas terão roll back automático--->
-<cfoutput>
-  <cfquery name="rsReopAtu" datasource="#dsn_inspecao#">
-           Select Und_CodReop  from Unidades WHERE Und_Codigo = '#form.codigo#'
-  </cfquery>
+   <cfproperty  name="dsn" type="String">
+   <cfset dsn = 'DBSNCI'>
+    <cffunction name="acao">
+      <cftransaction>  <!--- Inclusï¿½o: Marcelo Bittencourt em 14/07/2020; DEMANDA: Update na unidade centralizadora; Se um UPDATE ou INSERT falhar, todas as alteraï¿½ï¿½es feitas terï¿½o roll back automï¿½tico--->
+    <cfoutput>
+    <cfquery name="rsReopAtu" datasource="#dsn#">
+            Select Und_CodReop  from Unidades WHERE Und_Codigo = '#form.codigo#'
+    </cfquery>
   
-  <!--- INCLUSÃO: Marcelo Bittencourt em 09/07/2020; DEMANDA: Update na unidade centralizadora---> 
+  <!--- INCLUSï¿½O: Marcelo Bittencourt em 09/07/2020; DEMANDA: Update na unidade centralizadora---> 
    
-  <!---Cria uma instância do componente Dao--->
+  <!---Cria uma instï¿½ncia do componente Dao--->
 	<cfobject component = "CFC/Dao" name = "dao">
-  <!---Invoca o metodo  rsUsuarioLogado para retornar dados do usuário logado (rsUsuarioLogado)--->
+  <!---Invoca o metodo  rsUsuarioLogado para retornar dados do usuï¿½rio logado (rsUsuarioLogado)--->
 	<cfinvoke component="#dao#" method="rsUsuarioLogado" returnVariable="rsUsuarioLogado">
-  <!---Invoca o método 'rsUnidades' para retornar a unidade antes do update (qAtualizaUnidade)--->
+  <!---Invoca o mï¿½todo 'rsUnidades' para retornar a unidade antes do update (qAtualizaUnidade)--->
 	<cfinvoke component="#dao#" method="rsUnidadesSEusuario" returnVariable="rsUnidadeAntes" CodigoDaUnidade="#form.codigo#">
-  <!---Invoca o método 'rsUnidades' para retornar a unidade centralizadora (rsUnidadeAntes.OrgaoCentralizador) antes do update (qAtualizaUnidade)--->
+  <!---Invoca o mï¿½todo 'rsUnidades' para retornar a unidade centralizadora (rsUnidadeAntes.OrgaoCentralizador) antes do update (qAtualizaUnidade)--->
 	<cfinvoke component="#dao#" method="rsUnidadesSEusuario" returnVariable="rsUnidadeCentralizaAntes" CodigoDaUnidade="#rsUnidadeAntes.OrgaoCentralizador#">	
  
   <!--- Fim: Marcelo --->
  		  
-  <!--- ALTERAÇÃO: Marcelo Bittencourt em 09/07/2020; DEMANDA: Update na unidade centralizadora---> 
+  <!--- ALTERAï¿½ï¿½O: Marcelo Bittencourt em 09/07/2020; DEMANDA: Update na unidade centralizadora---> 
 
-  <cfquery name="qAtualizaUnidade" datasource="#dsn_inspecao#">
+  <cfquery name="qAtualizaUnidade" datasource="#dsn#">
            UPDATE Unidades SET Und_NomeGerente = '#form.gerente#', Und_CatOperacional = #form.categoria#, Und_Email = '#form.email#',
 	       Und_CodReop = '#form.reop#', Und_Endereco = '#form.endereco#', Und_Status = '#form.Status#', Und_Centraliza ='#form.centralizador#', 
 	       Und_Username = '#rsUsuarioLogado.Username#', Und_DtUltAtu = convert(char, getdate(), 102)    
@@ -32,28 +34,28 @@
   <!--- Fim: Marcelo --->
   
   <!--- Atualizar Resultado_Inspecao --->
-  <cfquery name="rsRIP" datasource="#dsn_inspecao#">
+  <cfquery name="rsRIP" datasource="#dsn#">
   SELECT RIP_Unidade, RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_CodReop FROM Resultado_Inspecao WHERE RIP_Unidade = '#form.codigo#'
 </cfquery>
 </cfoutput>
 <!--- <cfset gil = gil> --->
 <cfoutput query="rsRIP">
-  <cfquery name="rsPOS" datasource="#dsn_inspecao#">
+  <cfquery name="rsPOS" datasource="#dsn#">
 		 SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp FROM ParecerUnidade WHERE Pos_Unidade = '#form.codigo#' AND Pos_Inspecao = '#RIP_NumInspecao#' AND Pos_NumGrupo = #RIP_NumGrupo# AND Pos_NumItem = #RIP_NumItem# AND (Pos_Situacao_Resp <> 3 And Pos_Situacao_Resp <> 12 And Pos_Situacao_Resp <> 13)
 		</cfquery>
   <cfif rsPos.recordcount gt 0>
-    <cfquery datasource="#dsn_inspecao#">
+    <cfquery datasource="#dsn#">
 			 UPDATE Resultado_Inspecao SET RIP_CodReop = '#form.reop#' where RIP_Unidade = '#form.codigo#' and RIP_NumInspecao = '#RIP_NumInspecao#' and RIP_NumGrupo = #RIP_NumGrupo# and RIP_NumItem = #RIP_NumItem#
 		   </cfquery>
   </cfif>
  </cfoutput> 
 <!--- Fim --->
 	  
-<!--- Inclusão: Marcelo Bittencourt em 09/07/2020; DEMANDA: Update na unidade centralizadora --->
+<!--- Inclusï¿½o: Marcelo Bittencourt em 09/07/2020; DEMANDA: Update na unidade centralizadora --->
   
 
 <!---Busca na tabela ParecerUnidade todos os itens da unidade (form.codigo) que possuem o Itn_TipoUnidade = 4 na tabela Itens_Verificacao --->
-<cfquery name="rsPOSalteraCentraliza" datasource="#dsn_inspecao#">
+<cfquery name="rsPOSalteraCentraliza" datasource="#dsn#">
   SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp,
     Pos_Parecer, Pos_DtPrev_Solucao 
 	FROM ParecerUnidade 
@@ -69,7 +71,7 @@
    <!---Percorre todos os itens resultantes da consulta rsRIP_Centraliza --->
    <cfoutput query="rsPOSalteraCentraliza">
    <cfinvoke component="#dao#" method="rsUnidadesSEusuario" returnVariable="rsUnidadeCentralizaDepois" CodigoDaUnidade="#form.centralizador#">
-  <!---Compara o centralizador do form(form.centralizador) com o centralizador da tabela Unidades(rsUnidadeAntes.OrgaoCentralizador) antes do update(qAtualizaUnidade). A rotina será executada apenas se o usuário tiver alterado a unidade centralizadora, evitando Selects e Updadtes desnecessários, além de um Insert indevido no campo Pos_Parecer --->
+  <!---Compara o centralizador do form(form.centralizador) com o centralizador da tabela Unidades(rsUnidadeAntes.OrgaoCentralizador) antes do update(qAtualizaUnidade). A rotina serï¿½ executada apenas se o usuï¿½rio tiver alterado a unidade centralizadora, evitando Selects e Updadtes desnecessï¿½rios, alï¿½m de um Insert indevido no campo Pos_Parecer --->
   <cfif '#form.centralizador#' neq '#rsUnidadeAntes.OrgaoCentralizador#'>
     <!---Retorna o(s) item(ns) pendente(s) de unidade(Pos_Situacao_Resp = 2) na tabela ParecerUnidade--->
     
@@ -89,35 +91,35 @@
 		  
 		 <cfif '#form.centralizador#' eq "">
                <cfset pos_aux = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & 
-				   'Opinião do Controle Interno' & CHR(13) & CHR(13) &
-                   'À(O) ' &  Trim('#NomeUnidadeInspecionada#') & CHR(13) & CHR(13) &
-                   'Apontamento transferido para manifestação desse órgão em decorrência da descentralização da atividade de Distribuição Domiciliária. Favor adotar/apresentar as ações necessárias para o saneamento da Não Conformidade (NC) registrada.'& CHR(13) & CHR(13) &
-                   'Situação: PENDENTE DA UNIDADE'& CHR(13) & CHR(13) &
-                   'Data de Previsão da Solução: ' &  '#DataPrevisaoSolucao#' & CHR(13) & CHR(13) &
-                   'Responsável: ' & '#Responsavel#' & CHR(13) & CHR(13) &
+				   'Opiniï¿½o do Controle Interno' & CHR(13) & CHR(13) &
+                   'ï¿½(O) ' &  Trim('#NomeUnidadeInspecionada#') & CHR(13) & CHR(13) &
+                   'Apontamento transferido para manifestaï¿½ï¿½o desse ï¿½rgï¿½o em decorrï¿½ncia da descentralizaï¿½ï¿½o da atividade de Distribuiï¿½ï¿½o Domiciliï¿½ria. Favor adotar/apresentar as aï¿½ï¿½es necessï¿½rias para o saneamento da Nï¿½o Conformidade (NC) registrada.'& CHR(13) & CHR(13) &
+                   'Situaï¿½ï¿½o: PENDENTE DA UNIDADE'& CHR(13) & CHR(13) &
+                   'Data de Previsï¿½o da Soluï¿½ï¿½o: ' &  '#DataPrevisaoSolucao#' & CHR(13) & CHR(13) &
+                   'Responsï¿½vel: ' & '#Responsavel#' & CHR(13) & CHR(13) &
 				   RepeatString('-',119) >
 			   <cfset posArea = '#rsUnidadeAntes.CodigoUnidade#'>
 			   <cfset posNomeArea = '#rsUnidadeAntes.Descricao#'>
 
           <cfelseif	'#rsUnidadeCentralizaAntes.CodigoUnidade#' eq "">
                <cfset pos_aux = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & 
-                   'Opinião do Controle Interno' & CHR(13) & CHR(13) &
-                   'À(O) ' &  Trim('#NomeUnidadeCentralizaDepois#') & CHR(13) & CHR(13) &
-                   'Apontamento transferido para manifestação desse órgão em decorrência da centralização da atividade de Distribuição Domiciliária da unidade verificada: ' &  Trim('#NomeUnidadeInspecionada#')  & '. Favor adotar/apresentar as ações necessárias para o saneamento da Não Conformidade (NC) registrada.'& CHR(13) & CHR(13) &
-                   'Situação: PENDENTE DA UNIDADE'& CHR(13) & CHR(13) &
-                   'Data de Previsão da Solução: ' &  '#DataPrevisaoSolucao#' & CHR(13) & CHR(13) &
-                   'Responsável: ' & '#Responsavel#' & CHR(13) & CHR(13) &
+                   'Opiniï¿½o do Controle Interno' & CHR(13) & CHR(13) &
+                   'ï¿½(O) ' &  Trim('#NomeUnidadeCentralizaDepois#') & CHR(13) & CHR(13) &
+                   'Apontamento transferido para manifestaï¿½ï¿½o desse ï¿½rgï¿½o em decorrï¿½ncia da centralizaï¿½ï¿½o da atividade de Distribuiï¿½ï¿½o Domiciliï¿½ria da unidade verificada: ' &  Trim('#NomeUnidadeInspecionada#')  & '. Favor adotar/apresentar as aï¿½ï¿½es necessï¿½rias para o saneamento da Nï¿½o Conformidade (NC) registrada.'& CHR(13) & CHR(13) &
+                   'Situaï¿½ï¿½o: PENDENTE DA UNIDADE'& CHR(13) & CHR(13) &
+                   'Data de Previsï¿½o da Soluï¿½ï¿½o: ' &  '#DataPrevisaoSolucao#' & CHR(13) & CHR(13) &
+                   'Responsï¿½vel: ' & '#Responsavel#' & CHR(13) & CHR(13) &
                     RepeatString('-',119) >
 			   <cfset posArea = '#rsUnidadeCentralizaDepois.CodigoUnidade#'>
 			   <cfset posNomeArea = '#rsUnidadeCentralizaDepois.Descricao#'>	   
 		  <cfelse>
 			  <cfset pos_aux = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & 
-                   'Opinião do Controle Interno' & CHR(13) & CHR(13) &
-                   'À(O) ' &  Trim('#NomeUnidadeCentralizaDepois#') & CHR(13) & CHR(13) &
-                   'Apontamento transferido para manifestação desse órgão em decorrência da mudança da unidade de centralização da atividade de Distribuição Domiciliária da unidade verificada ' &  Trim('#NomeUnidadeInspecionada#') & ', mudando do ' & Trim('#NomeUnidadeCentralizaAntes#') & ' para ' & Trim('#NomeUnidadeCentralizaDepois#') & '. Favor adotar/apresentar as ações necessárias para o saneamento da Não Conformidade (NC) registrada.'& CHR(13) & CHR(13) &
-                   'Situação: PENDENTE DA UNIDADE'& CHR(13) & CHR(13) &
-                   'Data de Previsão da Solução: ' &  '#DataPrevisaoSolucao#' & CHR(13) & CHR(13) &
-                   'Responsável: ' & '#Responsavel#' & CHR(13) & CHR(13) &
+                   'Opiniï¿½o do Controle Interno' & CHR(13) & CHR(13) &
+                   'ï¿½(O) ' &  Trim('#NomeUnidadeCentralizaDepois#') & CHR(13) & CHR(13) &
+                   'Apontamento transferido para manifestaï¿½ï¿½o desse ï¿½rgï¿½o em decorrï¿½ncia da mudanï¿½a da unidade de centralizaï¿½ï¿½o da atividade de Distribuiï¿½ï¿½o Domiciliï¿½ria da unidade verificada ' &  Trim('#NomeUnidadeInspecionada#') & ', mudando do ' & Trim('#NomeUnidadeCentralizaAntes#') & ' para ' & Trim('#NomeUnidadeCentralizaDepois#') & '. Favor adotar/apresentar as aï¿½ï¿½es necessï¿½rias para o saneamento da Nï¿½o Conformidade (NC) registrada.'& CHR(13) & CHR(13) &
+                   'Situaï¿½ï¿½o: PENDENTE DA UNIDADE'& CHR(13) & CHR(13) &
+                   'Data de Previsï¿½o da Soluï¿½ï¿½o: ' &  '#DataPrevisaoSolucao#' & CHR(13) & CHR(13) &
+                   'Responsï¿½vel: ' & '#Responsavel#' & CHR(13) & CHR(13) &
                     RepeatString('-',119) >
 			 	
 			  <cfset posArea = '#rsUnidadeCentralizaDepois.CodigoUnidade#'>
@@ -125,7 +127,7 @@
           </cfif>
  
 		  <cfset pos_aux_hist = '#rsPOSalteraCentraliza.Pos_Parecer#' & CHR(13) & CHR(13) & '#pos_aux#'>
-		  <cfquery datasource="#dsn_inspecao#">
+		  <cfquery datasource="#dsn#">
 				  UPDATE ParecerUnidade SET Pos_Area = '#posArea#', Pos_NomeArea = '#posNomeArea#', Pos_Parecer = '#pos_aux_hist#', Pos_DtPosic  = convert(char, getdate(), 102), pos_dtultatu = getdate() 
 			      WHERE Pos_Unidade = '#form.codigo#' AND Pos_Inspecao = '#Pos_Inspecao#' AND Pos_NumGrupo = '#Pos_NumGrupo#' AND Pos_NumItem = '#Pos_NumItem#'  
 		 </cfquery>	
@@ -152,16 +154,16 @@
 			
 
 <!--- Atualizar ParecerUnidade --->
-<cfquery name="rsArea" datasource="#dsn_inspecao#">
+<cfquery name="rsArea" datasource="#dsn#">
 		 SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp 
 		 FROM ParecerUnidade 
 		 WHERE Pos_Area = '#rsReopAtu.Und_CodReop#' AND Pos_Unidade = '#form.codigo#' AND Pos_Inspecao = '#rsRIP.RIP_NumInspecao#' AND Pos_Situacao_Resp <> 0 AND Pos_Situacao_Resp <> 11 AND Pos_Situacao_Resp <> 3 And Pos_Situacao_Resp <> 12 And Pos_Situacao_Resp <> 13
 </cfquery>
 <cfoutput query="rsArea">
-  <cfquery name="rsREOP" datasource="#dsn_inspecao#">
+  <cfquery name="rsREOP" datasource="#dsn#">
            SELECT Rep_Nome FROM Reops WHERE Rep_Codigo = '#form.reop#'
   </cfquery>
-  <cfquery datasource="#dsn_inspecao#">
+  <cfquery datasource="#dsn#">
           UPDATE ParecerUnidade SET Pos_Area = '#form.reop#', Pos_NomeArea = '#rsREOP.Rep_Nome#' WHERE Pos_Unidade = '#form.codigo#' and Pos_Inspecao = '#rsArea.Pos_Inspecao#' and Pos_NumGrupo = #rsArea.Pos_NumGrupo# and Pos_NumItem = #rsArea.Pos_NumItem#
   </cfquery>
 </cfoutput>

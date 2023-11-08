@@ -30,7 +30,7 @@
 	<cfset data = DateFormat(now(),'DD-MM-YYYY') & '-' & TimeFormat(Now(),'HH') & 'h' & TimeFormat(Now(),'MM') & 'min' & TimeFormat(Now(),'SS') & 's'>
 
 	<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
-	<!--- O arquivo anexo recebe nome indicando Numero da inspeção, Número da unidade, Número do grupo e número do item ao qual está vinculado --->
+	<!--- O arquivo anexo recebe nome indicando Numero da inspeï¿½ï¿½o, Nï¿½mero da unidade, Nï¿½mero do grupo e nï¿½mero do item ao qual estï¿½ vinculado --->
 
 	<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & Right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & '.pdf'>
 
@@ -56,7 +56,7 @@
 	</cfif>
 
 	<cfcatch type="any">
-		<cfset mensagem = 'Ocorreu um erro ao efetuar esta operação, o campo Arquivo está vazio, Selecione um arquivo no formato PDF'>
+		<cfset mensagem = 'Ocorreu um erro ao efetuar esta operaï¿½ï¿½o, o campo Arquivo estï¿½ vazio, Selecione um arquivo no formato PDF'>
 		<script>
 			alert('<cfoutput>#mensagem#</cfoutput>');
 			history.back();
@@ -84,7 +84,7 @@
 
  <cfif qAnexos.recordCount Neq 0>
 
-	<!--- Exluindo arquivo do diretório de Anexos --->
+	<!--- Exluindo arquivo do diretï¿½rio de Anexos --->
 	<cfif FileExists(qAnexos.Ane_Caminho)>
 		<cffile action="delete" file="#qAnexos.Ane_Caminho#">
 	</cfif>
@@ -102,7 +102,7 @@
 </cfif>
 
 <!--- <cfset area = 'sins'> --->
-<cfset Encaminhamento = 'À SGCIN'>
+<cfset Encaminhamento = 'Ã€ SGCIN'>
 
 <cfset evento = 'document.form1.observacao.focus();'>
 
@@ -286,7 +286,7 @@ INNER JOIN Reops ON Und_CodReop = Rep_Codigo
 	  , Pos_DtUltAtu = CONVERT(char, GETDATE(), 120)
 	  , Pos_NomeResp='#CGI.REMOTE_USER#'  
 	  , Pos_username = '#CGI.REMOTE_USER#'
-	  <cfset Encaminhamento = 'Opinião do Subordinador Regional'>
+	  <cfset Encaminhamento = 'OpiniÃ£o do Subordinador Regional'>
 	  <cfset aux_obs = "">
 	  , Pos_Parecer=
 		<cfset aux_obs = Trim(FORM.observacao)>
@@ -296,14 +296,16 @@ INNER JOIN Reops ON Und_CodReop = Rep_Codigo
 		<cfset aux_obs = Replace(aux_obs,'>','','All')>
 		<!---	 <cfset aux_obs = Replace(aux_obs,'&','','All')>
 				 <cfset aux_obs = Replace(aux_obs,'%','','All')> --->
-		<cfset pos_aux = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & CHR(13) & CHR(13) & 'À(O)  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+		<cfset pos_aux = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & CHR(13) & CHR(13) & 'Ã(o)  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de PrevisÃ£o da SoluÃ§Ã£o: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'SituaÃ§Ã£o: ' & situacao & CHR(13) & CHR(13) &  'ResponsÃ¡vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 	  '#pos_aux#'
 	   WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
     </cfquery>
  <!--- Inserindo dados dados na tabela Andamento --->
-		 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'À(O)  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+ <cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
+<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
+		 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'Ã(o)  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de PrevisÃ£o da SoluÃ§Ã£o: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'SituaÃ§Ã£o: ' & situacao & CHR(13) & CHR(13) &  'ResponsÃ¡vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 		 <cfquery datasource="#dsn_inspecao#">
-			insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#qUsuario.Usu_Lotacao#', convert(char, getdate(), 108), '#and_obs#')
+			insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#qUsuario.Usu_Lotacao#', '#hhmmss#', '#and_obs#')
 		 </cfquery>
 <cflocation url="itens_subordinador_respostas_pendentes_subordinador_regional.cfm">
 </cfif>
@@ -336,14 +338,14 @@ INNER JOIN Reops ON Und_CodReop = Rep_Codigo
 <link href="css.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
 function aviso(){
-alert('AVISO IMPORTANTE \n\nAo Órgão Subordinador, caso sua resposta solucione a irregularidade de imediato, informar no campo Data de Previsão da Solução a data atual(hoje). \n\nSe for necessário prazo para regularização, indicar data futura. \n\nAté esta data será necessário entrar novamente no sistema SNCI para complementação de sua Resposta.');
+alert('AVISO IMPORTANTE \n\nAo ï¿½rgï¿½o Subordinador, caso sua resposta solucione a irregularidade de imediato, informar no campo Data de PrevisÃ£o da SoluÃ§Ã£o a data atual(hoje). \n\nSe for necessï¿½rio prazo para regularizaï¿½ï¿½o, indicar data futura. \n\nAtï¿½ esta data serï¿½ necessï¿½rio entrar novamente no sistema SNCI para complementaï¿½ï¿½o de sua Resposta.');
 }
 
 //=============================
-//permite digitaçao apenas de valores numéricos
+//permite digitaï¿½ao apenas de valores numï¿½ricos
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitaï¿½ï¿½o das teclas numï¿½ricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 	
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -361,7 +363,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia inválido!');
+		      alert('Valor para o dia invï¿½lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -371,7 +373,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o Mês inválido!');
+		      alert('Valor para o Mï¿½s invï¿½lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -415,7 +417,7 @@ if (x == 15 || x == 16 || x == 18 || x == 19  || x == 23 )
       document.form1.cbData.disabled = true;
     }
  }
-//Validação de campos vazios em formulário
+//Validaï¿½ï¿½o de campos vazios em formulï¿½rio
 function validaForm() {
 if (document.form1.acao.value == 'Salvar'){
   var strmanifesto = document.form1.observacao.value;    
@@ -423,19 +425,19 @@ if (document.form1.acao.value == 'Salvar'){
   
   if(strmanifesto == '')
 	  {
-	   alert('Caro Usuário, está faltando sua Análise no campo Manifestar-se!');
+	   alert('Caro Usuï¿½rio, estï¿½ faltando sua Anï¿½lise no campo Manifestar-se!');
 	   return false;
 	  }
  
    if(strmanifesto.length < 100)
 	   {
-	   alert('Caro Usuário, Sua manisfestação deverá conter no mínimo 100(cem) caracteres');
+	   alert('Caro Usuï¿½rio, Sua manisfestaï¿½ï¿½o deverï¿½ conter no mï¿½nimo 100(cem) caracteres');
 	   return false;
 	   }
 	var dtprevdig = document.form1.cbData.value;	    
 	if (dtprevdig.length != 10)
 		{
-		alert('Preencher campo: Data da Previsão da Solução ex. DD/MM/AAAA');
+		alert('Preencher campo: Data da PrevisÃ£o da SoluÃ§Ã£o ex. DD/MM/AAAA');
 		return false;
 		}	
 
@@ -452,34 +454,34 @@ if (document.form1.acao.value == 'Salvar'){
 		 
 	 if (dt_hoje_yyyymmdd > dtprevdig_yyyymmdd)
 	 {
-	  alert("Data de Previsão da Solução é inferior a data de hoje!")
+	  alert("Data de PrevisÃ£o da SoluÃ§Ã£o ï¿½ inferior a data de hoje!")
 	  return false;
 	 } 
  
 	 // so informar da dta de hoje()
 	 if ((And_dtposic_fut < dt_hoje_yyyymmdd) && (pos_dtPrevSoluc_atual < dt_hoje_yyyymmdd) && (dtprevdig_yyyymmdd > dt_hoje_yyyymmdd))
 	{
-    alert('Sr. Usuário. Você deve informar no campo data de previsão da solução a data de hoje.')
+    alert('Sr. Usuï¿½rio. Vocï¿½ deve informar no campo data de PrevisÃ£o da SoluÃ§Ã£o a data de hoje.')
 	return false;
 	}
     // considerar possivel adendo de prazo ao campo Pos_DtPRevSoluc
 	if (pos_dtPrevSoluc_atual > And_dtposic_fut && dtprevdig_yyyymmdd > pos_dtPrevSoluc_atual)
 	{
-    alert('Sr. Usuário. Você deve informar no campo data de previsão da solução a data de hoje ou uma data igual ou inferior a data: ' + pos_dtPrevSoluc_atual.substr(6,2) + '/' + pos_dtPrevSoluc_atual.substr(4,2) + '/' + pos_dtPrevSoluc_atual.substr(0,4))
+    alert('Sr. Usuï¿½rio. Vocï¿½ deve informar no campo data de PrevisÃ£o da SoluÃ§Ã£o a data de hoje ou uma data igual ou inferior a data: ' + pos_dtPrevSoluc_atual.substr(6,2) + '/' + pos_dtPrevSoluc_atual.substr(4,2) + '/' + pos_dtPrevSoluc_atual.substr(0,4))
 	return false;
 	} 
-	 // Neste status considerar o prazo máximo contado a partir da andamento.and_DtPosic
+	 // Neste status considerar o prazo mï¿½ximo contado a partir da andamento.and_DtPosic
 	if ((dtprevdig_yyyymmdd > And_dtposic_fut) && (dt_hoje_yyyymmdd != dtprevdig_yyyymmdd) && (And_dtposic_fut > pos_dtPrevSoluc_atual))
 	{
 	// Aguardar Edimir
-    alert('Sr. Usuário. Você deve informar no campo data de previsão da solução a data de hoje ou uma data igual ou inferior a data: ' + And_dtposic_fut.substr(6,2) + '/' + And_dtposic_fut.substr(4,2) + '/' + And_dtposic_fut.substr(0,4))
+    alert('Sr. Usuï¿½rio. Vocï¿½ deve informar no campo data de PrevisÃ£o da SoluÃ§Ã£o a data de hoje ou uma data igual ou inferior a data: ' + And_dtposic_fut.substr(6,2) + '/' + And_dtposic_fut.substr(4,2) + '/' + And_dtposic_fut.substr(0,4))
 	return false;
 	} 
 	 
 	  var sit = document.form1.frmResp.value;	
 	  if ((sit == 15 || sit == 16 || sit == 18 || sit == 19 || sit == 23) && dt_hoje_yyyymmdd == dtprevdig_yyyymmdd)
 		 {
-		  alert("Para Situação de Tratamento a Data de Previsão da Solução deve ser superior a data corrente(do dia)!")
+		  alert("Para SituaÃ§Ã£o de Tratamento a Data de PrevisÃ£o da SoluÃ§Ã£o deve ser superior a data corrente(do dia)!")
 		  //dtprazo(sit);
 		  return false;
 		 }
@@ -488,16 +490,16 @@ if (document.form1.acao.value == 'Salvar'){
 		 {
 		  var auxdtedit = document.form1.dtdezddtrat.value;
 		  auxdtedit = auxdtedit.substring(6,8) + '/' + auxdtedit.substring(4,6) + '/' + auxdtedit.substring(0,4)
-		  alert('Para Tratamento a Data de Previsão está menor que os 10(dez) dias úteis ou Data Previsão concedida para: ' + auxdtedit)
+		  alert('Para Tratamento a Data de PrevisÃ£o estï¿½ menor que os 10(dez) dias ï¿½teis ou Data PrevisÃ£o concedida para: ' + auxdtedit)
 		  //dtprazo(sit);
 		  return false;
 		 }				 
 	  //===============================================================================================		 
-	  if (sit == 2 || sit == 20) {var auxcam = '\n\nPENDENTE DE UNIDADE\n\n- Essa opção DEVOLVE o item à unidade para registro de resposta ou complementação'};
-	  if (sit == 7) {var auxcam = '\n\nRESPOSTA ÓRGÃO SUBORDINADOR\n\n - Essa opção RESPONDE o item e o encaminha para Equipe de Controle Interno da Regional (CCOP)'};
-	  if (sit == 16) {var auxcam = '\n\nTRATAMENTO ÓRGÃO SUBORDINADOR\n\n - Essa opção MANTÉM o item ao Órgão Subordinador para desenvolvimento de ação que necessita de maior prazo da regularização ou resposta.\n Nesse caso deve indicar o prazo necessário no campo Data de Previsão da Solução.\n Até essa data sua resposta deverá ser complementada'};
+	  if (sit == 2 || sit == 20) {var auxcam = '\n\nPENDENTE DE UNIDADE\n\n- Essa opï¿½ï¿½o DEVOLVE o item ï¿½ unidade para registro de resposta ou complementaï¿½ï¿½o'};
+	  if (sit == 7) {var auxcam = '\n\nRESPOSTA ï¿½RGï¿½O SUBORDINADOR\n\n - Essa opï¿½ï¿½o RESPONDE o item e o encaminha para Equipe de Controle Interno da Regional (CCOP)'};
+	  if (sit == 16) {var auxcam = '\n\nTRATAMENTO ï¿½RGï¿½O SUBORDINADOR\n\n - Essa opï¿½ï¿½o MANTï¿½M o item ao ï¿½rgï¿½o Subordinador para desenvolvimento de aï¿½ï¿½o que necessita de maior prazo da regularizaï¿½ï¿½o ou resposta.\n Nesse caso deve indicar o prazo necessï¿½rio no campo Data de PrevisÃ£o da SoluÃ§Ã£o.\n Atï¿½ essa data sua resposta deverï¿½ ser complementada'};
 	
-	 if (confirm ('            Atenção! ' + auxcam))
+	 if (confirm ('            Atenï¿½ï¿½o! ' + auxcam))
 	 {  
 	     document.form1.cbData.disabled = false;
 		 return true;
@@ -511,9 +513,9 @@ if (document.form1.acao.value == 'Salvar'){
 //return false;
 }
 
-//Função que abre uma página em Popup
+//Funï¿½ï¿½o que abre uma pï¿½gina em Popup
 function popupPage() {
-<cfoutput>  //página chamada, seguida dos parâmetros número, unidade, grupo e item
+<cfoutput>  //pï¿½gina chamada, seguida dos parï¿½metros nï¿½mero, unidade, grupo e item
 var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
 </cfoutput>
 windowprops = "location=no,"
@@ -533,11 +535,11 @@ window.open(page, "Popup", windowprops);
 <table width="77%" height="60%" align="center">
 <tr>
 	  <td width="74%" valign="top">
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
     <form name="form1" method="post" onSubmit="return validaForm()" enctype="multipart/form-data" action="itens_subordinador_respostas_pendentes_regional1.cfm">
       <div align="right"><table width="74%" align="center">
           <tr><br>
-              <td colspan="9"><p align="center" class="titulo1"><strong> PONTO DE controle interno por Órgão Subordinador Regional</strong>
+              <td colspan="9"><p align="center" class="titulo1"><strong> PONTO DE controle interno por ï¿½rgï¿½o Subordinador Regional</strong>
                       <input name="unid" type="hidden" id="unid" value="<cfoutput>#URL.Unid#</cfoutput>">
                       <input name="ninsp" type="hidden" id="ninsp" value="<cfoutput>#URL.Ninsp#</cfoutput>">
                       <input name="ngrup" type="hidden" id="ngrup" value="<cfoutput>#URL.Ngrup#</cfoutput>">
@@ -570,7 +572,7 @@ window.open(page, "Popup", windowprops);
             <td colspan="7" bgcolor="f7f7f7">-&nbsp;<cfoutput query="qInspetor"><strong>#qInspetor.Fun_Nome#</strong>&nbsp;<cfif qInspetor.currentrow neq qInspetor.recordcount><br>- </cfif></cfoutput></td>
           </tr>
           <tr class="exibir">
-            <td bgcolor="eeeeee">Nº Relatório</td>
+            <td bgcolor="eeeeee">Nï¿½ Relatï¿½rio</td>
             <cfset Num_Insp = Left(URL.Ninsp,2) & '.' & Mid(URL.Ninsp,3,4) & '/' & Right(URL.Ninsp,4)>
             <td colspan="8" bgcolor="f7f7f7"><cfoutput><strong>#Num_Insp#</strong></cfoutput></td>
           </tr>
@@ -593,13 +595,13 @@ window.open(page, "Popup", windowprops);
             <td colspan="9" bgcolor="f7f7f7"></td>
            </tr>
           <tr>
-            <td valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Situação Encontrada:</span></td>
+            <td valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">SituaÃ§Ã£o Encontrada:</span></td>
             <td colspan="8" bgcolor="f7f7f7"><span class="exibir">
               <textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.RIP_Comentario#</cfoutput></textarea>
             </span></td>
 		  </tr>
 		 <tr>
-            <td bgcolor="eeeeee"><span class="exibir"><span class="titulos">Orientações:</span></span></td>
+            <td bgcolor="eeeeee"><span class="exibir"><span class="titulos">Orientaï¿½ï¿½es:</span></span></td>
             <td colspan="7"><span class="exibir">
               <textarea name="H_recom" cols="200" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea>
             </span></td>
@@ -613,7 +615,7 @@ window.open(page, "Popup", windowprops);
           </tr>
           <tr>
             <td bgcolor="eeeeee"><span class="exibir"><span class="titulos">Manifestar-se:</span></span></td>
-            <td colspan="7"><span class="exibir"><textarea name="observacao" cols="200" rows="25" nome="Observação" vazio="false" wrap="VIRTUAL" class="form" id="observacao"><cfoutput>#Session.E01.observacao#</cfoutput></textarea>
+            <td colspan="7"><span class="exibir"><textarea name="observacao" cols="200" rows="25" nome="Observaï¿½ï¿½o" vazio="false" wrap="VIRTUAL" class="form" id="observacao"><cfoutput>#Session.E01.observacao#</cfoutput></textarea>
             </span></td>
           </tr>
 		  <tr>
@@ -648,9 +650,9 @@ window.open(page, "Popup", windowprops);
         <cfif FileExists(qAnexos.Ane_Caminho)>
 		 <cfset cla = cla + 1>
 		<cfif cla lt 10>
-			<cfset cl = '0' & cla & 'º'>
+			<cfset cl = '0' & cla & 'ï¿½'>
 		<cfelse>
-			<cfset cl = cla & 'º'>
+			<cfset cl = cla & 'ï¿½'>
 		</cfif>		
           <tr>
             <td colspan="6" bgcolor="eeeeee" class="form"><cfoutput>#cl# - #ListLast(qAnexos.Ane_Caminho,'\')#</cfoutput></td>
@@ -741,13 +743,13 @@ window.open(page, "Popup", windowprops);
 	<input name="dthojeyyyymmdd" type="hidden" id="dthojeyyyymmdd" value="<cfoutput>#DateFormat(now(),'YYYYMMDD')#</cfoutput>"> 
 
 	</form>
-<!--- Fim Área de conteúdo --->
+<!--- Fim ï¿½rea de conteï¿½do --->
   </tr>
 </table>
 </body>
  <script>
 	<cfoutput>
-		<!---Retorna true se a data de início da inspeção for maior ou igual a 04/03/2021, data em que o editor de texto foi implantado. Isso evitará que os textos anteriores sejam desformatados--->
+		<!---Retorna true se a data de inï¿½cio da inspeï¿½ï¿½o for maior ou igual a 04/03/2021, data em que o editor de texto foi implantado. Isso evitarï¿½ que os textos anteriores sejam desformatados--->
 		<cfset CouponDate = createDate( 2021, 03, 04 ) />
 		<cfif DateDiff( "d", '#rsItem.INP_DtInicInspecao#',CouponDate ) GTE 1>
 			<cfset usarEditor = false />
@@ -757,7 +759,7 @@ window.open(page, "Popup", windowprops);
 		var usarEditor = #usarEditor#;
 	</cfoutput>
 	if(usarEditor == true){
-		//configurações diferenciadas do editor de texto.
+		//configuraï¿½ï¿½es diferenciadas do editor de texto.
 		CKEDITOR.replace('Melhoria', {
 		width: 1020,
 		height: 200,

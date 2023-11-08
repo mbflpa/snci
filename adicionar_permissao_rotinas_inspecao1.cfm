@@ -631,7 +631,7 @@ function grupoacesso(){
               <td><div id="areab"><span class="exibir"><strong><strong>
                   <select name="lotacao" class="form">
                     <option selected="selected" value="---">---</option>
-                    <cfoutput query="request.qCS">
+                    <cfoutput query="request.qGov3">
 				         <option value="#Ars_Codigo#">#Ars_Descricao#(#Ars_Sigla#)</option>
 	                </cfoutput>
                   </select>

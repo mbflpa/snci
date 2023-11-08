@@ -315,21 +315,23 @@
 			</cfquery> 			 
 
 			<cfif qEmLiberacao.Pos_Situacao_Resp eq 11>
+				<cfset hhmmssd = timeFormat(now(), "HH:mm:ssl")>
+				<cfset hhmmssd = left(hhmmssd,2) & mid(hhmmssd,4,2) & mid(hhmmssd,7,2) & mid(hhmmssd,9,1)>
 				 <cfif rs11SN.recordcount lte 0>
 					   <cfif form.pontocentlzSN eq 'S' and FORM.nci eq 'Sim' and qVerificaTipo.Und_TipoUnidade neq 12 and qVerificaTipo.Und_TipoUnidade neq 16>
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-								VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 11, convert(char, getdate(), 108),'#qVerificaTipo.Und_CodReop#')
+								VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 11, '#hhmmssd#','#qVerificaTipo.Und_CodReop#')
 							</cfquery>
 					   <cfelseif form.pontocentlzSN eq 'S' and FORM.nci eq 'Sim' and (qVerificaTipo.Und_TipoUnidade eq 12 or qVerificaTipo.Und_TipoUnidade eq 16)>
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-								VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 11, convert(char, getdate(), 108),'#qVerificaArea.Rep_CodArea#')
+								VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 11, '#hhmmssd#','#qVerificaArea.Rep_CodArea#')
 							</cfquery>
 					   <cfelse>
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-								VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 11, convert(char, getdate(), 108),'#qVerificaTipo.Und_CodReop#')
+								VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 11, '#hhmmssd#','#qVerificaTipo.Und_CodReop#')
 							</cfquery>
 					   </cfif>
 				</cfif>
@@ -462,9 +464,11 @@
 				</cfquery> 
 				
 				<cfif qNaoRespondido.Pos_Situacao_Resp eq 14 and rs14SN.recordcount lte 0>
+					<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+					<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
 					<cfquery datasource="#dsn_inspecao#">
 						INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-						VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #qNaoRespondido.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, CONVERT(char, GETDATE(), 108),'#unid#')
+						VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #qNaoRespondido.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#', 108),'#unid#')
 					</cfquery>
 				</cfif>
 
@@ -588,8 +592,7 @@
 					UPDATE Resultado_Inspecao set RIP_Recomendacao = 'V'
 					WHERE RIP_NumInspecao = '#form.ninsp#' and RIP_NumGrupo =#form.ngrup# and RIP_NumItem =#form.nitem#
 				</cfquery>
-				
-
+			
 				<cfset and_aux = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #Trim(Encaminhamento)#  & CHR(13) & CHR(13) & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & #situacao# & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 				<!--- Registro do status 14 --->
 				<cfquery name="rsExiste14" datasource="#dsn_inspecao#">
@@ -603,40 +606,43 @@
 					Select Rep_CodArea from Reops WHERE Rep_Codigo=#qVerificaTipo.Und_CodReop#
 				</cfquery>
 				<cfif rsExiste14.recordcount lt 1>
-					
+					<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+					<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
 					<cfif form.pontocentlzSN eq 'S' and FORM.nci eq 'Sim' and qVerificaTipo.Und_TipoUnidade neq 12 and qVerificaTipo.Und_TipoUnidade neq 16>
 						<cfquery datasource="#dsn_inspecao#">
 							INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, convert(char, getdate(), 108), '#qVerificaTipo.Und_CodReop#')
+							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#', '#qVerificaTipo.Und_CodReop#')
 						</cfquery>
 					<cfelseif form.pontocentlzSN eq 'S' and FORM.nci eq 'Sim' and (qVerificaTipo.Und_TipoUnidade eq 12 or qVerificaTipo.Und_TipoUnidade eq 16)>
 						<cfquery datasource="#dsn_inspecao#">
 							INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, convert(char, getdate(), 108), '#qVerificaArea.Rep_CodArea#')
+							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#', '#qVerificaArea.Rep_CodArea#')
 						</cfquery>
 					<cfelse>
 						<cfquery datasource="#dsn_inspecao#">
 							INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, convert(char, getdate(), 108), '#unid#')
+							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#', '#unid#')
 						</cfquery>
 					</cfif>
 				</cfif>
 
 
 				<cfif form.pontocentlzSN eq 'S' and FORM.nci eq 'Sim' and qVerificaTipo.Und_TipoUnidade neq 12 and qVerificaTipo.Und_TipoUnidade neq 16>
+						<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
+						<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>				
 						<cfquery datasource="#dsn_inspecao#">
 							INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area)
-							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', #auxsitresp#, left(convert(char, getdate(), 114),10), '#and_aux#', '#qVerificaTipo.Und_CodReop#')
+							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', #auxsitresp#, '#hhmmss#', '#and_aux#', '#qVerificaTipo.Und_CodReop#')
 						</cfquery>
 				<cfelseif form.pontocentlzSN eq 'S' and FORM.nci eq 'Sim' and (qVerificaTipo.Und_TipoUnidade eq 12 or qVerificaTipo.Und_TipoUnidade eq 16)>
 						<cfquery datasource="#dsn_inspecao#">
 							INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area)
-							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', #auxsitresp#, left(convert(char, getdate(), 114),10), '#and_aux#', '#qVerificaArea.Rep_CodArea#')
+							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', #auxsitresp#, '#hhmmss#', '#and_aux#', '#qVerificaArea.Rep_CodArea#')
 						</cfquery>
 				<cfelse>
 						<cfquery datasource="#dsn_inspecao#">
 							INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area)
-							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', #auxsitresp#, left(convert(char, getdate(), 114),10), '#and_aux#', '#unid#')
+							VALUES ('#FORM.ninsp#', '#FORM.unid#', #FORM.ngrup#, #FORM.nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', #auxsitresp#, '#hhmmss#', '#and_aux#', '#unid#')
 						</cfquery>
 				</cfif>
 				<!--- envio de e-mail para area --->

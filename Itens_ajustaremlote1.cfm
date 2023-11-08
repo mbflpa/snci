@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfoutput>
 <cfset sdtatual = dateformat(now(),"YYYYMMDDHH")>
 <cfset sdtarquivo = dateformat(now(),"YYYYMMDDHH")>
@@ -32,7 +33,7 @@
 <cfset auxdadosproc = "">
 <cfset auxdadosnproc = "">
 <cfset qtdnproc = 0>
-<cfset auxdados = "Unidade   N∫InspeÁ„o   Grupo   Item" & CHR(13)>
+<cfset auxdados = "Unidade   Avalia√ß√£o   Grupo   Item" & CHR(13)>
 <cfset arqloteent = ArrayNew(1)>
 <cfset arqlotesai = ArrayNew(1)>
  <cfloop condition = "CountVar gt #sfim#"> 
@@ -170,7 +171,7 @@
 			<cfset aux_posnomearea = #rsAreacs.Ars_Sigla#>
 		</cfif>
 			
-		<!--- Tratamento quanto a data de previs„o da soluÁ„o --->
+		<!--- Tratamento quanto a data de previsÔøΩo da soluÔøΩÔøΩo --->
 		<cfif form.frmdtprev neq "">
 		   <cfset auxano = right(form.frmdtprev,4)>
 		   <cfset auxmes = mid(form.frmdtprev,4,2)>
@@ -200,13 +201,13 @@
 			</cfoutput>
 				<!--- fim loop --->
 			<cfset dtprevsol = CreateDate(year(now()),month(now()),day(now()))>
-			<cfset dtprevsol = "Data de Previs„o da SoluÁ„o: " & #DateFormat(dtnovoprazo,"dd/mm/yyyy")#>
+			<cfset dtprevsol = "Data de Previs√£o da Solu√ß√£o: " & #DateFormat(dtnovoprazo,"dd/mm/yyyy")#>
 		<cfelse>
 			<cfset dtprevsol = "">
 			<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
 		</cfif>   
 		<!--- ++++++++++++++++++++++++++++++++++++++++++++++++++++ --->	   
-		<!--- Tratamento quanto a SituaÁ„o --->	   
+		<!--- Tratamento quanto a SituaÔøΩÔøΩo --->	   
 		<cfif form.frmResp neq "">
 			  <cfquery name="rsPonto" datasource="#dsn_inspecao#">
 				 SELECT STO_Codigo, STO_Sigla, STO_Descricao FROM Situacao_Ponto WHERE STO_Codigo = #form.frmResp#
@@ -218,7 +219,7 @@
 				   <cfset DescStatus = #rsPonto.STO_Descricao#>
 				 </cfif>
 			  </cfloop>   
-			  <cfset Situacao = "SituaÁ„o: " & #DescStatus#>   
+			  <cfset Situacao = "Situa√ß√£o: " & #DescStatus#>   
 		<cfelse>
 			   <cfset IDStatus = "">
 			   <cfset SglStatus = "">
@@ -226,7 +227,7 @@
 			   <cfset Situacao = ""> 
 		</cfif>
 		<!--- Tratamento mensagem da Pos_Parecer e And_Parecer --->
-		<cfset Encaminhamento = 'Opini„o do Controle Interno'>
+		<cfset Encaminhamento = 'Opini√£o do Controle Interno'>
 		<cfif form.frmmensagem neq "">
 			<cfset sinformes = #form.frmmensagem#>
 		<cfelse>
@@ -242,19 +243,21 @@
 		<!---  --->
 		<!--- ++++++++++++++++++++++++++++++++++++++++++++++++++++ --->
 		  <cfif rsPar.recordcount gt 0>   
-	 	   <!--- INICIO tempor·rio para atualizar os pontos LEVES --->
+	 	   <!--- INICIO temporÔøΩrio para atualizar os pontos LEVES --->
 	<!---	   <cfset aux_posarea = #rsPar.Pos_Area#>
 		   <cfset aux_posnomearea = #rsPar.Pos_Nomearea#>
 		   #rsPar.Pos_Area# - #rsPar.Pos_Nomearea#
 		   <CFSET GIL = GIL> --->
-		   <!--- FINAL tempor·rio para atualizar os pontos LEVES --->		  
+		   <!--- FINAL temporÔøΩrio para atualizar os pontos LEVES --->		  
 		     <!--- Atualizar andamento --->
-			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & "-" & TimeFormat(Now(),'HH:MM') & ">" & Trim(Encaminhamento) & CHR(13) & CHR(13) & "¿(O) " & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & "Respons·vel: COORD VERIF CONTR UNID OP/GCOP" & CHR(13) & CHR(13) & "--------------------------------------------------------------------------------------------------------------">
+			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & "-" & TimeFormat(Now(),'HH:MM') & ">" & Trim(Encaminhamento) & CHR(13) & CHR(13) & "√Å(O) " & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & "Respons√°vel: COORD VERIF CONTR UNID OP/GCOP" & CHR(13) & CHR(13) & "--------------------------------------------------------------------------------------------------------------">
+			 <cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+			 <cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
 			 <cfquery datasource="#dsn_inspecao#">
-			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#dbinsp#', '#dbunid#', #dbgrupo#, #dbitem#, convert(char, getdate(), 102), 'Rotina_em_Lote', #IDStatus#, left(convert(char, getdate(), 114),10), '#and_obs#', '#aux_posarea#')
+			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#dbinsp#', '#dbunid#', #dbgrupo#, #dbitem#, convert(char, getdate(), 102), 'Rotina_em_Lote', #IDStatus#, '#hhmmssdc#', '#and_obs#', '#aux_posarea#')
 			 </cfquery>  
 		     <!--- Atualizar ParecerUnidade --->			   
-			  <cfset pos_obs = CHR(13) & #rsPar.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & '¿(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & 'Respons·vel: COORD VERIF CONTR UNID OP/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+			  <cfset pos_obs = CHR(13) & #rsPar.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & 'ÔøΩ(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & 'Respons√°vel: COORD VERIF CONTR UNID OP/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 			   <cfquery datasource="#dsn_inspecao#">
 			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = #IDStatus# 
 			   , Pos_Situacao = '#SglStatus#'
@@ -383,14 +386,14 @@
 					<!---  <cfset sdestina = "gilvanm@correios.com.br"> --->
 				    <cfset auxse = left(arqlotesai[nCont],2)>
 				    <cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="Ajuste por Lote" type="HTML">  
-						  Mensagem autom·tica. N„o precisa responder!<br><br> 
+						  Mensagem autom√°tica. N√£o precisa responder!<br><br> 
 					 <strong>
 					  #form.frmemail#<br><br>
 						<table>
 							<tr>
 							<td><strong>Unidade</strong></td>
-							<td><strong>Descricao</strong></td>
-							<td><strong>InspeÁ„o</strong></td>
+							<td><strong>Descri√ß√£o</strong></td>
+							<td><strong>Avalia√ß√£o</strong></td>
 							<td><strong>Grupo</strong></td>
 							<td><strong>Item</strong></td>
 							</tr>
@@ -414,7 +417,7 @@
 							  <cfset itemagrupa = trim(mid(arqlotesai[x],sinic,len(arqlotesai[x])))>
 							  <cfset sinic = 0>
 							  <cfset sfim = 0>
-							 <!--- DescriÁ„o da Unidade --->
+							 <!--- DescriÔøΩÔøΩo da Unidade --->
 							 <cfquery name="rsDescUnid" datasource="#dsn_inspecao#">
 								 SELECT Und_Descricao 
 								 FROM Unidades 
@@ -503,14 +506,14 @@
 					 <!--- <cfset sdestina = "gilvanm@correios.com.br">  --->
 				    <cfset auxse = left(arqlotesai[nCont],2)>
 				    <cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="Ajuste por Lote" type="HTML"> 
-						 Mensagem autom·tica. N„o precisa responder!<br><br>
+						 Mensagem autom√°tica. N√£o precisa responder!<br><br>
 					 <strong>
 					 #form.frmemail#<br><br> 
 						<table>
 							<tr>
 							<td><strong>Unidade</strong></td>
 							<td><strong>Descricao</strong></td>
-							<td><strong>InspeÁ„o</strong></td>
+							<td><strong>Avalia√ß√£o</strong></td>
 							<td><strong>Grupo</strong></td>
 							<td><strong>Item</strong></td>
 							</tr>
@@ -533,7 +536,7 @@
 							  <cfset itemagrupa = trim(mid(arqlotesai[x],sinic,len(arqlotesai[x])))>
 							  <cfset sinic = 0>
 							  <cfset sfim = 0>
-							 <!--- DescriÁ„o da Unidade --->
+							 <!--- DescriÔøΩÔøΩo da Unidade --->
 							 <cfquery name="rsDescUnid" datasource="#dsn_inspecao#">
 								 SELECT Und_Descricao 
 								 FROM Unidades 
@@ -610,7 +613,7 @@ var x=document.form1.nci.value;
 	if (x == 'Sim' && k.length == 20)
     {
 	document.form1.nseincirel.value = k;
-	alert('Gestor(a), Para essa informaÁ„o È necess·rio registrar um anexo');
+	alert('Gestor(a), Para essa informa√ß√£o √© necess√°rio registrar um anexo');
 	}
 }
 //===================
@@ -723,8 +726,8 @@ function validafrm()
 	   var anexoSN = 'N';   
 	   if (document.form1.existeanexo.value == "N")
 		{
-		   var auxcam = "\n\nN„o existe arquivo Anexo para esse Lote.\n\n Confirma em continuar mesmo assim?";
-		 if (confirm ('            AtenÁ„o! ' + auxcam))
+		   var auxcam = "\n\nN√£o existe arquivo Anexo para esse Lote.\n\n Confirma em continuar mesmo assim?";
+		 if (confirm ('            Aten√ß√£o! ' + auxcam))
 			{
 			anexoSN = 'S';
 			}
@@ -738,9 +741,9 @@ function validafrm()
 	   var auxemail = document.form1.frmemail.value;
 	   if (auxemail == "")
 		{
-		   var auxcam = "\n\nMensagem para o corpo do E-mail ao CCOP/SE, est· vazio!\n\n Confirma em continuar mesmo assim?";
+		   var auxcam = "\n\nMensagem para o corpo do E-mail ao CCOP/SE, est√° vazio!\n\n Confirma em continuar mesmo assim?";
 	
-		 if (confirm ('            AtenÁ„o! ' + auxcam))
+		 if (confirm ('            Aten√ß√£o! ' + auxcam))
 			{
 			emailSN = 'S';
 			}
@@ -752,7 +755,7 @@ function validafrm()
 	   
        if (auxemail == "" && emailSN == 'N')
 	   {
-	     alert("Caro Usu·rio, Mensagem para o corpo do E-mail ao CCOP/SE, est· vazio!");
+	     alert("Caro Usu√°rio, Mensagem para o corpo do E-mail ao CCOP/SE, est√° vazio!");
 	      return false;
 	   }
 	   //*******************************	 
@@ -760,8 +763,8 @@ function validafrm()
 	   var auxmenhist = document.form1.frmmensagem.value;
 	   if (auxmenhist == "")
 		{
-		    var auxcam = "\n\nMensagem para registro no histÛrico do ponto, est· vazio!\n\n Confirma em continuar mesmo assim?";
-		 if (confirm ('            AtenÁ„o! ' + auxcam))
+		    var auxcam = "\n\nMensagem para registro no hist√≥rico do ponto, est√° vazio!\n\n Confirma em continuar mesmo assim?";
+		 if (confirm ('            Aten√ß√£o! ' + auxcam))
 			{
 			msgSN = 'S';
 			}
@@ -773,15 +776,15 @@ function validafrm()
 
        if (auxmenhist == "" && msgSN == 'N')
 	   {
-	   alert("Caro Usu·rio, Mensagem para registro no histÛrico do ponto,  est· vazio!");
+	   alert("Caro Usu√°rio, Mensagem para registro no hist√≥rico do ponto,  est√° vazio!");
 	   return false;
 	   }
      //**********************************
        var sitSN = 'N';   
 	/*   if (document.form1.frmResp.value == "")
 		{
-		   var auxcam = "\n\nFoi identificado a falta da SituaÁ„o para esse Lote.\n\n Confirma em continuar a execuÁ„o da rotina?";
-		 if (confirm ('            AtenÁ„o! ' + auxcam))
+		   var auxcam = "\n\nFoi identificado a falta da Situa√ß√£o para esse Lote.\n\n Confirma em continuar a execu√ß√£o da rotina?";
+		 if (confirm ('            Aten√ß√£o! ' + auxcam))
 			{
 			sitSN = 'S';
 			}
@@ -794,13 +797,13 @@ function validafrm()
 	   var auxsit = document.form1.frmResp.value;
 	   if (auxsit == '' && sitSN == "N")
 		  {
-		   alert('Caro Usu·rio, Selecione uma SituaÁ„o!');
+		   alert('Caro Usu√°rio, Selecione uma Situa√ß√£o!');
 		   return false;
 		  }
 
 	   if ((auxsit == 9 || auxsit == 29) && (document.form1.cbareacs.value == ''))
 		  {
-		   alert('Caro Usu·rio, Selecione a ¡rea(CS)!');
+		   alert('Caro Usu√°rio, Selecione a √Årea(CS)!');
 		   return false;
 		  }		
 		//******************************************
@@ -808,9 +811,9 @@ function validafrm()
 		 var dtprevSN = 'N';
 /*		 if (dtprevdig == "")
 		{
-		   var auxcam = "\n\nFoi identificado a Falta da Data de Previs„o da SoluÁ„o.\n\n Confirma em continuar a execuÁ„o da rotina?";
+		   var auxcam = "\n\nFoi identificado a Falta da Data de Previs√£o da Solu√ß√£o.\n\n Confirma em continuar a execu√ß√£o da rotina?";
 	
-		 if (confirm ('            AtenÁ„o! ' + auxcam))
+		 if (confirm ('            Aten√ß√£o! ' + auxcam))
 			{
 			dtprevSN = 'S';
 			}
@@ -822,7 +825,7 @@ function validafrm()
 */	
 		if (dtprevdig.length != 10 && dtprevSN == 'N')
 		{
-			alert("Preencher campo: Data da Previs„o da SoluÁ„o ex. DD/MM/AAAA");
+			alert("Preencher campo: Data da Previs√£o da Solu√ß√£o ex. DD/MM/AAAA");
 			return false;
 		}
 		
@@ -835,7 +838,7 @@ function validafrm()
 
 		if (dt_hoje_yyyymmdd > dtprevdig_yyyymmdd && dtprevSN == 'N')
 		{
-		  alert('Data de Previs„o da SoluÁ„o deve ser superior a data corrente(do dia)!')
+		  alert('Data de Previs√£o da Solu√ß√£o deve ser superior a data corrente(do dia)!')
 		  return false;
 		}		
 		//********************************
@@ -1047,7 +1050,7 @@ function validafrm()
   <tr>
   <td colspan="3" class="exibir"><div align="center"></div>    
     <div align="center">
-	  <input name="Submit" type="submit" class="botao" value="Confirmar a AtualizaÁ„o em Lote" onClick="document.form1.acao.value='Salvar'">
+	  <input name="Submit" type="submit" class="botao" value="Confirmar a Atualiza√ß√£o em Lote" onClick="document.form1.acao.value='Salvar'">
     </div></td>
     </tr>
 </table>

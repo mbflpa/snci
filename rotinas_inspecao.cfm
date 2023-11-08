@@ -1,5 +1,14 @@
 
 <cfoutput>
+ #timeFormat(now(), "HH:mm:ssl")# <br>
+ <cfset hhmmssd = timeFormat(now(), "HH:mm:ssl")>
+ <cfset hhmmssd = left(hhmmssd,2) & mid(hhmmssd,4,2) & mid(hhmmssd,7,2) & mid(hhmmssd,9,1)>
+status 11: #hhmmssd#<br>
+<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+ <cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
+status 14: #hhmmssdc#<br>
+<cfdump  var="#cgi#">
+<cfabort>
 	<cfset auxnaveg = ''>
 	<cfif find('Edg', '#cgi.HTTP_USER_AGENT#') gt 0>
 	<cfelseif  find('MSIE', '#cgi.HTTP_USER_AGENT#') gt 0>

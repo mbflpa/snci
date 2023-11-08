@@ -175,9 +175,11 @@
 		<!---  --->		
 			<!--- Inserindo dados dados na tabela Andamento --->
 			<cfset andparecer = #posarea_cod#  & " --- " & #posarea_nome#>
+			<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
+			<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
 			<cfquery datasource="#dsn_inspecao#">
 				insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
-				values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, CONVERT(char, GETDATE(), 108), '#andparecer#', '#posarea_cod#')
+				values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, '#hhmmss#', '#andparecer#', '#posarea_cod#')
 			</cfquery>
 			<!---Fim Insere Andamento --->
 		</cfif> 
@@ -291,11 +293,12 @@
 				WHERE And_Unidade='#qNaoRespondido.Pos_Unidade#' AND And_NumInspecao='#qNaoRespondido.Pos_Inspecao#' AND And_NumGrupo=#qNaoRespondido.Pos_NumGrupo# AND And_NumItem=#qNaoRespondido.Pos_NumItem# 
 				AND And_Situacao_Resp = 14
 			</cfquery> 
-			
+			<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+			<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
 			<cfif qNaoRespondido.Pos_Situacao_Resp eq 14 and rs14SN.recordcount lte 0>
 				<cfquery datasource="#dsn_inspecao#">
 					INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-					VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, left(convert(char, getdate(), 114),10),'#FORM.unid#')
+					VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#','#FORM.unid#')
 				</cfquery>
 			</cfif>
 
@@ -450,11 +453,12 @@
 							WHERE And_Unidade='#qNaoRespondido.Pos_Unidade#' AND And_NumInspecao='#qNaoRespondido.Pos_Inspecao#' AND And_NumGrupo=#qNaoRespondido.Pos_NumGrupo# AND And_NumItem=#qNaoRespondido.Pos_NumItem# 
 							AND And_Situacao_Resp = 14
 						</cfquery> 
-						
+						<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+						<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>						
 						<cfif qNaoRespondido.Pos_Situacao_Resp eq 14 and rs14SN.recordcount lte 0>
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-								VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #qNaoRespondido.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, left(convert(char, getdate(), 114),10),'#FORM.unid#')
+								VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #qNaoRespondido.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#','#FORM.unid#')
 							</cfquery>
 						</cfif>
 
@@ -730,6 +734,7 @@
 				Select Pos_Inspecao from ParecerUnidade 
 				where Pos_Unidade = '#FORM.unid#' and Pos_Inspecao= '#FORM.Ninsp#' and Pos_NumGrupo = #FORM.Ngrup# and Pos_NumItem = #FORM.Nitem#
 			</cfquery>	
+
 			<cfif rsExiste.recordcount lte 0>									
 				<cfquery datasource="#dsn_inspecao#">
 					INSERT INTO ParecerUnidade (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_NomeResp, Pos_Situacao, Pos_Parecer, Pos_co_ci, Pos_dtultatu, Pos_username, Pos_aval_dinsp, Pos_Situacao_Resp, Pos_Area, Pos_NomeArea, Pos_NCISEI, Pos_PontuacaoPonto, Pos_ClassificacaoPonto) 
@@ -737,12 +742,15 @@
 							CONVERT(char, GETDATE(), 102), '#CGI.REMOTE_USER#', 'RE', '', 'INTRANET', CONVERT(char, GETDATE(), 120), '#CGI.REMOTE_USER#', NULL, 0,
 							'#posarea_cod#','#posarea_nome#','#rsVerificaItem.RIP_NCISEI#', #ItnPontuacao#,'#ClasItem_Ponto#')
 				</cfquery>
+				
 					<!---Fim Insere ParecerUnidade --->
 						<!--- Inserindo dados dados na tabela Andamento --->
 						<cfset andparecer = #posarea_cod#  & " --- " & #posarea_nome#>
+						<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
+						<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>							
 						<cfquery datasource="#dsn_inspecao#">
 							insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
-							values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, CONVERT(char, GETDATE(), 108), '#andparecer#', '#posarea_cod#')
+							values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, '#hhmmss#', '#andparecer#', '#posarea_cod#')
 						</cfquery>
 						<!---Fim Insere Andamento --->
 			</cfif>

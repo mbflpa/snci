@@ -106,7 +106,7 @@
 				And_NumInspecao = '#rsSLNC.Pos_Inspecao#' AND 
 				And_NumGrupo = #rsSLNC.Pos_NumGrupo# AND 
 				And_NumItem = #rsSLNC.Pos_NumItem# AND 
-				And_Situacao_Resp = 14 and And_DtPosic >= #dtlimitst14NR#
+				And_Situacao_Resp = 14 and And_DtPosic >= #dt30diasuteis14NR#
 			</cfquery>
 			 <cfif rs14.recordcount gt 0> 
 				<cfset SalvarSN = 'N'>
