@@ -44,6 +44,7 @@
                             <h5>Correções:</h5>
                             <ul>
                                 <li>Corrigido título dos arquivos em Excel que eram exportados das tabelas;</li>
+                                <li>Corrigido largura da tabela que ultrapassava o conteiner quando exibia status com a descrição mais longa;</li>
                                 <li>Corrigido o problema que causava a exibição incorreta de imagens;</li>
                                 <li>Corrigido o posicionamento do scroll das páginas após a seleção de alguma aba com informações sobre o processo.</li>
                             </ul>
