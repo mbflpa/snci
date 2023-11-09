@@ -146,7 +146,7 @@
 				<div class="card" >
 					
 					<!-- card-body -->
-					<div class="card-body" style="margin-bottom:100px">
+					<div class="card-body" >
 						<cfif #rsProcTab.recordcount# eq 0 >
 							<h5 align="center">Nenhuma Orientação para acompanhamento foi localizada para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
 						</cfif>
