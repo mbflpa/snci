@@ -156,7 +156,7 @@
 								
 								<thead style="background: #0083ca;color:#fff">
 									<tr style="font-size:14px">
-										<th style="" ></th>
+										
 										<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 											<th id="colunaEmAnalise"style="text-align: center!important;">Colocar<br>em análise</th>
 										</cfif>
@@ -180,7 +180,7 @@
 									<cfloop query="rsProcTab" >
 										<cfoutput>					
 											<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
-													<td class="selecionar"></td>
+													
 													<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 														<td align="center">
 															<cfif (#pc_aval_orientacao_status# neq 13 and #pc_aval_orientacao_status# neq 14) or (#pc_aval_orientacao_status# eq 13 and mcuOrgResp eq '#application.rsUsuarioParametros.pc_usu_lotacao#' and orgaoOrigem neq '#application.rsUsuarioParametros.pc_usu_lotacao#') or (#pc_aval_orientacao_status# eq 13 and (mcuOrgResp neq '#application.rsUsuarioParametros.pc_usu_lotacao#' or orgaoOrigem neq '#application.rsUsuarioParametros.pc_usu_lotacao#'))>
@@ -289,28 +289,18 @@
 				}
 
 				if ($('#colunaEmAnalise').is(':visible')) {
-				 var colunasMostrar = [2,7,8,11,13,14];
-				} else {
 				 var colunasMostrar = [1,6,7,10,12,13];
+				} else {
+				 var colunasMostrar = [0,5,6,9,11,12];
 				}
 
 				const tabOrientacoesProcessosAcomp = $('#tabProcessos').DataTable( {
 				
-					columnDefs: [
-						{ "orderable": false, "targets": 0 },//impede que a primeira coluna seja ordenada
-					],
 					stateSave: true,
-					select: true, // Permitir seleção de linhas
-					responsive: true, // Tornar a tabela responsiva
-					lengthChange: true, // Permitir ao usuário alterar o número de itens exibidos por página
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
 					scrollX: true, // Permitir rolagem horizontal
         			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
-					lengthMenu: [
-						[5, 10, 25, 50, -1],
-						[5, 10, 25, 50, 'Todos'],
-					],
-					//dom: "<'dtsp-verticalContainer'<'dtsp-verticalPanes'P><'dtsp-dataTable'lBrfitp>>",
+					pageLength: 5,
 					dom: 
 								"<'row'<'col-sm-4 dtsp-verticalContainer'<'dtsp-verticalPanes'P><'dtsp-dataTable'Bf>><'col-sm-8 text-left'p>>" +
 								"<'col-sm-12 text-left'i>" +

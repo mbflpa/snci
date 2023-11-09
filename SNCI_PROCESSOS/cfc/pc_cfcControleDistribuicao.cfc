@@ -55,7 +55,7 @@
 							<table id="tabProcessos" class="table table-bordered table-striped table-hover text-nowrap">
 								<thead style="background: #0083ca;color:#fff">
 									<tr style="font-size:14px">
-									    <th id="colunaMaisInfo" style="" ></th>
+									    
 									    <cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 											<th id="colunaEmAnalise" style="text-align: center!important;width: 20px!important;">Colocar<br>em análise</th>
 										</cfif>
@@ -81,7 +81,7 @@
 									<cfloop query="rsProcTab" >
 										<cfoutput>					
 											<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
-											        <td class="selecionar"></td>
+											        
 													<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 														<td align="center">
 															<cfif #pc_aval_orientacao_status# eq 2 or #pc_aval_orientacao_status# eq 3 or #pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5 or (#pc_aval_orientacao_status# eq 13 && '#orgaoOrigem#' neq '#mcuOrgResp#')>
@@ -181,32 +181,23 @@
 
 				if ($('#colunaEmAnalise').is(':visible')) {
 				 //var colunasMostrar = [0,1,3,4,5,9,11];
-				  var colunasMostrar = [2,6,7,10,12,13];
+				  var colunasMostrar = [1,5,6,9,11,12];
 				} else {
 				  if(controleInterno == 'S'){
 					//var colunasMostrar = [0,2,3,4,8,10];
-				 	var colunasMostrar = [1,5,6,9,11,12];	
+				 	var colunasMostrar = [0,4,5,8,10,11];	
 				  }else{
-					var colunasMostrar = [1,6,7,10,12,13];	
+					var colunasMostrar = [0,5,6,9,11,12];	
 				  }
 				 
 				}
 				//initialize datatable
 				const tabOrientacoesAcomp = $('#tabProcessos').DataTable( {
-					columnDefs: [
-						{ "orderable": false, "targets": 0 },//impede que a primeira coluna seja ordenada
-					],
 					stateSave: true,
-					select: true, // Permitir seleção de linhas
-					responsive: true, // Tornar a tabela responsiva
-					lengthChange: true, // Permitir ao usuário alterar o número de itens exibidos por página
-					autoWidth: false, // Desativar ajuste automático da largura das colunas
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					lengthMenu: [
-						[5, 10, 25, 50, -1],
-						[5, 10, 25, 50, 'Todos'],
-					],
-					//dom: "<'dtsp-verticalContainer'<'dtsp-verticalPanes'P><'dtsp-dataTable'lBrfitp>>",
+					scrollX: true, // Habilitar rolagem horizontal
+        			autoWidth: true, //largura da tabela de acordo com o conteúdo
+					pageLength: 5,
 					dom: 
 								"<'row'<'col-sm-4 dtsp-verticalContainer'<'dtsp-verticalPanes'P><'dtsp-dataTable'Bf>><'col-sm-8 text-left'p>>" +
 								"<'col-sm-12 text-left'i>" +
@@ -1546,17 +1537,12 @@
 					responsive: true, 
 					lengthChange: true, 
 					autoWidth: false,
-					// fixedHeader: true,
-					// fixedHeader: {
-					// 	headerOffset: $('.main-header').outerHeight()
-					// },
 					lengthMenu: [
-						[10, 25, 50, -1],
-						[10, 25, 50, 'Todos'],
+						[5,10, 25, 50, -1],
+						[5,10, 25, 50, 'Todos'],
 					],
 					
-					}).buttons().container().appendTo('#tabMelhoriasPendentes_wrapper .col-md-6:eq(0)');
-
+				});
 
 			} );
 

@@ -631,7 +631,7 @@
 								<table id="tabProcessos" class="table table-bordered table-striped table-hover text-nowrap">
 									<thead style="background: #0083ca;color:#fff">
 										<tr style="font-size:14px">
-											<th style="width:5px;background:#fff;border:none" ></th>
+											
 											<th>N°Processo SNCI:</th>
 											<th>Status do Processo: </th>
 											<th >SE/CS:</th>
@@ -671,7 +671,7 @@
 											<cfoutput>					
 												<tr style="cursor:pointer;font-size:12px" >
 																	
-														<td></td>
+														
 														<td align="center" onclick="javascript:exibirTabelaAvaliacoes(<cfoutput>'#rsProcTab.pc_processo_id#'</cfoutput>,this)">#pc_processo_id#</td>
 														<td onclick="javascript:exibirTabelaAvaliacoes(<cfoutput>'#rsProcTab.pc_processo_id#'</cfoutput>,this)">#pc_status_descricao#</td>
 													
@@ -747,14 +747,13 @@
 				tituloExcel = "SNCI_Consulta_Processos_Finalizados_";
 			}
 			$('#tabProcessos').DataTable( {
-				columnDefs: [
-					{ "orderable": false, "targets": 0 }//impede que a primeira coluna seja ordenada
-				],
-				order: [[ 1, "desc" ]],
 				stateSave: true,
-				responsive: true, 
-				lengthChange: true, 
+				scrollX: true, // Habilitar rolagem horizontal
 				autoWidth: false,
+				lengthMenu: [
+						[5,10, 25, 50, -1],
+						[5,10, 25, 50, 'Todos'],
+					],
 				buttons: [{
 						extend: 'excel',
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
@@ -770,42 +769,7 @@
 		} );
 
 		$(document).ready(function() {
-			var table = $('#tabProcessos').DataTable();
-			var filtroSpan = $('#filtroSpan');
-			var contadorPisca = 0;
 			
-			function piscaTexto() {
-				filtroSpan.fadeOut(500, function() {
-					filtroSpan.fadeIn(500, function() {
-						contadorPisca++;
-						
-						if (contadorPisca < 2) {
-							piscaTexto();
-						}
-					});
-				});
-			}
-			// Verificar se o DataTable está filtrado e exibir o span correspondente
-			if (table.search() !== '') {
-				$('#filtroSpan').show();
-				// Mostra a div e inicia a animação de piscar
-				filtroSpan.show();
-				piscaTexto();
-			} else {
-				$('#filtroSpan').hide();
-			}
-
-			// Atualizar o span quando houver filtragem
-			table.on('search.dt', function() {
-				if (table.search() !== '') {
-					$('#filtroSpan').show();
-					// Mostra a div e inicia a animação de piscar
-					filtroSpan.show();
-					piscaTexto();
-				} else {
-					$('#filtroSpan').hide();
-				}
-			});
 
 		});
 				
