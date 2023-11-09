@@ -245,6 +245,8 @@
 					lengthChange: true, // Permitir ao usuário alterar o número de itens exibidos por página
 					autoWidth: false, // Desativar ajuste automático da largura das colunas
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+					scrollX: true, // Habilitar rolagem horizontal
+        			autoWidth: true, //largura da tabela de acordo com o conteúdo
 					lengthMenu: [
 						[5, 10, 25, 50, -1],
 						[5, 10, 25, 50, 'Todos'],

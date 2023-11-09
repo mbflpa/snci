@@ -158,17 +158,17 @@
 									<tr style="font-size:14px">
 										<th style="" ></th>
 										<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
-											<th id="colunaEmAnalise"style="text-align: center!important;width: 20px!important;">Colocar<br>em análise</th>
+											<th id="colunaEmAnalise"style="text-align: center!important;">Colocar<br>em análise</th>
 										</cfif>
-										<th style="width: 30px!important;">Status:</th>
-										<th style="text-align: center!important;width: 20px!important;">N° Processo SNCI</th>
+										<th style="width:50px">Status:</th>
+										<th style="text-align: center!important;">N° Processo SNCI</th>
 										<th >N° Item:</th>
-										<th style="text-align: center!important;width: 20px!important;">ID da<br>Orientação</th>
-										<th style="text-align: center!important;width: 20px!important;">Data Prevista<br>p/ Resposta</th>
+										<th style="text-align: center!important;">ID da<br>Orientação</th>
+										<th style="text-align: center!important;">Data Prevista<br>p/ Resposta</th>
 										<th >Órgão Responsável: </th>
 										<th >SE/CS:</th>
 										<th >N° SEI: </th>
-										<th style="text-align: center!important;width: 20px!important;">N° Relatório<br>SEI</th>
+										<th style="text-align: center!important;">N° Relatório<br>SEI</th>
 										<th >Tipo de Avaliação:</th>	
 										<th >Data Hora Status: </th>
 										<th >Órgão Origem: </th>
@@ -305,6 +305,8 @@
 					lengthChange: true, // Permitir ao usuário alterar o número de itens exibidos por página
 					autoWidth: false, // Desativar ajuste automático da largura das colunas
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+					scrollX: true,
+        			autoWidth: true,
 					lengthMenu: [
 						[5, 10, 25, 50, -1],
 						[5, 10, 25, 50, 'Todos'],
