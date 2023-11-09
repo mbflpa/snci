@@ -2820,7 +2820,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 														<div class="timeline-item">
 															<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
 															
-															<span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
+															<span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 															<div class="card card-primary collapsed-card posicContInterno" >
 																<div class="card-header" style="background-color:<cfif ListFind('13,14,16', #pc_aval_posic_status#)>red<cfelse>##ececec;</cfif>">
@@ -2833,7 +2833,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 																			<cfelse>
 																				De: #pc_org_sigla# (#pc_usu_nome#) 
 																			</cfif>
-																			<span style="margin-left:20px;float:right">(id: #pc_aval_posic_id#)</span>
+																			
 																	</a>
 																
 																</div>
@@ -2908,7 +2908,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 															<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
 															
 															
-														    <span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
+														    <span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 															<div class="card card-primary collapsed-card posicOrgAvaliado" >
 															
@@ -2921,7 +2921,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 																			<cfelse>
 																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
 																			</cfif>
-																		    <span style="margin-left:20px;float:right">(id: #pc_aval_posic_id#)</span>
+																		    
 																	</a>
 
 																	
@@ -3976,7 +3976,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 												</cfoutput>
 												<div class="timeline-item" >
 													<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
-													<span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
+													<span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 													<div class="card card-primary collapsed-card posicContInterno" >
 														<div class="card-header" style="background-color: <cfif ListFind('13,14,16', #pc_aval_posic_status#)>red<cfelse> ##28a745;</cfif>">
@@ -4060,7 +4060,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 												<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
 												<div class="timeline-item" >
 													<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
-													<span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
+													<span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 													<div class="card card-primary collapsed-card  posicOrgAvaliado" >
 														<div class="card-header" style="background-color: ##ececec;">

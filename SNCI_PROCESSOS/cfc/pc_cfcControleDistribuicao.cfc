@@ -2478,7 +2478,7 @@
 												<i class="fas fa-user bg-green"  style="margin-top:6px"></i>
 												<div class="timeline-item" >
 													<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
-													<span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
+													<span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 													<div class="card card-primary collapsed-card posicContInterno" >
 														<div class="card-header" style="background-color: ##28a745;">
@@ -2557,7 +2557,7 @@
 												<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
 												<div class="timeline-item" >
 													<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
-													<span class="time" style="padding:4px;"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#</span>
+													<span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 													<div class="card card-primary collapsed-card  posicOrgAvaliado" >
 														<div class="card-header" style="background-color: ##ececec;">
