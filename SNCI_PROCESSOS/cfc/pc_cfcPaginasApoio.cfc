@@ -829,9 +829,9 @@
 					
 					<cfset textoEmail = 'Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas. 
 
-		Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:
+Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:
 
-		<a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a>'>
+<a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a>'>
 								
 					<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
 					<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
