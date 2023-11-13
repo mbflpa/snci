@@ -3235,6 +3235,7 @@
 					<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 						SELECT  pc_avaliacao_orientacoes.*,pc_avaliacoes.*, pc_processos.pc_modalidade, pc_processos.pc_iniciarBloqueado
 						,pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_email, pc_orgao_avaliado.pc_org_email as pc_orgao_avaliado_email
+						,pc_orgao_avaliado.pc_org_sigla as pc_orgao_avaliado_sigla
 						FROM pc_avaliacao_orientacoes
 						LEFT JOIN  pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
 						INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
@@ -3317,7 +3318,7 @@
 				<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_descricao))#>
 			</cfif>
 			<!-- se sigla do órgão avaliado começar com SE/, sem espaço antes, usa o pronome de tratamento "Senhor(a) Superintendente Estadual", caso contrárioa usa "Senhor(a) Chefe de Departamento"-->
-			<cfif left(rsOrientacoes.pc_org_sigla,3) eq 'SE/'>
+			<cfif left(LTrim(RTrim(rsOrientacoes.pc_orgao_avaliado_sigla)),3) eq 'SE/'>
 				<cfset pronomeTrat = "Senhor(a) Superintendente Estadual da #siglaOrgaoAvaliado#">
 			<cfelse>
 				<cfset pronomeTrat = "Senhor(a) Chefe de Departamento do #siglaOrgaoAvaliado#">
