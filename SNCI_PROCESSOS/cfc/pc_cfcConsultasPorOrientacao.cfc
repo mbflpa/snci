@@ -441,6 +441,14 @@
 						var mensagem = '<p style="text-align: justify;">Deseja colocar esta orientação ID <strong style="color:red">' + idOrientacao + '</strong> "EM ANÁLISE" sob responsabilidade do órgão de origem do processo (<strong>'+orgaoOrigemSigla +'</strong>)?</p>';
 						enviaOrgao = 1;
 					}
+					<cfoutput>
+						var processoEmAcompanhamento =  "#arguments.processoEmAcompanhamento#";
+					</cfoutput>
+					if(processoEmAcompanhamento !=='true'){
+						mensagem = mensagem + '<p style="text-align: justify;color:red">Atenção! Ao colocar esta orientação em análise, o processo voltará para o status <strong>"EM ACOMPANHAMENTO"</strong>.</p>';
+					}
+
+
 					Swal.fire({//sweetalert2
 					html: logoSNCIsweetalert2(mensagem),
 					showCancelButton: true,
@@ -510,6 +518,12 @@
 				
 				}else{
 					var mensagem = '<p style="text-align: justify;">Deseja colocar esta orientação ID <strong style="color:red">'+idOrientacao+'</strong> "EM ANÁLISE"?</p>';
+					<cfoutput>
+						var processoEmAcompanhamento =  "#arguments.processoEmAcompanhamento#";
+					</cfoutput>
+					if(processoEmAcompanhamento !=='true'){
+						mensagem = mensagem + '<p style="text-align: justify;color:red">Atenção! Ao colocar esta orientação em análise, o processo voltará para o status <strong>"EM ACOMPANHAMENTO"</strong>.</p>';
+					}
 					Swal.fire({//sweetalert2
 					html: logoSNCIsweetalert2(mensagem),
 					input: 'checkbox',
