@@ -1,6 +1,6 @@
 <cfparam name="opcao" default="vazio"> 
   <cfset vAcesso = true>
-   <cfif Not ListContains(Lista_SINS,UCase(cgi.REMOTE_USER))>
+   <cfif Not ListContains(Lista_SINS,UCase(snci.login))>
    <table width="100%" border="0" cellpadding="0" cellspacing="0">
      <tr>
       <td height="60"><img src="topoginsp.jpg" width="780" height="60"></td>
@@ -254,7 +254,7 @@
   </table>
 </body>
 </html>
-<cfif Ucase(CGI.REMOTE_USER) is 'PE\DESENVOLVEDOR'>
+<cfif Ucase(snci.login) is 'PE\DESENVOLVEDOR'>
 	<!---<cfdirectory directory="#GetDirectoryFromPath(GetTemplatePath())#\respostas_acf" name = "pasta" filter="*.xml">--->
 	<cfdirectory directory="#servidor_ftp#" name = "pasta" filter="*.xml">
 	<cfif pasta.recordcount neq 0>

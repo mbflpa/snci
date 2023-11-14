@@ -1,45 +1,51 @@
+<cfif (not isDefined("snci.permitir")) OR (snci.permitir eq 'False')>
+	<cfinclude template="aviso_sessao_encerrada.htm">
+	<cfabort> 
+</cfif> 
+<!--- Limpara variáveis globais --->
+<cfset snci.gesavaliacao=''>
+<cfset snci.gesunidade=''>
+<cfset snci.gesgrupo=''>
+<cfset snci.gesitem=''>
+
 <cfprocessingdirective pageEncoding ="utf-8"/> 
 
-<cfif isDefined("dtinic") And dtinic neq "">
-  <cfset dtinic =  dateformat(dtinic,"DD/MM/YYYY")>
-  <cfset dtfim = dateformat(dtfim,"DD/MM/YYYY")> 
-  <cfset dtinic =  CREATEDATE(YEAR(dtinic),MONTH(dtinic),DAY(dtinic))>
-  <cfset dtfim = CREATEDATE(YEAR(dtfim),MONTH(dtfim),DAY(dtfim))> 
-<cfelse>
-	<cfset dtinic = CreateDate(year(now()),month(now()),day(now()))>
-	<cfset dtfim = CreateDate(year(now()),month(now()),day(now()))>
-</cfif> 
+<cfset snci.filtrotipo=#ckTipo#>
+<cfset snci.filtronumaval=''>
+<cfset snci.filtrodtinic = year(now()) & '-' & month(now()) & '-' & day(now())>
+<cfset snci.filtrodtfim = year(now()) & '-' & month(now()) & '-' & day(now())>
+<cfset snci.filtrocodse=''>
+<cfset snci.filtrostatus=''>
 
-<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
- <cfinclude template="aviso_sessao_encerrada.htm">
-	  <cfabort> 
-</cfif>        
+<cfif snci.filtrotipo eq 'periodo'>
+	<cfset snci.filtrodtinic = #lsdateformat(dtinic,"YYYY-MM-DD")#>
+	<cfset snci.filtrodtfim = #lsdateformat(dtfim,"YYYY-MM-DD")#>
+	<cfset snci.filtrocodse=#SE#>
+</cfif>
+<cfif snci.filtrotipo eq 'inspecao'>
+	<cfset snci.filtronumaval=#numavaliacao#>
+</cfif>
+<cfif snci.filtrotipo eq 'status'>
+	<cfset snci.filtrostatus=#selStatus#>
+	<cfset snci.filtrocodse=#statusse#>
+</cfif>
+<!---
+<cfoutput>
+  Tipo: #snci.filtrotipo#<br>
+  snci.filtronumaval: #snci.filtronumaval# <br>
+  snci.filtrodtinic: #snci.filtrodtinic# <br>
+  snci.filtrodtfim: #snci.filtrodtfim# <br>
+  snci.filtrocodse: #snci.filtrocodse#<br>
+  snci.filtrostatus: #snci.filtrostatus#<br>
+</cfoutput>
+--->     
   
 <cfsetting requesttimeout="15000">
 <CFSET gestorMaster = 'GESTORMASTER'>
-<cfquery name="qUsuarioGestorMaster" datasource="#dsn_inspecao#">
-  SELECT DISTINCT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#' and Usu_GrupoAcesso = 'GESTORMASTER'
+<cfquery name="qUsuarioGestorMaster" datasource="#snci.dsn#">
+  SELECT DISTINCT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#snci.login#' and Usu_GrupoAcesso = 'GESTORMASTER'
 </cfquery>
-<cfquery name="qUsuario" datasource="#dsn_inspecao#">
-  SELECT Usu_DR, Usu_Matricula, Usu_Coordena FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
-</cfquery>
-<cfset UsuCoordena = trim(qUsuario.Usu_Coordena)>
-<cfif isDefined("Session.E01")>
-  <cfset StructClear(Session.E01)>
-</cfif>
-<cfif isDefined("url.SE") >
-	<cfset SE = #url.SE#>
-<cfelse>
-	<cfset SE = ''>
-</cfif> 
-<cfset txtNum_Inspecao = "">
-<cfif IsDefined("url.ninsp")>
-    <cfset txtNum_Inspecao = url.ninsp>
-<cfelseif IsDefined("url.txtNum_Inspecao")>
-	<cfset txtNum_Inspecao = url.txtNum_Inspecao>	
-<cfelse>
-	<cfset txtNum_Inspecao = "">
-</cfif>
+
 <!--- limpar .XLS --->
 <cfset sdtatual = dateformat(now(),"YYYYMMDDHH")>
 <cfset sdtarquivo = dateformat(now(),"YYYYMMDDHH")>
@@ -64,25 +70,25 @@
 <!---  <cfdump var="#Form#">
 <cfdump var="#URL#"> --->
 
-
+<!--- 
 <cfif IsDefined("url.ninsp")>
-<cfset txtNum_Inspecao = url.ninsp>
+	<cfset numavaliacao = url.ninsp>
 </cfif>
-
+--->
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 
 <cfset total=0>
 
- <cfif isDefined("ckTipo") And ckTipo eq "inspecao">
-	<cfquery name="rsBusc" datasource="#dsn_inspecao#">
-	 SELECT  Pos_Situacao_Resp FROM ParecerUnidade where Pos_Inspecao = '#txtNum_Inspecao#'
+ <cfif isDefined("snci.filtrotipo") And snci.filtrotipo eq "inspecao">
+	<cfquery name="rsBusc" datasource="#snci.dsn#">
+	 	SELECT  Pos_Situacao_Resp FROM ParecerUnidade where Pos_Inspecao = '#snci.filtronumaval#'
 	</cfquery>
-	 <cfif rsBusc.recordcount is 0>
-	   <cflocation url="Mens_Erro.cfm?msg=1">
-	 </cfif>
+	<cfif rsBusc.recordcount is 0>
+		<cflocation url="Mens_Erro.cfm?msg=1">
+	</cfif>
 	 
 	<!--- query alterada mara inibir pontos sobre ADICIONAIS DE COLET/DISTRIBUIÇÃO, ATENDIMENTO E TRATAMENTO--->	 
-	<cfquery name="rsLimite" datasource="#dsn_inspecao#">
+	<cfquery name="rsLimite" datasource="#snci.dsn#">
 	SELECT INP_DtFimInspecao 
 	FROM Situacao_Ponto 
 	INNER JOIN (Diretoria 
@@ -103,19 +109,19 @@
 	<cfelse>
 		(Pos_Situacao_Resp not in (3,9,10,12,13,24,25,26,27,31,51))
     </cfif>	
-	 AND (INP_NumInspecao = '#txtNum_Inspecao#')
+	 AND (INP_NumInspecao = '#snci.filtronumaval#')
 	<!--- AND 1 = CASE WHEN Pos_Situacao_Resp IN (1,6,7,22) THEN 0 ELSE 1 END  --->	
    </cfquery>
  </cfif> 
- <cfif isDefined("ckTipo") And ckTipo eq "status">
-	<cfquery name="rsBusc" datasource="#dsn_inspecao#">
-	 SELECT  Pos_Situacao_Resp FROM ParecerUnidade where Pos_Situacao_Resp = #selstatus#
+ <cfif isDefined("snci.filtrotipo") And snci.filtrotipo eq "status">
+	<cfquery name="rsBusc" datasource="#snci.dsn#">
+		SELECT  Pos_Situacao_Resp FROM ParecerUnidade where Pos_Situacao_Resp = #snci.filtrostatus#
 	</cfquery>
-	 <cfif rsBusc.recordcount is 0>
-	  <cflocation url="Mens_Erro.cfm?msg=1">
-	 </cfif>
+	<cfif rsBusc.recordcount is 0>
+		<cflocation url="Mens_Erro.cfm?msg=1">
+	</cfif>
 	<!--- query alterada mara inibir pontos sobre ADICIONAIS DE COLET/DISTRIBUIÇÃO, ATENDIMENTO E TRATAMENTO--->
-	<cfquery name="rsLimite" datasource="#dsn_inspecao#">
+	<cfquery name="rsLimite" datasource="#snci.dsn#">
 	SELECT INP_DtFimInspecao 
 	FROM Situacao_Ponto 
 	INNER JOIN (Diretoria 
@@ -137,37 +143,10 @@
 		(Pos_Situacao_Resp not in (3,9,12,13,24,25,26,27,31,51)) 
     </cfif>	
    </cfquery>
- </cfif> 
- <cfif isDefined("ckTipo") And ckTipo eq "inspecao">
- 	   <cfif rsLimite.recordcount gt 0>
- 		 <cfset dtinic = CreateDate(year(rsLimite.INP_DtFimInspecao),month(rsLimite.INP_DtFimInspecao),day(rsLimite.INP_DtFimInspecao))>
-	     <cfset dtfim = CreateDate(year(rsLimite.INP_DtFimInspecao),month(rsLimite.INP_DtFimInspecao),day(rsLimite.INP_DtFimInspecao))>
-	   <cfelse>
-		<!---  <cfset dtinic = CreateDate(year(now()),month(now()),day(now()))>
-	     <cfset dtfim = dtinic>  --->
-	   </cfif> 
-   <cfset url.selstatus = " ">
-   <cfset url.StatusSE= " ">
-   <cfset url.SE= " ">
- <cfelseif isDefined("ckTipo") And ckTipo eq "periodo">
-<!---     <cfset url.dtinic =  CreateDate(year(dtinic),month(dtinic),day(dtinic))>
-   <cfset url.dtfim = CreateDate(year(dtfim),month(dtfim),day(dtfim))>   ---> 
-   <cfset url.selstatus = " ">
-   <cfset url.StatusSE= " ">
-   <cfset txtNum_Inspecao = "">
- <cfelse>
-   <cfset url.SE= " ">
-   <cfset txtNum_Inspecao = "">
-	   <cfif rsLimite.recordcount gt 0>
-		 <cfset dtinic = CreateDate(year(rsLimite.INP_DtFimInspecao),month(rsLimite.INP_DtFimInspecao),day(rsLimite.INP_DtFimInspecao))>
-	     <cfset dtfim = CreateDate(year(rsLimite.INP_DtFimInspecao),month(rsLimite.INP_DtFimInspecao),day(rsLimite.INP_DtFimInspecao))> 
-<!--- 	   <cfelse>
-		 <cfset dtinic = CreateDate(year(now()),month(now()),day(now()))>
-	     <cfset dtfim = dtinic>  --->
-	   </cfif>
-</cfif> 
-        <!--- query alterada mara inibir pontos sobre ADICIONAIS DE COLET/DISTRIBUIÇÃO, ATENDIMENTO E TRATAMENTO--->
-	<cfquery name="rsItem" datasource="#dsn_inspecao#">
+ </cfif>  
+  
+    <!--- query alterada mara inibir pontos sobre ADICIONAIS DE COLET/DISTRIBUIÇÃO, ATENDIMENTO E TRATAMENTO--->
+	<cfquery name="rsItem" datasource="#snci.dsn#">
   	SELECT CASE WHEN INP_Modalidade = 0 then 'Fisica' else 'Remota' end as Modal,  
     DATEDIFF(dd, INP_DtFimInspecao, GETDATE()) AS Quant,
 	INP_Modalidade,
@@ -250,19 +229,19 @@
 	
 	<!---  AND 1 = CASE WHEN Pos_Situacao_Resp IN (1,6,7,22) THEN 0 ELSE 1 END    --->
 	
-	<cfif ckTipo eq "inspecao">
-	   and INP_NumInspecao = '#txtNum_Inspecao#')
-	<cfelseif ckTipo eq "periodo">
-		<cfif url.SE eq "Todas">
-		  and Und_CodDiretoria in (#UsuCoordena#) and INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#)
+	<cfif snci.filtrotipo eq "inspecao">
+	   and INP_NumInspecao = '#snci.filtronumaval#')
+	<cfelseif snci.filtrotipo eq "periodo">
+		<cfif snci.filtrocodse eq "Todas">
+		  and Und_CodDiretoria in (#snci.coordenacodse#) and INP_DtFimInspecao BETWEEN '#snci.filtrodtinic#' AND '#snci.filtrodtfim#')
 		<cfelse>
-		  and INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim# AND left(Pos_Area,2) = '#url.SE#')
+		  and INP_DtFimInspecao BETWEEN '#snci.filtrodtinic#' AND '#snci.filtrodtfim#' AND left(Pos_Area,2) = '#snci.filtrocodse#')
 		</cfif>
 	<cfelse>
-		<cfif StatusSE eq "Todas">
-		  and Pos_Situacao_Resp = #selstatus# and Und_CodDiretoria in (#UsuCoordena#))
+		<cfif statusse eq "Todas">
+		  and Pos_Situacao_Resp = #snci.filtrostatus# and Und_CodDiretoria in (#snci.coordenacodse#))
 		<cfelse>
-		  and Pos_Situacao_Resp = #selstatus# and left(Pos_Area,2) = '#StatusSE#')
+		  and Pos_Situacao_Resp = #snci.filtrostatus# and left(Pos_Area,2) = '#snci.filtrocodse#')
 		</cfif>
 	</cfif>
 	     ORDER BY Und_CodDiretoria, Pos_DtPosic, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Und_CodReop, Data  
@@ -333,7 +312,7 @@ from rsItem
 <cfset diretorio =#GetDirectoryFromPath(GetTemplatePath())#>
 <cfset slocal = #diretorio# & 'Fechamento\'>
 
-<cfset sarquivo = #DateFormat(now(),"YYYYMMDDHH")# & '_' & #trim(qUsuario.Usu_Matricula)# & '.xls'>
+<cfset sarquivo = #DateFormat(now(),"YYYYMMDDHH")# & '_' & #snci.matricula# & '.xls'>
 </cfoutput>
 <cfdirectory name="qList" filter="*.*" sort="name desc" directory="#slocal#">
 <cfoutput query="qList">
@@ -361,7 +340,7 @@ overwrite="true">
 <title>Sistema Nacional de Controle Interno</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link href="css.css" rel="stylesheet" type="text/css">
- <cfquery name="rsSPnt" datasource="#dsn_inspecao#">
+ <cfquery name="rsSPnt" datasource="#snci.dsn#">
   SELECT STO_Codigo, STO_Sigla, STO_Cor, STO_Conceito FROM Situacao_Ponto where sto_status = 'A'
  </cfquery>
  <style type="text/css">
@@ -379,17 +358,17 @@ overwrite="true">
 </head>
 <body>
 
- <cfif isDefined("ckTipo") And ckTipo eq "inspecao">
+ <cfif isDefined("snci.filtrotipo") And snci.filtrotipo eq "inspecao">
 		<!---Verifica se esta inspecao possui algum item em reanalise --->
-		<cfquery datasource="#dsn_inspecao#" name="qVerifEmReanalise">
+		<cfquery datasource="#snci.dsn#" name="qVerifEmReanalise">
 			SELECT RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao 
-			WHERE RIP_Recomendacao='S' and RIP_NumInspecao='#txtNum_Inspecao#'
+			WHERE RIP_Recomendacao='S' and RIP_NumInspecao='#snci.filtronumaval#'
 		</cfquery>
 		<cfif qVerifEmReanalise.recordcount neq 0 > 
 		<div align="center">
 			<div align="center" style="position:RELATIVE; top:3px;background:red;color:#fff;width:640px;padding:3px;font-family:Verdana, Arial, Helvetica, sans-serif">				
 			  <div style="float: left;">
-			    <img id="imgAtencao" name="imgAtencao"src="figuras/atencao.png" width="40px"  border="0" ></img>
+			    <img id="imgAtencao" name="imgAtencao"src="figuras/atencao.png" width="40px" border="0" ></img>
 			  </div>
 			  <div style="float: left;">
 				<cfif qVerifEmReanalise.recordcount eq 1 >
@@ -454,6 +433,7 @@ function Hint(objNome, action){
  }
 
 }
+
 </script>
 <!--- <table width="100%" align="center">
 <tr>
@@ -476,7 +456,7 @@ function Hint(objNome, action){
       <th height="10" colspan="2"><div align="center"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/excel.jpg" width="50" height="35" border="0"></a></div></th>
   </tr>
 
-  <tr><!---<th colspan="2"> <div align="left" class="titulosClaro">Nº Relat: <cfoutput>#txtNum_Inspecao#</cfoutput></div> ---></th></tr>
+  <tr><!---<th colspan="2"> <div align="left" class="titulosClaro">Nº Relat: <cfoutput>#snci.filtronumaval#</cfoutput></div> ---></th></tr>
   <cfif rsItem.recordCount neq 0>
 	  <tr class="titulosClaro">
 	    <th colspan="17" bgcolor="eeeeee" class="exibir"><cfoutput>Qt. Itens: #rsItem.recordCount#</cfoutput></th>
@@ -486,7 +466,7 @@ function Hint(objNome, action){
 		<th width="8%" bgcolor="eeeeee" class="exibir"><div align="center">Modalidade</div></th>
 		<th width="3%" bgcolor="eeeeee" class="exibir"><div align="center">Posição</div></th>
 		<th width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Previsão</div></th>
-		<!--- <th width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Acompanhamento (dias &uacute;teis)</div></th> --->
+		<!--- <th width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Acompanhamento (dias úteis)</div></th> --->
 		<th width="2%" bgcolor="eeeeee" class="exibir"><div align="center">SE Sigla</div></th>
 		<th bgcolor="eeeeee" class="exibir"><div align="center">Órgão Condutor</div></th>
 		<th width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Início</div></th>
@@ -497,7 +477,7 @@ function Hint(objNome, action){
 		<th width="16%" bgcolor="eeeeee" class="exibir"><div align="center">Grupo</div></th>
 		<th width="16%" bgcolor="eeeeee" class="exibir"><div align="center">Item</div></th>
 		<th width="8%" bgcolor="eeeeee" class="exibir"><strong>Encaminhamento</strong></th>		
-	    <th width="4%" bgcolor="eeeeee" class="exibir"><div align="center">Qtd. Dias</div></th>
+	    <th width="4%" bgcolor="eeeeee" class="exibir"><div align="center">Qtd.Dias</div></th>
 		<th width="8%" bgcolor="eeeeee" class="exibir"><div align="center">Classificação</div></th>
 	  </tr>
 	</thead >
@@ -506,7 +486,7 @@ function Hint(objNome, action){
 		  <cfset auxEnc = "MANUAL">
 		  <cfset btnSN = 'N'>
 		  <cfif Pos_Situacao_Resp eq 4 or Pos_Situacao_Resp eq 16>
-				<cfquery name="rsAnd" datasource="#dsn_inspecao#">
+				<cfquery name="rsAnd" datasource="#snci.dsn#">
 				SELECT Pos_Unidade 
 				FROM Andamento 
 				INNER JOIN ParecerUnidade ON (Pos_Situacao_Resp = And_Situacao_Resp) AND (Pos_DtPosic = And_DtPosic) AND (Pos_NumItem = And_NumItem) AND (Pos_NumGrupo = And_NumGrupo) AND (Pos_Inspecao = And_NumInspecao) AND (And_Unidade = Pos_Unidade) 
@@ -520,13 +500,13 @@ function Hint(objNome, action){
 	  	
 		 <tr bgcolor="f7f7f7" class="exibir">         
 		<cfif rsItem.Pos_Situacao_Resp is 0 or rsItem.Pos_Situacao_Resp is 11>
-			<cfquery name="qReanalisado" datasource="#dsn_inspecao#">
+			<cfquery name="qReanalisado" datasource="#snci.dsn#">
 				SELECT RIP_Recomendacao FROM Resultado_Inspecao
 				WHERE RIP_NumInspecao = '#rsItem.Pos_Inspecao#' and RIP_NumGrupo='#rsItem.Pos_NumGrupo#' and RIP_NumItem ='#rsItem.Pos_NumItem#'
 			</cfquery>
-			  <td width="8%" bgcolor="#STO_Cor#"><div align="center"><a href="itens_controle_revisliber.cfm?Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&Nitem=#rsItem.Pos_NumItem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&reop=#rsItem.Und_CodReop#&SE=#url.SE#&selStatus=#selStatus#&StatusSE=#StatusSE#&vlrdec=#rsItem.Itn_ValorDeclarado#&situacao=#rsItem.Pos_Situacao_Resp#&posarea=#rsItem.Pos_Area#&modal=#rsItem.INP_Modalidade#" class="exibir" onMouseMove="Hint('#STO_Sigla#',2)" onMouseOut="Hint('#STO_Sigla#',1)"><strong>#trim(STO_Descricao)#</strong><cfif '#trim(rsItem.Pos_NCISEI)#' neq '' and '#rsItem.Pos_Situacao_Resp#' eq 0><span style="color:white"><br>com NCI</span></cfif><cfif '#qReanalisado.RIP_Recomendacao#' eq 'R' and '#rsItem.Pos_Situacao_Resp#' eq 0><div ><span style="color:white;background:darkblue;padding:2px;"><br>REANALISADO</span></div></cfif></a></div></td>
+			  <td width="8%" bgcolor="#STO_Cor#"><div align="center"><a href="itens_controle_revisliber.cfm?Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&Nitem=#rsItem.Pos_NumItem#&DtInic=#snci.filtrodtinic#&dtFim=#snci.filtrodtfim#&snci.filtrotipo=#snci.filtrotipo#&reop=#rsItem.Und_CodReop#&SE=#snci.filtrocodse#&selStatus=#snci.filtrostatus#&statusse=#snci.filtrocodse#&vlrdec=#rsItem.Itn_ValorDeclarado#&situacao=#rsItem.Pos_Situacao_Resp#&posarea=#rsItem.Pos_Area#&modal=#rsItem.INP_Modalidade#" class="exibir" onMouseMove="Hint('#STO_Sigla#',2)" onMouseOut="Hint('#STO_Sigla#',1)"><strong>#trim(STO_Descricao)#</strong><cfif '#trim(rsItem.Pos_NCISEI)#' neq '' and '#rsItem.Pos_Situacao_Resp#' eq 0><span style="color:white"><br>com NCI</span></cfif><cfif '#qReanalisado.RIP_Recomendacao#' eq 'R' and '#rsItem.Pos_Situacao_Resp#' eq 0><div ><span style="color:white;background:darkblue;padding:2px;"><br>REANALISADO</span></div></cfif></a></div></td>
 		<cfelse>
-			  <td width="8%" bgcolor="#STO_Cor#"><div align="center"><a href="itens_controle_respostas1.cfm?Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&Nitem=#rsItem.Pos_NumItem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&reop=#rsItem.Und_CodReop#&SE=#url.SE#&selStatus=#selStatus#&StatusSE=#StatusSE#&vlrdec=#rsItem.Itn_ValorDeclarado#&situacao=#rsItem.Pos_Situacao_Resp#&posarea=#rsItem.Pos_Area#&modal=#rsItem.INP_Modalidade#" class="exibir" onMouseMove="Hint('#STO_Sigla#',2)" onMouseOut="Hint('#STO_Sigla#',1)"><strong>#trim(STO_Descricao)#</strong></a><cfif '#trim(rsItem.Pos_NCISEI)#' neq '' and '#rsItem.Pos_Situacao_Resp#' eq 0><span style="color:white"><br>com NCI</span></cfif></a></div></td>
+			  <td width="8%" bgcolor="#STO_Cor#"><div align="center"><a href="itens_controle_respostas1.cfm?Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&Nitem=#rsItem.Pos_NumItem#&DtInic=#snci.filtrodtinic#&dtFim=#snci.filtrodtfim#&snci.filtrotipo=#snci.filtrotipo#&reop=#rsItem.Und_CodReop#&SE=#snci.filtrocodse#&selStatus=#snci.filtrostatus#&statusse=#snci.filtrocodse#&vlrdec=#rsItem.Itn_ValorDeclarado#&situacao=#rsItem.Pos_Situacao_Resp#&posarea=#rsItem.Pos_Area#&modal=#rsItem.INP_Modalidade#" class="exibir" onMouseMove="Hint('#STO_Sigla#',2)" onMouseOut="Hint('#STO_Sigla#',1)"><strong>#trim(STO_Descricao)#</strong></a><cfif '#trim(rsItem.Pos_NCISEI)#' neq '' and '#rsItem.Pos_Situacao_Resp#' eq 0><span style="color:white"><br>com NCI</span></cfif></a></div></td>
 		</cfif>		  
 		<cfset auxsaida = DateFormat(rsItem.Pos_DtPosic,'DD/MM/YYYY')>
 		<td width="3%"><div align="center">#rsItem.Modal#</div></td>
@@ -558,10 +538,10 @@ function Hint(objNome, action){
 		</cfoutput>
 	</tbody>			
   <cfelse>
-		 <cfif isDefined("ckTipo") And ckTipo eq "inspecao">
+		 <cfif isDefined("snci.filtrotipo") And snci.filtrotipo eq "inspecao">
 			 <cfif qVerifEmReanalise.recordcount eq 0 >
 				<tr bgcolor="f7f7f7" class="exibir">
-				  <td colspan="17" align="center"><strong>Sr. Inspetor, todos os itens deste relatório foram solucionados, portanto a inspeção encontra-se encerrada.</strong></td>
+				  <td colspan="17" align="center"><strong>Sr. Inspetor, todos os itens deste relatório foram solucionados, portanto a Avaliação encontra-se encerrada.</strong></td>
 				</tr>
 				<tr><td colspan="17" align="center">&nbsp;</td></tr>
 			 </cfif>

@@ -1,9 +1,48 @@
+<cfset dsn_inspecao = 'DBSNCI'>
+<cfquery name="qAcesso" datasource="#dsn_inspecao#">
+	SELECT Usu_DR, Dir_Sigla, Dir_Descricao, Usu_Login, Usu_Matricula, Usu_GrupoAcesso, Usu_Apelido, Usu_Lotacao, Usu_LotacaoNome, Usu_Email, Usu_Coordena
+	FROM Usuarios INNER JOIN Diretoria ON Usu_DR = Dir_Codigo
+ 	WHERE Usu_Login = 'CORREIOSNET\85051071'
+	--WHERE Usu_Login = '#CGI.REMOTE_USER#'
+</cfquery>
+<!--- Dados em structure para acesso global no SNCI --->
+<cfset snci = structnew()>
+<cfset snci.dsn = 'DBSNCI'>
+<cfset snci.codse=#qAcesso.Usu_DR#>
+<cfset snci.siglase=#qAcesso.Dir_Sigla#>
+<cfset snci.descse=#trim(qAcesso.Dir_Descricao)#>
+<cfset snci.login=#ucase(trim(qAcesso.Usu_Login))#>
+<cfif len(trim(qAcesso.Usu_Matricula)) eq 8>
+	<cfset snci.matricula=#trim(qAcesso.Usu_Matricula)#>
+<cfelse>
+	<cfset snci.cpf=#trim(qAcesso.Usu_Matricula)#>
+</cfif>
+<cfset snci.grpacesso=#trim(qAcesso.Usu_GrupoAcesso)#>
+<cfset snci.nomeusuario=#trim(qAcesso.Usu_Apelido)#>
+<cfset snci.codlotacao=#qAcesso.Usu_Lotacao#>
+<cfset snci.nomelotacao=#trim(qAcesso.Usu_LotacaoNome)#>
+<cfset snci.emailusuario=#trim(qAcesso.Usu_Email)#>
+<cfset snci.coordenacodse=#trim(qAcesso.Usu_Coordena)#>
+<cfset snci.permitir=''>
+<cfset snci.filtrotipo=''>
+<cfset snci.filtronumaval=''>
+<cfset snci.filtrodtinic=''>
+<cfset snci.filtrodtfim=''>
+<cfset snci.filtrocodse=''>
+<cfset snci.filtrostatus=''>
+<cfset snci.gesavaliacao=''>
+<cfset snci.gesunidade=''>
+<cfset snci.gesgrupo=''>
+<cfset snci.gesitem=''>
+
+
+<!---
 <cfset DR = 'Departamento de Governan�a, Riscos e Compliance'>
 <cfset siglaDR = 'DCINT'>
 <cfset Sigla_Gerencia = 'CCOP'>
 <cfset Gerencia = 'COORD CONTR INT OPER/CCOP'>
 <cfset rodape = '.: CCOP :. Av. Guararapes, 250 - 3� Andar - Santo Ant�nio - Recife-PE'>
-<cfset sto_gerencia = '32050'> <!--- Cinco d�gitos iniciais --->
+<cfset sto_gerencia = '32050'> <!--- Cinco digitos iniciais --->
 <cfset cod_dr = '32'>
 <cfset Local = SetLocale("Portuguese (Brazilian)")>
 <cfset evento = ''>
@@ -12,12 +51,16 @@
 <cfset pesquisa = "http://intranetpe/gerencias/ginsp/sins/rotinas/formulario_ginsp.cfm">
 <cfset vMenu = ''>
 <!---<cfset dsn_pesquisa = 'DBPESQUISA_INSPECAO'>--->
-<cfset dsn_inspecao = 'DBSNCI'>
-<cfset Login_Agencia = 'PE\PEAC'> <!--- Parte inicial do login das ag�ncias (comum a todas as ag�ncias) --->
+--->
+<cfset Login_Agencia = 'PE\PEAC'> <!--- Parte inicial do login das agências (comum a todas as agências) --->
 <cfset Login_CDD = 'PE\PECDD'> <!--- Parte inicial do login dos CDDs (comum a todos os CDDs) --->
+
 <script type="text/javascript" src="ckeditor\ckeditor.js"></script>
 
-<!--- Diret�rio onde ser�o armazenados arquivos anexados a inspe��o --->
+
+
+
+<!--- Pastas onde serão armazenados arquivos anexados às Avaliações --->
 <cfset auxsite =  trim(ucase(cgi.server_name))>
 <cfif FIND("INTRANETSISTEMASPE", "#auxsite#") >
 	<cfset diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_ANEXOS\'>
@@ -36,16 +79,16 @@
     <cfset agenda.email="Gilvanm@correios.com.br">
     <cfset agenda.telefone="(81) 9 8572-6313">
 
-<!--- Diret�rio onde ser�o armazenadas as imagens --->
+<!--- Pastas onde serão armazenadas as imagens --->
 <cfset thisDir = expandPath(".")>
 <cfset imagesDirOrientacoes = "#thisDir#/IMAGENS_ORIENTACOES" />
 <cfset imagesDirAvaliacoes = "#thisDir#/IMAGENS_AVALIACOES" />
 <cfset imagesDirIcones = "#thisDir#/IMAGENS_ICONES" />
-<!--- fim: Diret�rio onde ser�o armazenadas as imagens --->
+<!--- fim: Pastas onde serão armazenadas as imagens --->
 
 <cfset vRelatorio = 'SNCI'>
 
-<!--- Listas de permiss�es --->
+<!--- Listas de permissões --->
 <cfquery name="qSINS" datasource="#dsn_inspecao#">
 	SELECT Usu_Login FROM Usuarios WHERE RTrim(Usu_GrupoAcesso) in ('GESTORES','DESENVOLVEDORES','GESTORMASTER', 'INSPETORES', 'ANALISTAS')
 </cfquery>
@@ -53,7 +96,7 @@
 <cfset Lista_SINS = UCase(ValueList(qSINS.Usu_Login))>
 
 
-<!--- Fun��o de confirma��o de a��o --->
+<!--- Função de confirmação de ação --->
 <script language="JavaScript">
 function confirmThis(message)
 {

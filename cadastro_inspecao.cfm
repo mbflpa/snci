@@ -1,11 +1,11 @@
 <cfprocessingdirective pageEncoding ="utf-8"/>
 <cfsetting requesttimeout="500">
-
+<!---
    <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
   </cfif>          
-  
+  --->
   <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	select Usu_DR, Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido, Usu_Coordena 
 	from usuarios 

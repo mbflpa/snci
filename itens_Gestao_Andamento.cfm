@@ -406,7 +406,6 @@ function listar(a,b,c,d){
 </cfif>
 <!--- <cfset dtlimit = 31/03/2022> --->
 <!--- fim criar linhas de metas --->
-
 <cfloop condition="#aux_mes# lte int(month(dtlimit))">
         <cfif aux_mes is 1>
 		  <cfset dtini = CreateDate(year(dtlimit),1,1)>
@@ -456,81 +455,48 @@ function listar(a,b,c,d){
 		</cfquery>
 		<cfif rsVazio.recordcount lte 0>
 		    <cfinclude template="INDICADORES_MES.CFM">
-
-<!--- rotina 2 --->
-			<!--- COMPOR O PRCI COM OS 14-NR, PENDENTES E TRATAMENTOS DO MES ANTERIOR--->
+			<!--- rotina 3 --->
+			<!--- COMPOR O PRCI COM OS 14-NR, PENDENTES E TRATAMENTOS DO MES --->
 			<!--- TODAS UNIDADES --->
-			<cfquery name="rsPRCIr2" datasource="#dsn_inspecao#">
-				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, 
-				andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
-				FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-				WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) and Pos_DtPosic < #dtini# 
-				ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
+			<cfquery name="rsPRCIa" datasource="#dsn_inspecao#">
+				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
+		FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+		WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) 
+		ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 			</cfquery>
-			<cfoutput query="rsPRCIr2">
-					<cfset AndtDPosic = CreateDate(year(rsPRCIr2.Pos_DtPosic),month(rsPRCIr2.Pos_DtPosic),day(rsPRCIr2.Pos_DtPosic))>
-					<cfset AndtHPosic = rsPRCIr2.andHrPosic>
-					<cfset AndtCodSE = rsPRCIr2.Und_CodDiretoria>
-					<cfset auxsta = rsPRCIr2.Pos_Situacao_Resp>			
+			 <cfoutput query="rsPRCIa">
+					<cfset AndtDPosic = CreateDate(year(rsPRCIa.Pos_DtPosic),month(rsPRCIa.Pos_DtPosic),day(rsPRCIa.Pos_DtPosic))>
+					<cfset AndtHPosic = rsPRCIa.andHrPosic>
+					<cfset AndtCodSE = left(rsPRCIa.Pos_Unidade,2)>
+					<cfset auxsta = rsPRCIa.Pos_Situacao_Resp>			
 					<cfif auxsta eq 14 or auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>
 					   <cfset AndtPrazo = 'DP'>
 					<cfelse>
 					   <cfset AndtPrazo = 'FP'>
 					</cfif>		
-					
+<!--- 					<cfset auxantes = 0>
+					<cfif rsPRCIa.Pos_Sit_Resp_Antes gt 0>
+						<cfset auxantes = rsPRCIa.Pos_Situacao_Resp>
+					</cfif> --->
 					<!--- garantir a inclusão para PRCI --->
 					<cfquery datasource="#dsn_inspecao#">
-						insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto)  
-						values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCIr2.Pos_Inspecao#', '#rsPRCIr2.Pos_Unidade#', #rsPRCIr2.Pos_NumGrupo#, #rsPRCIr2.Pos_NumItem#, #AndtDPosic#, '#AndtHPosic#', #auxsta#, #rsPRCIr2.Und_TipoUnidade#, 0, 0, '#rsPRCIr2.pos_username#', CONVERT(char, GETDATE(), 120), '#rsPRCIr2.Pos_Area#', '#rsPRCIr2.Pos_NomeArea#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCIr2.Pos_PontuacaoPonto#, '#rsPRCIr2.Pos_ClassificacaoPonto#')
+						insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCIa.Pos_Inspecao#', '#rsPRCIa.Pos_Unidade#', #rsPRCIa.Pos_NumGrupo#, #rsPRCIa.Pos_NumItem#, #AndtDPosic#, '#AndtHPosic#', #auxsta#, #rsPRCIa.Und_TipoUnidade#, 0, 0, '#rsPRCIa.pos_username#', CONVERT(char, GETDATE(), 120), '#rsPRCIa.Pos_Area#', '#rsPRCIa.Pos_NomeArea#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCIa.Pos_PontuacaoPonto#, '#rsPRCIa.Pos_ClassificacaoPonto#')
 					</cfquery>
-			</cfoutput> 
-<!--- fim rotina 2  --->			
-
-<!--- rotina 3 --->
-			<!--- COMPOR O PRCI COM OS 14-NR, PENDENTES E TRATAMENTOS DENTRO DO MES E COMO MIGRARAM AO MÊS CORRENTE --->
-			<!--- TODAS UNIDADES --->
-			<cfquery name="rsPRCIa" datasource="#dsn_inspecao#">
-				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, 
-				andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
-				FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-				WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23)  and Pos_DtPosic >= #dtini#  
-				ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
-			</cfquery>
-
-			<cfoutput query="rsPRCIa">
-				<cfset AndtDPosica = CreateDate(year(rsPRCIa.Pos_DtPosic),month(rsPRCIa.Pos_DtPosic),day(rsPRCIa.Pos_DtPosic))>
-				<cfset AndtHPosica = rsPRCIa.andHrPosic>
-				<cfset AndtCodSE = rsPRCIa.Und_CodDiretoria>
-				<cfset auxsta = rsPRCIa.Pos_Situacao_Resp>			
-				<cfif auxsta eq 14 or auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>
-					<cfset AndtPrazo = 'DP'>
-				<cfelse>
-					<cfset AndtPrazo = 'FP'>
-				</cfif>		
-					
-				<!--- garantir a inclusão para PRCI --->
-				<cfquery datasource="#dsn_inspecao#">
-					insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto)  values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCIa.Pos_Inspecao#', '#rsPRCIa.Pos_Unidade#', #rsPRCIa.Pos_NumGrupo#, #rsPRCIa.Pos_NumItem#, #AndtDPosica#, '#AndtHPosica#', #auxsta#, #rsPRCIa.Und_TipoUnidade#, 0, 0, '#rsPRCIa.pos_username#', CONVERT(char, GETDATE(), 120), '#rsPRCIa.Pos_Area#', '#rsPRCIa.Pos_NomeArea#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCIa.Pos_PontuacaoPonto#, '#rsPRCIa.Pos_ClassificacaoPonto#')
-				</cfquery>
-
-				<!--- FAZER BUSCAS POR outras possíveis ocorrências(14NR,PEND/TRAT) na andamento dentro do MêS/migração do mês anterior para PRCI --->
-				<!--- Apenas nos maiores que o dia primeiro do mês trabalhado --->
-					<cfset salvarSN = 'S'>
-
+					<!--- FAZER BUSCAS POR outras possíveis ocorrências(PEND/TRAT) na andamento dentro do MêS para PRCI --->
 					<cfquery name="rsPENDTRAT" datasource="#dsn_inspecao#">
 						SELECT And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area
-						FROM Andamento 
+						FROM Andamento
 						WHERE And_Unidade = '#rsPRCIa.Pos_Unidade#' AND 
 						And_NumInspecao = '#rsPRCIa.Pos_Inspecao#' AND 
 						And_NumGrupo = #rsPRCIa.Pos_NumGrupo# AND 
 						And_NumItem = #rsPRCIa.Pos_NumItem# AND 
-						And_Situacao_Resp in (2,4,5,8,20,15,16,18,19,23) and And_DtPosic <= #AndtDPosica# and And_HrPosic <> '#AndtHPosica#'
-						order by And_DtPosic desc, And_HrPosic desc
+						And_Situacao_Resp in (2,4,5,8,20,15,16,18,19,23) and And_DtPosic between #dtini# and #dtfim#
+						order by And_Unidade, And_NumInspecao, And_NumGrupo, And_NumItem, And_DtPosic
 					</cfquery>
-					
 					<cfloop query="rsPENDTRAT">
-						<cfset AndtDPosicb = CreateDate(year(rsPENDTRAT.And_DtPosic),month(rsPENDTRAT.And_DtPosic),day(rsPENDTRAT.And_DtPosic))>
-						<cfset AndtHPosicb = rsPENDTRAT.And_HrPosic>
+						<cfset AndtDPosic = CreateDate(year(rsPENDTRAT.And_DtPosic),month(rsPENDTRAT.And_DtPosic),day(rsPENDTRAT.And_DtPosic))>
+						<cfset AndtHPosic = rsPENDTRAT.And_HrPosic>
+						<cfset AndtCodSE = left(rsPRCIa.Pos_Unidade,2)>
 						<cfset auxsta = rsPENDTRAT.And_Situacao_Resp>			
 						<cfif auxsta eq 14 or auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>
 						   <cfset AndtPrazo = 'DP'>
@@ -547,35 +513,90 @@ function listar(a,b,c,d){
 							Andt_Unid = '#rsPRCIa.Pos_Unidade#' and
 							Andt_Grp = #rsPRCIa.Pos_NumGrupo# and 
 							Andt_Item = #rsPRCIa.Pos_NumItem# and 
-							Andt_DPosic = #AndtDPosicb# and
-							Andt_HPosic = '#AndtHPosicb#' and
+							Andt_DPosic = #AndtDPosic# and
+							Andt_HPosic = '#AndtHPosic#' and
 							Andt_Resp = #auxsta# and
 							Andt_TipoRel = 1
-						</cfquery>	
-								
-						<cfif (rsExiste.recordcount lte 0) and (salvarSN eq 'S')>
-							<cfquery datasource="#dsn_inspecao#">
-								insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) 
-								values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCIa.Pos_Inspecao#', '#rsPRCIa.Pos_Unidade#', #rsPRCIa.Pos_NumGrupo#, #rsPRCIa.Pos_NumItem#, #AndtDPosicb#, '#AndtHPosicb#', #auxsta#, #rsPRCIa.Und_TipoUnidade#, 0, 0, '#rsPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsPENDTRAT.And_Area#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCIa.Pos_PontuacaoPonto#, '#rsPRCIa.Pos_ClassificacaoPonto#')
-							</cfquery> 
-						</cfif>
-						<cfif dateformat(#AndtDPosicb#,"YYYYMMDD") lte dateformat(#dtini#,"YYYYMMDD")> 
-							<cfset salvarSN = 'N'>
-						</cfif>
+						</cfquery>			
+						 <cfif rsExiste.recordcount lte 0>
+								 <cfquery datasource="#dsn_inspecao#">
+								insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCIa.Pos_Inspecao#', '#rsPRCIa.Pos_Unidade#', #rsPRCIa.Pos_NumGrupo#, #rsPRCIa.Pos_NumItem#, #AndtDPosic#, '#AndtHPosic#', #auxsta#, #rsPRCIa.Und_TipoUnidade#, 0, 0, '#rsPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsPENDTRAT.And_Area#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCIa.Pos_PontuacaoPonto#, '#rsPRCIa.Pos_ClassificacaoPonto#')
+								</cfquery> 
+						 </cfif>
 					</cfloop>
 			</cfoutput> 
-
-<!--- fim rotina 3  --->
+			
+			<!--- fim rotina 3  --->
 		
-<!--- ROTINA 4 --->
+			<!--- ROTINA 4 --->
+			<!--- COMPOR O PRCI com possíveis redundantes do mês dos PENDENTES E TRATAMENTOS DO MES copiados da parecerunidade QUE PERTENÇAM AO MÊS --->
+			<!--- TODAS UNIDADES --->
+			<cfquery name="rsPRCI4" datasource="#dsn_inspecao#">
+					SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
+			FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			WHERE Pos_Situacao_Resp In (2,4,5,8,20,15,16,18,19,23) AND Pos_DtPosic between #dtini# and #dtfim# 
+			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
+			</cfquery>
+			<cfoutput query="rsPRCI4">
+				<cfset AndtDPosic = CreateDate(year(rsPRCI4.Pos_DtPosic),month(rsPRCI4.Pos_DtPosic),day(rsPRCI4.Pos_DtPosic))>
+				<cfset AndtHPosic = rsPRCI4.andHrPosic>
+			<!--- FAZER BUSCAS POR outras possíveis ocorrências(PEND/TRAT) na andamento dentro do MêS para PRCI --->
+				<cfquery name="rsPENDTRAT" datasource="#dsn_inspecao#">
+					SELECT And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area
+					FROM Andamento
+					WHERE And_Unidade = '#rsPRCI4.Pos_Unidade#' AND 
+					And_NumInspecao = '#rsPRCI4.Pos_Inspecao#' AND 
+					And_NumGrupo = #rsPRCI4.Pos_NumGrupo# AND 
+					And_NumItem = #rsPRCI4.Pos_NumItem# AND 
+					And_Situacao_Resp in (2,4,5,8,20,15,16,18,19,23) and And_DtPosic between #dtini# and #AndtDPosic# AND 
+					And_HrPosic <> '#AndtHPosic#'
+					order by And_Unidade, And_NumInspecao, And_NumGrupo, And_NumItem, And_DtPosic
+				</cfquery>
+		<!--- 		<cfset auxantes = 0>
+				<cfif rsPRCI4.Pos_Sit_Resp_Antes gt 0>
+					<cfset auxantes = rsPRCI4.Pos_Situacao_Resp>
+				</cfif> --->
+				<cfloop query="rsPENDTRAT">
+					<cfset AndtDPosic = CreateDate(year(rsPENDTRAT.And_DtPosic),month(rsPENDTRAT.And_DtPosic),day(rsPENDTRAT.And_DtPosic))>
+					<cfset AndtHPosic = rsPENDTRAT.And_HrPosic>
+					<cfset AndtCodSE = left(rsPRCI4.Pos_Unidade,2)>
+					<cfset auxsta = rsPENDTRAT.And_Situacao_Resp>			
+					<cfif auxsta eq 14 or auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>
+					   <cfset AndtPrazo = 'DP'>
+					<cfelse>
+					   <cfset AndtPrazo = 'FP'>
+					</cfif>
+			
+					<cfquery name="rsExiste" datasource="#dsn_inspecao#">
+						select Andt_Insp 
+						from Andamento_Temp 
+						where Andt_AnoExerc = '#year(dtlimit)#' and
+						Andt_Mes = #month(dtlimit)# and
+						Andt_Insp = '#rsPRCI4.Pos_Inspecao#' and
+						Andt_Unid = '#rsPRCI4.Pos_Unidade#' and
+						Andt_Grp = #rsPRCI4.Pos_NumGrupo# and 
+						Andt_Item = #rsPRCI4.Pos_NumItem# and 
+						Andt_DPosic = #AndtDPosic# and
+						Andt_HPosic = '#AndtHPosic#' and
+						Andt_Resp = #auxsta# and
+						Andt_TipoRel = 1
+					</cfquery>			
+			   		<cfif rsExiste.recordcount lte 0>
+						 <cfquery datasource="#dsn_inspecao#">
+						insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCI4.Pos_Inspecao#', '#rsPRCI4.Pos_Unidade#', #rsPRCI4.Pos_NumGrupo#, #rsPRCI4.Pos_NumItem#, #AndtDPosic#, '#AndtHPosic#', #auxsta#, #rsPRCIa.Und_TipoUnidade#, 0, 0, '#rsPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsPENDTRAT.And_Area#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCI4.Pos_PontuacaoPonto#, '#rsPRCI4.Pos_ClassificacaoPonto#')
+						</cfquery> 
+					</cfif>
+				</cfloop>
+			</cfoutput>
+			<!--- FIM ROTINA 4 ---> 
+		 	<!--- ROTINA 5 --->
 		 	<!--- OBTER NA ANDAMENTO POSSÍVEIS STATUS (14-NR, PEND OU TRAT) PARA COMPOR PRCI  DOS PONTOS TRAZIDOS DA PARECERUNIDADE(RESPOSTAS, SO, CS, PI, OC, RV AP, RC, NC, 
 	 BX, EA, EC e TP --->
- 
 			<cfquery name="rsPRCI5" datasource="#dsn_inspecao#">
-				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
-				FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-				WHERE Pos_Situacao_Resp In (3,1,6,7,17,22,9,10,12,13,21,24,25,26,27,28,29,30) AND Pos_DtPosic between #dtini# and #dtfim# 
-				ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
+				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
+			FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			WHERE Pos_Situacao_Resp In (3,1,6,7,17,22,9,10,12,13,21,24,25,26,27,28,29,30) AND Pos_DtPosic between #dtini# and #dtfim#
+			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 			</cfquery>
 			<cfoutput query="rsPRCI5">
 				<cfset AndtDPosic = CreateDate(year(rsPRCI5.Pos_DtPosic),month(rsPRCI5.Pos_DtPosic),day(rsPRCI5.Pos_DtPosic))>
@@ -587,20 +608,18 @@ function listar(a,b,c,d){
 					And_NumInspecao = '#rsPRCI5.Pos_Inspecao#' AND 
 					And_NumGrupo = #rsPRCI5.Pos_NumGrupo# AND 
 					And_NumItem = #rsPRCI5.Pos_NumItem# AND 
-					And_Situacao_Resp in (14,2,4,5,8,20,15,16,18,19,23) and 
-					And_DtPosic <= #AndtDPosic# AND 
+					And_Situacao_Resp in (14,2,4,5,8,20,15,16,18,19,23) and And_DtPosic between #dtini# and #AndtDPosic# AND 
 					And_HrPosic <> '#AndtHPosic#'
-					order by And_DtPosic desc, And_HrPosic desc
+					order by And_Unidade, And_NumInspecao, And_NumGrupo, And_NumItem, And_DtPosic
 				</cfquery>
 				<cfset auxantes = 0>
 				<cfif rsPRCI5.Pos_Sit_Resp_Antes gt 0>
 					<cfset auxantes = rsPRCI5.Pos_Situacao_Resp>
 				</cfif>
-				<cfset salvarSN = 'S'>
 				<cfloop query="rsNRPENDTRAT">
-					<cfset AndtDPosicc = CreateDate(year(rsNRPENDTRAT.And_DtPosic),month(rsNRPENDTRAT.And_DtPosic),day(rsNRPENDTRAT.And_DtPosic))>
-					<cfset AndtHPosicc = rsNRPENDTRAT.And_HrPosic>
-					<cfset AndtCodSE = rsPRCI5.Und_CodDiretoria>
+					<cfset AndtDPosic = CreateDate(year(rsNRPENDTRAT.And_DtPosic),month(rsNRPENDTRAT.And_DtPosic),day(rsNRPENDTRAT.And_DtPosic))>
+					<cfset AndtHPosic = rsNRPENDTRAT.And_HrPosic>
+					<cfset AndtCodSE = left(rsPRCI5.Pos_Unidade,2)>
 					<cfset auxsta = rsNRPENDTRAT.And_Situacao_Resp>			
 					<cfif auxsta eq 14 or auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>
 					   <cfset AndtPrazo = 'DP'>
@@ -617,24 +636,20 @@ function listar(a,b,c,d){
 						Andt_Unid = '#rsPRCI5.Pos_Unidade#' and
 						Andt_Grp = #rsPRCI5.Pos_NumGrupo# and 
 						Andt_Item = #rsPRCI5.Pos_NumItem# and 
-						Andt_DPosic = #AndtDPosicc# and
-						Andt_HPosic = '#AndtHPosicc#' and
+						Andt_DPosic = #AndtDPosic# and
+						Andt_HPosic = '#AndtHPosic#' and
 						Andt_Resp = #auxsta# and
 						Andt_TipoRel = 1
 					</cfquery>			
-			        <cfif (rsExisteb.recordcount lte 0) and (salvarSN eq 'S')>
-						<cfquery datasource="#dsn_inspecao#">
-							insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCI5.Pos_Inspecao#', '#rsPRCI5.Pos_Unidade#', #rsPRCI5.Pos_NumGrupo#, #rsPRCI5.Pos_NumItem#, #AndtDPosicc#, '#AndtHPosicc#', #auxsta#, #rsPRCI5.Und_TipoUnidade#, 0, 0, '#rsNRPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsNRPENDTRAT.And_Area#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCI5.Pos_PontuacaoPonto#, '#rsPRCI5.Pos_ClassificacaoPonto#')
+			        <cfif rsExisteb.recordcount lte 0>
+						 <cfquery datasource="#dsn_inspecao#">
+						insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCI5.Pos_Inspecao#', '#rsPRCI5.Pos_Unidade#', #rsPRCI5.Pos_NumGrupo#, #rsPRCI5.Pos_NumItem#, #AndtDPosic#, '#AndtHPosic#', #auxsta#, #rsPRCI5.Und_TipoUnidade#, 0, 0, '#rsNRPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsNRPENDTRAT.And_Area#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCI5.Pos_PontuacaoPonto#, '#rsPRCI5.Pos_ClassificacaoPonto#')
 						</cfquery> 
 				    </cfif>
-					<cfif dateformat(#AndtDPosicc#,"YYYYMMDD") lte dateformat(#dtini#,"YYYYMMDD")>
-						<cfset salvarSN = 'N'>
-					</cfif>					
 			   </cfloop>
-		    </cfoutput>  
-
-<!--- FIM ROTINA 4 ---> 
-<!--- ROTINA 5 --->
+		    </cfoutput> 
+			<!--- FIM ROTINA 5 ---> 
+			<!--- ROTINA 6 --->
 			<!--- VALIDAR PONTOS NA TABELA: Andamento_Temp  --->
 	    	<!--- GRUPOS E ITENS NÃO PERMITIDOS  --->
 			<cfquery name="rsGRIT" datasource="#dsn_inspecao#">
@@ -655,9 +670,9 @@ function listar(a,b,c,d){
 					</cfquery>	
 	        	</cfif>
 			</cfoutput>			
-<!--- FIM ROTINA 5 ---> 
+			<!--- FIM ROTINA 6 ---> 
 		
-<!--- ROTINA 6 --->
+			<!--- ROTINA 7 --->
 			<!--- POS_NOMEAREA NÃO PERMITIDOS  --->
 			 <cfquery name="AndtArea" datasource="#dsn_inspecao#">
 				SELECT Andt_AnoExerc, Andt_TipoRel, Andt_Mes, Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item, Andt_Resp, Andt_Area
@@ -688,7 +703,7 @@ function listar(a,b,c,d){
 				 	</cfquery>	
 				</cfif>			 	
 		</cfoutput>
-<!--- FIM ROTINA 6 ---> 
+		<!--- FIM ROTINA 7 ---> 
 	</cfif>	
 
 	<cfset aux_mes = aux_mes + 1>	
@@ -2886,4 +2901,3 @@ function listar(a,b,c,d){
  </cfoutput> 
 </body>
 </html>
- 

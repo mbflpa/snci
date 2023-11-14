@@ -15,31 +15,6 @@
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 
-
-<!---  --->
-<cfoutput>
-	<cfset auxdtprev = CreateDate(year(now()),month(now()),day(now()))>
-	<cfset nCont = 0>
-	<cfloop condition="nCont lte 9">
-	   <cfset nCont = nCont + 1>
-	   <cfset auxdtprev = DateAdd( "d", 1, auxdtprev)>
-	   <cfset vDiaSem = DayOfWeek(auxdtprev)>
-	   <cfif vDiaSem neq 1 and vDiaSem neq 7>
-			<!--- verificar se Feriado Nacional --->
-			<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-				 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #auxdtprev#
-			</cfquery>
-			<cfif rsFeriado.recordcount gt 0>
-			   <cfset nCont = nCont - 1>
-			</cfif>
-		</cfif>
-		<!--- Verifica se final de semana  --->
-		<cfif vDiaSem eq 1 or vDiaSem eq 7>
-			<cfset nCont = nCont - 1>
-		</cfif>
-	</cfloop>
-</cfoutput>
-<!---  --->
 	<cfset qtItens = qryPapelTrabalho.recordcount>
 
   <cfquery name="rsSituacoes" datasource="#dsn_inspecao#">
@@ -91,7 +66,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 
   <cfset emReavaliacaoReavaliado = "#rsItemEmReanalise.recordcount#" + "#rsItemReanalisado.recordcount#" >
 
-<!---inspeçoes NA = não avaliadas, ER = em reavaliação, RA =reavaliado, CO = conclu�da--->
+<!---inspeçoes NA = não avaliadas, ER = em reavaliação, RA =reavaliado, CO = concluida--->
   <cfquery name="rsInspecaoNaoFinalizada" datasource="#dsn_inspecao#">
         SELECT INP_Situacao, INP_DtUltAtu, Pos_Situacao_Resp  FROM Inspecao
         LEFT JOIN  ParecerUnidade ON INP_NumInspecao = Pos_Inspecao
@@ -115,39 +90,65 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
    
    
 
-    <!---In�cio do processo de liberação da avalia��o--->
-			    <!---Veirifica se esta inspeção possui algum item Em Revis�o --->	
+    <!---Inicio do processo de liberação da avaliação--->
+			    <!---Verifica se esta inspeção possui algum item Em Revisao --->	
 				<cfquery name="qInspecaoLiberada" datasource="#dsn_inspecao#">
 					SELECT * FROM ParecerUnidade 
 					WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 0
 				</cfquery>
-				<!---Veirifica se esta inspeção possui algum item em Reanálise --->
+				<!---Verifica se esta inspeção possui algum item em Reanálise --->
 				<cfquery datasource="#dsn_inspecao#" name="qVerifEmReanalise">
 					SELECT RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao 
 					WHERE (RTRIM(RIP_Recomendacao)='S' OR RTRIM(RIP_Recomendacao)='R') and RIP_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' 
 				</cfquery>
-				<!---Verifica se esta inspeção possui algum item não avaliado (todos os Não VERIFICADO e os Não EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1) --->
+				<!---Verifica se avaliação possui algum item não avaliado (todos os Não VERIFICADO e os Não EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1) --->
 				<cfquery datasource="#dsn_inspecao#" name="qVerifValidados">
 					SELECT RIP_Resposta, RIP_Recomendacao 
 					FROM ((Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade) 
-INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND 
-(INP_Unidade = RIP_Unidade)) 
-INNER JOIN Itens_Verificacao ON (Itn_Ano = convert(char(4),RIP_Ano)) and (RIP_NumItem = Itn_NumItem) 
-AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
- (INP_Modalidade = Itn_Modalidade) 
-					WHERE ((RTRIM(RIP_Resposta)= 'E' AND Itn_ValidacaoObrigatoria=1) OR RTRIM(RIP_Resposta)= 'V') AND   RTRIM(RIP_Recomendacao) IS NULL AND RIP_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' and RIP_Unidade='#qryPapelTrabalho.RIP_Unidade#' 
+          INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)) 
+          INNER JOIN Itens_Verificacao ON (Itn_Ano = convert(char(4),RIP_Ano)) AND 
+                      (RIP_NumItem = Itn_NumItem) AND 
+                      (RIP_NumGrupo = Itn_NumGrupo) AND 
+                      (Und_TipoUnidade = Itn_TipoUnidade) AND 
+                      (INP_Modalidade = Itn_Modalidade) 
+					WHERE 
+            ((RTRIM(RIP_Resposta)= 'E' AND Itn_ValidacaoObrigatoria=1) OR RTRIM(RIP_Resposta)= 'V') AND 
+            RTRIM(RIP_Recomendacao) IS NULL AND RIP_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' and RIP_Unidade='#qryPapelTrabalho.RIP_Unidade#' 
 				</cfquery>
    
-				<!---In�cio - Se não existirem itens em revisão e não existirem itens em reavaliação,
+				<!---Inicio - Se não existirem itens em revisão e não existirem itens em reavaliação,
 				     inicia o processo de liberação de todos os itens--->	
 					<cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0>
 
-						<!---Salva a matricula do gestor na tabela Inspecao para sinalisar o gestor que liberou a verifica��o --->
+						<!---Salva a matricula do gestor na tabela Inspecao para sinalisar o gestor que liberou a verificação --->
+
 						<cfquery datasource="#dsn_inspecao#">
 							UPDATE Inspecao SET INP_Situacao = 'CO', INP_UserName = '#CGI.REMOTE_USER#', INP_DtEncerramento = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, INP_DTUltAtu = CONVERT(DATETIME, getdate(), 103)
 							WHERE INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
 						</cfquery>
-						
+
+            <!--- 10 dias úteis na data de previsão --->
+            <cfset auxdtprev = CreateDate(year(now()),month(now()),day(now()))>
+            <cfset nCont = 0>
+            <cfloop condition="nCont lte 9">
+              <cfset nCont = nCont + 1>
+              <cfset auxdtprev = DateAdd( "d", 1, auxdtprev)>
+              <cfset vDiaSem = DayOfWeek(auxdtprev)>
+              <cfif vDiaSem neq 1 and vDiaSem neq 7>
+                <!--- verificar se Feriado Nacional --->
+                <cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+                  SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #auxdtprev#
+                </cfquery>
+              <cfif rsFeriado.recordcount gt 0>
+                <cfset nCont = nCont - 1>
+              </cfif>
+              </cfif>
+              <!--- Verifica se final de semana  --->
+              <cfif vDiaSem eq 1 or vDiaSem eq 7>
+                <cfset nCont = nCont - 1>
+              </cfif>
+            </cfloop>
+
 						<cfquery name="rs11" datasource="#dsn_inspecao#">
 							SELECT RIP_REINCINSPECAO, RIP_Falta, RIP_Sobra, Und_TipoUnidade, Und_Centraliza, Itn_TipoUnidade, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Itn_Pontuacao, Itn_Classificacao, Itn_PTC_Seq
 							FROM (((Inspecao 
@@ -157,17 +158,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 							INNER JOIN Unidades ON (Und_TipoUnidade = Itn_TipoUnidade) AND (Pos_Unidade = Und_Codigo)
 							WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 11
 						</cfquery>
-						<!--- <cfquery name="rs11" datasource="#dsn_inspecao#">
-							SELECT Und_TipoUnidade, Und_Centraliza, Itn_TipoUnidade, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Itn_Pontuacao, Itn_Classificacao, Itn_PTC_Seq
-							FROM Itens_Verificacao 
-							INNER JOIN (ParecerUnidade 
-							INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-							inner join inspecao on inspecao.INP_NumInspecao = Pos_Inspecao) ON (right(Pos_Inspecao,4)= Itn_Ano) and (Itn_NumItem = Pos_NumItem) 
-							AND (Itn_NumGrupo = Pos_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) and (INP_Modalidade = Itn_Modalidade)
-							WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 11
-						</cfquery> ---> 
-
-							<cfloop query="rs11">
+						<cfloop query="rs11">
 								<cfset auxposarea = rs11.Pos_Area>
 								<cfset auxnomearea = rs11.Pos_NomeArea>
 								
@@ -258,8 +249,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 								</cfquery>
 							</cfloop>
                      
-						<!---Fim -Se existirem itens em liberação, executa a rotina para mudan�a do status de todos os itens
-							em liberação para não respondido--->
+						<!---Fim -Se existirem itens em liberação, executa a rotina para mudança do status de todos os itens em liberação para não respondido --->
 
 						<!--- Início - e-mail automático por unidade --->
 							<cfquery name="rsEmail" datasource="#dsn_inspecao#">
@@ -369,30 +359,72 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 									</cfmail>
 								</cfif>
 							</cfoutput>
-						<!--- Fim - e-mail autom�tico por unidade --->
+						<!--- Fim - e-mail automático por unidade --->
 					</cfif>
 				<!---Fim do processo de liberação de todos os itens--->	
-				<!--- In�cio Verifica��o dos registros que est�o na situa��o 14(não Respondido) na tabela ParecerUnidade --->
+				<!--- Inicio Verificacao dos registros que estao na situacao 14(não Respondido) na tabela ParecerUnidade --->
 					<cfquery name="qNaoRespondido" datasource="#dsn_inspecao#">
 						SELECT Pos_Inspecao, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp FROM ParecerUnidade
 						WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' AND Pos_Situacao_Resp = 14
 					</cfquery>
 					
 					<cfoutput query="qNaoRespondido">
-						<cfquery name="rs14SN" datasource="#dsn_inspecao#">
-							SELECT And_NumInspecao FROM Andamento
-							WHERE And_Unidade='#qNaoRespondido.Pos_Unidade#' AND And_NumInspecao='#qNaoRespondido.Pos_Inspecao#' AND And_NumGrupo=#qNaoRespondido.Pos_NumGrupo# AND And_NumItem=#qNaoRespondido.Pos_NumItem# 
-							AND And_Situacao_Resp = 14
-						</cfquery> 
-						
-						<cfif qNaoRespondido.Pos_Situacao_Resp eq 14 and rs14SN.recordcount lte 0>
-                <cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
-                <cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
-							<cfquery datasource="#dsn_inspecao#">
-								INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-								VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #qNaoRespondido.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#','#qryPapelTrabalho.RIP_Unidade#')
-							</cfquery>
-						</cfif>
+              <cfquery datasource="#dsn_inspecao#">
+                UPDATE ParecerUnidade SET 
+                  Pos_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
+                , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(auxdtprev),month(auxdtprev),day(auxdtprev)))#
+                , Pos_DtUltAtu = CONVERT(char, GETDATE(), 120) 
+                WHERE 
+                    Pos_Inspecao='#qNaoRespondido.INP_NumInspecao#' and 
+                    Pos_NumGrupo = #qNaoRespondido.Pos_NumGrupo# and 
+                    Pos_NumItem = #qNaoRespondido.Pos_NumItem#
+              </cfquery>
+
+              <cfquery name="rs14SN" datasource="#dsn_inspecao#">
+                SELECT And_NumInspecao FROM Andamento
+                WHERE 
+                    And_Unidade='#qNaoRespondido.Pos_Unidade#' AND 
+                    And_NumInspecao='#qNaoRespondido.Pos_Inspecao#' AND 
+                    And_NumGrupo=#qNaoRespondido.Pos_NumGrupo# AND 
+                    And_NumItem=#qNaoRespondido.Pos_NumItem#   AND 
+                    And_Situacao_Resp = 14
+              </cfquery> 
+
+              <cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
+              <cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>		
+
+              <cfif rs14SN.recordcount lte 0>
+                  <cfquery datasource="#dsn_inspecao#">
+                    INSERT Andamento 
+                    (
+                      And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area
+                    )
+                    VALUES 
+                    (
+                     '#qNaoRespondido.Pos_Inspecao#', 
+                     '#qNaoRespondido.Pos_Unidade#', 
+                     #qNaoRespondido.Pos_NumGrupo#, 
+                     #qNaoRespondido.Pos_NumItem#, 
+                     convert(char, getdate(), 102), 
+                     '#CGI.REMOTE_USER#', 
+                     14, 
+                     '#hhmmssdc#',
+                     '#qryPapelTrabalho.RIP_Unidade#'
+                     )
+                  </cfquery>
+              <cfelse>
+                  <cfquery datasource="#dsn_inspecao#">
+                    UPDATE Andamento SET
+                      And_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
+                    , And_HrPosic = '#hhmmssdc#'
+                    WHERE 
+                      And_Unidade='#qNaoRespondido.Pos_Unidade#' AND 
+                      And_NumInspecao='#qNaoRespondido.Pos_Inspecao#' AND 
+                      And_NumGrupo=#qNaoRespondido.Pos_NumGrupo# AND 
+                      And_NumItem=#qNaoRespondido.Pos_NumItem#   AND 
+                      And_Situacao_Resp = 14
+                  </cfquery>
+              </cfif>
 					</cfoutput>
 				<!--- fim Verificação dos registros que estão na situação 14(não Respondido) na tabela ParecerUnidade --->
 					
@@ -444,7 +476,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 	</cfquery>
 
   <cfset semNCvalidado = false>
-   <!---Verifica se � uma verifca��o não tem itens não conforme e se foi validada--->
+   <!---Verifica se é uma verifcação não tem itens não conforme e se foi validada--->
   <cfquery datasource="#dsn_inspecao#" name="rsSemNC" >
 			SELECT Count(RIP_NumInspecao) as total, Count(CASE WHEN LTRIM(RTRIM(RIP_Recomendacao))='V' THEN 1 END) AS validado
       ,Count(CASE WHEN LTRIM(RTRIM(RIP_Resposta))='N' THEN 1 END) AS itemNC, Count(RIP_MatricAvaliador) as totalAvaliadores
@@ -453,7 +485,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
   </cfquery>
 
 
-  <!---FIM - Verifica se � uma verifica��o sem itens não conforme--->
+  <!---FIM - Verifica se � uma verificação sem itens não conforme--->
   <cfif "#rsSemNC.total#" eq "#rsSemNC.validado#" >
     <cfset semNCvalidado = true>
   </cfif>
@@ -486,13 +518,13 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 
   <script language="javascript" >
    
-    //captura a posi��o do scroll (usado nos bot�es que chamam outras páginas)
+    //captura a posição do scroll (usado nos botoes que chamam outras páginas)
     //e salva no sessionStorage
     function capturaPosicaoScroll() {
       sessionStorage.setItem('scrollpos', document.body.scrollTop);
     }
 
-    //ap�s o onload recupera a posi��o do scroll armazenada no sessionStorage e reposiciona-o conforme �ltima localiza��o
+    //apos o onload recupera a posição do scroll armazenada no sessionStorage e reposiciona-o conforme ultima localização
     window.onload = function () {
       var scrollpos = sessionStorage.getItem('scrollpos');
       if (scrollpos) window.scrollTo(0, scrollpos);
@@ -500,7 +532,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
       capturaPosicaoScroll();
     };
 
-    //ao fechar, atualiza a página de controle de verifica��es
+    //ao fechar, atualiza a página de controle de verificações
     window.onbeforeunload = function () {
       window.opener.location.reload();
     }
@@ -542,7 +574,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
 
     }
 
-    //para bot�o voltar ao topo
+    //para botao voltar ao topo
     window.onscroll = function () {
       scrollFunction()
     };
@@ -615,7 +647,7 @@ AND (RIP_NumGrupo = Itn_NumGrupo) AND (Und_TipoUnidade = Itn_TipoUnidade) AND
       }
 
     }
-    //fim script bot�o voltar ao topo
+    //fim script botão voltar ao topo
 
 
   </script>

@@ -850,7 +850,7 @@
 						'#posarea_cod#','#posarea_nome#','#rsVerificaItem.RIP_NCISEI#', #ItnPontuacao#,'#ClasItem_Ponto#')
 			</cfquery>
 			<!---Fim Insere ParecerUnidade --->
-				
+
 			<!--- Inserindo dados dados na tabela Andamento --->
 			<cfset andparecer = #posarea_cod#  & " --- " & #posarea_nome#>
 			<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
@@ -864,7 +864,7 @@
 		<!---  Se o tem era uma reanálise e nao existirem mais itens em reanálise, a finalizacao da verificacao é realizada nesta página
 		e nao em itens_inspetores_avaliacao.cfm como acontece para as outras avaliações--->
 		<cfif rsVerifItensEmReanalise.recordCount eq 0>
-				<!---UPDATE em Inspecao--->
+				<!--- UPDATE em Inspecao --->
 				<cfquery datasource="#dsn_inspecao#" ><!---Avaliacoes NA = nao avaliadas, ER = em reAvaliacao, RA =reavaliado, CO = concluida---> 
 					UPDATE Inspecao SET INP_Situacao = 'RA', INP_DtEncerramento =  CONVERT(char, GETDATE(), 102), INP_DtUltAtu =  CONVERT(char, GETDATE(), 120), INP_UserName ='#qAcesso.Usu_Matricula#'
 					WHERE INP_Unidade='#FORM.unid#' AND INP_NumInspecao='#FORM.Ninsp#' 
@@ -978,7 +978,7 @@
         <input name="nitem" type="hidden" id="nitem" value="<cfoutput>#URL.Nitem#</cfoutput>">
 		<input name="pg" type="hidden" id="pg" value="<cfoutput>#URL.pg#</cfoutput>">
 		<input name="acao" type="hidden" id="acao" value="">
-
+		
 		<img alt="Ajuda do Item" src="figuras/reavaliar.png" width="45"  border="0" style="position:absolute;left:2px;top:5px"></img>
 		<div align="center" style="margin-left:25px;width:700px;margin-top:15px">	
 			<div>

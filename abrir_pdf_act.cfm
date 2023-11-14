@@ -1,4 +1,4 @@
- <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
+ <cfif (not isDefined("snci.permitir")) OR (snci.permitir eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
 </cfif>

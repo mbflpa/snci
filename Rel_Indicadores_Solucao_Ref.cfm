@@ -115,7 +115,7 @@ ORDER BY Andt_AnoExerc DESC
 function valida_form() {
     var frm = document.forms[0];
     if (frm.se.value=='---'){
-	  alert('Informar a Superintend�ncia!');
+	  alert('Informar a Superintendência!');
 	  frm.se.focus();
 	  return false;
 	}	
