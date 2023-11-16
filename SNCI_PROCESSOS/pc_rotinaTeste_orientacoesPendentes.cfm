@@ -105,6 +105,9 @@
             padding-right: 0.75rem;
 
         }
+        tr {
+           text-align: center;
+        }
 
 
        
@@ -123,20 +126,30 @@
              <!-- Content Header (Page header) -->
             <section class="content-header">
 
-                <div class="container-fluid">
-                    <hr style="border-top: 3px solid black;">
-                    <h6>Quant. Órgãos com Orientações Pendentes: <span style="background: #0083ca;color:#fff;padding:2px"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentes.recordcount,"00")#</cfoutput></span></h6>
-                    <h6>Total de Orientações Pendentes: <span style="background: #0083ca;color:#fff;padding:2px"><cfoutput>#rsOrientacoesPendentes.recordcount#</cfoutput></span></h6>
+                <div class="container-fluid" style="margin-bottom:80px;">
+                    <div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
+                        <div class="col-sm-6">
+                            <h4>Rotina de Verificação de Pontos Pendentes</h4>
+                        </div>
+                    </div>
+                  
+                    <h6 style="margin-top:30px">Quant. Órgãos com Orientações Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentes.recordcount,"00")#</cfoutput></span></h6>
+                    <h6>Total de Orientações Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#rsOrientacoesPendentes.recordcount#</cfoutput></span></h6>
 
                     <cfset quantPendentes = 0>
                     <cfif rsOrgaosComOrientacoesPendentesParaTeste.recordcount gt 0>
                         <cfif application.auxsite neq 'intranetsistemaspe'>
                             <cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
-                            <h6>Quant. Órgãos com Orientações pendentes para teste de envio de e-mail: <span style="background: #0083ca;color:#fff;padding:2px"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
+                            <h6>Quant. Órgãos com Orientações pendentes para teste de envio de e-mail: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
 
                         <cfelse>
                             <cfset myQuery = "rsOrgaosComOrientacoesPendentes">
                         </cfif>
+                        <div style="margin-bottom:30px;justify-content:center; display: flex; width: 100%;margin-top:20px">
+                            <div>
+                                <button id="btnRotinaOrientacoesPendentes" class="btn btn-block btn-primary " >Executar Rotina</button>
+                            </div>      
+                        </div>
                         <hr style="border-top: 3px solid black;">
                         <cfloop query="#myQuery#">
                         
@@ -176,21 +189,22 @@
                                 right JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
                                 WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (2,16)  or (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp >= getdate()))
                             </cfquery>
-
-                            <cfoutput>#NumberFormat(rsOrientacoesPendentes.recordcount,"00")# orientações pendentes da #rsOrientacoesPendentes.siglaOrgaoResp#</cfoutput>
-                            <cfif rsOrientacoesOutrosStatus.recordcount gt 0>
-                                <br>
-                                <cfoutput>#NumberFormat(rsOrientacoesOutrosStatus.recordcount,"00")# outras orientações da #rsOrientacoesPendentes.siglaOrgaoResp#</cfoutput>
-                            </cfif> 
-                            <table id="tabOrientacoes" class="table-hover table-striped">
+                            <div style="margin-bottom:0px;background: #0083ca;color:#fff;padding:10px;font-weight: bold ">
+                                <cfoutput>#NumberFormat(rsOrientacoesPendentes.recordcount,"00")# orientações pendentes da #rsOrientacoesPendentes.siglaOrgaoResp#</cfoutput>
+                                <cfif rsOrientacoesOutrosStatus.recordcount gt 0>
+                                    <br>
+                                    <cfoutput>#NumberFormat(rsOrientacoesOutrosStatus.recordcount,"00")# outras orientações da #rsOrientacoesPendentes.siglaOrgaoResp#</cfoutput>
+                                </cfif> 
+                            </div>
+                            <table id="tabOrientacoes" class="table-striped">
                                 <thead style="background: #0083ca;color:#fff">
                                     <tr style="font-size:14px">
-                                        <th >ID da<br>Orientação</th>
-                                        <th >N° Processo<br>SNCI</th>
+                                        <th >ID da Orientação</th>
+                                        <th >N° Processo SNCI</th>
                                         <th >N° Item</th>
-                                        <th >Data Prevista<br>p/ Resposta</th>
+                                        <th >Data Prevista p/ Resposta</th>
                                         <th >N° SEI</th>
-                                        <th >N° Relatório<br>SEI</th>
+                                        <th >N° Relatório SEI</th>
                                         <th >Tipo de Avaliação:</th>	
                                     </tr>
                                 </thead>
@@ -198,7 +212,7 @@
                                 <tbody>
                                     <cfloop query="rsOrientacoesPendentes" >
                                         <cfoutput>					
-                                            <tr style="font-size:12px;cursor:pointer;z-index:2;"  >
+                                            <tr style="font-size:12px;"  >
                                                     
                                                     <td align="center" >#pc_aval_orientacao_id#</td>
                                                     <td align="center" >#pc_processo_id#</td>
@@ -227,18 +241,15 @@
                                 
 
                             </table>
-  
+                            
                             <cfset quantPendentes = quantPendentes + rsOrientacoesPendentes.recordcount>
                         </cfloop>
                     </cfif>
                     <cfif application.auxsite neq 'intranetsistemaspe'>
+                         <hr style="border-top: 3px solid black;">
                         <h6 >Total de Orientações Pendentes para teste: <cfoutput>#NumberFormat(quantPendentes,"00")#</cfoutput></h6>
                     </cfif>
-                    <div style="margin-bottom:80px;justify-content:center; display: flex; width: 100%;margin-top:20px">
-                        <div>
-                            <button id="btnRotinaOrientacoesPendentes" class="btn btn-block btn-primary " >Executar Rotina</button>
-                        </div>      
-                    </div>
+                    
                 </div>
             </section>
         </div>
