@@ -3318,7 +3318,7 @@
 				<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_descricao))#>
 			</cfif>
 			<!-- se sigla do órgão avaliado começar com SE/, sem espaço antes, usa o pronome de tratamento "Senhor(a) Superintendente Estadual", caso contrárioa usa "Senhor(a) Chefe de Departamento"-->
-			<cfif left(LTrim(RTrim(rsOrientacoes.pc_orgao_avaliado_sigla)),3) eq 'SE/'>
+			<cfif left(LTrim(RTrim(siglaOrgaoAvaliado)),3) eq 'SE/'>
 				<cfset pronomeTrat = "Senhor(a) Superintendente Estadual da #siglaOrgaoAvaliado#">
 			<cfelse>
 				<cfset pronomeTrat = "Senhor(a) Chefe de Departamento do #siglaOrgaoAvaliado#">

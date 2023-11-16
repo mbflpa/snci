@@ -1504,6 +1504,7 @@
 				<cftry>		
 					<!-- Se o processo não estiver bloqueado e a modalidade não for ACOMPANHAMENTO, envia e-mail para o órgão avaliado, com cópia para os órgãos responsáveis pelas orientações do processo-->
 					<cfif rsProcessoComOrientacoes.pc_iniciarBloqueado neq 'S' and rsProcesso.pc_modalidade neq 'A'>
+							
 							<cfset to = "#LTrim(RTrim(rsProcesso.pc_org_email))#">
 							<cfset cc = "#listaEmailsOrgaos#">
 							<cfset siglaOrgaoAvaliado = "#LTrim(RTrim(rsProcesso.pc_org_sigla))#">
@@ -1515,7 +1516,7 @@
 								<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_descricao))#>
 							</cfif>
 							<!-- se sigla do órgão avaliado começar com SE/, sem espaço antes, usa o pronome de tratamento "Senhor(a) Superintendente Estadual", caso contrárioa usa "Senhor(a) Chefe de Departamento"-->
-							<cfif left(LTrim(RTrim(rsProcessoComOrientacoes.pc_orgao_avaliado_sigla)),3) eq 'SE/'>
+							<cfif left(LTrim(RTrim(siglaOrgaoAvaliado)),3) eq 'SE/'>
 								<cfset pronomeTrat = "Senhor(a) Superintendente Estadual da #siglaOrgaoAvaliado#">
 							<cfelse>
 								<cfset pronomeTrat = "Senhor(a) Chefe de Departamento do #siglaOrgaoAvaliado#">
