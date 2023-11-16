@@ -101,12 +101,13 @@
                         <br>
 
 
-
-                        <div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
-                            <div id="btSalvarDiv" >
-                                <button id="btnRotinaPontosSuspensos" class="btn btn-block btn-primary " >Executar Rotina</button>
-                            </div>      
-                        </div>
+                        <cfif rsPontoSuspensoPrazoVencido.recordcount gt 0>
+                            <div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
+                                <div id="btSalvarDiv" >
+                                    <button id="btnRotinaPontosSuspensos" class="btn btn-block btn-primary " >Executar Rotina</button>
+                                </div>      
+                            </div>
+                        </cfif>
                     </cfoutput>
                 </div><!-- /.container-fluid -->
             </section>
