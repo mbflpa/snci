@@ -723,7 +723,7 @@
 
         <cfset to = "#arguments.para#">
 		<cfset cc = "">
-		<cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "">
+		<cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "" and (arguments.copiaPara neq arguments.para)>
 			<cfset cc = "#arguments.copiaPara#">
 		</cfif> 
 
