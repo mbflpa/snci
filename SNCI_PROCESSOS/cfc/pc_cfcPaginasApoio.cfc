@@ -770,7 +770,7 @@
 			</cfcatch>
 
 			
-    </cftry>
+    	</cftry>
 		<cfreturn #sucesso# />
     </cffunction>
 
@@ -1140,7 +1140,7 @@
 				INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_melhoria_num_orgao
 				INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 				INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-				INNER JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_num_orgao_avaliado
+				INNER JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
 				WHERE pc_aval_melhoria_num_orgao = '#pc_aval_melhoria_num_orgao#' and pc_aval_melhoria_status = 'P' and pc_num_status in(4,5)
 			</cfquery>
 
@@ -1163,6 +1163,7 @@
 				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
 				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
 							para = "#to#"
+							copiaPara = "#cc#"
 							pronomeTratamento = "#pronomeTrat#"
 							texto="#textoEmail#"
 				/>

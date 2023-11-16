@@ -4,21 +4,27 @@
 <cfquery name="rsOrgaosComMelhoriasPendentes" datasource="#application.dsn_processos#" >
     SELECT DISTINCT pc_aval_melhoria_num_orgao
     FROM pc_avaliacao_melhorias
-    WHERE pc_aval_melhoria_status = 'P'	
+    INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
+	INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
+    WHERE pc_aval_melhoria_status = 'P'	and pc_num_status in(4,5)
 </cfquery>
 
 
 <cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#" >
     SELECT pc_aval_melhoria_num_orgao
     FROM pc_avaliacao_melhorias
-    WHERE pc_aval_melhoria_status = 'P'	
+    INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
+	INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
+    WHERE pc_aval_melhoria_status = 'P'	and pc_num_status in(4,5)
 </cfquery>
 
 
 <cfquery name="rsOrgaosComMelhoriasPendentesParaTeste" datasource="#application.dsn_processos#" >
     SELECT DISTINCT TOP 5 pc_aval_melhoria_num_orgao
     FROM pc_avaliacao_melhorias
-    WHERE pc_aval_melhoria_status = 'P'	
+    INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
+	INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
+    WHERE pc_aval_melhoria_status = 'P'	and pc_num_status in(4,5)
 </cfquery>
 
 
