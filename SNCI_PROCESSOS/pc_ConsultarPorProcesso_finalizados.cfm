@@ -260,6 +260,7 @@
 
 			// Lidar com a mudança de seleção dos botões de rádio
 			$("input[type='radio']").click(function () {
+				$("#exibirTab").html('<h1 style="margin-left:50px">Carregando...</h1>');
 				radioValue = $("input[name='opcaoAno']:checked").val();
 				$("#modalOverlay").modal("show");
 				mostraTab = localStorage.getItem("mostraTab");

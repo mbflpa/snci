@@ -238,7 +238,7 @@
 		function exibirTabela(anoMostra) {
 			// Mostrar overlay para indicar carregamento
 			$("#modalOverlay").modal("show");
-
+			$("#exibirTab").html('<h1 style="margin-left:50px">Carregando...</h1>');
 			// Realizar uma requisição AJAX para obter os dados da tabela
 			setTimeout(function () {
 				$.ajax({

@@ -230,6 +230,7 @@
 		// Função para exibir a tabela com base no ano selecionado
 		function exibirTabela(anoMostra) {
 			$("#modalOverlay").modal("show");
+			$("#exibirTab").html('<h1 style="margin-left:50px">Carregando...</h1>');
 			setTimeout(function () {
 				$.ajax({
 					type: "post",
