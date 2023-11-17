@@ -36,7 +36,7 @@
                             <h5>Melhorias:</h5>
                             <ul>
                                 <li>Adicionados dois novos status: "JUDICIALIZADO" e "PONTO SUSPENSO";</li>
-                                <li>Maior velocidade de carregamento do aplicativo e páginas;</li>
+                                <li>Maior velocidade de carregamento das páginas;</li>
                                 <li>Maior velocidade de carregamento de tabelas;</li>
                                 <li>O controle de usuários está com uma nova interface e melhoria na velocidade de carregamento dos usuários cadastrados.</li>
                             </ul>
