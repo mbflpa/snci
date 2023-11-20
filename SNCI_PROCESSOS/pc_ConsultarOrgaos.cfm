@@ -36,34 +36,28 @@
             </section>
             <!--criar div dividindo o body em duas colunas-->
             <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-12">
                 <section class="content">
                     <div class="container-fluid">
                         <div>
                             <cfquery name="rsOrgaos" datasource="#application.dsn_processos#">
                                 SELECT pc_orgaos.*
                                 FROM pc_orgaos
-                                order by pc_org_se_sigla, pc_org_mcu_subord_adm, pc_org_sigla, pc_org_mcu
+                                order by pc_org_sigla
                             </cfquery>       
-                            <input type="text" id="filter" placeholder="Digite uma palavra ou número para filtrar" spellcheck="false">
-                            <button onclick="filterTree()"><i class="fa fa-search"></i> Filtrar</button>
-                            <button onclick="clearFilter()"><i class="fa fa-filter"></i> Limpar Filtro</button>
-                            <ul id="treeDemo" class="ztree"></ul>    
+                           
+                            <div class="input-group ">
+                                <input  id="filter" type="text" class="form-control rounded-0 col-sm-4"  placeholder="Digite uma palavra ou número para filtrar" spellcheck="false">
+                                <span class="input-group-append">
+                                    <button type="button" onclick="clearFilter()" class="btn btn-info btn-flat" style="font-size: 12px;"><i class="fa fa-filter"></i> Limpar Filtro</button>
+                                </span>
+                            </div>
+                            <ul style="margin-bottom:80px" id="treeDemo" class="ztree"></ul>    
                         </div>  
                     </div><!-- /.container-fluid -->
                 </section>
             </div>
-            <div class="col-sm-4">
-                <section class="content">
-                    <div class="container-fluid">
-                        <div>
-                            <div>
-                                <h6>Estrutura dos Órgãos:</h6>
-                            </div>
-                        </div>
-                    </div><!-- /.container-fluid -->
-                </section>
-            </div>
+            
         </div>
 
 
@@ -78,11 +72,13 @@
 <!-- ZtreeCore JavaScript -->
     <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/jquery.ztree.core.min.js"></script>
     <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/jquery.ztree.exhide.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/fuzzysearchModificado.js"></script>
     <script language="JavaScript">
 
         
         $(document).ready(function(){
             $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+            fuzzySearch('treeDemo','#filter',null,true); // initialize fuzzy search function
         });
 
      var zNodes =[
@@ -90,7 +86,7 @@
                     { 
                         id: #rsOrgaos.pc_org_mcu#, // unique ID
                         pId: #rsOrgaos.pc_org_mcu_subord_adm#, // parent ID
-                        name: "#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_descricao#-#rsOrgaos.pc_org_mcu#)", 
+                        name: "#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_descricao# - MCU: #rsOrgaos.pc_org_mcu# - <i class='fa fa-envelope'></i> #rsOrgaos.pc_org_email#)", 
                         open: false, // open this node on page load
                         status: "#rsOrgaos.pc_org_status#" // status of the node
                     },
@@ -103,53 +99,24 @@
                     enable: true
                 }
             },
+            keep: {
+                leaf: true
+            },
             view: {
                 fontCss: getFontCss,
-             }
+                dblClickExpand: false,
+                nameIsHTML: true
+             },
+             callback: {
+				onClick: onClick
+			}
         };
         
         function getFontCss(treeId, treeNode) {
             return treeNode.status == 'D' ? {color:"red"} : {};
         }
 
-        function filterTree() {
-            var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
-            var filterValue = document.getElementById('filter').value.toUpperCase();
-
-            // Define a função para encontrar os nós filhos
-            var findChildNodes = function(node) {
-                var childNodes = [];
-                for (var i = 0; i < zNodes.length; i++) {
-                    if (zNodes[i].pId === node.id) {
-                        childNodes.push(zNodes[i]);
-                        childNodes = childNodes.concat(findChildNodes(zNodes[i]));
-                    }
-                }
-                return childNodes;
-            };
-
-            // Define a função de filtro
-            var filterFunc = function(node) {
-                return node.name.toUpperCase().indexOf(filterValue) > -1;
-            };
-
-            // Filtra os dados originais
-            var filteredNodes = zNodes.filter(filterFunc);
-
-            // Adiciona todos os nós filhos dos nós filtrados
-            for (var i = 0; i < filteredNodes.length; i++) {
-                filteredNodes = filteredNodes.concat(findChildNodes(filteredNodes[i]));
-            }
-
-            // Remove duplicatas
-            filteredNodes = filteredNodes.filter(function(node, index) {
-                return filteredNodes.indexOf(node) === index;
-            });
-
-            // Reconstrói a árvore com os dados filtrados
-            treeObj.destroy();
-            $.fn.zTree.init($("#treeDemo"), setting, filteredNodes);
-        }
+       
 
         function clearFilter() {
             var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
@@ -159,6 +126,17 @@
             $.fn.zTree.init($("#treeDemo"), setting, zNodes);
             $('#filter').val('');
         }
+
+       function onClick(e,treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+			zTree.expandNode(treeNode);
+		}
+
+
+
+
+
+        
 
 
 
