@@ -1438,4 +1438,264 @@
 
 
 	</cffunction>
+
+	
+
+	
+	<cffunction name="trocaSubordTecnicaOrgao" access="remote"  hint="troca a subordinação técnica do órgão na consulta por órgão.">
+	
+		<cfargument name="mcuOrgao" type="string" required="true">
+		<cfargument name="mcuOrgaoSubord" type="string" required="true">
+        <cfargument name="tipoSubordinacao" type="string" required="true">
+		<cfif "#arguments.tipoSubordinacao#" eq "subTec">
+			<!--se mcuOrgao e mcuOrgaoSubordTec não for null-->
+			<cfif #mcuOrgao# neq "" and #mcuOrgaoSubord# neq "">
+				<cfquery name="rsTrocaSubordTecnicaOrgao" datasource="#application.dsn_processos#">
+					UPDATE pc_orgaos
+					SET pc_org_mcu_subord_tec = <cfqueryparam value="#mcuOrgaoSubord#" cfsqltype="cf_sql_varchar">
+					WHERE pc_org_mcu = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
+				</cfquery>
+				<cfreturn true>
+			<cfelse>
+				<cfreturn false>
+			</cfif>
+		<cfelse>
+			<!--se mcuOrgao e mcuOrgaoSubordAdm não for null-->
+			<cfif #mcuOrgao# neq "" and #mcuOrgaoSubord# neq "">
+				<cfquery name="rsTrocaSubordTecnicaOrgao" datasource="#application.dsn_processos#">
+					UPDATE pc_orgaos
+					SET pc_org_mcu_subord_adm = <cfqueryparam value="#mcuOrgaoSubord#" cfsqltype="cf_sql_varchar">
+					WHERE pc_org_mcu = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
+				</cfquery>
+				<cfreturn true>
+			<cfelse>
+				<cfreturn false>
+			</cfif>
+		</cfif>
+		
+	</cffunction>
+
+	<cffunction name="criarTreeOrgao" access="remote"  hint="cria a árvore de órgãos com base nos parametros de subordinação.">
+		<cfargument name="tipoSubordinacao" type="string" required="true">
+
+		
+		<cfquery name="rsOrgaos" datasource="#application.dsn_processos#">
+			SELECT pc_orgaos.*
+			FROM pc_orgaos
+			order by pc_org_sigla
+		</cfquery>  
+
+		 <ul style="margin-bottom:80px" id="treeOrgao" class="ztree"></ul>  
+
+		<script language="JavaScript">
+			$(document).ready(function(){
+				$.fn.zTree.init($("#treeOrgao"), setting, zNodes);
+				//fuzzySearch('treeOrgao','#filter',null,true); // initialize fuzzy search function
+				setEdit();
+				$("#cutNodeBtn_treeOrgao_1").bind("click", cutNodeBtnClick);
+				$("#pasteNodeBtn_treeOrgao_1").bind("click", pasteNodeBtnClick);
+				
+			});
+
+			 var zNodes =[
+					<cfoutput query="rsOrgaos">
+						<cfif "#arguments.tipoSubordinacao#" eq "subTec">
+							{ 
+								id: "#rsOrgaos.pc_org_mcu#", // unique ID
+								pId: "#rsOrgaos.pc_org_mcu_subord_tec#", // parent ID
+								name: "#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_descricao# - MCU: #rsOrgaos.pc_org_mcu# - <i class='fa fa-envelope'></i> #rsOrgaos.pc_org_email#)", 
+								open: false, // open this node on page load
+								status: "#rsOrgaos.pc_org_status#", // status of the node
+								extraData:"#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_mcu#)"
+							},
+						<cfelse>
+							{
+								id: "#rsOrgaos.pc_org_mcu#", // unique ID
+								pId: "#rsOrgaos.pc_org_mcu_subord_adm#", // parent ID
+								name: "#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_descricao# - MCU: #rsOrgaos.pc_org_mcu# - <i class='fa fa-envelope'></i> #rsOrgaos.pc_org_email#)", 
+								open: false, // open this node on page load
+								status: "#rsOrgaos.pc_org_status#", // status of the node
+								extraData:"#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_mcu#)"
+							},
+						</cfif>
+
+					</cfoutput>
+				];
+
+			var setting = {
+				data: {
+					simpleData: {
+						enable: true
+					}
+				},
+				keep: {
+					leaf: true
+				},
+				view: {
+					fontCss: getFontCss,
+					dblClickExpand: false,
+					nameIsHTML: true,
+					addDiyDom: function(treeId, treeNode) {
+						var spaceWidth = 5;
+						var buttonHTML = '<i id="cutNodeBtn_' + treeNode.tId + '" class="fa fa-check grow-icon" style="font-size: 12px;margin-left: 10px;display:none;"></i>'
+										+ '<i id="pasteNodeBtn_' + treeNode.tId + '" class="fa fa-paste grow-icon" style="font-size: 12px;display:none;margin-left: 10px;"></i>';
+						var tId = treeNode.tId;
+						var $node = $("#" + tId);
+						var $span = $("#" + tId + "_span");
+						if ($("#cutNodeBtn_" + tId).length > 0) return;
+						var $diyBtn = $(buttonHTML).appendTo($node);
+						// ajusta a posição do título do nó
+						$span.css({marginLeft: spaceWidth + "px"});
+						// Adicione um ouvinte de evento 'click' ao botão
+            			$('#cutNodeBtn_' + treeNode.tId).click(cutNodeBtnClick);
+						
+            			$('#pasteNodeBtn_' + treeNode.tId).click(pasteNodeBtnClick);
+					}
+				},
+				callback: {
+					onClick: onClick,
+					
+				}
+			};
+			
+			function getFontCss(treeId, treeNode) {
+				if (treeNode.status == 'D' && treeNode.cut || treeNode.cut) {
+					return {color:"gray"}; // Se o status for 'D' e o nó foi cortado, muda a cor para cinza
+				} else if (treeNode.status == 'D' && treeNode.pasted || treeNode.pasted) {
+					return {color:"blue"}; // Se o nó foi colado, muda a cor para azul
+				} else if (treeNode.status == 'D') {
+					return {color:"red"}; // Se apenas o status for 'D', muda a cor para vermelho
+				} else {
+					return {};
+				}
+			}
+
+
+
+		
+
+			
+		
+		function onClick(e,treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("treeOrgao");
+			zTree.expandNode(treeNode);
+            // Oculte todos os ícones
+            $('.fa-check, .fa-paste').hide();
+            // Verifique se um nó foi selecionado
+            if (treeNode) {
+                // Se um nó foi selecionado, mostre o botão
+                $('#cutNodeBtn_' + treeNode.tId).show();
+				
+				if (typeof cutNode !== 'undefined' && cutNode) {// Verifica se existe algum nó selecionado e se cutNode não é null	
+                	$('#pasteNodeBtn_' + treeNode.tId).show();
+				}
+            }
+		}
+
+		function cutNodeBtnClick() {
+			
+				var treeObj = $.fn.zTree.getZTreeObj("treeOrgao");
+				var nodes = treeObj.getSelectedNodes();
+				if (nodes.length > 0) {
+					cutNode = nodes[0];
+					cutNode.cut = true; // Adiciona uma propriedade 'cut' ao nó
+					treeObj.updateNode(cutNode); // Atualiza o nó para aplicar o novo estilo
+					var nomeOrgao = cutNode.extraData;
+					var mensagem = "";
+					if($('input[name="subRadio"]:checked').val() == "subTec"){
+						mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar o a subordinação técnica.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação técnica e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar em <i class="fa fa-paste"></i>.</p>'
+					}else{
+						mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar o a subordinação administrativa.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação administrativa e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar em <i class="fa fa-paste"></i>.</p>'	
+					}	
+					Swal.fire({
+						html: logoSNCIsweetalert2(mensagem),
+						title: '',
+						confirmButtonText: 'OK!'
+					});
+										
+					$('#pasteNodeBtn_' + cutNode.tId).show(); // Mostra o botão usando jQuery
+				}
+			}
+
+		function pasteNodeBtnClick() {
+				var treeObj = $.fn.zTree.getZTreeObj("treeOrgao");
+				var nodes = treeObj.getSelectedNodes();
+				if (nodes.length > 0 && cutNode) {// Verifica se existe algum nó selecionado e se cutNode não é null
+					treeObj.moveNode(nodes[0], cutNode, "inner");
+					cutNode.pasted = true; // Adiciona uma propriedade 'pasted' ao nó
+					cutNode.cut = false; // Define 'cut' como false
+					treeObj.updateNode(cutNode); // Atualiza o nó para aplicar o novo estilo
+					$('#pasteNodeBtn_' + cutNode.tId).hide(); // Esconde o botão usando jQuery
+
+					//ajax para o metodo trocaSubordTecnicaOrgao do cfc pc_cfcPaginasApoio.cfc
+					if (cutNode !== null) { // Verifica se cutNode não é null antes de acessar a propriedade id
+						var mcuOrgao = cutNode.id;
+						var nomeOrgao = cutNode.extraData;
+						var mcuOrgaoSubord = nodes[0].id;
+						var nomeOrgaoSubord = nodes[0].extraData;
+						$('#modalOverlay').modal('show')
+							setTimeout(function() {
+								$.ajax({
+									type: "POST",
+									url: "../SNCI_PROCESSOS/cfc/pc_cfcPaginasApoio.cfc?method=trocaSubordTecnicaOrgao",
+									data: {
+										"mcuOrgao": mcuOrgao,
+										"mcuOrgaoSubord": mcuOrgaoSubord,
+										"tipoSubordinacao": $('input[name="subRadio"]:checked').val()
+									},
+									success: function (data) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+											var mensagem = "";
+											if($('input[name="subRadio"]:checked').val() == "subTec"){
+												mensagem='<p style="text-align: justify;">Rotina executada com sucesso! <br><br>O órgão <strong>' + nomeOrgao +   '</strong> agora está subordinado tecnicamente a <strong>' + nomeOrgaoSubord + '</strong>.<br><br>A consulta será atualizada.</p>'
+											}else{
+												mensagem='<p style="text-align: justify;">Rotina executada com sucesso! <br><br>O órgão <strong>' + nomeOrgao +   '</strong> agora está subordinado administrativamente a <strong>' + nomeOrgaoSubord + '</strong>.<br><br>A consulta será atualizada.</p>'	
+											}	
+												Swal.fire({
+												html: logoSNCIsweetalert2(mensagem),
+												title: '',
+												confirmButtonText: 'OK!',
+											}).then((result) => {
+												if (result.isConfirmed) {
+													carregaTreeOrgao()
+												}
+											});
+										});
+										
+									},
+									error: function(xhr, ajaxOptions, thrownError) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});
+										$('#modal-danger').modal('show')
+										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+										$('#modal-danger').find('.modal-body').text(thrownError)
+									}
+								});
+							}, 500);
+					}
+					cutNode = null;
+				}
+			}
+
+
+			function setEdit() {
+				var zTree = $.fn.zTree.getZTreeObj("treeOrgao");
+			
+			}
+
+		</script>
+			
+
+	</cffunction>
+	
+
+		
+
+
+		
+
+
+
 </cfcomponent>
