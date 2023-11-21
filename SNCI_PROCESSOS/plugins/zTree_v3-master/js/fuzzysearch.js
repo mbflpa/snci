@@ -12,7 +12,6 @@
  * @returns
  */	
  function fuzzySearch(zTreeId, searchField, isHighLight, isExpand){
-	
 	var zTreeObj = $.fn.zTree.getZTreeObj(zTreeId);//get the ztree object by ztree id
 	if(!zTreeObj){
 		alert("fail to get ztree object");
@@ -81,31 +80,7 @@
 	/**
 	 * reprocess of nodes before showing
 	 */
-	function processShowNodes2(nodesShow,_keywords){
-		if(nodesShow && nodesShow.length>0){
-			//process the ancient nodes if _keywords is not blank
-			if(_keywords.length>0){ 
-				$.each(nodesShow, function(n,obj){
-					var pathOfOne = obj.getPath();//get all the ancient nodes including current node
-					if(pathOfOne && pathOfOne.length>0){ 
-						//i < pathOfOne.length-1 process every node in path except self
-						for(var i=0;i<pathOfOne.length-1;i++){
-							zTreeObj.showNode(pathOfOne[i]); //show node 
-							zTreeObj.expandNode(pathOfOne[i],true); //expand node
-						}
-					}
-				});	
-			}else{ //show all nodes when _keywords is blank and expand the root nodes
-				var rootNodes = zTreeObj.getNodesByParam('level','0');//get all root nodes
-				$.each(rootNodes,function(n,obj){
-					zTreeObj.expandNode(obj,true); //expand all root nodes
-				});
-			}
-		}
-	}
-
 	function processShowNodes(nodesShow,_keywords){
-		
 		if(nodesShow && nodesShow.length>0){
 			//process the ancient nodes if _keywords is not blank
 			if(_keywords.length>0){ 
@@ -118,13 +93,6 @@
 							zTreeObj.expandNode(pathOfOne[i],true); //expand node
 						}
 					}
-					// Here we add the code to show all child nodes of the matching node
-					var allChildNodes = zTreeObj.transformToArray(obj);
-					if (allChildNodes) {
-						for (var i = 0; i < allChildNodes.length; i++) {
-							zTreeObj.showNode(allChildNodes[i]);
-						}
-					}
 				});	
 			}else{ //show all nodes when _keywords is blank and expand the root nodes
 				var rootNodes = zTreeObj.getNodesByParam('level','0');//get all root nodes
@@ -134,12 +102,6 @@
 			}
 		}
 	}
-	
-	
-	
-	
-	
-	
 	
 	//listen to change in input element
 	$(searchField).bind('input propertychange', function() {
@@ -151,7 +113,6 @@
   var lastKeyword = '';
 	// excute lazy load once after input change, the last pending task will be cancled  
 	function searchNodeLazy(_keywords) {
-		limpaFilter();
 		if (timeoutId) { 
 			//clear pending task
 			clearTimeout(timeoutId);
@@ -165,13 +126,4 @@
       lastKeyword = _keywords;
 		}, 500);
 	}
-}
-
-function limpaFilter() {
-	var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
-
-	// Reinicializa a árvore com todos os nós originais
-	treeObj.destroy();
-	$.fn.zTree.init($("#treeDemo"), setting, zNodes);
-	//$('#filter').val('');
 }

@@ -61,6 +61,7 @@
                             <div class="input-group " style="margin-left:10px">
                                 <input  id="filter" type="text" class="form-control rounded-0 col-sm-4"  placeholder="Digite uma palavra ou número para filtrar" spellcheck="false">
                                 <span class="input-group-append">
+                                    <button id="btFiltrar" type="button" class="btn btn-info btn-flat" style="font-size: 12px;background: #b93d30;"><i class="fa fa-filter"></i> Filtrar</button>
                                     <button type="button" onclick="clearFilter()" class="btn btn-info btn-flat" style="font-size: 12px;background: #b93d30;"><i class="fa fa-filter-circle-xmark"></i> Limpar Filtro/Seleção</button>
                                 </span>
                             </div>
@@ -86,7 +87,7 @@
     <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/jquery.ztree.exhide.min.js"></script>
     <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/jquery.ztree.excheck.min.js"></script>
     <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/jquery.ztree.exedit.min.js"></script>
-    <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/fuzzysearchModificado.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/fuzzysearch.js"></script>
     <script language="JavaScript">
 
         
@@ -147,6 +148,21 @@
             carregaTreeOrgao();
             $('#filter').val('');
         }
+
+        $('#btFiltrar').click(function() {
+            
+            var treeObj = $.fn.zTree.getZTreeObj("treeOrgao");
+            var searchValue = $('#filter').val(); // obtém o valor do campo de entrada
+   
+            // realiza uma pesquisa difusa
+            var nodes = treeObj.getNodesByParamFuzzy("name", searchValue, null);
+
+            // expande os nós pai e mostra os nós filho do nó correspondente
+            nodes.forEach(function(node) {
+                treeObj.expandNode(node, true, false, true);
+            });
+        });
+
 					
 
 

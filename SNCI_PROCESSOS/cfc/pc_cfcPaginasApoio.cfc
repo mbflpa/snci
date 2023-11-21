@@ -1233,7 +1233,7 @@
 		<script language="JavaScript">
 			$(document).ready(function(){
 				$.fn.zTree.init($("#treeOrgao"), setting, zNodes);
-				fuzzySearch('treeOrgao','#filter',null,true); // initialize fuzzy search function
+				//fuzzySearch('treeOrgao','#filter',null,true); // initialize fuzzy search function
 				setEdit();
 				$("#cutNodeBtn_treeOrgao_1").bind("click", cutNodeBtnClick);
 				$("#pasteNodeBtn_treeOrgao_1").bind("click", pasteNodeBtnClick);
