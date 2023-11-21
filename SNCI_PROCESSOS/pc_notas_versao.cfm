@@ -30,7 +30,8 @@
                                 <li>Adicionada a funcionalidade "Distribuição", que permite ao órgão avaliado a distribuição das orientações e propostas de melhoria, na seção “Acompanhamento”;</li>
                                 <li>Implementado o "Controle das Distribuições". O órgão avaliado poderá acompanhar as orientações e propostas de melhoria distribuídas. Também, os órgãos avaliados poderão visualizar e editar as manifestações salvas, e ainda não enviadas, pelos seus órgãos subordinados;</li>
                                 <li>Envio de e-mails de alerta, aos órgãos responsáveis pelas orientações e propostas de melhoria e aos órgãos avaliados, após a disponibilização de um novo processo;</li>
-                                <li>Envio de e-mail de alerta, ao órgão responsável, quando ocorrer a distribuição de uma orientação e ou proposta de melhoria.</li>
+                                <li>Envio de e-mail de alerta, ao órgão responsável, quando ocorrer a distribuição de uma orientação e ou proposta de melhoria;</li>
+                                <li>Implementada a funcionalidade Consulta de Órgãos, apenas para o perfil CI - MASTER ACOMPANHAMENTO (GESTOR NÍVEL 4).</li>
                             </ul>
 
                             <h5>Melhorias:</h5>
