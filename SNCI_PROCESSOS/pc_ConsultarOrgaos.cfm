@@ -74,7 +74,7 @@
                                 <input  id="filter" type="text" class="form-control rounded-0 col-sm-4"  placeholder="Digite uma palavra ou número para filtrar" spellcheck="false">
                                 <span class="input-group-append">
                                     <button id="btLocalizar" type="button" class="btn btn-info btn-flat" style="font-size: 12px;background: #b93d30;"><i class="fa fa-magnifying-glass"></i> Localizar</button>
-                                    <button type="button" onclick="clearFilter()" class="btn btn-info btn-flat" style="font-size: 12px;background: #b93d30;"><i class="fa fa-rotate-right"></i></i> Atualizar/Limpar Consulta</button>
+                                    <button type="button" onclick="clearFilter()" class="btn btn-info btn-flat" style="font-size: 12px;background: #b93d30;margin-left:20px"><i class="fa fa-rotate-right"></i></i> Atualizar/Limpar Consulta</button>
                                 </span>
                             </div>
                             <div id="divTreeOrgao"></div> 

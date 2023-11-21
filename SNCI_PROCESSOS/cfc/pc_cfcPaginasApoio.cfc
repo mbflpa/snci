@@ -1485,7 +1485,8 @@
 			order by pc_org_sigla
 		</cfquery>  
 
-		 <ul style="margin-bottom:80px" id="treeOrgao" class="ztree"></ul>  
+		 <ul style="margin-bottom:80px;margin-top:20px;margin-left:10px;border: 1px solid rgba(0,0,0,0.2); box-shadow: 0px 0px 10px rgba(0,0,0,0.2);" id="treeOrgao" class="ztree"></ul>
+ 
 
 		<script language="JavaScript">
 			$(document).ready(function(){
@@ -1503,7 +1504,7 @@
 							{ 
 								id: "#rsOrgaos.pc_org_mcu#", // unique ID
 								pId: "#rsOrgaos.pc_org_mcu_subord_tec#", // parent ID
-								name: "#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_descricao# - MCU: #rsOrgaos.pc_org_mcu# - <i class='fa fa-envelope'></i> #rsOrgaos.pc_org_email#)", 
+								name: "#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_descricao# - mcu:#rsOrgaos.pc_org_mcu# - e-mail:#rsOrgaos.pc_org_email#)", 
 								open: false, // open this node on page load
 								status: "#rsOrgaos.pc_org_status#", // status of the node
 								extraData:"#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_mcu#)"
@@ -1512,7 +1513,7 @@
 							{
 								id: "#rsOrgaos.pc_org_mcu#", // unique ID
 								pId: "#rsOrgaos.pc_org_mcu_subord_adm#", // parent ID
-								name: "#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_descricao# - MCU: #rsOrgaos.pc_org_mcu# - <i class='fa fa-envelope'></i> #rsOrgaos.pc_org_email#)", 
+								name: "#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_descricao# - mcu:#rsOrgaos.pc_org_mcu# - e-mail:#rsOrgaos.pc_org_email#)", 
 								open: false, // open this node on page load
 								status: "#rsOrgaos.pc_org_status#", // status of the node
 								extraData:"#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_mcu#)"
