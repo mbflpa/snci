@@ -1817,11 +1817,16 @@
 								}else {
 									// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 									$('#modalOverlay').modal('hide');
+									
 									Swal.fire({
 											title: 'Operação Cancelada',
 											html: logoSNCIsweetalert2(''),
 											icon: 'info'
 										});
+									
+									carregaTreeOrgao();
+									cutNode.cut = false; // cancela seleção
+									$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
 								} 
 							});
 
@@ -1891,13 +1896,16 @@
 															mensagem='<p style="text-align: justify;">Rotina executada com sucesso! <br><br>Agora o órgão <strong>' + nomeOrgao +   '</strong> está subordinado administrativamente a <strong>' + nomeOrgaoSubord + '</strong>.<br><br>A consulta será atualizada.</p>'	
 														}		
 													}	
-														Swal.fire({
-														html: logoSNCIsweetalert2(mensagem),
-														title: '',
-														confirmButtonText: 'OK!',
+
+													Swal.fire({
+													html: logoSNCIsweetalert2(mensagem),
+													title: '',
+													confirmButtonText: 'OK!',
+														
 													}).then((result) => {
 														if (result.isConfirmed) {
-															carregaTreeOrgao()
+															$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
+															carregaTreeOrgao();
 														}
 													});
 												});
@@ -1921,6 +1929,9 @@
 											html: logoSNCIsweetalert2(''),
 											icon: 'info'
 										});
+									cutNode.cut = false; // cancela seleção
+									$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
+									carregaTreeOrgao();
 								} 
 							});	
 
