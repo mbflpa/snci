@@ -276,7 +276,7 @@
                                 type: "post",
                                 url: "cfc/pc_cfcPaginasApoio.cfc",
                                 data:{
-                                    method: "rotinaSemanalOrientacoesPendentes",
+                                    method: "rotinaSemanalOrientacoesPendentesTeste",
                                 },
                                 async: false,
                                 success: function(result) {

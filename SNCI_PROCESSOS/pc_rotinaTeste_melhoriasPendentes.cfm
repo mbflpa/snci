@@ -105,7 +105,7 @@
                                 type: "post",
                                 url: "cfc/pc_cfcPaginasApoio.cfc",
                                 data:{
-                                    method: "rotinaMensalMelhoriasPendentes",
+                                    method: "rotinaMensalMelhoriasPendentesTeste",
                                 },
                                 async: false,
                                 success: function(result) {
