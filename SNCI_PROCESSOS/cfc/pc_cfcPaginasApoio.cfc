@@ -1428,7 +1428,7 @@
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="marceloferreira@correios.com.br"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+						<cfoutput>Erro rotina "rsOrgaosComOrientacoesPendentesParaTeste" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
 					</cfmail>
 				</cfcatch>
 			</cftry> 
@@ -1537,7 +1537,7 @@
 					nameIsHTML: true,
 					addDiyDom: function(treeId, treeNode) {
 						var spaceWidth = 5;
-						var buttonHTML = '<i id="cutNodeBtn_' + treeNode.tId + '" class="fa fa-check grow-icon" style="font-size: 12px;margin-left: 10px;display:none;"></i>'
+						var buttonHTML = '<i id="cutNodeBtn_' + treeNode.tId + '" class="fa fa-pencil-alt grow-icon" style="font-size: 12px;margin-left: 10px;display:none;"></i>'
 										+ '<i id="pasteNodeBtn_' + treeNode.tId + '" class="fa fa-paste grow-icon" style="font-size: 12px;display:none;margin-left: 10px;"></i>';
 						var tId = treeNode.tId;
 						var $node = $("#" + tId);
@@ -1603,9 +1603,9 @@
 					var nomeOrgao = cutNode.extraData;
 					var mensagem = "";
 					if($('input[name="subRadio"]:checked').val() == "subTec"){
-						mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar o a subordinação técnica.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação técnica e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar em <i class="fa fa-paste"></i>.</p>'
+						mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar a subordinação técnica.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação técnica e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar em <i class="fa fa-paste"></i>.</p>'
 					}else{
-						mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar o a subordinação administrativa.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação administrativa e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar em <i class="fa fa-paste"></i>.</p>'	
+						mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar a subordinação administrativa.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação administrativa e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar em <i class="fa fa-paste"></i>.</p>'	
 					}	
 					Swal.fire({
 						html: logoSNCIsweetalert2(mensagem),
