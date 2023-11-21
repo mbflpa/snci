@@ -733,6 +733,66 @@
 			<cfelse>
 				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>.">
 			</cfif>
+			<cfset to = "marceloferreira@correios.com.br">
+			<cfset cc = "">
+        </cfif>
+
+		<cftry> 
+			<cfset de="SNCI@correios.com.br">
+		    <cfif application.auxsite eq "localhost">
+				<cfset de="mbflpa@yahoo.com.br">
+			</cfif>
+			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+			    <cfif application.auxsite neq "intranetsistemaspe">
+					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
+				</cfif>
+				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
+					<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;text-align: center;">
+						<p style="font-size:20px">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</p> 
+					</div> 
+					<cfoutput>
+						<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#arguments.pronomeTratamento#,</pre>
+						<div style="text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">#texto#</div>
+						<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;">
+							<p>Estamos à disposição para prestar informações adicionais a respeito do 
+							assunto, caso seja necessário.</p>
+						
+							<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
+							
+							<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
+						</div>
+					</cfoutput>
+				</div>
+			</cfmail>
+			<cfset sucesso = true>
+			<cfcatch type="any">
+				<cfset sucesso = false>
+			</cfcatch>
+
+			
+    	</cftry>
+		<cfreturn #sucesso# />
+    </cffunction>
+
+	<cffunction name="EnviaEmailsTeste" access="public" returntype="string" hint="Cria o formado dos e-mails e envia.">
+            
+        <cfargument name="para" type="string" required="true">
+        <cfargument name="copiaPara" type="string" required="false" default="">
+        <cfargument name="pronomeTratamento" type="string" required="true">
+        <cfargument name="texto" type="string" required="true">
+
+        <cfset to = "#arguments.para#">
+		<cfset cc = "">
+		<cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "" and (arguments.copiaPara neq arguments.para)>
+			<cfset cc = "#arguments.copiaPara#">
+		</cfif> 
+
+        <cfif application.auxsite neq "intranetsistemaspe">
+			<cfif #cc# neq "" >
+				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
+			<cfelse>
+				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>.">
+			</cfif>
 			<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 			<cfset cc = "">
         </cfif>
@@ -775,7 +835,9 @@
     </cffunction>
 
 
-	<cffunction name="rotinaPontosSuspensos" access="remote"  hint="Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
+
+
+	<cffunction name="rotinaDiariaPontosSuspensos" access="remote"  hint="Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
 		<cfquery name="rsPontoSuspensoPrazoVencido" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_orientacoes.*, pc_avaliacoes.pc_aval_processo
 			FROM pc_avaliacao_orientacoes
@@ -855,6 +917,88 @@
 		</cfoutput>
 	</cffunction>
 
+	<cffunction name="rotinaDiariaPontosSuspensosTeste" access="remote"  hint="Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
+		<cfquery name="rsPontoSuspensoPrazoVencido" datasource="#application.dsn_processos#">
+			SELECT pc_avaliacao_orientacoes.*, pc_avaliacoes.pc_aval_processo
+			FROM pc_avaliacao_orientacoes
+			INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+			WHERE pc_aval_orientacao_status = 16 and DATEDIFF(DAY, pc_aval_orientacao_dataPrevistaResp, GETDATE()) >0
+		</cfquery>
+
+
+		<cfoutput query= "rsPontoSuspensoPrazoVencido" >
+						
+			<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio"/>
+			<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias='15' />
+			<cfset posicionamento = "Prezado gestor,<br>Solicita-se atualizar as informações do andamento das ações para regularização do item apontado considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas."/>						
+			<cfset dataCFQUERY = "#DateFormat(obterDataPrevista.Data_Prevista,'YYYY-MM-DD')#">	
+			
+			<cftransaction >
+
+				<cfquery datasource="#application.dsn_processos#">
+					UPDATE pc_avaliacao_orientacoes 
+					SET    
+						pc_aval_orientacao_status = 5,
+						pc_aval_orientacao_dataPrevistaResp =#obterDataPrevista.Data_Prevista#
+					WHERE pc_aval_orientacao_id = #pc_aval_orientacao_id#
+				</cfquery>
+
+				<cfquery datasource="#application.dsn_processos#">
+					INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
+					VALUES (
+							<cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+							,<cfqueryparam value="#posicionamento#" cfsqltype="cf_sql_varchar">
+							,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+							,'99999999'
+							,'00436699'
+							,'#pc_aval_orientacao_mcu_orgaoResp#'
+							,'#dataCFQUERY#'
+							,5
+							,1
+						)
+				</cfquery>
+
+				<cftry>
+					<!--Informações do órgão responsável-->
+					<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
+						SELECT pc_org_emaiL, pc_org_sigla FROM pc_orgaos
+						WHERE pc_org_mcu = <cfqueryparam value="#pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">
+					</cfquery>
+
+					<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
+					<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
+					<cfset pronomeTrat = "Senhor(a) Gestor(a) da #siglaOrgaoResponsavel#">
+					
+					<cfset textoEmail = '<p>Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas.</p> 
+										 <p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:</p>
+										 <p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>'>
+								
+					<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
+					<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmailsTeste" returnVariable="sucessoEmail" 
+								para = "#to#"
+								pronomeTratamento = "#pronomeTrat#"
+								texto="#textoEmail#"
+					/>
+					<cfcatch type="any">
+					<cfset de="SNCI@correios.com.br">
+					<cfif application.auxsite eq "localhost">
+						<cfset de="mbflpa@yahoo.com.br">
+					</cfif>
+						<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+							<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+						</cfmail>
+					</cfcatch>
+				</cftry>
+
+				
+			</cftransaction>
+			
+
+		</cfoutput>
+	</cffunction>
+
+
+
 	<cffunction name="rotinaSemanalOrientacoesPendentes" access="remote"  hint="Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
 		<cfsetting RequestTimeout = "0"> 
 		<cfquery name="rsOrgaosComOrientacoesPendentes" datasource="#application.dsn_processos#" >
@@ -922,7 +1066,7 @@
 
 				<cfif application.auxsite neq "intranetsistemaspe">
 					<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
-					<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
+					<cfset to = "marceloferreira@correios.com.br">
 					<cfset cc = "">
 				</cfif>
 					
@@ -1111,79 +1255,7 @@
 
 	</cffunction>
 
-	<cffunction name="rotinaMensalMelhoriasPendentes" access="remote"  hint="Verifica or órgãos responsáveis pelas propostas de melhoria pendentes e encaminha e-mail de alerta.">
-		<cfsetting RequestTimeout = "0"> 
-		<cfquery name="rsOrgaosComMelhoriasPendentes" datasource="#application.dsn_processos#" >
-			SELECT DISTINCT pc_aval_melhoria_num_orgao
-			FROM pc_avaliacao_melhorias
-			WHERE pc_aval_melhoria_status = 'P'	
-		</cfquery>
-
-		<cfquery name="rsOrgaosComMelhoriasPendentesParaTeste" datasource="#application.dsn_processos#" >
-			SELECT DISTINCT TOP 5 pc_aval_melhoria_num_orgao
-			FROM pc_avaliacao_melhorias
-			WHERE pc_aval_melhoria_status = 'P'	
-		</cfquery>
-
-		<cfif application.auxsite neq 'intranetsistemaspe'>
-			<cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
-		<cfelse>
-			<cfset myQuery = "rsOrgaosComMelhoriasPendentes">
-		</cfif>
-
-		<cfloop query="#myQuery#">
-			<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
-				SELECT pc_avaliacao_melhorias.*, pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_num_sei
-				,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla as siglaOrgaoResp,  pc_orgaos.pc_org_mcu
-				,pc_orgaos.pc_org_emaiL as emailOrgaoResp, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
-				FROM pc_avaliacao_melhorias
-				INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_melhoria_num_orgao
-				INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
-				INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-				INNER JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-				WHERE pc_aval_melhoria_num_orgao = '#pc_aval_melhoria_num_orgao#' and pc_aval_melhoria_status = 'P' and pc_num_status in(4,5)
-			</cfquery>
-
-			<cftry>
-				<cfset to = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoResp))#">
-				<cfset cc = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoAvaliado))#">
-
-				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsMelhoriasPendentes.siglaOrgaoResp))#">
-				<cfset pronomeTrat = "Prezado Gestor">
-				<cfset textoEmail = '<p>Informamos que existe(m) #NumberFormat(rsMelhoriasPendentes.recordcount,"00")# Proposta(s) de Melhoria registrada(s) pelo Controle Interno, no Sistema SNCI, com status “PENDENTE”, aguardando manifestação do gestor responsável.</p> 
-									    <p>Para regularizar a situação, solicitamos acessar o sistema por meio do link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
-										<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
-								        <p>As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
-										<ul>
-											<li>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
-											<li>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
-											<li>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
-										</ul>'>
-										
-				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
-				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
-							para = "#to#"
-							copiaPara = "#cc#"
-							pronomeTratamento = "#pronomeTrat#"
-							texto="#textoEmail#"
-				/>
-				<cfcatch type="any">
-				<cfset de="SNCI@correios.com.br">
-				<cfif application.auxsite eq "localhost">
-					<cfset de="mbflpa@yahoo.com.br">
-				</cfif>
-					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
-					</cfmail>
-				</cfcatch>
-			</cftry>
-
-		</cfloop>
-
-	</cffunction>
-
-
-	<cffunction name="rotinaSemanalOrientacoesPendentesTESTE" access="remote"  hint="Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
+	<cffunction name="rotinaSemanalOrientacoesPendentesTeste" access="remote"  hint="Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
 		<cfsetting RequestTimeout = "0"> 
 		<cfquery name="rsOrgaosComOrientacoesPendentes" datasource="#application.dsn_processos#" >
 			SELECT DISTINCT pc_aval_orientacao_mcu_orgaoResp
@@ -1192,7 +1264,7 @@
 		</cfquery>
 
 		<cfquery name="rsOrgaosComOrientacoesPendentesParaTeste" datasource="#application.dsn_processos#">
-			SELECT DISTINCT TOP 5 pc_aval_orientacao_mcu_orgaoResp
+			SELECT DISTINCT TOP 30 pc_aval_orientacao_mcu_orgaoResp
 			FROM pc_avaliacao_orientacoes
 			WHERE pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate()
 		</cfquery>
@@ -1427,8 +1499,8 @@
 				<cfif application.auxsite eq "localhost">
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
-					<cfmail from="#de#" to="marceloferreira@correios.com.br"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "rsOrgaosComOrientacoesPendentesParaTeste" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
 					</cfmail>
 				</cfcatch>
 			</cftry> 
@@ -1699,4 +1771,150 @@
 
 
 
+
+
+	<cffunction name="rotinaMensalMelhoriasPendentes" access="remote"  hint="Verifica or órgãos responsáveis pelas propostas de melhoria pendentes e encaminha e-mail de alerta.">
+		<cfsetting RequestTimeout = "0"> 
+		<cfquery name="rsOrgaosComMelhoriasPendentes" datasource="#application.dsn_processos#" >
+			SELECT DISTINCT pc_aval_melhoria_num_orgao
+			FROM pc_avaliacao_melhorias
+			WHERE pc_aval_melhoria_status = 'P'	
+		</cfquery>
+
+		<cfquery name="rsOrgaosComMelhoriasPendentesParaTeste" datasource="#application.dsn_processos#" >
+			SELECT DISTINCT TOP 5 pc_aval_melhoria_num_orgao
+			FROM pc_avaliacao_melhorias
+			WHERE pc_aval_melhoria_status = 'P'	
+		</cfquery>
+
+		<cfif application.auxsite neq 'intranetsistemaspe'>
+			<cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
+		<cfelse>
+			<cfset myQuery = "rsOrgaosComMelhoriasPendentes">
+		</cfif>
+
+		<cfloop query="#myQuery#">
+			<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
+				SELECT pc_avaliacao_melhorias.*, pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_num_sei
+				,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla as siglaOrgaoResp,  pc_orgaos.pc_org_mcu
+				,pc_orgaos.pc_org_emaiL as emailOrgaoResp, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
+				FROM pc_avaliacao_melhorias
+				INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_melhoria_num_orgao
+				INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
+				INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
+				INNER JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+				WHERE pc_aval_melhoria_num_orgao = '#pc_aval_melhoria_num_orgao#' and pc_aval_melhoria_status = 'P' and pc_num_status in(4,5)
+			</cfquery>
+
+			<cftry>
+				<cfset to = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoResp))#">
+				<cfset cc = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoAvaliado))#">
+
+				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsMelhoriasPendentes.siglaOrgaoResp))#">
+				<cfset pronomeTrat = "Prezado Gestor">
+				<cfset textoEmail = '<p>Informamos que existe(m) #NumberFormat(rsMelhoriasPendentes.recordcount,"00")# Proposta(s) de Melhoria registrada(s) pelo Controle Interno, no Sistema SNCI, com status “PENDENTE”, aguardando manifestação do gestor responsável.</p> 
+									    <p>Para regularizar a situação, solicitamos acessar o sistema por meio do link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
+										<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
+								        <p>As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
+										<ul>
+											<li>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
+											<li>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
+											<li>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
+										</ul>'>
+										
+				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
+				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
+							para = "#to#"
+							copiaPara = "#cc#"
+							pronomeTratamento = "#pronomeTrat#"
+							texto="#textoEmail#"
+				/>
+				<cfcatch type="any">
+				<cfset de="SNCI@correios.com.br">
+				<cfif application.auxsite eq "localhost">
+					<cfset de="mbflpa@yahoo.com.br">
+				</cfif>
+					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+					</cfmail>
+				</cfcatch>
+			</cftry>
+
+		</cfloop>
+
+	</cffunction>
+
+	<cffunction name="rotinaMensalMelhoriasPendentesTeste" access="remote"  hint="Verifica or órgãos responsáveis pelas propostas de melhoria pendentes e encaminha e-mail de alerta.">
+		<cfsetting RequestTimeout = "0"> 
+		<cfquery name="rsOrgaosComMelhoriasPendentes" datasource="#application.dsn_processos#" >
+			SELECT DISTINCT pc_aval_melhoria_num_orgao
+			FROM pc_avaliacao_melhorias
+			WHERE pc_aval_melhoria_status = 'P'	
+		</cfquery>
+
+		<cfquery name="rsOrgaosComMelhoriasPendentesParaTeste" datasource="#application.dsn_processos#" >
+			SELECT DISTINCT TOP 5 pc_aval_melhoria_num_orgao
+			FROM pc_avaliacao_melhorias
+			WHERE pc_aval_melhoria_status = 'P'	
+		</cfquery>
+
+		<cfif application.auxsite neq 'intranetsistemaspe'>
+			<cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
+		<cfelse>
+			<cfset myQuery = "rsOrgaosComMelhoriasPendentes">
+		</cfif>
+
+		<cfloop query="#myQuery#">
+			<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
+				SELECT pc_avaliacao_melhorias.*, pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_num_sei
+				,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla as siglaOrgaoResp,  pc_orgaos.pc_org_mcu
+				,pc_orgaos.pc_org_emaiL as emailOrgaoResp, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
+				FROM pc_avaliacao_melhorias
+				INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_melhoria_num_orgao
+				INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
+				INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
+				INNER JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+				WHERE pc_aval_melhoria_num_orgao = '#pc_aval_melhoria_num_orgao#' and pc_aval_melhoria_status = 'P' and pc_num_status in(4,5)
+			</cfquery>
+
+			<cftry>
+				<cfset to = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoResp))#">
+				<cfset cc = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoAvaliado))#">
+
+				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsMelhoriasPendentes.siglaOrgaoResp))#">
+				<cfset pronomeTrat = "Prezado Gestor">
+				<cfset textoEmail = '<p>Informamos que existe(m) #NumberFormat(rsMelhoriasPendentes.recordcount,"00")# Proposta(s) de Melhoria registrada(s) pelo Controle Interno, no Sistema SNCI, com status “PENDENTE”, aguardando manifestação do gestor responsável.</p> 
+									    <p>Para regularizar a situação, solicitamos acessar o sistema por meio do link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
+										<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
+								        <p>As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
+										<ul>
+											<li>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
+											<li>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
+											<li>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
+										</ul>'>
+										
+				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
+				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmailsTeste" returnVariable="sucessoEmail" 
+							para = "#to#"
+							copiaPara = "#cc#"
+							pronomeTratamento = "#pronomeTrat#"
+							texto="#textoEmail#"
+				/>
+				<cfcatch type="any">
+				<cfset de="SNCI@correios.com.br">
+				<cfif application.auxsite eq "localhost">
+					<cfset de="mbflpa@yahoo.com.br">
+				</cfif>
+					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+					</cfmail>
+				</cfcatch>
+			</cftry>
+
+		</cfloop>
+
+	</cffunction>
+
+
+	
 </cfcomponent>

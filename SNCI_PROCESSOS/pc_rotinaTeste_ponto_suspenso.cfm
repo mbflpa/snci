@@ -104,7 +104,7 @@
                         <cfif rsPontoSuspensoPrazoVencido.recordcount gt 0>
                             <div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
                                 <div id="btSalvarDiv" >
-                                    <button id="btnRotinaPontosSuspensos" class="btn btn-block btn-primary " >Executar Rotina</button>
+                                    <button id="btnrotinaDiariaPontosSuspensos" class="btn btn-block btn-primary " >Executar Rotina</button>
                                 </div>      
                             </div>
                         </cfif>
@@ -127,9 +127,9 @@
 <cfinclude template="pc_Sidebar.cfm">	
 
     <script language="JavaScript">
-        //cria click em um botão para um ajax para executar cffunction metodo rotinaPontosSuspensos em pc_cfcPaginasApoio.cfc
+        //cria click em um botão para um ajax para executar cffunction metodo rotinaDiariaPontosSuspensos em pc_cfcPaginasApoio.cfc
         $(document).ready(function(){
-            $("#btnRotinaPontosSuspensos").click(function(){
+            $("#btnrotinaDiariaPontosSuspensos").click(function(){
                 Swal.fire({
                     html: logoSNCIsweetalert2('Deseja executar a rotina de verificação dos pontos suspensos?<br>Esta rotina irá verificar os pontos suspensos vencidos e alterar o status para TRATAMENTO, irá inserir um posicionamento e enviará um e-mail de aviso para você como se fosse o órgão responsável.'), 
                     title: 'Rotina de Verificação dos Pontos Suspensos',
@@ -144,7 +144,7 @@
                                 type: "post",
                                 url: "cfc/pc_cfcPaginasApoio.cfc",
                                 data:{
-                                    method: "rotinaPontosSuspensos",
+                                    method: "rotinaDiariaPontosSuspensosTeste",
                                 },
                                 async: false,
                                 success: function(result) {

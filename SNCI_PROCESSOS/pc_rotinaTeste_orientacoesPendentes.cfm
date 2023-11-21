@@ -17,7 +17,7 @@
 
 
 <cfquery name="rsOrgaosComOrientacoesPendentesParaTeste" datasource="#application.dsn_processos#">
-    SELECT DISTINCT TOP 5 pc_aval_orientacao_mcu_orgaoResp
+    SELECT DISTINCT TOP 30 pc_aval_orientacao_mcu_orgaoResp
     FROM pc_avaliacao_orientacoes
     WHERE pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate()
 </cfquery>
@@ -276,7 +276,7 @@
                                 type: "post",
                                 url: "cfc/pc_cfcPaginasApoio.cfc",
                                 data:{
-                                    method: "rotinaSemanalOrientacoesPendentes",
+                                    method: "rotinaSemanalOrientacoesPendentesTeste",
                                 },
                                 async: false,
                                 success: function(result) {
