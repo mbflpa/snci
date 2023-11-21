@@ -11,6 +11,11 @@
     
         <!-- Default Theme -->
     <link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/zTree_v3-master/css/zTreeStyle/zTreeStyle.css" />
+<style>
+    .redNode span{
+        color: #17a2b8 !important;
+    }
+</style>
 
 </head>   
 <body>
@@ -40,19 +45,26 @@
                 <section class="content">
                     <div class="container-fluid">
                         <div>
-                            <cfquery name="rsOrgaos" datasource="#application.dsn_processos#">
-                                SELECT pc_orgaos.*
-                                FROM pc_orgaos
-                                order by pc_org_sigla
-                            </cfquery>       
-                           
-                            <div class="input-group ">
+                                 
+
+                            <div class="form-group" style="display:flex">
+                                <div class="custom-control custom-radio" style="margin-left: 10px;margin-right:50px">
+                                    <input class="custom-control-input" type="radio" id="subTec" name="subRadio" value='subTec' checked>
+                                    <label for="subTec" class="custom-control-label">Subordinação Técnica</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input class="custom-control-input" type="radio" id="subAdm" name="subRadio"  value='subAdm'>
+                                    <label for="subAdm" class="custom-control-label">Subordinação Administrativa</label>
+                                </div>
+                            </div>
+                            
+                            <div class="input-group " style="margin-left:10px">
                                 <input  id="filter" type="text" class="form-control rounded-0 col-sm-4"  placeholder="Digite uma palavra ou número para filtrar" spellcheck="false">
                                 <span class="input-group-append">
-                                    <button type="button" onclick="clearFilter()" class="btn btn-info btn-flat" style="font-size: 12px;"><i class="fa fa-filter"></i> Limpar Filtro</button>
+                                    <button type="button" onclick="clearFilter()" class="btn btn-info btn-flat" style="font-size: 12px;background: #b93d30;"><i class="fa fa-filter-circle-xmark"></i> Limpar Filtro/Seleção</button>
                                 </span>
                             </div>
-                            <ul style="margin-bottom:80px" id="treeDemo" class="ztree"></ul>    
+                            <div id="divTreeOrgao"></div> 
                         </div>  
                     </div><!-- /.container-fluid -->
                 </section>
@@ -72,65 +84,77 @@
 <!-- ZtreeCore JavaScript -->
     <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/jquery.ztree.core.min.js"></script>
     <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/jquery.ztree.exhide.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/jquery.ztree.excheck.min.js"></script>
+    <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/jquery.ztree.exedit.min.js"></script>
     <script src="../SNCI_PROCESSOS/plugins/zTree_v3-master/js/fuzzysearchModificado.js"></script>
     <script language="JavaScript">
 
         
         $(document).ready(function(){
-            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
-            fuzzySearch('treeDemo','#filter',null,true); // initialize fuzzy search function
+           
+            var selectedRadio = sessionStorage.getItem('selectedRadio');
+            if (selectedRadio) {
+                $('#' + selectedRadio).prop('checked', true);
+
+                // Atualize zNodes com base na seleção do rádio
+                carregaTreeOrgao();
+            }
+            
         });
 
-     var zNodes =[
-                <cfoutput query="rsOrgaos">
-                    { 
-                        id: #rsOrgaos.pc_org_mcu#, // unique ID
-                        pId: #rsOrgaos.pc_org_mcu_subord_adm#, // parent ID
-                        name: "#rsOrgaos.pc_org_sigla# (#rsOrgaos.pc_org_descricao# - MCU: #rsOrgaos.pc_org_mcu# - <i class='fa fa-envelope'></i> #rsOrgaos.pc_org_email#)", 
-                        open: false, // open this node on page load
-                        status: "#rsOrgaos.pc_org_status#" // status of the node
+
+        function carregaTreeOrgao() {
+			$('#cutNodeBtn').hide();	
+            $('#modalOverlay').modal('show')
+            setTimeout(function() {
+                $.ajax({
+                    type: "POST",
+                    url: "cfc/pc_cfcPaginasApoio.cfc",
+					data:{
+						method: "criarTreeOrgao",
+                        tipoSubordinacao: $('input[name="subRadio"]:checked').val(),
+					},
+                    success: function (data) {
+                        $('#divTreeOrgao').html(data);
+                        $('#modalOverlay').delay(1000).hide(0, function() {
+                            $('#modalOverlay').modal('hide');
+                            
+                        });
+                        
                     },
-                </cfoutput>
-                
-            ];
-        var setting = {
-            data: {
-                simpleData: {
-                    enable: true
-                }
-            },
-            keep: {
-                leaf: true
-            },
-            view: {
-                fontCss: getFontCss,
-                dblClickExpand: false,
-                nameIsHTML: true
-             },
-             callback: {
-				onClick: onClick
-			}
-        };
-        
-        function getFontCss(treeId, treeNode) {
-            return treeNode.status == 'D' ? {color:"red"} : {};
+                    error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+						$('#modal-danger').find('.modal-body').text(thrownError)
+					}
+                });
+            }, 500);
         }
+
+        // Adicione um ouvinte de evento 'change' aos botões de rádio
+        $('input[name="subRadio"]').change(function() {
+            carregaTreeOrgao();
+
+            // Armazene a seleção do rádio no sessionStorage
+            sessionStorage.setItem('selectedRadio', this.id);
+
+        });
+
+        function clearFilter() {
+            carregaTreeOrgao();
+            $('#filter').val('');
+        }
+					
+
 
        
 
-        function clearFilter() {
-            var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+        
 
-            // Reinicializa a árvore com todos os nós originais
-            treeObj.destroy();
-            $.fn.zTree.init($("#treeDemo"), setting, zNodes);
-            $('#filter').val('');
-        }
-
-       function onClick(e,treeId, treeNode) {
-			var zTree = $.fn.zTree.getZTreeObj("treeDemo");
-			zTree.expandNode(treeNode);
-		}
+       
 
 
 
