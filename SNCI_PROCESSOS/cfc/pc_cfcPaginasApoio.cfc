@@ -1769,10 +1769,10 @@
 			
 		
 		function onClick(e,treeId, treeNode) {
-			var zTree = $.fn.zTree.getZTreeObj("treeOrgao");
-			zTree.expandNode(treeNode);
+			var zTree = $.fn.zTree.getZTreeObj("treeOrgao");//pega a arvore
+			//zTree.expandNode(treeNode);//expande o nó
             // Oculte todos os ícones
-            $('.fa-check, .fa-paste').hide();
+            $('.fa-pencil-alt, .fa-paste').hide();
             // Verifique se um nó foi selecionado
             if (treeNode) {
                 // Se um nó foi selecionado, mostre o botão
