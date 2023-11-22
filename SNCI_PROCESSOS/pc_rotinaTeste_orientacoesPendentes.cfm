@@ -129,7 +129,7 @@
                 <div class="container-fluid" style="margin-bottom:80px;">
                     <div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
                         <div class="col-sm-6">
-                            <h4>Rotina de Verificação de Pontos Pendentes</h4>
+                            <h4>Rotina de Verificação de Orientações Pendentes</h4>
                         </div>
                     </div>
                   

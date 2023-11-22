@@ -1,7 +1,7 @@
 <cfprocessingdirective pageencoding = "utf-8">	
 
 
-<cfquery name="rsPontoSuspensoPrazoVencido" datasource="#application.dsn_processos#">
+<cfquery name="rsOrientacaoSuspensaPrazoVencido" datasource="#application.dsn_processos#">
     SELECT pc_avaliacao_orientacoes.*, pc_avaliacoes.pc_aval_processo
     FROM pc_avaliacao_orientacoes
     INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
@@ -9,7 +9,7 @@
     order by pc_aval_orientacao_dataPrevistaResp desc
 </cfquery>
 
-<cfquery name="rsPontoSuspenso" datasource="#application.dsn_processos#">
+<cfquery name="rsOrientacaoSuspensa" datasource="#application.dsn_processos#">
     SELECT pc_avaliacao_orientacoes.*, pc_avaliacoes.pc_aval_processo
     FROM pc_avaliacao_orientacoes
     INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
@@ -51,24 +51,24 @@
 
                     <div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
                         <div class="col-sm-6">
-                            <h4>Rotina de Verificação dos Pontos Suspensos Vencidos</h4>
+                            <h4>Rotina de Verificação das Orientações Suspensas Vencidas</h4>
                         </div>
                     </div>
 
                     <br>
                     <cfoutput>
-                        <li>Quantidade de Pontos Suspensos: <b>#rsPontoSuspenso.recordcount#</b></li>
-                        <!--table dos pontos suspensos vencidos-->
-                        <table class="table table-bordered table-striped dataTable" id="tabelaPontoSuspensoVencido" role="grid" aria-describedby="tabelaPontoSuspensoVencido_info">
+                        <li>Quantidade de Orientações Suspensas: <b>#rsOrientacaoSuspensa.recordcount#</b></li>
+                        <!--table das orientações suspensas vencidas-->
+                        <table class="table table-bordered table-striped dataTable" id="tabelaOrientacaoSuspensaVencido" role="grid" aria-describedby="tabelaOrientacaoSuspensaVencido_info">
                             <thead>
                                 <tr role="row">
-                                    <th class="sorting" tabindex="0" aria-controls="tabelaPontoSuspensoVencido" rowspan="1" colspan="1" aria-label="Processo: Ordenar colunas de forma ascendente" style="width: 100px;">Processo</th>
-                                    <th class="sorting" tabindex="0" aria-controls="tabelaPontoSuspensoVencido" rowspan="1" colspan="1" aria-label="Orientação: Ordenar colunas de forma ascendente" style="width: 100px;">Orientação</th>
-                                    <th class="sorting" tabindex="0" aria-controls="tabelaPontoSuspensoVencido" rowspan="1" colspan="1" aria-label="Data Prevista: Ordenar colunas de forma ascendente" style="width: 100px;">Data Prevista</th>
+                                    <th class="sorting" tabindex="0" aria-controls="tabelaOrientacaoSuspensaVencido" rowspan="1" colspan="1" aria-label="Processo: Ordenar colunas de forma ascendente" style="width: 100px;">Processo</th>
+                                    <th class="sorting" tabindex="0" aria-controls="tabelaOrientacaoSuspensaVencido" rowspan="1" colspan="1" aria-label="Orientação: Ordenar colunas de forma ascendente" style="width: 100px;">Orientação</th>
+                                    <th class="sorting" tabindex="0" aria-controls="tabelaOrientacaoSuspensaVencido" rowspan="1" colspan="1" aria-label="Data Prevista: Ordenar colunas de forma ascendente" style="width: 100px;">Data Prevista</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <cfloop query="rsPontoSuspenso">
+                                <cfloop query="rsOrientacaoSuspensa">
                                     <tr role="row" class="odd">
                                         <td>#pc_aval_processo#</td>
                                         <td>#pc_aval_orientacao_id#</td>
@@ -78,18 +78,18 @@
                             </tbody>
                         </table>
                         <br>
-                        <li>Quantidade de Pontos Suspensos Vencidos: <b>#rsPontoSuspensoPrazoVencido.recordcount#</b></li>
-                        <!--table dos pontos suspensos vencidos-->
-                        <table class="table table-bordered table-striped dataTable" id="tabelaPontoSuspensoVencido" role="grid" aria-describedby="tabelaPontoSuspensoVencido_info">
+                        <li>Quantidade de Orientações Suspensas Vencidas: <b>#rsOrientacaoSuspensaPrazoVencido.recordcount#</b></li>
+                        <!--table das orientações suspensas vencidas-->
+                        <table class="table table-bordered table-striped dataTable" id="tabelaOrientacaoSuspensaVencido" role="grid" aria-describedby="tabelaOrientacaoSuspensaVencido_info">
                             <thead>
                                 <tr role="row">
-                                    <th class="sorting" tabindex="0" aria-controls="tabelaPontoSuspensoVencido" rowspan="1" colspan="1" aria-label="Processo: Ordenar colunas de forma ascendente" style="width: 100px;">Processo</th>
-                                    <th class="sorting" tabindex="0" aria-controls="tabelaPontoSuspensoVencido" rowspan="1" colspan="1" aria-label="Orientação: Ordenar colunas de forma ascendente" style="width: 100px;">Orientação</th>
-                                    <th class="sorting" tabindex="0" aria-controls="tabelaPontoSuspensoVencido" rowspan="1" colspan="1" aria-label="Data Prevista: Ordenar colunas de forma ascendente" style="width: 100px;">Data Prevista</th>
+                                    <th class="sorting" tabindex="0" aria-controls="tabelaOrientacaoSuspensaVencido" rowspan="1" colspan="1" aria-label="Processo: Ordenar colunas de forma ascendente" style="width: 100px;">Processo</th>
+                                    <th class="sorting" tabindex="0" aria-controls="tabelaOrientacaoSuspensaVencido" rowspan="1" colspan="1" aria-label="Orientação: Ordenar colunas de forma ascendente" style="width: 100px;">Orientação</th>
+                                    <th class="sorting" tabindex="0" aria-controls="tabelaOrientacaoSuspensaVencido" rowspan="1" colspan="1" aria-label="Data Prevista: Ordenar colunas de forma ascendente" style="width: 100px;">Data Prevista</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <cfloop query="rsPontoSuspensoPrazoVencido">
+                                <cfloop query="rsOrientacaoSuspensaPrazoVencido">
                                     <tr role="row" class="odd">
                                         <td>#pc_aval_processo#</td>
                                         <td>#pc_aval_orientacao_id#</td>
@@ -101,10 +101,10 @@
                         <br>
 
 
-                        <cfif rsPontoSuspensoPrazoVencido.recordcount gt 0>
+                        <cfif rsOrientacaoSuspensaPrazoVencido.recordcount gt 0>
                             <div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
                                 <div id="btSalvarDiv" >
-                                    <button id="btnrotinaDiariaPontosSuspensos" class="btn btn-block btn-primary " >Executar Rotina</button>
+                                    <button id="btnrotinaDiariaOrientacoesSuspensas" class="btn btn-block btn-primary " >Executar Rotina</button>
                                 </div>      
                             </div>
                         </cfif>
@@ -127,12 +127,12 @@
 <cfinclude template="pc_Sidebar.cfm">	
 
     <script language="JavaScript">
-        //cria click em um botão para um ajax para executar cffunction metodo rotinaDiariaPontosSuspensos em pc_cfcPaginasApoio.cfc
+        //cria click em um botão para um ajax para executar cffunction metodo rotinaDiariaOrientacoesSuspensas em pc_cfcPaginasApoio.cfc
         $(document).ready(function(){
-            $("#btnrotinaDiariaPontosSuspensos").click(function(){
+            $("#btnrotinaDiariaOrientacoesSuspensas").click(function(){
                 Swal.fire({
-                    html: logoSNCIsweetalert2('Deseja executar a rotina de verificação dos pontos suspensos?<br>Esta rotina irá verificar os pontos suspensos vencidos e alterar o status para TRATAMENTO, irá inserir um posicionamento e enviará um e-mail de aviso para você como se fosse o órgão responsável.'), 
-                    title: 'Rotina de Verificação dos Pontos Suspensos',
+                    html: logoSNCIsweetalert2('Deseja executar a rotina de verificação das orientações suspensas?<br>Esta rotina irá verificar os pontos suspensos vencidos e alterar o status para TRATAMENTO, irá inserir um posicionamento e enviará um e-mail de aviso para você como se fosse o órgão responsável.'), 
+                    title: 'Rotina de Verificação das Orientações Suspensas',
                     showCancelButton: true,
 					confirmButtonText: 'Sim!',
 					cancelButtonText: 'Cancelar!'
@@ -144,7 +144,7 @@
                                 type: "post",
                                 url: "cfc/pc_cfcPaginasApoio.cfc",
                                 data:{
-                                    method: "rotinaDiariaPontosSuspensosTeste",
+                                    method: "rotinaDiariaOrientacoesSuspensasTeste",
                                 },
                                 async: false,
                                 success: function(result) {

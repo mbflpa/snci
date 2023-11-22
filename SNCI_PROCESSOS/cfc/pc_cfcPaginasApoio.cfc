@@ -837,7 +837,7 @@
 
 
 
-	<cffunction name="rotinaDiariaPontosSuspensos" access="remote"  hint="Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
+	<cffunction name="rotinaDiariaOrientacoesSuspensas" access="remote"  hint="Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
 		<cfquery name="rsPontoSuspensoPrazoVencido" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_orientacoes.*, pc_avaliacoes.pc_aval_processo
 			FROM pc_avaliacao_orientacoes
@@ -917,7 +917,7 @@
 		</cfoutput>
 	</cffunction>
 
-	<cffunction name="rotinaDiariaPontosSuspensosTeste" access="remote"  hint="Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
+	<cffunction name="rotinaDiariaOrientacoesSuspensasTeste" access="remote"  hint="Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
 		<cfquery name="rsPontoSuspensoPrazoVencido" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_orientacoes.*, pc_avaliacoes.pc_aval_processo
 			FROM pc_avaliacao_orientacoes
