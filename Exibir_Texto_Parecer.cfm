@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/>  
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <cfinclude template="cabecalho.cfm">
 <html>
@@ -11,7 +12,7 @@ SELECT Pos_Parecer FROM ParecerUnidade WHERE Pos_Unidade='#frmUnid#' AND Pos_Ins
 </cfquery>
 <body>
 <cfoutput>Unidade : #frmUnid# <br>
-          Inspeção: #frmNumInsp# <br>
+          AvaliaÃ§Ã£o: #frmNumInsp# <br>
 		  Grupo   : #frmGrupo# <br>
 		  Item    : #frmItem# <br>
 </cfoutput>
@@ -39,7 +40,7 @@ SELECT Pos_Parecer FROM ParecerUnidade WHERE Pos_Unidade='#frmUnid#' AND Pos_Ins
 
 			  <cfset smanifesto = mid(sdados,sinicio,(smeio - sinicio))>
               <tr>
-                <td>			    <textarea name="textarea" cols="160" rows="20">#smanifesto#</textarea></td> 
+                <td><textarea name="textarea" cols="160" rows="20">#smanifesto#</textarea></td> 
               </tr>
 			  <cfset contador = contador + 1>
   		      <!--- <cfset sdados = mid(sdados, smeio, sfim)>  --->

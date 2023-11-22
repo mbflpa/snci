@@ -17,10 +17,10 @@
 <cfelse>
 	<cfset snci.cpf=#trim(qAcesso.Usu_Matricula)#>
 </cfif>
-<cfset snci.grpacesso=#trim(qAcesso.Usu_GrupoAcesso)#>
-<cfset snci.nomeusuario=#trim(qAcesso.Usu_Apelido)#>
+<cfset snci.grpacesso=#trim(ucase(qAcesso.Usu_GrupoAcesso))#>
+<cfset snci.nomeusuario=#trim(ucase(qAcesso.Usu_Apelido))#>
 <cfset snci.codlotacao=#qAcesso.Usu_Lotacao#>
-<cfset snci.nomelotacao=#trim(qAcesso.Usu_LotacaoNome)#>
+<cfset snci.nomelotacao=#trim(ucase(qAcesso.Usu_LotacaoNome))#>
 <cfset snci.emailusuario=#trim(qAcesso.Usu_Email)#>
 <cfset snci.coordenacodse=#trim(qAcesso.Usu_Coordena)#>
 <cfset snci.permitir=''>
@@ -32,16 +32,20 @@
 <cfset snci.filtrostatus=''>
 <cfset snci.gesavaliacao=''>
 <cfset snci.gesunidade=''>
+<cfset snci.gesdescunidade=''>
 <cfset snci.gesgrupo=''>
 <cfset snci.gesitem=''>
-
+<cfset snci.gesstatusresp=''>
+<cfset snci.gestipounid=''>
+<cfset snci.gesposarea=''>
+<cfset snci.gesnomearea=''>
 
 <!---
-<cfset DR = 'Departamento de Governan�a, Riscos e Compliance'>
+<cfset DR = 'Departamento de Governança, Riscos e Compliance'>
 <cfset siglaDR = 'DCINT'>
 <cfset Sigla_Gerencia = 'CCOP'>
 <cfset Gerencia = 'COORD CONTR INT OPER/CCOP'>
-<cfset rodape = '.: CCOP :. Av. Guararapes, 250 - 3� Andar - Santo Ant�nio - Recife-PE'>
+<cfset rodape = '.: CCOP :. Av. Guararapes, 250 - 3º Andar - Santo Antonio - Recife-PE'>
 <cfset sto_gerencia = '32050'> <!--- Cinco digitos iniciais --->
 <cfset cod_dr = '32'>
 <cfset Local = SetLocale("Portuguese (Brazilian)")>

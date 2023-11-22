@@ -358,7 +358,6 @@ function gerarData(str) {
 	<cfoutput><cfparam name="URL.acao" default=""></cfoutput>
  function valida_formCadNum() {
 	
-
     var frm = document.forms[0];
 
     if (frm.selUnidades.value == '') {
@@ -627,6 +626,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
 		<form id="formCadNum" nome="formCadNum" class="appnitro" onSubmit="return valida_formCadNum()" enctype="multipart/form-data" method="post"  action="cadastro_inspecao.cfm?acao=cadNumInsp">
 		
 		    <input type="hidden" name="NumInspecao" value="<cfoutput>#url.numInspecao#</cfoutput>">
+			<input type="hidden" name="sacao" id="sacao" value="">
 			<cfif '#url.acao#' neq 'cadastrado' >
 
 				<tr>

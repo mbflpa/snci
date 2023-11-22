@@ -28,7 +28,7 @@
 
 <!--- buscar pela decisao de reincidencia --->
 <cfif isDefined("Form.acao") And (#Form.acao# eq 'reincidencia')>
-	<cflocation url = "itens_inspetores_reincidencia.cfm?nunid=#Form.unid#&ninsp=#Form.ninsp#&ngrup=#Form.ngrup#&nitem=#Form.nitem#"> 
+	<cflocation url = "itens_inspetores_reincidencia_2024.cfm?nunid=#Form.unid#&ninsp=#Form.ninsp#&ngrup=#Form.ngrup#&nitem=#Form.nitem#&itnreincidentes=#itnreincidentes#&grpitmsql=#form.grpitmsql#"> 
 </cfif>
 
 <cfif (grpacesso eq 'INSPETORES') or (grpacesso eq 'DESENVOLVEDORES') or (grpacesso eq 'GESTORES')>
@@ -447,9 +447,11 @@ FORM.avalItem : #FORM.avalItem#<br>
 				
 					<!--- Inserindo dados dados na tabela Andamento --->
 					<cfset andparecer = #posarea_cod#  & " --- " & #posarea_nome#>
+					<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
+              		<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>		
 					<cfquery datasource="#dsn_inspecao#">
 						insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
-						values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, CONVERT(char, GETDATE(), 108), '#andparecer#', '#posarea_cod#')
+						values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, '#hhmmss#', '#andparecer#', '#posarea_cod#')
 					</cfquery>
 							<!---Fim Insere Andamento --->
 				</cfif> 
@@ -524,13 +526,28 @@ FORM.avalItem : #FORM.avalItem#<br>
 <!---  --->
  <cfset qtdreincidencia = 0>
  <cfset qtdfrmrsSeguir = 0>
- 
+<cfoutput>
 <!--- <cfif tpunid neq 12 and tpunid neq 16 and grpacesso eq 'INSPETORES'> --->
 <cfif grpacesso eq 'INSPETORES'>
+    <cfset grp=''>
+    <cfset itm=''>
+    <cfset grpitmsql='Pos_Unidade is null'>
+    <cfloop index="index" list="#url.itnreincidentes#">
+        <cfset grpitm = Replace(index,'_',',',"All")>
+        <cfset grp = left(grpitm,find(",",grpitm)-1)>
+        <cfset itm = mid(grpitm,(find(",",grpitm) + 1),len(grpitm))>
+        <cfif grpitmsql eq 'Pos_Unidade is null'>
+            <cfset grpitmsql = "Pos_NumGrupo = " & #grp# & " and Pos_NumItem = " & #itm#>
+        <cfelse>
+            <cfset grpitmsql = #grpitmsql# & " or Pos_NumGrupo = " & #grp# & " and Pos_NumItem = " & #itm#>
+        </cfif>
+        <cfset grp=''>
+        <cfset itm=''>
+    </cfloop>   
 	<cfquery name="rsIncidencia" datasource="#dsn_inspecao#">
 		SELECT Pos_Inspecao, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp, STO_Descricao
 		FROM ParecerUnidade INNER JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo
-		WHERE Pos_Unidade ='#URL.Unid#' AND Pos_NumGrupo = #URL.Ngrup# AND Pos_NumItem = #URL.Nitem# and Pos_Situacao_Resp in(1,6,7,17,22,2,4,5,8,20,15,16,18,19,23)
+		WHERE (Pos_Unidade ='#URL.Unid#' and Pos_Situacao_Resp in(1,6,7,17,22,2,4,5,8,20,15,16,18,19,23) and (#grpitmsql#))
 		order by Pos_Inspecao 
 	</cfquery>
 
@@ -548,6 +565,7 @@ FORM.avalItem : #FORM.avalItem#<br>
 		</cfif>
 	</cfif>
 </cfif>
+</cfoutput>	
 <!---  ---> 
 
 <!---Verifica se o item já foi avaliado ou está sendo avaliado--->
@@ -1569,7 +1587,7 @@ auxvlr: #auxvlr# <br>
   <tr>
     <td height="20" colspan="5">&nbsp;</td>
   </tr>
-  <form name="form1" method="post" onSubmit="return validarform()" enctype="multipart/form-data" action="itens_inspetores_avaliacao1.cfm">
+  <form name="form1" method="post" onSubmit="return validarform()" enctype="multipart/form-data" action="itens_inspetores_avaliacao1_2024.cfm">
 <!--- variaveis de formulario --->
 	<input type="hidden" id="acao" name="acao" value="<cfoutput>#URL.acao#</cfoutput>">
 	<input type="hidden" id="emReanalise" name="emReanalise" value="">
@@ -1582,6 +1600,10 @@ auxvlr: #auxvlr# <br>
 	<input name="nitem" type="hidden" id="nitem" value="<cfoutput>#URL.Nitem#</cfoutput>">
 	<input name="tpunid" id="tpunid" type="hidden"  value="<cfoutput>#URL.tpunid#</cfoutput>">
 	<input name="frminspreincidente" id="frminspreincidente" type="hidden"  value="<cfoutput>#URL.frminspreincidente#</cfoutput>">
+	<input name="itnreincidentes" id="itnreincidentes" type="hidden"  value="<cfoutput>#itnreincidentes#</cfoutput>">
+	<input name="grpitmsql" id="grpitmsql" type="hidden"  value="<cfoutput>#grpitmsql#</cfoutput>">
+	
+	
 <!--- fim variaveis --->
    
 
@@ -1629,7 +1651,7 @@ auxvlr: #auxvlr# <br>
 <!--- <cfset gil = gil> --->
 	<tr bgcolor="eeeeee" class="exibir">
 <!--- 		<td class="exibir" style="background:transparent;font-size:14px"><STRONG>AVALIA&Ccedil;&Atilde;O:</STRONG></td> --->
-		<td bgcolor="eeeeee" class="titulosClaro2"><div align="center"><STRONG>AVALIA&Ccedil;&Atilde;O:</STRONG></div></td>
+		<td bgcolor="eeeeee" class="titulosClaro2"><div align="center"><STRONG>AVALIAÇÃO:</STRONG></div></td>
 		<!--- <td width="11"> ---> 
 		<td colspan="5"> 
     

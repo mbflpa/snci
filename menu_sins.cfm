@@ -272,10 +272,14 @@
 	    </tr>
 	    </cfif>	
 	   <cfif ucase(trim(snci.grpacesso)) eq "GESTORMASTER">
-	   	<tr>		   
-		<td><img src="smallArrow.gif" width="16" height="5" /></td>
-		<td width="94%"><a href="index.cfm?opcao=permissao22">Autorizar Permuta Avaliação no PACIN</a></td>
-	    </tr>		   
+        <tr>		   
+          <td><img src="smallArrow.gif" width="16" height="5" /></td>
+          <td width="94%"><a href="index.cfm?opcao=permissao22">Autorizar Permuta Avaliação no PACIN</a></td>
+        </tr>	
+                <tr>		   
+          <td><img src="smallArrow.gif" width="16" height="5" /></td>
+          <td width="94%"><a href="index.cfm?opcao=permissao27">Grupo/Item Reincidentes no PACIN</a></td>
+        </tr>		   
 	   </cfif>	
 	  <cfif ucase(trim(snci.grpacesso)) eq 'GOVERNANCA'>
 	  <tr>
