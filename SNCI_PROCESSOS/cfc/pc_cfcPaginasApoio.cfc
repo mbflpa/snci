@@ -1698,9 +1698,11 @@
 			FROM pc_orgaos
 			order by pc_org_sigla
 		</cfquery>  
-
-		 <ul style="margin-bottom:80px;margin-top:20px;margin-left:10px;border: 1px solid rgba(0,0,0,0.2); box-shadow: 0px 0px 10px rgba(0,0,0,0.2);" id="treeOrgao" class="ztree"></ul>
- 
+         
+		<div style="margin-top:20px;margin-bottom:80px;">
+			<ul style="border: 1px solid rgba(0,0,0,0.2); margin-left:10px;box-shadow: 0px 0px 10px rgba(0,0,0,0.2);" id="treeOrgao" class="ztree"></ul>
+			<span style="margin-left:10px;color:red"><b>Obs:</b> Os órgãos em vermelho estão desativados.</span>
+		</div>
 
 		<script language="JavaScript">
 			$(document).ready(function(){
@@ -1709,7 +1711,8 @@
 				setEdit();
 				$("#cutNodeBtn_treeOrgao_1").bind("click", cutNodeBtnClick);
 				$("#pasteNodeBtn_treeOrgao_1").bind("click", pasteNodeBtnClick);
-				
+				$("#desativarNodeBtn_treeOrgao_1").bind("click", desativarNodeBtnClick);
+				$("#ativarNodeBtn_treeOrgao_1").bind("click", ativarNodeBtnClick);
 			});
 
 			 
@@ -1729,8 +1732,10 @@
 					nameIsHTML: true,
 					addDiyDom: function(treeId, treeNode) {
 						var spaceWidth = 5;
-						var buttonHTML = '<i id="cutNodeBtn_' + treeNode.tId + '" class="fa fa-pencil-alt grow-icon" style="font-size: 12px;margin-left: 10px;display:none;"></i>'
-										+ '<i id="pasteNodeBtn_' + treeNode.tId + '" class="fa fa-paste grow-icon" style="font-size: 12px;display:none;margin-left: 10px;"></i>';
+						var buttonHTML = '<i id="cutNodeBtn_' + treeNode.tId + '" title="Selecionar para transferência" class="fa fa-pencil-alt grow-icon" style="font-size: 12px;margin-left: 10px;display:none;"></i>'
+										+ '<i id="pasteNodeBtn_' + treeNode.tId + '" title="Transferir Órgão" class="fa fa-paste grow-icon" style="font-size: 12px;display:none;margin-left: 10px;"></i>'
+										+ '<i id="desativarNodeBtn_' + treeNode.tId + '" title="Desativar Órgão" class="fa fa-ban grow-icon" style="font-size: 12px;display:none;margin-left: 10px;"></i>'	   
+										+ '<i id="ativarNodeBtn_' + treeNode.tId + '" title="Ativar Órgão" class="fa fa-eye grow-icon" style="font-size: 12px;display:none;margin-left: 10px;"></i>';
 						var tId = treeNode.tId;
 						var $node = $("#" + tId);
 						var $span = $("#" + tId + "_span");
@@ -1742,6 +1747,11 @@
             			$('#cutNodeBtn_' + treeNode.tId).click(cutNodeBtnClick);
 						
             			$('#pasteNodeBtn_' + treeNode.tId).click(pasteNodeBtnClick);
+
+						$('#desativarNodeBtn_' + treeNode.tId).click(desativarNodeBtnClick);
+
+						$('#ativarNodeBtn_' + treeNode.tId).click(ativarNodeBtnClick);
+
 					}
 				},
 				callback: {
@@ -1768,73 +1778,78 @@
 
 			
 		
-		function onClick(e,treeId, treeNode) {
-			var zTree = $.fn.zTree.getZTreeObj("treeOrgao");//pega a arvore
-			//zTree.expandNode(treeNode);//expande o nó
-            // Oculte todos os ícones
-            $('.fa-pencil-alt, .fa-paste').hide();
-            // Verifique se um nó foi selecionado
-            if (treeNode) {
-                // Se um nó foi selecionado, mostre o botão
-                $('#cutNodeBtn_' + treeNode.tId).show();
-				
-				if (typeof cutNode !== 'undefined' && cutNode) {// Verifica se existe algum nó selecionado e se cutNode não é null	
-                	$('#pasteNodeBtn_' + treeNode.tId).show();
+			function onClick(e,treeId, treeNode) {
+				var zTree = $.fn.zTree.getZTreeObj("treeOrgao");//pega a arvore
+				//zTree.expandNode(treeNode);//expande o nó
+				// Oculte todos os ícones
+				$('.fa-pencil-alt, .fa-paste, .fa-ban, .fa-eye').hide();
+				// Verifique se um nó foi selecionado
+				if (treeNode) {
+					// Se um nó foi selecionado, mostre o botão
+					$('#cutNodeBtn_' + treeNode.tId).show();
+					if (treeNode.status == 'D') {
+						$('#ativarNodeBtn_' + treeNode.tId).show();
+					} else {
+						$('#desativarNodeBtn_' + treeNode.tId).show();
+					}
+
+					if (typeof cutNode !== 'undefined' && cutNode==="true") {// Verifica se existe algum nó selecionado e se cutNode não é null	
+						$('#pasteNodeBtn_' + treeNode.tId).show();
+					}
 				}
-            }
-		}
-
-		function cutNodeBtnClick() {
-			
-						var treeObj = $.fn.zTree.getZTreeObj("treeOrgao");
-						var nodes = treeObj.getSelectedNodes();
-						if (nodes.length > 0) {
-							cutNode = nodes[0];
-
-							swalWithBootstrapButtons.fire({//sweetalert2
-								html: logoSNCIsweetalert2('Deseja transferir este órgão:<br><strong>' + cutNode.extraData +'</strong> ?'),
-								showCancelButton: true,
-								confirmButtonText: 'Sim!',
-								cancelButtonText: 'Cancelar!',
-								}).then((result) => {
-								if (result.isConfirmed) {
-									cutNode.cut = true; // Adiciona uma propriedade 'cut' ao nó
-									treeObj.updateNode(cutNode); // Atualiza o nó para aplicar o novo estilo
-									var nomeOrgao = cutNode.extraData;
-									var mensagem = "";
-									if($('input[name="subRadio"]:checked').val() == "subTec"){
-										mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar a subordinação técnica.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação técnica e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar no botão <i class="fa fa-paste"></i> que aparecerá neste mesmo órgão.</p>'
-									}else{
-										mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar a subordinação administrativa.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação administrativa e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar no botão <i class="fa fa-paste"></i> que aparecerá neste mesmo órgão.</p>'	
-									}	
-									Swal.fire({
-										html: logoSNCIsweetalert2(mensagem),
-										title: '',
-										confirmButtonText: 'OK!'
-									});
-														
-									$('#pasteNodeBtn_' + cutNode.tId).show(); // Mostra o botão usando jQuery
-								}else {
-									// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
-									$('#modalOverlay').modal('hide');
-									
-									Swal.fire({
-											title: 'Operação Cancelada',
-											html: logoSNCIsweetalert2(''),
-											icon: 'info'
-										});
-									
-									carregaTreeOrgao();
-									cutNode.cut = false; // cancela seleção
-									$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
-								} 
-							});
-
-						}
-					
 			}
 
-		function pasteNodeBtnClick() {
+			function cutNodeBtnClick() {
+				
+				var treeObj = $.fn.zTree.getZTreeObj("treeOrgao");
+				var nodes = treeObj.getSelectedNodes();
+				if (nodes.length > 0) {
+					cutNode = nodes[0];
+
+					swalWithBootstrapButtons.fire({//sweetalert2
+						html: logoSNCIsweetalert2('Deseja transferir este órgão:<br><strong>' + cutNode.extraData +'</strong> ?'),
+						showCancelButton: true,
+						confirmButtonText: 'Sim!',
+						cancelButtonText: 'Cancelar!',
+						}).then((result) => {
+						if (result.isConfirmed) {
+							cutNode.cut = true; // Adiciona uma propriedade 'cut' ao nó
+							treeObj.updateNode(cutNode); // Atualiza o nó para aplicar o novo estilo
+							var nomeOrgao = cutNode.extraData;
+							var mensagem = "";
+							if($('input[name="subRadio"]:checked').val() == "subTec"){
+								mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar a subordinação técnica.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação técnica e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar no botão <i class="fa fa-paste"></i> que aparecerá neste mesmo órgão.</p>'
+							}else{
+								mensagem='<p style="text-align: justify;">Você selecionou o  órgão <strong>' + nomeOrgao +   '</strong> para alterar a subordinação administrativa.<br><br>Clique em OK, depois selecione o órgão que será a nova subordinação administrativa e clique em <i class="fa fa-paste"></i> para transferir.<br><br>Obs.: Par retirar esse órgão de qualquer estrutura, basta não selecionar nenhum outro órgão e clicar no botão <i class="fa fa-paste"></i> que aparecerá neste mesmo órgão.</p>'	
+							}	
+							Swal.fire({
+								html: logoSNCIsweetalert2(mensagem),
+								title: '',
+								confirmButtonText: 'OK!'
+							});
+												
+							$('#pasteNodeBtn_' + cutNode.tId).show(); // Mostra o botão usando jQuery
+						}else {
+							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+							$('#modalOverlay').modal('hide');
+							
+							Swal.fire({
+									title: 'Operação Cancelada',
+									html: logoSNCIsweetalert2(''),
+									icon: 'info'
+								});
+							
+							carregaTreeOrgao();
+							cutNode.cut = false; // cancela seleção
+							$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
+						} 
+					});
+
+				}
+						
+			}
+
+			function pasteNodeBtnClick() {
 				var treeObj = $.fn.zTree.getZTreeObj("treeOrgao");
 				var nodes = treeObj.getSelectedNodes();
 				if (nodes.length > 0 && cutNode) {// Verifica se existe algum nó selecionado e se cutNode não é null
@@ -1946,6 +1961,132 @@
 			
 			}
 
+			
+			function desativarNodeBtnClick() {
+				
+				var treeObj = $.fn.zTree.getZTreeObj("treeOrgao");
+				var nodes = treeObj.getSelectedNodes();
+				if (nodes.length > 0) {
+					cutNode = nodes[0];
+					swalWithBootstrapButtons.fire({//sweetalert2
+						html: logoSNCIsweetalert2('Deseja desativar este órgão:<br><strong>' + cutNode.extraData +'</strong> ?'),
+						showCancelButton: true,
+						confirmButtonText: 'Sim!',
+						cancelButtonText: 'Cancelar!',
+						}).then((result) => {
+						if (result.isConfirmed) {
+
+							$('#modalOverlay').modal('show')
+							setTimeout(function() {
+								$.ajax({
+									type: "POST",
+									url: "../SNCI_PROCESSOS/cfc/pc_cfcPaginasApoio.cfc?method=desativaOrgao",
+									data: {
+										"pcOrgMcu": cutNode.id
+									},
+									success: function (data) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+											var mensagem = "";
+											mensagem='<p style="text-align: justify;">Rotina executada com sucesso! <br><br>O órgão <strong>' + cutNode.extraData +   '</strong> foi desativado.<br><br>A consulta será atualizada.</p>'
+											Swal.fire({
+											html: logoSNCIsweetalert2(mensagem),
+											title: '',
+											confirmButtonText: 'OK!',
+												
+											}).then((result) => {
+												if (result.isConfirmed) {
+													$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
+													carregaTreeOrgao();
+												}
+											});
+										});
+										
+									},
+									error: function(xhr, ajaxOptions, thrownError) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});
+										$('#modal-danger').modal('show')
+										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+										$('#modal-danger').find('.modal-body').text(thrownError)
+									}
+								});
+							}, 500);
+					
+						}else {
+							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+							$('#modalOverlay').modal('hide');
+							
+							Swal.fire({
+									title: 'Operação Cancelada',
+									html: logoSNCIsweetalert2(''),
+									icon: 'info'
+								});
+							
+							
+						}
+					});
+				}
+						
+			}
+
+			function ativarNodeBtnClick() {
+				
+				var treeObj = $.fn.zTree.getZTreeObj("treeOrgao");
+				var nodes = treeObj.getSelectedNodes();
+				if (nodes.length > 0) {
+					cutNode = nodes[0];
+					swalWithBootstrapButtons.fire({//sweetalert2
+						html: logoSNCIsweetalert2('Deseja ativar este órgão:<br><strong>' + cutNode.extraData +'</strong> ?'),
+						showCancelButton: true,
+						confirmButtonText: 'Sim!',
+						cancelButtonText: 'Cancelar!',
+						}).then((result) => {
+						if (result.isConfirmed) {
+
+							$('#modalOverlay').modal('show')
+							setTimeout(function() {
+								$.ajax({
+									type: "POST",
+									url: "../SNCI_PROCESSOS/cfc/pc_cfcPaginasApoio.cfc?method=ativaOrgao",
+									data: {
+										"pcOrgMcu": cutNode.id
+									},
+									success: function (data) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+											var mensagem = "";
+											mensagem='<p style="text-align: justify;">Rotina executada com sucesso! <br><br>O órgão <strong>' + cutNode.extraData +   '</strong> foi ativado.<br><br>A consulta será atualizada.</p>'
+											Swal.fire({
+											html: logoSNCIsweetalert2(mensagem),
+											title: '',
+											confirmButtonText: 'OK!',
+												
+											}).then((result) => {
+												if (result.isConfirmed) {
+													$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
+													carregaTreeOrgao();
+												}
+											});
+										});
+										
+									},
+									error: function(xhr, ajaxOptions, thrownError) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});
+										$('#modal-danger').modal('show')
+										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+										$('#modal-danger').find('.modal-body').text(thrownError)
+									}
+								});
+							}, 500);
+						}
+					});
+				}
+			}	
+
 			var zNodes =[
 					<cfoutput query="rsOrgaos">
 						<cfif "#arguments.tipoSubordinacao#" eq "subTec">
@@ -1971,8 +2112,30 @@
 					</cfoutput>
 				];
 
-		</script>
-			
+		</script>		
+
+
+	</cffunction>
+
+	<cffunction name="desativaOrgao" access="remote"  hint="desativa órgãos na página Consultar Órgãos.">
+		<cfargument name="pcOrgMcu" type="string" required="true">
+		<cfquery name="rsDesativarOrgao" datasource="#application.dsn_processos#">
+			UPDATE pc_orgaos
+			SET pc_org_status = 'D'
+			WHERE pc_org_mcu = <cfqueryparam value="#arguments.pcOrgMcu#" cfsqltype="cf_sql_varchar">		
+		</cfquery>
+		<cfreturn true>
+
+	</cffunction>
+
+	<cffunction name="ativaOrgao" access="remote"  hint="ativa órgãos na página Consultar Órgãos.">
+		<cfargument name="pcOrgMcu" type="string" required="true">
+		<cfquery name="rsAtivarOrgao" datasource="#application.dsn_processos#">
+			UPDATE pc_orgaos
+			SET pc_org_status = 'A'
+			WHERE pc_org_mcu = <cfqueryparam value="#arguments.pcOrgMcu#" cfsqltype="cf_sql_varchar">		
+		</cfquery>
+		<cfreturn true>
 
 	</cffunction>
 	
