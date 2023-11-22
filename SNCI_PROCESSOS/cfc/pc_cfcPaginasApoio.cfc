@@ -887,7 +887,7 @@
 
 					<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
 					<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
-					<cfset pronomeTrat = "Senhor(a) Gestor(a) da #siglaOrgaoResponsavel#">
+					<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 					
 					<cfset textoEmail = '<p>Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas.</p> 
 										 <p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:</p>
@@ -967,7 +967,7 @@
 
 					<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
 					<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
-					<cfset pronomeTrat = "Senhor(a) Gestor(a) da #siglaOrgaoResponsavel#">
+					<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 					
 					<cfset textoEmail = '<p>Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas.</p> 
 										 <p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:</p>
@@ -1077,7 +1077,7 @@
 			
 				
 				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
-				<cfset pronomeTrat = "Senhor(a) Gestor do(a) #siglaOrgaoResponsavel#">
+				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 				<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
 					<!DOCTYPE html>
 					<html lang="pt-br">
@@ -1222,6 +1222,8 @@
 									</tbody>
 								</table>
 								<p>Para regularizar a situação, solicitamos a acessar o link abaixo, tela "Acompanhamento", aba “Medidas / Orientações para regularização” e inserir sua resposta:<br><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
+								<p>Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
+								<P>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</P>
 								<cfif rsOrientacoesOutrosStatus.recordcount gt 1>    
 									<p>Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount,"00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
 								<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
@@ -1333,7 +1335,7 @@
 			
 				
 				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
-				<cfset pronomeTrat = "Senhor(a) Gestor do(a) #siglaOrgaoResponsavel#">
+				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 				<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
 					<!DOCTYPE html>
 					<html lang="pt-br">
@@ -1478,6 +1480,8 @@
 									</tbody>
 								</table>
 								<p>Para regularizar a situação, solicitamos a acessar o link abaixo, tela "Acompanhamento", aba “Medidas / Orientações para regularização” e inserir sua resposta:<br><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
+								<p>Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
+								<P>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</P>
 								<cfif rsOrientacoesOutrosStatus.recordcount gt 1>    
 									<p>Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount,"00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
 								<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
@@ -1551,7 +1555,7 @@
 				<cfset cc = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoAvaliado))#">
 
 				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsMelhoriasPendentes.siglaOrgaoResp))#">
-				<cfset pronomeTrat = "Prezado Gestor">
+				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 				<cfset textoEmail = '<p>Informamos que existe(m) #NumberFormat(rsMelhoriasPendentes.recordcount,"00")# Proposta(s) de Melhoria registrada(s) pelo Controle Interno, no Sistema SNCI, com status “PENDENTE”, aguardando manifestação do gestor responsável.</p> 
 									    <p>Para regularizar a situação, solicitamos acessar o sistema por meio do link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
 										<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
@@ -1622,7 +1626,7 @@
 				<cfset cc = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoAvaliado))#">
 
 				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsMelhoriasPendentes.siglaOrgaoResp))#">
-				<cfset pronomeTrat = "Prezado Gestor">
+				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 				<cfset textoEmail = '<p>Informamos que existe(m) #NumberFormat(rsMelhoriasPendentes.recordcount,"00")# Proposta(s) de Melhoria registrada(s) pelo Controle Interno, no Sistema SNCI, com status “PENDENTE”, aguardando manifestação do gestor responsável.</p> 
 									    <p>Para regularizar a situação, solicitamos acessar o sistema por meio do link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
 										<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
