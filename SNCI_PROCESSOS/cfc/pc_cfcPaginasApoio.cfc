@@ -1706,6 +1706,9 @@
 
 		<script language="JavaScript">
 			$(document).ready(function(){
+				if (typeof cutNode !== 'undefined' && cutNode) {
+					cutNode=null;
+				}
 				$.fn.zTree.init($("#treeOrgao"), setting, zNodes);
 				//fuzzySearch('treeOrgao','#filter',null,true); // initialize fuzzy search function
 				setEdit();
@@ -1792,8 +1795,8 @@
 					} else {
 						$('#desativarNodeBtn_' + treeNode.tId).show();
 					}
-
-					if (typeof cutNode !== 'undefined' && cutNode==="true") {// Verifica se existe algum nó selecionado e se cutNode não é null	
+                    
+					if (typeof cutNode !== 'undefined' && cutNode) {// Verifica se existe algum nó selecionado e se cutNode não é null	
 						$('#pasteNodeBtn_' + treeNode.tId).show();
 					}
 				}
@@ -1840,8 +1843,7 @@
 								});
 							
 							carregaTreeOrgao();
-							cutNode.cut = false; // cancela seleção
-							$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
+							
 						} 
 					});
 
@@ -1919,7 +1921,6 @@
 														
 													}).then((result) => {
 														if (result.isConfirmed) {
-															$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
 															carregaTreeOrgao();
 														}
 													});
@@ -1944,8 +1945,6 @@
 											html: logoSNCIsweetalert2(''),
 											icon: 'info'
 										});
-									cutNode.cut = false; // cancela seleção
-									$('#pasteNodeBtn_' + cutNode.tId).hide(); // Mostra o botão usando jQuery
 									carregaTreeOrgao();
 								} 
 							});	
