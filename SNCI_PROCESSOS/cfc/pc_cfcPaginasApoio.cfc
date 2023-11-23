@@ -1041,12 +1041,12 @@
 						,orgaoResp.pc_org_sigla as siglaOrgaoResp
 						,orgaoResp.pc_org_emaiL as emailOrgaoResp
 				FROM pc_avaliacao_orientacoes
-				right JOIN pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
-				right JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
-				right JOIN pc_avaliacao_tipos on pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
-				right JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-				right JOIN pc_orgaos as orgaoAvaliado on orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-				right JOIN pc_orgaos as orgaoResp on orgaoResp.pc_org_mcu = pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp
+				LEFT JOIN pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
+				LEFT JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
+				LEFT JOIN pc_avaliacao_tipos on pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
+				LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
+				LEFT JOIN pc_orgaos as orgaoAvaliado on orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+				LEFT JOIN pc_orgaos as orgaoResp on orgaoResp.pc_org_mcu = pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp
 
 				WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate() 
 				ORDER BY pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp
@@ -1299,12 +1299,12 @@
 						,orgaoResp.pc_org_sigla as siglaOrgaoResp
 						,orgaoResp.pc_org_emaiL as emailOrgaoResp
 				FROM pc_avaliacao_orientacoes
-				right JOIN pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
-				right JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
-				right JOIN pc_avaliacao_tipos on pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
-				right JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-				right JOIN pc_orgaos as orgaoAvaliado on orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-				right JOIN pc_orgaos as orgaoResp on orgaoResp.pc_org_mcu = pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp
+				LEFT JOIN pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
+				LEFT JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
+				LEFT JOIN pc_avaliacao_tipos on pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
+				LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
+				LEFT JOIN pc_orgaos as orgaoAvaliado on orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+				LEFT JOIN pc_orgaos as orgaoResp on orgaoResp.pc_org_mcu = pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp
 
 				WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate() 
 				ORDER BY pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp
@@ -1539,14 +1539,20 @@
 
 		<cfloop query="#myQuery#">
 			<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
-				SELECT pc_avaliacao_melhorias.*, pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_num_sei
-				,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla as siglaOrgaoResp,  pc_orgaos.pc_org_mcu
-				,pc_orgaos.pc_org_emaiL as emailOrgaoResp, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
+				SELECT pc_avaliacao_melhorias.*
+				, pc_processos.pc_modalidade
+				, pc_processos.pc_processo_id
+				, pc_processos.pc_num_sei
+				, pc_avaliacoes.pc_aval_numeracao
+				, pc_orgaos.pc_org_sigla as siglaOrgaoResp
+				, pc_orgaos.pc_org_mcu
+				, pc_orgaos.pc_org_emaiL as emailOrgaoResp
+				, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
 				FROM pc_avaliacao_melhorias
-				INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_melhoria_num_orgao
-				INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
-				INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-				INNER JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+				LEFT JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_melhoria_num_orgao
+				LEFT JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
+				LEFT JOIN pc_processos on pc_processo_id = pc_aval_processo
+				LEFT JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
 				WHERE pc_aval_melhoria_num_orgao = '#pc_aval_melhoria_num_orgao#' and pc_aval_melhoria_status = 'P' and pc_num_status in(4,5)
 			</cfquery>
 
@@ -1610,14 +1616,20 @@
 
 		<cfloop query="#myQuery#">
 			<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
-				SELECT pc_avaliacao_melhorias.*, pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_num_sei
-				,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla as siglaOrgaoResp,  pc_orgaos.pc_org_mcu
-				,pc_orgaos.pc_org_emaiL as emailOrgaoResp, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
+				SELECT pc_avaliacao_melhorias.*
+				, pc_processos.pc_modalidade
+				, pc_processos.pc_processo_id
+				, pc_processos.pc_num_sei
+				, pc_avaliacoes.pc_aval_numeracao 
+				, pc_orgaos.pc_org_sigla as siglaOrgaoResp
+				, pc_orgaos.pc_org_mcu
+				, pc_orgaos.pc_org_emaiL as emailOrgaoResp
+				, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
 				FROM pc_avaliacao_melhorias
-				INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_melhoria_num_orgao
-				INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
-				INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-				INNER JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+				LEFT JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_melhoria_num_orgao
+				LEFT JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
+				LEFT JOIN pc_processos on pc_processo_id = pc_aval_processo
+				LEFT JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
 				WHERE pc_aval_melhoria_num_orgao = '#pc_aval_melhoria_num_orgao#' and pc_aval_melhoria_status = 'P' and pc_num_status in(4,5)
 			</cfquery>
 
