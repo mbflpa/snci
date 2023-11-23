@@ -105,7 +105,7 @@
         
         $(document).ready(function(){
             $(".content-wrapper").css("height","auto");
-            var selectedRadio = sessionStorage.getItem('selectedRadio');
+            var selectedRadio = localStorage.getItem('selectedRadio');
             if (selectedRadio) {
                 $('#' + selectedRadio).prop('checked', true);
 
@@ -152,8 +152,8 @@
         $('input[name="subRadio"]').change(function() {
             carregaTreeOrgao();
 
-            // Armazene a seleção do rádio no sessionStorage
-            sessionStorage.setItem('selectedRadio', this.id);
+            // Armazene a seleção do rádio no localStorage
+            localStorage.setItem('selectedRadio', this.id);
 
         });
 

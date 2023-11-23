@@ -386,7 +386,7 @@
                 //hopscotch.endTour();
 				hopscotch.configure({ i18n: customI18n }); // Configura as traduções personalizadas, se houver
 				hopscotch.startTour(tour);
-                sessionStorage.setItem("skipTour", 'true');
+                localStorage.setItem("skipTour", 'true');
 			}
 
             <cfoutput>
@@ -398,7 +398,7 @@
             //Se o usuário não for do controle interno e não for o perfil 13 (CONSULTA), inicia o tour automaticamente
             if(usuarioControleInterno == 'N' && usuarioPerfil != '13'){
                 // Verifica se a preferência já foi marcada como "true"
-                var skipTourValue = sessionStorage.getItem("skipTour");
+                var skipTourValue = localStorage.getItem("skipTour");
                 if (skipTourValue !== "true") {
                     iniciarTourAutomaticamente();
                 }
