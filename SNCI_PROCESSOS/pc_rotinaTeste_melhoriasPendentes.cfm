@@ -92,14 +92,31 @@
         $(document).ready(function(){
             $("#btnRotinaMelhoriasPendentes").click(function(){
                 var mensagem = '';
+                var emailUsuario = '';
                 <cfoutput >
-                     var emailUsuario = '#application.rsUsuarioParametros.pc_usu_email#';
+                    emailUsuario = '#application.rsUsuarioParametros.pc_usu_email#';
                     <cfif application.auxsite eq "intranetsistemaspe">
                         mensagem = 'Deseja executar a rotina de verificação das Propostas de Melhoria Pendentes?<br>Esta rotina irá verificar as Propostas de Melhoria pendentes e enviará um e-mail de aviso aos órgãos responsáveis que possuem e-mail cadastrado no SNCI-Processos.';
                     <cfelse>
                         mensagem = 'Deseja executar a rotina de verificação das Propostas de Melhoria Pendentes?<br>Esta rotina irá verificar as Propostas de Melhoria pendentes e enviará um e-mail de aviso para você como se fosse o órgão responsável.<br><br>ATENÇÃO: Esta rotina não irá enviar e-mail para os órgãos, apenas para você:<br>' + emailUsuario + '.';
+                        //verifica se o usuário possui e-mail cadastrado
+                        <cfif application.rsUsuarioParametros.pc_usu_email eq ''>
+                            mensagem = '<p style="text-align: justify;">Não foi possível executar a rotina de verificação das Propostas de Melhoria Pendentes.<br><br>Seu e-mail não está cadastrado no SNCI-Processos.<br><br>Informe o administrador do sistema para que ele possa cadastrar seu e-mail.</p>';
+                            //exibe mensagem de erro
+                            Swal.fire({
+                                html: logoSNCIsweetalert2(mensagem), 
+                                title: '',
+                                confirmButtonText: 'OK!',
+                            })
+                            //sai da função
+                            return false;
+                        </cfif>
+                   
                     </cfif>
+                        
                 </cfoutput>
+               
+
                 Swal.fire({
                     html: logoSNCIsweetalert2(mensagem), 
                     title: '',
