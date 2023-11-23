@@ -714,7 +714,7 @@
 		<cfreturn isFeriado>
 	</cffunction>
 
-	<cffunction name="EnviaEmails" access="public" returntype="string" hint="Cria o formado dos e-mails e envia.">
+	<cffunction name="EnviaEmails" access="public" returntype="string" hint="Cria o formado dos e-mails e envia. Se não for executado em produção, o email será enviado para marceloferreira@correios.com.br">
             
         <cfargument name="para" type="string" required="true">
         <cfargument name="copiaPara" type="string" required="false" default="">
@@ -774,7 +774,7 @@
 		<cfreturn #sucesso# />
     </cffunction>
 
-	<cffunction name="EnviaEmailsTeste" access="public" returntype="string" hint="Cria o formado dos e-mails e envia.">
+	<cffunction name="EnviaEmailsTeste" access="public" returntype="string" hint="Cria o formado dos e-mails e envia. Utilizado nas rotinas manuais. Se não for executado em produção, o email será enviado parao usuário que executou">
             
         <cfargument name="para" type="string" required="true">
         <cfargument name="copiaPara" type="string" required="false" default="">
@@ -917,7 +917,7 @@
 		</cfoutput>
 	</cffunction>
 
-	<cffunction name="rotinaDiariaOrientacoesSuspensasTeste" access="remote"  hint="Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
+	<cffunction name="rotinaDiariaOrientacoesSuspensasTeste" access="remote"  hint="Utilizado nas rotinas manuais. Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
 		<cfquery name="rsPontoSuspensoPrazoVencido" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_orientacoes.*, pc_avaliacoes.pc_aval_processo
 			FROM pc_avaliacao_orientacoes
@@ -1257,7 +1257,7 @@
 
 	</cffunction>
 
-	<cffunction name="rotinaSemanalOrientacoesPendentesTeste" access="remote"  hint="Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
+	<cffunction name="rotinaSemanalOrientacoesPendentesTeste" access="remote"  hint="Utilizado nas rotinas manuais. Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
 		<cfsetting RequestTimeout = "0"> 
 		<cfquery name="rsOrgaosComOrientacoesPendentes" datasource="#application.dsn_processos#" >
 			SELECT DISTINCT pc_aval_orientacao_mcu_orgaoResp
@@ -1588,7 +1588,7 @@
 
 	</cffunction>
 
-	<cffunction name="rotinaMensalMelhoriasPendentesTeste" access="remote"  hint="Verifica or órgãos responsáveis pelas propostas de melhoria pendentes e encaminha e-mail de alerta.">
+	<cffunction name="rotinaMensalMelhoriasPendentesTeste" access="remote"  hint="Utilizado nas rotinas manuais. Verifica or órgãos responsáveis pelas propostas de melhoria pendentes e encaminha e-mail de alerta.">
 		<cfsetting RequestTimeout = "0"> 
 		<cfquery name="rsOrgaosComMelhoriasPendentes" datasource="#application.dsn_processos#" >
 			SELECT DISTINCT pc_aval_melhoria_num_orgao

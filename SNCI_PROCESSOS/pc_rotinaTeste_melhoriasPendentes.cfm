@@ -91,8 +91,17 @@
         //cria click em um botão para um ajax para executar cffunction metodo rotinaMensalMelhoriasPendentes em pc_cfcPaginasApoio.cfc
         $(document).ready(function(){
             $("#btnRotinaMelhoriasPendentes").click(function(){
+                var mensagem = '';
+                <cfoutput >
+                     var emailUsuario = '#application.rsUsuarioParametros.pc_usu_email#';
+                    <cfif application.auxsite eq "intranetsistemaspe">
+                        mensagem = 'Deseja executar a rotina de verificação das Propostas de Melhoria Pendentes?<br>Esta rotina irá verificar as Propostas de Melhoria pendentes e enviará um e-mail de aviso aos órgãos responsáveis que possuem e-mail cadastrado no SNCI-Processos.';
+                    <cfelse>
+                        mensagem = 'Deseja executar a rotina de verificação das Propostas de Melhoria Pendentes?<br>Esta rotina irá verificar as Propostas de Melhoria pendentes e enviará um e-mail de aviso para você como se fosse o órgão responsável.<br><br>ATENÇÃO: Esta rotina não irá enviar e-mail para os órgãos, apenas para você:<br>' + emailUsuario + '.';
+                    </cfif>
+                </cfoutput>
                 Swal.fire({
-                    html: logoSNCIsweetalert2('Deseja executar a rotina de verificação das Propostas de Melhoria Pendentes?<br>Esta rotina irá verificar as Propostas de Melhoria pendentes e enviará um e-mail de aviso para você como se fosse o órgão responsável.'), 
+                    html: logoSNCIsweetalert2(mensagem), 
                     title: '',
                     showCancelButton: true,
 					confirmButtonText: 'Sim!',
