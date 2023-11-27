@@ -2687,7 +2687,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 			,pc_avaliacao_orientacoes.*
 			,pc_orgaos_heranca.*
 			,pc_status.*
-
+			,pc_orientacao_status.pc_orientacao_status_finalizador AS statusFinalizador	
 			FROM pc_processos
 			INNER JOIN pc_avaliacoes						ON pc_processo_id = pc_aval_processo
 			INNER JOIN pc_avaliacao_tipos 					ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
@@ -2699,7 +2699,8 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 			INNER JOIN pc_orgaos AS pc_orgao_OrientacaoResp	ON pc_orgao_OrientacaoResp.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
 			LEFT JOIN pc_orgaos_heranca	                    ON pc_orgHerancaMcuDe = pc_aval_orientacao_mcu_orgaoResp
 			LEFT JOIN pc_orgaos AS pc_orgaos_2 				ON pc_orgaos_2.pc_org_mcu = pc_orgHerancaMcuPara
-
+			INNER JOIN pc_orientacao_status 				ON pc_aval_orientacao_status = pc_orientacao_status.pc_orientacao_status_id
+			
 			WHERE pc_aval_orientacao_id  = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
 
 		</cfquery>		
@@ -3061,6 +3062,19 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 										</select>
 									</div>
 								</div>
+								<!--Ultimo órgão responsálvel da tabela pc_avaliacao_posicionamentos-->
+								<cfquery datasource="#application.dsn_processos#" name="rsUltimoOrgaoResp">
+									Select TOP 1 pc_aval_posic_num_orgaoResp as ultimoOrgaoResp 
+									from pc_avaliacao_posicionamentos
+									INNER JOIN pc_orientacao_status ON pc_orientacao_status.pc_orientacao_status_id = pc_avaliacao_posicionamentos.pc_aval_posic_status
+									INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_avaliacao_posicionamentos.pc_aval_posic_num_orgaoResp
+								
+									WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+									      AND not pc_aval_posic_num_orgaoResp is null AND pc_org_controle_interno = 'N' 
+									
+									order by pc_aval_posic_id desc
+								</cfquery>
+
 								<div id ="pcOrgaoRespAcompDiv" class="col-sm-4" hidden>
 									<div class="form-group">
 										
@@ -3073,7 +3087,12 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 													<option <cfif '#pc_org_mcu#' eq '#rsproc.mcuOrgaoRespOrientacao#'>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
 												<cfelse>
 													<option <cfif '#pc_org_mcu#' eq rsManifestacaoSalva.pc_aval_posic_num_orgaoResp>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
-												</cfif>	
+												</cfif>
+												<!-- Se o status da orientação for "EM ANÁLISE" ou se o status for finalizador, mostra o último órgão responsável pela última manifestação.-->
+												<cfif rsProc.pc_aval_orientacao_status eq 13 or rsProc.statusFinalizador eq 'S'>
+													<option <cfif '#pc_org_mcu#' eq '#rsUltimoOrgaoResp.ultimoOrgaoResp#'>selected</cfif> value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+												</cfif>
+													
 											</cfoutput>
 
 
@@ -3275,7 +3294,6 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
 						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
 						$("#pcDataPrevRespAcomp").val(null)	
-						$("#pcOrgaoRespAcomp").val(null)	
 						$("#pcNumProcJudicial").val(numProcJudicial)
 						$("#pcPosicAcomp").prop("disabled", true);
 					}else if ($('#pcOrientacaoStatus').val() == 16){
@@ -3290,7 +3308,6 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						$("#pcDataPrevRespAcompDiv").attr("hidden",true)
 						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
 						$("#pcNumProcJudicialDiv").attr("hidden",true)
-						$("#pcOrgaoRespAcomp").val(null)	
 						$("#pcDataPrevRespAcomp").val(null)	
 						$("#pcNumProcJudicial").val(null)	
 					}
@@ -3419,7 +3436,6 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					$("#pcDataPrevRespAcompDiv").attr("hidden",true)
 					$("#pcOrgaoRespAcompDiv").attr("hidden",true)
 					$("#pcDataPrevRespAcomp").val(null)	
-					//$("#pcOrgaoRespAcomp").val(null)
 					$("#pcPosicAcomp").val('Orientação baixada para efeitos de acompanhamento no Sistema SNCI – Módulo Acompanhamento de Processos, tendo em vista a existência de Processo Judicial relacionado ao tema.')
 					$("#pcPosicAcomp").prop("disabled", true);
 												
@@ -3439,7 +3455,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					$("#pcNumProcJudicialDiv").attr("hidden",true)
 					$("#pcDataPrevRespAcomp").val(null)	
 					$("#pcNumProcJudicial").val(null)
-					//$("#pcOrgaoRespAcomp").val(null)	
+						
 				}
 
 				if($('#pcOrientacaoStatus').val() != 15 && $('#pcOrientacaoStatus').val() != 16){
@@ -3700,6 +3716,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
 										pc_aval_posic_texto: $('#pcPosicAcomp').val(),
 										pc_aval_orientacao_status:$('#pcOrientacaoStatus').val(),
+										pc_aval_orientacao_mcu_orgaoResp: $('#pcOrgaoRespAcomp').val(),
 										pc_aval_orientacao_numProcJudicial: $('#pcNumProcJudicial').val(),
 										idAnexos: idAnexosString
 									},
@@ -4742,7 +4759,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 	   
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 		<cfargument name="pc_aval_posic_texto" type="string" required="true" />
-		<cfargument name="pc_aval_orientacao_mcu_orgaoResp" type="string" required="false" default=''/>
+		<cfargument name="pc_aval_orientacao_mcu_orgaoResp" type="string" required="true" />
 		<cfargument name="pc_aval_orientacao_dataPrevistaResp" type="string" required="false"  default=null/>
 		<cfargument name="pc_aval_orientacao_status" type="numeric" required="true" />
 		<cfargument name="pc_aval_orientacao_numProcJudicial" type="string" required="false" default=''/>
@@ -4758,7 +4775,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 			<cfquery datasource = "#application.dsn_processos#" name="rsOrgao">
 				SELECT 	pc_orgaos.* FROM pc_orgaos WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
 			</cfquery>
-			<cfif '#arguments.pc_aval_orientacao_mcu_orgaoResp#' neq ''>
+			<cfif #arguments.pc_aval_orientacao_status# eq 5 OR #arguments.pc_aval_orientacao_status# eq 16>
 				<cfset data="#DateFormat(arguments.pc_aval_orientacao_dataPrevistaResp,'DD-MM-YYYY')#">
 				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
@@ -4799,7 +4816,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_enviado, pc_aval_posic_numProcJudicial)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_enviado, pc_aval_posic_num_orgaoResp, pc_aval_posic_numProcJudicial)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
@@ -4808,6 +4825,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
+						<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
@@ -4820,6 +4838,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
 						pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
+						pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
 						pc_aval_orientacao_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
 					WHERE 
 						pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
