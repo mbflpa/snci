@@ -11,6 +11,7 @@
 
 <cfdump var = "#rsOrientacoesFinalizadas.recordcount#" >
 	
+	
 <cfloop query="rsOrientacoesFinalizadas">
 	<cfquery datasource="#application.dsn_processos#" name="rsUltimoOrgaoResp">
 		Select TOP 1 pc_aval_posic_num_orgaoResp as ultimoOrgaoResp 
