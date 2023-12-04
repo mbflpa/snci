@@ -1000,7 +1000,7 @@
 
 
 	<cffunction name="rotinaSemanalOrientacoesPendentes" access="remote"  hint="Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
-		<cfsetting RequestTimeout = "0"> 
+		
 		<cfquery name="rsOrgaosComOrientacoesPendentes" datasource="#application.dsn_processos#" >
 			SELECT DISTINCT pc_aval_orientacao_mcu_orgaoResp
 			FROM pc_avaliacao_orientacoes
@@ -1258,7 +1258,7 @@
 	</cffunction>
 
 	<cffunction name="rotinaSemanalOrientacoesPendentesTeste" access="remote"  hint="Utilizado nas rotinas manuais. Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
-		<cfsetting RequestTimeout = "0"> 
+		
 		<cfquery name="rsOrgaosComOrientacoesPendentes" datasource="#application.dsn_processos#" >
 			SELECT DISTINCT pc_aval_orientacao_mcu_orgaoResp
 			FROM pc_avaliacao_orientacoes
@@ -1518,7 +1518,7 @@
 	
 
 	<cffunction name="rotinaMensalMelhoriasPendentes" access="remote"  hint="Verifica or órgãos responsáveis pelas propostas de melhoria pendentes e encaminha e-mail de alerta.">
-		<cfsetting RequestTimeout = "0"> 
+		
 		<cfquery name="rsOrgaosComMelhoriasPendentes" datasource="#application.dsn_processos#" >
 			SELECT DISTINCT pc_aval_melhoria_num_orgao
 			FROM pc_avaliacao_melhorias

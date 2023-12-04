@@ -1,5 +1,5 @@
 <cfprocessingdirective pageencoding = "utf-8">	
-<cfsetting RequestTimeout = "0"> 
+
 
 <cfquery name="rsOrgaosComMelhoriasPendentes" datasource="#application.dsn_processos#" >
     SELECT DISTINCT pc_aval_melhoria_num_orgao

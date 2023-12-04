@@ -1,5 +1,5 @@
 <cfprocessingdirective pageencoding = "utf-8">	
-<cfsetting RequestTimeout = "0"> 
+
 
 
 <cfquery name="rsOrgaosComOrientacoesPendentes" datasource="#application.dsn_processos#" >
