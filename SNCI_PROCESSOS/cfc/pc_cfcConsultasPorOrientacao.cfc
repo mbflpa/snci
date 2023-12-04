@@ -127,7 +127,7 @@
 						AND  pc_aval_orientacao_status not in (9,12,14)
 				<cfelse>
 					<!---Não exibe orientações pendentes de posicionamento inicial do controle interno--->
-				    AND pc_aval_orientacao_status not in (1)
+				    AND pc_aval_orientacao_status not in (1,9,12)
 				
 					AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
