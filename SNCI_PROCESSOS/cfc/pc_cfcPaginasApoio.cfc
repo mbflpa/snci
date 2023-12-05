@@ -1595,7 +1595,7 @@
 	</cffunction>
 
 	<cffunction name="rotinaMensalMelhoriasPendentesTeste" access="remote"  hint="Utilizado nas rotinas manuais. Verifica or órgãos responsáveis pelas propostas de melhoria pendentes e encaminha e-mail de alerta.">
-		<cfsetting RequestTimeout = "0"> 
+		
 		<cfquery name="rsOrgaosComMelhoriasPendentes" datasource="#application.dsn_processos#" >
 			SELECT DISTINCT pc_aval_melhoria_num_orgao
 			FROM pc_avaliacao_melhorias
