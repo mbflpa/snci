@@ -28,8 +28,10 @@
 				WHERE  pc_status.pc_status_id IN ('2','3') 
 			<cfelseif #application.rsUsuarioParametros.pc_usu_perfil# eq 8>
 			    WHERE  pc_status.pc_status_id IN ('2','3')  and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+			<cfelseif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
+				WHERE  pc_status.pc_status_id IN ('2','3') and pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
 			<cfelse>
-				WHERE  pc_status.pc_status_id IN ('2','3') and pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se_abrangencia#')
+				WHERE  pc_status.pc_status_id = 0
 			</cfif>
 			ORDER BY 	pc_status.pc_status_id asc 
 		</cfquery>	

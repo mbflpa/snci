@@ -45,6 +45,13 @@ applicationtimeout="#createtimespan(0,6,0,0)#">
 		WHERE pc_usu_login = 'CORREIOSNET\80859992'
 	</cfif>
 </cfquery>
+<!--SE application.rsUsuarioParametros.pc_org_se_abrangencia NÃO FOR VAZIO, ENTÃO application.seAbrangencia RECEBE application.rsUsuarioParametros.pc_org_se_abrangencia-->
+<cfif Len(application.rsUsuarioParametros.pc_org_se_abrangencia) NEQ 0>
+	<cfset application.seAbrangencia = ValueList(application.rsUsuarioParametros.pc_org_se_abrangencia) />
+<cfelse>
+	<cfset application.seAbrangencia = 0 />
+</cfif>
+
 <cfquery name="qControleAcessoParametros" datasource="#application.dsn_processos#">
 	SELECT '/snci/snci_processos/'+pc_controle_acesso_pagina as pagina FROM pc_controle_acesso
 	WHERE pc_controle_acesso_perfis like '%#application.rsUsuarioParametros.pc_usu_perfil#%'

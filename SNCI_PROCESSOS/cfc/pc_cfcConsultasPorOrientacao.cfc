@@ -109,9 +109,9 @@
 					AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
 				</cfif>
 
-				<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' --->
-				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 >
-					AND pc_num_orgao_origem IN('00436698') AND (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se_abrangencia#')
+				<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)'  ou 14 -'CI - REGIONAL - SCIA - Acompanhamento'--->
+				<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) >
+					AND pc_num_orgao_origem IN('00436698') AND (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
 				</cfif>
 
 			<cfelse>

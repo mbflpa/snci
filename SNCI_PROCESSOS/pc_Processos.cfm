@@ -1,7 +1,6 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
 
-
 <!-- 'A' ATIVO, 'O' ORIGEM DE PROCESSOS, 'D' DESATIVADO -->
 <cfquery name="rsOrigem" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
