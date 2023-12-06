@@ -39,7 +39,7 @@
 <cfquery name="rs_OrgAvaliadoSE_usuario" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
 	FROM pc_orgaos
-	WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') AND (pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_org_se = '#application.rsUsuarioParametros.pc_org_se_abrangencia#')
+	WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') AND (pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_org_se in(#application.seAbrangencia#))
 	ORDER BY pc_org_sigla
 </cfquery>
 
@@ -147,7 +147,7 @@
 
 														<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 8>
 															<cfoutput><option selected value="#application.rsUsuarioParametros.pc_org_mcu#"> #application.rsUsuarioParametros.pc_org_sigla#</option></cfoutput>
-														<cfelseif #application.rsUsuarioParametros.pc_usu_perfil# eq 7>
+														<cfelseif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
 														    <cfoutput><option selected value="#rsOrigemGCOP.pc_org_mcu#">#rsOrigemGCOP.pc_org_sigla#</option></cfoutput>
 														<cfelse>
 															<cfoutput query="rsOrigem" >
@@ -223,7 +223,7 @@
 													<label for="pcOrgaoAvaliado">Órgão Avaliado:</label>
 													<select id="pcOrgaoAvaliado" required name="pcOrgaoAvaliado" class="form-control">
 														<option selected="" disabled="" value=""></option>
-														<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7>
+														<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
 															<cfoutput query="rs_OrgAvaliadoSE_usuario">
 																<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
 															</cfoutput>
