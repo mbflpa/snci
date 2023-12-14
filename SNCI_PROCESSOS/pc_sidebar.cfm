@@ -118,7 +118,7 @@
           <!---verifica de qual servidor a rotina está sendo disparada--->
           <cfset servidor =  cgi.server_name>
           <!---Se servidor não for de produção, aparecerá o select para alteração de perfil e lotação --->
-          <cfif ('#servidor#' eq "homolocacaope" or '#servidor#' eq "desenvolvimentope" or '#servidor#' eq "localhostpe")>
+          <cfif ('#servidor#' eq "homolocacaope" or '#servidor#' eq "desenvolvimentope" or '#servidor#' eq "localhostpe") or #application.rsUsuarioParametros.pc_usu_matricula# eq '80859992'>
             <div style="font-size:10px !important;">
               <div class="form-group" style="width:auto;margin-top:10px;index-z:1000;position:relative">
                 <select id="mudarPerfil" name="mudarPerfil" class="form-control" style="height:35px;">
