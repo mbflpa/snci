@@ -123,6 +123,7 @@
 					UPDATE pc_processos
 					SET 
 						pc_num_orgao_origem = '#arguments.pcOrigem#',
+						pc_num_sei = '#aux_sei#',
 						pc_num_rel_sei = '#arguments.pcNumRelatorio#',
 						pc_num_avaliacao_tipo = '#arguments.pcTipoAvaliado#',
 						pc_aval_tipo_nao_aplica_descricao = '#arguments.pcTipoAvalDescricao#',
