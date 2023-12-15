@@ -727,7 +727,7 @@
 			<cfset cc = "#arguments.copiaPara#">
 		</cfif> 
 
-        <cfif application.auxsite neq "intranetsistemaspe">
+        <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
 			<cfif #cc# neq "" >
 				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
 			<cfelse>
@@ -743,7 +743,7 @@
 				<cfset de="mbflpa@yahoo.com.br">
 			</cfif>
 			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-			    <cfif application.auxsite neq "intranetsistemaspe">
+			    <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
 					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 				</cfif>
 				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
@@ -787,7 +787,7 @@
 			<cfset cc = "#arguments.copiaPara#">
 		</cfif> 
 
-        <cfif application.auxsite neq "intranetsistemaspe">
+        <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
 			<cfif #cc# neq "" >
 				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
 			<cfelse>
@@ -803,7 +803,7 @@
 				<cfset de="mbflpa@yahoo.com.br">
 			</cfif>
 			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-			    <cfif application.auxsite neq "intranetsistemaspe">
+			    <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
 					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 				</cfif>
 				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
@@ -905,7 +905,7 @@
 						<cfset de="mbflpa@yahoo.com.br">
 					</cfif>
 						<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-							<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+							<cfoutput>Erro rotina "rotinaDiariaOrientacoesSuspensas" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
 						</cfmail>
 					</cfcatch>
 				</cftry>
@@ -985,7 +985,7 @@
 						<cfset de="mbflpa@yahoo.com.br">
 					</cfif>
 						<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-							<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+							<cfoutput>Erro rotina "rotinaDiariaOrientacoesSuspensasTeste" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
 						</cfmail>
 					</cfcatch>
 				</cftry>
@@ -1064,7 +1064,7 @@
 				<cfset to = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoResp))#">
 				<cfset cc = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoAvaliado))#">
 
-				<cfif application.auxsite neq "intranetsistemaspe">
+				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 					<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 					<cfset to = "marceloferreira@correios.com.br">
 					<cfset cc = "">
@@ -1172,7 +1172,7 @@
 					</head>
 					<body>
 
-						<cfif application.auxsite neq "intranetsistemaspe">
+						<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
 							<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 						</cfif>
 						<div style="background-color: ##00416B; color:##fff; border-radius: 15px; padding: 5px; box-shadow: 0px 0px 10px ##888888; margin: 0 auto; float: left;">
@@ -1246,7 +1246,7 @@
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+						<cfoutput>Erro rotina "rotinaSemanalOrientacoesPendentes" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
 					</cfmail>
 				</cfcatch>
 			</cftry> 
@@ -1322,7 +1322,7 @@
 				<cfset to = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoResp))#">
 				<cfset cc = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoAvaliado))#">
 
-				<cfif application.auxsite neq "intranetsistemaspe">
+				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
 					<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 					<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 					<cfset cc = "">
@@ -1430,7 +1430,7 @@
 					</head>
 					<body>
 
-						<cfif application.auxsite neq "intranetsistemaspe">
+						<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
 							<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 						</cfif>
 						<div style="background-color: ##00416B; color:##fff; border-radius: 15px; padding: 5px; box-shadow: 0px 0px 10px ##888888; margin: 0 auto; float: left;">
@@ -1504,7 +1504,7 @@
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+						<cfoutput>Erro rotina "rotinaSemanalOrientacoesPendentesTeste" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
 					</cfmail>
 				</cfcatch>
 			</cftry> 
@@ -1539,12 +1539,8 @@
 
 		<cfloop query="#myQuery#">
 			<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
-				SELECT pc_avaliacao_melhorias.*
-				, pc_processos.pc_modalidade
-				, pc_processos.pc_processo_id
-				, pc_processos.pc_num_sei
-				, pc_avaliacoes.pc_aval_numeracao
-				, pc_orgaos.pc_org_sigla as siglaOrgaoResp
+				SELECT 
+				  pc_orgaos.pc_org_sigla as siglaOrgaoResp
 				, pc_orgaos.pc_org_mcu
 				, pc_orgaos.pc_org_emaiL as emailOrgaoResp
 				, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
@@ -1585,7 +1581,7 @@
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+						<cfoutput>Erro rotina "rotinaMensalMelhoriasPendentes" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
 					</cfmail>
 				</cfcatch>
 			</cftry>
@@ -1616,13 +1612,8 @@
 
 		<cfloop query="#myQuery#">
 			<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
-				SELECT pc_avaliacao_melhorias.*
-				, pc_processos.pc_modalidade
-				, pc_processos.pc_processo_id
-				, pc_processos.pc_num_sei
-				, pc_avaliacoes.pc_aval_numeracao 
-				, pc_orgaos.pc_org_sigla as siglaOrgaoResp
-				, pc_orgaos.pc_org_mcu
+				SELECT 
+				  pc_orgaos.pc_org_sigla as siglaOrgaoResp
 				, pc_orgaos.pc_org_emaiL as emailOrgaoResp
 				, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
 				FROM pc_avaliacao_melhorias
@@ -1662,7 +1653,7 @@
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+						<cfoutput>Erro rotina "rotinaMensalMelhoriasPendentesTeste" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
 					</cfmail>
 				</cfcatch>
 			</cftry>

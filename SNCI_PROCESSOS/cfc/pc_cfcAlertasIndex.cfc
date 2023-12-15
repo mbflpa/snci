@@ -240,7 +240,7 @@
 				</div>
 		</cfif>
 
-		<cfif #qOrgaosSemUsuario.recordcount# neq 0 and application.auxsite eq "intranetsistemaspe">
+		<cfif #qOrgaosSemUsuario.recordcount# neq 0 and FindNoCase("intranetsistemaspe", application.auxsite)>
 			<div class="row" style="margin-top:30px;margin-bottom:50px">
 				<div class="col-md-12">	
 					<div class="card card-danger ">

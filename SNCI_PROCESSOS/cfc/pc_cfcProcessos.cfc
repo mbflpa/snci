@@ -829,7 +829,7 @@
                         pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu INNER JOIN
                         pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id left JOIN
 						pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
-			<cfif application.auxsite eq "intranetsistemaspe">			
+			<cfif FindNoCase("intranetsistemaspe", application.auxsite)>			
 				WHERE      NOT pc_processos.pc_processo_id in ( SELECT DISTINCT pc_avaliacoes.pc_aval_processo FROM pc_avaliacoes
 								LEFT JOIN pc_avaliacao_orientacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
 								LEFT JOIN pc_avaliacao_posicionamentos ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
@@ -850,7 +850,7 @@
 						<!-- /.card-header -->
 						<div class="card-body">
 							<table id="tabProcessos" class="table table-bordered table-striped table-hover text-nowrap">
-							<cfif application.auxsite eq "intranetsistemaspe">
+							<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
 								<h5>Só são listados processos sem posicionamentos de órgãos avaliados.</h5>
 							</cfif>
 							<thead style="background: #0083ca;color:#fff">

@@ -133,7 +133,7 @@
                 var mensagem = '';
                 <cfoutput >
                      var emailUsuario = '#application.rsUsuarioParametros.pc_usu_email#';
-                    <cfif application.auxsite eq "intranetsistemaspe">
+                    <cfif FindNoCase("intranetsistemaspe", application.auxsite)>
                         mensagem = 'Deseja executar a rotina de verificação das orientações suspensas?<br>Esta rotina irá verificar os pontos suspensos vencidos e alterar o status para TRATAMENTO, irá inserir um posicionamento e enviará um e-mail de aviso para o órgão responsável.';  
                     <cfelse>
                         //verifica se o usuário possui e-mail cadastrado

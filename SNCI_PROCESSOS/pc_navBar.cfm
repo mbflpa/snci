@@ -8,7 +8,7 @@
 					<a class="nav-link " data-widget="pushmenu" data-enable-remember="true" href="#" role="button"><i class="fas fa-bars"  style="font-size:2rem;"></i></a>
 				</li>
 
-				<cfif application.auxsite neq "intranetsistemaspe">
+				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
 					<div>
 						<h3 class="nav-link" style="position:relative;top:5px;color:red"><cfoutput>SERVIDOR: #Ucase(application.auxsite)#</cfoutput></h3>
 					</div>

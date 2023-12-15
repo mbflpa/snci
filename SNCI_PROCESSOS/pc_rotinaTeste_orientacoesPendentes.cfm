@@ -265,7 +265,7 @@
                 var mensagem = '';
                 <cfoutput >
                     var emailUsuario = '#application.rsUsuarioParametros.pc_usu_email#';
-                    <cfif application.auxsite eq "intranetsistemaspe">
+                    <cfif FindNoCase("intranetsistemaspe", application.auxsite)>
                         mensagem = 'Deseja executar a rotina de verificação das Orientações Pendentes?<br>Esta rotina irá verificar as orientações pendentes e enviará um e-mail de aviso o órgão responsável.';
                     <cfelse>
                         //verifica se o usuário possui e-mail cadastrado
