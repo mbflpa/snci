@@ -12,19 +12,19 @@ applicationtimeout="#createtimespan(0,6,0,0)#">
 <cfset application.SESSIONTIMEOUT = 60>
 
 <cfset application.auxsite =  cgi.server_name>
-	<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
-		<cfset application.diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
-		<cfset application.diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
-		<cfset application.diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_FAQS\'>
-	<cfelseif application.auxsite eq "desenvolvimentope" OR application.auxsite eq "homologacaope" >
-		<cfset application.diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset application.diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-		<cfset application.diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
-	<cfelse>
-	  	<cfset application.diretorio_anexos = 'C:\SNCI_TESTE\'>
-		<cfset application.diretorio_avaliacoes = 'C:\SNCI_TESTE\'>
-		<cfset application.diretorio_faqs = 'C:\SNCI_TESTE\'>
-	</cfif>
+<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
+	<cfset application.diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_ANEXOS\'>
+	<cfset application.diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\'>
+	<cfset application.diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_FAQS\'>
+<cfelseif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) >
+	<cfset application.diretorio_anexos = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
+	<cfset application.diretorio_avaliacoes = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
+	<cfset application.diretorio_faqs = '\\sac0424\SISTEMAS\SNCI\SNCI_TESTE\'>
+<cfelse>
+	<cfset application.diretorio_anexos = 'C:\SNCI_TESTE\'>
+	<cfset application.diretorio_avaliacoes = 'C:\SNCI_TESTE\'>
+	<cfset application.diretorio_faqs = 'C:\SNCI_TESTE\'>
+</cfif>
 
 
 
