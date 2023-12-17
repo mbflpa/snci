@@ -117,7 +117,7 @@
           </a>
         
           <!---Se servidor não for de produção, aparecerá o select para alteração de perfil e lotação --->
-          <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
+          <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite) or #application.rsUsuarioParametros.pc_usu_matricula# eq '80859992'>
             <div style="font-size:10px !important;">
               <div class="form-group" style="width:auto;margin-top:10px;index-z:1000;position:relative">
                 <select id="mudarPerfil" name="mudarPerfil" class="form-control" style="height:35px;">
