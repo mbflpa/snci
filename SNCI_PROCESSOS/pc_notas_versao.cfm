@@ -14,6 +14,31 @@
     <section class="content" style="margin-bottom:50px;position:relative; top:-20px">
         <div class="row" >
             <div class="col-12" id="accordion">
+            <div class="card card-primary card-outline">
+                    <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
+                        <div class="card-header">
+                            <h4 class="card-title w-100">
+                                Versão 1.1.1 - 02/01/2024
+                            </h4>
+                        </div>
+                    </a>
+                    <div id="collapseOne" class="collapse show" data-parent="#accordion">
+                        <div class="card-body">
+                            <h5>Novidades:</h5>
+                            <ul>
+                                <li>Criada a Consulta Propostas de Melhoria;</li>
+                                <li>Criado novo perfil de acesso: CI - REGIONAL - SCIA - Acompanhamento.</li>
+                            </ul>
+
+                            <h5>Melhorias:</h5>
+                            <ul>
+                                <li>Adicionado menu Consultas, agrupando todas as consultas do SNCI-Processos;</li>  
+                            </ul>
+
+                            
+                        </div>
+                    </div>
+                </div>
                 <div class="card card-primary card-outline">
                     <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
                         <div class="card-header">
@@ -22,7 +47,7 @@
                             </h4>
                         </div>
                     </a>
-                    <div id="collapseOne" class="collapse show" data-parent="#accordion">
+                    <div id="collapseOne" class="collapse " data-parent="#accordion">
                         <div class="card-body">
                             <h5>Novidades:</h5>
                             <ul>
@@ -52,6 +77,7 @@
                         </div>
                     </div>
                 </div>
+                
                 
                 <!-- Colocar abaixo a nota acima, quando existir nova versão -->
                 <!--<div class="card card-primary card-outline">

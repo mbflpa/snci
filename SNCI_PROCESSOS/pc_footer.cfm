@@ -15,6 +15,6 @@
 	</div>
 	CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno 
 	<div class="float-right d-none d-sm-block">
-		SNCI &copy; 2023 - Versão <b>1.1.0</b>
+		SNCI &copy; 2023 - Versão <b>1.1.1</b>
 	</div>
 </footer>
