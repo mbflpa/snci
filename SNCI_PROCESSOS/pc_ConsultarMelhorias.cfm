@@ -49,30 +49,32 @@
 				LEFT JOIN pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 				LEFT JOIN pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
-	WHERE NOT pc_num_status IN (2,3)  
+	WHERE NOT pc_num_status IN (2,3) 
 	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
+
+		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
 		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-			and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-		</cfif>
-		<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
-		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-			and pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-		</cfif>
-		<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1) - Execução' ou 14 - 'CI - REGIONAL - SCIA - Acompanhamento', com origem na GCOP---> --->
-		<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-			and pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+			AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 		</cfif>
 		
+		<!---Se o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
+		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 >
+			AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
+		</cfif>
+
+		<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)'  ou 14 -'CI - REGIONAL - SCIA - Acompanhamento'--->
+		<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) >
+			AND pc_num_orgao_origem IN('00436698') AND (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+		</cfif>
+
 	<cfelse>
-		<!---Se o perfil do usuário não for 13 - GOVERNANÇA (SE FOR GOVERNAÇA, MOSTRARÁ OS ANOS DE TODAS AS PROPOSTAS DE MELHORIA)--->
-		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-			AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
-		<cfelse>
-			and (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+	    AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
+		<!---Se o perfil do usuário não for 13 - GOVERNANÇA (SE FOR GOVERNAÇA, MOSTRARÁ TODAS AS PROPOSTAS DE MELHORIA)--->
+		<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
+			AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  (pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 			or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 			or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-			<cfif #mcusHeranca# neq ''> or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>) )
+			<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>))
 		</cfif>
 	</cfif>
 	

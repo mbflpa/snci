@@ -60,8 +60,6 @@
 			
 			
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-				
-				
 				<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
 				<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
 					AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
@@ -78,16 +76,14 @@
 				</cfif>
 
 			<cfelse>
-				<!---Se o perfil do usuário não for 13 - GOVERNANÇA (SE FOR GOVERNAÇA, MOSTRARÁ TODAS AS PROPOSTAS DE MELHORIA)--->
-				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-					AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
-				<cfelse>
+				AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
+				<!---Se o perfil do usuário não for 13 - GOVERNANÇA --->
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
 					AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  (pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 					<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>))
 				</cfif>
-				
 			</cfif>
 			
 			ORDER BY 	pc_processo_id, pc_aval_numeracao
@@ -109,12 +105,13 @@
 								<thead style="background: #0083ca;color:#fff">
 									<tr style="font-size:14px">
 									    <th id="colunaStatusProposta">Status:</th>
-										<th >ID:</th>
-										<th >N° Processo SNCI:</th>
-										<th >N° Item:</th>	
-										<th>Órgão Responsável: </th>
-										<th >SE/CS:</th>
-										<th >N° SEI: </th>
+										<th >ID</th>
+										<th >N° Processo SNCI</th>
+										<th >N° Item</th>	
+										<th>Órgão Responsável</th>
+										<th >SE/CS</th>
+										<th >N° SEI</th>
+										<th >Data Prev.</th>
 										
 									</tr>
 								</thead>
@@ -173,6 +170,13 @@
 												<cfelse>
 													<td align="center"></td>
 												</cfif>
+												<cfif pc_aval_melhoria_dataPrev neq ''>
+													<cfset dataPrev = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY')>
+													<td>#dataPrev#</td>
+												<cfelse>
+													<td>Não Informado</td>	
+												</cfif>
+
 											</tr>
 										</cfoutput>
 									</cfloop>	
@@ -393,14 +397,43 @@
 									<div class="col-md-12">
 										<cfoutput>
 											<cfif rsProcAval.pc_aval_melhoria_distribuido eq 1>
-												<div style=" display: inline;background-color: ##e83e8c;color:##fff;padding: 3px;">Proposta de melhoria distribuída pelo seu órgão subordinador:</div>
+												<div style=" display: inline;background-color: ##e83e8c;color:##fff;padding: 3px;">Proposta de melhoria distribuída pelo órgão subordinador:</div>
 											</cfif>
 										</cfoutput>
 							            <div  style="" >
 											<cfoutput>
-												<pre style="font-size: 1.5em;">#rsProcAval.pc_aval_melhoria_descricao#</pre>
+												
+												<cfif rsProcAval.pc_aval_melhoria_status eq 'T'>
+												    <div style="">Proposta de Melhoria Sugerida pelo Controle Interno:</div>
+													<pre style="font-size: 1.3em;">#rsProcAval.pc_aval_melhoria_descricao#</pre>
+													<div style="">Proposta de Melhoria Sugerida pelo Órgão Responsável:</div>
+													<pre style="font-size: 1.3em;">#rsProcAval.pc_aval_melhoria_sugestao#</pre>
+												<cfelseif rsProcAval.pc_aval_melhoria_status eq 'R'>
+													<div style="">Proposta de Melhoria Sugerida pelo Controle Interno:</div>
+													<pre style="font-size: 1.3em;">#rsProcAval.pc_aval_melhoria_descricao#</pre>
+													<div style="">Justificativa do órgão para Recusa:</div>
+													<cfif rsProcAval.pc_aval_melhoria_naoAceita_justif neq ''>
+														<pre style="font-size: 1.3em;">#rsProcAval.pc_aval_melhoria_naoAceita_justif#</pre>
+													<cfelse>
+														<pre style="font-size: 1.3em;">Não Informado</pre>
+													</cfif>
+												<cfelse>
+													<pre style="font-size: 1.3em;">#rsProcAval.pc_aval_melhoria_descricao#</pre>
+												</cfif>
 											</cfoutput>
+
+
 										</div>
+										<cfif application.rsOrgaoSubordinados.recordcount eq 0>	
+											<h6 style="color:#ff0080;padding:10px;line-height:1.7;">Obs.: A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
+											Caso o status seja 'PENDENTE', o órgão responsável necessita selecionar um status (Aceita / Troca / Recusa), em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".</h6>
+										<cfelse>
+											<h6 style="color:#ff0080;padding:10px;line-height:1.7;">Obs.: A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
+											Caso o status seja 'PENDENTE', o órgão responsável, se for um órgão subordinador, necessita selecionar a aba "Propostas de Melhoria" em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span> e
+											selecionar umas das abas: "Responder" (e selecionar um status: Aceita / Troca / Recusa) ou "Distribuir". Caso o órgão responsável não seja um órgão subordinador, o mesmo necessita selecionar um status (Aceita / Troca / Recusa), em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".</h6>
+											
+											</h6>
+										</cfif>
 										
 										
 									</div>
