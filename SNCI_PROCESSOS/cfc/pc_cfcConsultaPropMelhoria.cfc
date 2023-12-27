@@ -216,7 +216,7 @@
 
 				const tabMelhoriasConsulta = $('#tabMelhorias').DataTable( {
 				
-					stateSave: true,
+					stateSave: false,
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
 					scrollX: true, // Permitir rolagem horizontal
         			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
