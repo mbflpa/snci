@@ -40,6 +40,7 @@
 	SELECT pc_org_mcu, pc_org_sigla
 	FROM pc_orgaos
 	WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') AND (pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_org_se in(#application.seAbrangencia#))
+	      AND pc_org_orgaoAvaliado = 1
 	ORDER BY pc_org_sigla
 </cfquery>
 
@@ -225,7 +226,8 @@
 													<label for="pcOrgaoAvaliado">Órgão Avaliado:</label>
 													<select id="pcOrgaoAvaliado" required name="pcOrgaoAvaliado" class="form-control">
 														<option selected="" disabled="" value=""></option>
-														<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
+														
+														<cfif ListFind("0",#application.rsUsuarioParametros.pc_usu_perfil#)><!--No momento, nenhum perfil está utilizando esta opção-->
 															<cfoutput query="rs_OrgAvaliadoSE_usuario">
 																<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
 															</cfoutput>
