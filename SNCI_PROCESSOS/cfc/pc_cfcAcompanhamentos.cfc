@@ -5001,15 +5001,22 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				</cfquery>
 			<cfelse>
-
+			<!-- se o parametro pc_aval_orientacao_dataPrevistaResp vier "", obtem a data prevista calculada no último posicionamento de status  4 -“Não respondido” ou 5 - “Tratamento”-->
+				<cfquery datasource = "#application.dsn_processos#" name="rsDataPrevista">
+					SELECT TOP 1 pc_aval_posic_dataPrevistaResp FROM pc_avaliacao_posicionamentos 
+					WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> 
+							and pc_aval_posic_status in (4,5) and pc_aval_posic_enviado = 1
+					ORDER BY pc_aval_posic_id DESC
+				</cfquery>
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status,  pc_aval_posic_enviado)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#rsDataPrevista.pc_aval_posic_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="1" cfsqltype="cf_sql_integer">
 					)

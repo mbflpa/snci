@@ -1,25 +1,31 @@
-<cfquery datasource="#application.dsn_processos#" >
-    update pc_orgaos set pc_org_se_abrangencia ='10,06,16,28,26,75,65,05,03'
-    where pc_orgaos.pc_org_mcu in('00437382','00437394')
-
-    update pc_orgaos set pc_org_se_abrangencia ='20,08,14'
-    where pc_orgaos.pc_org_mcu in('00437384','00437396')
-
-    update pc_orgaos set pc_org_se_abrangencia ='36,64,68' 
-    where pc_orgaos.pc_org_mcu in('00437388','00437400')
-
-    update pc_orgaos set pc_org_se_abrangencia ='74,24,22'
-    where pc_orgaos.pc_org_mcu in('00437392','00437404')
-
-    update pc_orgaos set pc_org_se_abrangencia ='72,50'
-    where pc_orgaos.pc_org_mcu in('00437390','00437402')
-
-    UPDATE pc_perfil_tipos set 
-    pc_perfil_tipo_descricao = 'CI - REGIONAL - SCIA - Acompanhamento',
-    pc_perfil_tipo_status ='A',
-    pc_perfil_tipo_comentario ='SCIA - Visualiza todos os processos cujos órgão avaliados estão sob gestão da sua SE de lotação.'
-    where pc_perfil_tipo_id =14
-
-
+<cfprocessingdirective pageencoding = "utf-8">	
+<!--Executar este script em homologação ou desenvolvimento e, depois da homologação, executar em produção-->
+<cfquery datasource = "#application.dsn_processos#" name="rsPosicOrgaoAvaliado">
+      SELECT pc_aval_posic_id, pc_aval_posic_num_orientacao,pc_aval_posic_dataHora  from pc_avaliacao_posicionamentos
+      WHERE pc_aval_posic_status = 3  
+      and pc_aval_posic_enviado = 1
+      order by pc_aval_posic_num_orientacao
 </cfquery>
+
+
+
+
+<cfoutput query = "rsPosicOrgaoAvaliado">    
+      <cfquery datasource = "#application.dsn_processos#" name="rsDataPrevista">
+            SELECT TOP 1 pc_aval_posic_num_orientacao, pc_aval_posic_dataPrevistaResp FROM pc_avaliacao_posicionamentos 
+            WHERE pc_aval_posic_num_orientacao = #rsPosicOrgaoAvaliado.pc_aval_posic_num_orientacao#
+                  and pc_aval_posic_dataHora <  <cfqueryparam value="#rsPosicOrgaoAvaliado.pc_aval_posic_dataHora#" cfsqltype="cf_sql_timestamp">
+                  and pc_aval_posic_status in (4,5) and pc_aval_posic_enviado = 1
+           ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc
+      </cfquery>
+      <!-- Inserir a data prevista de resposta no posicionamento -->
+      <cfquery datasource = "#application.dsn_processos#" >
+            UPDATE pc_avaliacao_posicionamentos
+            SET pc_aval_posic_dataPrevistaResp = <cfqueryparam value="#rsDataPrevista.pc_aval_posic_dataPrevistaResp#" cfsqltype="cf_sql_varchar">
+            WHERE pc_aval_posic_id = #rsPosicOrgaoAvaliado.pc_aval_posic_id#
+      </cfquery>
+     
+</cfoutput>
+
+
 

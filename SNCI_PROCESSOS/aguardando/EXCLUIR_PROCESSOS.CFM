@@ -1,49 +1,96 @@
 
 <cfprocessingdirective pageencoding = "utf-8">	
-<cfset rotina = "http://#application.auxsite#/snci/snci_processos/aguardando/executaSQL.cfm">
-<cfset taskName = "EnviaEmailMarcelo_#application.auxsite#"> <!-- Nome da tarefa -->
-<cfschedule
-  action="update"
-  task="#taskName#"
-  operation="httprequest"
-  url="#rotina#"
-  startDate="#dateFormat(now(), 'yyyy/mm/dd')#" 
-  startTime="#timeFormat(now(), 'hh:mm tt')#" 
-  interval="once"
-  resolveURL="yes"
-  path="E:/LogsCF/PE/"
-  file="EnviaEmailMarcelo2.txt"
-  publish="yes"
-/>
-<cfschedule action="list" result="taskQuery">
-<cfdump var="#taskQuery#">
 
-<cfobject component = "pc_cfcEmails" name = "enviarEmail"/>
-<cfinvoke component="#enviarEmail#" method="EnviaEmails" returnVariable="sucessoEmail" 
-    para = "marceloferreira@correios.com.br"
-    copiaPara = "marceloferreira@correios.com.br"
-    pronomeTratamento = "Senhor(a) Superintendente Estadual da SE/BA"
-    texto = "Em cumprimento ao Plano Anual de Controle Interno – PACIN 2023, que 
-            consolida o planejamento das ações a serem realizadas pelo Departamento de 
-            Controle Interno – DCINT, encaminhamos o Relatório - SEI e seus respectivos 
-            anexos, referentes à avaliação de controles no processo '0100012023', para conhecimento e adoção de providências nos termos 
-            constantes dos aludidos documentos. 
-            Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE 
-            MELHORIA” apresentadas no mencionado relatório, recomenda-se a essa 
-            SE/BA a elaboração de plano de ação, com estabelecimento de 
-            prazos e responsáveis, objetivando a implementação de melhorias no processo 
-            avaliado. 
-            O plano de ação deverá apresentar providências focadas nas “Situações 
-            Encontradas registradas nos Anexos I, considerando as ORIENTAÇÕES para 
-            Regularização citadas no Anexo III. O prazo de resposta inicial para este 
-            Relatório é de 30 dias, a contar do recebimento deste. 
-            Ressalta-se que a implementação do plano de ação será acompanhada pelo 
-            CONTROLE INTERNO, e todas as ações implementadas deverão ser 
-            evidenciadas (documentadas) por esse gestor, com a inserção das 
-            comprovações no sistema SNCI Processos.
-            Orientamos a acessar o link 
-            http://intranetsistemaspe/snci/snci_processos/index.cfm, Tela 
-            “Acompanhamento”, aba “Medidas / Orientações para regularização” e inserir 
-            sua resposta. "
-/>
-<cfdump var = "#sucessoEmail#" >
+	<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
+		SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+		FROM pc_orgaos_heranca
+		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
+
+		union
+
+		SELECT  pc_orgaos2.pc_org_mcu
+		FROM pc_orgaos_heranca
+		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+		FROM pc_orgaos_heranca
+		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
+
+		union
+
+		select pc_orgaos.pc_org_mcu AS mcuHerdado
+		from pc_orgaos
+		LEFT JOIN pc_orgaos_heranca ON pc_orgHerancaMcuDe = pc_org_mcu
+		where pc_orgaos.pc_org_mcu_subord_tec in(SELECT  pc_orgaos2.pc_org_mcu
+		FROM pc_orgaos_heranca
+		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+		FROM pc_orgaos_heranca
+		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
+	</cfquery>
+
+	<cfquery dbtype="query" name="rsHeranca"> 
+		SELECT mcuHerdado FROM rsHerancaUnion WHERE not mcuHerdado is null
+	</cfquery>
+
+	<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
+
+<cfquery name="rs_DGCI_hoje" datasource="#application.dsn_processos#" timeout="120">
+    SELECT
+        orgaoAvaliado.pc_org_sigla as orgaoAvaliado,
+        orgaoResp.pc_org_sigla as orgaoResp,
+        pc_processos.pc_processo_id as numProcessoSNCI,
+        pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval as item,
+        pc_aval_posic_num_orientacao as orientacao,
+        pc_orientacao_status.pc_orientacao_status_descricao
+    FROM (
+        SELECT
+            pc_aval_posic_id,
+            pc_aval_posic_num_orientacao,
+            pc_aval_posic_status,
+            pc_aval_posic_num_orgaoResp,
+            ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
+        FROM
+            pc_avaliacao_posicionamentos
+      
+             
+    ) AS ranked_posicionamentos
+    INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
+    INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+    INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+    INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+    INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
+    INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
+    WHERE
+        ranked_posicionamentos.row_num = 1
+        AND pc_aval_posic_status IN (4, 5)
+        AND pc_aval_orientacao_status IN (4, 5)
+        AND (
+            pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+            OR pc_aval_orientacao_mcu_orgaoResp IN (
+                SELECT pc_orgaos.pc_org_mcu
+                FROM pc_orgaos
+                WHERE (
+                    pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+                    OR pc_org_mcu_subord_tec IN (
+                        SELECT pc_orgaos.pc_org_mcu
+                        FROM pc_orgaos
+                        WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+                    )
+                )
+            )
+            <cfif mcusHeranca neq ''>OR pc_aval_orientacao_mcu_orgaoResp IN (#mcusHeranca#)</cfif>
+        ) 
+        AND pc_aval_orientacao_dataPrevistaResp < GETDATE()       
+</cfquery>
+
+
+
+
+
+
+<cfdump var = "#rs_DGCI_hoje#" >
