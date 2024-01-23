@@ -1,31 +1,65 @@
 <cfprocessingdirective pageencoding = "utf-8">	
-<!--Executar este script em homologação ou desenvolvimento e, depois da homologação, executar em produção-->
-<cfquery datasource = "#application.dsn_processos#" name="rsPosicOrgaoAvaliado">
-      SELECT pc_aval_posic_id, pc_aval_posic_num_orientacao,pc_aval_posic_dataHora  from pc_avaliacao_posicionamentos
-      WHERE pc_aval_posic_status = 3  
-      and pc_aval_posic_enviado = 1
-      order by pc_aval_posic_num_orientacao
+<cfquery name="rs_ultima_posic_resp" datasource="#application.dsn_processos#" timeout="120">
+    SELECT
+        pc_aval_posic_num_orientacao as orientacao
+        
+    FROM (
+        SELECT
+            pc_aval_posic_id,
+            pc_aval_posic_num_orientacao,
+            pc_aval_posic_status,
+            pc_aval_posic_num_orgaoResp,
+            pc_aval_posic_dataPrevistaResp,
+            ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
+        FROM
+            pc_avaliacao_posicionamentos
+      
+             
+    ) AS ranked_posicionamentos
+    INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
+    INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+    INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+    INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+    INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
+    INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
+    INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
+    WHERE
+        ranked_posicionamentos.row_num = 1
+        AND pc_aval_posic_status IN (3)
+        
 </cfquery>
+ <table border="1">
+ <tr>
+    <th>Orientação ID</th>
+    <th>Origem</th>
+    <th>Orgão Resp</th>
+  </tr>
+<cfloop query="rs_ultima_posic_resp">
 
-
-
-
-<cfoutput query = "rsPosicOrgaoAvaliado">    
-      <cfquery datasource = "#application.dsn_processos#" name="rsDataPrevista">
-            SELECT TOP 1 pc_aval_posic_num_orientacao, pc_aval_posic_dataPrevistaResp FROM pc_avaliacao_posicionamentos 
-            WHERE pc_aval_posic_num_orientacao = #rsPosicOrgaoAvaliado.pc_aval_posic_num_orientacao#
-                  and pc_aval_posic_dataHora <  <cfqueryparam value="#rsPosicOrgaoAvaliado.pc_aval_posic_dataHora#" cfsqltype="cf_sql_timestamp">
-                  and pc_aval_posic_status in (4,5) and pc_aval_posic_enviado = 1
-           ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc
+      <cfquery name="rs_ultima_posic_resp" datasource="#application.dsn_processos#" timeout="120">
+            SELECT  pc_aval_orientacao_id as orientacaoID, orgaoOrigem.pc_org_sigla as origem, orgaoResp.pc_org_sigla as orgaoResp
+            from pc_avaliacao_orientacoes
+            INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+            INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+            INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
+            INNER JOIN pc_orientacao_status ON pc_avaliacao_orientacoes.pc_aval_orientacao_status = pc_orientacao_status.pc_orientacao_status_id
+            INNER JOIN pc_orgaos as orgaoResp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = orgaoResp.pc_org_mcu
+            WHERE pc_aval_orientacao_id= #orientacao# and pc_aval_orientacao_status <> 3 and pc_num_status =4 and pc_orientacao_status_finalizador='N'
       </cfquery>
-      <!-- Inserir a data prevista de resposta no posicionamento -->
-      <cfquery datasource = "#application.dsn_processos#" >
-            UPDATE pc_avaliacao_posicionamentos
-            SET pc_aval_posic_dataPrevistaResp = <cfqueryparam value="#rsDataPrevista.pc_aval_posic_dataPrevistaResp#" cfsqltype="cf_sql_varchar">
-            WHERE pc_aval_posic_id = #rsPosicOrgaoAvaliado.pc_aval_posic_id#
-      </cfquery>
+
      
-</cfoutput>
+ 
 
+  <cfloop query="rs_ultima_posic_resp">
+      <cfoutput>
+            <tr>
+                  <td>#rs_ultima_posic_resp.orientacaoID#</td>
+                  <td>#rs_ultima_posic_resp.origem#</td>
+                  <td>#rs_ultima_posic_resp.orgaoResp#</td>
+            </tr>
+     </cfoutput>
+  </cfloop>
 
+</cfloop>
 
+</table>

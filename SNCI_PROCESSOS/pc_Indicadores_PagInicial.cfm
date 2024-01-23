@@ -62,6 +62,15 @@
                     <span style="color:#0083ca;font-size:20px;margin-right:10px">Mês:</span>
                     <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
+
+				<div id="divIndicadores" class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
+					<div class="col-sm-12">
+						<div style="display: flex; align-items: center;">
+							<h4 style="margin-right: 10px;">Indicadores</h4>
+						</div>
+					</div>
+				</div>
+
 				
 			</div>
 		</section>
@@ -80,7 +89,7 @@
 			const currentYear = new Date().getFullYear();
 
 			// Cria um array de anos, começando em 2023 e indo até o ano atual, em ordem crescente
-			const yearRange = Array(currentYear - 2022).fill().map((_, i) => currentYear - i);
+			const yearRange = Array(currentYear - 2018).fill().map((_, i) => currentYear - i);
 
 			// Mapeia cada ano para um botão de opção de rádio com o ano como rótulo e valor
 			const radioButtonsAno = yearRange.map((year, i) => {
@@ -134,22 +143,39 @@
 			});
 
 
-
-			$('#opcoesMes').on('change', function() {
-				// Obtém o ano selecionado		
-				const selectedYear = parseInt($('input[name=ano]:checked').val());	
-				// Obtém o mês selecionado
-				const selectedMonth = parseInt($('input[name=mes]:checked').val());
-				
-				alert(selectedYear + '-' + selectedMonth);
-
-			});
-
-
-			
-
             
         }); 
+
+		$('#opcoesMes').on('change', function() {
+			// Obtém o ano selecionado		
+			let selectedYear = parseInt($('input[name=ano]:checked').val());	
+			// Obtém o mês selecionado
+			let selectedMonth = parseInt($('input[name=mes]:checked').val());
+			
+			alert(selectedYear + '-' + selectedMonth);
+			
+			$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+				type: "post",
+				url: "cfc/pc_cfcIndicadores.cfc",
+				data:{
+					method:"tabIndicadores",
+					ano:selectedYear,
+					mes:selectedMonth
+				},
+				async: false,
+				success: function(result) {	
+					$('#divIndicadores').html(result);//INSERE OS INDICADORES NA DIV
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+					$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL			
+				}
+			})	
+
+		});
+
+		
     </script>
 
 
