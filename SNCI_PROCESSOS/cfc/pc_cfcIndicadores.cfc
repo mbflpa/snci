@@ -183,12 +183,41 @@
 		<cfargument name="mes" type="string" required="true" />
 		
     	<cfset var resultado = consultaIndicadorPRCI(ano=arguments.ano, mes=arguments.mes)>
+
       
 			<cfset totalDP = 0 />
 			<cfset totalFP = 0 />
 			<cfset totalGeral = 0 />
+			
 
-		
+
+
+			<cfset orgaos = {}>
+<cfset prcis = {}>
+<cfset fps = {}>
+
+<cfloop query="resultado">
+    <cfif Prazo eq 'DP'>
+        <cfset totalDP = totalDP + 1>
+    <cfelseif Prazo eq 'FP'>
+        <cfset totalFP = totalFP + 1>
+    </cfif>
+    <cfset orgao = orgaoResp>
+    <cfif not StructKeyExists(orgaos, orgao)>
+        <cfset orgaos[orgao] = 1>
+        <cfset prcis[orgao] = 0>
+        <cfset fps[orgao] = 0>
+    <cfelse>
+        <cfset orgaos[orgao] = orgaos[orgao] + 1>
+    </cfif>
+    <cfif Prazo eq 'DP'>
+        <cfset prcis[orgao] = prcis[orgao] + 1>
+    <cfelseif Prazo eq 'FP'>
+        <cfset fps[orgao] = fps[orgao] + 1>
+    </cfif>
+</cfloop>
+
+
 
 
 		<div class="row">
@@ -202,7 +231,7 @@
 						<cfif #resultado.recordcount# eq 0 >
 							<h5 align="center">Nenhuma informação foi localizada para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
 						<cfelse>
-							<cfoutput><h5 align="center">Cálculo do PRCI: #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+							<cfoutput><h5 style="color:##2581c8;text-align: center;">Cálculo do <strong>PRCI</strong> (Atendimento ao Prazo de Resposta): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
 						
 						
 							<table id="tabPRCIdetalhe" class="table table-bordered table-striped table-hover text-nowrap" >
@@ -232,9 +261,6 @@
 											<cfset totalFP = totalFP + 1 />
 										</cfif>
 										
-
-
-    
 										<cfoutput>					
 											<tr style="font-size:12px;cursor:pointer;z-index:2;text-align: center;"  >
 												<td>#resultado.pc_aval_posic_id#</td>
@@ -255,7 +281,6 @@
 												<td>#dateFormat(dataFinal, 'dd/mm/yyyy')#</td>
 												<td>#resultado.Prazo#</td>
 													
-													
 											</tr>
 										</cfoutput>
 									</cfloop>	
@@ -268,7 +293,7 @@
 									<!--- Formata o percentualDP com duas casas decimais --->
     								<cfset percentualDPFormatado = NumberFormat(percentualDP, '0.0') />
 									<div>
-										<h4  style="color:##2581c8;"><strong>PRCI</strong>: #percentualDPFormatado#% (PRCI = TIDP/TGI)</h4>
+										<h4  style="color:##2581c8;"><strong>PRCI</strong>: #percentualDPFormatado#% <span style="font-size:14px">(PRCI = TIDP/TGI)</span></h4>
 										<h6><strong>TIDP</strong> (Posicionamento dentro do prazo (DP))= #totalDP#</h6>
 										<h6><strong>TGI</strong> (Total de Posicionamentos)= #totalGeral#</h6>
 									</div>
@@ -276,6 +301,25 @@
 								</cfoutput>
 							
 							</table>
+
+
+
+
+
+<cfoutput>
+    <p>Resumo:</p>
+    <ul>
+        <!--- Ordena a estrutura prcis por seus valores em ordem decrescente --->
+            <cfset prcisOrdenado = StructSort(prcis, "numeric", "desc")>
+            <cfloop array="#prcisOrdenado#" index="orgao">
+                <cfset percentualDP = (prcis[orgao] / orgaos[orgao]) * 100>
+                <cfset percentualDPFormatado = NumberFormat(percentualDP, '0.0')>
+                <!--- Mostra o percentual de PRCI e o número de FP na mesma linha, separados por uma vírgula --->
+                <li>#orgao#:  DP = #prcis[orgao]#, FP = #fps[orgao]#, PRCI = #percentualDPFormatado#% (PRCI = DP/DP+FP)</li>
+            </cfloop>
+    </ul>
+</cfoutput>
+							
 						</cfif>
 					</div>
 					<!-- /.card-body -->
