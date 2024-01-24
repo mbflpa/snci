@@ -255,11 +255,7 @@
 								
 								<tbody>
 									<cfloop query="resultado" >
-									    <cfif Prazo eq 'DP'>
-											<cfset totalDP = totalDP + 1 />
-										<cfelseif Prazo eq 'FP'>
-											<cfset totalFP = totalFP + 1 />
-										</cfif>
+									    
 										
 										<cfoutput>					
 											<tr style="font-size:12px;cursor:pointer;z-index:2;text-align: center;"  >
@@ -296,6 +292,36 @@
 										<h4  style="color:##2581c8;"><strong>PRCI</strong>: #percentualDPFormatado#% <span style="font-size:14px">(PRCI = TIDP/TGI)</span></h4>
 										<h6><strong>TIDP</strong> (Posicionamento dentro do prazo (DP))= #totalDP#</h6>
 										<h6><strong>TGI</strong> (Total de Posicionamentos)= #totalGeral#</h6>
+
+
+										<table id="tabResumo" class="table table-bordered table-striped table-hover text-nowrap" style="width:500px; margin-top:30px">
+											<cfoutput>
+												<thead style="background: ##0083ca;color:##fff;text-align: center;">
+													<tr style="font-size:14px">
+														<th>Órgão</th>
+														<th>DP</th>
+														<th>FP</th>
+														<th>PRCI</th>
+													</tr>
+												</thead>
+												<tbody>
+													<!--- Ordena a estrutura prcis por seus valores em ordem decrescente --->
+													<cfset prcisOrdenado = StructSort(fps, "numeric", "desc")>
+													<cfloop array="#prcisOrdenado#" index="orgao">
+														<cfset percentualDP = (prcis[orgao] / orgaos[orgao]) * 100>
+														<cfset percentualDPFormatado = NumberFormat(percentualDP, '0.0')>
+
+														<!--- Adiciona cada linha à tabela --->
+														<tr style="font-size:12px;cursor:pointer;z-index:2;text-align: center;"  >
+															<td>#orgao#</td>
+															<td>#prcis[orgao]#</td>
+															<td>#fps[orgao]#</td>
+															<td>#percentualDPFormatado#%</td>
+														</tr>
+													</cfloop>
+												</tbody>
+											</cfoutput>
+										</table>
 									</div>
 									
 								</cfoutput>
@@ -306,19 +332,6 @@
 
 
 
-<cfoutput>
-    <p>Resumo:</p>
-    <ul>
-        <!--- Ordena a estrutura prcis por seus valores em ordem decrescente --->
-            <cfset prcisOrdenado = StructSort(prcis, "numeric", "desc")>
-            <cfloop array="#prcisOrdenado#" index="orgao">
-                <cfset percentualDP = (prcis[orgao] / orgaos[orgao]) * 100>
-                <cfset percentualDPFormatado = NumberFormat(percentualDP, '0.0')>
-                <!--- Mostra o percentual de PRCI e o número de FP na mesma linha, separados por uma vírgula --->
-                <li>#orgao#:  DP = #prcis[orgao]#, FP = #fps[orgao]#, PRCI = #percentualDPFormatado#% (PRCI = DP/DP+FP)</li>
-            </cfloop>
-    </ul>
-</cfoutput>
 							
 						</cfif>
 					</div>
