@@ -44,6 +44,13 @@
 
 
 
+<cfset ano = "2024">
+<cfset mes = "1">
+
+<cfset dataInicial = createODBCDateTime(createDateTime(ano, mes, 1, 0, 0, 0))>
+<cfset dataFinal = createODBCDateTime(dateAdd('s', -1, dateAdd('m', 1, createDateTime(ano, mes, 1, 0, 0, 0))))>
+
+
 <cfquery name="rs_Orientacao_agora" datasource="#application.dsn_processos#" timeout="120">
     SELECT
         orgaoAvaliado.pc_org_sigla as orgaoAvaliado,
@@ -84,22 +91,30 @@
     INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
     INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
     WHERE
-        ranked_posicionamentos.row_num = 1
-        AND pc_aval_posic_status IN (4, 5)
-        AND pc_aval_posic_enviado = 1
-        
-        
+				ranked_posicionamentos.row_num = 1
+				AND pc_aval_posic_status IN (4, 5)
+				AND pc_aval_posic_enviado = 1
+				AND (
+					pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_aval_orientacao_mcu_orgaoResp IN (
+						SELECT pc_orgaos.pc_org_mcu
+						FROM pc_orgaos
+						WHERE (
+							pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+							OR pc_org_mcu_subord_tec IN (
+								SELECT pc_orgaos.pc_org_mcu
+								FROM pc_orgaos
+								WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+							)
+						)
+					)
+					<cfif mcusHeranca neq ''>OR pc_aval_orientacao_mcu_orgaoResp IN (#mcusHeranca#)</cfif>
+				) 
+				AND pc_aval_posic_datahora < = <cfqueryparam value="#createODBCDateTime(dataFinal)#" cfsqltype="CF_SQL_TIMESTAMP">
              
 </cfquery>
 
 
-
-
-<cfset ano = "2022">
-<cfset mes = "8">
-
-<cfset dataInicial = createODBCDateTime(createDateTime(ano, mes, 1, 0, 0, 0))>
-<cfset dataFinal = createODBCDateTime(dateAdd('s', -1, dateAdd('m', 1, createDateTime(ano, mes, 1, 0, 0, 0))))>
 
 
 
@@ -117,7 +132,7 @@
             ELSE pc_orientacao_status.pc_orientacao_status_descricao
         END AS OrientacaoStatus,
         CASE
-            WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp < GETDATE() THEN 'FP'
+            WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp < pc_avaliacao_posicionamentos.pc_aval_posic_datahora THEN 'FP'
             ELSE 'DP'
         END AS Prazo
     FROM pc_avaliacao_posicionamentos
@@ -127,11 +142,11 @@
     INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
     INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
     INNER JOIN pc_orientacao_status ON pc_avaliacao_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
-    WHERE pc_avaliacao_posicionamentos.pc_aval_posic_status IN (3)
-        
-        AND pc_avaliacao_posicionamentos.pc_aval_posic_datahora >= <cfqueryparam value="#createODBCDateTime(createDateTime(ano, mes, 1, 0, 0, 0))#" cfsqltype="cf_sql_timestamp">
-        AND pc_avaliacao_posicionamentos.pc_aval_posic_datahora < <cfqueryparam value="#createODBCDateTime(dateAdd('m', 1, createDateTime(ano, mes, 1, 0, 0, 0)))#" cfsqltype="cf_sql_timestamp">
-        AND pc_aval_posic_enviado = 1
+   WHERE pc_avaliacao_posicionamentos.pc_aval_posic_status IN (3)
+				
+				
+				
+				
 </cfquery>
 
 
@@ -147,3 +162,4 @@
     order by ORIENTAÇÃOSTATUS, DATAPOSICAO	
 </cfquery>
 <cfdump var = "#rs_Orientacao#" >
+<cfdump var = "#dataInicial# a #dataFinal#" >

@@ -1541,7 +1541,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Mel
 					</cfquery>
 					 <cfset insertedIdOrientacao = rsInserirOrientacao.idOrientacao> <!-- Obtém o ID gerado -->
 
-					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
+					<!--Insere a manifestação do órgão avaliado interno para a orientação com prazo de 30 dias como data prevista para resposta -->
 					
 					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
@@ -4544,6 +4544,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 				<cfoutput>
 					var   pc_aval_id = '#rsProc.pc_aval_id#';
+					var   pc_aval_orientacao_mcu_orgaoResp = '#rsProc.pc_aval_orientacao_mcu_orgaoResp#';
 					var   pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
 					var numProcesso = "#rsProc.pc_processo_id#";
 				</cfoutput>
@@ -4569,6 +4570,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 										pc_aval_posic_texto: $('#pcPosicAcomp').val(),
 										pc_aval_orientacao_status:statusOrientacao,
 										pc_aval_orientacao_dataPrevistaResp: $('#pcDataPrevRespAcomp').val(),
+										pc_aval_orientacao_mcu_orgaoResp: pc_aval_orientacao_mcu_orgaoResp,
 										idAnexos: idAnexosString
 										
 									},
@@ -4618,6 +4620,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 										pc_aval_orientacao_id: pc_aval_orientacao_id,
 										pc_aval_posic_texto: $('#pcPosicAcomp').val(),
 										pc_aval_orientacao_status:statusOrientacao,
+										pc_aval_orientacao_mcu_orgaoResp: pc_aval_orientacao_mcu_orgaoResp,
 										idAnexos: idAnexosString
 									},
 									async: false
@@ -4977,6 +4980,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 		<cfargument name="pc_aval_posic_texto" type="string" required="true" />
 		<cfargument name="pc_aval_orientacao_status" type="numeric" required="false" default="3" />
 		<cfargument name="pc_aval_orientacao_dataPrevistaResp" type="string" required="false" default=''/>
+		<cfargument name="pc_aval_orientacao_mcu_orgaoResp" type="string" required="true" />
 		<cfargument name="idAnexos" type="string" required="true">
 
 		<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
@@ -4987,7 +4991,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 			</cfquery>
 			<cfif '#arguments.pc_aval_orientacao_dataPrevistaResp#' neq ''>
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado, pc_aval_posic_num_orgaoResp)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
@@ -4996,7 +5000,8 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_integer">,
-						<cfqueryparam value="1" cfsqltype="cf_sql_integer">
+						<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
+						<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				</cfquery>
@@ -5009,7 +5014,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					ORDER BY pc_aval_posic_id DESC
 				</cfquery>
 				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
+					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado, pc_aval_posic_num_orgaoResp)
 					VALUES (
 						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
 						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
@@ -5018,7 +5023,8 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#rsDataPrevista.pc_aval_posic_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_integer">,
-						<cfqueryparam value="1" cfsqltype="cf_sql_integer">
+						<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
+						<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">
 					)
 					SELECT SCOPE_IDENTITY() AS idPosic;
 				

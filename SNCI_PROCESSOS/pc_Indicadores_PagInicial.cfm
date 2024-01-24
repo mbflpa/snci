@@ -85,6 +85,7 @@
     <script language="JavaScript">
     
         $(document).ready(function(){
+			
 			// Obtém o ano atual
 			const currentYear = new Date().getFullYear();
 
@@ -151,14 +152,12 @@
 			let selectedYear = parseInt($('input[name=ano]:checked').val());	
 			// Obtém o mês selecionado
 			let selectedMonth = parseInt($('input[name=mes]:checked').val());
-			
-			alert(selectedYear + '-' + selectedMonth);
-			
+
 			$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 				type: "post",
 				url: "cfc/pc_cfcIndicadores.cfc",
 				data:{
-					method:"tabIndicadores",
+					method:"tabPRCIDetalhe",
 					ano:selectedYear,
 					mes:selectedMonth
 				},
