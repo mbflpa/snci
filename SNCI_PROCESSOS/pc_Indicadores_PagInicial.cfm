@@ -152,26 +152,35 @@
 			let selectedYear = parseInt($('input[name=ano]:checked').val());	
 			// Obtém o mês selecionado
 			let selectedMonth = parseInt($('input[name=mes]:checked').val());
-
-			$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
-				type: "post",
-				url: "cfc/pc_cfcIndicadores.cfc",
-				data:{
-					method:"tabPRCIDetalhe",
-					ano:selectedYear,
-					mes:selectedMonth
-				},
-				async: false,
-				success: function(result) {	
-					$('#divIndicadores').html(result);//INSERE OS INDICADORES NA DIV
-				},
-				error: function(xhr, ajaxOptions, thrownError) {
-					$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
-					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
-					$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL			
-				}
-			})	
-
+			$('#modalOverlay').modal('show')
+			setTimeout(function() {	
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabPRCIDetalhe",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadores').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+					
+			}, 500);
 		});
 
 		

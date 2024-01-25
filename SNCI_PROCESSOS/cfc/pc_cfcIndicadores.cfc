@@ -52,9 +52,10 @@
 
 		<cfquery name="rs_Orientacao_agora" datasource="#application.dsn_processos#" timeout="120">
 			SELECT
-			pc_aval_posic_id,
+				pc_aval_posic_id,
 				orgaoAvaliado.pc_org_sigla as orgaoAvaliado,
 				orgaoResp.pc_org_sigla as orgaoResp,
+				orgaoDaAcao.pc_org_controle_interno as orgaoDaAcaoEdoControleInterno,
 				pc_processos.pc_processo_id as numProcessoSNCI,
 				pc_avaliacoes.pc_aval_numeracao as item,
 				CONVERT(DATE, pc_aval_posic_datahora) as dataPosicao,
@@ -79,17 +80,17 @@
 					pc_aval_posic_datahora,
 					pc_aval_posic_dataPrevistaResp,
 					pc_aval_posic_enviado,
+					pc_aval_posic_num_orgao,
 					ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
 				FROM
 					pc_avaliacao_posicionamentos
 				 WHERE 
             		pc_aval_posic_enviado = 1
 					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-				
-			
-					
+	
 			) AS ranked_posicionamentos
 			INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
+			INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
 			INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
 			INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
 			INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
@@ -121,9 +122,10 @@
 
 		<cfquery name="rs_Orientacao_Respondida" datasource="#application.dsn_processos#" timeout="120">
 			SELECT
-			pc_aval_posic_id,
+				pc_aval_posic_id,
 				orgaoAvaliado.pc_org_sigla as orgaoAvaliado,
 				orgaoResp.pc_org_sigla as orgaoResp,
+				orgaoDaAcao.pc_org_controle_interno as orgaoDaAcaoEdoControleInterno,
 				pc_processos.pc_processo_id as numProcessoSNCI,
 				pc_avaliacoes.pc_aval_numeracao as item,
 				CONVERT(DATE, pc_avaliacao_posicionamentos.pc_aval_posic_datahora) as dataPosicao,
@@ -140,6 +142,7 @@
 				END AS Prazo
 			FROM pc_avaliacao_posicionamentos
 			INNER JOIN pc_orgaos as orgaoResp ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
+			INNER JOIN pc_orgaos as orgaoDaAcao ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
 			INNER JOIN pc_avaliacao_orientacoes ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
 			INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
 			INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
@@ -185,40 +188,34 @@
     	<cfset var resultado = consultaIndicadorPRCI(ano=arguments.ano, mes=arguments.mes)>
 
       
-			<cfset totalDP = 0 />
-			<cfset totalFP = 0 />
-			<cfset totalGeral = 0 />
-			
+		<cfset totalDP = 0 /> 
+		<cfset totalFP = 0 /> 
+		<cfset orgaos = {}> <!-- Define a variável orgaos como um objeto vazio -->
+		<cfset dps = {}> <!-- Define a variável dps como um objeto vazio -->
+		<cfset fps = {}> <!-- Define a variável fps como um objeto vazio -->
 
+		<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
+			<cfif Prazo eq 'DP'> <!-- Verifica se o valor da coluna Prazo é igual a 'DP' -->
+				<cfset totalDP++> <!-- Se a condição for verdadeira, incrementa a variável totalDP em 1 -->
+			<cfelseif Prazo eq 'FP'> <!-- Verifica se o valor da coluna Prazo é igual a 'FP' -->
+				<cfset totalFP++> <!-- Se a condição for verdadeira, incrementa a variável totalFP em 1 -->
+			</cfif>
+			<cfif not StructKeyExists(orgaos, orgaoResp)> <!-- Verifica se a chave orgaoResp não existe no objeto orgaos -->
+				<cfset orgaos[orgaoResp] = 1> <!-- Se a condição for verdadeira, define a chave orgaoResp no objeto orgaos como 1 -->
+				<cfset dps[orgaoResp] = 0> <!-- Define a chave orgaoResp no objeto dps como 0 -->
+				<cfset fps[orgaoResp] = 0> <!-- Define a chave orgaoResp no objeto fps como 0 -->
+			<cfelse>
+				<cfset orgaos[orgaoResp]++> <!-- Incrementa a chave orgaoResp no objeto orgaos em 1 -->
+			</cfif>
+			<cfif Prazo eq 'DP'> <!-- Verifica se o valor da coluna Prazo é igual a 'DP' -->
+				<cfset dps[orgaoResp]++> <!-- Se a condição for verdadeira, incrementa a chave orgaoResp no objeto dps em 1 -->
+			<cfelseif Prazo eq 'FP'> <!-- Verifica se o valor da coluna Prazo é igual a 'FP' -->
+				<cfset fps[orgaoResp]++> <!-- Se a condição for verdadeira, incrementa a chave orgaoResp no objeto fps em 1 -->
+			</cfif>
+		</cfloop>
 
-
-			<cfset orgaos = {}>
-<cfset prcis = {}>
-<cfset fps = {}>
-
-<cfloop query="resultado">
-    <cfif Prazo eq 'DP'>
-        <cfset totalDP = totalDP + 1>
-    <cfelseif Prazo eq 'FP'>
-        <cfset totalFP = totalFP + 1>
-    </cfif>
-    <cfset orgao = orgaoResp>
-    <cfif not StructKeyExists(orgaos, orgao)>
-        <cfset orgaos[orgao] = 1>
-        <cfset prcis[orgao] = 0>
-        <cfset fps[orgao] = 0>
-    <cfelse>
-        <cfset orgaos[orgao] = orgaos[orgao] + 1>
-    </cfif>
-    <cfif Prazo eq 'DP'>
-        <cfset prcis[orgao] = prcis[orgao] + 1>
-    <cfelseif Prazo eq 'FP'>
-        <cfset fps[orgao] = fps[orgao] + 1>
-    </cfif>
-</cfloop>
-
-
-
+		
+	
 
 		<div class="row">
 			<div id="filtroSpan" style="display: none;text-align:right;font-size:18px;position:absolute;top:123px;right:24px;"><span class="statusOrientacoes" style="background:#2581c8;color:#fff;">Atenção! Um filtro foi aplicado.</span><br><i class="fa fa-2x fa-hand-point-down" style="color:#2581c8;position:relative;top:8px;right:117px"></i></div>
@@ -239,8 +236,8 @@
 								<thead style="background: #0083ca;color:#fff">
 									<tr style="font-size:14px">
 										<th style="width: 10px">Posic ID</th>
-										<th style="width: 10px">Orgão Avaliado</th>
-										<th style="width: 10px">Orgão Responsável</th>
+										<th style="width: 10px">Órgão Avaliado</th>
+										<th style="width: 10px">Órgão Responsável</th>
 										<th style="width: 10px">Processo SNCI</th>
 										<th style="width: 10px">Item</th>
 										<th style="width: 10px">Orientação</th>
@@ -255,8 +252,7 @@
 								
 								<tbody>
 									<cfloop query="resultado" >
-									    
-										
+									   
 										<cfoutput>					
 											<tr style="font-size:12px;cursor:pointer;z-index:2;text-align: center;"  >
 												<td>#resultado.pc_aval_posic_id#</td>
@@ -270,7 +266,15 @@
 												<cfelse>
 													<td>#dateFormat(resultado.dataPrevista, 'dd/mm/yyyy')#</td>
 												</cfif>
-												<td>#dateFormat(resultado.dataPosicao, 'dd/mm/yyyy')#</td>
+												<td>
+													
+													<cfif orgaoDaAcaoEdoControleInterno eq 'N' AND (resultado.pc_aval_posic_status eq 4 OR resultado.pc_aval_posic_status eq 5)>
+														#dateFormat(resultado.dataPosicao, 'dd/mm/yyyy')#<br><span style="color:red">(dt. distrib.)</span>
+													<cfelse>
+														#dateFormat(resultado.dataPosicao, 'dd/mm/yyyy')#
+													</cfif>
+												</td>
+
 
 												<td>#resultado.OrientacaoStatus#</td>
 												<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
@@ -291,42 +295,51 @@
 									<div>
 										<h4  style="color:##2581c8;"><strong>PRCI</strong>: #percentualDPFormatado#% <span style="font-size:14px">(PRCI = TIDP/TGI)</span></h4>
 										<h6><strong>TIDP</strong> (Posicionamento dentro do prazo (DP))= #totalDP#</h6>
-										<h6><strong>TGI</strong> (Total de Posicionamentos)= #totalGeral#</h6>
+										<h6><strong>TGI</strong> (Total de Posicionamentos)= #totalGeral# <span style="font-size:12px">(Dentro do Prazo(DP) = #totalDP# + Fora do Prazo(FP) = #totalFP#)</span></h6>
 
 
-										<table id="tabResumo" class="table table-bordered table-striped table-hover text-nowrap" style="width:500px; margin-top:30px">
-											<cfoutput>
-												<thead style="background: ##0083ca;color:##fff;text-align: center;">
-													<tr style="font-size:14px">
-														<th>Órgão</th>
-														<th>DP</th>
-														<th>FP</th>
-														<th>PRCI</th>
-													</tr>
-												</thead>
-												<tbody>
-													<!--- Ordena a estrutura prcis por seus valores em ordem decrescente --->
-													<cfset prcisOrdenado = StructSort(fps, "numeric", "desc")>
-													<cfloop array="#prcisOrdenado#" index="orgao">
-														<cfset percentualDP = (prcis[orgao] / orgaos[orgao]) * 100>
-														<cfset percentualDPFormatado = NumberFormat(percentualDP, '0.0')>
-
-														<!--- Adiciona cada linha à tabela --->
-														<tr style="font-size:12px;cursor:pointer;z-index:2;text-align: center;"  >
-															<td>#orgao#</td>
-															<td>#prcis[orgao]#</td>
-															<td>#fps[orgao]#</td>
-															<td>#percentualDPFormatado#%</td>
-														</tr>
-													</cfloop>
-												</tbody>
-											</cfoutput>
-										</table>
+										
 									</div>
 									
 								</cfoutput>
-							
+
 							</table>
+
+							<cfset totalOrgaosResp = StructCount(orgaos)> <!-- Conta a quantidade de orgaoResp -->
+							
+						    <cfif totalOrgaosResp gt 1>
+								<table id="tabResumoPRCI" class="table table-bordered table-striped table-hover text-nowrap" style="width:500px; margin-top:30px">
+									<cfoutput>
+										<thead style="background: ##489b72;color:##fff;text-align: center;">
+											<tr style="font-size:14px">
+												<th colspan="4" style="padding:5px!important;">RESUMO (Classif. por Órgão mais ofensor)</th>
+											</tr>
+											<tr style="font-size:14px">
+												<th style="padding:5px!important;">Órgão</th>
+												<th style="padding:5px!important;">DP</th>
+												<th style="padding:5px!important;">FP</th>
+												<th style="padding:5px!important;">PRCI</th>
+											</tr>
+										</thead>
+										<tbody>
+											<!--- Ordena a estrutura dps por seus valores em ordem decrescente --->
+											<cfset prcisOrdenado = StructSort(fps, "numeric", "desc")>
+											<cfloop array="#prcisOrdenado#" index="orgao">
+												<cfset percentualDP = (dps[orgao] / orgaos[orgao]) * 100>
+												<cfset percentualDPFormatado = NumberFormat(percentualDP, '0.0')>
+
+												<!--- Adiciona cada linha à tabela --->
+												<tr style="font-size:12px;cursor:pointer;z-index:2;text-align: center;"  >
+													<td>#orgao#</td>
+													<td>#dps[orgao]#</td>
+													<td>#fps[orgao]#</td>
+													<td>#percentualDPFormatado#%</td>
+												</tr>
+											</cfloop>
+										</tbody>
+									</cfoutput>
+								</table>
+							</cfif>
 
 
 
@@ -356,7 +369,7 @@
 
 			$(function () {
 				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
-			$(".content-wrapper").css("height", "auto");
+			
 				
 				var tituloExcel ="SNCI_Consulta_PRCI_Detalamento_";
 				var colunasMostrar = [1,2,8,10];
@@ -411,9 +424,14 @@
 					}
 
 				})
+
+
 			
 			});
+
+
 			$(document).ready(function() {
+				$(".content-wrapper").css("height", "auto");
 				
 			});
 

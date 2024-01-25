@@ -433,7 +433,7 @@ function initializeSearchPanesAndSidebar(tableSelector, alteraPlaceholder) {
             <aside id="sidebarPaineis" class="control-sidebar " style="width: 500px!important;overflow-y: auto;">
                 <div class="p-3">
                     <div style="display: flex; justify-content: space-between; align-items: center;margin-bottom:10px">
-                        <h4 class="font-weight-light" style="color: #0083ca">Painéis de Pesquisa</h4>
+                    <h4 class="font-weight-light" style="color: #0083ca; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;">Painéis de Pesquisa</h4>
                         <button class="btn btn-secondary btn-close-sidebar" data-widget="control-sidebar" style="font-size: 0.675rem;padding: 0.25rem 0.5rem;">
                             <i class="fas fa-times"></i>
                         </button>
