@@ -63,13 +63,12 @@
                     <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
-				<div id="divIndicadores" class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
-					<div class="col-sm-12">
-						<div style="display: flex; align-items: center;">
-							<h4 style="margin-right: 10px;">Indicadores</h4>
-						</div>
-					</div>
-				</div>
+				<div id="divIndicadorDGCI" class="row mb-2" style="margin-top:20px;margin-bottom:50px!important;"></div>
+
+				<div id="divIndicadorPRCI" ></div>
+					
+
+				<div id="divIndicadorSLNC" ></div>
 
 				
 			</div>
@@ -154,6 +153,37 @@
 			let selectedMonth = parseInt($('input[name=mes]:checked').val());
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {	
+				
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"resultadoDGCI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDGCI').html(result);//INSERE OS INDICADORES NA DIV
+						
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+				
+				
+				
+				
+				
+				
+				
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
 					url: "cfc/pc_cfcIndicadores.cfc",
@@ -164,7 +194,31 @@
 					},
 					async: false,
 					success: function(result) {	
-						$('#divIndicadores').html(result);//INSERE OS INDICADORES NA DIV
+						$('#divIndicadorPRCI').html(result);//INSERE OS INDICADORES NA DIV
+						
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabSLNCDetalhe",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorSLNC').html(result);//INSERE OS INDICADORES NA DIV
 						$('#modalOverlay').delay(1000).hide(0, function() {
 							$('#modalOverlay').modal('hide');
 						});
@@ -179,6 +233,9 @@
 							
 					}
 				})
+
+
+
 					
 			}, 500);
 		});
