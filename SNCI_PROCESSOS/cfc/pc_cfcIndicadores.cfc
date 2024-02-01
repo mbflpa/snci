@@ -327,7 +327,7 @@
 									<cfoutput>
 										<thead style="background: ##489b72;color:##fff;text-align: center;">
 											<tr style="font-size:14px">
-												<th colspan="4" style="padding:5px!important;">RESUMO (Classif. por Órgão mais ofensor)</th>
+												<th colspan="4" style="padding:5px!important;">RESUMO</th>
 											</tr>
 											<tr style="font-size:14px">
 												<th style="padding:5px!important;">Órgão</th>
@@ -337,8 +337,7 @@
 											</tr>
 										</thead>
 										<tbody>
-											<!--- Ordena a estrutura dps por seus valores em ordem decrescente --->
-											<cfset prcisOrdenado = StructSort(fps, "numeric", "desc")>
+											<cfset prcisOrdenado = StructSort(orgaos, "text", "asc")>
 											<cfloop array="#prcisOrdenado#" index="orgao">
 												<cfif orgaos[orgao] eq 0>
 													<cfset percentualDP = 0>
@@ -436,7 +435,7 @@
 				$(".content-wrapper").css("height", "auto");
 				// Inicializa a tabela para ser ordenável pelo plugin DataTables
 				$('#tabResumoPRCI').DataTable({
-					order: [[2, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
+					order: [[3, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
 					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
 					paging: false, // Remove a paginação
        				info: false, // Remove a exibição da quantidade de registros
@@ -779,7 +778,7 @@
 									<cfoutput>
 										<thead style="background: ##489b72;color:##fff;text-align: center;">
 											<tr style="font-size:14px">
-												<th colspan="4" style="padding:5px!important;">RESUMO (Classif. pelo indicador SLNC)</th>
+												<th colspan="4" style="padding:5px!important;">RESUMO</th>
 											</tr>
 											<tr style="font-size:14px">
 												<th style="padding:5px!important;">Órgão</th>
