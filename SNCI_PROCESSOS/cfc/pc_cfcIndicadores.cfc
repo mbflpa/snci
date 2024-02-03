@@ -295,7 +295,8 @@
 										<!--- Calcula a porcentagem --->
 										<cfset percentualDP = (totalDP / totalGeral) * 100 />
 										<!--- Formata o percentualDP com duas casas decimais --->
-										<cfset percentualDPFormatado = NumberFormat(percentualDP, '0.0') />
+										<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") />
+
 										
 
 										<div id="divResultPRCI" class="col-md-4 col-sm-4 col-4">
@@ -350,7 +351,7 @@
 												<cfelse>
 													<cfset percentualDP = (dps[orgao] / orgaos[orgao]) * 100>
 												</cfif>
-												<cfset percentualDPFormatado = NumberFormat(percentualDP, '0.0')>
+												<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") >
 
 												<!--- Adiciona cada linha à tabela --->
 												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
@@ -749,7 +750,7 @@
 										</cfif>
 										
 							
-										<cfset percentualSolucionadoFormatado = NumberFormat(percentualSolucionado, '0.0') />
+										<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
 										
 										<div id="divResultSLNC" class="col-md-6 col-sm-6 col-12">
 											<div class="info-box bg-gradient-warning">
@@ -799,7 +800,7 @@
 											<cfset slncOrdenado = StructSort(orgaos, "text", "asc")>
 											<cfloop array="#slncOrdenado#" index="orgao">
 												<cfset percentualSolucionado = (solucionados[orgao] / orgaos[orgao]) * 100>
-												<cfset percentualSolucionadoFormatado = NumberFormat(percentualSolucionado, '0.0') />
+												<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
 
 												<!--- Adiciona cada linha à tabela --->
 												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
@@ -943,7 +944,7 @@
 			</cfif>
 			<cfset percentualSolucionadoFormatado = NumberFormat(percentualSolucionado, '0.0') />
 
-			<cfset percentualDGCI = (percentualDPFormatado * 0.4) + (percentualSolucionadoFormatado*0.6) />
+			<cfset percentualDGCI = Replace((percentualDPFormatado * 0.4) + (percentualSolucionadoFormatado*0.6),".",",")  />
 
 			<div align="center" class="col-md-12 col-sm-12 col-12 mx-auto" style="margin-bottom:20px">
 				<span class="info-box-text" style="font-size:40px">#monthAsString(arguments.mes)#/#arguments.ano#</span>
