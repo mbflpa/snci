@@ -235,7 +235,7 @@
 							<cfoutput><h5 style="color:##2581c8;text-align: center;">Dados utilizados no cálculo do <strong>PRCI</strong> (Atendimento ao Prazo de Resposta): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
 						
 						    <div class="table-responsive">
-								<table id="tabPRCIdetalhe" class="table table-bordered table-striped table-hover text-nowrap" style="width: 100%;">
+								<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
 									
 									<thead style="background: #0083ca;color:#fff">
 										<tr style="font-size:14px">
@@ -329,7 +329,7 @@
 							<cfset totalOrgaosResp = StructCount(orgaos)> <!-- Conta a quantidade de orgaoResp -->
 							
 						    <cfif totalOrgaosResp gt 1>
-								<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap" style="width:500px; margin-top:30px;pointer:">
+								<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap" style="width:500px; margin-top:30px;cursor:pointer">
 									<cfoutput>
 										<thead style="background: ##489b72;color:##fff;text-align: center;">
 											<tr style="font-size:14px">
@@ -781,7 +781,7 @@
 							<cfset totalOrgaosResp = StructCount(orgaos)> 
 							
 						    <cfif totalOrgaosResp gt 1>
-								<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap" style="width:500px; margin-top:30px;pointer:">
+								<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap" style="width:500px; margin-top:30px;cursor:pointer">
 									<cfoutput>
 										<thead style="background: ##489b72;color:##fff;text-align: center;">
 											<tr style="font-size:14px">
