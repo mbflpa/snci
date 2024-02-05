@@ -308,7 +308,7 @@
 													<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDPFormatado#%</strong></font></font></span>
 
 													<div class="progress">
-														<div class="progress-bar" style="width: #percentualDPFormatado#%"></div>
+														<div class="progress-bar" style="width: #percentualDP#%"></div>
 													</div>
 													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
 														<span style="font-size:14px">PRCI = TIDP/TGI</span><br>
@@ -761,7 +761,7 @@
 													<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualSolucionadoFormatado#%</strong></font></font></span>
 
 													<div class="progress">
-													<div class="progress-bar" style="width: #percentualSolucionadoFormatado#%"></div>
+													<div class="progress-bar" style="width: #percentualSolucionado#%"></div>
 													</div>
 													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
 														<span style="font-size:14px">SLNC = QTSL/QTNC x 100</span><br>
@@ -943,8 +943,8 @@
 				<cfset percentualSolucionado = (totalSolucionadoSLNC / totalGeral *100) />
 			</cfif>
 			<cfset percentualSolucionadoFormatado = NumberFormat(percentualSolucionado, '0.0') />
-
-			<cfset percentualDGCI = Replace((percentualDPFormatado * 0.4) + (percentualSolucionadoFormatado*0.6),".",",")  />
+            <cfset percentualDGCI = NumberFormat((percentualDPFormatado * 0.4) + (percentualSolucionadoFormatado*0.6), '0.0') />
+			<cfset percentualDGCIformatado = Replace(NumberFormat((percentualDPFormatado * 0.4) + (percentualSolucionadoFormatado*0.6), '0.0'),".",",")  />
 
 			<div align="center" class="col-md-12 col-sm-12 col-12 mx-auto" style="margin-bottom:20px">
 				<span class="info-box-text" style="font-size:40px">#monthAsString(arguments.mes)#/#arguments.ano#</span>
@@ -955,7 +955,7 @@
 
 					<div class="info-box-content">
 						<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI</strong></font></font></span>
-						<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDGCI#%</strong></font></font></span>
+						<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDGCIformatado#%</strong></font></font></span>
 
 						<div class="progress">
 							<div class="progress-bar" style="width: #percentualDGCI#%"></div>
