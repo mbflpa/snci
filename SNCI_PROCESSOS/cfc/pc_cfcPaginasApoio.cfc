@@ -1004,7 +1004,9 @@
 		<cfquery name="rsOrgaosComOrientacoesPendentes" datasource="#application.dsn_processos#" >
 			SELECT DISTINCT pc_aval_orientacao_mcu_orgaoResp
 			FROM pc_avaliacao_orientacoes
-			WHERE pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate()
+			WHERE pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) 
+			and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null 
+			and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate()
 		</cfquery>
 
 		<cfquery name="rsOrgaosComOrientacoesPendentesParaTeste" datasource="#application.dsn_processos#">
@@ -1015,239 +1017,236 @@
 
 
 		<cfif application.auxsite neq 'intranetsistemaspe'>
-			<cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
+			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
 		<cfelse>
 			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
 		</cfif>
 
 		<cfloop query="#myQuery#">
-                        
-			<cfquery name="rsOrientacoesPendentes" datasource="#application.dsn_processos#" >
-				SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id 
-						,pc_orientacao_status.pc_orientacao_status_descricao
-						,pc_avaliacoes.pc_aval_numeracao
-						,pc_processos.pc_processo_id 
-						,pc_processos.pc_num_sei
-						,pc_processos.pc_num_rel_sei
-						,pc_processos.pc_num_avaliacao_tipo
-						,pc_avaliacao_tipos.pc_aval_tipo_descricao
-						,pc_processos.pc_aval_tipo_nao_aplica_descricao
-						,pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp 
-						,pc_avaliacao_orientacoes.pc_aval_orientacao_status 
-						,orgaoAvaliado.pc_org_mcu as mcuOrgaoAvaliado
-						,orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
-						,orgaoAvaliado.pc_org_emaiL as emailOrgaoAvaliado
-						,orgaoResp.pc_org_mcu as mcuOrgaoResp
-						,orgaoResp.pc_org_sigla as siglaOrgaoResp
-						,orgaoResp.pc_org_emaiL as emailOrgaoResp
-				FROM pc_avaliacao_orientacoes
-				LEFT JOIN pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
-				LEFT JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
-				LEFT JOIN pc_avaliacao_tipos on pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
-				LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-				LEFT JOIN pc_orgaos as orgaoAvaliado on orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-				LEFT JOIN pc_orgaos as orgaoResp on orgaoResp.pc_org_mcu = pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp
+            <cfif Len(Trim(pc_aval_orientacao_mcu_orgaoResp))>            
+				<cfquery name="rsOrientacoesPendentes" datasource="#application.dsn_processos#" >
+					SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id 
+							,pc_orientacao_status.pc_orientacao_status_descricao
+							,pc_avaliacoes.pc_aval_numeracao
+							,pc_processos.pc_processo_id 
+							,pc_processos.pc_num_sei
+							,pc_processos.pc_num_rel_sei
+							,pc_processos.pc_num_avaliacao_tipo
+							,pc_avaliacao_tipos.pc_aval_tipo_descricao
+							,pc_processos.pc_aval_tipo_nao_aplica_descricao
+							,pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp 
+							,pc_avaliacao_orientacoes.pc_aval_orientacao_status 
+							,orgaoAvaliado.pc_org_mcu as mcuOrgaoAvaliado
+							,orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
+							,orgaoAvaliado.pc_org_emaiL as emailOrgaoAvaliado
+							,orgaoResp.pc_org_mcu as mcuOrgaoResp
+							,orgaoResp.pc_org_sigla as siglaOrgaoResp
+							,orgaoResp.pc_org_emaiL as emailOrgaoResp
+					FROM pc_avaliacao_orientacoes
+					LEFT JOIN pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
+					LEFT JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
+					LEFT JOIN pc_avaliacao_tipos on pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
+					LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
+					LEFT JOIN pc_orgaos as orgaoAvaliado on orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+					LEFT JOIN pc_orgaos as orgaoResp on orgaoResp.pc_org_mcu = pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp
 
-				WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate() 
-				ORDER BY pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp
-			</cfquery>
+					WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate() 
+					ORDER BY pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp
+				</cfquery>
 
-			<cfquery name="rsOrientacoesOutrosStatus" datasource="#application.dsn_processos#" >
-				SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id, pc_orientacao_status.pc_orientacao_status_descricao                
-				FROM pc_avaliacao_orientacoes
-				right JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-				WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (2,16)  or (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp >= getdate()))
-			</cfquery>
+				<cfquery name="rsOrientacoesOutrosStatus" datasource="#application.dsn_processos#" >
+					SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id, pc_orientacao_status.pc_orientacao_status_descricao                
+					FROM pc_avaliacao_orientacoes
+					right JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
+					WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (2,16)  or (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp >= getdate()))
+				</cfquery>
 
-			
-			<cftry>
-				<cfset to = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoResp))#">
-				<cfset cc = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoAvaliado))#">
-
-				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
-					<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
-					<cfset to = "marceloferreira@correios.com.br">
-					<cfset cc = "">
-				</cfif>
-					
-				<cfset de="SNCI@correios.com.br">
-				<cfif application.auxsite eq "localhost">
-					<cfset de="mbflpa@yahoo.com.br">
-				</cfif>
-			
-				
-				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
-				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
-				<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-					<!DOCTYPE html>
-					<html lang="pt-br">
-					<head>
-						<meta charset="UTF-8">
-						<meta http-equiv="X-UA-Compatible" content="IE=edge">
-						<meta name="viewport" content="width=device-width, initial-scale=1.0">
-						<style>
-							
-							*, *::before, *::after {
-								box-sizing: border-box;
-							}
-							
-							body {
-								font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-								font-size: 0.8rem;
-								font-weight: 400;
-								line-height: 1.5;
-								color: rgba(33, 37, 41, 1); 
-								text-align: left;
-								background-color: rgba(255, 255, 255, 1); 
-							}
-							
-							table {
-								width: 100%;
-								margin-bottom: 1rem;
-								color: rgba(33, 37, 41, 1); 
-								background-color: transparent;
-								display: table;
-								border-collapse: separate;
-								box-sizing: border-box;
-								text-indent: initial;
-								border-spacing: 2px;
-								border-color: gray;
-							}
-
-							th {
-								text-align: center;
-								padding-left: 0.75rem;
-								padding-right: 0.75rem;
-							}
-
-							
-							.table-striped tbody tr:nth-of-type(odd) {
-								background-color: rgba(0, 0, 0, 0.05);
-							}
-
-							.text-nowrap {
-								white-space: nowrap !important;
-							}
-
-							.table-bordered {
-								border: 1px solid rgba(222, 226, 230, 1); 
-							}
-
-							.card {
-								position: relative;
-								display: flex;
-								flex-direction: column;
-								min-width: 0;
-								word-wrap: break-word;
-								background-color: rgba(255, 255, 255, 1); 
-								background-clip: border-box;
-								border: 0 solid rgba(0, 0, 0, 0.125);
-								border-radius: 0.25rem;
-								box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-								margin: 0 auto;
-								float: left;
-							}
-
-							.card-header {
-								background-color: rgba(255, 255, 255, 1); 
-								color: rgba(0, 65, 107, 1); 
-								border-radius: 10px;
-								box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-								text-align: center;
-								font-size: 20px;
-							}
-
-							.pre-style {
-								font-family: inherit;
-								font-weight: 500;
-								line-height: 1.2;
-							}
-
-							.info-text {
-								text-align: justify;
-								font-family: inherit;
-								font-weight: 500;
-								line-height: 1.2;
-								font-size: 14px;
-							}
-						</style>
-					</head>
-					<body>
-						<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
-							<pre class="pre-style">#mensagemParaTeste#</pre>
+				<!-- Verifica se o e-mail é válido e não está em branco -->
+				<cfif IsValid("email", rsOrientacoesPendentes.emailOrgaoResp) and Len(Trim(rsOrientacoesPendentes.emailOrgaoResp))>
+						<cfset to = rsOrientacoesPendentes.emailOrgaoResp>
+						
+						<cfif IsValid("email", rsOrientacoesPendentes.emailOrgaoAvaliado) and Len(Trim(rsOrientacoesPendentes.emailOrgaoAvaliado))>
+							<cfset cc = rsOrientacoesPendentes.emailOrgaoAvaliado>
+						<cfelse>
+							<cfset cc = "">
 						</cfif>
-						<div class="card" style="background-color: rgba(0, 65, 107, 1);color: rgba(255, 255, 255, 1);  border-radius: 15px; padding: 5px;">
-							<div class="card-header">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</div>
-							<cfoutput>
-								<pre class="pre-style">#pronomeTrat#,</pre>
-								<cfif rsOrientacoesPendentes.recordcount eq 1>
-									<p class="info-text">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, ao qual solicitamos especial atenção, conforme segue: </p>
-								<cfelseif rsOrientacoesPendentes.recordcount gt 1>
-									<p class="info-text">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, aos quais solicitamos especial atenção, conforme relação a seguir: </p>
-								</cfif>
-								<table id="tabOrientacoes" class="table-hover table-striped">
-									<thead style="background: rgba(0, 131, 202, 1); color: rgba(255, 255, 255, 1); ">
-										<tr style="font-size: 14px;">
-											<th>ID da Orientação</th>
-											<th>N° Processo SNCI</th>
-											<th>N° Item</th>
-											<th>Data Prevista p/ Resposta</th>
-											<th>N° SEI</th>
-											<th>N° Relatório SEI</th>
-											<th>Tipo de Avaliação:</th>    
-										</tr>
-									</thead>
+
+						<cfif application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+							<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
+							<cfset to = "marceloferreira@correios.com.br">
+							<cfset cc = "">
+						</cfif>
+							
+						<cfset de="SNCI@correios.com.br">
+						<cfif application.auxsite eq "localhost">
+							<cfset de="mbflpa@yahoo.com.br">
+						</cfif>
+					
+						
+						<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
+						<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
+						<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+							<!DOCTYPE html>
+							<html lang="pt-br">
+							<head>
+								<meta charset="UTF-8">
+								<meta http-equiv="X-UA-Compatible" content="IE=edge">
+								<meta name="viewport" content="width=device-width, initial-scale=1.0">
+								<style>
 									
-									<tbody>
-										<cfloop query="#rsOrientacoesPendentes#">
-											<cfoutput>                 
-												<tr style="font-size: 12px; cursor: pointer; z-index: 2;color: rgba(255, 255, 255, 1); ">
-													<td align="center">#pc_aval_orientacao_id#</td>
-													<td align="center">#pc_processo_id#</td>
-													<td align="center">#pc_aval_numeracao#</td>    
-													<td align="center">#DateFormat(pc_aval_orientacao_dataPrevistaResp, 'DD-MM-YYYY')#</td>
-													<cfset sei = left(#pc_num_sei#,5) & "."& mid(#pc_num_sei#,6,6) &"/"& mid(#pc_num_sei#,12,4) &"-"&right(#pc_num_sei#,2)>
-													<td align="center" >#sei#</td>
-													<td align="center">#pc_num_rel_sei#</td>
-													<cfif pc_num_avaliacao_tipo neq 2>
-														<td >#pc_aval_tipo_descricao#</td>
-													<cfelse>
-														<td >#pc_aval_tipo_nao_aplica_descricao#</td>
-													</cfif>
+									*, *::before, *::after {
+										box-sizing: border-box;
+									}
+									
+									body {
+										font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+										font-size: 0.8rem;
+										font-weight: 400;
+										line-height: 1.5;
+										color: rgba(33, 37, 41, 1); 
+										text-align: left;
+										background-color: rgba(255, 255, 255, 1); 
+									}
+									
+									table {
+										width: 100%;
+										margin-bottom: 1rem;
+										color: rgba(33, 37, 41, 1); 
+										background-color: transparent;
+										display: table;
+										border-collapse: separate;
+										box-sizing: border-box;
+										text-indent: initial;
+										border-spacing: 2px;
+										border-color: gray;
+									}
+
+									th {
+										text-align: center;
+										padding-left: 0.75rem;
+										padding-right: 0.75rem;
+									}
+
+									
+									.table-striped tbody tr:nth-of-type(odd) {
+										background-color: rgba(0, 0, 0, 0.05);
+									}
+
+									.text-nowrap {
+										white-space: nowrap !important;
+									}
+
+									.table-bordered {
+										border: 1px solid rgba(222, 226, 230, 1); 
+									}
+
+									.card {
+										position: relative;
+										display: flex;
+										flex-direction: column;
+										min-width: 0;
+										word-wrap: break-word;
+										background-color: rgba(255, 255, 255, 1); 
+										background-clip: border-box;
+										border: 0 solid rgba(0, 0, 0, 0.125);
+										border-radius: 0.25rem;
+										box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
+										margin: 0 auto;
+										float: left;
+									}
+
+									.card-header {
+										background-color: rgba(255, 255, 255, 1); 
+										color: rgba(0, 65, 107, 1); 
+										border-radius: 10px;
+										box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
+										text-align: center;
+										font-size: 20px;
+									}
+
+									.pre-style {
+										font-family: inherit;
+										font-weight: 500;
+										line-height: 1.2;
+									}
+
+									.info-text {
+										text-align: justify;
+										font-family: inherit;
+										font-weight: 500;
+										line-height: 1.2;
+										font-size: 14px;
+									}
+								</style>
+							</head>
+							<body>
+								<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
+									<pre class="pre-style">#mensagemParaTeste#</pre>
+								</cfif>
+								<div class="card" style="background-color: rgba(0, 65, 107, 1);color: rgba(255, 255, 255, 1);  border-radius: 15px; padding: 5px;">
+									<div class="card-header">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</div>
+									<cfoutput>
+										<pre class="pre-style">#pronomeTrat#,</pre>
+										<cfif rsOrientacoesPendentes.recordcount eq 1>
+											<p class="info-text">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, ao qual solicitamos especial atenção, conforme segue: </p>
+										<cfelseif rsOrientacoesPendentes.recordcount gt 1>
+											<p class="info-text">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, aos quais solicitamos especial atenção, conforme relação a seguir: </p>
+										</cfif>
+										<table id="tabOrientacoes" class="table-hover table-striped">
+											<thead style="background: rgba(0, 131, 202, 1); color: rgba(255, 255, 255, 1); ">
+												<tr style="font-size: 14px;">
+													<th>ID da Orientação</th>
+													<th>N° Processo SNCI</th>
+													<th>N° Item</th>
+													<th>Data Prevista p/ Resposta</th>
+													<th>N° SEI</th>
+													<th>N° Relatório SEI</th>
+													<th>Tipo de Avaliação:</th>    
 												</tr>
-											</cfoutput>
-										</cfloop>
-									</tbody>
-								</table>
-								<p>Para regularizar a situação, solicitamos acessar o link abaixo, tela "Acompanhamento", aba “Medidas / Orientações para regularização” e inserir sua resposta:<br><a style="color: rgba(255, 255, 255, 1); " href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
-								<p>Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
-								<p>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</p>
-								<cfif rsOrientacoesOutrosStatus.recordcount gt 1>    
-									<p>Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
-								<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
-									<p>Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
-								</cfif> 
-								<div style="background-color: rgba(255, 255, 255, 1); color: rgba(0, 65, 107, 1); border-radius: 10px; padding-top: 2px; padding-bottom: 2px; padding-left: 15px; padding-right: 10px; box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); width: 600px;">
-									<p>Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
-									<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
-									<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
+											</thead>
+											
+											<tbody>
+												<cfloop query="#rsOrientacoesPendentes#">
+													<cfoutput>                
+														<tr style="font-size: 12px; cursor: pointer; z-index: 2;color: rgba(255, 255, 255, 1); ">
+															<td align="center">#pc_aval_orientacao_id#</td>
+															<td align="center">#pc_processo_id#</td>
+															<td align="center">#pc_aval_numeracao#</td>    
+															<td align="center">#DateFormat(pc_aval_orientacao_dataPrevistaResp, 'DD-MM-YYYY')#</td>
+															<cfset sei = left(#pc_num_sei#,5) & "."& mid(#pc_num_sei#,6,6) &"/"& mid(#pc_num_sei#,12,4) &"-"&right(#pc_num_sei#,2)>
+															<td align="center" >#sei#</td>
+															<td align="center">#pc_num_rel_sei#</td>
+															<cfif pc_num_avaliacao_tipo neq 2>
+																<td >#pc_aval_tipo_descricao#</td>
+															<cfelse>
+																<td >#pc_aval_tipo_nao_aplica_descricao#</td>
+															</cfif>
+														</tr>
+													
+												    </cfoutput>
+                                                </cfloop>
+											</tbody>
+										</table>
+										<p>Para regularizar a situação, solicitamos acessar o link abaixo, tela "Acompanhamento", aba “Medidas / Orientações para regularização” e inserir sua resposta:<br><a style="color: rgba(255, 255, 255, 1); " href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
+										<p>Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
+										<p>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</p>
+										<cfif rsOrientacoesOutrosStatus.recordcount gt 1>    
+											<p>Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
+										<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
+											<p>Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
+										</cfif> 
+										<div style="background-color: rgba(255, 255, 255, 1); color: rgba(0, 65, 107, 1); border-radius: 10px; padding-top: 2px; padding-bottom: 2px; padding-left: 15px; padding-right: 10px; box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); width: 600px;">
+											<p>Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
+											<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
+											<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
+										</div>
+									</cfoutput>
 								</div>
-							</cfoutput>
-						</div>
-					</body>
-					</html>
-				</cfmail>
-            
-				<cfcatch type="any">
-				<cfset de="SNCI@correios.com.br">
-				<cfif application.auxsite eq "localhost">
-					<cfset de="mbflpa@yahoo.com.br">
-				</cfif>
-					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "rotinaSemanalOrientacoesPendentes" : #cfcatch.message#</cfoutput>
-					</cfmail>
-				</cfcatch>
-			</cftry> 
+							</body>
+							</html>
+						</cfmail>
+				</cfif>		
+			</cfif>		
 
 			
 		</cfloop>
