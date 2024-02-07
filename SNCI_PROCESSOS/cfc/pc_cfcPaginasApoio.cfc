@@ -1064,7 +1064,7 @@
 				<cfset to = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoResp))#">
 				<cfset cc = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoAvaliado))#">
 
-				<cfif application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 					<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 					<cfset to = "marceloferreira@correios.com.br">
 					<cfset cc = "">
@@ -1244,7 +1244,7 @@
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "rotinaSemanalOrientacoesPendentes" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+						<cfoutput>Erro rotina "rotinaSemanalOrientacoesPendentes" : #cfcatch.message#</cfoutput>
 					</cfmail>
 				</cfcatch>
 			</cftry> 
@@ -1343,27 +1343,25 @@
 						<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 						<style>
-			
-							.table-striped tbody tr:nth-of-type(odd) {
-								background-color: rgba(0,0,0,.05);
-							}
-
-							.text-nowrap {
-								white-space: nowrap !important;
-							}
-							.table-bordered {
-								border: 1px solid ##dee2e6;
-							}
-						
-						
+							
 							*, *::before, *::after {
 								box-sizing: border-box;
 							}
-
+							
+							body {
+								font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+								font-size: 0.8rem;
+								font-weight: 400;
+								line-height: 1.5;
+								color: rgba(33, 37, 41, 1); 
+								text-align: left;
+								background-color: rgba(255, 255, 255, 1); 
+							}
+							
 							table {
 								width: 100%;
 								margin-bottom: 1rem;
-								color: ##212529;
+								color: rgba(33, 37, 41, 1); 
 								background-color: transparent;
 								display: table;
 								border-collapse: separate;
@@ -1373,57 +1371,62 @@
 								border-color: gray;
 							}
 
-							table tr{
-								color: ##fff;
-							}
-							.card-body {
-								text-align: justify!important;
-							}
-							.card {
-								position: relative;
-								display: -ms-flexbox;
-								display: flex;
-								-ms-flex-direction: column;
-								flex-direction: column;
-								min-width: 0;
-								word-wrap: break-word;
-								background-color: ##fff;
-								background-clip: border-box;
-								border: 0 solid rgba(0, 0, 0, 0.125);
-								border-radius: 0.25rem;
-							}
-							.card {
-								position: relative;
-								display: -ms-flexbox;
-								display: flex;
-								-ms-flex-direction: column;
-								flex-direction: column;
-								min-width: 0;
-								word-wrap: break-word;
-								background-color: ##fff;
-								background-clip: border-box;
-								border: 0 solid rgba(0, 0, 0, 0.125);
-								border-radius: 0.25rem;
-							}
-							body {
-							
-								font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-								font-size: 0.8rem;
-								font-weight: 400;
-								line-height: 1.5;
-								color: ##212529;
-								text-align: left;
-								background-color: ##fff;
-							}
 							th {
 								text-align: center;
 								padding-left: 0.75rem;
 								padding-right: 0.75rem;
-
 							}
 
+							
+							.table-striped tbody tr:nth-of-type(odd) {
+								background-color: rgba(0, 0, 0, 0.05);
+							}
 
-						
+							.text-nowrap {
+								white-space: nowrap !important;
+							}
+
+							.table-bordered {
+								border: 1px solid rgba(222, 226, 230, 1); 
+							}
+
+							.card {
+								position: relative;
+								display: flex;
+								flex-direction: column;
+								min-width: 0;
+								word-wrap: break-word;
+								background-color: rgba(255, 255, 255, 1); 
+								background-clip: border-box;
+								border: 0 solid rgba(0, 0, 0, 0.125);
+								border-radius: 0.25rem;
+								box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
+								margin: 0 auto;
+								float: left;
+							}
+
+							.card-header {
+								background-color: rgba(255, 255, 255, 1); 
+								color: rgba(0, 65, 107, 1); 
+								border-radius: 10px;
+								box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
+								text-align: center;
+								font-size: 20px;
+							}
+
+							.pre-style {
+								font-family: inherit;
+								font-weight: 500;
+								line-height: 1.2;
+							}
+
+							.info-text {
+								text-align: justify;
+								font-family: inherit;
+								font-weight: 500;
+								line-height: 1.2;
+								font-size: 14px;
+							}
 						</style>
 					</head>
 					<body>
@@ -1458,7 +1461,7 @@
 									<tbody>
 										<cfloop query="#rsOrientacoesPendentes#" >
 											<cfoutput>					
-												<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
+												<tr style="font-size:12px;cursor:pointer;z-index:2;color: rgba(255, 255, 255, 1); "  >
 													<td align="center" >#pc_aval_orientacao_id#</td>
 													<td align="center" >#pc_processo_id#</td>
 													<td align="center" >#pc_aval_numeracao#</td>	
@@ -1502,7 +1505,7 @@
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "rotinaSemanalOrientacoesPendentesTeste" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
+						<cfoutput>Erro rotina "rotinaSemanalOrientacoesPendentesTeste": #cfcatch.message#</cfoutput>
 					</cfmail>
 				</cfcatch>
 			</cftry> 
