@@ -1064,7 +1064,7 @@
 				<cfset to = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoResp))#">
 				<cfset cc = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoAvaliado))#">
 
-				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+				<cfif application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 					<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 					<cfset to = "marceloferreira@correios.com.br">
 					<cfset cc = "">
@@ -1085,29 +1085,26 @@
 						<meta charset="UTF-8">
 						<meta http-equiv="X-UA-Compatible" content="IE=edge">
 						<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 						<style>
-			
-							.table-striped tbody tr:nth-of-type(odd) {
-								background-color: rgba(0,0,0,.05);
-							}
-
-							.text-nowrap {
-								white-space: nowrap !important;
-							}
-							.table-bordered {
-								border: 1px solid ##dee2e6;
-							}
-						
-						
+							
 							*, *::before, *::after {
 								box-sizing: border-box;
 							}
-
+							
+							body {
+								font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+								font-size: 0.8rem;
+								font-weight: 400;
+								line-height: 1.5;
+								color: rgba(33, 37, 41, 1); 
+								text-align: left;
+								background-color: rgba(255, 255, 255, 1); 
+							}
+							
 							table {
 								width: 100%;
 								margin-bottom: 1rem;
-								color: ##212529;
+								color: rgba(33, 37, 41, 1); 
 								background-color: transparent;
 								display: table;
 								border-collapse: separate;
@@ -1117,100 +1114,101 @@
 								border-color: gray;
 							}
 
-							table tr{
-								color: ##fff;
-							}
-							.card-body {
-								text-align: justify!important;
-							}
-							.card {
-								position: relative;
-								display: -ms-flexbox;
-								display: flex;
-								-ms-flex-direction: column;
-								flex-direction: column;
-								min-width: 0;
-								word-wrap: break-word;
-								background-color: ##fff;
-								background-clip: border-box;
-								border: 0 solid rgba(0, 0, 0, 0.125);
-								border-radius: 0.25rem;
-							}
-							.card {
-								position: relative;
-								display: -ms-flexbox;
-								display: flex;
-								-ms-flex-direction: column;
-								flex-direction: column;
-								min-width: 0;
-								word-wrap: break-word;
-								background-color: ##fff;
-								background-clip: border-box;
-								border: 0 solid rgba(0, 0, 0, 0.125);
-								border-radius: 0.25rem;
-							}
-							body {
-							
-								font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-								font-size: 0.8rem;
-								font-weight: 400;
-								line-height: 1.5;
-								color: ##212529;
-								text-align: left;
-								background-color: ##fff;
-							}
 							th {
 								text-align: center;
 								padding-left: 0.75rem;
 								padding-right: 0.75rem;
-
 							}
 
+							
+							.table-striped tbody tr:nth-of-type(odd) {
+								background-color: rgba(0, 0, 0, 0.05);
+							}
 
-						
+							.text-nowrap {
+								white-space: nowrap !important;
+							}
+
+							.table-bordered {
+								border: 1px solid rgba(222, 226, 230, 1); 
+							}
+
+							.card {
+								position: relative;
+								display: flex;
+								flex-direction: column;
+								min-width: 0;
+								word-wrap: break-word;
+								background-color: rgba(255, 255, 255, 1); 
+								background-clip: border-box;
+								border: 0 solid rgba(0, 0, 0, 0.125);
+								border-radius: 0.25rem;
+								box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
+								margin: 0 auto;
+								float: left;
+							}
+
+							.card-header {
+								background-color: rgba(255, 255, 255, 1); 
+								color: rgba(0, 65, 107, 1); 
+								border-radius: 10px;
+								box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
+								text-align: center;
+								font-size: 20px;
+							}
+
+							.pre-style {
+								font-family: inherit;
+								font-weight: 500;
+								line-height: 1.2;
+							}
+
+							.info-text {
+								text-align: justify;
+								font-family: inherit;
+								font-weight: 500;
+								line-height: 1.2;
+								font-size: 14px;
+							}
 						</style>
 					</head>
 					<body>
-
 						<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
-							<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
+							<pre class="pre-style">#mensagemParaTeste#</pre>
 						</cfif>
-						<div style="background-color: ##00416B; color:##fff; border-radius: 15px; padding: 5px; box-shadow: 0px 0px 10px ##888888; margin: 0 auto; float: left;">
-							<div style="background-color:##fff ; color:##00416B; border-radius: 10px;box-shadow: 0px 0px 10px ##888888;text-align: center;">
-								<span style="font-size:20px">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</span> 
-							</div> 
+						<div class="card" style="background-color: rgba(0, 65, 107, 1);color: rgba(255, 255, 255, 1);  border-radius: 15px; padding: 5px;">
+							<div class="card-header">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</div>
 							<cfoutput>
-								<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#pronomeTrat#,</pre>
+								<pre class="pre-style">#pronomeTrat#,</pre>
 								<cfif rsOrientacoesPendentes.recordcount eq 1>
-									<p style="text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount,"00")# apontamento registrado pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, ao qual solicitamos especial atenção, conforme segue: </p>
+									<p class="info-text">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, ao qual solicitamos especial atenção, conforme segue: </p>
 								<cfelseif rsOrientacoesPendentes.recordcount gt 1>
-									<p style="text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount,"00")# apontamentos registrados pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, aos quais solicitamos especial atenção, conforme relação a seguir: </p>
+									<p class="info-text">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, aos quais solicitamos especial atenção, conforme relação a seguir: </p>
 								</cfif>
 								<table id="tabOrientacoes" class="table-hover table-striped">
-									<thead style="background: ##0083ca;color:##fff">
-										<tr style="font-size:14px">
-											<th >ID da Orientação</th>
-											<th >N° Processo SNCI</th>
-											<th >N° Item</th>
-											<th >Data Prevista p/ Resposta</th>
-											<th >N° SEI</th>
-											<th >N° Relatório SEI</th>
-											<th >Tipo de Avaliação:</th>	
+									<thead style="background: rgba(0, 131, 202, 1); color: rgba(255, 255, 255, 1); ">
+										<tr style="font-size: 14px;">
+											<th>ID da Orientação</th>
+											<th>N° Processo SNCI</th>
+											<th>N° Item</th>
+											<th>Data Prevista p/ Resposta</th>
+											<th>N° SEI</th>
+											<th>N° Relatório SEI</th>
+											<th>Tipo de Avaliação:</th>    
 										</tr>
 									</thead>
 									
 									<tbody>
-										<cfloop query="#rsOrientacoesPendentes#" >
-											<cfoutput>					
-												<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
-													<td align="center" >#pc_aval_orientacao_id#</td>
-													<td align="center" >#pc_processo_id#</td>
-													<td align="center" >#pc_aval_numeracao#</td>	
-													<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,"DD-MM-YYYY") >
-													<td align="center" >#dataPrev#</td>
+										<cfloop query="#rsOrientacoesPendentes#">
+											<cfoutput>                 
+												<tr style="font-size: 12px; cursor: pointer; z-index: 2;color: rgba(255, 255, 255, 1); ">
+													<td align="center">#pc_aval_orientacao_id#</td>
+													<td align="center">#pc_processo_id#</td>
+													<td align="center">#pc_aval_numeracao#</td>    
+													<td align="center">#DateFormat(pc_aval_orientacao_dataPrevistaResp, 'DD-MM-YYYY')#</td>
 													<cfset sei = left(#pc_num_sei#,5) & "."& mid(#pc_num_sei#,6,6) &"/"& mid(#pc_num_sei#,12,4) &"-"&right(#pc_num_sei#,2)>
 													<td align="center" >#sei#</td>
-													<td align="center" >#pc_num_rel_sei#</td>
+													<td align="center">#pc_num_rel_sei#</td>
 													<cfif pc_num_avaliacao_tipo neq 2>
 														<td >#pc_aval_tipo_descricao#</td>
 													<cfelse>
@@ -1218,28 +1216,28 @@
 													</cfif>
 												</tr>
 											</cfoutput>
-										</cfloop>	
+										</cfloop>
 									</tbody>
 								</table>
-								<p>Para regularizar a situação, solicitamos a acessar o link abaixo, tela "Acompanhamento", aba “Medidas / Orientações para regularização” e inserir sua resposta:<br><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
+								<p>Para regularizar a situação, solicitamos acessar o link abaixo, tela "Acompanhamento", aba “Medidas / Orientações para regularização” e inserir sua resposta:<br><a style="color: rgba(255, 255, 255, 1); " href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
 								<p>Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
-								<P>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</P>
+								<p>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</p>
 								<cfif rsOrientacoesOutrosStatus.recordcount gt 1>    
-									<p>Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount,"00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
+									<p>Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
 								<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
-									<p>Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount,"00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
+									<p>Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
 								</cfif> 
-								<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;width:600px">
+								<div style="background-color: rgba(255, 255, 255, 1); color: rgba(0, 65, 107, 1); border-radius: 10px; padding-top: 2px; padding-bottom: 2px; padding-left: 15px; padding-right: 10px; box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); width: 600px;">
 									<p>Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
 									<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
 									<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
 								</div>
 							</cfoutput>
 						</div>
-
 					</body>
-					</html> 
-				</cfmail>            
+					</html>
+				</cfmail>
+            
 				<cfcatch type="any">
 				<cfset de="SNCI@correios.com.br">
 				<cfif application.auxsite eq "localhost">
