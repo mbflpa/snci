@@ -97,7 +97,7 @@
 				const checkedClass = year === currentYear ? " active" : "";
 				const label = `${year}`;
 				const input = `<input type="radio" name="ano" value="${year}" id="option_a${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
-				const radioButton = `<label style="border:none!important;border-radius:0!important;" class="btn bg-olive${checkedClass}">${input}${label}</label><br>`;
+				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="efeito-grow btn bg-yellow${checkedClass}">${input}${label}</label><br>`;
 				return radioButton;
 			}).reverse(); // Inverte a ordem dos botões de opção de rádio para que o ano mais recente apareça por último
 
@@ -114,7 +114,7 @@
 				const checkedClass = "";
 				const label = `${month}`;
 				const input = `<input type="radio" name="mes" value="${i + 1}" id="option_b${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
-				const radioButton = `<label style="border:none!important;border-radius:0!important;" class="btn bg-olive${checkedClass}">${input}${label}</label><br>`;
+				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:1px" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
 				return radioButton;
 			});
 
@@ -134,7 +134,7 @@
 					const checkedClass = "";
 					const label = `${month}`;
 					const input = `<input type="radio" name="mes" value="${i + 1}" id="option_b${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
-					const radioButton = `<label style="border:none!important;border-radius:0!important;" class="btn bg-olive${checkedClass}">${input}${label}</label><br>`;
+					const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:1px" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
 					return radioButton;
 				});
 
