@@ -156,10 +156,10 @@
 				<div style="display: flex;align-items: center;">
 					<span style="color:#0083ca;font-size:20px;margin-right:10px">Consultar Por:</span>
 					<div id="opcaoTipoConsulta" class="btn-group btn-group-toggle" data-toggle="buttons">
-						<label style="border:none!important;border-radius:0!important;" class="btn bg-olive active"><input type="radio" checked="" name="opcaoTipoConsulta" id="tipoProcesso" autocomplete="off" value="p" /> PROCESSOS</label><br>
-						<label style="border:none!important;border-radius:0!important;" class="btn bg-olive active"><input type="radio"  name="opcaoTipoConsulta" id="tipoItens" autocomplete="off" value="i" /> ITENS</label><br>
-						<label style="border:none!important;border-radius:0!important;" class="btn bg-olive active"><input type="radio"  name="opcaoTipoConsulta" id="tipoOrientacoes" autocomplete="off" value="o" /> ORIENTAÇÕES</label><br>
-						<label style="border:none!important;border-radius:0!important;" class="btn bg-olive active"><input type="radio"  name="opcaoTipoConsulta" id="tipoOrientacoes" autocomplete="off" value="m" /> PROP. MELHORIA</label><br>
+						<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="btn bg-yellow active efeito-grow"><input type="radio" checked="" name="opcaoTipoConsulta" id="tipoProcesso" autocomplete="off" value="p" /> PROCESSOS</label><br>
+						<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="btn bg-yellow active efeito-grow"><input type="radio"  name="opcaoTipoConsulta" id="tipoItens" autocomplete="off" value="i" /> ITENS</label><br>
+						<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="btn bg-yellow active efeito-grow"><input type="radio"  name="opcaoTipoConsulta" id="tipoOrientacoes" autocomplete="off" value="o" /> ORIENTAÇÕES</label><br>
+						<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="btn bg-yellow active efeito-grow"><input type="radio"  name="opcaoTipoConsulta" id="tipoOrientacoes" autocomplete="off" value="m" /> PROP. MELHORIA</label><br>
 					</div>
 				</div>
 				<div style="display: flex;align-items: center;">
@@ -204,9 +204,9 @@
 			const anoq = ano.length-1;
 			$.each(ano.sort().reverse(), function(i,val){
 				if(i == anoq){
-					$('<label style="border:none!important;border-radius:0!important;" class="btn bg-olive "><input type="radio" name="opcaoAno" id="option_b'+i+'" autocomplete="off" value="'+val+'" />'+val+'</label><br>').prependTo('#opcoesAno');
+					$('<label style="border:none!important;border-radius:10px!important;margin-left:1px;" class="efeito-grow btn bg-blue "><input type="radio" name="opcaoAno" id="option_b'+i+'" autocomplete="off" value="'+val+'" />'+val+'</label><br>').prependTo('#opcoesAno');
 				}else{
-					$('<label style="border:none!important;border-radius:0!important;" class="btn bg-olive"><input type="radio" name="opcaoAno" id="option_b'+i+'" autocomplete="off" value="'+val+'" />'+val+'</label><br>').prependTo('#opcoesAno');
+					$('<label style="border:none!important;border-radius:10px!important;margin-left:1px;" class="efeito-grow btn bg-blue"><input type="radio" name="opcaoAno" id="option_b'+i+'" autocomplete="off" value="'+val+'" />'+val+'</label><br>').prependTo('#opcoesAno');
 				}
 			})
 

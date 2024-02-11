@@ -41,7 +41,7 @@
 	<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
 
 
-	<cffunction name="consultaIndicadorPRCI"   access="remote" hint="gera a consulta para página de indicadores">
+	<cffunction name="consultaIndicadorPRCI_diario"   access="remote" hint="gera a consulta para página de indicadores">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 
@@ -181,11 +181,11 @@
 
 	</cffunction>
 
-	<cffunction name="tabPRCIDetalhe" access="remote" hint="outra função que utiliza tabIndicadores">
+	<cffunction name="tabPRCIDetalhe_diario" access="remote" hint="outra função que utiliza tabIndicadores">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
-    	<cfset var resultado = consultaIndicadorPRCI(ano=arguments.ano, mes=arguments.mes)>
+    	<cfset var resultado = consultaIndicadorPRCI_diario(ano=arguments.ano, mes=arguments.mes)>
 
       
 		<cfset totalDP = 0 /> 
@@ -215,10 +215,10 @@
 		</cfloop>
 
 		<style>
-.dataTables_wrapper {
-    width: 100%; /* ou a largura desejada */
-    margin: 0 auto;
-}
+			.dataTables_wrapper {
+				width: 100%; /* ou a largura desejada */
+				margin: 0 auto;
+			}
 		</style>
 	
 
@@ -455,7 +455,7 @@
 
 	</cffunction>
 
-	<cffunction name="consultaIndicadorSLNC"   access="remote" hint="gera a consulta para página de indicadores">
+	<cffunction name="consultaIndicadorSLNC_diario"   access="remote" hint="gera a consulta para página de indicadores">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 
@@ -651,15 +651,11 @@
 	</cffunction>
 
 
-
-
-	
-
-	<cffunction name="tabSLNCDetalhe" access="remote" hint="outra função que utiliza tabIndicadores">
+	<cffunction name="tabSLNCDetalhe_diario" access="remote" hint="outra função que utiliza tabIndicadores">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
-    	<cfset var resultadoSLNC = consultaIndicadorSLNC(ano=arguments.ano, mes=arguments.mes)>
+    	<cfset var resultadoSLNC = consultaIndicadorSLNC_diario(ano=arguments.ano, mes=arguments.mes)>
 
 		<cfset totalSolucionado = 0 /> 
 		<cfset orgaos = {}> <!-- Define a variável orgaos como um objeto vazio -->
@@ -877,6 +873,8 @@
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
 
+				
+
 				// Inicializa a tabela para ser ordenável pelo plugin DataTables
 				$('#tabResumoSLNC').DataTable({
 					order: [[3, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
@@ -885,6 +883,8 @@
        				info: false, // Remove a exibição da quantidade de registros
 					searching: false // Remove o campo de busca
 				});
+
+
 			});
 		</script>
 
@@ -892,12 +892,12 @@
 
 
 
-	<cffunction name="resultadoDGCI" access="remote" hint="outra função que utiliza tabIndicadores">
+	<cffunction name="resultadoDGCI_diario" access="remote" hint="outra função que utiliza tabIndicadores">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 
-		<cfset var resultadoPRCI = consultaIndicadorPRCI(ano=arguments.ano, mes=arguments.mes)>
-    	<cfset var resultadoSLNC = consultaIndicadorSLNC(ano=arguments.ano, mes=arguments.mes)>
+		<cfset var resultadoPRCI = consultaIndicadorPRCI_diario(ano=arguments.ano, mes=arguments.mes)>
+    	<cfset var resultadoSLNC = consultaIndicadorSLNC_diario(ano=arguments.ano, mes=arguments.mes)>
 
 		
 
@@ -971,21 +971,47 @@
 			</div>	
 			
 
-			<div class="col-12">
+			<div id ="divResultados" class="col-12">
 				<div class="row " style="display: flex; justify-content: center;margin-bottom:10px">
 					<i class="fa-solid fa-angles-up" style="font-size:40px;"></i>
-					
 				</div>
 				<div class="row " style="display: flex; justify-content: center;">
 					<div id="divResultadoPRCI" class="col-md-5 col-sm-5 col-12 "></div>
 					<div id="divResultadoSLNC" class="col-md-5 col-sm-5 col-12 "></div>
+				
+					
 				</div>
+
+				<div id="divTabDGCIorgaos" class="row" style="display: flex; justify-content: center;">
+					<div style="width: 500px; margin: 0 auto;">
+						<table id="tabDGCIorgaos" class="table table-bordered table-striped text-nowrap" style="width:100%; cursor:pointer">
+							<thead style="background: ##17a2b8; color: ##fff; text-align: center;">
+								<tr style="font-size:14px">
+									<th colspan="4" style="padding:5px!important;">DGCI por Órgãos</th>
+								</tr>
+								<tr style="font-size:14px">
+									<th>Órgão</th>
+									<th>PRCI</th>
+									<th>SLNC</th>
+									<th>DGCI</th>
+								</tr>
+							</thead>
+							<tbody id="theadTableBody">
+								<!-- Aqui serão inseridas as linhas da tabela via jQuery -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+
 			</div>
 
 		</cfoutput>
 
+		
+		
 		<script language="JavaScript">
 			$(document).ready(function(){
+
 				$(".content-wrapper").css("height", "auto");
 				var divResultPRCI = $("#divResultPRCI");
 				var divResultadoPRCI = $("#divResultadoPRCI");
@@ -997,6 +1023,94 @@
 
 				divResultPRCI.html("")
 				divResultSLNC.html("")
+
+				// Função para calcular o DGCI
+				function calcularDGCI() {
+					// Selecionar todas as linhas da tabela tabResumoPRCI
+					var prciRows = $('#tabResumoPRCI tbody tr');
+					// Selecionar todas as linhas da tabela tabResumoSLNC
+					var slncRows = $('#tabResumoSLNC tbody tr');
+					// Selecionar a thead da tabela tabDGCIorgaos
+					var theadTable = $('#theadTableBody');
+					var hasData = false; // Definir hasData como falso por padrão
+
+					theadTable.empty(); // Limpar os dados da tabela tabDGCIorgaos antes de preencher
+
+					var allOrgaos = {}; // Objeto para armazenar dados de todos os órgãos
+
+					// Preencher allOrgaos com dados da tabela tabResumoPRCI
+					prciRows.each(function() {
+						var orgao = $(this).find('td:first').text().trim(); // Nome do órgão
+						var prci = parseFloat($(this).find('td:eq(3)').text().replace('%', '').replace(',', '.').trim()); // Valor do PRCI
+
+						allOrgaos[orgao] = { 'PRCI': prci }; // Armazenar nome do órgão e PRCI
+					});
+
+					// Preencher allOrgaos com dados da tabela tabResumoSLNC
+					slncRows.each(function() {
+						var orgao = $(this).find('td:first').text().trim(); // Nome do órgão
+						var slnc = parseFloat($(this).find('td:eq(3)').text().replace('%', '').replace(',', '.').trim()); // Valor do SLNC
+
+						// Verificar se o órgão já existe em allOrgaos
+						if (allOrgaos[orgao]) {
+							allOrgaos[orgao]['SLNC'] = slnc; // Adicionar SLNC ao órgão existente
+						} else {
+							allOrgaos[orgao] = { 'SLNC': slnc }; // Criar um novo órgão com SLNC
+						}
+					});
+
+					// Preencher a terceira tabela com os dados calculados
+					$.each(allOrgaos, function(orgao, data) {
+						var prci = data['PRCI'] || 0; // PRCI do órgão, se não houver, definir como 0
+						var slnc = data['SLNC'] || 0; // SLNC do órgão, se não houver, definir como 0
+						var dgci = (prci * 0.40) + (slnc * 0.60); // Calcular o DGCI
+
+						// Construir uma nova linha com os dados calculados
+						var newRow = '<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"><td>' + orgao + '</td>' +
+							'<td>' + prci.toFixed(1).replace('.', ',') + '%</td>' +
+							'<td>' + slnc.toFixed(1).replace('.', ',') + '%</td>' +
+							'<td>' + dgci.toFixed(1).replace('.', ',') + '%</td></tr>';
+
+						theadTable.append(newRow); // Adicionar nova linha à tabela tabDGCIorgaos
+						hasData = true; // Atualizar hasData para verdadeiro se houver dados
+					});
+
+					// Classificar as linhas da terceira tabela por DGCI decrescente
+					var rows = theadTable.find('tr').get();
+					rows.sort(function(a, b) {
+						var dgciA = parseFloat($(a).find('td:eq(3)').text()); // DGCI da linha A
+						var dgciB = parseFloat($(b).find('td:eq(3)').text()); // DGCI da linha B
+						return dgciB - dgciA; // Ordenar de forma decrescente
+					});
+					$.each(rows, function(index, row) {
+						theadTable.append(row); // Adicionar linhas classificadas à tabela tabDGCIorgaos
+					});
+
+					// Exibir à tabela tabDGCIorgaos se houver dados, caso contrário, ocultá-la
+					if (hasData) {
+						$('#tabDGCIorgaos').show();
+					} else {
+						$('#tabDGCIorgaos').hide();
+					}
+				}
+
+
+				calcularDGCI();
+
+				// Inicializa a tabela para ser ordenável pelo plugin DataTables
+				const tabDGCIorgaosResumo = $('#tabDGCIorgaos').DataTable({
+					destroy: true, // Destruir a tabela antes de recriá-la
+					order: [[3, 'desc']], // Define a ordem inicial pela coluna DGCI em ordem decrescente
+					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
+					paging: false, // Remove a paginação
+					info: false, // Remove a exibição da quantidade de registros
+					searching: false // Remove o campo de busca
+				});	
+
+				
+
+
+				
 
 
 			});

@@ -431,37 +431,41 @@
         });
 
 
-    // Obtem a URL atual da janela
-    const url = window.location;
+        // Obtem a URL atual da janela
+        const url = window.location;
 
-    // Seleciona todos os links dentro dos elementos com a classe 'nav-item'
-    const allLinks = document.querySelectorAll('.nav-item a');
+        // Seleciona todos os links dentro dos elementos com a classe 'nav-item'
+        const allLinks = document.querySelectorAll('.nav-item a');
 
-    // Filtra os links para encontrar o link que possui o mesmo 'href' da URL atual
-    const currentLink = [...allLinks].filter(link => link.href === url.href);
+        // Filtra os links para encontrar o link que possui o mesmo 'href' da URL atual
+        const currentLink = [...allLinks].filter(link => link.href === url.href);
 
-    // Verifica se encontrou algum link correspondente
-    if (currentLink.length > 0) {
-      // Adiciona a classe 'active' ao link encontrado para destacá-lo como ativo
-      currentLink[0].classList.add("active");
+        // Verifica se encontrou algum link correspondente
+        if (currentLink.length > 0) {
+          // Adiciona a classe 'active' ao link encontrado para destacá-lo como ativo
+          currentLink[0].classList.add("active");
 
-      // Verifica se o link está dentro de um elemento com a classe 'nav-treeview'
-      if (currentLink[0].closest(".nav-treeview")) {
-        // Se sim, exibe esse elemento (caso estivesse oculto)
-        currentLink[0].closest(".nav-treeview").style.display = "block";
-      }
+          // Itera sobre os elementos pai e os expande
+          let parent = currentLink[0].closest(".nav-treeview");
+          while (parent) {
+            parent.style.display = "block";
+            parent = parent.parentElement.closest(".nav-treeview");
+          }
 
-      // Verifica se o link está dentro de um elemento com a classe 'has-treeview'
-      if (currentLink[0].closest(".has-treeview")) {
-        // Se sim, adiciona a classe 'active' ao elemento para indicar que está ativo
-        currentLink[0].closest(".has-treeview").classList.add("active");
-      }
-    } else {
-      // Caso não encontre nenhum link correspondente na navegação, redireciona para uma página de acesso negado.
-      if (url.pathname.toLowerCase() !== '/snci/snci_processos/index.cfm') {
-        window.location.href = "sem_acesso_pagina.html?pagina=" + url.pathname;  
-      }
-    }
+          // Verifica se o link está dentro de um elemento com a classe 'has-treeview'
+          if (currentLink[0].closest(".has-treeview")) {
+            // Se sim, adiciona a classe 'active' ao elemento para indicar que está ativo
+            currentLink[0].closest(".has-treeview").classList.add("active");
+          }
+        } else {
+          // Caso não encontre nenhum link correspondente na navegação, redireciona para uma página de acesso negado.
+          if (url.pathname.toLowerCase() !== '/snci/snci_processos/index.cfm') {
+            window.location.href = "sem_acesso_pagina.html?pagina=" + url.pathname;  
+          }
+        }
+
+
+
 
 
     <cfoutput>
