@@ -330,9 +330,9 @@
 							<cfset totalOrgaosResp = StructCount(orgaos)> <!-- Conta a quantidade de orgaoResp -->
 							
 						    <cfif totalOrgaosResp gt 1>
-								<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap" style="width:500px; margin-top:30px;cursor:pointer">
+								<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap shadow" style="width:500px; margin-top:30px;cursor:pointer">
 									<cfoutput>
-										<thead style="background: ##489b72;color:##fff;text-align: center;">
+										<thead style="background: ##0083ca;color:##fff;text-align: center;">
 											<tr style="font-size:14px">
 												<th colspan="4" style="padding:5px!important;">RESUMO</th>
 											</tr>
@@ -690,12 +690,12 @@
 						<cfif #resultadoSLNC.recordcount# eq 0 >
 							<h5 align="center">Nenhuma informação foi localizada para o cálculo do SLNC do órgão <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput>.</h5>
 						<cfelse>
-							<cfoutput><h5 style="color:##2581c8;text-align: center;">Dados utilizados no cálculo do <strong>SLNC</strong> (Solução de Não Conformidades): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+							<cfoutput><h5 style="color:##489b72;text-align: center;">Dados utilizados no cálculo do <strong>SLNC</strong> (Solução de Não Conformidades): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
 						
 							<div class="table-responsive">
 								<table id="tabSLNCdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
 									
-									<thead style="background: #0083ca;color:#fff">
+									<thead style="background: #489b72;color:#fff">
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
 											<th style="width: 10px">Órgão Avaliado</th>
@@ -778,7 +778,7 @@
 							<cfset totalOrgaosResp = StructCount(orgaos)> 
 							
 						    <cfif totalOrgaosResp gt 1>
-								<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap" style="width:500px; margin-top:30px;cursor:pointer">
+								<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap shadow" style="width:500px; margin-top:30px;cursor:pointer">
 									<cfoutput>
 										<thead style="background: ##489b72;color:##fff;text-align: center;">
 											<tr style="font-size:14px">
@@ -984,16 +984,16 @@
 
 				<div id="divTabDGCIorgaos" class="row" style="display: flex; justify-content: center;">
 					<div style="width: 500px; margin: 0 auto;">
-						<table id="tabDGCIorgaos" class="table table-bordered table-striped text-nowrap" style="width:100%; cursor:pointer">
+						<table id="tabDGCIorgaos" class="table table-bordered table-striped text-nowrap shadow" style="width:100%; cursor:pointer">
 							<thead style="background: ##17a2b8; color: ##fff; text-align: center;">
 								<tr style="font-size:14px">
 									<th colspan="4" style="padding:5px!important;">DGCI por Órgãos</th>
 								</tr>
 								<tr style="font-size:14px">
-									<th>Órgão</th>
-									<th>PRCI</th>
-									<th>SLNC</th>
-									<th>DGCI</th>
+									<th style="padding: 10px;">Órgão</th>
+									<th style="padding: 10px;">PRCI</th>
+									<th style="padding: 10px;">SLNC</th>
+									<th style="padding: 10px;">DGCI</th>
 								</tr>
 							</thead>
 							<tbody id="theadTableBody">
@@ -1002,7 +1002,6 @@
 						</table>
 					</div>
 				</div>
-
 			</div>
 
 		</cfoutput>

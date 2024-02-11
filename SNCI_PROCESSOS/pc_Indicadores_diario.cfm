@@ -21,6 +21,9 @@
 			.swal2-label{
 				text-align:justify;
 			}
+			* {
+				caret-color: transparent;
+			}
 		</style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
