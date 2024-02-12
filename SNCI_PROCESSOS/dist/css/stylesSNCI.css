@@ -243,4 +243,15 @@ td{
     border-radius:15px;
     padding: 10px;  
     font-weight: normal;
-}           
+}      
+
+.scrollTopBtn {
+    display: none;
+    position: fixed;
+    bottom: 60px;
+    right: 10px;
+    z-index: 99;
+    border: none;
+    background: none;
+    color:#6c757d;
+}

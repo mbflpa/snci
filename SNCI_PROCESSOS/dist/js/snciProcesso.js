@@ -522,3 +522,18 @@ function initializeSearchPanesAndSidebar(tableSelector, alteraPlaceholder) {
 
     
 }	
+
+// Mostra ou esconde o botão conforme a posição do scroll
+$(window).scroll(function(){
+    if ($(this).scrollTop() > 100) {
+        $('#scrollTopBtn').fadeIn();
+    } else {
+        $('#scrollTopBtn').fadeOut();
+    }
+});
+
+// Scroll suave ao clicar no botão
+$('#scrollTopBtn').click(function(){
+    $('html, body').animate({scrollTop : 0},800);
+    return false;
+});

@@ -17,4 +17,7 @@
 	<div class="float-right d-none d-sm-block">
 		SNCI &copy; 2023 - Versão <b>1.1.1</b>
 	</div>
+	<button id="scrollTopBtn" class="scrollTopBtn" title="Voltar ao Topo">
+		<i class="fas fa-circle-arrow-up fa-3x grow-icon" ></i>
+	</button>
 </footer>
