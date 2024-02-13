@@ -26,7 +26,7 @@
                         <div class="card-body">
                             <h5>Novidades:</h5>
                             <ul>
-                                <li>Criadas as Consultas dos Indicadores: Acompanhamento e Mensal para os Órgãos Avaliados;</li>
+                                <li>Criadas as Consultas dos Indicadores (Acompanhamento e Mensal), para os Órgãos Avaliados;</li>
                                 <li>Criada a Consulta Indicador Mensal para o Controle Interno;</li>
                             </ul>
 

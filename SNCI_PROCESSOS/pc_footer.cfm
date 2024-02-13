@@ -15,7 +15,7 @@
 	</div>
 	CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno 
 	<div class="float-right d-none d-sm-block">
-		SNCI &copy; 2023 - Versão <b>1.1.1</b>
+		SNCI &copy; 2023 - Versão <b>1.1.2</b>
 	</div>
 	<button id="scrollTopBtn" class="scrollTopBtn" title="Voltar ao Topo">
 		<i class="fas fa-circle-arrow-up fa-3x grow-icon" ></i>
