@@ -14,7 +14,31 @@
     <section class="content" style="margin-bottom:50px;position:relative; top:-20px">
         <div class="row" >
             <div class="col-12" id="accordion">
-            <div class="card card-primary card-outline">
+                <div class="card card-primary card-outline">
+                    <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
+                        <div class="card-header">
+                            <h4 class="card-title w-100">
+                                Versão 1.1.2 - 13/02/2024
+                            </h4>
+                        </div>
+                    </a>
+                    <div id="collapseOne" class="collapse show" data-parent="#accordion">
+                        <div class="card-body">
+                            <h5>Novidades:</h5>
+                            <ul>
+                                <li>Criadas as Consultas dos Indicadores: Acompanhamento e Mensal para os Órgãos Avaliados;</li>
+                                <li>Criada a Consulta Indicador Mensal para o Controle Interno;</li>
+                            </ul>
+
+                            <h5>Melhorias:</h5>
+                            <ul>
+                                <li>Modificada a aparência dos botões de opção para as consultas;</li> 
+                                <li>Adicionado botão para retornar ao topo das páginas;</li>  
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-primary card-outline">
                     <a class="d-block w-100" data-toggle="collapse" href="#collapseOne">
                         <div class="card-header">
                             <h4 class="card-title w-100">
@@ -22,7 +46,7 @@
                             </h4>
                         </div>
                     </a>
-                    <div id="collapseOne" class="collapse show" data-parent="#accordion">
+                    <div id="collapseOne" class="collapse" data-parent="#accordion">
                         <div class="card-body">
                             <h5>Novidades:</h5>
                             <ul>
