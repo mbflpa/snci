@@ -196,7 +196,7 @@
 			// Percorrer o array de anos, ordenar em ordem decrescente e criar os elementos HTML para os botões de rádio
 			$.each(ano.sort().reverse(), function (i, val) {
 				const checkedClass = i === anoq ? " active" : "";
-				const radioHTML = `<label style="border:none!important;border-radius:0!important;" class="btn bg-olive${checkedClass}">
+				const radioHTML = `<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="efeito-grow btn bg-yellow${checkedClass}">
 					<input type="radio" ${checkedClass ? 'checked=""' : ""} name="${radio_name}" id="option_b${i}" autocomplete="off" value="${val}" />${val}
 				</label><br>`;
 				$(radioHTML).prependTo("#opcoesAno");
