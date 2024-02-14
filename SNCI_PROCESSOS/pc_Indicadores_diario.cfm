@@ -21,8 +21,15 @@
 			.swal2-label{
 				text-align:justify;
 			}
-			* {
-				caret-color: transparent;
+			
+			hr{
+				display: block;
+				margin-top: 5em!important;
+				margin-bottom: 5em!important;
+				margin-left: auto!important;
+				margin-right: auto!important;
+				border-style: inset!important;
+				border-top: 3px solid rgba(0, 0, 0, 0.1)!important;
 			}
 		</style>
 </head>
@@ -58,13 +65,13 @@
 				
 				
 
-				<div id="divIndicadorDGCI" class="row mb-2" style="margin-top:20px;margin-bottom:50px!important;"></div>
+				<div id="divIndicadorDGCI"></div>
 
 				
-				<div id="divIndicadorPRCI" ></div>
+				<div id="divIndicadorPRCI"></div>
 					
 
-				<div id="divIndicadorSLNC" ></div>
+				<div id="divIndicadorSLNC"></div>
 
 				
 			</div>
@@ -80,14 +87,13 @@
     <script language="JavaScript">
     
         $(document).ready(function(){
-			
+			$(".content-wrapper").css("height", "auto");
+
 			// Obtém o ano atual
 			const currentYear = new Date().getFullYear();
 
 			// Obtém o mês atual
 			const currentMonth = new Date().getMonth() + 1;
-
-
 			
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {	
@@ -170,7 +176,8 @@
 					
 			}, 1000);
 
-
+			
+			
 			
 		});
 

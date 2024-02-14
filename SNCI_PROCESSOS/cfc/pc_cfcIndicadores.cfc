@@ -228,16 +228,16 @@
 				<div class="card" >
 					
 					<!-- card-body -->
-					<div class="card-body" style="margin-bottom:80px">
+					<div class="card-body" >
 						<cfif #resultado.recordcount# eq 0 >
 							<h5 align="center">Nenhuma informação foi localizada para o cálculo do PRCI do órgão <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput>.</h5>
 						<cfelse>
-							<cfoutput><h5 style="color:##2581c8;text-align: center;">Dados utilizados no cálculo do <strong>PRCI</strong> (Atendimento ao Prazo de Resposta): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+							<cfoutput><h5 style="color:##000;text-align: center;">Dados utilizados no cálculo do <strong>PRCI</strong> (Atendimento ao Prazo de Resposta): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
 						
 						    <div class="table-responsive">
 								<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
 									
-									<thead style="background: #0083ca;color:#fff">
+									<thead class="bg-gradient-warning">
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
 											<th style="width: 10px">Órgão Avaliado</th>
@@ -330,41 +330,44 @@
 							<cfset totalOrgaosResp = StructCount(orgaos)> <!-- Conta a quantidade de orgaoResp -->
 							
 						    <cfif totalOrgaosResp gt 1>
-								<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap shadow" style="width:500px; margin-top:30px;cursor:pointer">
-									<cfoutput>
-										<thead style="background: ##0083ca;color:##fff;text-align: center;">
-											<tr style="font-size:14px">
-												<th colspan="4" style="padding:5px!important;">RESUMO</th>
-											</tr>
-											<tr style="font-size:14px">
-												<th style="padding:5px!important;">Órgão</th>
-												<th style="padding:5px!important;">DP</th>
-												<th style="padding:5px!important;">FP</th>
-												<th style="padding:5px!important;">PRCI</th>
-											</tr>
-										</thead>
-										<tbody>
-											<cfset prcisOrdenado = StructSort(orgaos, "text", "asc")>
-											<cfloop array="#prcisOrdenado#" index="orgao">
-												<cfif orgaos[orgao] eq 0>
-													<cfset percentualDP = 0>
-												<cfelse>
-													<cfset percentualDP = (dps[orgao] / orgaos[orgao]) * 100>
-												</cfif>
-												<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") >
+								<div id="divTabResumoPRCI" class="table-responsive">
+									<div style="width: 350px; margin: 0 auto;">
+										<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap " style="width:100%; cursor:pointer">
+											<cfoutput>
+												<thead class="bg-gradient-warning" style="text-align: center;">
+													<tr style="font-size:14px">
+														<th colspan="4" style="padding:5px">PRCI</th>
+													</tr>
+													<tr style="font-size:14px">
+														<th >Órgão</th>
+														<th >DP</th>
+														<th >FP</th>
+														<th >PRCI</th>
+													</tr>
+												</thead>
+												<tbody>
+													<cfset prcisOrdenado = StructSort(orgaos, "text", "asc")>
+													<cfloop array="#prcisOrdenado#" index="orgao">
+														<cfif orgaos[orgao] eq 0>
+															<cfset percentualDP = 0>
+														<cfelse>
+															<cfset percentualDP = (dps[orgao] / orgaos[orgao]) * 100>
+														</cfif>
+														<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") >
 
-												<!--- Adiciona cada linha à tabela --->
-												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-													<td>#orgao#</td>
-													<td>#dps[orgao]#</td>
-													<td>#fps[orgao]#</td>
-													<td>#percentualDPFormatado#%</td>
-												</tr>
-											</cfloop>
-										</tbody>
-									</cfoutput>
-								</table>
-
+														<!--- Adiciona cada linha à tabela --->
+														<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+															<td>#orgao#</td>
+															<td>#dps[orgao]#</td>
+															<td>#fps[orgao]#</td>
+															<td>#percentualDPFormatado#%</td>
+														</tr>
+													</cfloop>
+												</tbody>
+											</cfoutput>
+										</table>
+									</div>
+								</div>
 														 
    
 	
@@ -441,14 +444,18 @@
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
 				// Inicializa a tabela para ser ordenável pelo plugin DataTables
+				// Inicializa a tabela para ser ordenável pelo plugin DataTables
 				$('#tabResumoPRCI').DataTable({
 					order: [[3, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
 					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
 					paging: false, // Remove a paginação
-       				info: false, // Remove a exibição da quantidade de registros
+					info: false, // Remove a exibição da quantidade de registros
 					searching: false // Remove o campo de busca
 				});
 
+
+				
+				
 				
 			});
 		</script>
@@ -686,16 +693,16 @@
 				<div class="card" >
 					
 					<!-- card-body -->
-					<div class="card-body" style="margin-bottom:80px">
+					<div class="card-body" >
 						<cfif #resultadoSLNC.recordcount# eq 0 >
 							<h5 align="center">Nenhuma informação foi localizada para o cálculo do SLNC do órgão <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput>.</h5>
 						<cfelse>
-							<cfoutput><h5 style="color:##489b72;text-align: center;">Dados utilizados no cálculo do <strong>SLNC</strong> (Solução de Não Conformidades): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+							<cfoutput><h5 style="color:##000;text-align: center;">Dados utilizados no cálculo do <strong>SLNC</strong> (Solução de Não Conformidades): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
 						
 							<div class="table-responsive">
 								<table id="tabSLNCdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
 									
-									<thead style="background: #489b72;color:#fff">
+									<thead class="bg-gradient-warning">
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
 											<th style="width: 10px">Órgão Avaliado</th>
@@ -778,37 +785,39 @@
 							<cfset totalOrgaosResp = StructCount(orgaos)> 
 							
 						    <cfif totalOrgaosResp gt 1>
-								<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap shadow" style="width:500px; margin-top:30px;cursor:pointer">
-									<cfoutput>
-										<thead style="background: ##489b72;color:##fff;text-align: center;">
-											<tr style="font-size:14px">
-												<th colspan="4" style="padding:5px!important;">RESUMO</th>
-											</tr>
-											<tr style="font-size:14px">
-												<th style="padding:5px!important;">Órgão</th>
-												<th style="padding:5px!important;">Solucionadas</th>
-												<th style="padding:5px!important;">Total de Orientações</th>
-												<th style="padding:5px!important;">SLNC</th>
-											</tr>
-										</thead>
-										<tbody>
-											
-											<cfset slncOrdenado = StructSort(orgaos, "text", "asc")>
-											<cfloop array="#slncOrdenado#" index="orgao">
-												<cfset percentualSolucionado = (solucionados[orgao] / orgaos[orgao]) * 100>
-												<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
-
-												<!--- Adiciona cada linha à tabela --->
-												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-													<td>#orgao#</td>
-													<td>#solucionados[orgao]#</td>
-													<td>#orgaos[orgao]#</td>
-													<td>#percentualSolucionadoFormatado#%</td>
+								<div id="divTabResumoSLNC" class="table-responsive">
+									<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap" style="width:350px; cursor:pointer">
+										<cfoutput>
+											<thead class="bg-gradient-warning" style="text-align: center;">
+												<tr style="font-size:14px">
+													<th colspan="4" style="padding:5px">SLNC</th>
 												</tr>
-											</cfloop>
-										</tbody>
-									</cfoutput>
-								</table>
+												<tr style="font-size:14px">
+													<th >Órgão</th>
+													<th >Solucionadas</th>
+													<th >Qt.Orientações</th>
+													<th >SLNC</th>
+												</tr>
+											</thead>
+											<tbody>
+												
+												<cfset slncOrdenado = StructSort(orgaos, "text", "asc")>
+												<cfloop array="#slncOrdenado#" index="orgao">
+													<cfset percentualSolucionado = (solucionados[orgao] / orgaos[orgao]) * 100>
+													<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
+
+													<!--- Adiciona cada linha à tabela --->
+													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+														<td>#orgao#</td>
+														<td>#solucionados[orgao]#</td>
+														<td>#orgaos[orgao]#</td>
+														<td>#percentualSolucionadoFormatado#%</td>
+													</tr>
+												</cfloop>
+											</tbody>
+										</cfoutput>
+									</table>
+								</div>
 
 	
 							</cfif>
@@ -872,18 +881,14 @@
 
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
-
-				
-
 				// Inicializa a tabela para ser ordenável pelo plugin DataTables
 				$('#tabResumoSLNC').DataTable({
 					order: [[3, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
 					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
 					paging: false, // Remove a paginação
-       				info: false, // Remove a exibição da quantidade de registros
+					info: false, // Remove a exibição da quantidade de registros
 					searching: false // Remove o campo de busca
 				});
-
 
 			});
 		</script>
@@ -949,59 +954,97 @@
 			<div align="center" class="col-md-12 col-sm-12 col-12 mx-auto" style="margin-bottom:20px">
 				<span class="info-box-text" style="font-size:40px">#monthAsString(arguments.mes)#/#arguments.ano#</span>
 			</div>	
-			<div id="divResultadoDGCI" class="col-md-5 col-sm-5 col-12 mx-auto">
-				<div class="info-box bg-info">
-					<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
-					<div class="info-box-content">
-						<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI</strong></font></font></span>
-						<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDGCIformatado#%</strong></font></font></span>
+			<div class="row" style="width: 100%;">	
+				<div class="col-12">
+					<div class="card" >
+						<!-- card-body -->
+						<div class="card-body shadow" style="border: 2px solid ##34a2b7">
+						    <h5 style="text-align: center; margin-bottom:20px">RESULTADO GERAL DO ÓRGÃO <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></h5>
+							<div id="divResultadoDGCI" class="col-md-5 col-sm-5 col-12 mx-auto">
+								<div class="info-box bg-info">
+									<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
-						<div class="progress">
-							<div class="progress-bar" style="width: #percentualDGCI#%"></div>
+									<div class="info-box-content">
+										<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI</strong></font></font></span>
+										<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDGCIformatado#%</strong></font></font></span>
+
+										<div class="progress">
+											<div class="progress-bar" style="width: #percentualDGCI#%"></div>
+										</div>
+										<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+											<span style="font-size:14px">DGCI = (PRCI*0,40) + (SLNC*0,60)</span><br>
+										</font></font></span>
+									</div>
+									<!-- /.info-box-content -->
+								</div>
+							
+							
+							</div>	
+							<div class="col-12">
+								
+								<div class="row " style="display: flex; justify-content: center;margin-bottom:10px">
+									<i class="fa-solid fa-angles-up" style="font-size:40px;"></i>
+								</div>
+
+								<div class="row " style="display: flex; justify-content: center;">
+									
+									<div id="divResultadoPRCI" class="col-md-5 col-sm-5 col-12 "></div>
+									<div id="divResultadoSLNC" class="col-md-5 col-sm-5 col-12 "></div>
+								</div>
+							</div>
 						</div>
-						<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-							<span style="font-size:14px">DGCI = (PRCI*0,40) + (SLNC*0,60)</span><br>
-						</font></font></span>
+						<!-- /.card-body -->
 					</div>
-					<!-- /.info-box-content -->
+					<!-- /.card -->
 				</div>
-			
-			
-			</div>	
-			
+				<!-- /.col -->
+			</div>
 
-			<div id ="divResultados" class="col-12">
-				<div class="row " style="display: flex; justify-content: center;margin-bottom:10px">
-					<i class="fa-solid fa-angles-up" style="font-size:40px;"></i>
-				</div>
-				<div class="row " style="display: flex; justify-content: center;">
-					<div id="divResultadoPRCI" class="col-md-5 col-sm-5 col-12 "></div>
-					<div id="divResultadoSLNC" class="col-md-5 col-sm-5 col-12 "></div>
-				
-					
-				</div>
-
-				<div id="divTabDGCIorgaos" class="row" style="display: flex; justify-content: center;">
-					<div style="width: 500px; margin: 0 auto;">
-						<table id="tabDGCIorgaos" class="table table-bordered table-striped text-nowrap shadow" style="width:100%; cursor:pointer">
-							<thead style="background: ##17a2b8; color: ##fff; text-align: center;">
-								<tr style="font-size:14px">
-									<th colspan="4" style="padding:5px!important;">DGCI por Órgãos</th>
-								</tr>
-								<tr style="font-size:14px">
-									<th style="padding: 10px;">Órgão</th>
-									<th style="padding: 10px;">PRCI</th>
-									<th style="padding: 10px;">SLNC</th>
-									<th style="padding: 10px;">DGCI</th>
-								</tr>
-							</thead>
-							<tbody id="theadTableBody">
-								<!-- Aqui serão inseridas as linhas da tabela via jQuery -->
-							</tbody>
-						</table>
+			<div id ="divResultadosRow" class="row" style="width: 100%;">	
+				<div class="col-12">
+					<div class="card" >
+						<!-- card-body -->
+						<div class="card-body" >
+							<h5 style="text-align: center; margin-bottom:20px">RESULTADO POR ORGÃOS</h5>
+							<div id ="divResultados" class="col-12">
+								<div id="divTabResumoIndicadores" >
+									<div id="divTabDGCIorgaos" class="row" style="display: flex; justify-content: center;">
+										<div style="width: 500px; margin: 0 auto;">
+											<table id="tabDGCIorgaos" class="table table-bordered table-striped text-nowrap" style="width:100%; cursor:pointer">
+												<thead style="background: ##17a2b8; color: ##fff; text-align: center;">
+													<tr style="font-size:14px;">
+														<th colspan="4" style="padding:5px">DGCI</th>
+													</tr>
+													<tr style="font-size:14px">
+														<th >Órgão</th>
+														<th >PRCI</th>
+														<th >SLNC</th>
+														<th >DGCI</th>
+													</tr>
+												</thead>
+												<tbody id="theadTableBody">
+													<!-- Aqui serão inseridas as linhas da tabela via jQuery -->
+												</tbody>
+											</table>
+										</div>
+									</div>
+									
+									<div class="row " style="display: flex; justify-content: center;margin-top:10px;margin-bottom:5px">
+										<i class="fa-solid fa-angles-up" style="font-size:40px;"></i>
+									</div>
+									<div class="row " style="display: flex; justify-content: center;">
+										<div id="divTabPRCIorgaos" class="row" class="col-md-6 col-sm-6 col-12 " style="margin-right: 50px;"></div>
+										<div id="divTabSLNCorgaos" class="row" class="col-md-6 col-sm-6 col-12 "></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<!-- /.card-body -->
 					</div>
+					<!-- /.card -->
 				</div>
+				<!-- /.col -->
 			</div>
 
 		</cfoutput>
@@ -1020,8 +1063,19 @@
 				var divResultadoSLNC = $("#divResultadoSLNC");
 				divResultadoSLNC.html(divResultSLNC.html());
 
+
+				var divResumoPRCI = $("#divTabResumoPRCI");
+				var divTabPRCIorgaos = $("#divTabPRCIorgaos");
+				divTabPRCIorgaos.html(divResumoPRCI.html());
+				
+				var divResumoSLNC = $("#divTabResumoSLNC");
+				var divTabSLNCorgaos = $("#divTabSLNCorgaos");
+				divTabSLNCorgaos.html(divResumoSLNC.html());
+				
 				divResultPRCI.html("")
 				divResultSLNC.html("")
+				divResumoPRCI.html("")
+				divResumoSLNC.html("")
 
 				// Função para calcular o DGCI
 				function calcularDGCI() {
@@ -1087,9 +1141,9 @@
 
 					// Exibir à tabela tabDGCIorgaos se houver dados, caso contrário, ocultá-la
 					if (hasData) {
-						$('#tabDGCIorgaos').show();
+						$('#divResultadosRow').show();
 					} else {
-						$('#tabDGCIorgaos').hide();
+						$('#divResultadosRow').hide();
 					}
 				}
 

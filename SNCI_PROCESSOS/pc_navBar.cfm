@@ -1,7 +1,7 @@
 	<cfprocessingdirective pageencoding = "utf-8">
 	<!-- Navbar -->
 		
-		<nav class="main-header navbar navbar-expand navbar-light " style="background-color:#FFC20E;height:56px;box-shadow: 0 7px 14px rgb(0 0 0 / 25%), 0 3px 6px rgb(0 0 0 / 22%) !important" >
+		<nav class="main-header navbar navbar-expand navbar-light shadow-sm" style="background-color:#FFC20E;height:56px;" >
 			<!-- Left navbar links -->
 			<ul class="navbar-nav " style="margin-bottom:16px;display: flex; justify-content: space-between;  width: 100%;">
 				<li class="nav-item" style="position:relative;top:5px">

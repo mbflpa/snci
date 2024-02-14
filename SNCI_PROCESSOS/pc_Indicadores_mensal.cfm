@@ -21,8 +21,15 @@
 			.swal2-label{
 				text-align:justify;
 			}
-			* {
-				caret-color: transparent;
+			
+			hr{
+				display: block;
+				margin-top: 5em!important;
+				margin-bottom: 5em!important;
+				margin-left: auto!important;
+				margin-right: auto!important;
+				border-style: inset!important;
+				border-top: 3px solid rgba(0, 0, 0, 0.1)!important;
 			}
 		</style>
 		
@@ -56,18 +63,18 @@
 		<!-- Main content -->
 		<section class="content">
 			<div class="container-fluid" >
+
 				<div style="display: flex;align-items: center;">
 					<span style="color:#0083ca;font-size:20px;margin-right:10px">Ano:</span>
 					<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
-                    
 				</div>
+
 				<div style="display: flex;align-items: center;">
-					
                     <span style="color:#0083ca;font-size:20px;margin-right:10px">Mês:</span>
                     <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
-				<div id="divIndicadorDGCI" class="row mb-2" style="margin-top:20px;margin-bottom:50px!important;"></div>
+				<div id="divIndicadorDGCI" ></div>
 
 
 				<div id="divIndicadorPRCI" ></div>
@@ -89,7 +96,7 @@
     <script language="JavaScript">
     
         $(document).ready(function(){
-			
+			$(".content-wrapper").css("height", "auto");
 			// Obtém o ano atual
 			const currentYear = new Date().getFullYear();
 
@@ -147,6 +154,7 @@
 				$('#opcoesMes').html(radioButtonsMes.join(''));
 			});
 
+			
 
             
         }); 
@@ -236,12 +244,6 @@
 
 					
 			}, 1000);
-		});
-
-		$(document).ready(function() {
-			$(".content-wrapper").css("height", "auto");
-		
-			
 		});
 
 
