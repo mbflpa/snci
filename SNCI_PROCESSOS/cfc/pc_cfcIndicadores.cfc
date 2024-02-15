@@ -406,7 +406,7 @@
 				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
 			
 				
-				var tituloExcel ="SNCI_Consulta_PRCI_Detalamento_";
+				var tituloExcel ="SNCI_Consulta_PRCI_detalhamento_";
 				var colunasMostrar = [1,2,8,10];
 
 
@@ -850,7 +850,7 @@
 				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
 			
 				
-				var tituloExcel ="SNCI_Consulta_SLNC_Detalamento_";
+				var tituloExcel ="SNCI_Consulta_SLNC_detalhamento_";
 				var colunasMostrar = [1,2,8,10];
 
 
