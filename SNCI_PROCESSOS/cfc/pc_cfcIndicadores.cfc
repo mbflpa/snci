@@ -63,13 +63,15 @@
 				pc_aval_posic_dataPrevistaResp as dataPrevista,
 				pc_aval_posic_status,
 				CASE
-					WHEN pc_aval_posic_dataPrevistaResp < GETDATE() THEN 'PENDENTE'
-					ELSE pc_orientacao_status.pc_orientacao_status_descricao
+					WHEN (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> <= GETDATE() and pc_aval_posic_dataPrevistaResp < <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">) 
+					OR (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> > GETDATE() and pc_aval_posic_dataPrevistaResp < GETDATE()) 
+					THEN 'PENDENTE'	ELSE pc_orientacao_status.pc_orientacao_status_descricao
 				END AS OrientacaoStatus,
 
 				CASE
-					WHEN pc_aval_posic_dataPrevistaResp < GETDATE() THEN 'FP'
-					ELSE 'DP'
+					WHEN (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> <= GETDATE() and pc_aval_posic_dataPrevistaResp < <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">) 
+					OR (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> > GETDATE() and pc_aval_posic_dataPrevistaResp < GETDATE()) 
+					THEN 'FP' ELSE 'DP'
 				END AS Prazo
 			FROM (
 				SELECT
@@ -181,6 +183,8 @@
 
 	</cffunction>
 
+
+
 	<cffunction name="tabPRCIDetalhe_diario" access="remote" hint="outra função que utiliza tabIndicadores">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
@@ -221,172 +225,171 @@
 			}
 		</style>
 	
-
-		<div class="row" style="width: 100%;">
+		<cfif #resultado.recordcount# neq 0 >	
+			<div class="row" style="width: 100%;">
+							
+				<div class="col-12">
+					<div class="card" >
 						
-			<div class="col-12">
-				<div class="card" >
-					
-					<!-- card-body -->
-					<div class="card-body" >
-						<cfif #resultado.recordcount# eq 0 >
-							<h5 align="center">Nenhuma informação foi localizada para o cálculo do PRCI do órgão <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput>.</h5>
-						<cfelse>
-							<cfoutput><h5 style="color:##000;text-align: center;">Dados utilizados no cálculo do <strong>PRCI</strong> (Atendimento ao Prazo de Resposta): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
-						
-						    <div class="table-responsive">
-								<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
-									
-									<thead class="bg-gradient-warning">
-										<tr style="font-size:14px">
-											<th style="width: 10px">Posic ID</th>
-											<th style="width: 10px">Órgão Avaliado</th>
-											<th style="width: 10px">Órgão Responsável</th>
-											<th style="width: 10px">Processo SNCI</th>
-											<th style="width: 10px">Item</th>
-											<th style="width: 10px">Orientação</th>
-											<th style="width: 10px">Data Prevista</th>
-											<th style="width: 10px">Data Status</th>
-											<th style="width: 10px">Status</th>
-											<th style="width: 10px">Data Ref.</th>
-											<th style="width: 10px">Prazo</th>
-
-										</tr>
-									</thead>
-									
-									<tbody>
-										<cfloop query="resultado" >
-										
-											<cfoutput>					
-												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-													<td>#resultado.pc_aval_posic_id#</td>
-													<td>#resultado.orgaoAvaliado#</td>
-													<td>#resultado.orgaoResp#</td>
-													<td>#resultado.numProcessoSNCI#</td>
-													<td >#resultado.item#</td>
-													<td>#resultado.orientacao#</td>
-													<cfif resultado.dataPrevista eq '1900-01-01' or resultado.dataPrevista eq ''>
-														<td>NÃO INF.</td>
-													<cfelse>
-														<td>#dateFormat(resultado.dataPrevista, 'dd/mm/yyyy')#</td>
-													</cfif>
-													<td>
+						<!-- card-body -->
+						<div class="card-body" >
 														
-														<cfif orgaoDaAcaoEdoControleInterno eq 'N' AND (resultado.pc_aval_posic_status eq 4 OR resultado.pc_aval_posic_status eq 5)>
-															#dateFormat(resultado.dataPosicao, 'dd/mm/yyyy')#<br><span style="color:red">(dt. distrib.)</span>
+								<cfoutput><h5 style="color:##000;text-align: center;">Dados utilizados no cálculo do <strong>PRCI</strong> (Atendimento ao Prazo de Resposta): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+							
+								<div class="table-responsive">
+									<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
+										
+										<thead class="bg-gradient-warning">
+											<tr style="font-size:14px">
+												<th style="width: 10px">Posic ID</th>
+												<th style="width: 10px">Órgão Avaliado</th>
+												<th style="width: 10px">Órgão Responsável</th>
+												<th style="width: 10px">Processo SNCI</th>
+												<th style="width: 10px">Item</th>
+												<th style="width: 10px">Orientação</th>
+												<th style="width: 10px">Data Prevista</th>
+												<th style="width: 10px">Data Status</th>
+												<th style="width: 10px">Status</th>
+												<th style="width: 10px">Data Ref.</th>
+												<th style="width: 10px">Prazo</th>
+
+											</tr>
+										</thead>
+										
+										<tbody>
+											<cfloop query="resultado" >
+											
+												<cfoutput>					
+													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+														<td>#resultado.pc_aval_posic_id#</td>
+														<td>#resultado.orgaoAvaliado#</td>
+														<td>#resultado.orgaoResp#</td>
+														<td>#resultado.numProcessoSNCI#</td>
+														<td >#resultado.item#</td>
+														<td>#resultado.orientacao#</td>
+														<cfif resultado.dataPrevista eq '1900-01-01' or resultado.dataPrevista eq ''>
+															<td>NÃO INF.</td>
 														<cfelse>
-															#dateFormat(resultado.dataPosicao, 'dd/mm/yyyy')#
+															<td>#dateFormat(resultado.dataPrevista, 'dd/mm/yyyy')#</td>
 														</cfif>
-													</td>
+														<td>
+															
+															<cfif orgaoDaAcaoEdoControleInterno eq 'N' AND (resultado.pc_aval_posic_status eq 4 OR resultado.pc_aval_posic_status eq 5)>
+																#dateFormat(resultado.dataPosicao, 'dd/mm/yyyy')#<br><span style="color:red">(dt. distrib.)</span>
+															<cfelse>
+																#dateFormat(resultado.dataPosicao, 'dd/mm/yyyy')#
+															</cfif>
+														</td>
 
 
-													<td>#resultado.OrientacaoStatus#</td>
-													<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
-													<td>#dateFormat(dataFinal, 'dd/mm/yyyy')#</td>
-													<td>#resultado.Prazo#</td>
-														
-												</tr>
-											</cfoutput>
-										</cfloop>	
-									</tbody>
-									<!--- Imprime os resultados ou faça o que desejar com eles --->
-									<cfoutput>
-										<cfset totalGeral = resultado.recordcount />
-										<!--- Calcula a porcentagem --->
-										<cfset percentualDP = (totalDP / totalGeral) * 100 />
-										<!--- Formata o percentualDP com duas casas decimais --->
-										<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") />
+														<td>#resultado.OrientacaoStatus#</td>
+														<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+														<td>#dateFormat(dataFinal, 'dd/mm/yyyy')#</td>
+														<td>#resultado.Prazo#</td>
+															
+													</tr>
+												</cfoutput>
+											</cfloop>	
+										</tbody>
+										<!--- Imprime os resultados ou faça o que desejar com eles --->
+										<cfoutput>
+											<cfset totalGeral = resultado.recordcount />
+											<!--- Calcula a porcentagem --->
+											<cfset percentualDP = (totalDP / totalGeral) * 100 />
+											<!--- Formata o percentualDP com duas casas decimais --->
+											<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") />
 
-										
+											
 
-										<div id="divResultPRCI" class="col-md-4 col-sm-4 col-4">
-											<div class="info-box bg-gradient-warning">
-												<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
+											<div id="divResultPRCI" class="col-md-4 col-sm-4 col-4">
+												<div class="info-box bg-gradient-warning">
+													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
-												<div class="info-box-content">
-													<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">PRCI</font></font></span>
-													<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDPFormatado#%</strong></font></font></span>
+													<div class="info-box-content">
+														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">PRCI</font></font></span>
+														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDPFormatado#%</strong></font></font></span>
 
-													<div class="progress">
-														<div class="progress-bar" style="width: #percentualDP#%"></div>
+														<div class="progress">
+															<div class="progress-bar" style="width: #percentualDP#%"></div>
+														</div>
+														<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+															<span style="font-size:14px">PRCI = TIDP/TGI</span><br>
+															<span style="font-size:14px">TIDP (Posic. dentro do prazo (DP))= #totalDP#</span><br>
+															<span style="font-size:14px">TGI (Total de Posicionamentos)= #totalGeral# </span>
+
+														</font></font></span>
 													</div>
-													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-														<span style="font-size:14px">PRCI = TIDP/TGI</span><br>
-														<span style="font-size:14px">TIDP (Posic. dentro do prazo (DP))= #totalDP#</span><br>
-														<span style="font-size:14px">TGI (Total de Posicionamentos)= #totalGeral# </span>
-
-													</font></font></span>
+													<!-- /.info-box-content -->
 												</div>
-												<!-- /.info-box-content -->
+												<!-- /.info-box -->
 											</div>
-											<!-- /.info-box -->
-										</div>
-										
-									</cfoutput>
+											
+										</cfoutput>
 
-								</table>
-							</div>
-
-							<cfset totalOrgaosResp = StructCount(orgaos)> <!-- Conta a quantidade de orgaoResp -->
-							
-						    <cfif totalOrgaosResp gt 1>
-								<div id="divTabResumoPRCI" class="table-responsive">
-									<div style="width: 350px; margin: 0 auto;">
-										<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap " style="width:100%; cursor:pointer">
-											<cfoutput>
-												<thead class="bg-gradient-warning" style="text-align: center;">
-													<tr style="font-size:14px">
-														<th colspan="4" style="padding:5px">PRCI</th>
-													</tr>
-													<tr style="font-size:14px">
-														<th >Órgão</th>
-														<th >DP</th>
-														<th >FP</th>
-														<th >PRCI</th>
-													</tr>
-												</thead>
-												<tbody>
-													<cfset prcisOrdenado = StructSort(orgaos, "text", "asc")>
-													<cfloop array="#prcisOrdenado#" index="orgao">
-														<cfif orgaos[orgao] eq 0>
-															<cfset percentualDP = 0>
-														<cfelse>
-															<cfset percentualDP = (dps[orgao] / orgaos[orgao]) * 100>
-														</cfif>
-														<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") >
-
-														<!--- Adiciona cada linha à tabela --->
-														<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-															<td>#orgao#</td>
-															<td>#dps[orgao]#</td>
-															<td>#fps[orgao]#</td>
-															<td>#percentualDPFormatado#%</td>
-														</tr>
-													</cfloop>
-												</tbody>
-											</cfoutput>
-										</table>
-									</div>
+									</table>
 								</div>
-														 
-   
+
+								<cfset totalOrgaosResp = StructCount(orgaos)> <!-- Conta a quantidade de orgaoResp -->
+								
+								<cfif totalOrgaosResp gt 1>
+									<div id="divTabResumoPRCI" class="table-responsive">
+										<div style="width: 350px; margin: 0 auto;">
+											<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap " style="width:100%; cursor:pointer">
+												<cfoutput>
+													<thead class="bg-gradient-warning" style="text-align: center;">
+														<tr style="font-size:14px">
+															<th colspan="4" style="padding:5px">PRCI</th>
+														</tr>
+														<tr style="font-size:14px">
+															<th >Órgão</th>
+															<th >DP</th>
+															<th >FP</th>
+															<th >PRCI</th>
+														</tr>
+													</thead>
+													<tbody>
+														<cfset prcisOrdenado = StructSort(orgaos, "text", "asc")>
+														<cfloop array="#prcisOrdenado#" index="orgao">
+															<cfif orgaos[orgao] eq 0>
+																<cfset percentualDP = 0>
+															<cfelse>
+																<cfset percentualDP = (dps[orgao] / orgaos[orgao]) * 100>
+															</cfif>
+															<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") >
+
+															<!--- Adiciona cada linha à tabela --->
+															<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+																<td>#orgao#</td>
+																<td>#dps[orgao]#</td>
+																<td>#fps[orgao]#</td>
+																<td>#percentualDPFormatado#%</td>
+															</tr>
+														</cfloop>
+													</tbody>
+												</cfoutput>
+											</table>
+										</div>
+									</div>
+															
 	
-							</cfif>
+		
+								</cfif>
 
 
 
 
 
+								
 							
-						</cfif>
+						</div>
+						<!-- /.card-body -->
 					</div>
-					<!-- /.card-body -->
+					<!-- /.card -->
 				</div>
-				<!-- /.card -->
+			<!-- /.col -->
 			</div>
-		<!-- /.col -->
-		</div>
-		<!-- /.row -->
+			<!-- /.row -->
+        </cfif>
 
 		<script language="JavaScript">
 		   
@@ -594,7 +597,8 @@
 				pc_aval_posic_dataPrevistaResp as dataPrevista,
 				pc_aval_posic_status as status,
 				CASE
-					WHEN pc_aval_posic_dataPrevistaResp < GETDATE() AND pc_aval_posic_status = 5 THEN 'PENDENTE'
+					WHEN ((<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> <= GETDATE() and pc_aval_posic_dataPrevistaResp < <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">) 
+					OR (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> > GETDATE() and pc_aval_posic_dataPrevistaResp < GETDATE()))  AND pc_aval_posic_status = 5 THEN 'PENDENTE'
 					ELSE pc_orientacao_status.pc_orientacao_status_descricao
 				END AS OrientacaoStatus
 
@@ -686,152 +690,151 @@
 
 		
 	
-
-		<div class="row" style="width: 100%;">
-						
-			<div class="col-12">
-				<div class="card" >
-					
-					<!-- card-body -->
-					<div class="card-body" >
-						<cfif #resultadoSLNC.recordcount# eq 0 >
-							<h5 align="center">Nenhuma informação foi localizada para o cálculo do SLNC do órgão <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput>.</h5>
-						<cfelse>
-							<cfoutput><h5 style="color:##000;text-align: center;">Dados utilizados no cálculo do <strong>SLNC</strong> (Solução de Não Conformidades): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
-						
-							<div class="table-responsive">
-								<table id="tabSLNCdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
-									
-									<thead class="bg-gradient-warning">
-										<tr style="font-size:14px">
-											<th style="width: 10px">Posic ID</th>
-											<th style="width: 10px">Órgão Avaliado</th>
-											<th style="width: 10px">Órgão Responsável</th>
-											<th style="width: 10px">Processo SNCI</th>
-											<th style="width: 10px">Item</th>
-											<th style="width: 10px">Orientação</th>
-											<th style="width: 10px">Data Prevista</th>
-											<th style="width: 10px">Data Status</th>
-											<th style="width: 10px">Status</th>
-											<th style="width: 10px">Data Ref.</th>
-										</tr>
-									</thead>
-									
-									<tbody>
-										<cfloop query="resultadoSLNC" >
-										
-											<cfoutput>					
-												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-													<td>#resultadoSLNC.pc_aval_posic_id#</td>
-													<td>#resultadoSLNC.orgaoAvaliado#</td>
-													<td>#resultadoSLNC.orgaoResp#</td>
-													<td>#resultadoSLNC.numProcessoSNCI#</td>
-													<td >#resultadoSLNC.item#</td>
-													<td>#resultadoSLNC.orientacao#</td>
-													<cfif resultadoSLNC.dataPrevista eq '1900-01-01' or resultadoSLNC.dataPrevista eq ''>
-														<td>---</td>
-													<cfelse>
-														<td>#dateFormat(resultadoSLNC.dataPrevista, 'dd/mm/yyyy')#</td>
-													</cfif>
-													<td>#dateFormat(resultadoSLNC.dataPosicao, 'dd/mm/yyyy')#</td>
-													<td>#resultadoSLNC.OrientacaoStatus#</td>
-													<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
-													<td>#dateFormat(dataFinal, 'dd/mm/yyyy')#</td>
-													
-														
-												</tr>
-											</cfoutput>
-										</cfloop>	
-									</tbody>
-								
-									<cfoutput>
-										<cfset totalGeral = resultadoSLNC.recordcount />
-										<cfif totalGeral eq 0>
-											<cfset percentualSolucionado = 0 />
-										<cfelse>
-											<cfset percentualSolucionado = (totalSolucionado / totalGeral *100) />
-										</cfif>
-										
+		<cfif #resultadoSLNC.recordcount# neq 0 >
+			<div class="row" style="width: 100%;">
 							
-										<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
-										
-										<div id="divResultSLNC" class="col-md-6 col-sm-6 col-12">
-											<div class="info-box bg-gradient-warning">
-												<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
-
-												<div class="info-box-content">
-													<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">SLNC</font></font></span>
-													<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualSolucionadoFormatado#%</strong></font></font></span>
-
-													<div class="progress">
-													<div class="progress-bar" style="width: #percentualSolucionado#%"></div>
-													</div>
-													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-														<span style="font-size:14px">SLNC = QTSL/QTNC x 100</span><br>
-														<span style="font-size:14px">QTSL (Quant. Orientações Solucionadas)= #totalSolucionado#</span><br>
-														<span style="font-size:14px">QTNC (Quant. Orientações Registradas )= #totalGeral#</span>
-													</font></font></span>
-												</div>
-												<!-- /.info-box-content -->
-											</div>
-											<!-- /.info-box -->
-										</div>
-										
-									</cfoutput>
-
-								</table>
-							</div>
-
-							<cfset totalOrgaosResp = StructCount(orgaos)> 
+				<div class="col-12">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
 							
-						    <cfif totalOrgaosResp gt 1>
-								<div id="divTabResumoSLNC" class="table-responsive">
-									<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap" style="width:350px; cursor:pointer">
-										<cfoutput>
-											<thead class="bg-gradient-warning" style="text-align: center;">
-												<tr style="font-size:14px">
-													<th colspan="4" style="padding:5px">SLNC</th>
-												</tr>
-												<tr style="font-size:14px">
-													<th >Órgão</th>
-													<th >Solucionadas</th>
-													<th >Qt.Orientações</th>
-													<th >SLNC</th>
-												</tr>
-											</thead>
-											<tbody>
-												
-												<cfset slncOrdenado = StructSort(orgaos, "text", "asc")>
-												<cfloop array="#slncOrdenado#" index="orgao">
-													<cfset percentualSolucionado = (solucionados[orgao] / orgaos[orgao]) * 100>
-													<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
-
-													<!--- Adiciona cada linha à tabela --->
+							
+								<cfoutput><h5 style="color:##000;text-align: center;">Dados utilizados no cálculo do <strong>SLNC</strong> (Solução de Não Conformidades): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+							
+								<div class="table-responsive">
+									<table id="tabSLNCdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
+										
+										<thead class="bg-gradient-warning">
+											<tr style="font-size:14px">
+												<th style="width: 10px">Posic ID</th>
+												<th style="width: 10px">Órgão Avaliado</th>
+												<th style="width: 10px">Órgão Responsável</th>
+												<th style="width: 10px">Processo SNCI</th>
+												<th style="width: 10px">Item</th>
+												<th style="width: 10px">Orientação</th>
+												<th style="width: 10px">Data Prevista</th>
+												<th style="width: 10px">Data Status</th>
+												<th style="width: 10px">Status</th>
+												<th style="width: 10px">Data Ref.</th>
+											</tr>
+										</thead>
+										
+										<tbody>
+											<cfloop query="resultadoSLNC" >
+											
+												<cfoutput>					
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-														<td>#orgao#</td>
-														<td>#solucionados[orgao]#</td>
-														<td>#orgaos[orgao]#</td>
-														<td>#percentualSolucionadoFormatado#%</td>
+														<td>#resultadoSLNC.pc_aval_posic_id#</td>
+														<td>#resultadoSLNC.orgaoAvaliado#</td>
+														<td>#resultadoSLNC.orgaoResp#</td>
+														<td>#resultadoSLNC.numProcessoSNCI#</td>
+														<td >#resultadoSLNC.item#</td>
+														<td>#resultadoSLNC.orientacao#</td>
+														<cfif resultadoSLNC.dataPrevista eq '1900-01-01' or resultadoSLNC.dataPrevista eq ''>
+															<td>---</td>
+														<cfelse>
+															<td>#dateFormat(resultadoSLNC.dataPrevista, 'dd/mm/yyyy')#</td>
+														</cfif>
+														<td>#dateFormat(resultadoSLNC.dataPosicao, 'dd/mm/yyyy')#</td>
+														<td>#resultadoSLNC.OrientacaoStatus#</td>
+														<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+														<td>#dateFormat(dataFinal, 'dd/mm/yyyy')#</td>
+														
+															
 													</tr>
-												</cfloop>
-											</tbody>
+												</cfoutput>
+											</cfloop>	
+										</tbody>
+									
+										<cfoutput>
+											<cfset totalGeral = resultadoSLNC.recordcount />
+											<cfif totalGeral eq 0>
+												<cfset percentualSolucionado = 0 />
+											<cfelse>
+												<cfset percentualSolucionado = (totalSolucionado / totalGeral *100) />
+											</cfif>
+											
+								
+											<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
+											
+											<div id="divResultSLNC" class="col-md-6 col-sm-6 col-12">
+												<div class="info-box bg-gradient-warning">
+													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
+
+													<div class="info-box-content">
+														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">SLNC</font></font></span>
+														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualSolucionadoFormatado#%</strong></font></font></span>
+
+														<div class="progress">
+														<div class="progress-bar" style="width: #percentualSolucionado#%"></div>
+														</div>
+														<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+															<span style="font-size:14px">SLNC = QTSL/QTNC x 100</span><br>
+															<span style="font-size:14px">QTSL (Quant. Orientações Solucionadas)= #totalSolucionado#</span><br>
+															<span style="font-size:14px">QTNC (Quant. Orientações Registradas )= #totalGeral#</span>
+														</font></font></span>
+													</div>
+													<!-- /.info-box-content -->
+												</div>
+												<!-- /.info-box -->
+											</div>
+											
 										</cfoutput>
+
 									</table>
 								</div>
 
-	
-							</cfif>
+								<cfset totalOrgaosResp = StructCount(orgaos)> 
+								
+								<cfif totalOrgaosResp gt 1>
+									<div id="divTabResumoSLNC" class="table-responsive">
+										<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap" style="width:350px; cursor:pointer">
+											<cfoutput>
+												<thead class="bg-gradient-warning" style="text-align: center;">
+													<tr style="font-size:14px">
+														<th colspan="4" style="padding:5px">SLNC</th>
+													</tr>
+													<tr style="font-size:14px">
+														<th >Órgão</th>
+														<th >Solucionadas</th>
+														<th >Qt.Orientações</th>
+														<th >SLNC</th>
+													</tr>
+												</thead>
+												<tbody>
+													
+													<cfset slncOrdenado = StructSort(orgaos, "text", "asc")>
+													<cfloop array="#slncOrdenado#" index="orgao">
+														<cfset percentualSolucionado = (solucionados[orgao] / orgaos[orgao]) * 100>
+														<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
 
-						</cfif>
+														<!--- Adiciona cada linha à tabela --->
+														<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+															<td>#orgao#</td>
+															<td>#solucionados[orgao]#</td>
+															<td>#orgaos[orgao]#</td>
+															<td>#percentualSolucionadoFormatado#%</td>
+														</tr>
+													</cfloop>
+												</tbody>
+											</cfoutput>
+										</table>
+									</div>
+
+		
+								</cfif>
+
+							
+						</div>
+						<!-- /.card-body -->
 					</div>
-					<!-- /.card-body -->
+					<!-- /.card -->
 				</div>
-				<!-- /.card -->
+			<!-- /.col -->
 			</div>
-		<!-- /.col -->
-		</div>
-		<!-- /.row -->
-
+			<!-- /.row -->
+		</cfif>
 		<script language="JavaScript">
 		   
 				
@@ -951,8 +954,8 @@
             <cfset percentualDGCI = NumberFormat((percentualDPFormatado * 0.4) + (percentualSolucionadoFormatado*0.6), '0.0') />
 			<cfset percentualDGCIformatado = Replace(NumberFormat((percentualDPFormatado * 0.4) + (percentualSolucionadoFormatado*0.6), '0.0'),".",",")  />
 
-			<div align="center" class="col-md-12 col-sm-12 col-12 mx-auto" style="margin-bottom:20px">
-				<span class="info-box-text" style="font-size:40px">#monthAsString(arguments.mes)#/#arguments.ano#</span>
+			<div align="center" class="col-md-12 col-sm-12 col-12 mx-auto" style="margin-bottom:10px">
+				<span class="info-box-text" style="font-size:30px">#monthAsString(arguments.mes)#/#arguments.ano#</span>
 			</div>	
 
 			<div class="row" style="width: 100%;">	
@@ -960,39 +963,43 @@
 					<div class="card" >
 						<!-- card-body -->
 						<div class="card-body shadow" style="border: 2px solid ##34a2b7">
-						    <h5 style="text-align: center; margin-bottom:20px">RESULTADO GERAL DO ÓRGÃO <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></h5>
-							<div id="divResultadoDGCI" class="col-md-5 col-sm-5 col-12 mx-auto">
-								<div class="info-box bg-info">
-									<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
+							<cfif #resultadoPRCI.recordcount# eq 0  and #resultadoSLNC.recordcount# eq 0>
+								<h5 align="center">Nenhuma informação foi localizada para o cálculo do DGCI do órgão <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput>.</h5>
+							<cfelse>
+								<h5 style="text-align: center; margin-bottom:20px">RESULTADO GERAL DO ÓRGÃO <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></h5>
+								<div id="divResultadoDGCI" class="col-md-5 col-sm-5 col-12 mx-auto">
+									<div class="info-box bg-info">
+										<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
-									<div class="info-box-content">
-										<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI</strong></font></font></span>
-										<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDGCIformatado#%</strong></font></font></span>
+										<div class="info-box-content">
+											<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI</strong></font></font></span>
+											<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDGCIformatado#%</strong></font></font></span>
 
-										<div class="progress">
-											<div class="progress-bar" style="width: #percentualDGCI#%"></div>
+											<div class="progress">
+												<div class="progress-bar" style="width: #percentualDGCI#%"></div>
+											</div>
+											<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+												<span style="font-size:14px">DGCI = (PRCI*0,40) + (SLNC*0,60)</span><br>
+											</font></font></span>
 										</div>
-										<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-											<span style="font-size:14px">DGCI = (PRCI*0,40) + (SLNC*0,60)</span><br>
-										</font></font></span>
+										<!-- /.info-box-content -->
 									</div>
-									<!-- /.info-box-content -->
-								</div>
-							
-							
-							</div>	
-							<div class="col-12">
 								
-								<div class="row " style="display: flex; justify-content: center;margin-bottom:10px">
-									<i class="fa-solid fa-angles-up" style="font-size:40px;"></i>
-								</div>
-
-								<div class="row " style="display: flex; justify-content: center;">
+								
+								</div>	
+								<div class="col-12">
 									
-									<div id="divResultadoPRCI" class="col-md-5 col-sm-5 col-12 "></div>
-									<div id="divResultadoSLNC" class="col-md-5 col-sm-5 col-12 "></div>
+									<div class="row " style="display: flex; justify-content: center;margin-top:-5px;margin-bottom:5px">
+										<i class="fa-solid fa-angles-up" style="font-size:30px;"></i>
+									</div>
+
+									<div class="row " style="display: flex; justify-content: center;">
+										
+										<div id="divResultadoPRCI" class="col-md-5 col-sm-5 col-12 "></div>
+										<div id="divResultadoSLNC" class="col-md-5 col-sm-5 col-12 "></div>
+									</div>
 								</div>
-							</div>
+							</cfif>
 						</div>
 						<!-- /.card-body -->
 					</div>
@@ -1031,7 +1038,7 @@
 									</div>
 									
 									<div class="row " style="display: flex; justify-content: center;margin-top:10px;margin-bottom:5px">
-										<i class="fa-solid fa-angles-up" style="font-size:40px;"></i>
+										<i class="fa-solid fa-angles-up" style="font-size:30px;"></i>
 									</div>
 									<div class="row " style="display: flex; justify-content: center;">
 										<div id="divTabPRCIorgaos" class="row" class="col-md-6 col-sm-6 col-12 " style="margin-right: 50px;"></div>

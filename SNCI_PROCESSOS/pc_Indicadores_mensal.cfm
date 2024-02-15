@@ -49,7 +49,7 @@
 		<section class="content-header">
 			<div class="container-fluid">
 						
-				<div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
+				<div class="row mb-2" style="margin-bottom:0px!important;">
 					<div class="col-sm-12">
 						<div style="display: flex; align-items: center;">
 							<h4 style="margin-right: 10px;">Indicadores: <strong>Resultado Mensal</strong></h4>
