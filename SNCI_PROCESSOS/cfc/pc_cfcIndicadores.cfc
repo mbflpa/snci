@@ -306,7 +306,7 @@
 													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
 													<div class="info-box-content">
-														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">PRCI</font></font></span>
+														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">PRCI</font></font><span style="font-size:12px;position: absolute;left: 89px;top: 36px;">Atendimento ao Prazo de Resposta</span></span>
 														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDPFormatado#%</strong></font></font></span>
 
 														<div class="progress">
@@ -763,7 +763,7 @@
 													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
 													<div class="info-box-content">
-														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">SLNC</font></font></span>
+														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">SLNC</font></font><span style="font-size:12px;position: absolute;left: 89px;top: 36px;">Solução de Não Conformidades</span></span>
 														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualSolucionadoFormatado#%</strong></font></font></span>
 
 														<div class="progress">
@@ -972,7 +972,7 @@
 										<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
 										<div class="info-box-content">
-											<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI</strong></font></font></span>
+											<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI</strong></font></font><span style="font-size:12px;position: relative;left:-71px;top:13px">Desempenho Geral de Controle Interno</span></span>
 											<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDGCIformatado#%</strong></font></font></span>
 
 											<div class="progress">
