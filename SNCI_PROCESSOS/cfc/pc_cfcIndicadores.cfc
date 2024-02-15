@@ -417,17 +417,13 @@
 					scrollX: true, // Permitir rolagem horizontal
         			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 					pageLength: 5,
-					// dom: 
-					// 			"<'row'<'col-sm-4 dtsp-verticalContainer'<'dtsp-verticalPanes'P><'dtsp-dataTable'Bf>><'col-sm-8 text-left'p>>" +
-					// 			"<'col-sm-12 text-left'i>" +
-					// 			"<'row'<'col-sm-12'tr>>" ,
 					dom:   "<'row'<'col-sm-4'B><'col-sm-4'p><'col-sm-4 text-right'i>>" ,
 
 							
 					buttons: [
 						{
 							extend: 'excel',
-							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
 							title : tituloExcel + d,
 							className: 'btExcel',
 						}
@@ -869,7 +865,7 @@
 					buttons: [
 						{
 							extend: 'excel',
-							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
 							title : tituloExcel + d,
 							className: 'btExcel',
 						}
