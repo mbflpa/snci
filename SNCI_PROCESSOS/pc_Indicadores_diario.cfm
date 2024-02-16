@@ -53,7 +53,7 @@
 						<div style="display: flex; align-items: center;">
 							<h4 style="margin-right: 10px;">Indicadores: <strong>Acompanhamento Mês/Ano Corrente</strong></h4>
 						</div>
-						<p style="margin-right: 10px;">Atenção: As informações a seguir são fornecidas apenas para fins de acompanhamento, com o objetivo de auxiliar a gestão na melhoria dos indicadores. O resultado final do mês deve ser verificado em Consultas - Indicadores - Resultado Mensal, até o quinto dia útil do mês subsequente.</p>
+						<p style="margin-right: 10px;">Atenção: As informações a seguir são fornecidas apenas para fins de acompanhamento, com o objetivo de auxiliar a gestão na melhoria dos indicadores. O resultado final do mês deve ser verificado em Consultas - Indicadores - Resultado Mensal, disponibilizado até o quinto dia útil do mês subsequente.</p>
 					</div>
 				</div>
 			</div><!-- /.container-fluid -->
