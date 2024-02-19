@@ -338,12 +338,12 @@
 												<cfoutput>
 													<thead class="bg-gradient-warning" style="text-align: center;">
 														<tr style="font-size:14px">
-															<th colspan="4" style="padding:5px">PRCI</th>
+															<th colspan="4" style="padding:5px">PRCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
 														</tr>
 														<tr style="font-size:14px">
-															<th >Órgão</th>
-															<th >DP</th>
-															<th >FP</th>
+															<th style="font-weight: normal!important">Órgão</th>
+															<th style="font-weight: normal!important">DP</th>
+															<th style="font-weight: normal!important">FP</th>
 															<th >PRCI</th>
 														</tr>
 													</thead>
@@ -362,7 +362,7 @@
 																<td>#orgao#</td>
 																<td>#dps[orgao]#</td>
 																<td>#fps[orgao]#</td>
-																<td>#percentualDPFormatado#%</td>
+																<td><strong>#percentualDPFormatado#%</strong></td>
 															</tr>
 														</cfloop>
 													</tbody>
@@ -789,12 +789,12 @@
 											<cfoutput>
 												<thead class="bg-gradient-warning" style="text-align: center;">
 													<tr style="font-size:14px">
-														<th colspan="4" style="padding:5px">SLNC</th>
+														<th colspan="4" style="padding:5px">SLNC - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
 													</tr>
 													<tr style="font-size:14px">
-														<th >Órgão</th>
-														<th >Solucionadas</th>
-														<th >Qt.Orientações</th>
+														<th style="font-weight: normal!important">Órgão</th>
+														<th style="font-weight: normal!important">Solucionadas</th>
+														<th style="font-weight: normal!important">Qt.Orientações</th>
 														<th >SLNC</th>
 													</tr>
 												</thead>
@@ -810,7 +810,7 @@
 															<td>#orgao#</td>
 															<td>#solucionados[orgao]#</td>
 															<td>#orgaos[orgao]#</td>
-															<td>#percentualSolucionadoFormatado#%</td>
+															<td><strong>#percentualSolucionadoFormatado#%</strong></td>
 														</tr>
 													</cfloop>
 												</tbody>
@@ -1015,14 +1015,14 @@
 									<div id="divTabDGCIorgaos" class="row" style="display: flex; justify-content: center;">
 										<div style="width: 500px; margin: 0 auto;">
 											<table id="tabDGCIorgaos" class="table table-bordered table-striped text-nowrap" style="width:100%; cursor:pointer">
-												<thead style="background: ##17a2b8; color: ##fff; text-align: center;">
+												<thead style="background: ##17a2b8; color: ##fff; text-align: center; ">
 													<tr style="font-size:14px;">
-														<th colspan="4" style="padding:5px">DGCI</th>
+														<th colspan="4" style="padding:5px">DGCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
 													</tr>
 													<tr style="font-size:14px">
-														<th >Órgão</th>
-														<th >PRCI</th>
-														<th >SLNC</th>
+														<th style="font-weight: normal!important">Órgão</th>
+														<th class="bg-gradient-warning" style="font-weight: normal!important">PRCI</th>
+														<th class="bg-gradient-warning" style="font-weight: normal!important">SLNC</th>
 														<th >DGCI</th>
 													</tr>
 												</thead>
@@ -1125,7 +1125,7 @@
 						var newRow = '<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"><td>' + orgao + '</td>' +
 							'<td>' + prci.toFixed(1).replace('.', ',') + '%</td>' +
 							'<td>' + slnc.toFixed(1).replace('.', ',') + '%</td>' +
-							'<td>' + dgci.toFixed(1).replace('.', ',') + '%</td></tr>';
+							'<td><strong>' + dgci.toFixed(1).replace('.', ',') + '%</strong></td></tr>';
 
 						theadTable.append(newRow); // Adicionar nova linha à tabela tabDGCIorgaos
 						hasData = true; // Atualizar hasData para verdadeiro se houver dados

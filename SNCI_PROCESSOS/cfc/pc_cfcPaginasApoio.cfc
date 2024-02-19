@@ -1071,7 +1071,7 @@
 							<cfset cc = "">
 						</cfif>
 
-						<cfif application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+						<cfif application.auxsite eq "desenvolvimentope"  or application.auxsite eq "homologacaope" or application.auxsite eq "localhost">
 							<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 							<cfset to = "marceloferreira@correios.com.br">
 							<cfset cc = "">
