@@ -51,17 +51,107 @@
 		</cfquery>
 
 		
-		<cfoutput>#rsIndicadorDados.recordcount#</cfoutput>
+		<cfoutput>#rsIndicadorDados.recordcount#</cfoutput> 
 	</cffunction>
 
-	<cffunction name="gerarDadosParaIndicadores"   access="remote" hint="gera os dados para os indicadores e insere na tabela pc_indicador_dados">
+	<cffunction name="mesesDadosGerados"   access="remote" hint="os meses do ano que já possuem dados gerados">
+		<cfargument name="ano" type="string" required="true" />
+      
+		
+		<cfquery name="rsIndicadorDados" datasource="#application.dsn_processos#">
+			SELECT 
+				pc_indDados_dataRef, 
+				pc_indDados_matriculaGeracao, 
+				COUNT(pc_indDados_dataRef) as quantDados,
+				MAX(pc_indDados_dataHoraGeracao) AS max_dataHoraGeracao
+			FROM 
+				pc_indicadores_dados
+			WHERE 
+				YEAR(pc_indDados_dataRef) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+			GROUP BY 
+				pc_indDados_dataRef, 
+				pc_indDados_matriculaGeracao
+			ORDER BY 
+				pc_indDados_dataRef DESC
+		</cfquery>
+
+		<!--query de query para totalizar quantDados-->
+		<cfquery dbtype="query" name="rsIndicadorDadosTotal" >
+			SELECT SUM(quantDados) as totalQuantReg FROM rsIndicadorDados
+		</cfquery>
+
+
+		<cfif #rsIndicadorDados.recordcount# neq 0 >
+			<div class="card"  >
+				<!-- card-body -->
+				<div class="card-body" >
+					<cfoutput>
+						<h5 style="color:##000;text-align: center;">Dados gerados para os indicadores de <strong>#arguments.ano#</strong></h5>
+						<h6 style="color:##000;text-align: center;">(Total: <strong>#Replace(NumberFormat(rsIndicadorDadosTotal.totalQuantReg, "9,999"), ",", ".", "all")#</strong> posicionamentos)</h6>
+					</cfoutput>
+					<table id="tabelaDados" class="table table-bordered table-striped text-nowrap no-footer" style="width: 100%; margin: 0 auto;margin-bottom:200px">
+						<thead>
+							<tr style="text-align: center;"  >
+								<th>Mês/Ano</th>
+								<th>Quant. Posic.</th>
+								<th>Data/Hora Gerado</th>
+								<th>Usuário Gerador</th>
+							</tr>
+						</thead>
+						<tbody>
+						  
+							<cfoutput query="rsIndicadorDados">
+								<tr style="text-align: center;"  >
+									<td>#dateFormat(pc_indDados_dataRef, 'mm/yyyy')#</td>
+									<td>#Replace(NumberFormat(quantDados, "9,999"), ",", ".", "all")#</td>
+									<td>#DateFormat(max_dataHoraGeracao, "dd/mm/yyyy")# - #TimeFormat(max_dataHoraGeracao, "HH:mm:ss")#</td>
+									<!--retorna o nome do usuário que gerou os dados-->
+									<cfquery name="rsUsuarioGerador" datasource="#application.dsn_processos#">
+										SELECT pc_usu_nome FROM pc_usuarios WHERE pc_usu_matricula = <cfqueryparam value="#pc_indDados_matriculaGeracao#" cfsqltype="cf_sql_varchar">
+									</cfquery>
+									<td>#rsUsuarioGerador.pc_usu_nome#</td>
+								</tr>
+								
+							</cfoutput>
+						</tbody>
+						
+					</table>
+				</div>
+			</div>
+		<cfelse>
+			<cfoutput><h5 style="color:##000;text-align: center;">Não existem dados gerados para o ano #arguments.ano#</h5></cfoutput>
+		</cfif>
+		
+		<script language="JavaScript">
+    
+			$(document).ready(function(){
+				$('#tabelaDados').DataTable({
+					order: [[0, 'desc']], // Ordena a tabela pela primeira coluna (data) de forma decrescente
+					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
+					paging: false, // Remove a paginação
+					info: false, // Remove a exibição da quantidade de registros
+					searching: false // Remove o campo de busca
+					
+				});
+				$(".content-wrapper").css("height", "auto");
+			});
+		</script>
+
+
+
+
+		
+		
+	</cffunction>
+
+	<cffunction name="gerarDadosParaIndicadores"   access="remote" hint="gera os dados para os indicadores e insere na tabela pc_indicador_dados - acompanhamento mensal">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		<cfset dataInicial = createODBCDate(createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))>
 		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
 	
 
-		<cfquery name="rs_Orientacao_agora" datasource="#application.dsn_processos#" timeout="120">
+		<cfquery name="rs_Orientacao_prci" datasource="#application.dsn_processos#" timeout="120">
 			SELECT
 				pc_aval_posic_id,
 				orgaoAvaliado.pc_org_mcu as orgaoAvaliado,
@@ -109,15 +199,14 @@
 			INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
 			INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
 			INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
-			WHERE
-				ranked_posicionamentos.row_num = 1
+			WHERE ranked_posicionamentos.row_num = 1
 				AND pc_aval_posic_status IN (4, 5)
 				AND pc_aval_posic_enviado = 1
 				AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					
 		</cfquery>
 
-		<cfquery name="rs_Orientacao_Respondida" datasource="#application.dsn_processos#" timeout="120">
+		<cfquery name="rs_Orientacao_Respondida_prci" datasource="#application.dsn_processos#" timeout="120">
 			SELECT
 				pc_aval_posic_id,
 				orgaoAvaliado.pc_org_mcu as orgaoAvaliado,
@@ -146,119 +235,226 @@
 			INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
 			INNER JOIN pc_orientacao_status ON pc_avaliacao_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
 			WHERE pc_avaliacao_posicionamentos.pc_aval_posic_status IN (3)
-				
-				
 				AND pc_avaliacao_posicionamentos.pc_aval_posic_datahora 
 				BETWEEN <cfqueryparam value="#dataInicial#" cfsqltype="cf_sql_date"> AND <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 				AND pc_avaliacao_posicionamentos.pc_aval_posic_enviado = 1
-		</cfquery>		
+		</cfquery>	
+
+		<cfquery name="rs_solucionados_slnc" datasource="#application.dsn_processos#" timeout="120">
+			SELECT
+				pc_aval_posic_id,
+				orgaoAvaliado.pc_org_mcu as orgaoAvaliado,
+				orgaoResp.pc_org_mcu as orgaoResp,
+				orgaoDaAcao.pc_org_controle_interno as orgaoDaAcaoEdoControleInterno,
+				pc_processos.pc_processo_id as numProcessoSNCI,
+				pc_avaliacoes.pc_aval_numeracao as item,
+				CONVERT(DATE, pc_aval_posic_datahora) as dataPosicao,
+				pc_aval_posic_num_orientacao as orientacao,
+				pc_aval_posic_dataPrevistaResp as dataPrevista,
+				pc_aval_posic_status,
+				pc_orientacao_status.pc_orientacao_status_descricao AS OrientacaoStatus
+
+			FROM (
+				SELECT
+					pc_aval_posic_id,
+					pc_aval_posic_num_orientacao,
+					pc_aval_posic_status,
+					pc_aval_posic_num_orgaoResp,
+					pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp as orgaoResponsavelMCU,
+					pc_aval_posic_datahora,
+					pc_aval_posic_dataPrevistaResp,
+					pc_aval_posic_enviado,
+					pc_aval_posic_num_orgao,
+					ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
+				FROM
+					pc_avaliacao_posicionamentos
+				INNER JOIN pc_avaliacao_orientacoes ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+				WHERE 
+            		pc_aval_posic_enviado = 1
+					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+	
+			) AS ranked_posicionamentos
+			LEFT JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.orgaoResponsavelMCU = orgaoResp.pc_org_mcu
+			INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
+			INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+			INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+			INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+			INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
+			INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
+			WHERE
+				ranked_posicionamentos.row_num = 1
+				AND pc_aval_posic_status IN (6)
+				AND pc_aval_posic_enviado = 1
+				AND pc_aval_posic_datahora
+				BETWEEN <cfqueryparam value="#dataInicial#" cfsqltype="cf_sql_date"> AND <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+					
+		</cfquery>
 
 
+		<cfquery name="rs_tratamento_slnc" datasource="#application.dsn_processos#" timeout="120">
+			SELECT
+				pc_aval_posic_id,
+				orgaoAvaliado.pc_org_mcu as orgaoAvaliado,
+				orgaoResp.pc_org_mcu as orgaoResp,
+				orgaoDaAcao.pc_org_controle_interno as orgaoDaAcaoEdoControleInterno,
+				pc_processos.pc_processo_id as numProcessoSNCI,
+				pc_avaliacoes.pc_aval_numeracao as item,
+				CONVERT(DATE, pc_aval_posic_datahora) as dataPosicao,
+				pc_aval_posic_num_orientacao as orientacao,
+				pc_aval_posic_dataPrevistaResp as dataPrevista,
+				pc_aval_posic_status,
+				CASE
+					WHEN ((<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> <= GETDATE() and pc_aval_posic_dataPrevistaResp < <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">) 
+					OR (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> > GETDATE() and pc_aval_posic_dataPrevistaResp < GETDATE()))  AND pc_aval_posic_status = 5 THEN 'PENDENTE'
+					ELSE pc_orientacao_status.pc_orientacao_status_descricao
+				END AS OrientacaoStatus
 
-		<!--delete dos registros do mês e ano selecionados-->
+			FROM (
+				SELECT
+					pc_aval_posic_id,
+					pc_aval_posic_num_orientacao,
+					pc_aval_posic_status,
+					pc_aval_posic_num_orgaoResp,
+					pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp as orgaoResponsavelMCU,
+					pc_aval_posic_datahora,
+					pc_aval_posic_dataPrevistaResp,
+					pc_aval_posic_enviado,
+					pc_aval_posic_num_orgao,
+					ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
+				FROM
+					pc_avaliacao_posicionamentos
+				INNER JOIN pc_avaliacao_orientacoes ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+				WHERE 
+            		pc_aval_posic_enviado = 1
+					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+	
+			) AS ranked_posicionamentos
+			INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.orgaoResponsavelMCU = orgaoResp.pc_org_mcu
+			INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
+			INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+			INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+			INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+			INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
+			INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
+			WHERE
+				ranked_posicionamentos.row_num = 1
+				AND pc_aval_posic_status IN (5)
+				AND pc_aval_posic_enviado = 1
+				AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+		</cfquery>
+
+
+		
 		<cfquery name="rsIndicadorDados" datasource="#application.dsn_processos#">
 			DELETE FROM pc_indicadores_dados WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 		</cfquery>
-		
-		
-		<cfloop query="rs_Orientacao_agora">
-		    <cfif rs_Orientacao_agora.orgaoDaAcaoEdoControleInterno eq 'N' AND (rs_Orientacao_agora.pc_aval_posic_status eq 4 OR rs_Orientacao_agora.pc_aval_posic_status eq 5)>
-				<cfset distribuida = 1>
-			<cfelse>
-				<cfset distribuida = 0>
-			</cfif>
 
-			<cfquery datasource="#application.dsn_processos#">
-				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
-												,pc_indDados_numIndicador
-												,pc_indDados_matriculaGeracao
-												,pc_indDados_numPosic
-												,pc_indDados_numOrgaoAvaliado
-												,pc_indDados_numOrgaoResp
-												,pc_indDados_numProcesso
-												,pc_indDados_numItem
-												,pc_indDados_numOrientacao
-												,pc_indDados_dataPrevista
-												,pc_indDados_dataStatus
-												,pc_indDados_status
-												,pc_indDados_orientacaoDistribuida
-												,pc_indDados_orientacaoStatus
-												,pc_indDados_prazo)
-				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-					,1
-					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_agora.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#rs_Orientacao_agora.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_agora.orgaoResp#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_agora.numProcessoSNCI#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_agora.item#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_agora.orientacao#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#rs_Orientacao_agora.dataPrevista#" cfsqltype="cf_sql_date">
-					,<cfqueryparam value="#rs_Orientacao_agora.dataPosicao#" cfsqltype="cf_sql_date">
-					,<cfqueryparam value="#rs_Orientacao_agora.pc_aval_posic_status#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
-					,<cfqueryparam value="#rs_Orientacao_agora.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_agora.Prazo#" cfsqltype="cf_sql_varchar">
-				)
-			</cfquery>
-		</cfloop>
+	
 
-		<cfloop query="rs_Orientacao_Respondida">
-		    <cfif rs_Orientacao_Respondida.orgaoDaAcaoEdoControleInterno eq 'N' AND (rs_Orientacao_Respondida.pc_aval_posic_status eq 4 OR rs_Orientacao_Respondida.pc_aval_posic_status eq 5)>
-				<cfset distribuida = 1>
-			<cfelse>
-				<cfset distribuida = 0>
-			</cfif>
-
-			<cfquery datasource="#application.dsn_processos#">
-				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
-												,pc_indDados_numIndicador
-												,pc_indDados_matriculaGeracao
-												,pc_indDados_numPosic
-												,pc_indDados_numOrgaoAvaliado
-												,pc_indDados_numOrgaoResp
-												,pc_indDados_numProcesso
-												,pc_indDados_numItem
-												,pc_indDados_numOrientacao
-												,pc_indDados_dataPrevista
-												,pc_indDados_dataStatus
-												,pc_indDados_status
-												,pc_indDados_orientacaoDistribuida
-												,pc_indDados_orientacaoStatus
-												,pc_indDados_prazo)
-				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-					,1
-					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.orgaoResp#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.numProcessoSNCI#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.item#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.orientacao#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.dataPrevista#" cfsqltype="cf_sql_date">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.dataPosicao#" cfsqltype="cf_sql_date">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.pc_aval_posic_status#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_Orientacao_Respondida.Prazo#" cfsqltype="cf_sql_varchar">
-				)
-			</cfquery>
-		</cfloop>
-
-
-
-
-		<!-- query para retornar o total de registros inseridos -->
-		<cfquery name="rsIndicadorDados" datasource="#application.dsn_processos#">
-			SELECT pc_indDados_id FROM pc_indicadores_dados 
+		<cfquery name="rs_dados_prci" dbtype="query">
+			SELECT * FROM rs_Orientacao_prci
+			UNION
+			SELECT * FROM rs_Orientacao_prci
 		</cfquery>
 
-		<cfoutput>#rsIndicadorDados.recordcount#</cfoutput>
+		<cfquery name="rs_dados_slnc" dbtype="query">
+			SELECT * FROM rs_solucionados_slnc
+			UNION
+			SELECT * FROM rs_tratamento_slnc
+		</cfquery>
+		
+		
+		<cfloop query="rs_dados_prci">
+		    <cfif rs_dados_prci.orgaoDaAcaoEdoControleInterno eq 'N' AND (rs_dados_prci.pc_aval_posic_status eq 4 OR rs_dados_prci.pc_aval_posic_status eq 5)>
+				<cfset distribuida = 1>
+			<cfelse>
+				<cfset distribuida = 0>
+			</cfif>
 
+			<cfquery datasource="#application.dsn_processos#">
+				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
+												,pc_indDados_numIndicador
+												,pc_indDados_matriculaGeracao
+												,pc_indDados_numPosic
+												,pc_indDados_numOrgaoAvaliado
+												,pc_indDados_numOrgaoResp
+												,pc_indDados_numProcesso
+												,pc_indDados_numItem
+												,pc_indDados_numOrientacao
+												,pc_indDados_dataPrevista
+												,pc_indDados_dataStatus
+												,pc_indDados_status
+												,pc_indDados_orientacaoDistribuida
+												,pc_indDados_orientacaoStatus
+												,pc_indDados_prazo)
+				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+					,1
+					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_prci.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
+					,<cfqueryparam value="#rs_dados_prci.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_prci.orgaoResp#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_prci.numProcessoSNCI#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_prci.item#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_prci.orientacao#" cfsqltype="cf_sql_integer">
+					,<cfqueryparam value="#rs_dados_prci.dataPrevista#" cfsqltype="cf_sql_date">
+					,<cfqueryparam value="#rs_dados_prci.dataPosicao#" cfsqltype="cf_sql_date">
+					,<cfqueryparam value="#rs_dados_prci.pc_aval_posic_status#" cfsqltype="cf_sql_integer">
+					,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
+					,<cfqueryparam value="#rs_dados_prci.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_prci.Prazo#" cfsqltype="cf_sql_varchar">
+				)
+			</cfquery>
+		</cfloop>
+
+		<cfloop query="rs_dados_slnc">
+		    <cfif rs_dados_slnc.orgaoDaAcaoEdoControleInterno eq 'N' AND rs_dados_slnc.pc_aval_posic_status eq 5>
+				<cfset distribuida = 1>
+			<cfelse>
+				<cfset distribuida = 0>
+			</cfif>
+
+			<cfquery datasource="#application.dsn_processos#">
+				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
+												,pc_indDados_numIndicador
+												,pc_indDados_matriculaGeracao
+												,pc_indDados_numPosic
+												,pc_indDados_numOrgaoAvaliado
+												,pc_indDados_numOrgaoResp
+												,pc_indDados_numProcesso
+												,pc_indDados_numItem
+												,pc_indDados_numOrientacao
+												,pc_indDados_dataPrevista
+												,pc_indDados_dataStatus
+												,pc_indDados_status
+												,pc_indDados_orientacaoDistribuida
+												,pc_indDados_orientacaoStatus
+												,pc_indDados_prazo)
+				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+					,2
+					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_slnc.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
+					,<cfqueryparam value="#rs_dados_slnc.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_slnc.orgaoResp#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_slnc.numProcessoSNCI#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_slnc.item#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#rs_dados_slnc.orientacao#" cfsqltype="cf_sql_integer">
+					,<cfqueryparam value="#rs_dados_slnc.dataPrevista#" cfsqltype="cf_sql_date">
+					,<cfqueryparam value="#rs_dados_slnc.dataPosicao#" cfsqltype="cf_sql_date">
+					,<cfqueryparam value="#rs_dados_slnc.pc_aval_posic_status#" cfsqltype="cf_sql_integer">
+					,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
+					,<cfqueryparam value="#rs_dados_slnc.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
+					,null
+				)
+			</cfquery>
+		</cfloop>
+
+		<cfset quantDados = rs_dados_prci.recordcount + rs_dados_slnc.recordcount>
+		
+		<cfreturn quantDados>
 
 	</cffunction>
 
-	<cffunction name="consultaIndicadorPRCI_diario"   access="remote" hint="gera a consulta para página de indicadores">
+	<cffunction name="consultaIndicadorPRCI_diario"   access="remote" hint="gera a consulta para página de indicadores - acompanhamento diário">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 
@@ -401,7 +597,7 @@
 
 
 
-	<cffunction name="tabPRCIDetalhe_diario" access="remote" hint="outra função que utiliza tabIndicadores">
+	<cffunction name="tabPRCIDetalhe_diario" access="remote" hint="outra função que utiliza tabIndicadores - acompanhamento diário">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
@@ -677,7 +873,7 @@
 
 	</cffunction>
 
-	<cffunction name="consultaIndicadorSLNC_diario"   access="remote" hint="gera a consulta para página de indicadores">
+	<cffunction name="consultaIndicadorSLNC_diario"   access="remote" hint="gera a consulta para página de indicadores - acompanhamento diário">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 
@@ -829,7 +1025,7 @@
 	</cffunction>
 
 
-	<cffunction name="tabSLNCDetalhe_diario" access="remote" hint="outra função que utiliza tabIndicadores">
+	<cffunction name="tabSLNCDetalhe_diario" access="remote" hint="outra função que utiliza tabIndicadores - acompanhamento diário">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
@@ -1067,7 +1263,7 @@
 
 
 
-	<cffunction name="resultadoDGCI_diario" access="remote" hint="outra função que utiliza tabIndicadores">
+	<cffunction name="resultadoDGCI_diario" access="remote" hint="outra função que utiliza tabIndicadores - acompanhamento diário">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 
