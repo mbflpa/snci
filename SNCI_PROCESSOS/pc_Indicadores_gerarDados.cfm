@@ -120,7 +120,7 @@
 				const checkedClass = "";
 				const label = `${month}`;
 				const input = `<input type="radio" name="mes" value="${i + 1}" id="option_b${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
-				const radioButton = `<label name="mesLabel" style="border:none!important;border-radius:10px!important;margin-left:1px" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
+				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:1px" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
 				return radioButton;
 			});
 
@@ -151,13 +151,12 @@
 			});
 
 			
-			$('#opcoesMes').on('change', function() {
+			 $('#opcoesMes').on('click', 'input[name=mes]', function() {
 				// Obtém o ano selecionado		
 				let selectedYear = parseInt($('input[name=ano]:checked').val());	
 				// Obtém o mês selecionado
-				let selectedMonth = parseInt($('input[name=mes]:checked').val());
-
-				
+				let selectedMonth = parseInt($(this).val());
+		
 						$('#modalOverlay').modal('show')
 						setTimeout(function() {	
 							
@@ -172,11 +171,12 @@
 								async: false,
 								success: function(result) {	
 									gerarDados(result)
-									//$('#opcoesMes').find('label').removeClass('active');
+									$('#opcoesMes').find('label').removeClass('active');
 								},
 								error: function(xhr, ajaxOptions, thrownError) {
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide');
+										$('#opcoesMes').find('label').removeClass('active');
 									});							
 									$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
 									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
@@ -194,7 +194,7 @@
 				let mes = parseInt($('input[name=mes]:checked').val());
 				//se existeDados for true, pergunta se deseja gerar novamente, caso contrário, gera os dados
 				if(existeDados > 0){
-					var mensagem = 'Já existem dados gerados para o mês e ano selecionados (' + monthNames[mes - 1] + '/' + ano + '). Deseja gerar novamente?<br><br><span style="color:red"><strong>Atenção:</strong> Ao clicar em "Sim", os dados gerados anteriormente serão substituídos.</span>';
+					var mensagem = 'Já existem dados gerados para <strong style="color:#2581c8">' + monthNames[mes - 1] + '/' + ano + '</strong>. Deseja gerar novamente?<br><br><span style="color:red"><strong>Atenção:</strong> Ao clicar em "Sim", os dados gerados anteriormente serão substituídos.</span>';
 					Swal.fire({
 						title: mensagem,
 						showDenyButton: true,
@@ -249,7 +249,7 @@
 							
 								$('#modalOverlay').modal('hide');
 								Swal.fire('Operação cancelada', '', 'info')
-								//$('#opcoesMes').find('label').removeClass('active');
+								$('#opcoesMes').find('label').removeClass('active');
 								
 							
 						}
@@ -295,7 +295,7 @@
 									error: function(xhr, ajaxOptions, thrownError) {
 										$('#modalOverlay').delay(1000).hide(0, function() {
 											$('#modalOverlay').modal('hide');
-											
+											$('#opcoesMes').find('label').removeClass('active');
 										});
 										$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
 										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL

@@ -87,13 +87,13 @@
 				<div class="card-body" >
 					<cfoutput>
 						<h5 style="color:##000;text-align: center;">Dados gerados para os indicadores de <strong>#arguments.ano#</strong></h5>
-						<h6 style="color:##000;text-align: center;">(Total: <strong>#Replace(NumberFormat(rsIndicadorDadosTotal.totalQuantReg, "9,999"), ",", ".", "all")#</strong> posicionamentos)</h6>
+						<h6 style="color:##000;text-align: center;">(Total: <strong>#Replace(NumberFormat(rsIndicadorDadosTotal.totalQuantReg, "9,999"), ",", ".", "all")#</strong> registros)</h6>
 					</cfoutput>
 					<table id="tabelaDados" class="table table-bordered table-striped text-nowrap no-footer" style="width: 100%; margin: 0 auto;margin-bottom:200px">
 						<thead>
 							<tr style="text-align: center;"  >
 								<th>Mês/Ano</th>
-								<th>Quant. Posic.</th>
+								<th>Quant. Reg.</th>
 								<th>Data/Hora Gerado</th>
 								<th>Usuário Gerador</th>
 							</tr>

@@ -727,7 +727,7 @@
 			<cfset cc = "#arguments.copiaPara#">
 		</cfif> 
 
-        <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
+        <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 			<cfif #cc# neq "" >
 				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
 			<cfelse>
@@ -743,7 +743,7 @@
 				<cfset de="mbflpa@yahoo.com.br">
 			</cfif>
 			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-			    <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
+			    <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 				</cfif>
 				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
@@ -787,7 +787,7 @@
 			<cfset cc = "#arguments.copiaPara#">
 		</cfif> 
 
-        <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
+        <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 			<cfif #cc# neq "" >
 				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
 			<cfelse>
@@ -803,7 +803,7 @@
 				<cfset de="mbflpa@yahoo.com.br">
 			</cfif>
 			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-			    <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
+			    <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 				</cfif>
 				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
@@ -958,37 +958,42 @@
 						)
 				</cfquery>
 
-				<cftry>
-					<!--Informações do órgão responsável-->
-					<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
-						SELECT pc_org_emaiL, pc_org_sigla FROM pc_orgaos
-						WHERE pc_org_mcu = <cfqueryparam value="#pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-
-					<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
-					<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
-					<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
+				
+				<!--Informações do órgão responsável-->
+				<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
+					SELECT pc_org_emaiL, pc_org_sigla FROM pc_orgaos
+					WHERE pc_org_mcu = <cfqueryparam value="#pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">
+				</cfquery>
+				
+				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+					<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 					
-					<cfset textoEmail = '<p>Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas.</p> 
-										 <p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:</p>
-										 <p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>'>
-								
-					<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
-					<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmailsTeste" returnVariable="sucessoEmail" 
-								para = "#to#"
-								pronomeTratamento = "#pronomeTrat#"
-								texto="#textoEmail#"
-					/>
-					<cfcatch type="any">
-					<cfset de="SNCI@correios.com.br">
-					<cfif application.auxsite eq "localhost">
-						<cfset de="mbflpa@yahoo.com.br">
-					</cfif>
-						<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-							<cfoutput>Erro rotina "rotinaDiariaOrientacoesSuspensasTeste" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
-						</cfmail>
-					</cfcatch>
-				</cftry>
+				</cfif>
+					
+				<cfset de="SNCI@correios.com.br">
+				<cfif application.auxsite eq "localhost">
+					<cfset de="mbflpa@yahoo.com.br">
+				</cfif>
+
+				<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
+				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+					<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
+				</cfif>
+
+				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
+				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
+				
+				<cfset textoEmail = '<p>Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas.</p> 
+										<p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:</p>
+										<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>'>
+							
+				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
+				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmailsTeste" returnVariable="sucessoEmail" 
+							para = "#to#"
+							pronomeTratamento = "#pronomeTrat#"
+							texto="#textoEmail#"
+				/>
+					
 
 				
 			</cftransaction>
@@ -1180,7 +1185,7 @@
 								</style>
 							</head>
 							<body>
-								<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
+								<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 									<pre class="pre-style">#mensagemParaTeste#</pre>
 								</cfif>
 								<div class="card" style="background-color: rgba(0, 65, 107, 1);color: rgba(255, 255, 255, 1);  border-radius: 15px; padding: 5px;">
@@ -1410,7 +1415,7 @@
 								</style>
 							</head>
 							<body>
-								<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
+								<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 									<pre class="pre-style">#mensagemParaTeste#</pre>
 								</cfif>
 								<div class="card" style="background-color: rgba(0, 65, 107, 1);color: rgba(255, 255, 255, 1);  border-radius: 15px; padding: 5px;">
@@ -1522,7 +1527,7 @@
 				<cfset to = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoResp))#">
 				<cfset cc = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoAvaliado))#">
 
-				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
+				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 					<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 					<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 					<cfset cc = "">
@@ -1633,7 +1638,7 @@
 					</head>
 					<body>
 
-						<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhostpe">
+						<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
 							<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 						</cfif>
 						<div style="background-color: ##00416B; color:##fff; border-radius: 15px; padding: 5px; box-shadow: 0px 0px 10px ##888888; margin: 0 auto; float: left;">
