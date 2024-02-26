@@ -144,7 +144,7 @@
 		
 	</cffunction>
 
-	<cffunction name="gerarDadosParaIndicadores"   access="remote" hint="gera os dados para os indicadores e insere na tabela pc_indicador_dados - acompanhamento mensal">
+	<cffunction name="gerarDadosParaIndicadoresMensal"   access="remote" hint="gera os dados para os indicadores e insere na tabela pc_indicador_dados - acompanhamento mensal">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		<cfset dataInicial = createODBCDate(createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))>
@@ -365,6 +365,24 @@
 		
 		
 		<cfloop query="rs_dados_prci">
+			<cfquery name="mcuOrgaoIndicador" datasource="#application.dsn_processos#" timeout="120">
+				WITH OrgHierarchy AS (
+									SELECT pc_org_mcu, pc_org_sigla, pc_org_mcu_subord_tec, pc_org_status, pc_org_orgaoAvaliado, 1 AS Level
+									FROM pc_orgaos
+									WHERE pc_org_mcu = <cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#rs_dados_prci.orgaoResp#">
+
+									UNION ALL
+
+									SELECT o.pc_org_mcu, o.pc_org_sigla, o.pc_org_mcu_subord_tec, o.pc_org_status, o.pc_org_orgaoAvaliado, h.Level + 1
+									FROM pc_orgaos o
+									INNER JOIN OrgHierarchy h ON o.pc_org_mcu = h.pc_org_mcu_subord_tec
+									WHERE h.Level < 10 
+								)
+				SELECT pc_org_mcu  
+				FROM OrgHierarchy  
+				WHERE pc_org_status = 'A' AND pc_org_orgaoAvaliado = 1
+			</cfquery>
+
 		    <cfif rs_dados_prci.orgaoDaAcaoEdoControleInterno eq 'N' AND (rs_dados_prci.pc_aval_posic_status eq 4 OR rs_dados_prci.pc_aval_posic_status eq 5)>
 				<cfset distribuida = 1>
 			<cfelse>
@@ -375,6 +393,7 @@
 				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
 												,pc_indDados_numIndicador
 												,pc_indDados_matriculaGeracao
+												,pc_indDados_numOrgaoIndicador
 												,pc_indDados_numPosic
 												,pc_indDados_numOrgaoAvaliado
 												,pc_indDados_numOrgaoResp
@@ -390,6 +409,7 @@
 				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					,1
 					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#mcuOrgaoIndicador.pc_org_mcu#" cfsqltype="cf_sql_varchar">
 					,<cfqueryparam value="#rs_dados_prci.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
 					,<cfqueryparam value="#rs_dados_prci.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
 					,<cfqueryparam value="#rs_dados_prci.orgaoResp#" cfsqltype="cf_sql_varchar">
@@ -407,6 +427,23 @@
 		</cfloop>
 
 		<cfloop query="rs_dados_slnc">
+			<cfquery name="mcuOrgaoIndicador" datasource="#application.dsn_processos#" timeout="120">
+				WITH OrgHierarchy AS (
+									SELECT pc_org_mcu, pc_org_sigla, pc_org_mcu_subord_tec, pc_org_status, pc_org_orgaoAvaliado, 1 AS Level
+									FROM pc_orgaos
+									WHERE pc_org_mcu = <cfqueryparam cfsqltype="CF_SQL_VARCHAR" value="#rs_dados_slnc.orgaoResp#">
+
+									UNION ALL
+
+									SELECT o.pc_org_mcu, o.pc_org_sigla, o.pc_org_mcu_subord_tec, o.pc_org_status, o.pc_org_orgaoAvaliado, h.Level + 1
+									FROM pc_orgaos o
+									INNER JOIN OrgHierarchy h ON o.pc_org_mcu = h.pc_org_mcu_subord_tec
+									WHERE h.Level < 10 
+								)
+				SELECT pc_org_mcu  
+				FROM OrgHierarchy  
+				WHERE pc_org_status = 'A' AND pc_org_orgaoAvaliado = 1
+			</cfquery>
 		    <cfif rs_dados_slnc.orgaoDaAcaoEdoControleInterno eq 'N' AND rs_dados_slnc.pc_aval_posic_status eq 5>
 				<cfset distribuida = 1>
 			<cfelse>
@@ -417,6 +454,7 @@
 				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
 												,pc_indDados_numIndicador
 												,pc_indDados_matriculaGeracao
+												,pc_indDados_numOrgaoIndicador
 												,pc_indDados_numPosic
 												,pc_indDados_numOrgaoAvaliado
 												,pc_indDados_numOrgaoResp
@@ -432,6 +470,7 @@
 				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					,2
 					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#mcuOrgaoIndicador.pc_org_mcu#" cfsqltype="cf_sql_varchar">
 					,<cfqueryparam value="#rs_dados_slnc.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
 					,<cfqueryparam value="#rs_dados_slnc.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
 					,<cfqueryparam value="#rs_dados_slnc.orgaoResp#" cfsqltype="cf_sql_varchar">
