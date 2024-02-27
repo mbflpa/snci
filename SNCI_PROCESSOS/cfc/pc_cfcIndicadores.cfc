@@ -380,7 +380,7 @@
 								)
 				SELECT pc_org_mcu  
 				FROM OrgHierarchy  
-				WHERE pc_org_status = 'A' AND pc_org_orgaoAvaliado = 1
+				WHERE pc_org_orgaoAvaliado = 1
 			</cfquery>
 
 		    <cfif rs_dados_prci.orgaoDaAcaoEdoControleInterno eq 'N' AND (rs_dados_prci.pc_aval_posic_status eq 4 OR rs_dados_prci.pc_aval_posic_status eq 5)>
@@ -1578,6 +1578,370 @@
 			});
 		   
 		</script>
+	</cffunction>
+
+
+
+	<cffunction name="tabPRCIDetalhe_CI" access="remote" hint="mostra tabela com os dados do PRCI de todos os órgãos para o controle interno">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+
+
+		<cfquery name="dadosAno_CI" datasource="#application.dsn_processos#" timeout="120" >
+			SELECT	pc_indDados_numPosic 
+					,pc_orgaoIndicador.pc_org_sigla as orgaoIndicador
+					,pc_orgaoAvaliado.pc_org_sigla as orgaoAvaliado
+					,pc_orgaoResp.pc_org_sigla as orgaoResp
+					,pc_indDados_numProcesso as numProcessoSNCI
+					,pc_indDados_numItem as item
+					,pc_indDados_numOrientacao as orientacao
+					,pc_indDados_dataPrevista as dataPrevista
+					,pc_indDados_dataStatus as dataPosicao
+					,pc_indDados_orientacaoStatus as OrientacaoStatus
+					,pc_indDados_dataRef as dataRef
+					,pc_indDados_prazo as prazo
+					,MONTH(pc_indDados_dataRef) AS monthRef
+					,YEAR(pc_indDados_dataRef) AS yearRef
+					,pc_indDados_numIndicador
+					,CASE WHEN pc_indDados_prazo = 'DP' THEN 1 ELSE 0 END AS DP
+					,pc_indMeta_meta
+			FROM pc_indicadores_dados		
+			INNER JOIN pc_orgaos as pc_orgaoAvaliado ON pc_orgaoAvaliado.pc_org_mcu = pc_indicadores_dados.pc_indDados_numOrgaoAvaliado
+			INNER JOIN pc_orgaos as pc_orgaoResp ON pc_orgaoResp.pc_org_mcu = pc_indicadores_dados.pc_indDados_numOrgaoResp
+			INNER JOIN pc_orgaos as pc_orgaoIndicador ON pc_orgaoIndicador.pc_org_mcu = pc_indicadores_dados.pc_indDados_numOrgaoIndicador
+			LEFT JOIN pc_indicadores_meta ON pc_indicadores_meta.pc_indMeta_ano = YEAR(pc_indicadores_dados.pc_indDados_dataRef) 
+                                      AND pc_indicadores_meta.pc_indMeta_mes = MONTH(pc_indicadores_dados.pc_indDados_dataRef)
+                                      AND pc_orgaoIndicador.pc_org_mcu = pc_indicadores_meta.pc_indMeta_numOrgao
+									  AND pc_indicadores_dados.pc_indDados_numIndicador = pc_indicadores_meta.pc_indMeta_numIndicador
+			WHERE YEAR(pc_indDados_dataRef) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+		</cfquery>
+
+		<cfquery name="resultadoPRCIporOrgao" dbtype="query">
+			SELECT
+				yearRef,
+				monthRef,
+				orgaoIndicador,
+				SUM(DP)/COUNT(*) AS prci,
+				pc_indMeta_meta
+			FROM dadosAno_CI
+			WHERE monthRef = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+				AND pc_indDados_numIndicador = 1
+			GROUP BY yearRef, monthRef, pc_indMeta_meta,orgaoIndicador	
+				
+		</cfquery>
+
+    	<cfquery name="resultadoPRCI" dbtype="query">
+			SELECT	*	FROM dadosAno_CI	
+			WHERE	monthRef = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+					AND pc_indDados_numIndicador = 1
+		</cfquery>
+
+		<cfquery name="resultadoSLNC" dbtype="query">
+			SELECT	*	FROM dadosAno_CI	
+			WHERE	monthRef = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+					AND pc_indDados_numIndicador = 2
+		</cfquery>
+
+		<style>
+			.dataTables_wrapper {
+				width: 100%; /* ou a largura desejada */
+				margin: 0 auto;
+			}
+		</style>
+
+		<cfif #resultadoPRCIporOrgao.recordcount# neq 0 >	
+			<div id="divPRCIporOrgao" class="row" style="width: 100%;">
+							
+				<div class="col-12">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
+							
+							<div class="table-responsive">
+								<table id="tabPRCIporOrgao" class="table table-bordered table-striped text-nowrap" style="width: 300px;">
+									
+									<thead class="bg-gradient-warning">
+										<tr style="font-size:14px">
+											<th style="width: 10px">Órgão</th>
+											<th style="width: 10px">Meta</th>
+											<th style="width: 10px">PRCI</th>
+											
+										</tr>
+									</thead>
+									
+									<tbody>
+										<cfloop query="resultadoPRCIporOrgao" >
+										
+											<cfoutput>					
+												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+													<td>#resultadoPRCIporOrgao.orgaoIndicador#</td>
+													<td>#Replace(resultadoPRCIporOrgao.pc_indMeta_meta,".",",")#</td>
+													<td>#Replace(NumberFormat(resultadoPRCIporOrgao.prci*100, '0.00'),".",",")#</td>
+												</tr>
+											</cfoutput>
+										</cfloop>	
+									</tbody>
+
+								</table>
+							</div>							
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+		</cfif>
+	
+		<cfif #resultadoPRCI.recordcount# neq 0 >	
+			<div id="divDetalhePRCI" class="row" style="width: 100%;">
+							
+				<div class="col-12">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
+														
+							<cfoutput><h5 style="color:##000;text-align: center;">Dados utilizados no cálculo do <strong>PRCI</strong> (Atendimento ao Prazo de Resposta): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+						
+							<div class="table-responsive">
+								<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
+									
+									<thead class="bg-gradient-warning">
+										<tr style="font-size:14px">
+											<th style="width: 10px">Posic ID</th>
+											<th style="width: 10px">SE/CS</th>
+											<th style="width: 10px">Órgão Responsável</th>
+											<th style="width: 10px">Processo SNCI</th>
+											<th style="width: 10px">Órgão Avaliado</th>
+											<th style="width: 10px">Item</th>
+											<th style="width: 10px">Orientação</th>
+											<th style="width: 10px">Data Prevista</th>
+											<th style="width: 10px">Data Status</th>
+											<th style="width: 10px">Status</th>
+											<th style="width: 10px">Data Ref.</th>
+											<th style="width: 10px">Prazo</th>
+
+										</tr>
+									</thead>
+									
+									<tbody>
+										<cfloop query="resultadoPRCI" >
+										
+											<cfoutput>					
+												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+													<td>#resultadoPRCI.pc_indDados_numPosic#</td>
+													<td>#resultadoPRCI.orgaoIndicador#</td>
+													<td>#resultadoPRCI.orgaoResp#</td>
+													<td>#resultadoPRCI.numProcessoSNCI#</td>
+													<td>#resultadoPRCI.orgaoAvaliado#</td>
+													<td >#resultadoPRCI.item#</td>
+													<td>#resultadoPRCI.orientacao#</td>
+													<cfif resultadoPRCI.dataPrevista eq '1900-01-01' or resultadoPRCI.dataPrevista eq ''>
+														<td>NÃO INF.</td>
+													<cfelse>
+														<td>#dateFormat(resultadoPRCI.dataPrevista, 'dd/mm/yyyy')#</td>
+													</cfif>
+													<td>#dateFormat(resultadoPRCI.dataPosicao, 'dd/mm/yyyy')#</td>
+													<td>#resultadoPRCI.OrientacaoStatus#</td>
+													<td>#dateFormat(resultadoPRCI.dataRef, 'dd/mm/yyyy')#</td>
+													<td>#resultadoPRCI.prazo#</td>
+												</tr>
+											</cfoutput>
+										</cfloop>	
+									</tbody>
+
+								</table>
+							</div>							
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+        </cfif>
+
+		<cfif #resultadoSLNC.recordcount# neq 0 >	
+			<div id="divDetalheSLNC" class="row" style="width: 100%;">
+							
+				<div class="col-12">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
+														
+							<cfoutput><h5 style="color:##000;text-align: center;">Dados utilizados no cálculo do <strong>SLNC</strong> (Solução de Não Conformidades): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+						
+							<div class="table-responsive">
+								<table id="tabSLNCdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
+									
+									<thead class="bg-gradient-warning">
+										<tr style="font-size:14px">
+											<th style="width: 10px">Posic ID</th>
+											<th style="width: 10px">SE/CS</th>
+											<th style="width: 10px">Órgão Responsável</th>
+											<th style="width: 10px">Processo SNCI</th>
+											<th style="width: 10px">Órgão Avaliado</th>
+											<th style="width: 10px">Item</th>
+											<th style="width: 10px">Orientação</th>
+											<th style="width: 10px">Data Prevista</th>
+											<th style="width: 10px">Data Status</th>
+											<th style="width: 10px">Status</th>
+											<th style="width: 10px">Data Ref.</th>
+
+										</tr>
+									</thead>
+									
+									<tbody>
+										<cfloop query="resultadoSLNC" >
+										
+											<cfoutput>					
+												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+													<td>#resultadoSLNC.pc_indDados_numPosic#</td>
+													<td>#resultadoSLNC.orgaoIndicador#</td>
+													<td>#resultadoSLNC.orgaoResp#</td>
+													<td>#resultadoSLNC.numProcessoSNCI#</td>
+													<td>#resultadoSLNC.orgaoAvaliado#</td>
+													<td >#resultadoSLNC.item#</td>
+													<td>#resultadoSLNC.orientacao#</td>
+													<cfif resultadoSLNC.dataPrevista eq '1900-01-01' or resultadoSLNC.dataPrevista eq ''>
+														<td>NÃO INF.</td>
+													<cfelse>
+														<td>#dateFormat(resultadoSLNC.dataPrevista, 'dd/mm/yyyy')#</td>
+													</cfif>
+													<td>#dateFormat(resultadoSLNC.dataPosicao, 'dd/mm/yyyy')#</td>
+
+													<td>#resultadoSLNC.OrientacaoStatus#</td>
+
+													<td>#dateFormat(resultadoSLNC.dataRef, 'dd/mm/yyyy')#</td>
+												</tr>
+											</cfoutput>
+										</cfloop>	
+									</tbody>
+
+								</table>
+							</div>							
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+        </cfif>
+
+		
+
+		<script language="JavaScript">
+		   
+				
+
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+
+			var d = day + "-" + month + "-" + year;	
+
+			$(function () {
+				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
+			
+				
+				var tituloExcel_PRCI ="SNCI_Consulta_PRCI_detalhamento_";
+
+				const tabPRCIdetalhamento = $('#tabPRCIdetalhe').DataTable( {
+				    destroy: true, // Destruir a tabela antes de recriá-la
+					stateSave: false,
+					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+					scrollX: true, // Permitir rolagem horizontal
+        			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+					pageLength: 5,
+					dom:   "<'row'<'col-sm-4'B><'col-sm-4'p><'col-sm-4 text-right'i>>" ,
+
+							
+					buttons: [
+						{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+							title : tituloExcel_PRCI + d,
+							className: 'btExcel',
+						}
+
+					]
+					
+
+				})
+
+				var tituloExcel_SLNC ="SNCI_Consulta_SLNC_detalhamento_";
+
+				const tabSLNCdetalhamento = $('#tabSLNCdetalhe').DataTable( {
+					  destroy: true, // Destruir a tabela antes de recriá-la
+					stateSave: false,
+					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+					scrollX: true, // Permitir rolagem horizontal
+        			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+					pageLength: 5,
+					dom:   "<'row'<'col-sm-4'B><'col-sm-4'p><'col-sm-4 text-right'i>>" ,
+
+							
+					buttons: [
+						{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+							title : tituloExcel_SLNC + d,
+							className: 'btExcel',
+						}
+
+					]
+					
+
+				})
+
+				var tituloExcel_SLNC ="SNCI_Consulta_PRCI_por_orgao_";
+
+				const tabPRCIporOrgao = $('#tabPRCIporOrgao').DataTable( {
+					destroy: true, // Destruir a tabela antes de recriá-la
+					stateSave: false,
+					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+					scrollX: true, // Permitir rolagem horizontal
+        			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+					pageLength: 10,
+					order: [[2, 'desc']],//classificar pela coluna PRCI em ordem decrescente
+					dom:   "<'row'<'col-sm-4'B><'col-sm-4'p><'col-sm-4 text-right'i>>" ,
+
+							
+					buttons: [
+						{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+							title : tituloExcel_SLNC + d,
+							className: 'btExcel',
+						}
+
+					]
+					
+
+				})
+ 
+				
+
+
+			
+			});
+
+
+			$(document).ready(function() {
+				
+				$(".content-wrapper").css("height", "auto");
+			
+			});
+		</script>
+
 	</cffunction>
 
 
