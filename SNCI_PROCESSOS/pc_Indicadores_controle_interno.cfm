@@ -74,6 +74,8 @@
                     <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
+				<div id="divMesAnoCI"></div>
+
 				<div id="divTabsIndicadores" class="card card-primary card-tabs"  style="widht:100%;">
 					<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
 						
@@ -81,6 +83,10 @@
 							
 							<li class="nav-item" style="">
 								<a  class="nav-link  active" id="custom-tabs-one-PRCIporOrgao-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIporOrgao" role="tab" aria-controls="custom-tabs-one-PRCIporOrgao" aria-selected="true">PRCI por Órgao</a>
+							</li>
+
+							<li class="nav-item" style="">
+								<a  class="nav-link  " id="custom-tabs-one-SLNCporOrgao-tab"   data-toggle="pill" href="#custom-tabs-one-SLNCporOrgao" role="tab" aria-controls="custom-tabs-one-SLNCporOrgao" aria-selected="true">SLNC por Órgao</a>
 							</li>
 
 							<li class="nav-item" style="">
@@ -94,10 +100,14 @@
 						</ul>
 					</div>
 					<div class="card-body">
-						<div class="tab-content" id="custom-tabs-one-tabContent" >
+						<div class="tab-content " id="custom-tabs-one-tabContent" >
 
-							<div disable class="tab-pane fade  active show" id="custom-tabs-one-PRCIporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIporOrgao-tab" >														
+							<div disable class="tab-pane fade  active show " id="custom-tabs-one-PRCIporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIporOrgao-tab" >														
 								<div id="divIndicadorPRCIporOrgao" ></div>
+							</div>
+
+							<div disable class="tab-pane fade  " id="custom-tabs-one-SLNCporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-SLNCporOrgao-tab" >														
+								<div id="divIndicadorSLNCporOrgao" ></div>
 							</div>
 
 							<div disable class="tab-pane fade" id="custom-tabs-one-PRCI"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCI-tab" >														
@@ -174,6 +184,7 @@
 			$('#opcoesAno').on('change', function() {
 				$('#divTabsIndicadores').hide();
 				$('#divIndicadorDetalhes').html('');
+				$('#divMesAnoCI').html('');
 				// Obtém o ano selecionado
 				const selectedYear = parseInt($('input[name=ano]:checked').val());
 
@@ -201,6 +212,7 @@
 		$('#opcoesMes').on('change', function() {
 			$('#divTabsIndicadores').hide();
 			$('#divIndicadorDetalhes').html('');
+			$('#divMesAnoCI').html('');
 			// Obtém o ano selecionado		
 			let selectedYear = parseInt($('input[name=ano]:checked').val());	
 			// Obtém o mês selecionado
@@ -212,7 +224,7 @@
 					type: "post",
 					url: "cfc/pc_cfcIndicadores.cfc",
 					data:{
-						method:"tabPRCIDetalhe_CI",
+						method:"formIndicadoresCI",
 						ano:selectedYear,
 						mes:selectedMonth
 					},
@@ -221,18 +233,25 @@
 						$('#divIndicadorDetalhes').html(result);//INSERE OS INDICADORES NA DIV
 						// Armazenar o conteúdo das divs de detalhes
 						let conteudoPRCIporOrgao = $('#divPRCIporOrgao').html();
+						let conteudoSLNCporOrgao = $('#divSLNCporOrgao').html();
 						let conteudoDetalhesPRCI = $('#divDetalhePRCI').html();
 						let conteudoDetalhesSLNC = $('#divDetalheSLNC').html();
+						let conteudoDivMesAnoCI = $('#divMesAno').html();
+						
 
 						// Limpar o conteúdo das divs de detalhes
 						$('#divIndicadorPRCIporOrgao').html('');
+						$('#divIndicadorSLNCporOrgao').html('');
 						$('#divIndicadorDetalhesPRCI').html('');
 						$('#divIndicadorDetalhesSLNC').html('');
+						$('#divMesAnoCI').html('');
 						
 						// Adicionar o conteúdo às divs de detalhes das abas
 						$('#divIndicadorPRCIporOrgao').append(conteudoPRCIporOrgao);
+						$('#divIndicadorSLNCporOrgao').append(conteudoSLNCporOrgao);
 						$('#divIndicadorDetalhesPRCI').append(conteudoDetalhesPRCI);
 						$('#divIndicadorDetalhesSLNC').append(conteudoDetalhesSLNC);
+						$('#divMesAnoCI').append(conteudoDivMesAnoCI);
 
 						// Esconder o conteúdo original
 						$('#divIndicadorDetalhes').html('');

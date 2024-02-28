@@ -1331,8 +1331,7 @@
 		<cfelse>
 			<cfset percentualDP = (totalDPPRCI / totalGeral) * 100 />
 		</cfif>
-	 		<!--- Formata o percentualDP com duas casas decimais --->
-		<cfset percentualDPFormatado = NumberFormat(percentualDP, '0.0') />
+	 	
 		
 
 
@@ -1353,8 +1352,17 @@
 				<cfset percentualSolucionado = (totalSolucionadoSLNC / totalGeral *100) />
 			</cfif>
 			<cfset percentualSolucionadoFormatado = NumberFormat(percentualSolucionado, '0.0') />
-            <cfset percentualDGCI = NumberFormat((percentualDPFormatado * 0.4) + (percentualSolucionadoFormatado*0.6), '0.0') />
-			<cfset percentualDGCIformatado = Replace(NumberFormat((percentualDPFormatado * 0.4) + (percentualSolucionadoFormatado*0.6), '0.0'),".",",")  />
+
+			<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
+				SELECT	pc_ind_peso FROM pc_indicadores WHERE pc_indicadores.pc_ind_id = 1
+			</cfquery>
+
+			<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
+				SELECT	pc_ind_peso FROM pc_indicadores WHERE pc_indicadores.pc_ind_id = 2
+			</cfquery>
+
+            <cfset percentualDGCI = NumberFormat((percentualDP * #rsPRCIpeso.pc_ind_peso#) + (percentualSolucionadoFormatado * #rsSLNCpeso.pc_ind_peso# ), '0.0') />
+			<cfset percentualDGCIformatado = Replace(NumberFormat((percentualDP * #rsPRCIpeso.pc_ind_peso#) + (percentualSolucionadoFormatado * #rsSLNCpeso.pc_ind_peso#), '0.0'),".",",")  />
 
 			<div align="center" class="col-md-12 col-sm-12 col-12 mx-auto" style="margin-bottom:10px">
 				<span class="info-box-text" style="font-size:30px">#monthAsString(arguments.mes)#/#arguments.ano#</span>
@@ -1381,7 +1389,7 @@
 												<div class="progress-bar" style="width: #percentualDGCI#%"></div>
 											</div>
 											<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-												<span style="font-size:14px">DGCI = (PRCI*0,40) + (SLNC*0,60)</span><br>
+												<span style="font-size:14px">DGCI = (PRCI * #rsPRCIpeso.pc_ind_peso#) + (SLNC * #rsSLNCpeso.pc_ind_peso#)</span><br>
 											</font></font></span>
 										</div>
 										<!-- /.info-box-content -->
@@ -1522,10 +1530,14 @@
 					});
 
 					// Preencher a terceira tabela com os dados calculados
+					<cfoutput>
+						let pesoPRCI = #rsPRCIpeso.pc_ind_peso#;
+						let pesoSLNC = #rsSLNCpeso.pc_ind_peso#
+					</cfoutput>
 					$.each(allOrgaos, function(orgao, data) {
 						var prci = data['PRCI'] || 0; // PRCI do órgão, se não houver, definir como 0
 						var slnc = data['SLNC'] || 0; // SLNC do órgão, se não houver, definir como 0
-						var dgci = (prci * 0.40) + (slnc * 0.60); // Calcular o DGCI
+						var dgci = (prci * pesoPRCI) + (slnc * pesoSLNC); // Calcular o DGCI
 
 						// Construir uma nova linha com os dados calculados
 						var newRow = '<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"><td>' + orgao + '</td>' +
@@ -1582,12 +1594,12 @@
 
 
 
-	<cffunction name="tabPRCIDetalhe_CI" access="remote" hint="mostra tabela com os dados do PRCI de todos os órgãos para o controle interno">
+	<cffunction name="formIndicadoresCI" access="remote" hint="mostra os dados dos indicadores de todos os órgãos para o controle interno">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 
 
-		<cfquery name="dadosAno_CI" datasource="#application.dsn_processos#" timeout="120" >
+		<cfquery name="dadosAno_CI" datasource="#application.dsn_processos#" timeout="120"  >
 			SELECT	pc_indDados_numPosic 
 					,pc_orgaoIndicador.pc_org_sigla as orgaoIndicador
 					,pc_orgaoAvaliado.pc_org_sigla as orgaoAvaliado
@@ -1604,6 +1616,7 @@
 					,YEAR(pc_indDados_dataRef) AS yearRef
 					,pc_indDados_numIndicador
 					,CASE WHEN pc_indDados_prazo = 'DP' THEN 1 ELSE 0 END AS DP
+					,CASE WHEN pc_indDados_status = 6 THEN 1 ELSE 0 END AS solucionado
 					,pc_indMeta_meta
 			FROM pc_indicadores_dados		
 			INNER JOIN pc_orgaos as pc_orgaoAvaliado ON pc_orgaoAvaliado.pc_org_mcu = pc_indicadores_dados.pc_indDados_numOrgaoAvaliado
@@ -1615,6 +1628,31 @@
 									  AND pc_indicadores_dados.pc_indDados_numIndicador = pc_indicadores_meta.pc_indMeta_numIndicador
 			WHERE YEAR(pc_indDados_dataRef) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 		</cfquery>
+
+		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	* FROM pc_indicadores WHERE pc_indicadores.pc_ind_id = 1
+		</cfquery>
+
+		<cfquery name="rsSNCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	* FROM pc_indicadores WHERE pc_indicadores.pc_ind_id = 2
+		</cfquery>
+
+		<cfquery name="resultadoDGCIporOrgao" dbtype="query">
+			SELECT
+				yearRef,
+				monthRef,
+				orgaoIndicador,
+				SUM(DP)/COUNT(*) AS prci,
+				SUM(solucionado)/COUNT(*) AS slnc
+			FROM dadosAno_CI
+			WHERE monthRef = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+			GROUP BY yearRef, monthRef, orgaoIndicador	
+				
+		</cfquery>
+
+
+
+
 
 		<cfquery name="resultadoPRCIporOrgao" dbtype="query">
 			SELECT
@@ -1629,6 +1667,21 @@
 			GROUP BY yearRef, monthRef, pc_indMeta_meta,orgaoIndicador	
 				
 		</cfquery>
+
+		<cfquery name="resultadoSLNCporOrgao" dbtype="query">
+			SELECT
+				yearRef,
+				monthRef,
+				orgaoIndicador,
+				SUM(solucionado)/COUNT(*) AS slnc,
+				pc_indMeta_meta
+			FROM dadosAno_CI
+			WHERE monthRef = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+				AND pc_indDados_numIndicador = 2
+			GROUP BY yearRef, monthRef, pc_indMeta_meta,orgaoIndicador	
+				
+		</cfquery>
+
 
     	<cfquery name="resultadoPRCI" dbtype="query">
 			SELECT	*	FROM dadosAno_CI	
@@ -1648,36 +1701,184 @@
 				margin: 0 auto;
 			}
 		</style>
+		<div id="divMesAno" class="row" style="width: 100%;">	
+			<cfif #resultadoPRCI.recordcount# neq 0 or #resultadoSLNC.recordcount# neq 0>
+       			<cfoutput><h4 style="color:blue;text-align: center;padding:10px">#monthAsString(arguments.mes)#/#arguments.ano# </h4></cfoutput>
+			<cfelse>
+				<h4 style="color:##000;text-align: center;padding:10px">Não foram gerados dados para #monthAsString(arguments.mes)#/#arguments.ano# </h4>
+			</cfif>
+
+			<cfdump var="#resultadoDGCIporOrgao#">
+		</div>
 
 		<cfif #resultadoPRCIporOrgao.recordcount# neq 0 >	
 			<div id="divPRCIporOrgao" class="row" style="width: 100%;">
 							
-				<div class="col-12">
+				<div class="col-11">
 					<div class="card" >
 						
 						<!-- card-body -->
 						<div class="card-body" >
 							
-							<div class="table-responsive">
-								<table id="tabPRCIporOrgao" class="table table-bordered table-striped text-nowrap" style="width: 300px;">
+							<div class="table-responsive ">
+								<table id="tabPRCIporOrgao" class="table table-bordered table-striped text-nowrap " >
 									
 									<thead class="bg-gradient-warning">
 										<tr style="font-size:14px">
-											<th style="width: 10px">Órgão</th>
-											<th style="width: 10px">Meta</th>
-											<th style="width: 10px">PRCI</th>
-											
+											<th >Órgão</th>
+											<th >Meta</th>
+											<th >PRCI <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
+											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
+											<th >PRCI Acumulado</th>
+											<th >Resultado Acumulado</th>
 										</tr>
 									</thead>
 									
 									<tbody>
 										<cfloop query="resultadoPRCIporOrgao" >
+											<cfquery name="resultadoPRCIporOrgaoAcumulado" dbtype="query">
+												SELECT
+													yearRef,
+													orgaoIndicador,
+													SUM(DP)/COUNT(*) AS prciAcumulado
+												FROM dadosAno_CI
+												WHERE monthRef <= <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+													AND pc_indDados_numIndicador = 1
+													AND orgaoIndicador = '#orgaoIndicador#'
+												GROUP BY yearRef,orgaoIndicador	
+													
+											</cfquery>
 										
-											<cfoutput>					
+											<cfoutput>	
+											     <cfset metaMes = #NumberFormat(0, '0.0')#>		
 												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 													<td>#resultadoPRCIporOrgao.orgaoIndicador#</td>
-													<td>#Replace(resultadoPRCIporOrgao.pc_indMeta_meta,".",",")#</td>
-													<td>#Replace(NumberFormat(resultadoPRCIporOrgao.prci*100, '0.00'),".",",")#</td>
+													<cfif resultadoPRCIporOrgao.pc_indMeta_meta eq ''>
+														<td>#metaMes#</td>
+													<cfelse>
+														<cfset metaMes = NumberFormat(resultadoPRCIporOrgao.pc_indMeta_meta, '0.0')>
+														<td>#metaMes#</td>
+													</cfif>
+													
+													<td>#NumberFormat(resultadoPRCIporOrgao.prci*100, '0.0')#</td>
+													<cfif NumberFormat(resultadoPRCIporOrgao.prci*100, '0.0') gt  metaMes and  metaMes neq ''>
+														<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
+													<cfelseif NumberFormat(resultadoPRCIporOrgao.prci*100, '0.0') lt  metaMes and  metaMes neq ''>
+														<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
+													<cfelseif NumberFormat(resultadoPRCIporOrgao.prci*100, '0.0') eq  metaMes and  metaMes neq ''>
+														<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+													<cfelse>
+														<td>SEM META</td>	
+													</cfif>
+
+													<cfif resultadoPRCIporOrgaoAcumulado.prciAcumulado neq ''>
+														<cfset prciAcumulado =resultadoPRCIporOrgaoAcumulado.prciAcumulado>	
+													<cfelse>
+														<cfset prciAcumulado = 0>
+													</cfif>
+
+													<td>#NumberFormat(prciAcumulado*100, '0.0')#</td>
+
+													<cfif NumberFormat(prciAcumulado*100, '0.0') gt  metaMes and  metaMes neq ''>
+														<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
+													<cfelseif NumberFormat(prciAcumulado*100, '0.0') lt  metaMes and  metaMes neq ''>
+														<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
+													<cfelseif NumberFormat(prciAcumulado*100, '0.0') eq  metaMes and  metaMes neq ''>
+														<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+													<cfelse>
+														<td>SEM META</td>	
+													</cfif>
+												</tr>
+											</cfoutput>
+										</cfloop>	
+									</tbody>
+
+								</table>
+							</div>							
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+		</cfif>
+
+		<cfif #resultadoSLNCporOrgao.recordcount# neq 0 >	
+			<div id="divSLNCporOrgao" class="row" style="width: 100%;">
+							
+				<div class="col-11">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
+							
+							<div class="table-responsive ">
+								<table id="tabSLNCporOrgao" class="table table-bordered table-striped text-nowrap " >
+									
+									<thead class="bg-gradient-warning">
+										<tr style="font-size:14px">
+											<th >Órgão</th>
+											<th >Meta</th>
+											<th >SLNC <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
+											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
+											<th >SLNC Acumulado</th>
+											<th >Resultado Acumulado</th>
+										</tr>
+									</thead>
+									
+									<tbody>
+										<cfloop query="resultadoSLNCporOrgao" >
+											<cfquery name="resultadoSLNCporOrgaoAcumulado" dbtype="query">
+												SELECT
+													yearRef,
+													orgaoIndicador,
+													SUM(solucionado)/COUNT(*) AS SLNCacumulado
+												FROM dadosAno_CI
+												WHERE monthRef <= <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+													AND pc_indDados_numIndicador = 2
+													AND orgaoIndicador = '#orgaoIndicador#'
+												GROUP BY yearRef,orgaoIndicador	
+													
+											</cfquery>
+										
+											<cfoutput>					
+											   <cfset metaMes = #NumberFormat(0, '0.0')#>
+												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+													<td>#resultadoSLNCporOrgao.orgaoIndicador#</td>
+													<cfif resultadoSLNCporOrgao.pc_indMeta_meta eq ''>
+														<td>#metaMes#</td>
+													<cfelse>
+														<cfset metaMes = NumberFormat(resultadoSLNCporOrgao.pc_indMeta_meta, '0.0')>
+														<td>#metaMes#</td>
+													</cfif>
+													<td>#NumberFormat(resultadoSLNCporOrgao.SLNC*100, '0.0')#</td>
+													<cfif NumberFormat(resultadoSLNCporOrgao.SLNC*100, '0.0') gt metaMes >
+														<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
+													<cfelseif NumberFormat(resultadoSLNCporOrgao.SLNC*100, '0.0') lt metaMes >
+														<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
+													<cfelse>
+														<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+													</cfif>
+
+													
+													<cfif resultadoSLNCporOrgaoAcumulado.SLNCacumulado neq ''>
+														<cfset SLNCacumulado =resultadoSLNCporOrgaoAcumulado.SLNCacumulado>
+													<cfelse>
+														<cfset SLNCacumulado = 0>
+													</cfif>
+
+													<td>#NumberFormat(SLNCacumulado*100, '0.0')#</td>
+													<cfif NumberFormat(SLNCacumulado*100, '0.0') gt metaMes >
+														<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
+													<cfelseif NumberFormat(SLNCacumulado*100, '0.0') lt metaMes >
+														<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
+													<cfelseif NumberFormat(SLNCacumulado*100, '0.0') eq metaMes >
+														<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+													<cfelse>
+														<td>SEM META</td>	
+													</cfif>
 												</tr>
 											</cfoutput>
 										</cfloop>	
@@ -1902,7 +2103,7 @@
 
 				})
 
-				var tituloExcel_SLNC ="SNCI_Consulta_PRCI_por_orgao_";
+				var tituloExcel_PRCIporOrgao ="SNCI_Consulta_PRCI_por_orgao_";
 
 				const tabPRCIporOrgao = $('#tabPRCIporOrgao').DataTable( {
 					destroy: true, // Destruir a tabela antes de recriá-la
@@ -1910,16 +2111,17 @@
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
 					scrollX: true, // Permitir rolagem horizontal
         			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
-					pageLength: 10,
+					pageLength: 15,
 					order: [[2, 'desc']],//classificar pela coluna PRCI em ordem decrescente
-					dom:   "<'row'<'col-sm-4'B><'col-sm-4'p><'col-sm-4 text-right'i>>" ,
+					dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-2 text-right'i>>" ,
+
 
 							
 					buttons: [
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel_SLNC + d,
+							title : tituloExcel_PRCIporOrgao + d,
 							className: 'btExcel',
 						}
 
@@ -1927,6 +2129,34 @@
 					
 
 				})
+
+				var tituloExcel_SLNCporOrgao ="SNCI_Consulta_SLNC_por_orgao_";
+
+				const tabSLNCporOrgao = $('#tabSLNCporOrgao').DataTable( {
+					destroy: true, // Destruir a tabela antes de recriá-la
+					stateSave: false,
+					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+					scrollX: true, // Permitir rolagem horizontal
+        			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+					pageLength: 15,
+					order: [[2, 'desc']],//classificar pela coluna SLNC em ordem decrescente
+					dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-2 text-right'i>>" ,
+
+
+							
+					buttons: [
+						{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+							title : tituloExcel_SLNCporOrgao + d,
+							className: 'btExcel',
+						}
+
+					]
+					
+
+				})
+ 
  
 				
 
