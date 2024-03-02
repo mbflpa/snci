@@ -80,9 +80,13 @@
 					<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
 						
 						<ul class="nav nav-tabs" id="custom-tabs-one-tabAcomp" role="tablist" style="font-size:14px;">
+
+							<li class="nav-item" style="">
+								<a  class="nav-link  active" id="custom-tabs-one-DGCIporOrgao-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgao" role="tab" aria-controls="custom-tabs-one-DGCIporOrgao" aria-selected="true">DGCI por Órgao</a>
+							</li>
 							
 							<li class="nav-item" style="">
-								<a  class="nav-link  active" id="custom-tabs-one-PRCIporOrgao-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIporOrgao" role="tab" aria-controls="custom-tabs-one-PRCIporOrgao" aria-selected="true">PRCI por Órgao</a>
+								<a  class="nav-link  " id="custom-tabs-one-PRCIporOrgao-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIporOrgao" role="tab" aria-controls="custom-tabs-one-PRCIporOrgao" aria-selected="true">PRCI por Órgao</a>
 							</li>
 
 							<li class="nav-item" style="">
@@ -102,7 +106,11 @@
 					<div class="card-body">
 						<div class="tab-content " id="custom-tabs-one-tabContent" >
 
-							<div disable class="tab-pane fade  active show " id="custom-tabs-one-PRCIporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIporOrgao-tab" >														
+							<div disable class="tab-pane fade  active show " id="custom-tabs-one-DGCIporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgao-tab" >														
+								<div id="divIndicadorDGCIporOrgao" ></div>
+							</div>
+
+							<div disable class="tab-pane fade " id="custom-tabs-one-PRCIporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIporOrgao-tab" >														
 								<div id="divIndicadorPRCIporOrgao" ></div>
 							</div>
 
@@ -232,6 +240,7 @@
 					success: function(result) {	
 						$('#divIndicadorDetalhes').html(result);//INSERE OS INDICADORES NA DIV
 						// Armazenar o conteúdo das divs de detalhes
+						let conteudoDGCIporOrgao = $('#divDGCIporOrgao').html();
 						let conteudoPRCIporOrgao = $('#divPRCIporOrgao').html();
 						let conteudoSLNCporOrgao = $('#divSLNCporOrgao').html();
 						let conteudoDetalhesPRCI = $('#divDetalhePRCI').html();
@@ -240,6 +249,7 @@
 						
 
 						// Limpar o conteúdo das divs de detalhes
+						$('#divIndicadorDGCIporOrgao').html('');
 						$('#divIndicadorPRCIporOrgao').html('');
 						$('#divIndicadorSLNCporOrgao').html('');
 						$('#divIndicadorDetalhesPRCI').html('');
@@ -247,6 +257,7 @@
 						$('#divMesAnoCI').html('');
 						
 						// Adicionar o conteúdo às divs de detalhes das abas
+						$('#divIndicadorDGCIporOrgao').append(conteudoDGCIporOrgao);
 						$('#divIndicadorPRCIporOrgao').append(conteudoPRCIporOrgao);
 						$('#divIndicadorSLNCporOrgao').append(conteudoSLNCporOrgao);
 						$('#divIndicadorDetalhesPRCI').append(conteudoDetalhesPRCI);
