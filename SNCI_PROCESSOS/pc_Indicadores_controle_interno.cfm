@@ -82,7 +82,10 @@
 						<ul class="nav nav-tabs" id="custom-tabs-one-tabAcomp" role="tablist" style="font-size:14px;">
 
 							<li class="nav-item" style="">
-								<a  class="nav-link  active" id="custom-tabs-one-DGCIporOrgao-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgao" role="tab" aria-controls="custom-tabs-one-DGCIporOrgao" aria-selected="true">DGCI por Órgao</a>
+								<a  class="nav-link  active" id="custom-tabs-one-DGCIporOrgaoSubord-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgaoSubord" role="tab" aria-controls="custom-tabs-one-DGCIporOrgaoSubord" aria-selected="true">DGCI por Órgao Subordinador</a>
+							</li>
+							<li class="nav-item" style="">
+								<a  class="nav-link  " id="custom-tabs-one-DGCIporGerencia-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporGerencia" role="tab" aria-controls="custom-tabs-one-DGCIporGerencia" aria-selected="true">DGCI por Gerência</a>
 							</li>
 							
 							<li class="nav-item" style="">
@@ -106,8 +109,12 @@
 					<div class="card-body">
 						<div class="tab-content " id="custom-tabs-one-tabContent" >
 
-							<div disable class="tab-pane fade  active show " id="custom-tabs-one-DGCIporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgao-tab" >														
-								<div id="divIndicadorDGCIporOrgao" ></div>
+							<div disable class="tab-pane fade  active show " id="custom-tabs-one-DGCIporOrgaoSubord"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgaoSubord-tab" >														
+								<div id="divIndicadorDGCIporOrgaoSubord" ></div>
+							</div>
+
+							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporGerencia"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporGerencia-tab" >														
+								<div id="divIndicadorDGCIporGerencia" ></div>
 							</div>
 
 							<div disable class="tab-pane fade " id="custom-tabs-one-PRCIporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIporOrgao-tab" >														
@@ -174,7 +181,7 @@
 			// Cria um array de nomes de meses, começando em janeiro e indo até o mês atual, em ordem crescente
 			const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 			const currentMonth = new Date().getMonth();
-			const monthRange = monthNames.slice(0, currentYear === parseInt($('input[name=ano]:checked').val()) ? currentMonth + 1 : 12);
+			const monthRange = monthNames.slice(0, currentYear === parseInt($('input[name=ano]:checked').val()) ? currentMonth  : 12);
 
 			// Mapeia cada mês para um botão de opção de rádio com o número do mês como valor e o nome do mês como rótulo
 			const radioButtonsMes = monthRange.map((month, i) => {
@@ -197,7 +204,7 @@
 				const selectedYear = parseInt($('input[name=ano]:checked').val());
 
 				// Cria um array de nomes de meses, começando em janeiro e indo até o mês atual, em ordem crescente, com base no ano selecionado
-				const monthRange = monthNames.slice(0, selectedYear === currentYear ? currentMonth + 1 : 12);
+				const monthRange = monthNames.slice(0, selectedYear === currentYear ? currentMonth : 12);
 
 				// Mapeia cada mês para um botão de opção de rádio com o número do mês como valor e o nome do mês como rótulo
 				const radioButtonsMes = monthRange.map((month, i) => {
@@ -240,7 +247,8 @@
 					success: function(result) {	
 						$('#divIndicadorDetalhes').html(result);//INSERE OS INDICADORES NA DIV
 						// Armazenar o conteúdo das divs de detalhes
-						let conteudoDGCIporOrgao = $('#divDGCIporOrgao').html();
+						let conteudoDGCIporOrgaoSubord = $('#divDGCIporOrgaoSubord').html();
+						let conteudoDGCIporGerencia = $('#divDGCIporGerencia').html();
 						let conteudoPRCIporOrgao = $('#divPRCIporOrgao').html();
 						let conteudoSLNCporOrgao = $('#divSLNCporOrgao').html();
 						let conteudoDetalhesPRCI = $('#divDetalhePRCI').html();
@@ -249,7 +257,8 @@
 						
 
 						// Limpar o conteúdo das divs de detalhes
-						$('#divIndicadorDGCIporOrgao').html('');
+						$('#divIndicadorDGCIporOrgaoSubord').html('');
+						$('#divIndicadorDGCIporGerencia').html('');
 						$('#divIndicadorPRCIporOrgao').html('');
 						$('#divIndicadorSLNCporOrgao').html('');
 						$('#divIndicadorDetalhesPRCI').html('');
@@ -257,7 +266,8 @@
 						$('#divMesAnoCI').html('');
 						
 						// Adicionar o conteúdo às divs de detalhes das abas
-						$('#divIndicadorDGCIporOrgao').append(conteudoDGCIporOrgao);
+						$('#divIndicadorDGCIporOrgaoSubord').append(conteudoDGCIporOrgaoSubord);
+						$('#divIndicadorDGCIporGerencia').append(conteudoDGCIporGerencia);
 						$('#divIndicadorPRCIporOrgao').append(conteudoPRCIporOrgao);
 						$('#divIndicadorSLNCporOrgao').append(conteudoSLNCporOrgao);
 						$('#divIndicadorDetalhesPRCI').append(conteudoDetalhesPRCI);

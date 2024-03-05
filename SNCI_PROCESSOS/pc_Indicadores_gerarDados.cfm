@@ -209,7 +209,7 @@
 									type: "post",
 									url: "cfc/pc_cfcIndicadores.cfc",
 									data:{
-										method:"gerarDadosParaIndicadoresMensal",
+										method:"gerarDadosParaIndicadores",
 										ano:ano,
 										mes:mes
 									},
@@ -270,7 +270,7 @@
 									type: "post",
 									url: "cfc/pc_cfcIndicadores.cfc",
 									data:{
-										method:"gerarDadosParaIndicadoresMensal",
+										method:"gerarDadosParaIndicadores",
 										ano:parseInt($('input[name=ano]:checked').val()),
 										mes:parseInt($('input[name=mes]:checked').val())
 									},
