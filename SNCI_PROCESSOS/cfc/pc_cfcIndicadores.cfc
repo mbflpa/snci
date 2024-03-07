@@ -1944,26 +1944,20 @@
 			SELECT * FROM resultadoDetalhe	WHERE numIndicador = 2
 		</cfquery>
 
-
-
-
-		<style>
-			.dataTables_wrapper {
-				width: 100%; /* ou a largura desejada */
-				margin: 0 auto;
-			}
-		</style>
+		
 		
 		<div id="divMesAno" class="row" style="width: 100%;">	
-			
-			<cfoutput><h4 style="color:blue;text-align: center;padding:10px">#monthAsString(arguments.mes)#/#arguments.ano# </h4></cfoutput>
-
-			
+			<cfif resultadoDetalhe.recordcount eq 0>
+				<h5 style="color:#0083CA;text-align: center;padding:40px">Nenhuma informação foi localizada para o mês <cfoutput>#monthAsString(arguments.mes)#</cfoutput>/<cfoutput>#arguments.ano#</cfoutput>.</h5>
+			<cfelse>
+				<cfoutput><h4 style="color:##0083CA;text-align: center;padding:10px">#monthAsString(arguments.mes)#/#arguments.ano# </h4></cfoutput>
+			</cfif>
 		</div>
+
 
 		<cfif #resultadoDGCIporOrgaoSubordinador.recordcount# neq 0 >	
 	
-			<div id="divDGCIporOrgaoSubord" class="row" style="width: 100%;">
+			<div id="divDGCIporOrgaoSubord" class="row" >
 							
 				<div class="col-12">
 					<div class="card" >
@@ -1975,10 +1969,10 @@
 								<table id="tabDGCIporOrgaoSubord" class="table table-bordered table-striped text-nowrap " >
 									
 									<thead >
-										<tr style="font-size:14px">
+										<tr style="font-size:14px;text-align: center;">
 											<th >Órgão</th>
-											<th style="text-align: center;">PRCI <br><cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
-											<th style="text-align: center;">SLNC <br><cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
+											<th >PRCI <br><cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
+											<th >SLNC <br><cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
 											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;text-align: center;">
 												DGCI 
 												<cfoutput>
@@ -1990,14 +1984,25 @@
 											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
 											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;text-align: center;">DGCI<br>Acumulado</th>
 											<th>Resultado Acumulado</th>
+											<th >Result. em Relação<br>à Meta Mensal</th>
 										</tr>
 									</thead>
 									
 									<tbody>
+									    <cfset totalPRCI = 0>
+										<cfset totalSLNC = 0>
+										<cfset totalDGCI = 0>
+										<cfset totalMeta = 0>
+										<cfset totalDGCIAcumulado = 0>
+										<cfset totalPRCIAcumulado = 0>
+										<cfset totalSLNCAcumulado = 0>
+										<cfset count = 0>
+
 										<cfloop query="resultadoDGCIporOrgaoSubordinador" >
+										    <cfset count = count + 1>
 											<cfoutput>	
 												<cfquery name="resultadoPRCI"   dbtype="query">
-													SELECT pc_indOrgao_resultadoMes as prci FROM resultadoPorOrgao	
+													SELECT pc_indOrgao_resultadoMes as prci, pc_indOrgao_resultadoAcumulado FROM resultadoPorOrgao	
 													WHERE pc_indOrgao_numIndicador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 													AND pc_indOrgao_mcuOrgao = <cfqueryparam value="#resultadoDGCIporOrgaoSubordinador.pc_indOrgao_mcuOrgao#" cfsqltype="cf_sql_varchar">
 													AND pc_indOrgao_ano = <cfqueryparam value="#pc_indOrgao_ano#" cfsqltype="cf_sql_integer">
@@ -2006,7 +2011,7 @@
 												</cfquery>	
 
 												<cfquery name="resultadoSLNC"   dbtype="query">
-													SELECT pc_indOrgao_resultadoMes as slnc FROM resultadoPorOrgao	
+													SELECT pc_indOrgao_resultadoMes as slnc, pc_indOrgao_resultadoAcumulado  FROM resultadoPorOrgao	
 													WHERE pc_indOrgao_numIndicador = <cfqueryparam value="2" cfsqltype="cf_sql_integer">
 													AND pc_indOrgao_mcuOrgao = <cfqueryparam value="#resultadoDGCIporOrgaoSubordinador.pc_indOrgao_mcuOrgao#" cfsqltype="cf_sql_varchar">
 													AND pc_indOrgao_ano = <cfqueryparam value="#pc_indOrgao_ano#" cfsqltype="cf_sql_integer">
@@ -2057,37 +2062,99 @@
 														<cfset metaMes = NumberFormat(metaDGCI, '0.0')>
 														<td>#metaMes#</td>
 													</cfif>
+
+													<cfif metaMes neq 0>
+														<cfset resultEmRelacaoMeta = NumberFormat((NumberFormat(pc_indOrgao_resultadoMes, '0.0') / metaMes)*100,0.0)>
+													<cfelse>
+														<cfset resultEmRelacaoMeta = NumberFormat(0, '0.0')>	
+													</cfif>
 							
 													
 													
-													<cfif NumberFormat(pc_indOrgao_resultadoMes, '0.0') gt  metaMes and  metaMes neq ''>
-														<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
-													<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') lt  metaMes and  metaMes neq ''>
-														<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
-													<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') eq  metaMes and  metaMes neq ''>
-														<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+													<cfif NumberFormat(pc_indOrgao_resultadoMes, '0.0') gt  metaMes and  metaMes neq 0>
+														<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+													<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') lt  metaMes and  metaMes neq 0>
+														<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
+													<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') eq  metaMes and  metaMes neq 0>
+														<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
 													<cfelse>
-														<td>SEM META</td>	
+														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
 													</cfif>
 													
 
 													<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0')#</strong></td>
 
-													<cfif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') gt  metaMes and  metaMes neq ''>
-														<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
-													<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') lt  metaMes and  metaMes neq ''>
-														<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
-													<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') eq  metaMes and  metaMes neq ''>
-														<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+													<cfif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') gt  metaMes and  metaMes neq 0>
+														<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+													<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') lt  metaMes and  metaMes neq 0>
+														<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
+													<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') eq  metaMes and  metaMes neq 0>
+														<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
 													<cfelse>
-														<td>SEM META</td>	
+														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
 													</cfif>
+
+													<td>#resultEmRelacaoMeta#</td>
+
+
 												</tr>
 											</cfoutput>	
+											<!-- RESUMO -->
+											<cfif resultadoPRCI.prci neq ''>
+												<cfset totalPRCI = totalPRCI + resultadoPRCI.prci>
+											</cfif>
+											<cfif  resultadoSLNC.slnc neq ''>
+												<cfset totalSLNC = totalSLNC + resultadoSLNC.slnc>
+											</cfif>
+
+											<cfset totalDGCI = totalDGCI + pc_indOrgao_resultadoMes>
+
+											<cfset totalMeta = totalMeta + metaMes>
+
+											<cfif pc_indOrgao_resultadoAcumulado neq ''>
+												<cfset totalDGCIAcumulado = totalDGCIAcumulado + pc_indOrgao_resultadoAcumulado>
+											</cfif>
+											<cfif resultadoPRCI.pc_indOrgao_resultadoAcumulado neq ''>
+												<cfset totalPRCIAcumulado = totalPRCIAcumulado + resultadoPRCI.pc_indOrgao_resultadoAcumulado>
+											</cfif>
+											<cfif resultadoSLNC.pc_indOrgao_resultadoAcumulado neq ''>
+												<cfset totalSLNCAcumulado = totalSLNCAcumulado + resultadoSLNC.pc_indOrgao_resultadoAcumulado>
+											</cfif>
+
 										</cfloop>	
+
+										
 									</tbody>
+									<cfif count gt 0>
+											<!-- Cálculo das médias -->
+											<cfset mediaPRCI = Replace(NumberFormat(totalPRCI / count, '0.0'),'.',',')>
+											<cfset mediaSLNC = Replace(NumberFormat(totalSLNC / count, '0.0'),'.',',')>
+											<cfset mediaDGCI = Replace(NumberFormat(totalDGCI / count, '0.0'),'.',',')>
+											<cfset mediaMeta = Replace(NumberFormat(totalMeta / count, '0.0'),'.',',')>
+
+											<cfset mediaDGCISemReplace = NumberFormat(totalDGCI / count, '0.0')>
+											<cfset mediaMetaSemReplace = NumberFormat(totalMeta / count, '0.0')>
+
+											<cfset mediaDGCIAcumulado = Replace(NumberFormat(totalDGCIAcumulado / count, '0.0'),'.',',')>
+											<!--<cfset mediaPRCIAcumulado = Replace(NumberFormat(totalPRCIAcumulado / count, '0.0'),'.',',')>
+											<cfset mediaSLNCAcumulado = Replace(NumberFormat(totalSLNCAcumulado / count, '0.0'),'.',',')>-->
+
+											<cfif mediaMetaSemReplace eq NumberFormat(0, '0.0')>
+												<cfset resultaDGCIemRelacaoAmetaSemReplace = NumberFormat(0, '0.0')>
+												<cfset resultaDGCIacumuladoEmRelacaoAmetaSemReplace = NumberFormat(0, '0.0')>
+												<cfset resultaDGCIemRelacaoAmeta = NumberFormat(0, '0.0')>
+												<cfset resultaDGCIacumuladoEmRelacaoAmeta = NumberFormat(0, '0.0')>
+											<cfelse>
+											    <cfset resultaDGCIemRelacaoAmetaSemReplace = (mediaDGCISemReplace / mediaMetaSemReplace)*100>
+												<cfset resultaDGCIacumuladoEmRelacaoAmetaSemReplace = (totalDGCIAcumulado / totalMeta)*100>
+												<cfset resultaDGCIemRelacaoAmeta = Replace(NumberFormat((mediaDGCISemReplace / mediaMetaSemReplace)*100, '0.0'),'.',',')>
+												<cfset resultaDGCIacumuladoEmRelacaoAmeta = Replace(NumberFormat((totalDGCIAcumulado / totalMeta)*100, '0.0'),'.',',')>
+											</cfif>
+
+									</cfif>
 
 								</table>
+
 							</div>							
 						</div>
 						<!-- /.card-body -->
@@ -2097,12 +2164,157 @@
 			<!-- /.col -->
 			</div>
 			<!-- /.row -->
+            <div id="divCardDGCIectMes">
+				<cfif count gt 0>
+
+					<div class="row" style="width: 100%;">	
+						<div class="col-12">
+							<div class="card" >
+								
+								<cfoutput>
+									<!-- card-body -->
+									<div class="card-body shadow" style="border: 2px solid ##34a2b7">
+									   
+										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT - <span style="fontsize:12px">(#monthAsString(arguments.mes)#/#arguments.ano#)</span></h5></div>
+										<div id="divResultadoDGCI" class="col-md-8 col-sm-8 col-12 mx-auto">
+											<div class="info-box bg-info">
+											     <div class="ribbon-wrapper ribbon-xl"  >
+                                                    <cfif resultaDGCIemRelacaoAmetaSemReplace gt 100>
+														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##0083CA;color: ##fff;">ACIMA DO ESPERADO</div>
+													<cfelseif resultaDGCIemRelacaoAmetaSemReplace lt 100 and resultaDGCIemRelacaoAmetaSemReplace neq 0>
+														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##dc3545;color: ##fff;">ABAIXO DO ESPERADO</div>		
+													<cfelseif resultaDGCIemRelacaoAmetaSemReplace eq 100>
+														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: green;color: ##fff;">DENTRO DO ESPERADO</div>
+													<cfelse>
+														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##e3dada;color:##000;">SEM META</div>
+													</cfif>
+												</div>
+												<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
+
+												<div class="info-box-content">
+													<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI = #mediaDGCI#%</strong></font></font><span style="font-size:12px;position: relative;left:-194px;top:13px">Desempenho Geral de Controle Interno</span></span>
+													<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong> #resultaDGCIemRelacaoAmeta#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (DGCI / Meta) * 100 = (#mediaDGCI# / #mediaMeta#) * 100</span></span>
+
+													<div class="progress">
+														<div class="progress-bar" style="width: #resultaDGCIemRelacaoAmetaSemReplace#%"></div>
+													</div>
+													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+														<span style="font-size:14px"><strong>DGCI</strong> =  <span style="font-size:16px"><strong>#mediaDGCI#%</strong></span>   (PRCI * #Replace(rsPRCIpeso.pc_indPeso_peso,'.',',')#) + (SLNC * #Replace(rsSLNCpeso.pc_indPeso_peso,'.',',')#) = (#mediaPRCI# * #Replace(rsPRCIpeso.pc_indPeso_peso,'.',',')#) + ( #mediaSLNC# * #Replace(rsSLNCpeso.pc_indPeso_peso,'.',',')#)</span><br>
+														<span style="font-size:14px"><strong>Meta</strong> = <span style="font-size:16px"><strong>#mediaMeta#%</strong></span></span><br>
+													</font></font></span>
+												</div>
+												<!-- /.info-box-content -->
+											</div>
+										
+										
+										</div>	
+										<div class="col-12">
+											<!--
+											<div class="row " style="display: flex; justify-content: center;margin-top:-5px;margin-bottom:5px">
+												<i class="fa-solid fa-angles-up" style="font-size:30px;"></i>
+											</div>-->
+
+											<div class="row " style="display: flex; justify-content: center;">
+												
+												<div id="divResultadoPRCI" class="col-md-5 col-sm-5 col-12 "></div>
+												<div id="divResultadoSLNC" class="col-md-5 col-sm-5 col-12 "></div>
+											</div>
+										</div>
+										
+									</div>
+									<!-- /.card-body -->
+								</cfoutput>
+							</div>
+							<!-- /.card -->
+						</div>
+						<!-- /.col -->
+					</div>									
+					
+
+
+
+				</cfif>
+			</div>
+
+			 <div id="divCardDGCIectAcumulado">
+				<cfif count gt 0>
+
+					<div class="row" style="width: 100%;">	
+						<div class="col-12">
+							<div class="card" >
+								
+								<cfoutput>
+									<!-- card-body -->
+									<div class="card-body shadow" style="border: 2px solid ##34a2b7">
+									   
+										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT ACUMULADO- <span style="fontsize:12px">#arguments.ano#</span></h5></div>
+										<div id="divResultadoDGCI" class="col-md-8 col-sm-8 col-12 mx-auto">
+											<div class="info-box bg-info">
+											     <div class="ribbon-wrapper ribbon-xl"  >
+                                                    <cfif resultaDGCIacumuladoEmRelacaoAmetaSemReplace gt 100>
+														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##0083CA;color: ##fff;">ACIMA DO ESPERADO</div>
+													<cfelseif resultaDGCIacumuladoEmRelacaoAmetaSemReplace lt 100 and resultaDGCIacumuladoEmRelacaoAmetaSemReplace neq 0>
+														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##dc3545;color: ##fff;">ABAIXO DO ESPERADO</div>		
+													<cfelseif resultaDGCIacumuladoEmRelacaoAmetaSemReplace eq 100>
+														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: green;color: ##fff;">DENTRO DO ESPERADO</div>
+													<cfelse>
+														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##e3dada;color:##000;">SEM META</div>
+													</cfif>
+												</div>
+												<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
+
+												<div class="info-box-content">
+													<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI = #mediaDGCIAcumulado#%</strong></font></font><span style="font-size:12px;position: relative;left:-194px;top:13px">Desempenho Geral de Controle Interno</span></span>
+													<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong> #resultaDGCIacumuladoEmRelacaoAmeta#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (DGCI / Meta) * 100 = (#mediaDGCIAcumulado# / #mediaMeta#) * 100</span></span>
+
+													<div class="progress">
+														<div class="progress-bar" style="width: #resultaDGCIacumuladoEmRelacaoAmetaSemReplace#%"></div>
+													</div>
+													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+														<span style="font-size:14px"><strong>DGCI acumulado</strong> =  <span style="font-size:16px"><strong>#mediaDGCIAcumulado#%</strong></span><br>
+														<span style="font-size:14px"><strong>Meta</strong> = <span style="font-size:16px"><strong>#mediaMeta#%</strong></span></span><br>
+													
+													</font></font></span>
+												</div>
+												<!-- /.info-box-content -->
+											</div>
+										
+										
+										</div>	
+										<div class="col-12">
+											<!--
+											<div class="row " style="display: flex; justify-content: center;margin-top:-5px;margin-bottom:5px">
+												<i class="fa-solid fa-angles-up" style="font-size:30px;"></i>
+											</div>-->
+
+											<div class="row " style="display: flex; justify-content: center;">
+												
+												<div id="divResultadoPRCI" class="col-md-5 col-sm-5 col-12 "></div>
+												<div id="divResultadoSLNC" class="col-md-5 col-sm-5 col-12 "></div>
+											</div>
+										</div>
+										
+									</div>
+									<!-- /.card-body -->
+								</cfoutput>
+							</div>
+							<!-- /.card -->
+						</div>
+						<!-- /.col -->
+					</div>									
+					
+
+
+
+				</cfif>
+			</div>
+									
 
 		</cfif>
 
 		<cfif #resultadoDGCIporGerencia.recordcount# neq 0 >	
 	
-			<div id="divDGCIporGerencia" class="row" style="width: 100%;">
+			<div id="divDGCIporGerencia" class="row" >
 							
 				<div class="col-12">
 					<div class="card" >
@@ -2114,13 +2326,13 @@
 								<table id="tabDGCIporGerencia" class="table table-bordered table-striped text-nowrap " >
 									
 									<thead >
-										<tr style="font-size:14px">
+										<tr style="font-size:14px;text-align: center;">
 											
 											<th >Órgão</th>
 											<th >Órgão Subordinador</th>
-											<th style="text-align: center;">PRCI <br><cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
-											<th style="text-align: center;">SLNC <br><cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
-											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;text-align: center;">
+											<th >PRCI <br><cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
+											<th >SLNC <br><cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
+											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;">
 												DGCI 
 												<cfoutput>
 													#monthAsString(arguments.mes)#<br>
@@ -2131,6 +2343,7 @@
 											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
 											<th class="bg-gradient-warning" style="text-align: center;border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;">DGCI<br>Acumulado</th>
 											<th >Resultado Acumulado</th>
+											<th >Result. em Relação<br>à Meta Mensal</th>
 										</tr>
 									</thead>
 									
@@ -2194,6 +2407,7 @@
 											
 											    <cfset metaMes = #NumberFormat(0, '0.0')#>	
 
+												
 												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 
 												    
@@ -2210,17 +2424,21 @@
 														<td>#metaMes#</td>
 													</cfif>
 							
-													
+													<cfif metaMes neq 0>
+														<cfset resultEmRelacaoMeta = NumberFormat((NumberFormat(pc_indOrgao_resultadoMes, '0.0') / metaMes)*100,0.0)>
+													<cfelse>
+														<cfset resultEmRelacaoMeta = NumberFormat(0, '0.0')>	
+													</cfif>
 													
 													<cfif metaMes eq 0>
-														<td>SEM META</td>
+														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
 													<cfelse>
-														<cfif NumberFormat(pc_indOrgao_resultadoMes, '0.0') gt  metaMes and  metaMes neq ''>
-															<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
-														<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') lt  metaMes and  metaMes neq ''>
-															<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
-														<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') eq  metaMes and  metaMes neq ''>
-															<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+														<cfif NumberFormat(pc_indOrgao_resultadoMes, '0.0') gt  metaMes and  metaMes neq 0>
+															<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+														<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') lt  metaMes and  metaMes neq 0>
+															<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
+														<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') eq  metaMes and  metaMes neq 0>
+															<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
 														<cfelse>
 															<td></td>	
 														</cfif>
@@ -2231,18 +2449,21 @@
 
 
 													<cfif metaMes eq 0>
-														<td>SEM META</td>
+														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
 													<cfelse>
-														<cfif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') gt  metaMes and  metaMes neq ''>
-															<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
-														<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') lt  metaMes and  metaMes neq ''>
-															<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
-														<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') eq  metaMes and  metaMes neq ''>
-															<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+														<cfif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') gt  metaMes and metaMes neq 0>
+															<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+														<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') lt  metaMes and metaMes neq 0>
+															<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
+														<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') eq  metaMes and metaMes neq 0>
+															<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
 														<cfelse>
 															<td></td>	
 														</cfif>
 													</cfif>
+
+													<td>#resultEmRelacaoMeta#</td>
+
 												</tr>
 											</cfoutput>	
 										</cfloop>	
@@ -2262,7 +2483,7 @@
 		</cfif>
 
 		<cfif #resultadoPRCIporOrgao.recordcount# neq 0 >	
-			<div id="divPRCIporOrgao" class="row" style="width: 100%;">
+			<div id="divPRCIporOrgao" class="row" >
 							
 				<div class="col-12">
 					<div class="card" >
@@ -2274,7 +2495,7 @@
 								<table id="tabPRCIporOrgao" class="table table-bordered table-striped text-nowrap " >
 									
 									<thead>
-										<tr style="font-size:14px">
+										<tr style="font-size:14px;text-align: center;">
 											<th >Órgão</th>
 											<th >Órgão Subordinador</th>
 											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;">PRCI <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
@@ -2282,6 +2503,7 @@
 											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
 											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;">PRCI Acumulado</th>
 											<th >Resultado Acumulado</th>
+											<th >Result. em Relação<br>à Meta Mensal</th>
 										</tr>
 									</thead>
 									
@@ -2316,17 +2538,23 @@
 															</cfif>
 														</cfif>
 
+														<cfif metaMes neq 0>
+															<cfset resultEmRelacaoMeta = NumberFormat((NumberFormat(pc_indOrgao_resultadoMes, '0.0') / metaMes)*100,0.0)>
+														<cfelse>
+															<cfset resultEmRelacaoMeta = NumberFormat(0, '0.0')>	
+														</cfif>
+
 														
 														
 														<cfif metaMes eq 0>
-															<td>SEM META</td>
+															<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
 														<cfelse>
-															<cfif NumberFormat(pc_indOrgao_resultadoMes, '0.0') gt  metaMes and  metaMes neq ''>
-																<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
-															<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') lt  metaMes and  metaMes neq ''>
-																<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
-															<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') eq  metaMes and  metaMes neq ''>
-																<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+															<cfif NumberFormat(pc_indOrgao_resultadoMes, '0.0') gt  metaMes and  metaMes neq 0>
+																<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+															<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') lt  metaMes and  metaMes neq 0>
+																<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
+															<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') eq  metaMes and  metaMes neq 0>
+																<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
 															<cfelse>
 																<td></td>	
 															</cfif>
@@ -2335,18 +2563,21 @@
 														<td style="border-left:1px solid ##000;border-right:1px solid ##000">#NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0')#</td>
 
 														<cfif metaMes eq 0>
-															<td>SEM META</td>
+															<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
 														<cfelse>
-															<cfif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') gt  metaMes and  metaMes neq ''>
-																<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
-															<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') lt  metaMes and  metaMes neq ''>
-																<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
-															<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') eq  metaMes and  metaMes neq ''>
-																<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+															<cfif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') gt  metaMes and  metaMes neq 0>
+																<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+															<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') lt  metaMes and  metaMes neq 0>
+																<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
+															<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') eq  metaMes and  metaMes neq 0>
+																<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
 															<cfelse>
 																<td></td>	
 															</cfif>
 														</cfif>
+
+														<td>#resultEmRelacaoMeta#</td>
+
 													</tr>
 												
 											</cfoutput>
@@ -2366,7 +2597,7 @@
 		</cfif>
 
 		<cfif #resultadoSLNCporOrgao.recordcount# neq 0 >	
-			<div id="divSLNCporOrgao" class="row" style="width: 100%;">
+			<div id="divSLNCporOrgao" class="row" >
 							
 				<div class="col-12">
 					<div class="card" >
@@ -2378,7 +2609,7 @@
 								<table id="tabSLNCporOrgao" class="table table-bordered table-striped text-nowrap " >
 									
 									<thead>
-										<tr style="font-size:14px">
+										<tr style="font-size:14px;text-align: center;">
 											<th >Órgão</th>
 											<th >Órgão Subordinador</th>
 											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;">SLNC <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
@@ -2386,6 +2617,7 @@
 											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
 											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;text-align: center;">SLNC Acumulado</th>
 											<th >Resultado Acumulado</th>
+											<th >Result. em Relação<br>à Meta Mensal</th>
 										</tr>
 									</thead>
 									
@@ -2414,16 +2646,22 @@
 														<cfset metaMes = NumberFormat(metaSLNCporOrgao.metaMes, '0.0')>
 														<td>#metaMes#</td>
 													</cfif>
+
+													<cfif metaMes neq 0>
+														<cfset resultEmRelacaoMeta = NumberFormat((NumberFormat(pc_indOrgao_resultadoMes, '0.0') / metaMes)*100,0.0)>
+													<cfelse>
+														<cfset resultEmRelacaoMeta = NumberFormat(0, '0.0')>	
+													</cfif>
 													
 													<cfif metaMes eq 0>
-														<td>SEM META</td>
+														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
 													<cfelse>
-														<cfif NumberFormat(pc_indOrgao_resultadoMes, '0.0') gt  metaMes and  metaMes neq ''>
-															<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
-														<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') lt  metaMes and  metaMes neq ''>
-															<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
-														<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') eq  metaMes and  metaMes neq ''>
-															<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+														<cfif NumberFormat(pc_indOrgao_resultadoMes, '0.0') gt  metaMes and  metaMes neq 0>
+															<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+														<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') lt  metaMes and  metaMes neq 0>
+															<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
+														<cfelseif NumberFormat(pc_indOrgao_resultadoMes, '0.0') eq  metaMes and  metaMes neq 0>
+															<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
 														<cfelse>
 															<td></td>	
 														</cfif>
@@ -2432,18 +2670,21 @@
 													<td style="border-left:1px solid ##000;border-right:1px solid ##000">#NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0')#</td>
 
 													<cfif metaMes eq 0>
-														<td>SEM META</td>
+														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
 													<cfelse>
-														<cfif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') gt  metaMes and  metaMes neq ''>
-															<td style="color: blue;"><strong>ACIMA DO ESPERADO</strong></td>
-														<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') lt  metaMes and  metaMes neq ''>
-															<td style="color: red;"><strong>ABAIXO DO ESPERADO</strong></td>	
-														<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') eq  metaMes and  metaMes neq ''>
-															<td style="color: green;"><strong>DENTRO DO ESPERADO</strong></td>
+														<cfif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') gt  metaMes and  metaMes neq 0>
+															<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+														<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') lt  metaMes and  metaMes neq 0>
+															<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
+														<cfelseif NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0') eq  metaMes and  metaMes neq 0>
+															<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
 														<cfelse>
 															<td></td>	
 														</cfif>
 													</cfif>
+
+													<td>#resultEmRelacaoMeta#</td>
+
 												</tr>
 											</cfoutput>
 										</cfloop>	
@@ -2462,7 +2703,7 @@
 		</cfif>
 	
 		<cfif #resultadoPRCIdetalhe.recordcount# neq 0 >	
-			<div id="divDetalhePRCI" class="row" style="width: 100%;">
+			<div id="divDetalhePRCI" class="row" >
 							
 				<div class="col-12">
 					<div class="card" >
@@ -2532,7 +2773,7 @@
         </cfif>
 
 		<cfif #resultadoSLNCdetalhe.recordcount# neq 0 >	
-			<div id="divDetalheSLNC" class="row" style="width: 100%;">
+			<div id="divDetalheSLNC" class="row" >
 							
 				<div class="col-12">
 					<div class="card" >
@@ -2605,14 +2846,12 @@
 
 		<script language="JavaScript">
 		   
-				
-
 			var currentDate = new Date()
 			var day = currentDate.getDate()
 			var month = currentDate.getMonth() + 1
 			var year = currentDate.getFullYear()
 
-			var d = day + "-" + month + "-" + year;	
+			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
 
 			$(function () {
 				
@@ -2638,6 +2877,8 @@
 							className: 'btExcel',
 						}
 					]
+
+					
 				})
 
 				var tituloExcel_DGCIporGerencia ="SNCI_Consulta_DGCI_porGerencia_";
@@ -2738,7 +2979,7 @@
 				var tituloExcel_SLNC ="SNCI_Consulta_SLNC_detalhamento_";
 
 				const tabSLNCdetalhamento = $('#tabSLNCdetalhe').DataTable( {
-					  destroy: true, // Destruir a tabela antes de recriá-la
+					destroy: true, // Destruir a tabela antes de recriá-la
 					stateSave: false,
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
 					scrollX: true, // Permitir rolagem horizontal
@@ -2770,9 +3011,9 @@
 
 
 			$(document).ready(function() {
-				
 				$(".content-wrapper").css("height", "auto");
-			
+				
+					
 			});
 		</script>
 

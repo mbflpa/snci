@@ -82,7 +82,11 @@
 						<ul class="nav nav-tabs" id="custom-tabs-one-tabAcomp" role="tablist" style="font-size:14px;">
 
 							<li class="nav-item" style="">
-								<a  class="nav-link  active" id="custom-tabs-one-DGCIporOrgaoSubord-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgaoSubord" role="tab" aria-controls="custom-tabs-one-DGCIporOrgaoSubord" aria-selected="true">DGCI por Órgao Subordinador</a>
+								<a  class="nav-link  active" id="custom-tabs-one-DGCI_ECT-tab"   data-toggle="pill" href="#custom-tabs-one-DGCI_ECT" role="tab" aria-controls="custom-tabs-one-DGCI_ECT" aria-selected="true">DGCI ECT</a>
+							</li>
+
+							<li class="nav-item" style="">
+								<a  class="nav-link " id="custom-tabs-one-DGCIporOrgaoSubord-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgaoSubord" role="tab" aria-controls="custom-tabs-one-DGCIporOrgaoSubord" aria-selected="true">DGCI por Órgao Subordinador</a>
 							</li>
 							<li class="nav-item" style="">
 								<a  class="nav-link  " id="custom-tabs-one-DGCIporGerencia-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporGerencia" role="tab" aria-controls="custom-tabs-one-DGCIporGerencia" aria-selected="true">DGCI por Gerência</a>
@@ -109,7 +113,11 @@
 					<div class="card-body">
 						<div class="tab-content " id="custom-tabs-one-tabContent" >
 
-							<div disable class="tab-pane fade  active show " id="custom-tabs-one-DGCIporOrgaoSubord"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgaoSubord-tab" >														
+							<div disable class="tab-pane fade active show " id="custom-tabs-one-DGCI_ECT"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCI_ECT-tab" >														
+								<div id="divIndicadorDGCI_ECT" ></div>
+							</div>
+
+							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporOrgaoSubord"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgaoSubord-tab" >														
 								<div id="divIndicadorDGCIporOrgaoSubord" ></div>
 							</div>
 
@@ -159,6 +167,7 @@
         $(document).ready(function(){
 			$(".content-wrapper").css("height", "auto");
 			$('#divTabsIndicadores').hide();
+			
 			// Obtém o ano atual
 			const currentYear = new Date().getFullYear();
 
@@ -228,10 +237,15 @@
 			$('#divTabsIndicadores').hide();
 			$('#divIndicadorDetalhes').html('');
 			$('#divMesAnoCI').html('');
+			$('#divIndicadorDGCI_ECT').html('');
 			// Obtém o ano selecionado		
 			let selectedYear = parseInt($('input[name=ano]:checked').val());	
 			// Obtém o mês selecionado
 			let selectedMonth = parseInt($('input[name=mes]:checked').val());
+
+			
+
+
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {	
 
@@ -247,6 +261,8 @@
 					success: function(result) {	
 						$('#divIndicadorDetalhes').html(result);//INSERE OS INDICADORES NA DIV
 						// Armazenar o conteúdo das divs de detalhes
+						let conteudoDGCI_ECT = $('#divCardDGCIectMes').html();
+						let conteudoDGCI_ECT_acumulado = $('#divCardDGCIectAcumulado').html();
 						let conteudoDGCIporOrgaoSubord = $('#divDGCIporOrgaoSubord').html();
 						let conteudoDGCIporGerencia = $('#divDGCIporGerencia').html();
 						let conteudoPRCIporOrgao = $('#divPRCIporOrgao').html();
@@ -257,6 +273,8 @@
 						
 
 						// Limpar o conteúdo das divs de detalhes
+						$('#divCardDGCIectMes').html('');
+						$('#divCardDGCIectAcumulado').html('');
 						$('#divIndicadorDGCIporOrgaoSubord').html('');
 						$('#divIndicadorDGCIporGerencia').html('');
 						$('#divIndicadorPRCIporOrgao').html('');
@@ -266,6 +284,8 @@
 						$('#divMesAnoCI').html('');
 						
 						// Adicionar o conteúdo às divs de detalhes das abas
+						$('#divIndicadorDGCI_ECT').append(conteudoDGCI_ECT);
+						$('#divIndicadorDGCI_ECT').append(conteudoDGCI_ECT_acumulado);
 						$('#divIndicadorDGCIporOrgaoSubord').append(conteudoDGCIporOrgaoSubord);
 						$('#divIndicadorDGCIporGerencia').append(conteudoDGCIporGerencia);
 						$('#divIndicadorPRCIporOrgao').append(conteudoPRCIporOrgao);
@@ -276,14 +296,11 @@
 
 						// Esconder o conteúdo original
 						$('#divIndicadorDetalhes').html('');
-						
-						
 
 						// Ajustar altura
 						$(".content-wrapper").css("height", "auto");
 
 						$('#divTabsIndicadores').show();
-						
 
 						$('#modalOverlay').delay(1000).hide(0, function() {
 				 			$('#modalOverlay').modal('hide');
