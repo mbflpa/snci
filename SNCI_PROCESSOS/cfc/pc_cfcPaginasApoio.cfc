@@ -714,7 +714,7 @@
 		<cfreturn isFeriado>
 	</cffunction>
 
-	<cffunction name="EnviaEmails" access="public" returntype="string" hint="Cria o formado dos e-mails e envia. Se não for executado em produção, o email será enviado para marceloferreira@correios.com.br">
+	<cffunction name="EnviaEmails" access="public" returntype="string" hint="Cria o formado dos e-mails e envia. Se não for executado em produção, o email será enviado para application.rsUsuarioParametros.pc_usu_email">
             
         <cfargument name="para" type="string" required="true">
         <cfargument name="copiaPara" type="string" required="false" default="">
@@ -733,7 +733,7 @@
 			<cfelse>
 				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>.">
 			</cfif>
-			<cfset to = "marceloferreira@correios.com.br">
+			<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 			<cfset cc = "">
         </cfif>
 
@@ -1078,7 +1078,7 @@
 
 						<cfif application.auxsite eq "desenvolvimentope"  or application.auxsite eq "homologacaope" or application.auxsite eq "localhost">
 							<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
-							<cfset to = "marceloferreira@correios.com.br">
+							<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 							<cfset cc = "">
 						</cfif>
 							
@@ -1333,7 +1333,7 @@
 
 						<cfif application.auxsite eq "desenvolvimentope"  or application.auxsite eq "homologacaope" or application.auxsite eq "localhost">
 							<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
-							<cfset to = "marceloferreira@correios.com.br">
+							<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 							<cfset cc = "">
 						</cfif>
 							
