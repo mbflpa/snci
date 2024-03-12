@@ -81,31 +81,31 @@
 						
 						<ul class="nav nav-tabs" id="custom-tabs-one-tabAcomp" role="tablist" style="font-size:14px;">
 
-							<li class="nav-item" style="">
+							<li class="nav-item" style="text-align: center;font-size: 28px;">
 								<a  class="nav-link  active" id="custom-tabs-one-DGCI_ECT-tab"   data-toggle="pill" href="#custom-tabs-one-DGCI_ECT" role="tab" aria-controls="custom-tabs-one-DGCI_ECT" aria-selected="true">DGCI ECT</a>
 							</li>
 
-							<li class="nav-item" style="">
-								<a  class="nav-link " id="custom-tabs-one-DGCIporOrgaoSubord-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgaoSubord" role="tab" aria-controls="custom-tabs-one-DGCIporOrgaoSubord" aria-selected="true">DGCI por Órgao Subordinador</a>
+							<li class="nav-item" style="text-align: center;">
+								<a  class="nav-link " id="custom-tabs-one-DGCIporOrgaoSubord-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgaoSubord" role="tab" aria-controls="custom-tabs-one-DGCIporOrgaoSubord" aria-selected="true">DGCI<br>Órgão Subord.</a>
 							</li>
-							<li class="nav-item" style="">
-								<a  class="nav-link  " id="custom-tabs-one-DGCIporGerencia-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporGerencia" role="tab" aria-controls="custom-tabs-one-DGCIporGerencia" aria-selected="true">DGCI por Gerência</a>
-							</li>
-							
-							<li class="nav-item" style="">
-								<a  class="nav-link  " id="custom-tabs-one-PRCIporOrgao-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIporOrgao" role="tab" aria-controls="custom-tabs-one-PRCIporOrgao" aria-selected="true">PRCI por Órgao</a>
-							</li>
-
-							<li class="nav-item" style="">
-								<a  class="nav-link  " id="custom-tabs-one-SLNCporOrgao-tab"   data-toggle="pill" href="#custom-tabs-one-SLNCporOrgao" role="tab" aria-controls="custom-tabs-one-SLNCporOrgao" aria-selected="true">SLNC por Órgao</a>
-							</li>
-
-							<li class="nav-item" style="">
-								<a  class="nav-link" id="custom-tabs-one-PRCI-tab"   data-toggle="pill" href="#custom-tabs-one-PRCI" role="tab" aria-controls="custom-tabs-one-PRCI" aria-selected="true">PRCI - Detalhes</a>
+							<li class="nav-item" style="text-align: center;">
+								<a  class="nav-link  " id="custom-tabs-one-DGCIporGerencia-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporGerencia" role="tab" aria-controls="custom-tabs-one-DGCIporGerencia" aria-selected="true">DGCI<br>Órgão Resp.</a>
 							</li>
 							
-							<li class="nav-item" style="">
-								<a  class="nav-link " id="custom-tabs-one-SLNC-tab"   data-toggle="pill" href="#custom-tabs-one-SLNC" role="tab" aria-controls="custom-tabs-one-SLNC" aria-selected="true">SLNC - Detalhes</a>
+							<li class="nav-item" style="text-align: center;">
+								<a  class="nav-link  " id="custom-tabs-one-PRCIporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-PRCIporOrgaoSubordinador" aria-selected="true">PRCI<br>Órgao Subord.</a>
+							</li>
+
+							<li class="nav-item" style="text-align: center;">
+								<a  class="nav-link  " id="custom-tabs-one-SLNCporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-SLNCporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-SLNCporOrgaoSubordinador" aria-selected="true">SLNC<br>Órgao Subord.</a>
+							</li>
+
+							<li class="nav-item" style="text-align: center;">
+								<a  class="nav-link" id="custom-tabs-one-PRCI-tab"   data-toggle="pill" href="#custom-tabs-one-PRCI" role="tab" aria-controls="custom-tabs-one-PRCI" aria-selected="true">PRCI<br>Detalhes</a>
+							</li>
+							
+							<li class="nav-item" style="text-align: center;">
+								<a  class="nav-link " id="custom-tabs-one-SLNC-tab"   data-toggle="pill" href="#custom-tabs-one-SLNC" role="tab" aria-controls="custom-tabs-one-SLNC" aria-selected="true">SLNC<br>Detalhes</a>
 							</li>
 							
 						</ul>
@@ -113,31 +113,41 @@
 					<div class="card-body">
 						<div class="tab-content " id="custom-tabs-one-tabContent" >
 
-							<div disable class="tab-pane fade active show " id="custom-tabs-one-DGCI_ECT"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCI_ECT-tab" >														
+							<div disable class="tab-pane fade active show " id="custom-tabs-one-DGCI_ECT"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCI_ECT-tab" >
+												
 								<div id="divIndicadorDGCI_ECT" ></div>
 							</div>
 
-							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporOrgaoSubord"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgaoSubord-tab" >														
+							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporOrgaoSubord"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgaoSubord-tab" >	
+							    <div><h5 style="color:#0083ca;margin-left: 10px">DGCI por órgão subordinador:</h5></div>														
 								<div id="divIndicadorDGCIporOrgaoSubord" ></div>
 							</div>
 
-							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporGerencia"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporGerencia-tab" >														
+							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporGerencia"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporGerencia-tab" >
+							    <div style="margin-left: 10px">
+									<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
+									<h6 >Atenção: Nesta tabela, também aparecerão os órgãos subordinadores que possuem ou possuíram orientações sob sua responsabilidade no período selecionado.</h6>
+								</div>															
 								<div id="divIndicadorDGCIporGerencia" ></div>
 							</div>
 
-							<div disable class="tab-pane fade " id="custom-tabs-one-PRCIporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIporOrgao-tab" >														
-								<div id="divIndicadorPRCIporOrgao" ></div>
+							<div disable class="tab-pane fade " id="custom-tabs-one-PRCIporOrgaoSubordinador"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIporOrgaoSubordinador-tab" >	
+								<div><h5 style="color:#0083ca;margin-left: 10px">PRCI por órgão subordinador:</h5></div>													
+								<div id="divIndicadorPRCIporOrgaoSubordinador" ></div>
 							</div>
 
-							<div disable class="tab-pane fade  " id="custom-tabs-one-SLNCporOrgao"  role="tabpanel" aria-labelledby="custom-tabs-one-SLNCporOrgao-tab" >														
-								<div id="divIndicadorSLNCporOrgao" ></div>
+							<div disable class="tab-pane fade  " id="custom-tabs-one-SLNCporOrgaoSubordinador"  role="tabpanel" aria-labelledby="custom-tabs-one-SLNCporOrgaoSubordinador-tab" >	
+								<div><h5 style="color:#0083ca;margin-left: 10px">SLNC por órgão subordinador:</h5></div>													
+								<div id="divIndicadorSLNCporOrgaoSubordinador" ></div>
 							</div>
 
-							<div disable class="tab-pane fade" id="custom-tabs-one-PRCI"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCI-tab" >														
+							<div disable class="tab-pane fade" id="custom-tabs-one-PRCI"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCI-tab" >	
+								<div><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do PRCI:</h5></div>									
 								<div id="divIndicadorDetalhesPRCI" ></div>
 							</div>
 							
-							<div disable class="tab-pane fade " id="custom-tabs-one-SLNC"  role="tabpanel" aria-labelledby="custom-tabs-one-SLNC-tab" >								
+							<div disable class="tab-pane fade " id="custom-tabs-one-SLNC"  role="tabpanel" aria-labelledby="custom-tabs-one-SLNC-tab" >		
+								<div><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC:</h5></div>						
 								<div id="divIndicadorDetalhesSLNC" ></div>
 							</div>			
 							
@@ -263,10 +273,11 @@
 						// Armazenar o conteúdo das divs de detalhes
 						let conteudoDGCI_ECT = $('#divCardDGCIectMes').html();
 						let conteudoDGCI_ECT_acumulado = $('#divCardDGCIectAcumulado').html();
+						let conteudoIndicadoresMes = $('#divIndicadoresMes').html();
 						let conteudoDGCIporOrgaoSubord = $('#divDGCIporOrgaoSubord').html();
 						let conteudoDGCIporGerencia = $('#divDGCIporGerencia').html();
-						let conteudoPRCIporOrgao = $('#divPRCIporOrgao').html();
-						let conteudoSLNCporOrgao = $('#divSLNCporOrgao').html();
+						let conteudoPRCIporOrgaoSubordinador = $('#divPRCIporOrgaoSubordinador').html();
+						let conteudoSLNCporOrgaoSubordinador = $('#divSLNCporOrgaoSubordinador').html();
 						let conteudoDetalhesPRCI = $('#divDetalhePRCI').html();
 						let conteudoDetalhesSLNC = $('#divDetalheSLNC').html();
 						let conteudoDivMesAnoCI = $('#divMesAno').html();
@@ -275,10 +286,11 @@
 						// Limpar o conteúdo das divs de detalhes
 						$('#divCardDGCIectMes').html('');
 						$('#divCardDGCIectAcumulado').html('');
+						$('#divIndicadoresMes').html('');
 						$('#divIndicadorDGCIporOrgaoSubord').html('');
 						$('#divIndicadorDGCIporGerencia').html('');
-						$('#divIndicadorPRCIporOrgao').html('');
-						$('#divIndicadorSLNCporOrgao').html('');
+						$('#divPRCIporOrgaoSubordinador').html('');
+						$('#divIndicadorSLNCporOrgaoSubordinador').html('');
 						$('#divIndicadorDetalhesPRCI').html('');
 						$('#divIndicadorDetalhesSLNC').html('');
 						$('#divMesAnoCI').html('');
@@ -286,13 +298,14 @@
 						// Adicionar o conteúdo às divs de detalhes das abas
 						$('#divIndicadorDGCI_ECT').append(conteudoDGCI_ECT);
 						$('#divIndicadorDGCI_ECT').append(conteudoDGCI_ECT_acumulado);
-						$('#divIndicadorDGCIporOrgaoSubord').append(conteudoDGCIporOrgaoSubord);
-						$('#divIndicadorDGCIporGerencia').append(conteudoDGCIporGerencia);
-						$('#divIndicadorPRCIporOrgao').append(conteudoPRCIporOrgao);
-						$('#divIndicadorSLNCporOrgao').append(conteudoSLNCporOrgao);
-						$('#divIndicadorDetalhesPRCI').append(conteudoDetalhesPRCI);
-						$('#divIndicadorDetalhesSLNC').append(conteudoDetalhesSLNC);
-						$('#divMesAnoCI').append(conteudoDivMesAnoCI);
+						$('#divIndicadorDGCI_ECT').append(conteudoIndicadoresMes);
+						$('#divIndicadorDGCIporOrgaoSubord').html(conteudoDGCIporOrgaoSubord);
+						$('#divIndicadorDGCIporGerencia').html(conteudoDGCIporGerencia);
+						$('#divIndicadorPRCIporOrgaoSubordinador').html(conteudoPRCIporOrgaoSubordinador);
+						$('#divIndicadorSLNCporOrgaoSubordinador').html(conteudoSLNCporOrgaoSubordinador);
+						$('#divIndicadorDetalhesPRCI').html(conteudoDetalhesPRCI);
+						$('#divIndicadorDetalhesSLNC').html(conteudoDetalhesSLNC);
+						$('#divMesAnoCI').html(conteudoDivMesAnoCI);
 
 						// Esconder o conteúdo original
 						$('#divIndicadorDetalhes').html('');

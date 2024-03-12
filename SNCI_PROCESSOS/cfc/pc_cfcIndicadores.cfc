@@ -1857,24 +1857,43 @@
 
 		
 		
-		<cfquery name="resultadoPorOrgao" datasource="#application.dsn_processos#" timeout="120"  >
+		<cfquery name="rsIndicadoresPorOrgao" datasource="#application.dsn_processos#" timeout="120"  >
 			SELECT pc_indOrgao_ano
 				   ,pc_indOrgao_mes
 				   ,pc_indOrgao_numIndicador
 				   ,pc_indOrgao_mcuOrgao
 				   ,pc_orgaos.pc_org_sigla as siglaOrgao
-				   ,pc_indOrgao_resultadoMes
-				   ,pc_indOrgao_resultadoAcumulado
+				   ,pc_indOrgao_resultadoMes 
+				   ,pc_indOrgao_resultadoAcumulado 
 				   ,pc_indOrgao_paraOrgaoSubordinador
  				   ,pc_indOrgao_mcuOrgaoSubordinador
 				   ,pc_orgaosSubordinador.pc_org_sigla as siglaOrgaoSubordinador
-				  
 			FROM pc_indicadores_porOrgao
 			INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
 			INNER JOIN pc_orgaos as pc_orgaosSubordinador on pc_orgaosSubordinador.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgaoSubordinador
+			
 			WHERE pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
 		</cfquery>
+
+        
+		<cfquery name="resultadoECTmes" dbtype="query"  >
+			SELECT  pc_indOrgao_mes
+					,pc_indOrgao_numIndicador
+					,AVG(pc_indOrgao_resultadoMes) AS media_resultadoMes
+					,AVG(pc_indOrgao_resultadoAcumulado) AS media_resultadoAcumulado
+			FROM rsIndicadoresPorOrgao
+			WHERE pc_indOrgao_paraOrgaoSubordinador = 1
+			GROUP BY pc_indOrgao_mes, pc_indOrgao_numIndicador
+		</cfquery>
+		
+		
+
+		<cfquery name="resultadoPorOrgao" dbtype="query" >
+			SELECT *FROM rsIndicadoresPorOrgao
+			WHERE pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+		</cfquery>
+
+
 
 		<cfquery name="resultadoDGCIporOrgaoSubordinador"   dbtype="query">
 			SELECT * FROM resultadoPorOrgao	WHERE pc_indOrgao_paraOrgaoSubordinador = 1	AND pc_indOrgao_numIndicador = 3
@@ -1884,15 +1903,23 @@
 			SELECT * FROM resultadoPorOrgao	
 			WHERE pc_indOrgao_paraOrgaoSubordinador = 0	
 				  AND pc_indOrgao_numIndicador = 3
-				  AND pc_indOrgao_mcuOrgao <>pc_indOrgao_mcuOrgaoSubordinador
+				  
 		</cfquery>
 
-		<cfquery name="resultadoPRCIporOrgao"   dbtype="query">
-			SELECT * FROM resultadoPorOrgao	WHERE pc_indOrgao_numIndicador = 1 
+		<cfquery name="resultadoPRCIporOrgaoSubordinador"   dbtype="query">
+			SELECT * FROM resultadoPorOrgao	WHERE pc_indOrgao_numIndicador = 1 AND pc_indOrgao_paraOrgaoSubordinador = 1
 		</cfquery>
 
-		<cfquery name="resultadoSLNCporOrgao"   dbtype="query">
-			SELECT * FROM resultadoPorOrgao	WHERE pc_indOrgao_numIndicador = 2
+		<cfquery name="resultadoPRCIporGerencia"   dbtype="query">
+			SELECT * FROM resultadoPorOrgao	WHERE pc_indOrgao_numIndicador = 1 AND pc_indOrgao_paraOrgaoSubordinador = 0 
+		</cfquery>
+
+		<cfquery name="resultadoSLNCporOrgaoSubordinador"   dbtype="query">
+			SELECT * FROM resultadoPorOrgao	WHERE pc_indOrgao_numIndicador = 2 AND pc_indOrgao_paraOrgaoSubordinador = 1
+		</cfquery>
+
+		<cfquery name="resultadoSLNCporGerencia"   dbtype="query">
+			SELECT * FROM resultadoPorOrgao	WHERE pc_indOrgao_numIndicador = 2 AND pc_indOrgao_paraOrgaoSubordinador = 0 AND pc_indOrgao_mcuOrgao <>pc_indOrgao_mcuOrgaoSubordinador
 		</cfquery>
 
 		
@@ -1955,7 +1982,117 @@
 		</div>
 
 
-		<cfif #resultadoDGCIporOrgaoSubordinador.recordcount# neq 0 >	
+		<cfif resultadoECTmes.recordcount neq 0>
+			<div id="divIndicadoresMes" class="row" >
+							
+				<div class="col-12">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
+							
+							<div class="table-responsive ">
+								<table id="tabIndicadoresMes" class="table table-bordered table-striped text-nowrap " >
+									
+									<thead >
+										<tr style="font-size:14px;text-align: center;">
+											<th >MÊS</th>
+											<th >PRCI</th>
+											<th >SLNC</th>
+											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;text-align: center;">
+												DGCI<br>
+												<cfoutput>
+													<span style="font-size: 9px">(PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span>
+												</cfoutput>
+											</th>
+											<th >META</th>
+											<th >RESULTADO</th>
+											<th >Result. em Relação<br>à Meta Mensal</th>
+										</tr>
+									</thead>
+									<tbody>
+										<cfoutput query="resultadoECTmes" group="pc_indOrgao_mes">
+
+										    <cfquery name="metaMediaPRCIMes" datasource="#application.dsn_processos#">
+												SELECT AVG(pc_indMeta_meta) AS mediaMetaPRCImes FROM pc_indicadores_meta 
+												INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_meta.pc_indMeta_mcuOrgao
+												WHERE pc_indMeta_numIndicador = 1
+													AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+													AND pc_indMeta_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
+													AND pc_org_orgaoAvaliado = 1
+											</cfquery>  
+
+											<cfif Trim(metaMediaPRCIMes.mediaMetaPRCImes) eq "">
+												<cfset metaMediaPRCI = 0>
+											<cfelse>
+												<cfset metaMediaPRCI = metaMediaPRCIMes.mediaMetaPRCImes >
+											</cfif>
+
+											 <cfquery name="metaMediaSLNCMes" datasource="#application.dsn_processos#">
+												SELECT AVG(pc_indMeta_meta) AS mediaMetaSLNCmes FROM pc_indicadores_meta 
+												INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_meta.pc_indMeta_mcuOrgao
+												WHERE pc_indMeta_numIndicador = 2
+													AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+													AND pc_indMeta_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
+													AND pc_org_orgaoAvaliado =  1
+											</cfquery>
+											<cfif Trim(metaMediaSLNCMes.mediaMetaSLNCmes) eq "">
+												<cfset metaMediaSLNC = 0>
+											<cfelse>
+												<cfset metaMediaSLNC = metaMediaSLNCMes.mediaMetaSLNCmes>
+											</cfif>
+											
+											<cfset metaDGCI = (metaMediaPRCI * rsPRCIpeso.pc_indPeso_peso) + (metaMediaSLNC * rsSLNCpeso.pc_indPeso_peso)>
+											
+
+											<tr style="font-size:12px;text-align: center;">
+												<td>#monthAsString(pc_indOrgao_mes)#</td>
+												<td>
+													<cfoutput>
+														#IIF(pc_indOrgao_numIndicador EQ 1, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "")#
+													</cfoutput>
+												</td>
+												<td>
+													<cfoutput>
+														#IIF(pc_indOrgao_numIndicador EQ 2, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "")#
+													</cfoutput>
+												</td>
+												<td>
+													<cfoutput>
+														#IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "")#
+													</cfoutput>
+												</td>
+
+												<td>#Replace(NumberFormat( metaDGCI,0.0),',','.')#</td>
+
+												<cfif IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "") gt  metaDGCI and  metaDGCI neq 0>
+														<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+													<cfelseif IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "") lt  metaDGCI and  metaDGCI neq 0>
+														<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
+													<cfelseif IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "") eq  metaDGCI and  metaDGCI neq 0>
+														<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
+													<cfelse>
+														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
+													</cfif>
+												<td><!-- Coloque o Result. em Relação à Meta Mensal Aqui --></td>
+											</tr>
+										</cfoutput>
+
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+				<!-- /.col -->
+			</div>
+		</cfif>
+
+
+
+		<cfif resultadoDGCIporOrgaoSubordinador.recordcount neq 0 >	
 	
 			<div id="divDGCIporOrgaoSubord" class="row" >
 							
@@ -1997,7 +2134,8 @@
 										<cfset totalPRCIAcumulado = 0>
 										<cfset totalSLNCAcumulado = 0>
 										<cfset count = 0>
-
+										<cfset countPRCI = 0>
+										<cfset countSLNC = 0>
 										<cfloop query="resultadoDGCIporOrgaoSubordinador" >
 										    <cfset count = count + 1>
 											<cfoutput>	
@@ -2009,6 +2147,9 @@
 													AND pc_indOrgao_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
 													AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 												</cfquery>	
+												<cfif resultadoPRCI.recordcount neq 0>
+													<cfset countPRCI = countPRCI + 1>
+												</cfif>
 
 												<cfquery name="resultadoSLNC"   dbtype="query">
 													SELECT pc_indOrgao_resultadoMes as slnc, pc_indOrgao_resultadoAcumulado  FROM resultadoPorOrgao	
@@ -2018,6 +2159,9 @@
 													AND pc_indOrgao_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
 													AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 												</cfquery>
+												<cfif resultadoSLNC.recordcount neq 0>
+													<cfset countSLNC = countSLNC + 1>
+												</cfif>
 
 												<cfquery name="metaPRCIporOrgao" datasource="#application.dsn_processos#">
 													SELECT pc_indMeta_meta AS metaMes FROM pc_indicadores_meta 
@@ -2053,8 +2197,16 @@
 												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 
 													<td style="text-align: left;">#siglaOrgao# (#pc_indOrgao_mcuOrgao#)</td>
-													<td >#NumberFormat(resultadoPRCI.prci, '0.0')#</td>
-													<td >#NumberFormat(resultadoSLNC.slnc, '0.0')#</td>
+													<cfif resultadoPRCI.prci neq ''>
+														<td >#resultadoPRCI.prci#</td>
+													<cfelse>
+														<td style="color:red">sem dados</td>
+													</cfif>
+													<cfif resultadoSLNC.slnc neq ''>
+														<td >#resultadoSLNC.slnc#</td>
+													<cfelse>
+														<td style="color:red">sem dados</td>
+													</cfif>
 													<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(pc_indOrgao_resultadoMes, '0.0')#</strong></td>
 													<cfif metaDGCI eq ''>
 														<td>#metaMes#</td>
@@ -2127,8 +2279,8 @@
 									</tbody>
 									<cfif count gt 0>
 											<!-- Cálculo das médias -->
-											<cfset mediaPRCI = Replace(NumberFormat(totalPRCI / count, '0.0'),'.',',')>
-											<cfset mediaSLNC = Replace(NumberFormat(totalSLNC / count, '0.0'),'.',',')>
+											<cfset mediaPRCI = Replace(NumberFormat(totalPRCI / countPRCI, '0.0'),'.',',')>
+											<cfset mediaSLNC = Replace(NumberFormat(totalSLNC / countSLNC, '0.0'),'.',',')>
 											<cfset mediaDGCI = Replace(NumberFormat(totalDGCI / count, '0.0'),'.',',')>
 											<cfset mediaMeta = Replace(NumberFormat(totalMeta / count, '0.0'),'.',',')>
 
@@ -2175,7 +2327,7 @@
 									<!-- card-body -->
 									<div class="card-body shadow" style="border: 2px solid ##34a2b7">
 									   
-										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT - <span style="fontsize:12px">(#monthAsString(arguments.mes)#/#arguments.ano#)</span></h5></div>
+										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT - <span style="fontsize:12px">#monthAsString(arguments.mes)#/#arguments.ano#</span></h5></div>
 										<div id="divResultadoDGCI" class="col-md-8 col-sm-8 col-12 mx-auto">
 											<div class="info-box bg-info">
 											     <div class="ribbon-wrapper ribbon-xl"  >
@@ -2200,7 +2352,7 @@
 													</div>
 													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
 														<span style="font-size:14px"><strong>DGCI</strong> =  <span style="font-size:16px"><strong>#mediaDGCI#%</strong></span>   (PRCI * #Replace(rsPRCIpeso.pc_indPeso_peso,'.',',')#) + (SLNC * #Replace(rsSLNCpeso.pc_indPeso_peso,'.',',')#) = (#mediaPRCI# * #Replace(rsPRCIpeso.pc_indPeso_peso,'.',',')#) + ( #mediaSLNC# * #Replace(rsSLNCpeso.pc_indPeso_peso,'.',',')#)</span><br>
-														<span style="font-size:14px"><strong>Meta</strong> = <span style="font-size:16px"><strong>#mediaMeta#%</strong></span></span><br>
+														<span style="font-size:14px"><strong>Meta</strong> = <span style="font-size:16px"><strong>#mediaMeta#%</strong></span></span><span> (média das metas do DGCI dos órgãos subordinadores)</span><br>
 													</font></font></span>
 												</div>
 												<!-- /.info-box-content -->
@@ -2247,7 +2399,7 @@
 									<!-- card-body -->
 									<div class="card-body shadow" style="border: 2px solid ##34a2b7">
 									   
-										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT ACUMULADO- <span style="fontsize:12px">#arguments.ano#</span></h5></div>
+										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT ACUMULADO - <span style="fontsize:12px">#arguments.ano#</span></h5></div>
 										<div id="divResultadoDGCI" class="col-md-8 col-sm-8 col-12 mx-auto">
 											<div class="info-box bg-info">
 											     <div class="ribbon-wrapper ribbon-xl"  >
@@ -2271,8 +2423,8 @@
 														<div class="progress-bar" style="width: #resultaDGCIacumuladoEmRelacaoAmetaSemReplace#%"></div>
 													</div>
 													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-														<span style="font-size:14px"><strong>DGCI acumulado</strong> =  <span style="font-size:16px"><strong>#mediaDGCIAcumulado#%</strong></span><br>
-														<span style="font-size:14px"><strong>Meta</strong> = <span style="font-size:16px"><strong>#mediaMeta#%</strong></span></span><br>
+														<span style="font-size:14px"><strong>DGCI acumulado</strong> =  <span style="font-size:16px"><strong>#mediaDGCIAcumulado#%</strong></span><span> (média dos DGCI acumulados dos órgãos subordinadores)</span><br>
+														<span style="font-size:14px"><strong>Meta</strong> = <span style="font-size:16px"><strong>#mediaMeta#%</strong></span></span><span> (média das metas do DGCI dos órgãos subordinadores)</span><br>
 													
 													</font></font></span>
 												</div>
@@ -2312,7 +2464,7 @@
 
 		</cfif>
 
-		<cfif #resultadoDGCIporGerencia.recordcount# neq 0 >	
+		<cfif resultadoDGCIporGerencia.recordcount neq 0 >	
 	
 			<div id="divDGCIporGerencia" class="row" >
 							
@@ -2357,7 +2509,7 @@
 													AND pc_indOrgao_ano = <cfqueryparam value="#pc_indOrgao_ano#" cfsqltype="cf_sql_integer">
 													AND pc_indOrgao_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
 													AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="0" cfsqltype="cf_sql_integer">
-													AND pc_indOrgao_mcuOrgao <> pc_indOrgao_mcuOrgaoSubordinador
+													
 												</cfquery>	
 
 												<cfquery name="resultadoSLNCporGerencia"   dbtype="query">
@@ -2367,7 +2519,7 @@
 													AND pc_indOrgao_ano = <cfqueryparam value="#pc_indOrgao_ano#" cfsqltype="cf_sql_integer">
 													AND pc_indOrgao_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
 													AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="0" cfsqltype="cf_sql_integer">
-													AND pc_indOrgao_mcuOrgao <> pc_indOrgao_mcuOrgaoSubordinador
+													
 												</cfquery>	
 
 
@@ -2380,7 +2532,7 @@
 														
 												</cfquery>
 
-												<cfif metaPRCIporOrgao.recordcount eq 0>
+												<cfif metaPRCIporOrgao.recordcount eq 0 OR pc_indOrgao_mcuOrgao eq pc_indOrgao_mcuOrgaoSubordinador>
 													<cfset metaPRCI = 0>
 												<cfelse>
 													<cfset metaPRCI = metaPRCIporOrgao.metaMes>
@@ -2394,7 +2546,7 @@
 														AND pc_indMeta_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
 												</cfquery>
 
-												<cfif metaSLNCporOrgao.recordcount eq 0>
+												<cfif metaSLNCporOrgao.recordcount eq 0 OR pc_indOrgao_mcuOrgao eq pc_indOrgao_mcuOrgaoSubordinador>
 													<cfset metaSLNC = 0>
 												<cfelse>
 													<cfset metaSLNC = metaSLNCporOrgao.metaMes>
@@ -2413,8 +2565,17 @@
 												    
 													<td style="text-align: left;">#siglaOrgao# (#pc_indOrgao_mcuOrgao#)</td>
 													<td style="text-align: left;">#siglaOrgaoSubordinador# (#pc_indOrgao_mcuOrgaoSubordinador#)</td>
-													<td >#NumberFormat(resultadoPRCIporGerencia.prci, '0.0')#</td>
-													<td >#NumberFormat(resultadoSLNCporGerencia.slnc, '0.0')#</td>
+													<cfif resultadoPRCIporGerencia.prci neq ''>
+														<td >#resultadoPRCIporGerencia.prci#</td>
+													<cfelse>
+														<td style="color:red">sem dados</td>
+													</cfif>
+													<cfif resultadoSLNCporGerencia.slnc neq ''>
+														<td >#resultadoSLNCporGerencia.slnc#</td>
+													<cfelse>
+														<td style="color:red">sem dados</td>
+													</cfif>
+													
 													<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(pc_indOrgao_resultadoMes, '0.0')#</strong></td>
 
 													<cfif metaDGCI eq ''>
@@ -2482,8 +2643,8 @@
 
 		</cfif>
 
-		<cfif #resultadoPRCIporOrgao.recordcount# neq 0 >	
-			<div id="divPRCIporOrgao" class="row" >
+		<cfif resultadoPRCIporOrgaoSubordinador.recordcount neq 0 >	
+			<div id="divPRCIporOrgaoSubordinador" class="row" >
 							
 				<div class="col-12">
 					<div class="card" >
@@ -2492,7 +2653,7 @@
 						<div class="card-body" >
 							
 							<div class="table-responsive ">
-								<table id="tabPRCIporOrgao" class="table table-bordered table-striped text-nowrap " >
+								<table id="tabPRCIporOrgaoSubordinador" class="table table-bordered table-striped text-nowrap " >
 									
 									<thead>
 										<tr style="font-size:14px;text-align: center;">
@@ -2508,7 +2669,7 @@
 									</thead>
 									
 									<tbody>
-										<cfloop query="resultadoPRCIporOrgao" >
+										<cfloop query="resultadoPRCIporOrgaoSubordinador" >
 											<cfoutput>	
 												
 													<cfquery name="metaPRCIporOrgao" datasource="#application.dsn_processos#">
@@ -2596,8 +2757,8 @@
 			<!-- /.row -->
 		</cfif>
 
-		<cfif #resultadoSLNCporOrgao.recordcount# neq 0 >	
-			<div id="divSLNCporOrgao" class="row" >
+		<cfif resultadoSLNCporOrgaoSubordinador.recordcount neq 0 >	
+			<div id="divSLNCporOrgaoSubordinador" class="row" >
 							
 				<div class="col-12">
 					<div class="card" >
@@ -2606,7 +2767,7 @@
 						<div class="card-body" >
 							
 							<div class="table-responsive ">
-								<table id="tabSLNCporOrgao" class="table table-bordered table-striped text-nowrap " >
+								<table id="tabSLNCporOrgaoSubordinador" class="table table-bordered table-striped text-nowrap " >
 									
 									<thead>
 										<tr style="font-size:14px;text-align: center;">
@@ -2622,7 +2783,7 @@
 									</thead>
 									
 									<tbody>
-										<cfloop query="resultadoSLNCporOrgao" >
+										<cfloop query="resultadoSLNCporOrgaoSubordinador" >
 											<cfoutput>	
 											
 												<cfquery name="metaSLNCporOrgao" datasource="#application.dsn_processos#">
@@ -2702,7 +2863,7 @@
 			<!-- /.row -->
 		</cfif>
 	
-		<cfif #resultadoPRCIdetalhe.recordcount# neq 0 >	
+		<cfif resultadoPRCIdetalhe.recordcount neq 0 >	
 			<div id="divDetalhePRCI" class="row" >
 							
 				<div class="col-12">
@@ -2710,8 +2871,6 @@
 						
 						<!-- card-body -->
 						<div class="card-body" >
-														
-							<cfoutput><h5 style="color:##000;text-align: center;margin-bottom: 20px;">Dados utilizados no cálculo do <strong>PRCI</strong> (Atendimento ao Prazo de Resposta): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
 						
 							<div class="table-responsive">
 								<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
@@ -2772,7 +2931,7 @@
 			<!-- /.row -->
         </cfif>
 
-		<cfif #resultadoSLNCdetalhe.recordcount# neq 0 >	
+		<cfif resultadoSLNCdetalhe.recordcount neq 0 >	
 			<div id="divDetalheSLNC" class="row" >
 							
 				<div class="col-12">
@@ -2781,7 +2940,6 @@
 						<!-- card-body -->
 						<div class="card-body" >
 														
-							<cfoutput><h5 style="color:##000;text-align: center;margin-bottom: 20px;">Dados utilizados no cálculo do <strong>SLNC</strong> (Solução de Não Conformidades): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
 						
 							<div class="table-responsive">
 								<table id="tabSLNCdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
@@ -2854,6 +3012,14 @@
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
 
 			$(function () {
+				const tabIndicadoresMes = $('#tabIndicadoresMes').DataTable( {
+					destroy: true, // Destruir a tabela antes de recriá-la
+					order: [[3, 'desc']], // Define a ordem inicial pela coluna DGCI em ordem decrescente
+					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
+					paging: false, // Remove a paginação
+					info: false, // Remove a exibição da quantidade de registros
+					searching: false // Remove o campo de busca
+				})
 				
 				var tituloExcel_DGCIporOrgaoSubord ="SNCI_Consulta_DGCI_por_orgaoSubord_";
 				const tabDGCIporOrgaoSubord = $('#tabDGCIporOrgaoSubord').DataTable( {
@@ -2907,8 +3073,8 @@
 					]
 				})
 
-				var tituloExcel_PRCIporOrgao ="SNCI_Consulta_PRCI_por_orgao_";
-				const tabPRCIporOrgao = $('#tabPRCIporOrgao').DataTable( {
+				var tituloExcel_PRCIporOrgaoSubordinador ="SNCI_Consulta_PRCI_porOrgaoSubordinador_";
+				const tabPRCIporOrgaoSubordinador = $('#tabPRCIporOrgaoSubordinador').DataTable( {
 					destroy: true, // Destruir a tabela antes de recriá-la
 					stateSave: false,
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
@@ -2923,14 +3089,14 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel_PRCIporOrgao + d,
+							title : tituloExcel_PRCIporOrgaoSubordinador + d,
 							className: 'btExcel',
 						}
 					]
 				})
 
-				var tituloExcel_SLNCporOrgao ="SNCI_Consulta_SLNC_por_orgao_";
-				const tabSLNCporOrgao = $('#tabSLNCporOrgao').DataTable( {
+				var tituloExcel_SLNCporOrgaoSubordinador="SNCI_Consulta_SLNC_porOrgaoSubordinador_";
+				const tabSLNCporOrgaoSubordinador= $('#tabSLNCporOrgaoSubordinador').DataTable( {
 					destroy: true, // Destruir a tabela antes de recriá-la
 					stateSave: false,
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
@@ -2945,7 +3111,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel_SLNCporOrgao + d,
+							title : tituloExcel_SLNCporOrgaoSubordinador+ d,
 							className: 'btExcel',
 						}
 					]
@@ -3000,12 +3166,6 @@
 					
 
 				})
-
- 
- 
-				
-
-
 			
 			});
 
