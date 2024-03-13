@@ -1871,7 +1871,6 @@
 			FROM pc_indicadores_porOrgao
 			INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
 			INNER JOIN pc_orgaos as pc_orgaosSubordinador on pc_orgaosSubordinador.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgaoSubordinador
-			
 			WHERE pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 		</cfquery>
 
@@ -1883,7 +1882,9 @@
 					,AVG(pc_indOrgao_resultadoAcumulado) AS media_resultadoAcumulado
 			FROM rsIndicadoresPorOrgao
 			WHERE pc_indOrgao_paraOrgaoSubordinador = 1
+			and pc_indOrgao_mes <= <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
 			GROUP BY pc_indOrgao_mes, pc_indOrgao_numIndicador
+			ORDER BY pc_indOrgao_mes, pc_indOrgao_numIndicador
 		</cfquery>
 		
 		
@@ -1984,88 +1985,134 @@
 
 		<cfif resultadoECTmes.recordcount neq 0>
 			<div id="divIndicadoresMes" class="row" >
-							
-				<div class="col-12">
-					<div class="card" >
-						
-						<!-- card-body -->
-						<div class="card-body" >
-							
-							<div class="table-responsive ">
-								<table id="tabIndicadoresMes" class="table table-bordered table-striped text-nowrap " >
-									
-									<thead >
-										<tr style="font-size:14px;text-align: center;">
-											<th >MÊS</th>
-											<th >PRCI</th>
-											<th >SLNC</th>
-											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;text-align: center;">
-												DGCI<br>
-												<cfoutput>
-													<span style="font-size: 9px">(PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span>
-												</cfoutput>
-											</th>
-											<th >META</th>
-											<th >RESULTADO</th>
-											<th >Result. em Relação<br>à Meta Mensal</th>
-										</tr>
-									</thead>
-									<tbody>
-										<cfoutput query="resultadoECTmes" group="pc_indOrgao_mes">
+				<div class="row" style="width: 100%;">	
+					<div class="col-12">
+						<div class="card" >
 
-										    <cfquery name="metaMediaPRCIMes" datasource="#application.dsn_processos#">
-												SELECT AVG(pc_indMeta_meta) AS mediaMetaPRCImes FROM pc_indicadores_meta 
-												INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_meta.pc_indMeta_mcuOrgao
-												WHERE pc_indMeta_numIndicador = 1
-													AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-													AND pc_indMeta_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
-													AND pc_org_orgaoAvaliado = 1
-											</cfquery>  
-
-											<cfif Trim(metaMediaPRCIMes.mediaMetaPRCImes) eq "">
-												<cfset metaMediaPRCI = 0>
-											<cfelse>
-												<cfset metaMediaPRCI = metaMediaPRCIMes.mediaMetaPRCImes >
-											</cfif>
-
-											 <cfquery name="metaMediaSLNCMes" datasource="#application.dsn_processos#">
-												SELECT AVG(pc_indMeta_meta) AS mediaMetaSLNCmes FROM pc_indicadores_meta 
-												INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_meta.pc_indMeta_mcuOrgao
-												WHERE pc_indMeta_numIndicador = 2
-													AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-													AND pc_indMeta_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
-													AND pc_org_orgaoAvaliado =  1
-											</cfquery>
-											<cfif Trim(metaMediaSLNCMes.mediaMetaSLNCmes) eq "">
-												<cfset metaMediaSLNC = 0>
-											<cfelse>
-												<cfset metaMediaSLNC = metaMediaSLNCMes.mediaMetaSLNCmes>
-											</cfif>
+							<div class="card-body shadow" style="border: 2px solid #34a2b7">
+								<div class="table-responsive " style="width: 850px; margin: 0 auto;">
+									<h4 style=" text-align: center;">DGCI por Mês:</h4>
+									<table id="tabIndicadoresMes" class="table table-bordered table-striped text-nowrap " tyle="width: 350px; margin: 0 auto;">
+										
+										<thead >
+											<tr style="font-size:14px;text-align: center;">
+												<th >MÊS</th>
+												<th >PRCI</th>
+												<th >SLNC</th>
+												<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;text-align: center;">
+													DGCI<br>
+													<cfoutput>
+														<span style="font-size: 9px">(PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span>
+													</cfoutput>
+												</th>
+												<th >META</th>
+												<th >RESULTADO</th>
+												<th >Result. % em Relação<br>à Meta</th>
+											</tr>
+										</thead>
+										<tbody>
 											
-											<cfset metaDGCI = (metaMediaPRCI * rsPRCIpeso.pc_indPeso_peso) + (metaMediaSLNC * rsSLNCpeso.pc_indPeso_peso)>
+										
+											<cfset totalDGCI = {}>
+											<cfset count = {}>
+
+											<!--- Loop pelos meses --->
+											<cfloop index="month" from="1" to="#arguments.mes#">
+												<!--- Inicializar total e contagem para o mês atual --->
+												<cfset totalDGCI[month] = 0>
+												<cfset count[month] = 0>
+
+												
+
+												<cfquery name="rsOrgaosDGCI" dbtype="query" >
+													SELECT pc_indOrgao_mcuOrgao FROM rsIndicadoresPorOrgao
+													WHERE pc_indOrgao_mes = <cfqueryparam value="#month#" cfsqltype="cf_sql_integer">
+														AND pc_indOrgao_numIndicador = 3
+														AND pc_indOrgao_paraOrgaoSubordinador = 1
+												</cfquery>
+
+												<cfloop query="rsOrgaosDGCI">
+													<!--- Inicializar as metas como 0 caso sejam NULL --->
+													<cfset metaPRCI = 0>
+													<cfset metaSLNC = 0>
+													
+													<!--- Obter metaPRCI --->
+													<cfquery name="metaPRCImes" datasource="#application.dsn_processos#">
+														SELECT pc_indMeta_meta as metaPRCI
+														FROM pc_indicadores_meta 
+														WHERE pc_indMeta_numIndicador = 1
+															AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+															AND pc_indMeta_mcuOrgao = <cfqueryparam value="#rsOrgaosDGCI.pc_indOrgao_mcuOrgao#" cfsqltype="cf_sql_varchar">
+															AND pc_indMeta_mes = <cfqueryparam value="#month#" cfsqltype="cf_sql_integer">
+														ORDER BY pc_indMeta_mes
+													</cfquery>
+													
+													<!--- Obter metaSLNC --->
+													<cfquery name="metaSLNCmes" datasource="#application.dsn_processos#">
+														SELECT pc_indMeta_meta as metaSLNC
+														FROM pc_indicadores_meta 
+														WHERE pc_indMeta_numIndicador = 2
+															AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+															AND pc_indMeta_mcuOrgao = <cfqueryparam value="#rsOrgaosDGCI.pc_indOrgao_mcuOrgao#" cfsqltype="cf_sql_varchar">
+															AND pc_indMeta_mes = <cfqueryparam value="#month#" cfsqltype="cf_sql_integer">
+													</cfquery>
+
+													<!--- Se houver resultados, calcular DGCI --->
+													<cfif metaPRCImes.recordCount>
+														<!--- Obter a metaPRCI --->
+														<cfset metaPRCI = metaPRCImes.metaPRCI>
+													</cfif>
+													
+													<cfif metaSLNCmes.recordCount>
+														<!--- Obter a metaSLNC --->
+														<cfset metaSLNC = metaSLNCmes.metaSLNC>
+													</cfif>
+													
+													<!--- Calcular o DGCI --->
+													<cfset DGCI = NumberFormat((metaPRCI ?: 0) * 0.75 + (metaSLNC ?: 0) * 0.25,'0.0')>
+													
+													<!--- Adicionar ao total e incrementar contador para o mês --->
+													<cfset totalDGCI[month] += DGCI>
+													<cfset count[month]++>
+												</cfloop>
+											</cfloop>
+
+											<!--- Calcular a média do DGCI para cada mês --->
+											<cfset mediaDGCI = {}>
+											<cfloop index="month" from="1" to="#arguments.mes#">
+												<cfif count[month] neq 0>
+													<cfset mediaDGCI[month] = totalDGCI[month] / count[month]>
+												<cfelse>
+													<cfset mediaDGCI[month] = 0>
+												</cfif>
+											</cfloop>
+
 											
+											<cfoutput query="resultadoECTmes" group="pc_indOrgao_mes">
 
-											<tr style="font-size:12px;text-align: center;">
-												<td>#monthAsString(pc_indOrgao_mes)#</td>
-												<td>
-													<cfoutput>
-														#IIF(pc_indOrgao_numIndicador EQ 1, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "")#
-													</cfoutput>
-												</td>
-												<td>
-													<cfoutput>
-														#IIF(pc_indOrgao_numIndicador EQ 2, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "")#
-													</cfoutput>
-												</td>
-												<td>
-													<cfoutput>
-														#IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "")#
-													</cfoutput>
-												</td>
+																							
+												<tr style="font-size:12px;text-align: center;">
+													
+													<td>#monthAsString(pc_indOrgao_mes)#</td>
+													<td>
+														<cfoutput>
+															#IIF(pc_indOrgao_numIndicador EQ 1, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "")#
+														</cfoutput>
+													</td>
+													<td>
+														<cfoutput>
+															#IIF(pc_indOrgao_numIndicador EQ 2, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "")#
+														</cfoutput>
+													</td>
+													<td>
+														<cfoutput>
+															<strong>#IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "")#</strong>
+														</cfoutput>
+													</td>
+													<cfset metaDGCI = mediaDGCI[pc_indOrgao_mes]>
+													<td>#NumberFormat(metaDGCI, '0.0')#</td>
 
-												<td>#Replace(NumberFormat( metaDGCI,0.0),',','.')#</td>
-
-												<cfif IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "") gt  metaDGCI and  metaDGCI neq 0>
+													<cfif IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "") gt  metaDGCI and  metaDGCI neq 0>
 														<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
 													<cfelseif IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "") lt  metaDGCI and  metaDGCI neq 0>
 														<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
@@ -2074,19 +2121,36 @@
 													<cfelse>
 														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
 													</cfif>
-												<td><!-- Coloque o Result. em Relação à Meta Mensal Aqui --></td>
-											</tr>
-										</cfoutput>
 
-									</tbody>
-								</table>
+													
+													<cfoutput>
+														<cfif metaDGCI neq 0>
+															<cfset percentual = (#IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), 0)#/#NumberFormat(metaDGCI, '0.0')#)*100 >
+																
+														<cfelse>
+															<cfset percentual = 0>
+														</cfif>
+													</cfoutput>
+													
+													<cfif percentual neq 0>
+														<td >#NumberFormat(percentual, '0.0')#</td>
+													<cfelse>
+														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
+													</cfif>
+
+												</tr>
+											</cfoutput>
+
+										</tbody>
+									</table>
+								</div>
 							</div>
+
 						</div>
-						<!-- /.card-body -->
+						<!-- /.card -->
 					</div>
-					<!-- /.card -->
+					<!-- /.col -->
 				</div>
-				<!-- /.col -->
 			</div>
 		</cfif>
 
@@ -2121,7 +2185,7 @@
 											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
 											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;text-align: center;">DGCI<br>Acumulado</th>
 											<th>Resultado Acumulado</th>
-											<th >Result. em Relação<br>à Meta Mensal</th>
+											<th >Result. % em Relação<br>à Meta Mensal</th>
 										</tr>
 									</thead>
 									
@@ -2495,7 +2559,7 @@
 											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
 											<th class="bg-gradient-warning" style="text-align: center;border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;">DGCI<br>Acumulado</th>
 											<th >Resultado Acumulado</th>
-											<th >Result. em Relação<br>à Meta Mensal</th>
+											<th >Result. % em Relação<br>à Meta Mensal</th>
 										</tr>
 									</thead>
 									
@@ -2664,7 +2728,7 @@
 											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
 											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;">PRCI Acumulado</th>
 											<th >Resultado Acumulado</th>
-											<th >Result. em Relação<br>à Meta Mensal</th>
+											<th >Result. % em Relação<br>à Meta Mensal</th>
 										</tr>
 									</thead>
 									
@@ -2778,7 +2842,7 @@
 											<th >Resultado <cfoutput>#monthAsString(arguments.mes)#</cfoutput></th>
 											<th class="bg-gradient-warning" style="border-left:1px solid #000;border-right:1px solid #000;border-top:1px solid #000;text-align: center;">SLNC Acumulado</th>
 											<th >Resultado Acumulado</th>
-											<th >Result. em Relação<br>à Meta Mensal</th>
+											<th >Result. % em Relação<br>à Meta Mensal</th>
 										</tr>
 									</thead>
 									
@@ -3012,13 +3076,25 @@
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
 
 			$(function () {
+			
+				var tituloExcel_DGCIporMes ="SNCI_Consulta_DGCI_por_mes_";
 				const tabIndicadoresMes = $('#tabIndicadoresMes').DataTable( {
 					destroy: true, // Destruir a tabela antes de recriá-la
-					order: [[3, 'desc']], // Define a ordem inicial pela coluna DGCI em ordem decrescente
+					ordering: false, // Desativa a classificação
 					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
 					paging: false, // Remove a paginação
 					info: false, // Remove a exibição da quantidade de registros
-					searching: false // Remove o campo de busca
+					searching: false, // Remove o campo de busca
+					dom: "<'row'<'col-sm-2'B>>" ,
+					buttons: [
+						{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+							title : tituloExcel_DGCIporMes + d,
+							className: 'btExcel',
+						}
+					]
+					
 				})
 				
 				var tituloExcel_DGCIporOrgaoSubord ="SNCI_Consulta_DGCI_por_orgaoSubord_";
