@@ -1953,7 +1953,10 @@
 				,pc_indDados_descricaoStatus as descricaoOrientacaoStatus
 				,pc_indDados_dataRef as dataRef
 				,pc_indDados_numIndicador as numIndicador
-				,pc_indDados_dataStatus as dataPosicao
+				,CASE 
+					WHEN pc_indDados_descricaoStatus = 'PENDENTE' THEN DATEADD(day, 1, pc_indDados_dataPrevista)
+					ELSE pc_indDados_dataStatus
+				END as dataPosicao
 				,pc_indDados_prazo as prazo
 
 			FROM pc_indicadores_dados
@@ -1991,8 +1994,8 @@
 
 							<div class="card-body shadow" style="border: 2px solid #34a2b7">
 								<div class="table-responsive " style="width: 850px; margin: 0 auto;">
-									<h4 style=" text-align: center;">DGCI por Mês:</h4>
-									<table id="tabIndicadoresMes" class="table table-bordered table-striped text-nowrap " tyle="width: 350px; margin: 0 auto;">
+									<h4 style=" text-align: center;">DGCI ECT por Mês:</h4>
+									<table id="tabIndicadoresMes" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 										
 										<thead >
 											<tr style="font-size:14px;text-align: center;">
@@ -2167,7 +2170,7 @@
 						<div class="card-body" >
 							
 							<div class="table-responsive ">
-								<table id="tabDGCIporOrgaoSubord" class="table table-bordered table-striped text-nowrap " >
+								<table id="tabDGCIporOrgaoSubord" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
 									<thead >
 										<tr style="font-size:14px;text-align: center;">
@@ -2262,12 +2265,12 @@
 
 													<td style="text-align: left;">#siglaOrgao# (#pc_indOrgao_mcuOrgao#)</td>
 													<cfif resultadoPRCI.prci neq ''>
-														<td >#resultadoPRCI.prci#</td>
+														<td >#NumberFormat(resultadoPRCI.prci, '0.0')#</td>
 													<cfelse>
 														<td style="color:red">sem dados</td>
 													</cfif>
 													<cfif resultadoSLNC.slnc neq ''>
-														<td >#resultadoSLNC.slnc#</td>
+														<td >#NumberFormat(resultadoSLNC.slnc, '0.0')#</td>
 													<cfelse>
 														<td style="color:red">sem dados</td>
 													</cfif>
@@ -2539,7 +2542,7 @@
 						<div class="card-body" >
 							
 							<div class="table-responsive ">
-								<table id="tabDGCIporGerencia" class="table table-bordered table-striped text-nowrap " >
+								<table id="tabDGCIporGerencia" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
 									<thead >
 										<tr style="font-size:14px;text-align: center;">
@@ -2630,12 +2633,12 @@
 													<td style="text-align: left;">#siglaOrgao# (#pc_indOrgao_mcuOrgao#)</td>
 													<td style="text-align: left;">#siglaOrgaoSubordinador# (#pc_indOrgao_mcuOrgaoSubordinador#)</td>
 													<cfif resultadoPRCIporGerencia.prci neq ''>
-														<td >#resultadoPRCIporGerencia.prci#</td>
+														<td >#NumberFormat(resultadoPRCIporGerencia.prci, '0.0')#</td>
 													<cfelse>
 														<td style="color:red">sem dados</td>
 													</cfif>
 													<cfif resultadoSLNCporGerencia.slnc neq ''>
-														<td >#resultadoSLNCporGerencia.slnc#</td>
+														<td >#NumberFormat(resultadoSLNCporGerencia.slnc, '0.0')#</td>
 													<cfelse>
 														<td style="color:red">sem dados</td>
 													</cfif>
@@ -2717,7 +2720,7 @@
 						<div class="card-body" >
 							
 							<div class="table-responsive ">
-								<table id="tabPRCIporOrgaoSubordinador" class="table table-bordered table-striped text-nowrap " >
+								<table id="tabPRCIporOrgaoSubordinador" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
 									<thead>
 										<tr style="font-size:14px;text-align: center;">
@@ -2831,7 +2834,7 @@
 						<div class="card-body" >
 							
 							<div class="table-responsive ">
-								<table id="tabSLNCporOrgaoSubordinador" class="table table-bordered table-striped text-nowrap " >
+								<table id="tabSLNCporOrgaoSubordinador" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
 									<thead>
 										<tr style="font-size:14px;text-align: center;">
@@ -2937,7 +2940,7 @@
 						<div class="card-body" >
 						
 							<div class="table-responsive">
-								<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
+								<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
 									<thead >
 										<tr style="font-size:14px">
@@ -3006,7 +3009,7 @@
 														
 						
 							<div class="table-responsive">
-								<table id="tabSLNCdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
+								<table id="tabSLNCdetalhe" class="table table-bordered table-striped text-nowrap" style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
 									<thead>
 										<tr style="font-size:14px">
@@ -3157,8 +3160,11 @@
 					scrollX: true, // Permitir rolagem horizontal
         			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 					pageLength: 5,//quantidade de registros por página
-					
-					dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>>" ,
+					lengthMenu: [
+						[5, 10, 25, 50, -1],
+						['5', '10', '25', '50', 'Todos']
+					],
+					dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>><'row'<'col-sm-2 text-left'l>>" ,
 					order: [[2, 'desc']],//classificar pela coluna PRCI em ordem decrescente
 					//dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-12 text-left'i>>" ,
 					buttons: [
@@ -3179,8 +3185,11 @@
 					scrollX: true, // Permitir rolagem horizontal
         			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 					pageLength: 5,//quantidade de registros por página
-					
-					dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>>" ,
+					lengthMenu: [
+						[5, 10, 25, 50, -1],
+						['5', '10', '25', '50', 'Todos']
+					],
+					dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>><'row'<'col-sm-2 text-left'l>>" ,
 					order: [[2, 'desc']],//classificar pela coluna SLNC em ordem decrescente
 					//dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-12 text-left'i>>" ,
 					buttons: [
