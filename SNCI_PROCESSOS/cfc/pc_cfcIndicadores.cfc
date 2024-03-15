@@ -1994,7 +1994,7 @@
 
 							<div class="card-body shadow" style="border: 2px solid #34a2b7">
 								<div class="table-responsive " style="width: 850px; margin: 0 auto;">
-									<h4 style=" text-align: center;">DGCI ECT por Mês:</h4>
+									<h4 style=" text-align: center;">DGCI ECT <cfoutput>#arguments.ano#</cfoutput> por Mês:</h4>
 									<table id="tabIndicadoresMes" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 										
 										<thead >
@@ -2474,7 +2474,7 @@
 									<!-- card-body -->
 									<div class="card-body shadow" style="border: 2px solid ##34a2b7">
 									   
-										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT ACUMULADO - <span style="fontsize:12px"></span></h5></div>
+										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT #arguments.ano# <span style="fontsize:12px"></span></h5></div>
 										<div id="divResultadoDGCI" class="col-md-8 col-sm-8 col-12 mx-auto">
 											<div class="info-box bg-info">
 											     <div class="ribbon-wrapper ribbon-xl"  >
