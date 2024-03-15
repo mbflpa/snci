@@ -2090,7 +2090,11 @@
 												</cfif>
 											</cfloop>
 
-											
+											<cfset DGCIcount = 0>
+											<cfset DGCIsoma = 0>
+											<cfset DGCImetaSoma = 0>
+
+
 											<cfoutput query="resultadoECTmes" group="pc_indOrgao_mes">
 
 																							
@@ -2113,6 +2117,7 @@
 														</cfoutput>
 													</td>
 													<cfset metaDGCI = mediaDGCI[pc_indOrgao_mes]>
+													<cfset DGCImetaSoma += NumberFormat(metaDGCI, '0.0')>
 													<td>#NumberFormat(metaDGCI, '0.0')#</td>
 
 													<cfif IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), "") gt  metaDGCI and  metaDGCI neq 0>
@@ -2133,6 +2138,8 @@
 														<cfelse>
 															<cfset percentual = 0>
 														</cfif>
+														<cfset DGCIcount += #IIF(pc_indOrgao_numIndicador EQ 3, 1, 0)#>
+														<cfset DGCIsoma += #IIF(pc_indOrgao_numIndicador EQ 3, NumberFormat(media_resultadoMes,0.0), 0)#>
 													</cfoutput>
 													
 													<cfif percentual neq 0>
@@ -2141,8 +2148,12 @@
 														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
 													</cfif>
 
+													
+
 												</tr>
 											</cfoutput>
+											<cfset DGCIano = NumberFormat((DGCIsoma/DGCIcount), '0.0')>
+											<cfset DGCImetaAno = NumberFormat((DGCImetaSoma/DGCIcount), '0.0')>
 
 										</tbody>
 									</table>
@@ -2354,20 +2365,17 @@
 											<cfset mediaDGCISemReplace = NumberFormat(totalDGCI / count, '0.0')>
 											<cfset mediaMetaSemReplace = NumberFormat(totalMeta / count, '0.0')>
 
-											<cfset mediaDGCIAcumulado = Replace(NumberFormat(totalDGCIAcumulado / count, '0.0'),'.',',')>
-											<!--<cfset mediaPRCIAcumulado = Replace(NumberFormat(totalPRCIAcumulado / count, '0.0'),'.',',')>
-											<cfset mediaSLNCAcumulado = Replace(NumberFormat(totalSLNCAcumulado / count, '0.0'),'.',',')>-->
-
+											
 											<cfif mediaMetaSemReplace eq NumberFormat(0, '0.0')>
 												<cfset resultaDGCIemRelacaoAmetaSemReplace = NumberFormat(0, '0.0')>
-												<cfset resultaDGCIacumuladoEmRelacaoAmetaSemReplace = NumberFormat(0, '0.0')>
+												<cfset DGCIanoEmRelacaoAmetaSemReplace = NumberFormat(0, '0.0')>
 												<cfset resultaDGCIemRelacaoAmeta = NumberFormat(0, '0.0')>
-												<cfset resultaDGCIacumuladoEmRelacaoAmeta = NumberFormat(0, '0.0')>
+												<cfset DGCIanoEmRelacaoAmeta = NumberFormat(0, '0.0')>
 											<cfelse>
 											    <cfset resultaDGCIemRelacaoAmetaSemReplace = (mediaDGCISemReplace / mediaMetaSemReplace)*100>
-												<cfset resultaDGCIacumuladoEmRelacaoAmetaSemReplace = (totalDGCIAcumulado / totalMeta)*100>
+												<cfset DGCIanoEmRelacaoAmetaSemReplace = (DGCIano / DGCImetaAno)*100>
 												<cfset resultaDGCIemRelacaoAmeta = Replace(NumberFormat((mediaDGCISemReplace / mediaMetaSemReplace)*100, '0.0'),'.',',')>
-												<cfset resultaDGCIacumuladoEmRelacaoAmeta = Replace(NumberFormat((totalDGCIAcumulado / totalMeta)*100, '0.0'),'.',',')>
+												<cfset DGCIanoEmRelacaoAmeta = Replace(NumberFormat((DGCIano / DGCImetaAno)*100, '0.0'),'.',',')>
 											</cfif>
 
 									</cfif>
@@ -2418,7 +2426,7 @@
 														<div class="progress-bar" style="width: #resultaDGCIemRelacaoAmetaSemReplace#%"></div>
 													</div>
 													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-														<span style="font-size:14px"><strong>DGCI</strong> =  <span style="font-size:16px"><strong>#mediaDGCI#%</strong></span>   (PRCI * #Replace(rsPRCIpeso.pc_indPeso_peso,'.',',')#) + (SLNC * #Replace(rsSLNCpeso.pc_indPeso_peso,'.',',')#) = (#mediaPRCI# * #Replace(rsPRCIpeso.pc_indPeso_peso,'.',',')#) + ( #mediaSLNC# * #Replace(rsSLNCpeso.pc_indPeso_peso,'.',',')#)</span><br>
+														<span style="font-size:14px"><strong>DGCI #monthAsString(arguments.mes)#</strong> =  <span style="font-size:16px"><strong>#mediaDGCI#%</strong></span> (média dos DGCI dos órgãos subordinadores)</span><br>
 														<span style="font-size:14px"><strong>Meta</strong> = <span style="font-size:16px"><strong>#mediaMeta#%</strong></span></span><span> (média das metas do DGCI dos órgãos subordinadores)</span><br>
 													</font></font></span>
 												</div>
@@ -2466,15 +2474,15 @@
 									<!-- card-body -->
 									<div class="card-body shadow" style="border: 2px solid ##34a2b7">
 									   
-										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT ACUMULADO - <span style="fontsize:12px">#arguments.ano#</span></h5></div>
+										<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT ACUMULADO - <span style="fontsize:12px"></span></h5></div>
 										<div id="divResultadoDGCI" class="col-md-8 col-sm-8 col-12 mx-auto">
 											<div class="info-box bg-info">
 											     <div class="ribbon-wrapper ribbon-xl"  >
-                                                    <cfif resultaDGCIacumuladoEmRelacaoAmetaSemReplace gt 100>
+                                                    <cfif DGCIanoEmRelacaoAmetaSemReplace gt 100>
 														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##0083CA;color: ##fff;">ACIMA DO ESPERADO</div>
-													<cfelseif resultaDGCIacumuladoEmRelacaoAmetaSemReplace lt 100 and resultaDGCIacumuladoEmRelacaoAmetaSemReplace neq 0>
+													<cfelseif DGCIanoEmRelacaoAmetaSemReplace lt 100 and DGCIanoEmRelacaoAmetaSemReplace neq 0>
 														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##dc3545;color: ##fff;">ABAIXO DO ESPERADO</div>		
-													<cfelseif resultaDGCIacumuladoEmRelacaoAmetaSemReplace eq 100>
+													<cfelseif DGCIanoEmRelacaoAmetaSemReplace eq 100>
 														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: green;color: ##fff;">DENTRO DO ESPERADO</div>
 													<cfelse>
 														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##e3dada;color:##000;">SEM META</div>
@@ -2483,15 +2491,15 @@
 												<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
 												<div class="info-box-content">
-													<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI = #mediaDGCIAcumulado#%</strong></font></font><span style="font-size:12px;position: relative;left:-194px;top:13px">Desempenho Geral de Controle Interno</span></span>
-													<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong> #resultaDGCIacumuladoEmRelacaoAmeta#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (DGCI / Meta) * 100 = (#mediaDGCIAcumulado# / #mediaMeta#) * 100</span></span>
+													<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI = #DGCIano#%</strong></font></font><span style="font-size:12px;position: relative;left:-194px;top:13px">Desempenho Geral de Controle Interno</span></span>
+													<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong> #DGCIanoEmRelacaoAmeta#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (DGCI / Meta) * 100 = (#Replace(DGCIano,',','.')# / #Replace(DGCImetaAno,',','.')#) * 100</span></span>
 
 													<div class="progress">
-														<div class="progress-bar" style="width: #resultaDGCIacumuladoEmRelacaoAmetaSemReplace#%"></div>
+														<div class="progress-bar" style="width: #DGCIanoEmRelacaoAmetaSemReplace#%"></div>
 													</div>
 													<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-														<span style="font-size:14px"><strong>DGCI acumulado</strong> =  <span style="font-size:16px"><strong>#mediaDGCIAcumulado#%</strong></span><span> (média dos DGCI acumulados dos órgãos subordinadores)</span><br>
-														<span style="font-size:14px"><strong>Meta</strong> = <span style="font-size:16px"><strong>#mediaMeta#%</strong></span></span><span> (média das metas do DGCI dos órgãos subordinadores)</span><br>
+														<span style="font-size:14px"><strong>DGCI #arguments.ano#</strong> =  <span style="font-size:16px"><strong>#Replace(DGCIano,',','.')#%</strong></span><span> (média dos resultados mensais do DGCI)</span><br>
+														<span style="font-size:14px"><strong>Meta</strong> = <span style="font-size:16px"><strong>#Replace(DGCImetaAno,',','.')#%</strong></span></span><span> (média das metas mensais)</span><br>
 													
 													</font></font></span>
 												</div>
