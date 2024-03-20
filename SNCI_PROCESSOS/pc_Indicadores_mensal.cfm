@@ -220,7 +220,7 @@
 					type: "post",
 					url: "cfc/pc_cfcIndicadores.cfc",
 					data:{
-						method:"tabSLNCDetalhe_diario",
+						method:"tabSLNCDetalhe_mensal",
 						ano:selectedYear,
 						mes:selectedMonth
 					},

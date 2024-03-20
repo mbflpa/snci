@@ -537,3 +537,18 @@ $('#scrollTopBtn').click(function(){
     $('html, body').animate({scrollTop : 0},800);
     return false;
 });
+
+// Atualiza a cor da fita do resultado do indicador
+function updateRibbon(ribbon) {
+    const metaValue = parseFloat(ribbon.data('value'));
+
+    if (metaValue > 100) {
+      ribbon.text('ACIMA DO ESPERADO').css('background', '#0083CA').css('color', '#fff');
+    } else if (metaValue < 100) {
+      ribbon.text('ABAIXO DO ESPERADO').css('background', '#dc3545').css('color', '#fff');
+    } else if (metaValue === 100) {
+      ribbon.text('DENTRO DO ESPERADO').css('background', 'green').css('color', '#fff');
+    } else {
+      ribbon.text('SEM META').css('background', '#e3dada').css('color', '#000');
+    }
+}

@@ -88,8 +88,8 @@
 						<thead>
 							<tr style="text-align: center;"  >
 								<th>Mês/Ano</th>
-								<th>Data/Hora Gerado</th>
-								<th>Usuário Gerador</th>
+								<th>Data/Hora</th>
+								<th>Usuário</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -375,6 +375,11 @@
 			<cfelse>
 				<cfset distribuida = 0>
 			</cfif>
+			<cfif rs_dados_prci.orgaoDaAcaoEdoControleInterno eq 'N'>
+				<cfset ehControleInteno = 0>
+			<cfelse>
+				<cfset ehControleInteno = 1>
+			</cfif>
 
 			<cfquery datasource="#application.dsn_processos#">
 				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
@@ -392,7 +397,8 @@
 												,pc_indDados_status
 												,pc_indDados_orientacaoDistribuida
 												,pc_indDados_descricaoStatus
-												,pc_indDados_prazo)
+												,pc_indDados_prazo
+												,pc_indDados_mcuOrgaoPosicEcontInterno)
 				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					,1
 					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
@@ -409,6 +415,7 @@
 					,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
 					,<cfqueryparam value="#rs_dados_prci.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
 					,<cfqueryparam value="#rs_dados_prci.Prazo#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#ehControleInteno#" cfsqltype="cf_sql_bit">
 				)
 			</cfquery>
 		</cfloop>
@@ -436,6 +443,11 @@
 			<cfelse>
 				<cfset distribuida = 0>
 			</cfif>
+			<cfif rs_dados_prci.orgaoDaAcaoEdoControleInterno eq 'N'>
+				<cfset ehControleInteno = 0>
+			<cfelse>
+				<cfset ehControleInteno = 1>
+			</cfif>
 
 			<cfquery datasource="#application.dsn_processos#">
 				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
@@ -453,7 +465,8 @@
 												,pc_indDados_status
 												,pc_indDados_orientacaoDistribuida
 												,pc_indDados_descricaoStatus
-												,pc_indDados_prazo)
+												,pc_indDados_prazo
+												,pc_indDados_mcuOrgaoPosicEcontInterno)
 				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					,2
 					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
@@ -470,6 +483,7 @@
 					,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
 					,<cfqueryparam value="#rs_dados_slnc.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
 					,null
+					,<cfqueryparam value="#ehControleInteno#" cfsqltype="cf_sql_bit">
 				)
 			</cfquery>
 		</cfloop>
@@ -892,7 +906,7 @@
 
 
 
-	<cffunction name="tabPRCIDetalhe_diario" access="remote" hint="outra função que utiliza tabIndicadores - acompanhamento diário">
+	<cffunction name="tabPRCIDetalhe_diario" access="remote" hint="acompanhamento diário">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
@@ -965,6 +979,13 @@
 										
 										<tbody>
 											<cfloop query="resultado" >
+											    <cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
+													SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+													WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+															AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+															AND pc_indMeta_numIndicador = 1
+															AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+												</cfquery>
 											
 												<cfoutput>					
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
@@ -1002,28 +1023,45 @@
 										<cfoutput>
 											<cfset totalGeral = resultado.recordcount />
 											<!--- Calcula a porcentagem --->
-											<cfset percentualDP = (totalDP / totalGeral) * 100 />
+											<cfset percentualDP = NumberFormat((totalDP / totalGeral) * 100, '0.0') />
 											<!--- Formata o percentualDP com duas casas decimais --->
-											<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") />
+											<cfset percentualDPFormatado = Replace(percentualDP,".",",") />
+											
+											<cfset metaPRCIorgao= NumberFormat(rsMetaPRCI.pc_indMeta_meta, '0.0') />
+											<cfset metaPRCIorgaoFormatado = Replace(metaPRCIorgao,".",",") />
 
+											<cfif metaPRCIorgao eq 0>
+												<cfset PRCIresultadoMeta = NumberFormat(0, '0.0') />
+											<cfelse>
+												<cfset PRCIresultadoMeta = NumberFormat((percentualDP/metaPRCIorgao)*100, '0.0') />
+											</cfif>
+
+											<cfset PRCIresultadoMetaFormatado = Replace(PRCIresultadoMeta,".",",") />
 											
 
 											<div id="divResultPRCI" class="col-md-4 col-sm-4 col-4">
 												<div class="info-box bg-gradient-warning">
+													<div class="ribbon-wrapper ribbon-xl"  >
+														<cfif metaPRCIorgao eq 0>
+															<div class="ribbon" id="ribbon" data-value=""></div>
+														<cfelse>
+															<div class="ribbon" id="ribbon" data-value="#PRCIresultadoMeta#"></div>
+														</cfif>
+													</div>
 													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
 													<div class="info-box-content">
-														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">PRCI</font></font><span style="font-size:12px;position: absolute;left: 89px;top: 36px;">Atendimento ao Prazo de Resposta</span></span>
-														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDPFormatado#%</strong></font></font></span>
+														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">PRCI = #percentualDPFormatado#%</font></font></span><span style="font-size:12px;position:absolute; top:36px">Atendimento ao Prazo de Resposta</span>
+														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#PRCIresultadoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (PRCI / Meta) * 100</span></span>
 
-														<div class="progress">
-															<div class="progress-bar" style="width: #percentualDP#%"></div>
+														<div class="progress" style="width:90%">
+															<div class="progress-bar" style="width: #PRCIresultadoMeta#%"></div>
 														</div>
 														<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
 															<span style="font-size:14px">PRCI = TIDP/TGI</span><br>
 															<span style="font-size:14px">TIDP (Posic. dentro do prazo (DP))= #totalDP#</span><br>
-															<span style="font-size:14px">TGI (Total de Posicionamentos)= #totalGeral# </span>
-
+															<span style="font-size:14px">TGI (Total de Posicionamentos)= #totalGeral# </span><br>
+															<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#%</span><br>
 														</font></font></span>
 													</div>
 													<!-- /.info-box-content -->
@@ -1320,7 +1358,7 @@
 	</cffunction>
 
 
-	<cffunction name="tabSLNCDetalhe_diario" access="remote" hint="outra função que utiliza tabIndicadores - acompanhamento diário">
+	<cffunction name="tabSLNCDetalhe_diario" access="remote" hint="acompanhamento diário">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
@@ -1380,7 +1418,13 @@
 										
 										<tbody>
 											<cfloop query="resultadoSLNC" >
-											
+												<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
+													SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+													WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+															AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+															AND pc_indMeta_numIndicador = 2
+															AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+												</cfquery>
 												<cfoutput>					
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 														<td>#resultadoSLNC.pc_aval_posic_id#</td>
@@ -1408,29 +1452,47 @@
 										<cfoutput>
 											<cfset totalGeral = resultadoSLNC.recordcount />
 											<cfif totalGeral eq 0>
-												<cfset percentualSolucionado = 0 />
+												<cfset percentualSolucionado = NumberFormat(0, '0.0') />
 											<cfelse>
-												<cfset percentualSolucionado = (totalSolucionado / totalGeral *100) />
+												<cfset percentualSolucionado = NumberFormat((totalSolucionado / totalGeral *100), '0.0') />
 											</cfif>
 											
 								
-											<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
+											<cfset percentualSolucionadoFormatado = Replace(percentualSolucionado,".",",")  />
+											<cfset metaSLNCorgao= NumberFormat(rsMetaSLNC.pc_indMeta_meta, '0.0') />
+											<cfset metaSLNCorgaoFormatado = Replace(metaSLNCorgao,".",",") />
+											<cfif metaSLNCorgao eq 0>
+												<cfset SLNCresultadoMeta = NumberFormat(0, '0.0') />
+											<cfelse>
+												<cfset SLNCresultadoMeta = NumberFormat((percentualSolucionado/metaSLNCorgao)*100, '0.0') />
+											</cfif>
+											<cfset SLNCresultadoMetaFormatado = Replace(SLNCresultadoMeta,".",",") />
+											
+											
 											
 											<div id="divResultSLNC" class="col-md-6 col-sm-6 col-12">
 												<div class="info-box bg-gradient-warning">
+												    <div class="ribbon-wrapper ribbon-xl"  >
+													    <cfif metaSLNCorgao eq 0>
+															<div class="ribbon" id="ribbon" data-value=""></div>
+														<cfelse>
+															<div class="ribbon" id="ribbon" data-value="#SLNCresultadoMeta#"></div>
+														</cfif>
+													</div>
 													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
 													<div class="info-box-content">
-														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">SLNC</font></font><span style="font-size:12px;position: absolute;left: 89px;top: 36px;">Solução de Não Conformidades</span></span>
-														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualSolucionadoFormatado#%</strong></font></font></span>
+														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">SLNC = #percentualSolucionadoFormatado#%</font></font></span><span style="font-size:12px;position:absolute; top:36px">Solução de Não Conformidades</span>
+														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#SLNCresultadoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (SLNC / Meta) * 100</span></span>
 
-														<div class="progress">
+														<div class="progress" style="width:90%">
 														<div class="progress-bar" style="width: #percentualSolucionado#%"></div>
 														</div>
 														<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
 															<span style="font-size:14px">SLNC = QTSL/QTNC x 100</span><br>
 															<span style="font-size:14px">QTSL (Quant. Orientações Solucionadas)= #totalSolucionado#</span><br>
-															<span style="font-size:14px">QTNC (Quant. Orientações Registradas )= #totalGeral#</span>
+															<span style="font-size:14px">QTNC (Quant. Orientações Registradas )= #totalGeral#</span><br>
+															<span style="font-size:14px">Meta = #metaSLNCorgaoFormatado#%</span><br>
 														</font></font></span>
 													</div>
 													<!-- /.info-box-content -->
@@ -1558,7 +1620,642 @@
 
 
 
-	<cffunction name="resultadoDGCI_diario" access="remote" hint="outra função que utiliza tabIndicadores - acompanhamento diário">
+
+
+	<cffunction name="tabPRCIDetalhe_mensal" access="remote" hint="acompanhamento mensal">
+   		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+		
+    	
+		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+
+
+		<cfquery name="resultadoPRCI" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT pc_indDados_numPosic
+				,pc_indDados_mcuOrgaoResp as mcuOrgaoResp
+				,pc_orgaos.pc_org_sigla as siglaOrgaoResp
+				,pc_indDados_mcuOrgaoSubordinador as mcuOrgaoSubordinador
+				,pc_orgaosSubordinador.pc_org_sigla as siglaOrgaoSubordinador
+				,pc_indDados_mcuOrgaoAvaliado as mcuOrgaoAvaliado
+				,pc_orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
+				,pc_indDados_numProcesso as numProcessoSNCI
+				,pc_indDados_numItem as item
+				,pc_indDados_numOrientacao as orientacao
+				,pc_indDados_dataPrevista as dataPrevista
+				,pc_indDados_status as numStatus
+				,pc_indDados_descricaoStatus as descricaoOrientacaoStatus
+				,pc_indDados_dataRef as dataRef
+				,pc_indDados_numIndicador as numIndicador
+				,CASE 
+					WHEN pc_indDados_descricaoStatus = 'PENDENTE' THEN DATEADD(day, 1, pc_indDados_dataPrevista)
+					ELSE pc_indDados_dataStatus
+				END as dataPosicao
+				,pc_indDados_prazo as prazo
+
+			FROM pc_indicadores_dados
+			INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoResp
+			INNER JOIN pc_orgaos as pc_orgaosSubordinador on pc_orgaosSubordinador.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoSubordinador
+			INNER JOIN pc_orgaos as pc_orgaoAvaliado on pc_orgaoAvaliado.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoAvaliado
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 1
+				AND pc_indDados_mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+      	</cfquery>
+      
+		<cfset totalDP = 0 /> 
+		<cfset totalFP = 0 /> 
+		<cfset orgaos = {}> <!-- Define a variável orgaos como um objeto vazio -->
+		<cfset dps = {}> <!-- Define a variável dps como um objeto vazio -->
+		<cfset fps = {}> <!-- Define a variável fps como um objeto vazio -->
+
+		<cfloop query="resultadoPRCI"> <!-- Inicia um loop que itera sobre o conjunto de dados resultadoPRCI -->
+			<cfif Prazo eq 'DP'> <!-- Verifica se o valor da coluna Prazo é igual a 'DP' -->
+				<cfset totalDP++> <!-- Se a condição for verdadeira, incrementa a variável totalDP em 1 -->
+			<cfelseif Prazo eq 'FP'> <!-- Verifica se o valor da coluna Prazo é igual a 'FP' -->
+				<cfset totalFP++> <!-- Se a condição for verdadeira, incrementa a variável totalFP em 1 -->
+			</cfif>
+			<cfif not StructKeyExists(orgaos, siglaOrgaoResp)> <!-- Verifica se a chave siglaOrgaoResp não existe no objeto orgaos -->
+				<cfset orgaos[siglaOrgaoResp] = 1> <!-- Se a condição for verdadeira, define a chave siglaOrgaoResp no objeto orgaos como 1 -->
+				<cfset dps[siglaOrgaoResp] = 0> <!-- Define a chave siglaOrgaoResp no objeto dps como 0 -->
+				<cfset fps[siglaOrgaoResp] = 0> <!-- Define a chave siglaOrgaoResp no objeto fps como 0 -->
+			<cfelse>
+				<cfset orgaos[siglaOrgaoResp]++> <!-- Incrementa a chave siglaOrgaoResp no objeto orgaos em 1 -->
+			</cfif>
+			<cfif Prazo eq 'DP'> <!-- Verifica se o valor da coluna Prazo é igual a 'DP' -->
+				<cfset dps[siglaOrgaoResp]++> <!-- Se a condição for verdadeira, incrementa a chave siglaOrgaoResp no objeto dps em 1 -->
+			<cfelseif Prazo eq 'FP'> <!-- Verifica se o valor da coluna Prazo é igual a 'FP' -->
+				<cfset fps[siglaOrgaoResp]++> <!-- Se a condição for verdadeira, incrementa a chave siglaOrgaoResp no objeto fps em 1 -->
+			</cfif>
+		</cfloop>
+
+		<style>
+			.dataTables_wrapper {
+				width: 100%; /* ou a largura desejada */
+				margin: 0 auto;
+			}
+		</style>
+	
+		<cfif #resultadoPRCI.recordcount# neq 0 >	
+			<div class="row" style="width: 100%;">
+							
+				<div class="col-12">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
+														
+								<cfoutput><h5 style="color:##000;text-align: center;margin-bottom: 20px;">Dados utilizados no cálculo do <strong>PRCI</strong> (Atendimento ao Prazo de Resposta): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+							
+								<div class="table-responsive">
+									<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
+										
+										<thead class="bg-gradient-warning">
+											<tr style="font-size:14px">
+												<th style="width: 10px">Posic ID</th>
+												<th style="width: 10px">Órgão Avaliado</th>
+												<th style="width: 10px">Órgão Responsável</th>
+												<th style="width: 10px">Processo SNCI</th>
+												<th style="width: 10px">Item</th>
+												<th style="width: 10px">Orientação</th>
+												<th style="width: 10px">Data Prevista</th>
+												<th style="width: 10px">Data Status</th>
+												<th style="width: 10px">Status</th>
+												<th style="width: 10px">Data Ref.</th>
+												<th style="width: 10px">Prazo</th>
+
+											</tr>
+										</thead>
+										
+										<tbody>
+											<cfloop query="resultado" >
+											    <cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
+													SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+													WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+															AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+															AND pc_indMeta_numIndicador = 1
+															AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+												</cfquery>
+											
+												<cfoutput>					
+													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+														<td>#resultadoPRCI.pc_indDados_numPosic#</td>
+														<td>#resultadoPRCI.siglaOrgaoAvaliado#</td>
+														<td>#resultadoPRCI.siglaOrgaoResp#</td>
+														<td>#resultadoPRCI.numProcessoSNCI#</td>
+														<td >#resultadoPRCI.item#</td>
+														<td>#resultadoPRCI.orientacao#</td>
+														<cfif resultadoPRCI.dataPrevista eq '1900-01-01' or resultadoPRCI.dataPrevista eq ''>
+															<td>NÃO INF.</td>
+														<cfelse>
+															<td>#dateFormat(resultadoPRCI.dataPrevista, 'dd/mm/yyyy')#</td>
+														</cfif>
+														<td>
+															
+															<cfif orgaoDaAcaoEdoControleInterno eq 'N' AND (resultadoPRCI.numStatus eq 4 OR resultadoPRCI.numStatus eq 5)>
+																#dateFormat(resultadoPRCI.dataPosicao, 'dd/mm/yyyy')#<br><span style="color:red">(dt. distrib.)</span>
+															<cfelse>
+																#dateFormat(resultadoPRCI.dataPosicao, 'dd/mm/yyyy')#
+															</cfif>
+														</td>
+
+
+														<td>#resultadoPRCI.OrientacaoStatus#</td>
+														<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+														<td>#dateFormat(dataFinal, 'dd/mm/yyyy')#</td>
+														<td>#resultadoPRCI.Prazo#</td>
+															
+													</tr>
+												</cfoutput>
+											</cfloop>	
+										</tbody>
+										<!--- Imprime os resultados ou faça o que desejar com eles --->
+										<cfoutput>
+											<cfset totalGeral = resultadoPRCI.recordcount />
+											<!--- Calcula a porcentagem --->
+											<cfset percentualDP = NumberFormat((totalDP / totalGeral) * 100, '0.0') />
+											<!--- Formata o percentualDP com duas casas decimais --->
+											<cfset percentualDPFormatado = Replace(percentualDP,".",",") />
+											
+											<cfset metaPRCIorgao= NumberFormat(rsMetaPRCI.pc_indMeta_meta, '0.0') />
+											<cfset metaPRCIorgaoFormatado = Replace(metaPRCIorgao,".",",") />
+
+											<cfif metaPRCIorgao eq 0>
+												<cfset PRCIresultadoMeta = NumberFormat(0, '0.0') />
+											<cfelse>
+												<cfset PRCIresultadoMeta = NumberFormat((percentualDP/metaPRCIorgao)*100, '0.0') />
+											</cfif>
+
+											<cfset PRCIresultadoMetaFormatado = Replace(PRCIresultadoMeta,".",",") />
+											
+
+											<div id="divResultPRCI" class="col-md-4 col-sm-4 col-4">
+												<div class="info-box bg-gradient-warning">
+													<div class="ribbon-wrapper ribbon-xl"  >
+														<cfif metaPRCIorgao eq 0>
+															<div class="ribbon" id="ribbon" data-value=""></div>
+														<cfelse>
+															<div class="ribbon" id="ribbon" data-value="#PRCIresultadoMeta#"></div>
+														</cfif>
+													</div>
+													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
+
+													<div class="info-box-content">
+														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">PRCI = #percentualDPFormatado#%</font></font></span><span style="font-size:12px;position:absolute; top:36px">Atendimento ao Prazo de Resposta</span>
+														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#PRCIresultadoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (PRCI / Meta) * 100</span></span>
+
+														<div class="progress" style="width:90%">
+															<div class="progress-bar" style="width: #PRCIresultadoMeta#%"></div>
+														</div>
+														<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+															<span style="font-size:14px">PRCI = TIDP/TGI</span><br>
+															<span style="font-size:14px">TIDP (Posic. dentro do prazo (DP))= #totalDP#</span><br>
+															<span style="font-size:14px">TGI (Total de Posicionamentos)= #totalGeral# </span><br>
+															<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#%</span><br>
+														</font></font></span>
+													</div>
+													<!-- /.info-box-content -->
+												</div>
+												<!-- /.info-box -->
+											</div>
+											
+										</cfoutput>
+
+									</table>
+								</div>
+
+								<cfset totalOrgaosResp = StructCount(orgaos)> <!-- Conta a quantidade de orgaoResp -->
+								
+								<cfif totalOrgaosResp gt 1>
+									<div id="divTabResumoPRCI" class="table-responsive">
+										<div style="width: 350px; margin: 0 auto;">
+											<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap " style="width:100%; cursor:pointer">
+												<cfoutput>
+													<thead class="bg-gradient-warning" style="text-align: center;">
+														<tr style="font-size:14px">
+															<th colspan="4" style="padding:5px">PRCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
+														</tr>
+														<tr style="font-size:14px">
+															<th style="font-weight: normal!important">Órgão</th>
+															<th style="font-weight: normal!important">DP</th>
+															<th style="font-weight: normal!important">FP</th>
+															<th >PRCI</th>
+														</tr>
+													</thead>
+													<tbody>
+														<cfset prcisOrdenado = StructSort(orgaos, "text", "asc")>
+														<cfloop array="#prcisOrdenado#" index="orgao">
+															<cfif orgaos[orgao] eq 0>
+																<cfset percentualDP = 0>
+															<cfelse>
+																<cfset percentualDP = (dps[orgao] / orgaos[orgao]) * 100>
+															</cfif>
+															<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP, '0.0'),".",",") >
+
+															<!--- Adiciona cada linha à tabela --->
+															<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+																<td>#orgao#</td>
+																<td>#dps[orgao]#</td>
+																<td>#fps[orgao]#</td>
+																<td><strong>#percentualDPFormatado#%</strong></td>
+															</tr>
+														</cfloop>
+													</tbody>
+												</cfoutput>
+											</table>
+										</div>
+									</div>
+															
+	
+		
+								</cfif>
+
+
+
+
+
+								
+							
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+        </cfif>
+
+		<script language="JavaScript">
+		   
+				
+
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+
+			var d = day + "-" + month + "-" + year;	
+
+			$(function () {
+				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
+			
+				
+				var tituloExcel ="SNCI_Consulta_PRCI_detalhamento_";
+				var colunasMostrar = [1,2,8,10];
+
+
+				const tabPRCIdetalhamento = $('#tabPRCIdetalhe').DataTable( {
+				
+					stateSave: false,
+					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+					scrollX: true, // Permitir rolagem horizontal
+        			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+					pageLength: 5,
+					dom:   "<'row'<'col-sm-4'B><'col-sm-4'p><'col-sm-4 text-right'i>>" ,
+
+							
+					buttons: [
+						{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+							title : tituloExcel + d,
+							className: 'btExcel',
+						}
+
+					]
+					
+
+				})
+ 
+				
+
+
+			
+			});
+
+
+			$(document).ready(function() {
+				$(".content-wrapper").css("height", "auto");
+				// Inicializa a tabela para ser ordenável pelo plugin DataTables
+				// Inicializa a tabela para ser ordenável pelo plugin DataTables
+				$('#tabResumoPRCI').DataTable({
+					order: [[3, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
+					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
+					paging: false, // Remove a paginação
+					info: false, // Remove a exibição da quantidade de registros
+					searching: false // Remove o campo de busca
+				});
+
+
+				
+				
+				
+			});
+		</script>
+
+	</cffunction>
+
+
+	<cffunction name="tabSLNCDetalhe_mensal" access="remote" hint="acompanhamento mensal">
+   		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+		
+    	
+		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+
+
+		<cfquery name="resultadoSLNC" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT pc_indDados_numPosic
+				,pc_indDados_mcuOrgaoResp as mcuOrgaoResp
+				,pc_orgaos.pc_org_sigla as siglaOrgaoResp
+				,pc_indDados_mcuOrgaoSubordinador as mcuOrgaoSubordinador
+				,pc_orgaosSubordinador.pc_org_sigla as siglaOrgaoSubordinador
+				,pc_indDados_mcuOrgaoAvaliado as mcuOrgaoAvaliado
+				,pc_orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
+				,pc_indDados_numProcesso as numProcessoSNCI
+				,pc_indDados_numItem as item
+				,pc_indDados_numOrientacao as orientacao
+				,pc_indDados_dataPrevista as dataPrevista
+				,pc_indDados_status as numStatus
+				,pc_indDados_descricaoStatus as descricaoOrientacaoStatus
+				,pc_indDados_dataRef as dataRef
+				,pc_indDados_numIndicador as numIndicador
+				,CASE 
+					WHEN pc_indDados_descricaoStatus = 'PENDENTE' THEN DATEADD(day, 1, pc_indDados_dataPrevista)
+					ELSE pc_indDados_dataStatus
+				END as dataPosicao
+				,pc_indDados_prazo as prazo
+
+			FROM pc_indicadores_dados
+			INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoResp
+			INNER JOIN pc_orgaos as pc_orgaosSubordinador on pc_orgaosSubordinador.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoSubordinador
+			INNER JOIN pc_orgaos as pc_orgaoAvaliado on pc_orgaoAvaliado.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoAvaliado
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 2
+				AND pc_indDados_mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+      	</cfquery>
+
+		<cfset totalSolucionado = 0 /> 
+		<cfset orgaos = {}> <!-- Define a variável orgaos como um objeto vazio -->
+		<cfset solucionados = {}> <!-- Define a variável solucionados como um objeto vazio -->
+		
+
+		<cfloop query="resultadoSLNC"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
+			<cfif numStatus eq 6> 
+				<cfset totalSolucionado++> 
+			</cfif>
+			<cfif not StructKeyExists(orgaos, siglaOrgaoResp)>
+				<cfset orgaos[siglaOrgaoResp] = 1> 
+				<cfset solucionados[siglaOrgaoResp] = 0> 
+			<cfelse>
+				<cfset orgaos[siglaOrgaoResp]++> 
+			</cfif>
+			<cfif numStatus eq 6> 
+				<cfset solucionados[siglaOrgaoResp]++> 
+			</cfif>
+		</cfloop>
+
+		
+	
+		<cfif #resultadoSLNC.recordcount# neq 0 >
+			<div class="row" style="width: 100%;">
+							
+				<div class="col-12">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
+							
+							
+								<cfoutput><h5 style="color:##000;text-align: center; margin-bottom: 20px;margin-bottom: 20px;margin-bottom: 20px;">Dados utilizados no cálculo do <strong>SLNC</strong> (Solução de Não Conformidades): #monthAsString(arguments.mes)#/#arguments.ano# </h5></cfoutput>
+							
+								<div class="table-responsive">
+									<table id="tabSLNCdetalheMensal" class="table table-bordered table-striped text-nowrap" style="width: 100%;">
+										
+										<thead class="bg-gradient-warning">
+											<tr style="font-size:14px">
+												<th style="width: 10px">Posic ID</th>
+												<th style="width: 10px">Órgão Avaliado</th>
+												<th style="width: 10px">Órgão Responsável</th>
+												<th style="width: 10px">Processo SNCI</th>
+												<th style="width: 10px">Item</th>
+												<th style="width: 10px">Orientação</th>
+												<th style="width: 10px">Data Prevista</th>
+												<th style="width: 10px">Data Status</th>
+												<th style="width: 10px">Status</th>
+												<th style="width: 10px">Data Ref.</th>
+											</tr>
+										</thead>
+										
+										<tbody>
+											<cfloop query="resultadoSLNC" >
+												
+												<cfoutput>					
+													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+														<td>#resultadoSLNC.pc_indDados_numPosic#</td>
+														<td>#resultadoSLNC.siglaOrgaoAvaliado#</td>
+														<td>#resultadoSLNC.siglaOrgaoResp#</td>
+														<td>#resultadoSLNC.numProcessoSNCI#</td>
+														<td >#resultadoSLNC.item#</td>
+														<td>#resultadoSLNC.orientacao#</td>
+														<cfif resultadoSLNC.dataPrevista eq '1900-01-01' or resultadoSLNC.dataPrevista eq ''>
+															<td>---</td>
+														<cfelse>
+															<td>#dateFormat(resultadoSLNC.dataPrevista, 'dd/mm/yyyy')#</td>
+														</cfif>
+														<td>#dateFormat(resultadoSLNC.dataPosicao, 'dd/mm/yyyy')#</td>
+														<td>#resultadoSLNC.descricaoOrientacaoStatus#</td>
+														<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+														<td>#dateFormat(dataFinal, 'dd/mm/yyyy')#</td>
+														
+															
+													</tr>
+												</cfoutput>
+											</cfloop>	
+										</tbody>
+									
+										<cfoutput>
+											<cfset totalGeral = resultadoSLNC.recordcount />
+											<cfif totalGeral eq 0>
+												<cfset percentualSolucionado = NumberFormat(0, '0.0') />
+											<cfelse>
+												<cfset percentualSolucionado = NumberFormat((totalSolucionado / totalGeral *100), '0.0') />
+											</cfif>
+											<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
+													SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+													WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+															AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+															AND pc_indMeta_numIndicador = 2
+															AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+												</cfquery>
+								
+											<cfset percentualSolucionadoFormatado = Replace(percentualSolucionado,".",",")  />
+											<cfset metaSLNCorgao= NumberFormat(rsMetaSLNC.pc_indMeta_meta, '0.0') />
+											<cfset metaSLNCorgaoFormatado = Replace(metaSLNCorgao,".",",") />
+											<cfif metaSLNCorgao eq 0>
+												<cfset SLNCresultadoMeta = NumberFormat(0, '0.0') />
+											<cfelse>
+												<cfset SLNCresultadoMeta = NumberFormat((percentualSolucionado/metaSLNCorgao)*100, '0.0') />
+											</cfif>
+											<cfset SLNCresultadoMetaFormatado = Replace(SLNCresultadoMeta,".",",") />
+											
+											
+											
+											<div id="divResultSLNC" class="col-md-6 col-sm-6 col-12">
+												<div class="info-box bg-gradient-warning">
+												    <div class="ribbon-wrapper ribbon-xl"  >
+													    <cfif metaSLNCorgao eq 0>
+															<div class="ribbon" id="ribbon" data-value=""></div>
+														<cfelse>
+															<div class="ribbon" id="ribbon" data-value="#SLNCresultadoMeta#"></div>
+														</cfif>
+													</div>
+													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
+
+													<div class="info-box-content">
+														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">SLNC = #percentualSolucionadoFormatado#%</font></font></span><span style="font-size:12px;position:absolute; top:36px">Solução de Não Conformidades</span>
+														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#SLNCresultadoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (SLNC / Meta) * 100</span></span>
+
+														<div class="progress" style="width:90%">
+														<div class="progress-bar" style="width: #percentualSolucionado#%"></div>
+														</div>
+														<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+															<span style="font-size:14px">SLNC = QTSL/QTNC x 100</span><br>
+															<span style="font-size:14px">QTSL (Quant. Orientações Solucionadas)= #totalSolucionado#</span><br>
+															<span style="font-size:14px">QTNC (Quant. Orientações Registradas )= #totalGeral#</span><br>
+															<span style="font-size:14px">Meta = #metaSLNCorgaoFormatado#%</span><br>
+														</font></font></span>
+													</div>
+													<!-- /.info-box-content -->
+												</div>
+												<!-- /.info-box -->
+											</div>
+											
+										</cfoutput>
+
+									</table>
+								</div>
+
+								<cfset totalOrgaosResp = StructCount(orgaos)> 
+								
+								<cfif totalOrgaosResp gt 1>
+									<div id="divTabResumoSLNC" class="table-responsive">
+										<table id="tabResumoSLNCmensal" class="table table-bordered table-striped text-nowrap" style="width:350px; cursor:pointer">
+											<cfoutput>
+												<thead class="bg-gradient-warning" style="text-align: center;">
+													<tr style="font-size:14px">
+														<th colspan="4" style="padding:5px">SLNC - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
+													</tr>
+													<tr style="font-size:14px">
+														<th style="font-weight: normal!important">Órgão</th>
+														<th style="font-weight: normal!important">Solucionadas</th>
+														<th style="font-weight: normal!important">Qt.Orientações</th>
+														<th >SLNC</th>
+													</tr>
+												</thead>
+												<tbody>
+													
+													<cfset slncOrdenado = StructSort(orgaos, "text", "asc")>
+													<cfloop array="#slncOrdenado#" index="orgao">
+														<cfset percentualSolucionado = (solucionados[orgao] / orgaos[orgao]) * 100>
+														<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado, '0.0'),".",",")  />
+
+														<!--- Adiciona cada linha à tabela --->
+														<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+															<td>#orgao#</td>
+															<td>#solucionados[orgao]#</td>
+															<td>#orgaos[orgao]#</td>
+															<td><strong>#percentualSolucionadoFormatado#%</strong></td>
+														</tr>
+													</cfloop>
+												</tbody>
+											</cfoutput>
+										</table>
+									</div>
+
+		
+								</cfif>
+
+							
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+		</cfif>
+		<script language="JavaScript">
+		   
+				
+
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+
+			var d = day + "-" + month + "-" + year;	
+
+			$(function () {
+				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
+			
+				
+				var tituloExcel ="SNCI_Consulta_SLNC_detalhamento_";
+				var colunasMostrar = [1,2,8,10];
+
+
+				const tabSLNCdetalhamento = $('#tabSLNCdetalheMensal').DataTable( {
+				
+					stateSave: false,
+					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+					scrollX: true, // Permitir rolagem horizontal
+        			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+					pageLength: 5,
+					lengthMenu: [
+						[5, 10, 25, 50, -1],
+						[5, 10, 25, 50, 'Todos']
+					],
+					dom:   "<'row'<'col-sm-4'B><'col-sm-4'p><'col-sm-4 text-right'i>>" ,
+					buttons: [
+						{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+							title : tituloExcel + d,
+							className: 'btExcel',
+						}
+
+					]
+
+				})
+ 
+			
+			});
+
+
+			$(document).ready(function() {
+				$(".content-wrapper").css("height", "auto");
+				// Inicializa a tabela para ser ordenável pelo plugin DataTables
+				$('#tabResumoSLNCmensal').DataTable({
+					order: [[3, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
+					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
+					paging: false, // Remove a paginação
+					info: false, // Remove a exibição da quantidade de registros
+					searching: false // Remove o campo de busca
+				});
+
+			});
+		</script>
+
+	</cffunction>
+
+
+
+
+
+
+
+
+	<cffunction name="resultadoDGCI_diario" access="remote" hint="acompanhamento diário">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 
@@ -1609,17 +2306,50 @@
 			</cfif>
 			<cfset percentualSolucionadoFormatado = NumberFormat(percentualSolucionado, '0.0') />
 
-			<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
-				SELECT	pc_ind_peso FROM pc_indicadores WHERE pc_indicadores.pc_ind_id = 1
+			
+
+			<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#"   >
+				SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = 1 and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 			</cfquery>
 
-			<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
-				SELECT	pc_ind_peso FROM pc_indicadores WHERE pc_indicadores.pc_ind_id = 2
+			<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#"   >
+				SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = 2 and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 			</cfquery>
 
-            <cfset percentualDGCI = NumberFormat((percentualDP * #rsPRCIpeso.pc_ind_peso#) + (percentualSolucionadoFormatado * #rsSLNCpeso.pc_ind_peso# ), '0.0') />
-			<cfset percentualDGCIformatado = Replace(NumberFormat((percentualDP * #rsPRCIpeso.pc_ind_peso#) + (percentualSolucionadoFormatado * #rsSLNCpeso.pc_ind_peso#), '0.0'),".",",")  />
+			<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
+				SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_numIndicador = 1
+						AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+			</cfquery>
+			<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
+				SELECT pc_indMeta_meta  FROM pc_indicadores_meta 
+				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_numIndicador = 2
+						AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+			</cfquery>
 
+
+			<cfset metaPRCIorgao= NumberFormat(rsMetaPRCI.pc_indMeta_meta, '0.0') />
+			<cfset metaSLNCorgao= NumberFormat(rsMetaSLNC.pc_indMeta_meta, '0.0') />
+
+			<cfset metaDGCI = NumberFormat((metaPRCIorgao * rsPRCIpeso.pc_indPeso_peso) + (metaSLNCorgao * rsSLNCpeso.pc_indPeso_peso), '0.0') />
+			<cfset metaDGCIformatado = Replace(metaDGCI,".",",")  />
+
+
+
+            <cfset percentualDGCI = NumberFormat((percentualDP * rsPRCIpeso.pc_indPeso_peso) + (percentualSolucionadoFormatado * rsSLNCpeso.pc_indPeso_peso ), '0.0') />
+			<cfset percentualDGCIformatado = Replace(percentualDGCI,".",",")  />
+			<cfif metaDGCI eq 0>
+				<cfset DGCIresultadoMeta = NumberFormat(0, '0.0') />	
+			<cfelse>
+				<cfset DGCIresultadoMeta = NumberFormat((percentualDGCI/metaDGCI)*100, '0.0') />
+			</cfif>
+
+			<cfset DGCIresultadoMetaFormatado = Replace(DGCIresultadoMeta,".",",") />
+	
 			<div align="center" class="col-md-12 col-sm-12 col-12 mx-auto" style="margin-bottom:10px">
 				<span class="info-box-text" style="font-size:30px">#monthAsString(arguments.mes)#/#arguments.ano#</span>
 			</div>	
@@ -1635,22 +2365,30 @@
 								<h5 style="text-align: center; margin-bottom:20px">RESULTADO GERAL DO ÓRGÃO <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></h5>
 								<div id="divResultadoDGCI" class="col-md-5 col-sm-5 col-12 mx-auto">
 									<div class="info-box bg-info">
+										<div class="ribbon-wrapper ribbon-xl"  >
+											<cfif metaDGCI eq 0>
+												<div class="ribbon" id="ribbon" data-value=""></div>
+											<cfelse>
+											 	<div class="ribbon" id="ribbon" data-value="#DGCIresultadoMeta#"></div>
+											</cfif>
+										</div>
+										
 										<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
 										<div class="info-box-content">
-											<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI</strong></font></font><span style="font-size:12px;position: relative;left:-71px;top:13px">Desempenho Geral de Controle Interno</span></span>
-											<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#percentualDGCIformatado#%</strong></font></font></span>
+											<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI = #percentualDGCIformatado#%</strong></font></font></span><span style="font-size:12px;position:absolute; top:48px">Desempenho Geral de Controle Interno</span>
+											<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#DGCIresultadoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (DGCI / Meta) * 100</span></span>
 
-											<div class="progress">
-												<div class="progress-bar" style="width: #percentualDGCI#%"></div>
+											<div class="progress" style="width:90%">
+												<div class="progress-bar" style="width: #DGCIresultadoMeta#%"></div>
 											</div>
 											<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-												<span style="font-size:14px">DGCI = (PRCI * #rsPRCIpeso.pc_ind_peso#) + (SLNC * #rsSLNCpeso.pc_ind_peso#)</span><br>
+												<span style="font-size:14px">DGCI = #percentualDGCIformatado#% (PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>
+												<span style="font-size:14px">Meta = #metaDGCIformatado#%  (Meta PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (Meta SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>
 											</font></font></span>
 										</div>
 										<!-- /.info-box-content -->
 									</div>
-								
 								
 								</div>	
 								<div class="col-12">
@@ -1726,7 +2464,7 @@
 		
 		<script language="JavaScript">
 			$(document).ready(function(){
-
+				
 				$(".content-wrapper").css("height", "auto");
 				var divResultPRCI = $("#divResultPRCI");
 				var divResultadoPRCI = $("#divResultadoPRCI");
@@ -1787,8 +2525,8 @@
 
 					// Preencher a terceira tabela com os dados calculados
 					<cfoutput>
-						let pesoPRCI = #rsPRCIpeso.pc_ind_peso#;
-						let pesoSLNC = #rsSLNCpeso.pc_ind_peso#
+						let pesoPRCI = #rsPRCIpeso.pc_indPeso_peso#;
+						let pesoSLNC = #rsSLNCpeso.pc_indPeso_peso#
 					</cfoutput>
 					$.each(allOrgaos, function(orgao, data) {
 						var prci = data['PRCI'] || 0; // PRCI do órgão, se não houver, definir como 0
@@ -1822,6 +2560,10 @@
 					} else {
 						$('#divResultadosRow').hide();
 					}
+
+					$('.ribbon').each(function() {
+						updateRibbon($(this));
+					});
 				}
 
 
@@ -1837,13 +2579,10 @@
 					searching: false // Remove o campo de busca
 				});	
 
-				
-
-
-				
 
 
 			});
+
 		   
 		</script>
 	</cffunction>
@@ -2311,6 +3050,7 @@
 														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
 													</cfif>
 													
+													
 
 													<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(pc_indOrgao_resultadoAcumulado, '0.0')#</strong></td>
 
@@ -2406,15 +3146,7 @@
 										<div id="divResultadoDGCI" class="col-md-8 col-sm-8 col-12 mx-auto">
 											<div class="info-box bg-info">
 											     <div class="ribbon-wrapper ribbon-xl"  >
-                                                    <cfif resultaDGCIemRelacaoAmetaSemReplace gt 100>
-														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##0083CA;color: ##fff;">ACIMA DO ESPERADO</div>
-													<cfelseif resultaDGCIemRelacaoAmetaSemReplace lt 100 and resultaDGCIemRelacaoAmetaSemReplace neq 0>
-														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##dc3545;color: ##fff;">ABAIXO DO ESPERADO</div>		
-													<cfelseif resultaDGCIemRelacaoAmetaSemReplace eq 100>
-														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: green;color: ##fff;">DENTRO DO ESPERADO</div>
-													<cfelse>
-														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##e3dada;color:##000;">SEM META</div>
-													</cfif>
+													<div class="ribbon" id="ribbon" data-value="#resultaDGCIemRelacaoAmetaSemReplace#"></div>
 												</div>
 												<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
@@ -2478,15 +3210,7 @@
 										<div id="divResultadoDGCI" class="col-md-8 col-sm-8 col-12 mx-auto">
 											<div class="info-box bg-info">
 											     <div class="ribbon-wrapper ribbon-xl"  >
-                                                    <cfif DGCIanoEmRelacaoAmetaSemReplace gt 100>
-														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##0083CA;color: ##fff;">ACIMA DO ESPERADO</div>
-													<cfelseif DGCIanoEmRelacaoAmetaSemReplace lt 100 and DGCIanoEmRelacaoAmetaSemReplace neq 0>
-														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##dc3545;color: ##fff;">ABAIXO DO ESPERADO</div>		
-													<cfelseif DGCIanoEmRelacaoAmetaSemReplace eq 100>
-														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: green;color: ##fff;">DENTRO DO ESPERADO</div>
-													<cfelse>
-														<div class="ribbon" style="font-size:18px!important;left:8px;font-size: 12px !important;left: 8px;background: ##e3dada;color:##000;">SEM META</div>
-													</cfif>
+													<div class="ribbon" id="ribbon" data-value="#DGCIanoEmRelacaoAmetaSemReplace#"></div>
 												</div>
 												<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
 
@@ -3266,8 +3990,43 @@
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
 				
+				$('.ribbon').each(function() {
+					updateRibbon($(this));
+				});
 					
 			});
+
+
+
+
+			function atualizarStatusOrientacoes() {
+				const statusElements = document.querySelectorAll('.resultadoIndicador');
+				
+				statusElements.forEach(function(element) {
+					const metaMes = parseFloat(element.getAttribute('data-metaMes'));
+					const valorIndicador = parseFloat(element.getAttribute('data-valorIndicador'));
+
+					if (metaMes !== 0) {
+					if (valorIndicador > metaMes) {
+						element.textContent = 'ACIMA DO ESPERADO';
+						element.style.background = '#0083CA';
+						element.style.color = '#fff';
+					} else if (valorIndicador < metaMes) {
+						element.textContent = 'ABAIXO DO ESPERADO';
+						element.style.background = '#dc3545';
+						element.style.color = '#fff';
+					} else if (valorIndicador === metaMes) {
+						element.textContent = 'DENTRO DO ESPERADO';
+						element.style.background = 'green';
+						element.style.color = '#fff';
+					}
+					} else {
+					element.textContent = 'SEM META';
+					element.style.background = '#fff';
+					element.style.color = 'gray';
+					}
+				});
+			}
 		</script>
 
 	</cffunction>
