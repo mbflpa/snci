@@ -254,6 +254,12 @@
 							
 						}
 					})
+				}else if(existeDados = -1){
+					$('#modalOverlay').delay(1000).hide(0, function() {
+						$('#modalOverlay').modal('hide');
+						$('#opcoesMes').find('label').removeClass('active');
+						Swal.fire('Não foram encontrados todos os pesos dos indicadores para <strong>' +ano + '</strong>. Cadastre na tabela os pesos dos respectivos indicadores conforme o ano selecionado e tente novamente!', '', 'info')
+					});
 				}else{
 					var mensagem = 'Deseja gerar os dados para ' + monthNames[mes - 1] + '/' + ano + '?';
 					Swal.fire({
@@ -284,7 +290,7 @@
 										obterDados();
 										$('#modalOverlay').modal('hide');
 										if(quantDados == 0){
-												Swal.fire('Não foram encontrados dados para <strong>' + monthNames[mes - 1] + '/' + ano + '</strong> que possam ser utilizados nos cálculos dos indicadores!', '', 'info')
+											Swal.fire('Não foram encontrados dados para <strong>' + monthNames[mes - 1] + '/' + ano + '</strong> que possam ser utilizados nos cálculos dos indicadores!', '', 'info')
 										}else{
 											Swal.fire('Dados gerados com sucesso!', '', 'success')
 										}

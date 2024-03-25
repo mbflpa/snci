@@ -172,6 +172,20 @@
     <!-- ./wrapper -->
     <cfinclude template="pc_Sidebar.cfm">
 
+	<!-- cfqquery que retorna os anos e meses que constam na coluna pc_indOrgao_ano da tabela pc_indicadores_porOrgao -->
+	<cfquery name="getAnos" datasource="#application.dsn_processos#" timeout="120"  >
+		SELECT DISTINCT pc_indOrgao_ano, pc_indOrgao_mes
+		FROM pc_indicadores_porOrgao
+		ORDER BY pc_indOrgao_ano, pc_indOrgao_mes asc
+	</cfquery>
+
+	
+	<cfset data = ArrayNew(1)>
+	<cfloop query="getAnos">
+		<cfset anoMes = {ano=pc_indOrgao_ano, mes=pc_indOrgao_mes}>
+		<cfset ArrayAppend(data, anoMes)>
+	</cfloop>
+
     <script language="JavaScript">
     
         $(document).ready(function(){
@@ -180,55 +194,47 @@
 			
 			// Obtém o ano atual
 			const currentYear = new Date().getFullYear();
+			// Obtém os anos e meses da CFQUERY
+			<cfoutput>
+        		const data = #serializeJSON(data)#;
+			</cfoutput>
 
-			// Cria um array de anos, começando em 2023 e indo até o ano atual, em ordem crescente
-			const yearRange = Array(currentYear - 2018).fill().map((_, i) => currentYear - i);
+			// Cria um objeto para armazenar os anos e meses
+			const anosMeses = {};
+			
+			// Cria um array com os nomes dos meses
+			const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 
-			// Mapeia cada ano para um botão de opção de rádio com o ano como rótulo e valor
-			const radioButtonsAno = yearRange.map((year, i) => {
-				// Define a classe "active" para o botão de opção de rádio do ano atual
-				const checkedClass = year === currentYear ? " active" : "";
-				const label = `${year}`;
-				const input = `<input type="radio" name="ano" value="${year}" id="option_a${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
+			// Preenche o objeto com os anos como chaves e os meses como valores
+			data.forEach(item => {
+				if (!anosMeses[item.ANO]) {
+					anosMeses[item.ANO] = [];
+				}
+				anosMeses[item.ANO].push(monthNames[item.MES - 1]);
+			});
+
+      	  // Mapeia cada ano para um botão de opção de rádio com o ano como rótulo e valor
+			const radioButtonsAno = Object.keys(anosMeses).map((ano, i) => {
+				// Converte 'ano' para um número antes de comparar
+				const checkedClass = Number(ano) === currentYear ? " active" : "";
+				const label = `${ano}`;
+				const input = `<input type="radio" name="ano" value="${ano}" id="option_a${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
 				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="efeito-grow btn bg-yellow${checkedClass}">${input}${label}</label><br>`;
 				return radioButton;
-			}).reverse(); // Inverte a ordem dos botões de opção de rádio para que o ano mais recente apareça por último
+			});
 
 			// Adiciona os botões de opção de rádio ao elemento HTML com o ID "opcoesAno"
 			$('#opcoesAno').html(radioButtonsAno.join(''));
 
-			// Cria um array de nomes de meses, começando em janeiro e indo até o mês atual, em ordem crescente
-			const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-			const currentMonth = new Date().getMonth();
-			const monthRange = monthNames.slice(0, currentYear === parseInt($('input[name=ano]:checked').val()) ? currentMonth  : 12);
-
-			// Mapeia cada mês para um botão de opção de rádio com o número do mês como valor e o nome do mês como rótulo
-			const radioButtonsMes = monthRange.map((month, i) => {
-				const checkedClass = "";
-				const label = `${month}`;
-				const input = `<input type="radio" name="mes" value="${i + 1}" id="option_b${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
-				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:1px" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
-				return radioButton;
-			});
-
-			// Adiciona os botões de opção de rádio ao elemento HTML com o ID "opcoesMes"
-			$('#opcoesMes').html(radioButtonsMes.join(''));
-
-			// Adiciona um ouvinte de eventos ao elemento HTML com o ID "opcoesAno"
-			$('#opcoesAno').on('change', function() {
-				$('#divTabsIndicadores').hide();
-				$('#divIndicadorDetalhes').html('');
-				$('#divMesAnoCI').html('');
-				// Obtém o ano selecionado
-				const selectedYear = parseInt($('input[name=ano]:checked').val());
-
+			// Função para criar botões de opção de rádio para os meses
+			function createMonthRadioButtons(selectedYear) {
 				// Cria um array de nomes de meses, começando em janeiro e indo até o mês atual, em ordem crescente, com base no ano selecionado
-				const monthRange = monthNames.slice(0, selectedYear === currentYear ? currentMonth : 12);
+				const monthRange = anosMeses[selectedYear];
 
 				// Mapeia cada mês para um botão de opção de rádio com o número do mês como valor e o nome do mês como rótulo
-				const radioButtonsMes = monthRange.map((month, i) => {
+				const radioButtonsMes = monthRange.map((mes, i) => {
 					const checkedClass = "";
-					const label = `${month}`;
+					const label = `${mes}`;
 					const input = `<input type="radio" name="mes" value="${i + 1}" id="option_b${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
 					const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:1px" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
 					return radioButton;
@@ -236,6 +242,18 @@
 
 				// Adiciona os botões de opção de rádio atualizados ao elemento HTML com o ID "opcoesMes"
 				$('#opcoesMes').html(radioButtonsMes.join(''));
+			}
+
+			// Chama a função para criar os botões de opção de rádio para os meses do ano atual
+			createMonthRadioButtons(currentYear);
+
+			// Adiciona um ouvinte de eventos ao elemento HTML com o ID "opcoesAno"
+			$('#opcoesAno').on('change', function() {
+				// Obtém o ano selecionado
+				const selectedYear = parseInt($('input[name=ano]:checked').val());
+
+				// Chama a função para criar os botões de opção de rádio para os meses do ano selecionado
+				createMonthRadioButtons(selectedYear);
 			});
 
 			
