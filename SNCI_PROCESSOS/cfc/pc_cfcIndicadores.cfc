@@ -809,7 +809,9 @@
 			SELECT
 				pc_aval_posic_id,
 				orgaoAvaliado.pc_org_sigla as orgaoAvaliado,
+				orgaoAvaliado.pc_org_mcu as orgaoAvaliadoMCU,
 				orgaoResp.pc_org_sigla as orgaoResp,
+				orgaoResp.pc_org_mcu as orgaoRespMCU,
 				orgaoDaAcao.pc_org_controle_interno as orgaoDaAcaoEdoControleInterno,
 				pc_processos.pc_processo_id as numProcessoSNCI,
 				pc_avaliacoes.pc_aval_numeracao as item,
@@ -881,7 +883,9 @@
 			SELECT
 				pc_aval_posic_id,
 				orgaoAvaliado.pc_org_sigla as orgaoAvaliado,
+				orgaoAvaliado.pc_org_mcu as orgaoAvaliadoMCU,
 				orgaoResp.pc_org_sigla as orgaoResp,
+				orgaoResp.pc_org_mcu as orgaoRespMCU,
 				orgaoDaAcao.pc_org_controle_interno as orgaoDaAcaoEdoControleInterno,
 				pc_processos.pc_processo_id as numProcessoSNCI,
 				pc_avaliacoes.pc_aval_numeracao as item,
@@ -951,8 +955,10 @@
 		<cfset orgaos = {}> <!-- Define a variável orgaos como um objeto vazio -->
 		<cfset dps = {}> <!-- Define a variável dps como um objeto vazio -->
 		<cfset fps = {}> <!-- Define a variável fps como um objeto vazio -->
+		<cfset orgaoRespMCUs = {}><!-- Define a variável orgaoRespMCUs como um objeto vazio -->
 
 		<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
+			
 			<cfif Prazo eq 'DP'> <!-- Verifica se o valor da coluna Prazo é igual a 'DP' -->
 				<cfset totalDP++> <!-- Se a condição for verdadeira, incrementa a variável totalDP em 1 -->
 			<cfelseif Prazo eq 'FP'> <!-- Verifica se o valor da coluna Prazo é igual a 'FP' -->
@@ -970,6 +976,7 @@
 			<cfelseif Prazo eq 'FP'> <!-- Verifica se o valor da coluna Prazo é igual a 'FP' -->
 				<cfset fps[orgaoResp]++> <!-- Se a condição for verdadeira, incrementa a chave orgaoResp no objeto fps em 1 -->
 			</cfif>
+			<cfset orgaoRespMCUs[orgaoResp] = orgaoRespMCU>
 		</cfloop>
 
 		<style>
@@ -1052,15 +1059,21 @@
 												</cfoutput>
 											</cfloop>	
 										</tbody>
+										
 										<!--- Imprime os resultados ou faça o que desejar com eles --->
 										<cfoutput>
 											<cfset totalGeral = resultado.recordcount />
 											<!--- Calcula a porcentagem --->
 											<cfset percentualDP = ROUND((totalDP / totalGeral) * 100*10)/10 />
 											<!--- Formata o percentualDP com duas casas decimais --->
-											<cfset percentualDPFormatado = Replace(percentualDP,".",",") />
+											<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP,0.0),".",",") />
 											
-											<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
+											<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
+												<cfset metaPRCIorgao= NumberFormat(0,0.0) />
+											<cfelse>
+												<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
+											</cfif>
+											
 											<cfset metaPRCIorgaoFormatado = Replace(metaPRCIorgao,".",",") />
 
 											<cfif metaPRCIorgao eq 0>
@@ -1069,7 +1082,7 @@
 												<cfset PRCIresultadoMeta = ROUND((percentualDP/metaPRCIorgao)*100*10)/10 />
 											</cfif>
 
-											<cfset PRCIresultadoMetaFormatado = Replace(PRCIresultadoMeta,".",",") />
+											<cfset PRCIresultadoMetaFormatado = Replace(NumberFormat(PRCIresultadoMeta,0.0),".",",") />
 											
 
 											<div id="divResultPRCI" class="col-md-4 col-sm-4 col-4">
@@ -1094,7 +1107,7 @@
 															<span style="font-size:14px">PRCI = TIDP/TGI</span><br>
 															<span style="font-size:14px">TIDP (Posic. dentro do prazo (DP))= #totalDP#</span><br>
 															<span style="font-size:14px">TGI (Total de Posicionamentos)= #totalGeral# </span><br>
-															<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#%</span><br>
+															<span style="font-size:14px">Meta = #NumberFormat(metaPRCIorgaoFormatado,0.0)#%</span><br>
 														</font></font></span>
 													</div>
 													<!-- /.info-box-content -->
@@ -1137,7 +1150,7 @@
 
 															<!--- Adiciona cada linha à tabela --->
 															<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-																<td>#orgao#</td>
+																<td>#orgao# (#orgaoRespMCUs[orgao]#)</td>
 																<td>#dps[orgao]#</td>
 																<td>#fps[orgao]#</td>
 																<td><strong>#percentualDPFormatado#%</strong></td>
@@ -1252,7 +1265,9 @@
 			SELECT
 				pc_aval_posic_id,
 				orgaoAvaliado.pc_org_sigla as orgaoAvaliado,
+				orgaoAvaliado.pc_org_mcu as orgaoAvaliadoMCU,
 				orgaoResp.pc_org_sigla as orgaoResp,
+				orgaoResp.pc_org_mcu as orgaoRespMCU,
 				pc_processos.pc_processo_id as numProcessoSNCI,
 				pc_avaliacoes.pc_aval_numeracao as item,
 				CONVERT(DATE, pc_aval_posic_datahora) as dataPosicao,
@@ -1317,7 +1332,9 @@
 			SELECT
 				pc_aval_posic_id,
 				orgaoAvaliado.pc_org_sigla as orgaoAvaliado,
+				orgaoAvaliado.pc_org_mcu as orgaoAvaliadoMCU,
 				orgaoResp.pc_org_sigla as orgaoResp,
+				orgaoResp.pc_org_mcu as orgaoRespMCU,
 				pc_processos.pc_processo_id as numProcessoSNCI,
 				pc_avaliacoes.pc_aval_numeracao as item,
 				CONVERT(DATE, pc_aval_posic_datahora) as dataPosicao,
@@ -1400,12 +1417,15 @@
 		<cfset totalSolucionado = 0 /> 
 		<cfset orgaos = {}> <!-- Define a variável orgaos como um objeto vazio -->
 		<cfset solucionados = {}> <!-- Define a variável solucionados como um objeto vazio -->
+		<cfset metaSLNC = {}>
+		<cfset orgaoRespMCUs = {}>
 		
-
 		<cfloop query="resultadoSLNC"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
+			
 			<cfif status eq 6> 
 				<cfset totalSolucionado++> 
 			</cfif>
+			
 			<cfif not StructKeyExists(orgaos, orgaoResp)>
 				<cfset orgaos[orgaoResp] = 1> 
 				<cfset solucionados[orgaoResp] = 0> 
@@ -1415,9 +1435,11 @@
 			<cfif status eq 6> 
 				<cfset solucionados[orgaoResp]++> 
 			</cfif>
+			<cfset orgaoRespMCUs[orgaoResp] = orgaoRespMCU>
+		
 		</cfloop>
 
-		
+
 	
 		<cfif #resultadoSLNC.recordcount# neq 0 >
 			<div class="row" style="width: 100%;">
@@ -1490,16 +1512,22 @@
 												<cfset percentualSolucionado = ROUND((totalSolucionado / totalGeral *100)*10)/10 />
 											</cfif>
 											
-								
-											<cfset percentualSolucionadoFormatado = Replace(percentualSolucionado,".",",")  />
-											<cfset metaSLNCorgao= ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10 />
-											<cfset metaSLNCorgaoFormatado = Replace(metaSLNCorgao,".",",") />
+
+											<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado,0.0),".",",")  />
+											<cfif rsMetaSLNC.pc_indMeta_meta eq "">
+												<cfset metaSLNCorgao = NumberFormat(0, 0.0)>
+											<cfelse>
+												<cfset metaSLNCorgao= ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10 />
+											</cfif>
+
+											<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0),".",",") />
+
 											<cfif metaSLNCorgao eq 0>
 												<cfset SLNCresultadoMeta = ROUND(0*10)/10 />
 											<cfelse>
-												<cfset SLNCresultadoMeta = ROUND((percentualSolucionado/metaSLNCorgao)*100*10)/10 />
+												<cfset SLNCresultadoMeta = ROUND(NumberFormat((percentualSolucionado/metaSLNCorgao),0.0)*100*10)/10 />
 											</cfif>
-											<cfset SLNCresultadoMetaFormatado = Replace(SLNCresultadoMeta,".",",") />
+											<cfset SLNCresultadoMetaFormatado = Replace(NumberFormat(SLNCresultadoMeta,0.0),".",",") />
 											
 											
 											
@@ -1546,13 +1574,14 @@
 											<cfoutput>
 												<thead class="bg-gradient-warning" style="text-align: center;">
 													<tr style="font-size:14px">
-														<th colspan="4" style="padding:5px">SLNC - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
+														<th colspan="5" style="padding:5px">SLNC - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
 													</tr>
 													<tr style="font-size:14px">
 														<th style="font-weight: normal!important">Órgão</th>
 														<th style="font-weight: normal!important">Solucionadas</th>
 														<th style="font-weight: normal!important">Qt.Orientações</th>
 														<th >SLNC</th>
+														
 													</tr>
 												</thead>
 												<tbody>
@@ -1564,10 +1593,11 @@
 
 														<!--- Adiciona cada linha à tabela --->
 														<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-															<td>#orgao#</td>
+															<td>#orgao# (#orgaoRespMCUs[orgao]#)</td>
 															<td>#solucionados[orgao]#</td>
 															<td>#orgaos[orgao]#</td>
 															<td><strong>#percentualSolucionadoFormatado#%</strong></td>
+															
 														</tr>
 													</cfloop>
 												</tbody>
@@ -1804,8 +1834,13 @@
 											<cfset percentualDP = ROUND((totalDP / totalGeral) * 100*10)/10 />
 											<!--- Formata o percentualDP com duas casas decimais --->
 											<cfset percentualDPFormatado = Replace(percentualDP,".",",") />
-											
-											<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
+
+											<cfif rsMetaPRCI.pc_indMeta_meta eq "">
+												<cfset metaPRCIorgao = NumberFormat(0, 0.0)>
+											<cfelse>
+												<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
+											</cfif>
+
 											<cfset metaPRCIorgaoFormatado = Replace(metaPRCIorgao,".",",") />
 
 											<cfif metaPRCIorgao eq 0>
@@ -2119,7 +2154,13 @@
 												</cfquery>
 								
 											<cfset percentualSolucionadoFormatado = Replace(percentualSolucionado,".",",")  />
-											<cfset metaSLNCorgao= ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10 />
+											
+											<cfif rsMetaSLNC.pc_indMeta_meta eq "">
+												<cfset metaSLNCorgao = NumberFormat(0, 0.0)>
+											<cfelse>
+												<cfset metaSLNCorgao= ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10 />
+											</cfif>
+
 											<cfset metaSLNCorgaoFormatado = Replace(metaSLNCorgao,".",",") />
 											<cfif metaSLNCorgao eq 0>
 												<cfset SLNCresultadoMeta = ROUND(0*10)/10 />
@@ -2361,9 +2402,17 @@
 						AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 			</cfquery>
 
-
-			<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
-			<cfset metaSLNCorgao= ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10 />
+			<cfif rsMetaPRCI.pc_indMeta_meta eq "">
+				<cfset metaPRCIorgao=NumberFormat(0,0.0) />
+			<cfelse>
+				<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
+			</cfif>
+			
+			<cfif rsMetaSLNC.pc_indMeta_meta eq "">
+				<cfset metaSLNCorgao=NumberFormat(0,0.0) />
+			<cfelse>
+				<cfset metaSLNCorgao= ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10 />
+			</cfif>
 
 			<cfset metaDGCI = ROUND((metaPRCIorgao * rsPRCIpeso.pc_indPeso_peso) + (metaSLNCorgao * rsSLNCpeso.pc_indPeso_peso)*10)/10 />
 			<cfset metaDGCIformatado = Replace(metaDGCI,".",",")  />
@@ -2475,7 +2524,7 @@
 										<i class="fa-solid fa-angles-up" style="font-size:30px;"></i>
 									</div>
 									<div class="row " style="display: flex; justify-content: center;">
-										<div id="divTabPRCIorgaos" class="row" class="col-md-6 col-sm-6 col-12 " style="margin-right: 50px;"></div>
+										<div id="divTabPRCIorgaos" class="row" class="col-md-6 col-sm-6 col-12 " style="margin-right: 80px;"></div>
 										<div id="divTabSLNCorgaos" class="row" class="col-md-6 col-sm-6 col-12 "></div>
 									</div>
 								</div>
@@ -3530,8 +3579,12 @@
 
 
 
-												
-													<cfset metaMes = ROUND(metaPRCIporOrgao.metaMes*10)/10>		
+												    <cfif metaPRCIporOrgao.metaMes eq ''>
+														<cfset metaMes = NumberFormat(0,0.0)>
+													<cfelse>
+														<cfset metaMes = ROUND(metaPRCIporOrgao.metaMes*10)/10>	
+													</cfif>
+
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 														<td style="text-align: left;">#siglaOrgao# (#pc_indOrgao_mcuOrgao#)</td>
 														<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(pc_indOrgao_resultadoMes*10)/10,0.0)#</strong></td>
@@ -3646,8 +3699,12 @@
 														) as subConsultaMetaPRCI
 												</cfquery>
 
-											
-											    <cfset metaMes = ROUND(metaSLNCporOrgao.metaMes*10)/10>		
+												<cfif metaSLNCporOrgao.metaMes eq ''>
+													<cfset metaMes = NumberFormat(0,0.0)>
+												<cfelse>
+											    	<cfset metaMes = ROUND(metaSLNCporOrgao.metaMes*10)/10>
+												</cfif>
+
 												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 													<td style="text-align: left;">#siglaOrgao# (#pc_indOrgao_mcuOrgao#)</td>
 													<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(pc_indOrgao_resultadoMes*10)/10,0.0)#</strong></td>
