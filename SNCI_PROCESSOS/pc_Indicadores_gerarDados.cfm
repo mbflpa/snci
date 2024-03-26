@@ -170,7 +170,9 @@
 								},
 								async: false,
 								success: function(result) {	
+								
 									gerarDados(result)
+									
 									$('#opcoesMes').find('label').removeClass('active');
 								},
 								error: function(xhr, ajaxOptions, thrownError) {
@@ -245,16 +247,15 @@
 									}
 								})
 							}, 1000);
-						} else if (result.isDenied) {
+						} else{
 							
 								$('#modalOverlay').modal('hide');
 								Swal.fire('Operação cancelada', '', 'info')
 								$('#opcoesMes').find('label').removeClass('active');
-								
-							
 						}
+						
 					})
-				}else if(existeDados = -1){
+				}else if(existeDados == -1){
 					$('#modalOverlay').delay(1000).hide(0, function() {
 						$('#modalOverlay').modal('hide');
 						$('#opcoesMes').find('label').removeClass('active');

@@ -45,23 +45,24 @@
 		<cfargument name="mes" type="string" required="true" />
         <cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
 		
-		<cfquery name="rsIndicadorDados" datasource="#application.dsn_processos#">
-			SELECT pc_indDados_id FROM pc_indicadores_dados 
-			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#"  >
+			SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
+			 and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
 		</cfquery>
 
-		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = 1 and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
-		</cfquery>
-
-		<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = 2 and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+		<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#"  >
+			SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = <cfqueryparam value="2" cfsqltype="cf_sql_integer">
+			and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
 		</cfquery>
 
 
-		<cfif rsPRCIpeso.RecordCount eq 0 or rsSLNCpeso.RecordCount eq 0>
+		<cfif rsPRCIpeso.recordcount eq 0 or rsSLNCpeso.recordcount eq 0>
 			<cfoutput>-1</cfoutput> 
 		<cfelse>
+		    <cfquery name="rsIndicadorDados" datasource="#application.dsn_processos#">
+				SELECT pc_indDados_id FROM pc_indicadores_dados 
+				WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+			</cfquery>
 			<cfoutput>#rsIndicadorDados.recordcount#</cfoutput> 
 		</cfif>
 	</cffunction>
