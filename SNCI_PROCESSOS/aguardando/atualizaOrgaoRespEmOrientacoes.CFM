@@ -51,11 +51,3 @@
 </cfloop>
 
 	
-
-<cfif rsUltimoOrgaoResp.ultimoOrgaoResp neq "">
-	<cfquery datasource="#application.dsn_processos#" name="rsUpdateOrientacoes">
-		UPDATE pc_avaliacao_orientacoes
-		SET pc_aval_orientacao_mcu_orgaoResp = '#rsUltimoOrgaoResp.ultimoOrgaoResp#'
-		WHERE pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#pc_aval_orientacao_id#">
-	</cfquery>
-</cfif>
