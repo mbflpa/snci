@@ -1,5 +1,6 @@
 
 <cfprocessingdirective pageencoding = "utf-8">	
+<!--Executar este script em homologação ou desenvolvimento e, depois da homologação, executar em produção-->
 <cfquery datasource="#application.dsn_processos#" name="rsOrientacoesFinalizadas">
 	SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes
 	INNER JOIN pc_orientacao_status ON pc_orientacao_status.pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
@@ -9,7 +10,7 @@
 	WHERE pc_orientacao_status_finalizador = 'S' and pc_org_controle_interno='S' 
 </cfquery>
 
-<cfdump var = "#rsOrientacoesFinalizadas.recordcount#" >
+<cfdump var = "#rsOrientacoesFinalizadas#" >
 	
 	
 <cfloop query="rsOrientacoesFinalizadas">
@@ -37,15 +38,31 @@
 
 
 
-	<!-- update na tabela pc_avaliacao_orientacoes -->
-	<!-- se rsUltimoOrgaoResp não for vazio, atualiza o campo pc_aval_orientacao_mcu_orgaoResp -->
+	
 	<cfif rsUltimoOrgaoResp.ultimoOrgaoResp neq "">
-		<cfquery datasource="#application.dsn_processos#" name="rsUpdateOrientacoes">
-			UPDATE pc_avaliacao_orientacoes
-			SET pc_aval_orientacao_mcu_orgaoResp = '#rsUltimoOrgaoResp.ultimoOrgaoResp#'
-			WHERE pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#pc_aval_orientacao_id#">
-		</cfquery>
+		<cftransaction> 
+			<!-- update na tabela pc_avaliacao_orientacoes -->
+			<!-- se rsUltimoOrgaoResp não for vazio, atualiza o campo pc_aval_orientacao_mcu_orgaoResp -->
+			<cfquery datasource="#application.dsn_processos#" name="rsUpdateOrientacoes">
+				UPDATE pc_avaliacao_orientacoes
+				SET pc_aval_orientacao_mcu_orgaoResp = '#rsUltimoOrgaoResp.ultimoOrgaoResp#'
+				WHERE pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#pc_aval_orientacao_id#">
+			</cfquery>
+			<!-- update na tabela pc_avaliacao_posicionamentos -->
+			<!-- se rsUltimoOrgaoResp não for vazio, atualiza o campo pc_aval_posic_num_orgaoResp dos status 6-solucionado-->
+			<cfquery datasource="#application.dsn_processos#" name="rsUpdatePosicionamentoSolucionado">
+				UPDATE pc_avaliacao_posicionamentos
+				SET pc_aval_posic_num_orgaoResp = '#rsUltimoOrgaoResp.ultimoOrgaoResp#'
+				INNER JOIN pc_orientacao_status ON pc_orientacao_status.pc_orientacao_status_id = pc_avaliacao_posicionamentos.pc_aval_posic_status
+				WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#rsOrientacoesFinalizadas.pc_aval_orientacao_id#">
+					and pc_aval_posic_num_orgaoResp is null
+					and pc_orientacao_status_finalizador = 'S'
+			</cfquery>
+		</cftransaction>
+	
 	</cfif>
+
+
 
 
 </cfloop>
