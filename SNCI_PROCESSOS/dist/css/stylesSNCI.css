@@ -199,6 +199,7 @@ td{
 .grow-icon {
     transition: transform 0.2s ease; /* Define a transição para a animação */
     cursor:pointer;
+    user-select: none;
 }
 
 .grow-icon:hover {

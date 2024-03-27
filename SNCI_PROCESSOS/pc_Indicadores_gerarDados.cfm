@@ -34,7 +34,7 @@
 		</style>
 		
 </head>
-<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" >
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height" style="user-select: none;">
 	<!-- Site wrapper -->
 	<div class="wrapper">
 	
@@ -110,7 +110,7 @@
 			// Adiciona os botões de opção de rádio ao elemento HTML com o ID "opcoesAno"
 			$('#opcoesAno').html(radioButtonsAno.join(''));
 
-			// Cria um array de nomes de meses, começando em janeiro e indo até o mês atual, em ordem crescente
+			// Cria um array de nomes de meses, começando em janeiro e indo até o mês anterior, em ordem crescente
 			const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 			const currentMonth = new Date().getMonth();
 			const monthRange = monthNames.slice(0, currentYear === parseInt($('input[name=ano]:checked').val()) ? currentMonth  : 12);

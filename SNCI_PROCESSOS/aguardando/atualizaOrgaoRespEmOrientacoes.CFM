@@ -25,16 +25,7 @@
 		order by pc_aval_posic_id desc
 	</cfquery>
 
-	<cfquery datasource="#application.dsn_processos#" name="rsUltimoOrgaoEnvio">
-		Select TOP 1 pc_aval_posic_num_orgaoResp as ultimoOrgaoResp 
-		from pc_avaliacao_posicionamentos
-		INNER JOIN pc_orientacao_status ON pc_orientacao_status.pc_orientacao_status_id = pc_avaliacao_posicionamentos.pc_aval_posic_status
-		INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_avaliacao_posicionamentos.pc_aval_posic_num_orgaoResp
 	
-		WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#rsOrientacoesFinalizadas.pc_aval_orientacao_id#">
-				AND not pc_aval_posic_num_orgaoResp is null AND pc_org_controle_interno = 'N' 
-		order by pc_aval_posic_id desc
-	</cfquery>
 
 
 
@@ -49,7 +40,7 @@
 				WHERE pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#pc_aval_orientacao_id#">
 			</cfquery>
 			<!-- update na tabela pc_avaliacao_posicionamentos -->
-			<!-- se rsUltimoOrgaoResp não for vazio, atualiza o campo pc_aval_posic_num_orgaoResp dos status 6-solucionado-->
+			<!-- se rsUltimoOrgaoResp não for vazio, atualiza o campo pc_aval_posic_num_orgaoResp dos status finalizadores-->
 			<cfquery datasource="#application.dsn_processos#" name="rsUpdatePosicionamentoSolucionado">
 				UPDATE pc_avaliacao_posicionamentos
 				SET pc_aval_posic_num_orgaoResp = '#rsUltimoOrgaoResp.ultimoOrgaoResp#'

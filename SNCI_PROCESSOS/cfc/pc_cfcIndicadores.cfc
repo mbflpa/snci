@@ -97,12 +97,15 @@
 						<h5 style="color:##000;text-align: center;">Dados gerados para os indicadores de <strong>#arguments.ano#</strong></h5>
 						
 					</cfoutput>
-					<table id="tabelaDados" class="table table-bordered table-striped text-nowrap no-footer" style="width: 100%; margin: 0 auto;margin-bottom:200px">
+					<table id="tabelaDados" class="table table-bordered table-striped text-nowrap no-footer" style="user-select: none;width: 100%; margin: 0 auto;margin-bottom:200px">
 						<thead>
 							<tr style="text-align: center;"  >
 								<th>Mês/Ano</th>
 								<th>Data/Hora</th>
 								<th>Usuário</th>
+								<cfif application.rsUsuarioParametros.pc_usu_perfil eq 3>
+									<th>Excluir</th>
+								</cfif>
 							</tr>
 						</thead>
 						<tbody>
@@ -116,6 +119,10 @@
 										SELECT pc_usu_nome FROM pc_usuarios WHERE pc_usu_matricula = <cfqueryparam value="#pc_indDados_matriculaGeracao#" cfsqltype="cf_sql_varchar">
 									</cfquery>
 									<td>#rsUsuarioGerador.pc_usu_nome#</td>
+									
+									<cfif application.rsUsuarioParametros.pc_usu_perfil eq 3>
+										<td><a id="btExcluir Dados" onclick="excluirDados(#dateFormat(pc_indDados_dataRef, 'mm')#)" ><i class="fas fa-trash-alt grow-icon delete-button"></i></a></td>
+									</cfif>
 								</tr>
 								
 							</cfoutput>
@@ -141,6 +148,58 @@
 				});
 				$(".content-wrapper").css("height", "auto");
 			});
+
+			function excluirDados(mesSelecionado){
+				let ano = parseInt($('input[name=ano]:checked').val());
+				let mes = mesSelecionado;
+
+				var mensagem = 'Deseja realmente excluir os dados do mês '+mes+'/'+ano+'?';
+					Swal.fire({
+						title: mensagem,
+						showDenyButton: true,
+						confirmButtonText: `Sim`,
+						denyButtonText: `Não`,
+					}).then((result) => {
+						/* Read more about isConfirmed, isDenied below */
+						if (result.isConfirmed) {
+							$('#modalOverlay').modal('show')
+							setTimeout(function() {	
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcIndicadores.cfc",
+									data:{
+										method:"deletaDadosParaIndicadores",
+										ano:ano,
+										mes:mes
+									},
+									async: false,
+									success: function(data){
+										// Chamar a função para obter os dados quando o documento estiver pronto
+										obterDados();
+										$('#modalOverlay').delay(500).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+											Swal.fire('Dados excluídos com sucesso!', '', 'success')
+											$(".content-wrapper").css("height", "auto");
+										});	
+									},
+									error: function(xhr, ajaxOptions, thrownError) {
+										$('#modalOverlay').delay(500).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+											
+										});
+										$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+										$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+											
+									}
+								});
+							}, 500);
+						} else if (result.isDenied) {
+							Swal.fire('Os dados não foram excluídos.', '', 'info')
+						}
+					})
+
+			}
 		</script>
 
 
@@ -785,15 +844,39 @@
 		</cftransaction>	
 
 		<cfquery name="PC_INDICADORES_DADOS" datasource="#application.dsn_processos#">
-			SELECT * FROM pc_indicadores_dados WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+			SELECT pc_indDados_id FROM pc_indicadores_dados WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 		</cfquery>
 		<cfquery name="PC_INDICADORES_PORORGAO" datasource="#application.dsn_processos#">
-			SELECT * FROM pc_indicadores_porOrgao WHERE pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer"> AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+			SELECT pc_indOrgao_ano FROM pc_indicadores_porOrgao WHERE pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer"> AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
 		</cfquery>
 
 		<cfset quantDados = PC_INDICADORES_DADOS.recordCount + PC_INDICADORES_PORORGAO.recordCount>
 
 		<cfreturn quantDados>
+	</cffunction>
+
+	<cffunction name="deletaDadosParaIndicadores"   access="remote" hint="deleta os dados para os indicadores - acompanhamento mensal">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+
+		<cfset ano = arguments.ano>
+		<cfset mes = arguments.mes>
+        <cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+
+
+		<cftransaction>
+			<cfquery name="deleta_PC_INDICADORES_DADOS" datasource="#application.dsn_processos#">
+				DELETE FROM pc_indicadores_dados WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+			</cfquery>
+
+			<cfquery name="deleta_PC_INDICADORES_PORORGAO" datasource="#application.dsn_processos#">
+				DELETE FROM pc_indicadores_porOrgao 
+				WHERE pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer"> 
+				AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+			</cfquery>
+
+		</cftransaction>	
+
 	</cffunction>
 
 
@@ -2844,8 +2927,6 @@
 												<cfset totalMetaDGCI[month] = 0>
 												<cfset count[month] = 0>
 
-												
-
 												<cfquery name="rsOrgaosDGCI" dbtype="query" >
 													SELECT pc_indOrgao_mcuOrgao FROM rsIndicadoresPorOrgao
 													WHERE pc_indOrgao_mes = <cfqueryparam value="#month#" cfsqltype="cf_sql_integer">
@@ -2854,48 +2935,55 @@
 												</cfquery>
 
 												<cfloop query="rsOrgaosDGCI">
+
 													<!--- Inicializar as metas como 0 caso sejam NULL --->
 													<cfset metaPRCI = 0>
 													<cfset metaSLNC = 0>
 													
-													<!--- Obter metaPRCI --->
-													<cfquery name="metaPRCImes" datasource="#application.dsn_processos#">
-														SELECT pc_indMeta_meta as metaPRCI
-														FROM pc_indicadores_meta 
-														WHERE pc_indMeta_numIndicador = 1
-															AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-															AND pc_indMeta_mcuOrgao = <cfqueryparam value="#rsOrgaosDGCI.pc_indOrgao_mcuOrgao#" cfsqltype="cf_sql_varchar">
-															AND pc_indMeta_mes = <cfqueryparam value="#month#" cfsqltype="cf_sql_integer">
-														ORDER BY pc_indMeta_mes
+													<cfquery name="metaPRCIporOrgao" datasource="#application.dsn_processos#">
+														SELECT  COALESCE(AVG(COALESCE(meta,0)),0) AS metaMes from (
+															SELECT DISTINCT pc_indOrgao_ano, pc_indMeta_mes, pc_indOrgao_mcuOrgaoSubordinador, pc_indMeta_mcuOrgao, pc_indicadores_meta.pc_indMeta_meta as meta from pc_indicadores_porOrgao
+															INNER JOIN pc_indicadores_meta ON pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao = pc_indicadores_meta.pc_indMeta_mcuOrgao 
+																	and pc_indicadores_porOrgao.pc_indOrgao_numIndicador = pc_indicadores_meta.pc_indMeta_numIndicador and pc_indicadores_porOrgao.pc_indOrgao_ano = pc_indicadores_meta.pc_indMeta_ano and pc_indicadores_porOrgao.pc_indOrgao_mes = pc_indicadores_meta.pc_indMeta_mes
+																	WHERE pc_indOrgao_mcuOrgaoSubordinador = <cfqueryparam value="#pc_indOrgao_mcuOrgao#" cfsqltype="cf_sql_varchar">
+																AND pc_indOrgao_numIndicador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
+																AND pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+																AND pc_indOrgao_mes = <cfqueryparam value="#month#" cfsqltype="cf_sql_integer">
+																
+														) as metaPRCI
 													</cfquery>
 													
-													<!--- Obter metaSLNC --->
-													<cfquery name="metaSLNCmes" datasource="#application.dsn_processos#">
-														SELECT pc_indMeta_meta as metaSLNC
-														FROM pc_indicadores_meta 
-														WHERE pc_indMeta_numIndicador = 2
-															AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-															AND pc_indMeta_mcuOrgao = <cfqueryparam value="#rsOrgaosDGCI.pc_indOrgao_mcuOrgao#" cfsqltype="cf_sql_varchar">
-															AND pc_indMeta_mes = <cfqueryparam value="#month#" cfsqltype="cf_sql_integer">
-													</cfquery>
 
-													<!--- Se houver resultados, calcular DGCI --->
-													<cfif metaPRCImes.recordCount>
-														<!--- Obter a metaPRCI --->
-														<cfset metaPRCI = metaPRCImes.metaPRCI>
+													<cfif metaPRCIporOrgao.recordcount eq 0>
+														<cfset metaPRCI = 0>
+													<cfelse>
+														<cfset metaPRCI = metaPRCIporOrgao.metaMes>
+													</cfif>
+
+													<cfquery name="metaSLNCporOrgao" datasource="#application.dsn_processos#">
+														SELECT  COALESCE(AVG(COALESCE(meta,0)),0) AS metaMes from (
+															SELECT DISTINCT pc_indOrgao_ano, pc_indMeta_mes, pc_indOrgao_mcuOrgaoSubordinador, pc_indMeta_mcuOrgao, pc_indicadores_meta.pc_indMeta_meta as meta from pc_indicadores_porOrgao
+															INNER JOIN pc_indicadores_meta ON pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao = pc_indicadores_meta.pc_indMeta_mcuOrgao 
+																	and pc_indicadores_porOrgao.pc_indOrgao_numIndicador = pc_indicadores_meta.pc_indMeta_numIndicador and pc_indicadores_porOrgao.pc_indOrgao_ano = pc_indicadores_meta.pc_indMeta_ano and pc_indicadores_porOrgao.pc_indOrgao_mes = pc_indicadores_meta.pc_indMeta_mes
+															WHERE pc_indOrgao_mcuOrgaoSubordinador = <cfqueryparam value="#pc_indOrgao_mcuOrgao#" cfsqltype="cf_sql_varchar">
+																AND pc_indOrgao_numIndicador = <cfqueryparam value="2" cfsqltype="cf_sql_integer">
+																AND pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+																AND pc_indOrgao_mes = <cfqueryparam value="#month#" cfsqltype="cf_sql_integer">
+																
+														) as metaSLNC
+													</cfquery>
+													<cfif metaSLNCporOrgao.recordcount eq 0>
+														<cfset metaSLNC = 0>
+													<cfelse>
+														<cfset metaSLNC = metaSLNCporOrgao.metaMes>
 													</cfif>
 													
-													<cfif metaSLNCmes.recordCount>
-														<!--- Obter a metaSLNC --->
-														<cfset metaSLNC = metaSLNCmes.metaSLNC>
-													</cfif>
-													
-													<!--- Calcular o DGCI --->
-													<cfset metaDGCI = round(((metaPRCI ?: 0) * 0.75 + (metaSLNC ?: 0) * 0.25)*10)/10 >
-													
+													<cfset metaDGCI = (metaPRCI * rsPRCIpeso.pc_indPeso_peso) + (metaSLNC * rsSLNCpeso.pc_indPeso_peso)>
+
 													<!--- Adicionar ao total e incrementar contador para o mês --->
-													<cfset totalMetaDGCI[month] += metaDGCI>
+													<cfset totalMetaDGCI[month] += round(metaDGCI*10)/10>
 													<cfset count[month]++>
+													
 												</cfloop>
 											</cfloop>
 
@@ -2903,10 +2991,11 @@
 											<cfset mediaMetaDGCI = {}>
 											<cfloop index="month" from="1" to="#arguments.mes#">
 												<cfif count[month] neq 0>
-													<cfset mediaMetaDGCI[month] = totalMetaDGCI[month] / count[month]>
+													<cfset mediaMetaDGCI[month] = ROUND(totalMetaDGCI[month]*10)/10 / count[month]>
 												<cfelse>
 													<cfset mediaMetaDGCI[month] = 0>
 												</cfif>
+												
 											</cfloop>
 
 											<cfset DGCIcount = 0>
@@ -2936,7 +3025,7 @@
 														</cfoutput>
 													</td>
 													<cfset metaDGCI = mediaMetaDGCI[pc_indOrgao_mes]>
-													<cfset DGCImetaSoma += ROUND(metaDGCI*10)/10>
+													<cfset DGCImetaSoma += metaDGCI>
 													<td>#NumberFormat(ROUND(metaDGCI*10)/10,0.0)#</td>
 
 													<cfif IIF(pc_indOrgao_numIndicador EQ 3, Replace(ROUND(media_resultadoMes*10)/10,',','.'), "") gt  metaDGCI and  metaDGCI neq 0>
