@@ -213,7 +213,8 @@
 									data:{
 										method:"gerarDadosParaIndicadores",
 										ano:ano,
-										mes:mes
+										mes:mes,
+										tipoRotina:'M'
 									},
 									async: false,
 									success: function(result) {	

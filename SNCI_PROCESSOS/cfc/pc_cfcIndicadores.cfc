@@ -114,12 +114,16 @@
 								<tr style="text-align: center;"  >
 									<td>#dateFormat(pc_indDados_dataRef, 'mm/yyyy')#</td>
 									<td>#DateFormat(max_dataHoraGeracao, "dd/mm/yyyy")# - #TimeFormat(max_dataHoraGeracao, "HH:mm:ss")#</td>
-									<!--retorna o nome do usuário que gerou os dados-->
-									<cfquery name="rsUsuarioGerador" datasource="#application.dsn_processos#">
-										SELECT pc_usu_nome FROM pc_usuarios WHERE pc_usu_matricula = <cfqueryparam value="#pc_indDados_matriculaGeracao#" cfsqltype="cf_sql_varchar">
-									</cfquery>
-									<td>#rsUsuarioGerador.pc_usu_nome#</td>
-									
+									<cfif pc_indDados_matriculaGeracao eq "A">
+										<td>Rotina Automática</td>
+									<cfelse>
+										<!--retorna o nome do usuário que gerou os dados-->
+										<cfquery name="rsUsuarioGerador" datasource="#application.dsn_processos#">
+											SELECT pc_usu_nome FROM pc_usuarios WHERE pc_usu_matricula = <cfqueryparam value="#pc_indDados_matriculaGeracao#" cfsqltype="cf_sql_varchar">
+										</cfquery>
+
+										<td>#rsUsuarioGerador.pc_usu_nome#</td>
+									</cfif>
 									<cfif application.rsUsuarioParametros.pc_usu_perfil eq 3>
 										<td><a id="btExcluir Dados" onclick="excluirDados(#dateFormat(pc_indDados_dataRef, 'mm')#)" ><i class="fas fa-trash-alt grow-icon delete-button"></i></a></td>
 									</cfif>
@@ -212,6 +216,7 @@
 	<cffunction name="gerarDadosParaIndicadoresMensal"   access="remote" hint="gera os dados para os indicadores e insere na tabela pc_indicadores_dados - acompanhamento mensal">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
+		<cfargument name="tipoRotina" type="string" required="false" default="A" />
 		<cfset dataInicial = createODBCDate(createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))>
 		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
 	
@@ -450,6 +455,12 @@
 			<cfelse>
 				<cfset ehControleInteno = 1>
 			</cfif>
+			<cfif arguments.tipoRotina eq "A">
+				<cfset matricula = "A">
+			<cfelse>
+				<cfset matricula = application.rsUsuarioParametros.pc_usu_matricula>
+			</cfif>
+
 
 			<cfquery datasource="#application.dsn_processos#">
 				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
@@ -471,7 +482,7 @@
 												,pc_indDados_mcuOrgaoPosicEcontInterno)
 				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					,1
-					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#matricula#" cfsqltype="cf_sql_varchar">
 					,<cfqueryparam value="#mcuOrgaoIndicador.pc_org_mcu#" cfsqltype="cf_sql_varchar">
 					,<cfqueryparam value="#rs_dados_prci.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
 					,<cfqueryparam value="#rs_dados_prci.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
@@ -539,7 +550,7 @@
 												,pc_indDados_mcuOrgaoPosicEcontInterno)
 				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					,2
-					,<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#matricula#" cfsqltype="cf_sql_varchar">
 					,<cfqueryparam value="#mcuOrgaoIndicador.pc_org_mcu#" cfsqltype="cf_sql_varchar">
 					,<cfqueryparam value="#rs_dados_slnc.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
 					,<cfqueryparam value="#rs_dados_slnc.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
@@ -564,9 +575,15 @@
 	<cffunction name="gerarDadosParaIndicadoresPorOrgao"   access="remote" hint="gera os dados para os indicadores e insere na tabela pc_indicador_porOrgao - acompanhamento mensal"> 
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
+		<cfargument name="tipoRotina" type="string" required="false" default="A" />
 
 		<cfset ano = arguments.ano>
 		<cfset mes = arguments.mes>
+		<cfif arguments.tipoRotina eq "A">
+			<cfset matricula = "A">
+		<cfelse>
+			<cfset matricula = application.rsUsuarioParametros.pc_usu_matricula>
+		</cfif>
 
 		<cfquery name="dadosAno_CI" datasource="#application.dsn_processos#" timeout="120"  >
 			SELECT	pc_orgaoSubordinador.pc_org_mcu as mcuOrgaoSubordinador
@@ -820,9 +837,11 @@
 	<cffunction name="gerarDadosParaIndicadores"   access="remote" hint="gera os dados para os indicadores - acompanhamento mensal">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
+		<cfargument name="tipoRotina" type="string" required="false" default="A" />
 
 		<cfset ano = arguments.ano>
 		<cfset mes = arguments.mes>
+		<cfset tipoRotina = arguments.tipoRotina>
         <cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
 
 
@@ -837,7 +856,7 @@
 				AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
 			</cfquery>
 
-			<cfset quantDados = gerarDadosParaIndicadoresMensal(ano,mes)>
+			<cfset quantDados = gerarDadosParaIndicadoresMensal(ano,mes,tipoRotina)>
 			<cfset quantDadosPorOrgao = gerarDadosParaIndicadoresPorOrgao(ano,mes)>
 		</cftransaction>	
 

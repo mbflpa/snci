@@ -404,11 +404,78 @@
             }
 			 
 
-               
-           
-            
+            // Função para gerar os dados para os indicadores
+            // Obtém o ano atual
+			const currentYear = new Date().getFullYear();
+			// Obtém o mês atual
+			const currentMonth = new Date().getMonth() + 1;
 
+            //executar a partir do primeiro dia do mês para gerar os dados do mês anterior
+            const firstDay = new Date(currentYear, currentMonth - 1, 1);
+          
+           //se a data de hoje for maior ou igual ao primeiro dia do mês, executa a função
+            if (new Date() >= firstDay) {
+               //ontém o mês anterior
+                const previousMonth = new Date().getMonth();
+                // Obtém o ano atual e se o mês for janeiro, subtrai 1 do ano
+                const previousYear = new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear();
+                // Executa a função para gerar os dados para os indicadores
+                $.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+                    type: "post",
+                    url: "cfc/pc_cfcIndicadores.cfc",
+                    data:{
+                        method:"verificaExisteDadosGerados",
+                        ano:previousYear,
+                        mes:previousMonth
+                    },
+                    async: true,
+                    success: function(result) {
+                        if(result == -1){
+                            $('#modalOverlay').delay(1000).hide(0, function() {
+                                $('#modalOverlay').modal('hide');
+                                $('#opcoesMes').find('label').removeClass('active');
+                                Swal.fire('Não foram encontrados todos os pesos dos indicadores para <strong>' + previousYear + '</strong> para geração dos dados. Cadastre na tabela os pesos dos respectivos indicadores conforme o ano selecionado!', '', 'info')
+                            });
+                        }else{
+                            if(result == 0){
+                                gerarDados(previousMonth, previousYear);
+                            }
+                        }
+                    },
+                            
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        $('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+                        $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+                        $('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+                            
+                    }
+                })//fim ajax
+            }//
         });
+
+
+        function gerarDados(previousMonth, previousYear){
+             $.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+                type: "post",
+                url: "cfc/pc_cfcIndicadores.cfc",
+                data:{
+                    method:"gerarDadosParaIndicadores",
+                    ano:previousYear,
+                    mes:previousMonth
+                },
+                async: true,
+                success: function(result) {
+                console.log("Dados para indicadores gerados com sucesso! "+previousMonth+"/"+previousYear);
+                },
+                        
+                error: function(xhr, ajaxOptions, thrownError) {
+                    $('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+                    $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+                    $('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+                        
+                }
+            })//fim ajax
+        }
 
        
 
