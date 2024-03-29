@@ -380,7 +380,6 @@
 					pc_aval_posic_num_orientacao,
 					pc_aval_posic_status,
 					pc_aval_posic_num_orgaoResp,
-					pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp as orgaoResponsavelMCU,
 					pc_aval_posic_datahora,
 					pc_aval_posic_dataPrevistaResp,
 					pc_aval_posic_enviado,
@@ -388,13 +387,12 @@
 					ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
 				FROM
 					pc_avaliacao_posicionamentos
-				INNER JOIN pc_avaliacao_orientacoes ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
 				WHERE 
             		pc_aval_posic_enviado = 1
 					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 	
 			) AS ranked_posicionamentos
-			INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.orgaoResponsavelMCU = orgaoResp.pc_org_mcu
+			INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
 			INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
 			INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
 			INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
@@ -1158,7 +1156,7 @@
 												<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
 											</cfif>
 											
-											<cfset metaPRCIorgaoFormatado = Replace(metaPRCIorgao,".",",") />
+											<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0),".",",") />
 
 											<cfif metaPRCIorgao eq 0>
 												<cfset PRCIresultadoMeta = ROUND(0*10)/10 />
@@ -1191,7 +1189,7 @@
 															<span style="font-size:14px">PRCI = TIDP/TGI</span><br>
 															<span style="font-size:14px">TIDP (Posic. dentro do prazo (DP))= #totalDP#</span><br>
 															<span style="font-size:14px">TGI (Total de Posicionamentos)= #totalGeral# </span><br>
-															<span style="font-size:14px">Meta = #NumberFormat(metaPRCIorgaoFormatado,0.0)#%</span><br>
+															<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#%</span><br>
 														</font></font></span>
 													</div>
 													<!-- /.info-box-content -->
@@ -1366,7 +1364,6 @@
 					pc_aval_posic_num_orientacao,
 					pc_aval_posic_status,
 					pc_aval_posic_num_orgaoResp,
-					pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp as orgaoResponsavelMCU,
 					pc_aval_posic_datahora,
 					pc_aval_posic_dataPrevistaResp,
 					pc_aval_posic_enviado,
@@ -1374,13 +1371,12 @@
 					ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
 				FROM
 					pc_avaliacao_posicionamentos
-				INNER JOIN pc_avaliacao_orientacoes ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
 				WHERE 
             		pc_aval_posic_enviado = 1
 					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 	
 			) AS ranked_posicionamentos
-			LEFT JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.orgaoResponsavelMCU = orgaoResp.pc_org_mcu
+			LEFT JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
 			INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
 			INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
 			INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
@@ -1437,7 +1433,6 @@
 					pc_aval_posic_num_orientacao,
 					pc_aval_posic_status,
 					pc_aval_posic_num_orgaoResp,
-					pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp as orgaoResponsavelMCU,
 					pc_aval_posic_datahora,
 					pc_aval_posic_dataPrevistaResp,
 					pc_aval_posic_enviado,
@@ -1445,13 +1440,12 @@
 					ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
 				FROM
 					pc_avaliacao_posicionamentos
-				INNER JOIN pc_avaliacao_orientacoes ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
 				WHERE 
             		pc_aval_posic_enviado = 1
 					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 	
 			) AS ranked_posicionamentos
-			INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.orgaoResponsavelMCU = orgaoResp.pc_org_mcu
+			INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
 			INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
 			INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
 			INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
