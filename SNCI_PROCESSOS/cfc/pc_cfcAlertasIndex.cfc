@@ -64,7 +64,7 @@
 											<cfelse>
 												<li style="margin-bottom:20px;color:red;"><span  style="color:red;font-size:1.2em">Existem #qPosicionamentosSubordinados.recordcount# Orientações para manifestação de órgãos subordinados a <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
 											</cfif>
-											<span style="color:red;font-size:1.2em">Clique no menu ao lado em <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em;margin-right:10px"><i class="nav-icon fas fa-search"></i> Consultas</span>e escolha a opção <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em"><i class="nav-icon fas fa-search"></i> Consulta por Orientação</span></span></li>
+											<span style="color:red;font-size:1.2em">Clique no menu ao lado em <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em;margin-right:10px"><i class="nav-icon fas fa-search"></i> Consultas</span>, depois em <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em"><i class="nav-icon fas fa-spinner"></i> Processos Em Acomp.</span>  e escolha a opção <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em"><i class="nav-icon fas fa-spinner"></i> Por Orientação</span></span></li>
 										
 										</cfoutput>
 									</cfif>
