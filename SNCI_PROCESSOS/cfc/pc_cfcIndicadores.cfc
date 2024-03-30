@@ -48,11 +48,13 @@
 		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#"  >
 			SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 			 and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+			 and pc_indPeso_ativo = 1
 		</cfquery>
 
 		<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#"  >
 			SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = <cfqueryparam value="2" cfsqltype="cf_sql_integer">
 			and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+			 and pc_indPeso_ativo = 1
 		</cfquery>
 
 
@@ -729,11 +731,17 @@
 
 
 		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = 1 and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
+				WHERE pc_indPeso_numIndicador = 1 
+				and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+				and pc_indPeso_ativo = 1
 		</cfquery>
 
 		<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = 2 and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
+				WHERE pc_indPeso_numIndicador = 2 
+				and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+				and pc_indPeso_ativo = 1
 		</cfquery>
 
 	
@@ -2477,11 +2485,17 @@
 			
 
 			<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#"   >
-				SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = 1 and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+				SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
+					WHERE pc_indPeso_numIndicador = 1 
+					and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+					and pc_indPeso_ativo = 1
 			</cfquery>
 
 			<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#"   >
-				SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = 2 and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+				SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
+					WHERE pc_indPeso_numIndicador = 2 
+					and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+					and pc_indPeso_ativo = 1
 			</cfquery>
 
 			<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
@@ -2840,13 +2854,17 @@
 
 		
 		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT	pc_indPeso_peso FROM pc_indicadores_peso WHERE pc_indPeso_numIndicador = 1 and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
+				WHERE  pc_indPeso_numIndicador = 1 
+				and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+				and pc_indPeso_ativo = 1
 		</cfquery>
 
 		<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
 			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
-			WHERE pc_indPeso_numIndicador = 2 
-			and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+				WHERE pc_indPeso_numIndicador = 2 
+				and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+				and pc_indPeso_ativo = 1
 		</cfquery>
 
 

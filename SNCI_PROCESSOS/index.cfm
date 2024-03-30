@@ -413,8 +413,9 @@
             //executar a partir do primeiro dia do mês para gerar os dados do mês anterior
             const firstDay = new Date(currentYear, currentMonth - 1, 1);
           
-           //se a data de hoje for maior ou igual ao primeiro dia do mês, executa a função
-            if (new Date() >= firstDay) {
+           //se a data de hoje for maior ou igual ao primeiro dia do mês e se o usuário for do controle interno, executa a função
+                     
+            if (new Date() >= firstDay && usuarioControleInterno == 'S') {
                //ontém o mês anterior
                 const previousMonth = new Date().getMonth();
                 // Obtém o ano atual e se o mês for janeiro, subtrai 1 do ano
@@ -430,11 +431,11 @@
                     },
                     async: true,
                     success: function(result) {
-                        if(result == -1){
+                        if(result == -1 && usuarioPerfil != '11'){
                             $('#modalOverlay').delay(1000).hide(0, function() {
                                 $('#modalOverlay').modal('hide');
                                 $('#opcoesMes').find('label').removeClass('active');
-                                Swal.fire('Não foram encontrados todos os pesos dos indicadores para <strong>' + previousYear + '</strong> para geração dos dados. Cadastre na tabela os pesos dos respectivos indicadores conforme o ano selecionado!', '', 'info')
+                                Swal.fire('Não estão cadastrados e ativos, todos os pesos dos indicadores para <strong>' + previousYear + '</strong>. Sem eles, os dados dos indicadores não poderão ser gerados.', '', 'info')
                             });
                         }else{
                             if(result == 0){
