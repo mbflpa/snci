@@ -113,7 +113,7 @@
 			// Cria um array de nomes de meses, começando em janeiro e indo até o mês anterior, em ordem crescente
 			const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
 			const currentMonth = new Date().getMonth();
-			const monthRange = monthNames.slice(0, currentYear === parseInt($('input[name=ano]:checked').val()) ? currentMonth  : 12);
+			const monthRange = monthNames.slice(0, currentYear === parseInt($('input[name=ano]:checked').val()) ? currentMonth+1  : 12);
 
 			// Mapeia cada mês para um botão de opção de rádio com o número do mês como valor e o nome do mês como rótulo
 			const radioButtonsMes = monthRange.map((month, i) => {
@@ -279,8 +279,9 @@
 									url: "cfc/pc_cfcIndicadores.cfc",
 									data:{
 										method:"gerarDadosParaIndicadores",
-										ano:parseInt($('input[name=ano]:checked').val()),
-										mes:parseInt($('input[name=mes]:checked').val())
+										ano:ano,
+										mes:mes,
+										tipoRotina:'M'
 									},
 									async: false,
 									success: function(result) {	

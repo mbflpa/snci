@@ -1088,6 +1088,94 @@
 			<cfset orgaoRespMCUs[orgaoResp] = orgaoRespMCU>
 		</cfloop>
 
+		<!-- tabela resumo -->
+		<cfset totalOrgaosResp = StructCount(orgaos)> <!-- Conta a quantidade de orgaoResp -->						
+		<cfif totalOrgaosResp gt 1>
+			<div id="divTabResumoPRCI" class="table-responsive">
+				<div style="width: 350px; margin: 0 auto;">
+					<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap " style="width:100%; cursor:pointer">
+						<cfoutput>
+							
+							<thead class="bg-gradient-warning" style="text-align: center;">
+								<tr style="font-size:14px">
+									<th colspan="6" style="padding:5px">PRCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
+								</tr>
+								<tr style="font-size:14px">
+									<th style="font-weight: normal!important">Órgão</th>
+									<th style="font-weight: normal!important">DP</th>
+									<th style="font-weight: normal!important">FP</th>
+									<th >PRCI</th>
+									<th >Meta</th>
+									<th >Resultado</th>
+								</tr>
+							</thead>
+							<tbody>
+								<cfset prcisOrdenado = StructSort(orgaos, "text", "asc")>
+								<cfset totalMetaSubord = 0> <!-- Variável para armazenar a soma total das pc_indMeta_meta -->
+								<cfset countMetaSubord = 0> <!-- Contador para o número de pc_indMeta_meta -->
+								<cfloop array="#prcisOrdenado#" index="orgao">
+
+									<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
+										SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+										WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_numIndicador = 1
+												AND pc_indMeta_mcuOrgao = '#orgaoRespMCUs[orgao]#'
+									</cfquery>
+									
+
+
+									<cfif orgaos[orgao] eq 0>
+										<cfset metaPRCIorgao = 0>
+									<cfelse>
+										<cfset metaPRCIorgao = ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10>
+									</cfif>
+									<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0),".",",") >
+
+									<cfif orgaos[orgao] eq 0>
+										<cfset percentualDP = 0>
+									<cfelse>
+										<cfset percentualDP = (dps[orgao] / orgaos[orgao]) * 100>
+									</cfif>
+
+									<cfif metaPRCIorgao neq ''>
+										<cfset totalMetaSubord += metaPRCIorgao>
+										<cfset countMetaSubord++>
+										<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualDP*10)/10 / metaPRCIorgao)*100*10)/10>
+									<cfelse>
+										<cfset resultMesEmRelacaoMeta = ROUND(0*10)/10>	
+									</cfif>
+
+									<cfset percentualDPFormatado = Replace(ROUND(percentualDP*10)/10,".",",") >
+
+
+									<!--- Adiciona cada linha à tabela --->
+									<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+										<td>#orgao# (#orgaoRespMCUs[orgao]#)</td>
+										<td>#dps[orgao]#</td>
+										<td>#fps[orgao]#</td>
+										<td><strong>#percentualDPFormatado#%</strong></td>
+										<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
+											<td>0%</td>
+										<cfelse>	
+											<td><strong>#metaPRCIorgaoFormatado#%</strong></td>
+										</cfif>
+										<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+
+									</tr>
+								</cfloop>
+								<!-- Calcula a média do órgao subordinador-->
+								<cfset avgMetaPRCIsubordinador = Round((totalMetaSubord/countMetaSubord)*10)/10>
+							</tbody>
+						</cfoutput>
+					</table>
+				</div>
+			</div>
+									
+
+
+		</cfif>
+
 		<style>
 			.dataTables_wrapper {
 				width: 100%; /* ou a largura desejada */
@@ -1128,14 +1216,7 @@
 										
 										<tbody>
 											<cfloop query="resultado" >
-											    <cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
-													SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-													WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-															AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-															AND pc_indMeta_numIndicador = 1
-															AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-												</cfquery>
-											
+											    											
 												<cfoutput>					
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 														<td>#resultado.pc_aval_posic_id#</td>
@@ -1168,6 +1249,8 @@
 												</cfoutput>
 											</cfloop>	
 										</tbody>
+
+										
 										
 										<!--- Imprime os resultados ou faça o que desejar com eles --->
 										<cfoutput>
@@ -1177,18 +1260,14 @@
 											<!--- Formata o percentualDP com duas casas decimais --->
 											<cfset percentualDPFormatado = Replace(NumberFormat(percentualDP,0.0),".",",") />
 											
-											<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
-												<cfset metaPRCIorgao= NumberFormat(0,0.0) />
-											<cfelse>
-												<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
-											</cfif>
 											
-											<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0),".",",") />
+											
+											<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(avgMetaPRCIsubordinador,0.0),".",",") />
 
-											<cfif metaPRCIorgao eq 0>
+											<cfif avgMetaPRCIsubordinador eq 0>
 												<cfset PRCIresultadoMeta = ROUND(0*10)/10 />
 											<cfelse>
-												<cfset PRCIresultadoMeta = ROUND((percentualDP/metaPRCIorgao)*100*10)/10 />
+												<cfset PRCIresultadoMeta = ROUND((percentualDP/avgMetaPRCIsubordinador)*100*10)/10 />
 											</cfif>
 
 											<cfset PRCIresultadoMetaFormatado = Replace(NumberFormat(PRCIresultadoMeta,0.0),".",",") />
@@ -1197,7 +1276,7 @@
 											<div id="divResultPRCI" class="col-md-4 col-sm-4 col-4">
 												<div class="info-box bg-gradient-warning">
 													<div class="ribbon-wrapper ribbon-xl"  >
-														<cfif metaPRCIorgao eq 0>
+														<cfif avgMetaPRCIsubordinador eq 0>
 															<div class="ribbon" id="ribbon" data-value=""></div>
 														<cfelse>
 															<div class="ribbon" id="ribbon" data-value="#PRCIresultadoMeta#"></div>
@@ -1229,51 +1308,7 @@
 									</table>
 								</div>
 
-								<cfset totalOrgaosResp = StructCount(orgaos)> <!-- Conta a quantidade de orgaoResp -->
 								
-								<cfif totalOrgaosResp gt 1>
-									<div id="divTabResumoPRCI" class="table-responsive">
-										<div style="width: 350px; margin: 0 auto;">
-											<table id="tabResumoPRCI" class="table table-bordered table-striped text-nowrap " style="width:100%; cursor:pointer">
-												<cfoutput>
-													<thead class="bg-gradient-warning" style="text-align: center;">
-														<tr style="font-size:14px">
-															<th colspan="4" style="padding:5px">PRCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
-														</tr>
-														<tr style="font-size:14px">
-															<th style="font-weight: normal!important">Órgão</th>
-															<th style="font-weight: normal!important">DP</th>
-															<th style="font-weight: normal!important">FP</th>
-															<th >PRCI</th>
-														</tr>
-													</thead>
-													<tbody>
-														<cfset prcisOrdenado = StructSort(orgaos, "text", "asc")>
-														<cfloop array="#prcisOrdenado#" index="orgao">
-															<cfif orgaos[orgao] eq 0>
-																<cfset percentualDP = 0>
-															<cfelse>
-																<cfset percentualDP = (dps[orgao] / orgaos[orgao]) * 100>
-															</cfif>
-															<cfset percentualDPFormatado = Replace(ROUND(percentualDP*10)/10,".",",") >
-
-															<!--- Adiciona cada linha à tabela --->
-															<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-																<td>#orgao# (#orgaoRespMCUs[orgao]#)</td>
-																<td>#dps[orgao]#</td>
-																<td>#fps[orgao]#</td>
-																<td><strong>#percentualDPFormatado#%</strong></td>
-															</tr>
-														</cfloop>
-													</tbody>
-												</cfoutput>
-											</table>
-										</div>
-									</div>
-															
-	
-		
-								</cfif>
 
 
 
@@ -1292,7 +1327,13 @@
         </cfif>
 
 		<script language="JavaScript">
-		   
+		   // Define a função para aplicar o estilo apenas nas células com a classe 'tdResult'
+			function aplicarEstiloNasTDsComClasseTdResult() {
+				// Para cada célula com a classe 'tdResult' na tabela
+				$('.tdResult').each(function() {
+					updateTDresultIndicadores($(this));
+				});
+			}
 				
 
 			var currentDate = new Date()
@@ -1349,7 +1390,10 @@
 					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
 					paging: false, // Remove a paginação
 					info: false, // Remove a exibição da quantidade de registros
-					searching: false // Remove o campo de busca
+					searching: false, // Remove o campo de busca
+					drawCallback: function (settings) {
+						aplicarEstiloNasTDsComClasseTdResult();
+					}
 				});
 
 
@@ -1360,6 +1404,7 @@
 		</script>
 
 	</cffunction>
+
 
 	<cffunction name="consultaIndicadorSLNC_diario"   access="remote" hint="gera a consulta para página de indicadores - acompanhamento diário">
 		<cfargument name="ano" type="string" required="true" />
@@ -1544,6 +1589,88 @@
 		
 		</cfloop>
 
+		<!-- tabela resumo -->
+		<cfset totalOrgaosResp = StructCount(orgaos)> 		
+		<cfif totalOrgaosResp gt 1>
+			<div id="divTabResumoSLNC" class="table-responsive">
+				<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap" style="width:350px; cursor:pointer">
+					<cfoutput>
+						<thead class="bg-gradient-warning" style="text-align: center;">
+							<tr style="font-size:14px">
+								<th colspan="6" style="padding:5px">SLNC - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
+							</tr>
+							<tr style="font-size:14px">
+								<th style="font-weight: normal!important">Órgão</th>
+								<th style="font-weight: normal!important">Soluc.</th>
+								<th style="font-weight: normal!important">Orient.</th>
+								<th >SLNC</th>
+								<th >Meta</th>
+								<th >Resultado</th>
+							</tr>
+						</thead>
+						<tbody>
+							
+							<cfset slncOrdenado = StructSort(orgaos, "text", "asc")>
+							<cfset totalMetaSubord = 0> <!-- Variável para armazenar a soma total das pc_indMeta_meta -->
+							<cfset countMetaSubord = 0> <!-- Contador para o número de pc_indMeta_meta -->
+							
+							<cfloop array="#slncOrdenado#" index="orgao">
+								<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
+									SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+									WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+											AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+											AND pc_indMeta_numIndicador = 2
+											AND pc_indMeta_mcuOrgao = '#orgaoRespMCUs[orgao]#'
+								</cfquery>
+								
+
+
+								<cfif orgaos[orgao] eq 0>
+									<cfset metaSLNCorgao = 0>
+								<cfelse>
+									<cfset metaSLNCorgao = ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10>
+								</cfif>
+								<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0),".",",") >
+
+								
+								
+								<cfset percentualSolucionado = (solucionados[orgao] / orgaos[orgao]) * 100>
+								<cfset percentualSolucionadoFormatado = Replace(ROUND(percentualSolucionado*10)/10,".",",")  />
+
+								<cfif metaSLNCorgao neq ''>
+									<cfset totalMetaSubord += metaSLNCorgao>
+									<cfset countMetaSubord++>
+									<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualSolucionado*10)/10 / metaSLNCorgao)*100*10)/10>
+								<cfelse>
+									<cfset resultMesEmRelacaoMeta = ROUND(0*10)/10>	
+								</cfif>
+
+								<!--- Adiciona cada linha à tabela --->
+								<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+									<td>#orgao# (#orgaoRespMCUs[orgao]#)</td>
+									<td>#solucionados[orgao]#</td>
+									<td>#orgaos[orgao]#</td>
+									<td><strong>#percentualSolucionadoFormatado#%</strong></td>
+									<cfif rsMetaSLNC.pc_indMeta_meta eq ''>
+										<td>0%</td>
+									<cfelse>	
+										<td><strong>#metaSLNCorgaoFormatado#%</strong></td>
+									</cfif>
+									<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+
+								</tr>
+							</cfloop>
+							<!-- Calcula a média do órgao subordinador-->
+							<cfset avgMetaSLNCsubordinador = Round((totalMetaSubord/countMetaSubord)*10)/10>
+							</tbody>
+						</tbody>
+					</cfoutput>
+				</table>
+			</div>
+
+
+		</cfif>
+
 
 	
 		<cfif #resultadoSLNC.recordcount# neq 0 >
@@ -1619,18 +1746,13 @@
 											
 
 											<cfset percentualSolucionadoFormatado = Replace(NumberFormat(percentualSolucionado,0.0),".",",")  />
-											<cfif rsMetaSLNC.pc_indMeta_meta eq "">
-												<cfset metaSLNCorgao = NumberFormat(0, 0.0)>
-											<cfelse>
-												<cfset metaSLNCorgao= ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10 />
-											</cfif>
+											
+											<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(avgMetaSLNCsubordinador,0.0),".",",") />
 
-											<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0),".",",") />
-
-											<cfif metaSLNCorgao eq 0>
+											<cfif avgMetaSLNCsubordinador eq 0>
 												<cfset SLNCresultadoMeta = ROUND(0*10)/10 />
 											<cfelse>
-												<cfset SLNCresultadoMeta = ROUND(NumberFormat((percentualSolucionado/metaSLNCorgao),0.0)*100*10)/10 />
+												<cfset SLNCresultadoMeta = ROUND(NumberFormat((percentualSolucionado/avgMetaSLNCsubordinador),0.0)*100*10)/10 />
 											</cfif>
 											<cfset SLNCresultadoMetaFormatado = Replace(NumberFormat(SLNCresultadoMeta,0.0),".",",") />
 											
@@ -1639,7 +1761,7 @@
 											<div id="divResultSLNC" class="col-md-6 col-sm-6 col-12">
 												<div class="info-box bg-gradient-warning">
 												    <div class="ribbon-wrapper ribbon-xl"  >
-													    <cfif metaSLNCorgao eq 0>
+													    <cfif avgMetaSLNCsubordinador eq 0>
 															<div class="ribbon" id="ribbon" data-value=""></div>
 														<cfelse>
 															<div class="ribbon" id="ribbon" data-value="#SLNCresultadoMeta#"></div>
@@ -1670,48 +1792,6 @@
 
 									</table>
 								</div>
-
-								<cfset totalOrgaosResp = StructCount(orgaos)> 
-								
-								<cfif totalOrgaosResp gt 1>
-									<div id="divTabResumoSLNC" class="table-responsive">
-										<table id="tabResumoSLNC" class="table table-bordered table-striped text-nowrap" style="width:350px; cursor:pointer">
-											<cfoutput>
-												<thead class="bg-gradient-warning" style="text-align: center;">
-													<tr style="font-size:14px">
-														<th colspan="5" style="padding:5px">SLNC - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
-													</tr>
-													<tr style="font-size:14px">
-														<th style="font-weight: normal!important">Órgão</th>
-														<th style="font-weight: normal!important">Solucionadas</th>
-														<th style="font-weight: normal!important">Qt.Orientações</th>
-														<th >SLNC</th>
-														
-													</tr>
-												</thead>
-												<tbody>
-													
-													<cfset slncOrdenado = StructSort(orgaos, "text", "asc")>
-													<cfloop array="#slncOrdenado#" index="orgao">
-														<cfset percentualSolucionado = (solucionados[orgao] / orgaos[orgao]) * 100>
-														<cfset percentualSolucionadoFormatado = Replace(ROUND(percentualSolucionado*10)/10,".",",")  />
-
-														<!--- Adiciona cada linha à tabela --->
-														<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-															<td>#orgao# (#orgaoRespMCUs[orgao]#)</td>
-															<td>#solucionados[orgao]#</td>
-															<td>#orgaos[orgao]#</td>
-															<td><strong>#percentualSolucionadoFormatado#%</strong></td>
-															
-														</tr>
-													</cfloop>
-												</tbody>
-											</cfoutput>
-										</table>
-									</div>
-
-		
-								</cfif>
 
 							
 						</div>
@@ -1778,7 +1858,10 @@
 					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
 					paging: false, // Remove a paginação
 					info: false, // Remove a exibição da quantidade de registros
-					searching: false // Remove o campo de busca
+					searching: false, // Remove o campo de busca
+					drawCallback: function (settings) {
+						aplicarEstiloNasTDsComClasseTdResult();
+					}
 				});
 
 			});
@@ -2426,11 +2509,6 @@
 
 
 
-
-
-
-
-
 	<cffunction name="resultadoDGCI_diario" access="remote" hint="acompanhamento diário">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
@@ -2513,7 +2591,7 @@
 						AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 			</cfquery>
 
-			<cfif rsMetaPRCI.pc_indMeta_meta eq "">
+			<cfif rsMetaPRCI.pc_indMeta_meta neq "">
 				<cfset metaPRCIorgao=NumberFormat(0,0.0) />
 			<cfelse>
 				<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
@@ -2635,7 +2713,7 @@
 										<i class="fa-solid fa-angles-up" style="font-size:30px;"></i>
 									</div>
 									<div class="row " style="display: flex; justify-content: center;">
-										<div id="divTabPRCIorgaos" class="row" class="col-md-6 col-sm-6 col-12 " style="margin-right: 80px;"></div>
+										<div id="divTabPRCIorgaos" class="row" class="col-md-6 col-sm-6 col-12 " style="margin-right: 300px;"></div>
 										<div id="divTabSLNCorgaos" class="row" class="col-md-6 col-sm-6 col-12 "></div>
 									</div>
 								</div>
@@ -3247,38 +3325,20 @@
 													</cfif>
 
 													<cfif metaMes neq 0>
-														<cfset resultEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoMes*10)/10 / metaMes)*100*10)/10>
+														<cfset resultMesEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoMes*10)/10 / metaMes)*100*10)/10>
+														<cfset resultAcumuladoEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoAcumulado*10)/10 / metaMes)*100*10)/10>
 													<cfelse>
-														<cfset resultEmRelacaoMeta = ROUND(0*10)/10>	
+														<cfset resultMesEmRelacaoMeta = ROUND(0*10)/10>	
+														<cfset resultAcumuladoEmRelacaoMeta = ROUND(0*10)/10>
 													</cfif>
-							
-													
-													
-													<cfif ROUND(pc_indOrgao_resultadoMes*10)/10 gt  metaMes and  metaMes neq 0>
-														<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
-													<cfelseif ROUND(pc_indOrgao_resultadoMes*10)/10 lt  metaMes and  metaMes neq 0>
-														<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
-													<cfelseif ROUND(pc_indOrgao_resultadoMes*10)/10 eq  metaMes and  metaMes neq 0>
-														<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
-													<cfelse>
-														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
-													</cfif>
-													
-													
+
+													<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 
 													<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(pc_indOrgao_resultadoAcumulado*10)/10,0.0)#</strong></td>
 
-													<cfif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 gt  metaMes and  metaMes neq 0>
-														<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
-													<cfelseif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 lt  metaMes and  metaMes neq 0>
-														<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
-													<cfelseif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 eq  metaMes and  metaMes neq 0>
-														<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
-													<cfelse>
-														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
-													</cfif>
+													<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
 
-													<td>#NumberFormat(resultEmRelacaoMeta,0.0)#</td>
+													<td>#NumberFormat(resultMesEmRelacaoMeta,0.0)#</td>
 
 
 												</tr>
@@ -3599,44 +3659,21 @@
 													</cfif>
 							
 													<cfif metaMes neq 0>
-														<cfset resultEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoMes*10)/10 / metaMes)*100*10)/10>
+														<cfset resultMesEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoMes*10)/10 / metaMes)*100*10)/10>
+														<cfset resultAcumuladoEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoAcumulado*10)/10 / metaMes)*100*10)/10>
 													<cfelse>
-														<cfset resultEmRelacaoMeta = ROUND(0*10)/10>	
+														<cfset resultMesEmRelacaoMeta = ROUND(0*10)/10>	
+														<cfset resultAcumuladoEmRelacaoMeta = ROUND(0*10)/10>
 													</cfif>
 													
-													<cfif metaMes eq 0>
-														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
-													<cfelse>
-														<cfif ROUND(pc_indOrgao_resultadoMes*10)/10 gt  metaMes and  metaMes neq 0>
-															<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
-														<cfelseif ROUND(pc_indOrgao_resultadoMes*10)/10 lt  metaMes and  metaMes neq 0>
-															<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
-														<cfelseif ROUND(pc_indOrgao_resultadoMes*10)/10 eq  metaMes and  metaMes neq 0>
-															<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
-														<cfelse>
-															<td></td>	
-														</cfif>
-													</cfif>
-													
+													<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 
 													<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(pc_indOrgao_resultadoAcumulado*10)/10,0.0)#</strong></td>
 
+													<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
 
-													<cfif metaMes eq 0>
-														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
-													<cfelse>
-														<cfif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 gt  metaMes and metaMes neq 0>
-															<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
-														<cfelseif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 lt  metaMes and metaMes neq 0>
-															<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
-														<cfelseif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 eq  metaMes and metaMes neq 0>
-															<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
-														<cfelse>
-															<td></td>	
-														</cfif>
-													</cfif>
 
-													<td>#NumberFormat(resultEmRelacaoMeta,0.0)#</td>
+													<td>#NumberFormat(resultMesEmRelacaoMeta,0.0)#</td>
 
 												</tr>
 											</cfoutput>	
@@ -3696,10 +3733,9 @@
 																AND pc_indOrgao_mes = <cfqueryparam value="#pc_indOrgao_mes#" cfsqltype="cf_sql_integer">
 																
 														) as metaPRCI
+														
 													</cfquery>
-
-
-
+		
 												    <cfif metaPRCIporOrgao.metaMes eq ''>
 														<cfset metaMes = NumberFormat(0,0.0)>
 													<cfelse>
@@ -3723,44 +3759,21 @@
 														</cfif>
 
 														<cfif metaMes neq 0>
-															<cfset resultEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoMes*10)/10 / metaMes)*100*10)/10>
+															<cfset resultMesEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoMes*10)/10 / metaMes)*100*10)/10>
+															<cfset resultAcumuladoEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoAcumulado*10)/10 / metaMes)*100*10)/10>
 														<cfelse>
-															<cfset resultEmRelacaoMeta = ROUND(0*10)/10>	
+															<cfset resultMesEmRelacaoMeta = ROUND(0*10)/10>	
+															<cfset resultAcumuladoEmRelacaoMeta = ROUND(0*10)/10>
 														</cfif>
 
-														
-														
-														<cfif metaMes eq 0>
-															<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
-														<cfelse>
-															<cfif ROUND(pc_indOrgao_resultadoMes*10)/10 gt  metaMes and  metaMes neq 0>
-																<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
-															<cfelseif ROUND(pc_indOrgao_resultadoMes*10)/10 lt  metaMes and  metaMes neq 0>
-																<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
-															<cfelseif ROUND(pc_indOrgao_resultadoMes*10)/10 eq  metaMes and  metaMes neq 0>
-																<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
-															<cfelse>
-																<td></td>	
-															</cfif>
-														</cfif>
+														<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 
 														<td style="border-left:1px solid ##000;border-right:1px solid ##000">#NumberFormat(ROUND(pc_indOrgao_resultadoAcumulado*10)/10,0.0)#</td>
 
-														<cfif metaMes eq 0>
-															<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
-														<cfelse>
-															<cfif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 gt  metaMes and  metaMes neq 0>
-																<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
-															<cfelseif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 lt  metaMes and  metaMes neq 0>
-																<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
-															<cfelseif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 eq  metaMes and  metaMes neq 0>
-																<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
-															<cfelse>
-																<td></td>	
-															</cfif>
-														</cfif>
+														<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
 
-														<td>#NumberFormat(resultEmRelacaoMeta,0.0)#</td>
+
+														<td>#NumberFormat(resultMesEmRelacaoMeta,0.0)#</td>
 
 													</tr>
 												
@@ -3830,50 +3843,34 @@
 													<td style="text-align: left;">#siglaOrgao# (#pc_indOrgao_mcuOrgao#)</td>
 													<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(pc_indOrgao_resultadoMes*10)/10,0.0)#</strong></td>
 
-													<cfif metaSLNCporOrgao.metaMes eq ''>
+													<cfif pc_indOrgao_mcuOrgao eq pc_indOrgao_mcuOrgaoSubordinador AND pc_indOrgao_paraOrgaoSubordinador eq 0>
+														<cfset metaMes = 0>	
 														<td>#NumberFormat(metaMes,0.0)#</td>
 													<cfelse>
-														<cfset metaMes = ROUND(metaSLNCporOrgao.metaMes*10)/10>
-														<td>#NumberFormat(metaMes,0.0)#</td>
+														<cfif metaSLNCporOrgao.metaMes eq ''>
+															<td>#NumberFormat(metaMes,0.0)#</td>
+														<cfelse>
+															<cfset metaMes = ROUND(metaSLNCporOrgao.metaMes*10)/10>
+															<td>#NumberFormat(metaMes,0.0)#</td>
+														</cfif>
 													</cfif>
 
 													<cfif metaMes neq 0>
-														<cfset resultEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoMes*10)/10 / metaMes)*100*10)/10>
+														<cfset resultMesEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoMes*10)/10 / metaMes)*100*10)/10>
+														<cfset resultAcumuladoEmRelacaoMeta = ROUND((ROUND(pc_indOrgao_resultadoAcumulado*10)/10 / metaMes)*100*10)/10>
 													<cfelse>
-														<cfset resultEmRelacaoMeta = ROUND(0*10)/10>	
+														<cfset resultMesEmRelacaoMeta = ROUND(0*10)/10>	
+														<cfset resultAcumuladoEmRelacaoMeta = ROUND(0*10)/10>
 													</cfif>
 													
-													<cfif metaMes eq 0>
-														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
-													<cfelse>
-														<cfif ROUND(pc_indOrgao_resultadoMes*10)/10 gt  metaMes and  metaMes neq 0>
-															<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
-														<cfelseif ROUND(pc_indOrgao_resultadoMes*10)/10 lt  metaMes and  metaMes neq 0>
-															<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
-														<cfelseif ROUND(pc_indOrgao_resultadoMes*10)/10 eq  metaMes and  metaMes neq 0>
-															<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
-														<cfelse>
-															<td></td>	
-														</cfif>
-													</cfif>
+													<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 
-													<td style="border-left:1px solid ##000;border-right:1px solid ##000">#NumberFormat(ROUND(pc_indOrgao_resultadoAcumulado*10)/10,0.0)#</td>
+													<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(pc_indOrgao_resultadoAcumulado*10)/10,0.0)#</strong></td>
 
-													<cfif metaMes eq 0>
-														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>
-													<cfelse>
-														<cfif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 gt  metaMes and  metaMes neq 0>
-															<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
-														<cfelseif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 lt  metaMes and  metaMes neq 0>
-															<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
-														<cfelseif ROUND(pc_indOrgao_resultadoAcumulado*10)/10 eq  metaMes and  metaMes neq 0>
-															<td ><span class="statusOrientacoes" style="background:green;color:##fff;">DENTRO DO ESPERADO</span></td>
-														<cfelse>
-															<td></td>	
-														</cfif>
-													</cfif>
+													<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
 
-													<td>#NumberFormat(resultEmRelacaoMeta,0.0)#</td>
+													<td>#NumberFormat(resultMesEmRelacaoMeta,0.0)#</td>
+
 
 												</tr>
 											</cfoutput>
@@ -4032,6 +4029,14 @@
 	
 
 		<script language="JavaScript">
+
+		    // Define a função para aplicar o estilo apenas nas células com a classe 'tdResult'
+			function aplicarEstiloNasTDsComClasseTdResult() {
+				// Para cada célula com a classe 'tdResult' na tabela
+				$('.tdResult').each(function() {
+					updateTDresultIndicadores($(this));
+				});
+			}
 		   
 			var currentDate = new Date()
 			var day = currentDate.getDate()
@@ -4083,7 +4088,10 @@
 							title : tituloExcel_DGCIporOrgaoSubord + d,
 							className: 'btExcel',
 						}
-					]
+					],
+					drawCallback: function (settings) {
+						aplicarEstiloNasTDsComClasseTdResult();
+					}
 
 					
 				})
@@ -4111,7 +4119,10 @@
 							title : tituloExcel_DGCIporGerencia + d,
 							className: 'btExcel',
 						}
-					]
+					],
+					drawCallback: function (settings) {
+						aplicarEstiloNasTDsComClasseTdResult();
+					}
 				})
 
 				var tituloExcel_PRCIporOrgaoSubordinador ="SNCI_Consulta_PRCI_porOrgaoSubordinador_";
@@ -4136,7 +4147,10 @@
 							title : tituloExcel_PRCIporOrgaoSubordinador + d,
 							className: 'btExcel',
 						}
-					]
+					],
+					drawCallback: function (settings) {
+						aplicarEstiloNasTDsComClasseTdResult();
+					}
 				})
 
 				var tituloExcel_SLNCporOrgaoSubordinador="SNCI_Consulta_SLNC_porOrgaoSubordinador_";
@@ -4161,7 +4175,11 @@
 							title : tituloExcel_SLNCporOrgaoSubordinador+ d,
 							className: 'btExcel',
 						}
-					]
+					],
+					drawCallback: function (settings) {
+						aplicarEstiloNasTDsComClasseTdResult();
+					}
+
 				})
 
 				var tituloExcel_PRCI ="SNCI_Consulta_PRCI_detalhamento_";
@@ -4216,6 +4234,8 @@
 			
 			});
 
+			
+
 
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
@@ -4223,40 +4243,14 @@
 				$('.ribbon').each(function() {
 					updateRibbon($(this));
 				});
+				
+
+				
 					
 			});
 
 
 
-
-			function atualizarStatusOrientacoes() {
-				const statusElements = document.querySelectorAll('.resultadoIndicador');
-				
-				statusElements.forEach(function(element) {
-					const metaMes = parseFloat(element.getAttribute('data-metaMes'));
-					const valorIndicador = parseFloat(element.getAttribute('data-valorIndicador'));
-
-					if (metaMes !== 0) {
-					if (valorIndicador > metaMes) {
-						element.textContent = 'ACIMA DO ESPERADO';
-						element.style.background = '#0083CA';
-						element.style.color = '#fff';
-					} else if (valorIndicador < metaMes) {
-						element.textContent = 'ABAIXO DO ESPERADO';
-						element.style.background = '#dc3545';
-						element.style.color = '#fff';
-					} else if (valorIndicador === metaMes) {
-						element.textContent = 'DENTRO DO ESPERADO';
-						element.style.background = 'green';
-						element.style.color = '#fff';
-					}
-					} else {
-					element.textContent = 'SEM META';
-					element.style.background = '#fff';
-					element.style.color = 'gray';
-					}
-				});
-			}
 		</script>
 
 	</cffunction>

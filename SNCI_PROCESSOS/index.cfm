@@ -397,10 +397,10 @@
             //Se o usuário não for do controle interno e não for o perfil 13 (CONSULTA), inicia o tour automaticamente
             if(usuarioControleInterno == 'N' && usuarioPerfil != '13'){
                 // Verifica se a preferência já foi marcada como "true"
-                var skipTourValue = localStorage.getItem("skipTour");
-                if (skipTourValue !== "true") {
-                    iniciarTourAutomaticamente();
-                }
+                // var skipTourValue = localStorage.getItem("skipTour");
+                // if (skipTourValue !== "true") {
+                //     iniciarTourAutomaticamente();
+                // }
             }
 			 
 
@@ -413,8 +413,7 @@
             //executar a partir do primeiro dia do mês para gerar os dados do mês anterior
             const firstDay = new Date(currentYear, currentMonth - 1, 1);
           
-           //se a data de hoje for maior ou igual ao primeiro dia do mês e se o usuário for do controle interno, executa a função
-                     
+           //se a data de hoje for maior ou igual ao primeiro dia do mês e se o usuário for do controle interno, executa a função 
             if (new Date() >= firstDay && usuarioControleInterno == 'S') {
                //ontém o mês anterior
                 const previousMonth = new Date().getMonth();

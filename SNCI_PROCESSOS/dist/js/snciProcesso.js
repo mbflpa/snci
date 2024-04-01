@@ -552,3 +552,19 @@ function updateRibbon(ribbon) {
       ribbon.text('SEM META').css('background', '#e3dada').css('color', '#000');
     }
 }
+
+//Atualiza a td das tabelas com indicadores
+
+function updateTDresultIndicadores(tdResult) {
+    const metaValue = parseFloat(tdResult.data('value'));
+
+    if (metaValue > 100) {
+      tdResult.text('ACIMA DO ESPERADO').css('background', '#0083CA').css('color', '#fff');
+    } else if (metaValue < 100) {
+      tdResult.text('ABAIXO DO ESPERADO').css('background', '#dc3545').css('color', '#fff');
+    } else if (metaValue === 100) {
+      tdResult.text('DENTRO DO ESPERADO').css('background', 'green').css('color', '#fff');
+    } else {
+      tdResult.text('SEM META').css('background', '#e3dada').css('color', '#000');
+    }
+}
