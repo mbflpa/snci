@@ -1156,7 +1156,7 @@
 										<td>#fps[orgao]#</td>
 										<td><strong>#percentualDPFormatado#%</strong></td>
 										<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
-											<td>0%</td>
+											<td>sem meta</td>
 										<cfelse>	
 											<td><strong>#metaPRCIorgaoFormatado#%</strong></td>
 										</cfif>
@@ -1652,16 +1652,17 @@
 									<td>#orgaos[orgao]#</td>
 									<td><strong>#percentualSolucionadoFormatado#%</strong></td>
 									<cfif rsMetaSLNC.pc_indMeta_meta eq ''>
-										<td>0%</td>
+										<td>sem meta</td>
 									<cfelse>	
 										<td><strong>#metaSLNCorgaoFormatado#%</strong></td>
 									</cfif>
 									<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
-
 								</tr>
+								<!-- calcular a média da coluna meta -->
+								<cfset avgMetaSLNCsubordinador = Round((totalMetaSubord/countMetaSubord)*10)/10>
+
 							</cfloop>
-							<!-- Calcula a média do órgao subordinador-->
-							<cfset avgMetaSLNCsubordinador = Round((totalMetaSubord/countMetaSubord)*10)/10>
+						
 							</tbody>
 						</tbody>
 					</cfoutput>
@@ -2592,26 +2593,37 @@
 			</cfquery>
 
 			<cfif rsMetaPRCI.pc_indMeta_meta neq "">
-				<cfset metaPRCIorgao=NumberFormat(0,0.0) />
-			<cfelse>
 				<cfset metaPRCIorgao= ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10 />
 			</cfif>
 			
-			<cfif rsMetaSLNC.pc_indMeta_meta eq "">
-				<cfset metaSLNCorgao=NumberFormat(0,0.0) />
-			<cfelse>
+			<cfif rsMetaSLNC.pc_indMeta_meta neq "">
 				<cfset metaSLNCorgao= ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10 />
 			</cfif>
+            
+			<cfif rsMetaPRCI.pc_indMeta_meta neq "" and rsMetaSLNC.pc_indMeta_meta neq "">			
+				<cfset metaDGCI = ROUND((metaPRCIorgao * rsPRCIpeso.pc_indPeso_peso) + (metaSLNCorgao * rsSLNCpeso.pc_indPeso_peso)*10)/10 />
+				<cfset metaDGCIformatado = Replace(metaDGCI,".",",")  />
+			<cfelseif rsMetaPRCI.pc_indMeta_meta eq "" and rsMetaSLNC.pc_indMeta_meta neq "">
+				<cfset metaDGCI = ROUND((metaSLNCorgao)*10)/10 />
+				<cfset metaDGCIformatado = Replace(metaDGCI,".",",")  />
+			<cfelseif rsMetaPRCI.pc_indMeta_meta neq "" and rsMetaSLNC.pc_indMeta_meta eq "">
+				<cfset metaDGCI = ROUND((metaPRCIorgao)*10)/10 />
+				<cfset metaDGCIformatado = Replace(metaDGCI,".",",")  />
+			<cfelse>
+				<cfset metaDGCI = "" />
+				<cfset metaDGCIformatado = "" />
+			</cfif>
 
-			<cfset metaDGCI = ROUND((metaPRCIorgao * rsPRCIpeso.pc_indPeso_peso) + (metaSLNCorgao * rsSLNCpeso.pc_indPeso_peso)*10)/10 />
-			<cfset metaDGCIformatado = Replace(metaDGCI,".",",")  />
+			
 
 
 
             <cfset percentualDGCI = ROUND((percentualDP * rsPRCIpeso.pc_indPeso_peso) + (percentualSolucionadoFormatado * rsSLNCpeso.pc_indPeso_peso )*10)/10 />
 			<cfset percentualDGCIformatado = Replace(percentualDGCI,".",",")  />
 			<cfif metaDGCI eq 0>
-				<cfset DGCIresultadoMeta = ROUND(0*10)/10 />	
+				<cfset DGCIresultadoMeta = ROUND(0*10)/10 />
+			<cfelseif metaDGCI eq ''>
+				<cfset DGCIresultadoMeta = '' />	
 			<cfelse>
 				<cfset DGCIresultadoMeta = ROUND((percentualDGCI/metaDGCI)*100*10)/10 />
 			</cfif>
@@ -2693,15 +2705,19 @@
 											<table id="tabDGCIorgaos" class="table table-bordered table-striped text-nowrap" style="width:100%; cursor:pointer">
 												<thead style="background: ##17a2b8; color: ##fff; text-align: center; ">
 													<tr style="font-size:14px;">
-														<th colspan="4" style="padding:5px">DGCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
+														<th colspan="6" style="padding:5px">DGCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
 													</tr>
 													<tr style="font-size:14px">
 														<th style="font-weight: normal!important">Órgão</th>
 														<th class="bg-gradient-warning" style="font-weight: normal!important">PRCI</th>
 														<th class="bg-gradient-warning" style="font-weight: normal!important">SLNC</th>
 														<th >DGCI</th>
+														<th >Meta</th>
+														<th>Resultado</th>
+
 													</tr>
 												</thead>
+												
 												<tbody id="theadTableBody">
 													<!-- Aqui serão inseridas as linhas da tabela via jQuery -->
 												</tbody>
@@ -2774,21 +2790,23 @@
 					prciRows.each(function() {
 						var orgao = $(this).find('td:first').text().trim(); // Nome do órgão
 						var prci = parseFloat($(this).find('td:eq(3)').text().replace('%', '').replace(',', '.').trim()); // Valor do PRCI
-
-						allOrgaos[orgao] = { 'PRCI': prci }; // Armazenar nome do órgão e PRCI
+						var metaPRCI = parseFloat($(this).find('td:eq(4)').text().replace('%', '').replace(',', '.').trim()); // Valor da meta do PRCI
+						allOrgaos[orgao] = { 'PRCI': prci, 'MetaPRCI': metaPRCI }; // Adicionar PRCI e meta do PRCI ao órgão
 					});
 
 					// Preencher allOrgaos com dados da tabela tabResumoSLNC
 					slncRows.each(function() {
 						var orgao = $(this).find('td:first').text().trim(); // Nome do órgão
 						var slnc = parseFloat($(this).find('td:eq(3)').text().replace('%', '').replace(',', '.').trim()); // Valor do SLNC
-
+						var metaSLNC = parseFloat($(this).find('td:eq(4)').text().replace('%', '').replace(',', '.').trim()); // Valor da meta do SLNC
 						// Verificar se o órgão já existe em allOrgaos
 						if (allOrgaos[orgao]) {
 							allOrgaos[orgao]['SLNC'] = slnc; // Adicionar SLNC ao órgão existente
+							allOrgaos[orgao]['MetaSLNC'] = metaSLNC; // Adicionar meta do SLNC ao órgão existente
 						} else {
-							allOrgaos[orgao] = { 'SLNC': slnc }; // Criar um novo órgão com SLNC
+							allOrgaos[orgao] = { 'SLNC': slnc, 'MetaSLNC': metaSLNC }; // Adicionar SLNC e meta do SLNC ao órgão
 						}
+						
 					});
 
 					// Preencher a terceira tabela com os dados calculados
@@ -2797,15 +2815,80 @@
 						let pesoSLNC = #rsSLNCpeso.pc_indPeso_peso#
 					</cfoutput>
 					$.each(allOrgaos, function(orgao, data) {
-						var prci = data['PRCI'] || 0; // PRCI do órgão, se não houver, definir como 0
-						var slnc = data['SLNC'] || 0; // SLNC do órgão, se não houver, definir como 0
-						var dgci = (prci * pesoPRCI) + (slnc * pesoSLNC); // Calcular o DGCI
+						var prci = data['PRCI'] ; 
+						var slnc = data['SLNC'] ; 
+						var metaPRCI = data['MetaPRCI'] ;
+						var metaSLNC = data['MetaSLNC'] ;
+						
+						if(isNaN(prci) && isNaN(slnc)){
+							var dgci ="sem dados";
+							var prci = "sem dados";
+							var slnc = "sem dados";
+													
+						} 
 
-						// Construir uma nova linha com os dados calculados
-						var newRow = '<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"><td>' + orgao + '</td>' +
-							'<td>' + prci.toFixed(1).replace('.', ',') + '%</td>' +
-							'<td>' + slnc.toFixed(1).replace('.', ',') + '%</td>' +
-							'<td><strong>' + dgci.toFixed(1).replace('.', ',') + '%</strong></td></tr>';
+						if(isNaN(prci) && !isNaN(slnc)){
+							var slnc = slnc
+							var prci = "sem dados";
+							var dgci = slnc;
+							
+						}
+						if(!isNaN(prci) && isNaN(slnc)){
+							var slnc = "sem dados";
+							var dgci = prci;
+						}	
+						if(!isNaN(prci) && !isNaN(slnc)){
+							var dgci = (prci * pesoPRCI) + (slnc * pesoSLNC); // Calcular o DGCI
+						}
+
+						if(isNaN(metaPRCI) && isNaN(metaSLNC)){
+							var dgci = "sem meta";
+							var resutadoDGCI = "sem meta";
+						}
+						if(isNaN(metaPRCI) && !isNaN(metaSLNC)){
+							var metaDGCI = metaSLNC;
+							var resutadoDGCI = (slnc/metaSLNC)*100;
+						}
+						if(!isNaN(metaPRCI) && isNaN(metaSLNC)){
+							var metaDGCI = metaPRCI;
+							var resutadoDGCI = (prci/metaPRCI)*100;
+						}
+						if(!isNaN(metaPRCI) && !isNaN(metaSLNC)){
+							var metaDGCI = (metaPRCI * pesoPRCI) + (metaSLNC * pesoSLNC); // Calcular a meta do DGCI
+							var resutadoDGCI = (dgci/metaDGCI)*100; // Calcular o resultado do DGCI
+						}
+
+						var formatNumber = function(number) {
+							// Verifica se o número é um número válido
+							if (!isNaN(number)) {
+								// Formata o número com uma casa decimal e substitui o ponto por vírgula
+								return parseFloat(number).toFixed(1).replace('.', ',');
+							} else {
+								// Se não for um número válido, retorna o valor original
+								return number;
+							}
+						};
+
+						var formatPercentage = function(number) {
+							// Verifica se o número é um número válido
+							if (!isNaN(number)) {
+								// Formata o número com uma casa decimal e substitui o ponto por vírgula
+								return formatNumber(number) + '%';
+							} else {
+								// Se não for um número válido, retorna uma string vazia
+								return number;
+							}
+						};
+
+						var newRow = '<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;">' +
+							'<td>' + orgao + '</td>' +
+							'<td>' + formatPercentage(prci) + '</td>' +
+							'<td>' + formatPercentage(slnc) + '</td>' +
+							'<td><strong>' + formatPercentage(dgci) + '</strong></td>' +
+							'<td>' + formatPercentage(metaDGCI) + '</td>' +
+							//inserir <td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+							'<td ><span class="tdResult statusOrientacoes" data-value="' + formatPercentage(resutadoDGCI) + '"></span></td>' +
+							'</tr>';
 
 						theadTable.append(newRow); // Adicionar nova linha à tabela tabDGCIorgaos
 						hasData = true; // Atualizar hasData para verdadeiro se houver dados
