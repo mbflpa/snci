@@ -91,11 +91,11 @@
 			$(".content-wrapper").css("height", "auto");
 
 			// Obtém o ano atual
-			//const currentYear = new Date().getFullYear();
-const currentYear = 2023;
+			const currentYear = new Date().getFullYear();
+//const currentYear = 2023;
 			// Obtém o mês atual
-			//const currentMonth = new Date().getMonth() + 1;
-const currentMonth = 12
+			const currentMonth = new Date().getMonth() + 1;
+//const currentMonth = 12
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {	
 				

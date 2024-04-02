@@ -1274,33 +1274,24 @@
 											
 
 											<div id="divResultPRCI" class="col-md-4 col-sm-4 col-4">
-												<div class="info-box bg-gradient-warning">
-													<div class="ribbon-wrapper ribbon-xl"  >
-														<cfif avgMetaPRCIsubordinador eq 0>
-															<div class="ribbon" id="ribbon" data-value=""></div>
-														<cfelse>
-															<div class="ribbon" id="ribbon" data-value="#PRCIresultadoMeta#"></div>
-														</cfif>
-													</div>
-													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
-
-													<div class="info-box-content">
-														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">PRCI = #percentualDPFormatado#%</font></font></span><span style="font-size:12px;position:absolute; top:36px">Atendimento ao Prazo de Resposta</span>
-														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#PRCIresultadoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (PRCI / Meta) * 100</span></span>
-
-														<div class="progress" style="width:90%">
-															<div class="progress-bar" style="width: #PRCIresultadoMeta#%"></div>
-														</div>
-														<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-															<span style="font-size:14px">PRCI = TIDP/TGI</span><br>
+												
+												<cfset 	infoRodape = '<span style="font-size:14px">PRCI = TIDP/TGI</span><br>
 															<span style="font-size:14px">TIDP (Posic. dentro do prazo (DP))= #totalDP#</span><br>
 															<span style="font-size:14px">TGI (Total de Posicionamentos)= #totalGeral# </span><br>
-															<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#%</span><br>
-														</font></font></span>
-													</div>
-													<!-- /.info-box-content -->
-												</div>
-												<!-- /.info-box -->
+															<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#%</span><br>'>			
+												<cfset var criarCardIndicador = criarCardIndicador(
+													tipoDeCard = 'bg-gradient-warning',
+													siglaIndicador ='PRCI',
+													percentualIndicadorFormatado = percentualDPFormatado,
+													resultadoEmRelacaoMeta = PRCIresultadoMeta,
+													resultadoEmRelacaoMetaFormatado = PRCIresultadoMetaFormatado,
+													infoRodape = infoRodape
+
+												)>
+
+												<cfoutput>#criarCardIndicador#</cfoutput>
+
+
 											</div>
 											
 										</cfoutput>
@@ -1760,33 +1751,27 @@
 											
 											
 											<div id="divResultSLNC" class="col-md-6 col-sm-6 col-12">
-												<div class="info-box bg-gradient-warning">
-												    <div class="ribbon-wrapper ribbon-xl"  >
-													    <cfif avgMetaSLNCsubordinador eq 0>
-															<div class="ribbon" id="ribbon" data-value=""></div>
-														<cfelse>
-															<div class="ribbon" id="ribbon" data-value="#SLNCresultadoMeta#"></div>
-														</cfif>
-													</div>
-													<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
-
-													<div class="info-box-content">
-														<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">SLNC = #percentualSolucionadoFormatado#%</font></font></span><span style="font-size:12px;position:absolute; top:36px">Solução de Não Conformidades</span>
-														<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#SLNCresultadoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (SLNC / Meta) * 100</span></span>
-
-														<div class="progress" style="width:90%">
-														<div class="progress-bar" style="width: #percentualSolucionado#%"></div>
-														</div>
-														<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-															<span style="font-size:14px">SLNC = QTSL/QTNC x 100</span><br>
+												
+												<cfset 	infoRodape = '<span style="font-size:14px">SLNC = QTSL/QTNC x 100</span><br>
 															<span style="font-size:14px">QTSL (Quant. Orientações Solucionadas)= #totalSolucionado#</span><br>
 															<span style="font-size:14px">QTNC (Quant. Orientações Registradas )= #totalGeral#</span><br>
-															<span style="font-size:14px">Meta = #metaSLNCorgaoFormatado#%</span><br>
-														</font></font></span>
-													</div>
-													<!-- /.info-box-content -->
-												</div>
-												<!-- /.info-box -->
+															<span style="font-size:14px">Meta = #metaSLNCorgaoFormatado#%</span><br>'>			
+												<cfset var criarCardIndicador = criarCardIndicador(
+													tipoDeCard = 'bg-gradient-warning',
+													siglaIndicador ='SLNC',
+													percentualIndicadorFormatado = percentualSolucionadoFormatado,
+													resultadoEmRelacaoMeta = SLNCresultadoMeta,
+													resultadoEmRelacaoMetaFormatado = SLNCresultadoMetaFormatado,
+													infoRodape = infoRodape
+
+												)>
+
+												<cfoutput>#criarCardIndicador#</cfoutput>
+												
+
+
+
+
 											</div>
 											
 										</cfoutput>
@@ -2619,7 +2604,7 @@
 
 
             <cfset percentualDGCI = ROUND((percentualDP * rsPRCIpeso.pc_indPeso_peso) + (percentualSolucionadoFormatado * rsSLNCpeso.pc_indPeso_peso )*10)/10 />
-			<cfset percentualDGCIformatado = Replace(percentualDGCI,".",",")  />
+			<cfset percentualDGCIformatado = Replace(NumberFormat(percentualDGCI,0.0),".",",")  />
 			<cfif metaDGCI eq 0>
 				<cfset DGCIresultadoMeta = ROUND(0*10)/10 />
 			<cfelseif metaDGCI eq ''>
@@ -2628,7 +2613,7 @@
 				<cfset DGCIresultadoMeta = ROUND((percentualDGCI/metaDGCI)*100*10)/10 />
 			</cfif>
 
-			<cfset DGCIresultadoMetaFormatado = Replace(DGCIresultadoMeta,".",",") />
+			<cfset DGCIresultadoMetaFormatado = Replace(NumberFormat(DGCIresultadoMeta,0.0),".",",") />
 	
 			<div align="center" class="col-md-12 col-sm-12 col-12 mx-auto" style="margin-bottom:10px">
 				<span class="info-box-text" style="font-size:30px">#monthAsString(arguments.mes)#/#arguments.ano#</span>
@@ -2644,31 +2629,20 @@
 							<cfelse>
 								<h5 style="text-align: center; margin-bottom:20px">RESULTADO GERAL DO ÓRGÃO <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></h5>
 								<div id="divResultadoDGCI" class="col-md-5 col-sm-5 col-12 mx-auto">
-									<div class="info-box bg-info">
-										<div class="ribbon-wrapper ribbon-xl"  >
-											<cfif metaDGCI eq 0>
-												<div class="ribbon" id="ribbon" data-value=""></div>
-											<cfelse>
-											 	<div class="ribbon" id="ribbon" data-value="#DGCIresultadoMeta#"></div>
-											</cfif>
-										</div>
-										
-										<span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
+									
+									<cfset 	infoRodape = '<span style="font-size:14px">DGCI = #percentualDGCIformatado#% (PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>
+											        	<span style="font-size:14px">Meta = #metaDGCIformatado#%  (Meta PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (Meta SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>'>			
+									<cfset var criarCardIndicador = criarCardIndicador(
+										tipoDeCard = 'bg-info',
+										siglaIndicador ='DGCI',
+										percentualIndicadorFormatado = percentualDGCIformatado,
+										resultadoEmRelacaoMeta = DGCIresultadoMeta,
+										resultadoEmRelacaoMetaFormatado = DGCIresultadoMetaFormatado,
+										infoRodape = infoRodape
+									)>
 
-										<div class="info-box-content">
-											<span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:30px"><strong>DGCI = #percentualDGCIformatado#%</strong></font></font></span><span style="font-size:12px;position:absolute; top:48px">Desempenho Geral de Controle Interno</span>
-											<span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#DGCIresultadoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (DGCI / Meta) * 100</span></span>
+									<cfoutput>#criarCardIndicador#</cfoutput>
 
-											<div class="progress" style="width:90%">
-												<div class="progress-bar" style="width: #DGCIresultadoMeta#%"></div>
-											</div>
-											<span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
-												<span style="font-size:14px">DGCI = #percentualDGCIformatado#% (PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>
-												<span style="font-size:14px">Meta = #metaDGCIformatado#%  (Meta PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (Meta SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>
-											</font></font></span>
-										</div>
-										<!-- /.info-box-content -->
-									</div>
 								
 								</div>	
 								<div class="col-12">
@@ -4337,6 +4311,47 @@
 		</script>
 
 	</cffunction>
+
+
+	<cffunction name="criarCardIndicador" access="public" returntype="string" hint="cria os cards com as informações dos resultados dos indicadores">
+    	<cfargument name="tipoDeCard" type="string" required="no" default="bg-info">
+		<cfargument name="siglaIndicador" type="string" required="yes">
+        <cfargument name="percentualIndicadorFormatado" type="string" required="yes">
+        <cfargument name="resultadoEmRelacaoMeta" type="numeric" required="yes">
+		<cfargument name="resultadoEmRelacaoMetaFormatado" type="string" required="yes">
+        <cfargument name="infoRodape" type="string" required="yes">
+
+        <cfset var infoBox = "">
+        
+        <cfoutput>
+            <cfsavecontent variable="infoBox">
+                <div class="info-box #tipoDeCard#">
+                    <div class="ribbon-wrapper ribbon-xl">
+                        
+                        <div class="ribbon" id="ribbon" data-value="#resultadoEmRelacaoMeta#"></div>
+                       
+                    </div>
+                    <span class="info-box-icon"><i class="fas fa-chart-line" style="font-size:45px"></i></span>
+
+                    <div class="info-box-content">
+                        <span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">#siglaIndicador# = #percentualIndicadorFormatado#%</font></font></span><span style="font-size:12px;position:absolute; top:36px">Atendimento ao Prazo de Resposta</span>
+                        <span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#resultadoEmRelacaoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (#siglaIndicador# / Meta) * 100</span></span>
+
+                        <div class="progress" style="width:90%">
+                            <div class="progress-bar" style="width: #resultadoEmRelacaoMeta#%"></div>
+                        </div>
+                        <span class="progress-description"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;">
+                            #infoRodape#
+                        </font></font></span>
+                    </div>
+                </div>
+            </cfsavecontent>
+        </cfoutput>
+        
+        <cfreturn infoBox>
+    </cffunction>
+
+    
 
 
 
