@@ -2629,7 +2629,7 @@
 							<cfelse>
 								<h5 style="text-align: center; margin-bottom:20px">RESULTADO GERAL DO ÓRGÃO <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></h5>
 								<div id="divResultadoDGCI" class="col-md-5 col-sm-5 col-12 mx-auto">
-									
+									<!--- Cria um card com o resultado do indicador --->
 									<cfset 	infoRodape = '<span style="font-size:14px">DGCI = #percentualDGCIformatado#% (PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>
 											        	<span style="font-size:14px">Meta = #metaDGCIformatado#%  (Meta PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (Meta SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>'>			
 									<cfset var criarCardIndicador = criarCardIndicador(
@@ -2640,10 +2640,8 @@
 										resultadoEmRelacaoMetaFormatado = DGCIresultadoMetaFormatado,
 										infoRodape = infoRodape
 									)>
-
 									<cfoutput>#criarCardIndicador#</cfoutput>
-
-								
+									<!--- Fim do card --->								
 								</div>	
 								<div class="col-12">
 									
