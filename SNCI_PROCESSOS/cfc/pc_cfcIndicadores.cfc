@@ -4349,6 +4349,690 @@
         <cfreturn infoBox>
     </cffunction>
 
+
+
+
+
+	
+
+	<cffunction name="consultaIndicadorPRCI_diario_paraTbResumo"   access="remote" hint="gera a consulta para página de indicadores - acompanhamento diário para a tabela de resumo com os órgaos responsáveis subordinados ao órgão avaliado.">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+
+	
+		<cfset dataInicial = createODBCDate(createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))>
+		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+	
+
+		<cfquery name="rs_PRCIorgaosResp" datasource="#application.dsn_processos#" timeout="120">
+			WITH rs_OrientacaoUniao AS (	
+				SELECT
+					orgaoResp.pc_org_sigla as orgaoResp,
+					orgaoResp.pc_org_mcu as orgaoRespMCU,
+					SUM(CASE
+						WHEN (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> <= GETDATE() and pc_aval_posic_dataPrevistaResp < <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">) 
+						OR (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> > GETDATE() and pc_aval_posic_dataPrevistaResp < GETDATE()) 
+						THEN 1 ELSE 0
+					END) AS FP,
+					SUM(CASE
+						WHEN (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> <= GETDATE() and pc_aval_posic_dataPrevistaResp >= <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">) 
+						OR (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date"> > GETDATE() and pc_aval_posic_dataPrevistaResp >= GETDATE()) 
+						THEN 1 ELSE 0
+					END) AS DP
+				FROM (
+					SELECT
+						pc_aval_posic_id,
+						pc_aval_posic_num_orientacao,
+						pc_aval_posic_status,
+						pc_aval_posic_num_orgaoResp,
+						pc_aval_posic_datahora,
+						pc_aval_posic_dataPrevistaResp,
+						pc_aval_posic_enviado,
+						pc_aval_posic_num_orgao,
+						ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
+					FROM
+						pc_avaliacao_posicionamentos
+					WHERE 
+						pc_aval_posic_enviado = 1
+						AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+		
+				) AS ranked_posicionamentos
+				INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
+				INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
+				INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+				INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+				INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+				INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
+				INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
+				WHERE
+					ranked_posicionamentos.row_num = 1
+					AND pc_aval_posic_status IN (4, 5)
+					AND pc_aval_posic_enviado = 1
+					AND (
+						pc_aval_posic_num_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+						OR pc_aval_posic_num_orgaoResp IN (
+							SELECT pc_orgaos.pc_org_mcu
+							FROM pc_orgaos
+							WHERE (
+								pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								OR pc_org_mcu_subord_tec IN (
+									SELECT pc_orgaos.pc_org_mcu
+									FROM pc_orgaos
+									WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								)
+							)
+						)
+						<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
+					) 
+					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu
+		
+
+				UNION 
+		
+				SELECT
+					orgaoResp.pc_org_sigla as orgaoResp,
+					orgaoResp.pc_org_mcu as orgaoRespMCU,
+					SUM(CASE
+						WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp < pc_avaliacao_posicionamentos.pc_aval_posic_datahora
+						THEN 1 ELSE 0
+					END) AS FP,
+					SUM(CASE
+						WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp >= pc_avaliacao_posicionamentos.pc_aval_posic_datahora
+						THEN 1 ELSE 0
+					END) AS DP
+				FROM pc_avaliacao_posicionamentos
+				INNER JOIN pc_orgaos as orgaoResp ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
+				INNER JOIN pc_orgaos as orgaoDaAcao ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
+				INNER JOIN pc_avaliacao_orientacoes ON pc_avaliacao_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+				INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+				INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+				INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
+				INNER JOIN pc_orientacao_status ON pc_avaliacao_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
+				WHERE pc_avaliacao_posicionamentos.pc_aval_posic_status IN (3)
+					AND (pc_aval_posic_num_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+						OR pc_aval_posic_num_orgaoResp IN (
+							SELECT pc_orgaos.pc_org_mcu
+							FROM pc_orgaos
+							WHERE (
+								pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								OR pc_org_mcu_subord_tec IN (
+									SELECT pc_orgaos.pc_org_mcu
+									FROM pc_orgaos
+									WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								)
+							)
+						)
+						<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
+					) 
+					
+					AND pc_avaliacao_posicionamentos.pc_aval_posic_datahora 
+					BETWEEN <cfqueryparam value="#dataInicial#" cfsqltype="cf_sql_date"> AND <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+					AND pc_avaliacao_posicionamentos.pc_aval_posic_enviado = 1
+					GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu
+
+			)
+			SELECT orgaoResp, orgaoRespMCU, SUM(FP) as totalFP, SUM(DP) as totalDP
+			FROM rs_OrientacaoUniao
+			GROUP BY orgaoResp, orgaoRespMCU
+			ORDER BY orgaoResp
+			
+		</cfquery>
+
+		<cfreturn #rs_PRCIorgaosResp#>
+
+	</cffunction>
+
+	<cffunction name="consultaIndicadorSLNC_diario_paraTbResumo"   access="remote" hint="gera a consulta para página de indicadores - acompanhamento diário">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+
+	
+		<cfset dataInicial = createODBCDate(createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))>
+		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+
+		<cfquery name="rs_SLNC_orgaosResp" datasource="#application.dsn_processos#" timeout="120">
+			WITH slnc_subconsulta AS (	
+				SELECT
+					orgaoResp.pc_org_sigla as orgaoResp,
+					orgaoResp.pc_org_mcu as orgaoRespMCU,
+					Count(pc_aval_posic_id) as totalSolucionados,
+					0 as totalTratamento
+				FROM (
+					SELECT
+						pc_aval_posic_id,
+						pc_aval_posic_num_orientacao,
+						pc_aval_posic_status,
+						pc_aval_posic_num_orgaoResp,
+						pc_aval_posic_datahora,
+						pc_aval_posic_dataPrevistaResp,
+						pc_aval_posic_enviado,
+						pc_aval_posic_num_orgao,
+						ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
+					FROM
+						pc_avaliacao_posicionamentos
+					WHERE 
+						pc_aval_posic_enviado = 1
+						AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+
+				) AS ranked_posicionamentos
+				LEFT JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
+				INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
+				INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+				INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+				INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+				INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
+				INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
+				WHERE
+					ranked_posicionamentos.row_num = 1
+					AND pc_aval_posic_status IN (6)
+					AND pc_aval_posic_enviado = 1
+					AND (pc_aval_posic_num_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+						OR pc_aval_posic_num_orgaoResp IN (
+							SELECT pc_orgaos.pc_org_mcu
+							FROM pc_orgaos
+							WHERE (
+								pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								OR pc_org_mcu_subord_tec IN (
+									SELECT pc_orgaos.pc_org_mcu
+									FROM pc_orgaos
+									WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								)
+							)
+						)
+						<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
+					) 
+					AND pc_aval_posic_datahora
+					BETWEEN <cfqueryparam value="#dataInicial#" cfsqltype="cf_sql_date"> AND <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+					GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu	
+				UNION
+
+				SELECT
+					orgaoResp.pc_org_sigla as orgaoResp,
+					orgaoResp.pc_org_mcu as orgaoRespMCU,
+					0 as totalSolucionados,
+					Count(pc_aval_posic_id) as totalTratamento
+				FROM (
+					SELECT
+						pc_aval_posic_id,
+						pc_aval_posic_num_orientacao,
+						pc_aval_posic_status,
+						pc_aval_posic_num_orgaoResp,
+						pc_aval_posic_datahora,
+						pc_aval_posic_dataPrevistaResp,
+						pc_aval_posic_enviado,
+						pc_aval_posic_num_orgao,
+						ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
+					FROM
+						pc_avaliacao_posicionamentos
+					WHERE 
+						pc_aval_posic_enviado = 1
+						AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+
+				) AS ranked_posicionamentos
+				INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
+				INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
+				INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
+				INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+				INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+				INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
+				INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
+				WHERE
+					ranked_posicionamentos.row_num = 1
+					AND pc_aval_posic_status IN (5)
+					AND pc_aval_posic_enviado = 1
+					AND (
+						pc_aval_posic_num_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+						OR pc_aval_posic_num_orgaoResp IN (
+							SELECT pc_orgaos.pc_org_mcu
+							FROM pc_orgaos
+							WHERE (
+								pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								OR pc_org_mcu_subord_tec IN (
+									SELECT pc_orgaos.pc_org_mcu
+									FROM pc_orgaos
+									WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								)
+							)
+						)
+						<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
+					) 
+					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu
+			)
+			SELECT
+				orgaoResp,
+				orgaoRespMCU,
+				SUM(totalSolucionados) as totalSolucionados,
+				SUM(totalTratamento) as totalTratamento
+			FROM
+				slnc_subconsulta
+			GROUP BY orgaoResp, orgaoRespMCU
+					
+		</cfquery>
+		
+		<cfreturn #rs_SLNC_orgaosResp#>
+
+	</cffunction>
+
+	<cffunction name="tabResumoPRCIorgaosResp_AcompDiario" access="remote" returntype="string" hint="cria o card com as informações dos resultados do PRCI">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+		
+    	<cfset var resultado = consultaIndicadorPRCI_diario_paraTbResumo(ano=arguments.ano, mes=arguments.mes)>
+       
+		<!-- tabela resumo -->
+		<cfif resultado.recordcount neq 0>
+			<div id="divTabResumoPRCIorgaos" class="table-responsive">
+				<table id="tabResumoPRCIorgaos" class="table table-bordered table-striped text-nowrap " style="width:350px; cursor:pointer">
+					<cfoutput>
+						
+						<thead class="bg-gradient-warning" style="text-align: center;">
+							<tr style="font-size:14px">
+								<th colspan="6" style="padding:5px">PRCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span>NOVO</th>
+							</tr>
+							<tr style="font-size:14px">
+								<th style="font-weight: normal!important">Órgão</th>
+								<th style="font-weight: normal!important">TIDP</th>
+								<th style="font-weight: normal!important">TGI</th>
+								<th >PRCI</th>
+								<th >Meta</th>
+								<th >Resultado</th>
+							</tr>
+						</thead>
+						<tbody>
+							
+							<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
+
+								<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
+									SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+									WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+											AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+											AND pc_indMeta_numIndicador = 1
+											AND pc_indMeta_mcuOrgao = '#orgaoRespMCU#'
+								</cfquery>
+								
+								<!--- Adiciona cada linha à tabela --->
+								<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+									<td>#orgaoResp# (#orgaoRespMCU#)</td>
+									<td>#totalDP#</td>
+									<td>#(totalDP + totalFP)#</td>
+									<cfset percentualDP = NumberFormat(Round((totalDP / (totalDP + totalFP)) * 100*10)/10,0.0)>
+									<td><strong>#percentualDP#%</strong></td>
+									<cfset metaPRCIorgao = 0>
+									<cfif rsMetaPRCI.pc_indMeta_meta neq ''>
+										<cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
+									</cfif>
+									<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
+										<td>sem meta</td>
+									<cfelse>	
+										<td><strong>#metaPRCIorgao#%</strong></td>
+									</cfif>
+									<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualDP*10)/10 / metaPRCIorgao)*100*10)/10>
+									<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+
+								</tr>
+							</cfloop>
+						</tbody>
+						<tfoot >
+							<tr>
+								<th colspan="6" style="font-weight: normal; font-size: smaller;">
+									<li>TIDP = Total de orientações dentro do prazo (status “Não respondido” e “Tratamento”); </li>
+									<li>TGI  = Total Geral de orientações (status "Respondido", “Não Respondido”, “Tratamento” e “Pendente”); </li>
+									<li>PRCI = Atendimento ao Prazo de Resposta = (TIDP/TGI)x100.</li>
+									Obs.: Se uma determinada gerência não estiver representada na tabela, isso indica que não houve orientações com o status necessário para a computação do indicador em questão.
+								</th>
+							</tr>
+						</tfoot>
+					</cfoutput>
+				</table>
+			</div>
+									
+
+
+		</cfif>
+		<script language="JavaScript">
+
+		    // Define a função para aplicar o estilo apenas nas células com a classe 'tdResult'
+			function aplicarEstiloNasTDsComClasseTdResult() {
+				// Para cada célula com a classe 'tdResult' na tabela
+				$('.tdResult').each(function() {
+					updateTDresultIndicadores($(this));
+				});
+			}
+
+			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			$('#tabResumoPRCIorgaos').DataTable({
+				order: [[3, 'desc'], [4, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
+				lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
+				paging: false, // Remove a paginação
+				info: false, // Remove a exibição da quantidade de registros
+				searching: false, // Remove o campo de busca
+				drawCallback: function (settings) {
+					aplicarEstiloNasTDsComClasseTdResult();
+				}
+			});
+			$(document).ready(function() {
+				$(".content-wrapper").css("height", "auto");
+    
+
+			});
+		</script>
+
+
+
+
+	</cffunction>
+
+	<cffunction name="tabResumoSLNCorgaosResp_AcompDiario" access="remote" returntype="string" hint="cria o card com as informações dos resultados do SLNC">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+		
+    	<cfset var resultado = consultaIndicadorSLNC_diario_paraTbResumo(ano=arguments.ano, mes=arguments.mes)>
+       
+		<!-- tabela resumo -->
+		<cfif resultado.recordcount neq 0>
+				<div id="divTabResumoSLNCorgaos" class="table-responsive">
+					<table id="tabResumoSLNCorgaos" class="table table-bordered table-striped text-nowrap" style="width:350px; cursor:pointer">
+						<cfoutput>
+							<thead class="bg-gradient-warning" style="text-align: center;">
+								<tr style="font-size:14px">
+									<th colspan="6" style="padding:5px">SLNC - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span>NOVO</th>
+								</tr>
+								<tr style="font-size:14px">
+									<th>Órgão</th>
+									<th>QTSL</th>
+									<th>QTNC</th>
+									<th>SLNC</th>
+									<th>Meta</th>
+									<th>Resultado</th>
+								</tr>
+							</thead>
+							<tbody>
+								
+								<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->	
+									<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
+										SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+										WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_numIndicador = 2
+												AND pc_indMeta_mcuOrgao = '#orgaoRespMCU#'
+									</cfquery>
+									
+									<!--- Adiciona cada linha à tabela --->
+									<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+										<td>#orgaoResp# (#orgaoRespMCU#)</td>
+										<td>#totalSolucionados#</td>
+										<cfset totalOrientacoes = totalSolucionados + totalTratamento>
+										<td>#totalOrientacoes#</td>
+										<cfset percentualSolucionado = NumberFormat(Round((totalSolucionados / totalOrientacoes) * 100*10)/10,0.0)>
+										<td><strong>#percentualSolucionado#%</strong></td>
+										<cfset metaSLNCorgao = 0>
+										<cfif rsMetaSLNC.pc_indMeta_meta neq ''>
+											<cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>
+										</cfif>
+								
+										<cfif rsMetaSLNC.pc_indMeta_meta eq ''>
+											<td>sem meta</td>
+										<cfelse>	
+											<td><strong>#metaSLNCorgao#%</strong></td>
+										</cfif>
+										<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualSolucionado*10)/10 / metaSLNCorgao)*100*10)/10>
+										<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+									</tr>
+
+								</cfloop>
+								
+							</tbody>
+							<tfoot >
+							   <tr>
+								    <th colspan="6" style="font-weight: normal; font-size: smaller;">
+										<li>QTSL = Quantidade de orientações Solucionadas (somente com status Solucionado no SNCI);</li>
+										<li>QTNC = Quantidade de Orientações Registradas (abrange as orientações nos status Pendente + Tratamento + Solucionado no SNCI);</li>
+										<li>SLNC = Solução de Não Conformidades = (QTSL/QTNC)x100.</li>
+										Obs.: Se uma determinada gerência não estiver representada na tabela, isso indica que não houve orientações com o status necessário para a computação do indicador em questão.
+									</th>
+									
+								</tr>
+							</tfoot>
+						</cfoutput>
+					</table>
+				</div>
+
+		</cfif>
+		<script language="JavaScript">
+
+		    // Define a função para aplicar o estilo apenas nas células com a classe 'tdResult'
+			function aplicarEstiloNasTDsComClasseTdResult() {
+				// Para cada célula com a classe 'tdResult' na tabela
+				$('.tdResult').each(function() {
+					updateTDresultIndicadores($(this));
+				});
+			}
+
+			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			$('#tabResumoSLNCorgaos').DataTable({
+				order: [[3, 'desc'], [4, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
+				lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
+				paging: false, // Remove a paginação
+				info: false, // Remove a exibição da quantidade de registros
+				searching: false, // Remove o campo de busca
+				drawCallback: function (settings) {
+					aplicarEstiloNasTDsComClasseTdResult();
+				}
+			});
+			$(document).ready(function() {
+				$(".content-wrapper").css("height", "auto");
+    
+
+			});
+		</script>
+
+
+
+
+	</cffunction>
+
+	<cffunction name="tabResumoDGCIorgaosResp_AcompDiario" access="remote" returntype="string" hint="cria o card com as informações dos resultados do DGCI">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+		<cfset var resultadoPRCI = consultaIndicadorPRCI_diario_paraTbResumo(ano=arguments.ano, mes=arguments.mes)>
+    	<cfset var resultadoSLNC = consultaIndicadorSLNC_diario_paraTbResumo(ano=arguments.ano, mes=arguments.mes)>
+
+		<cfquery dbtype="query" name="rs_Orgaos" >
+			SELECT orgaoResp, orgaoRespMCU FROM resultadoPRCI
+			UNION
+			SELECT orgaoResp, orgaoRespMCU FROM resultadoSLNC
+		</cfquery>
+
+		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
+				WHERE  pc_indPeso_numIndicador = 1 
+				and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+				and pc_indPeso_ativo = 1
+		</cfquery>
+
+		<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
+				WHERE pc_indPeso_numIndicador = 2 
+				and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+				and pc_indPeso_ativo = 1
+		</cfquery>
+
+		<!-- tabela resumo -->
+		<cfif rs_Orgaos.recordCount neq 0>
+			<div id="divTabResumoIndicadores" class="table-responsive">
+				<div id="divTabDGCIorgaos" class="table table-bordered table-striped text-nowrap" style="width:350px; cursor:pointer">
+					<div style="width: 500px; margin: 0 auto;">
+						<table id="tabResumoDGCIorgaos" class="table table-bordered table-striped text-nowrap" style="width:100%; cursor:pointer">
+							<cfoutput>
+								<thead class="bg-gradient-info" style="text-align: center;">
+									<tr style="font-size:14px;">
+										<th colspan="6" style="padding:5px">DGCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
+									</tr>
+									<tr style="font-size:14px">
+									
+										<th >Órgão</th>
+										<th >PRCI</th>
+										<th >SLNC</th>
+										<th >DGCI</th>
+										<th >Meta</th>
+										<th >Resultado</th>
+										
+									</tr>
+								</thead>
+								
+								<tbody >
+									<cfloop query="rs_Orgaos"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->	
+										<cfquery name="rsResultadoPRCI" dbtype="query">
+											SELECT * FROM resultadoPRCI WHERE orgaoRespMCU = '#orgaoRespMCU#'
+										</cfquery>
+
+										<cfquery name="rsResultadoSLNC" dbtype="query">
+											SELECT * FROM resultadoSLNC WHERE orgaoRespMCU = '#orgaoRespMCU#'
+										</cfquery>
+
+										<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
+											SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+											WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+													AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+													AND pc_indMeta_numIndicador = 1
+													AND pc_indMeta_mcuOrgao = '#orgaoRespMCU#'
+										</cfquery>
+									
+										<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
+											SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+											WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+													AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+													AND pc_indMeta_numIndicador = 2
+													AND pc_indMeta_mcuOrgao = '#orgaoRespMCU#'
+										</cfquery>
+
+										
+											<!--- Adiciona cada linha à tabela --->
+											<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+												<td>#orgaoResp# (#orgaoRespMCU#)</td>
+												<cfset percentualPRCI = "sem dados">
+												<cfif rsResultadoPRCI.recordcount neq 0>
+													<cfset percentualPRCI = NumberFormat(Round((rsResultadoPRCI.totalDP / (rsResultadoPRCI.totalDP + rsResultadoPRCI.totalFP)) * 100*10)/10,0.0)>
+													<td><strong>#percentualPRCI#%</strong></td>
+												<cfelse>
+													<td>sem dados</td>
+												</cfif>
+												<cfif rsResultadoSLNC.recordcount neq 0>
+													<cfset percentualSLNC = NumberFormat(Round((rsResultadoSLNC.totalSolucionados / (rsResultadoSLNC.totalSolucionados + rsResultadoSLNC.totalTratamento)) * 100*10)/10,0.0)>
+													<td><strong>#percentualSLNC#%</strong></td>
+												<cfelse>
+													<td>sem dados</td>
+												</cfif>
+												<cfset pesoPRCI = 0>
+												<cfset pesoSLNC = 0>
+												<cfif rsPRCIpeso.recordcount neq 0>
+													<cfset pesoPRCI = rsPRCIpeso.pc_indPeso_peso>
+												</cfif>
+												<cfif rsSLNCpeso.recordcount neq 0>
+													<cfset pesoSLNC = rsSLNCpeso.pc_indPeso_peso>
+												</cfif>
+												<cfset percentualDGCI = 0>
+												<cfif rsResultadoPRCI.recordcount neq 0 and rsResultadoSLNC.recordcount neq 0>
+													<cfset percentualDGCI = NumberFormat(Round(((percentualPRCI * pesoPRCI) + (percentualSLNC * pesoSLNC))*10)/10,0.0)>
+													<td><strong>#percentualDGCI#%</strong></td>
+												<cfelseif rsResultadoPRCI.recordcount neq 0 and rsResultadoSLNC.recordcount eq 0>
+													<cfset percentualDGCI = percentualPRCI>
+													<td><strong>#percentualDGCI#%</strong></td>
+												<cfelseif rsResultadoPRCI.recordcount eq 0 and rsResultadoSLNC.recordcount neq 0>
+													<cfset percentualDGCI = percentualSLNC>
+													<td><strong>#percentualDGCI#%</strong></td>
+												<cfelse>
+													<td>sem dados</td>
+												</cfif>
+
+												<cfset metaPRCIorgao = 0>
+												<cfif rsMetaPRCI.pc_indMeta_meta neq ''>
+													<cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
+												</cfif>
+												<cfset metaSLNCorgao = 0>
+												<cfif rsMetaSLNC.pc_indMeta_meta neq ''>
+													<cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>	
+												</cfif>
+												<cfif rsResultadoPRCI.recordcount neq 0 and rsResultadoSLNC.recordcount neq 0> 
+													<cfset metaDGCIorgao = NumberFormat(ROUND(((metaPRCIorgao * pesoPRCI) + (metaSLNCorgao * pesoSLNC))*10)/10,0.0)>
+												<cfelseif rsResultadoPRCI.recordcount neq 0 and rsResultadoSLNC.recordcount eq 0>
+													<cfset metaDGCIorgao = metaPRCIorgao >
+												<cfelseif rsResultadoPRCI.recordcount eq 0 and rsResultadoSLNC.recordcount neq 0>
+													<cfset metaDGCIorgao = metaSLNCorgao >
+												<cfelse>
+													<cfset metaDGCIorgao = NumberFormat(0,0.0) >
+												</cfif>
+												<td ><strong>#metaDGCIorgao#%</strong></td>
+												
+
+
+												
+												<cfif metaDGCIorgao eq 0>
+													<cfset resultMesEmRelacaoMeta = 0>
+													<td>sem meta</td>
+												<cfelse>
+													<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualDGCI*10)/10 / metaDGCIorgao)*100*10)/10>
+													<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+												</cfif>
+											</tr>
+										
+									</cfloop>
+								</tbody>
+								<tfoot >
+								<tr>
+										<th colspan="6" style="font-weight: normal; font-size: smaller;">
+											<li>DGCI = Desempenho Geral do Controle Interno = (PRCI x peso do PRCI) + (SLNC x peso do SLNC) = (PRCI x #pesoPRCI#) + (SLNC x #pesoSLNC#)</li>
+										    <li>Meta = (Meta PRCI x peso do PRCI) + (Meta do SLNC x peso SLNC) = (Meta PRCI x #pesoPRCI#) + (Meta SLNC x #pesoSLNC#)</li>
+											Obs.: Caso não existam dados para o PRCI ou SLNC, os cálculos acima serão feitos apenas com os resultados e metas do indicador disponível, sem multiplicação pelo seu peso.
+										</th>
+										
+									</tr>
+								</tfoot>
+                            </cfoutput>
+						</table>
+					</div>
+				</div>
+				
+				
+			</div>
+		</cfif>
+
+		<script language="JavaScript">
+
+		    // Define a função para aplicar o estilo apenas nas células com a classe 'tdResult'
+			function aplicarEstiloNasTDsComClasseTdResult() {
+				// Para cada célula com a classe 'tdResult' na tabela
+				$('.tdResult').each(function() {
+					updateTDresultIndicadores($(this));
+				});
+			}
+
+			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			$('#tabResumoDGCIorgaos').DataTable({
+				order: [[3, 'desc'], [4, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
+				lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
+				paging: false, // Remove a paginação
+				info: false, // Remove a exibição da quantidade de registros
+				searching: false, // Remove o campo de busca
+				drawCallback: function (settings) {
+					aplicarEstiloNasTDsComClasseTdResult();
+				}
+			});
+			$(document).ready(function() {
+				$(".content-wrapper").css("height", "auto");
+    
+
+			});
+		</script>
+
+	</cffunction>
+
+
     
 
 
