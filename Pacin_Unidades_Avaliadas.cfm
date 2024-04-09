@@ -10,9 +10,8 @@
 		WHERE Usu_DR = '#form.se#'
 	</cfquery>
 
-
-	<cfquery name="rsUnidade" datasource="#dsn_inspecao#">
-	SELECT Und_Codigo, Und_Descricao, Und_TipoUnidade, Und_Ano_Horas_Avaliar, Und_Ano_Pontos_Avaliar, TUN_Descricao, INP_NumInspecao, INP_Modalidade, INP_DtInicInspecao, INP_DtFimInspecao, INP_HrsInspecao, INP_Responsavel, Dir_Sigla
+	<cfquery name="rsUnidativ" datasource="#dsn_inspecao#">
+	SELECT Und_Codigo, Und_Descricao, Und_TipoUnidade, Und_Ano_Horas_Avaliar, Und_Ano_Pontos_Avaliar, TUN_Descricao, INP_NumInspecao, INP_Modalidade, INP_DtInicInspecao, INP_DtFimInspecao, INP_HrsInspecao, INP_Responsavel, INP_Situacao, Dir_Sigla
 	FROM Unidades 
 	INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
 	INNER JOIN Tipo_Unidades ON Und_TipoUnidade = TUN_Codigo
@@ -30,7 +29,34 @@
 			right(INP_NumInspecao,4) = '#form.frmano#' and
 		</cfif>
 	</cfif>
-	Und_Status = 'A'
+	Und_Status = 'A' and INP_Situacao <> 'CO'
+	<cfif form.se eq 'Todos' and form.grupoacesso eq 'GESTORES'>
+		and Und_CodDiretoria in(#form.usucoordena#)
+	</cfif>
+	ORDER BY Und_CodDiretoria, TUN_Descricao, Und_Descricao, INP_NumInspecao
+	</cfquery>
+
+	<cfquery name="rsUnidade" datasource="#dsn_inspecao#">
+	SELECT Und_Codigo, Und_Descricao, Und_TipoUnidade, Und_Ano_Horas_Avaliar, Und_Ano_Pontos_Avaliar, TUN_Descricao, 
+	INP_NumInspecao, INP_Modalidade, INP_DtInicInspecao, INP_DtFimInspecao, INP_HrsInspecao, INP_Responsavel, Dir_Sigla
+	FROM Unidades 
+	INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
+	INNER JOIN Tipo_Unidades ON Und_TipoUnidade = TUN_Codigo
+	INNER JOIN Inspecao ON Und_Codigo = INP_Unidade 
+	WHERE 
+	<cfif form.se neq 'Todos' or form.frmtipounid neq 'Todas' or trim(form.frmano) neq 'Todos'>
+		 <cfif form.se neq 'Todos'>
+			 Und_CodDiretoria = '#form.se#' and
+		 </cfif>
+		<cfif form.frmtipounid neq 'Todas'>
+	 	    Und_TipoUnidade= #form.frmtipounid# and
+		 </cfif>			
+		<cfif trim(form.frmano) neq 'Todos'>
+		    <!--- INP_NumInspecao Like '%#form.frmano#' and --->
+			right(INP_NumInspecao,4) = '#form.frmano#' and
+		</cfif>
+	</cfif>
+	Und_Status = 'A' and INP_Situacao = 'CO'
 	<cfif form.se eq 'Todos' and form.grupoacesso eq 'GESTORES'>
 		and Und_CodDiretoria in(#form.usucoordena#)
 	</cfif>
@@ -184,13 +210,106 @@
 	  <table width="91%" border="0" align="center">
         <tr bgcolor="f7f7f7">
           <td colspan="19" align="center" bgcolor="f7f7f7">
-		  <cfif form.grupoacesso is 'GESTORMASTER'>
-		  <div align="right"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/csv.png" width="45" height="45" border="0"></a></div>
-		  </cfif>		  </td>
+			<cfif form.grupoacesso is 'GESTORMASTER'>
+		  		<div align="right"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/csv.png" width="45" height="45" border="0"></a></div>
+			</cfif>
+		  </td>
         </tr>
-		
+
+<!----        --------------------------------- --->
+<tr bgcolor="f7f7f7">
+			<td colspan="19" align="center" bgcolor="#B4B4B4" class="titulo1">UNIDADES EM CADASTRO DE AVALIAÇÃO/ANDAMENTO/REVISÃO NO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
+		</tr>
+        <tr class="titulosClaro">
+          <td colspan="25" bgcolor="eeeeee" class="exibir"><cfoutput>Qtd. #rsUnidativ.recordcount#</cfoutput></td>
+        </tr>
+          <tr bgcolor="#CCCCCC" class="titulos">
+            <td colspan="2" align="center">SE</td>
+            <td align="center"><div align="left">Código</div></td>
+            <td width="19%"><div align="left">Descrição</div></td>
+            <td width="5%"><div align="left">Tipo</div></td>
+            <td width="5%">Avaliação</td>
+            <td width="5%">Modal</td>
+            <td width="9%">Início Avaliação</td>
+            <td width="8%">Final Avaliação</td>
+            <td width="10%"><div align="center">Horas Avaliação</div></td>
+			<td width="5%"><div align="center">Pontuação</div></td>
+            <td width="15%"><div align="left">Gestor da Unidade</div></td>
+            <td width="19%">Avaliações realizadas </td>
+			<td width="5%">Status</td>
+          </tr>
+      <cfoutput query="rsUnidativ">
+			<cfquery name="rsAval" datasource="#dsn_inspecao#">		
+				SELECT Right(INP_NumInspecao,4) as ano
+				FROM Inspecao
+				WHERE INP_Unidade = '#Und_Codigo#' 
+				ORDER BY Right(INP_NumInspecao,4)
+			</cfquery>
+			
+            <cfset auxano = ''>
+			
+			<cfloop query="rsAval">
+			   <cfset auxano = auxano & ' ' & rsAval.ano>
+			</cfloop>
+		  	
+			<cfset scor = 'f7f7f7'>		
+			
+			<cfif INP_Modalidade is 0>
+			  <cfset modal = 'PRESENCIAL'>
+			<cfelseif INP_Modalidade is 1>
+			  <cfset modal = 'A DISTÂNICA'>
+			<cfelse>
+			  <cfset modal = 'MISTA'>			
+			</cfif>
+			<cfset UndCod = Und_Codigo>
+			<cfset UndDesc = Und_Descricao>
+			<cfset TUNDesc = TUN_Descricao>
+			<cfset INPInsp = INP_NumInspecao>
+			<cfset INPDtInic = dateformat(INP_DtInicInspecao,"dd/mm/yyyy")>
+			<cfset INPDtFim = dateformat(INP_DtFimInspecao,"dd/mm/yyyy")>
+			<cfset INPResp = INP_Responsavel>
+						
+          <tr bgcolor="#scor#" class="exibir">
+            <td width="1%"><div align="left">#left(UndCod,2)#</div></td>
+            <td width="2%"><div align="left">#Dir_Sigla#</div></td>
+            <td width="2%">#UndCod#</td>
+            <td width="10%">#UndDesc#</td>
+            <td width="5%">#TUNDesc#</td>
+            <td width="5%">#INPInsp#</td>
+            <td width="5%">#modal#</td>
+            <td width="9%">#INPDtInic#</td>
+            <td width="8%">#INPDtFim#</td>
+            <td width="10%"><div align="center">#INP_HrsInspecao#</div></td>
+			<cfset pontos = numberFormat(Und_Ano_Pontos_Avaliar,99.00)>
+			<td width="5%"><div align="center">#pontos#</div></td>
+            <td width="15%"><div align="left">#INPResp#</div></td>
+            <td width="19%">#auxano#</td>
+			<td width="5%"><div align="center">#INP_Situacao#</div></td>
+			
+          </tr>
+
+		  <cfif scor eq 'f7f7f7'>
+		    <cfset scor = 'CCCCCC'>
+		  <cfelse>
+		    <cfset scor = 'f7f7f7'>
+		  </cfif>
+      </cfoutput>
+        <tr bgcolor="f7f7f7">
+          <td colspan="19" align="center" class="titulos"><hr></td>
+        </tr>
+        <tr>
+          <td colspan="12">
+              <div align="center">
+			  <input name="Submit1" type="button" class="form" id="Submit1" value="Fechar" onClick="window.close()">
+          </div>
+             <div align="right"></div></td>
+        </tr>
+        <tr>
+          <td colspan="19" align="center" class="titulos"><hr></td>
+        </tr>
+<!---    -----------------------------------    --->
 		<tr bgcolor="f7f7f7">
-			<td colspan="19" align="center" bgcolor="#B4B4B4" class="titulo1">LISTAS DAS UNIDADES  AVALIADAS NO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
+			<td colspan="19" align="center" bgcolor="#B4B4B4" class="titulo1">UNIDADES AVALIADAS NO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
 		</tr>
         <tr class="titulosClaro">
           <td colspan="25" bgcolor="eeeeee" class="exibir"><cfoutput>Qtd. #rsUnidade.recordcount#</cfoutput></td>
@@ -306,7 +425,7 @@
 			<td colspan="19" align="center" bgcolor="f7f7f7" class="titulo1">&nbsp;</td>
 		</tr>
 		<tr bgcolor="f7f7f7">
-			<td colspan="19" align="center" bgcolor="#B4B4B4" class="titulo1">LISTAS DAS UNIDADES PROGRAMADAS E NÃO AVALIADAS NO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
+			<td colspan="19" align="center" bgcolor="#B4B4B4" class="titulo1">UNIDADES PROGRAMADAS E NÃO AVALIADAS NO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
 		</tr>
 
 		<tr class="titulosClaro">
@@ -410,7 +529,7 @@
           <td colspan="17" align="center" bgcolor="f7f7f7" class="titulo1">&nbsp;</td>
         </tr>
         <tr bgcolor="f7f7f7">
-          <td colspan="17" align="center" bgcolor="#B4B4B4" class="titulo1">LISTAS DAS UNIDADES NÃO PROGRAMADAS NO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
+          <td colspan="17" align="center" bgcolor="#B4B4B4" class="titulo1">UNIDADES NÃO PROGRAMADAS NO EXERCÍCIO DE: <cfoutput>#form.frmano#</cfoutput></td>
           <cfset sarquivo = #DateFormat(now(),"YYYYMMDDHH")# & '_' & #right(CGI.REMOTE_USER,8)# & '.xls'>
     </tr>
         <tr class="titulosClaro">

@@ -28,29 +28,31 @@
 			, RIP_DtUltAtu = CONVERT(char, GETDATE(), 120)
 			WHERE RIP_NumInspecao='#FORM.frminsp#' AND  RIP_Unidade='#FORM.frmunid#' AND RIP_NumGrupo=#FORM.frmgrupo# AND RIP_NumItem=#FORM.frmitem#
 		</cfquery>	
-	<cflocation url="itens_inspetores_avaliacao1.cfm?Unid=#FORM.frmunid#&Ninsp=#FORM.frminsp#&Ngrup=#FORM.frmgrupo#&Nitem=#FORM.frmitem#&tpunid=#form.tpunid#&frminspreincidente=#FORM.frminspreincidente#&retornosn=#form.retornosn#&frmsituantes=#form.frmsituantes#&frmdescantes=#form.frmdescantes#">  
+		<cflocation url="itens_inspetores_avaliacao1.cfm?Unid=#FORM.frmunid#&Ninsp=#FORM.frminsp#&Ngrup=#FORM.frmgrupo#&Nitem=#FORM.frmitem#&tpunid=#form.tpunid#&itnreincidentes=#form.itnreincidentes#&frminspreincidente=#FORM.frminspreincidente#&frmgruporeincidente=#form.frmgruporeincidente#&frmitemreincidente=#form.frmitemreincidente#&retornosn=#form.retornosn#&frmsituantes=#form.frmsituantes#&frmdescantes=#form.frmdescantes#">  
 	</cfoutput> 
 </cfif>
 
 <cfif isDefined("Form.acao") and #form.acao# is 'NAOVALIDAR'>
-<cfoutput>
-	 <cfquery datasource="#dsn_inspecao#">
-		UPDATE Resultado_Inspecao SET
-		 RIP_ReincInspecao = ''
-		, RIP_ReincGrupo = 0
-		, RIP_ReincItem = 0
-		, RIP_UserName = '#CGI.REMOTE_USER#'
-		, RIP_DtUltAtu = CONVERT(char, GETDATE(), 120)
-        WHERE RIP_NumInspecao='#FORM.frminsp#' AND  RIP_Unidade='#FORM.frmunid#' AND RIP_NumGrupo=#FORM.frmgrupo# AND RIP_NumItem=#FORM.frmitem#
-	  </cfquery> 
-	  <cflocation url="itens_inspetores_avaliacao1.cfm?Unid=#FORM.frmunid#&Ninsp=#FORM.frminsp#&Ngrup=#FORM.frmgrupo#&Nitem=#FORM.frmitem#&tpunid=#form.tpunid#&frmsituantes=#frmsituantes#&frmdescantes=#form.frmdescantes#"> 
-</cfoutput>
+	<cfoutput>
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE Resultado_Inspecao SET
+			RIP_ReincInspecao = ''
+			, RIP_ReincGrupo = 0
+			, RIP_ReincItem = 0
+			, RIP_UserName = '#CGI.REMOTE_USER#'
+			, RIP_DtUltAtu = CONVERT(char, GETDATE(), 120)
+			WHERE RIP_NumInspecao='#FORM.frminsp#' AND  RIP_Unidade='#FORM.frmunid#' AND RIP_NumGrupo=#FORM.frmgrupo# AND RIP_NumItem=#FORM.frmitem#
+		</cfquery>
+			<cflocation url="itens_inspetores_avaliacao1.cfm?Unid=#FORM.frmunid#&Ninsp=#FORM.frminsp#&Ngrup=#FORM.frmgrupo#&Nitem=#FORM.frmitem#&tpunid=#form.tpunid#&itnreincidentes=#form.itnreincidentes#&frmsituantes=#frmsituantes#&frmdescantes=#form.frmdescantes#&frminspreincidente=#FORM.frminspreincidente#&frmgruporeincidente=&frmitemreincidente=&retornosn="> 
+	</cfoutput>
 </cfif>
-
+<cfset anolimit = (year(now()) - 2)>
 <cfquery name="qResposta" datasource="#dsn_inspecao#">
  SELECT RIP_NumInspecao, UND_DESCRICAO, Pos_Area, 
  Pos_NomeArea, 
  Pos_Inspecao,
+ Pos_NumGrupo, 
+ Pos_NumItem,
  Pos_Situacao_Resp, 
  Pos_Parecer, 
  RIP_Recomendacoes, 
@@ -74,7 +76,6 @@
  Pos_DtPosic, 
  DATEDIFF(dd,Pos_DtPosic,GETDATE()) AS diasOcor, 
  Pos_SEI, 
- Pos_Situacao_Resp, 
  INP_DtInicInspecao, 
  INP_TNCClassificacao, 
  Pos_NCISEI,
@@ -90,12 +91,12 @@ INNER JOIN Itens_Verificacao ON (convert(char(4),Rip_Ano) = Itn_Ano) and (INP_Mo
 INNER JOIN Grupos_Verificacao ON (Itn_Ano = Grp_Ano) AND (Itn_NumGrupo = Grp_Codigo)) 
 left JOIN ParecerUnidade ON (RIP_NumItem = Pos_NumItem) AND (RIP_NumGrupo = Pos_NumGrupo) AND (RIP_NumInspecao = Pos_Inspecao) AND (RIP_Unidade = Pos_Unidade)
 left JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo
-WHERE RIP_Unidade ='#nunid#' AND RIP_NumGrupo = #ngrup# AND RIP_NumItem = #nitem# and Pos_Situacao_Resp in(1,6,7,17,22,2,4,5,8,20,15,16,18,19,23)
+WHERE (RIP_Unidade ='#nunid#' and (#grpitmsql#) and Pos_Situacao_Resp in(1,6,7,17,22,2,4,5,8,20,15,16,18,19,23) and RIGHT(Pos_Inspecao,4) >= #anolimit#)
 order by RIP_NumInspecao desc
 </cfquery>
 
 <cfquery dbtype="query" name="rsOrdem">
-SELECT * FROM qResposta order by Pos_Inspecao
+	SELECT * FROM qResposta order by Pos_Inspecao desc
 </cfquery>
 
 <cfset anoinsp = right(ninsp,4)> 
@@ -174,6 +175,7 @@ SELECT * FROM qResposta order by Pos_Inspecao
 	<cfparam name="URL.VLRDEC" default="#Form.sVLRDEC#">
 	<cfparam name="URL.situacao" default="#Form.situacao#">
 	<cfparam name="URL.posarea" default="#Form.posarea#">
+	<cfparam name="URL.itnreincidentes" default="#Form.itnreincidentes#">
 	<cfset auxavisosn = "N">
 <cfelse>
 
@@ -198,6 +200,7 @@ SELECT * FROM qResposta order by Pos_Inspecao
 	<cfparam name="URL.VLRDEC" default="">
 	<cfparam name="URL.situacao" default="">		
 	<cfparam name="URL.posarea" default="">
+	<cfparam name="URL.itnreincidentes" default="">
 	<cfset auxavisosn = "S">
 </cfif> 
 <cfquery name="rsTercTransfer" datasource="#dsn_inspecao#">
@@ -274,8 +277,8 @@ function validarform(){
 //=============================
 //              a               b            c          d                     e
 //fazgestao('#auxcont#','#RIP_NumInspecao#','S','#Pos_Situacao_Resp#','#STO_Descricao#')">
-function fazgestao(a,b,c,d,e){
-	//alert(a + b + c + d);
+function fazgestao(a,b,c,d,e,f,g){
+	//alert(a + b + c + d + e + f + g);
 	var frm = document.forms[0];
 	var auxnumreg = frm.frmtotreincidente.value;
 
@@ -400,6 +403,8 @@ if (auxnumreg == 2){
 		frm.frmsituantes.value = d;
 		frm.frmdescantes.value = e;
 		frm.retornosn.value = c;
+		frm.frmgruporeincidente.value = f;
+		frm.frmitemreincidente.value = g;		
 	}
 //------------------------------------	
 //	if (c == 'N' && (frm.frminspreincidente.value=='' || frm.frminspreincidente.value < b)){
@@ -408,6 +413,8 @@ if (c == 'N' && frm.frminspreincidente.value <= b){
 		frm.frmsituantes.value = d;
 		frm.frmdescantes.value = e;
 		frm.retornosn.value = c;	
+		frm.frmgruporeincidente.value = f;
+		frm.frmitemreincidente.value = g;
 	}
 //------------------------------------	
 	if (auxnumreg == 1){
@@ -415,13 +422,16 @@ if (c == 'N' && frm.frminspreincidente.value <= b){
 		frm.frmsituantes.value = d;
 		frm.frmdescantes.value = e;
 		frm.retornosn.value = c;
+		frm.frmgruporeincidente.value = f;
+		frm.frmitemreincidente.value = g;		
 	}	
 	
 //frm.retornosn.value = c;
 //var auxamostrasn = c;
 	frm.validar.disabled=false;
 	 //=================================================================
-//	 alert('valor atribuido1: frm.frminspreincidente.value:' + frm.frminspreincidente.value + ' frm.frmsituantes.value:' + frm.frmsituantes.value + ' frm.frmdescantes.value:' + frm.frmdescantes.value + ' frm.retornosn.value:' + frm.retornosn.value);
+//	 alert('valor atribuido: frm.frminspreincidente.value:' + frm.frminspreincidente.value + ' frm.frmsituantes.value:' + frm.frmsituantes.value + ' frm.frmdescantes.value:' + frm.frmdescantes.value + ' frm.retornosn.value:' + frm.retornosn.value);
+//	 alert('valor atribuido1: ' + frm.ponto1.value);
 //	 alert('valor atribuido2: ' + frm.ponto2.value);
 //	 alert('valor atribuido3: ' + frm.ponto3.value);
       
@@ -466,6 +476,11 @@ if (c == 'N' && frm.frminspreincidente.value <= b){
 </cfoutput>
 <cfoutput query="qResposta">
     <cfset auxcont = auxcont + 1>
+	<cfif auxcont eq 1>
+	  <cfset nomecampo = 'Melhoria'>
+	<cfelse>
+	  <cfset nomecampo = 'Melhoria2'>
+	</cfif>
 	<cfif qResposta.RIP_NumInspecao eq ninsp>
 	   <cfset db_reincInsp = #ninsp#>
 	   <cfset db_reincGrup = #ngrup#>
@@ -489,10 +504,10 @@ if (c == 'N' && frm.frminspreincidente.value <= b){
 <tr bgcolor="eeeeee">
       <td width="101" class="exibir">N&ordm; Relat&oacute;rio:</td>
       <td width="1173"><table width="1173" border="0">
-        <tr>
+	    <tr>
           <td width="115"><strong class="exibir">#Num_Insp#</strong></td>
           <td width="74" class="exibir">Grupo/Item:</td>
-          <td class="exibir"><strong>#URL.Ngrup#.#URL.Nitem# - </strong>#Itn_Descricao#            <div class="icones" width="10%" colspan="2" align="center">
+          <td class="exibir"><strong>#qResposta.Pos_NumGrupo#.#qResposta.Pos_NumItem# - </strong>#Itn_Descricao#            <div class="icones" width="10%" colspan="2" align="center">
               <div align="right"></div>
             </div></td>
           </tr>
@@ -517,7 +532,7 @@ if (c == 'N' && frm.frminspreincidente.value <= b){
  	  	 <cfset melhoria = replace('#qResposta.RIP_Comentario#','; ' ,';','all')>
 		<tr>
          <td width="101" align="center" bgcolor="eeeeee" class="exibir">Situação Encontrada:</td>
-        <td colspan="2" bgcolor="f7f7f7"><textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form" readonly>#melhoria#</textarea></td>
+        <td colspan="2" bgcolor="f7f7f7"><textarea name="#nomecampo#" id="#nomecampo#" cols="200" rows="20" wrap="VIRTUAL" class="form" readonly>#melhoria#</textarea></td>
       </tr>	
 	<!---  --->  
 
@@ -525,27 +540,33 @@ if (c == 'N' && frm.frminspreincidente.value <= b){
       <td height="30" colspan="3" align="center" valign="middle"><hr></td>
     </tr>
     <tr>
+	
       <td height="32" colspan="3" align="center" valign="middle" bgcolor="##EEEEEE"><table width="920" class="exibir">
         <tr class="titulos">
-          <td colspan="3" class="exibir"><div align="center">O período/amostra considerados para realização das avaliações são idênticos? (Item #URL.Ngrup#.#URL.Nitem# - Relatório #Num_Insp# e Item #URL.Ngrup#.#URL.Nitem# - Relatório #Num_Insp_atual#)</div></td>
+          <td colspan="3" class="exibir"><div align="center">O período/amostra considerados para realização das avaliações são idênticos? (Item #qResposta.Pos_NumGrupo#.#qResposta.Pos_NumItem# - Relatório #Num_Insp# e Item #URL.Ngrup#.#URL.Nitem# - Relatório #Num_Insp_atual#)</div></td>
           </tr>
         <tr>
-          <td colspan="3" class="exibir"><div align="center"><strong>Atenção:</strong> Antes da confirmação de uma das opções "Sim" ou "Não", ler atentamente as orientações disponibilizadas <a href="abrir_pdf_act.cfm?arquivo=\\sac0424\SISTEMAS\SNCI\GUIAS\Orientar_Reg_Reincidencia.pdf"><span class="exibir"><strong>Aqui.</strong></span></a></div></td>
+          <td colspan="3" class="exibir"><div align="center"><strong>Atenção:</strong>Antes da confirmação de uma das opções "Sim" ou "Não", ler atentamente as orientações disponibilizadas <a href="abrir_pdf_act.cfm?arquivo=\\sac0424\SISTEMAS\SNCI\GUIAS\Orientar_Reg_Reincidencia.pdf"><span class="exibir"><strong>Aqui.</strong></span></a></div></td>
           </tr>
         <tr>
           <td colspan="3" class="exibir"><hr></td>
           </tr>
         <tr>
 		<td width="324" class="exibir">&nbsp;</td>
-          <td width="195" valign="middle"><label>
-		    <cfset rdb = 'rdb' & #auxcont#>
-            <input name="#rdb#" type="radio" value="S" onClick="fazgestao('#auxcont#','#RIP_NumInspecao#','S','#Pos_Situacao_Resp#','#STO_Descricao#')">
-              <strong>Sim</strong>              </label></td>
-          
-          <td width="385" valign="middle"><label>
-            <input name="#rdb#" type="radio" value="N" onClick="fazgestao('#auxcont#','#RIP_NumInspecao#','N','#Pos_Situacao_Resp#','#STO_Descricao#')">
-              <strong>Não</strong>              </label></td>
-        </tr>
+		<td width="195" valign="middle">
+			<label>
+				<cfset rdb = 'rdb' & #auxcont#>
+				<input name="#rdb#" type="radio" value="S" onClick="fazgestao('#auxcont#','#RIP_NumInspecao#','S','#Pos_Situacao_Resp#','#STO_Descricao#','#qResposta.Pos_NumGrupo#','#qResposta.Pos_NumItem#')">
+				<strong>Sim</strong>
+			</label>
+		</td>
+		<td width="385" valign="middle">
+			<label>
+				<input name="#rdb#" type="radio" value="N" onClick="fazgestao('#auxcont#','#RIP_NumInspecao#','N','#Pos_Situacao_Resp#','#STO_Descricao#','#qResposta.Pos_NumGrupo#','#qResposta.Pos_NumItem#')">
+				<strong>Não</strong>
+			</label>
+		</td>
+	</tr>
 
         <tr>
           <td colspan="3" class="exibir"><hr></td>
@@ -568,14 +589,14 @@ if (c == 'N' && frm.frminspreincidente.value <= b){
         <label></label>        
         &nbsp;&nbsp;&nbsp;&nbsp;</td>
       <td width="446"><div align="center">
-	      <input name="validar" type="Submit" class="titulos" value="Confirmar" onClick="document.form1.acao.value='VALIDAR';ajustardados()">
+	      <input name="validar" type="Submit" class="titulos" value="Confirmar" onClick="document.form1.acao.value='VALIDAR';">
 	        </div>        </td>
       </tr>
   </table></td>
   <tr>
   
 <cfif isdefined('retornosn') and (retornosn eq 'S' or retornosn eq 'N')>
-		<cfif listfind('2,4,5,8,15,16,19,23,1,6,7,22,9,10,31,24,32','#frmsituantes#')>
+		<cfif listfind('2,4,5,8,20,15,16,19,20,23,1,6,7,17,22,9,10,31,24,32','#frmsituantes#')>
 			<cfif retornosn eq 'S'>		
 			<cfset restringirSN = 'S'>
 			<cfset auxjustificativa = 'Os fatos identificados como Não Conforme foram registrados no relatório anterior : Avaliação: ' & #frminspreincidente# & ' Grupo/Item: ' & #ngrup# & '-' & #nitem# & ' com situação atual em: ' & #frmdescantes#>  
@@ -611,15 +632,15 @@ if (c == 'N' && frm.frminspreincidente.value <= b){
 <input type="hidden" name="frmgrupo" value="<cfoutput>#ngrup#</cfoutput>">
 <input type="hidden" name="frmitem" value="<cfoutput>#nitem#</cfoutput>">
 <input type="hidden" name="frminspatual" value="<cfoutput>#auxfrminspatual#</cfoutput>">
+<input type="hidden" name="itnreincidentes" value="<cfoutput>#itnreincidentes#</cfoutput>">
 <input type="hidden" name="TPUNID" value="<cfoutput>#qResposta.Itn_TipoUnidade#</cfoutput>">
 <input type="hidden" name="frminspreincidente" value=""> 
+<input type="hidden" name="frmgruporeincidente" value="">
+<input type="hidden" name="frmitemreincidente" value="">
 <input type="hidden" name="frmexibirnuminspecao" value="<cfoutput>#exibirnuminspecao#</cfoutput>">
 <input type="hidden" name="frmtotreincidente" value="<cfoutput>#qResposta.recordcount#</cfoutput>">
-<!--- <input type="hidden" name="frmavaliacaoantes" value=""> --->
 <input type="hidden" name="frmsituantes" value="">
 <input type="hidden" name="frmdescantes" value="">
-<!--- <input type="hidden" name="frmamostraigualsn" value=""> --->
-
 <input type="hidden" id="acao" name="acao" value="">
 <input type="hidden" id="amostra" name="amostra" value="">
 <input type="hidden" id="qtdamostrasanalisadas" name="qtdamostrasanalisadas" value="">
@@ -653,9 +674,10 @@ CKEDITOR.replace('Melhoria', {
 			['HorizontalRule','SpecialChar', '-','TextColor', 'BGColor','-','Imagem', '-','Maximize','Table'  ]
 		]
     });
-	CKEDITOR.replace('recomendacao', {
+
+CKEDITOR.replace('Melhoria2', {
 		width: '1020',
-		height: 100,
+		height: 200,
 		removePlugins: 'scayt',
         disableNativeSpellChecker: false,
 		line_height:'1px',
@@ -663,16 +685,14 @@ CKEDITOR.replace('Melhoria', {
 <!--- 		enterMode:2,forceEnterMode:false,shiftEnterMode:1,  transforma enter em <br> shift+enter <p>--->
 		toolbar: [
 			[ 'Preview', 'Print', '-' ],
-			[ 'Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat','-', 'Undo', 'Redo', '-','Find' ],
+			[ 'Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat', '-', 'Undo', 'Redo', '-','Find' ],
 			['SelectAll', '-'],
 			[ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ],
 			[ 'NumberedList', 'BulletedList', '-',  'Blockquote','-','Outdent', 'Indent', '-'], 
 			['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
-			['HorizontalRule','SpecialChar', '-','TextColor', 'BGColor','Maximize','Table'  ]
+			['HorizontalRule','SpecialChar', '-','TextColor', 'BGColor','-','Imagem', '-','Maximize','Table'  ]
 		]
-			
     });
-
 
 function aviso(){
 var frminsp = document.form1.frminspantes.value;

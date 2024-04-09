@@ -64,9 +64,10 @@
 	<cfset status13 = 0>	
 	<cfset ripfalta = 0>					
 	<cfset ripsobra = 0>	
+	<cfset ripemrisco = 0>
 		
 	<cfquery name="rsBusca" datasource="#dsn_inspecao#">
-		SELECT INP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_Falta, RIP_Sobra, Pos_Situacao_Resp, Itn_Pontuacao, Itn_PTC_Seq
+		SELECT INP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_Falta, RIP_Sobra, RIP_EmRisco, Pos_Situacao_Resp, Itn_Pontuacao, Itn_PTC_Seq
 		FROM (((Inspecao 
 		INNER JOIN Unidades ON INP_Unidade = Und_Codigo) 
 		INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
@@ -101,7 +102,7 @@
 	<!---  --->
 	<cfset fator = 1>
 	<cfquery dbtype="query" name="rsPTSUNID">
-		SELECT RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_Falta, RIP_Sobra, Itn_Pontuacao
+		SELECT RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_Falta, RIP_Sobra, RIP_EmRisco,Itn_Pontuacao
 		FROM rsBusca 
 		WHERE RIP_Resposta IN('C','N')
 	</cfquery>
@@ -115,38 +116,38 @@
 	  <cfset somaptsmax = 0>		  
       <cfset somapiatu = 0>
 	  <cfset somafalta = 0>	
-	  <cfset somasobra = 0>		  
+	  <cfset somasobra = 0>		
+	  <cfset somaemrisco = 0>  
       <cfloop query="rsBusca">
 			<cfset grp = rsBusca.RIP_NumGrupo>	
 			<cfset item = rsBusca.RIP_NumItem>	
 			<cfset resp = rsBusca.RIP_Resposta>										
-			<cfset falta = lscurrencyformat(rsBusca.RIP_Falta)>	
-			<cfset sobra = lscurrencyformat(rsBusca.RIP_Sobra)>
 			<cfset composic = Itn_PTC_Seq>	
 			<cfset impactosn = 'N'>
 			<cfif left(composic,2) eq '10'>
 			  <cfset impactosn = 'S'>
 			</cfif>
 			<cfset pontua = rsBusca.Itn_Pontuacao>
-			<cfset fator = 1>
-			<cfif impactosn eq 'S'>
-				 <cfset somafaltasobra = rsBusca.RIP_Falta>
-				 <cfif (rsBusca.RIP_NumItem eq 1 and (rsBusca.RIP_NumGrupo eq 53 or rsBusca.RIP_NumGrupo eq 72 or rsBusca.RIP_NumGrupo eq 214 or rsBusca.RIP_NumGrupo eq 284))>
-					<cfset somafaltasobra = somafaltasobra + rsBusca.RIP_Sobra>
-				 </cfif>
-				 <cfif somafaltasobra gt 0>
-					<cfloop query="rsRelev">
-						 <cfif rsRelev.VLR_FaixaInicial is 0 and rsRelev.VLR_FaixaFinal lte somafaltasobra>
-							<cfset fator = rsRelev.VLR_Fator>
-						 <cfelseif rsRelev.VLR_FaixaInicial neq 0 and VLR_FaixaFinal neq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial and somafaltasobra lte rsRelev.VLR_FaixaFinal>
-							<cfset fator = rsRelev.VLR_Fator>
-						 <cfelseif VLR_FaixaFinal eq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial>
-							<cfset fator = rsRelev.VLR_Fator> 
-						 </cfif>
-<!--- 				rsRelev.VLR_FaixaInicial: #rsRelev.VLR_FaixaInicial#  rsRelev.VLR_FaixaFinal: #rsRelev.VLR_FaixaFinal#	rsRelev.VLR_Fator#rsRelev.VLR_Fator#  falta:#somafaltasobra#  fator:#fator#<br> --->
-					</cfloop>
-				</cfif>	
-			</cfif>		
+			<cfset fator = 0>
+            <cfif impactosn eq 'S'>
+              <cfset somafaltasobrarisco = rsBusca.RIP_Falta + rsBusca.RIP_Sobra + rsBusca.RIP_EmRisco>
+              <cfset somafaltasobrarisco = numberformat(#somafaltasobrarisco#,9999999999.99)>
+              <cfif somafaltasobrarisco gte 0>
+                <cfloop query="rsRelev">
+                  <cfset fxini = numberformat(rsRelev.VLR_FaixaInicial,9999999999.99)>
+                  <cfset fxfim = numberformat(rsRelev.VLR_FaixaFinal,9999999999.99)>
+                  <cfif fxini eq 0.00 and somafaltasobrarisco lte fxfim and fator eq 0>
+                    <cfset fator = rsRelev.VLR_Fator>
+                  </cfif>
+                  <cfif (fxini neq 0.00 and fxfim neq 0.00) and (somafaltasobrarisco gt fxini and somafaltasobrarisco lte fxfim) and fator eq 0>
+                    <cfset fator = rsRelev.VLR_Fator>
+                  </cfif>					
+                  <cfif fxfim eq 0.00 and somafaltasobrarisco gte fxini and fator eq 0>
+                    <cfset fator = rsRelev.VLR_Fator> 
+                  </cfif>
+                </cfloop>
+              </cfif>	
+            </cfif>	
 						
 			<cfset fatorconst = 4.5>
 			<cfset PTSMAXUNIDINICIAL = 0>
@@ -197,36 +198,67 @@
 			<cfset somaptsmax = somaptsmax + pmini>		  
 			<cfset somapiatu = somapiatu + piatu>
 			<cfset somafalta = somafalta + rsBusca.RIP_Falta>	
-			<cfset somasobra = somasobra + rsBusca.RIP_Sobra>			
+			<cfset somasobra = somasobra + rsBusca.RIP_Sobra>	
+			<cfset somaemrisco = somaemrisco + rsBusca.RIP_EmRisco>		
 	</cfloop>
 	<cfset totCN = totC + totN>
 	
-	<cfif somaptsmax eq 0> <cfset somaptsmax=1></cfif>
-	
-    <cfset TNCInicio = numberFormat((somapiini/somaptsmax)*100,999)>
-	<cfif TNCInicio lte 5>
-	  <cfset TNCClassInicio = 'Plenamente eficaz'>
-	<cfelseif TNCInicio lte 10>
-	  <cfset TNCClassInicio = 'Eficaz'>
-	<cfelseif TNCInicio lte 20>
-	  <cfset TNCClassInicio = 'Eficacia mediana'>	  
-	<cfelseif TNCInicio lte 50>
-	  <cfset TNCClassInicio = 'Pouco eficaz'>	  
-	<cfelse>
-	  <cfset TNCClassInicio = 'Ineficaz'>	  	
+	<cfif somaptsmax eq 0> 
+		<cfset somaptsmax=1>
 	</cfif>
-	<!---  --->	
-	<cfset TNCAtual = numberFormat((somapiatu/somaptsmax)*100,999)>
-	<cfif TNCAtual lte 5>
-	  <cfset TNCClassAtual = 'Plenamente eficaz'>
-	<cfelseif TNCAtual lte 10>
-	  <cfset TNCClassAtual = 'Eficaz'>
-	<cfelseif TNCAtual lte 20>
-	  <cfset TNCClassAtual = 'Eficacia mediana'>	  
-	<cfelseif TNCAtual lte 50>
-	  <cfset TNCClassAtual = 'Pouco eficaz'>	  
-	<cfelse>
-	  <cfset TNCClassAtual = 'Ineficaz'>	  	
+	<cfif form.frmano lt 2024>
+		<cfset TNCInicio = numberFormat((somapiini/somaptsmax)*100,999)>
+		<cfif TNCInicio lte 5>
+		<cfset TNCClassInicio = 'Plenamente eficaz'>
+		<cfelseif TNCInicio lte 10>
+		<cfset TNCClassInicio = 'Eficaz'>
+		<cfelseif TNCInicio lte 20>
+		<cfset TNCClassInicio = 'Eficacia mediana'>	  
+		<cfelseif TNCInicio lte 50>
+		<cfset TNCClassInicio = 'Pouco eficaz'>	  
+		<cfelse>
+		<cfset TNCClassInicio = 'Ineficaz'>	  	
+		</cfif>
+		<!---  --->	
+		<cfset TNCAtual = numberFormat((somapiatu/somaptsmax)*100,999)>
+		<cfif TNCAtual lte 5>
+		<cfset TNCClassAtual = 'Plenamente eficaz'>
+		<cfelseif TNCAtual lte 10>
+		<cfset TNCClassAtual = 'Eficaz'>
+		<cfelseif TNCAtual lte 20>
+		<cfset TNCClassAtual = 'Eficacia mediana'>	  
+		<cfelseif TNCAtual lte 50>
+		<cfset TNCClassAtual = 'Pouco eficaz'>	  
+		<cfelse>
+		<cfset TNCClassAtual = 'Ineficaz'>	  	
+		</cfif>	
+	</cfif>	
+	<cfif form.frmano gte 2024>
+		<cfset TNCInicio = numberFormat((somapiini/somaptsmax)*100,999)>
+		<cfif TNCInicio lte 5>
+		<cfset TNCClassInicio = 'Plenamente eficaz'>
+		<cfelseif TNCInicio lte 10>
+		<cfset TNCClassInicio = 'Eficaz'>
+		<cfelseif TNCInicio lte 30>
+		<cfset TNCClassInicio = 'Eficacia mediana'>	  
+		<cfelseif TNCInicio lte 50>
+		<cfset TNCClassInicio = 'Pouco eficaz'>	  
+		<cfelse>
+		<cfset TNCClassInicio = 'Ineficaz'>	  	
+		</cfif>
+		<!---  --->	
+		<cfset TNCAtual = numberFormat((somapiatu/somaptsmax)*100,999)>
+		<cfif TNCAtual lte 5>
+		<cfset TNCClassAtual = 'Plenamente eficaz'>
+		<cfelseif TNCAtual lte 10>
+		<cfset TNCClassAtual = 'Eficaz'>
+		<cfelseif TNCAtual lte 20>
+		<cfset TNCClassAtual = 'Eficacia mediana'>	  
+		<cfelseif TNCAtual lte 50>
+		<cfset TNCClassAtual = 'Pouco eficaz'>	  
+		<cfelse>
+		<cfset TNCClassAtual = 'Ineficaz'>	  	
+		</cfif>	
 	</cfif>	
 <!--- ============================================================================= --->
 <!--- FINAL OBTER PONTUACAO ATUAL DA UNIDADE E PONTUAÇÃO ATUAL MÁXIMA DA UNIDADE --->
@@ -242,7 +274,7 @@
 	</cfquery>
 	<cfif rsExiste.recordcount lte 0>
 		<cfquery datasource="#dsn_inspecao#">
-		insert into	TNC_Classificacao (TNC_Ano,TNC_Unidade,TNC_Avaliacao,TNC_dtultatu,TNC_username,TNC_QTDC,TNC_QTDN,TNC_QTDV,TNC_QTDE,TNC_QTDCN,TNC_QTDSolucao,TNC_QTDRegularizado,TNC_QTDImprocedente,TNC_QTDCancelado,TNC_VLRFALTA,TNC_VLRSOBRA,TNC_PTSMaxUnidade,TNC_PTSUnidInicio,TNC_TNCInicio,TNC_Classifinicio,TNC_PTSUnidAtual,TNC_TNCAtual,TNC_ClassifAtual,TNC_PTSSolucao,TNC_PTSRegularizado,TNC_PTSImprocedente,TNC_PTSCancelado) values ('#Right(rsClas.RIP_NumInspecao,4)#','#rsClas.RIP_Unidade#','#rsClas.RIP_NumInspecao#',CONVERT(char, GETDATE(), 120),'#CGI.REMOTE_USER#',#totC#,#totN#,#totV#,#totE#,#totCN#,#status3#,#status25#,#status12#,#status13#,#somafalta#,#somasobra#,#somaptsmax#,#somapiini#,#TNCInicio#,'#TNCClassInicio#',#somapiatu#,#TNCAtual#,'#TNCClassAtual#',#TNCPTSSolucao#,#TNCPTSRegularizado#,#TNCPTSImprocedente#,#TNCPTSCancelado#)
+		insert into	TNC_Classificacao (TNC_Ano,TNC_Unidade,TNC_Avaliacao,TNC_dtultatu,TNC_username,TNC_QTDC,TNC_QTDN,TNC_QTDV,TNC_QTDE,TNC_QTDCN,TNC_QTDSolucao,TNC_QTDRegularizado,TNC_QTDImprocedente,TNC_QTDCancelado,TNC_VLRFALTA,TNC_VLRSOBRA,TNC_VLREMRISCO,TNC_PTSMaxUnidade,TNC_PTSUnidInicio,TNC_TNCInicio,TNC_Classifinicio,TNC_PTSUnidAtual,TNC_TNCAtual,TNC_ClassifAtual,TNC_PTSSolucao,TNC_PTSRegularizado,TNC_PTSImprocedente,TNC_PTSCancelado) values ('#Right(rsClas.RIP_NumInspecao,4)#','#rsClas.RIP_Unidade#','#rsClas.RIP_NumInspecao#',CONVERT(char, GETDATE(), 120),'#CGI.REMOTE_USER#',#totC#,#totN#,#totV#,#totE#,#totCN#,#status3#,#status25#,#status12#,#status13#,#somafalta#,#somasobra#,#somaemrisco#,#somaptsmax#,#somapiini#,#TNCInicio#,'#TNCClassInicio#',#somapiatu#,#TNCAtual#,'#TNCClassAtual#',#TNCPTSSolucao#,#TNCPTSRegularizado#,#TNCPTSImprocedente#,#TNCPTSCancelado#)
 		</cfquery>
 	<cfelse>	
 	   <cfquery datasource="#dsn_inspecao#">
@@ -254,6 +286,7 @@
 			,TNC_QTDCancelado=#status13#
 			,TNC_VLRFALTA=#somafalta#
 			,TNC_VLRSOBRA=#somasobra#
+			,TNC_VLREMRISCO=#somaemrisco#
 			,TNC_PTSMaxUnidade=#somaptsmax#
 			,TNC_PTSUnidInicio=#somapiini#
 			,TNC_TNCInicio=#TNCInicio#
@@ -286,7 +319,7 @@
 	</cfquery>
 </cfif>	
 	<cfquery name="rsBusca" datasource="#dsn_inspecao#">
-		SELECT TNC_Ano, TNC_Unidade, TNC_Avaliacao, TNC_QTDC, TNC_QTDN, TNC_QTDV, TNC_QTDE, TNC_QTDCN, TNC_QTDSolucao, TNC_PTSSolucao, TNC_QTDRegularizado, TNC_PTSRegularizado, TNC_QTDImprocedente, TNC_PTSImprocedente, TNC_QTDCancelado, TNC_PTSCancelado, TNC_VLRFALTA, TNC_VLRSOBRA, TNC_PTSUnidInicio, TNC_PTSMaxUnidade, TNC_TNCInicio, TNC_ClassifInicio, TNC_PTSUnidAtual, TNC_TNCAtual, TNC_ClassifAtual, TNC_dtultatu, TNC_username, Und_CodDiretoria, Und_Descricao, Und_TipoUnidade,TUN_Descricao
+		SELECT TNC_Ano, TNC_Unidade, TNC_Avaliacao, TNC_QTDC, TNC_QTDN, TNC_QTDV, TNC_QTDE, TNC_QTDCN, TNC_QTDSolucao, TNC_PTSSolucao, TNC_QTDRegularizado, TNC_PTSRegularizado, TNC_QTDImprocedente, TNC_PTSImprocedente, TNC_QTDCancelado, TNC_PTSCancelado, TNC_VLRFALTA, TNC_VLRSOBRA, TNC_VLREMRISCO, TNC_PTSUnidInicio, TNC_PTSMaxUnidade, TNC_TNCInicio, TNC_ClassifInicio, TNC_PTSUnidAtual, TNC_TNCAtual, TNC_ClassifAtual, TNC_dtultatu, TNC_username, Und_CodDiretoria, Und_Descricao, Und_TipoUnidade,TUN_Descricao
 		FROM TNC_Classificacao 
 		INNER JOIN Unidades ON TNC_Unidade = Und_Codigo
 		INNER JOIN Tipo_Unidades ON Und_TipoUnidade = TUN_Codigo
@@ -310,7 +343,7 @@
 		</cfquery>
 	</cfoutput>	 
 	<cfquery name="rsXLS" datasource="#dsn_inspecao#">
-		SELECT TNC_Ano, TNC_Unidade, Und_Descricao, TUN_Descricao, TNC_Avaliacao, TNC_QTDC, TNC_QTDN, TNC_QTDV, TNC_QTDE, TNC_QTDCN, TNC_QTDSolucao, TNC_PTSSolucao, TNC_QTDRegularizado, TNC_PTSRegularizado, TNC_QTDImprocedente, TNC_PTSImprocedente, TNC_QTDCancelado, TNC_PTSCancelado, convert(money, TNC_VLRFALTA,1) as TNCVLRFALTA,  convert(money, TNC_VLRSOBRA,1) as TNCVLRSOBRA, TNC_PTSUnidInicio, TNC_PTSMaxUnidade, TNC_TNCInicio, TNC_ClassifInicio, TNC_PTSUnidAtual, TNC_TNCAtual, TNC_ClassifAtual, convert(char,TNC_dtultatu,103) as TNCdtultatu
+		SELECT TNC_Ano, TNC_Unidade, Und_Descricao, TUN_Descricao, TNC_Avaliacao, TNC_QTDC, TNC_QTDN, TNC_QTDV, TNC_QTDE, TNC_QTDCN, TNC_QTDSolucao, TNC_PTSSolucao, TNC_QTDRegularizado, TNC_PTSRegularizado, TNC_QTDImprocedente, TNC_PTSImprocedente, TNC_QTDCancelado, TNC_PTSCancelado, convert(money, TNC_VLRFALTA,1) as TNCVLRFALTA,  convert(money, TNC_VLRSOBRA,1) as TNCVLRSOBRA, convert(money, TNC_VLREMRISCO,1) as TNCVLREMRISCO, TNC_PTSUnidInicio, TNC_PTSMaxUnidade, TNC_TNCInicio, TNC_ClassifInicio, TNC_PTSUnidAtual, TNC_TNCAtual, TNC_ClassifAtual, convert(char,TNC_dtultatu,103) as TNCdtultatu
 		FROM TNC_Classificacao 
 		INNER JOIN Unidades ON TNC_Unidade = Und_Codigo
 		INNER JOIN Tipo_Unidades ON Und_TipoUnidade = TUN_Codigo
@@ -403,7 +436,7 @@ function troca(a){
           </cfoutput>
         </table>
 <form action="Pacin_o.cfm" method="post" target="_parent" name="form1">  
-	  <table width="1950" border="0" align="center">
+	  <table width="2200" border="0" align="center">
         <tr bgcolor="f7f7f7">
           <td colspan="35" align="center" bgcolor="f7f7f7">
 		  <cfif form.grupoacesso is 'GESTORMASTER'>
@@ -418,7 +451,7 @@ function troca(a){
           <td colspan="41" bgcolor="eeeeee" class="exibir"><cfoutput>Qtd. #rsBusca.recordcount#</cfoutput></td>
         </tr>
           <tr bgcolor="#CCCCCC" class="titulos">
-            <td width="3%" align="center">Dados</td>
+            <td width="3%" align="center">+Dados</td>
             <td width="3%" align="center">Código</td>
             <td width="11%"><div align="left">Descrição</div></td>
             <td width="5%"><div align="left">Tipo</div></td>
@@ -427,39 +460,39 @@ function troca(a){
             <td width="2%"><div align="center">Qtd.N</div></td>
             <td width="2%"><div align="center">Qtd.V</div></td>
             <td width="2%"><div align="center">Qtd.E</div></td>
-            <td width="3%"><div align="center">Qtd.<br />
+            <td width="3%"><div align="center">Qtd.<br>
             (N+C)</div></td>
-            <td width="3%"><div align="center">Qtd. <br />
+            <td width="3%"><div align="center">Qtd. <br>
               (3-SO)</div></td>
-            <td width="3%"><div align="center">Pts.<br />
+            <td width="3%"><div align="center">Pts.<br>
               (3-SO)</div></td>
-            <td width="3%"><div align="center">Qtd.<br />
+            <td width="3%"><div align="center">Qtd.<br>
               (25-RC)</div></td>
-            <td width="3%"><div align="center">Pts.<br />
+            <td width="3%"><div align="center">Pts.<br>
               (25-RC)</div></td>
-            <td width="3%"><div align="center">Qtd.<br />
+            <td width="3%"><div align="center">Qtd.<br>
               (12-PI)</div></td>
-            <td width="3%"><div align="center">Pts.<br />
+            <td width="3%"><div align="center">Pts.<br>
               (12-PI)</div></td>
-            <td width="3%"><div align="center">Qtd.<br />
+            <td width="3%"><div align="center">Qtd.<br>
               (13-OC)</div></td>
-            <td width="3%"><div align="center">Pts.<br />
+            <td width="3%"><div align="center">Pts.<br>
               (13-OC)</div></td>
             <td width="5%"><div align="center">Falta(R$)</div></td>
             <td width="4%"><div align="center">Sobra(R$)</div></td>
-            <td width="4%"><div align="center">Pts.Max Unidade<br /></div></td>
-            <td width="4%"><div align="center">Pts.Item<br />(Inicial)</div></td>
-            <td width="3%"><div align="center">TNC<br />
+			<td width="5%"><div align="center">EmRisco(R$)</div></td>
+            <td width="4%"><div align="center">Pts.Max Unidade<br></div></td>
+            <td width="4%"><div align="center">Pts.Item<br>(Inicial)</div></td>
+            <td width="3%"><div align="center">TNC<br>
             (Inicial)</div></td>
             <td width="7%">Classif(Inicial)</td>
-            <td width="3%"><div align="center">Pts.Item<br />
+            <td width="3%"><div align="center">Pts.Item<br>
             (Atual)</div></td>
-            <td width="3%"><div align="center">TNC<br />
+            <td width="3%"><div align="center">TNC<br>
             (Atual)</div></td>
-            <td width="7%">Classif(Atual)</td>
+            <td width="10%">Classif(Atual)</td>
           </tr>
       <cfoutput query="rsBusca">
-
 			<cfset scor = 'f7f7f7'>		
   			<cfset ano = rsBusca.TNC_Ano>
 			<cfset UndCod = TNC_Unidade>
@@ -479,11 +512,10 @@ function troca(a){
 			<cfset pts12pi = TNC_PTSImprocedente>	
 			<cfset qtd13oc = TNC_QTDCancelado>	
 			<cfset pts13oc = TNC_PTSCancelado>	
-			<!--- <cfset falta = numberFormat(TNC_VLRFALTA,999.00)>	 --->
 			<cfset falta = lscurrencyformat(TNC_VLRFALTA)>	
 			<cfset sobra = lscurrencyformat(TNC_VLRSOBRA)>
-<!--- 			<cfset falta = TNC_VLRFALTA>
-			<cfset sobra = TNC_VLRSOBRA> --->	
+			<cfset emrisco = lscurrencyformat(TNC_VLREMRISCO)>			
+
 			<cfset piini = TNC_PTSUnidInicio>	
 			<cfset pmini = TNC_PTSMaxUnidade>	
 			<cfset tncini = numberFormat(TNC_TNCInicio,999)>
@@ -515,6 +547,7 @@ function troca(a){
             <td width="3%"><div align="center">#pts13oc#</div></td>
             <td width="5%"><div align="center">#falta#</div></td>
             <td width="4%"><div align="center">#sobra#</div></td>
+			<td width="4%"><div align="center">#emrisco#</div></td>
 			<cfset auxcol = replace(pmini,'.',',')>
             <td width="4%"><div align="center">#auxcol#</div></td>
 			<cfset auxcol = replace(piini,'.',',')>
@@ -524,7 +557,7 @@ function troca(a){
 			<cfset auxcol = replace(piatu,'.',',')>
             <td><div align="center">#auxcol#</div></td>
             <td width="3%"><div align="center">#tncatu#</div></td>
-            <td width="7%"><div align="left">#classatu#</div></td>
+            <td width="12%"><div align="left">#classatu#</div></td>
           </tr>
 
 		  <cfif scor eq 'f7f7f7'>
@@ -580,8 +613,8 @@ function troca(a){
     FilePath = ExpandPath( "./Fechamento/" & sarquivo ),
     Query = rsXLS,
 	ColumnList = 
-"TNC_Ano,TNC_Unidade,Und_Descricao,TUN_Descricao,TNC_Avaliacao,TNC_QTDC,TNC_QTDN,TNC_QTDV,TNC_QTDE,TNC_QTDCN,TNC_QTDSolucao,TNC_PTSSolucao,TNC_QTDRegularizado,TNC_PTSRegularizado,TNC_QTDImprocedente,TNC_PTSImprocedente,TNC_QTDCancelado,TNC_PTSCancelado,TNCVLRFALTA,TNCVLRSOBRA,TNC_PTSMaxUnidade,TNC_PTSUnidInicio,TNC_TNCInicio,TNC_ClassifInicio,TNC_PTSUnidAtual,TNC_TNCAtual,TNC_ClassifAtual,TNCdtultatu",
-	ColumnNames = "Ano,Código,Descrição,Tipo,Avaliação,Qtd.C,Qtd.N,Qtd.V,Qtd.E,Qtd.(C+N),Qtd.(3-SO),Pts.(3-SO),Qtd.(25-RC),Pts.(25-RC),Qtd.(12-PI),Pts.(12-PI),Qtd.(13-OC),Pts.(13-OC),Falta(R$),Sobra(R$),Pts.MaxUnidade,Pts.Item(Inicial),TNC(Inicial),Classif(Inicial),Pts.Item(Atual),TNC(Atual),Classif(Atual),DT.Atualiz",
+"TNC_Ano,TNC_Unidade,Und_Descricao,TUN_Descricao,TNC_Avaliacao,TNC_QTDC,TNC_QTDN,TNC_QTDV,TNC_QTDE,TNC_QTDCN,TNC_QTDSolucao,TNC_PTSSolucao,TNC_QTDRegularizado,TNC_PTSRegularizado,TNC_QTDImprocedente,TNC_PTSImprocedente,TNC_QTDCancelado,TNC_PTSCancelado,TNCVLRFALTA,TNCVLRSOBRA,TNCVLREMRISCO,TNC_PTSMaxUnidade,TNC_PTSUnidInicio,TNC_TNCInicio,TNC_ClassifInicio,TNC_PTSUnidAtual,TNC_TNCAtual,TNC_ClassifAtual,TNCdtultatu",
+	ColumnNames = "Ano,Código,Descrição,Tipo,Avaliação,Qtd.C,Qtd.N,Qtd.V,Qtd.E,Qtd.(C+N),Qtd.(3-SO),Pts.(3-SO),Qtd.(25-RC),Pts.(25-RC),Qtd.(12-PI),Pts.(12-PI),Qtd.(13-OC),Pts.(13-OC),Falta(R$),Sobra(R$),Em Risco(R$),Pts.MaxUnidade,Pts.Item(Inicial),TNC(Inicial),Classif(Inicial),Pts.Item(Atual),TNC(Atual),Classif(Atual),DT.Atualiz",
 	SheetName = "CLASSIFICAÇÕES DAS UNIDADES"
     ) />
 

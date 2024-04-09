@@ -1,17 +1,24 @@
-<!---  <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
-   <cfinclude template="aviso_sessao_encerrada.htm">
+<cfprocessingdirective pageEncoding ="utf-8"> 
+
+<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
+  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
-</cfif> --->
-<!--- <cfsetting requesttimeout="10"> --->
+</cfif> 
+<!--- <cfsetting requesttimeout="10"> 
 <cfquery name="qUsuarioGestorMaster" datasource="#dsn_inspecao#">
   SELECT DISTINCT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#' and (trim(Usu_GrupoAcesso) = 'GESTORMASTER' or trim(Usu_GrupoAcesso) = 'GOVERNANCA')
 </cfquery>
+--->
+
 <cfquery name="qUsu" datasource="#dsn_inspecao#">
-	SELECT Usu_Coordena, Usu_GrupoAcesso
+	SELECT Usu_Coordena, Usu_GrupoAcesso, Usu_email
 	FROM Usuarios 
 	WHERE Usu_Login = '#CGI.REMOTE_USER#' 
 </cfquery>
-<cfif trim(qUsu.Usu_GrupoAcesso) neq 'GESTORMASTER' and trim(qUsu.Usu_GrupoAcesso) neq 'GOVERNANCA'>
+
+<cfset grpacesso = ucase(Trim(qUsu.Usu_GrupoAcesso))>
+
+<cfif grpacesso neq 'GESTORMASTER' and grpacesso neq 'GOVERNANCA'>
 	<cfquery name="qSE" datasource="#dsn_inspecao#">
 		SELECT distinct Dir_Codigo, Dir_Sigla
 		FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR 
@@ -20,23 +27,22 @@
 	</cfquery>
 <cfelse>
 	<cfquery name="qSE" datasource="#dsn_inspecao#">
-	 SELECT distinct Dir_Codigo, Dir_Sigla
-	 FROM Diretoria
-	 ORDER BY Dir_Sigla
+		SELECT Dir_Codigo, Dir_Sigla
+		FROM Diretoria
+		WHERE Dir_Codigo <> '01'
+		ORDER BY Dir_Sigla
 	</cfquery>	
 </cfif>
-<cfquery name="qAcesso" datasource="#dsn_inspecao#">
-	select Usu_GrupoAcesso from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
-</cfquery>
+
 <!--- =========================== --->
-<cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORMASTER' or Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
+<cfif grpacesso neq 'GESTORMASTER' and grpacesso neq 'GOVERNANCA'>
 	<cfquery name="rsStatus" datasource="#dsn_inspecao#">
 	  SELECT STO_Codigo, STO_Sigla, STO_Descricao
 	  FROM Situacao_Ponto where STO_Status = 'A' and 
 	  <cfif trim(qUsu.Usu_GrupoAcesso) eq 'GOVERNANCA'>
-	  (STO_Codigo in (3,24,25,26,27,29,31)) 
+	  	(STO_Codigo in (3,24,25,26,27,29,31)) 
 	  <cfelse>
-	  (STO_Codigo in (3,12,13,24,25,26,27,29,31))
+	  	(STO_Codigo in (3,12,13,24,25,26,27,29,31))
 	  </cfif>
 	  order by Sto_Sigla
 	</cfquery>
@@ -83,29 +89,27 @@ function valida_form() {
        //  alert('dt inicio: ' + dtinic_yyyymmdd + '     dt fim: ' + dtfim_yyyymmdd);
 		 if (dtinic_yyyymmdd > dtfim_yyyymmdd)
 		 {
-		  alert('Data Inicial é maior que a Data Final!')
+		  alert('Data Inicial Ã© maior que a Data Final!')
 		  frm.dtinic.focus();
 		  return false;
 		 }
 		 if ((dtfim_yyyymmdd - dtinic_yyyymmdd) > 10000)
 		 {
 		// alert((dtfim_yyyymmdd - dtinic_yyyymmdd));
-		  alert('Esta consulta está limitada a 365(dias) entre as duas datas!')
+		  alert('Esta consulta estÃ¡ limitada a 365(dias) entre as duas datas!')
 		  frm.dtfim.focus();
 		  return false;
 		 }		
 		
-		
-		
 		if (frm.SE.value==''){
-		  alert('Informar a Superintendência!');
+		  alert('Informar a SuperintendÃªncia!');
 		  frm.SE.focus();
 		  return false;
 		}
   }
    if (frm.ckTipo.value=='inspecao'){
 		if (frm.txtNum_Inspecao.value==''){
-		  alert('Informar o Nº do Relatório');
+		  alert('Informar o NÂº da AvaliaÃ§Ã£o');
 		  frm.txtNum_Inspecao.focus();
 		  return false;
 		}
@@ -117,7 +121,7 @@ function valida_form() {
 		  return false;
 		}
 		if (frm.StatusSE.value==''){
-		  alert('Selecionar a Superintendência!');
+		  alert('Selecionar a SuperintendÃªncia!');
 		  frm.StatusSE.focus();
 		  return false;
 		}
@@ -175,7 +179,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia inválido!');
+		      alert('Valor para o dia invÃ¡lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -185,7 +189,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o Mês inválido!');
+		      alert('Valor para o MÃªs invÃ¡lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -196,10 +200,10 @@ function Mascara_Data(data)
 	}
 }
 //=============================
-//permite digitaçao apenas de valores numéricos
+//permite digitaï¿½ao apenas de valores numï¿½ricos
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitaï¿½ï¿½o das teclas numï¿½ricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 	
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -221,7 +225,7 @@ var tecla = window.event.keyCode;
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 	<form action="itens_controle_pontosbaixados_respostas.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return valida_form()">
 	  <table width="95%" align="center">
         <tr>
@@ -245,10 +249,10 @@ var tecla = window.event.keyCode;
         <tr>
           <td width="2%" class="exibir">&nbsp;</td>
           <td colspan="2">
-          <input name="ckTipo" type="radio" onClick="document.frmObjeto.ckTipo.value='periodo';desabilita_campos(1)" value="periodo" checked>          <span class="exibir"><strong>Per&iacute;odo/Superintendência</strong></span></td>
+          <input name="ckTipo" type="radio" onClick="document.frmObjeto.ckTipo.value='periodo';desabilita_campos(1)" value="periodo" checked><span class="exibir"><strong>PerÃ­odo/SuperintendÃªncia</strong></span></td>
           <td colspan="2"><div align="left"><strong>
             <input name="ckTipo" type="radio" value="inspecao" onClick="document.frmObjeto.ckTipo.value='inspecao';desabilita_campos(2)">
-          </strong><strong class="exibir">N&uacute;mero da Relat&oacute;rio</strong></div></td>
+          </strong><strong class="exibir">NÃºmero do RelatÃ³rio</strong></div></td>
           <td colspan="2" class="exibir"><div align="left"><strong>          
           <input name="ckTipo" type="radio" value="status" onClick="document.frmObjeto.ckTipo.value='status';desabilita_campos(3)">          
           Por Status/<strong>Superintend&ecirc;ncia</strong></strong></div></td>
@@ -261,7 +265,7 @@ var tecla = window.event.keyCode;
           <td width="13%"><strong><span class="exibir">Data Inicial:</span></strong><strong></strong></td>
           <td width="20%"><strong class="titulo1"><input name="dtinic" type="text" class="form" tabindex="1" id="dtinic" size="14" maxlength="10"  onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" >
 </strong></td>
-          <td width="7%"><strong><span class="exibir"> N&uacute;mero:</span></strong></td>
+          <td width="7%"><strong><span class="exibir">NÃºmero:</span></strong></td>
           <td width="19%"><input name="txtNum_Inspecao" type="text" size="14" maxlength="10" tabindex="3" class="form" onKeyPress="numericos()"></td>
           <td width="9%" class="exibir"><strong>Status: </strong>	      </td>
           <td width="30%" colspan="2" class="exibir">
@@ -285,7 +289,7 @@ var tecla = window.event.keyCode;
         </tr>
         <tr>
           <td>&nbsp;</td>
-          <td><strong><span class="exibir">Superintend&ecirc;ncia:</span></strong>            </td>
+          <td><strong><span class="exibir">SuperintendÃªncia:</span></strong>            </td>
           <td><select name="SE" class="form" tabindex="3">
             <option selected="selected" value="Todas">Todas</option>
             <cfoutput query="qSE">
@@ -293,7 +297,7 @@ var tecla = window.event.keyCode;
             </cfoutput>
           </select></td>
           <td colspan="2">&nbsp;</td>
-          <td><strong><span class="exibir">Superintend&ecirc;ncia:</span></strong></td>
+          <td><strong><span class="exibir">SuperintendÃªncia:</span></strong></td>
           <td><select name="StatusSE" class="form" id="StatusSE">
             <option selected="selected" value="Todas">Todas</option>
             <cfoutput query="qSE">

@@ -384,7 +384,7 @@ function Hint(objNome, action){
   </tr>
 
   <tr>
-    <td height="10" colspan="14"><div align="center"><strong class="titulo1">Controle das MANIFESTA&Ccedil;&Otilde;ES</strong></div></td>
+    <td height="10" colspan="14"><div align="center"><strong class="titulo1">CONTROLE DAS MANIFESTAÇÕES</strong></div></td>
       <td height="10" colspan="2"><div align="center"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/excel.jpg" width="50" height="35" border="0"></a></div></td>
   </tr>
 
@@ -427,10 +427,8 @@ function Hint(objNome, action){
 	  </cfif>
 	   <!---  --->
 		<cfset dtposic = CreateDate(year(rsItem.Pos_DtPosic),month(rsItem.Pos_DtPosic),day(rsItem.Pos_DtPosic))>
-		<cfset nCont = 0>
-		<cfset nFinal = 15>
-		<cfloop condition="nCont lte 14">
-			<cfset nCont = nCont + 1>
+		<cfset nCont = 1>
+		<cfloop condition="nCont lte 15">
 			<cfset dtposic = DateAdd( "d", 1, dtposic)>
 			<cfset vDiaSem = DayOfWeek(dtposic)>
 			<cfif vDiaSem neq 1 and vDiaSem neq 7>
@@ -446,6 +444,7 @@ function Hint(objNome, action){
 			<cfif vDiaSem eq 1 or vDiaSem eq 7>
 				<cfset nCont = nCont - 1>
 			</cfif>	
+			<cfset nCont = nCont + 1>
 		</cfloop>		
 		    
 		   <cfset dtFUP = DateFormat(dtposic,'DD/MM/YYYY')>

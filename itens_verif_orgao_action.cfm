@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -20,18 +21,18 @@
 		<cfset cabse = "Todas">
 		<cfset cabunid = "Todas">
 		<cfquery name="rsGeral" datasource="#dsn_inspecao#">
-			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total
+			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total, INP_Situacao
 			FROM (Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade) INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)
-			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, RIP_NumInspecao, INP_DtEncerramento, RIP_Resposta
-			HAVING (RIP_Resposta <> 'A' and INP_DtEncerramento Between #auxdtini# and #auxdtfim#)
+			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, RIP_NumInspecao, INP_DtEncerramento, RIP_Resposta, INP_Situacao
+			HAVING (INP_Situacao = 'CO' and RIP_Resposta <> 'A' and INP_DtEncerramento Between #auxdtini# and #auxdtfim#)
 			ORDER BY Und_CodDiretoria, RIP_Unidade, RIP_NumInspecao
 		</cfquery>
 		<!--- planilha --->
 		<cfquery name="rsXLSa" datasource="#dsn_inspecao#">
-			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total
+			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total, INP_Situacao
 			FROM (Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade) INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)
-			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, RIP_NumInspecao, INP_DtEncerramento, RIP_Resposta
-			HAVING (RIP_Resposta <> 'A' and INP_DtEncerramento Between #auxdtini# and #auxdtfim#)
+			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, RIP_NumInspecao, INP_DtEncerramento, RIP_Resposta, INP_Situacao
+			HAVING (INP_Situacao = 'CO' and RIP_Resposta <> 'A' and INP_DtEncerramento Between #auxdtini# and #auxdtfim#)
 			ORDER BY Und_CodDiretoria, RIP_Unidade, RIP_NumInspecao
 		</cfquery>
 		<!--- fim planilha --->
@@ -39,18 +40,18 @@
 		<cfset cabse = form.se>
 		<cfset cabunid = "Todas">		
 		<cfquery name="rsGeral" datasource="#dsn_inspecao#">
-			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total
+			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total, INP_Situacao
 			FROM (Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade) INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)
-			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta
-			HAVING (Und_CodDiretoria = '#cabse#') AND (INP_DtEncerramento Between #auxdtini# and #auxdtfim#) AND (RIP_Resposta <> 'A')
+			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, INP_Situacao
+			HAVING (Und_CodDiretoria = '#cabse#') AND (INP_DtEncerramento Between #auxdtini# and #auxdtfim#) AND (RIP_Resposta <> 'A') and (INP_Situacao = 'CO')
 			ORDER BY Und_CodDiretoria, RIP_Unidade, RIP_NumInspecao
 		</cfquery>
 		<!--- planilha --->
 		<cfquery name="rsXLSa" datasource="#dsn_inspecao#">
-			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total
+			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total, INP_Situacao
 			FROM (Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade) INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)
-			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta
-			HAVING (Und_CodDiretoria = '#cabse#') AND (INP_DtEncerramento Between #auxdtini# and #auxdtfim#) AND (RIP_Resposta <> 'A')
+			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, INP_Situacao
+			HAVING (Und_CodDiretoria = '#cabse#') AND (INP_DtEncerramento Between #auxdtini# and #auxdtfim#) AND (RIP_Resposta <> 'A') and (INP_Situacao = 'CO')
 			ORDER BY Und_CodDiretoria, RIP_Unidade, RIP_NumInspecao
 		</cfquery>
 		<!--- fim planilha --->
@@ -58,18 +59,18 @@
 		<cfset cabse = form.se>
 		<cfset cabunid = form.Unidade>
 		<cfquery name="rsGeral" datasource="#dsn_inspecao#">
-			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total
+			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total, INP_Situacao
 			FROM (Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade) INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)
-			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta
-			HAVING (Und_CodDiretoria = '#cabse#') and (RIP_Unidade = '#cabunid#') AND (INP_DtEncerramento Between #auxdtini# and #auxdtfim#) AND (RIP_Resposta <> 'A')
+			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, INP_Situacao
+			HAVING (Und_CodDiretoria = '#cabse#') and (RIP_Unidade = '#cabunid#') AND (INP_DtEncerramento Between #auxdtini# and #auxdtfim#) AND (RIP_Resposta <> 'A') and (INP_Situacao = 'CO')
 			ORDER BY Und_CodDiretoria, RIP_Unidade, RIP_NumInspecao
 		</cfquery>
 		<!--- planilha --->
 		<cfquery name="rsXLSa" datasource="#dsn_inspecao#">
-			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total
+			SELECT Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, Count(RIP_Resposta) AS Total, INP_Situacao
 			FROM (Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade) INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)
-			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta
-			HAVING (Und_CodDiretoria = '#form.se#') and (RIP_Unidade = '#form.Unidade#') AND (INP_DtEncerramento Between #auxdtini# and #auxdtfim#) AND (RIP_Resposta <> 'A')
+			GROUP BY Und_CodDiretoria, RIP_Unidade, Und_Descricao, INP_DtEncerramento, RIP_NumInspecao, RIP_Resposta, INP_Situacao
+			HAVING (Und_CodDiretoria = '#form.se#') and (RIP_Unidade = '#form.Unidade#') AND (INP_DtEncerramento Between #auxdtini# and #auxdtfim#) AND (RIP_Resposta <> 'A') and (INP_Situacao = 'CO')
 			ORDER BY Und_CodDiretoria, RIP_Unidade, RIP_NumInspecao
 		</cfquery>
 		<!--- fim planilha --->
@@ -91,7 +92,7 @@
 <tr>
 <td valign="top" width="1%" class="link1">&nbsp;</td>
 <td width="99%" valign="top">
-<!--- ¡rea de conte˙do   --->
+<!--- ÔøΩrea de conteÔøΩdo   --->
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
   SELECT DISTINCT Usu_Matricula FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
 </cfquery>
@@ -125,7 +126,7 @@ FROM (Grupos_Verificacao INNER JOIN Itens_Verificacao ON Grp_Codigo = Itn_NumGru
 				</cfif>
 			  </cfif>
 			</cfloop>
-		<!--- Fim exclus„o de arquivos --->
+		<!--- Fim exclusÔøΩo de arquivos --->
         <cfif cabse neq 'Todas'>
 			<cfquery name="rsSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Sigla FROM Diretoria WHERE Dir_Codigo = '#cabse#'
@@ -153,18 +154,18 @@ FROM (Grupos_Verificacao INNER JOIN Itens_Verificacao ON Grp_Codigo = Itn_NumGru
 			  <td colspan="13"><div align="right"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>" target="_blank"><img src="icones/xml.jpg" width="103" height="38" border="0"></a></div></td>
 			  </tr>
 			<tr class="exibir">
-			  <td colspan="13" bgcolor="eeeeee">&nbsp;Per&iacute;odo: <strong><cfoutput>#form.dtinic#</cfoutput></strong> atÈ <strong><cfoutput>#form.dtfinal#</cfoutput></strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Superintend&ecirc;ncia: <strong><cfoutput>#cabse#</cfoutput></strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unidade(s): <strong><cfoutput>#cabunid#</cfoutput></strong></td>
+			  <td colspan="13" bgcolor="eeeeee">&nbsp;Per&iacute;odo: <strong><cfoutput>#form.dtinic#</cfoutput></strong> at√© <strong><cfoutput>#form.dtfinal#</cfoutput></strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Superintend&ecirc;ncia: <strong><cfoutput>#cabse#</cfoutput></strong> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Unidade(s): <strong><cfoutput>#cabunid#</cfoutput></strong></td>
 			  </tr>
 			  <cffile action="Append" file="#slocal##sarquivo#" output="<rootelement>">
 			  <cffile action="Append" file="#slocal##sarquivo#" output="<Periodo>#form.dtinic# ate #form.dtfinal#</Periodo><Superintendencia>#cabse#</Superintendencia><Unidade>#cabunid#</Unidade>">
 		
 			<tr class="exibir">
 			  <td width="75" bgcolor="eeeeee"><div align="center"></div>
-				<div align="left">Dt de In&iacute;cio </div>
+				<div align="left">Dt de In√≠cio </div>
 				<div align="center"></div>        <div align="center"></div></td>
 			  <td width="65" bgcolor="eeeeee">Unidade</td>
 			  <td width="292" bgcolor="eeeeee">Nome</td>
-			  <td width="98" bgcolor="eeeeee">N&ordm; Inspe&ccedil;&atilde;o</td>
+			  <td width="98" bgcolor="eeeeee">N¬∫ Inspe√ß√£o</td>
 			  <td colspan="2" bgcolor="eeeeee"> <div align="center"><strong>C</strong></div></td>
 			  <td colspan="2" bgcolor="eeeeee"> <div align="center"><strong>N</strong></div></td>
 			  <td colspan="2" bgcolor="eeeeee"><div align="center"><strong>V</strong></div></td>
@@ -321,11 +322,11 @@ FROM (Grupos_Verificacao INNER JOIN Itens_Verificacao ON Grp_Codigo = Itn_NumGru
 <div align="center" class="exibir">
   <div align="center">
   <cfif rsGeral.RecordCount EQ 0>
-      <strong class="exibir">N„o existe informaÁ„o para o perÌodo/&oacute;rg&atilde;o informado</strong>
+      <strong class="exibir">N√£o existe informa√ß√£o para o per√≠odo/√ìrg√£o informado</strong>
   </cfif> </div>
 </div>
 
-<!--- Fim ¡rea de conte˙do --->
+<!--- Fim ÔøΩrea de conteÔøΩdo --->
     </td>
   </tr>
 </table>

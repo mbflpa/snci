@@ -27,6 +27,7 @@
 </cfquery>
 
  <cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
+
  <cfif (grpacesso neq 'GESTORES') and (grpacesso neq 'DESENVOLVEDORES') and (grpacesso neq 'GESTORMASTER')  and (grpacesso neq 'INSPETORES') and (grpacesso neq 'ANALISTAS') and (grpacesso neq 'GOVERNANCA')>
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>   
@@ -149,6 +150,7 @@
 			  <cfset pos_aux = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>Registro de Processo Disciplinar(Inclusão)' & CHR(13) & CHR(13) & 'Data de Atualização: ' & #DateFormat(now(),"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Número do Processo: ' & #FORM.proc_se# & '-' & #FORM.proc_num# & '-' & #FORM.proc_ano# & CHR(13) & CHR(13) & 'Modalidade: ' & #FORM.Modalidade# & CHR(13) & CHR(13) & 'N.SEI(Processo): ' & #FORM.frmprocsei# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 			  <cfset and_aux = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>Registro de Processo Disciplinar(Inclusão)' & CHR(13) & CHR(13) & 'Data de Atualização: ' & #DateFormat(now(),"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Número do Processo: ' & #FORM.proc_se# & '-' & #FORM.proc_num# & '-' & #FORM.proc_ano# & CHR(13) & CHR(13) & 'Modalidade: ' & #FORM.Modalidade# & CHR(13) & CHR(13) & 'N.SEI(Processo): ' & #FORM.frmprocsei# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 		</cfif>	
+		<cfset houveProcSN = 'S'>
 	<cfelse>
 		<cfquery datasource="#dsn_inspecao#" name="qExitesSEI">
 			SELECT SEI_Inspecao FROM Inspecao_SEI
@@ -163,6 +165,7 @@
 			<cfset pos_aux = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>Registro de N.SEI Apuracao(Inclusão)' & CHR(13) & CHR(13) & 'Data de Atualização: ' & #DateFormat(now(),"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Número do SEI: ' & #FORM.frmprocsei# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 			<cfset and_aux = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> Registro de N.SEI Apuração(Inclusão)' & CHR(13) & CHR(13) & 'Data de Atualização: ' & #DateFormat(now(),"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Número do SEI: ' & #FORM.frmprocsei# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 		</cfif>
+		<cfset houveProcSN = 'N'>
 	</cfif>	
 	
   	<!--- Atualizar PareceUnidade --->
@@ -188,9 +191,6 @@
 			WHERE And_Unidade='#unid#' AND And_NumInspecao='#ninsp#' AND And_NumGrupo=#ngrup# AND And_NumItem=#nitem# and And_DtPosic = #prazo# and And_Situacao_Resp = #rsSitAtual.Pos_Situacao_Resp#
 		</cfquery>
     </cfif>
-    	  
-    <cfset houveProcSN = 'S'>
-
 </cfif>
 
  <!--- Excluir N. SEI --->
@@ -391,7 +391,7 @@
 	ORDER BY SEI_NumSEI
 </cfquery>
 <cfquery name="qProcSei" datasource="#dsn_inspecao#">
-	SELECT PDC_ProcSEI, PDC_Processo, PDC_Modalidade FROM Inspecao_ProcDisciplinar
+	SELECT PDC_ProcSEI, PDC_Processo, PDC_Modalidade,PDC_dtultatu FROM Inspecao_ProcDisciplinar
 	WHERE PDC_Unidade='#unid#' AND PDC_Inspecao='#ninsp#' AND PDC_Grupo=#ngrup# AND PDC_Item=#nitem#
 	ORDER BY PDC_ProcSEI
 </cfquery>
@@ -488,7 +488,7 @@
 		  SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
 	  </cfquery>
 	  <cfset auxposarea = #rsReop.Rep_Codigo#>
-	<cfelseif Form.frmResp is 5 or Form.frmResp is 10 or Form.frmResp is 19 or Form.frmResp is 21 or Form.frmResp is 25 or Form.frmResp is 26>
+	<cfelseif Form.frmResp is 5 or Form.frmResp is 10 or Form.frmResp is 19 or Form.frmResp is 25 or Form.frmResp is 26>
 		<cfset auxposarea = #Form.cbarea#>
 	<cfelseif Form.frmResp is 4>  
 		<cfset auxposarea = #rsMod.Dir_Sto#>
@@ -770,21 +770,23 @@
 	  <cfset IDArea = #strIDGestor#>
 	</cfcase>
     <cfcase value=21>
+	<!---
 	  <cfquery name="qArea2" datasource="#dsn_inspecao#">
 		SELECT Ars_Sigla, Ars_Descricao, Ars_Email
 		FROM Areas
 		WHERE Ars_Codigo = '#Form.cbscia#'
 	  </cfquery>
+	--->
 	   , Pos_Situacao = 'RV'
-	   , Pos_Area = '#Form.cbscia#'
-	   , Pos_Nomearea = '#qArea2.Ars_Descricao#'
+	   , Pos_Area = '#strIDGestor#'
+	   , Pos_Nomearea = '#strNomeGestor#'
 	   , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
 	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	   <cfset Gestor = '#qArea2.Ars_Descricao#'>
+	   <cfset Gestor = '#strNomeGestor#'>
 	   <cfset situacao = 'REAVALIACAO'>
-	   <cfset IDArea = #Form.cbscia#>
-	   <cfset sdestina = #qArea2.Ars_Email#>
-  	   <cfset nomedestino = #qArea2.Ars_Descricao#>
+	   <cfset IDArea = '#strIDGestor#'>
+	   <cfset sdestina = #rsMod.Und_Email#>
+  	   <cfset nomedestino = #rsMod.Und_Descricao#>
 	</cfcase>
 	<cfcase value=23>
 	<!--- Status: Tratamento pela SE --->
@@ -949,8 +951,9 @@
 </cfquery>
 
 <!---  --->
-	<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
-	<cfset hhmmss = left(hhmmssmmm,2) & mid(hhmmssmmm,4,2) & mid(hhmmssmmm,7,2)>
+	<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+	<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+	<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>
   <cfquery datasource="#dsn_inspecao#">
    INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area)
    VALUES (
@@ -962,13 +965,13 @@
    ,
    #form.Nitem#
    ,
-   convert(char, getdate(), 102)
+   #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
    ,
    '#CGI.REMOTE_USER#'
    ,
    #FORM.frmResp#
    ,
-  '#hhmmss#'
+  '#hhmmssdc#'
    ,
   <cfif IsDefined("FORM.observacao") AND FORM.observacao NEQ "">
      <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #Trim(Encaminhamento)#  & CHR(13) & CHR(13) & 'AO (À) ' & '  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & CHR(13) & CHR(13) & 'Situação: ' & #situacao# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
@@ -1062,7 +1065,9 @@ INNER JOIN (Diretoria
  FROM Inspetor_Inspecao INNER JOIN Funcionarios ON IPT_MatricInspetor = Fun_Matric AND IPT_MatricInspetor =
  Fun_Matric WHERE IPT_NumInspecao = '#URL.Ninsp#'
 </cfquery>
-
+<cfif qProcSei.Pdc_dtultatu gte qResposta.Pos_DtPosic>
+	<cfset houveProcSN = 'S'>
+</cfif>	
 	  
 <cfquery name="qAreaDaUnidade" datasource="#dsn_inspecao#">  
       SELECT Areas.Ars_Codigo, Areas.Ars_Sigla, Areas.Ars_Descricao
@@ -1119,26 +1124,37 @@ INNER JOIN (Diretoria
 <cfquery name="rsTPUnid" datasource="#dsn_inspecao#">
      SELECT Und_Codigo, Und_Descricao, Und_TipoUnidade FROM Unidades WHERE Und_Codigo = '#URL.unid#'
 </cfquery>
-	<!---Cria uma instancia do componente Dao--->
-	<cfobject component = "CFC/Dao" name = "dao">
-    <!---Invoca o metodo  rsUsuarioLogado para retornar dados do Usu&atilde;rio logado (rsUsuarioLogado)--->
-	<cfinvoke component="#dao#" method="rsUsuarioLogado" returnVariable="rsUsuarioLogado">
 	<cfif rsTPUnid.Und_TipoUnidade is 12 || rsTPUnid.Und_TipoUnidade is 16>
-		 <!---Invoca o metodo  VencidoPrazo_Andamento para retornar 'yes' se o prazo estiver vencido ou 'no' --->
-		<cfinvoke component="#dao#" method="VencidoPrazo_Andamento" returnVariable="PrazoVencido"	  
-		  NumeroDaInspecao = '#URL.ninsp#'
-		  CodigoDaUnidade ='#URL.unid#'
-		  Grupo ='#URL.ngrup#'
-		  Item ='#URL.nitem#' 
-		  ListaDeStatusContabilizados = 14,18,20,5,19,4,16 
-		  Prazo = 30	
-		  RetornaQuantDias = no
-		/>	  	
 	
+		<cfquery name="rs14AND" datasource="#dsn_inspecao#">
+			SELECT And_DtPosic FROM Andamento
+			WHERE And_Unidade='#URL.unid#' AND And_NumInspecao='#URL.ninsp#' AND And_NumGrupo=#URL.ngrup# AND And_NumItem=#URL.nitem# 
+			AND And_Situacao_Resp = 14
+		</cfquery>
+		<cfset dtnovoprazo = CreateDate(year(rs14AND.And_DtPosic),month(rs14AND.And_DtPosic),day(rs14AND.And_DtPosic))> 
+		<cfset nCont = 1>
+		<cfloop condition="nCont lte 30">
+			<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+			<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
+			<cfif vDiaSem neq 1 and vDiaSem neq 7>
+				<!--- verificar se Feriado Nacional --->
+				<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+					SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
+				</cfquery>
+				<cfif rsFeriado.recordcount gt 0>
+				<cfset nCont = nCont - 1>
+				</cfif>
+			</cfif>
+			<!--- Verifica se final de semana  --->
+			<cfif vDiaSem eq 1 or vDiaSem eq 7>
+				<cfset nCont = nCont - 1>
+			</cfif>	
+			<cfset nCont = nCont + 1>	
+		</cfloop> 	
 		<!--- <cfset gil=gil> --->
 			<cfquery name="rsPonto" datasource="#dsn_inspecao#">
-			  SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo not in (1,2,4,3,5,6,7,8,11,14,15,17,18,19,20,22,23,24,27,30)	                                                                                                   
-			  <cfif #PrazoVencido# eq 'yes'>
+			  SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo not in (1,2,4,3,5,6,7,8,11,14,15,17,18,19,20,22,23,24,27,29,30)	                                                                                                   
+			  <cfif dateformat(#dtnovoprazo#,"YYYYMMDD") lt dateformat(now(),"YYYYMMDD")>
 				  AND STO_Codigo <> 20 
 			  </cfif>
 			  order by STO_Descricao
@@ -1151,7 +1167,7 @@ INNER JOIN (Diretoria
 			<cfelse>
 			   SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo not in (1,2,4,5,6,7,8,9,11,14,17,18,20,22,25,27,30) 			
 			</cfif>
-			<cfif Trim(rsUsuarioLogado.GrupoAcesso) neq 'GESTORMASTER'>
+			<cfif grpacesso neq 'GESTORMASTER'>
 					 AND STO_Codigo <> 21 
 			 </cfif>
 		 order by STO_Descricao	
@@ -1468,7 +1484,7 @@ function exibirscia(ind){
 //alert('exibirscia: ' + ind);
   
   document.form1.cbscia.disabled=false;
-if (ind==21) {
+if (ind==210) {
           window.dAreascia.style.visibility = 'visible'; 
 		  travarcombo('SEC ACOMP CONTR INTERNO/SGCIN','cbscia');
   
@@ -1723,6 +1739,8 @@ function validarform(){
 	  
 	  if (confirm ('                       Atenção! \n\nConfirmar a Exclusão do Processo Disciplinar Selecionado?'))
 	    {
+		document.form1.frmResp.disabled=false;
+		document.form1.cbareaCS.disabled=false;					
 	     return true;
 		}
 	else
@@ -1733,6 +1751,8 @@ function validarform(){
 //==================== 
   if (document.form1.acao.value=='Excluir_Sei'){
 	  var aux = document.form1.dbfrmnumsei.value;
+		document.form1.frmResp.disabled=false;
+		document.form1.cbareaCS.disabled=false;			  
 	  //alert(aux);
 	  if (aux.length != 17){
 		  alert("Gestor(a), você deve selecionar Nº SEI a ser excluído!");
@@ -1755,6 +1775,8 @@ if (document.form1.acao.value=='Incluir_Proc'){
 	  var auxproc = document.form1.proc_num.value;
 	  var auxano = document.form1.proc_ano.value;
 	  var auxmodal = document.form1.modalidade.value;
+		document.form1.frmResp.disabled=false;
+		document.form1.cbareaCS.disabled=false;			  
 	  
 	 // alert(auxsei.length);
 	  if (auxsei.length != 20){
@@ -2017,9 +2039,9 @@ window.open(page, "Popup", windowprops);
 		<cfset resp = #qResposta.Pos_Situacao_Resp#> 
 		<input type="hidden" name="srespatual" id="srespatual" value="#resp#">
 		<cfset caracvlr = #trim(qResposta.RIP_Caractvlr)#>
-		<cfset falta = #mid(LSCurrencyFormat(qResposta.RIP_Falta, "local"), 4, 20)#>
-		<cfset sobra = #mid(LSCurrencyFormat(qResposta.RIP_Sobra, "local"), 4, 20)#>
-		<cfset emrisco = #mid(LSCurrencyFormat(qResposta.RIP_EmRisco, "local"), 4, 20)#>
+		<cfset falta = trim(Replace(NumberFormat(qResposta.RIP_Falta,999.00),'.',',','All'))> 
+		<cfset sobra = trim(Replace(NumberFormat(qResposta.RIP_Sobra,999.00),'.',',','All'))> 
+		<cfset emrisco = trim(Replace(NumberFormat(qResposta.RIP_EmRisco,999.00),'.',',','All'))> 
 		<input type="hidden" name="scaracvlr" id="scaracvlr" value="#caracvlr#">
 		<input type="hidden" name="sfrmfalta" id="sfrmfalta" value="#falta#">
 		<input type="hidden" name="sfrmsobra" id="sfrmsobra" value="#sobra#">
@@ -2060,7 +2082,7 @@ window.open(page, "Popup", windowprops);
 	  
       <cfset habslvsn = 'S'>
 	  <cfset auxtmp = left(url.PosArea,2)>
-	  <cfif qUsuario.Usu_DR neq auxtmp and not listfind(trim(qAcesso.Usu_Coordena),auxtmp) and trim(ucase(qAcesso.Usu_GrupoAcesso)) neq 'GESTORMASTER'>
+	  <cfif qUsuario.Usu_DR neq auxtmp and not listfind(trim(qAcesso.Usu_Coordena),auxtmp) and grpacesso neq 'GESTORMASTER'>
 	    <cfset habslvsn = 'N'>
 	  </cfif>
     </tr>
@@ -2420,7 +2442,7 @@ N&ordm; Relat&oacute;rio:
         </td>
         </tr>
 <tr bgcolor="eeeeee">
-<td colspan="5" class="exibir"><div id="dAreaCS">Selecione a &Aacute;rea(CS):
+<td colspan="5" class="exibir"><div id="dAreaCS">Selecione a Área(CS):
 	<select name="cbareaCS" class="form">
 	  <option selected="selected" value="">---</option>
 	  <cfoutput query="qAreaCS">
@@ -2430,7 +2452,7 @@ N&ordm; Relat&oacute;rio:
 </div></td>
 </tr>
 <tr bgcolor="eeeeee">
-<td colspan="5" class="exibir"><div id="dAreascia">Selecione a &Aacute;rea(SCIA):
+<td colspan="5" class="exibir"><div id="dAreascia">Selecione a Área(SCIA):
 	<select name="cbscia" class="form">
 	 <!---  <option selected="selected" value="">---</option> --->
 	  <cfoutput query="qscia">
@@ -2581,7 +2603,7 @@ N&ordm; Relat&oacute;rio:
 </tr>
 
       <tr bgcolor="eeeeee">
-        <td colspan="5" class="exibir"><div id="dAreaCS">Selecione a &Aacute;rea(CS):
+        <td colspan="5" class="exibir"><div id="dAreaCS">Selecione a Área(CS):
             <select name="cbareaCS" class="form">
               <option selected="selected" value="">---</option>
               <cfoutput query="qAreaCS">
@@ -2591,7 +2613,7 @@ N&ordm; Relat&oacute;rio:
         </div></td>
       </tr>
 <tr bgcolor="eeeeee">
-<td colspan="5" class="exibir"><div id="dAreascia">Selecione a &Aacute;rea(SCIA):
+<td colspan="5" class="exibir"><div id="dAreascia">Selecione a Área(SCIA):
 	<select name="cbscia" class="form">
 	 <!---  <option selected="selected" value="">---</option> --->
 	  <cfoutput query="qscia">
@@ -2704,9 +2726,9 @@ N&ordm; Relat&oacute;rio:
 
 	<!---   <cfoutput>sn:#habslvsn#</cfoutput> --->
 	   <cfset numdias = qResposta.diasOcor>
-	  <cfif ((resp is 10) or (resp is 1 and numdias lte 2) or (resp is 6 and numdias lte 2) or (resp is 7 and numdias lte 2) or (resp is 17 and numdias lte 2) or (resp is 22 and numdias lte 2) or (resp is 18) or (resp is 20) or Trim(qAcesso.Usu_GrupoAcesso) eq 'INSPETORES')>
+	  <cfif ((resp is 10) or (resp is 1 and numdias lte 2) or (resp is 6 and numdias lte 2) or (resp is 7 and numdias lte 2) or (resp is 17 and numdias lte 2) or (resp is 22 and numdias lte 2) or (resp is 18) or (resp is 20) or grpacesso eq 'INSPETORES')>
 		<input name="Salvar2" type="submit" class="botao" value="Salvar" onClick="document.form1.acao.value='Salvar2';" disabled>
-	  <cfelseif (resp eq 9 or resp eq 27) and Trim(qAcesso.Usu_GrupoAcesso) neq 'GESTORMASTER'>
+	  <cfelseif (resp eq 9 or resp eq 27) and grpacesso neq 'GESTORMASTER'>
 		<input name="Salvar2" type="submit" class="botao" value="Salvar" onClick="document.form1.acao.value='Salvar2';" disabled>
 	  <cfelse>
         <input name="Salvar2" type="submit" class="botao" value="Salvar" onClick="document.form1.acao.value='Salvar2';" <cfoutput>#halbtgeral#</cfoutput>>

@@ -1,7 +1,8 @@
-<!---  <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
+<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
-</cfif>  --->    
+</cfif>     
 <!---
  <cfoutput>#Form.tpunid#</cfoutput> --->
  <html>
@@ -15,7 +16,7 @@ function validaForm() {
 //alert(document.form1.acao.value);
 if (document.form1.acao.value != 'Filtro')
    {
-    if (document.form1.frmcodunid.value == 'N'){return false;}
+    if (document.form1.frmcodunid.value == 'N') {return false;}
     document.form1.action="alterar_dados_unidade.cfm";
     document.form1.submit();
 	}
@@ -36,13 +37,13 @@ function voltar(){
   SELECT Dir_Sigla FROM Diretoria WHERE Dir_Codigo = '#form.se#'
 </cfquery>
 
-
 <cfquery datasource="#dsn_inspecao#" name="rsTipoUnid">
   SELECT Und_TipoUnidade, TUN_Descricao 
   FROM Tipo_Unidades INNER JOIN Unidades ON TUN_Codigo = Und_TipoUnidade 
   GROUP BY Und_TipoUnidade, TUN_Descricao, Und_CodDiretoria 
   HAVING (((Und_CodDiretoria)='#form.se#')) 
 </cfquery>
+
 <cfinclude template="cabecalho.cfm">
 <form name="form1" method="post" onSubmit="return validaForm()">
 <div align="center">
@@ -85,24 +86,21 @@ function voltar(){
 	   <td colspan="8" class="titulos">Filtrar por:</td>
 	   </tr>
 	   <cfset qtdcol = 0>
-	   <tr>	  <cfoutput query="rsTipoUnid">
-       
-	  <cfset ntam = len(#trim(TUN_Descricao)#)>
-	  <cfset ntam = 14 - ntam>
-	  <!--- <cfset strnome = RepeatString(" ", ntam / 2) & trim(TUN_Descricao) & RepeatString(" ", ntam / 2)> --->
-	  
-	  <cfset strnome = RepeatString(" ", ntam / 2) & left(trim(TUN_Descricao),14) & RepeatString(" ", ntam / 2)>
-	  <cfif qtdcol gte 10>
-		  <tr>		  </tr> 
-		  <cfset qtdcol = 0>
-	  </cfif>
-		 <td><div align="center">
-	    <div align="left">
-	      <input name="#Und_TipoUnidade#" type="button" class="exibir" onClick="document.form1.acao.value='Filtro'; document.form1.tpunid.value=this.name; validaForm()" value="#strnome#">
-	      </div>
-	    </div>	  </td>
-	  
-	  <cfset qtdcol = qtdcol + 1>
+	   <tr>	  
+    <cfoutput query="rsTipoUnid">
+      <cfset ntam = len(trim(#TUN_Descricao#))>
+      <cfset ntam = 14 - ntam>
+        <cfset strnome = RepeatString(" ", ntam / 2) & left(trim(TUN_Descricao),14) & RepeatString(" ", ntam / 2)>
+      <cfif qtdcol gte 10>
+        <tr>		  </tr> 
+        <cfset qtdcol = 0>
+      </cfif>
+      <td><div align="center">
+        <div align="left">
+          <input name="#Und_TipoUnidade#" type="button" class="exibir" onClick="document.form1.acao.value='Filtro'; document.form1.tpunid.value=this.name; validaForm()" value="#strnome#">
+          </div>
+        </div>	  </td>
+      <cfset qtdcol = qtdcol + 1>
 	  </cfoutput>
 	  </tr>
 	  </table>	  </td>
@@ -207,6 +205,7 @@ function voltar(){
 	 <input name="codigo" id="codigo" type="hidden"value="">
 	 <input name="acao" id="acao" type="hidden"value="">
 	 <input name="se" type="hidden" value="<cfoutput>#form.se#</cfoutput>">
+   <input name="evento" type="hidden" value="<cfoutput>#form.evento#</cfoutput>">
 </form>
 <form name="formvolta" method="post" action="index.cfm?opcao=permissao0">
   <input name="sacao" type="hidden" id="sacao" value="voltar">

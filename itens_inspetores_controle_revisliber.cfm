@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/> 
+<cfprocessingdirective pageEncoding ="utf-8"> 
 <!--- <cfdump var="#form#"> <cfdump var="#session#"> --->
 <!---  <cfdump var="#url#">  --->
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
@@ -22,7 +22,8 @@
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	select Usu_GrupoAcesso, Usu_Matricula, Usu_Email from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
-
+<cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
+	  
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
   SELECT DISTINCT Usu_Apelido, Usu_Lotacao, Usu_LotacaoNome, Usu_DR, Usu_Email
   FROM Usuarios
@@ -34,7 +35,7 @@
  SELECT Pos_NCISEI FROM ParecerUnidade WHERE Pos_Unidade='#unid#' AND Pos_Inspecao='#ninsp#' AND Pos_NCISEI Is Not Null ORDER BY Pos_NCISEI DESC
 </cfquery>
 
-<cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES' or Trim(qAcesso.Usu_GrupoAcesso) eq 'DESENVOLVEDORES' or Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORMASTER'>
+<cfif grpacesso eq 'GESTORES' or grpacesso eq 'DESENVOLVEDORES' or grpacesso eq 'GESTORMASTER'>
 <!---  <cftry>  --->
   <cfif isDefined("Form.acao") And (Form.acao is 'alter_reincidencia' Or Form.acao is 'alter_valores' Or Form.acao is 'Anexar' Or Form.acao is 'Excluir_Anexo')>
   <cfif isDefined("Form.abertura")><cfset Session.E01.abertura = Form.abertura><cfelse><cfset Session.E01.abertura = 'Não'></cfif>
@@ -101,6 +102,10 @@
 			, RIP_EmRisco=#auxfrmemrisco#
 		    , RIP_UserName = '#CGI.REMOTE_USER#'
 		    , RIP_DtUltAtu = CONVERT(char, GETDATE(), 120)
+			<cfif grpacesso eq 'GESTORES'>
+			, RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
+			, RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)
+			</cfif>			
 		    WHERE RIP_Unidade='#unid#' AND RIP_NumInspecao='#ninsp#' AND RIP_NumGrupo = #ngrup# AND RIP_NumItem = #nitem#
 	</cfquery>
 
@@ -116,7 +121,6 @@
 	<cfset aux_obs = Replace(aux_obs,"'","","All")>
 	<cfset aux_obs = Replace(aux_obs,'*','','All')>
     <cfset aux_obs = Replace(aux_obs,'>','','All')>
-    
 	<cfset pos_aux = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> Alteração de Valores' & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & ' Antes(R$) - Falta: ' & #form.sfrmfalta# & '  Sobra: ' & #form.sfrmsobra# & '  Em Risco: ' & #form.sfrmemrisco# & CHR(13) & 'Atual (R$) - Falta: ' & #form.frmfalta# & '  Sobra: ' & #form.frmsobra# & '  Em Risco: ' & #form.frmemrisco# & CHR(13) & CHR(13) &  'Data de Atualização: ' & #DateFormat(now(),"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
  </cfif>		
 </cfif>
@@ -204,7 +208,6 @@
 		WHERE UND_codigo='#unid#'
  </cfquery>
 
-
  <cfif IsDefined("FORM.submit") AND IsDefined("FORM.acao") And Form.acao is "Salvar">
 	<cfquery datasource="#dsn_inspecao#" name="qVerificaTipo">
 		Select Und_TipoUnidade, Und_CodReop from Unidades WHERE Und_Codigo = #Unid#
@@ -223,18 +226,20 @@
 	   <cfif IsDefined("FORM.recomendacao") AND FORM.recomendacao NEQ "">
 		 , RIP_Recomendacoes=
 		  <cfset aux_recom = CHR(13) & FORM.recomendacao>
-		 
 		  '#aux_recom#'
 		</cfif>
 		  , RIP_UserName = '#CGI.REMOTE_USER#'
 		  , RIP_DtUltAtu = CONVERT(char, GETDATE(), 120)
+          <cfif grpacesso eq 'GESTORES'>
+            , RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
+            , RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)
+          </cfif>		  
 		  WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_NumItem=#FORM.nitem#
 	  </cfquery>
 	  <cfif IsDefined("FORM.frmcbarea") AND FORM.frmcbarea EQ "">
 			 <cfquery datasource="#dsn_inspecao#">
 			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = 11
 			   , Pos_Situacao = 'EL'
-         <!--- , Pos_NomeArea = '#qUnidade.Und_Descricao#' --->
 			   , Pos_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
 			   , Pos_DtPrev_Solucao = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
 			   , Pos_DtUltAtu = CONVERT(char, GETDATE(), 120)
@@ -405,29 +410,40 @@
 <cfquery name="rsTPUnid" datasource="#dsn_inspecao#">
      SELECT Und_Codigo, Und_Descricao, Und_TipoUnidade FROM Unidades WHERE Und_Codigo = '#URL.unid#'
 </cfquery>
-	<!---Cria uma instancia do componente Dao--->
-	<cfobject component = "CFC/Dao" name = "dao">
-    <!---Invoca o metodo  rsUsuarioLogado para retornar dados do Usuário logado (rsUsuarioLogado)--->
-	<cfinvoke component="#dao#" method="rsUsuarioLogado" returnVariable="rsUsuarioLogado">
+
 <cfif rsTPUnid.Und_TipoUnidade is 12 || rsTPUnid.Und_TipoUnidade is 16>
-	 <!---Invoca o metodo  VencidoPrazo_Andamento para retornar 'yes' se o prazo estiver vencido ou 'no' --->
-	<cfinvoke component="#dao#" method="VencidoPrazo_Andamento" returnVariable="PrazoVencido"	  
-      NumeroDaInspecao = '#URL.ninsp#'
-      CodigoDaUnidade ='#URL.unid#'
-      Grupo ='#URL.ngrup#'
-      Item ='#URL.nitem#' 
-	  ListaDeStatusContabilizados = 14,18,20 
-	  Prazo = 30	
-	  RetornaQuantDias = no
-	  MostraDump = no
-	  ApenasDiasUteis = yes
-	/>	  	
+
+	<cfquery name="rs14AND" datasource="#dsn_inspecao#">
+		SELECT And_DtPosic FROM Andamento
+		WHERE And_Unidade='#URL.unid#' AND And_NumInspecao='#URL.ninsp#' AND And_NumGrupo=#URL.ngrup# AND And_NumItem=#URL.nitem# 
+		AND And_Situacao_Resp = 14
+	</cfquery>
+	<cfset dtnovoprazo = CreateDate(year(rs14AND.And_DtPosic),month(rs14AND.And_DtPosic),day(rs14AND.And_DtPosic))> 
+	<cfset nCont = 1>
+	<cfloop condition="nCont lte 30">
+		<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+		<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
+		<cfif vDiaSem neq 1 and vDiaSem neq 7>
+			<!--- verificar se Feriado Nacional --->
+			<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+				SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
+			</cfquery>
+			<cfif rsFeriado.recordcount gt 0>
+			<cfset nCont = nCont - 1>
+			</cfif>
+		</cfif>
+		<!--- Verifica se final de semana  --->
+		<cfif vDiaSem eq 1 or vDiaSem eq 7>
+			<cfset nCont = nCont - 1>
+		</cfif>	
+		<cfset nCont = nCont + 1>	
+	</cfloop>
 
 	
 		  <cfquery name="rsPonto" datasource="#dsn_inspecao#">
 		  SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto 
 		  WHERE STO_Status='A'                                                                                                   
-		  <cfif #PrazoVencido# eq 'yes'>
+		  <cfif dateformat(#dtnovoprazo#,"YYYYMMDD") lt dateformat(now(),"YYYYMMDD")>
 			  <cfif Trim(rsUsuarioLogado.GrupoAcesso) eq 'GESTORMASTER'>
 			   AND STO_Codigo in (9,12,13,21,25,26)
 			  <cfelse>
@@ -443,7 +459,7 @@
 	      </cfif>
 		  order by STO_Descricao
 		</cfquery>
-        <cfset PrzVencSN = PrazoVencido>
+
 		<cfif situacao eq 28>
 		   <cfquery name="rsPonto" datasource="#dsn_inspecao#">
 		     SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo in (12,28) order by STO_Descricao
@@ -881,7 +897,7 @@ window.open(page, "Popup", windowprops);
     <td height="20" colspan="5" bgcolor="eeeeee">&nbsp;</td>
   </tr>
   <tr>
-    <td height="10" colspan="5" bgcolor="eeeeee"><div align="center"><strong class="titulo1">Controle das MANIFESTA&Ccedil;&Otilde;ES</strong></div></td>
+    <td height="10" colspan="5" bgcolor="eeeeee"><div align="center"><strong class="titulo1">CONTROLE DAS MANIFESTAÇÕES</strong></div></td>
   </tr>
   <tr>
     <td height="20" colspan="5" bgcolor="eeeeee">&nbsp;</td>
@@ -895,9 +911,9 @@ window.open(page, "Popup", windowprops);
 		<cfset resp = #qResposta.Pos_Situacao_Resp#> 
 		<input type="hidden" name="srespatual" id="srespatual" value="#resp#">
 		<cfset caracvlr = #trim(qResposta.RIP_Caractvlr)#>
-		<cfset falta = #mid(LSCurrencyFormat(qResposta.RIP_Falta, "local"), 4, 20)#>
-		<cfset sobra = #mid(LSCurrencyFormat(qResposta.RIP_Sobra, "local"), 4, 20)#>
-		<cfset emrisco = #mid(LSCurrencyFormat(qResposta.RIP_EmRisco, "local"), 4, 20)#>
+		<cfset falta = trim(Replace(NumberFormat(qResposta.RIP_Falta,999.00),'.',',','All'))> 
+		<cfset sobra = trim(Replace(NumberFormat(qResposta.RIP_Sobra,999.00),'.',',','All'))> 
+		<cfset emrisco = trim(Replace(NumberFormat(qResposta.RIP_EmRisco,999.00),'.',',','All'))> 
 		<!--- <input type="hidden" name="tuipontuacao" id="tuipontuacao" value="#rsPto.TUI_Pontuacao#"> --->
 		<input type="hidden" name="scaracvlr" id="scaracvlr" value="#caracvlr#">
 		<input type="hidden" name="sfrmfalta" id="sfrmfalta" value="#falta#">
@@ -954,7 +970,7 @@ window.open(page, "Popup", windowprops);
             <td colspan="4" bgcolor="eeeeee">-&nbsp;<cfoutput query="qInspetor"><strong class="exibir">#qInspetor.Fun_Nome#</strong>&nbsp;<cfif qInspetor.currentrow neq qInspetor.recordcount><br>-&nbsp;</cfif></cfoutput></td>
       </tr>
     <tr class="exibir">
-      <td bgcolor="eeeeee">Nº Relatório</td>
+      <td bgcolor="eeeeee">Nº Avaliação</td>
       <td colspan="4" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In&iacute;cio 
 
 
@@ -1022,10 +1038,14 @@ N&ordm; Relat&oacute;rio:
 	 <cfoutput>
 	<cfset caracvlrhabilSN = 'N'>
 	<cfset caracvlr = 'NAO QUANTIFICADO'>
+	<cfset auxriscoSN = 'N'>
 	<!--- <cfif listFind(#rsItem.Itn_PTC_Seq#,10) and (ucase(trim(rsItem.RIP_CARACTVLR)) eq 'QUANTIFICADO' or trim(rsItem.RIP_CARACTVLR) eq '')> --->
 	<cfif listFind(#rsItem.Itn_PTC_Seq#,10)>
 	   <cfset caracvlr = 'QUANTIFICADO'>
 	   <cfset caracvlrhabilSN = 'S'>
+	   <cfif (Ngrup is 230 and Nitem is 1) or (Ngrup is 232 and Nitem is 1) or (Ngrup is 702 and Nitem is 2)>
+	   	<cfset auxriscoSN = 'S'>
+	   </cfif>
 	</cfif>	
 
 <!--- composicao item: #rsItem.Itn_PTC_Seq# --->
@@ -1035,26 +1055,23 @@ N&ordm; Relat&oacute;rio:
       <td colspan="4" bgcolor="eeeeee">
 		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee" >
 		  <cfif caracvlrhabilSN is 'S'>
-		  
 		  <tr bgcolor="eeeeee" class="form">
-					<td bgcolor="eeeeee">Caracteres:&nbsp;
-					  <select name="caracvlr" id="caracvlr" class="form">
-						<option  value="Quantificado">Quantificado</option>
-                  </select>                    </td>
-<td bgcolor="eeeeee">Falta(R$):&nbsp;
-  <input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)" ></td>
-					<td bgcolor="eeeeee">Sobra(R$):&nbsp;
-				  <input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)" ></td>
-					<td bgcolor="eeeeee">Em Risco(R$):&nbsp;
-				  <input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)" ></td>
-				<!---   <td> --->		  
+			<td bgcolor="eeeeee">Caracteres:&nbsp;
+				<select name="caracvlr" id="caracvlr" class="form">
+					<option  value="QUANTIFICADO">QUANTIFICADO</option>
+				</select>                    
+			</td>
+			<td bgcolor="eeeeee">Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></td>
+			<td bgcolor="eeeeee">Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></td>
+			<td bgcolor="eeeeee">Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></td>  
 		  </tr>
 		  <cfelse>
 		  		<tr class="form" bgcolor="eeeeee">
 					<td bgcolor="eeeeee">Caracteres:&nbsp;
 					  <select name="caracvlr" id="caracvlr" class="form" disabled="disabled">
-                        <option  value="Nao Quantificado">Não Quantificado</option>	
-                      </select>                    </td>
+                        <option  value="NAO QUANTIFICADO">NÃO QUANTIFICADO</option>	
+                      </select>                    
+					</td>
 					<td bgcolor="eeeeee">Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly="yes"></td>
 					<td bgcolor="eeeeee">Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly="yes"></td>
 					<td bgcolor="eeeeee">Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly="yes"></td>
@@ -1063,6 +1080,8 @@ N&ordm; Relat&oacute;rio:
 		  </table>	  
 		  </td>
       </tr> 
+	<input type="hidden" name="caracvlrhabilSN" id="caracvlrhabilSN" value="#caracvlrhabilSN#">
+	<input type="hidden" name="auxriscoSN" id="auxriscoSN" value="#auxriscoSN#">
    </cfoutput>
 	 <cfset melhoria = '#qResposta.RIP_Comentario#'>
        <tr>
@@ -1188,9 +1207,6 @@ N&ordm; Relat&oacute;rio:
 			   controleNCI(); 
 			   exibir_Area011(document.form1.nci.value);
 			</script>
-
-
-
  </form>
 </table>
 </body>

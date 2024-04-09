@@ -1,8 +1,9 @@
+<cfprocessingdirective pageEncoding ="utf-8"> 
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
-
-<cfif TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'ANALISTAS' and TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GESTORMASTER' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GESTORES' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'DESENVOLVEDORES' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'SUPERINTENDENTE' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GERENTES' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'ORGAOSUBORDINADOR' AND TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'SUBORDINADORREGIONAL'>
+<cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
+<cfif grpacesso NEQ 'ANALISTAS' and grpacesso NEQ 'GESTORMASTER' and grpacesso NEQ 'GOVERNANCA' AND grpacesso NEQ 'GESTORES' AND grpacesso NEQ 'DESENVOLVEDORES' AND grpacesso NEQ 'SUPERINTENDENTE' AND grpacesso NEQ 'GERENTES' AND grpacesso NEQ 'ORGAOSUBORDINADOR' AND grpacesso NEQ 'SUBORDINADORREGIONAL'>
 	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=PAGINA DE INDICADORES EM MANUTENCAO ATE 12h">
 </cfif>   
 <cfset auxanoatu = year(now())>
@@ -18,32 +19,31 @@
 <cfset auxdia = int(day(now()))>
 <cfset aux_mes = int(month(now()))>
 <cfset aux_ano = int(year(now()))>
-<!--- <cfset auxdia = 11>
-<cfset aux_mes = 1>   --->
-<cfif aux_mes eq 1>
-	<cfset aux_mes = 12>
-	<cfset aux_ano = (aux_ano - 1)>
-<cfelse>
-	 <cfif UCASE(TRIM(qAcesso.Usu_GrupoAcesso)) neq 'GESTORMASTER'>
-	<!---  <cfset aux_mes = (aux_mes - 1)> --->
-		<cfif auxdia gte 11>
-		 	<cfset aux_mes = (aux_mes - 1)>
-		<cfelse>
-		 	<cfset aux_mes = (aux_mes - 2)>
-			<!---  --->
-			<cfif aux_mes eq 0>
-				<cfset aux_mes = 12>
-				<cfset aux_ano = (aux_ano - 1)>
-			</cfif>
-			<!---  --->
-		</cfif>  
-	 <cfelse>
+<cfif grpacesso eq 'GESTORMASTER'>
+   <cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
+		<cfset aux_mes = 12>
+		<cfset aux_ano = aux_ano - 1>
+	<cfelseif (aux_mes gt 2 and auxdia lte 10)>
 		<cfset aux_mes = (aux_mes - 1)>
-	 </cfif>
-</cfif> 
+	<cfelse>
+		<cfset aux_mes = (aux_mes - 1)>		
+   </cfif>
 
-<!---  <cfoutput>aux_ano:#aux_ano#  === aux_mes:#aux_mes#</cfoutput><BR> 
-<cfset gil = gil>  --->    
+<cfelse>
+	<cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
+		<cfset aux_mes = 12>
+		<cfset aux_ano = aux_ano - 1>
+	<cfelseif (aux_mes gt 2 and auxdia lte 10)>
+		<cfset aux_mes = (aux_mes - 2)>
+	<cfelse>
+		<cfset aux_mes = (aux_mes - 1)>
+	</cfif>
+</cfif>
+
+<!---
+ <cfoutput>aux_ano:#aux_ano#  === aux_mes:#aux_mes#</cfoutput><BR> 
+<cfset gil = gil> 
+--->
 
 <cfif aux_mes is 1>
     <cfset dtlimit = aux_ano & "/01/31">
@@ -74,9 +74,10 @@
 <cfelse>
 	   <cfset dtlimit = aux_ano & "/12/31">				   
 </cfif>
-
-<!---  <cfoutput>dtlimit:#dtlimit#</cfoutput>
- <CFSET GIL = GIL>  --->
+<!---
+ <cfoutput>dtlimit:#dtlimit#</cfoutput>
+ <CFSET GIL = GIL>  
+--->
 <html>
 	<head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
@@ -89,16 +90,17 @@ function trocar(a){
     a = a.toUpperCase();
 					
 	if (a == "---") {
-	   alert("Selecionar uma Superintendencia!");
+	   alert("Selecionar uma Superintendência!");
 	   return false;
 	}
     //document.form1.se.value = a; 
     document.form1.submit(); 
 }
+
 function valida_form() {
     var frm = document.forms[0];
     if (frm.dr.value=='---'){
-	  alert('Informar a Superintend�ncia!');
+	  alert('Informar a Superintendência!');
 	  frm.dr.focus();
 	  return false;
 	}	
@@ -116,12 +118,13 @@ function valida_form() {
 	} 
 
 }
+
 </script>
 </head>
 
 <body>
 
-<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) is 'SUPERINTENDENTE'> 
+<cfif grpacesso is 'SUPERINTENDENTE'> 
 	<cfinclude template="cabecalho.cfm">
 </cfif> 
 <form action="se_indicadores.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return valida_form()">
@@ -152,7 +155,7 @@ function valida_form() {
 		      <td colspan="2"><div align="center"><span class="titulos">&nbsp;&nbsp;&nbsp;&nbsp;</span></div></td>
 	  </tr>
 
-	   <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' AND qAcesso.Usu_DR eq '01'>
+	   <cfif grpacesso eq 'GESTORMASTER' OR grpacesso eq 'GOVERNANCA'>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where dir_codigo <> '01'
 			</cfquery>
@@ -167,7 +170,7 @@ function valida_form() {
                      </cfoutput>
                    </select>
 	           </div></td></tr>
-		 <cfelseif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'DESENVOLVEDORES'>
+		 <cfelseif grpacesso eq 'DESENVOLVEDORES'>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria
 			</cfquery>
@@ -182,7 +185,7 @@ function valida_form() {
                      </cfoutput>
                    </select>
 	           </div></td></tr>
-		<cfelseif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'SUPERINTENDENTE' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GERENTES' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'ORGAOSUBORDINADOR' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'SUBORDINADORREGIONAL'>
+		<cfelseif grpacesso eq 'SUPERINTENDENTE' OR grpacesso eq 'GERENTES' OR grpacesso eq 'ORGAOSUBORDINADOR' OR grpacesso eq 'SUBORDINADORREGIONAL'>
 		   <cfoutput>
 		   <cfset se= #trim(qAcesso.Usu_DR)#>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
@@ -190,7 +193,7 @@ function valida_form() {
 			</cfquery>
 			 <tr valign="baseline">
 		     <td><div align="center"></div></td>
-			 <td width="97%">
+			 <td width="97%"> 
 			   
 			   <div align="center">
 			       <select name="dr" id="dr" class="form">
@@ -199,7 +202,7 @@ function valida_form() {
 			       
 			   </div></td></tr>
 			 </cfoutput>
-		<cfelseif (UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORES' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'ANALISTAS') AND len(TRIM(qAcesso.Usu_Coordena)) gt 0> 
+		<cfelseif (grpacesso eq 'GESTORES' OR grpacesso eq 'ANALISTAS') AND len(TRIM(qAcesso.Usu_Coordena)) gt 0> 
 			<cfoutput>
 			<cfset se= #trim(qAcesso.Usu_Coordena)#>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
@@ -330,7 +333,7 @@ function valida_form() {
 		</tr>
   </table>
 	
-  <cfif trim(qAcesso.Usu_GrupoAcesso) eq 'SUPERINTENDENTE'>
+  <cfif grpacesso eq 'SUPERINTENDENTE'>
 	<!--- <cfif seprinc eq 'N'> --->
 	<script>
 	document.form1.submit();
@@ -341,6 +344,8 @@ function valida_form() {
 	  <input name="dtlimitatual" type="hidden" value="<cfoutput>#dtlimit#</cfoutput>">
 	  <input name="anoexerc" type="hidden" value="<cfoutput>#year(dtLimit)#</cfoutput>">
 	  <input name="anoatual" type="hidden" value="<cfoutput>#year(now())#</cfoutput>">
+	  
+
 <!--- 	  
 <cfoutput>dtlimit:#dtlimit#</cfoutput><br>
 <cfoutput>#year(dtLimit)#</cfoutput><br>

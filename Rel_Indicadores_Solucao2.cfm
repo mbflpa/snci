@@ -1,4 +1,4 @@
-<!--- <cfprocessingdirective pageEncoding ="utf-8"/> --->
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfsetting requesttimeout="10000">
 <cfif len(form.lis_se) is 1>
 	<cfset form.lis_se = 0 & form.lis_se>
@@ -39,9 +39,9 @@
 </cfloop>
 <cffile action="write" addnewline="no" file="#slocal##sarquivo#" output=''>
 <cffile action="Append" file="#slocal##sarquivo#" output='#auxfilta#'>
-<cffile action="Append" file="#slocal##sarquivo#" output='SOLU��O DE N�O CONFORMIDADES(SLNC)'>
+<cffile action="Append" file="#slocal##sarquivo#" output='SOLUÇÃO DE NÃO CONFORMIDADES(SLNC)'>
 <!--- <cffile action="Append" file="#slocal##sarquivo#" output=';;A;B;C;D;E=((C*100)/D);'>
-<cffile action="Append" file="#slocal##sarquivo#" output='SE;M�s;Quantidade (Solucionados);Total;% de SL do m�s;Meta Mensal;% Em Rela��o � meta Mensal;Resultado'> --->
+<cffile action="Append" file="#slocal##sarquivo#" output='SE;Mês;Quantidade (Solucionados);Total;% de SL do mês;Meta Mensal;% Em Relação à meta Mensal;Resultado'> --->
 <!---  --->
 
 
@@ -156,7 +156,7 @@ function valida_form(a,b) {
 		WHERE (Andt_Resp = 3) and 
 		(Andt_TipoRel = 2) and 
 		Andt_RespAnt in (1,17,2,15,18,20) AND 
-		(Andt_CodSE = '#lis_se#') and
+		(Und_CodDiretoria = '#lis_se#') and
 		Andt_AnoExerc = '#form.lis_anoexerc#'
 		<cfif lis_mes neq 0>
 		  and Andt_Mes = #lis_mes#
@@ -173,7 +173,7 @@ function valida_form(a,b) {
 		WHERE (Andt_Resp = 3) and 
 		(Andt_TipoRel = 2) and 
 		Andt_RespAnt in (6,5,19) AND 
-		(Andt_CodSE = '#lis_se#') and 
+		(Und_CodDiretoria = '#lis_se#') and 
 		Andt_AnoExerc = '#form.lis_anoexerc#'
 		<cfif lis_mes neq 0>
 		  and Andt_Mes = #lis_mes#
@@ -190,7 +190,7 @@ function valida_form(a,b) {
 		WHERE (Andt_Resp = 3) and 
 		(Andt_TipoRel = 2) and 
 		Andt_RespAnt in (7,4,16) AND 
-		(Andt_CodSE = '#lis_se#') and
+		(Und_CodDiretoria = '#lis_se#') and
 		Andt_AnoExerc = '#form.lis_anoexerc#'
 		<cfif lis_mes neq 0>
 		  and Andt_Mes = #lis_mes#
@@ -207,7 +207,7 @@ function valida_form(a,b) {
 		WHERE (Andt_Resp = 3) and 
 		(Andt_TipoRel = 2) and 
 		Andt_RespAnt in(22,8,23) AND 
-		(Andt_CodSE = '#lis_se#') and
+		(Und_CodDiretoria = '#lis_se#') and
 		Andt_AnoExerc = '#form.lis_anoexerc#'
 		<cfif lis_mes neq 0>
 		  and Andt_Mes = #lis_mes#
@@ -215,48 +215,61 @@ function valida_form(a,b) {
 		order by Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item
 	</cfquery>
 </cfif>		
+<cfif lis_grpace is 'geral'>							
+	<!--- Todos --->
+	<cfquery name="rs3SO" datasource="#dsn_inspecao#">
+		SELECT Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_tpunid, Andt_Area, Andt_RespAnt
+		FROM Andamento_Temp 
+		INNER JOIN Unidades ON Andt_Unid = Und_Codigo
+		WHERE (Andt_Resp = 3) and 
+		(Andt_TipoRel = 2) and  
+		(Und_CodDiretoria = '#lis_se#') and
+		Andt_AnoExerc = '#form.lis_anoexerc#'
+		order by Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item
+	</cfquery>
+</cfif>	
 </cfoutput>	
 <!--- Fim obter solucionados por mes --->
 <!--- Atualizar  Andamento_Temp--->
 <cfoutput query="rs3SO">
-    	<cfif rs3SO.Andt_Uteis lte 0> 
-  		<cfset rs3SODT = CreateDate(year(rs3SO.Andt_DPosic),month(rs3SO.Andt_DPosic),day(rs3SO.Andt_DPosic))>
-		<!---   <cfif rsExiste.Recordcount lte 0> --->
-		
-		<!--- Obter status14 --->
-		<cfquery name="rs14ST" datasource="#dsn_inspecao#">
-			  Select And_DtPosic 
-			  from Andamento
-			  where And_Unidade = '#rs3SO.Andt_Unid#' and 
-			  And_NumInspecao = '#rs3SO.Andt_Insp#' and 
-			  And_NumGrupo = #rs3SO.Andt_Grp# and 
-			  And_NumItem = #rs3SO.Andt_Item# and 
-			  And_Situacao_Resp in(0,11,14)
-			  order by And_DtPosic desc
-		</cfquery>
-		<cfset auxDifdias = 0>
-		<cfset dduteis = 0> 
-		<cfif rs14ST.recordcount gt 0>
-			<cfset rs14STDT = CreateDate(year(rs14ST.And_DtPosic),month(rs14ST.And_DtPosic),day(rs14ST.And_DtPosic))>
-			<cfset auxdtnova = CreateDate(year(now()),month(now()),day(now()))>
-			<cfset auxDifdias = dateDiff("d", rs14STDT, dtfim)>	
-			<!--- obter dias uteis  --->
+    	<cfif rs3SO.Andt_Uteis lte 0 and lis_grpace neq 'geral'> 
+			<cfset rs3SODT = CreateDate(year(rs3SO.Andt_DPosic),month(rs3SO.Andt_DPosic),day(rs3SO.Andt_DPosic))>
+			<!---   <cfif rsExiste.Recordcount lte 0> --->
+			
+			<!--- Obter status14 --->
+			<cfquery name="rs14ST" datasource="#dsn_inspecao#">
+				Select And_DtPosic 
+				from Andamento
+				where And_Unidade = '#rs3SO.Andt_Unid#' and 
+				And_NumInspecao = '#rs3SO.Andt_Insp#' and 
+				And_NumGrupo = #rs3SO.Andt_Grp# and 
+				And_NumItem = #rs3SO.Andt_Item# and 
+				And_Situacao_Resp in(0,11,14)
+				order by And_DtPosic desc
+			</cfquery>
+			<cfset auxDifdias = 0>
 			<cfset dduteis = 0> 
-			<cfset dias = auxDifdias>  
-			<cfset nCont = 1>
-			<cfset dsusp = 0>
-			<cfset auxdtnova = rs14STDT>
-			<cfset auxdtfim = CreateDate(year(now()),month(now()),day(now()))>
-			<cfset auxdtfim = DateAdd("d", #auxDifdias#, #auxdtnova#)>
-			<!--- obter os sabados/domingos nos feriados nacionais --->
-			<cfset vDiaSem = DayOfWeek(auxdtnova)>
-			<cfif rsFer.recordcount gt 0> 
-					<cfloop query="rsFer">
-						<cfif dateformat(rsFer.Fer_Data,"YYYYMMDD") eq dateformat(auxdtnova,"YYYYMMDD")>
-							<cfset dsusp = dsusp + 1>
-						</cfif>
-					</cfloop> 
-			</cfif>
+			<cfif rs14ST.recordcount gt 0>
+				<cfset rs14STDT = CreateDate(year(rs14ST.And_DtPosic),month(rs14ST.And_DtPosic),day(rs14ST.And_DtPosic))>
+				<cfset auxdtnova = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset auxDifdias = dateDiff("d", rs14STDT, dtfim)>	
+				<!--- obter dias uteis  --->
+				<cfset dduteis = 0> 
+				<cfset dias = auxDifdias>  
+				<cfset nCont = 1>
+				<cfset dsusp = 0>
+				<cfset auxdtnova = rs14STDT>
+				<cfset auxdtfim = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset auxdtfim = DateAdd("d", #auxDifdias#, #auxdtnova#)>
+				<!--- obter os sabados/domingos nos feriados nacionais --->
+				<cfset vDiaSem = DayOfWeek(auxdtnova)>
+				<cfif rsFer.recordcount gt 0> 
+						<cfloop query="rsFer">
+							<cfif dateformat(rsFer.Fer_Data,"YYYYMMDD") eq dateformat(auxdtnova,"YYYYMMDD")>
+								<cfset dsusp = dsusp + 1>
+							</cfif>
+						</cfloop> 
+				</cfif>
 			<cfloop condition="nCont lte #auxDifdias#">  
 				<cfif (vDiaSem eq 1) or (vDiaSem eq 7)> 
 				  <cfset dsusp = dsusp + 1>
@@ -342,7 +355,7 @@ function valida_form(a,b) {
 		INNER JOIN Unidades ON Andt_Area = Und_Codigo
 		INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo 
 		INNER JOIN Diretoria ON Dir_Codigo = Und_CodDiretoria 
-		WHERE Andt_CodSE ='#form.lis_se#' AND 
+		WHERE Dir_Codigo ='#form.lis_se#' AND 
 		Andt_AnoExerc = '#form.lis_anoexerc#' and
 		(Andt_Resp = 3 and Andt_RespAnt in(1,2,15,17,18,20) or Andt_Resp in (2,15,18,20)) and 
 		Andt_TipoRel = 2 
@@ -361,7 +374,7 @@ function valida_form(a,b) {
 		INNER JOIN Unidades ON Andt_Unid = Und_Codigo
 		INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo 
 		INNER JOIN Diretoria ON Dir_Codigo = Und_CodDiretoria 
-		WHERE Andt_CodSE ='#form.lis_se#' and 
+		WHERE Dir_Codigo ='#form.lis_se#' and 
 		Andt_AnoExerc = '#form.lis_anoexerc#' AND 
 		(Andt_Resp = 3 and Andt_RespAnt in(5,6,19) or Andt_Resp in (5,19)) and
 		Andt_TipoRel = 2 and
@@ -382,7 +395,7 @@ function valida_form(a,b) {
 		INNER JOIN Unidades ON Andt_Unid = Und_Codigo
 		INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo 
 		INNER JOIN Diretoria ON Dir_Codigo = Und_CodDiretoria 
-		WHERE Andt_CodSE ='#form.lis_se#' AND 
+		WHERE Dir_Codigo ='#form.lis_se#' AND 
 		Andt_AnoExerc = '#form.lis_anoexerc#' and
 		(Andt_Resp = 3 and Andt_RespAnt in(4,7,16) or Andt_Resp in (4,16)) and 
 		Andt_TipoRel = 2 
@@ -400,8 +413,8 @@ function valida_form(a,b) {
 		INNER JOIN Diretoria ON Andt_Area = Dir_Sto
 		INNER JOIN Unidades ON Andt_Unid = Und_Codigo
 		INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo 
-		WHERE Andt_CodSE ='#form.lis_se#' AND 
-		Andt_AnoExerc = '#form.lis_anoexerc#' AND
+		WHERE Dir_Codigo ='#form.lis_se#' AND 
+		Andt_AnoExerc = '#form.lis_anoexerc#' and
 		(Andt_Resp = 3 and Andt_RespAnt in(8,22,23) or Andt_Resp in (8,23)) and 
 		Andt_TipoRel = 2 
 		<cfif form.lis_mes neq 0>
@@ -409,8 +422,22 @@ function valida_form(a,b) {
 		</cfif>
 		order by Dir_Codigo, Andt_Mes, Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic
 	</cfquery>	
-
 </cfif>	
+<cfif lis_grpace is 'geral'>							
+	<!--- geral --->
+	<cfquery name="rsResumo" datasource="#dsn_inspecao#">
+		SELECT Dir_Codigo, Dir_Sigla, Dir_Descricao, Andt_Unid, Und_Descricao, Andt_Mes, Andt_Insp, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, STO_Descricao, Andt_Uteis, Andt_Area, Andt_DTEnvio, Andt_NomeOrgCondutor, Andt_Prazo, Andt_DTRefer, Andt_NomeOrgCondutor 
+		FROM Andamento_Temp
+		INNER JOIN Diretoria ON Andt_CodSE = Dir_Codigo
+		INNER JOIN Unidades ON Andt_Unid = Und_Codigo
+		INNER JOIN Situacao_Ponto ON Andt_Resp = STO_Codigo 
+		WHERE Dir_Codigo ='#form.lis_se#' AND 
+		Andt_AnoExerc = '#form.lis_anoexerc#' and
+		(Andt_Resp = 3) and 
+		Andt_TipoRel = 2 
+		order by Dir_Codigo, Andt_Mes, Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic
+	</cfquery>	
+</cfif>
 </cfoutput>
 
 <form action="itens_Gestao_2.cfm" method="get" target="_blank" name="frmResumo">
@@ -418,14 +445,17 @@ function valida_form(a,b) {
 		<cfset grpace = "Unidades">
  		<cfset relgpac = "UNSO">
 	<cfelseif form.lis_grpace is "ge">
-		<cfset grpace = "Ger�ncias Regionais e �reas de Suporte">
+		<cfset grpace = "Gerências Regionais e Áreas de Suporte">
 		<cfset relgpac = "GRSO">
 	<cfelseif form.lis_grpace is "sb">
-		<cfset grpace = "�rg�os Subordinadores">
+		<cfset grpace = "Órgãos Subordinadores">
 		<cfset relgpac = "OSSO">
 	<cfelseif form.lis_grpace is "su">
-		<cfset grpace = "Superintend�ncia">
+		<cfset grpace = "Superintendência">
 		<cfset relgpac = "SUSO">
+    <cfelseif form.lis_grpace is "geral">
+		<cfset grpace = "Geral">
+		<cfset relgpac = "Gerais">
 	</cfif>  
   <table width="90%" border="1" align="center" cellpadding="0" cellspacing="0">
   <cfoutput>
@@ -448,41 +478,46 @@ function valida_form(a,b) {
         <td colspan="13"><div align="right"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/csv.png" width="39" height="38" border="0"></a></div></td>
       </tr>
       <tr>
-        <td colspan="12"><div align="center" class="exibir"><span class="titulo1"><strong>Solu&Ccedil;&Atilde;o de N&Atilde;o Conformidades (SLNC)</strong></span></div></td>
+        <td colspan="12"><div align="center" class="exibir"><span class="titulo1"><strong>Solução de Não Conformidades (SLNC)</strong></span></div></td>
       </tr>
-<!---       <tr>
-        <td colspan="10" class="titulos">#grpace# &nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;(&nbsp;A�&otilde;es de : SOLUCIONADO)   <strong>&nbsp;&nbsp;-&nbsp;Exerc&iacute;cio: #form.lis_anoexerc# </strong></td>
-		 <cfset auxqtd = rsResumo.recordcount> 
-        <td colspan="2" class="titulos"><div align="right">Qtd.:&nbsp; #auxqtd#</div></td>
-      </tr>	   --->
-	        <tr>
-        <td colspan="10" class="titulos"><p>#grpace# &nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;SOLUCIONADOS: #form.lis_soluc#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Outros Status: #form.lis_outros#</p>
-          </td>
-        
-		 <cfset auxqtd = form.lis_soluc + form.lis_outros> 
-        <td colspan="2" class="titulos"><div align="right">Qtd.:&nbsp; #auxqtd#</div></td>
-      </tr>	 
-	   <cffile action="Append" file="#slocal##sarquivo#" output='#grpace#  -  SOLUCIONADOS: #form.lis_soluc#     Outros Status: #form.lis_outros#;;;;;;;;;;Qtd.: #auxqtd#'> 
+<cfif grpace neq 'geral'>
+	<tr>
+		<td colspan="10" class="titulos"><p>#grpace# &nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;SOLUCIONADOS: #form.lis_soluc#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Outros Status: #form.lis_outros#</p>
+	</td>
+		<cfset auxqtd = form.lis_soluc + form.lis_outros> 
+		<td colspan="2" class="titulos"><div align="right">Qtd.:&nbsp; #auxqtd#</div></td>
+	</tr>
+	<cffile action="Append" file="#slocal##sarquivo#" output='#grpace#  -  SOLUCIONADOS: #form.lis_soluc#     Outros Status: #form.lis_outros#;;;;;;;;;;Qtd.: #auxqtd#'> 
+<cfelse>
+	<tr>
+		<td colspan="10" class="titulos"><p>#grpace# &nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;&nbsp;SOLUCIONADOS: #rs3SO.recordcount#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Outros Status: 0</p>
+	</td>
+		<cfset auxqtd = rs3SO.recordcount> 
+		<td colspan="2" class="titulos"><div align="right">Qtd.:&nbsp; #auxqtd#</div></td>
+	</tr>
+	<cffile action="Append" file="#slocal##sarquivo#" output='#grpace#  -  SOLUCIONADOS: #rs3SO.recordcount#     Outros Status: 0;;;;;;;;;;Qtd.: #auxqtd#'> 
+</cfif>		 
+	   
 </cfoutput>	  
 
 	  <tr class="exibir">
-	    <td width="4%" height="27" class="titulos"><div align="center">M&ecirc;s </div>
+	    <td width="4%" height="27" class="titulos"><div align="center">Mês</div>
 	      <div align="center"></div></td>
         <td width="16%" class="titulos"><div align="left">Unidade</div>
         <div align="center"></div></td>
-        <td width="20%" class="titulos">&Oacute;rg�o Solucionador (*)</td>
-        <td width="6%" class="titulos">Relat&oacute;rio</td>
+        <td width="20%" class="titulos">Órgão Solucionador (*)</td>
+        <td width="6%" class="titulos">Relatório</td>
         <td width="5%" class="titulos"><div align="center">Grupo</div></td>
         <td width="4%" class="titulos"><div align="center">Item</div></td>
-		<td width="9%" class="titulos">Dt. Libera&ccedil;&atilde;o (**)</td>
-        <td width="9%" class="titulos">Dt. Solu&ccedil;&atilde;o </td>
+		<td width="9%" class="titulos">Dt. Liberação (**)</td>
+        <td width="9%" class="titulos">Dt. Solução </td>
         <td width="11%" class="titulos"><div align="center"></div>          
-          <div align="center">A&ccedil;&atilde;o</div></td>
+          <div align="center">Ação</div></td>
         <td width="6%" class="titulos">Dt. Refer.:</td>
-        <td width="10%" class="titulos"><div align="center">Tempo de Solu&ccedil;&atilde;o(dias &uacute;teis) (***)</div></td>
+        <td width="10%" class="titulos"><div align="center">Tempo de Solução(dias úteis) (***)</div></td>
 <!---         <td width="7%" class="titulos"><div align="center">Prazo</div></td> --->
       </tr>
-	<cffile action="Append" file="#slocal##sarquivo#" output='M�s;Unidade;�rg�o Solucionador(*);Relat�rio;Grupo;Item;Dt. Libera��o(**);Dt. Solu��o;A��o;Dt. refer.:;Tempo de Solu��o(dias �teis)(***)'>
+	<cffile action="Append" file="#slocal##sarquivo#" output='Mês;Unidade;Órgão Solucionador(*);Relatório;Grupo;Item;Dt. Liberação(**);Dt. Solução;Dt. refer.:;Tempo de Solução(dias úteis)(***)'>
 <cfoutput query="rsResumo">
 <!--- Dir_Codigo, Dir_Sigla, Dir_Descricao, Andt_Unid, Und_Descricao, Andt_Mes, , , , , Andt_HPosic, Andt_Resp, STO_Descricao, Andt_Uteis, Andt_Area, Andt_DTEnvio, Andt_NomeOrgCondutor, , Andt_DTRefer  --->
 <!---  --->
@@ -534,8 +569,8 @@ function valida_form(a,b) {
 	    <td><div align="center">#rsResumo.STO_Descricao#</div></td>
 	    <cfset dtfim = dateformat(dtfim,"dd/mm/yyyy")>
 	    <td><div align="center">#dtfim#</div></td>	
-<CFSET DDUT = 0>		
-<cfif Andt_Resp is 3>		
+<CFSET DDUT = 0>	
+<cfif Andt_Resp is 3 and grpace neq 'geral'>		
 		<!--- inicio dias uteis --->
 			<cfset auxdtprev = CreateDate(year(Andt_DTEnvio),month(Andt_DTEnvio),day(Andt_DTEnvio))>
 			<cfset nCont = 'S'>
@@ -566,29 +601,29 @@ function valida_form(a,b) {
         <td colspan="12" class="titulos">&nbsp;</td>
       </tr>
       <tr class="exibir">
-        <td colspan="12" class="titulos">(*) &Oacute;rg&atilde;o Solucionador:  &nbsp;&nbsp;&Oacute;rg&atilde;o respons&aacute;vel pela solu&ccedil;&atilde;o do ponto.</td>
+        <td colspan="12" class="titulos">(*) Órgão Solucionador:  &nbsp;&nbsp;É o responsável pela solução do ponto.</td>
       </tr>
-	  <cffile action="Append" file="#slocal##sarquivo#" output='(*) �rg�o Solucionador:   �rg�o respons�vel pela solu��o do ponto.'>
+	  <cffile action="Append" file="#slocal##sarquivo#" output='(*) Órgão Solucionador:   Órgão responsável pela solução do ponto.'>
 	   <tr class="exibir">
-        <td colspan="12" class="titulos">(**) <strong>Dt. Libera&ccedil;&atilde;o</strong>:&nbsp;&nbsp;&Eacute; a data de envio do relat&oacute;rio de avalia&ccedil;&atilde;o de controle interno para unidade.</td>
+        <td colspan="12" class="titulos">(**) <strong>Dt. Liberação</strong>:&nbsp;É a data de envio do relatório de avaliação de controle interno para unidade.</td>
       </tr>
-	  <cffile action="Append" file="#slocal##sarquivo#" output='(**) Dt. Libera��o:  � a data de envio do relat�rio de avalia��o de controle interno para unidade.'>
+	  <cffile action="Append" file="#slocal##sarquivo#" output='(**) Dt. Liberação:  É a data de envio do relatório de avaliação de controle interno para unidade.'>
 	   <tr class="exibir">
-        <td colspan="12" class="titulos">(***) Tempo de Solu&ccedil;&atilde;o(dias &uacute;teis): &nbsp;&nbsp;&Eacute; o intervalo entre a data de libera&ccedil;&atilde;o e a data de solu&ccedil;&atilde;o.</td>
+        <td colspan="12" class="titulos">(***) Tempo de Solução(dias úteis): &nbsp;&nbsp;É o intervalo entre a data de liberação e a data de solução.</td>
       </tr>	
-	  <cffile action="Append" file="#slocal##sarquivo#" output='(***) Tempo de Solu��o(dias �teis):   � o intervalo entre a data de libera��o e a data de solu��o.'>  
+	  <cffile action="Append" file="#slocal##sarquivo#" output='(***) Tempo de Solução(dias úteis):   É o intervalo entre a data de liberação e a data de solução.'>  
       <tr class="exibir">
         <td colspan="12">
 		<table width="1179" border="0">
           <tr>
-            <td colspan="12"><p align="center" class="titulos"><strong> CRIT&Eacute;RIOS DE MENSURA&Ccedil;&Atilde;O </strong></p></td>
+            <td colspan="12"><p align="center" class="titulos"><strong> CRITÉRIOS DE MENSURAÇÃO </strong></p></td>
           </tr>
-<cffile action="Append" file="#slocal##sarquivo#" output='CRIT�RIOS DE MENSURA��O'>  		  
+<cffile action="Append" file="#slocal##sarquivo#" output='CRITÉRIOS DE MENSURAÇÃO'>  		  
          <tr class="exibir">
             <td width="121" class="exibir"><strong>SOLUCIONADO</strong></td>
-            <td width="1048"><p> A situa&ccedil;&atilde;o apontada foi regularizada pelo gestor. </p></td>
+            <td width="1048"><p> A situação apontada foi regularizada pelo gestor. </p></td>
           </tr>
-<cffile action="Append" file="#slocal##sarquivo#" output='SOLUCIONADO A situa��o apontada foi regularizada pelo gestor. 
+<cffile action="Append" file="#slocal##sarquivo#" output='SOLUCIONADO A situaçao apontada foi regularizada pelo gestor. 
  '> 		  
         </table></td>
       </tr>  

@@ -259,7 +259,7 @@
 	<cfset aux_obs = Replace(aux_obs,'>','','All')>
 	<!---	 <cfset aux_obs = Replace(aux_obs,'&','','All')>
 		     <cfset aux_obs = Replace(aux_obs,'%','','All')> --->
-  <cfset pos_obs = trim(Form.H_obs) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Situa��o: ' & #sDesc_Resp# & CHR(13) & CHR(13) & #data# & #DateFormat(dtcbData,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: ' & CGI.REMOTE_USER & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+  <cfset pos_obs = trim(Form.H_obs) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Situação: ' & #sDesc_Resp# & CHR(13) & CHR(13) & #data# & #DateFormat(dtcbData,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: ' & CGI.REMOTE_USER & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 	'#pos_obs#'
    </cfif>
   WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
@@ -267,10 +267,12 @@
 
  <!--- Inserindo dados dados na tabela Andamento --->
  <cfif IsDefined("FORM.MM_UpdateRecord") AND FORM.MM_UpdateRecord EQ "form1" And IsDefined("FORM.acao") And Form.acao is "Salvar2">
- <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Situa��o: ' & #sDesc_Resp# & CHR(13) & CHR(13) & #data# & #DateFormat(dtcbData,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: ' & CGI.REMOTE_USER & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
-
+ <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Situação: ' & #sDesc_Resp# & CHR(13) & CHR(13) & #data# & #DateFormat(dtcbData,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Responsável: ' & CGI.REMOTE_USER & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>
  <cfquery datasource="#dsn_inspecao#">
-    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', convert(varchar, getdate(), 114), '#and_obs#', '#qUsuario.Usu_Lotacao#')
+    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#hhmmssdc#', '#and_obs#', '#qUsuario.Usu_Lotacao#')
  </cfquery>
 
 </cfif>

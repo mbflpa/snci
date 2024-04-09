@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -7,7 +8,7 @@ SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena
 FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR 
 WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
-
+<cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
 <!--- =========================== --->
 <!--- <cfinclude template="cabecalho.cfm"> --->
 <html>
@@ -49,7 +50,7 @@ function valida_form() {
        //  alert('dt inicio: ' + dtinic_yyyymmdd + '     dt fim: ' + dtfim_yyyymmdd);
 		 if (dtinic_yyyymmdd > dtfim_yyyymmdd)
 		 {
-		  alert('Data Inicial È maior que a Data Final!')
+		  alert('Data Inicial √© maior que a Data Final!')
 		  frm.dtinic.focus();
 		  return false;
 		 }
@@ -58,12 +59,12 @@ function valida_form() {
 		 if (eval(auxnumdias) > 31)
 		 {
 		 //alert(eval(dtfim_yyyymmdd) + ' ' + eval(dtinic_yyyymmdd));
-		  alert('Esta consulta est· limitada a 31(dias) entre as duas datas!')
+		  alert('Esta consulta est√° limitada a 31(dias) entre as duas datas!')
 		  frm.dtfim.focus();
 		  return false;
 		 }
 		if (frm.SE.value==''){
-		  alert('Informar a SuperintendÍncia!');
+		  alert('Informar a Superintend√™ncia!');
 		  frm.SE.focus();
 		  return false;
 		}
@@ -76,12 +77,12 @@ function valida_form() {
 		  return false;
 		}
 		if (frm.superAno.value.length != 4){
-		  alert('Informar o campo ano com 4 dÌgitos ex. 2018');
+		  alert('Informar o campo ano com 4 d√≠gitos ex. 2018');
 		  frm.superAno.focus();
 		  return false;
 		}
 		if (frm.superAno.value < 2018 ){
-		  alert('N„o h· InspeÁ„o para ano inferior a 2018');
+		  alert('N√£o h√° Avalia√ß√£o para ano inferior a 2018');
 		  frm.superAno.focus();
 		  return false;
 		}
@@ -89,12 +90,12 @@ function valida_form() {
 	//==========================
    if (frm.ckTipo.value=='inspecao'){
 		if (frm.txtNum_Inspecao.value==''){
-		  alert('Informar o N∫ do RelatÛrio');
+		  alert('Informar o N¬∫ do Relat√≥rio');
 		  frm.txtNum_Inspecao.focus();
 		  return false;
 		}
 		if (frm.txtNum_Inspecao.value.length != 10){
-		alert("N∫ de InspeÁ„o deve conter 10 dÌgitos!");
+		alert("N¬∫ da Avalia√ß√£o deve conter 10 d√≠gitos!");
 		frm.txtNum_Inspecao.focus();
 		return false;
 	    }
@@ -128,13 +129,13 @@ function valida_form() {
        //  alert('dt inicio: ' + dtinic_yyyymmdd + '     dt fim: ' + dtfim_yyyymmdd);
 		 if (dtinic_yyyymmdd > dtfim_yyyymmdd)
 		 {
-		  alert('Data Inicial È maior que a Data Final!')
+		  alert('Data Inicial ÔøΩ maior que a Data Final!')
 		  frm.dtinicinsp.focus();
 		  return false;
 		 }
 		 if ((dtfim_yyyymmdd - dtinic_yyyymmdd) > 1130)
 		 {
-		//  alert('Esta consulta est· limitada a 365 dias entre as duas datas!')
+		//  alert('Esta consulta estÔøΩ limitada a 365 dias entre as duas datas!')
 		//  frm.dtfim.focus();
 		 // return false;
 		 }
@@ -210,7 +211,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia inv·lido!');
+		      alert('Valor para o dia inv√°lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -220,7 +221,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o MÍs inv·lido!');
+		      alert('Valor para o M√™s inv√°lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -231,10 +232,10 @@ function Mascara_Data(data)
 	}
 }
 //=============================
-//permite digitaÁao apenas de valores numÈricos
+//permite digitaÔøΩao apenas de valores numÔøΩricos
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digitaÁ„o das teclas numÈricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitaÔøΩÔøΩo das teclas numÔøΩricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 	
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -249,7 +250,7 @@ var tecla = window.event.keyCode;
  <link href="css.css" rel="stylesheet" type="text/css">
 </head>
 <br>
-<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) eq 'INSPETORES'>
+<cfif grpacesso eq 'INSPETORES'>
 <cfinclude template="cabecalho.cfm">
 </cfif>
 <body>
@@ -259,11 +260,11 @@ var tecla = window.event.keyCode;
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- ¡rea de conte˙do   --->
+<!--- ÔøΩrea de conteÔøΩdo   --->
 	<form action="Itens_Analise_Manifestacao.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return valida_form()">
       <table width="59%" align="center">
         <tr>
-          <td colspan="5" align="center" class="titulo1">AN&Aacute;LISES  DAS MANIFESTA&Ccedil;&Otilde;ES</td>
+          <td colspan="5" align="center" class="titulo1">AN√ÅLISES  DAS MANIFESTA√á√ïES</td>
         </tr>
         <tr>
           <td colspan="5" align="center"><div align="left"></div>            <div align="left">&nbsp;</div></td>
@@ -273,7 +274,7 @@ var tecla = window.event.keyCode;
         <tr>
           <td width="1%" class="exibir">&nbsp;</td>
           <td colspan="4"><input name="ckTipo" type="radio" onClick="document.frmObjeto.ckTipo.value='periodo';desabilita_campos(1)" value="periodo" checked>
-              <span class="exibir"><strong>Per&iacute;odo/SuperintendÍncia</strong></span></td>
+              <span class="exibir"><strong>Per&iacute;odo/Superintend√™ncia</strong></span></td>
         </tr>
         <tr>
           <td colspan="5">&nbsp;</td>
@@ -301,9 +302,9 @@ var tecla = window.event.keyCode;
           <td><strong><span class="exibir">Superintend&ecirc;ncia :</span></strong> </td>
 		  
 		  <!---  --->
-		     <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' AND qAcesso.Usu_DR eq '01'>
+		     <cfif grpacesso eq 'GESTORMASTER' or grpacesso eq 'GOVERNANCA'>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
-				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria
+				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where Dir_Codigo <> '01'
 			</cfquery>
 
 		     <td colspan="3">
@@ -316,13 +317,13 @@ var tecla = window.event.keyCode;
 
 <!--- 			 <cfset seprinc= '04'>
 	         <cfset sesubor= '70'> --->
-		<cfelseif (UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORES' or UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'INSPETORES' or UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'ANALISTAS') AND len(TRIM(qAcesso.Usu_Coordena)) gt 0> 
+		<cfelseif (grpacesso eq 'GESTORES' or grpacesso eq 'INSPETORES' or grpacesso eq 'ANALISTAS') AND len(TRIM(qAcesso.Usu_Coordena)) gt 0> 
             <cfset auxtam_lista = len(TRIM(qAcesso.Usu_Coordena))>
 			<cfset aux_lista = TRIM(qAcesso.Usu_Coordena)>
 			<cfset aux_codse = "">			
 			
 
-		     <td width="37%" colspan="3">
+		    <td width="37%" colspan="3">
 			    <select name="SE" id="SE" class="form">
 		          <option selected="selected" value="0">Todas</option>
 <cfoutput>
@@ -339,7 +340,8 @@ var tecla = window.event.keyCode;
 					</cfif>
 				  </cfloop>
 </cfoutput>				  				  
-	           </select>				</td>
+	           </select>				
+			</td>
         </cfif>
 		  <!---  --->
         </tr>

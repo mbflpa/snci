@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -19,7 +20,7 @@
 	  <tr>
            
 			<td width="602" height="38">
-					 <div align="center"><span class="style1">Nº de Avaliação Inexistente!</span><span class="style1"></span></div>
+					 <div align="center"><span class="style1">NÂº de AvaliaÃ§Ã£o Inexistente!</span><span class="style1"></span></div>
            </td>
 
       </tr>

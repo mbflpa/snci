@@ -7,7 +7,7 @@
   </cfif>          
   --->
   <cfquery name="qAcesso" datasource="#dsn_inspecao#">
-	select Usu_DR, Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido, Usu_Coordena 
+	select Usu_DR, Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido, Usu_Coordena, Usu_Login 
 	from usuarios 
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
@@ -49,7 +49,7 @@
 			INP_Unidade=rtrim(ltrim('#url.unidade#'))
 		</cfquery>
 		<cfquery datasource="#dsn_inspecao#">
-           UPDATE Numera_Inspecao SET NIP_Situacao ='E', NIP_DtUltAtu=convert(char,	getdate(), 120),  NIP_UserName=convert(varchar,'#qAcesso.Usu_Matricula#')
+           UPDATE Numera_Inspecao SET NIP_Situacao ='E', NIP_DtUltAtu=convert(char,	getdate(), 120), NIP_UserName=convert(varchar,'#qAcesso.Usu_Matricula#')
            WHERE NIP_NumInspecao=rtrim(ltrim(convert(varchar,'#url.numInspecao#'))) and NIP_Unidade=rtrim(ltrim('#url.unidade#'))
 		</cfquery>
 		<cflocation url = "cadastro_inspecao.cfm" addToken = "no">
@@ -156,21 +156,18 @@
 	        </cfquery>
 
 			<cfif rsItens.recordcount neq 0> 
-			   
 							<cfquery datasource="#dsn_inspecao#">
 								INSERT INTO Numera_Inspecao
 								(NIP_UNIDADE,NIP_NumInspecao,NIP_DtIniPrev,NIP_Situacao,NIP_DtUltAtu,NIP_UserName)
 								VALUES
-								('#selUnidades#','#nInsp#',convert(DATETIME,#dataPrevista#,103),'P',convert(char,
-								getdate(), 120),'#qAcesso.Usu_Matricula#')
+								('#selUnidades#','#nInsp#',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'P',convert(char,getdate(), 120),'#qAcesso.Usu_Matricula#')
 							</cfquery>
 
 							<cfquery datasource="#dsn_inspecao#">
 							INSERT INTO Inspecao
 								(INP_Unidade,INP_NumInspecao,INP_HrsPreInspecao,INP_DtInicDeslocamento,INP_DtFimDeslocamento,INP_HrsDeslocamento,INP_DtInicInspecao,INP_DtFimInspecao,INP_HrsInspecao,INP_Situacao,INP_DtEncerramento,INP_Coordenador,INP_Responsavel,INP_DtUltAtu,INP_UserName,INP_Motivo,INP_Modalidade)
 								VALUES
-								('#selUnidades#','#nInsp#','0',convert(DATETIME,#dataPrevista#,103),convert(DATETIME,#dataPrevista#,103),'0',convert(DATETIME,#dataPrevista#,103),convert(DATETIME,#dataPrevista#,103),'0','NA',convert(DATETIME,#dataPrevista#,103),'#selCoordenador#','#resp#',convert(char,
-								getdate(), 120),'#qAcesso.Usu_Matricula#','','#selModalidades#')
+								('#selUnidades#','#nInsp#','0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0','NA',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'#selCoordenador#','#resp#',convert(char,getdate(), 120),'#qAcesso.Usu_Login#','','#selModalidades#')
 							</cfquery>
 							<cfquery datasource="#dsn_inspecao#">
 							   UPDATE Unidades SET Und_NomeGerente = '#resp#' WHERE Und_Codigo ='#selUnidades#'
@@ -356,67 +353,67 @@ function gerarData(str) {
     }
 
 	<cfoutput><cfparam name="URL.acao" default=""></cfoutput>
- function valida_formCadNum() {
-	
-    var frm = document.forms[0];
+ function valida_formCadNum(a) {
+	if (a == 'GERAR') {
+		var frm = document.forms[0];
 
-    if (frm.selUnidades.value == '') {
-    	alert('Informe a Unidade que será inspecionada!');
-    	frm.selUnidades.focus();
-    	return false;
-    }
-
-    if (frm.selModalidades.value == '') {
-    	alert('Informe a Modalidade desta Avaliação!');
-    	frm.selModalidades.focus();
-    	return false;
-    }
-
-	if (frm.selCoordenador.value == '') {
-    	alert('Informe o nome do Coordenador desta Avaliação!');
-    	frm.selCoordenador.focus();
-    	return false;
-    }
-
-    if (frm.dataPrevista.value == '') {
-    	alert('Informe a Data Prevista para Inicio desta Avaliação!');
-    	frm.dataPrevista.focus();
-    	return false;
-    }
-
-	var d = new Date();
-    d.setHours(0,0,0,0);
-	var datPrevInsp =gerarData(frm.dataPrevista.value);
-	if(d > datPrevInsp){
-		alert('A data prevista da Avaliação não pode ser menor que a data de hoje!');
-    	frm.dataPrevista.focus();
-		frm.dataPrevista.select();
-    	return false;
-	}
-
-	function myTrim(x) {
-      return x.replace(/^\s+|\s+$/gm,'');
-    }
-	var resp = myTrim(frm.responsavel.value);
-	
-	if (resp == '') {
-    	alert('Informe o nome do responsável pela Unidade selecionada.')
-		frm.responsavel.focus();
-		return false;
-			
-	}
-		
-	if(window.confirm("O nome do Responsável pela unidade está atualizado?\n\nConfirma o cadastro desta Avaliação?")){
-		aguarde();
-		if(sessionStorage.getItem('abaAtual')){
-			sessionStorage.setItem('abaAtual', 'naoFinaliz');
+		if (frm.selUnidades.value == '') {
+			alert('Informe a Unidade que será inspecionada!');
+			frm.selUnidades.focus();
+			return false;
 		}
+
+		if (frm.selModalidades.value == '') {
+			alert('Informe a Modalidade desta Avaliação!');
+			frm.selModalidades.focus();
+			return false;
+		}
+
+		if (frm.selCoordenador.value == '') {
+			alert('Informe o nome do Coordenador desta Avaliação!');
+			frm.selCoordenador.focus();
+			return false;
+		}
+
+		if (frm.dataPrevista.value == '') {
+			alert('Informe a Data Prevista para Inicio desta Avaliação!');
+			frm.dataPrevista.focus();
+			return false;
+		}
+
+		var d = new Date();
+		d.setHours(0,0,0,0);
+		var datPrevInsp =gerarData(frm.dataPrevista.value);
+		if(d > datPrevInsp){
+			alert('A data prevista da Avaliação não pode ser menor que a data de hoje!');
+			frm.dataPrevista.focus();
+			frm.dataPrevista.select();
+			return false;
+		}
+
+		function myTrim(x) {
+		return x.replace(/^\s+|\s+$/gm,'');
+		}
+		var resp = myTrim(frm.responsavel.value);
 		
-		return true;
-	}else{
-		return false;
-	}
-    
+		if (resp == '') {
+			alert('Informe o nome do responsável pela Unidade selecionada.')
+			frm.responsavel.focus();
+			return false;
+				
+		}
+			
+		if(window.confirm("O nome do Responsável pela unidade está atualizado?\n\nConfirma o cadastro desta Avaliação?")){
+			aguarde();
+			if(sessionStorage.getItem('abaAtual')){
+				sessionStorage.setItem('abaAtual', 'naoFinaliz');
+			}
+			
+			return true;
+		}else{
+			return false;
+		}
+} else{return false;}
  }
 
 //================
@@ -613,17 +610,17 @@ function busca(){
 	<br><br>
 	<!--- <img id="top" src="top.png" alt=""> --->
 <cfif '#url.acao#' neq "inspCad">	
-<div id="aguarde" name="aguarde" align="center"  style="width:100%;height:200%;top:0px;left:0px; background:transparent;
+<div id="aguarde" name="aguarde" align="center" style="width:100%;height:200%;top:0px;left:0px; background:transparent;
 filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F86b2ff,endColorstr=#7F86b2ff);
 z-index:1000;visibility:hidden;position:absolute;" >		
 		 <img id="imgAguarde" name="imgAguarde" src="figuras/aguarde.png" width="100px"  border="0" style="position:absolute;"></img>
 </div>
-	<div id="form_container" style="position:relative;top:-30px">
+	<div id="form_container" style="position:relative;top:-30px" align="center">
 			
 		<img src="figuras/cadastro.png" width="29"  border="0" style="position:absolute;left:-4px;top:-1px"></img>
 		<h1 style="font-size:14px"><div align="center">GERAR E CADASTRAR N° DE AVALIAÇÃO</div></h1>
 	
-		<form id="formCadNum" nome="formCadNum" class="appnitro" onSubmit="return valida_formCadNum()" enctype="multipart/form-data" method="post"  action="cadastro_inspecao.cfm?acao=cadNumInsp">
+		<form id="formCadNum" nome="formCadNum" class="appnitro" onSubmit="return valida_formCadNum('')" enctype="multipart/form-data" method="post"  action="cadastro_inspecao.cfm?acao=cadNumInsp">
 		
 		    <input type="hidden" name="NumInspecao" value="<cfoutput>#url.numInspecao#</cfoutput>">
 			<input type="hidden" name="sacao" id="sacao" value="">
@@ -762,7 +759,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
 				<div align="center" >
 								    <!--- <img src="figuras/cadastro.png" width="20" border="0" style="position:relative;left:26px;top:2px"></img>
 									<input name="btCadastrar" style="width:235px" type="submit" class="botao" id="btCadastrar" value="Gerar e cadastrar n° da Avaliação" align="center"> --->
-									<a name="btCadastrar" onClick="return valida_formCadNum()" id="btCadastrar" href="javascript:formCadNum.submit()"
+									<a name="btCadastrar" onClick="return valida_formCadNum('GERAR')" id="btCadastrar" href="javascript:formCadNum.submit()"
 									class="botaoCad" style="position:relative;left:13px;"><img src="figuras/cadastro.png" width="25"  border="0" style="position:absolute;left:0px;top:5px"></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Clique para Gerar e Cadastrar n° da Avaliação</a>
 				</div>
 				<br>
@@ -892,8 +889,6 @@ tbody {
 				ORDER BY Dir_Sigla, Und_Descricao
 </cfquery>
 
-
-
 <cfquery datasource="#dsn_inspecao#" name="rsFinalizadasSemNC" >
 			SELECT DISTINCT INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_Modalidade
 				, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'semNC' as tipo FROM  Inspecao
@@ -946,9 +941,9 @@ tbody {
 	WHERE  Und_CodDiretoria in(#se#) and NIP_Situacao = 'E' and right(NIP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
 	ORDER BY Dir_Sigla, Und_Descricao  
 </cfquery>
-<h1 id="titulo" style="font-size:14px;width:720px;"><STRONG>AVALIAÇÕES</STRONG></h1>
+<h1 id="titulo" style="font-size:14px;width:1390px;"><STRONG>AVALIAÇÕES</STRONG></h1>
 
-<div style="background:#6699CC;width=720px;">
+<div style="background:#6699CC;width:1390px;" align="center">
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('NaoFinalizadas', this, '#6699CC')" id="naoFinaliz"><STRONG>INCLUIR INSPETORES</STRONG><br>( <cfoutput>#rsNumeraInspecao.recordcount#</cfoutput> )</button>
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('NaoAvaliadas', this, '#6699CC')" id="naoAval"><STRONG>EM ANDAMENTO</STRONG><br>( <cfoutput>#rsInspecao.recordcount#</cfoutput> )</button>
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('EmRevisao', this, '#6699CC')" id="emRev"><STRONG>EM REVISÃO</STRONG><br>( <cfoutput>#rsEmRevisaoFinalizadasSemNC.recordcount#</cfoutput> )</button>
@@ -956,7 +951,7 @@ tbody {
     <button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('Excluidas', this, '#6699CC')" id="excl"><STRONG>EXCLUÍDAS</STRONG><br>
     ( <cfoutput>#rsExcluidas.recordcount#</cfoutput> )</button>
 
-		<div id="NaoFinalizadas" class="tabcontent" >
+		<div id="NaoFinalizadas" class="tabcontent">
 			<!---INICIO TABELA DE AVALIAÇÕES COM NUMERAÇÃO CADASTRADA, PORÉM, SEM CADASTRO CONCLUÝDO--->
 			<cfif rsNumeraInspecao.recordCount neq 0>
 				<div  id="form_container" style="width:680px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">

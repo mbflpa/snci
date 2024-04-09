@@ -3,14 +3,16 @@
    <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
 </cfif>   
-
+<cfset statusbtn = 'disabled'>
 <cfif isDefined("form.acao") and form.acao eq 'buscargrpitm'>
-    <cfquery name="rsgrpitm" datasource="#dsn_inspecao#">
-        SELECT Itn_NumGrupo, Itn_NumItem
-        FROM Itens_Verificacao
+ <!---   <cfquery name="rsgrpitm" datasource="#dsn_inspecao#">
+        SELECT Itn_NumGrupo, Itn_NumItem, Grp_Descricao
+        FROM Grupos_Verificacao INNER JOIN Itens_Verificacao ON (Grp_Codigo = Itn_NumGrupo) AND (Grp_Ano = Itn_Ano)
         WHERE (((Itn_Ano)='#form.frmano#') AND ((Itn_Modalidade)='#form.frmmodal#') AND ((Itn_TipoUnidade)=#form.frmtipounid#))
         ORDER BY Itn_NumGrupo, Itn_NumItem
     </cfquery>
+    <cfset statusbtn = ''>
+--->
 <cfelse>
     <cfset form.frmtipounid=''>
 </cfif>
@@ -40,7 +42,14 @@ HAVING Andt_AnoExerc  < '#auxanoatu#'
 ORDER BY Andt_AnoExerc DESC
 </cfquery>
 <!--- =========================== --->
-
+    <cfquery name="rsgrpitm" datasource="#dsn_inspecao#">
+        SELECT Itn_NumGrupo, Itn_NumItem, Grp_Descricao
+        FROM Grupos_Verificacao INNER JOIN Itens_Verificacao ON (Grp_Codigo = Itn_NumGrupo) AND (Grp_Ano = Itn_Ano)
+        GROUP BY Itn_Ano, Itn_Modalidade, Itn_NumGrupo, Itn_NumItem, Grp_Descricao
+        HAVING (((Itn_Ano)='#year(now())#') AND ((Itn_Modalidade)='0'))
+        ORDER BY Itn_NumGrupo, Itn_NumItem
+    </cfquery>
+    <cfset statusbtn = ''>
 <html>
 <head>
 <title>Sistema Nacional de Controle Interno</title>
@@ -85,8 +94,8 @@ function validarform() {
 </tr>
 
 <!--- area de conteudo   --->
-	<form action="index.cfm?opcao=permissao27" method="post" target="" name="frmObjeto" onSubmit="return validarform()">
-	  <table width="38%" align="center">
+	<form action="index.cfm?opcao=permissao27" method="post" name="frmObjeto" onSubmit="return validarform()">
+	  <table width="50%" align="center">
        
         <tr>
           <td colspan="5" align="center" class="titulo2">Registrar Reincindência para Grupo Item no PACIN</td>
@@ -113,11 +122,7 @@ function validarform() {
             <td class="exibir"><strong>Exercício &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
             <td colspan="2">
 			<select name="frmano" class="exibir" id="frmano">
-                <option value="<cfoutput>#year(now()) + 1#</cfoutput>"><cfoutput>#year(now()) + 1#</cfoutput></option>
-              <cfloop condition="cont gte 2018">
-                <option value="<cfoutput>#cont#</cfoutput>"><cfoutput>#cont#</cfoutput></option>
-				<cfset cont = cont - 1>
-              </cfloop>
+                <option value="<cfoutput>#year(now())#</cfoutput>"><cfoutput>#year(now())#</cfoutput></option> 
             </select></td>
         </tr>
         <tr>
@@ -126,16 +131,18 @@ function validarform() {
             <td colspan="2">
                 <select name="frmmodal" class="exibir" id="frmmodal">
                     <option value="0">Presencial</option>
-                    <option value="1">A Distância</option>
+   <!---                 <option value="1">A Distância</option>
                     <option value="2">Mista</option>
+--->                    
                 </select>
             </td>
-        </tr>        
+        </tr> 
+<!---               
         <tr>
             <td>&nbsp;</td>
             <td width="39%" class="exibir"><strong>Tipo de Unidade&nbsp;&nbsp;: </strong></td>
             <td colspan="2">
-                <select name="frmtipounid" class="exibir" id="frmtipounid"  onChange="buscar(this.value)">
+                <select name="frmtipounid" class="exibir" id="frmtipounid" onChange="buscar('buscargrpitm')">
                     <option value="">---</option>
                     <cfoutput query="rstpunid">
                         <option value="#TUN_Codigo#" <cfif #TUN_Codigo# eq #form.frmtipounid#>selected</cfif>>#ucase(trim(TUN_Descricao))#</option>  
@@ -143,27 +150,29 @@ function validarform() {
                 </select>
             </td>
         </tr>
+--->        
         <tr>
             <td>&nbsp;</td>
             <td width="39%" class="exibir"><strong>Grupo_Item&nbsp;&nbsp;: </strong></td>
             <td colspan="2">
                 <select name="frmgrpitm" class="exibir" id="frmgrpitm">
-                    <option value="">---</option>
-                    <cfif isDefined("form.acao") and form.acao eq 'buscargrpitm'>
+                  <!---  <option value="">---</option> 
+                    <cfif isDefined("form.acao") and form.acao eq 'buscargrpitm'>--->
                         <cfoutput query="rsgrpitm"> 
-                            <option value="#Itn_NumGrupo#_#Itn_NumItem#">#Itn_NumGrupo#_#Itn_NumItem#</option>  
+                            <option value="#Itn_NumGrupo#_#Itn_NumItem#">#Itn_NumGrupo#_#Itn_NumItem#-#trim(Grp_Descricao)#</option>  
                         </cfoutput>   
-                    </cfif>
+               <!---     </cfif> --->
                 </select>
             </td>
         </tr>  
         <tr>
           <td>&nbsp;</td>
-          <br>
+          <br><br>
             <td colspan="3" align="right">
-                <input name="Confirmar" type="submit" class="botao" id="Confirmar" value="Confirmar" disabled>
+                <input name="Confirmar" type="submit" class="botao" id="Confirmar" value="Confirmar" <cfoutput>#statusbtn#</cfoutput> onClick="buscar('confirmar')">
             </td>
         </tr>
+       
         <tr>
             <td>&nbsp;</td>
             <td colspan="3">&nbsp;</td>
@@ -179,7 +188,11 @@ function validarform() {
     <script>
       function buscar(a) {
         var frm = document.forms[0];
-        frm.acao.value='buscargrpitm';
+        if (a == 'confirmar') { 
+            //frm.target="_blank";
+            frm.action='Pacin_GrupoItemReincidem.cfm';
+            }
+        frm.acao.value=a;
 		frm.submit();
       }
     </script>

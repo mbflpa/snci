@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -6,7 +7,7 @@
 	select Usu_DR, Usu_Lotacao, Usu_LotacaoNome, Usu_GrupoAcesso from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 <cfquery name="qSE" datasource="#dsn_inspecao#">
-	 SELECT Dir_Codigo, Dir_Sigla FROM Diretoria ORDER BY Dir_Sigla ASC
+	 SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where Dir_Codigo <> '01' ORDER BY Dir_Sigla ASC
 </cfquery>
 <cfoutput>
 	<cfset frmdr = rsSE.Usu_DR>
@@ -14,7 +15,9 @@
 	<cfset dtfim = "">
 	<!--- <cfif not isDefined("Form.acao")> --->
 	  <cfquery name="rsUnid" datasource="#dsn_inspecao#">
-		 SELECT Und_Codigo, Und_Descricao FROM Unidades where Und_CodDiretoria = '#rsSE.Usu_DR#' order by Und_Descricao
+	  SELECT Und_Codigo, Und_Descricao
+	  FROM Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade
+	  WHERE INP_Situacao='CO' AND INP_NumInspecao Like '%#year(now())#' AND Und_CodDiretoria='#rsSE.Usu_DR#'
 	  </cfquery>
 	<!--- </cfif> --->
 	<!--- ================= --->
@@ -24,11 +27,14 @@
 	   <cfset frmdr = form.SE>
 	   <cfif frmdr eq "Todas">
 		   <cfquery name="rsUnid" datasource="#dsn_inspecao#">
-			 SELECT Und_Codigo, Und_Descricao FROM Unidades where Und_CodDiretoria = '9999' order by Und_Descricao
+			FROM Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade
+			WHERE INP_Situacao='CO' AND INP_NumInspecao Like '%#year(now())#' AND Und_CodDiretoria='9999'
 		   </cfquery>
 	   <cfelse>
 	       <cfquery name="rsUnid" datasource="#dsn_inspecao#">
-			 SELECT Und_Codigo, Und_Descricao FROM Unidades where Und_CodDiretoria = '#frmdr#' order by Und_Descricao
+			SELECT Und_Codigo, Und_Descricao
+			FROM Unidades INNER JOIN Inspecao ON Und_Codigo = INP_Unidade
+			WHERE INP_Situacao='CO' AND INP_NumInspecao Like '%#year(now())#' AND Und_CodDiretoria='#frmdr#'
 		   </cfquery>
 	  </cfif>
 	
@@ -39,7 +45,7 @@
 
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitaï¿½ï¿½o das teclas numï¿½ricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -57,7 +63,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia inválido!');
+		      alert('Valor para o dia invÃ¡lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -67,7 +73,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o Mês inválido!');
+		      alert('Valor para o MÃªs invÃ¡lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -85,9 +91,9 @@ function desab_unidade(x){
 </script>
 
 <script type="text/javascript">
-//Validação de campos vazios em formulário
+//Validaï¿½ï¿½o de campos vazios em formulï¿½rio
 function valida_form(form) {
- // inicio críticas para o botão Salvar manifestação
+ // inicio crï¿½ticas para o botï¿½o Salvar manifestaï¿½ï¿½o
   if (document.form1.acao.value == 'Confirma')
   {
  // alert(document.form1.acao.value);
@@ -114,7 +120,7 @@ function valida_form(form) {
 
 		 if (dtinicdig_aaaammdd > dtfinaldig_aaaammdd)
 		 {
-		  alert("Data Inicial é maior que a Data Final!")
+		  alert("Data Inicial Ã© maior que a Data Final!")
 		  //dtprazo(sit);
 		  return false;
 		 }
@@ -129,7 +135,7 @@ function valida_form(form) {
 
 <html>
 <head>
-<title>Sistema de Acompanhamento das Respostas das Inspeções</title>
+<title>Sistema de Acompanhamento das Respostas das Inspeï¿½ï¿½es</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="css.css" rel="stylesheet" type="text/css">
 </head>

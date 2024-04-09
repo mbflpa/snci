@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/> 
+<cfprocessingdirective pageEncoding ="utf-8"> 
 <cfoutput>
 <cfset sdtatual = dateformat(now(),"YYYYMMDDHH")>
 <cfset sdtarquivo = dateformat(now(),"YYYYMMDDHH")>
@@ -140,29 +140,16 @@
 			 FROM Areas WHERE Ars_Status = 'A' AND (Left(Ars_Codigo,2) = '#scia_se#') and (Ars_Sigla Like '%/SCIA%' OR Ars_Sigla Like '%DCINT/GCOP/SGCIN/SCIA')
 			 ORDER BY Ars_Sigla
 			</cfquery>				
-<!--- 			<cfquery name="rsarea" datasource="#dsn_inspecao#">
-			 SELECT Ars_Codigo, Ars_Sigla
-			 FROM Areas 
-			 WHERE (Ars_Sigla Like '%SCOI%' OR Ars_Sigla Like '%DCINT/GCOP/SGCIN/SCOI') AND (Ars_Status = 'A') AND (Left([Ars_Codigo],2)) = '#left(dbunid,2)#'
-			</cfquery> --->
 			<cfset aux_posarea = #rsSCIA.Ars_Codigo#>
 			<cfset aux_posnomearea = #rsSCIA.Ars_Sigla#>
-		<cfelseif form.frmResp eq 3 or form.frmResp eq 10 or form.frmResp eq 13> 
-			<cfquery name="rsAreaAtu" datasource="#dsn_inspecao#">
-			SELECT Pos_Area, Pos_NomeArea 
-			FROM ParecerUnidade 
-			WHERE (Pos_Unidade = '#dbunid#') AND (Pos_Inspecao = '#dbinsp#') AND (Pos_NumGrupo = #dbgrupo#) AND (Pos_NumItem = #dbitem#)
-			</cfquery>
-			<cfset aux_posarea = #rsAreaAtu.Pos_Area#>
-			<cfset aux_posnomearea = #rsAreaAtu.Pos_NomeArea#>
-		<cfelseif form.frmResp eq 15>		
+		<cfelseif form.frmResp eq 3 or form.frmResp eq 10 or form.frmResp eq 13 or form.frmResp eq 15 or form.frmResp eq 29> 
 			<cfquery name="rsUnidade" datasource="#dsn_inspecao#">
 				SELECT Und_Descricao
 				FROM Unidades
 				WHERE Und_Codigo = '#dbunid#'
 			</cfquery>
 			<cfset aux_posarea = #dbunid#>
-			<cfset aux_posnomearea = #rsUnidade.Und_Descricao#>			
+			<cfset aux_posnomearea = #rsUnidade.Und_Descricao#>	
 		<cfelse>	
 			<cfquery name="rsAreacs" datasource="#dsn_inspecao#">
 			 SELECT Ars_Codigo, Ars_Sigla FROM Areas WHERE Ars_Codigo = '#form.cbareacs#'
@@ -250,9 +237,10 @@
 		   <CFSET GIL = GIL> --->
 		   <!--- FINAL tempor�rio para atualizar os pontos LEVES --->		  
 		     <!--- Atualizar andamento --->
-			 <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & "-" & TimeFormat(Now(),'HH:MM') & ">" & Trim(Encaminhamento) & CHR(13) & CHR(13) & "Á(O) " & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & "Responsável: COORD VERIF CONTR UNID OP/GCOP" & CHR(13) & CHR(13) & "--------------------------------------------------------------------------------------------------------------">
-			 <cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
-			 <cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
+			<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & "-" & TimeFormat(Now(),'HH:MM') & ">" & Trim(Encaminhamento) & CHR(13) & CHR(13) & "Á(O) " & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & "Responsável: COORD VERIF CONTR UNID OP/GCOP" & CHR(13) & CHR(13) & "--------------------------------------------------------------------------------------------------------------">
+			<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+			<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+			<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>
 			 <cfquery datasource="#dsn_inspecao#">
 			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#dbinsp#', '#dbunid#', #dbgrupo#, #dbitem#, convert(char, getdate(), 102), 'Rotina_em_Lote', #IDStatus#, '#hhmmssdc#', '#and_obs#', '#aux_posarea#')
 			 </cfquery>  

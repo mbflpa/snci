@@ -2,8 +2,8 @@
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	SELECT Usu_DR, Dir_Sigla, Dir_Descricao, Usu_Login, Usu_Matricula, Usu_GrupoAcesso, Usu_Apelido, Usu_Lotacao, Usu_LotacaoNome, Usu_Email, Usu_Coordena
 	FROM Usuarios INNER JOIN Diretoria ON Usu_DR = Dir_Codigo
- 	WHERE Usu_Login = 'CORREIOSNET\85051071'
-	--WHERE Usu_Login = '#CGI.REMOTE_USER#'
+--- 	WHERE Usu_Login = 'CORREIOSNET\85051071'
+	WHERE Usu_Login = '#CGI.REMOTE_USER#'
 </cfquery>
 <!--- Dados em structure para acesso global no SNCI --->
 <cfset snci = structnew()>
@@ -39,7 +39,7 @@
 <cfset snci.gestipounid=''>
 <cfset snci.gesposarea=''>
 <cfset snci.gesnomearea=''>
-
+<cfset Local = SetLocale("Portuguese (Brazilian)")>
 <!---
 <cfset DR = 'Departamento de Governança, Riscos e Compliance'>
 <cfset siglaDR = 'DCINT'>
@@ -48,7 +48,7 @@
 <cfset rodape = '.: CCOP :. Av. Guararapes, 250 - 3º Andar - Santo Antonio - Recife-PE'>
 <cfset sto_gerencia = '32050'> <!--- Cinco digitos iniciais --->
 <cfset cod_dr = '32'>
-<cfset Local = SetLocale("Portuguese (Brazilian)")>
+
 <cfset evento = ''>
 <cfset Meses = ('Jan, Fev, Mar, Abr, Mai, Jun, Jul, Ago, Set, Out, Nov, Dez')>
 <cfset Email_Ginsp = 'peginsp@correios.com.br'>
@@ -60,9 +60,6 @@
 <cfset Login_CDD = 'PE\PECDD'> <!--- Parte inicial do login dos CDDs (comum a todos os CDDs) --->
 
 <script type="text/javascript" src="ckeditor\ckeditor.js"></script>
-
-
-
 
 <!--- Pastas onde serão armazenados arquivos anexados às Avaliações --->
 <cfset auxsite =  trim(ucase(cgi.server_name))>
@@ -94,7 +91,7 @@
 
 <!--- Listas de permissões --->
 <cfquery name="qSINS" datasource="#dsn_inspecao#">
-	SELECT Usu_Login FROM Usuarios WHERE RTrim(Usu_GrupoAcesso) in ('GESTORES','DESENVOLVEDORES','GESTORMASTER', 'INSPETORES', 'ANALISTAS')
+	SELECT Usu_Login FROM Usuarios WHERE RTrim(Usu_GrupoAcesso) in ('GESTORES','DESENVOLVEDORES','GESTORMASTER','INSPETORES','ANALISTAS','GOVERNANCA')
 </cfquery>
 
 <cfset Lista_SINS = UCase(ValueList(qSINS.Usu_Login))>

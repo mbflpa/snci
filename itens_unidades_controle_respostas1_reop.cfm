@@ -106,7 +106,7 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
     <cfset pos_obs = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & '  ' & '-' & '  ' & #aux_obs# & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
   '#pos_obs#'
   </cfif> 
-  , Pos_DtPosic=#CreateDate(Year(Now()),Month(Now()),Day(Now()))#
+  , Pos_DtPosic=#createodbcdate(createdate(year(now()),month(now()),day(now())))#
   , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
   , Pos_NomeResp='#CGI.REMOTE_USER#'
   , Pos_username = '#CGI.REMOTE_USER#'
@@ -116,10 +116,12 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
  <!--- Inserindo dados dados na tabela Andamento --->
   <cfif IsDefined("FORM.MM_UpdateRecord") AND FORM.MM_UpdateRecord EQ "form1" And IsDefined("FORM.acao") And Form.acao is "Salvar2">
  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'À(o)' & '  ' & Gestor & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
- <cfset hhmmssd = timeFormat(now(), "HH:mm:ssl")>
-<cfset hhmmssd = left(hhmmssd,2) & mid(hhmmssd,4,2) & mid(hhmmssd,7,2) & mid(hhmmssd,9,1)>
+  <cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+  <cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+  <cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>	
  <cfquery datasource="#dsn_inspecao#">
-    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#qUsuario.Usu_Lotacao#', '#hhmmssd#', '#and_obs#')
+    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer) 
+    values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', #createodbcdate(createdate(year(now()),month(now()),day(now())))#, '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#qUsuario.Usu_Lotacao#', '#hhmmssdc#', '#and_obs#')
  </cfquery>
      
  

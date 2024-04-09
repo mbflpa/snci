@@ -5,7 +5,7 @@
   </cfif> 
   
   <cfquery name="qAcesso" datasource="#dsn_inspecao#">
-	select Usu_DR,Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena from usuarios 
+	select Usu_DR,Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena,Usu_login from usuarios 
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 
@@ -81,9 +81,24 @@
 	
 				<cfquery datasource="#dsn_inspecao#">
 					insert into Inspetor_Inspecao (IPT_CodUnidade, IPT_NumInspecao, IPT_MatricInspetor, IPT_DtInicInsp, IPT_DtFimInsp, IPT_DtInicDesloc, IPT_DtFimDesloc, IPT_NumHrsPreInsp, IPT_NumHrsdesloc, IPT_NumHrsInsp, IPT_DtUltAtu, IPT_UserName)
-					values ('#rsUnidade.Und_Codigo#', '#rsInspecao.INP_NumInspecao#', '#i#', CONVERT(DATETIME, '#form.dataInicioInsp#', 103), CONVERT(DATETIME, '#form.dataFimInsp#', 103), CONVERT(DATETIME, '#form.dataInicioDesl#', 103), CONVERT(DATETIME, '#form.dataFimDesl#', 103), '#form.horasPreInspecao#', '#form.horasDeslocamento#', '#form.horasInspeção#', CONVERT(char, getdate(), 120), '#qAcesso.Usu_Matricula#')
+					values ('#rsUnidade.Und_Codigo#', '#rsInspecao.INP_NumInspecao#', '#i#', CONVERT(DATETIME, '#form.dataInicioInsp#', 103), CONVERT(DATETIME, '#form.dataFimInsp#', 103), CONVERT(DATETIME, '#form.dataInicioDesl#', 103), CONVERT(DATETIME, '#form.dataFimDesl#', 103), '#form.horasPreInspecao#', '#form.horasDeslocamento#', '#form.horasInspecao#', CONVERT(char, getdate(), 120), '#qAcesso.Usu_Matricula#')
 				</cfquery>
 			</cfloop>
+			<!--- Tela pode alterar a partir de 22/01/2024 Gilvan --->
+			<cfquery datasource="#dsn_inspecao#">
+			UPDATE Inspetor_Inspecao SET IPT_NumHrsPreInsp = '#form.horasPreInspecao#', 
+			                    <cfif '#rsInspecao.INP_Modalidade#' eq 0>
+									IPT_DtInicDesloc = CONVERT(DATETIME, '#form.dataInicioDesl#', 103),
+									IPT_DtFimDesloc =  CONVERT(DATETIME, '#form.dataFimDesl#', 103),
+								</cfif>
+								IPT_NumHrsdesloc=  '#form.horasDeslocamento#',
+					 			IPT_DtInicInsp=  CONVERT(DATETIME, '#form.dataInicioInsp#', 103),
+								IPT_DtFimInsp=  CONVERT(DATETIME, '#form.dataFimInsp#', 103), 
+								IPT_NumHrsInsp = '#form.horasInspecao#',
+								IPT_DtUltAtu = CONVERT(char, getdate(), 120), 
+								IPT_UserName = '#qAcesso.Usu_Matricula#'
+				WHERE IPT_NumInspecao = convert(varchar,'#rsInspecao.INP_NumInspecao#') 
+			</cfquery>
 			<cfquery datasource="#dsn_inspecao#">
 			UPDATE inspecao SET INP_HrsPreInspecao = '#form.horasPreInspecao#', 
 			                    <cfif '#rsInspecao.INP_Modalidade#' eq 0>
@@ -91,9 +106,9 @@
 									INP_DtFimDeslocamento =  CONVERT(DATETIME, '#form.dataFimDesl#', 103),
 								</cfif>
 								INP_HrsDeslocamento=  '#form.horasDeslocamento#',
-					<!--- 			INP_DtInicInspecao=  CONVERT(DATETIME, '#form.dataInicioInsp#', 103),
-								INP_DtFimInspecao=  CONVERT(DATETIME, '#form.dataFimInsp#', 103), --->
-								INP_HrsInspecao = '#form.horasInspeção#'
+					 			INP_DtInicInspecao=  CONVERT(DATETIME, '#form.dataInicioInsp#', 103),
+								INP_DtFimInspecao=  CONVERT(DATETIME, '#form.dataFimInsp#', 103), 
+								INP_HrsInspecao = '#form.horasInspecao#'
 				WHERE INP_NumInspecao = convert(varchar,'#rsInspecao.INP_NumInspecao#') 
 			</cfquery>
 			</cftransaction> 
@@ -158,12 +173,12 @@
 										INP_DtInicDeslocamento = '#rsResumo.dtInicDeslocMin#',
 										INP_DtFimDeslocamento =  '#rsResumo.dtFimDesloclMax#',
 										INP_HrsDeslocamento=     '#rsResumo.numHrsDeslocTotal#',
-										<!--- INP_DtInicInspecao=      '#rsResumo.dtInicInspMin#',
-										INP_DtFimInspecao=       '#rsResumo.dtFimInspMax#', --->
+										INP_DtInicInspecao=      '#rsResumo.dtInicInspMin#',
+										INP_DtFimInspecao=       '#rsResumo.dtFimInspMax#', 
 										INP_HrsInspecao =        '#rsResumo.numHrsInspTotal#',
 										INP_Situacao =           'NA',
 										INP_DtUltAtu =           convert(char,getdate(), 120),
-                                        INP_UserName =           '#qAcesso.Usu_Matricula#'
+                                        INP_UserName =           '#qAcesso.Usu_Login#'
 					WHERE INP_NumInspecao = convert(varchar,'#url.numInspecao#') 
 				</cfquery>
 
@@ -180,9 +195,9 @@
 				</cfquery>
 				<cfset auxvlr = '0.00'>
 				<cfoutput query="rsItens">
-				    <cfset RIPCaractvlr = 'Nao Quantificado'>
+				    <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
 					<cfif listfind('#rsItens.TUI_Pontuacao_Seq#','10')>
-					 <cfset RIPCaractvlr = 'Quantificado'>
+					 <cfset RIPCaractvlr = 'QUANTIFICADO'>
 					</cfif>
 				     
 				    <cfquery datasource="#dsn_inspecao#">
@@ -252,7 +267,8 @@ function aguarde(){
  }
  
 
-function verifQuantInspetores(){
+function verifQuantInspetores(a,b) {
+
 <cfif isdefined('url.numInspecao')	>
 	<cfquery datasource="#dsn_inspecao#" name="rsInspCadast">
 		SELECT IPT_MatricInspetor FROM Inspetor_Inspecao WHERE IPT_NumInspecao = '#url.numInspecao#'
@@ -267,16 +283,16 @@ function verifQuantInspetores(){
 	var quant =<cfoutput>'#rsInspCadast.recordcount#'</cfoutput>;
 	var temCoord =<cfoutput>'#rsVerifCadCoord.recordcount#'</cfoutput>;
 	var mens ='Cadastre o coordenador desta verificação!\n<cfoutput>#rsNomeCoordenador.Fun_Nome#</cfoutput>';
-			if(quant == '1'){
-				alert('Cadastre, pelo menos, dois inspetores!');	
-				return false;
-			}
-			if(temCoord == '0'){
-				alert(mens);	
-				return false;
-			}
-			resumoCadastro(<cfoutput>'#url.NumInspecao#','#url.coordenador#'</cfoutput>);
-	</cfif>
+	if(quant == '1'){
+		alert('Cadastre, pelo menos, dois inspetores!');	
+		return false;
+	}
+	if(temCoord == '0'){
+		alert(mens);	
+		return false;
+	}
+	resumoCadastro(<cfoutput>'#url.NumInspecao#','#url.coordenador#'</cfoutput>);
+</cfif>
 }
 
  function valida_formCadInsp() {
@@ -351,15 +367,17 @@ return false;
 
 function resumoCadastro(insp,coord){
    var caminho = 'cadastro_inspecao_inspetores.cfm?numInspecao=' + insp +'&coordenador=' + coord + '&acao=resumo' +'#resumo';
-	window.location.href(caminho);
+   window.location.href = caminho;
+	//window.location.href(caminho);
 }
 function finalizarCadastro(insp,coord){
    var caminho = 'cadastro_inspecao_inspetores.cfm?numInspecao=' + insp +'&coordenador=' + coord + '&acao=finalizar';
-   var mensagem ="ATENÇÃO!\n\nApós finalização do cadastro desta Avaliação, caso haja algum erro, ela deverá ser excluída (Cadastro de Avaliações -> Tabela 'Avaliações com Cadastro Finalizado') e recadastrada (neste caso, o n° de Avaliação " + insp + " pode não ser mais utilizado).\n\nVocê conferiu os dados desse cadastro e deseja finalizá-lo?";
-   if (window.confirm(mensagem)) {
-	  aguardeFinaliza(); 
-	  window.location.href(caminho);
-   }
+ //  var mensagem ="ATENÇÃO!\n\nApós finalização do cadastro desta Avaliação, caso haja algum erro, ela deverá ser excluída (Cadastro de Avaliações -> Tabela 'Avaliações com Cadastro Finalizado') e recadastrada (neste caso, o n° de Avaliação " + insp + " pode não ser mais utilizado).\n\nVocê conferiu os dados desse cadastro e deseja finalizá-lo?";
+//   if (window.confirm(mensagem)) {
+//	  aguardeFinaliza(); 
+	window.location.href = caminho;
+//	  window.location.href(caminho);
+ //  }
 }
 
 //================
@@ -533,10 +551,10 @@ function valida_formCadNum() {
 
 	
 
-	if (frm.horasInspeção.value == '' || frm.horasInspeção.value == '0' ) {
+	if (frm.horasInspecao.value == '' || frm.horasInspecao.value == '0' ) {
     	alert('Informe a quantidade de horas utilizadas na Avaliação!');
-    	frm.horasInspeção.focus();
-		frm.horasInspeção.select();
+    	frm.horasInspecao.focus();
+		frm.horasInspecao.select();
     	return false;
     }
 
@@ -632,7 +650,7 @@ function valida_formCadNum() {
 					</cfquery>
 				</cfif>	
 
-				<div align:"center" style="position:relative;left:88px">	
+				<div align:"center" style="position:relative;left:50px">	
 					<tr>
 						<td>
 							<label for="selInspetores" style="color:grey">Selecione um ou mais Inspetores:  </label>
@@ -641,12 +659,12 @@ function valida_formCadNum() {
 								<cfoutput query="rsInspetores">
 									<option  <cfif  '#trim(Usu_Matricula)#' eq '#url.coordenador#' >selected</cfif> value="#trim(Usu_Matricula)#"><cfif  '#trim(Usu_Matricula)#' eq '#url.coordenador#' >Coord.: </cfif>#trim(Dir_Sigla)# - #trim(Usu_Apelido)#</option>
 								</cfoutput>
-							</select><br><span style="font-size:11px;color:cadetblue;position:absolute;top:88px">Mantenha pressionada a tecla "CTRL" para selecionar mais de um inspetor.</span>
+							</select><br><span style="font-size:11px;color:cadetblue;position:absolute;top:100px">Mantenha pressionada a tecla "CTRL" para selecionar mais de um inspetor.</span>
 						</td>
 					</tr>
 				</div>	
 					<br>
-				<div style="WIDTH: 202px; RIGHT:18px;POSITION: absolute; PADDING: 5px;TOP: 122px;BACKGROUND-COLOR:#fff;border:1px solid #e0dddd">
+				<div style="WIDTH: 202px; RIGHT:18px;POSITION: absolute; PADDING: 5px;TOP:125px;BACKGROUND-COLOR:#fff;border:1px solid #e0dddd">
 					<span style="color:gray;font-size:14px;position:absolute;top:-19px;left:0px">Carga Horária (por inspetor):</span>
 					<tr>
 					<td>
@@ -654,7 +672,7 @@ function valida_formCadNum() {
 							SELECT IPT_MatricInspetor FROM Inspetor_Inspecao WHERE IPT_NumInspecao = '#url.numInspecao#'
 						</cfquery>
 						<label for="horasPreInspecao" style="color:gray">Horas Pré-Avaliação:</label>
-						<input id="horasPreInspecao" name="horasPreInspecao" type="text" 
+<!---						<input id="horasPreInspecao" name="horasPreInspecao" type="text" 
 						    value="<cfoutput><cfif isDefined("url.numInspecao") and '#rsInspecao.INP_Modalidade#' eq '0'>#rsInspetoresCadastrados.IPT_NumHrsPreInsp#<cfelse>0</cfif></cfoutput>" 
 							onKeyPress="numericos()" maxlength="2" 	style="width:20px;text-align:center;margin-left:3px;border:1px solid #e0dddd"
 							
@@ -666,47 +684,60 @@ function valida_formCadNum() {
 									style="background:#eef1f3;text-align:center;"
 									readonly
 								</cfif>
-						
-
+--->
+						<input id="horasPreInspecao" name="horasPreInspecao" type="text" 
+						    value="<cfoutput><cfif isDefined("url.numInspecao") and '#rsInspecao.INP_Modalidade#' eq '0'>#rsInspetoresCadastrados.IPT_NumHrsPreInsp#<cfelse>0</cfif></cfoutput>" 
+							onKeyPress="numericos()" maxlength="2" 	style="width:20px;text-align:center;margin-left:3px;border:1px solid #e0dddd"/>
 					</td>
 					<br>
 					<td>
 						<label for="horasDeslocamento" style="color:gray">Horas Deslocamento:</label>
-						<input id="horasDeslocamento" name="horasDeslocamento" type="text" 
+<!---						<input id="horasDeslocamento" name="horasDeslocamento" type="text" 
 						value="<cfoutput><cfif isDefined("url.numInspecao")>#rsInspetoresCadastrados.IPT_NumHrsDesloc#</cfif></cfoutput>"
 						style="width:20px;text-align:center;margin-left:0px;border:1px solid #e0dddd" onKeyPress="numericos()" maxlength="2" 
 						<cfif isDefined("url.numInspecao") and '#rsInspCadastrados.recordcount#' gte '1'>
 							style="background:#eef1f3;"
 							readonly
 						</cfif>
-						/>
+--->
+						<input id="horasDeslocamento" name="horasDeslocamento" type="text" 
+						value="<cfoutput><cfif isDefined("url.numInspecao")>#rsInspetoresCadastrados.IPT_NumHrsDesloc#</cfif></cfoutput>"
+						style="width:20px;text-align:center;margin-left:0px;border:1px solid #e0dddd" onKeyPress="numericos()" maxlength="2"/>
 					</td>
 					<br>
 					<td>
-						<label for="horasInspeção" style="color:gray">Horas Avaliação:
+						<label for="horasInspecao" style="color:gray">Horas Avaliação:
 							&nbsp;&nbsp;&nbsp;&nbsp;</label>
-						<input id="horasInspeção" name="horasInspeção" type="text" 
+<!---						<input id="horasInspecao" name="horasInspecao" type="text" 
 						value="<cfoutput><cfif isDefined("url.numInspecao")>#rsInspetoresCadastrados.IPT_NumHrsInsp#</cfif></cfoutput>" style="border:1px solid #e0dddd;width:20px;text-align:center;margin-left:7px"
 							onKeyPress="numericos()" maxlength="2" 
 							<cfif isDefined("url.numInspecao") and '#rsInspCadastrados.recordcount#' gte '1'>
 								style="background:#eef1f3;"
 								readonly
-							</cfif>/>
+							</cfif>
+--->
+						<input id="horasInspecao" name="horasInspecao" type="text" 
+						value="<cfoutput><cfif isDefined("url.numInspecao")>#rsInspetoresCadastrados.IPT_NumHrsInsp#</cfif></cfoutput>" style="border:1px solid #e0dddd;width:20px;text-align:center;margin-left:7px"
+							onKeyPress="numericos()" maxlength="2"/>
+
 					</td>
 				  </tr>
 				</div>
 					<br>
-				<div style="background:#fff;padding:5px;padding-top:6px;position:relative;top:-15px;height:77px;width:442px;border:1px solid #e0dddd">
+				<div style="background:#fff;padding:1px;padding-top:6px;position:relative;top:-5px;height:60px;width:440px;border:1px solid #e0dddd">
 				<span style="color:gray;font-size:14px;position:absolute;top:-19px;left:0px">Datas:</span>
 				<tr>
 					<td>
 						<label for="dataInicioDesl" style="color:gray">Início Desloc.:&nbsp;&nbsp;</label>
 						<cfset dataInicioDesl ="">
-						<cfif isDefined("url.numInspecao") and isdefined('form.dataInicioDesl') and '#form.dataInicioDesl#' neq ''>
+						<cfif isDefined("url.numInspecao") and isdefined('form.dataInicioDesl') and '#form.dataInicioDesl#' neq ''></cfif>
 						  <cfset dataInicioDesl ='#DateFormat(rsInspetoresCadastrados.IPT_DtInicDesloc,"dd/mm/yyyy")#'>
-						</cfif>
-						<input id="dataInicioDesl" name="dataInicioDesl" type="text" value="<cfoutput>#dataInicioDesl#</cfoutput>" style="width:82px;border:1px solid #e0dddd"
+						
+<!---						<input id="dataInicioDesl" name="dataInicioDesl" type="text" value="<cfoutput>#dataInicioDesl#</cfoutput>" style="width:82px;border:1px solid #e0dddd"
 							onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" size="14" maxlength="10" <cfif '#rsInspetoresCadastrados.IPT_DtInicDesloc#' eq '1900/1/1' or '#dataInicioDesl#' neq ''>style="background:#eef1f3;" readonly</cfif>/>
+--->
+						<input id="dataInicioDesl" name="dataInicioDesl" type="text" value="<cfoutput>#dataInicioDesl#</cfoutput>" style="width:82px;border:1px solid #e0dddd"
+							onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" size="14" maxlength="10">
 					</td>
 
 					<td colspan="3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp</td>
@@ -714,11 +745,14 @@ function valida_formCadNum() {
 					<td>
 						<label for="dataFimDesl" style="color:gray">Fim Desloc.:&nbsp;&nbsp;&nbsp;</label>
 						<cfset dataFimDesl ="">
-						<cfif isDefined("url.numInspecao") and isdefined('form.dataFimDesl') and '#form.dataFimDesl#' neq ''>
+						<cfif isDefined("url.numInspecao") and isdefined('form.dataFimDesl') and '#form.dataFimDesl#' neq ''></cfif>
 						  <cfset dataFimDesl ='#DateFormat(rsInspetoresCadastrados.IPT_DtFimDesloc,"dd/mm/yyyy")#'>
-						</cfif>
-						<input id="dataFimDesl" name="dataFimDesl" type="text" value="<cfoutput>#dataFimDesl#</cfoutput>" style="width:82px;border:1px solid #e0dddd"
+						
+<!---						<input id="dataFimDesl" name="dataFimDesl" type="text" value="<cfoutput>#dataFimDesl#</cfoutput>" style="width:82px;border:1px solid #e0dddd"
 							onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" size="14" maxlength="10" <cfif '#rsInspetoresCadastrados.IPT_DtInicDesloc#' eq '1900/1/1' or '#dataFimDesl#' neq ''>style="background:#eef1f3;" readonly</cfif>/>
+--->						
+<input id="dataFimDesl" name="dataFimDesl" type="text" value="<cfoutput>#dataFimDesl#</cfoutput>" style="width:82px;border:1px solid #e0dddd"
+							onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" size="14" maxlength="10">	
 					</td>
 
 					
@@ -732,8 +766,11 @@ function valida_formCadNum() {
 						<cfif isDefined("url.numInspecao")>
 						  <cfset dataInicioInsp ='#DateFormat(rsInspetoresCadastrados.IPT_DtInicInsp,"dd/mm/yyyy")#'>
 						</cfif>
-						<input id="dataInicioInsp" name="dataInicioInsp" type="text" value="<cfoutput>#dataInicioInsp#</cfoutput>" style="width:82px;border:1px solid #e0dddd;margin-left:5px"
+<!---						<input id="dataInicioInsp" name="dataInicioInsp" type="text" value="<cfoutput>#dataInicioInsp#</cfoutput>" style="width:82px;border:1px solid #e0dddd;margin-left:5px"
 							onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" size="14" maxlength="10" <cfif '#dataInicioInsp#' neq ''>style="background:#eef1f3;" readonly</cfif>/>
+--->
+							<input id="dataInicioInsp" name="dataInicioInsp" type="text" value="<cfoutput>#dataInicioInsp#</cfoutput>" style="width:82px;border:1px solid #e0dddd;margin-left:5px"
+							onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" size="14" maxlength="10">						
 					</td>
 
 					<td colspan="3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
@@ -744,8 +781,11 @@ function valida_formCadNum() {
 						<cfif isDefined("url.numInspecao")>
 						  <cfset dataFimInsp ='#DateFormat(rsInspetoresCadastrados.IPT_DtFimInsp,"dd/mm/yyyy")#'>
 						</cfif>
-						<input id="dataFimInsp" name="dataFimInsp" type="text" value="<cfoutput>#dataFimInsp#</cfoutput>" style="width:82px;border:1px solid #e0dddd;margin-left:13px"
+<!---						<input id="dataFimInsp" name="dataFimInsp" type="text" value="<cfoutput>#dataFimInsp#</cfoutput>" style="width:82px;border:1px solid #e0dddd;margin-left:13px"
 							onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" size="14" maxlength="10" <cfif '#dataFimInsp#' neq ''>style="background:#eef1f3;" readonly</cfif>/>
+--->
+						<input id="dataFimInsp" name="dataFimInsp" type="text" value="<cfoutput>#dataFimInsp#</cfoutput>" style="width:82px;border:1px solid #e0dddd;margin-left:13px"
+							onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" size="14" maxlength="10">
 					</td>
 
 					
@@ -753,7 +793,7 @@ function valida_formCadNum() {
 
 				</div>	
 			
-				
+				<br>
 				<div align="center">
 				
 						<a name="btCadastrar" onClick="return valida_formCadNum()" id="btCadastrar" href="javascript:formCadNum.submit()"
@@ -822,14 +862,18 @@ function valida_formCadNum() {
 										WHERE Usu_Matricula =
 										convert(varchar,#IPT_MatricInspetor#)
 									</cfquery>
-								<cfif isdefined('form.dataInicioDesl') and '#form.dataInicioDesl#' neq "">	
+<!---							<cfif isdefined('form.dataInicioDesl') and '#form.dataInicioDesl#' neq "">	
 									<cfset perDesloc='#DateFormat(IPT_DtInicDesloc,' dd/mm/yyyy')#' & ' a '
 										& '#DateFormat(IPT_DtFimDesloc,' dd/mm/yyyy')#'> 
 								<cfelse>
 									<cfset perDesloc="não houve">
-                                 </cfif>
+                                </cfif>
+--->
+								<cfset perDesloc='#DateFormat(IPT_DtInicDesloc,' dd/mm/yyyy')#' & ' a '
+										& '#DateFormat(IPT_DtFimDesloc,' dd/mm/yyyy')#'> 
+														
 
-								 <cfset	perInspec='#DateFormat(IPT_DtInicInsp,' dd/mm/yyyy')#' & ' a '
+								<cfset	perInspec='#DateFormat(IPT_DtInicInsp,' dd/mm/yyyy')#' & ' a '
 										& '#DateFormat(IPT_DtFimInsp,' dd/mm/yyyy')#'> 
 
 								<tr valign="middle"		bgcolor="#scor#" class="exibir">
@@ -886,7 +930,7 @@ function valida_formCadNum() {
 			<cfset inspecaoTexto="#url.NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#)">
 
 				<div align="center">
-					<a  onclick="verifQuantInspetores();"  href="#"
+					<a  onclick="verifQuantInspetores(<cfoutput>'#url.NumInspecao#','#url.coordenador#'</cfoutput>);"  href="#"
 						class="botaoCad" style="position:relative;left:13px;top:0px"><img src="figuras/cadastro.png" width="25"  
 						border="0" style="position:absolute;left:0px;top:5px">
 						</img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Clique para Conferir e finalizar o Cadastro desta Avaliação</a>
@@ -1164,10 +1208,3 @@ function valida_formCadNum() {
 
 </body>
 </html>
-
-
-
-
-
-	
-

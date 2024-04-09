@@ -1,18 +1,17 @@
 <cfprocessingdirective pageEncoding ="utf-8"/>
-<cfif (not isDefined("snci.permitir")) OR (snci.permitir eq 'False')>
+<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
 </cfif>   
-<!--- <cfset gestorMaster = TRIM('GESTORMASTER')/>
-<cfset desenvolvedores = TRIM('DESENVOLVEDORES')/> --->
+<!--- <cfset gestorMaster = TRIM('GESTORMASTER')/>--->
+<cfset auxgrpacesso = 'DESENVOLVEDORES,GESTORMASTER,GOVERNANCA'> 
 <cfquery name="qUsuarioGestorMaster" datasource="#dsn_inspecao#">
-  SELECT DISTINCT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#snci.login#' and (trim(Usu_GrupoAcesso) = 'GESTORMASTER' OR trim(Usu_GrupoAcesso) = 'DESENVOLVEDORES')
+  SELECT DISTINCT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#' and Usu_GrupoAcesso in ('#auxgrpacesso#')
 </cfquery>
-<!---
 <cfquery name="rsGrpAcesso" datasource="#dsn_inspecao#">
-  SELECT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#snci.login#'
+  SELECT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
 </cfquery> 
---->
+<cfset grpacesso = ucase(Trim(rsGrpAcesso.Usu_GrupoAcesso))>
  <table width="261" border="0" cellpadding="0" cellspacing="0" bgcolor="003366" class="menu">  
  <!---  <table width="260" border="0" cellpadding="0" cellspacing="0">  --->
   <tr>
@@ -21,7 +20,7 @@
   <tr>
     <td height="25">
 	<table class="menu" width="100%" border="0" cellpadding="0">
-	<cfif ucase(trim(snci.grpacesso)) neq "GOVERNANCA">
+	<cfif grpacesso neq "GOVERNANCA">
       <tr>
         <td colspan="2"><a href="#">CADASTRO/ALTERAÇÃO</a></td>
       </tr>
@@ -33,7 +32,7 @@
       <tr>
         <td width="90%">
 		<table width="112%" border="0" cellpadding="0" cellspacing="4" class="menu">
-		<cfif ucase(trim(snci.grpacesso)) neq "GOVERNANCA" and ucase(trim(snci.grpacesso)) neq "ANALISTAS">
+		<cfif grpacesso neq "GOVERNANCA" and grpacesso neq "ANALISTAS">
 		 <tr>
             <td width="6%"><img src="smallArrow.gif" width="16" height="5" /></td>
             <td width="94%"><a href="index.cfm?opcao=permissao0">Unidades</a></td>
@@ -56,20 +55,20 @@
             <td width="94%"><a href="index.cfm?opcao=permissao5">Funcionários</a></td>
           </tr>
 	</cfif>		
-	<cfif ucase(trim(snci.grpacesso)) neq "GOVERNANCA">  
+	<cfif grpacesso neq "GOVERNANCA">  
 		  <tr>
 	        <td><img src="smallArrow.gif" width="16" height="5" /></td>
 	        <td width="94%"><a href="index.cfm?opcao=permissao">Permissões - Usuários</a></td>
           </tr>
 	 </cfif>
-	  <cfif ucase(trim(qUsuarioGestorMaster.Usu_GrupoAcesso)) eq "GESTORMASTER">
+	  <cfif grpacesso eq "GESTORMASTER">
 	   <tr>
 		<td><img src="smallArrow.gif" width="16" height="5" /></td>
 		<td width="94%"><a href="index.cfm?opcao=permissao15">Avisos</a></td>
 	   </tr>
 	  </cfif> 
   
-<!--- 		  <cfif ucase(trim(qUsuarioGestorMaster.Usu_GrupoAcesso)) eq "GESTORMASTER">
+<!--- 		  <cfif grpacesso eq "GESTORMASTER">
 		   <tr>
 	        <td><img src="smallArrow.gif" width="16" height="5" /></td>
 	        <td width="94%"><a href="index.cfm?opcao=permissao16">Listar Itens Verifica&ccedil;&atilde;o</a></td>
@@ -109,7 +108,7 @@
 ---> 
       <tr>
         <td width="7%"><img src="smallArrow.gif" width="16" height="5" /></td>
-        <td width="94%"><a href="index.cfm?opcao=inspecao">Relatório Itens por Tipo Avaliação</a></td>
+        <td width="94%"><a href="index.cfm?opcao=inspecao">Relatórios Itens por Tipo Avaliação</a></td>
       </tr>
     <!---   <tr>
         <td><img src="smallArrow.gif" width="16" height="5" /></td>
@@ -127,10 +126,10 @@
 		<td><img src="smallArrow.gif" width="16" height="5" /></td>
 		<td width="94%"><a href="index.cfm?opcao=inspecao19">Relatório Acompanhamento Itens</a></td>
 	  </tr>	
-	  <cfif ucase(trim(snci.grpacesso)) neq "GOVERNANCA">
+	  <cfif grpacesso neq "GOVERNANCA">
 		   <tr>
 			<td><img src="smallArrow.gif" width="16" height="5" /></td>
-			<td><a href="index.cfm?opcao=inspecao16">Relatório Análise das Manifestações</a></td>
+			<td><a href="index.cfm?opcao=inspecao16">Relatório Análise de Manifestação</a></td>
 		  </tr>
 	  </cfif>      
 <!--- 	  <tr>
@@ -138,19 +137,19 @@
         <td><a href="index.cfm?opcao=inspecao21">Efic&aacute;cia de Controle Interno das Unidades Operacionais (EFCI)</a></td>
       </tr> --->
 	
-<cfif ucase(trim(snci.grpacesso)) neq "ANALISTAS">	 	    
+<cfif grpacesso neq "ANALISTAS" and grpacesso neq "GOVERNANCA">	 	    
 	  <tr> 
         <td><img src="smallArrow.gif" width="16" height="5" /></td>
-        <td><a href="index.cfm?opcao=inspecao4">Avaliação Itens por Causa Provável</a></td>
+        <td><a href="index.cfm?opcao=inspecao4">Relatório Itens por Causa Provável</a></td>
       </tr>
 </cfif>	
  <!---	   <tr>
             <td width="7%"><img src="smallArrow.gif" width="16" height="5" /></td>
-            <td><a href="index.cfm?opcao=inspecao5">Pontos Controle Interno - Estatística</td>
+            <td><a href="index.cfm?opcao=inspecao5">Pontos Controle Interno - Estat�stica</td>
           </tr>
           <tr>
             <td><img src="smallArrow.gif" width="16" height="5" /></td>
-            <td><a href="index.cfm?opcao=inspecao6">Pontos Pendentes - Áreas </a></td>
+            <td><a href="index.cfm?opcao=inspecao6">Pontos Pendentes - &Aacute;reas </a></td>
           </tr>
 		  <tr>
             <td><img src="smallArrow.gif" width="16" height="5" /></td>
@@ -238,22 +237,17 @@
 	    <tr>
 	      <td colspan="2">&nbsp;</td>
         </tr>--->
-    <cfif qUsuarioGestorMaster.recordcount neq 0 >
+    <cfif grpacesso eq "GESTORMASTER">
 		  <tr>
 	      <td><img src="smallArrow.gif" width="16" height="5" /></td>
 	      <td><a href="index.cfm?opcao=permissao14">Processamento em Lote</a></td>
       </tr>
     </cfif>
-<!--- 	<cfif ucase(trim(snci.grpacesso)) neq "ANALISTAS">	
-	    <tr>
-	      <td><img src="smallArrow.gif" width="16" height="5" /></td>
-	      <td><a href="index.cfm?opcao=permissao1">Excluir Relat&oacute;rio de Controle Interno</a></td>
-        </tr>	  
-	</cfif> --->
-		  <cfif ucase(trim(snci.grpacesso)) eq "GESTORMASTER" or ucase(trim(snci.grpacesso)) eq "GESTORES">
+
+		  <cfif grpacesso eq "GESTORMASTER" or grpacesso eq "GESTORES">
 	   <tr>
 		<td><img src="smallArrow.gif" width="16" height="5" /></td>
-		<td width="94%"><a href="index.cfm?opcao=permissao18">Pesquisa P&oacute;s-Avalia&ccedil;&atilde;o</a></td>
+		<td width="94%"><a href="index.cfm?opcao=permissao18">Pesquisa Pós-Avaliação</a></td>
 	   </tr>
 	   <tr>
 		<td><img src="smallArrow.gif" width="16" height="5" /></td>
@@ -265,23 +259,23 @@
 	   </tr>
 	   		      
 	  </cfif>
-	   <cfif ucase(trim(snci.grpacesso)) eq "GESTORES">
+	   <cfif grpacesso eq "GESTORES">
 	   	<tr>		   
 		<td><img src="smallArrow.gif" width="16" height="5" /></td>
 		<td width="94%"><a href="index.cfm?opcao=permissao21">Solicitar Permuta Avaliação no PACIN</a></td>
 	    </tr>
 	    </cfif>	
-	   <cfif ucase(trim(snci.grpacesso)) eq "GESTORMASTER">
+	   <cfif grpacesso eq "GESTORMASTER">
+      <tr>		   
+         <td><img src="smallArrow.gif" width="16" height="5" /></td>
+         <td width="94%"><a href="index.cfm?opcao=permissao22">Autorizar Permuta Avaliação no PACIN</a></td>
+      </tr>		
         <tr>		   
           <td><img src="smallArrow.gif" width="16" height="5" /></td>
-          <td width="94%"><a href="index.cfm?opcao=permissao22">Autorizar Permuta Avaliação no PACIN</a></td>
-        </tr>	
-                <tr>		   
-          <td><img src="smallArrow.gif" width="16" height="5" /></td>
           <td width="94%"><a href="index.cfm?opcao=permissao27">Grupo/Item Reincidentes no PACIN</a></td>
-        </tr>		   
+        </tr>		         
 	   </cfif>	
-	  <cfif ucase(trim(snci.grpacesso)) eq 'GOVERNANCA'>
+	  <cfif grpacesso eq 'GOVERNANCA'>
 	  <tr>
 		<td><img src="smallArrow.gif" width="16" height="5" /></td>
 		<td width="94%"><a href="index.cfm?opcao=permissao20">Classificação Unidades</a></td>
@@ -326,7 +320,7 @@
    </td>
   </tr>
   <tr>
-    <td class="branco" align="center" bgcolor="#FFFFFF"><div class="exibir">Login: <strong><cfoutput>#snci.login#</cfoutput></strong></div></td>
+    <td class="branco" align="center" bgcolor="#FFFFFF"><div class="exibir">Login: <strong><cfoutput>#CGI.REMOTE_USER#</cfoutput></strong></div></td>
   </tr>
   <tr>
     <td>&nbsp;</td>

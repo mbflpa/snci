@@ -1,7 +1,9 @@
-
 <cfoutput>
-CGI.REMOTE_USER ==> #CGI.REMOTE_USER#
-<!--- snci.login: #snci.login#
+<!---
+para o link: (http://desenvolvimentope/snci/rotinas_inspecao.cfm) <br>
+O valor esperado da CGI.REMOTE_USER ==> ( #CGI.REMOTE_USER# ) <br>
+Ainda não está sendo fornecido pelo servidor coldfusion, ou seja, está vindo com vazio.
+ snci.login: #snci.login#
  #timeFormat(now(), "HH:mm:ssl")# <br>
  <cfset hhmmssd = timeFormat(now(), "HH:mm:ssl")>
  <cfset hhmmssd = left(hhmmssd,2) & mid(hhmmssd,4,2) & mid(hhmmssd,7,2) & mid(hhmmssd,9,1)>
@@ -87,8 +89,8 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 <cfset auxdt = dateformat(now(),"YYYYMMDD")>
 <cfset vDiaSem = DayOfWeek(auxdt)>
 <cfset auxsite =  cgi.server_name>
-<!--- <cfoutput>#auxsite#</cfoutput> --->
-<cfif (rsDia.MSG_Realizado neq auxdt)>
+
+<cfif (trim(rsDia.MSG_Realizado) neq auxdt)>
    <cflocation url="Mensagens.cfm"> 
 </cfif>
 
@@ -155,6 +157,11 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 			SELECT Usu_Login FROM usuarios WHERE RTrim(Usu_GrupoAcesso) = 'GESTORMASTER';
 		</cfquery>
 		<cfset Lista_Dcint = UCase(ValueList(qLista_Dcint.Usu_Login))>
+
+		<cfquery name="qLista_Gernanca" datasource="#dsn_inspecao#">
+			SELECT Usu_Login FROM usuarios WHERE RTrim(Usu_GrupoAcesso) = 'GOVERNANCA';
+		</cfquery>
+		<cfset Lista_Governanca = UCase(ValueList(qLista_Gernanca.Usu_Login))>
 		
 		 <cfquery name="qLista_Coordenador" datasource="#dsn_inspecao#">
 			SELECT Usu_Login FROM usuarios WHERE RTrim(Usu_GrupoAcesso) = 'COORDENADOR';
@@ -244,7 +251,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	</cfif>
 	
 
-	<cfif Left(snci.login,Len(Login_Agencia)) eq Login_Agencia Or Left(snci.login,Len(Login_CDD)) eq Login_CDD Or ListContains(ListQualify(Lista_Unid_Oper,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Coordenador,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
+	<cfif Left(snci.login,Len(Login_Agencia)) eq Login_Agencia Or Left(snci.login,Len(Login_CDD)) eq Login_CDD Or ListContains(ListQualify(Lista_Unid_Oper,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Coordenador,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
 
         <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('itens_unidades_controle_respostas_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/RelatorioUnidade.jpg" width="200" height="90" border="0" /></a></div>
 
@@ -398,20 +405,20 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	 </cfif>
 
 
-	<cfif ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Coordenador,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login))>
+	<cfif ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Coordenador,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login))>
 	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('index.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/gerenciamento_de_inspecoes.jpg" width="200" height="90" border="0" /></a></div>	  </tr>
 	  <cfset snci.permitir = True>
 	  <cfset Session.vPermissao = True>
     </cfif>
 
- 	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Reop,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(snci.login))>
-
-	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('Rel_indicadoresglobal_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Metas.png" width="200" height="90" border="0" /></a></div>
+ 	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Reop,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(snci.login))>
+		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('Rel_indicadoresglobal_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Metas.png" width="200" height="90" border="0" /></a></div>
+	    <!--- <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('metas_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Metas.png" width="200" height="90" border="0" /></a></div> --->
 
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif> 
- 	<!--- <cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login))> --->
+ 	
 	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login))>
 
 	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('Pacin_Unidades_Avaliacao_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/UnidadeAvaliacao.png" width="200" height="90" border="0" /></a></div>
@@ -442,7 +449,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 </cfif>
-	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login))>
+	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login))>
 	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('https://app.powerbi.com/reportEmbed?reportId=2c84bd6e-8587-4c00-a8a0-f3f36cc75d75&amp;autoAuth=true&amp;ctid=349047e4-8aa4-4867-b4f7-bc3cb08bbb60&amp;config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLW5vcnRoLWV1cm9wZS1oLXByaW1hcnktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQvIn0%3D', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/dashboardMonitoramento.png" width="200" height="90" border="0" /></a></div>	  </tr>
 	  <cfset snci.permitir = True>
 	  <cfset Session.vPermissao = True>
@@ -474,7 +481,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>	
-	 <cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login))>
+	 <cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login))>
 		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('abrir_pdf_act.cfm?arquivo=\\\\sac0424\\SISTEMAS\\SNCI\\GUIAS\\GUIA SNCI_GESTORMASTER.PDF','_blank')" src="icones/GuiaUnidade.png" width="200" height="90" border="0" /></a></div>
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
@@ -502,15 +509,22 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 
 </div>
 	<cfif ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) and '#comReanalise#' neq 0>
-		<div align="center" >
-			<div align="center" style="position:RELATIVE; top:20px;left:0px;background:red;color:#fff;width:540px;padding:3px;font-family:Verdana, Arial, Helvetica, sans-serif">						
+		<div align="center" style="position:RELATIVE; top:240px;left:600px;width:540px;padding:20px;font-family:Verdana, Arial, Helvetica, sans-serif">						
 				<div style="float: left;">
-			    	<img id="imgAtencao" name="imgAtencao"src="figuras/atencao.png" width="50px"  border="0" ></img>
+			    	<img id="imgAtencao" name="imgAtencao"src="figuras/Avisoinspetores.jpg" width="500px"  border="0" ></img>
+				</div>
+		<!---
+			<div align="center" style="position:RELATIVE; top:320px;left:0px;background:red;color:#fff;width:540px;padding:20px;font-family:Verdana, Arial, Helvetica, sans-serif">						
+			
+				<div style="float: left;">
+			    	<img id="imgAtencao" name="imgAtencao"src="figuras/atencao.png" width="40px"  border="0" ></img>
 				</div>
 				<div style="float: left;">
-			    	<span style="font-size:10px;position:relative;top:11px"><strong>Sr. Inspetor! Existem Avaliações de Controle com itens pendentes de REANÁLISE. <br>Favor priorizar os ajustes solicitados!</strong></span> 							
-				</div>							
+			    	<span style="font-size:10px;position:relative;top:7px"><strong>Sr. Inspetor! Existem Avaliações de Controle com itens pendentes de REANÁLISE. <br>Favor priorizar os ajustes solicitados!</strong></span> 							
+				</div>	
+									
 			</div>
+			--->
 		</div>
 	</cfif>
 <!--- rotina para aviso às unidades ref. pesquisa de Opinião --->

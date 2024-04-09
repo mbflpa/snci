@@ -5,7 +5,7 @@
   </cfif>    
   
   <cfquery name="qAcesso" datasource="#dsn_inspecao#">
-	select Usu_DR,Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena from usuarios 
+	select Usu_DR,Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena,Usu_login from usuarios 
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 
@@ -401,7 +401,7 @@ return false;
 //================
 function resumoCadastro(insp,coord,unid){
    var caminho = 'cadastro_inspecao_inspetores_alt.cfm?numInspecao=' + insp + '&Unid=' + unid + '&coordenador=' + coord + '&acao=resumo' +'#resumo';
-	window.location.href(caminho);
+	window.location.href = caminho;
 }
 //================
 function valida_formCadNum(x) {
@@ -699,7 +699,7 @@ if (x == 'altcadastro') {
 					</cfquery>
 				</cfif>	
 
-				<div align:"center" style="position:relative;left:88px">	
+				<div align:"center" style="position:relative;left:50px">	
 					<tr>
 						<td>
 							<label for="selInspetores" style="color:grey">Selecione um ou mais Inspetores:</label>
@@ -708,10 +708,10 @@ if (x == 'altcadastro') {
 								<cfoutput query="rsInspetores">
 									<option  <cfif  '#trim(Usu_Matricula)#' eq '#url.coordenador#' >selected</cfif> value="#trim(Usu_Matricula)#"><cfif  '#trim(Usu_Matricula)#' eq '#url.coordenador#' >Coord.: </cfif>#trim(Dir_Sigla)# - #trim(Usu_Apelido)#</option>
 								</cfoutput>
-							</select><br><span style="font-size:11px;color:cadetblue;position:absolute;top:88px">Mantenha pressionada a tecla "CTRL" para selecionar mais de um inspetor.</span>
+							</select><br><span style="font-size:11px;color:cadetblue;position:absolute;top:96px">Mantenha pressionada a tecla "CTRL" para selecionar mais de um inspetor.</span>
 						</td>
 						</tr>
-						<br>
+						<br><br>
 				<tr><td>
 
 
@@ -913,12 +913,15 @@ if (x == 'altcadastro') {
 										WHERE Usu_Matricula =
 										convert(varchar,#IPT_MatricInspetor#)
 									</cfquery>
-								<cfif isdefined('form.dataInicioDesl') and '#form.dataInicioDesl#' neq "">	
+<!---								<cfif isdefined('form.dataInicioDesl') and '#form.dataInicioDesl#' neq "">	
 									<cfset perDesloc='#DateFormat(IPT_DtInicDesloc,' dd/mm/yyyy')#' & ' a '
 										& '#DateFormat(IPT_DtFimDesloc,' dd/mm/yyyy')#'> 
 								<cfelse>
 									<cfset perDesloc="não houve">
                                  </cfif>
+--->
+								<cfset perDesloc='#DateFormat(IPT_DtInicDesloc,' dd/mm/yyyy')#' & ' a '
+										& '#DateFormat(IPT_DtFimDesloc,' dd/mm/yyyy')#'> 							
 								<cfset auxcoord = 'Não'>
 								<cfif url.Coordenador eq IPT_MatricInspetor>
 									<cfset auxcoord = 'Sim'>

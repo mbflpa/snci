@@ -130,7 +130,7 @@ WHERE Und_Codigo = '#URL.Unid#'
       <cfelse>
 	  NULL     	   
     </cfif> 
-    , Pos_DtPosic = convert(char, getdate(), 102)
+    , Pos_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
 	, Pos_username = '#CGI.REMOTE_USER#'
 	, Pos_DtUltAtu = CONVERT(char, GETDATE(), 120)
       WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
@@ -145,8 +145,9 @@ WHERE Und_Codigo = '#URL.Unid#'
 	<cfelse>
 		<cfset maskcgiusu = left(maskcgiusu,12) & mid(maskcgiusu,13,4) & '***' & right(maskcgiusu,1)>	
 	</cfif> 
-  <cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
-	<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
+  <cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+  <cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+  <cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>	
    <cfquery datasource="#dsn_inspecao#">
    INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer)
    VALUES (   
@@ -174,7 +175,7 @@ WHERE Und_Codigo = '#URL.Unid#'
       NULL
    </cfif>
    ,   
-   convert(char, getdate(), 102)
+   #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
    ,
    '#CGI.REMOTE_USER#',
       
@@ -221,7 +222,7 @@ WHERE Und_Codigo = '#URL.Unid#'
 	 </cfcase>	 	 
    </cfswitch> 
    ,      
-  '#hhmmss#'
+  '#hhmmssdc#'
   ,
   <cfif IsDefined("FORM.observacao") AND FORM.observacao NEQ "">
      <cfset and_obs = trim(Encaminhamento) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(FORM.observacao) & CHR(13) & 'Respons�vel: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>

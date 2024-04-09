@@ -45,42 +45,40 @@
 
 
 <cfif (grpacesso eq 'GESTORES') or (grpacesso eq 'DESENVOLVEDORES') or (grpacesso eq 'GESTORMASTER')>
-
 <!---  <cftry>  --->
-  <cfif isDefined("Form.acao") And (Form.acao is 'alter_reincidencia' Or Form.acao is 'alter_valores' Or Form.acao is 'Excluir_Proc' Or Form.acao is 'Incluir_Proc' Or Form.acao is 'Excluir_Sei' Or Form.acao is 'Incluir_Causa' Or Form.acao is 'Anexar' Or Form.acao is 'Excluir_Anexo' Or Form.acao is 'Excluir_Causa')>
-  <cfif isDefined("Form.abertura")><cfset Session.E01.abertura = Form.abertura><cfelse><cfset Session.E01.abertura = 'Nao'></cfif>
-  <cfif isDefined("Form.processo")><cfset Session.E01.processo = Form.proc_se & Form.proc_num & Form.proc_ano><cfelse><cfset Session.E01.processo = ''></cfif>
-  <cfif isDefined("Form.causaprovavel")><cfset Session.E01.causaprovavel = Form.causaprovavel><cfelse><cfset Session.E01.causaprovavel = ''></cfif>
-  <cfif isDefined("Form.cbarea")><cfset Session.E01.cbarea = Form.cbarea><cfelse><cfset Session.E01.cbarea = ''></cfif>
-  <cfif isDefined("Form.cbdata")><cfset Session.E01.cbdata = Form.cbdata><cfelse><cfset Session.E01.cbdata = ''></cfif>
-  <cfif isDefined("Form.cbunid")><cfset Session.E01.cbunid = Form.cbunid><cfelse><cfset Session.E01.cbunid = ''></cfif>
-  <cfif isDefined("Form.frmresp")><cfset Session.E01.frmresp = Form.frmresp><cfelse><cfset Session.E01.frmresp = ''></cfif>
-  <cfif isDefined("Form.cborgao")><cfset Session.E01.cborgao = Form.cborgao><cfelse><cfset Session.E01.cborgao = ''></cfif>
-  <cfif isDefined("Form.cktipo")><cfset Session.E01.cktipo = Form.cktipo><cfelse><cfset Session.E01.cktipo = ''></cfif>
-  <cfif isDefined("Form.dtfinal")><cfset Session.E01.dtfinal = Form.dtfinal><cfelse><cfset Session.E01.dtfinal = ''></cfif>
-  <cfif isDefined("Form.dtinicio")><cfset Session.E01.dtinicio = Form.dtinicio><cfelse><cfset Session.E01.dtinicio = ''></cfif>
-  <cfif isDefined("Form.hreop")><cfset Session.E01.hreop = Form.hreop><cfelse><cfset Session.E01.hreop = ''></cfif>
-  <cfif isDefined("Form.hunidade")><cfset Session.E01.hunidade = Form.hunidade><cfelse><cfset Session.E01.hunidade = ''></cfif>
-  <cfif isDefined("Form.h_obs")><cfset Session.E01.h_obs = Form.h_obs><cfelse><cfset Session.E01.h_obs = ''></cfif>
-  <cfif isDefined("Form.melhoria")><cfset Session.E01.melhoria = Form.melhoria><cfelse><cfset Session.E01.melhoria = ''></cfif>
-  <cfif isDefined("Form.ngrup")><cfset Session.E01.ngrup = Form.ngrup><cfelse><cfset Session.E01.ngrup = ''></cfif>
-  <cfif isDefined("Form.ninsp")><cfset Session.E01.ninsp = Form.ninsp><cfelse><cfset Session.E01.ninsp = ''></cfif>
-  <cfif isDefined("Form.nitem")><cfset Session.E01.nitem = Form.nitem><cfelse><cfset Session.E01.nitem = ''></cfif>
-  <cfif isDefined("Form.frmmotivo")><cfset Session.E01.frmmotivo = Form.frmmotivo><cfelse><cfset Session.E01.frmmotivo = ''></cfif>
-  <cfif isDefined("Form.cbdata")><cfset Session.E01.cbdata = Form.cbdata><cfelse><cfset Session.E01.cbdata = ''></cfif>
-  <cfif isDefined("Form.observacao")><cfset Session.E01.observacao = Form.observacao><cfelse><cfset Session.E01.observacao = ''></cfif>
-  <cfif isDefined("Form.recomendacao")><cfset Session.E01.recomendacao = Form.recomendacao><cfelse><cfset Session.E01.recomendacao = ''></cfif>
-  <cfif isDefined("Form.reop")><cfset Session.E01.reop = Form.reop><cfelse><cfset Session.E01.reop = ''></cfif>
-  <cfif isDefined("Form.unid")><cfset Session.E01.unid = Form.unid><cfelse><cfset Session.E01.unid = ''></cfif>
-  <cfif isDefined("Form.modalidade")><cfset Session.E01.modalidade = Form.modalidade><cfelse><cfset Session.E01.modalidade = ''></cfif>
-  <cfif isDefined("Form.valor")><cfset Session.E01.valor = Form.valor><cfelse><cfset Session.E01.valor = ''></cfif>
-  <cfif isDefined("Form.SE")><cfset Session.E01.SE = Form.SE><cfelse><cfset Session.E01.SE = ''></cfif>
-  <cfif isDefined("Form.VLRecuperado")><cfset Session.E01.VLRecuperado = Form.VLRecuperado><cfelse><cfset Session.E01.VLRecuperado = ''></cfif>
-  <cfif isDefined("Form.cbareaCS")><cfset Session.E01.cbareaCS = Form.cbareaCS><cfelse><cfset Session.E01.cbareaCS = ''></cfif>
-  <cfif isDefined("Form.dbfrmnumsei")><cfset Session.E01.dbfrmnumsei = Form.dbfrmnumsei><cfelse><cfset Session.E01.dbfrmnumsei = ''></cfif>
-  <cfif isDefined("Form.posarea")><cfset Session.E01.posarea = Form.posarea><cfelse><cfset Session.E01.posarea = ''></cfif>
-
-</cfif>
+  	<cfif isDefined("Form.acao") And (Form.acao is 'alter_reincidencia' Or Form.acao is 'alter_valores' Or Form.acao is 'Excluir_Proc' Or Form.acao is 'Incluir_Proc' Or Form.acao is 'Excluir_Sei' Or Form.acao is 'Incluir_Causa' Or Form.acao is 'Anexar' Or Form.acao is 'Excluir_Anexo' Or Form.acao is 'Excluir_Causa')>
+		<cfif isDefined("Form.abertura")><cfset Session.E01.abertura = Form.abertura><cfelse><cfset Session.E01.abertura = 'Nao'></cfif>
+		<cfif isDefined("Form.processo")><cfset Session.E01.processo = Form.proc_se & Form.proc_num & Form.proc_ano><cfelse><cfset Session.E01.processo = ''></cfif>
+		<cfif isDefined("Form.causaprovavel")><cfset Session.E01.causaprovavel = Form.causaprovavel><cfelse><cfset Session.E01.causaprovavel = ''></cfif>
+		<cfif isDefined("Form.cbarea")><cfset Session.E01.cbarea = Form.cbarea><cfelse><cfset Session.E01.cbarea = ''></cfif>
+		<cfif isDefined("Form.cbdata")><cfset Session.E01.cbdata = Form.cbdata><cfelse><cfset Session.E01.cbdata = ''></cfif>
+		<cfif isDefined("Form.cbunid")><cfset Session.E01.cbunid = Form.cbunid><cfelse><cfset Session.E01.cbunid = ''></cfif>
+		<cfif isDefined("Form.frmresp")><cfset Session.E01.frmresp = Form.frmresp><cfelse><cfset Session.E01.frmresp = ''></cfif>
+		<cfif isDefined("Form.cborgao")><cfset Session.E01.cborgao = Form.cborgao><cfelse><cfset Session.E01.cborgao = ''></cfif>
+		<cfif isDefined("Form.cktipo")><cfset Session.E01.cktipo = Form.cktipo><cfelse><cfset Session.E01.cktipo = ''></cfif>
+		<cfif isDefined("Form.dtfinal")><cfset Session.E01.dtfinal = Form.dtfinal><cfelse><cfset Session.E01.dtfinal = ''></cfif>
+		<cfif isDefined("Form.dtinicio")><cfset Session.E01.dtinicio = Form.dtinicio><cfelse><cfset Session.E01.dtinicio = ''></cfif>
+		<cfif isDefined("Form.hreop")><cfset Session.E01.hreop = Form.hreop><cfelse><cfset Session.E01.hreop = ''></cfif>
+		<cfif isDefined("Form.hunidade")><cfset Session.E01.hunidade = Form.hunidade><cfelse><cfset Session.E01.hunidade = ''></cfif>
+		<cfif isDefined("Form.h_obs")><cfset Session.E01.h_obs = Form.h_obs><cfelse><cfset Session.E01.h_obs = ''></cfif>
+		<cfif isDefined("Form.melhoria")><cfset Session.E01.melhoria = Form.melhoria><cfelse><cfset Session.E01.melhoria = ''></cfif>
+		<cfif isDefined("Form.ngrup")><cfset Session.E01.ngrup = Form.ngrup><cfelse><cfset Session.E01.ngrup = ''></cfif>
+		<cfif isDefined("Form.ninsp")><cfset Session.E01.ninsp = Form.ninsp><cfelse><cfset Session.E01.ninsp = ''></cfif>
+		<cfif isDefined("Form.nitem")><cfset Session.E01.nitem = Form.nitem><cfelse><cfset Session.E01.nitem = ''></cfif>
+		<cfif isDefined("Form.frmmotivo")><cfset Session.E01.frmmotivo = Form.frmmotivo><cfelse><cfset Session.E01.frmmotivo = ''></cfif>
+		<cfif isDefined("Form.cbdata")><cfset Session.E01.cbdata = Form.cbdata><cfelse><cfset Session.E01.cbdata = ''></cfif>
+		<cfif isDefined("Form.observacao")><cfset Session.E01.observacao = Form.observacao><cfelse><cfset Session.E01.observacao = ''></cfif>
+		<cfif isDefined("Form.recomendacao")><cfset Session.E01.recomendacao = Form.recomendacao><cfelse><cfset Session.E01.recomendacao = ''></cfif>
+		<cfif isDefined("Form.reop")><cfset Session.E01.reop = Form.reop><cfelse><cfset Session.E01.reop = ''></cfif>
+		<cfif isDefined("Form.unid")><cfset Session.E01.unid = Form.unid><cfelse><cfset Session.E01.unid = ''></cfif>
+		<cfif isDefined("Form.modalidade")><cfset Session.E01.modalidade = Form.modalidade><cfelse><cfset Session.E01.modalidade = ''></cfif>
+		<cfif isDefined("Form.valor")><cfset Session.E01.valor = Form.valor><cfelse><cfset Session.E01.valor = ''></cfif>
+		<cfif isDefined("Form.SE")><cfset Session.E01.SE = Form.SE><cfelse><cfset Session.E01.SE = ''></cfif>
+		<cfif isDefined("Form.VLRecuperado")><cfset Session.E01.VLRecuperado = Form.VLRecuperado><cfelse><cfset Session.E01.VLRecuperado = ''></cfif>
+		<cfif isDefined("Form.cbareaCS")><cfset Session.E01.cbareaCS = Form.cbareaCS><cfelse><cfset Session.E01.cbareaCS = ''></cfif>
+		<cfif isDefined("Form.dbfrmnumsei")><cfset Session.E01.dbfrmnumsei = Form.dbfrmnumsei><cfelse><cfset Session.E01.dbfrmnumsei = ''></cfif>
+		<cfif isDefined("Form.posarea")><cfset Session.E01.posarea = Form.posarea><cfelse><cfset Session.E01.posarea = ''></cfif>
+	</cfif>
 <cfset maskcgiusu = ucase(trim(CGI.REMOTE_USER))>
 <cfif left(maskcgiusu,8) eq 'EXTRANET'>
 	<cfset maskcgiusu = left(maskcgiusu,9) & '***' &  mid(maskcgiusu,13,8)>
@@ -470,7 +468,7 @@
 </cfif>
 
 <cfquery name="rsMod" datasource="#dsn_inspecao#">
-  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
+  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
   FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
   WHERE Und_Codigo = '#URL.Unid#'
 </cfquery>
@@ -558,429 +556,457 @@
 	<!--- fim EVITAR DUPLICATAS DE  --->	
 
 	<cfif auxsalvarSN is 'S'>	  	
-       <!--- data do dia default --->
- <!--- data do dia default --->
-<cfset dtnovoprazo = CreateDate(right(form.cbdata,4),mid(form.cbdata,4,2),left(form.cbdata,2))> 
-<cfoutput>
-<cfset nCont = 1>
-<cfloop condition="nCont lte 1">
-<cfset exibir = 'S'>
-	<cfset nCont = nCont + 1>
-	<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
-	<cfif vDiaSem neq 1 and vDiaSem neq 7>
-		<!--- verificar se Feriado Nacional --->
-		<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-			 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
-		</cfquery>
-		<cfif rsFeriado.recordcount gt 0>
-		   <cfset nCont = nCont - 1>
-		   <cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
-		</cfif>
-	</cfif>
-	<!--- Verifica se final de semana  --->
-	<cfif vDiaSem eq 1 or vDiaSem eq 7>
-		<cfset nCont = nCont - 1>
-		<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
-	</cfif>	
-</cfloop>	
-</cfoutput>	 
-	  <!--- ===================== --->
- <cfquery datasource="#dsn_inspecao#">
-  UPDATE ParecerUnidade SET
-  <cfif IsDefined("FORM.frmResp") AND FORM.frmResp NEQ "N">
-    Pos_Situacao_Resp=#FORM.frmResp#
-  </cfif>
-  <cfset IDArea = #form.unid#>
-  <cfswitch expression="#Form.frmResp#">
-	<cfcase value=2>
-	    <cfif form.frmtransfer eq 'S'>
-			<cfquery name="rsMod" datasource="#dsn_inspecao#">
-				SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
-				FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
-				WHERE Und_Codigo = '#form.cbunidtransfer#'
-			</cfquery>
-			 <cfset strIDGestor = #form.cbunidtransfer#>
-             <cfset strNomeGestor = #rsMod.Und_Descricao#>
-             <cfset Gestor = '#rsMod.Und_Descricao#'>
-		</cfif>			
-	   <!--- Atualizar variaveis com os dados do CDD ---> 
-	   <!--- Item da AC respondido por CDD quando Centralizada --->
-	   <cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
-	       <!--- uma AC  => verificar se centralizada --->
-		   <cfquery name="rsCDD" datasource="#dsn_inspecao#">
-			  SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsMod.Und_Centraliza#'
-		   </cfquery>
-		   <cfif rsCDD.recordcount gt 0>
-			  <cfset strIDGestor = #rsCDD.Und_Codigo#>
-			  <cfset strNomeGestor = #rsCDD.Und_Descricao#>
-			  <cfset Gestor = '#strNomeGestor#'>
-		   </cfif>
-	  </cfif>
-	  , Pos_Situacao = 'PU'
-	  , Pos_Area = '#strIDGestor#'
-	  , Pos_NomeArea = '#strNomeGestor#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	  <cfset situacao = 'PENDENTE DE UNIDADE'>
-	  <cfset IDArea = #strIDGestor#>
-	</cfcase>
-	<cfcase value=3>
-	  , Pos_Situacao = 'SO'
-	  <!---, Pos_Area = '#strIDGestor#'
-	  , Pos_NomeArea = '#strNomeGestor#'--->
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	  <cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
-	  <cfset situacao = 'SOLUCIONADO'>
-	  <cfset IDArea = '#qSituacaoResp.Pos_Area#'>
-	</cfcase>
-	<cfcase value=4>
-	    <cfif form.frmtransfer eq 'S'>
-			  <cfquery name="rsReop" datasource="#dsn_inspecao#">
-				  SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops WHERE Rep_Codigo = '#form.cbsubordinador#'
-			  </cfquery>		
+        <!--- data do dia default --->
+	    <cfif rsMod.Und_TipoUnidade neq 12 and rsMod.Und_TipoUnidade neq 16>
+			<cfset dtnovoprazo = CreateDate(right(form.cbdata,4),mid(form.cbdata,4,2),left(form.cbdata,2))> 
+			<cfoutput>
+				<cfset nCont = 1>
+				<cfloop condition="nCont lte 1">
+					<cfset nCont = nCont + 1>
+					<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
+					<cfif vDiaSem neq 1 and vDiaSem neq 7>
+						<!--- verificar se Feriado Nacional --->
+						<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+							SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
+						</cfquery>
+						<cfif rsFeriado.recordcount gt 0>
+						<cfset nCont = nCont - 1>
+						<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+						</cfif>
+					</cfif>
+					<!--- Verifica se final de semana  --->
+					<cfif vDiaSem eq 1 or vDiaSem eq 7>
+						<cfset nCont = nCont - 1>
+						<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+					</cfif>	
+				</cfloop>	
+			</cfoutput>
 		<cfelse>
-			  <cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
-				   <!--- uma AC  => verificar se centralizada --->
-				  <cfset strIDGestor = #rsMod.Und_Centraliza#>
-			  </cfif>
-			  <cfquery name="rsReop" datasource="#dsn_inspecao#">
-				  SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
-			  </cfquery>		
-		</cfif>		  
-	   , Pos_Situacao = 'PO'
-	   , Pos_Area = '#rsReop.Rep_Codigo#'
-	   , Pos_Nomearea = '#rsReop.Rep_Nome#'
-	   , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	   <cfset Gestor = '#rsReop.Rep_Nome#'>
-	   <cfset situacao = 'PENDENTE DE ORGAO SUBORDINADOR'>
-	   <cfset IDArea = #rsReop.Rep_Codigo#>
-	   <cfset sdestina = #rsReop.Rep_Email#>
-  	   <cfset nomedestino = #rsReop.Rep_Nome#>
-	 </cfcase>
-	<cfcase value=5>
-	  <cfquery name="qArea2" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla, Ars_Descricao, Ars_Email 
-		FROM Areas
-		WHERE Ars_Codigo = '#Form.cbarea#'
-	  </cfquery>
-	   , Pos_Situacao = 'PA'
-	   , Pos_Area = '#Form.cbarea#'
-	   , Pos_Nomearea = '#qArea2.Ars_Descricao#'
-	   , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	   <cfset Gestor = '#qArea2.Ars_Descricao#'>
-	   <cfset situacao = 'PENDENTE DE AREA'>
-	   <cfset IDArea = #Form.cbarea#>
-	   <cfset sdestina = #qArea2.Ars_Email#>
-  	   <cfset nomedestino = #qArea2.Ars_Descricao#>
-	</cfcase>
-	<cfcase value=8>
-		<cfquery name="rsSE" datasource="#dsn_inspecao#">
-			SELECT Dir_Sto, Dir_Codigo, Dir_Descricao, Dir_Email
-			FROM  Diretoria
-			WHERE Dir_Codigo = '#left(form.posarea,2)#'
-		</cfquery>
-	  , Pos_Situacao = 'SE'
-	  , Pos_Area = '#rsSE.Dir_Sto#'
-	  , Pos_NomeArea = '#rsSE.Dir_Descricao#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	  <cfset Gestor = '#rsSE.Dir_Descricao#'>
-	  <cfset situacao = 'PENDENTE SUPERINTENDENCIA ESTADUAL'>
-	  <cfset IDArea = #rsSE.Dir_Sto#>
-	  <cfset sdestina = #rsSE.Dir_Email#>
-  	  <cfset nomedestino = #rsSE.Dir_Descricao#>
-	</cfcase>
-	<cfcase value=9>
-	   <cfquery name="qArea2" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla, Ars_Descricao
-		FROM Areas
-		WHERE Ars_Codigo = '#Form.cbareaCS#'
-	   </cfquery>
-	  , Pos_Nomearea = '#qArea2.Ars_Descricao#'
-	  , Pos_Situacao = 'CS'
-	  , Pos_Area = '#Form.cbareaCS#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	   <cfset Gestor = '#qArea2.Ars_Descricao#'>
-	   <cfset situacao = 'CORPORATIVO CS'>
-	   <cfset IDArea = #Form.cbareaCS#>
-	</cfcase>
-	<cfcase value=10>
-	  <cfquery name="qArea2" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla,Ars_Descricao
-		FROM Areas
-		WHERE Ars_Codigo = '#Form.cbarea#'
-	  </cfquery>
-      , Pos_Situacao = 'PS'
-	  , Pos_Area = '#Form.cbarea#'
-      , Pos_Nomearea = '#qArea2.Ars_Descricao#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-      <cfset Gestor = '#qArea2.Ars_Descricao#'>
-	  <cfset situacao = 'PONTO SUSPENSO'>
-	  <cfset IDArea = #Form.cbarea#>
-	</cfcase>
-	<cfcase value=12>
-	  , Pos_Situacao = 'PI'
-	  , Pos_Area = '#strIDGestor#'
-	  , Pos_NomeArea = '#strNomeGestor#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	  <cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
-	  <cfset situacao = 'PONTO IMPROCEDENTE'>
-	  <cfset IDArea = #strIDGestor#>
-	</cfcase>
-	<cfcase value=13>
-	  , Pos_Situacao = 'OC'
-	  , Pos_Area = '#strIDGestor#'
-	  , Pos_NomeArea = '#strNomeGestor#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	  <cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
-	  <cfset situacao = 'ORIENTACAO CANCELADA'>
-	  <cfset IDArea = #strIDGestor#>
-	</cfcase>
-	<cfcase value=15>
-		<cfif form.frmtransfer eq 'S'>
-			<cfquery name="rsMod" datasource="#dsn_inspecao#">
-				SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
-				FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
-				WHERE Und_Codigo = '#form.cbunidtransfer#'
-			</cfquery>
-			 <cfset strIDGestor = #form.cbunidtransfer#>
-             <cfset strNomeGestor = #rsMod.Und_Descricao#>
-             <cfset Gestor = '#rsMod.Und_Descricao#'>
+			<cfoutput>
+				<!--- contar 30 dias úteis para AGF e ACC --->			
+				<cfquery name="rs14SN" datasource="#dsn_inspecao#">
+					SELECT And_DtPosic FROM Andamento
+					WHERE And_Unidade='#FORM.unid#' AND 
+					And_NumInspecao='#FORM.ninsp#' AND 
+					And_NumGrupo=#FORM.ngrup# AND 
+					And_NumItem=#FORM.nitem# AND 
+					And_Situacao_Resp in(0,11,14)
+					order by And_DtPosic desc
+				</cfquery>
+				<cfset dtnovoprazo = CreateDate(year(rs14SN.And_DtPosic),month(rs14SN.And_DtPosic),day(rs14SN.And_DtPosic))> 
+				<cfset nCont = 1>
+				<cfloop condition="nCont lte 30">
+					<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+					<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
+					<cfif vDiaSem neq 1 and vDiaSem neq 7>
+						<!--- verificar se Feriado Nacional --->
+						<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+							SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
+						</cfquery>
+						<cfif rsFeriado.recordcount gt 0>
+						<cfset nCont = nCont - 1>
+						</cfif>
+					</cfif>
+					<!--- Verifica se final de semana  --->
+					<cfif vDiaSem eq 1 or vDiaSem eq 7>
+						<cfset nCont = nCont - 1>
+					</cfif>	
+					<cfset nCont = nCont + 1>	
+				</cfloop>	
+			</cfoutput>		
 		</cfif>
-	<!--- Atualizar variaveis com os dados do CDD ---> 
-	   <!--- Item da AC respondido por CDD quando Centralizada --->
-	   <cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
-	       <!--- ao uma AC  => verificar se centralizada --->
-		   <cfquery name="rsCDD" datasource="#dsn_inspecao#">
-			  SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsMod.Und_Centraliza#'
-		   </cfquery>
-		   <cfif rsCDD.recordcount gt 0>
-			  <cfset strIDGestor = #rsCDD.Und_Codigo#>
-			  <cfset strNomeGestor = #rsCDD.Und_Descricao#>
-			  <cfset Gestor = '#strNomeGestor#'>
-		   </cfif>
-	  </cfif>
-	  , Pos_Situacao = 'TU'
-	  , Pos_Area = '#strIDGestor#'
-	  , Pos_NomeArea = '#strNomeGestor#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	<!---   <cfset Gestor = '#rsMod.Und_Descricao#'> --->
-	  <cfset situacao = 'TRATAMENTO UNIDADE'>
-	  <cfset IDArea = #strIDGestor#>
-	  <cfset sdestina = #rsMod.Und_Email#>
-  	  <cfset nomedestino = #rsMod.Und_Descricao#>
-	</cfcase>
-	<cfcase value=16>
-        <cfif form.frmtransfer eq 'S'>
-			  <cfquery name="rsReop" datasource="#dsn_inspecao#">
-				  SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops WHERE Rep_Codigo = '#form.cbsubordinador#'
+	  	<!--- ===================== --->
+		<cfquery datasource="#dsn_inspecao#">
+		UPDATE ParecerUnidade SET
+		<cfif IsDefined("FORM.frmResp") AND FORM.frmResp NEQ "N">
+			Pos_Situacao_Resp=#FORM.frmResp#
+		</cfif>
+		<cfset IDArea = #form.unid#>
+		<cfswitch expression="#Form.frmResp#">
+			<cfcase value=2>
+				<cfif form.frmtransfer eq 'S'>
+					<cfquery name="rsMod" datasource="#dsn_inspecao#">
+						SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
+						FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
+						WHERE Und_Codigo = '#form.cbunidtransfer#'
+					</cfquery>
+					<cfset strIDGestor = #form.cbunidtransfer#>
+					<cfset strNomeGestor = #rsMod.Und_Descricao#>
+					<cfset Gestor = '#rsMod.Und_Descricao#'>
+				</cfif>			
+				<!--- Atualizar variaveis com os dados do CDD ---> 
+				<!--- Item da AC respondido por CDD quando Centralizada --->
+				<cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
+					<!--- uma AC  => verificar se centralizada --->
+					<cfquery name="rsCDD" datasource="#dsn_inspecao#">
+						SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsMod.Und_Centraliza#'
+					</cfquery>
+					<cfif rsCDD.recordcount gt 0>
+						<cfset strIDGestor = #rsCDD.Und_Codigo#>
+						<cfset strNomeGestor = #rsCDD.Und_Descricao#>
+						<cfset Gestor = '#strNomeGestor#'>
+					</cfif>
+				</cfif>
+				, Pos_Situacao = 'PU'
+				, Pos_Area = '#strIDGestor#'
+				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset situacao = 'PENDENTE DE UNIDADE'>
+				<cfset IDArea = #strIDGestor#>
+			</cfcase>
+			<cfcase value=3>
+				, Pos_Situacao = 'SO'
+				<!---, Pos_Area = '#strIDGestor#'
+				, Pos_NomeArea = '#strNomeGestor#'--->
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
+				<cfset situacao = 'SOLUCIONADO'>
+				<cfset IDArea = '#qSituacaoResp.Pos_Area#'>
+			</cfcase>
+			<cfcase value=4>
+				<cfif form.frmtransfer eq 'S'>
+					<cfquery name="rsReop" datasource="#dsn_inspecao#">
+						SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops WHERE Rep_Codigo = '#form.cbsubordinador#'
+					</cfquery>		
+				<cfelse>
+					<cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
+						<!--- uma AC  => verificar se centralizada --->
+						<cfset strIDGestor = #rsMod.Und_Centraliza#>
+					</cfif>
+					<cfquery name="rsReop" datasource="#dsn_inspecao#">
+						SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
+					</cfquery>		
+				</cfif>		  
+				, Pos_Situacao = 'PO'
+				, Pos_Area = '#rsReop.Rep_Codigo#'
+				, Pos_Nomearea = '#rsReop.Rep_Nome#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#rsReop.Rep_Nome#'>
+				<cfset situacao = 'PENDENTE DE ORGAO SUBORDINADOR'>
+				<cfset IDArea = #rsReop.Rep_Codigo#>
+				<cfset sdestina = #rsReop.Rep_Email#>
+				<cfset nomedestino = #rsReop.Rep_Nome#>
+			</cfcase>
+			<cfcase value=5>
+				<cfquery name="qArea2" datasource="#dsn_inspecao#">
+					SELECT Ars_Sigla, Ars_Descricao, Ars_Email 
+					FROM Areas
+					WHERE Ars_Codigo = '#Form.cbarea#'
+				</cfquery>
+				, Pos_Situacao = 'PA'
+				, Pos_Area = '#Form.cbarea#'
+				, Pos_Nomearea = '#qArea2.Ars_Descricao#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#qArea2.Ars_Descricao#'>
+				<cfset situacao = 'PENDENTE DE AREA'>
+				<cfset IDArea = #Form.cbarea#>
+				<cfset sdestina = #qArea2.Ars_Email#>
+				<cfset nomedestino = #qArea2.Ars_Descricao#>
+			</cfcase>
+			<cfcase value=8>
+				<cfquery name="rsSE" datasource="#dsn_inspecao#">
+					SELECT Dir_Sto, Dir_Codigo, Dir_Descricao, Dir_Email
+					FROM  Diretoria
+					WHERE Dir_Codigo = '#left(form.posarea,2)#'
+				</cfquery>
+				, Pos_Situacao = 'SE'
+				, Pos_Area = '#rsSE.Dir_Sto#'
+				, Pos_NomeArea = '#rsSE.Dir_Descricao#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#rsSE.Dir_Descricao#'>
+				<cfset situacao = 'PENDENTE SUPERINTENDENCIA ESTADUAL'>
+				<cfset IDArea = #rsSE.Dir_Sto#>
+				<cfset sdestina = #rsSE.Dir_Email#>
+				<cfset nomedestino = #rsSE.Dir_Descricao#>
+			</cfcase>
+			<cfcase value=9>
+				<cfquery name="qArea2" datasource="#dsn_inspecao#">
+					SELECT Ars_Sigla, Ars_Descricao
+					FROM Areas
+					WHERE Ars_Codigo = '#Form.cbareaCS#'
+				</cfquery>
+				, Pos_Nomearea = '#qArea2.Ars_Descricao#'
+				, Pos_Situacao = 'CS'
+				, Pos_Area = '#Form.cbareaCS#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#qArea2.Ars_Descricao#'>
+				<cfset situacao = 'CORPORATIVO CS'>
+				<cfset IDArea = #Form.cbareaCS#>
+			</cfcase>
+			<cfcase value=10>
+				<cfquery name="qArea2" datasource="#dsn_inspecao#">
+					SELECT Ars_Sigla,Ars_Descricao
+					FROM Areas
+					WHERE Ars_Codigo = '#Form.cbarea#'
+				</cfquery>
+				, Pos_Situacao = 'PS'
+				, Pos_Area = '#Form.cbarea#'
+				, Pos_Nomearea = '#qArea2.Ars_Descricao#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset Gestor = '#qArea2.Ars_Descricao#'>
+				<cfset situacao = 'PONTO SUSPENSO'>
+				<cfset IDArea = #Form.cbarea#>
+			</cfcase>
+			<cfcase value=12>
+				, Pos_Situacao = 'PI'
+				, Pos_Area = '#strIDGestor#'
+				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
+				<cfset situacao = 'PONTO IMPROCEDENTE'>
+				<cfset IDArea = #strIDGestor#>
+			</cfcase>
+			<cfcase value=13>
+				, Pos_Situacao = 'OC'
+				, Pos_Area = '#strIDGestor#'
+				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
+				<cfset situacao = 'ORIENTACAO CANCELADA'>
+				<cfset IDArea = #strIDGestor#>
+			</cfcase>
+			<cfcase value=15>
+				<cfif form.frmtransfer eq 'S'>
+					<cfquery name="rsMod" datasource="#dsn_inspecao#">
+						SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
+						FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
+						WHERE Und_Codigo = '#form.cbunidtransfer#'
+					</cfquery>
+					<cfset strIDGestor = #form.cbunidtransfer#>
+					<cfset strNomeGestor = #rsMod.Und_Descricao#>
+					<cfset Gestor = '#rsMod.Und_Descricao#'>
+				</cfif>
+				<!--- Atualizar variaveis com os dados do CDD ---> 
+				<!--- Item da AC respondido por CDD quando Centralizada --->
+				<cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
+					<!--- ao uma AC  => verificar se centralizada --->
+					<cfquery name="rsCDD" datasource="#dsn_inspecao#">
+						SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsMod.Und_Centraliza#'
+					</cfquery>
+					<cfif rsCDD.recordcount gt 0>
+						<cfset strIDGestor = #rsCDD.Und_Codigo#>
+						<cfset strNomeGestor = #rsCDD.Und_Descricao#>
+						<cfset Gestor = '#strNomeGestor#'>
+					</cfif>
+				</cfif>
+				, Pos_Situacao = 'TU'
+				, Pos_Area = '#strIDGestor#'
+				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<!---   <cfset Gestor = '#rsMod.Und_Descricao#'> --->
+				<cfset situacao = 'TRATAMENTO UNIDADE'>
+				<cfset IDArea = #strIDGestor#>
+				<cfset sdestina = #rsMod.Und_Email#>
+				<cfset nomedestino = #rsMod.Und_Descricao#>
+			</cfcase>
+			<cfcase value=16>
+				<cfif form.frmtransfer eq 'S'>
+					<cfquery name="rsReop" datasource="#dsn_inspecao#">
+						SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops WHERE Rep_Codigo = '#form.cbsubordinador#'
 
-			  </cfquery>		
-		<cfelse>
-			  <cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
-				   <!--- uma AC  => verificar se centralizada --->
-				  <cfset strIDGestor = #rsMod.Und_Centraliza#>
-			  </cfif>
-			  <cfquery name="rsReop" datasource="#dsn_inspecao#">
-				  SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
-			  </cfquery>		
-		</cfif>	
-	   , Pos_Situacao = 'TS'
-	   , Pos_Area = '#rsReop.Rep_Codigo#'
-	   , Pos_Nomearea = '#rsReop.Rep_Nome#'
-	   , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	   <cfset Gestor = '#rsReop.Rep_Nome#'>
-	   <cfset situacao = 'TRATAMENTO ORGAO SUBORDINADOR'>
-	   <cfset IDArea = #rsReop.Rep_Codigo#>
-	   <cfset sdestina = #rsReop.Rep_Email#>
-  	   <cfset nomedestino = #rsReop.Rep_Nome#>
-	 </cfcase>
-	 <cfcase value=18>
-		<cfif form.frmtransfer eq 'S'>
-			<cfquery name="rsMod" datasource="#dsn_inspecao#">
-			SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
-			FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
-			WHERE Und_Codigo = '#form.cbterctransfer#'
-		    </cfquery>
-			<cfset strIDGestor = #form.cbterctransfer#>
-			<cfset strNomeGestor = #rsMod.Und_Descricao#>
-			<cfset Gestor = '#rsMod.Und_Descricao#'>
-		</cfif>
-	  , Pos_Situacao = 'TF'
-	  , Pos_Area = '#strIDGestor#'
-	  , Pos_NomeArea = '#strNomeGestor#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	  <cfset Gestor = '#rsMod.Und_Descricao#'>
-	  <cfset situacao = 'TRATAMENTO TERCEIRIZADA'>
-	  <cfset IDArea = #strIDGestor#>
-	  <cfset sdestina = #rsMod.Und_Email#>
-  	  <cfset nomedestino = #rsMod.Und_Descricao#>
-	</cfcase>
-	<cfcase value=19>
-	  <cfquery name="qArea2" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla, Ars_Descricao, Ars_Email FROM Areas	WHERE Ars_Codigo = '#Form.cbarea#'
-	  </cfquery>
-	   , Pos_Situacao = 'TA'
-	   , Pos_Area = '#Form.cbarea#'
-	   , Pos_Nomearea = '#qArea2.Ars_Descricao#'
-	   , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	   <cfset Gestor = '#qArea2.Ars_Descricao#'>
-	   <cfset situacao = 'TRATAMENTO DA AREA'>
-	   <cfset IDArea = #Form.cbarea#>
-	   <cfset sdestina = #qArea2.Ars_Email#>
-  	   <cfset nomedestino = #qArea2.Ars_Descricao#>
-	</cfcase>
-	<cfcase value=20>
-		<cfif form.frmtransfer eq 'S'>
-			<cfquery name="rsMod" datasource="#dsn_inspecao#">
-			SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
-			FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
-			WHERE Und_Codigo = '#form.cbterctransfer#'
-		    </cfquery>
-			<cfset strIDGestor = #form.cbterctransfer#>
-			<cfset strNomeGestor = #rsMod.Und_Descricao#>
-			<cfset Gestor = '#rsMod.Und_Descricao#'>
-		</cfif>	
-	  , Pos_Situacao = 'PF'
-	  , Pos_Area = '#strIDGestor#'
-	  , Pos_NomeArea = '#strNomeGestor#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	  <cfset Gestor = '#rsMod.Und_Descricao#'>
-	  <cfset situacao = 'PENDENTE DE TERCEIRIZADA'>
-	  <cfset IDArea = #strIDGestor#>
-	</cfcase>
-	<cfcase value=21>
-	  <cfquery name="qArea2" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla, Ars_Descricao, Ars_Email
-		FROM Areas
-		WHERE Ars_Codigo = '#Form.cbarea#'
-	  </cfquery>
-	   , Pos_Situacao = 'RV'
-	   , Pos_Area = '#Form.cbarea#'
-	   , Pos_Nomearea = '#qArea2.Ars_Descricao#'
-	   , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	   <cfset Gestor = '#qArea2.Ars_Descricao#'>
-	   <cfset situacao = 'REAVALIACAO'>
-	   <cfset IDArea = #Form.cbarea#>
-	   <cfset sdestina = #qArea2.Ars_Email#>
-  	   <cfset nomedestino = #qArea2.Ars_Descricao#>
-	</cfcase>
-	<cfcase value=23>
-	<!--- Status: Tratamento pela SE --->
-		<cfquery name="rsSE" datasource="#dsn_inspecao#">
-			SELECT Dir_Sto, Dir_Codigo, Dir_Descricao, Dir_Email
-			FROM  Diretoria
-			WHERE Dir_Codigo = '#left(form.posarea,2)#'
-		</cfquery>
-	  , Pos_Situacao = 'TO'
-	  , Pos_Area = '#rsSE.Dir_Sto#'
-	  , Pos_NomeArea = '#rsSE.Dir_Descricao#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	  <cfset Gestor = '#rsSE.Dir_Descricao#'>
-	  <cfset IDArea = #rsSE.Dir_Sto#>
-	  <cfset situacao = 'TRATAMENTO SUPERINTENDENCIA ESTADUAL'>
-	  <cfset sdestina = #rsSE.Dir_Email#>
-  	  <cfset nomedestino = #rsSE.Dir_Descricao#>
-	</cfcase>
-	<cfcase value=24>
-	   <cfquery name="qArea2" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla, Ars_Descricao
-		FROM Areas
-		WHERE Ars_Codigo = '#Form.cbareaCS#'
-	   </cfquery>
-	  , Pos_Nomearea = '#qArea2.Ars_Descricao#'
-	  , Pos_Situacao = 'CS'
-	  , Pos_Area = '#Form.cbareaCS#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	   <cfset Gestor = '#qArea2.Ars_Descricao#'>
-	   <cfset situacao = 'APURACAO'>
-	   <cfset IDArea = #Form.cbareaCS#>
-	</cfcase>
-	<cfcase value=25>
-	  <cfquery name="qArea2" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla, Ars_Descricao, Ars_Email
-		FROM Areas
-		WHERE Ars_Codigo = '#Form.cbarea#'
-	  </cfquery>
-	   , Pos_Situacao = 'RC'
-	   , Pos_Area = '#Form.cbarea#'
-	   , Pos_Nomearea = '#qArea2.Ars_Descricao#'
-	   , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	   <cfset Gestor = '#qArea2.Ars_Descricao#'>
-	   <cfset situacao = 'REGULARIZADO - APLICAR O CONTRATO'>
-	   <cfset IDArea = #Form.cbarea#>
-	   <cfset sdestina = #qArea2.Ars_Email#>
-  	   <cfset nomedestino = #qArea2.Ars_Descricao#>
-	</cfcase>
-	<cfcase value=26>
-	  <cfquery name="qArea2" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla, Ars_Descricao, Ars_Email
-		FROM Areas
-		WHERE Ars_Codigo = '#Form.cbarea#'
-	  </cfquery>
-	   , Pos_Situacao = 'NC'
-	   , Pos_Area = '#Form.cbarea#'
-	   , Pos_Nomearea = '#qArea2.Ars_Descricao#'
-	   , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	   <cfset Gestor = '#qArea2.Ars_Descricao#'>
-	   <cfset situacao = 'NAO REGULARIZADO - APLICAR O CONTRATO'>
-	   <cfset IDArea = #Form.cbarea#>
-	   <cfset sdestina = #qArea2.Ars_Email#>
-  	   <cfset nomedestino = #qArea2.Ars_Descricao#>
-	</cfcase>	   
-    <cfcase value=28>
-	  , Pos_Situacao = 'EA'
-	  , Pos_Area = '#strIDGestor#'
-	  , Pos_NomeArea = '#strNomeGestor#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	  <cfset situacao = 'EM AN&atilde;LISE'>
-	  <cfset IDArea = #strIDGestor#>
-	</cfcase>	
-	<cfcase value=29>
-<!--- 	   <cfquery name="qArea2" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla, Ars_Descricao
-		FROM Areas
-		WHERE Ars_Codigo = '#Form.cbareaCS#'
-	   </cfquery> 
-	  , Pos_Area = '#Form.cbareaCS#'	   
-   	  , Pos_Nomearea = '#qArea2.Ars_Descricao#'--->
-	  , Pos_Situacao = 'EC'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	  <cfset situacao = 'ENCERRADO'>
-	  <cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
-	  <cfset IDArea = '#qSituacaoResp.Pos_Area#'>
-	</cfcase>	 
+					</cfquery>		
+				<cfelse>
+					<cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
+						<!--- uma AC  => verificar se centralizada --->
+						<cfset strIDGestor = #rsMod.Und_Centraliza#>
+					</cfif>
+					<cfquery name="rsReop" datasource="#dsn_inspecao#">
+						SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
+					</cfquery>		
+				</cfif>	
+				, Pos_Situacao = 'TS'
+				, Pos_Area = '#rsReop.Rep_Codigo#'
+				, Pos_Nomearea = '#rsReop.Rep_Nome#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset Gestor = '#rsReop.Rep_Nome#'>
+				<cfset situacao = 'TRATAMENTO ORGAO SUBORDINADOR'>
+				<cfset IDArea = #rsReop.Rep_Codigo#>
+				<cfset sdestina = #rsReop.Rep_Email#>
+				<cfset nomedestino = #rsReop.Rep_Nome#>
+			</cfcase>
+			<cfcase value=18>
+				<cfif form.frmtransfer eq 'S'>
+					<cfquery name="rsMod" datasource="#dsn_inspecao#">
+					SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
+					FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
+					WHERE Und_Codigo = '#form.cbterctransfer#'
+					</cfquery>
+					<cfset strIDGestor = #form.cbterctransfer#>
+					<cfset strNomeGestor = #rsMod.Und_Descricao#>
+					<cfset Gestor = '#rsMod.Und_Descricao#'>
+				</cfif>
+				, Pos_Situacao = 'TF'
+				, Pos_Area = '#strIDGestor#'
+				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset Gestor = '#rsMod.Und_Descricao#'>
+				<cfset situacao = 'TRATAMENTO TERCEIRIZADA'>
+				<cfset IDArea = #strIDGestor#>
+				<cfset sdestina = #rsMod.Und_Email#>
+				<cfset nomedestino = #rsMod.Und_Descricao#>
+			</cfcase>
+			<cfcase value=19>
+				<cfquery name="qArea2" datasource="#dsn_inspecao#">
+					SELECT Ars_Sigla, Ars_Descricao, Ars_Email FROM Areas	WHERE Ars_Codigo = '#Form.cbarea#'
+				</cfquery>
+				, Pos_Situacao = 'TA'
+				, Pos_Area = '#Form.cbarea#'
+				, Pos_Nomearea = '#qArea2.Ars_Descricao#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset Gestor = '#qArea2.Ars_Descricao#'>
+				<cfset situacao = 'TRATAMENTO DA AREA'>
+				<cfset IDArea = #Form.cbarea#>
+				<cfset sdestina = #qArea2.Ars_Email#>
+				<cfset nomedestino = #qArea2.Ars_Descricao#>
+			</cfcase>
+			<cfcase value=20>
+				<cfif form.frmtransfer eq 'S'>
+					<cfquery name="rsMod" datasource="#dsn_inspecao#">
+					SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
+					FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
+					WHERE Und_Codigo = '#form.cbterctransfer#'
+					</cfquery>
+					<cfset strIDGestor = #form.cbterctransfer#>
+					<cfset strNomeGestor = #rsMod.Und_Descricao#>
+					<cfset Gestor = '#rsMod.Und_Descricao#'>
+				</cfif>	
+				, Pos_Situacao = 'PF'
+				, Pos_Area = '#strIDGestor#'
+				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset Gestor = '#rsMod.Und_Descricao#'>
+				<cfset situacao = 'PENDENTE DE TERCEIRIZADA'>
+				<cfset IDArea = #strIDGestor#>
+			</cfcase>
+			<cfcase value=21>
+				<cfquery name="qArea2" datasource="#dsn_inspecao#">
+					SELECT Ars_Sigla, Ars_Descricao, Ars_Email
+					FROM Areas
+					WHERE Ars_Codigo = '#Form.cbarea#'
+				</cfquery>
+				, Pos_Situacao = 'RV'
+				, Pos_Area = '#Form.cbarea#'
+				, Pos_Nomearea = '#qArea2.Ars_Descricao#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#qArea2.Ars_Descricao#'>
+				<cfset situacao = 'REAVALIACAO'>
+				<cfset IDArea = #Form.cbarea#>
+				<cfset sdestina = #qArea2.Ars_Email#>
+				<cfset nomedestino = #qArea2.Ars_Descricao#>
+			</cfcase>
+			<cfcase value=23>
+				<!--- Status: Tratamento pela SE --->
+				<cfquery name="rsSE" datasource="#dsn_inspecao#">
+					SELECT Dir_Sto, Dir_Codigo, Dir_Descricao, Dir_Email
+					FROM  Diretoria
+					WHERE Dir_Codigo = '#left(form.posarea,2)#'
+				</cfquery>
+				, Pos_Situacao = 'TO'
+				, Pos_Area = '#rsSE.Dir_Sto#'
+				, Pos_NomeArea = '#rsSE.Dir_Descricao#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset Gestor = '#rsSE.Dir_Descricao#'>
+				<cfset IDArea = #rsSE.Dir_Sto#>
+				<cfset situacao = 'TRATAMENTO SUPERINTENDENCIA ESTADUAL'>
+				<cfset sdestina = #rsSE.Dir_Email#>
+				<cfset nomedestino = #rsSE.Dir_Descricao#>
+			</cfcase>
+			<cfcase value=24>
+				<cfquery name="qArea2" datasource="#dsn_inspecao#">
+					SELECT Ars_Sigla, Ars_Descricao
+					FROM Areas
+					WHERE Ars_Codigo = '#Form.cbareaCS#'
+				</cfquery>
+				, Pos_Nomearea = '#qArea2.Ars_Descricao#'
+				, Pos_Situacao = 'CS'
+				, Pos_Area = '#Form.cbareaCS#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#qArea2.Ars_Descricao#'>
+				<cfset situacao = 'APURACAO'>
+				<cfset IDArea = #Form.cbareaCS#>
+			</cfcase>
+			<cfcase value=25>
+				<cfquery name="qArea2" datasource="#dsn_inspecao#">
+					SELECT Ars_Sigla, Ars_Descricao, Ars_Email
+					FROM Areas
+					WHERE Ars_Codigo = '#Form.cbarea#'
+				</cfquery>
+				, Pos_Situacao = 'RC'
+				, Pos_Area = '#Form.cbarea#'
+				, Pos_Nomearea = '#qArea2.Ars_Descricao#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset Gestor = '#qArea2.Ars_Descricao#'>
+				<cfset situacao = 'REGULARIZADO - APLICAR O CONTRATO'>
+				<cfset IDArea = #Form.cbarea#>
+				<cfset sdestina = #qArea2.Ars_Email#>
+				<cfset nomedestino = #qArea2.Ars_Descricao#>
+			</cfcase>
+			<cfcase value=26>
+				<cfquery name="qArea2" datasource="#dsn_inspecao#">
+					SELECT Ars_Sigla, Ars_Descricao, Ars_Email
+					FROM Areas
+					WHERE Ars_Codigo = '#Form.cbarea#'
+				</cfquery>
+				, Pos_Situacao = 'NC'
+				, Pos_Area = '#Form.cbarea#'
+				, Pos_Nomearea = '#qArea2.Ars_Descricao#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset Gestor = '#qArea2.Ars_Descricao#'>
+				<cfset situacao = 'NAO REGULARIZADO - APLICAR O CONTRATO'>
+				<cfset IDArea = #Form.cbarea#>
+				<cfset sdestina = #qArea2.Ars_Email#>
+				<cfset nomedestino = #qArea2.Ars_Descricao#>
+			</cfcase>	   
+			<cfcase value=28>
+				, Pos_Situacao = 'EA'
+				, Pos_Area = '#strIDGestor#'
+				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset situacao = 'EM AN&atilde;LISE'>
+				<cfset IDArea = #strIDGestor#>
+			</cfcase>	
+			<cfcase value=29>
+				, Pos_Area = '#strIDGestor#'	   
+				, Pos_Nomearea = '#strNomeGestor#'
+				, Pos_Situacao = 'EC'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset situacao = 'ENCERRADO'>
+				<cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
+				<cfset IDArea = '#qSituacaoResp.Pos_Area#'>
+			</cfcase>	 
 	 
-	  <cfcase value=30>
-	   <cfquery name="qArea3" datasource="#dsn_inspecao#">
-		SELECT Ars_Sigla, Ars_Descricao
-		FROM Areas
-		WHERE Ars_Codigo = '#Form.cbscoi#'
-	   </cfquery>
-	  , Pos_Area = '#Form.cbscoi#'	   
-   	  , Pos_Nomearea = '#qArea3.Ars_Descricao#'
-	  , Pos_Situacao = 'TP'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-	  <cfset situacao = 'TRANSFERENCIA DE PONTO'>
-	  <cfset Gestor = '#qArea3.Ars_Sigla#'>		  
-	  <cfset IDArea = #Form.cbscoi#>
-	</cfcase>
-	<cfcase value=31>
-	  , Pos_Situacao = 'JD'
-	  , Pos_NumProcJudicial = '#Form.posnumprocjudicial#'
-	  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
-	   <cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-	  <cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
-	  <cfset situacao = 'JUDICIALIZADO'>
-	  <cfset IDArea = '#qSituacaoResp.Pos_Area#'>
-	</cfcase>	
+			<cfcase value=30>
+				<cfquery name="qArea3" datasource="#dsn_inspecao#">
+					SELECT Ars_Sigla, Ars_Descricao
+					FROM Areas
+					WHERE Ars_Codigo = '#Form.cbscoi#'
+				</cfquery>
+				, Pos_Area = '#Form.cbscoi#'	   
+				, Pos_Nomearea = '#qArea3.Ars_Descricao#'
+				, Pos_Situacao = 'TP'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
+				<cfset situacao = 'TRANSFERENCIA DE PONTO'>
+				<cfset Gestor = '#qArea3.Ars_Sigla#'>		  
+				<cfset IDArea = #Form.cbscoi#>
+			</cfcase>
+			<cfcase value=31>
+				, Pos_Situacao = 'JD'
+				, Pos_NumProcJudicial = '#Form.posnumprocjudicial#'
+				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
+				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
+				<cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
+				<cfset situacao = 'JUDICIALIZADO'>
+				<cfset IDArea = '#qSituacaoResp.Pos_Area#'>
+			</cfcase>	
   </cfswitch>
     
   <cfset Encaminhamento = 'Opiniao do Controle Interno'>
@@ -1031,10 +1057,11 @@
 	, Pos_Sit_Resp_Antes = #form.scodresp#
 	WHERE Pos_Unidade= '#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
  </cfquery>
-	<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
-	<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
+	<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+	<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+	<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>		
   <cfquery datasource="#dsn_inspecao#">
-   INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area)
+   INSERT into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area)
    VALUES (
    '#form.ninsp#'
    ,
@@ -1044,13 +1071,13 @@
    ,
    #form.Nitem#
    ,
-   convert(char, getdate(), 102)
+   #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
    ,
    '#CGI.REMOTE_USER#'
    ,
    #FORM.frmResp#
    ,
-  '#hhmmss#'
+  '#hhmmssdc#'
    ,
   <cfif IsDefined("FORM.observacao") AND FORM.observacao NEQ "">
      <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #Trim(Encaminhamento)#  & CHR(13) & CHR(13) & 'AO (À) ' & '  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & CHR(13) & CHR(13) & 'Situação: ' & #situacao# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
@@ -1212,71 +1239,63 @@ left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidad
  Cpr_Codigo WHERE PCP_Unidade='#URL.unid#' AND PCP_Inspecao='#URL.ninsp#' AND PCP_NumGrupo=#URL.ngrup# AND PCP_NumItem=#URL.nitem#
 </cfquery>
 <cfset PrzVencSN = 'no'>
-<cfquery name="rsTPUnid" datasource="#dsn_inspecao#">
-     SELECT Und_Codigo, Und_Descricao, Und_TipoUnidade FROM Unidades WHERE Und_Codigo = '#URL.unid#'
-</cfquery>
-	<!---Cria uma instancia do componente Dao--->
-	<cfobject component = "CFC/Dao" name = "dao">
-    <!---Invoca o metodo  rsUsuarioLogado para retornar dados do Usu&atilde;rio logado (rsUsuarioLogado)--->
-	<cfinvoke component="#dao#" method="rsUsuarioLogado" returnVariable="rsUsuarioLogado">
-<cfif rsTPUnid.Und_TipoUnidade is 12 || rsTPUnid.Und_TipoUnidade is 16>
-	 <!---Invoca o metodo  VencidoPrazo_Andamento para retornar 'yes' se o prazo estiver vencido ou 'no' --->
-	<cfinvoke component="#dao#" method="VencidoPrazo_Andamento" returnVariable="PrazoVencido"	  
-      NumeroDaInspecao = '#URL.ninsp#'
-      CodigoDaUnidade ='#URL.unid#'
-      Grupo ='#URL.ngrup#'
-      Item ='#URL.nitem#' 
-	  ListaDeStatusContabilizados = 14,18,20 
-	  Prazo = 30	
-	  RetornaQuantDias = no
-	  MostraDump = no
-	  ApenasDiasUteis = yes
-	/>	  	
+<cfif qResposta.Itn_TipoUnidade is 12 || qResposta.Itn_TipoUnidade is 16>
 
-		
-		  <cfquery name="rsPonto" datasource="#dsn_inspecao#">
-		  SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto 
-		  WHERE STO_Status='A'                                                                                                   
-		  <cfif #PrazoVencido# eq 'yes'>
-			  <cfif Trim(rsUsuarioLogado.GrupoAcesso) eq 'GESTORMASTER'>
-			   AND STO_Codigo in (9,12,13,21,25,26,30,31)
-			  <cfelse>
-			   AND STO_Codigo in (9,12,13,18,25,26,30,31)	  
-			  </cfif>
-			
-		  <cfelse>
-			  <cfif Trim(rsUsuarioLogado.GrupoAcesso) eq 'GESTORMASTER'>
-			   AND STO_Codigo in (9,12,13,21,25,26,30,31) 
-			  <cfelse>
-               AND STO_Codigo in (9,12,13,18,25,26,30,31) 				  
-			  </cfif>
-	      </cfif>
-		  order by STO_Descricao
-		</cfquery>
-        <cfset PrzVencSN = PrazoVencido>
-		<cfif situacao eq 28>
-<!--- 		   <cfquery name="rsPonto" datasource="#dsn_inspecao#">
-		     SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo in (12,28) order by STO_Descricao
-		   </cfquery> --->
-		</cfif>
-<cfelse>
-	
-	<cfquery name="rsPonto" datasource="#dsn_inspecao#">
-		<cfif qResposta.Pos_Situacao_Resp neq 9>
-	       SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo not in (1,2,4,5,6,7,8,11,14,17,18,20,22,25,26,27) 
-	    <cfelse>
-           SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo not in (1,2,4,5,6,7,8,9,11,14,17,18,20,22,25,26,27) 			
-	    </cfif>
-	    <cfif Trim(rsUsuarioLogado.GrupoAcesso) neq 'GESTORMASTER'>
-				 AND STO_Codigo <> 21 
-		 </cfif>
-	 order by STO_Descricao	
+	<cfquery name="rs14AND" datasource="#dsn_inspecao#">
+		SELECT And_DtPosic FROM Andamento
+		WHERE And_Unidade='#URL.unid#' AND And_NumInspecao='#URL.ninsp#' AND And_NumGrupo=#URL.ngrup# AND And_NumItem=#URL.nitem# 
+		AND And_Situacao_Resp = 14
 	</cfquery>
-	<cfif situacao eq 28>
-	<!--- 	   <cfquery name="rsPonto" datasource="#dsn_inspecao#">
-		     SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo in (12,28) order by STO_Descricao
-		   </cfquery> --->
+	<cfset dtnovoprazo = CreateDate(year(rs14AND.And_DtPosic),month(rs14AND.And_DtPosic),day(rs14AND.And_DtPosic))> 
+	<cfset nCont = 1>
+	<cfloop condition="nCont lte 30">
+		<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+		<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
+		<cfif vDiaSem neq 1 and vDiaSem neq 7>
+			<!--- verificar se Feriado Nacional --->
+			<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+				SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
+			</cfquery>
+			<cfif rsFeriado.recordcount gt 0>
+			<cfset nCont = nCont - 1>
+			</cfif>
 		</cfif>
+		<!--- Verifica se final de semana  --->
+		<cfif vDiaSem eq 1 or vDiaSem eq 7>
+			<cfset nCont = nCont - 1>
+		</cfif>	
+		<cfset nCont = nCont + 1>	
+	</cfloop>	
+	<cfquery name="rsPonto" datasource="#dsn_inspecao#">
+		SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto 
+		WHERE STO_Status='A'                                                                                                   
+		<cfif dateformat(#dtnovoprazo#,"YYYYMMDD") lt dateformat(now(),"YYYYMMDD")>
+			<cfif grpacesso eq 'GESTORMASTER'>
+				AND STO_Codigo in (9,12,13,21,25,26,30,31)
+			<cfelse>
+				AND STO_Codigo in (9,12,13,25,26,30,31)	  
+			</cfif>
+		<cfelse>
+			<cfif grpacesso eq 'GESTORMASTER'>
+				AND STO_Codigo in (9,12,13,21,25,26,30,31) 
+			<cfelse>
+				AND STO_Codigo in (9,12,13,18,25,26,30,31) 				  
+			</cfif>
+		</cfif>
+		order by STO_Descricao
+	</cfquery>
+<cfelse>
+		<cfquery name="rsPonto" datasource="#dsn_inspecao#">
+			<cfif qResposta.Pos_Situacao_Resp neq 9>
+				SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo not in (1,2,4,5,6,7,8,11,14,17,18,20,22,24,25,26,27,31,32) 
+			<cfelse>
+				SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo not in (1,2,4,5,6,7,8,9,11,14,17,18,20,22,24,25,26,27,31,32) 			
+			</cfif>
+			<cfif grpacesso neq 'GESTORMASTER'>
+				AND STO_Codigo <> 21 
+			</cfif>
+			order by STO_Descricao	
+		</cfquery>
 </cfif>
 
 
@@ -2145,10 +2164,10 @@ window.open(page, "Popup", windowprops);
 		<input type="hidden" name="sfrmTipoUnidade" id="sfrmTipoUnidade" value="#qResposta.Itn_TipoUnidade#">
 		<cfset resp = #qResposta.Pos_Situacao_Resp#> 
 		<input type="hidden" name="srespatual" id="srespatual" value="#resp#">
-		<cfset caracvlr = #trim(qResposta.RIP_Caractvlr)#>
-		<cfset falta = #mid(LSCurrencyFormat(qResposta.RIP_Falta, "local"), 4, 20)#>
-		<cfset sobra = #mid(LSCurrencyFormat(qResposta.RIP_Sobra, "local"), 4, 20)#>
-		<cfset emrisco = #mid(LSCurrencyFormat(qResposta.RIP_EmRisco, "local"), 4, 20)#>
+		<cfset caracvlr = UCASE(trim(qResposta.RIP_Caractvlr))>
+		<cfset falta = trim(Replace(NumberFormat(qResposta.RIP_Falta,999.00),'.',',','All'))> 
+		<cfset sobra = trim(Replace(NumberFormat(qResposta.RIP_Sobra,999.00),'.',',','All'))> 
+		<cfset emrisco = trim(Replace(NumberFormat(qResposta.RIP_EmRisco,999.00),'.',',','All'))> 
 		<input type="hidden" name="scaracvlr" id="scaracvlr" value="#caracvlr#">
 		<input type="hidden" name="sfrmfalta" id="sfrmfalta" value="#falta#">
 		<input type="hidden" name="sfrmsobra" id="sfrmsobra" value="#sobra#">
@@ -2183,7 +2202,7 @@ window.open(page, "Popup", windowprops);
       </p></td>
       <cfset habslvsn = 'S'>
 	  <cfset auxtmp = left(url.PosArea,2)>
-	  <cfif qUsuario.Usu_DR neq auxtmp and not listfind(trim(qUsuario.Usu_Coordena),auxtmp) and trim(ucase(qAcesso.Usu_GrupoAcesso)) neq 'GESTORMASTER'>
+	  <cfif qUsuario.Usu_DR neq auxtmp and not listfind(trim(qUsuario.Usu_Coordena),auxtmp) and grpacesso neq 'GESTORMASTER'>
 	    <cfset habslvsn = 'N'>
 	  </cfif> 
     </tr>

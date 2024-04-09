@@ -1,4 +1,4 @@
-
+<cfprocessingdirective pageEncoding ="utf-8"/>
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
@@ -9,7 +9,7 @@ SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<c
 	<title>Sistema Nacional de Controle Interno</title>
 	<link href="css.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
-// função que transmite as rotinas de alt, exc, etc...
+// funÃ§Ã£o que transmite as rotinas de alt, exc, etc...
 function trocar(a,b){
     a = a.toUpperCase();
 					
@@ -18,6 +18,8 @@ function trocar(a,b){
 	   return false;
 	}
     document.form1.se.value = a; 
+	document.form1.evento.value = b; 
+
 	if (b == 'alt') {document.form1.action='alterar_unidade.cfm';}
 	if (b == 'inc') {document.form1.action='incluir_unidade.cfm';}	
 	if (b == 'exc') {document.form1.action='Excluir_Unidades.cfm';}		
@@ -27,15 +29,8 @@ function trocar(a,b){
 </script>
 </head>
 
-	
-	<!--- <body onLoad="grupoacesso('---')"; onsubmit="mensagem()"> --->
 <body>
 
-<!--- <cfif isDefined("Form.sacao") And (#Form.sacao# neq "")>
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
- <cfinclude template="cabecalho.cfm">
-</table>
-</cfif>  --->
 
 <cfset seprinc= 'N'>
 
@@ -50,7 +45,7 @@ function trocar(a,b){
 	        <td colspan="4">&nbsp;</td>
           </tr>
 	      <tr valign="baseline">
-		      <td colspan="4"><div align="center"><span class="titulos">Superintendência:</span></div></td>
+		      <td colspan="4"><div align="center"><span class="titulos">SuperintendÃªncia:</span></div></td>
 	  </tr>
 
 	   <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' AND qAcesso.Usu_DR eq '01'>
@@ -178,6 +173,7 @@ function trocar(a,b){
         </tr>
 	</table>
 	<input name="se" type="hidden" value="<cfoutput>#qAcesso.Usu_DR#</cfoutput>">
+	<input name="evento" type="hidden" value="">
 
   <cfif (trim(qAcesso.Usu_GrupoAcesso) neq "GESTORMASTER") AND (TRIM(qAcesso.Usu_Coordena) eq '')>
 	<script>
@@ -185,7 +181,7 @@ function trocar(a,b){
 	</script>
   </cfif> 
 </form>
-  <!--- Término da área de conteúdo --->
+  <!--- Termino da area de conteudo --->
 </body>
 </html>
 

@@ -37,7 +37,7 @@ function valida_acao(a) {
 //return false;
 var   grpacesso = '<cfoutput>#ucase(trim(qAcesso.Usu_GrupoAcesso))#</cfoutput>';
 if (a=='S' && (grpacesso=='GESTORES' || grpacesso=='ANALISTAS' || grpacesso=='INSPETORES')){
-alert('Aten��o!\n\nPrezado usu�rio, o plano de testes anal�tico � pra utiliza��o restrita do controle interno.\n\nN�o dever� ser divulgado/disponibilizado aos demais �rg�os dos correios');
+alert('Atenção!\n\nPrezado usuário, o plano de testes analático é pra utilização restrita do controle interno.\n\nNão deverá ser divulgado/disponibilizado aos demais órgãos dos correios');
 }
 var frm = document.forms[0];
 frm.frmacao.value=a;
@@ -161,7 +161,7 @@ frm.frmacao.value=a;
 
               <td width="8"><div align="center"></div></td>
               <td width="199"><div align="center">
-                <input name="como" type="submit" class="botao" id="como" value="Plano de Testes Anal&iacute;tico" onClick="valida_acao('S');">
+                <input name="como" type="submit" class="botao" id="como" value="Plano de Testes Analítico" onClick="valida_acao('S');">
               </div></td>
               <td width="6"><div align="center"><span class="exibir">
                 <input name="frmacao" type="hidden" id="frmacao" size="1" maxlength="1">
@@ -169,7 +169,7 @@ frm.frmacao.value=a;
               <td width="160">
                 
                 <div align="center">
-                  <input name="sem" type="submit" class="botao" id="sem" value="Plano de Testes Sint&eacute;tico" onClick="valida_acao('C')">
+                  <input name="sem" type="submit" class="botao" id="sem" value="Plano de Testes Sintético" onClick="valida_acao('C')">
                 </div></td>
             </tr>
           </table>

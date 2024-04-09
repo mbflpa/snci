@@ -1,4 +1,5 @@
- <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
+<cfprocessingdirective pageEncoding ="utf-8"> 
+<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
 </cfif>   
@@ -80,20 +81,20 @@ function valida_form() {
        //  alert('dt inicio: ' + dtinic_yyyymmdd + '     dt fim: ' + dtfim_yyyymmdd);
 		 if (dtinic_yyyymmdd > dtfim_yyyymmdd)
 		 {
-		  alert('Data Inicial È maior que a Data Final!')
+		  alert('Data Inicial √© maior que a Data Final!')
 		  frm.dtinic.focus();
 		  return false;
 		 }
 		 if ((dtfim_yyyymmdd - dtinic_yyyymmdd) > 1130)
 		 {
-		//  alert('Esta consulta est· limitada a 365 dias entre as duas datas!')
+		//  alert('Esta consulta est√° limitada a 365 dias entre as duas datas!')
 		//  frm.dtfim.focus();
 		 // return false;
 		 }
 		if (frm.SE.value==''){
-		  alert('Informar a SuperintendÍncia!');
-		  frm.SE.focus();
-		  return false;
+		//  alert('Informar a Superintend√™ncia!');
+		//  frm.SE.focus();
+		//  return false;
 		}
   }
   //=========================
@@ -104,12 +105,12 @@ function valida_form() {
 		  return false;
 		}
 		if (frm.superAno.value.length != 4){
-		  alert('Informar o campo ano com 4 dÌgitos ex. 2018');
+		  alert('Informar o campo ano com 4 d√≠gitos ex. 2018');
 		  frm.superAno.focus();
 		  return false;
 		}
 		if (frm.superAno.value < 2018 ){
-		  alert('N„o h· InspeÁ„o para ano inferior a 2018');
+		  alert('N√£o h√° Avalia√ß√£o para ano inferior a 2018');
 		  frm.superAno.focus();
 		  return false;
 		}
@@ -117,12 +118,12 @@ function valida_form() {
 	//==========================
    if (frm.ckTipo.value=='inspecao'){
 		if (frm.txtNum_Inspecao.value==''){
-		  alert('Informar o N∫ do RelatÛrio');
+		  alert('Informar o N¬∫ do Relat√≥rio');
 		  frm.txtNum_Inspecao.focus();
 		  return false;
 		}
 		if (frm.txtNum_Inspecao.value.length != 10){
-		alert("N∫ de InspeÁ„o deve conter 10 dÌgitos!");
+		alert("N¬∫ do Relat√≥rio deve conter 10 d√≠gitos!");
 		frm.txtNum_Inspecao.focus();
 		return false;
 	    }
@@ -186,7 +187,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia inv·lido!');
+		      alert('Valor para o dia inv√°lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -196,7 +197,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o MÍs inv·lido!');
+		      alert('Valor para o M√™s inv√°lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -207,10 +208,10 @@ function Mascara_Data(data)
 	}
 }
 //=============================
-//permite digitaÁao apenas de valores numÈricos
+//permite digitaÔøΩao apenas de valores numÔøΩricos
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digitaÁ„o das teclas numÈricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitaÔøΩÔøΩo das teclas numÔøΩricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 	
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -232,21 +233,21 @@ var tecla = window.event.keyCode;
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- ¡rea de conte˙do   --->
+<!--- ÔøΩrea de conteÔøΩdo   --->
 	<form action="Itens_Analise_Manifestacao1.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return valida_form()">
       <table width="46%" align="center">
         <tr>
-          <td colspan="4" align="center" class="titulo1">AN&Aacute;LISES  DAS MANIFESTA&Ccedil;&Otilde;ES</td>
+          <td colspan="4" align="center" class="titulo1">AN√ÅLISES  DAS MANIFESTA√á√ïES</td>
         </tr>
         <tr>
-          <td colspan="4" align="center"><div align="left"></div>            <div align="left">&nbsp;</div></td>
+          <td colspan="4" align="center"><div align="left"></div><div align="left">&nbsp;</div></td>
         </tr>
         
         
         <tr>
           <td width="2%" class="exibir">&nbsp;</td>
           <td colspan="3"><input name="ckTipo" type="radio" onClick="document.frmObjeto.ckTipo.value='periodo';desabilita_campos(1)" value="periodo" checked>
-              <span class="exibir"><strong>Per&iacute;odo/SuperintendÍncia</strong></span></td>
+              <span class="exibir"><strong>Per&iacute;odo/Superintend√™ncia</strong></span></td>
         </tr>
         <tr>
           <td colspan="4">&nbsp;</td>
@@ -263,7 +264,7 @@ var tecla = window.event.keyCode;
         </tr>
         <tr>
           <td>&nbsp;</td>
-          <td><strong><span class="exibir">Superintend&ecirc;ncia :</span></strong> </td>
+          <td><strong><span class="exibir">Superintend√™ncia :</span></strong> </td>
           <td colspan="2">
 		  
 		  <select name="SE" class="form" tabindex="3" disabled="disabled">

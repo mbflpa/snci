@@ -173,11 +173,13 @@
   </cfquery>
 
  <!--- Inserindo dados dados na tabela Andamento --->
- <cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
-<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
+	<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+	<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+	<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>
  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Situação: RESPOSTA DA UNIDADE' & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
  <cfquery datasource="#dsn_inspecao#">
-    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Orgao_Solucao) values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#hhmmss#', '#and_obs#', '#qUsuario.Usu_Lotacao#')
+    insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Orgao_Solucao) 
+    values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#hhmmssdc#', '#and_obs#', '#qUsuario.Usu_Lotacao#')
  </cfquery>
 
  <cfif form.salvar_anexar is "anexar">
@@ -298,9 +300,9 @@ function mensagem(){
                       <input name="ngrup" type="hidden" id="ngrup" value="<cfoutput>#URL.Ngrup#</cfoutput>">
                       <input name="nitem" type="hidden" id="nitem" value="<cfoutput>#URL.Nitem#</cfoutput>">
 					  <cfset caracvlr = #trim(rsItem.RIP_Caractvlr)#>
-		<cfset falta = #mid(LSCurrencyFormat(rsItem.RIP_Falta, "local"), 4, 20)#>
-		<cfset sobra = #mid(LSCurrencyFormat(rsItem.RIP_Sobra, "local"), 4, 20)#>
-		<cfset emrisco = #mid(LSCurrencyFormat(rsItem.RIP_EmRisco, "local"), 4, 20)#>
+            <cfset falta = trim(Replace(NumberFormat(rsItem.RIP_Falta,999.00),'.',',','All'))> 
+            <cfset sobra = trim(Replace(NumberFormat(rsItem.RIP_Sobra,999.00),'.',',','All'))> 
+            <cfset emrisco = trim(Replace(NumberFormat(rsItem.RIP_EmRisco,999.00),'.',',','All'))> 
               </p></td>
           </tr>
           <tr bgcolor="#FFFFFF" class="exibir">

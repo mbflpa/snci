@@ -1,7 +1,9 @@
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
    <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
 </cfif>   
+
 <!---  --->
 
 <!---  <cfif TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GESTORMASTER'>
@@ -41,13 +43,13 @@ function validarform() {
 	//alert('frmanoselecionado ' + frm.frmano.value + ' Ano atual ' + frm.frmanoatual.value + ' Mes selecionado ' + frm.frmmes.value + ' mes atual: ' + mesatual);	
 	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
 	{
-	if (eval(messelec) >= eval(mesatual)){
-	alert('Gestor(a), o m�s selecionado para o ano selecionado ainda n�o gerado!');
+	if (eval(messelec) > eval(mesatual)){
+	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
 	return false;
 	}
 
-    if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmdia.value <= 10){
-	alert('Gestor(a), o m�s selecionado para o ano selecionado ainda n�o gerado!');
+  if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmUsuGrupoAcesso.value != 'GOVERNANCA' && frm.frmdia.value <= 10){
+	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
 	return false;
 	}	
 	} 
@@ -71,7 +73,7 @@ function validarform() {
 	  <table width="24%" align="center">
        
         <tr>
-          <td colspan="5" align="center" class="titulo2"><strong class="titulo1"> RESULTADO EM RELA&Ccedil;&Atilde;O &Agrave; META</strong> </td>
+          <td colspan="5" align="center" class="titulo2"><strong class="titulo1">RESULTADO EM RELAÇÃO À META</strong> </td>
         </tr>
 		<tr>
           <td colspan="5" align="center">&nbsp;</td>
@@ -80,7 +82,7 @@ function validarform() {
           <td colspan="5" align="center">&nbsp;</td>
         </tr>
         <tr>
-          <td colspan="5" align="center"><div align="left"><strong class="titulos">Filtro de sele&ccedil;&atilde;o:
+          <td colspan="5" align="center"><div align="left"><strong class="titulos">Filtro de seleção:
             
           </strong></div></td>
         </tr>
@@ -112,7 +114,7 @@ function validarform() {
           </tr>
 		      <tr>
             <td>&nbsp;</td>
-            <td width="23%" class="exibir"><strong>M�s : </strong></td>
+            <td width="23%" class="exibir"><strong>Mês : </strong></td>
             <td colspan="2"><select name="frmmes" class="exibir" id="frmmes">
                 <option value="1">Jan</option>
 				<option value="2">Fev</option>
@@ -149,7 +151,6 @@ function validarform() {
 	  <input name="frmmesatual" type="hidden" value="<cfoutput>#month(now())#</cfoutput>">
 	  <input name="frmUsuGrupoAcesso" type="hidden" value="<cfoutput>#ucase(trim(qAcesso.Usu_GrupoAcesso))#</cfoutput>">
 	  <input name="frmdia" type="hidden" value="<cfoutput>#day(now())#</cfoutput>">
-	  
   
 	</form>
 </body>

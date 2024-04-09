@@ -1,18 +1,35 @@
+<cfif month(dtini) eq '01'>
+	<cfset dtinimesant = (year(dtini) - 1) & '-12-01'>
+<cfelse>
+	<cfset dtinimesant = year(dtini) & '-' & (month(dtini) - 1) & '-01'>	
+</cfif>
+<!---
+ <cfoutput>
+ #se#  === #anoexerc#  === #dtlimit#<br>
+ dtini: #dtini#   dtfim: #dtfim# dtinimesant: #dtinimesant#<br>
+ 			SELECT Fer_Data FROM FeriadoNacional 
+		where Fer_Data between '#dateformat(dtinimesant,"YYYY-MM-DD")#' and '#dateformat(dtfim,"YYYY-MM-DD")#'
+		order by Fer_Data
+ <cfset gil = gil> 
+ </cfoutput>
+--->
 	<cfquery name="rsFer" datasource="#dsn_inspecao#">
 		SELECT Fer_Data FROM FeriadoNacional 
-		where Fer_Data between #dtini# and #dtfim#
+		where Fer_Data between '#dtinimesant#' and '#dateformat(dtfim,"YYYY-MM-DD")#'
 		order by Fer_Data
 	</cfquery>
+
 	<!---  --->
-    <cfset dt30diasuteis14NR = #dtfim#>
-	<cfset nCont = 1>
+    <cfset dt14limitprci_slnc  = #dtini#>
+	<cfset nCont = 0>
 	<cfset dsusp = 0>
-	<cfloop condition="nCont lte 30"> 
-		<cfset vDiaSem = DayOfWeek(dt30diasuteis14NR)>
+	<cfloop condition="nCont lte 9"> 
+		<cfset dt14limitprci_slnc  = DateAdd("d", -1, #dt14limitprci_slnc#)>	
+		<cfset vDiaSem = DayOfWeek(dt14limitprci_slnc )>
 		<cfif (vDiaSem neq 1) and (vDiaSem neq 7)>
 			<cfif rsFer.recordcount gt 0> 
 					<cfloop query="rsFer">
-						<cfif dateformat(rsFer.Fer_Data,"YYYYMMDD") eq dateformat(dt30diasuteis14NR,"YYYYMMDD")>
+						<cfif dateformat(rsFer.Fer_Data,"YYYYMMDD") eq dateformat(dt14limitprci_slnc ,"YYYYMMDD")>
 							<cfset nCont = nCont - 1>
 						</cfif>
 					</cfloop> 
@@ -22,12 +39,36 @@
 			  <cfset nCont = nCont - 1>
 			 </cfif> 
 		</cfif>
-		<cfset dt30diasuteis14NR = DateAdd("d", -1, #dt30diasuteis14NR#)>
 		<cfset nCont = nCont + 1> 
 	</cfloop> 
-<!--- <cfoutput>data marco inicio:#dt30diasuteis14NR# time format: #TimeFormat(now(),"hh:mm:ssss")#</cfoutput>	
-<cfset gil = gil> --->
-	<!---  --->
+<!---   
+data limite para SLNC 30(trinta) dias uteis da liberação 
+<cfset dt14limit30dslnc = #dtfim#>
+<cfset nCont = 1>
+<cfset dsusp = 0>
+<cfloop condition="nCont lte 30"> 
+<cfset vDiaSem = DayOfWeek(dt30diasuteis14NR)>
+<cfif (vDiaSem neq 1) and (vDiaSem neq 7)>
+<cfif rsFer.recordcount gt 0> 
+<cfloop query="rsFer">
+<cfif dateformat(rsFer.Fer_Data,"YYYYMMDD") eq dateformat(dt30diasuteis14NR,"YYYYMMDD")>
+<cfset nCont = nCont - 1>
+</cfif>
+</cfloop> 
+</cfif>
+<cfelse>
+<cfif (vDiaSem eq 1) or (vDiaSem eq 7)> 
+<cfset nCont = nCont - 1>
+</cfif> 
+</cfif>
+<cfset dt30diasuteis14NR = DateAdd("d", -1, #dt30diasuteis14NR#)>
+<cfset nCont = nCont + 1> 
+</cfloop> 
+--->
+<!---
+ <cfoutput>data marco inicio:#DTLIMITST14NR # time format: #TimeFormat(now(),"hh:mm:ssss")#</cfoutput>	
+<cfset gil = gil> 
+	  --->
 <!---    <cfif rotina eq 0>  --->
 	   <!--- VALIDAR PONTOS NA TABELA: SLNCPRCIDCGIMES  --->
 	   <!--- GRUPOS E ITENS NÃO PERMITIDOS  --->

@@ -1,5 +1,5 @@
 <!--- #se#  === #frmano#<br> --->
-<cfprocessingdirective pageEncoding ="utf-8"/> 
+<cfprocessingdirective pageEncoding ="utf-8"> 
   <!--- <cfif day(now()) lte 10>
 	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Favor aguardar ate o dia 11 do mes para gerar o relatorio de METAS com os dados atualizados ao mes anterior!">
   </cfif> --->
@@ -15,7 +15,8 @@
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
 	select Usu_GrupoAcesso, Usu_Matricula, Usu_Coordena from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
- 
+<cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
+
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 
 <cfset total=0>
@@ -42,11 +43,14 @@ function listar(a,b,c){
 </head>
 <body>
 <form action="" method="post" target="_blank" name="form1">
-
-<!---  --->
-
 <cfset dtlimit = CreateDate(#frmano#,#frmmes#,day(now()))>
-
+<!---  
+<cfif grpacesso eq 'GESTORMASTER' or grpacesso eq 'GOVERNANCA>
+  <cfset dtlimit = CreateDate(#frmano#,#frmmes#,day(now()))>
+<cfelse>
+  <cfset dtlimit = CreateDate(2023,11,30)>
+</cfif>
+--->
 <!--- Obter solucionados --->
 <cfset aux_mes = int(month(dtlimit))>
 <cfif aux_mes is 1>
@@ -91,16 +95,17 @@ function listar(a,b,c){
 	<cfset dtlimit = (year(dtlimit)) & "/12/31">				
 	<cfset cabec = 'Dez/' & year(dtlimit)>	   
 </cfif>
-<!---  <cfoutput>
- frmmes: #frmmes#<br>
+
+<!---
+  <cfoutput>
+frmmes: #frmmes#<br>
 dtlimit: #dtlimit#<br>
 #int(month(now()) - 1)#
-
 </cfoutput>
 <cfset gil = gil>  --->
 
 <!--- exibicao em tela --->
-<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER'>
+<cfif grpacesso eq 'GESTORMASTER' or grpacesso eq 'GOVERNANCA'>
 	<cfquery name="rsMetas" datasource="#dsn_inspecao#">
 		SELECT Met_Codigo, Met_Ano, Dir_Sigla, Met_SE_STO, Met_SLNC, Met_SLNC_Mes, Met_PRCI, Met_PRCI_Mes, Met_PRCI_Acum, Met_DGCI, Met_SLNC_Acum, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_DGCI_Mes, Met_DGCI_Acum, Met_DGCI_AcumPeriodo 
 		FROM Metas INNER JOIN Diretoria ON Met_Codigo = Dir_Codigo
@@ -326,7 +331,7 @@ dtlimit: #dtlimit#<br>
 frmmes: #frmmes#  mesantes: #mesantes# day(now()): #day(now())#<br>
 </cfoutput>
 <cfset gil = gil> --->
-<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and frmmes eq mesantes and day(now()) lte 10>	
+<cfif grpacesso eq 'GESTORMASTER' and day(now()) lte 10>	
     <cfquery datasource="#dsn_inspecao#">
       UPDATE Metas SET Met_Resultado = '#permeta#' WHERE Met_Codigo='#rsMetas.Met_Codigo#' and Met_Ano = #frmano# and Met_Mes = #frmmes#
       </cfquery>

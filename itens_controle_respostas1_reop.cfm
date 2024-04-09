@@ -94,8 +94,9 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
 	<cfelse>
 		<cfset maskcgiusu = left(maskcgiusu,12) & mid(maskcgiusu,13,4) & '***' & right(maskcgiusu,1)>	
 	</cfif>  
-  <cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
-	<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
+  <cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+  <cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+  <cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>	
    <cfquery datasource="#dsn_inspecao#">
    INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Orgao_Solucao, And_HrPosic, And_Parecer)
    VALUES (   
@@ -123,7 +124,7 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
       NULL
    </cfif>
    ,   
-   convert(char, getdate(), 102)
+   #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
    ,
    '#CGI.REMOTE_USER#',
       
@@ -170,7 +171,7 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
 	 </cfcase>	 	 
    </cfswitch> 
    ,      
-  '#hhmmss#'
+  '#hhmmssdc#'
   ,
   <cfif IsDefined("FORM.observacao") AND FORM.observacao NEQ "">
 	  <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Situação: RESPOSTA DA UNIDADE' & CHR(13) & CHR(13) & 'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_Lotacao) & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>

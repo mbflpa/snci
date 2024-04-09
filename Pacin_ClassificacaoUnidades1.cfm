@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/> 
+<cfprocessingdirective pageEncoding ="utf-8"> 
 <cfsetting requesttimeout="15000"> 
 
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
@@ -8,7 +8,7 @@
 <cfset auxano=right(form.frmx_aval,4)>
 
 <cfquery name="rsBusca" datasource="#dsn_inspecao#">
-	SELECT RIP_Ano, TUN_Codigo, TUN_Descricao, RIP_Unidade, Und_Descricao, RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_Falta, RIP_Sobra, Itn_PTC_Seq, Itn_Pontuacao, Pos_Situacao_Resp, STO_Descricao, INP_Modalidade, INP_DtInicInspecao, INP_DtFimInspecao, INP_HrsInspecao, INP_Responsavel
+	SELECT RIP_Ano, TUN_Codigo, TUN_Descricao, RIP_Unidade, Und_Descricao, RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_Falta, RIP_Sobra, RIP_EmRisco, Itn_PTC_Seq, Itn_Pontuacao, Pos_Situacao_Resp, STO_Descricao, INP_Modalidade, INP_DtInicInspecao, INP_DtFimInspecao, INP_HrsInspecao, INP_Responsavel
 	FROM (((Unidades 
 	INNER JOIN (Inspecao 
 	INNER JOIN (Resultado_Inspecao 
@@ -108,29 +108,30 @@
             <td width="3%"><div align="center">Resposta</div></td>
             <td width="6%"><div align="center">Falta(R$)</div></td>
             <td width="7%"><div align="center">Sobra(R$)</div></td>
-            <td width="5%"><div align="center">Composição <br />
+			<td width="7%"><div align="center">EmRisco(R$)</div></td>
+            <td width="5%"><div align="center">Composição <br>
             Pontuação</div></td>
-            <td width="4%"><div align="center">Impacto <br />
+            <td width="4%"><div align="center">Impacto <br>
               Financeiro?</div></td>
-            <td width="3%"><div align="center">Pontuação<br />
+            <td width="3%"><div align="center">Pontuação<br>
             Item</div></td>
-            <td width="2%"><div align="center">Fator<br />
-            <br />
+            <td width="2%"><div align="center">Fator<br>
+            <br>
             </div></td>
-			<td width="3%"><div align="center">Situação<br />
+			<td width="3%"><div align="center">Situação<br>
             (Item)</div></td>
             <td width="11%"><div align="left">Descrição
             Situação Item</div></td>
-            <td width="5%"><div align="center">Pts. Máxima<br />
+            <td width="5%"><div align="center">Pts. Máxima<br>
               Unidade</div></td>
-            <td width="4%"><div align="center">Pts. Item<br />
+            <td width="4%"><div align="center">Pts. Item<br>
 (Inicial)</div></td>
-            <td width="3%"><div align="center">TNC<br />
+            <td width="3%"><div align="center">TNC<br>
             (Inicial)</div></td>
             <td width="13%">Classif(Inicial)</td>
-            <td width="6%"><div align="center">Pts.Item<br />
+            <td width="6%"><div align="center">Pts.Item<br>
             (Atual)</div></td>
-            <td width="3%"><div align="center">TNC<br />
+            <td width="3%"><div align="center">TNC<br>
             (Atual)</div></td>
             <td width="18%">Classif(Atual)</td>
           </tr>
@@ -139,39 +140,42 @@
       <cfset somapiatu = 0>
 	  <cfset somaptsmaxunidatual = 0>	
 	  <cfset somafalta = 0>	
-	  <cfset somasobra = 0>		  
+	  <cfset somasobra = 0>	
+	  <cfset somaemrisco = 0>		  
       <cfoutput query="rsBusca">
 			<cfset scor = 'f7f7f7'>		
 			<cfset grp = RIP_NumGrupo>	
 			<cfset item = RIP_NumItem>	
-			<cfset resp = RIP_Resposta>										
-			<cfset falta = lscurrencyformat(RIP_Falta)>	
-			<cfset sobra = lscurrencyformat(RIP_Sobra)>
+			<cfset resp = RIP_Resposta>	
+			<cfset falta = lscurrencyformat(rsBusca.RIP_Falta)>
+			<cfset sobra = lscurrencyformat(rsBusca.RIP_Sobra)>
+			<cfset emrisco = lscurrencyformat(rsBusca.RIP_EmRisco)>
 			<cfset composic = Itn_PTC_Seq>	
 			<cfset impactosn = 'N'>
 			<cfif left(composic,2) eq '10'>
 			  <cfset impactosn = 'S'>
 			</cfif>
 			<cfset pontua = Itn_Pontuacao>
-			<cfset fator = 1>
-			<cfif impactosn eq 'S'>
-				 <cfset somafaltasobra = rsBusca.RIP_Falta>
-				 <cfif (rsBusca.RIP_NumItem eq 1 and (rsBusca.RIP_NumGrupo eq 53 or rsBusca.RIP_NumGrupo eq 72 or rsBusca.RIP_NumGrupo eq 214 or rsBusca.RIP_NumGrupo eq 284))>
-					<cfset somafaltasobra = somafaltasobra + rsBusca.RIP_Sobra>
-				 </cfif>
-				 <cfif somafaltasobra gt 0>
-					<cfloop query="rsRelev">
-						 <cfif rsRelev.VLR_FaixaInicial is 0 and rsRelev.VLR_FaixaFinal lte somafaltasobra>
-							<cfset fator = rsRelev.VLR_Fator>
-						 <cfelseif rsRelev.VLR_FaixaInicial neq 0 and VLR_FaixaFinal neq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial and somafaltasobra lte rsRelev.VLR_FaixaFinal>
-							<cfset fator = rsRelev.VLR_Fator>
-						 <cfelseif VLR_FaixaFinal eq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial>
-							<cfset fator = rsRelev.VLR_Fator> 
-						 </cfif>
-<!--- 				rsRelev.VLR_FaixaInicial: #rsRelev.VLR_FaixaInicial#  rsRelev.VLR_FaixaFinal: #rsRelev.VLR_FaixaFinal#	rsRelev.VLR_Fator#rsRelev.VLR_Fator#  falta:#somafaltasobra#  fator:#fator#<br> --->
-					</cfloop>
-				</cfif>	
-			</cfif>						
+			<cfset fator = 0>
+            <cfif impactosn eq 'S'>
+              <cfset somafaltasobrarisco = rsBusca.RIP_Falta + rsBusca.RIP_Sobra + rsBusca.RIP_EmRisco>
+              <cfset somafaltasobrarisco = numberformat(#somafaltasobrarisco#,9999999999.99)>
+              <cfif somafaltasobrarisco gte 0>
+                <cfloop query="rsRelev">
+                  <cfset fxini = numberformat(rsRelev.VLR_FaixaInicial,9999999999.99)>
+                  <cfset fxfim = numberformat(rsRelev.VLR_FaixaFinal,9999999999.99)>
+                  <cfif fxini eq 0.00 and somafaltasobrarisco lte fxfim and fator eq 0>
+                    <cfset fator = rsRelev.VLR_Fator>
+                  </cfif>
+                  <cfif (fxini neq 0.00 and fxfim neq 0.00) and (somafaltasobrarisco gt fxini and somafaltasobrarisco lte fxfim) and fator eq 0>
+                    <cfset fator = rsRelev.VLR_Fator>
+                  </cfif>					
+                  <cfif fxfim eq 0.00 and somafaltasobrarisco gte fxini and fator eq 0>
+                    <cfset fator = rsRelev.VLR_Fator> 
+                  </cfif>
+                </cfloop>
+              </cfif>	
+            </cfif>						
 			
 			<cfset stat = Pos_Situacao_Resp>
 			<cfset statdesc = STO_Descricao>
@@ -212,6 +216,7 @@
             <td width="3%"><div align="center">#resp#</div></td>
             <td width="6%"><div align="center">#falta#</div></td>
             <td width="7%"><div align="center">#sobra#</div></td>
+			 <td width="7%"><div align="center">#emrisco#</div></td>
             <td width="5%"><div align="center">#composic#</div></td>
             <td width="4%"><div align="center">#impactosn#</div></td>
             <td width="3%"><div align="center">#pontua#</div></td>
@@ -235,85 +240,114 @@
 		  <cfelse>
 		    <cfset scor = 'f7f7f7'>
 		  </cfif>
-		<!---  --->		
-
-		  		  
+		<!---  --->				  
 		  <cfset somapiatu = somapiatu + piatu>
 		  <cfset somafalta = somafalta + rsBusca.RIP_Falta>	
-	  	  <cfset somasobra = somasobra + rsBusca.RIP_Sobra>			
+	  	  <cfset somasobra = somasobra + rsBusca.RIP_Sobra>		
+		  <cfset somaemrisco = somaemrisco + rsBusca.RIP_EmRisco>		
 		<!---  --->  
       </cfoutput>
 	<!---  --->	
     <cfset TNCI = numberFormat((somapiini/somapmini)*100,999)>
-	<cfif TNCI lte 5>
-	  <cfset TNCClassInicio = 'Plenamente eficaz'>
-	<cfelseif TNCI lte 10>
-	  <cfset TNCClassInicio = 'Eficaz'>
-	<cfelseif TNCI lte 20>
-	  <cfset TNCClassInicio = 'Eficacia mediana'>	  
-	<cfelseif TNCI lte 50>
-	  <cfset TNCClassInicio = 'Pouco eficaz'>	  
-	<cfelse>
-	  <cfset TNCClassInicio = 'Ineficaz'>	  	
-	</cfif>
-	<!---  --->	
-	<cfset TNCA = numberFormat((somapiatu/somapmini)*100,999)>
-	<cfif TNCA lte 5>
-	  <cfset TNCClassAtual = 'Plenamente eficaz'>
-	<cfelseif TNCA lte 10>
-	  <cfset TNCClassAtual = 'Eficaz'>
-	<cfelseif TNCA lte 20>
-	  <cfset TNCClassAtual = 'Eficacia mediana'>	  
-	<cfelseif TNCA lte 50>
-	  <cfset TNCClassAtual = 'Pouco eficaz'>	  
-	<cfelse>
-	  <cfset TNCClassAtual = 'Ineficaz'>	  	
+	<cfif auxano lt 2024>
+		<cfif TNCI lte 5>
+			<cfset TNCClassInicio = 'Plenamente eficaz'>
+		<cfelseif TNCI lte 10>
+			<cfset TNCClassInicio = 'Eficaz'>
+		<cfelseif TNCI lte 20>
+			<cfset TNCClassInicio = 'Eficacia mediana'>	  
+		<cfelseif TNCI lte 50>
+			<cfset TNCClassInicio = 'Pouco eficaz'>	  
+		<cfelse>
+			<cfset TNCClassInicio = 'Ineficaz'>	  	
+		</cfif>
+		<!---  --->	
+		<cfset TNCA = numberFormat((somapiatu/somapmini)*100,999)>
+		<cfif TNCA lte 5>
+			<cfset TNCClassAtual = 'Plenamente eficaz'>
+		<cfelseif TNCA lte 10>
+			<cfset TNCClassAtual = 'Eficaz'>
+		<cfelseif TNCA lte 20>
+			<cfset TNCClassAtual = 'Eficacia mediana'>	  
+		<cfelseif TNCA lte 50>
+			<cfset TNCClassAtual = 'Pouco eficaz'>	  
+		<cfelse>
+			<cfset TNCClassAtual = 'Ineficaz'>	  	
+		</cfif>	
 	</cfif>	
+	<cfif auxano gte 2024>
+		<cfif TNCI lte 5>
+			<cfset TNCClassInicio = 'Plenamente eficaz'>
+		<cfelseif TNCI lte 10>
+			<cfset TNCClassInicio = 'Eficaz'>
+		<cfelseif TNCI lte 30>
+			<cfset TNCClassInicio = 'Eficacia mediana'>	  
+		<cfelseif TNCI lte 50>
+			<cfset TNCClassInicio = 'Pouco eficaz'>	  
+		<cfelse>
+			<cfset TNCClassInicio = 'Ineficaz'>	  	
+		</cfif>
+		<!---  --->	
+		<cfset TNCA = numberFormat((somapiatu/somapmini)*100,999)>
+		<cfif TNCA lte 5>
+			<cfset TNCClassAtual = 'Plenamente eficaz'>
+		<cfelseif TNCA lte 10>
+			<cfset TNCClassAtual = 'Eficaz'>
+		<cfelseif TNCA lte 30>
+			<cfset TNCClassAtual = 'Eficacia mediana'>	  
+		<cfelseif TNCA lte 50>
+			<cfset TNCClassAtual = 'Pouco eficaz'>	  
+		<cfelse>
+			<cfset TNCClassAtual = 'Ineficaz'>	  	
+		</cfif>	
+	</cfif>
 <cfoutput>	
 <cfset somafalta = lscurrencyformat(somafalta)>	
 <cfset somasobra = lscurrencyformat(somasobra)>
+<cfset somaemrisco = lscurrencyformat(somaemrisco)>
 <cfset totreg = rsBusca.recordcount>	
 <cfset sptmu = somapmini>
 <cfset sptitui = somapiini>
 <cfset sptitua = somapiatu>
 <tr bgcolor="CCCCCC" class="titulos">
-		     <td align="center">&nbsp;</td>
-		     <td>&nbsp;</td>
-		     <td><div align="center">#totreg#</div></td>
-		     <td><div align="right">#somafalta#</div></td>
-		     <td><div align="right">#somasobra#</div></td>
-		     <td>&nbsp;</td>
-		     <td>&nbsp;</td>
-		     <td>&nbsp;</td>
-		     <td>&nbsp;</td>
-		     <td width="3%">&nbsp;</td>
-		     <td width="11%">&nbsp;</td>
-			 <cfset auxcol = replace(sptmu,'.',',')>
-		     <td><div align="center">#auxcol#</div></td>
-			 <cfset auxcol = replace(sptitui,'.',',')>			 
-		     <td><div align="center">#auxcol#</div></td>
-		     <td><div align="center">#TNCI#</div></td>
-		     <td>#TNCClassInicio#</td>
-			 <cfset auxcol = replace(sptitua,'.',',')>				 
-		     <td><div align="center">#auxcol#</div></td>
-		     <td><div align="center">#TNCA#</div></td>
-		     <td colspan="2"><div align="left">#TNCClassAtual#</div>
-	         <div align="center"></div>		       <div align="left"></div></td>
-      </tr>	
+	<td align="center">&nbsp;</td>
+	<td>&nbsp;</td>
+	<td><div align="center">#totreg#</div></td>
+	<td><div align="right">#somafalta#</div></td>
+	<td><div align="right">#somasobra#</div></td>
+	<td><div align="right">#somaemrisco#</div></td>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+	<td>&nbsp;</td>
+	<td width="3%">&nbsp;</td>
+	<td width="11%">&nbsp;</td>
+	<cfset auxcol = replace(sptmu,'.',',')>
+	<td><div align="center">#auxcol#</div></td>
+	<cfset auxcol = replace(sptitui,'.',',')>			 
+	<td><div align="center">#auxcol#</div></td>
+	<td><div align="center">#TNCI#</div></td>
+	<td>#TNCClassInicio#</td>
+	<cfset auxcol = replace(sptitua,'.',',')>				 
+	<td><div align="center">#auxcol#</div></td>
+	<td><div align="center">#TNCA#</div></td>
+	<td colspan="2"><div align="left">#TNCClassAtual#</div>
+	<div align="center"></div>		       <div align="left"></div></td>
+</tr>	
 </cfoutput>				  
-        <tr bgcolor="f7f7f7">
-          <td colspan="27" align="center" class="titulos"><hr></td>
-        </tr>
-        <tr>
-          <td colspan="20">
-              <div align="center">
-                <input name="Submit1" type="button" class="form" id="Submit1" value="Fechar" onClick="window.close()">
-          </div>
-             <div align="right"></div></td>
-        </tr>
-        <tr>
-          <td colspan="27" align="center" class="titulos"><hr></td>
-        </tr>
+	<tr bgcolor="f7f7f7">
+		<td colspan="27" align="center" class="titulos"><hr></td>
+	</tr>
+	<tr>
+		<td colspan="20">
+			<div align="center">
+			<input name="Submit1" type="button" class="form" id="Submit1" value="Fechar" onClick="window.close()">
+		</div>
+			<div align="right"></div></td>
+	</tr>
+	<tr>
+		<td colspan="27" align="center" class="titulos"><hr></td>
+	</tr>
 	  <!--- FIM DA ÁREA DE CONTEÚDO --->
  </table>
 </form>	

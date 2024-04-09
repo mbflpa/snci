@@ -1,4 +1,4 @@
-
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfset dtinic = CreateDate(Right(dtinic,4), Mid(dtinic,4,2), Left(dtinic,2))>
 <cfset dtfim = CreateDate(Right(dtfim,4), Mid(dtfim,4,2), Left(dtfim,2))>
 <!--- <cfquery name="rsLine" datasource="#dsn_inspecao#">
@@ -46,7 +46,7 @@ HAVING And_DtPosic BETWEEN #dtinic# AND #dtfim#
    <table width="95%" border="1" align="left">
   <tr>
     <cfoutput>
-    <td colspan="15" class="titulo2"><div align="center"><span class="titulo">GR¡FICO QUANTITATIVOS DE AN¡LISES REALIZADAS POR  (#UsuApelido#) ENTRE OS DIAS #DATEFORMAT(dtinic,"DD-MM-YYYY")# E #DATEFORMAT(dtfim,"DD-MM-YYYY")#</span></div></td>
+    <td colspan="15" class="titulo2"><div align="center"><span class="titulo">GR√ÅFICO QUANTITATIVOS DE AN√ÅLISES REALIZADAS POR  (#UsuApelido#) ENTRE OS DIAS #DATEFORMAT(dtinic,"DD-MM-YYYY")# E #DATEFORMAT(dtfim,"DD-MM-YYYY")#</span></div></td>
     </cfoutput>
     </tr>
  
@@ -68,14 +68,14 @@ HAVING And_DtPosic BETWEEN #dtinic# AND #dtfim#
      <td colspan="2" class="titulos"><hr></td>
      </tr>
    <tr>
-    <td class="titulos">Total Geral de Pontos no perÌodo =&gt; <cfoutput>#totpontos#</cfoutput></td>
+    <td class="titulos">Total Geral de Pontos no per√≠odo =&gt; <cfoutput>#totpontos#</cfoutput></td>
 
    </tr>
 
 </table>  
 
 <!--- <cfelse>
- <p class="red_titulo">Informar os valores: Ano e SuperintendÍncia.</p>
+ <p class="red_titulo">Informar os valores: Ano e Superintend√™ncia.</p>
 </cfif>  --->
 </form>
 </body>

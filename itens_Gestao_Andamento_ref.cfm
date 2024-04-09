@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>  
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -11,6 +11,7 @@ SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena, Dir_Descricao, Usu_Matr
 FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR 
 WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
+<cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
 <!---  <cfif TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GESTORMASTER'>
 	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=PAGINA DE INDICADORES PRCI EM MANUTENCAO ATE 12h!">
 </cfif>  ---> 
@@ -38,33 +39,31 @@ ORDER BY Andt_AnoExerc DESC
 <cfset auxdia = int(day(now()))>
 <cfset aux_mes = int(month(now()))>
 <cfset aux_ano = int(year(now()))>
-<!--- <cfset auxdia = 11>
-<cfset aux_mes = 1>   --->
-<cfif aux_mes eq 1>
-	<cfset aux_mes = 12>
-	<cfset aux_ano = (aux_ano - 1)>
-<cfelse>
-	 <cfif UCASE(TRIM(qAcesso.Usu_GrupoAcesso)) neq 'GESTORMASTER'>
-	<!---  <cfset aux_mes = (aux_mes - 1)> --->
-		<cfif auxdia gte 11>
-		 	<cfset aux_mes = (aux_mes - 1)>
-		<cfelse>
-		 	<cfset aux_mes = (aux_mes - 2)>
-			<!---  --->
-			<cfif aux_mes eq 0>
-				<cfset aux_mes = 12>
-				<cfset aux_ano = (aux_ano - 1)>
-			</cfif>
-			<!---  --->
-		</cfif>  
-	 <cfelse>
+<cfif grpacesso eq 'GESTORMASTER'>
+   <cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
+		<cfset aux_mes = 12>
+		<cfset aux_ano = aux_ano - 1>
+	<cfelseif (aux_mes gt 2 and auxdia lte 10)>
 		<cfset aux_mes = (aux_mes - 1)>
-	 </cfif>
-</cfif> 
+	<cfelse>
+		<cfset aux_mes = (aux_mes - 1)>		
+   </cfif>
 
-<!---  <cfoutput>aux_ano:#aux_ano#  === aux_mes:#aux_mes#</cfoutput><BR> 
-<cfset gil = gil>  --->  
+<cfelse>
+	<cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
+		<cfset aux_mes = 12>
+		<cfset aux_ano = aux_ano - 1>
+	<cfelseif (aux_mes gt 2 and auxdia lte 10)>
+		<cfset aux_mes = (aux_mes - 2)>
+	<cfelse>
+		<cfset aux_mes = (aux_mes - 1)>
+	</cfif>
+</cfif>
 
+<!---
+ <cfoutput>aux_ano:#aux_ano#  === aux_mes:#aux_mes#</cfoutput><BR> 
+<cfset gil = gil> 
+--->
 <cfif aux_mes is 1>
     <cfset dtlimit = aux_ano & "/01/31">
 <cfelseif aux_mes is 2>  
@@ -94,8 +93,13 @@ ORDER BY Andt_AnoExerc DESC
 <cfelse>
 	   <cfset dtlimit = aux_ano & "/12/31">				   
 </cfif>
-
-<cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'SUPERINTENDENTE' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GERENTES' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'ORGAOSUBORDINADOR' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'SUBORDINADORREGIONAL'>
+<!---
+<cfoutput>
+dtlimit:#dtlimit#
+<cfset gil=gil>
+</cfoutput>
+--->
+<cfif grpacesso eq 'SUPERINTENDENTE' OR grpacesso eq 'GERENTES' OR grpacesso eq 'ORGAOSUBORDINADOR' OR grpacesso eq 'SUBORDINADORREGIONAL'>
     <cflocation url="itens_Gestao_Andamento.cfm?se=#qAcesso.Usu_DR#&anoexerc=#year(dtlimit)#&dtlimit=#dtlimit#&frmano=#year(dtlimit)#"> 
 	<!--- <cfinclude template="cabecalho.cfm"> --->
 </cfif>
@@ -109,7 +113,7 @@ ORDER BY Andt_AnoExerc DESC
 function valida_form() {
     var frm = document.forms[0];
     if (frm.se.value=='---'){
-	  alert('Informar a Superintend�ncia!');
+	  alert('Informar a Superintendência!');
 	  frm.se.focus();
 	  return false;
 	}	
@@ -124,7 +128,7 @@ function valida_form() {
 	} 	
 //=========================================	
 	if (frm.mes.value=='---'){
-	  alert('Informar o M�s!');
+	  alert('Informar o Mês!');
 	  frm.mes.focus();
 	  return false;
 	}
@@ -169,7 +173,7 @@ function mudar(a){
 <!--- �rea de conte�do   --->
 	<form action="itens_Gestao_Andamento.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return valida_form()">
 	  <table width="59%" align="center">
-	  <cfif UCASE(trim(qAcesso.Usu_GrupoAcesso)) eq "SUPERINTENDENTE">
+	  <cfif grpacesso eq "SUPERINTENDENTE">
 		<tr>
 		<td colspan="5" align="center"><cfoutput><span class="titulo2">#qAcesso.Dir_Descricao#</span></cfoutput></td>
 		</tr>
@@ -204,10 +208,10 @@ function mudar(a){
         </tr>
         <tr>
           <td>&nbsp;</td>
-          <td width="23%"><strong><span class="exibir">Superintend&ecirc;ncia :</span></strong> </td>
+          <td width="23%"><strong><span class="exibir">Superintendência :</span></strong> </td>
           <td width="76%" colspan="3">
 		  <!---  --->
-		   <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' AND qAcesso.Usu_DR eq '01'>
+		   <cfif grpacesso eq 'GESTORMASTER' or grpacesso eq 'GOVERNANCA'>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where dir_codigo <> '01'
 			</cfquery>
@@ -217,18 +221,27 @@ function mudar(a){
 		          	<option value="#qSE.Dir_Codigo#">#Ucase(trim(qSE.Dir_Sigla))#</option>
 				  </cfoutput>
 		        </select>
-		<cfelseif (UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORES' OR UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'ANALISTAS') AND len(TRIM(qAcesso.Usu_Coordena)) gt 0> 
+		<cfelseif (grpacesso eq 'GESTORES' OR grpacesso eq 'ANALISTAS') AND len(TRIM(qAcesso.Usu_Coordena)) gt 0> 
 		
-            	<cfset aux_lista = TRIM(qAcesso.Usu_Coordena)>
+            <cfset auxtam_lista = len(TRIM(qAcesso.Usu_Coordena))>
+			<cfset aux_lista = TRIM(qAcesso.Usu_Coordena)>
+			<cfset aux_codse = "">			
 			    <select name="se" id="se" class="form">
 		          <option selected="selected" value="---">---</option>
 <cfoutput>
-				<cfloop list="#aux_lista#" index="i">
-					<cfquery name="qCDR" datasource="#dsn_inspecao#">
-						SELECT Dir_Sigla FROM Diretoria  WHERE Dir_Codigo = '#i#'
-					</cfquery>
-					<option value="#i#">#Ucase(trim(qCDR.Dir_Sigla))#</option>
-				</cfloop>
+
+				  <cfloop from="1" to="#val(auxtam_lista) + 1# " index="i">
+				     <cfif len(aux_codse) eq 2>
+					   <cfquery name="qCDR" datasource="#dsn_inspecao#">
+						SELECT Dir_Sigla FROM Diretoria  WHERE Dir_Codigo = '#aux_codse#'
+					   </cfquery> 
+		               <option value="#aux_codse#">#Ucase(trim(qCDR.Dir_Sigla))#</option>
+					   <cfset aux_codse = "">
+					</cfif>
+					<cfif mid(aux_lista,i,1) neq ",">
+					  <cfset aux_codse = #aux_codse# & #mid(aux_lista,i,1)#>
+					</cfif>
+				  </cfloop>
 </cfoutput>				  				  
 		        </select>
 

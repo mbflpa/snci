@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfif IsDefined("url.ninsp")>
 <cfset txtNum_Inspecao = url.ninsp>
 </cfif>
@@ -6,6 +7,7 @@
 	from usuarios 
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
+<cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
 
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 <cfquery name="qDR" datasource="#dsn_inspecao#">
@@ -33,7 +35,7 @@ INNER JOIN Itens_Verificacao ON (INP_Modalidade = Itn_Modalidade) and (Itn_TipoU
 WHERE (And_DtPosic BETWEEN #url.dtInicio# AND #url.dtFinal#) and (And_Situacao_Resp in (3,10,12,13,15,16,18,19,23,24,25,26,28,29,30,31)) and (trim(Usu_GrupoAcesso)= 'INSPETORES' Or trim(Usu_GrupoAcesso) = 'GESTORES' Or trim(Usu_GrupoAcesso) = 'ANALISTAS')
 <cfif URL.gestor gt 0>
  and (And_username = '#url.gestor#')
-<cfelseif ucase(trim(qUsuario.Usu_GrupoAcesso)) neq 'GESTORMASTER'>
+<cfelseif grpacesso neq 'GESTORMASTER'>
  AND (left(And_NumInspecao,2) in (#trim(qUsuario.Usu_Coordena)#)) 
 </cfif>
 	ORDER BY Usu_Apelido, And_DtPosic, And_HrPosic, And_Unidade, And_NumInspecao, And_NumGrupo, And_NumItem
@@ -41,7 +43,7 @@ WHERE (And_DtPosic BETWEEN #url.dtInicio# AND #url.dtFinal#) and (And_Situacao_R
 </cfoutput>
 
  <cfif rsItem.recordcount lte 0>
-  N�o H� dados a serem relatados para o per�odo informado!<br>
+  Não Há dados a serem relatados para o período informado!<br>
   <input type="button" class="botao" onClick="window.close()" value="Fechar">
   <cfabort> 
 </cfif> 

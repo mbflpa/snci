@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
 
 <cfif isDefined("dtinic") And dtinic neq "">
   <cfset dtinic =  dateformat(dtinic,"DD/MM/YYYY")>
@@ -34,14 +34,29 @@
 </cfif>
 <cfoutput>
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
-  SELECT DISTINCT Usu_Matricula, Usu_Coordena FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
+  SELECT DISTINCT Usu_DR,Usu_Matricula,Usu_Coordena,Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
 </cfquery>
+<cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
 <cfset UsuCoordena = trim(qUsuario.Usu_Coordena)>
-</cfoutput>
-<cfquery name="qAcesso" datasource="#dsn_inspecao#">
-	select Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido, Usu_Coordena from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
-</cfquery>
+<cfset auxgestao = UsuCoordena>
 
+<cfif grpacesso eq 'GESTORMASTER' or grpacesso eq 'GOVERNANCA'>
+	<cfquery name="qSE" datasource="#dsn_inspecao#">
+		SELECT Dir_Codigo, Dir_Sigla
+		FROM Diretoria
+		WHERE Dir_Codigo <> '01'
+		ORDER BY Dir_Codigo
+	</cfquery>	
+	<cfloop query="qSE">
+	   <cfif auxgestao eq ''>
+	   		<cfset auxgestao = #qSE.Dir_Codigo#>
+	   <cfelse>
+			<cfset auxgestao = auxgestao & ',' & #qSE.Dir_Codigo#>
+	   </cfif>
+	</cfloop>
+</cfif>
+
+</cfoutput>
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 
 <cfset total=0>
@@ -127,7 +142,6 @@ ON STO_Codigo = Pos_Situacao_Resp
 	</cfif>
 
 <!--- =========================== --->
-
 	<cfquery name="rsItem" datasource="#dsn_inspecao#">
 	SELECT CASE WHEN INP_Modalidade = 0 then 'Fisica' else 'Remota' end as Modal, 
 	INP_DtInicInspecao, 
@@ -174,56 +188,59 @@ ON Dir_Codigo = Und_CodDiretoria)
 ON STO_Codigo = Pos_Situacao_Resp
 Where   
 	<cfif ckTipo eq "inspecao">
-	      <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
-          (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (INP_NumInspecao = '#txtNum_Inspecao#')
-		  <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
-		  (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (INP_NumInspecao = '#txtNum_Inspecao#')
+	      <cfif grpacesso eq 'GESTORES'>
+          	(Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (INP_NumInspecao = '#txtNum_Inspecao#')
+		  <cfelseif grpacesso eq 'GOVERNANCA'>
+		  	(Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (INP_NumInspecao = '#txtNum_Inspecao#')
 		  <cfelse>
-		  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (INP_NumInspecao = '#txtNum_Inspecao#')
+		  	(Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (INP_NumInspecao = '#txtNum_Inspecao#')
           </cfif>
 	<cfelseif ckTipo eq "periodo">
 		<cfif url.SE eq "Todas">
-			  <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
-			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#UsuCoordena#))
-			  <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
-			  (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#UsuCoordena#))
+			  <cfif grpacesso eq 'GESTORES'>
+			  	(Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#auxgestao#))
+			  <cfelseif grpacesso eq 'GOVERNANCA'>
+			  	(Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#auxgestao#))
 			  <cfelse>
-			  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#UsuCoordena#))
+			  	(Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#UsuCoordena#))
 			  </cfif>
 		<cfelse>
-			  <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
-			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria = '#url.SE#')
-			  <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
-			  (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria = '#url.SE#')
+			  <cfif grpacesso eq 'GESTORES'>
+			  	(Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria = '#url.SE#')
+			  <cfelseif grpacesso eq 'GOVERNANCA'>
+			  	(Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria = '#url.SE#')
 			  <cfelse>
-			  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria = '#url.SE#')
+			  	(Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria = '#url.SE#')
 			  </cfif>
 		</cfif>		  
 	<cfelse>
-	      <cfif StatusSE eq "Todas">
-			  <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
-			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#UsuCoordena#))
-			   <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
-			   (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#UsuCoordena#))
-			  <cfelse>
-			  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#UsuCoordena#))
-			  </cfif>		  
-		  <cfelse>
-			  <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
-			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria = '#StatusSE#')
-			  <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
-			  (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria = '#StatusSE#')
-			  <cfelse>
-			  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria = '#StatusSE#')
-			  </cfif>
-		  </cfif>
+		<cfif StatusSE eq "Todas">
+			<cfif grpacesso eq 'GESTORES'>
+				(Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#auxgestao#))
+			<cfelseif grpacesso eq 'GOVERNANCA'>
+				(Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#auxgestao#))
+			<cfelse>
+				(Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#UsuCoordena#))
+			</cfif>		  
+		<cfelse>
+			<cfif grpacesso eq 'GESTORES'>
+				(Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria = '#StatusSE#')
+			<cfelseif grpacesso eq 'GOVERNANCA'>
+				(Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria = '#StatusSE#')
+			<cfelse>
+				(Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria = '#StatusSE#')
+			</cfif>
+		</cfif>
 	</cfif>
 	ORDER BY Pos_DtPosic, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Und_CodReop, Data
 	</cfquery>
-
+<cfset startTime = CreateTime(0,0,0)> 
+<cfset endTime = CreateTime(0,0,45)> 
+<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+</cfloop>
 <!--- gerar planilha  Gilvan 09/05/2019 --->
 <cfquery name="rsXLS" datasource="#dsn_inspecao#">
-SELECT CASE WHEN INP_Modalidade = 0 then 'Fisica' else 'Remota' end as INPModal, RIP_ReincInspecao as RIPRInsp, convert(char, RIP_ReincGrupo) as RIPRGp, convert(char, RIP_ReincItem) as RIPRIt, Und_CodDiretoria, Pos_Unidade, Und_Descricao, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Und_CodReop, RIP_Ano, RIP_Resposta, RIP_Caractvlr, convert(money, RIP_Falta) as RIPFalta, convert(money, RIP_Sobra) as RIPSobra, convert(money, RIP_EmRisco) as RIPEmRisco, convert(char,Pos_DtUltAtu,120) as POSDtUltAtu, case when left(POS_UserName,8) = 'EXTRANET' then concat(left(POS_UserName,9),'***',substring(trim(POS_UserName),12,8)) else concat(left(trim(POS_UserName),12),substring(trim(POS_UserName),13,4),'***',right(trim(POS_UserName),1)) end as POSUserName, RIP_Recomendacao, INP_HrsPreInspecao, convert(char,INP_DtInicDeslocamento,103) as INPDtInicDesloc, INP_HrsDeslocamento, convert(char,INP_DtFimDeslocamento,103) as INPDtFimDesloc, convert(char,INP_DtInicInspecao,103) as INPDtInicInsp, convert(char,INP_DtFimInspecao,103) as INPDtFimInsp, INP_HrsInspecao, INP_Situacao, convert(char,INP_DtEncerramento,103) as INPDtEncer, concat(left(INP_Coordenador,1),'.',substring(INP_Coordenador,2,3),'.***-',right(INP_Coordenador,1)) as INPCoordenador, INP_Responsavel, substring(INP_Motivo,1,32500) as motivo, convert(char,Pos_PontuacaoPonto) as PosPontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, STO_Sigla, STO_Descricao, convert(char,Pos_DtPosic,103) as PosDtPosic, convert(char,Pos_DtPrev_Solucao,103) as PosDtPrevSoluc, Pos_Area, trim(Pos_NomeArea) as PosNomeArea, substring(Pos_Parecer,1,32500) as parecer, Pos_VLRecuperado, Pos_Processo, Pos_Tipo_Processo, Grp_Descricao, Itn_Descricao, DATEDIFF(dd, INP_DtFimInspecao, GETDATE()) AS Quant,
+SELECT CASE WHEN INP_Modalidade = 0 then 'Fisica' else 'Remota' end as INPModal, convert(char, RIP_ReincInspecao) as RIPRInsp, convert(char, RIP_ReincGrupo) as RIPRGp, convert(char, RIP_ReincItem) as RIPRIt, Und_CodDiretoria, convert(char, Pos_Unidade) as PosUnidade, Und_Descricao, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Und_CodReop, RIP_Ano, RIP_Resposta, RIP_Caractvlr, convert(money, RIP_Falta) as RIPFalta, convert(money, RIP_Sobra) as RIPSobra, convert(money, RIP_EmRisco) as RIPEmRisco, convert(char,Pos_DtUltAtu,120) as POSDtUltAtu, case when left(POS_UserName,8) = 'EXTRANET' then concat(left(POS_UserName,9),'***',substring(trim(POS_UserName),12,8)) else concat(left(trim(POS_UserName),12),substring(trim(POS_UserName),13,4),'***',right(trim(POS_UserName),1)) end as POSUserName, RIP_Recomendacao, INP_HrsPreInspecao, convert(char,INP_DtInicDeslocamento,103) as INPDtInicDesloc, INP_HrsDeslocamento, convert(char,INP_DtFimDeslocamento,103) as INPDtFimDesloc, convert(char,INP_DtInicInspecao,103) as INPDtInicInsp, convert(char,INP_DtFimInspecao,103) as INPDtFimInsp, INP_HrsInspecao, INP_Situacao, convert(char,INP_DtEncerramento,103) as INPDtEncer, concat(left(INP_Coordenador,1),'.',substring(INP_Coordenador,2,3),'.***-',right(INP_Coordenador,1)) as INPCoordenador, INP_Responsavel, substring(INP_Motivo,1,32500) as motivo, convert(char,Pos_PontuacaoPonto) as PosPontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, STO_Sigla, STO_Descricao, convert(char,Pos_DtPosic,103) as PosDtPosic, convert(char,Pos_DtPrev_Solucao,103) as PosDtPrevSoluc, Pos_Area, trim(Pos_NomeArea) as PosNomeArea, substring(Pos_Parecer,1,32500) as parecer, Pos_VLRecuperado, Pos_Processo, Pos_Tipo_Processo, Grp_Descricao, Itn_Descricao, DATEDIFF(dd, INP_DtFimInspecao, GETDATE()) AS Quant,
 CASE WHEN Pos_OpcaoBaixa = 1 then 'Penalidade Aplicada' WHEN Pos_OpcaoBaixa = 2 then 'Defesa Acatada'  WHEN Pos_OpcaoBaixa = 3 then 'Outros' end as Pos_OpcaoBaixa, case when LTRIM(RTRIM(SEI_NumSEI)) IS NULL AND Pos_OpcaoBaixa IS NOT NULL then 'não informado' else LEFT(SEI_NumSEI,5)+'.'+SUBSTRING(SEI_NumSEI,6,6)+'/'+SUBSTRING(SEI_NumSEI,12,4) +'-'+RIGHT(SEI_NumSEI,2) end AS SEI_NumSEI 
 FROM ((((Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo) 
 INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
@@ -236,26 +253,26 @@ LEFT JOIN Inspecao_SEI ON  SEI_Inspecao= Pos_Inspecao AND SEI_Grupo= Pos_NumGrup
 
     Where  
 	<cfif ckTipo eq "inspecao">
-	      <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
+	      <cfif grpacesso eq 'GESTORES'>
           (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (INP_NumInspecao = '#txtNum_Inspecao#')
-		  <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
+		  <cfelseif grpacesso eq 'GOVERNANCA'>
 		   (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (INP_NumInspecao = '#txtNum_Inspecao#')
 		  <cfelse>
 		  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (INP_NumInspecao = '#txtNum_Inspecao#')
           </cfif>
 	<cfelseif ckTipo eq "periodo">
 		<cfif url.SE eq "Todas">
-			  <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
-			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#UsuCoordena#))
-		      <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>	
-			  (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#UsuCoordena#))		  
+			  <cfif grpacesso eq 'GESTORES'>
+			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#auxgestao#))
+		      <cfelseif grpacesso eq 'GOVERNANCA'>	
+			  (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#auxgestao#))		  
 			  <cfelse>
 			  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria in (#UsuCoordena#))
 			  </cfif>
 		<cfelse>
-			  <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
+			  <cfif grpacesso eq 'GESTORES'>
 			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria = '#url.SE#')
-			  <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
+			  <cfelseif grpacesso eq 'GOVERNANCA'>
 			  (Pos_Situacao_Resp in (3,24,25,26,27,29)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria = '#url.SE#')
 			  <cfelse>
 			  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29)) and (INP_DtFimInspecao BETWEEN #dtinic# AND #dtfim#) AND (Und_CodDiretoria = '#url.SE#')
@@ -263,17 +280,17 @@ LEFT JOIN Inspecao_SEI ON  SEI_Inspecao= Pos_Inspecao AND SEI_Grupo= Pos_NumGrup
 		</cfif>		  
 	<cfelse>
 	      <cfif StatusSE eq "Todas">
-			  <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
-			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#UsuCoordena#))
-			  <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
-			  (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#UsuCoordena#))
+			  <cfif grpacesso eq 'GESTORES'>
+			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#auxgestao#))
+			  <cfelseif grpacesso eq 'GOVERNANCA'>
+			  (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#auxgestao#))
 			  <cfelse>
 			  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria  in (#UsuCoordena#))
 			  </cfif>		  
 		  <cfelse>
-			  <cfif Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES'>
+			  <cfif grpacesso eq 'GESTORES'>
 			  (Pos_Situacao_Resp in (3,9,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria = '#StatusSE#')
-			  <cfelseif Trim(qAcesso.Usu_GrupoAcesso) eq 'GOVERNANCA'>
+			  <cfelseif grpacesso eq 'GOVERNANCA'>
 			  (Pos_Situacao_Resp in (3,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria = '#StatusSE#')
 			  <cfelse>
 			  (Pos_Situacao_Resp in (3,12,13,24,25,26,27,29,31)) and (Pos_Situacao_Resp = #selstatus#) and (Und_CodDiretoria = '#StatusSE#')
@@ -282,6 +299,10 @@ LEFT JOIN Inspecao_SEI ON  SEI_Inspecao= Pos_Inspecao AND SEI_Grupo= Pos_NumGrup
 	</cfif>
 	ORDER BY  Quant DESC, INP_DtInicInspecao, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Und_CodReop
 </cfquery>
+<cfset startTime = CreateTime(0,0,0)> 
+<cfset endTime = CreateTime(0,0,45)> 
+<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+</cfloop>
 <!--- dados temporário --->
  <cfif isDefined("ckTipo") And ckTipo eq "inspecao">
 	<cfset dtinic = dateformat(dtinic,"dd/mm/yyyy")>
@@ -336,7 +357,7 @@ LEFT JOIN Inspecao_SEI ON  SEI_Inspecao= Pos_Inspecao AND SEI_Grupo= Pos_NumGrup
 	 <cfset objPOI.WriteSingleExcel(
     FilePath = ExpandPath( "./Fechamento/" & sarquivo ),
     Query = rsXLS,
-	ColumnList = "PosPontuacaoPonto,Pos_ClassificacaoPonto,INPModal,Und_CodDiretoria,Pos_Unidade,Und_Descricao,Pos_Inspecao,Pos_NumGrupo,Grp_Descricao,Pos_NumItem,Itn_Descricao,Und_CodReop,RIP_Ano,RIP_Resposta,RIP_Caractvlr,RIPFalta,RIPSobra,RIPEmRisco,POSDtUltAtu,POSUserName,RIP_Recomendacao,INP_HrsPreInspecao,INPDtInicDesloc,INP_HrsDeslocamento,INPDtFimDesloc,INPDtInicInsp,INPDtFimInsp,INP_HrsInspecao,INP_Situacao,INPDtEncer,INPCoordenador,INP_Responsavel,motivo,Pos_Situacao_Resp,STO_Sigla,STO_Descricao,PosDtPosic,PosDtPrevSoluc,Pos_Area,PosNomeArea,parecer,Pos_VLRecuperado,Pos_Processo,Pos_Tipo_Processo,RIPRInsp,RIPRGp,RIPRIt,Quant,Pos_OpcaoBaixa,SEI_NumSEI",
+	ColumnList = "PosPontuacaoPonto,Pos_ClassificacaoPonto,INPModal,Und_CodDiretoria,PosUnidade,Und_Descricao,Pos_Inspecao,Pos_NumGrupo,Grp_Descricao,Pos_NumItem,Itn_Descricao,Und_CodReop,RIP_Ano,RIP_Resposta,RIP_Caractvlr,RIPFalta,RIPSobra,RIPEmRisco,POSDtUltAtu,POSUserName,RIP_Recomendacao,INP_HrsPreInspecao,INPDtInicDesloc,INP_HrsDeslocamento,INPDtFimDesloc,INPDtInicInsp,INPDtFimInsp,INP_HrsInspecao,INP_Situacao,INPDtEncer,INPCoordenador,INP_Responsavel,motivo,Pos_Situacao_Resp,STO_Sigla,STO_Descricao,PosDtPosic,PosDtPrevSoluc,Pos_Area,PosNomeArea,parecer,Pos_VLRecuperado,Pos_Processo,Pos_Tipo_Processo,RIPRInsp,RIPRGp,RIPRIt,Quant,Pos_OpcaoBaixa,SEI_NumSEI",
 	ColumnNames = "Pontuacao_Item,Classificacao_Item,Modalidade,Diretoria,Cod_Unidade,DescricaoUnidade,Num_Inspecao,Num_Grupo,Descricao_Grupo,Num_Item,Descricao_Item,Cod_REATE,ANO,Resposta,CaracteresVlr,Falta,Sobra,EmRisco,Data Ultima Atualiz,Nome_do_Usuario,Recomendacao,Hora_Pre_Inspecao,DT_Inic_Desloc,Hora_Desloc,DT_Fim_Desloc,DT_Inic_Inspecao,DT_Fim_Inspecao,Hora Inspecao,Situacao,DT_Encerram_Inspecao,Coordenador,Responsavel,Motivo,Status,Sigla_Status,Descricao_Status,Dt_Posicao,Dt_Previsao_Solucao,Area,Nome_Area,Parecer,Valor Recuperado,Processo,Tipo_Processo,ReInc_Relat,ReInc_Grupo,ReInc_Item,Qtd_Dias,OpcaoDeBaixa,SEI_Baixa",
 	SheetName = "Controle_Manifestacoes"
     ) />
@@ -627,15 +648,15 @@ function Hint(objNome, action){
       <tr class="titulosClaro">
 	    <td width="8%" bgcolor="eeeeee" class="exibir"><div align="center">Status</div></td>
 		<td width="2%" bgcolor="eeeeee" class="exibir"><div align="center">Modalidade</div></td>
-		<td width="3%" bgcolor="eeeeee" class="exibir"><div align="center">Posi&ccedil;&atilde;o</div></td>
-		<td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Previs&atilde;o</div></td>
+		<td width="3%" bgcolor="eeeeee" class="exibir"><div align="center">Posição</div></td>
+		<td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Previsão</div></td>
 		<td width="2%" bgcolor="eeeeee" class="exibir"><div align="center">SE Sigla</div></td>
-		<td width="4%" bgcolor="eeeeee" class="exibir"><div align="center">&Oacute;rg&atilde;o Condutor</div></td>
-		<td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">In&iacute;cio</div></td>
+		<td width="4%" bgcolor="eeeeee" class="exibir"><div align="center">Órgão Condutor</div></td>
+		<td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Início</div></td>
 		<td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Fim</div></td>
 		<td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Envio Ponto</div></td>
 		<td width="10%" bgcolor="eeeeee" class="exibir"><div align="center">Nome Unidade</div></td>
-		<td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Relat&oacute;rio</div></td>
+		<td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Relatório</div></td>
 		<td width="16%" bgcolor="eeeeee" class="exibir"><div align="center">Grupo</div></td>
 		<td width="16%" bgcolor="eeeeee" class="exibir"><div align="center">Item</div></td>
 		<td width="8%" bgcolor="eeeeee" class="exibir"><strong>Encaminhamento</strong></td>		

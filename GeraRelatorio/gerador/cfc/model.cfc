@@ -1,6 +1,6 @@
 <!------------------------------------------------------------------>
-<!---@Nome: Componente de acesso ao banco para reletórios ---------->
-<!---@Descrição: --->
+<!---@Nome: Componente de acesso ao banco para reletï¿½rios ---------->
+<!---@Descriï¿½ï¿½o: --->
 <!---@Data: 07/07/2010 --------------------------------------------->
 <!---@Autor: Sandro Mendes - GESIT/SSAD----------------------------->
 <!------------------------------------------------------------------>
@@ -8,10 +8,10 @@
 <cfcomponent>
 
 	<!---@Nome:--->
-	<!---@Descrição:--->
-	<!---@Parâmetros:--->
-	<!---@Data Modificação:--->
-	<!---@Versão:--->
+	<!---@Descriï¿½ï¿½o:--->
+	<!---@Parï¿½metros:--->
+	<!---@Data Modificaï¿½ï¿½o:--->
+	<!---@Versï¿½o:--->
 	<cffunction name="listaDadosRelatorio" access="public" returntype="query">
 
 		<cfargument name="id" required="no" type="string" default="0">
@@ -31,12 +31,11 @@
 		<cftry> 
 							
 			      <cfquery name="qryRelatorio" timeout="120" datasource="#Application.DSN#">
-					 SELECT Grupos_Verificacao.Grp_Descricao, Grupos_Verificacao.Grp_Codigo, Itens_Verificacao.Itn_Descricao, Itens_Verificacao.Itn_NumItem,  Itens_Verificacao.Itn_Amostra,  Itens_Verificacao.Itn_Norma, Itens_Verificacao.Itn_ValidacaoObrigatoria,
-					Inspecao.INP_Coordenador, Resultado_Inspecao.RIP_Comentario, Resultado_Inspecao.RIP_Recomendacoes, Resultado_Inspecao.RIP_Recomendacao, Resultado_Inspecao.RIP_Unidade,  Resultado_Inspecao.RIP_MatricAvaliador, Areas.Ars_Sigla,
+					 SELECT Grupos_Verificacao.Grp_Descricao, Grupos_Verificacao.Grp_Codigo, Itens_Verificacao.Itn_Descricao,Itens_Verificacao.Itn_NumItem, Itens_Verificacao.Itn_Amostra,  Itens_Verificacao.Itn_Norma, Itens_Verificacao.Itn_ValidacaoObrigatoria,
+					Itens_Verificacao.Itn_TipoUnidade,Itens_Verificacao.Itn_PTC_Seq,Itens_Verificacao.Itn_ImpactarTipos,Inspecao.INP_Coordenador, Resultado_Inspecao.RIP_Comentario, Resultado_Inspecao.RIP_Recomendacoes, Resultado_Inspecao.RIP_Recomendacao, Resultado_Inspecao.RIP_Unidade,  Resultado_Inspecao.RIP_MatricAvaliador, Areas.Ars_Sigla,
 					Tipo_Unidades.TUN_Codigo, Tipo_Unidades.TUN_Descricao, ParecerUnidade.Pos_Parecer, ParecerUnidade.Pos_PontuacaoPonto, ParecerUnidade.Pos_ClassificacaoPonto,Inspecao.INP_NumInspecao,
 					Inspecao.INP_DtInicInspecao, Inspecao.INP_UserName, ParecerUnidade.Pos_Situacao_Resp, Inspecao.INP_DtFimInspecao, Unidades.Und_Descricao,
 					Diretoria.Dir_Sigla, Funcionarios.Fun_Matric, Funcionarios.Fun_Nome, Resultado_Inspecao.RIP_Valor, Diretoria.Dir_Descricao, ITN_PONTUACAO, Itn_Classificacao 
-					
 					FROM ParecerUnidade INNER JOIN Resultado_Inspecao ON Pos_Unidade = RIP_Unidade AND Pos_Inspecao = RIP_NumInspecao AND Pos_NumGrupo = RIP_NumGrupo AND Pos_NumItem = RIP_NumItem 
 					LEFT OUTER JOIN Analise ON Pos_Unidade = Ana_Unidade AND Pos_Inspecao = Ana_NumInspecao AND Pos_NumGrupo = Ana_NumGrupo AND Pos_NumItem = Ana_NumItem 
 					INNER JOIN Itens_Verificacao 
@@ -102,7 +101,7 @@
 		<cftry>
 
 			      <cfquery name="qryPapelTrabalho" timeout="120" datasource="#Application.DSN#">					
-						select Grupos_Verificacao.Grp_Descricao, Grupos_Verificacao.Grp_Codigo, Itens_Verificacao.Itn_Descricao, Itens_Verificacao.Itn_NumItem,Itens_Verificacao.Itn_ValorDeclarado,  Itens_Verificacao.Itn_Amostra,  Itens_Verificacao.Itn_Norma, Itens_Verificacao.Itn_ValidacaoObrigatoria, Itens_Verificacao.Itn_Pontuacao, Itens_Verificacao.Itn_Classificacao, Itens_Verificacao.Itn_PTC_Seq, Inspecao.INP_Coordenador, Inspecao.INP_UserName,  Inspecao.INP_DtUltAtu, Resultado_Inspecao.RIP_Comentario, Resultado_Inspecao.RIP_Recomendacoes, Resultado_Inspecao.RIP_Recomendacao, Resultado_Inspecao.RIP_Resposta, Resultado_Inspecao.RIP_Unidade, Resultado_Inspecao.RIP_MatricAvaliador,
+						select Grupos_Verificacao.Grp_Descricao, Grupos_Verificacao.Grp_Codigo, Itens_Verificacao.Itn_Descricao, Itens_Verificacao.Itn_NumItem,Itens_Verificacao.Itn_ValorDeclarado,  Itens_Verificacao.Itn_Amostra,  Itens_Verificacao.Itn_Norma, Itens_Verificacao.Itn_ValidacaoObrigatoria, Itens_Verificacao.Itn_Pontuacao, Itens_Verificacao.Itn_Classificacao, Itens_Verificacao.Itn_PTC_Seq,Itens_Verificacao.Itn_ImpactarTipos,Itens_Verificacao.Itn_TipoUnidade, Inspecao.INP_Coordenador, Inspecao.INP_UserName,  Inspecao.INP_DtUltAtu, Resultado_Inspecao.RIP_Comentario, Resultado_Inspecao.RIP_Recomendacoes, Resultado_Inspecao.RIP_Recomendacao, Resultado_Inspecao.RIP_Resposta, Resultado_Inspecao.RIP_Unidade, Resultado_Inspecao.RIP_MatricAvaliador,
 						Tipo_Unidades.TUN_Codigo, Tipo_Unidades.TUN_Descricao, Inspecao.INP_NumInspecao, Inspecao.INP_DtInicInspecao, Inspecao.INP_DtFimInspecao, Inspecao.INP_Modalidade, Unidades.Und_Descricao, Diretoria.Dir_Sigla, Funcionarios.Fun_Matric, Funcionarios.Fun_Nome, Resultado_Inspecao.RIP_Valor,  Resultado_Inspecao.RIP_Falta, Resultado_Inspecao.RIP_Sobra, Resultado_Inspecao.RIP_EmRisco, Resultado_Inspecao.RIP_ReincInspecao, Resultado_Inspecao.RIP_ReincGrupo, Resultado_Inspecao.RIP_ReincItem, Diretoria.Dir_Descricao, ParecerUnidade.Pos_PontuacaoPonto, ParecerUnidade.Pos_ClassificacaoPonto, TNC_ClassifInicio, TNC_ClassifAtual
 						FROM (Diretoria INNER JOIN (Tipo_Unidades INNER JOIN ((((((Inspecao INNER JOIN Resultado_Inspecao ON (Inspecao.INP_NumInspecao = Resultado_Inspecao.RIP_NumInspecao) AND (Inspecao.INP_Unidade = Resultado_Inspecao.RIP_Unidade)) LEFT JOIN Analise ON (Resultado_Inspecao.RIP_NumItem = Analise.Ana_NumItem) AND (Resultado_Inspecao.RIP_NumGrupo = Analise.Ana_NumGrupo) AND (Resultado_Inspecao.RIP_NumInspecao = Analise.Ana_NumInspecao) AND (Resultado_Inspecao.RIP_Unidade = Analise.Ana_Unidade)) LEFT JOIN ParecerUnidade ON (Resultado_Inspecao.RIP_NumItem = ParecerUnidade.Pos_NumItem) AND (Resultado_Inspecao.RIP_NumGrupo = ParecerUnidade.Pos_NumGrupo) AND (Resultado_Inspecao.RIP_NumInspecao = ParecerUnidade.Pos_Inspecao) AND (Resultado_Inspecao.RIP_Unidade = ParecerUnidade.Pos_Unidade)) 
 						INNER JOIN Unidades ON Resultado_Inspecao.RIP_Unidade = Unidades.Und_Codigo) INNER JOIN Itens_Verificacao ON (Inspecao.INP_Modalidade = Itens_Verificacao.Itn_Modalidade) AND (Resultado_Inspecao.RIP_NumItem = Itens_Verificacao.Itn_NumItem) and convert(char(4),RIP_Ano) = Itn_Ano AND (Resultado_Inspecao.RIP_NumGrupo = Itens_Verificacao.Itn_NumGrupo) AND (Unidades.Und_TipoUnidade = Itens_Verificacao.Itn_TipoUnidade)) INNER JOIN Grupos_Verificacao ON (Itens_Verificacao.Itn_Ano = Grupos_Verificacao.Grp_Ano) AND (Itens_Verificacao.Itn_NumGrupo = Grupos_Verificacao.Grp_Codigo)) ON Tipo_Unidades.TUN_Codigo = Itens_Verificacao.Itn_TipoUnidade) ON Diretoria.Dir_Codigo = Resultado_Inspecao.RIP_CodDiretoria) INNER JOIN Funcionarios ON Inspecao.INP_Coordenador = Funcionarios.Fun_Matric

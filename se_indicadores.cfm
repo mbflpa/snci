@@ -1,5 +1,9 @@
 <!---
   <cfdump  var="#url#">
+ 
+ <cfoutput>
+ #dtlimit#
+ </cfoutput>
  --->
  <cfprocessingdirective pageEncoding ="utf-8"/>  
 <cfif #frmano# lte 2022>
@@ -13,7 +17,7 @@
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
-
+<cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
 <cfquery name="qSE" datasource="#dsn_inspecao#">
 	SELECT Dir_Codigo, Dir_Descricao
 	FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR
@@ -64,34 +68,49 @@ SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<c
 </cfswitch>
 
 <cfquery name="rsMetasAntes" datasource="#dsn_inspecao#">
-SELECT  Met_Mes, Met_DGCI_Mes, Met_DGCI_AcumPeriodo, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_SLNC_Mes, Met_PRCI_Mes, Met_DGCI_Acum, MET_DGCI, Met_SLNC_Acum, Met_PRCI_Acum
-FROM Metas
-WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)# and Met_Mes < #aux_mes#
-ORDER BY Met_Mes
+  SELECT  Met_Mes, Met_DGCI_Mes, Met_DGCI_AcumPeriodo, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_SLNC_Mes, Met_PRCI_Mes, Met_DGCI_Acum, MET_DGCI, Met_SLNC_Acum, Met_PRCI_Acum
+  FROM Metas
+  WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)# and 
+  <cfif aux_mes gt 1>
+    Met_Mes < #aux_mes#
+  <cfelse>
+    Met_Mes = #aux_mes#
+  </cfif>
+  ORDER BY Met_Mes
 </cfquery>
 
-<cfset MetaPer = trim(numberFormat(rsMetasAntes.MET_DGCI,999.0))>
+
 <cfquery name="rsMetas" datasource="#dsn_inspecao#">
-	SELECT Met_Codigo, Met_Ano, Met_SE_STO, Met_SLNC, Met_PRCI, Met_DGCI, Met_SLNC_Acum, Met_PRCI_Acum, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_SLNC_Mes, Met_PRCI_Mes, Met_DGCI_Mes
-	FROM Metas
-	WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)# and Met_Mes = #aux_mes#
+    SELECT Met_Codigo, Met_Ano, Met_SE_STO, Met_SLNC, Met_PRCI, Met_DGCI, Met_SLNC_Acum, Met_PRCI_Acum, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_SLNC_Mes, Met_PRCI_Mes, Met_DGCI_Mes
+    FROM Metas
+    WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)# and Met_Mes = #aux_mes#
 </cfquery>
-
+<cfset MetaPer = trim(rsMetas.MET_DGCI)>
 <!--- Inicio PRCI  --->
 <cfset PRCI = trim(rsMetas.Met_PRCI)> 
 <!--- FIM PRCI  --->  
 <!--- Inicio SLNC  --->
-<cfset SLNC = trim(numberFormat(rsMetas.Met_SLNC,999.0))>
+<cfset SLNC = trim(rsMetas.Met_SLNC)>
 <!--- DGCI --->
 <!--- <cfset MetaPer = trim(numberFormat(MetDGCIMesAntes,999.0))> --->
+<cfset MetDGCIMesAntes = trim(numberFormat(rsMetas.Met_DGCI,999.0))>
 <!--- FIM PRCI  --->
 <!--- resultacum --->
-<cfset Result_Acum = numberFormat((rsMetas.Met_SLNC_Acum * 0.25) + (rsMetas.Met_PRCI_Acum * 0.75),999.0)>
-<cfset colaslncacum = numberFormat(rsMetas.Met_SLNC_Acum,999.0)>
-<cfset colaprciacum = numberFormat(rsMetas.Met_PRCI_Acum,999.0)>
-<cfset colaresultacum = numberFormat(Result_Acum,999.0)>
-<cfset COLA = '(' & #colaslncacum# & ' * 0.25) + (' & #colaprciacum# & ' * 0.75) = ' & #colaresultacum#>
-<cfset COLB = '(' & #SLNC# & ' * 0.25) + (' & #numberFormat(PRCI,999.0)# & ' * 0.75) = ' & #MetaPer# & '%'>
+<cfif year(dtlimit) lte 2023>
+  <cfset Result_Acum = numberFormat((rsMetas.Met_SLNC_Acum * 0.25) + (rsMetas.Met_PRCI_Acum * 0.75),999.0)>
+  <cfset colaslncacum = numberFormat(rsMetas.Met_SLNC_Acum,999.0)>
+  <cfset colaprciacum = numberFormat(rsMetas.Met_PRCI_Acum,999.0)>
+  <cfset colaresultacum = numberFormat(Result_Acum,999.0)>
+  <cfset COLA = '(' & #colaslncacum# & ' * 0.25) + (' & #colaprciacum# & ' * 0.75) = ' & #colaresultacum#>
+  <cfset COLB = '(' & #SLNC# & ' * 0.25) + (' & #numberFormat(PRCI,999.0)# & ' * 0.75) = ' & #MetaPer# & '%'>
+<cfelse>
+  <cfset Result_Acum = numberFormat((rsMetas.Met_SLNC_Acum * 0.45) + (rsMetas.Met_PRCI_Acum * 0.55),999.0)>
+  <cfset colaslncacum = numberFormat(rsMetas.Met_SLNC_Acum,999.0)>
+  <cfset colaprciacum = numberFormat(rsMetas.Met_PRCI_Acum,999.0)>
+  <cfset colaresultacum = numberFormat(Result_Acum,999.0)>
+  <cfset COLA = '(' & #colaslncacum# & ' * 0.45) + (' & #colaprciacum# & ' * 0.55) = ' & #colaresultacum#>
+  <cfset COLB = '(' & #SLNC# & ' * 0.45) + (' & #numberFormat(PRCI,999.0)# & ' * 0.55) = ' & #MetaPer# & '%'>
+</cfif>
 <!---  --->
 <!--- MES:#aux_mes# <br>
 PRCI:#rsMetas.Met_PRCI# #rsMetas.Met_PRCI# <br>
@@ -210,103 +229,97 @@ function Hint(objNome, action){
           </tr>
 <!---  --->
 <cfset AcumPerAno = 0>
-<cfif rsMetasAntes.recordcount gt 0>	
- <tr bgcolor="#FFFFFF" class="exibir">
-   <td colspan="4" class="exibir"><div align="center"><strong>Resultados nos meses anteriores </strong></div></td>
-   </tr>
- <tr bgcolor="#FFFFFF" class="exibir">
-            <td colspan="2"><strong>M&ecirc;s(es)</strong></td>
-            <td><div align="center"><strong>Meta Mensal</strong></div></td>
-            <td><div align="center"><strong>Resultado</strong></div></td>
-          </tr>	  
-<cfset MetDGCIMesAntes = trim(numberFormat(rsMetasAntes.Met_DGCI,999.0))>
-<cfloop query="rsMetasAntes">		
-<cfswitch expression="#rsMetasAntes.Met_Mes#">
-	<cfcase value="1">
-		<cfset mesantes = "Janeiro">
-	</cfcase>
-	<cfcase value="2">
-		<cfset mesantes = "Fevereiro">
-	</cfcase>
-	<cfcase value="3">
-		<cfset mesantes = "Março">
-	</cfcase>
-	<cfcase value="4">
-		<cfset mesantes = "Abril">
-	</cfcase>
-	<cfcase value="5">
-		<cfset mesantes = "Maio">
-	</cfcase>
-	<cfcase value="6">
-		<cfset mesantes = "Junho">
-	</cfcase>
-	<cfcase value="7">
-		<cfset mesantes = "Julho">
-	</cfcase>
-	<cfcase value="8">
-		<cfset mesantes = "Agosto">
-	</cfcase>
-	<cfcase value="9">
-		<cfset mesantes = "Setembro">
-	</cfcase>
-	<cfcase value="10">
-		<cfset mesantes = "Outubro">
-	</cfcase>
-	<cfcase value="11">
-		<cfset mesantes = "Novembro">
-	</cfcase>
-	<cfcase value="12">
-		<cfset mesantes = "Dezembro">
-	</cfcase>
-</cfswitch>
-	<!--- <cfset MetDGCIMesAntes = trim(numberFormat(rsMetasAntes.Met_DGCI,999.0))> ---> 	  
-<!--- 	<cfset MetDGCIAcumAntes = trim(numberFormat((rsMetasAntes.Met_SLNC_Acum * 0.25) + (rsMetasAntes.Met_PRCI_Acum * 0.75),999.0))> --->
+<cfif rsMetasAntes.recordcount gt 0 and aux_mes gt 1>	
+  <tr bgcolor="#FFFFFF" class="exibir">
+    <td colspan="4" class="exibir"><div align="center"><strong>Resultados nos meses anteriores </strong></div></td>
+  </tr>
+  <tr bgcolor="#FFFFFF" class="exibir">
+    <td colspan="2"><strong>Mês(es)</strong></td>
+    <td><div align="center"><strong>Meta Mensal</strong></div></td>
+    <td><div align="center"><strong>Resultado</strong></div></td>
+  </tr>	  
+  <cfset MetDGCIMesAntes = trim(numberFormat(rsMetasAntes.Met_DGCI,999.0))>
+  <cfloop query="rsMetasAntes">		
+    <cfswitch expression="#rsMetasAntes.Met_Mes#">
+      <cfcase value="1">
+        <cfset mesantes = "Janeiro">
+      </cfcase>
+      <cfcase value="2">
+        <cfset mesantes = "Fevereiro">
+      </cfcase>
+      <cfcase value="3">
+        <cfset mesantes = "Março">
+      </cfcase>
+      <cfcase value="4">
+        <cfset mesantes = "Abril">
+      </cfcase>
+      <cfcase value="5">
+        <cfset mesantes = "Maio">
+      </cfcase>
+      <cfcase value="6">
+        <cfset mesantes = "Junho">
+      </cfcase>
+      <cfcase value="7">
+        <cfset mesantes = "Julho">
+      </cfcase>
+      <cfcase value="8">
+        <cfset mesantes = "Agosto">
+      </cfcase>
+      <cfcase value="9">
+        <cfset mesantes = "Setembro">
+      </cfcase>
+      <cfcase value="10">
+        <cfset mesantes = "Outubro">
+      </cfcase>
+      <cfcase value="11">
+        <cfset mesantes = "Novembro">
+      </cfcase>
+      <cfcase value="12">
+        <cfset mesantes = "Dezembro">
+      </cfcase>
+    </cfswitch>
     <cfset MetDGCIAcumAntes = numberFormat(rsMetasAntes.Met_DGCI_Acum,999.0)>  
-   <!---  <cfset MetaPerantes = numberFormat(rsMetasAntes.Met_DGCI,999.0)>   --->
 
     <cfset auxcorantes = "##FF3300">
-	<cfif MetDGCIAcumAntes gt MetDGCIMesAntes>
-		<cfset Result_AcumAntes = "ACIMA DO ESPERADO">
-		<cfset auxcorantes = "##33CCFF">
-	<cfelseif MetDGCIAcumAntes eq MetDGCIMesAntes>		
-		<cfset Result_AcumAntes = "DENTRO DO ESPERADO">
-		<cfset auxcorantes = "##339900">
-	<cfelse>
-		<cfset Result_AcumAntes = "ABAIXO DO ESPERADO">
-		<cfset auxcor = "##FF3300">
-	</cfif>
-	<cfset AcumPerAno = AcumPerAno + MetDGCIAcumAntes>
-	<cfset acumper = trim(NumberFormat((AcumPerAno/rsMetasAntes.Met_Mes),999.0))>
-     
-	 <tr bgcolor="#FFFFFF" class="exibir">
-            <td><cfoutput><span class="titulos">#mesantes#</span></cfoutput></td>
-			<cfset auximp = MetDGCIAcumAntes>
-            <td><cfoutput>
-              <div align="center"><span class="titulos">#auximp#</span></div>
-            </cfoutput></td>
-            <td><div align="center"><span class="titulos"><cfoutput>#MetDGCIMesAntes#</cfoutput></span></div></td>
-			<td bgcolor="<cfoutput>#auxcorantes#</cfoutput>" class="exibir"><div align="center"><strong><cfoutput>#Result_AcumAntes#</cfoutput></strong></div></td>
-          </tr>
-        <!--- <cfset acumper = trim(NumberFormat((AcumPerAno/rsMetasAntes.Met_Mes),999.0))> --->
-<!--- 		<cfquery datasource="#dsn_inspecao#">
-			UPDATE Metas SET MET_DGCI = '#MetDGCIMesAntes#', Met_DGCI_Mes = '#MetDGCIMesantes#', Met_DGCI_Acum = '#MetDGCIAcumAntes#', Met_DGCI_AcumPeriodo = '#acumper#'
-			WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)# and Met_Mes = #rsMetasAntes.Met_Mes#
-		</cfquery> ---> 			  
-</cfloop>		
+    <cfif MetDGCIAcumAntes gt MetDGCIMesAntes>
+      <cfset Result_AcumAntes = "ACIMA DO ESPERADO">
+      <cfset auxcorantes = "##33CCFF">
+    <cfelseif MetDGCIAcumAntes eq MetDGCIMesAntes>		
+      <cfset Result_AcumAntes = "DENTRO DO ESPERADO">
+      <cfset auxcorantes = "##339900">
+    <cfelse>
+      <cfset Result_AcumAntes = "ABAIXO DO ESPERADO">
+      <cfset auxcor = "##FF3300">
+    </cfif>
+    <cfset AcumPerAno = AcumPerAno + MetDGCIAcumAntes>
+    <cfset acumper = trim(NumberFormat((AcumPerAno/rsMetasAntes.Met_Mes),999.0))>
+
+    <tr bgcolor="#FFFFFF" class="exibir">
+      <td><cfoutput><span class="titulos">#mesantes#</span></cfoutput></td>
+      <cfset auximp = MetDGCIAcumAntes>
+      <td><div align="center"><span class="titulos"><cfoutput>#auximp#</cfoutput></span></div></td>
+      <td><div align="center"><span class="titulos"><cfoutput>#MetDGCIMesAntes#</cfoutput></span></div></td>
+      <td bgcolor="<cfoutput>#auxcorantes#</cfoutput>" class="exibir"><div align="center"><strong><cfoutput>#Result_AcumAntes#</cfoutput></strong></div></td>
+    </tr>	  
+  </cfloop>		
 	 <tr bgcolor="#CCCCCC" class="exibir">
 	   <td height="16" colspan="4">&nbsp;</td>
 	   </tr>  
 </cfif>	
 <!---  --->
-		<cfset MetDGCIMesAtual = trim(numberFormat(rsMetas.Met_DGCI,999.0))> 	  
-		<cfset MetDGCIAcumAtual = trim(numberFormat((rsMetas.Met_SLNC_Acum * 0.25) + (rsMetas.Met_PRCI_Acum * 0.75),999.0))>	           
+		<cfset MetDGCIMesAtual = trim(rsMetas.Met_DGCI)> 	  
+    <cfif year(dtlimit) lte 2023>
+		  <cfset MetDGCIAcumAtual = trim(numberFormat((rsMetas.Met_SLNC_Acum * 0.25) + (rsMetas.Met_PRCI_Acum * 0.75),999.0))>	  
+    <cfelse>
+      <cfset MetDGCIAcumAtual = trim(numberFormat((rsMetas.Met_SLNC_Acum * 0.45) + (rsMetas.Met_PRCI_Acum * 0.55),999.0))>    
+    </cfif>         
           <tr bgcolor="#FFFFFF" class="exibir">
-            <td colspan="4"><div align="center"><strong>Resultado  do m&ecirc;s: <cfoutput>#mes#</cfoutput></strong></div></td>
+            <td colspan="4"><div align="center"><strong>Resultado  do mês: <cfoutput>#mes#</cfoutput></strong></div></td>
           </tr>
           <tr bgcolor="#FFFFFF" class="exibir">
-            <td width="213" colspan="2"><p align="center"><strong> DGCI </strong></p></td>
+            <td width="213" colspan="2"><p align="center"><strong>DGCI</strong></p></td>
             <td width="189"><div align="center"><strong>Meta Mensal</strong> </div></td>
-            <td width="157"><div align="center"><strong>Resultado </strong></div></td>
+            <td width="157"><div align="center"><strong>Resultado</strong></div></td>
           </tr>
 		  <cfset auxcor = "##FF3300">
 			<cfif Result_Acum gt MetaPer>
@@ -323,23 +336,36 @@ function Hint(objNome, action){
           <tr>
             <td colspan="2" class="exibir"><div align="center" class="exibir" onMouseMove="Hint('PA',2)" onMouseOut="Hint('PA',1)"><strong><cfoutput>#Result_Acum#</cfoutput></strong></div></td>
             <td class="exibir"><div align="center" class="exibir" onMouseMove="Hint('RA',2)" onMouseOut="Hint('RA',1)"><strong><cfoutput>#MetaPer#</cfoutput>%</strong></div></td>
-			<td bgcolor="<cfoutput>#auxcor#</cfoutput>" class="exibir"><div align="center"><strong><cfoutput>#resultado#</cfoutput></strong></div></td>
+			      <td bgcolor="<cfoutput>#auxcor#</cfoutput>" class="exibir"><div align="center"><strong><cfoutput>#resultado#</cfoutput></strong></div></td>
           </tr>
            <tr>
-            <td colspan="4" class="form"><strong class="exibir"> (*) DGCI = (SLNC*0,25) + (PRCI*0,75) </strong></td>
+            <td colspan="4" class="form">
+            <cfif year(dtlimit) lte 2023>
+		          <strong class="exibir"> (*) DGCI = (SLNC*0,25) + (PRCI*0,75)</strong>  
+            <cfelse>
+              <strong class="exibir"> (*) DGCI = (SLNC*0,45) + (PRCI*0,55)</strong>   
+            </cfif> 
+            
+            </td>
           </tr>
         </table>		</td>
       </tr>
-    <!--- <cfset MetDGCIMesAtual = trim(numberFormat(rsMetas.Met_DGCI,999.0))> ---> 	  
-	<cfset MetDGCIAcumAtual = trim(numberFormat((rsMetas.Met_SLNC_Acum * 0.25) + (rsMetas.Met_PRCI_Acum * 0.75),999.0))>	   
+
+    <cfif year(dtlimit) lte 2023>
+	    <cfset MetDGCIAcumAtual = trim(numberFormat((rsMetas.Met_SLNC_Acum * 0.25) + (rsMetas.Met_PRCI_Acum * 0.75),999.0))>	
+      <cfset MetDGCIAcumPeriodo = trim(numberFormat((rsMetas.Met_SLNC_AcumPeriodo * 0.25) + (rsMetas.Met_PRCI_AcumPeriodo * 0.75),999.0))>
+    <cfelse>   
+      <cfset MetDGCIAcumAtual = trim(numberFormat((rsMetas.Met_SLNC_Acum * 0.45) + (rsMetas.Met_PRCI_Acum * 0.55),999.0))>	
+      <cfset MetDGCIAcumPeriodo = trim(numberFormat((rsMetas.Met_SLNC_AcumPeriodo * 0.45) + (rsMetas.Met_PRCI_AcumPeriodo * 0.55),999.0))>
+    </cfif>
 	<cfset AcumPerAno = AcumPerAno + MetDGCIAcumAtual>
 	<cfset MetDGCIAcum = trim(NumberFormat(Result_Acum,999.0))> 
-	<!--- <cfset acumper = trim(NumberFormat((AcumPerAno/aux_mes),999.0))> ---> 
-	<cfset MetDGCIAcumPeriodo = trim(numberFormat((rsMetas.Met_SLNC_AcumPeriodo * 0.25) + (rsMetas.Met_PRCI_AcumPeriodo * 0.75),999.0))>
+	
 <!--- 	<cfoutput>  #MetDGCIAcumPeriodo#</cfoutput> --->
-	 <cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' AND int(month(now()) - 1) eq int(month(dtlimit)) and day(now()) lte 10>
-       <cfquery datasource="#dsn_inspecao#">
-        UPDATE Metas SET Met_DGCI = '#MetDGCIMesAntes#', Met_DGCI_Mes = '#MetDGCIMesAntes#', Met_DGCI_Acum = '#MetDGCIAcum#', Met_DGCI_AcumPeriodo = '#MetDGCIAcumPeriodo#' WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)# and Met_Mes = #aux_mes#
+	 <cfif grpacesso eq 'GESTORMASTER' and aux_mes eq #month(dtlimit)# and day(now()) lte 10>
+        <cfquery datasource="#dsn_inspecao#">
+        UPDATE Metas SET Met_DGCI = '#MetDGCIMesAntes#', Met_DGCI_Mes = '#MetDGCIMesAntes#', Met_DGCI_Acum = '#MetDGCIAcum#', Met_DGCI_AcumPeriodo = '#MetDGCIAcumPeriodo#' 
+        WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)# and Met_Mes = #aux_mes#
        </cfquery>  
 	 </cfif>	   
             <tr>
@@ -366,7 +392,7 @@ function Hint(objNome, action){
         <tr>
            <td colspan="2">&nbsp;</td>
         </tr>
-		<cfif trim(qAcesso.Usu_GrupoAcesso) eq 'SUPERINTENDENTE' OR trim(qAcesso.Usu_GrupoAcesso) eq 'GERENTES' OR trim(qAcesso.Usu_GrupoAcesso) eq 'ORGAOSUBORDINADOR' OR trim(qAcesso.Usu_GrupoAcesso) eq 'SUBORDINADORREGIONAL'>
+		<cfif grpacesso eq 'SUPERINTENDENTE' OR grpacesso eq 'GERENTES' OR grpacesso eq 'ORGAOSUBORDINADOR' OR grpacesso eq 'SUBORDINADORREGIONAL'>
 		<tr>
           <td width="51%">
             <div align="center">
@@ -388,8 +414,16 @@ function Hint(objNome, action){
 	FROM Metas
 	WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)#
 </cfquery>
+<!---
+  	 <cfif grpacesso eq 'GESTORMASTER' and aux_mes eq #month(dtlimit)# and day(now()) lte 10>
+        <cfquery datasource="#dsn_inspecao#">
+        UPDATE Metas SET Met_DGCI = '#MetDGCIMMetDGCIMesAntesesAntes#', Met_DGCI_Mes = '#MetDGCIMesAntes#', Met_DGCI_Acum = '#MetDGCIAcum#', Met_DGCI_AcumPeriodo = '#MetDGCIAcumPeriodo#' 
+        WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)# and Met_Mes = #aux_mes#
+       </cfquery>  
+	 </cfif>	 
+   --->
   <table width="200" border="1" align="center">
-<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) is 'SUPERINTENDENTE'> 
+<cfif grpacesso is 'SUPERINTENDENTE'> 
     <tr class="exibir">
       <td colspan="13"><div align="center"><strong>Para obter a Ficha de Identifica&ccedil;&atilde;o dos Indicadores clique na figura abaixo </strong></div></td>
     </tr>
@@ -435,7 +469,7 @@ function Hint(objNome, action){
       <td class="exibir"><div align="center"><strong>PRCI</strong></div></td>
 	   <cfset ncont = 1>
        <cfloop condition="ncont lte 12">  
-        <td class="exibir"><div align="center">#rsMetas.Met_PRCI#</div></td>
+        <td class="exibir"><div align="center">#trim(rsMetas.Met_PRCI)#</div></td>
 			<cfset nCont = nCont + 1> 
 	   </cfloop>
     </tr>
@@ -443,7 +477,7 @@ function Hint(objNome, action){
       <td class="exibir"><div align="center"><strong>SLNC</strong></div></td>
 	   <cfset ncont = 1>
        <cfloop condition="ncont lte 12">  
-		<td class="exibir"><div align="center">#numberFormat(rsMetas.Met_SLNC,999.0)#</div></td>
+		<td class="exibir"><div align="center">#trim(rsMetas.Met_SLNC)#</div></td>
 		<cfset nCont = nCont + 1>  
 	   </cfloop>
     </tr>
@@ -452,7 +486,7 @@ function Hint(objNome, action){
 	   <cfset ncont = 1>
        <cfloop condition="ncont lte 12">  
 		   <cfset nCont = nCont + 1>  
-		   <td class="exibir"><div align="center">#numberFormat(rsMetas.Met_DGCI,999.0)#</div></td>
+		   <td class="exibir"><div align="center">#trim(rsMetas.Met_DGCI)#</div></td>
 	   </cfloop>
     </tr>
   </table>

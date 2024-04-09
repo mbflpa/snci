@@ -1,4 +1,4 @@
-
+<cfprocessingdirective pageEncoding ="utf-8"/>
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
@@ -89,7 +89,7 @@ function sit(x){
   //alert(x);
  if (x != 'A' && x != 'D')
    {
-   alert('Campo SituaÁ„o: A - Ativado    D - Desativado ');
+   alert('Campo Situa√ß√£o: A - Ativado    D - Desativado ');
     document.form1.status.value = 'A';
     return false;
    }
@@ -182,28 +182,28 @@ body {
 		var centralizadorDepois = CentralizadorDepois();
 		var centralizadorDepoisNome = selecionarTexto('centralizador', CentralizadorDepois());
 		var mensagem ="";
-		var textoItensPendentes="\u2605N„o foram localizados Apontamentos pendentes de soluÁ„o para serem transferidos.";
+		var textoItensPendentes="\u2605N√£o foram localizados Apontamentos pendentes de solu√ß√£o para serem transferidos.";
 		if ('#totalItensPendentes#' != 0){
 			if ('#totalItensPendentes#' == 1){
-			   textoItensPendentes = "\u2605Existe 01 Apontamento pendente de soluÁ„o que ser· transferido.";	
+			   textoItensPendentes = "\u2605Existe 01 Apontamento pendente de solu√ß√£o que ser√° transferido.";	
 			} else{
-				textoItensPendentes = "\u2605Existem " + '#totalItensPendentes#' + " Apontamentos pendentes de soluÁ„o que ser„o transferidos.";	
+				textoItensPendentes = "\u2605Existem " + '#totalItensPendentes#' + " Apontamentos pendentes de solu√ß√£o que ser√£o transferidos.";	
 			}
 		}
 		if(centralizadorAntes =="" ){
-			mensagem ="Apontamentos especÌficos de DistribuiÁ„o Domicili·ria ser„o transferidos da " + '#trim(qVisualiza.Und_Descricao)#' + " para o " + centralizadorDepoisNome + " e/ou para seu ”rg„o Subordinador e/ou ¡rea (CentralizaÁ„o da DistribuiÁ„o).\n\n" 
+			mensagem ="Apontamentos espec√≠ficos de Distribui√ß√£o Domicili√°ria ser√£o transferidos da " + '#trim(qVisualiza.Und_Descricao)#' + " para o " + centralizadorDepoisNome + " e/ou para seu √≥rg√£o Subordinador e/ou √°rea (Centraliza√ß√£o da Distribui√ß√£o).\n\n" 
 			+ textoItensPendentes + 
-			"\n\nConfirma a alteraÁ„o da 'Unidade Centralizadora'?"; 
+			"\n\nConfirma a altera√ß√£o da 'Unidade Centralizadora'?"; 
 		}
 		if(centralizadorAntes != "" ){
-			mensagem ="Apontamentos especÌficos de DistribuiÁ„o Domicili·ria da " + '#trim(qVisualiza.Und_Descricao)#' + " ser„o transferidos do " + '#trim(qUnidCentralizaAntes.Und_Descricao)#' + " para o " + centralizadorDepoisNome +" e/ou para seu ”rg„o Subordinador e/ou ¡rea.\n\n" 
+			mensagem ="Apontamentos espec√≠ficos de Distribui√ß√£o Domicili√°ria da " + '#trim(qVisualiza.Und_Descricao)#' + " ser√£o transferidos do " + '#trim(qUnidCentralizaAntes.Und_Descricao)#' + " para o " + centralizadorDepoisNome +" e/ou para seu √≥rg√£o Subordinador e/ou √°rea.\n\n" 
 			+ textoItensPendentes + 
-			"\n\nConfirma a alteraÁ„o da 'Unidade Centralizadora'?"; 
+			"\n\nConfirma a altera√ß√£o da 'Unidade Centralizadora'?"; 
 		}
 		if(centralizadorDepois =="" ){
-			mensagem ="Apontamentos especÌficos de DistribuiÁ„o Domicili·ria ser„o transferidos do " + '#trim(qUnidCentralizaAntes.Und_Descricao)#' + " para a " + '#trim(qVisualiza.Und_Descricao)#' + " e/ou para seu ”rg„o Subordinador e/ou ¡rea (DescentralizaÁ„o da DistribuiÁ„o).\n\n" 
+			mensagem ="Apontamentos espec√≠ficos de Distribui√ß√£o Domicili√°ria ser√£o transferidos do " + '#trim(qUnidCentralizaAntes.Und_Descricao)#' + " para a " + '#trim(qVisualiza.Und_Descricao)#' + " e/ou para seu √≥rg√£o Subordinador e/ou √°rea (Descentraliza√ß√£o da Distribui√ß√£o).\n\n" 
 			+ textoItensPendentes + 
-			"\n\nConfirma a alteraÁ„o da 'Unidade Centralizadora'?";  
+			"\n\nConfirma a altera√ß√£o da 'Unidade Centralizadora'?";  
 		}
 		
 		if(centralizadorAntes != centralizadorDepois){
@@ -211,7 +211,7 @@ body {
             if (r == true) {
               return true;
             } else {
-              alert("AlteraÁ„o cancelada!") ;
+              alert("Altera√ß√£o cancelada!") ;
 			  document.form1.centralizador.value = centralizadorAntes;
               return false;
             } 
@@ -228,7 +228,7 @@ body {
 	//---------------------------------
 	var auxcgc = frm.CGC.value;
 	if (auxcgc == '' || auxcgc.length != 14 ) {
-		alert('Informar o CGC da Unidade com 14(quatorze) dÌgitos');
+		alert('Informar o CGC da Unidade com 14(quatorze) d√≠gitos');
 		frm.CGC.focus();
 		return false;
 	}
@@ -250,7 +250,7 @@ body {
 	var auxemail = frm.email.value.indexOf('@');
 	
 	if (auxemail < 0 || frm.email.value.length == 16) {
-		alert('Informar E-mail da Unidade com a extens„o: @');
+		alert('Informar E-mail da Unidade com a extens√£o: @');
 		frm.email.focus();
 		return false;
 	}
@@ -259,14 +259,14 @@ body {
 	var auxemail = frm.email.value.indexOf('.com.br');
 	
 	if (auxemail < 0 || frm.email.value.length == 16) {
-		alert('Informar E-mail da Unidade com a extens„o: @.nomeoperadora.com.br');
+		alert('Informar E-mail da Unidade com a extens√£o: @.nomeoperadora.com.br');
 		frm.email.focus();
 		return false;
 	}	
 	//---------------------------------	
 	frm.endereco.value = frm.endereco.value.toUpperCase();
 	if (frm.endereco.value == '') {
-		alert('Informar EndereÁo da Unidade');
+		alert('Informar Endere√ßo da Unidade');
 		frm.endereco.focus();
 		return false;
 	}
@@ -279,7 +279,7 @@ body {
 	}
 	//---------------------------------			
 
- 	if (confirm ("Confirma a alteraÁ„o do cadastro da unidade?"))
+ 	if (confirm ("Confirma a altera√ß√£o do cadastro da unidade?"))
 	   {}
 	else
 	   {
@@ -366,8 +366,8 @@ body {
               <td><strong>Unidade Centralizadora </strong></td>
               <td colspan="3"><cfset vcentraliza = qVisualiza.Und_Centraliza>
                 <select name="centralizador" id="centralizador" class="form">  
-                  <option value=""<cfif qUnidCentraliza.Und_Codigo eq ''>selected</cfif>>N√O CENTRALIZADA</option>
-			      <option value="">N√O CENTRALIZADA</option>
+                  <option value=""<cfif qUnidCentraliza.Und_Codigo eq ''>selected</cfif>>N√ÉO CENTRALIZADA</option>
+			      <option value="">N√ÉO CENTRALIZADA</option>
                   <cfoutput query="qUnidCentraliza"  >
                     <option value="#Und_Codigo#"<cfif qUnidCentraliza.Und_Codigo is vcentraliza>selected</cfif> 
 						  >#qUnidCentraliza.Und_Descricao#</option>
@@ -470,6 +470,7 @@ body {
 <form name="formvolta" method="post" action="alterar_unidade.cfm">
   <input name="tpunid" id="tpunid" type="hidden" value="<cfoutput>#vTipo#</cfoutput>">
   <input name="se" type="hidden" value="<cfoutput>#form.se#</cfoutput>">
+  <input name="evento" type="hidden" value="<cfoutput>#form.evento#</cfoutput>">
 </form>
 </body>
 </html>

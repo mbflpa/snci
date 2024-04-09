@@ -1,4 +1,4 @@
- <cfprocessingdirective pageEncoding ="utf-8"/> 
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="aviso_sessao_encerrada.htm">
@@ -10,7 +10,7 @@
 	from usuarios 
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
-
+<cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
 
 <cfif isDefined("Form.recomendacao")>
   <cfparam name="Form.recomendacao" default="#form.recomendacao#">
@@ -40,13 +40,56 @@
 	INNER JOIN Grupos_Verificacao ON Itn_NumGrupo = Grp_Codigo and Grp_Ano = Itn_Ano
 	WHERE Itn_Ano=RIGHT('#URL.Ninsp#',4) AND Grp_Ano=Itn_Ano and Itn_NumGrupo='#url.Ngrup#' and Itn_NumItem ='#url.Nitem#' and Itn_TipoUnidade = #url.tpunid# and Itn_Modalidade = '#qOrientacao.INP_Modalidade#'
 </cfquery>
-
+<cfset auxdtprev = CreateDate(year(now()),month(now()), day(now()))> 
+<cfif qItemReanalise.Itn_TipoUnidade neq 12 and qItemReanalise.Itn_TipoUnidade neq 16>
+	<!--- 10 dias úteis na data de previsão --->
+  <cfset nCont = 1>
+  <cfloop condition="nCont lte 10">
+    <cfset auxdtprev = DateAdd( "d", 1, auxdtprev)>
+    <cfset vDiaSem = DayOfWeek(auxdtprev)>
+    <cfif vDiaSem neq 1 and vDiaSem neq 7>
+      <!--- verificar se Feriado Nacional --->
+      <cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+        SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #auxdtprev#
+      </cfquery>
+      <cfif rsFeriado.recordcount gt 0>
+        <cfset nCont = nCont - 1>
+      </cfif>
+    </cfif>
+    <!--- Verifica se final de semana  --->
+    <cfif vDiaSem eq 1 or vDiaSem eq 7>
+      <cfset nCont = nCont - 1>
+    </cfif>
+    <cfset nCont = nCont + 1>
+  </cfloop>
+<cfelse>
+  <!--- 30 dias úteis na data de previsão --->
+  <cfset nCont = 1>
+  <cfloop condition="nCont lte 30">
+    <cfset auxdtprev = DateAdd( "d", 1, auxdtprev)>
+    <cfset vDiaSem = DayOfWeek(auxdtprev)>
+    <cfif vDiaSem neq 1 and vDiaSem neq 7>
+      <!--- verificar se Feriado Nacional --->
+      <cfquery name="rsFeriado" datasource="#dsn_inspecao#">
+        SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #auxdtprev#
+      </cfquery>
+      <cfif rsFeriado.recordcount gt 0>
+        <cfset nCont = nCont - 1>
+      </cfif>
+    </cfif>
+    <!--- Verifica se final de semana  --->
+    <cfif vDiaSem eq 1 or vDiaSem eq 7>
+      <cfset nCont = nCont - 1>
+    </cfif>
+    <cfset nCont = nCont + 1>
+  </cfloop>   	
+</cfif>
 <cfquery name="qUltimoReavaliado" datasource="#dsn_inspecao#">
 	SELECT RIP_Recomendacao_Inspetor, RIP_Critica_Inspetor, RIP_Recomendacao FROM Resultado_Inspecao
 	WHERE RIP_NumInspecao = '#URL.Ninsp#' AND RIP_Recomendacao = 'R'
 </cfquery>
 <cfif isDefined("Form.acao") and "#form.acao#" eq 'cancelarReanalise'>
-		<!---Veirifica se esta Avaliacao possui algum item em reanálise --->
+		<!---Veirifica se esta Avaliação possui algum item em reanálise --->
 		<cfquery datasource="#dsn_inspecao#" name="qVerifEmReanalise">
 			SELECT RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao 
 			WHERE (RIP_Recomendacao='S' OR RIP_Recomendacao='R') and RIP_NumInspecao='#ninsp#'  
@@ -112,13 +155,13 @@
 				<cfquery name="rsRelev" datasource="#dsn_inspecao#">
 					SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
 					FROM ValorRelevancia
-					WHERE VLR_Ano = right('#FORM.Ninsp#',4))
+					WHERE VLR_Ano = right('#FORM.Ninsp#',4)
 				</cfquery
 				 ><cfset somafaltasobra = rsVerificaItem.RIP_Falta>
 				 <cfif (FORM.Nitem eq 1 and (FORM.Ngrup eq 53 or FORM.Ngrup eq 72 or FORM.Ngrup eq 214 or FORM.Ngrup eq 284))>
 					<cfset somafaltasobra = somafaltasobra + rsVerificaItem.RIP_Sobra>
 				 </cfif>
-				 <cfif somafaltasobra gt 0>
+				 <cfif somafaltasobra gte 0>
 					<cfloop query="rsRelev">
 						 <cfif rsRelev.VLR_FaixaInicial is 0 and rsRelev.VLR_FaixaFinal lte somafaltasobra>
 							<cfset fator = rsRelev.VLR_Fator>
@@ -152,7 +195,7 @@
 					<cfset ClasItem_Ponto = 'LEVE'> 
 					</cfif>	
 			</cfif>	
-			<cfif ClasItem_Ponto eq 'LEVE'	and len(trim(rsVerificaItem.RIP_REINCINSPECAO)) gt 0>
+			<cfif (len(trim(rsVerificaItem.RIP_REINCINSPECAO)) gt 0 or impactosn eq 'S') AND ClasItem_Ponto eq 'LEVE'>
 			      <cfset ClasItem_Ponto = 'MEDIANO'>
 			</cfif>				
 			<!--- fim classificacao do ponto --->	
@@ -166,12 +209,22 @@
 		
 			<!--- Inserindo dados dados na tabela Andamento --->
 			<cfset andparecer = #posarea_cod#  & " --- " & #posarea_nome#>
-			<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
-			<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
-			<cfquery datasource="#dsn_inspecao#">
-				insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
-				values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, '#hhmmss#', '#andparecer#', '#posarea_cod#')
+	
+			<cfquery name="rsExisteAND" datasource="#dsn_inspecao#">
+					select And_Unidade 
+					from Andamento 
+					where And_Unidade = '#FORM.unid#' and 
+					And_NumInspecao='#FORM.Ninsp#' and 
+					And_NumGrupo=#FORM.Ngrup# 
+					and And_NumItem = #FORM.Nitem# 
+					and And_Situacao_Resp = 0
 			</cfquery>
+			<cfif rsExisteAND.recordcount lte 0>
+				<cfquery datasource="#dsn_inspecao#">
+					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
+					values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, '000000', '#andparecer#', '#posarea_cod#')
+				</cfquery>
+			</cfif>
 			<!---Fim Insere Andamento --->
 		</cfif> 
 
@@ -182,12 +235,12 @@
 				SELECT * FROM ParecerUnidade 
 				WHERE Pos_Inspecao='#ninsp#' AND Pos_Situacao_Resp = 0
 			</cfquery>
-			<!---Veirifica se esta Avaliacao possui algum item em reanálise --->
+			<!---Veirifica se esta Avaliação possui algum item em reanálise --->
 			<cfquery datasource="#dsn_inspecao#" name="qVerifEmReanalise">
 				SELECT RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao 
 				WHERE (RIP_Recomendacao='S' OR RIP_Recomendacao='R') and RIP_NumInspecao='#ninsp#'  
 			</cfquery>
-			<!---Verifica se esta Avaliacao possui algum item nao avaliado (todos os NAO VERIFICADO e os NAO EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1) --->
+			<!---Verifica se esta Avaliação possui algum item nao avaliado (todos os NAO VERIFICADO e os NAO EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1) --->
 			<cfquery datasource="#dsn_inspecao#" name="qVerifValidados">
 				SELECT RIP_Resposta, RIP_Recomendacao,Itn_ValidacaoObrigatoria 
 				FROM Resultado_Inspecao 
@@ -210,7 +263,7 @@
 				<cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0>
 					<!---Salva a matricula do gestor na tabela Inspecao para sinalisar o gestor que liberou a verificacao --->
 					<cfquery datasource="#dsn_inspecao#">
-						UPDATE Inspecao SET INP_Situacao = 'CO', INP_UserName = '#qAcesso.Usu_Matricula#', INP_DTUltAtu = CONVERT(char, getdate(), 120)
+						UPDATE Inspecao SET INP_Situacao = 'CO', INP_UserName = '#qAcesso.Usu_Login#', INP_DTUltAtu = CONVERT(char, getdate(), 120)
 						WHERE INP_Unidade = '#FORM.unid#' and INP_NumInspecao ='#ninsp#'
 					</cfquery>
 					
@@ -229,31 +282,9 @@
 						<cfquery name="rsRelev" datasource="#dsn_inspecao#">
 							SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
 							FROM ValorRelevancia
-							WHERE VLR_Ano = right('#ninsp#',4))
-						</cfquery
-						
-						><cfset auxdtprev = CreateDate(year(now()),month(now()),day(now()))>
-						<cfset nCont = 0>
-						<cfloop condition="nCont lte 9">
-						   <cfset nCont = nCont + 1>
-						   <cfset auxdtprev = DateAdd( "d", 1, auxdtprev)>
-						   <cfset vDiaSem = DayOfWeek(auxdtprev)>
-						   <cfif vDiaSem neq 1 and vDiaSem neq 7>
-								<!--- verificar se Feriado Nacional --->
-								<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-									 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #auxdtprev#
-								</cfquery>
-								<cfif rsFeriado.recordcount gt 0>
-								   <cfset nCont = nCont - 1>
-								</cfif>
-							</cfif>
-							<!--- Verifica se final de semana  --->
-							<cfif vDiaSem eq 1 or vDiaSem eq 7>
-								<cfset nCont = nCont - 1>
-							</cfif>
-						</cfloop>					
+							WHERE VLR_Ano = right('#ninsp#',4)
+						</cfquery>
 					</cfif>
-					<!--- fim 10 (dez) dias uteis para status 14-NR --->
 
 					<!---Início -Se existirem itens em liberacao, executa a rotina para mudança do status de todos os itens
 						em liberacao para nao respondido--->
@@ -290,7 +321,7 @@
 								 <cfif (rs11.Pos_NumItem eq 1 and (rs11.Pos_NumGrupo eq 53 or rs11.Pos_NumGrupo eq 72 or rs11.Pos_NumGrupo eq 214 or rs11.Pos_NumGrupo eq 284))>
 									<cfset somafaltasobra = somafaltasobra + rsInspecaoFinal.RIP_Sobra>
 								 </cfif>
-								 <cfif somafaltasobra gt 0>
+								 <cfif somafaltasobra gte 0>
 									<cfloop query="rsRelev">
 										 <cfif rsRelev.VLR_FaixaInicial is 0 and rsRelev.VLR_FaixaFinal lte somafaltasobra>
 											<cfset fator = rsRelev.VLR_Fator>
@@ -324,7 +355,7 @@
 									<cfset ClasItem_Ponto = 'LEVE'> 
 									</cfif>	
 							</cfif>	
-							<cfif ClasItem_Ponto eq 'LEVE'	and len(trim(rsInspecaoFinal.RIP_REINCINSPECAO)) gt 0>
+							<cfif (len(trim(rsInspecaoFinal.RIP_REINCINSPECAO)) gt 0 or impactosn eq 'S') and ClasItem_Ponto eq 'LEVE'>
 								  <cfset ClasItem_Ponto = 'MEDIANO'>
 							</cfif>				
 					    <!--- fim classificacao do ponto --->							
@@ -343,36 +374,24 @@
 								, Pos_ClassificacaoPonto='#ClasItem_Ponto#'
 								WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#ninsp#' and Pos_NumGrupo = #rs11.Pos_NumGrupo# and Pos_NumItem = #rs11.Pos_NumItem# and Pos_Situacao_Resp = 11
 							</cfquery>
-							
+							<cfquery name="rs14SN" datasource="#dsn_inspecao#">
+								SELECT And_NumInspecao FROM Andamento
+								WHERE And_Unidade='#FORM.unid#' AND 
+								And_NumInspecao='#ninsp#' AND 
+								And_NumGrupo=#rs11.Pos_NumGrupo# AND 
+								And_NumItem=#rs11.Pos_NumItem# and
+								And_Situacao_Resp = 14
+							</cfquery> 	
+							<cfif rs14SN.recordcount lte 0>
+								<cfquery datasource="#dsn_inspecao#">
+									INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
+									VALUES ('#ninsp#', '#FORM.unid#', #rs11.Pos_NumGrupo#, #rs11.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '000014','#FORM.unid#')
+								</cfquery>
+							</cfif>													
 						</cfloop>
 					<!---Fim -Se existirem itens em liberacao, executa a rotina para mudança do status de todos os itens em liberacao para nao respondido --->
 				</cfif>
 			<!---Fim do processo de liberacao de todos os itens--->	
-			<!--- Início Verificacao dos registros que estilo na situacao 14(Nao Respondido) na tabela ParecerUnidade --->
-				<cfquery name="qNaoRespondido" datasource="#dsn_inspecao#">
-					SELECT Pos_Inspecao, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp FROM ParecerUnidade
-					WHERE Pos_Inspecao='#ninsp#' AND Pos_Situacao_Resp = 14
-				</cfquery>
-				
-				<cfoutput query="qNaoRespondido">
-					<cfquery name="rs14SN" datasource="#dsn_inspecao#">
-						SELECT And_NumInspecao FROM Andamento
-						WHERE And_Unidade='#qNaoRespondido.Pos_Unidade#' AND And_NumInspecao='#qNaoRespondido.Pos_Inspecao#' AND And_NumGrupo=#qNaoRespondido.Pos_NumGrupo# AND And_NumItem=#qNaoRespondido.Pos_NumItem# 
-						AND And_Situacao_Resp = 14
-					</cfquery> 
-					
-					<cfif qNaoRespondido.Pos_Situacao_Resp eq 14 and rs14SN.recordcount lte 0>
-					    <cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
-						<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
-						<cfquery datasource="#dsn_inspecao#">
-							INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-							VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#','#FORM.unid#')
-						</cfquery>
-					</cfif>
-
-				</cfoutput>
-			<!--- fim Verificaçaõ dos registros que estilo na situacao 14(Nao Respondido) na tabela ParecerUnidade --->
-				
 		<!---Fim do prcesso de liberacao da Avaliacao--->
 		
 
@@ -386,7 +405,7 @@
 			}
 			<cfoutput>	
 				<cfif qInspecaoLiberada.recordCount neq 0 or qVerifEmReanalise.recordCount neq 0>
-					alert("Reanalise cancelada!");
+					alert("Reanálise cancelada!");
 				</cfif>
 			</cfoutput>
 			window.close(); 
@@ -405,7 +424,7 @@
 				WHERE RIP_NumInspecao = '#URL.Ninsp#' and RIP_NumGrupo ='#url.Ngrup#' and RIP_NumItem ='#url.Nitem#'
 			</cfquery>
 
-			<!---Veirifica se esta Avaliacao possui algum item em reanálise --->
+			<!---Veirifica se esta Avaliação possui algum item em reanálise --->
 			<cfquery datasource="#dsn_inspecao#" name="qVerifEmReanalise">
 				SELECT RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao 
 				WHERE (RIP_Recomendacao='S' OR RIP_Recomendacao='R') and RIP_NumInspecao='#ninsp#'  
@@ -440,7 +459,7 @@
 					<cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0>
 						<!---Salva a matricula do gestor na tabela Inspecao para sinalisar o gestor que liberou a verificacao --->
 						<cfquery datasource="#dsn_inspecao#">
-							UPDATE Inspecao SET INP_Situacao ='CO', INP_UserName = '#qAcesso.Usu_Matricula#', INP_DTUltAtu = CONVERT(char, getdate(), 120)
+							UPDATE Inspecao SET INP_Situacao ='CO', INP_UserName = '#qAcesso.Usu_Login#', INP_DTUltAtu = CONVERT(char, getdate(), 120)
 							WHERE INP_NumInspecao ='#ninsp#'
 						</cfquery>
 
@@ -453,32 +472,7 @@
 							INNER JOIN Unidades ON Pos_Unidade = Und_Codigo) ON (Itn_Ano = '#right(ninsp)#' and INP_Modalidade = Itn_Modalidade and Itn_TipoUnidade = Und_TipoUnidade and Itn_NumItem = Pos_NumItem AND Itn_NumGrupo = Pos_NumGrupo) 
 							WHERE Pos_Inspecao='#ninsp#' AND Pos_Situacao_Resp = 11 and (Itn_TipoUnidade = #url.tpunid#)
 						</cfquery> 
-						
-					<!--- inicio 10 (dez) dias uteis para status 14-NR --->
-					<cfif rs11.recordcount gt 0>
-						<cfset auxdtprev = CreateDate(year(now()),month(now()),day(now()))>
-						<cfset nCont = 0>
-						<cfloop condition="nCont lte 9">
-						   <cfset nCont = nCont + 1>
-						   <cfset auxdtprev = DateAdd( "d", 1, auxdtprev)>
-						   <cfset vDiaSem = DayOfWeek(auxdtprev)>
-						   <cfif vDiaSem neq 1 and vDiaSem neq 7>
-								<!--- verificar se Feriado Nacional --->
-								<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-									 SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #auxdtprev#
-								</cfquery>
-								<cfif rsFeriado.recordcount gt 0>
-								   <cfset nCont = nCont - 1>
-								</cfif>
-							</cfif>
-							<!--- Verifica se final de semana  --->
-							<cfif vDiaSem eq 1 or vDiaSem eq 7>
-								<cfset nCont = nCont - 1>
-							</cfif>
-						</cfloop>					
-					</cfif>
-					<!--- fim 10 (dez) dias uteis para status 14-NR --->	
-										
+							
 						<!---Início -Se existirem itens em liberacao, executa a rotina para mudança do status de todos os itens
 							em liberacao para Nao respondido--->
 							<cfloop query="rs11">
@@ -508,13 +502,13 @@
 									<cfquery name="rsRelev" datasource="#dsn_inspecao#">
 										SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
 										FROM ValorRelevancia
-										WHERE VLR_Ano = right('#Ninsp#',4))
+										WHERE VLR_Ano = right('#Ninsp#',4)
 									</cfquery
 									 ><cfset somafaltasobra = rsVerificaItem.RIP_Falta>
 									 <cfif (rs11.Pos_NumItem eq 1 and (rs11.Pos_NumGrupo eq 53 or rs11.Pos_NumGrupo eq 72 or rs11.Pos_NumGrupo eq 214 or rs11.Pos_NumGrupo eq 284))>
 										<cfset somafaltasobra = somafaltasobra + rsVerificaItem.RIP_Sobra>
 									 </cfif>
-									 <cfif somafaltasobra gt 0>
+									 <cfif somafaltasobra gte 0>
 										<cfloop query="rsRelev">
 											 <cfif rsRelev.VLR_FaixaInicial is 0 and rsRelev.VLR_FaixaFinal lte somafaltasobra>
 												<cfset fator = rsRelev.VLR_Fator>
@@ -548,7 +542,7 @@
 										<cfset ClasItem_Ponto = 'LEVE'> 
 										</cfif>	
 								</cfif>	
-								<cfif ClasItem_Ponto eq 'LEVE'	and len(trim(rsVerificaItem.RIP_REINCINSPECAO)) gt 0>
+								<cfif (len(trim(rsVerificaItem.RIP_REINCINSPECAO)) gt 0 or impactosn eq 'S') and ClasItem_Ponto eq 'LEVE'>
 									  <cfset ClasItem_Ponto = 'MEDIANO'>
 								</cfif>				
 						<!--- fim classificacao do ponto --->								
@@ -563,38 +557,26 @@
 									, Pos_DtUltAtu = CONVERT(char, GETDATE(), 120) 
 									, pos_username = '#CGI.REMOTE_USER#' 
 									, Pos_Sit_Resp_Antes = #rs11.Pos_Situacao_Resp#
-									WHERE Pos_Inspecao='#ninsp#' and Pos_NumGrupo = #rs11.Pos_NumGrupo# and Pos_NumItem = #rs11.Pos_NumItem# and Pos_Situacao_Resp = 11
+									WHERE Pos_Unidade='#FORM.unid#' and Pos_Inspecao='#ninsp#' and Pos_NumGrupo = #rs11.Pos_NumGrupo# and Pos_NumItem = #rs11.Pos_NumItem# and Pos_Situacao_Resp = 11
 								</cfquery>
-								
+								<cfquery name="rs14SN" datasource="#dsn_inspecao#">
+									SELECT And_NumInspecao FROM Andamento
+									WHERE And_Unidade='#FORM.unid#' AND 
+									And_NumInspecao='#ninsp#' AND 
+									And_NumGrupo=#rs11.Pos_NumGrupo# AND 
+									And_NumItem=#rs11.Pos_NumItem# AND 
+									And_Situacao_Resp = 14
+								</cfquery> 	
+								<cfif rs14SN.recordcount lte 0>
+									<cfquery datasource="#dsn_inspecao#">
+										INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
+										VALUES ('#ninsp#', '#FORM.unid#', #rs11.Pos_NumGrupo#, #rs11.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '000014','#FORM.unid#')
+									</cfquery>
+								</cfif>													
 							</cfloop>
 						<!---Fim -Se existirem itens em liberacao, executa a rotina para mudança do status de todos os itens em liberacao para Nao respondido--->
 					</cfif>
-				<!---Fim do processo de liberacao de todos os itens--->	
-				<!--- Início Verificacao dos registros que estilo na situacao 14(Nao Respondido) na tabela ParecerUnidade --->
-					<cfquery name="qNaoRespondido" datasource="#dsn_inspecao#">
-						SELECT Pos_Inspecao, Pos_Unidade, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp FROM ParecerUnidade
-						WHERE Pos_Inspecao='#ninsp#' AND Pos_Situacao_Resp = 14
-					</cfquery>
-					
-					<cfoutput query="qNaoRespondido">
-						<cfquery name="rs14SN" datasource="#dsn_inspecao#">
-							SELECT And_NumInspecao FROM Andamento
-							WHERE And_Unidade='#qNaoRespondido.Pos_Unidade#' AND And_NumInspecao='#qNaoRespondido.Pos_Inspecao#' AND And_NumGrupo=#qNaoRespondido.Pos_NumGrupo# AND And_NumItem=#qNaoRespondido.Pos_NumItem# 
-							AND And_Situacao_Resp = 14
-						</cfquery> 
-						
-						<cfif qNaoRespondido.Pos_Situacao_Resp eq 14 and rs14SN.recordcount lte 0>
-							<cfset hhmmssdc = timeFormat(now(), "HH:mm:ssl")>
-							<cfset hhmmssdc = left(hhmmssdc,2) & mid(hhmmssdc,4,2) & mid(hhmmssdc,7,2) & mid(hhmmssdc,9,2)>
-							<cfquery datasource="#dsn_inspecao#">
-								INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-								VALUES ('#qNaoRespondido.Pos_Inspecao#', '#qNaoRespondido.Pos_Unidade#', #qNaoRespondido.Pos_NumGrupo#, #qNaoRespondido.Pos_NumItem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 14, '#hhmmssdc#','#FORM.unid#')
-							</cfquery>
-						</cfif>
-
-					</cfoutput>
-				<!--- fim Verificaçaõ dos registros que estilo na situacao 14(Nao Respondido) na tabela ParecerUnidade --->
-					
+				<!---Fim do processo de liberacao de todos os itens--->				
 			<!---Fim do prcesso de liberacao da Avaliacao--->
 
 			<script>
@@ -607,7 +589,7 @@
 				}
 				<cfoutput>	
 					<cfif qInspecaoLiberada.recordCount neq 0 or qVerifEmReanalise.recordCount neq 0>
-						alert("Reanalise validada!");
+						alert("Reanálise validada!");
 					</cfif>
 				</cfoutput>
 				
@@ -624,14 +606,14 @@
 			<!--- Update na tabela Resultado_Inspecao--->
 			<cfquery datasource="#dsn_inspecao#">
 				UPDATE Resultado_Inspecao set 
-				<cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores') >
+				<cfif ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES') >
 					RIP_Recomendacao = 'S', RIP_Recomendacao_Inspetor = '#form.recomendacao#'
 				<cfelse>
 					RIP_Critica_Inspetor='#form.respInsp#'
 				</cfif>
 				WHERE RIP_NumInspecao = '#URL.Ninsp#' and RIP_NumGrupo ='#url.Ngrup#' and RIP_NumItem ='#url.Nitem#'
 			</cfquery>
-			<cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores')>
+			<cfif ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES')>
 				<!--- Update na tabela Inspecao com sigla  NA = nao avaliada, ER = em reAvaliacao, RA = reavaliada, CO = concluida--->
 				<cfquery datasource="#dsn_inspecao#">
 					UPDATE Inspecao set INP_Situacao ='ER'
@@ -678,7 +660,7 @@
                     <cfset sdestina = '#qAcesso.Usu_Email#'>
 				</cfif>
 				<cfset myImgPath = expandPath('./')>
-				<cfset assunto = 'SNCI - AVALIACAO N�� ' & '#Num_Insp#' & ' - ' & '#trim(rsEmail.Und_Descricao)#' >
+				<cfset assunto = 'SNCI - AVALIAÇÃO NÃO ' & '#Num_Insp#' & ' - ' & '#trim(rsEmail.Und_Descricao)#' >
 				<cfset auxdr = left(URL.Ninsp,2)>
 				<cfif auxdr eq '32' or auxdr eq '04' or auxdr eq '30' or auxdr eq '70' or auxdr eq '60' or auxdr eq '34' or auxdr eq '18' or auxdr eq '12'>
 					<cfset sdestina = sdestina & ';' & 'EDIMIR@correios.com.br'>
@@ -716,8 +698,8 @@
 				if( pg == 'pt'){
 					window.opener.location.reload();
 				}	
-				<cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores')>
-					alert("Item enviado para Reanalise do Inspetor.\n\nObs.: Foi encaminhado um e-mail de aviso para a caixa postal do inspetor.");
+				<cfif ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES')>
+					alert("Item enviado para Reanálise do Inspetor.\n\nObs.: Foi encaminhado um e-mail de aviso para a caixa postal do inspetor.");
 				<cfelse>
 					alert("Resposta salva!");
 				</cfif>
@@ -799,13 +781,13 @@
 				<cfquery name="rsRelev" datasource="#dsn_inspecao#">
 					SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
 					FROM ValorRelevancia
-					WHERE VLR_Ano = right('#FORM.Ninsp#',4))
+					WHERE VLR_Ano = right('#FORM.Ninsp#',4)
 				</cfquery>
 				<cfset somafaltasobra = rsVerificaItem.RIP_Falta>
 				<cfif (FORM.Nitem eq 1 and (FORM.Ngrup eq 53 or FORM.Ngrup eq 72 or FORM.Ngrup eq 214 or FORM.Ngrup eq 284))>
 				<cfset somafaltasobra = somafaltasobra + rsVerificaItem.RIP_Sobra>
 				</cfif>
-				<cfif somafaltasobra gt 0>
+				<cfif somafaltasobra gte 0>
 					<cfloop query="rsRelev">
 							<cfif rsRelev.VLR_FaixaInicial is 0 and rsRelev.VLR_FaixaFinal lte somafaltasobra>
 							<cfset fator = rsRelev.VLR_Fator>
@@ -839,26 +821,34 @@
 					<cfset ClasItem_Ponto = 'LEVE'> 
 				</cfif>	
 			</cfif>	 	
-			<cfif ClasItem_Ponto eq 'LEVE'	and len(trim(rsVerificaItem.RIP_REINCINSPECAO)) gt 0>
+			<cfif (len(trim(rsVerificaItem.RIP_REINCINSPECAO)) gt 0 or impactosn eq 'S') and ClasItem_Ponto eq 'LEVE'>
 					<cfset ClasItem_Ponto = 'MEDIANO'>
 			</cfif>				
 			<!--- fim classificacao do ponto --->					
 			<cfquery datasource="#dsn_inspecao#">
 				INSERT INTO ParecerUnidade (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_NomeResp, Pos_Situacao, Pos_Parecer, Pos_co_ci, Pos_dtultatu, Pos_username, Pos_aval_dinsp, Pos_Situacao_Resp, Pos_Area, Pos_NomeArea, Pos_NCISEI, Pos_PontuacaoPonto, Pos_ClassificacaoPonto) 
-				VALUES ('#FORM.unid#', '#FORM.Ninsp#', #FORM.Ngrup#, #FORM.Nitem#, 
-						CONVERT(char, GETDATE(), 102), '#CGI.REMOTE_USER#', 'RE', '', 'INTRANET', CONVERT(char, GETDATE(), 120), '#CGI.REMOTE_USER#', NULL, 0,
-						'#posarea_cod#','#posarea_nome#','#rsVerificaItem.RIP_NCISEI#', #ItnPontuacao#,'#ClasItem_Ponto#')
+				VALUES ('#FORM.unid#', '#FORM.Ninsp#', #FORM.Ngrup#, #FORM.Nitem#,CONVERT(char, GETDATE(), 102), '#CGI.REMOTE_USER#', 'RE', '', 'INTRANET', CONVERT(char, GETDATE(), 120), '#CGI.REMOTE_USER#', NULL, 0,'#posarea_cod#','#posarea_nome#','#rsVerificaItem.RIP_NCISEI#', #ItnPontuacao#,'#ClasItem_Ponto#')
 			</cfquery>
 			<!---Fim Insere ParecerUnidade --->
 
 			<!--- Inserindo dados dados na tabela Andamento --->
 			<cfset andparecer = #posarea_cod#  & " --- " & #posarea_nome#>
-			<cfset hhmmss = timeFormat(now(), "HH:mm:ss")>
-			<cfset hhmmss = left(hhmmss,2) & mid(hhmmss,4,2) & mid(hhmmss,7,2)>
-			<cfquery datasource="#dsn_inspecao#">
-				insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
-				values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, '#hhmmss#', '#andparecer#', '#posarea_cod#')
+
+			<cfquery name="rsExisteAND" datasource="#dsn_inspecao#">
+					select And_Unidade 
+					from Andamento 
+					where And_Unidade = '#FORM.unid#' and 
+					And_NumInspecao='#FORM.Ninsp#' and 
+					And_NumGrupo=#FORM.Ngrup# 
+					and And_NumItem = #FORM.Nitem# 
+					and And_Situacao_Resp = 0
 			</cfquery>
+			<cfif rsExisteAND.recordcount lte 0>
+				<cfquery datasource="#dsn_inspecao#">
+					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
+					values ('#FORM.Ninsp#', '#FORM.unid#', #FORM.Ngrup#, #FORM.Nitem#, convert(char, getdate(), 102), '#CGI.REMOTE_USER#', 0, '000000', '#andparecer#', '#posarea_cod#')
+				</cfquery>
+			</cfif>
 			<!---Fim Insere Andamento --->
 		</cfif> 
 		<!---  Se o tem era uma reanálise e nao existirem mais itens em reanálise, a finalizacao da verificacao é realizada nesta página
@@ -866,7 +856,7 @@
 		<cfif rsVerifItensEmReanalise.recordCount eq 0>
 				<!--- UPDATE em Inspecao --->
 				<cfquery datasource="#dsn_inspecao#" ><!---Avaliacoes NA = nao avaliadas, ER = em reAvaliacao, RA =reavaliado, CO = concluida---> 
-					UPDATE Inspecao SET INP_Situacao = 'RA', INP_DtEncerramento =  CONVERT(char, GETDATE(), 102), INP_DtUltAtu =  CONVERT(char, GETDATE(), 120), INP_UserName ='#qAcesso.Usu_Matricula#'
+					UPDATE Inspecao SET INP_Situacao = 'RA', INP_DtEncerramento =  CONVERT(char, GETDATE(), 102), INP_DtUltAtu =  CONVERT(char, GETDATE(), 120), INP_UserName ='#qAcesso.Usu_Login#'
 					WHERE INP_Unidade='#FORM.unid#' AND INP_NumInspecao='#FORM.Ninsp#' 
 				</cfquery>
 				<!---Fim UPDATE em Inspecao
@@ -893,7 +883,7 @@
 <html lang="pt-BR">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title><cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores')>SNCI - ENVIA O ITEM PARA REANÁLISE PELO INSPETOR<CFELSE>SNCI - RECOMENDAÁE�ES AO INSPETOR</CFIF></title>
+<title><cfif ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES')>SNCI - ENVIA O ITEM PARA REANÁLISE PELO INSPETOR<CFELSE>SNCI - RECOMENDAÁE�ES AO INSPETOR</CFIF></title>
 <link rel="stylesheet" type="text/css" href="view.css" media="all">
 
 
@@ -912,16 +902,16 @@
   function validarform(){
 	var frm = document.forms.form1;
     <cfoutput>
-	<cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores')>
+	<cfif ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES')>
 		if(frm.recomendacao.value == ''){
-			alert('O campo "RECOMENDAÁE�ES AO INSPETOR" nao pode estar vazio.');
+			alert('O campo "RECOMENDAÇÕES AO INSPETOR" não pode estar vazio.');
 			frm.recomendacao.focus();
 			return false;
 		}
 
 	<cfelse>
 	    if(frm.respInsp.value == ''){
-			alert('O campo "RESPOSTA DO INSPETOR" nao pode estar vazio.');
+			alert('O campo "RESPOSTA DO INSPETOR" não pode estar vazio.');
 			frm.respInsp.focus();
 			return false;
 		}
@@ -935,12 +925,12 @@
 	var frm = document.forms.form1;
     
 	if(frm.respInsp.value == ''){
-		alert('O campo "RESPOSTA DO INSPETOR" nao pode estar vazio.');
+		alert('O campo "RESPOSTA DO INSPETOR" não pode estar vazio.');
 		frm.respInsp.focus();
 		return false;
 	}
 
-	if(confirm('Deseja salvar a sua resposta e devolver o item ao Gestor sem alteracoes?')){
+	if(confirm('Deseja salvar a sua resposta e devolver o item ao Gestor sem alterações?')){
 		document.form1.acao.value='respSemAlteracao';
 		return true;
 	}else{
@@ -948,17 +938,13 @@
 	}
 
   }
-
-
-
-
 </script>
 
 </head>
 
 	<!---Verifica se esta Avaliacao possui algum item nao avaliado (todos os NAO VERIFICADO e os NAO EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1) --->
 <cfquery datasource="#dsn_inspecao#" name="rsVerifValidados">
-	SELECT RIP_Resposta, RIP_Recomendacao,Itn_ValidacaoObrigatoria 
+	SELECT RIP_Resposta, RIP_Recomendacao,Itn_ValidacaoObrigatoria
 	FROM Resultado_Inspecao
 	INNER JOIN Unidades ON 
 	RIP_Unidade = Und_Codigo
@@ -988,7 +974,7 @@
 			</div>
 			<div  style="background:#0a3865;border:1px solid #fff;font-family:Verdana, Arial, Helvetica, sans-serif">
 		    	<label style="color:white"><strong>Parecer Andamento:</strong></label>
-				<textarea  <cfif "#qAcesso.Usu_GrupoAcesso#" eq "inspetores">readonly</cfif> id="recomendacao" name="recomendacao" 
+				<textarea  <cfif "#grpacesso#" eq "inspetores">readonly</cfif> id="recomendacao" name="recomendacao" 
 				style="background:#fff;color:black;text-align:justify;" cols="85" 
 				rows="<cfif '#trim(qOrientacao.RIP_Recomendacao_Inspetor)#' neq ''>6<cfelse>14</cfif>" 
 				wrap="VIRTUAL" class="form"><cfoutput>#qOrientacao.RIP_Recomendacao_Inspetor#</cfoutput></textarea>
@@ -997,7 +983,7 @@
 
 			<div  style="background:#0a3865;border:1px solid #fff;font-family:Verdana, Arial, Helvetica, sans-serif">
 		    	<label style="color:white"><strong>Recomenda&ccedil;&otilde;es ao Gestor:</strong></label>
-				<textarea  <cfif "#qAcesso.Usu_GrupoAcesso#" eq "inspetores">readonly</cfif> id="recomendacao" name="recomendacao" 
+				<textarea  <cfif "#grpacesso#" eq "inspetores">readonly</cfif> id="recomendacao" name="recomendacao" 
 				style="background:#fff;color:black;text-align:justify;" cols="85" 
 				rows="<cfif '#trim(qOrientacao.RIP_Recomendacao_Inspetor)#' neq ''>6<cfelse>14</cfif>" 
 				wrap="VIRTUAL" class="form"><cfoutput>#qOrientacao.RIP_Recomendacao_Inspetor#</cfoutput></textarea>
@@ -1007,15 +993,15 @@
             <cfif '#trim(qOrientacao.RIP_Recomendacao_Inspetor)#' neq ''>
 				<div  style="margin-top:20px;background:#0a3865;border:1px solid #fff;font-family:Verdana, Arial, Helvetica, sans-serif">
 					<label style="color:white;margin-top:40px"><strong>Resposta do Gestor:</strong></label>
-					<textarea  <cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores')>readonly</cfif> id="respInsp" name="respInsp" 
+					<textarea  <cfif ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES')>readonly</cfif> id="respInsp" name="respInsp" 
 					style="background:#fff;color:black;text-align:justify;" cols="85" rows="6" wrap="VIRTUAL" class="form"><cfoutput>#qOrientacao.RIP_Critica_Inspetor#</cfoutput></textarea>
 				</div>
             </cfif>
 
-			<cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores') and '#qOrientacao.RIP_Recomendacao#' eq 'R'>
+			<cfif ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES') and '#qOrientacao.RIP_Recomendacao#' eq 'R'>
 				<cfif qInspecaoLiberada.recordCount eq 0 and rsVerifValidados.recordCount eq 0 and qVerifEmReanalise.recordCount eq 1 >
 					<input type="submit" class="botao" 
-					onclick="if(window.confirm('Atencao! Após a validacao desta reanálise, esta Avaliacao será liberada e nao será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME. NAO EXECUTA e NAO VERIFICADO já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisao dos itens.')){document.form1.acao.value='validar'}" style="background-color:blue;color:#fff;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
+					onclick="if(window.confirm('Atenção! Após a validação desta reanálise, esta Avaliacao será liberada e nao será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME. NAO EXECUTA e NAO VERIFICADO já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisao dos itens.')){document.form1.acao.value='validar'}" style="background-color:blue;color:#fff;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
 			        value="Validar Reanalise">	
 				<cfelse>
 					<input type="submit" class="botao" onClick="document.form1.acao.value='validar'" style="background-color:blue;color:#fff;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
@@ -1023,14 +1009,14 @@
 				</cfif>
             </cfif>
 
-            <cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores') and not isDefined('url.cancelar')>
+            <cfif ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES') and not isDefined('url.cancelar')>
 		        	<input type="submit" class="botao" onClick="return validarform();" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
 			         value="Enviar para Reanalise do Inspetor"></input>	
 			</cfif>
 			
-			<cfif ('#qAcesso.Usu_GrupoAcesso#' eq 'gestores' or '#qAcesso.Usu_GrupoAcesso#' eq 'desenvolvedores') and isDefined('url.cancelar') and '#url.cancelar#' eq 's'>
+			<cfif ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES') and isDefined('url.cancelar') and '#url.cancelar#' eq 's'>
 					<cfif qInspecaoLiberada.recordCount eq 0 and rsVerifValidados.recordCount eq 0 and qVerifEmReanalise.recordCount eq 1 and '#trim(qOrientacao.RIP_Resposta)#' neq 'N'>
-						<input type="submit" class="botao"	onclick="if(window.confirm('Atencao! Após o cancelamento desta reanálise, esta Avaliacao será liberada e nao será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME. NAO EXECUTA e NAO VERIFICADO já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisao dos itens.')){document.form1.acao.value='cancelarReanalise'}else{window.close();}" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer"  
+						<input type="submit" class="botao"	onclick="if(window.confirm('Atenção! Após o cancelamento desta reanálise, esta Avaliação será liberada e nao será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME. NAO EXECUTA e NAO VERIFICADO já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisao dos itens.')){document.form1.acao.value='cancelarReanalise'}else{window.close();}" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer"  
 						value="Cancelar Reanalise">	
 					<cfelse>
 						<input type="submit" class="botao" onClick="document.form1.acao.value='cancelarReanalise'" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
@@ -1039,7 +1025,7 @@
 			</cfif>
 			
 	
-			<cfif '#qAcesso.Usu_GrupoAcesso#' eq 'inspetores'>	
+			<cfif '#grpacesso#' eq 'INSPETORES'>	
 
 			    	<button type="submit" class="botao" onClick="return validarform();" 
 				 	style="white-space:normal;width:195px;height:45px;padding:2px;text-align:center;margin-top:10px;cursor:pointer;background-color:blue;color:#fff" >

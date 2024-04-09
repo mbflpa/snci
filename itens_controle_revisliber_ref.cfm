@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -5,7 +6,7 @@
 
 <CFSET gestorMaster = TRIM('GESTORMASTER')/>
 <cfquery name="qUsuarioGestorMaster" datasource="#dsn_inspecao#">
-  SELECT DISTINCT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#' and Usu_GrupoAcesso = '#gestorMaster#'
+  SELECT DISTINCT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#' and Usu_GrupoAcesso = '#GESTORMASTER#'
 </cfquery>
 <cfquery name="qSE" datasource="#dsn_inspecao#">
  SELECT Dir_Codigo, Dir_Sigla
@@ -54,14 +55,14 @@ function valida_form() {
 	    }
 		
 		if (frm.SE.value==''){
-		  alert('Informar a Superintendência!');
+		  alert('Informar a SuperintendÃªncia!');
 		  frm.SE.focus();
 		  return false;
 		}
   }
    if (frm.ckTipo.value=='inspecao'){
 		if (frm.txtNum_Inspecao.value==''){
-		  alert('Informar o Nº do Relatório');
+		  alert('Informar o NÂº do RelatÃ³rio');
 		  frm.txtNum_Inspecao.focus();
 		  return false;
 		}
@@ -73,7 +74,7 @@ function valida_form() {
 		  return false;
 		}
 		if (frm.StatusSE.value==''){
-		  alert('Selecionar a Superintendência!');
+		  alert('Selecionar a SuperintendÃªncia!');
 		  frm.StatusSE.focus();
 		  return false;
 		}
@@ -131,7 +132,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia inválido!');
+		      alert('Valor para o dia invÃ¡lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -141,7 +142,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o Mês inválido!');
+		      alert('Valor para o MÃª invÃ¡lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -152,10 +153,10 @@ function Mascara_Data(data)
 	}
 }
 //=============================
-//permite digitaçao apenas de valores numéricos
+//permite digitaï¿½ao apenas de valores numï¿½ricos
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitaï¿½ï¿½o das teclas numï¿½ricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 	
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -177,7 +178,7 @@ var tecla = window.event.keyCode;
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 	<form action="itens_controle_revisliber_listarpontos.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return valida_form()">
 	  <table width="95%" align="center">
         <tr>
@@ -201,13 +202,13 @@ var tecla = window.event.keyCode;
         <tr>
           <td width="2%" class="exibir">&nbsp;</td>
           <td colspan="2">
-          <input name="ckTipo" type="radio" onClick="document.frmObjeto.ckTipo.value='periodo';desabilita_campos(1)" value="periodo" checked>          <span class="exibir"><strong>Per&iacute;odo/Superintendência</strong></span></td>
+          <input name="ckTipo" type="radio" onClick="document.frmObjeto.ckTipo.value='periodo';desabilita_campos(1)" value="periodo" checked>          <span class="exibir"><strong>Per&iacute;odo/Superintendï¿½ncia</strong></span></td>
           <td colspan="2"><div align="left"><strong>
             <input name="ckTipo" type="radio" value="inspecao" onClick="document.frmObjeto.ckTipo.value='inspecao';desabilita_campos(2)">
-          </strong><strong class="exibir">N&uacute;mero da Relat&oacute;rio</strong></div></td>
+          </strong><strong class="exibir">NÃºmero da AvaliaÃ§Ã£o</strong></div></td>
           <td colspan="2" class="exibir"><div align="left"><strong>          
           <input name="ckTipo" type="radio" value="status" onClick="document.frmObjeto.ckTipo.value='status';desabilita_campos(3)">          
-          Por Status/<strong>Superintend&ecirc;ncia</strong></strong></div></td>
+          Por Status/<strong>SuperintendÃªncia</strong></strong></div></td>
         </tr>
         <tr>
           <td colspan="7">&nbsp;</td>
@@ -217,7 +218,7 @@ var tecla = window.event.keyCode;
           <td width="13%"><strong><span class="exibir">Data Inicial:</span></strong><strong></strong></td>
           <td width="20%"><strong class="titulo1"><input name="dtinic" type="text" class="form" tabindex="1" id="dtinic" size="14" maxlength="10"  onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" >
 </strong></td>
-          <td width="7%"><strong><span class="exibir"> N&uacute;mero:</span></strong></td>
+          <td width="7%"><strong><span class="exibir"> NÃºmero:</span></strong></td>
           <td width="19%"><input name="txtNum_Inspecao" type="text" size="14" maxlength="10" tabindex="3" class="form" onKeyPress="numericos()"></td>
           <td width="9%" class="exibir"><strong>Status: </strong>	      </td>
           <td width="30%" colspan="2" class="exibir"><select name="selStatus" class="form">
@@ -240,7 +241,7 @@ var tecla = window.event.keyCode;
         </tr>
         <tr>
           <td>&nbsp;</td>
-          <td><strong><span class="exibir">Superintend&ecirc;ncia:</span></strong>            </td>
+          <td><strong><span class="exibir">SuperintendÃªncia:</span></strong>            </td>
           <td><select name="SE" class="form" tabindex="3">
 		  <option selected="selected" value="Todas">Todas</option>
 <!---             <option selected="selected" value="">---</option> --->
@@ -249,7 +250,7 @@ var tecla = window.event.keyCode;
             </cfoutput>
           </select></td>
           <td colspan="2">&nbsp;</td>
-          <td><strong><span class="exibir">Superintend&ecirc;ncia:</span></strong></td>
+          <td><strong><span class="exibir">SuperintendÃªncia:</span></strong></td>
           <td><select name="StatusSE" class="form" id="StatusSE">
 		  <option selected="selected" value="Todas">Todas</option>
 <!---             <option selected="selected" value="">---</option> --->
