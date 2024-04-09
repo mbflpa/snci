@@ -81,7 +81,7 @@
 						
 						<ul class="nav nav-tabs" id="custom-tabs-one-tabAcomp" role="tablist" style="font-size:14px;">
 
-							<li class="nav-item" style="text-align: center;font-size: 28px;">
+							<li class="nav-item" style="text-align: center;f">
 								<a  class="nav-link  active" id="custom-tabs-one-DGCI_ECT-tab"   data-toggle="pill" href="#custom-tabs-one-DGCI_ECT" role="tab" aria-controls="custom-tabs-one-DGCI_ECT" aria-selected="true">DGCI ECT</a>
 							</li>
 
