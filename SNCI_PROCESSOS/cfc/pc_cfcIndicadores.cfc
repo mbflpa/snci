@@ -5050,30 +5050,7 @@
 	</cffunction>
 
 
-	<cffunction name="consultaIndicadorPRCI_diario_paraTbResumo"   access="remote" hint="gera a consulta para página de indicadores - acompanhamento mensal para a tabela de resumo com os órgaos responsáveis subordinados ao órgão avaliado.">
-		<cfargument name="ano" type="string" required="true" />
-		<cfargument name="mes" type="string" required="true" />
-		
-    	
-		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
-
-
-		<cfquery name="consultaPRCImensal" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT 
-
-			FROM pc_indicadores_dados
-			INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoResp
-			INNER JOIN pc_orgaos as pc_orgaosSubordinador on pc_orgaosSubordinador.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoSubordinador
-			INNER JOIN pc_orgaos as pc_orgaoAvaliado on pc_orgaoAvaliado.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoAvaliado
-			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-				AND pc_indDados_numIndicador = 1
-				AND pc_indDados_mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-      	</cfquery>
-
-		<cfreturn #consultaPRCImensal#>
-		
-       
-	</cffunction>
+	
 
 
 	<cffunction name="tabResumoPRCIorgaosResp_mensal" access="remote" returntype="string" hint="cria tabela resumo com as informações dos resultados do PRCI dos órgãos subordinadores">
