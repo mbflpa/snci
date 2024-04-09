@@ -272,9 +272,9 @@
 
 <script>
 	// Redirecionar para a página no Edge se estiver no IE	
-	if (window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-		// Se estiver no modo de compatibilidade do IE, redirecione para a página no Edge
-		window.location.href = "microsoft-edge:http://homologacaope/index.cfm";
-	}
+	// if (window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+	// 	// Se estiver no modo de compatibilidade do IE, redirecione para a página no Edge
+	// 	window.location.href = "microsoft-edge:http://homologacaope/index.cfm";
+	// }
 
 </script>
