@@ -278,9 +278,11 @@
 
 		// Constrói a URL de destino
 		var targetUrl = "microsoft-edge:http://" + currentHost + currentPath;
-
+        
 		if (window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-				window.location.href = targetUrl;
+			// Se estiver no modo de compatibilidade do IE, redirecione para a página no Edge
+			window.open(targetUrl, "_blank");
+			window.close();
 		}
 	}
 
