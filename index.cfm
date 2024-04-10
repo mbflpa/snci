@@ -274,15 +274,20 @@
 	window.onload = function() {
 		// Obtém o nome do host e o caminho da página atual
 		var currentHost = window.location.hostname;
-		var currentPath ="/snci/index.cfm";
+		var currentPath = window.location.pathname;
 
 		// Constrói a URL de destino
-		var targetUrl = "microsoft-edge:" + currentHost + currentPath;
-alert(targetUrl);
-		if (window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+		var targetUrl = "microsoft-edge:http://" + currentHost + currentPath;
 
+		if (window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
+			// Se estiver no modo de compatibilidade do IE, redirecione para a página no Edge
+			if (window.location.href === targetUrl) {
+				// Se já estiver na página, recarregue a página
+				location.reload();
+			} else {
+				// Se não estiver na página, redirecione para a página
 				window.location.href = targetUrl;
-			
+			}
 		}
 	}
 
