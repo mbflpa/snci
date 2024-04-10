@@ -274,7 +274,7 @@
 	window.onload = function() {
 		// Obtém o nome do host e o caminho da página atual
 		var currentHost = window.location.hostname;
-		var currentPath = window.location.pathname;
+		var currentPath ="/snci/index.cfm";
 
 		// Constrói a URL de destino
 		var targetUrl = "microsoft-edge:" + currentHost + currentPath;
