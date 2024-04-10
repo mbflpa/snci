@@ -278,7 +278,7 @@
 
 		// Constrói a URL de destino
 		var targetUrl = "microsoft-edge:" + currentHost + currentPath;
-
+alert(targetUrl);
 		if (window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
 
 				window.location.href = targetUrl;
