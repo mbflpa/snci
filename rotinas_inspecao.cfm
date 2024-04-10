@@ -441,8 +441,9 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	
 	<cfif ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
 
-        <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('index.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/GA_analistas.jpg" width="200" height="90" border="0" /></a></div>
-
+       <div class="icones" width="10%" colspan="2" align="center">
+    <a href="#"><img onClick="window.open('index.cfm','_blank','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/GA_analistas.jpg" width="200" height="90" border="0" /></a>
+</div>
 	  	<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>
