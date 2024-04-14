@@ -76,11 +76,17 @@
 
 				<div id="divIndicadorDGCI" ></div>
 
+				<div id="divTabPRCI" ></div>
+				<div id="divTabSLNC" ></div>
+
 
 				<div id="divIndicadorPRCI" ></div>
 					
 
 				<div id="divIndicadorSLNC" ></div>
+
+				
+
 
 				
 			</div>
@@ -260,6 +266,61 @@
 							
 					}
 				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabResumoPRCIorgaosResp_mensal",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divTabPRCI').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+				
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabResumoSLNCorgaosResp_mensal",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divTabSLNC').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+
+
 
 					
 			}, 1000);

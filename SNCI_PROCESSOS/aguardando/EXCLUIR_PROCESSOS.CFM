@@ -1,170 +1,102 @@
 
 <cfprocessingdirective pageencoding = "utf-8"> 
-<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
-		SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
-
-		union
-
-		SELECT  pc_orgaos2.pc_org_mcu
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
-
-		union
-
-		select pc_orgaos.pc_org_mcu AS mcuHerdado
-		from pc_orgaos
-		LEFT JOIN pc_orgaos_heranca ON pc_orgHerancaMcuDe = pc_org_mcu
-		where pc_orgaos.pc_org_mcu_subord_tec in(SELECT  pc_orgaos2.pc_org_mcu
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
-	</cfquery>
-
-	<cfquery dbtype="query" name="rsHeranca"> 
-		SELECT mcuHerdado FROM rsHerancaUnion WHERE not mcuHerdado is null
-	</cfquery>
-
-	<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
-<cfset ano = 2023>
-<cfset mes = 12>
+<cfset ano = 2024>
+<cfset mes = 1>
 
 <cfset dataInicial = createODBCDate(createDateTime(ano, mes, 1, 0, 0, 0))>
 <cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(ano, mes, 1, 0, 0, 0))))>
 	
-
-<cfquery name="rs_slnc" datasource="#application.dsn_processos#" timeout="120">
-	WITH slnc_subconsulta AS (	
-		SELECT
-			orgaoResp.pc_org_sigla as orgaoResp,
-			orgaoResp.pc_org_mcu as orgaoRespMCU,
-			Count(pc_aval_posic_id) as totalSolucionados,
-			0 as totalTratamento
-		FROM (
-			SELECT
-				pc_aval_posic_id,
-				pc_aval_posic_num_orientacao,
-				pc_aval_posic_status,
-				pc_aval_posic_num_orgaoResp,
-				pc_aval_posic_datahora,
-				pc_aval_posic_dataPrevistaResp,
-				pc_aval_posic_enviado,
-				pc_aval_posic_num_orgao,
-				ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
-			FROM
-				pc_avaliacao_posicionamentos
-			WHERE 
-				pc_aval_posic_enviado = 1
-				AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-
-		) AS ranked_posicionamentos
-		LEFT JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
-		INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
-		INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
-		INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
-		INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
-		INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
-		INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
-		WHERE
-			ranked_posicionamentos.row_num = 1
-			AND pc_aval_posic_status IN (6)
-			AND pc_aval_posic_enviado = 1
-			AND (pc_aval_posic_num_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-				OR pc_aval_posic_num_orgaoResp IN (
-					SELECT pc_orgaos.pc_org_mcu
-					FROM pc_orgaos
-					WHERE (
-						pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-						OR pc_org_mcu_subord_tec IN (
-							SELECT pc_orgaos.pc_org_mcu
-							FROM pc_orgaos
-							WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-						)
-					)
-				)
-				<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
-			) 
-			AND pc_aval_posic_datahora
-			BETWEEN <cfqueryparam value="#dataInicial#" cfsqltype="cf_sql_date"> AND <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-			GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu	
-		UNION
-
-		SELECT
-			orgaoResp.pc_org_sigla as orgaoResp,
-			orgaoResp.pc_org_mcu as orgaoRespMCU,
-			0 as totalSolucionados,
-			Count(pc_aval_posic_id) as totalTratamento
-		FROM (
-			SELECT
-				pc_aval_posic_id,
-				pc_aval_posic_num_orientacao,
-				pc_aval_posic_status,
-				pc_aval_posic_num_orgaoResp,
-				pc_aval_posic_datahora,
-				pc_aval_posic_dataPrevistaResp,
-				pc_aval_posic_enviado,
-				pc_aval_posic_num_orgao,
-				ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
-			FROM
-				pc_avaliacao_posicionamentos
-			WHERE 
-				pc_aval_posic_enviado = 1
-				AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-
-		) AS ranked_posicionamentos
-		INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
-		INNER JOIN pc_orgaos as orgaoDaAcao ON ranked_posicionamentos.pc_aval_posic_num_orgao = orgaoDaAcao.pc_org_mcu
-		INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
-		INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
-		INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
-		INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
-		INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
-		WHERE
-			ranked_posicionamentos.row_num = 1
-			AND pc_aval_posic_status IN (5)
-			AND pc_aval_posic_enviado = 1
-			AND (
-				pc_aval_posic_num_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-				OR pc_aval_posic_num_orgaoResp IN (
-					SELECT pc_orgaos.pc_org_mcu
-					FROM pc_orgaos
-					WHERE (
-						pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-						OR pc_org_mcu_subord_tec IN (
-							SELECT pc_orgaos.pc_org_mcu
-							FROM pc_orgaos
-							WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-						)
-					)
-				)
-				<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
-			) 
-			AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-		GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu
-	)
-	SELECT
-		orgaoResp,
-		orgaoRespMCU,
-		SUM(totalSolucionados) as totalSolucionados,
-		SUM(totalTratamento) as totalTratamento
-	FROM
-		slnc_subconsulta
-	GROUP BY orgaoResp, orgaoRespMCU
-			
+<cfquery name="consulta_PRCI_TIDP_TGI_mensal" datasource="#application.dsn_processos#" timeout="120">
+    SELECT 
+        pc_indOrgao_mcuOrgao as mcuOrgaoResp,
+        pc_orgaos.pc_org_sigla as siglaOrgaoResp,
+        MAX(IIF(pc_indOrgao_numIndicador = 4, pc_indOrgao_resultadoMes, 0)) as TIDP,
+        MAX(IIF(pc_indOrgao_numIndicador = 5, pc_indOrgao_resultadoMes, 0)) as TGI,
+        MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, 0)) as PRCI
+    FROM 
+        pc_indicadores_porOrgao
+    INNER JOIN 
+        pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
+    WHERE 
+        pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+        AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+        AND pc_indOrgao_numIndicador IN(1,4,5)
+        AND pc_indOrgao_mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+		AND pc_indOrgao_paraOrgaoSubordinador = 0
+    GROUP BY 
+        pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
 </cfquery>
+					
 
-	<cfdump var="#rs_slnc#">
+	<!-- tabela resumo -->
+		<cfif consulta_PRCI_TIDP_TGI_mensal.RECORDCOUNT neq 0>
+			<div id="divTabResumoPRCIorgaos" class="table-responsive">
+				<table id="tabResumoPRCIorgaos" class="table table-bordered table-striped text-nowrap " style="width:350px; cursor:pointer">
+					<cfoutput>
+						
+						<thead class="bg-gradient-warning" style="text-align: center;">
+							<tr style="font-size:14px">
+								<th colspan="6" style="padding:5px">PRCI - <span>#monthAsString(mes)#/#ano#</span></th>
+							</tr>
+							<tr style="font-size:14px">
+								<th >Órgão</th>
+								<th >TIDP</th>
+								<th >TGI</th>
+								<th >PRCI</th>
+								<th >Meta</th>
+								<th >Resultado</th>
+							</tr>
+						</thead>
+						<tbody>
+							<cfoutput>
+								<cfloop query="consulta_PRCI_TIDP_TGI_mensal"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
+
+									<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
+										SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+										WHERE pc_indMeta_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_numIndicador = 1
+												AND pc_indMeta_mcuOrgao = '#mcuOrgaoResp#'
+									</cfquery>
+									
+									<!--- Adiciona cada linha à tabela --->
+									<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+										<td>#siglaOrgaoResp# (#mcuOrgaoResp#)</td>
+										<td>#NumberFormat(TIDP,0)#</td>
+										<td>#NumberFormat(TGI,0)#</td>
+										<td><strong>#NumberFormat(ROUND(PRCI*10)/10,0.0)#%</strong></td>
+										<cfset metaPRCIorgao = 0>
+										<cfif rsMetaPRCI.pc_indMeta_meta neq ''>
+											<cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
+										</cfif>
+										<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
+											<td>sem meta</td>
+										<cfelse>	
+											<td><strong>#metaPRCIorgao#%</strong></td>
+										</cfif>
+										<cfset resultMesEmRelacaoMeta = 0>
+										<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+									</tr>
+								</cfloop>
+							</cfoutput>
+						</tbody>
+						<tfoot >
+							<tr>
+								<th colspan="6" style="font-weight: normal; font-size: smaller;">
+									<li>TIDP = Total de orientações dentro do prazo (status “Não respondido” e “Tratamento”); </li>
+									<li>TGI  = Total Geral de orientações (status "Respondido", “Não Respondido”, “Tratamento” e “Pendente”); </li>
+									<li>PRCI = Atendimento ao Prazo de Resposta = (TIDP/TGI)x100.</li>
+									Obs.: Se uma determinada gerência não estiver representada na tabela, isso indica que não houve orientações com o status necessário para a computação do indicador em questão.
+								</th>
+							</tr>
+						</tfoot>
+					</cfoutput>
+				</table>
+			</div>
+									
+
+
+		</cfif>
 
 
 

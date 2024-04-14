@@ -429,7 +429,7 @@
 		
 		
 		<cfloop query="rs_dados_prci">
-			<cfquery name="mcuOrgaoIndicador" datasource="#application.dsn_processos#" timeout="120">
+			<cfquery name="mcuOrgaoSubordinador" datasource="#application.dsn_processos#" timeout="120">
 				WITH OrgHierarchy AS (
 									SELECT pc_org_mcu, pc_org_sigla, pc_org_mcu_subord_tec, pc_org_status, pc_org_orgaoAvaliado, 1 AS Level
 									FROM pc_orgaos
@@ -463,48 +463,49 @@
 				<cfset matricula = application.rsUsuarioParametros.pc_usu_matricula>
 			</cfif>
 
-
-			<cfquery datasource="#application.dsn_processos#">
-				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
-												,pc_indDados_numIndicador
-												,pc_indDados_matriculaGeracao
-												,pc_indDados_mcuOrgaoSubordinador
-												,pc_indDados_numPosic
-												,pc_indDados_mcuOrgaoAvaliado
-												,pc_indDados_mcuOrgaoResp
-												,pc_indDados_numProcesso
-												,pc_indDados_numItem
-												,pc_indDados_numOrientacao
-												,pc_indDados_dataPrevista
-												,pc_indDados_dataStatus
-												,pc_indDados_status
-												,pc_indDados_orientacaoDistribuida
-												,pc_indDados_descricaoStatus
-												,pc_indDados_prazo
-												,pc_indDados_mcuOrgaoPosicEcontInterno)
-				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-					,1
-					,<cfqueryparam value="#matricula#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#mcuOrgaoIndicador.pc_org_mcu#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_prci.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#rs_dados_prci.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_prci.orgaoResp#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_prci.numProcessoSNCI#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_prci.item#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_prci.orientacao#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#rs_dados_prci.dataPrevista#" cfsqltype="cf_sql_date">
-					,<cfqueryparam value="#rs_dados_prci.dataPosicao#" cfsqltype="cf_sql_date">
-					,<cfqueryparam value="#rs_dados_prci.pc_aval_posic_status#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
-					,<cfqueryparam value="#rs_dados_prci.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_prci.Prazo#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#ehControleInteno#" cfsqltype="cf_sql_bit">
-				)
-			</cfquery>
+			<cfif mcuOrgaoSubordinador.pc_org_mcu  neq "">
+				<cfquery datasource="#application.dsn_processos#">
+					INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
+													,pc_indDados_numIndicador
+													,pc_indDados_matriculaGeracao
+													,pc_indDados_mcuOrgaoSubordinador
+													,pc_indDados_numPosic
+													,pc_indDados_mcuOrgaoAvaliado
+													,pc_indDados_mcuOrgaoResp
+													,pc_indDados_numProcesso
+													,pc_indDados_numItem
+													,pc_indDados_numOrientacao
+													,pc_indDados_dataPrevista
+													,pc_indDados_dataStatus
+													,pc_indDados_status
+													,pc_indDados_orientacaoDistribuida
+													,pc_indDados_descricaoStatus
+													,pc_indDados_prazo
+													,pc_indDados_mcuOrgaoPosicEcontInterno)
+					VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+						,1
+						,<cfqueryparam value="#matricula#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#mcuOrgaoSubordinador.pc_org_mcu#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_prci.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
+						,<cfqueryparam value="#rs_dados_prci.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_prci.orgaoResp#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_prci.numProcessoSNCI#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_prci.item#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_prci.orientacao#" cfsqltype="cf_sql_integer">
+						,<cfqueryparam value="#rs_dados_prci.dataPrevista#" cfsqltype="cf_sql_date">
+						,<cfqueryparam value="#rs_dados_prci.dataPosicao#" cfsqltype="cf_sql_date">
+						,<cfqueryparam value="#rs_dados_prci.pc_aval_posic_status#" cfsqltype="cf_sql_integer">
+						,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
+						,<cfqueryparam value="#rs_dados_prci.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_prci.Prazo#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#ehControleInteno#" cfsqltype="cf_sql_bit">
+					)
+				</cfquery>
+			</cfif>
 		</cfloop>
 
 		<cfloop query="rs_dados_slnc">
-			<cfquery name="mcuOrgaoIndicador" datasource="#application.dsn_processos#" timeout="120">
+			<cfquery name="mcuOrgaoSubordinador" datasource="#application.dsn_processos#" timeout="120">
 				WITH OrgHierarchy AS (
 									SELECT pc_org_mcu, pc_org_sigla, pc_org_mcu_subord_tec, pc_org_status, pc_org_orgaoAvaliado, 1 AS Level
 									FROM pc_orgaos
@@ -531,56 +532,59 @@
 			<cfelse>
 				<cfset ehControleInteno = 1>
 			</cfif>
-
-			<cfquery datasource="#application.dsn_processos#">
-				INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
-												,pc_indDados_numIndicador
-												,pc_indDados_matriculaGeracao
-												,pc_indDados_mcuOrgaoSubordinador
-												,pc_indDados_numPosic
-												,pc_indDados_mcuOrgaoAvaliado
-												,pc_indDados_mcuOrgaoResp
-												,pc_indDados_numProcesso
-												,pc_indDados_numItem
-												,pc_indDados_numOrientacao
-												,pc_indDados_dataPrevista
-												,pc_indDados_dataStatus
-												,pc_indDados_status
-												,pc_indDados_orientacaoDistribuida
-												,pc_indDados_descricaoStatus
-												,pc_indDados_prazo
-												,pc_indDados_mcuOrgaoPosicEcontInterno)
-				VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
-					,2
-					,<cfqueryparam value="#matricula#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#mcuOrgaoIndicador.pc_org_mcu#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_slnc.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#rs_dados_slnc.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_slnc.orgaoResp#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_slnc.numProcessoSNCI#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_slnc.item#" cfsqltype="cf_sql_varchar">
-					,<cfqueryparam value="#rs_dados_slnc.orientacao#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#rs_dados_slnc.dataPrevista#" cfsqltype="cf_sql_date">
-					,<cfqueryparam value="#rs_dados_slnc.dataPosicao#" cfsqltype="cf_sql_date">
-					,<cfqueryparam value="#rs_dados_slnc.pc_aval_posic_status#" cfsqltype="cf_sql_integer">
-					,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
-					,<cfqueryparam value="#rs_dados_slnc.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
-					,null
-					,<cfqueryparam value="#ehControleInteno#" cfsqltype="cf_sql_bit">
-				)
-			</cfquery>
+			<cfif mcuOrgaoSubordinador.pc_org_mcu  neq "">
+				<cfquery datasource="#application.dsn_processos#">
+					INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
+													,pc_indDados_numIndicador
+													,pc_indDados_matriculaGeracao
+													,pc_indDados_mcuOrgaoSubordinador
+													,pc_indDados_numPosic
+													,pc_indDados_mcuOrgaoAvaliado
+													,pc_indDados_mcuOrgaoResp
+													,pc_indDados_numProcesso
+													,pc_indDados_numItem
+													,pc_indDados_numOrientacao
+													,pc_indDados_dataPrevista
+													,pc_indDados_dataStatus
+													,pc_indDados_status
+													,pc_indDados_orientacaoDistribuida
+													,pc_indDados_descricaoStatus
+													,pc_indDados_prazo
+													,pc_indDados_mcuOrgaoPosicEcontInterno)
+					VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+						,2
+						,<cfqueryparam value="#matricula#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#mcuOrgaoSubordinador.pc_org_mcu#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_slnc.pc_aval_posic_id#" cfsqltype="cf_sql_integer">
+						,<cfqueryparam value="#rs_dados_slnc.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_slnc.orgaoResp#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_slnc.numProcessoSNCI#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_slnc.item#" cfsqltype="cf_sql_varchar">
+						,<cfqueryparam value="#rs_dados_slnc.orientacao#" cfsqltype="cf_sql_integer">
+						,<cfqueryparam value="#rs_dados_slnc.dataPrevista#" cfsqltype="cf_sql_date">
+						,<cfqueryparam value="#rs_dados_slnc.dataPosicao#" cfsqltype="cf_sql_date">
+						,<cfqueryparam value="#rs_dados_slnc.pc_aval_posic_status#" cfsqltype="cf_sql_integer">
+						,<cfqueryparam value="#distribuida#" cfsqltype="cf_sql_bit">
+						,<cfqueryparam value="#rs_dados_slnc.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
+						,null
+						,<cfqueryparam value="#ehControleInteno#" cfsqltype="cf_sql_bit">
+					)
+				</cfquery>
+			</cfif>
 		</cfloop>
 
 
 	</cffunction>
 
-	<cffunction name="gerarDadosParaIndicadoresPorOrgao"   access="remote" hint="gera os dados para os indicadores e insere na tabela pc_indicador_porOrgao - acompanhamento mensal"> 
+	<cffunction name="gerarDadosParaIndicadoresMensalPorOrgao"   access="remote" hint="gera os dados para os indicadores e insere na tabela pc_indicador_porOrgao - acompanhamento mensal"> 
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		<cfargument name="tipoRotina" type="string" required="false" default="A" />
 
+		
 		<cfset ano = arguments.ano>
 		<cfset mes = arguments.mes>
+		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
 		<cfif arguments.tipoRotina eq "A">
 			<cfset matricula = "A">
 		<cfelse>
@@ -601,9 +605,6 @@
 			INNER JOIN pc_orgaos as pc_orgaoSubordinador ON pc_orgaoSubordinador.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoSubordinador
 			WHERE YEAR(pc_indDados_dataRef) = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
 		</cfquery>
-
-
-
 
 		<cfquery name="resultadoPRCIporOrgaoResp" dbtype="query">
 			SELECT	ano
@@ -632,8 +633,6 @@
 			order by mcuOrgaoSubordinador
 		</cfquery>
 
-		
-
 		<cfquery name="resultadoSLNCporOrgaoResp" dbtype="query">
 			SELECT	ano
 					,mes
@@ -661,6 +660,7 @@
 			order by mcuOrgaoSubordinador
 		</cfquery>
 
+
 		<!-- consulta união dos resultados  -->
 		<cfquery name="resultadoIndicadoresPorOrgao" dbtype="query">
 			SELECT	* FROM resultadoPRCIporOrgaoSubordinador
@@ -672,8 +672,7 @@
 			SELECT	* FROM resultadoSLNCporOrgaoResp
 		</cfquery>
 
-
-		<!--insere os dados na tabela pc_indicadores_porOrgao-->
+		<!--insere os dados dos indicadores da cesta (PRCI e SLNC) na tabela pc_indicadores_porOrgao-->
 		<cfloop query="resultadoIndicadoresPorOrgao">
 
 			<!-- cfquery que retorna pc_indOrgao_resultadoAcumulado do mês anterior da tabela pc_indicadores_porOrgaos -->
@@ -720,15 +719,101 @@
 			
 		</cfloop>
 
-		<!--orgãso da tabela pc_indicadores_porOrgao-->
+		<cfquery name="resultadoTIDPporOrgaoResp" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	YEAR(pc_indDados_dataRef) AS ano
+					,MONTH(pc_indDados_dataRef) AS mes
+					,pc_indDados_mcuOrgaoResp
+					,pc_indDados_mcuOrgaoSubordinador 
+					,count(*) AS resultadoIndicador
+					,0 as paraOrgaoSubordinador
+					,4 as numIndicador
+			FROM pc_indicadores_dados
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 1
+				AND pc_indDados_prazo = 'DP'
+			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoResp,pc_indDados_mcuOrgaoSubordinador 
+		</cfquery>
+
+		<cfquery name="resultadoTGIporOrgaoResp" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	YEAR(pc_indDados_dataRef) AS ano
+					,MONTH(pc_indDados_dataRef) AS mes
+					,pc_indDados_mcuOrgaoResp
+					,pc_indDados_mcuOrgaoSubordinador 
+					,count(*) AS resultadoIndicador
+					,0 as paraOrgaoSubordinador
+					,5 as numIndicador
+			FROM pc_indicadores_dados
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 1
+			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoResp,pc_indDados_mcuOrgaoSubordinador 
+		</cfquery>
+
+		<cfquery name="resultadoQTSLporOrgaoResp" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	YEAR(pc_indDados_dataRef) AS ano
+					,MONTH(pc_indDados_dataRef) AS mes
+					,pc_indDados_mcuOrgaoResp
+					,pc_indDados_mcuOrgaoSubordinador 
+					,count(*) AS resultadoIndicador
+					,0 as paraOrgaoSubordinador
+					,6 as numIndicador
+			FROM pc_indicadores_dados
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 2
+				AND pc_indDados_status = 6
+			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoResp,pc_indDados_mcuOrgaoSubordinador
+		</cfquery>
+		
+		<cfquery name="resultadoQTNCporOrgaoResp" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	YEAR(pc_indDados_dataRef) AS ano
+					,MONTH(pc_indDados_dataRef) AS mes
+					,pc_indDados_mcuOrgaoResp
+					,pc_indDados_mcuOrgaoSubordinador 
+					,count(*) AS resultadoIndicador
+					,0 as paraOrgaoSubordinador
+					,7 as numIndicador
+			FROM pc_indicadores_dados
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 2
+			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoResp,pc_indDados_mcuOrgaoSubordinador
+		</cfquery>
+					
+		<!-- consulta união dos resultados  -->
+		<cfquery name="resultadoIndicadoresSecundariosPorOrgao" dbtype="query">
+			SELECT	* FROM resultadoTIDPporOrgaoResp
+			UNION
+			SELECT	* FROM resultadoTGIporOrgaoResp
+			UNION
+			SELECT	* FROM resultadoQTSLporOrgaoResp
+			UNION
+			SELECT	* FROM resultadoQTNCporOrgaoResp
+		</cfquery>
+
+		<!--insere os dados dos indicadores secundários na tabela pc_indicadores_porOrgao-->
+		<cfloop query="resultadoIndicadoresSecundariosPorOrgao">
+			<cfquery  datasource="#application.dsn_processos#" timeout="120"  >
+				INSERT INTO pc_indicadores_porOrgao
+				(pc_indOrgao_ano, pc_indOrgao_mes, pc_indOrgao_numIndicador, pc_indOrgao_mcuOrgao, pc_indOrgao_resultadoMes, pc_indOrgao_resultadoAcumulado, pc_indOrgao_paraOrgaoSubordinador, pc_indOrgao_mcuOrgaoSubordinador)
+				VALUES
+				(	<cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+					,<cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+					,<cfqueryparam value="#numIndicador#" cfsqltype="cf_sql_integer">
+					,<cfqueryparam value="#pc_indDados_mcuOrgaoResp#" cfsqltype="cf_sql_varchar">
+					,<cfqueryparam value="#resultadoIndicador#" cfsqltype="cf_sql_float">
+					,<cfqueryparam value="0" cfsqltype="cf_sql_float">
+					,<cfqueryparam value="#paraOrgaoSubordinador#" cfsqltype="cf_sql_bit">
+					,<cfqueryparam value="#pc_indDados_mcuOrgaoSubordinador#" cfsqltype="cf_sql_varchar">
+				)
+			</cfquery>
+			
+		</cfloop>
+
+		<!--órgãos da tabela pc_indicadores_porOrgao-->
 		<cfquery name="orgaos" datasource="#application.dsn_processos#" timeout="120"  >
 			SELECT DISTINCT pc_indOrgao_mcuOrgao as mcuOrgao ,pc_indOrgao_paraOrgaoSubordinador , pc_indOrgao_mcuOrgaoSubordinador
 			FROM pc_indicadores_porOrgao
 			WHERE pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
 			AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
-			
 		</cfquery>
-
 
 		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
 			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
@@ -743,10 +828,9 @@
 				and pc_indPeso_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
 				and pc_indPeso_ativo = 1
 		</cfquery>
-
 	
 
-		<!--LOOP em cada órgao para inserir na tabela pc_indicadores_porOrgao o indicador 3 (DGCI) através da fórmula DGCI = PRCI*0.55 + SLNC*0.45-->
+		<!--LOOP em cada órgao para inserir na tabela pc_indicadores_porOrgao o indicador 3 (DGCI) através da fórmula DGCI = PRCI*pesoPRCI + SLNC*pesoSLNC-->
 		<cfloop query="orgaos">
 			<cfquery name="rsPRCIporOrgao" datasource="#application.dsn_processos#" timeout="120" >
 				SELECT	pc_indOrgao_resultadoMes FROM pc_indicadores_porOrgao
@@ -865,7 +949,7 @@
 			</cfquery>
 
 			<cfset quantDados = gerarDadosParaIndicadoresMensal(ano,mes,tipoRotina)>
-			<cfset quantDadosPorOrgao = gerarDadosParaIndicadoresPorOrgao(ano,mes)>
+			<cfset quantDadosPorOrgao = gerarDadosParaIndicadoresMensalPorOrgao(ano,mes)>
 		</cftransaction>	
 
 		<cfquery name="PC_INDICADORES_DADOS" datasource="#application.dsn_processos#">
@@ -5049,15 +5133,43 @@
 
 	</cffunction>
 
+	<cffunction name="consultaIndicadorPRCI_TIDP_TGI_mensal_paraTbResumo" access="remote" hint="gera a consulta para ser utilizadas nas cffunctions do PRCI">
+   		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
 
+
+		<cfquery name="consulta_PRCI_TIDP_TGI_mensal" datasource="#application.dsn_processos#" timeout="120">
+			SELECT 
+				pc_indOrgao_mcuOrgao as mcuOrgaoResp,
+				pc_orgaos.pc_org_sigla as siglaOrgaoResp,
+				MAX(IIF(pc_indOrgao_numIndicador = 4, pc_indOrgao_resultadoMes, 0)) as TIDP,
+				MAX(IIF(pc_indOrgao_numIndicador = 5, pc_indOrgao_resultadoMes, 0)) as TGI,
+				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, 0)) as PRCI
+			FROM 
+				pc_indicadores_porOrgao
+			INNER JOIN 
+				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
+			WHERE 
+				pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
+				AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+				AND pc_indOrgao_numIndicador IN(1,4,5)
+				AND pc_indOrgao_mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+				AND pc_indOrgao_paraOrgaoSubordinador = 0
+			GROUP BY 
+				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
+		</cfquery>
+
+		<cfreturn #consulta_PRCI_TIDP_TGI_mensal#>
+      
+		
+
+	</cffunction>
 	
-
-
 	<cffunction name="tabResumoPRCIorgaosResp_mensal" access="remote" returntype="string" hint="cria tabela resumo com as informações dos resultados do PRCI dos órgãos subordinadores">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
-    	<cfset var resultado = consultaPRCIdetalhe_mensal(ano=arguments.ano, mes=arguments.mes)>
+    	<cfset var resultado = consultaIndicadorPRCI_TIDP_TGI_mensal_paraTbResumo(ano=arguments.ano, mes=arguments.mes)>
        
 	  	
 		
@@ -5069,7 +5181,7 @@
 						
 						<thead class="bg-gradient-warning" style="text-align: center;">
 							<tr style="font-size:14px">
-								<th colspan="6" style="padding:5px">PRCI - <span>#monthAsString(arguments.mes)#/#arguments.ano#</span></th>
+								<th colspan="6" style="padding:5px">PRCI - <span>#monthAsString(mes)#/#ano#</span></th>
 							</tr>
 							<tr style="font-size:14px">
 								<th >Órgão</th>
@@ -5081,44 +5193,43 @@
 							</tr>
 						</thead>
 						<tbody>
-							
-							<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
+							<cfoutput>
+								<cfloop query="consulta_PRCI_TIDP_TGI_mensal"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
 
-								<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
-									SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-									WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-											AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-											AND pc_indMeta_numIndicador = 1
-											AND pc_indMeta_mcuOrgao = '#orgaoRespMCU#'
-								</cfquery>
-								
-								<!--- Adiciona cada linha à tabela --->
-								<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-									<td>#orgaoResp# (#orgaoRespMCU#)</td>
-									<td>#totalDP#</td>
-									<td>#(totalDP + totalFP)#</td>
-									<cfset percentualDP = NumberFormat(Round((totalDP / (totalDP + totalFP)) * 100*10)/10,0.0)>
-									<td><strong>#percentualDP#%</strong></td>
-									<cfset metaPRCIorgao = 0>
-									<cfif rsMetaPRCI.pc_indMeta_meta neq ''>
-										<cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
-									</cfif>
-									<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
-										<td>sem meta</td>
-									<cfelse>	
-										<td><strong>#metaPRCIorgao#%</strong></td>
-									</cfif>
-									<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualDP*10)/10 / metaPRCIorgao)*100*10)/10>
-									<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
-
-								</tr>
-							</cfloop>
+									<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
+										SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+										WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_numIndicador = 1
+												AND pc_indMeta_mcuOrgao = '#mcuOrgaoResp#'
+									</cfquery>
+									
+									<!--- Adiciona cada linha à tabela --->
+									<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+										<td>#siglaOrgaoResp# (#mcuOrgaoResp#)</td>
+										<td>#NumberFormat(TIDP,0)#</td>
+										<td>#NumberFormat(TGI,0)#</td>
+										<td><strong>#NumberFormat(ROUND(PRCI*10)/10,0.0)#%</strong></td>
+										<cfset metaPRCIorgao = 0>
+										<cfif rsMetaPRCI.pc_indMeta_meta neq ''>
+											<cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
+										</cfif>
+										<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
+											<td>sem meta</td>
+										<cfelse>	
+											<td><strong>#metaPRCIorgao#%</strong></td>
+										</cfif>
+										<cfset resultMesEmRelacaoMeta = 0>
+										<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+									</tr>
+								</cfloop>
+							</cfoutput>
 						</tbody>
 						<tfoot >
 							<tr>
 								<th colspan="6" style="font-weight: normal; font-size: smaller;">
-									<li>TIDP = Total de orientações dentro do prazo (status “Não respondido” e “Tratamento”); </li>
-									<li>TGI  = Total Geral de orientações (status "Respondido", “Não Respondido”, “Tratamento” e “Pendente”); </li>
+									<li>TIDP = Total de orientações dentro do prazo (abrange as orientações nos status “Não respondido” + "Respondido" + “Tratamento”); </li>
+									<li>TGI  = Total Geral de orientações (abrange as orientações nos status "Respondido" + “Não Respondido” + "Respondido" + “Tratamento” + “Pendente”); </li>
 									<li>PRCI = Atendimento ao Prazo de Resposta = (TIDP/TGI)x100.</li>
 									Obs.: Se uma determinada gerência não estiver representada na tabela, isso indica que não houve orientações com o status necessário para a computação do indicador em questão.
 								</th>
@@ -5127,8 +5238,6 @@
 					</cfoutput>
 				</table>
 			</div>
-									
-
 
 		</cfif>
 		<script language="JavaScript">
@@ -5165,12 +5274,144 @@
 
 	</cffunction>
 
+    <cffunction name="consultaIndicadorSLNC_QTSL_QTNC" access="remote" hint="gera a consulta para ser utilizadas nas cffunctions do SLNC">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
 
 
+		<cfquery name="consulta_SLNC_QTSL_QTNC_mensal" datasource="#application.dsn_processos#" timeout="120">		
+			SELECT 
+				pc_indOrgao_mcuOrgao as mcuOrgaoResp,
+				pc_orgaos.pc_org_sigla as siglaOrgaoResp,
+				MAX(IIF(pc_indOrgao_numIndicador = 6, pc_indOrgao_resultadoMes, 0)) as QTSL,
+				MAX(IIF(pc_indOrgao_numIndicador = 7, pc_indOrgao_resultadoMes, 0)) as QTNC,
+				MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, 0)) as SLNC
+			FROM 
+				pc_indicadores_porOrgao
+			INNER JOIN 
+				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
+			WHERE 
+				pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+				AND pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+				AND pc_indOrgao_numIndicador IN(2,6,7)
+				AND pc_indOrgao_mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+				AND pc_indOrgao_paraOrgaoSubordinador = 0
+			GROUP BY 
+				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
+		</cfquery>
+
+		<cfreturn #consulta_SLNC_QTSL_QTNC_mensal#>	
+
+	</cffunction>
+
+	<cffunction name="tabResumoSLNCorgaosResp_mensal" access="remote" returntype="string" hint="cria tabela resumo com as informações dos resultados do SLNC dos órgãos subordinadores">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+		
+    	<cfset var resultado = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
+       
+	  	
+		
+		<!-- tabela resumo -->
+		<cfif resultado.recordcount neq 0>
+			<div id="divTabResumoSLNCorgaos" class="table-responsive">
+				<table id="tabResumoSLNCorgaos" class="table table-bordered table-striped text-nowrap " style="width:350px; cursor:pointer">
+					<cfoutput>
+						
+						<thead class="bg-gradient-warning" style="text-align: center;">
+							<tr style="font-size:14px">
+								<th colspan="6" style="padding:5px">SLNC - <span>#monthAsString(mes)#/#ano#</span></th>
+							</tr>
+							<tr style="font-size:14px">
+								<th >Órgão</th>
+								<th >QTSL</th>
+								<th >QTNC</th>
+								<th >SLNC</th>
+								<th >Meta</th>
+								<th >Resultado</th>
+							</tr>
+						</thead>
+						<tbody>
+							<cfoutput>
+								<cfloop query="consulta_SLNC_QTSL_QTNC_mensal"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
+
+									<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
+										SELECT pc_indMeta_meta FROM pc_indicadores_meta 
+										WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+												AND pc_indMeta_numIndicador = 2
+												AND pc_indMeta_mcuOrgao = '#mcuOrgaoResp#'
+									</cfquery>
+									
+									<!--- Adiciona cada linha à tabela --->
+									<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+										<td>#siglaOrgaoResp# (#mcuOrgaoResp#)</td>
+										<td>#NumberFormat(QTSL,0)#</td>
+										<td>#NumberFormat(QTNC,0)#</td>
+										<td><strong>#NumberFormat(ROUND(SLNC*10)/10,0.0)#%</strong></td>
+										<cfset metaSLNCorgao = 0>
+										<cfif rsMetaSLNC.pc_indMeta_meta neq ''>
+											<cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>
+										</cfif>
+										<cfif rsMetaSLNC.pc_indMeta_meta eq ''>
+											<td>sem meta</td>
+										<cfelse>	
+											<td><strong>#metaSLNCorgao#%</strong></td>
+										</cfif>
+										<cfset resultMesEmRelacaoMeta = 0>
+										<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+									</tr>
+								</cfloop>
+							</cfoutput>
+						</tbody>
+						<tfoot >
+							<tr>
+								<th colspan="6" style="font-weight: normal; font-size: smaller;">
+									<li>QTSL = Quantidade de orientações Solucionadas (abrange as orientações no status "Solucionado" no SNCI);</li>
+									<li>QTNC = Quantidade de Orientações Registradas (abrange as orientações nos status "Pendente" + "Tratamento" + "Solucionado" no SNCI);</li>
+									<li>SLNC = Solução de Não Conformidades = (QTSL/QTNC)x100.</li>
+									Obs.: Se uma determinada gerência não estiver representada na tabela, isso indica que não houve orientações com o status necessário para a computação do indicador em questão.
+								</th>
+							</tr>
+						</tfoot>
+					</cfoutput>
+				</table>
+			</div>
+
+		</cfif>
 
 
+		<script language="JavaScript">
 
-	
+		    // Define a função para aplicar o estilo apenas nas células com a classe 'tdResult'
+			function aplicarEstiloNasTDsComClasseTdResult() {
+				// Para cada célula com a classe 'tdResult' na tabela
+				$('.tdResult').each(function() {
+					updateTDresultIndicadores($(this));
+				});
+			}
+
+			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			$('#tabResumoSLNCorgaos').DataTable({
+				order: [[3, 'desc'], [4, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
+				lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
+				paging: false, // Remove a paginação
+				info: false, // Remove a exibição da quantidade de registros
+				searching: false, // Remove o campo de busca
+				drawCallback: function (settings) {
+					aplicarEstiloNasTDsComClasseTdResult();
+				}
+			});
+			$(document).ready(function() {
+				$(".content-wrapper").css("height", "auto");
+    
+
+			});
+		</script>
+
+	</cffunction>
+
 
 
 
