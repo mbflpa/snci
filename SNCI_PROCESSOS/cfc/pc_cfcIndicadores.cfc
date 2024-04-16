@@ -4874,8 +4874,8 @@
 			SELECT 
 				pc_indOrgao_mcuOrgao as mcuOrgaoResp,
 				pc_orgaos.pc_org_sigla as siglaOrgaoResp,
-				MAX(IIF(pc_indOrgao_numIndicador = 4, pc_indOrgao_resultadoMes, NULL)) as TIDP,
-				MAX(IIF(pc_indOrgao_numIndicador = 5, pc_indOrgao_resultadoMes, NULL)) as TGI,
+				MAX(IIF(pc_indOrgao_numIndicador = 4, pc_indOrgao_resultadoMes, 0)) as TIDP,
+				MAX(IIF(pc_indOrgao_numIndicador = 5, pc_indOrgao_resultadoMes, 0)) as TGI,
 				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, NULL)) as PRCI,
 				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoAcumulado, NULL)) as PRCIacumulado
 			FROM 
@@ -5107,8 +5107,8 @@
 			SELECT 
 				 pc_indOrgao_mcuOrgao as mcuOrgaoResp
 				,pc_orgaos.pc_org_sigla as siglaOrgaoResp
-				,MAX(IIF(pc_indOrgao_numIndicador = 6, pc_indOrgao_resultadoMes, NULL)) as QTSL
-				,MAX(IIF(pc_indOrgao_numIndicador = 7, pc_indOrgao_resultadoMes, NULL)) as QTNC
+				,MAX(IIF(pc_indOrgao_numIndicador = 6, pc_indOrgao_resultadoMes, 0)) as QTSL
+				,MAX(IIF(pc_indOrgao_numIndicador = 7, pc_indOrgao_resultadoMes, 0)) as QTNC
 				,MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, NULL)) as SLNC
 				,MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoAcumulado, NULL)) as SLNCacumulado
 			FROM 
