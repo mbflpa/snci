@@ -31,6 +31,27 @@
 				border-style: inset!important;
 				border-top: 3px solid rgba(0, 0, 0, 0.1)!important;
 			}
+
+			.nav-pills-abasIndicadoresMensal .nav-link-abasIndicadoresMensal {
+				color: #3f4449!important;
+				background-color: #ececec!important;
+				border: 2px solid #f2f4f7 !important;
+				border-radius: 10px!important;
+				margin-right: 5px!important;
+			}
+			.nav-pills-abasIndicadoresMensal .nav-link-abasIndicadoresMensal.active, .nav-pills-abasIndicadoresMensal .show > .nav-link-abasIndicadoresMensal {
+				color: #fff!important;
+				background-color: #2581c8!important;
+				border-color: #2581c8!important;
+			}
+
+			
+
+			.nav-link-abasIndicadoresMensal:hover {
+				border-color: #fbc32f7d!important;
+				background-color: #fbc32f7d!important;
+			}
+
 		</style>
 		
 </head>
@@ -74,24 +95,85 @@
                     <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
-				<div id="divIndicadorDGCI" ></div>
-
-				<div id="divTabPRCI" ></div>
-				<div id="divTabSLNC" ></div>
-
-
-				<div id="divIndicadorPRCI" ></div>
-					
-
-				<div id="divIndicadorSLNC" ></div>
-
-				
-
-
-				
 			</div>
 		</section>
 		<!-- /.content -->
+
+		<!-- Content Header (Page header) -->
+			
+			<section class="content" style="margin-top:20px">
+				<div class="container-fluid">
+					<div id="divTabsIndicadores" style="display:none">
+					    
+						
+							<cfoutput><h5 style="color:##0083ca;">#application.rsUsuarioParametros.pc_org_sigla#: <strong><span id="mesAno"></span></strong></h5></cfoutput>
+						<div class="card-header p-0 pt-1" >
+							<ul class="nav nav-pills nav-pills-abasIndicadoresMensal" id="myTabs" role="tablist" style="font-size:14px;">
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link active  btn   nav-link-abasIndicadoresMensal " id="tabCardDGCIacompMensal" data-toggle="tab" href="#divCardDGCIacompMensalContent" role="tab" aria-controls="divCardDGCIacompMensalContent" aria-selected="true" ><i class="fa fa-chart-line"></i> Resultado DGCI</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn  nav-link-abasIndicadoresMensal " id="tabTabResumoDGCIorgaos" data-toggle="tab" href="#divTabResumoDGCIorgaosContent" role="tab" aria-controls="divTabResumoDGCIorgaosContent" aria-selected="false"><i class="fa fa-chart-line"></i> DGCI (órgãos)</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoPRCIorgaos" data-toggle="tab" href="#divTabResumoPRCIorgaosContent" role="tab" aria-controls="divTabResumoPRCIorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> PRCI (órgãos)</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoSLNCorgaos" data-toggle="tab" href="#divTabResumoSLNCorgaosContent" role="tab" aria-controls="divTabResumoSLNCorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> SLNC (órgãos)</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabIndicadorPRCI" data-toggle="tab" href="#divIndicadorPRCIContent" role="tab" aria-controls="divIndicadorPRCIContent" aria-selected="false"><i class="fa fa-database"></i> Dados PRCI</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabIndicadorSLNC" data-toggle="tab" href="#divIndicadorSLNCContent" role="tab" aria-controls="divIndicadorSLNCContent" aria-selected="false"><i class="fa fa-database"></i> Dados SLNC</a>
+								</li>
+							</ul>
+						
+						</div>
+						<div class="card-body">
+							<div class="tab-content" id="myTabsContent" >
+								<div class="tab-pane fade show active" id="divCardDGCIacompMensalContent" role="tabpanel" aria-labelledby="tabCardDGCIacompMensal">
+									<div style="display: flex; flex-direction: column; justify-content: center; align-items: center;width:800px">
+									    
+										<div id="divCardDGCI" style="width:800px;"></div>
+										<div id="divCesta" style="width:740px;border: 1px solid #9f9b9b; border-radius:30px; padding-left: 20px;padding-right: 20px;padding-bottom:5px; margin-top:10px; display: none; flex-direction: column; justify-content: center; align-items: center;">
+											<!-- Ícone de seta da Font Awesome -->
+											<div style="position: relative; top: -19px;">
+												<i class="fa fa-arrow-up" style="font-size:20px;color:#9f9b9b"></i>
+											</div>
+											
+											<div id="divCardPRCI" style="width:700px"></div>
+											<div id="divCardSLNC" style="width:700px"></div>
+											
+										</div>
+									</div>
+								</div>
+							
+								<div class="tab-pane fade" id="divTabResumoDGCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoDGCIorgaos" style="width:100%;">
+									<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
+									<div id="divTabDGCI"></div>
+								</div>
+								<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
+									<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
+									<div id="divTabPRCI"></div>
+								</div>
+								<div class="tab-pane fade" id="divTabResumoSLNCorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoSLNCorgaos" >
+									<h5 style="color:#0083ca;">SLNC por órgão responsável:</h5>
+									<div id="divTabSLNC"></div>
+								</div>
+								<div class="tab-pane fade" id="divIndicadorPRCIContent" role="tabpanel" aria-labelledby="tabIndicadorPRCI" >
+								
+									<div id="divDetalhePRCI"></div>
+								</div>
+								<div class="tab-pane fade" id="divIndicadorSLNCContent" role="tabpanel" aria-labelledby="tabIndicadorSLNC" >
+									<div id="divDetalheSLNC"></div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</section>
 	</div>
 	<!-- /.content-wrapper -->
 	<cfinclude template="pc_Footer.cfm">
@@ -192,29 +274,7 @@
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {	
 				
-				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
-					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
-					data:{
-						method:"resultadoDGCI_diario",
-						ano:selectedYear,
-						mes:selectedMonth
-					},
-					async: false,
-					success: function(result) {	
-						$('#divIndicadorDGCI').html(result);//INSERE OS INDICADORES NA DIV
-						
-					},
-					error: function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
-						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
-							
-					}
-				})
+				
 			
 				
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
@@ -227,7 +287,7 @@
 					},
 					async: false,
 					success: function(result) {	
-						$('#divIndicadorPRCI').html(result);//INSERE OS INDICADORES NA DIV
+						$('#divDetalhePRCI').html(result);//INSERE OS INDICADORES NA DIV
 						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
@@ -251,7 +311,7 @@
 					},
 					async: false,
 					success: function(result) {	
-						$('#divIndicadorSLNC').html(result);//INSERE OS INDICADORES NA DIV
+						$('#divDetalheSLNC').html(result);//INSERE OS INDICADORES NA DIV
 						$('#modalOverlay').delay(1000).hide(0, function() {
 							$('#modalOverlay').modal('hide');
 						});
@@ -319,13 +379,130 @@
 					}
 				})
 
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabResumoDGCIorgaosResp_mensal",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divTabDGCI').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})	
 
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"cardPRCI_AcompMensal",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divCardPRCI').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
 
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"cardSLNC_AcompMensal",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divCardSLNC').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"cardDGCI_AcompMensal",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divCardDGCI').html(result);//INSERE OS INDICADORES NA DIV
+						$('#mesAno').html($('#spanMesAno').text());
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+               //retirar o display none de divTabsIndicadores
+			   	$('#divTabsIndicadores').css('display', 'block');			
+			   		
+
+			
+			
+				
 
 					
 			}, 1000);
-		});
 
+			$('#modalOverlay').delay(1000).hide(0, function() {
+				$('#modalOverlay').modal('hide');
+				//divCesta display flex
+				$('#divCesta').css('display', 'flex');
+			});
+		});
+        
+		
 
 		
     </script>

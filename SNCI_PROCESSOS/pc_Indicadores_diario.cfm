@@ -62,106 +62,106 @@
 		<cfinclude template="pc_Modal_preloader.cfm">
 		<cfinclude template="pc_NavBar.cfm">
 
-	<!-- Content Wrapper. Contains page content -->
-	<div class="content-wrapper" >
-		<!-- Content Header (Page header) -->
-		
-		<section class="content-header">
-			<div class="container-fluid">
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper" >
+			<!-- Content Header (Page header) -->
+			
+			<section class="content-header">
+				<div class="container-fluid">
+							
+					<div class="row mb-2" style="margin-bottom:0px!important;">
+						<div class="col-sm-12">
+							<div style="display: flex; align-items: center;">
+								<h4 style="margin-right: 10px;">Indicadores: <strong>Acompanhamento Mês/Ano Corrente</strong></h4>
+							</div>
+							<p style="margin-right: 10px;">Atenção: As informações a seguir são fornecidas apenas para fins de acompanhamento, com o objetivo de auxiliar a gestão na melhoria dos indicadores. O resultado final do mês deve ser verificado em Consultas - Indicadores - Resultado Mensal, disponibilizado até o quinto dia útil do mês subsequente.</p>
+
+							<cfset mes = month(now())>
+							<cfset mes = monthAsString(mes)>
+							<cfset ano = year(now())>
+							<cfoutput><h5 style="color:##0083ca;">Resultado dos Indicadores do órgão #application.rsUsuarioParametros.pc_org_sigla#: <strong>#mes#/#ano#</strong></h5></cfoutput>
 						
-				<div class="row mb-2" style="margin-bottom:0px!important;">
-					<div class="col-sm-12">
-						<div style="display: flex; align-items: center;">
-							<h4 style="margin-right: 10px;">Indicadores: <strong>Acompanhamento Mês/Ano Corrente</strong></h4>
+						
 						</div>
-						<p style="margin-right: 10px;">Atenção: As informações a seguir são fornecidas apenas para fins de acompanhamento, com o objetivo de auxiliar a gestão na melhoria dos indicadores. O resultado final do mês deve ser verificado em Consultas - Indicadores - Resultado Mensal, disponibilizado até o quinto dia útil do mês subsequente.</p>
-
-						<cfset mes = month(now())>
-						<cfset mes = monthAsString(mes)>
-						<cfset ano = year(now())>
-						<cfoutput><h5 style="color:##0083ca;">Resultado dos Indicadores do órgão #application.rsUsuarioParametros.pc_org_sigla#: <strong>#mes#/#ano#</strong></h5></cfoutput>
-					
-					
 					</div>
-				</div>
-			</div><!-- /.container-fluid -->
-
-		<section class="content">
-			<div class="container-fluid">
-				<div id="divTabsIndicadores" >
-					<div class="card-header p-0 pt-1" >
-						<ul class="nav nav-pills nav-pills-abasIndicadoresDiario" id="myTabs" role="tablist" style="font-size:14px;">
-							<li class="nav-item " style="text-align: center;">
-								<a class="nav-link active  btn   nav-link-abasIndicadoresDiario " id="tabCardDGCIacompDiario" data-toggle="tab" href="#divCardDGCIacompDiarioContent" role="tab" aria-controls="divCardDGCIacompDiarioContent" aria-selected="true" ><i class="fa fa-chart-line"></i> Resultado DGCI</a>
-							</li>
-							<li class="nav-item " style="text-align: center;">
-								<a class="nav-link btn  nav-link-abasIndicadoresDiario " id="tabTabResumoDGCIorgaos" data-toggle="tab" href="#divTabResumoDGCIorgaosContent" role="tab" aria-controls="divTabResumoDGCIorgaosContent" aria-selected="false"><i class="fa fa-chart-line"></i> DGCI (órgãos)</a>
-							</li>
-							<li class="nav-item " style="text-align: center;">
-								<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabTabResumoPRCIorgaos" data-toggle="tab" href="#divTabResumoPRCIorgaosContent" role="tab" aria-controls="divTabResumoPRCIorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> PRCI (órgãos)</a>
-							</li>
-							<li class="nav-item " style="text-align: center;">
-								<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabTabResumoSLNCorgaos" data-toggle="tab" href="#divTabResumoSLNCorgaosContent" role="tab" aria-controls="divTabResumoSLNCorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> SLNC (órgãos)</a>
-							</li>
-							<li class="nav-item " style="text-align: center;">
-								<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabIndicadorPRCI" data-toggle="tab" href="#divIndicadorPRCIContent" role="tab" aria-controls="divIndicadorPRCIContent" aria-selected="false"><i class="fa fa-database"></i> Dados PRCI</a>
-							</li>
-							<li class="nav-item " style="text-align: center;">
-								<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabIndicadorSLNC" data-toggle="tab" href="#divIndicadorSLNCContent" role="tab" aria-controls="divIndicadorSLNCContent" aria-selected="false"><i class="fa fa-database"></i> Dados SLNC</a>
-							</li>
-						</ul>
-					
-					</div>
-					<div class="card-body">
-						<div class="tab-content" id="myTabsContent" >
-							<div class="tab-pane fade show active" id="divCardDGCIacompDiarioContent" role="tabpanel" aria-labelledby="tabCardDGCIacompDiario">
-								<div style="display: flex; flex-direction: column; justify-content: center; align-items: center;width:800px">
-									<div id="divCardDGCIacompDiario" style="width:800px;"></div>
-									<div id="divCesta" style="width:740px;border: 1px solid #9f9b9b; border-radius:30px; padding-left: 20px;padding-right: 20px;padding-bottom:5px; margin-top:10px; display: none; flex-direction: column; justify-content: center; align-items: center;">
-										<!-- Ícone de seta da Font Awesome -->
-										<div style="position: relative; top: -19px;">
-											<i class="fa fa-arrow-up" style="font-size:20px;color:#9f9b9b"></i>
+				</div><!-- /.container-fluid -->
+			</section>
+			<section class="content">
+				<div class="container-fluid">
+					<div id="divTabsIndicadores" >
+						<div class="card-header p-0 pt-1" >
+							<ul class="nav nav-pills nav-pills-abasIndicadoresDiario" id="myTabs" role="tablist" style="font-size:14px;">
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link active  btn   nav-link-abasIndicadoresDiario " id="tabCardDGCIacompDiario" data-toggle="tab" href="#divCardDGCIacompDiarioContent" role="tab" aria-controls="divCardDGCIacompDiarioContent" aria-selected="true" ><i class="fa fa-chart-line"></i> Resultado DGCI</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn  nav-link-abasIndicadoresDiario " id="tabTabResumoDGCIorgaos" data-toggle="tab" href="#divTabResumoDGCIorgaosContent" role="tab" aria-controls="divTabResumoDGCIorgaosContent" aria-selected="false"><i class="fa fa-chart-line"></i> DGCI (órgãos)</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabTabResumoPRCIorgaos" data-toggle="tab" href="#divTabResumoPRCIorgaosContent" role="tab" aria-controls="divTabResumoPRCIorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> PRCI (órgãos)</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabTabResumoSLNCorgaos" data-toggle="tab" href="#divTabResumoSLNCorgaosContent" role="tab" aria-controls="divTabResumoSLNCorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> SLNC (órgãos)</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabIndicadorPRCI" data-toggle="tab" href="#divIndicadorPRCIContent" role="tab" aria-controls="divIndicadorPRCIContent" aria-selected="false"><i class="fa fa-database"></i> Dados PRCI</a>
+								</li>
+								<li class="nav-item " style="text-align: center;">
+									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabIndicadorSLNC" data-toggle="tab" href="#divIndicadorSLNCContent" role="tab" aria-controls="divIndicadorSLNCContent" aria-selected="false"><i class="fa fa-database"></i> Dados SLNC</a>
+								</li>
+							</ul>
+						
+						</div>
+						<div class="card-body">
+							<div class="tab-content" id="myTabsContent" >
+								<div class="tab-pane fade show active" id="divCardDGCIacompDiarioContent" role="tabpanel" aria-labelledby="tabCardDGCIacompDiario">
+									<div style="display: flex; flex-direction: column; justify-content: center; align-items: center;width:800px">
+										<div id="divCardDGCIacompDiario" style="width:800px;"></div>
+										<div id="divCesta" style="width:740px;border: 1px solid #9f9b9b; border-radius:30px; padding-left: 20px;padding-right: 20px;padding-bottom:5px; margin-top:10px; display: none; flex-direction: column; justify-content: center; align-items: center;">
+											<!-- Ícone de seta da Font Awesome -->
+											<div style="position: relative; top: -19px;">
+												<i class="fa fa-arrow-up" style="font-size:20px;color:#9f9b9b"></i>
+											</div>
+											
+											<div id="divCardPRCIacompDiario" style="width:700px"></div>
+											<div id="divCardSLNCacompDiario" style="width:700px"></div>
+											
 										</div>
-										
-										<div id="divCardPRCIacompDiario" style="width:700px"></div>
-										<div id="divCardSLNCacompDiario" style="width:700px"></div>
-										
 									</div>
 								</div>
-							</div>
-						
-							<div class="tab-pane fade" id="divTabResumoDGCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoDGCIorgaos" style="width:100%;">
-								<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
-								<div id="divTabResumoDGCIorgaos"></div>
-							</div>
-							<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
-								<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
-								<div id="divTabResumoPRCIorgaos"></div>
-							</div>
-							<div class="tab-pane fade" id="divTabResumoSLNCorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoSLNCorgaos" >
-								<h5 style="color:#0083ca;">SLNC por órgão responsável:</h5>
-								<div id="divTabResumoSLNCorgaos"></div>
-							</div>
-							<div class="tab-pane fade" id="divIndicadorPRCIContent" role="tabpanel" aria-labelledby="tabIndicadorPRCI" >
 							
-								<div id="divIndicadorPRCI"></div>
-							</div>
-							<div class="tab-pane fade" id="divIndicadorSLNCContent" role="tabpanel" aria-labelledby="tabIndicadorSLNC" >
-								<div id="divIndicadorSLNC"></div>
+								<div class="tab-pane fade" id="divTabResumoDGCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoDGCIorgaos" style="width:100%;">
+									<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
+									<div id="divTabResumoDGCIorgaos"></div>
+								</div>
+								<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
+									<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
+									<div id="divTabResumoPRCIorgaos"></div>
+								</div>
+								<div class="tab-pane fade" id="divTabResumoSLNCorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoSLNCorgaos" >
+									<h5 style="color:#0083ca;">SLNC por órgão responsável:</h5>
+									<div id="divTabResumoSLNCorgaos"></div>
+								</div>
+								<div class="tab-pane fade" id="divIndicadorPRCIContent" role="tabpanel" aria-labelledby="tabIndicadorPRCI" >
+								
+									<div id="divIndicadorPRCI"></div>
+								</div>
+								<div class="tab-pane fade" id="divIndicadorSLNCContent" role="tabpanel" aria-labelledby="tabIndicadorSLNC" >
+									<div id="divIndicadorSLNC"></div>
+								</div>
 							</div>
 						</div>
+
 					</div>
-
 				</div>
-			</div>
-		</section>
+			</section>
 
 
-		
-		<!-- /.content -->
-	</div>
-	<!-- /.content-wrapper -->
-	<cfinclude template="pc_Footer.cfm">
+			
+			<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<cfinclude template="pc_Footer.cfm">
 	</div>
     <!-- ./wrapper -->
     <cfinclude template="pc_Sidebar.cfm">
@@ -184,7 +184,7 @@
 					type: "post",
 					url: "cfc/pc_cfcIndicadores.cfc",
 					data:{
-						method:"cardGDCI_AcompDiario",
+						method:"cardDGCI_AcompDiario",
 						ano:currentYear,
 						mes:currentMonth
 					},
