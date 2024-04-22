@@ -201,6 +201,8 @@
 				justify-content: center!important;
 			}			
 		</style>
+		
+		
 
 		<!-- Main content -->
 		<section class="content">
@@ -241,6 +243,8 @@
 																	<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 																		SELECT pc_avaliadores.pc_avaliador_matricula FROM pc_avaliadores WHERE pc_avaliador_id_processo = '#pc_processo_id#' 
 																	</cfquery>
+																	<cfset aux_sei = Trim('#rsProcCard.pc_num_sei#')>
+																	<cfset aux_sei = Left(aux_sei,"5") & "." & Mid(aux_sei,"6","6") & "/" &  Mid(aux_sei,"12","4")& "-" & Right(aux_sei,"2")>
 																	<cfset avaliadores = ValueList(rsAvaliadores.pc_avaliador_matricula,',')>
 																	<tr style="width:270px;border:none;">
 																		<td style="background: none;border:none;white-space:normal!important;" >	
@@ -263,12 +267,13 @@
 																										
 
 																										<div class="card-header" style="height:120px;width:250px;    font-weight: normal!important;">
-																											<p style="font-size:1em;margin-bottom: 0.3rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
+																											<p style="font-size:1em;margin-bottom: 0.3rem!important;"><cfoutput>Processo SNCI n°: #pc_processo_id#</cfoutput></p>
+																											<p style="font-size:0.8em;margin-bottom: 0.3rem!important;"><cfoutput>Processo SEI n°: #aux_sei#</cfoutput></p>
 																											<p style="font-size:1em;margin-bottom: 0.3rem!important;"><cfoutput>#pc_org_sigla#</cfoutput></p>
 																											<cfif pc_num_avaliacao_tipo neq 2>
-																												<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
+																												<p style="font-size:9px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
 																											<cfelse>
-																												<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
+																												<p style="font-size:9px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
 																											</cfif>
 																											
 																										</div>

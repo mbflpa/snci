@@ -116,6 +116,9 @@
 							<div disable class="tab-pane fade active show " id="custom-tabs-one-DGCI_ECT"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCI_ECT-tab" >
 												
 								<div id="divIndicadorDGCI_ECT" ></div>
+								<div id="divIndicadorDGCI_ECT_mes_a_mes" ></div>
+
+
 							</div>
 
 							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporOrgaoSubord"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgaoSubord-tab" >	
@@ -128,7 +131,7 @@
 									<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
 									<h6 >Atenção: Nesta tabela, também aparecerão os órgãos subordinadores que possuem ou possuíram orientações sob sua responsabilidade no período selecionado.</h6>
 								</div>															
-								<div id="divIndicadorDGCIporGerencia" ></div>
+								<div id="divIndicadorDGCIporOrgaoResponsavel" ></div>
 							</div>
 
 							<div disable class="tab-pane fade " id="custom-tabs-one-PRCIporOrgaoSubordinador"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIporOrgaoSubordinador-tab" >	
@@ -292,10 +295,7 @@
 						let conteudoDGCI_ECT = $('#divCardDGCIectMes').html();
 						let conteudoDGCI_ECT_acumulado = $('#divCardDGCIectAcumulado').html();
 						let conteudoIndicadoresMes = $('#divIndicadoresMes').html();
-						let conteudoDGCIporOrgaoSubord = $('#divDGCIporOrgaoSubord').html();
-						let conteudoDGCIporGerencia = $('#divDGCIporGerencia').html();
-						let conteudoPRCIporOrgaoSubordinador = $('#divPRCIporOrgaoSubordinador').html();
-						let conteudoSLNCporOrgaoSubordinador = $('#divSLNCporOrgaoSubordinador').html();
+						
 						let conteudoDetalhesPRCI = $('#divDetalhePRCI').html();
 						let conteudoDetalhesSLNC = $('#divDetalheSLNC').html();
 						let conteudoDivMesAnoCI = $('#divMesAno').html();
@@ -305,24 +305,23 @@
 						$('#divCardDGCIectMes').html('');
 						$('#divCardDGCIectAcumulado').html('');
 						$('#divIndicadoresMes').html('');
+						
 						$('#divIndicadorDGCIporOrgaoSubord').html('');
-						$('#divIndicadorDGCIporGerencia').html('');
-						$('#divPRCIporOrgaoSubordinador').html('');
+						$('#divIndicadorDGCIporOrgaoResponsavel').html('');
+						$('#divIndicadorPRCIporOrgaoSubordinador').html('');
 						$('#divIndicadorSLNCporOrgaoSubordinador').html('');
-						$('#divIndicadorDetalhesPRCI').html('');
-						$('#divIndicadorDetalhesSLNC').html('');
+						
+						//$('#divIndicadorDetalhesPRCI').html('');
+						//$('#divIndicadorDetalhesSLNC').html('');
 						$('#divMesAnoCI').html('');
 						
 						// Adicionar o conteúdo às divs de detalhes das abas
 						$('#divIndicadorDGCI_ECT').append(conteudoDGCI_ECT);
 						$('#divIndicadorDGCI_ECT').append(conteudoDGCI_ECT_acumulado);
 						$('#divIndicadorDGCI_ECT').append(conteudoIndicadoresMes);
-						$('#divIndicadorDGCIporOrgaoSubord').html(conteudoDGCIporOrgaoSubord);
-						$('#divIndicadorDGCIporGerencia').html(conteudoDGCIporGerencia);
-						$('#divIndicadorPRCIporOrgaoSubordinador').html(conteudoPRCIporOrgaoSubordinador);
-						$('#divIndicadorSLNCporOrgaoSubordinador').html(conteudoSLNCporOrgaoSubordinador);
-						$('#divIndicadorDetalhesPRCI').html(conteudoDetalhesPRCI);
-						$('#divIndicadorDetalhesSLNC').html(conteudoDetalhesSLNC);
+						
+						//$('#divIndicadorDetalhesPRCI').html(conteudoDetalhesPRCI);
+						//$('#divIndicadorDetalhesSLNC').html(conteudoDetalhesSLNC);
 						$('#divMesAnoCI').html(conteudoDivMesAnoCI);
 
 						// Esconder o conteúdo original
@@ -350,6 +349,192 @@
 							
 					}
 				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabPRCIorgaosSubordinadores_mensal_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorPRCIporOrgaoSubordinador').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				}) 
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabSLNCorgaosSubordinadores_mensal_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorSLNCporOrgaoSubordinador').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabDGCIorgaosSubordinadores_mensal_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDGCIporOrgaoSubord').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabDGCIorgaosResposaveis_mensal_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDGCIporOrgaoResponsavel').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabPRCIdetalhe_mensal_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDetalhesPRCI').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabSLNCdetalhe_mensal_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDetalhesSLNC').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores.cfc",
+					data:{
+						method:"tabDGCImes_A_mes_mensal_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDGCI_ECT_mes_a_mes').html(result);//INSERE OS INDICADORES NA DIV
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				
+
+				
 
 			}, 1000);
 		});
