@@ -172,7 +172,7 @@
 							setTimeout(function() {	
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcIndicadores.cfc",
+									url: "cfc/pc_cfcIndicadores_gerarDados.cfc",
 									data:{
 										method:"deletaDadosParaIndicadores",
 										ano:ano,
