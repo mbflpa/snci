@@ -104,22 +104,24 @@
 			<section class="content" style="margin-top:20px">
 				<div class="container-fluid">
 					<div id="divTabsIndicadores" style="display:none">
-					    
+					    <cfset orgaoAvaliado = application.rsUsuarioParametros.pc_org_orgaoAvaliado>
 						
-							<cfoutput><h5 style="color:##0083ca;">#application.rsUsuarioParametros.pc_org_sigla#: <strong><span id="mesAno"></span></strong></h5></cfoutput>
+						<cfoutput><h5 style="color:##0083ca;">#application.rsUsuarioParametros.pc_org_sigla#: <strong><span id="mesAno"></span></strong></h5></cfoutput>
 						<div class="card-header p-0 pt-1" >
 							<ul class="nav nav-pills nav-pills-abasIndicadoresMensal" id="myTabs" role="tablist" style="font-size:14px;">
 								<li class="nav-item " style="text-align: center;">
 									<a class="nav-link active  btn   nav-link-abasIndicadoresMensal " id="tabCardDGCIacompMensal" data-toggle="tab" href="#divCardDGCIacompMensalContent" role="tab" aria-controls="divCardDGCIacompMensalContent" aria-selected="true" ><i class="fa fa-chart-line"></i> Resultado DGCI</a>
 								</li>
+								<cfif orgaoAvaliado eq 1>
+									<li class="nav-item " style="text-align: center;">
+										<a class="nav-link btn  nav-link-abasIndicadoresMensal " id="tabTabResumoDGCIorgaos" data-toggle="tab" href="#divTabResumoDGCIorgaosContent" role="tab" aria-controls="divTabResumoDGCIorgaosContent" aria-selected="false"><i class="fa fa-chart-line"></i> DGCI <cfif orgaoAvaliado eq 1>(órgãos)</cfif></a>
+									</li>
+								</cfif>
 								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn  nav-link-abasIndicadoresMensal " id="tabTabResumoDGCIorgaos" data-toggle="tab" href="#divTabResumoDGCIorgaosContent" role="tab" aria-controls="divTabResumoDGCIorgaosContent" aria-selected="false"><i class="fa fa-chart-line"></i> DGCI (órgãos)</a>
+									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoPRCIorgaos" data-toggle="tab" href="#divTabResumoPRCIorgaosContent" role="tab" aria-controls="divTabResumoPRCIorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> PRCI <cfif orgaoAvaliado eq 1>(órgãos)</cfif></a>
 								</li>
 								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoPRCIorgaos" data-toggle="tab" href="#divTabResumoPRCIorgaosContent" role="tab" aria-controls="divTabResumoPRCIorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> PRCI (órgãos)</a>
-								</li>
-								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoSLNCorgaos" data-toggle="tab" href="#divTabResumoSLNCorgaosContent" role="tab" aria-controls="divTabResumoSLNCorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> SLNC (órgãos)</a>
+									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoSLNCorgaos" data-toggle="tab" href="#divTabResumoSLNCorgaosContent" role="tab" aria-controls="divTabResumoSLNCorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> SLNC <cfif orgaoAvaliado eq 1>(órgãos)</cfif></a>
 								</li>
 								<li class="nav-item " style="text-align: center;">
 									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabIndicadorPRCI" data-toggle="tab" href="#divIndicadorPRCIContent" role="tab" aria-controls="divIndicadorPRCIContent" aria-selected="false"><i class="fa fa-database"></i> Dados PRCI</a>
@@ -148,11 +150,12 @@
 										</div>
 									</div>
 								</div>
-							
-								<div class="tab-pane fade" id="divTabResumoDGCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoDGCIorgaos" style="width:100%;">
-									<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
-									<div id="divTabDGCI"></div>
-								</div>
+								<cfif orgaoAvaliado eq 1>
+									<div class="tab-pane fade" id="divTabResumoDGCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoDGCIorgaos" style="width:100%;">
+										<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
+										<div id="divTabDGCI"></div>
+									</div>
+								</cfif>
 								<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
 									<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
 									<div id="divTabPRCI"></div>
@@ -274,12 +277,17 @@
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {	
 				
-				
-			
+				<cfoutput>
+					var orgaoAvaliado = '#application.rsUsuarioParametros.pc_org_orgaoAvaliado#';
+				</cfoutput>
+				let cfcIndicadoresMensal ='cfc/pc_cfcIndicadores_acomp_mensal_OA.cfc';
+			    if(orgaoAvaliado == 0){
+					cfcIndicadoresMensal = 'cfc/pc_cfcIndicadores_acomp_mensal_OR.cfc';
+				}
 				
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: cfcIndicadoresMensal,
 					data:{
 						method:"tabPRCIDetalhe_mensal",
 						ano:selectedYear,
@@ -303,7 +311,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: cfcIndicadoresMensal,
 					data:{
 						method:"tabSLNCDetalhe_mensal",
 						ano:selectedYear,
@@ -329,7 +337,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: cfcIndicadoresMensal,
 					data:{
 						method:"tabResumoPRCIorgaosResp_mensal",
 						ano:selectedYear,
@@ -355,7 +363,7 @@
 				
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: cfcIndicadoresMensal,
 					data:{
 						method:"tabResumoSLNCorgaosResp_mensal",
 						ano:selectedYear,
@@ -381,7 +389,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: cfcIndicadoresMensal,
 					data:{
 						method:"tabResumoDGCIorgaosResp_mensal",
 						ano:selectedYear,
@@ -407,7 +415,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: cfcIndicadoresMensal,
 					data:{
 						method:"cardPRCI_AcompMensal",
 						ano:selectedYear,
@@ -433,7 +441,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: cfcIndicadoresMensal,
 					data:{
 						method:"cardSLNC_AcompMensal",
 						ano:selectedYear,
@@ -459,7 +467,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: cfcIndicadoresMensal,
 					data:{
 						method:"cardDGCI_AcompMensal",
 						ano:selectedYear,

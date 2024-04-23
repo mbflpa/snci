@@ -162,7 +162,7 @@
 							
 							$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 								type: "post",
-								url: "cfc/pc_cfcIndicadores.cfc",
+								url: "cfc/pc_cfcIndicadores_gerarDados.cfc",
 								data:{
 									method:"verificaExisteDadosGerados",
 									ano:selectedYear,
@@ -209,7 +209,7 @@
 							setTimeout(function() {	
 								$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 									type: "post",
-									url: "cfc/pc_cfcIndicadores.cfc",
+									url: "cfc/pc_cfcIndicadores_gerarDados.cfc",
 									data:{
 										method:"gerarDadosParaIndicadores",
 										ano:ano,
@@ -276,7 +276,7 @@
 							setTimeout(function() {	
 								$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 									type: "post",
-									url: "cfc/pc_cfcIndicadores.cfc",
+									url: "cfc/pc_cfcIndicadores_gerarDados.cfc",
 									data:{
 										method:"gerarDadosParaIndicadores",
 										ano:ano,
@@ -336,7 +336,7 @@
 			setTimeout(function() {	
 				$.ajax({
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: "cfc/pc_cfcIndicadores_gerarDados.cfc",
 					data:{
 						method:"mesesDadosGerados",
 						ano:ano

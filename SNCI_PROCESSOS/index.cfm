@@ -422,7 +422,7 @@
                 // Executa a função para gerar os dados para os indicadores
                 $.ajax({//AJAX PARA CONSULTAR OS INDICADORES
                     type: "post",
-                    url: "cfc/pc_cfcIndicadores.cfc",
+                    url: "cfc/pc_cfcIndicadores_gerarDados.cfc",
                     data:{
                         method:"verificaExisteDadosGerados",
                         ano:previousYear,
@@ -457,7 +457,7 @@
         function gerarDados(previousMonth, previousYear){
              $.ajax({//AJAX PARA CONSULTAR OS INDICADORES
                 type: "post",
-                url: "cfc/pc_cfcIndicadores.cfc",
+                url: "cfc/pc_cfcIndicadores_gerarDados.cfc",
                 data:{
                     method:"gerarDadosParaIndicadores",
                     ano:previousYear,

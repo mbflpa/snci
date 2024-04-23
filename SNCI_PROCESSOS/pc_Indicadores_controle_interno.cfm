@@ -31,6 +31,25 @@
 				border-style: inset!important;
 				border-top: 3px solid rgba(0, 0, 0, 0.1)!important;
 			}
+			.nav-pills-abasIndicadoresMensal .nav-link-abasIndicadoresMensal {
+				color: #3f4449!important;
+				background-color: #ececec!important;
+				border: 2px solid #f2f4f7 !important;
+				border-radius: 10px!important;
+				margin-right: 5px!important;
+			}
+			.nav-pills-abasIndicadoresMensal .nav-link-abasIndicadoresMensal.active, .nav-pills-abasIndicadoresMensal .show > .nav-link-abasIndicadoresMensal {
+				color: #fff!important;
+				background-color: #2581c8!important;
+				border-color: #2581c8!important;
+			}
+
+			
+
+			.nav-link-abasIndicadoresMensal:hover {
+				border-color: #fbc32f7d!important;
+				background-color: #fbc32f7d!important;
+			}
 		</style>
 		
 </head>
@@ -76,36 +95,36 @@
 
 				<div id="divMesAnoCI"></div>
 
-				<div id="divTabsIndicadores" class="card card-primary card-tabs"  style="widht:100%;">
-					<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+				<div id="divTabsIndicadores" style="display:none">
+					<div class="card-header p-0 pt-1" >
 						
-						<ul class="nav nav-tabs" id="custom-tabs-one-tabAcomp" role="tablist" style="font-size:14px;">
+						<ul class="nav nav-pills nav-pills-abasIndicadoresMensal" id="custom-tabs-one-tabAcomp" role="tablist" style="font-size:14px;">
 
 							<li class="nav-item" style="text-align: center;f">
-								<a  class="nav-link  active" id="custom-tabs-one-DGCI_ECT-tab"   data-toggle="pill" href="#custom-tabs-one-DGCI_ECT" role="tab" aria-controls="custom-tabs-one-DGCI_ECT" aria-selected="true">DGCI ECT</a>
+								<a  class="nav-link  active btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCI_ECT-tab"   data-toggle="pill" href="#custom-tabs-one-DGCI_ECT" role="tab" aria-controls="custom-tabs-one-DGCI_ECT" aria-selected="true">RESULTADO<br>DGCI ECT</a>
 							</li>
 
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link " id="custom-tabs-one-DGCIporOrgaoSubord-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgaoSubord" role="tab" aria-controls="custom-tabs-one-DGCIporOrgaoSubord" aria-selected="true">DGCI<br>Órgão Subord.</a>
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCIporOrgaoSubord-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgaoSubord" role="tab" aria-controls="custom-tabs-one-DGCIporOrgaoSubord" aria-selected="true">DGCI<br>Órgão Subord.</a>
 							</li>
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link  " id="custom-tabs-one-DGCIporGerencia-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporGerencia" role="tab" aria-controls="custom-tabs-one-DGCIporGerencia" aria-selected="true">DGCI<br>Órgão Resp.</a>
+								<a  class="nav-link  btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCIporGerencia-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporGerencia" role="tab" aria-controls="custom-tabs-one-DGCIporGerencia" aria-selected="true">DGCI<br>Órgão Resp.</a>
 							</li>
 							
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link  " id="custom-tabs-one-PRCIporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-PRCIporOrgaoSubordinador" aria-selected="true">PRCI<br>Órgao Subord.</a>
+								<a  class="nav-link  btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-PRCIporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-PRCIporOrgaoSubordinador" aria-selected="true">PRCI<br>Órgao Subord.</a>
 							</li>
 
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link  " id="custom-tabs-one-SLNCporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-SLNCporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-SLNCporOrgaoSubordinador" aria-selected="true">SLNC<br>Órgao Subord.</a>
+								<a  class="nav-link  btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-SLNCporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-SLNCporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-SLNCporOrgaoSubordinador" aria-selected="true">SLNC<br>Órgao Subord.</a>
 							</li>
 
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link" id="custom-tabs-one-PRCI-tab"   data-toggle="pill" href="#custom-tabs-one-PRCI" role="tab" aria-controls="custom-tabs-one-PRCI" aria-selected="true">PRCI<br>Detalhes</a>
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-PRCI-tab"   data-toggle="pill" href="#custom-tabs-one-PRCI" role="tab" aria-controls="custom-tabs-one-PRCI" aria-selected="true">PRCI<br>Detalhes</a>
 							</li>
 							
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link " id="custom-tabs-one-SLNC-tab"   data-toggle="pill" href="#custom-tabs-one-SLNC" role="tab" aria-controls="custom-tabs-one-SLNC" aria-selected="true">SLNC<br>Detalhes</a>
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-SLNC-tab"   data-toggle="pill" href="#custom-tabs-one-SLNC" role="tab" aria-controls="custom-tabs-one-SLNC" aria-selected="true">SLNC<br>Detalhes</a>
 							</li>
 							
 						</ul>
@@ -114,11 +133,9 @@
 						<div class="tab-content " id="custom-tabs-one-tabContent" >
 
 							<div disable class="tab-pane fade active show " id="custom-tabs-one-DGCI_ECT"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCI_ECT-tab" >
-												
-								<div id="divIndicadorDGCI_ECT" ></div>
-								<div id="divIndicadorDGCI_ECT_mes_a_mes" ></div>
-
-
+								<div id="divIndicadorDGCI_ECT_mes" style="margin-bottom:20px"></div>
+								<div id="divIndicadorDGCI_ECT_acumulado" style="margin-bottom:20px"></div>
+								<div id="divIndicadorDGCI_ECT_mes_a_mes" style="margin-bottom:20px" ></div>
 							</div>
 
 							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporOrgaoSubord"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgaoSubord-tab" >	
@@ -159,9 +176,6 @@
 					
 				</div>
 
-
-				
-					<div id="divIndicadorDetalhes" ></div>
 
 
 				
@@ -266,93 +280,29 @@
 
 		$('#opcoesMes').on('change', function() {
 			$('#divTabsIndicadores').hide();
-			$('#divIndicadorDetalhes').html('');
 			$('#divMesAnoCI').html('');
-			$('#divIndicadorDGCI_ECT').html('');
+			$('#divIndicadorDGCI_ECT_mes').html('');
+			$('#divIndicadorDGCI_ECT_acumulado').html('');
+			$('#divIndicadorDGCI_ECT_mes_a_mes').html('');
+			$('#divIndicadorDGCIporOrgaoSubord').html('');
+			$('#divIndicadorDGCIporOrgaoResponsavel').html('');
+			$('#divIndicadorPRCIporOrgaoSubordinador').html('');
+			$('#divIndicadorSLNCporOrgaoSubordinador').html('');
+			$('#divIndicadorDetalhesPRCI').html('');
+			$('#divIndicadorDetalhesSLNC').html('');
+
+
 			// Obtém o ano selecionado		
 			let selectedYear = parseInt($('input[name=ano]:checked').val());	
 			// Obtém o mês selecionado
 			let selectedMonth = parseInt($('input[name=mes]:checked').val());
-
-			
-
 
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {	
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
-					data:{
-						method:"formIndicadoresCI",
-						ano:selectedYear,
-						mes:selectedMonth
-					},
-					async: false,
-					success: function(result) {	
-						$('#divIndicadorDetalhes').html(result);//INSERE OS INDICADORES NA DIV
-						// Armazenar o conteúdo das divs de detalhes
-						let conteudoDGCI_ECT = $('#divCardDGCIectMes').html();
-						let conteudoDGCI_ECT_acumulado = $('#divCardDGCIectAcumulado').html();
-						let conteudoIndicadoresMes = $('#divIndicadoresMes').html();
-						
-						let conteudoDetalhesPRCI = $('#divDetalhePRCI').html();
-						let conteudoDetalhesSLNC = $('#divDetalheSLNC').html();
-						let conteudoDivMesAnoCI = $('#divMesAno').html();
-						
-
-						// Limpar o conteúdo das divs de detalhes
-						$('#divCardDGCIectMes').html('');
-						$('#divCardDGCIectAcumulado').html('');
-						$('#divIndicadoresMes').html('');
-						
-						$('#divIndicadorDGCIporOrgaoSubord').html('');
-						$('#divIndicadorDGCIporOrgaoResponsavel').html('');
-						$('#divIndicadorPRCIporOrgaoSubordinador').html('');
-						$('#divIndicadorSLNCporOrgaoSubordinador').html('');
-						
-						//$('#divIndicadorDetalhesPRCI').html('');
-						//$('#divIndicadorDetalhesSLNC').html('');
-						$('#divMesAnoCI').html('');
-						
-						// Adicionar o conteúdo às divs de detalhes das abas
-						$('#divIndicadorDGCI_ECT').append(conteudoDGCI_ECT);
-						$('#divIndicadorDGCI_ECT').append(conteudoDGCI_ECT_acumulado);
-						$('#divIndicadorDGCI_ECT').append(conteudoIndicadoresMes);
-						
-						//$('#divIndicadorDetalhesPRCI').html(conteudoDetalhesPRCI);
-						//$('#divIndicadorDetalhesSLNC').html(conteudoDetalhesSLNC);
-						$('#divMesAnoCI').html(conteudoDivMesAnoCI);
-
-						// Esconder o conteúdo original
-						$('#divIndicadorDetalhes').html('');
-
-						// Ajustar altura
-						$(".content-wrapper").css("height", "auto");
-
-						$('#divTabsIndicadores').show();
-
-						$('#modalOverlay').delay(1000).hide(0, function() {
-				 			$('#modalOverlay').modal('hide');
-				 		});
-						
-					},
-					error: function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-							$('#divTabsIndicadores').hide();
-							$('#divIndicadorDetalhes').html('');
-						});
-						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
-						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
-							
-					}
-				})
-
-				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
-					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
 					data:{
 						method:"tabPRCIorgaosSubordinadores_mensal_CI",
 						ano:selectedYear,
@@ -361,9 +311,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divIndicadorPRCIporOrgaoSubordinador').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -378,7 +326,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
 					data:{
 						method:"tabSLNCorgaosSubordinadores_mensal_CI",
 						ano:selectedYear,
@@ -387,9 +335,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divIndicadorSLNCporOrgaoSubordinador').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -404,7 +350,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
 					data:{
 						method:"tabDGCIorgaosSubordinadores_mensal_CI",
 						ano:selectedYear,
@@ -413,9 +359,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divIndicadorDGCIporOrgaoSubord').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -430,7 +374,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
 					data:{
 						method:"tabDGCIorgaosResposaveis_mensal_CI",
 						ano:selectedYear,
@@ -439,9 +383,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divIndicadorDGCIporOrgaoResponsavel').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -456,7 +398,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
 					data:{
 						method:"tabPRCIdetalhe_mensal_CI",
 						ano:selectedYear,
@@ -465,9 +407,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divIndicadorDetalhesPRCI').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -482,7 +422,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
 					data:{
 						method:"tabSLNCdetalhe_mensal_CI",
 						ano:selectedYear,
@@ -491,9 +431,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divIndicadorDetalhesSLNC').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -508,7 +446,7 @@
 
 				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
 					type: "post",
-					url: "cfc/pc_cfcIndicadores.cfc",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
 					data:{
 						method:"tabDGCImes_A_mes_mensal_CI",
 						ano:selectedYear,
@@ -517,9 +455,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divIndicadorDGCI_ECT_mes_a_mes').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -532,11 +468,57 @@
 					}
 				})
 
-				
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
+					data:{
+						method:"cardDGCI_ECT_mes_mensal_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDGCI_ECT_mes').html(result);//INSERE OS INDICADORES NA DIV
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
 
-				
-
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
+					data:{
+						method:"cardDGCI_ECT_acumulado_mensal_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDGCI_ECT_acumulado').html(result);//INSERE OS INDICADORES NA DIV
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+                $('#divTabsIndicadores').show();
 			}, 1000);
+
+			$('#modalOverlay').delay(1000).hide(0, function() {
+				$('#modalOverlay').modal('hide');
+			});
 		});
 
 
