@@ -101,30 +101,30 @@
 						<ul class="nav nav-pills nav-pills-abasIndicadoresMensal" id="custom-tabs-one-tabAcomp" role="tablist" style="font-size:14px;">
 
 							<li class="nav-item" style="text-align: center;f">
-								<a  class="nav-link  active btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCI_ECT-tab"   data-toggle="pill" href="#custom-tabs-one-DGCI_ECT" role="tab" aria-controls="custom-tabs-one-DGCI_ECT" aria-selected="true">RESULTADO<br>DGCI ECT</a>
+								<a  class="nav-link  active btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCI_ECT-tab"   data-toggle="pill" href="#custom-tabs-one-DGCI_ECT" role="tab" aria-controls="custom-tabs-one-DGCI_ECT" aria-selected="true"><i class="fa fa-chart-line"></i> DGCI<br>RESULTADO ECT</a>
 							</li>
 
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCIporOrgaoSubord-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgaoSubord" role="tab" aria-controls="custom-tabs-one-DGCIporOrgaoSubord" aria-selected="true">DGCI<br>Órgão Subord.</a>
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCIporOrgaoSubord-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporOrgaoSubord" role="tab" aria-controls="custom-tabs-one-DGCIporOrgaoSubord" aria-selected="true"><i class="fa fa-chart-line"></i> DGCI<br>Órgão Subord.</a>
 							</li>
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link  btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCIporGerencia-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporGerencia" role="tab" aria-controls="custom-tabs-one-DGCIporGerencia" aria-selected="true">DGCI<br>Órgão Resp.</a>
+								<a  class="nav-link  btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCIporGerencia-tab"   data-toggle="pill" href="#custom-tabs-one-DGCIporGerencia" role="tab" aria-controls="custom-tabs-one-DGCIporGerencia" aria-selected="true"><i class="fa fa-chart-line"></i> DGCI<br>Órgão Resp.</a>
 							</li>
 							
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link  btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-PRCIporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-PRCIporOrgaoSubordinador" aria-selected="true">PRCI<br>Órgao Subord.</a>
+								<a  class="nav-link  btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-PRCIporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-PRCIporOrgaoSubordinador" aria-selected="true"><i class="fa fa-shopping-basket"></i> PRCI<br>Órgao Subord.</a>
 							</li>
 
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link  btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-SLNCporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-SLNCporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-SLNCporOrgaoSubordinador" aria-selected="true">SLNC<br>Órgao Subord.</a>
+								<a  class="nav-link  btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-SLNCporOrgaoSubordinador-tab"   data-toggle="pill" href="#custom-tabs-one-SLNCporOrgaoSubordinador" role="tab" aria-controls="custom-tabs-one-SLNCporOrgaoSubordinador" aria-selected="true"><i class="fa fa-shopping-basket"></i> SLNC<br>Órgao Subord.</a>
 							</li>
 
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-PRCI-tab"   data-toggle="pill" href="#custom-tabs-one-PRCI" role="tab" aria-controls="custom-tabs-one-PRCI" aria-selected="true">PRCI<br>Detalhes</a>
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-PRCI-tab"   data-toggle="pill" href="#custom-tabs-one-PRCI" role="tab" aria-controls="custom-tabs-one-PRCI" aria-selected="true"><i class="fa fa-database"></i> PRCI<br>Detalhes</a>
 							</li>
 							
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-SLNC-tab"   data-toggle="pill" href="#custom-tabs-one-SLNC" role="tab" aria-controls="custom-tabs-one-SLNC" aria-selected="true">SLNC<br>Detalhes</a>
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-SLNC-tab"   data-toggle="pill" href="#custom-tabs-one-SLNC" role="tab" aria-controls="custom-tabs-one-SLNC" aria-selected="true"><i class="fa fa-database"></i> SLNC<br>Detalhes</a>
 							</li>
 							
 						</ul>
