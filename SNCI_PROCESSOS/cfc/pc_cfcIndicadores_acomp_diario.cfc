@@ -2069,7 +2069,19 @@
 		</cfif>
 
 		<cfif percentualDGCI neq ''>
-			<cfset infoRodape = '<span style="font-size:14px">DGCI = #percentualDGCIformatado#% -> (PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#mediaPRCIformatado# x #pesoPRCIformatado#) + (#mediaSLNCformatado# x #pesoSLNCformatado#)</span><br>
+			<cfif rsmediaPRCIcardDiario.recordcount neq 0 AND rsmediaSLNCcardDiario.recordcount neq 0>
+				<cfset formulaDGCI = '(PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#mediaPRCIformatado# x #pesoPRCIformatado#) + (#mediaSLNCformatado# x #pesoSLNCformatado#)'>
+			<cfelseif rsmediaPRCIcardDiario.recordcount neq 0 AND rsmediaSLNCcardDiario.recordcount eq 0>
+				<cfset formulaDGCI = '(PRCI) = (#mediaPRCIformatado#)'>
+			<cfelseif rsmediaPRCIcardDiario.recordcount eq 0 AND rsmediaSLNCcardDiario.recordcount neq 0>
+				<cfset formulaDGCI = '(SLNC) = (#mediaSLNCformatado#)'>
+			<cfelse>
+				<cfset formulaDGCI = ''>
+			</cfif>
+
+						
+
+			<cfset infoRodape = '<span style="font-size:14px">DGCI = #percentualDGCIformatado#% -> #formulaDGCI#</span><br>
 						<span style="font-size:14px">Meta = #metaDGCIorgaoFormatado#% -> (Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC)= (#mediaMetaPRCIorgaosFormatado# x #pesoPRCIformatado#) + (#mediaMetaSLNCorgaosFormatado# x #pesoSLNCformatado#)</span><br>'>
 			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
 			<cfset var cardDGCI = objetoCFC.criarCardIndicador(
