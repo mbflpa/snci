@@ -1093,10 +1093,10 @@
 			SELECT 
 				pc_indOrgao_mcuOrgao as mcuOrgaoResp,
 				pc_orgaos.pc_org_sigla as siglaOrgaoResp,
-				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, 0)) as PRCI,
-				MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, 0)) as SLNC,
-				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoMes, 0)) as DGCI,
-				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoAcumulado, 0)) as DGCIacumulado
+				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, null)) as PRCI,
+				MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, null)) as SLNC,
+				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoMes, null)) as DGCI,
+				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoAcumulado, null)) as DGCIacumulado
 			FROM 
 				pc_indicadores_porOrgao
 			INNER JOIN 
@@ -1172,11 +1172,15 @@
 			<cfset metaDGCIformatado = Replace(NumberFormat(metaDGCIorgao,0.0), ".", ",")>
 		</cfif>
 		<cfif resultDGCIdados.DGCI neq ''>
-			<cfset mediaPRCI = NumberFormat(ROUND(resultDGCIdados.PRCI*10)/10,0.0)>
-			<cfset mediaPRCIformatado = Replace(NumberFormat(mediaPRCI,0.0), ".", ",")>
+		    <cfif resultDGCIdados.PRCI neq ''>
+				<cfset mediaPRCI = NumberFormat(ROUND(resultDGCIdados.PRCI*10)/10,0.0)>
+				<cfset mediaPRCIformatado = Replace(NumberFormat(mediaPRCI,0.0), ".", ",")>
+			</cfif>
 
-			<cfset mediaSLNC = NumberFormat(ROUND(resultDGCIdados.SLNC*10)/10,0.0)>
-			<cfset mediaSLNCformatado = Replace(NumberFormat(mediaSLNC,0.0), ".", ",")>
+			<cfif resultDGCIdados.SLNC neq ''>
+				<cfset mediaSLNC = NumberFormat(ROUND(resultDGCIdados.SLNC*10)/10,0.0)>
+				<cfset mediaSLNCformatado = Replace(NumberFormat(mediaSLNC,0.0), ".", ",")>
+			</cfif>
 
 			<cfset mediaDGCI = NumberFormat(ROUND(resultDGCIdados.DGCI*10)/10,0.0)>
 			<cfset mediaDGCIformatado = Replace(NumberFormat(mediaDGCI,0.0), ".", ",")>
@@ -1184,7 +1188,15 @@
 			<cfset DGCIresultadoMeta = ROUND((mediaDGCI / metaDGCIorgao)*100*10)/10>
 			<cfset DGCIresultadoMetaFormatado = Replace(NumberFormat(DGCIresultadoMeta,0.0), ".", ",")>
 
-			<cfset infoRodape = '<span style="font-size:14px">DGCI = #mediaDGCIformatado#% -> (PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#mediaPRCIformatado# x #pesoPRCIformatado#) + (#mediaSLNCformatado# x #pesoSLNCformatado#)</span><br>
+			<cfif resultDGCIdados.PRCI neq '' AND resultDGCIdados.SLNC neq ''>
+				<cfset formulaDGCI = '(PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#mediaPRCIformatado# x #pesoPRCIformatado#) + (#mediaSLNCformatado# x #pesoSLNCformatado#)'>
+			<cfelseif resultDGCIdados.PRCI neq '' AND resultDGCIdados.SLNC eq ''>
+				<cfset formulaDGCI = '(PRCI) = (#mediaPRCIformatado#)'>
+			<cfelseif resultDGCIdados.PRCI eq '' AND resultDGCIdados.SLNC neq ''>
+				<cfset formulaDGCI = '(SLNC) = (#mediaSLNCformatado#)'>
+			</cfif>
+
+			<cfset infoRodape = '<span style="font-size:14px">DGCI = #mediaDGCIformatado#% ->#formulaDGCI#</span><br>
 						<span style="font-size:14px">Meta = #metaDGCIformatado#% -> (Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC)= (#mediaMetaPRCIorgaosFormatado# x #pesoPRCIformatado#) + (#mediaMetaSLNCorgaosFormatado# x #pesoSLNCformatado#)</span><br>'>
 			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
 			<cfset var cardDGCImensal = objetoCFC.criarCardIndicador(

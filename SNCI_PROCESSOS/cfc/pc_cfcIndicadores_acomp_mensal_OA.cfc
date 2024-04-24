@@ -1121,10 +1121,10 @@
 			SELECT 
 				pc_indOrgao_mcuOrgao as mcuOrgaoResp,
 				pc_orgaos.pc_org_sigla as siglaOrgaoResp,
-				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, 0)) as PRCI,
-				MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, 0)) as SLNC,
-				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoMes, 0)) as DGCI,
-				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoAcumulado, 0)) as DGCIacumulado
+				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, null)) as PRCI,
+				MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, null)) as SLNC,
+				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoMes, null)) as DGCI,
+				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoAcumulado, null)) as DGCIacumulado
 			FROM 
 				pc_indicadores_porOrgao
 			INNER JOIN 
@@ -1185,64 +1185,73 @@
 				and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 				and pc_indPeso_ativo = 1
 		</cfquery>
-		<cfset pesoPRCI = 0>
-		<cfset pesoSLNC = 0>
-		<cfif rsPRCIpeso.recordcount neq 0>
-			<cfset pesoPRCI = rsPRCIpeso.pc_indPeso_peso>
-			<cfset pesoPRCIformatado = Replace(pesoPRCI, ".", ",")>
+
+		<cfif resultDGCIdados.DGCI neq ''>	
+			<cfset pesoPRCI = 0>
+			<cfset pesoSLNC = 0>
+			<cfif rsPRCIpeso.recordcount neq 0>
+				<cfset pesoPRCI = rsPRCIpeso.pc_indPeso_peso>
+				<cfset pesoPRCIformatado = Replace(pesoPRCI, ".", ",")>
+			</cfif>
+			<cfif rsSLNCpeso.recordcount neq 0>
+				<cfset pesoSLNC = rsSLNCpeso.pc_indPeso_peso>
+				<cfset pesoSLNCformatado = Replace(pesoSLNC, ".", ",")>
+			</cfif>
+
+
+			<cfset mediaMetaPRCIorgaos =rsMetaPRCI.mediaPRCImeta>
+			<cfif mediaMetaPRCIorgaos neq ''>
+				<cfset mediaMetaPRCIorgaosFormatado = Replace(NumberFormat(mediaMetaPRCIorgaos,0.0), ".", ",")>
+			</cfif>
+			<cfset mediaMetaSLNCorgaos =rsMetaSLNC.mediaSLNCmeta>
+			<cfif mediaMetaSLNCorgaos neq ''>
+				<cfset mediaMetaSLNCorgaosFormatado = Replace(NumberFormat(mediaMetaSLNCorgaos,0.0), ".", ",")>
+			</cfif>
+
+			<cfset metaDGCIorgao = rsMetaPRCI.mediaPRCImeta*rsPRCIpeso.pc_indPeso_peso + rsMetaSLNC.mediaSLNCmeta*rsSLNCpeso.pc_indPeso_peso>
+			<cfif metaDGCIorgao neq ''>
+				<cfset metaDGCIformatado = Replace(NumberFormat(metaDGCIorgao,0.0), ".", ",")>
+			</cfif>
+
+			<cfif resultDGCIdados.PRCI neq ''>
+				<cfset mediaPRCI = NumberFormat(ROUND(resultDGCIdados.PRCI*10)/10,0.0)>
+				<cfset mediaPRCIformatado = Replace(NumberFormat(mediaPRCI,0.0), ".", ",")>
+			</cfif>
+
+			<cfif resultDGCIdados.SLNC neq ''>
+				<cfset mediaSLNC = NumberFormat(ROUND(resultDGCIdados.SLNC*10)/10,0.0)>
+				<cfset mediaSLNCformatado = Replace(NumberFormat(mediaSLNC,0.0), ".", ",")>
+			</cfif>
+
+			<cfset mediaDGCI = NumberFormat(ROUND(resultDGCIdados.DGCI*10)/10,0.0)>
+			<cfset mediaDGCIformatado = Replace(NumberFormat(mediaDGCI,0.0), ".", ",")>
+
+			<cfset DGCIresultadoMeta = ROUND((mediaDGCI / metaDGCIorgao)*100*10)/10>
+			<cfset DGCIresultadoMetaFormatado = Replace(NumberFormat(DGCIresultadoMeta,0.0), ".", ",")>
+
+			<cfset infoRodape = '<span style="font-size:14px">DGCI = #mediaDGCIformatado#% -> (PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#mediaPRCIformatado# x #pesoPRCIformatado#) + (#mediaSLNCformatado# x #pesoSLNCformatado#)</span><br>
+						<span style="font-size:14px">Meta = #metaDGCIformatado#% -> (Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC)= (#mediaMetaPRCIorgaosFormatado# x #pesoPRCIformatado#) + (#mediaMetaSLNCorgaosFormatado# x #pesoSLNCformatado#)</span><br>'>
+			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
+			<cfset var cardDGCImensal = objetoCFC.criarCardIndicador(
+				tipoDeCard = 'bg-gradient-info',
+				siglaIndicador ='DGCI',
+				descricaoIndicador = 'Desempenho Geral do Controle Interno',
+				percentualIndicadorFormatado = mediaDGCIformatado,
+				resultadoEmRelacaoMeta = DGCIresultadoMeta,
+				resultadoEmRelacaoMetaFormatado = DGCIresultadoMetaFormatado,
+				infoRodape = infoRodape,
+				icone = 'fa fa-chart-line'
+
+			)>
+			<cfoutput>
+			
+				<div style="display: flex;justify-content: center;color:##0083ca;"><h5>#application.rsUsuarioParametros.pc_org_sigla# - #monthAsString(mes)#/#ano#</h5></div>
+				<div>#cardDGCImensal#</div>
+
+			</cfoutput>
+		<cfelse>
+			<cfoutput><h5 style="text-align:center">Sem dados para o indicador DGCI</cfoutput>
 		</cfif>
-		<cfif rsSLNCpeso.recordcount neq 0>
-			<cfset pesoSLNC = rsSLNCpeso.pc_indPeso_peso>
-			<cfset pesoSLNCformatado = Replace(pesoSLNC, ".", ",")>
-		</cfif>
-
-
-		<cfset mediaMetaPRCIorgaos =rsMetaPRCI.mediaPRCImeta>
-		<cfif mediaMetaPRCIorgaos neq ''>
-			<cfset mediaMetaPRCIorgaosFormatado = Replace(NumberFormat(mediaMetaPRCIorgaos,0.0), ".", ",")>
-		</cfif>
-		<cfset mediaMetaSLNCorgaos =rsMetaSLNC.mediaSLNCmeta>
-		<cfif mediaMetaSLNCorgaos neq ''>
-			<cfset mediaMetaSLNCorgaosFormatado = Replace(NumberFormat(mediaMetaSLNCorgaos,0.0), ".", ",")>
-		</cfif>
-
-		<cfset metaDGCIorgao = rsMetaPRCI.mediaPRCImeta*rsPRCIpeso.pc_indPeso_peso + rsMetaSLNC.mediaSLNCmeta*rsSLNCpeso.pc_indPeso_peso>
-		<cfif metaDGCIorgao neq ''>
-			<cfset metaDGCIformatado = Replace(NumberFormat(metaDGCIorgao,0.0), ".", ",")>
-		</cfif>
-
-		<cfset mediaPRCI = NumberFormat(ROUND(resultDGCIdados.PRCI*10)/10,0.0)>
-		<cfset mediaPRCIformatado = Replace(NumberFormat(mediaPRCI,0.0), ".", ",")>
-
-		<cfset mediaSLNC = NumberFormat(ROUND(resultDGCIdados.SLNC*10)/10,0.0)>
-		<cfset mediaSLNCformatado = Replace(NumberFormat(mediaSLNC,0.0), ".", ",")>
-
-		<cfset mediaDGCI = NumberFormat(ROUND(resultDGCIdados.DGCI*10)/10,0.0)>
-		<cfset mediaDGCIformatado = Replace(NumberFormat(mediaDGCI,0.0), ".", ",")>
-
-		<cfset DGCIresultadoMeta = ROUND((mediaDGCI / metaDGCIorgao)*100*10)/10>
-		<cfset DGCIresultadoMetaFormatado = Replace(NumberFormat(DGCIresultadoMeta,0.0), ".", ",")>
-
-		<cfset infoRodape = '<span style="font-size:14px">DGCI = #mediaDGCIformatado#% -> (PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#mediaPRCIformatado# x #pesoPRCIformatado#) + (#mediaSLNCformatado# x #pesoSLNCformatado#)</span><br>
-					<span style="font-size:14px">Meta = #metaDGCIformatado#% -> (Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC)= (#mediaMetaPRCIorgaosFormatado# x #pesoPRCIformatado#) + (#mediaMetaSLNCorgaosFormatado# x #pesoSLNCformatado#)</span><br>'>
-		<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-		<cfset var cardDGCImensal = objetoCFC.criarCardIndicador(
-			tipoDeCard = 'bg-gradient-info',
-			siglaIndicador ='DGCI',
-			descricaoIndicador = 'Desempenho Geral do Controle Interno',
-			percentualIndicadorFormatado = mediaDGCIformatado,
-			resultadoEmRelacaoMeta = DGCIresultadoMeta,
-			resultadoEmRelacaoMetaFormatado = DGCIresultadoMetaFormatado,
-			infoRodape = infoRodape,
-			icone = 'fa fa-chart-line'
-
-		)>
-		<cfoutput>
-		
-			<div style="display: flex;justify-content: center;color:##0083ca;"><h5>#application.rsUsuarioParametros.pc_org_sigla# - #monthAsString(mes)#/#ano#</h5></div>
-			<div>#cardDGCImensal#</div>
-
-		</cfoutput>
 
 		<script language="JavaScript">
 			$(document).ready(function() {
