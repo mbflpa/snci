@@ -513,7 +513,8 @@
 							
 					}
 				})
-                $('#divTabsIndicadores').show();
+                 //retirar o display none de divTabsIndicadores
+			   	$('#divTabsIndicadores').css('display', 'block');	
 			}, 1000);
 
 			$('#modalOverlay').delay(1000).hide(0, function() {

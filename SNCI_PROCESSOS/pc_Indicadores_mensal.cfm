@@ -270,6 +270,7 @@
         }); 
 
 		$('#opcoesMes').on('change', function() {
+			$('#divTabsIndicadores').hide();
 			// Obtém o ano selecionado		
 			let selectedYear = parseInt($('input[name=ano]:checked').val());	
 			// Obtém o mês selecionado
@@ -320,9 +321,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divDetalheSLNC').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -346,9 +345,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divTabPRCI').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -372,9 +369,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divTabSLNC').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -398,9 +393,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divTabDGCI').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -424,9 +417,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divCardPRCI').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -450,9 +441,7 @@
 					async: false,
 					success: function(result) {	
 						$('#divCardSLNC').html(result);//INSERE OS INDICADORES NA DIV
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -477,9 +466,7 @@
 					success: function(result) {	
 						$('#divCardDGCI').html(result);//INSERE OS INDICADORES NA DIV
 						$('#mesAno').html($('#spanMesAno').text());
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
+						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
