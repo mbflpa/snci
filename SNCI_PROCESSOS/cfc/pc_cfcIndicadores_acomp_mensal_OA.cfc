@@ -195,7 +195,9 @@
 			<!-- /.col -->
 			</div>
 			<!-- /.row -->
-        </cfif>
+        <cfelse>
+			<h5>Não há dados para exibir</h5>
+		</cfif>
 
 		<script language="JavaScript">
 		   
@@ -383,6 +385,8 @@
 			<!-- /.col -->
 			</div>
 			<!-- /.row -->
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 		<script language="JavaScript">
 		   
@@ -557,6 +561,8 @@
 				</table>
 			</div>
 
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 		<script language="JavaScript">
 
@@ -799,6 +805,8 @@
 				</table>
 			</div>
 
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 
 
@@ -1085,6 +1093,8 @@
 				</table>
 			</div>
 
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 
 

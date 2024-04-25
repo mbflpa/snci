@@ -286,7 +286,9 @@
 			<!-- /.col -->
 			</div>
 			<!-- /.row -->
-        </cfif>
+        <cfelse>
+			<h5>Não há dados para exibir</h5>
+		</cfif>
 
 		<script language="JavaScript">
 		   // Define a função para aplicar o estilo apenas nas células com a classe 'tdResult'
@@ -586,6 +588,8 @@
 			<!-- /.col -->
 			</div>
 			<!-- /.row -->
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 		<script language="JavaScript">
 		   
@@ -1396,6 +1400,8 @@
 									
 
 
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 		<script language="JavaScript">
 
@@ -1506,6 +1512,8 @@
 					</table>
 				</div>
 
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 		<script language="JavaScript">
 
@@ -1705,6 +1713,8 @@
 				
 				
 			</div>
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 
 		<script language="JavaScript">

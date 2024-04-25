@@ -257,7 +257,9 @@
 			<!-- /.col -->
 			</div>
 			<!-- /.row -->
-        </cfif>
+        <cfelse>
+			<h5>Não há dados para exibir</h5>
+		</cfif>
 
 		<script language="JavaScript">
 			var currentDate = new Date()
@@ -400,7 +402,9 @@
 			<!-- /.col -->
 			</div>
 			<!-- /.row -->
-        </cfif>
+        <cfelse>
+			<h5>Não há dados para exibir</h5>
+		</cfif>
 
 		<script language="JavaScript">
 
@@ -531,6 +535,8 @@
 					</div>
 				</div>
 			</div>
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 		<script language="JavaScript">
 
@@ -678,6 +684,8 @@
 					</div>
 				</div>
 			</div>
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 		<script language="JavaScript">
 
@@ -905,6 +913,8 @@
 					</div>
 				</div>
 			</div>
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 		<script language="JavaScript">
 
@@ -1120,6 +1130,8 @@
 					</div>
 				</div>
 			</div>
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 		<script language="JavaScript">
 
@@ -1348,6 +1360,8 @@
 					</div>
 				</div>
 			</div>
+		<cfelse>
+			<h5>Não há dados para exibir</h5>
 		</cfif>
 
 		<script language="JavaScript">
