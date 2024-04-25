@@ -617,56 +617,59 @@
 				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
 		</cfquery>
 
+		<cfif resultPRCIdados.recordcount neq 0>
+			<cfset var resultado = consultaIndicadorPRCI_TIDP_TGI_mensal(ano=arguments.ano, mes=arguments.mes)>
 
-        <cfset var resultado = consultaIndicadorPRCI_TIDP_TGI_mensal(ano=arguments.ano, mes=arguments.mes)>
+			<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
+				<cfset orgaosMCUList = ValueList(resultado.mcuOrgao)>
+			<cfelse>
+				<cfset orgaosMCUList = application.rsUsuarioParametros.pc_usu_lotacao>
+			</cfif>
+			
+			
+			<cfquery name="rsMetaPRCIcardMensal" datasource="#application.dsn_processos#" >
+				SELECT avg(pc_indMeta_meta) mediaPRCImeta FROM pc_indicadores_meta 
 
-		<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
-			<cfset orgaosMCUList = ValueList(resultado.mcuOrgao)>
+				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_numIndicador = 1
+						AND pc_indMeta_mcuOrgao in(#orgaosMCUList#)
+			</cfquery>
+
+			<cfset metaPRCIorgao = rsMetaPRCIcardMensal.mediaPRCImeta>
+			<cfif metaPRCIorgao neq ''>
+				<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0), ".", ",")>
+			</cfif>
+			
+
+			<cfset mediaPRCI = NumberFormat(ROUND(resultPRCIdados.PRCI*10)/10,0.0)>
+			<cfset mediaPRCIformatado = Replace(NumberFormat(mediaPRCI,0.0), ".", ",")>
+
+			<cfset PRCIresultadoMeta = ROUND((mediaPRCI / metaPRCIorgao)*100*10)/10>
+			<cfset PRCIresultadoMetaFormatado = Replace(NumberFormat(PRCIresultadoMeta,0.0), ".", ",")>
+
+																
+			<cfset 	infoRodape = '<span style="font-size:14px">PRCI = #mediaPRCIformatado#% (média do resultado do PRCI dos órgão subordinados)</span><br>
+						<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#% (média das metas do PRCI dos órgãos subordinados)</span><br>'>			
+			
+			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
+			<cfset var cardPRCImensal = objetoCFC.criarCardIndicador(
+				tipoDeCard = 'bg-gradient-warning',
+				siglaIndicador ='PRCI',
+				descricaoIndicador = 'Atendimento ao Prazo de Resposta',
+				percentualIndicadorFormatado = mediaPRCIformatado,
+				resultadoEmRelacaoMeta = PRCIresultadoMeta,
+				resultadoEmRelacaoMetaFormatado = PRCIresultadoMetaFormatado,
+				infoRodape = infoRodape,
+				icone = 'fa fa-shopping-basket'
+
+			)>
+
+			<cfoutput>#cardPRCImensal#</cfoutput>
 		<cfelse>
-			<cfset orgaosMCUList = application.rsUsuarioParametros.pc_usu_lotacao>
+			<cfoutput><h5 style="text-align:center">Sem dados para o indicador PRCI</cfoutput>
 		</cfif>
-		
-		
-		<cfquery name="rsMetaPRCIcardMensal" datasource="#application.dsn_processos#" >
-			SELECT avg(pc_indMeta_meta) mediaPRCImeta FROM pc_indicadores_meta 
 
-			WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-					AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-					AND pc_indMeta_numIndicador = 1
-					AND pc_indMeta_mcuOrgao in(#orgaosMCUList#)
-		</cfquery>
-
-		<cfset metaPRCIorgao = rsMetaPRCIcardMensal.mediaPRCImeta>
-		<cfif metaPRCIorgao neq ''>
-			<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0), ".", ",")>
-		</cfif>
-		
-
-		<cfset mediaPRCI = NumberFormat(ROUND(resultPRCIdados.PRCI*10)/10,0.0)>
-		<cfset mediaPRCIformatado = Replace(NumberFormat(mediaPRCI,0.0), ".", ",")>
-
-		<cfset PRCIresultadoMeta = ROUND((mediaPRCI / metaPRCIorgao)*100*10)/10>
-		<cfset PRCIresultadoMetaFormatado = Replace(NumberFormat(PRCIresultadoMeta,0.0), ".", ",")>
-
-															
-		<cfset 	infoRodape = '<span style="font-size:14px">PRCI = #mediaPRCIformatado#% (média do resultado do PRCI dos órgão subordinados)</span><br>
-					<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#% (média das metas do PRCI dos órgãos subordinados)</span><br>'>			
-		
-		<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-		<cfset var cardPRCImensal = objetoCFC.criarCardIndicador(
-			tipoDeCard = 'bg-gradient-warning',
-			siglaIndicador ='PRCI',
-			descricaoIndicador = 'Atendimento ao Prazo de Resposta',
-			percentualIndicadorFormatado = mediaPRCIformatado,
-			resultadoEmRelacaoMeta = PRCIresultadoMeta,
-			resultadoEmRelacaoMetaFormatado = PRCIresultadoMetaFormatado,
-			infoRodape = infoRodape,
-			icone = 'fa fa-shopping-basket'
-
-		)>
-
-		<cfoutput>#cardPRCImensal#</cfoutput>
-		
 
 		<script language="JavaScript">
 			$(document).ready(function() {
@@ -855,54 +858,57 @@
 				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
 		</cfquery>
 
+		<cfif resultSLNCdados.recordcount neq 0>
+			<cfset var resultado = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
 
-		<cfset var resultado = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
+			<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
+				<cfset orgaosMCUList = ValueList(resultado.mcuOrgao)>
+			<cfelse>
+				<cfset orgaosMCUList = application.rsUsuarioParametros.pc_usu_lotacao>
+			</cfif>
+			
+			
+			<cfquery name="rsMetaSLNCcardMensal" datasource="#application.dsn_processos#" >
+				SELECT avg(pc_indMeta_meta) mediaSLNCmeta FROM pc_indicadores_meta 
 
-		<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
-			<cfset orgaosMCUList = ValueList(resultado.mcuOrgao)>
+				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_numIndicador = 2
+						AND pc_indMeta_mcuOrgao in(#orgaosMCUList#)
+			</cfquery>
+
+			<cfset metaSLNCorgao = rsMetaSLNCcardMensal.mediaSLNCmeta>
+			<cfif metaSLNCorgao neq ''>
+				<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0), ".", ",")>
+			</cfif>
+
+			<cfset mediaSLNC = NumberFormat(ROUND(resultSLNCdados.SLNC*10)/10,0.0)>
+			<cfset mediaSLNCformatado = Replace(NumberFormat(mediaSLNC,0.0), ".", ",")>
+
+			<cfset SLNCresultadoMeta = ROUND((mediaSLNC / metaSLNCorgao)*100*10)/10>
+
+			<cfset SLNCresultadoMetaFormatado = Replace(NumberFormat(SLNCresultadoMeta,0.0), ".", ",")>
+
+
+			<cfset 	infoRodape = '<span style="font-size:14px">SLNC = #mediaSLNCformatado#% (média do resultado do SLNC dos órgão subordinados)</span><br>
+						<span style="font-size:14px">Meta = #metaSLNCorgaoFormatado#% (média das metas do SLNC dos órgãos subordinados)</span><br>'>
+			
+			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
+			<cfset var cardSLNCmensal = objetoCFC.criarCardIndicador(
+				tipoDeCard = 'bg-gradient-warning',
+				siglaIndicador ='SLNC',
+				descricaoIndicador = 'Solução de Não Conformidades',
+				percentualIndicadorFormatado = mediaSLNCformatado,
+				resultadoEmRelacaoMeta = SLNCresultadoMeta,
+				resultadoEmRelacaoMetaFormatado = SLNCresultadoMetaFormatado,
+				infoRodape = infoRodape,
+				icone = 'fa fa-shopping-basket'
+
+			)>
+			<cfoutput>#cardSLNCmensal#</cfoutput>
 		<cfelse>
-			<cfset orgaosMCUList = application.rsUsuarioParametros.pc_usu_lotacao>
+			<cfoutput><h5 style="text-align:center">Sem dados para o indicador SLNC</cfoutput>
 		</cfif>
-		
-		
-		<cfquery name="rsMetaSLNCcardMensal" datasource="#application.dsn_processos#" >
-			SELECT avg(pc_indMeta_meta) mediaSLNCmeta FROM pc_indicadores_meta 
-
-			WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-					AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-					AND pc_indMeta_numIndicador = 2
-					AND pc_indMeta_mcuOrgao in(#orgaosMCUList#)
-		</cfquery>
-
-		<cfset metaSLNCorgao = rsMetaSLNCcardMensal.mediaSLNCmeta>
-		<cfif metaSLNCorgao neq ''>
-			<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0), ".", ",")>
-		</cfif>
-
-		<cfset mediaSLNC = NumberFormat(ROUND(resultSLNCdados.SLNC*10)/10,0.0)>
-		<cfset mediaSLNCformatado = Replace(NumberFormat(mediaSLNC,0.0), ".", ",")>
-
-		<cfset SLNCresultadoMeta = ROUND((mediaSLNC / metaSLNCorgao)*100*10)/10>
-
-		<cfset SLNCresultadoMetaFormatado = Replace(NumberFormat(SLNCresultadoMeta,0.0), ".", ",")>
-
-
-		<cfset 	infoRodape = '<span style="font-size:14px">SLNC = #mediaSLNCformatado#% (média do resultado do SLNC dos órgão subordinados)</span><br>
-					<span style="font-size:14px">Meta = #metaSLNCorgaoFormatado#% (média das metas do SLNC dos órgãos subordinados)</span><br>'>
-		
-		<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-		<cfset var cardSLNCmensal = objetoCFC.criarCardIndicador(
-			tipoDeCard = 'bg-gradient-warning',
-			siglaIndicador ='SLNC',
-			descricaoIndicador = 'Solução de Não Conformidades',
-			percentualIndicadorFormatado = mediaSLNCformatado,
-			resultadoEmRelacaoMeta = SLNCresultadoMeta,
-			resultadoEmRelacaoMetaFormatado = SLNCresultadoMetaFormatado,
-			infoRodape = infoRodape,
-			icone = 'fa fa-shopping-basket'
-
-		)>
-		<cfoutput>#cardSLNCmensal#</cfoutput>
 
 		<script language="JavaScript">
 			$(document).ready(function() {
@@ -1139,54 +1145,56 @@
 				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
 		</cfquery>
 
-	    <cfset resultadoPRCI = consultaIndicadorPRCI_TIDP_TGI_mensal(ano=arguments.ano, mes=arguments.mes)>
-		<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
-			<cfset orgaosMCUListPRCI = ValueList(resultadoPRCI.mcuOrgao)>
-		<cfelse>
-			<cfset orgaosMCUListPRCI = application.rsUsuarioParametros.pc_usu_lotacao>
-		</cfif>
+		<cfif resultDGCIdados.recordcount neq 0>	
 
-		<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
-			SELECT avg(pc_indMeta_meta) mediaPRCImeta FROM pc_indicadores_meta 
+			<cfset resultadoPRCI = consultaIndicadorPRCI_TIDP_TGI_mensal(ano=arguments.ano, mes=arguments.mes)>
+			<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
+				<cfset orgaosMCUListPRCI = ValueList(resultadoPRCI.mcuOrgao)>
+			<cfelse>
+				<cfset orgaosMCUListPRCI = application.rsUsuarioParametros.pc_usu_lotacao>
+			</cfif>
 
-			WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-					AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-					AND pc_indMeta_numIndicador = 1
-					AND pc_indMeta_mcuOrgao in(#orgaosMCUListPRCI#)
-		</cfquery>	
+			<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
+				SELECT avg(pc_indMeta_meta) mediaPRCImeta FROM pc_indicadores_meta 
 
-       <cfset var resultadoSLNC = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
-	    <cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
-			<cfset orgaosMCUListSLNC = ValueList(resultadoSLNC.mcuOrgao)>
-		<cfelse>
-			<cfset orgaosMCUListSLNC = application.rsUsuarioParametros.pc_usu_lotacao>
-		</cfif>
+				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_numIndicador = 1
+						AND pc_indMeta_mcuOrgao in(#orgaosMCUListPRCI#)
+			</cfquery>	
 
-		<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
-			SELECT avg(pc_indMeta_meta) mediaSLNCmeta FROM pc_indicadores_meta 
+		<cfset var resultadoSLNC = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
+			<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
+				<cfset orgaosMCUListSLNC = ValueList(resultadoSLNC.mcuOrgao)>
+			<cfelse>
+				<cfset orgaosMCUListSLNC = application.rsUsuarioParametros.pc_usu_lotacao>
+			</cfif>
 
-			WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-					AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-					AND pc_indMeta_numIndicador = 2
-					AND pc_indMeta_mcuOrgao in(#orgaosMCUListSLNC#)
-		</cfquery>
+			<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
+				SELECT avg(pc_indMeta_meta) mediaSLNCmeta FROM pc_indicadores_meta 
+
+				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
+						AND pc_indMeta_numIndicador = 2
+						AND pc_indMeta_mcuOrgao in(#orgaosMCUListSLNC#)
+			</cfquery>
 
 
-		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
-				WHERE  pc_indPeso_numIndicador = 1 
-				and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-				and pc_indPeso_ativo = 1
-		</cfquery>
+			<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
+				SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
+					WHERE  pc_indPeso_numIndicador = 1 
+					and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+					and pc_indPeso_ativo = 1
+			</cfquery>
 
-		<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
-				WHERE pc_indPeso_numIndicador = 2 
-				and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-				and pc_indPeso_ativo = 1
-		</cfquery>
+			<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
+				SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
+					WHERE pc_indPeso_numIndicador = 2 
+					and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+					and pc_indPeso_ativo = 1
+			</cfquery>
 
-		<cfif resultDGCIdados.DGCI neq ''>	
+		
 			<cfset pesoPRCI = 0>
 			<cfset pesoSLNC = 0>
 			<cfif rsPRCIpeso.recordcount neq 0>

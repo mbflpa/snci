@@ -1190,14 +1190,20 @@
 
 			<cfif resultDGCIdados.PRCI neq '' AND resultDGCIdados.SLNC neq ''>
 				<cfset formulaDGCI = '(PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#mediaPRCIformatado# x #pesoPRCIformatado#) + (#mediaSLNCformatado# x #pesoSLNCformatado#)'>
+				<cfset formulaMetaDGCI = '(Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC) = (#mediaMetaPRCIorgaosFormatado# x #pesoPRCIformatado#) + (#mediaMetaSLNCorgaosFormatado# x #pesoSLNCformatado#)'>
 			<cfelseif resultDGCIdados.PRCI neq '' AND resultDGCIdados.SLNC eq ''>
 				<cfset formulaDGCI = '(PRCI) = (#mediaPRCIformatado#)'>
+				<cfset formulaMetaDGCI = '(Meta PRCI) = (#mediaMetaPRCIorgaosFormatado#)'>
 			<cfelseif resultDGCIdados.PRCI eq '' AND resultDGCIdados.SLNC neq ''>
 				<cfset formulaDGCI = '(SLNC) = (#mediaSLNCformatado#)'>
+				<cfset formulaMetaDGCI = '(Meta SLNC) = (#mediaMetaSLNCorgaosFormatado#)'>
+			<cfelse>
+				<cfset formulaDGCI = 'sem dados'>
+				<cfset formulaMetaDGCI = 'sem dados'>
 			</cfif>
 
 			<cfset infoRodape = '<span style="font-size:14px">DGCI = #mediaDGCIformatado#% ->#formulaDGCI#</span><br>
-						<span style="font-size:14px">Meta = #metaDGCIformatado#% -> (Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC)= (#mediaMetaPRCIorgaosFormatado# x #pesoPRCIformatado#) + (#mediaMetaSLNCorgaosFormatado# x #pesoSLNCformatado#)</span><br>'>
+						<span style="font-size:14px">Meta = #metaDGCIformatado#% ->#formulaMetaDGCI#</span><br>'>
 			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
 			<cfset var cardDGCImensal = objetoCFC.criarCardIndicador(
 				tipoDeCard = 'bg-gradient-info',

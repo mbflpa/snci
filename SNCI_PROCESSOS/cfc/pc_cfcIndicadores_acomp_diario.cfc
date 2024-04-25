@@ -2071,18 +2071,22 @@
 		<cfif percentualDGCI neq ''>
 			<cfif rsmediaPRCIcardDiario.recordcount neq 0 AND rsmediaSLNCcardDiario.recordcount neq 0>
 				<cfset formulaDGCI = '(PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#mediaPRCIformatado# x #pesoPRCIformatado#) + (#mediaSLNCformatado# x #pesoSLNCformatado#)'>
+			    <cfset formulaMeta = '(Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC) = (#mediaMetaPRCIorgaosFormatado# x #pesoPRCIformatado#) + (#mediaMetaSLNCorgaosFormatado# x #pesoSLNCformatado#)'>
 			<cfelseif rsmediaPRCIcardDiario.recordcount neq 0 AND rsmediaSLNCcardDiario.recordcount eq 0>
 				<cfset formulaDGCI = '(PRCI) = (#mediaPRCIformatado#)'>
+				<cfset formulaMeta = '(Meta PRCI) = (#mediaMetaPRCIorgaosFormatado#)'>
 			<cfelseif rsmediaPRCIcardDiario.recordcount eq 0 AND rsmediaSLNCcardDiario.recordcount neq 0>
 				<cfset formulaDGCI = '(SLNC) = (#mediaSLNCformatado#)'>
+				<cfset formulaMeta = '(Meta SLNC) = (#mediaMetaSLNCorgaosFormatado#)'>
 			<cfelse>
 				<cfset formulaDGCI = ''>
+				<cfset formulaMeta = ''>
 			</cfif>
 
 						
 
 			<cfset infoRodape = '<span style="font-size:14px">DGCI = #percentualDGCIformatado#% -> #formulaDGCI#</span><br>
-						<span style="font-size:14px">Meta = #metaDGCIorgaoFormatado#% -> (Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC)= (#mediaMetaPRCIorgaosFormatado# x #pesoPRCIformatado#) + (#mediaMetaSLNCorgaosFormatado# x #pesoSLNCformatado#)</span><br>'>
+						<span style="font-size:14px">Meta = #metaDGCIorgaoFormatado#% -> #formulaMeta#</span><br>'>
 			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
 			<cfset var cardDGCI = objetoCFC.criarCardIndicador(
 				tipoDeCard = 'bg-gradient-info',
@@ -2095,6 +2099,8 @@
 
 			)>
 			<cfoutput>#cardDGCI#</cfoutput>
+
+			
 		<cfelse>
 			<cfoutput><h5 style="text-align:center">Não há dados disponíveis para o DGCI</h5></cfoutput>
 		</cfif>
