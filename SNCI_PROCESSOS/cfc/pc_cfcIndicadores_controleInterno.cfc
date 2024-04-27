@@ -501,19 +501,21 @@
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 														<td style="text-align: left;">#siglaOrgao# (#mcuOrgao#)</td>
 														<td><strong>#NumberFormat(ROUND(PRCI*10)/10,0.0)#</strong></td>
-														<cfset metaPRCIorgao = 0>
-														<cfif rsMetaPRCI.pc_indMeta_meta neq ''>
-															<cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
-														</cfif>
+														
+														
 														<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
 															<td>sem meta</td>
-														<cfelse>	
+															<cfset resultMesEmRelacaoMeta = "sem meta">
+															<cfset resultAcumuladoEmRelacaoMeta = "sem meta">
+														<cfelse>
+														    <cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
+															<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((PRCI/metaPRCIorgao)*100*10)/10,0.0)>	
+															<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((PRCIacumulado/metaPRCIorgao)*100*10)/10,0.0)>
 															<td><strong>#metaPRCIorgao#</strong></td>
 														</cfif>
-														<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((PRCI/metaPRCIorgao)*100*10)/10,0.0)>
+														
 														<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 														<td>#NumberFormat(ROUND(PRCIacumulado*10)/10,0.0)#</td>
-														<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((PRCIacumulado/metaPRCIorgao)*100*10)/10,0.0)>
 														<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
 														<td><strong>#resultMesEmRelacaoMeta#</strong></td>
 													</tr>
@@ -650,19 +652,19 @@
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 														<td style="text-align: left;"  >#siglaOrgao# (#mcuOrgao#)</td>
 														<td><strong>#NumberFormat(ROUND(SLNC*10)/10,0.0)#</strong></td>
-														<cfset metaSLNCorgao = 0>
-														
-														<cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>
 														
 														<cfif rsMetaSLNC.pc_indMeta_meta eq ''>
 															<td>sem meta</td>
-														<cfelse>	
+															<cfset resultMesEmRelacaoMeta = "sem meta">
+															<cfset resultAcumuladoEmRelacaoMeta = "sem meta">
+														<cfelse>
+														    <cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>
+															<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((SLNC/metaSLNCorgao)*100*10)/10,0.0)>
+															<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((SLNCacumulado/metaSLNCorgao)*100*10)/10,0.0)>	
 															<td>#metaSLNCorgao#</td>
 														</cfif>
-														<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((SLNC/metaSLNCorgao)*100*10)/10,0.0)>
 														<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 														<td><strong>#NumberFormat(ROUND(SLNCacumulado*10)/10,0.0)#</strong></td>
-														<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((SLNCacumulado/metaSLNCorgao)*100*10)/10,0.0)>
 														<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
 														<td>#resultMesEmRelacaoMeta#</td>
 													</tr>
