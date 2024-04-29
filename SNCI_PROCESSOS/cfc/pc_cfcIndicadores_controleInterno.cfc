@@ -501,23 +501,22 @@
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 														<td style="text-align: left;">#siglaOrgao# (#mcuOrgao#)</td>
 														<td><strong>#NumberFormat(ROUND(PRCI*10)/10,0.0)#</strong></td>
-														
-														
 														<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
 															<td>sem meta</td>
 															<cfset resultMesEmRelacaoMeta = "sem meta">
 															<cfset resultAcumuladoEmRelacaoMeta = "sem meta">
 														<cfelse>
 														    <cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
-															<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((PRCI/metaPRCIorgao)*100*10)/10,0.0)>	
-															<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((PRCIacumulado/metaPRCIorgao)*100*10)/10,0.0)>
-															<td><strong>#metaPRCIorgao#</strong></td>
+															<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((PRCI/metaPRCIorgao)*100*10)/10,0.0)>
+															<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((PRCIacumulado/metaPRCIorgao)*100*10)/10,0.0)>	
+															<td>#metaPRCIorgao#</td>
 														</cfif>
-														
 														<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
-														<td>#NumberFormat(ROUND(PRCIacumulado*10)/10,0.0)#</td>
+														<td><strong>#NumberFormat(ROUND(PRCIacumulado*10)/10,0.0)#</strong></td>
 														<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
-														<td><strong>#resultMesEmRelacaoMeta#</strong></td>
+														<td>#resultMesEmRelacaoMeta#</td>
+														
+														
 													</tr>
 												</cfloop>
 											</cfoutput>
@@ -558,32 +557,55 @@
 
 			
 			var tituloExcel_PRCIporOrgaoSubordinador ="SNCI_Consulta_PRCI_porOrgaoSubordinador_";
-				$('#tabPRCIporOrgaoSubordinador').DataTable( {
-					destroy: true, // Destruir a tabela antes de recriá-la
-					stateSave: false,
-					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					scrollX: true, // Permitir rolagem horizontal
-        			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
-					pageLength: 5,//quantidade de registros por página
-					lengthMenu: [
-						[5, 10, 25, 50, -1],
-						['5', '10', '25', '50', 'Todos']
-					],
-					dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>><'row'<'col-sm-2 text-left'l>>" ,
-					order: [[2, 'desc']],//classificar pela coluna PRCI em ordem decrescente
-					//dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-12 text-left'i>>" ,
-					buttons: [
-						{
-							extend: 'excel',
-							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel_PRCIporOrgaoSubordinador + d,
-							className: 'btExcel',
+			$('#tabPRCIporOrgaoSubordinador').DataTable( {
+				destroy: true, // Destruir a tabela antes de recriá-la
+				stateSave: false,
+				deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+				scrollX: true, // Permitir rolagem horizontal
+				autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+				pageLength: 5,//quantidade de registros por página
+				lengthMenu: [
+					[5, 10, 25, 50, -1],
+					['5', '10', '25', '50', 'Todos']
+				],
+				dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>><'row'<'col-sm-2 text-left'l>>" ,
+				order: [[2, 'desc']],//classificar pela coluna PRCI em ordem decrescente
+				//dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-12 text-left'i>>" ,
+				buttons: [
+					{
+						extend: 'excel',
+						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+						title : tituloExcel_PRCIporOrgaoSubordinador + d,
+						className: 'btExcel',
+						exportOptions: {
+							format: {
+								body: function (data, row, column, node) {
+									return $(node).data('excel') !== undefined ? $(node).data('excel') : $(node).text();
+								}
+							}
+						},
+						//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
+						action: function (e, dt, button, config) {
+							// Armazenar a página atual
+							var currentPage = dt.page();
+
+							// Exibir temporariamente todas as páginas
+							dt.page.len(-1).draw('page');
+
+							// Exportar os dados
+							$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+
+							// Restaurar o número padrão de linhas por página e a página original
+							dt.page.len(5).draw('page');
+							dt.page(currentPage).draw('page');
 						}
-					],
-					drawCallback: function (settings) {
-						aplicarEstiloNasTDsComClasseTdResult();
+						
 					}
-				})
+				],
+				drawCallback: function (settings) {
+					aplicarEstiloNasTDsComClasseTdResult();
+				}
+			})
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
     
@@ -727,6 +749,28 @@
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
 							title : tituloExcel_SLNCporOrgaoSubordinador + d,
 							className: 'btExcel',
+							exportOptions: {
+									format: {
+										body: function (data, row, column, node) {
+											return $(node).data('excel') !== undefined ? $(node).data('excel') : $(node).text();
+										}
+									}
+								},
+							//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
+							action: function (e, dt, button, config) {
+								// Armazenar a página atual
+								var currentPage = dt.page();
+
+								// Exibir temporariamente todas as páginas
+								dt.page.len(-1).draw('page');
+
+								// Exportar os dados
+								$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+
+								// Restaurar o número padrão de linhas por página e a página original
+								dt.page.len(5).draw('page');
+								dt.page(currentPage).draw('page');
+							}
 						}
 					],
 					drawCallback: function (settings) {
@@ -868,7 +912,7 @@
 														<cfelseif metaPRCI eq '' and metaSLNC neq ''>
 															<cfset metaDGCIorgao = metaSLNC>
 														<cfelse>
-															<cfset metaDGCIorgao = NumberFormat(ROUND(metaDGCIorgao*10)/10,0.0)>	
+															<cfset metaDGCIorgao = ''>	
 														</cfif>
 														
 
@@ -956,6 +1000,28 @@
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
 							title : tituloExcel_DGCIporOrgaoSubordinador + d,
 							className: 'btExcel',
+							exportOptions: {
+								format: {
+									body: function (data, row, column, node) {
+										return $(node).data('excel') !== undefined ? $(node).data('excel') : $(node).text();
+									}
+								}
+							},
+							//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
+							action: function (e, dt, button, config) {
+								// Armazenar a página atual
+								var currentPage = dt.page();
+
+								// Exibir temporariamente todas as páginas
+								dt.page.len(-1).draw('page');
+
+								// Exportar os dados
+								$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+
+								// Restaurar o número padrão de linhas por página e a página original
+								dt.page.len(5).draw('page');
+								dt.page(currentPage).draw('page');
+							}
 						}
 					],
 					drawCallback: function (settings) {
@@ -1091,7 +1157,9 @@
 
 														<cfif metaDGCIorgao neq 0>
 															<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((DGCI/metaDGCIformatado)*100*10)/10,0.0)>
-															<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+															<td >
+																<span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span>
+															</td>
 														<cfelse>
 														    <cfset resultMesEmRelacaoMeta ='sem meta'>
 															<td style="color:red">sem meta</td>
@@ -1099,7 +1167,9 @@
 														<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(DGCIacumulado*10)/10,0.0)#</strong></td>
 									                    <cfif metaDGCIorgao neq 0>
 															<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((NumberFormat(ROUND(DGCIacumulado*10)/10,0.0)/metaDGCIformatado)*100*10)/10,0.0)>
-															<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
+															<td >
+																<span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span>
+															</td>
 														<cfelse>
 														    <cfset resultAcumuladoEmRelacaoMeta ='sem meta'>
 															<td style="color:red">sem meta</td>
@@ -1152,32 +1222,54 @@
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
 			
 			var tituloExcel_DGCIporOrgaoResponsavel ="SNCI_Consulta_DGCI_porOrgaoResponsavel_";
-				$('#tabDGCIporOrgaoResponsavel').DataTable( {
-					destroy: true, // Destruir a tabela antes de recriá-la
-					stateSave: false,
-					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					scrollX: true, // Permitir rolagem horizontal
-					autoWidth: true,// Ajustar automaticamente o tamanho das colunas
-					pageLength: 5,//quantidade de registros por página
-					lengthMenu: [
-						[5, 10, 25, 50, -1],
-						['5', '10', '25', '50', 'Todos']
-					],
-					dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>><'row'<'col-sm-2 text-left'l>>" ,
-					order: [[2, 'desc']],//classificar pela coluna DGCI em ordem decrescente
-					//dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-12 text-left'i>>" ,
-					buttons: [
-						{
-							extend: 'excel',
-							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel_DGCIporOrgaoResponsavel + d,
-							className: 'btExcel',
+			$('#tabDGCIporOrgaoResponsavel').DataTable( {
+				destroy: true, // Destruir a tabela antes de recriá-la
+				stateSave: false,
+				deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+				scrollX: true, // Permitir rolagem horizontal
+				autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+				pageLength: 5,//quantidade de registros por página
+				lengthMenu: [
+					[5, 10, 25, 50, -1],
+					['5', '10', '25', '50', 'Todos']
+				],
+				dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>><'row'<'col-sm-2 text-left'l>>" ,
+				order: [[2, 'desc']],//classificar pela coluna DGCI em ordem decrescente
+				//dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-12 text-left'i>>" ,
+				buttons: [
+					{
+						extend: 'excel',
+						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+						title : tituloExcel_DGCIporOrgaoResponsavel + d,
+						className: 'btExcel',
+						exportOptions: {
+							format: {
+								body: function (data, row, column, node) {
+									return $(node).data('excel') !== undefined ? $(node).data('excel') : $(node).text();
+								}
+							}
+						},
+						//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
+						action: function (e, dt, button, config) {
+							// Armazenar a página atual
+							var currentPage = dt.page();
+
+							// Exibir temporariamente todas as páginas
+							dt.page.len(-1).draw('page');
+
+							// Exportar os dados
+							$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+
+							// Restaurar o número padrão de linhas por página e a página original
+							dt.page.len(5).draw('page');
+							dt.page(currentPage).draw('page');
 						}
-					],
-					drawCallback: function (settings) {
-						aplicarEstiloNasTDsComClasseTdResult();
 					}
-				})
+				],
+				drawCallback: function (settings) {
+					aplicarEstiloNasTDsComClasseTdResult();
+				}
+			})
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
 	
@@ -1397,6 +1489,28 @@
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
 						title : tituloExcel_DGCI_Mes_a_Mes + d,
 						className: 'btExcel',
+						exportOptions: {
+							format: {
+								body: function (data, row, column, node) {
+									return $(node).data('excel') !== undefined ? $(node).data('excel') : $(node).text();
+								}
+							}
+						},
+						//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
+						action: function (e, dt, button, config) {
+							// Armazenar a página atual
+							var currentPage = dt.page();
+
+							// Exibir temporariamente todas as páginas
+							dt.page.len(-1).draw('page');
+
+							// Exportar os dados
+							$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+
+							// Restaurar o número padrão de linhas por página e a página original
+							dt.page.len(5).draw('page');
+							dt.page(currentPage).draw('page');
+						}
 					}
 				]
 			})

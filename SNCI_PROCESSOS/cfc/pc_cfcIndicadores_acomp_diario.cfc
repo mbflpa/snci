@@ -1369,17 +1369,17 @@
 									<td>#(totalDP + totalFP)#</td>
 									<cfset percentualDP = NumberFormat(Round((totalDP / (totalDP + totalFP)) * 100*10)/10,0.0)>
 									<td><strong>#percentualDP#%</strong></td>
-									<cfset metaPRCIorgao = 0>
-									<cfif rsMetaPRCI.pc_indMeta_meta neq ''>
-										<cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
-									</cfif>
+									
+
 									<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
 										<td>sem meta</td>
+										<td>sem meta</td>
 									<cfelse>	
+										<cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
 										<td><strong>#metaPRCIorgao#%</strong></td>
+										<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualDP*10)/10 / metaPRCIorgao)*100*10)/10>
+										<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 									</cfif>
-									<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualDP*10)/10 / metaPRCIorgao)*100*10)/10>
-									<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 
 								</tr>
 							</cfloop>
@@ -1480,18 +1480,19 @@
 										<td>#totalOrientacoes#</td>
 										<cfset percentualSolucionado = NumberFormat(Round((totalSolucionados / totalOrientacoes) * 100*10)/10,0.0)>
 										<td><strong>#percentualSolucionado#%</strong></td>
-										<cfset metaSLNCorgao = 0>
-										<cfif rsMetaSLNC.pc_indMeta_meta neq ''>
-											<cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>
-										</cfif>
+									
 								
 										<cfif rsMetaSLNC.pc_indMeta_meta eq ''>
 											<td>sem meta</td>
-										<cfelse>	
+											<td>sem meta</td>
+										<cfelse>
+										    <cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>	
+											<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualSolucionado*10)/10 / metaSLNCorgao)*100*10)/10>
 											<td><strong>#metaSLNCorgao#%</strong></td>
+											<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 										</cfif>
-										<cfset resultMesEmRelacaoMeta = ROUND((ROUND(percentualSolucionado*10)/10 / metaSLNCorgao)*100*10)/10>
-										<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+										
+										
 									</tr>
 
 								</cfloop>
@@ -1778,6 +1779,8 @@
 			<cfset metaPRCIorgao = rsMetaPRCIcardDiario.mediaPRCImeta>
 			<cfif metaPRCIorgao neq ''>
 				<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0), ".", ",")>
+				<cfset PRCIresultadoMeta = ROUND((mediaPRCI / metaPRCIorgao)*100*10)/10>
+				<cfset PRCIresultadoMetaFormatado = Replace(NumberFormat(PRCIresultadoMeta,0.0), ".", ",")>
 			</cfif>
 			
 
@@ -1794,12 +1797,15 @@
 			<cfset mediaPRCI = Round((totalPRCI*100 / rsmediaPRCIcardDiario.recordCount)*10)/10>
 			<cfset mediaPRCIformatado = Replace(NumberFormat(mediaPRCI,0.0), ".", ",")>
 
-			<cfset PRCIresultadoMeta = ROUND((mediaPRCI / metaPRCIorgao)*100*10)/10>
-			<cfset PRCIresultadoMetaFormatado = Replace(NumberFormat(PRCIresultadoMeta,0.0), ".", ",")>
+			
 
-																
-			<cfset 	infoRodape = '<span style="font-size:14px">PRCI = #mediaPRCIformatado#% (média do resultado do PRCI dos órgão subordinados)</span><br>
-						<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#% (média das metas do PRCI dos órgãos subordinados)</span><br>'>			
+			<cfif metaPRCIorgaoFormatado neq 0>													
+				<cfset 	infoRodape = '<span style="font-size:14px">PRCI = #mediaPRCIformatado#% (média do resultado do PRCI dos órgão subordinados)</span><br>
+						<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#% (média das metas do PRCI dos órgãos subordinados)</span><br>'>
+			<cfelse>
+				<cfset infoRodape = '<span style="font-size:14px">PRCI = #mediaPRCIformatado#% (média do resultado do PRCI dos órgão subordinados)</span><br>
+						<span style="font-size:14px">Meta = sem meta</span><br>'>
+			</cfif>			
 			
 			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
 			<cfset var cardPRCIdiario = objetoCFC.criarCardIndicador(
@@ -1861,6 +1867,8 @@
 			<cfset metaSLNCorgao = rsMetaSLNCcardDiario.mediaSLNCmeta>
 			<cfif metaSLNCorgao neq ''>
 				<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0), ".", ",")>
+				<cfset SLNCresultadoMeta = ROUND((mediaSLNC / metaSLNCorgao)*100*10)/10>
+				<cfset SLNCresultadoMetaFormatado = Replace(NumberFormat(SLNCresultadoMeta,0.0), ".", ",")>
 			</cfif>
 			
 
@@ -1876,11 +1884,14 @@
 			<cfset mediaSLNC = Round((totalSLNC*100 / rsmediaSLNCcardDiario.recordCount)*10)/10>
 			<cfset mediaSLNCformatado = Replace(NumberFormat(mediaSLNC,0.0), ".", ",")>
 
-			<cfset SLNCresultadoMeta = ROUND((mediaSLNC / metaSLNCorgao)*100*10)/10>
-			<cfset SLNCresultadoMetaFormatado = Replace(NumberFormat(SLNCresultadoMeta,0.0), ".", ",")>
-
-			<cfset infoRodape = '<span style="font-size:14px">SLNC = #mediaSLNCformatado#% (média do resultado do SLNC dos órgão subordinados)</span><br>
+		
+			<cfif metaSLNCorgaoFormatado neq 0>
+				<cfset infoRodape = '<span style="font-size:14px">SLNC = #mediaSLNCformatado#% (média do resultado do SLNC dos órgão subordinados)</span><br>
 						<span style="font-size:14px">Meta = #metaSLNCorgaoFormatado#% (média das metas do SLNC dos órgãos subordinados)</span><br>'>
+			<cfelse>
+				<cfset infoRodape = '<span style="font-size:14px">SLNC = #mediaSLNCformatado#% (média do resultado do SLNC dos órgão subordinados)</span><br>
+						<span style="font-size:14px">Meta = sem meta</span><br>'>
+			</cfif>
 			
             <cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
 			<cfset var cardSLNCdiario = objetoCFC.criarCardIndicador(
@@ -1971,11 +1982,11 @@
 						AND pc_indMeta_mcuOrgao in(#orgaosMCUListPRCI#)
 			</cfquery>
 
-
-			<cfset mediaMetaPRCIorgaos = NumberFormat(round(rsMetaPRCIcardDiario.mediaPRCImeta*10)/10,0.0)>
-			<cfif mediaMetaPRCIorgaos neq ''>
+			<cfif rsMetaPRCIcardDiario.mediaPRCImeta neq''>
+				<cfset mediaMetaPRCIorgaos = NumberFormat(round(rsMetaPRCIcardDiario.mediaPRCImeta*10)/10,0.0)>
 				<cfset mediaMetaPRCIorgaosFormatado = Replace(mediaMetaPRCIorgaos, ".", ",")>
 			</cfif>
+
 		<cfelse>
 			<cfset mediaMetaPRCIorgaosFormatado = 0>
 		</cfif>
@@ -1989,8 +2000,10 @@
 						AND pc_indMeta_numIndicador = 2
 						AND pc_indMeta_mcuOrgao in(#orgaosMCUListSLNC#)
 			</cfquery>
-			<cfset mediaMetaSLNCorgaos = NumberFormat(round(rsMetaSLNCcardDiario.mediaSLNCmeta*10)/10,0.0)>
-			<cfif mediaMetaSLNCorgaos neq ''>
+
+			
+			<cfif rsMetaSLNCcardDiario.mediaSLNCmeta neq ''>
+				<cfset mediaMetaSLNCorgaos = NumberFormat(round(rsMetaSLNCcardDiario.mediaSLNCmeta*10)/10,0.0)>
 				<cfset mediaMetaSLNCorgaosFormatado = Replace(mediaMetaSLNCorgaos, ".", ",")>
 			</cfif>
 		<cfelse>
@@ -2069,13 +2082,15 @@
 			<cfset metaDGCIorgao = NumberFormat(0,0.0) >
 		</cfif>
 
-		<cfif metaDGCIorgao neq ''>
-			<cfset metaDGCIorgaoFormatado = Replace(NumberFormat(metaDGCIorgao,0.0), ".", ",")>
-		</cfif>
+		
 
 		<cfif metaDGCIorgao neq 0>
+			<cfset metaDGCIorgaoFormatado = Replace(NumberFormat(metaDGCIorgao,0.0), ".", ",")>
 			<cfset DGCIresultadoMeta = ROUND((ROUND(percentualDGCI*10)/10 / metaDGCIorgao)*100*10)/10>
 			<cfset DGCIresultadoMetaFormatado = Replace(NumberFormat(DGCIresultadoMeta,0.0), ".", ",")>
+		<cfelse>
+			<cfset DGCIresultadoMeta =0>
+			<cfset DGCIresultadoMetaFormatado = 0>
 		</cfif>
 
 		<cfif percentualDGCI neq ''>
@@ -2094,9 +2109,14 @@
 			</cfif>
 
 						
-
-			<cfset infoRodape = '<span style="font-size:14px">DGCI = #percentualDGCIformatado#% -> #formulaDGCI#</span><br>
+			<cfif metaDGCIorgaoFormatado neq 0>
+				<cfset infoRodape = '<span style="font-size:14px">DGCI = #percentualDGCIformatado#% -> #formulaDGCI#</span><br>
 						<span style="font-size:14px">Meta = #metaDGCIorgaoFormatado#% -> #formulaMeta#</span><br>'>
+			<cfelse>
+				<cfset infoRodape = '<span style="font-size:14px">DGCI = #percentualDGCIformatado#% -> #formulaDGCI#</span><br>
+						<span style="font-size:14px">Meta = sem meta</span><br>'>
+			</cfif>
+
 			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
 			<cfset var cardDGCI = objetoCFC.criarCardIndicador(
 				tipoDeCard = 'bg-gradient-info',
