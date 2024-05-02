@@ -60,43 +60,79 @@
 				color:#fff!important;
 			}
 
-			#iconSync {
-				-webkit-animation-name: fa-spin;
-						animation-name: fa-spin;
-				-webkit-animation-delay: var(--fa-animation-delay, 0s);
-						animation-delay: var(--fa-animation-delay, 0s);
-				-webkit-animation-direction: var(--fa-animation-direction, normal);
-						animation-direction: var(--fa-animation-direction, normal);
-				-webkit-animation-duration: var(--fa-animation-duration, 2s);
-						animation-duration: var(--fa-animation-duration, 2s);
-				-webkit-animation-iteration-count: var(--fa-animation-iteration-count, infinite);
-						animation-iteration-count: var(--fa-animation-iteration-count, infinite);
-				-webkit-animation-timing-function: var(--fa-animation-timing, linear);
-						animation-timing-function: var(--fa-animation-timing, linear);
+		
+
+			/* HTML: <div class="loader"></div> */
+			.loader {
+				width: 150px;
+				height: 150px;
+				position: relative;
+				display: flex;
+				flex-direction: column; /* Coloca o texto embaixo da imagem */
+				justify-content: center;
+				align-items: center;
 			}
 
-			@media (prefers-reduced-motion: reduce) {
-				.fa-spin {
-						-webkit-animation-delay: -1ms;
-								animation-delay: -1ms;
-						-webkit-animation-duration: 1ms;
-								animation-duration: 1ms;
-						-webkit-animation-iteration-count: 1;
-								animation-iteration-count: 1;
-						transition-delay: 0s;
-						transition-duration: 0s; 
-						}
+
+			.loader::before,
+			.loader::after {
+				content: "";
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				border: 15px solid #fff;
+				border-radius: 50%;
+				border-color: #2581c8 #fbc32f #fff #fff;
+				mix-blend-mode: darken;
+				animation: l14 1s infinite linear;
 			}
+
+			.loader::after {
+				animation-direction: reverse;
+			}
+
+			@keyframes l14 {
+				100% {
+					transform: rotate(1turn);
+				}
+			}
+
+			.loader img {
+				position: relative;
+				width: 75px;
+				height: auto;
+				z-index: 2;
+				animation: none; /* Desabilita a animação na imagem */
+			}
+
+			.texto-aguarde {
+				font-size:1rem;
+				font-weight: bold; /* Deixa o texto mais grosso */
+				color: #fff; /* Define a cor do texto */
+				text-shadow: 
+					-1px -1px 0 #2581c8,  
+					1px -1px 0 #2581c8,
+					-1px 1px 0 #2581c8,
+					1px 1px 0 #2581c8; /* Adiciona contorno preto ao texto */
+			}
+
+
+
+
+
+
 
 
 		</style>
 
-		<div class=" modal fade " id="modalOverlay" >
-			<div class="modal-dialog modalOverlay">
-				<i id="iconSync" class="fas fa-5x fa-sync-alt" ></i>
-			</div>
-			
-		</div>
+<div class="modal fade" id="modalOverlay">
+    <div class="modal-dialog modalOverlay">
+        <div class="loader" >
+            <img src="../SNCI_PROCESSOS/dist/img/correios.png"  alt="logo Correios">
+            <span class="texto-aguarde" >AGUARDE...</span>
+        </div>
+    </div>
+</div>
 
 		<!-- Preloader -->
 		<div class="preloader flex-column justify-content-center align-items-center">
