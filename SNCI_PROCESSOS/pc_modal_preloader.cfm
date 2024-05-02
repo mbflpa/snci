@@ -83,7 +83,7 @@
 				border: 15px solid #fff;
 				border-radius: 50%;
 				border-color: #2581c8 #fbc32f #fff #fff;
-				mix-blend-mode: darken;
+				mix-blend-mode:  multiply;
 				animation: l14 1s infinite linear;
 			}
 
