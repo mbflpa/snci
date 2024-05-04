@@ -622,12 +622,14 @@
 		<cfquery name="resultadoPRCIporOrgaoSubordinador" dbtype="query">
 			SELECT	ano
 					,mes
-					,numIndicador
+					,pc_indDados_numIndicador as numIndicador
 					,mcuOrgaoSubordinador as mcuOrgao
-					,mcuOrgaoSubordinador
-					,AVG(resultadoIndicador) as resultadoIndicador
+					,mcuOrgaoSubordinador 
+					,(SUM(DP)/COUNT(*))*100 AS resultadoIndicador
 					,1 as paraOrgaoSubordinador
-			FROM resultadoPRCIporOrgaoResp
+			FROM dadosAno_CI
+			WHERE mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+				AND pc_indDados_numIndicador = 1
 			GROUP BY ano, mes, numIndicador, mcuOrgaoSubordinador
 			order by mcuOrgaoSubordinador
 		</cfquery>
@@ -649,12 +651,14 @@
 		<cfquery name="resultadoSLNCporOrgaoSubordinador" dbtype="query">
 			SELECT	ano
 					,mes
-					,numIndicador
+					,pc_indDados_numIndicador as numIndicador
 					,mcuOrgaoSubordinador as mcuOrgao
-					,mcuOrgaoSubordinador
-					,AVG(resultadoIndicador) as resultadoIndicador
+					,mcuOrgaoSubordinador 
+					,(SUM(solucionado)/COUNT(*))*100 AS resultadoIndicador
 					,1 as paraOrgaoSubordinador
-			FROM resultadoSLNCporOrgaoResp
+			FROM dadosAno_CI
+			WHERE mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+				AND pc_indDados_numIndicador = 2
 			GROUP BY ano, mes, numIndicador, mcuOrgaoSubordinador
 			order by mcuOrgaoSubordinador
 		</cfquery>
@@ -683,6 +687,7 @@
 						AND NOT pc_indOrgao_resultadoAcumulado IS NULL
 						AND pc_indOrgao_numIndicador = <cfqueryparam value="#resultadoIndicadoresPorOrgao.numIndicador#" cfsqltype="cf_sql_integer">
 						AND pc_indOrgao_mcuOrgao = <cfqueryparam value="#resultadoIndicadoresPorOrgao.mcuOrgao#" cfsqltype="cf_sql_varchar">
+						and pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="#resultadoIndicadoresPorOrgao.paraOrgaoSubordinador#" cfsqltype="cf_sql_bit">
 			</cfquery>
 
 			<cfquery name="rsContarMeses" datasource="#application.dsn_processos#" timeout="120"  >
@@ -692,6 +697,7 @@
 						AND pc_indOrgao_mes < <cfqueryparam value="#resultadoIndicadoresPorOrgao.mes#" cfsqltype="cf_sql_integer">
 						AND pc_indOrgao_numIndicador = <cfqueryparam value="#resultadoIndicadoresPorOrgao.numIndicador#" cfsqltype="cf_sql_integer">
 						AND pc_indOrgao_mcuOrgao = <cfqueryparam value="#resultadoIndicadoresPorOrgao.mcuOrgao#" cfsqltype="cf_sql_varchar">
+						and pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="#resultadoIndicadoresPorOrgao.paraOrgaoSubordinador#" cfsqltype="cf_sql_bit">
 			</cfquery>
 
 
@@ -775,6 +781,74 @@
 				AND pc_indDados_numIndicador = 2
 			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoResp,pc_indDados_mcuOrgaoSubordinador
 		</cfquery>
+
+
+
+
+
+		<cfquery name="resultadoTIDPporOrgaoSubordinador" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	YEAR(pc_indDados_dataRef) AS ano
+					,MONTH(pc_indDados_dataRef) AS mes
+					,pc_indDados_mcuOrgaoSubordinador 
+					,pc_indDados_mcuOrgaoSubordinador 
+					,count(*) AS resultadoIndicador
+					,1 as paraOrgaoSubordinador
+					,4 as numIndicador
+			FROM pc_indicadores_dados
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 1
+				AND pc_indDados_prazo = 'DP'
+			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoSubordinador 
+		</cfquery>
+
+		<cfquery name="resultadoTGIporOrgaoSubordinador" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	YEAR(pc_indDados_dataRef) AS ano
+					,MONTH(pc_indDados_dataRef) AS mes
+					,pc_indDados_mcuOrgaoSubordinador 
+					,pc_indDados_mcuOrgaoSubordinador 
+					,count(*) AS resultadoIndicador
+					,1 as paraOrgaoSubordinador
+					,5 as numIndicador
+			FROM pc_indicadores_dados
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 1
+			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoSubordinador 
+		</cfquery>
+
+		<cfquery name="resultadoQTSLporOrgaoSubordinador" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	YEAR(pc_indDados_dataRef) AS ano
+					,MONTH(pc_indDados_dataRef) AS mes
+					,pc_indDados_mcuOrgaoSubordinador 
+					,pc_indDados_mcuOrgaoSubordinador 
+					,count(*) AS resultadoIndicador
+					,1 as paraOrgaoSubordinador
+					,6 as numIndicador
+			FROM pc_indicadores_dados
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 2
+				AND pc_indDados_status = 6
+			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoSubordinador
+		</cfquery>
+		
+		<cfquery name="resultadoQTNCporOrgaoSubordinador" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT	YEAR(pc_indDados_dataRef) AS ano
+					,MONTH(pc_indDados_dataRef) AS mes
+					,pc_indDados_mcuOrgaoSubordinador 
+					,pc_indDados_mcuOrgaoSubordinador 
+					,count(*) AS resultadoIndicador
+					,1 as paraOrgaoSubordinador
+					,7 as numIndicador
+			FROM pc_indicadores_dados
+			WHERE pc_indDados_dataRef = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND pc_indDados_numIndicador = 2
+			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoSubordinador
+		</cfquery>
+
+
+
+
+
+
 					
 		<!-- consulta união dos resultados  -->
 		<cfquery name="resultadoIndicadoresSecundariosPorOrgao" dbtype="query">
@@ -785,6 +859,14 @@
 			SELECT	* FROM resultadoQTSLporOrgaoResp
 			UNION
 			SELECT	* FROM resultadoQTNCporOrgaoResp
+			UNION
+			SELECT	* FROM resultadoTIDPporOrgaoSubordinador
+			UNION
+			SELECT	* FROM resultadoTGIporOrgaoSubordinador
+			UNION
+			SELECT	* FROM resultadoQTSLporOrgaoSubordinador
+			UNION
+			SELECT	* FROM resultadoQTNCporOrgaoSubordinador
 		</cfquery>
 
 		<!--insere os dados dos indicadores secundários na tabela pc_indicadores_porOrgao-->
