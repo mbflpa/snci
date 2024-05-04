@@ -77,6 +77,7 @@
 			SELECT 
 				pc_indDados_dataRef, 
 				pc_indDados_matriculaGeracao,
+				pc_indDados_rotinaManual,
 				MAX(pc_indDados_dataHoraGeracao) AS max_dataHoraGeracao
 			FROM 
 				pc_indicadores_dados
@@ -84,7 +85,8 @@
 				YEAR(pc_indDados_dataRef) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 			GROUP BY 
 				pc_indDados_dataRef, 
-				pc_indDados_matriculaGeracao
+				pc_indDados_matriculaGeracao,
+				pc_indDados_rotinaManual
 			ORDER BY 
 				pc_indDados_dataRef DESC
 		</cfquery>
@@ -116,7 +118,7 @@
 								<tr style="text-align: center;"  >
 									<td>#dateFormat(pc_indDados_dataRef, 'mm/yyyy')#</td>
 									<td>#DateFormat(max_dataHoraGeracao, "dd/mm/yyyy")# - #TimeFormat(max_dataHoraGeracao, "HH:mm:ss")#</td>
-									<cfif pc_indDados_matriculaGeracao eq "A">
+									<cfif pc_indDados_rotinaManual eq 1>
 										<td>Rotina Automática</td>
 									<cfelse>
 										<!--retorna o nome do usuário que gerou os dados-->
@@ -458,9 +460,11 @@
 				<cfset ehControleInteno = 1>
 			</cfif>
 			<cfif arguments.tipoRotina eq "A">
-				<cfset matricula = "A">
+				<cfset matricula = NULL>
+				<cfset rotinaManual = 1>
 			<cfelse>
 				<cfset matricula = application.rsUsuarioParametros.pc_usu_matricula>
+				<cfset rotinaManual = 0>
 			</cfif>
 
 			<cfif mcuOrgaoSubordinador.pc_org_mcu  neq "">
@@ -481,7 +485,8 @@
 													,pc_indDados_orientacaoDistribuida
 													,pc_indDados_descricaoStatus
 													,pc_indDados_prazo
-													,pc_indDados_mcuOrgaoPosicEcontInterno)
+													,pc_indDados_mcuOrgaoPosicEcontInterno
+													,pc_indDados_rotinaManual)
 					VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 						,1
 						,<cfqueryparam value="#matricula#" cfsqltype="cf_sql_varchar">
@@ -499,6 +504,7 @@
 						,<cfqueryparam value="#rs_dados_prci.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
 						,<cfqueryparam value="#rs_dados_prci.Prazo#" cfsqltype="cf_sql_varchar">
 						,<cfqueryparam value="#ehControleInteno#" cfsqltype="cf_sql_bit">
+						,<cfqueryparam value="#rotinaManual#" cfsqltype="cf_sql_bit">
 					)
 				</cfquery>
 			</cfif>
@@ -579,18 +585,11 @@
 	<cffunction name="gerarDadosParaIndicadoresMensalPorOrgao"   access="remote" hint="gera os dados para os indicadores e insere na tabela pc_indicador_porOrgao - acompanhamento mensal"> 
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
-		<cfargument name="tipoRotina" type="string" required="false" default="A" />
-
-		
+			
 		<cfset ano = arguments.ano>
 		<cfset mes = arguments.mes>
 		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
-		<cfif arguments.tipoRotina eq "A">
-			<cfset matricula = "A">
-		<cfelse>
-			<cfset matricula = application.rsUsuarioParametros.pc_usu_matricula>
-		</cfif>
-
+		
 		<cfquery name="dadosAno_CI" datasource="#application.dsn_processos#" timeout="120"  >
 			SELECT	pc_orgaoSubordinador.pc_org_mcu as mcuOrgaoSubordinador
 					,pc_orgaoResp.pc_org_mcu as mcuOrgaoResp
