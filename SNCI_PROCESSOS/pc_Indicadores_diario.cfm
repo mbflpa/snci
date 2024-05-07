@@ -93,25 +93,26 @@
 							<cfset orgaoAvaliado = application.rsUsuarioParametros.pc_org_orgaoAvaliado>
 							<ul class="nav nav-pills nav-pills-abasIndicadoresDiario" id="myTabs" role="tablist" style="font-size:14px;">
 								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link active  btn   nav-link-abasIndicadoresDiario " id="tabCardDGCIacompDiario" data-toggle="tab" href="#divCardDGCIacompDiarioContent" role="tab" aria-controls="divCardDGCIacompDiarioContent" aria-selected="true" ><i class="fa fa-chart-line"></i> Resultado DGCI</a>
+									<a class="nav-link active  btn   nav-link-abasIndicadoresDiario " id="tabCardDGCIacompDiario" data-toggle="tab" href="#divCardDGCIacompDiarioContent" role="tab" aria-controls="divCardDGCIacompDiarioContent" aria-selected="true" ><i class="fa fa-chart-line"></i> DGCI<br>Resultado</a>
 								</li>
 								<cfif orgaoAvaliado eq 1>
 									<li class="nav-item " style="text-align: center;">
-										<a class="nav-link btn  nav-link-abasIndicadoresDiario " id="tabTabResumoDGCIorgaos" data-toggle="tab" href="#divTabResumoDGCIorgaosContent" role="tab" aria-controls="divTabResumoDGCIorgaosContent" aria-selected="false"><i class="fa fa-chart-line"></i> DGCI (órgãos)</a>
+										<a class="nav-link btn  nav-link-abasIndicadoresDiario " id="tabTabResumoDGCIorgaos" data-toggle="tab" href="#divTabResumoDGCIorgaosContent" role="tab" aria-controls="divTabResumoDGCIorgaosContent" aria-selected="false"><i class="fa fa-chart-line"></i> DGCI<br>órgãos subordinados</a>
 									</li>
 								</cfif>
-
+								<cfif orgaoAvaliado eq 1>
+									<li class="nav-item " style="text-align: center;">
+										<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabTabResumoPRCIorgaos" data-toggle="tab" href="#divTabResumoPRCIorgaosContent" role="tab" aria-controls="divTabResumoPRCIorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> PRCI<br>órgãos subordinados</a>
+									</li>
+									<li class="nav-item " style="text-align: center;">
+										<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabTabResumoSLNCorgaos" data-toggle="tab" href="#divTabResumoSLNCorgaosContent" role="tab" aria-controls="divTabResumoSLNCorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> SLNC<br>órgãos subordinados</a>
+									</li>
+								</cfif>
 								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabTabResumoPRCIorgaos" data-toggle="tab" href="#divTabResumoPRCIorgaosContent" role="tab" aria-controls="divTabResumoPRCIorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> PRCI <cfif orgaoAvaliado eq 1>(órgãos)</cfif></a>
+									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabIndicadorPRCI" data-toggle="tab" href="#divIndicadorPRCIContent" role="tab" aria-controls="divIndicadorPRCIContent" aria-selected="false"><i class="fa fa-database"></i> PRCI<br>detalhes</a>
 								</li>
 								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabTabResumoSLNCorgaos" data-toggle="tab" href="#divTabResumoSLNCorgaosContent" role="tab" aria-controls="divTabResumoSLNCorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> SLNC <cfif orgaoAvaliado eq 1>(órgãos)</cfif></a>
-								</li>
-								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabIndicadorPRCI" data-toggle="tab" href="#divIndicadorPRCIContent" role="tab" aria-controls="divIndicadorPRCIContent" aria-selected="false"><i class="fa fa-database"></i> Dados PRCI</a>
-								</li>
-								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabIndicadorSLNC" data-toggle="tab" href="#divIndicadorSLNCContent" role="tab" aria-controls="divIndicadorSLNCContent" aria-selected="false"><i class="fa fa-database"></i> Dados SLNC</a>
+									<a class="nav-link btn   nav-link-abasIndicadoresDiario" id="tabIndicadorSLNC" data-toggle="tab" href="#divIndicadorSLNCContent" role="tab" aria-controls="divIndicadorSLNCContent" aria-selected="false"><i class="fa fa-database"></i> SLNC<br>detalhes</a>
 								</li>
 							</ul>
 						
@@ -139,14 +140,16 @@
 										<div id="divTabResumoDGCIorgaos"></div>
 									</div>
 								</cfif>
-								<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
-									<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
-									<div id="divTabResumoPRCIorgaos"></div>
-								</div>
-								<div class="tab-pane fade" id="divTabResumoSLNCorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoSLNCorgaos" >
-									<h5 style="color:#0083ca;">SLNC por órgão responsável:</h5>
-									<div id="divTabResumoSLNCorgaos"></div>
-								</div>
+								<cfif orgaoAvaliado eq 1>
+									<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
+										<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
+										<div id="divTabResumoPRCIorgaos"></div>
+									</div>
+									<div class="tab-pane fade" id="divTabResumoSLNCorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoSLNCorgaos" >
+										<h5 style="color:#0083ca;">SLNC por órgão responsável:</h5>
+										<div id="divTabResumoSLNCorgaos"></div>
+									</div>
+								</cfif>
 								<div class="tab-pane fade" id="divIndicadorPRCIContent" role="tabpanel" aria-labelledby="tabIndicadorPRCI" >
 								
 									<div id="divIndicadorPRCI"></div>
@@ -181,7 +184,7 @@
 //const currentYear = 2023;
 			// Obtém o mês atual
 			const currentMonth = new Date().getMonth() + 1;
-//const currentMonth = 12
+//const currentMonth = 12;
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {	
 				

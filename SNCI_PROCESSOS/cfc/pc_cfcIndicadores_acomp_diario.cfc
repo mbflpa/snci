@@ -1360,6 +1360,7 @@
 											AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 											AND pc_indMeta_numIndicador = 1
 											AND pc_indMeta_mcuOrgao = '#orgaoRespMCU#'
+											AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="0" cfsqltype="cf_sql_integer">
 								</cfquery>
 								
 								<!--- Adiciona cada linha à tabela --->
@@ -1470,6 +1471,7 @@
 												AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 												AND pc_indMeta_numIndicador = 2
 												AND pc_indMeta_mcuOrgao = '#orgaoRespMCU#'
+												AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="0" cfsqltype="cf_sql_integer">
 									</cfquery>
 									
 									<!--- Adiciona cada linha à tabela --->
@@ -1615,6 +1617,7 @@
 													AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 													AND pc_indMeta_numIndicador = 1
 													AND pc_indMeta_mcuOrgao = '#orgaoRespMCU#'
+													AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="0" cfsqltype="cf_sql_integer">
 										</cfquery>
 									
 										<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
@@ -1623,6 +1626,7 @@
 													AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 													AND pc_indMeta_numIndicador = 2
 													AND pc_indMeta_mcuOrgao = '#orgaoRespMCU#'
+													AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="0" cfsqltype="cf_sql_integer">
 										</cfquery>
 
 										
@@ -1758,52 +1762,52 @@
 		<cfset totalFP = 0>
 		<cfset totalGeral = 0>
 		<cfset metaPRCIorgao = 0>
-		<cfset PRCIresultadoMeta = 0>
+		<cfset PRCIresultadoMeta = ''>
 		<cfset PRCIresultadoMetaFormatado = 0>
-		<cfset mediaPRCI = 0>
-		<cfset mediaPRCIformatado = 0>
+		<cfset totalPRCI = 0>
+		<cfset totalTIDP = 0>
+		<cfset totalTGI = 0>
+		<cfset totalPRCIformatado = 0>
 		<cfset metaPRCIorgaoFormatado = 0>
-
-		<cfset orgaosMCUList = ValueList(resultPRCIdados.orgaoRespMCU)>
+     
+	
 		
 		<cfif resultPRCIdados.recordcount neq 0>
 			<cfquery name="rsMetaPRCIcardDiario" datasource="#application.dsn_processos#" >
-				SELECT avg(pc_indMeta_meta) mediaPRCImeta FROM pc_indicadores_meta 
-
+				SELECT pc_indMeta_meta  FROM pc_indicadores_meta 
 				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
 						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 						AND pc_indMeta_numIndicador = 1
-						AND pc_indMeta_mcuOrgao in(#orgaosMCUList#)
+						AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+						AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 			</cfquery>
+
+
+			<cfquery name="rstotalPRCIcardDiario" dbtype="query">
+				SELECT SUM(totalDP) as totalDPorgao, SUM(totalFP) as totalFPorgao
+				FROM resultPRCIdados
+			</cfquery>
+
 			
-			<cfset metaPRCIorgao = rsMetaPRCIcardDiario.mediaPRCImeta>
+		    <cfset totalTIDP = rstotalPRCIcardDiario.totalDPorgao>
+			<cfset totalTGI = rstotalPRCIcardDiario.totalDPorgao + rstotalPRCIcardDiario.totalFPorgao>
+			<cfset totalPRCI = (totalTIDP/totalTGI)*100>
+		
+			<cfset totalPRCI = Round(totalPRCI*10)/10>
+			<cfset totalPRCIformatado = Replace(NumberFormat(totalPRCI,0.0), ".", ",")>
+		
+			<cfset metaPRCIorgao = rsMetaPRCIcardDiario.pc_indMeta_meta>
 			<cfif metaPRCIorgao neq ''>
 				<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0), ".", ",")>
-				<cfset PRCIresultadoMeta = ROUND((mediaPRCI / metaPRCIorgao)*100*10)/10>
+				<cfset PRCIresultadoMeta = ROUND((totalPRCI / metaPRCIorgao)*100*10)/10>
 				<cfset PRCIresultadoMetaFormatado = Replace(NumberFormat(PRCIresultadoMeta,0.0), ".", ",")>
 			</cfif>
 			
-
-		
-			<cfquery name="rsmediaPRCIcardDiario" dbtype="query">
-					SELECT totalDP / (totalDP + totalFP) as prciOrgao FROM resultPRCIdados
-			</cfquery>
-
-			<cfset totalPRCI = 0>
-			<cfloop query="rsmediaPRCIcardDiario">
-				<cfset totalPRCI = totalPRCI + prciOrgao>
-			</cfloop>
-
-			<cfset mediaPRCI = Round((totalPRCI*100 / rsmediaPRCIcardDiario.recordCount)*10)/10>
-			<cfset mediaPRCIformatado = Replace(NumberFormat(mediaPRCI,0.0), ".", ",")>
-
-			
-
 			<cfif metaPRCIorgaoFormatado neq 0>													
-				<cfset 	infoRodape = '<span style="font-size:14px">PRCI = #mediaPRCIformatado#% (média do resultado do PRCI dos órgão subordinados)</span><br>
-						<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#% (média das metas do PRCI dos órgãos subordinados)</span><br>'>
+				<cfset 	infoRodape = '<span style="font-size:14px">PRCI = #totalPRCIformatado#% ->  (TIDP&divide;TGI)x100 = (#totalTIDP#&divide;#totalTGI#)x100</span><br>
+						<span style="font-size:14px">Meta = #metaPRCIorgaoFormatado#%</span><br>'>
 			<cfelse>
-				<cfset infoRodape = '<span style="font-size:14px">PRCI = #mediaPRCIformatado#% (média do resultado do PRCI dos órgão subordinados)</span><br>
+				<cfset infoRodape = '<span style="font-size:14px">PRCI = #totalPRCIformatado#% </span><br>
 						<span style="font-size:14px">Meta = sem meta</span><br>'>
 			</cfif>			
 			
@@ -1812,7 +1816,7 @@
 				tipoDeCard = 'bg-gradient-warning',
 				siglaIndicador ='PRCI',
 				descricaoIndicador = 'Atendimento ao Prazo de Resposta',
-				percentualIndicadorFormatado = mediaPRCIformatado,
+				percentualIndicadorFormatado = totalPRCIformatado,
 				resultadoEmRelacaoMeta = PRCIresultadoMeta,
 				resultadoEmRelacaoMetaFormatado = PRCIresultadoMetaFormatado,
 				infoRodape = infoRodape,
@@ -1839,7 +1843,7 @@
 	</cffunction>
 
 	<cffunction name="cardSLNC_AcompDiario" access="remote" returntype="string" hint="cria o card com as informações dos resultados do SLNC para acompanhamento diário">
-	 				<cfargument name="ano" type="string" required="true" />
+	 	<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		<cfset var resultSLNCdados = consultaIndicadorSLNC_diario_paraTbResumo(ano=arguments.ano, mes=arguments.mes)>
 
@@ -1847,49 +1851,53 @@
 		<cfset totalTratamento = 0>
 		<cfset totalGeral = 0>
 		<cfset metaSLNCorgao = 0>
-		<cfset SLNCresultadoMeta = 0>
+		<cfset SLNCresultadoMeta = ''>
 		<cfset SLNCresultadoMetaFormatado = 0>
-		<cfset mediaSLNC = 0>
-		<cfset mediaSLNCformatado = 0>
+		<cfset totalSLNCformatado = 0>
 		<cfset metaSLNCorgaoFormatado = 0>
+		<cfset totalSLNC = 0>
+		<cfset totalQTSL = 0>
+		<cfset totalQTNC = 0>
 
-		<cfset orgaosMCUList = ValueList(resultSLNCdados.orgaoRespMCU)>
-		
+			
 		<cfif resultSLNCdados.recordcount neq 0>
+			
 			<cfquery name="rsMetaSLNCcardDiario" datasource="#application.dsn_processos#" >
-				SELECT avg(pc_indMeta_meta) mediaSLNCmeta FROM pc_indicadores_meta 
-
+				SELECT pc_indMeta_meta  FROM pc_indicadores_meta 
 				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
 						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 						AND pc_indMeta_numIndicador = 2
-						AND pc_indMeta_mcuOrgao in(#orgaosMCUList#)
+						AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+						AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 			</cfquery>
-			<cfset metaSLNCorgao = rsMetaSLNCcardDiario.mediaSLNCmeta>
+
+			
+		
+			<cfquery name="rstotalSLNCcardDiario" dbtype="query">
+					SELECT SUM(totalSolucionados) as totalSolucionadoOrgao, SUM(totalTratamento) as totalTratamentoOrgao
+					 FROM resultSLNCdados
+			</cfquery>
+
+			<cfset totalQTSL = rstotalSLNCcardDiario.totalSolucionadoOrgao>
+			<cfset totalQTNC = rstotalSLNCcardDiario.totalSolucionadoOrgao + rstotalSLNCcardDiario.totalTratamentoOrgao>
+			<cfset totalSLNC = (totalQTSL/totalQTNC)*100>
+			<cfset totalSLNC = Round(totalSLNC*10)/10>
+						
+			<cfset totalSLNCformatado = Replace(NumberFormat(totalSLNC,0.0), ".", ",")>
+
+			<cfset metaSLNCorgao = rsMetaSLNCcardDiario.pc_indMeta_meta>
 			<cfif metaSLNCorgao neq ''>
 				<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0), ".", ",")>
-				<cfset SLNCresultadoMeta = ROUND((mediaSLNC / metaSLNCorgao)*100*10)/10>
+				<cfset SLNCresultadoMeta = ROUND((totalSLNC / metaSLNCorgao)*100*10)/10>
 				<cfset SLNCresultadoMetaFormatado = Replace(NumberFormat(SLNCresultadoMeta,0.0), ".", ",")>
 			</cfif>
 			
 
-		
-			<cfquery name="rsmediaSLNCcardDiario" dbtype="query">
-					SELECT totalSolucionados / (totalSolucionados + totalTratamento) as slncOrgao FROM resultSLNCdados
-			</cfquery>
-
-			<cfset totalSLNC = 0>
-			<cfloop query="rsmediaSLNCcardDiario">
-				<cfset totalSLNC = totalSLNC + slncOrgao>	
-			</cfloop>	
-			<cfset mediaSLNC = Round((totalSLNC*100 / rsmediaSLNCcardDiario.recordCount)*10)/10>
-			<cfset mediaSLNCformatado = Replace(NumberFormat(mediaSLNC,0.0), ".", ",")>
-
-		
 			<cfif metaSLNCorgaoFormatado neq 0>
-				<cfset infoRodape = '<span style="font-size:14px">SLNC = #mediaSLNCformatado#% (média do resultado do SLNC dos órgão subordinados)</span><br>
-						<span style="font-size:14px">Meta = #metaSLNCorgaoFormatado#% (média das metas do SLNC dos órgãos subordinados)</span><br>'>
+				<cfset infoRodape = '<span style="font-size:14px">SLNC = #totalSLNCformatado#% -> (QTSL&divide;QTNC)x100 = (#totalQTSL#&divide;#totalQTNC#)x100</span><br>
+						<span style="font-size:14px">Meta = #metaSLNCorgaoFormatado#% </span><br>'>
 			<cfelse>
-				<cfset infoRodape = '<span style="font-size:14px">SLNC = #mediaSLNCformatado#% (média do resultado do SLNC dos órgão subordinados)</span><br>
+				<cfset infoRodape = '<span style="font-size:14px">SLNC = #totalSLNCformatado#% </span><br>
 						<span style="font-size:14px">Meta = sem meta</span><br>'>
 			</cfif>
 			
@@ -1898,7 +1906,7 @@
 				tipoDeCard = 'bg-gradient-warning',
 				siglaIndicador ='SLNC',
 				descricaoIndicador = 'Solução de Não Conformidades',
-				percentualIndicadorFormatado = mediaSLNCformatado,
+				percentualIndicadorFormatado = totalSLNCformatado,
 				resultadoEmRelacaoMeta = SLNCresultadoMeta,
 				resultadoEmRelacaoMetaFormatado = SLNCresultadoMetaFormatado,
 				infoRodape = infoRodape,
@@ -1927,27 +1935,26 @@
 		<cfargument name="mes" type="string" required="true" />
 		<cfset var resultPRCIdadosParaDGCI = consultaIndicadorPRCI_diario_paraTbResumo(ano=arguments.ano, mes=arguments.mes)>
 		<cfset var resultSLNCdadosParaDGCI = consultaIndicadorSLNC_diario_paraTbResumo(ano=arguments.ano, mes=arguments.mes)>
-		<cfset orgaosMCUListPRCI = ValueList(resultPRCIdadosParaDGCI.orgaoRespMCU)>
-		<cfset orgaosMCUListSLNC = ValueList(resultSLNCdadosParaDGCI.orgaoRespMCU)>
+		
 
 
 		<cfset totalDP = 0>
 		<cfset totalFP = 0>
 		<cfset totalGeral = 0>
-		<cfset mediaMetaPRCIorgaos = 0>
+		<cfset metaPRCIorgao = 0>
 		<cfset PRCIresultadoMeta = 0>
 		<cfset PRCIresultadoMetaFormatado = 0>
-		<cfset mediaPRCI = 0>
-		<cfset mediaPRCIformatado = 0>
-		<cfset mediaMetaPRCIorgaosFormatado = 0>
+		<cfset totalPRCI = 0>
+		<cfset totalPRCIformatado = 0>
+		<cfset metaPRCIorgaoFormatado = 0>
 		<cfset totalSolucionados = 0>
 		<cfset totalTratamento = 0>
-		<cfset mediaMetaSLNCorgaos = 0>
+		<cfset metaSLNCorgao = 0>
 		<cfset SLNCresultadoMeta = 0>
 		<cfset SLNCresultadoMetaFormatado = 0>
-		<cfset mediaSLNC = 0>
-		<cfset mediaSLNCformatado = 0>
-		<cfset mediaMetaSLNCorgaosFormatado = 0>
+		<cfset totalSLNC = 0>
+		<cfset totalSLNCformatado = 0>
+		<cfset metaSLNCorgaoFormatado = 0>
 		<cfset pesoPRCI = 0>
 		<cfset pesoSLNC = 0>
 		<cfset percentualDGCI = 0>
@@ -1975,82 +1982,72 @@
 
 		<cfif resultPRCIdadosParaDGCI.recordcount neq 0>
 			<cfquery name="rsMetaPRCIcardDiario" datasource="#application.dsn_processos#" >
-				SELECT avg(pc_indMeta_meta) mediaPRCImeta FROM pc_indicadores_meta 
+				SELECT pc_indMeta_meta  FROM pc_indicadores_meta 
 				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
 						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 						AND pc_indMeta_numIndicador = 1
-						AND pc_indMeta_mcuOrgao in(#orgaosMCUListPRCI#)
+						AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+						AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 			</cfquery>
 
-			<cfif rsMetaPRCIcardDiario.mediaPRCImeta neq''>
-				<cfset mediaMetaPRCIorgaos = NumberFormat(round(rsMetaPRCIcardDiario.mediaPRCImeta*10)/10,0.0)>
-				<cfset mediaMetaPRCIorgaosFormatado = Replace(mediaMetaPRCIorgaos, ".", ",")>
+			<cfif rsMetaPRCIcardDiario.pc_indMeta_meta neq''>
+				<cfset metaPRCIorgao = NumberFormat(round(rsMetaPRCIcardDiario.pc_indMeta_meta*10)/10,0.0)>
+				<cfset metaPRCIorgaoFormatado = Replace(metaPRCIorgao, ".", ",")>
 			</cfif>
 
-		<cfelse>
-			<cfset mediaMetaPRCIorgaosFormatado = 0>
-		</cfif>
-
-
-		<cfif resultSLNCdadosParaDGCI.recordcount neq 0>
+		
 			<cfquery name="rsMetaSLNCcardDiario" datasource="#application.dsn_processos#" >
-				SELECT avg(pc_indMeta_meta) mediaSLNCmeta FROM pc_indicadores_meta 
+				SELECT pc_indMeta_meta  FROM pc_indicadores_meta 
 				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
 						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 						AND pc_indMeta_numIndicador = 2
-						AND pc_indMeta_mcuOrgao in(#orgaosMCUListSLNC#)
+						AND pc_indMeta_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+						AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 			</cfquery>
 
 			
-			<cfif rsMetaSLNCcardDiario.mediaSLNCmeta neq ''>
-				<cfset mediaMetaSLNCorgaos = NumberFormat(round(rsMetaSLNCcardDiario.mediaSLNCmeta*10)/10,0.0)>
-				<cfset mediaMetaSLNCorgaosFormatado = Replace(mediaMetaSLNCorgaos, ".", ",")>
+			<cfif rsMetaSLNCcardDiario.pc_indMeta_meta neq ''>
+				<cfset metaSLNCorgao = NumberFormat(round(rsMetaSLNCcardDiario.pc_indMeta_meta*10)/10,0.0)>
+				<cfset metaSLNCorgaoFormatado = Replace(metaSLNCorgao, ".", ",")>
 			</cfif>
+
+
 		<cfelse>
-			<cfset mediaMetaSLNCorgaosFormatado = 0>
+			<cfset metaPRCIorgaoFormatado = 0>
+			<cfset metaSLNCorgaoFormatado = 0>
 		</cfif>
 		
 
-		<cfquery name="rsmediaPRCIcardDiario" dbtype="query">
-				SELECT totalDP / (totalDP + totalFP) as prciOrgao FROM resultPRCIdadosParaDGCI
+		<cfquery name="rstotalPRCIcardDiario" dbtype="query">
+			SELECT SUM(totalDP) as totalDPorgao, SUM(totalFP) as totalFPorgao
+			FROM resultPRCIdadosParaDGCI
 		</cfquery>
-		<cfset totalPRCI = 0>
-		<cfloop query="rsmediaPRCIcardDiario">
-			<cfset totalPRCI = totalPRCI + prciOrgao>
-		</cfloop>
 
-		<cfif rsmediaPRCIcardDiario.recordcount neq 0>
-			<cfset mediaPRCI = Round((totalPRCI*100 / rsmediaPRCIcardDiario.recordCount)*10)/10>
-			<cfset mediaPRCIformatado = Replace(NumberFormat(mediaPRCI,0.0), ".", ",")>
-		</cfif>
-
-		<cfif mediaMetaPRCIorgaos neq 0>
-			<cfset PRCIresultadoMeta = ROUND((mediaPRCI / mediaMetaPRCIorgaos)*100*10)/10>
-		</cfif>
-
-		<cfset PRCIresultadoMetaFormatado = Replace(NumberFormat(PRCIresultadoMeta,0.0), ".", ",")>
-
-		<cfquery name="rsmediaSLNCcardDiario" dbtype="query">
-				SELECT totalSolucionados / (totalSolucionados + totalTratamento) as slncOrgao FROM resultSLNCdadosParaDGCI
-		</cfquery>
-		<cfset totalSLNC = 0>
-		<cfloop query="rsmediaSLNCcardDiario">
-			<cfset totalSLNC = totalSLNC + slncOrgao>
-		</cfloop>
-
-		<cfif rsmediaSLNCcardDiario.recordcount neq 0>
-			<cfset mediaSLNC = Round((totalSLNC*100 / rsmediaSLNCcardDiario.recordCount)*10)/10>
-			<cfset mediaSLNCformatado = Replace(NumberFormat(mediaSLNC,0.0), ".", ",")>
-		</cfif>
-
-        <cfif mediaMetaSLNCorgaos neq 0>
-			<cfset SLNCresultadoMeta = ROUND((mediaSLNC / mediaMetaSLNCorgaos)*100*10)/10>
-		</cfif>
 		
+		<cfset totalTIDP = rstotalPRCIcardDiario.totalDPorgao>
+		<cfset totalTGI = rstotalPRCIcardDiario.totalDPorgao + rstotalPRCIcardDiario.totalFPorgao>
+		<cfset totalPRCI = (totalTIDP/totalTGI)*100>
+	
+		<cfset totalPRCI = Round(totalPRCI*10)/10>
+		<cfset totalPRCIformatado = Replace(NumberFormat(totalPRCI,0.0), ".", ",")>
 
-		<cfset SLNCresultadoMetaFormatado = Replace(NumberFormat(SLNCresultadoMeta,0.0), ".", ",")>
+
+		<cfquery name="rstotalSLNCcardDiario" dbtype="query">
+				SELECT SUM(totalSolucionados) as totalSolucionadoOrgao, SUM(totalTratamento) as totalTratamentoOrgao
+					FROM resultSLNCdadosParaDGCI
+		</cfquery>
+
+		<cfset totalQTSL = rstotalSLNCcardDiario.totalSolucionadoOrgao>
+		<cfset totalQTNC = rstotalSLNCcardDiario.totalSolucionadoOrgao + rstotalSLNCcardDiario.totalTratamentoOrgao>
+		<cfset totalSLNC = (totalQTSL/totalQTNC)*100>
+		<cfset totalSLNC = Round(totalSLNC*10)/10>
+					
+		<cfset totalSLNCformatado = Replace(NumberFormat(totalSLNC,0.0), ".", ",")>
+
+		
 		<cfset pesoPRCI = 0>
 		<cfset pesoSLNC = 0>
+
 		<cfif rsPRCIpeso.recordcount neq 0>
 			<cfset pesoPRCI = rsPRCIpeso.pc_indPeso_peso>
 			<cfset pesoPRCIformatado = Replace(pesoPRCI, ".", ",")>
@@ -2059,25 +2056,26 @@
 			<cfset pesoSLNC = rsSLNCpeso.pc_indPeso_peso>
 			<cfset pesoSLNCformatado = Replace(pesoSLNC, ".", ",")>
 		</cfif>
+
 		<cfset percentualDGCI = ''>
-		<cfif rsmediaPRCIcardDiario.recordcount neq 0 and rsmediaSLNCcardDiario.recordcount neq 0>
-			<cfset percentualDGCI = NumberFormat(Round(((mediaPRCI * pesoPRCI) + (mediaSLNC * pesoSLNC))*10)/10,0.0)>
-		<cfelseif rsmediaPRCIcardDiario.recordcount neq 0 and rsmediaSLNCcardDiario.recordcount eq 0>
-			<cfset percentualDGCI = mediaPRCI>
-		<cfelseif rsmediaPRCIcardDiario.recordcount eq 0 and rsmediaSLNCcardDiario.recordcount neq 0>
-			<cfset percentualDGCI = mediaSLNC>
+		<cfif rstotalPRCIcardDiario.recordcount neq 0 and rstotalSLNCcardDiario.recordcount neq 0>
+			<cfset percentualDGCI = NumberFormat(Round(((totalPRCI * pesoPRCI) + (totalSLNC * pesoSLNC))*10)/10,0.0)>
+		<cfelseif rstotalPRCIcardDiario.recordcount neq 0 and rstotalSLNCcardDiario.recordcount eq 0>
+			<cfset percentualDGCI = totalPRCI>
+		<cfelseif rstotalPRCIcardDiario.recordcount eq 0 and rstotalSLNCcardDiario.recordcount neq 0>
+			<cfset percentualDGCI = totalSLNC>
 		<cfelse>
 			<cfset percentualDGCI = ''>
 		</cfif>
 
 		<cfset percentualDGCIformatado = Replace(percentualDGCI, ".", ",")>
 
-		<cfif mediaMetaPRCIorgaos neq 0 and mediaMetaSLNCorgaos neq 0>
-			<cfset metaDGCIorgao = NumberFormat(ROUND(((mediaMetaPRCIorgaos * pesoPRCI) + (mediaMetaSLNCorgaos * pesoSLNC))*10)/10,0.0)>
-		<cfelseif mediaMetaPRCIorgaos neq 0 and mediaMetaSLNCorgaos eq 0>
-			<cfset metaDGCIorgao = mediaMetaPRCIorgaos >
-		<cfelseif mediaMetaPRCIorgaos eq 0 and mediaMetaSLNCorgaos neq 0>
-			<cfset metaDGCIorgao = mediaMetaSLNCorgaos >
+		<cfif metaPRCIorgao neq 0 and metaSLNCorgao neq 0>
+			<cfset metaDGCIorgao = NumberFormat(ROUND(((metaPRCIorgao * pesoPRCI) + (metaSLNCorgao * pesoSLNC))*10)/10,0.0)>
+		<cfelseif metaPRCIorgao neq 0 and metaSLNCorgao eq 0>
+			<cfset metaDGCIorgao = metaPRCIorgao >
+		<cfelseif metaPRCIorgao eq 0 and metaSLNCorgao neq 0>
+			<cfset metaDGCIorgao = metaSLNCorgao >
 		<cfelse>
 			<cfset metaDGCIorgao = NumberFormat(0,0.0) >
 		</cfif>
@@ -2089,20 +2087,20 @@
 			<cfset DGCIresultadoMeta = ROUND((ROUND(percentualDGCI*10)/10 / metaDGCIorgao)*100*10)/10>
 			<cfset DGCIresultadoMetaFormatado = Replace(NumberFormat(DGCIresultadoMeta,0.0), ".", ",")>
 		<cfelse>
-			<cfset DGCIresultadoMeta =0>
-			<cfset DGCIresultadoMetaFormatado = 0>
+			<cfset DGCIresultadoMeta =''>
+			<cfset DGCIresultadoMetaFormatado = ''>
 		</cfif>
 
 		<cfif percentualDGCI neq ''>
-			<cfif rsmediaPRCIcardDiario.recordcount neq 0 AND rsmediaSLNCcardDiario.recordcount neq 0>
-				<cfset formulaDGCI = '(PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#mediaPRCIformatado# x #pesoPRCIformatado#) + (#mediaSLNCformatado# x #pesoSLNCformatado#)'>
-			    <cfset formulaMeta = '(Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC) = (#mediaMetaPRCIorgaosFormatado# x #pesoPRCIformatado#) + (#mediaMetaSLNCorgaosFormatado# x #pesoSLNCformatado#)'>
-			<cfelseif rsmediaPRCIcardDiario.recordcount neq 0 AND rsmediaSLNCcardDiario.recordcount eq 0>
-				<cfset formulaDGCI = '(PRCI) = (#mediaPRCIformatado#)'>
-				<cfset formulaMeta = '(Meta PRCI) = (#mediaMetaPRCIorgaosFormatado#)'>
-			<cfelseif rsmediaPRCIcardDiario.recordcount eq 0 AND rsmediaSLNCcardDiario.recordcount neq 0>
-				<cfset formulaDGCI = '(SLNC) = (#mediaSLNCformatado#)'>
-				<cfset formulaMeta = '(Meta SLNC) = (#mediaMetaSLNCorgaosFormatado#)'>
+			<cfif rstotalPRCIcardDiario.recordcount neq 0 AND rstotalSLNCcardDiario.recordcount neq 0>
+				<cfset formulaDGCI = '(PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#totalPRCIformatado# x #pesoPRCIformatado#) + (#totalSLNCformatado# x #pesoSLNCformatado#)'>
+			    <cfset formulaMeta = '(Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC) = (#metaPRCIorgaoFormatado# x #pesoPRCIformatado#) + (#metaSLNCorgaoFormatado# x #pesoSLNCformatado#)'>
+			<cfelseif rstotalPRCIcardDiario.recordcount neq 0 AND rstotalSLNCcardDiario.recordcount eq 0>
+				<cfset formulaDGCI = '(PRCI) = (#totalPRCIformatado#)'>
+				<cfset formulaMeta = '(Meta PRCI) = (#metaPRCIorgaoFormatado#)'>
+			<cfelseif rstotalPRCIcardDiario.recordcount eq 0 AND rstotalSLNCcardDiario.recordcount neq 0>
+				<cfset formulaDGCI = '(SLNC) = (#totalSLNCformatado#)'>
+				<cfset formulaMeta = '(Meta SLNC) = (#metaSLNCorgaoFormatado#)'>
 			<cfelse>
 				<cfset formulaDGCI = ''>
 				<cfset formulaMeta = ''>
@@ -2144,7 +2142,6 @@
 			});
 		</script>
 	</cffunction>
-
 
 
 

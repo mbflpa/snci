@@ -6,7 +6,7 @@
 		<cfargument name="siglaIndicador" type="string" required="yes">
 		<cfargument name="descricaoIndicador" type="string" required="yes">
         <cfargument name="percentualIndicadorFormatado" type="string" required="yes">
-        <cfargument name="resultadoEmRelacaoMeta" type="numeric" required="yes">
+        <cfargument name="resultadoEmRelacaoMeta" type="string" required="yes">
 		<cfargument name="resultadoEmRelacaoMetaFormatado" type="string" required="yes">
         <cfargument name="infoRodape" type="string" required="yes">
 		<cfargument name="icone" type="string" required="no" default="fas fa-chart-line">
@@ -24,9 +24,14 @@
                     <span class="info-box-icon"><i class="#icone#" style="font-size:45px"></i></span>
 
                     <div class="info-box-content">
+                    
                         <span class="info-box-text"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;font-size:22px">#siglaIndicador# = #percentualIndicadorFormatado#%</font></font></span><span style="font-size:12px;position:absolute; top:36px">#descricaoIndicador#</span>
-                        <span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#resultadoEmRelacaoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (#siglaIndicador# / Meta) * 100</span></span>
-
+                        
+                        <cfif resultadoEmRelacaoMeta neq ''>    
+                            <span class="info-box-number"><font style="vertical-align: inherit;"><font style="vertical-align: inherit;inherit;font-size:20px"><strong>#resultadoEmRelacaoMetaFormatado#%</strong></font></font><span style="font-size:10px;"> em relação a meta = (#siglaIndicador# &divide; Meta) x 100</span></span>
+                        <cfelse>
+                            <br>
+                        </cfif>
                         <div class="progress" style="width:90%">
                             <div class="progress-bar" style="width: #resultadoEmRelacaoMeta#%"></div>
                         </div>
