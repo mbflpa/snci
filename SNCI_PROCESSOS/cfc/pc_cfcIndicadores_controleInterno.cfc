@@ -204,6 +204,9 @@
 								<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
 									<thead >
+									    <tr style="font-size:14px">
+											<th colspan="12" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do PRCI: <cfoutput><strong>#monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+										</tr>
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
 											<th style="width: 10px">SE/CS</th>
@@ -350,6 +353,9 @@
 									
 									<thead>
 										<tr style="font-size:14px">
+											<th colspan="12" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>#monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+										</tr>
+										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
 											<th style="width: 10px">SE/CS</th>
 											<th style="width: 10px">Órgão Responsável</th>
@@ -444,6 +450,315 @@
 
 	</cffunction>
 
+	<cffunction name="tabPRCIdetalhe_mensalAcumulado_CI" access="remote" returntype="string" hint="cria tabela como os dados para o indicador PRCI, de todos os meses, dos órgãos para consulta do Controle Interno">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+
+		
+		<cfquery name="resultadoDetalhe" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT pc_indDados_numPosic
+				,pc_indDados_mcuOrgaoResp as mcuOrgaoResp
+				,pc_orgaos.pc_org_sigla as siglaOrgaoResp
+				,pc_indDados_mcuOrgaoSubordinador as mcuOrgaoSubordinador
+				,pc_orgaosSubordinador.pc_org_sigla as siglaOrgaoSubordinador
+				,pc_indDados_mcuOrgaoAvaliado as mcuOrgaoAvaliado
+				,pc_orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
+				,pc_indDados_numProcesso as numProcessoSNCI
+				,pc_indDados_numItem as item
+				,pc_indDados_numOrientacao as orientacao
+				,pc_indDados_dataPrevista as dataPrevista
+				,pc_indDados_status as numStatus
+				,pc_indDados_descricaoStatus as descricaoOrientacaoStatus
+				,pc_indDados_dataRef as dataRef
+				,pc_indDados_numIndicador as numIndicador
+				,CASE 
+					WHEN pc_indDados_descricaoStatus = 'PENDENTE' THEN DATEADD(day, 1, pc_indDados_dataPrevista)
+					ELSE pc_indDados_dataStatus
+				END as dataPosicao
+				,pc_indDados_prazo as prazo
+
+			FROM pc_indicadores_dados
+			INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoResp
+			INNER JOIN pc_orgaos as pc_orgaosSubordinador on pc_orgaosSubordinador.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoSubordinador
+			INNER JOIN pc_orgaos as pc_orgaoAvaliado on pc_orgaoAvaliado.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoAvaliado
+			WHERE MONTH(pc_indDados_dataRef) <= <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+			      and YEAR(pc_indDados_dataRef) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+
+		</cfquery>
+
+		<cfquery name="resultadoPRCIdetalhe"   dbtype="query">
+			SELECT * FROM resultadoDetalhe	WHERE numIndicador = 1
+		</cfquery>
+
+		<cfif resultadoPRCIdetalhe.recordcount neq 0 >	
+			<div id="divDetalhePRCI" class="row" >
+							
+				<div class="col-12">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
+						
+							<div class="table-responsive">
+								<table id="tabPRCIdetalheAcumulado" class="table table-bordered table-striped text-nowrap" style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+									
+									<thead >
+									    <tr style="font-size:14px">
+											<th colspan="14" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do PRCI: <cfoutput><strong>Janeiro a #monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+										</tr>
+										<tr style="font-size:14px">
+											<th style="width: 10px">Posic ID</th>
+											<th style="width: 10px">Mês</th>
+											<th style="width: 10px">Ano</th>
+											<th style="width: 10px">SE/CS</th>
+											<th style="width: 10px">Órgão Responsável</th>
+											<th style="width: 10px">Processo SNCI</th>
+											<th style="width: 10px">Órgão Avaliado</th>
+											<th style="width: 10px">Item</th>
+											<th style="width: 10px">Orientação</th>
+											<th style="width: 10px">Data Prevista</th>
+											<th style="width: 10px">Data Status</th>
+											<th style="width: 10px">Status</th>
+											<th style="width: 10px">Data Ref.</th>
+											<th style="width: 10px">Prazo</th>
+
+										</tr>
+									</thead>
+									
+									<tbody>
+										<cfloop query="resultadoPRCIdetalhe" >
+										
+											<cfoutput>					
+												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+													<td>#pc_indDados_numPosic#</td>
+													<td>#dateFormat(dataRef, 'mm')#</td>
+													<td>#dateFormat(dataRef, 'yyyy')#</td>
+													<td>#siglaOrgaoSubordinador# (#mcuOrgaoSubordinador#)</td>
+													<td>#siglaOrgaoResp# (#mcuOrgaoResp#)</td>
+													<td>#numProcessoSNCI#</td>
+													<td>#siglaOrgaoAvaliado# (#mcuOrgaoAvaliado#)</td>
+													<td >#item#</td>
+													<td>#orientacao#</td>
+													<cfif dataPrevista eq '1900-01-01' or dataPrevista eq ''>
+														<td>NÃO INF.</td>
+													<cfelse>
+														<td>#dateFormat(dataPrevista, 'dd/mm/yyyy')#</td>
+													</cfif>
+													<td>#dateFormat(dataPosicao, 'dd/mm/yyyy')#</td>
+													<td>#descricaoOrientacaoStatus#</td>
+													<td>#dateFormat(dataRef, 'dd/mm/yyyy')#</td>
+													<td>#prazo#</td>
+												</tr>
+											</cfoutput>
+										</cfloop>	
+									</tbody>
+
+								</table>
+							</div>							
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+        <cfelse>
+			<h5>Não há dados para exibir</h5>
+		</cfif>
+
+		<script language="JavaScript">
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
+			var tituloExcel_PRCIacumulado ="SNCI_Consulta_PRCI_detalhamentoAcumulado_";
+			$('#tabPRCIdetalheAcumulado').DataTable( {
+				destroy: true, // Destruir a tabela antes de recriá-la
+				stateSave: false,
+				deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+				scrollX: true, // Permitir rolagem horizontal
+				autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+				pageLength: 5,
+				
+				dom: "<'row'<'col-sm-3'B><'col-sm-4 text-center' p><'col-sm-4 text-right'i>>" ,
+				order: [[1, 'asc'], [2, 'asc']], // Ordena a segunda e a terceira coluna em ordem crescente
+				buttons: [
+					{
+						extend: 'excel',
+						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+						title : tituloExcel_PRCIacumulado + d,
+						className: 'btExcel',
+					}
+
+				]
+				
+
+			})
+			$(document).ready(function() {
+				$(".content-wrapper").css("height", "auto");
+			});
+		</script>
+	</cffunction>
+
+	<cffunction name="tabSLNCdetalhe_mensalAcumulado_CI" access="remote" returntype="string" hint="cria tabela como os dados para o indicador SLNC dos órgãos para consulta do Controle Interno">
+		<cfargument name="ano" type="string" required="true" />
+		<cfargument name="mes" type="string" required="true" />
+		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
+
+		<cfquery name="resultadoDetalhe" datasource="#application.dsn_processos#" timeout="120"  >
+			SELECT pc_indDados_numPosic
+				,pc_indDados_mcuOrgaoResp as mcuOrgaoResp
+				,pc_orgaos.pc_org_sigla as siglaOrgaoResp
+				,pc_indDados_mcuOrgaoSubordinador as mcuOrgaoSubordinador
+				,pc_orgaosSubordinador.pc_org_sigla as siglaOrgaoSubordinador
+				,pc_indDados_mcuOrgaoAvaliado as mcuOrgaoAvaliado
+				,pc_orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
+				,pc_indDados_numProcesso as numProcessoSNCI
+				,pc_indDados_numItem as item
+				,pc_indDados_numOrientacao as orientacao
+				,pc_indDados_dataPrevista as dataPrevista
+				,pc_indDados_status as numStatus
+				,pc_indDados_descricaoStatus as descricaoOrientacaoStatus
+				,pc_indDados_dataRef as dataRef
+				,pc_indDados_numIndicador as numIndicador
+				,CASE 
+					WHEN pc_indDados_descricaoStatus = 'PENDENTE' THEN DATEADD(day, 1, pc_indDados_dataPrevista)
+					ELSE pc_indDados_dataStatus
+				END as dataPosicao
+				,pc_indDados_prazo as prazo
+
+			FROM pc_indicadores_dados
+			INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoResp
+			INNER JOIN pc_orgaos as pc_orgaosSubordinador on pc_orgaosSubordinador.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoSubordinador
+			INNER JOIN pc_orgaos as pc_orgaoAvaliado on pc_orgaoAvaliado.pc_org_mcu = pc_indicadores_dados.pc_indDados_mcuOrgaoAvaliado
+			WHERE MONTH(pc_indDados_dataRef) <= <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+			      and YEAR(pc_indDados_dataRef) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+
+		</cfquery>
+
+		<cfquery name="resultadoSLNCdetalhe"   dbtype="query">
+			SELECT * FROM resultadoDetalhe	WHERE numIndicador = 2
+		</cfquery>
+
+		<cfif resultadoSLNCdetalhe.recordcount neq 0 >	
+			<div id="divDetalheSLNC" class="row" >
+							
+				<div class="col-12">
+					<div class="card" >
+						
+						<!-- card-body -->
+						<div class="card-body" >
+														
+						
+							<div class="table-responsive">
+								<table id="tabSLNCdetalheAcumulado" class="table table-bordered table-striped text-nowrap" style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+									
+									<thead>
+										<tr style="font-size:14px">
+											<th colspan="14" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>Janeiro a #monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+										</tr>
+										<tr style="font-size:14px">
+											<th style="width: 10px">Posic ID</th>
+											<th style="width: 10px">Mês</th>
+											<th style="width: 10px">Ano</th>
+											<th style="width: 10px">SE/CS</th>
+											<th style="width: 10px">Órgão Responsável</th>
+											<th style="width: 10px">Processo SNCI</th>
+											<th style="width: 10px">Órgão Avaliado</th>
+											<th style="width: 10px">Item</th>
+											<th style="width: 10px">Orientação</th>
+											<th style="width: 10px">Data Prevista</th>
+											<th style="width: 10px">Data Status</th>
+											<th style="width: 10px">Status</th>
+											<th style="width: 10px">Data Ref.</th>
+
+										</tr>
+									</thead>
+									
+									<tbody>
+										<cfloop query="resultadoSLNCdetalhe" >
+										
+											<cfoutput>					
+												<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
+													<td>#pc_indDados_numPosic#</td>
+													<td>#dateFormat(dataRef, 'mm')#</td>
+													<td>#dateFormat(dataRef, 'yyyy')#</td>
+													<td>#siglaOrgaoSubordinador# (#mcuOrgaoSubordinador#)</td>
+													<td>#siglaOrgaoResp# (#mcuOrgaoResp#)</td>
+													<td>#numProcessoSNCI#</td>
+													<td>#siglaOrgaoAvaliado# (#mcuOrgaoAvaliado#)</td>
+													<td >#item#</td>
+													<td>#orientacao#</td>
+													<cfif dataPrevista eq '1900-01-01' or dataPrevista eq ''>
+														<td>NÃO INF.</td>
+													<cfelse>
+														<td>#dateFormat(dataPrevista, 'dd/mm/yyyy')#</td>
+													</cfif>
+													<td>#dateFormat(dataPosicao, 'dd/mm/yyyy')#</td>
+
+													<td>#descricaoOrientacaoStatus#</td>
+
+													<td>#dateFormat(dataRef, 'dd/mm/yyyy')#</td>
+												</tr>
+											</cfoutput>
+										</cfloop>	
+									</tbody>
+
+								</table>
+							</div>							
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+        <cfelse>
+			<h5>Não há dados para exibir</h5>
+		</cfif>
+
+		<script language="JavaScript">
+
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
+			var tituloExcel_SLNCacumulado ="SNCI_Consulta_SLNC_detalhamento_acumulado";
+
+				$('#tabSLNCdetalheAcumulado').DataTable( {
+					destroy: true, // Destruir a tabela antes de recriá-la
+					stateSave: false,
+					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+					scrollX: true, // Permitir rolagem horizontal
+        			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+					pageLength: 5,
+					
+					dom: "<'row'<'col-sm-3'B><'col-sm-4 text-center' p><'col-sm-4 text-right'i>>"  ,
+					order: [[1, 'asc'], [2, 'asc']], // Ordena a segunda e a terceira coluna em ordem crescente
+					buttons: [
+						{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+							title : tituloExcel_SLNCacumulado + d,
+							className: 'btExcel',
+						}
+
+					]
+					
+
+				})
+				$(document).ready(function() {
+					$(".content-wrapper").css("height", "auto");
+				});
+		</script>
+
+	</cffunction>
+
 	<cffunction name="tabPRCIorgaosSubordinadores_mensal_CI" access="remote" returntype="string" hint="cria tabela resumo com as informações dos resultados do PRCI dos órgãos subordinadores para consulta do Controle Interno">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
@@ -479,22 +794,13 @@
 												<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
 													
 													<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#">
-														SELECT  AVG(meta) AS pc_indMeta_meta from (
-															SELECT DISTINCT pc_indMeta_ano
-																			,pc_indMeta_mes
-																			,pc_indOrgao_mcuOrgaoSubordinador
-																			,pc_indMeta_mcuOrgao
-																			,pc_indicadores_meta.pc_indMeta_meta as meta 
+														SELECT pc_indMeta_meta
 															FROM pc_indicadores_meta
-															INNER JOIN (select  DISTINCT pc_indOrgao_mcuOrgao, pc_indOrgao_mcuOrgaoSubordinador
-																		from pc_indicadores_porOrgao
-																		where pc_indOrgao_ano = #ano# and pc_indOrgao_mes = #mes#) as pc_indicadores_porOrgao on pc_indOrgao_mcuOrgao = pc_indMeta_mcuOrgao 	
-															WHERE pc_indOrgao_mcuOrgaoSubordinador = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
+															WHERE pc_indMeta_mcuOrgao = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
 																AND pc_indMeta_numIndicador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 																AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 																AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
-
-														) as metaPRCI
+																AND pc_indMeta_paraOrgaoSubordinador = 1
 													</cfquery>
 													
 													<!--- Adiciona cada linha à tabela --->
@@ -521,14 +827,7 @@
 												</cfloop>
 											</cfoutput>
 										</tbody>
-										<tfoot >
-											<tr>
-												<th colspan="7" style="font-weight: normal; font-size: smaller;">
-												    <li>PRCI % = média dos resultados dos órgãos subordinados e do próprio órgão subordinador (caso tenha sido responsável por alguma orientação).</li> 
-													<li>Meta % = média das metas dos órgãos subordinados e do próprio órgão subordinador (caso tenha sido responsável por alguma orientação).</li>
-												</th>
-											</tr>
-										</tfoot>
+										
 									</cfoutput>
 								</table>
 							</div>
@@ -652,22 +951,13 @@
 											<cfoutput>
 												<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
 													<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#">
-														SELECT  AVG(meta) AS pc_indMeta_meta from (
-															SELECT DISTINCT pc_indMeta_ano
-																			,pc_indMeta_mes
-																			,pc_indOrgao_mcuOrgaoSubordinador
-																			,pc_indMeta_mcuOrgao
-																			,pc_indicadores_meta.pc_indMeta_meta as meta 
-															FROM pc_indicadores_meta
-															INNER JOIN (select  DISTINCT pc_indOrgao_mcuOrgao, pc_indOrgao_mcuOrgaoSubordinador
-																		from pc_indicadores_porOrgao
-																		where pc_indOrgao_ano = #ano# and pc_indOrgao_mes = #mes#) as pc_indicadores_porOrgao on pc_indOrgao_mcuOrgao = pc_indMeta_mcuOrgao 	
-															WHERE pc_indOrgao_mcuOrgaoSubordinador = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
-																AND pc_indMeta_numIndicador = <cfqueryparam value="2" cfsqltype="cf_sql_integer">
-																AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-																AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
-
-														) as metaSLNC
+														SELECT  pc_indMeta_meta 
+														FROM pc_indicadores_meta
+														WHERE pc_indMeta_mcuOrgao = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
+															AND pc_indMeta_numIndicador = <cfqueryparam value="2" cfsqltype="cf_sql_integer">
+															AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+															AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+															AND pc_indMeta_paraOrgaoSubordinador = 1
 													</cfquery>
 
 													<!--- Adiciona cada linha à tabela --->
@@ -693,14 +983,7 @@
 												</cfloop>
 											</cfoutput>
 										</tbody>
-										<tfoot >
-											<tr>
-												<th colspan="7" style="font-weight: normal; font-size: smaller;">
-													<li>SLNC % = média dos resultados dos órgãos subordinados e do próprio órgão subordinador (caso tenha sido responsável por alguma orientação).</li>
-													<li>Meta % = média das metas dos órgãos subordinados e do próprio órgão subordinador (caso tenha sido responsável por alguma orientação).</li>
-												</th>
-											</tr>
-										</tfoot>
+										
 									</cfoutput>
 								</table>
 							</div>
@@ -741,7 +1024,7 @@
 						['5', '10', '25', '50', 'Todos']
 					],
 					dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>><'row'<'col-sm-2 text-left'l>>" ,
-					order: [[2, 'desc']],//classificar pela coluna SLNC em ordem decrescente
+					order: [[1, 'desc']],//classificar pela coluna SLNC em ordem decrescente
 					//dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-12 text-left'i>>" ,
 					buttons: [
 						{
@@ -824,7 +1107,7 @@
 												<th>PRCI %</th>
 												<th>SLNC %</th>
 												<th class="bg-gradient-warning" style="border-left:1px solid ##000;border-right:1px solid ##000;border-top:1px solid ##000;text-align: center;">
-													DGCI <br>
+													DGCI %<br>
 													<span style="font-size: 9px">(PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span>
 												</th>
 												<th >Meta %</th>
@@ -838,43 +1121,24 @@
 											<cfoutput>
 												<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
 													<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#">
-														SELECT  ROUND(AVG(meta),1) AS pc_indMeta_meta from (
-															SELECT DISTINCT pc_indMeta_ano
-																			,pc_indMeta_mes
-																			,pc_indOrgao_mcuOrgaoSubordinador
-																			,pc_indMeta_mcuOrgao
-																			,pc_indicadores_meta.pc_indMeta_meta as meta 
+														SELECT pc_indMeta_meta 
 															FROM pc_indicadores_meta
-															INNER JOIN (select  DISTINCT pc_indOrgao_mcuOrgao, pc_indOrgao_mcuOrgaoSubordinador
-																		from pc_indicadores_porOrgao
-																		where pc_indOrgao_ano = #ano# and pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">) 
-																		as pc_indicadores_porOrgao on pc_indOrgao_mcuOrgao = pc_indMeta_mcuOrgao 	
-															WHERE pc_indOrgao_mcuOrgaoSubordinador = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
+															WHERE pc_indMeta_mcuOrgao = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
 																AND pc_indMeta_numIndicador = <cfqueryparam value="1" cfsqltype="cf_sql_integer">
 																AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 																AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+																AND pc_indMeta_paraOrgaoSubordinador = 1
 
-														) as metaPRCI
 													</cfquery>
 
 													<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#">
-														SELECT  ROUND(AVG(meta),1) AS pc_indMeta_meta from (
-															SELECT DISTINCT pc_indMeta_ano
-																			,pc_indMeta_mes
-																			,pc_indOrgao_mcuOrgaoSubordinador
-																			,pc_indMeta_mcuOrgao
-																			,pc_indicadores_meta.pc_indMeta_meta as meta 
+														SELECT pc_indMeta_meta 
 															FROM pc_indicadores_meta
-															INNER JOIN (select  DISTINCT pc_indOrgao_mcuOrgao, pc_indOrgao_mcuOrgaoSubordinador
-																		from pc_indicadores_porOrgao
-																		where pc_indOrgao_ano = #ano# and pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">) 
-																		as pc_indicadores_porOrgao on pc_indOrgao_mcuOrgao = pc_indMeta_mcuOrgao 	
-															WHERE pc_indOrgao_mcuOrgaoSubordinador = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
+															WHERE pc_indMeta_mcuOrgao = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
 																AND pc_indMeta_numIndicador = <cfqueryparam value="2" cfsqltype="cf_sql_integer">
 																AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 																AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
-
-														) as metaSLNC
+																AND pc_indMeta_paraOrgaoSubordinador = 1
 													</cfquery>
 
 													<!--- Adiciona cada linha à tabela --->
@@ -946,12 +1210,12 @@
 										<tfoot >
 											<tr>
 												<th colspan="9" style="font-weight: normal; font-size: smaller;">
-													<li>PRCI % = média dos resultados dos órgãos subordinados e do próprio órgão subordinador (caso tenha sido responsável por alguma orientação);</li>
-													<li>SLNC % = média dos resultados dos órgãos subordinados e do próprio órgão subordinador (caso tenha sido responsável por alguma orientação).</li>
-													<li>META % = média das metas dos órgãos subordinados e do próprio órgão subordinador (caso tenha sido responsável por alguma orientação) = (média meta PRCI * peso PRCI) + (média meta SLNC * peso SLNC)</li>
+												    <li>DGCI % = (PRCI x peso PRCI) + (SLNC x peso SLNC) -> Não existindo dados para o SLNC, a formula será DGCI % = PRCI x peso PRCI. Não existindo dados para o PRCI, a formula será DGCI % = SLNC x peso SLNC; </li>
+													<li>META % = (meta PRCI x peso PRCI) + (meta SLNC x peso SLNC) -> Meta fixa, independente da existência de dados de algum indicador da cesta.</li>
 												</th>
 											</tr>
 										</tfoot>
+										
 									</cfoutput>
 								</table>
 							</div>
@@ -992,7 +1256,7 @@
 						['5', '10', '25', '50', 'Todos']
 					],
 					dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>><'row'<'col-sm-2 text-left'l>>" ,
-					order: [[2, 'desc']],//classificar pela coluna DGCI em ordem decrescente
+					order: [[3, 'desc']],//classificar pela coluna DGCI em ordem decrescente
 					//dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-12 text-left'i>>" ,
 					buttons: [
 						{
@@ -1076,7 +1340,7 @@
 												<th>PRCI %</th>
 												<th>SLNC %</th>
 												<th class="bg-gradient-warning" style="border-left:1px solid ##000;border-right:1px solid ##000;border-top:1px solid ##000;text-align: center;">
-													DGCI <br>
+													DGCI %<br>
 													<span style="font-size: 9px">(PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span>
 												</th>
 												<th >Meta %</th>
@@ -1097,6 +1361,7 @@
 																AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 																AND pc_indMeta_numIndicador = 1
 																AND pc_indMeta_mcuOrgao = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
+																AND pc_indMeta_paraOrgaoSubordinador = 0
 													</cfquery>	
 
 												
@@ -1107,6 +1372,7 @@
 																AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
 																AND pc_indMeta_numIndicador = 2
 																AND pc_indMeta_mcuOrgao = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
+																AND pc_indMeta_paraOrgaoSubordinador = 0
 													</cfquery>
 
 													<!--- Adiciona cada linha à tabela --->
@@ -1188,12 +1454,13 @@
 											</cfoutput>
 										</tbody>
 										<tfoot >
-										<tr>
-											<th colspan="8" style="font-weight: normal; font-size: smaller;">
-												<li>META % = (meta PRCI x peso PRCI) + (meta SLNC x peso SLNC)</li>
-											</th>
-										</tr>
-									</tfoot>
+											<tr>
+												<th colspan="10" style="font-weight: normal; font-size: smaller;">
+												    <li>DGCI % = (PRCI x peso PRCI) + (SLNC x peso SLNC) -> Não existindo dados para o SLNC, a formula será DGCI % = PRCI x peso PRCI. Não existindo dados para o PRCI, a formula será DGCI % = SLNC x peso SLNC; </li>
+													<li>META % = (meta PRCI x peso PRCI) + (meta SLNC x peso SLNC) -> Meta fixa, independente da existência de dados de algum indicador da cesta.</li>
+												</th>
+											</tr>
+										</tfoot>
 										
 									</cfoutput>
 								</table>
@@ -1234,7 +1501,7 @@
 					['5', '10', '25', '50', 'Todos']
 				],
 				dom: "<'row'<'col-sm-2'B><'col-sm-5 text-left' p><'col-sm-5 text-left'i>><'row'<'col-sm-2 text-left'l>>" ,
-				order: [[2, 'desc']],//classificar pela coluna DGCI em ordem decrescente
+				order: [[4, 'desc']],//classificar pela coluna DGCI em ordem decrescente
 				//dom:   "<'row'<'col-sm-2'B><'col-sm-4'p><'col-sm-12 text-left'i>>" ,
 				buttons: [
 					{
@@ -1300,6 +1567,7 @@
 			INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
 			INNER JOIN pc_orgaos as pc_orgaosSubordinador on pc_orgaosSubordinador.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgaoSubordinador
 			WHERE pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+				and pc_indOrgao_numIndicador = <cfqueryparam value="3" cfsqltype="cf_sql_integer">
 		</cfquery>
 
 		<cfquery name="resultadoECTmes" dbtype="query"  >
@@ -1392,11 +1660,8 @@
 												<tr style="font-size:12px;text-align: center;">
 													<td>#monthAsString(pc_indOrgao_mes)#</td>
 													
-													<td>
-														<cfoutput>
-															<strong>#IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(ROUND(media_resultadoMes*10)/10,0.0),',','.'), "")#</strong>
-														</cfoutput>
-													</td>
+													<td><strong>#Replace(NumberFormat(ROUND(media_resultadoMes*10)/10,0.0),',','.')#</strong></td>
+										
 													<cfset metaDGCI = mediaMetaDGCImes.mediaDGCI>
 									
 													<td>#NumberFormat(ROUND(metaDGCI*10)/10,0.0)#</td>
@@ -1412,20 +1677,19 @@
 													</cfif>
 
 													
-													<cfoutput>
-														<cfif metaDGCI neq 0>
-															<cfset percentual = (#IIF(pc_indOrgao_numIndicador EQ 3, Replace(NumberFormat(media_resultadoMes,0.0),',','.'), 0)#/#NumberFormat(metaDGCI, '0.0')#)*100 >
-																
-														<cfelse>
-															<cfset percentual = 0>
-														</cfif>
+												
+													<cfif metaDGCI neq 0>
+														<cfset percentual = ((ROUND(media_resultadoMes*10)/10)/(ROUND(metaDGCI*10)/10))*100 >
+													<cfelse>
+														<cfset percentual = 0>
+													</cfif>
 														
-													</cfoutput>
+												
 													
 													<cfif percentual neq 0>
 														<td >#NumberFormat(ROUND(percentual*10)/10,0.0)#</td>
 													<cfelse>
-														<td><span class="statusOrientacoes" style="background:##fff;color:gray;">SEM META</span></td>	
+														<td>SEM META</td>	
 													</cfif>
 
 													

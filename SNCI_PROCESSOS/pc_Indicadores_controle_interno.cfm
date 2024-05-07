@@ -37,14 +37,13 @@
 				border: 2px solid #f2f4f7 !important;
 				border-radius: 10px!important;
 				margin-right: 5px!important;
+				font-size: 0.8rem!important;
 			}
 			.nav-pills-abasIndicadoresMensal .nav-link-abasIndicadoresMensal.active, .nav-pills-abasIndicadoresMensal .show > .nav-link-abasIndicadoresMensal {
 				color: #fff!important;
 				background-color: #2581c8!important;
 				border-color: #2581c8!important;
 			}
-
-			
 
 			.nav-link-abasIndicadoresMensal:hover {
 				border-color: #fbc32f7d!important;
@@ -84,13 +83,13 @@
 			<div class="container-fluid" >
 
 				<div style="display: flex;align-items: center;">
-					<span style="color:#0083ca;font-size:20px;margin-right:10px">Ano:</span>
+					<span style="color:#0083ca;font-size:1rem;margin-right:10px">Ano:</span>
 					<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
 				<div style="display: flex;align-items: center;">
-                    <span style="color:#0083ca;font-size:20px;margin-right:10px">Mês:</span>
-                    <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
+                    <span style="color:#0083ca;font-size:1rem;margin-right:10px">Mês:</span>
+                    <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons" ></div><br><br>
 				</div>
 
 				<div id="divMesAnoCI"></div>
@@ -98,9 +97,9 @@
 				<div id="divTabsIndicadores" style="display:none">
 					<div class="card-header p-0 pt-1" >
 						
-						<ul class="nav nav-pills nav-pills-abasIndicadoresMensal" id="custom-tabs-one-tabAcomp" role="tablist" style="font-size:14px;">
+						<ul class="nav nav-pills nav-pills-abasIndicadoresMensal" id="custom-tabs-one-tabAcomp" role="tablist" >
 
-							<li class="nav-item" style="text-align: center;f">
+							<li class="nav-item" style="text-align: center;">
 								<a  class="nav-link  active btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-DGCI_ECT-tab"   data-toggle="pill" href="#custom-tabs-one-DGCI_ECT" role="tab" aria-controls="custom-tabs-one-DGCI_ECT" aria-selected="true"><i class="fa fa-chart-line"></i> DGCI<br>RESULTADO ECT</a>
 							</li>
 
@@ -120,11 +119,19 @@
 							</li>
 
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-PRCI-tab"   data-toggle="pill" href="#custom-tabs-one-PRCI" role="tab" aria-controls="custom-tabs-one-PRCI" aria-selected="true"><i class="fa fa-database"></i> PRCI<br>Detalhes</a>
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-PRCI-tab"   data-toggle="pill" href="#custom-tabs-one-PRCI" role="tab" aria-controls="custom-tabs-one-PRCI" aria-selected="true"><i class="fa fa-database"></i> PRCI<br>Detalhes (Mês)</a>
 							</li>
 							
 							<li class="nav-item" style="text-align: center;">
-								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-SLNC-tab"   data-toggle="pill" href="#custom-tabs-one-SLNC" role="tab" aria-controls="custom-tabs-one-SLNC" aria-selected="true"><i class="fa fa-database"></i> SLNC<br>Detalhes</a>
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-SLNC-tab"   data-toggle="pill" href="#custom-tabs-one-SLNC" role="tab" aria-controls="custom-tabs-one-SLNC" aria-selected="true"><i class="fa fa-database"></i> SLNC<br>Detalhes (Mês)</a>
+							</li>
+
+							<li class="nav-item" style="text-align: center;">
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-PRCIacumulado-tab"   data-toggle="pill" href="#custom-tabs-one-PRCIacumulado" role="tab" aria-controls="custom-tabs-one-PRCIacumulado" aria-selected="true"><i class="fa fa-database"></i> PRCI<br>Detalhes (Acumulado)</a>
+							</li>
+
+							<li class="nav-item" style="text-align: center;">
+								<a  class="nav-link btn   nav-link-abasIndicadoresMensal " id="custom-tabs-one-SLNCacumulado-tab"   data-toggle="pill" href="#custom-tabs-one-SLNCacumulado" role="tab" aria-controls="custom-tabs-one-SLNCacumulado" aria-selected="true"><i class="fa fa-database"></i> SLNC<br>Detalhes (Acumulado)</a>
 							</li>
 							
 						</ul>
@@ -162,14 +169,20 @@
 							</div>
 
 							<div disable class="tab-pane fade" id="custom-tabs-one-PRCI"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCI-tab" >	
-								<div><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do PRCI:</h5></div>									
 								<div id="divIndicadorDetalhesPRCI" ></div>
 							</div>
 							
-							<div disable class="tab-pane fade " id="custom-tabs-one-SLNC"  role="tabpanel" aria-labelledby="custom-tabs-one-SLNC-tab" >		
-								<div><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC:</h5></div>						
+							<div disable class="tab-pane fade " id="custom-tabs-one-SLNC"  role="tabpanel" aria-labelledby="custom-tabs-one-SLNC-tab" >							
 								<div id="divIndicadorDetalhesSLNC" ></div>
-							</div>			
+							</div>	
+
+							<div disable class="tab-pane fade " id="custom-tabs-one-PRCIacumulado"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIacumulado-tab" >							
+								<div id="divIndicadorDetalhesPRCIacumulado" ></div>
+							</div>	
+
+							<div disable class="tab-pane fade " id="custom-tabs-one-SLNCacumulado"  role="tabpanel" aria-labelledby="custom-tabs-one-SLNCacumulado-tab" >							
+								<div id="divIndicadorDetalhesSLNCacumulado" ></div>
+							</div>		
 							
 						</div>
 					</div>
@@ -236,7 +249,7 @@
 				const checkedClass = Number(ano) === currentYear ? " active" : "";
 				const label = `${ano}`;
 				const input = `<input type="radio" name="ano" value="${ano}" id="option_a${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
-				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="efeito-grow btn bg-yellow${checkedClass}">${input}${label}</label><br>`;
+				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:2px;font-size:0.8rem" class="efeito-grow btn bg-yellow${checkedClass}">${input}${label}</label><br>`;
 				return radioButton;
 			});
 
@@ -253,7 +266,7 @@
 					const checkedClass = "";
 					const label = `${mes}`;
 					const input = `<input type="radio" name="mes" value="${i + 1}" id="option_b${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
-					const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:1px" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
+					const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:1px;font-size:0.8rem" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
 					return radioButton;
 				});
 
@@ -290,6 +303,8 @@
 			$('#divIndicadorSLNCporOrgaoSubordinador').html('');
 			$('#divIndicadorDetalhesPRCI').html('');
 			$('#divIndicadorDetalhesSLNC').html('');
+			$('#divIndicadorDetalhesPRCIacumulado').html('');
+			$('#divIndicadorDetalhesSLNCacumulado').html('');
 
 
 			// Obtém o ano selecionado		
@@ -424,6 +439,30 @@
 					type: "post",
 					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
 					data:{
+						method:"tabPRCIdetalhe_mensalAcumulado_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDetalhesPRCIacumulado').html(result);//INSERE OS INDICADORES NA DIV
+						
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
+					data:{
 						method:"tabSLNCdetalhe_mensal_CI",
 						ano:selectedYear,
 						mes:selectedMonth
@@ -431,6 +470,30 @@
 					async: false,
 					success: function(result) {	
 						$('#divIndicadorDetalhesSLNC').html(result);//INSERE OS INDICADORES NA DIV
+						
+					},
+					error: function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')//MOSTRA O MODAL DE ERRO
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')//INSERE O TITULO DO MODAL
+						$('#modal-danger').find('.modal-body').text(thrownError)//INSERE O CORPO DO MODAL	
+							
+					}
+				})
+
+				$.ajax({//AJAX PARA CONSULTAR OS INDICADORES
+					type: "post",
+					url: "cfc/pc_cfcIndicadores_controleInterno.cfc",
+					data:{
+						method:"tabSLNCdetalhe_mensalAcumulado_CI",
+						ano:selectedYear,
+						mes:selectedMonth
+					},
+					async: false,
+					success: function(result) {	
+						$('#divIndicadorDetalhesSLNCacumulado').html(result);//INSERE OS INDICADORES NA DIV
 						
 					},
 					error: function(xhr, ajaxOptions, thrownError) {
@@ -513,6 +576,10 @@
 							
 					}
 				})
+				
+
+				
+
                  //retirar o display none de divTabsIndicadores
 			   	$('#divTabsIndicadores').css('display', 'block');	
 			}, 1000);

@@ -680,11 +680,11 @@
 
 			<!-- cfquery que retorna pc_indOrgao_resultadoAcumulado do mês anterior da tabela pc_indicadores_porOrgaos -->
 			<cfquery name="resultadoIndicadorAcumuladoMesAnterior" datasource="#application.dsn_processos#" timeout="120"  >
-				SELECT TOP 1 pc_indOrgao_resultadoAcumulado
+				SELECT SUM(pc_indOrgao_resultadoMes) AS somaResultadosAnteriores
 				FROM pc_indicadores_porOrgao
 				WHERE 	pc_indOrgao_ano = <cfqueryparam value="#resultadoIndicadoresPorOrgao.ano#" cfsqltype="cf_sql_integer">
-						AND pc_indOrgao_mes < <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
-						AND NOT pc_indOrgao_resultadoAcumulado IS NULL
+						AND pc_indOrgao_mes < = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+						AND NOT pc_indOrgao_resultadoMes IS NULL
 						AND pc_indOrgao_numIndicador = <cfqueryparam value="#resultadoIndicadoresPorOrgao.numIndicador#" cfsqltype="cf_sql_integer">
 						AND pc_indOrgao_mcuOrgao = <cfqueryparam value="#resultadoIndicadoresPorOrgao.mcuOrgao#" cfsqltype="cf_sql_varchar">
 						and pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="#resultadoIndicadoresPorOrgao.paraOrgaoSubordinador#" cfsqltype="cf_sql_bit">
@@ -701,10 +701,10 @@
 			</cfquery>
 
 
-			<cfif resultadoIndicadorAcumuladoMesAnterior.recordCount eq 0>
+			<cfif resultadoIndicadorAcumuladoMesAnterior.recordCount eq 0 OR resultadoIndicadorAcumuladoMesAnterior.somaResultadosAnteriores eq ''>
 				<cfset resultadoIndicadorAcumulado = resultadoIndicadoresPorOrgao.resultadoIndicador>
 			<cfelse>
-				<cfset resultadoIndicadorAcumulado = (resultadoIndicadorAcumuladoMesAnterior.pc_indOrgao_resultadoAcumulado + resultadoIndicadoresPorOrgao.resultadoIndicador)/(rsContarMeses.quantMeses+1)>
+				<cfset resultadoIndicadorAcumulado = (resultadoIndicadorAcumuladoMesAnterior.somaResultadosAnteriores + resultadoIndicadoresPorOrgao.resultadoIndicador)/(rsContarMeses.quantMeses+1)>
 			</cfif>
 			
 			<cfquery name="insereDadosIndicadoresporOrgao" datasource="#application.dsn_processos#" timeout="120"  >
@@ -843,11 +843,6 @@
 				AND pc_indDados_numIndicador = 2
 			GROUP BY pc_indDados_dataRef, pc_indDados_mcuOrgaoSubordinador
 		</cfquery>
-
-
-
-
-
 
 					
 		<!-- consulta união dos resultados  -->
