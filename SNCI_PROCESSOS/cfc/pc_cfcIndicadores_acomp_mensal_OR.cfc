@@ -1261,7 +1261,11 @@
 
 			
 			
-
+			<cfset resultadoPRCI =''>
+			<cfset resultadoPRCIformatado =''>
+			<cfset resultadoSLNC =''>
+			<cfset resultadoSLNCformatado =''>
+			
 			<cfif resultDGCIdados.PRCI neq ''>
 				<cfset resultadoPRCI = NumberFormat(ROUND(resultDGCIdados.PRCI*10)/10,0.0)>
 				<cfset resultadoPRCIformatado = Replace(NumberFormat(resultadoPRCI,0.0), ".", ",")>
