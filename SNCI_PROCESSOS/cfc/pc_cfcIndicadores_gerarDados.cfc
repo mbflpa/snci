@@ -952,10 +952,11 @@
 
 			<!-- cfquery que retorna pc_indOrgao_resultadoAcumulado do mês anterior da tabela pc_indicadores_porOrgaos -->
 			<cfquery name="resultadoIndicadorAcumuladoMesAnterior" datasource="#application.dsn_processos#" timeout="120"  >
-				SELECT TOP 1 pc_indOrgao_resultadoAcumulado
+				SELECT SUM(pc_indOrgao_resultadoMes) AS somaResultadosAnteriores
 				FROM pc_indicadores_porOrgao
 				WHERE 	pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
-						AND pc_indOrgao_mes < <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+						AND pc_indOrgao_mes < =<cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
+						AND NOT pc_indOrgao_resultadoMes IS NULL
 						AND pc_indOrgao_numIndicador = 3
 						AND pc_indOrgao_mcuOrgao = <cfqueryparam value="#orgaos.mcuOrgao#" cfsqltype="cf_sql_varchar">
 						AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="#orgaos.pc_indOrgao_paraOrgaoSubordinador#" cfsqltype="cf_sql_bit">
@@ -972,10 +973,10 @@
 			</cfquery>
 
 
-			<cfif resultadoIndicadorAcumuladoMesAnterior.recordCount eq 0>
-				<cfset resultadoIndicadorAcumulado = resultadoDGCI>
+			<cfif resultadoIndicadorAcumuladoMesAnterior.recordCount eq 0 OR resultadoIndicadorAcumuladoMesAnterior.somaResultadosAnteriores eq ''>
+				<cfset resultadoIndicadorAcumulado = ROUND(resultadoDGCI*10)/10>
 			<cfelse>
-				<cfset resultadoIndicadorAcumulado = (resultadoIndicadorAcumuladoMesAnterior.pc_indOrgao_resultadoAcumulado + resultadoDGCI)/(rsContarMeses.quantMeses+1)>
+				<cfset resultadoIndicadorAcumulado = (resultadoIndicadorAcumuladoMesAnterior.somaResultadosAnteriores + ROUND(resultadoDGCI*10)/10)/(rsContarMeses.quantMeses+1)>
 			</cfif>
 			
 			<cfquery name="insereDadosIndicadoresporOrgao" datasource="#application.dsn_processos#" timeout="120"  >
@@ -986,13 +987,14 @@
 					,<cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
 					,<cfqueryparam value="3" cfsqltype="cf_sql_integer">
 					,<cfqueryparam value="#orgaos.mcuOrgao#" cfsqltype="cf_sql_varchar">
+					
 					<cfif resultadoDGCI neq ''>
-						,<cfqueryparam value="#resultadoDGCI#" cfsqltype="cf_sql_float">
+						,<cfqueryparam value="#ROUND(resultadoDGCI*10)/10#" cfsqltype="cf_sql_float">
 					<cfelse>
 						,NULL
 					</cfif>
 
-					,<cfqueryparam value="#resultadoIndicadorAcumulado#" cfsqltype="cf_sql_float">
+					,<cfqueryparam value="#ROUND(resultadoIndicadorAcumulado*10)/10#" cfsqltype="cf_sql_float">
 					,<cfqueryparam value="#orgaos.pc_indOrgao_paraOrgaoSubordinador#" cfsqltype="cf_sql_bit">
 					,<cfqueryparam value="#orgaos.pc_indOrgao_mcuOrgaoSubordinador#" cfsqltype="cf_sql_varchar">
 				)
