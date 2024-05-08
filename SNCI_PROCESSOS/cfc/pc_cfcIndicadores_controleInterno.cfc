@@ -1210,7 +1210,7 @@
 										<tfoot >
 											<tr>
 												<th colspan="9" style="font-weight: normal; font-size: smaller;">
-												    <li>DGCI % = (PRCI x peso PRCI) + (SLNC x peso SLNC) -> Não existindo dados para o SLNC, a formula será DGCI % = PRCI x peso PRCI. Não existindo dados para o PRCI, a formula será DGCI % = SLNC x peso SLNC; </li>
+												    <li>DGCI % = (PRCI x peso PRCI) + (SLNC x peso SLNC) -> Não existindo dados para o SLNC, a fórmula será DGCI % = PRCI x peso PRCI. Não existindo dados para o PRCI, a fórmula será DGCI % = SLNC x peso SLNC; </li>
 													<li>META % = (meta PRCI x peso PRCI) + (meta SLNC x peso SLNC) -> Meta fixa, independente da existência de dados de algum indicador da cesta.</li>
 												</th>
 											</tr>

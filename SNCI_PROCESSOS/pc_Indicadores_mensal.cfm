@@ -38,6 +38,7 @@
 				border: 2px solid #f2f4f7 !important;
 				border-radius: 10px!important;
 				margin-right: 5px!important;
+				font-size: 0.8rem!important;
 			}
 			.nav-pills-abasIndicadoresMensal .nav-link-abasIndicadoresMensal.active, .nav-pills-abasIndicadoresMensal .show > .nav-link-abasIndicadoresMensal {
 				color: #fff!important;
@@ -110,24 +111,25 @@
 						<div class="card-header p-0 pt-1" >
 							<ul class="nav nav-pills nav-pills-abasIndicadoresMensal" id="myTabs" role="tablist" style="font-size:14px;">
 								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link active  btn   nav-link-abasIndicadoresMensal " id="tabCardDGCIacompMensal" data-toggle="tab" href="#divCardDGCIacompMensalContent" role="tab" aria-controls="divCardDGCIacompMensalContent" aria-selected="true" ><i class="fa fa-chart-line"></i> Resultado DGCI</a>
+									<a class="nav-link active  btn   nav-link-abasIndicadoresMensal " id="tabCardDGCIacompMensal" data-toggle="tab" href="#divCardDGCIacompMensalContent" role="tab" aria-controls="divCardDGCIacompMensalContent" aria-selected="true" ><i class="fa fa-chart-line"></i> DGCI<br>Resultado </a>
 								</li>
 								<cfif orgaoAvaliado eq 1>
 									<li class="nav-item " style="text-align: center;">
-										<a class="nav-link btn  nav-link-abasIndicadoresMensal " id="tabTabResumoDGCIorgaos" data-toggle="tab" href="#divTabResumoDGCIorgaosContent" role="tab" aria-controls="divTabResumoDGCIorgaosContent" aria-selected="false"><i class="fa fa-chart-line"></i> DGCI <cfif orgaoAvaliado eq 1>(órgãos)</cfif></a>
+										<a class="nav-link btn  nav-link-abasIndicadoresMensal " id="tabTabResumoDGCIorgaos" data-toggle="tab" href="#divTabResumoDGCIorgaosContent" role="tab" aria-controls="divTabResumoDGCIorgaosContent" aria-selected="false"><i class="fa fa-chart-line"></i> DGCI<br>órgãos subordinados</a>
+									</li>
+								
+									<li class="nav-item " style="text-align: center;">
+										<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoPRCIorgaos" data-toggle="tab" href="#divTabResumoPRCIorgaosContent" role="tab" aria-controls="divTabResumoPRCIorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> PRCI<br>órgãos subordinados</a>
+									</li>
+									<li class="nav-item " style="text-align: center;">
+										<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoSLNCorgaos" data-toggle="tab" href="#divTabResumoSLNCorgaosContent" role="tab" aria-controls="divTabResumoSLNCorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> SLNC<br>órgãos subordinados</a>
 									</li>
 								</cfif>
 								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoPRCIorgaos" data-toggle="tab" href="#divTabResumoPRCIorgaosContent" role="tab" aria-controls="divTabResumoPRCIorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> PRCI <cfif orgaoAvaliado eq 1>(órgãos)</cfif></a>
+									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabIndicadorPRCI" data-toggle="tab" href="#divIndicadorPRCIContent" role="tab" aria-controls="divIndicadorPRCIContent" aria-selected="false"><i class="fa fa-database"></i> PRCI<br>detalhes</a>
 								</li>
 								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabTabResumoSLNCorgaos" data-toggle="tab" href="#divTabResumoSLNCorgaosContent" role="tab" aria-controls="divTabResumoSLNCorgaosContent" aria-selected="false"><i class="fa fa-shopping-basket"></i> SLNC <cfif orgaoAvaliado eq 1>(órgãos)</cfif></a>
-								</li>
-								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabIndicadorPRCI" data-toggle="tab" href="#divIndicadorPRCIContent" role="tab" aria-controls="divIndicadorPRCIContent" aria-selected="false"><i class="fa fa-database"></i> Dados PRCI</a>
-								</li>
-								<li class="nav-item " style="text-align: center;">
-									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabIndicadorSLNC" data-toggle="tab" href="#divIndicadorSLNCContent" role="tab" aria-controls="divIndicadorSLNCContent" aria-selected="false"><i class="fa fa-database"></i> Dados SLNC</a>
+									<a class="nav-link btn   nav-link-abasIndicadoresMensal" id="tabIndicadorSLNC" data-toggle="tab" href="#divIndicadorSLNCContent" role="tab" aria-controls="divIndicadorSLNCContent" aria-selected="false"><i class="fa fa-database"></i> SLNC<br>detalhes</a>
 								</li>
 							</ul>
 						
@@ -155,15 +157,17 @@
 										<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
 										<div id="divTabDGCI"></div>
 									</div>
+								
+									<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
+										<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
+										<div id="divTabPRCI"></div>
+									</div>
+
+									<div class="tab-pane fade" id="divTabResumoSLNCorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoSLNCorgaos" >
+										<h5 style="color:#0083ca;">SLNC por órgão responsável:</h5>
+										<div id="divTabSLNC"></div>
+									</div>
 								</cfif>
-								<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
-									<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
-									<div id="divTabPRCI"></div>
-								</div>
-								<div class="tab-pane fade" id="divTabResumoSLNCorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoSLNCorgaos" >
-									<h5 style="color:#0083ca;">SLNC por órgão responsável:</h5>
-									<div id="divTabSLNC"></div>
-								</div>
 								<div class="tab-pane fade" id="divIndicadorPRCIContent" role="tabpanel" aria-labelledby="tabIndicadorPRCI" >
 								
 									<div id="divDetalhePRCI"></div>
@@ -230,7 +234,7 @@
 				const checkedClass = Number(ano) === currentYear ? " active" : "";
 				const label = `${ano}`;
 				const input = `<input type="radio" name="ano" value="${ano}" id="option_a${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
-				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="efeito-grow btn bg-yellow${checkedClass}">${input}${label}</label><br>`;
+				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:2px;font-size:0.8rem" class="efeito-grow btn bg-yellow${checkedClass}">${input}${label}</label><br>`;
 				return radioButton;
 			});
 
@@ -247,7 +251,7 @@
 					const checkedClass = "";
 					const label = `${mes}`;
 					const input = `<input type="radio" name="mes" value="${i + 1}" id="option_b${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
-					const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:1px" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
+					const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:1px;font-size:0.8rem" class="efeito-grow btn bg-blue${checkedClass}">${input}${label}</label><br>`;
 					return radioButton;
 				});
 

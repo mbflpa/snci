@@ -1961,7 +1961,11 @@
 		<cfset metaDGCIorgao = 0>
 		<cfset metaDGCIorgaoFormatado = 0>
 		<cfset DGCIresultadoMetaFormatado = 0>
-		
+		<cfset totalTGI =0>
+		<cfset totalTIDP = 0>
+		<cfset totalQTSL = 0>
+		<cfset totalQTNC = 0>
+
 
 
 		<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
@@ -2023,10 +2027,18 @@
 			FROM resultPRCIdadosParaDGCI
 		</cfquery>
 
-		
-		<cfset totalTIDP = rstotalPRCIcardDiario.totalDPorgao>
-		<cfset totalTGI = rstotalPRCIcardDiario.totalDPorgao + rstotalPRCIcardDiario.totalFPorgao>
-		<cfset totalPRCI = (totalTIDP/totalTGI)*100>
+		<cfif rstotalPRCIcardDiario.totalDPorgao neq ''>
+			<cfset totalTIDP = rstotalPRCIcardDiario.totalDPorgao>
+		</cfif>
+
+	    <cfif rstotalPRCIcardDiario.totalFPorgao neq ''>
+			<cfset totalTGI = totalTIDP + rstotalPRCIcardDiario.totalFPorgao>
+		<cfelse>
+			<cfset totalTGI = totalTIDP>
+		</cfif>
+		<cfif totalTGI neq 0>
+			<cfset totalPRCI = (totalTIDP/totalTGI)*100>
+		</cfif>	
 	
 		<cfset totalPRCI = Round(totalPRCI*10)/10>
 		<cfset totalPRCIformatado = Replace(NumberFormat(totalPRCI,0.0), ".", ",")>
@@ -2037,9 +2049,19 @@
 					FROM resultSLNCdadosParaDGCI
 		</cfquery>
 
-		<cfset totalQTSL = rstotalSLNCcardDiario.totalSolucionadoOrgao>
-		<cfset totalQTNC = rstotalSLNCcardDiario.totalSolucionadoOrgao + rstotalSLNCcardDiario.totalTratamentoOrgao>
-		<cfset totalSLNC = (totalQTSL/totalQTNC)*100>
+		<cfif rstotalSLNCcardDiario.totalSolucionadoOrgao neq ''>
+			<cfset totalQTSL = rstotalSLNCcardDiario.totalSolucionadoOrgao>
+		</cfif>
+		<cfif rstotalSLNCcardDiario.totalTratamentoOrgao neq ''>
+			<cfset totalQTNC =  totalQTSL + rstotalSLNCcardDiario.totalTratamentoOrgao>
+		<cfelse>
+			<cfset totalQTNC = totalQTSL>
+		</cfif>
+
+		<cfif totalQTNC neq 0>
+			<cfset totalSLNC = (totalQTSL/totalQTNC)*100>
+		</cfif>
+
 		<cfset totalSLNC = Round(totalSLNC*10)/10>
 					
 		<cfset totalSLNCformatado = Replace(NumberFormat(totalSLNC,0.0), ".", ",")>
