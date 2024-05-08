@@ -1322,9 +1322,9 @@
 			<cfif resultadoPRCIformatado neq '' and resultadoSLNCformatado neq ''>
 				<cfset infoRodapeResultado = '<span style="font-size:14px">DGCI = #resultadoDGCIformatado#% -> (PRCI  x peso PRCI) + (SLNC x peso SLNC) = (#resultadoPRCIformatado# x #pesoPRCIformatado#) + (#resultadoSLNCformatado# x #pesoSLNCformatado#)</span><br>'>
 			<cfelseif resultadoPRCIformatado neq '' and resultadoSLNCformatado eq ''>
-				<cfset infoRodapeResultado = '<span style="font-size:14px">DGCI = #resultadoDGCIformatado#% -> (PRCI  x peso PRCI) = (#resultadoPRCIformatado# x #pesoPRCIformatado#)</span><br>'>
+				<cfset infoRodapeResultado = '<span style="font-size:14px">DGCI = #resultadoDGCIformatado#% = PRCI</span><br>'>
 			<cfelseif resultadoPRCIformatado eq '' and resultadoSLNCformatado neq ''>
-				<cfset infoRodapeResultado = '<span style="font-size:14px">DGCI = #resultadoDGCIformatado#% -> (SLNC x peso SLNC) = (#resultadoSLNCformatado# x #pesoSLNCformatado#)</span><br>'>
+				<cfset infoRodapeResultado = '<span style="font-size:14px">DGCI = #resultadoDGCIformatado#% = SLNC</span><br>'>
 			<cfelse>
 				<cfset infoRodapeResultado = '<span style="font-size:14px">DGCI = Sem dados para PRCI e SLNC</span><br>'>
 			</cfif>
@@ -1333,9 +1333,9 @@
 			<cfif metaPRCIorgaoFormatado neq 0 and metaSLNCorgaoFormatado neq 0>
 					<cfset infoRodapeMeta = '<span style="font-size:14px">Meta = #metaDGCIformatado#% -> (Meta PRCI x peso PRCI) + (Meta SLNC x peso SLNC)= (#metaPRCIorgaoFormatado# x #pesoPRCIformatado#) + (#metaSLNCorgaoFormatado# x #pesoSLNCformatado#)</span><br>'>
 			<cfelseif metaPRCIorgaoFormatado neq 0 and metaSLNCorgaoFormatado eq 0>
-				<cfset infoRodapeMeta = '<span style="font-size:14px">Meta = #metaDGCIformatado#% -> (Meta PRCI x peso PRCI)</span><br>'>
+				<cfset infoRodapeMeta = '<span style="font-size:14px">Meta = #metaDGCIformatado#% = Meta PRCI</span><br>'>
 			<cfelseif metaPRCIorgaoFormatado eq 0 and metaSLNCorgaoFormatado neq 0>
-				<cfset infoRodapeMeta = '<span style="font-size:14px">Meta = #metaDGCIformatado#% -> (Meta SLNC x peso SLNC)</span><br>'>
+				<cfset infoRodapeMeta = '<span style="font-size:14px">Meta = #metaDGCIformatado#% = Meta SLNC</span><br>'>
 			<cfelse>
 				<cfset infoRodapeMeta = '<span style="font-size:14px">Meta = sem meta </span><br>'>
 			</cfif>
