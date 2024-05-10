@@ -4798,8 +4798,12 @@
 						</div>			
 					</div>
 				</div>
+	<cfset myimage = getThumbnail(pc_anexo_caminho,10)> 
+	  <a href="pc_Anexos.cfm?arquivo=<cfoutput>#caminho#</cfoutput>" target="_blank">
+		<cfimage action="writeToBrowser" source="#myimage#">
+	</a>
 	
-
+	
 		</cfloop>
 
 		<script language="JavaScript">
@@ -5136,6 +5140,43 @@
 	</cffunction>
 
 
+<cffunction name="getThumbnail" returnType="any" output="false" hint="Get a thumbnail of the first page of a PDF file. - Não utilizando no SNCI">
+    <cfargument name="url" type="string" required="true">
+    <cfargument name="scale" type="numeric" required="false" default="25">
+    
+    <cfset var pdfdata = "">
+    <cfset var prefix = replace(createUUID(),"-","_","all")>
+    <cfset var myimage = "">
+    
+    <!--- Verificar se o arquivo PDF existe --->
+    <cfif NOT FileExists(arguments.url)>
+        <cfthrow message="O arquivo PDF especificado não existe." detail="URL: #arguments.url#">
+    </cfif>
+    
+    <!--- Depurar o URL --->
+    <cfoutput>URL do PDF: #arguments.url#</cfoutput>
+    
+    <!--- make the pdf --->
+    <cfdocument src="#arguments.url#" name="pdfdata" format="pdf" />
+    
+    <!--- write out the image --->
+    <cfpdf source="pdfdata" pages="1" action="thumbnail" destination="." format="jpg" overwrite="true" resolution="high" scale="#arguments.scale#" imagePrefix="#prefix#">
+    
+    <!--- read it in --->
+    <cfset myimage = imageNew(expandPath('./#prefix#_page_1.jpg'))>
+    
+    <!--- clean it up --->
+    <cffile action="delete" file="#expandPath('./#prefix#_page_1.jpg')#">
+
+	<!--- IMPLEMENTAR DA SEGUINT FORMA
+	<cfset myimage = getThumbnail(pc_anexo_caminho,10)> 
+	  <a href="pc_Anexos.cfm?arquivo=<cfoutput>#caminho#</cfoutput>" target="_blank">
+		<cfimage action="writeToBrowser" source="#myimage#">
+	</a>
+	 --->
+    
+    <cfreturn myimage> 
+</cffunction>
 
 
 
