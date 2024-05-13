@@ -268,9 +268,9 @@
 	    $.widget.bridge('uibutton', $.ui.button)
 		</script>
 
-    <!-- jspdf -->
+    <!-- jspdf 
 		<script  src="../SNCI_PROCESSOS/plugins/jspdf/jspdf.min.js"></script>
-
+-->
    <!-- html2pdf-->
     <script  src="../SNCI_PROCESSOS/plugins/html2pdf/html2pdf.bundle.min.js"></script>
 

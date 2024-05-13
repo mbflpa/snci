@@ -3286,7 +3286,7 @@
 					<div  id ="cardAvaliacaoPDF" class="card card-primary card-tabs collapsed-card" style="transition: all 0.15s ease 0s; height: inherit; width: inherit;">
 						<div class="card-header" style="background-color:#00416b;">
 						
-							<h3 class="card-title" style="font-size:16px;position:relative;top:3px"><i class="fas fa-file-pdf" style="margin-right:10px;"></i><cfoutput> #pc_anexo_nome#</cfoutput></h3>
+							<h3 class="card-title" style="font-size:16px;position:relative;top:3px;cursor:pointer" data-card-widget="collapse"><i class="fas fa-file-pdf" style="margin-right:10px;"></i><cfoutput> #pc_anexo_nome#</cfoutput></h3>
 						    <div  class="card-tools">
 								
 								<button type="button"  id="btExcluir" class="btn btn-tool  " style="font-size:16px" onclick="javascript:excluirAnexoAvaliacao(<cfoutput>#pc_anexo_id#</cfoutput>);"  ><i class="fas fa-trash-alt"></i></button>
