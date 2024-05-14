@@ -28,6 +28,7 @@
                             <ul>
                                 <li>Criadas as Consultas dos Indicadores (Acompanhamento e Mensal), para os Órgãos Avaliados;</li>
                                 <li>Criada a Consulta Indicador Mensal para o Controle Interno;</li>
+                                <li>Perfis CI - REGIONAL (Gestor Nível 1) - Execução e  CI - REGIONAL - SCIA - Acompanhamento, agora terão acesso aos processos com origem na GCIA e GACE, além da GCOP.</li>
                             </ul>
 
                             <h5>Melhorias:</h5>
