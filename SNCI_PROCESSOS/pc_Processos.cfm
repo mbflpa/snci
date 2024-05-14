@@ -8,10 +8,10 @@
 	WHERE pc_org_Status = 'O' 
 	ORDER BY pc_org_sigla
 </cfquery>
-<cfquery name="rsOrigemGCOP" datasource="#application.dsn_processos#">
+<cfquery name="rsOrigemGCOP_GCIA_GACE" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
 	FROM pc_orgaos
-	WHERE pc_org_Status = 'O' and pc_org_mcu = '00436698'
+	WHERE pc_org_Status = 'O' and pc_org_mcu IN('00436698','00436697','00438080')
 	ORDER BY pc_org_sigla
 </cfquery>
 
@@ -148,7 +148,7 @@
 														<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 8>
 															<cfoutput><option selected value="#application.rsUsuarioParametros.pc_org_mcu#"> #application.rsUsuarioParametros.pc_org_sigla#</option></cfoutput>
 														<cfelseif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
-														    <cfoutput><option selected value="#rsOrigemGCOP.pc_org_mcu#">#rsOrigemGCOP.pc_org_sigla#</option></cfoutput>
+														    <cfoutput><option selected value="#rsOrigemGCOP_GCIA_GACE.pc_org_mcu#">#rsOrigemGCOP_GCIA_GACE.pc_org_sigla#</option></cfoutput>
 														<cfelse>
 															<cfoutput query="rsOrigem" >
 																<option value="#rsOrigem.pc_org_mcu#">#rsOrigem.pc_org_sigla#</option>
