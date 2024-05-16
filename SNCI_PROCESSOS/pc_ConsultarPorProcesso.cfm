@@ -148,7 +148,7 @@
 
 						
 						<!--acordion-->
-						<div id="accordionCadItemPainel" >
+						<div id="accordionCadItemPainel" style="margin-bottom:80px">
 							<div class="card card-success" >
 								<div class="card-header" style="background-color: #ffD400;">
 									<h4 class="card-title ">
