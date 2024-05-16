@@ -417,7 +417,7 @@
 			}
 		});
 
-		
+		$(".content-wrapper").css("height", "auto");
 
 
 

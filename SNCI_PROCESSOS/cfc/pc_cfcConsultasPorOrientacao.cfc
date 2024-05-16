@@ -143,7 +143,7 @@
 			<div id="filtroSpan" style="display: none;text-align:right;font-size:18px;position:absolute;top:123px;right:24px;"><span class="statusOrientacoes" style="background:#2581c8;color:#fff;">Atenção! Um filtro foi aplicado.</span><br><i class="fa fa-2x fa-hand-point-down" style="color:#2581c8;position:relative;top:8px;right:117px"></i></div>
 						
 			<div class="col-12">
-				<div class="card" >
+				<div class="card"  style="margin-bottom:80px">
 					
 					<!-- card-body -->
 					<div class="card-body" >

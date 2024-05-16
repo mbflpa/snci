@@ -86,7 +86,7 @@
 		<div class="row">
 			
 			<div class="col-12">
-				<div class="card"  >
+				<div class="card"  style="padding-bottom:80px">
 				    
 					<!-- /.card-header -->
 					<div class="card-body" >
