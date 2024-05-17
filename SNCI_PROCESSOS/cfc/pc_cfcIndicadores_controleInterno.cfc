@@ -48,27 +48,16 @@
 
 
 		<cfquery name="consulta_PRCI_TIDP_TGI_mensal" datasource="#application.dsn_processos#" timeout="120">
-			SELECT 
-				pc_indOrgao_mcuOrgao as mcuOrgao,
-				pc_orgaos.pc_org_sigla as siglaOrgao,
-				MAX(IIF(pc_indOrgao_numIndicador = 4, pc_indOrgao_resultadoMes, 0)) as TIDP,
-				MAX(IIF(pc_indOrgao_numIndicador = 5, pc_indOrgao_resultadoMes, 0)) as TGI,
-				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, NULL)) as PRCI,
-				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoAcumulado, NULL)) as PRCIacumulado
-			FROM 
-				pc_indicadores_porOrgao
-			INNER JOIN 
-				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
+			SELECT * FROM pc_view_resultadoIndicadores
+			
 			WHERE 
 				pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 				AND pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_numIndicador IN(1,4,5)
 				AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="#arguments.paraOrgaoSubordinador#" cfsqltype="cf_sql_integer">
 				<cfif arguments.paraOrgaoSubordinador eq 0>
-					AND pc_indOrgao_mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					AND mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 				</cfif>
-			GROUP BY 
-				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
+			
 		</cfquery>
 
 		<cfreturn #consulta_PRCI_TIDP_TGI_mensal#>
@@ -84,27 +73,16 @@
 
 
 		<cfquery name="consulta_SLNC_QTSL_QTNC_mensal" datasource="#application.dsn_processos#" timeout="120">		
-			SELECT 
-				 pc_indOrgao_mcuOrgao as mcuOrgao
-				,pc_orgaos.pc_org_sigla as siglaOrgao
-				,MAX(IIF(pc_indOrgao_numIndicador = 6, pc_indOrgao_resultadoMes, 0)) as QTSL
-				,MAX(IIF(pc_indOrgao_numIndicador = 7, pc_indOrgao_resultadoMes, 0)) as QTNC
-				,MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, NULL)) as SLNC
-				,MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoAcumulado, NULL)) as SLNCacumulado
-			FROM 
-				pc_indicadores_porOrgao
-			INNER JOIN 
-				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
+			SELECT * FROM pc_view_resultadoIndicadores
+			
 			WHERE 
 				pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
 				AND pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_numIndicador IN(2,6,7)
 				AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="#arguments.paraOrgaoSubordinador#" cfsqltype="cf_sql_integer">
 				<cfif arguments.paraOrgaoSubordinador eq 0>
-					AND pc_indOrgao_mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					AND mcuOrgaoSubordinador = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 				</cfif>
-			GROUP BY 
-				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
+			
 		</cfquery>
 
 		<cfreturn #consulta_SLNC_QTSL_QTNC_mensal#>	
@@ -950,35 +928,48 @@
 										<tbody>
 											<cfoutput>
 												<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
-													<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#">
-														SELECT  pc_indMeta_meta 
-														FROM pc_indicadores_meta
-														WHERE pc_indMeta_mcuOrgao = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
-															AND pc_indMeta_numIndicador = <cfqueryparam value="2" cfsqltype="cf_sql_integer">
-															AND pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-															AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
-															AND pc_indMeta_paraOrgaoSubordinador = 1
-													</cfquery>
+													
 
 													<!--- Adiciona cada linha à tabela --->
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 														<td style="text-align: left;"  >#siglaOrgao# (#mcuOrgao#)</td>
-														<td><strong>#NumberFormat(ROUND(SLNC*10)/10,0.0)#</strong></td>
-														
-														<cfif rsMetaSLNC.pc_indMeta_meta eq ''>
+														<cfif resultado.SLNC eq ''>
+															<td>sem dados</td>
+														<cfelse>
+															<td><strong>#NumberFormat(ROUND(resultado.SLNC*10)/10,0.0)#</strong></td>
+														</cfif>
+														<cfif metaSLNC eq ''>
 															<td>sem meta</td>
 															<cfset resultMesEmRelacaoMeta = "sem meta">
 															<cfset resultAcumuladoEmRelacaoMeta = "sem meta">
 														<cfelse>
-														    <cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>
-															<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((SLNC/metaSLNCorgao)*100*10)/10,0.0)>
-															<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((SLNCacumulado/metaSLNCorgao)*100*10)/10,0.0)>	
+														    <cfset metaSLNCorgao = NumberFormat(ROUND(metaSLNC*10)/10,0.0)>
+															<cfif resultado.SLNC neq ''>
+																<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((resultado.SLNC/metaSLNCorgao)*100*10)/10,0.0)>
+																<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((SLNCacumulado/metaSLNCorgao)*100*10)/10,0.0)>	
+															
+															</cfif>
 															<td>#metaSLNCorgao#</td>
 														</cfif>
-														<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
-														<td><strong>#NumberFormat(ROUND(SLNCacumulado*10)/10,0.0)#</strong></td>
-														<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
-														<td>#resultMesEmRelacaoMeta#</td>
+														<cfif resultado.SLNC eq ''>
+															<td>sem dados</td>
+														<cfelse>
+															<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+														</cfif>
+
+														<cfif resultado.SLNC eq ''>
+															<td>sem dados</td>
+															<td>sem dados</td>
+															<td>sem dados</td>
+														<cfelse>
+															<td><strong>#NumberFormat(ROUND(SLNCacumulado*10)/10,0.0)#</strong></td>
+															<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
+															<td>#resultMesEmRelacaoMeta#</td>
+														</cfif>
+
+														
+
+														
 													</tr>
 												</cfloop>
 											</cfoutput>

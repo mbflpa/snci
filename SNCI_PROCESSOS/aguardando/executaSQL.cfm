@@ -1,65 +1,45 @@
 <cfprocessingdirective pageencoding = "utf-8">	
 <cfquery name="rs_ultima_posic_resp" datasource="#application.dsn_processos#" timeout="120">
-    SELECT
-        pc_aval_posic_num_orientacao as orientacao
+  SELECT  DISTINCT pc_indOrgao_mcuOrgao
+       ,pc_orgaos.pc_org_sigla
+       ,pc_indOrgao_ano
+       ,pc_indOrgao_mes
+       ,pc_indOrgao_paraOrgaoSubordinador
+       ,pc_indOrgao_mcuOrgaoSubordinador
+       ,MAX(IIF(pc_indOrgao_numIndicador = 4,pc_indOrgao_resultadoMes,0))                                                       AS TIDP
+       ,MAX(IIF(pc_indOrgao_numIndicador = 5,pc_indOrgao_resultadoMes,0))                                                       AS TGI
+       ,MAX(IIF(pc_indOrgao_numIndicador = 1,pc_indOrgao_resultadoMes,NULL))                                                    AS PRCI
+       ,MAX(IIF(pc_indMeta_numIndicador = 1,pc_indMeta_meta,NULL))                                                              AS metaPRCI
+       ,MAX(IIF(pc_indOrgao_numIndicador = 1,pc_indOrgao_resultadoAcumulado,NULL))                                              AS PRCIacumulado
+       ,MAX(IIF(pc_indOrgao_numIndicador = 6,pc_indOrgao_resultadoMes,0))                                                       AS QTSL
+       ,MAX(IIF(pc_indOrgao_numIndicador = 7,pc_indOrgao_resultadoMes,0))                                                       AS QTNC
+       ,MAX(IIF(pc_indOrgao_numIndicador = 2,pc_indOrgao_resultadoMes,NULL))                                                    AS SLNC
+       ,MAX(IIF(pc_indMeta_numIndicador = 2,pc_indMeta_meta,NULL))                                                              AS metaSLNC
+       ,MAX(IIF(pc_indOrgao_numIndicador = 2,pc_indOrgao_resultadoAcumulado,NULL))                                              AS SLNCacumulado
+       ,MAX(IIF(pc_indPeso_numIndicador = 1,pc_indPeso_peso,NULL))                                                              AS pesoPRCI
+       ,MAX(IIF(pc_indPeso_numIndicador = 2,pc_indPeso_peso,NULL))                                                              AS pesoSLNC
+       ,MAX(IIF(pc_indOrgao_numIndicador = 3,pc_indOrgao_resultadoMes,NULL))                                                    AS DGCI
+       ,MAX(IIF(pc_indOrgao_numIndicador = 3,pc_indOrgao_resultadoAcumulado,NULL))                                              AS DGCIacumulado
+       ,MAX(IIF(pc_indMeta_numIndicador = 1,pc_indMeta_meta,NULL)) * MAX(IIF(pc_indPeso_numIndicador = 1,pc_indPeso_peso,NULL)) AS metaPonderadaPRCI
+       ,MAX(IIF(pc_indMeta_numIndicador = 2,pc_indMeta_meta,NULL)) * MAX(IIF(pc_indPeso_numIndicador = 2,pc_indPeso_peso,NULL)) AS metaPonderadaSLNC
+       ,Round((MAX(IIF(pc_indMeta_numIndicador = 1,pc_indMeta_meta,NULL)) * MAX(IIF(pc_indPeso_numIndicador = 1,pc_indPeso_peso,NULL))) + (MAX(IIF(pc_indMeta_numIndicador = 2,pc_indMeta_meta,NULL)) * MAX(IIF(pc_indPeso_numIndicador = 2,pc_indPeso_peso,NULL))),1) AS metaDGCI
+FROM pc_indicadores_porOrgao
+INNER JOIN pc_orgaos
+ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
+INNER JOIN pc_orgaos as orgaoSubordinadores
+ON orgaoSubordinadores.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgaoSubordinador
+LEFT JOIN pc_indicadores_meta
+ON pc_indMeta_mes = pc_indOrgao_mes AND pc_indMeta_ano = pc_indOrgao_ano AND pc_indOrgao_mcuOrgao = pc_indMeta_mcuOrgao AND pc_indMeta_paraOrgaoSubordinador = pc_indOrgao_paraOrgaoSubordinador
+LEFT JOIN pc_indicadores_peso
+ON pc_indicadores_peso.pc_indPeso_ano = pc_indOrgao_ano
+GROUP BY  pc_indOrgao_mcuOrgao
+         ,pc_orgaos.pc_org_sigla
+         ,pc_indOrgao_ano
+         ,pc_indOrgao_mes
+         ,pc_indOrgao_paraOrgaoSubordinador
+         ,pc_indOrgao_mcuOrgaoSubordinador
         
-    FROM (
-        SELECT
-            pc_aval_posic_id,
-            pc_aval_posic_num_orientacao,
-            pc_aval_posic_status,
-            pc_aval_posic_num_orgaoResp,
-            pc_aval_posic_dataPrevistaResp,
-            ROW_NUMBER() OVER (PARTITION BY pc_aval_posic_num_orientacao ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc) as row_num
-        FROM
-            pc_avaliacao_posicionamentos
-      
-             
-    ) AS ranked_posicionamentos
-    INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
-    INNER JOIN pc_avaliacao_orientacoes ON ranked_posicionamentos.pc_aval_posic_num_orientacao = pc_avaliacao_orientacoes.pc_aval_orientacao_id
-    INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
-    INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
-    INNER JOIN pc_orgaos as orgaoAvaliado ON pc_processos.pc_num_orgao_avaliado = orgaoAvaliado.pc_org_mcu
-    INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
-    INNER JOIN pc_orientacao_status ON ranked_posicionamentos.pc_aval_posic_status = pc_orientacao_status.pc_orientacao_status_id
-    WHERE
-        ranked_posicionamentos.row_num = 1
-        AND pc_aval_posic_status IN (3)
-        
+
 </cfquery>
- <table border="1">
- <tr>
-    <th>Orientação ID</th>
-    <th>Origem</th>
-    <th>Orgão Resp</th>
-  </tr>
-<cfloop query="rs_ultima_posic_resp">
-
-      <cfquery name="rs_ultima_posic_resp" datasource="#application.dsn_processos#" timeout="120">
-            SELECT  pc_aval_orientacao_id as orientacaoID, orgaoOrigem.pc_org_sigla as origem, orgaoResp.pc_org_sigla as orgaoResp
-            from pc_avaliacao_orientacoes
-            INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
-            INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
-            INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
-            INNER JOIN pc_orientacao_status ON pc_avaliacao_orientacoes.pc_aval_orientacao_status = pc_orientacao_status.pc_orientacao_status_id
-            INNER JOIN pc_orgaos as orgaoResp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = orgaoResp.pc_org_mcu
-            WHERE pc_aval_orientacao_id= #orientacao# and pc_aval_orientacao_status <> 3 and pc_num_status =4 and pc_orientacao_status_finalizador='N'
-      </cfquery>
-
-     
  
-
-  <cfloop query="rs_ultima_posic_resp">
-      <cfoutput>
-            <tr>
-                  <td>#rs_ultima_posic_resp.orientacaoID#</td>
-                  <td>#rs_ultima_posic_resp.origem#</td>
-                  <td>#rs_ultima_posic_resp.orgaoResp#</td>
-            </tr>
-     </cfoutput>
-  </cfloop>
-
-</cfloop>
-
-</table>
+ <cfdump var="#rs_ultima_posic_resp#">
