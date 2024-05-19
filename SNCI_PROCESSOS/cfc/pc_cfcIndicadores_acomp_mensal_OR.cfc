@@ -56,7 +56,7 @@
     	
 		<cfset dataFinal = createODBCDate(dateAdd('s', -1, dateAdd('m', 1, createDateTime(arguments.ano, arguments.mes, 1, 0, 0, 0))))>
 		
-		<cfset resultadoPRCI = consultaPRCIdetalhe_mensal(ano=arguments.ano, mes=arguments.mes)>	
+		<cfset resultado = consultaPRCIdetalhe_mensal(ano=arguments.ano, mes=arguments.mes)>	
 
 		
 
@@ -67,7 +67,7 @@
 			}
 		</style>
 	
-		<cfif #resultadoPRCI.recordcount# neq 0 >	
+		<cfif #resultado.recordcount# neq 0 >	
 			<div class="row" style="width: 100%;">
 							
 				<div class="col-12">
@@ -99,7 +99,7 @@
 										</thead>
 										
 										<tbody>
-											<cfloop query="resultadoPRCI" >
+											<cfloop query="resultado" >
 											    <cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
 													SELECT pc_indMeta_meta FROM pc_indicadores_meta 
 													WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
@@ -110,27 +110,27 @@
 											
 												<cfoutput>					
 													<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
-														<td>#resultadoPRCI.pc_indDados_numPosic#</td>
-														<td>#resultadoPRCI.siglaOrgaoAvaliado#</td>
-														<td>#resultadoPRCI.siglaOrgaoResp#</td>
-														<td>#resultadoPRCI.numProcessoSNCI#</td>
-														<td >#resultadoPRCI.item#</td>
-														<td>#resultadoPRCI.orientacao#</td>
-														<cfif resultadoPRCI.dataPrevista eq '1900-01-01' or resultadoPRCI.dataPrevista eq ''>
+														<td>#resultado.pc_indDados_numPosic#</td>
+														<td>#resultado.siglaOrgaoAvaliado#</td>
+														<td>#resultado.siglaOrgaoResp#</td>
+														<td>#resultado.numProcessoSNCI#</td>
+														<td >#resultado.item#</td>
+														<td>#resultado.orientacao#</td>
+														<cfif resultado.dataPrevista eq '1900-01-01' or resultado.dataPrevista eq ''>
 															<td>NÃO INF.</td>
 														<cfelse>
-															<td>#dateFormat(resultadoPRCI.dataPrevista, 'dd/mm/yyyy')#</td>
+															<td>#dateFormat(resultado.dataPrevista, 'dd/mm/yyyy')#</td>
 														</cfif>
 														<td>
-															<cfif resultadoPRCI.pc_indDados_mcuOrgaoPosicEcontInterno eq 0 AND (resultadoPRCI.numStatus eq 4 OR resultadoPRCI.numStatus eq 5)>
-																#dateFormat(resultadoPRCI.dataPosicao, 'dd/mm/yyyy')#<br><span style="color:red">(dt. distrib.)</span>
+															<cfif resultado.pc_indDados_mcuOrgaoPosicEcontInterno eq 0 AND (resultado.numStatus eq 4 OR resultado.numStatus eq 5)>
+																#dateFormat(resultado.dataPosicao, 'dd/mm/yyyy')#<br><span style="color:red">(dt. distrib.)</span>
 															<cfelse>
-																#dateFormat(resultadoPRCI.dataPosicao, 'dd/mm/yyyy')#
+																#dateFormat(resultado.dataPosicao, 'dd/mm/yyyy')#
 															</cfif>
 														</td>
-														<td>#resultadoPRCI.descricaoOrientacaoStatus#</td>
+														<td>#resultado.descricaoOrientacaoStatus#</td>
 														<td>#dateFormat(dataFinal, 'dd/mm/yyyy')#</td>
-														<td>#resultadoPRCI.Prazo#</td>
+														<td>#resultado.Prazo#</td>
 															
 													</tr>
 												</cfoutput>
@@ -398,43 +398,39 @@
 
 
 
-	<cffunction name="consultaIndicadorPRCI_TIDP_TGI_mensal" access="remote" hint="gera a consulta para ser utilizadas nas cffunctions do PRCI">
+
+	<cffunction name="consultaIndicadores" access="remote" hint="gera a consulta para ser utilizadas nas cffunctions do PRCI">
    		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
+		<cfargument name="mes_a_mes" type="numeric" required="false" default="0" />
 
-		<cfquery name="consulta_PRCI_TIDP_TGI_mensal" datasource="#application.dsn_processos#" timeout="120">
-			SELECT 
-				pc_indOrgao_mcuOrgao as mcuOrgao,
-				pc_orgaos.pc_org_sigla as siglaOrgao,
-				MAX(IIF(pc_indOrgao_numIndicador = 4, pc_indOrgao_resultadoMes, 0)) as TIDP,
-				MAX(IIF(pc_indOrgao_numIndicador = 5, pc_indOrgao_resultadoMes, 0)) as TGI,
-				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, NULL)) as PRCI,
-				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoAcumulado, NULL)) as PRCIacumulado
-			FROM 
-				pc_indicadores_porOrgao
-			INNER JOIN 
-				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
-			WHERE 
-				pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_numIndicador IN(1,4,5)
-				AND pc_indOrgao_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+		<cfquery name="consulta_todos" datasource="#application.dsn_processos#" timeout="120">
+			SELECT * FROM pc_view_resultadoIndicadores
 			
-			GROUP BY 
-				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
+			WHERE 
+				ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                <cfif arguments.mes_a_mes eq 1>
+					AND mes <= <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+				<cfelse>
+					AND mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
+				</cfif>
+
+				AND mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 		</cfquery>
 
-		<cfreturn #consulta_PRCI_TIDP_TGI_mensal#>
+		<cfreturn #consulta_todos#>
       
 		
 
 	</cffunction>
 	
+
+
 	<cffunction name="tabResumoPRCIorgaosResp_mensal" access="remote" returntype="string" hint="cria tabela resumo com as informações dos resultados do PRCI dos órgãos responsáveis">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
-    	<cfset var resultado = consultaIndicadorPRCI_TIDP_TGI_mensal(ano=arguments.ano, mes=arguments.mes)>
+    	<cfset var resultado = consultaIndicadores(ano=arguments.ano, mes=arguments.mes)>
        
 	  	
 		
@@ -463,13 +459,7 @@
 							<cfoutput>
 								<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
 
-									<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
-										SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-										WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-												AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-												AND pc_indMeta_numIndicador = 1
-												AND pc_indMeta_mcuOrgao = '#mcuOrgao#'
-									</cfquery>
+								
 									
 									<!--- Adiciona cada linha à tabela --->
 									<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
@@ -478,13 +468,13 @@
 										<td>#NumberFormat(TGI,0)#</td>
 										<td><strong>#NumberFormat(ROUND(PRCI*10)/10,0.0)#</strong></td>
 									
-										<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
+										<cfif metaPRCI eq ''>
 											<td>sem meta</td>
 										<cfelse>	
-											<cfset metaPRCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
+											<cfset metaPRCIorgao = NumberFormat(ROUND(metaPRCI*10)/10,0.0)>
 											<td><strong>#metaPRCIorgao#</strong></td>
 										</cfif>
-										<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
+										<cfif metaPRCI eq ''>
 											<td>sem meta</td>
 										<cfelse>
 											<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((PRCI/metaPRCIorgao)*100*10)/10,0.0)>
@@ -493,7 +483,7 @@
 
 										<td>#NumberFormat(ROUND(PRCIacumulado*10)/10,0.0)#</td>
 										
-										<cfif rsMetaPRCI.pc_indMeta_meta eq ''>
+										<cfif metaPRCI eq ''>
 											<td>sem meta</td>
 										<cfelse>
 											<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((PRCIacumulado/metaPRCIorgao)*100*10)/10,0.0)>
@@ -559,46 +549,17 @@
 		<cfargument name="mes" type="string" required="true" />
 		
 
-		<cfquery name="resultPRCIdados" datasource="#application.dsn_processos#" timeout="120">
-			SELECT 
-				pc_indOrgao_mcuOrgao as mcuOrgaoResp,
-				pc_orgaos.pc_org_sigla as siglaOrgaoResp,
-				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, NULL)) as PRCI,
-				MAX(IIF(pc_indOrgao_numIndicador = 4, pc_indOrgao_resultadoMes, 0)) as TIDP,
-				MAX(IIF(pc_indOrgao_numIndicador = 5, pc_indOrgao_resultadoMes, 0)) as TGI
-			FROM 
-				pc_indicadores_porOrgao
-			INNER JOIN 
-				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
-			WHERE 
-				pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-				AND pc_indOrgao_numIndicador in (1,4,5)
-	            AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="#application.rsUsuarioParametros.pc_org_orgaoAvaliado#" cfsqltype="cf_sql_integer">
-			GROUP BY 
-				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
-		</cfquery>
+		<cfset var resultPRCIdados = consultaIndicadores(ano=arguments.ano, mes=arguments.mes)>
 
 		<cfif resultPRCIdados.recordcount neq 0>
-			<cfset var resultado = consultaIndicadorPRCI_TIDP_TGI_mensal(ano=arguments.ano, mes=arguments.mes)>
-
-			<cfquery name="rsMetaPRCIcardMensal" datasource="#application.dsn_processos#" >
-				SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-						AND pc_indMeta_numIndicador = 1
-						AND pc_indMeta_mcuOrgao= '#application.rsUsuarioParametros.pc_usu_lotacao#'
-						AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="#application.rsUsuarioParametros.pc_org_orgaoAvaliado#" cfsqltype="cf_sql_integer">
-			</cfquery>
-
+			
 			<cfset totalPRCI = NumberFormat(ROUND(resultPRCIdados.PRCI*10)/10,0.0)>
 			<cfset totalPRCIformatado = Replace(NumberFormat(totalPRCI,0.0), ".", ",")>
 
 			<cfset totalTIDP = ROUND(resultPRCIdados.TIDP)>
 			<cfset totalTGI = ROUND(resultPRCIdados.TGI)>
 			
-			<cfset metaPRCIorgao = rsMetaPRCIcardMensal.pc_indMeta_meta>
+			<cfset metaPRCIorgao = resultPRCIdados.metaPRCI>
 			<cfif metaPRCIorgao neq ''>
 				<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0), ".", ",")>
 				<cfset PRCIresultadoMeta = ROUND((totalPRCI / metaPRCIorgao)*100*10)/10>
@@ -651,42 +612,11 @@
 	</cffunction>
 
 
-
-    <cffunction name="consultaIndicadorSLNC_QTSL_QTNC" access="remote" hint="gera a consulta para ser utilizadas nas cffunctions do SLNC">
-		<cfargument name="ano" type="string" required="true" />
-		<cfargument name="mes" type="string" required="true" />
-
-		<cfquery name="consulta_SLNC_QTSL_QTNC_mensal" datasource="#application.dsn_processos#" timeout="120">		
-			SELECT 
-				 pc_indOrgao_mcuOrgao as mcuOrgao
-				,pc_orgaos.pc_org_sigla as siglaOrgao
-				,MAX(IIF(pc_indOrgao_numIndicador = 6, pc_indOrgao_resultadoMes, 0)) as QTSL
-				,MAX(IIF(pc_indOrgao_numIndicador = 7, pc_indOrgao_resultadoMes, 0)) as QTNC
-				,MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, NULL)) as SLNC
-				,MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoAcumulado, NULL)) as SLNCacumulado
-			FROM 
-				pc_indicadores_porOrgao
-			INNER JOIN 
-				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
-			WHERE 
-				pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_numIndicador IN(2,6,7)
-				AND pc_indOrgao_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-				
-			GROUP BY 
-				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
-		</cfquery>
-
-		<cfreturn #consulta_SLNC_QTSL_QTNC_mensal#>	
-
-	</cffunction>
-
 	<cffunction name="tabResumoSLNCorgaosResp_mensal" access="remote" returntype="string" hint="cria tabela resumo com as informações dos resultados do SLNC dos órgãos subordinadores">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
-    	<cfset var resultado = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
+    	<cfset var resultado = consultaIndicadores(ano=arguments.ano, mes=arguments.mes)>
        
 	  	
 		
@@ -715,13 +645,6 @@
 							<cfoutput>
 								<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
 
-									<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
-										SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-										WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-												AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-												AND pc_indMeta_numIndicador = 2
-												AND pc_indMeta_mcuOrgao = '#mcuOrgao#'
-									</cfquery>
 									
 									<!--- Adiciona cada linha à tabela --->
 									<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
@@ -732,12 +655,12 @@
 										<cfset metaSLNCorgao = 0>
 										<cfset resultMesEmRelacaoMeta =0>
 										<cfset resultAcumuladoEmRelacaoMeta =0>
-										<cfif rsMetaSLNC.pc_indMeta_meta neq ''>
-											<cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>
+										<cfif metaSLNC neq ''>
+											<cfset metaSLNCorgao = NumberFormat(ROUND(metaSLNC*10)/10,0.0)>
 											<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((SLNC/metaSLNCorgao)*100*10)/10,0.0)>
 											<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((SLNCacumulado/metaSLNCorgao)*100*10)/10,0.0)>
 										</cfif>
-										<cfif rsMetaSLNC.pc_indMeta_meta eq ''>
+										<cfif metaSLNC eq ''>
 											<td>sem meta</td>
 										<cfelse>	
 											<td><strong>#metaSLNCorgao#</strong></td>
@@ -805,63 +728,17 @@
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
-
-		<cfquery name="resultSLNCdados" datasource="#application.dsn_processos#" timeout="120">
-			SELECT 
-				pc_indOrgao_mcuOrgao as mcuOrgaoResp,
-				pc_orgaos.pc_org_sigla as siglaOrgaoResp,
-				MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, NULL)) as SLNC,
-				MAX(IIF(pc_indOrgao_numIndicador = 6, pc_indOrgao_resultadoMes, 0)) as QTSL,
-				MAX(IIF(pc_indOrgao_numIndicador = 7, pc_indOrgao_resultadoMes, 0)) as QTNC
-			FROM 
-				pc_indicadores_porOrgao
-			INNER JOIN 
-				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
-			WHERE 
-				pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_numIndicador in (2,6,7)
-				AND pc_indOrgao_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-				AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="#application.rsUsuarioParametros.pc_org_orgaoAvaliado#" cfsqltype="cf_sql_integer">
-			GROUP BY 
-				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
-		</cfquery>
+		<cfset var resultSLNCdados = consultaIndicadores(ano=arguments.ano, mes=arguments.mes)>
 
 		<cfif resultSLNCdados.recordcount neq 0>
-			<cfset var resultado = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
-
-
-			<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
-				<cfset orgaosMCUList = ValueList(resultado.mcuOrgao)>
-			<cfelse>
-				<cfset orgaosMCUList = application.rsUsuarioParametros.pc_usu_lotacao>
-			</cfif>
 			
-			
-			
-			<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
-				<cfset orgaosMCUList = ValueList(resultado.mcuOrgao)>
-			<cfelse>
-				<cfset orgaosMCUList = application.rsUsuarioParametros.pc_usu_lotacao>
-			</cfif>
-			
-			
-			<cfquery name="rsMetaSLNCcardMensal" datasource="#application.dsn_processos#" >
-				SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-						AND pc_indMeta_numIndicador = 2
-						AND pc_indMeta_mcuOrgao= '#application.rsUsuarioParametros.pc_usu_lotacao#'
-						AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="#application.rsUsuarioParametros.pc_org_orgaoAvaliado#" cfsqltype="cf_sql_integer">
-			</cfquery>
-
             <cfset totalSLNC = NumberFormat(ROUND(resultSLNCdados.SLNC*10)/10,0.0)>
 			<cfset totalSLNCformatado = Replace(NumberFormat(totalSLNC,0.0), ".", ",")>
 
 			<cfset totalQTSL = ROUND(resultSLNCdados.QTSL)>
 			<cfset totalQTNC = ROUND(resultSLNCdados.QTNC)>
 
-			<cfset metaSLNCorgao = rsMetaSLNCcardMensal.pc_indMeta_meta>
+			<cfset metaSLNCorgao = resultSLNCdados.metaSLNC>
 			<cfif metaSLNCorgao neq ''>
 				<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0), ".", ",")>
 				<cfset SLNCresultadoMeta = ROUND((totalSLNC / metaSLNCorgao)*100*10)/10>
@@ -914,59 +791,12 @@
 
 
 
-
-	<cffunction name="consultaIndicadorDGCI_mensal" access="remote" hint="gera a consulta para ser utilizadas nas cffunctions do DGCI">
-		<cfargument name="ano" type="string" required="true" />
-		<cfargument name="mes" type="string" required="true" />
-		
-		<cfquery name="consulta_DGCI_mensal" datasource="#application.dsn_processos#" timeout="120">
-			SELECT 
-				pc_indOrgao_mcuOrgao as mcuOrgao
-				,pc_orgaos.pc_org_sigla as siglaOrgao
-				,pc_indOrgao_mcuOrgaoSubordinador as mcuOrgaoSubordinador
-				,pc_orgaoSubordinador.pc_org_sigla as siglaOrgaoSubordinador
-				,MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, null)) as PRCI
-				,MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, null)) as SLNC
-				,MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoMes, null)) as DGCI
-				,MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoAcumulado, null)) as DGCIacumulado
-
-			FROM 
-				pc_indicadores_porOrgao
-			INNER JOIN 
-				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
-			INNER JOIN 
-				pc_orgaos pc_orgaoSubordinador ON pc_orgaoSubordinador.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgaoSubordinador	
-			WHERE 
-				pc_indOrgao_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_numIndicador in (1,2,3)
-				AND pc_indOrgao_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-				
-			GROUP BY 
-				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla,pc_indOrgao_mcuOrgaoSubordinador,pc_orgaoSubordinador.pc_org_sigla
-		</cfquery>
-		<cfreturn #consulta_DGCI_mensal#>	
-	
-	</cffunction>
-
 	<cffunction name="tabResumoDGCIorgaosResp_mensal" access="remote" returntype="string" hint="cria tabela resumo com as informações dos resultados do DGCI dos órgãos subordinadores">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
-		<cfset var resultado = consultaIndicadorDGCI_mensal(ano=arguments.ano, mes=arguments.mes)>
+		<cfset var resultado = consultaIndicadores(ano=arguments.ano, mes=arguments.mes)>
 	   
-	  	<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
-				WHERE  pc_indPeso_numIndicador = 1 
-				and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-				and pc_indPeso_ativo = 1
-		</cfquery>
-		<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
-			SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
-				WHERE pc_indPeso_numIndicador = 2 
-				and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-				and pc_indPeso_ativo = 1
-		</cfquery>
 		
 		<!-- tabela resumo -->
 		<cfif resultado.recordcount neq 0>
@@ -993,23 +823,6 @@
 							<cfoutput>
 								<cfloop query="resultado"> <!-- Inicia um loop que itera sobre o conjunto de dados resultado -->
 
-									<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
-										SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-										WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-												AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-												AND pc_indMeta_numIndicador = 1
-												AND pc_indMeta_mcuOrgao = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
-												AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="#application.rsUsuarioParametros.pc_org_orgaoAvaliado#" cfsqltype="cf_sql_integer"> 
-									</cfquery>
-									<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
-										SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-										WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-												AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-												AND pc_indMeta_numIndicador = 2
-												AND pc_indMeta_mcuOrgao = <cfqueryparam value="#mcuOrgao#" cfsqltype="cf_sql_varchar">
-												AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="#application.rsUsuarioParametros.pc_org_orgaoAvaliado#" cfsqltype="cf_sql_integer">
-									</cfquery>
-
 									
 									<tr style="font-size:12px;cursor:auto;z-index:2;text-align: center;"  >
 										<td>#siglaOrgao# (#mcuOrgao#)</td>
@@ -1029,13 +842,13 @@
 
 										<cfset metaDGCIorgao =''>
 
-										<cfif rsMetaPRCI.pc_indMeta_meta neq '' AND rsMetaSLNC.pc_indMeta_meta neq ''>
+										<cfif metaPRCI neq '' AND metaSLNC neq ''>
 											<cfif PRCI neq '' AND SLNC neq ''>
-												<cfset metaDGCIorgao = NumberFormat(ROUND((rsMetaPRCI.pc_indMeta_meta*rsPRCIpeso.pc_indPeso_peso + rsMetaSLNC.pc_indMeta_meta*rsSLNCpeso.pc_indPeso_peso)*10)/10,0.0)>
+												<cfset metaDGCIorgao = NumberFormat(ROUND((metaPRCI*pesoPRCI + metaSLNC*pesoSLNC)*10)/10,0.0)>
 											<cfelseif PRCI neq '' and SLNC eq ''>
-												<cfset metaDGCIorgao = NumberFormat(ROUND(rsMetaPRCI.pc_indMeta_meta*10)/10,0.0)>
+												<cfset metaDGCIorgao = NumberFormat(ROUND(metaPRCI*10)/10,0.0)>
 											<cfelseif PRCI eq '' and SLNC neq ''>
-												<cfset metaDGCIorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>
+												<cfset metaDGCIorgao = NumberFormat(ROUND(metaSLNC*10)/10,0.0)>
 											</cfif>
 										</cfif>	
 										
@@ -1064,8 +877,8 @@
 							<tr>
 								<th colspan="8" style="font-weight: normal; font-size: smaller;">
 									<cfoutput>
-										<li>DGCI = Desempenho Geral do Controle Interno = (PRCI x peso do PRCI) + (SLNC x peso do SLNC) = (PRCI x #rsPRCIpeso.pc_indPeso_peso#) + (SLNC x #rsSLNCpeso.pc_indPeso_peso#)</li>
-										<li>Meta = (Meta PRCI x peso do PRCI) + (Meta do SLNC x peso SLNC) = (Meta PRCI x #rsPRCIpeso.pc_indPeso_peso#) + (Meta SLNC x #rsSLNCpeso.pc_indPeso_peso#)</li>
+										<li>DGCI = Desempenho Geral do Controle Interno = (PRCI x peso do PRCI) + (SLNC x peso do SLNC) = (PRCI x #resultado.pesoPRCI#) + (SLNC x #resultado.pesoSLNC#)</li>
+										<li>Meta = (Meta PRCI x peso do PRCI) + (Meta do SLNC x peso SLNC) = (Meta PRCI x #resultado.pesoPRCI#) + (Meta SLNC x #resultado.pesoSLNC#)</li>
 										Obs.: Caso não existam dados para o PRCI ou SLNC, os cálculos acima serão feitos apenas com os resultados e metas do indicador disponível, sem multiplicação pelo seu peso.
 									</cfoutput>
 								</th>
@@ -1114,131 +927,56 @@
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
 		
+		<cfset resultado = consultaIndicadores(ano=arguments.ano, mes=arguments.mes)>
 
-		<cfquery name="resultDGCIdados" datasource="#application.dsn_processos#" timeout="120">
-			SELECT 
-				pc_indOrgao_mcuOrgao as mcuOrgaoResp,
-				pc_orgaos.pc_org_sigla as siglaOrgaoResp,
-				MAX(IIF(pc_indOrgao_numIndicador = 1, pc_indOrgao_resultadoMes, null)) as PRCI,
-				MAX(IIF(pc_indOrgao_numIndicador = 2, pc_indOrgao_resultadoMes, null)) as SLNC,
-				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoMes, null)) as DGCI,
-				MAX(IIF(pc_indOrgao_numIndicador = 3, pc_indOrgao_resultadoAcumulado, null)) as DGCIacumulado
-			FROM 
-				pc_indicadores_porOrgao
-			INNER JOIN 
-				pc_orgaos ON pc_orgaos.pc_org_mcu = pc_indicadores_porOrgao.pc_indOrgao_mcuOrgao
-			WHERE 
-				pc_indOrgao_ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_mes = <cfqueryparam value="#mes#" cfsqltype="cf_sql_integer">
-				AND pc_indOrgao_numIndicador in(1,2,3)
-				AND pc_indOrgao_mcuOrgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-				AND pc_indOrgao_paraOrgaoSubordinador = <cfqueryparam value="#application.rsUsuarioParametros.pc_org_orgaoAvaliado#" cfsqltype="cf_sql_integer">
-			GROUP BY 
-				pc_indOrgao_mcuOrgao, pc_orgaos.pc_org_sigla
-		</cfquery>
-
-		<cfif resultDGCIdados.recordcount neq 0>	
-
-			<cfset resultadoPRCI = consultaIndicadorPRCI_TIDP_TGI_mensal(ano=arguments.ano, mes=arguments.mes)>
-			
-			<cfquery name="rsMetaPRCI" datasource="#application.dsn_processos#" >
-				SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-						AND pc_indMeta_numIndicador = 1
-						AND pc_indMeta_mcuOrgao= '#application.rsUsuarioParametros.pc_usu_lotacao#'
-						AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="#application.rsUsuarioParametros.pc_org_orgaoAvaliado#" cfsqltype="cf_sql_integer">
-			</cfquery>	
-
-		<cfset var resultadoSLNC = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
-		<cfset var resultadoSLNC = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
-			<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
-				<cfset orgaosMCUListSLNC = ValueList(resultadoSLNC.mcuOrgao)>
-			<cfelse>
-				<cfset orgaosMCUListSLNC = application.rsUsuarioParametros.pc_usu_lotacao>
-			</cfif>
-			<cfset var resultadoSLNC = consultaIndicadorSLNC_QTSL_QTNC(ano=arguments.ano, mes=arguments.mes)>
-			<cfif application.rsUsuarioParametros.pc_org_orgaoAvaliado eq 1>
-				<cfset orgaosMCUListSLNC = ValueList(resultadoSLNC.mcuOrgao)>
-			<cfelse>
-				<cfset orgaosMCUListSLNC = application.rsUsuarioParametros.pc_usu_lotacao>
-			</cfif>
-
-			<cfquery name="rsMetaSLNC" datasource="#application.dsn_processos#" >
-				SELECT pc_indMeta_meta FROM pc_indicadores_meta 
-				WHERE pc_indMeta_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer"> 
-						AND pc_indMeta_mes = <cfqueryparam value="#arguments.mes#" cfsqltype="cf_sql_integer"> 
-						AND pc_indMeta_numIndicador = 2
-						AND pc_indMeta_mcuOrgao= '#application.rsUsuarioParametros.pc_usu_lotacao#'
-						AND pc_indMeta_paraOrgaoSubordinador = <cfqueryparam value="#application.rsUsuarioParametros.pc_org_orgaoAvaliado#" cfsqltype="cf_sql_integer">
-			</cfquery>
-
-
-
-			
-
-			<cfquery name="rsPRCIpeso" datasource="#application.dsn_processos#" timeout="120"  >
-				SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
-					WHERE  pc_indPeso_numIndicador = 1 
-					and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-					and pc_indPeso_ativo = 1
-			</cfquery>
-
-			<cfquery name="rsSLNCpeso" datasource="#application.dsn_processos#" timeout="120"  >
-				SELECT	pc_indPeso_peso FROM pc_indicadores_peso 
-					WHERE pc_indPeso_numIndicador = 2 
-					and pc_indPeso_ano = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-					and pc_indPeso_ativo = 1
-			</cfquery>
+		<cfif resultado.recordcount neq 0>	
 
 		
 			<cfset pesoPRCI = 0>
 			<cfset pesoSLNC = 0>
-			<cfif rsPRCIpeso.recordcount neq 0>
-				<cfset pesoPRCI = rsPRCIpeso.pc_indPeso_peso>
+			<cfif resultado.pesoPRCI neq ''>
+				<cfset pesoPRCI = resultado.pesoPRCI>
 				<cfset pesoPRCIformatado = Replace(pesoPRCI, ".", ",")>
 			</cfif>
-			<cfif rsSLNCpeso.recordcount neq 0>
-				<cfset pesoSLNC = rsSLNCpeso.pc_indPeso_peso>
+			<cfif resultado.pesoSLNC neq ''>
+				<cfset pesoSLNC = resultado.pesoSLNC>
 				<cfset pesoSLNCformatado = Replace(pesoSLNC, ".", ",")>
 			</cfif>
 
 
-			<cfset metaPRCIorgao =rsMetaPRCI.pc_indMeta_meta>
+			<cfset metaPRCIorgao =resultado.metaPRCI>
 			<cfif metaPRCIorgao neq ''>
 				<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0), ".", ",")>
 			<cfelse>
 				<cfset metaPRCIorgaoFormatado = 0>
 			</cfif>
-			<cfset metaSLNCorgao =rsMetaSLNC.pc_indMeta_meta>
+			<cfset metaSLNCorgao =resultado.metaSLNC>
 			<cfif metaSLNCorgao neq ''>
 				<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0), ".", ",")>
 			<cfelse>
 				<cfset metaSLNCorgaoFormatado = 0>
 			</cfif>
 
-			
-			
 			<cfset resultadoPRCI =''>
 			<cfset resultadoPRCIformatado =''>
 			<cfset resultadoSLNC =''>
 			<cfset resultadoSLNCformatado =''>
 			
-			<cfif resultDGCIdados.PRCI neq ''>
-				<cfset resultadoPRCI = NumberFormat(ROUND(resultDGCIdados.PRCI*10)/10,0.0)>
+			<cfif resultado.PRCI neq ''>
+				<cfset resultadoPRCI = NumberFormat(ROUND(resultado.PRCI*10)/10,0.0)>
 				<cfset resultadoPRCIformatado = Replace(NumberFormat(resultadoPRCI,0.0), ".", ",")>
 			</cfif>
 
-			<cfif resultDGCIdados.SLNC neq ''>
-				<cfset resultadoSLNC = NumberFormat(ROUND(resultDGCIdados.SLNC*10)/10,0.0)>
+			<cfif resultado.SLNC neq ''>
+				<cfset resultadoSLNC = NumberFormat(ROUND(resultado.SLNC*10)/10,0.0)>
 				<cfset resultadoSLNCformatado = Replace(NumberFormat(resultadoSLNC,0.0), ".", ",")>
 			</cfif>
 
-			<cfset resultadoDGCI = NumberFormat(ROUND(resultDGCIdados.DGCI*10)/10,0.0)>
+			<cfset resultadoDGCI = NumberFormat(ROUND(resultado.DGCI*10)/10,0.0)>
 			<cfset resultadoDGCIformatado = Replace(NumberFormat(resultadoDGCI,0.0), ".", ",")>
 
-			<cfif rsMetaPRCI.pc_indMeta_meta neq '' and  rsMetaSLNC.pc_indMeta_meta neq ''>
-				<cfset metaDGCIorgao = rsMetaPRCI.pc_indMeta_meta*rsPRCIpeso.pc_indPeso_peso + rsMetaSLNC.pc_indMeta_meta*rsSLNCpeso.pc_indPeso_peso>
+			<cfif metaPRCIorgao neq '' and  metaSLNCorgao neq ''>
+				<cfset metaDGCIorgao = metaPRCIorgao*pesoPRCI + metaSLNCorgao*pesoSLNC>
 				<cfset metaDGCIformatado = Replace(NumberFormat(metaDGCIorgao,0.0), ".", ",")>
 				<cfset DGCIresultadoMeta = ROUND((resultadoDGCI / metaDGCIorgao)*100*10)/10>
 				<cfset DGCIresultadoMetaFormatado = Replace(NumberFormat(DGCIresultadoMeta,0.0), ".", ",")>
