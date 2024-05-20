@@ -4586,7 +4586,8 @@
 					responsive: true, 
 					lengthChange: false, 
 					autoWidth: false,
-					searching: false
+					searching: false,
+					paging: false // Desativa a paginação
 				})
 					
 			});
