@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -206,7 +207,7 @@
         function submeterForm(){
             var frm = document.getElementById('formConsulta');
             if(frm.selAnoConsulta.value==''){
-                alert('Necessário selecionar, pelo menos, o ano!');
+                alert('NecessÃ¡rio selecionar, pelo menos, o ano!');
                 frm.selAnoConsulta.focus();
                 return false;
             }
@@ -215,11 +216,11 @@
             setTimeout('javascript:formConsulta.submit();',2000);
         }
 
-        //Início função de filtro de tabela
+        //Inï¿½cio funï¿½ï¿½o de filtro de tabela
         function doDestacaTexto(Texto, termoBusca){
 
             /*******************************************************************/
-            // CASO QUEIRA MODIFICAR O ESTILO DA MARCAÇÃO ALTERE ESSAS VARIÁVEIS
+            // CASO QUEIRA MODIFICAR O ESTILO DA MARCAï¿½ï¿½O ALTERE ESSAS VARIï¿½VEIS
             /*******************************************************************/
             inicioTag = "<font style='color:#000;background-color:#A0FFFF'><b>";
             fimTag = "</b></font>";
@@ -281,7 +282,7 @@
             td = tr.getElementsByTagName("td");
             
         }
-        //Fim função de filtro de tabela
+        //Fim funï¿½ï¿½o de filtro de tabela
         
 
     </script>
@@ -340,7 +341,7 @@
                                     </cfif> 
 
                                     <cfoutput query="rsModFiltro">
-                                        <option <cfif '#form.selModConsulta#' eq  '#TUI_Modalidade#' >selected</cfif> value="#TUI_Modalidade#"><cfif #TUI_Modalidade# eq 0>PRESENCIAL<cfelse>A DISTÂNCIA</cfif></option>                                   
+                                        <option <cfif '#form.selModConsulta#' eq '#TUI_Modalidade#' >selected</cfif> value="#TUI_Modalidade#"><cfif #TUI_Modalidade# eq 0>PRESENCIAL<cfelse>A DISTï¿½NCIA</cfif></option>                                   
                                     </cfoutput>
                                 </select>
 						    </div>
@@ -365,7 +366,7 @@
                                         </select>              		
                             </div>
                             <div style="margin-bottom:10px;float:left;margin-right:10px;">
-                                <label  for="selSitConsulta" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">SITUAÇÃO:</label>
+                                <label  for="selSitConsulta" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">SITUAÃ‡ÃƒO:</label>
                                 <div ></div>
                                 <select name="selSitConsulta" id="selSitConsulta" class="form"  onchange="mudarFiltroSit();submeterForm()" 
                                         style="display:inline-block;width:110px;">
@@ -390,7 +391,7 @@
                                         <option selected value="">TODOS</option>
                                     </cfif>
                                     <cfoutput query="rsVlrDecFiltro">
-                                        <option  <cfif '#form.selValDecConsulta#' eq '#Itn_ValorDeclarado#'>selected</cfif> value="#Itn_ValorDeclarado#"><cfif '#Itn_ValorDeclarado#' eq 'S'>SIM<cfelse>NÃO</cfif></option>
+                                        <option  <cfif '#form.selValDecConsulta#' eq '#Itn_ValorDeclarado#'>selected</cfif> value="#Itn_ValorDeclarado#"><cfif '#Itn_ValorDeclarado#' eq 'S'>SIM<cfelse>NÃƒO</cfif></option>
                                     </cfoutput>        
 								</select>
 							</div>
@@ -410,13 +411,13 @@
                                         <img src="figuras/print.png" width="25"  border="0"  ></img>
                                     </div>
                                     <div >
-                                        <span style="font-size:10px">Pontuações / Classificações</span>
+                                        <span style="font-size:10px">PontuaÃ§Ãµes / ClassificaÃ§Ãµes</span>
                                     </div>   
                           </div>
 																
 <div align="center" style="width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/planoDeTeste.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=n')</cfoutput>">
                                     <div style="position:relative;top:10px">
-                                        <img src="figuras/print.png" width="25"  border="0"  ></img>
+                                        <img src="figuras/print.png" width="25"  border="0"></img>
                                     </div>
                                     <div >
                                         <span style="font-size:10px">s/ Como Executar</span>
@@ -436,7 +437,7 @@
                                         <img src="figuras/print.png" width="25"  border="0"  ></img>
                                     </div>
                                     <div>
-                                        <span style="font-size:10px">Relevância</span>
+                                        <span style="font-size:10px">RelevÃ¢ncia</span>
                                     </div>   
                           </div>						  
 						  
@@ -474,7 +475,7 @@
                                                     <th width="9%">
                                                   <div align="center">Valor Declarado</div>                                                    </th>
                                                     <th width="12%">
-                                                  <div align="center">Situação</div>                                                    </th>
+                                                  <div align="center">SituaÃ§Ã£o</div>                                                    </th>
                                                 </tr>
                                             </thead>
                                             <cfset scor='white'>
@@ -487,7 +488,7 @@
                                                             onclick="gravaOrdLinha(this);abrirPopup('cadastroGruposItens_consultaPopup.cfm?selAnoConsulta=#TUI_Ano#&selTipoConsulta=#TUI_TipoUnid#&selModConsulta=#TUI_Modalidade#&selGrupoConsulta=#TUI_GrupoItem#&selItemConsulta=#TUI_ItemVerif#',800,400);" 
                                                             valign="middle" bgcolor="#scor#" class="exibir" 
                                                             style="cursor:pointer;text-align: justify;"
-                                                            title="Clique para visualizar as orientações para este item.">
+                                                            title="Clique para visualizar as orientaÃ§Ãµes para este item.">
                                                             
                                                             
                                                             <td width="9%">
@@ -496,16 +497,16 @@
                                                             <td width="10%">
                                                           <div align="center">#tudesc#</div>                                                            </td>
                                                             <td width="13%">
-                                                          <div align="center"><cfif #TUI_Modalidade# eq 0>Presencial<cfelse>A Distância</cfif></div>                                                            </td>
+                                                          <div align="center"><cfif #TUI_Modalidade# eq 0>Presencial<cfelse>A DistÃ¢ncia</cfif></div>                                                            </td>
                                                             <td width="17%">
                                                           <div >#TUI_GrupoItem#-#Grp_Descricao#</div>                                                            </td>
                                                             <td width="30%"  >
                                                           <div style="padding:5px" >#TUI_ItemVerif#-#Itn_Descricao#</div>                                                            </td>
                                                             <td width="9%">
-                                                          <div align="center"><cfif #Itn_ValorDeclarado# eq 'S'>SIM<cfelse>NÃO</cfif></div>                                                            </td>
+                                                          <div align="center"><cfif #Itn_ValorDeclarado# eq 'S'>SIM<cfelse>NÃƒO</cfif></div>                                                            </td>
                                                             <td width="12%">
                                                                     <div align="center"><cfif '#TUI_Ativo#' eq 0><span style="color:red">DESATIVADO</span><cfelse><strong>ATIVO</strong></cfif></div>
-                                                          <div align="center" title='"VISUALIZAÇÃO BLOQUEADA" significa que o item não será visível para tratamento.' style="margin-top:5px"><cfif '#Itn_TipoUnidade#' eq 99><span style="color:red;font-size:8px;"><i><strong>VISUALIZAÇÃO BLOQUEADA</strong></i></span></cfif></div>                                                            </td>
+                                                          <div align="center" title='"VISUALIZAÃ‡ÃƒO BLOQUEADA" significa que o item nÃ£o serÃ¡ visÃ­vel para tratamento.' style="margin-top:5px"><cfif '#Itn_TipoUnidade#' eq 99><span style="color:red;font-size:8px;"><i><strong>VISUALIZAÃ‡ÃƒO BLOQUEADA</strong></i></span></cfif></div>                                                            </td>
                                                         </tr>
                                                         
                                                     </form>
@@ -519,7 +520,7 @@
                               </table>
                           </div>
                         <cfelse>
-                        <div align="center"><label>NÃO FORAM LOCALIZADOS REGISTROS PARA OS PARÂMETROS SELECIONADOS</label></div>
+                        <div align="center"><label>NÃƒO FORAM LOCALIZADOS REGISTROS PARA OS PARÃ‚METROS SELECIONADOS</label></div>
                         </cfif> 
                     </cfif>       
                 </div>

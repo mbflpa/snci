@@ -48,7 +48,11 @@ function validarform() {
 	return false;
 	}
 
-  if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmUsuGrupoAcesso.value != 'GOVERNANCA' && frm.frmdia.value <= 10){
+  if (eval(messelec) == (eval(mesatual) - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmUsuGrupoAcesso.value != 'GOVERNANCA' && frm.frmdia.value <= 10){
+	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
+	return false;
+	}	
+  if (eval(messelec) == eval(mesatual) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmUsuGrupoAcesso.value != 'GOVERNANCA'){
 	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
 	return false;
 	}	

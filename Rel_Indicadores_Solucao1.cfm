@@ -1,4 +1,3 @@
-
 <cfprocessingdirective pageEncoding ="utf-8"/> 
 <!---   <cfoutput>se:#se#&dtlimit:#dtlimit# anoexerc:#anoexerc#<br></cfoutput> 
 <CFSET GIL = GIL>   --->

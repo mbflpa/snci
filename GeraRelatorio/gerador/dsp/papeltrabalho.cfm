@@ -1,6 +1,5 @@
 <cfprocessingdirective pageEncoding ="utf-8"> 
 <cfinclude template="../../../parametros.cfm">
-
 <cfinvoke component="#vRelatorio#.GeraRelatorio.gerador.ctrl.controller"
 	method="geraMatriculaInspetor" returnvariable="qryInspetor">
 </cfinvoke>
@@ -17,7 +16,6 @@
 <cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
 
 <cfset qtItens = qryPapelTrabalho.recordcount>
-
 <cfquery name="rsSituacoes" datasource="#dsn_inspecao#">
     SELECT Pos_Situacao_Resp, Pos_NumGrupo, Pos_NumItem, Pos_NCISEI, STO_Descricao, STO_Cor FROM ParecerUnidade
     INNER JOIN Situacao_Ponto ON STO_Codigo = Pos_Situacao_Resp
@@ -134,8 +132,8 @@
     </cfinvoke>
 </cfif>
 
-  <!--- Valida todos os itens de uma avaliação sem itens NC --->
-  <cfif isDefined("form.acao") and '#form.acao#' is 'validarSemNC'>
+  <!--- Concluir Revisão para todos os grupos/itens com Não Conformidades - NC --->
+  <cfif isDefined("form.acao") and '#form.acao#' is 'ConcluirRevisaoSemNC'>
 	  <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
 	  <cfif listfind('#qryPapelTrabalho.Itn_PTC_Seq#','10')>
 		  <cfset RIPCaractvlr = 'QUANTIFICADO'>
@@ -149,25 +147,18 @@
           WHERE RIP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and RIP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
       </cfquery>
       <cfquery datasource="#dsn_inspecao#">
-          UPDATE Inspecao SET INP_Situacao = 'CO', INP_UserName = '#CGI.REMOTE_USER#', INP_DtEncerramento = convert(varchar, getdate(), 102), INP_DTUltAtu = CONVERT(varchar, getdate(), 120)
+          UPDATE Inspecao SET INP_Situacao = 'CO'
+          , INP_UserName = '#CGI.REMOTE_USER#'
+          , INP_DtEncerramento = convert(varchar, getdate(), 102)
+          , INP_DTUltAtu = CONVERT(varchar, getdate(), 120)
+          , INP_DTConcluirRevisao = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
           WHERE INP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
       </cfquery>
       <cfquery datasource="#dsn_inspecao#">
           UPDATE ProcessoParecerUnidade SET Pro_Situacao = 'EN', Pro_DtEncerr = convert(varchar, getdate(), 102), Pro_userName = '#CGI.REMOTE_USER#', Pro_dtultatu = CONVERT(DATETIME, getdate(), 103)
           WHERE Pro_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and Pro_Inspecao ='#qryPapelTrabalho.INP_NumInspecao#'
       </cfquery>
-      
-      <script language="javascript" >
-        window.opener.location.reload() ;
-        alert('Avaliação sem Itens "não CONFORME" Validada com sucesso!');
-        <cfoutput>
-          window.open(window.location,'_self');
-        </cfoutput>
-      </script>
-      <!--- Atualizar dados na tela --->
-    <cfinvoke component="#vRelatorio#.GeraRelatorio.gerador.ctrl.controller"
-	    method="geraPapelTrabalho" returnvariable="qryPapelTrabalho">
-    </cfinvoke>      
+      <cflocation url="../../../Pacin_ClassificacaoUnidades.cfm?&pagretorno=GeraRelatorio/gerador/dsp/papeltrabalho.cfm&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#">    
   </cfif>
 <!--- inicio liberar avaliação para o gestor da unidade --->
 <!---Verifica se esta inspeção possui algum item Em Revisao --->	
@@ -194,15 +185,17 @@
     ((RTRIM(RIP_Resposta)= 'E' AND Itn_ValidacaoObrigatoria=1) OR RTRIM(RIP_Resposta)= 'V') AND 
     RTRIM(RIP_Recomendacao) IS NULL AND RIP_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' and RIP_Unidade='#qryPapelTrabalho.RIP_Unidade#' 
 </cfquery>
-<cfif not isDefined("liberarSN")>
- <cfset liberarSN = 'N'>
-</cfif>
-<cfif isDefined("liberarSN") and #liberarSN# is 'S'>
+
+  <cfif isDefined("form.acao") and '#form.acao#' is 'ConcluirRevisaoComNC'>
     <!---Inicio do processo de liberação da avaliação--->  
     <cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0>
         <!---Salva a matricula do gestor na tabela Inspecao para sinalisar o gestor que liberou a verificação --->
         <cfquery datasource="#dsn_inspecao#">
-          UPDATE Inspecao SET INP_Situacao = 'CO', INP_UserName = '#CGI.REMOTE_USER#', INP_DtEncerramento = convert(varchar, getdate(), 102), INP_DTUltAtu = CONVERT(varchar, getdate(), 120)
+          UPDATE Inspecao SET INP_Situacao = 'CO'
+          , INP_UserName = '#CGI.REMOTE_USER#'
+          , INP_DtEncerramento = convert(varchar, getdate(), 102)
+          , INP_DTUltAtu = CONVERT(varchar, getdate(), 120)
+          , INP_DTConcluirRevisao = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
           WHERE INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
         </cfquery>
 
@@ -294,11 +287,35 @@
               WHERE Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#' and Pos_NumGrupo = #rs11.Pos_NumGrupo# and Pos_NumItem = #rs11.Pos_NumItem# and Pos_Situacao_Resp = 11
             </cfquery>
             <!--- Inserindo dados dados na tabela Andamento --->
-            <cfset andparecer = #auxposarea#  & " --- " & #auxnomearea#>
-            <cfquery datasource="#dsn_inspecao#">
-              insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
-              values ('#qryPapelTrabalho.INP_NumInspecao#', '#rs11.Pos_Unidade#', #rs11.Pos_NumGrupo#, #rs11.Pos_NumItem#, convert(varchar, getdate(), 102), '#CGI.REMOTE_USER#', 14, '000014', '#andparecer#', '#auxposarea#')
-            </cfquery>
+            <cfset andparecer = 'Ação: Concluir Revisao Com NC (GESTORES)'>
+            <cfquery name="rsExisteSN" datasource="#dsn_inspecao#">
+              select And_Unidade from Andamento 
+              where And_Unidade = '#rs11.Pos_Unidade#' and 
+              And_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' and 
+              And_NumGrupo=#rs11.Pos_NumGrupo# and 
+              And_NumItem = #rs11.Pos_NumItem# and 
+              And_HrPosic = '000014' and 
+              And_Situacao_Resp = 14
+					  </cfquery>
+            <cfif rsExisteSN.recordcount lte 0>
+              <cfquery datasource="#dsn_inspecao#">
+                insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
+                values ('#qryPapelTrabalho.INP_NumInspecao#', '#rs11.Pos_Unidade#', #rs11.Pos_NumGrupo#, #rs11.Pos_NumItem#, convert(varchar, getdate(), 102), '#CGI.REMOTE_USER#', 14, '000014', '#andparecer#', '#rs11.Pos_Unidade#')
+              </cfquery>
+            <cfelse>
+              <cfquery datasource="#dsn_inspecao#">
+                update Andamento set And_DtPosic=#createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
+                , And_username='#CGI.REMOTE_USER#'
+                , And_Area = '#Form.unid#'
+                , and_Parecer= '#andparecer#'
+                where And_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' and 
+                And_Unidade='#rs11.Pos_Unidade#' and 
+                And_NumGrupo=#rs11.Pos_NumGrupo# and 
+                And_NumItem=#rs11.Pos_NumItem# and
+                And_Situacao_Resp=14 and
+                And_HrPosic='000014'
+              </cfquery>            
+            </cfif>
         </cfloop>       
 				<!---Fim -Se existirem itens em liberação, executa a rotina para mudança do status de todos os itens em liberação para não respondido --->
 				<!--- Início - e-mail automático por unidade --->
@@ -337,10 +354,16 @@
             <cfset emailcoord = #rsCoord.Fun_Email#>
 
             <!--- adquirir o email do SCOI da SE --->
+            <cfset scoi_se = left(rs11.Pos_Unidade,2)>
+            <cfif scoi_se eq '03' or scoi_se eq '05' or scoi_se eq '65'>
+              <cfset scoi_se = '10'>
+            <cfelseif scoi_se eq '70'>
+              <cfset scoi_se = '04'>						 					 				 
+            </cfif>
             <cfquery name="rsSCOIEmail" datasource="#dsn_inspecao#">
               SELECT Ars_Email
               FROM Areas
-              WHERE (Ars_Codigo Like 'left(#qryPapelTrabalho.INP_NumInspecao#,2)%') AND 
+              WHERE (Ars_Codigo = '#scoi_se#') AND 
               (Ars_Sigla Like '%CCOP/SCOI%' OR Ars_Sigla Like '%DCINT/GCOP/SGCIN/SCOI') AND (Ars_Status='A')
             </cfquery>
             <cfset emailscoi = #rsSCOIEmail.Ars_Email#>
@@ -392,7 +415,7 @@
 
                 &nbsp;&nbsp;&nbsp;Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação. <br><br>
 
-                &nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #qAcesso.Usu_Email#.<br><br>
+                &nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #emailscoi#.<br><br>
 
                 <table>
                 <tr>
@@ -433,7 +456,7 @@
 
                 &nbsp;&nbsp;&nbsp;Após esse prazo, a situação será direcionada diretamente para área gestora do Contrato de Terceirizadas para adoção das ações previstas em contrato. <br><br>                      
 
-                &nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #qAcesso.Usu_Email#.<br><br>
+                &nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #emailscoi#.<br><br>
 
                 <table>
                 <tr>
@@ -453,7 +476,8 @@
             </cfif>
 					</cfif>
 				</cfoutput>
-						<!--- Fim - e-mail automático por unidade --->       
+        <!--- Fim - e-mail automático por unidade --->  
+      <cflocation url="../../../Pacin_ClassificacaoUnidades.cfm?&pagretorno=GeraRelatorio/gerador/dsp/papeltrabalho.cfm&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#">             
 		</cfif>
 		<!---Fim do processo de liberação de todos os itens--->	
 		<!--- Inicio Verificacao dos registros que estao na situacao 14(não Respondido) na tabela ParecerUnidade --->
@@ -473,7 +497,7 @@
               Pos_NumGrupo = #qNaoRespondido.Pos_NumGrupo# and 
               Pos_NumItem = #qNaoRespondido.Pos_NumItem#
         </cfquery>
-
+        <cfset andparecer = 'Ação: Concluir Revisao Com NC (GESTORES)'>
         <cfquery name="rs14SN" datasource="#dsn_inspecao#">
           SELECT And_NumInspecao FROM Andamento
           WHERE 
@@ -488,19 +512,20 @@
             <cfquery datasource="#dsn_inspecao#">
               INSERT Andamento 
               (
-                And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area
+                And_NumInspecao,And_Unidade,And_NumGrupo,And_NumItem,And_DtPosic,And_username,And_Situacao_Resp,And_HrPosic,And_Area,and_Parecer
               )
               VALUES 
               (
-                '#qNaoRespondido.Pos_Inspecao#', 
-                '#qNaoRespondido.Pos_Unidade#', 
-                #qNaoRespondido.Pos_NumGrupo#, 
-                #qNaoRespondido.Pos_NumItem#, 
-                convert(char, getdate(), 102), 
-                '#CGI.REMOTE_USER#', 
-                14, 
-                '000014',
-                '#qryPapelTrabalho.RIP_Unidade#'
+                '#qNaoRespondido.Pos_Inspecao#'
+                ,'#qNaoRespondido.Pos_Unidade#'
+                , #qNaoRespondido.Pos_NumGrupo#
+                , #qNaoRespondido.Pos_NumItem#
+                , convert(char, getdate(), 102)
+                , '#CGI.REMOTE_USER#'
+                , 14
+                , '000014'
+                , '#qryPapelTrabalho.RIP_Unidade#'
+                , '#andparecer#'
                 )
             </cfquery>
         <cfelse>
@@ -508,6 +533,7 @@
               UPDATE Andamento SET
                 And_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
               , And_HrPosic = '000014'
+              , and_Parecer = '#andparecer#'
               WHERE 
                 And_Unidade='#qNaoRespondido.Pos_Unidade#' AND 
                 And_NumInspecao='#qNaoRespondido.Pos_Inspecao#' AND 
@@ -539,7 +565,7 @@
 
   <cfset semNCvalidado = false>
    <!---Verifica se é uma verifcação não tem itens não conforme e se foi validada--->
-  <cfquery datasource="#dsn_inspecao#" name="rsSemNC" >
+  <cfquery datasource="#dsn_inspecao#" name="rsSemNC">
 			SELECT Count(RIP_NumInspecao) as total, Count(CASE WHEN LTRIM(RTRIM(RIP_Recomendacao))='V' THEN 1 END) AS validado
       ,Count(CASE WHEN LTRIM(RTRIM(RIP_Resposta))='N' THEN 1 END) AS itemNC, Count(RIP_MatricAvaliador) as totalAvaliadores
       FROM  Resultado_Inspecao
@@ -646,7 +672,7 @@
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
         function (callback) {
-          window.setTimeout(callback, 1000 / 60);
+          window.setTimeout(callback, 5000 / 60);
         };
     })();
 
@@ -657,13 +683,12 @@
 
       var scrollY = window.scrollY || document.documentElement.scrollTop,
         scrollTargetY = scrollTargetY || 0,
-        speed = speed || 2000,
+        speed = speed || 3000,
         easing = easing || 'easeOutSine',
         currentTime = 0;
 
       // min time .1, max time .8 seconds
       var time = Math.max(.1, Math.min(Math.abs(scrollY - scrollTargetY) / speed, .8));
-
       var easingEquations = {
         easeOutSine: function (pos) {
           return Math.sin(pos * (Math.PI / 2));
@@ -689,7 +714,7 @@
         if (p < 1) {
           requestAnimFrame(tick);
 
-          window.scrollTo(0, scrollY + ((scrollTargetY - scrollY) * t));
+         window.scrollTo(0, scrollY + ((scrollTargetY - scrollY) * t));
         } else {
           window.scrollTo(0, scrollTargetY);
         }
@@ -718,17 +743,16 @@
 </head>
 <cfset qtdrevisar = 0>
 <cfset qtdvalidar = 0>
-<cfset exibirSN = 'S'>
 
-<body id="main_body" style="background:#fff" >
-<cfset form.acao = ''>
+
+<body id="main_body" style="background:#fff">
 <div id="aguarde" name="aguarde" align="center"  style="width:100%;height:200%;top:0px;left:0px; background:transparent;
 filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F86b2ff,endColorstr=#7F86b2ff);
 z-index:1000;visibility:hidden;position:absolute;" >		
 		 <img id="imgAguarde" name="imgAguarde" src="figuras/aguarde.png" width="100px"  border="0" style="position:absolute;"></img>
 </div>
+<cfset exibirSN = 'S'>
   <form id="formPT"  name="formPT" method="post">
-      <input type="hidden" id="acao" name="acao" value="">
       <input type="hidden" id="grupo" name="grupo" value="">
       <input type="hidden" id="item" name="item" value="">
 
@@ -756,10 +780,10 @@ z-index:1000;visibility:hidden;position:absolute;" >
           </tr>
           <tr>
             <td colspan="2" rowspan="2" valign="top" bordercolor="999999" bgcolor="" scope="row"><span class="labelcell"><img src="../../geral/img/logoCorreios.gif" alt="Logo ECT" width="148" height="33" align="left" /></span></td>
-            <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"><span class="style2">DEPARTAMENTO DE CONTROLE INTERNO</span></div></td>
+            <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center"><span class="style2">DEPARTAMENTO DE CONTROLE INTERNO</span></div></td>
           </tr>
           <tr>
-            <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"> <span class="style2">PAPEL DE TRABALHO</span> </div></td>
+            <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center"> <span class="style2">PAPEL DE TRABALHO</span> </div></td>
           </tr>
           <tr>
             <td width="4" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left" class="labelcell"></div></td>
@@ -797,7 +821,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
             <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="justify"><cfoutput>#Num_Insp#</cfoutput>
                     <cfif '#rsSituacoes.recordCount#' neq 0 and '#rsSemNC.totalAvaliadores#' neq 0>
                         <cfif '#rsInspecaoNaoFinalizada.recordcount#' eq 0 and rsVerifValidados.recordcount eq 0 and rsQuatEmRevisao.recordcount eq 0>
-                          <cfset dataHora = '#DateFormat(qryPapelTrabalho.INP_DtUltAtu,"DD/MM/YYYY")#'>
+                          <cfset dataHora = '#DateFormat(qryPapelTrabalho.INP_DtEncerramento,"DD/MM/YYYY")#'>
                           <span style="font-family:arial;font-size:12px;color:blue"><strong>AVALIAÇÃO LIBERADA</strong></span> <span style="font-family:arial;font-size:10px;color:blue"> (por: <cfoutput>#rsLiberadaValidadaPor.Usu_Apelido# - em: #dataHora#)</cfoutput></span>
                           <cfif structKeyExists(url,'pg') and '#url.pg#' eq 'controle' >
                             <script>
@@ -977,7 +1001,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                       <span class="noprint" style="background:###TRIM(qSituAcao.STO_Cor)#;padding:2px;color:##fff">
                       <cfif '#qSituacao.STO_Codigo#' eq 11>
                         <div style="margin-bottom:10px">
-                        <span class="noprint" style="background:blue;padding:2px;color:##fff"> REVISADO </span>
+                        <span class="noprint" style="background:blue;padding:2px;color:white">REVISADO</span>
                       </cfif>
                       </div>
                       </span>
@@ -1166,7 +1190,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
             <td><div align="center">Falta</div></td>
             <td><div align="center">Sobra</div></td>
             <td><div align="center">EmRisco</div></td>
-			    <td><div align="center">Reicidentes</div></td>
+			    <td><div align="center">Reincidentes</div></td>
           </tr>
       <cfoutput>
         <cfset qtdc = rsC.recordcount>
@@ -1197,7 +1221,33 @@ z-index:1000;visibility:hidden;position:absolute;" >
           <td><div align="center">#reincinde#</div></td>
         </tr>
       </cfoutput>
-	  </table>           
+	  </table>  
+ 
+        <cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0 and exibirSN eq 'S' and '#rsSemNC.itemNC#' neq 0>
+          <br>
+            <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:620px">
+                <a style="cursor:pointer;"  onclick="if(confirm('Confirma Concluir Revisão e Liberar Avaliação para Gestor(a) da Unidade?')){document.formPT.acao.value='ConcluirRevisaoComNC';document.formPT.submit();}">
+                <div ><img  alt="Liberar" src="../../../figuras/liberada.png" width="25" border="0" /></div>
+                <div style="color:darkred;position:relative;font-size:25px">Concluir Revisão e Liberar Avaliação para Gestor(a) da Unidade</div>
+                </a> 
+                </div>      
+          <br><br><br>          
+        </cfif>    
+        <cfif ('#semNCvalidado#' is false) and ('#emReavaliacaoReavaliado#' eq 0) and ('#rsSemNC.itemNC#' eq 0)>
+          <!---
+                <div align="center">
+            <input name="submit" type="submit" type="button" class="botao" onClick="if(confirm('Deseja validar esta Avaliação sem itens NÃO CONFORME?\n\nTodos os itens foram analisados?')){document.formPT.acao.value = 'ConcluirRevisaoSemNC';}" value="Validar Avaliação sem Itens Não Conforme">
+            </div>
+          --->
+          <br>
+          <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:620px">
+            <a style="cursor:pointer;" onClick="if(confirm('Confirma Concluir Revisão (Validar Avaliação sem Não Conformidades)?')){document.formPT.acao.value='ConcluirRevisaoSemNC';document.formPT.submit();}">
+            <div ><img  alt="Liberar" src="../../../figuras/liberada.png" width="25" border="0" /></div>
+            <div style="color:darkred;position:relative;font-size:25px">Concluir Revisão (Validar Avaliação sem Não Conformidades)</div>
+            </a> 
+          </div>   
+          <br><br><br>  
+        </cfif>	                   
 <!--- --->
           <tr>
             <td bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
@@ -1214,7 +1264,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
             <th colspan="2" valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</th>
           </tr>
           <cfquery name="qInspetores" datasource="#dsn_inspecao#">
-  SELECT Fun_Matric, Fun_Nome from Inspetor_Inspecao INNER JOIN Funcionarios ON Fun_Matric = IPT_MatricInspetor WHERE IPT_NumInspecao = '#qryPapelTrabalho.INP_NumInspecao#' ORDER BY Fun_Nome
+            SELECT Fun_Matric, Fun_Nome from Inspetor_Inspecao INNER JOIN Funcionarios ON Fun_Matric = IPT_MatricInspetor WHERE IPT_NumInspecao = '#qryPapelTrabalho.INP_NumInspecao#' ORDER BY Fun_Nome
           </cfquery>
           <cfoutput query= "qInspetores">
             <tr>
@@ -1250,21 +1300,9 @@ z-index:1000;visibility:hidden;position:absolute;" >
                 </div>
              </div></th>
           </tr>
-<!--- --->
-                    <cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0 and liberarSN eq 'N' and exibirSN eq 'S'>
-                    <br>
-                     <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:620px">
-                          <a style="cursor:pointer;"  onclick="")){
-                                         window.open('papeltrabalho.cfm?pg=pt&Form.id=<cfoutput>#qryPapelTrabalho.INP_NumInspecao#</cfoutput>&liberarsn=S','_self');}"><a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('papeltrabalho.cfm?pg=pt&Form.id=<cfoutput>#qryPapelTrabalho.INP_NumInspecao#</cfoutput>&liberarsn=S','_self')">
-                          <div ><img  alt="Liberar" src="../../../figuras/liberada.png" width="25" border="0" /></div>
-                          <div style="color:darkred;position:relative;font-size:25px">Concluir Revisão e Liberar Avaliação para Gestor(a) da Unidade</div>
-                          </a> 
-                         </div>
-<!---  --->                   
-                  </cfif> 
-
-          <cfif liberarSN eq 'S' or exibirSN eq 'N'>
-          <!--- <cfif '#rsInspecaoNaoFinalizada.recordcount#' eq 0 and '#rsVerifValidados.recordcount#' eq 0 and '#qInspecaoEmRevisao.recordcount#' eq 0> --->
+        
+   <!--- <cfif '#rsInspecaoNaoFinalizada.recordcount#' eq 0 and '#rsVerifValidados.recordcount#' eq 0 and '#qInspecaoEmRevisao.recordcount#' eq 0>  --->
+    <cfif isDefined("form.acao") and (#form.acao# eq 'ConcluirRevisaoSemNC' or #form.acao# eq 'ConcluirRevisaoComNC') or ('#rsInspecaoNaoFinalizada.recordcount#' eq 0 and '#rsVerifValidados.recordcount#' eq 0 and '#qInspecaoEmRevisao.recordcount#' eq 0 and #exibirSN# eq 'N')>         
           <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:690px">
             <tr class="noprint">
               <th colspan="5" valign="top" bordercolor="999999" bgcolor="" scope="row"><button type="button" onClick=" window.print();">Imprimir</button></th>
@@ -1274,11 +1312,8 @@ z-index:1000;visibility:hidden;position:absolute;" >
           <tr>
             <td colspan="5" valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
           </tr>
-    </table>
-        <cfif ('#semNCvalidado#' is false) and ('#emReavaliacaoReavaliado#' eq 0) and ('#rsSemNC.itemNC#' eq 0)>
-        <div align="center">
-		<input name="submit" type="submit" type="button" class="botao" onClick="if(confirm('Deseja validar esta Avaliação sem itens NÃO CONFORME?\n\nTodos os itens foram analisados?')){document.formPT.acao.value = 'validarSemNC';}" value="Validar Avaliação sem Itens Não Conforme"></div>
-      </cfif>		
+    </table>	
+    <input type="hidden" id="acao" name="acao" value="">      
   </form>
 </body>
 </html>

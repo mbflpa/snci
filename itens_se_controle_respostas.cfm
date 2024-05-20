@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
 
  <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False' )>
   <cfinclude template="aviso_sessao_encerrada.htm">
@@ -31,24 +31,24 @@
 
       <cfquery name="rsItem" datasource="#dsn_inspecao#">
        <cfif ckTipo eq "1">
-		SELECT INP_DtInicInspecao, pos_area, Pos_NumItem, Pos_Unidade, DATEDIFF(dd, Pos_DtPosic, GETDATE())
-		AS Quant, Und_Descricao, Und_TipoUnidade, Pos_Inspecao, Pos_NumGrupo, Pos_dtultatu, DATEDIFF(dd,Pos_DtPosic,GETDATE()) AS data,
-		Itn_Descricao, Grp_Descricao, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Rep_Codigo, Rep_Nome, RIP_NumInspecao, Pos_Parecer,
-		INP_DtInicInspecao, INP_DtFimInspecao, INP_DtEncerramento, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_DtPrev_Solucao
-		FROM Reops 
-		INNER JOIN Resultado_Inspecao 
-		INNER JOIN Grupos_Verificacao 
-		INNER JOIN Unidades 
-		INNER JOIN ParecerUnidade 
-		INNER JOIN Inspecao ON Pos_Unidade = INP_Unidade AND Pos_Inspecao = INP_NumInspecao 
-		ON Und_Codigo = Pos_Unidade 
-		ON Grp_Codigo = Pos_NumGrupo 
-		ON RIP_Unidade = Pos_Unidade AND RIP_NumInspecao = INP_NumInspecao AND RIP_NumInspecao = Pos_Inspecao AND RIP_NumGrupo = Pos_NumGrupo AND RIP_NumItem = Pos_NumItem 
-		ON Rep_Codigo = RIP_CodReop  
-		INNER JOIN Itens_Verificacao ON Itn_NumGrupo = Pos_NumGrupo AND Pos_NumItem = Itn_NumItem 
-		and right([Pos_Inspecao], 4) = Itn_Ano AND Itn_Ano = Grp_Ano and Itn_TipoUnidade = Und_TipoUnidade AND (INP_Modalidade = Itn_Modalidade)
-		INNER JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo
-		WHERE  pos_area='#qAcesso.Usu_Lotacao#' AND (pos_situacao_resp IN (8,22,23))
+          SELECT INP_DtInicInspecao, pos_area, Pos_NumItem, Pos_Unidade, DATEDIFF(dd, Pos_DtPosic, GETDATE())
+          AS Quant, Und_Descricao, Und_TipoUnidade, Pos_Inspecao, Pos_NumGrupo, Pos_dtultatu, DATEDIFF(dd,Pos_DtPosic,GETDATE()) AS data,
+          Itn_Descricao, Grp_Descricao, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Rep_Codigo, Rep_Nome, RIP_NumInspecao, Pos_Parecer,
+          INP_DtInicInspecao, INP_DtFimInspecao, INP_DtEncerramento, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_DtPrev_Solucao
+          FROM Reops 
+          INNER JOIN Resultado_Inspecao 
+          INNER JOIN Grupos_Verificacao 
+          INNER JOIN Unidades 
+          INNER JOIN ParecerUnidade 
+          INNER JOIN Inspecao ON Pos_Unidade = INP_Unidade AND Pos_Inspecao = INP_NumInspecao 
+          ON Und_Codigo = Pos_Unidade 
+          ON Grp_Codigo = Pos_NumGrupo 
+          ON RIP_Unidade = Pos_Unidade AND RIP_NumInspecao = INP_NumInspecao AND RIP_NumInspecao = Pos_Inspecao AND RIP_NumGrupo = Pos_NumGrupo AND RIP_NumItem = Pos_NumItem 
+          ON Rep_Codigo = RIP_CodReop  
+          INNER JOIN Itens_Verificacao ON Itn_NumGrupo = Pos_NumGrupo AND Pos_NumItem = Itn_NumItem 
+          and right([Pos_Inspecao], 4) = Itn_Ano AND Itn_Ano = Grp_Ano and Itn_TipoUnidade = Und_TipoUnidade AND (INP_Modalidade = Itn_Modalidade)
+          INNER JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo
+          WHERE  pos_area='#qAcesso.Usu_Lotacao#' AND (pos_situacao_resp IN (8,22,23))
 
        <cfelse>
          SELECT                       
@@ -98,7 +98,7 @@
 
          <cfif '#frmResp#' neq ''> 
            <cfswitch expression='#frmResp#'>
-             <cfcase value="N">WHERE (Pos_Area = '#qAcesso.Usu_Lotacao#' or Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (2,4,5,8,14,15,16,19,23) </cfcase>
+             <cfcase value="N">WHERE (Pos_Area = '#qAcesso.Usu_Lotacao#' or Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (1,6,7,17,22,2,4,5,8,20,14,15,16,18,19,23) </cfcase>
              <cfcase value="S">WHERE (Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (3)</cfcase>
              <cfcase value="A">WHERE (Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (24)</cfcase>
              <cfcase value="R">WHERE (Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (14,18,20,25,26,27) AND Unidades.Und_TipoUnidade=12</cfcase>
@@ -153,7 +153,7 @@
 		INNER JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo
         WHERE  pos_area='#qAcesso.Usu_Lotacao#' AND (pos_situacao_resp IN (8,23) )
 
-       <cfelse>
+    <cfelse>
          SELECT CASE WHEN INP_Modalidade = 0 then 'Fisica' else 'Remota' end as INPModal, RIP_ReincInspecao as RIPRInsp,
         convert(char, RIP_ReincGrupo) as RIPRGp, convert(char, RIP_ReincItem) as RIPRIt, Und_CodDiretoria, Pos_Unidade,
         Und_Descricao, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, RIP_Ano, RIP_Resposta,
@@ -187,7 +187,7 @@
              ON ParecerUnidade.Pos_Situacao_Resp = Situacao_Ponto.STO_Codigo
         <cfif '#frmResp#' neq ''> 
           <cfswitch expression='#frmResp#'>
-             <cfcase value="N">WHERE (Pos_Area = '#qAcesso.Usu_Lotacao#' or Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (2,4,5,8,14,15,16,19,23) </cfcase>
+             <cfcase value="N">WHERE (Pos_Area = '#qAcesso.Usu_Lotacao#' or Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (1,6,7,17,22,2,4,5,8,20,14,15,16,18,19,23) </cfcase>
              <cfcase value="S">WHERE (Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (3) </cfcase>
              <cfcase value="A">WHERE (Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (24) </cfcase>
              <cfcase value="R">WHERE (Unidades.Und_CodDiretoria = '#qAcesso.Usu_DR#') AND pos_situacao_resp in (14,18,20,25,26,27) AND Unidades.Und_TipoUnidade=12 </cfcase>
@@ -430,7 +430,7 @@
                                   <tr bgcolor="f7f7f7">
                                     <td width="5%" bgcolor="#STO_Cor#">
                                       <div align="center"><a <cfif ckTipo eq 2>target="_blank"</cfif>
-                                          href="itens_se_controle_respostas1.cfm?cktipo=#URL.ckTipo#&Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&DGrup=#rsItem.Grp_Descricao#&Nitem=#rsItem.Pos_NumItem#&Desc=#rsItem.Itn_Descricao#&Situacao=#rsItem.Pos_Situacao_Resp#&areaSubordinados=#rsItem.Pos_Area#&diasdecor=#data#"
+                                          href="itens_se_controle_respostas1.cfm?cktipo=#URL.ckTipo#&Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&DGrup=&Nitem=#rsItem.Pos_NumItem#&Desc=&Situacao=#rsItem.Pos_Situacao_Resp#&areaSubordinados=#rsItem.Pos_Area#&diasdecor=#data#"
                                           class="exibir" onMouseMove="Hint('#STO_Sigla#',2)"
                                           onMouseOut="Hint('#STO_Sigla#',1)"><strong>#trim(STO_Descricao)#</strong></a>
                                       </div>

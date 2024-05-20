@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfquery name="qAtualiza" datasource="#dsn_inspecao#">
 UPDATE Funcionarios SET Fun_Nome = '#uCase(form.txtNome)#', Fun_DR = '#form.dr#', Fun_Status = '#form.Status#', Fun_Lotacao = '#uCase(form.Lotacao)#', Fun_DTUltAtu = convert(char, getdate(), 120), Fun_Email = '#form.Email#'
 WHERE Fun_matric = '#Replace(Replace(Form.matricula,'.','','all'),'-','','all')#'
@@ -18,7 +18,7 @@ WHERE Fun_matric = '#Replace(Replace(Form.matricula,'.','','all'),'-','','all')#
 <br><br>
 <tr><table width="90%">
 <tr>
-  <td align="center"><span class="red_titulo">Caro Usu&aacute;rio, sua opera&ccedil;&atilde;o de altera&ccedil;&atilde;o foi realizada com sucesso!!! </span></td>
+  <td align="center"><span class="red_titulo">Caro Usuário, sua operação de alteração foi realizada com sucesso!!! </span></td>
 </tr>
 <tr>
   <td align="center">&nbsp;</td>

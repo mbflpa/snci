@@ -1,10 +1,11 @@
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
 </cfif>
 <html>
    <head>
-      <title>Sistema de Acompanhamento das Respostas das Inspeções</title>
+      <title>Sistema de Acompanhamento das Respostas das InspeÃ§Ãµes</title>
       <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
    </head>
 

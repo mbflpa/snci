@@ -42,9 +42,8 @@
 
 <!---
  <cfoutput>aux_ano:#aux_ano#  === aux_mes:#aux_mes#</cfoutput><BR> 
-<cfset gil = gil> 
+ <CFSET GIL = GIL>  
 --->
-
 <cfif aux_mes is 1>
     <cfset dtlimit = aux_ano & "/01/31">
 <cfelseif aux_mes is 2>  
@@ -106,15 +105,11 @@ function valida_form() {
 	}	
 	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	frm.anoexerc.value = frm.frmano.value;
-	 
-	var auxdt = frm.dtlimit.value; 
-	if (frm.frmano.value < 2023) {
-		frm.dtlimit.value = frm.frmano.value + auxdt.substring(4,10);
-	}	
+	frm.dtlimit.value = frm.dtlimitatual.value;
 	if (frm.frmano.value < frm.anoatual.value)
 	{
 	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
-	//frm.dtlimit.value = frm.frmano.value + '/12/31';
+	frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 
 
 }

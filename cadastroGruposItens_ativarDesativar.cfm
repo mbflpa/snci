@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfsetting requesttimeout="500">
 
 <!--- 	<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>

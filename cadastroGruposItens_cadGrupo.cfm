@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -33,7 +34,7 @@
             <cfset numGrupo = '1'> 
         </cfif>
         <cfset gpDesc = '#Ucase(form.cadGrupoDescricao)#'>
-        <cfset orientacao ="Vide orientaÁıes em cada item do grupo (opÁ„o do Sistema - Ajuda a Coment·rio do Item)">
+        <cfset orientacao ="Vide orienta√ß√µes em cada item do grupo (op√ß√£o do Sistema - Ajuda a Coment√°rio do Item)">
         <cfquery datasource="#dsn_inspecao#">
             INSERT INTO Grupos_Verificacao VALUES('#numGrupo#','#gpDesc#','#orientacao#'
                                                 ,'D', CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#'
@@ -50,7 +51,7 @@
         <cfset anoGrupo = '#rsGrupoCadastrado.Grp_Ano#'>
     <cfelse>
       <script>
-        alert('J· existe um grupo cadastrado com a mesma DescriÁ„o e Ano.\n\nEsta aÁ„o foi cancelada.');
+        alert('J√° existe um grupo cadastrado com a mesma Descri√ß√£o e Ano.\n\nEsta a√ß√£o foi cancelada.');
       </script>
     </cfif> 
 
@@ -84,12 +85,12 @@
             
             var frm = document.getElementById('formCadGrupo');
             if (frm.selCadGrupoAno.value == '') {
-				alert('Informe o ano que este grupo ser· utilizado!');
+				alert('Informe o ano que este grupo ser√° utilizado!');
 				frm.selCadGrupoAno.focus();
 				return false;
 			}
             if (frm.cadGrupoDescricao.value == '') {
-				alert('Informe a DescriÁ„o do Grupo!');
+				alert('Informe a Descri√ß√£o do Grupo!');
 				frm.cadGrupoDescricao.focus();
 				return false;
 			}
@@ -129,14 +130,14 @@
 						</select>		
 					</div>
 					<div style="margin-bottom:10px;">
-						<label  for="cadGrupoDescricao" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">DESCRI«√O:</label>	
+						<label  for="cadGrupoDescricao" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">DESCRI√á√ÉO:</label>	
 						<br>
                         <textarea  name="cadGrupoDescricao"  id="cadGrupoDescricao" style="background:#fff;text-transform: uppercase" cols="50" rows="2" wrap="VIRTUAL" class="form" style="font-family:Verdana, Arial, Helvetica, sans-serif"></textarea>		
 					</div>	
              	
                     <div align="center">
 						<a type="button" onclick="return valida_formCadGrupo()" href="#" class="botaoCad" style="background:blue;color:#fff;font-size:12px">Cadastrar</a>     
-                         <a type="button" onclick="javascript:if(confirm('Deseja cancelar este cadastro?\n\nObs: Esta aÁ„o n„o cancela cadastros j· confirmados.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
+                         <a type="button" onclick="javascript:if(confirm('Deseja cancelar este cadastro?\n\nObs: Esta a√ß√£o n√£o cancela cadastros j√° confirmados.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
                                     Cancelar</a>
                     </div>    
                 
@@ -147,13 +148,13 @@
 								<span class="tituloDivCadGrupo" >Grupo Cadastrado</span>
 						</div>
                         <div >
-                            <span >CÛd. do Grupo: <cfoutput><strong>#numGrupo#</strong></cfoutput></span>
+                            <span >C√≥d. do Grupo: <cfoutput><strong>#numGrupo#</strong></cfoutput></span>
                             <br><br>
                             <span >Ano: <cfoutput><strong>#anoGrupo#</strong></cfoutput></span>	
-                            <span style="margin-left:20px">SituaÁ„o: <cfoutput><strong><cfif #sitGrupo# eq 'D'>Desativado<cfelse>Ativo</cfif></strong></cfoutput></span>	
+                            <span style="margin-left:20px">Situa√ß√£o: <cfoutput><strong><cfif #sitGrupo# eq 'D'>Desativado<cfelse>Ativo</cfif></strong></cfoutput></span>	
                         </div>
                         <div style="margin-bottom:10px;">
-                            <label  for="cadGrupoDescricao2" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">DESCRI«√O:</label>	
+                            <label  for="cadGrupoDescricao2" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">DESCRI√á√ÉO:</label>	
                             <br>
                             <textarea readonly  name="cadGrupoDescricao2"   id="cadGrupoDescricao2" style="background:#fff;" cols="50" rows="2" wrap="VIRTUAL" class="form" 
                             style="font-family:Verdana, Arial, Helvetica, sans-serif;"><cfoutput>#descGrupo#</cfoutput></textarea>		
@@ -163,8 +164,6 @@
                     </div>
                 </cfif>
             </form>
-
-
         </div>
     </body>
 </html>

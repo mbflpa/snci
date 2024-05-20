@@ -49,10 +49,14 @@
 <!--- 	<cfoutput>#Arguments.sapelido_usu#</cfoutput> --->
 	
 <cfif #form.sacao# is "inc">
+    <cfset Arguments.slogin = Arguments.sdominio & "\" &  Replace(Replace(auxMatrInsp,'.','','all'),'-','','all')>
+	<cfset INCSN = "S">
 
-     <cfset Arguments.slogin = Arguments.sdominio & "\" &  Replace(Replace(auxMatrInsp,'.','','all'),'-','','all')>
-	 <cfset INCSN = "S">
-   	 <cfquery name="rsExiste" datasource="DBSNCI">
+	<cfquery datasource="DBSNCI">
+     DELETE FROM Usuarios WHERE Usu_Login = '#Arguments.slogin#'
+    </cfquery>
+
+   	<cfquery name="rsExiste" datasource="DBSNCI">
      Select Usu_Login, Usu_LotacaoNome FROM Usuarios WHERE Usu_Login = '#Arguments.slogin#' 
     </cfquery>
 	<cfif rsExiste.recordcount gt 0>
@@ -122,7 +126,7 @@
 			  '#qDepto.Dep_Descricao#'
 			<cfelseif Arguments.sarea_usu EQ "SUPERINTENDENTE">
 				<cfquery name="qSuper" datasource="DBSNCI">
-				SELECT Dir_Descricao FROM Diretoria WHERE Dir_Status = 'A' and (Dir_Codigo = '#Arguments.slotacao#')
+				SELECT Dir_Descricao FROM Diretoria WHERE (Dir_Sto = '#Arguments.slotacao#')
 				</cfquery>
 			  '#qSuper.Dir_Descricao#'
 		   </cfif>

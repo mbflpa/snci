@@ -130,7 +130,7 @@ function valida_form() {
 	if (frm.frmano.value < frm.anoatual.value)
 	{
 	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
-	//frm.dtlimit.value = frm.frmano.value + '/12/31';
+	frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 
 //alert(frm.anoatual.value + '  ' + frm.frmano.value + '  ' + frm.dtlimit.value);
 
@@ -217,7 +217,7 @@ function mudar(a){
           <td width="23%"><strong><span class="exibir">Superintend&ecirc;ncia :</span></strong> </td>
           <td width="76%" colspan="3">
 		  <!---  --->
-		   <cfif grpacesso eq 'GESTORMASTER'  OR grpacesso eq 'GOVERNANCA'>
+		   <cfif grpacesso eq 'GESTORMASTER' OR grpacesso eq 'GOVERNANCA'>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where dir_codigo <> '01'
 			</cfquery>

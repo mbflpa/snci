@@ -65,14 +65,15 @@
 
 
 <!--- =========================== --->
-<cfset auxsit = '0,1,2,4,5,6,7,8,10,11,14,15,16,17,18,19,20,21,22,23,28,30'>
+<cfset auxsit = '1,2,4,5,6,7,8,10,14,15,16,17,18,19,20,21,22,23,28,30'>
 <cfif ucase(trim(qUsu.Usu_GrupoAcesso)) eq 'GOVERNANCA'>
 	<cfset auxsit = '1,2,4,5,6,7,8,10,14,15,16,17,18,19,20,22,23,28,30'>
 </cfif>
 
 <cfquery name="rsStatus" datasource="#dsn_inspecao#">
   SELECT STO_Codigo, STO_Sigla, STO_Descricao
-  FROM Situacao_Ponto where (STO_Status = 'A') and STO_Codigo in (<cfoutput>#auxsit#</cfoutput>)
+  FROM Situacao_Ponto 
+  where (STO_Status = 'A') and STO_Codigo in (<cfoutput>#auxsit#</cfoutput>)
   <cfif grpacesso eq 'GESTORMASTER'>
 	or STO_Codigo = 9
   </cfif>

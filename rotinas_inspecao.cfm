@@ -410,15 +410,10 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	  <cfset snci.permitir = True>
 	  <cfset Session.vPermissao = True>
     </cfif>
-	<cfif ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Coordenador,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login))>
-	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('snci_processos/index.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/relogio.png" width="90" height="90" border="0" /></a></div>	  </tr>
-	  <cfset snci.permitir = True>
-	  <cfset Session.vPermissao = True>
-    </cfif>
 
  	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Reop,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(snci.login))>
-		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('Rel_indicadoresglobal_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Metas.png" width="200" height="90" border="0" /></a></div>
-	    <!--- <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('metas_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Metas.png" width="200" height="90" border="0" /></a></div> --->
+	<!--- 	<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('Rel_indicadoresglobal_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Metas.png" width="200" height="90" border="0" /></a></div> --->
+	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('metas_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Metas.png" width="200" height="90" border="0" /></a></div> 
 
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
@@ -441,9 +436,8 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	
 	<cfif ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
 
-       <div class="icones" width="10%" colspan="2" align="center">
-    <a href="#"><img onClick="window.open('index.cfm','_blank')" src="icones/GA_analistas.jpg" width="200" height="90" border="0" /></a>
-</div>
+        <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('index.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/GA_analistas.jpg" width="200" height="90" border="0" /></a></div>
+
 	  	<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>

@@ -1,4 +1,4 @@
-
+<cfprocessingdirective pageEncoding ="utf-8"> 
 <cfquery name="qVisualiza" datasource="#dsn_inspecao#">
   SELECT Fun_Matric, Fun_Nome, Fun_DR, Fun_Status, Fun_Lotacao, Fun_Email  
   FROM Funcionarios
@@ -43,7 +43,7 @@ function validarform(){
 	var auxmatric = document.alterar_dados_funcionario.matricula.value;
 	if (auxmatric.length != 11)
 	{
-		alert('Informar a matr�cula com 8 d�gitos ex. X.XXX.XXX-X');
+		alert('Informar a matrícula com 8 dígitos ex. X.XXX.XXX-X');
 		return false;
 	}
 	var auxnome = document.alterar_dados_funcionario.txtnome.value;
@@ -61,7 +61,7 @@ function validarform(){
 	
 	if (document.alterar_dados_funcionario.Lotacao.value == '')
 	{
-		alert('Informar a Lota��o');
+		alert('Informar a Lotação');
 		return false;
 	}	
 	
@@ -109,7 +109,8 @@ body {
 }
 -->
 </style>
-<body onLoad="<cfoutput>#evento#</cfoutput>" text="#FFFFFF" link="#FFFFFF" vlink="#FFFFFF" alink="#FFFFFF" class="link1">
+<body onLoad="" text="#FFFFFF" link="#FFFFFF" vlink="#FFFFFF" alink="#FFFFFF" class="link1">
+<!--- <body onLoad="<cfoutput>#evento#</cfoutput>" text="#FFFFFF" link="#FFFFFF" vlink="#FFFFFF" alink="#FFFFFF" class="link1"> --->
 <div align="center"></div>
 <TABLE width="780" border="0" cellpadding="0" cellspacing="0" class="exibir">
   <tr align="center" valign="top">
@@ -117,7 +118,7 @@ body {
     <td width="80%" align="left" valign="top" class="link1 style5">&nbsp;</td>
   </tr>
   <tr valign="top">
-    <td height="19" align="left" valign="bottom" class="link1">&nbsp;&nbsp;<a href="principal.cfm" class="link1">P&aacute;gina Inicial</a></td>
+    <td height="19" align="left" valign="bottom" class="link1">&nbsp;&nbsp;<a href="principal.cfm" class="link1">Página Inicial</a></td>
   </tr>
   <tr valign="top">
     <td rowspan="2" class="link1">
@@ -129,7 +130,7 @@ body {
 
  <table width="100%"  border="0" class="exibir">
   <tr>
-    <td colspan="4"><div align="center" class="titulo1">Funcion&Aacute;rio</div></td>
+    <td colspan="4"><div align="center" class="titulo1">Funcionário</div></td>
   </tr>
 
 <form method="post" name="alterar_dados_funcionario" onSubmit="return validarform()" action="alterar_funcionario_acao.cfm"> 
@@ -144,7 +145,7 @@ body {
     <tr>
 	     <cfset mat = qVisualiza.Fun_Matric>
 		 <cfset matricula = Left(mat,1) & '.' & Mid(mat,2,3) & '.' & Mid(mat,5,3) & '-' & Right(mat,1)>        
-      <td class="style3"><label><strong>Matr&iacute;cula:</strong></label>&nbsp;</td>
+      <td class="style3"><label><strong>Matrícula:</strong></label>&nbsp;</td>
       <td><input name="matricula" type="text" class="form" value="<cfoutput>#matricula#</cfoutput>" size="14" maxlength="11" readonly="yes";></td>
     </tr>
     <tr>
@@ -166,7 +167,7 @@ body {
 	</tr>
 	<tr>
 	  <td><span class="style3">
-	    <label><strong>Situa&ccedil;&atilde;o:</strong></label>
+	    <label><strong>Situação:</strong></label>
 	  </span></td>	
 	  <td><select name="status" class="form">
              <cfset vStatus = qVisualiza.Fun_Status>
@@ -179,7 +180,7 @@ body {
 	</tr>
 	<tr>
 	  <td><span class="style3">
-	    <label><strong>Lota&ccedil;&atilde;o:</strong></label>
+	    <label><strong>Lotação:</strong></label>
       </span></td>
 	  <td><input name="Lotacao" type="text" class="form"  size="32"  maxlength="30" value="<cfoutput>#trim(qVisualiza.Fun_Lotacao)#</cfoutput>"></td>
 	</tr>

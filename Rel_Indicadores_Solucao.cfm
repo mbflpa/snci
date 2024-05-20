@@ -94,7 +94,7 @@
 		<cfquery name="rsSLNC" datasource="#dsn_inspecao#">
 			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
 			FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-			WHERE (((Pos_Situacao_Resp) In (2,4,5,8,15,16,19,23)) AND ((Und_TipoUnidade)<>12 And (Und_TipoUnidade)<>16)) 
+			WHERE (((Pos_Situacao_Resp) In (2,4,5,8,15,16,19,23)) AND ((Und_TipoUnidade)<>12 And (Und_TipoUnidade)<>16)) and Pos_Mes = #month(dtfim)#
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 		</cfquery>
 
@@ -151,7 +151,7 @@
 		<cfquery name="rs3SO" datasource="#dsn_inspecao#">
 			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes,Und_CodDiretoria
 			FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-			WHERE Pos_Situacao_Resp = 3
+			WHERE Pos_Situacao_Resp = 3 and Pos_Mes = #month(dtfim)#
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 		</cfquery>
 

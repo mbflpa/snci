@@ -18,7 +18,39 @@
 		select Usu_GrupoAcesso, Usu_Matricula from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 	</cfquery>
   <cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
-
+<cfif grpacesso neq 'GESTORMASTER'>
+	<cfset aux_mes = month(dtlimit)>
+	<cfset aux_ano = year(dtlimit)>
+	<cfif aux_mes is 1>
+		<cfset dtlimit = (aux_ano - 1) & "/12/31">
+	<cfelseif aux_mes is 2>
+		<cfset dtlimit = aux_ano  & "/01/31">		
+	<cfelseif aux_mes is 3>  
+		<cfif int(aux_ano) mod 4 is 0>
+			<cfset dtlimit = aux_ano & "/02/29">
+		<cfelse>
+			<cfset dtlimit = aux_ano & "/02/28">
+		</cfif>
+	<cfelseif aux_mes is 4>
+		<cfset dtlimit = aux_ano & "/03/31">
+	<cfelseif aux_mes is 5>
+		<cfset dtlimit = aux_ano & "/04/30">		
+	<cfelseif aux_mes is 6>
+		<cfset dtlimit = aux_ano & "/05/31">		
+	<cfelseif aux_mes is 7>
+		<cfset dtlimit = aux_ano & "/06/30">					   
+	<cfelseif aux_mes is 8>
+		<cfset dtlimit = aux_ano & "/07/31">					   
+	<cfelseif aux_mes is 9>
+		<cfset dtlimit = aux_ano & "/08/31">					   
+	<cfelseif aux_mes is 10>
+		<cfset dtlimit = aux_ano & "/09/30">					   
+	<cfelseif aux_mes is 11>
+		<cfset dtlimit = aux_ano & "/10/31">	
+	<cfelseif aux_mes is 12>	
+		<cfset dtlimit = aux_ano & "/11/30">	   				   			   
+	</cfif>
+</cfif>
 	<cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 <!---
   <cfoutput>#se#  === #anoexerc#  === #dtlimit#<br></cfoutput>

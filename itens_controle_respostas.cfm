@@ -121,11 +121,11 @@
 	ON STO_Codigo = Pos_Situacao_Resp
 	WHERE 
 	<cfif grpacesso eq 'GESTORMASTER'>
-		(Pos_Situacao_Resp not in (3,10,12,13,24,25,26,27,31,51)) 
+		(Pos_Situacao_Resp not in (0,3,10,11,12,13,24,25,26,27,31,51)) 
 	<cfelseif grpacesso eq 'GOVERNANCA'>
 		(Pos_Situacao_Resp not in (0,3,10,11,12,13,21,24,25,26,27,31,51))
 	<cfelse>
-		(Pos_Situacao_Resp not in (3,9,10,12,13,24,25,26,27,31,51))
+		(Pos_Situacao_Resp not in (0,3,9,10,11,12,13,24,25,26,27,31,51))
     </cfif>	
 	 AND (INP_NumInspecao = '#txtNum_Inspecao#')
 	<!--- AND 1 = CASE WHEN Pos_Situacao_Resp IN (1,6,7,22) THEN 0 ELSE 1 END  --->	
@@ -156,11 +156,11 @@
 	ON STO_Codigo = Pos_Situacao_Resp
 	WHERE
 	<cfif grpacesso eq 'GESTORMASTER'>
-		(Pos_Situacao_Resp not in (3,10,12,13,24,25,26,27,31,51)) 
+		(Pos_Situacao_Resp not in (0,3,10,11,12,13,24,25,26,27,31,51)) 
 	<cfelseif grpacesso eq 'GOVERNANCA'>
 		(Pos_Situacao_Resp not in (0,3,10,11,12,13,21,24,25,26,27,31,51) 
 	<cfelse>
-		(Pos_Situacao_Resp not in (3,9,10,12,13,24,25,26,27,31,51)) 
+		(Pos_Situacao_Resp not in (0,3,9,10,11,12,13,24,25,26,27,31,51)) 
     </cfif>	
    </cfquery>
  </cfif> 
@@ -243,11 +243,11 @@
 	ON STO_Codigo = Pos_Situacao_Resp
 	WHERE 
 	<cfif grpacesso eq 'GESTORMASTER'>
-		(Pos_Situacao_Resp not in (3,12,13,24,25,26,27,29,31,51) 
+		(Pos_Situacao_Resp not in (0,3,11,12,13,24,25,26,27,29,31,51) 
 	<cfelseif grpacesso eq 'GOVERNANCA'>
 		(Pos_Situacao_Resp not in (0,3,11,12,13,21,24,25,26,27,29,31,51) 	
 	<cfelse>
-		(Pos_Situacao_Resp not in (3,9,12,13,24,25,26,27,29,31,51)
+		(Pos_Situacao_Resp not in (0,3,9,11,12,13,24,25,26,27,29,31,51)
     </cfif>	
 	
 	<!---  AND 1 = CASE WHEN Pos_Situacao_Resp IN (1,6,7,22) THEN 0 ELSE 1 END    --->
@@ -357,11 +357,11 @@
 	AND (Pos_Inspecao = RIP_NumInspecao) AND (Pos_Unidade = RIP_Unidade)
 	WHERE 
     <cfif grpacesso eq 'GESTORMASTER'>
-		(Pos_Situacao_Resp not in (3,12,13,24,25,26,27,29,31,51) 
+		(Pos_Situacao_Resp not in (0,3,11,12,13,24,25,26,27,29,31,51) 
 	<cfelseif grpacesso eq 'GOVERNANCA'>
 		(Pos_Situacao_Resp not in (0,3,11,12,13,21,24,25,26,27,29,31,51) 	
 	<cfelse>
-		(Pos_Situacao_Resp not in (3,9,12,13,24,25,26,27,29,31,51) 
+		(Pos_Situacao_Resp not in (0,3,9,11,12,13,24,25,26,27,29,31,51) 
     </cfif>	
 	
 	 <!--- AND 1 = CASE WHEN Pos_Situacao_Resp IN (1,6,7,22) THEN 0 ELSE 1 END    --->

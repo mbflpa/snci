@@ -18,6 +18,39 @@
 SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 <cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
+<cfif grpacesso neq 'GESTORMASTER'>
+	<cfset aux_mes = month(dtlimit)>
+	<cfset aux_ano = year(dtlimit)>
+	<cfif aux_mes is 1>
+		<cfset dtlimit = (aux_ano - 1) & "/12/31">
+	<cfelseif aux_mes is 2>
+		<cfset dtlimit = aux_ano  & "/01/31">		
+	<cfelseif aux_mes is 3>  
+		<cfif int(aux_ano) mod 4 is 0>
+			<cfset dtlimit = aux_ano & "/02/29">
+		<cfelse>
+			<cfset dtlimit = aux_ano & "/02/28">
+		</cfif>
+	<cfelseif aux_mes is 4>
+		<cfset dtlimit = aux_ano & "/03/31">
+	<cfelseif aux_mes is 5>
+		<cfset dtlimit = aux_ano & "/04/30">		
+	<cfelseif aux_mes is 6>
+		<cfset dtlimit = aux_ano & "/05/31">		
+	<cfelseif aux_mes is 7>
+		<cfset dtlimit = aux_ano & "/06/30">					   
+	<cfelseif aux_mes is 8>
+		<cfset dtlimit = aux_ano & "/07/31">					   
+	<cfelseif aux_mes is 9>
+		<cfset dtlimit = aux_ano & "/08/31">					   
+	<cfelseif aux_mes is 10>
+		<cfset dtlimit = aux_ano & "/09/30">					   
+	<cfelseif aux_mes is 11>
+		<cfset dtlimit = aux_ano & "/10/31">	
+	<cfelseif aux_mes is 12>	
+		<cfset dtlimit = aux_ano & "/11/30">	   				   			   
+	</cfif>
+</cfif>
 <cfquery name="qSE" datasource="#dsn_inspecao#">
 	SELECT Dir_Codigo, Dir_Descricao
 	FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR
@@ -103,7 +136,8 @@ SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<c
   <cfset COLA = '(' & #colaslncacum# & ' * 0.25) + (' & #colaprciacum# & ' * 0.75) = ' & #colaresultacum#>
   <cfset COLB = '(' & #SLNC# & ' * 0.25) + (' & #numberFormat(PRCI,999.0)# & ' * 0.75) = ' & #MetaPer# & '%'>
 <cfelse>
-  <cfset Result_Acum = numberFormat((rsMetas.Met_SLNC_Acum * 0.45) + (rsMetas.Met_PRCI_Acum * 0.55),999.0)>
+  <!--- <cfset Result_Acum = numberFormat((rsMetas.Met_SLNC_Acum * 0.45) + (rsMetas.Met_PRCI_Acum * 0.55),999.0)> --->
+  <cfset Result_Acum = rsMetas.Met_DGCI_Acum>
   <cfset colaslncacum = numberFormat(rsMetas.Met_SLNC_Acum,999.0)>
   <cfset colaprciacum = numberFormat(rsMetas.Met_PRCI_Acum,999.0)>
   <cfset colaresultacum = numberFormat(Result_Acum,999.0)>
@@ -321,8 +355,8 @@ function Hint(objNome, action){
             <td colspan="12"><div align="center"><strong>Resultado do mês: <cfoutput>#mes#</cfoutput></strong></div></td>
           </tr>
           <tr bgcolor="#FFFFFF" class="exibir">
-            <td width="213" colspan="9"><p align="center"><strong>DGCI</strong></p></td>
             <td width="189"><div align="center"><strong>Meta Mensal</strong> </div></td>
+            <td width="213" colspan="9"><p align="center"><strong>DGCI</strong></p></td>            
             <td width="157"><div align="center"><strong>Resultado</strong></div></td>
           </tr>
 		  <cfset auxcor = "##FF3300">
@@ -338,27 +372,26 @@ function Hint(objNome, action){
 			</cfif>
 
           <tr>
+            <td class="exibir"><div align="center" class="exibir" onMouseMove="Hint('RA',2)" onMouseOut="Hint('RA',1)"><strong><cfoutput>#MetDGCIMesAntes#</cfoutput></strong></div></td>
             <td colspan="9" class="exibir"><div align="center" class="exibir" onMouseMove="Hint('PA',2)" onMouseOut="Hint('PA',1)"><strong><cfoutput>#Result_Acum#</cfoutput></strong></div></td>
-            <td class="exibir"><div align="center" class="exibir" onMouseMove="Hint('RA',2)" onMouseOut="Hint('RA',1)"><strong><cfoutput>#MetDGCIMesAntes#</cfoutput>%</strong></div></td>
 			      <td bgcolor="<cfoutput>#auxcor#</cfoutput>" class="exibir"><div align="center"><strong><cfoutput>#resultado#</cfoutput></strong></div></td>
           </tr>
            <tr>
             <td colspan="12" class="form">
-            <cfif year(dtlimit) lte 2024>
+            <cfif year(dtlimit) lt 2024>
 		          <strong class="exibir"> (*) DGCI = (SLNC*0,25) + (PRCI*0,75)</strong>  
             <cfelse>
               <strong class="exibir"> (*) DGCI = (SLNC*0,45) + (PRCI*0,55)</strong>   
             </cfif> 
             </td>
           </tr>
-<cfif frmano eq anoatual>
+  <cfif (frmano eq anoatual) and (aux_mes eq month(now()))>
           <cfset dtini = dateformat(now(),"DD/MM/YYYY")>
           <cfset dtini = '01' & right(dtini,8)>
           <cfset dtfim = now()>
           <cfset dtfim = DateAdd( "d", -1, dtfim)> 
-
           <tr class="exibir">
-   <cfoutput><td colspan="12" class="exibir"><strong>#mes#&nbsp;&nbsp;&nbsp;Período de  #dtini#  até  #dateformat(dtfim,"DD/MM/YYYY")#</strong></td></cfoutput>
+   <cfoutput><td colspan="12" class="exibir"><strong>#mes#&nbsp;&nbsp;&nbsp;(Período de  #dtini#  até  #dateformat(dtfim,"DD/MM/YYYY")#)</strong></td></cfoutput>
           </tr>    
 </cfif>                         
         </table>		

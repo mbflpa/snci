@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="permissao_negada.htm">
 	<cfabort>

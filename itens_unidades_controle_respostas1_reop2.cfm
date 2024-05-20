@@ -29,17 +29,23 @@
   RIP_NumItem, 
   RIP_Comentario, 
   RIP_Recomendacoes, 
+  RIP_Valor, 
+  RIP_Caractvlr, 
+  RIP_Falta, 
+  RIP_Sobra, 
+  RIP_EmRisco,
+  RIP_ReincInspecao, 
+  RIP_ReincGrupo, 
+  RIP_ReincItem,  
   INP_DtInicInspecao, 
   INP_Responsavel, 
   Rep_Codigo, 
-  RIP_Valor, 
   Itn_Descricao,
-  Itn_TipoUnidade, 
+  Itn_TipoUnidade,
+  Itn_ImpactarTipos, 
+  Itn_PTC_Seq,
   INP_DtEncerramento, 
   Grp_Descricao,
-  RIP_ReincInspecao, 
-  RIP_ReincGrupo, 
-  RIP_ReincItem,
   TNC_ClassifInicio, 
   TNC_ClassifAtual  
   FROM Reops 
@@ -250,11 +256,23 @@ FROM  Inspecao
   FROM ParecerUnidade
   WHERE Pos_Unidade='#unid#' AND Pos_Inspecao='#ninsp#' AND Pos_NumGrupo=#ngrup# AND Pos_NumItem=#nitem#
 </cfquery>
-<cfquery name="rsMod" datasource="#dsn_inspecao#">
-	SELECT Und_Descricao, Und_CodReop, Und_Codigo, Und_Centraliza, Und_CodDiretoria, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
-	FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
-	WHERE Und_Codigo = '#url.unid#'
-</cfquery>
+<cfif left(ninsp,2) eq left(trim(qUsuario.Usu_Lotacao),2)>
+	<cfquery name="rsMod" datasource="#dsn_inspecao#">
+	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
+	  FROM Unidades INNER JOIN Diretoria ON Unidades.Und_CodDiretoria = Diretoria.Dir_Codigo
+	  WHERE Und_Codigo = '#URL.Unid#'
+	</cfquery>
+	<cfset auxposarea = rsMod.Und_Codigo>
+	<cfset auxnomearea = rsMod.Und_Descricao>
+<cfelse> 
+	<cfquery name="rsMod" datasource="#dsn_inspecao#">
+	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
+	  FROM Unidades INNER JOIN Diretoria ON Unidades.Und_CodDiretoria = Diretoria.Dir_Codigo
+	  WHERE Und_Codigo = '#URL.posarea#'
+	</cfquery>
+	<cfset auxposarea = rsMod.Und_Codigo>
+	<cfset auxnomearea = rsMod.Und_Descricao>	
+</cfif> 
 <cfset strIDGestor = #URL.Unid#>
  <cfset strNomeGestor = #rsMod.Und_Descricao#>
  <cfset Gestor = '#rsMod.Und_Descricao#'>
@@ -362,48 +380,47 @@ FROM  Inspecao
 		</cfquery>
  		<!--- Inserindo dados dados na tabela Andamento --->
 		<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'À ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
-		<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
-		<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
-		<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>		
+		<cfset hhmhss = timeFormat(now(), "HH:MM:ss")>
+		<cfset hhmhss = Replace(hhmhss,':','',"All")>
+		<cfset hhmhss = Replace(hhmhss,'.','',"All")> 	
 		<cfquery datasource="#dsn_inspecao#">
 			insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) 
-			values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#strIDGestor#', '#hhmmssdc#', '#and_obs#')
+			values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', convert(char, getdate(), 102), '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#strIDGestor#', '#hhmhss#', '#and_obs#')
 	 	</cfquery> 
- 		<!----Condição para classificação do Item para ENCERRADO------------>
+		<cfif form.encerrarSN eq 'S'>
+<!---		
+			<cfquery name="rsObserv" datasource="#dsn_inspecao#">
+				SELECT Pos_Parecer, Pos_Situacao_Resp
+				FROM ParecerUnidade 
+				WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
+			</cfquery>
+			<cfset pos_aux = trim(rsObserv.Pos_Parecer) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM')  & '> ' & 'Opinião do Controle Interno' & CHR(13) & CHR(13) & 'À(O) ' & #rsItem.Und_Descricao# & CHR(13) & CHR(13) & 'Conforme decisão do Departamento de Controle Interno (DCINT/SUGOV/DIGOE), a partir de 05/03/2024, deixarão de ser acompanhadas pelo órgão de controle a ' & CHR(13) & 'regularização das Não Conformidades identificadas nas Avaliações de Controle realizadas nas unidades operacionais, que não apresentem Impacto Financeiro Direto,' & CHR(13) & 'bem como aquelas que apresentem Impacto Financeiro Direto mas que tenham valor envolvido abaixo da função de quebra de caixa.' & CHR(13) & CHR(13) & 'Tal decisão não exime os órgãos responsáveis da regularização da situação registrada pelo Controle Interno, inclusive quanto ao recolhimento aos cofres da Empresa dos valores devidos.' & CHR(13) & CHR(13) & 'Situação: ENCERRADO' & CHR(13) & CHR(13) &  'Responsável: DCINT/SUGOV/DIGOE ' & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 		
-		<cfif (Form.frmResp eq 6 or Form.frmResp eq 7) and (rsItem.Und_TipoUnidade neq 12 and rsItem.Und_TipoUnidade neq 16)>
-
-			<cfif ucase(Form.PosClassificacaoPonto) eq 'LEVE'>
-
-				<cfquery name="rsObserv" datasource="#dsn_inspecao#">
-					SELECT Pos_Parecer
-					FROM ParecerUnidade 
-					WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
-				</cfquery>
-<cfset pos_aux = trim(rsObserv.Pos_Parecer) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> Opinião do Controle Interno' & CHR(13) & CHR(13) & 'À(O) CS/DIGOV/DCINT' & CHR(13) & CHR(13) & '   A partir da adoção de metodologia que classifica os itens avaliados como Não Conformes em GRAVE, MEDIANO ou LEVE, foi estabelecido pelo Departamento de Controle Interno (DCINT) que o acompanhamento da' & CHR(13) & 'regularização será realizado pelo Controle Interno somente para os itens de relevância GRAVE e MEDIANO.' & CHR(13) & '   Em decorrência disso, este item teve seu acompanhamento ENCERRADO após o registro da manifestação do gestor da unidade avaliada, uma vez que apresenta relevância LEVE.' & CHR(13) & CHR(13) & '   IMPORTANTE:' & CHR(13) & '   O não acompanhamento da regularização do item pelo Controle Interno não exime o gestor da unidade avaliada de adotar ações imediatas para regularizar a Não Conformidade registrada.' & CHR(13) & '   Em caso de reincidência dessa Não Conformidade em avaliações de controles futuras, o item será considerado como MEDIANO e passará a ter acompanhamento até a sua regularização.' & CHR(13) & CHR(13) & 'Situação: ENCERRADO' & CHR(13) & CHR(13) &  'Responsável: SEC AVAL CONT INTERNO/SGCIN ' & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
-				 <cfquery datasource="#dsn_inspecao#">
-					UPDATE ParecerUnidade SET Pos_Situacao_Resp = 29
-					, Pos_DtPosic = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
-					, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))# 
-					, Pos_DtUltAtu = CONVERT(char, GETDATE(), 120)
-					, Pos_NomeResp='#CGI.REMOTE_USER#'
-					, Pos_username = '#CGI.REMOTE_USER#'
-					, Pos_Situacao = 'EC'
-					, Pos_Parecer = '#pos_aux#'
-					, Pos_Sit_Resp_Antes = #form.scodresp#
-					WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
-				</cfquery> 
-				<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> Opinião do Controle Interno' & CHR(13) & CHR(13) & 'À(O) CS/DIGOV/DCINT' & CHR(13) & CHR(13) & '   A partir da adoção de metodologia que classifica os itens avaliados como Não Conformes em GRAVE, MEDIANO ou LEVE, foi estabelecido pelo Departamento de Controle Interno (DCINT) que o acompanhamento da' & CHR(13) & 'regularização será realizado pelo Controle Interno somente para os itens de relevância GRAVE e MEDIANO.' & CHR(13) & '   Em decorrência disso, este item teve seu acompanhamento ENCERRADO após o registro da manifestação do gestor da unidade avaliada, uma vez que apresenta relevância LEVE.' & CHR(13) & CHR(13) & '   IMPORTANTE:' & CHR(13) & '   O não acompanhamento da regularização do item pelo Controle Interno não exime o gestor da unidade avaliada de adotar ações imediatas para regularizar a Não Conformidade registrada.' & CHR(13) & '   Em caso de reincidência dessa Não Conformidade em avaliações de controles futuras, o item será considerado como MEDIANO e passará a ter acompanhamento até a sua regularização.' & CHR(13) & CHR(13) & 'Situação: ENCERRADO' & CHR(13) & CHR(13) &  'Responsável: SEC AVAL CONT INTERNO/SGCIN ' & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>		
-				<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
-				<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
-				<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>				
-				<cfquery datasource="#dsn_inspecao#">
-					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) 
-					values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', #createodbcdate(createdate(year(now()),month(now()),day(now())))#, '#CGI.REMOTE_USER#', 29, '#strIDGestor#', '#hhmmssdc#', '#and_obs#')
-				</cfquery> 
-		    </cfif>
-		</cfif> 
-	
+			<cfquery datasource="#dsn_inspecao#">
+				UPDATE ParecerUnidade SET Pos_Situacao_Resp = 29
+				, Pos_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
+				, Pos_DtPrev_Solucao = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))# 
+				, Pos_DtUltAtu = CONVERT(char, GETDATE(), 120)
+				, Pos_NomeResp='#CGI.REMOTE_USER#'
+				, Pos_username = '#CGI.REMOTE_USER#'
+				, Pos_Situacao = 'EC'
+				, Pos_Parecer = '#pos_aux#'
+				, Pos_Sit_Resp_Antes = #rsObserv.Pos_Situacao_Resp#
+				WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
+			</cfquery> 
+			<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM')  & '> ' & 'Opinião do Controle Interno' & CHR(13) & CHR(13) & 'À(O) ' & #rsItem.Und_Descricao# & CHR(13) & CHR(13) & 'Conforme decisão do Departamento de Controle Interno (DCINT/SUGOV/DIGOE), a partir de 05/03/2024, deixarão de ser acompanhadas pelo órgão de controle a ' & CHR(13) & 'regularização das Não Conformidades identificadas nas Avaliações de Controle realizadas nas unidades operacionais, que não apresentem Impacto Financeiro Direto,' & CHR(13) & 'bem como aquelas que apresentem Impacto Financeiro Direto mas que tenham valor envolvido abaixo da função de quebra de caixa.' & CHR(13) & CHR(13) & 'Tal decisão não exime os órgãos responsáveis da regularização da situação registrada pelo Controle Interno, inclusive quanto ao recolhimento aos cofres da Empresa dos valores devidos.' & CHR(13) & CHR(13) & 'Situação: ENCERRADO' & CHR(13) & CHR(13) &  'Responsável: DCINT/SUGOV/DIGOE ' & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+			<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+			<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+			<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")> 
+			<cfif len(hhmmssdc) lt 9>
+				<cfset hhmmssdc = hhmmssdc & '0'>
+			</cfif>
+			<cfquery datasource="#dsn_inspecao#">
+				insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) 
+				values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 29, '#auxposarea#', '#hhmmssdc#', '#and_obs#')
+			</cfquery> 
+--->			
+		</cfif>
 		<cflocation url="itens_unidades_controle_respostas_reop.cfm?ckTipo=#URL.ckTipo#">		
 
 </cfif>
@@ -415,20 +432,30 @@ FROM  Inspecao
 </cfquery>
 <!--- ============= --->
 
-<cfquery name="rsMod" datasource="#dsn_inspecao#">
-  SELECT UND_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Dir_Descricao, Dir_Codigo, Dir_Sigla
-  FROM Unidades INNER JOIN Diretoria ON Unidades.Und_CodDiretoria = Diretoria.Dir_Codigo
-  WHERE Und_Codigo = '#URL.Unid#'
-</cfquery>
+<cfif left(ninsp,2) eq left(trim(qUsuario.Usu_Lotacao),2)>
+	<cfquery name="rsMod" datasource="#dsn_inspecao#">
+	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
+	  FROM Unidades INNER JOIN Diretoria ON Unidades.Und_CodDiretoria = Diretoria.Dir_Codigo
+	  WHERE Und_Codigo = '#URL.Unid#'
+	</cfquery>
+	<cfset auxposarea = rsMod.Und_Codigo>
+	<cfset auxnomearea = rsMod.Und_Descricao>
+<cfelse> 
+	<cfquery name="rsMod" datasource="#dsn_inspecao#">
+	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
+	  FROM Unidades INNER JOIN Diretoria ON Unidades.Und_CodDiretoria = Diretoria.Dir_Codigo
+	  WHERE Und_Codigo = '#URL.posarea#'
+	</cfquery>
+	<cfset auxposarea = rsMod.Und_Codigo>
+	<cfset auxnomearea = rsMod.Und_Descricao>	
+</cfif> 
 
 <head>
 <title>Sistema Nacional de Controle Interno</title>
-<link href="CSS.css" rel="stylesheet" type="text/css">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="css.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
-  <cfinclude template="mm_menu.js">
-
+<cfinclude template="mm_menu.js">
 //======================
 function dtprazo(x){
 //alert('aqui');
@@ -582,8 +609,6 @@ window.open(page, "Popup", windowprops);
   WHERE Pos_NumGrupo = #ngrup# AND Pos_NumItem = #nitem# AND Pos_Unidade = '#unid#' AND Pos_Inspecao = '#ninsp#'
 </cfquery>
 
-
-
 <body onLoad="dtprazo(document.form1.frmResp.value)">
 <cfset form.acao = ''>
 <cfinclude template="cabecalho.cfm">
@@ -677,26 +702,86 @@ window.open(page, "Popup", windowprops);
 				</td>
 			</tr>	
 <cfoutput>
-   <cfset db_reincInsp = #trim(rsItem.RIP_ReincInspecao)#>
-   <cfset db_reincGrup = #rsItem.RIP_ReincGrupo#>
-   <cfset db_reincItem = #rsItem.RIP_ReincItem#>	 
-	  <cfif len(trim(rsItem.RIP_ReincInspecao)) gt 0><!---Foi colocado zero pois o xml gerado pelo SGI est&atilde; colocando 0(zero) por padrao--->
-		  
-		 <tr class="red_titulo">
-	  <td bgcolor="eeeeee">Reincid&ecirc;ncia</td>  
-	      <input type="hidden" name="db_reincSN" id="db_reincSN" value="N">
-		   <cfset reincSN = "S">
-		   <input type="hidden" name="db_reincSN" id="db_reincSN" value="S">
-
-	<td  colspan="7" bgcolor="eeeeee">
-N&ordm; Relat&oacute;rio:
-			<input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" style="background:white" readonly="">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&ordm; Grupo:
-			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" style="background:white" readonly="">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&ordm; Item:
-			<input name="frmreincItem" type="text" class="form" id="frmreincItem" size="7" maxlength="4" value="#db_reincItem#" style="background:white" readonly=""></td>
+<cfset reincSN = "N">
+<cfset aux_reincSN = "Nao">
+<cfset db_reincInsp = "">
+<cfset db_reincGrup = 0>
+<cfset db_reincItem = 0>
+<cfif rsItem.RIP_ReincGrupo neq 0>
+	<cfset reincSN = "S">
+	<cfset aux_reincSN = "Sim">
+	<cfset db_reincInsp = #trim(rsItem.RIP_ReincInspecao)#>
+	<cfset db_reincGrup = #rsItem.RIP_ReincGrupo#>
+	<cfset db_reincItem = #rsItem.RIP_ReincItem#>
+</cfif>	   
+	<cfif reincSN eq 'S'>
+		<tr class="red_titulo">
+			<td bgcolor="eeeeee">Reincidência</td>
+			<td colspan="7" bgcolor="eeeeee">Nº Avaliação:
+				<input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" onKeyPress="numericos(this.value)">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Grupo:
+			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" onKeyPress="numericos(this.value)">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Item:
+			<input name="frmreincItem" type="text" class="form" id="frmreincItem" size="7" maxlength="4" value="#db_reincItem#" onKeyPress="numericos(this.value)">
+			</strong>		  
+			</td>
 	</tr>
-	</cfif>
+	</cfif> 
+	<cfset encerrarSN = 'N'>
+	<cfset impactofin = 'N'>
+	<cfset tipoimpacto = 'NÃO QUANTIFICADO'>
+	<cfif listFind(#rsItem.Itn_PTC_Seq#,'10')>
+	  	<cfset impactofin = 'S'>
+		<cfset tipoimpacto = 'QUANTIFICADO'>
+	</cfif>	
+	<cfset falta = lscurrencyformat(rsItem.RIP_Falta,'Local')>
+	<cfset sobra = lscurrencyformat(rsItem.RIP_Sobra,'Local')>
+	<cfset emrisco = lscurrencyformat(rsItem.RIP_EmRisco,'Local')>
+	<cfset fator = 0>
+	<cfset somafaltasobrarisco = (rsItem.RIP_Falta + rsItem.RIP_Sobra + rsItem.RIP_EmRisco)>	   
+	<cfset encerrarSN = 'N'>
+	<cfif reincSN neq 'S' and rsItem.Und_TipoUnidade neq 12 and rsItem.Und_TipoUnidade neq 16>
+		<cfif impactofin eq 'N'>
+			<!--- Não tem impacto financeiro --->
+			<cfset encerrarSN = 'S'>
+		<cfelse>
+			<cfset somafaltasobrarisco = numberformat(#somafaltasobrarisco#,9999999999.99)>
+			<!--- Tem impacto financeiro --->
+			<cfquery name="rsRelev" datasource="#dsn_inspecao#">
+				SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
+				FROM ValorRelevancia
+				WHERE VLR_Ano = '#right(ninsp,4)#'
+			</cfquery>
+			<cfloop query="rsRelev">
+				<cfset fxini = numberformat(rsRelev.VLR_FaixaInicial,9999999999.99)>
+				<cfset fxfim = numberformat(rsRelev.VLR_FaixaFinal,9999999999.99)>
+				<cfif fxini eq 0.01 and somafaltasobrarisco lte fxfim and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator>
+				</cfif>
+				<cfif (fxini neq 0.01 and fxfim neq 0.00) and (somafaltasobrarisco gt fxini and somafaltasobrarisco lte fxfim) and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator>
+				</cfif>					
+				<cfif fxfim eq 0.00 and somafaltasobrarisco gte fxini and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator> 
+				</cfif>
+			</cfloop>				
+			<cfif fator eq 1>
+				<cfset encerrarSN = 'S'>
+			</cfif>
+		</cfif>
+	</cfif>		
+ 	<tr class="exibir">
+      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
+      <td colspan="7" bgcolor="eeeeee">
+		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			<tr class="exibir"><strong>
+				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			</tr>
+		  </table>		  
+	  </td>
+    </tr>
 </cfoutput>
           <tr class="exibir">
             <td colspan="5" bgcolor="eeeeee"></td>
@@ -798,7 +883,7 @@ N&ordm; Relat&oacute;rio:
 				<cfset dtbase = posdtprevsolucao>	
 				<cfset auxQtdDias = DateDiff("d", dt30diasuteis,posdtprevsolucao)>
 			</cfif>
-			<cfif dtbase lte dateformat(now(),"YYYYMMDD")>
+			<cfif dtbase lte dateformat(now(),"YYYYMMDD") or encerrarSN eq 'S'>
 			<!--- somente direito a responder --->
 				<cfquery name="rsPonto" datasource="#dsn_inspecao#">
 					SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND (STO_Codigo = 7)
@@ -896,33 +981,32 @@ N&ordm; Relat&oacute;rio:
 	<!--- <cfset resp = qResposta.Pos_Situacao_Resp> --->
 	<cfset numdias = qResposta.diasOcor>
 <cfif ckTipo neq 3> 
+ <cfset resp = qResposta.Pos_Situacao_Resp>
   <tr>
-	 <td colspan="4" bgcolor="eeeeee" class="exibir"><div align="right"><cfoutput>
-	             <input name="button" type="button" class="botao" onClick="window.open('itens_unidades_controle_respostas_reop.cfm?ckTipo=#URL.ckTipo#','_self')" value="Voltar">
-             </cfoutput>
-	         </div></td><cfset resp = qResposta.Pos_Situacao_Resp>
-  
-       <td colspan="4">
-	     <div align="center">
+	 <td colspan="8" bgcolor="eeeeee" class="exibir" align='center'>
+	 	<cfoutput><input name="button" type="button" class="botao" onClick="window.open('itens_unidades_controle_respostas_reop.cfm?ckTipo=#URL.ckTipo#','_self')" value="Voltar"></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	       <cfif (resp is 1 or resp is 6 or resp is 7 or resp is 17 or resp is 18 or resp is 21 or resp is 3 or resp is 24 or resp is 9 or resp is 25 or resp is 26 or resp is 27 or resp is 29)>
                <input name="Submit" type="submit" class="botao" value="Salvar" onClick="document.form1.acao.value='Salvar'" disabled>
-	           <cfelse>
+	        <cfelse>
                <input name="Submit" type="submit" class="botao" value="Salvar" onClick="document.form1.acao.value='Salvar'">
-	         </cfif>
-	       </div></td>
+	        </cfif>
+	 </td>
   
           </tr>  
    <cfelse>
-        <tr><td colspan="9" align="center"> <button onClick="window.close()" class="botao">Fechar</button></td></tr>
+        <tr><td colspan="8" align="center"><button onClick="window.close()" class="botao">Fechar</button></td></tr>
    </cfif>
         </table>
 		<input type="hidden" name="MM_UpdateRecord" value="form1">
 		<input type="hidden" name="salvar_anexar" value="">
-
-	<input type="hidden" name="PosClassificacaoPonto" id="PosClassificacaoPonto" value="<cfoutput>#trim(qResposta.Pos_ClassificacaoPonto)#</cfoutput>"> 
-	<input type="hidden" name="undtipounidade" id="undtipounidade" value="<cfoutput>#trim(rsItem.Und_TipoUnidade)#</cfoutput>">
-	<input type="hidden" name="scodresp" id="scodresp" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
-
+<cfoutput>
+	<input type="hidden" name="PosClassificacaoPonto" id="PosClassificacaoPonto" value="#trim(qResposta.Pos_ClassificacaoPonto)#"> 
+	<input type="hidden" name="undtipounidade" id="undtipounidade" value="#trim(rsItem.Und_TipoUnidade)#">
+	<input type="hidden" name="scodresp" id="scodresp" value="#qResposta.Pos_Situacao_Resp#">
+	<input type="hidden" name="encerrarSN" id="encerrarSN" value="#encerrarSN#">
+	<input name="somafaltasobrarisco" type="hidden" id="somafaltasobrarisco" value="#somafaltasobrarisco#">
+	<input name="reincideSN" type="hidden" id="reincideSN" value="#reincSN#">	
+</cfoutput>
 	</form>
 <!--- Fim Área de conteúdo --->
 </td>

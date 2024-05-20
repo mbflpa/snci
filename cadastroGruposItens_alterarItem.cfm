@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="permissao_negada.htm">
 	<cfabort>
@@ -45,7 +46,7 @@
 		<!---  --->
         <cfset tipoUnidadeEncontrado =''>
         <cfset tipoUnidadeNaoExcluir =''>
-        <!---Se existirem tipos de unidade a serem excluídos do PLANO DE TESTE, verifica quais deles já fizeram parte de alguma avaliação--->
+        <!---Se existirem tipos de unidade a serem excluï¿½dos do PLANO DE TESTE, verifica quais deles jï¿½ fizeram parte de alguma avaliaï¿½ï¿½o--->
         <cfif "#form.tiposExcluidos#" neq ''>        
             <cfquery datasource="#dsn_inspecao#" name="rsChecklistUtilizado">
                 SELECT  (rtrim(TUN_Descricao) + ':' + convert(varchar,count(RIP_NumInspecao))) + ' avalia&ccedil;&otilde;es' as totalAvaliacoes, TUN_Codigo FROM Resultado_Inspecao
@@ -66,12 +67,12 @@
         <cftransaction>
 <!--- 				<script>
 					<cfoutput>
-					 alert('ID da pontuaçãoAC:' + '#form.frmptos#' + '     ID da pontuaçãOAGF:' + '#form.frmptosAGF#');
+					 alert('ID da pontuaï¿½ï¿½oAC:' + '#form.frmptos#' + '     ID da pontuaï¿½ï¿½OAGF:' + '#form.frmptosAGF#');
 					</cfoutput>
 				</script> 
 				<cfset gil = gil>  --->
 				
-                <!---Altera a tabela TipoUnidade_ItemVerificacao com o valor da pontuação para cada tipo de unidade e ano do item--->               
+                <!---Altera a tabela TipoUnidade_ItemVerificacao com o valor da pontuaï¿½ï¿½o para cada tipo de unidade e ano do item--->               
                 <cfloop list="#form.tipos#" index="i">
                     <cfset tipo = "#i#">
 					 <!--- Ajustes para os campos: Itn_Pontuacao, Itn_Classificacao e Itn_PTC_Seq --->
@@ -110,7 +111,7 @@
 							</cfif>							 
 							<cfset auxpontua = form.selAltItemPontuacaoAGF>	
 					</cfif>
-					<!--- Obter a pontuação max pelo ano e tipo da unidade --->
+					<!--- Obter a pontuaï¿½ï¿½o max pelo ano e tipo da unidade --->
 					<cfquery name="rsPtoMax" datasource="#dsn_inspecao#">
 						SELECT TUP_PontuacaoMaxima 
 						FROM Tipo_Unidade_Pontuacao 
@@ -193,7 +194,7 @@
 					<!---  --->
          </cfloop>
                 
-					<!---Se existirem tipos de unidade a serem excluídos do PLANO DE TESTE--->
+					<!---Se existirem tipos de unidade a serem excluï¿½dos do PLANO DE TESTE--->
 					<cfif "#form.tiposExcluidos#" neq ''> 
 						<cfquery datasource="#dsn_inspecao#" >
 							DELETE FROM Itens_Verificacao 
@@ -218,7 +219,7 @@
 								</cfif>
 						</cfquery>
 					</cfif>
-                	<!---Se existirem tipos de unidade a serem incluídos do PLANO DE TESTE--->
+                	<!---Se existirem tipos de unidade a serem incluï¿½dos do PLANO DE TESTE--->
                 	<cfif "#form.tiposIncluidos#" neq ''>
                     	<cfloop list="#form.tiposIncluidos#" index="i">
 							<cfset tipo = "#i#">
@@ -333,8 +334,8 @@
                 alert('Item alterado com sucesso!');
                 var frm = document.getElementById('formAltItem');
             }else{
-                alert('Existem avalições cadastradas no SNCI para o item selecionado e tipo(s) de unidade desmarcado(s) no PLANO DE TESTE:\n\n' + tipoUnidadeEncontrado + '\n\nEsta alteração não foi realizada.');
-                alert('Demais alterações realizadas com sucesso!');
+                alert('Existem avaliÃ§Ãµes cadastradas no SNCI para o item selecionado e tipo(s) de unidade desmarcado(s) no PLANO DE TESTE:\n\n' + tipoUnidadeEncontrado + '\n\nEsta alteraÃ§Ã£o nÃ£o foi realizada.');
+                alert('Demais alteraÃ§Ãµes realizadas com sucesso!');
             }                
         </script>
 </cfif>
@@ -360,7 +361,7 @@
         </cfquery> 
     </cftransaction>
     <script type="text/javascript">           
-        alert('Item excluído com sucesso!');
+        alert('Item excluÃ­do com sucesso!');
         window.open('cadastroGruposItens.cfm','_self');           
     </script
 ></cfif>
@@ -399,7 +400,7 @@
 </cfif>
 
 <cfif isDefined("form.selAltModalidade") and '#form.selAltModalidade#' neq ''>
-    <!--- Verifica se o item selecionado já faz parte de alguma avaliação para impedir exclusão--->
+    <!--- Verifica se o item selecionado jï¿½ faz parte de alguma avaliaï¿½ï¿½o para impedir exclusï¿½o--->
     <cfquery datasource="#dsn_inspecao#" name="rsChecklistJaUtilizado">
                 SELECT  RIP_NumInspecao FROM Resultado_Inspecao
                 INNER JOIN Unidades ON Und_Codigo = RIP_Unidade
@@ -407,7 +408,7 @@
                 WHERE RIP_Ano = '#form.selAltItemAno#' AND RIP_NumGrupo = '#form.selAltItemGrupo#' 
                       AND RIP_NumItem = '#form.selAltItem#' AND INP_Modalidade = '#form.selAltModalidade#'
     </cfquery>
-    <!--- Fim da verifica se o item seleciona já faz parte de alguma avaliação para impedir exclusão--->
+    <!--- Fim da verifica se o item seleciona jï¿½ faz parte de alguma avaliaï¿½ï¿½o para impedir exclusï¿½o--->
 
 
     <cfquery dbtype="query" name="rsItemFiltrado">
@@ -468,8 +469,8 @@ WHERE TUP_Ano = '#form.selAltItemAno#' order by TUN_Descricao
                 </cfif>
             </cfoutput>
 
-            if(tipo.indexOf(b.value) == -1){//se não estiver na lista tipo
-                if(b.checked==false){//se não estiver marcado
+            if(tipo.indexOf(b.value) == -1){//se nao estiver na lista tipo
+                if(b.checked==false){//se nao estiver marcado
                     b.parentNode.style.background='none';
                     b.parentNode.style.border='1px solid transparent';
                 }else{//se estiver marcado
@@ -477,7 +478,7 @@ WHERE TUP_Ano = '#form.selAltItemAno#' order by TUN_Descricao
                     b.parentNode.style.border='1px solid #fff'
                 }      
             }else{//se estiver na lista tipo
-                 if(b.checked==false){//se não estiver marcado
+                 if(b.checked==false){//se nao estiver marcado
                     b.parentNode.style.background='red';
                     b.parentNode.style.border='1px solid #fff'         
                  }else{//se estiver marcado
@@ -521,7 +522,7 @@ WHERE TUP_Ano = '#form.selAltItemAno#' order by TUN_Descricao
             var frm = document.getElementById('formAltItem');
 
             if (frm.altItemDescricao.value == '') {
-				alert('Informe uma descrição para item.');
+				alert('Informe uma descriÃ§Ã£o para item.');
 				frm.altItemDescricao.focus();
 				return false;
 			}
@@ -558,31 +559,31 @@ WHERE TUP_Ano = '#form.selAltItemAno#' order by TUN_Descricao
 			}
             
             if (CKEDITOR.instances.altItemOrientacaoRelato.getData()== '') {
-				alert('Informe uma orientação para o órgão.');
+				alert('Informe uma orientaÃ§Ã£o para o Ã³rgÃ£o.');
 				CKEDITOR.instances.altItemOrientacaoRelato.focus();
 				return false;
 			}
 
             if (tiposSelecionados == '') {
-				alert('Selecione, pelo menos, 01(um) tipo de unidade para a qual o item será aplicado.');
+				alert('Selecione, pelo menos, 01(um) tipo de unidade para a qual o item serÃ¡ aplicado.');
 				return false;
 			}
 
             if ((frm.selAltItemPontuacao.value == '' ||  frm.selAltItemPontuacao.value == 0) && isVisible(document.getElementById('selAltItemPontuacao'))==true) {
-				alert('Informe a Pontuação para o item.\n\nObs.: Utilize a "Calculadora de Pontuação".');
+				alert('Informe a PontuaÃ§Ã£o para o item.\n\nObs.: Utilize a "Calculadora de PontuaÃ§Ã£o".');
                 frm.selAltItemPontuacao.focus();
 				return false;
 			}  
 
             if (frm.frmptos.value == '' || frm.frmptos.value == 0)  {
-				alert('Revisar e Confirmar a Pontuação para o item.\n\nObs.: Utilize a "Calculadora de Pontuação".');
+				alert('Revisar e Confirmar a PontuaÃ§Ã£o para o item.\n\nObs.: Utilize a "Calculadora de PontuaÃ§Ã£o".');
                 frm.selAltItemPontuacao.focus();
 				return false;
 			//mostraCalculadora();
 			} 			
 
             if ((frm.selAltItemPontuacaoAGF.value == '' || frm.selAltItemPontuacaoAGF.value == 0) && isVisible(document.getElementById('selAltItemPontuacaoAGF'))==true) {
-				alert('Informe a Pontuação do item para AGF.\n\nObs.: Utilize a "Calculadora de Pontuação".');
+				alert('Informe a PontuaÃ§Ã£o do item para AGF.\n\nObs.: Utilize a "Calculadora de PontuaÃ§Ã£o".');
                 frm.selAltItemPontuacaoAGF.focus();
 				return false;
 			}
@@ -648,13 +649,13 @@ WHERE TUP_Ano = '#form.selAltItemAno#' order by TUN_Descricao
             </cfoutput>
            
             if(quantUtil !=0){
-                alert('Foram localizados registros de avaliação para o Item.\n\n A exclusão não poderá ser realizada!')
+                alert('Foram localizados registros de avaliaÃ§Ã£o para o Item.\n\n A exclusÃ£o nÃ£o poderÃ¡ ser realizada!')
                 return false;
             }
            
             if(quantUtil == 0){
 
-                if(window.confirm('Confirma a exclusão definitiva do item?\n\nAtenção: O item será excluído do Plano de Teste de todas as modalidades de Avaliação!')){
+                if(window.confirm('Confirma a exclusÃ£o definitiva do item?\n\nAtenÃ§Ã£o: O item serÃ¡ excluÃ­do do Plano de Teste de todas as modalidades de AvaliaÃ§Ã£o!')){
                     frm.acao.value = 'excItem';
                     aguarde();
                     setTimeout('document.getElementById("formAltItem").submit();',2000);
@@ -669,7 +670,7 @@ WHERE TUP_Ano = '#form.selAltItemAno#' order by TUN_Descricao
 
         
 
-        //script para calculadora de pontuação
+        //script para calculadora de pontuaï¿½ï¿½o
 
         // apos load muda cor dos tipos de unidades conforme item selecionado
         window.onload = function(){
@@ -778,7 +779,7 @@ WHERE TUP_Ano = '#form.selAltItemAno#' order by TUN_Descricao
 
         function inserePontuacao(){
             if (document.getElementById('pontuacaoCalculadaAGF').value == 0 && isVisible(document.getElementById('checkPontuacaoAGF'))==true) {
-				alert('Selecione a pontuação adicional para a AGF.');
+				alert('Selecione a pontuaÃ§Ã£o adicional para a AGF.');
                 document.getElementById('checkPontuacaoAGF').focus();
 				return false;
 			}else{           
@@ -806,7 +807,7 @@ WHERE TUP_Ano = '#form.selAltItemAno#' order by TUN_Descricao
             document.getElementById("calculadoraPontuacaoAlt").style.display = 'none';
             
         }
-        //Fim script para calculadora de pontuação
+        //Fim script para calculadora de pontuaï¿½ï¿½o
 
         function mostraAvisoAlteracao(){
             if (isVisible(document.getElementById('avisoAlteracao'))==true) {
@@ -983,12 +984,12 @@ function selecptosAGF(a){
                                 <label  for="selAltItemValorDec" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">VALOR<br>DECLARADO:</label>
                                 <div ></div>	
                                 <select name="selCadItemValorDec" id="selCadItemValorDec"  class="form" style="display:inline-block;width:50px;">
-                                    <option <cfif '#rsItemFiltrado.Itn_ValorDeclarado#' eq 'N'>selected</cfif> value="N">N&atilde;o</option>
+                                    <option <cfif '#rsItemFiltrado.Itn_ValorDeclarado#' eq 'N'>selected</cfif> value="N">NÃ£o</option>
                                     <option <cfif '#rsItemFiltrado.Itn_ValorDeclarado#' eq 'S'>selected</cfif> value="S">Sim</option>
                                 </select>			 										
                             </div>
 
-                            <div style="margin-bottom:10px;margin-left:100px;width:200px;float:left;" title="Impede a visualização e tratamento do item em todas as páginas.">
+                            <div style="margin-bottom:10px;margin-left:100px;width:200px;float:left;" title="Impede a visualizaÃ§Ã£o e tratamento do item em todas as pÃ¡ginas.">
                                 <label  for="selAltVisualizacao" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">VISUALIZA&Ccedil;&Atilde;O<br>BLOQUEADA (TRATAMENTO):</label>
                                 <div ></div>	
                                 <select name="selAltVisualizacao" id="selAltVisualizacao"  class="form" style="display:inline-block;width:50px;">
@@ -997,7 +998,7 @@ function selecptosAGF(a){
                                 </select>			 										
                             </div>
 
-                            <div style="margin-bottom:10px;margin-left:200px;" title="Obriga que o gestor valide este item em caso de avaliação NÃO EXECUTA.">
+                            <div style="margin-bottom:10px;margin-left:200px;" title="Obriga que o gestor valide este item em caso de avaliaÃ§Ã£o NÃ£O EXECUTA.">
                                 <label  for="selAltValidObrig"  style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">VALIDA&Ccedil;&Atilde;O<br>OBRIGAT&Oacute;RIA (N&Atilde;O EXECUTA):</label>
                                 <div ></div>	
                                 <select name="selAltValidObrig" id="selAltValidObrig"  class="form" style="display:inline-block;width:50px;">
@@ -1040,7 +1041,7 @@ function selecptosAGF(a){
                             </div>
 
                             <div align="left" style="margin-bottom:30px;">
-                                <label  for="altItemOrientacaoRelato" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">ORIENTA&Ccedil;&Otilde;ES UNIDADE/&Oacute;RG&Atilde;O:</label>	 
+                                <label  for="altItemOrientacaoRelato" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">ORIENTAÃ‡Ã•ES UNIDADE/Ã“RGÃƒO:</label>	 
                                 <div ></div>
                                 <textarea  name="altItemOrientacaoRelato" id="altItemOrientacaoRelato" 
                                 style="display:none!important;background:#fff;font-family:Verdana, Arial, Helvetica, sans-serif"><cfoutput>#rsItemFiltrado.Itn_OrientacaoRelato#</cfoutput></textarea>		
@@ -1119,12 +1120,12 @@ function selecptosAGF(a){
                                     Alterar</a> 
                                 <a type="button" onClick="return valida_formExcItem()" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
                                     Excluir este Item</a> 
-                                <a type="button" onClick="javascript:if(confirm('Deseja cancelar as alterações realizadas?\n\nObs.: Esta ação não cancela as alterações já confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
+                                <a type="button" onClick="javascript:if(confirm('Deseja cancelar as alterÃ§Ãµes realizadas?\n\nObs.: Esta aÃ§Ã£o nÃ£o cancela as alteraÃ§Ãµes jÃ¡ confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
                                     Cancelar</a>
                         </div>   
                 <!---     </cfif> --->
                
-                    <!---Calculadora de Pontuação--->
+                    <!---Calculadora de Pontuaï¿½ï¿½o--->
                     <div id="calculadoraPontuacaoAlt" align="left" style="visibility:hidden;display:none;z-index:1000;background-color:#003390;position:absolute;padding:10px;border:3px solid lightGray;width:620px;">
                         <div align="left" style="padding:3px">   
                             <span class="tituloDivAltItem" style="font-size:12px;border:2px solid lightGray;align:center;top: -24px;background-color:#003390;">
@@ -1148,20 +1149,20 @@ function selecptosAGF(a){
 <!---						
 							<input type="checkbox"  name="checkPontuacao" value="9" onclick="calcularPontuacao();">TEM IMPACTO FINANCEIRO DIRETO = <strong>9 pontos</strong></input>
                             <div></div>
-                            <input type="checkbox"  name="checkPontuacao" value="4" onclick="calcularPontuacao();">PODE ENSEJAR INDENIZAÇÃO/PENALIZAÇÃO À ECT/MULTAS CONTRATUAIS OU LEGAIS = <strong>4 pontos</strong></input>
+                            <input type="checkbox"  name="checkPontuacao" value="4" onclick="calcularPontuacao();">PODE ENSEJAR INDENIZAï¿½ï¿½O/PENALIZAï¿½ï¿½O ï¿½ ECT/MULTAS CONTRATUAIS OU LEGAIS = <strong>4 pontos</strong></input>
                             <div></div>
                             <input type="checkbox"  name="checkPontuacao" value="2" onclick="calcularPontuacao();">DESCUMPRIMENTO DE LEI/NORMA EXTERNA = <strong>2 pontos</strong></input>
                             <div></div>
                             <input type="checkbox"  name="checkPontuacao" value="1" onclick="calcularPontuacao();">DESCUMPRIMENTO DE NORMA INTERNA = <strong>1 ponto</strong></input>
                             <div></div>
-                            <input type="checkbox"  name="checkPontuacao" value="3" onclick="calcularPontuacao();">RISCO À SEGURANÇA E INTEGRIDADE DO PATRIMÔNIO, BENS, OBJETOS E PESSOAS = <strong>3 pontos</strong></input>
+                            <input type="checkbox"  name="checkPontuacao" value="3" onclick="calcularPontuacao();">RISCO ï¿½ SEGURANï¿½A E INTEGRIDADE DO PATRIMï¿½NIO, BENS, OBJETOS E PESSOAS = <strong>3 pontos</strong></input>
                             <div></div>
-                            <input type="checkbox"  name="checkPontuacao" value="2" onclick="calcularPontuacao();">RISCO À IMAGEM DA ECT = <strong>2 pontos</strong></input>
+                            <input type="checkbox"  name="checkPontuacao" value="2" onclick="calcularPontuacao();">RISCO ï¿½ IMAGEM DA ECT = <strong>2 pontos</strong></input>
 --->
                             
                             <div id="checkPontuacaoAGFdiv" style="margin-top:10px;visiblity:hidden;display:none">
-                                Pontuação Adicional p/ AGF:<div></div> 
-								<input  type="radio" id="" name="checkPontuacaoAGF" value="0" onClick="calcularPontuacao('0')" checked>Pontuação Inicial</input>								
+                                PontuaÃ§Ã£o Adicional p/ AGF:<div></div> 
+								<input  type="radio" id="" name="checkPontuacaoAGF" value="0" onClick="calcularPontuacao('0')" checked>PontuaÃ§Ã£o Inicial</input>								
 								<div></div>
 						        <cfoutput query="rsPta">
 								   <cfif rsPta.PTC_Franquia is 'S'>
@@ -1172,10 +1173,10 @@ function selecptosAGF(a){
 								  <input type="hidden" name="teste2">
   <!---                               <select id="checkPontuacaoAGF" name="checkPontuacaoAGF" onchange="calcularPontuacao();">
                                     <option value=""  selected></option> 
-                                    <option value="1">PONTUAÇÃO PREVISTA NO CFP IGUAL A 0(ZERO) = <strong>1 ponto</strong></option>
-                                    <option value="3">PONTUAÇÃO PREVISTA NO CFP ENTRE 1 E 10 = <strong>3 pontos</strong></option>
-                                    <option value="6">PONTUAÇÃO PREVISTA NO CFP ENTRE 11 E 49 = <strong>6 pontos</strong></option>
-                                    <option value="9" >PONTUAÇÃO PREVISTA NO CFP MAIOR OU IGUAL A 50 = <strong>9 pontos</strong></option>
+                                    <option value="1">PONTUAï¿½ï¿½O PREVISTA NO CFP IGUAL A 0(ZERO) = <strong>1 ponto</strong></option>
+                                    <option value="3">PONTUAï¿½ï¿½O PREVISTA NO CFP ENTRE 1 E 10 = <strong>3 pontos</strong></option>
+                                    <option value="6">PONTUAï¿½ï¿½O PREVISTA NO CFP ENTRE 11 E 49 = <strong>6 pontos</strong></option>
+                                    <option value="9" >PONTUAï¿½ï¿½O PREVISTA NO CFP MAIOR OU IGUAL A 50 = <strong>9 pontos</strong></option>
                                 </select> --->
                                
                             </div>
@@ -1193,7 +1194,7 @@ function selecptosAGF(a){
  
                             <div align="right" style="margin-top:20px;float:left">
                                 <button onClick="calcularPontuacao();inserePontuacao()" onmouseOver="this.style.backgroundColor='cornflowerBlue';" onMouseOut="this.style.backgroundColor='blue';"
-                                class="botaoCad" style="background:blue;color:#fff;font-size:12px;width:121px">Inserir Pontuação</button> 
+                                class="botaoCad" style="background:blue;color:#fff;font-size:12px;width:121px">Inserir PontuaÃ§Ã£o</button> 
                             </div>
                             <div align="right" style="margin-top:20px;">
                                 <button onClick="fechaCalculadora()" onmouseOver="this.style.backgroundColor='red';" onMouseOut="this.style.backgroundColor='darkred';"
@@ -1201,7 +1202,7 @@ function selecptosAGF(a){
                             </div>
                         </div>
                     </div>
-                    <!---Fim Calculadora de Pontuação--->
+                    <!---Fim Calculadora de Pontuaï¿½ï¿½o--->
 					</cfif>
             </form>
 

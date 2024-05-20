@@ -1,29 +1,28 @@
 <cfcomponent >
-   <cfprocessingdirective pageencoding = "utf-8">
-   <cfproperty  name="dsn" type="String">
-   <cfset dsn = 'DBSNCI'>
-   <cfquery name="qUsuarioLogado"  datasource="#dsn#">
-      SELECT Usu_Login as Login
-               ,Usu_GrupoAcesso as GrupoAcesso
-               ,Usu_Apelido as NomeUsuario
-               ,Usu_LotacaoNome as NomeLotacao
-               ,Usu_Matricula as Matricula
-               ,Usu_Username as UserName
-               ,Usu_DtUltAtu as DataUltimaAtualizacao
-               ,Usu_DR as SE
-               ,Usu_Lotacao as CodigoLotacao
-               ,Usu_Email as Email
-      FROM Usuarios 
-      WHERE Usu_Login = '#CGI.REMOTE_USER#'
-   </cfquery>
+<cfprocessingdirective pageencoding = "utf-8">
+<cfset dsn = 'DBSNCI'>
+<cfquery name="qUsuarioLogado"  datasource="#dsn#">
+	 SELECT Usu_Login as Login
+            ,Usu_GrupoAcesso as GrupoAcesso
+            ,Usu_Apelido as NomeUsuario
+            ,Usu_LotacaoNome as NomeLotacao
+            ,Usu_Matricula as Matricula
+            ,Usu_Username as UserName
+            ,Usu_DtUltAtu as DataUltimaAtualizacao
+            ,Usu_DR as SE
+            ,Usu_Lotacao as CodigoLotacao
+            ,Usu_Email as Email
+    FROM Usuarios 
+    WHERE Usu_Login = '#CGI.REMOTE_USER#'
+  </cfquery>
 
-   <!--Gera nova data prevista para soluçãoo pelo órgão	(Dez dias corridos p�s Insert do parecer)-->
-   <cffunction	 name="dataNovoPrazo" returntype="date" hint="Gera nova data prevista para solução pelo órgão (Dez dias corridos)">
+<!--Gera nova data prevista para solu��o pelo �rg�o	(Dez dias corridos p�s Insert do parecer)-->
+<cffunction	 name="dataNovoPrazo" returntype="date" hint="Gera nova data prevista para solução pelo órgão (Dez dias corridos)">
   
-      <cfset dtatual = CreateDate(year(now()),month(now()),day(now()))>
+   <cfset dtatual = CreateDate(year(now()),month(now()),day(now()))>
                 <cfset dtnovoprazo = DateAdd("d", 10, #dtatual#)>
-      <cfset nCont = 1>
-      <cfloop condition="nCont lt 2">
+   <cfset nCont = 1>
+   <cfloop condition="nCont lt 2">
           <cfif nCont eq 1>
             <cfquery name="rsFeriado" datasource="#dsn#">
                SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
@@ -52,7 +51,7 @@
                    <cfset nCont = 2>
                </cfdefaultcase>
              </cfswitch>
-      </cfloop>
+     </cfloop>
   <!--- fim loop --->
 	<cfset result = '#dtnovoprazo#' />
   <cfreturn result />
@@ -107,6 +106,9 @@
     <cfargument name="CodigoDaSituacaoDoPonto" type="string" required="true"  />  
     <cfargument name="CodigoUnidadeDaPosicao" type="string" required="true"  />
     <cfargument name="Parecer" type="string" required="true"   />     
+   <cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+   <cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+   <cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>
     <cfquery datasource="#dsn#">
 
         INSERT INTO Andamento (
@@ -129,7 +131,7 @@
               convert(char, getdate(), 102),
               '#qUsuarioLogado.Login#',
               <cfqueryparam cfsqltype="CF_SQL_INTEGER" maxlength="10" value="#trim(arguments.CodigoDaSituacaoDoPonto)#">,
-              convert(char, getdate(), 108),
+              '#hhmmssdc#',
               <cfqueryparam cfsqltype="CF_SQL_CHAR" maxlength="8" value="#trim(arguments.CodigoUnidadeDaPosicao)#" >,
 			  <cfqueryparam cfsqltype="CF_SQL_LONGVARCHAR"  value="#trim(arguments.Parecer)#" >
         ) 
@@ -154,7 +156,7 @@
        <cfset arguments.ListaDeStatusContabilizados = listToArray(arguments.ListaDeStatusContabilizados)>
    <cfelseif NOT isArray(arguments.ListaDeStatusContabilizados)>
        <cfthrow type="java.lang.IllegalArgumentException"
-           message="O argumento 'ListaDeStatusContabilizados' deve ser uma lista delimitada por v�rgulas. Ex.: 17,18">
+           message="O argumento 'ListaDeStatusContabilizados' deve ser uma lista delimitada por vírgulas. Ex.: 17,18">
    </cfif>
  
    <cfset listContabilizados = ArrayToList('#arguments.ListaDeStatusContabilizados#') />	  
@@ -273,7 +275,7 @@
     
      <cfdump var= '#rsDias_Andamento#'/>
      <cfdump var= '#qDiasUteis#'/><!---para teste--->
-     <cfdump var= 'Quant. dias n�o �teis para reduzir: #qDiasNaoUteis# dias'   />  <!---para teste--->
+     <cfdump var= 'Quant. dias não úteis para reduzir: #qDiasNaoUteis# dias'   />  <!---para teste--->
 
     <br>
    <cfdump var= 'Prazo: #arguments.Prazo# dias'/>
@@ -284,7 +286,7 @@
          <cfdump var= 'retorno: #result# (dias)' />
    <cfelse>
       <cfif #result# eq 'no' >
-            <cfdump var= 'retorno: #result# (prazo n�o vencido)' />
+            <cfdump var= 'retorno: #result# (prazo não vencido)' />
       <cfelse>
           <cfdump var= 'retorno: #result# (prazo vencido)' />
       </cfif>
@@ -298,10 +300,10 @@
 </cffunction>
 
 
-<!---Gera nova data prevista para solu��o pelo órgão--->
-<cffunction	 name="DataPrevistaSolucao" returntype="struct" hint="Gera nova data prevista para solu��o pelo órgão.">
+<!---Gera nova data prevista para solu��o pelo �rg�o--->
+<cffunction	 name="DataPrevistaSolucao" returntype="struct" hint="Gera nova data prevista para solução pelo órgão.">
    <cfargument name="Prazo" type="numeric" required="yes"/>
-   <cfargument name="MostraDump" type="string"  default="no" /><!---yes ou no ou n�o informar--->
+   <cfargument name="MostraDump" type="string"  default="no" /><!---yes ou no ou nao informar--->
 	
    <cfset dtatual = CreateDate(year(now()),month(now()),day(now()))>
    <cfset dtnovoprazo = DateAdd("d", '#Prazo#', #dtatual#)>
@@ -362,10 +364,10 @@
   <cfreturn result />
 </cffunction>
 		
-<!---Retorna um Struct com os dados do órgão subordinador, da �rea e do centralizador da unidade--->	
-<cffunction name="DadosUnidade" hint="Retorna dados do órgão subordinador, da �rea e do centralizador da unidade."  returntype="struct">
+<!---Retorna um Struct com os dados do �rg�o subordinador, da �rea e do centralizador da unidade--->	
+<cffunction name="DadosUnidade" hint="Retorna dados do órgão subordinador, da área e do centralizador da unidade."  returntype="struct">
   <cfargument name="CodigoDaUnidade" type="string" required="true"  />
-  <cfargument name="MostraDump" type="string"  default="no" /><!---yes ou no ou n�o informar--->
+  <cfargument name="MostraDump" type="string"  default="no" /><!---yes ou no ou nao informar--->
 	
   <cfquery datasource="#dsn#" name="rsDadosUnidade">
      SELECT  Unidades.Und_Codigo AS Und_Unidade_Codigo,  Unidades.Und_CodDiretoria AS Und_Codigo_SE, Unidades.Und_Descricao AS Und_Unidade_Descricao, Unidades.Und_TipoUnidade AS Und_TipoUnidade, Unidades.Und_CatOperacional AS Und_CatOperacional, Unidades.Und_Email,   Reops.Rep_Codigo AS Und_OrgSub_Codigo,Reops.Rep_Nome AS Und_OrgSub_Descricao,  Reops.Rep_Sigla AS Und_OrgSub_Sigla, Reops.Rep_Email, Areas.Ars_Codigo AS Und_Area_Codigo,  Areas.Ars_Descricao AS Und_Area_Descricao, Areas.Ars_Sigla AS Und_Area_Sigla, Unidades.Und_Centraliza AS Und_Centra_Codigo, Areas.Ars_Email
@@ -408,17 +410,17 @@
   <cfset dados.Centra_Area_Sigla='#rsDadosCentralizador.Centra_Area_Sigla#'>
   <cfset dados.Centra_Area_Email='#rsDadosCentralizador.Ars_Email#'>      
 <cfelse>  
-  <cfset dados.Centra_Unidade_Codigo='N�o Centralizada'>	  
-  <cfset dados.Centra_Unidade_Descricao='N�o Centralizada'>
-  <cfset dados.Centra_Email='N�o Centralizada'> 
-  <cfset dados.Centra_OrgSub_Codigo='N�o Centralizada'>  
-  <cfset dados.Centra_OrgSub_Descricao='N�o Centralizada'> 
-  <cfset dados.Centra_OrgSub_Sigla='N�o Centralizada'>
-  <cfset dados.Centra_OrgSub_Email='N�o Centralizada'>
-  <cfset dados.Centra_Area_Codigo='N�o Centralizada'> 
-  <cfset dados.Centra_Area_Descricao='N�o Centralizada'> 
-  <cfset dados.Centra_Area_Sigla='N�o Centralizada'>	  
-   <cfset dados.Centra_Area_Email='N�o Centralizada'>   
+  <cfset dados.Centra_Unidade_Codigo='Não Centralizada'>	  
+  <cfset dados.Centra_Unidade_Descricao='Não Centralizada'>
+  <cfset dados.Centra_Email='Não Centralizada'> 
+  <cfset dados.Centra_OrgSub_Codigo='Não Centralizada'>  
+  <cfset dados.Centra_OrgSub_Descricao='Não Centralizada'> 
+  <cfset dados.Centra_OrgSub_Sigla='Não Centralizada'>
+  <cfset dados.Centra_OrgSub_Email='Não Centralizada'>
+  <cfset dados.Centra_Area_Codigo='Não Centralizada'> 
+  <cfset dados.Centra_Area_Descricao='Não Centralizada'> 
+  <cfset dados.Centra_Area_Sigla='Não Centralizada'>	  
+   <cfset dados.Centra_Area_Email='Não Centralizada'>   
  </cfif>
 	  
 	  
@@ -434,11 +436,11 @@
 
 
 <!---Gera resultformatado para CPF, CNPJ, Matr�cula, Telefone e N�SEI--->	  
-<cffunction	 name="FormataNumero" returntype="string" hint="Gera resultado formatado para CPF, Matrícula e NºSEI.">
+<cffunction	 name="FormataNumero" returntype="string" hint="Gera resultado formatado para CPF, Matrícula e Nº SEI.">
 
    <cfargument name="Variavel" type="string" required="yes"/><!---Valor a ser formatado--->
    <cfargument name="TipoDeSaida" type="string" default="CPF"/><!---CPF ou CNPJ ou MATRICULA, TEL ou SEI--->
-   <cfargument name="MostraDump" type="string"  default="no" /><!---yes ou no ou n�o informar--->
+   <cfargument name="MostraDump" type="string"  default="no" /><!---yes ou no ou nao informar--->
 
    <cfset retorno= ""/>	
 	
@@ -493,9 +495,9 @@
 		 <cfset Tipo.INSPECAO="99.9999/9999">	 
 		 <cfset Tipo.MOEDA="R$ 9.999,99">
 			 
-	     <cfdump var='Op��es para o argumento TipoDeSaida' />
+	     <cfdump var='Opções para o argumento TipoDeSaida' />
          <cfdump var='#Tipo#' />	
-         <cfdump var= 'Tipo de Sa�da escolhido: #TipoDeSaida#' />
+         <cfdump var= 'Tipo de Saída escolhido: #TipoDeSaida#' />
           <br>
          <cfdump var= 'Resultado: #result#' />
      </cfif> 
@@ -505,7 +507,7 @@
 	
 </cffunction>
 	  
-<!---Retorna os contatos na SCOI da SE da Unidade/órgão, para as mensagens autom�ticas--->	  
+<!---Retorna os contatos na SCOI da SE da Unidade/�rg�o, para as mensagens autom�ticas--->	  
 <cffunction	 name="Contato" returntype="string" hint="Retorna os contatos na SCOI da SE da Unidade/órgão, para as mensagens automáticas.">
   <cfargument name="CodigoDaUnidade" type="string" required="true"  />
   <cfargument name="MostraDump" type="string"  default="no" /><!---yes ou no ou n�o informar--->
@@ -551,7 +553,7 @@
 
 </cffunction>
 	
-<!--Retorna a descrição do órgão no pos_area-->
+<!--Retorna a descri��o do �rg�o no pos_area-->
 <cffunction	 name="DescricaoPosArea" returntype="string" hint="Retorna a descrição do órgão no pos_area">
   <cfargument name="CodigoDaUnidade" type="string" required="true"  />
 	

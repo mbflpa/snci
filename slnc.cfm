@@ -1,10 +1,10 @@
-<!---  
+<!--- 
   <cfdump  var="#url#">
- 
+
  <cfoutput>
  #dtlimit#
  </cfoutput>
---->
+ --->
 <cfprocessingdirective pageEncoding ="utf-8"> 
 <cfsetting requesttimeout="15000"> 
 <cfoutput>
@@ -17,6 +17,40 @@
 		select Usu_GrupoAcesso, Usu_Matricula from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 	</cfquery>
 	<cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
+
+<cfif grpacesso neq 'GESTORMASTER'>
+	<cfset aux_mes = month(dtlimit)>
+	<cfset aux_ano = year(dtlimit)>
+	<cfif aux_mes is 1>
+		<cfset dtlimit = (aux_ano - 1) & "/12/31">
+	<cfelseif aux_mes is 2>
+		<cfset dtlimit = aux_ano  & "/01/31">		
+	<cfelseif aux_mes is 3>  
+		<cfif int(aux_ano) mod 4 is 0>
+			<cfset dtlimit = aux_ano & "/02/29">
+		<cfelse>
+			<cfset dtlimit = aux_ano & "/02/28">
+		</cfif>
+	<cfelseif aux_mes is 4>
+		<cfset dtlimit = aux_ano & "/03/31">
+	<cfelseif aux_mes is 5>
+		<cfset dtlimit = aux_ano & "/04/30">		
+	<cfelseif aux_mes is 6>
+		<cfset dtlimit = aux_ano & "/05/31">		
+	<cfelseif aux_mes is 7>
+		<cfset dtlimit = aux_ano & "/06/30">					   
+	<cfelseif aux_mes is 8>
+		<cfset dtlimit = aux_ano & "/07/31">					   
+	<cfelseif aux_mes is 9>
+		<cfset dtlimit = aux_ano & "/08/31">					   
+	<cfelseif aux_mes is 10>
+		<cfset dtlimit = aux_ano & "/09/30">					   
+	<cfelseif aux_mes is 11>
+		<cfset dtlimit = aux_ano & "/10/31">	
+	<cfelseif aux_mes is 12>	
+		<cfset dtlimit = aux_ano & "/11/30">	   				   			   
+	</cfif>
+</cfif>
 
 	<cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 
@@ -84,47 +118,47 @@
 	<cfset totmessbsol = 0>	
 	<cfset totmessusol = 0>				
 
-	<cfquery name="rs3SO" datasource="#dsn_inspecao#">
+	<cfquery name="rsTodos" datasource="#dsn_inspecao#">
 		SELECT Andt_AnoExerc, Andt_Mes, Andt_DTRefer, Andt_Resp, Andt_RespAnt
 		FROM Andamento_Temp
 		WHERE (Andt_AnoExerc = '#anoexerc#') AND  (Andt_Mes <= #month(dtlimit)#) AND (Andt_TipoRel = 2) and (Andt_CodSE =  '#se#')
 		order by Andt_Mes
 	</cfquery> 
-	<cfset aux_mes = rs3SO.Andt_Mes>
+	<cfset aux_mes = rsTodos.Andt_Mes>
 
 	<!--- quant. (3-SOL) no mês --->
 	<!--- Unidades --->
-	<cfquery dbtype="query" name="rstotmesunsol">
+	<cfquery dbtype="query" name="rsExisteUN">
 		SELECT Andt_RespAnt 
-		FROM  rs3SO
-		where Andt_RespAnt in (1,17,2,15,18,20) and Andt_Mes = #aux_mes#
+		FROM  rsTodos
+		where Andt_RespAnt in (1,14,17,2,15,18,20) and (Andt_Mes <= #month(dtlimit)#)
 	</cfquery>
-	<cfset totmesunsol = rstotmesunsol.recordcount>
+	<cfset totExisteUN = rsExisteUN.recordcount>
 
 	<!--- Áreas --->
-	<cfquery dbtype="query" name="rstotmesgesol">
+	<cfquery dbtype="query" name="rsExisteGE">
 		SELECT Andt_RespAnt 
-		FROM  rs3SO
-		where Andt_RespAnt in (6,5,19) and Andt_Mes = #aux_mes#
+		FROM  rsTodos
+		where Andt_RespAnt in (6,5,19) and (Andt_Mes <= #month(dtlimit)#)
 	</cfquery>
-	<cfset totmesgesol = rstotmesgesol.recordcount>
+	<cfset totExisteGE = rsExisteGE.recordcount>
 
 	<!--- Subordinadores --->
-	<cfquery dbtype="query" name="rstotmessbsol">
+	<cfquery dbtype="query" name="rsExisteSB">
 		SELECT Andt_RespAnt 
-		FROM  rs3SO
-		where Andt_RespAnt in (4,7,16) and Andt_Mes = #aux_mes#
+		FROM  rsTodos
+		where Andt_RespAnt in (4,7,16) and (Andt_Mes <= #month(dtlimit)#)
 	</cfquery>
-	<cfset totmessbsol = rstotmessbsol.recordcount>
+	<cfset totExisteSB = rsExisteSB.recordcount>
 	
 	<!--- Superintendencia --->
-	<cfquery dbtype="query" name="rstotmessusol">
+	<cfquery dbtype="query" name="rsExisteSU">
 		SELECT Andt_RespAnt 
-		FROM  rs3SO
-		where Andt_RespAnt in (8,22,23) and Andt_Mes = #aux_mes#
+		FROM  rsTodos
+		where Andt_RespAnt in (8,22,23) and (Andt_Mes <= #month(dtlimit)#)
 	</cfquery>
-	<cfset totmessusol = rstotmessusol.recordcount>	
-
+	<cfset totExisteSU = rsExisteSU.recordcount>
+	
 	<!--- exibicao em tela --->
 	<cfquery name="rsBaseB" datasource="#dsn_inspecao#">
 		SELECT Andt_Unid as UNID, Andt_Insp as INSP, Andt_Grp as Grupo, Andt_Item as Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_Mes, Andt_Prazo
@@ -151,7 +185,7 @@
 	          <td colspan="17">&nbsp;</td>
       </tr>
 	<!--- UNIDADES --->		
-	<cfif totmesunsol neq 0>	
+	<cfif totExisteUN neq 0>	
 		<cfset totparcialunsol = 0>
 		<cfset totparcialunpendtrat = 0>	     
 		<tr class="exibir">
@@ -169,8 +203,8 @@
 			<!--- OBTER QTD. SOLUCIONADOS --->     
 			<cfquery dbtype="query" name="rstotsolmes">
 				SELECT Andt_RespAnt 
-				FROM  rs3SO
-				where Andt_RespAnt in (1,17,2,15,18,20) and Andt_Mes = #aux_mes_un# AND (Andt_Resp=3)
+				FROM  rsTodos
+				where Andt_RespAnt in (1,14,17,2,15,18,20) and Andt_Mes = #aux_mes_un# AND (Andt_Resp=3)
 			</cfquery>	
 			<!--- Quant. UNIDADES SOLUCIONADO --->
 			<cfset totsolmes = rstotsolmes.recordcount>
@@ -179,7 +213,7 @@
 			<cfquery dbtype="query" name="rstotpendtratmes">
 				SELECT Andt_Resp 
 				FROM  rsBaseB
-				where Andt_Resp in (2,15,18,20) and Andt_Mes = #aux_mes_un# 
+				where Andt_Resp in (2,14,15,18,20) and Andt_Mes = #aux_mes_un# 
 			</cfquery>				
 			<cfset totpendtratmes = rstotpendtratmes.recordcount>
 
@@ -275,7 +309,7 @@
 		</tr>	
 	</cfif>
 <!--- AREAS --->	
-<cfif totmesgesol neq 0>	
+<cfif totExisteGE neq 0>	
 		<cfset totparcialgesol = 0>
 		<cfset totparcialgependtrat = 0>   
 		<tr class="exibir">
@@ -293,7 +327,7 @@
 			<!--- OBTER QTD. SOLUCIONADOS --->     
 			<cfquery dbtype="query" name="rstotsolmes">
 				SELECT Andt_RespAnt 
-				FROM  rs3SO
+				FROM  rsTodos
 				where Andt_RespAnt in (6,5,19) and Andt_Mes = #aux_mes_ge# AND (Andt_Resp=3)
 			</cfquery>	
 			<!--- Quant. UNIDADES SOLUCIONADO --->
@@ -397,7 +431,7 @@
 		</tr>	
 	</cfif>
 	<!--- SUBORDINADORES --->	
-	<cfif totmessbsol neq 0>	
+	<cfif totExisteSB neq 0>	
 		<cfset totparcialsbsol = 0>
 		<cfset totparcialsbpendtrat = 0>	   
 		<tr class="exibir">
@@ -415,7 +449,7 @@
 			<!--- OBTER QTD. SOLUCIONADOS --->     
 			<cfquery dbtype="query" name="rstotsolmes">
 				SELECT Andt_RespAnt 
-				FROM  rs3SO
+				FROM  rsTodos
 				where Andt_RespAnt in (4,7,16) and Andt_Mes = #aux_mes_sb# AND (Andt_Resp=3)
 			</cfquery>	
 			<!--- Quant. UNIDADES SOLUCIONADO --->
@@ -519,7 +553,7 @@
 		</tr>	
 	</cfif>
 	<!--- SUPERINTENDENTES --->	
-	<cfif totmessusol neq 0>	
+	<cfif totExisteSU neq 0>	
 		<cfset totparcialsusol = 0>
 		<cfset totparcialsupendtrat = 0>      
 		<tr class="exibir">
@@ -537,7 +571,7 @@
 			<!--- OBTER QTD. SOLUCIONADOS --->     
 			<cfquery dbtype="query" name="rstotsolmes">
 				SELECT Andt_RespAnt 
-				FROM  rs3SO
+				FROM  rsTodos
 				where Andt_RespAnt in (8,22,23) and Andt_Mes = #aux_mes_su# AND (Andt_Resp=3)
 			</cfquery>	
 			<!--- Quant. UNIDADES SOLUCIONADO --->

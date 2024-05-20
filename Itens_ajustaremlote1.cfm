@@ -115,9 +115,9 @@
 		  <cfset dbitem = trim(mid(arqloteent[i],sinic,len(arqloteent[i])))>
 		  <cfset sinic = 0>
 		  <cfset sfim = 0>
-		 
+	 
 		 <!--- Definir os dados do Pos_Area e Pos_NomeArea --->
-		 <cfif form.frmResp eq 21 or form.frmResp eq 28>
+		<cfif form.frmResp eq 21 or form.frmResp eq 28>
 			<!---  --->
 			<cfset auxSE = left(dbinsp,2)>
 			<cfset scia_se = auxSE>
@@ -141,7 +141,7 @@
 			 ORDER BY Ars_Sigla
 			</cfquery>				
 			<cfset aux_posarea = #rsSCIA.Ars_Codigo#>
-			<cfset aux_posnomearea = #rsSCIA.Ars_Sigla#>
+			<cfset aux_posnomearea = #rsSCIA.Ars_Sigla#>		
 		<cfelseif form.frmResp eq 3 or form.frmResp eq 10 or form.frmResp eq 13 or form.frmResp eq 15 or form.frmResp eq 29> 
 			<cfquery name="rsUnidade" datasource="#dsn_inspecao#">
 				SELECT Und_Descricao
@@ -158,7 +158,7 @@
 			<cfset aux_posnomearea = #rsAreacs.Ars_Sigla#>
 		</cfif>
 			
-		<!--- Tratamento quanto a data de previs�o da solu��o --->
+		<!--- Tratamento quanto a data de previsao da solucao --->
 		<cfif form.frmdtprev neq "">
 		   <cfset auxano = right(form.frmdtprev,4)>
 		   <cfset auxmes = mid(form.frmdtprev,4,2)>
@@ -230,14 +230,14 @@
 		<!---  --->
 		<!--- ++++++++++++++++++++++++++++++++++++++++++++++++++++ --->
 		  <cfif rsPar.recordcount gt 0>   
-	 	   <!--- INICIO tempor�rio para atualizar os pontos LEVES --->
+	 	   <!--- INICIO temporario para atualizar os pontos LEVES --->
 	<!---	   <cfset aux_posarea = #rsPar.Pos_Area#>
 		   <cfset aux_posnomearea = #rsPar.Pos_Nomearea#>
 		   #rsPar.Pos_Area# - #rsPar.Pos_Nomearea#
 		   <CFSET GIL = GIL> --->
-		   <!--- FINAL tempor�rio para atualizar os pontos LEVES --->		  
+		   <!--- FINAL temporario para atualizar os pontos LEVES --->		  
 		     <!--- Atualizar andamento --->
-			<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & "-" & TimeFormat(Now(),'HH:MM') & ">" & Trim(Encaminhamento) & CHR(13) & CHR(13) & "Á(O) " & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & "Responsável: COORD VERIF CONTR UNID OP/GCOP" & CHR(13) & CHR(13) & "--------------------------------------------------------------------------------------------------------------">
+			<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & "-" & TimeFormat(Now(),'HH:MM') & ">" & Trim(Encaminhamento) & CHR(13) & CHR(13) & "Á(O) " & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & "Responsável: DCINT/SUGOV/DIGOE" & CHR(13) & CHR(13) & "--------------------------------------------------------------------------------------------------------------">
 			<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
 			<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
 			<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>
@@ -245,7 +245,7 @@
 			   insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#dbinsp#', '#dbunid#', #dbgrupo#, #dbitem#, convert(char, getdate(), 102), 'Rotina_em_Lote', #IDStatus#, '#hhmmssdc#', '#and_obs#', '#aux_posarea#')
 			 </cfquery>  
 		     <!--- Atualizar ParecerUnidade --->			   
-			  <cfset pos_obs = CHR(13) & #rsPar.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & '�(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & 'Responsável: COORD VERIF CONTR UNID OP/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
+			  <cfset pos_obs = CHR(13) & #rsPar.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & Trim(Encaminhamento) & CHR(13) & CHR(13) & '�(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & #Situacao# & CHR(13) & CHR(13) & #dtprevsol# & CHR(13) & CHR(13) & 'Responsável: DCINT/SUGOV/DIGOE' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 			   <cfquery datasource="#dsn_inspecao#">
 			   UPDATE ParecerUnidade SET Pos_Situacao_Resp = #IDStatus# 
 			   , Pos_Situacao = '#SglStatus#'

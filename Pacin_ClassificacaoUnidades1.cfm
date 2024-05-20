@@ -1,5 +1,4 @@
 <cfprocessingdirective pageEncoding ="utf-8"> 
-<cfsetting requesttimeout="15000"> 
 
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 
@@ -18,6 +17,10 @@
 	WHERE (((Itn_Ano)='#auxano#') AND ((RIP_Ano)=#auxano#) AND ((RIP_NumInspecao)='#form.frmx_aval#'))
 	ORDER BY RIP_NumGrupo, RIP_NumItem
 </cfquery>
+<cfset startTime = CreateTime(0,0,0)> 
+<cfset endTime = CreateTime(0,0,45)> 
+<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+</cfloop>
 <cfquery name="rsRelev" datasource="#dsn_inspecao#">
 	SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
 	FROM ValorRelevancia
@@ -67,7 +70,7 @@
 <cfset INPDtFim = dateformat(rsBusca.INP_DtFimInspecao,"dd/mm/yyyy")>
 <cfset INPResp = rsBusca.INP_Responsavel>	
 <cfset HRAval = rsBusca.INP_HrsInspecao>
-<form action="Pacin_o.cfm" method="post" target="_parent" name="form1">  
+<form action="Pacin_ClassificacaoUnidades1.cfm" method="post" target="_parent" name="form1">  
 	  <table width="1950" border="0" align="center">
 	       <tr bgcolor="#CCCCCC" class="exibir">
             <td colspan="19" align="center">
@@ -355,4 +358,3 @@
   <!--- Término da área de conteúdo --->
 </body>
 </html>
-

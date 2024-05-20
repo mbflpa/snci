@@ -1,5 +1,5 @@
 
-
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -37,7 +37,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<title>SNCI - ORIENTAÇÕES DO ITEM</title>
+<title>SNCI - ORIENTAÃ‡Ã•ES DO ITEM</title>
 <link rel="stylesheet" type="text/css" href="view.css" media="all">
 <!--- <script type="text/javascript" src="ckeditor/ckeditor.js"></script> --->
 
@@ -54,8 +54,8 @@
 					<div  style="margin-bottom:10px;">Item: <strong  style="">#rsItemSelecionado.TUI_ITEMVERIF#-#rsItemSelecionado.Itn_Descricao#</strong></div>	 
 					<!---<div  style="margin-bottom:10px;">
 						Tipos de Unidade: <strong  style="">#ValueList(rsTipoItem.TUN_Descricao,', ')#</strong> 
-						<label style="margin-left:30px;">Modalidade: <strong  style=""><cfif #rsItemSelecionado.TUI_Modalidade# eq 0>PRESENCIAL<cfelse>A DISTÂNCIA</cfif></label></strong>	 
-						<label style="margin-left:30px;">Situação: <strong  style=""><cfif #rsItemSelecionado.TUI_Ativo# eq 0>DESATIVADO<cfelse>ATIVO</cfif></label></strong>
+						<label style="margin-left:30px;">Modalidade: <strong  style=""><cfif #rsItemSelecionado.TUI_Modalidade# eq 0>PRESENCIAL<cfelse>A DISTï¿½NCIA</cfif></label></strong>	 
+						<label style="margin-left:30px;">SituaÃ§Ã£o: <strong  style=""><cfif #rsItemSelecionado.TUI_Ativo# eq 0>DESATIVADO<cfelse>ATIVO</cfif></label></strong>
 					</div>--->	 
 				</cfoutput>
 			</div>
@@ -73,7 +73,7 @@
 		</form>
 	</body>
 <script>
-         //configurações diferenciadas do editor de texto.
+         //configuraï¿½ï¿½es diferenciadas do editor de texto.
             CKEDITOR.replace('consultaItemOrientacao', {
             width: '98%',
       		height: 250,

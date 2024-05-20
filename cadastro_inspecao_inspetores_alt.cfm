@@ -1,13 +1,15 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
   <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
   </cfif>    
-  
+
   <cfquery name="qAcesso" datasource="#dsn_inspecao#">
-	select Usu_DR,Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena,Usu_login from usuarios 
-	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+	select Usu_DR,Usu_GrupoAcesso,Usu_Matricula,Usu_Email,Usu_Apelido,Usu_Coordena,Usu_login from usuarios 
+	where Usu_login = '#cgi.REMOTE_USER#'
 </cfquery>
+
+<cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
 
 <cfif trim(qAcesso.Usu_Coordena) neq ''>
     <cfset se= '#qAcesso.Usu_Coordena#'>
@@ -41,82 +43,105 @@
 
 <cfif isdefined('form.acao')>
 <!---  --->
-		<cfif '#form.acao#' eq 'altcadastro'>
-			<!---  --->			
-			<cfquery datasource="#dsn_inspecao#">
-				UPDATE Unidades SET Und_NomeGerente = '#ucase(trim(form.responsavel))#' 
-				WHERE Und_Codigo = '#url.Unid#'
-			</cfquery>		
-			<!---  --->	
-			<cfquery datasource="#dsn_inspecao#" name="rsINSIPT">
-				Select * FROM Inspetor_inspecao  WHERE IPT_NumInspecao = '#url.NumInspecao#'
-			</cfquery>
-			<cfquery datasource="#dsn_inspecao#">
-					UPDATE Numera_Inspecao set NIP_DtIniPrev = CONVERT(DATETIME, '#form.dataInicioInsp#', 103)
-					where NIP_NumInspecao = '#url.NumInspecao#'				
-			</cfquery>
-			<!---  --->			
-			<cfoutput query="rsINSIPT">
-				<cfquery datasource="#dsn_inspecao#">
-				  UPDATE Inspetor_Inspecao SET 
-				  IPT_DtInicInsp= CONVERT(DATETIME, '#form.dataInicioInsp#', 103), 
-				  IPT_DtFimInsp= CONVERT(DATETIME, '#form.dataFimInsp#', 103), 
-				  IPT_DtInicDesloc= CONVERT(DATETIME, '#form.dataInicioDesl#', 103), 
-				  IPT_DtFimDesloc= CONVERT(DATETIME, '#form.dataFimDesl#', 103), 
-				  IPT_NumHrsPreInsp= '#form.horasPreInspecao#', 
-				  IPT_NumHrsdesloc= '#form.horasDeslocamento#', 
-				  IPT_NumHrsInsp= '#form.horasInspecao#', 
-				  IPT_DtUltAtu= CONVERT(char, getdate(), 120), 
-				  IPT_UserName= '#qAcesso.Usu_Matricula#'
-				  where IPT_NumInspecao = '#url.NumInspecao#' and IPT_MatricInspetor = '#rsINSIPT.IPT_MatricInspetor#'
-				</cfquery>
-			</cfoutput>
+	<cfif '#form.acao#' eq 'altgestor'>
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE Unidades SET Und_NomeGerente = '#ucase(trim(form.responsavel))#' 
+			WHERE Und_Codigo = '#url.Unid#'
+		</cfquery>
+	
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE inspecao SET INP_Responsavel= '#ucase(trim(form.responsavel))#'
+			WHERE INP_NumInspecao ='#url.NumInspecao#' 
+		</cfquery>	
 			
-			<!---  --->			
-		    <cfset tothrpreaval = form.horasPreInspecao * rsINSIPT.recordcount>
-			<cfset tothraval = form.horasInspecao * rsINSIPT.recordcount>
-			INP_HrsPreInspecao
-			<cftransaction> 
-			<cfif '#form.acao#' eq 'incInspetor'>			
-				<cfloop list="#form.selInspetores#" index="i">  
-					<cfquery datasource="#dsn_inspecao#" name="rsNumera_Inspecao_verif">
-						Select IPT_NumInspecao FROM Inspetor_inspecao  WHERE IPT_NumInspecao = convert(varchar,'#url.NumInspecao#') and IPT_MatricInspetor = '#i#'
-					</cfquery>
+		<cfquery datasource="#dsn_inspecao#" name="rsInspAtual">
+			SELECT * FROM Inspecao 
+			WHERE INP_NumInspecao = '#url.NumInspecao#'
+		</cfquery>
+		<cfquery datasource="#dsn_inspecao#" name="rsInspetoresCadastrados">
+			SELECT Inspetor_Inspecao.*  
+			FROM Inspetor_Inspecao INNER JOIN Funcionarios ON IPT_MatricInspetor = Fun_Matric
+			WHERE IPT_NumInspecao = '#url.numInspecao#'
+			ORDER BY Fun_Nome
+		</cfquery>		
+	</cfif>
+
+	<cfif '#form.acao#' eq 'altcadastro'>
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE Unidades SET Und_NomeGerente = '#ucase(trim(form.responsavel))#' 
+			WHERE Und_Codigo = '#url.Unid#'
+		</cfquery>		
+		<!---  --->	
+		<cfquery datasource="#dsn_inspecao#" name="rsINSIPT">
+			Select * FROM Inspetor_inspecao  WHERE IPT_NumInspecao = '#url.NumInspecao#'
+		</cfquery>
 		
-					<cfquery datasource="#dsn_inspecao#">
-						insert into Inspetor_Inspecao (IPT_CodUnidade, IPT_NumInspecao, IPT_MatricInspetor, IPT_DtInicInsp, IPT_DtFimInsp, IPT_DtInicDesloc, IPT_DtFimDesloc, IPT_NumHrsPreInsp, IPT_NumHrsdesloc, IPT_NumHrsInsp, IPT_DtUltAtu, IPT_UserName)
-						values ('#url.Unid#', '#url.NumInspecao#', '#i#', CONVERT(DATETIME, '#form.dataInicioInsp#', 103), CONVERT(DATETIME, '#form.dataFimInsp#', 103), CONVERT(DATETIME, '#form.dataInicioDesl#', 103), CONVERT(DATETIME, '#form.dataFimDesl#', 103), '#form.horasPreInspecao#', '#form.horasDeslocamento#', '#form.horasInspecao#', CONVERT(char, getdate(), 120), '#qAcesso.Usu_Matricula#')
-					</cfquery>
-					<cfset tothrpreaval = tothrpreaval + #form.horasPreInspecao#>
-					<cfset tothraval = tothraval + #form.horasInspecao#>
-				</cfloop>
-			</cfif>				
-			<!---  --->
+		<cfquery datasource="#dsn_inspecao#">
+				UPDATE Numera_Inspecao set NIP_DtIniPrev = CONVERT(DATETIME, '#form.dataInicioInsp#', 103)
+				where NIP_NumInspecao = '#url.NumInspecao#'				
+		</cfquery>
+			<!---  --->			
+		<cfoutput query="rsINSIPT">
 			<cfquery datasource="#dsn_inspecao#">
-				UPDATE inspecao SET INP_HrsPreInspecao = '#tothrpreaval#', 
-			                    <cfif '#rsInspAtual.INP_Modalidade#' eq 0>
-									INP_DtInicDeslocamento = CONVERT(DATETIME, '#form.dataInicioDesl#', 103),
-									INP_DtFimDeslocamento =  CONVERT(DATETIME, '#form.dataFimDesl#', 103),
-								</cfif>
-								INP_HrsDeslocamento=  '#form.horasDeslocamento#',
-								INP_DtInicInspecao=  CONVERT(DATETIME, '#form.dataInicioInsp#', 103),
-								INP_DtFimInspecao=  CONVERT(DATETIME, '#form.dataFimInsp#', 103), 
-								INP_DtEncerramento=  CONVERT(DATETIME, '#form.dataFimInsp#', 103),
-								INP_Responsavel= '#ucase(trim(form.responsavel))#',
-								INP_HrsInspecao= #tothraval#
-				WHERE INP_NumInspecao = convert(varchar,'#url.NumInspecao#') 
+				UPDATE Inspetor_Inspecao SET 
+				IPT_DtInicInsp= CONVERT(DATETIME, '#form.dataInicioInsp#', 103), 
+				IPT_DtFimInsp= CONVERT(DATETIME, '#form.dataFimInsp#', 103), 
+				IPT_DtInicDesloc= CONVERT(DATETIME, '#form.dataInicioDesl#', 103), 
+				IPT_DtFimDesloc= CONVERT(DATETIME, '#form.dataFimDesl#', 103), 
+				IPT_NumHrsPreInsp= '#form.horasPreInspecao#', 
+				IPT_NumHrsdesloc= '#form.horasDeslocamento#', 
+				IPT_NumHrsInsp= '#form.horasInspecao#', 
+				IPT_DtUltAtu= CONVERT(char, getdate(), 120), 
+				IPT_UserName= '#qAcesso.Usu_Matricula#'
+				where IPT_NumInspecao = '#url.NumInspecao#' and IPT_MatricInspetor = '#rsINSIPT.IPT_MatricInspetor#'
 			</cfquery>
-			<cfquery datasource="#dsn_inspecao#" name="rsInspAtual">
-				SELECT * FROM Inspecao 
-				WHERE INP_NumInspecao = '#url.NumInspecao#'
-			</cfquery>
-			<cfquery datasource="#dsn_inspecao#" name="rsInspetoresCadastrados">
-				SELECT Inspetor_Inspecao.*  
-				FROM Inspetor_Inspecao INNER JOIN Funcionarios ON IPT_MatricInspetor = Fun_Matric
-				WHERE IPT_NumInspecao = '#url.numInspecao#'
-				ORDER BY Fun_Nome
-			</cfquery>
-			</cftransaction> 
+		</cfoutput>	
+		<!---  --->			
+		<cfset tothrpreaval = form.horasPreInspecao * rsINSIPT.recordcount>
+		<cfset tothraval = form.horasInspecao * rsINSIPT.recordcount>
+	<!---	
+		<cfif '#form.acao#' eq 'incInspetor'>			
+			<cfloop list="#form.selInspetores#" index="i">  
+				<cfquery datasource="#dsn_inspecao#" name="rsNumera_Inspecao_verif">
+					Select IPT_NumInspecao FROM Inspetor_inspecao  
+					WHERE IPT_NumInspecao = convert(varchar,'#url.NumInspecao#') and IPT_MatricInspetor = '#i#'
+				</cfquery>
+	
+				<cfquery datasource="#dsn_inspecao#">
+					insert into Inspetor_Inspecao (IPT_CodUnidade, IPT_NumInspecao, IPT_MatricInspetor, IPT_DtInicInsp, IPT_DtFimInsp, IPT_DtInicDesloc, IPT_DtFimDesloc, IPT_NumHrsPreInsp, IPT_NumHrsdesloc, IPT_NumHrsInsp, IPT_DtUltAtu, IPT_UserName)
+					values ('#url.Unid#', '#url.NumInspecao#', '#i#', CONVERT(DATETIME, '#form.dataInicioInsp#', 103), CONVERT(DATETIME, '#form.dataFimInsp#', 103), CONVERT(DATETIME, '#form.dataInicioDesl#', 103), CONVERT(DATETIME, '#form.dataFimDesl#', 103), '#form.horasPreInspecao#', '#form.horasDeslocamento#', '#form.horasInspecao#', CONVERT(char, getdate(), 120), '#qAcesso.Usu_Matricula#')
+				</cfquery>
+				<cfset tothrpreaval = tothrpreaval + #form.horasPreInspecao#>
+				<cfset tothraval = tothraval + #form.horasInspecao#>
+			</cfloop>
+		</cfif>	
+	--->				
+			<!---  --->
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE inspecao SET INP_HrsPreInspecao = '#tothrpreaval#', 
+							<cfif '#rsInspAtual.INP_Modalidade#' eq 0>
+								INP_DtInicDeslocamento = CONVERT(DATETIME, '#form.dataInicioDesl#', 103),
+								INP_DtFimDeslocamento =  CONVERT(DATETIME, '#form.dataFimDesl#', 103),
+							</cfif>
+							INP_HrsDeslocamento=  '#form.horasDeslocamento#',
+							INP_DtInicInspecao=  CONVERT(DATETIME, '#form.dataInicioInsp#', 103),
+							INP_DtFimInspecao=  CONVERT(DATETIME, '#form.dataFimInsp#', 103), 
+							INP_DtEncerramento=  CONVERT(DATETIME, '#form.dataFimInsp#', 103),
+							INP_Responsavel= '#ucase(trim(form.responsavel))#',
+							INP_HrsInspecao= #tothraval#
+			WHERE INP_NumInspecao = '#url.NumInspecao#' 
+		</cfquery>
+
+		<cfquery datasource="#dsn_inspecao#" name="rsInspAtual">
+			SELECT * FROM Inspecao 
+			WHERE INP_NumInspecao = '#url.NumInspecao#'
+		</cfquery>
+		<cfquery datasource="#dsn_inspecao#" name="rsInspetoresCadastrados">
+			SELECT Inspetor_Inspecao.*  
+			FROM Inspetor_Inspecao INNER JOIN Funcionarios ON IPT_MatricInspetor = Fun_Matric
+			WHERE IPT_NumInspecao = '#url.numInspecao#'
+			ORDER BY Fun_Nome
+		</cfquery>
 	</cfif>
 <!---  --->
 	<cfif '#form.acao#' eq 'incInspetor'>
@@ -154,8 +179,7 @@
 			</cfoutput>
 			<cfset tothrpreaval = form.horasPreInspecao * rsINSIPT.recordcount>
 		    <cfset tothraval = form.horasInspecao * rsINSIPT.recordcount>
-			<cftransaction> 
-			<cfif '#form.acao#' eq 'incInspetor'>			
+		
 				<cfloop list="#form.selInspetores#" index="i">  
 					<cfquery datasource="#dsn_inspecao#" name="rsNumera_Inspecao_verif">
 						Select IPT_NumInspecao FROM Inspetor_inspecao  WHERE IPT_NumInspecao = convert(varchar,'#url.NumInspecao#') and IPT_MatricInspetor = '#i#'
@@ -168,7 +192,7 @@
 					<cfset tothrpreaval = tothrpreaval + #form.horasPreInspecao#>
 					<cfset tothraval = tothraval + #form.horasInspecao#>
 				</cfloop>
-			</cfif>				
+			
 			<!---  --->
 			<cfquery datasource="#dsn_inspecao#">
 				UPDATE inspecao SET INP_HrsPreInspecao = '#tothrpreaval#', 
@@ -182,7 +206,7 @@
 								INP_DtEncerramento=  CONVERT(DATETIME, '#form.dataFimInsp#', 103),
 								INP_Responsavel= '#ucase(trim(form.responsavel))#',
 								INP_HrsInspecao= #tothraval#
-				WHERE INP_NumInspecao = convert(varchar,'#url.NumInspecao#') 
+				WHERE INP_NumInspecao = '#url.NumInspecao#' 
 			</cfquery>
 			<!---  --->	
 			<cfquery datasource="#dsn_inspecao#" name="rsInspAtual">
@@ -195,7 +219,6 @@
 				WHERE IPT_NumInspecao = '#url.numInspecao#'
 				ORDER BY Fun_Nome
 			</cfquery>		
-			</cftransaction> 
     	</cfif>
 <!---  --->
 	</cfif>
@@ -220,7 +243,7 @@
 
 				<cfquery datasource="#dsn_inspecao#">
 					UPDATE inspecao SET INP_HrsInspecao= #tothraval#, INP_HrsPreInspecao=#tothrpreaval#
-					WHERE INP_NumInspecao = trim(convert(varchar,'#url.numInspecao#')) 
+					WHERE INP_NumInspecao = '#url.numInspecao#'
 				</cfquery>	
 	    </cfif>				
 		<cflocation url = "cadastro_inspecao_inspetores_alt.cfm?numInspecao=#url.NumInspecao#&Unid=#url.Unid#&coordenador=#url.coordenador#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=#RIPMatricAvaliador###tabInsp" addToken = "no">
@@ -247,11 +270,8 @@
 		SELECT *  FROM Unidades WHERE Und_Status='A' and Und_Codigo = '#rsInspecao.INP_Unidade#'
 	</cfquery>
     
-	
-
 	<cfset inspecao = "#rsInspecao.INP_NumInspecao# - #rsUnidade.Und_Descricao# (#rsUnidade.Und_Codigo#)">
 
-	
 	<cfquery datasource="#dsn_inspecao#" name="rsInspetores">
 		SELECT Usu_Matricula, Usu_Apelido, Dir_Sigla, CASE WHEN Usu_Matricula = '#url.coordenador#' THEN '0' ELSE '1' END AS ordem FROM Usuarios 
 		INNER JOIN Diretoria ON  Dir_Codigo = Usu_DR
@@ -267,7 +287,7 @@
 		ORDER BY Fun_Nome
 	</cfquery>
 </cfif>
- 
+
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -419,6 +439,8 @@ function valida_formCadNum(x) {
 	
 	if (x == 'incInspetor') {frm.acao.value = 'incInspetor';}
 	if (x == 'altcadastro') {frm.acao.value = 'altcadastro';}
+	if (x == 'altgestor') {frm.acao.value = 'altgestor';}
+	
 
 	function gerarData(str) {
 		var partes = str.split("/");
@@ -426,7 +448,7 @@ function valida_formCadNum(x) {
     }
     var d = new Date();
 	d.setHours(0,0,0,0);
-	if(d > gerarData(frm.dataInicioDesl.value) && x != 'incInspetor' && x != 'altcadastro'){
+	if(d > gerarData(frm.dataInicioDesl.value) && x != 'incInspetor' && x != 'altcadastro' && x != 'altgestor'){
 		alert('A data de início do deslocamento não pode ser menor que a data de hoje.')
 		frm.dataInicioDesl.focus();
 		frm.dataInicioDesl.select();
@@ -610,6 +632,8 @@ if (x == 'altcadastro') {
 		return false;
 	}
 }	
+
+
 //------------------------------------------------------------------------    
  }
 
@@ -714,7 +738,7 @@ if (x == 'altcadastro') {
 						<br><br>
 				<tr><td>
 
-
+<cfif grpacesso eq 'GESTORES' OR grpacesso eq 'ANALISTAS'>
  				<div align="left">
 
 					<a name="btCadastrar" onClick="return valida_formCadNum('incInspetor')" id="btCadastrar" href="javascript:formCadNum.submit()"
@@ -723,7 +747,7 @@ if (x == 'altcadastro') {
 								</img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Incluir Novo(s) Inspetor(es)</a>								
 	
 				</div> 
-			
+</cfif>			
 <!---  --->
 
 <br>
@@ -958,7 +982,7 @@ if (x == 'altcadastro') {
 										</td>
 										
 										<td width="3%">
-										 <cfif auxcoord neq 'Sim'>
+										 <cfif auxcoord neq 'Sim' and grpacesso neq 'INSPETORES'>
 											<div align="center"><a
 													onclick="return confirm('Confirma alterar este Inspetor para ser coordenador desta Avaliação? \n#trim(nomeInspCad.Usu_Apelido)#')"
 													href="cadastro_inspecao_inspetores_alt.cfm?numInspecao=#IPT_NumInspecao#&Unid=#url.Unid#&numMatricula=#IPT_MatricInspetor#&coordenador=#url.Coordenador#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=N&acao=altInspetor"><img
@@ -978,7 +1002,7 @@ if (x == 'altcadastro') {
 										</cfif>
 										<!---  --->																		
 										<td width="5%">
-										<cfif auxcoord neq 'Sim' and qtdinspetores gt 2>	
+										<cfif auxcoord neq 'Sim' and qtdinspetores gt 2 and grpacesso neq 'INSPETORES'>	
 											<div align="center"><a
 													onclick="return confirm('Confirma a exclusão deste Inspetor como participante desta Inspeção? \n#trim(nomeInspCad.Usu_Apelido)#')"
 													href="cadastro_inspecao_inspetores_alt.cfm?numInspecao=#IPT_NumInspecao#&Unid=#url.Unid#&numMatricula=#IPT_MatricInspetor#&coordenador=#url.Coordenador#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=#RIP_MatricAvaliador#&acao=excInspetor"><img
@@ -1009,12 +1033,21 @@ if (x == 'altcadastro') {
 
 			<cfset inspecaoTexto="#url.NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#)">
 <br>
-				<div align="center">
-						<a name="btCadastrar" onClick="return valida_formCadNum('altcadastro')" id="btCadastrar" href="javascript:formCadNum.submit()"
-									class="botaoCad" style="position:relative;left:13px;"><img src="figuras/cadastro.png" width="25"  
-									border="0" style="position:absolute;left:0px;top:5px">
-								</img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alterar Cadastro da Avaliação</a>
-				</div>
+				<cfif grpacesso neq 'INSPETORES'>
+					<div align="center">
+							<a name="btCadastrar" onClick="return valida_formCadNum('altcadastro')" id="btCadastrar" href="javascript:formCadNum.submit()"
+										class="botaoCad" style="position:relative;left:13px;"><img src="figuras/cadastro.png" width="25"  
+										border="0" style="position:absolute;left:0px;top:5px">
+									</img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alterar Cadastro da Avaliação</a>
+					</div>
+				<cfelse>
+					<div align="center">
+							<a name="btCadastrar" onClick="return valida_formCadNum('altgestor')" id="btCadastrar" href="javascript:formCadNum.submit()"
+										class="botaoCad" style="position:relative;left:13px;"><img src="figuras/cadastro.png" width="25"  
+										border="0" style="position:absolute;left:0px;top:5px">
+									</img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alterar Gestor da Unidade</a>
+					</div>				
+				</cfif>
 		</cfif>
 				</div>
 				</div>
@@ -1029,10 +1062,3 @@ if (x == 'altcadastro') {
 
 </body>
 </html>
-
-
-
-
-
-	
-

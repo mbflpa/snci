@@ -455,7 +455,7 @@ function listar(a,b,c,d){
 				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, 
 				andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
 				FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-				WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) and Pos_DtPosic < #dtini# 
+				WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) and Pos_DtPosic < #dtini# and Pos_Mes = #month(dtfim)#
 				ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 			</cfquery>
 			<cfoutput query="rsPRCIr2">
@@ -484,7 +484,7 @@ function listar(a,b,c,d){
 				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, 
 				andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
 				FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-				WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) and Pos_DtPosic >= #dtini#
+				WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) and Pos_DtPosic >= #dtini# and Pos_Mes = #month(dtfim)#
 				ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 			</cfquery>
 
@@ -569,7 +569,7 @@ function listar(a,b,c,d){
 			<cfquery name="rsPRCI5" datasource="#dsn_inspecao#">
 				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
 				FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-				WHERE Pos_Situacao_Resp In (3,1,6,7,17,22) AND Pos_DtPosic between #dtini# and #dtfim#
+				WHERE Pos_Situacao_Resp In (3,1,6,7,17,22) AND Pos_DtPosic between #dtini# and #dtfim# and Pos_Mes = #month(dtfim)#
 				ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 			</cfquery>
 			<cfoutput query="rsPRCI5">

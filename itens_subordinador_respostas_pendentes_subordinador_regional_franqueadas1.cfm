@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	  <cfinclude template="aviso_sessao_encerrada.htm">
@@ -22,11 +22,33 @@
 	 SELECT Ars_Codigo, Ars_Descricao FROM Areas WHERE Ars_Codigo = '#qUsuario.Usu_Lotacao#'
 </cfquery>
 
-
-
 <cfquery name="rsItem" datasource="#dsn_inspecao#">
-  SELECT RIP_NumInspecao, RIP_Unidade, Und_Descricao, RIP_NumGrupo, RIP_NumItem, RIP_Comentario, RIP_Recomendacoes, 
-  INP_DtInicInspecao, INP_Responsavel, Rep_Codigo, RIP_Valor, Itn_Descricao, INP_DtEncerramento, Grp_Descricao 
+  SELECT RIP_NumInspecao, 
+	  RIP_Unidade, 
+	  Und_Descricao, 
+	  Und_TipoUnidade, 
+	  RIP_NumGrupo, 
+	  RIP_NumItem, 
+	  RIP_Comentario, 
+	  RIP_Recomendacoes, 
+	  INP_DtInicInspecao, 
+	  INP_Responsavel, 
+	  Rep_Codigo, 
+	  RIP_Valor, 
+	  RIP_Caractvlr, 
+	  RIP_Falta, 
+	  RIP_Sobra, 
+	  RIP_EmRisco, 
+	  RIP_ReincInspecao, 
+	  RIP_ReincGrupo, 
+	  RIP_ReincItem, 
+	  Itn_TipoUnidade, 
+	  Itn_Descricao, 
+	  Itn_ImpactarTipos,
+	  Itn_PTC_Seq,
+	  INP_DtEncerramento,
+	  INP_TNCClassificacao, 
+	  Grp_Descricao
   FROM Reops 
   INNER JOIN Resultado_Inspecao 
   INNER JOIN Inspecao ON RIP_Unidade = INP_Unidade AND RIP_NumInspecao = INP_NumInspecao 
@@ -316,26 +338,15 @@
   WHERE Und_Codigo = '#URL.Unid#'
 </cfquery>
 
-<script>
+<html>
+<head>
+<title>Sistema Nacional de Controle Interno</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="css.css" rel="stylesheet" type="text/css">
+<script type="text/javascript">
+<cfinclude template="mm_menu.js">
 
-//=============================
-//permite digitaçao apenas de valores numéricos
-function numericos() {
-var tecla = window.event.keyCode;
-//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
-//if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
-
-	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
-		//alert(tecla);
-	//  if () {
-		event.returnValue = false;
-	 // }
-	}
-//}
-}
-//==========================
-
-
+//=========================
 function Trim(str)
 {
 while (str.charAt(0) == ' ')
@@ -423,16 +434,9 @@ function Mascara_SEI(x)
 		  break;
 	}
 }
-//================
-
-
 </script>
 
-<html>
-<head>
-<title>Sistema Nacional de Controle Interno</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="css.css" rel="stylesheet" type="text/css">
+
 
 </head>
 <cfquery name="qResposta" datasource="#dsn_inspecao#">
@@ -452,7 +456,7 @@ function Mascara_SEI(x)
  </cfif>
 
 
-<body onLoad="dtprazo(document.form1.frmResp.value)">
+<body onLoad="">
 <cfset form.acao = ''>
 <cfinclude template="cabecalho.cfm">
 <table width="99%" height="60%" align="center">
@@ -460,10 +464,10 @@ function Mascara_SEI(x)
 	  <td width="74%" valign="top">
 <!--- Área de conteúdo   --->
     <form name="form1" method="post" onSubmit="return validaForm()" enctype="multipart/form-data" action="itens_subordinador_respostas_pendentes_subordinador_regional_franqueadas1.cfm">
-      <div align="right"><table width="90%" align="center">
+      <div align="right"><table width="100%" align="center">
 
 	  <tr class="exibir">
-            <td colspan="8" bgcolor="eeeeee"><div align="center"><cfoutput><span class="titulo1"><strong>PONTO DE CONTROLE INTERNO POR ÁREA</strong>
+            <td colspan="7" bgcolor="eeeeee"><div align="center"><cfoutput><span class="titulo1"><strong>PONTO DE CONTROLE INTERNO POR ÁREA</strong>
                     <input name="unid" type="hidden" id="unid" value="#URL.Unid#">
                     <input name="ninsp" type="hidden" id="ninsp" value="#URL.Ninsp#">
                     <input name="ngrup" type="hidden" id="ngrup" value="#URL.Ngrup#">
@@ -485,83 +489,162 @@ function Mascara_SEI(x)
 		  </tr>
 		
 		  	  <tr class="exibir">
-	    <td colspan="8" bgcolor="eeeeee">&nbsp;</td>
+	    <td colspan="7" bgcolor="eeeeee">&nbsp;</td>
 	    </tr>
            <tr class="exibir">
-	    <td width="10%" bgcolor="eeeeee">Unidade</td>
-	    <td colspan="3" bgcolor="f7f7f7"><cfoutput><strong>#rsMOd.Und_Descricao#</strong></cfoutput></td>
-	    <td colspan="4" bgcolor="f7f7f7">Respons&aacute;vel<cfoutput><strong>&nbsp;&nbsp;#qResponsavel.INP_Responsavel#</strong></cfoutput></td>
+	    <td bgcolor="eeeeee">Unidade</td>
+	    <td bgcolor="f7f7f7"><cfoutput><strong>#rsMOd.Und_Descricao#</strong></cfoutput></td>
+	    <td bgcolor="f7f7f7">Responsável<cfoutput><strong>&nbsp;&nbsp;#qResponsavel.INP_Responsavel#</strong></cfoutput></td>
 	    </tr>
           <tr class="exibir">
             <cfif qInspetor.RecordCount lt 2>
               <td bgcolor="eeeeee">Inspetor</td>
               <cfelse>
-              <td width="23%" bgcolor="eeeeee">Inspetores</td>
+              <td bgcolor="eeeeee">Inspetores</td>
             </cfif>
             <cfset Num_Insp = Left(URL.Ninsp,2) & '.' & Mid(URL.Ninsp,3,4) & '/' & Right(URL.Ninsp,4)>
-            <td colspan="6" bgcolor="f7f7f7"> -&nbsp;<cfoutput query="qInspetor"><strong>#qInspetor.Fun_Nome#</strong>&nbsp;<cfif qInspetor.currentrow neq qInspetor.recordcount><br> - </cfif></cfoutput></td>
+            <td bgcolor="f7f7f7"> -&nbsp;<cfoutput query="qInspetor"><strong>#qInspetor.Fun_Nome#</strong>&nbsp;<cfif qInspetor.currentrow neq qInspetor.recordcount><br> - </cfif></cfoutput></td>
           </tr>
           <tr class="exibir">
-            <td bgcolor="eeeeee">Nº Relatório</td>
+            <td bgcolor="eeeeee">Nº Avaliação</td>
             <cfset Num_Insp = Left(URL.Ninsp,2) & '.' & Mid(URL.Ninsp,3,4) & '/' & Right(URL.Ninsp,4)>
-            <td colspan="7" bgcolor="f7f7f7"><cfoutput><strong>#Num_Insp#</strong></cfoutput></td>
+            <td colspan="6" bgcolor="f7f7f7"><cfoutput><strong>#Num_Insp#</strong></cfoutput></td>
           </tr>
           <tr class="exibir">
             <td bgcolor="eeeeee">Grupo</td>
-            <td colspan="7" bgcolor="f7f7f7"><cfoutput>#URL.Ngrup#</cfoutput><cfoutput><strong> - #rsItem.Grp_Descricao#</strong></cfoutput></td>
+            <td colspan="6" bgcolor="f7f7f7"><cfoutput>#URL.Ngrup#</cfoutput><cfoutput><strong> - #rsItem.Grp_Descricao#</strong></cfoutput></td>
           </tr>
           <tr class="exibir">
             <td bgcolor="eeeeee">Item</td>
-            <td colspan="7" bgcolor="f7f7f7"><cfoutput>#URL.Nitem#</cfoutput><cfoutput><strong> - #rsItem.Itn_Descricao#</strong></cfoutput></td>
+            <td colspan="6" bgcolor="f7f7f7"><cfoutput>#URL.Nitem#</cfoutput><cfoutput> - #rsItem.Itn_Descricao#</cfoutput></td>
           </tr>
            <tr class="exibir">
 			  <td bgcolor="f7f7f7">Relevância</td>
-			  <td colspan="7" bgcolor="f7f7f7">
-			  <table width="100%" border="0">
+			  <td colspan="6" bgcolor="f7f7f7">
+			  <table width="90%" border="0">
 				<tr class="exibir">
-				  <td width="70">Pontuação </td>
-				  <td width="50"><strong class="exibir"><cfoutput>#qResposta.Pos_PontuacaoPonto#</cfoutput></strong></td>
-				  <td width="169"><div align="right">Classificação do Ponto &nbsp;</div></td>
-				  <td width="538"><strong class="exibir"><cfoutput>#qResposta.Pos_ClassificacaoPonto#</cfoutput></strong></td>
+				  <td>Pontuação </td>
+				  <td><strong class="exibir"><cfoutput>#qResposta.Pos_PontuacaoPonto#</cfoutput></strong></td>
+				  <td><div align="right">Classificação do Ponto &nbsp;</div></td>
+				  <td><strong class="exibir"><cfoutput>#qResposta.Pos_ClassificacaoPonto#</cfoutput></strong></td>
 				</tr>
 			  </table></td>
 			  </tr>		  
+<cfoutput>		
+<cfset reincSN = "N">
+<cfset aux_reincSN = "Nao">
+<cfset db_reincInsp = "">
+<cfset db_reincGrup = 0>
+<cfset db_reincItem = 0>
+<cfif rsItem.RIP_ReincGrupo neq 0>
+	<cfset reincSN = "S">
+	<cfset aux_reincSN = "Sim">
+	<cfset db_reincInsp = #trim(rsItem.RIP_ReincInspecao)#>
+	<cfset db_reincGrup = #rsItem.RIP_ReincGrupo#>
+	<cfset db_reincItem = #rsItem.RIP_ReincItem#>
+</cfif>	   
+	<cfif reincSN eq 'S'>
+		<tr class="red_titulo">
+			<td bgcolor="eeeeee">Reincidência</td>
+			<td colspan="6" bgcolor="eeeeee">Nº Avaliação:
+				<input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" onKeyPress="numericos(this.value)">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Grupo:
+			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" onKeyPress="numericos(this.value)">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Item:
+			<input name="frmreincItem" type="text" class="form" id="frmreincItem" size="7" maxlength="4" value="#db_reincItem#" onKeyPress="numericos(this.value)">
+			</strong>		  
+			</td>
+	</tr>
+	</cfif> 
+	<cfset tipoimpacto = 'NÃO QUANTIFICADO'>
+	<cfset encerrarSN = 'N'>
+	<cfset impactofin = 'N'>
+	<cfif listFind(#rsItem.Itn_PTC_Seq#,'10')>
+	  	<cfset impactofin = 'S'>
+		<cfset tipoimpacto = 'QUANTIFICADO'>
+	</cfif>		
+	<cfset falta = lscurrencyformat(rsItem.RIP_Falta,'Local')>
+	<cfset sobra = lscurrencyformat(rsItem.RIP_Sobra,'Local')>
+	<cfset emrisco = lscurrencyformat(rsItem.RIP_EmRisco,'Local')>
+	<cfset fator = 0>
+	<cfset somafaltasobrarisco = (rsItem.RIP_Falta + rsItem.RIP_Sobra + rsItem.RIP_EmRisco)>	   
+	<cfset encerrarSN = 'N'>
+	<cfif reincSN neq 'S' and rsItem.Und_TipoUnidade neq 12 and rsItem.Und_TipoUnidade neq 16>
+		<cfif impactofin eq 'N'>
+			<!--- Não tem impacto financeiro --->
+			<cfset encerrarSN = 'S'>
+		<cfelse>
+			<cfset somafaltasobrarisco = numberformat(#somafaltasobrarisco#,9999999999.99)>
+			<!--- Tem impacto financeiro --->
+			<cfquery name="rsRelev" datasource="#dsn_inspecao#">
+				SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
+				FROM ValorRelevancia
+				WHERE VLR_Ano = '#right(ninsp,4)#'
+			</cfquery>
+			<cfloop query="rsRelev">
+				<cfset fxini = numberformat(rsRelev.VLR_FaixaInicial,9999999999.99)>
+				<cfset fxfim = numberformat(rsRelev.VLR_FaixaFinal,9999999999.99)>
+				<cfif fxini eq 0.01 and somafaltasobrarisco lte fxfim and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator>
+				</cfif>
+				<cfif (fxini neq 0.01 and fxfim neq 0.00) and (somafaltasobrarisco gt fxini and somafaltasobrarisco lte fxfim) and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator>
+				</cfif>					
+				<cfif fxfim eq 0.00 and somafaltasobrarisco gte fxini and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator> 
+				</cfif>
+			</cfloop>				
+			<cfif fator eq 1>
+				<cfset encerrarSN = 'S'>
+			</cfif>
+		</cfif>
+	</cfif>		
+ 	<tr class="exibir">
+      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
+      <td colspan="6" bgcolor="eeeeee">
+		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			<tr class="exibir"><strong>
+				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			</tr>
+		  </table>		  
+	  </td>
+    </tr>	  
+	</cfoutput>
           <tr class="exibir">
-            <td colspan="5" bgcolor="f7f7f7">&nbsp;</td>
-          </tr>
-          <tr class="exibir">
-            <td colspan="5" bgcolor="f7f7f7"></td>
+            <td colspan="6" bgcolor="f7f7f7"></td>
           </tr>
           <tr>
             <td align="center" valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Situação Encontrada:</span></td>
-            <td colspan="7" bgcolor="f7f7f7"><span class="exibir">
+            <td colspan="6" bgcolor="f7f7f7"><span class="exibir">
 				<cfset melhoria = replace('#rsItem.RIP_Comentario#','; ' ,';','all')>	
               <textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form" readonly><cfoutput>#melhoria#</cfoutput></textarea>
             </span></td>
 		  </tr>
 		 <tr>
             <td align="center" valign="middle" bgcolor="eeeeee"><span class="titulos">Orientações:</span></td>
-            <td colspan="7"><textarea name="H_recom" cols="200" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea></td>
+            <td colspan="6"><textarea name="H_recom" cols="200" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea></td>
 		  </tr>
 
            <input type="hidden" name="frmResp" value="7"> 
            <input type="hidden" name="obs" value="<cfoutput>#qResposta.Pos_Parecer#</cfoutput>">
           <tr>
             <td align="center" valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Hist&oacute;rico:</span> <span class="titulos">Manifesta&ccedil;&atilde;o/An&aacute;lise do Controle Interno</span><span class="titulos">:</span></td>
-            <td colspan="7" bgcolor="f7f7f7">
+            <td colspan="6" bgcolor="f7f7f7">
 			<textarea name="H_obs" cols="200" rows="40" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.Pos_Parecer#</cfoutput></textarea>
 			</td>
           </tr>
 
 
           <tr>
-          	<td colspan="4" align="left" valign="middle" bgcolor="white"><span class="titulos"
-          			>Senhor gestor escolha uma das Opções de Baixa:</span>
+          	<td colspan="6" align="left" valign="middle" bgcolor="white"><span class="titulos">
+				Senhor gestor escolha uma das Opções de Baixa:</span>
           	</td>
           </tr>
           <tr>
 
-			  <td colspan="11" align="left" valign="middle" bgcolor="white" class="exibir" >
+			  <td colspan="6" align="left" valign="middle" bgcolor="white" class="exibir" >
 			  <cfset op ="#Session.E01.Pos_OpcaoBaixa#">
           		<input type="radio" id="penalidade_aplicada" name="opcaoBaixa" value="1" <cfif '#op#' eq 1>checked</cfif>>
           		<label for="penalidade_aplicada">Penalidade Aplicada</label>
@@ -574,38 +657,34 @@ function Mascara_SEI(x)
           	</td>
           </tr>
           <tr>
-          	<td colspan="1" align="center" valign="middle" bgcolor="white"><span class="titulos"
-          			>N° SEI:</span>
-          	</td>
-          	
-
-          	<td align="left"><input name="numSEI" id="numSEI" type="text" class="form" wrap="VIRTUAL" onKeyPress="numericos();"
+          	<td colspan="2" align="left" valign="middle" bgcolor="white"><span class="titulos">N° SEI:</span>
+          	    <input name="numSEI" id="numSEI" type="text" class="form" wrap="VIRTUAL" onKeyPress="numericos();"
           			onKeyDown="validacao(); Mascara_SEI(this);" size="27" maxlength="20"
-          			value="<cfoutput>#Session.E01.NumSEI#</cfoutput>"> </td>
-			  <cfif "#qResposta.Pos_OpcaoBaixa#" neq '0' and "#qResposta.Pos_OpcaoBaixa#" neq ''>
-				     <td width="45%" style="color:blue"><strong>ITEM BAIXADO COM SUCESSO!</strong></td>
-			  </cfif>
+          			value="<cfoutput>#Session.E01.NumSEI#</cfoutput>"> 
+			</td>
+			<cfif "#qResposta.Pos_OpcaoBaixa#" neq '0' and "#qResposta.Pos_OpcaoBaixa#" neq ''>
+				<td width="45%" style="color:blue"><strong>ITEM BAIXADO COM SUCESSO!</strong></td>
+			</cfif>
           </tr>
 
 
           <tr>
           	<td align="center" valign="middle" bgcolor="eeeeee"><span class="exibir"><span class="titulos">Registro do
           				Gestor:</span></span></td>
-          	<td colspan="7" bgcolor="f7f7f7"><textarea name="observacao" cols="200" rows="25" 
+          	<td colspan="6" bgcolor="f7f7f7"><textarea name="observacao" cols="200" rows="25" 
           			vazio="false" wrap="VIRTUAL" class="form" id="observacao"><cfoutput>#Session.E01.observacao#</cfoutput></textarea></td>
           </tr>
 		  
 		  <tr>
 	        <td align="center" valign="middle" bgcolor="eeeeee" class="exibir"><strong>ANEXOS</strong></td>
-            <td colspan="7" align="center" valign="middle" bgcolor="eeeeee" class="exibir">&nbsp;</td>
+            <td colspan="6" align="center" valign="middle" bgcolor="eeeeee" class="exibir">&nbsp;</td>
           </tr>
 		 
           <tr>
           	<cfset resp=#qResposta.Pos_Situacao_Resp#>
           		<td align="center" valign="middle" bgcolor="eeeeee" class="exibir"><strong>Arquivo:</strong></td>
-          		<td colspan="4" bgcolor="eeeeee" class="exibir"><input name="arquivo" class="botao" type="file"
-          				size="50"></td>
-          		<td colspan="3" bgcolor="eeeeee" class="exibir">
+          		<td colspan="6" bgcolor="eeeeee" class="exibir"><input name="arquivo" class="botao" type="file"
+          				size="50">
           			<cfif (resp neq 21)>
           				<input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Anexar'"
           					value="Anexar">
@@ -617,7 +696,7 @@ function Mascara_SEI(x)
 		  </tr>
 		
 	      <tr>
-	        <td colspan="8" align="center" valign="middle" bgcolor="eeeeee" class="exibir">&nbsp;</td>
+	        <td colspan="6" align="center" valign="middle" bgcolor="eeeeee" class="exibir">&nbsp;</td>
 		  </tr>
 	<cfset cla = 0>
       <cfloop query= "qAnexos">
@@ -645,31 +724,26 @@ function Mascara_SEI(x)
         </cfif>
       </cfloop>
 	      <tr>
-	        <td colspan="8" align="center" valign="middle" bgcolor="eeeeee" class="exibir">&nbsp;</td>
+	        <td colspan="6" align="center" valign="middle" bgcolor="eeeeee" class="exibir">&nbsp;</td>
           </tr>
 	
 
-
-  <tr>
-	 <td colspan="4" bgcolor="eeeeee" class="exibir"><div align="center">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <cfoutput>
-         <input name="button" type="button" class="botao" onClick="window.open('itens_subordinador_respostas_pendentes_subordinador_regional_franqueadas.cfm?','_self')" value="Voltar">
- </cfoutput>    
-         </div></td>
-	
-     <td colspan="4" bgcolor="eeeeee" class="exibir">
-         <div align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-           <input name="Submit" type="submit" class="botao" value="Baixar" onClick="document.form1.acao.value='Salvar';" >
-	       </div></td>
-	  
-	 </tr>
-	
-
-        </table>
+  <tr>
+	 <td colspan="6" bgcolor="eeeeee" class="exibir" align="center"><input name="button" type="button" class="botao" onClick="window.open('itens_subordinador_respostas_pendentes_subordinador_regional_franqueadas.cfm?','_self')" value="Voltar">
+     &nbsp;&nbsp;&nbsp;&nbsp;<input name="Submit" type="submit" class="botao" value="Baixar" onClick="document.form1.acao.value='Salvar';" >
+	 </td>
+  </tr>
+ </cfoutput>  	
+   </table>
+<cfoutput>		
 		<input type="hidden" name="MM_UpdateRecord" value="form1">
 		<input type="hidden" name="salvar_anexar" value="">
-		<input type="hidden" name="scodresp" id="scodresp" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
-
+		<input type="hidden" name="scodresp" id="scodresp" value="#qResposta.Pos_Situacao_Resp#">
+		<input type="hidden" name="encerrarSN" id="encerrarSN" value="#encerrarSN#">
+		<input name="somafaltasobrarisco" type="hidden" id="somafaltasobrarisco" value="#somafaltasobrarisco#">
+		<input name="reincideSN" type="hidden" id="reincideSN" value="#reincSN#">		
+</cfoutput>
 	</form>
 <!--- Fim Área de conteúdo --->
   </tr>

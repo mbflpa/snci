@@ -41,6 +41,8 @@
 	  RIP_ReincItem, 
 	  Itn_TipoUnidade, 
 	  Itn_Descricao, 
+	  Itn_ImpactarTipos,
+	  Itn_PTC_Seq,
 	  INP_DtEncerramento,
 	  INP_TNCClassificacao, 
 	  Grp_Descricao,
@@ -80,6 +82,8 @@
 	  RIP_ReincItem,
 	  Itn_TipoUnidade, 
 	  Itn_Descricao, 
+	  Itn_ImpactarTipos,
+	  Itn_PTC_Seq,
 	  INP_DtEncerramento,
 	  INP_TNCClassificacao, 
 	  Grp_Descricao
@@ -157,6 +161,20 @@
 <cfif isDefined("Form.acao")>
 	<cfif Form.acao is 'Anexar' and Form.Arquivo neq "">
 		<cftry>
+			<cfquery name="rsSeq" datasource="#dsn_inspecao#">
+				SELECT Ane_Codigo FROM Anexos
+				where Ane_NumInspecao='#Form.ninsp#' and 
+				Ane_Unidade='#Form.unid#' and 
+				Ane_NumGrupo=#Form.ngrup# and 
+				Ane_NumItem=#Form.nitem#
+			</cfquery>
+			<cfif rsSeq.recordcount lte 0>
+				<cfset seq = 1>
+			<cfelse>
+				<cfset seq = val(rsSeq.recordcount + 1)>			
+			</cfif>	
+			<cfset seq = '_Seq' & seq>	
+
 			<cffile action="upload" filefield="arquivo" destination="#diretorio_anexos#" nameconflict="overwrite" accept="application/pdf">
 
 			<cfset data = DateFormat(now(),'DD-MM-YYYY') & '-' & TimeFormat(Now(),'HH') & 'h' & TimeFormat(Now(),'MM') & 'min' & TimeFormat(Now(),'SS') & 's'>
@@ -171,8 +189,7 @@
 			<cfelse>
 			<cfset sconta = Right(sconta,11)>
 			</cfif>
-
-			<cfset destino = cffile.serverdirectory & '\' & #Form.Ninsp# & '_' & data & '_' & #sconta# & '_' & #Form.Ngrup# & '_' & #Form.Nitem# & '.pdf'>
+			<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & seq & '.pdf'>
 
 			<cfif FileExists(origem)>
 
@@ -495,12 +512,12 @@
 
  <!--- Inserindo dados dados na tabela Andamento --->
 	<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'A(o) ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
-	<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
-	<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
-	<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")> 
+	<cfset hhmhss = timeFormat(now(), "HH:MM:ss")>
+	<cfset hhmhss = Replace(hhmhss,':','',"All")>
+	<cfset hhmhss = Replace(hhmhss,'.','',"All")> 
 	<cfquery datasource="#dsn_inspecao#">
 		insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) 
-		values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#auxposarea#', '#hhmmssdc#', '#and_obs#')
+		values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', '#FORM.frmResp#', '#auxposarea#', '#hhmhss#', '#and_obs#')
 	</cfquery>
  
 	<cfif form.encerrarSN eq 'S'>
@@ -526,7 +543,10 @@
 		<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM')  & '> ' & 'Opinião do Controle Interno' & CHR(13) & CHR(13) & 'À(O) ' & #rsItem.Und_Descricao# & CHR(13) & CHR(13) & 'Conforme decisão do Departamento de Controle Interno (DCINT/SUGOV/DIGOE), a partir de 05/03/2024, deixarão de ser acompanhadas pelo órgão de controle a ' & CHR(13) & 'regularização das Não Conformidades identificadas nas Avaliações de Controle realizadas nas unidades operacionais, que não apresentem Impacto Financeiro Direto,' & CHR(13) & 'bem como aquelas que apresentem Impacto Financeiro Direto mas que tenham valor envolvido abaixo da função de quebra de caixa.' & CHR(13) & CHR(13) & 'Tal decisão não exime os órgãos responsáveis da regularização da situação registrada pelo Controle Interno, inclusive quanto ao recolhimento aos cofres da Empresa dos valores devidos.' & CHR(13) & CHR(13) & 'Situação: ENCERRADO' & CHR(13) & CHR(13) &  'Responsável: DCINT/SUGOV/DIGOE ' & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 		<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
 		<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
-		<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")> 		
+		<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")> 
+		<cfif len(hhmmssdc) lt 9>
+			<cfset hhmmssdc = hhmmssdc & '0'>
+		</cfif>
 		<cfquery datasource="#dsn_inspecao#">
 			insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_Area, And_HrPosic, And_Parecer) 
 			values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 29, '#auxposarea#', '#hhmmssdc#', '#and_obs#')
@@ -590,9 +610,9 @@
 <title>Sistema Nacional de Controle Interno</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="css.css" rel="stylesheet" type="text/css">
-
 <script type="text/javascript">
 <cfinclude template="mm_menu.js">
+
 //===================
 function avisonci(){
 //alert(document.form1.nci.value);
@@ -771,71 +791,6 @@ if (document.form1.acao.value == 'Salvar'){
 		alert('Preencher campo: Data da Previsão da Solução ex. DD/MM/AAAA');
 		return false;
 	}
-/*
-
-	
-	var dataForm = dtprevdig.split("/");
-	var dataInformada = new Date(dataForm[2], dataForm[1]-1, dataForm[0]);
-	
-	if (dataInformada > datalimite){
-		var datalimite = datalimite.getDate() + "/" + (datalimite.getMonth() + 1) + "/" + datalimite.getFullYear();
-		alert('Este item s? poder? ficar no status TRATAMENTO TERCEIRIZADA até ' + datalimite + '.  Altere a data de Previsão da Solu�o para uma data igual ou inferior a ' + datalimite + '.');
-		return false;
-	} 
-*/
-	
-	 <!--- formato AAAAMMDD --->
-//	 var dt_hoje_yyyymmdd = document.form1.dthojeyyyymmdd.value;
-//     var pos_dtPrevSoluc_atual = document.form1.frmdtprev_atual.value;
-//	 var And_dtposic_fut = document.form1.frmDT30dias_Fut.value;
-	<!---  var pos_dtposic_amd_atual = document.form1.pos_posic_ymd.value; --->
-//======================================================
-/*
-	 var vDia = dtprevdig.substr(0,2);
-	 var vMes = dtprevdig.substr(3,2);
-	 var vAno = dtprevdig.substr(6,10);
-	 var dtprevdig_yyyymmdd = vAno + vMes + vDia
-
-	 if (dt_hoje_yyyymmdd > dtprevdig_yyyymmdd)
-	 {
-	  alert('Data de Previsão da Solução ? inferior a data de hoje!')
-	  dtprazo(sit);
-	  return false;
-	 }
-	 //==============================
-	 if ((sit == 15 || sit == 16 || sit == 18 || sit == 19 || sit == 23) && dt_hoje_yyyymmdd == dtprevdig_yyyymmdd)
-		 {
-		  alert("Para Situação de Tratamento a Data de Previsão da Solução deve ser superior a data corrente(do dia)!")
-		  //dtprazo(sit);
-		//   document.form1.cbData.disabled = false;
-		  return false;
-		 }
-	if ((sit == 15 || sit == 16 || sit == 18 || sit == 19 || sit == 23) && (dtprevdig_yyyymmdd > document.form1.dtdezddtrat.value))
-		 {
-		  var auxdtedit = document.form1.dtdezddtrat.value;
-		  auxdtedit = auxdtedit.substring(6,8) + '/' + auxdtedit.substring(4,6) + '/' + auxdtedit.substring(0,4)
-		  alert('Para Tratamento a Data de Previsão esta menor que os 10(dez) dias úteis ou Data Previsão concedida para: ' + auxdtedit)
-		// dtprazo(sit);
-		 // exibe(sit);
-	//	  document.form1.cbData.disabled = false;
-		  return false;
-		 }	
-*/	
-//===============================================
- /*
-    if (sit == 15 || sit == 16 || sit == 18 || sit == 19 || sit == 23)
-    {
-	 var dttratfut = document.form1.frmDT_Tratamento_Fut.value;
-	// alert(dtprevdig_yyyymmdd + '   ' + dttratfut);
-	 if (dtprevdig_yyyymmdd > dttratfut)
-	 {
-	  dttratfut = dttratfut.substr(6,2) + "/" + dttratfut.substr(4,2) + "/" + dttratfut.substr(0,4);
-	  alert('Limite de Data Previs?o\n\nEste item s? podera? ficar na Situa??o TRATAMENTO at? ' + dttratfut + '.\n\nAltere a data de previs?o da solu??o para uma data igual ou inferior a ' + dttratfut + '.\n\Ou Manifeste-se em Resposta por mais prazo ao SGCIN');
-	  dtprazo(sit);
-	  return false;
-	 }
-   }	
-*/   
 	//=============================================
     // Sem adendo no campo Pos_DtPrev_Solucao concedido pelo SGCIN
 	if ((dtprevdig_yyyymmdd > And_dtposic_fut) && (And_dtposic_fut >= pos_dtPrevSoluc_atual) && (dt_hoje_yyyymmdd != dtprevdig_yyyymmdd))
@@ -979,6 +934,8 @@ function mensagem(){
   RIP_ReincGrupo, 
   RIP_ReincItem, 
   Itn_Descricao, 
+  Itn_ImpactarTipos,  
+  Itn_PTC_Seq,  
   INP_DtEncerramento, 
   Grp_Descricao,
   INP_TNCCLASSIFICACAO,
@@ -1013,52 +970,8 @@ function mensagem(){
 	<cfset db_reincItem = #rsItem.RIP_ReincItem#>
 </cfif>	
 
-<cfset caracvlr = ucase(trim(rsItem.RIP_Caractvlr))>
-<cfset falta = lscurrencyformat(rsItem.RIP_Falta,'Local')>
-<cfset sobra = lscurrencyformat(rsItem.RIP_Sobra,'Local')>
-<cfset emrisco = lscurrencyformat(rsItem.RIP_EmRisco,'Local')>
-<cfset fator = 0>
-<cfset somafaltasobrarisco = (rsItem.RIP_Falta + rsItem.RIP_Sobra + rsItem.RIP_EmRisco)>	   
-
-<cfset encerrarSN = 'N'>
-<cfif reincSN neq 'S' and rsItem.Und_TipoUnidade neq 12 and rsItem.Und_TipoUnidade neq 16>
-	    <cfif caracvlr neq 'QUANTIFICADO'>
-			<!--- Não tem impacto financeiro --->
-			<cfset encerrarSN = 'S'>
-		<cfelse>
-		    <cfset somafaltasobrarisco = numberformat(#somafaltasobrarisco#,9999999999.99)>
-			<!--- Tem impacto financeiro --->
-			<cfquery name="rsRelev" datasource="#dsn_inspecao#">
-				SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
-				FROM ValorRelevancia
-				WHERE VLR_Ano = '#right(ninsp,4)#'
-			</cfquery>
-			<cfloop query="rsRelev">
-				<cfset fxini = numberformat(rsRelev.VLR_FaixaInicial,9999999999.99)>
-				<cfset fxfim = numberformat(rsRelev.VLR_FaixaFinal,9999999999.99)>
-				<cfif fxini eq 0.01 and somafaltasobrarisco lte fxfim and fator eq 0>
-					<cfset fator = rsRelev.VLR_Fator>
-				</cfif>
-				<cfif (fxini neq 0.01 and fxfim neq 0.00) and (somafaltasobrarisco gt fxini and somafaltasobrarisco lte fxfim) and fator eq 0>
-					<cfset fator = rsRelev.VLR_Fator>
-				</cfif>					
-				<cfif fxfim eq 0.00 and somafaltasobrarisco gte fxini and fator eq 0>
-					<cfset fator = rsRelev.VLR_Fator> 
-				</cfif>
-			</cfloop>				
-			<cfif fator eq 1>
-				<cfset encerrarSN = 'S'>
-			</cfif>
-		</cfif>
-</cfif>	
-<!---
-<cfoutput>
-encerrarSN: #encerrarSN# caracvlr:#caracvlr# falta: #falta# sobra: #sobra# emrisco: #emrisco# somafaltasobrarisco: #somafaltasobrarisco#  reincidente=> #db_reincInsp# - #db_reincGrup# - #db_reincItem#
-</cfoutput>
-<cfset gil = gil>
---->
 <!--- <body onLoad="dtprazo(document.form1.frmResp.value); reincidencia(document.form1.frmReinccb.value); hanci()"> --->
-<body onLoad="dtprazo(document.form1.frmResp.value); hanci()">
+<body onLoad="dtprazo(document.form1.frmResp.value); hanci(); ">
  
 <cfset form.acao = ''>
  <cfinclude template="cabecalho.cfm">
@@ -1082,9 +995,6 @@ encerrarSN: #encerrarSN# caracvlr:#caracvlr# falta: #falta# sobra: #sobra# emris
                       <input name="ngrup" type="hidden" id="ngrup" value="<cfoutput>#URL.Ngrup#</cfoutput>">
                       <input name="nitem" type="hidden" id="nitem" value="<cfoutput>#URL.Nitem#</cfoutput>">
 					  <input name="posarea" type="hidden" id="posarea" value="<cfoutput>#URL.posarea#</cfoutput>">
-					  <input name="quantificSN" type="hidden" id="quantificSN" value="<cfoutput>#caracvlr#</cfoutput>">
-					  <input name="somafaltasobrarisco" type="hidden" id="somafaltasobrarisco" value="<cfoutput>#somafaltasobrarisco#</cfoutput>">
-					  <input name="reincideSN" type="hidden" id="reincideSN" value="<cfoutput>#reincSN#</cfoutput>">
 					  <cfif isDefined("Form.acao")>
 					   <input type="hidden" name="acao" id="acao" value="<cfoutput>#Form.acao#</cfoutput>">
 					  <cfelse>
@@ -1159,7 +1069,19 @@ encerrarSN: #encerrarSN# caracvlr:#caracvlr# falta: #falta# sobra: #sobra# emris
 		</tr>
 	  </table></td>
  	 </tr>		  
-<cfoutput>		   
+<cfoutput>		
+<cfset reincSN = "N">
+<cfset aux_reincSN = "Nao">
+<cfset db_reincInsp = "">
+<cfset db_reincGrup = 0>
+<cfset db_reincItem = 0>
+<cfif rsItem.RIP_ReincGrupo neq 0>
+	<cfset reincSN = "S">
+	<cfset aux_reincSN = "Sim">
+	<cfset db_reincInsp = #trim(rsItem.RIP_ReincInspecao)#>
+	<cfset db_reincGrup = #rsItem.RIP_ReincGrupo#>
+	<cfset db_reincItem = #rsItem.RIP_ReincItem#>
+</cfif>	   
 	<cfif reincSN eq 'S'>
 		<tr class="red_titulo">
 			<td bgcolor="eeeeee">Reincidência</td>
@@ -1173,16 +1095,65 @@ encerrarSN: #encerrarSN# caracvlr:#caracvlr# falta: #falta# sobra: #sobra# emris
 			</td>
 	</tr>
 	</cfif> 
-	<cfif caracvlr eq 'QUANTIFICADO'>
-		<tr class="exibir">
-		<td bgcolor="eeeeee">Valores</td>
-		<td colspan="4" bgcolor="eeeeee">&nbsp;&nbsp;<strong class="exibir">Falta: #falta#</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong class="exibir">Sobra: #sobra#</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong class="exibir">Em Risco: #emrisco#</strong></td>
-		</tr>
-	</cfif>		  
+	<cfset encerrarSN = 'N'>
+	<cfset impactofin = 'N'>
+	<cfset tipoimpacto = 'NÃO QUANTIFICADO'>
+	<cfif listFind(#rsItem.Itn_PTC_Seq#,'10')>
+	  	<cfset impactofin = 'S'>
+		<cfset tipoimpacto = 'QUANTIFICADO'>
+	</cfif>
+	<cfset falta = lscurrencyformat(rsItem.RIP_Falta,'Local')>
+	<cfset sobra = lscurrencyformat(rsItem.RIP_Sobra,'Local')>
+	<cfset emrisco = lscurrencyformat(rsItem.RIP_EmRisco,'Local')>
+	<cfset fator = 0>
+	<cfset somafaltasobrarisco = (rsItem.RIP_Falta + rsItem.RIP_Sobra + rsItem.RIP_EmRisco)>	   
+	<cfset encerrarSN = 'N'>
+	<cfif reincSN neq 'S' and rsItem.Und_TipoUnidade neq 12 and rsItem.Und_TipoUnidade neq 16>
+		<cfif impactofin eq 'N'>
+			<!--- Não tem impacto financeiro --->
+			<cfset encerrarSN = 'S'>
+		<cfelse>
+			<cfset somafaltasobrarisco = numberformat(#somafaltasobrarisco#,9999999999.99)>
+			<!--- Tem impacto financeiro --->
+			<cfquery name="rsRelev" datasource="#dsn_inspecao#">
+				SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
+				FROM ValorRelevancia
+				WHERE VLR_Ano = '#right(ninsp,4)#'
+			</cfquery>
+			<cfloop query="rsRelev">
+				<cfset fxini = numberformat(rsRelev.VLR_FaixaInicial,9999999999.99)>
+				<cfset fxfim = numberformat(rsRelev.VLR_FaixaFinal,9999999999.99)>
+				<cfif fxini eq 0.00 and somafaltasobrarisco lte fxfim and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator>
+				</cfif>
+				<cfif (fxini neq 0.00 and fxfim neq 0.00) and (somafaltasobrarisco gt fxini and somafaltasobrarisco lte fxfim) and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator>
+				</cfif>					
+				<cfif fxfim eq 0.00 and somafaltasobrarisco gte fxini and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator> 
+				</cfif>
+			</cfloop>				
+			<cfif fator eq 1>
+				<cfset encerrarSN = 'S'>
+			</cfif>
+		</cfif>
+	</cfif>		
+ 	<tr class="exibir">
+      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
+      <td colspan="5" bgcolor="eeeeee">
+		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			<tr class="exibir"><strong>
+				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			</tr>
+		  </table>		  
+	  </td>
+    </tr>	  
 	</cfoutput>
-		  <tr class="exibir">
-            <td colspan="4" bgcolor="eeeeee"></td>
-          </tr>
+	<tr class="exibir">
+		<td colspan="4" bgcolor="eeeeee"></td>
+	</tr>
 
     <tr>
 	 <td height="38" bgcolor="eeeeee" align="center"><span class="titulos">Oportunidade<br>de<br>Aprimoramento:</span></td>
@@ -1549,7 +1520,8 @@ encerrarSN: #encerrarSN# caracvlr:#caracvlr# falta: #falta# sobra: #sobra# emris
 	<input type="hidden" name="PosClassificacaoPonto" id="PosClassificacaoPonto" value="#trim(qResposta.Pos_ClassificacaoPonto)#">
 	<input type="hidden" name="undtipounidade" id="undtipounidade" value="#trim(rsItem.Und_TipoUnidade)#">
 	<input type="hidden" name="encerrarSN" id="encerrarSN" value="#encerrarSN#">
-	
+	<input name="somafaltasobrarisco" type="hidden" id="somafaltasobrarisco" value="#somafaltasobrarisco#">
+	<input name="reincideSN" type="hidden" id="reincideSN" value="#reincSN#">
 </cfoutput>
 
       </div>

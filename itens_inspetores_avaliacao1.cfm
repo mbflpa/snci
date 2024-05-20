@@ -49,7 +49,7 @@
 	<cfif isDefined("Form.hunidade")><cfset Session.E01.hunidade = Form.hunidade><cfelse><cfset Session.E01.hunidade = ''></cfif>
 	<cfif isDefined("Form.h_obs")><cfset Session.E01.h_obs = Form.h_obs><cfelse><cfset Session.E01.h_obs = ''></cfif>
 	<cfif isDefined("Form.melhoria")><cfset Session.E01.melhoria = Form.melhoria><cfelse><cfset Session.E01.melhoria = ''></cfif>
-	<cfif isDefined("Form.recomendacao")><cfset Session.E01.recomendacao = Form.recomendacao><cfelse><cfset Session.E01.recomendacao = ''></cfif>
+	<cfif isDefined("form.recomendacoes")><cfset Session.E01.recomendacoes = form.recomendacoes><cfelse><cfset Session.E01.recomendacoes = ''></cfif>
 	<cfif isDefined("Form.ngrup")><cfset Session.E01.ngrup = Form.ngrup><cfelse><cfset Session.E01.ngrup = ''></cfif>
 	<cfif isDefined("Form.ninsp")><cfset Session.E01.ninsp = Form.ninsp><cfelse><cfset Session.E01.ninsp = ''></cfif>
 	<cfif isDefined("Form.nitem")><cfset Session.E01.nitem = Form.nitem><cfelse><cfset Session.E01.nitem = ''></cfif>
@@ -107,7 +107,19 @@
 	<!--- anexar arquivo --->
 	<cfif isDefined("Form.acao") and Form.acao is 'anexar'>
 		<cftry>
-	
+			<cfquery name="rsSeq" datasource="#dsn_inspecao#">
+				SELECT Ane_Codigo FROM Anexos
+				where Ane_NumInspecao='#Form.ninsp#' and 
+				Ane_Unidade='#Form.unid#' and 
+				Ane_NumGrupo=#Form.ngrup# and 
+				Ane_NumItem=#Form.nitem#
+			</cfquery>
+		    <cfif rsSeq.recordcount lte 0>
+				<cfset seq = 1>
+			<cfelse>
+				<cfset seq = val(rsSeq.recordcount + 1)>			
+			</cfif>	
+			<cfset seq = '_Seq' & seq>
 			<cffile action="upload" filefield="arquivo" destination="#diretorio_anexos#" nameconflict="overwrite" accept="application/pdf">
 	
 			<cfset data = DateFormat(now(),'DD-MM-YYYY') & '-' & TimeFormat(Now(),'HH') & 'h' & TimeFormat(Now(),'MM') & 'min' & TimeFormat(Now(),'SS') & 's'>
@@ -115,8 +127,7 @@
 			<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
 			<!--- O arquivo anexo recebe nome indicando Numero da inspeção, Número da unidade, Número do grupo e número do item ao qual está vinculado --->
 	
-			<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & '.pdf'>
-	
+			<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & seq & '.pdf'>
 	
 			<cfif FileExists(origem)>
 	
@@ -134,9 +145,10 @@
 					</cfquery>
 				</cfif>
 			 </cfif>
+
 			<!---  Gilvan em 11/03/2024 --->
 			<cfset aux_melhoria = CHR(13) & Form.melhoria>
-			<cfset aux_recomend = CHR(13) & FORM.recomendacao>	
+			<cfset aux_recomendacoes = CHR(13) & Form.recomendacoes>	
 			<cfset auxfrmfalta = '0.0'>
 			<cfset auxfrmsobra = '0.0'>
 			<cfset auxfrmemrisco = '0.0'>
@@ -160,7 +172,7 @@
 			<cfquery datasource="#dsn_inspecao#">
 				UPDATE Resultado_Inspecao SET
 				RIP_Comentario = '#aux_melhoria#',
-				RIP_Recomendacoes='#aux_recomend#',
+				RIP_Recomendacoes='#aux_recomendacoes#',
 				RIP_Falta= #auxfrmfalta#,
 				RIP_Sobra=#auxfrmsobra#,
 				RIP_EmRisco=#auxfrmemrisco#,
@@ -189,8 +201,7 @@
     </cfif> 
 	<!--- final anexar --->
    <cfif isDefined("Form.acao") and Form.acao is 'excluir_anexo'>
- 
-	  <!--- Verificar se anexo existe --->
+ 	  <!--- Verificar se anexo existe --->
 		 <cfquery datasource="#dsn_inspecao#" name="qAnexos">
 			SELECT Ane_Codigo, Ane_Caminho FROM Anexos
 			WHERE Ane_Codigo = #form.vCodigo#
@@ -211,7 +222,7 @@
 			</cfquery>
 <!---  Gilvan em 11/03/2024 --->
 			<cfset aux_melhoria = CHR(13) & Form.melhoria>
-			<cfset aux_recomend = CHR(13) & FORM.recomendacao>	
+			<cfset aux_recomendacoes = CHR(13) & Form.recomendacoes>	
 			<cfset auxfrmfalta = '0.0'>
 			<cfset auxfrmsobra = '0.0'>
 			<cfset auxfrmemrisco = '0.0'>
@@ -234,7 +245,7 @@
 			<cfquery datasource="#dsn_inspecao#">
 				UPDATE Resultado_Inspecao SET
 				RIP_Comentario = '#aux_melhoria#',
-				RIP_Recomendacoes='#aux_recomend#',
+				RIP_Recomendacoes='#aux_recomendacoes#',
 				RIP_Falta= #auxfrmfalta#,
 				RIP_Sobra=#auxfrmsobra#,
 				RIP_EmRisco=#auxfrmemrisco#,
@@ -267,9 +278,9 @@
 		<cfelse>
 			RIP_Comentario='.'
 	   </cfif>
-	   <cfif IsDefined("FORM.recomendacao") AND FORM.avalItem eq 'N'>
+	   <cfif IsDefined("form.recomendacoes") AND FORM.avalItem eq 'N'>
 		 , RIP_Recomendacoes=
-		  <cfset aux_recom = CHR(13) & FORM.recomendacao>
+		  <cfset aux_recom = CHR(13) & form.recomendacoes>
 		  '#aux_recom#'
 		 <cfelse>
 		 , RIP_Recomendacoes=''		  
@@ -338,16 +349,40 @@
 
 		<!--- Exclusão de todos os anexos para avaliação diferente de N - Não Conforme --->
 		<cfif FORM.avalItem neq 'N'>
+			<!--- Verificar se anexo existe --->
+			<cfquery datasource="#dsn_inspecao#" name="rsAnexos">
+				SELECT Ane_Codigo, Ane_Caminho FROM Anexos
+				WHERE Ane_NumInspecao = '#FORM.ninsp#' and
+				Ane_NumGrupo=#FORM.ngrup# and 
+				Ane_NumItem=#FORM.nitem#
+			</cfquery>
+		 	<cfif rsAnexos.recordCount gt 0>
+				<!--- Exluindo arquivo do diretório de Anexos --->
+				<cfif FileExists(rsAnexos.Ane_Caminho)>
+					<cffile action="delete" file="#rsAnexos.Ane_Caminho#">
+				</cfif>
+			</cfif>				
+			<!--- Excluindo anexo do banco de dados --->
 			<cfquery datasource="#dsn_inspecao#">
 			  DELETE FROM Anexos
-			  WHERE  Ane_Unidade = '#form.unid#' and Ane_NumInspecao = '#FORM.ninsp#' AND Ane_NumGrupo=#FORM.ngrup# AND Ane_NumItem=#FORM.nitem#
+			  WHERE  Ane_Unidade='#form.unid#' and 
+			  Ane_NumInspecao='#FORM.ninsp#' AND 
+			  Ane_NumGrupo=#FORM.ngrup# AND 
+			  Ane_NumItem=#FORM.nitem#
 			</cfquery>	
 			<cfquery datasource="#dsn_inspecao#">
-				delete from Andamento where And_NumInspecao='#FORM.Ninsp#' and And_Unidade='#FORM.unid#' and And_NumGrupo=#FORM.Ngrup# and And_NumItem=#FORM.Nitem#
+				delete from Andamento 
+				where And_NumInspecao='#FORM.Ninsp#' and 
+				And_Unidade='#FORM.unid#' and 
+				And_NumGrupo=#FORM.Ngrup# and 
+				And_NumItem=#FORM.Nitem#
 			</cfquery>
-
 			<cfquery datasource="#dsn_inspecao#">
-				delete from ParecerUnidade where Pos_Inspecao='#FORM.Ninsp#' and Pos_Unidade='#FORM.unid#' and Pos_NumGrupo=#FORM.Ngrup# and Pos_NumItem=#FORM.Nitem#
+				delete from ParecerUnidade 
+				where Pos_Inspecao='#FORM.Ninsp#' and 
+				Pos_Unidade='#FORM.unid#' and 
+				Pos_NumGrupo=#FORM.Ngrup# and 
+				Pos_NumItem=#FORM.Nitem#
 			</cfquery>	
 		</cfif>	
 	</cfif> 
@@ -405,7 +440,6 @@
 			FROM Resultado_Inspecao 
 			WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_NumItem=#FORM.nitem#
         </cfquery>
-
 
 		<cfif '#qRecomendacao.RIP_Recomendacao#' eq 'R' and '#Form.acao#' neq 'anexar' and '#Form.acao#' neq 'excluir_anexo'>
 				<!--- 	Verifica se ainda existem itens em reanálise.	 --->
@@ -813,7 +847,7 @@ function AvaliacaoOnChange(a){
 //alert('linha 599');		
 //-----------------------------------
 		if (a == 'V' || a == 'E' || a == 'C' || a == 'A'){
-			document.getElementById("recomendacao").readOnly = true;
+			document.getElementById("recomendacoes").readOnly = true;
 			frm.nci.value='N';
 			frm.nci.disabled = true;
 			frm.frmnumseinci.value = '';
@@ -852,7 +886,7 @@ function AvaliacaoOnChange(a){
 			document.getElementById("melhoria").readOnly = false;
 			CKEDITOR.instances['melhoria'].setData('.');
 			document.getElementById("melhoria").readOnly = true;
-			document.getElementById("recomendacao").readOnly = true;
+			document.getElementById("recomendacoes").readOnly = true;
 		}	
 //alert('linha 644');						
 //-----------------------------------
@@ -866,17 +900,17 @@ function AvaliacaoOnChange(a){
 				window.reincidB.style.visibility = 'visible';
 			}
 			var auxmelhoria = frm.ripcomentario.value;
-			var auxrecomendacao = frm.riprecomendacoes.value;
+			var auxrecomendacoes = frm.riprecomendacoes.value;
 		 
 			if (frm.acao.value == 'anexar' || frm.acao.value == 'excluir_anexo' || frm.frmrestringirsn.value == 'S') { 
 				auxmelhoria = frm.frmanexoscomentario.value; 
-				auxrecomendacao = frm.frmanexosrecomendacao.value;
+				auxrecomendacoes = frm.frmanexosrecomendacoes.value;
 			}
 				
 			document.getElementById("melhoria").readOnly = false;
 			CKEDITOR.instances['melhoria'].setData(auxmelhoria);
-			document.getElementById("recomendacao").readOnly = false;
-			CKEDITOR.instances['recomendacao'].setData(auxrecomendacao);
+			document.getElementById("recomendacoes").readOnly = false;
+			CKEDITOR.instances['recomendacoes'].setData(auxrecomendacoes);
 		}
 //-----------------------------------		
 		<cfoutput>
@@ -909,7 +943,7 @@ function AvaliacaoOnChangeModelos(a){
 		window.reincidB.style.visibility = 'hidden';	
 		document.getElementById("btnsalvar").disabled = false;
 		document.getElementById("melhoria").readOnly = false;
-	    document.getElementById("recomendacao").readOnly = false;
+	    document.getElementById("recomendacoes").readOnly = false;
 //-------------------------------------------------------	
 	if (a == 'V' || a == 'E' || a == 'C' || a == 'A'){
 		frm.propagaAval.value='n';
@@ -921,10 +955,10 @@ function AvaliacaoOnChangeModelos(a){
 //-------------------------------------------------------	
 	if (a == 'V' || a == 'E' || a == 'C' || a == 'A'){
 //	alert('linha 692');
-		document.getElementById("recomendacao").readOnly = false;
-		CKEDITOR.instances['recomendacao'].setData('');
-	//	document.getElementById("recomendacao").readOnly = true;
-		frm.recomendacao.disabled = true;
+		document.getElementById("recomendacoes").readOnly = false;
+		CKEDITOR.instances['recomendacoes'].setData('');
+	//	document.getElementById("recomendacoes").readOnly = true;
+		frm.recomendacoes.disabled = true;
 		frm.nci.value='N';
 		frm.nci.disabled = true;
 		frm.frmnumseinci.value = '';
@@ -946,7 +980,7 @@ function AvaliacaoOnChangeModelos(a){
 		//frm.btnsalvar.disabled = false;
 		document.getElementById("btnsalvar").disabled = true;
 		CKEDITOR.instances['melhoria'].setData('');
-		CKEDITOR.instances['recomendacao'].setData('');
+		CKEDITOR.instances['recomendacoes'].setData('');
 		//return false;
 	}
 	
@@ -1016,15 +1050,15 @@ function AvaliacaoOnChangeModelos(a){
 			
 		if (frm.acao.value == 'anexar' || frm.acao.value == 'excluir_anexo' || frm.frmrestringirsn.value == 'S') { 
 			oportunaprim = frm.frmanexoscomentario.value; 
-			orientacao = frm.frmanexosrecomendacao.value;	
+			orientacao = frm.frmanexosrecomendacoes.value;	
 		}	
 		   
 			document.getElementById("melhoria").readOnly = false;
-			document.getElementById("recomendacao").readOnly = false; 
+			document.getElementById("recomendacoes").readOnly = false; 
 			
 		if (frm.frmrestringirsn.value != 'S'){
 			CKEDITOR.instances['melhoria'].setData(oportunaprim);
-			CKEDITOR.instances['recomendacao'].setData(orientacao);
+			CKEDITOR.instances['recomendacoes'].setData(orientacao);
 		}
 }
 
@@ -1035,17 +1069,17 @@ habarea(a);
 function habarea(a) {
 	if (a == 'A') {
 	  CKEDITOR.instances['melhoria'].setReadOnly();
-	  CKEDITOR.instances['recomendacao'].setReadOnly();
+	  CKEDITOR.instances['recomendacoes'].setReadOnly();
 	}
 	if (a == 'C' || a == 'V' || a == 'E' || a == 'N') {
 	  CKEDITOR.instances['melhoria'].setReadOnly( false );
-	  CKEDITOR.instances['recomendacao'].setReadOnly();
+	  CKEDITOR.instances['recomendacoes'].setReadOnly();
 	}
  //-------------------------------------------------------
 	 if (a == 'N') {
         document.getElementById("melhoria").readOnly = false;
-	    document.getElementById("recomendacao").readOnly = false;
-		CKEDITOR.instances['recomendacao'].setReadOnly( false );
+	    document.getElementById("recomendacoes").readOnly = false;
+		CKEDITOR.instances['recomendacoes'].setReadOnly( false );
 	 }
 }	
 //-----------------------------------------
@@ -1131,7 +1165,7 @@ function validarform(){
 // if (document.form1.acao.value == 'Salvar' || document.form1.acao.value == 'anexar'){
  if (document.form1.acao.value == 'Salvar'){
         document.getElementById("melhoria").readOnly = false;
-		document.getElementById("recomendacao").readOnly = false;
+		document.getElementById("recomendacoes").readOnly = false;
 		document.getElementById("aguarde").style.visibility = "visible";
 		if (document.form1.acao.value == 'anexar'){
 				if(document.getElementById('arquivo').value==""){
@@ -1148,7 +1182,7 @@ function validarform(){
 		var melhor = frm.melhoria.value;
 		melhor = melhor.replace(/\s/g, '');
 		
-		var recomed = frm.recomendacao.value;
+		var recomed = frm.recomendacoes.value;
 		recomed = recomed.replace(/\s/g, '');
 
 		if (frm.avalItem.value =='N' && frm.nci.value == ''){
@@ -1219,7 +1253,7 @@ function validarform(){
 		}
 //alert('Linha 1046');		
 //-----------------------------------------------------------				
-        if (( frm.melhoria.value == '' || frm.recomendacao.value == '') && frm.avalItem.value =='N')
+        if (( frm.melhoria.value == '' || frm.recomendacoes.value == '') && frm.avalItem.value =='N')
 		{
 		alert('Inspetor(a), para a avaliação "NÃO CONFORME", o campo "Situação Encontrada e/ou Orientações" deve conter, no mínimo, 100 caracteres');
 		document.getElementById('arquivo').value='';
@@ -1372,12 +1406,12 @@ function validarform(){
 		if (document.form1.acao.value == 'anexar'){
 			if(confirm('Esta ação irá salvar esta avaliação.\nDeseja Continuar?')){
 			        document.getElementById("melhoria").readOnly = false;
-					document.getElementById("recomendacao").readOnly = false;
-					if (frm.avalItem.value != 'N'){ document.getElementById("recomendacao").readOnly = true;}
+					document.getElementById("recomendacoes").readOnly = false;
+					if (frm.avalItem.value != 'N'){ document.getElementById("recomendacoes").readOnly = true;}
 					if (frm.avalItem.value == 'E'){ document.getElementById("melhoria").readOnly = true;}
 					if (frm.avalItem.value == 'N'){ 
 						document.getElementById("melhoria").readOnly = false;
-						document.getElementById("recomendacao").readOnly = false;	
+						document.getElementById("recomendacoes").readOnly = false;	
 					}
 			}else{
 				document.getElementById("aguarde").style.visibility = "hidden";
@@ -1607,7 +1641,7 @@ if (auxjustfa.length > 0)
 			<cfset restringirSN = 'S'>
 			<cfset auxjustificativa = 'Os fatos identificados como Não Conforme foram registrados no relatório anterior : Avaliação: ' & #frminspreincidente# & ' Grupo/Item: ' & #ngrup# & '-' & #nitem# & ' com situação atual em: ' & #frmdescantes#>  
 			<cfset Form.melhoria = #auxjustificativa#>  
-			<cfset Form.recomendacao = ''>
+			<cfset form.recomendacoes = ''>
 			<cfset auxvlr = 'C'>
 			<cfset auxdescvlr = 'CONFORME'>
 			
@@ -1620,7 +1654,7 @@ if (auxjustfa.length > 0)
 			<cfset auxdescvlr = 'NÃO CONFORME'>		
 			<!--- <cfset Form.melhoria = #rsItem.Itn_PreRelato# & '<strong>Ref. Normativa:</strong>' & #Trim(rsItem.Itn_Norma)# & '<p><strong>Possíveis Consequências da Situação Encontrada:</strong>'> --->	
 			<cfset Form.melhoria = #rsItem.Itn_PreRelato# & '<strong>Ref. Normativa:</strong>' & #Trim(rsItem.Itn_Norma)#>	
-			<cfset Form.recomendacao = #rsItem.Itn_OrientacaoRelato#>	 
+			<cfset form.recomendacoes = #rsItem.Itn_OrientacaoRelato#>	 
 		</cfif>	
 		<cfelseif listfind('3,29','#frmsituantes#')>
 				<cfset restringirSN = 'S'>
@@ -1628,7 +1662,7 @@ if (auxjustfa.length > 0)
 				<cfset auxdescvlr = 'NÃO CONFORME'>
 			<!---	<cfset Form.melhoria = #rsItem.Itn_PreRelato# & '<strong>Ref. Normativa:</strong>' & #Trim(rsItem.Itn_Norma)# & '<p><strong>Possíveis Consequências da Situação Encontrada:</strong>'> --->
 				<cfset Form.melhoria = #rsItem.Itn_PreRelato# & '<strong>Ref. Normativa:</strong>' & #Trim(rsItem.Itn_Norma)#>
-				<cfset Form.recomendacao = #rsItem.Itn_OrientacaoRelato#>	
+				<cfset form.recomendacoes = #rsItem.Itn_OrientacaoRelato#>	
 			<cfif retornosn eq 'N'>
 				<cfset restringirSN = 'N'>
 			</cfif>				
@@ -1705,7 +1739,7 @@ auxvlr: #auxvlr# <br>
 			['Styles','HorizontalRule','SpecialChar', '-','TextColor', 'BGColor','-','Imagem', '-','Table','-','Maximize'  ]
 		]
     });
-	CKEDITOR.replace('recomendacao', {
+	CKEDITOR.replace('recomendacoes', {
 		width: '1020',
 		height: 100,
 		removePlugins: 'scayt',
@@ -1733,18 +1767,18 @@ auxvlr: #auxvlr# <br>
 
 <table width="68%"  align="center" bordercolor="eeeeee">
   <tr>
-    <td height="20" colspan="5"><div align="center"><strong class="titulo2"><cfoutput>#rsItem.Dir_Descricao#</cfoutput></strong></div></td>
+    <td height="20" colspan="6"><div align="center"><strong class="titulo2"><cfoutput>#rsItem.Dir_Descricao#</cfoutput></strong></div></td>
   </tr>
   <tr>
-    <td height="20" colspan="5">&nbsp;</td>
+    <td height="20" colspan="6">&nbsp;</td>
   </tr>
   <tr>
-    <td height="10" colspan="5"><div align="center"><strong class="titulo1">AVALIAÇÃO ITEM</strong></div></td>
+    <td height="10" colspan="6"><div align="center"><strong class="titulo1">AVALIAÇÃO ITEM</strong></div></td>
   </tr>
   
 
   <tr>
-    <td height="20" colspan="5">&nbsp;</td>
+    <td height="20" colspan="6">&nbsp;</td>
   </tr>
   <form name="form1" method="post" onSubmit="return validarform()" enctype="multipart/form-data" action="itens_inspetores_avaliacao1.cfm">
 <!--- variaveis de formulario --->
@@ -1792,7 +1826,7 @@ auxvlr: #auxvlr# <br>
 		<input type="hidden" name="frmrsSeguir" id="frmrsSeguir" value="#qtdfrmrsSeguir#">
 	</cfoutput>
  <!---   <tr>
-      <td colspan="5"><p class="titulo1">
+      <td colspan="6"><p class="titulo1">
 	  
 		<cfif isDefined("url.frmavaliacaoantes") and url.frmavaliacaoantes neq "">
 			<input name="frminspreincidente" type="hidden" id="frminspreincidente" value="<cfoutput>#frminspreincidente#</cfoutput>">
@@ -1813,7 +1847,7 @@ auxvlr: #auxvlr# <br>
 <!--- 		<td class="exibir" style="background:transparent;font-size:14px"><STRONG>AVALIAÇÃO:</STRONG></td> --->
 		<td bgcolor="eeeeee" class="titulosClaro2"><div align="center"><STRONG>AVALIAÇÃO:</STRONG></div></td>
 		<!--- <td width="11"> ---> 
-		<td colspan="5"> 
+		<td colspan="6"> 
 	<select name="avalItem" id="avalItem" class="form" onChange="exibirvalores();reincidencia(this.value);rsseguir(this.value,'#qtdfrmrsSeguir#','#frmGrprsSeguir#','#frmItemrsSeguir#');if (document.form1.acao.value != 'reincidencia') {AvaliacaoOnChangeModelos(this.value)};" style="background:white;font-size:14px"> 			
 		<cfif #rsItem.RIP_NumGrupo# eq 500 and #rsItem.RIP_NumItem# eq 1>	
 			<option <cfif '#auxvlr#' is "A">selected</cfif>  value="A">---</option>			
@@ -1846,7 +1880,7 @@ auxvlr: #auxvlr# <br>
  </cfoutput>
 	  <tr>
 	    <td bgcolor="eeeeee" class="exibir">Unidade</td>
-	    <td colspan="5" bgcolor="eeeeee"><table width="100%">
+	    <td colspan="6" bgcolor="eeeeee"><table width="100%">
           <tr>
             <td width="333"><cfoutput><strong class="exibir">#URL.Unid#</strong> - <strong class="exibir">#rsMOd.Und_Descricao#</strong></cfoutput></td>
             <td width="99"><span class="exibir">Respons&aacute;vel:</span></td>
@@ -1863,21 +1897,21 @@ auxvlr: #auxvlr# <br>
               Inspetores
         </cfif>	</td>
             <cfset Num_Insp = Left(URL.Ninsp,2) & '.' & Mid(URL.Ninsp,3,4) & '/' & Right(URL.Ninsp,4)>
-            <td colspan="5" bgcolor="eeeeee">-&nbsp;<cfoutput query="qInspetor"><strong class="exibir">#qInspetor.Fun_Nome#</strong>&nbsp;<cfif qInspetor.currentrow neq qInspetor.recordcount><br>-&nbsp;</cfif></cfoutput></td>
+            <td colspan="6" bgcolor="eeeeee">-&nbsp;<cfoutput query="qInspetor"><strong class="exibir">#qInspetor.Fun_Nome#</strong>&nbsp;<cfif qInspetor.currentrow neq qInspetor.recordcount><br>-&nbsp;</cfif></cfoutput></td>
       </tr>
 
     <tr class="exibir">
       <td bgcolor="eeeeee">Nº Relatório</td>
-      <td colspan="5" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In&iacute;cio Inspe&ccedil;&atilde;o &nbsp;<strong class="exibir"><cfoutput>#DateFormat(rsItem.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>
+      <td colspan="6" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In&iacute;cio Inspe&ccedil;&atilde;o &nbsp;<strong class="exibir"><cfoutput>#DateFormat(rsItem.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>
       </tr>
     <tr class="exibir">
       <td bgcolor="eeeeee">Grupo</td>
-      <td colspan="5" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ngrup#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#URL.DGrup#</strong></cfoutput></td>
+      <td colspan="6" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ngrup#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#URL.DGrup#</strong></cfoutput></td>
     </tr>
 
     <tr class="exibir">
       <td bgcolor="eeeeee">Item</td>
-      <td colspan="5" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Nitem#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#rsItem.Itn_Descricao#</strong></cfoutput><cfoutput></cfoutput>        <div align="right"></div>        <cfoutput></cfoutput></td>
+      <td colspan="6" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Nitem#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#rsItem.Itn_Descricao#</strong></cfoutput><cfoutput></cfoutput>        <div align="right"></div>        <cfoutput></cfoutput></td>
 	  </tr>
 <cfoutput>
   <cfset auxclassif = rsItem.Itn_Classificacao>
@@ -1886,7 +1920,7 @@ auxvlr: #auxvlr# <br>
   </cfif>
  	<tr bgcolor="eeeeee" class="exibir">
 	  <td bgcolor="eeeeee">Relevância Item </td>
-	  <td colspan="5" bgcolor="eeeeee">
+	  <td colspan="6" bgcolor="eeeeee">
 	    <table width="100%" border="0">
           <tr>
             <td width="14%"><div align="left"><strong class="exibir">#rsItem.Itn_Pontuacao#</strong></div></td>
@@ -1898,7 +1932,7 @@ auxvlr: #auxvlr# <br>
 <cfif trim(rsItem.TNC_ClassifInicio) neq ''>	
 	<tr bgcolor="eeeeee" class="exibir">
 	  <td>Classificação Unidade</td>
-	  <td colspan="5"><table width="100%" border="0">
+	  <td colspan="6"><table width="100%" border="0">
 		<tr>
 		  <td width="15%" class="exibir"><div align="center">Classificação Inicial:</div></td>
 		  <td width="35%" class="exibir"><strong>#rsItem.TNC_ClassifInicio#</strong></td>
@@ -1936,7 +1970,7 @@ auxvlr: #auxvlr# <br>
 	   
 	      <input type="hidden" name="db_reincSN" id="db_reincSN" value="#reincSN#">
 		   
-	<td colspan="5"  bgcolor="eeeeee"><div id="reincidB">Nº Relatório:
+	<td colspan="6"  bgcolor="eeeeee"><div id="reincidB">Nº Relatório:
 			<input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" style="background:white" onKeyPress="numericos()" readonly="">
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Grupo:
 			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" style="background:white" onKeyPress="numericos()" readonly="">
@@ -1976,7 +2010,7 @@ auxvlr: #auxvlr# <br>
 	</cfif>	  
  	<tr class="exibir">
       <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
-      <td colspan="5" bgcolor="eeeeee">
+      <td colspan="6" bgcolor="eeeeee">
 		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
 			<tr class="exibir">
 				<td width="23%" bgcolor="eeeeee"><div id="impactofalta">Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></div></td>
@@ -1991,15 +2025,15 @@ auxvlr: #auxvlr# <br>
 
 <cfif not isDefined("Form.acao")> 
 	<cfparam name="Form.melhoria" default="#rsItem.RIP_COMENTARIO#">
-	<cfparam name="form.recomendacao" default="#rsItem.RIP_RECOMENDACAO#"> 
+	<cfparam name="form.recomendacoes" default="#rsItem.RIP_Recomendacoes#"> 
 <!--- </cfif>	
-<cfif isDefined("Form.recomendacao")> --->
+<cfif isDefined("form.recomendacoes")> --->
 <cfelse>
- <!--- <cfset form.recomendacao = Session.E01.recomendacao>  --->
+ <!--- <cfset form.recomendacoes = Session.E01.recomendacoes>  --->
 </cfif>
 <tr>
 	<td bgcolor="#eeeeee" align="center"><span class="titulos">Situação Encontrada:</span></td>
-	<td colspan="5" bgcolor="eeeeee"><textarea name="melhoria" id="melhoria" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.melhoria#</cfoutput></textarea></td>
+	<td colspan="6" bgcolor="eeeeee"><textarea name="melhoria" id="melhoria" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.melhoria#</cfoutput></textarea></td>
 </tr>
 
 <textarea  hidden name="ripcomentariojustif" id="ripcomentariojustif" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#auxjustificativa#</cfoutput></textarea>
@@ -2012,11 +2046,11 @@ auxvlr: #auxvlr# <br>
 	 
 <tr>
 	<td bgcolor="eeeeee" align="center"><span class="titulos">Orientações:</span></td>
-	<td colspan="5" bgcolor="eeeeee"><textarea  name="recomendacao" id="recomendacao" style="background:#fff;" cols="200" rows="7" wrap="VIRTUAL" class="form"><cfoutput>#form.recomendacao#</cfoutput></textarea></td>
+	<td colspan="6" bgcolor="eeeeee"><textarea  name="recomendacoes" id="recomendacoes" style="background:#fff;" cols="200" rows="7" wrap="VIRTUAL" class="form"><cfoutput>#form.recomendacoes#</cfoutput></textarea></td>
 </tr>
 <textarea  hidden name="riprecomendacoes" id="riprecomendacoes" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea>
 <textarea  hidden name="itnorientacaorelato" id="itnorientacaorelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.Itn_OrientacaoRelato#</cfoutput></textarea>
-<textarea  hidden name="frmanexosrecomendacao" id="frmanexosrecomendacao" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#Form.recomendacao#</cfoutput></textarea>
+<textarea  hidden name="frmanexosrecomendacoes" id="frmanexosrecomendacoes" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.recomendacoes#</cfoutput></textarea>
 
 <cfset existeanexos = 'N'>
 
@@ -2053,43 +2087,55 @@ auxvlr: #auxvlr# <br>
 	<div id="divAnexos" name="divAnexos" >
 
 		<tr>
-		<td colspan="5" class="exibir" bgcolor="eeeeee"><div align="left"><strong class="exibir">ANEXOS</strong></div></td>
+		<td colspan="6" class="exibir" bgcolor="eeeeee"><div align="left"><strong class="exibir">ANEXOS</strong></div></td>
 		</tr>
 
 		<tr>
-			<td colspan="3" bgcolor="eeeeee" class="exibir"><strong class="exibir">Arquivo:</strong><input  id="arquivo" name="arquivo" class="botao" type="file" size="50" style="display:none"></td>
+			<td colspan="4" bgcolor="eeeeee" class="exibir"><strong class="exibir">Arquivo:</strong><input  id="arquivo" name="arquivo" class="botao" type="file" size="50" style="display:none"></td>
 			<cfif '#grpacesso#' eq "INSPETORES">
-				<td colspan="5" bgcolor="eeeeee" class="exibir"><input id="procurar"name="procurar" type="submit" style="display:none" class="botao" onClick="CKupdate();document.form1.acao.value='anexar';document.form1.recomendacao.disabled = false;<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>" value="anexar"></td>			
+				<td colspan="2" bgcolor="eeeeee" class="exibir" align="center"><input id="procurar"name="procurar" type="submit" style="display:none" class="botao" onClick="CKupdate();document.form1.acao.value='anexar';document.form1.recomendacoes.disabled = false;<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>" value="anexar"></td>			
 			</cfif>
 		</tr>
 		<tr>
-			<td colspan="5">&nbsp;</td>
+			<td colspan="6">&nbsp;</td>
 		</tr>
-
+		<cfset cla = 0>
 		<cfloop query= "qAnexos">
-		<cfif FileExists(qAnexos.Ane_Caminho)>
-		<cfset existeanexos = 'S'>
-			<tr id="tdAnexoButton">
-			<td colspan="3" bgcolor="#eeeeee" class="form"><cfoutput>#ListLast(qAnexos.Ane_Caminho,'\')#</cfoutput></td>
-			<td width="755" bgcolor="#eeeeee"><cfset arquivo = ListLast(qAnexos.Ane_Caminho,'\')>
-					<div align="left">
-						&nbsp;
-						<input name="Abrir" id="Abrir" type="button" class="botao"  value="Abrir" onClick="window.open('abrir_pdf_act.cfm?arquivo=<cfoutput>#arquivo#</cfoutput>','_blank')" />
-			  </div></td>
-			<td width="254" colspan="4" bgcolor="eeeeee"><cfoutput>
-				<div align="center">
-					<input id="Excluir" name="Excluir" type="submit" class="botao" onClick="document.form1.acao.value='excluir_anexo';document.form1.vCodigo.value='#qAnexos.Ane_Codigo#';<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>;document.form1.recomendacao.disabled = false;" value="Excluir" codigo="#qAnexos.Ane_Codigo#">
-				  </div>
-			</cfoutput></td>
-			</tr>
-		</cfif>
+			<cfif FileExists(qAnexos.Ane_Caminho)>
+				<cfset cla = cla + 1>
+				<cfif cla lt 10>
+					<cfset cl = '0' & cla & 'º'>
+				<cfelse>
+					<cfset cl = cla & 'º'>
+				</cfif>		
+				<cfset existeanexos = 'S'>
+				<tr id="tdAnexoButton">
+				<td colspan="4" bgcolor="#eeeeee" class="form"><cfoutput>#cl# - #ListLast(qAnexos.Ane_Caminho,'\')#</cfoutput></td>
+				<td colspan="1"bgcolor="#eeeeee"><cfset arquivo = ListLast(qAnexos.Ane_Caminho,'\')>
+						<div align="center">
+							&nbsp;
+							<input name="Abrir" id="Abrir" type="button" class="botao"  value="Abrir" onClick="window.open('abrir_pdf_act.cfm?arquivo=<cfoutput>#arquivo#</cfoutput>','_blank')" />
+				</div></td>
+				<td colspan="1" bgcolor="eeeeee">
+					<cfoutput>
+						<div align="center">
+						<cfif (cla eq qAnexos.recordcount)>
+							<input id="Excluir" name="Excluir" type="submit" class="botao" onClick="document.form1.acao.value='excluir_anexo';document.form1.vCodigo.value='#qAnexos.Ane_Codigo#';<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>;document.form1.recomendacoes.disabled = false;" value="Excluir" codigo="#qAnexos.Ane_Codigo#">
+						<cfelse>
+							<input id="Excluir" name="Excluir" type="submit" class="botao" onClick="document.form1.acao.value='excluir_anexo';document.form1.vCodigo.value='#qAnexos.Ane_Codigo#';<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>;document.form1.recomendacoes.disabled = false;" value="Excluir" codigo="#qAnexos.Ane_Codigo#" disabled>					
+						</cfif>
+						</div>
+					</cfoutput>
+				</td>
+				</tr>
+			</cfif>
 		</cfloop>
 	</div>
 	<tr>
-      <td colspan="5">&nbsp;</td>
+      <td colspan="6">&nbsp;</td>
     </tr>
 	    <tr>
-      <td colspan="5" align="center"><cfoutput>
+      <td colspan="6" align="center"><cfoutput>
 		<div style="position:absolute;top:145px;left:12px">
 		   <input  name="button" type="button" class="botao" style="cursor:pointer;font-size:18px;background:transparent;color:##000;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=##0a366bb0,endColorstr=##053c7e);" 
 		   onClick="window.open('itens_inspetores_avaliacao.cfm?numInspecao=#URL.Ninsp#&Unid=#url.Unid#','_self')" value="Voltar">
@@ -2152,7 +2198,7 @@ CKEDITOR.replace('melhoria', {
 					
 		]
     });
-	CKEDITOR.replace('recomendacao', {
+	CKEDITOR.replace('recomendacoes', {
 		width: '1020',
 		height: 100,
 		removePlugins: 'scayt',

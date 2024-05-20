@@ -102,8 +102,6 @@
 	</cfif>
 </cfif>
  
-	
-
 <cfset houveProcSN = 'N'>
 <cfif not isDefined("Form.Submit")>
 	<cfset numncisei = "">
@@ -135,7 +133,6 @@
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
 </cfif>        
-
 
 <cfquery name="rsSEINCI" datasource="#dsn_inspecao#">
  SELECT Pos_NCISEI FROM ParecerUnidade WHERE Pos_Unidade='#unid#' AND Pos_Inspecao='#ninsp#' AND Pos_NCISEI Is Not Null ORDER BY Pos_NCISEI DESC
@@ -183,9 +180,20 @@
   <cfif isDefined("Form.modal")><cfset Session.E01.modal = Form.modal><cfelse><cfset Session.E01.modal = ''></cfif>
 
 <cfif Form.acao is 'Anexar'>
-
 	<cftry>
-
+		<cfquery name="rsSeq" datasource="#dsn_inspecao#">
+			SELECT Ane_Codigo FROM Anexos
+			where Ane_NumInspecao='#Form.ninsp#' and 
+			Ane_Unidade='#Form.unid#' and 
+			Ane_NumGrupo=#Form.ngrup# and 
+			Ane_NumItem=#Form.nitem#
+		</cfquery>
+		<cfif rsSeq.recordcount lte 0>
+			<cfset seq = 1>
+		<cfelse>
+			<cfset seq = val(rsSeq.recordcount + 1)>			
+		</cfif>	
+		<cfset seq = '_Seq' & seq>	
 		<cffile action="upload" filefield="arquivo" destination="#diretorio_anexos#" nameconflict="overwrite" accept="application/pdf">
 
 		<cfset data = DateFormat(now(),'DD-MM-YYYY') & '-' & TimeFormat(Now(),'HH') & 'h' & TimeFormat(Now(),'MM') & 'min' & TimeFormat(Now(),'SS') & 's'>
@@ -193,7 +201,7 @@
 		<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
 		<!--- O arquivo anexo recebe nome indicando Numero da Inspeção, Número da unidade, Número do grupo e Número do item ao qual estão vinculado --->
 
-		<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & '.pdf'>
+		<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & seq & '.pdf'>
 
 
 		<cfif FileExists(origem)>
@@ -258,7 +266,6 @@
 	</cfif>
 </cfif>
 
-
  <cfquery name="qUnidade" datasource="#dsn_inspecao#">
 		SELECT Und_descricao FROM Unidades
 		WHERE UND_codigo='#unid#'
@@ -321,26 +328,34 @@
 			</cfif> 		
 			WHERE Pos_Unidade='#unid#' AND Pos_Inspecao='#ninsp#' AND Pos_NumGrupo=#ngrup# AND Pos_NumItem=#nitem#
 		</cfquery>
+		<cfset andparecer = "Ação: Revisar (GESTORES)">
 		<cfquery name="rsExiste" datasource="#dsn_inspecao#">
 		    select And_NumInspecao 
 			from Andamento 
 			where And_NumInspecao='#Form.ninsp#' and 
 			And_Unidade='#Form.unid#' and 
 			And_NumGrupo=#Form.ngrup# and 
-			And_NumItem=#Form.nitem#
+			And_NumItem=#Form.nitem# and
+			And_Situacao_Resp=11 and
+			And_HrPosic='000011'
 		</cfquery>
 		<cfif rsExiste.recordcount lte 0>
 			<cfquery datasource="#dsn_inspecao#">
-				INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-				VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 11, '000011','#Form.unid#')
+				INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area,and_Parecer)
+				VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 11, '000011','#Form.unid#','#andparecer#')
 			</cfquery>
 		<cfelse>
 			<cfquery datasource="#dsn_inspecao#">
-				update Andamento set And_DtPosic=#createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, And_username='#CGI.REMOTE_USER#'
+				update Andamento set And_DtPosic=#createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
+				, And_username='#CGI.REMOTE_USER#'
+				, And_Area = '#Form.unid#'
+				, and_Parecer= '#andparecer#'
 				where And_NumInspecao='#Form.ninsp#' and 
 				And_Unidade='#Form.unid#' and 
 				And_NumGrupo=#Form.ngrup# and 
-				And_NumItem=#Form.nitem#
+				And_NumItem=#Form.nitem# and
+				And_Situacao_Resp=11 and
+				And_HrPosic='000011'
 			</cfquery>
 		</cfif>
 
@@ -1155,11 +1170,9 @@ function abrirPopup(url,w,h)
 		<input type="hidden" name="sfrmTipoUnidade" id="sfrmTipoUnidade" value="#qResposta.Itn_TipoUnidade#">
 		<cfset resp = #qResposta.Pos_Situacao_Resp#> 
 		<input type="hidden" name="srespatual" id="srespatual" value="#resp#">
-		<cfset caracvlr = ucase(trim(qResposta.RIP_Caractvlr))>
 		<cfset falta = lscurrencyformat(qResposta.RIP_Falta,'Local')>
 		<cfset sobra = lscurrencyformat(qResposta.RIP_Sobra,'Local')>
 		<cfset emrisco = lscurrencyformat(qResposta.RIP_EmRisco,'Local')>
-		<input type="hidden" name="scaracvlr" id="scaracvlr" value="#caracvlr#">
 		<input type="hidden" name="sfrmfalta" id="sfrmfalta" value="#falta#">
 		<input type="hidden" name="sfrmsobra" id="sfrmsobra" value="#sobra#">
 		<input type="hidden" name="sfrmemrisco" id="sfrmemrisco" value="#emrisco#">
@@ -1264,6 +1277,10 @@ function abrirPopup(url,w,h)
 	</cfif>
 	</cfoutput>	
 	<cfoutput>
+	<cfset tipoimpacto = 'NÃO QUANTIFICADO'>
+	<cfif listFind(#qResposta.Itn_PTC_Seq#,'10')>
+		<cfset tipoimpacto = 'QUANTIFICADO'>
+	</cfif>
 	<cfset impactofin = 'N'>
 	<cfset impactofalta = 'N'>
 	<cfset impactosobra = 'N'>
@@ -1284,10 +1301,10 @@ function abrirPopup(url,w,h)
       <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
       <td colspan="5" bgcolor="eeeeee">
 		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
-			<tr class="exibir">
-				<td width="23%" bgcolor="eeeeee"><div id="impactofalta">Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></div></td>
-				<td width="26%" bgcolor="eeeeee"><div id="impactosobra">Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></div></td>
-				<td width="27%" bgcolor="eeeeee"><div id="impactoemrisco">Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></div></td>
+			<tr class="exibir"><strong>
+				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
 			</tr>
 		  </table>		  
 	  </td>
@@ -1357,10 +1374,17 @@ function abrirPopup(url,w,h)
         <td colspan="5">&nbsp;</td>
       </tr>
  <!--- <cfset resp = qResposta.Pos_Situacao_Resp> --->
+ 	<cfset cla = 0>
     <cfloop query= "qAnexos">
       <cfif FileExists(qAnexos.Ane_Caminho)>
+		<cfset cla = cla + 1>
+		<cfif cla lt 10>
+			<cfset cl = '0' & cla & 'º'>
+		<cfelse>
+			<cfset cl = cla & 'º'>
+		</cfif>	
         <tr>
-          <td colspan="3" bgcolor="#eeeeee" class="form"><cfoutput>#ListLast(qAnexos.Ane_Caminho,'\')#</cfoutput></td>
+          <td colspan="3" bgcolor="#eeeeee" class="form"><cfoutput>#cl# - #ListLast(qAnexos.Ane_Caminho,'\')#</cfoutput></td>
           <td width="472" bgcolor="#eeeeee"><cfset arquivo = ListLast(qAnexos.Ane_Caminho,'\')>
                   <div align="left">
                     &nbsp;
@@ -1368,7 +1392,7 @@ function abrirPopup(url,w,h)
                 </div></td>
 		  <td bgcolor="eeeeee"><cfoutput>
               <div align="center">
-				<cfif (resp neq 24)>
+				<cfif (resp neq 24 and cla eq qAnexos.recordcount)>
                    <input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value=this.codigo" value="Excluir" codigo="#qAnexos.Ane_Codigo#">
                 <cfelse>
                    <input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value=this.codigo" value="Excluir" codigo="#qAnexos.Ane_Codigo#" disabled>

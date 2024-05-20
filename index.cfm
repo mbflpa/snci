@@ -137,13 +137,13 @@
 	  	</cfcase> 		
 		
 		<cfcase value="inspecao20">
-	  <!---		<cfinclude template="slnc_Ref.cfm"> --->
-			<cfinclude template="Rel_Indicadores_Solucao_Ref.cfm">
+	 		<cfinclude template="slnc_Ref.cfm"> 
+		 <!---	<cfinclude template="Rel_Indicadores_Solucao_Ref.cfm">--->
 	  	</cfcase>
 		
 		<cfcase value="inspecao17">
-		<!---	<cfinclude template="prci_ref.cfm"> --->
-			<cfinclude template="itens_Gestao_Andamento_ref.cfm">
+			<cfinclude template="prci_ref.cfm"> 
+		<!---	<cfinclude template="itens_Gestao_Andamento_ref.cfm">--->
 		</cfcase>
 		
 		<cfcase value="inspecao21">
@@ -151,8 +151,8 @@
 	  	</cfcase>	
 		
 		<cfcase value="inspecao22">
-	<!---  		<cfinclude template="dgci_Ref.cfm"> --->
-			<cfinclude template="se_indicadores_Ref.cfm">
+	  		<cfinclude template="dgci_Ref.cfm"> 
+	<!---		<cfinclude template="se_indicadores_Ref.cfm">--->
 	  	</cfcase>					
 		
         <cfcase value="permissao0">
@@ -269,21 +269,3 @@
 		</script>
 	</cfif>
 </cfif>
-
-<script>
-	window.onload = function() {
-		// Obtém o nome do host e o caminho da página atual
-		var currentHost = window.location.hostname;
-		var currentPath = window.location.pathname;
-
-		// Constrói a URL de destino
-		var targetUrl = "microsoft-edge:http://" + currentHost + currentPath;
-        
-		if (window.navigator.userAgent.indexOf("MSIE ") > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./)) {
-			// Se estiver no modo de compatibilidade do IE, redirecione para a página no Edge
-			window.open(targetUrl, "_blank");
-			window.close();
-		}
-	}
-
-</script>

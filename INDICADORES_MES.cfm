@@ -75,15 +75,21 @@ data limite para SLNC 30(trinta) dias uteis da liberação
 	    <cfquery name="rsGRPITEM" datasource="#dsn_inspecao#">
 			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Pos_Situacao_Resp
 			FROM SLNCPRCIDCGIMES 
+			where Pos_Mes=#aux_mes#
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 		</cfquery>
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,45)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>		
 		<cfoutput query="rsGRPITEM">
 			<cfset auxgrp = rsGRPITEM.Pos_NumGrupo>
 			<cfset auxitm = rsGRPITEM.Pos_NumItem>
 			<cfif (auxgrp is 9 and auxitm is 9) or (auxgrp is 29 and auxitm is 4) or (auxgrp is 68 and auxitm is 3) or (auxgrp is 96 and auxitm is 3) or (auxgrp is 122 and auxitm is 3) or (auxgrp is 209 and auxitm is 3) or (auxgrp is 241 and auxitm is 3) or (auxgrp is 308 and auxitm is 3) or (auxgrp is 278 and auxitm is 2) or (auxgrp is 337 and auxitm is 2)>
 				<cfquery datasource="#dsn_inspecao#">
 				   UPDATE SLNCPRCIDCGIMES SET Pos_Situacao_Resp = 10000
-				   WHERE Pos_Unidade='#rsGRPITEM.Pos_Unidade#' AND 
+				   WHERE Pos_Mes=#aux_mes# and 
+				   Pos_Unidade='#rsGRPITEM.Pos_Unidade#' AND 
 				   Pos_Inspecao='#rsGRPITEM.Pos_Inspecao#' AND 
 				   Pos_NumGrupo=#rsGRPITEM.Pos_NumGrupo# AND 
 				   Pos_NumItem=#rsGRPITEM.Pos_NumItem#
@@ -96,9 +102,13 @@ data limite para SLNC 30(trinta) dias uteis da liberação
 	   <cfquery name="rsPosNArea" datasource="#dsn_inspecao#">
 			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Pos_Situacao_Resp
 			FROM SLNCPRCIDCGIMES 
-			WHERE Pos_Situacao_Resp In (14,3,2,4,5,8,20,15,16,18,19,23) AND (Pos_NomeArea is null or Pos_Area is null)
+			WHERE Pos_Situacao_Resp In (14,3,2,4,5,8,20,15,16,18,19,23) AND (Pos_NomeArea is null or Pos_Area is null) and (Pos_Mes=#aux_mes#)
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 		</cfquery>
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,45)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>		
 		<cfoutput query="rsPosNArea">
 			<cfset PosNomeArea = ''>
 			<cfset PosArea = rsPosNArea.Pos_Area>
@@ -158,13 +168,18 @@ data limite para SLNC 30(trinta) dias uteis da liberação
 		 <cfquery name="rsPosNmArea" datasource="#dsn_inspecao#">
 			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Pos_Situacao_Resp
 			FROM SLNCPRCIDCGIMES 
-			where (Pos_NomeArea Like '%/CVCO%' or Pos_NomeArea Like '%CVCO/SCIA%' or Pos_NomeArea Like '%CCOP/SCIA%' Or Pos_NomeArea Like '%CVCO/SCOI%' Or Pos_NomeArea Like '%CCOP/SCOI%' Or Pos_NomeArea Like '%GCOP/SGCIN%' or Pos_NomeArea Like '%GSOP/CSEC' or Pos_NomeArea Like '%GAAV/SGSEC' Or Pos_NomeArea Like '%/CORR%' OR Pos_NomeArea Like '%/SCORG%')
+			where (Pos_Mes=#aux_mes#) and (Pos_NomeArea Like '%/CVCO%' or Pos_NomeArea Like '%CVCO/SCIA%' or Pos_NomeArea Like '%CCOP/SCIA%' Or Pos_NomeArea Like '%CVCO/SCOI%' Or Pos_NomeArea Like '%CCOP/SCOI%' Or Pos_NomeArea Like '%GCOP/SGCIN%' or Pos_NomeArea Like '%GSOP/CSEC' or Pos_NomeArea Like '%GAAV/SGSEC' Or Pos_NomeArea Like '%/CORR%' OR Pos_NomeArea Like '%/SCORG%')
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 		</cfquery>
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,45)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>
 		<cfoutput query="rsPosNmArea">
 			<cfquery datasource="#dsn_inspecao#">
 			   UPDATE SLNCPRCIDCGIMES SET Pos_Situacao_Resp = 11000 
-			   WHERE Pos_Unidade='#rsPosNmArea.Pos_Unidade#' AND 
+			   WHERE Pos_Mes=#aux_mes# and 
+			   Pos_Unidade='#rsPosNmArea.Pos_Unidade#' AND 
 			   Pos_Inspecao='#rsPosNmArea.Pos_Inspecao#' AND 
 			   Pos_NumGrupo=#rsPosNmArea.Pos_NumGrupo# AND 
 			   Pos_NumItem=#rsPosNmArea.Pos_NumItem#
@@ -178,9 +193,13 @@ data limite para SLNC 30(trinta) dias uteis da liberação
 		 <cfquery name="rsAndHRPosic" datasource="#dsn_inspecao#">
 			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Area, Pos_NomeArea, Pos_Situacao_Resp, Pos_DtPosic
 			FROM SLNCPRCIDCGIMES 
-			WHERE Pos_Situacao_Resp < 5000
+			WHERE Pos_Situacao_Resp < 5000 and Pos_Mes=#aux_mes#
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 		</cfquery>
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,45)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>		
 		<cfoutput query="rsAndHRPosic">
 			<cfset PosDtPosic = CreateDate(year(rsAndHRPosic.Pos_DtPosic),month(rsAndHRPosic.Pos_DtPosic),day(rsAndHRPosic.Pos_DtPosic))>
 			<cfquery name="rs14HH" datasource="#dsn_inspecao#">
@@ -201,7 +220,8 @@ data limite para SLNC 30(trinta) dias uteis da liberação
 			</cfif>
 	        <cfquery datasource="#dsn_inspecao#">
 			   UPDATE SLNCPRCIDCGIMES SET andHrPosic = '#AndHrPosic#' 
-			   WHERE Pos_Unidade='#rsAndHRPosic.Pos_Unidade#' AND 
+			   WHERE  Pos_Mes=#aux_mes# and
+			   Pos_Unidade='#rsAndHRPosic.Pos_Unidade#' AND 
 			   Pos_Inspecao='#rsAndHRPosic.Pos_Inspecao#' AND 
 			   Pos_NumGrupo=#rsAndHRPosic.Pos_NumGrupo# AND 
 			   Pos_NumItem=#rsAndHRPosic.Pos_NumItem#

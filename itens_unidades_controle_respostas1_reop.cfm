@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/> 
+<cfprocessingdirective pageEncoding ="utf-8"> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
@@ -127,13 +127,43 @@ WHERE     (IPT_NumInspecao = '#URL.Ninsp#')
  
    <cflocation url="itens_unidades_controle_respostas_reop.cfm?#CGI.QUERY_STRING#">
 </cfif>
-<cfquery name="rsMod" datasource="#dsn_inspecao#">
-SELECT Unidades.Und_Descricao, Unidades.Und_CodReop
-FROM Unidades
-WHERE Unidades.Und_Codigo = '#URL.Unid#' 
-</cfquery>
+ <cfif left(ninsp,2) eq left(trim(qUsuario.Usu_Lotacao),2)>
+	<cfquery name="rsMod" datasource="#dsn_inspecao#">
+	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
+	  FROM Unidades INNER JOIN Diretoria ON Unidades.Und_CodDiretoria = Diretoria.Dir_Codigo
+	  WHERE Und_Codigo = '#URL.Unid#'
+	</cfquery>
+	<cfset auxposarea = rsMod.Und_Codigo>
+	<cfset auxnomearea = rsMod.Und_Descricao>
+<cfelse> 
+	<cfquery name="rsMod" datasource="#dsn_inspecao#">
+	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
+	  FROM Unidades INNER JOIN Diretoria ON Unidades.Und_CodDiretoria = Diretoria.Dir_Codigo
+	  WHERE Und_Codigo = '#URL.posarea#'
+	</cfquery>
+	<cfset auxposarea = rsMod.Und_Codigo>
+	<cfset auxnomearea = rsMod.Und_Descricao>	
+</cfif> 
 
-<script>
+
+<html>
+<head>
+<title>Sistema Nacional de Controle Interno</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="css.css" rel="stylesheet" type="text/css">
+<script type="text/javascript">
+<cfinclude template="mm_menu.js">
+//============================
+//Funcao que abre uma pagina em Popup
+function popupPage() {
+<cfoutput>  //página chamada, seguida dos parâmetros número, unidade, grupo e item
+var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
+</cfoutput>
+windowprops = "location=no,"
++ "scrollbars=yes,width=750,height=500,top=100,left=200,menubars=no,toolbars=no,resizable=yes";
+window.open(page, "Popup", windowprops);
+}
+
 function Trim(str)
 {
 while (str.charAt(0) == ' ')
@@ -162,24 +192,7 @@ function valida_form(form) {
    }
  } 
 }
-
-//Fun��o que abre uma p�gina em Popup
-function popupPage() {
-<cfoutput>  //p�gina chamada, seguida dos par�metros n�mero, unidade, grupo e item
-var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
-</cfoutput>
-windowprops = "location=no,"
-+ "scrollbars=yes,width=750,height=500,top=100,left=200,menubars=no,toolbars=no,resizable=yes";
-window.open(page, "Popup", windowprops);
-}
 </script>
-
-<html>
-<head>
-<title>Sistema de Acompanhamento das Respostas das Auditorias</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="css.css" rel="stylesheet" type="text/css">
-
 </head>
 <body>
 <cfset form.acao = ''>
@@ -206,9 +219,9 @@ window.open(page, "Popup", windowprops);
             <td colspan="7">&nbsp;</td>
           </tr>
           <tr class="exibir">
-            <td width="97" bgcolor="eeeeee">Unidade </td>
+            <td width="97" bgcolor="eeeeee">Unidade</td>
             <td colspan="2" bgcolor="f7f7f7"><cfoutput><strong>#rsMOd.Und_Descricao#</strong></cfoutput></td>
-            <td width="128" bgcolor="f7f7f7">Respons&aacute;vel</td>
+            <td width="128" bgcolor="f7f7f7">Responsável</td>
             <td width="200" colspan="3" bgcolor="f7f7f7"><cfoutput><strong>#qResponsavel.INP_Responsavel#</strong></cfoutput></td>
             </tr>
           <tr class="exibir">
@@ -242,12 +255,6 @@ window.open(page, "Popup", windowprops);
           <tr class="exibir">
             <td colspan="7" bgcolor="f7f7f7"></td>
            </tr>
-        <!---  <tr class="exibir">
-            <td bgcolor="eeeeee">&nbsp;</td>
-            <td colspan="5" bgcolor="f7f7f7"><cfoutput>
-                <input name="comentarios" type="button" class="botao" onClick="window.open('itens_unidades_controle_respostas_comentarios.cfm?numero=#URL.ninsp#&unidade=<cfoutput>#URL.unid#</cfoutput>&numgrupo=<cfoutput>#URL.ngrup#</cfoutput>&numitem=<cfoutput>#URL.nitem#</cfoutput>','','scrollbars=yes, resizable=yes, width=600, height=460, left=120, top=100')" value="Situação Encontrada">
-            </cfoutput></td>
-          </tr> --->
           <input type="hidden" name="frmResp" value="7">
           <input type="hidden" name="obs" value="<cfoutput>#qResposta.Pos_Parecer#</cfoutput>">
           <tr>
@@ -258,13 +265,13 @@ window.open(page, "Popup", windowprops);
             <input type="hidden" name="frmResp" value="3">
             <!--- <input type="hidden" name="obs" value="<cfoutput>#qResposta.Pos_Parecer#</cfoutput>"> --->
           <tr>
-            <td valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Hist&oacute;rico:</span> <span class="titulos">Manifesta&ccedil;&atilde;o/An&aacute;lise da Auditoria</span><span class="titulos">:</span></td>
+            <td valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Histórico:</span> <span class="titulos">Manifesta&ccedil;&atilde;o/An&aacute;lise da Auditoria</span><span class="titulos">:</span></td>
             <td colspan="6" bgcolor="f7f7f7"><cfif Not IsDefined("FORM.MM_UpdateRecord") And Trim(qResposta.Pos_Parecer) neq ''>
               <textarea name="H_obs" cols="120" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.Pos_Parecer#</cfoutput></textarea></cfif>
                <!--- <textarea name="observacao" cols="120" rows="5" vazio="false" wrap="VIRTUAL" class="form" id="observacao"></textarea></td>--->
           </tr>
           <tr>
-            <td bgcolor="eeeeee"><span class="exibir"><span class="titulos">Recomenda&ccedil;&otilde;es:</span></span></td>
+            <td bgcolor="eeeeee"><span class="exibir"><span class="titulos">Recomendações:</span></span></td>
             <td colspan="6"><span class="exibir">
               <textarea name="H_recom" cols="120" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea>
             </span></td>
@@ -307,9 +314,13 @@ window.open(page, "Popup", windowprops);
               </td>
           </tr>
         </table>
+</div>        
+<cfoutput>        
         <input type="hidden" name="MM_UpdateRecord" value="form1">
-		<input type="hidden" name="scodresp" id="scodresp" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
-      </div>
+		    <input type="hidden" name="scodresp" id="scodresp" value="#qResposta.Pos_Situacao_Resp#">
+        <input name="somafaltasobrarisco" type="hidden" id="somafaltasobrarisco" value="#somafaltasobrarisco#">
+        <input name="reincideSN" type="hidden" id="reincideSN" value="#reincSN#">        
+</cfoutput>      
 	</form>
 
 <!--- Fim �rea de conte�do --->

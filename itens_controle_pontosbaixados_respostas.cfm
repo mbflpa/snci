@@ -157,6 +157,7 @@ ON STO_Codigo = Pos_Situacao_Resp
 	Pos_NumGrupo, 
 	Pos_NumItem, 
 	Pos_dtultatu, 
+	Pos_Area,
 	Grp_Descricao, 
 	Dir_Codigo,
 	Dir_Sigla,
@@ -679,7 +680,7 @@ function Hint(objNome, action){
 			</cfif>
 	  </cfif>
 	  	 <tr bgcolor="f7f7f7" class="exibir">			
-			<td width="6%" bgcolor="#STO_Cor#"><div align="center"><a onClick="capturaPosicaoScroll()" href="itens_controle_pontosbaixados_respostas1.cfm?Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&Nitem=#rsItem.Pos_NumItem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&reop=#rsItem.Und_CodReop#&SE=#url.SE#&selStatus=#selStatus#&StatusSE=#StatusSE#&txtNum_Inspecao=#txtNum_Inspecao#&vlrdec=#rsItem.Itn_ValorDeclarado#&situacao=#rsItem.Pos_Situacao_Resp#" class="exibir" onMouseMove="Hint('#STO_Sigla#',2)" onMouseOut="Hint('#STO_Sigla#',1)"><strong>#trim(STO_Descricao)#</strong></a></div></td>
+			<td width="6%" bgcolor="#STO_Cor#"><div align="center"><a onClick="capturaPosicaoScroll()" href="itens_controle_pontosbaixados_respostas1.cfm?Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&Nitem=#rsItem.Pos_NumItem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&reop=#rsItem.Und_CodReop#&SE=#url.SE#&selStatus=#selStatus#&StatusSE=#StatusSE#&txtNum_Inspecao=#txtNum_Inspecao#&vlrdec=#rsItem.Itn_ValorDeclarado#&posarea=#rsItem.Pos_Area#&situacao=#rsItem.Pos_Situacao_Resp#" class="exibir" onMouseMove="Hint('#STO_Sigla#',2)" onMouseOut="Hint('#STO_Sigla#',1)"><strong>#trim(STO_Descricao)#</strong></a></div></td>
 			<cfset auxsaida = DateFormat(rsItem.Pos_DtPosic,'DD/MM/YYYY')>
 		<td width="2%"><div align="center">#rsItem.Modal#</div></td>
 		<td width="3%">#auxsaida#</td>

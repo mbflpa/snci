@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfsetting requesttimeout="500">
 <!---
    <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
@@ -286,7 +286,7 @@ var ancora = window.location.href.split("#")[1];
 bd.onmousemove = goLoad;
 
 function goLoad() {	
-    if(new Date().getTime() - time >= 50000) {
+    if(new Date().getTime() - time >= 90000) {
 		// alert("Os dados da página serão atualizados!");
 		time = new Date().getTime();
 		aguarde();
@@ -298,8 +298,6 @@ function goLoad() {
         time = new Date().getTime();
     }
 }
-
-
 
 function piscando(){
     img = document.getElementById("imgAguarde");
@@ -313,10 +311,6 @@ function piscando(){
   setTimeout('piscando()', 500);
 
 }
-
-
-
-
  function aguarde(t){
 
   if(t !== undefined){
@@ -427,8 +421,6 @@ function gerarData(str) {
 	
 }
 
-
-	
 //================
 function Mascara_Data(data)
 {
@@ -610,12 +602,12 @@ function busca(){
 	<br><br>
 	<!--- <img id="top" src="top.png" alt=""> --->
 <cfif '#url.acao#' neq "inspCad">	
-<div id="aguarde" name="aguarde" align="center" style="width:100%;height:200%;top:0px;left:0px; background:transparent;
+<div id="aguarde" name="aguarde" align="center"  style="width:100%;height:200%;top:0px;left:0px; background:transparent;
 filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F86b2ff,endColorstr=#7F86b2ff);
 z-index:1000;visibility:hidden;position:absolute;" >		
 		 <img id="imgAguarde" name="imgAguarde" src="figuras/aguarde.png" width="100px"  border="0" style="position:absolute;"></img>
 </div>
-	<div id="form_container" style="position:relative;top:-30px" align="center">
+	<div id="form_container" style="position:relative;top:-30px">
 			
 		<img src="figuras/cadastro.png" width="29"  border="0" style="position:absolute;left:-4px;top:-1px"></img>
 		<h1 style="font-size:14px"><div align="center">GERAR E CADASTRAR N° DE AVALIAÇÃO</div></h1>
@@ -889,6 +881,8 @@ tbody {
 				ORDER BY Dir_Sigla, Und_Descricao
 </cfquery>
 
+
+
 <cfquery datasource="#dsn_inspecao#" name="rsFinalizadasSemNC" >
 			SELECT DISTINCT INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_Modalidade
 				, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'semNC' as tipo FROM  Inspecao
@@ -941,9 +935,9 @@ tbody {
 	WHERE  Und_CodDiretoria in(#se#) and NIP_Situacao = 'E' and right(NIP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
 	ORDER BY Dir_Sigla, Und_Descricao  
 </cfquery>
-<h1 id="titulo" style="font-size:14px;width:1390px;"><STRONG>AVALIAÇÕES</STRONG></h1>
+<h1 id="titulo" style="font-size:14px;width:720px;"><STRONG>AVALIAÇÕES</STRONG></h1>
 
-<div style="background:#6699CC;width:1390px;" align="center">
+<div style="background:#6699CC;width=720px;">
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('NaoFinalizadas', this, '#6699CC')" id="naoFinaliz"><STRONG>INCLUIR INSPETORES</STRONG><br>( <cfoutput>#rsNumeraInspecao.recordcount#</cfoutput> )</button>
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('NaoAvaliadas', this, '#6699CC')" id="naoAval"><STRONG>EM ANDAMENTO</STRONG><br>( <cfoutput>#rsInspecao.recordcount#</cfoutput> )</button>
 	<button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('EmRevisao', this, '#6699CC')" id="emRev"><STRONG>EM REVISÃO</STRONG><br>( <cfoutput>#rsEmRevisaoFinalizadasSemNC.recordcount#</cfoutput> )</button>
@@ -951,7 +945,7 @@ tbody {
     <button class="tablink" onmouseOver="corHover(this);" onMouseOut="corOut(this);" onClick="openPage('Excluidas', this, '#6699CC')" id="excl"><STRONG>EXCLUÍDAS</STRONG><br>
     ( <cfoutput>#rsExcluidas.recordcount#</cfoutput> )</button>
 
-		<div id="NaoFinalizadas" class="tabcontent">
+		<div id="NaoFinalizadas" class="tabcontent" >
 			<!---INICIO TABELA DE AVALIAÇÕES COM NUMERAÇÃO CADASTRADA, PORÉM, SEM CADASTRO CONCLUÝDO--->
 			<cfif rsNumeraInspecao.recordCount neq 0>
 				<div  id="form_container" style="width:680px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">

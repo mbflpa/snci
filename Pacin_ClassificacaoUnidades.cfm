@@ -1,5 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/> 
-<cfsetting requesttimeout="15000"> 
+<cfprocessingdirective pageEncoding ="utf-8"> 
 
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
  <cfif isDefined("url.Ninsp") and url.Ninsp neq ''>
@@ -75,7 +74,10 @@
 		LEFT JOIN ParecerUnidade ON (RIP_Unidade = Pos_Unidade) AND (RIP_NumInspecao = Pos_Inspecao) AND (RIP_NumGrupo = Pos_NumGrupo) AND (RIP_NumItem = Pos_NumItem)
 		WHERE Itn_Ano='#form.frmano#' AND INP_NumInspecao='#rsClas.RIP_NumInspecao#'
 	</cfquery> 
-						
+	<cfset startTime = CreateTime(0,0,0)> 
+	<cfset endTime = CreateTime(0,0,45)> 
+	<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+	</cfloop>						
 	<cfquery dbtype="query" name="rsCNVE">
 		SELECT RIP_Resposta, Count(RIP_Resposta) AS QtdCNVE
 		FROM rsBusca 
@@ -252,7 +254,7 @@
 		<cfset TNCClassAtual = 'Plenamente eficaz'>
 		<cfelseif TNCAtual lte 10>
 		<cfset TNCClassAtual = 'Eficaz'>
-		<cfelseif TNCAtual lte 20>
+		<cfelseif TNCAtual lte 30>
 		<cfset TNCClassAtual = 'Eficacia mediana'>	  
 		<cfelseif TNCAtual lte 50>
 		<cfset TNCClassAtual = 'Pouco eficaz'>	  
@@ -304,9 +306,9 @@
 </cfif>	
 <cfif isDefined("url.Ninsp") and url.Ninsp neq ''>
 	<cfif not isDefined("url.Ngrup")>
-		<cflocation url="#url.pagretorno#?&Unid=#url.Unid#&numInspecao=#url.Ninsp#">
+		<cflocation url="#url.pagretorno#?pg=controle&Form.id=#url.Ninsp#&Unid=#url.Unid#&numInspecao=#url.Ninsp#">
 	<cfelse>
-		<cflocation url="#url.pagretorno#?&Unid=#Unid#&Ninsp=#Ninsp#&Ngrup=#Ngrup#&Nitem=#Nitem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&reop=#reop#&vlrdec=#vlrdec#&situacao=#situacao#&posarea=&modal=">	
+		<cflocation url="#url.pagretorno#?pg=controle&Form.id=#url.Ninsp#&Unid=#Unid#&Ninsp=#Ninsp#&Ngrup=#Ngrup#&Nitem=#Nitem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&reop=#reop#&vlrdec=#vlrdec#&situacao=#situacao#&posarea=&modal=">	
 	</cfif>
 </cfif>
 

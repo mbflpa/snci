@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
 <!--- <cfdump var="#form#">
 <cfdump var="#url#">
 <cfdump var="#session#"> ---> 
@@ -160,8 +160,15 @@ INP_Responsavel,
 Rep_Codigo, 
 Itn_Descricao, 
 Itn_TipoUnidade, 
+Itn_ImpactarTipos,
+Itn_PTC_Seq,
 Grp_Descricao,
 Und_TipoUnidade,
+RIP_Valor, 
+RIP_Caractvlr, 
+RIP_Falta, 
+RIP_Sobra, 
+RIP_EmRisco, 
 RIP_ReincInspecao, 
 RIP_ReincGrupo, 
 RIP_ReincItem,
@@ -212,11 +219,23 @@ WHERE RIP_NumInspecao ='#ninsp#' AND RIP_Unidade='#unid#' AND RIP_NumGrupo= #ngr
   Inspetor_Inspecao.IPT_MatricInspetor = Funcionarios.Fun_Matric
   WHERE (IPT_NumInspecao = '#URL.Ninsp#')
 </cfquery>
-<cfquery name="rsMod" datasource="#dsn_inspecao#">
-	SELECT UND_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Email, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
-	FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
-	WHERE Und_Codigo = '#url.unid#'
-</cfquery>
+ <cfif left(ninsp,2) eq left(trim(qUsuario.Usu_Lotacao),2)>
+	<cfquery name="rsMod" datasource="#dsn_inspecao#">
+	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
+	  FROM Unidades INNER JOIN Diretoria ON Unidades.Und_CodDiretoria = Diretoria.Dir_Codigo
+	  WHERE Und_Codigo = '#URL.Unid#'
+	</cfquery>
+	<cfset auxposarea = rsMod.Und_Codigo>
+	<cfset auxnomearea = rsMod.Und_Descricao>
+<cfelse> 
+	<cfquery name="rsMod" datasource="#dsn_inspecao#">
+	  SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla
+	  FROM Unidades INNER JOIN Diretoria ON Unidades.Und_CodDiretoria = Diretoria.Dir_Codigo
+	  WHERE Und_Codigo = '#URL.posarea#'
+	</cfquery>
+	<cfset auxposarea = rsMod.Und_Codigo>
+	<cfset auxnomearea = rsMod.Und_Descricao>	
+</cfif> 
   <cfset strIDGestor = #URL.Unid#>
   <cfset strNomeGestor = #rsMod.Und_Descricao#>
   <cfset Gestor = '#rsMod.Und_Descricao#'>
@@ -313,8 +332,8 @@ WHERE RIP_NumInspecao ='#ninsp#' AND RIP_Unidade='#unid#' AND RIP_NumGrupo= #ngr
 	 
 <!--- Condição para itens LEVE ENCERRADO --->
 
-<cfif (Form.frmResp eq 6 and rsItem.Und_TipoUnidade neq 12 and rsItem.Und_TipoUnidade neq 16)>
-		 
+		<cfif form.encerrarSN eq 'S'>
+<!---
 		  <cfif ucase(Form.PosClassificacaoPonto) eq 'LEVE'>
 			  <cfquery name="rsObserv" datasource="#dsn_inspecao#">
 					  SELECT Pos_Parecer
@@ -343,6 +362,7 @@ WHERE RIP_NumInspecao ='#ninsp#' AND RIP_Unidade='#unid#' AND RIP_NumGrupo= #ngr
 					values ('#FORM.ninsp#', '#FORM.unid#', '#FORM.ngrup#', '#FORM.nitem#', #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 29, '#qAcesso.Usu_Lotacao#', '#hhmmssdc#', '#and_obs#')
 				 </cfquery>
 		  </cfif>
+--->
 	 </cfif> 
 	 <cflocation url="itens_subordinador_respostas_pendentes_subordinador_regional.cfm?ckTipo=#URL.ckTipo#&dtinicial=&dtfinal=">
 
@@ -368,11 +388,21 @@ WHERE RIP_NumInspecao ='#ninsp#' AND RIP_Unidade='#unid#' AND RIP_NumGrupo= #ngr
 <html>
 <head>
 <title>Sistema Nacional de Controle Interno</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="css.css" rel="stylesheet" type="text/css">
-
 <script type="text/javascript">
-  <cfinclude template="mm_menu.js">
+<cfinclude template="mm_menu.js">
+//==================================
+//Função que abre uma página em Popup
+function popupPage() {
+<cfoutput>  //página chamada, seguida dos parâmetros número, unidade, grupo e item
+var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
+</cfoutput>
+windowprops = "location=no,"
++ "scrollbars=yes,width=750,height=500,top=100,left=200,menubars=no,toolbars=no,resizable=yes";
+window.open(page, "Popup", windowprops);
+}
+
 //==========================
 function dtprazo(x){
 
@@ -391,13 +421,6 @@ function dtprazo(x){
 	 {
 		document.form1.cbData.value = document.form1.dtrespos.value;
 	 }
-	/*
-	if (x == 15 || x == 16 || x == 18 || x == 19  || x == 23 )
-	 {
-		   document.form1.cbData.value = document.form1.dtdezdiasfut.value;
-		   document.form1.cbData.disabled = false;
-	 }
-	 */
 }
 //=============================
 function Trim(str)
@@ -501,20 +524,8 @@ if (document.form1.acao.value == 'Salvar'){
 	}
 //return false;
 }
-
-//Função que abre uma página em Popup
-function popupPage() {
-<cfoutput>  //página chamada, seguida dos parâmetros número, unidade, grupo e item
-var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
-</cfoutput>
-windowprops = "location=no,"
-+ "scrollbars=yes,width=750,height=500,top=100,left=200,menubars=no,toolbars=no,resizable=yes";
-window.open(page, "Popup", windowprops);
-}
 </script>
 </head>
-
-
 <body onLoad="dtprazo(document.form1.frmResp.value)">
 <cfset form.acao = ''>
 <cfinclude template="cabecalho.cfm">
@@ -615,54 +626,117 @@ window.open(page, "Popup", windowprops);
 				</td>
 			</tr>		  
 
-	 <cfoutput>
-   <cfset db_reincInsp = #trim(rsItem.RIP_ReincInspecao)#>
-   <cfset db_reincGrup = #rsItem.RIP_ReincGrupo#>
-   <cfset db_reincItem = #rsItem.RIP_ReincItem#>	 
-	  <cfif len(trim(rsItem.RIP_ReincInspecao)) gt 0><!---Foi colocado zero pois o xml gerado pelo SGI est&atilde; colocando 0(zero) por padrao--->
-		  
-		 <tr class="red_titulo">
-	  <td bgcolor="eeeeee">Reincid&ecirc;ncia</td>  
-	      <input type="hidden" name="db_reincSN" id="db_reincSN" value="N">
-		   <cfset reincSN = "S">
-		   <input type="hidden" name="db_reincSN" id="db_reincSN" value="S">
-
-	<td  colspan="7" bgcolor="eeeeee">
-N&ordm; Relat&oacute;rio:
-			<input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" style="background:white" readonly="">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&ordm; Grupo:
-			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" style="background:white" readonly="">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&ordm; Item:
-			<input name="frmreincItem" type="text" class="form" id="frmreincItem" size="7" maxlength="4" value="#db_reincItem#" style="background:white" readonly=""></td>
+<cfoutput>
+<cfset reincSN = "N">
+<cfset aux_reincSN = "Nao">
+<cfset db_reincInsp = "">
+<cfset db_reincGrup = 0>
+<cfset db_reincItem = 0>
+<cfif rsItem.RIP_ReincGrupo neq 0>
+	<cfset reincSN = "S">
+	<cfset aux_reincSN = "Sim">
+	<cfset db_reincInsp = #trim(rsItem.RIP_ReincInspecao)#>
+	<cfset db_reincGrup = #rsItem.RIP_ReincGrupo#>
+	<cfset db_reincItem = #rsItem.RIP_ReincItem#>
+</cfif>	   
+	<cfif reincSN eq 'S'>
+		<tr class="red_titulo">
+			<td bgcolor="eeeeee">Reincidência</td>
+			<td colspan="7" bgcolor="eeeeee">Nº Avaliação:
+				<input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" onKeyPress="numericos(this.value)">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Grupo:
+			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" onKeyPress="numericos(this.value)">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Item:
+			<input name="frmreincItem" type="text" class="form" id="frmreincItem" size="7" maxlength="4" value="#db_reincItem#" onKeyPress="numericos(this.value)">
+			</strong>		  
+			</td>
 	</tr>
-	</cfif>
+	</cfif> 
+	<cfset tipoimpacto = 'NÃO QUANTIFICADO'>
+	<cfset encerrarSN = 'N'>
+	<cfset impactofin = 'N'>
+	<cfif listFind(#rsItem.Itn_PTC_Seq#,'10')>
+	  	<cfset impactofin = 'S'>
+		<cfset tipoimpacto = 'QUANTIFICADO'>
+	</cfif>		
+	<cfset falta = lscurrencyformat(rsItem.RIP_Falta,'Local')>
+	<cfset sobra = lscurrencyformat(rsItem.RIP_Sobra,'Local')>
+	<cfset emrisco = lscurrencyformat(rsItem.RIP_EmRisco,'Local')>
+	<cfset fator = 0>
+	<cfset somafaltasobrarisco = (rsItem.RIP_Falta + rsItem.RIP_Sobra + rsItem.RIP_EmRisco)>	   
+	<cfset encerrarSN = 'N'>
+	<cfif reincSN neq 'S' and rsItem.Und_TipoUnidade neq 12 and rsItem.Und_TipoUnidade neq 16>
+		<cfif impactofin eq 'N'>
+			<!--- Não tem impacto financeiro --->
+			<cfset encerrarSN = 'S'>
+		<cfelse>
+			<cfset somafaltasobrarisco = numberformat(#somafaltasobrarisco#,9999999999.99)>
+			<!--- Tem impacto financeiro --->
+			<cfquery name="rsRelev" datasource="#dsn_inspecao#">
+				SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
+				FROM ValorRelevancia
+				WHERE VLR_Ano = '#right(ninsp,4)#'
+			</cfquery>
+			<cfloop query="rsRelev">
+				<cfset fxini = numberformat(rsRelev.VLR_FaixaInicial,9999999999.99)>
+				<cfset fxfim = numberformat(rsRelev.VLR_FaixaFinal,9999999999.99)>
+				<cfif fxini eq 0.01 and somafaltasobrarisco lte fxfim and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator>
+				</cfif>
+				<cfif (fxini neq 0.01 and fxfim neq 0.00) and (somafaltasobrarisco gt fxini and somafaltasobrarisco lte fxfim) and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator>
+				</cfif>					
+				<cfif fxfim eq 0.00 and somafaltasobrarisco gte fxini and fator eq 0>
+					<cfset fator = rsRelev.VLR_Fator> 
+				</cfif>
+			</cfloop>				
+			<cfif fator eq 1>
+				<cfset encerrarSN = 'S'>
+			</cfif>
+		</cfif>
+	</cfif>		
+ 	<tr class="exibir">
+      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
+      <td colspan="7" bgcolor="eeeeee">
+		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			<tr class="exibir"><strong>
+				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			</tr>
+		  </table>		  
+	  </td>
+    </tr>
 	</cfoutput>
 
           <tr class="exibir">
-            <td colspan="9" bgcolor="eeeeee"></td>
+            <td colspan="8" bgcolor="eeeeee"></td>
           </tr>
           <tr>
-            <td align="center" valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Situação Encontrada:</span></td>
+            <td align="center" valign="middle" bgcolor="eeeeee" class="exibir">
+			<span class="titulos">Situação Encontrada:</span>
+			</td>
+			<cfset melhoria = replace('#rsItem.RIP_Comentario#','; ' ,';','all')>	
             <td colspan="8" bgcolor="eeeeee"><span class="exibir">
-				<cfset melhoria = replace('#rsItem.RIP_Comentario#','; ' ,';','all')>	
-            <textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form" readonly><cfoutput>#melhoria#</cfoutput></textarea>
-</span></td>
+            <textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form" readonly><cfoutput>#melhoria#</cfoutput></textarea></span></td>
 		  </tr>
 		 <tr>
-            <td align="center" valign="middle" bgcolor="eeeeee"><span class="exibir"><span class="titulos">Orientações:</span></span></td>
-            <td colspan="7"><span class="exibir">
-              <textarea name="H_recom" cols="200" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea>
-            </span></td>
+            <td align="center" valign="middle" bgcolor="eeeeee"><span class="exibir">
+			<span class="titulos">Orientações:</span></span>
+			</td>
+			<cfset RIPRecomendacoes = replace('#rsItem.RIP_Recomendacoes#','; ' ,';','all')>	
+            <td colspan="8" bgcolor="eeeeee"><span class="exibir">
+              <textarea name="H_recom" cols="200" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#RIPRecomendacoes#</cfoutput></textarea></span></td>
 		  </tr>
 
           <tr>
-            <td align="center" valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Hist&oacute;rico:</span> <span class="titulos">Manifesta&ccedil;&atilde;o/An&aacute;lise do Controle Interno</span><span class="titulos">:</span></td>
-            <td colspan="7" bgcolor="eeeeee"><textarea name="H_obs" cols="200" rows="40" wrap="VIRTUAL" value="#Session.E01.h_obs#" class="form" readonly><cfoutput>#qResposta.Pos_Parecer#</cfoutput></textarea></td>
+            <td align="center" valign="middle" bgcolor="eeeeee" class="exibir"><span class="titulos">Histórico:</span> <span class="titulos">Manifestação/Análise do Controle Interno</span><span class="titulos">:</span></td>
+            <td colspan="8" bgcolor="eeeeee"><textarea name="H_obs" cols="200" rows="40" wrap="VIRTUAL" value="#Session.E01.h_obs#" class="form" readonly><cfoutput>#qResposta.Pos_Parecer#</cfoutput></textarea></td>
           </tr>
          <cfif ckTipo neq 4>
           <tr>
             <td align="center" valign="middle" bgcolor="eeeeee"><span class="exibir"><span class="titulos">Manifestar-se:</span></span></td>
-            <td colspan="7"><span class="exibir"><textarea name="observacao" cols="200" rows="25" nome="Observação" vazio="false" wrap="VIRTUAL" class="form" id="observacao"><cfoutput>#Session.E01.observacao#</cfoutput></textarea>
+            <td colspan="8"><span class="exibir"><textarea name="observacao" cols="200" rows="25" nome="Observação" vazio="false" wrap="VIRTUAL" class="form" id="observacao"><cfoutput>#Session.E01.observacao#</cfoutput></textarea>
             </span></td>
           </tr>
         </cfif>
@@ -765,7 +839,7 @@ N&ordm; Relat&oacute;rio:
 				<cfset dtbase = posdtprevsolucao>	
 				<cfset auxQtdDias = DateDiff("d", dt30diasuteis,posdtprevsolucao)>
 			</cfif>
-			<cfif dtbase lte dateformat(now(),"YYYYMMDD")>
+			<cfif dtbase lte dateformat(now(),"YYYYMMDD") or encerrarSN eq 'S'>
 			<!--- somente direito a responder --->
 				<cfquery name="rsPonto" datasource="#dsn_inspecao#">
 					SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND (STO_Codigo = 6)
@@ -912,19 +986,23 @@ N&ordm; Relat&oacute;rio:
 	         </div></td>
           </tr>  
    <cfelse>
-        <tr><td colspan="9" align="center"> <button onClick="window.close()" class="botao">Fechar</button></td></tr>
+        <tr><td colspan="9" align="center"><button onClick="window.close()" class="botao">Fechar</button></td></tr>
    </cfif>
         </table>
-        <input type="hidden" name="MM_UpdateRecord" value="form1">
-		<input type="hidden" name="salvar_anexar" value="">
-		<input name="exigedata" type="hidden" id="exigedata" value="N">
-		<input type="hidden" name="frmSitResp_Banco" id="frmSitResp_Banco" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
-		<cfset SitResp = qResposta.Pos_Situacao_Resp>
-		<input type="hidden" name="vPSitResp" id="vPSitResp" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
-	<input type="hidden" name="PosClassificacaoPonto" id="PosClassificacaoPonto" value="<cfoutput>#trim(qResposta.Pos_ClassificacaoPonto)#</cfoutput>"> 
-	<input type="hidden" name="undtipounidade" id="undtipounidade" value="<cfoutput>#trim(rsItem.Und_TipoUnidade)#</cfoutput>">
-	<input type="hidden" name="scodresp" id="scodresp" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
-		 
+<cfoutput>		
+	<input type="hidden" name="MM_UpdateRecord" value="form1">
+	<input type="hidden" name="salvar_anexar" value="">
+	<input name="exigedata" type="hidden" id="exigedata" value="N">
+	<input type="hidden" name="frmSitResp_Banco" id="frmSitResp_Banco" value="#qResposta.Pos_Situacao_Resp#">
+	<cfset SitResp = qResposta.Pos_Situacao_Resp>
+	<input type="hidden" name="vPSitResp" id="vPSitResp" value="#qResposta.Pos_Situacao_Resp#">
+	<input type="hidden" name="PosClassificacaoPonto" id="PosClassificacaoPonto" value="#trim(qResposta.Pos_ClassificacaoPonto)#"> 
+	<input type="hidden" name="undtipounidade" id="undtipounidade" value="#trim(rsItem.Und_TipoUnidade)#">
+	<input type="hidden" name="scodresp" id="scodresp" value="#qResposta.Pos_Situacao_Resp#">
+	<input type="hidden" name="encerrarSN" id="encerrarSN" value="#encerrarSN#">
+	<input name="somafaltasobrarisco" type="hidden" id="somafaltasobrarisco" value="#somafaltasobrarisco#">
+	<input name="reincideSN" type="hidden" id="reincideSN" value="#reincSN#">	
+</cfoutput>		 
 	</form>
 <!--- Fim Área de conteúdo --->
   </tr>

@@ -46,7 +46,7 @@
 <cfif (grpacesso eq 'GESTORES') or (grpacesso eq 'DESENVOLVEDORES') or (grpacesso eq 'GESTORMASTER') or (grpacesso eq 'GOVERNANCA') or (grpacesso eq 'ANALISTAS')>
 
 <!---  <cftry>  --->
-  <cfif isDefined("Form.acao") And (Form.acao is 'alter_valores' Or Form.acao is 'Excluir_Proc' Or Form.acao is 'Incluir_Proc' Or Form.acao is 'Excluir_Sei' Or Form.acao is 'Incluir_Causa' Or Form.acao is 'Anexar' Or Form.acao is 'Excluir_Anexo' Or Form.acao is 'Excluir_Causa')>
+  <cfif isDefined("Form.acao") And (Form.acao is 'Excluir_Proc' Or Form.acao is 'Incluir_Proc' Or Form.acao is 'Excluir_Sei' Or Form.acao is 'Incluir_Causa' Or Form.acao is 'Anexar' Or Form.acao is 'Excluir_Anexo' Or Form.acao is 'Excluir_Causa')>
   <cfif isDefined("Form.abertura")><cfset Session.E01.abertura = Form.abertura><cfelse><cfset Session.E01.abertura = 'Nao'></cfif>
   <cfif isDefined("Form.processo")><cfset Session.E01.processo = Form.proc_se & Form.proc_num & Form.proc_ano><cfelse><cfset Session.E01.processo = ''></cfif>
   <cfif isDefined("Form.causaprovavel")><cfset Session.E01.causaprovavel = Form.causaprovavel><cfelse><cfset Session.E01.causaprovavel = ''></cfif>
@@ -246,7 +246,19 @@
   serverfile: #cffile.serverfile#<br>
   <cfset gil = gil>
   </cfoutput> --->
-	
+		<cfquery name="rsSeq" datasource="#dsn_inspecao#">
+			SELECT Ane_Codigo FROM Anexos
+			where Ane_NumInspecao='#Form.ninsp#' and 
+			Ane_Unidade='#Form.unid#' and 
+			Ane_NumGrupo=#Form.ngrup# and 
+			Ane_NumItem=#Form.nitem#
+		</cfquery>
+		<cfif rsSeq.recordcount lte 0>
+			<cfset seq = 1>
+		<cfelse>
+			<cfset seq = val(rsSeq.recordcount + 1)>			
+		</cfif>	
+		<cfset seq = '_Seq' & seq>
 
 		<cffile action="upload" filefield="arquivo" destination="#diretorio_anexos#" nameconflict="overwrite" accept="application/pdf">
 
@@ -255,7 +267,7 @@
 		<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
 		<!--- O arquivo anexo recebe nome indicando Numero da Inspecao, Numero da unidade, Numero do grupo e Numero do item ao qual estao vinculado --->
 
-		<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & '.pdf'>
+		<cfset destino = cffile.serverdirectory & '\' & Form.ninsp & '_' & data & '_' & right(CGI.REMOTE_USER,8) & '_' & Form.ngrup & '_' & Form.nitem & seq & '.pdf'>
 
 
 		<cfif FileExists(origem)>
@@ -443,6 +455,16 @@
 	<cfparam name="URL.posarea" default="">
 	<cfset auxavisosn = "S">
 </cfif>
+<cfif url.situacao eq 21 or url.situacao eq 28>
+	<cfset url.posarea = URL.Unid>
+</cfif>
+
+<cfset auxtransfer = 'N'>
+<cfif left(URL.Unid,2) neq left(url.posarea,2) and url.situacao neq 21 and url.situacao neq 28>
+ <cfset auxtransfer = 'S'>
+</cfif>
+
+
 <cfquery name="rsTercTransfer" datasource="#dsn_inspecao#">
   SELECT Und_CodDiretoria, Und_Codigo, Und_Descricao, Und_Email
   FROM Unidades 
@@ -451,18 +473,16 @@
 <cfquery name="rsUnidTransfer" datasource="#dsn_inspecao#">
   SELECT Und_CodDiretoria, Und_Codigo, Und_Descricao, Und_Email
   FROM Unidades 
-  WHERE Und_Status = 'A' and Und_CodDiretoria = '#left(URL.posarea,2)#' and Und_TipoUnidade not in (12,16)
+  WHERE Und_Status = 'A' and 
+  	Und_CodDiretoria = '#left(URL.posarea,2)#' and 
+	Und_TipoUnidade not in (12,16)
 </cfquery>
 <cfquery name="rsReopTransfer" datasource="#dsn_inspecao#">
   SELECT Rep_Codigo, Rep_Nome, Rep_Email 
   FROM Reops 
-  WHERE Rep_Status = 'A' and Rep_CodDiretoria = '#left(URL.posarea,2)#'
+  WHERE Rep_Status = 'A' and 
+		Rep_CodDiretoria = '#left(URL.posarea,2)#'   
 </cfquery>
-
-<cfset auxtransfer = 'N'>
-<cfif left(URL.Unid,2) neq left(url.posarea,2)>
- <cfset auxtransfer = 'S'>
-</cfif>
 
 <cfquery name="rsMod" datasource="#dsn_inspecao#">
   SELECT Und_Centraliza, Und_Descricao, Und_CodReop, Und_Codigo, Und_CodDiretoria, Und_Centraliza, Und_Email, Und_TipoUnidade, Dir_Descricao, Dir_Codigo, Dir_Sigla, Dir_Sto, Dir_Email
@@ -510,7 +530,7 @@
 		<cfset auxposarea = #rsMod.Dir_Sto#>
 	<cfelseif Form.frmResp is 9 or Form.frmResp is 24 or Form.frmResp is 29>
 		<cfset auxposarea = #Form.cbareaCS#>
-	<cfelseif Form.frmResp is 12 or Form.frmResp is 13 or Form.frmResp is 18 or Form.frmResp is 20 or Form.frmResp is 28>
+	<cfelseif Form.frmResp is 12 or Form.frmResp is 13 or Form.frmResp is 18 or Form.frmResp is 20>
 		<cfset auxposarea = #strIDGestor#>
 	<cfelseif Form.frmResp is 16>
 		<cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
@@ -525,7 +545,6 @@
 	<cfelseif Form.frmResp is 30>	
 		<cfset auxposarea = #Form.cbscoi#>	
 	</cfif>
-
 <!---  --->
 	<cfquery datasource="#dsn_inspecao#" name="rsDuplo">
 		select Pos_Situacao_Resp from ParecerUnidade
@@ -548,9 +567,7 @@
 		</script>
 		
 	</cfif>
-
 	<!--- fim EVITAR DUPLICATAS DE  --->	
-
 	<cfif auxsalvarSN is 'S'>	  	
         <!--- data do dia default --->
 	    <cfif rsMod.Und_TipoUnidade neq 12 and rsMod.Und_TipoUnidade neq 16>
@@ -611,7 +628,32 @@
 				</cfloop>	
 			</cfoutput>		
 		</cfif>
- 
+ 		<cfif form.frmResp eq 21 or form.frmResp eq 28>
+			<!---  --->
+			<cfset auxSE = left(form.unid,2)>
+			<cfset scia_se = auxSE>
+			<cfif auxSE eq '03' or auxSE eq '16' or auxSE eq '26' or auxSE eq '06' or auxSE eq '75' or auxSE eq '28' or auxSE eq '65' or auxSE eq '05'> <!--- ACR;GO;RO;AM;TO;PA;RR;AP --->
+				<cfset scia_se = '10'>	<!--- BSB --->
+			<cfelseif auxSE eq '08' or auxSE eq '14'>   <!--- BA; ES --->
+				<cfset scia_se = '20'> <!--- MG --->
+			<cfelseif auxSE eq '04' or auxSE eq '12' or auxSE eq '18' or auxSE eq '30' or auxSE eq '34' or auxSE eq '60' or auxSE eq '70'> <!--- AL; CE; MA; PB; PI; RN; SE --->
+				<cfset scia_se = '32'> <!--- PE --->
+			<cfelseif auxSE eq '68' or auxSE eq '64'> <!--- SC;RS --->
+				<cfset scia_se = '36'>	<!--- PR --->
+			<cfelseif auxSE eq '50'>   <!--- RJ --->
+				<cfset scia_se = '72'> <!--- SPM --->
+			<cfelseif auxSE eq '22' OR auxSE eq '24'>   <!--- MS; MT --->
+				<cfset scia_se = '74'> <!--- SPI --->				 					 				 
+			</cfif>	
+			<!---  --->	 
+			<cfquery name="rsSCIA" datasource="#dsn_inspecao#">
+			 SELECT DISTINCT Ars_Codigo, Ars_Sigla, Ars_Descricao, Ars_Email
+			 FROM Areas WHERE Ars_Status = 'A' AND (Left(Ars_Codigo,2) = '#scia_se#') and (Ars_Sigla Like '%/SCIA%' OR Ars_Sigla Like '%DCINT/GCOP/SGCIN/SCIA')
+			 ORDER BY Ars_Sigla
+			</cfquery>				
+			<cfset strIDGestor = #rsSCIA.Ars_Codigo#>
+			<cfset strNomeGestor = #rsSCIA.Ars_Sigla#>
+		</cfif>			
 		<!--- ===================== --->
 		<cfquery datasource="#dsn_inspecao#">
 		UPDATE ParecerUnidade SET
@@ -882,23 +924,13 @@
 				<cfset IDArea = #strIDGestor#>
 			</cfcase>
 			<cfcase value=21>
-<!---			
-				<cfquery name="qArea2" datasource="#dsn_inspecao#">
-					SELECT Ars_Sigla, Ars_Descricao, Ars_Email
-					FROM Areas
-					WHERE Ars_Codigo = '#Form.cbscia#'
-				</cfquery>
---->				
 				, Pos_Situacao = 'RV'
 				, Pos_Area = '#strIDGestor#'
 				, Pos_Nomearea = '#strNomeGestor#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
 				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-				<cfset Gestor = '#strNomeGestor#'>
 				<cfset situacao = 'REAVALIACAO'>
 				<cfset IDArea = #strIDGestor#>
-				<cfset sdestina = #rsMod.Und_Email#>
-				<cfset nomedestino = #rsMod.Und_Descricao#>
 			</cfcase>
 			<cfcase value=23>
 				<!--- Status: Tratamento pela SE --->
@@ -969,7 +1001,7 @@
 				, Pos_Area = '#strIDGestor#'
 				, Pos_NomeArea = '#strNomeGestor#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
-				<cfset situacao = 'EM ANALISE'>
+				<cfset situacao = 'EM ANÁLISE'>
 				<cfset IDArea = #strIDGestor#>
 			</cfcase>	
 			<cfcase value=29>
@@ -1174,6 +1206,8 @@
  Itn_Descricao, 
  Itn_TipoUnidade, 
  Itn_ValorDeclarado,
+ Itn_ImpactarTipos,
+ Itn_PTC_Seq,
  Pos_VLRecuperado, 
  Pos_DtPrev_Solucao, 
  Pos_DtPosic, 
@@ -1264,10 +1298,11 @@ left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidad
 
 <cfquery name="qArea" datasource="#dsn_inspecao#">
  SELECT DISTINCT Ars_Codigo, Ars_Sigla, Ars_Descricao
- FROM Areas WHERE Ars_Status = 'A' AND (Left(Ars_Codigo,2) = '#left(URL.Posarea,2)#')
+ FROM Areas WHERE Ars_Status = 'A' AND 
+ 	(Left(Ars_Codigo,2) = '#left(URL.Posarea,2)#')
  ORDER BY Ars_Sigla
 </cfquery>	  
-		  
+	  
 <cfquery name="qAreaCS" datasource="#dsn_inspecao#">
  SELECT DISTINCT Ars_Codigo, Ars_Sigla, Ars_Descricao
  FROM Areas WHERE Ars_Status = 'A' AND (Left(Ars_Codigo,2) = '01')
@@ -1355,7 +1390,6 @@ left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidad
 
 <script type="text/javascript">
 <cfinclude template="mm_menu.js">
-
 
 //reinicia o ckeditor para inibir o erro de retornar conteúdo vazio no textarea
 function CKupdate(){
@@ -1467,62 +1501,7 @@ function reincidencia(a){
    
   }
  }
- 
- //============================
- function reverter()
-{
- //alert(document.form1.sfrmfalta.value);
-  var caracvlr = document.form1.scaracvlr.value;
-  document.form1.alter_valores.value = 'Alterar';
-  caracvlr = caracvlr.toUpperCase();
-  if (caracvlr == 'QUANTIFICADO')
-  {
-	 document.form1.caracvlr.selectedIndex = 0;
-     document.form1.frmfalta.disabled = false;
-     document.form1.frmsobra.disabled = false;
-	 document.form1.frmemrisco.disabled = false;
-	 document.form1.frmfalta.value = document.form1.sfrmfalta.value;
-	 document.form1.frmsobra.value = document.form1.sfrmsobra.value;
-	 document.form1.frmemrisco.value = document.form1.sfrmemrisco.value;
-  }
-  if (caracvlr != 'Quantificado') {
-	 document.form1.caracvlr.selectedIndex = 1;
-     document.form1.frmfalta.value = '0,00';
-     document.form1.frmsobra.value = '0,00';
-	 document.form1.frmemrisco.value = '0,00';
 
-     document.form1.frmfalta.disabled = true;
-     document.form1.frmsobra.disabled = true;
-	 document.form1.frmemrisco.disabled = true;
-  }
-}
- //============================
- function exibevalores()
-{
- //alert(document.form1.sfrmfalta.value);
-  var caracvlr = document.form1.caracvlr.value;
-  caracvlr = caracvlr.toUpperCase();
-//  alert(caracvlr);
-  if (caracvlr == 'QUANTIFICADO')
-  {
-	 document.form1.caracvlr.selectedIndex = 0;
-     document.form1.frmfalta.disabled = false;
-     document.form1.frmsobra.disabled = false;
-	 document.form1.frmemrisco.disabled = false;
-	 document.form1.frmfalta.value = document.form1.sfrmfalta.value;
-	 document.form1.frmsobra.value = document.form1.sfrmsobra.value;
-	 document.form1.frmemrisco.value = document.form1.sfrmemrisco.value;
-  }
-  if (caracvlr != 'QUANTIFICADO') {
-	 document.form1.caracvlr.selectedIndex = 1;
-     document.form1.frmfalta.value = '0,00';
-     document.form1.frmsobra.value = '0,00';
-	 document.form1.frmemrisco.value = '0,00';
-     document.form1.frmfalta.disabled = true;
-     document.form1.frmsobra.disabled = true;
-	 document.form1.frmemrisco.disabled = true;
-  }
-}
 //===================
 function controleNCI(){
 //alert(document.form1.nci.value);
@@ -1869,56 +1848,6 @@ function validarform(){
 			}
 	}
   
-  //==================== 
-  if (document.form1.acao.value=='alter_valores'){
-	 var caracter = document.form1.caracvlr.value;
-	 var tela_falta = document.form1.frmfalta.value;
-	 var tela_sobra = document.form1.frmsobra.value;
-	 var tela_risco = document.form1.frmemrisco.value;
-	 var db_falta = document.form1.sfrmfalta.value;
-	 var db_sobra = document.form1.sfrmsobra.value;
-	 var db_risco = document.form1.sfrmemrisco.value;
-	 var sresp = document.form1.scodresp.value;
-	 
-	 if (caracter == 'Quantificado' && tela_falta == '0,00' && tela_sobra == '0,00' && tela_risco == '0,00')
-	 {
-	    alert('Para o Caracteres: Quantificado deve informar os campos Falta e ou Sobra e ou Em Risco!');
-		return false;
-	 }
-	 
-	 if (sresp != 0 && sresp != 11)
-	  {
-		  var strobs = document.form1.observacao.value;
-		  if (strobs == '')
-		  {
-		   alert('Caro Usuário(a), favor justificar a alteração no campo: Opinião da Equipe de Controle Interno!');
-		      return false;
-	       }
-	       if (strobs.length <= 99)
-	       {
-		   alert("Caro Gestor(a), Sua justificativa deverá conter no mínimo 100(cem) caracteres!");		
-		   return false;
-	       }
-	  }
-	  
-	 if (tela_falta != db_falta || tela_sobra != db_sobra || tela_risco != db_risco) { 
-	  if (confirm ('                       Atencao! \n\nConfirmar Alteração dos Valores deste ponto?'))
-	    {
-	     return true;
-		}
-	  else
-	   {
-	   return false;
-	   }
-	 }
-	 else
-	   {
-	   return false;
-	   }
-	}
-	
- //==================== 
- 
   if (document.form1.acao.value=='Excluir_Proc'){
 	  
 	  if (confirm ('                       Atenção! \n\nConfirmar a Exclusão do Processo Disciplinar Selecionado?'))
@@ -2043,36 +1972,7 @@ if (document.form1.acao.value=='Incluir_Proc'){
 		 alert('Sr. Gestor, Falta selecionar a SCOI de destino');
 		 return false;
 		}		
-	//----------------------------------------------
-//	alert(sit + '   ' + document.form1.PrzVencSN.value);
-	
-    if (sit == 26 && document.form1.PrzVencSN.value != 'no')
-		  {
-	//		 alert('Sr. Gestor, Ponto ainda encontra-se no período de tratamento/regularização junto à AGF/ACC');
-	//		 exibe(sit);
-	//		 return false;
-		}
 
-	//----------------------------------------------
-	var falta = document.form1.frmfalta.value;
-	falta = falta.replace(',', '.');
-	falta = Number(falta);
-	
-	var sobra = document.form1.frmsobra.value;
-	sobra = sobra.replace(',', '.');
-	sobra = Number(sobra);
-	
-	var VLRecuperado = document.form1.VLRecuperado.value;
-	VLRecuperado = VLRecuperado.replace(',', '.');
-	VLRecuperado = Number(VLRecuperado);
-
-	var somarfaltasobra = Number(falta + sobra);
-
- //   if ((sit == 3 || sit == 9 || sit == 25) && somarfaltasobra > 0 && VLRecuperado == 0)
-//	    {
-//			 alert('Sr. Gestor, Item possui possui valor(es) para os campos Falta(R$) e/ou Sobra(R$), o campo Valor Regularizado não pode ser igual a zero');
-//			 return false;
-//		}
 	//----------------------------------------------
 	if ((sit == 3 || sit == 9 || sit == 25) && somarfaltasobra == 0 && VLRecuperado > 0)
 	    {
@@ -2126,7 +2026,6 @@ if (document.form1.acao.value=='Incluir_Proc'){
 			   exibe(sit)
 		       return false;
 		  } 		  
- 
 	  }
 // fim de critica exclusiva para o ponto transferido de SE
 
@@ -2231,23 +2130,6 @@ if (document.form1.acao.value=='Incluir_Proc'){
 				return false;
 				}	
 	//=====================================
-	/*
-	     if (sit == 15 || sit == 16 || sit == 18 || sit == 19 || sit == 23) {
-			var auxcam = '\n\nTRATAMENTO\n\n - AVISO IMPORTANTE \n\nCaro Colaborador(a), você informou uma nova Data de Previsão da Solucão;\n\nNos casos em que foi cedido dilatação de prazo, requisitamos que registre em sua opinião a motivação da mudança.\n\nConfirma a nova Data de Previsão?';
-			if (confirm ('            Atenção! ' + auxcam))
-				{
-				document.form1.cbdata.disabled=false;
-				return true;
-				}
-			else
-			{
-			if (sit != 15 && sit != 16 && sit != 18 && sit != 19 && sit != 23) {document.form1.cbdata.disabled = true;}
-			exibe(sit);
-			return false;
-			}
-		}
-	*/
- // alert('ok');
          document.form1.observacao.disabled=false;
 	     document.form1.cbarea.disabled=false;
 	     document.form1.cbdata.disabled=false;
@@ -2305,7 +2187,7 @@ window.open(page, "Popup", windowprops);
 </style>
 </head>
 
-<body onLoad="exibevalores(); if(document.form1.houveProcSN.value != 'S') {exibe(document.form1.frmResp.value)} else {exibe(24)}; hanci(); controleNCI(); exibir_Area011(this.value)"> 
+<body onLoad="if(document.form1.houveProcSN.value != 'S') {exibe(document.form1.frmResp.value)} else {exibe(24)}; hanci(); controleNCI(); exibir_Area011(this.value)"> 
 <cfset Form.acao = ''>
  <cfinclude template="cabecalho.cfm">
 <table width="70%"  align="center" bordercolor="f7f7f7">
@@ -2329,14 +2211,6 @@ window.open(page, "Popup", windowprops);
 		<input type="hidden" name="sfrmTipoUnidade" id="sfrmTipoUnidade" value="#qResposta.Itn_TipoUnidade#">
 		<cfset resp = #qResposta.Pos_Situacao_Resp#> 
 		<input type="hidden" name="srespatual" id="srespatual" value="#resp#">
-		<cfset caracvlr = ucase(trim(qResposta.RIP_Caractvlr))>
-		<cfset falta = trim(Replace(NumberFormat(qResposta.RIP_Falta,999.00),'.',',','All'))> 
-		<cfset sobra = trim(Replace(NumberFormat(qResposta.RIP_Sobra,999.00),'.',',','All'))> 
-		<cfset emrisco = trim(Replace(NumberFormat(qResposta.RIP_EmRisco,999.00),'.',',','All'))> 
-		<input type="hidden" name="scaracvlr" id="scaracvlr" value="#caracvlr#">
-		<input type="hidden" name="sfrmfalta" id="sfrmfalta" value="#falta#">
-		<input type="hidden" name="sfrmsobra" id="sfrmsobra" value="#sobra#">
-		<input type="hidden" name="sfrmemrisco" id="sfrmemrisco" value="#emrisco#">
 		<input type="hidden" name="sVLRDEC" id="sVLRDEC" value="#url.VLRDEC#">
 		<input type="hidden" name="situacao" id="situacao" value="#url.situacao#">
 		<input type="hidden" name="posarea" id="posarea" value="#url.posarea#">
@@ -2451,8 +2325,8 @@ window.open(page, "Popup", windowprops);
 	    <cfset db_reincItem = #qResposta.RIP_ReincItem#>
 		<cfif len(trim(qResposta.RIP_ReincInspecao)) gt 0>	  
 			<tr bgcolor="eeeeee" class="exibir">
-			  <td><span class="style4">Reincid&ecirc;ncia</span></td>
-			  <td colspan="4"><span class="style4">Nº Relatório:&nbsp;&nbsp;&nbsp;
+			  <td><span class="style4">Reincidência</span></td>
+			  <td colspan="4"><span class="style4">Nº Avaliação:&nbsp;&nbsp;&nbsp;
 				  <input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" style="background:white" readonly="">
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Grupo:
 		<input name="frmreincGrup2" type="text" class="form" id="frmreincGrup2" size="8" maxlength="5" value="#db_reincGrup#" style="background:white" readonly="">
@@ -2463,24 +2337,25 @@ window.open(page, "Popup", windowprops);
 		</cfif>	
 	</cfoutput>	
     <cfoutput>
- 	 <tr bgcolor="eeeeee" class="exibir">
-      <td>Valores</td>
-
-      <td colspan="4">
-		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee" >
-		  <tr bgcolor="eeeeee">
-					<td><span class="exibir">Caracteres:</span>&nbsp;
-					  <select name="caracvlr" id="caracvlr" class="form" onChange="exibevalores()" disabled="disabled">
-                         <option <cfif UCASE(trim(caracvlr)) eq "QUANTIFICADO"> selected</cfif> value="QUANTIFICADO">QUANTIFICADO</option>
-                        <option <cfif trim(caracvlr) neq "QUANTIFICADO"> selected</cfif> value="NAO QUANTIFICADO">NÃO QUANTIFICADO</option>
-                      </select>                    </td>
-					<td><span class="exibir">Falta(R$):</span>&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)" readonly="yes">					</td>
-					<td><span class="exibir">Sobra(R$):&nbsp;</span>
-				    <input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)" readonly="yes">					</td>
-					<td><span class="exibir">Em Risco(R$):</span>&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)" readonly="yes">					</td>
-		  </tr>
-	    </table>	  </td>
-      </tr>
+		<cfset tipoimpacto = 'NÃO QUANTIFICADO'>
+		<cfif listFind(#qResposta.Itn_PTC_Seq#,'10')>
+			<cfset tipoimpacto = 'QUANTIFICADO'>
+		</cfif>
+		<cfset falta = lscurrencyformat(qResposta.RIP_Falta,'Local')>
+		<cfset sobra = lscurrencyformat(qResposta.RIP_Sobra,'Local')>
+		<cfset emrisco = lscurrencyformat(qResposta.RIP_EmRisco,'Local')>
+ 	<tr class="exibir">
+      <td bgcolor="eeeeee">IMPACTO FINANCEIRO (Valor)</td>
+      <td colspan="5" bgcolor="eeeeee">
+		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			<tr class="exibir"><strong>
+				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			</tr>
+		  </table>		  
+	  </td>
+    </tr> 
     </cfoutput>
 	 <cfset melhoria = replace('#qResposta.RIP_Comentario#','; ' ,';','all')>
 		<tr bgcolor="eeeeee">
@@ -2691,7 +2566,6 @@ window.open(page, "Popup", windowprops);
 					<select name="cbsubordinador" id="cbsubordinador" class="form">
 								<option selected="selected" value="">---</option>
 								<cfoutput query="rsReopTransfer">
-
 								  <option value="#Rep_Codigo#" <cfif #Rep_Codigo# is #qResposta.Pos_Area#>selected</cfif>>#trim(Rep_Nome)#</option>
 								</cfoutput>
 					</select>	      
@@ -2715,7 +2589,7 @@ window.open(page, "Popup", windowprops);
 				   <select name="select" id="select" class="form" onChange="SelecArea(this.value)">
                      <option selected="selected" value="">---</option>
                      <cfoutput query="qArea">
-                       <option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #qResposta.Pos_Area#>selected</cfif>>#trim(Ars_Descricao)#</option>
+                       <option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #URL.Posarea#>selected</cfif>>#trim(Ars_Descricao)#</option>
                      </cfoutput>
                    </select>
         </div></td>
@@ -2733,7 +2607,7 @@ window.open(page, "Popup", windowprops);
                     <select name="cbareaCS" class="form">
                         <option selected="selected" value="">---</option>
                         <cfoutput query="qAreaCS">
-                          <option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #qResposta.Pos_Area#>selected</cfif>>#trim(Ars_Descricao)#</option>
+                          <option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #URL.Posarea#>selected</cfif>>#trim(Ars_Descricao)#</option>
                         </cfoutput>
                     </select>
         </div>        </td>
@@ -2744,7 +2618,7 @@ window.open(page, "Popup", windowprops);
 	<select name="cbareaCS" class="form">
 	  <option selected="selected" value="">---</option>
 	  <cfoutput query="qAreaCS">
-		<option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #qResposta.Pos_Area#>selected</cfif>>#trim(Ars_Descricao)#</option>
+		<option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #URL.Posarea#>selected</cfif>>#trim(Ars_Descricao)#</option>
 	  </cfoutput>
 	</select>
 </div></td>
@@ -2790,8 +2664,16 @@ window.open(page, "Popup", windowprops);
       <tr>
         <td colspan="5">&nbsp;</td>
       </tr>
+	  <cfset cla = 0>
       <cfloop query= "qAnexos">
         <cfif FileExists(qAnexos.Ane_Caminho)>
+			<cfset cla = cla + 1>
+			<cfif cla lt 10>
+				<cfset cl = '0' & cla & 'º'>
+			<cfelse>
+				<cfset cl = cla & 'º'>
+			</cfif>	
+			
 		  <tr>
             <td colspan="3" bgcolor="eeeeee" class="form"><cfoutput>#ListLast(qAnexos.Ane_Caminho,'\')#</cfoutput></td>
             <td width="472" align="center" bgcolor="eeeeee"><cfset arquivo = ListLast(qAnexos.Ane_Caminho,'\')>
@@ -2801,7 +2683,7 @@ window.open(page, "Popup", windowprops);
                 </div></td>
             <td bgcolor="eeeeee">
               <div align="center">
-			<cfif (resp neq 24) and (habslvsn eq 'S')>
+			<cfif (resp neq 24 and habslvsn eq 'S' and cla eq qAnexos.recordcount)>
                 <input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value=<cfoutput>'#qAnexos.Ane_Codigo#'</cfoutput>" value="Excluir" <cfoutput>#halbtgeral#</cfoutput>>
             <cfelse>
 				<input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value=<cfoutput>'#qAnexos.Ane_Codigo#'</cfoutput>" value="Excluir" disabled>
@@ -2897,7 +2779,7 @@ window.open(page, "Popup", windowprops);
 				<select name="cbarea" id="cbarea" class="form" onChange="SelecArea(this.value)">
                             <option selected="selected" value="">---</option>
                             <cfoutput query="qArea">
-                              <option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #qResposta.Pos_Area#>selected</cfif>>#trim(Ars_Descricao)#</option>
+                              <option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #url.posarea#>selected</cfif>>#trim(Ars_Descricao)#</option>
                             </cfoutput>
                 </select>	      
 
@@ -2917,7 +2799,7 @@ window.open(page, "Popup", windowprops);
 	<select name="cbareaCS" class="form">
 	  <option selected="selected" value="">---</option>
 	  <cfoutput query="qAreaCS">
-		<option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #qResposta.Pos_Area#>selected</cfif>>#trim(Ars_Descricao)#</option>
+		<option value="#Ars_Codigo#" <cfif #Ars_Codigo# is #URL.Posarea#>selected</cfif>>#trim(Ars_Descricao)#</option>
 	  </cfoutput>
 	</select>
 </div></td>
@@ -2983,6 +2865,7 @@ window.open(page, "Popup", windowprops);
 		<cfelse>
 			<cfset cl = cla & 'º'>
 		</cfif>
+
 		  <tr>
             <td colspan="3" bgcolor="eeeeee" class="form"><cfoutput>#cl# - #ListLast(qAnexos.Ane_Caminho,'\')#</cfoutput></td>
             <td width="472" align="center" bgcolor="eeeeee"><cfset arquivo = ListLast(qAnexos.Ane_Caminho,'\')>
@@ -2993,12 +2876,13 @@ window.open(page, "Popup", windowprops);
             <td bgcolor="eeeeee">
               <div align="center">
        <!---  <cfif (resp neq 24) and ('#qUsuario.Usu_DR#' eq left(url.PosArea,2))> --->
-		<cfif (resp neq 24) and (habslvsn eq 'S')>		
+		<cfif (resp neq 24 and habslvsn eq 'S' and cla eq qAnexos.recordcount)>		
            <input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value=<cfoutput>'#qAnexos.Ane_Codigo#'</cfoutput>" value="Excluir" <cfoutput>#halbtgeral#</cfoutput>>
         <cfelse>
 	       <input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value=<cfoutput>'#qAnexos.Ane_Codigo#'</cfoutput>" value="Excluir" disabled>
         </cfif>
-              </div>            </td>
+              </div>            
+		</td>
           </tr>
         </cfif>
       </cfloop>
@@ -3094,6 +2978,7 @@ window.open(page, "Popup", windowprops);
     <input type="hidden" name="PrzVencSN" id="PrzVencSN" value="<cfoutput>#PrzVencSN#</cfoutput>">
     <input type="hidden" name="auxavisosn" id="auxavisosn" value="<cfoutput>#auxavisosn#</cfoutput>">   
 	<input type="hidden" name="frmtransfer" id="frmtransfer" value="<cfoutput>#auxtransfer#</cfoutput>">
+	<input type="hidden" name="ItnPTCSeq" id="ItnPTCSeq" value="<cfoutput>#qResposta.Itn_PTC_Seq#</cfoutput>">
  </form>
   <!--- Fim area de conteudo --->
 </table>

@@ -13,8 +13,9 @@
 <cfset txtNum_Inspecao = url.ninsp>
 </cfif>
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
-	select Usu_GrupoAcesso, Usu_Matricula, Usu_Coordena from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+	select Usu_GrupoAcesso,Usu_Matricula,Usu_Coordena,Usu_DR from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
+
 <cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
 
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
@@ -110,17 +111,28 @@ dtlimit: #dtlimit#<br>
 		SELECT Met_Codigo, Met_Ano, Dir_Sigla, Met_SE_STO, Met_SLNC, Met_SLNC_Mes, Met_PRCI, Met_PRCI_Mes, Met_PRCI_Acum, Met_DGCI, Met_SLNC_Acum, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_DGCI_Mes, Met_DGCI_Acum, Met_DGCI_AcumPeriodo 
 		FROM Metas INNER JOIN Diretoria ON Met_Codigo = Dir_Codigo
 		WHERE (Met_Ano = #frmano#) and Met_Mes = #frmmes#
-		ORDER BY Met_Resultado DESC
+		ORDER BY Met_Resultado DESC, Met_DGCI_Acum desc
+	</cfquery>
+<cfelseif grpacesso eq 'GESTORES' or grpacesso eq 'ANALISTAS'>
+	<cfquery name="rsMetas" datasource="#dsn_inspecao#">
+		SELECT Met_Codigo, Met_Ano, Dir_Sigla, Met_SE_STO, Met_SLNC, Met_SLNC_Mes, Met_PRCI, Met_PRCI_Mes, Met_PRCI_Acum, Met_DGCI, Met_SLNC_Acum, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_DGCI_Mes, Met_DGCI_Acum, Met_DGCI_AcumPeriodo 
+		FROM Metas INNER JOIN Diretoria ON Met_Codigo = Dir_Codigo
+		WHERE (Met_Ano = #frmano#) and Met_Mes = #frmmes# and Met_Codigo in(#qUsuario.Usu_Coordena#)
+		ORDER BY Met_Resultado DESC, Met_DGCI_Acum desc
 	</cfquery>
 <cfelse>
 	<cfquery name="rsMetas" datasource="#dsn_inspecao#">
 		SELECT Met_Codigo, Met_Ano, Dir_Sigla, Met_SE_STO, Met_SLNC, Met_SLNC_Mes, Met_PRCI, Met_PRCI_Mes, Met_PRCI_Acum, Met_DGCI, Met_SLNC_Acum, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_DGCI_Mes, Met_DGCI_Acum, Met_DGCI_AcumPeriodo 
 		FROM Metas INNER JOIN Diretoria ON Met_Codigo = Dir_Codigo
-		WHERE (Met_Ano = #frmano#) and Met_Mes = #frmmes# and Met_Codigo in(#qUsuario.Usu_Coordena#)
+		WHERE (Met_Ano = #frmano#) and Met_Mes = #frmmes# and Met_Codigo = '#qUsuario.Usu_DR#'
 		ORDER BY Met_Resultado DESC
 	</cfquery>
 </cfif>
-
+	<cfquery name="rsNacional" datasource="#dsn_inspecao#">
+		SELECT Met_PRCI,Met_SLNC,Met_DGCI
+		FROM Metas 
+		WHERE Met_Ano = #frmano# and Met_Mes = 1
+	</cfquery>
 
 <!--- Cria��o do arquivo CSV --->
 <cfset sdata = dateformat(now(),"YYYYMMDDHH")>
@@ -312,14 +324,11 @@ dtlimit: #dtlimit#<br>
       <td bgcolor="#scorp1#" class="exibir"><div align="center">#DGCIAcuPerRealRes#</div></td>
 	  <td class="exibir"><div align="center"><strong>#permeta#</strong></div></td>
     </tr>
-    <cfset PRCInac = PRCInac + PRCIm>
 	<cfset prciacurealnac = prciacurealnac + PRCIAcuPerReal>
 	<cfset PRCIAPnac = PRCIAPnac + PRCIAM>
-    <cfset SLNCnac = SLNCnac + SLNCm>
 	<cfset slncacurealnac = slncacurealnac + SLNCAcuPerReal>
-    <cfset SLNCAPnac = SLNCAPnac + SLNCAM>
-    <cfset DGCInac = DGCInac + DGCIm>
-    <cfset DGCIAPnac = DGCIAPnac + DGCIAM>
+  <cfset SLNCAPnac = SLNCAPnac + SLNCAM>
+  <cfset DGCIAPnac = DGCIAPnac + DGCIAM>
 	<cfset dgciacurealnac = dgciacurealnac + DGCIAcuPerReal>
 	
     <cfset RESMETnac = RESMETnac + permeta> 
@@ -339,13 +348,21 @@ frmmes: #frmmes#  mesantes: #mesantes# day(now()): #day(now())#<br>
 
     <cffile action="Append" file="#slocal##sarquivo#" output='#se#;#PRCIm#;#PRCIAM#;#PRCIRes#;#PRCIAcuPerReal#;#PRCIAcuPerRealRes#;#SLNCm#;#SLNCAM#;#SLNCRes#;#SLNCAcuPerReal#;#SLNCAcuPerRealRes#;#DGCIm#;#DGCIAM#;#DGCIRes#;#Met_DGCI_AcumPeriodo#;#DGCIAcuPerRealRes#;#permeta#'>
   </cfoutput>
-	<cfset PRCInac = numberFormat((PRCInac/rsMetas.recordcount),999.0)>
+
+  <cfloop query="rsNacional">
+    <cfset PRCInac = PRCInac + rsNacional.Met_PRCI>
+    <cfset SLNCnac = SLNCnac + rsNacional.Met_SLNC>
+    <cfset DGCInac = DGCInac + rsNacional.Met_DGCI>
+  </cfloop>
+
+
+	<cfset PRCInac = numberFormat((PRCInac/rsNacional.recordcount),999.0)>
 	<cfset prciacurealnac = numberFormat((prciacurealnac/rsMetas.recordcount),999.0)>
 	<cfset PRCIAPnac = numberFormat((PRCIAPnac/rsMetas.recordcount),999.0)>
-	<cfset SLNCnac = numberFormat((SLNCnac/rsMetas.recordcount),999.0)>
+	<cfset SLNCnac = numberFormat((SLNCnac/rsNacional.recordcount),999.0)>
 	<cfset slncacurealnac = numberFormat((slncacurealnac/rsMetas.recordcount),999.0)>
 	<cfset SLNCAPnac = numberFormat((SLNCAPnac/rsMetas.recordcount),999.0)>
-	<cfset DGCInac = numberFormat((DGCInac/rsMetas.recordcount),999.0)>
+	<cfset DGCInac = numberFormat((DGCInac/rsNacional.recordcount),999.0)>
 	<cfset dgciacurealnac = numberFormat((dgciacurealnac/rsMetas.recordcount),999.0)>
 	<cfset DGCIAPnac = numberFormat((DGCIAPnac/rsMetas.recordcount),999.0)>
 	<cfset RESMETnac = numberFormat((DGCIAPnac/DGCInac)*100,999.0)> 
@@ -460,10 +477,8 @@ frmmes: #frmmes#  mesantes: #mesantes# day(now()): #day(now())#<br>
       <td class="exibir"><div align="center"><strong>#RESMETnac#%</strong></div></td>
     </tr>	
     
-    <cffile action="Append" file="#slocal##sarquivo#" output=';Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;;'>
-    <!---    <CFSET RESMETnac = numberFormat((DGCIAPnac/DGCInac)*100,999.0)> --->
-    
-<cffile action="Append" file="#slocal##sarquivo#" output=';#PRCInac#%;#PRCIAPnac#%;#PRCIResNac#;#prciacurealnac#%;#prciacurealnacres#;#SLNCnac#%;#SLNCAPnac#%;#SLNCResNac#;#slncacurealnac#%;#slncacurealnacres#;#DGCInac#%;#DGCIAPnac#%;#DGCIResNac#;#dgciacurealnac#%;#dgciacurealnacres#;#RESMETnac#%'>
+    <cffile action="Append" file="#slocal##sarquivo#" output=';Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;;'>   
+    <cffile action="Append" file="#slocal##sarquivo#" output=';#PRCInac#%;#PRCIAPnac#%;#PRCIResNac#;#prciacurealnac#%;#prciacurealnacres#;#SLNCnac#%;#SLNCAPnac#%;#SLNCResNac#;#slncacurealnac#%;#slncacurealnacres#;#DGCInac#%;#DGCIAPnac#%;#DGCIResNac#;#dgciacurealnac#%;#dgciacurealnacres#;#RESMETnac#%'>
   </cfoutput>
 </table>
 <!--- fim exibicao --->

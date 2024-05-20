@@ -81,9 +81,9 @@
 </cfif>
 
 <cfquery name="rsItem" datasource="#dsn_inspecao#">
-  SELECT RIP_NumInspecao, RIP_Unidade, Und_Descricao, RIP_NumGrupo, RIP_NumItem,
-  RIP_Comentario, RIP_Recomendacoes, INP_DtInicInspecao, INP_Responsavel, Rep_Codigo, RIP_Valor,
-  Itn_Descricao, INP_DtEncerramento, Grp_Descricao, RIP_ReincInspecao, RIP_ReincGrupo, RIP_ReincItem, RIP_Caractvlr, RIP_Falta, RIP_Sobra, RIP_EmRisco, TNC_ClassifInicio, 
+  SELECT RIP_NumInspecao, RIP_Unidade, Und_Descricao, RIP_NumGrupo, RIP_NumItem,Und_TipoUnidade,
+  RIP_Comentario, RIP_Recomendacoes, INP_DtInicInspecao, INP_Responsavel, Rep_Codigo, RIP_Valor,Itn_PTC_Seq,
+  Itn_Descricao, Itn_ImpactarTipos, INP_DtEncerramento, Grp_Descricao, RIP_ReincInspecao, RIP_ReincGrupo, RIP_ReincItem, RIP_Caractvlr, RIP_Falta, RIP_Sobra, RIP_EmRisco, TNC_ClassifInicio, 
   TNC_ClassifAtual
   FROM Reops 
   INNER JOIN Resultado_Inspecao 
@@ -195,7 +195,15 @@
    WHERE Unidades.Und_Codigo = '#URL.Unid#'
 </cfquery>
 
-<script>
+<html>
+<head>
+<title>Sistema Nacional de Controle Interno</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link href="css.css" rel="stylesheet" type="text/css">
+<script type="text/javascript">
+<cfinclude template="mm_menu.js">
+
+//==================================
 function anexar(){
     if(document.form1.observacao.value == ''){
 		       alert('O campo Manifestar-se deve ser preenchido!');
@@ -257,13 +265,6 @@ function mensagem(){
 	alert('Sr. Inspetor, se necessário ajuste os campos Situação Encontrada e/ou Orientação');
 	}
 </script>
-
-<html>
-<head>
-<title>Sistema Nacional de Controle Interno</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="css.css" rel="stylesheet" type="text/css">
-
 </head>
 
 <cfquery name="qVerificaRevisao" datasource="#dsn_inspecao#">
@@ -300,9 +301,7 @@ function mensagem(){
                       <input name="ngrup" type="hidden" id="ngrup" value="<cfoutput>#URL.Ngrup#</cfoutput>">
                       <input name="nitem" type="hidden" id="nitem" value="<cfoutput>#URL.Nitem#</cfoutput>">
 					  <cfset caracvlr = #trim(rsItem.RIP_Caractvlr)#>
-            <cfset falta = trim(Replace(NumberFormat(rsItem.RIP_Falta,999.00),'.',',','All'))> 
-            <cfset sobra = trim(Replace(NumberFormat(rsItem.RIP_Sobra,999.00),'.',',','All'))> 
-            <cfset emrisco = trim(Replace(NumberFormat(rsItem.RIP_EmRisco,999.00),'.',',','All'))> 
+
               </p></td>
           </tr>
           <tr bgcolor="#FFFFFF" class="exibir">
@@ -364,54 +363,52 @@ function mensagem(){
 			</table>
 			</td>
 		</tr>			
-<cfoutput>
-   <cfset db_reincInsp = #trim(rsItem.RIP_ReincInspecao)#>
-   <cfset db_reincGrup = #rsItem.RIP_ReincGrupo#>
-   <cfset db_reincItem = #rsItem.RIP_ReincItem#>	 
-	  <cfif len(trim(rsItem.RIP_ReincInspecao)) gt 0><!---Foi colocado zero pois o xml gerado pelo SGI est&atilde; colocando 0(zero) por padrao--->
-		  
-		 <tr class="red_titulo">
-	  <td bgcolor="eeeeee">Reincid&ecirc;ncia</td>  
-	      <input type="hidden" name="db_reincSN" id="db_reincSN" value="N">
-		   <cfset reincSN = "S">
-		   <input type="hidden" name="db_reincSN" id="db_reincSN" value="S">
-
-	<td  colspan="7" bgcolor="eeeeee">
-N&ordm; Relat&oacute;rio:
-			<input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" style="background:white" readonly="">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&ordm; Grupo:
-			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" style="background:white" readonly="">
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&ordm; Item:
-			<input name="frmreincItem" type="text" class="form" id="frmreincItem" size="7" maxlength="4" value="#db_reincItem#" style="background:white" readonly=""></td>
+<cfoutput>		
+<cfset reincSN = "N">
+<cfset aux_reincSN = "Nao">
+<cfset db_reincInsp = "">
+<cfset db_reincGrup = 0>
+<cfset db_reincItem = 0>
+<cfif rsItem.RIP_ReincGrupo neq 0>
+	<cfset reincSN = "S">
+	<cfset aux_reincSN = "Sim">
+	<cfset db_reincInsp = #trim(rsItem.RIP_ReincInspecao)#>
+	<cfset db_reincGrup = #rsItem.RIP_ReincGrupo#>
+	<cfset db_reincItem = #rsItem.RIP_ReincItem#>
+</cfif>	   
+	<cfif reincSN eq 'S'>
+		<tr class="red_titulo">
+			<td bgcolor="eeeeee">Reincidência</td>
+			<td colspan="6" bgcolor="eeeeee">Nº Avaliação:
+				<input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" onKeyPress="numericos(this.value)">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Grupo:
+			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" onKeyPress="numericos(this.value)">
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Item:
+			<input name="frmreincItem" type="text" class="form" id="frmreincItem" size="7" maxlength="4" value="#db_reincItem#" onKeyPress="numericos(this.value)">
+			</strong>		  
+			</td>
 	</tr>
+	</cfif> 
+	<cfset tipoimpacto = 'NÃO QUANTIFICADO'>
+	<cfif listFind(#rsItem.Itn_PTC_Seq#,'10')>
+	<cfset tipoimpacto = 'QUANTIFICADO'>
 	</cfif>
-</cfoutput>			  	  
-
-<cfoutput>
- 	 <tr class="exibir">
-      <td bgcolor="eeeeee">Valores</td>
-
-      <td colspan="4" bgcolor="eeeeee">
-		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee" >
-		  <tr class="form">
-					<td>Caracteres:&nbsp;
-					  <select name="caracvlr" id="caracvlr" class="form" onChange="exibevalores()" disabled="disabled">
-                         <option <cfif trim(caracvlr) eq "Quantificado"> selected</cfif> value="Quantificado">Quantificado</option>
-                        <option <cfif trim(caracvlr) neq "Quantificado"> selected</cfif> value="Nao Quantificado">Não Quantificado</option>
-                      </select>
-                    </td>
-					<td>Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)" readonly="yes">
-					</td>
-					<td>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)" readonly="yes">
-					</td>
-					<td>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)" readonly="yes">
-					</td>
-
-		  </tr>
-		  </table>
+	<cfset falta = lscurrencyformat(rsItem.RIP_Falta,'Local')>
+	<cfset sobra = lscurrencyformat(rsItem.RIP_Sobra,'Local')>
+	<cfset emrisco = lscurrencyformat(rsItem.RIP_EmRisco,'Local')>	
+ 	<tr class="exibir">
+      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
+      <td colspan="6" bgcolor="eeeeee">
+		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			<tr class="exibir"><strong>
+				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			</tr>
+		  </table>		  
 	  </td>
-      </tr>
-	 </cfoutput>
+    </tr>	  
+	</cfoutput>
 
     <tr>
 	 <td height="38" bgcolor="#eeeeee" align="center"><span class="titulos">Situação Encontrada:</span></td>
@@ -459,7 +456,7 @@ N&ordm; Relat&oacute;rio:
 		    <input type="hidden" name="frmResp" value="1">
            <!---  <input type="hidden" name="obs" value="<cfoutput>#qResposta.Pos_Parecer#</cfoutput>"> --->
           <tr>
-            <td height="38" align="center" bgcolor="eeeeee" class="exibir"><span class="titulos">Hist&oacute;rico:</span> <span class="titulos">Manifesta&ccedil;&atilde;o e Plano de Ação/An&aacute;lise do Controle Interno</span><span class="titulos">:</span></td>
+            <td height="38" align="center" bgcolor="eeeeee" class="exibir"><span class="titulos">Histórico:</span> <span class="titulos">Manifestações e Plano de Ação/Análise do Controle Interno</span><span class="titulos">:</span></td>
 
 			<td colspan="4" bgcolor="eeeeee"><cfif Not IsDefined("FORM.MM_UpdateRecord") And Trim(qResposta.Pos_Parecer) neq ''>
               <textarea name="H_obs" cols="200" rows="40" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.Pos_Parecer#</cfoutput></textarea></cfif></td>
@@ -491,10 +488,13 @@ N&ordm; Relat&oacute;rio:
 			</tr>
 
         </table>
-        <input type="hidden" name="MM_UpdateRecord" value="form1">
-		<input type="hidden" name="salvar_anexar" value="">
-		<input type="hidden" name="scodresp" id="scodresp" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
       </div>
+<cfoutput>      
+    <input type="hidden" name="MM_UpdateRecord" value="form1">
+		<input type="hidden" name="salvar_anexar" value="">
+		<input type="hidden" name="scodresp" id="scodresp" value="#qResposta.Pos_Situacao_Resp#">
+		<input name="reincideSN" type="hidden" id="reincideSN" value="#reincSN#">	   
+</cfoutput>       
 	</form>
 
          <!--- Fim Área de conteúdo --->

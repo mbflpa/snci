@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"> 
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -48,16 +49,16 @@
 <div align="center">
   <table width="90%" border="0" align="left" class="exibir">
     <tr>
-      <td colspan="7" class="titulo1"><div align="center">Funcion&Aacute;rios</div></td>
+      <td colspan="7" class="titulo1"><div align="center">Funcionários</div></td>
     </tr>
     <tr>
       <td colspan="7">&nbsp;</td>
     </tr>
     <tr>
-      <td colspan="2"><div align="center"><span class="titulos">Matr&iacute;cula</span></div></td>
-      <td width="255"><div align="center"></div>        <div align="center"><span class="titulos">Lota&ccedil;&atilde;o</span></div></td>
+      <td colspan="2"><div align="center"><span class="titulos">Matrícula</span></div></td>
+      <td width="255"><div align="center"></div>        <div align="center"><span class="titulos">Lotação</span></div></td>
       <td width="603" class="titulos"><div align="center">Nome</div></td>
-      <td width="149"><div align="center"><span class="titulos">Situa&ccedil;&atilde;o</span></div></td>
+      <td width="149"><div align="center"><span class="titulos">Situação</span></div></td>
       <td colspan="2">&nbsp;</td>
     </tr>
       
@@ -112,11 +113,11 @@
 			&nbsp;&nbsp;
 		      </cfif>
 	          <cfif PageNum_qNoticias LT TotalPages_qNoticias>
-		        <a href="#CurrentPage#?PageNum_qNoticias=#Min(IncrementValue(PageNum_qNoticias),TotalPages_qNoticias)##QueryString_qNoticias#"><span class="titulosclaro">Pr�ximo</span></a>
+		        <a href="#CurrentPage#?PageNum_qNoticias=#Min(IncrementValue(PageNum_qNoticias),TotalPages_qNoticias)##QueryString_qNoticias#"><span class="titulosclaro">Pr�ximo</span></a>
 			&nbsp;&nbsp;
 		      </cfif>
 	          <cfif PageNum_qNoticias LT TotalPages_qNoticias>
-		        <a href="#CurrentPage#?PageNum_qNoticias=#TotalPages_qNoticias##QueryString_qNoticias#"><span class="titulosclaro">�ltimo</span></a>
+		        <a href="#CurrentPage#?PageNum_qNoticias=#TotalPages_qNoticias##QueryString_qNoticias#"><span class="titulosclaro">�ltimo</span></a>
 		      </cfif>
 	        </td>
 	        <td colspan="2">&nbsp;</td>		  
@@ -128,7 +129,7 @@
     <tr>	     	
       <td colspan="6">        
           <div align="center">
-            <input type="submit" name="Adicionar" value="Cadastrar Novo Funcion�rio" class="botao" onClick="window.open('Adicionar_funcionario.cfm?','_self')">
+            <input type="submit" name="Adicionar" value="Cadastrar Novo Funcionáio" class="botao" onClick="window.open('Adicionar_funcionario.cfm?','_self')">
 	</div></td>
       <td width="80">&nbsp;</td>
     </tr>
