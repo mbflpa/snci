@@ -687,8 +687,8 @@
 														<cfelse>
 														    <cfset metaPRCIorgao = NumberFormat(ROUND(metaPRCI*10)/10,0.0)>
 															<cfif metaPRCIorgao neq '' or  metaPRCIorgao neq 0>
-                                                                <cfif PRCI neq ''>
-																 	<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((PRCI/metaPRCIorgao)*100*10)/10,0.0)>
+                                                                <cfif atingPRCI neq ''>
+																 	<cfset resultMesEmRelacaoMeta = atingPRCI>
 																</cfif>
 																<cfif PRCIacumulado neq ''>
 																	<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((PRCIacumulado/metaPRCIorgao)*100*10)/10,0.0)>	
@@ -864,8 +864,8 @@
 															<cfset resultAcumuladoEmRelacaoMeta = "sem meta">
 														<cfelse>
 														    <cfset metaSLNCorgao = NumberFormat(ROUND(metaSLNC*10)/10,0.0)>
-															<cfif resultado.SLNC neq ''>
-																<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((resultado.SLNC/metaSLNCorgao)*100*10)/10,0.0)>
+															<cfif atingSLNC neq ''>
+																<cfset resultMesEmRelacaoMeta = atingSLNC>
 																<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((SLNCacumulado/metaSLNCorgao)*100*10)/10,0.0)>	
 															
 															</cfif>
@@ -1056,8 +1056,8 @@
 															<td style="color:red">sem meta</td>
 														</cfif>
 
-														<cfif metaDGCIorgao neq ''>
-															<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((DGCI/metaDGCIformatado)*100*10)/10,0.0)>
+														<cfif atingDGCI neq ''>
+															<cfset resultMesEmRelacaoMeta = atingDGCI>
 															<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 														<cfelse>
 														    <cfset resultMesEmRelacaoMeta ='sem meta'>
@@ -1256,8 +1256,8 @@
 															<td style="color:red">sem meta</td>
 														</cfif>
 
-														<cfif metaDGCIorgao neq 0>
-															<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((DGCI/metaDGCIformatado)*100*10)/10,0.0)>
+														<cfif atingDGCI neq ''>
+															<cfset resultMesEmRelacaoMeta = atingDGCI>
 															<td >
 																<span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span>
 															</td>
