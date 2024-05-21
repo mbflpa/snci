@@ -476,8 +476,10 @@
 										</cfif>
 										<cfif metaPRCI eq ''>
 											<td>sem meta</td>
+										<cfelseif PRCI eq ''>
+											<td>sem dados</td>
 										<cfelse>
-											<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((PRCI/metaPRCIorgao)*100*10)/10,0.0)>
+											<cfset resultMesEmRelacaoMeta = atingPRCI>
 											<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 										</cfif>
 
@@ -485,9 +487,10 @@
 										
 										<cfif metaPRCI eq ''>
 											<td>sem meta</td>
+										<cfelseif PRCI eq ''>
+											<td>sem dados</td>
 										<cfelse>
-											<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((PRCIacumulado/metaPRCIorgao)*100*10)/10,0.0)>
-											<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
+											<td >#resultMesEmRelacaoMeta#</span></td>
 										</cfif>
 									</tr>
 								</cfloop>
@@ -562,7 +565,7 @@
 			<cfset metaPRCIorgao = resultPRCIdados.metaPRCI>
 			<cfif metaPRCIorgao neq ''>
 				<cfset metaPRCIorgaoFormatado = Replace(NumberFormat(metaPRCIorgao,0.0), ".", ",")>
-				<cfset PRCIresultadoMeta = ROUND((totalPRCI / metaPRCIorgao)*100*10)/10>
+				<cfset PRCIresultadoMeta = resultPRCIdados.atingPRCI>
 				<cfset PRCIresultadoMetaFormatado = Replace(NumberFormat(PRCIresultadoMeta,0.0), ".", ",")>
 			<cfelse>
 				<cfset PRCIresultadoMeta = ''>
@@ -655,21 +658,24 @@
 										<cfset metaSLNCorgao = 0>
 										<cfset resultMesEmRelacaoMeta =0>
 										<cfset resultAcumuladoEmRelacaoMeta =0>
-										<cfif metaSLNC neq ''>
-											<cfset metaSLNCorgao = NumberFormat(ROUND(metaSLNC*10)/10,0.0)>
-											<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((SLNC/metaSLNCorgao)*100*10)/10,0.0)>
-											<cfset resultAcumuladoEmRelacaoMeta = NumberFormat(ROUND((SLNCacumulado/metaSLNCorgao)*100*10)/10,0.0)>
-										</cfif>
 										<cfif metaSLNC eq ''>
 											<td>sem meta</td>
-										<cfelse>	
-											<td><strong>#metaSLNCorgao#</strong></td>
+										<cfelseif SLNC eq ''>
+											<td>sem dados</td>
+										<cfelse>
+											<cfset resultMesEmRelacaoMeta = atingSLNC>
+											<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 										</cfif>
-										
-										<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
+
 										<td>#NumberFormat(ROUND(SLNCacumulado*10)/10,0.0)#</td>
 										
-										<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
+										<cfif metaSLNC eq ''>
+											<td>sem meta</td>
+										<cfelseif SLNC eq ''>
+											<td>sem dados</td>
+										<cfelse>
+											<td >#resultMesEmRelacaoMeta#</span></td>
+										</cfif>
 									</tr>
 								</cfloop>
 							</cfoutput>
@@ -741,7 +747,7 @@
 			<cfset metaSLNCorgao = resultSLNCdados.metaSLNC>
 			<cfif metaSLNCorgao neq ''>
 				<cfset metaSLNCorgaoFormatado = Replace(NumberFormat(metaSLNCorgao,0.0), ".", ",")>
-				<cfset SLNCresultadoMeta = ROUND((totalSLNC / metaSLNCorgao)*100*10)/10>
+				<cfset SLNCresultadoMeta = resultSLNCdados.atingSLNC>
 				<cfset SLNCresultadoMetaFormatado = Replace(NumberFormat(SLNCresultadoMeta,0.0), ".", ",")>
 			<cfelse>
 			    <cfset metaSLNCorgaoFormatado =0>

@@ -1232,11 +1232,11 @@
 														<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(DGCI*10)/10,0.0)#</strong></td>
 														
 														<cfif metaPRCI neq ''>
-															<cfset metaPRCI = NumberFormat(ROUND(rsMetaPRCI.metaPRCI*10)/10,0.0)>
+															<cfset metaPRCI = NumberFormat(ROUND(metaPRCI*10)/10,0.0)>
 														</cfif>
 
 														<cfif metaSLNC neq ''>
-															<cfset metaSLNC = NumberFormat(ROUND(rsMetaSLNC.metaSLNC*10)/10,0.0)>
+															<cfset metaSLNC = NumberFormat(ROUND(metaSLNC*10)/10,0.0)>
 														</cfif>
 														
 														<cfif metaPRCI neq '' and metaSLNC neq ''>
