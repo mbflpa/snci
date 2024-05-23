@@ -18,7 +18,7 @@
                     <a class="d-block w-100" data-toggle="collapse" href="#collapse3">
                         <div class="card-header">
                             <h4 class="card-title w-100">
-                                Versão 1.1.2 - 13/02/2024
+                                Versão 1.2.0 - 23/05/2024
                             </h4>
                         </div>
                     </a>
@@ -39,7 +39,7 @@
                             <h5>Correções:</h5>
                             <ul>
                                 <li>Corrigida a visualização no menu do link da página atualmente aberta;</li>
-                               
+                                <li>Corrigida a visualização de tabelas em telas de menores.</li>
                             </ul>
                         </div>
                     </div>
