@@ -39,7 +39,7 @@
                             <h5>Correções:</h5>
                             <ul>
                                 <li>Corrigida a visualização no menu do link da página atualmente aberta;</li>
-                                <li>Corrigida a visualização de tabelas em telas de menores.</li>
+                                <li>Corrigida a visualização de tabelas em telas menores.</li>
                             </ul>
                         </div>
                     </div>
