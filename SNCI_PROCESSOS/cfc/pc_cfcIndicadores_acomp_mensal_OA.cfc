@@ -175,7 +175,7 @@
 				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
 			
 				
-				var tituloExcel ="SNCI_Consulta_PRCI_detalhamento_";
+				var tituloExcel ="SNCI_Consulta_PRCI_detalhamento_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 				var colunasMostrar = [1,2,8,10];
 
 
@@ -193,7 +193,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel + d,
+							title : tituloExcel + '_(gerado_em: _' + d + ')',
 							className: 'btExcel',
 						}
 
@@ -364,7 +364,7 @@
 				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
 			
 				
-				var tituloExcel ="SNCI_Consulta_SLNC_detalhamento_";
+				var tituloExcel ="SNCI_Consulta_SLNC_detalhamento_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 				var colunasMostrar = [1,2,8,10];
 
 
@@ -384,7 +384,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel + d,
+							title : tituloExcel + '_(gerado_em: _' + d + ')',
 							className: 'btExcel',
 						}
 
@@ -465,9 +465,10 @@
 								<th >TGI</th>
 								<th >PRCI %</th>
 								<th >Meta %</th>
+								<th>Result. %<br>em Relação à Meta</th>
 								<th >Resultado</th>
 								<th >PRCI<br>Acumulado %</th>
-								<th>Result. %<br>em Relação à Meta</th>
+								
 							</tr>
 						</thead>
 						<tbody>
@@ -494,6 +495,14 @@
  											<cfset metaPRCIorgao = NumberFormat(ROUND(metaPRCI*10)/10,0.0)>
 											<td><strong>#metaPRCIorgao#</strong></td>
 										</cfif>
+
+										<cfif metaPRCI eq ''>
+											<td>sem meta</td>
+										<cfelseif PRCI eq ''>
+											<td>sem dados</td>
+										<cfelse>
+											<td >#resultMesEmRelacaoMeta#</span></td>
+										</cfif>
                                         
 										<cfif metaPRCI eq ''>
 											<td>sem meta</td>
@@ -509,13 +518,7 @@
 											<td>#NumberFormat(ROUND(PRCIacumulado*10)/10,0.0)#</td>
 										</cfif>
 
-										<cfif metaPRCI eq ''>
-											<td>sem meta</td>
-										<cfelseif PRCI eq ''>
-											<td>sem dados</td>
-										<cfelse>
-											<td >#resultMesEmRelacaoMeta#</span></td>
-										</cfif>
+										
 									</tr>
 								</cfloop>
 							</cfoutput>
@@ -547,8 +550,12 @@
 				});
 			}
 
-			// Inicializa a tabela para ser ordenável pelo plugin DataTables
-			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
+			var tituloExcel_PRCI ="SNCI_Consulta_PRCI_orgaos_subordinados_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 			$('#tabResumoPRCIorgaos').DataTable({
 				order: [[3, 'desc'], [4, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
 				lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
@@ -557,7 +564,17 @@
 				searching: false, // Remove o campo de busca
 				drawCallback: function (settings) {
 					aplicarEstiloNasTDsComClasseTdResult();
-				}
+				},
+				dom: "<'row'<'col-sm-3'B><'col-sm-4 text-center' p><'col-sm-4 text-right'i>>" ,
+				buttons: [
+					{
+						extend: 'excel',
+						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+						title : tituloExcel_PRCI + '_(gerado_em: _' + d + ')',
+						className: 'btExcel',
+					}
+
+				]
 			});
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
@@ -678,9 +695,10 @@
 								<th >QTNC</th>
 								<th >SLNC %</th>
 								<th >Meta %</th>
+								<th>Result. %<br>em Relação à Meta</th>
 								<th >Resultado</th>
 								<th >SLNC<br>Acumulado %</th>
-								<th>Result. %<br>em Relação à Meta</th>
+								
 							</tr>
 						</thead>
 						<tbody>
@@ -710,6 +728,13 @@
 										<cfelseif SLNC eq ''>
 											<td>sem dados</td>
 										<cfelse>	
+											<td >#resultMesEmRelacaoMeta#</td>
+										</cfif>
+										<cfif metaSLNC eq ''>
+											<td>sem meta</td>
+										<cfelseif SLNC eq ''>
+											<td>sem dados</td>
+										<cfelse>	
 											<cfset resultMesEmRelacaoMeta = NumberFormat(ROUND((SLNC/metaSLNCorgao)*100*10)/10,0.0)>
 											<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 										</cfif>
@@ -719,13 +744,7 @@
 											<td>#NumberFormat(ROUND(SLNCacumulado*10)/10,0.0)#</td>
 										</cfif>
 										
-										<cfif metaSLNC eq ''>
-											<td>sem meta</td>
-										<cfelseif SLNC eq ''>
-											<td>sem dados</td>
-										<cfelse>	
-											<td >#resultMesEmRelacaoMeta#</td>
-										</cfif>
+										
 									</tr>
 								</cfloop>
 							</cfoutput>
@@ -759,8 +778,12 @@
 				});
 			}
 
-			// Inicializa a tabela para ser ordenável pelo plugin DataTables
-			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
+			var tituloExcel_SLNC ="SNCI_Consulta_SLNC_orgaos_subordinados_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 			$('#tabResumoSLNCorgaos').DataTable({
 				order: [[3, 'desc'], [4, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
 				lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
@@ -769,7 +792,17 @@
 				searching: false, // Remove o campo de busca
 				drawCallback: function (settings) {
 					aplicarEstiloNasTDsComClasseTdResult();
-				}
+				},
+				dom: "<'row'<'col-sm-3'B><'col-sm-4 text-center' p><'col-sm-4 text-right'i>>" ,
+				buttons: [
+					{
+						extend: 'excel',
+						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+						title : tituloExcel_SLNC + '_(gerado_em: _' + d + ')',
+						className: 'btExcel',
+					}
+
+				]
 			});
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
@@ -918,9 +951,10 @@
 								<th >SLNC %</th>
 								<th >DGCI %</th>
 								<th >Meta %</th>
+								<th>Result. %<br>em Relação à Meta</th>
 								<th >Resultado</th>
 								<th >DGCI<br>Acumulado %</th>
-								<th>Result. %<br>em Relação à Meta</th>
+								
 							</tr>
 						</thead>
 						<tbody>
@@ -957,13 +991,13 @@
 										<cfif metaDGCI eq ''>
 											<td>sem meta</td>
 											<td>sem meta</td>
-											<td><strong>#DGCIacumulado#</strong></td>
 											<td>sem meta</td>
+											<td><strong>#DGCIacumulado#</strong></td>
 										<cfelse>	
 											<td><strong>#metaDGCI#</strong></td>
+											<td >#atingDGCI#</td>
 											<td ><span class="tdResult statusOrientacoes" data-value="#atingDGCI#"></span></td>
 											<td><strong>#DGCIacumulado#</strong></td>
-											<td >#atingDGCI#</td>
 										</cfif>
 										
 										
@@ -1002,8 +1036,13 @@
 				});
 			}
 
-			// Inicializa a tabela para ser ordenável pelo plugin DataTables
-			// Inicializa a tabela para ser ordenável pelo plugin DataTables
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
+			var tituloExcel_DGCI ="SNCI_Consulta_DGCI_orgaos_subordinados_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
+			
 			$('#tabResumoDGCIorgaos').DataTable({
 				order: [[3, 'desc'], [4, 'desc']], // Define a ordem inicial pela coluna SLNC em ordem decrescente
 				lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
@@ -1012,7 +1051,17 @@
 				searching: false, // Remove o campo de busca
 				drawCallback: function (settings) {
 					aplicarEstiloNasTDsComClasseTdResult();
-				}
+				},
+				dom: "<'row'<'col-sm-3'B><'col-sm-4 text-center' p><'col-sm-4 text-right'i>>" ,
+				buttons: [
+					{
+						extend: 'excel',
+						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
+						title : tituloExcel_DGCI + '_(gerado_em: _' + d + ')',
+						className: 'btExcel',
+					}
+
+				]
 			});
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");

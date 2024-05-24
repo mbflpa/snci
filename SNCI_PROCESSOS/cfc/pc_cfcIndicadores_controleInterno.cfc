@@ -143,12 +143,15 @@
 		</cfif>
 
 		<script language="JavaScript">
+		 $(document).ready(function(){
 			var currentDate = new Date()
 			var day = currentDate.getDate()
 			var month = currentDate.getMonth() + 1
 			var year = currentDate.getFullYear()
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
-			var tituloExcel_PRCI ="SNCI_Consulta_PRCI_detalhamento_";
+			
+			
+			let tituloExcel_PRCI ="SNCI_Consulta_PRCI_detalhamento_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 			$('#tabPRCIdetalhe').DataTable( {
 				destroy: true, // Destruir a tabela antes de recriá-la
 				stateSave: false,
@@ -163,7 +166,7 @@
 					{
 						extend: 'excel',
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-						title : tituloExcel_PRCI + d,
+						title : tituloExcel_PRCI + '_(gerado_em: _' + d + ')',
 						className: 'btExcel',
 					}
 
@@ -171,7 +174,7 @@
 				
 
 			})
-			$(document).ready(function() {
+		
 				$(".content-wrapper").css("height", "auto");
 			});
 		</script>
@@ -297,7 +300,9 @@
 			var month = currentDate.getMonth() + 1
 			var year = currentDate.getFullYear()
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
-			var tituloExcel_SLNC ="SNCI_Consulta_SLNC_detalhamento_";
+			
+			
+			var tituloExcel_SLNC ="SNCI_Consulta_SLNC_detalhamento_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));;
 
 				$('#tabSLNCdetalhe').DataTable( {
 					destroy: true, // Destruir a tabela antes de recriá-la
@@ -313,7 +318,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel_SLNC + d,
+							title : tituloExcel_SLNC + '_(gerado_em: _' + d + ')',
 							className: 'btExcel',
 						}
 
@@ -327,6 +332,8 @@
 		</script>
 
 	</cffunction>
+
+
 
 	<cffunction name="tabPRCIdetalhe_mensalAcumulado_CI" access="remote" returntype="string" hint="cria tabela como os dados para o indicador PRCI, de todos os meses, dos órgãos para consulta do Controle Interno">
 		<cfargument name="ano" type="string" required="true" />
@@ -452,7 +459,7 @@
 			var month = currentDate.getMonth() + 1
 			var year = currentDate.getFullYear()
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
-			var tituloExcel_PRCIacumulado ="SNCI_Consulta_PRCI_detalhamentoAcumulado_";
+			var tituloExcel_PRCIacumulado ="SNCI_Consulta_PRCI_detalhamentoAcumulado_janeiro_a_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 			$('#tabPRCIdetalheAcumulado').DataTable( {
 				destroy: true, // Destruir a tabela antes de recriá-la
 				stateSave: false,
@@ -467,7 +474,7 @@
 					{
 						extend: 'excel',
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-						title : tituloExcel_PRCIacumulado + d,
+						title : tituloExcel_PRCIacumulado + '_(gerado_em: _' + d + ')',
 						className: 'btExcel',
 					}
 
@@ -606,7 +613,7 @@
 			var month = currentDate.getMonth() + 1
 			var year = currentDate.getFullYear()
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
-			var tituloExcel_SLNCacumulado ="SNCI_Consulta_SLNC_detalhamento_acumulado";
+			var tituloExcel_SLNCacumulado ="SNCI_Consulta_SLNC_detalhamento_acumulado_janeiro_a_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 
 				$('#tabSLNCdetalheAcumulado').DataTable( {
 					destroy: true, // Destruir a tabela antes de recriá-la
@@ -622,7 +629,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel_SLNCacumulado + d,
+							title : tituloExcel_SLNCacumulado  + '_(gerado_em: _' + d + ')',
 							className: 'btExcel',
 						}
 
@@ -636,6 +643,8 @@
 		</script>
 
 	</cffunction>
+
+
 
 	<cffunction name="tabPRCIorgaosSubordinadores_mensal_CI" access="remote" returntype="string" hint="cria tabela resumo com as informações dos resultados do PRCI dos órgãos subordinadores para consulta do Controle Interno">
 		<cfargument name="ano" type="string" required="true" />
@@ -661,10 +670,11 @@
 												<th >Órgão</th>
 												<th class="bg-gradient-warning">PRCI %</th>
 												<th >Meta %</th>
+												<th>Result. %<br>em Relação à Meta Mensal</th>
 												<th >Resultado</th>
 												<th class="bg-gradient-warning">PRCI<br>Acumulado %</th>
 												<th>Resultado Acumulado</th>
-												<th>Result. %<br>em Relação à Meta Mensal</th>
+												
 											</tr>
 										</thead>
 										<tbody>
@@ -698,6 +708,12 @@
 														</cfif>
 
 														<cfif PRCI neq ''>
+															<td>#resultMesEmRelacaoMeta#</td>
+														<cfelse>
+															<td>sem dados</td>
+														</cfif>
+
+														<cfif PRCI neq ''>
 															<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 														<cfelse>
 															<td>sem dados</td>
@@ -714,11 +730,7 @@
 															<td>sem dados</td>
 														</cfif>
 
-														<cfif PRCI neq ''>
-															<td>#resultMesEmRelacaoMeta#</td>
-														<cfelse>
-															<td>sem dados</td>
-														</cfif>
+														
 														
 														
 													</tr>
@@ -753,7 +765,7 @@
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
 
 			
-			var tituloExcel_PRCIporOrgaoSubordinador ="SNCI_Consulta_PRCI_porOrgaoSubordinador_";
+			var tituloExcel_PRCIporOrgaoSubordinador ="SNCI_Consulta_PRCI_porOrgaoSubordinador_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 			$('#tabPRCIporOrgaoSubordinador').DataTable( {
 				destroy: true, // Destruir a tabela antes de recriá-la
 				stateSave: false,
@@ -772,7 +784,7 @@
 					{
 						extend: 'excel',
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-						title : tituloExcel_PRCIporOrgaoSubordinador + d,
+						title : tituloExcel_PRCIporOrgaoSubordinador + '_(gerado_em: _' + d + ')',
 						className: 'btExcel',
 						exportOptions: {
 							format: {
@@ -839,10 +851,11 @@
 												<th >Órgão</th>
 												<th class="bg-gradient-warning">SLNC %</th>
 												<th >Meta %</th>
+												<th>Result. %<br>em Relação à Meta Mensal</th>
 												<th >Resultado</th>
 												<th class="bg-gradient-warning">SLNC<br>Acumulado %</th>
 												<th>Resultado Acumulado</th>
-												<th>Result. %<br>em Relação à Meta Mensal</th>
+												
 											</tr>
 										</thead>
 										<tbody>
@@ -862,6 +875,7 @@
 															<td>sem meta</td>
 															<cfset resultMesEmRelacaoMeta = "sem meta">
 															<cfset resultAcumuladoEmRelacaoMeta = "sem meta">
+															<td>sem meta</td>
 														<cfelse>
 														    <cfset metaSLNCorgao = NumberFormat(ROUND(metaSLNC*10)/10,0.0)>
 															<cfif atingSLNC neq ''>
@@ -870,6 +884,7 @@
 															
 															</cfif>
 															<td>#metaSLNCorgao#</td>
+															<td>#resultMesEmRelacaoMeta#</td>
 														</cfif>
 														<cfif resultado.SLNC eq ''>
 															<td>sem dados</td>
@@ -880,11 +895,10 @@
 														<cfif resultado.SLNC eq ''>
 															<td>sem dados</td>
 															<td>sem dados</td>
-															<td>sem dados</td>
 														<cfelse>
 															<td><strong>#NumberFormat(ROUND(SLNCacumulado*10)/10,0.0)#</strong></td>
 															<td ><span class="tdResult statusOrientacoes" data-value="#resultAcumuladoEmRelacaoMeta#"></span></td>
-															<td>#resultMesEmRelacaoMeta#</td>
+															
 														</cfif>
 
 														
@@ -922,7 +936,7 @@
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
 
 			
-			var tituloExcel_SLNCporOrgaoSubordinador ="SNCI_Consulta_SLNC_porOrgaoSubordinador_";
+			var tituloExcel_SLNCporOrgaoSubordinador ="SNCI_Consulta_SLNC_porOrgaoSubordinador_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 				$('#tabSLNCporOrgaoSubordinador').DataTable( {
 					destroy: true, // Destruir a tabela antes de recriá-la
 					stateSave: false,
@@ -941,7 +955,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel_SLNCporOrgaoSubordinador + d,
+							title : tituloExcel_SLNCporOrgaoSubordinador + '_(gerado_em: _' + d + ')',
 							className: 'btExcel',
 							exportOptions: {
 									format: {
@@ -980,6 +994,9 @@
 
 	</cffunction>
 
+
+
+
 	<cffunction name="tabDGCIorgaosSubordinadores_mensal_CI" access="remote" returntype="string" hint="cria tabela resumo com as informações dos resultados do DGCI dos órgãos subordinadores para consulta do Controle Interno">
 		<cfargument name="ano" type="string" required="true" />
 		<cfargument name="mes" type="string" required="true" />
@@ -1010,10 +1027,11 @@
 													<span style="font-size: 9px">(PRCI * #resultado.pesoPRCI#) + (SLNC * #resultado.pesoSLNC#)</span>
 												</th>
 												<th >Meta %</th>
+												<th>Result. %<br>em Relação à Meta Mensal</th>
 												<th >Resultado</th>
 												<th class="bg-gradient-warning" style="border-left:1px solid ##000;border-right:1px solid ##000;border-top:1px solid ##000;text-align: center;">DGCI<br>Acumulado</th>
 												<th>Resultado Acumulado</th>
-												<th>Result. %<br>em Relação à Meta Mensal</th>
+												
 											</tr>
 										</thead>
 										<tbody>
@@ -1058,9 +1076,11 @@
 
 														<cfif atingDGCI neq ''>
 															<cfset resultMesEmRelacaoMeta = atingDGCI>
+															<td>#resultMesEmRelacaoMeta#</td>
 															<td ><span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span></td>
 														<cfelse>
 														    <cfset resultMesEmRelacaoMeta ='sem meta'>
+															<td style="color:red">sem meta</td>
 															<td style="color:red">sem meta</td>
 														</cfif>
 														<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(DGCIacumulado*10)/10,0.0)#</strong></td>
@@ -1071,7 +1091,7 @@
 														    <cfset resultAcumuladoEmRelacaoMeta ='sem meta'>
 															<td style="color:red">sem meta</td>
 														</cfif>
-														<td>#resultMesEmRelacaoMeta#</td>
+														
 													</tr>
 												</cfloop>
 											</cfoutput>
@@ -1080,7 +1100,7 @@
 											<tr>
 												<th colspan="9" style="font-weight: normal; font-size: smaller;">
 												    <li>DGCI % = (PRCI x peso PRCI) + (SLNC x peso SLNC) -> Não existindo dados para o SLNC, a fórmula será DGCI % = PRCI. Não existindo dados para o PRCI, a fórmula será DGCI % = SLNC; </li>
-													<li>META % = (meta PRCI x peso PRCI) + (meta SLNC x peso SLNC) -> Meta fixa, independente da existência de dados de algum indicador da cesta.</li>
+													<li>META % = (meta PRCI x peso PRCI) + (meta SLNC x peso SLNC)</li>
 												</th>
 											</tr>
 										</tfoot>
@@ -1112,7 +1132,7 @@
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
 
 			
-			var tituloExcel_DGCIporOrgaoSubordinador ="SNCI_Consulta_DGCI_porOrgaoSubordinador_";
+			var tituloExcel_DGCIporOrgaoSubordinador ="SNCI_Consulta_DGCI_porOrgaoSubordinador_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 				$('#tabDGCIporOrgaoSubordinador').DataTable( {
 					destroy: true, // Destruir a tabela antes de recriá-la
 					stateSave: false,
@@ -1131,7 +1151,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel_DGCIporOrgaoSubordinador + d,
+							title : tituloExcel_DGCIporOrgaoSubordinador + '_(gerado_em: _' + d + ')',
 							className: 'btExcel',
 							exportOptions: {
 								format: {
@@ -1202,10 +1222,11 @@
 													<span style="font-size: 9px">(PRCI * #resultado.pesoPRCI#) + (SLNC * #resultado.pesoSLNC#)</span>
 												</th>
 												<th >Meta %</th>
+												<th>Result. %<br>em Relação à Meta Mensal</th>
 												<th >Resultado</th>
 												<th class="bg-gradient-warning" style="border-left:1px solid ##000;border-right:1px solid ##000;border-top:1px solid ##000;text-align: center;">DGCI<br>Acumulado</th>
 												<th>Resultado Acumulado</th>
-												<th>Result. %<br>em Relação à Meta Mensal</th>
+												
 											</tr>
 										</thead>
 										<tbody>
@@ -1258,11 +1279,12 @@
 
 														<cfif atingDGCI neq ''>
 															<cfset resultMesEmRelacaoMeta = atingDGCI>
+															<td>#resultMesEmRelacaoMeta#</td>
 															<td >
 																<span class="tdResult statusOrientacoes" data-value="#resultMesEmRelacaoMeta#"></span>
 															</td>
 														<cfelse>
-														    <cfset resultMesEmRelacaoMeta ='sem meta'>
+															<td style="color:red">sem meta</td>
 															<td style="color:red">sem meta</td>
 														</cfif>
 														<td style="border-left:1px solid ##000;border-right:1px solid ##000"><strong>#NumberFormat(ROUND(DGCIacumulado*10)/10,0.0)#</strong></td>
@@ -1276,11 +1298,6 @@
 															<td style="color:red">sem meta</td>
 														</cfif>
 
-														<cfif resultMesEmRelacaoMeta neq 'sem meta'>
-															<td>#resultMesEmRelacaoMeta#</td>
-														<cfelse>
-															<td style="color:red">#resultMesEmRelacaoMeta#</td>
-														</cfif>
 
 
 														
@@ -1292,7 +1309,7 @@
 											<tr>
 												<th colspan="10" style="font-weight: normal; font-size: smaller;">
 												    <li>DGCI % = (PRCI x peso PRCI) + (SLNC x peso SLNC) -> Não existindo dados para o SLNC, a formula será DGCI % = PRCI. Não existindo dados para o PRCI, a formula será DGCI % = SLNC; </li>
-													<li>META % = (meta PRCI x peso PRCI) + (meta SLNC x peso SLNC) -> Meta fixa, independente da existência de dados de algum indicador da cesta.</li>
+													<li>META % = (meta PRCI x peso PRCI) + (meta SLNC x peso SLNC)</li>
 												</th>
 											</tr>
 										</tfoot>
@@ -1323,7 +1340,7 @@
 			var year = currentDate.getFullYear()
 			var d = day + "-" + month + "-" + year;	//data atual para nomear o arquivo excel
 			
-			var tituloExcel_DGCIporOrgaoResponsavel ="SNCI_Consulta_DGCI_porOrgaoResponsavel_";
+			var tituloExcel_DGCIporOrgaoResponsavel ="SNCI_Consulta_DGCI_porOrgaoResponsavel_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 			$('#tabDGCIporOrgaoResponsavel').DataTable( {
 				destroy: true, // Destruir a tabela antes de recriá-la
 				stateSave: false,
@@ -1342,7 +1359,7 @@
 					{
 						extend: 'excel',
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-						title : tituloExcel_DGCIporOrgaoResponsavel + d,
+						title : tituloExcel_DGCIporOrgaoResponsavel + '_(gerado_em: _' + d + ')',
 						className: 'btExcel',
 						exportOptions: {
 							format: {

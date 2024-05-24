@@ -568,3 +568,9 @@ function updateTDresultIndicadores(tdResult) {
       tdResult.text('SEM META').css('background', '#e3dada').css('color', '#000');
     }
 }
+
+function periodoPorExtenso(mes,ano) {
+    let meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+    let nomeMesExtenso = meses[mes - 1];
+    return nomeMesExtenso + "_de_" + ano;
+}

@@ -170,7 +170,7 @@
 				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
 			
 				
-				var tituloExcel ="SNCI_Consulta_PRCI_detalhamento_";
+				var tituloExcel ="SNCI_Consulta_PRCI_detalhamento_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 				var colunasMostrar = [1,2,8,10];
 
 
@@ -188,7 +188,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel + d,
+							title : tituloExcel + '_(gerado_em: _' + d + ')',
 							className: 'btExcel',
 						}
 
@@ -355,7 +355,7 @@
 				// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
 			
 				
-				var tituloExcel ="SNCI_Consulta_SLNC_detalhamento_";
+				var tituloExcel ="SNCI_Consulta_SLNC_detalhamento_"+ periodoPorExtenso(parseInt($('input[name=mes]:checked').val()),parseInt($('input[name=ano]:checked').val()));
 				var colunasMostrar = [1,2,8,10];
 
 
@@ -375,7 +375,7 @@
 						{
 							extend: 'excel',
 							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="padding:10px"></i>',
-							title : tituloExcel + d,
+							title : tituloExcel + '_(gerado_em: _' + d + ')',
 							className: 'btExcel',
 						}
 

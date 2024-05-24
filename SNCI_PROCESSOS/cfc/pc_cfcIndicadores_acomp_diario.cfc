@@ -91,7 +91,7 @@
 					pc_avaliacao_posicionamentos
 				 WHERE 
             		pc_aval_posic_enviado = 1
-					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+					AND CONVERT(DATE, pc_aval_posic_datahora) < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 	
 			) AS ranked_posicionamentos
 			INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
@@ -121,7 +121,7 @@
 					)
 					<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
 				) 
-				AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND CONVERT(DATE, pc_aval_posic_datahora) < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					
 		</cfquery>
 
@@ -144,7 +144,7 @@
 					ELSE pc_orientacao_status.pc_orientacao_status_descricao
 				END AS OrientacaoStatus,
 				CASE
-					WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp < pc_avaliacao_posicionamentos.pc_aval_posic_datahora THEN 'FP'
+					WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp < CONVERT(DATE, pc_avaliacao_posicionamentos.pc_aval_posic_datahora) THEN 'FP'
 					ELSE 'DP'
 				END AS Prazo
 			FROM pc_avaliacao_posicionamentos
@@ -172,7 +172,7 @@
 					<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
 				) 
 				
-				AND pc_avaliacao_posicionamentos.pc_aval_posic_datahora 
+				AND CONVERT(DATE, pc_avaliacao_posicionamentos.pc_aval_posic_datahora)
 				BETWEEN <cfqueryparam value="#dataInicial#" cfsqltype="cf_sql_date"> AND <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 				AND pc_avaliacao_posicionamentos.pc_aval_posic_enviado = 1
 		</cfquery>	
@@ -422,7 +422,7 @@
 					)
 					<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
 				) 
-				AND pc_aval_posic_datahora
+				AND CONVERT(DATE, pc_aval_posic_datahora)
 				BETWEEN <cfqueryparam value="#dataInicial#" cfsqltype="cf_sql_date"> AND <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					
 		</cfquery>
@@ -462,7 +462,7 @@
 					pc_avaliacao_posicionamentos
 				WHERE 
             		pc_aval_posic_enviado = 1
-					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+					AND CONVERT(DATE, pc_aval_posic_datahora) < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 	
 			) AS ranked_posicionamentos
 			INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
@@ -492,7 +492,7 @@
 					)
 					<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
 				) 
-				AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+				AND CONVERT(DATE, pc_aval_posic_datahora) < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 		</cfquery>
 
 		<cfquery name="rs_solucionados_tratamento_agora" dbtype="query">
@@ -1104,7 +1104,7 @@
 						pc_avaliacao_posicionamentos
 					WHERE 
 						pc_aval_posic_enviado = 1
-						AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+						AND CONVERT(DATE, pc_aval_posic_datahora) < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 		
 				) AS ranked_posicionamentos
 				INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
@@ -1134,7 +1134,7 @@
 						)
 						<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
 					) 
-					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+					AND CONVERT(DATE, pc_aval_posic_datahora) < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 				GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu
 		
 
@@ -1144,11 +1144,11 @@
 					orgaoResp.pc_org_sigla as orgaoResp,
 					orgaoResp.pc_org_mcu as orgaoRespMCU,
 					SUM(CASE
-						WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp < pc_avaliacao_posicionamentos.pc_aval_posic_datahora
+						WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp < CONVERT(DATE, pc_avaliacao_posicionamentos.pc_aval_posic_datahora)
 						THEN 1 ELSE 0
 					END) AS FP,
 					SUM(CASE
-						WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp >= pc_avaliacao_posicionamentos.pc_aval_posic_datahora
+						WHEN pc_avaliacao_posicionamentos.pc_aval_posic_dataPrevistaResp >= CONVERT(DATE, pc_avaliacao_posicionamentos.pc_aval_posic_datahora)
 						THEN 1 ELSE 0
 					END) AS DP
 				FROM pc_avaliacao_posicionamentos
@@ -1176,7 +1176,7 @@
 						<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
 					) 
 					
-					AND pc_avaliacao_posicionamentos.pc_aval_posic_datahora 
+					AND CONVERT(DATE, pc_avaliacao_posicionamentos.pc_aval_posic_datahora)
 					BETWEEN <cfqueryparam value="#dataInicial#" cfsqltype="cf_sql_date"> AND <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					AND pc_avaliacao_posicionamentos.pc_aval_posic_enviado = 1
 					GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu
@@ -1223,7 +1223,7 @@
 						pc_avaliacao_posicionamentos
 					WHERE 
 						pc_aval_posic_enviado = 1
-						AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+						AND CONVERT(DATE, pc_aval_posic_datahora) < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 
 				) AS ranked_posicionamentos
 				LEFT JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
@@ -1252,7 +1252,7 @@
 						)
 						<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
 					) 
-					AND pc_aval_posic_datahora
+					AND CONVERT(DATE, pc_aval_posic_datahora)
 					BETWEEN <cfqueryparam value="#dataInicial#" cfsqltype="cf_sql_date"> AND <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 					GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu	
 				UNION
@@ -1277,7 +1277,7 @@
 						pc_avaliacao_posicionamentos
 					WHERE 
 						pc_aval_posic_enviado = 1
-						AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+						AND CONVERT(DATE, pc_aval_posic_datahora) < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 
 				) AS ranked_posicionamentos
 				INNER JOIN pc_orgaos as orgaoResp ON ranked_posicionamentos.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
@@ -1307,7 +1307,7 @@
 						)
 						<cfif mcusHeranca neq ''>OR pc_aval_posic_num_orgaoResp IN (#mcusHeranca#)</cfif>
 					) 
-					AND pc_aval_posic_datahora < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
+					AND CONVERT(DATE, pc_aval_posic_datahora) < = <cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 				GROUP BY orgaoResp.pc_org_sigla, orgaoResp.pc_org_mcu
 			)
 			SELECT
