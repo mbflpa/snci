@@ -148,7 +148,9 @@
 														<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 8>
 															<cfoutput><option selected value="#application.rsUsuarioParametros.pc_org_mcu#"> #application.rsUsuarioParametros.pc_org_sigla#</option></cfoutput>
 														<cfelseif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
-														    <cfoutput><option selected value="#rsOrigemGCOP_GCIA_GACE.pc_org_mcu#">#rsOrigemGCOP_GCIA_GACE.pc_org_sigla#</option></cfoutput>
+														    <cfoutput query="rsOrigemGCOP_GCIA_GACE">
+																<option value="#rsOrigemGCOP_GCIA_GACE.pc_org_mcu#">#rsOrigemGCOP_GCIA_GACE.pc_org_sigla#</option>
+															</cfoutput>
 														<cfelse>
 															<cfoutput query="rsOrigem" >
 																<option value="#rsOrigem.pc_org_mcu#">#rsOrigem.pc_org_sigla#</option>

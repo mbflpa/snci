@@ -2,42 +2,6 @@
 <cfprocessingdirective pageencoding = "utf-8">	
 
 
-<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
-	SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
-
-	union
-
-	SELECT  pc_orgaos2.pc_org_mcu
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
-
-	union
-
-	select pc_orgaos.pc_org_mcu AS mcuHerdado
-	from pc_orgaos
-	LEFT JOIN pc_orgaos_heranca ON pc_orgHerancaMcuDe = pc_org_mcu
-	where pc_orgaos.pc_org_mcu_subord_tec in(SELECT  pc_orgaos2.pc_org_mcu
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
-</cfquery>
-
-<cfquery dbtype="query" name="rsHeranca"> 
-	SELECT mcuHerdado FROM rsHerancaUnion WHERE not mcuHerdado is null
-</cfquery>
-<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
 
     <cffunction name="tabMelhoriasConsulta" access="remote" hint="Criar a tabela das propostas de melhoria e envia para a página pc_ConsultarMelhorias.cfm">
 		
@@ -45,13 +9,18 @@
 			SELECT pc_avaliacao_melhorias.*
             , pc_processos.*
 			,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu
-			,pc_orgaos_heranca.*, pc_orgaos_2.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_2.pc_org_se_sigla as seOrgRespHerdeiro
+			, pc_orgaos_origem.pc_org_sigla as orgaoOrigemSigla
+			, pc_orgaos_origem.pc_org_mcu as orgaoOrigemMcu
+			, pc_orgaos_avaliado.pc_org_sigla as orgaoAvaliadoSigla
+			, pc_orgaos_avaliado.pc_org_mcu as orgaoAvaliadoMcu
+
 			FROM pc_avaliacao_melhorias
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-			LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_num_orgao_avaliado
-			LEFT JOIN pc_orgaos AS pc_orgaos_2 ON pc_orgaos_2.pc_org_mcu = pc_orgHerancaMcuPara
+			INNER JOIN pc_orgaos AS pc_orgaos_origem ON pc_orgaos_origem.pc_org_mcu = pc_num_orgao_origem
+			INNER JOIN pc_orgaos AS pc_orgaos_avaliado ON pc_orgaos_avaliado.pc_org_mcu = pc_num_orgao_avaliado
+			
 			WHERE NOT pc_num_status IN (2,3) 
 			
 			<cfif '#arguments.ano#' neq 'TODOS'>
@@ -82,7 +51,7 @@
 					AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  (pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-					<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>))
+					))
 				</cfif>
 			</cfif>
 			
@@ -112,6 +81,8 @@
 										<th >SE/CS</th>
 										<th >N° SEI</th>
 										<th >Data Prev.</th>
+										<th >Órgão Origem</th>
+										<th >Órgão Avaliado</th>
 										
 									</tr>
 								</thead>
@@ -156,13 +127,10 @@
 												<td align="center">#pc_aval_melhoria_id#</td>	
 												<td align="center">#pc_processo_id#</td>
 												<td align="center">#pc_aval_numeracao#</td>
-												<cfif #pc_orgHerancaMcuPara# neq '' and  DateFormat(Now(),"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy")>
-													<td align="center">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (#pc_org_mcu#)</span></td>
-													<td align="center">#seOrgRespHerdeiro#</td>
-												<cfelse>
-													<td align="center">#pc_org_sigla# (#pc_org_mcu#)</td>
-													<td align="center">#pc_org_se_sigla#</td>
-												</cfif>
+												
+												<td align="center">#pc_org_sigla# (#pc_org_mcu#)</td>
+												<td align="center">#pc_org_se_sigla#</td>
+												
 
 												<cfif #rsMelhorias.pc_modalidade# eq 'A' or #rsMelhorias.pc_modalidade# eq 'E'>
 													<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
@@ -176,6 +144,8 @@
 												<cfelse>
 													<td>Não Informado</td>	
 												</cfif>
+												<td>#orgaoOrigemSigla#</td>	
+												<td>#orgaoAvaliadoSigla#</td>
 
 											</tr>
 										</cfoutput>
@@ -727,13 +697,11 @@
 			SELECT pc_avaliacao_melhorias.*
             , pc_processos.*
 			,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu
-			,pc_orgaos_heranca.*, pc_orgaos_2.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_2.pc_org_se_sigla as seOrgRespHerdeiro
 			FROM pc_avaliacao_melhorias
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-			LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_num_orgao_avaliado
-			LEFT JOIN pc_orgaos AS pc_orgaos_2 ON pc_orgaos_2.pc_org_mcu = pc_orgHerancaMcuPara
+			
 			WHERE 	 pc_processo_id IS NOT NULL  
 			
 			<cfif '#arguments.ano#' neq 'TODOS' >
@@ -764,7 +732,7 @@
 				AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  (pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 				or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 				or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-				<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>))
+				))
 			
 			</cfif>
 			
@@ -781,13 +749,10 @@
 			<cfset melhoria.PC_AVAL_NUMERACAO = rsMelhorias.pc_aval_numeracao>
 			<cfset melhoria.PC_AVAL_MELHORIA_ID = rsMelhorias.pc_aval_melhoria_id>
 			
-			<cfif #rsMelhorias.pc_orgHerancaMcuPara# neq '' and  DateFormat(Now(),"dd/mm/yyyy ") gte DateFormat(rsMelhorias.pc_orgHerancaDataInicio,"dd/mm/yyyy")>
-				<cfset melhoria.PC_ORG_SIGLA = rsMelhorias.siglaOrgRespHerdeiro>
-				<cfset melhoria.PC_ORG_SE_SIGLA = rsMelhorias.seOrgRespHerdeiro>
-			<cfelse>
-				<cfset melhoria.PC_ORG_SIGLA = rsMelhorias.pc_org_sigla>
-				<cfset melhoria.PC_ORG_SE_SIGLA = rsMelhorias.pc_org_se_sigla>
-			</cfif>
+			
+			<cfset melhoria.PC_ORG_SIGLA = rsMelhorias.pc_org_sigla>
+		    <cfset melhoria.PC_ORG_SE_SIGLA = rsMelhorias.pc_org_se_sigla>
+		
 
 			<cfif #rsMelhorias.pc_modalidade# eq 'A' or #rsMelhorias.pc_modalidade# eq 'E'>	
 				<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
