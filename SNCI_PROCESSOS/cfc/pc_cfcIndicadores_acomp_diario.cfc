@@ -784,17 +784,17 @@
 									<!--- Cria um card com o resultado do indicador --->
 									<cfset 	infoRodape = '<span style="font-size:14px">DGCI = #percentualDGCIformatado#% (PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>
 											        	<span style="font-size:14px">Meta = #metaDGCIformatado#%  (Meta PRCI * #rsPRCIpeso.pc_indPeso_peso#) + (Meta SLNC * #rsSLNCpeso.pc_indPeso_peso#)</span><br>'>			
-									<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-									<cfset var criarCardIndicadorDGCI = objetoCFC.criarCardIndicador(
-										tipoDeCard = 'bg-info',
-										siglaIndicador ='DGCI',
-										percentualIndicadorFormatado = percentualDGCIformatado,
-										resultadoEmRelacaoMeta = DGCIresultadoMeta,
-										resultadoEmRelacaoMetaFormatado = DGCIresultadoMetaFormatado,
-										infoRodape = infoRodape,
-										icone = 'fa fa-chart-line',
-										descricaoIndicador = 'Desempenho Geral do Controle Interno'
-									)>
+									<cfinvoke component="pc_cfcIndicadores_modeloCard" method="criarCardIndicador" returnvariable="criarCardIndicadorDGCI">
+										<cfinvokeargument name="tipoDeCard" value="bg-info">
+										<cfinvokeargument name="siglaIndicador" value="DGCI">
+										<cfinvokeargument name="percentualIndicadorFormatado" value="#percentualDGCIformatado#">
+										<cfinvokeargument name="resultadoEmRelacaoMeta" value="#DGCIresultadoMeta#">
+										<cfinvokeargument name="resultadoEmRelacaoMetaFormatado" value="#DGCIresultadoMetaFormatado#">
+										<cfinvokeargument name="infoRodape" value="#infoRodape#">
+										<cfinvokeargument name="icone" value="fa fa-chart-line">
+										<cfinvokeargument name="descricaoIndicador" value="Desempenho Geral do Controle Interno">
+									</cfinvoke>
+
 									<cfoutput>#criarCardIndicadorDGCI#</cfoutput>
 									<!--- Fim do card --->								
 								</div>	
