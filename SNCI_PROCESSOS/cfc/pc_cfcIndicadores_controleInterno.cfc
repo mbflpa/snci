@@ -1442,16 +1442,22 @@
 												<cfquery name="mediaMetaDGCImes" dbtype="query"  timeout="120">
 													SELECT AVG(metaDGCI) AS mediaDGCI FROM resultado_Mes_a_Mes
 													WHERE mes = <cfqueryparam value="#resultadoECTmes.mes#" cfsqltype="cf_sql_integer">
+													and metaDGCI IS NOT NULL
 												</cfquery>	
 
 												<tr style="font-size:12px;text-align: center;">
 													<td>#monthAsString(resultadoECTmes.mes)#</td>
 													
 													<td><strong>#Replace(NumberFormat(ROUND(media_resultadoMes*10)/10,0.0),',','.')#</strong></td>
-										
-													<cfset metaDGCI = mediaMetaDGCImes.mediaDGCI>
+													<cfif mediaMetaDGCImes.recordcount neq 0>
+														<cfset metaDGCI = mediaMetaDGCImes.mediaDGCI>
+														<td>#NumberFormat(ROUND(metaDGCI*10)/10,0.0)#</td>
+													<cfelse>
+														<cfset metaDGCI = 0>
+														<td>SEM META</td>
+													</cfif>
 									
-													<td>#NumberFormat(ROUND(metaDGCI*10)/10,0.0)#</td>
+													
 
 													<cfif Replace(ROUND(media_resultadoMes*10)/10,',','.') gt  metaDGCI and  metaDGCI neq 0>
 														<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
@@ -1597,9 +1603,10 @@
 
 		<cfquery name="mediaMetaDGCImes" dbtype="query"  timeout="120">
 			SELECT	AVG(metaDGCI) AS mediaMetaDGCI FROM resultado_Mes
+			WHERE metaDGCI IS NOT NULL
 		</cfquery>
 
-		<cfif mediaMetaDGCImes.mediaMetaDGCI neq ''>
+		<cfif mediaMetaDGCImes.recordcount neq 0>
 			<cfset mediaMetaDGCI = NumberFormat(ROUND(mediaMetaDGCImes.mediaMetaDGCI*10)/10,0.0)>
 			<cfset mediaMetaDGCIformatado = REPLACE(NumberFormat(ROUND(mediaMetaDGCImes.mediaMetaDGCI*10)/10,0.0), '.', ',')>
 		<cfelse>
@@ -1656,29 +1663,44 @@
 	   <cfquery name="resultadoECTmes" dbtype="query"  timeout="120">
 			SELECT  mes
 					,AVG(DGCI) AS media_resultadoMes
+				FROM resultado_Mes_a_Mes
+			GROUP BY mes
+			ORDER BY mes
+		</cfquery>
+
+		<cfquery name="metaECTmes" dbtype="query"  timeout="120">
+			SELECT  mes
 					,AVG(metaDGCI) AS mediaMetaDGCI
 			FROM resultado_Mes_a_Mes
+			WHERE metaDGCI IS NOT NULL
 			GROUP BY mes
 			ORDER BY mes
 		</cfquery>
 
 		<cfquery name="resultado_DGCI_ECT_mes" dbtype="query"  timeout="120">
 			SELECT AVG(media_resultadoMes) AS mediaDGCIano
-					,AVG(mediaMetaDGCI) AS mediaMetaDGCIano
 			FROM resultadoECTmes
 		</cfquery>
 
+		<cfset mediaDGCIano = ROUND(resultado_DGCI_ECT_mes.mediaDGCIano*10)/10>
+        <cfset mediaDGCIanoformatado = REPLACE(NumberFormat(mediaDGCIano,0.0), '.', ',')>
 
-		<cfset mediaMetaDGCI = NumberFormat(ROUND(resultado_DGCI_ECT_mes.mediaMetaDGCIano*10)/10,0.0)>
-		<cfset mediaMetaDGCIFormatado = REPLACE(mediaMetaDGCI, '.', ',')>
+		<cfif metaECTmes.recordcount neq 0>
+			<cfquery name="mediaMeta_DGCI_ECT_mes" dbtype="query"  timeout="120">
+				SELECT AVG(mediaMetaDGCI) AS mediaMetaDGCIano
+				FROM metaECTmes
+			</cfquery>
+			<cfset mediaMetaDGCI = NumberFormat(ROUND(mediaMeta_DGCI_ECT_mes.mediaMetaDGCIano*10)/10,0.0)>
+			<cfset mediaMetaDGCIFormatado = REPLACE(mediaMetaDGCI, '.', ',')>
+			<cfset DGCIresultadoMeta = NumberFormat(ROUND((mediaDGCIano/mediaMetaDGCI)*100*10)/10,0.0)>
+			<cfset DGCIresultadoMetaFormatado = REPLACE(DGCIresultadoMeta, '.', ',')>
+		<cfelse>
+			<cfset mediaMetaDGCI = 'sem meta'>
+			<cfset mediaMetaDGCIFormatado = 'sem meta'>
+			<cfset DGCIresultadoMeta = 'sem meta'>
+			<cfset DGCIresultadoMetaFormatado = ''>
+		</cfif>
 
-		<cfset mediaDGCIano = NumberFormat(round(resultado_DGCI_ECT_mes.mediaDGCIano*10)/10,0.0)>
-		<cfset mediaDGCIanoformatado =REPLACE(mediaDGCIano, '.', ',')>
-
-		
-		<cfset DGCIresultadoMeta = NumberFormat(ROUND((mediaDGCIano/mediaMetaDGCI)*100*10)/10,0.0)>
-		<cfset DGCIresultadoMetaFormatado = REPLACE(DGCIresultadoMeta, '.', ',')>
-	
 
 		<cfset infoRodape = '<span style="font-size:14px">DGCI = #mediaDGCIanoformatado#% (média dos resultados mensais do DGCI)</span><br>
 					<span style="font-size:14px">Meta = #mediaMetaDGCIFormatado#% (média das metas mensais do DGCI)</span><br>'>
