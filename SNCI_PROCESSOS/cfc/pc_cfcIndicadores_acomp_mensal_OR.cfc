@@ -582,18 +582,17 @@
 						<span style="font-size:14px">Meta = sem meta</span><br>'>
 			</cfif>		
 			
-			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-			<cfset var cardPRCImensal = objetoCFC.criarCardIndicador(
-				tipoDeCard = 'bg-gradient-warning',
-				siglaIndicador ='PRCI',
-				descricaoIndicador = 'Atendimento ao Prazo de Resposta',
-				percentualIndicadorFormatado = totalPRCIformatado,
-				resultadoEmRelacaoMeta = PRCIresultadoMeta,
-				resultadoEmRelacaoMetaFormatado = PRCIresultadoMetaFormatado,
-				infoRodape = infoRodape,
-				icone = 'fa fa-shopping-basket'
+			<cfinvoke component="pc_cfcIndicadores_modeloCard" method="criarCardIndicador" returnvariable="cardPRCImensal">
+				<cfinvokeargument name="tipoDeCard" value="bg-gradient-warning">
+				<cfinvokeargument name="siglaIndicador" value="PRCI">
+				<cfinvokeargument name="descricaoIndicador" value="Atendimento ao Prazo de Resposta">
+				<cfinvokeargument name="percentualIndicadorFormatado" value="#totalPRCIformatado#">
+				<cfinvokeargument name="resultadoEmRelacaoMeta" value="#PRCIresultadoMeta#">
+				<cfinvokeargument name="resultadoEmRelacaoMetaFormatado" value="#PRCIresultadoMetaFormatado#">
+				<cfinvokeargument name="infoRodape" value="#infoRodape#">
+				<cfinvokeargument name="icone" value="fa fa-shopping-basket">
+			</cfinvoke>
 
-			)>
 
 			<cfoutput>#cardPRCImensal#</cfoutput>
 		<cfelse>
@@ -766,18 +765,17 @@
 						<span style="font-size:14px">Meta = sem meta</span><br>'>
 			</cfif>
 			
-			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-			<cfset var cardSLNCmensal = objetoCFC.criarCardIndicador(
-				tipoDeCard = 'bg-gradient-warning',
-				siglaIndicador ='SLNC',
-				descricaoIndicador = 'Solução de Não Conformidades',
-				percentualIndicadorFormatado = totalSLNCformatado,
-				resultadoEmRelacaoMeta = SLNCresultadoMeta,
-				resultadoEmRelacaoMetaFormatado = SLNCresultadoMetaFormatado,
-				infoRodape = infoRodape,
-				icone = 'fa fa-shopping-basket'
+			<cfinvoke component="pc_cfcIndicadores_modeloCard" method="criarCardIndicador" returnvariable="cardSLNCmensal">
+				<cfinvokeargument name="tipoDeCard" value="bg-gradient-warning">
+				<cfinvokeargument name="siglaIndicador" value="SLNC">
+				<cfinvokeargument name="descricaoIndicador" value="Solução de Não Conformidades">
+				<cfinvokeargument name="percentualIndicadorFormatado" value="#totalSLNCformatado#">
+				<cfinvokeargument name="resultadoEmRelacaoMeta" value="#SLNCresultadoMeta#">
+				<cfinvokeargument name="resultadoEmRelacaoMetaFormatado" value="#SLNCresultadoMetaFormatado#">
+				<cfinvokeargument name="infoRodape" value="#infoRodape#">
+				<cfinvokeargument name="icone" value="fa fa-shopping-basket">
+			</cfinvoke>
 
-			)>
 			<cfoutput>#cardSLNCmensal#</cfoutput>
 		<cfelse>
 			<cfoutput><h5 style="text-align:center">Sem dados para o indicador SLNC</cfoutput>
@@ -1027,18 +1025,17 @@
 
 
 
-			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-			<cfset var cardDGCImensal = objetoCFC.criarCardIndicador(
-				tipoDeCard = 'bg-gradient-info',
-				siglaIndicador ='DGCI',
-				descricaoIndicador = 'Desempenho Geral do Controle Interno',
-				percentualIndicadorFormatado = resultadoDGCIformatado,
-				resultadoEmRelacaoMeta = DGCIresultadoMeta,
-				resultadoEmRelacaoMetaFormatado = DGCIresultadoMetaFormatado,
-				infoRodape = infoRodape,
-				icone = 'fa fa-chart-line'
+			<cfinvoke component="pc_cfcIndicadores_modeloCard" method="criarCardIndicador" returnvariable="cardDGCImensal">
+				<cfinvokeargument name="tipoDeCard" value="bg-gradient-info">
+				<cfinvokeargument name="siglaIndicador" value="DGCI">
+				<cfinvokeargument name="descricaoIndicador" value="Desempenho Geral do Controle Interno">
+				<cfinvokeargument name="percentualIndicadorFormatado" value="#resultadoDGCIformatado#">
+				<cfinvokeargument name="resultadoEmRelacaoMeta" value="#DGCIresultadoMeta#">
+				<cfinvokeargument name="resultadoEmRelacaoMetaFormatado" value="#DGCIresultadoMetaFormatado#">
+				<cfinvokeargument name="infoRodape" value="#infoRodape#">
+				<cfinvokeargument name="icone" value="fa fa-chart-line">
+			</cfinvoke>
 
-			)>
 			<cfoutput>
 			
 				<div style="display: flex;justify-content: center;color:##0083ca;"><h5>#application.rsUsuarioParametros.pc_org_sigla# - #monthAsString(mes)#/#ano#</h5></div>

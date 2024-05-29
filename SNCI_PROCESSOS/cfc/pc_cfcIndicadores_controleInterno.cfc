@@ -1624,18 +1624,18 @@
 
 		<cfset infoRodape = '<span style="font-size:14px">DGCI = #mediaDGCIformatado#% (média dos DGCI dos órgãos subordinadores)</span><br>
 					<span style="font-size:14px">Meta = #mediaMetaDGCIformatado#% (média das metas do DGCI dos órgãos subordinadores)</span><br>'>
-		<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-		<cfset var cardDGCImensal = objetoCFC.criarCardIndicador(
-			tipoDeCard = 'bg-gradient-info',
-			siglaIndicador ='DGCI',
-			descricaoIndicador = 'Desempenho Geral do Controle Interno',
-			percentualIndicadorFormatado = mediaDGCIformatado,
-			resultadoEmRelacaoMeta = DGCIresultadoMeta,
-			resultadoEmRelacaoMetaFormatado = DGCIresultadoMetaFormatado,
-			infoRodape = infoRodape,
-			icone = 'fa fa-chart-line'
+		
+		<cfinvoke component="pc_cfcIndicadores_modeloCard" method="criarCardIndicador" returnvariable="cardDGCImensal">
+			<cfinvokeargument name="tipoDeCard" value="bg-gradient-info">
+			<cfinvokeargument name="siglaIndicador" value="DGCI">
+			<cfinvokeargument name="descricaoIndicador" value="Desempenho Geral do Controle Interno">
+			<cfinvokeargument name="percentualIndicadorFormatado" value="#mediaDGCIformatado#">
+			<cfinvokeargument name="resultadoEmRelacaoMeta" value="#DGCIresultadoMeta#">
+			<cfinvokeargument name="resultadoEmRelacaoMetaFormatado" value="#DGCIresultadoMetaFormatado#">
+			<cfinvokeargument name="infoRodape" value="#infoRodape#">
+			<cfinvokeargument name="icone" value="fa fa-chart-line">
+		</cfinvoke>
 
-		)>
 		<cfoutput>
 			<div class="card-body shadow col-md-8 col-sm-8 col-12 mx-auto" style="border: 2px solid ##34a2b7">
 				<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT - <span style="fontsize:12px">#monthAsString(arguments.mes)#/#arguments.ano#</span></h5></div>
@@ -1704,18 +1704,17 @@
 
 		<cfset infoRodape = '<span style="font-size:14px">DGCI = #mediaDGCIanoformatado#% (média dos resultados mensais do DGCI)</span><br>
 					<span style="font-size:14px">Meta = #mediaMetaDGCIFormatado#% (média das metas mensais do DGCI)</span><br>'>
-		<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-		<cfset var cardDGCImensal = objetoCFC.criarCardIndicador(
-			tipoDeCard = 'bg-gradient-info',
-			siglaIndicador ='DGCI',
-			descricaoIndicador = 'Desempenho Geral do Controle Interno',
-			percentualIndicadorFormatado = mediaDGCIanoformatado,
-			resultadoEmRelacaoMeta = DGCIresultadoMeta,
-			resultadoEmRelacaoMetaFormatado = DGCIresultadoMetaFormatado,
-			infoRodape = infoRodape,
-			icone = 'fa fa-chart-line'
-
-		)>
+		<!--- Chama o método criarCardIndicador do componente pc_cfcIndicadores_modeloCard --->
+		<cfinvoke component="pc_cfcIndicadores_modeloCard" method="criarCardIndicador" returnvariable="cardDGCImensal">
+			<cfinvokeargument name="tipoDeCard" value="bg-gradient-info">
+			<cfinvokeargument name="siglaIndicador" value="DGCI">
+			<cfinvokeargument name="descricaoIndicador" value="Desempenho Geral do Controle Interno">
+			<cfinvokeargument name="percentualIndicadorFormatado" value="#mediaDGCIanoformatado#">
+			<cfinvokeargument name="resultadoEmRelacaoMeta" value="#DGCIresultadoMeta#">
+			<cfinvokeargument name="resultadoEmRelacaoMetaFormatado" value="#DGCIresultadoMetaFormatado#">
+			<cfinvokeargument name="infoRodape" value="#infoRodape#">
+			<cfinvokeargument name="icone" value="fa fa-chart-line">
+		</cfinvoke>
 		<cfoutput>
 			<div class="card-body shadow col-md-8 col-sm-8 col-12 mx-auto" style="border: 2px solid ##34a2b7">
 				<div id="divDGCI_mes_ano"><h4 style="text-align: center; margin-bottom:20px">DGCI ECT <span style="fontsize:12px">#arguments.ano#</span></h5></div>

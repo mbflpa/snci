@@ -1811,18 +1811,18 @@
 						<span style="font-size:14px">Meta = sem meta</span><br>'>
 			</cfif>			
 			
-			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-			<cfset var cardPRCIdiario = objetoCFC.criarCardIndicador(
-				tipoDeCard = 'bg-gradient-warning',
-				siglaIndicador ='PRCI',
-				descricaoIndicador = 'Atendimento ao Prazo de Resposta',
-				percentualIndicadorFormatado = totalPRCIformatado,
-				resultadoEmRelacaoMeta = PRCIresultadoMeta,
-				resultadoEmRelacaoMetaFormatado = PRCIresultadoMetaFormatado,
-				infoRodape = infoRodape,
-				icone = 'fa fa-shopping-basket'
+			<!--- Chama o método criarCardIndicador do componente pc_cfcIndicadores_modeloCard --->
+			<cfinvoke component="pc_cfcIndicadores_modeloCard" method="criarCardIndicador" returnvariable="cardPRCIdiario">
+				<cfinvokeargument name="tipoDeCard" value="bg-gradient-warning">
+				<cfinvokeargument name="siglaIndicador" value="PRCI">
+				<cfinvokeargument name="descricaoIndicador" value="Atendimento ao Prazo de Resposta">
+				<cfinvokeargument name="percentualIndicadorFormatado" value="#totalPRCIformatado#">
+				<cfinvokeargument name="resultadoEmRelacaoMeta" value="#PRCIresultadoMeta#">
+				<cfinvokeargument name="resultadoEmRelacaoMetaFormatado" value="#PRCIresultadoMetaFormatado#">
+				<cfinvokeargument name="infoRodape" value="#infoRodape#">
+				<cfinvokeargument name="icone" value="fa fa-shopping-basket">
+			</cfinvoke>
 
-			)>
 
 			<cfoutput>#cardPRCIdiario#</cfoutput>
 		<cfelse>
@@ -1901,18 +1901,18 @@
 						<span style="font-size:14px">Meta = sem meta</span><br>'>
 			</cfif>
 			
-            <cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-			<cfset var cardSLNCdiario = objetoCFC.criarCardIndicador(
-				tipoDeCard = 'bg-gradient-warning',
-				siglaIndicador ='SLNC',
-				descricaoIndicador = 'Solução de Não Conformidades',
-				percentualIndicadorFormatado = totalSLNCformatado,
-				resultadoEmRelacaoMeta = SLNCresultadoMeta,
-				resultadoEmRelacaoMetaFormatado = SLNCresultadoMetaFormatado,
-				infoRodape = infoRodape,
-				icone = 'fa fa-shopping-basket'
+            <!--- Chama o método criarCardIndicador do componente pc_cfcIndicadores_modeloCard --->
+			<cfinvoke component="pc_cfcIndicadores_modeloCard" method="criarCardIndicador" returnvariable="cardSLNCdiario">
+				<cfinvokeargument name="tipoDeCard" value="bg-gradient-warning">
+				<cfinvokeargument name="siglaIndicador" value="SLNC">
+				<cfinvokeargument name="descricaoIndicador" value="Solução de Não Conformidades">
+				<cfinvokeargument name="percentualIndicadorFormatado" value="#totalSLNCformatado#">
+				<cfinvokeargument name="resultadoEmRelacaoMeta" value="#SLNCresultadoMeta#">
+				<cfinvokeargument name="resultadoEmRelacaoMetaFormatado" value="#SLNCresultadoMetaFormatado#">
+				<cfinvokeargument name="infoRodape" value="#infoRodape#">
+				<cfinvokeargument name="icone" value="fa fa-shopping-basket">
+			</cfinvoke>
 
-			)>
 
 			<cfoutput>#cardSLNCdiario#</cfoutput>
 		<cfelse>
@@ -2137,17 +2137,17 @@
 						<span style="font-size:14px">Meta = sem meta</span><br>'>
 			</cfif>
 
-			<cfset objetoCFC = createObject("component", "pc_cfcIndicadores_modeloCard")>
-			<cfset var cardDGCI = objetoCFC.criarCardIndicador(
-				tipoDeCard = 'bg-gradient-info',
-				siglaIndicador ='DGCI',
-				descricaoIndicador = 'Desempenho Geral do Controle Interno',
-				percentualIndicadorFormatado = percentualDGCIformatado,
-				resultadoEmRelacaoMeta =  DGCIresultadoMeta,
-				resultadoEmRelacaoMetaFormatado = DGCIresultadoMetaFormatado,
-				infoRodape = infoRodape
+			<!--- Chama o método criarCardIndicador do componente pc_cfcIndicadores_modeloCard --->
+			<cfinvoke component="pc_cfcIndicadores_modeloCard" method="criarCardIndicador" returnvariable="cardDGCI">
+				<cfinvokeargument name="tipoDeCard" value="bg-gradient-info">
+				<cfinvokeargument name="siglaIndicador" value="DGCI">
+				<cfinvokeargument name="descricaoIndicador" value="Desempenho Geral do Controle Interno">
+				<cfinvokeargument name="percentualIndicadorFormatado" value="#percentualDGCIformatado#">
+				<cfinvokeargument name="resultadoEmRelacaoMeta" value="#DGCIresultadoMeta#">
+				<cfinvokeargument name="resultadoEmRelacaoMetaFormatado" value="#DGCIresultadoMetaFormatado#">
+				<cfinvokeargument name="infoRodape" value="#infoRodape#">
+			</cfinvoke>
 
-			)>
 			<cfoutput>#cardDGCI#</cfoutput>
 
 			
