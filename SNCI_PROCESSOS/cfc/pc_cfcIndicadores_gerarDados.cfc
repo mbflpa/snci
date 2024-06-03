@@ -500,6 +500,15 @@
 			<cfelse>
 				<cfset ehControleInteno = 1>
 			</cfif>
+
+			<cfif arguments.tipoRotina eq "A">
+				<cfset matricula =''>
+				<cfset rotinaManual = 1>
+			<cfelse>
+				<cfset matricula = application.rsUsuarioParametros.pc_usu_matricula>
+				<cfset rotinaManual = 0>
+			</cfif>
+
 			<cfif mcuOrgaoSubordinador.pc_org_mcu  neq "">
 				<cfquery datasource="#application.dsn_processos#">
 					INSERT INTO pc_indicadores_dados(pc_indDados_dataRef
@@ -518,7 +527,8 @@
 													,pc_indDados_orientacaoDistribuida
 													,pc_indDados_descricaoStatus
 													,pc_indDados_prazo
-													,pc_indDados_mcuOrgaoPosicEcontInterno)
+													,pc_indDados_mcuOrgaoPosicEcontInterno
+													,pc_indDados_rotinaManual)
 					VALUES (<cfqueryparam value="#dataFinal#" cfsqltype="cf_sql_date">
 						,2
 						,<cfqueryparam value="#matricula#" cfsqltype="cf_sql_varchar">
@@ -536,6 +546,7 @@
 						,<cfqueryparam value="#rs_dados_slnc.OrientacaoStatus#" cfsqltype="cf_sql_varchar">
 						,null
 						,<cfqueryparam value="#ehControleInteno#" cfsqltype="cf_sql_bit">
+						,<cfqueryparam value="#rotinaManual#" cfsqltype="cf_sql_bit">
 					)
 				</cfquery>
 			</cfif>
