@@ -422,7 +422,7 @@
 				<cfset ehControleInteno = 1>
 			</cfif>
 			<cfif arguments.tipoRotina eq "A">
-				<cfset matricula = NULL>
+				<cfset matricula =''>
 				<cfset rotinaManual = 1>
 			<cfelse>
 				<cfset matricula = application.rsUsuarioParametros.pc_usu_matricula>
