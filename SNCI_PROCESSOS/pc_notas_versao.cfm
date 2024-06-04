@@ -42,10 +42,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="card card-primary card-outline">
+                <div class="card card-secondary card-outline">
                     <a class="d-block w-100" data-toggle="collapse" href="#collapse3">
                         <div class="card-header">
-                            <h4 class="card-title w-100">
+                            <h4 class="card-title w-100" style="color:gray">
                                 Versão 1.2.0 - 23/05/2024
                             </h4>
                         </div>
@@ -72,10 +72,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="card card-primary card-outline">
+                <div class="card card-secondary card-outline">
                     <a class="d-block w-100" data-toggle="collapse" href="#collapse2">
                         <div class="card-header">
-                            <h4 class="card-title w-100">
+                            <h4 class="card-title w-100" style="color:gray">
                                 Versão 1.1.1 - 02/01/2024
                             </h4>
                         </div>
@@ -97,10 +97,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="card card-primary card-outline">
+                <div class="card card-secondary card-outline">
                     <a class="d-block w-100" data-toggle="collapse" href="#collapse1">
                         <div class="card-header">
-                            <h4 class="card-title w-100">
+                            <h4 class="card-title w-100" style="color:gray">
                                 Versão 1.1.0 - 02/11/2023
                             </h4>
                         </div>
