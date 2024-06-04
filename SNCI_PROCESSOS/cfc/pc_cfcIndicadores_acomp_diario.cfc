@@ -1636,13 +1636,13 @@
 												<cfset percentualPRCI = "sem dados">
 												<cfif rsResultadoPRCI.recordcount neq 0>
 													<cfset percentualPRCI = NumberFormat(Round((rsResultadoPRCI.totalDP / (rsResultadoPRCI.totalDP + rsResultadoPRCI.totalFP)) * 100*10)/10,0.0)>
-													<td><strong>#percentualPRCI#%</strong></td>
+													<td>#percentualPRCI#%</td>
 												<cfelse>
 													<td>sem dados</td>
 												</cfif>
 												<cfif rsResultadoSLNC.recordcount neq 0>
 													<cfset percentualSLNC = NumberFormat(Round((rsResultadoSLNC.totalSolucionados / (rsResultadoSLNC.totalSolucionados + rsResultadoSLNC.totalTratamento)) * 100*10)/10,0.0)>
-													<td><strong>#percentualSLNC#%</strong></td>
+													<td>#percentualSLNC#%</td>
 												<cfelse>
 													<td>sem dados</td>
 												</cfif>
@@ -1676,20 +1676,21 @@
 												<cfif rsMetaSLNC.pc_indMeta_meta neq ''>
 													<cfset metaSLNCorgao = NumberFormat(ROUND(rsMetaSLNC.pc_indMeta_meta*10)/10,0.0)>	
 												</cfif>
-												<cfif rsResultadoPRCI.recordcount neq 0 and rsResultadoSLNC.recordcount neq 0> 
+												
+												<cfif metaPRCIorgao neq 0 and metaSLNCorgao neq 0> 
 													<cfset metaDGCIorgao = NumberFormat(ROUND(((metaPRCIorgao * pesoPRCI) + (metaSLNCorgao * pesoSLNC))*10)/10,0.0)>
-												<cfelseif rsResultadoPRCI.recordcount neq 0 and rsResultadoSLNC.recordcount eq 0>
+													<td >#metaDGCIorgao#%</td>
+												<cfelseif  metaPRCIorgao neq 0 and metaSLNCorgao eq 0>
 													<cfset metaDGCIorgao = metaPRCIorgao >
-												<cfelseif rsResultadoPRCI.recordcount eq 0 and rsResultadoSLNC.recordcount neq 0>
+													<td >#metaDGCIorgao#%</td>
+												<cfelseif  metaPRCIorgao eq 0 and metaSLNCorgao neq 0>
 													<cfset metaDGCIorgao = metaSLNCorgao >
+													<td >#metaDGCIorgao#%</td>
 												<cfelse>
-													<cfset metaDGCIorgao = NumberFormat(0,0.0) >
+												    <cfset metaDGCIorgao = 0 >
+													<td >sem meta</td>
 												</cfif>
-												<td ><strong>#metaDGCIorgao#%</strong></td>
-												
-
-
-												
+																								
 												<cfif metaDGCIorgao eq 0>
 													<cfset resultMesEmRelacaoMeta = 0>
 													<td>sem meta</td>
@@ -1706,7 +1707,7 @@
 										<th colspan="6" style="font-weight: normal; font-size: smaller;">
 											<li>DGCI = Desempenho Geral do Controle Interno = (PRCI x peso do PRCI) + (SLNC x peso do SLNC) = (PRCI x #pesoPRCI#) + (SLNC x #pesoSLNC#)</li>
 										    <li>Meta = (Meta PRCI x peso do PRCI) + (Meta do SLNC x peso SLNC) = (Meta PRCI x #pesoPRCI#) + (Meta SLNC x #pesoSLNC#)</li>
-											Obs.: Caso não existam dados para o PRCI ou SLNC, os cálculos acima serão feitos apenas com os resultados e metas do indicador disponível, sem multiplicação pelo seu peso.
+											Obs.: Caso não existam dados para o PRCI ou SLNC, os cálculos acima serão feitos apenas com os resultados do indicador disponível, sem multiplicação pelo seu peso.
 										</th>
 										
 									</tr>
