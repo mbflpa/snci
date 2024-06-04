@@ -2814,8 +2814,8 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;<cfif ListFind('13,14,16', #pc_aval_posic_status#)>##fff<cfelse>color:##00416b</cfif>" data-card-widget="collapse">
 																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:<cfif ListFind('13,14,16', #pc_aval_posic_status#)>##fff<cfelse>gray</cfif>"></i>
 																		</button></i>
-																			<!-- O para: só será visualizado se a orientação não tiver órgão responsável não estiver bloqueada-->
-																			<cfif orgaoResp neq '' and pc_aval_posic_status neq 14>
+																			
+																			<cfif pc_aval_posic_status neq 13 and pc_aval_posic_status neq 14>
 																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#)  
 																			<cfelse>
 																				De: #pc_org_sigla# (#pc_usu_nome#) 
@@ -2903,9 +2903,9 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;" data-card-widget="collapse">
 																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
 																		</button></i>
-																		    <cfif orgaoResp eq ''>
+																		    <cfif pc_aval_posic_status eq 3 ><!--se for uma resposta-->
 																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
-																			<cfelse>
+																			<cfelse><!--se não for uma resposta é uma distribuição do órgão avaliado ao órgão subordinador-->
 																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
 																			</cfif>
 																		    
@@ -3986,7 +3986,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 														<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;" data-card-widget="collapse">
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" ></i>
 															</button></i>
-															<cfif #orgaoResp# neq ''>
+															<cfif pc_aval_posic_status neq 13 and pc_aval_posic_status neq 14>
 																De: Controle Interno -> Para: #orgaoResp# (#mcuOrgaoResp#)  
 															<cfelse>
 																De: Controle Interno
@@ -4066,11 +4066,18 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 													<span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 													<div class="card card-primary collapsed-card  posicOrgAvaliado" >
-														<div class="card-header" style="background-color: ##ececec;">
-														<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
+														<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0'>
+															<div class="card-header" style="background-color: ##ececec;">
+															<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
+														<cfelse>
+															<div class="card-header" style="background-color: ##28a745;">
+															<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##fff" data-card-widget="collapse">
+														</cfif>
+
+														
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
 															</button></i>
-																<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0' or orgaoResp eq ''>
+																<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0'>
 															   		De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
 																<cfelse>
 																	De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
