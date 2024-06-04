@@ -14,6 +14,34 @@
     <section class="content" style="margin-bottom:50px;position:relative; top:-20px">
         <div class="row" >
             <div class="col-12" id="accordion">
+                 <div class="card card-primary card-outline">
+                    <a class="d-block w-100" data-toggle="collapse" href="#collapse4">
+                        <div class="card-header">
+                            <h4 class="card-title w-100">
+                                Versão 2.0.0 - 01/07/2024
+                            </h4>
+                        </div>
+                    </a>
+                    <div id="collapse4" class="collapse show" data-parent="#accordion">
+                        <div class="card-body">
+                            <h5>Novidades:</h5>
+                            <ul>
+                                <li></li>
+                            </ul>
+
+                            <h5>Melhorias:</h5>
+                            <ul>
+                                <li></li> 
+
+                            </ul>
+                            <h5>Correções:</h5>
+                            <ul>
+                                <li></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <div class="card card-primary card-outline">
                     <a class="d-block w-100" data-toggle="collapse" href="#collapse3">
                         <div class="card-header">
@@ -22,7 +50,7 @@
                             </h4>
                         </div>
                     </a>
-                    <div id="collapse3" class="collapse show" data-parent="#accordion">
+                    <div id="collapse3" class="collapse" data-parent="#accordion">
                         <div class="card-body">
                             <h5>Novidades:</h5>
                             <ul>
