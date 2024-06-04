@@ -138,12 +138,12 @@
 
                     <cfset quantPendentes = 0>
                     <cfif rsOrgaosComOrientacoesPendentesParaTeste.recordcount gt 0>
-                        <cfif application.auxsite neq 'intranetsistemaspe'>
+                        <cfif FindNoCase("intranetsistemaspe", application.auxsite)>
+                            <cfset myQuery = "rsOrgaosComOrientacoesPendentes">
+                        <cfelse>
                             <cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
                             <h6>Quant. Órgãos com Orientações pendentes para teste de envio de e-mail: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
 
-                        <cfelse>
-                            <cfset myQuery = "rsOrgaosComOrientacoesPendentes">
                         </cfif>
                         <div style="margin-bottom:30px;justify-content:center; display: flex; width: 100%;margin-top:20px">
                             <div>
@@ -245,10 +245,7 @@
                             <cfset quantPendentes = quantPendentes + rsOrientacoesPendentes.recordcount>
                         </cfloop>
                     </cfif>
-                    <cfif application.auxsite neq 'intranetsistemaspe'>
-                         <hr style="border-top: 3px solid black;">
-                        <h6 >Total de Orientações Pendentes para teste: <cfoutput>#NumberFormat(quantPendentes,"00")#</cfoutput></h6>
-                    </cfif>
+                   
                     
                 </div>
             </section>

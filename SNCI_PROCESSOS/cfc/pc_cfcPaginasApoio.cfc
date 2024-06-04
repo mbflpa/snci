@@ -727,7 +727,7 @@
 			<cfset cc = "#arguments.copiaPara#">
 		</cfif> 
 
-        <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+        <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 			<cfif #cc# neq "" >
 				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
 			<cfelse>
@@ -739,11 +739,11 @@
 
 		<cftry> 
 			<cfset de="SNCI@correios.com.br">
-		    <cfif application.auxsite eq "localhost">
+		    <cfif FindNoCase("localhost", application.auxsite)>
 				<cfset de="mbflpa@yahoo.com.br">
 			</cfif>
 			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-			    <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+			    <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 				</cfif>
 				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
@@ -787,7 +787,7 @@
 			<cfset cc = "#arguments.copiaPara#">
 		</cfif> 
 
-        <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+        <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 			<cfif #cc# neq "" >
 				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
 			<cfelse>
@@ -799,11 +799,11 @@
 
 		<cftry> 
 			<cfset de="SNCI@correios.com.br">
-		    <cfif application.auxsite eq "localhost">
+		    <cfif FindNoCase("localhost", application.auxsite)>
 				<cfset de="mbflpa@yahoo.com.br">
 			</cfif>
 			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-			    <cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+			    <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 				</cfif>
 				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
@@ -901,7 +901,7 @@
 					/>
 					<cfcatch type="any">
 					<cfset de="SNCI@correios.com.br">
-					<cfif application.auxsite eq "localhost">
+					<cfif FindNoCase("localhost", application.auxsite)>
 						<cfset de="mbflpa@yahoo.com.br">
 					</cfif>
 						<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
@@ -965,18 +965,18 @@
 					WHERE pc_org_mcu = <cfqueryparam value="#pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">
 				</cfquery>
 				
-				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+				<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 					<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 					
 				</cfif>
 					
 				<cfset de="SNCI@correios.com.br">
-				<cfif application.auxsite eq "localhost">
+				<cfif FindNoCase("localhost", application.auxsite)>
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 
 				<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
-				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+				<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 					<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 				</cfif>
 
@@ -1021,10 +1021,11 @@
 		</cfquery>
 
 
-		<cfif application.auxsite neq 'intranetsistemaspe'>
+		
+		<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
 			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
 		<cfelse>
-			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
+			<cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
 		</cfif>
 
 		<cfloop query="#myQuery#">
@@ -1076,14 +1077,14 @@
 							<cfset cc = "">
 						</cfif>
 
-						<cfif application.auxsite eq "desenvolvimentope"  or application.auxsite eq "homologacaope" or application.auxsite eq "localhost">
+						<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 							<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 							<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 							<cfset cc = "">
 						</cfif>
 							
 						<cfset de="SNCI@correios.com.br">
-						<cfif application.auxsite eq "localhost">
+						<cfif FindNoCase("localhost", application.auxsite)>
 							<cfset de="mbflpa@yahoo.com.br">
 						</cfif>
 					
@@ -1185,7 +1186,7 @@
 								</style>
 							</head>
 							<body>
-								<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+								 <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 									<pre class="pre-style">#mensagemParaTeste#</pre>
 								</cfif>
 								<div class="card" style="background-color: rgba(0, 65, 107, 1);color: rgba(255, 255, 255, 1);  border-radius: 15px; padding: 5px;">
@@ -1276,10 +1277,10 @@
 		</cfquery>
 
 
-		<cfif application.auxsite neq 'intranetsistemaspe'>
+		<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
 			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
 		<cfelse>
-			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
+			<cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
 		</cfif>
 
 		<cfloop query="#myQuery#">
@@ -1331,14 +1332,15 @@
 							<cfset cc = "">
 						</cfif>
 
-						<cfif application.auxsite eq "desenvolvimentope"  or application.auxsite eq "homologacaope" or application.auxsite eq "localhost">
+						<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
+
 							<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 							<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 							<cfset cc = "">
 						</cfif>
 							
 						<cfset de="SNCI@correios.com.br">
-						<cfif application.auxsite eq "localhost">
+						<cfif FindNoCase("localhost", application.auxsite)>
 							<cfset de="mbflpa@yahoo.com.br">
 						</cfif>
 					
@@ -1415,7 +1417,7 @@
 								</style>
 							</head>
 							<body>
-								<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+								<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 									<pre class="pre-style">#mensagemParaTeste#</pre>
 								</cfif>
 								<div class="card" style="background-color: rgba(0, 65, 107, 1);color: rgba(255, 255, 255, 1);  border-radius: 15px; padding: 5px;">
@@ -1477,10 +1479,12 @@
 		</cfquery>
 
 
-		<cfif application.auxsite neq 'intranetsistemaspe'>
-			<cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
-		<cfelse>
+		
+
+		<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
 			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
+		<cfelse>
+			<cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
 		</cfif>
 
 		<cfloop query="#myQuery#">
@@ -1527,14 +1531,14 @@
 				<cfset to = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoResp))#">
 				<cfset cc = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoAvaliado))#">
 
-				<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+				 <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 					<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 					<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
 					<cfset cc = "">
 				</cfif>
 					
 				<cfset de="SNCI@correios.com.br">
-				<cfif application.auxsite eq "localhost">
+				<cfif FindNoCase("localhost", application.auxsite)>
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 			
@@ -1638,7 +1642,7 @@
 					</head>
 					<body>
 
-						<cfif application.auxsite eq "homolocacaope" or application.auxsite eq "desenvolvimentope" or application.auxsite eq "localhost">
+						<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 							<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 						</cfif>
 						<div style="background-color: ##00416B; color:##fff; border-radius: 15px; padding: 5px; box-shadow: 0px 0px 10px ##888888; margin: 0 auto; float: left;">
@@ -1708,7 +1712,7 @@
 				</cfmail>            
 				<cfcatch type="any">
 				<cfset de="SNCI@correios.com.br">
-				<cfif application.auxsite eq "localhost">
+				<cfif FindNoCase("localhost", application.auxsite)>
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
@@ -1739,10 +1743,11 @@
 			WHERE pc_aval_melhoria_status = 'P'	
 		</cfquery>
 
-		<cfif application.auxsite neq 'intranetsistemaspe'>
-			<cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
-		<cfelse>
+		
+		<cfif FindNoCase('intranetsistemaspe', application.auxsite)>
 			<cfset myQuery = "rsOrgaosComMelhoriasPendentes">
+		<cfelse>
+			<cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
 		</cfif>
 
 		<cfloop query="#myQuery#">
@@ -1785,7 +1790,7 @@
 				/>
 				<cfcatch type="any">
 				<cfset de="SNCI@correios.com.br">
-				<cfif application.auxsite eq "localhost">
+				<cfif FindNoCase("localhost", application.auxsite)>
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
@@ -1812,10 +1817,10 @@
 			WHERE pc_aval_melhoria_status = 'P'	
 		</cfquery>
 
-		<cfif application.auxsite neq 'intranetsistemaspe'>
-			<cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
-		<cfelse>
+		<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
 			<cfset myQuery = "rsOrgaosComMelhoriasPendentes">
+		<cfelse>
+			<cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
 		</cfif>
 
 		<cfloop query="#myQuery#">
@@ -1857,7 +1862,7 @@
 				/>
 				<cfcatch type="any">
 				<cfset de="SNCI@correios.com.br">
-				<cfif application.auxsite eq "localhost">
+				<cfif FindNoCase("localhost", application.auxsite)>
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">

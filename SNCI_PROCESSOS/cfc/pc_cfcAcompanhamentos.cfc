@@ -1457,7 +1457,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Mel
 				/>
 				<cfcatch type="any">
 				<cfset de="SNCI@correios.com.br">
-				<cfif application.auxsite eq "localhost">
+				<cfif FindNoCase("localhost", application.auxsite)>
 					<cfset de="mbflpa@yahoo.com.br">
 				</cfif>
 					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">

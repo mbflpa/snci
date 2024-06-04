@@ -62,12 +62,11 @@
 
                     <cfset quantPendentes = 0>
                     <cfif rsOrgaosComMelhoriasPendentesParaTeste.recordcount gt 0>
-                        <cfif application.auxsite neq 'intranetsistemaspe'>
-                            <cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
-                            <h6>Quant. Órgãos com Propostas de Melhoria pendentes para teste de envio de e-mail: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComMelhoriasPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
-
-                        <cfelse>
+                         <cfif FindNoCase("intranetsistemaspe", application.auxsite)>
                             <cfset myQuery = "rsOrgaosComMelhoriasPendentes">
+                        <cfelse>
+                           <cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
+                            <h6>Quant. Órgãos com Propostas de Melhoria pendentes para teste de envio de e-mail: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComMelhoriasPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
                         </cfif>
                         <div style="margin-bottom:30px;justify-content:center; display: flex; width: 100%;margin-top:20px">
                             <div>

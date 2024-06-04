@@ -39,10 +39,10 @@ applicationtimeout="#createtimespan(0,6,0,0)#">
 	SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
 	INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
 	INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-	<cfif application.auxsite neq "localhost">
-		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
-	<cfelse>
+	<cfif FindNoCase("localhost", application.auxsite)>
 		WHERE pc_usu_login = 'CORREIOSNET\80859992'
+	<cfelse>
+		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
 	</cfif>
 </cfquery>
 
