@@ -2815,10 +2815,10 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:<cfif ListFind('13,14,16', #pc_aval_posic_status#)>##fff<cfelse>gray</cfif>"></i>
 																		</button></i>
 																			
-																			<cfif pc_aval_posic_status neq 13 and pc_aval_posic_status neq 14>
-																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#)  
-																			<cfelse>
+																			<cfif pc_aval_posic_status eq 13 or pc_aval_posic_status eq 14>
 																				De: #pc_org_sigla# (#pc_usu_nome#) 
+																			<cfelse>
+																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#)
 																			</cfif>
 																			
 																	</a>
@@ -2890,7 +2890,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 												<cfelse>
 													<!-- timeline item -->
 													<div>
-														<i class="fas fa-user bg-green"  style="margin-top:6px;"></i>
+														<cfif pc_aval_posic_status eq 3 ><!--se for uma resposta-->
+															<i class="fas fa-user bg-green"  style="margin-top:6px;"></i>
+														<cfelse><!--se não for uma resposta é uma distribuição do órgão avaliado ao órgão subordinador-->
+															<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+														</cfif>
 														<div class="timeline-item">
 															<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
 															
@@ -2898,10 +2902,13 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 														    <span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 															<div class="card card-primary collapsed-card posicOrgAvaliado" >
-															
-																<div class="card-header" style="background-color:##28a745;">
+																<cfif pc_aval_posic_status eq 3 ><!--se for uma resposta-->
+																	<div class="card-header" style="background-color:##28a745;">
+																<cfelse><!--se não for uma resposta é uma distribuição do órgão avaliado ao órgão subordinador-->
+																	<div class="card-header" style="background-color:##ececec;">
+																</cfif>
 																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;" data-card-widget="collapse">
-																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="<cfif pc_aval_posic_status neq 3 >color:gray</cfif>"></i>
 																		</button></i>
 																		    <cfif pc_aval_posic_status eq 3 ><!--se for uma resposta-->
 																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
@@ -4060,29 +4067,44 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 										<cfelse>
 											<!-- timeline item -->
 											<div>
-												<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+												<cfif pc_aval_posic_status eq 3 >
+													<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+												<cfelseif mcuOrgaoResp eq '#application.rsUsuarioParametros.pc_usu_lotacao#'>
+													<i class="fas fa-user bg-green"  style="margin-top:6px;"></i>
+												<cfelse>
+													<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+												</cfif>
+
 												<div class="timeline-item" >
 													<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
 													<span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 													<div class="card card-primary collapsed-card  posicOrgAvaliado" >
-														<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0'>
+														<cfif pc_aval_posic_status eq 3 >
 															<div class="card-header" style="background-color: ##ececec;">
 															<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
-														<cfelse>
-															<div class="card-header" style="background-color: ##28a745;">
-															<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##fff" data-card-widget="collapse">
-														</cfif>
-
-														
+															
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
 															</button></i>
-																<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0'>
-															   		De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
-																<cfelse>
-																	De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
-																</cfif>
-														</a>
+														<cfelseif mcuOrgaoResp eq '#application.rsUsuarioParametros.pc_usu_lotacao#'>
+															<div class="card-header" style="background-color: ##28a745;"> 
+															<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##fff" data-card-widget="collapse">
+															
+															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:##ececec;"></i>
+															</button></i>
+														<cfelse>
+															<div class="card-header" style="background-color: ##ececec;">
+															<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
+															
+															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
+															</button></i>
+														</cfif>
+																	<cfif pc_aval_posic_status eq 3 ><!--se for uma resposta-->
+																		De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+																	<cfelse>
+																		De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
+																	</cfif>
+															</a>
 														
 														</div>
 														<div class="card-body" >
