@@ -4777,7 +4777,7 @@
 
 		<cfloop query="rsPc_anexos" >
 		    <cfif FileExists(pc_anexo_caminho)>
-				<cfset caminho = ListLast(pc_anexo_caminho,'\')>
+				<cfset caminho = "#pc_anexo_caminho#">
 			<cfelse>
 				<cfset caminho = "Caminho  não encontrado">
 			</cfif>
