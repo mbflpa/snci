@@ -2407,11 +2407,14 @@
 
 
 		<cfquery name="rsPosicionamentos" datasource="#application.dsn_processos#">
-			SELECT pc_avaliacao_posicionamentos.*, pc_orgaos.* , pc_usuarios.*,  pc_orgaos2.pc_org_sigla as orgaoResp, pc_orgaos2.pc_org_mcu as mcuOrgaoResp, CONVERT(char, pc_aval_posic_datahora, 103) as dataPosic
+			SELECT pc_avaliacao_posicionamentos.*, pc_orgaos.* , pc_usuarios.*,  pc_orgaos2.pc_org_sigla as orgaoResp, pc_orgaos2.pc_org_mcu as mcuOrgaoResp
+			, CONVERT(char, pc_aval_posic_datahora, 103) as dataPosic
+			, pc_orientacao_status.pc_orientacao_status_finalizador as eHstatusFinalizador
 			FROM pc_avaliacao_posicionamentos
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_aval_posic_num_orgaoResp
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
+			INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_posic_status
 			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 1
 			ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc	
 		</cfquery>
@@ -2511,11 +2514,10 @@
 																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;<cfif ListFind('13,14,16', #pc_aval_posic_status#)> ##fff <cfelse> color:##00416b </cfif>" data-card-widget="collapse">
 																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:<cfif ListFind('13,14,16', #pc_aval_posic_status#)>##fff<cfelse>gray</cfif>"></i>
 																		</button></i>
-																			<!-- O para: só será visualizado se a orientação não tiver órgão responsável e não estiver em análise e não estiver bloqueada-->
-																			<cfif orgaoResp neq '' and pc_aval_posic_status neq 13 and pc_aval_posic_status neq 14>
-																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#)  
-																			<cfelse>
+																			<cfif pc_aval_posic_status eq 13 or pc_aval_posic_status eq 14  or eHstatusFinalizador eq 'S'>
 																				De: #pc_org_sigla# (#pc_usu_nome#) 
+																			<cfelse>
+																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#)
 																			</cfif>
 																		    
 																	</a>
@@ -2586,7 +2588,11 @@
 												<cfelse>
 													<!-- timeline item -->
 													<div>
-														<i class="fas fa-user bg-green"  style="margin-top:6px;"></i>
+														<cfif pc_aval_posic_status eq 3 ><!--se for uma resposta-->
+															<i class="fas fa-user bg-green"  style="margin-top:6px;"></i>
+														<cfelse><!--se não for uma resposta é uma distribuição do órgão avaliado ao órgão subordinador-->
+															<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+														</cfif>
 														<div class="timeline-item">
 															<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
 															
@@ -2595,14 +2601,19 @@
 															
 															<div class="card card-primary collapsed-card posicOrgAvaliado" >
 															
-																<div class="card-header" style="background-color:##28a745;">
+																<cfif pc_aval_posic_status eq 3 ><!--se for uma resposta-->
+																	<div class="card-header" style="background-color:##28a745;">
+																<cfelse><!--se não for uma resposta é uma distribuição do órgão avaliado ao órgão subordinador-->
+																	<div class="card-header" style="background-color:##ececec;">
+																</cfif>
+																	
 																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;" data-card-widget="collapse">
-																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i>
+																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="<cfif pc_aval_posic_status neq 3 >color:gray</cfif>"></i>
 																		</button></i>
 																		
-																			<cfif orgaoResp eq ''>
+																			<cfif pc_aval_posic_status eq 3 ><!--se for uma resposta-->
 																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
-																			<cfelse>
+																			<cfelse><!--se não for uma resposta é uma distribuição do órgão avaliado ao órgão subordinador-->
 																				De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
 																			</cfif>
 																		    
@@ -2784,11 +2795,16 @@
 		
 
 		<cfquery name="rsPosicionamentos" datasource="#application.dsn_processos#">
-			SELECT pc_avaliacao_posicionamentos.*, pc_orgaos.* , pc_usuarios.*,  pc_orgaos2.pc_org_sigla as orgaoResp, pc_orgaos2.pc_org_mcu as mcuOrgaoResp, CONVERT(char, pc_aval_posic_datahora, 103) as dataPosic
+			SELECT pc_avaliacao_posicionamentos.*, pc_orgaos.* , pc_usuarios.*
+			,  pc_orgaos2.pc_org_sigla as orgaoResp
+			, pc_orgaos2.pc_org_mcu as mcuOrgaoResp
+			, CONVERT(char, pc_aval_posic_datahora, 103) as dataPosic
+			, pc_orientacao_status.pc_orientacao_status_finalizador as eHstatusFinalizador
 			FROM pc_avaliacao_posicionamentos
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_aval_posic_num_orgaoResp
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
+			INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_posic_status
 			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#" > and not pc_aval_posic_status IN(13,14) and pc_aval_posic_enviado = 1
 			ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc		
 		</cfquery>
@@ -2897,7 +2913,7 @@
 														<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;" data-card-widget="collapse">
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" ></i>
 															</button></i>
-															<cfif #orgaoResp# neq ''>
+															<cfif eHstatusFinalizador eq 'N'>
 																De: Controle Interno -> Para: #orgaoResp# (#mcuOrgaoResp#)  
 															<cfelse>
 																De: Controle Interno
@@ -2971,22 +2987,44 @@
 										<cfelse>
 											<!-- timeline item -->
 											<div>
-												<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+												<cfif pc_aval_posic_status eq 3 >
+													<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+												<cfelseif mcuOrgaoResp eq '#application.rsUsuarioParametros.pc_usu_lotacao#'>
+													<i class="fas fa-user bg-green"  style="margin-top:6px;"></i>
+												<cfelse>
+													<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+												</cfif>
 												<div class="timeline-item" >
 													<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
 													<span class="time" style="padding:4px;font-size:9px"><i class="fas fa-calendar"></i> #data#<br><i class="fas fa-clock"></i> #hora#<br><i class="fas fa-key"></i> #pc_aval_posic_id#</span>
 															
 													<div class="card card-primary collapsed-card  posicOrgAvaliado" >
-														<div class="card-header" style="background-color: ##ececec;">
-														<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
+														<cfif pc_aval_posic_status eq 3 >
+															<div class="card-header" style="background-color: ##ececec;">
+															<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
+															
 															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
 															</button></i>
-															<cfif '#rsProc.pc_aval_orientacao_distribuido#' eq '0' or orgaoResp eq ''>
-																De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
-															<cfelse>
-																De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
-															</cfif>
-														</a>
+														<cfelseif mcuOrgaoResp eq '#application.rsUsuarioParametros.pc_usu_lotacao#'>
+															<div class="card-header" style="background-color: ##28a745;"> 
+															<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##fff" data-card-widget="collapse">
+															
+															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:##ececec;"></i>
+															</button></i>
+														<cfelse>
+															<div class="card-header" style="background-color: ##ececec;">
+															<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;color:##00416b" data-card-widget="collapse">
+															
+															<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
+															</button></i>
+														</cfif>
+
+																<cfif pc_aval_posic_status eq 3>
+																	De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+																<cfelse>
+																	De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
+																</cfif>
+															</a>
 														
 														</div>
 														<div class="card-body" style="font-size:1em">
