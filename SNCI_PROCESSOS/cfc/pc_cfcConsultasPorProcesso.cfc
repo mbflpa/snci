@@ -2607,7 +2607,7 @@
 																	<div class="card-header" style="background-color:##ececec;">
 																</cfif>
 																	
-																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;" data-card-widget="collapse">
+																	<a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:16px;<cfif pc_aval_posic_status neq 3 >color:gray</cfif>" data-card-widget="collapse">
 																		<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="<cfif pc_aval_posic_status neq 3 >color:gray</cfif>"></i>
 																		</button></i>
 																		
