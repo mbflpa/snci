@@ -2795,12 +2795,12 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 														<cfif ListFind("13,14,16", #pc_aval_posic_status#)>
 															<cfset cor = "bg-red">
 														<cfelse>
-														 	<cfset cor = "bg-gray">
+														 	<cfset cor = "##fff">
 														</cfif>
 
 
 														<cfoutput>
-															<i class="fas #icone# #cor#"  style="margin-top:6px"></i>
+															<i class="fas #icone# #cor#"  style="margin-top:6px;color:##fff"></i>
 														</cfoutput>
 
 
@@ -2891,9 +2891,9 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 													<!-- timeline item -->
 													<div>
 														<cfif pc_aval_posic_status eq 3 ><!--se for uma resposta-->
-															<i class="fas fa-user bg-green"  style="margin-top:6px;"></i>
+															<i class="fas fa-user bg-green"  style="margin-top:6px;color:##fff"></i>
 														<cfelse><!--se não for uma resposta é uma distribuição do órgão avaliado ao órgão subordinador-->
-															<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+															<i class="fas fa-user ##ececec"  style="margin-top:6px;color:##fff"></i>
 														</cfif>
 														<div class="timeline-item">
 															<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
@@ -3977,12 +3977,12 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 												<cfif ListFind("13,14,16", #pc_aval_posic_status#)>
 													<cfset cor = "bg-red">
 												<cfelse>
-													<cfset cor = "bg-gray">
+													<cfset cor = "bg-green">
 												</cfif>
 
 
 												<cfoutput>
-													<i class="fas #icone# #cor#"  style="margin-top:6px"></i>
+													<i class="fas #icone# #cor#"  style="margin-top:6px;color:##fff"></i>
 												</cfoutput>
 												<div class="timeline-item" >
 													<cfset hora = TimeFormat(#pc_aval_posic_dataHora#,'HH:mm') >
@@ -4068,11 +4068,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 											<!-- timeline item -->
 											<div>
 												<cfif pc_aval_posic_status eq 3 >
-													<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+													<i class="fas fa-user ##ececec"  style="margin-top:6px;color:##fff"></i>
 												<cfelseif mcuOrgaoResp eq '#application.rsUsuarioParametros.pc_usu_lotacao#'>
-													<i class="fas fa-user bg-green"  style="margin-top:6px;"></i>
+													<i class="fas fa-user bg-green"  style="margin-top:6px;color:##fff"></i>
 												<cfelse>
-													<i class="fas fa-user bg-gray"  style="margin-top:6px;"></i>
+													<i class="fas fa-user ##ececec"  style="margin-top:6px;color:##fff"></i>
 												</cfif>
 
 												<div class="timeline-item" >
