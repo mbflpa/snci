@@ -252,13 +252,13 @@
                                                         <!--Inicio TabAnexosPosic-->
                                                         <div id="tabAnexosPosicDiv" style="margin-left: 0.75rem;">
                                                             <cfquery datasource="#application.dsn_processos#" name="rsAnexosPosic">
-                                                                Select pc_anexo_nome,pc_anexo_caminho  FROM pc_anexos 
+                                                                Select pc_anexo_nome,pc_anexo_caminho,pc_anexo_aval_posic  FROM pc_anexos 
                                                                 WHERE pc_anexo_aval_posic = #pc_aval_posic_id# 
                                                                 order By pc_anexo_id desc
                                                             </cfquery>
                                                             <cfif rsAnexosPosic.recordcount neq 0 >
                                                                
-                                                                <table id="tabAnexosPosic" class="table table-bordered table-striped table-hover text-nowrap">
+                                                                <table id="tabAnexosPosic_#rsAnexosPosic.pc_anexo_aval_posic#" class="table table-bordered table-striped table-hover text-nowrap">
 
                                                                     <thead>
                                                                         <tr>
@@ -322,24 +322,15 @@
         
         </div>
 
-        	<script language="JavaScript">
-			$(function () {
-					// Verifique se a tabela com o ID 'tabAnexosPosic' existe no DOM
-				 if ($('#tabAnexosPosic').length) {
-					$("#tabAnexosPosic").DataTable({
-						"destroy": true,
-						"stateSave": false,
-						"responsive": true, 
-						"lengthChange": false, 
-						"autoWidth": false,
-						"searching": false,
-                        "pageLength": 5
-					})
-				}
-                	
-			});
+        <script language="JavaScript">
+			
+          
+                
+           
+
 			
 			$(document).ready(function() {
+
 				$('.posicContInterno').CardWidget('expand')
 				$('.posicOrgAvaliado').CardWidget('expand')
 				$('#btRecolherPosic').removeClass('fa-eye')
@@ -347,6 +338,26 @@
 				$('#exportarTimelinePDF').on('click', function() {
 					exportarTimelineParaPDF()
 				});
+
+                // Seleciona todas as tabelas com o ID 'tabAnexosPosic'
+                // Seleciona todas as tabelas que contêm "tabAnexosPosic" no ID
+                 var tables = $("[id*='tabAnexosPosic']");
+
+                // Aplica a configuração DataTables a cada tabela
+                tables.each(function() {
+                    // Verifica se o elemento é realmente uma tabela
+                    if (this.tagName.toLowerCase() === 'table' && !$.fn.DataTable.isDataTable(this)) {
+                        $(this).DataTable({
+                            "destroy": true,
+                            "stateSave": false,
+                            "responsive": true,
+                            "lengthChange": false,
+                            "autoWidth": false,
+                            "searching": false,
+                            "pageLength": 5
+                        });
+                    }
+                });
 			});
 			
 		    $('#btRecolherPosic').on('click', function (event)  {
