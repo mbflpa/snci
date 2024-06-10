@@ -91,9 +91,9 @@
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->
 				<cfif '#arguments.processoEmAcompanhamento#' eq true >
-						AND pc_num_status in(4,6)
+					AND pc_num_status in(4,6)
 				<cfelse>
-						AND pc_num_status in(5)
+					AND pc_num_status in(5)
 				</cfif>	
 				<!---Se o perfil não for 3 - DESENVOLVEDOR ou 8 - GESTOR MASTER OU 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) oculta o status 13 - EM ANÁLISE--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 3 and #application.rsUsuarioParametros.pc_usu_perfil# neq 8 and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
