@@ -91,7 +91,7 @@
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->
 				<cfif '#arguments.processoEmAcompanhamento#' eq true >
-					AND not pc_num_status in(5,7)
+					AND pc_num_status in(4,6)
 				<cfelse>
 					AND pc_num_status in(5)
 				</cfif>	
