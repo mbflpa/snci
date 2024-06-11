@@ -132,7 +132,7 @@
                             <h4>Rotina de Verificação de Orientações Pendentes</h4>
                         </div>
                     </div>
-                  
+                    <h6 style="margin-top:30px">SERVIDOR: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#application.auxsite#</cfoutput></span></h6>
                     <h6 style="margin-top:30px">Quant. Órgãos com Orientações Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentes.recordcount,"00")#</cfoutput></span></h6>
                     <h6>Total de Orientações Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#rsOrientacoesPendentes.recordcount#</cfoutput></span></h6>
 

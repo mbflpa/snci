@@ -56,10 +56,9 @@
                             <h4>Rotina de Verificação de Propostas de Melhoria Pendentes</h4>
                         </div>
                     </div>
-                  
+                    <h6 style="margin-top:30px">SERVIDOR: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#application.auxsite#</cfoutput></span></h6>
                     <h6 style="margin-top:30px">Quant. Órgãos com Propostas de Melhoria Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComMelhoriasPendentes.recordcount,"00")#</cfoutput></span></h6>
                     <h6>Total de Propostas de Melhoria Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#rsMelhoriasPendentes.recordcount#</cfoutput></span></h6>
-
                     <cfset quantPendentes = 0>
                     <cfif rsOrgaosComMelhoriasPendentesParaTeste.recordcount gt 0>
                          <cfif FindNoCase("intranetsistemaspe", application.auxsite)>
