@@ -4989,7 +4989,7 @@
 		<cfquery datasource="#application.dsn_processos#" >
 			<cfif #arguments.pc_aval_orientacao_id# eq ''>
 				INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login)
-				VALUES (1, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
+				VALUES (0, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
 			<cfelse>
 				UPDATE pc_avaliacao_orientacoes
 				SET    pc_aval_orientacao_descricao = '#arguments.pc_aval_orientacao_descricao#',
