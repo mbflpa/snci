@@ -142,7 +142,7 @@
                             <cfset myQuery = "rsOrgaosComOrientacoesPendentes">
                         <cfelse>
                             <cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
-                            <h6>Quant. Órgãos com Orientações pendentes para teste de envio de e-mail: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
+                            <h6>Quant. Órgãos com Orientações pendentes para envio de e-mail: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
 
                         </cfif>
                         <div style="margin-bottom:30px;justify-content:center; display: flex; width: 100%;margin-top:20px">
@@ -150,100 +150,7 @@
                                 <button id="btnRotinaOrientacoesPendentes" class="btn btn-block btn-primary " >Executar Rotina</button>
                             </div>      
                         </div>
-                        <hr style="border-top: 3px solid black;">
-                        <cfloop query="#myQuery#">
-                        
-                            <cfquery name="rsOrientacoesPendentes" datasource="#application.dsn_processos#" >
-                                SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id 
-                                        ,pc_orientacao_status.pc_orientacao_status_descricao
-                                        ,pc_avaliacoes.pc_aval_numeracao
-                                        ,pc_processos.pc_processo_id 
-                                        ,pc_processos.pc_num_sei
-                                        ,pc_processos.pc_num_rel_sei
-                                        ,pc_processos.pc_num_avaliacao_tipo
-                                        ,pc_avaliacao_tipos.pc_aval_tipo_descricao
-                                        ,pc_processos.pc_aval_tipo_nao_aplica_descricao
-                                        ,pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp 
-                                        ,pc_avaliacao_orientacoes.pc_aval_orientacao_status 
-                                        ,orgaoAvaliado.pc_org_mcu as mcuOrgaoAvaliado
-                                        ,orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
-                                        ,orgaoAvaliado.pc_org_emaiL as emailOrgaoAvaliado
-                                        ,orgaoResp.pc_org_mcu as mcuOrgaoResp
-                                        ,orgaoResp.pc_org_sigla as siglaOrgaoResp
-                                        ,orgaoResp.pc_org_emaiL as emailOrgaoResp
-                                FROM pc_avaliacao_orientacoes
-                                right JOIN pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
-                                right JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
-                                right JOIN pc_avaliacao_tipos on pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
-                                right JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-                                right JOIN pc_orgaos as orgaoAvaliado on orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-                                right JOIN pc_orgaos as orgaoResp on orgaoResp.pc_org_mcu = pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp
-
-                                WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate() 
-                                ORDER BY pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp
-                            </cfquery>
-
-                            <cfquery name="rsOrientacoesOutrosStatus" datasource="#application.dsn_processos#" >
-                                SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id, pc_orientacao_status.pc_orientacao_status_descricao                
-                                FROM pc_avaliacao_orientacoes
-                                right JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-                                WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (2,16)  or (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp >= getdate()))
-                            </cfquery>
-                            <div style="margin-bottom:0px;background: #0083ca;color:#fff;padding:10px;font-weight: bold ">
-                                <cfoutput>#NumberFormat(rsOrientacoesPendentes.recordcount,"00")# orientações pendentes da #rsOrientacoesPendentes.siglaOrgaoResp#</cfoutput>
-                                <cfif rsOrientacoesOutrosStatus.recordcount gt 0>
-                                    <br>
-                                    <cfoutput>#NumberFormat(rsOrientacoesOutrosStatus.recordcount,"00")# outras orientações da #rsOrientacoesPendentes.siglaOrgaoResp#</cfoutput>
-                                </cfif> 
-                            </div>
-                            <table id="tabOrientacoes" class="table-striped">
-                                <thead style="background: #0083ca;color:#fff">
-                                    <tr style="font-size:14px">
-                                        <th >ID da Orientação</th>
-                                        <th >N° Processo SNCI</th>
-                                        <th >N° Item</th>
-                                        <th >Data Prevista p/ Resposta</th>
-                                        <th >N° SEI</th>
-                                        <th >N° Relatório SEI</th>
-                                        <th >Tipo de Avaliação:</th>	
-                                    </tr>
-                                </thead>
-                                
-                                <tbody>
-                                    <cfloop query="rsOrientacoesPendentes" >
-                                        <cfoutput>					
-                                            <tr style="font-size:12px;"  >
-                                                    
-                                                    <td align="center" >#pc_aval_orientacao_id#</td>
-                                                    <td align="center" >#pc_processo_id#</td>
-                                                    <td align="center" >#pc_aval_numeracao#</td>	
-                                                    
-                                                    
-                                                    
-                                                    <cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,"DD-MM-YYYY") >
-                                                    <td align="center" >#dataPrev#</td>
-                                                        
-                                                    
-                                                    <cfset sei = left(#pc_num_sei#,5) & "."& mid(#pc_num_sei#,6,6) &"/"& mid(#pc_num_sei#,12,4) &"-"&right(#pc_num_sei#,2)>
-                                                    <td align="center" >#sei#</td>
-                                                    <td align="center" >#pc_num_rel_sei#</td>
-                                                    
-                                                    <cfif pc_num_avaliacao_tipo neq 2>
-                                                        <td >#pc_aval_tipo_descricao#</td>
-                                                    <cfelse>
-                                                        <td >#pc_aval_tipo_nao_aplica_descricao#</td>
-                                                    </cfif>
-                                                        
-                                            </tr>
-                                        </cfoutput>
-                                    </cfloop>	
-                                </tbody>
-                                
-
-                            </table>
-                            
-                            <cfset quantPendentes = quantPendentes + rsOrientacoesPendentes.recordcount>
-                        </cfloop>
+                       
                     </cfif>
                    
                     
