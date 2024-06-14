@@ -1,11 +1,7 @@
 <cfcomponent  >
 <cfprocessingdirective pageencoding = "utf-8">	
 
-	<!-- iCheck -->
-	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
 	
-	
-
 
 	<cffunction name="cardsAvaliacao"   access="remote" hint="enviar os cards dos processos cadastrados e iniciados pata a páginas pc_Avaliacao">
 
@@ -5134,6 +5130,39 @@
 		</script>
 
 	</cffunction>
+
+
+	<cffunction name="getAvaliacaoTipos" access="remote" returntype="any" returnformat="json" output="false">
+        <cfset var result = "" />
+        <cfquery name="qAvaliacaoTipos" datasource="#application.dsn_processos#">
+            SELECT 
+                pc_aval_tipo_id, 
+                pc_aval_tipo_macroprocessos, 
+                pc_aval_tipo_processoN1, 
+                pc_aval_tipo_processoN2, 
+                pc_aval_tipo_processoN3
+            FROM 
+                pc_avaliacao_tipos
+            WHERE
+                pc_aval_tipo_status = 'A' 
+        </cfquery>
+        
+        <cfset var data = [] />
+        <cfloop query="qAvaliacaoTipos">
+            <cfset var tipos = {
+                id: qAvaliacaoTipos.pc_aval_tipo_id,
+                macroprocessos: qAvaliacaoTipos.pc_aval_tipo_macroprocessos,
+                processo_n1: qAvaliacaoTipos.pc_aval_tipo_processoN1,
+                processo_n2: qAvaliacaoTipos.pc_aval_tipo_processoN2,
+                processo_n3: qAvaliacaoTipos.pc_aval_tipo_processoN3
+            } />
+            <cfset ArrayAppend(data, tipos) />
+        </cfloop>
+        
+        
+        
+        <cfreturn data/>
+    </cffunction>
 
 
 

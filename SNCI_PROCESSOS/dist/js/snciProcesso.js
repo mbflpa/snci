@@ -574,3 +574,203 @@ function periodoPorExtenso(mes,ano) {
     let nomeMesExtenso = meses[mes - 1];
     return nomeMesExtenso + "_de_" + ano;
 }
+
+/*
+    cria selects a partir de um array de objetos JSON 
+    Forma de utilização:
+    Inserir o código abaixo no arquivo HTML:
+    Tem que existir apenas a div com id dados-container e o input com id idSelecionado (pode usar outro id se desejar)
+    <div class="container mt-5">
+        <h2>Selecione o Processo</h2>
+        <div id="dados-container" class="dados-container">
+            <!-- Os selects serão adicionados aqui -->
+        </div>
+        <div id="selectedInfo" style="margin-top: 20px;">
+            <p><strong>Id selecionado:<input id="idSelecionado"></input></p>
+        </div>
+    </div>
+
+    <script>
+        
+        $(document).ready(function() {
+            Exemplo de dados
+            var data = [
+                {id: 1001, macroprocessos: 'Estratégia e Desempenho', processo_n1: 'Gerir projetos corporativos', processo_n2: 'Gerir contabilidade e relatórios', processo_n3: 'Outros'},
+                {id: 1002, macroprocessos: 'Estratégia e Desempenho', processo_n1: 'Gerir projetos corporativos', processo_n2: 'Realizar operações de contabilidade', processo_n3: 'Escriturar Fatos Contábeis'},
+            ];
+            var dataLevels = ['macroprocessos', 'processo_n1', 'processo_n2', 'processo_n3'];
+            var labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+            initializeSelects(data, dataLevels, 'id', labelNames, 'idSelecionado');
+        });
+    </script>
+*/
+
+function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputAlvo) {
+
+    // Limpa o container de selects e adiciona o primeiro select
+    $('#dados-container').empty().append('<div class="select-container-initializeSelects"><label class="dynamic-label-initializeSelects">' + labelNames[0] + ': </label><select class="form-control process-select" id="level-0" style="width: calc(100% - 120px);"></select></div>');
+
+    // Função para preencher os selects
+    function populateSelect(level, parentSelections) {
+        // Obtém o nível atual a partir de dataLevels
+        var currentLevel = dataLevels[level];
+        if (!currentLevel) return;  // Se não há mais níveis, sai da função
+
+        // Filtra os dados com base nas seleções dos níveis superiores
+        var filteredData = data;
+        for (var i = 0; i < level; i++) {
+            filteredData = filteredData.filter(item => item[dataLevels[i]] === parentSelections[i]);
+        }
+
+        // Obtém opções únicas para o select atual
+        var uniqueOptions = [...new Set(filteredData.map(item => item[currentLevel]))];
+
+        var $select = $('#level-' + level);
+
+        if ($select.length === 0) {
+            // Cria um novo select se ele não existir
+            $select = $('<select class="form-control process-select dynamic-select" id="level-' + level + '" style="width: calc(100% - 120px);"></select>');
+            var $container = $('<div class="select-container-initializeSelects"></div>');
+            $container.append('<label class="dynamic-label-initializeSelects">' + labelNames[level] + ': </label>');
+            $container.append($select);
+            $('#dados-container').append($container);
+        }
+
+        // Preenche o select com opções
+        $select.empty().append('<option></option>');
+        uniqueOptions.forEach(item => {
+            let option = $('<option></option>').val(item).text(item);
+            $select.append(option);
+        });
+
+        // Calcula a largura necessária com base na largura dos textos dos options
+        var maxWidth = 0;
+        $select.children('option').each(function() {
+            var optionWidth = $('<span>').text($(this).text()).css({
+                'font-family': $select.css('font-family'),
+                'font-size': $select.css('font-size'),
+                'visibility': 'hidden',
+                'white-space': 'nowrap'
+            }).appendTo('body').width();
+            maxWidth = Math.max(maxWidth, optionWidth);
+        });
+
+        // Adiciona padding à largura calculada e ajusta a largura do select
+        var padding = 45; // 40px de padding adicional
+        if (maxWidth + padding < 100) {
+            $select.css('width', '100px');
+        } else {
+            $select.css('width', (maxWidth + padding) + 'px');
+        }
+    }
+
+    // Inicializa o primeiro select
+    populateSelect(0, []);
+
+    // Inicializa o select2 para todos os selects
+    $('.process-select').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Selecione...'
+    });
+
+    // Evento de mudança para selects dinâmicos
+    $('#dados-container').on('change', '.process-select', function() {
+        var level = parseInt($(this).attr('id').split('-')[1]);
+        var parentSelections = [];
+        for (var i = 0; i <= level; i++) {
+            parentSelections.push($('#level-' + i).val());
+        }
+
+        // Verifica se o primeiro select (MACROPROCESSOS) é 'Não se aplica'
+        if (parentSelections[0] === 'Não se aplica') {
+            var finalSelection = data.find(item => item.MACROPROCESSOS === 'Não se aplica');
+            if (finalSelection) {
+                $('#' + inputAlvo).val(finalSelection[idAttributeName]);
+            }
+            // Remove todos os selects além do primeiro
+            $('.process-select').parent().slice(1).remove();
+            return; // Sai da função, não preenche os selects adicionais
+        }
+
+        // Remove selects de níveis mais baixos
+        $('.process-select').each(function() {
+            var currentLevel = parseInt($(this).attr('id').split('-')[1]);
+            if (currentLevel > level) {
+                $(this).parent().remove();
+            }
+        });
+
+        // Preenche o próximo nível de select
+        if (parentSelections[level]) {
+            populateSelect(level + 1, parentSelections);
+        } else {
+            $('#' + inputAlvo).val('');
+        }
+
+        // Atualiza o ID selecionado se for o último nível
+        if (!$('#level-' + (level + 1)).length && parentSelections.every(selection => selection)) {
+            var finalSelection = data.find(item => {
+                return dataLevels.every((process, index) => item[process] === parentSelections[index]);
+            });
+            if (finalSelection) {
+                $('#' + inputAlvo).val(finalSelection[idAttributeName]);
+            }
+        } else {
+            $('#' + inputAlvo).val('');
+        }
+
+        // Inicializa o select2 para os selects dinâmicos
+        $('.process-select').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Selecione...'
+        });
+    });
+}
+
+/* Função para preencher selects a partir de um ID informado:
+Use essa função dentro do sucess do ajax que retornou o json.
+Exemplo:
+    $.ajax({
+        url: 'cfc/pc_cfcJsons.cfc',
+        data: {
+            method: 'getAvaliacaoTipos',
+        },
+        dataType: "json",
+        method: 'GET',
+        success: function(data) {
+        
+            // Define os níveis de dados e nomes dos labels
+            var dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
+            var labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+            
+            // Inicializa os selects dinâmicos
+            initializeSelects(data, dataLevels, 'ID', labelNames, 'idSelecionado');
+            // Exemplo de uso da função para preencher os selects a partir de um ID
+            const exampleID = 220; // Mude para o ID desejado
+            populateSelectsFromID(data, exampleID, dataLevels, 'idSelecionado');
+        },
+        error: function(error) {
+            console.error("Erro ao obter dados:", error);
+        }
+    });
+*/
+function populateSelectsFromID(data, id, dataLevels, inputAlvo) {
+    const selectedData = data.find(item => item.ID === id);
+    if (!selectedData) {
+        console.error("ID inválido.");
+        return;
+    }
+
+    // Inicializa os selects
+    //initializeSelects(data, dataLevels, 'ID', ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'], inputAlvo);
+
+    // Preenche os selects
+    let parentSelections = [];
+    dataLevels.forEach((level, idx) => {
+        parentSelections.push(selectedData[level]);
+        $('#level-' + idx).val(selectedData[level]).trigger('change');
+    });
+
+    // Atualiza o campo de destino com o ID correto
+    $('#' + inputAlvo).val(selectedData.ID);
+}

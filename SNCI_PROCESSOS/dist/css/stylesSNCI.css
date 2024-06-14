@@ -256,3 +256,19 @@ td{
     background: none;
     color:#6c757d;
 }
+
+/* Estilo utilizado no componente de geração de selects a partir de um json (initializeSelects) */
+.dynamic-label-initializeSelects {
+    display: inline-block;
+    width: 120px; /* Largura do rótulo */
+    margin-right: 10px; /* Espaçamento entre o rótulo e o select */
+    text-align: right; /* Alinhamento do texto à direita */
+    line-height: 36px; /* Altura de linha igual à altura do contêiner */
+}
+
+.select-container-initializeSelects {
+    display: flex;
+    align-items: baseline;
+    height: 36px; /* Definir altura fixa para o contêiner */
+    /*margin-bottom: 10px;  Espaçamento inferior */
+}
