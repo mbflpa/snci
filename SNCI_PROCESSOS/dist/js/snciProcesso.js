@@ -774,3 +774,54 @@ function populateSelectsFromID(data, id, dataLevels, inputAlvo) {
     // Atualiza o campo de destino com o ID correto
     $('#' + inputAlvo).val(selectedData.ID);
 }
+
+/*Função para contar a quantidade decaracteres digitados em um input ou textarea
+Forma de utilização:
+Inserir o código abaixo no arquivo HTML:
+<div class="form-group" style="margin-bottom:25px">
+        <label for="myInput">Input Text</label>
+        <input type="text" id="myInput" class="form-control" >
+    </div>
+    ou 
+    <div class="form-group">
+        <label for="myTextarea">Textarea</label>
+        <textarea id="myTextarea" class="form-control"></textarea>
+    </div>
+    <script>
+        $(document).ready(function() {
+            setupCharCounter('myInput', 10);
+            setupCharCounter('myTextarea', 50);
+        });
+    </script>
+*/
+
+function setupCharCounter(inputId, maxChars) {
+    const inputElem = $('#' + inputId);
+
+    // Criação dinâmica do span para contagem de caracteres
+    const charCountElem = $('<span>', {
+        id: 'charCount-' + inputId,
+        class: 'text-muted',
+        style: 'position: absolute;'
+    });
+    inputElem.after(charCountElem);
+
+    inputElem.on('input', function() {
+        const currentLength = inputElem.val().length;
+
+        if (currentLength > maxChars) {
+            inputElem.val(inputElem.val().substring(0, maxChars));
+            Swal.fire({
+                icon: 'warning',
+                title: 'Limite de caracteres ultrapassado!',
+                html: logoSNCIsweetalert2('O máximo permitido é ' + maxChars + ' caracteres.' + '<br>O texto foi cortado para atender ao limite.'),
+             }).then(() => {
+                inputElem.focus();
+            }).catch((error) => {
+                console.error('SweetAlert2 Error:', error);
+            });
+        }
+
+        charCountElem.text(`Caracteres: ${inputElem.val().length}/${maxChars}`);
+    });
+}
