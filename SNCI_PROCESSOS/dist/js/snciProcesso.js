@@ -728,7 +728,7 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
 }
 
 /* Função para preencher selects a partir de um ID informado:
-Use essa função dentro do sucess do ajax que retornou o json.
+Use essa função dentro do success do ajax que retornou o json.
 Exemplo:
     $.ajax({
         url: 'cfc/pc_cfcJsons.cfc',
