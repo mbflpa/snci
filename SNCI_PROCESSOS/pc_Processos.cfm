@@ -198,27 +198,6 @@
 												</div>
 											</div>
 
-											
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label for="pcTipoAvaliado">Tipo de Avaliação:</label>
-													<select id="pcTipoAvaliado" required  name="pcTipoAvaliado" class="form-control" >
-														<option selected="" disabled="" value=""></option>
-														<cfoutput query="rsAvaliacaoTipo">
-															<option value="#rsAvaliacaoTipo.pc_aval_tipo_id#">#trim(rsAvaliacaoTipo.pc_aval_tipo_descricao)#</option>
-														</cfoutput>
-													</select>
-												</div>
-											</div>
-											<div id="TipoAvalDescricaoDiv"  class="col-sm-7" hidden>
-												<div class="form-group">
-													<label for="pcTipoAvalDescricao">Descrição do Tipo de Avaliação:</label>
-													<div class="input-group date" id="reservationdate" data-target-input="nearest">
-														<input  id="pcTipoAvalDescricao"  name="pcTipoAvalDescricao" maxlength="100" required class="form-control" placeholder="Descreva o tipo de avaliação..." >
-													</div>
-												</div>
-											</div>
-
 											<input hidden  id="pcOrgaoAvaliadoAnterior"  name="pcOrgaoAvaliadoAnterior">
 											<div class="col-sm-3">
 												<div class="form-group">
@@ -237,6 +216,22 @@
 													</select>
 												</div>
 											</div>
+
+											<input id="idTipoAvaliacao" hidden></input>
+											<div class="form-group col-sm-12" style="border: 1px solid gray; padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+												<div class="col-sm-12">
+													<div id="dados-container" class="dados-container">
+														<!-- Os selects serão adicionados aqui -->
+													</div>
+													<div id="TipoAvalDescricaoDiv" class="form-group" hidden>
+														<label for="pcTipoAvalDescricao" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Tipo de Avaliação:</label>
+														<div class="input-group date " id="reservationdate" data-target-input="nearest">
+															<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" maxlength="100" required class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;" >
+														</div>
+													</div>
+												</div>
+											</div>
+
 
 											<div id ="pcTipoClassificacaoDiv" class="col-sm-3" hidden>
 												<div class="form-group">
@@ -480,6 +475,36 @@
 			$('#pcAnoPacin').html(selectOptions);
 			//FIM GERAÇÃO ANOS PARA PCANOPACIN
 
+			$.ajax({
+                url: 'cfc/pc_cfcAvaliacoes.cfc',
+                data: {
+                    method: 'getAvaliacaoTipos',
+                },
+                dataType: "json",
+                async: false
+            })//fim ajax
+            .done(function(data) {
+                // Define os níveis de dados e nomes dos labels
+                let dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
+                let labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+                let outrosOptions = [
+                    { dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
+                ];
+                // Inicializa os selects dinâmicos
+                initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
+                
+
+            })//fim done
+            .fail(function(xhr, ajaxOptions, thrownError) {
+                $('#modalOverlay').delay(1000).hide(0, function() {
+                    $('#modalOverlay').modal('hide');
+                });
+                $('#modal-danger').modal('show')
+                $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+                $('#modal-danger').find('.modal-body').text(thrownError)
+
+            })//fim fail
+
 		});
 
 
@@ -503,15 +528,28 @@
 			$('#pcDataFimAvaliacao').attr("min",$('#pcDataInicioAvaliacao').val())	
 		});
 
-		$('#pcTipoAvaliado').on('change', function (event){
-            if($('#pcTipoAvaliado').val() == 2){
+		
+	 $('#dados-container').on('change', '#selectDinamico-MACROPROCESSOS', function() {
+        var selectedText = $(this).find('option:selected').text();
+		if(selectedText == 'Não se aplica'){
 				$('#pcTipoAvalDescricao').val(null).trigger('change')
 				$('#TipoAvalDescricaoDiv').attr("hidden",false)		
 			}else{
 				$('#pcTipoAvalDescricao').val(null).trigger('change')
 				$('#TipoAvalDescricaoDiv').attr("hidden",true)
 			}
-		});
+    });
+
+		// Adiciona um listener de evento para mudanças no input
+    $('#idTipoAvaliacao').on('change', function() {
+        var valorInput = $(this).val();
+        
+        // Verifica se o valor do input é zero
+        if (valorInput === '0') {
+            console.log('O valor do input é zero.');
+            // Execute outras ações aqui, se necessário
+        }
+    });
 
 		$('#pcModalidade').on('change', function (event){
 			if($('#pcModalidade').val() == 'A' || $('#pcModalidade').val() == 'E'){
