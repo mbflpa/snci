@@ -586,26 +586,46 @@ function periodoPorExtenso(mes,ano) {
             <!-- Os selects serão adicionados aqui -->
         </div>
         <div id="selectedInfo" style="margin-top: 20px;">
-            <p><strong>Id selecionado:<input id="idSelecionado"></input></p>
+            <p><strong>Id selecionado:</strong><input id="idSelecionado"></input></p>
         </div>
     </div>
 
     <script>
-        
         $(document).ready(function() {
-            Exemplo de dados
-            var data = [
-                {id: 1001, macroprocessos: 'Estratégia e Desempenho', processo_n1: 'Gerir projetos corporativos', processo_n2: 'Gerir contabilidade e relatórios', processo_n3: 'Outros'},
-                {id: 1002, macroprocessos: 'Estratégia e Desempenho', processo_n1: 'Gerir projetos corporativos', processo_n2: 'Realizar operações de contabilidade', processo_n3: 'Escriturar Fatos Contábeis'},
-            ];
-            var dataLevels = ['macroprocessos', 'processo_n1', 'processo_n2', 'processo_n3'];
-            var labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
-            initializeSelects(data, dataLevels, 'id', labelNames, 'idSelecionado');
+            $.ajax({
+                url: 'cfc/pc_cfcAvaliacoes.cfc',
+                data: {
+                    method: 'getAvaliacaoTipos',
+                },
+                dataType: "json",
+                async: false
+            })//fim ajax
+            .done(function(data) {
+                // Define os níveis de dados e nomes dos labels
+                let dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
+                let labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+                let outrosOptions = [
+                    { dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
+                ];
+                // Inicializa os selects dinâmicos
+                initializeSelects(data, dataLevels, 'ID', labelNames, 'idSelecionado',outrosOptions);
+                
+
+            })//fim done
+            .fail(function(xhr, ajaxOptions, thrownError) {
+                $('#modalOverlay').delay(1000).hide(0, function() {
+                    $('#modalOverlay').modal('hide');
+                });
+                $('#modal-danger').modal('show')
+                $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+                $('#modal-danger').find('.modal-body').text(thrownError)
+
+            })//fim fail
         });
     </script>
 */
 
-function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputAlvo) {
+function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions = []) {
 
     // Limpa o container de selects e adiciona o primeiro select
     $('#dados-container').empty().append('<div class="select-container-initializeSelects"><label class="dynamic-label-initializeSelects">' + labelNames[0] + ': </label><select class="form-control process-select" id="level-0" style="width: calc(100% - 120px);"></select></div>');
@@ -638,9 +658,17 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
 
         // Preenche o select com opções
         $select.empty().append('<option></option>');
+
         uniqueOptions.forEach(item => {
             let option = $('<option></option>').val(item).text(item);
             $select.append(option);
+        });
+
+        // Adiciona opções "OUTROS" com base no array outrosOptions
+        outrosOptions.forEach(outrosOption => {
+            if (dataLevels[level] === outrosOption.dataLevel) {
+                $select.append($('<option></option>').val(outrosOption.value).text(outrosOption.text));
+            }
         });
 
         // Calcula a largura necessária com base na largura dos textos dos options
@@ -709,9 +737,20 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
 
         // Atualiza o ID selecionado se for o último nível
         if (!$('#level-' + (level + 1)).length && parentSelections.every(selection => selection)) {
+            var $select = $('#level-' + level);
+            var selectedOption = $select.val();
+
+            // Verifica se a opção selecionada está em outrosOptions
+            var isOutrosOption = outrosOptions.some(option => option.value.toString() === selectedOption);
+            if (isOutrosOption) {
+                $('#' + inputAlvo).val(selectedOption);
+                return;
+            }
+
             var finalSelection = data.find(item => {
                 return dataLevels.every((process, index) => item[process] === parentSelections[index]);
             });
+
             if (finalSelection) {
                 $('#' + inputAlvo).val(finalSelection[idAttributeName]);
             }
@@ -726,6 +765,10 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
         });
     });
 }
+
+
+
+
 
 /* Função para preencher selects a partir de um ID informado:
 Use essa função dentro do success do ajax que retornou o json.
