@@ -628,7 +628,7 @@ function periodoPorExtenso(mes,ano) {
 function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions = []) {
 
     // Limpa o container de selects e adiciona o primeiro select
-    $('#dados-container').empty().append('<div class="select-container-initializeSelects"><label class="dynamic-label-initializeSelects">' + labelNames[0] + ': </label><select class="form-control process-select" id="level-0" style="width: calc(100% - 120px);"></select></div>');
+    $('#dados-container').empty().append('<div class="select-container-initializeSelects"><label class="dynamic-label-initializeSelects">' + labelNames[0] + ': </label><select class="form-control process-select" id="selectDinamico-' + dataLevels[0] + '" style="width: calc(100% - 120px);"></select></div>');
 
     // Função para preencher os selects
     function populateSelect(level, parentSelections) {
@@ -645,11 +645,11 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
         // Obtém opções únicas para o select atual
         var uniqueOptions = [...new Set(filteredData.map(item => item[currentLevel]))];
 
-        var $select = $('#level-' + level);
+        var $select = $('#selectDinamico-' + currentLevel);
 
         if ($select.length === 0) {
             // Cria um novo select se ele não existir
-            $select = $('<select class="form-control process-select dynamic-select" id="level-' + level + '" style="width: calc(100% - 120px);"></select>');
+            $select = $('<select class="form-control process-select dynamic-select" id="selectDinamico-' + currentLevel + '" style="width: calc(100% - 120px);"></select>');
             var $container = $('<div class="select-container-initializeSelects"></div>');
             $container.append('<label class="dynamic-label-initializeSelects">' + labelNames[level] + ': </label>');
             $container.append($select);
@@ -703,10 +703,10 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
 
     // Evento de mudança para selects dinâmicos
     $('#dados-container').on('change', '.process-select', function() {
-        var level = parseInt($(this).attr('id').split('-')[1]);
+        var level = dataLevels.indexOf($(this).attr('id').replace('selectDinamico-', ''));
         var parentSelections = [];
         for (var i = 0; i <= level; i++) {
-            parentSelections.push($('#level-' + i).val());
+            parentSelections.push($('#selectDinamico-' + dataLevels[i]).val());
         }
 
         // Verifica se o primeiro select (MACROPROCESSOS) é 'Não se aplica'
@@ -722,7 +722,7 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
 
         // Remove selects de níveis mais baixos
         $('.process-select').each(function() {
-            var currentLevel = parseInt($(this).attr('id').split('-')[1]);
+            var currentLevel = dataLevels.indexOf($(this).attr('id').replace('selectDinamico-', ''));
             if (currentLevel > level) {
                 $(this).parent().remove();
             }
@@ -736,8 +736,8 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
         }
 
         // Atualiza o ID selecionado se for o último nível
-        if (!$('#level-' + (level + 1)).length && parentSelections.every(selection => selection)) {
-            var $select = $('#level-' + level);
+        if (!$('#selectDinamico-' + dataLevels[level + 1]).length && parentSelections.every(selection => selection)) {
+            var $select = $('#selectDinamico-' + dataLevels[level]);
             var selectedOption = $select.val();
 
             // Verifica se a opção selecionada está em outrosOptions
@@ -765,6 +765,8 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
         });
     });
 }
+
+
 
 
 
