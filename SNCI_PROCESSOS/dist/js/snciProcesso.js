@@ -840,18 +840,12 @@ Inserir o código abaixo no arquivo HTML:
     </script>
 */
 
-function setupCharCounter(inputId, maxChars) {
+function setupCharCounter(inputId, spanId, maxChars) {
     const inputElem = $('#' + inputId);
-
-    // Criação dinâmica do span para contagem de caracteres
-    const charCountElem = $('<span>', {
-        id: 'charCount-' + inputId,
-        class: 'text-muted',
-        style: 'position: absolute;'
-    });
-    inputElem.after(charCountElem);
-
+    const charCountElem = $('#' + spanId);
+    charCountElem.attr("hidden",true);
     inputElem.on('input', function() {
+        charCountElem.attr("hidden",false);
         const currentLength = inputElem.val().length;
 
         if (currentLength > maxChars) {

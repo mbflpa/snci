@@ -50,6 +50,24 @@
 	ORDER BY pc_org_se_sigla ASC,  pc_usu_nome ASC
 </cfquery>
 
+<cfquery datasource="#application.dsn_processos#" name="rsObjetivoEstrategico">
+	SELECT * FROM pc_objetivo_estrategico
+	WHERE pc_objEstrategico_status = 'A'
+	ORDER BY pc_objEstrategico_descricao
+</cfquery>
+
+<cfquery datasource="#application.dsn_processos#" name="rsRiscoEstrategico">
+	SELECT * FROM pc_risco_estrategico
+	WHERE pc_riscoEstrategico_status = 'A'
+	ORDER BY pc_riscoEstrategico_descricao
+</cfquery>
+
+<cfquery datasource="#application.dsn_processos#" name="rsMebitda">
+	SELECT * FROM pc_mebitda
+	WHERE pc_mebitda_status = 'A'
+	ORDER BY pc_mebitda_descricao
+</cfquery>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -63,6 +81,25 @@
 	<!-- iCheck -->
 	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
      <style>
+
+		fieldset{
+			border: 1px solid #ced4da!important;
+			border-radius: 8px!important;
+			padding: 20px!important;
+			margin-bottom: 10px!important;
+			background: none!important;
+		}
+
+		legend {
+			font-size: 1rem!important;
+			font-weight: bold!important;
+			color: #fff!important;
+			background-color: #0083ca!important;
+			border: 1px solid #ced4da!important;
+			border-radius: 5px!important;
+			padding: 5px!important;
+			width: auto!important;
+		}
 		
 	 </style>
 	
@@ -217,22 +254,6 @@
 												</div>
 											</div>
 
-											<input id="idTipoAvaliacao" hidden></input>
-											<div class="form-group col-sm-12" style="border: 1px solid gray; padding: 20px; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
-												<div class="col-sm-12">
-													<div id="dados-container" class="dados-container">
-														<!-- Os selects serão adicionados aqui -->
-													</div>
-													<div id="TipoAvalDescricaoDiv" class="form-group" hidden>
-														<label for="pcTipoAvalDescricao" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Tipo de Avaliação:</label>
-														<div class="input-group date " id="reservationdate" data-target-input="nearest">
-															<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" maxlength="100" required class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;" >
-														</div>
-													</div>
-												</div>
-											</div>
-
-
 											<div id ="pcTipoClassificacaoDiv" class="col-sm-3" hidden>
 												<div class="form-group">
 													<label for="pcTipoClassificacao">Classificação:</label>
@@ -245,42 +266,138 @@
 												</div>
 											</div>
 
-											<div class="col-sm-8 " style="box-shadow:0!important">
-												<div class="form-group " >
-														<label for="pcAvaliadores">Avaliadores:</label>
-														<select id="pcAvaliadores" required="false" class="form-control" multiple="multiple">
-															<cfoutput query="rsAvaliadores">
-																<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
-															</cfoutput>
-														</select>	
-												</div>
-											</div>
-										
-											<div id="pcCoordenadorDiv" class="col-sm-4 ">
-												<div class="form-group">
-													<label style="">Coordenador Regional:</label>
-													<select id="pcCoordenador" required name="pcCoordenador" class="form-control">
-														<option selected="" disabled="" value=""></option>
-														<option value="0">Sem Coord. Regional</option>
-														<cfoutput query="rsAvaliadores">
-															<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
-														</cfoutput>
-													</select>
-												</div>
+											<input id="idTipoAvaliacao" hidden></input>
+											<div class="form-group " style="padding: 0;width: auto;">
+												<fieldset >
+													<legend>Tipo de Avaliação</legend>
+													
+														<div id="dados-container" class="dados-container">
+															<!-- Os selects serão adicionados aqui -->
+														</div>
+
+														<div id="TipoAvalDescricaoDiv" class="form-group " hidden style="margin-top:10px;width:700px">
+															<label for="pcTipoAvalDescricao" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Tipo de Avaliação:</label>
+															<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" required class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
+																<span id="pcTipoAvalDescricaoCharCounter" class="badge badge-secondary"></span>
+															</div>
+														</div>
+														<div id="pcProcessoN3Div" class="form-group " hidden style="margin-top:10px;width:700px">
+															<label for="pcProcessoN3" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo N3:</label>
+															<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																<input id="pcProcessoN3" name="pcProcessoN3" required class="form-control" placeholder="Descreva o PROCESSO N3..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
+																<span id="pcProcessoN3CharCounter" class="badge badge-secondary"></span>
+															</div>
+														</div>
+													
+												</fieldset>
 											</div>
 
-											<div class="col-sm-4 " >
-												<div class="form-group">
-													<label style="">Coordenador Nacional:</label>
-													<select id="pcCoordNacional" required name="pcCoordNacional" class="form-control">
-														<option selected="" disabled="" value=""></option>
-														<option value="0">Sem Coord. Nacional</option>
-														<cfoutput query="rsAvaliadores">
-															<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
-														</cfoutput>
-													</select>
-												</div>
+											<div class="form-group col-sm-12" style="padding: 0;width: auto;">
+												<fieldset >
+													<legend >Informações Estratégicas</legend>
+													<div class="row" style="display:flex; justify-content: space-between;">
+														<div class="col-sm-4">
+															<div class="form-group " >
+																	<label for="pcObjetivoEstrategico">Objetivo Estratégico:</label>
+																	<select id="pcObjetivoEstrategico" required="false" class="form-control" multiple="multiple">
+																		<cfoutput query="rsObjetivoEstrategico">
+																			<option value="#pc_objEstrategico_id#">#trim(pc_objEstrategico_descricao)#</option>
+																		</cfoutput>
+																	</select>	
+															</div>
+														</div>
+
+														<div class="col-sm-8">
+															<div class="form-group " >
+																	<label for="pcRiscoEstrategico">Risco Estratégico:</label>
+																	<select id="pcRiscoEstrategico" required="false" class="form-control" multiple="multiple">
+																		<cfoutput query="rsRiscoEstrategico">
+																			<option value="#pc_riscoEstrategico_id#">#trim(pc_riscoEstrategico_descricao)#</option>
+																		</cfoutput>
+																	</select>	
+															</div>
+														</div>
+
+														<div class="col-sm-4">
+															<div class="form-group " >
+																	<label for="pcEbitda">Margem EBITDA (MEBITDA):</label>
+																	<select id="pcEbitda" required="false" class="form-control" multiple="multiple">
+																		<cfoutput query="rsMebitda">
+																			<option value="#pc_mebitda_id#">#trim(pc_mebitda_descricao)#</option>
+																		</cfoutput>
+																	</select>	
+															</div>
+														</div>
+
+														<div class="col-sm-8">
+															<div class="form-group " >
+																<div id="pcIndicadorSetorialDiv" class="form-group " >
+																	<label for="pcIndicadorSetorial" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Indicador Setorial:</label>
+																	<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																		<input id="pcIndicadorSetorial" name="pcIndicadorSetorial" required class="form-control" placeholder="Descreva o Indicador Setorial..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
+																		<span id="pcIndicadorSetorialCharCounter" class="badge badge-secondary"></span>
+																	</div>
+																</div>	
+															</div>
+														</div>
+
+
+
+													</div>
+														
+													
+												</fieldset>
 											</div>
+
+
+											<div class="form-group col-sm-12" style="padding: 0;">
+												<fieldset >
+													<legend style="">Equipe</legend>
+
+													<div class="row">
+														<div class="col-sm-12">
+															<div class="form-group " >
+																	<label for="pcAvaliadores">Avaliadores:</label>
+																	<select id="pcAvaliadores" required="false" class="form-control" multiple="multiple">
+																		<cfoutput query="rsAvaliadores">
+																			<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
+																		</cfoutput>
+																	</select>	
+															</div>
+														</div>
+
+														<div id="pcCoordenadorDiv" class="col-sm-4">
+															<div class="form-group">
+																<label style="" for="pcCoordenado">Coordenador Regional:</label>
+																<select id="pcCoordenador" required name="pcCoordenador" class="form-control">
+																	<option selected="" disabled="" value=""></option>
+																	<option value="0">Sem Coord. Regional</option>
+																	<cfoutput query="rsAvaliadores">
+																		<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
+																	</cfoutput>
+																</select>
+															</div>
+														</div>
+
+														<div class="col-sm-4">
+															<div class="form-group">
+																<label style="" for="pcCoordNacional">Coordenador Nacional:</label>
+																<select id="pcCoordNacional" required name="pcCoordNacional" class="form-control">
+																	<option selected="" disabled="" value=""></option>
+																	<option value="0">Sem Coord. Nacional</option>
+																	<cfoutput query="rsAvaliadores">
+																		<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
+																	</cfoutput>
+																</select>
+															</div>
+														</div>
+													</div>
+
+												</fieldset>
+											</div>
+       
+
 											<divc id="pcBloquearDiv" class="col-sm-2" hidden>
 												<div class="form-group">
 													<label for="pcBloquear" >Bloquear Processo:</label>
@@ -350,17 +467,11 @@
 
 
 	<script language="JavaScript">
-
-	
-	
-
 		//Initialize Select2 Elements
 		$('select').select2({
-		theme: 'bootstrap4',
-		placeholder: 'Selecione...'
+			theme: 'bootstrap4',
+			placeholder: 'Selecione...'
 		});
-
-		
 
 		$(document).ready(function() {
 			$('#modalOverlay').delay(1000).hide(0, function() {
@@ -505,13 +616,13 @@
 
             })//fim fail
 
-		});
+			setupCharCounter('pcIndicadorSetorial', 'pcIndicadorSetorialCharCounter', 250);
 
+		});
 
 		$(function () {
 			$('[data-mask]').inputmask()
 		});
-
 		
 		$('#pcTipoDemanda').on('change', function (event)  {
 			if( $('#pcTipoDemanda').val()=='P'){//se o tipo de demanda for PLANEJADA, visualizar o campo Ano PACIN para preenchimento
@@ -523,34 +634,35 @@
 			}
 		});
 
-
 		$('#pcDataInicioAvaliacao').on('change', function (event) {
 			$('#pcDataFimAvaliacao').attr("min",$('#pcDataInicioAvaliacao').val())	
 		});
 
 		
-	 $('#dados-container').on('change', '#selectDinamico-MACROPROCESSOS', function() {
-        var selectedText = $(this).find('option:selected').text();
-		if(selectedText == 'Não se aplica'){
-				$('#pcTipoAvalDescricao').val(null).trigger('change')
-				$('#TipoAvalDescricaoDiv').attr("hidden",false)		
+		$('#dados-container').on('change', '#selectDinamico-MACROPROCESSOS', function() {
+			var selectedText = $(this).find('option:selected').text();
+			if(selectedText == 'Não se aplica'){
+					$('#pcTipoAvalDescricao').val(null).trigger('change')
+					$('#TipoAvalDescricaoDiv').attr("hidden",false)	
+					setupCharCounter('pcTipoAvalDescricao', 'pcTipoAvalDescricaoCharCounter', 250);	
+				}else{
+					$('#pcTipoAvalDescricao').val(null).trigger('change')
+					$('#TipoAvalDescricaoDiv').attr("hidden",true)
+				}
+		});
+
+		$('#dados-container').on('change', '#selectDinamico-PROCESSO_N3', function() {
+			var selectedText = $(this).find('option:selected').text();
+			if(selectedText == 'OUTROS'){
+				$('#pcProcessoN3').val(null).trigger('change')
+				$('#pcProcessoN3Div').attr("hidden",false)
+				setupCharCounter('pcProcessoN3', 'pcProcessoN3CharCounter', 250);
 			}else{
-				$('#pcTipoAvalDescricao').val(null).trigger('change')
-				$('#TipoAvalDescricaoDiv').attr("hidden",true)
+				$('#pcProcessoN3').val(null).trigger('change')
+				$('#pcProcessoN3Div').attr("hidden",true);
 			}
-    });
-
-		// Adiciona um listener de evento para mudanças no input
-    $('#idTipoAvaliacao').on('change', function() {
-        var valorInput = $(this).val();
-        
-        // Verifica se o valor do input é zero
-        if (valorInput === '0') {
-            console.log('O valor do input é zero.');
-            // Execute outras ações aqui, se necessário
-        }
-    });
-
+		});
+	 
 		$('#pcModalidade').on('change', function (event){
 			if($('#pcModalidade').val() == 'A' || $('#pcModalidade').val() == 'E'){
 				//$('#pcNumSEI').val(null).trigger('change')
@@ -602,18 +714,31 @@
 			$('#pcModalidade').val(null).trigger('change');
 			$('#pcTipoClassificacao').val(null).trigger('change');
 			$('#pcTipoAvaliado').val(null).trigger('change');
-			$('#pcTipoAvalDescricao').val(null).trigger('change');
+			$('#pcTipoAvalDescricao').val(null);
+			$('#TipoAvalDescricaoDiv').attr("hidden",true)
+			$('#pcTipoAvalDescricaoCharCounter').attr("hidden",true);
 			$('#pcOrgaoAvaliado').val(null).trigger('change');
 			$('#pcOrgaoAvaliadoAnterior').val(null);
 			$('#pcAvaliadores').val(null).trigger('change');
 			$('#pcCoordenador').val(null).trigger('change');
 			$('#pcCoordNacional').val(null).trigger('change');
 			$('#pcTipoDemanda').val(null).trigger('change');
-			$('#pcAnoPacin').val(null).trigger('change')
-			$('#pcBloquear').val(null).trigger('change')
-			$('#cadastro').CardWidget('collapse')
+			$('#pcAnoPacin').val(null).trigger('change');
+			$('#pcBloquear').val(null).trigger('change');
+			$('#selectDinamico-MACROPROCESSOS').val(null).trigger('change');
+			$('#idTipoAvaliacao').val(null).trigger('change');
+			$('#pcProcessoN3').val(null);
+			$('#pcProcessoN3Div').attr("hidden",true);
+			$('#pcProcessoN3CharCounter').attr("hidden",true);
+			$('#cadastro').CardWidget('collapse');
 			$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Processo");
 			$("#btSalvarDiv").attr("hidden",false)
+			$('#pcIndicadorSetorial').val(null);
+			$('#pcIndicadorSetorialCharCounter').attr("hidden",true);
+			$('#pcObjetivoEstrategico').val(null).trigger('change');
+			$('#pcRiscoEstrategico').val(null).trigger('change');
+			$('#pcEbitda').val(null).trigger('change');
+
 		}
         
 		$('#btCancelar').on('click', function (event)  {
@@ -622,10 +747,7 @@
 			cancelar()
 			
 		});
-
 		
-
-
 		$('#btSalvar').on('click', function (event)  {
 			event.preventDefault()
 			event.stopPropagation()
@@ -803,9 +925,6 @@
 			
 		});
 
-
-		
-
 		function processoDel(numProcesso) {
 				
 			event.preventDefault()
@@ -873,8 +992,6 @@
 				});	
 		}
 		
-
-
 		function processoEditarCard(processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin, bloquear) {
             event.preventDefault()
         	event.stopPropagation()
@@ -1119,7 +1236,6 @@
 				
 		}
 		
-
 		$('#btExibirTab').on('click', function (event)  {
 			$('#modalOverlay').modal('show')
 			if($(this).hasClass('fa-th')){
@@ -1138,13 +1254,7 @@
 			});
 		});
 
-		
-
-		
-
-
-
-	
+			
 	</script>
 
 
