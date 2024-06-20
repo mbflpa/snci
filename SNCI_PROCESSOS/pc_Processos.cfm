@@ -62,10 +62,10 @@
 	ORDER BY pc_riscoEstrategico_descricao
 </cfquery>
 
-<cfquery datasource="#application.dsn_processos#" name="rsMebitda">
-	SELECT * FROM pc_mebitda
-	WHERE pc_mebitda_status = 'A'
-	ORDER BY pc_mebitda_descricao
+<cfquery datasource="#application.dsn_processos#" name="rsIndEstrategico">
+	SELECT * FROM pc_indicador_estrategico
+	WHERE pc_indEstrategico_status = 'A'
+	ORDER BY pc_indEstrategico_descricao
 </cfquery>
 
 <!DOCTYPE html>
@@ -88,11 +88,13 @@
 			padding: 20px!important;
 			margin-bottom: 10px!important;
 			background: none!important;
+			-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 		}
 
 		legend {
-			font-size: 1rem!important;
-			font-weight: bold!important;
+			font-size: 0.8rem!important;
 			color: #fff!important;
 			background-color: #0083ca!important;
 			border: 1px solid #ced4da!important;
@@ -160,7 +162,7 @@
 												</div>
 											</div>
 
-											<div id="pcNumSEIDiv"  class="col-sm-2" hidden>
+											<div id="pcNumSEIDiv"  class="col-sm-2" >
 												<div class="form-group">
 													<label for="pcNumSEI" >N°SEI</label>
 													<input id="pcNumSEI"  required name="pcNumSEI" type="text" class="form-control "  data-inputmask="'mask': '99999.999999/9999-99'" data-mask="99999999999999999"  placeholder="N°SEI...">
@@ -168,7 +170,7 @@
 												</div>
 											</div>
 
-											<div  id="pcNumRelatorioDiv" class="col-sm-2" hidden>
+											<div  id="pcNumRelatorioDiv" class="col-sm-2" >
 												<div class="form-group">
 													<label for="pcNumRelatorio">N°Rel. SEI</label>
 													<input  id="pcNumRelatorio" required  name="pcNumRelatorio" type="text" class="form-control "  data-inputmask="'mask': '99999999'" data-mask="99999999" placeholder="N°Relatório SEI...">
@@ -197,9 +199,9 @@
 													
 												</div>
 											</div>
-
-                                            <input hidden  id="pcDataInicioAvaliacaoAnterior"  name="pcDataInicioAvaliacaoAnterior" type="date" class="form-control" placeholder="dd/mm/aaaa" >
-											<div class="col-md-3">
+											
+											<input hidden  id="pcDataInicioAvaliacaoAnterior"  name="pcDataInicioAvaliacaoAnterior" type="date" class="form-control" placeholder="dd/mm/aaaa" >
+											<div class="col-md-2">
 												<div class="form-group">
 													<label for="pcDataInicioAvaliacao">Data Início Avaliação:</label>
 													<div class="input-group date" id="reservationdate" data-target-input="nearest">
@@ -208,7 +210,7 @@
 												</div>
 											</div>
 
-											<div id="pcDataFimAvaliacaoDiv"  class="col-md-3" hidden>
+											<div id="pcDataFimAvaliacaoDiv"  class="col-md-2" >
 												<div class="form-group">
 													<label for="pcDataFimAvaliacao">Data Fim Avaliação:</label>
 													<div class="input-group date" id="reservationdate" data-target-input="nearest">
@@ -235,54 +237,57 @@
 												</div>
 											</div>
 
-											<input hidden  id="pcOrgaoAvaliadoAnterior"  name="pcOrgaoAvaliadoAnterior">
-											<div class="col-sm-3">
-												<div class="form-group">
-													<label for="pcOrgaoAvaliado">Órgão Avaliado:</label>
-													<select id="pcOrgaoAvaliado" required name="pcOrgaoAvaliado" class="form-control">
-														<option selected="" disabled="" value=""></option>
-														<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
-															<cfoutput query="rs_OrgAvaliadoSE_usuario">
-																<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
-															</cfoutput>
-														<cfelse>
-															<cfoutput query="rs_OrgAvaliado">
-																<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
-															</cfoutput>
-														</cfif>
-													</select>
-												</div>
-											</div>
 
-											<div id ="pcTipoClassificacaoDiv" class="col-sm-3" hidden>
-												<div class="form-group">
-													<label for="pcTipoClassificacao">Classificação:</label>
-													<select id="pcTipoClassificacao" required name="pcTipoClassificacao" class="form-control">
-														<option selected="" disabled="" value=""></option>
-														<cfoutput query="rsClas">
-															<option value="#pc_class_id#">#pc_class_descricao#</option>
-														</cfoutput>
-													</select>
+											<div id ="pcTipoClassificacaoDiv" class="col-sm-3">
+													<div class="form-group">
+														<label for="pcTipoClassificacao">Classificação:</label>
+														<select id="pcTipoClassificacao" required name="pcTipoClassificacao" class="form-control">
+															<option selected="" disabled="" value=""></option>
+															<cfoutput query="rsClas">
+																<option value="#pc_class_id#">#pc_class_descricao#</option>
+															</cfoutput>
+														</select>
+													</div>
 												</div>
-											</div>
+
+												<input hidden  id="pcOrgaoAvaliadoAnterior"  name="pcOrgaoAvaliadoAnterior">
+												<div class="col-sm-3">
+													<div class="form-group">
+														<label for="pcOrgaoAvaliado">Órgão Avaliado:</label>
+														<select id="pcOrgaoAvaliado" required name="pcOrgaoAvaliado" class="form-control">
+															<option selected="" disabled="" value=""></option>
+															<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
+																<cfoutput query="rs_OrgAvaliadoSE_usuario">
+																	<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+																</cfoutput>
+															<cfelse>
+																<cfoutput query="rs_OrgAvaliado">
+																	<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+																</cfoutput>
+															</cfif>
+														</select>
+													</div>
+												</div>
 
 											<input id="idTipoAvaliacao" hidden></input>
-											<div class="form-group " style="padding: 0;width: auto;">
+											<div class="form-group col-sm-12" style="width: auto;">
 												<fieldset >
-													<legend>Tipo de Avaliação</legend>
+													<legend>TIPO DE AVALIAÇÃO</legend>
+
+														
 													
 														<div id="dados-container" class="dados-container">
 															<!-- Os selects serão adicionados aqui -->
 														</div>
 
-														<div id="TipoAvalDescricaoDiv" class="form-group " hidden style="margin-top:10px;width:700px">
+														<div id="TipoAvalDescricaoDiv" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
 															<label for="pcTipoAvalDescricao" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Tipo de Avaliação:</label>
 															<div class="input-group date" id="reservationdate" data-target-input="nearest">
 																<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" required class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
 																<span id="pcTipoAvalDescricaoCharCounter" class="badge badge-secondary"></span>
 															</div>
 														</div>
-														<div id="pcProcessoN3Div" class="form-group " hidden style="margin-top:10px;width:700px">
+														<div id="pcProcessoN3Div" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
 															<label for="pcProcessoN3" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo N3:</label>
 															<div class="input-group date" id="reservationdate" data-target-input="nearest">
 																<input id="pcProcessoN3" name="pcProcessoN3" required class="form-control" placeholder="Descreva o PROCESSO N3..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
@@ -293,11 +298,11 @@
 												</fieldset>
 											</div>
 
-											<div class="form-group col-sm-12" style="padding: 0;width: auto;">
+											<div class="form-group col-sm-12" style="width: auto;">
 												<fieldset >
-													<legend >Informações Estratégicas</legend>
+													<legend >INFORMAÇÕES ESTRATÉGICAS</legend>
 													<div class="row" style="display:flex; justify-content: space-between;">
-														<div class="col-sm-4">
+														<div class="col-sm-6">
 															<div class="form-group " >
 																	<label for="pcObjetivoEstrategico">Objetivo Estratégico:</label>
 																	<select id="pcObjetivoEstrategico" required="false" class="form-control" multiple="multiple">
@@ -308,7 +313,7 @@
 															</div>
 														</div>
 
-														<div class="col-sm-8">
+														<div class="col-sm-6">
 															<div class="form-group " >
 																	<label for="pcRiscoEstrategico">Risco Estratégico:</label>
 																	<select id="pcRiscoEstrategico" required="false" class="form-control" multiple="multiple">
@@ -319,31 +324,18 @@
 															</div>
 														</div>
 
-														<div class="col-sm-4">
+														<div class="col-sm-6">
 															<div class="form-group " >
-																	<label for="pcEbitda">Margem EBITDA (MEBITDA):</label>
-																	<select id="pcEbitda" required="false" class="form-control" multiple="multiple">
-																		<cfoutput query="rsMebitda">
-																			<option value="#pc_mebitda_id#">#trim(pc_mebitda_descricao)#</option>
+																	<label for="pcIndEstrategico">Indicador Estratégico:</label>
+																	<select id="pcIndEstrategico" required="false" class="form-control" multiple="multiple">
+																		<cfoutput query="rsIndEstrategico">
+																			<option value="#pc_indEstrategico_id#">#trim(pc_indEstrategico_descricao)#</option>
 																		</cfoutput>
 																	</select>	
 															</div>
 														</div>
 
-														<div class="col-sm-8">
-															<div class="form-group " >
-																<div id="pcIndicadorSetorialDiv" class="form-group " >
-																	<label for="pcIndicadorSetorial" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Indicador Setorial:</label>
-																	<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																		<input id="pcIndicadorSetorial" name="pcIndicadorSetorial" required class="form-control" placeholder="Descreva o Indicador Setorial..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
-																		<span id="pcIndicadorSetorialCharCounter" class="badge badge-secondary"></span>
-																	</div>
-																</div>	
-															</div>
-														</div>
-
-
-
+														
 													</div>
 														
 													
@@ -351,9 +343,9 @@
 											</div>
 
 
-											<div class="form-group col-sm-12" style="padding: 0;">
+											<div class="form-group col-sm-12" style="width: auto;">
 												<fieldset >
-													<legend style="">Equipe</legend>
+													<legend style="">EQUIPE</legend>
 
 													<div class="row">
 														<div class="col-sm-12">
@@ -616,7 +608,7 @@
 
             })//fim fail
 
-			setupCharCounter('pcIndicadorSetorial', 'pcIndicadorSetorialCharCounter', 250);
+		
 
 		});
 
@@ -644,6 +636,7 @@
 			if(selectedText == 'Não se aplica'){
 					$('#pcTipoAvalDescricao').val(null).trigger('change')
 					$('#TipoAvalDescricaoDiv').attr("hidden",false)	
+					$('#pcProcessoN3Div').attr("hidden",true);
 					setupCharCounter('pcTipoAvalDescricao', 'pcTipoAvalDescricaoCharCounter', 250);	
 				}else{
 					$('#pcTipoAvalDescricao').val(null).trigger('change')
@@ -733,11 +726,9 @@
 			$('#cadastro').CardWidget('collapse');
 			$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Processo");
 			$("#btSalvarDiv").attr("hidden",false)
-			$('#pcIndicadorSetorial').val(null);
-			$('#pcIndicadorSetorialCharCounter').attr("hidden",true);
 			$('#pcObjetivoEstrategico').val(null).trigger('change');
 			$('#pcRiscoEstrategico').val(null).trigger('change');
-			$('#pcEbitda').val(null).trigger('change');
+			$('#pcIndEstrategico').val(null).trigger('change');
 
 		}
         
