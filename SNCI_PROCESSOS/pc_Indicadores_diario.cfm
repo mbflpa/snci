@@ -74,8 +74,12 @@
 							<div style="display: flex; align-items: center;">
 								<h4 style="margin-right: 10px;">Indicadores: <strong>Acompanhamento Mês/Ano Corrente</strong></h4>
 							</div>
-							<p style="margin-right: 10px;">Atenção: As informações a seguir são fornecidas apenas para fins de acompanhamento, com o objetivo de auxiliar a gestão na melhoria dos indicadores. O resultado final do mês deve ser verificado em Consultas - Indicadores - Resultado Mensal, disponibilizado até o quinto dia útil do mês subsequente.</p>
-
+							<h6>Observações:</h6>
+                            <ul >
+                                <li>As informações a seguir são fornecidas apenas para fins de acompanhamento, com o objetivo de auxiliar a gestão na melhoria dos indicadores. O resultado final do mês deve ser verificado em Consultas - Indicadores - Resultado Mensal, disponibilizado até o quinto dia útil do mês subsequente;</li>
+                                <li style="color:#dc3545">No momento, os resultados do indicador DGCI - Processos, demonstrados neste módulo, não são considerados no resultado do DGCI - Unidades, que consta no Plano de Trabalho das SE.</li>
+                            </ul>
+							
 							<cfset mes = month(now())>
 							<cfset mes = monthAsString(mes)>
 							<cfset ano = year(now())>

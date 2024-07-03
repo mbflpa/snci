@@ -69,6 +69,11 @@
                                 <li>Corrigida a visualização no menu do link da página atualmente aberta;</li>
                                 <li>Corrigida a visualização de tabelas em telas menores.</li>
                             </ul>
+
+                            <h5 style="color:#dc3545">Observação:</h5>
+                            <ul style="color:#dc3545">
+                                <li>No momento, os resultados do indicador DGCI - Processos, demonstrados neste módulo, não são considerados no resultado do DGCI - Unidades, que consta no Plano de Trabalho das SE.</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
