@@ -76,7 +76,11 @@
 						<div style="display: flex; align-items: center;">
 							<h4 style="margin-right: 10px;">Indicadores: <strong>Resultado Mensal</strong></h4>
 						</div>
+						<div style="display: flex; align-items: center;">
+							<h6 style="color:#dc3545">Observação: No momento, os resultados do indicador DGCI - Processos, demonstrados neste módulo, não são considerados no resultado do DGCI - Unidades, que consta no Plano de Trabalho das SE.</h6>
+						</div>
 					</div>
+					
 				</div>
 			</div><!-- /.container-fluid -->
 		</section>
