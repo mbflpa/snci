@@ -2850,7 +2850,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 							</div>
 							<span id="dataPrevistaCalculada" style='font-size:11px;color:blue'></span>
 						</div>
-						<div id ="pcNumProcJudicialDiv" class="col-md-2" hidden>
+						<div id ="pcNumProcJudicialDiv" class="col-md-3" hidden>
 							<div class="form-group">
 								<label for="pcNumProcJudicial">N° Processo Judicial:</label>
 								<input id="pcNumProcJudicial"  name="pcNumProcJudicial" required="" class="form-control" style="height:35px">
@@ -2998,7 +2998,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						$("#pcOrgaoRespAcompDiv").attr("hidden",true)
 						$("#pcDataPrevRespAcomp").val(null)	
 						$("#pcNumProcJudicial").val(numProcJudicial)
-						$("#pcPosicAcomp").prop("disabled", true);
+						//$("#pcPosicAcomp").prop("disabled", true);
 					}else if ($('#pcOrientacaoStatus').val() == 16){
 						$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
 						$("#pcDataPrevRespAcompDiv").attr("hidden",false)
@@ -3139,8 +3139,8 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					$("#pcDataPrevRespAcompDiv").attr("hidden",true)
 					$("#pcOrgaoRespAcompDiv").attr("hidden",true)
 					$("#pcDataPrevRespAcomp").val(null)	
-					$("#pcPosicAcomp").val('Orientação baixada para efeitos de acompanhamento no Sistema SNCI – Módulo Acompanhamento de Processos, tendo em vista a existência de Processo Judicial relacionado ao tema.')
-					$("#pcPosicAcomp").prop("disabled", true);
+					$("#pcPosicAcomp").val('Orientação baixada para efeitos de acompanhamento no Sistema SNCI – Módulo Acompanhamento de Processos, tendo em vista a existência de Processo Judicial relacionado ao tema. Caso sejam identificados mais de um processo judicial relacionado ao tema, registrar os números nesta manifestação e indicar no campo "N° Processo Judicial" a mensagem: "Diversos (números registrados na manifestação)".')
+					//$("#pcPosicAcomp").prop("disabled", true);
 												
 				}else if ($('#pcOrientacaoStatus').val() == 16){
 					$("#pcOrgaoRespAcompDiv").attr("hidden",false)	
