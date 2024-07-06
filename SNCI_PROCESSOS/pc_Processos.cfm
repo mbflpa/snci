@@ -80,6 +80,9 @@
    
 	<!-- iCheck -->
 	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+
+
+
      <style>
 
 		fieldset{
@@ -89,8 +92,8 @@
 			margin-bottom: 10px!important;
 			background: none!important;
 			-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
--moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+			-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+			box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 		}
 
 		legend {
@@ -102,6 +105,23 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 			padding: 5px!important;
 			width: auto!important;
 		}
+
+/* Evita que campos de datas e textos tenham o ícone verde */
+.form-control[type="text"].is-valid {
+    background-image: none !important;
+    background-position:0 !important;
+    background-size: 0 !important;
+	padding-right:0 !important;
+}	
+
+/* Evita que campos de datas tenham o ícone verde */
+.form-control[type="date"].is-valid {
+    background-image: none !important;
+    background-position:0 !important;
+    background-size: 0 !important;
+	padding-right:0.75rem !important;
+}
+ 
 		
 	 </style>
 	
@@ -122,308 +142,412 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 			
 				<div class="container-fluid">
 							
-					<div class="card-body" style="display:flex;flex-direction:column">
+					<div class="card-body" style="display:flex;flex-direction:column;">
 
-						<form  class="row g-3" id="myForm" name="myForm" format="html"  style="height: auto;">
-							
-
-							<!--acordion-->
-							<div id="accordion" >
-								<div id="cadastro" class="card card-primary collapsed-card" style="margin-left:8px">
-									<div  class="card-header" style="background-color: #0083ca;color:#fff;">
-										<a   class="d-block" data-toggle="collapse" href="#collapseOne"  data-card-widget="collapse">
-											<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-											</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um novo Processo</span>
-										</a>
-										
-									</div>
+						<!--acordion-->
+						<div id="accordion ">
+					
+							<div id="cadastro" class="card card-primary collapsed-card " style="margin-left:8px;">
+								<div  class="card-header" style="background-color: #0083ca;color:#fff;">
+									<a   class="d-block" data-toggle="collapse" href="#collapseOne"  data-card-widget="collapse">
+										<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
+										</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um novo Processo</span>
+									</a>
 									
-									<input id="pcProcessoId" hidden>
+								</div>
+								
+								<input id="pcProcessoId" hidden>
 
-									<div class="card-body" style="border: solid 3px #0083ca">
-										<div class="row" >
+								<div class="card-body" style="border: solid 3px #0083ca;" >
+									<div class="card card-default">
+										<div class="card-body p-0">
+											<div class="bs-stepper" >
+												<div class="bs-stepper-header" role="tablist" >
+													<!-- your steps here -->
+													<div class="step" data-target="#infoInicial">
+														<button type="button" class="step-trigger" role="tab" aria-controls="infoInicial" id="infoInicial-trigger">
+															<span class="bs-stepper-circle">1</span>
+															<span class="bs-stepper-label">Informações Iniciais</span>
+														</button>
+													</div>
 
-											<div class="col-sm-3">
-												<div class="form-group">
-													<label for="pcModalidade">Modalidade:</label>
-													<select id="pcModalidade" required name="pcModalidade" class="form-control">
-														<option selected="" disabled="" value=""></option>
-														<!--Se a gerência do usuário for GINS-->
-                                                        <cfif '#application.rsUsuarioParametros.pc_usu_lotacao#' eq '00437407' or '#application.rsUsuarioParametros.pc_usu_perfil#' eq 7>
-															<option value="E">ENTREGA DO RELATÓRIO</option>
-														<cfelse>
-															<option value="A">ACOMPANHAMENTO</option>
-															<option value="E">ENTREGA DO RELATÓRIO</option>
-														</cfif>
+													<div class="line"></div>
+
+													<div class="step" data-target="#tipoAvaliacao">
+														<button type="button" class="step-trigger" role="tab" aria-controls="tipoAvaliacao" id="tipoAvaliacao-trigger">
+															<span class="bs-stepper-circle">2</span>
+															<span class="bs-stepper-label">Tipo de avaliação</span>
+														</button>
+													</div>
+
+													<div class="line"></div>
+
+													<div class="step" data-target="#infoEstrategicas">
+														<button type="button" class="step-trigger" role="tab" aria-controls="infoEstrategicas" id="infoEstrategicas-trigger">
+															<span class="bs-stepper-circle">3</span>
+															<span class="bs-stepper-label">Informações Estratégicas</span>
+														</button>
+													</div>
+
+													<div class="line"></div>
+													
+													<div class="step" data-target="#equipe">
+														<button type="button" class="step-trigger" role="tab" aria-controls="equipe" id="equipe-trigger">
+															<span class="bs-stepper-circle">4</span>
+															<span class="bs-stepper-label">Equipe</span>
+														</button>
+													</div>
+
+													<div class="line"></div>
+													
+													<div class="step" data-target="#Finalizar">
+														<button type="button" class="step-trigger" role="tab" aria-controls="Finalizar" id="Finalizar-trigger">
+															<span class="bs-stepper-circle">4</span>
+															<span class="bs-stepper-label">Finalizar</span>
+														</button>
+													</div>
+
+
+												</div>
+
+
+												<div class="bs-stepper-content " >
+													<!-- your steps content here -->
+													<form   id="formInfoInicial" name="formInfoInicial" format="html"  style="height: auto;">
+														<div id="infoInicial" class="content " role="tabpanel" aria-labelledby="infoInicial-trigger" >
+															<div class="card-body" style="border: solid 1px #0083ca">
+																<div class="row" >
+																	<div class="col-sm-3">
+																		<div class="form-group">
+																			<label for="pcModalidade">Modalidade:</label>
+																			<select id="pcModalidade" required name="pcModalidade" class="form-control">
+																				<option selected="" disabled="" value=""></option>
+																				<!--Se a gerência do usuário for GINS-->
+																				<cfif '#application.rsUsuarioParametros.pc_usu_lotacao#' eq '00437407' or '#application.rsUsuarioParametros.pc_usu_perfil#' eq 7>
+																					<option value="E">ENTREGA DO RELATÓRIO</option>
+																				<cfelse>
+																					<option value="A">ACOMPANHAMENTO</option>
+																					<option value="E">ENTREGA DO RELATÓRIO</option>
+																				</cfif>
+																					
+
+																				<!--<option value="N">NORMAL</option>-->
+																			</select>
+																		</div>
+																	</div>
+
+																	<div id="pcNumSEIDiv"  class="col-sm-2" >
+																		<div class="form-group">
+																			<label for="pcNumSEI" >N°SEI</label>
+																			<input id="pcNumSEI"  name="pcNumSEI" type="text" class="form-control "  data-inputmask="'mask': '99999.999999/9999-99'" data-mask="99999999999999999"  placeholder="N°SEI...">
+																			
+																		</div>
+																	</div>
+
+																	<div  id="pcNumRelatorioDiv" class="col-sm-2" >
+																		<div class="form-group">
+																			<label for="pcNumRelatorio">N°Rel. SEI</label>
+																			<input  id="pcNumRelatorio" required  name="pcNumRelatorio" type="text" class="form-control "  data-inputmask="'mask': '99999999'" data-mask="99999999" placeholder="N°Relatório SEI...">
+																		</div>
+																	</div>
+																	
+																	<div class="col-sm-5">
+																		<div class="form-group">
+																			<label for="pcOrigem">Origem:</label>
+																	
+																			<select id="pcOrigem" required  name="pcOrigem" class="form-control" >
+																				<option selected="" disabled="" value=""></option>
+
+																				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 8>
+																					<cfoutput><option selected value="#application.rsUsuarioParametros.pc_org_mcu#"> #application.rsUsuarioParametros.pc_org_sigla#</option></cfoutput>
+																				<cfelseif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
+																					<cfoutput query="rsOrigemGCOP_GCIA_GACE">
+																						<option value="#rsOrigemGCOP_GCIA_GACE.pc_org_mcu#">#rsOrigemGCOP_GCIA_GACE.pc_org_sigla#</option>
+																					</cfoutput>
+																				<cfelse>
+																					<cfoutput query="rsOrigem" >
+																						<option value="#rsOrigem.pc_org_mcu#">#rsOrigem.pc_org_sigla#</option>
+																					</cfoutput>
+																				</cfif>
+																			</select>
+																			
+																		</div>
+																	</div>
+																	
+																	<input hidden  id="pcDataInicioAvaliacaoAnterior"  name="pcDataInicioAvaliacaoAnterior" type="date" class="form-control" placeholder="dd/mm/aaaa" >
+																	<div class="col-md-2">
+																		<div class="form-group">
+																			<label for="pcDataInicioAvaliacao">Data Início Avaliação:</label>
+																			<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																				<input  id="pcDataInicioAvaliacao"  name="pcDataInicioAvaliacao" required  type="date" class="form-control" placeholder="dd/mm/aaaa" >
+																			</div>
+																		</div>
+																	</div>
+
+																	<div id="pcDataFimAvaliacaoDiv"  class="col-md-2" >
+																		<div class="form-group">
+																			<label for="pcDataFimAvaliacao">Data Fim Avaliação:</label>
+																			<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																				<input  id="pcDataFimAvaliacao" min="" name="pcDataFimAvaliacao" required  type="date" class="form-control" placeholder="dd/mm/aaaa" >
+																			</div>
+																		</div>
+																	</div>
+
+																	<div class="col-sm-2">
+																		<div class="form-group">
+																			<label for="pcTipoDemanda" >Tipo de Demanda:</label>
+																			<select id="pcTipoDemanda" required  name="pcTipoDemanda" class="form-control" >
+																				<option selected="" disabled="" value="">Selecione o tipo de demanda...</option>
+																				<option value="P">PLANEJADA</option>
+																				<option value="E">EXTRAORDINÁRIA</option>				
+																			</select>
+																		</div>
+																	</div>
+
+																	<div id="pcAnoPacinDiv"  class="col-sm-2" hidden>
+																		<div class="form-group">
+																			<label for="pcAnoPacin">Ano PACIN:</label>
+																			<select id="pcAnoPacin" required name="pcAnoPacin" class="form-control" style="font-size: 14px!important"></select>															
+																		</div>
+																	</div>
+
+
+																	<div id ="pcTipoClassificacaoDiv" class="col-sm-3">
+																		<div class="form-group">
+																			<label for="pcTipoClassificacao">Classificação:</label>
+																			<select id="pcTipoClassificacao" required name="pcTipoClassificacao" class="form-control">
+																				<option selected="" disabled="" value=""></option>
+																				<cfoutput query="rsClas">
+																					<option value="#pc_class_id#">#pc_class_descricao#</option>
+																				</cfoutput>
+																			</select>
+																		</div>
+																	</div>
+
+																	<input hidden  id="pcOrgaoAvaliadoAnterior"  name="pcOrgaoAvaliadoAnterior">
+																	<div class="col-sm-3">
+																		<div class="form-group">
+																			<label for="pcOrgaoAvaliado">Órgão Avaliado:</label>
+																			<select id="pcOrgaoAvaliado" required name="pcOrgaoAvaliado" class="form-control">
+																				<option selected="" disabled="" value=""></option>
+																				<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
+																					<cfoutput query="rs_OrgAvaliadoSE_usuario">
+																						<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+																					</cfoutput>
+																				<cfelse>
+																					<cfoutput query="rs_OrgAvaliado">
+																						<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
+																					</cfoutput>
+																				</cfif>
+																			</select>
+																		</div>
+																	</div>
+																	
+																	
+																	<div id="pcBloquearDiv" class="col-sm-2" hidden>
+																		<div class="form-group">
+																			<label for="pcBloquear" >Bloquear Processo:</label>
+																			<select id="pcBloquear" required=""  name="pcBloquear" class="form-control" >
+																				<option selected="" disabled="" value="">Selecione...</option>
+																				<option value="N">NÃO</option>
+																				<option value="S">SIM</option>				
+																			</select>
+																		</div>
+																	</div>
+																	
+																</div>
+															</div>
+															<div style="margin-top:10px;display:flex;justify-content:space-between">
+																<button class="btn btn-primary" onclick="inicializarValidacaoStep1();" >Próximo</button>
+																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+															</div>
+														</div>
+													</form>
+													<form   id="formTipoAvaliacao" name="formTipoAvaliacao" format="html"  style="height: auto;">
+														<div id="tipoAvaliacao" class="content " role="tabpanel" aria-labelledby="tipoAvaliacao-trigger" >
+															<div class="card-body " style="border: solid 1px #0083ca">
+																<div class="row " >
+																	<input id="idTipoAvaliacao" hidden></input>
+																	<div class="form-group col-sm-12">
+																				<div id="dados-container" class="dados-container">
+																					<!-- Os selects serão adicionados aqui -->
+																				</div>
+
+																				<div id="TipoAvalDescricaoDiv" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
+																					<label for="pcTipoAvalDescricao" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Tipo de Avaliação:</label>
+																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																						<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" required class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
+																						<span id="pcTipoAvalDescricaoCharCounter" class="badge badge-secondary"></span>
+																					</div>
+																				</div>
+																				<div id="pcProcessoN3Div" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
+																					<label for="pcProcessoN3" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo N3:</label>
+																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																						<input id="pcProcessoN3" name="pcProcessoN3" required class="form-control" placeholder="Descreva o PROCESSO N3..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
+																						<span id="pcProcessoN3CharCounter" class="badge badge-secondary"></span>
+																					</div>
+																				</div>
+																			
+																	
+																	</div>
+																</div>
+															</div>
+															<div style="margin-top:10px;display:flex;justify-content:space-between">
+																<div>	
+																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																	<button class="btn btn-primary" onclick="inicializarValidacaoStep2()">Próximo</button>
+																</div>
+
+																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+															</div>
 															
-
-													    <!--<option value="N">NORMAL</option>-->
-													</select>
-												</div>
-											</div>
-
-											<div id="pcNumSEIDiv"  class="col-sm-2" >
-												<div class="form-group">
-													<label for="pcNumSEI" >N°SEI</label>
-													<input id="pcNumSEI"  required name="pcNumSEI" type="text" class="form-control "  data-inputmask="'mask': '99999.999999/9999-99'" data-mask="99999999999999999"  placeholder="N°SEI...">
+														</div>
+													</form>
 													
-												</div>
-											</div>
+													<div id="infoEstrategicas" class="content" role="tabpanel" aria-labelledby="infoEstrategicas-trigger">
+														<div class="card-body" style="border: solid 1px #0083ca">
+															<div class="row" style="display:flex; justify-content: space-between;">
+																<div class="col-sm-6">
+																	<div class="form-group " >
+																			<label for="pcObjetivoEstrategico">Objetivo Estratégico:</label>
+																			<select id="pcObjetivoEstrategico" name="pcObjetivoEstrategico"  class="form-control" multiple="multiple">
+																				<cfoutput query="rsObjetivoEstrategico">
+																					<option value="#pc_objEstrategico_id#">#trim(pc_objEstrategico_descricao)#</option>
+																				</cfoutput>
+																			</select>	
+																	</div>
+																</div>
 
-											<div  id="pcNumRelatorioDiv" class="col-sm-2" >
-												<div class="form-group">
-													<label for="pcNumRelatorio">N°Rel. SEI</label>
-													<input  id="pcNumRelatorio" required  name="pcNumRelatorio" type="text" class="form-control "  data-inputmask="'mask': '99999999'" data-mask="99999999" placeholder="N°Relatório SEI...">
-												</div>
-											</div>
-											
-											<div class="col-sm-5">
-												<div class="form-group">
-													<label for="pcOrigem">Origem:</label>
-											
-													<select id="pcOrigem" required  name="pcOrigem" class="form-control" >
-														<option selected="" disabled="" value=""></option>
+																<div class="col-sm-6">
+																	<div class="form-group " >
+																			<label for="pcRiscoEstrategico">Risco Estratégico:</label>
+																			<select id="pcRiscoEstrategico" name="pcRiscoEstrategico" class="form-control" multiple="multiple">
+																				<cfoutput query="rsRiscoEstrategico">
+																					<option value="#pc_riscoEstrategico_id#">#trim(pc_riscoEstrategico_descricao)#</option>
+																				</cfoutput>
+																			</select>	
+																	</div>
+																</div>
 
-														<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 8>
-															<cfoutput><option selected value="#application.rsUsuarioParametros.pc_org_mcu#"> #application.rsUsuarioParametros.pc_org_sigla#</option></cfoutput>
-														<cfelseif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
-														    <cfoutput query="rsOrigemGCOP_GCIA_GACE">
-																<option value="#rsOrigemGCOP_GCIA_GACE.pc_org_mcu#">#rsOrigemGCOP_GCIA_GACE.pc_org_sigla#</option>
-															</cfoutput>
-														<cfelse>
-															<cfoutput query="rsOrigem" >
-																<option value="#rsOrigem.pc_org_mcu#">#rsOrigem.pc_org_sigla#</option>
-															</cfoutput>
-														</cfif>
-													</select>
-													
-												</div>
-											</div>
-											
-											<input hidden  id="pcDataInicioAvaliacaoAnterior"  name="pcDataInicioAvaliacaoAnterior" type="date" class="form-control" placeholder="dd/mm/aaaa" >
-											<div class="col-md-2">
-												<div class="form-group">
-													<label for="pcDataInicioAvaliacao">Data Início Avaliação:</label>
-													<div class="input-group date" id="reservationdate" data-target-input="nearest">
-														<input  id="pcDataInicioAvaliacao"  name="pcDataInicioAvaliacao" required  type="date" class="form-control" placeholder="dd/mm/aaaa" >
-													</div>
-												</div>
-											</div>
-
-											<div id="pcDataFimAvaliacaoDiv"  class="col-md-2" >
-												<div class="form-group">
-													<label for="pcDataFimAvaliacao">Data Fim Avaliação:</label>
-													<div class="input-group date" id="reservationdate" data-target-input="nearest">
-														<input  id="pcDataFimAvaliacao" min="" name="pcDataFimAvaliacao" required  type="date" class="form-control" placeholder="dd/mm/aaaa" >
-													</div>
-												</div>
-											</div>
-
-											<div class="col-sm-2">
-												<div class="form-group">
-													<label for="pcTipoDemanda" >Tipo de Demanda:</label>
-													<select id="pcTipoDemanda" required=""  name="pcTipoDemanda" class="form-control" >
-														<option selected="" disabled="" value="">Selecione o tipo de demanda...</option>
-														<option value="P">PLANEJADA</option>
-														<option value="E">EXTRAORDINÁRIA</option>				
-													</select>
-												</div>
-											</div>
-
-											<div id="pcAnoPacinDiv"  class="col-sm-2" hidden>
-												<div class="form-group">
-													<label for="pcAnoPacin">Ano PACIN:</label>
-													<select id="pcAnoPacin" required name="pcAnoPacin" class="form-control" style="font-size: 14px!important"></select>															
-												</div>
-											</div>
-
-
-											<div id ="pcTipoClassificacaoDiv" class="col-sm-3">
-													<div class="form-group">
-														<label for="pcTipoClassificacao">Classificação:</label>
-														<select id="pcTipoClassificacao" required name="pcTipoClassificacao" class="form-control">
-															<option selected="" disabled="" value=""></option>
-															<cfoutput query="rsClas">
-																<option value="#pc_class_id#">#pc_class_descricao#</option>
-															</cfoutput>
-														</select>
-													</div>
-												</div>
-
-												<input hidden  id="pcOrgaoAvaliadoAnterior"  name="pcOrgaoAvaliadoAnterior">
-												<div class="col-sm-3">
-													<div class="form-group">
-														<label for="pcOrgaoAvaliado">Órgão Avaliado:</label>
-														<select id="pcOrgaoAvaliado" required name="pcOrgaoAvaliado" class="form-control">
-															<option selected="" disabled="" value=""></option>
-															<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
-																<cfoutput query="rs_OrgAvaliadoSE_usuario">
-																	<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
-																</cfoutput>
-															<cfelse>
-																<cfoutput query="rs_OrgAvaliado">
-																	<option value="#pc_org_mcu#">#pc_org_sigla# (#pc_org_mcu#)</option>
-																</cfoutput>
-															</cfif>
-														</select>
-													</div>
-												</div>
-
-											<input id="idTipoAvaliacao" hidden></input>
-											<div class="form-group col-sm-12" style="width: auto;">
-												<fieldset >
-													<legend>TIPO DE AVALIAÇÃO</legend>
-
-														
-													
-														<div id="dados-container" class="dados-container">
-															<!-- Os selects serão adicionados aqui -->
-														</div>
-
-														<div id="TipoAvalDescricaoDiv" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
-															<label for="pcTipoAvalDescricao" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Tipo de Avaliação:</label>
-															<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" required class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
-																<span id="pcTipoAvalDescricaoCharCounter" class="badge badge-secondary"></span>
+																<div class="col-sm-6">
+																	<div class="form-group " >
+																			<label for="pcIndEstrategico">Indicador Estratégico:</label>
+																			<select id="pcIndEstrategico" name="pcIndEstrategico" class="form-control" multiple="multiple">
+																				<cfoutput query="rsIndEstrategico">
+																					<option value="#pc_indEstrategico_id#">#trim(pc_indEstrategico_descricao)#</option>
+																				</cfoutput>
+																			</select>	
+																	</div>
+																</div>
 															</div>
 														</div>
-														<div id="pcProcessoN3Div" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
-															<label for="pcProcessoN3" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo N3:</label>
-															<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																<input id="pcProcessoN3" name="pcProcessoN3" required class="form-control" placeholder="Descreva o PROCESSO N3..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
-																<span id="pcProcessoN3CharCounter" class="badge badge-secondary"></span>
+														<div style="margin-top:10px;display:flex;justify-content:space-between">
+															<div>	
+																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																<button class="btn btn-primary" onclick="stepper.next()">Próximo</button>
 															</div>
+															<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
 														</div>
-													
-												</fieldset>
-											</div>
-
-											<div class="form-group col-sm-12" style="width: auto;">
-												<fieldset >
-													<legend >INFORMAÇÕES ESTRATÉGICAS</legend>
-													<div class="row" style="display:flex; justify-content: space-between;">
-														<div class="col-sm-6">
-															<div class="form-group " >
-																	<label for="pcObjetivoEstrategico">Objetivo Estratégico:</label>
-																	<select id="pcObjetivoEstrategico" name="pcObjetivoEstrategico"  class="form-control" multiple="multiple">
-																		<cfoutput query="rsObjetivoEstrategico">
-																			<option value="#pc_objEstrategico_id#">#trim(pc_objEstrategico_descricao)#</option>
-																		</cfoutput>
-																	</select>	
-															</div>
-														</div>
-
-														<div class="col-sm-6">
-															<div class="form-group " >
-																	<label for="pcRiscoEstrategico">Risco Estratégico:</label>
-																	<select id="pcRiscoEstrategico" name="pcRiscoEstrategico" class="form-control" multiple="multiple">
-																		<cfoutput query="rsRiscoEstrategico">
-																			<option value="#pc_riscoEstrategico_id#">#trim(pc_riscoEstrategico_descricao)#</option>
-																		</cfoutput>
-																	</select>	
-															</div>
-														</div>
-
-														<div class="col-sm-6">
-															<div class="form-group " >
-																	<label for="pcIndEstrategico">Indicador Estratégico:</label>
-																	<select id="pcIndEstrategico" name="pcIndEstrategico" class="form-control" multiple="multiple">
-																		<cfoutput query="rsIndEstrategico">
-																			<option value="#pc_indEstrategico_id#">#trim(pc_indEstrategico_descricao)#</option>
-																		</cfoutput>
-																	</select>	
-															</div>
-														</div>
-
 														
 													</div>
-														
-													
-												</fieldset>
-											</div>
 
+													<div id="equipe" class="content" role="tabpanel" aria-labelledby="equipe-trigger">
+														<div class="card-body" style="border: solid 1px #0083ca">
+															<div class="row">
+																<div class="col-sm-12">
+																	<div class="form-group " >
+																			<label for="pcAvaliadores">Avaliadores:</label>
+																			<select id="pcAvaliadores" name="pcAvaliadores" class="form-control" multiple="multiple">
+																				<cfoutput query="rsAvaliadores">
+																					<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
+																				</cfoutput>
+																			</select>	
+																	</div>
+																</div>
 
-											<div class="form-group col-sm-12" style="width: auto;">
-												<fieldset >
-													<legend style="">EQUIPE</legend>
+																<div id="pcCoordenadorDiv" class="col-sm-4">
+																	<div class="form-group">
+																		<label style="" for="pcCoordenado">Coordenador Regional:</label>
+																		<select id="pcCoordenador" required name="pcCoordenador" class="form-control">
+																			<option selected="" disabled="" value=""></option>
+																			<option value="0">Sem Coord. Regional</option>
+																			<cfoutput query="rsAvaliadores">
+																				<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
+																			</cfoutput>
+																		</select>
+																	</div>
+																</div>
 
-													<div class="row">
-														<div class="col-sm-12">
-															<div class="form-group " >
-																	<label for="pcAvaliadores">Avaliadores:</label>
-																	<select id="pcAvaliadores" name="pcAvaliadores" class="form-control" multiple="multiple">
-																		<cfoutput query="rsAvaliadores">
-																			<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
-																		</cfoutput>
-																	</select>	
+																<div class="col-sm-4">
+																	<div class="form-group">
+																		<label style="" for="pcCoordNacional">Coordenador Nacional:</label>
+																		<select id="pcCoordNacional" required name="pcCoordNacional" class="form-control">
+																			<option selected="" disabled="" value=""></option>
+																			<option value="0">Sem Coord. Nacional</option>
+																			<cfoutput query="rsAvaliadores">
+																				<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
+																			</cfoutput>
+																		</select>
+																	</div>
+																</div>
 															</div>
 														</div>
-
-														<div id="pcCoordenadorDiv" class="col-sm-4">
-															<div class="form-group">
-																<label style="" for="pcCoordenado">Coordenador Regional:</label>
-																<select id="pcCoordenador" required name="pcCoordenador" class="form-control">
-																	<option selected="" disabled="" value=""></option>
-																	<option value="0">Sem Coord. Regional</option>
-																	<cfoutput query="rsAvaliadores">
-																		<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
-																	</cfoutput>
-																</select>
+														<div style="margin-top:10px;display:flex;justify-content:space-between">
+															<div>	
+																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																<button class="btn btn-primary" onclick="stepper.next()">Próximo</button>
 															</div>
+															<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
 														</div>
 
-														<div class="col-sm-4">
-															<div class="form-group">
-																<label style="" for="pcCoordNacional">Coordenador Nacional:</label>
-																<select id="pcCoordNacional" required name="pcCoordNacional" class="form-control">
-																	<option selected="" disabled="" value=""></option>
-																	<option value="0">Sem Coord. Nacional</option>
-																	<cfoutput query="rsAvaliadores">
-																		<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
-																	</cfoutput>
-																</select>
-															</div>
-														</div>
+
 													</div>
 
-												</fieldset>
-											</div>
-       
+													<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="Finalizar-trigger">
+														<div class="form-card">
+															<h3 class="fs-title text-center">Todas as Informações foram validadas com sucesso!</h3>
+															<br>
+															<div class="row justify-content-center">
+																
+																<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:100px"></i>
+																
+															</div>
+															<br>
+															<div class="row justify-content-center">
+																<div class="col-7 text-center">
+																	<h5>Clique no botão "Salvar" para cadastrar este processo.</h5>
+																</div>
+															</div>
+														</div>
 
-											<div id="pcBloquearDiv" class="col-sm-2" hidden>
-												<div class="form-group">
-													<label for="pcBloquear" >Bloquear Processo:</label>
-													<select id="pcBloquear" required=""  name="pcBloquear" class="form-control" >
-														<option selected="" disabled="" value="">Selecione...</option>
-														<option value="N">NÃO</option>
-														<option value="S">SIM</option>				
-													</select>
+														<div style="margin-top:10px;display:flex;justify-content:space-between">
+															<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+															<button id="btSalvar" class="btn  btn-success " >Salvar</button>
+															<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+														</div>
+
+													</div>
+
+
+
+
+													
+																	
 												</div>
 											</div>
+										
+										</div>
+										<!-- /.card -->
+									</div>
+								</div><!--fim card-body -->
+								<!--fim collapseOne -->
+							</div><!--fim card card-primary -->
 
+						</div><!--fim acordion -->
+							
+					</div>	<!-- fim card-body -->
 
-											<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
-												<div id="btSalvarDiv" >
-													<button id="btSalvar" class="btn btn-block btn-primary " >Salvar</button>
-												</div>
-												<div style="margin-left:100px">	
-													<button id="btCancelar"  class="btn btn-block btn-danger " >Cancelar</button>
-												</div>
-												
-											</div>
-										</div> <!-- fim row -->
-									</div><!--fim card-body -->
-									<!--fim collapseOne -->
-								</div><!--fim card card-primary -->
-
-							</div><!--fim acordion -->
-						</form><!-- fim myForm -->
-
-						<!--<button id="btTesteJson" class="btn btn-block btn-primary " >teste json </button>
-						<div id="testeJson"></div>-->
-
-
-
+					<div class="card-body" style="display:flex;flex-direction:column;">
 						<div style="justify-content:right;  width: 100%;">
 							<div style="margin-right: 30px;float:right">
 								<i id="btExibirTab" class=" fas fa-th" style="font-size:40px;color: #2581c8;cursor:pointer" title ="Exibir Tabela"></i>
@@ -459,13 +583,20 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 
 
 	<script language="JavaScript">
+
+
+		// BS-Stepper Init
+		document.addEventListener('DOMContentLoaded', function () {
+			window.stepper = new Stepper(document.querySelector('.bs-stepper'))
+		})
 		//Initialize Select2 Elements
 		$('select').select2({
 			theme: 'bootstrap4',
 			placeholder: 'Selecione...'
 		});
-		function inicializarValidacao() {	
-			//INÍCIO DA VALIDAÇÃO DO myForm
+		
+		function inicializarValidacao2() {	
+			//INÍCIO DA VALIDAÇÃO DO formInfoInicial
 			// Adicionar classe 'is-invalid' a todos os campos
 			var currentDate = new Date();
 			var maxDate = new Date(currentDate.getFullYear() + 1, 11, 31);
@@ -481,10 +612,7 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 				return date >= startDate && date <= maxDate;
 			}, "Data fora do intervalo permitido");
 
-			$.validator.addMethod("validSeiLength", function(value, element) {
-				var pcModalidade = $('#pcModalidade').val();
-				return !(pcModalidade == 'A' || pcModalidade == 'E') || value.length == 17;
-			}, "O N° SEI deve ter 17 caracteres.");
+			
 
 			$.validator.addMethod("validRelatorioLength", function(value, element) {
 				var pcModalidade = $('#pcModalidade').val();
@@ -498,13 +626,13 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 
 			$.validator.addMethod("requiredIfType445", function(value, element) {
 				return $('#pcTipoAvaliado').val() != 445 || value !== "";
-			}, "Campo obrigatório se o tipo avaliado for 445.");
+			}, "Campo obrigatório se o tipo avaliado for Outros.");
 
 			$.validator.addMethod("requiredIfSelectDinamicoZero", function(value, element) {
 				return $('#selectDinamicoPROCESSO_N3').val() != 0 || value !== "";
 			}, "Campo obrigatório se o valor do select dinâmico for 0.");
 
-			$('#myForm').validate({
+			$('#myform').validate({
 				errorPlacement: function(error, element) {
 					error.appendTo(element.closest('.form-group'));
 					$(element).removeClass('is-valid').addClass('is-invalid');
@@ -512,8 +640,7 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 				rules: {
 					pcNumSEI: {
 						required: true,
-						pattern: /^\d{5}\.\d{6}\/\d{4}-\d{2}$/,
-						validSeiLength: true
+						pattern: /^\d{5}\.\d{6}\/\d{4}-\d{2}$/					
 					},
 					pcNumRelatorio: {
 						required: true,
@@ -646,7 +773,7 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 						requiredForModalidadeAorE: '<span style="color:red;font-size:10px">Campo obrigatório para a modalidade A ou E.</span>'
 					},
 					pcBloquear: {
-						required: '<span style="color:red;font-size:10px">O campo Bloquear é obrigatório para a modalidade E.</span>'
+						required: '<span style="color:red;font-size:10px">O campo Bloquear Processo é obrigatório para a modalidade Entrega de Relatório.</span>'
 					},
 					pcObjetivoEstrategico: {
 						atLeastOneSelected: '<span style="color:red;font-size:10px">O campo Objetivo Estratégico é obrigatório.</span>'
@@ -655,7 +782,7 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 						atLeastOneSelected: '<span style="color:red;font-size:10px">O campo Risco Estratégico é obrigatório.</span>'
 					},
 					pcIndEstrategico: {
-						atLeastOneSelected: '<span style="color:red;font-size:10px">O campo Índice Estratégico é obrigatório.</span>'
+						atLeastOneSelected: '<span style="color:red;font-size:10px">O campo Indicador Estratégico é obrigatório.</span>'
 					}
 				},
 				errorClass: 'is-invalid',
@@ -666,8 +793,8 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 					$(element).removeClass(errorClass);
 				},
 				submitHandler: function(form) {
-					toastr.success('Todos os campos foram preenchidos corretamente!');
-					form.submit();
+					//toastr.success('Todos os campos foram preenchidos corretamente!');
+					//form.submit();
 				},
 				invalidHandler: function(event, validator) {
 					toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
@@ -684,26 +811,292 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 				});
 			});
 		}
+		function inicializarValidacaoStep1() {	
+			//INÍCIO DA VALIDAÇÃO DO formInfoInicial
+			// Adicionar classe 'is-invalid' a todos os campos
+			var currentDate = new Date();
+			var maxDate = new Date(currentDate.getFullYear() + 1, 11, 31);
+
+			// Adiciona o método de validação personalizado para múltipla seleção
+			$.validator.addMethod("atLeastOneSelected", function(value, element) {
+				return $(element).find('option:selected').length > 0;
+			}, "Pelo menos uma opção deve ser selecionada.");
+
+			$.validator.addMethod("dateRange", function(value, element) {
+				var date = new Date(value);
+				var startDate = new Date(2019, 0, 1);
+				return date >= startDate && date <= maxDate;
+			}, "Data fora do intervalo permitido");
+
+			
+
+			$.validator.addMethod("validRelatorioLength", function(value, element) {
+				var pcModalidade = $('#pcModalidade').val();
+				return !(pcModalidade == 'A' || pcModalidade == 'E') || value.length == 8;
+			}, "O N° Rel. SEI deve ter 8 caracteres.");
+
+			
+			
+
+			$('#formInfoInicial').validate({
+				errorPlacement: function(error, element) {
+					error.appendTo(element.closest('.form-group'));
+					$(element).removeClass('is-valid').addClass('is-invalid');
+				},
+				rules: {
+					pcNumSEI: {
+						required: true,
+						pattern: /^\d{5}\.\d{6}\/\d{4}-\d{2}$/					
+					},
+					pcNumRelatorio: {
+						required: true,
+						pattern: /^\d{8}$/,
+						validRelatorioLength: true
+					},
+					pcDataInicioAvaliacao: {
+						required: true,
+						dateRange: true
+					},
+					pcDataFimAvaliacao: {
+						required: true,
+						dateRange: true
+					},
+					pcOrgaoAvaliado: {
+						required: true
+					},
+					pcOrigem: {
+						required: true
+					},
+					
+					pcModalidade: {
+						required: true
+					},
+					
+					pcTipoDemanda: {
+						required: true
+					},
+					
+					pcAnoPacin: {
+						required: function(element) {
+							return $('#pcTipoDemanda').val() == 'P';
+						}
+					},
+					pcTipoClassificacao: {
+						required: true
+
+					},
+					pcBloquear: {
+						required: function(element) {
+							return $('#pcModalidade').val() == 'E';
+						}
+					}
+					
+					
+				},
+				messages: {
+					pcNumSEI: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						pattern: '<span style="color:red;font-size:10px">O N° SEI deve ter 17 números.</span>'
+					},
+					pcNumRelatorio: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						pattern: '<span style="color:red;font-size:10px">O N° Rel. SEI deve ter 8 números.</span>'
+					},
+					pcDataInicioAvaliacao: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						dateRange: '<span style="color:red;font-size:10px;">A data deve estar entre 01/01/2019 e ' + maxDate.toLocaleDateString('pt-BR') + '.</span>'
+					},
+					pcDataFimAvaliacao: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						dateRange: '<span style="color:red;font-size:10px;">Data fora do intervalo permitido.</span>',
+						
+					},
+					pcOrgaoAvaliado: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					pcOrigem: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					
+					
+					pcModalidade: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					
+					pcTipoDemanda: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					
+					pcAnoPacin: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória para demanda Planejada.</span>'
+					},
+					pcTipoClassificacao: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+					},
+					pcBloquear: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória para a modalidade Entrega de Relatório.</span>'
+					},
+					
+				},
+				errorClass: 'is-invalid',
+				highlight: function(element, errorClass, validClass) {
+					$(element).addClass(errorClass).removeClass(validClass);
+				},
+				unhighlight: function(element, errorClass, validClass) {
+					$(element).removeClass(errorClass).addClass('is-valid');
+					$(element).addClass('campoValido');
+					
+				},
+				submitHandler: function(form) {
+					//toastr.success('Todos os campos foram preenchidos corretamente!');
+					stepper.next();
+				},
+				invalidHandler: function(event, validator) {
+					toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
+					
+					stepper.previous();
+				}
+				
+			});
+
+			// Adiciona manipuladores de eventos de mudança para os campos select2
+			$('select').on('change.select2', function() {
+				var $this = $(this);
+				if ($this.val()) {
+					$this.removeClass('is-invalid').addClass('is-valid');
+					$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+					
+				}
+			});
+
+			
+		}
+		function inicializarValidacaoStep2() {	
+			var currentDate = new Date();
+			var maxDate = new Date(currentDate.getFullYear() + 1, 11, 31);
+			$.validator.addMethod("requiredIfType445", function(value, element) {
+				return $('#pcTipoAvaliado').val() != 445 || value !== "";
+			}, "Campo obrigatório se o tipo avaliado for Outros.");
+
+			$.validator.addMethod("requiredIfSelectDinamicoZero", function(value, element) {
+				return $('#selectDinamicoPROCESSO_N3').val() != 0 || value !== "";
+			}, "Campo obrigatório se o valor do select dinâmico for 0.");
+			
+			
+
+			$('#formTipoAvaliacao').validate({
+				errorPlacement: function(error, element) {
+					error.appendTo(element.closest('.form-group'));
+					$(element).removeClass('is-valid').addClass('is-invalid');
+				},
+				rules: {
+					pcTipoAvaliado: {
+						required: true
+					},
+					pcTipoAvalDescricao: {
+						required: true,
+						requiredIfType445: true
+					},
+					
+
+					pcProcessoN3: {
+						required: true,
+						requiredIfSelectDinamicoZero: true
+					}
+					
+					
+				},
+				messages: {
+					pcTipoAvaliado: {
+						required: '<span style="color:red;font-size:10px">O campo Tipo Avaliado é obrigatório.</span>'
+					},
+					pcTipoAvalDescricao: {
+						required: '<span style="color:red;font-size:10px">O campo Descrição do Tipo Avaliado é obrigatório.</span>',
+						requiredIfType445: '<span style="color:red;font-size:10px">Campo obrigatório se o tipo avaliado for Não se aplica.</span>'
+					},
+					
+					pcProcessoN3: {
+						required: '<span style="color:red;font-size:10px">O campo Processo N3 é obrigatório.</span>',
+						requiredIfSelectDinamicoZero: '<span style="color:red;font-size:10px">Campo obrigatório se o valor do select dinâmico for Outros.</span>'
+					}
+					
+				},
+				errorClass: 'is-invalid',
+				highlight: function(element, errorClass, validClass) {
+					$(element).addClass(errorClass).removeClass(validClass);
+				},
+				unhighlight: function(element, errorClass, validClass) {
+					$(element).removeClass(errorClass).addClass('is-valid');
+					$(element).addClass('campoValido');
+					
+				},
+				submitHandler: function(form) {
+					//toastr.success('Todos os campos foram preenchidos corretamente!');
+					stepper.next();
+				},
+				invalidHandler: function(event, validator) {
+					toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
+					//stepper.previous();
+					//stepper.to(1);
+				}
+				
+			});
+
+			
+			// Adiciona manipuladores de eventos de mudança para os campos select2
+			$('select').on('change.select2', function() {
+				var $this = $(this);
+				if ($this.val()) {
+					$this.removeClass('is-invalid').addClass('is-valid');
+					$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+					
+				}
+			});
+			// Aplicar validação aos selects cujo id começa com selectDinamico
+			$('#selectDinamicoPROCESSO_N1').each(function() {
+				$(this).rules('add', {
+					required: true,
+					messages: {
+						required: '<span style="color:red;font-size:10px">Este campo é obrigatório.</span>'
+					}
+				});
+			});
+
+			
+
+			
+		}
+
+		
 
 		$('#dados-container').on('change', '#selectDinamicoMACROPROCESSOS', function() {
 			var selectedText = $(this).find('option:selected').text();
 			if(selectedText == 'Não se aplica'){
-					$('#pcTipoAvalDescricao').val(null).trigger('change')
-					$('#TipoAvalDescricaoDiv').attr("hidden",false)	
-					$('#pcProcessoN3Div').attr("hidden",true);
-					setupCharCounter('pcTipoAvalDescricao', 'pcTipoAvalDescricaoCharCounter', 250);	
-				}else{
-					$('#pcTipoAvalDescricao').val(null).trigger('change')
-					$('#TipoAvalDescricaoDiv').attr("hidden",true)
-					 inicializarValidacao();
-				}
+				$('#pcTipoAvalDescricao').val(null).trigger('change')
+				$('#TipoAvalDescricaoDiv').attr("hidden",false)	
+				$('#pcProcessoN3Div').attr("hidden",true);
+				setupCharCounter('pcTipoAvalDescricao', 'pcTipoAvalDescricaoCharCounter', 250);	
+				
+			}else{
+				$('#pcTipoAvalDescricao').val(null).trigger('change')
+				$('#TipoAvalDescricaoDiv').attr("hidden",true)
+				
+			}
+			inicializarValidacaoStep2();
+		});
+
+		$('#dados-container').on('change', '#selectDinamicoPROCESSO_N1', function() {
+			inicializarValidacaoStep2();
 		});
 
 
 
 
 
+
+
 		$(document).ready(function() {
+
 			$('#modalOverlay').delay(1000).hide(0, function() {
 				$('#modalOverlay').modal('hide');
 			});
@@ -789,15 +1182,19 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 
             })//fim fail
 
-             inicializarValidacao();
-			
+             //inicializarValidacao();
+			inicializarValidacaoStep1();
+			inicializarValidacaoStep2();
 		
 
+		
 		});
 
 		$(function () {
 			$('[data-mask]').inputmask()
 		});
+
+		
 		
 		$('#pcTipoDemanda').on('change', function (event)  {
 			if( $('#pcTipoDemanda').val()=='P'){//se o tipo de demanda for PLANEJADA, visualizar o campo Ano PACIN para preenchimento
@@ -843,16 +1240,16 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 				$("#pcTipoClassificacaoDiv").attr("hidden",false);	
 			}else{
 				$('#pcNumSEI').val(null).trigger('change')
-				$('#pcNumSEIDiv').attr("hidden",true)	
+				//$('#pcNumSEIDiv').attr("hidden",true)	
 
 				$('#pcNumRelatorio').val(null).trigger('change')
-				$('#pcNumRelatorioDiv').attr("hidden",true)	
+				//$('#pcNumRelatorioDiv').attr("hidden",true)	
 
 				$('#pcDataFimAvaliacao').val(null).trigger('change')
-				$('#pcDataFimAvaliacaoDiv').attr("hidden",true)
+				//$('#pcDataFimAvaliacaoDiv').attr("hidden",true)
 
 				$("#pcTipoClassificacao").val('6')
-				$("#pcTipoClassificacaoDiv").attr("hidden",true)	
+				//$("#pcTipoClassificacaoDiv").attr("hidden",true)	
 			}
 
 			if($('#pcModalidade').val() == 'E'){
@@ -867,40 +1264,44 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 		});
 
 		function cancelar(){
-			$('#pcDataInicioAvaliacao').removeAttr('disabled');
-            $('#pcOrgaoAvaliado').removeAttr('disabled');
-			$('#pcProcessoId').val(null);
-			$('#pcNumSEI').val(null);
-			$('#pcNumRelatorio').val(null);
-			$('#pcDataInicioAvaliacao').val(null);
-			$('#pcDataInicioAvaliacaoAnterior').val(null);
-			$('#pcDataFimAvaliacao').val(null);
-			$('#pcOrigem').val(null).trigger('change');
-			$('#pcModalidade').val(null).trigger('change');
-			$('#pcTipoClassificacao').val(null).trigger('change');
-			$('#pcTipoAvaliado').val(null).trigger('change');
-			$('#pcTipoAvalDescricao').val(null);
-			$('#TipoAvalDescricaoDiv').attr("hidden",true)
-			$('#pcTipoAvalDescricaoCharCounter').attr("hidden",true);
-			$('#pcOrgaoAvaliado').val(null).trigger('change');
-			$('#pcOrgaoAvaliadoAnterior').val(null);
-			$('#pcAvaliadores').val(null).trigger('change');
-			$('#pcCoordenador').val(null).trigger('change');
-			$('#pcCoordNacional').val(null).trigger('change');
-			$('#pcTipoDemanda').val(null).trigger('change');
-			$('#pcAnoPacin').val(null).trigger('change');
-			$('#pcBloquear').val(null).trigger('change');
-			$('#selectDinamicoMACROPROCESSOS').val(null).trigger('change');
-			$('#idTipoAvaliacao').val(null).trigger('change');
-			$('#pcProcessoN3').val(null);
-			$('#pcProcessoN3Div').attr("hidden",true);
-			$('#pcProcessoN3CharCounter').attr("hidden",true);
-			$('#cadastro').CardWidget('collapse');
-			$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Processo");
-			$("#btSalvarDiv").attr("hidden",false)
-			$('#pcObjetivoEstrategico').val(null).trigger('change');
-			$('#pcRiscoEstrategico').val(null).trigger('change');
-			$('#pcIndEstrategico').val(null).trigger('change');
+			//$('#pcDataInicioAvaliacao').removeAttr('disabled');
+            //$('#pcOrgaoAvaliado').removeAttr('disabled');
+			// $('#pcProcessoId').val(null);
+			// $('#pcNumSEI').val(null);
+			// $('#pcNumRelatorio').val(null);
+			// $('#pcDataInicioAvaliacao').val(null);
+			// $('#pcDataInicioAvaliacaoAnterior').val(null);
+			// $('#pcDataFimAvaliacao').val(null);
+			// $('#pcOrigem').val(null).trigger('change');
+			// $('#pcModalidade').val(null).trigger('change');
+			// $('#pcTipoClassificacao').val(null).trigger('change');
+			// $('#pcTipoAvaliado').val(null).trigger('change');
+			// $('#pcTipoAvalDescricao').val(null);
+			// $('#TipoAvalDescricaoDiv').attr("hidden",true)
+			// $('#pcTipoAvalDescricaoCharCounter').attr("hidden",true);
+			// $('#pcOrgaoAvaliado').val(null).trigger('change');
+			// $('#pcOrgaoAvaliadoAnterior').val(null);
+			// $('#pcAvaliadores').val(null).trigger('change');
+			// $('#pcCoordenador').val(null).trigger('change');
+			// $('#pcCoordNacional').val(null).trigger('change');
+			// $('#pcTipoDemanda').val(null).trigger('change');
+			// $('#pcAnoPacin').val(null).trigger('change');
+			// $('#pcBloquear').val(null).trigger('change');
+			// $('#selectDinamicoMACROPROCESSOS').val(null).trigger('change');
+			// $('#idTipoAvaliacao').val(null).trigger('change');
+			// $('#pcProcessoN3').val(null);
+			// $('#pcProcessoN3Div').attr("hidden",true);
+			// $('#pcProcessoN3CharCounter').attr("hidden",true);
+			// $('#cadastro').CardWidget('collapse');
+			// $('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Processo");
+			// $("#btSalvarDiv").attr("hidden",false)
+			// $('#pcObjetivoEstrategico').val(null).trigger('change');
+			// $('#pcRiscoEstrategico').val(null).trigger('change');
+			// $('#pcIndEstrategico').val(null).trigger('change');
+			// stepper.to(1)
+			 // Recarrega a página
+    		location.reload();
+
 
 		}
         
@@ -911,7 +1312,8 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 		});
 
 		function salvar() {
-			inicializarValidacao();
+			//inicializarValidacao();
+			
 			var isValid = $('#myForm').valid(); // Valida o formulário
 
 			if (isValid) {
@@ -927,7 +1329,7 @@ box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 		}
 		
 		$('#btSalvar').on('click', function (event)  {
-			salvar();
+			//salvar();
 			
 			event.preventDefault()
 			event.stopPropagation()

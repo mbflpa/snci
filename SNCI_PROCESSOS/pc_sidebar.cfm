@@ -82,6 +82,9 @@
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
 
+  <!-- stepper -->
+  <link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/bs-stepper/css/bs-stepper.min.css">
+
 
     <style>
           .select2-container--bootstrap4 .select2-dropdown .select2-results__option[aria-selected="true"] {
@@ -329,9 +332,12 @@
     <script  src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/dataTables.searchPanes.js"></script>	
     <script  src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/searchPanes.bootstrap4.min.js"></script>	
 
+      <!-- bs-stepper -->
+     <script src="plugins/bs-stepper/js/bs-stepper.min.js"></script>
 
-    <!-- Tour -->
-    <script  src="../SNCI_PROCESSOS/plugins/tour/dist/js/hopscotch.min.js"></script>
+
+    <!-- Tour 
+    <script  src="../SNCI_PROCESSOS/plugins/tour/dist/js/hopscotch.min.js"></script>-->
 
     
     <!-- SNCI -->
