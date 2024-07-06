@@ -1052,8 +1052,8 @@
 					
 				}
 			});
-			// Aplicar validação aos selects cujo id começa com selectDinamico
-			$('#selectDinamicoPROCESSO_N1').each(function() {
+			// Aplicar validação aos selects cujo id contenha selectDinamico
+			$('select[id*="selectDinamico"]').each(function() {
 				$(this).rules('add', {
 					required: true,
 					messages: {
@@ -1082,12 +1082,10 @@
 				$('#TipoAvalDescricaoDiv').attr("hidden",true)
 				
 			}
-			inicializarValidacaoStep2();
+			
 		});
 
-		$('#dados-container').on('change', '#selectDinamicoPROCESSO_N1', function() {
-			inicializarValidacaoStep2();
-		});
+		
 
 
 
@@ -1183,8 +1181,8 @@
             })//fim fail
 
              //inicializarValidacao();
-			inicializarValidacaoStep1();
-			inicializarValidacaoStep2();
+			//inicializarValidacaoStep1();
+			//inicializarValidacaoStep2();
 		
 
 		

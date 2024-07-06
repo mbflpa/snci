@@ -628,7 +628,7 @@ function periodoPorExtenso(mes,ano) {
 function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions = []) {
 
     // Limpa o container de selects e adiciona o primeiro select
-    $('#dados-container').empty().append('<div class="select-container-initializeSelects"><label class="dynamic-label-initializeSelects" style="text-align: left;">' + labelNames[0] + ': </label><select class="form-control process-select" id="selectDinamico' + dataLevels[0] + '" style="width: calc(100% - 120px);"></select></div>');
+    $('#dados-container').empty().append('<div class="select-container-initializeSelects"><label class="dynamic-label-initializeSelects" style="text-align: left;">' + labelNames[0] + ': </label><select class="form-control process-select" id="selectDinamico' + dataLevels[0] + '" name="selectDinamico' + dataLevels[0] + '" style="width: calc(100% - 120px);"></select></div>');
 
     // Função para preencher os selects
     function populateSelect(level, parentSelections) {
@@ -649,7 +649,7 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
 
         if ($select.length === 0) {
             // Cria um novo select se ele não existir
-            $select = $('<select class="form-control process-select dynamic-select" id="selectDinamico' + currentLevel + '" style="width: calc(100% - 120px);"></select>');
+            $select = $('<select class="form-control process-select dynamic-select" id="selectDinamico' + currentLevel + '" name="selectDinamico' + currentLevel + '" style="width: calc(100% - 120px);"></select>');
             var $container = $('<div class="select-container-initializeSelects"></div>');
             $container.append('<label class="dynamic-label-initializeSelects" style="text-align: left;">' + labelNames[level] + ': </label>');
             $container.append($select);
