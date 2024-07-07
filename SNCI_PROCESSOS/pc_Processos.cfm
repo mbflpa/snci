@@ -213,7 +213,7 @@
 
 												<div class="bs-stepper-content " >
 													<!-- your steps content here -->
-													<form   id="formInfoInicial" name="formInfoInicial" format="html"  style="height: auto;">
+													<form   id="formInfoInicial" name="formInfoInicial"   onsubmit="return false" novalidate>
 														<div id="infoInicial" class="content " role="tabpanel" aria-labelledby="infoInicial-trigger" >
 															<div class="card-body" style="border: solid 1px #0083ca">
 																<div class="row" >
@@ -347,7 +347,7 @@
 																	<div id="pcBloquearDiv" class="col-sm-2" hidden>
 																		<div class="form-group">
 																			<label for="pcBloquear" >Bloquear Processo:</label>
-																			<select id="pcBloquear" required=""  name="pcBloquear" class="form-control" >
+																			<select id="pcBloquear" required  name="pcBloquear" class="form-control" >
 																				<option selected="" disabled="" value="">Selecione...</option>
 																				<option value="N">NÃO</option>
 																				<option value="S">SIM</option>				
@@ -363,7 +363,7 @@
 															</div>
 														</div>
 													</form>
-													<form   id="formTipoAvaliacao" name="formTipoAvaliacao" format="html"  style="height: auto;">
+													<form   id="formTipoAvaliacao" name="formTipoAvaliacao"  onsubmit="return false" novalidate>
 														<div id="tipoAvaliacao" class="content " role="tabpanel" aria-labelledby="tipoAvaliacao-trigger" >
 															<div class="card-body " style="border: solid 1px #0083ca">
 																<div class="row " >
@@ -376,7 +376,7 @@
 																				<div id="TipoAvalDescricaoDiv" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
 																					<label for="pcTipoAvalDescricao" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Tipo de Avaliação:</label>
 																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																						<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" required class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
+																						<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" required  class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
 																						<span id="pcTipoAvalDescricaoCharCounter" class="badge badge-secondary"></span>
 																					</div>
 																				</div>
@@ -403,134 +403,133 @@
 															
 														</div>
 													</form>
-													
-													<div id="infoEstrategicas" class="content" role="tabpanel" aria-labelledby="infoEstrategicas-trigger">
-														<div class="card-body" style="border: solid 1px #0083ca">
-															<div class="row" style="display:flex; justify-content: space-between;">
-																<div class="col-sm-6">
-																	<div class="form-group " >
-																			<label for="pcObjetivoEstrategico">Objetivo Estratégico:</label>
-																			<select id="pcObjetivoEstrategico" name="pcObjetivoEstrategico"  class="form-control" multiple="multiple">
-																				<cfoutput query="rsObjetivoEstrategico">
-																					<option value="#pc_objEstrategico_id#">#trim(pc_objEstrategico_descricao)#</option>
-																				</cfoutput>
-																			</select>	
+													<form   id="formInfoEstrategicas" name="formInfoEstrategicaso"  onsubmit="return false" novalidate>
+														<div id="infoEstrategicas" class="content" role="tabpanel" aria-labelledby="infoEstrategicas-trigger">
+															<div class="card-body" style="border: solid 1px #0083ca">
+																<div class="row" style="display:flex; justify-content: space-between;">
+																	<div class="col-sm-6">
+																		<div class="form-group " >
+																				<label for="pcObjetivoEstrategico">Objetivo Estratégico:</label>
+																				<select id="pcObjetivoEstrategico" name="pcObjetivoEstrategico"  class="form-control" multiple="multiple">
+																					<cfoutput query="rsObjetivoEstrategico">
+																						<option value="#pc_objEstrategico_id#">#trim(pc_objEstrategico_descricao)#</option>
+																					</cfoutput>
+																				</select>	
+																		</div>
 																	</div>
-																</div>
 
-																<div class="col-sm-6">
-																	<div class="form-group " >
-																			<label for="pcRiscoEstrategico">Risco Estratégico:</label>
-																			<select id="pcRiscoEstrategico" name="pcRiscoEstrategico" class="form-control" multiple="multiple">
-																				<cfoutput query="rsRiscoEstrategico">
-																					<option value="#pc_riscoEstrategico_id#">#trim(pc_riscoEstrategico_descricao)#</option>
-																				</cfoutput>
-																			</select>	
+																	<div class="col-sm-6">
+																		<div class="form-group " >
+																				<label for="pcRiscoEstrategico">Risco Estratégico:</label>
+																				<select id="pcRiscoEstrategico" name="pcRiscoEstrategico" class="form-control" multiple="multiple">
+																					<cfoutput query="rsRiscoEstrategico">
+																						<option value="#pc_riscoEstrategico_id#">#trim(pc_riscoEstrategico_descricao)#</option>
+																					</cfoutput>
+																				</select>	
+																		</div>
 																	</div>
-																</div>
 
-																<div class="col-sm-6">
-																	<div class="form-group " >
-																			<label for="pcIndEstrategico">Indicador Estratégico:</label>
-																			<select id="pcIndEstrategico" name="pcIndEstrategico" class="form-control" multiple="multiple">
-																				<cfoutput query="rsIndEstrategico">
-																					<option value="#pc_indEstrategico_id#">#trim(pc_indEstrategico_descricao)#</option>
-																				</cfoutput>
-																			</select>	
+																	<div class="col-sm-6">
+																		<div class="form-group " >
+																				<label for="pcIndEstrategico">Indicador Estratégico:</label>
+																				<select id="pcIndEstrategico" name="pcIndEstrategico" class="form-control" multiple="multiple">
+																					<cfoutput query="rsIndEstrategico">
+																						<option value="#pc_indEstrategico_id#">#trim(pc_indEstrategico_descricao)#</option>
+																					</cfoutput>
+																				</select>	
+																		</div>
 																	</div>
 																</div>
 															</div>
-														</div>
-														<div style="margin-top:10px;display:flex;justify-content:space-between">
-															<div>	
-																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-																<button class="btn btn-primary" onclick="stepper.next()">Próximo</button>
+															<div style="margin-top:10px;display:flex;justify-content:space-between">
+																<div>	
+																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																	<button class="btn btn-primary" onclick="inicializarValidacaoStep3()">Próximo</button>
+																</div>
+																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
 															</div>
-															<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+															
 														</div>
-														
-													</div>
+													</form>
+													<form   id="formEquipe" name="formEquipe"  onsubmit="return false" novalidate>
+														<div id="equipe" class="content" role="tabpanel" aria-labelledby="equipe-trigger">
+															<div class="card-body" style="border: solid 1px #0083ca">
+																<div class="row">
+																	<div class="col-sm-12">
+																		<div class="form-group " >
+																				<label for="pcAvaliadores">Avaliadores:</label>
+																				<select id="pcAvaliadores" name="pcAvaliadores" class="form-control" multiple="multiple">
+																					<cfoutput query="rsAvaliadores">
+																						<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
+																					</cfoutput>
+																				</select>	
+																		</div>
+																	</div>
 
-													<div id="equipe" class="content" role="tabpanel" aria-labelledby="equipe-trigger">
-														<div class="card-body" style="border: solid 1px #0083ca">
-															<div class="row">
-																<div class="col-sm-12">
-																	<div class="form-group " >
-																			<label for="pcAvaliadores">Avaliadores:</label>
-																			<select id="pcAvaliadores" name="pcAvaliadores" class="form-control" multiple="multiple">
+																	<div id="pcCoordenadorDiv" class="col-sm-4">
+																		<div class="form-group">
+																			<label style="" for="pcCoordenado">Coordenador Regional:</label>
+																			<select id="pcCoordenador" required name="pcCoordenador" class="form-control">
+																				<option selected="" disabled="" value=""></option>
+																				<option value="0">Sem Coord. Regional</option>
 																				<cfoutput query="rsAvaliadores">
 																					<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
 																				</cfoutput>
-																			</select>	
+																			</select>
+																		</div>
 																	</div>
-																</div>
 
-																<div id="pcCoordenadorDiv" class="col-sm-4">
-																	<div class="form-group">
-																		<label style="" for="pcCoordenado">Coordenador Regional:</label>
-																		<select id="pcCoordenador" required name="pcCoordenador" class="form-control">
-																			<option selected="" disabled="" value=""></option>
-																			<option value="0">Sem Coord. Regional</option>
-																			<cfoutput query="rsAvaliadores">
-																				<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
-																			</cfoutput>
-																		</select>
-																	</div>
-																</div>
-
-																<div class="col-sm-4">
-																	<div class="form-group">
-																		<label style="" for="pcCoordNacional">Coordenador Nacional:</label>
-																		<select id="pcCoordNacional" required name="pcCoordNacional" class="form-control">
-																			<option selected="" disabled="" value=""></option>
-																			<option value="0">Sem Coord. Nacional</option>
-																			<cfoutput query="rsAvaliadores">
-																				<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
-																			</cfoutput>
-																		</select>
+																	<div class="col-sm-4">
+																		<div class="form-group">
+																			<label style="" for="pcCoordNacional">Coordenador Nacional:</label>
+																			<select id="pcCoordNacional" required name="pcCoordNacional" class="form-control">
+																				<option selected="" disabled="" value=""></option>
+																				<option value="0">Sem Coord. Nacional</option>
+																				<cfoutput query="rsAvaliadores">
+																					<option value="#trim(pc_usu_matricula)#">#trim(pc_org_se_sigla)# - #trim(pc_usu_nome)# (#trim(pc_usu_matricula)#)</option>
+																				</cfoutput>
+																			</select>
+																		</div>
 																	</div>
 																</div>
 															</div>
+															<div style="margin-top:10px;display:flex;justify-content:space-between">
+																<div>	
+																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																	<button class="btn btn-primary" onclick="finalizarValidacao()">Próximo</button>
+																</div>
+																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+															</div>
+
+
 														</div>
-														<div style="margin-top:10px;display:flex;justify-content:space-between">
-															<div>	
+													</form>
+													<form   id="formFinalizar" name="formFinalizar"  onsubmit="return false" novalidate>
+														<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="Finalizar-trigger">
+															<div class="form-card">
+																<h3 class="fs-title text-center">Todas as Informações foram validadas com sucesso!</h3>
+																<br>
+																<div class="row justify-content-center">
+																	
+																	<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:100px"></i>
+																	
+																</div>
+																<br>
+																<div class="row justify-content-center">
+																	<div class="col-7 text-center">
+																		<h5>Clique no botão "Salvar" para cadastrar este processo.</h5>
+																	</div>
+																</div>
+															</div>
+
+															<div style="margin-top:10px;display:flex;justify-content:space-between">
 																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-																<button class="btn btn-primary" onclick="stepper.next()">Próximo</button>
+																<button id="btSalvar" class="btn  btn-success " >Salvar</button>
+																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
 															</div>
-															<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+
 														</div>
-
-
-													</div>
-
-													<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="Finalizar-trigger">
-														<div class="form-card">
-															<h3 class="fs-title text-center">Todas as Informações foram validadas com sucesso!</h3>
-															<br>
-															<div class="row justify-content-center">
-																
-																<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:100px"></i>
-																
-															</div>
-															<br>
-															<div class="row justify-content-center">
-																<div class="col-7 text-center">
-																	<h5>Clique no botão "Salvar" para cadastrar este processo.</h5>
-																</div>
-															</div>
-														</div>
-
-														<div style="margin-top:10px;display:flex;justify-content:space-between">
-															<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-															<button id="btSalvar" class="btn  btn-success " >Salvar</button>
-															<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
-														</div>
-
-													</div>
-
-
-
-
+													</form>
 													
 																	
 												</div>
@@ -587,7 +586,12 @@
 
 		// BS-Stepper Init
 		document.addEventListener('DOMContentLoaded', function () {
-			window.stepper = new Stepper(document.querySelector('.bs-stepper'))
+			window.stepper = new Stepper(document.querySelector('.bs-stepper',
+				{
+
+					animation:true
+				})
+			)
 		})
 		//Initialize Select2 Elements
 		$('select').select2({
@@ -625,7 +629,7 @@
 			}, "Campo obrigatório para a modalidade A ou E.");
 
 			$.validator.addMethod("requiredIfType445", function(value, element) {
-				return $('#pcTipoAvaliado').val() != 445 || value !== "";
+				return $('#selectDinamicoMACROPROCESSOS').val() != 445 || value !== "";
 			}, "Campo obrigatório se o tipo avaliado for Outros.");
 
 			$.validator.addMethod("requiredIfSelectDinamicoZero", function(value, element) {
@@ -662,7 +666,7 @@
 					pcOrigem: {
 						required: true
 					},
-					pcTipoAvaliado: {
+					selectDinamicoMACROPROCESSOS: {
 						required: true
 					},
 					pcTipoAvalDescricao: {
@@ -739,7 +743,7 @@
 					pcOrigem: {
 						required: '<span style="color:red;font-size:10px">O campo Origem é obrigatório.</span>'
 					},
-					pcTipoAvaliado: {
+					selectDinamicoMACROPROCESSOS: {
 						required: '<span style="color:red;font-size:10px">O campo Tipo Avaliado é obrigatório.</span>'
 					},
 					pcTipoAvalDescricao: {
@@ -811,7 +815,7 @@
 				});
 			});
 		}
-		function inicializarValidacaoStep1() {	
+		function inicializarValidacaoStep10() {	
 			//INÍCIO DA VALIDAÇÃO DO formInfoInicial
 			// Adicionar classe 'is-invalid' a todos os campos
 			var currentDate = new Date();
@@ -971,11 +975,11 @@
 
 			
 		}
-		function inicializarValidacaoStep2() {	
+		function inicializarValidacaoStep20() {	
 			var currentDate = new Date();
 			var maxDate = new Date(currentDate.getFullYear() + 1, 11, 31);
 			$.validator.addMethod("requiredIfType445", function(value, element) {
-				return $('#pcTipoAvaliado').val() != 445 || value !== "";
+				return $('#selectDinamicoMACROPROCESSOS').val() != 445 || value !== "";
 			}, "Campo obrigatório se o tipo avaliado for Outros.");
 
 			$.validator.addMethod("requiredIfSelectDinamicoZero", function(value, element) {
@@ -990,35 +994,35 @@
 					$(element).removeClass('is-valid').addClass('is-invalid');
 				},
 				rules: {
-					pcTipoAvaliado: {
+					selectDinamicoMACROPROCESSOS: {
 						required: true
 					},
-					pcTipoAvalDescricao: {
-						required: true,
-						requiredIfType445: true
-					},
+					// pcTipoAvalDescricao: {
+					// 	required: true,
+					// 	requiredIfType445: true
+					// },
 					
 
-					pcProcessoN3: {
-						required: true,
-						requiredIfSelectDinamicoZero: true
-					}
+					// pcProcessoN3: {
+					// 	required: true,
+					// 	requiredIfSelectDinamicoZero: true
+					// }
 					
 					
 				},
 				messages: {
-					pcTipoAvaliado: {
+					selectDinamicoMACROPROCESSOS: {
 						required: '<span style="color:red;font-size:10px">O campo Tipo Avaliado é obrigatório.</span>'
 					},
-					pcTipoAvalDescricao: {
-						required: '<span style="color:red;font-size:10px">O campo Descrição do Tipo Avaliado é obrigatório.</span>',
-						requiredIfType445: '<span style="color:red;font-size:10px">Campo obrigatório se o tipo avaliado for Não se aplica.</span>'
-					},
+					// pcTipoAvalDescricao: {
+					// 	required: '<span style="color:red;font-size:10px">O campo Descrição do Tipo Avaliado é obrigatório.</span>',
+					// 	requiredIfType445: '<span style="color:red;font-size:10px">Campo obrigatório se o tipo avaliado for Não se aplica.</span>'
+					// },
 					
-					pcProcessoN3: {
-						required: '<span style="color:red;font-size:10px">O campo Processo N3 é obrigatório.</span>',
-						requiredIfSelectDinamicoZero: '<span style="color:red;font-size:10px">Campo obrigatório se o valor do select dinâmico for Outros.</span>'
-					}
+					// pcProcessoN3: {
+					// 	required: '<span style="color:red;font-size:10px">O campo Processo N3 é obrigatório.</span>',
+					// 	requiredIfSelectDinamicoZero: '<span style="color:red;font-size:10px">Campo obrigatório se o valor do select dinâmico for Outros.</span>'
+					// }
 					
 				},
 				errorClass: 'is-invalid',
@@ -1094,6 +1098,384 @@
 
 
 		$(document).ready(function() {
+			//INÍCIO DA VALIDAÇÃO DO formInfoInicial
+			// Adicionar classe 'is-invalid' a todos os campos
+			var currentDate = new Date();
+			var maxDate = new Date(currentDate.getFullYear() + 1, 11, 31);
+
+			// Adiciona o método de validação personalizado para múltipla seleção
+			$.validator.addMethod("atLeastOneSelected", function(value, element) {
+				return $(element).find('option:selected').length > 0;
+			}, "Pelo menos uma opção deve ser selecionada.");
+
+			$.validator.addMethod("dateRange", function(value, element) {
+				var date = new Date(value);
+				var startDate = new Date(2019, 0, 1);
+				return date >= startDate && date <= maxDate;
+			}, "Data fora do intervalo permitido");
+
+			$.validator.addMethod("validRelatorioLength", function(value, element) {
+				var pcModalidade = $('#pcModalidade').val();
+				return !(pcModalidade == 'A' || pcModalidade == 'E') || value.length == 8;
+			}, "O N° Rel. SEI deve ter 8 caracteres.");
+
+			$.validator.addMethod("requiredIfType445", function(value, element) {
+				return $('#selectDinamicoMACROPROCESSOS').val() != 445 || value !== "";
+			}, "Campo obrigatório se o tipo avaliado for Outros.");
+
+			$.validator.addMethod("requiredIfSelectDinamicoZero", function(value, element) {
+				return $('#selectDinamicoPROCESSO_N3').val() != 0 || value !== "";
+			}, "Campo obrigatório se o valor do select dinâmico for 0.");
+			
+			// Adiciona método customizado para validar campos de seleção múltipla
+			$.validator.addMethod("atLeastOne", function(value, element) {
+				return $(element).find('option:selected').length > 0;
+			}, "Por favor, selecione pelo menos uma opção.");
+
+			$('#formInfoInicial').validate({
+				errorPlacement: function(error, element) {
+					error.appendTo(element.closest('.form-group'));
+					$(element).removeClass('is-valid').addClass('is-invalid');
+				},
+				rules: {
+					pcNumSEI: {
+						required: true,
+						pattern: /^\d{5}\.\d{6}\/\d{4}-\d{2}$/					
+					},
+					pcNumRelatorio: {
+						required: true,
+						pattern: /^\d{8}$/,
+						validRelatorioLength: true
+					},
+					pcDataInicioAvaliacao: {
+						required: true,
+						dateRange: true
+					},
+					pcDataFimAvaliacao: {
+						required: true,
+						dateRange: true
+					},
+					pcOrgaoAvaliado: {
+						required: true
+					},
+					pcOrigem: {
+						required: true
+					},
+					
+					pcModalidade: {
+						required: true
+					},
+					
+					pcTipoDemanda: {
+						required: true
+					},
+					
+					pcAnoPacin: {
+						required: function(element) {
+							return $('#pcTipoDemanda').val() == 'P';
+						}
+					},
+					pcTipoClassificacao: {
+						required: true
+
+					},
+					pcBloquear: {
+						required: function(element) {
+							return $('#pcModalidade').val() == 'E';
+						}
+					}
+					
+					
+				},
+				messages: {
+					pcNumSEI: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						pattern: '<span style="color:red;font-size:10px">O N° SEI deve ter 17 números.</span>'
+					},
+					pcNumRelatorio: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						pattern: '<span style="color:red;font-size:10px">O N° Rel. SEI deve ter 8 números.</span>'
+					},
+					pcDataInicioAvaliacao: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						dateRange: '<span style="color:red;font-size:10px;">A data deve estar entre 01/01/2019 e ' + maxDate.toLocaleDateString('pt-BR') + '.</span>'
+					},
+					pcDataFimAvaliacao: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						dateRange: '<span style="color:red;font-size:10px;">Data fora do intervalo permitido.</span>',
+						
+					},
+					pcOrgaoAvaliado: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					pcOrigem: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					
+					
+					pcModalidade: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					
+					pcTipoDemanda: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					
+					pcAnoPacin: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória para demanda Planejada.</span>'
+					},
+					pcTipoClassificacao: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+					},
+					pcBloquear: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória para a modalidade Entrega de Relatório.</span>'
+					},
+					
+				},
+				errorPlacement: function(error, element) {
+					error.addClass("invalid-feedback");
+					element.closest(".form-group").append(error);
+				},
+				highlight: function(element) {
+					$(element).addClass("is-invalid").removeClass("is-valid");
+				},
+				unhighlight: function(element) {
+					$(element).addClass("is-valid").removeClass("is-invalid");
+				}
+				// submitHandler: function(form) {
+				// 	//toastr.success('Todos os campos foram preenchidos corretamente!');
+				// 	//stepper.next();
+				// },
+				// invalidHandler: function(event, validator) {
+				// 	toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
+					
+				// }
+				
+			});
+
+			$('#formTipoAvaliacao').validate({
+				errorPlacement: function(error, element) {
+					error.appendTo(element.closest('.form-group'));
+					$(element).removeClass('is-valid').addClass('is-invalid');
+				},
+				rules: {
+					selectDinamicoMACROPROCESSOS: {
+						required: true
+					},
+					pcTipoAvalDescricao: {
+						required: true,
+						requiredIfType445: true
+					},
+					
+
+					pcProcessoN3: {
+						required: true,
+						requiredIfSelectDinamicoZero: true
+					}
+					
+					
+				},
+				messages: {
+					selectDinamicoMACROPROCESSOS: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					pcTipoAvalDescricao: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						requiredIfType445: '<span style="color:red;font-size:10px">Campo obrigatório se o tipo avaliado for Não se aplica.</span>'
+					},
+					
+					pcProcessoN3: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						requiredIfSelectDinamicoZero: '<span style="color:red;font-size:10px">Campo obrigatório se o valor do select dinâmico for Outros.</span>'
+					}
+					
+				},
+				errorPlacement: function(error, element) {
+					error.addClass("invalid-feedback");
+					element.closest(".form-group").append(error);
+				},
+				highlight: function(element) {
+					$(element).addClass("is-invalid").removeClass("is-valid");
+				},
+				unhighlight: function(element) {
+					$(element).addClass("is-valid").removeClass("is-invalid");
+				}
+				// submitHandler: function(form) {
+				// 	//toastr.success('Todos os campos foram preenchidos corretamente!');
+				// 	stepper.next();
+				// },
+				// invalidHandler: function(event, validator) {
+				// 	toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
+				// 	//stepper.previous();
+				// 	//stepper.to(1);
+				// }
+				
+			});
+
+			
+			$("#formInfoEstrategicas").validate({
+				rules: {
+					pcObjetivoEstrategico: {
+						atLeastOne: true
+					},
+					pcRiscoEstrategico: {
+						atLeastOne: true
+					},
+					pcIndEstrategico: {
+						atLeastOne: true
+					}
+				},
+				messages: {
+					pcObjetivoEstrategico: {
+						atLeastOne: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					pcRiscoEstrategico: {
+						atLeastOne: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					},
+					pcIndEstrategico: {
+						atLeastOne: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+					}
+				},
+				errorPlacement: function(error, element) {
+					error.addClass("invalid-feedback");
+					element.closest(".form-group").append(error);
+				},
+				highlight: function(element) {
+					$(element).addClass("is-invalid").removeClass("is-valid");
+				},
+				unhighlight: function(element) {
+					$(element).addClass("is-valid").removeClass("is-invalid");
+				}
+			});
+
+			
+			// Adiciona manipuladores de eventos de mudança para os campos select2
+			$('select').on('change.select2', function() {
+				var $this = $(this);
+				if ($this.val()) {
+					$this.removeClass('is-invalid').addClass('is-valid');
+					$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+					
+				}
+			});
+
+			
+			// Aplicar validação aos selects cujo id contenha selectDinamico
+			$('select[id*="selectDinamico"]').each(function() {
+				$(this).rules('add', {
+					required: true,
+					messages: {
+						required: '<span style="color:red;font-size:10px">Este campo é obrigatório.</span>'
+					}
+				});
+			});
+
+			// Delegação de eventos para selects dinâmicos
+			$(document).on('change', 'select[id*="selectDinamico"]', function() {
+				var $this = $(this);
+				if ($this.val()) {
+					$this.removeClass('is-invalid').addClass('is-valid');
+					$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+				} else {
+					$this.removeClass('is-valid').addClass('is-invalid');
+					$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+				}
+			});
+
+			// Delegação de eventos para selects dinâmicos
+			$(document).on('change', 'select[id*="selectDinamico"]', function() {
+				var $this = $(this);
+				if ($this.val()) {
+					$this.removeClass('is-invalid').addClass('is-valid');
+					$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+				} else {
+					$this.removeClass('is-valid').addClass('is-invalid');
+					$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+				}
+			});
+			
+
+			
+            
+			
+			// Inicializar validação ao clicar no botão Próximo
+			window.inicializarValidacaoStep1 = function() {
+				
+				if ($("#formInfoInicial").valid()) {
+					// Ir para o próximo passo
+					stepper.next();
+				}
+			};
+
+			window.inicializarValidacaoStep2 = function() {
+				// Adiciona manipuladores de eventos de mudança para os campos select2
+				$('select').on('change.select2', function() {
+					var $this = $(this);
+					if ($this.val()) {
+						$this.removeClass('is-invalid').addClass('is-valid');
+						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						
+					}
+				});
+				
+				// Aplicar validação aos selects cujo id contenha selectDinamico
+				$('select[id*="selectDinamico"]').each(function() {
+					// Adiciona manipuladores de eventos de mudança para os campos select2
+					$('select').on('change.select2', function() {
+						var $this = $(this);
+						if ($this.val()) {
+							$this.removeClass('is-invalid').addClass('is-valid');
+							$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+							
+						}
+					});
+
+					$(this).rules('add', {
+						required: true,
+						messages: {
+							required: '<span style="color:red;font-size:10px">Este campo é obrigatório.</span>'
+						}
+					});
+				});
+				if ($("#formTipoAvaliacao").valid()) {
+					// Ir para o próximo passo
+					stepper.next();
+				}
+			};
+
+			window.inicializarValidacaoStep3 = function() {
+				if ($("#formInfoEstrategicas").valid()) {
+					// Ir para o próximo passo
+					stepper.next();
+				}
+			};
+
+			// Função para finalizar a validação e salvar o formulário
+			window.finalizarValidacao = function() {
+				// Validar todos os formulários antes de salvar
+				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid() && $("#formInfoEstrategicas").valid()) {
+					// Código para salvar o formulário
+					alert("Formulário salvo com sucesso!");
+				}
+			};
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 			$('#modalOverlay').delay(1000).hide(0, function() {
 				$('#modalOverlay').modal('hide');
@@ -1273,7 +1655,7 @@
 			// $('#pcOrigem').val(null).trigger('change');
 			// $('#pcModalidade').val(null).trigger('change');
 			// $('#pcTipoClassificacao').val(null).trigger('change');
-			// $('#pcTipoAvaliado').val(null).trigger('change');
+			// $('#selectDinamicoMACROPROCESSOS').val(null).trigger('change');
 			// $('#pcTipoAvalDescricao').val(null);
 			// $('#TipoAvalDescricaoDiv').attr("hidden",true)
 			// $('#pcTipoAvalDescricaoCharCounter').attr("hidden",true);
@@ -1390,7 +1772,7 @@
 									pcOrigem:$('#pcOrigem').val(),
 									pcDataInicioAvaliacao:$('#pcDataInicioAvaliacao').val(),
 									pcDataFimAvaliacao:$('#pcDataFimAvaliacao').val(),
-									pcTipoAvaliado:$('#pcTipoAvaliado').val(),
+									selectDinamicoMACROPROCESSOS:$('#selectDinamicoMACROPROCESSOS').val(),
 									pcTipoAvalDescricao:$('#pcTipoAvalDescricao').val(),
 									pcModalidade:$('#pcModalidade').val(),
 									pcTipoClassificacao:$('#pcTipoClassificacao').val(),
@@ -1424,7 +1806,7 @@
 								$('#pcOrigem').val(null).trigger('change');
 								$('#pcModalidade').val(null).trigger('change');
 								$('#pcTipoClassificacao').val(null).trigger('change');
-								$('#pcTipoAvaliado').val(null).trigger('change');
+								$('#selectDinamicoMACROPROCESSOS').val(null).trigger('change');
 								$('#pcOrgaoAvaliado').val(null).trigger('change');
 								$('#pcAvaliadores').val(null).trigger('change');
 								$('#pcCoordenador').val(null).trigger('change');
@@ -1569,7 +1951,7 @@
 			$('#pcDataInicioAvaliacao').val(dataInicio);
 			$('#pcDataInicioAvaliacaoAnterior').val(dataInicio);
 			$('#pcDataFimAvaliacao').val(dataFim);
-			$('#pcTipoAvaliado').val(processoAvaliado).trigger('change');
+			$('#selectDinamicoMACROPROCESSOS').val(processoAvaliado).trigger('change');
 			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 			
 
@@ -1639,7 +2021,7 @@
 			$('#pcDataInicioAvaliacao').val(dataInicio);
 			$('#pcDataInicioAvaliacaoAnterior').val(dataInicio);
 			$('#pcDataFimAvaliacao').val(dataFim);
-			$('#pcTipoAvaliado').val(processoAvaliado).trigger('change');
+			$('#selectDinamicoMACROPROCESSOS').val(processoAvaliado).trigger('change');
 			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 
 			$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
@@ -1698,7 +2080,7 @@
 			$('#pcOrigem').val(orgaoOrigem).trigger('change');
 			$('#pcDataInicioAvaliacao').val(dataInicio);
 			$('#pcDataFimAvaliacao').val(dataFim);
-			$('#pcTipoAvaliado').val(processoAvaliado).trigger('change');
+			$('#selectDinamicoMACROPROCESSOS').val(processoAvaliado).trigger('change');
 			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 
 			$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
