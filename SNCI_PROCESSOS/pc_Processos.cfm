@@ -353,8 +353,12 @@
 																				<option value="S">SIM</option>				
 																			</select>
 																		</div>
+																		
 																	</div>
-																	
+																	<br>
+																	<div id="bloqueioAlert" class="alert alert-info col-sm-12" hidden style="text-align: center;font-size:1.2em">
+																		Atenção: Após a conclusão do cadastro deste processo, não ocorrerá o encaminhamento para o órgão avaliado.
+																	</div>
 																</div>
 															</div>
 															<div style="margin-top:10px;display:flex;justify-content:space-between">
@@ -1036,9 +1040,19 @@
 					alert("Formulário salvo com sucesso!");
 				}
 			};
+
+			// Quando o campo #pcBloquear mudar de valor
+			$('#pcBloquear').change(function() {
+				// Verifica se o valor selecionado é 'S' (SIM)
+				if ($(this).val() === 'S') {
+					// Mostra o span em azul alertando sobre o bloqueio dos processos
+					$('#bloqueioAlert').attr("hidden",false)
+				} else {
+					// Caso contrário, esconde o span
+					$('#bloqueioAlert').attr("hidden",true)	
+				}
+			});
 	
-
-
 
 			$('#modalOverlay').delay(1000).hide(0, function() {
 				$('#modalOverlay').modal('hide');
@@ -1124,10 +1138,6 @@
                 $('#modal-danger').find('.modal-body').text(thrownError)
 
             })//fim fail
-
-             //inicializarValidacao();
-			//inicializarValidacaoStep1();
-			//inicializarValidacaoStep2();
 		
 
 		
@@ -1206,73 +1216,10 @@
 
 		});
 
-		function cancelar(){
-			//$('#pcDataInicioAvaliacao').removeAttr('disabled');
-            //$('#pcOrgaoAvaliado').removeAttr('disabled');
-			// $('#pcProcessoId').val(null);
-			// $('#pcNumSEI').val(null);
-			// $('#pcNumRelatorio').val(null);
-			// $('#pcDataInicioAvaliacao').val(null);
-			// $('#pcDataInicioAvaliacaoAnterior').val(null);
-			// $('#pcDataFimAvaliacao').val(null);
-			// $('#pcOrigem').val(null).trigger('change');
-			// $('#pcModalidade').val(null).trigger('change');
-			// $('#pcTipoClassificacao').val(null).trigger('change');
-			// $('#selectDinamicoMACROPROCESSOS').val(null).trigger('change');
-			// $('#pcTipoAvalDescricao').val(null);
-			// $('#TipoAvalDescricaoDiv').attr("hidden",true)
-			// $('#pcTipoAvalDescricaoCharCounter').attr("hidden",true);
-			// $('#pcOrgaoAvaliado').val(null).trigger('change');
-			// $('#pcOrgaoAvaliadoAnterior').val(null);
-			// $('#pcAvaliadores').val(null).trigger('change');
-			// $('#pcCoordenador').val(null).trigger('change');
-			// $('#pcCoordNacional').val(null).trigger('change');
-			// $('#pcTipoDemanda').val(null).trigger('change');
-			// $('#pcAnoPacin').val(null).trigger('change');
-			// $('#pcBloquear').val(null).trigger('change');
-			// $('#selectDinamicoMACROPROCESSOS').val(null).trigger('change');
-			// $('#idTipoAvaliacao').val(null).trigger('change');
-			// $('#pcProcessoN3').val(null);
-			// $('#pcProcessoN3Div').attr("hidden",true);
-			// $('#pcProcessoN3CharCounter').attr("hidden",true);
-			// $('#cadastro').CardWidget('collapse');
-			// $('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Processo");
-			// $("#btSalvarDiv").attr("hidden",false)
-			// $('#pcObjetivoEstrategico').val(null).trigger('change');
-			// $('#pcRiscoEstrategico').val(null).trigger('change');
-			// $('#pcIndEstrategico').val(null).trigger('change');
-			// stepper.to(1)
-			 // Recarrega a página
-    		location.reload();
-
-
-		}
-        
-		$('#btCancelar').on('click', function (event)  {
-			//event.preventDefault()
-			//event.stopPropagation()
-			cancelar()
-		});
-
-		function salvar() {
-			//inicializarValidacao();
 			
-			var isValid = $('#myForm').valid(); // Valida o formulário
-
-			if (isValid) {
-				// Coloque aqui o código para salvar os dados, se o formulário for válido
-				toastr.success('Salvando os dados...');
-				// Exemplo:
-				// enviarDados();
-				return false;
-			} else {
-				toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
-				return false;
-			}
-		}
 		
 		$('#btSalvar').on('click', function (event)  {
-			//salvar();
+			
 			
 			event.preventDefault()
 			event.stopPropagation()
