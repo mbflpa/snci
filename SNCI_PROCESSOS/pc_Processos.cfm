@@ -359,7 +359,7 @@
 															</div>
 															<div style="margin-top:10px;display:flex;justify-content:space-between">
 																<button class="btn btn-primary" onclick="inicializarValidacaoStep1();" >Próximo</button>
-																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+																<button id="btCancelar"  class="btn  btn-danger " onclick="location.reload()">Cancelar</button>
 															</div>
 														</div>
 													</form>
@@ -376,14 +376,14 @@
 																				<div id="TipoAvalDescricaoDiv" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
 																					<label for="pcTipoAvalDescricao" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Tipo de Avaliação:</label>
 																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																						<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" required  class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
+																						<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" required  class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; padding: 10px; box-sizing: border-box; width: 100%;">
 																						<span id="pcTipoAvalDescricaoCharCounter" class="badge badge-secondary"></span>
 																					</div>
 																				</div>
 																				<div id="pcProcessoN3Div" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
 																					<label for="pcProcessoN3" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo N3:</label>
 																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																						<input id="pcProcessoN3" name="pcProcessoN3" required class="form-control" placeholder="Descreva o PROCESSO N3..." style="border-radius: 4px; border: 1px solid #ddd; padding: 10px; box-sizing: border-box; width: 100%;">
+																						<input id="pcProcessoN3" name="pcProcessoN3" required class="form-control" placeholder="Descreva o PROCESSO N3..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
 																						<span id="pcProcessoN3CharCounter" class="badge badge-secondary"></span>
 																					</div>
 																				</div>
@@ -398,7 +398,7 @@
 																	<button class="btn btn-primary" onclick="inicializarValidacaoStep2()">Próximo</button>
 																</div>
 
-																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+																<button id="btCancelar"  class="btn  btn-danger " onclick="location.reload()">Cancelar</button>
 															</div>
 															
 														</div>
@@ -446,7 +446,7 @@
 																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
 																	<button class="btn btn-primary" onclick="inicializarValidacaoStep3()">Próximo</button>
 																</div>
-																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+																<button id="btCancelar"  class="btn  btn-danger " onclick="location.reload()">Cancelar</button>
 															</div>
 															
 														</div>
@@ -496,9 +496,9 @@
 															<div style="margin-top:10px;display:flex;justify-content:space-between">
 																<div>	
 																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-																	<button class="btn btn-primary" onclick="finalizarValidacao()">Próximo</button>
+																	<button class="btn btn-primary" onclick="inicializarValidacaoStep4()">Próximo</button>
 																</div>
-																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+																<button id="btCancelar"  class="btn  btn-danger " onclick="location.reload()">Cancelar</button>
 															</div>
 
 
@@ -525,7 +525,7 @@
 															<div style="margin-top:10px;display:flex;justify-content:space-between">
 																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
 																<button id="btSalvar" class="btn  btn-success " >Salvar</button>
-																<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+																<button id="btCancelar"  class="btn  btn-danger " onclick="location.reload()">Cancelar</button>
 															</div>
 
 														</div>
@@ -582,7 +582,7 @@
 
 
 	<script language="JavaScript">
-
+        
 
 		// BS-Stepper Init
 		document.addEventListener('DOMContentLoaded', function () {
@@ -593,511 +593,16 @@
 				})
 			)
 		})
-		//Initialize Select2 Elements
-		$('select').select2({
-			theme: 'bootstrap4',
-			placeholder: 'Selecione...'
-		});
 		
-		function inicializarValidacao2() {	
-			//INÍCIO DA VALIDAÇÃO DO formInfoInicial
-			// Adicionar classe 'is-invalid' a todos os campos
-			var currentDate = new Date();
-			var maxDate = new Date(currentDate.getFullYear() + 1, 11, 31);
-
-			// Adiciona o método de validação personalizado para múltipla seleção
-			$.validator.addMethod("atLeastOneSelected", function(value, element) {
-				return $(element).find('option:selected').length > 0;
-			}, "Pelo menos uma opção deve ser selecionada.");
-
-			$.validator.addMethod("dateRange", function(value, element) {
-				var date = new Date(value);
-				var startDate = new Date(2019, 0, 1);
-				return date >= startDate && date <= maxDate;
-			}, "Data fora do intervalo permitido");
-
-			
-
-			$.validator.addMethod("validRelatorioLength", function(value, element) {
-				var pcModalidade = $('#pcModalidade').val();
-				return !(pcModalidade == 'A' || pcModalidade == 'E') || value.length == 8;
-			}, "O N° Rel. SEI deve ter 8 caracteres.");
-
-			$.validator.addMethod("requiredForModalidadeAorE", function(value, element) {
-				var pcModalidade = $('#pcModalidade').val();
-				return !(pcModalidade == 'A' || pcModalidade == 'E') || value !== "";
-			}, "Campo obrigatório para a modalidade A ou E.");
-
-			$.validator.addMethod("requiredIfType445", function(value, element) {
-				return $('#selectDinamicoMACROPROCESSOS').val() != 445 || value !== "";
-			}, "Campo obrigatório se o tipo avaliado for Outros.");
-
-			$.validator.addMethod("requiredIfSelectDinamicoZero", function(value, element) {
-				return $('#selectDinamicoPROCESSO_N3').val() != 0 || value !== "";
-			}, "Campo obrigatório se o valor do select dinâmico for 0.");
-
-			$('#myform').validate({
-				errorPlacement: function(error, element) {
-					error.appendTo(element.closest('.form-group'));
-					$(element).removeClass('is-valid').addClass('is-invalid');
-				},
-				rules: {
-					pcNumSEI: {
-						required: true,
-						pattern: /^\d{5}\.\d{6}\/\d{4}-\d{2}$/					
-					},
-					pcNumRelatorio: {
-						required: true,
-						pattern: /^\d{8}$/,
-						validRelatorioLength: true
-					},
-					pcDataInicioAvaliacao: {
-						required: true,
-						dateRange: true
-					},
-					pcDataFimAvaliacao: {
-						required: true,
-						dateRange: true,
-						requiredForModalidadeAorE: true
-					},
-					pcOrgaoAvaliado: {
-						required: true
-					},
-					pcOrigem: {
-						required: true
-					},
-					selectDinamicoMACROPROCESSOS: {
-						required: true
-					},
-					pcTipoAvalDescricao: {
-						required: true,
-						requiredIfType445: true
-					},
-					pcProcessoN3: {
-						required: true,
-						requiredIfSelectDinamicoZero: true
-					},
-					pcModalidade: {
-						required: true
-					},
-					pcAvaliadores: {
-						required: true
-					},
-					pcTipoDemanda: {
-						required: true
-					},
-					pcCoordenador: {
-						required: true
-					},
-					pcCoordNacional: {
-						required: true
-					},
-					pcAnoPacin: {
-						required: function(element) {
-							return $('#pcTipoDemanda').val() == 'P';
-						}
-					},
-					pcTipoClassificacao: {
-						required: true,
-						requiredForModalidadeAorE: true
-					},
-					pcBloquear: {
-						required: function(element) {
-							return $('#pcModalidade').val() == 'E';
-						}
-					},
-					pcObjetivoEstrategico: {
-						atLeastOneSelected: true
-					},
-					pcRiscoEstrategico: {
-						atLeastOneSelected: true
-					},
-					pcIndEstrategico: {
-						atLeastOneSelected: true
-					}
-					
-				},
-				messages: {
-					pcNumSEI: {
-						required: '<span style="color:red;font-size:10px">O campo N° SEI é obrigatório.</span>',
-						pattern: '<span style="color:red;font-size:10px">O formato do N° SEI é inválido.</span>',
-						validSeiLength: '<span style="color:red;font-size:10px">O N° SEI deve ter 17 caracteres.</span>'
-					},
-					pcNumRelatorio: {
-						required: '<span style="color:red;font-size:10px">O campo N° Rel. SEI é obrigatório.</span>',
-						pattern: '<span style="color:red;font-size:10px">O formato do N° Rel. SEI é inválido.</span>',
-						validRelatorioLength: '<span style="color:red;font-size:10px">O N° Rel. SEI deve ter 8 caracteres.</span>'
-					},
-					pcDataInicioAvaliacao: {
-						required: '<span style="color:red;font-size:10px">A data de início da avaliação é obrigatória.</span>',
-						dateRange: '<span style="color:red;font-size:10px;">A data deve estar entre 01/01/2019 e ' + maxDate.toLocaleDateString('pt-BR') + '.</span>'
-					},
-					pcDataFimAvaliacao: {
-						required: '<span style="color:red;font-size:10px">A data de fim da avaliação é obrigatória.</span>',
-						dateRange: '<span style="color:red;font-size:10px;">Data fora do intervalo permitido.</span>',
-						requiredForModalidadeAorE: '<span style="color:red;font-size:10px">Campo obrigatório para a modalidade A ou E.</span>'
-					},
-					pcOrgaoAvaliado: {
-						required: '<span style="color:red;font-size:10px">O campo Órgão Avaliado é obrigatório.</span>'
-					},
-					pcOrigem: {
-						required: '<span style="color:red;font-size:10px">O campo Origem é obrigatório.</span>'
-					},
-					selectDinamicoMACROPROCESSOS: {
-						required: '<span style="color:red;font-size:10px">O campo Tipo Avaliado é obrigatório.</span>'
-					},
-					pcTipoAvalDescricao: {
-						required: '<span style="color:red;font-size:10px">O campo Descrição do Tipo Avaliado é obrigatório.</span>',
-						requiredIfType445: '<span style="color:red;font-size:10px">Campo obrigatório se o tipo avaliado for 445.</span>'
-					},
-					pcProcessoN3: {
-						required: '<span style="color:red;font-size:10px">O campo Processo N3 é obrigatório.</span>',
-						requiredIfSelectDinamicoZero: '<span style="color:red;font-size:10px">Campo obrigatório se o valor do select dinâmico for 0.</span>'
-					},
-					pcModalidade: {
-						required: '<span style="color:red;font-size:10px">O campo Modalidade é obrigatório.</span>'
-					},
-					pcAvaliadores: {
-						required: '<span style="color:red;font-size:10px">O campo Avaliadores é obrigatório.</span>'
-					},
-					pcTipoDemanda: {
-						required: '<span style="color:red;font-size:10px">O campo Tipo Demanda é obrigatório.</span>'
-					},
-					pcCoordenador: {
-						required: '<span style="color:red;font-size:10px">O campo Coordenador é obrigatório.</span>'
-					},
-					pcCoordNacional: {
-						required: '<span style="color:red;font-size:10px">O campo Coordenação Nacional é obrigatório.</span>'
-					},
-					pcAnoPacin: {
-						required: '<span style="color:red;font-size:10px">O campo Ano Pacin é obrigatório se a demanda for do tipo P.</span>'
-					},
-					pcTipoClassificacao: {
-						required: '<span style="color:red;font-size:10px">O campo Tipo Classificação é obrigatório.</span>',
-						requiredForModalidadeAorE: '<span style="color:red;font-size:10px">Campo obrigatório para a modalidade A ou E.</span>'
-					},
-					pcBloquear: {
-						required: '<span style="color:red;font-size:10px">O campo Bloquear Processo é obrigatório para a modalidade Entrega de Relatório.</span>'
-					},
-					pcObjetivoEstrategico: {
-						atLeastOneSelected: '<span style="color:red;font-size:10px">O campo Objetivo Estratégico é obrigatório.</span>'
-					},
-					pcRiscoEstrategico: {
-						atLeastOneSelected: '<span style="color:red;font-size:10px">O campo Risco Estratégico é obrigatório.</span>'
-					},
-					pcIndEstrategico: {
-						atLeastOneSelected: '<span style="color:red;font-size:10px">O campo Indicador Estratégico é obrigatório.</span>'
-					}
-				},
-				errorClass: 'is-invalid',
-				highlight: function(element, errorClass, validClass) {
-					$(element).addClass(errorClass).removeClass(validClass);
-				},
-				unhighlight: function(element, errorClass, validClass) {
-					$(element).removeClass(errorClass);
-				},
-				submitHandler: function(form) {
-					//toastr.success('Todos os campos foram preenchidos corretamente!');
-					//form.submit();
-				},
-				invalidHandler: function(event, validator) {
-					toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
-				}
-				
-			});
-			// Aplicar validação aos selects cujo id começa com selectDinamico
-			$('select[id^="selectDinamico"]').each(function() {
-				$(this).rules('add', {
-					required: true,
-					messages: {
-						required: '<span style="color:red;font-size:10px">Este campo é obrigatório.</span>'
-					}
-				});
-			});
-		}
-		function inicializarValidacaoStep10() {	
-			//INÍCIO DA VALIDAÇÃO DO formInfoInicial
-			// Adicionar classe 'is-invalid' a todos os campos
-			var currentDate = new Date();
-			var maxDate = new Date(currentDate.getFullYear() + 1, 11, 31);
-
-			// Adiciona o método de validação personalizado para múltipla seleção
-			$.validator.addMethod("atLeastOneSelected", function(value, element) {
-				return $(element).find('option:selected').length > 0;
-			}, "Pelo menos uma opção deve ser selecionada.");
-
-			$.validator.addMethod("dateRange", function(value, element) {
-				var date = new Date(value);
-				var startDate = new Date(2019, 0, 1);
-				return date >= startDate && date <= maxDate;
-			}, "Data fora do intervalo permitido");
-
-			
-
-			$.validator.addMethod("validRelatorioLength", function(value, element) {
-				var pcModalidade = $('#pcModalidade').val();
-				return !(pcModalidade == 'A' || pcModalidade == 'E') || value.length == 8;
-			}, "O N° Rel. SEI deve ter 8 caracteres.");
-
-			
-			
-
-			$('#formInfoInicial').validate({
-				errorPlacement: function(error, element) {
-					error.appendTo(element.closest('.form-group'));
-					$(element).removeClass('is-valid').addClass('is-invalid');
-				},
-				rules: {
-					pcNumSEI: {
-						required: true,
-						pattern: /^\d{5}\.\d{6}\/\d{4}-\d{2}$/					
-					},
-					pcNumRelatorio: {
-						required: true,
-						pattern: /^\d{8}$/,
-						validRelatorioLength: true
-					},
-					pcDataInicioAvaliacao: {
-						required: true,
-						dateRange: true
-					},
-					pcDataFimAvaliacao: {
-						required: true,
-						dateRange: true
-					},
-					pcOrgaoAvaliado: {
-						required: true
-					},
-					pcOrigem: {
-						required: true
-					},
-					
-					pcModalidade: {
-						required: true
-					},
-					
-					pcTipoDemanda: {
-						required: true
-					},
-					
-					pcAnoPacin: {
-						required: function(element) {
-							return $('#pcTipoDemanda').val() == 'P';
-						}
-					},
-					pcTipoClassificacao: {
-						required: true
-
-					},
-					pcBloquear: {
-						required: function(element) {
-							return $('#pcModalidade').val() == 'E';
-						}
-					}
-					
-					
-				},
-				messages: {
-					pcNumSEI: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
-						pattern: '<span style="color:red;font-size:10px">O N° SEI deve ter 17 números.</span>'
-					},
-					pcNumRelatorio: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
-						pattern: '<span style="color:red;font-size:10px">O N° Rel. SEI deve ter 8 números.</span>'
-					},
-					pcDataInicioAvaliacao: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
-						dateRange: '<span style="color:red;font-size:10px;">A data deve estar entre 01/01/2019 e ' + maxDate.toLocaleDateString('pt-BR') + '.</span>'
-					},
-					pcDataFimAvaliacao: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
-						dateRange: '<span style="color:red;font-size:10px;">Data fora do intervalo permitido.</span>',
-						
-					},
-					pcOrgaoAvaliado: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
-					},
-					pcOrigem: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
-					},
-					
-					
-					pcModalidade: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
-					},
-					
-					pcTipoDemanda: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
-					},
-					
-					pcAnoPacin: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória para demanda Planejada.</span>'
-					},
-					pcTipoClassificacao: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
-					},
-					pcBloquear: {
-						required: '<span style="color:red;font-size:10px">Informação obrigatória para a modalidade Entrega de Relatório.</span>'
-					},
-					
-				},
-				errorClass: 'is-invalid',
-				highlight: function(element, errorClass, validClass) {
-					$(element).addClass(errorClass).removeClass(validClass);
-				},
-				unhighlight: function(element, errorClass, validClass) {
-					$(element).removeClass(errorClass).addClass('is-valid');
-					$(element).addClass('campoValido');
-					
-				},
-				submitHandler: function(form) {
-					//toastr.success('Todos os campos foram preenchidos corretamente!');
-					stepper.next();
-				},
-				invalidHandler: function(event, validator) {
-					toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
-					
-					stepper.previous();
-				}
-				
-			});
-
-			// Adiciona manipuladores de eventos de mudança para os campos select2
-			$('select').on('change.select2', function() {
-				var $this = $(this);
-				if ($this.val()) {
-					$this.removeClass('is-invalid').addClass('is-valid');
-					$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
-					
-				}
-			});
-
-			
-		}
-		function inicializarValidacaoStep20() {	
-			var currentDate = new Date();
-			var maxDate = new Date(currentDate.getFullYear() + 1, 11, 31);
-			$.validator.addMethod("requiredIfType445", function(value, element) {
-				return $('#selectDinamicoMACROPROCESSOS').val() != 445 || value !== "";
-			}, "Campo obrigatório se o tipo avaliado for Outros.");
-
-			$.validator.addMethod("requiredIfSelectDinamicoZero", function(value, element) {
-				return $('#selectDinamicoPROCESSO_N3').val() != 0 || value !== "";
-			}, "Campo obrigatório se o valor do select dinâmico for 0.");
-			
-			
-
-			$('#formTipoAvaliacao').validate({
-				errorPlacement: function(error, element) {
-					error.appendTo(element.closest('.form-group'));
-					$(element).removeClass('is-valid').addClass('is-invalid');
-				},
-				rules: {
-					selectDinamicoMACROPROCESSOS: {
-						required: true
-					},
-					// pcTipoAvalDescricao: {
-					// 	required: true,
-					// 	requiredIfType445: true
-					// },
-					
-
-					// pcProcessoN3: {
-					// 	required: true,
-					// 	requiredIfSelectDinamicoZero: true
-					// }
-					
-					
-				},
-				messages: {
-					selectDinamicoMACROPROCESSOS: {
-						required: '<span style="color:red;font-size:10px">O campo Tipo Avaliado é obrigatório.</span>'
-					},
-					// pcTipoAvalDescricao: {
-					// 	required: '<span style="color:red;font-size:10px">O campo Descrição do Tipo Avaliado é obrigatório.</span>',
-					// 	requiredIfType445: '<span style="color:red;font-size:10px">Campo obrigatório se o tipo avaliado for Não se aplica.</span>'
-					// },
-					
-					// pcProcessoN3: {
-					// 	required: '<span style="color:red;font-size:10px">O campo Processo N3 é obrigatório.</span>',
-					// 	requiredIfSelectDinamicoZero: '<span style="color:red;font-size:10px">Campo obrigatório se o valor do select dinâmico for Outros.</span>'
-					// }
-					
-				},
-				errorClass: 'is-invalid',
-				highlight: function(element, errorClass, validClass) {
-					$(element).addClass(errorClass).removeClass(validClass);
-				},
-				unhighlight: function(element, errorClass, validClass) {
-					$(element).removeClass(errorClass).addClass('is-valid');
-					$(element).addClass('campoValido');
-					
-				},
-				submitHandler: function(form) {
-					//toastr.success('Todos os campos foram preenchidos corretamente!');
-					stepper.next();
-				},
-				invalidHandler: function(event, validator) {
-					toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
-					//stepper.previous();
-					//stepper.to(1);
-				}
-				
-			});
-
-			
-			// Adiciona manipuladores de eventos de mudança para os campos select2
-			$('select').on('change.select2', function() {
-				var $this = $(this);
-				if ($this.val()) {
-					$this.removeClass('is-invalid').addClass('is-valid');
-					$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
-					
-				}
-			});
-			// Aplicar validação aos selects cujo id contenha selectDinamico
-			$('select[id*="selectDinamico"]').each(function() {
-				$(this).rules('add', {
-					required: true,
-					messages: {
-						required: '<span style="color:red;font-size:10px">Este campo é obrigatório.</span>'
-					}
-				});
-			});
-
-			
-
-			
-		}
-
-		
-
-		$('#dados-container').on('change', '#selectDinamicoMACROPROCESSOS', function() {
-			var selectedText = $(this).find('option:selected').text();
-			if(selectedText == 'Não se aplica'){
-				$('#pcTipoAvalDescricao').val(null).trigger('change')
-				$('#TipoAvalDescricaoDiv').attr("hidden",false)	
-				$('#pcProcessoN3Div').attr("hidden",true);
-				setupCharCounter('pcTipoAvalDescricao', 'pcTipoAvalDescricaoCharCounter', 250);	
-				
-			}else{
-				$('#pcTipoAvalDescricao').val(null).trigger('change')
-				$('#TipoAvalDescricaoDiv').attr("hidden",true)
-				
-			}
-			
-		});
-
-		
-
-
-
-
-
-
-
+	
 		$(document).ready(function() {
+			//Initialize Select2 Elements
+			$('select').select2({
+				theme: 'bootstrap4',
+				placeholder: 'Selecione...',
+				allowClear: true
+			});
+			
 			//INÍCIO DA VALIDAÇÃO DO formInfoInicial
 			// Adicionar classe 'is-invalid' a todos os campos
 			var currentDate = new Date();
@@ -1311,7 +816,6 @@
 				// }
 				
 			});
-
 			
 			$("#formInfoEstrategicas").validate({
 				rules: {
@@ -1348,6 +852,40 @@
 				}
 			});
 
+			$('#formEquipe').validate({
+                rules: {
+                    pcAvaliadores: {
+                        required: true
+                    },
+                    pcCoordenador: {
+                        required: true
+                    },
+                    pcCoordNacional: {
+                        required: true
+                    }
+                },
+                messages: {
+                    pcAvaliadores: {
+                        required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+                    },
+                    pcCoordenador: {
+                        required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+                    },
+                    pcCoordNacional: {
+                        required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+                    }
+                },
+                errorPlacement: function(error, element) {
+					error.addClass("invalid-feedback");
+					element.closest(".form-group").append(error);
+				},
+				highlight: function(element) {
+					$(element).addClass("is-invalid").removeClass("is-valid");
+				},
+				unhighlight: function(element) {
+					$(element).addClass("is-valid").removeClass("is-invalid");
+				}
+			});
 			
 			// Adiciona manipuladores de eventos de mudança para os campos select2
 			$('select').on('change.select2', function() {
@@ -1382,6 +920,22 @@
 				}
 			});
 
+			$('#dados-container').on('change', '#selectDinamicoMACROPROCESSOS', function() {
+				var selectedText = $(this).find('option:selected').text();
+				if(selectedText == 'Não se aplica'){
+					$('#pcTipoAvalDescricao').val(null).trigger('change')
+					$('#TipoAvalDescricaoDiv').attr("hidden",false)	
+					$('#pcProcessoN3Div').attr("hidden",true);
+					setupCharCounter('pcTipoAvalDescricao', 'pcTipoAvalDescricaoCharCounter', 250);	
+					
+				}else{
+					$('#pcTipoAvalDescricao').val(null).trigger('change')
+					$('#TipoAvalDescricaoDiv').attr("hidden",true)
+					
+				}
+				
+			});
+
 			// Delegação de eventos para selects dinâmicos
 			$(document).on('change', 'select[id*="selectDinamico"]', function() {
 				var $this = $(this);
@@ -1393,6 +947,23 @@
 					$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
 				}
 			});
+
+
+			$(document).on('change', '#pcTipoAvalDescricao, #pcProcessoN3, #pcObjetivoEstrategico, #pcRiscoEstrategico, #pcIndEstrategico, #pcAvaliadores', function(e) {
+				var $this = $(this);
+				var selectedValues = $this.val();
+
+				if (selectedValues && selectedValues.length > 0) {
+					
+					$this.removeClass('is-invalid').addClass('is-valid');
+					$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+				} else {
+					
+					$this.removeClass('is-valid').addClass('is-invalid');
+					$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+				}
+			});
+			
 			
 
 			
@@ -1450,6 +1021,13 @@
 				}
 			};
 
+			window.inicializarValidacaoStep4 = function() {
+				if ($("#formEquipe").valid()) {
+					// Ir para o próximo passo
+					stepper.next();
+				}
+			};
+
 			// Função para finalizar a validação e salvar o formulário
 			window.finalizarValidacao = function() {
 				// Validar todos os formulários antes de salvar
@@ -1459,21 +1037,6 @@
 				}
 			};
 	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1686,8 +1249,8 @@
 		}
         
 		$('#btCancelar').on('click', function (event)  {
-			event.preventDefault()
-			event.stopPropagation()
+			//event.preventDefault()
+			//event.stopPropagation()
 			cancelar()
 		});
 
