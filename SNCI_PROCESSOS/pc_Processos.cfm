@@ -106,22 +106,64 @@
 			width: auto!important;
 		}
 
-/* Evita que campos de datas e textos tenham o ícone verde */
-.form-control[type="text"].is-valid {
-    background-image: none !important;
-    background-position:0 !important;
-    background-size: 0 !important;
-	padding-right:0 !important;
-}	
+		/* Evita que campos de datas e textos tenham o ícone verde */
+		.form-control[type="text"].is-valid {
+			background-image: none !important;
+			background-position:0 !important;
+			background-size: 0 !important;
+			padding-right:0 !important;
+		}	
+		/* Evita que campos de datas e textos tenham o ícone verde */
+		.form-control[type="text"].is-invalid {
+			background-image: none !important;
+			background-position:0 !important;
+			background-size: 0 !important;
+			padding-right:0 !important;
+		}
 
-/* Evita que campos de datas tenham o ícone verde */
-.form-control[type="date"].is-valid {
-    background-image: none !important;
-    background-position:0 !important;
-    background-size: 0 !important;
-	padding-right:0.75rem !important;
-}
- 
+		/* Evita que campos de datas tenham o ícone verde */
+		.form-control[type="date"].is-valid {
+			background-image: none !important;
+			background-position:0 !important;
+			background-size: 0 !important;
+			padding-right:0.75rem !important;
+		}
+
+		/* Evita que campos de datas tenham o ícone verde */
+		.form-control[type="date"].is-invalid {
+			background-image: none !important;
+			background-position:0 !important;
+			background-size: 0 !important;
+			padding-right:0.75rem !important;
+		}
+
+		/* Evita que campos de datas e textos tenham o ícone verde */
+		.form-control[type="input"].is-valid {
+			background-image: none !important;
+			/*background-position:0 !important;*/
+			/*background-size: 0 !important;*/
+			padding-right:0 !important;
+		}	
+
+		/* Evita que campos de datas tenham o ícone verde */
+		.form-control[type="input"].is-invalid {
+			background-image: none !important;
+			/*background-position:0 !important;*/
+			/*background-size: 0 !important;*/
+			padding-right:0.75rem !important;
+		}
+
+        /*Utilizando na descrição dos tipos de processos nos cards, para não ultrapassar o conteiner*/
+		.text-ellipsis {
+			font-size: 10px!important;
+			margin-bottom: 0!important;
+			display: -webkit-box!important;
+			-webkit-box-orient: vertical!important;
+			overflow: hidden!important;
+			text-overflow: ellipsis!important;
+			-webkit-line-clamp: 4!important; /* Número de linhas que você quer exibir antes das reticências */
+		}
+
 		
 	 </style>
 	
@@ -357,7 +399,7 @@
 																	</div>
 																	<br>
 																	<div id="bloqueioAlert" class="alert alert-info col-sm-12" hidden style="text-align: center;font-size:1.2em">
-																		Atenção: Após a conclusão do cadastro deste processo, não ocorrerá o encaminhamento para o órgão avaliado.
+																		Atenção: Ao bloquear este processo, o encaminhamento ao órgão avaliado só ocorrerá após o seu desbloqueio.
 																	</div>
 																</div>
 															</div>
@@ -385,11 +427,25 @@
 																					</div>
 																				</div>
 																				<div id="pcProcessoN3Div" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
-																					<label for="pcProcessoN3" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo N3:</label>
+																					<label for="pcProcessoN3" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Nome do Processo N3:</label>
 																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																						<input id="pcProcessoN3" name="pcProcessoN3" required class="form-control" placeholder="Descreva o PROCESSO N3..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
+																						<input id="pcProcessoN3" name="pcProcessoN3" required class="form-control" placeholder="Nome do PROCESSO N3..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
 																						<span id="pcProcessoN3CharCounter" class="badge badge-secondary"></span>
 																					</div>
+																				</div>
+																				<div id="pcProcessoN3descricaoDiv" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
+																					<label for="pcProcessoN3desc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo N3:</label>
+																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																						<input id="pcProcessoN3desc" name="pcProcessoN3desc" required class="form-control" placeholder="Descreva o PROCESSO N3..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
+																						<span id="pcProcessoN3descCharCounter" class="badge badge-secondary"></span>
+																					</div>
+																				</div>
+																				
+																				<div id="pcProcessoDescricaoDiv" class="col-sm-12" hidden style="font-size:1.2em;text-align: justify;margin-top:40px">
+																					<fieldset >
+																						<legend style="margin-bottom:-10px">Descrição do Processo:</legend>
+																						<span id="pcProcessoDescricao" ></span>
+																					</fieldset>
 																				</div>
 																			
 																	
@@ -519,7 +575,7 @@
 																	
 																</div>
 																<br>
-																<div class="row justify-content-center">
+																<div id="mensagemSalvar" class="row justify-content-center">
 																	<div class="col-7 text-center">
 																		<h5>Clique no botão "Salvar" para cadastrar este processo.</h5>
 																	</div>
@@ -606,8 +662,8 @@
 				placeholder: 'Selecione...',
 				allowClear: true
 			});
-			
-			//INÍCIO DA VALIDAÇÃO DO formInfoInicial
+					
+			//Início da validção dos forms do bs-stepper (etapas do cadastro de processo)
 			// Adicionar classe 'is-invalid' a todos os campos
 			var currentDate = new Date();
 			var maxDate = new Date(currentDate.getFullYear() + 1, 11, 31);
@@ -622,6 +678,7 @@
 				var startDate = new Date(2019, 0, 1);
 				return date >= startDate && date <= maxDate;
 			}, "Data fora do intervalo permitido");
+			
 
 			$.validator.addMethod("validRelatorioLength", function(value, element) {
 				var pcModalidade = $('#pcModalidade').val();
@@ -750,15 +807,9 @@
 				},
 				unhighlight: function(element) {
 					$(element).addClass("is-valid").removeClass("is-invalid");
-				}
-				// submitHandler: function(form) {
-				// 	//toastr.success('Todos os campos foram preenchidos corretamente!');
-				// 	//stepper.next();
-				// },
-				// invalidHandler: function(event, validator) {
-				// 	toastr.error('Existem erros no formulário. Por favor, corrija-os e tente novamente.');
 					
-				// }
+				}
+				
 				
 			});
 
@@ -780,6 +831,9 @@
 					pcProcessoN3: {
 						required: true,
 						requiredIfSelectDinamicoZero: true
+					},
+					pcProcessoN3desc: {
+						required: true
 					}
 					
 					
@@ -794,6 +848,10 @@
 					},
 					
 					pcProcessoN3: {
+						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
+						requiredIfSelectDinamicoZero: '<span style="color:red;font-size:10px">Campo obrigatório se o valor do select dinâmico for Outros.</span>'
+					},
+					pcProcessoN3desc: {
 						required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>',
 						requiredIfSelectDinamicoZero: '<span style="color:red;font-size:10px">Campo obrigatório se o valor do select dinâmico for Outros.</span>'
 					}
@@ -925,35 +983,50 @@
 			});
 
 			$('#dados-container').on('change', '#selectDinamicoMACROPROCESSOS', function() {
+				
 				var selectedText = $(this).find('option:selected').text();
 				if(selectedText == 'Não se aplica'){
 					$('#pcTipoAvalDescricao').val(null).trigger('change')
+					$('#pcProcessoN3').val(null).trigger('change')
+					$('#pcProcessoN3desc').val(null).trigger('change')
 					$('#TipoAvalDescricaoDiv').attr("hidden",false)	
 					$('#pcProcessoN3Div').attr("hidden",true);
+					$('#pcProcessoN3descricaoDiv').attr("hidden",true);
 					setupCharCounter('pcTipoAvalDescricao', 'pcTipoAvalDescricaoCharCounter', 250);	
-					
 				}else{
 					$('#pcTipoAvalDescricao').val(null).trigger('change')
 					$('#TipoAvalDescricaoDiv').attr("hidden",true)
 					
 				}
+			});
+
+			// Adiciona manipuladores de eventos de mudança para os campos select2 com o objetivo de esconder a descrição do processo
+			$(document).on('change', '#selectDinamicoMACROPROCESSOS, #selectDinamicoPROCESSO_N1, #selectDinamicoPROCESSO_N2', function() {
+				$('#pcProcessoDescricaoDiv').attr("hidden",true);
+				$('#pcProcessoDescricao').text('');
+				$('#pcProcessoN3Div').attr("hidden",true);
+				$('#pcProcessoN3descricaoDiv').attr("hidden",true);
+				$('#pcProcessoN3').val(null).trigger('change')
+				$('#pcProcessoN3desc').val(null).trigger('change')
+			});
+
+
+
+			// Delegação de eventos para selects dinâmicos mudando o estado de válido para inválido quando o campo não tiver nenhuma opção selecionada
+			// $(document).on('change', 'select[id*="selectDinamico"]', function() {
 				
-			});
+			// 	var $this = $(this);
+			// 	if ($this.val()) {
+			// 		$this.removeClass('is-invalid').addClass('is-valid');
+			// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+			// 	} else {
+			// 		$this.removeClass('is-valid').addClass('is-invalid');
+			// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+			// 	}
+			// });
 
-			// Delegação de eventos para selects dinâmicos
-			$(document).on('change', 'select[id*="selectDinamico"]', function() {
-				var $this = $(this);
-				if ($this.val()) {
-					$this.removeClass('is-invalid').addClass('is-valid');
-					$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
-				} else {
-					$this.removeClass('is-valid').addClass('is-invalid');
-					$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
-				}
-			});
-
-
-			$(document).on('change', '#pcTipoAvalDescricao, #pcProcessoN3, #pcObjetivoEstrategico, #pcRiscoEstrategico, #pcIndEstrategico, #pcAvaliadores', function(e) {
+			// Adiciona manipuladores de eventos de mudança para os campos select2 mudado o estado de válido para inválido quando o campo não tiver nenhuma opção selecionada
+			$(document).on('change', 'select[id*="selectDinamico"],#pcTipoAvalDescricao, #pcProcessoN3, #pcProcessoN3desc, #pcObjetivoEstrategico, #pcRiscoEstrategico, #pcIndEstrategico, #pcAvaliadores', function(e) {
 				var $this = $(this);
 				var selectedValues = $this.val();
 
@@ -968,11 +1041,7 @@
 				}
 			});
 			
-			
-
-			
-            
-			
+						
 			// Inicializar validação ao clicar no botão Próximo
 			window.inicializarValidacaoStep1 = function() {
 				
@@ -1035,7 +1104,7 @@
 			// Função para finalizar a validação e salvar o formulário
 			window.finalizarValidacao = function() {
 				// Validar todos os formulários antes de salvar
-				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid() && $("#formInfoEstrategicas").valid()) {
+				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid() && $("#formInfoEstrategicas").valid() && $("#formEquipe").valid()) {
 					// Código para salvar o formulário
 					alert("Formulário salvo com sucesso!");
 				}
@@ -1138,6 +1207,62 @@
                 $('#modal-danger').find('.modal-body').text(thrownError)
 
             })//fim fail
+
+
+			$('#dados-container').on('change', '#selectDinamicoPROCESSO_N3', function() {
+			
+				var selectedText = $(this).find('option:selected').text();
+				if(selectedText == 'OUTROS'){
+					$('#pcProcessoN3').val(null).trigger('change')
+					$('#pcProcessoN3desc').val(null).trigger('change')
+					$('#pcProcessoN3Div').attr("hidden",false)
+					$('#pcProcessoN3descricaoDiv').attr("hidden",false)
+					setupCharCounter('pcProcessoN3', 'pcProcessoN3CharCounter', 250);
+					setupCharCounter('pcProcessoN3desc', 'pcProcessoN3descCharCounter', 250);
+					$('#pcProcessoDescricaoDiv').attr("hidden",true);
+					$('#pcProcessoDescricao').text('');
+				}else{
+					$('#pcProcessoN3').val(null).trigger('change')
+					$('#pcProcessoN3desc').val(null).trigger('change')
+					$('#pcProcessoN3Div').attr("hidden",true);
+					$('#pcProcessoN3descricaoDiv').attr("hidden",true);
+					
+					//obtem o valor do idTipoAvaliacao
+					var idTipoProcesso = $('#idTipoAvaliacao').val();
+				
+					//chama a cffunction obterDescricaoDoTipoDeProcesso e insere no span id pcProcessoDescricao
+					$.ajax({
+						url: 'cfc/pc_cfcProcessos.cfc',
+						type: 'POST',
+						data: {
+							method: 'obterDescricaoDoTipoDeProcesso',
+							idTipoProcesso: idTipoProcesso
+						},
+						async: false,
+					}).done(function(result) {
+						// Extrai o texto entre as tags <string> e </string> usando regex
+						var regex = /<string>([\s\S]*?)<\/string>/;
+						var match = regex.exec(result);
+
+						// Verifica se houve um match e extrai o texto capturado
+						var descricao = match ? match[1] : "";
+
+						// Remove as aspas inicial e final, se presentes
+						descricao = descricao.replace(/^"(.*)"$/, '$1');
+
+						// Atualiza o conteúdo no elemento HTML
+						if (descricao.trim() !== "") {
+							$('#pcProcessoDescricao').text(descricao);
+							$('#pcProcessoDescricaoDiv').removeAttr("hidden");
+						}else{
+							$('#pcProcessoDescricao').text('');
+							$('#pcProcessoDescricaoDiv').attr("hidden",true);
+						}
+					});
+
+				}
+	
+			});
 		
 
 		
@@ -1166,17 +1291,7 @@
 		
 		
 
-		$('#dados-container').on('change', '#selectDinamicoPROCESSO_N3', function() {
-			var selectedText = $(this).find('option:selected').text();
-			if(selectedText == 'OUTROS'){
-				$('#pcProcessoN3').val(null).trigger('change')
-				$('#pcProcessoN3Div').attr("hidden",false)
-				setupCharCounter('pcProcessoN3', 'pcProcessoN3CharCounter', 250);
-			}else{
-				$('#pcProcessoN3').val(null).trigger('change')
-				$('#pcProcessoN3Div').attr("hidden",true);
-			}
-		});
+		
 	 
 		$('#pcModalidade').on('change', function (event){
 			if($('#pcModalidade').val() == 'A' || $('#pcModalidade').val() == 'E'){
@@ -1216,6 +1331,8 @@
 
 		});
 
+		
+
 			
 		
 		$('#btSalvar').on('click', function (event)  {
@@ -1239,8 +1356,9 @@
 			var anoAnterior = new Date($('#pcDataInicioAvaliacaoAnterior').val()).getFullYear();
             var orgaoAvaliadoAnterior = $('#pcOrgaoAvaliadoAnterior').val();
 			var orgaoAvaliado = $('#pcOrgaoAvaliado').val();
-			// alert("orgaoAvaliadoAnterior = "+orgaoAvaliadoAnterior+" orgaoAvaliado = "+orgaoAvaliado)
-			// return false;
+			
+
+
 			var mensagem = ""
 	        if($('#pcProcessoId').val() == ''){
 				var mensagem = "Deseja cadastrar este processo?"
@@ -1268,7 +1386,11 @@
 				cancelButtonText: 'Cancelar!'
 				}).then((result) => {
 					if (result.isConfirmed) {
-						var avaliadoresList = $('#pcAvaliadores').val();
+						let avaliadoresList = $('#pcAvaliadores').val();
+						let objetivoEstrategicoList = $('#pcObjetivoEstrategico').val();
+						let riscoEstrategicoList = $('#pcRiscoEstrategico').val();
+						let indEstrategicoList = $('#pcIndEstrategico').val();
+
 						$('#modalOverlay').modal('show')
 						setTimeout(function() {
 							$.ajax({
@@ -1282,17 +1404,25 @@
 									pcOrigem:$('#pcOrigem').val(),
 									pcDataInicioAvaliacao:$('#pcDataInicioAvaliacao').val(),
 									pcDataFimAvaliacao:$('#pcDataFimAvaliacao').val(),
-									selectDinamicoMACROPROCESSOS:$('#selectDinamicoMACROPROCESSOS').val(),
+									idTipoAvaliacao:$('#idTipoAvaliacao').val(),
 									pcTipoAvalDescricao:$('#pcTipoAvalDescricao').val(),
 									pcModalidade:$('#pcModalidade').val(),
 									pcTipoClassificacao:$('#pcTipoClassificacao').val(),
 									pcOrgaoAvaliado:$('#pcOrgaoAvaliado').val(),
+									pcObjetivoEstrategico:objetivoEstrategicoList.join(','),
+									pcRiscoEstrategico:riscoEstrategicoList.join(','),
+									pcIndEstrategico:indEstrategicoList.join(','),
 									pcAvaliadores:avaliadoresList.join(','),
 									pcCoordenador:$('#pcCoordenador').val(),
 									pcCoordNacional:$('#pcCoordNacional').val(),
 									pcTipoDemanda:$('#pcTipoDemanda').val(),
 									pcAnoPacin:$('#pcAnoPacin').val(),
 									pcBloquear:$('#pcBloquear').val(),
+									textoSelectDinamicoMACROPROCESSOS:$('#selectDinamicoMACROPROCESSOS option:selected').text(),
+									textoSelectDinamicoPROCESSOSN1:$('#selectDinamicoPROCESSO_N1 option:selected').text(),
+									textoSelectDinamicoPROCESSOSN2:$('#selectDinamicoPROCESSO_N2 option:selected').text(),
+									textoProcessoN3:$('#pcProcessoN3').val(),
+									textoComentarioProcessoN3:$('#pcProcessoN3desc').val()
 								},
 								async: false
 							})//fim ajax
@@ -1318,6 +1448,9 @@
 								$('#pcTipoClassificacao').val(null).trigger('change');
 								$('#selectDinamicoMACROPROCESSOS').val(null).trigger('change');
 								$('#pcOrgaoAvaliado').val(null).trigger('change');
+								$('#pcObjetivoEstrategico').val(null).trigger('change');
+								$('#pcRiscoEstrategico').val(null).trigger('change');
+								$('#pcIndEstrategico').val(null).trigger('change');
 								$('#pcAvaliadores').val(null).trigger('change');
 								$('#pcCoordenador').val(null).trigger('change');
 								$('#pcCoordNacional').val(null).trigger('change');
@@ -1442,13 +1575,17 @@
 				});	
 		}
 		
-		function processoEditarCard(processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin, bloquear) {
+		function processoEditarCard(processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin, bloquear, objetivoEstrategico, riscoEstrategico, indEstrategico) {
             event.preventDefault()
         	event.stopPropagation()
-		  
+		  	stepper.to(0);
 			var listAvaliadores = avaliadores.split(",");
+			var listObjetivoEstrategico = objetivoEstrategico.split(",");
+			var listRiscoEstrategico = riscoEstrategico.split(",");
+			var listIndEstrategico = indEstrategico.split(",");
 		    $('#cabecalhoAccordion').text("Editar o Processo:" + ' ' + processoId);
-			$("#btSalvarDiv").attr("hidden",false)
+			$("#btSalvar").attr("hidden",false);
+			$("#mensagemSalvar").attr("hidden",false);
 			
 			
 			$('#pcModalidade').val(modalidade).trigger('change');
@@ -1461,7 +1598,9 @@
 			$('#pcDataInicioAvaliacao').val(dataInicio);
 			$('#pcDataInicioAvaliacaoAnterior').val(dataInicio);
 			$('#pcDataFimAvaliacao').val(dataFim);
-			$('#selectDinamicoMACROPROCESSOS').val(processoAvaliado).trigger('change');
+
+		
+
 			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 			
 
@@ -1495,14 +1634,60 @@
 				
 
 
-		    var selectedValues = new Array();
+		    var selectedValuesAvaliadores = new Array();
 			$.each(listAvaliadores, function(index,value){
-				selectedValues[index] = value;
+				selectedValuesAvaliadores[index] = value;
 			});
 			
-			$('#pcAvaliadores').val(selectedValues).trigger('change');
+			$('#pcAvaliadores').val(selectedValuesAvaliadores).trigger('change');
+
+			var selectedValuesObjetivoEstrategico = new Array();
+			$.each(listObjetivoEstrategico, function(index,value){
+				selectedValuesObjetivoEstrategico[index] = value;
+			});
+
+			$('#pcObjetivoEstrategico').val(selectedValuesObjetivoEstrategico).trigger('change');
+
+			var selectedValuesRiscoEstrategico = new Array();
+			$.each(listRiscoEstrategico, function(index,value){
+				selectedValuesRiscoEstrategico[index] = value;
+			});
+
+			$('#pcRiscoEstrategico').val(selectedValuesRiscoEstrategico).trigger('change');
+
+			var selectedValuesIndEstrategico = new Array();
+			$.each(listIndEstrategico, function(index,value){
+				selectedValuesIndEstrategico[index] = value;
+			});
+
+			$('#pcIndEstrategico').val(selectedValuesIndEstrategico).trigger('change');
+			
 
 			$('#pcBloquear').val(bloquear).trigger('change');
+
+			//popula os selects dinâmicos	
+			$.ajax({
+				url: 'cfc/pc_cfcAvaliacoes.cfc',
+				data: {
+					method: 'getAvaliacaoTipos',
+				},
+				dataType: "json",
+				method: 'GET'
+			})
+			.done(function(data) {
+				// Define os IDs dos selects
+				let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
+				const exampleID = processoAvaliado; // Mude para o ID desejado
+				populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+			})
+			.fail(function(error) {
+				$('#modal-danger').modal('show')
+					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+					$('#modal-danger').find('.modal-body').text(error)
+			});
+			//fim popula os selects dinâmicos
+			
+
 		
 			$('#cadastro').CardWidget('expand')
 		
@@ -1512,14 +1697,19 @@
 
 		}
 
-		function processoEditarTab(linha,processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin,bloquear) {
+		function processoEditarTab(linha,processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin,bloquear, objetivoEstrategico, riscoEstrategico, indEstrategico) {
             event.preventDefault()
         	event.stopPropagation()
+			stepper.to(0);
+
 		    $(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
 			var listAvaliadores = avaliadores.split(",");
+			var listObjetivoEstrategico = objetivoEstrategico.split(",");
+			var listRiscoEstrategico = riscoEstrategico.split(",");
+			var listIndEstrategico = indEstrategico.split(",");
 		    $('#cabecalhoAccordion').text("Editar o Processo:" + ' ' + processoId);
-			$("#btSalvarDiv").attr("hidden",false)
-			
+			$("#btSalvar").attr("hidden",false);
+			$("#mensagemSalvar").attr("hidden",false);
 			
 			$('#pcModalidade').val(modalidade).trigger('change');
 
@@ -1531,7 +1721,7 @@
 			$('#pcDataInicioAvaliacao').val(dataInicio);
 			$('#pcDataInicioAvaliacaoAnterior').val(dataInicio);
 			$('#pcDataFimAvaliacao').val(dataFim);
-			$('#selectDinamicoMACROPROCESSOS').val(processoAvaliado).trigger('change');
+			
 			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 
 			$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
@@ -1555,12 +1745,57 @@
 			$('#pcAnoPacin').val(anoPacin).trigger('change');	
 
 
-		    var selectedValues = new Array();
+		   var selectedValuesAvaliadores = new Array();
 			$.each(listAvaliadores, function(index,value){
-				selectedValues[index] = value;
+				selectedValuesAvaliadores[index] = value;
 			});
 			
-			$('#pcAvaliadores').val(selectedValues).trigger('change');
+			$('#pcAvaliadores').val(selectedValuesAvaliadores).trigger('change');
+
+			var selectedValuesObjetivoEstrategico = new Array();
+			$.each(listObjetivoEstrategico, function(index,value){
+				selectedValuesObjetivoEstrategico[index] = value;
+			});
+
+			$('#pcObjetivoEstrategico').val(selectedValuesObjetivoEstrategico).trigger('change');
+
+			var selectedValuesRiscoEstrategico = new Array();
+			$.each(listRiscoEstrategico, function(index,value){
+				selectedValuesRiscoEstrategico[index] = value;
+			});
+
+			$('#pcRiscoEstrategico').val(selectedValuesRiscoEstrategico).trigger('change');
+
+			var selectedValuesIndEstrategico = new Array();
+			$.each(listIndEstrategico, function(index,value){
+				selectedValuesIndEstrategico[index] = value;
+			});
+
+			$('#pcIndEstrategico').val(selectedValuesIndEstrategico).trigger('change');
+
+			//popula os selects dinâmicos	
+			$.ajax({
+				url: 'cfc/pc_cfcAvaliacoes.cfc',
+				data: {
+					method: 'getAvaliacaoTipos',
+				},
+				dataType: "json",
+				method: 'GET'
+			})
+			.done(function(data) {
+				// Define os IDs dos selects
+				let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
+				const exampleID = processoAvaliado; // Mude para o ID desejado
+				populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+			})
+			.fail(function(error) {
+				$('#modal-danger').modal('show')
+					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+					$('#modal-danger').find('.modal-body').text(error)
+			});
+			//fim popula os selects dinâmicos
+			
+			
 			$('#pcBloquear').val(bloquear).trigger('change');
 		
 			$('#cadastro').CardWidget('expand')
@@ -1571,13 +1806,19 @@
 
 		}
 
-		function processoVisualizar(processoId,sei,relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin,bloquear) {
+		function processoVisualizar(processoId,sei,relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin,bloquear, objetivoEstrategico, riscoEstrategico, indEstrategico) {
             event.preventDefault()
         	event.stopPropagation()
+			stepper.to(0);	
 		
 			var listAvaliadores = avaliadores.split(",");
+			var listObjetivoEstrategico = objetivoEstrategico.split(",");
+			var listRiscoEstrategico = riscoEstrategico.split(",");
+			var listIndEstrategico = indEstrategico.split(",");
+
 		    $('#cabecalhoAccordion').text("Visualizando o Processo:" + ' ' + processoId);
-			$("#btSalvarDiv").attr("hidden",true);
+			$("#btSalvar").attr("hidden",true);
+			$("#mensagemSalvar").attr("hidden",true);
 			$('#pcDataInicioAvaliacao').removeAttr('disabled');
             $('#pcOrgaoAvaliado').removeAttr('disabled');
 			
@@ -1590,7 +1831,6 @@
 			$('#pcOrigem').val(orgaoOrigem).trigger('change');
 			$('#pcDataInicioAvaliacao').val(dataInicio);
 			$('#pcDataFimAvaliacao').val(dataFim);
-			$('#selectDinamicoMACROPROCESSOS').val(processoAvaliado).trigger('change');
 			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 
 			$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
@@ -1608,15 +1848,58 @@
 			}
 			$('#pcTipoDemanda').val(tipoDemanda).trigger('change');
 			$('#pcAnoPacin').val(anoPacin).trigger('change');	
+	
 
-		
-
-		    var selectedValues = new Array();
+		   var selectedValuesAvaliadores = new Array();
 			$.each(listAvaliadores, function(index,value){
-				selectedValues[index] = value;
+				selectedValuesAvaliadores[index] = value;
 			});
 			
-			$('#pcAvaliadores').val(selectedValues).trigger('change');
+			$('#pcAvaliadores').val(selectedValuesAvaliadores).trigger('change');
+
+			var selectedValuesObjetivoEstrategico = new Array();
+			$.each(listObjetivoEstrategico, function(index,value){
+				selectedValuesObjetivoEstrategico[index] = value;
+			});
+
+			$('#pcObjetivoEstrategico').val(selectedValuesObjetivoEstrategico).trigger('change');
+
+			var selectedValuesRiscoEstrategico = new Array();
+			$.each(listRiscoEstrategico, function(index,value){
+				selectedValuesRiscoEstrategico[index] = value;
+			});
+
+			$('#pcRiscoEstrategico').val(selectedValuesRiscoEstrategico).trigger('change');
+
+			var selectedValuesIndEstrategico = new Array();
+			$.each(listIndEstrategico, function(index,value){
+				selectedValuesIndEstrategico[index] = value;
+			});
+
+			$('#pcIndEstrategico').val(selectedValuesIndEstrategico).trigger('change');
+
+			//popula os selects dinâmicos	
+			$.ajax({
+				url: 'cfc/pc_cfcAvaliacoes.cfc',
+				data: {
+					method: 'getAvaliacaoTipos',
+				},
+				dataType: "json",
+				method: 'GET'
+			})
+			.done(function(data) {
+				// Define os IDs dos selects
+				let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
+				const exampleID = processoAvaliado; // Mude para o ID desejado
+				populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+			})
+			.fail(function(error) {
+				$('#modal-danger').modal('show')
+					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+					$('#modal-danger').find('.modal-body').text(error)
+			});
+			//fim popula os selects dinâmicos
+
 			$('#pcBloquear').val(bloquear).trigger('change');
 		
 			$('#cadastro').CardWidget('expand')

@@ -776,44 +776,44 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
 Use essa função dentro do success do ajax que retornou o json.
 Exemplo:
     $.ajax({
-        url: 'cfc/pc_cfcJsons.cfc',
+        url: 'cfc/pc_cfcAvaliacoes.cfc',
         data: {
             method: 'getAvaliacaoTipos',
         },
         dataType: "json",
-        method: 'GET',
-        success: function(data) {
+        method: 'GET'
+    })
+    .done(function(data) {
+        // Define os IDs dos selects
+        let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
         
-            // Define os níveis de dados e nomes dos labels
-            var dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
-            var labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
-            
-            // Inicializa os selects dinâmicos
-            initializeSelects(data, dataLevels, 'ID', labelNames, 'idSelecionado');
-            // Exemplo de uso da função para preencher os selects a partir de um ID
-            const exampleID = 220; // Mude para o ID desejado
-            populateSelectsFromID(data, exampleID, dataLevels, 'idSelecionado');
-        },
-        error: function(error) {
-            console.error("Erro ao obter dados:", error);
-        }
+        // Inicializa os selects (se necessário)
+        // initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao');
+        
+        // Exemplo de uso da função para preencher os selects a partir de um ID
+        const exampleID = processoAvaliado; // Mude para o ID desejado
+        
+        populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+    })
+    .fail(function(error) {
+        $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(error)
     });
 */
-function populateSelectsFromID(data, id, dataLevels, inputAlvo) {
-    const selectedData = data.find(item => item.ID === id);
+
+function populateSelectsFromID(data, id, selectIDs, inputAlvo) {
+    const selectedData = data.find(item => item.ID == id);
     if (!selectedData) {
         console.error("ID inválido.");
         return;
     }
 
-    // Inicializa os selects
-    //initializeSelects(data, dataLevels, 'ID', ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'], inputAlvo);
-
     // Preenche os selects
-    let parentSelections = [];
-    dataLevels.forEach((level, idx) => {
-        parentSelections.push(selectedData[level]);
-        $('#level-' + idx).val(selectedData[level]).trigger('change');
+    selectIDs.forEach(selectID => {
+        const selectLevel = selectID.replace('selectDinamico', '');
+        const value = selectedData[selectLevel];
+        $(`#${selectID}`).val(value).trigger('change');
     });
 
     // Atualiza o campo de destino com o ID correto

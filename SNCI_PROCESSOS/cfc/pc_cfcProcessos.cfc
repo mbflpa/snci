@@ -11,16 +11,16 @@
 		<cfargument name="pcOrigem" type="string" required="true" />
 		<cfargument name="pcDataInicioAvaliacao" type="date" required="true" />
 		<cfargument name="pcDataFimAvaliacao" type="any" required="false" />
-		<cfargument name="pcTipoAvaliado" type="string" required="true" />
+		<cfargument name="idTipoAvaliacao" type="string" required="true" />
 		<cfargument name="pcTipoAvalDescricao" type="string" required="false" default=''/>
 		<cfargument name="pcModalidade" type="string" required="true" />
 		<cfargument name="pcTipoClassificacao" type="string" required="true" />
 		<cfargument name="pcOrgaoAvaliado" type="string" required="true" />
 
-		<cfargument name="pcObjEstrategico" type="string" required="true" />
+		<cfargument name="pcObjetivoEstrategico" type="string" required="true" />
 		<cfargument name="pcRiscoEstrategico" type="string" required="true" />
-		<cfargument name="pcMebitda" type="string" required="true" />
-		<cfargument name="pcIndicadorSetorial" type="string" required="true" />
+		<cfargument name="pcIndEstrategico" type="string" required="true" />
+
 
 		<cfargument name="pcAvaliadores" type="any" required="true" />
 		<cfargument name="pcCoordenador" type="string" required="false" default=''/>
@@ -29,6 +29,12 @@
         <cfargument name="pcTipoDemanda" type="string" required="true"/>
 		<cfargument name="pcAnoPacin" type="string" required="true"/>
 		<cfargument name="pcBloquear" type="string" required="true"/>
+
+		<cfargument name="textoSelectDinamicoMACROPROCESSOS" type="string" required="false" default=''/>
+		<cfargument name="textoSelectDinamicoPROCESSOSN1" type="string" required="false" default=''/>
+		<cfargument name="textoSelectDinamicoPROCESSOSN2" type="string" required="false" default=''/>
+		<cfargument name="textoProcessoN3" type="string" required="false" default=''/>
+		<cfargument name="textoComentarioProcessoN3" type="string" required="false" default=''/>
 		
 		<cfset ano = year(#arguments.pcDataInicioAvaliacao#)> 
 		<cfset login = '#application.rsUsuarioParametros.pc_usu_login#'>
@@ -71,273 +77,295 @@
 
 
         <!-- Verifica se o processo já existe -->
-		<cfif '#arguments.pcProcessoId#' eq '' >
-			
-			<cfquery datasource="#application.dsn_processos#">
-				INSERT pc_processos (pc_processo_id, pc_usu_matricula_cadastro, pc_datahora_cadastro, pc_num_sei, pc_num_orgao_origem, pc_num_rel_sei, pc_num_orgao_avaliado, pc_num_avaliacao_tipo, pc_aval_tipo_nao_aplica_descricao,pc_num_classificacao, pc_data_inicioAvaliacao, pc_data_fimAvaliacao, pc_num_status, pc_alteracao_datahora, pc_alteracao_login, pc_usu_matricula_coordenador,pc_usu_matricula_coordenador_nacional, pc_Modalidade,pc_tipo_demanda, pc_ano_pacin, pc_iniciarBloqueado, pc_indicadorSetorial)
-				VALUES 
-					(
-					<cfqueryparam value="#NumID#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">, 
-					<cfqueryparam value="#aux_sei#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcOrigem#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcNumRelatorio#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcOrgaoAvaliado#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcTipoAvaliado#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcTipoAvalDescricao#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcTipoClassificacao#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcDataInicioAvaliacao#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcDataFimAvaliacao#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcNumStatus#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">, 
-					<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcCoordenador#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcCoordNacional#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcModalidade#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcTipoDemanda#" cfsqltype="cf_sql_varchar">, 
-					<cfqueryparam value="#arguments.pcAnoPacin#" cfsqltype="cf_sql_varchar">,
-					<cfqueryparam value="#arguments.pcBloquear#" cfsqltype="cf_sql_varchar">,
-					<cfqueryparam value="#arguments.pcIndicadorSetorial#" cfsqltype="cf_sql_varchar">
-					)
-
-			</cfquery> 	
-	
-
-			<!--Cadastra avaliadores -->
-
-			<cfloop list="#arguments.pcAvaliadores#" index="i">  
-				<cfset matriculaAvaliador = '#i#'>
+		<cfif '#arguments.pcProcessoId#' eq '' ><!--Se o processo não existir, cadastra um novo-->
+			<cftransaction>
+				<cfif '#arguments.idTipoAvaliacao#' neq 0>
+					<cfset idDoTipoAvaliacao = '#arguments.idTipoAvaliacao#'>
+				<cfelse>
+					<!--cadastrar novo tipo de avaliação na tabela pc_avaliacao_tipos-->
+					<cfquery datasource="#application.dsn_processos#" name="rsCadastraTipoAvaliacao">
+						INSERT pc_avaliacao_tipos (pc_aval_tipo_status, pc_aval_tipo_macroprocessos,pc_aval_tipo_processoN1,pc_aval_tipo_processoN2,pc_aval_tipo_processoN3,pc_aval_tipo_comentario)
+						VALUES ('A','#arguments.textoSelectDinamicoMACROPROCESSOS#','#arguments.textoSelectDinamicoPROCESSOSN1#','#arguments.textoSelectDinamicoPROCESSOSN2#','#arguments.textoProcessoN3#','#arguments.textoComentarioProcessoN3#')
+						SELECT SCOPE_IDENTITY() AS newID;
+					</cfquery>
+					<cfset idDoTipoAvaliacao = '#rsCadastraTipoAvaliacao.newID#'>
+				</cfif>
+				
 				<cfquery datasource="#application.dsn_processos#">
-					INSERT pc_avaliadores (pc_avaliador_matricula,  pc_avaliador_id_processo)
-					VALUES ('#matriculaAvaliador#',  '#NumID#')
-				</cfquery>
-			</cfloop>
+					INSERT pc_processos (pc_processo_id, pc_usu_matricula_cadastro, pc_datahora_cadastro, pc_num_sei, pc_num_orgao_origem, pc_num_rel_sei, pc_num_orgao_avaliado, pc_num_avaliacao_tipo, pc_aval_tipo_nao_aplica_descricao,pc_num_classificacao, pc_data_inicioAvaliacao, pc_data_fimAvaliacao, pc_num_status, pc_alteracao_datahora, pc_alteracao_login, pc_usu_matricula_coordenador,pc_usu_matricula_coordenador_nacional, pc_Modalidade,pc_tipo_demanda, pc_ano_pacin, pc_iniciarBloqueado)
+					VALUES 
+						(
+						<cfqueryparam value="#NumID#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">, 
+						<cfqueryparam value="#aux_sei#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcOrigem#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcNumRelatorio#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcOrgaoAvaliado#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#idDoTipoAvaliacao#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcTipoAvalDescricao#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcTipoClassificacao#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcDataInicioAvaliacao#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcDataFimAvaliacao#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcNumStatus#" cfsqltype="cf_sql_integer">, 
+						<cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">, 
+						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcCoordenador#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcCoordNacional#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcModalidade#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcTipoDemanda#" cfsqltype="cf_sql_varchar">, 
+						<cfqueryparam value="#arguments.pcAnoPacin#" cfsqltype="cf_sql_varchar">,
+						<cfqueryparam value="#arguments.pcBloquear#" cfsqltype="cf_sql_varchar">
+						)
 
-			<!--Cadastra objetivos estratégicos -->
-			<cfloop list="#arguments.pcObjEstrategico#" index="i">  
-				<cfset objEstrategico = '#i#'>
-				<cfquery datasource="#application.dsn_processos#">
-					INSERT pc_processos_objEstrategicos (pc_processo_id, pc_objEstrategico_id)
-					VALUES ('#NumID#','#objEstrategico#')
-				</cfquery>
-			</cfloop>
+				</cfquery> 	
+		
 
-			<!--Cadastra riscos estratégicos -->
-			<cfloop list="#arguments.pcRiscoEstrategico#" index="i">  
-				<cfset riscoEstrategico = '#i#'>
-				<cfquery datasource="#application.dsn_processos#">
-					INSERT pc_processos_riscosEstrategicos (pc_processo_id, pc_riscoEstrategico_id)
-					VALUES ('#NumID#','#riscoEstrategico#')
-				</cfquery>
-			</cfloop>
+				<!--Cadastra avaliadores -->
 
-			<!--Cadastra mebitda -->
-			<cfloop list="#arguments.pcMebitda#" index="i">  
-				<cfset mebitda = '#i#'>
-				<cfquery datasource="#application.dsn_processos#">
-					INSERT pc_processos_mebitda (pc_processo_id, pc_mebitda_id)
-					VALUES ('#NumID#','#mebitda#')
-				</cfquery>
-			</cfloop>
-
-		<cfelse>
-			<!--Se o processos existir mas ano da data de início da avaliação ou a SE do órgão avaliado foi alterada, um novo processo é cadastrado e o processo antigo é excluído-->
-		    <cfquery datasource="#application.dsn_processos#" name="qProcessoEditar">
-				SELECT pc_data_inicioAvaliacao, pc_org_se  FROM pc_processos 
-				INNER JOIN pc_orgaos ON pc_orgaos.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-				WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-			</cfquery>
-			<cfset anoAntes = year(#qProcessoEditar.pc_data_inicioAvaliacao#)>
-			<cfset seAntes = '#qProcessoEditar.pc_org_se#'>
-			<cfset seDepois = '#rsSEorgAvaliado.pc_org_se#'>
-
-			<cfif anoAntes neq ano or seAntes neq seDepois>
-				<cftransaction>
-			
+				<cfloop list="#arguments.pcAvaliadores#" index="i">  
+					<cfset matriculaAvaliador = '#i#'>
 					<cfquery datasource="#application.dsn_processos#">
-						INSERT pc_processos (pc_processo_id, pc_usu_matricula_cadastro, pc_datahora_cadastro, pc_num_sei, pc_num_orgao_origem, pc_num_rel_sei, pc_num_orgao_avaliado, pc_num_avaliacao_tipo, pc_aval_tipo_nao_aplica_descricao,pc_num_classificacao, pc_data_inicioAvaliacao, pc_data_fimAvaliacao, pc_num_status, pc_alteracao_datahora, pc_alteracao_login, pc_usu_matricula_coordenador,pc_usu_matricula_coordenador_nacional, pc_Modalidade,pc_tipo_demanda, pc_ano_pacin, pc_iniciarBloqueado, pc_indicadorSetorial)
-						VALUES (
-								<cfqueryparam value="#NumID#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-								<cfqueryparam value="#aux_sei#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcOrigem#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcNumRelatorio#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcOrgaoAvaliado#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcTipoAvaliado#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcTipoAvalDescricao#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcTipoClassificacao#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcDataInicioAvaliacao#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcDataFimAvaliacao#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcNumStatus#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-								<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcCoordenador#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcCoordNacional#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcModalidade#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcTipoDemanda#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcAnoPacin#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcBloquear#" cfsqltype="cf_sql_varchar">,
-								<cfqueryparam value="#arguments.pcIndicadorSetorial#" cfsqltype="cf_sql_varchar">
-							)
+						INSERT pc_avaliadores (pc_avaliador_matricula,  pc_avaliador_id_processo)
+						VALUES ('#matriculaAvaliador#',  '#NumID#')
+					</cfquery>
+				</cfloop>
 
+				<!--Cadastra objetivos estratégicos -->
+				<cfloop list="#arguments.pcObjetivoEstrategico#" index="i">  
+					<cfset objEstrategico = '#i#'>
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT pc_processos_objEstrategicos (pc_processo_id, pc_objEstrategico_id)
+						VALUES ('#NumID#','#objEstrategico#')
+					</cfquery>
+				</cfloop>
+
+				<!--Cadastra riscos estratégicos -->
+				<cfloop list="#arguments.pcRiscoEstrategico#" index="i">  
+					<cfset riscoEstrategico = '#i#'>
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT pc_processos_riscosEstrategicos (pc_processo_id, pc_riscoEstrategico_id)
+						VALUES ('#NumID#','#riscoEstrategico#')
+					</cfquery>
+				</cfloop>
+
+				<!--Cadastra IndEstrategico -->
+				<cfloop list="#arguments.pcIndEstrategico#" index="i">  
+					<cfset indEstrategico = '#i#'>
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT pc_processos_IndEstrategicos (pc_processo_id, pc_indEstrategico_id)
+						VALUES ('#NumID#','#indEstrategico#')
+					</cfquery>
+				</cfloop>
+			</cftransaction>
+		<cfelse><!--Se o processo existir, edita o processo-->
+			<cftransaction>	
+			    <cfif '#arguments.idTipoAvaliacao#' neq 0>
+					<cfset idDoTipoAvaliacao = '#arguments.idTipoAvaliacao#'>
+				<cfelse>
+					<!--cadastrar novo tipo de avaliação na tabela pc_avaliacao_tipos-->
+					<cfquery datasource="#application.dsn_processos#" name="rsCadastraTipoAvaliacao">
+						INSERT pc_avaliacao_tipos (pc_aval_tipo_status, pc_aval_tipo_macroprocessos,pc_aval_tipo_processoN1,pc_aval_tipo_processoN2,pc_aval_tipo_processoN3,pc_aval_tipo_comentario)
+						VALUES ('A','#arguments.textoSelectDinamicoMACROPROCESSOS#','#arguments.textoSelectDinamicoPROCESSOSN1#','#arguments.textoSelectDinamicoPROCESSOSN2#','#arguments.textoProcessoN3#','#arguments.textoComentarioProcessoN3#')
+						SELECT SCOPE_IDENTITY() AS newID;
+					</cfquery>
+					<cfset idDoTipoAvaliacao = '#rsCadastraTipoAvaliacao.newID#'>
+				</cfif>
+				<!--Se o processos existir mas ano da data de início da avaliação ou a SE do órgão avaliado foi alterada, um novo processo é cadastrado e o processo antigo é excluído-->
+				<cfquery datasource="#application.dsn_processos#" name="qProcessoEditar">
+					SELECT pc_data_inicioAvaliacao, pc_org_se  FROM pc_processos 
+					INNER JOIN pc_orgaos ON pc_orgaos.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+					WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
+				</cfquery>
+				<cfset anoAntes = year(#qProcessoEditar.pc_data_inicioAvaliacao#)>
+				<cfset seAntes = '#qProcessoEditar.pc_org_se#'>
+				<cfset seDepois = '#rsSEorgAvaliado.pc_org_se#'>
+
+				<cfif anoAntes neq ano or seAntes neq seDepois>
+					<cftransaction>
+				
+						<cfquery datasource="#application.dsn_processos#">
+							INSERT pc_processos (pc_processo_id, pc_usu_matricula_cadastro, pc_datahora_cadastro, pc_num_sei, pc_num_orgao_origem, pc_num_rel_sei, pc_num_orgao_avaliado, pc_num_avaliacao_tipo, pc_aval_tipo_nao_aplica_descricao,pc_num_classificacao, pc_data_inicioAvaliacao, pc_data_fimAvaliacao, pc_num_status, pc_alteracao_datahora, pc_alteracao_login, pc_usu_matricula_coordenador,pc_usu_matricula_coordenador_nacional, pc_Modalidade,pc_tipo_demanda, pc_ano_pacin, pc_iniciarBloqueado)
+							VALUES (
+									<cfqueryparam value="#NumID#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+									<cfqueryparam value="#aux_sei#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcOrigem#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcNumRelatorio#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcOrgaoAvaliado#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#idDoTipoAvaliacao#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcTipoAvalDescricao#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcTipoClassificacao#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcDataInicioAvaliacao#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcDataFimAvaliacao#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcNumStatus#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+									<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcCoordenador#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcCoordNacional#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcModalidade#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcTipoDemanda#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcAnoPacin#" cfsqltype="cf_sql_varchar">,
+									<cfqueryparam value="#arguments.pcBloquear#" cfsqltype="cf_sql_varchar">
+								)
+
+						
+						
+						</cfquery> 	
+				
+
+						<!--Cadastra avaliadores -->
+						<cfloop list="#arguments.pcAvaliadores#" index="i">  
+							<cfset matriculaAvaliador = '#i#'>
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT pc_avaliadores (pc_avaliador_matricula,  pc_avaliador_id_processo)
+								VALUES ('#matriculaAvaliador#',  '#NumID#')
+							</cfquery>
+						</cfloop>
+						<!--Cadastra objetivos estratégicos -->
+						<cfloop list="#arguments.pcObjetivoEstrategico#" index="i">  
+							<cfset objEstrategico = '#i#'>
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT pc_processos_objEstrategicos (pc_processo_id, pc_objEstrategico_id)
+								VALUES ('#NumID#','#objEstrategico#')
+							</cfquery>
+						</cfloop>
+
+						<!--Cadastra riscos estratégicos -->
+						<cfloop list="#arguments.pcRiscoEstrategico#" index="i">  
+							<cfset riscoEstrategico = '#i#'>
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT pc_processos_riscosEstrategicos (pc_processo_id, pc_riscoEstrategico_id)
+								VALUES ('#NumID#','#riscoEstrategico#')
+							</cfquery>
+						</cfloop>
+
+						<!--Cadastra IndEstrategico -->
+						<cfloop list="#arguments.pcIndEstrategico#" index="i">  
+							<cfset indEstrategico = '#i#'>
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT pc_processos_IndEstrategicos (pc_processo_id, pc_indEstrategico_id)
+								VALUES ('#NumID#','#indEstrategico#')
+							</cfquery>
+						</cfloop>
+
+						<cfquery datasource="#application.dsn_processos#" name="DeletaAvaliadores">
+							DELETE FROM pc_avaliadores
+							WHERE pc_avaliadores.pc_avaliador_id_processo = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
+						</cfquery> 
+
+						<cfquery datasource="#application.dsn_processos#" name="DeletaObjEstrategicos">
+							DELETE FROM pc_processos_objEstrategicos
+							WHERE pc_processos_objEstrategicos.pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
+						</cfquery>
+
+						<cfquery datasource="#application.dsn_processos#" name="DeletaRiscosEstrategicos">
+							DELETE FROM pc_processos_riscosEstrategicos
+							WHERE pc_processos_riscosEstrategicos.pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
+						</cfquery>
+
+						<cfquery datasource="#application.dsn_processos#" name="DeletaindEstrategicos">
+							DELETE FROM pc_processos_indEstrategicos
+							WHERE pc_processos_indEstrategicos.pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
+						</cfquery>
 					
+						<cfquery datasource="#application.dsn_processos#" name="DeletaProcessos">
+							DELETE FROM pc_processos
+							WHERE pc_processos.pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
+						</cfquery>
+					</cftransaction>	
+				<!--Se nem o ano de início da avaliação e nem o órgão avaliado for alterado, editar o processo normalmente-->
+				<cfelse>
 					
-					</cfquery> 	
-			
+						<cfquery datasource="#application.dsn_processos#" >
+							UPDATE pc_processos
+							SET pc_num_sei = <cfqueryparam value="#aux_sei#" cfsqltype="cf_sql_varchar">,
+								pc_num_orgao_origem = <cfqueryparam value="#arguments.pcOrigem#" cfsqltype="cf_sql_varchar">,
+								pc_num_rel_sei = <cfqueryparam value="#arguments.pcNumRelatorio#" cfsqltype="cf_sql_varchar">,
+								pc_num_orgao_avaliado = <cfqueryparam value="#arguments.pcOrgaoAvaliado#" cfsqltype="cf_sql_varchar">,
+								pc_num_avaliacao_tipo = <cfqueryparam value="#idDoTipoAvaliacao#" cfsqltype="cf_sql_varchar">,
+								pc_aval_tipo_nao_aplica_descricao = <cfqueryparam value="#arguments.pcTipoAvalDescricao#" cfsqltype="cf_sql_varchar">,
+								pc_Modalidade = <cfqueryparam value="#arguments.pcModalidade#" cfsqltype="cf_sql_varchar">,
+								pc_num_classificacao = <cfqueryparam value="#arguments.pcTipoClassificacao#" cfsqltype="cf_sql_varchar">,
+								pc_data_inicioAvaliacao = <cfqueryparam value="#arguments.pcDataInicioAvaliacao#" cfsqltype="cf_sql_varchar">,
+								pc_data_fimAvaliacao = <cfqueryparam value="#arguments.pcDataFimAvaliacao#" cfsqltype="cf_sql_varchar">,
+								pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="CF_SQL_TIMESTAMP">,
+								pc_alteracao_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
+								pc_usu_matricula_coordenador = <cfqueryparam value="#arguments.pcCoordenador#" cfsqltype="cf_sql_varchar">,
+								pc_usu_matricula_coordenador_nacional = <cfqueryparam value="#arguments.pcCoordNacional#" cfsqltype="cf_sql_varchar">,
+								pc_tipo_demanda = <cfqueryparam value="#arguments.pcTipoDemanda#" cfsqltype="cf_sql_varchar">,
+								pc_ano_pacin = <cfqueryparam value="#arguments.pcAnoPacin#" cfsqltype="cf_sql_varchar">,
+								pc_iniciarBloqueado = <cfqueryparam value="#arguments.pcBloquear#" cfsqltype="cf_sql_varchar">
+							WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar"> 
 
-					<!--Cadastra avaliadores -->
-					<cfloop list="#arguments.pcAvaliadores#" index="i">  
-						<cfset matriculaAvaliador = '#i#'>
-						<cfquery datasource="#application.dsn_processos#">
-							INSERT pc_avaliadores (pc_avaliador_matricula,  pc_avaliador_id_processo)
-							VALUES ('#matriculaAvaliador#',  '#NumID#')
+
+
+						</cfquery> 	
+
+						<cfquery datasource="#application.dsn_processos#" >
+							DELETE FROM pc_avaliadores
+							WHERE pc_avaliador_id_processo= <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
+						</cfquery> 	
+
+
+						<cfloop list="#arguments.pcAvaliadores#" index="i">  
+							<cfset matriculaAvaliador = '#i#'>
+							<cfif '#matriculaAvaliador#' eq  "#arguments.pcCoordenador#">
+								<cfset coordena ='S'>
+							<cfelse>
+								<cfset coordena ='N'>
+							</cfif>
+
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT pc_avaliadores (pc_avaliador_matricula, pc_avaliador_id_processo)
+								VALUES ('#matriculaAvaliador#', <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar"> )
+							</cfquery>
+						</cfloop>
+
+
+						<cfquery datasource="#application.dsn_processos#" >
+							DELETE FROM pc_processos_objEstrategicos
+							WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
 						</cfquery>
-					</cfloop>
-					<!--Cadastra objetivos estratégicos -->
-					<cfloop list="#arguments.pcObjEstrategico#" index="i">  
-						<cfset objEstrategico = '#i#'>
-						<cfquery datasource="#application.dsn_processos#">
-							INSERT pc_processos_objEstrategicos (pc_processo_id, pc_objEstrategico_id)
-							VALUES ('#NumID#','#objEstrategico#')
+
+						<cfloop list="#arguments.pcObjetivoEstrategico#" index="i">  
+							<cfset objEstrategico = '#i#'>
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT pc_processos_objEstrategicos (pc_processo_id, pc_objEstrategico_id)
+								VALUES ('#arguments.pcProcessoId#','#objEstrategico#')
+							</cfquery>
+						</cfloop>
+
+						<cfquery datasource="#application.dsn_processos#" >
+							DELETE FROM pc_processos_riscosEstrategicos
+							WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
 						</cfquery>
-					</cfloop>
 
-					<!--Cadastra riscos estratégicos -->
-					<cfloop list="#arguments.pcRiscoEstrategico#" index="i">  
-						<cfset riscoEstrategico = '#i#'>
-						<cfquery datasource="#application.dsn_processos#">
-							INSERT pc_processos_riscosEstrategicos (pc_processo_id, pc_riscoEstrategico_id)
-							VALUES ('#NumID#','#riscoEstrategico#')
+						<cfloop list="#arguments.pcRiscoEstrategico#" index="i">  
+							<cfset riscoEstrategico = '#i#'>
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT pc_processos_riscosEstrategicos (pc_processo_id, pc_riscoEstrategico_id)
+								VALUES ('#arguments.pcProcessoId#','#riscoEstrategico#')
+							</cfquery>
+						</cfloop>
+
+						<cfquery datasource="#application.dsn_processos#" >
+							DELETE FROM pc_processos_indEstrategicos
+							WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
 						</cfquery>
-					</cfloop>
 
-					<!--Cadastra mebitda -->
-					<cfloop list="#arguments.pcMebitda#" index="i">  
-						<cfset mebitda = '#i#'>
-						<cfquery datasource="#application.dsn_processos#">
-							INSERT pc_processos_mebitda (pc_processo_id, pc_mebitda_id)
-							VALUES ('#NumID#','#mebitda#')
-						</cfquery>
-					</cfloop>
-
-					<cfquery datasource="#application.dsn_processos#" name="DeletaAvaliadores">
-						DELETE FROM pc_avaliadores
-						WHERE pc_avaliadores.pc_avaliador_id_processo = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-					</cfquery> 
-
-					<cfquery datasource="#application.dsn_processos#" name="DeletaObjEstrategicos">
-						DELETE FROM pc_processos_objEstrategicos
-						WHERE pc_processos_objEstrategicos.pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-
-					<cfquery datasource="#application.dsn_processos#" name="DeletaRiscosEstrategicos">
-						DELETE FROM pc_processos_riscosEstrategicos
-						WHERE pc_processos_riscosEstrategicos.pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-
-					<cfquery datasource="#application.dsn_processos#" name="DeletaMebitda">
-						DELETE FROM pc_processos_mebitda
-						WHERE pc_processos_mebitda.pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-				
-					<cfquery datasource="#application.dsn_processos#" name="DeletaProcessos">
-						DELETE FROM pc_processos
-						WHERE pc_processos.pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-				</cftransaction>	
-			<!--Se nem o ano de início da avaliação e nem o órgão avaliado for alterado, editar o processo normalmente-->
-			<cfelse>
-				
-					<cfquery datasource="#application.dsn_processos#" >
-						UPDATE pc_processos
-						SET pc_num_sei = <cfqueryparam value="#aux_sei#" cfsqltype="cf_sql_varchar">,
-							pc_num_orgao_origem = <cfqueryparam value="#arguments.pcOrigem#" cfsqltype="cf_sql_varchar">,
-							pc_num_rel_sei = <cfqueryparam value="#arguments.pcNumRelatorio#" cfsqltype="cf_sql_varchar">,
-							pc_num_orgao_avaliado = <cfqueryparam value="#arguments.pcOrgaoAvaliado#" cfsqltype="cf_sql_varchar">,
-							pc_num_avaliacao_tipo = <cfqueryparam value="#arguments.pcTipoAvaliado#" cfsqltype="cf_sql_varchar">,
-							pc_aval_tipo_nao_aplica_descricao = <cfqueryparam value="#arguments.pcTipoAvalDescricao#" cfsqltype="cf_sql_varchar">,
-							pc_Modalidade = <cfqueryparam value="#arguments.pcModalidade#" cfsqltype="cf_sql_varchar">,
-							pc_num_classificacao = <cfqueryparam value="#arguments.pcTipoClassificacao#" cfsqltype="cf_sql_varchar">,
-							pc_data_inicioAvaliacao = <cfqueryparam value="#arguments.pcDataInicioAvaliacao#" cfsqltype="cf_sql_varchar">,
-							pc_data_fimAvaliacao = <cfqueryparam value="#arguments.pcDataFimAvaliacao#" cfsqltype="cf_sql_varchar">,
-							pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="CF_SQL_TIMESTAMP">,
-							pc_alteracao_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
-							pc_usu_matricula_coordenador = <cfqueryparam value="#arguments.pcCoordenador#" cfsqltype="cf_sql_varchar">,
-							pc_usu_matricula_coordenador_nacional = <cfqueryparam value="#arguments.pcCoordNacional#" cfsqltype="cf_sql_varchar">,
-							pc_tipo_demanda = <cfqueryparam value="#arguments.pcTipoDemanda#" cfsqltype="cf_sql_varchar">,
-							pc_ano_pacin = <cfqueryparam value="#arguments.pcAnoPacin#" cfsqltype="cf_sql_varchar">,
-							pc_iniciarBloqueado = <cfqueryparam value="#arguments.pcBloquear#" cfsqltype="cf_sql_varchar">,
-							pc_indicadorSetorial = <cfqueryparam value="#arguments.pcIndicadorSetorial#" cfsqltype="cf_sql_varchar">
-						WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar"> 
-
-
-
-					</cfquery> 	
-
-					<cfquery datasource="#application.dsn_processos#" >
-						DELETE FROM pc_avaliadores
-						WHERE pc_avaliador_id_processo= <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-					</cfquery> 	
-
-
-					<cfloop list="#arguments.pcAvaliadores#" index="i">  
-						<cfset matriculaAvaliador = '#i#'>
-						<cfif '#matriculaAvaliador#' eq  "#arguments.pcCoordenador#">
-							<cfset coordena ='S'>
-						<cfelse>
-							<cfset coordena ='N'>
-						</cfif>
-
-						<cfquery datasource="#application.dsn_processos#">
-							INSERT pc_avaliadores (pc_avaliador_matricula, pc_avaliador_id_processo)
-							VALUES ('#matriculaAvaliador#', <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar"> )
-						</cfquery>
-					</cfloop>
-
-
-					<cfquery datasource="#application.dsn_processos#" >
-						DELETE FROM pc_processos_objEstrategicos
-						WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-
-					<cfloop list="#arguments.pcObjEstrategico#" index="i">  
-						<cfset objEstrategico = '#i#'>
-						<cfquery datasource="#application.dsn_processos#">
-							INSERT pc_processos_objEstrategicos (pc_processo_id, pc_objEstrategico_id)
-							VALUES ('#arguments.pcProcessoId#','#objEstrategico#')
-						</cfquery>
-					</cfloop>
-
-					<cfquery datasource="#application.dsn_processos#" >
-						DELETE FROM pc_processos_riscosEstrategicos
-						WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-
-					<cfloop list="#arguments.pcRiscoEstrategico#" index="i">  
-						<cfset riscoEstrategico = '#i#'>
-						<cfquery datasource="#application.dsn_processos#">
-							INSERT pc_processos_riscosEstrategicos (pc_processo_id, pc_riscoEstrategico_id)
-							VALUES ('#arguments.pcProcessoId#','#riscoEstrategico#')
-						</cfquery>
-					</cfloop>
-
-					<cfquery datasource="#application.dsn_processos#" >
-						DELETE FROM pc_processos_mebitda
-						WHERE pc_processo_id = <cfqueryparam value="#arguments.pcProcessoId#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-
-					<cfloop list="#arguments.pcMebitda#" index="i">  
-						<cfset mebitda = '#i#'>
-						<cfquery datasource="#application.dsn_processos#">
-							INSERT pc_processos_mebitda (pc_processo_id, pc_mebitda_id)
-							VALUES ('#arguments.pcProcessoId#','#mebitda#')
-						</cfquery>
-					</cfloop>
-				
-			</cfif>
-
+						<!--Cadastra IndEstrategico -->
+						<cfloop list="#arguments.pcIndEstrategico#" index="i">  
+							<cfset indEstrategico = '#i#'>
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT pc_processos_IndEstrategicos (pc_processo_id, pc_indEstrategico_id)
+								VALUES ('#arguments.pcProcessoId#','#indEstrategico#')
+							</cfquery>
+						</cfloop>
+					
+				</cfif>
+			</cftransaction>
         </cfif>
 
 
@@ -372,10 +400,11 @@
 				WHERE pc_processos_riscosEstrategicos.pc_processo_id = <cfqueryparam value="#arguments.numProc#" cfsqltype="cf_sql_varchar">
 			</cfquery>
 
-			<cfquery datasource="#application.dsn_processos#" name="DeletaMebitda">
-				DELETE FROM pc_processos_mebitda
-				WHERE pc_processos_mebitda.pc_processo_id = <cfqueryparam value="#arguments.numProc#" cfsqltype="cf_sql_varchar">
+			<cfquery datasource="#application.dsn_processos#" name="DeletaIndEstrategico">
+				DELETE FROM pc_processos_IndEstrategicos
+				WHERE pc_processos_IndEstrategicos.pc_processo_id = <cfqueryparam value="#arguments.numProc#" cfsqltype="cf_sql_varchar">
 			</cfquery>
+				
 		
 			<cfquery datasource="#application.dsn_processos#" name="DeletaProcessos">
 				DELETE FROM pc_processos
@@ -415,106 +444,12 @@
 
 
 
-
-
-
-
-	
-	<cffunction name="cards" returntype="any" hint="Criar os cards dos processos (ainda não utilizado em nenhuma página)">
-		<cfargument name="status" type="any" required="true"   /> <!-- -->
-
-		<cfquery name="rsProcCards" datasource="#application.dsn_processos#">
-			SELECT pc_processos.*,pc_orgaos.pc_org_descricao,pc_orgaos.pc_org_sigla, pc_status.*,pc_avaliacao_tipos.pc_aval_tipo_descricao
-			FROM   pc_processos 
-			INNER JOIN pc_avaliacao_tipos on pc_num_avaliacao_tipo = pc_aval_tipo_id
-			INNER JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado =pc_orgaos.pc_org_mcu
-			INNER JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id
-			<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 11> 
-				<cfif '#arguments.status#' eq 'todos'><cfelse>WHERE  pc_num_status='#arguments.status#'</cfif>
-			<cfelse>
-		    	WHERE  pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'<cfif '#arguments.status#' eq 'todos'><cfelse> and pc_num_status='#arguments.status#'</cfif>
-			</cfif>
-			ORDER BY pc_datahora_cadastro desc 	
-		</cfquery>
-
-		<div class="card-body" style="border: solid 3px ##ffD400">
-			<div class="row" style="justify-content: space-around;">
-				<cfloop query="rsProcCards" >
-					<cfset status = "#pc_status_id#"> 
-					
-					<section class="content" >
-						
-						<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
-						   SELECT pc_avaliadores.pc_avaliador_matricula FROM pc_avaliadores WHERE pc_avaliador_id_processo = '#pc_processo_id#' 
-						</cfquery>
-						<cfset avaliadores = ValueList(rsAvaliadores.pc_avaliador_matricula,',')>
-					
-						
-
-						<div id="processosCadastrados" class="container-fluid">
-							<div class="row">
-								<div id="cartao" style="width:270px;" >
-									<!-- small card -->
-									<div class="small-box " style="<cfoutput>#pc_status_card_style_body#</cfoutput> ;font-weight: normal;">
-										<div class="ribbon-wrapper ribbon-lg" >
-											<div class="ribbon " style="font-size:12px;left:8px;<cfoutput>#pc_status_card_style_ribbon#</cfoutput>"><cfoutput>#pc_status_card_nome_ribbon#</cfoutput></div>
-										</div>
-										<div class="card-header" style="height:120px;width:250px;border-bottom:none; font-weight: normal!important">
-											<p style="font-size:16px;margin-bottom: 0.3rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
-											<p style="font-size:13px;margin-bottom: 0.3rem!important;"><cfoutput>#pc_org_sigla#</cfoutput></p>
-											<cfif pc_num_avaliacao_tipo neq 2>
-												<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
-											<cfelse>
-												<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
-											</cfif>
-											
-										</div>
-										<div class="icon">
-											<i class="fas fa-search" style="opacity:0.6;left:100px;top:30px"></i>
-										</div>
-
-										<a href="##"  target="_self" class="small-box-footer"   >
-											<div style="display:flex;justify-content: space-around;" >
-												<input id="pcNumProcessoCard" name="pcNumProcessoCard" type="text" hidden >												
-												<i  class="fas fa-trash-alt efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'" style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoDel(<cfoutput>'#pc_processo_id#'</cfoutput>);" data-toggle="tooltip"  tilte="Excluir" ></i>
-												<i id="btEdit" class="fas fa-edit efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'"  style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoEditarCard(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_iniciarBloqueado#')</cfoutput>;" data-toggle="tooltip"  tilte="Editar"></i>
-												<i  class="fas fa-eye efeito-grow"   onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'" style="z-index:100;cursor: pointer;font-size:20px" onclick="javascript:processoVisualizar(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_iniciarBloqueado#')</cfoutput>;" tilte="Visualizar"></i>
-											</div>
-										</a>
-									</div>
-								</div>
-							</div>
-						</div>
-					</section>
-				</cfloop>
-
-				<!-- Fim Cards com os processos cadastrados -->
-			</div> <!-- fim row -->
-		</div>
-
-
-
-
-	</cffunction>
-	
-
-
-
-
-
-
-
-
-
-
-
-
 	
 	<cffunction name="cardsProcessos" returntype="any" access="remote" hint="Criar os cards dos processos e envia para a páginas pc_CadastroProcesso">
 	   
 
 		<cfquery name="rsProcCard" datasource="#application.dsn_processos#">
-			SELECT pc_processos.*,pc_orgaos.pc_org_descricao,pc_orgaos.pc_org_sigla, pc_status.*,pc_avaliacao_tipos.pc_aval_tipo_descricao
+			SELECT pc_processos.*,pc_orgaos.pc_org_descricao,pc_orgaos.pc_org_sigla, pc_status.*,pc_avaliacao_tipos.pc_aval_tipo_descricao, CONCAT(pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,' - ',pc_avaliacao_tipos.pc_aval_tipo_processoN1, ' - ',pc_avaliacao_tipos.pc_aval_tipo_processoN2,' - ',pc_avaliacao_tipos.pc_aval_tipo_processoN3) as tipoProcesso
 			FROM   pc_processos 
 			INNER JOIN pc_avaliacao_tipos on pc_num_avaliacao_tipo = pc_aval_tipo_id
 			INNER JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado =pc_orgaos.pc_org_mcu
@@ -578,6 +513,28 @@
 																		SELECT pc_avaliadores.pc_avaliador_matricula FROM pc_avaliadores WHERE pc_avaliador_id_processo = '#pc_processo_id#' 
 																	</cfquery>
 																	<cfset avaliadores = ValueList(rsAvaliadores.pc_avaliador_matricula,',')>
+
+																	<cfquery name="rsObjetivoEstrategico" datasource="#application.dsn_processos#">
+																		SELECT pc_objetivo_estrategico.pc_objEstrategico_id FROM pc_processos_objEstrategicos 
+																		INNER JOIN pc_objetivo_estrategico ON pc_objetivo_estrategico.pc_objEstrategico_id = pc_processos_objEstrategicos.pc_objEstrategico_id
+																		WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
+																	</cfquery>
+																	<cfset objetivosEstrategicos = ValueList(rsObjetivoEstrategico.pc_objEstrategico_id,',')>
+
+																	<cfquery name="rsRiscoEstrategico" datasource="#application.dsn_processos#">
+																		SELECT pc_risco_estrategico.pc_riscoEstrategico_id FROM pc_processos_riscosEstrategicos 
+																		INNER JOIN pc_risco_estrategico ON pc_risco_estrategico.pc_riscoEstrategico_id = pc_processos_riscosEstrategicos.pc_riscoEstrategico_id
+																		WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
+																	</cfquery>
+																	<cfset riscosEstrategicos = ValueList(rsRiscoEstrategico.pc_riscoEstrategico_id,',')>
+
+																	<cfquery name="rsIndEstrategico" datasource="#application.dsn_processos#">
+																		SELECT pc_indicador_estrategico.pc_indEstrategico_id FROM pc_processos_IndEstrategicos 
+																		INNER JOIN pc_indicador_estrategico ON pc_indicador_estrategico.pc_indEstrategico_id = pc_processos_IndEstrategicos.pc_indEstrategico_id
+																		WHERE pc_processos_IndEstrategicos.pc_processo_id = '#pc_processo_id#'
+																	</cfquery>
+																	<cfset indEstrategicos = ValueList(rsIndEstrategico.pc_indEstrategico_id,',')>
+
 																	<tr style="width:270px;border:none;">
 																		<td style="background: none;border:none;white-space:normal!important;" >	
 																			<section class="content" >
@@ -605,9 +562,13 @@
 																											<p style="font-size:1em;margin-bottom: 0.3rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
 																											<p style="font-size:1em;margin-bottom: 0.3rem!important;"><cfoutput>#pc_org_sigla#</cfoutput></p>
 																											<cfif pc_num_avaliacao_tipo neq 2>
-																												<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
+																												<cfif pc_aval_tipo_descricao neq ''>
+																													<p style="font-size:10px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
+																												<cfelse>
+																													<p class="text-ellipsis" ><cfoutput>#tipoProcesso#</cfoutput></p>
+																												</cfif>
 																											<cfelse>
-																												<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
+																												<p style="font-size:10px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
 																											</cfif>
 																											
 																										</div>
@@ -619,8 +580,8 @@
 																											<div style="display:flex;justify-content: space-around;" >
 																												<input id="pcNumProcessoCard" name="pcNumProcessoCard" type="text" hidden >												
 																												<i  class="fas fa-trash-alt efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'" style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoDel(<cfoutput>'#pc_processo_id#'</cfoutput>);" data-toggle="tooltip"  tilte="Excluir" ></i>
-																												<i id="btEdit" class="fas fa-edit efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'"  style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoEditarCard(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#')</cfoutput>;" data-toggle="tooltip"  tilte="Editar"></i>
-																												<i  class="fas fa-eye efeito-grow"   onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'" style="z-index:100;cursor: pointer;font-size:20px" onclick="javascript:processoVisualizar(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#')</cfoutput>;" tilte="Visualizar"></i>
+																												<i id="btEdit" class="fas fa-edit efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'"  style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoEditarCard(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;" data-toggle="tooltip"  tilte="Editar"></i>
+																												<i  class="fas fa-eye efeito-grow"   onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'" style="z-index:100;cursor: pointer;font-size:20px" onclick="javascript:processoVisualizar(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;" tilte="Visualizar"></i>
 																											</div>
 																										</a>
 																											
@@ -771,9 +732,34 @@
 									</cfquery>	 
 								
 									<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'<br>')>
+
+
 									
 									<!-- para polular select multiplo-->
 									<cfset avaliadoresSelect = ValueList(rsAvaliadores.pc_avaliador_matricula,',')>
+
+									<cfquery name="rsObjetivoEstrategico" datasource="#application.dsn_processos#">
+										SELECT pc_objetivo_estrategico.pc_objEstrategico_id FROM pc_processos_objEstrategicos 
+										INNER JOIN pc_objetivo_estrategico ON pc_objetivo_estrategico.pc_objEstrategico_id = pc_processos_objEstrategicos.pc_objEstrategico_id
+										WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
+									</cfquery>
+									<cfset objetivosEstrategicos = ValueList(rsObjetivoEstrategico.pc_objEstrategico_id,',')>
+
+									<cfquery name="rsRiscoEstrategico" datasource="#application.dsn_processos#">
+										SELECT pc_risco_estrategico.pc_riscoEstrategico_id FROM pc_processos_riscosEstrategicos 
+										INNER JOIN pc_risco_estrategico ON pc_risco_estrategico.pc_riscoEstrategico_id = pc_processos_riscosEstrategicos.pc_riscoEstrategico_id
+										WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
+									</cfquery>
+									<cfset riscosEstrategicos = ValueList(rsRiscoEstrategico.pc_riscoEstrategico_id,',')>
+
+									<cfquery name="rsIndEstrategico" datasource="#application.dsn_processos#">
+										SELECT pc_indicador_estrategico.pc_indEstrategico_id FROM pc_processos_IndEstrategicos 
+										INNER JOIN pc_indicador_estrategico ON pc_indicador_estrategico.pc_indEstrategico_id = pc_processos_IndEstrategicos.pc_indEstrategico_id
+										WHERE pc_processos_IndEstrategicos.pc_processo_id = '#pc_processo_id#'
+									</cfquery>
+									<cfset indEstrategicos = ValueList(rsIndEstrategico.pc_indEstrategico_id,',')>
+
+
 
 								
 
@@ -782,7 +768,7 @@
 											<td>
 												<div style="display:flex;justify-content:space-around;border:none">
 													<i  class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:1;font-size:16px" onclick="javascript:processoDel(<cfoutput>'#pc_processo_id#'</cfoutput>);" data-toggle="tooltip"  tilte="Excluir" ></i>	
-													<i class="fas fa-edit efeito-grow"   style="cursor: pointer;z-index:1;font-size:16px"  onclick="javascript:processoEditarTab(this,'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadoresSelect#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#' );" data-toggle="tooltip"  tilte="Editar"></i>
+													<i class="fas fa-edit efeito-grow"   style="cursor: pointer;z-index:1;font-size:16px"  onclick="javascript:processoEditarTab(this,'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadoresSelect#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')" data-toggle="tooltip"  tilte="Editar"></i>
 													
 												</div>
 											</td>
@@ -1244,8 +1230,25 @@
 
 
 
+    <cffunction name="obterDescricaoDoTipoDeProcesso" access="remote" returntype="string" hint="Obter a descrição do tipo de processo">
+    <cfargument name="idTipoProcesso" type="numeric" required="true" default=""/>
 
-	
+    <cfquery name="rsTipoProcesso" datasource="#application.dsn_processos#">
+        SELECT pc_aval_tipo_comentario
+        FROM pc_avaliacao_tipos
+        WHERE pc_aval_tipo_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idTipoProcesso#">
+    </cfquery>
+
+    <cfset var descricao = "" />
+
+    <cfif rsTipoProcesso.recordCount gt 0>
+        <cfset descricao = rsTipoProcesso.pc_aval_tipo_comentario />
+    </cfif>
+
+    <!--- Serializa o resultado manualmente em JSON ou texto simples --->
+    <cfreturn serializeJSON(descricao) />
+</cffunction>
+
 
 
 
