@@ -567,14 +567,14 @@
 																										<div class="card-header" style="height:120px;width:250px;    font-weight: normal!important;">
 																											<p style="font-size:1em;margin-bottom: 0rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
 																											<p style="font-size:1em;margin-bottom: 0rem!important;"><cfoutput>#pc_org_sigla#</cfoutput></p>
-																											<cfif pc_num_avaliacao_tipo neq 2>
+																											<cfif pc_num_avaliacao_tipo neq 445>
 																												<cfif pc_aval_tipo_descricao neq ''>
-																													<p style="font-size:10px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
+																													<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
 																												<cfelse>
 																													<p class="text-ellipsis" ><cfoutput>#tipoProcesso#</cfoutput></p>
 																												</cfif>
 																											<cfelse>
-																												<p style="font-size:10px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
+																												<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
 																											</cfif>
 																											
 																										</div>
