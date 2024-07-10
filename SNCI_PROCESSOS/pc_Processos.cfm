@@ -1690,6 +1690,15 @@
 				method: 'GET'
 			})
 			.done(function(data) {
+				// Define os níveis de dados e nomes dos labels
+                let dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
+                let labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+                let outrosOptions = [
+                    { dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
+                ];
+                // Inicializa os selects dinâmicos
+                initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
+ 
 				// Define os IDs dos selects
 				let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
 				const exampleID = processoAvaliado; // Mude para o ID desejado
@@ -1799,6 +1808,14 @@
 				method: 'GET'
 			})
 			.done(function(data) {
+				// Define os níveis de dados e nomes dos labels
+                let dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
+                let labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+                let outrosOptions = [
+                    { dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
+                ];
+                // Inicializa os selects dinâmicos
+                initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
 				// Define os IDs dos selects
 				let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
 				const exampleID = processoAvaliado; // Mude para o ID desejado
@@ -1905,6 +1922,14 @@
 				method: 'GET'
 			})
 			.done(function(data) {
+				// Define os níveis de dados e nomes dos labels
+                let dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
+                let labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+                let outrosOptions = [
+                    { dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
+                ];
+                // Inicializa os selects dinâmicos
+                initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
 				// Define os IDs dos selects
 				let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
 				const exampleID = processoAvaliado; // Mude para o ID desejado
