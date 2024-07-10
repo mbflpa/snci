@@ -1,6 +1,5 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
-
 <!-- 'A' ATIVO, 'O' ORIGEM DE PROCESSOS, 'D' DESATIVADO -->
 <cfquery name="rsOrigem" datasource="#application.dsn_processos#">
 	SELECT pc_org_mcu, pc_org_sigla
@@ -81,9 +80,8 @@
 	<!-- iCheck -->
 	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">
 
-
-
      <style>
+        
 
 		fieldset{
 			border: 1px solid #ced4da!important;
@@ -671,16 +669,11 @@
 
 	<script language="JavaScript">
         
-
-		// BS-Stepper Init
-		document.addEventListener('DOMContentLoaded', function () {
-			window.stepper = new Stepper(document.querySelector('.bs-stepper',
-				{animation:true	})
-			)
-		})
-		
-	
 		$(document).ready(function() {
+			window.stepper = new Stepper($('.bs-stepper')[0], {
+				animation: true
+			});
+
 			//Initialize Select2 Elements
 			$('select').select2({
 				theme: 'bootstrap4',
