@@ -182,6 +182,11 @@
 		<div class="content-wrapper" >
 			<!-- Content Header (Page header) -->
 			<div class="content-header" style="background:  #f4f6f9;">
+				<div class="row mb-2" style="margin-left:30px;margin-top:10px;margin-bottom:0px!important;">
+					<div class="col-sm-6">
+						<h4>Cadastrar Processos</h4>
+					</div>
+				</div>
 			
 				<div class="container-fluid">
 							
@@ -189,6 +194,7 @@
 
 						<!--acordion-->
 						<div id="accordion ">
+						   
 					
 							<div id="cadastro" class="card card-primary collapsed-card " style="margin-left:8px;">
 								<div  class="card-header" style="background-color: #0083ca;color:#fff;">
@@ -669,10 +675,7 @@
 		// BS-Stepper Init
 		document.addEventListener('DOMContentLoaded', function () {
 			window.stepper = new Stepper(document.querySelector('.bs-stepper',
-				{
-
-					animation:true
-				})
+				{animation:true	})
 			)
 		})
 		
@@ -1500,7 +1503,7 @@
 									)
 								});
 							})//fim fail
-						}, 500);
+						}, 1000);
 					}else {
 						// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 						$('#modalOverlay').modal('hide');
@@ -1698,6 +1701,7 @@
 					$('#modal-danger').find('.modal-body').text(error)
 			});
 			//fim popula os selects dinâmicos
+			
 			
 
 		
