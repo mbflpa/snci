@@ -609,9 +609,9 @@
 																</div>
 															</div>
 
-															<div style="margin-top:10px;display:flex;justify-content:space-between">
+															<div style="margin-top:10px;display:flex;justify-content:space-between" >
 																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-																<button id="btSalvar" class="btn  btn-success animate__animated animate__zoomInDown animate__slow" >Salvar</button>
+																<button id="btSalvar" class="btn  btn-success animate__animated animate__bounceIn animate__slow animate__delay-2s " >Salvar</button>
 																<button id="btCancelar"  class="btn  btn-danger " onclick="location.reload()">Cancelar</button>
 															</div>
 
