@@ -50,9 +50,12 @@
 	<!-- Tour -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">
 
-  <!-- Theme style -->
+    <!-- Theme style -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
+
+    <!-- animate.css -->
+    <link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/animate.min.css">
 
 </head>
 

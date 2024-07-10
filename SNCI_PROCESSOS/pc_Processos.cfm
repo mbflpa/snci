@@ -165,7 +165,8 @@
 
 
 	 </style>
-	
+	 <!-- animate.css -->
+    <link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/animate.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -191,7 +192,7 @@
 					<div class="card-body" style="display:flex;flex-direction:column;">
 
 						<!--acordion-->
-						<div id="accordion ">
+						<div id="accordion">
 						   
 					
 							<div id="cadastro" class="card card-primary collapsed-card " style="margin-left:8px;">
@@ -262,8 +263,8 @@
 													<!-- your steps content here -->
 													<form   id="formInfoInicial" name="formInfoInicial"   onsubmit="return false" novalidate>
 														<div id="infoInicial" class="content " role="tabpanel" aria-labelledby="infoInicial-trigger" >
-															<div class="card-body" style="border: solid 1px #0083ca">
-																<div class="row" >
+															<div class="card-body animate__animated animate__flipInX" style="border: solid 1px #0083ca">
+																<div class="row  " >
 																	<div class="col-sm-3">
 																		<div class="form-group">
 																			<label for="pcModalidade">Modalidade:</label>
@@ -414,10 +415,10 @@
 															</div>
 														</div>
 													</form>
-													<form   id="formTipoAvaliacao" name="formTipoAvaliacao"  onsubmit="return false" novalidate>
+													<form   id="formTipoAvaliacao" name="formTipoAvaliacao"  onsubmit="return false" novalidate >
 														<div id="tipoAvaliacao" class="content " role="tabpanel" aria-labelledby="tipoAvaliacao-trigger" >
-															<div class="card-body " style="border: solid 1px #0083ca">
-																<div class="row " >
+															<div class="card-body animate__animated animate__flipInX" style="border: solid 1px #0083ca">
+																<div class="row" >
 																	<input id="idTipoAvaliacao" hidden></input>
 																	<div class="form-group col-sm-12">
 																				<div id="dados-container" class="dados-container">
@@ -474,7 +475,7 @@
 													</form>
 													<form   id="formInfoEstrategicas" name="formInfoEstrategicaso"  onsubmit="return false" novalidate>
 														<div id="infoEstrategicas" class="content" role="tabpanel" aria-labelledby="infoEstrategicas-trigger">
-															<div class="card-body" style="border: solid 1px #0083ca">
+															<div class="card-body animate__animated animate__flipInX" style="border: solid 1px #0083ca">
 																<div class="row" style="display:flex; justify-content: space-between;">
 																	<div class="col-sm-6">
 																		<div class="form-group " >
@@ -522,7 +523,7 @@
 													</form>
 													<form   id="formEquipe" name="formEquipe"  onsubmit="return false" novalidate>
 														<div id="equipe" class="content" role="tabpanel" aria-labelledby="equipe-trigger">
-															<div class="card-body" style="border: solid 1px #0083ca">
+															<div class="card-body animate__animated animate__flipInX" style="border: solid 1px #0083ca">
 																<div class="row">
 																	<div class="col-sm-12">
 																		<div class="form-group " >
@@ -576,7 +577,7 @@
 													<form   id="formFinalizar" name="formFinalizar"  onsubmit="return false" novalidate>
 														<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="Finalizar-trigger">
 															
-															<div id="infoValidas" hidden class="form-card col-sm-12 mostraValidacao">
+															<div id="infoValidas" hidden class="form-card col-sm-12 animate__animated animate__zoomInDown animate__slow">
 																<h3 class="fs-title text-center">Todas as Informações foram validadas com sucesso!</h3>
 																<br>
 																<div class="row justify-content-center col-sm-12">
@@ -592,7 +593,7 @@
 																</div>
 															</div>
 
-															<div id="infoInvalidas" hidden class="form-card col-sm-12 mostraValidacao">
+															<div id="infoInvalidas" hidden class="form-card col-sm-12 animate__animated animate__wobble">
 																<h3 class="fs-title text-center">Há campos que precisam ser corrigidos!</h3>
 																<br>
 																<div class="row justify-content-center col-sm-12">
@@ -610,7 +611,7 @@
 
 															<div style="margin-top:10px;display:flex;justify-content:space-between">
 																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-																<button id="btSalvar" class="btn  btn-success " >Salvar</button>
+																<button id="btSalvar" class="btn  btn-success animate__animated animate__zoomInDown animate__slow" >Salvar</button>
 																<button id="btCancelar"  class="btn  btn-danger " onclick="location.reload()">Cancelar</button>
 															</div>
 
@@ -666,13 +667,14 @@
 
 	
 
-
 	<script language="JavaScript">
-        
+       
 		$(document).ready(function() {
 			window.stepper = new Stepper($('.bs-stepper')[0], {
 				animation: true
 			});
+
+			
 
 			//Initialize Select2 Elements
 			$('select').select2({
@@ -1106,9 +1108,7 @@
 					stepper.next();
  					$('#infoValidas').attr("hidden",false);
 					$('#infoInvalidas').attr("hidden",true);
-					//adiciona style display none no mostraValidacao
-					$('.mostraValidacao').css('display', 'none')
-					$('.mostraValidacao').fadeIn(2000);
+					
 				}else{
 					$('#infoValidas').attr("hidden",true);
 					$('#infoInvalidas').attr("hidden",false);
