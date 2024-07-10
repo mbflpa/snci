@@ -449,7 +449,13 @@
 	   
 
 		<cfquery name="rsProcCard" datasource="#application.dsn_processos#">
-			SELECT pc_processos.*,pc_orgaos.pc_org_descricao,pc_orgaos.pc_org_sigla, pc_status.*,pc_avaliacao_tipos.pc_aval_tipo_descricao, CONCAT(pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,' - ',pc_avaliacao_tipos.pc_aval_tipo_processoN1, ' - ',pc_avaliacao_tipos.pc_aval_tipo_processoN2,' - ',pc_avaliacao_tipos.pc_aval_tipo_processoN3) as tipoProcesso
+			SELECT pc_processos.*,pc_orgaos.pc_org_descricao,pc_orgaos.pc_org_sigla, pc_status.*,pc_avaliacao_tipos.pc_aval_tipo_descricao
+					,CONCAT(
+					'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+					'<br>N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+					'<br>N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+					'<br>N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+					) as tipoProcesso
 			FROM   pc_processos 
 			INNER JOIN pc_avaliacao_tipos on pc_num_avaliacao_tipo = pc_aval_tipo_id
 			INNER JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado =pc_orgaos.pc_org_mcu
@@ -559,8 +565,8 @@
 																										
 
 																										<div class="card-header" style="height:120px;width:250px;    font-weight: normal!important;">
-																											<p style="font-size:1em;margin-bottom: 0.3rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
-																											<p style="font-size:1em;margin-bottom: 0.3rem!important;"><cfoutput>#pc_org_sigla#</cfoutput></p>
+																											<p style="font-size:1em;margin-bottom: 0rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
+																											<p style="font-size:1em;margin-bottom: 0rem!important;"><cfoutput>#pc_org_sigla#</cfoutput></p>
 																											<cfif pc_num_avaliacao_tipo neq 2>
 																												<cfif pc_aval_tipo_descricao neq ''>
 																													<p style="font-size:10px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>

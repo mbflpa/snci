@@ -161,10 +161,11 @@
 			-webkit-box-orient: vertical!important;
 			overflow: hidden!important;
 			text-overflow: ellipsis!important;
-			-webkit-line-clamp: 4!important; /* Número de linhas que você quer exibir antes das reticências */
+			-webkit-line-clamp: 6!important; /* Número de linhas que você quer exibir antes das reticências */
+			line-height: 1.1;
 		}
 
-		
+
 	 </style>
 	
 </head>
@@ -434,12 +435,16 @@
 																					</div>
 																				</div>
 																				<div id="pcProcessoN3descricaoDiv" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
-																					<label for="pcProcessoN3desc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo N3:</label>
+																					<label for="pcProcessoN3desc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo:</label>
 																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																						<input id="pcProcessoN3desc" name="pcProcessoN3desc" required class="form-control" placeholder="Descreva o PROCESSO N3..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
+																						<input id="pcProcessoN3desc" name="pcProcessoN3desc" required class="form-control" placeholder="Descreva o PROCESSO..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
 																						<span id="pcProcessoN3descCharCounter" class="badge badge-secondary"></span>
 																					</div>
+																					<div id="bloqueioAlert" class="alert alert-info col-sm-12" style="text-align: center;font-size:1.2em;margin-top:5px">
+																						Atenção: Ao finalinalizar o cadastro, este novo grupo de tipo de avaliação também será cadastrado e disponibilizado para seleção em futuros processos.
+																					</div>
 																				</div>
+																				
 																				
 																				<div id="pcProcessoDescricaoDiv" class="col-sm-12" hidden style="font-size:1.2em;text-align: justify;margin-top:40px">
 																					<fieldset >
@@ -566,10 +571,11 @@
 													</form>
 													<form   id="formFinalizar" name="formFinalizar"  onsubmit="return false" novalidate>
 														<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="Finalizar-trigger">
-															<div class="form-card">
+															
+															<div id="infoValidas" hidden class="form-card col-sm-12 mostraValidacao">
 																<h3 class="fs-title text-center">Todas as Informações foram validadas com sucesso!</h3>
 																<br>
-																<div class="row justify-content-center">
+																<div class="row justify-content-center col-sm-12">
 																	
 																	<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:100px"></i>
 																	
@@ -578,6 +584,22 @@
 																<div id="mensagemSalvar" class="row justify-content-center">
 																	<div class="col-7 text-center">
 																		<h5>Clique no botão "Salvar" para cadastrar este processo.</h5>
+																	</div>
+																</div>
+															</div>
+
+															<div id="infoInvalidas" hidden class="form-card col-sm-12 mostraValidacao">
+																<h3 class="fs-title text-center">Há campos que precisam ser corrigidos!</h3>
+																<br>
+																<div class="row justify-content-center col-sm-12">
+																	
+																	<i class="fa-solid fa-circle-xmark" style="color:#dc3545;font-size:100px"></i>
+																	
+																</div>
+																<br>
+																<div id="mensagemSalvar" class="row justify-content-center">
+																	<div class="col-7 text-center">
+																		<h5>Corrija os campos destacados e tente novamente.</h5>
 																	</div>
 																</div>
 															</div>
@@ -1012,19 +1034,6 @@
 
 
 
-			// Delegação de eventos para selects dinâmicos mudando o estado de válido para inválido quando o campo não tiver nenhuma opção selecionada
-			// $(document).on('change', 'select[id*="selectDinamico"]', function() {
-				
-			// 	var $this = $(this);
-			// 	if ($this.val()) {
-			// 		$this.removeClass('is-invalid').addClass('is-valid');
-			// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
-			// 	} else {
-			// 		$this.removeClass('is-valid').addClass('is-invalid');
-			// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
-			// 	}
-			// });
-
 			// Adiciona manipuladores de eventos de mudança para os campos select2 mudado o estado de válido para inválido quando o campo não tiver nenhuma opção selecionada
 			$(document).on('change', 'select[id*="selectDinamico"],#pcTipoAvalDescricao, #pcProcessoN3, #pcProcessoN3desc, #pcObjetivoEstrategico, #pcRiscoEstrategico, #pcIndEstrategico, #pcAvaliadores', function(e) {
 				var $this = $(this);
@@ -1081,34 +1090,37 @@
 						}
 					});
 				});
-				if ($("#formTipoAvaliacao").valid()) {
+				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid()) {
 					// Ir para o próximo passo
 					stepper.next();
 				}
 			};
 
 			window.inicializarValidacaoStep3 = function() {
-				if ($("#formInfoEstrategicas").valid()) {
+				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid() && $("#formInfoEstrategicas").valid()) {
 					// Ir para o próximo passo
 					stepper.next();
 				}
 			};
 
+           
 			window.inicializarValidacaoStep4 = function() {
-				if ($("#formEquipe").valid()) {
+				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid() && $("#formInfoEstrategicas").valid() && $("#formEquipe").valid()) {
 					// Ir para o próximo passo
 					stepper.next();
+ 					$('#infoValidas').attr("hidden",false);
+					$('#infoInvalidas').attr("hidden",true);
+					//adiciona style display none no mostraValidacao
+					$('.mostraValidacao').css('display', 'none')
+					$('.mostraValidacao').fadeIn(2000);
+				}else{
+					$('#infoValidas').attr("hidden",true);
+					$('#infoInvalidas').attr("hidden",false);
+					$('#btSalvar').attr("hidden",true);
 				}
 			};
 
-			// Função para finalizar a validação e salvar o formulário
-			window.finalizarValidacao = function() {
-				// Validar todos os formulários antes de salvar
-				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid() && $("#formInfoEstrategicas").valid() && $("#formEquipe").valid()) {
-					// Código para salvar o formulário
-					alert("Formulário salvo com sucesso!");
-				}
-			};
+			
 
 			// Quando o campo #pcBloquear mudar de valor
 			$('#pcBloquear').change(function() {
@@ -1364,7 +1376,7 @@
 				var mensagem = "Deseja cadastrar este processo?"
 			}else{
 				if ((anoAtual !== anoAnterior && $('#pcDataInicioAvaliacaoAnterior').val()!==null) || orgaoAvaliadoAnterior !== orgaoAvaliado) {
-					var mensagem = "O ano da data de início da avaliação e/ou o órgão responsável foi alterado. Isso fará com que o SNCI exclua o processo atual e crie um novo processo com uma nova numeração. Caso a alteração seja apenas do órgão responsável, sem que haja modificação de SE, o número SNCI será mantido. Deseja continuar?"
+					var mensagem = "O ano da data de início da avaliação e/ou o órgão avaliado foi alterado. Isso fará com que o SNCI exclua o processo atual e crie um novo processo com uma nova numeração. Caso a alteração seja apenas do órgão responsável, sem que haja modificação de SE, o número SNCI será mantido. Deseja continuar?"
 				}else{
 					var mensagem = "Deseja editar este processo?"
 				}
