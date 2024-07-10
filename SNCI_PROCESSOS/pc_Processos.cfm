@@ -1011,7 +1011,7 @@
 				
 				var selectedText = $(this).find('option:selected').text();
 				if(selectedText == 'Não se aplica'){
-					$('#pcTipoAvalDescricao').val(null).trigger('change')
+					//$('#pcTipoAvalDescricao').val(null).trigger('change')
 					$('#pcProcessoN3').val(null).trigger('change')
 					$('#pcProcessoN3desc').val(null).trigger('change')
 					$('#TipoAvalDescricaoDiv').attr("hidden",false)	
@@ -1616,7 +1616,7 @@
 
 		
 
-			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
+			
 			
 
 			$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
@@ -1702,8 +1702,8 @@
 			});
 			//fim popula os selects dinâmicos
 			
-			
-
+			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
+            console.log(naoAplicaDesc)
 		
 			$('#cadastro').CardWidget('expand')
 		
@@ -1738,7 +1738,7 @@
 			$('#pcDataInicioAvaliacaoAnterior').val(dataInicio);
 			$('#pcDataFimAvaliacao').val(dataFim);
 			
-			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
+			
 
 			$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
 			$('#pcOrgaoAvaliadoAnterior').val(orgaoAvaliado);
@@ -1811,6 +1811,7 @@
 			});
 			//fim popula os selects dinâmicos
 			
+			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 			
 			$('#pcBloquear').val(bloquear).trigger('change');
 		
