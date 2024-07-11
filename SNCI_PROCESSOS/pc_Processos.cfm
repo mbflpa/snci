@@ -404,7 +404,7 @@
 																		
 																	</div>
 																	<br>
-																	<div id="bloqueioAlert" class="alert alert-info col-sm-12" hidden style="text-align: center;font-size:1.2em">
+																	<div id="bloqueioAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown" hidden style="text-align: center;font-size:1.2em">
 																		Atenção: Ao bloquear este processo, o encaminhamento ao órgão avaliado só ocorrerá após o seu desbloqueio.
 																	</div>
 																</div>
@@ -451,7 +451,7 @@
 																				</div>
 																				
 																				
-																				<div id="pcProcessoDescricaoDiv" class="col-sm-12" hidden style="font-size:1.2em;text-align: justify;margin-top:40px">
+																				<div id="pcProcessoDescricaoDiv" class="col-sm-12 animate__animated animate__zoomInDown" hidden style="font-size:1.2em;text-align: justify;margin-top:40px">
 																					<fieldset >
 																						<legend style="margin-bottom:-10px">Descrição do Processo:</legend>
 																						<span id="pcProcessoDescricao" ></span>
@@ -1450,6 +1450,7 @@
 								$('#modalOverlay').delay(1000).hide(0, function() {
 									$('#modalOverlay').modal('hide');
 									toastr.success('Operação realizada com sucesso!');
+									stepper.to(0);
 								});
 
 								if(localStorage.getItem('mostraTab')){
