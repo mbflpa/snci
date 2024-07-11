@@ -38,24 +38,17 @@
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-select/css/select.bootstrap4.min.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-scroller/css/scroller.bootstrap4.min.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-searchpanes/css/searchPanes.bootstrap4.min.css">
-	
-	
+		
 	<!-- Select2 -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2/css/select2.min.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
  
-
-	
-
 	<!-- Tour -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">
 
     <!-- Theme style -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
-
-    <!-- animate.css -->
-    <link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/animate.min.css">
 
 </head>
 
