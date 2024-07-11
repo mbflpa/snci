@@ -213,9 +213,9 @@
 												<div class="bs-stepper-header" role="tablist" >
 													<!-- your steps here -->
 													<div class="step" data-target="#infoInicial">
-														<button type="button" class="step-trigger" role="tab" aria-controls="infoInicial" id="infoInicial-trigger">
+														<button type="button" class="step-trigger animate__animated animate__bounce" role="tab" aria-controls="infoInicial" id="infoInicial-trigger">
 															<span class="bs-stepper-circle">1</span>
-															<span class="bs-stepper-label">Informações Iniciais</span>
+															<span class="bs-stepper-label " id="infoInicialLabel">Informações Iniciais</span>
 														</button>
 													</div>
 
@@ -224,7 +224,7 @@
 													<div class="step" data-target="#tipoAvaliacao">
 														<button type="button" class="step-trigger" role="tab" aria-controls="tipoAvaliacao" id="tipoAvaliacao-trigger">
 															<span class="bs-stepper-circle">2</span>
-															<span class="bs-stepper-label">Tipo de avaliação</span>
+															<span class="bs-stepper-label" id="tipoAvaliacaoLabel">Tipo de avaliação</span>
 														</button>
 													</div>
 
@@ -233,7 +233,7 @@
 													<div class="step" data-target="#infoEstrategicas">
 														<button type="button" class="step-trigger" role="tab" aria-controls="infoEstrategicas" id="infoEstrategicas-trigger">
 															<span class="bs-stepper-circle">3</span>
-															<span class="bs-stepper-label">Informações Estratégicas</span>
+															<span class="bs-stepper-label" id="infoEstrategicasLabel">Informações Estratégicas</span>
 														</button>
 													</div>
 
@@ -242,16 +242,16 @@
 													<div class="step" data-target="#equipe">
 														<button type="button" class="step-trigger" role="tab" aria-controls="equipe" id="equipe-trigger">
 															<span class="bs-stepper-circle">4</span>
-															<span class="bs-stepper-label">Equipe</span>
+															<span class="bs-stepper-label" id="equipeLabel">Equipe</span>
 														</button>
 													</div>
 
 													<div class="line"></div>
 													
 													<div class="step" data-target="#Finalizar">
-														<button type="button" class="step-trigger" role="tab" aria-controls="Finalizar" id="Finalizar-trigger">
+														<button type="button" class="step-trigger" role="tab" aria-controls="Finalizar" id="finalizar-trigger">
 															<span class="bs-stepper-circle">4</span>
-															<span class="bs-stepper-label">Finalizar</span>
+															<span class="bs-stepper-label" id="finalizarLabel">Finalizar</span>
 														</button>
 													</div>
 
@@ -263,7 +263,7 @@
 													<!-- your steps content here -->
 													<form   id="formInfoInicial" name="formInfoInicial"   onsubmit="return false" novalidate>
 														<div id="infoInicial" class="content " role="tabpanel" aria-labelledby="infoInicial-trigger" >
-															<div class="card-body animate__animated animate__flipInX" style="border: solid 1px #0083ca">
+															<div class="card-body animate__animated animate__zoomInDown" style="border: solid 1px #0083ca">
 																<div class="row  " >
 																	<div class="col-sm-3">
 																		<div class="form-group">
@@ -417,7 +417,7 @@
 													</form>
 													<form   id="formTipoAvaliacao" name="formTipoAvaliacao"  onsubmit="return false" novalidate >
 														<div id="tipoAvaliacao" class="content " role="tabpanel" aria-labelledby="tipoAvaliacao-trigger" >
-															<div class="card-body animate__animated animate__flipInX" style="border: solid 1px #0083ca">
+															<div class="card-body animate__animated animate__zoomInDown" style="border: solid 1px #0083ca">
 																<div class="row" >
 																	<input id="idTipoAvaliacao" hidden></input>
 																	<div class="form-group col-sm-12">
@@ -475,7 +475,7 @@
 													</form>
 													<form   id="formInfoEstrategicas" name="formInfoEstrategicaso"  onsubmit="return false" novalidate>
 														<div id="infoEstrategicas" class="content" role="tabpanel" aria-labelledby="infoEstrategicas-trigger">
-															<div class="card-body animate__animated animate__flipInX" style="border: solid 1px #0083ca">
+															<div class="card-body animate__animated animate__zoomInDown" style="border: solid 1px #0083ca">
 																<div class="row" style="display:flex; justify-content: space-between;">
 																	<div class="col-sm-6">
 																		<div class="form-group " >
@@ -523,7 +523,7 @@
 													</form>
 													<form   id="formEquipe" name="formEquipe"  onsubmit="return false" novalidate>
 														<div id="equipe" class="content" role="tabpanel" aria-labelledby="equipe-trigger">
-															<div class="card-body animate__animated animate__flipInX" style="border: solid 1px #0083ca">
+															<div class="card-body animate__animated animate__zoomInDown" style="border: solid 1px #0083ca">
 																<div class="row">
 																	<div class="col-sm-12">
 																		<div class="form-group " >
@@ -575,7 +575,7 @@
 														</div>
 													</form>
 													<form   id="formFinalizar" name="formFinalizar"  onsubmit="return false" novalidate>
-														<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="Finalizar-trigger">
+														<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="finalizar-trigger">
 															
 															<div id="infoValidas" hidden class="form-card col-sm-12 animate__animated animate__zoomInDown animate__slow">
 																<h3 class="fs-title text-center">Todas as Informações foram validadas com sucesso!</h3>
@@ -674,7 +674,8 @@
 				animation: true
 			});
 
-			
+			// Oculta todos os elementos com a classe step-trigger, exceto aquele com o ID infoInicial-trigger
+            $('.step-trigger').not('#infoInicial-trigger').hide();
 
 			//Initialize Select2 Elements
 			$('select').select2({
@@ -1055,6 +1056,9 @@
 				if ($("#formInfoInicial").valid()) {
 					// Ir para o próximo passo
 					stepper.next();
+					$('#tipoAvaliacao-trigger').show();
+					// Adiciona a animação bounce ao elemento
+           			 $('#tipoAvaliacao-trigger').addClass('animate__animated animate__bounce');
 				}
 			};
 
@@ -1091,6 +1095,9 @@
 				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid()) {
 					// Ir para o próximo passo
 					stepper.next();
+					$('#infoEstrategicas-trigger').show();
+					// Adiciona a animação bounce ao elemento
+           			 $('#infoEstrategicas-trigger').addClass('animate__animated animate__bounce');
 				}
 			};
 
@@ -1098,6 +1105,8 @@
 				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid() && $("#formInfoEstrategicas").valid()) {
 					// Ir para o próximo passo
 					stepper.next();
+					$('#equipe-trigger').show();
+					$('#equipe-trigger').addClass('animate__animated animate__bounce');
 				}
 			};
 
@@ -1106,6 +1115,8 @@
 				if ($("#formInfoInicial").valid() && $("#formTipoAvaliacao").valid() && $("#formInfoEstrategicas").valid() && $("#formEquipe").valid()) {
 					// Ir para o próximo passo
 					stepper.next();
+					$('#finalizar-trigger').show();
+					$('#finalizar-trigger').addClass('animate__animated animate__bounce');
  					$('#infoValidas').attr("hidden",false);
 					$('#infoInvalidas').attr("hidden",true);
 					
@@ -1587,6 +1598,7 @@
             event.preventDefault()
         	event.stopPropagation()
 		  	stepper.to(0);
+			$('.step-trigger').show();
 			var listAvaliadores = avaliadores.split(",");
 			var listObjetivoEstrategico = objetivoEstrategico.split(",");
 			var listRiscoEstrategico = riscoEstrategico.split(",");
@@ -1719,7 +1731,7 @@
             event.preventDefault()
         	event.stopPropagation()
 			stepper.to(0);
-
+            $('.step-trigger').show();
 		    $(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
 			var listAvaliadores = avaliadores.split(",");
 			var listObjetivoEstrategico = objetivoEstrategico.split(",");
@@ -1837,7 +1849,7 @@
             event.preventDefault()
         	event.stopPropagation()
 			stepper.to(0);	
-		
+		    $('.step-trigger').show();
 			var listAvaliadores = avaliadores.split(",");
 			var listObjetivoEstrategico = objetivoEstrategico.split(",");
 			var listRiscoEstrategico = riscoEstrategico.split(",");
