@@ -163,6 +163,13 @@
 			line-height: 1.1;
 		}
 
+       .cardBodyStepper {
+			    border: solid 1px rgba(108, 117, 125, 0.3);
+				border-radius: 0.5rem;
+				box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.05);
+		}
+
+
 
 	 </style>
 	 <!-- animate.css -->
@@ -263,7 +270,7 @@
 													<!-- your steps content here -->
 													<form   id="formInfoInicial" name="formInfoInicial"   onsubmit="return false" novalidate>
 														<div id="infoInicial" class="content " role="tabpanel" aria-labelledby="infoInicial-trigger" >
-															<div class="card-body animate__animated animate__zoomInDown" style="border: solid 1px #0083ca">
+															<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
 																<div class="row  " >
 																	<div class="col-sm-3">
 																		<div class="form-group">
@@ -417,7 +424,7 @@
 													</form>
 													<form   id="formTipoAvaliacao" name="formTipoAvaliacao"  onsubmit="return false" novalidate >
 														<div id="tipoAvaliacao" class="content " role="tabpanel" aria-labelledby="tipoAvaliacao-trigger" >
-															<div class="card-body animate__animated animate__zoomInDown" style="border: solid 1px #0083ca">
+															<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
 																<div class="row" >
 																	<input id="idTipoAvaliacao" hidden></input>
 																	<div class="form-group col-sm-12">
@@ -475,7 +482,7 @@
 													</form>
 													<form   id="formInfoEstrategicas" name="formInfoEstrategicaso"  onsubmit="return false" novalidate>
 														<div id="infoEstrategicas" class="content" role="tabpanel" aria-labelledby="infoEstrategicas-trigger">
-															<div class="card-body animate__animated animate__zoomInDown" style="border: solid 1px #0083ca">
+															<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
 																<div class="row" style="display:flex; justify-content: space-between;">
 																	<div class="col-sm-6">
 																		<div class="form-group " >
@@ -523,7 +530,7 @@
 													</form>
 													<form   id="formEquipe" name="formEquipe"  onsubmit="return false" novalidate>
 														<div id="equipe" class="content" role="tabpanel" aria-labelledby="equipe-trigger">
-															<div class="card-body animate__animated animate__zoomInDown" style="border: solid 1px #0083ca">
+															<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
 																<div class="row">
 																	<div class="col-sm-12">
 																		<div class="form-group " >
