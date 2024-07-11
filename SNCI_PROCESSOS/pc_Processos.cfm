@@ -1450,7 +1450,18 @@
 								$('#modalOverlay').delay(1000).hide(0, function() {
 									$('#modalOverlay').modal('hide');
 									toastr.success('Operação realizada com sucesso!');
+									// Oculta todos os elementos com a classe step-trigger, exceto aquele com o ID infoInicial-trigger
+            						$('.step-trigger').not('#infoInicial-trigger').hide();
 									stepper.to(0);
+									// Após o cadastro, resetar o estado de validação de todos os formulários
+									$("#formInfoInicial").validate().resetForm();
+									$("#formTipoAvaliacao").validate().resetForm();
+									$("#formInfoEstrategicas").validate().resetForm();
+									$("#formEquipe").validate().resetForm();
+									// Remover classes .is-valid e .is-invalid de todos os elementos da página
+									$('*').removeClass('is-valid is-invalid');
+									
+
 								});
 
 								if(localStorage.getItem('mostraTab')){
@@ -1561,10 +1572,19 @@
 								}else{
 									ocultarTabela()	
 								}	
+
 								$('#modalOverlay').delay(1000).hide(0, function() {
 									$('#modalOverlay').modal('hide');
 									toastr.success('Operação realizada com sucesso!');
 								});
+								// Após o cadastro, resetar o estado de validação de todos os formulários
+								$("#formInfoInicial").validate().resetForm();
+								$("#formTipoAvaliacao").validate().resetForm();
+								$("#formInfoEstrategicas").validate().resetForm();
+								$("#formEquipe").validate().resetForm();
+								// Remover classes .is-valid e .is-invalid de todos os elementos da página
+								$('*').removeClass('is-valid is-invalid');
+								
 								
 							})//fim done
 							.fail(function(xhr, ajaxOptions, thrownError) {
