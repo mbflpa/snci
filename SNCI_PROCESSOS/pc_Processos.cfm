@@ -425,27 +425,27 @@
 																					<!-- Os selects serão adicionados aqui -->
 																				</div>
 
-																				<div id="TipoAvalDescricaoDiv" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
+																				<div id="TipoAvalDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
 																					<label for="pcTipoAvalDescricao" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Tipo de Avaliação:</label>
 																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
 																						<input id="pcTipoAvalDescricao" name="pcTipoAvalDescricao" required  class="form-control" placeholder="Descreva o tipo de avaliação..." style="border-radius: 4px; padding: 10px; box-sizing: border-box; width: 100%;">
 																						<span id="pcTipoAvalDescricaoCharCounter" class="badge badge-secondary"></span>
 																					</div>
 																				</div>
-																				<div id="pcProcessoN3Div" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
+																				<div id="pcProcessoN3Div" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
 																					<label for="pcProcessoN3" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Nome do Processo N3:</label>
 																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
 																						<input id="pcProcessoN3" name="pcProcessoN3" required class="form-control" placeholder="Nome do PROCESSO N3..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
 																						<span id="pcProcessoN3CharCounter" class="badge badge-secondary"></span>
 																					</div>
 																				</div>
-																				<div id="pcProcessoN3descricaoDiv" class="form-group col-sm-12" hidden style="margin-top:10px;padding-left: 0;">
+																				<div id="pcProcessoN3descricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
 																					<label for="pcProcessoN3desc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Processo:</label>
 																					<div class="input-group date" id="reservationdate" data-target-input="nearest">
 																						<input id="pcProcessoN3desc" name="pcProcessoN3desc" required class="form-control" placeholder="Descreva o PROCESSO..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
 																						<span id="pcProcessoN3descCharCounter" class="badge badge-secondary"></span>
 																					</div>
-																					<div id="bloqueioAlert" class="alert alert-info col-sm-12" style="text-align: center;font-size:1.2em;margin-top:5px">
+																					<div id="bloqueioAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
 																						Atenção: Ao finalinalizar o cadastro, este novo grupo de tipo de avaliação também será cadastrado e disponibilizado para seleção em futuros processos.
 																					</div>
 																				</div>

@@ -649,8 +649,8 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
 
         if ($select.length === 0) {
             // Cria um novo select se ele não existir
-            $select = $('<select class="form-control process-select dynamic-select" id="selectDinamico' + currentLevel + '" name="selectDinamico' + currentLevel + '" style="width: calc(100% - 120px);"></select>');
-            var $container = $('<div class="select-container-initializeSelects"></div>');
+            $select = $('<select class="form-control process-select dynamic-select animate__animated animate__fadeInDown" id="selectDinamico' + currentLevel + '" name="selectDinamico' + currentLevel + '" style="width: calc(100% - 120px);"></select>');
+            var $container = $('<div class="select-container-initializeSelects animate__animated animate__fadeInDown"></div>');
             $container.append('<label class="dynamic-label-initializeSelects" style="text-align: left;">' + labelNames[level] + ': </label>');
             $container.append($select);
             $('#dados-container').append($container);
