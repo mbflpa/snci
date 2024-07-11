@@ -404,7 +404,7 @@
 																		
 																	</div>
 																	<br>
-																	<div id="bloqueioAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown" hidden style="text-align: center;font-size:1.2em">
+																	<div id="bloqueioAlert" class="alert alert-info col-sm-12 " hidden style="text-align: center;font-size:1.2em">
 																		Atenção: Ao bloquear este processo, o encaminhamento ao órgão avaliado só ocorrerá após o seu desbloqueio.
 																	</div>
 																</div>
@@ -1135,9 +1135,26 @@
 				if ($(this).val() === 'S') {
 					// Mostra o span em azul alertando sobre o bloqueio dos processos
 					$('#bloqueioAlert').attr("hidden",false)
+					$('#bloqueioAlert').removeClass('animate__animated animate__zoomOut');
+					$('#bloqueioAlert').addClass('animate__animated animate__zoomInDown');
 				} else {
 					// Caso contrário, esconde o span
-					$('#bloqueioAlert').attr("hidden",true)	
+					
+					// Verifica se o elemento possui a classe desejada
+					if ($('#bloqueioAlert').hasClass('animate__animated animate__zoomInDown')) {
+						$('#bloqueioAlert').removeClass('animate__animated animate__zoomInDown');
+						// Adiciona a classe de animação
+						$('#bloqueioAlert').addClass('animate__animated animate__zoomOut');
+
+						// Espera 1000 milissegundos antes de ocultar o elemento
+						setTimeout(function() {
+							// Verifica novamente se a classe ainda está presente (pode ter sido removida durante a animação)
+							if ($('#bloqueioAlert').hasClass('animate__animated animate__zoomOut')) {
+								// Define o atributo hidden para true
+								$('#bloqueioAlert').attr('hidden', true);
+							}
+						}, 500); // Aguarda 1 segundo antes de ocultar o elemento
+					}
 				}
 			});
 	
