@@ -151,17 +151,7 @@
 			padding-right:0.75rem !important;
 		}
 
-        /*Utilizando na descrição dos tipos de processos nos cards, para não ultrapassar o conteiner*/
-		.text-ellipsis {
-			font-size: 10px!important;
-			margin-bottom: 0!important;
-			display: -webkit-box!important;
-			-webkit-box-orient: vertical!important;
-			overflow: hidden!important;
-			text-overflow: ellipsis!important;
-			-webkit-line-clamp: 6!important; /* Número de linhas que você quer exibir antes das reticências */
-			line-height: 1.1;
-		}
+        
 
        .cardBodyStepper {
 			    border: solid 1px rgba(108, 117, 125, 0.3);

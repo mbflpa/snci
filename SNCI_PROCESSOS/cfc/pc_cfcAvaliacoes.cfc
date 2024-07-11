@@ -13,6 +13,12 @@
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 						, pc_classificacoes.pc_class_descricao
+						,CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						'<br>N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						'<br>N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						'<br>N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						) as tipoProcesso
 
 			FROM        pc_processos INNER JOIN
 						pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id INNER JOIN
@@ -98,12 +104,16 @@
 																										
 
 																										<div class="card-header" style="height:120px;width:250px;    font-weight: normal!important;">
-																											<p style="font-size:1em;margin-bottom: 0.3rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
-																											<p style="font-size:1em;margin-bottom: 0.3rem!important;"><cfoutput>#siglaOrgAvaliado#</cfoutput></p>
-																											<cfif pc_num_avaliacao_tipo neq 2>
-																												<p style="font-size:0.9em;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
+																											<p style="font-size:1em;margin-bottom:0rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
+																											<p style="font-size:1em;margin-bottom:0rem!important;"><cfoutput>#siglaOrgAvaliado#</cfoutput></p>
+																											<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
+																												<cfif pc_aval_tipo_descricao neq ''>
+																													<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
+																												<cfelse>
+																													<p class="text-ellipsis" ><cfoutput>#tipoProcesso#</cfoutput></p>
+																												</cfif>
 																											<cfelse>
-																												<p style="font-size:0.9em;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
+																												<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
 																											</cfif>
 																											
 																											
@@ -224,6 +234,12 @@
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado, pc_orgaos.pc_org_mcu,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 						, pc_classificacoes.pc_class_descricao
+						,CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						'<br>N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						'<br>N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						'<br>N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						) as tipoProcesso
 
 			FROM        pc_processos INNER JOIN
 						pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id INNER JOIN
@@ -247,19 +263,18 @@
             <div class="modal fade" id="modal-danger">
 				<div class="modal-dialog">
 					<div class="modal-content bg-danger">
-					<div class="modal-header">
-						<h4 class="modal-title">Danger Modal</h4>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<p>One fine body&hellip;</p>
-					</div>
-					<div class="modal-footer justify-content-between">
-						<button type="button" class="btn btn-outline-light" data-dismiss="modal">Fechar</button>
-		<!--- 				<button type="button" class="btn btn-outline-light">Save changes</button> --->
-					</div>
+						<div class="modal-header">
+							<h4 class="modal-title">Danger Modal</h4>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<p>One fine body&hellip;</p>
+						</div>
+						<div class="modal-footer justify-content-between">
+							<button type="button" class="btn btn-outline-light" data-dismiss="modal">Fechar</button>
+						</div>
 					</div>
 					<!-- /.modal-content -->
 				</div>
@@ -287,8 +302,14 @@
 												<span style="margin-left:20px">Relatório n°:</span> 
 												<strong style="color:##0692c6">#rsProcForm.pc_num_rel_sei#</strong></p>
 											</cfif>	
-											<cfif rsProcForm.pc_num_avaliacao_tipo neq 2>
-												<p style="font-size: 1.3em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcForm.pc_aval_tipo_descricao#</strong></p>
+											<cfif rsProcForm.pc_num_avaliacao_tipo neq 2 and rsProcForm.pc_num_avaliacao_tipo neq 445>
+												<cfif rsProcForm.pc_aval_tipo_descricao neq ''>
+													<p style="font-size: 1.3em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcForm.pc_aval_tipo_descricao#</strong></p>
+												<cfelse>
+													<p style="font-size: 1.3em;margin-right:30px">Tipo de Avaliação:
+													<br>
+													<span style="color:##0692c6; ">#rsProcForm.tipoProcesso#</span></p>
+												</cfif>
 											<cfelse>
 												<p style="font-size: 1.3em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcForm.pc_aval_tipo_nao_aplica_descricao#</strong></p>
 											</cfif>
