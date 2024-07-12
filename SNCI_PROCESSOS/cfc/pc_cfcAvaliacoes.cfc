@@ -235,10 +235,10 @@
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 						, pc_classificacoes.pc_class_descricao
 						,CONCAT(
-						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
-						'<br>N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
-						'<br>N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
-						'<br>N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+						' -> N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+						' -> N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+						' -> N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
 						) as tipoProcesso
 
 			FROM        pc_processos INNER JOIN
@@ -258,556 +258,792 @@
 			ORDER BY pc_org_sigla
 		</cfquery>
 
+		<cfquery name="rsAvaliacaoTipoControle" datasource="#application.dsn_processos#">
+			SELECT pc_avaliacao_tipoControle.*
+			FROM pc_avaliacao_tipoControle
+			WHERE  pc_aval_tipoControle_status = 'A'
+		</cfquery>
 
-		<form id="formCadItem"  class="needs-validation was-validated" name="formCadItem" format="html"  style="height: auto;padding-left:25px;padding-right:25px;">
-            <div class="modal fade" id="modal-danger">
-				<div class="modal-dialog">
-					<div class="modal-content bg-danger">
-						<div class="modal-header">
-							<h4 class="modal-title">Danger Modal</h4>
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-							</button>
+		<cfquery name="rsAvaliacaoCategoriaControle" datasource="#application.dsn_processos#">
+			SELECT pc_avaliacao_categoriaControle.*
+			FROM pc_avaliacao_categoriaControle
+			WHERE  pc_aval_categoriaControle_status = 'A'
+		</cfquery>
+
+		<cfquery name="rsAvaliacaoRisco" datasource="#application.dsn_processos#">
+			SELECT pc_avaliacao_risco.*
+			FROM pc_avaliacao_risco
+			WHERE  pc_aval_risco_status = 'A'
+		</cfquery>
+
+
+		<!DOCTYPE html>
+		<html lang="pt-br">
+			<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+				<meta http-equiv="X-UA-Compatible" content="IE=edge">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+				<!-- animate.css -->
+				<link rel="stylesheet" href="dist/css/animate.min.css">
+				<style>
+					
+
+					fieldset{
+						border: 1px solid #ced4da!important;
+						border-radius: 8px!important;
+						padding: 20px!important;
+						margin-bottom: 10px!important;
+						background: none!important;
+						-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+						-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+						box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+					}
+
+					legend {
+						font-size: 0.8rem!important;
+						color: #fff!important;
+						background-color: #0083ca!important;
+						border: 1px solid #ced4da!important;
+						border-radius: 5px!important;
+						padding: 5px!important;
+						width: auto!important;
+					}
+
+					/* Evita que campos de datas e textos tenham o ícone verde */
+					.form-control[type="text"].is-valid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0 !important;
+					}	
+					/* Evita que campos de datas e textos tenham o ícone verde */
+					.form-control[type="text"].is-invalid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0 !important;
+					}
+
+					/* Evita que campos de datas tenham o ícone verde */
+					.form-control[type="date"].is-valid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0.75rem !important;
+					}
+
+					/* Evita que campos de datas tenham o ícone verde */
+					.form-control[type="date"].is-invalid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0.75rem !important;
+					}
+					/* Evita que campos de textarea tenham o ícone verde */
+					.form-control[type="textarea"].is-valid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0 !important;
+					}
+
+					/* Evita que campos de textarea tenham o ícone verde */
+					.form-control[type="textarea"].is-invalid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0 !important;
+					}
+
+
+					/* Evita que campos de datas e textos tenham o ícone verde */
+					.form-control[type="input"].is-valid {
+						background-image: none !important;
+						/*background-position:0 !important;*/
+						/*background-size: 0 !important;*/
+						padding-right:0 !important;
+					}	
+
+					/* Evita que campos de datas tenham o ícone verde */
+					.form-control[type="input"].is-invalid {
+						background-image: none !important;
+						/*background-position:0 !important;*/
+						/*background-size: 0 !important;*/
+						padding-right:0.75rem !important;
+					}
+
+					
+
+					.cardBodyStepper {
+							border: solid 1px rgba(108, 117, 125, 0.3);
+							border-radius: 0.5rem;
+							box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.05);
+					}
+
+
+
+				</style>
+				
+			</head>
+			<body >
+
+				<form id="formCadItem"  class="needs-validation was-validated" name="formCadItem" format="html"  style="height: auto;padding-left:25px;padding-right:25px;">
+					<div class="modal fade" id="modal-danger">
+						<div class="modal-dialog">
+							<div class="modal-content bg-danger">
+								<div class="modal-header">
+									<h4 class="modal-title">Danger Modal</h4>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+									</button>
+								</div>
+								<div class="modal-body">
+									<p>One fine body&hellip;</p>
+								</div>
+								<div class="modal-footer justify-content-between">
+									<button type="button" class="btn btn-outline-light" data-dismiss="modal">Fechar</button>
+								</div>
+							</div>
+							<!-- /.modal-content -->
 						</div>
-						<div class="modal-body">
-							<p>One fine body&hellip;</p>
-						</div>
-						<div class="modal-footer justify-content-between">
-							<button type="button" class="btn btn-outline-light" data-dismiss="modal">Fechar</button>
-						</div>
+						<!-- /.modal-dialog -->
 					</div>
-					<!-- /.modal-content -->
-				</div>
-				<!-- /.modal-dialog -->
-			</div>
-			<!-- /.modal -->
-			<cfset aux_sei = Trim('#rsProcForm.pc_num_sei#')>
-			<cfset aux_sei = Left(aux_sei,"5") & "." & Mid(aux_sei,"6","6") & "/" &  Mid(aux_sei,"12","4")& "-" & Right(aux_sei,"2")>
-		
-			<section class="content" id="infoProcesso">
-					<div id="processosCadastrados" class="container-fluid" >
-						<div class="row">
-							<div id="cartao" style="width:100%;" >
-								<!-- small card -->
-								<cfoutput>
-									<div class="small-box " style=" font-weight: bold;">
-										<div class="ribbon-wrapper ribbon-xl" >
-											<div class="ribbon " style="font-size:18px!important;left:8px;<cfoutput>#rsProcForm.pc_status_card_style_ribbon#</cfoutput>"><cfoutput>#rsProcForm.pc_status_card_nome_ribbon#</cfoutput></div>
-										</div>
-										<div class="card-header" style="height:auto">
-											<p style="font-size: 1.8em;">Processo SNCI n°: <strong style="color:##0692c6;margin-right:30px">#rsProcForm.pc_processo_id#</strong> Órgão Avaliado: <strong style="color:##0692c6">#rsProcForm.siglaOrgAvaliado#</strong></p>
-											<p style="font-size: 1.3em;">Origem: <strong style="color:##0692c6;margin-right:30px">#rsProcForm.siglaOrgOrigem#</strong>
-											<cfif #rsProcForm.pc_modalidade# eq 'A' or #rsProcForm.pc_modalidade# eq 'E'>
-												<span >Processo SEI n°: </span> <strong style="color:##0692c6">#aux_sei#</strong> 
-												<span style="margin-left:20px">Relatório n°:</span> 
-												<strong style="color:##0692c6">#rsProcForm.pc_num_rel_sei#</strong></p>
-											</cfif>	
-											<cfif rsProcForm.pc_num_avaliacao_tipo neq 2 and rsProcForm.pc_num_avaliacao_tipo neq 445>
-												<cfif rsProcForm.pc_aval_tipo_descricao neq ''>
-													<p style="font-size: 1.3em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcForm.pc_aval_tipo_descricao#</strong></p>
-												<cfelse>
-													<p style="font-size: 1.3em;margin-right:30px">Tipo de Avaliação:
-													<br>
-													<span style="color:##0692c6; ">#rsProcForm.tipoProcesso#</span></p>
-												</cfif>
-											<cfelse>
-												<p style="font-size: 1.3em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcForm.pc_aval_tipo_nao_aplica_descricao#</strong></p>
-											</cfif>
-											
-											
-										
-											<cfif #rsProcForm.pc_modalidade# eq 'A' or #rsProcForm.pc_modalidade# eq 'E'>
-											
-												<div id="actions" class="row" >
-													<div class="col-lg-12" align="center">
-														<div class="btn-group w-30">
-															<span id="relatorios" class="btn btn-success col fileinput-button" style="background:##0083CA">
-																<i class="fas fa-upload"></i>
-																<span style="margin-left:5px">Clique aqui para anexar o Relatório do Processo e Anexos I, II e III em PDF</span>
-															</span>																	
-														</div>
-													</div>
+					<!-- /.modal -->
+					<cfset aux_sei = Trim('#rsProcForm.pc_num_sei#')>
+					<cfset aux_sei = Left(aux_sei,"5") & "." & Mid(aux_sei,"6","6") & "/" &  Mid(aux_sei,"12","4")& "-" & Right(aux_sei,"2")>
+				
+					<section class="content" id="infoProcesso">
+							<div id="processosCadastrados" class="container-fluid" >
+								<div class="row">
+									<div id="cartao" style="width:100%;" >
+										<!-- small card -->
+										<cfoutput>
+											<div class="small-box " style=" font-weight: bold;">
+												<div class="ribbon-wrapper ribbon-xl" >
+													<div class="ribbon " style="font-size:18px!important;left:8px;<cfoutput>#rsProcForm.pc_status_card_style_ribbon#</cfoutput>"><cfoutput>#rsProcForm.pc_status_card_nome_ribbon#</cfoutput></div>
 												</div>
+												<div class="card-header" style="height:auto">
+													<p style="font-size: 1.8em;">Processo SNCI n°: <span style="color:##0692c6;margin-right:30px">#rsProcForm.pc_processo_id#</span> Órgão Avaliado: <span style="color:##0692c6">#rsProcForm.siglaOrgAvaliado#</span></p>
+													<p style="font-size: 1.3em;">Origem: <span style="color:##0692c6;margin-right:30px">#rsProcForm.siglaOrgOrigem#</span>
+													<cfif #rsProcForm.pc_modalidade# eq 'A' or #rsProcForm.pc_modalidade# eq 'E'>
+														<span >Processo SEI n°: </span> <span style="color:##0692c6">#aux_sei#</span> 
+														<span style="margin-left:20px">Relatório n°:</span> 
+														<span style="color:##0692c6">#rsProcForm.pc_num_rel_sei#</span></p>
+													</cfif>	
+													<cfif rsProcForm.pc_num_avaliacao_tipo neq 2 and rsProcForm.pc_num_avaliacao_tipo neq 445>
+														<cfif rsProcForm.pc_aval_tipo_descricao neq ''>
+															<p style="font-size: 1.3em;">Tipo de Avaliação: <span style="color:##0692c6">#rsProcForm.pc_aval_tipo_descricao#</span></p>
+														<cfelse>
+															<p style="font-size: 1.3em;margin-right:30px">Tipo de Avaliação: <span style="color:##0692c6; ">#rsProcForm.tipoProcesso#</span></p>
+														</cfif>
+													<cfelse>
+														<p style="font-size: 1.3em;">Tipo de Avaliação: <span style="color:##0692c6">#rsProcForm.pc_aval_tipo_nao_aplica_descricao#</span></p>
+													</cfif>
+													
+													
 												
-												<div class="table table-striped files" id="previewsRelatorio">
-													<div id="templateRelatorio" class="row mt-2">
-														<div class="col-auto">
-															<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
-														</div>
-														<div class="col d-flex align-items-center">
-															<p class="mb-0">
-															<span class="lead" data-dz-name></span>
-															(<span data-dz-size></span>)
-															</p>
-															<strong class="error text-danger" data-dz-errormessage></strong>
-														</div>
-														<div class="col-4 d-flex align-items-center" >
-															<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
-																<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
+													<cfif #rsProcForm.pc_modalidade# eq 'A' or #rsProcForm.pc_modalidade# eq 'E'>
+													
+														<div id="actions" class="row" >
+															<div class="col-lg-12" align="center">
+																<div class="btn-group w-30">
+																	<span id="relatorios" class="btn btn-success col fileinput-button" style="background:##0083CA">
+																		<i class="fas fa-upload"></i>
+																		<span style="margin-left:5px">Clique aqui para anexar o Relatório do Processo e Anexos I, II e III em PDF</span>
+																	</span>																	
+																</div>
 															</div>
 														</div>
 														
+														<div class="table table-striped files" id="previewsRelatorio">
+															<div id="templateRelatorio" class="row mt-2">
+																<div class="col-auto">
+																	<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
+																</div>
+																<div class="col d-flex align-items-center">
+																	<p class="mb-0">
+																	<span class="lead" data-dz-name></span>
+																	(<span data-dz-size></span>)
+																	</p>
+																	<strong class="error text-danger" data-dz-errormessage></strong>
+																</div>
+																<div class="col-4 d-flex align-items-center" >
+																	<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
+																		<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
+																	</div>
+																</div>
+																
+															</div>
+														</div>
+
+														<div id="anexoRelatorioDiv"></div>
+													
+													</cfif>	
+												</div>									
+											</div>
+										</cfoutput>
+
+
+
+									</div>
+								</div>
+
+								
+							</div>
+
+							
+					
+
+							
+						
+					</section>
+
+
+				<!-- animate.css -->
+					<link rel="stylesheet" href="dist/css/animate.min.css">
+					
+					<input id="pcProcessoId" value="<cfoutput>#rsProcForm.pc_processo_id#</cfoutput>" hidden>
+
+					<div id="accordion"  class="row" style="margin-left:0px!important">
+						<div  id="cadastro" class="card card-primary collapsed-card"  >
+							<div class="card-header" style="background-color: #0083ca;color:#fff;">
+								<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
+									<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
+									</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (1° Passo)</span>
+								</a>
+							</div>
+							<div class="card-body" >
+								
+								<div class="tab-content" id="custom-tabs-one-tabContent" style="width: 100%!important">
+									<input id="pc_aval_id" hidden>
+
+									<div class="tab-pane fade active show" id="custom-tabs-one-1passo" role="tabpanel" aria-labelledby="custom-tabs-one-1passo-tab">
+										<div class="row" style="font-size:16px">
+											<div class="col-sm-12">
+												
+												<div class="form-group">
+													<label for="pcTeste" >Teste (Pergunta do Plano):</label>
+													<textarea id="pcTeste" name="pcTeste" class="form-control" rows="5"  inputmode="text" placeholder="Informe o teste realizado (pergunta do plano)"></textarea>
+													<span id="pcTesteCounter" class="badge badge-secondary"></span>
+												</div>
+											</div>
+											<div class="col-sm-6">
+												<div class="form-group">
+													<label for="pcAvaliacaoTipoControle" >Tipo de Controle:</label>
+													<select id="pcAvaliacaoTipoControle" name="pcAvaliacaoTipoControle" class="form-control" multiple="multiple">
+														<cfoutput query="rsAvaliacaoTipoControle">
+															<option value="#pc_aval_tipoControle_id#">#pc_aval_tipoControle_descricao#</option>
+														</cfoutput>
+													</select>
+												</div>
+											</div>
+
+											
+											<div class="col-sm-12">
+												<div class="form-group">
+													<label for="pcControleTestado" >Controle Testado:</label>
+													<textarea id="pcControleTestado" name="pcControleTestado" class="form-control" rows="5"  inputmode="text" placeholder="Informe o controle testado"></textarea>
+													<span id="pcControleTestadoCounter" class="badge badge-secondary"></span>
+												</div>
+											</div>	
+
+											<div class="col-sm-6">
+												<div class="form-group">
+													<label for="pcAvaliacaoCategoriaControle" >Categoria do Controle Testado:</label>
+													<select id="pcAvaliacaoCategoriaControle" name="pcAvaliacaoCategoriaControle" class="form-control" multiple="multiple">
+														<cfoutput query="rsAvaliacaoCategoriaControle">
+															<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
+														</cfoutput>
+													</select>
+												</div>
+											</div>
+											
+											<div class="col-sm-2">
+												<div class="form-group">
+													<label for="pcNumSituacaoEncontrada" >N°:</label>
+													<input id="pcNumSituacaoEncontrada"  name="pcNumSituacaoEncontrada" type="text" class="form-control "  inputmode="text" >													
+												</div>
+											</div>
+											<div class="col-sm-10">
+												<div class="form-group">
+													<label for="pcTituloSituacaoEncontrada" >Título da Situação Encontrada:</label>
+													<input id="pcTituloSituacaoEncontrada"  name="pcTituloSituacaoEncontrada" type="text" class="form-control "  inputmode="text" placeholder="Informe o título da situação encontrada">
+												</div>
+											</div>
+
+											<div class="col-sm-12">
+												<div class="form-group">
+													<label for="pcSintese" >Síntese:</label>
+													<textarea id="pcSintese" name="pcSintese" class="form-control" rows="5"  inputmode="text" placeholder="Informe a síntese do ponto( achado) para processos/descrição do teste para unidades..."></textarea>
+													<span id="pcSinteseCounter" class="badge badge-secondary"></span>
+												</div>
+											</div>	
+
+											<div class="col-sm-6">
+												<div class="form-group">
+													<label for="pcAvaliacaoRisco" >Risco Identificado:</label>
+													<select id="pcAvaliacaoRisco" name="pcAvaliacaoRisco" class="form-control" multiple="multiple">
+														<cfoutput query="rsAvaliacaoRisco">
+															<option value="#pc_aval_risco_id#">#pc_aval_risco_descricao#</option>
+														</cfoutput>
+														<option value="0">Outros</option>
+													</select>
+												</div>
+											</div>
+
+											<div id="pcAvaliacaoRiscoOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
+												<label for="pcAvaliacaoRiscoOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Risco:</label>
+												<div class="input-group date" id="reservationdate" data-target-input="nearest">
+													<input id="pcAvaliacaoRiscoOutrosDesc" name="pcAvaliacaoRiscoOutrosDesc" required class="form-control" placeholder="Descreva o PROCESSO..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
+													<span id="pcAvaliacaoRiscoOutrosDescCharCounter" class="badge badge-secondary"></span>
+												</div>
+												<div id="risciOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
+													Atenção: Ao finalinalizar o cadastro deste item, este novo risco descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
+												</div>
+											</div>
+											
+											<div class="col-sm-5">
+												<div class="form-group">
+													<label for="pcTipoClassificacao" >Classificação:</label>
+													<select id="pcTipoClassificacao" name="pcTipoClassificacao" class="form-control" >
+														<option selected="" disabled="" value="">Selecione a Classificação...</option>
+														<option value="L">Leve</option>
+														<option value="M">Mediana</option>		
+														<option value="G">Grave</option>															
+													</select>
+												</div>
+											</div>
+
+
+
+
+
+
+
+											<div class="col-sm-5">
+												<div  class="form-group">
+													<label for="pcValorApuradoTipo" >Tipo do Valor Envolvido:</label>
+													<select id="pcValorApuradoTipo" name="pcValorApuradoTipo" class="form-control">
+														<option selected="" disabled="" value="">Selecione o tipo do Valor Envolvido...</option>
+														<option value="q">Quantificado</option>
+														<option value="n">Não Quantificado</option>												
+													</select>	
+												</div>
+											</div>
+											<div class="col-sm-12" id="divValores" hidden style="display:flex;gap:15px">
+												<div >
+													<div class="form-group" >
+														<label for="pcvaFalta" >Falta: <i class="fas fa-info-circle" style="" data-toggle="popover" data-trigger="hover" title="FALTA" data-placement="top" data-content="DIFERENÇA CONTRA ECT/PREJUÍZO ESTIMADO/FALTA DE BEM/REPASSE"></i></label>
+														<input id="pcvaFalta"   ame="pcvaFalta" type="text" class="form-control money"  inputmode="text"  >
 													</div>
 												</div>
-
-												<div id="anexoRelatorioDiv"></div>
+												<div >
+													<div class="form-group" >
+														<label for="pcvaRisco" >Risco: <i class="fas fa-info-circle" style=""  data-toggle="popover" data-trigger="hover" title="RISCO" data-placement="top" data-content="O IMPACTO FINANCEIRO AINDA NÃO OCORREU"></i></label>
+														<input id="pcvaRisco"   ame="pcvaRisco" type="text" class="form-control money"  inputmode="text"  >
+													</div>
+												</div>
+												<div >
+													<div class="form-group" >
+														<label for="pcvaSobra" >Sobra: <i class="fas fa-info-circle" style="" data-toggle="popover" data-trigger="hover" title="SOBRA" data-placement="top" data-content="DIFERENÇA CONTRA TERCEIROS/VALOR NÃO REPASSADO/SOBRA DE BEM"></i></label>
+														<input id="pcvaSobra"   ame="pcvaSobra" type="text" class="form-control money"  inputmode="text"  >
+													</div>
+												</div>
+											</div>
+										</div>	
+										
+										<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
+											<div >
+												<button id="btSalvar" class="btn btn-block btn-primary " >Salvar</button>
+											</div>
+											<div style="margin-left:100px">
+												<button id="btCancelar"  class="btn btn-block btn-danger " >Cancelar</button>
+											</div>
+										</div>			
+									</div>
+									
+									
 											
-											</cfif>	
-										</div>									
-									</div>
-								</cfoutput>
-
-
-
-							</div>
-						</div>
-
-						
-					</div>
-
-					
-			
-
-					
-				
-			</section>
-
-
-		
- 			
-		    <input id="pcProcessoId" value="<cfoutput>#rsProcForm.pc_processo_id#</cfoutput>" hidden>
-
-			<div id="accordion"  class="row" style="margin-left:0px!important">
-				<div  id="cadastro" class="card card-primary collapsed-card"  >
-					<div class="card-header" style="background-color: #0083ca;color:#fff;">
-						<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
-							<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-							</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (1° Passo)</span>
-						</a>
-					</div>
-					<div class="card-body" >
-						
-						<div class="tab-content" id="custom-tabs-one-tabContent" style="width: 100%!important">
-							<input id="pc_aval_id" hidden>
-
-							<div class="tab-pane fade active show" id="custom-tabs-one-1passo" role="tabpanel" aria-labelledby="custom-tabs-one-1passo-tab">
-								<div class="row" style="font-size:16px">
-									<div class="col-sm-2">
-										<div class="form-group">
-											<label for="pcNumSituacaoEncontrada" >N°:</label>
-											<input id="pcNumSituacaoEncontrada"  required="" name="pcNumSituacaoEncontrada" type="text" class="form-control "  inputmode="text" >													
-										</div>
-									</div>
-									<div class="col-sm-10">
-										<div class="form-group">
-											<label for="pcTituloSituacaoEncontrada" >Título da Situação Encontrada:</label>
-											<input id="pcTituloSituacaoEncontrada"  required=""  name="pcTituloSituacaoEncontrada" type="text" class="form-control "  inputmode="text" placeholder="Informe o título da situação encontrada">
-										</div>
-									</div>
-									<div class="col-sm-5">
-										<div class="form-group">
-											<label for="pcTipoClassificacao" >Classificação:</label>
-											<select id="pcTipoClassificacao" required=""  name="pcTipoClassificacao" class="form-control" >
-												<option selected="" disabled="" value="">Selecione a Classificação...</option>
-												<option value="L">Leve</option>
-												<option value="M">Mediana</option>		
-												<option value="G">Grave</option>															
-											</select>
-										</div>
-									</div>
-									<div class="col-sm-5">
-										<div  class="form-group">
-											<label for="pcValorApuradoTipo" >Tipo do Valor Envolvido:</label>
-											<select id="pcValorApuradoTipo" required=""  name="pcValorApuradoTipo" class="form-control">
-												<option selected="" disabled="" value="">Selecione o tipo do Valor Envolvido...</option>
-												<option value="q">Quantificado</option>
-												<option value="n">Não Quantificado</option>												
-											</select>	
-										</div>
-									</div>
-									<div class="col-sm-12" id="divValores" hidden style="display:flex;gap:15px">
-										<div >
-											<div class="form-group" >
-												<label for="pcvaFalta" >Falta: <i class="fas fa-info-circle" style="" data-toggle="popover" data-trigger="hover" title="FALTA" data-placement="top" data-content="DIFERENÇA CONTRA ECT/PREJUÍZO ESTIMADO/FALTA DE BEM/REPASSE"></i></label>
-												<input id="pcvaFalta"   required="" name="pcvaFalta" type="text" class="form-control money"  inputmode="text"  >
-											</div>
-										</div>
-										<div >
-											<div class="form-group" >
-												<label for="pcvaRisco" >Risco: <i class="fas fa-info-circle" style=""  data-toggle="popover" data-trigger="hover" title="RISCO" data-placement="top" data-content="O IMPACTO FINANCEIRO AINDA NÃO OCORREU"></i></label>
-												<input id="pcvaRisco"   required="" name="pcvaRisco" type="text" class="form-control money"  inputmode="text"  >
-											</div>
-										</div>
-										<div >
-											<div class="form-group" >
-												<label for="pcvaSobra" >Sobra: <i class="fas fa-info-circle" style="" data-toggle="popover" data-trigger="hover" title="SOBRA" data-placement="top" data-content="DIFERENÇA CONTRA TERCEIROS/VALOR NÃO REPASSADO/SOBRA DE BEM"></i></label>
-												<input id="pcvaSobra"   required="" name="pcvaSobra" type="text" class="form-control money"  inputmode="text"  >
-											</div>
-										</div>
-									</div>
-								</div>	
 								
-								<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
-									<div >
-										<button id="btSalvar" class="btn btn-block btn-primary " >Salvar</button>
-									</div>
-									<div style="margin-left:100px">
-										<button id="btCancelar"  class="btn btn-block btn-danger " >Cancelar</button>
-									</div>
-								</div>			
+
+								</div>
+
+								
+
+							
 							</div>
-							
-							
-									
-						
-
 						</div>
-
-						
-
+					</div>			
 					
-					</div>
-				</div>
-			</div>			
-			
-            
-
-		</form><!-- fim formCadAvaliacao -->
-		
-		
-		<div id="TabAvaliacao" style="margin-bottom:50px"></div>
-
-		<div id="CadastroAvaliacaoRelato" style="padding-left:25px;padding-right:25px"></div>
-
-		<script language="JavaScript">
-			//INICIALIZA O POPOVER NOS ÍCONES DE FALTA, SOBRA E RISCO
-			$(function () {
-				$('[data-toggle="popover"]').popover()
-			})	
-			$('.popover-dismiss').popover({
-				trigger: 'hover'
-			})
-			//FIM NICIALIZA O POPOVER NOS ÍCONES DE FALTA, SOBRA E RISCO
-
-			$(function () {
-				$('[data-mask]').inputmask()//mascara para os inputs
-			})
-
-			// prepara o input com a mascara 'R$'
-			$(document).ready(function(){
-				$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});
-				$(".money").inputmask( 'currency',{"autoUnmask": true,
-						radixPoint:",",
-						groupSeparator: ".",
-						allowMinus: false,
-						prefix: 'R$ ',            
-						digits: 2,
-						digitsOptional: false,
-						rightAlign: true,
-						unmaskAsNumber: true
-				});
-
-				mostraRelatorioPDF()
-
-				  
-				<cfoutput>
-					let modalidade = '#rsProcForm.pc_modalidade#'
-					let pc_processo_id = '#rsProcForm.pc_processo_id#'
-				</cfoutput>
-
-				if(modalidade ==='A' || modalidade ==='E'){
-					// DropzoneJS Demo Code Start
-					Dropzone.autoDiscover = false
-
-					// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-					var previewNode = document.querySelector("#templateRelatorio")
-					//previewNode.id = ""
-					var previewTemplate = previewNode.parentNode.innerHTML
-					previewNode.parentNode.removeChild(previewNode)
-
-					var myDropzoneRelatorio = new Dropzone("#processosCadastrados", { // Make the whole body a dropzone
-						url: "cfc/pc_cfcAvaliacoes.cfc?method=uploadArquivos", // Set the url
-						autoProcessQueue :true,
-						maxFiles: 1,
-						maxFilesize:20,
-						thumbnailWidth: 80,
-						thumbnailHeight: 80,
-						parallelUploads: 1,
-						acceptedFiles: '.pdf',
-						previewTemplate: previewTemplate,
-						autoQueue: true, // Make sure the files aren't queued until manually added
-						previewsContainer: "#previewsRelatorio", // Define the container to display the previews
-						clickable: "#relatorios", // Define the element that should be used as click trigger to select files.
-						headers: { "pc_aval_id":"", 
-								"pc_aval_processo":pc_processo_id, 
-								"pc_anexo_avaliacaoPDF":"S",
-								"arquivoParaTodosOsItens":"S"},//informar "S" se o arquivo deve ser exibido em todos os itens do processo
-						init: function() {
-							this.on('error', function(file, errorMessage) {	
-								toastr.error(errorMessage);
-								return false;
-							});
-						}
-						
-					})
-
 					
 
-					// // Update the total progress bar
-					// myDropzoneRelatorio.on("totaluploadprogress", function(progress) {
-					// 	document.querySelector(".progress-bar").style.width = progress + "%"
-					// })
-
-					// myDropzoneRelatorio.on("sending", function(file) {
-					// 	$('#modalOverlay').modal('show')
-					// })
-
-
-
-					// Hide the total progress bar when nothing's uploading anymore
-					myDropzoneRelatorio.on("queuecomplete", function(progress) {
-						//toastr.success("Arquivo(s) enviado(s) com sucesso!")
-						myDropzoneRelatorio.removeAllFiles(true);
-						mostraRelatorioPDF();
-
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-					})
-
-					
-					// DropzoneJS 1 Demo Code End
-				}
-
-				exibirTabAvaliacoes();
-			});
-
-			function mostraRelatorioPDF(){
-				<cfoutput>
-					let pc_processo_id = '#rsProcForm.pc_processo_id#'
-				</cfoutput>
-				$('#modalOverlay').modal('show')
-				setTimeout(function() {
-					$.ajax({
-						type: "post",
-						url:"cfc/pc_cfcAvaliacoes.cfc",
-						data:{
-							method: "anexoRelatorio",
-							pc_anexo_processo_id: pc_processo_id
-						},
-						async: false
-					})//fim ajax
-					.done(function(result){
-						
-						$('#anexoRelatorioDiv').html(result)
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-					})//fim done
-					.fail(function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-						$('#modal-danger').modal('show')
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-						$('#modal-danger').find('.modal-body').text(thrownError)
-
-					})//fim fail
-				}, 1000);
-			}
-
-
-
-
-			//Verifica se o tipo de valor apurado é diferente de  não quantificado. Caso afirmativo, mostra o campo valor.
-			$('#pcValorApuradoTipo').on('change', function (event)  {
-				$('#pcvaFalta').val('')
-				$('#pcvaRisco').val('')
-				$('#pcvaSobra').val('')
-				if($('#pcValorApuradoTipo').val() !== 'n'){
-					$("#divValores").attr("hidden",false)	
-				}else{
-					
-					if (!$("#divValores").attr("hidden")) {
-						$("#divValores").attr("hidden", true)
-					} 
-				}
-				
-			});
-
-			$('#btCancelar').on('click', function (event)  {
-				//cancela e  não propaga o event click original no botão
-				event.preventDefault()
-				event.stopPropagation()
-				$('#pcNumSituacaoEncontrada').val('') 
-				$('#pcTituloSituacaoEncontrada').val('') 
-				$('#pcTipoClassificacao').val('')
-				$('#pcValorApuradoTipo').val('')
-				$('#pcvaFalta').val('')
-				$('#pcvaRisco').val('')
-				$('#pcvaSobra').val('')
-				$('#cadastro').CardWidget('collapse')
-				$('#cabecalhoAccordion').text("Clique aqui para cadastrar um item (1° Passo)");	
-						
-			});
-			
-			$('#pcTipoClassificacao').on('change', function (event)  {
-				if($('#pcTipoClassificacao').val() == 'L' && !$('#pc_aval_id').val() == ''){
-					alert("Atenção! Ao mudar a classificação deste item para leve, caso existam orientações e/ou propostas de melhoria cadastradas, elas serão excluídas após a alteração ser salva.")
-				}
-			});
-
-			$('#btSalvar').on('click', function (event)  {
-				//cancela e  não propaga o event click original no botão
-				event.preventDefault()
-				event.stopPropagation()
-				//retira o ponto do número da manchete (situação encontrada)
-				//var numSituacaoEncontrada=$("#pcNumSituacaoEncontrada").val().replace(/([^\d])+/gim, '');
-				//verifica se os campos necessários foram preenchidos
-				if (
-					!$("#pcNumSituacaoEncontrada").val() ||
-					!$('#pcTituloSituacaoEncontrada').val() ||
-					$('#pcTipoClassificacao').val().length == 0 ||
-					$('#pcValorApuradoTipo').val().length == 0			
-				)
-				{   
-					//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
-					toastr.error('Todos os campos devem ser preenchidos!');
-					return false;
-				}
-
-				//verifica se os campos necessários foram preenchidos
-				if ($('#pcValorApuradoTipo').val() == 'q' & !$('#pcvaFalta').val() & !$('#pcvaRisco').val() & !$('#pcvaSobra').val())
-				{   
-					//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
-					var mens ='Você definiu o tipo de valor como Quantificado.\nPelo menos, um valor referente a A Sobra, Risco ou Falta deve ser preenchido.'
-					toastr.error(mens);
-					return false;
-				}
-
-				var mensagem = ""
-				if($('#pc_aval_id').val() == ''){
-					mensagem = "Deseja cadastrar este item?"
-				}else{
-					mensagem = "Deseja editar este item?"
-				}
+				</form><!-- fim formCadAvaliacao -->
 				
 				
-				swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!',
-					}).then((result) => {
-					if (result.isConfirmed) {
-						$('#modalOverlay').modal('show');
-						setTimeout(function() {
-							//inicio ajax
-							$.ajax({
-								type: "post",
-								url: "cfc/pc_cfcAvaliacoes.cfc",
-								data:{
-									method:"cadProcAvaliacaoTitulo",
-									pc_aval_id: $('#pc_aval_id').val(),
-									pc_aval_processo:$('#pcProcessoId').val(),
-									pc_aval_numeracao:$('#pcNumSituacaoEncontrada').val(),
-									pc_aval_descricao:$('#pcTituloSituacaoEncontrada').val(),
-									pc_aval_classificacao:$('#pcTipoClassificacao').val(),
-									pc_aval_vaFalta:$('#pcvaFalta').val(),
-									pc_aval_vaRisco:$('#pcvaRisco').val(),
-									pc_aval_vaSobra:$('#pcvaSobra').val()
-								},
-					
-								async: false,
-								success: function(result) {	
-									$('#pcNumSituacaoEncontrada').val('') 
-									$('#pcTituloSituacaoEncontrada').val('') 
-									$('#pcTipoClassificacao').val('')
-									$('#pcValorApuradoTipo').val('')
-									$('#pcvaFalta').val('')
-									$('#pcvaRisco').val('')
-									$('#pcvaSobra').val('')	
-									$('#pc_aval_id').val('')
-									
-									//mostraCadastroRelato(<cfoutput>'#arguments.pc_aval_processoForm#'</cfoutput>)
-									exibirTabAvaliacoes()
-									$('#CadastroAvaliacaoRelato').html("")
-									//mostraCads()
-									$('#cabecalhoAccordion').text("Clique aqui para cadastrar um item (1° Passo)");	
-									$('#cadastro').CardWidget('collapse')
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										toastr.success('Operação realizada com sucesso!');
-									});
-									
-										
-								},
-								error: function(xhr, ajaxOptions, thrownError) {									
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
-													+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
-										const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
-										
-										swalWithBootstrapButtons.fire(
-												{...erroSistema}
-										)
-									});
+				<div id="TabAvaliacao" style="margin-bottom:50px"></div>
+
+				<div id="CadastroAvaliacaoRelato" style="padding-left:25px;padding-right:25px"></div>
+
+				<script language="JavaScript">
+						//Initialize Select2 Elements
+						$('select').not('[name="tabProcAcompCards_length"]').select2({
+							theme: 'bootstrap4',
+							placeholder: 'Selecione...',
+							allowClear: true
+						});
+						//INICIALIZA O POPOVER NOS ÍCONES DE FALTA, SOBRA E RISCO
+						$(function () {
+							$('[data-toggle="popover"]').popover()
+						})	
+						$('.popover-dismiss').popover({
+							trigger: 'hover'
+						})
+						//FIM NICIALIZA O POPOVER NOS ÍCONES DE FALTA, SOBRA E RISCO
+
+						$(function () {
+							$('[data-mask]').inputmask()//mascara para os inputs
+						})
+
+						// prepara o input com a mascara 'R$'
+						$(document).ready(function(){
+							
+							
+							// se for seleciobnado outros em pcAvaliacaoRisco, exibe o campo de descrição
+							$(document).on('change', '#pcAvaliacaoRisco', function() {
+								var $this = $(this);
+								// Verifica se alguma das opções selecionadas tem o valor 0
+								if ($this.val().includes('0')) {
+									$('#pcAvaliacaoRiscoOutrosDescricaoDiv').attr("hidden",false);
+								} else {
+									$('#pcAvaliacaoRiscoOutrosDescricaoDiv').attr("hidden",true);
 								}
-
-							})
-							//fim ajax
-						}, 1000); 
-
-					}else {
-						// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
-						$('#modalOverlay').modal('hide');
-						Swal.fire({
-								title: 'Operação Cancelada',
-								html: logoSNCIsweetalert2(''),
-								icon: 'info'
 							});
-					} 
-				})
-					
-				$('#modalOverlay').delay(1000).hide(0, function() {
-					$('#modalOverlay').modal('hide');
-					
-				});
-			});
 
-		function exibirTabAvaliacoes(){
-	
-			var numProcesso = $('#pcProcessoId').val();
-			$.ajax({
-				type: "post",
-				url: "cfc/pc_cfcAvaliacoes.cfc",
-				data:{
-					method: "tabAvaliacoes",
-					numProcesso: numProcesso
-				},
-				async: false,
-				success: function(result) {
-					$('#TabAvaliacao').html(result)
-					
-				},
-				error: function(xhr, ajaxOptions, thrownError) {
-					$('#modal-danger').modal('show')
-					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-					$('#modal-danger').find('.modal-body').text(thrownError)
-					
-				}
-			})	
-			
+							
+							
+							
+							
+							$('#modalOverlay').delay(1000).hide(0, function() {
+									$('#modalOverlay').modal('hide');
+								});
+							$(".money").inputmask( 'currency',{"autoUnmask": true,
+									radixPoint:",",
+									groupSeparator: ".",
+									allowMinus: false,
+									prefix: 'R$ ',            
+									digits: 2,
+									digitsOptional: false,
+									rightAlign: true,
+									unmaskAsNumber: true
+							});
+
+							mostraRelatorioPDF()
+
+							setupCharCounter('pcTeste', 'pcTesteCounter', 5000);
+							setupCharCounter('pcControleTestado', 'pcControleTestadoCounter', 7500);
+							setupCharCounter('pcSintese', 'pcSinteseCounter', 7500);
+
+
+							
+							<cfoutput>
+								let modalidade = '#rsProcForm.pc_modalidade#'
+								let pc_processo_id = '#rsProcForm.pc_processo_id#'
+							</cfoutput>
+
+							if(modalidade ==='A' || modalidade ==='E'){
+								// DropzoneJS Demo Code Start
+								Dropzone.autoDiscover = false
+
+								// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
+								var previewNode = document.querySelector("#templateRelatorio")
+								//previewNode.id = ""
+								var previewTemplate = previewNode.parentNode.innerHTML
+								previewNode.parentNode.removeChild(previewNode)
+
+								var myDropzoneRelatorio = new Dropzone("#processosCadastrados", { // Make the whole body a dropzone
+									url: "cfc/pc_cfcAvaliacoes.cfc?method=uploadArquivos", // Set the url
+									autoProcessQueue :true,
+									maxFiles: 1,
+									maxFilesize:20,
+									thumbnailWidth: 80,
+									thumbnailHeight: 80,
+									parallelUploads: 1,
+									acceptedFiles: '.pdf',
+									previewTemplate: previewTemplate,
+									autoQueue: true, // Make sure the files aren't queued until manually added
+									previewsContainer: "#previewsRelatorio", // Define the container to display the previews
+									clickable: "#relatorios", // Define the element that should be used as click trigger to select files.
+									headers: { "pc_aval_id":"", 
+											"pc_aval_processo":pc_processo_id, 
+											"pc_anexo_avaliacaoPDF":"S",
+											"arquivoParaTodosOsItens":"S"},//informar "S" se o arquivo deve ser exibido em todos os itens do processo
+									init: function() {
+										this.on('error', function(file, errorMessage) {	
+											toastr.error(errorMessage);
+											return false;
+										});
+									}
+									
+								})
+
+								
+
+								// // Update the total progress bar
+								// myDropzoneRelatorio.on("totaluploadprogress", function(progress) {
+								// 	document.querySelector(".progress-bar").style.width = progress + "%"
+								// })
+
+								// myDropzoneRelatorio.on("sending", function(file) {
+								// 	$('#modalOverlay').modal('show')
+								// })
+
+
+
+								// Hide the total progress bar when nothing's uploading anymore
+								myDropzoneRelatorio.on("queuecomplete", function(progress) {
+									//toastr.success("Arquivo(s) enviado(s) com sucesso!")
+									myDropzoneRelatorio.removeAllFiles(true);
+									mostraRelatorioPDF();
+
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+								})
+
+								
+								// DropzoneJS 1 Demo Code End
+							}
+
+							exibirTabAvaliacoes();
+						});
+
+						function mostraRelatorioPDF(){
+							<cfoutput>
+								let pc_processo_id = '#rsProcForm.pc_processo_id#'
+							</cfoutput>
+							$('#modalOverlay').modal('show')
+							setTimeout(function() {
+								$.ajax({
+									type: "post",
+									url:"cfc/pc_cfcAvaliacoes.cfc",
+									data:{
+										method: "anexoRelatorio",
+										pc_anexo_processo_id: pc_processo_id
+									},
+									async: false
+								})//fim ajax
+								.done(function(result){
+									
+									$('#anexoRelatorioDiv').html(result)
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+								})//fim done
+								.fail(function(xhr, ajaxOptions, thrownError) {
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+									$('#modal-danger').modal('show')
+									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+									$('#modal-danger').find('.modal-body').text(thrownError)
+
+								})//fim fail
+							}, 1000);
+						}
+
+
+
+
+						//Verifica se o tipo de valor apurado é diferente de  não quantificado. Caso afirmativo, mostra o campo valor.
+						$('#pcValorApuradoTipo').on('change', function (event)  {
+							$('#pcvaFalta').val('')
+							$('#pcvaRisco').val('')
+							$('#pcvaSobra').val('')
+							if($('#pcValorApuradoTipo').val() !== 'n'){
+								$("#divValores").attr("hidden",false)	
+							}else{
+								
+								if (!$("#divValores").attr("hidden")) {
+									$("#divValores").attr("hidden", true)
+								} 
+							}
+							
+						});
+
+						$('#btCancelar').on('click', function (event)  {
+							//cancela e  não propaga o event click original no botão
+							event.preventDefault()
+							event.stopPropagation()
+							$('#pcNumSituacaoEncontrada').val('') 
+							$('#pcTituloSituacaoEncontrada').val('') 
+							$('#pcTipoClassificacao').val('')
+							$('#pcValorApuradoTipo').val('')
+							$('#pcvaFalta').val('')
+							$('#pcvaRisco').val('')
+							$('#pcvaSobra').val('')
+							$('#cadastro').CardWidget('collapse')
+							$('#cabecalhoAccordion').text("Clique aqui para cadastrar um item (1° Passo)");	
+									
+						});
+						
+						$('#pcTipoClassificacao').on('change', function (event)  {
+							if($('#pcTipoClassificacao').val() == 'L' && !$('#pc_aval_id').val() == ''){
+								alert("Atenção! Ao mudar a classificação deste item para leve, caso existam orientações e/ou propostas de melhoria cadastradas, elas serão excluídas após a alteração ser salva.")
+							}
+						});
+
+						$('#btSalvar').on('click', function (event)  {
+							//cancela e  não propaga o event click original no botão
+							event.preventDefault()
+							event.stopPropagation()
+							//retira o ponto do número da manchete (situação encontrada)
+							//var numSituacaoEncontrada=$("#pcNumSituacaoEncontrada").val().replace(/([^\d])+/gim, '');
+							//verifica se os campos necessários foram preenchidos
+							if (
+								!$("#pcNumSituacaoEncontrada").val() ||
+								!$('#pcTituloSituacaoEncontrada').val() ||
+								$('#pcTipoClassificacao').val().length == 0 ||
+								$('#pcValorApuradoTipo').val().length == 0			
+							)
+							{   
+								//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
+								toastr.error('Todos os campos devem ser preenchidos!');
+								return false;
+							}
+
+							//verifica se os campos necessários foram preenchidos
+							if ($('#pcValorApuradoTipo').val() == 'q' & !$('#pcvaFalta').val() & !$('#pcvaRisco').val() & !$('#pcvaSobra').val())
+							{   
+								//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
+								var mens ='Você definiu o tipo de valor como Quantificado.\nPelo menos, um valor referente a A Sobra, Risco ou Falta deve ser preenchido.'
+								toastr.error(mens);
+								return false;
+							}
+
+							var mensagem = ""
+							if($('#pc_aval_id').val() == ''){
+								mensagem = "Deseja cadastrar este item?"
+							}else{
+								mensagem = "Deseja editar este item?"
+							}
+							
+							
+							swalWithBootstrapButtons.fire({//sweetalert2
+								html: logoSNCIsweetalert2(mensagem),
+								showCancelButton: true,
+								confirmButtonText: 'Sim!',
+								cancelButtonText: 'Cancelar!',
+								}).then((result) => {
+								if (result.isConfirmed) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										//inicio ajax
+										$.ajax({
+											type: "post",
+											url: "cfc/pc_cfcAvaliacoes.cfc",
+											data:{
+												method:"cadProcAvaliacaoTitulo",
+												pc_aval_id: $('#pc_aval_id').val(),
+												pc_aval_processo:$('#pcProcessoId').val(),
+												pc_aval_numeracao:$('#pcNumSituacaoEncontrada').val(),
+												pc_aval_descricao:$('#pcTituloSituacaoEncontrada').val(),
+												pc_aval_classificacao:$('#pcTipoClassificacao').val(),
+												pc_aval_vaFalta:$('#pcvaFalta').val(),
+												pc_aval_vaRisco:$('#pcvaRisco').val(),
+												pc_aval_vaSobra:$('#pcvaSobra').val()
+											},
+								
+											async: false,
+											success: function(result) {	
+												$('#pcNumSituacaoEncontrada').val('') 
+												$('#pcTituloSituacaoEncontrada').val('') 
+												$('#pcTipoClassificacao').val('')
+												$('#pcValorApuradoTipo').val('')
+												$('#pcvaFalta').val('')
+												$('#pcvaRisco').val('')
+												$('#pcvaSobra').val('')	
+												$('#pc_aval_id').val('')
+												
+												//mostraCadastroRelato(<cfoutput>'#arguments.pc_aval_processoForm#'</cfoutput>)
+												exibirTabAvaliacoes()
+												$('#CadastroAvaliacaoRelato').html("")
+												//mostraCads()
+												$('#cabecalhoAccordion').text("Clique aqui para cadastrar um item (1° Passo)");	
+												$('#cadastro').CardWidget('collapse')
+												$('#modalOverlay').delay(1000).hide(0, function() {
+													$('#modalOverlay').modal('hide');
+													toastr.success('Operação realizada com sucesso!');
+												});
+												
+													
+											},
+											error: function(xhr, ajaxOptions, thrownError) {									
+												$('#modalOverlay').delay(1000).hide(0, function() {
+													$('#modalOverlay').modal('hide');
+													var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
+																+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
+													const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
+													
+													swalWithBootstrapButtons.fire(
+															{...erroSistema}
+													)
+												});
+											}
+
+										})
+										//fim ajax
+									}, 1000); 
+
+								}else {
+									// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+									$('#modalOverlay').modal('hide');
+									Swal.fire({
+											title: 'Operação Cancelada',
+											html: logoSNCIsweetalert2(''),
+											icon: 'info'
+										});
+								} 
+							})
+								
+							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
+								
+							});
+						});
+
+						function exibirTabAvaliacoes(){
 				
+						var numProcesso = $('#pcProcessoId').val();
+						$.ajax({
+							type: "post",
+							url: "cfc/pc_cfcAvaliacoes.cfc",
+							data:{
+								method: "tabAvaliacoes",
+								numProcesso: numProcesso
+							},
+							async: false,
+							success: function(result) {
+								$('#TabAvaliacao').html(result)
+								
+							},
+							error: function(xhr, ajaxOptions, thrownError) {
+								$('#modal-danger').modal('show')
+								$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+								$('#modal-danger').find('.modal-body').text(thrownError)
+								
+							}
+						})	
+						
+							
 
-		}
+					}
 
-		
-		
-		</script>
+					
+					
+				</script>
+			</body>
+		</html>
 
 	</cffunction>
 
@@ -5033,10 +5269,6 @@
 		</cfquery>
 		<cfreturn true />
 	</cffunction>
-
-
-
-
 
 
 
