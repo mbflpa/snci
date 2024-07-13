@@ -350,6 +350,7 @@
     <!-- dotdotdot plugin JavaScript utilizado para truncar conteúdo de múltiplas linhas-->
 		<script  src="../SNCI_PROCESSOS/plugins/dotdotdot/dotdotdot.js"></script>
 
+
    <script language="JavaScript">
       //para sweetalert2
       const swalWithBootstrapButtons = Swal.mixin({
