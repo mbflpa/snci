@@ -2064,7 +2064,7 @@
 																												<i  class="fas fa-trash-alt efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'" style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoDel(<cfoutput>'#pc_processo_id#'</cfoutput>);" data-toggle="popover" data-trigger="hover" 	data-placement="bottom" data-content="Excluir" ></i>
 																												<i id="btEdit" class="fas fa-edit efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'"  style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoEditarCard(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;" data-toggle="popover" data-trigger="hover" 	data-placement="bottom" data-content="Editar"></i>
 																												<i  class="fas fa-eye efeito-grow"   onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'" style="z-index:100;cursor: pointer;font-size:20px" onclick="javascript:processoVisualizar(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;" data-toggle="popover" data-trigger="hover" 	data-placement="bottom" data-content="Visualizar"></i>
-																												<i id="btCopia" class="fas fa-copy efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'"  style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoCopiarCard(<cfoutput>'#pc_num_orgao_origem#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_classificacao#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;" data-toggle="popover" data-trigger="hover" 	data-placement="bottom" data-content="Copiar"></i>
+																												<i id="btCopia" class="fas fa-copy efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'"  style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoCopiarCard(<cfoutput>'#pc_num_orgao_origem#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;" data-toggle="popover" data-trigger="hover" 	data-placement="bottom" data-content="Copiar"></i>
 																											</div>
 																										</a>
 																											
@@ -2449,7 +2449,7 @@
 		
 			}
 
-			function processoCopiarCard(orgaoOrigem, processoAvaliado, naoAplicaDesc,classificacao, modalidade, tipoDemanda, anoPacin, objetivoEstrategico, riscoEstrategico, indEstrategico) {
+			function processoCopiarCard(orgaoOrigem, processoAvaliado, naoAplicaDesc, modalidade, tipoDemanda, anoPacin, objetivoEstrategico, riscoEstrategico, indEstrategico) {
 				event.preventDefault()
 				event.stopPropagation()
 				
@@ -2465,16 +2465,10 @@
 					$("#btSalvar").attr("hidden",false);
 					$("#mensagemSalvar").attr("hidden",false);
 					
-					
 					$('#pcModalidade').val(modalidade).trigger('change');
 
-	
-					$('#pcTipoClassificacao').val(classificacao).trigger('change');
-
 					$('#pcOrigem').val(orgaoOrigem).trigger('change');
-
-
-					
+				
 					$('#pcTipoDemanda').val(tipoDemanda).trigger('change');
 					
 					if (tipoDemanda == 'E'){
