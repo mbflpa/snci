@@ -347,7 +347,8 @@
     <!-- AdminLTE App -->
 		<script  src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
  
-
+    <!-- dotdotdot plugin JavaScript utilizado para truncar conteúdo de múltiplas linhas-->
+		<script  src="../SNCI_PROCESSOS/plugins/dotdotdot/dotdotdot.js"></script>
 
    <script language="JavaScript">
       //para sweetalert2
