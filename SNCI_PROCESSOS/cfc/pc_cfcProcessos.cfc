@@ -2064,6 +2064,7 @@
 																												<i  class="fas fa-trash-alt efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'" style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoDel(<cfoutput>'#pc_processo_id#'</cfoutput>);" data-toggle="tooltip"  tilte="Excluir" ></i>
 																												<i id="btEdit" class="fas fa-edit efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'"  style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoEditarCard(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;" data-toggle="tooltip"  tilte="Editar"></i>
 																												<i  class="fas fa-eye efeito-grow"   onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'" style="z-index:100;cursor: pointer;font-size:20px" onclick="javascript:processoVisualizar(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;" tilte="Visualizar"></i>
+																												<i id="btCopia" class="fas fa-copy efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'"  style="cursor: pointer;z-index:100;font-size:20px" onclick="javascript:processoCopiarCard(<cfoutput>'#pc_num_orgao_origem#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_classificacao#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;" data-toggle="tooltip"  tilte="Copia Processo"></i>
 																											</div>
 																										</a>
 																											
@@ -2445,6 +2446,107 @@
 
 				}, 1000);
 		
+			}
+
+			function processoCopiarCard(orgaoOrigem, processoAvaliado, naoAplicaDesc,classificacao, modalidade, tipoDemanda, anoPacin, objetivoEstrategico, riscoEstrategico, indEstrategico) {
+				event.preventDefault()
+				event.stopPropagation()
+				
+				exibirFormCadProcesso();//function que consta na página pc_Processos.cfm	
+				$('.step-trigger').show();
+				
+				setTimeout(function() {	
+
+					var listObjetivoEstrategico = objetivoEstrategico.split(",");
+					var listRiscoEstrategico = riscoEstrategico.split(",");
+					var listIndEstrategico = indEstrategico.split(",");
+
+					$("#btSalvar").attr("hidden",false);
+					$("#mensagemSalvar").attr("hidden",false);
+					
+					
+					$('#pcModalidade').val(modalidade).trigger('change');
+
+	
+					$('#pcTipoClassificacao').val(classificacao).trigger('change');
+
+					$('#pcOrigem').val(orgaoOrigem).trigger('change');
+
+
+					
+					$('#pcTipoDemanda').val(tipoDemanda).trigger('change');
+					
+					if (tipoDemanda == 'E'){
+						anoPacin = null;
+					}
+					$('#pcAnoPacin').val(anoPacin).trigger('change');
+						
+
+
+					var selectedValuesObjetivoEstrategico = new Array();
+					$.each(listObjetivoEstrategico, function(index,value){
+						selectedValuesObjetivoEstrategico[index] = value;
+					});
+
+					$('#pcObjetivoEstrategico').val(selectedValuesObjetivoEstrategico).trigger('change');
+
+					var selectedValuesRiscoEstrategico = new Array();
+					$.each(listRiscoEstrategico, function(index,value){
+						selectedValuesRiscoEstrategico[index] = value;
+					});
+
+					$('#pcRiscoEstrategico').val(selectedValuesRiscoEstrategico).trigger('change');
+
+					var selectedValuesIndEstrategico = new Array();
+					$.each(listIndEstrategico, function(index,value){
+						selectedValuesIndEstrategico[index] = value;
+					});
+
+					$('#pcIndEstrategico').val(selectedValuesIndEstrategico).trigger('change');
+					
+					
+					//popula os selects dinâmicos	
+					$.ajax({
+						url: 'cfc/pc_cfcAvaliacoes.cfc',
+						data: {
+							method: 'getAvaliacaoTipos',
+						},
+						dataType: "json",
+						method: 'GET'
+					})
+					.done(function(data) {
+						// Define os níveis de dados e nomes dos labels
+						let dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
+						let labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+						let outrosOptions = [
+							{ dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
+						];
+						// Inicializa os selects dinâmicos
+						initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
+		
+						// Define os IDs dos selects
+						let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
+						const exampleID = processoAvaliado; // Mude para o ID desejado
+						populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+
+						$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
+						console.log(naoAplicaDesc)
+					
+						$('#cadastro').CardWidget('expand')
+				
+						$('html, body').animate({
+							scrollTop: $('#cadastro').offset().top - 80
+						},'slow');
+					})
+					.fail(function(error) {
+						$('#modal-danger').modal('show')
+							$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+							$('#modal-danger').find('.modal-body').text(error)
+					});
+					//fim popula os selects dinâmicos
+				
+				}, 1000);
+             
 			}
 		</script>
 	</cffunction>
