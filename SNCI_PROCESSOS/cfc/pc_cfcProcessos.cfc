@@ -2028,7 +2028,7 @@
 																									<!-- small card -->
 																									<div class="small-box " style="<cfoutput>#pc_status_card_style_header#</cfoutput> font-weight: normal;">
 																										<cfif #pc_iniciarBloqueado# eq "S">
-																									  	  <i id="btBloquear" class="fas fa-lock grow-icon" style="position:absolute;color: red;left: 2px;top:2px;z-index:1" title="Processo Bloqueado: após validação dos itens, não será encaminhado ao órgão avaliado e órgãos responsáveis."></i>
+																									  	  <i id="btBloquear" class="fas fa-lock grow-icon" style="position:absolute;color: red;left: 2px;top:2px;z-index:1" data-toggle="popover" data-trigger="hover" data-placement="top" title="Processo Bloqueado" data-content="Após validação dos itens, não será encaminhado ao órgão avaliado e órgãos responsáveis."></i>
 																										</cfif>	
 																										<cfif #pc_modalidade# eq "A">
 																											<span style="font-size:1em;color:#fff;position:relative;float:right;margin-right:10px;"><strong>A</strong></span>
@@ -2675,7 +2675,7 @@
 											<td>
 												#pc_processo_id#
 												<cfif #pc_iniciarBloqueado# eq "S">
-													<i id="btBloquear" class="fas fa-lock grow-icon" style="color:##000;left: 2px;z-index:1" title="Processo Bloqueado: após validação dos itens, não será encaminhado ao órgão avaliado e órgãos responsáveis."></i>
+													<i id="btBloquear" class="fas fa-lock grow-icon" style="color:##000;left: 2px;z-index:1" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Processo Bloqueado" data-content="Após validação dos itens, não será encaminhado ao órgão avaliado e órgãos responsáveis."></i>
 												</cfif>
 											</td>
 											<td>#seOrgAvaliado#</td>
@@ -2751,7 +2751,13 @@
 			<!-- /.row -->
 				
 				
-		<script>
+		<script language="JavaScript">
+		    $(function () {
+				$('[data-toggle="popover"]').popover()
+			})	
+			$('.popover-dismiss').popover({
+				trigger: 'hover'
+			})
 			var currentDate = new Date()
 			var day = currentDate.getDate()
 			var month = currentDate.getMonth() + 1
