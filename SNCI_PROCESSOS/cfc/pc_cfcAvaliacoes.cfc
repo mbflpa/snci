@@ -524,14 +524,14 @@
 												
 												<div class="form-group">
 													<label for="pcTeste" >Teste (Pergunta do Plano):</label>
-													<textarea id="pcTeste" name="pcTeste" class="form-control" rows="5"  inputmode="text" placeholder="Informe o teste realizado (pergunta do plano)"></textarea>
+													<textarea id="pcTeste" name="pcTeste" class="form-control" rows="5"  inputmode="text" placeholder="Informe o teste realizado (pergunta do plano)..."></textarea>
 													<span id="pcTesteCounter" class="badge badge-secondary"></span>
 												</div>
 											</div>
 											<div class="col-sm-6">
 												<div class="form-group">
 													<label for="pcAvaliacaoTipoControle" >Tipo de Controle:</label>
-													<select id="pcAvaliacaoTipoControle" name="pcAvaliacaoTipoControle" class="form-control" multiple="multiple">
+													<select id="pcAvaliacaoTipoControle" name="pcAvaliacaoTipoControle" class="form-control" multiple="multiple" placeholder="Selecione...">
 														<cfoutput query="rsAvaliacaoTipoControle">
 															<option value="#pc_aval_tipoControle_id#">#pc_aval_tipoControle_descricao#</option>
 														</cfoutput>
@@ -543,7 +543,7 @@
 											<div class="col-sm-12">
 												<div class="form-group">
 													<label for="pcControleTestado" >Controle Testado:</label>
-													<textarea id="pcControleTestado" name="pcControleTestado" class="form-control" rows="5"  inputmode="text" placeholder="Informe o controle testado"></textarea>
+													<textarea id="pcControleTestado" name="pcControleTestado" class="form-control" rows="5"  inputmode="text" placeholder="Informe o controle testado..."></textarea>
 													<span id="pcControleTestadoCounter" class="badge badge-secondary"></span>
 												</div>
 											</div>	
@@ -568,14 +568,14 @@
 											<div class="col-sm-10">
 												<div class="form-group">
 													<label for="pcTituloSituacaoEncontrada" >Título da Situação Encontrada:</label>
-													<input id="pcTituloSituacaoEncontrada"  name="pcTituloSituacaoEncontrada" type="text" class="form-control "  inputmode="text" placeholder="Informe o título da situação encontrada">
+													<input id="pcTituloSituacaoEncontrada"  name="pcTituloSituacaoEncontrada" type="text" class="form-control "  inputmode="text" placeholder="Informe o título da situação encontrada...">
 												</div>
 											</div>
 
 											<div class="col-sm-12">
 												<div class="form-group">
 													<label for="pcSintese" >Síntese:</label>
-													<textarea id="pcSintese" name="pcSintese" class="form-control" rows="5"  inputmode="text" placeholder="Informe a síntese do ponto( achado) para processos/descrição do teste para unidades..."></textarea>
+													<textarea id="pcSintese" name="pcSintese" class="form-control" rows="5"  inputmode="text" placeholder="Informe a síntese do ponto (achado)..."></textarea>
 													<span id="pcSinteseCounter" class="badge badge-secondary"></span>
 												</div>
 											</div>	
