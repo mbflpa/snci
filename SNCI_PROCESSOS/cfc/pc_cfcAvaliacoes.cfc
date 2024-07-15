@@ -602,6 +602,19 @@
 													Atenção: Ao finalinalizar o cadastro deste item, este novo risco descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
 												</div>
 											</div>
+											<div class="col-sm-12">
+												<div class="form-group">
+													<input id="idCoso" hidden></input>
+													<div id="dados-container-coso" class="dados-container">
+														<!-- Os selects serão adicionados aqui -->
+													</div>
+													
+												</div>
+											</div>
+											
+
+
+
 											
 											<div class="col-sm-5">
 												<div class="form-group">
@@ -692,23 +705,53 @@
 							placeholder: 'Selecione...',
 							allowClear: true
 						});
-						//INICIALIZA O POPOVER NOS ÍCONES DE FALTA, SOBRA E RISCO
+
+						//INICIALIZA O POPOVER NOS ÍCONES
 						$(function () {
 							$('[data-toggle="popover"]').popover()
 						})	
 						$('.popover-dismiss').popover({
 							trigger: 'hover'
 						})
-						//FIM NICIALIZA O POPOVER NOS ÍCONES DE FALTA, SOBRA E RISCO
+						//FIM NICIALIZA O POPOVER NOS ÍCONES 
 
 						$(function () {
 							$('[data-mask]').inputmask()//mascara para os inputs
 						})
 
-						// prepara o input com a mascara 'R$'
-						$(document).ready(function(){
-							
-							
+						
+						 $(document).ready(function(){
+						// 	$.ajax({
+						// 		url: 'cfc/pc_cfcAvaliacoes.cfc',
+						// 		data: {
+						// 			method: 'getAvaliacaoCoso',
+						// 		},
+						// 		dataType: "json",
+						// 		async: false
+						// 	})//fim ajax
+						// 	.done(function(data) {
+						// 		// Define os níveis de dados e nomes dos labels
+						// 		let dataLevels = ['COMPONENTE', 'PRINCIPIO'];
+						// 		let labelNames = ['Componente', 'Princípio'];
+						// 		// Inicializa os selects dinâmicos
+						// 		initializeSelects('#dados-container-coso', data, dataLevels, 'ID', labelNames, 'idCoso');
+						// 	})//fim done
+						// 	.fail(function(xhr, ajaxOptions, thrownError) {
+						// 		$('#modalOverlay').delay(1000).hide(0, function() {
+						// 			$('#modalOverlay').modal('hide');
+						// 		});
+						// 		$('#modal-danger').modal('show')
+						// 		$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+						// 		$('#modal-danger').find('.modal-body').text(thrownError)
+
+						// 	})//fim fail
+
+						// Define os níveis de dados e nomes dos labels
+							let dataLevels = ['COMPONENTE', 'PRINCIPIO'];
+							let labelNames = ['Componente', 'Princípio'];
+							initializeSelectsAjax('#dados-container-coso', dataLevels, 'ID', labelNames, 'idCoso',[],'cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso');
+
+
 							// se for seleciobnado outros em pcAvaliacaoRisco, exibe o campo de descrição
 							$(document).on('change', '#pcAvaliacaoRisco', function() {
 								var $this = $(this);
@@ -5417,7 +5460,32 @@
         <cfreturn data/>
     </cffunction>
 
-
-
+    <cffunction name="getAvaliacaoCoso" access="remote" returntype="any" returnformat="json" output="false">
+		<cfset var result = "" />
+		<cfquery name="qAvaliacaoCoso" datasource="#application.dsn_processos#">
+			SELECT 
+				pc_avalCoso_id, 
+				pc_avalCoso_componente,
+				pc_avalCoso_principio
+			FROM 
+				pc_avaliacao_coso
+			WHERE
+				pc_avalCoso_status = 'A' 
+		</cfquery>
+		
+		<cfset var data = [] />
+		<cfloop query="qAvaliacaoCoso">
+			<cfset var coso = {
+				id: qAvaliacaoCoso.pc_avalCoso_id,
+				componente: qAvaliacaoCoso.pc_avalCoso_componente,
+				principio: qAvaliacaoCoso.pc_avalCoso_principio
+			} />
+			<cfset ArrayAppend(data, coso) />
+		</cfloop>
+		
+		
+		
+		<cfreturn data/>
+	</cffunction>
 
 </cfcomponent>

@@ -625,10 +625,10 @@ function periodoPorExtenso(mes,ano) {
     </script>
 */
 
-function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions = []) {
+function initializeSelects(containerId,data, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions = []) {
 
     // Limpa o container de selects e adiciona o primeiro select
-    $('#dados-container').empty().append('<div class="select-container-initializeSelects"><label class="dynamic-label-initializeSelects" style="text-align: left;">' + labelNames[0] + ': </label><select class="form-control process-select" id="selectDinamico' + dataLevels[0] + '" name="selectDinamico' + dataLevels[0] + '" style="width: calc(100% - 120px);"></select></div>');
+    $(containerId).empty().append('<div class="select-container-initializeSelects"><label class="dynamic-label-initializeSelects" style="text-align: left;">' + labelNames[0] + ': </label><select class="form-control process-select" id="selectDinamico' + dataLevels[0] + '" name="selectDinamico' + dataLevels[0] + '" style="width: 100%;"></select></div>');
 
     // Função para preencher os selects
     function populateSelect(level, parentSelections) {
@@ -649,11 +649,11 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
 
         if ($select.length === 0) {
             // Cria um novo select se ele não existir
-            $select = $('<select class="form-control process-select dynamic-select animate__animated animate__fadeInDown" id="selectDinamico' + currentLevel + '" name="selectDinamico' + currentLevel + '" style="width: calc(100% - 120px);"></select>');
+            $select = $('<select class="form-control process-select dynamic-select animate__animated animate__fadeInDown" id="selectDinamico' + currentLevel + '" name="selectDinamico' + currentLevel + '" style="width: 100%;"></select>');
             var $container = $('<div class="select-container-initializeSelects animate__animated animate__fadeInDown"></div>');
             $container.append('<label class="dynamic-label-initializeSelects" style="text-align: left;">' + labelNames[level] + ': </label>');
             $container.append($select);
-            $('#dados-container').append($container);
+            $(containerId).append($container);
         }
 
         // Preenche o select com opções
@@ -702,7 +702,7 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
     });
 
     // Evento de mudança para selects dinâmicos
-    $('#dados-container').on('change', '.process-select', function() {
+    $(containerId).on('change', '.process-select', function() {
         var level = dataLevels.indexOf($(this).attr('id').replace('selectDinamico', ''));
         var parentSelections = [];
         for (var i = 0; i <= level; i++) {
@@ -764,11 +764,35 @@ function initializeSelects(data, dataLevels, idAttributeName, labelNames, inputA
             placeholder: 'Selecione...'
         });
     });
+
+    
 }
 
-
-
-
+/*Função para inicializar selects com Ajax:*/
+function initializeSelectsAjax(containerId, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions = [], cfc, metodo) {
+    $.ajax({
+        url: cfc,
+        method: "GET", // ou "POST", dependendo do seu endpoint
+        data: {
+            method: metodo,
+        },
+        dataType: "json",
+        async: false
+    })
+    .done(function(data) {
+        // Inicializa os selects dinâmicos
+        initializeSelects(containerId, data, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions);
+    })
+    .fail(function(xhr, ajaxOptions, thrownError) {
+        console.log('AJAX call failed', thrownError);
+        $('#modalOverlay').delay(1000).hide(0, function() {
+            $('#modalOverlay').modal('hide');
+        });
+        $('#modal-danger').modal('show');
+        $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
+        $('#modal-danger').find('.modal-body').text(thrownError);
+    });
+}
 
 
 

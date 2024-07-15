@@ -395,7 +395,7 @@
 														<div class="row" >
 															<input id="idTipoAvaliacao" hidden></input>
 															<div class="form-group col-sm-12">
-																		<div id="dados-container" class="dados-container">
+																		<div id="dados-container" >
 																			<!-- Os selects serão adicionados aqui -->
 																		</div>
 
@@ -1127,35 +1127,16 @@
 						$('#pcAnoPacin').html(selectOptions);
 						//FIM GERAÇÃO ANOS PARA PCANOPACIN
 
-						$.ajax({
-							url: 'cfc/pc_cfcAvaliacoes.cfc',
-							data: {
-								method: 'getAvaliacaoTipos',
-							},
-							dataType: "json",
-							async: false
-						})//fim ajax
-						.done(function(data) {
-							// Define os níveis de dados e nomes dos labels
-							let dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
-							let labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
-							let outrosOptions = [
-								{ dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
-							];
-							// Inicializa os selects dinâmicos
-							initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
-							
+						
 
-						})//fim done
-						.fail(function(xhr, ajaxOptions, thrownError) {
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-							$('#modal-danger').modal('show')
-							$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-							$('#modal-danger').find('.modal-body').text(thrownError)
-
-						})//fim fail
+						// Define os níveis de dados e nomes dos labels
+						let dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
+						let labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+						let outrosOptions = [
+							{ dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
+						];
+						// Inicializa os selects dinâmicos
+						initializeSelectsAjax('#dados-container', dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions,'cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoTipos');
 
 
 						$('#dados-container').on('change', '#selectDinamicoPROCESSO_N3', function() {
@@ -2306,7 +2287,7 @@
 							{ dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
 						];
 						// Inicializa os selects dinâmicos
-						initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
+						initializeSelects('#dados-container', data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
 		
 						// Define os IDs dos selects
 						let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
@@ -2424,7 +2405,7 @@
 							{ dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
 						];
 						// Inicializa os selects dinâmicos
-						initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
+						initializeSelects('#dados-container', data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
 						// Define os IDs dos selects
 						let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
 						const exampleID = processoAvaliado; // Mude para o ID desejado
@@ -2517,7 +2498,7 @@
 							{ dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
 						];
 						// Inicializa os selects dinâmicos
-						initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
+						initializeSelects('#dados-container', data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
 		
 						// Define os IDs dos selects
 						let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
@@ -2950,7 +2931,7 @@
 							{ dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
 						];
 						// Inicializa os selects dinâmicos
-						initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
+						initializeSelects('#dados-container', data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
 						// Define os IDs dos selects
 						let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
 						const exampleID = processoAvaliado; // Mude para o ID desejado
