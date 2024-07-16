@@ -84,16 +84,18 @@
 			and pc_num_orgao_origem IN('00436698','00436697','00438080') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
 		</cfif>
 	<cfelse>
-	    <cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-			AND NOT pc_aval_orientacao_status in (9,12)
-		<cfelse>
-		    AND NOT pc_aval_orientacao_status in (9,12,14)
+	    <cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
+			
 			AND (
-					pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					or pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 					<cfif getOrgHierarchy.recordCount gt 0>
-						or pc_processos.pc_num_orgao_avaliado IN (#orgaosHierarquiaList#)
-						or pc_aval_orientacao_mcu_orgaoResp IN (#orgaosHierarquiaList#)
+						OR pc_aval_orientacao_mcu_orgaoResp in (#orgaosHierarquiaList#)
+						OR pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#)
+						OR pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
+						OR pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
 					</cfif>
 				)  
 		</cfif>

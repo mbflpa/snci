@@ -38,6 +38,22 @@
 
 <cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
 
+<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
+	WITH OrgHierarchy AS (
+		SELECT pc_org_mcu, pc_org_mcu_subord_tec
+		FROM pc_orgaos
+		WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+		UNION ALL
+		SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
+		FROM pc_orgaos o
+		INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+	)
+	SELECT pc_org_mcu
+	FROM OrgHierarchy
+</cfquery>
+
+<cfset orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
+
 <cfquery name="rsProcAno" datasource="#application.dsn_processos#" timeout="120" >
 	SELECT distinct   right(pc_processos.pc_processo_id,4) as ano
 
@@ -69,12 +85,20 @@
 	<cfelse>
 		<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-				AND  pc_aval_orientacao_status not in (9,12,14) and pc_num_status not in(6)
+				pc_num_status not in(6)
 		<cfelse>
-			AND (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-			or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-			or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-			<cfif #mcusHeranca# neq ''>or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>)
+			AND (
+					pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					<cfif getOrgHierarchy.recordCount gt 0>
+						OR pc_aval_orientacao_mcu_orgaoResp in (#orgaosHierarquiaList#)
+						OR pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#)
+						OR pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
+						OR pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
+					</cfif>
+				) 
 		</cfif>  
 	</cfif>	
 	ORDER BY ano

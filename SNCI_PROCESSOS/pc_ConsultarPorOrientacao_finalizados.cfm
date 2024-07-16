@@ -66,7 +66,7 @@
 				LEFT JOIN pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
-	WHERE  not pc_aval_orientacao_status in (1) AND pc_num_status in (5)
+	WHERE  pc_num_status in (5)
 	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
 		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
@@ -84,9 +84,9 @@
 	<cfelse>
 		<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-				AND not pc_aval_orientacao_status in (9,12)
+				AND not pc_aval_orientacao_status in (0,19,12)
 		<cfelse>
-			and (
+		   	and (
 					pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					OR pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					<cfif getOrgHierarchy.recordCount gt 0>
