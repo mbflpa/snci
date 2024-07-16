@@ -4,21 +4,39 @@
 	<!-- iCheck -->
 	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">	
 
+	<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
+		WITH OrgHierarchy AS (
+			SELECT pc_org_mcu, pc_org_mcu_subord_tec
+			FROM pc_orgaos
+			WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+			UNION ALL
+			SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
+			FROM pc_orgaos o
+			INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+		)
+		SELECT pc_org_mcu
+		FROM OrgHierarchy
+	</cfquery>
+
+	<cfset orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
+
 
 	<cffunction name="alertasOA"   access="remote" hint="mostra alertas para os órgão avaliados na página index.">
         <cfquery datasource="#application.dsn_processos#" name="qPosicionamentos">
-			select pc_avaliacao_orientacoes.*, pc_orientacao_status.*  from pc_avaliacao_orientacoes
+			select pc_avaliacao_orientacoes.*, pc_orientacao_status.*, pc_processos.pc_num_status  from pc_avaliacao_orientacoes
 			inner join pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
-			where pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar"> and pc_aval_orientacao_status in (4,5)
+			inner join pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+			inner join pc_processos on pc_processo_id = pc_aval_processo
+			where pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar"> AND pc_aval_orientacao_status in (4,5) AND pc_num_status in(4)
 		</cfquery> 
 
 		<cfquery datasource="#application.dsn_processos#" name="qPosicionamentosSubordinados">
-			select pc_avaliacao_orientacoes.*, pc_orientacao_status.*, pc_orgaos.* from pc_avaliacao_orientacoes
+			select pc_avaliacao_orientacoes.*, pc_orientacao_status.*, pc_orgaos.*, pc_processos.pc_num_status from pc_avaliacao_orientacoes
 			inner join pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
 			inner join pc_orgaos ON pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-			where pc_aval_orientacao_status in (4,5) and
-				(pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
-				or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">)))) 
+			inner join pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+			inner join pc_processos on pc_processo_id = pc_aval_processo
+			where pc_aval_orientacao_status in (4,5) AND pc_aval_orientacao_mcu_orgaoResp in (#orgaosHierarquiaList#) AND pc_num_status in(4)
 		</cfquery> 
 
 		<cfquery name="qMelhoriasPendentes" datasource="#application.dsn_processos#">
@@ -29,8 +47,8 @@
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
 			LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_aval_melhoria_num_orgao
-			WHERE pc_aval_melhoria_status = 'P' and (pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_processos.pc_num_status in(4,5)
-			OR (pc_orgHerancaMcuPara = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_orgHerancaDataInicio <= CONVERT (date, GETDATE())))
+			WHERE pc_aval_melhoria_status = 'P' AND pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' AND pc_processos.pc_num_status in(4,5)
+			
 		</cfquery>
 	
 		<cfif #qPosicionamentos.recordcount# neq 0 || #qPosicionamentosSubordinados.recordcount# neq 0 ||#qMelhoriasPendentes.recordcount# neq 0>     
