@@ -1,42 +1,59 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
-	<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
-		SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
+<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
+	SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+	FROM pc_orgaos_heranca
+	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
 
-		union
+	union
 
-		SELECT  pc_orgaos2.pc_org_mcu
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-																		FROM pc_orgaos_heranca
-																		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-																		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
+	SELECT  pc_orgaos2.pc_org_mcu
+	FROM pc_orgaos_heranca
+	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+	LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
+	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+																	FROM pc_orgaos_heranca
+																	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+																	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
 
-		union
+	union
 
-		select pc_orgaos.pc_org_mcu AS mcuHerdado
-		from pc_orgaos
-		LEFT JOIN pc_orgaos_heranca ON pc_orgHerancaMcuDe = pc_org_mcu
-		where pc_orgaos.pc_org_mcu_subord_tec in(SELECT  pc_orgaos2.pc_org_mcu
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-																		FROM pc_orgaos_heranca
-																		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-																		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
-	</cfquery>
+	select pc_orgaos.pc_org_mcu AS mcuHerdado
+	from pc_orgaos
+	LEFT JOIN pc_orgaos_heranca ON pc_orgHerancaMcuDe = pc_org_mcu
+	where pc_orgaos.pc_org_mcu_subord_tec in(SELECT  pc_orgaos2.pc_org_mcu
+	FROM pc_orgaos_heranca
+	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+	LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
+	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
+																	FROM pc_orgaos_heranca
+																	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
+																	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
+</cfquery>
 
-	<cfquery dbtype="query" name="rsHeranca"> 
-		SELECT mcuHerdado FROM rsHerancaUnion WHERE not mcuHerdado is null
-	</cfquery>
+<cfquery dbtype="query" name="rsHeranca"> 
+	SELECT mcuHerdado FROM rsHerancaUnion WHERE not mcuHerdado is null
+</cfquery>
 
-	<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
+<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
+
+<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
+	WITH OrgHierarchy AS (
+		SELECT pc_org_mcu, pc_org_mcu_subord_tec
+		FROM pc_orgaos
+		WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+		UNION ALL
+		SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
+		FROM pc_orgaos o
+		INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+	)
+	SELECT pc_org_mcu
+	FROM OrgHierarchy
+</cfquery>
+
+<cfset orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
+
 
 <cfquery name="rsProcAno" datasource="#application.dsn_processos#" timeout="120" >
 	SELECT distinct   right(pc_processos.pc_processo_id,4) as ano
@@ -52,7 +69,7 @@
 				LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
-	WHERE NOT pc_num_status IN (2,3) AND pc_num_status in (5)	
+	WHERE pc_num_status in (5)	
 	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
 		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
@@ -68,12 +85,17 @@
 		</cfif>
 	<cfelse>
 	    <cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-			AND not pc_aval_orientacao_status in (9,12)
+			AND NOT pc_aval_orientacao_status in (9,12)
 		<cfelse>
-			AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' or (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-			or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-			or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-			<cfif #mcusHeranca# neq ''>or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>))  
+		    AND NOT pc_aval_orientacao_status in (9,12,14)
+			AND (
+					pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					or pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					<cfif getOrgHierarchy.recordCount gt 0>
+						or pc_processos.pc_num_orgao_avaliado IN (#orgaosHierarquiaList#)
+						or pc_aval_orientacao_mcu_orgaoResp IN (#orgaosHierarquiaList#)
+					</cfif>
+				)  
 		</cfif>
 	</cfif>	
 	ORDER BY ano
