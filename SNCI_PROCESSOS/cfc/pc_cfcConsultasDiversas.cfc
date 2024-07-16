@@ -40,6 +40,22 @@
 
 	<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
 
+	<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
+		WITH OrgHierarchy AS (
+			SELECT pc_org_mcu, pc_org_mcu_subord_tec
+			FROM pc_orgaos
+			WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+			UNION ALL
+			SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
+			FROM pc_orgaos o
+			INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+		)
+		SELECT pc_org_mcu
+		FROM OrgHierarchy
+	</cfquery>
+
+	<cfset orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
+
 
 	<cffunction name="tabConsultaExportarProcessos"   access="remote" hint="gera a consulta para exportação de qualquer informação sobre os processos">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
@@ -83,7 +99,14 @@
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-						AND pc_num_status not in(6)
+						AND pc_num_status not in(6,7)
+				</cfif>
+
+				<!---Se o perfil for 15 - 'DIRETORIA'--->
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 15 >
+						AND pc_num_status not in(6,7)
+						AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+							<cfif getOrgHierarchy.recordCount gt 0>or pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)</cfif>)
 				</cfif>
 			</cfif>
 			
@@ -387,7 +410,14 @@
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13>
-					AND pc_aval_status_id not in(8)	AND pc_num_status not in(6)
+					AND pc_aval_status_id not in(1,2,3,5,8)	AND pc_num_status not in(6,7)
+				</cfif>
+
+				<!---Se o perfil for 15 - 'DIRETORIA' --->
+				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 15>
+					AND pc_aval_status_id not in(1,2,3,5,8)	AND pc_num_status not in(6,7)
+					AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+						<cfif getOrgHierarchy.recordCount gt 0>or pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)</cfif>) 
 				</cfif>
 			
 			</cfif>
@@ -746,25 +776,16 @@
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-						AND  pc_aval_orientacao_status not in (9,12,14) and pc_num_status not in(6)
+						AND  pc_aval_orientacao_status not in (0,1,9,12,14) and pc_num_status not in(6,7)
 				<cfelse>
-					AND ((pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-					<cfif #mcusHeranca# neq ''>or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>)
-
-					or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-					<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>)
-
-					or (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-					<cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#)</cfif>))
+				    AND  pc_aval_orientacao_status not in (0,1,9,12,14) and pc_num_status not in(6,7)
+					AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+						or  pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+						<cfif getOrgHierarchy.recordCount gt 0>or pc_processos.pc_num_orgao_avaliado IN (#orgaosHierarquiaList#)</cfif>
+						<cfif getOrgHierarchy.recordCount gt 0>or pc_aval_orientacao_mcu_orgaoResp IN (#orgaosHierarquiaList#)</cfif>)
 				</cfif>
 			</cfif>
-		
+
 		</cfquery>
 
 		<cfquery dbtype="query" name="rsProcTab" timeout="120" > 
@@ -1146,7 +1167,19 @@
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO), não mostra processos e melhorias bloqueadas--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-					AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
+					AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6,7)
+				<cfelse>
+				    AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6,7)
+					AND (
+							pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR  pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+							<cfif getOrgHierarchy.recordCount gt 0> 
+								OR pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
+							</cfif>
+						)
 				</cfif>
 			
 			</cfif>

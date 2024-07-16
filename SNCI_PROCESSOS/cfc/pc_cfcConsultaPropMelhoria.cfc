@@ -4,7 +4,22 @@
 
 
     <cffunction name="tabMelhoriasConsulta" access="remote" hint="Criar a tabela das propostas de melhoria e envia para a página pc_ConsultarMelhorias.cfm">
-		
+		<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
+			WITH OrgHierarchy AS (
+				SELECT pc_org_mcu, pc_org_mcu_subord_tec
+				FROM pc_orgaos
+				WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+				UNION ALL
+				SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
+				FROM pc_orgaos o
+				INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+			)
+			SELECT pc_org_mcu
+			FROM OrgHierarchy
+		</cfquery>
+
+		<cfset orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
+
 		<cfquery name="rsMelhorias" datasource="#application.dsn_processos#" timeout="120">
 			SELECT pc_avaliacao_melhorias.*
             , pc_processos.*
@@ -48,10 +63,16 @@
 				AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
 				<!---Se o perfil do usuário não for 13 - GOVERNANÇA --->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
-					AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  (pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-					or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-					))
+					AND (
+							pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR  pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+							<cfif getOrgHierarchy.recordCount gt 0> 
+								OR pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
+							</cfif>
+						)
 				</cfif>
 			</cfif>
 			
@@ -690,81 +711,5 @@
 
     </cffunction>
 
-	<cffunction name="melhoriaJSON" access="remote" returntype="any" returnformat="json" output="false">
-
-
-		<cfquery name="rsMelhorias" datasource="#application.dsn_processos#" timeout="120">
-			SELECT pc_avaliacao_melhorias.*
-            , pc_processos.*
-			,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu
-			FROM pc_avaliacao_melhorias
-			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
-			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
-			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-			
-			WHERE 	 pc_processo_id IS NOT NULL  
-			
-			<cfif '#arguments.ano#' neq 'TODOS' >
-					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
-			</cfif>
-			
-			
-			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-				
-				
-				<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
-				<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-					AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-				</cfif>
-				
-				<!---Se o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
-				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 >
-					AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-				</cfif>
-
-				<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)'  ou 14 -'CI - REGIONAL - SCIA - Acompanhamento'--->
-				<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) >
-					AND pc_num_orgao_origem IN('00436698','00436697','00438080') AND (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
-				</cfif>
-
-			<cfelse>
-				
-				AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  (pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-				or pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-				or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-				))
-			
-			</cfif>
-			
-			ORDER BY 	pc_processo_id, pc_aval_numeracao
-		</cfquery>
-
-		
-		<cfset melhorias = []>
-		
-		<cfloop query="rsMelhorias">
-			<cfset melhoria = {}>
-			<cfset melhoria.PC_AVAL_MELHORIA_STATUS = rsMelhorias.pc_aval_melhoria_status>
-			<cfset melhoria.PC_PROCESSO_ID = rsMelhorias.pc_processo_id>
-			<cfset melhoria.PC_AVAL_NUMERACAO = rsMelhorias.pc_aval_numeracao>
-			<cfset melhoria.PC_AVAL_MELHORIA_ID = rsMelhorias.pc_aval_melhoria_id>
-			
-			
-			<cfset melhoria.PC_ORG_SIGLA = rsMelhorias.pc_org_sigla>
-		    <cfset melhoria.PC_ORG_SE_SIGLA = rsMelhorias.pc_org_se_sigla>
-		
-
-			<cfif #rsMelhorias.pc_modalidade# eq 'A' or #rsMelhorias.pc_modalidade# eq 'E'>	
-				<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
-				<cfset melhoria.PC_NUM_SEI = #sei#>
-			<cfelse>
-				<cfset melhoria.PC_NUM_SEI = ''>
-			</cfif>
-
-
-			<cfset arrayAppend(melhorias, melhoria)>
-		</cfloop>
-		
-		<cfreturn melhorias>
-	</cffunction>
+	
 </cfcomponent>
