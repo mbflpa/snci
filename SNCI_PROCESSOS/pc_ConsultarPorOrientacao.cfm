@@ -98,6 +98,7 @@
 						OR pc_aval_orientacao_mcu_orgaoResp in (#orgaosHierarquiaList#)
 					</cfif>
 				)
+			
 		</cfif>
 	</cfif>
 	

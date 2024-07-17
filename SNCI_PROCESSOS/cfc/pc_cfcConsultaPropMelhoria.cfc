@@ -73,6 +73,16 @@
 								OR pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
 							</cfif>
 						)
+					<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+					<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+							
+							and NOT (
+									pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+								)
+							
+					</cfif>	
 				</cfif>
 			</cfif>
 			
