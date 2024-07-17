@@ -99,7 +99,8 @@
 							<table id="tabProcessos" class="table table-bordered table-striped table-hover text-nowrap">
 								<thead style="background: #0083ca;color:#fff">
 									<tr style="font-size:14px">
-									    
+									    <th style="display:none;">ID</th>
+										<th style="display:none;">ID Orientação</th>
 									    <cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 											<th id="colunaEmAnalise" style="text-align: center!important;width: 20px!important;">Colocar<br>em análise</th>
 										</cfif>
@@ -125,9 +126,10 @@
 									<cfloop query="rsProcTab" >
 										<cfoutput>					
 											<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
-											        
+											        <td id="pcAvalId" style="display:none;">#pc_aval_id#</td>
+													<td id="pcAvalOrientacaoId" style="display:none;">#pc_aval_orientacao_id#</td>
 													<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
-														<td align="center">
+														<td align="center" >
 															<cfif #pc_aval_orientacao_status# eq 2 or #pc_aval_orientacao_status# eq 3 or #pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5 or (#pc_aval_orientacao_status# eq 13 && '#orgaoOrigem#' neq '#mcuOrgResp#')>
 																<i onclick="javascript:colocarEmAnalise('#pc_processo_id#',#pc_aval_id#,#pc_aval_orientacao_id#,'#orgaoOrigem#','#orgaoOrigemSigla#','#mcuOrgResp#',#pc_aval_orientacao_status#)"class="fas fa-file-medical-alt grow-icon clickable-icon" style="color:##0083ca;font-size:20px;margin-right:10px;z-index:10000"> </i>
 															</cfif>
@@ -135,28 +137,28 @@
 													</cfif>
 													<cfif #pc_aval_orientacao_dataPrevistaResp# neq '' and DATEFORMAT(#pc_aval_orientacao_dataPrevistaResp#,"yyyy-mm-dd")  lt DATEFORMAT(Now(),"yyyy-mm-dd") and (#pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5)>
 														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;" >PENDENTE</span></td>
+															<td align="center"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;" >PENDENTE</span></td>
 														<cfelse>
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >PENDENTE</span></td>
+															<td align="center"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >PENDENTE</span></td>
 														</cfif>
 													<cfelseif #pc_aval_orientacao_status# eq 3>
 														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##FFA500;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
+															<td align="center"><span  class="statusOrientacoes" style="background:##FFA500;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
 														<cfelse>
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
+															<td align="center"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
 														</cfif>
 											
 													<cfelse>
-														<td  align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)"><span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;"  >#pc_orientacao_status_descricao#</span></td>
+														<td  align="center"><span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;"  >#pc_orientacao_status_descricao#</span></td>
 													</cfif>
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_processo_id#</td>
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_numeracao#</td>	
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_orientacao_id#</td>	
+													<td align="center">#pc_processo_id#</td>
+													<td align="center">#pc_aval_numeracao#</td>	
+													<td align="center">#pc_aval_orientacao_id#</td>	
 													
 													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N' >
 														<cfif ListFind("4,5,16", #pc_aval_orientacao_status#)>
 															<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
-															<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#dataPrev#</td>
+															<td align="center">#dataPrev#</td>
 														<cfelse>
 															<td></td>
 														</cfif>
@@ -164,33 +166,33 @@
 													
 													<cfif #pc_orgHerancaMcuPara# neq '' and (#pc_orientacao_status_finalizador# neq 'S' or DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
 														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
+															<td>#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
 														<cfelse>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
+															<td>#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
 														</cfif>
-														<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgRespHerdeiro#</td>
+														<td>#seOrgRespHerdeiro#</td>
 													<cfelse>
 														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
+															<td>#siglaOrgResp# (#mcuOrgResp#)</td>
 														<cfelse>
-															<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
+															<td>#siglaOrgResp# (#mcuOrgResp#)</td>
 														</cfif>
-														<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgResp#</td>
+														<td>#seOrgResp#</td>
 													</cfif>
 
 													<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#sei#</td>
-													<td align="center" onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_num_rel_sei#</td>
+													<td align="center">#sei#</td>
+													<td align="center">#pc_num_rel_sei#</td>
 													
 													<cfif pc_num_avaliacao_tipo neq 2>
-														<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_tipo_descricao#</td>
+														<td>#pc_aval_tipo_descricao#</td>
 													<cfelse>
-														<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#pc_aval_tipo_nao_aplica_descricao#</td>
+														<td>#pc_aval_tipo_nao_aplica_descricao#</td>
 													</cfif>
-													<td onclick="javascript:mostraInformacoesItensAcompanhamento(#pc_aval_id#, #pc_aval_orientacao_id#)">#DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy")# - #TimeFormat(pc_aval_orientacao_status_datahora,"HH:mm")#</td>	
+													<td>#DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy")# - #TimeFormat(pc_aval_orientacao_status_datahora,"HH:mm")#</td>	
 													
-													<td>#orgaoOrigemSigla#</td>	
-													<td>#orgaoAvaliado#</td>	
+													<td class="group">#orgaoOrigemSigla#</td>	
+													<td class="group">#orgaoAvaliado#</td>	
 											</tr>
 										</cfoutput>
 									</cfloop>	
@@ -299,16 +301,44 @@
 					}
 					sessionStorage.removeItem('emAnalise');
 				}
+
+				// Adicionar evento de clique às linhas da tabela para selecionar
+				$('#tabProcessos tbody').on('click', 'tr', function() {
+					// Remove a classe 'selected' de todas as linhas
+					$('#tabProcessos tr').removeClass('selected');
+					
+					// Adiciona a classe 'selected' à linha clicada
+					$(this).addClass('selected');
+				});
+
+				// Adicionar evento de clique às linhas da tabela para selecionar
+				$('#tabProcessos tbody').on('click', 'tr', function(event) {
+					// Verifica se o clique foi em um botão
+					if ($(event.target).hasClass('clickable-icon')) {
+						return; // Ignora a ação da TR se o clique foi em um botão
+					}
+					
+					// Remove a classe 'selected' de todas as linhas
+					$('#tabProcessos tr').removeClass('selected');
+					
+					// Adiciona a classe 'selected' à linha clicada
+					$(this).addClass('selected');
+
+					// Pega a linha (tr) em que a célula foi clicada
+					var $row = $(this);
+					
+					// Obtém os valores das células ocultas
+					var pcAvalId = $row.find('#pcAvalId').text();
+					var pcAvalOrientacaoId = $row.find('#pcAvalOrientacaoId').text();
+
+					// Chama a função mostraInformacoesItensAcompanhamento com os valores
+					mostraInformacoesItensAcompanhamento(pcAvalId, pcAvalOrientacaoId);
+				});
 			});
 
 			
 			function mostraInformacoesItensAcompanhamento(idAvaliacao, idOrientacao){
-				$('#tabProcessos tr').each(function () {
-					$(this).removeClass('selected');
-				}); 
-				$('#tabProcessos tbody').on('click', 'tr', function () {
-					$(this).addClass('selected');
-				});
+				
 				$('#modalOverlay').modal('show')
 				
 				$('#informacoesItensAcompanhamentoDiv').html('');
