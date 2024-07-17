@@ -63,7 +63,7 @@
 		
 
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
-			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
+			SELECT  DISTINCT    pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 						, pc_classificacoes.pc_class_descricao
@@ -78,7 +78,9 @@
 						INNER JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
 						LEFT JOIN  pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
-					   
+						INNER JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
+						INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
+						INNER JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
 			WHERE NOT pc_num_status IN (2,3) 
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#"> 
@@ -107,7 +109,27 @@
 						AND pc_num_status not in(6,7)
 						AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 							<cfif getOrgHierarchy.recordCount gt 0>or pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)</cfif>)
+					    <!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+						<cfif getOrgHierarchy.recordCount gt 0 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+								<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
+								and NOT (
+										pc_aval_orientacao_status not in (13)
+										AND pc_orgaos_2.pc_org_status IN ('O')
+									)
+								<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
+								and NOT (
+										pc_aval_orientacao_status = 13
+										AND pc_num_orgao_avaliado NOT IN (#orgaosHierarquiaList#)
+									)
+								and NOT (
+											pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+											OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+											OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+										)
+						</cfif>
+						
 				</cfif>
+				
 			</cfif>
 			
 		</cfquery>	
@@ -367,7 +389,7 @@
 		
 
 		<cfquery name="rsProcTabInicio" datasource="#application.dsn_processos#" timeout="120" >
-			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
+			SELECT  DISTINCT  pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 						, pc_classificacoes.pc_class_descricao
@@ -389,7 +411,8 @@
 						INNER JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
 						LEFT JOIN  pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
-	
+						INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
+						INNER JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
 			WHERE NOT pc_num_status IN (2,3) 
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
@@ -418,6 +441,25 @@
 					AND pc_aval_status_id not in(1,2,3,5,8)	AND pc_num_status not in(6,7)
 					AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 						<cfif getOrgHierarchy.recordCount gt 0>or pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)</cfif>) 
+					<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+					<cfif getOrgHierarchy.recordCount gt 0 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+							<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
+							and NOT (
+									pc_aval_orientacao_status not in (13)
+									AND pc_orgaos_2.pc_org_status IN ('O')
+								)
+							<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
+							and NOT (
+									pc_aval_orientacao_status = 13
+									AND pc_num_orgao_avaliado NOT IN (#orgaosHierarquiaList#)
+								)
+							and NOT (
+										pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+										OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+										OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+									)
+					</cfif>
+				
 				</cfif>
 			
 			</cfif>
@@ -778,12 +820,30 @@
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
 						AND  pc_aval_orientacao_status not in (0,1,9,12,14) and pc_num_status not in(6,7)
 				<cfelse>
-				    AND  pc_aval_orientacao_status not in (0,1,9,12,14) and pc_num_status not in(6,7)
-					AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-						or  pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-						<cfif getOrgHierarchy.recordCount gt 0>or pc_processos.pc_num_orgao_avaliado IN (#orgaosHierarquiaList#)</cfif>
-						<cfif getOrgHierarchy.recordCount gt 0>or pc_aval_orientacao_mcu_orgaoResp IN (#orgaosHierarquiaList#)</cfif>)
-				</cfif>
+					<!---Não exibe orientações pendentes de posicionamento inicial do controle interno, canceladas, improcedentes e bloqueadas--->
+				    AND pc_aval_orientacao_status not in (1,9,12,14)
+					AND (
+							pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR  pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							<cfif getOrgHierarchy.recordCount gt 0>
+								OR pc_processos.pc_num_orgao_avaliado IN (#orgaosHierarquiaList#)
+								OR pc_aval_orientacao_mcu_orgaoResp IN (#orgaosHierarquiaList#)
+							</cfif>
+						)
+					<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+					<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+							<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
+							and NOT (
+									pc_aval_orientacao_status not in (13)
+									AND pc_orgaos_1.pc_org_status IN ('O')
+								)
+							<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
+							and NOT (
+									pc_aval_orientacao_status = 13
+									AND pc_num_orgao_avaliado NOT IN (#orgaosHierarquiaList#)
+								)
+					</cfif>
+				</cfif>	
 			</cfif>
 
 		</cfquery>

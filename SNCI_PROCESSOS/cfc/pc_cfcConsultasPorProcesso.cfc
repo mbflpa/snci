@@ -147,8 +147,7 @@
 									<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
 										AND (
 												pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-												OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-												OR pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+												
 												OR pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 												<cfif getOrgHierarchy.recordCount gt 0>
 													OR pc_aval_orientacao_mcu_orgaoResp in (#orgaosHierarquiaList#)
@@ -922,24 +921,43 @@
 					
 
 					<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
-						Select  pc_avaliacao_melhorias.*, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_aval_melhoria_num_orgao ELSE pc_aval_melhoria_sug_orgao_mcu END as mcuOrgaoResp, 
-								CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_orgaos.pc_org_sigla ELSE pc_orgaoSug.pc_org_sigla END as siglaOrgaoResp,
-								pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
+						Select  pc_avaliacao_melhorias.*
+								, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_aval_melhoria_num_orgao ELSE pc_aval_melhoria_sug_orgao_mcu END as mcuOrgaoResp
+								, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_orgaos.pc_org_sigla ELSE pc_orgaoSug.pc_org_sigla END as siglaOrgaoResp
+								, pc_orgaos.pc_org_sigla
+								, pc_orgaoSug.pc_org_sigla as siglaOrgSug
 						FROM pc_avaliacao_melhorias 
 						LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
 						LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
-						WHERE pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#"> 
-						<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
-							and ((pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">   
-								and ((pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-								or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))	
-								or (pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-								)
-								
-								or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-								or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-								or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-								) <cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#) or pc_aval_melhoria_sug_orgao_mcu in (#mcusHeranca#)</cfif>)
+						LEFT JOIN pc_avaliacoes ON pc_aval_id = pc_aval_melhoria_num_aval
+						LEFT JOIN pc_processos ON pc_processo_id = pc_avaliacoes.pc_aval_processo
+						
+						WHERE pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
+						
+						<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S'and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
+							AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
+							AND (
+								pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+								or  pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								OR pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+								<cfif getOrgHierarchy.recordCount gt 0>
+									or pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
+									or pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#)
+									or pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
+								</cfif>
+							)
+
+							<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+							<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+									
+									and NOT (
+											pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+										OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+										OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+										)
+									
+							</cfif>	
+							
 						</cfif>
 						order By pc_aval_melhoria_id 
 						
@@ -1246,23 +1264,43 @@
 					
 
 					<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
-						Select  pc_avaliacao_melhorias.*, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_aval_melhoria_num_orgao ELSE pc_aval_melhoria_sug_orgao_mcu END as mcuOrgaoResp, 
-								CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_orgaos.pc_org_sigla ELSE pc_orgaoSug.pc_org_sigla END as siglaOrgaoResp,
-								pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
+						Select  pc_avaliacao_melhorias.*
+								, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_aval_melhoria_num_orgao ELSE pc_aval_melhoria_sug_orgao_mcu END as mcuOrgaoResp
+								, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_orgaos.pc_org_sigla ELSE pc_orgaoSug.pc_org_sigla END as siglaOrgaoResp
+								, pc_orgaos.pc_org_sigla
+								, pc_orgaoSug.pc_org_sigla as siglaOrgSug
 						FROM pc_avaliacao_melhorias 
 						LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
 						LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
+						LEFT JOIN pc_avaliacoes ON pc_aval_id = pc_aval_melhoria_num_aval
+						LEFT JOIN pc_processos ON pc_processo_id = pc_avaliacoes.pc_aval_processo
+						
 						WHERE pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
-						<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
-							and ((pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
-								and ((pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))	
-								or (pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-								)
-								
-								or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-								or pc_aval_melhoria_sug_orgao_mcu in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-								or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-								) <cfif #mcusHeranca# neq ''>or pc_aval_melhoria_num_orgao in (#mcusHeranca#) or pc_aval_melhoria_sug_orgao_mcu in (#mcusHeranca#)</cfif>)
+						
+						<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S'and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
+							AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
+							AND (
+								pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+								or  pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+								OR pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+								<cfif getOrgHierarchy.recordCount gt 0>
+									or pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
+									or pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#)
+									or pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
+								</cfif>
+							)
+
+							<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+							<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+									
+									and NOT (
+											pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+										OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+										OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+										)
+									
+							</cfif>	
+							
 						</cfif>
 						order By pc_aval_melhoria_id 
 						
@@ -1773,25 +1811,39 @@
 		
 
         <cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
-			Select  pc_avaliacao_melhorias.*, 
-			        CASE  WHEN LEN(pc_aval_melhoria_sug_orgao_mcu) > 0 THEN pc_aval_melhoria_sug_orgao_mcu ELSE pc_aval_melhoria_num_orgao END as mcuOrgaoResp, 
-		            CASE  WHEN LEN(pc_aval_melhoria_sug_orgao_mcu) > 0 THEN pc_orgaoSug.pc_org_sigla ELSE pc_orgaos.pc_org_sigla  END as siglaOrgaoResp,
-					pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
+			Select  pc_avaliacao_melhorias.*
+					, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_aval_melhoria_num_orgao ELSE pc_aval_melhoria_sug_orgao_mcu END as mcuOrgaoResp
+					, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_orgaos.pc_org_sigla ELSE pc_orgaoSug.pc_org_sigla END as siglaOrgaoResp
+					, pc_orgaos.pc_org_sigla
+					, pc_orgaoSug.pc_org_sigla as siglaOrgSug
 			FROM pc_avaliacao_melhorias 
 			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
+			LEFT JOIN pc_avaliacoes ON pc_aval_id = pc_aval_melhoria_num_aval
+			LEFT JOIN pc_processos ON pc_processo_id = pc_avaliacoes.pc_aval_processo
+			
 			WHERE pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
 			
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# neq 'S'and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
-				
-				and (
-					(pc_aval_melhoria_num_aval = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
-					and ((pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#))	
-					or (pc_aval_melhoria_sug_orgao_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#))))
-					
-					or not pc_aval_melhoria_sug_orgao_mcu = null and (pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					or pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#))
-					)
+				AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
+				AND (
+					pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' or  pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					<cfif getOrgHierarchy.recordCount gt 0>
+						or pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
+						or pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#)
+					</cfif>
+				)
+
+				<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+				<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+						
+						and NOT (
+								pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+							OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+							OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+							)
+						
+				</cfif>	
 				
 			</cfif>
 			order By pc_aval_melhoria_id 

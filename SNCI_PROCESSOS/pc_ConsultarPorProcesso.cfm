@@ -68,7 +68,8 @@
 				LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
-	WHERE NOT pc_num_status IN (2,3) 	
+				LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
+	WHERE pc_num_status IN (4,6) 	
 	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
 		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
@@ -83,6 +84,7 @@
 			and pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
 		</cfif>
 	<cfelse>
+	    AND NOT pc_num_status IN (6) 
 		<!---Se o perfil não for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
 			AND (
@@ -97,6 +99,24 @@
 						OR pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
 					</cfif>
 				)
+			<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+			<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+					<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
+					and NOT (
+							pc_aval_orientacao_status not in (13)
+							AND pc_orgaos_2.pc_org_status IN ('O')
+						)
+					<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
+					and NOT (
+							pc_aval_orientacao_status = 13
+							AND pc_num_orgao_avaliado NOT IN (#orgaosHierarquiaList#)
+						)
+					and NOT (
+								pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+							)
+			</cfif>
 		</cfif>
 	</cfif>	
 	ORDER BY ano
