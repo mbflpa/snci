@@ -178,8 +178,7 @@
 								
 								<thead style="background: #0083ca;color:#fff">
 									<tr style="font-size:14px">
-										<th style="display:none">ID</th>
-										<th style="display:none">ID Orientação</th>
+										
 										<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 											<th id="colunaEmAnalise"style="text-align: center!important;">Colocar<br>em análise</th>
 										</cfif>
@@ -195,7 +194,9 @@
 										<th >Tipo de Avaliação:</th>	
 										<th >Data Hora Status: </th>
 										<th >Órgão Origem: </th>
-										<th >Órgão Avaliado: </th>	
+										<th >Órgão Avaliado: </th>
+										<th style="display:none"></th>
+										<th style="display:none"></th>	
 									</tr>
 								</thead>
 								
@@ -203,8 +204,7 @@
 									<cfloop query="rsProcTab" >
 										<cfoutput>					
 											<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
-													<td id="pcAvalId" style="display:none">#pc_aval_id#</td>
-													<td id="pcAvalOrientacaoId" style="display:none">#pc_aval_orientacao_id#</td>
+													
 													<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 														<td align="center">
 															<cfif (#pc_aval_orientacao_status# neq 13 and #pc_aval_orientacao_status# neq 14) or (#pc_aval_orientacao_status# eq 13 and mcuOrgResp eq '#application.rsUsuarioParametros.pc_usu_lotacao#' and orgaoOrigem neq '#application.rsUsuarioParametros.pc_usu_lotacao#') or (#pc_aval_orientacao_status# eq 13 and (mcuOrgResp neq '#application.rsUsuarioParametros.pc_usu_lotacao#' or orgaoOrigem neq '#application.rsUsuarioParametros.pc_usu_lotacao#'))>
@@ -271,6 +271,8 @@
 													
 													<td>#orgaoOrigemSigla#</td>
 													<td>#orgaoAvaliado#</td>
+													<td id="pcAvalId" style="display:none">#pc_aval_id#</td>
+													<td id="pcAvalOrientacaoId" style="display:none">#pc_aval_orientacao_id#</td>
 											</tr>
 										</cfoutput>
 									</cfloop>	

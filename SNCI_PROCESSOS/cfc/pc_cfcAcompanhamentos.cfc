@@ -99,8 +99,7 @@
 							<table id="tabProcessos" class="table table-bordered table-striped table-hover text-nowrap">
 								<thead style="background: #0083ca;color:#fff">
 									<tr style="font-size:14px">
-									    <th style="display:none;">ID</th>
-										<th style="display:none;">ID Orientação</th>
+									   
 									    <cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 											<th id="colunaEmAnalise" style="text-align: center!important;width: 20px!important;">Colocar<br>em análise</th>
 										</cfif>
@@ -119,6 +118,9 @@
 										<th >Data Hora Status: </th>
 										<th >Órgão Origem: </th>
 										<th >Órgão Avaliado: </th>
+
+										<th style="display:none;">ID</th>
+										<th style="display:none;">ID Orientação</th>
 									</tr>
 								</thead>
 								
@@ -126,8 +128,7 @@
 									<cfloop query="rsProcTab" >
 										<cfoutput>					
 											<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
-											        <td id="pcAvalId" style="display:none;">#pc_aval_id#</td>
-													<td id="pcAvalOrientacaoId" style="display:none;">#pc_aval_orientacao_id#</td>
+											        
 													<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
 														<td align="center" >
 															<cfif #pc_aval_orientacao_status# eq 2 or #pc_aval_orientacao_status# eq 3 or #pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5 or (#pc_aval_orientacao_status# eq 13 && '#orgaoOrigem#' neq '#mcuOrgResp#')>
@@ -193,6 +194,9 @@
 													
 													<td class="group">#orgaoOrigemSigla#</td>	
 													<td class="group">#orgaoAvaliado#</td>	
+													
+													<td id="pcAvalId" style="display:none;">#pc_aval_id#</td>
+													<td id="pcAvalOrientacaoId" style="display:none;">#pc_aval_orientacao_id#</td>
 											</tr>
 										</cfoutput>
 									</cfloop>	
