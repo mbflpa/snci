@@ -56,18 +56,18 @@
 
 <cfquery name="rsProcAno" datasource="#application.dsn_processos#" timeout="120" >
 	SELECT distinct   right(pc_processos.pc_processo_id,4) as ano
-
 	FROM        pc_processos INNER JOIN
-				pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id INNER JOIN
-				pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu INNER JOIN
-				pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id INNER JOIN
-				pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu INNER JOIN
+				pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id LEFT JOIN
+				pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu LEFT JOIN
+				pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id LEFT JOIN
+				pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu LEFT JOIN
 				pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
 				LEFT JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
 				LEFT JOIN pc_avaliacao_posicionamentos on pc_aval_posic_num_orientacao = pc_aval_id
 				LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
+				LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
 	WHERE NOT pc_num_status IN (2,3) 	
 	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
@@ -85,8 +85,9 @@
 	<cfelse>
 		<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-				pc_num_status not in(6)
+			AND	pc_num_status not in(6)
 		<cfelse>
+			AND pc_num_status not in(6)
 			AND (
 					pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
@@ -99,6 +100,24 @@
 						OR pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
 					</cfif>
 				) 
+			<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+			<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+					<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
+					and NOT (
+							pc_aval_orientacao_status not in (13)
+							AND pc_orgaos_2.pc_org_status IN ('O')
+						)
+					<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
+					and NOT (
+							pc_aval_orientacao_status = 13
+							AND pc_num_orgao_avaliado NOT IN (#orgaosHierarquiaList#)
+						)
+					and NOT (
+								pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+							)
+			</cfif>
 		</cfif>  
 	</cfif>	
 	ORDER BY ano
@@ -255,10 +274,41 @@
 
 			$('#modalOverlay').modal('show');
 			let tipoConsulta = "";
-			if(tipo ==='p'){tipoConsulta ="tabConsultaExportarProcessos"};
-			if(tipo ==='i'){tipoConsulta ="tabConsultaExportarItens"};
-			if(tipo ==='o'){tipoConsulta ="tabConsultaExportarOrientacoes"};
-			if(tipo ==='m'){tipoConsulta ="tabConsultaExportarMelhorias"};
+			let tipoSelecao = "";
+			
+			if(tipo ==='p'){
+				tipoConsulta ="tabConsultaExportarProcessos"; 
+				if(ano === undefined){
+					tipoSelecao="PROCESSOS (não selecionou o ano)";
+				}else{
+					tipoSelecao="PROCESSOS de " + ano;
+				}
+			}
+
+			if(tipo ==='i'){
+				tipoConsulta ="tabConsultaExportarItens"
+				if(ano === undefined){
+					tipoSelecao="ITENS (não selecionou o ano)";
+				}else{
+					tipoSelecao="ITENS de " + ano;
+				}
+			};
+			if(tipo ==='o'){
+				tipoConsulta ="tabConsultaExportarOrientacoes";
+				if(ano === undefined){
+					tipoSelecao="ORIENTAÇÕES (não selecionou o ano)";
+				}else{
+					tipoSelecao="ORIENTAÇÕES de " + ano;
+				}
+			};
+			if(tipo ==='m'){
+				tipoConsulta ="tabConsultaExportarMelhorias";
+				if(ano === undefined){
+					tipoSelecao="PROPOSTAS DE MELHORIA (não selecionou o ano)";
+				}else{
+					tipoSelecao="PROPOSTAS DE MELHORIA de " + ano;
+				}
+			};
 			setTimeout(function() {
 				$.ajax({
 					type: "post",
@@ -269,8 +319,16 @@
 					},
 					async: false,
 					success: function(result) {
-						$('#exibirTabExportarDiv').html(result)		
+						if(result === "<wddxPacket version='1.0'><header/><data><string>N</string></data></wddxPacket>"){
+							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
+							});
+							$('#exibirTabExportarDiv').html('<h5 align="center" style="margin-top:50px">Nenhum registro foi localizado para os parâmetros informados: ' + tipoSelecao + '</h5>')
+							return;
+						}
+						$('#exibirTabExportarDiv').html(result)	
 						var table = $('#tabProcessos').DataTable();
+
   						if( tipoConsulta !=null && ano !=null ){
 							table.on('draw.dt', function() {		
 								$('#modalOverlay').delay(1000).hide(0, function() {

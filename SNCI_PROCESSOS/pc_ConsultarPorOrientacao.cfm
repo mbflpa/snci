@@ -98,6 +98,20 @@
 						OR pc_aval_orientacao_mcu_orgaoResp in (#orgaosHierarquiaList#)
 					</cfif>
 				)
+			<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+			<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+					<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
+					and NOT (
+							pc_aval_orientacao_status not in (13)
+							AND pc_orgaos_1.pc_org_status IN ('O')
+						)
+					<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
+					and NOT (
+							pc_aval_orientacao_status = 13
+							AND pc_num_orgao_avaliado NOT IN (#orgaosHierarquiaList#)
+						)
+			</cfif>
+			
 		</cfif>
 	</cfif>
 	
