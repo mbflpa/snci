@@ -319,7 +319,15 @@
 					},
 					async: false,
 					success: function(result) {
-						if(result === "<wddxPacket version='1.0'><header/><data><string>N</string></data></wddxPacket>"){
+						let comDados = "";
+						try {
+							xmlDoc = $.parseXML(result);
+							var $xml = $(xmlDoc);
+							comDados = $xml.find("string").text();
+						} catch (e) {
+							comDados = 'S';
+						}
+						if(comDados=='N'){
 							$('#modalOverlay').delay(1000).hide(0, function() {
 								$('#modalOverlay').modal('hide');
 							});
