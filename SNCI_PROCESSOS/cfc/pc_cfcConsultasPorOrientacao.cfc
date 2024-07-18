@@ -142,10 +142,10 @@
 				</cfif>	
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-						AND  pc_aval_orientacao_status not in (9,12,14)
+						AND  pc_aval_orientacao_status not in (0,9,12,14)
 				<cfelse>
 					<!---Não exibe orientações pendentes de posicionamento inicial do controle interno, canceladas, improcedentes e bloqueadas--->
-				    AND pc_aval_orientacao_status not in (1,9,12,14)
+				    AND pc_aval_orientacao_status not in (0,1,9,12,14)
 					AND (
 							pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 							OR  pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 

@@ -71,16 +71,17 @@
 						,pc_usuCoodNacional.pc_usu_nome  as coordNacional
 						
 			FROM        pc_processos 
-						INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
-						INNER JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
-						INNER JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id 
-						INNER JOIN pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
-						INNER JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
+						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
+						LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
+						LEFT JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id 
+						LEFT JOIN pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
+						LEFT JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
 						LEFT JOIN  pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
-						INNER JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
-						INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
-						INNER JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
+						LEFT JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
+						LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
+						LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
+						LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 			WHERE NOT pc_num_status IN (2,3) 
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#"> 
@@ -107,8 +108,18 @@
 				<!---Se o perfil for 15 - 'DIRETORIA'--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 15 >
 						AND pc_num_status not in(6,7)
-						AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-							<cfif getOrgHierarchy.recordCount gt 0>or pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)</cfif>)
+						AND (
+							pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+							<cfif getOrgHierarchy.recordCount gt 0>
+								OR pc_aval_orientacao_mcu_orgaoResp in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
+								OR pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
+							</cfif>
+						) 
 					    <!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
 						<cfif getOrgHierarchy.recordCount gt 0 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
 								<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
@@ -122,10 +133,11 @@
 										AND pc_num_orgao_avaliado NOT IN (#orgaosHierarquiaList#)
 									)
 								and NOT (
-											pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
-											OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
-											OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
-										)
+								pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+							)
+								
 						</cfif>
 						
 				</cfif>
@@ -134,7 +146,10 @@
 			
 		</cfquery>	
 
-		<div class="row">
+		
+		<cfif #rsProcTab.recordcount# neq 0 >	
+		
+			<div class="row">
 				<div class="col-12">
 					<div class="card card-success" style="margin-top:20px;">
 						<div class="card-header" id="texto_card-title" style="background-color: #367657;"><span style="color:#fff; "><strong>PROCESSOS - Ano: <cfoutput>#arguments.ano#</cfoutput></strong></span></div>
@@ -182,7 +197,7 @@
 											</cfquery>	 
 										
 											<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
-	
+
 											<cfoutput>					
 												<tr style="cursor:pointer;font-size:12px" >
 																	
@@ -260,125 +275,124 @@
 			<!-- /.col -->
 			</div>
 			<!-- /.row -->
-				
-		<!--Para charmar o plugin que inclui lengenda dentro do gráfico-->		
-    	<script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
-				
-		<script language="JavaScript">
-			var currentDate = new Date()
-			var day = currentDate.getDate()
-			var month = currentDate.getMonth() + 1
-			var year = currentDate.getFullYear()
-
-			var d = day + "-" + month + "-" + year;	
-
-		$(function () {
-			// var tabela = $('#tabProcessos').DataTable();
-			// // Loop através de todas as colunas
-			// tabela.columns().every(function() {
-			// 	// Define a propriedade visible como false
-			// 	this.visible(false);
-			// });
-			$('#tabProcessos').DataTable( {
-				destroy: true,
-				ordering: false,
-				stateSave: true,
-				scrollY:"150px",
-				filter: false,
-				scrollX:        true,
-				scrollCollapse: true,
-				deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-				pageLength: 3,
-				buttons: [{
-						extend: 'excelHtml5',
-						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
-						title : 'SNCI_Processos_' + d,
-						className: 'btExcel',
-						exportOptions: {
-							columns: ':visible'
-						},
-						customize: function(xlsx) {
-							var sheet = xlsx.xl.worksheets['sheet1.xml'];
-							
-							$('row:eq(0) c', sheet).attr('s','50');//centraliza 1° linha (título)
-							$('row:eq(0) c', sheet).attr('s','2');//1° linha em negrito
-							$('row:eq(1) c', sheet).attr('s','51');//2° linha centralizada
-							$('row:eq(1) c', sheet).attr('s','2');//2° linha em negrito
-						
-							//PARA PERCORRER TODAS AS COLUNAS E APLICAR UM STYLE
-							// var twoDecPlacesCols = ['A','B','C','D','E','F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];           
-							// for ( i=0; i < twoDecPlacesCols.length; i++ ) {
-							// 	$('row c[r^='+twoDecPlacesCols[i]+']', sheet).attr( 's', '25' );
-							// }
-						},
-						customizeData: function (data) {
-							// Percorre os dados exportados
-							for (var i = 0; i < data.body.length; i++) {
-							var rowData = data.body[i];
-							// Percorre as células da linha
-							for (var j = 0; j < rowData.length; j++) {
-								var cellData = rowData[j];
-								// Verifica se o valor contém "&nbsp;"
-								if (cellData.includes('&nbsp;')) {
-								// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
-								rowData[j] = cellData.replace(/&nbsp;/g, ' ');
-								}
-							}
-							}
-						}
-					},
-					{
-						extend: 'colvis',
-						text: 'Selecionar Colunas',
-						className: 'btSelecionarColuna',
-						collectionLayout: 'fixed three-column',
-						colvisButton: true,
-						
-					},
+		
 			
-					{
-						text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
-						action: function (e, dt, node, config) {
-							$('#modalOverlay').modal('show');
-							setTimeout(function() {
-								dt.columns().visible(true);
-							}, 500);
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-
-						}
-					},
-					{
-						text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
-						action: function (e, dt, node, config) {
-							$('#modalOverlay').modal('show');
-							setTimeout(function() {
-								dt.columns().visible(false);
-							}, 500);
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-
-						}
-					},
+			<!--Para charmar o plugin que inclui lengenda dentro do gráfico-->		
+			<script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
 					
-				],
-				drawCallback: function(settings) {//após a tabela se renderizada
-					graficoPizza ('pie','tabProcessos','CLASSIFICAÇÃO (PROCESSOS)','Classificação','pieChartProcessos')	
-					graficoPizza ('pie','tabProcessos','STATUS (PROCESSOS)','Status do Processo','pieChartProcessos2')	
-				}	
-				
-			}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
+			<script language="JavaScript">
+				var currentDate = new Date()
+				var day = currentDate.getDate()
+				var month = currentDate.getMonth() + 1
+				var year = currentDate.getFullYear()
 
-		} );
+				var d = day + "-" + month + "-" + year;	
 
-		
-		
+				$(function () {
+					// var tabela = $('#tabProcessos').DataTable();
+					// // Loop através de todas as colunas
+					// tabela.columns().every(function() {
+					// 	// Define a propriedade visible como false
+					// 	this.visible(false);
+					// });
+					$('#tabProcessos').DataTable( {
+						destroy: true,
+						ordering: false,
+						stateSave: true,
+						scrollY:"150px",
+						filter: false,
+						scrollX:        true,
+						scrollCollapse: true,
+						deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+						pageLength: 3,
+						buttons: [{
+								extend: 'excelHtml5',
+								text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
+								title : 'SNCI_Processos_' + d,
+								className: 'btExcel',
+								exportOptions: {
+									columns: ':visible'
+								},
+								customize: function(xlsx) {
+									var sheet = xlsx.xl.worksheets['sheet1.xml'];
+									
+									$('row:eq(0) c', sheet).attr('s','50');//centraliza 1° linha (título)
+									$('row:eq(0) c', sheet).attr('s','2');//1° linha em negrito
+									$('row:eq(1) c', sheet).attr('s','51');//2° linha centralizada
+									$('row:eq(1) c', sheet).attr('s','2');//2° linha em negrito
+								
+									//PARA PERCORRER TODAS AS COLUNAS E APLICAR UM STYLE
+									// var twoDecPlacesCols = ['A','B','C','D','E','F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];           
+									// for ( i=0; i < twoDecPlacesCols.length; i++ ) {
+									// 	$('row c[r^='+twoDecPlacesCols[i]+']', sheet).attr( 's', '25' );
+									// }
+								},
+								customizeData: function (data) {
+									// Percorre os dados exportados
+									for (var i = 0; i < data.body.length; i++) {
+									var rowData = data.body[i];
+									// Percorre as células da linha
+									for (var j = 0; j < rowData.length; j++) {
+										var cellData = rowData[j];
+										// Verifica se o valor contém "&nbsp;"
+										if (cellData.includes('&nbsp;')) {
+										// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
+										rowData[j] = cellData.replace(/&nbsp;/g, ' ');
+										}
+									}
+									}
+								}
+							},
+							{
+								extend: 'colvis',
+								text: 'Selecionar Colunas',
+								className: 'btSelecionarColuna',
+								collectionLayout: 'fixed three-column',
+								colvisButton: true,
+								
+							},
+					
+							{
+								text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(true);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
 
+								}
+							},
+							{
+								text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(false);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
 
-		</script>			
+								}
+							},
+							
+						],
+						drawCallback: function(settings) {//após a tabela se renderizada
+							graficoPizza ('pie','tabProcessos','CLASSIFICAÇÃO (PROCESSOS)','Classificação','pieChartProcessos')	
+							graficoPizza ('pie','tabProcessos','STATUS (PROCESSOS)','Status do Processo','pieChartProcessos2')	
+						}	
+						
+					}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
 
+				} );
+
+			</script>	
+		<cfelse>
+			<cfreturn 'N'> 	
+		</cfif>
 	</cffunction>
 
 
@@ -401,18 +415,18 @@
 
 
 			FROM        pc_processos 
-						INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
-						INNER JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
-						INNER JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id 
-						INNER JOIN pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
-						
-						INNER JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
+						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
+						LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
+						LEFT JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id 
+						LEFT JOIN pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
+						LEFT JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
 						LEFT JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
-						INNER JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
+						LEFT JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
 						LEFT JOIN  pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
-						INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
-						INNER JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
+						LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
+						LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
+						LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 			WHERE NOT pc_num_status IN (2,3) 
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
@@ -439,8 +453,18 @@
 				<!---Se o perfil for 15 - 'DIRETORIA' --->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 15>
 					AND pc_aval_status_id not in(1,2,3,5,8)	AND pc_num_status not in(6,7)
-					AND (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-						<cfif getOrgHierarchy.recordCount gt 0>or pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)</cfif>) 
+					AND (
+							pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+							OR pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+							<cfif getOrgHierarchy.recordCount gt 0>
+								OR pc_aval_orientacao_mcu_orgaoResp in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
+								OR pc_processos.pc_num_orgao_avaliado in (#orgaosHierarquiaList#)
+							</cfif>
+						) 
 					<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
 					<cfif getOrgHierarchy.recordCount gt 0 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
 							<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
@@ -454,10 +478,11 @@
 									AND pc_num_orgao_avaliado NOT IN (#orgaosHierarquiaList#)
 								)
 							and NOT (
-										pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
-										OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
-										OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
-									)
+								pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+							)
+							
 					</cfif>
 				
 				</cfif>
@@ -470,291 +495,295 @@
 			select distinct rsProcTabInicio.* from rsProcTabInicio
 		</cfquery>
 
-		<div class="row">
-				<div class="col-12">
-					<div class="card card-success" style="margin-top:20px;">
-						<div class="card-header" id="texto_card-title" style="background-color: #367657;"><span style="color:#fff; "><strong>ITENS - Ano: <cfoutput>#arguments.ano#</cfoutput></strong></span></div>
-					
-						<!-- /.card-header -->
-						<div class="card-body">
-							<cfif #rsProcTab.recordcount# eq 0 >
-								<h5 align="center">Nenhum item foi localizado.</h5>
-							</cfif>
-							<cfif #rsProcTab.recordcount# neq 0 >
-								<table id="tabProcessos" class="table table-bordered table-striped  text-nowrap">
-									<thead style="background: #0083ca;color:#fff">
-										<tr style="font-size:14px">
-											<th >N°Processo SNCI</th>
-											<th >Status do Processo</th>
-											<th >Data Fim Processo</th>
-											<th >SE/CS</th>
-											<th >Ano PACIN</th>
-											<th >N° SEI</th>
-											<th >N° Relat. SEI</th>
-											<th >Início Avaliação</th>
-											<th >Fim Avaliação</th>
-											<th >Órgão Origem</th>
-											<th >Órgão Avaliado</th>
-											<th >Tipo de Avaliação</th>
-											<th >Modalidade</th>
-											<th >Classificação</th>
-											<th >Tipo Demanda</th>
-											<th >Avaliador(es)</th>
-											<th >Coordenador Regional</th>
-											<th >Coordenador Nacional</th>
-											<th >Cód. Item</th>
-											<th >N° do Item</th>
-											<th>Título da situação encontrada</th>
-											<th>Classificação do Item</th>
-											<th>Valor Envolvido (FALTA)</th>
-											<th>Valor Envolvido (SOBRA)</th>
-											<th>Valor Envolvido (RISCO)</th>
-											<th>Status do Item</th>
-											
-										</tr>
-									</thead>
-									
-									<tbody>
-										<cfloop query="rsProcTab" >
-											<cfset status = "#pc_status_id#"> 
-											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
-												SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
-												FROM    pc_avaliadores 
-														INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
-														INNER JOIN pc_orgaos ON pc_usuarios.pc_usu_lotacao = pc_orgaos.pc_org_mcu
-												WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
-											</cfquery>	 
+		<cfif #rsProcTab.recordcount# neq 0 >
+			<div class="row">
+					<div class="col-12">
+						<div class="card card-success" style="margin-top:20px;">
+							<div class="card-header" id="texto_card-title" style="background-color: #367657;"><span style="color:#fff; "><strong>ITENS - Ano: <cfoutput>#arguments.ano#</cfoutput></strong></span></div>
+						
+							<!-- /.card-header -->
+							<div class="card-body">
+								<cfif #rsProcTab.recordcount# eq 0 >
+									<h5 align="center">Nenhum item foi localizado.</h5>
+								</cfif>
+								<cfif #rsProcTab.recordcount# neq 0 >
+									<table id="tabProcessos" class="table table-bordered table-striped  text-nowrap">
+										<thead style="background: #0083ca;color:#fff">
+											<tr style="font-size:14px">
+												<th >N°Processo SNCI</th>
+												<th >Status do Processo</th>
+												<th >Data Fim Processo</th>
+												<th >SE/CS</th>
+												<th >Ano PACIN</th>
+												<th >N° SEI</th>
+												<th >N° Relat. SEI</th>
+												<th >Início Avaliação</th>
+												<th >Fim Avaliação</th>
+												<th >Órgão Origem</th>
+												<th >Órgão Avaliado</th>
+												<th >Tipo de Avaliação</th>
+												<th >Modalidade</th>
+												<th >Classificação</th>
+												<th >Tipo Demanda</th>
+												<th >Avaliador(es)</th>
+												<th >Coordenador Regional</th>
+												<th >Coordenador Nacional</th>
+												<th >Cód. Item</th>
+												<th >N° do Item</th>
+												<th>Título da situação encontrada</th>
+												<th>Classificação do Item</th>
+												<th>Valor Envolvido (FALTA)</th>
+												<th>Valor Envolvido (SOBRA)</th>
+												<th>Valor Envolvido (RISCO)</th>
+												<th>Status do Item</th>
+												
+											</tr>
+										</thead>
 										
-											<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
-	
-											<cfoutput>					
-												<tr style="cursor:pointer;font-size:12px" >
-																	
-														<td align="center"> #pc_processo_id#</td>
-														<td>#pc_status_descricao#</td>
-
-														<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
-														<td>#dataFimProcesso#</td>
-
-														<td>#seOrgAvaliado#</td>
-														<td>#pc_ano_pacin#</td>
-														<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
-														<td>#sei#</td>
-														<td>#pc_num_rel_sei#</td>
-														
-														<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
-														<td>#dataInicio#</td>
-														
-														<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
-														<td>#dataFim#</td>
-
-														<td>#siglaOrgOrigem#</td>
-														<td>#siglaOrgAvaliado#</td>
-
-														<cfif pc_num_avaliacao_tipo neq 2>
-															<td>#pc_aval_tipo_descricao#</td>
-														<cfelse>
-															<td>#pc_aval_tipo_nao_aplica_descricao#</td>
-														</cfif>
-														
-														<td>
-															<cfif #pc_Modalidade# eq 'A'>
-																Acompanhamento
-															<cfelseif #pc_Modalidade# eq 'E'>
-																ENTREGA DO RELATÓRIO
-															<cfelse>
-																Normal
-															</cfif>
-														</td>
-														<td>#pc_class_descricao#</td>
-														<cfif #pc_tipo_demanda# eq 'P'>
-															<td>PLANEJADA</td>
-														<cfelseif #pc_tipo_demanda# eq 'E'>
-															<td>EXTRAORDINÁRIA</td>
-														<cfelse>
-															<td>Não informado</td>
-														</cfif>
-														<td>#avaliadores#</td>
-														<td>#coordRegional#</td>
-														<td>#coordNacional#</td>
-														<td >#pc_aval_id#</td>
-														<td >#pc_aval_numeracao#</td>
-														<td >#pc_aval_descricao#</td>
-														<cfset classifRisco = "">
-														<cfif #pc_aval_classificacao# eq 'L'>
-															<cfset classifRisco = "Leve">
-														</cfif>	
-														<cfif #pc_aval_classificacao# eq 'M'>
-															<cfset classifRisco = "Mediano">
-														</cfif>	
-														<cfif #pc_aval_classificacao# eq 'G'>
-															<cfset classifRisco = "Grave">
-														</cfif>	
-														<cfif #pc_aval_classificacao# eq ''>
-															<cfset classifRisco = "Não Classificado">
-														</cfif>	
-
-														<td>#classifRisco#</td>
-														<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
-														<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
-														<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
-														<td>#vaFalta#</td>
-														<td>#vaSobra#</td>
-														<td>#vaRisco#</td>
-														<td>#pc_aval_status_descricao#</td> 
-														
+										<tbody>
+											<cfloop query="rsProcTab" >
+												<cfset status = "#pc_status_id#"> 
+												<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
+													SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
+													FROM    pc_avaliadores 
+															INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
+															INNER JOIN pc_orgaos ON pc_usuarios.pc_usu_lotacao = pc_orgaos.pc_org_mcu
+													WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
+												</cfquery>	 
+											
+												<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
 		
-												</tr>
-											</cfoutput>
-										</cfloop>	
-									</tbody>
-									
-								
-								</table>
-							</cfif>
-						</div>
-						<!-- /.card-body -->
-					</div>
-					<div style="display:flex;justify-content: space-around;">
-						<div style="margin-top:10px;width:500px;margin-bottom:80px;">
-							<canvas id="pieChartItens" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-						</div>
-						<div style="margin-top:10px;width:500px;margin-bottom:80px;">
-							<canvas id="pieChartItens2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-						</div>
-					</div>
-					<!-- /.card -->
-				</div>
-			<!-- /.col -->
-			</div>
-			<!-- /.row -->
-				
-		<!--Para charmar o plugin que inclui lengenda dentro do gráfico-->		
-    	<script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
-				
-		<script language="JavaScript">
-			var currentDate = new Date()
-			var day = currentDate.getDate()
-			var month = currentDate.getMonth() + 1
-			var year = currentDate.getFullYear()
+												<cfoutput>					
+													<tr style="cursor:pointer;font-size:12px" >
+																		
+															<td align="center"> #pc_processo_id#</td>
+															<td>#pc_status_descricao#</td>
 
-			var d = day + "-" + month + "-" + year;	
-		$(function () {
-			// var tabela = $('#tabProcessos').DataTable();
-			// // Loop através de todas as colunas
-			// tabela.columns().every(function() {
-			// 	// Define a propriedade visible como false
-			// 	this.visible(false);
-			// });
-			$('#tabProcessos').DataTable( {
-				destroy: true,
-				ordering: false,
-				stateSave: true,
-				scrollY:"150px",
-				filter: false,
-				scrollX:        true,
-				scrollCollapse: true,
-				deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-				pageLength: 3,
-				buttons: [{
-						extend: 'excelHtml5',
-						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
-						title : 'SNCI_Itens_' + d,
-						className: 'btExcel',
-						exportOptions: {
-							columns: ':visible',
-							format: {
-								body: function(data, row, column, node) {
-									if (column === $('th:contains("N° do Item")').index()) {
-                 						return data.replaceAll('.', ' . ');
-									} else {
-										return data;
+															<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
+															<td>#dataFimProcesso#</td>
+
+															<td>#seOrgAvaliado#</td>
+															<td>#pc_ano_pacin#</td>
+															<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
+															<td>#sei#</td>
+															<td>#pc_num_rel_sei#</td>
+															
+															<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
+															<td>#dataInicio#</td>
+															
+															<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
+															<td>#dataFim#</td>
+
+															<td>#siglaOrgOrigem#</td>
+															<td>#siglaOrgAvaliado#</td>
+
+															<cfif pc_num_avaliacao_tipo neq 2>
+																<td>#pc_aval_tipo_descricao#</td>
+															<cfelse>
+																<td>#pc_aval_tipo_nao_aplica_descricao#</td>
+															</cfif>
+															
+															<td>
+																<cfif #pc_Modalidade# eq 'A'>
+																	Acompanhamento
+																<cfelseif #pc_Modalidade# eq 'E'>
+																	ENTREGA DO RELATÓRIO
+																<cfelse>
+																	Normal
+																</cfif>
+															</td>
+															<td>#pc_class_descricao#</td>
+															<cfif #pc_tipo_demanda# eq 'P'>
+																<td>PLANEJADA</td>
+															<cfelseif #pc_tipo_demanda# eq 'E'>
+																<td>EXTRAORDINÁRIA</td>
+															<cfelse>
+																<td>Não informado</td>
+															</cfif>
+															<td>#avaliadores#</td>
+															<td>#coordRegional#</td>
+															<td>#coordNacional#</td>
+															<td >#pc_aval_id#</td>
+															<td >#pc_aval_numeracao#</td>
+															<td >#pc_aval_descricao#</td>
+															<cfset classifRisco = "">
+															<cfif #pc_aval_classificacao# eq 'L'>
+																<cfset classifRisco = "Leve">
+															</cfif>	
+															<cfif #pc_aval_classificacao# eq 'M'>
+																<cfset classifRisco = "Mediano">
+															</cfif>	
+															<cfif #pc_aval_classificacao# eq 'G'>
+																<cfset classifRisco = "Grave">
+															</cfif>	
+															<cfif #pc_aval_classificacao# eq ''>
+																<cfset classifRisco = "Não Classificado">
+															</cfif>	
+
+															<td>#classifRisco#</td>
+															<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
+															<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
+															<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
+															<td>#vaFalta#</td>
+															<td>#vaSobra#</td>
+															<td>#vaRisco#</td>
+															<td>#pc_aval_status_descricao#</td> 
+															
+			
+													</tr>
+												</cfoutput>
+											</cfloop>	
+										</tbody>
+										
+									
+									</table>
+								</cfif>
+							</div>
+							<!-- /.card-body -->
+						</div>
+						<div style="display:flex;justify-content: space-around;">
+							<div style="margin-top:10px;width:500px;margin-bottom:80px;">
+								<canvas id="pieChartItens" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+							</div>
+							<div style="margin-top:10px;width:500px;margin-bottom:80px;">
+								<canvas id="pieChartItens2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+							</div>
+						</div>
+						<!-- /.card -->
+					</div>
+				<!-- /.col -->
+				</div>
+				<!-- /.row -->
+					
+			<!--Para charmar o plugin que inclui lengenda dentro do gráfico-->		
+			<script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
+				
+			<script language="JavaScript">
+				var currentDate = new Date()
+				var day = currentDate.getDate()
+				var month = currentDate.getMonth() + 1
+				var year = currentDate.getFullYear()
+
+				var d = day + "-" + month + "-" + year;	
+				$(function () {
+					// var tabela = $('#tabProcessos').DataTable();
+					// // Loop através de todas as colunas
+					// tabela.columns().every(function() {
+					// 	// Define a propriedade visible como false
+					// 	this.visible(false);
+					// });
+					$('#tabProcessos').DataTable( {
+						destroy: true,
+						ordering: false,
+						stateSave: true,
+						scrollY:"150px",
+						filter: false,
+						scrollX:        true,
+						scrollCollapse: true,
+						deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+						pageLength: 3,
+						buttons: [{
+								extend: 'excelHtml5',
+								text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
+								title : 'SNCI_Itens_' + d,
+								className: 'btExcel',
+								exportOptions: {
+									columns: ':visible',
+									format: {
+										body: function(data, row, column, node) {
+											if (column === $('th:contains("N° do Item")').index()) {
+												return data.replaceAll('.', ' . ');
+											} else {
+												return data;
+											}
+										}
+									}
+								},
+								customize: function(xlsx) {
+									var sheet = xlsx.xl.worksheets['sheet1.xml'];
+									
+									$('row:eq(0) c', sheet).attr('s','50');//centraliza 1° linha (título)
+									$('row:eq(0) c', sheet).attr('s','2');//1° linha em negrito
+									$('row:eq(1) c', sheet).attr('s','51');//2° linha centralizada
+									$('row:eq(1) c', sheet).attr('s','2');//2° linha em negrito
+								
+									//PARA PERCORRER TODAS AS COLUNAS E APLICAR UM STYLE
+									// var twoDecPlacesCols = ['A','B','C','D','E','F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];           
+									// for ( i=0; i < twoDecPlacesCols.length; i++ ) {
+									// 	$('row c[r^='+twoDecPlacesCols[i]+']', sheet).attr( 's', '25' );
+									// }
+								},
+								customizeData: function (data) {
+									// Percorre os dados exportados
+									for (var i = 0; i < data.body.length; i++) {
+									var rowData = data.body[i];
+									// Percorre as células da linha
+									for (var j = 0; j < rowData.length; j++) {
+										var cellData = rowData[j];
+										// Verifica se o valor contém "&nbsp;"
+										if (cellData.includes('&nbsp;')) {
+										// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
+										rowData[j] = cellData.replace(/&nbsp;/g, ' ');
+										}
+									}
 									}
 								}
-							}
-						},
-						customize: function(xlsx) {
-							var sheet = xlsx.xl.worksheets['sheet1.xml'];
-							
-							$('row:eq(0) c', sheet).attr('s','50');//centraliza 1° linha (título)
-							$('row:eq(0) c', sheet).attr('s','2');//1° linha em negrito
-							$('row:eq(1) c', sheet).attr('s','51');//2° linha centralizada
-							$('row:eq(1) c', sheet).attr('s','2');//2° linha em negrito
-						
-							//PARA PERCORRER TODAS AS COLUNAS E APLICAR UM STYLE
-							// var twoDecPlacesCols = ['A','B','C','D','E','F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];           
-							// for ( i=0; i < twoDecPlacesCols.length; i++ ) {
-							// 	$('row c[r^='+twoDecPlacesCols[i]+']', sheet).attr( 's', '25' );
-							// }
-						},
-						customizeData: function (data) {
-							// Percorre os dados exportados
-							for (var i = 0; i < data.body.length; i++) {
-							var rowData = data.body[i];
-							// Percorre as células da linha
-							for (var j = 0; j < rowData.length; j++) {
-								var cellData = rowData[j];
-								// Verifica se o valor contém "&nbsp;"
-								if (cellData.includes('&nbsp;')) {
-								// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
-								rowData[j] = cellData.replace(/&nbsp;/g, ' ');
-								}
-							}
-							}
-						}
-					},
-					{
-						extend: 'colvis',
-						text: 'Selecionar Colunas',
-						className: 'btSelecionarColuna',
-						collectionLayout: 'fixed three-column',
-						colvisButton: true,
-						
-					},
-			
+							},
+							{
+								extend: 'colvis',
+								text: 'Selecionar Colunas',
+								className: 'btSelecionarColuna',
+								collectionLayout: 'fixed three-column',
+								colvisButton: true,
+								
+							},
 					
-					{
-						text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
-						action: function (e, dt, node, config) {
-							$('#modalOverlay').modal('show');
-							setTimeout(function() {
-								dt.columns().visible(true);
-							}, 500);
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
+							
+							{
+								text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(true);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
 
-						}
-					},
-					{
-						text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
-						action: function (e, dt, node, config) {
-							$('#modalOverlay').modal('show');
-							setTimeout(function() {
-								dt.columns().visible(false);
-							}, 500);
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
+								}
+							},
+							{
+								text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(false);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
 
+								}
+							},
+						],
+						drawCallback: function(settings) {//após a tabela se renderizada
+							graficoPizza ('pie','tabProcessos','CLASSIFICAÇÃO (ITENS)','Classificação do Item','pieChartItens')	
+							graficoPizza ('pie','tabProcessos','STATUS (ITENS)','Status do Item','pieChartItens2')		
 						}
-					},
-				],
-				drawCallback: function(settings) {//após a tabela se renderizada
+						
+					}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
+
 					graficoPizza ('pie','tabProcessos','CLASSIFICAÇÃO (ITENS)','Classificação do Item','pieChartItens')	
-					graficoPizza ('pie','tabProcessos','STATUS (ITENS)','Status do Item','pieChartItens2')		
-				}
-				
-			}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
+					graficoPizza ('pie','tabProcessos','STATUS (ITENS)','Status do Item','pieChartItens2')	
+						
+				} );
 
-			graficoPizza ('pie','tabProcessos','CLASSIFICAÇÃO (ITENS)','Classificação do Item','pieChartItens')	
-			graficoPizza ('pie','tabProcessos','STATUS (ITENS)','Status do Item','pieChartItens2')	
-				
-		} );
+			
 
-		
-
-		</script>			
+			</script>	
+		<cfelse>
+			<cfreturn 'N'> 	
+		</cfif>		
 
 	</cffunction>
 
@@ -784,20 +813,20 @@
 							ELSE pc_orientacao_status_descricao
 						END AS statusDescricao
 			FROM        pc_processos 
-						INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
-						INNER JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
-						INNER JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id 
-						INNER JOIN pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
-						
-						INNER JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
-						LEFT JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
-						INNER JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
+						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
+						LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
+						LEFT JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id 
+						LEFT JOIN pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
+						LEFT JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
+						INNER JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
+						LEFT JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
 						LEFT JOIN  pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
-						INNER JOIN pc_orgaos AS pc_orgaos_resp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_resp.pc_org_mcu 
+						LEFT JOIN pc_orgaos AS pc_orgaos_resp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_resp.pc_org_mcu 
 						LEFT JOIN  pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 						LEFT JOIN  pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
-					    INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
+					    LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
+						LEFT JOIN pc_orgaos AS pc_orgaoResp ON pc_orgaoResp.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
 			WHERE NOT pc_num_status IN (2,3) 
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
@@ -818,10 +847,10 @@
 			<cfelse>
 				<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-						AND  pc_aval_orientacao_status not in (0,1,9,12,14) and pc_num_status not in(6,7)
+						AND  pc_aval_orientacao_status not in (0,9,12,14) and pc_num_status not in(6,7)
 				<cfelse>
 					<!---Não exibe orientações pendentes de posicionamento inicial do controle interno, canceladas, improcedentes e bloqueadas--->
-				    AND pc_aval_orientacao_status not in (1,9,12,14)
+				    AND pc_aval_orientacao_status not in (0,1,9,12,14) and pc_num_status not in(6,7)
 					AND (
 							pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 							OR  pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
@@ -835,7 +864,7 @@
 							<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
 							and NOT (
 									pc_aval_orientacao_status not in (13)
-									AND pc_orgaos_1.pc_org_status IN ('O')
+									AND pc_orgaoResp.pc_org_status IN ('O')
 								)
 							<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
 							and NOT (
@@ -852,318 +881,321 @@
 			select distinct rsProcTabInicio.* from rsProcTabInicio
 		</cfquery>
 
-
-		<div class="row">
-				<div class="col-12">
-					<div class="card card-success" style="margin-top:20px;">
-						<div class="card-header" id="texto_card-title" style="background: #367657;"><span style="color:#fff; "><strong>ORIENTAÇÕES - Ano: <cfoutput>#arguments.ano#</cfoutput></strong></span></div>
-					
-						<!-- /.card-header -->
-						<div class="card-body " id="dataTableContainer" >
-							<cfif #rsProcTab.recordcount# eq 0 >
-								<h5 align="center">Nenhuma orientação foi localizada.</h5>
-							</cfif>
-							<cfif #rsProcTab.recordcount# neq 0 >
-								<table id="tabProcessos" class="table table-bordered table-striped  text-nowrap" >
-									<thead style="background: #0083ca;color:#fff">
-										<tr style="font-size:14px">
-											<th >N°Processo SNCI</th>
-											<th >Status do Processo</th>
-											<th >Data Fim Processo</th>
-											<th >SE/CS</th>
-											<th >Ano PACIN</th>
-											<th >N° SEI</th>
-											<th >N° Relat. SEI</th>
-											<th >Início Avaliação</th>
-											<th >Fim Avaliação</th>
-											<th >Órgão Origem</th>
-											<th >Órgão Avaliado</th>
-											<th >Tipo de Avaliação</th>
-											<th >Modalidade</th>
-											<th >Classificação</th>
-											<th >Tipo Demanda</th>
-											<th >Avaliador(es)</th>
-											<th >Coordenador Regional</th>
-											<th >Coordenador Nacional</th>
-											<th >Cód. Item</th>
-											<th >N° do Item</th>
-											<th>Título da situação encontrada</th>
-											<th>Classificação do Item</th>
-											<th>Valor Envolvido (FALTA)</th>
-											<th>Valor Envolvido (SOBRA)</th>
-											<th>Valor Envolvido (RISCO)</th>
-											<th>Status do Item</th>
-											<th >Cód. Orientação</th>
-											<th >Orientação</th>
-											<th >Órgão Responsável</th>
-											<th >Status da Orientação</th>
-											<th >Data Prev. Resp.</th>
-											<th >Acomp. Finalizado?</th>
-										</tr>
-									</thead>
-									
-									<tbody>
-										<cfloop query="rsProcTab" >
-											<cfset status = "#pc_status_id#"> 
-											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
-												SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
-												FROM    pc_avaliadores 
-														INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
-														INNER JOIN pc_orgaos ON pc_usuarios.pc_usu_lotacao = pc_orgaos.pc_org_mcu
-												WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
-											</cfquery>	 
+		<cfif #rsProcTab.recordcount# neq 0 >
+			<div class="row">
+					<div class="col-12">
+						<div class="card card-success" style="margin-top:20px;">
+							<div class="card-header" id="texto_card-title" style="background: #367657;"><span style="color:#fff; "><strong>ORIENTAÇÕES - Ano: <cfoutput>#arguments.ano#</cfoutput></strong></span></div>
+						
+							<!-- /.card-header -->
+							<div class="card-body " id="dataTableContainer" >
+								<cfif #rsProcTab.recordcount# eq 0 >
+									<h5 align="center">Nenhuma orientação foi localizada.</h5>
+								</cfif>
+								<cfif #rsProcTab.recordcount# neq 0 >
+									<table id="tabProcessos" class="table table-bordered table-striped  text-nowrap" >
+										<thead style="background: #0083ca;color:#fff">
+											<tr style="font-size:14px">
+												<th >N°Processo SNCI</th>
+												<th >Status do Processo</th>
+												<th >Data Fim Processo</th>
+												<th >SE/CS</th>
+												<th >Ano PACIN</th>
+												<th >N° SEI</th>
+												<th >N° Relat. SEI</th>
+												<th >Início Avaliação</th>
+												<th >Fim Avaliação</th>
+												<th >Órgão Origem</th>
+												<th >Órgão Avaliado</th>
+												<th >Tipo de Avaliação</th>
+												<th >Modalidade</th>
+												<th >Classificação</th>
+												<th >Tipo Demanda</th>
+												<th >Avaliador(es)</th>
+												<th >Coordenador Regional</th>
+												<th >Coordenador Nacional</th>
+												<th >Cód. Item</th>
+												<th >N° do Item</th>
+												<th>Título da situação encontrada</th>
+												<th>Classificação do Item</th>
+												<th>Valor Envolvido (FALTA)</th>
+												<th>Valor Envolvido (SOBRA)</th>
+												<th>Valor Envolvido (RISCO)</th>
+												<th>Status do Item</th>
+												<th >Cód. Orientação</th>
+												<th >Orientação</th>
+												<th >Órgão Responsável</th>
+												<th >Status da Orientação</th>
+												<th >Data Prev. Resp.</th>
+												<th >Acomp. Finalizado?</th>
+											</tr>
+										</thead>
 										
-											<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
-	
-											<cfoutput>					
-												<tr style="cursor:pointer;font-size:12px" >
-																	
-														<td align="center"> #pc_processo_id#</td>
-														<td>#pc_status_descricao#</td>
-
-														<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
-														<td>#dataFimProcesso#</td>
-
-														<td>#seOrgAvaliado#</td>
-														<td>#pc_ano_pacin#</td>
-														<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
-														<td>#sei#</td>
-														<td>#pc_num_rel_sei#</td>
-														
-														<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
-														<td>#dataInicio#</td>
-														
-														<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
-														<td>#dataFim#</td>
-
-														<td>#siglaOrgOrigem#</td>
-														<td>#siglaOrgAvaliado#</td>
-
-														<cfif pc_num_avaliacao_tipo neq 2>
-															<td>#pc_aval_tipo_descricao#</td>
-														<cfelse>
-															<td>#pc_aval_tipo_nao_aplica_descricao#</td>
-														</cfif>
-														
-														<td>
-															<cfif #pc_Modalidade# eq 'A'>
-																Acompanhamento
-															<cfelseif #pc_Modalidade# eq 'E'>
-																ENTREGA DO RELATÓRIO
-															<cfelse>
-																Normal
-															</cfif>
-														</td>
-														<td>#pc_class_descricao#</td>
-														<cfif #pc_tipo_demanda# eq 'P'>
-															<td>PLANEJADA</td>
-														<cfelseif #pc_tipo_demanda# eq 'E'>
-															<td>EXTRAORDINÁRIA</td>
-														<cfelse>
-															<td>Não informado</td>
-														</cfif>
-														<td>#avaliadores#</td>
-														<td>#coordRegional#</td>
-														<td>#coordNacional#</td>
-														<td >#pc_aval_id#</td>
-														<td >#pc_aval_numeracao#</td>
-														<td >#pc_aval_descricao#</td>
-														<cfset classifRisco = "">
-														<cfif #pc_aval_classificacao# eq 'L'>
-															<cfset classifRisco = "Leve">
-														</cfif>	
-														<cfif #pc_aval_classificacao# eq 'M'>
-															<cfset classifRisco = "Mediano">
-														</cfif>	
-														<cfif #pc_aval_classificacao# eq 'G'>
-															<cfset classifRisco = "Grave">
-														</cfif>	
-														<cfif #pc_aval_classificacao# eq ''>
-															<cfset classifRisco = "Não Classificado">
-														</cfif>	
-														<td>#classifRisco#</td>
-														<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
-														<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
-														<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
-														<td>#vaFalta#</td>
-														<td>#vaSobra#</td>
-														<td>#vaRisco#</td>
-														<td>#pc_aval_status_descricao#</td> 
-														<td >#pc_aval_orientacao_id#</td>
-														<td >#pc_aval_orientacao_descricao#</td>
-														<td>#orientacaoOrgaoResp#</td>
-														<td>#statusDescricao#</td>
-														
-														<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
-														<cfif pc_aval_orientacao_status eq 4 and pc_aval_orientacao_status eq 5>
-															<td>#dataPrev#</td>
-														<cfelse>
-															<td></td>
-														</cfif>
-														
-														<cfif pc_orientacao_status_finalizador eq "S">
-															<td>Sim</td>
-														<cfelse>
-															<td>Não</td>
-														</cfif>
-												</tr>
-											</cfoutput>
-										</cfloop>	
-									</tbody>
-									
-								
-								</table>
-
-								
-
-							</cfif>
-
-						</div>
-						<!-- /.card-body -->
-						<div style = "display:flex;justify-content: space-around;margin-bottom:80px;">
-							<canvas id="pieChartOrientacoes" style="max-width: 50%;margin-left:10px;"></canvas>
-							<div style="margin-top:10px;width:500px">
-								<canvas id="pieChartOrientacoes2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-							</div>
-						</div>
-							
-					</div>
-					<!-- /.card -->
-				</div>
-			<!-- /.col -->
-			</div>
-			<!-- /.row -->
-				
-		<!--Para charmar o plugin que inclui lengenda dentro do gráfico-->		
-    	<script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
-				
-		<script language="JavaScript">
-
-			var currentDate = new Date()
-			var day = currentDate.getDate()
-			var month = currentDate.getMonth() + 1
-			var year = currentDate.getFullYear()
-
-			var d = day + "-" + month + "-" + year;	
-			$(function () {
-				// var tabela = $('#tabProcessos').DataTable();
-				// // Loop através de todas as colunas
-				// tabela.columns().every(function() {
-				// 	// Define a propriedade visible como false
-				// 	this.visible(false);
-				// });
-				$('#tabProcessos').DataTable( {
-					destroy: true,
-					ordering: false,
-					stateSave: true,
-					scrollY:"150px",
-					filter: false,
-					scrollX:        true,
-					scrollCollapse: true,
-					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					pageLength: 3,
-					
-					buttons: [						
-						{
-							extend: 'excelHtml5',
-							text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
-							title : 'SNCI_Orientacoes_' + d,
-							className: 'btExcel',
-							exportOptions: {
-								columns: ':visible',
-								format: {
-									body: function(data, row, column, node) {
-										if (column === $('th:contains("N° do Item")').index()) {
+										<tbody>
+											<cfloop query="rsProcTab" >
+												<cfset status = "#pc_status_id#"> 
+												<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
+													SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
+													FROM    pc_avaliadores 
+															INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
+															INNER JOIN pc_orgaos ON pc_usuarios.pc_usu_lotacao = pc_orgaos.pc_org_mcu
+													WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
+												</cfquery>	 
 											
-											return data.replaceAll('.', ' . ');
-										} else {
-											return data;
+												<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
+		
+												<cfoutput>					
+													<tr style="cursor:pointer;font-size:12px" >
+																		
+															<td align="center"> #pc_processo_id#</td>
+															<td>#pc_status_descricao#</td>
+
+															<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
+															<td>#dataFimProcesso#</td>
+
+															<td>#seOrgAvaliado#</td>
+															<td>#pc_ano_pacin#</td>
+															<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
+															<td>#sei#</td>
+															<td>#pc_num_rel_sei#</td>
+															
+															<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
+															<td>#dataInicio#</td>
+															
+															<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
+															<td>#dataFim#</td>
+
+															<td>#siglaOrgOrigem#</td>
+															<td>#siglaOrgAvaliado#</td>
+
+															<cfif pc_num_avaliacao_tipo neq 2>
+																<td>#pc_aval_tipo_descricao#</td>
+															<cfelse>
+																<td>#pc_aval_tipo_nao_aplica_descricao#</td>
+															</cfif>
+															
+															<td>
+																<cfif #pc_Modalidade# eq 'A'>
+																	Acompanhamento
+																<cfelseif #pc_Modalidade# eq 'E'>
+																	ENTREGA DO RELATÓRIO
+																<cfelse>
+																	Normal
+																</cfif>
+															</td>
+															<td>#pc_class_descricao#</td>
+															<cfif #pc_tipo_demanda# eq 'P'>
+																<td>PLANEJADA</td>
+															<cfelseif #pc_tipo_demanda# eq 'E'>
+																<td>EXTRAORDINÁRIA</td>
+															<cfelse>
+																<td>Não informado</td>
+															</cfif>
+															<td>#avaliadores#</td>
+															<td>#coordRegional#</td>
+															<td>#coordNacional#</td>
+															<td >#pc_aval_id#</td>
+															<td >#pc_aval_numeracao#</td>
+															<td >#pc_aval_descricao#</td>
+															<cfset classifRisco = "">
+															<cfif #pc_aval_classificacao# eq 'L'>
+																<cfset classifRisco = "Leve">
+															</cfif>	
+															<cfif #pc_aval_classificacao# eq 'M'>
+																<cfset classifRisco = "Mediano">
+															</cfif>	
+															<cfif #pc_aval_classificacao# eq 'G'>
+																<cfset classifRisco = "Grave">
+															</cfif>	
+															<cfif #pc_aval_classificacao# eq ''>
+																<cfset classifRisco = "Não Classificado">
+															</cfif>	
+															<td>#classifRisco#</td>
+															<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
+															<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
+															<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
+															<td>#vaFalta#</td>
+															<td>#vaSobra#</td>
+															<td>#vaRisco#</td>
+															<td>#pc_aval_status_descricao#</td> 
+															<td >#pc_aval_orientacao_id#</td>
+															<td >#pc_aval_orientacao_descricao#</td>
+															<td>#orientacaoOrgaoResp#</td>
+															<td>#statusDescricao#</td>
+															
+															<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
+															<cfif pc_aval_orientacao_status eq 4 and pc_aval_orientacao_status eq 5>
+																<td>#dataPrev#</td>
+															<cfelse>
+																<td></td>
+															</cfif>
+															
+															<cfif pc_orientacao_status_finalizador eq "S">
+																<td>Sim</td>
+															<cfelse>
+																<td>Não</td>
+															</cfif>
+													</tr>
+												</cfoutput>
+											</cfloop>	
+										</tbody>
+										
+									
+									</table>
+
+									
+
+								</cfif>
+
+							</div>
+							<!-- /.card-body -->
+							<div style = "display:flex;justify-content: space-around;margin-bottom:80px;">
+								<canvas id="pieChartOrientacoes" style="max-width: 50%;margin-left:10px;"></canvas>
+								<div style="margin-top:10px;width:500px">
+									<canvas id="pieChartOrientacoes2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+								</div>
+							</div>
+								
+						</div>
+						<!-- /.card -->
+					</div>
+				<!-- /.col -->
+				</div>
+				<!-- /.row -->
+					
+			<!--Para charmar o plugin que inclui lengenda dentro do gráfico-->		
+			<script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
+					
+			<script language="JavaScript">
+
+				var currentDate = new Date()
+				var day = currentDate.getDate()
+				var month = currentDate.getMonth() + 1
+				var year = currentDate.getFullYear()
+
+				var d = day + "-" + month + "-" + year;	
+				$(function () {
+					// var tabela = $('#tabProcessos').DataTable();
+					// // Loop através de todas as colunas
+					// tabela.columns().every(function() {
+					// 	// Define a propriedade visible como false
+					// 	this.visible(false);
+					// });
+					$('#tabProcessos').DataTable( {
+						destroy: true,
+						ordering: false,
+						stateSave: true,
+						scrollY:"150px",
+						filter: false,
+						scrollX:        true,
+						scrollCollapse: true,
+						deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+						pageLength: 3,
+						
+						buttons: [						
+							{
+								extend: 'excelHtml5',
+								text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
+								title : 'SNCI_Orientacoes_' + d,
+								className: 'btExcel',
+								exportOptions: {
+									columns: ':visible',
+									format: {
+										body: function(data, row, column, node) {
+											if (column === $('th:contains("N° do Item")').index()) {
+												
+												return data.replaceAll('.', ' . ');
+											} else {
+												return data;
+											}
 										}
 									}
-								}
-							},
-							customize: function(xlsx) {
-								var sheet = xlsx.xl.worksheets['sheet1.xml'];
+								},
+								customize: function(xlsx) {
+									var sheet = xlsx.xl.worksheets['sheet1.xml'];
+									
+									$('row:eq(0) c', sheet).attr('s','50');//centraliza 1° linha (título)
+									$('row:eq(0) c', sheet).attr('s','2');//1° linha em negrito
+									$('row:eq(1) c', sheet).attr('s','51');//2° linha centralizada
+									$('row:eq(1) c', sheet).attr('s','2');//2° linha em negrito
 								
-								$('row:eq(0) c', sheet).attr('s','50');//centraliza 1° linha (título)
-								$('row:eq(0) c', sheet).attr('s','2');//1° linha em negrito
-								$('row:eq(1) c', sheet).attr('s','51');//2° linha centralizada
-								$('row:eq(1) c', sheet).attr('s','2');//2° linha em negrito
-							
-								//PARA PERCORRER TODAS AS COLUNAS E APLICAR UM STYLE
-								// var twoDecPlacesCols = ['A','B','C','D','E','F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];           
-								// for ( i=0; i < twoDecPlacesCols.length; i++ ) {
-								// 	$('row c[r^='+twoDecPlacesCols[i]+']', sheet).attr( 's', '25' );
-								// }
-							},
-							customizeData: function (data) {
-								// Percorre os dados exportados
-								for (var i = 0; i < data.body.length; i++) {
-								var rowData = data.body[i];
-								// Percorre as células da linha
-								for (var j = 0; j < rowData.length; j++) {
-									var cellData = rowData[j];
-									// Verifica se o valor contém "&nbsp;"
-									if (cellData.includes('&nbsp;')) {
-									// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
-									rowData[j] = cellData.replace(/&nbsp;/g, ' ');
+									//PARA PERCORRER TODAS AS COLUNAS E APLICAR UM STYLE
+									// var twoDecPlacesCols = ['A','B','C','D','E','F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];           
+									// for ( i=0; i < twoDecPlacesCols.length; i++ ) {
+									// 	$('row c[r^='+twoDecPlacesCols[i]+']', sheet).attr( 's', '25' );
+									// }
+								},
+								customizeData: function (data) {
+									// Percorre os dados exportados
+									for (var i = 0; i < data.body.length; i++) {
+									var rowData = data.body[i];
+									// Percorre as células da linha
+									for (var j = 0; j < rowData.length; j++) {
+										var cellData = rowData[j];
+										// Verifica se o valor contém "&nbsp;"
+										if (cellData.includes('&nbsp;')) {
+										// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
+										rowData[j] = cellData.replace(/&nbsp;/g, ' ');
+										}
+									}
 									}
 								}
+							},
+							{
+								extend: 'colvis',
+								text: 'Selecionar Colunas',
+								className: 'btSelecionarColuna',
+								collectionLayout: 'fixed three-column',
+								colvisButton: true,
+								
+							},				
+							
+							{
+								text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(true);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+
 								}
-							}
-						},
-						{
-							extend: 'colvis',
-							text: 'Selecionar Colunas',
-							className: 'btSelecionarColuna',
-							collectionLayout: 'fixed three-column',
-							colvisButton: true,
+							},
+							{
+								text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(false);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+
+								}
+							},
+								
 							
-						},				
-						
-						{
-							text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
-							action: function (e, dt, node, config) {
-								$('#modalOverlay').modal('show');
-								setTimeout(function() {
-									dt.columns().visible(true);
-								}, 500);
-								$('#modalOverlay').delay(1000).hide(0, function() {
-									$('#modalOverlay').modal('hide');
-								});
-
-							}
-						},
-						{
-							text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
-							action: function (e, dt, node, config) {
-								$('#modalOverlay').modal('show');
-								setTimeout(function() {
-									dt.columns().visible(false);
-								}, 500);
-								$('#modalOverlay').delay(1000).hide(0, function() {
-									$('#modalOverlay').modal('hide');
-								});
-
-							}
-						},
 							
+						],
 						
+						drawCallback: function(settings) {//após a tabela se renderizada
+							graficoBarra ('tabProcessos','STATUS (ORIENTAÇÕES)','Status da Orientação','pieChartOrientacoes')	
+							graficoPizza ('pie','tabProcessos','ACOMPANHAMENTO FINALIZADO (ORIENTAÇÕES)','Acomp. Finalizado?','pieChartOrientacoes2') 
+						},	
 						
-					],
+					}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
 					
-					drawCallback: function(settings) {//após a tabela se renderizada
-						graficoBarra ('tabProcessos','STATUS (ORIENTAÇÕES)','Status da Orientação','pieChartOrientacoes')	
-						graficoPizza ('pie','tabProcessos','ACOMPANHAMENTO FINALIZADO (ORIENTAÇÕES)','Acomp. Finalizado?','pieChartOrientacoes2') 
-					},	
-					
-				}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
-				
-			} );
+				} );
 
-		
+			
 
-		</script>			
+			</script>		
+		<cfelse>
+			<cfreturn 'N'>
+		</cfif>	
 
 	</cffunction>
 
@@ -1205,7 +1237,7 @@
 						INNER JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 						INNER JOIN pc_orgaos as  pc_orgaos_melhoria on pc_orgaos_melhoria.pc_org_mcu = pc_aval_melhoria_num_orgao
 						LEFT JOIN  pc_orgaos as pc_orgaos_melhoria_sug on pc_orgaos_melhoria_sug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
-			
+			            
 			WHERE NOT pc_num_status IN (2,3) 
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
@@ -1240,6 +1272,15 @@
 								OR pc_aval_melhoria_sug_orgao_mcu in (#orgaosHierarquiaList#)
 							</cfif>
 						)
+					<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+					<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+							and NOT (
+									pc_processos.pc_num_orgao_avaliado not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao not in (#orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu  not in (#orgaosHierarquiaList#)
+								)
+							
+					</cfif>	
 				</cfif>
 			
 			</cfif>
@@ -1248,326 +1289,329 @@
 		</cfquery>	
 
 		
-
-		<div class="row">
-				<div class="col-12">
-					<div class="card card-success" style="margin-top:20px;">
-						<div class="card-header" id="texto_card-title" style="background-color: #367657;"><span style="color:#fff; "><strong>PROP. MELHORIA - Ano: <cfoutput>#arguments.ano#</cfoutput></strong></span></div>
-					
-						<!-- /.card-header -->
-						<div class="card-body">
-							<cfif #rsProcTab.recordcount# eq 0 >
-								<h5 align="center">Nenhuma proposta de melhoria foi localizada.</h5>
-							</cfif>
-							<cfif #rsProcTab.recordcount# neq 0 >
-								<table id="tabProcessos" class="table table-bordered table-striped  text-nowrap" >
-									<thead style="background: #0083ca;color:#fff">
-										<tr style="font-size:14px">
-											<th >N°Processo SNCI</th>
-											<th >Status do Processo</th>
-											<th >Data Fim Processo</th>
-											<th >SE/CS</th>
-											<th >Ano PACIN</th>
-											<th >N° SEI</th>
-											<th >N° Relat. SEI</th>
-											<th >Início Avaliação</th>
-											<th >Fim Avaliação</th>
-											<th >Órgão Origem</th>
-											<th >Órgão Avaliado</th>
-											<th >Tipo de Avaliação</th>
-											<th >Modalidade</th>
-											<th >Classificação</th>
-											<th >Tipo Demanda</th>
-											<th >Avaliador(es)</th>
-											<th >Coordenador Regional</th>
-											<th >Coordenador Nacional</th>
-											<th >Cód. Item</th>
-											<th >N° do Item</th>
-											<th>Título da situação encontrada</th>
-											<th>Classificação do Item</th>
-											<th>Valor Envolvido (FALTA)</th>
-											<th>Valor Envolvido (SOBRA)</th>
-											<th>Valor Envolvido (RISCO)</th>
-											<th>Status do Item</th>
-											<th>Cód. Prop. Melhoria</th>
-											<th>Proposta de Melhoria</th>
-											<th>Órgão Responsável</th>
-											<th>Status da Prop. Melhoria</th>
-											<th>Data Prev.</th>
-											<th>Melhoria Sugerida pelo Órgão</th>
-											<th>Órgão Resp. Sugerido</th>
-											<th>Justificativa da Recusa</th>
-											
-										</tr>
-									</thead>
-									
-									<tbody>
-										<cfloop query="rsProcTab" >
-											<cfset status = "#pc_status_id#"> 
-											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
-												SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
-												FROM    pc_avaliadores 
-														INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
-														INNER JOIN pc_orgaos ON pc_usuarios.pc_usu_lotacao = pc_orgaos.pc_org_mcu
-												WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
-											</cfquery>	 
+		<cfif #rsProcTab.recordcount# neq 0 >
+			<div class="row">
+					<div class="col-12">
+						<div class="card card-success" style="margin-top:20px;">
+							<div class="card-header" id="texto_card-title" style="background-color: #367657;"><span style="color:#fff; "><strong>PROP. MELHORIA - Ano: <cfoutput>#arguments.ano#</cfoutput></strong></span></div>
+						
+							<!-- /.card-header -->
+							<div class="card-body">
+								<cfif #rsProcTab.recordcount# eq 0 >
+									<h5 align="center">Nenhuma proposta de melhoria foi localizada.</h5>
+								</cfif>
+								<cfif #rsProcTab.recordcount# neq 0 >
+									<table id="tabProcessos" class="table table-bordered table-striped  text-nowrap" >
+										<thead style="background: #0083ca;color:#fff">
+											<tr style="font-size:14px">
+												<th >N°Processo SNCI</th>
+												<th >Status do Processo</th>
+												<th >Data Fim Processo</th>
+												<th >SE/CS</th>
+												<th >Ano PACIN</th>
+												<th >N° SEI</th>
+												<th >N° Relat. SEI</th>
+												<th >Início Avaliação</th>
+												<th >Fim Avaliação</th>
+												<th >Órgão Origem</th>
+												<th >Órgão Avaliado</th>
+												<th >Tipo de Avaliação</th>
+												<th >Modalidade</th>
+												<th >Classificação</th>
+												<th >Tipo Demanda</th>
+												<th >Avaliador(es)</th>
+												<th >Coordenador Regional</th>
+												<th >Coordenador Nacional</th>
+												<th >Cód. Item</th>
+												<th >N° do Item</th>
+												<th>Título da situação encontrada</th>
+												<th>Classificação do Item</th>
+												<th>Valor Envolvido (FALTA)</th>
+												<th>Valor Envolvido (SOBRA)</th>
+												<th>Valor Envolvido (RISCO)</th>
+												<th>Status do Item</th>
+												<th>Cód. Prop. Melhoria</th>
+												<th>Proposta de Melhoria</th>
+												<th>Órgão Responsável</th>
+												<th>Status da Prop. Melhoria</th>
+												<th>Data Prev.</th>
+												<th>Melhoria Sugerida pelo Órgão</th>
+												<th>Órgão Resp. Sugerido</th>
+												<th>Justificativa da Recusa</th>
+												
+											</tr>
+										</thead>
 										
-											<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
-	
-											<cfoutput>					
-												<tr style="cursor:pointer;font-size:12px" >
-																	
-														<td align="center"> #pc_processo_id#</td>
-														<td>#pc_status_descricao#</td>
+										<tbody>
+											<cfloop query="rsProcTab" >
+												<cfset status = "#pc_status_id#"> 
+												<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
+													SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
+													FROM    pc_avaliadores 
+															INNER JOIN pc_usuarios ON pc_avaliadores.pc_avaliador_matricula = pc_usuarios.pc_usu_matricula 
+															INNER JOIN pc_orgaos ON pc_usuarios.pc_usu_lotacao = pc_orgaos.pc_org_mcu
+													WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
+												</cfquery>	 
+											
+												<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
+		
+												<cfoutput>					
+													<tr style="cursor:pointer;font-size:12px" >
+																		
+															<td align="center"> #pc_processo_id#</td>
+															<td>#pc_status_descricao#</td>
 
-														<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
-														<td>#dataFimProcesso#</td>
+															<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
+															<td>#dataFimProcesso#</td>
 
-														<td>#seOrgAvaliado#</td>
-														<td>#pc_ano_pacin#</td>
-														<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
-														<td>#sei#</td>
-														<td>#pc_num_rel_sei#</td>
-														
-														<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
-														<td>#dataInicio#</td>
-														
-														<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
-														<td>#dataFim#</td>
+															<td>#seOrgAvaliado#</td>
+															<td>#pc_ano_pacin#</td>
+															<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
+															<td>#sei#</td>
+															<td>#pc_num_rel_sei#</td>
+															
+															<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
+															<td>#dataInicio#</td>
+															
+															<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
+															<td>#dataFim#</td>
 
-														<td>#siglaOrgOrigem#</td>
-														<td>#siglaOrgAvaliado#</td>
+															<td>#siglaOrgOrigem#</td>
+															<td>#siglaOrgAvaliado#</td>
 
-														<cfif pc_num_avaliacao_tipo neq 2>
-															<td>#pc_aval_tipo_descricao#</td>
-														<cfelse>
-															<td>#pc_aval_tipo_nao_aplica_descricao#</td>
-														</cfif>
-														
-														<td>
-															<cfif #pc_Modalidade# eq 'A'>
-																Acompanhamento
-															<cfelseif #pc_Modalidade# eq 'E'>
-																ENTREGA DO RELATÓRIO
+															<cfif pc_num_avaliacao_tipo neq 2>
+																<td>#pc_aval_tipo_descricao#</td>
 															<cfelse>
-																Normal
+																<td>#pc_aval_tipo_nao_aplica_descricao#</td>
 															</cfif>
-														</td>
-														<td>#pc_class_descricao#</td>
-														<cfif #pc_tipo_demanda# eq 'P'>
-															<td>PLANEJADA</td>
-														<cfelseif #pc_tipo_demanda# eq 'E'>
-															<td>EXTRAORDINÁRIA</td>
-														<cfelse>
-															<td>Não informado</td>
-														</cfif>
-														<td>#avaliadores#</td>
-														<td>#coordRegional#</td>
-														<td>#coordNacional#</td>
-														<td >#pc_aval_id#</td>
-														<td >#pc_aval_numeracao#</td>
-														<td >#pc_aval_descricao#</td>
-														<cfset classifRisco = "">
-														<cfif #pc_aval_classificacao# eq 'L'>
-															<cfset classifRisco = "Leve">
-														</cfif>	
-														<cfif #pc_aval_classificacao# eq 'M'>
-															<cfset classifRisco = "Mediano">
-														</cfif>	
-														<cfif #pc_aval_classificacao# eq 'G'>
-															<cfset classifRisco = "Grave">
-														</cfif>	
-														<cfif #pc_aval_classificacao# eq ''>
-															<cfset classifRisco = "Não Classificado">
-														</cfif>	
-														<td>#classifRisco#</td>
-														<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
-														<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
-														<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
-														<td>#vaFalta#</td>
-														<td>#vaSobra#</td>
-														<td>#vaRisco#</td>
-														<td>#pc_aval_status_descricao#</td> 
-														<td>#pc_aval_melhoria_id#</td>
-														<td>#pc_aval_melhoria_descricao#</td>
-														<td>#orgaoResp#</td>
-														
-														
-														<cfswitch expression="#pc_aval_melhoria_status#">
-															<cfcase value="P">
-																<cfset statusMelhoria = "PENDENTE">
-															</cfcase>
-															<cfcase value="A">
-																<cfset statusMelhoria = "ACEITA">
-															</cfcase>
-															<cfcase value="R">
-																<cfset statusMelhoria = "RECUSA">
-															</cfcase>
-															<cfcase value="T">
-																<cfset statusMelhoria = "TROCA">
-															</cfcase>
-															<cfcase value="N">
-																<cfset statusMelhoria = "NÃO INFORMADO">
-															</cfcase>
-															<cfcase value="B">
-																<cfset statusMelhoria = "BLOQUEADO">
-															</cfcase>
-															<cfdefaultcase>
-																<cfset statusMelhoria = "">	
-															</cfdefaultcase>
-														</cfswitch>
-														<td>#statusMelhoria#</td>
-														<cfset dataPrev = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY') >
-														<td>#dataPrev#</td>
-														<td>#pc_aval_melhoria_sugestao#</td>
-														<td>#orgaoRespSug#</td>
-														<td>#pc_aval_melhoria_naoAceita_justif#</td>
-												</tr>
-											</cfoutput>
-										</cfloop>	
-									</tbody>
+															
+															<td>
+																<cfif #pc_Modalidade# eq 'A'>
+																	Acompanhamento
+																<cfelseif #pc_Modalidade# eq 'E'>
+																	ENTREGA DO RELATÓRIO
+																<cfelse>
+																	Normal
+																</cfif>
+															</td>
+															<td>#pc_class_descricao#</td>
+															<cfif #pc_tipo_demanda# eq 'P'>
+																<td>PLANEJADA</td>
+															<cfelseif #pc_tipo_demanda# eq 'E'>
+																<td>EXTRAORDINÁRIA</td>
+															<cfelse>
+																<td>Não informado</td>
+															</cfif>
+															<td>#avaliadores#</td>
+															<td>#coordRegional#</td>
+															<td>#coordNacional#</td>
+															<td >#pc_aval_id#</td>
+															<td >#pc_aval_numeracao#</td>
+															<td >#pc_aval_descricao#</td>
+															<cfset classifRisco = "">
+															<cfif #pc_aval_classificacao# eq 'L'>
+																<cfset classifRisco = "Leve">
+															</cfif>	
+															<cfif #pc_aval_classificacao# eq 'M'>
+																<cfset classifRisco = "Mediano">
+															</cfif>	
+															<cfif #pc_aval_classificacao# eq 'G'>
+																<cfset classifRisco = "Grave">
+															</cfif>	
+															<cfif #pc_aval_classificacao# eq ''>
+																<cfset classifRisco = "Não Classificado">
+															</cfif>	
+															<td>#classifRisco#</td>
+															<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
+															<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
+															<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
+															<td>#vaFalta#</td>
+															<td>#vaSobra#</td>
+															<td>#vaRisco#</td>
+															<td>#pc_aval_status_descricao#</td> 
+															<td>#pc_aval_melhoria_id#</td>
+															<td>#pc_aval_melhoria_descricao#</td>
+															<td>#orgaoResp#</td>
+															
+															
+															<cfswitch expression="#pc_aval_melhoria_status#">
+																<cfcase value="P">
+																	<cfset statusMelhoria = "PENDENTE">
+																</cfcase>
+																<cfcase value="A">
+																	<cfset statusMelhoria = "ACEITA">
+																</cfcase>
+																<cfcase value="R">
+																	<cfset statusMelhoria = "RECUSA">
+																</cfcase>
+																<cfcase value="T">
+																	<cfset statusMelhoria = "TROCA">
+																</cfcase>
+																<cfcase value="N">
+																	<cfset statusMelhoria = "NÃO INFORMADO">
+																</cfcase>
+																<cfcase value="B">
+																	<cfset statusMelhoria = "BLOQUEADO">
+																</cfcase>
+																<cfdefaultcase>
+																	<cfset statusMelhoria = "">	
+																</cfdefaultcase>
+															</cfswitch>
+															<td>#statusMelhoria#</td>
+															<cfset dataPrev = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY') >
+															<td>#dataPrev#</td>
+															<td>#pc_aval_melhoria_sugestao#</td>
+															<td>#orgaoRespSug#</td>
+															<td>#pc_aval_melhoria_naoAceita_justif#</td>
+													</tr>
+												</cfoutput>
+											</cfloop>	
+										</tbody>
+										
 									
-								
-								</table>
-							</cfif>
+									</table>
+								</cfif>
 
+								
+							</div>
+							<!-- /.card-body -->
+							<div style="float:left;margin-top:10px;margin-bottom:80px;width:500px">
+								<canvas id="pieChartMelhorias" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+							</div>
 							
 						</div>
-						<!-- /.card-body -->
-						<div style="float:left;margin-top:10px;margin-bottom:80px;width:500px">
-							<canvas id="pieChartMelhorias" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-						</div>
-						
+						<!-- /.card -->
 					</div>
-					<!-- /.card -->
+				<!-- /.col -->
 				</div>
-			<!-- /.col -->
-			</div>
-			<!-- /.row -->
-		
-		<!--Para charmar o plugin que inclui lengenda dentro do gráfico-->		
-    	<script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
+				<!-- /.row -->
+			
+			<!--Para charmar o plugin que inclui lengenda dentro do gráfico-->		
+			<script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
 
-		<script language="JavaScript">
-		    
-			var currentDate = new Date()
-			var day = currentDate.getDate()
-			var month = currentDate.getMonth() + 1
-			var year = currentDate.getFullYear()
+			<script language="JavaScript">
+				
+				var currentDate = new Date()
+				var day = currentDate.getDate()
+				var month = currentDate.getMonth() + 1
+				var year = currentDate.getFullYear()
 
-			var d = day + "-" + month + "-" + year;	
-			$(function () {
-				// var tabela = $('#tabProcessos').DataTable();
-				// // Loop através de todas as colunas
-				// tabela.columns().every(function() {
-				// 	// Define a propriedade visible como false
-				// 	this.visible(false);
-				// });
-				$('#tabProcessos').DataTable( {
-					destroy: true,
-					ordering: false,
-					stateSave: true,
-					scrollY:"150px",
-					filter: false,
-					scrollX:        true,
-					scrollCollapse: true,
-					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					pageLength: 3,
-					buttons: [{
-							extend: 'excelHtml5',
-							text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
-							title : 'SNCI_Propostas_Melhoria_' + d,
-							className: 'btExcel',
-							exportOptions: {
-								columns: ':visible',
-								format: {
-									body: function(data, row, column, node) {
-										if (column === $('th:contains("N° do Item")').index()) {
-											
-											return data.replaceAll('.', ' . ');
-										} else {
-											return data;
+				var d = day + "-" + month + "-" + year;	
+				$(function () {
+					// var tabela = $('#tabProcessos').DataTable();
+					// // Loop através de todas as colunas
+					// tabela.columns().every(function() {
+					// 	// Define a propriedade visible como false
+					// 	this.visible(false);
+					// });
+					$('#tabProcessos').DataTable( {
+						destroy: true,
+						ordering: false,
+						stateSave: true,
+						scrollY:"150px",
+						filter: false,
+						scrollX:        true,
+						scrollCollapse: true,
+						deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+						pageLength: 3,
+						buttons: [{
+								extend: 'excelHtml5',
+								text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
+								title : 'SNCI_Propostas_Melhoria_' + d,
+								className: 'btExcel',
+								exportOptions: {
+									columns: ':visible',
+									format: {
+										body: function(data, row, column, node) {
+											if (column === $('th:contains("N° do Item")').index()) {
+												
+												return data.replaceAll('.', ' . ');
+											} else {
+												return data;
+											}
 										}
 									}
-								}
-							},
-							customize: function(xlsx) {
-								var sheet = xlsx.xl.worksheets['sheet1.xml'];
+								},
+								customize: function(xlsx) {
+									var sheet = xlsx.xl.worksheets['sheet1.xml'];
+									
+									$('row:eq(0) c', sheet).attr('s','50');//centraliza 1° linha (título)
+									$('row:eq(0) c', sheet).attr('s','2');//1° linha em negrito
+									$('row:eq(1) c', sheet).attr('s','51');//2° linha centralizada
+									$('row:eq(1) c', sheet).attr('s','2');//2° linha em negrito
 								
-								$('row:eq(0) c', sheet).attr('s','50');//centraliza 1° linha (título)
-								$('row:eq(0) c', sheet).attr('s','2');//1° linha em negrito
-								$('row:eq(1) c', sheet).attr('s','51');//2° linha centralizada
-								$('row:eq(1) c', sheet).attr('s','2');//2° linha em negrito
-							
-								//PARA PERCORRER TODAS AS COLUNAS E APLICAR UM STYLE
-								// var twoDecPlacesCols = ['A','B','C','D','E','F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];           
-								// for ( i=0; i < twoDecPlacesCols.length; i++ ) {
-								// 	$('row c[r^='+twoDecPlacesCols[i]+']', sheet).attr( 's', '25' );
-								// }
-							},
-							customizeData: function (data) {
-								// Percorre os dados exportados
-								for (var i = 0; i < data.body.length; i++) {
-								var rowData = data.body[i];
-								// Percorre as células da linha
-								for (var j = 0; j < rowData.length; j++) {
-									var cellData = rowData[j];
-									// Verifica se o valor contém "&nbsp;"
-									if (cellData.includes('&nbsp;')) {
-									// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
-									rowData[j] = cellData.replace(/&nbsp;/g, ' ');
+									//PARA PERCORRER TODAS AS COLUNAS E APLICAR UM STYLE
+									// var twoDecPlacesCols = ['A','B','C','D','E','F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];           
+									// for ( i=0; i < twoDecPlacesCols.length; i++ ) {
+									// 	$('row c[r^='+twoDecPlacesCols[i]+']', sheet).attr( 's', '25' );
+									// }
+								},
+								customizeData: function (data) {
+									// Percorre os dados exportados
+									for (var i = 0; i < data.body.length; i++) {
+									var rowData = data.body[i];
+									// Percorre as células da linha
+									for (var j = 0; j < rowData.length; j++) {
+										var cellData = rowData[j];
+										// Verifica se o valor contém "&nbsp;"
+										if (cellData.includes('&nbsp;')) {
+										// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
+										rowData[j] = cellData.replace(/&nbsp;/g, ' ');
+										}
+									}
 									}
 								}
+							},
+							{
+								extend: 'colvis',
+								text: 'Selecionar Colunas',
+								className: 'btSelecionarColuna',
+								collectionLayout: 'fixed four-column',
+								colvisButton: true,
+								
+							},
+								
+							{
+								text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(true);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+
 								}
-							}
-						},
-						{
-							extend: 'colvis',
-							text: 'Selecionar Colunas',
-							className: 'btSelecionarColuna',
-							collectionLayout: 'fixed four-column',
-							colvisButton: true,
-							
-						},
-							
-						{
-							text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
-							action: function (e, dt, node, config) {
-								$('#modalOverlay').modal('show');
-								setTimeout(function() {
-									dt.columns().visible(true);
-								}, 500);
-								$('#modalOverlay').delay(1000).hide(0, function() {
-									$('#modalOverlay').modal('hide');
-								});
+							},
+							{
+								text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(false);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
 
-							}
-						},
-						{
-							text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
-							action: function (e, dt, node, config) {
-								$('#modalOverlay').modal('show');
-								setTimeout(function() {
-									dt.columns().visible(false);
-								}, 500);
-								$('#modalOverlay').delay(1000).hide(0, function() {
-									$('#modalOverlay').modal('hide');
-								});
+								}
+							},
+						],
+						drawCallback: function(settings) {//após a tabela se renderizada
+							graficoPizza ('pie','tabProcessos','STATUS (PROPOSTAS DE MELHORIA)','Status da Prop. Melhoria','pieChartMelhorias')
+						}	
+						
+					}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
 
-							}
-						},
-					],
-					drawCallback: function(settings) {//após a tabela se renderizada
-						graficoPizza ('pie','tabProcessos','STATUS (PROPOSTAS DE MELHORIA)','Status da Prop. Melhoria','pieChartMelhorias')
-					}	
 					
-				}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
+				} );
 
-				
-			} );
-
-		
-		</script>			
+			
+			</script>	
+		<cfelse>
+			<cfreturn 'N'>
+		</cfif>		
 
 	</cffunction>
 
