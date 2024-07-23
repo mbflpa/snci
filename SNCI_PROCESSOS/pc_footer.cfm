@@ -6,6 +6,7 @@
 		position: fixed!important;
 		right: 0!important;
 		z-index: 1032!important;
+		padding:0.3rem!important;
 	}
 
 </style>
