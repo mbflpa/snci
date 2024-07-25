@@ -54,7 +54,7 @@
                         <div class="card-body">
                             <h5>Novidades:</h5>
                             <ul>
-                                <li>Criado o perfil "DIRETORIA";</li>
+                                <li>Criado o perfil "DIRETORIA".</li>
                             </ul>
 
                             <h5>Correções:</h5>
