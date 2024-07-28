@@ -381,6 +381,11 @@
 							box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.05);
 					}
 
+					.form-group.d-flex .form-control {
+						width: auto;
+						flex-grow: 1;
+					}
+
 
 
 				</style>
@@ -565,10 +570,12 @@
 													<input id="pcNumSituacaoEncontrada"  name="pcNumSituacaoEncontrada" type="text" class="form-control "  inputmode="text" >													
 												</div>
 											</div>
-											<div class="col-sm-10">
+											
+											<div class="col-sm-12">
 												<div class="form-group">
-													<label for="pcTituloSituacaoEncontrada" >Título da Situação Encontrada:</label>
-													<input id="pcTituloSituacaoEncontrada"  name="pcTituloSituacaoEncontrada" type="text" class="form-control "  inputmode="text" placeholder="Informe o título da situação encontrada...">
+													<label for="pcTituloSituacaoEncontrada" >Controle Testado:</label>
+													<textarea id="pcTituloSituacaoEncontrada" name="pcTituloSituacaoEncontrada" class="form-control" rows="2"  inputmode="text" placeholder="Informe o controle testado..."></textarea>
+													<span id="pcTituloSituacaoEncontradaCounter" class="badge badge-secondary"></span>
 												</div>
 											</div>
 
@@ -629,41 +636,60 @@
 											</div>
 
 
+											<div class="col-sm-12">
+												<div class="col-sm-6">
+													<fieldset style="padding:0px!important">
+														<legend style="margin-left:20px">Potencial Valor Estimado a Recuperar:</legend>
+														<div class="form-group d-flex align-items-center" style="margin-left:20px">
+															<div id="btn-groupValorRecuperar" class="btn-group  mr-2" role="group" aria-label="Basic example">
+																<button type="button" class="btn btn-light" id="btn-nao-aplica-recuperar" >Não se aplica</button>
+																<button type="button" class="btn btn-light" id="btn-quantificado-recuperar" style="margin-left:5px;">Quantificado</button>
+															</div>
+															<div class="col-sm-2">
+																<input id="pcValorRecuperar" name="pcValorRecuperar" style="display: none;" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+															</div>
+														</div>
+													</fieldset>
+												
 
-
-
-
-
-											<div class="col-sm-5">
-												<div  class="form-group">
-													<label for="pcValorApuradoTipo" >Tipo do Valor Envolvido:</label>
-													<select id="pcValorApuradoTipo" name="pcValorApuradoTipo" class="form-control">
-														<option selected="" disabled="" value="">Selecione o tipo do Valor Envolvido...</option>
-														<option value="q">Quantificado</option>
-														<option value="n">Não Quantificado</option>												
-													</select>	
+												
+													<fieldset style="margin-top:20px;padding:0px!important">
+														<legend style="margin-left:20px">Potencial Valor Estimado em Risco ou Valor Envolvido:</legend>
+														<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+															<div id="btn-groupValorRisco" class="btn-group mr-2" role="group" aria-label="Basic example">
+																<button type="button" class="btn btn-light" id="btn-nao-aplica-risco">Não se aplica</button>
+																<button type="button" class="btn btn-light" id="btn-quantificado-risco" style="margin-left:5px">Quantificado</button>
+															</div>
+															<div class="col-sm-3">
+																<input id="pcValorRisco" name="pcValorRisco" style="display: none;" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+															</div>
+														</div>
+													</fieldset>
+												
+												
+													<fieldset style="margin-top:20px;padding:0px!important">
+														<legend style="margin-left:20px">Potencial Valor Estimado Não Planejado/Extrapolado/Sobra:</legend>
+														<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+															<div id="btn-groupValorNaoPlanejado" class="btn-group mr-2" role="group" aria-label="Basic example">
+																<button type="button" class="btn btn-light" id="btn-nao-aplica-NaoPlanejado">Não se aplica</button>
+																<button type="button" class="btn btn-light" id="btn-quantificado-NaoPlanejado" style="margin-left:5px">Quantificado</button>
+															</div>
+															<div class="col-sm-3">
+																<input id="pcValorNaoPlanejado" name="pcNaoPlanejado" style="display: none;" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+															</div>
+														</div>
+													</fieldset>
 												</div>
 											</div>
-											<div class="col-sm-12" id="divValores" hidden style="display:flex;gap:15px">
-												<div >
-													<div class="form-group" >
-														<label for="pcvaFalta" >Falta: <i class="fas fa-info-circle" style="" data-toggle="popover" data-trigger="hover" title="FALTA" data-placement="top" data-content="DIFERENÇA CONTRA ECT/PREJUÍZO ESTIMADO/FALTA DE BEM/REPASSE"></i></label>
-														<input id="pcvaFalta"   ame="pcvaFalta" type="text" class="form-control money"  inputmode="text"  >
-													</div>
-												</div>
-												<div >
-													<div class="form-group" >
-														<label for="pcvaRisco" >Risco: <i class="fas fa-info-circle" style=""  data-toggle="popover" data-trigger="hover" title="RISCO" data-placement="top" data-content="O IMPACTO FINANCEIRO AINDA NÃO OCORREU"></i></label>
-														<input id="pcvaRisco"   ame="pcvaRisco" type="text" class="form-control money"  inputmode="text"  >
-													</div>
-												</div>
-												<div >
-													<div class="form-group" >
-														<label for="pcvaSobra" >Sobra: <i class="fas fa-info-circle" style="" data-toggle="popover" data-trigger="hover" title="SOBRA" data-placement="top" data-content="DIFERENÇA CONTRA TERCEIROS/VALOR NÃO REPASSADO/SOBRA DE BEM"></i></label>
-														<input id="pcvaSobra"   ame="pcvaSobra" type="text" class="form-control money"  inputmode="text"  >
-													</div>
-												</div>
-											</div>
+
+
+
+
+
+
+
+
+											
 										</div>	
 										
 										<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
@@ -720,33 +746,75 @@
 						})
 
 						
-						 $(document).ready(function(){
-						// 	$.ajax({
-						// 		url: 'cfc/pc_cfcAvaliacoes.cfc',
-						// 		data: {
-						// 			method: 'getAvaliacaoCoso',
-						// 		},
-						// 		dataType: "json",
-						// 		async: false
-						// 	})//fim ajax
-						// 	.done(function(data) {
-						// 		// Define os níveis de dados e nomes dos labels
-						// 		let dataLevels = ['COMPONENTE', 'PRINCIPIO'];
-						// 		let labelNames = ['Componente', 'Princípio'];
-						// 		// Inicializa os selects dinâmicos
-						// 		initializeSelects('#dados-container-coso', data, dataLevels, 'ID', labelNames, 'idCoso');
-						// 	})//fim done
-						// 	.fail(function(xhr, ajaxOptions, thrownError) {
-						// 		$('#modalOverlay').delay(1000).hide(0, function() {
-						// 			$('#modalOverlay').modal('hide');
-						// 		});
-						// 		$('#modal-danger').modal('show')
-						// 		$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-						// 		$('#modal-danger').find('.modal-body').text(thrownError)
+						$(document).ready(function(){
+						
+							
+$('#btn-groupValorRecuperar .btn').click(function() {
+    $('#btn-groupValorRecuperar .btn').removeClass('active');
+    $(this).addClass('active');
+    
+    var selectedValue = $(this).attr('id');
 
-						// 	})//fim fail
+    if (selectedValue === 'btn-quantificado-recuperar') {
+        $('#pcValorRecuperar').show();
+        $('#btn-quantificado-recuperar').removeClass('btn-light').addClass('btn-primary');
+        $('#btn-nao-aplica-recuperar').removeClass('btn-dark').addClass('btn-light');
+    } else if (selectedValue === 'btn-nao-aplica-recuperar') {
+        $('#pcValorRecuperar').hide();
+        $('#btn-nao-aplica-recuperar').removeClass('btn-light').addClass('btn-dark');
+        $('#btn-quantificado-recuperar').removeClass('btn-primary').addClass('btn-light');
+        $('#pcValorRecuperar').val('');
+    } else {
+        $('#pcValorRecuperar').hide();
+        $('#pcValorRecuperar').val('');
+    }
+});
 
-						// Define os níveis de dados e nomes dos labels
+$('#btn-groupValorRisco .btn').click(function() {
+	$('#btn-groupValorRisco .btn').removeClass('active');
+	$(this).addClass('active');
+
+	var selectedValue = $(this).attr('id');
+
+	if (selectedValue === 'btn-quantificado-risco') {
+		$('#pcValorRisco').show();
+		$('#btn-quantificado-risco').removeClass('btn-light').addClass('btn-primary');
+		$('#btn-nao-aplica-risco').removeClass('btn-dark').addClass('btn-light');
+	} else if (selectedValue === 'btn-nao-aplica-risco') {
+		$('#pcValorRisco').hide();
+		$('#btn-nao-aplica-risco').removeClass('btn-light').addClass('btn-dark');
+		$('#btn-quantificado-risco').removeClass('btn-primary').addClass('btn-light');
+		$('#pcValorRisco').val('');
+	} else {
+		$('#pcValorRisco').hide();
+		$('#pcValorRisco').val('');
+	}
+});
+
+$('#btn-groupValorNaoPlanejado .btn').click(function() {
+	$('#btn-groupValorNaoPlanejado .btn').removeClass('active');
+	$(this).addClass('active');
+
+	var selectedValue = $(this).attr('id');
+
+	if (selectedValue === 'btn-quantificado-NaoPlanejado') {
+		$('#pcValorNaoPlanejado').show();
+		$('#btn-quantificado-NaoPlanejado').removeClass('btn-light').addClass('btn-primary');
+		$('#btn-nao-aplica-NaoPlanejado').removeClass('btn-dark').addClass('btn-light');
+	} else if (selectedValue === 'btn-nao-aplica-NaoPlanejado') {
+		$('#pcValorNaoPlanejado').hide();
+		$('#btn-nao-aplica-NaoPlanejado').removeClass('btn-light').addClass('btn-dark');
+		$('#btn-quantificado-NaoPlanejado').removeClass('btn-primary').addClass('btn-light');
+		$('#pcValorNaoPlanejado').val('');
+	} else {
+		$('#pcValorNaoPlanejado').hide();
+		$('#pcValorNaoPlanejado').val('');
+	}
+});
+
+
+
+							// Define os níveis de dados e nomes dos labels
 							let dataLevels = ['COMPONENTE', 'PRINCIPIO'];
 							let labelNames = ['Componente', 'Princípio'];
 							initializeSelectsAjax('#dados-container-coso', dataLevels, 'ID', labelNames, 'idCoso',[],'cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso');
@@ -786,6 +854,7 @@
 							setupCharCounter('pcTeste', 'pcTesteCounter', 5000);
 							setupCharCounter('pcControleTestado', 'pcControleTestadoCounter', 7500);
 							setupCharCounter('pcSintese', 'pcSinteseCounter', 7500);
+							setupCharCounter('pcTituloSituacaoEncontrada', 'pcTituloSituacaoEncontradaCounter', 500);
 
 
 							
