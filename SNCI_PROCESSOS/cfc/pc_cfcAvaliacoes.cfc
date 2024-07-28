@@ -609,6 +609,8 @@
 													Atenção: Ao finalinalizar o cadastro deste item, este novo risco descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
 												</div>
 											</div>
+
+
 											<div class="col-sm-12">
 												<div class="form-group">
 													<input id="idCoso" hidden></input>
@@ -683,12 +685,15 @@
 											</div>
 
 
+											<div class="col-sm-12">
+												<div class="form-group">
+													<label for="pcCriterioRef" >Critérios e referências nosmativas:</label>
+													<textarea id="pcCriterioRef" name="pcCriterioRef" class="form-control" rows="3"  inputmode="text" placeholder="Informe os critérios e referências normativas..."></textarea>
+													<span id="pcCriterioRefCounter" class="badge badge-secondary"></span>
+												</div>
+											</div>
 
-
-
-
-
-
+											
 											
 										</div>	
 										
@@ -725,407 +730,401 @@
 				<div id="CadastroAvaliacaoRelato" style="padding-left:25px;padding-right:25px"></div>
 
 				<script language="JavaScript">
-						//Initialize Select2 Elements
-						$('select').not('[name="tabProcAcompCards_length"]').select2({
-							theme: 'bootstrap4',
-							placeholder: 'Selecione...',
-							allowClear: true
+					//Initialize Select2 Elements
+					$('select').not('[name="tabProcAcompCards_length"]').select2({
+						theme: 'bootstrap4',
+						placeholder: 'Selecione...',
+						allowClear: true
+					});
+
+					//INICIALIZA O POPOVER NOS ÍCONES
+					$(function () {
+						$('[data-toggle="popover"]').popover()
+					})	
+					$('.popover-dismiss').popover({
+						trigger: 'hover'
+					})
+					//FIM NICIALIZA O POPOVER NOS ÍCONES 
+
+					$(function () {
+						$('[data-mask]').inputmask()//mascara para os inputs
+					})
+
+					
+					$(document).ready(function(){
+			
+						// Define os níveis de dados e nomes dos labels
+						let dataLevels = ['COMPONENTE', 'PRINCIPIO'];
+						let labelNames = ['Componente', 'Princípio'];
+						initializeSelectsAjax('#dados-container-coso', dataLevels, 'ID', labelNames, 'idCoso',[],'cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso');
+
+
+						// se for seleciobnado outros em pcAvaliacaoRisco, exibe o campo de descrição
+						$(document).on('change', '#pcAvaliacaoRisco', function() {
+							var $this = $(this);
+							// Verifica se alguma das opções selecionadas tem o valor 0
+							if ($this.val().includes('0')) {
+								$('#pcAvaliacaoRiscoOutrosDescricaoDiv').attr("hidden",false);
+							} else {
+								$('#pcAvaliacaoRiscoOutrosDescricaoDiv').attr("hidden",true);
+							}
 						});
 
-						//INICIALIZA O POPOVER NOS ÍCONES
-						$(function () {
-							$('[data-toggle="popover"]').popover()
-						})	
-						$('.popover-dismiss').popover({
-							trigger: 'hover'
-						})
-						//FIM NICIALIZA O POPOVER NOS ÍCONES 
-
-						$(function () {
-							$('[data-mask]').inputmask()//mascara para os inputs
-						})
-
-						
-						$(document).ready(function(){
-						
-							
-$('#btn-groupValorRecuperar .btn').click(function() {
-    $('#btn-groupValorRecuperar .btn').removeClass('active');
-    $(this).addClass('active');
-    
-    var selectedValue = $(this).attr('id');
-
-    if (selectedValue === 'btn-quantificado-recuperar') {
-        $('#pcValorRecuperar').show();
-        $('#btn-quantificado-recuperar').removeClass('btn-light').addClass('btn-primary');
-        $('#btn-nao-aplica-recuperar').removeClass('btn-dark').addClass('btn-light');
-    } else if (selectedValue === 'btn-nao-aplica-recuperar') {
-        $('#pcValorRecuperar').hide();
-        $('#btn-nao-aplica-recuperar').removeClass('btn-light').addClass('btn-dark');
-        $('#btn-quantificado-recuperar').removeClass('btn-primary').addClass('btn-light');
-        $('#pcValorRecuperar').val('');
-    } else {
-        $('#pcValorRecuperar').hide();
-        $('#pcValorRecuperar').val('');
-    }
-});
-
-$('#btn-groupValorRisco .btn').click(function() {
-	$('#btn-groupValorRisco .btn').removeClass('active');
-	$(this).addClass('active');
-
-	var selectedValue = $(this).attr('id');
-
-	if (selectedValue === 'btn-quantificado-risco') {
-		$('#pcValorRisco').show();
-		$('#btn-quantificado-risco').removeClass('btn-light').addClass('btn-primary');
-		$('#btn-nao-aplica-risco').removeClass('btn-dark').addClass('btn-light');
-	} else if (selectedValue === 'btn-nao-aplica-risco') {
-		$('#pcValorRisco').hide();
-		$('#btn-nao-aplica-risco').removeClass('btn-light').addClass('btn-dark');
-		$('#btn-quantificado-risco').removeClass('btn-primary').addClass('btn-light');
-		$('#pcValorRisco').val('');
-	} else {
-		$('#pcValorRisco').hide();
-		$('#pcValorRisco').val('');
-	}
-});
-
-$('#btn-groupValorNaoPlanejado .btn').click(function() {
-	$('#btn-groupValorNaoPlanejado .btn').removeClass('active');
-	$(this).addClass('active');
-
-	var selectedValue = $(this).attr('id');
-
-	if (selectedValue === 'btn-quantificado-NaoPlanejado') {
-		$('#pcValorNaoPlanejado').show();
-		$('#btn-quantificado-NaoPlanejado').removeClass('btn-light').addClass('btn-primary');
-		$('#btn-nao-aplica-NaoPlanejado').removeClass('btn-dark').addClass('btn-light');
-	} else if (selectedValue === 'btn-nao-aplica-NaoPlanejado') {
-		$('#pcValorNaoPlanejado').hide();
-		$('#btn-nao-aplica-NaoPlanejado').removeClass('btn-light').addClass('btn-dark');
-		$('#btn-quantificado-NaoPlanejado').removeClass('btn-primary').addClass('btn-light');
-		$('#pcValorNaoPlanejado').val('');
-	} else {
-		$('#pcValorNaoPlanejado').hide();
-		$('#pcValorNaoPlanejado').val('');
-	}
-});
-
-
-
-							// Define os níveis de dados e nomes dos labels
-							let dataLevels = ['COMPONENTE', 'PRINCIPIO'];
-							let labelNames = ['Componente', 'Princípio'];
-							initializeSelectsAjax('#dados-container-coso', dataLevels, 'ID', labelNames, 'idCoso',[],'cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso');
-
-
-							// se for seleciobnado outros em pcAvaliacaoRisco, exibe o campo de descrição
-							$(document).on('change', '#pcAvaliacaoRisco', function() {
-								var $this = $(this);
-								// Verifica se alguma das opções selecionadas tem o valor 0
-								if ($this.val().includes('0')) {
-									$('#pcAvaliacaoRiscoOutrosDescricaoDiv').attr("hidden",false);
-								} else {
-									$('#pcAvaliacaoRiscoOutrosDescricaoDiv').attr("hidden",true);
-								}
+													
+						$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
 							});
+						$(".money").inputmask( 'currency',{"autoUnmask": true,
+								radixPoint:",",
+								groupSeparator: ".",
+								allowMinus: false,
+								prefix: 'R$ ',            
+								digits: 2,
+								digitsOptional: false,
+								rightAlign: true,
+								unmaskAsNumber: true
+						});
+
+						mostraRelatorioPDF()
+
+						setupCharCounter('pcTeste', 'pcTesteCounter', 5000);
+						setupCharCounter('pcControleTestado', 'pcControleTestadoCounter', 7500);
+						setupCharCounter('pcSintese', 'pcSinteseCounter', 7500);
+						setupCharCounter('pcTituloSituacaoEncontrada', 'pcTituloSituacaoEncontradaCounter', 500);
+						setupCharCounter('pcCriterioRef', 'pcCriterioRefCounter', 350);
+
+
+						
+						<cfoutput>
+							let modalidade = '#rsProcForm.pc_modalidade#'
+							let pc_processo_id = '#rsProcForm.pc_processo_id#'
+						</cfoutput>
+
+						if(modalidade ==='A' || modalidade ==='E'){
+							// DropzoneJS Demo Code Start
+							Dropzone.autoDiscover = false
+
+							// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
+							var previewNode = document.querySelector("#templateRelatorio")
+							//previewNode.id = ""
+							var previewTemplate = previewNode.parentNode.innerHTML
+							previewNode.parentNode.removeChild(previewNode)
+
+							var myDropzoneRelatorio = new Dropzone("#processosCadastrados", { // Make the whole body a dropzone
+								url: "cfc/pc_cfcAvaliacoes.cfc?method=uploadArquivos", // Set the url
+								autoProcessQueue :true,
+								maxFiles: 1,
+								maxFilesize:20,
+								thumbnailWidth: 80,
+								thumbnailHeight: 80,
+								parallelUploads: 1,
+								acceptedFiles: '.pdf',
+								previewTemplate: previewTemplate,
+								autoQueue: true, // Make sure the files aren't queued until manually added
+								previewsContainer: "#previewsRelatorio", // Define the container to display the previews
+								clickable: "#relatorios", // Define the element that should be used as click trigger to select files.
+								headers: { "pc_aval_id":"", 
+										"pc_aval_processo":pc_processo_id, 
+										"pc_anexo_avaliacaoPDF":"S",
+										"arquivoParaTodosOsItens":"S"},//informar "S" se o arquivo deve ser exibido em todos os itens do processo
+								init: function() {
+									this.on('error', function(file, errorMessage) {	
+										toastr.error(errorMessage);
+										return false;
+									});
+								}
+								
+							})
 
 							
-							
-							
-							
-							$('#modalOverlay').delay(1000).hide(0, function() {
+
+							// // Update the total progress bar
+							// myDropzoneRelatorio.on("totaluploadprogress", function(progress) {
+							// 	document.querySelector(".progress-bar").style.width = progress + "%"
+							// })
+
+							// myDropzoneRelatorio.on("sending", function(file) {
+							// 	$('#modalOverlay').modal('show')
+							// })
+
+
+
+							// Hide the total progress bar when nothing's uploading anymore
+							myDropzoneRelatorio.on("queuecomplete", function(progress) {
+								//toastr.success("Arquivo(s) enviado(s) com sucesso!")
+								myDropzoneRelatorio.removeAllFiles(true);
+								mostraRelatorioPDF();
+
+								$('#modalOverlay').delay(1000).hide(0, function() {
 									$('#modalOverlay').modal('hide');
 								});
-							$(".money").inputmask( 'currency',{"autoUnmask": true,
-									radixPoint:",",
-									groupSeparator: ".",
-									allowMinus: false,
-									prefix: 'R$ ',            
-									digits: 2,
-									digitsOptional: false,
-									rightAlign: true,
-									unmaskAsNumber: true
-							});
-
-							mostraRelatorioPDF()
-
-							setupCharCounter('pcTeste', 'pcTesteCounter', 5000);
-							setupCharCounter('pcControleTestado', 'pcControleTestadoCounter', 7500);
-							setupCharCounter('pcSintese', 'pcSinteseCounter', 7500);
-							setupCharCounter('pcTituloSituacaoEncontrada', 'pcTituloSituacaoEncontradaCounter', 500);
-
+							})
 
 							
-							<cfoutput>
-								let modalidade = '#rsProcForm.pc_modalidade#'
-								let pc_processo_id = '#rsProcForm.pc_processo_id#'
-							</cfoutput>
-
-							if(modalidade ==='A' || modalidade ==='E'){
-								// DropzoneJS Demo Code Start
-								Dropzone.autoDiscover = false
-
-								// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-								var previewNode = document.querySelector("#templateRelatorio")
-								//previewNode.id = ""
-								var previewTemplate = previewNode.parentNode.innerHTML
-								previewNode.parentNode.removeChild(previewNode)
-
-								var myDropzoneRelatorio = new Dropzone("#processosCadastrados", { // Make the whole body a dropzone
-									url: "cfc/pc_cfcAvaliacoes.cfc?method=uploadArquivos", // Set the url
-									autoProcessQueue :true,
-									maxFiles: 1,
-									maxFilesize:20,
-									thumbnailWidth: 80,
-									thumbnailHeight: 80,
-									parallelUploads: 1,
-									acceptedFiles: '.pdf',
-									previewTemplate: previewTemplate,
-									autoQueue: true, // Make sure the files aren't queued until manually added
-									previewsContainer: "#previewsRelatorio", // Define the container to display the previews
-									clickable: "#relatorios", // Define the element that should be used as click trigger to select files.
-									headers: { "pc_aval_id":"", 
-											"pc_aval_processo":pc_processo_id, 
-											"pc_anexo_avaliacaoPDF":"S",
-											"arquivoParaTodosOsItens":"S"},//informar "S" se o arquivo deve ser exibido em todos os itens do processo
-									init: function() {
-										this.on('error', function(file, errorMessage) {	
-											toastr.error(errorMessage);
-											return false;
-										});
-									}
-									
-								})
-
-								
-
-								// // Update the total progress bar
-								// myDropzoneRelatorio.on("totaluploadprogress", function(progress) {
-								// 	document.querySelector(".progress-bar").style.width = progress + "%"
-								// })
-
-								// myDropzoneRelatorio.on("sending", function(file) {
-								// 	$('#modalOverlay').modal('show')
-								// })
-
-
-
-								// Hide the total progress bar when nothing's uploading anymore
-								myDropzoneRelatorio.on("queuecomplete", function(progress) {
-									//toastr.success("Arquivo(s) enviado(s) com sucesso!")
-									myDropzoneRelatorio.removeAllFiles(true);
-									mostraRelatorioPDF();
-
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-								})
-
-								
-								// DropzoneJS 1 Demo Code End
-							}
-
-							exibirTabAvaliacoes();
-						});
-
-						function mostraRelatorioPDF(){
-							<cfoutput>
-								let pc_processo_id = '#rsProcForm.pc_processo_id#'
-							</cfoutput>
-							$('#modalOverlay').modal('show')
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url:"cfc/pc_cfcAvaliacoes.cfc",
-									data:{
-										method: "anexoRelatorio",
-										pc_anexo_processo_id: pc_processo_id
-									},
-									async: false
-								})//fim ajax
-								.done(function(result){
-									
-									$('#anexoRelatorioDiv').html(result)
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-									$('#modal-danger').modal('show')
-									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-									$('#modal-danger').find('.modal-body').text(thrownError)
-
-								})//fim fail
-							}, 1000);
+							// DropzoneJS 1 Demo Code End
 						}
 
 
+						$('#btn-groupValorRecuperar .btn').click(function() {
+							$('#btn-groupValorRecuperar .btn').removeClass('active');
+							$(this).addClass('active');
+							
+							var selectedValue = $(this).attr('id');
 
+							if (selectedValue === 'btn-quantificado-recuperar') {
+								$('#pcValorRecuperar').show();
+								$('#btn-quantificado-recuperar').removeClass('btn-light').addClass('btn-primary');
+								$('#btn-nao-aplica-recuperar').removeClass('btn-dark').addClass('btn-light');
+							} else if (selectedValue === 'btn-nao-aplica-recuperar') {
+								$('#pcValorRecuperar').hide();
+								$('#btn-nao-aplica-recuperar').removeClass('btn-light').addClass('btn-dark');
+								$('#btn-quantificado-recuperar').removeClass('btn-primary').addClass('btn-light');
+								$('#pcValorRecuperar').val('');
+							} else {
+								$('#pcValorRecuperar').hide();
+								$('#pcValorRecuperar').val('');
+							}
+						});
 
-						//Verifica se o tipo de valor apurado é diferente de  não quantificado. Caso afirmativo, mostra o campo valor.
-						$('#pcValorApuradoTipo').on('change', function (event)  {
-							$('#pcvaFalta').val('')
-							$('#pcvaRisco').val('')
-							$('#pcvaSobra').val('')
-							if($('#pcValorApuradoTipo').val() !== 'n'){
-								$("#divValores").attr("hidden",false)	
-							}else{
+						$('#btn-groupValorRisco .btn').click(function() {
+							$('#btn-groupValorRisco .btn').removeClass('active');
+							$(this).addClass('active');
+
+							var selectedValue = $(this).attr('id');
+
+							if (selectedValue === 'btn-quantificado-risco') {
+								$('#pcValorRisco').show();
+								$('#btn-quantificado-risco').removeClass('btn-light').addClass('btn-primary');
+								$('#btn-nao-aplica-risco').removeClass('btn-dark').addClass('btn-light');
+							} else if (selectedValue === 'btn-nao-aplica-risco') {
+								$('#pcValorRisco').hide();
+								$('#btn-nao-aplica-risco').removeClass('btn-light').addClass('btn-dark');
+								$('#btn-quantificado-risco').removeClass('btn-primary').addClass('btn-light');
+								$('#pcValorRisco').val('');
+							} else {
+								$('#pcValorRisco').hide();
+								$('#pcValorRisco').val('');
+							}
+						});
+
+						$('#btn-groupValorNaoPlanejado .btn').click(function() {
+							$('#btn-groupValorNaoPlanejado .btn').removeClass('active');
+							$(this).addClass('active');
+
+							var selectedValue = $(this).attr('id');
+
+							if (selectedValue === 'btn-quantificado-NaoPlanejado') {
+								$('#pcValorNaoPlanejado').show();
+								$('#btn-quantificado-NaoPlanejado').removeClass('btn-light').addClass('btn-primary');
+								$('#btn-nao-aplica-NaoPlanejado').removeClass('btn-dark').addClass('btn-light');
+							} else if (selectedValue === 'btn-nao-aplica-NaoPlanejado') {
+								$('#pcValorNaoPlanejado').hide();
+								$('#btn-nao-aplica-NaoPlanejado').removeClass('btn-light').addClass('btn-dark');
+								$('#btn-quantificado-NaoPlanejado').removeClass('btn-primary').addClass('btn-light');
+								$('#pcValorNaoPlanejado').val('');
+							} else {
+								$('#pcValorNaoPlanejado').hide();
+								$('#pcValorNaoPlanejado').val('');
+							}
+						});
+
+						exibirTabAvaliacoes();
+					});
+
+					function mostraRelatorioPDF(){
+						<cfoutput>
+							let pc_processo_id = '#rsProcForm.pc_processo_id#'
+						</cfoutput>
+						$('#modalOverlay').modal('show')
+						setTimeout(function() {
+							$.ajax({
+								type: "post",
+								url:"cfc/pc_cfcAvaliacoes.cfc",
+								data:{
+									method: "anexoRelatorio",
+									pc_anexo_processo_id: pc_processo_id
+								},
+								async: false
+							})//fim ajax
+							.done(function(result){
 								
-								if (!$("#divValores").attr("hidden")) {
-									$("#divValores").attr("hidden", true)
-								} 
-							}
-							
-						});
-
-						$('#btCancelar').on('click', function (event)  {
-							//cancela e  não propaga o event click original no botão
-							event.preventDefault()
-							event.stopPropagation()
-							$('#pcNumSituacaoEncontrada').val('') 
-							$('#pcTituloSituacaoEncontrada').val('') 
-							$('#pcTipoClassificacao').val('')
-							$('#pcValorApuradoTipo').val('')
-							$('#pcvaFalta').val('')
-							$('#pcvaRisco').val('')
-							$('#pcvaSobra').val('')
-							$('#cadastro').CardWidget('collapse')
-							$('#cabecalhoAccordion').text("Clique aqui para cadastrar um item (1° Passo)");	
-									
-						});
-						
-						$('#pcTipoClassificacao').on('change', function (event)  {
-							if($('#pcTipoClassificacao').val() == 'L' && !$('#pc_aval_id').val() == ''){
-								alert("Atenção! Ao mudar a classificação deste item para leve, caso existam orientações e/ou propostas de melhoria cadastradas, elas serão excluídas após a alteração ser salva.")
-							}
-						});
-
-						$('#btSalvar').on('click', function (event)  {
-							//cancela e  não propaga o event click original no botão
-							event.preventDefault()
-							event.stopPropagation()
-							//retira o ponto do número da manchete (situação encontrada)
-							//var numSituacaoEncontrada=$("#pcNumSituacaoEncontrada").val().replace(/([^\d])+/gim, '');
-							//verifica se os campos necessários foram preenchidos
-							if (
-								!$("#pcNumSituacaoEncontrada").val() ||
-								!$('#pcTituloSituacaoEncontrada').val() ||
-								$('#pcTipoClassificacao').val().length == 0 ||
-								$('#pcValorApuradoTipo').val().length == 0			
-							)
-							{   
-								//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
-								toastr.error('Todos os campos devem ser preenchidos!');
-								return false;
-							}
-
-							//verifica se os campos necessários foram preenchidos
-							if ($('#pcValorApuradoTipo').val() == 'q' & !$('#pcvaFalta').val() & !$('#pcvaRisco').val() & !$('#pcvaSobra').val())
-							{   
-								//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
-								var mens ='Você definiu o tipo de valor como Quantificado.\nPelo menos, um valor referente a A Sobra, Risco ou Falta deve ser preenchido.'
-								toastr.error(mens);
-								return false;
-							}
-
-							var mensagem = ""
-							if($('#pc_aval_id').val() == ''){
-								mensagem = "Deseja cadastrar este item?"
-							}else{
-								mensagem = "Deseja editar este item?"
-							}
-							
-							
-							swalWithBootstrapButtons.fire({//sweetalert2
-								html: logoSNCIsweetalert2(mensagem),
-								showCancelButton: true,
-								confirmButtonText: 'Sim!',
-								cancelButtonText: 'Cancelar!',
-								}).then((result) => {
-								if (result.isConfirmed) {
-									$('#modalOverlay').modal('show');
-									setTimeout(function() {
-										//inicio ajax
-										$.ajax({
-											type: "post",
-											url: "cfc/pc_cfcAvaliacoes.cfc",
-											data:{
-												method:"cadProcAvaliacaoTitulo",
-												pc_aval_id: $('#pc_aval_id').val(),
-												pc_aval_processo:$('#pcProcessoId').val(),
-												pc_aval_numeracao:$('#pcNumSituacaoEncontrada').val(),
-												pc_aval_descricao:$('#pcTituloSituacaoEncontrada').val(),
-												pc_aval_classificacao:$('#pcTipoClassificacao').val(),
-												pc_aval_vaFalta:$('#pcvaFalta').val(),
-												pc_aval_vaRisco:$('#pcvaRisco').val(),
-												pc_aval_vaSobra:$('#pcvaSobra').val()
-											},
-								
-											async: false,
-											success: function(result) {	
-												$('#pcNumSituacaoEncontrada').val('') 
-												$('#pcTituloSituacaoEncontrada').val('') 
-												$('#pcTipoClassificacao').val('')
-												$('#pcValorApuradoTipo').val('')
-												$('#pcvaFalta').val('')
-												$('#pcvaRisco').val('')
-												$('#pcvaSobra').val('')	
-												$('#pc_aval_id').val('')
-												
-												//mostraCadastroRelato(<cfoutput>'#arguments.pc_aval_processoForm#'</cfoutput>)
-												exibirTabAvaliacoes()
-												$('#CadastroAvaliacaoRelato').html("")
-												//mostraCads()
-												$('#cabecalhoAccordion').text("Clique aqui para cadastrar um item (1° Passo)");	
-												$('#cadastro').CardWidget('collapse')
-												$('#modalOverlay').delay(1000).hide(0, function() {
-													$('#modalOverlay').modal('hide');
-													toastr.success('Operação realizada com sucesso!');
-												});
-												
-													
-											},
-											error: function(xhr, ajaxOptions, thrownError) {									
-												$('#modalOverlay').delay(1000).hide(0, function() {
-													$('#modalOverlay').modal('hide');
-													var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
-																+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
-													const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
-													
-													swalWithBootstrapButtons.fire(
-															{...erroSistema}
-													)
-												});
-											}
-
-										})
-										//fim ajax
-									}, 1000); 
-
-								}else {
-									// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+								$('#anexoRelatorioDiv').html(result)
+								$('#modalOverlay').delay(1000).hide(0, function() {
 									$('#modalOverlay').modal('hide');
-									Swal.fire({
-											title: 'Operação Cancelada',
-											html: logoSNCIsweetalert2(''),
-											icon: 'info'
-										});
-								} 
-							})
-								
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-								
-							});
-						});
+								});
+							})//fim done
+							.fail(function(xhr, ajaxOptions, thrownError) {
+								$('#modalOverlay').delay(1000).hide(0, function() {
+									$('#modalOverlay').modal('hide');
+								});
+								$('#modal-danger').modal('show')
+								$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+								$('#modal-danger').find('.modal-body').text(thrownError)
 
-						function exibirTabAvaliacoes(){
-				
+							})//fim fail
+						}, 1000);
+					}
+
+					//Verifica se o tipo de valor apurado é diferente de  não quantificado. Caso afirmativo, mostra o campo valor.
+					$('#pcValorApuradoTipo').on('change', function (event)  {
+						$('#pcvaFalta').val('')
+						$('#pcvaRisco').val('')
+						$('#pcvaSobra').val('')
+						if($('#pcValorApuradoTipo').val() !== 'n'){
+							$("#divValores").attr("hidden",false)	
+						}else{
+							
+							if (!$("#divValores").attr("hidden")) {
+								$("#divValores").attr("hidden", true)
+							} 
+						}
+						
+					});
+
+					$('#btCancelar').on('click', function (event)  {
+						//cancela e  não propaga o event click original no botão
+						event.preventDefault()
+						event.stopPropagation()
+						$('#pcNumSituacaoEncontrada').val('') 
+						$('#pcTituloSituacaoEncontrada').val('') 
+						$('#pcTipoClassificacao').val('')
+						$('#pcValorApuradoTipo').val('')
+						$('#pcvaFalta').val('')
+						$('#pcvaRisco').val('')
+						$('#pcvaSobra').val('')
+						$('#cadastro').CardWidget('collapse')
+						$('#cabecalhoAccordion').text("Clique aqui para cadastrar um item (1° Passo)");	
+								
+					});
+					
+					$('#pcTipoClassificacao').on('change', function (event)  {
+						if($('#pcTipoClassificacao').val() == 'L' && !$('#pc_aval_id').val() == ''){
+							alert("Atenção! Ao mudar a classificação deste item para leve, caso existam orientações e/ou propostas de melhoria cadastradas, elas serão excluídas após a alteração ser salva.")
+						}
+					});
+
+					$('#btSalvar').on('click', function (event)  {
+						//cancela e  não propaga o event click original no botão
+						event.preventDefault()
+						event.stopPropagation()
+						//retira o ponto do número da manchete (situação encontrada)
+						//var numSituacaoEncontrada=$("#pcNumSituacaoEncontrada").val().replace(/([^\d])+/gim, '');
+						//verifica se os campos necessários foram preenchidos
+						if (
+							!$("#pcNumSituacaoEncontrada").val() ||
+							!$('#pcTituloSituacaoEncontrada').val() ||
+							$('#pcTipoClassificacao').val().length == 0 ||
+							$('#pcValorApuradoTipo').val().length == 0			
+						)
+						{   
+							//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
+							toastr.error('Todos os campos devem ser preenchidos!');
+							return false;
+						}
+
+						//verifica se os campos necessários foram preenchidos
+						if ($('#pcValorApuradoTipo').val() == 'q' & !$('#pcvaFalta').val() & !$('#pcvaRisco').val() & !$('#pcvaSobra').val())
+						{   
+							//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
+							var mens ='Você definiu o tipo de valor como Quantificado.\nPelo menos, um valor referente a A Sobra, Risco ou Falta deve ser preenchido.'
+							toastr.error(mens);
+							return false;
+						}
+
+						var mensagem = ""
+						if($('#pc_aval_id').val() == ''){
+							mensagem = "Deseja cadastrar este item?"
+						}else{
+							mensagem = "Deseja editar este item?"
+						}
+						
+						
+						swalWithBootstrapButtons.fire({//sweetalert2
+							html: logoSNCIsweetalert2(mensagem),
+							showCancelButton: true,
+							confirmButtonText: 'Sim!',
+							cancelButtonText: 'Cancelar!',
+							}).then((result) => {
+							if (result.isConfirmed) {
+								$('#modalOverlay').modal('show');
+								setTimeout(function() {
+									//inicio ajax
+									$.ajax({
+										type: "post",
+										url: "cfc/pc_cfcAvaliacoes.cfc",
+										data:{
+											method:"cadProcAvaliacaoTitulo",
+											pc_aval_id: $('#pc_aval_id').val(),
+											pc_aval_processo:$('#pcProcessoId').val(),
+											pc_aval_numeracao:$('#pcNumSituacaoEncontrada').val(),
+											pc_aval_descricao:$('#pcTituloSituacaoEncontrada').val(),
+											pc_aval_classificacao:$('#pcTipoClassificacao').val(),
+											pc_aval_valorEstimadoRecuperar:$('#pcValorRecuperar').val(),
+											pc_aval_valorEstimadoRisco:$('#pcValorRisco').val(),
+											pc_aval_valorEstimadoNaoPlanejado:$('#pcValorNaoPlanejado').val(),
+
+										},
+							
+										async: false,
+										success: function(result) {	
+											$('#pcNumSituacaoEncontrada').val('') 
+											$('#pcTituloSituacaoEncontrada').val('') 
+											$('#pcTipoClassificacao').val('')
+											$('#pcValorApuradoTipo').val('')
+											$('#pcvaFalta').val('')
+											$('#pcvaRisco').val('')
+											$('#pcvaSobra').val('')	
+											$('#pc_aval_id').val('')
+											
+											//mostraCadastroRelato(<cfoutput>'#arguments.pc_aval_processoForm#'</cfoutput>)
+											exibirTabAvaliacoes()
+											$('#CadastroAvaliacaoRelato').html("")
+											//mostraCads()
+											$('#cabecalhoAccordion').text("Clique aqui para cadastrar um item (1° Passo)");	
+											$('#cadastro').CardWidget('collapse')
+											$('#modalOverlay').delay(1000).hide(0, function() {
+												$('#modalOverlay').modal('hide');
+												toastr.success('Operação realizada com sucesso!');
+											});
+											
+												
+										},
+										error: function(xhr, ajaxOptions, thrownError) {									
+											$('#modalOverlay').delay(1000).hide(0, function() {
+												$('#modalOverlay').modal('hide');
+												var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
+															+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
+												const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
+												
+												swalWithBootstrapButtons.fire(
+														{...erroSistema}
+												)
+											});
+										}
+
+									})
+									//fim ajax
+								}, 1000); 
+
+							}else {
+								// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+								$('#modalOverlay').modal('hide');
+								Swal.fire({
+										title: 'Operação Cancelada',
+										html: logoSNCIsweetalert2(''),
+										icon: 'info'
+									});
+							} 
+						})
+							
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+							
+						});
+					});
+
+					function exibirTabAvaliacoes(){
+			
 						var numProcesso = $('#pcProcessoId').val();
 						$.ajax({
 							type: "post",
