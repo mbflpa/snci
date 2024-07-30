@@ -420,7 +420,7 @@
 																				<span id="pcProcessoN3descCharCounter" class="badge badge-secondary"></span>
 																			</div>
 																			<div id="bloqueioAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
-																				Atenção: Ao finalinalizar o cadastro, este novo grupo de tipo de avaliação também será cadastrado e disponibilizado para seleção em futuros processos.
+																				Atenção: Ao finalizar o cadastro, este novo grupo de tipo de avaliação também será cadastrado e disponibilizado para seleção em futuros processos.
 																			</div>
 																		</div>
 																		
