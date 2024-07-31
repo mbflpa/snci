@@ -861,7 +861,7 @@
 								type: "post",
 								url: "cfc/pc_cfcProcessos_editar.cfc",
 								data:{
-									method:"cadProcAvaliacaoTitulo",
+									method:"cadProcAvaliacaoItem",
 									pc_aval_id: $('#pc_aval_id').val(),
 									pc_aval_processo:pc_processo_id,
 									pc_aval_numeracao:$('#pcNumSituacaoEncontrada').val(),
@@ -1143,7 +1143,7 @@
 
 
 
-	<cffunction name="cadProcAvaliacaoTitulo"   access="remote"  returntype="any"> 
+	<cffunction name="cadProcAvaliacaoItem"   access="remote"  returntype="any"> 
 	
 	    <cfargument name="pc_aval_id" type="string" required="false" default=''/>
 		<cfargument name="pc_aval_processo" type="string" required="true"/>

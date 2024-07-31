@@ -562,7 +562,7 @@
 												</div>
 											</div>	
 
-											<div class="col-sm-6">
+											<div class="col-sm-12">
 												<div class="form-group">
 													<label for="pcAvaliacaoCategoriaControle" >Categoria do Controle Testado:</label>
 													<select id="pcAvaliacaoCategoriaControle" name="pcAvaliacaoCategoriaControle" class="form-control" multiple="multiple">
@@ -580,10 +580,10 @@
 												</div>
 											</div>
 											
-											<div class="col-sm-12">
+											<div class="col-sm-10">
 												<div class="form-group">
-													<label for="pcTituloSituacaoEncontrada" >Controle Testado:</label>
-													<textarea id="pcTituloSituacaoEncontrada" name="pcTituloSituacaoEncontrada" class="form-control" rows="2"  inputmode="text" placeholder="Informe o controle testado..."></textarea>
+													<label for="pcTituloSituacaoEncontrada" >Título da Situação Encontrada:</label>
+													<textarea id="pcTituloSituacaoEncontrada" name="pcTituloSituacaoEncontrada" class="form-control" rows="2"  inputmode="text" placeholder="Informe o título da situação encontrada..."></textarea>
 													<span id="pcTituloSituacaoEncontradaCounter" class="badge badge-secondary"></span>
 												</div>
 											</div>
@@ -696,7 +696,7 @@
 
 											<div class="col-sm-12">
 												<div class="form-group">
-													<label for="pcCriterioRef" >Critérios e referências nosmativas:</label>
+													<label for="pcCriterioRef" >Critérios e Referências Normativas:</label>
 													<select id="pcCriterioRef" name="pcCriterioRef" class="form-control" >
 													    <option value="" disabled selected></option>
 														<option value="0" >Outros</option>
@@ -708,9 +708,9 @@
 											</div>
 
 											<div id="pcCriterioRefOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
-												<label for="pcCriterioRefOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição dos Critérios e referências nosmativas:</label>
+												<label for="pcCriterioRefOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição dos Critérios e Referências Normativas:</label>
 												<div class="input-group date" id="reservationdate" data-target-input="nearest">
-													<textarea id="pcCriterioRefOutrosDesc" name="pcCriterioRefOutrosDesc" class="form-control" rows="2"  inputmode="text" placeholder="Informe os Critérios e referências nosmativas..."></textarea>
+													<textarea id="pcCriterioRefOutrosDesc" name="pcCriterioRefOutrosDesc" class="form-control" rows="2"  inputmode="text" placeholder="Informe os Critérios e Referências Normativas..."></textarea>
 												</div>
 												<span id="pcCriterioRefOutrosDescCharCounter" class="badge badge-secondary"></span>
 												<div id="pcCriterioRefOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
@@ -1102,7 +1102,7 @@
 										type: "post",
 										url: "cfc/pc_cfcAvaliacoes.cfc",
 										data:{
-											method:"cadProcAvaliacaoTitulo",
+											method:"cadProcAvaliacaoItem",
 											pc_aval_id: $('#pc_aval_id').val(),
 											pc_aval_processo:$('#pcProcessoId').val(),
 											pc_aval_teste:$('#pcTeste').val(),
@@ -1209,7 +1209,7 @@
 
 
 
-	<cffunction name="cadProcAvaliacaoTitulo"   access="remote"  returntype="any"> 
+	<cffunction name="cadProcAvaliacaoItem"   access="remote"  returntype="any"> 
 	
 	    <cfargument name="pc_aval_id" type="numeric" required="false" default=''/>
 		<cfargument name="pc_aval_processo" type="string" required="true"/>
@@ -1230,7 +1230,7 @@
 		<cfargument name="pc_aval_criterioRef_id" type="numeric" required="true"/>
 		
 		
-        <cfif '#arguments.pc_aval_id#' eq '' >
+        <cfif arguments.pc_aval_id eq '' >
 			<cftransaction>
 
 				<!--cadastra critério e referências se pc_criteroRef_id for igual a zero-->
