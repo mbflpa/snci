@@ -1112,14 +1112,16 @@
 											pc_aval_numeracao:$('#pcNumSituacaoEncontrada').val(),
 											pc_aval_descricao:$('#pcTituloSituacaoEncontrada').val(),
 											pc_aval_sintese:$('#pcSintese').val(),
-											pc_aval_riscos_id:pcAvaliacaoRisco.join(','),
+											pc_aval_risco_id:pcAvaliacaoRisco.join(','),
 											pc_aval_risco_outros:$('#pcAvaliacaoRiscoOutrosDesc').val(),
 											pc_aval_coso_id:$('#idCoso').val(),
 											pc_aval_classificacao:$('#pcTipoClassificacao').val(),
 											pc_aval_valorEstimadoRecuperar:$('#pcValorRecuperar').val(),
 											pc_aval_valorEstimadoRisco:$('#pcValorRisco').val(),
 											pc_aval_valorEstimadoNaoPlanejado:$('#pcValorNaoPlanejado').val(),
-											pc_aval_criterioRef_id:$('#pcCriterioRef').val()
+											pc_aval_criterioRef_id:$('#pcCriterioRef').val(),
+											pcCriterioRefOutrosDesc:$('#pcCriterioRefOutrosDesc').val()
+											
 										},
 							
 										async: false,
@@ -1211,7 +1213,7 @@
 
 	<cffunction name="cadProcAvaliacaoItem"   access="remote"  returntype="any"> 
 	
-	    <cfargument name="pc_aval_id" type="numeric" required="false" default=''/>
+	    <cfargument name="pc_aval_id" type="string" required="false" default=''/>
 		<cfargument name="pc_aval_processo" type="string" required="true"/>
 		<cfargument name="pc_aval_teste" type="string" required="true"/>
 		<cfargument name="pc_aval_tipoControle_id" type="string" required="true"/>
@@ -1220,7 +1222,7 @@
 		<cfargument name="pc_aval_numeracao" type="string" required="true"/><!--Numeração da Titulo. Inicialmente será manual-->
 		<cfargument name="pc_aval_descricao" type="string" required="true"/><!--Manchete-->
 		<cfargument name="pc_aval_sintese" type="string" required="true"/>
-		<cfargument name="pc_aval_riscos_id" type="string" required="true"/>
+		<cfargument name="pc_aval_risco_id" type="string" required="true"/>
 		<cfargument name="pc_aval_risco_outros" type="string" required="false"/>
 		<cfargument name="pc_aval_coso_id" type="numeric" required="true"/>
 		<cfargument name="pc_aval_classificacao" type="string" required="true"/>
@@ -1228,6 +1230,7 @@
 		<cfargument name="pc_aval_valorEstimadoRisco" type="string" required="false"/>
 		<cfargument name="pc_aval_valorEstimadoNaoPlanejado" type="string" required="false"/>
 		<cfargument name="pc_aval_criterioRef_id" type="numeric" required="true"/>
+		<cfargument name="pcCriterioRefOutrosDesc" type="string" required="false"/>
 		
 		
         <cfif arguments.pc_aval_id eq '' >
@@ -1236,7 +1239,7 @@
 				<!--cadastra critério e referências se pc_criteroRef_id for igual a zero-->
 				<cfif arguments.pc_aval_criterioRef_id eq 0>
 					<cfquery datasource="#application.dsn_processos#" name="rsCriterioRef">
-						INSERT INTO pc_avaliacao_criterioReferencia (pc_criterioRef_descricao)
+						INSERT INTO pc_avaliacao_criterioReferencia (pc_aval_criterioRef_descricao)
 						VALUES ('#arguments.pcCriterioRefOutrosDesc#')
 						SELECT SCOPE_IDENTITY() AS newIDcriterioRef;
 					</cfquery>
@@ -1247,13 +1250,13 @@
 				<!--cadastra avaliação-->
 				<cfquery datasource="#application.dsn_processos#" name="rsAvaliacao">
 					INSERT INTO pc_avaliacoes
-									(pc_aval_processo, pc_aval_numeracao, pc_aval_datahora, pc_aval_atualiz_datahora,pc_aval_atualiz_login,
+									(pc_aval_status, pc_aval_processo, pc_aval_numeracao, pc_aval_datahora, pc_aval_atualiz_datahora,pc_aval_atualiz_login,
 									pc_aval_avaliador_matricula, pc_aval_teste, pc_aval_controleTestado, 
-									pc_aval_numeracao, pc_aval_descricao, pc_aval_sintese,  pc_aval_coso_id, pc_aval_classificacao,
+									pc_aval_descricao, pc_aval_sintese,  pc_aval_coso_id, pc_aval_classificacao,
 									pc_aval_valorEstimadoRecuperar, pc_aval_valorEstimadoRisco, pc_aval_valorEstimadoNaoPlanejado, pc_aval_criterioRef_id)
-					VALUES     		('#arguments.pc_aval_processo#', '#arguments.pc_aval_numeracao#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#application.rsUsuarioParametros.pc_usu_matricula#,
+					VALUES     		(1,'#arguments.pc_aval_processo#', '#arguments.pc_aval_numeracao#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#application.rsUsuarioParametros.pc_usu_matricula#,
 										'#arguments.pc_aval_teste#',  '#arguments.pc_aval_controleTestado#', 
-										'#arguments.pc_aval_numeracao#', '#arguments.pc_aval_descricao#', '#arguments.pc_aval_sintese#', '#arguments.pc_aval_coso_id#', '#arguments.pc_aval_classificacao#',
+										'#arguments.pc_aval_descricao#', '#arguments.pc_aval_sintese#', '#arguments.pc_aval_coso_id#', '#arguments.pc_aval_classificacao#',
 										'#arguments.pc_aval_valorEstimadoRecuperar#', '#arguments.pc_aval_valorEstimadoRisco#', '#arguments.pc_aval_valorEstimadoNaoPlanejado#', '#arguments.pc_aval_criterioRef_id#')
 			        SELECT SCOPE_IDENTITY() AS newIDaval;
 				</cfquery>  
@@ -1262,7 +1265,7 @@
 				<!-- cadastra avaliacao x tipos de controles-->	
 				<cfloop list="#arguments.pc_aval_tipoControle_id#" index="i"> 
 					<cfquery datasource="#application.dsn_processos#" name="rsAvalTipoControle">
-						INSERT INTO pc_avaliacao_tipo_controle (pc_aval_id, pc_aval_tipo_controle_id)
+						INSERT INTO pc_avaliacao_tiposControles (pc_aval_id, pc_aval_tipoControle_id)
 						VALUES ('#rsAvaliacao.newIDaval#', '#i#')
 					</cfquery>
 				</cfloop>
@@ -1271,15 +1274,15 @@
 				<!-- cadastra avaliacao x categorias de controles-->
 				<cfloop list="#arguments.pc_aval_categoriaControle_id#" index="i"> 
 					<cfquery datasource="#application.dsn_processos#" name="rsAvalCategoriaControle">
-						INSERT INTO pc_avaliacao_categoria_controle (pc_aval_id, pc_aval_categoria_controle_id)
+						INSERT INTO pc_avaliacao_categoriasControles (pc_aval_id, pc_aval_categoriaControle_id)
 						VALUES ('#rsAvaliacao.newIDaval#', '#i#')
 					</cfquery>
 				</cfloop>
 				<!--fim cadastro avaliacao x categorias de controles-->
 
 				<!-- início cadastro dos riscos selecionados e outros-->
-				<!-- se arguments.pc_aval_riscos_id não for igual a zero-->
-				<cfif arguments.pc_aval_riscos_id neq 0>
+				<!-- se arguments.pc_aval_risco_id não for igual a zero-->
+				<cfif arguments.pc_aval_risco_id neq 0>
 					<cfset  idAvalRisco = arguments.pc_aval_risco_id>
 					<cfloop list="#idAvalRisco#" index="i"> 
 						<!-- se i não for zero-->
@@ -1442,7 +1445,8 @@
                          
 		</cfquery>
 		
-            
+            <cfdump var="#rsAvalTab#">
+			<cfset m=m>
 				<div class="row" style="padding-left:25px; padding-right:25px">
 				<div id="divErroDelAvaliacao" ></div>
 					<div class="col-12">
@@ -1455,9 +1459,8 @@
 									    <th >Controles</th>
 										<th >Status: </th>
 										<th >Item N°:</th>
-										<th >Título: </th>	
+										<th >Título da Situação Encontrada: </th>	
 										<th >Classificação: </th>
-										<th >Tipo Valor Envolvido: </th>
 										<th hidden>Última Atualização: </th>
 										<th hidden></th>
 										<th hidden></th>
@@ -1533,12 +1536,7 @@
 												<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
 												<td>#classifRisco#</td>
 
-												<cfif #vaFalta# eq 'R$ 0,00' and #vaRisco# eq 'R$ 0,00' and #vaSobra# eq 'R$ 0,00' >
-													<td  style="vertical-align: middle;">Não Quantificado</td>
-												<cfelse>
-													<td  style="vertical-align: middle;">Falta: #vaFalta# / Risco: #vaRisco# / Sobra: #vaSobra#</td>
-												</cfif>
-												
+																							
 												<cfset dataHora = DateFormat(#pc_aval_atualiz_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_aval_atualiz_datahora#,'HH:mm:ss') & ')'>
 												<td hidden>#dataHora# - #pc_aval_atualiz_login#</td>
 												<td hidden>#pc_aval_id#</td>
@@ -5728,21 +5726,21 @@
 		<cfset var result = "" />
 		<cfquery name="qAvaliacaoCoso" datasource="#application.dsn_processos#">
 			SELECT 
-				pc_avalCoso_id, 
-				pc_avalCoso_componente,
-				pc_avalCoso_principio
+				pc_aval_coso_id, 
+				pc_aval_cosoComponente,
+				pc_aval_cosoPrincipio
 			FROM 
 				pc_avaliacao_coso
 			WHERE
-				pc_avalCoso_status = 'A' 
+				pc_aval_cosoStatus = 'A' 
 		</cfquery>
 		
 		<cfset var data = [] />
 		<cfloop query="qAvaliacaoCoso">
 			<cfset var coso = {
-				id: qAvaliacaoCoso.pc_avalCoso_id,
-				componente: qAvaliacaoCoso.pc_avalCoso_componente,
-				principio: qAvaliacaoCoso.pc_avalCoso_principio
+				id: qAvaliacaoCoso.pc_aval_coso_id,
+				componente: qAvaliacaoCoso.pc_aval_cosoComponente,
+				principio: qAvaliacaoCoso.pc_aval_cosoPrincipio
 			} />
 			<cfset ArrayAppend(data, coso) />
 		</cfloop>
