@@ -179,10 +179,15 @@
 						</div>
 						
 						<input id="pcProcessoId" hidden>
-
+						
 						<div class="card-body" style="border: solid 3px #0083ca;" >
+						    
 							<div class="card card-default">
 								<div class="card-body p-0">
+								    
+									<h6  class="font-weight-light text-center" style="top:-15px;font-size:20px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+										<span id="infoTipoCadastro" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Novo Processo</span>
+									</h6>
 									<div class="bs-stepper" >
 										<div class="bs-stepper-header" role="tablist" >
 											<!-- your steps here -->
@@ -224,7 +229,7 @@
 											
 											<div class="step" data-target="#Finalizar">
 												<button type="button" class="step-trigger" role="tab" aria-controls="Finalizar" id="finalizar-trigger">
-													<span class="bs-stepper-circle">4</span>
+													<span class="bs-stepper-circle">5</span>
 													<span class="bs-stepper-label" id="finalizarLabel">Finalizar</span>
 												</button>
 											</div>
@@ -562,7 +567,7 @@
 														<br>
 														<div id="mensagemSalvar" class="row justify-content-center">
 															<div class="col-7 text-center">
-																<h5>Clique no botão "Salvar" para cadastrar este processo.</h5>
+																<h5 id="mensagemFinalizar">Clique no botão "Salvar" para cadastrar este processo.</h5>
 															</div>
 														</div>
 													</div>
@@ -2194,6 +2199,8 @@
 					var listRiscoEstrategico = riscoEstrategico.split(",");
 					var listIndEstrategico = indEstrategico.split(",");
 					$('#cabecalhoAccordion').text("Editar o Processo:" + ' ' + processoId);
+					$('#infoTipoCadastro').html("Editando o Processo <strong>" + processoId + "</strong>");
+                    $('#mensagemFinalizar').html('<h5>Clique no botão "Salvar" para <span style="color: green;font-size: 1.5rem">EDITAR</span> o processo'  + ' <span style="color: green;font-size: 1.5rem"><strong>' + processoId + '</strong></span></h5>');
 					$("#btSalvar").attr("hidden",false);
 					$("#mensagemSalvar").attr("hidden",false);
 					
@@ -2327,6 +2334,7 @@
 					var listIndEstrategico = indEstrategico.split(",");
 
 					$('#cabecalhoAccordion').text("Visualizando o Processo:" + ' ' + processoId);
+					$('#infoTipoCadastro').html("Visualizando o Processo <strong>" + processoId + "</strong>");
 					$("#btSalvar").attr("hidden",true);
 					$("#mensagemSalvar").attr("hidden",true);
 					$('#pcDataInicioAvaliacao').removeAttr('disabled');
@@ -2444,6 +2452,7 @@
 					var listIndEstrategico = indEstrategico.split(",");
 
 					$("#btSalvar").attr("hidden",false);
+
 					$("#mensagemSalvar").attr("hidden",false);
 					
 					$('#pcModalidade').val(modalidade).trigger('change');

@@ -176,7 +176,9 @@
 			});
 
 			function mostraCadastroRelato(numProcesso) {
+				
 				$('#modalOverlay').modal('show')
+				    $('#cadAvaliacaoForm').html('');
 					setTimeout(function() {
 						$.ajax({
 							type: "post",
@@ -1445,121 +1447,119 @@
                          
 		</cfquery>
 		
-            <cfdump var="#rsAvalTab#">
-			<cfset m=m>
-				<div class="row" style="padding-left:25px; padding-right:25px">
-				<div id="divErroDelAvaliacao" ></div>
-					<div class="col-12">
-						<div class="card">
-							<!-- /.card-header -->
-							<div class="card-body">
-								<table id="tabAvaliacoes" class="table table-bordered  table-hover table-striped">
-								<thead style="background: #0083ca;color:#fff">
-									<tr style="font-size:12px!important">
-									    <th >Controles</th>
-										<th >Status: </th>
-										<th >Item N°:</th>
-										<th >Título da Situação Encontrada: </th>	
-										<th >Classificação: </th>
-										<th hidden>Última Atualização: </th>
-										<th hidden></th>
-										<th hidden></th>
-										<th hidden></th>
-										<th hidden></th>
-										
-									</tr>
-								</thead>
+		<div class="row" style="padding-left:25px; padding-right:25px">
+		<div id="divErroDelAvaliacao" ></div>
+			<div class="col-12">
+				<div class="card">
+					<!-- /.card-header -->
+					<div class="card-body">
+						<table id="tabAvaliacoes" class="table table-bordered  table-hover table-striped">
+						<thead style="background: #0083ca;color:#fff">
+							<tr style="font-size:12px!important">
+								<th >Controles</th>
+								<th >Status: </th>
+								<th >Item N°:</th>
+								<th >Título da Situação Encontrada: </th>	
+								<th >Classificação: </th>
+								<th hidden>Última Atualização: </th>
+								<th hidden></th>
+								<th hidden></th>
+								<th hidden></th>
+								<th hidden></th>
 								
-								<tbody>
-									<cfloop query="rsAvalTab" >
+							</tr>
+						</thead>
+						
+						<tbody>
+							<cfloop query="rsAvalTab" >
 
-										<cfquery datasource="#application.dsn_processos#" name="rsAnexoAvaliacao">
-											SELECT pc_anexos.pc_anexo_avaliacao_id FROM pc_anexos WHERE pc_anexo_avaliacao_id = #pc_aval_id# 
-										</cfquery> 
+								<cfquery datasource="#application.dsn_processos#" name="rsAnexoAvaliacao">
+									SELECT pc_anexos.pc_anexo_avaliacao_id FROM pc_anexos WHERE pc_anexo_avaliacao_id = #pc_aval_id# 
+								</cfquery> 
 
-										<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
-											SELECT pc_avaliacao_melhorias.pc_aval_melhoria_num_aval FROM pc_avaliacao_melhorias WHERE pc_aval_melhoria_num_aval = #pc_aval_id#
-										</cfquery>
+								<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
+									SELECT pc_avaliacao_melhorias.pc_aval_melhoria_num_aval FROM pc_avaliacao_melhorias WHERE pc_aval_melhoria_num_aval = #pc_aval_id#
+								</cfquery>
 
-										<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
-											SELECT pc_avaliacao_orientacoes.pc_aval_orientacao_id FROM pc_avaliacao_orientacoes WHERE pc_aval_orientacao_num_aval = #pc_aval_id#
-										</cfquery>
+								<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
+									SELECT pc_avaliacao_orientacoes.pc_aval_orientacao_id FROM pc_avaliacao_orientacoes WHERE pc_aval_orientacao_num_aval = #pc_aval_id#
+								</cfquery>
+
+						
+								
+								<cfset classifRisco = "">
+								<cfif #pc_aval_classificacao# eq 'L'>
+									<cfset classifRisco = "Leve">
+								</cfif>	
+								<cfif #pc_aval_classificacao# eq 'M'>
+									<cfset classifRisco = "Mediana">
+								</cfif>	
+								<cfif #pc_aval_classificacao# eq 'G'>
+									<cfset classifRisco = "Grave">
+								</cfif>	
 
 								
-										
-										<cfset classifRisco = "">
-										<cfif #pc_aval_classificacao# eq 'L'>
-											<cfset classifRisco = "Leve">
-										</cfif>	
-										<cfif #pc_aval_classificacao# eq 'M'>
-											<cfset classifRisco = "Mediana">
-										</cfif>	
-										<cfif #pc_aval_classificacao# eq 'G'>
-											<cfset classifRisco = "Grave">
-										</cfif>	
 
-										
-
-										<cfoutput>					
-											<tr style="font-size:12px" >
-											    <td style="vertical-align: middle;">
-													<div style="display:flex;justify-content:space-around;">
-														<cfif '#pc_aval_status#' eq '1' or '#pc_aval_status#' eq '3'>
-															<cfif #rsAnexoAvaliacao.RecordCount# eq 0 && #rsOrientacoes.RecordCount# eq 0 && #rsMelhorias.RecordCount# eq 0>
-																<i  class="fas fa-trash-alt efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px" onclick="javascript:excluirAvaliacao(<cfoutput>'#pc_aval_id#'</cfoutput>,this);"    title="Excluir" ></i>
-															<cfelse>
-																<i  class="fas fa-trash-alt efeito-grow"  style="margin-right:10px;pedding:3px;cursor: pointer;z-index:100;font-size:20px" onclick="javascript:mensErro('Não é possível excluir avaliações com anexos, medidas/orientações para regularização e propostas de melhoria cadastrados!<br>Exclua todos os anexos, medidas/orientações para regularização e as propostas de melhoria e tente novamente.'); "   title="Excluir" ></i>
-															</cfif>
-															<i class="fas fa-edit efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:editarAvaliacaoTitulo(this)"    title="Editar"></i>
-														</cfif>
-
-														<cfif '#pc_aval_status#' eq '5' &&  (#application.rsUsuarioParametros.pc_usu_perfil# eq 3 || #application.rsUsuarioParametros.pc_usu_perfil# eq 7 || #application.rsUsuarioParametros.pc_usu_perfil# eq 8 || #application.rsUsuarioParametros.pc_usu_perfil# eq 11)>
-															<i class="fas fa-redo efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:reverterValidacao(this)"    title="Reverter Validação"></i>
-														</cfif>
-
-														<i  class="fas fa-boxes-packing efeito-grow" onclick="javascript:mostraCadastroAvaliacaoRelato(<cfoutput>'#pc_aval_id#'</cfoutput>,this);"  style="cursor: pointer;z-index:100;font-size:20px"    title="Mostrar próximos passos." ></i>
-
-													</div>
-												</td>
-
-												<cfif '#pc_aval_status#' eq '6' >
-													<td align="center"  style="vertical-align: middle;"><p class="statusOrientacoes" style="<cfoutput>#pc_aval_status_card_style_ribbon#</cfoutput> ;padding:5px;vertical-align: middle;">ENVIADA PARA ACOMPANHAMENTO</p></td>
-												<cfelse>
-													<td align="center"  style="vertical-align: middle;"><p class="statusOrientacoes" style="<cfoutput>#pc_aval_status_card_style_ribbon#</cfoutput> ;padding:5px;">#pc_aval_status_descricao#</p></td>
+								<cfoutput>					
+									<tr style="font-size:12px" >
+										<td style="vertical-align: middle;">
+											<div style="display:flex;justify-content:space-around;">
+												<cfif '#pc_aval_status#' eq '1' or '#pc_aval_status#' eq '3'>
+													<cfif #rsAnexoAvaliacao.RecordCount# eq 0 && #rsOrientacoes.RecordCount# eq 0 && #rsMelhorias.RecordCount# eq 0>
+														<i  class="fas fa-trash-alt efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px" onclick="javascript:excluirAvaliacao(<cfoutput>'#pc_aval_id#'</cfoutput>,this);"    title="Excluir" ></i>
+													<cfelse>
+														<i  class="fas fa-trash-alt efeito-grow"  style="margin-right:10px;pedding:3px;cursor: pointer;z-index:100;font-size:20px" onclick="javascript:mensErro('Não é possível excluir avaliações com anexos, medidas/orientações para regularização e propostas de melhoria cadastrados!<br>Exclua todos os anexos, medidas/orientações para regularização e as propostas de melhoria e tente novamente.'); "   title="Excluir" ></i>
+													</cfif>
+													<i class="fas fa-edit efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:editarAvaliacaoTitulo(this)"    title="Editar"></i>
 												</cfif>
 
-												<td  align="center" style="vertical-align: middle;">#pc_aval_numeracao# </td>
-												<td  ><pre >#pc_aval_descricao#</pre></td>
+												<cfif '#pc_aval_status#' eq '5' &&  (#application.rsUsuarioParametros.pc_usu_perfil# eq 3 || #application.rsUsuarioParametros.pc_usu_perfil# eq 7 || #application.rsUsuarioParametros.pc_usu_perfil# eq 8 || #application.rsUsuarioParametros.pc_usu_perfil# eq 11)>
+													<i class="fas fa-redo efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:reverterValidacao(this)"    title="Reverter Validação"></i>
+												</cfif>
 
-												<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
-												<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
-												<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
-												<td>#classifRisco#</td>
+												<i  class="fas fa-boxes-packing efeito-grow" onclick="javascript:mostraCadastroAvaliacaoRelato(<cfoutput>'#pc_aval_id#'</cfoutput>,this);"  style="cursor: pointer;z-index:100;font-size:20px"    title="Mostrar próximos passos." ></i>
 
-																							
-												<cfset dataHora = DateFormat(#pc_aval_atualiz_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_aval_atualiz_datahora#,'HH:mm:ss') & ')'>
-												<td hidden>#dataHora# - #pc_aval_atualiz_login#</td>
-												<td hidden>#pc_aval_id#</td>
-												<td hidden>#vaFalta#</td>
-												<td hidden>#vaRisco#</td>
-												<td hidden>#vaSobra#</td>
-											</tr>
-										</cfoutput>
-									</cfloop>	
-								</tbody>
-									
-								
-								</table>
-							</div>
+											</div>
+										</td>
 
+										<cfif '#pc_aval_status#' eq '6' >
+											<td align="center"  style="vertical-align: middle;"><p class="statusOrientacoes" style="<cfoutput>#pc_aval_status_card_style_ribbon#</cfoutput> ;padding:5px;vertical-align: middle;">ENVIADA PARA ACOMPANHAMENTO</p></td>
+										<cfelse>
+											<td align="center"  style="vertical-align: middle;"><p class="statusOrientacoes" style="<cfoutput>#pc_aval_status_card_style_ribbon#</cfoutput> ;padding:5px;">#pc_aval_status_descricao#</p></td>
+										</cfif>
+
+										<td  align="center" style="vertical-align: middle;">#pc_aval_numeracao# </td>
+										<td  ><pre >#pc_aval_descricao#</pre></td>
+
+										<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
+										<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
+										<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
+										<td>#classifRisco#</td>
+
+																					
+										<cfset dataHora = DateFormat(#pc_aval_atualiz_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_aval_atualiz_datahora#,'HH:mm:ss') & ')'>
+										<td hidden>#dataHora# - #pc_aval_atualiz_login#</td>
+										<td hidden>#pc_aval_id#</td>
+										<td hidden>#vaFalta#</td>
+										<td hidden>#vaRisco#</td>
+										<td hidden>#vaSobra#</td>
+									</tr>
+								</cfoutput>
+							</cfloop>	
+						</tbody>
 							
-							<!-- /.card-body -->
-						</div>
-						<!-- /.card -->
+						
+						</table>
 					</div>
-				<!-- /.col -->
+
+					
+					<!-- /.card-body -->
 				</div>
-				<!-- /.row -->
+				<!-- /.card -->
+			</div>
+		<!-- /.col -->
+		</div>
+		<!-- /.row -->
 		<script language="JavaScript">
 
 		
