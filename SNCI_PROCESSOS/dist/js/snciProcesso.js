@@ -826,7 +826,7 @@ Exemplo:
     });
 */
 
-function populateSelectsFromID(data, id, selectIDs, inputAlvo) {
+function populateSelectsFromID(data, id, dataLevels, inputAlvo) {
     const selectedData = data.find(item => item.ID == id);
     if (!selectedData) {
         console.error("ID inválido.");
@@ -834,15 +834,39 @@ function populateSelectsFromID(data, id, selectIDs, inputAlvo) {
     }
 
     // Preenche os selects
-    selectIDs.forEach(selectID => {
-        const selectLevel = selectID.replace('selectDinamico', '');
-        const value = selectedData[selectLevel];
-        $(`#${selectID}`).val(value).trigger('change');
+    dataLevels.forEach(selectID => {
+        const value = selectedData[selectID];
+        $(`#selectDinamico${selectID}`).val(value).trigger('change');
     });
 
     // Atualiza o campo de destino com o ID correto
     $('#' + inputAlvo).val(selectedData.ID);
 }
+function populateSelectsFromIDAjax(cfc, metodo, id, dataLevels, inputAlvo) {
+    $.ajax({
+        url: cfc,
+        method: "GET", // ou "POST", dependendo do seu endpoint
+        data: {
+            method: metodo,
+        },
+        dataType: "json",
+        async: false
+    })
+    .done(function(data) {
+        populateSelectsFromID(data, id, dataLevels, inputAlvo);
+    })
+    .fail(function(xhr, ajaxOptions, thrownError) {
+        console.log('AJAX call failed', thrownError);
+        $('#modalOverlay').delay(1000).hide(0, function() {
+            $('#modalOverlay').modal('hide');
+        });
+        $('#modal-danger').modal('show');
+        $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
+        $('#modal-danger').find('.modal-body').text(thrownError);
+    });
+}
+
+
 
 /*Função para contar a quantidade decaracteres digitados em um input ou textarea
 Forma de utilização:

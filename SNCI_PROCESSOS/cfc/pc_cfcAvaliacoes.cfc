@@ -1007,9 +1007,7 @@
 					}
 
 					function resetFormFields()  {
-						//cancela e  não propaga o event click original no botão
-						event.preventDefault()
-						event.stopPropagation()
+						
 						$('#pcTeste').val('')
 						$('#pcControleTestado').val('')
 						$('#pcAvaliacaoTipoControle').val('').trigger('change')
@@ -1328,7 +1326,7 @@
 				<!--cadastra critério e referências se pc_criteroRef_id for igual a zero-->
 				<cfif arguments.pc_aval_criterioRef_id eq 0>
 					<cfquery datasource="#application.dsn_processos#" name="rsCriterioRef">
-						INSERT INTO pc_avaliacao_criterioReferencia (pc_criterioRef_descricao)
+						INSERT INTO pc_avaliacao_criterioReferencia (pc_aval_criterioRef_descricao)
 						VALUES ('#arguments.pcCriterioRefOutrosDesc#')
 						SELECT SCOPE_IDENTITY() AS newIDcriterioRef;
 					</cfquery>
@@ -1361,11 +1359,11 @@
 
 				<!--cadastra avaliação x tipos de controles-->
 				<cfquery datasource="#application.dsn_processos#" >
-					DELETE FROM pc_avaliacao_tipo_controle WHERE pc_aval_id = '#arguments.pc_aval_id#'
+					DELETE FROM pc_avaliacao_tiposControles WHERE pc_aval_id = '#arguments.pc_aval_id#'
 				</cfquery>
 				<cfloop list="#arguments.pc_aval_tipoControle_id#" index="i"> 
 					<cfquery datasource="#application.dsn_processos#" name="rsAvalTipoControle">
-						INSERT INTO pc_avaliacao_tipo_controle (pc_aval_id, pc_aval_tipo_controle_id)
+						INSERT INTO pc_avaliacao_tiposControles (pc_aval_id, pc_aval_tipoControle_id)
 						VALUES ('#arguments.pc_aval_id#', '#i#')
 					</cfquery>
 				</cfloop>
@@ -1373,11 +1371,11 @@
 
 				<!--cadastra avaliação x categorias de controles-->
 				<cfquery datasource="#application.dsn_processos#" >
-					DELETE FROM pc_avaliacao_categoria_controle WHERE pc_aval_id = '#arguments.pc_aval_id#'
+					DELETE FROM pc_avaliacao_categoriasControles WHERE pc_aval_id = '#arguments.pc_aval_id#'
 				</cfquery>
 				<cfloop list="#arguments.pc_aval_categoriaControle_id#" index="i"> 
 					<cfquery datasource="#application.dsn_processos#" name="rsAvalCategoriaControle">
-						INSERT INTO pc_avaliacao_categoria_controle (pc_aval_id, pc_aval_categoria_controle_id)
+						INSERT INTO pc_avaliacao_categoriasControles (pc_aval_id, pc_aval_categoriaControle_id)
 						VALUES ('#arguments.pc_aval_id#', '#i#')
 					</cfquery>
 				</cfloop>
@@ -1386,26 +1384,38 @@
 				<cfquery datasource="#application.dsn_processos#" >
 					DELETE FROM pc_avaliacao_riscos WHERE pc_aval_id = '#arguments.pc_aval_id#'
 				</cfquery>
-				<cfloop list="#arguments.pc_aval_riscos_id#" index="i"> 
-					<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
-						INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
-						VALUES ('#arguments.pc_aval_id#', '#i#')
-					</cfquery>
-				</cfloop>
+				<!-- início cadastro dos riscos selecionados e outros-->
+				<!-- se arguments.pc_aval_risco_id não for igual a zero-->
+				<cfif arguments.pc_aval_risco_id neq 0>
+					<cfset  idAvalRisco = arguments.pc_aval_risco_id>
+					<cfloop list="#idAvalRisco#" index="i"> 
+						<!-- se i não for zero-->
+						<cfif '#i#' neq 0>
+						    <!--cadastra avaliação x riscos-->
+							<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
+								INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
+								VALUES ('#arguments.pc_aval_id#', '#i#')
+							</cfquery>
+						</cfif>
+					</cfloop>
+				</cfif>
 
-				<!--cadastra avaliação x riscos outros-->
+				<!-- se pc_aval_risco_outros não estiver vazio, ou seja, se algum texto existir-->	
 				<cfif arguments.pc_aval_risco_outros neq ''>
+					<!--cadastra o novo risco (pc_aval_risco_outros)-->	
 					<cfquery datasource="#application.dsn_processos#" name="rsRiscoOutros">
 						INSERT INTO pc_avaliacao_risco (pc_aval_risco_descricao)
 						VALUES ('#arguments.pc_aval_risco_outros#')
 						SELECT SCOPE_IDENTITY() AS newIDrisco;
 					</cfquery>
 					<cfset  idAvalRisco = rsRiscoOutros.newIDrisco>
+					<!--cadastra avaliação x riscos-->
 					<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
 						INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
 						VALUES ('#arguments.pc_aval_id#', '#idAvalRisco#')
 					</cfquery>
-				</cfif>
+				</cfif>	
+				<!-- fim cadastro dos riscos selecionados e outros-->
 
 				
 
@@ -1462,10 +1472,18 @@
 								<th >Título da Situação Encontrada: </th>	
 								<th >Classificação: </th>
 								<th hidden>Última Atualização: </th>
-								<th hidden></th>
-								<th hidden></th>
-								<th hidden></th>
-								<th hidden></th>
+								<th hidden></th><!--7 pc_aval_id-->
+								<th hidden></th><!--8 pc_aval_teste-->
+								<th hidden></th><!--9 pc_aval_tiposControles-->
+								<th hidden></th><!--10 pc_aval_controleTestado-->
+								<th hidden></th><!--11 pc_aval_categoriaControle-->
+								<th hidden></th><!--12 pc_aval_sintese-->
+								<th hidden></th><!--13 pc_aval_risco-->
+								<th hidden></th><!--14 pc_aval_coso_id-->
+								<th hidden></th><!--15 pc_aval_valorEstimadoRecuperar-->
+								<th hidden></th><!--16 pc_aval_valorEstimadoRisco-->
+								<th hidden></th><!--17 pc_aval_valorEstimadoNaoPlanejado-->
+								<th hidden></th><!--18 pc_aval_criterioRef_id-->
 								
 							</tr>
 						</thead>
@@ -1484,6 +1502,24 @@
 								<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 									SELECT pc_avaliacao_orientacoes.pc_aval_orientacao_id FROM pc_avaliacao_orientacoes WHERE pc_aval_orientacao_num_aval = #pc_aval_id#
 								</cfquery>
+
+								<cfquery name="rsTiposControles" datasource="#application.dsn_processos#">
+									SELECT pc_aval_tipoControle_id FROM pc_avaliacao_tiposControles 
+									WHERE pc_aval_id = #pc_aval_id#
+								</cfquery>
+								<cfset listaTiposControles = ValueList(rsTiposControles.pc_aval_tipoControle_id,',')>
+
+								<cfquery name="rsCategoriasControles" datasource="#application.dsn_processos#">
+									SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_categoriasControles 
+									WHERE pc_aval_id = #pc_aval_id#
+								</cfquery>
+								<cfset listaCategoriasControles = ValueList(rsCategoriasControles.pc_aval_categoriaControle_id,',')>
+
+								<cfquery name="rsRiscos" datasource="#application.dsn_processos#">
+									SELECT pc_aval_risco_id FROM pc_avaliacao_riscos 
+									WHERE pc_aval_id = #pc_aval_id#
+								</cfquery>
+								<cfset listaRiscos = ValueList(rsRiscos.pc_aval_risco_id,',')>
 
 						
 								
@@ -1540,9 +1576,19 @@
 										<cfset dataHora = DateFormat(#pc_aval_atualiz_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_aval_atualiz_datahora#,'HH:mm:ss') & ')'>
 										<td hidden>#dataHora# - #pc_aval_atualiz_login#</td>
 										<td hidden>#pc_aval_id#</td>
-										<td hidden>#vaFalta#</td>
-										<td hidden>#vaRisco#</td>
-										<td hidden>#vaSobra#</td>
+										<td hidden>#pc_aval_teste#</td>
+										<td hidden>#listaTiposControles#</td>
+										<td hidden>#pc_aval_controleTestado#</td>
+										<td hidden>#listaCategoriasControles#</td>
+										<td hidden>#pc_aval_sintese#</td>
+										<td hidden>#listaRiscos#</td>
+										<td hidden>#pc_aval_coso_id#</td>
+										<td hidden>#pc_aval_valorEstimadoRecuperar#</td>
+										<td hidden>#pc_aval_valorEstimadoRisco#</td>
+										<td hidden>#pc_aval_valorEstimadoNaoPlanejado#</td>
+										<td hidden>#pc_aval_criterioRef_id#</td>
+
+										
 									</tr>
 								</cfoutput>
 							</cfloop>	
@@ -1656,62 +1702,148 @@
 			}
 
          
+            function formatCurrency(value) {
+				// Formata o valor como moeda brasileira
+				let formatter = new Intl.NumberFormat('pt-BR', {
+					style: 'currency',
+					currency: 'BRL',
+					minimumFractionDigits: 2
+				});
+				return formatter.format(value);
+			}
 
 			function editarAvaliacaoTitulo(linha) {
 				event.preventDefault()
 				event.stopPropagation()
-				$(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
-	    		var pcNumSituacaoEncontrada = $(linha).closest("tr").children("td:nth-child(3)").text();
-				var pcTituloSituacaoEncontrada = $(linha).closest("tr").children("td:nth-child(4)").text();
-				var pcTipoClassificacao = $(linha).closest("tr").children("td:nth-child(5)").text();
-				var pc_aval_id = $(linha).closest("tr").children("td:nth-child(8)").text();
-				var pc_aval_vaFalta = $(linha).closest("tr").children("td:nth-child(9)").text();
-				var pc_aval_vaRisco = $(linha).closest("tr").children("td:nth-child(10)").text();
-				var pc_aval_vaSobra = $(linha).closest("tr").children("td:nth-child(11)").text();
-	
-				var pcTipoClassificacaoVal = "";
+                resetFormFields();
 
-				switch(pcTipoClassificacao) {
-					case "Leve":
-						pcTipoClassificacaoVal = "L"
-					break;
-					case "Mediana":
-						pcTipoClassificacaoVal = "M"
-					break;
-					case "Grave":
-						pcTipoClassificacaoVal = "G"
-					break;
+                let pc_aval_id = $(linha).closest("tr").children("td:nth-child(7)").text();
 
-					default:
-						pcTipoClassificacaoVal = ""
-				}  
+				$('#modalOverlay').modal('show')	
+				setTimeout(function() {
+					 
+					$.ajax({
+						type: "post",
+						url: "cfc/pc_cfcAvaliacoes.cfc",
+						data: {
+							method: "getAvaliacaoDadosParaEdicao",
+							pc_aval_id: pc_aval_id
+						},
+						async: true
+					})
+					.done(function(result) {
+							let data = JSON.parse(result);
+							//return false;
+							// Verifique se os dados são um array e têm pelo menos um elemento
+							if (Array.isArray(data) && data.length > 0) {
+								let item = data[0];
+								
+								let pcNumSituacaoEncontrada = item.PC_AVAL_NUMERACAO;
+								let pcTituloSituacaoEncontrada = item.PC_AVAL_DESCRICAO;
+								let pcTipoClassificacao = item.PC_AVAL_CLASSIFICACAO;
+								let pc_aval_teste = item.PC_AVAL_TESTE;
+								
+								// Verifique se a propriedade existe antes de chamar split
+								let listTiposControles = typeof item.AVALIACAO_TIPO_CONTROLE === 'string' ? item.AVALIACAO_TIPO_CONTROLE.split(",") : [item.AVALIACAO_TIPO_CONTROLE.toString()];
+								let pc_aval_controleTestado = item.PC_AVAL_CONTROLETESTADO;
+								let listCategoriasControles = typeof item.AVALIACAO_CATEGORIA_CONTROLE === 'string' ? item.AVALIACAO_CATEGORIA_CONTROLE.split(",") : [item.AVALIACAO_CATEGORIA_CONTROLE.toString()];
+								let pc_aval_sintese = item.PC_AVAL_SINTESE;
+								let listRiscos = typeof item.AVALIACAO_RISCOS === 'string' ? item.AVALIACAO_RISCOS.split(",") : [item.AVALIACAO_RISCOS.toString()];
+								let pc_aval_coso_id = item.PC_AVAL_COSO_ID;
+								let pc_aval_valorEstimadoRecuperar = item.PC_AVAL_VALORESTIMADORECUPERAR;
+								let pc_aval_valorEstimadoRisco = item.PC_AVAL_VALORESTIMADORISCO;
+								let pc_aval_valorEstimadoNaoPlanejado = item.PC_AVAL_VALORESTIMADONAOPLANEJADO;
+								let pc_aval_criterioRef_id = item.PC_AVAL_CRITERIOREF_ID;
 
-				var pcValorApuradoTipoVal ="" 
-				if(pc_aval_vaFalta == "R$ 0,00" && pc_aval_vaRisco == "R$ 0,00" && pc_aval_vaSobra == "R$ 0,00"){
-					pcValorApuradoTipoVal ="n";
-				}else{
-					pcValorApuradoTipoVal ="q";
-				}
-				$('#pcvaFalta').val(pc_aval_vaFalta);
-				$('#pcvaRisco').val(pc_aval_vaRisco);
-				$('#pcvaSobra').val(pc_aval_vaSobra);
-				$('#pcNumSituacaoEncontrada').val(pcNumSituacaoEncontrada);
-				$('#pcTituloSituacaoEncontrada').val(pcTituloSituacaoEncontrada);
-				$('#pcTipoClassificacao').val(pcTipoClassificacaoVal);
-				$('#pcValorApuradoTipo').val(pcValorApuradoTipoVal);
-				$('#pc_aval_id').val(pc_aval_id);
+								$('#pcNumSituacaoEncontrada').val(pcNumSituacaoEncontrada);
+								$('#pcTituloSituacaoEncontrada').val(pcTituloSituacaoEncontrada);
+								$('#pcTipoClassificacao').val(pcTipoClassificacao).trigger('change');
+								$('#pc_aval_id').val(pc_aval_id);
+								$('#pcTeste').val(pc_aval_teste);
+								$('#pcControleTestado').val(pc_aval_controleTestado);
+								$('#pcAvaliacaoTipoControle').val(pc_aval_controleTestado).trigger('change');
+								$('#pcSintese').val(pc_aval_sintese);
 
-				if($('#pcValorApuradoTipo').val() !== 'n'){
-					$("#divValores").attr("hidden",false)
-				}else{
-					if (!$("#divValores").attr("hidden")) {
-						$("#divValores").attr("hidden", true)
-					} 
-				}
-				$('#cabecalhoAccordion').text("Editar o item:" + ' ' + pcNumSituacaoEncontrada);
+								
+								$('#pcValorRecuperar').val(formatCurrency(pc_aval_valorEstimadoRecuperar));
+								$('#pcValorRisco').val(formatCurrency(pc_aval_valorEstimadoRisco));
+								$('#pcValorNaoPlanejado').val(formatCurrency(pc_aval_valorEstimadoNaoPlanejado));
+								$('#pcCriterioRef').val(pc_aval_criterioRef_id).trigger('change');
+						
+								//popula o select dinâmico do COSO
+								let dataLevels = ['COMPONENTE', 'PRINCIPIO'];
+								let labelNames = ['Componente', 'Princípio'];
+								initializeSelectsAjax('#dados-container-coso', dataLevels, 'ID', labelNames, 'idCoso',[],'cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso');
+								populateSelectsFromIDAjax('cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso',pc_aval_coso_id, dataLevels,'idCoso');
+								//fim popula o select dinâmico do COSO
+
+
+								//popula os selects multiplos
+								$('#pcAvaliacaoTipoControle').val(listTiposControles).trigger('change');
+								$('#pcAvaliacaoCategoriaControle').val(listCategoriasControles).trigger('change');
+								$('#pcAvaliacaoRisco').val(listRiscos).trigger('change');
+
+								// Inicializa o estado dos botões com base no valor de pc_aval_valorEstimadoRecuperar
+								if (pc_aval_valorEstimadoRecuperar == 0) {
+									$('#btn-nao-aplica-recuperar').addClass('active btn-dark').removeClass('btn-light');
+									$('#btn-quantificado-recuperar').removeClass('active btn-primary').addClass('btn-light');
+									$('#pcValorRecuperar').hide();
+								} else {
+									$('#btn-quantificado-recuperar').addClass('active btn-primary').removeClass('btn-light');
+									$('#btn-nao-aplica-recuperar').removeClass('active btn-dark').addClass('btn-light');
+									$('#pcValorRecuperar').show();
+								}
+
+								// Inicializa o estado dos botões com base no valor de pc_aval_valorEstimadoRisco
+								if (pc_aval_valorEstimadoRisco == 0) {
+									$('#btn-nao-aplica-risco').addClass('active btn-dark').removeClass('btn-light');
+									$('#btn-quantificado-risco').removeClass('active btn-primary').addClass('btn-light');
+									$('#pcValorRisco').hide();
+								} else {
+									$('#btn-quantificado-risco').addClass('active btn-primary').removeClass('btn-light');
+									$('#btn-nao-aplica-risco').removeClass('active btn-dark').addClass('btn-light');
+									$('#pcValorRisco').show();
+
+								}
+
+								// Inicializa o estado dos botões com base no valor de pc_aval_valorEstimadoNaoPlanejado
+								if (pc_aval_valorEstimadoNaoPlanejado == 0) {
+									$('#btn-nao-aplica-NaoPlanejado').addClass('active btn-dark').removeClass('btn-light');
+									$('#btn-quantificado-NaoPlanejado').removeClass('active btn-primary').addClass('btn-light');
+									$('#pcValorNaoPlanejado').hide();
+								} else {
+									$('#btn-quantificado-NaoPlanejado').addClass('active btn-primary').removeClass('btn-light');
+									$('#btn-nao-aplica-NaoPlanejado').removeClass('active btn-dark').addClass('btn-light');
+									$('#pcValorNaoPlanejado').show();
+								}
+							
+												
+								$('#cabecalhoAccordion').text("Editar o item:" + ' ' + pcNumSituacaoEncontrada);
+									
+								$('#cadastro').CardWidget('expand')
+								$('html, body').animate({ scrollTop: ($('#cadastro').offset().top - 80)} , 500);
+
+
+							}
+							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
+							});	
 					
-				$('#cadastro').CardWidget('expand')
-				$('html, body').animate({ scrollTop: ($('#cadastro').offset().top - 80)} , 500);
+					})
+					.fail(function(xhr, ajaxOptions, thrownError) {
+						console.error("AJAX Error:", thrownError); // Adicionado para depuração
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show');
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
+						$('#modal-danger').find('.modal-body').text(thrownError);
+					});
+				}, 1000);
+
+				
+								
+				
 			};	
 
 			
@@ -1730,7 +1862,7 @@
 			function excluirAvaliacao(pc_aval_id, linha)  {
 				event.preventDefault()
 		        event.stopPropagation()
-			
+			   
 				<cfoutput>var pc_aval_processo = '#arguments.numProcesso#';</cfoutput>
                 var mensagem = "Deseja excluir este item?";
 				
@@ -1756,7 +1888,8 @@
 									},
 									async: false
 								})//fim ajax
-								.done(function(result) {	
+								.done(function(result) {
+									 resetFormFields();	
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide');
 										toastr.success('Operação realizada com sucesso!');
@@ -1817,7 +1950,20 @@
 			WHERE pc_validacao_chat_num_aval= '#arguments.pc_aval_id#'
 		</cfquery>
 
-   
+		<cfquery datasource="#application.dsn_processos#" >
+			DELETE FROM pc_avaliacao_categoriasControles
+			WHERE pc_aval_id= '#arguments.pc_aval_id#'
+		</cfquery>
+
+		<cfquery datasource="#application.dsn_processos#" >
+			DELETE FROM pc_avaliacao_tiposControles
+			WHERE pc_aval_id= '#arguments.pc_aval_id#'
+		</cfquery>
+
+		<cfquery datasource="#application.dsn_processos#" >
+			DELETE FROM pc_avaliacao_riscos
+			WHERE pc_aval_id= '#arguments.pc_aval_id#'
+		</cfquery>
 
 		<cfif #rsAnexoAvaliacao.RecordCount# eq 0 && #rsMelhorias.RecordCount# eq 0>
 			<cfquery datasource="#application.dsn_processos#" >
@@ -5749,5 +5895,75 @@
 		
 		<cfreturn data/>
 	</cffunction>
+
+	<cffunction name="getAvaliacaoDadosParaEdicao" access="remote" returntype="any" returnformat="json" output="false">
+		<cfargument name="pc_aval_id" type="numeric" required="true" />
+		<cfset var result = "" />
+		<cfquery name="qAvaliacaoDados" datasource="#application.dsn_processos#">
+			SELECT pc_aval_id
+					,pc_aval_processo
+					,pc_aval_numeracao
+					,pc_aval_descricao
+					,pc_aval_relato
+					,pc_aval_classificacao
+					,pc_aval_teste
+					,pc_aval_controleTestado
+					,pc_aval_sintese
+					,pc_aval_coso_id
+					,pc_aval_valorEstimadoRecuperar
+					,pc_aval_valorEstimadoRisco
+					,pc_aval_valorEstimadoNaoPlanejado
+					,pc_aval_criterioRef_id
+			FROM pc_avaliacoes
+			WHERE pc_aval_id = #arguments.pc_aval_id#
+		</cfquery>
+
+		<cfquery name="rsTiposControles" datasource="#application.dsn_processos#">
+			SELECT pc_aval_tipoControle_id FROM pc_avaliacao_tiposControles 
+			WHERE pc_aval_id = #arguments.pc_aval_id#
+		</cfquery>
+		<cfset listaTiposControles = ValueList(rsTiposControles.pc_aval_tipoControle_id,',')>
+
+		<cfquery name="rsCategoriasControles" datasource="#application.dsn_processos#">
+			SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_categoriasControles 
+			WHERE pc_aval_id = #arguments.pc_aval_id#
+		</cfquery>
+		<cfset listaCategoriasControles = ValueList(rsCategoriasControles.pc_aval_categoriaControle_id,',')>
+
+		<cfquery name="rsRiscos" datasource="#application.dsn_processos#">
+			SELECT pc_aval_risco_id FROM pc_avaliacao_riscos 
+			WHERE pc_aval_id = #arguments.pc_aval_id#
+		</cfquery>
+		<cfset listaRiscos = ValueList(rsRiscos.pc_aval_risco_id,',')>
+
+		<cfset var data = [] />
+		<cfloop query="qAvaliacaoDados">
+			<cfset var avaliacao = {
+				pc_aval_id: qAvaliacaoDados.pc_aval_id,
+				pc_aval_processo: qAvaliacaoDados.pc_aval_processo, 
+				pc_aval_numeracao: qAvaliacaoDados.pc_aval_numeracao, 
+				pc_aval_descricao: qAvaliacaoDados.pc_aval_descricao, 
+				pc_aval_relato: qAvaliacaoDados.pc_aval_relato,
+				pc_aval_classificacao: qAvaliacaoDados.pc_aval_classificacao,
+				pc_aval_teste: qAvaliacaoDados.pc_aval_teste, 	 
+				pc_aval_controleTestado: qAvaliacaoDados.pc_aval_controleTestado, 
+				pc_aval_sintese: qAvaliacaoDados.pc_aval_sintese, 
+				pc_aval_coso_id: qAvaliacaoDados.pc_aval_coso_id, 
+				pc_aval_valorEstimadoRecuperar: qAvaliacaoDados.pc_aval_valorEstimadoRecuperar, 
+				pc_aval_valorEstimadoRisco: qAvaliacaoDados.pc_aval_valorEstimadoRisco, 
+				pc_aval_valorEstimadoNaoPlanejado: qAvaliacaoDados.pc_aval_valorEstimadoNaoPlanejado, 
+				pc_aval_criterioRef_id: qAvaliacaoDados.pc_aval_criterioRef_id, 
+				avaliacao_categoria_controle: listaCategoriasControles,
+				avaliacao_tipo_controle: listaTiposControles,
+				avaliacao_riscos: listaRiscos 
+			} />
+			<cfset ArrayAppend(data, avaliacao) />
+		</cfloop>
+
+		<cfreturn data/>
+	</cffunction>
+			
+			       
+				
 
 </cfcomponent>

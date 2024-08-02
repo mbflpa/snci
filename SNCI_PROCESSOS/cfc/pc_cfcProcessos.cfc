@@ -1198,7 +1198,7 @@
 							}
 				
 						});
-					
+						$("#btSalvar").attr("hidden",false);
 
 					
 					});
@@ -2296,13 +2296,12 @@
 						// Inicializa os selects dinâmicos
 						initializeSelects('#dados-container', data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
 		
-						// Define os IDs dos selects
-						let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
+						
 						const exampleID = processoAvaliado; // Mude para o ID desejado
-						populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+						populateSelectsFromID(data, exampleID, dataLevels, 'idTipoAvaliacao');
 
 						$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
-						console.log(naoAplicaDesc)
+					
 					
 						$('#cadastro').CardWidget('expand')
 				
@@ -2414,10 +2413,9 @@
 						];
 						// Inicializa os selects dinâmicos
 						initializeSelects('#dados-container', data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
-						// Define os IDs dos selects
-						let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
+						
 						const exampleID = processoAvaliado; // Mude para o ID desejado
-						populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+						populateSelectsFromID(data, exampleID, dataLevels, 'idTipoAvaliacao');
 					})
 					.fail(function(error) {
 						$('#modal-danger').modal('show')
@@ -2509,13 +2507,12 @@
 						// Inicializa os selects dinâmicos
 						initializeSelects('#dados-container', data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
 		
-						// Define os IDs dos selects
-						let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
+						
 						const exampleID = processoAvaliado; // Mude para o ID desejado
-						populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+						populateSelectsFromID(data, exampleID, dataLevels, 'idTipoAvaliacao');
 
 						$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
-						console.log(naoAplicaDesc)
+						
 					
 						$('#cadastro').CardWidget('expand')
 				
@@ -2942,9 +2939,9 @@
 						// Inicializa os selects dinâmicos
 						initializeSelects('#dados-container', data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao',outrosOptions);
 						// Define os IDs dos selects
-						let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
+						
 						const exampleID = processoAvaliado; // Mude para o ID desejado
-						populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+						populateSelectsFromID(data, exampleID, dataLevels, 'idTipoAvaliacao');
 					})
 					.fail(function(error) {
 						$('#modal-danger').modal('show')
