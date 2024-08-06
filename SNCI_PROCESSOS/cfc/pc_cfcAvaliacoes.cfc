@@ -396,6 +396,103 @@
 						flex-grow: 1;
 					}
 
+					fieldset{
+						border: 1px solid #ced4da!important;
+						border-radius: 8px!important;
+						padding: 20px!important;
+						margin-bottom: 10px!important;
+						background: none!important;
+						-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+						-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+						box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+					}
+
+					legend {
+						font-size: 0.8rem!important;
+						color: #fff!important;
+						background-color: #0083ca!important;
+						border: 1px solid #ced4da!important;
+						border-radius: 5px!important;
+						padding: 5px!important;
+						width: auto!important;
+					}
+
+					/* Evita que campos de datas e textos tenham o ícone verde */
+					.form-control[type="text"].is-valid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0 !important;
+					}	
+					/* Evita que campos de datas e textos tenham o ícone verde */
+					.form-control[type="text"].is-invalid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0 !important;
+					}
+
+					/* Evita que campos de datas tenham o ícone verde */
+					.form-control[type="date"].is-valid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0.75rem !important;
+					}
+
+					/* Evita que campos de datas tenham o ícone verde */
+					.form-control[type="date"].is-invalid {
+						background-image: none !important;
+						background-position:0 !important;
+						background-size: 0 !important;
+						padding-right:0.75rem !important;
+					}
+
+					/* Evita que campos de datas e textos tenham o ícone verde */
+					.form-control[type="input"].is-valid {
+						background-image: none !important;
+						/*background-position:0 !important;*/
+						/*background-size: 0 !important;*/
+						padding-right:0 !important;
+					}	
+
+					/* Evita que campos de datas tenham o ícone verde */
+					.form-control[type="input"].is-invalid {
+						background-image: none !important;
+						/*background-position:0 !important;*/
+						/*background-size: 0 !important;*/
+						padding-right:0.75rem !important;
+					}
+
+					/* Evita que campos de datas e textos tenham o ícone verde */
+					.form-control[type="textarea"].is-valid {
+						background-image: none !important;
+						padding-right:0 !important;
+					}	
+					/* Evita que campos de datas e textos tenham o ícone verde */
+					.form-control[type="textarea"].is-invalid {
+						background-image: none !important;
+						padding-right:0 !important;
+					}
+
+					
+
+					
+
+					.cardBodyStepper {
+							border: solid 1px rgba(108, 117, 125, 0.3);
+							border-radius: 0.5rem;
+							box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.05);
+					}
+
+					.small-input{
+						width: 70px !important;
+					}
+
+					
+
+					
+
 
 
 				</style>
@@ -514,242 +611,407 @@
 						
 					</section>
 
-
-				<!-- animate.css -->
-					<link rel="stylesheet" href="dist/css/animate.min.css">
-					
+				</form><!-- fim formCadAvaliacao -->
+				   
 					<input id="pcProcessoId" value="<cfoutput>#rsProcForm.pc_processo_id#</cfoutput>" hidden>
 
-					<div id="accordion"  class="row" style="margin-left:0px!important">
-						<div  id="cadastro" class="card card-primary collapsed-card"  >
+					<div id="accordion" >
+						<div  id="cadastro" class="card card-primary collapsed-card"  style="margin-left:8px;">
 							<div class="card-header" style="background-color: #0083ca;color:#fff;">
 								<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
 									<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 									</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (1° Passo)</span>
 								</a>
 							</div>
-							<div class="card-body" >
-								
-								<div class="tab-content" id="custom-tabs-one-tabContent" style="width: 100%!important">
-									<input id="pc_aval_id" hidden>
 
-									<div class="tab-pane fade active show" id="custom-tabs-one-1passo" role="tabpanel" aria-labelledby="custom-tabs-one-1passo-tab">
-										<div class="row" style="font-size:16px">
-											<div class="col-sm-12">
+							<input id="pc_aval_id" hidden>
+							<div class="card-body" style="border: solid 3px #0083ca;" >
+						    
+								<div class="card card-default">
+									<div class="card-body p-0">
+										
+										<h6  class="font-weight-light text-center" style="top:-15px;font-size:20px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+											<span id="infoTipoCadastro" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Novo Item</span>
+										</h6>
+										<div class="bs-stepper" >
+											<div class="bs-stepper-header" role="tablist" >
+												<div class="step" data-target="#aval_testeControle">
+													<button type="button" class="step-trigger animate__animated animate__bounce" role="tab" aria-controls="aval_testeControle" id="aval_testeControle-trigger">
+														<span class="bs-stepper-circle">1</span>
+														<span class="bs-stepper-label " id="aval_testeControleLabel">Teste / Controle</span>
+													</button>
+												</div>
+
+												<div class="line"></div>
+
+												<div class="step" data-target="#aval_item">
+													<button type="button" class="step-trigger" role="tab" aria-controls="aval_item" id="aval_item-trigger">
+														<span class="bs-stepper-circle">2</span>
+														<span class="bs-stepper-label" id="aval_itemLabel">Item</span>
+													</button>
+												</div>
+
+												<div class="line"></div>
+
+												<div class="step" data-target="#aval_riscoCoso">
+													<button type="button" class="step-trigger" role="tab" aria-controls="aval_riscoCoso" id="aval_riscoCoso-trigger">
+														<span class="bs-stepper-circle">3</span>
+														<span class="bs-stepper-label" id="aval_riscoCosoLabel">Coso 2013</span>
+													</button>
+												</div>
+
+
+												<div class="line"></div>
+
+												<div class="step" data-target="#aval_valorEstimado">
+													<button type="button" class="step-trigger" role="tab" aria-controls="aval_valorEstimado" id="aval_valorEstimado-trigger">
+														<span class="bs-stepper-circle">4</span>
+														<span class="bs-stepper-label" id="aval_valorEstimadoLabel">Valor Estimado</span>
+													</button>
+												</div>
+
+												<div class="line"></div>
+
+												<div class="step" data-target="#aval_criteriosReferencias">
+													<button type="button" class="step-trigger" role="tab" aria-controls="aval_criteriosReferencias" id="aval_criteriosReferencias-trigger">
+														<span class="bs-stepper-circle">5</span>
+														<span class="bs-stepper-label" id="aval_criteriosReferenciasLabel">Critérios / Referências</span>
+													</button>
+												</div>
+
+												<div class="line"></div>
+
+												<div class="step" data-target="#Finalizar">
+													<button type="button" class="step-trigger" role="tab" aria-controls="finalizar" id="finalizar-trigger">
+														<span class="bs-stepper-circle">6</span>
+														<span class="bs-stepper-label" id="finalizarLabelLabel">Finalizar</span>
+													</button>
+												</div>
+
 												
-												<div class="form-group">
-													<label for="pcTeste" >Teste (Pergunta do Plano):</label>
-													<textarea id="pcTeste" name="pcTeste" class="form-control" rows="5"  inputmode="text" placeholder="Informe o teste realizado (pergunta do plano)..."></textarea>
-													<span id="pcTesteCounter" class="badge badge-secondary"></span>
-												</div>
+
 											</div>
+										
+											<div class="bs-stepper-content">
+												<form   id="formAval_testeControle" name="formAval_testeControle"   onsubmit="return false" novalidate>
+													<div id="aval_testeControle" class="content " role="tabpanel" aria-labelledby="aval_testeControle-trigger" >
+														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+															<div class="row  " >
+																<div class="col-sm-12">
+																	<div class="form-group">
+																		<label for="pcTeste" >Teste (Pergunta do Plano):</label>
+																		<textarea id="pcTeste" required name="pcTeste" class="form-control" rows="2"  inputmode="text" placeholder="Informe o teste realizado (pergunta do plano)..."></textarea>
+																		<span id="pcTesteCounter" class="badge badge-secondary"></span>
+																	</div>
+																</div>
 
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label for="pcAvaliacaoTipoControle" >Tipo de Controle:</label>
-													<select id="pcAvaliacaoTipoControle" name="pcAvaliacaoTipoControle" class="form-control" multiple="multiple" placeholder="Selecione...">
-														<cfoutput query="rsAvaliacaoTipoControle">
-															<option value="#pc_aval_tipoControle_id#">#pc_aval_tipoControle_descricao#</option>
-														</cfoutput>
-													</select>
-												</div>
-											</div>
+																
 
-											
-											<div class="col-sm-12">
-												<div class="form-group">
-													<label for="pcControleTestado" >Controle Testado:</label>
-													<textarea id="pcControleTestado" name="pcControleTestado" class="form-control" rows="5"  inputmode="text" placeholder="Informe o controle testado..."></textarea>
-													<span id="pcControleTestadoCounter" class="badge badge-secondary"></span>
-												</div>
-											</div>	
+																
+																<div class="col-sm-12">
+																	<div class="form-group">
+																		<label for="pcControleTestado" >Controle Testado:</label>
+																		<textarea id="pcControleTestado" required name="pcControleTestado" class="form-control" rows="2"  inputmode="text" placeholder="Informe o controle testado..."></textarea>
+																		<span id="pcControleTestadoCounter" class="badge badge-secondary"></span>
+																	</div>
+																</div>	
 
-											<div class="col-sm-12">
-												<div class="form-group">
-													<label for="pcAvaliacaoCategoriaControle" >Categoria do Controle Testado:</label>
-													<select id="pcAvaliacaoCategoriaControle" name="pcAvaliacaoCategoriaControle" class="form-control" multiple="multiple">
-														<cfoutput query="rsAvaliacaoCategoriaControle">
-															<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
-														</cfoutput>
-													</select>
-												</div>
-											</div>
-											
-											<div class="col-sm-2">
-												<div class="form-group">
-													<label for="pcNumSituacaoEncontrada" >N°:</label>
-													<input id="pcNumSituacaoEncontrada"  name="pcNumSituacaoEncontrada" type="text" class="form-control "  inputmode="text" >													
-												</div>
-											</div>
-											
-											<div class="col-sm-10">
-												<div class="form-group">
-													<label for="pcTituloSituacaoEncontrada" >Título da Situação Encontrada:</label>
-													<textarea id="pcTituloSituacaoEncontrada" name="pcTituloSituacaoEncontrada" class="form-control" rows="2"  inputmode="text" placeholder="Informe o título da situação encontrada..."></textarea>
-													<span id="pcTituloSituacaoEncontradaCounter" class="badge badge-secondary"></span>
-												</div>
-											</div>
+																<div class="col-sm-6">
+																	<div class="form-group">
+																		<label for="pcAvaliacaoTipoControle" >Tipo de Controle:</label>
+																		<select id="pcAvaliacaoTipoControle" name="pcAvaliacaoTipoControle" required class="form-control" multiple="multiple" placeholder="Selecione...">
+																			<cfoutput query="rsAvaliacaoTipoControle">
+																				<option value="#pc_aval_tipoControle_id#">#pc_aval_tipoControle_descricao#</option>
+																			</cfoutput>
+																		</select>
+																	</div>
+																</div>
 
-											<div class="col-sm-12">
-												<div class="form-group">
-													<label for="pcSintese" >Síntese:</label>
-													<textarea id="pcSintese" name="pcSintese" class="form-control" rows="5"  inputmode="text" placeholder="Informe a síntese do ponto (achado)..."></textarea>
-													<span id="pcSinteseCounter" class="badge badge-secondary"></span>
-												</div>
-											</div>	
-
-											<div class="col-sm-6">
-												<div class="form-group">
-													<label for="pcAvaliacaoRisco" >Risco Identificado:</label>
-													<select id="pcAvaliacaoRisco" name="pcAvaliacaoRisco" class="form-control" multiple="multiple">
-														<cfoutput query="rsAvaliacaoRisco">
-															<option value="#pc_aval_risco_id#">#pc_aval_risco_descricao#</option>
-														</cfoutput>
-														<option value="0">Outros</option>
-													</select>
-												</div>
-											</div>
-
-											<div id="pcAvaliacaoRiscoOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
-												<label for="pcAvaliacaoRiscoOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Risco:</label>
-												<div class="input-group date" id="reservationdate" data-target-input="nearest">
-													<input id="pcAvaliacaoRiscoOutrosDesc" name="pcAvaliacaoRiscoOutrosDesc" required class="form-control" placeholder="Descreva o PROCESSO..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
-													
-												</div>
-												<span id="pcAvaliacaoRiscoOutrosDescCharCounter" class="badge badge-secondary"></span>
-												<div id="risciOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
-													Atenção: Ao finalizar o cadastro deste item, este novo risco descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
-												</div>
-											</div>
+																<div class="col-sm-6">
+																	<div class="form-group">
+																		<label for="pcAvaliacaoCategoriaControle" >Categoria do Controle Testado:</label>
+																		<select id="pcAvaliacaoCategoriaControle" name="pcAvaliacaoCategoriaControle" required class="form-control" multiple="multiple">
+																			<cfoutput query="rsAvaliacaoCategoriaControle">
+																				<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
+																			</cfoutput>
+																		</select>
+																	</div>
+																</div>
 
 
-											<div class="col-sm-12">
-												<div class="form-group">
-													<input id="idCoso" hidden></input>
-													<div id="dados-container-coso" class="dados-container">
-														<!-- Os selects serão adicionados aqui -->
+															</div>
+														</div>
+														<div style="margin-top:10px;display:flex;justify-content:space-between">
+															<button class="btn btn-primary" onclick="inicializarValidacaoStep1();" >Próximo</button>
+															<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+														</div>
 													</div>
+												</form>
+
+												<form   id="formAval_item" name="formAval_item"   onsubmit="return false" novalidate>
+													<div id="aval_item" class="content" role="tabpanel" aria-labelledby="aval_item-trigger">
+														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+															<div class="row  " >
+																<div class="col-sm-1">
+																	<div class="form-group">
+																		<label for="pcNumSituacaoEncontrada" >N°:</label>
+																		<input id="pcNumSituacaoEncontrada"  name="pcNumSituacaoEncontrada" type="text" class="form-control small-input"  inputmode="text" >													
+																	</div>
+																</div>
+																
+																<div class="col-sm-11">
+																	<div class="form-group">
+																		<label for="pcTituloSituacaoEncontrada" >Título da Situação Encontrada:</label>
+																		<textarea id="pcTituloSituacaoEncontrada" name="pcTituloSituacaoEncontrada" class="form-control" rows="1"  inputmode="text" placeholder="Informe o título da situação encontrada..."></textarea>
+																		<span id="pcTituloSituacaoEncontradaCounter" class="badge badge-secondary"></span>
+																	</div>
+																</div>
+
+																<div class="col-sm-12">
+																	<div class="form-group">
+																		<label for="pcSintese" >Síntese:</label>
+																		<textarea id="pcSintese" name="pcSintese" class="form-control" rows="2"  inputmode="text" placeholder="Informe a síntese do ponto (achado)..."></textarea>
+																		<span id="pcSinteseCounter" class="badge badge-secondary"></span>
+																	</div>
+																</div>	
+
+																<div class="col-sm-12">
+																	<div class="form-group">
+																		<label for="pcAvaliacaoRisco" >Risco Identificado:</label>
+																		<select id="pcAvaliacaoRisco" name="pcAvaliacaoRisco" class="form-control" multiple="multiple">
+																			<cfoutput query="rsAvaliacaoRisco">
+																				<option value="#pc_aval_risco_id#">#pc_aval_risco_descricao#</option>
+																			</cfoutput>
+																			<option value="0">Outros</option>
+																		</select>
+																	</div>
+																</div>
+
+																<div id="pcAvaliacaoRiscoOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
+																	<label for="pcAvaliacaoRiscoOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Risco:</label>
+																	<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																		<input id="pcAvaliacaoRiscoOutrosDesc" name="pcAvaliacaoRiscoOutrosDesc" required class="form-control" placeholder="Descreva o PROCESSO..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
+																		
+																	</div>
+																	<span id="pcAvaliacaoRiscoOutrosDescCharCounter" class="badge badge-secondary"></span>
+																	<div id="risciOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
+																		Atenção: Ao finalizar o cadastro deste item, este novo risco descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
+																	</div>
+																</div>
+
+																<div class="col-sm-5">
+																	<div class="form-group">
+																		<label for="pcTipoClassificacao" >Classificação:</label>
+																		<select id="pcTipoClassificacao" name="pcTipoClassificacao" class="form-control" >
+																			<option selected="" disabled="" value="">Selecione a Classificação...</option>
+																			<option value="L">Leve</option>
+																			<option value="M">Mediana</option>		
+																			<option value="G">Grave</option>															
+																		</select>
+																	</div>
+																</div>
+
+															</div>
+
+															<div style="margin-top:10px;display:flex;justify-content:space-between">
+																<div>	
+																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																	<button class="btn btn-primary" onclick="inicializarValidacaoStep2()">Próximo</button>
+																</div>
+																<button id="btCancelar"  class="btn  btn-danger " onclick="exibirFormCadItem();">Cancelar</button>
+															</div>
+														</div>
+													</div>
+												</form>
+
+												<form  id="formAval_riscoCoso" name="formAval_riscoCoso"   onsubmit="return false" novalidate>
+													<div id="aval_riscoCoso" class="content" role="tabpanel" aria-labelledby="aval_riscoCoso-trigger">
+														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+															<div class="row  " >
+																<div class="col-sm-12">
+																	<div class="form-group">
+																		<input id="idCoso" hidden></input>
+																		<div id="dados-container-coso" class="dados-container">
+																			
+																		</div>
+																		
+																	</div>
+																</div>
+															</div>
+															<div style="margin-top:10px;display:flex;justify-content:space-between">
+																<div>	
+																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																	<button class="btn btn-primary" onclick="inicializarValidacaoStep3()">Próximo</button>
+																</div>
+																<button id="btCancelar"  class="btn  btn-danger " onclick="exibirFormCadItem();">Cancelar</button>
+															</div>
+														</div>
+													</div>
+												</form>
+
+												<form id="formAval_valorEstimado" name="formAval_valorEstimado"   onsubmit="return false" novalidate>
+													<div id="aval_valorEstimado" class="content" role="tabpanel" aria-labelledby="aval_valorEstimado-trigger">
+														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+															<div class="row  " >
+															
+																<div class="col-sm-12">
+																	<fieldset style="padding:0px!important">
+																		<legend style="margin-left:20px">Potencial Valor Estimado a Recuperar:</legend>
+																		<div class="form-group d-flex align-items-center" style="margin-left:20px">
+																			<div id="btn_groupValorRecuperar" name="btn_groupValorRecuperar" class="btn-group  mr-4" role="group" aria-label="Basic example">
+																				<button type="button" class="btn btn-light" id="btn-nao-aplica-recuperar" style=" white-space: nowrap;">Não se aplica</button>
+																				<button type="button" class="btn btn-light" id="btn-quantificado-recuperar" style="margin-left:5px;white-space: nowrap;">Quantificado</button>
+																			</div>
+																			<div>
+																				<input id="pcValorRecuperar" name="pcValorRecuperar" style="display: none;margin-right:10px" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+																			</div>
+																		</div>
+																	</fieldset>
+																</div>
+																	
+
+																<div class="col-sm-12">	
+																	<fieldset style="margin-top:20px;padding:0px!important">
+																		<legend style="margin-left:20px">Potencial Valor Estimado em Risco ou Valor Envolvido:</legend>
+																		<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+																			<div id="btn_groupValorRisco" name="btn_groupValorRisco" class="btn-group mr-4" role="group" aria-label="Basic example">
+																				<button type="button" class="btn btn-light" id="btn-nao-aplica-risco" style=" white-space: nowrap;">Não se aplica</button>
+																				<button type="button" class="btn btn-light" id="btn-quantificado-risco" style="margin-left:5px;white-space: nowrap;">Quantificado</button>
+																			</div>
+																			<div>
+																				<input id="pcValorRisco" name="pcValorRisco" style="display: none;margin-right:10px" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+																			</div>
+																		</div>
+																	</fieldset>
+																</div>	
+																<div class="col-sm-12">	
+																	<fieldset style="margin-top:20px;padding:0px!important">
+																		<legend style="margin-left:20px">Potencial Valor Estimado Não Planejado/Extrapolado/Sobra:</legend>
+																		<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+																			<div id="btn_groupValorNaoPlanejado" name="btn_groupValorNaoPlanejado" class="btn-group mr-4" role="group" aria-label="Basic example">
+																				<button type="button" class="btn btn-light" id="btn-nao-aplica-NaoPlanejado" style=" white-space: nowrap;">Não se aplica</button>
+																				<button type="button" class="btn btn-light" id="btn-quantificado-NaoPlanejado" style="margin-left:5px;white-space: nowrap;">Quantificado</button>
+																			</div>
+																			<div>
+																				<input id="pcValorNaoPlanejado" name="pcValorNaoPlanejado" style="display: none;margin-right:10px" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+																			</div>
+																		</div>
+																	</fieldset>
+																	
+																</div>															
+																
+															</div>
+															<div style="margin-top:10px;display:flex;justify-content:space-between">
+																<div>	
+																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																	<button class="btn btn-primary" onclick="inicializarValidacaoStep4()">Próximo</button>
+																</div>
+																<button id="btCancelar"  class="btn  btn-danger " onclick="exibirFormCadItem();">Cancelar</button>
+															</div>
+														</div>
+													</div>
+												</form>		
+
+												<form id="formAval_criteriosReferencias" name="formAval_criteriosReferencias"   onsubmit="return false" novalidate>
+													<div id="aval_criteriosReferencias" class="content" role="tabpanel" aria-labelledby="aval_criteriosReferencias-trigger">
+														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+															<div class="row  " >
+																<div class="col-sm-12">
+																	<div class="form-group">
+																		<label for="pcCriterioRef" >Critérios e Referências Normativas:</label>
+																		<select id="pcCriterioRef" name="pcCriterioRef" class="form-control" >
+																			<option value="" disabled selected></option>
+																			<option value="0" >Outros</option>
+																			<cfoutput query="rsCriteriosRef">
+																				<option value="#pc_aval_criterioRef_id#">#pc_aval_criterioRef_descricao#</option>
+																			</cfoutput>
+																		</select>
+																	</div>
+																</div>
+
+																<div id="pcCriterioRefOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
+																	<label for="pcCriterioRefOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição dos Critérios e Referências Normativas:</label>
+																	<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																		<textarea id="pcCriterioRefOutrosDesc" name="pcCriterioRefOutrosDesc" class="form-control" rows="3"  inputmode="text" placeholder="Informe os Critérios e Referências Normativas..."></textarea>
+																	</div>
+																	<span id="pcCriterioRefOutrosDescCharCounter" class="badge badge-secondary"></span>
+																	<div id="pcCriterioRefOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
+																		Atenção: Ao finalizar o cadastro deste item, este novo critério/referência descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
+																	</div>
+																</div>
+															</div>
+															<div style="margin-top:10px;display:flex;justify-content:space-between">
+																<div>	
+																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																	<button class="btn btn-primary" onclick="inicializarValidacaoStep5()">Próximo</button>
+																</div>
+																<button id="btCancelar"  class="btn  btn-danger " onclick="exibirFormCadItem();">Cancelar</button>
+															</div>
+														</div>
+													</div>
+												</form>
+												
+												<form   id="formFinalizar" name="formFinalizar"  onsubmit="return false" novalidate>
+													<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="finalizar-trigger">
 													
-												</div>
-											</div>
-											
-										
-											<div class="col-sm-5">
-												<div class="form-group">
-													<label for="pcTipoClassificacao" >Classificação:</label>
-													<select id="pcTipoClassificacao" name="pcTipoClassificacao" class="form-control" >
-														<option selected="" disabled="" value="">Selecione a Classificação...</option>
-														<option value="L">Leve</option>
-														<option value="M">Mediana</option>		
-														<option value="G">Grave</option>															
-													</select>
-												</div>
-											</div>
-
-
-											<div class="col-sm-12">
-												<div class="col-sm-6">
-													<fieldset style="padding:0px!important">
-														<legend style="margin-left:20px">Potencial Valor Estimado a Recuperar:</legend>
-														<div class="form-group d-flex align-items-center" style="margin-left:20px">
-															<div id="btn-groupValorRecuperar" class="btn-group  mr-2" role="group" aria-label="Basic example">
-																<button type="button" class="btn btn-light" id="btn-nao-aplica-recuperar" >Não se aplica</button>
-																<button type="button" class="btn btn-light" id="btn-quantificado-recuperar" style="margin-left:5px;">Quantificado</button>
-															</div>
-															<div class="col-sm-2">
-																<input id="pcValorRecuperar" name="pcValorRecuperar" style="display: none;" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+													<div id="infoValidas" hidden class="form-card col-sm-12 animate__animated animate__zoomInDown animate__slow">
+														<h3 class="fs-title text-center">Todas as Informações foram validadas com sucesso!</h3>
+														<br>
+														<div class="row justify-content-center col-sm-12">
+															
+															<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:100px"></i>
+															
+														</div>
+														<br>
+														<div id="mensagemSalvar" class="row justify-content-center">
+															<div class="col-7 text-center">
+																<h5 id="mensagemFinalizar">Clique no botão "Salvar" para cadastrar este processo.</h5>
 															</div>
 														</div>
-													</fieldset>
-												
+													</div>
 
-												
-													<fieldset style="margin-top:20px;padding:0px!important">
-														<legend style="margin-left:20px">Potencial Valor Estimado em Risco ou Valor Envolvido:</legend>
-														<div class="form-group d-flex align-items-center"  style="margin-left:20px">
-															<div id="btn-groupValorRisco" class="btn-group mr-2" role="group" aria-label="Basic example">
-																<button type="button" class="btn btn-light" id="btn-nao-aplica-risco">Não se aplica</button>
-																<button type="button" class="btn btn-light" id="btn-quantificado-risco" style="margin-left:5px">Quantificado</button>
-															</div>
-															<div class="col-sm-3">
-																<input id="pcValorRisco" name="pcValorRisco" style="display: none;" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+													<div id="infoInvalidas" hidden class="form-card col-sm-12 animate__animated animate__wobble">
+														<h3 class="fs-title text-center">Há campos que precisam ser corrigidos!</h3>
+														<br>
+														<div class="row justify-content-center col-sm-12">
+															
+															<i class="fa-solid fa-circle-xmark" style="color:#dc3545;font-size:100px"></i>
+															
+														</div>
+														<br>
+														<div id="mensagemSalvar" class="row justify-content-center">
+															<div class="col-7 text-center">
+																<h5>Corrija os campos destacados e tente novamente.</h5>
 															</div>
 														</div>
-													</fieldset>
-												
-												
-													<fieldset style="margin-top:20px;padding:0px!important">
-														<legend style="margin-left:20px">Potencial Valor Estimado Não Planejado/Extrapolado/Sobra:</legend>
-														<div class="form-group d-flex align-items-center"  style="margin-left:20px">
-															<div id="btn-groupValorNaoPlanejado" class="btn-group mr-2" role="group" aria-label="Basic example">
-																<button type="button" class="btn btn-light" id="btn-nao-aplica-NaoPlanejado">Não se aplica</button>
-																<button type="button" class="btn btn-light" id="btn-quantificado-NaoPlanejado" style="margin-left:5px">Quantificado</button>
-															</div>
-															<div class="col-sm-3">
-																<input id="pcValorNaoPlanejado" name="pcNaoPlanejado" style="display: none;" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
-															</div>
-														</div>
-													</fieldset>
+													</div>
+
+													<div style="margin-top:10px;display:flex;justify-content:space-between" >
+														<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+														<button id="btSalvar" class="btn  btn-success animate__animated animate__bounceIn animate__slow animate__delay-2s " >Salvar</button>
+														<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+													</div>
+
 												</div>
-											</div>
+												</form>																
+																	
 
 
-											
 
-											<div class="col-sm-12">
-												<div class="form-group">
-													<label for="pcCriterioRef" >Critérios e Referências Normativas:</label>
-													<select id="pcCriterioRef" name="pcCriterioRef" class="form-control" >
-													    <option value="" disabled selected></option>
-														<option value="0" >Outros</option>
-														<cfoutput query="rsCriteriosRef">
-															<option value="#pc_aval_criterioRef_id#">#pc_aval_criterioRef_descricao#</option>
-														</cfoutput>
-													</select>
-												</div>
-											</div>
 
-											<div id="pcCriterioRefOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
-												<label for="pcCriterioRefOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição dos Critérios e Referências Normativas:</label>
-												<div class="input-group date" id="reservationdate" data-target-input="nearest">
-													<textarea id="pcCriterioRefOutrosDesc" name="pcCriterioRefOutrosDesc" class="form-control" rows="2"  inputmode="text" placeholder="Informe os Critérios e Referências Normativas..."></textarea>
-												</div>
-												<span id="pcCriterioRefOutrosDescCharCounter" class="badge badge-secondary"></span>
-												<div id="pcCriterioRefOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
-													Atenção: Ao finalizar o cadastro deste item, este novo critério/referência descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
-												</div>
-											</div>
 
-											
-											
-										</div>	
-										
-										<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
-											<div >
-												<button id="btSalvar" class="btn btn-block btn-primary " >Salvar</button>
 											</div>
-											<div style="margin-left:100px">
-												<button id="btCancelar"  class="btn btn-block btn-danger " >Cancelar</button>
-											</div>
-										</div>			
+										</div>
 									</div>
-									
-									
-											
-								
-
 								</div>
 
-								
-
-							
 							</div>
 						</div>
 					</div>			
 					
 					
 
-				</form><!-- fim formCadAvaliacao -->
+				
 				
 				
 				<div id="TabAvaliacao" style="margin-bottom:50px"></div>
@@ -757,36 +1019,468 @@
 				<div id="CadastroAvaliacaoRelato" style="padding-left:25px;padding-right:25px"></div>
 
 				<script language="JavaScript">
-					//Initialize Select2 Elements
-					$('select').not('[name="tabProcAcompCards_length"]').select2({
-						theme: 'bootstrap4',
-						placeholder: 'Selecione...',
-						allowClear: true
-					});
-
-					//INICIALIZA O POPOVER NOS ÍCONES
-					$(function () {
-						$('[data-toggle="popover"]').popover()
-					})	
-					$('.popover-dismiss').popover({
-						trigger: 'hover'
-					})
-					//FIM NICIALIZA O POPOVER NOS ÍCONES 
-
-					$(function () {
-						$('[data-mask]').inputmask()//mascara para os inputs
-					})
+					
 
 					
 					$(document).ready(function(){
-			
+						//Initialize Select2 Elements
+						$('select').not('[name="tabProcAcompCards_length"]').select2({
+							theme: 'bootstrap4',
+							placeholder: 'Selecione...',
+							allowClear: true
+						});
+
+						//INICIALIZA O POPOVER NOS ÍCONES
+						$(function () {
+							$('[data-toggle="popover"]').popover()
+						})	
+						$('.popover-dismiss').popover({
+							trigger: 'hover'
+						})
+						//FIM NICIALIZA O POPOVER NOS ÍCONES 
+
+						$(function () {
+							$('[data-mask]').inputmask()//mascara para os inputs
+						})
+						
+			            window.stepper = new Stepper($('.bs-stepper')[0], {
+							animation: true
+						});
+
+						// Oculta todos os elementos com a classe step-trigger, exceto aquele com o ID infoInicial-trigger
+						$('.step-trigger').not('#aval_testeControle-trigger').hide();
+
+						
+						
+						
+						// Oculta todos os elementos com a classe step-trigger, exceto aquele com o ID aval_testeControle-trigger
+						//$('.step-trigger').not('#aval_testeControle-trigger').hide();
+
+						//Início da validção dos forms do bs-stepper (etapas do cadastro de processo)
+						// Adicionar classe 'is-invalid' a todos os campos
+
+						// Adiciona o método de validação personalizado para múltipla seleção
+						$.validator.addMethod("atLeastOneSelected", function(value, element) {
+							return $(element).find('option:selected').length > 0;
+						}, "Pelo menos uma opção deve ser selecionada.");
+
+						// Adiciona validação aos campos option zero foi selecionado
+						$.validator.addMethod("requiredIfSelectDinamicoZero", function(value, element) {
+							return $('#selectDinamicoPROCESSO_N3').val() != 0 || value !== "";
+						}, "Campo obrigatório se o valor do select dinâmico for Outros.");
+
+						// Função de validação customizada
+						// Função de validação customizada
+						function validateButtonGroups() {
+							var isValid = true;
+
+							if ($("#btn_groupValorRecuperar .active").length === 0) {
+								$("#btn_groupValorRecuperar").addClass("is-invalid").removeClass("is-valid");
+								if ($("#btn_groupValorRecuperar").next("span.error").length === 0) {
+									$("<span class='error invalid-feedback'>Selecione, pelo menos, uma opção.</span>").insertAfter("#btn_groupValorRecuperar");
+								}
+								isValid = false;
+							} else {
+								$("#btn_groupValorRecuperar").removeClass("is-invalid").addClass("is-valid");
+								$("#btn_groupValorRecuperar").next("span.error").remove();
+								$("#pcValorRecuperar-error").remove();
+							}
+
+							if ($("#btn_groupValorRisco .active").length === 0) {
+								$("#btn_groupValorRisco").addClass("is-invalid").removeClass("is-valid");
+								if ($("#btn_groupValorRisco").next("span.error").length === 0) {
+									$("<span class='error invalid-feedback'>Selecione, pelo menos, uma opção.</span>").insertAfter("#btn_groupValorRisco");
+								}
+								isValid = false;
+							} else {
+								$("#btn_groupValorRisco").removeClass("is-invalid").addClass("is-valid");
+								$("#btn_groupValorRisco").next("span.error").remove();
+								$("#pcValorRisco-error").remove();
+							}
+
+							if ($("#btn_groupValorNaoPlanejado .active").length === 0) {
+								$("#btn_groupValorNaoPlanejado").addClass("is-invalid").removeClass("is-valid");
+								if ($("#btn_groupValorNaoPlanejado").next("span.error").length === 0) {
+									$("<span class='error invalid-feedback'>Selecione, pelo menos, uma opção.</span>").insertAfter("#btn_groupValorNaoPlanejado");
+								}
+								isValid = false;
+							} else {
+								$("#btn_groupValorNaoPlanejado").removeClass("is-invalid").addClass("is-valid");
+								$("#btn_groupValorNaoPlanejado").next("span.error").remove();
+								$("#pcValorNaoPlanejado-error").remove();
+							}
+
+							return isValid;
+						}
+
+						// Adicione métodos de validação personalizados para verificar visibilidade e valor não zero
+						$.validator.addMethod("requiredIfVisibleAndNotZero", function(value, element) {
+							if (!$(element).is(":visible")) {
+								return true; // Se o campo não estiver visível, considere-o válido
+							}
+							// Converta o valor para string e verifique se não é zero
+							var stringValue = String(value);
+							var numericValue = parseFloat(stringValue.replace(/[^0-9,-]+/g, '').replace(',', '.'));
+							return numericValue > 0;
+						}, "Campo obrigatório e deve ser maior que zero.");
+
+						// Adicione e remova a classe 'active' quando os botões forem clicados
+						$("#btn_groupValorRecuperar button").on("click", function() {
+							$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+							validateButtonGroups()
+						});
+						$("#btn_groupValorRisco button").on("click", function() {
+							$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+							validateButtonGroups()
+						});
+						$("#btn_groupValorNaoPlanejado button").on("click", function() {
+							$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+							validateButtonGroups()
+						});
+
+						$('#formAval_testeControle').validate({
+							errorPlacement: function(error, element) {
+								error.appendTo(element.closest('.form-group'));
+								$(element).removeClass('is-valid').addClass('is-invalid');
+							},
+							rules: {
+								pcTeste: {
+									required: true,
+									maxlength: 5000
+								},
+								pcControleTestado: {
+									required: true,
+									maxlength: 7500
+								},
+								pcAvaliacaoTipoControle: {
+									required: true,
+									atLeastOneSelected: true
+								},
+								pcAvaliacaoCategoriaControle: {
+									required: true,
+									atLeastOneSelected: true
+								}
+							},
+							messages: {
+								pcTeste: {
+									required: "Campo obrigatório.",
+									maxlength: "O campo deve conter no máximo 5000 caracteres."
+								},
+								pcControleTestado: {
+									required: "Campo obrigatório.",
+									maxlength: "O campo deve conter no máximo 7500 caracteres."
+								},
+								pcAvaliacaoTipoControle: {
+									required: "Campo obrigatório.",
+									atLeastOneSelected: "Selecione pelo menos uma opção."
+								},
+								pcAvaliacaoCategoriaControle: {
+									required: "Campo obrigatório.",
+									atLeastOneSelected: "Selecione pelo menos uma opção."
+								}
+							},
+							errorPlacement: function(error, element) {
+								error.addClass("invalid-feedback");
+								element.closest(".form-group").append(error);
+							},
+							highlight: function(element) {
+								$(element).addClass("is-invalid").removeClass("is-valid");
+							},
+							unhighlight: function(element) {
+								$(element).addClass("is-valid").removeClass("is-invalid");
+								
+							}
+						});
+
+						$('#formAval_item').validate({
+							errorPlacement: function(error, element) {
+								error.appendTo(element.closest('.form-group'));
+								$(element).removeClass('is-valid').addClass('is-invalid');
+							},
+							rules: {
+								pcNumSituacaoEncontrada: {
+									required: true
+								},
+								pcTituloSituacaoEncontrada: {
+									required: true,
+									maxlength: 500
+								},
+								pcSintese: {
+									required: true,
+									maxlength: 7500
+								},
+								pcAvaliacaoRisco: {
+									required: true
+								},
+								pcAvaliacaoRiscoOutrosDesc: {
+									required: true,
+									maxlength: 100,
+									requiredIfSelectDinamicoZero: true
+								},
+								pcTipoClassificacao: {
+									required: true
+								}
+								
+							},
+							messages: {
+								pcNumSituacaoEncontrada: {
+									required: "Campo obrigatório."
+								},
+								pcTituloSituacaoEncontrada: {
+									required: "Campo obrigatório.",
+									maxlength: "O campo deve conter no máximo 500 caracteres."
+								},
+								pcSintese: {
+									required: "Campo obrigatório.",
+									maxlength: "O campo deve conter no máximo 7500 caracteres."
+								},
+								pcAvaliacaoRisco: {
+									required: "Campo obrigatório."
+								},
+								pcAvaliacaoRiscoOutrosDesc: {
+									required: "Campo obrigatório.",
+									maxlength: "O campo deve conter no máximo 100 caracteres.",
+									requiredIfSelectDinamicoZero: "Campo obrigatório."
+								},
+								pcTipoClassificacao: {
+									required: "Campo obrigatório."
+								}
+							},
+							errorPlacement: function(error, element) {
+								error.addClass("invalid-feedback");
+								element.closest(".form-group").append(error);
+							},
+							highlight: function(element) {
+								$(element).addClass("is-invalid").removeClass("is-valid");
+							},
+							unhighlight: function(element) {
+								$(element).addClass("is-valid").removeClass("is-invalid");
+							}
+						});
+
+						$('#formAval_riscoCoso').validate({
+							errorPlacement: function(error, element) {
+								error.appendTo(element.closest('.form-group'));
+								$(element).removeClass('is-valid').addClass('is-invalid');
+							},
+							rules: {
+								selectDinamicoCOMPONENTE: {
+									required: true
+								},
+								selectDinamicoPRINCIPIO: {
+									required: true
+								},
+							},
+							messages: {
+								selectDinamicoCOMPONENTE: {
+									required: "Campo obrigatório."
+								},
+								selectDinamicoPRINCIPIO: {
+									required: "Campo obrigatório."
+								}
+							},
+							errorPlacement: function(error, element) {
+								error.addClass("invalid-feedback");
+								element.closest(".form-group").append(error);
+							},
+							highlight: function(element) {
+								$(element).addClass("is-invalid").removeClass("is-valid");
+							},
+							unhighlight: function(element) {
+								$(element).addClass("is-valid").removeClass("is-invalid");
+							}
+						});
+
+						// Inicializa a validação do formulário
+						$('#formAval_valorEstimado').validate({
+							rules: {
+								pcValorRecuperar: {
+									requiredIfVisibleAndNotZero: true
+								},
+								pcValorRisco: {
+									requiredIfVisibleAndNotZero: true
+								},
+								pcValorNaoPlanejado: {
+									requiredIfVisibleAndNotZero: true
+								}
+							},
+							messages: {
+								pcValorRecuperar: {
+									requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
+								},
+								pcValorRisco: {
+									requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
+								},
+								pcValorNaoPlanejado: {
+									requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
+								}
+							},
+							errorPlacement: function(error, element) {
+								error.addClass("invalid-feedback");
+								element.closest(".form-group").append(error);
+							},
+							highlight: function(element) {
+								$(element).addClass("is-invalid").removeClass("is-valid");
+							},
+							unhighlight: function(element) {
+								$(element).addClass("is-valid").removeClass("is-invalid");
+							}
+						});
+					
+
+						$('#formAval_criteriosReferencias').validate({
+							errorPlacement: function(error, element) {
+								error.appendTo(element.closest('.form-group'));
+								$(element).removeClass('is-valid').addClass('is-invalid');
+							},
+							rules: {
+								pcCriterioRef: {
+									required: true
+								},
+								pcCriterioRefOutrosDesc: {
+									required: true,
+									maxlength: 500,
+									requiredIfSelectDinamicoZero: true
+								}
+							},
+							messages: {
+								pcCriterioRef: {
+									required: "Campo obrigatório."
+								},
+								pcCriterioRefOutrosDesc: {
+									required: "Campo obrigatório.",
+									maxlength: "O campo deve conter no máximo 500 caracteres.",
+									requiredIfSelectDinamicoZero: "Campo obrigatório."
+								}
+							},
+							errorPlacement: function(error, element) {
+								error.addClass("invalid-feedback");
+								element.closest(".form-group").append(error);
+							},
+							highlight: function(element) {
+								$(element).addClass("is-invalid").removeClass("is-valid");
+							},
+							unhighlight: function(element) {
+								$(element).addClass("is-valid").removeClass("is-invalid");
+							}
+						});
+							
+
+
+						// Inicializar validação ao clicar no botão Próximo do primeiro passo
+						window.inicializarValidacaoStep1 = function() {
+							
+							 if ($("#formAval_testeControle").valid()) {
+								// Ir para o próximo passo
+								stepper.next();
+								$('#aval_item-trigger').show();
+								// Adiciona a animação bounce ao elemento
+								$('#aval_item-trigger').addClass('animate__animated animate__bounce');
+							}
+						};
+
+						// Inicializar validação ao clicar no botão Próximo do segundo passo
+						window.inicializarValidacaoStep2 = function() {
+							if ($("#formAval_item").valid()) {
+								// Ir para o próximo passo
+								stepper.next();
+								$('#aval_riscoCoso-trigger').show();
+								// Adiciona a animação bounce ao elemento
+								$('#aval_riscoCoso-trigger').addClass('animate__animated animate__bounce');
+							}
+						};
+
+						// Inicializar validação ao clicar no botão Próximo do terceiro passo
+						window.inicializarValidacaoStep3 = function() {
+							if ($("#formAval_riscoCoso").valid()) {
+								// Ir para o próximo passo
+								stepper.next();
+								$('#aval_valorEstimado-trigger').show();
+								// Adiciona a animação bounce ao elemento
+								$('#aval_valorEstimado-trigger').addClass('animate__animated animate__bounce');
+							}
+						};
+
 						// Define os níveis de dados e nomes dos labels
 						let dataLevels = ['COMPONENTE', 'PRINCIPIO'];
 						let labelNames = ['Componente', 'Princípio'];
 						initializeSelectsAjax('#dados-container-coso', dataLevels, 'ID', labelNames, 'idCoso',[],'cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso');
 
+						// Inicializar validação ao clicar no botão Próximo do quarto passo
+						window.inicializarValidacaoStep4 = function() {
+							if ($("#formAval_valorEstimado").valid() && validateButtonGroups()) {
+								// Ir para o próximo passo
+								stepper.next();
+								$('#aval_criteriosReferencias-trigger').show();
+								// Adiciona a animação bounce ao elemento
+								$('#aval_criteriosReferencias-trigger').addClass('animate__animated animate__bounce');
+							}
+						};
 
-						// se for seleciobnado outros em pcAvaliacaoRisco, exibe o campo de descrição
+						// Inicializar validação ao clicar no botão Próximo do quinto passo
+						window.inicializarValidacaoStep5 = function() {
+							if ($("#formAval_criteriosReferencias").valid()) {
+								// Ir para o próximo passo
+								stepper.next();
+								$('#finalizar-trigger').show();
+								$('#finalizar-trigger').addClass('animate__animated animate__bounce');
+								$('#infoValidas').attr("hidden",false);
+								$('#infoInvalidas').attr("hidden",true);
+								$('#btSalvar').attr("hidden",false);
+							}else{
+								$('#infoValidas').attr("hidden",true);
+								$('#infoInvalidas').attr("hidden",false);
+								$('#btSalvar').attr("hidden",true);
+							}
+						};
+
+
+
+						
+
+						
+
+
+
+						// Adiciona manipuladores de eventos de mudança para os campos select2
+						$('select').on('change.select2', function() {
+							var $this = $(this);
+							if ($this.val()) {
+								$this.removeClass('is-invalid').addClass('is-valid');
+								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+								
+							}
+						});
+
+						
+						// Aplicar validação aos selects cujo id contenha selectDinamico
+						$('select[id*="selectDinamico"]').each(function() {
+							$(this).rules('add', {
+								required: true,
+								messages: {
+									required: '<span style="color:red;font-size:10px">Este campo é obrigatório.</span>'
+								}
+							});
+						});
+
+						// Delegação de eventos para selects dinâmicos
+						$(document).on('change', 'select[id*="selectDinamico"]', function() {
+							var $this = $(this);
+							if ($this.val()) {
+								$this.removeClass('is-invalid').addClass('is-valid');
+								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+							} else {
+								$this.removeClass('is-valid').addClass('is-invalid');
+								$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+							}
+						});
+
+						
+						
+						
+
+
+						// se for selecionado outros em pcAvaliacaoRisco, exibe o campo de descrição
 						$(document).on('change', '#pcAvaliacaoRisco', function() {
 							var $this = $(this);
 							// Verifica se alguma das opções selecionadas tem o valor 0
@@ -879,16 +1573,6 @@
 
 							
 
-							// // Update the total progress bar
-							// myDropzoneRelatorio.on("totaluploadprogress", function(progress) {
-							// 	document.querySelector(".progress-bar").style.width = progress + "%"
-							// })
-
-							// myDropzoneRelatorio.on("sending", function(file) {
-							// 	$('#modalOverlay').modal('show')
-							// })
-
-
 
 							// Hide the total progress bar when nothing's uploading anymore
 							myDropzoneRelatorio.on("queuecomplete", function(progress) {
@@ -906,8 +1590,8 @@
 						}
 
 
-						$('#btn-groupValorRecuperar .btn').click(function() {
-							$('#btn-groupValorRecuperar .btn').removeClass('active');
+						$('#btn_groupValorRecuperar .btn').click(function() {
+							$('#btn_groupValorRecuperar .btn').removeClass('active');
 							$(this).addClass('active');
 							
 							var selectedValue = $(this).attr('id');
@@ -927,8 +1611,8 @@
 							}
 						});
 
-						$('#btn-groupValorRisco .btn').click(function() {
-							$('#btn-groupValorRisco .btn').removeClass('active');
+						$('#btn_groupValorRisco .btn').click(function() {
+							$('#btn_groupValorRisco .btn').removeClass('active');
 							$(this).addClass('active');
 
 							var selectedValue = $(this).attr('id');
@@ -948,8 +1632,8 @@
 							}
 						});
 
-						$('#btn-groupValorNaoPlanejado .btn').click(function() {
-							$('#btn-groupValorNaoPlanejado .btn').removeClass('active');
+						$('#btn_groupValorNaoPlanejado .btn').click(function() {
+							$('#btn_groupValorNaoPlanejado .btn').removeClass('active');
 							$(this).addClass('active');
 
 							var selectedValue = $(this).attr('id');
@@ -969,8 +1653,32 @@
 							}
 						});
 
+						
+
 						exibirTabAvaliacoes();
+
+						
+
+						//preenche todos os campos com dados fictícios
+						// $('#pcTeste').val('Teste de controle de qualidade do processo de avaliação de riscos.');
+						// $('#pcControleTestado').val('Controle de qualidade do processo de avaliação de riscos.');
+						// $('#pcAvaliacaoTipoControle').val('1').trigger('change');
+						// $('#pcAvaliacaoCategoriaControle').val('1').trigger('change');
+						// $('#pcNumSituacaoEncontrada').val('1');
+						// $('#pcTituloSituacaoEncontrada').val('Título da situação encontrada.');
+						// $('#pcSintese').val('Síntese do ponto (achado) identificado.');
+						// $('#pcAvaliacaoRisco').val('1').trigger('change');
+						// $('#pcTipoClassificacao').val('G').trigger('change');
+						// //selects dinamicos
+						// //popula o select dinâmico do COSO
+						// var pc_aval_coso_id = 1;
+						// let dataLevels2 = ['COMPONENTE', 'PRINCIPIO'];
+						// let labelNames2 = ['Componente', 'Princípio'];
+						// initializeSelectsAjax('#dados-container-coso', dataLevels2, 'ID', labelNames2, 'idCoso',[],'cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso');
+						// populateSelectsFromIDAjax('cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso',pc_aval_coso_id, dataLevels2,'idCoso');
 					});
+
+					 
 
 					function mostraRelatorioPDF(){
 						<cfoutput>
@@ -1033,18 +1741,18 @@
 
 						$('#btn-quantificado-recuperar').removeClass('btn-primary').addClass('btn-light');
 						$('#btn-nao-aplica-recuperar').removeClass('btn-dark').addClass('btn-light');
-						$('#btn-groupValorRecuperar .btn').removeClass('active');
+						$('#btn_groupValorRecuperar .btn').removeClass('active');
 						$('#pcValorRecuperar').hide();
 						
 
 						$('#btn-quantificado-risco').removeClass('btn-primary').addClass('btn-light');
 						$('#btn-nao-aplica-risco').removeClass('btn-dark').addClass('btn-light');
-						$('#btn-groupValorRisco .btn').removeClass('active');
+						$('#btn_groupValorRisco .btn').removeClass('active');
 						$('#pcValorRisco').hide();
 
 						$('#btn-quantificado-NaoPlanejado').removeClass('btn-primary').addClass('btn-light');
 						$('#btn-nao-aplica-NaoPlanejado').removeClass('btn-dark').addClass('btn-light');
-						$('#btn-groupValorNaoPlanejado .btn').removeClass('active');
+						$('#btn_groupValorNaoPlanejado .btn').removeClass('active');
 						$('#pcValorNaoPlanejado').hide();
 						//fim ações para os controles dos valores estimados
 
@@ -1716,8 +2424,12 @@
 				event.preventDefault()
 				event.stopPropagation()
                 resetFormFields();
+				$('.step-trigger').show();
+				//incializa no primeiro step
+				stepper.to(1);
 
                 let pc_aval_id = $(linha).closest("tr").children("td:nth-child(7)").text();
+
 
 				$('#modalOverlay').modal('show')	
 				setTimeout(function() {
@@ -1818,7 +2530,11 @@
 								}
 							
 												
-								$('#cabecalhoAccordion').text("Editar o item:" + ' ' + pcNumSituacaoEncontrada);
+								$('#cabecalhoAccordion').text("Editar o item N°:" + ' ' + pcNumSituacaoEncontrada);
+								$('#infoTipoCadastro').text("Editando o Item N°:" + ' ' + pcNumSituacaoEncontrada);
+								$('#mensagemFinalizar').html('<h5>Clique no botão "Salvar" para <span style="color: green;font-size: 1.5rem">EDITAR</span> o Item'  + ' <span style="color: green;font-size: 1.5rem"><strong>' + pcNumSituacaoEncontrada + '</strong></span></h5>');
+								$("#btSalvar").attr("hidden",false);
+								$("#mensagemSalvar").attr("hidden",false);
 									
 								$('#cadastro').CardWidget('expand')
 								$('html, body').animate({ scrollTop: ($('#cadastro').offset().top - 80)} , 500);
@@ -1937,56 +2653,54 @@
 		<cfargument name="pc_aval_id" type="numeric" required="true" />
 		<cfargument name="pc_aval_processo" type="string" required="true" />
 
-		<cfquery datasource="#application.dsn_processos#" name="rsAnexoAvaliacao">
-			SELECT pc_anexos.pc_anexo_avaliacao_id FROM pc_anexos WHERE pc_anexo_avaliacao_id = #arguments.pc_aval_id# 
-		</cfquery> 
-
-		<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
-			SELECT pc_avaliacao_melhorias.pc_aval_melhoria_num_aval FROM pc_avaliacao_melhorias WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id#
-		</cfquery>
-
-		<cfquery datasource="#application.dsn_processos#" >
-			DELETE FROM pc_validacoes_chat
-			WHERE pc_validacao_chat_num_aval= '#arguments.pc_aval_id#'
-		</cfquery>
-
-		<cfquery datasource="#application.dsn_processos#" >
-			DELETE FROM pc_avaliacao_categoriasControles
-			WHERE pc_aval_id= '#arguments.pc_aval_id#'
-		</cfquery>
-
-		<cfquery datasource="#application.dsn_processos#" >
-			DELETE FROM pc_avaliacao_tiposControles
-			WHERE pc_aval_id= '#arguments.pc_aval_id#'
-		</cfquery>
-
-		<cfquery datasource="#application.dsn_processos#" >
-			DELETE FROM pc_avaliacao_riscos
-			WHERE pc_aval_id= '#arguments.pc_aval_id#'
-		</cfquery>
-
-		<cfif #rsAnexoAvaliacao.RecordCount# eq 0 && #rsMelhorias.RecordCount# eq 0>
-			<cfquery datasource="#application.dsn_processos#" >
-				DELETE FROM pc_avaliacoes
-				WHERE pc_aval_id= '#arguments.pc_aval_id#'
+		<cftransaction>
+			<cfquery datasource="#application.dsn_processos#" name="rsAnexoAvaliacao">
+				SELECT pc_anexos.pc_anexo_avaliacao_id FROM pc_anexos WHERE pc_anexo_avaliacao_id = #arguments.pc_aval_id# 
 			</cfquery> 
-		</cfif>
 
+			<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
+				SELECT pc_avaliacao_melhorias.pc_aval_melhoria_num_aval FROM pc_avaliacao_melhorias WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id#
+			</cfquery>
 
-
-		<cfquery datasource="#application.dsn_processos#" name="rsAvaliacoes">
-			SELECT pc_avaliacoes.pc_aval_id FROM pc_avaliacoes WHERE pc_aval_processo = '#arguments.pc_aval_processo#'
-		</cfquery>
-
-
-
-		<cfif #rsAvaliacoes.recordCount#  eq 0>
 			<cfquery datasource="#application.dsn_processos#" >
-				UPDATE pc_processos
-				SET pc_num_status = 2
-				WHERE  pc_processo_id = '#arguments.pc_aval_processo#'
-			</cfquery> 	
-		</cfif>
+				DELETE FROM pc_validacoes_chat
+				WHERE pc_validacao_chat_num_aval= '#arguments.pc_aval_id#'
+			</cfquery>
+
+			<cfquery datasource="#application.dsn_processos#" >
+				DELETE FROM pc_avaliacao_categoriasControles
+				WHERE pc_aval_id= '#arguments.pc_aval_id#'
+			</cfquery>
+
+			<cfquery datasource="#application.dsn_processos#" >
+				DELETE FROM pc_avaliacao_tiposControles
+				WHERE pc_aval_id= '#arguments.pc_aval_id#'
+			</cfquery>
+
+			<cfquery datasource="#application.dsn_processos#" >
+				DELETE FROM pc_avaliacao_riscos
+				WHERE pc_aval_id= '#arguments.pc_aval_id#'
+			</cfquery>
+
+			<cfif #rsAnexoAvaliacao.RecordCount# eq 0 && #rsMelhorias.RecordCount# eq 0>
+				<cfquery datasource="#application.dsn_processos#" >
+					DELETE FROM pc_avaliacoes
+					WHERE pc_aval_id= '#arguments.pc_aval_id#'
+				</cfquery> 
+			</cfif>
+
+			<cfquery datasource="#application.dsn_processos#" name="rsAvaliacoes">
+				SELECT pc_avaliacoes.pc_aval_id FROM pc_avaliacoes WHERE pc_aval_processo = '#arguments.pc_aval_processo#'
+			</cfquery>
+
+			<cfif #rsAvaliacoes.recordCount#  eq 0>
+				<cfquery datasource="#application.dsn_processos#" >
+					UPDATE pc_processos
+					SET pc_num_status = 2
+					WHERE  pc_processo_id = '#arguments.pc_aval_processo#'
+				</cfquery> 	
+			</cfif>
+		</cftransaction>
 	</cffunction>
 
 

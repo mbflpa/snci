@@ -151,6 +151,10 @@
 						padding-right:0.75rem !important;
 					}
 
+					.was-validated .form-control:invalid, .form-control.is-invalid, .form-control:valid, .form-control.is-valid {
+						background-image: none !important;
+					}
+
 					
 
 					.cardBodyStepper {
@@ -158,6 +162,8 @@
 							border-radius: 0.5rem;
 							box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.05);
 					}
+
+
 
 
 
@@ -846,7 +852,7 @@
 						$("#formInfoEstrategicas").validate({
 							rules: {
 								pcObjetivoEstrategico: {
-									atLeastOne: true
+									atLeastOne: true // Adiciona regra de validação customizada
 								},
 								pcRiscoEstrategico: {
 									atLeastOne: true
@@ -1062,7 +1068,10 @@
 								$('#finalizar-trigger').addClass('animate__animated animate__bounce');
 								$('#infoValidas').attr("hidden",false);
 								$('#infoInvalidas').attr("hidden",true);
-								
+								//se infoTipoCadastro não iniciar o texto com visualizando
+								if($('#infoTipoCadastro').text().indexOf('Visualizando') == -1){
+									$('#btSalvar').attr("hidden",false);
+								}
 							}else{
 								$('#infoValidas').attr("hidden",true);
 								$('#infoInvalidas').attr("hidden",false);

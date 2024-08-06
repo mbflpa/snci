@@ -284,3 +284,16 @@ td{
     -webkit-line-clamp: 6!important; /* Número de linhas que você quer exibir antes das reticências */
     line-height: 1.1;
 }
+
+.invalid-feedback {
+    color: #dc3545 !important;
+    background-image: none !important;
+}
+
+.is-valid {
+    background-image: none !important;
+}
+
+.is-invalid {
+    background-image: none !important;
+}
