@@ -929,6 +929,15 @@
 							}
 						});
 
+						// Adiciona manipuladores de eventos para validar os campos
+						$('textarea, input, select').on('change blur keyup', function() {
+							var $this = $(this);
+							if ($this.val()) {
+								$this.removeClass('is-invalid').addClass('is-valid');
+								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+							}
+						});
+
 						
 						// Aplicar validação aos selects cujo id contenha selectDinamico
 						$('select[id*="selectDinamico"]').each(function() {
@@ -1110,11 +1119,6 @@
 							}
 						});
 				
-
-						
-							
-						
-
 
 						// Fim código validação dos inputs: pcNumSEI e pcNumRelatorio
 
@@ -2023,7 +2027,7 @@
 																									<!-- small card -->
 																									<div class="small-box " style="<cfoutput>#pc_status_card_style_header#</cfoutput> font-weight: normal;">
 																										<cfif #pc_iniciarBloqueado# eq "S">
-																									  	  <i id="btBloquear" class="fas fa-lock grow-icon" style="position:absolute;color: red;left: 2px;top:2px;z-index:1" data-toggle="popover" data-trigger="hover" data-placement="top" title="Processo Bloqueado" data-content="Após validação dos itens, não será encaminhado ao órgão avaliado e órgãos responsáveis."></i>
+																									  	  <i id="btBloquear" class="fas fa-lock grow-icon" style="position:absolute;color: red;left: 2px;top:2px;z-index:1" data-toggle="popover" data-trigger="hover" data-placement="top" title="Processo Bloqueado" data-content="O encaminhamento ao órgão avaliado só ocorrerá após o seu desbloqueio."></i>
 																										</cfif>	
 																										<cfif #pc_modalidade# eq "A">
 																											<span style="font-size:1em;color:#fff;position:relative;float:right;margin-right:10px;"><strong>A</strong></span>
@@ -2216,17 +2220,17 @@
 					
 					$('#pcModalidade').val(modalidade).trigger('change');
 
-					$('#pcNumSEI').val(sei);
-					$('#pcProcessoId').val(processoId);			
+					$('#pcNumSEI').val(sei).trigger('change');
+					$('#pcProcessoId').val(processoId).trigger('change');			
 					$('#pcTipoClassificacao').val(classificacao).trigger('change');
-					$('#pcNumRelatorio').val(relSei);
+					$('#pcNumRelatorio').val(relSei).trigger('change');
 					$('#pcOrigem').val(orgaoOrigem).trigger('change');
-					$('#pcDataInicioAvaliacao').val(dataInicio);
-					$('#pcDataInicioAvaliacaoAnterior').val(dataInicio);
-					$('#pcDataFimAvaliacao').val(dataFim);
+					$('#pcDataInicioAvaliacao').val(dataInicio).trigger('change');
+					$('#pcDataInicioAvaliacaoAnterior').val(dataInicio).trigger('change');
+					$('#pcDataFimAvaliacao').val(dataFim).trigger('change');
 
 					$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
-					$('#pcOrgaoAvaliadoAnterior').val(orgaoAvaliado);
+					$('#pcOrgaoAvaliadoAnterior').val(orgaoAvaliado).trigger('change');
 					$( "#pcProcessoId" ).focus();	
 					
 					if(coordenador==''){
@@ -2350,13 +2354,13 @@
 					
 					$('#pcModalidade').val(modalidade).trigger('change');
 
-					$('#pcNumSEI').val(sei);
-					$('#pcProcessoId').val(processoId);			
+					$('#pcNumSEI').val(sei).trigger('change');
+					$('#pcProcessoId').val(processoId).trigger('change');			
 					$('#pcTipoClassificacao').val(classificacao).trigger('change');
-					$('#pcNumRelatorio').val(relSei);
+					$('#pcNumRelatorio').val(relSei).trigger('change');
 					$('#pcOrigem').val(orgaoOrigem).trigger('change');
-					$('#pcDataInicioAvaliacao').val(dataInicio);
-					$('#pcDataFimAvaliacao').val(dataFim);
+					$('#pcDataInicioAvaliacao').val(dataInicio).trigger('change');
+					$('#pcDataFimAvaliacao').val(dataFim).trigger('change');
 					$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 
 					$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
@@ -2671,7 +2675,7 @@
 											<td>
 												#pc_processo_id#
 												<cfif #pc_iniciarBloqueado# eq "S">
-													<i id="btBloquear" class="fas fa-lock grow-icon" style="color:##000;left: 2px;z-index:1" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Processo Bloqueado" data-content="Após validação dos itens, não será encaminhado ao órgão avaliado e órgãos responsáveis."></i>
+													<i id="btBloquear" class="fas fa-lock grow-icon" style="color:##000;left: 2px;z-index:1" data-toggle="popover" data-trigger="hover" data-placement="bottom" title="Processo Bloqueado" data-content="O encaminhamento ao órgão avaliado só ocorrerá após o seu desbloqueio."></i>
 												</cfif>
 											</td>
 											<td>#seOrgAvaliado#</td>

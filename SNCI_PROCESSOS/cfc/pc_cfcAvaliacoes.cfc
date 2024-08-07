@@ -91,7 +91,7 @@
 																									<!-- small card -->
 																									<div class="small-box " style="<cfoutput>#pc_status_card_style_header#</cfoutput> font-weight: normal;">
 																										<cfif #pc_iniciarBloqueado# eq "S">
-																									  	  <i id="btBloquear" class="fas fa-lock grow-icon" style="position:absolute;color: red;left: 2px;top:2px;z-index:1;cursor: default" title="Processo Bloqueado: após validação dos itens, não será encaminhado ao órgão avaliado e órgãos responsáveis."></i>
+																									  	  <i id="btBloquear" class="fas fa-lock grow-icon" style="position:absolute;color: red;left: 2px;top:2px;z-index:1;cursor: default" data-toggle="popover" data-trigger="hover" data-placement="top" title="Processo Bloqueado" data-content="O encaminhamento ao órgão avaliado só ocorrerá após o seu desbloqueio."></i>
 																										</cfif>	
 																										<cfif #pc_modalidade# eq "A">
 																											<span style="font-size:1em;color:#fff;position:relative;float:right;margin-right:10px;"><strong>A</strong></span>
@@ -210,6 +210,13 @@
 				
 						
 			}
+
+			$(function () {
+				$('[data-toggle="popover"]').popover()
+			})	
+			$('.popover-dismiss').popover({
+				trigger: 'hover'
+			})
 
 
 
@@ -488,7 +495,14 @@
 					.small-input{
 						width: 70px !important;
 					}
+					
+					.btnValorNaoSeAplica{
+						border-radius: 25px 0 0 25px !important;
+					}
 
+					.btnValorQuantificado{
+						border-radius: 0 25px 25px 0 !important;
+					}
 					
 
 					
@@ -613,401 +627,402 @@
 
 				</form><!-- fim formCadAvaliacao -->
 				   
-					<input id="pcProcessoId" value="<cfoutput>#rsProcForm.pc_processo_id#</cfoutput>" hidden>
+				<input id="pcProcessoId" value="<cfoutput>#rsProcForm.pc_processo_id#</cfoutput>" hidden>
 
-					<div id="accordion" >
-						<div  id="cadastro" class="card card-primary collapsed-card"  style="margin-left:8px;">
-							<div class="card-header" style="background-color: #0083ca;color:#fff;">
-								<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
-									<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-									</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (1° Passo)</span>
-								</a>
-							</div>
+				<div id="accordion"  style="display: flex; justify-content: center;">
+					<div  id="cadastro" class="card card-primary collapsed-card"  style="width:95%">
+						<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+							<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
+								<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
+								</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (1° Passo)</span>
+							</a>
+						</div>
 
-							<input id="pc_aval_id" hidden>
-							<div class="card-body" style="border: solid 3px #0083ca;" >
-						    
-								<div class="card card-default">
-									<div class="card-body p-0">
-										
-										<h6  class="font-weight-light text-center" style="top:-15px;font-size:20px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
-											<span id="infoTipoCadastro" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Novo Item</span>
-										</h6>
-										<div class="bs-stepper" >
-											<div class="bs-stepper-header" role="tablist" >
-												<div class="step" data-target="#aval_testeControle">
-													<button type="button" class="step-trigger animate__animated animate__bounce" role="tab" aria-controls="aval_testeControle" id="aval_testeControle-trigger">
-														<span class="bs-stepper-circle">1</span>
-														<span class="bs-stepper-label " id="aval_testeControleLabel">Teste / Controle</span>
-													</button>
-												</div>
-
-												<div class="line"></div>
-
-												<div class="step" data-target="#aval_item">
-													<button type="button" class="step-trigger" role="tab" aria-controls="aval_item" id="aval_item-trigger">
-														<span class="bs-stepper-circle">2</span>
-														<span class="bs-stepper-label" id="aval_itemLabel">Item</span>
-													</button>
-												</div>
-
-												<div class="line"></div>
-
-												<div class="step" data-target="#aval_riscoCoso">
-													<button type="button" class="step-trigger" role="tab" aria-controls="aval_riscoCoso" id="aval_riscoCoso-trigger">
-														<span class="bs-stepper-circle">3</span>
-														<span class="bs-stepper-label" id="aval_riscoCosoLabel">Coso 2013</span>
-													</button>
-												</div>
-
-
-												<div class="line"></div>
-
-												<div class="step" data-target="#aval_valorEstimado">
-													<button type="button" class="step-trigger" role="tab" aria-controls="aval_valorEstimado" id="aval_valorEstimado-trigger">
-														<span class="bs-stepper-circle">4</span>
-														<span class="bs-stepper-label" id="aval_valorEstimadoLabel">Valor Estimado</span>
-													</button>
-												</div>
-
-												<div class="line"></div>
-
-												<div class="step" data-target="#aval_criteriosReferencias">
-													<button type="button" class="step-trigger" role="tab" aria-controls="aval_criteriosReferencias" id="aval_criteriosReferencias-trigger">
-														<span class="bs-stepper-circle">5</span>
-														<span class="bs-stepper-label" id="aval_criteriosReferenciasLabel">Critérios / Referências</span>
-													</button>
-												</div>
-
-												<div class="line"></div>
-
-												<div class="step" data-target="#Finalizar">
-													<button type="button" class="step-trigger" role="tab" aria-controls="finalizar" id="finalizar-trigger">
-														<span class="bs-stepper-circle">6</span>
-														<span class="bs-stepper-label" id="finalizarLabelLabel">Finalizar</span>
-													</button>
-												</div>
-
-												
-
+						<input id="pc_aval_id" hidden>
+						<div class="card-body" style="border: solid 3px #0083ca;" >
+						
+							<div class="card card-default">
+								<div class="card-body p-0">
+									
+									<h6  class="font-weight-light text-center" style="top:-15px;font-size:20px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+										<span id="infoTipoCadastro" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Novo Item</span>
+									</h6>
+									<div class="bs-stepper" >
+										<div class="bs-stepper-header" role="tablist" >
+											<div class="step" data-target="#aval_testeControle">
+												<button type="button" class="step-trigger animate__animated animate__bounce" role="tab" aria-controls="aval_testeControle" id="aval_testeControle-trigger">
+													<span class="bs-stepper-circle">1</span>
+													<span class="bs-stepper-label " id="aval_testeControleLabel">Teste / Controle</span>
+												</button>
 											</div>
-										
-											<div class="bs-stepper-content">
-												<form   id="formAval_testeControle" name="formAval_testeControle"   onsubmit="return false" novalidate>
-													<div id="aval_testeControle" class="content " role="tabpanel" aria-labelledby="aval_testeControle-trigger" >
-														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
-															<div class="row  " >
-																<div class="col-sm-12">
-																	<div class="form-group">
-																		<label for="pcTeste" >Teste (Pergunta do Plano):</label>
-																		<textarea id="pcTeste" required name="pcTeste" class="form-control" rows="2"  inputmode="text" placeholder="Informe o teste realizado (pergunta do plano)..."></textarea>
-																		<span id="pcTesteCounter" class="badge badge-secondary"></span>
-																	</div>
+
+											<div class="line"></div>
+
+											<div class="step" data-target="#aval_item">
+												<button type="button" class="step-trigger" role="tab" aria-controls="aval_item" id="aval_item-trigger">
+													<span class="bs-stepper-circle">2</span>
+													<span class="bs-stepper-label" id="aval_itemLabel">Item</span>
+												</button>
+											</div>
+
+											<div class="line"></div>
+
+											<div class="step" data-target="#aval_riscoCoso">
+												<button type="button" class="step-trigger" role="tab" aria-controls="aval_riscoCoso" id="aval_riscoCoso-trigger">
+													<span class="bs-stepper-circle">3</span>
+													<span class="bs-stepper-label" id="aval_riscoCosoLabel">Coso 2013</span>
+												</button>
+											</div>
+
+
+											<div class="line"></div>
+
+											<div class="step" data-target="#aval_valorEstimado">
+												<button type="button" class="step-trigger" role="tab" aria-controls="aval_valorEstimado" id="aval_valorEstimado-trigger">
+													<span class="bs-stepper-circle">4</span>
+													<span class="bs-stepper-label" id="aval_valorEstimadoLabel">Valor Estimado</span>
+												</button>
+											</div>
+
+											<div class="line"></div>
+
+											<div class="step" data-target="#aval_criteriosReferencias">
+												<button type="button" class="step-trigger" role="tab" aria-controls="aval_criteriosReferencias" id="aval_criteriosReferencias-trigger">
+													<span class="bs-stepper-circle">5</span>
+													<span class="bs-stepper-label" id="aval_criteriosReferenciasLabel">Critérios / Referências</span>
+												</button>
+											</div>
+
+											<div class="line"></div>
+
+											<div class="step" data-target="#Finalizar">
+												<button type="button" class="step-trigger" role="tab" aria-controls="finalizar" id="finalizar-trigger">
+													<span class="bs-stepper-circle">6</span>
+													<span class="bs-stepper-label" id="finalizarLabelLabel">Finalizar</span>
+												</button>
+											</div>
+
+											
+
+										</div>
+									
+										<div class="bs-stepper-content">
+											<form   id="formAval_testeControle" name="formAval_testeControle"   onsubmit="return false" novalidate>
+												<div id="aval_testeControle" class="content " role="tabpanel" aria-labelledby="aval_testeControle-trigger" >
+													<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+														<div class="row  " >
+															<div class="col-sm-12">
+																<div class="form-group">
+																	<label for="pcTeste" >Teste (Pergunta do Plano):</label>
+																	<textarea id="pcTeste" name="pcTeste" class="form-control" rows="2"  inputmode="text" placeholder="Informe o teste realizado (pergunta do plano)..."></textarea>
+																	<span id="pcTesteCounter" class="badge badge-secondary"></span>
 																</div>
+															</div>
 
-																
+															
 
-																
-																<div class="col-sm-12">
-																	<div class="form-group">
-																		<label for="pcControleTestado" >Controle Testado:</label>
-																		<textarea id="pcControleTestado" required name="pcControleTestado" class="form-control" rows="2"  inputmode="text" placeholder="Informe o controle testado..."></textarea>
-																		<span id="pcControleTestadoCounter" class="badge badge-secondary"></span>
-																	</div>
-																</div>	
-
-																<div class="col-sm-6">
-																	<div class="form-group">
-																		<label for="pcAvaliacaoTipoControle" >Tipo de Controle:</label>
-																		<select id="pcAvaliacaoTipoControle" name="pcAvaliacaoTipoControle" required class="form-control" multiple="multiple" placeholder="Selecione...">
-																			<cfoutput query="rsAvaliacaoTipoControle">
-																				<option value="#pc_aval_tipoControle_id#">#pc_aval_tipoControle_descricao#</option>
-																			</cfoutput>
-																		</select>
-																	</div>
+															
+															<div class="col-sm-12">
+																<div class="form-group">
+																	<label for="pcControleTestado" >Controle Testado:</label>
+																	<textarea id="pcControleTestado" name="pcControleTestado" class="form-control" rows="2"  inputmode="text" placeholder="Informe o controle testado..."></textarea>
+																	<span id="pcControleTestadoCounter" class="badge badge-secondary"></span>
 																</div>
+															</div>	
 
-																<div class="col-sm-6">
-																	<div class="form-group">
-																		<label for="pcAvaliacaoCategoriaControle" >Categoria do Controle Testado:</label>
-																		<select id="pcAvaliacaoCategoriaControle" name="pcAvaliacaoCategoriaControle" required class="form-control" multiple="multiple">
-																			<cfoutput query="rsAvaliacaoCategoriaControle">
-																				<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
-																			</cfoutput>
-																		</select>
-																	</div>
+															<div class="col-sm-6">
+																<div class="form-group">
+																	<label for="pcAvaliacaoTipoControle" >Tipo de Controle:</label>
+																	<select id="pcAvaliacaoTipoControle" name="pcAvaliacaoTipoControle" class="form-control" multiple="multiple" placeholder="Selecione...">
+																		<cfoutput query="rsAvaliacaoTipoControle">
+																			<option value="#pc_aval_tipoControle_id#">#pc_aval_tipoControle_descricao#</option>
+																		</cfoutput>
+																	</select>
 																</div>
+															</div>
+
+															<div class="col-sm-6">
+																<div class="form-group">
+																	<label for="pcAvaliacaoCategoriaControle" >Categoria do Controle Testado:</label>
+																	<select id="pcAvaliacaoCategoriaControle" name="pcAvaliacaoCategoriaControle" class="form-control" multiple="multiple">
+																		<cfoutput query="rsAvaliacaoCategoriaControle">
+																			<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
+																		</cfoutput>
+																	</select>
+																</div>
+															</div>
 
 
+														</div>
+													</div>
+													<div style="margin-top:10px;display:flex;justify-content:space-between">
+														<button class="btn btn-primary" onclick="inicializarValidacaoStep1();" >Próximo</button>
+														<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+													</div>
+												</div>
+											</form>
+
+											<form   id="formAval_item" name="formAval_item"   onsubmit="return false" novalidate>
+												<div id="aval_item" class="content" role="tabpanel" aria-labelledby="aval_item-trigger">
+													<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+														<div class="row  " >
+															<div class="col-sm-1">
+																<div class="form-group">
+																	<label for="pcNumSituacaoEncontrada" >N°:</label>
+																	<input id="pcNumSituacaoEncontrada"  name="pcNumSituacaoEncontrada" type="text" class="form-control small-input"  inputmode="text" >													
+																</div>
+															</div>
+															
+															<div class="col-sm-11">
+																<div class="form-group">
+																	<label for="pcTituloSituacaoEncontrada" >Título da Situação Encontrada:</label>
+																	<textarea id="pcTituloSituacaoEncontrada" name="pcTituloSituacaoEncontrada" class="form-control" rows="1"  inputmode="text" placeholder="Informe o título da situação encontrada..."></textarea>
+																	<span id="pcTituloSituacaoEncontradaCounter" class="badge badge-secondary"></span>
+																</div>
+															</div>
+
+															<div class="col-sm-12">
+																<div class="form-group">
+																	<label for="pcSintese" >Síntese:</label>
+																	<textarea id="pcSintese" name="pcSintese" class="form-control" rows="2"  inputmode="text" placeholder="Informe a síntese do ponto (achado)..."></textarea>
+																	<span id="pcSinteseCounter" class="badge badge-secondary"></span>
+																</div>
+															</div>	
+
+															<div class="col-sm-12">
+																<div class="form-group">
+																	<label for="pcAvaliacaoRisco" >Risco Identificado:</label>
+																	<select id="pcAvaliacaoRisco" name="pcAvaliacaoRisco" class="form-control" multiple="multiple">
+																		<cfoutput query="rsAvaliacaoRisco">
+																			<option value="#pc_aval_risco_id#">#pc_aval_risco_descricao#</option>
+																		</cfoutput>
+																		<option value="0">Outros</option>
+																	</select>
+																</div>
+															</div>
+
+															<div id="pcAvaliacaoRiscoOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
+																<label for="pcAvaliacaoRiscoOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Risco:</label>
+																<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																	<input id="pcAvaliacaoRiscoOutrosDesc" name="pcAvaliacaoRiscoOutrosDesc" class="form-control" placeholder="Descreva o PROCESSO..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
+																	
+																</div>
+																<span id="pcAvaliacaoRiscoOutrosDescCharCounter" class="badge badge-secondary"></span>
+																<div id="risciOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
+																	Atenção: Ao finalizar o cadastro deste item, este novo risco descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
+																</div>
+															</div>
+
+															<div class="col-sm-5">
+																<div class="form-group">
+																	<label for="pcTipoClassificacao" >Classificação:</label>
+																	<select id="pcTipoClassificacao" name="pcTipoClassificacao" class="form-control" >
+																		<option selected="" disabled="" value="">Selecione a Classificação...</option>
+																		<option value="L">Leve</option>
+																		<option value="M">Mediana</option>		
+																		<option value="G">Grave</option>															
+																	</select>
+																</div>
+															</div>
+
+														</div>
+
+														<div style="margin-top:10px;display:flex;justify-content:space-between">
+															<div>	
+																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																<button class="btn btn-primary" onclick="inicializarValidacaoStep2()">Próximo</button>
+															</div>
+															<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+														</div>
+													</div>
+												</div>
+											</form>
+
+											<form  id="formAval_riscoCoso" name="formAval_riscoCoso"   onsubmit="return false" novalidate>
+												<div id="aval_riscoCoso" class="content" role="tabpanel" aria-labelledby="aval_riscoCoso-trigger">
+													<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+														<div class="row  " >
+															<div class="col-sm-12">
+																<div class="form-group">
+																	<input id="idCoso" hidden></input>
+																	<div id="dados-container-coso" class="dados-container">
+																		
+																	</div>
+																	
+																</div>
 															</div>
 														</div>
 														<div style="margin-top:10px;display:flex;justify-content:space-between">
-															<button class="btn btn-primary" onclick="inicializarValidacaoStep1();" >Próximo</button>
-															<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
+															<div>	
+																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																<button class="btn btn-primary" onclick="inicializarValidacaoStep3()">Próximo</button>
+															</div>
+															<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
 														</div>
 													</div>
-												</form>
-
-												<form   id="formAval_item" name="formAval_item"   onsubmit="return false" novalidate>
-													<div id="aval_item" class="content" role="tabpanel" aria-labelledby="aval_item-trigger">
-														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
-															<div class="row  " >
-																<div class="col-sm-1">
-																	<div class="form-group">
-																		<label for="pcNumSituacaoEncontrada" >N°:</label>
-																		<input id="pcNumSituacaoEncontrada"  name="pcNumSituacaoEncontrada" type="text" class="form-control small-input"  inputmode="text" >													
-																	</div>
-																</div>
-																
-																<div class="col-sm-11">
-																	<div class="form-group">
-																		<label for="pcTituloSituacaoEncontrada" >Título da Situação Encontrada:</label>
-																		<textarea id="pcTituloSituacaoEncontrada" name="pcTituloSituacaoEncontrada" class="form-control" rows="1"  inputmode="text" placeholder="Informe o título da situação encontrada..."></textarea>
-																		<span id="pcTituloSituacaoEncontradaCounter" class="badge badge-secondary"></span>
-																	</div>
-																</div>
-
-																<div class="col-sm-12">
-																	<div class="form-group">
-																		<label for="pcSintese" >Síntese:</label>
-																		<textarea id="pcSintese" name="pcSintese" class="form-control" rows="2"  inputmode="text" placeholder="Informe a síntese do ponto (achado)..."></textarea>
-																		<span id="pcSinteseCounter" class="badge badge-secondary"></span>
-																	</div>
-																</div>	
-
-																<div class="col-sm-12">
-																	<div class="form-group">
-																		<label for="pcAvaliacaoRisco" >Risco Identificado:</label>
-																		<select id="pcAvaliacaoRisco" name="pcAvaliacaoRisco" class="form-control" multiple="multiple">
-																			<cfoutput query="rsAvaliacaoRisco">
-																				<option value="#pc_aval_risco_id#">#pc_aval_risco_descricao#</option>
-																			</cfoutput>
-																			<option value="0">Outros</option>
-																		</select>
-																	</div>
-																</div>
-
-																<div id="pcAvaliacaoRiscoOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
-																	<label for="pcAvaliacaoRiscoOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição do Risco:</label>
-																	<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																		<input id="pcAvaliacaoRiscoOutrosDesc" name="pcAvaliacaoRiscoOutrosDesc" required class="form-control" placeholder="Descreva o PROCESSO..." style="border-radius: 4px;  padding: 10px; box-sizing: border-box; width: 100%;">
-																		
-																	</div>
-																	<span id="pcAvaliacaoRiscoOutrosDescCharCounter" class="badge badge-secondary"></span>
-																	<div id="risciOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
-																		Atenção: Ao finalizar o cadastro deste item, este novo risco descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
-																	</div>
-																</div>
-
-																<div class="col-sm-5">
-																	<div class="form-group">
-																		<label for="pcTipoClassificacao" >Classificação:</label>
-																		<select id="pcTipoClassificacao" name="pcTipoClassificacao" class="form-control" >
-																			<option selected="" disabled="" value="">Selecione a Classificação...</option>
-																			<option value="L">Leve</option>
-																			<option value="M">Mediana</option>		
-																			<option value="G">Grave</option>															
-																		</select>
-																	</div>
-																</div>
-
-															</div>
-
-															<div style="margin-top:10px;display:flex;justify-content:space-between">
-																<div>	
-																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-																	<button class="btn btn-primary" onclick="inicializarValidacaoStep2()">Próximo</button>
-																</div>
-																<button id="btCancelar"  class="btn  btn-danger " onclick="exibirFormCadItem();">Cancelar</button>
-															</div>
-														</div>
-													</div>
-												</form>
-
-												<form  id="formAval_riscoCoso" name="formAval_riscoCoso"   onsubmit="return false" novalidate>
-													<div id="aval_riscoCoso" class="content" role="tabpanel" aria-labelledby="aval_riscoCoso-trigger">
-														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
-															<div class="row  " >
-																<div class="col-sm-12">
-																	<div class="form-group">
-																		<input id="idCoso" hidden></input>
-																		<div id="dados-container-coso" class="dados-container">
-																			
-																		</div>
-																		
-																	</div>
-																</div>
-															</div>
-															<div style="margin-top:10px;display:flex;justify-content:space-between">
-																<div>	
-																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-																	<button class="btn btn-primary" onclick="inicializarValidacaoStep3()">Próximo</button>
-																</div>
-																<button id="btCancelar"  class="btn  btn-danger " onclick="exibirFormCadItem();">Cancelar</button>
-															</div>
-														</div>
-													</div>
-												</form>
-
-												<form id="formAval_valorEstimado" name="formAval_valorEstimado"   onsubmit="return false" novalidate>
-													<div id="aval_valorEstimado" class="content" role="tabpanel" aria-labelledby="aval_valorEstimado-trigger">
-														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
-															<div class="row  " >
-															
-																<div class="col-sm-12">
-																	<fieldset style="padding:0px!important">
-																		<legend style="margin-left:20px">Potencial Valor Estimado a Recuperar:</legend>
-																		<div class="form-group d-flex align-items-center" style="margin-left:20px">
-																			<div id="btn_groupValorRecuperar" name="btn_groupValorRecuperar" class="btn-group  mr-4" role="group" aria-label="Basic example">
-																				<button type="button" class="btn btn-light" id="btn-nao-aplica-recuperar" style=" white-space: nowrap;">Não se aplica</button>
-																				<button type="button" class="btn btn-light" id="btn-quantificado-recuperar" style="margin-left:5px;white-space: nowrap;">Quantificado</button>
-																			</div>
-																			<div>
-																				<input id="pcValorRecuperar" name="pcValorRecuperar" style="display: none;margin-right:10px" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
-																			</div>
-																		</div>
-																	</fieldset>
-																</div>
-																	
-
-																<div class="col-sm-12">	
-																	<fieldset style="margin-top:20px;padding:0px!important">
-																		<legend style="margin-left:20px">Potencial Valor Estimado em Risco ou Valor Envolvido:</legend>
-																		<div class="form-group d-flex align-items-center"  style="margin-left:20px">
-																			<div id="btn_groupValorRisco" name="btn_groupValorRisco" class="btn-group mr-4" role="group" aria-label="Basic example">
-																				<button type="button" class="btn btn-light" id="btn-nao-aplica-risco" style=" white-space: nowrap;">Não se aplica</button>
-																				<button type="button" class="btn btn-light" id="btn-quantificado-risco" style="margin-left:5px;white-space: nowrap;">Quantificado</button>
-																			</div>
-																			<div>
-																				<input id="pcValorRisco" name="pcValorRisco" style="display: none;margin-right:10px" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
-																			</div>
-																		</div>
-																	</fieldset>
-																</div>	
-																<div class="col-sm-12">	
-																	<fieldset style="margin-top:20px;padding:0px!important">
-																		<legend style="margin-left:20px">Potencial Valor Estimado Não Planejado/Extrapolado/Sobra:</legend>
-																		<div class="form-group d-flex align-items-center"  style="margin-left:20px">
-																			<div id="btn_groupValorNaoPlanejado" name="btn_groupValorNaoPlanejado" class="btn-group mr-4" role="group" aria-label="Basic example">
-																				<button type="button" class="btn btn-light" id="btn-nao-aplica-NaoPlanejado" style=" white-space: nowrap;">Não se aplica</button>
-																				<button type="button" class="btn btn-light" id="btn-quantificado-NaoPlanejado" style="margin-left:5px;white-space: nowrap;">Quantificado</button>
-																			</div>
-																			<div>
-																				<input id="pcValorNaoPlanejado" name="pcValorNaoPlanejado" style="display: none;margin-right:10px" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
-																			</div>
-																		</div>
-																	</fieldset>
-																	
-																</div>															
-																
-															</div>
-															<div style="margin-top:10px;display:flex;justify-content:space-between">
-																<div>	
-																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-																	<button class="btn btn-primary" onclick="inicializarValidacaoStep4()">Próximo</button>
-																</div>
-																<button id="btCancelar"  class="btn  btn-danger " onclick="exibirFormCadItem();">Cancelar</button>
-															</div>
-														</div>
-													</div>
-												</form>		
-
-												<form id="formAval_criteriosReferencias" name="formAval_criteriosReferencias"   onsubmit="return false" novalidate>
-													<div id="aval_criteriosReferencias" class="content" role="tabpanel" aria-labelledby="aval_criteriosReferencias-trigger">
-														<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
-															<div class="row  " >
-																<div class="col-sm-12">
-																	<div class="form-group">
-																		<label for="pcCriterioRef" >Critérios e Referências Normativas:</label>
-																		<select id="pcCriterioRef" name="pcCriterioRef" class="form-control" >
-																			<option value="" disabled selected></option>
-																			<option value="0" >Outros</option>
-																			<cfoutput query="rsCriteriosRef">
-																				<option value="#pc_aval_criterioRef_id#">#pc_aval_criterioRef_descricao#</option>
-																			</cfoutput>
-																		</select>
-																	</div>
-																</div>
-
-																<div id="pcCriterioRefOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
-																	<label for="pcCriterioRefOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição dos Critérios e Referências Normativas:</label>
-																	<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																		<textarea id="pcCriterioRefOutrosDesc" name="pcCriterioRefOutrosDesc" class="form-control" rows="3"  inputmode="text" placeholder="Informe os Critérios e Referências Normativas..."></textarea>
-																	</div>
-																	<span id="pcCriterioRefOutrosDescCharCounter" class="badge badge-secondary"></span>
-																	<div id="pcCriterioRefOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
-																		Atenção: Ao finalizar o cadastro deste item, este novo critério/referência descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
-																	</div>
-																</div>
-															</div>
-															<div style="margin-top:10px;display:flex;justify-content:space-between">
-																<div>	
-																	<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-																	<button class="btn btn-primary" onclick="inicializarValidacaoStep5()">Próximo</button>
-																</div>
-																<button id="btCancelar"  class="btn  btn-danger " onclick="exibirFormCadItem();">Cancelar</button>
-															</div>
-														</div>
-													</div>
-												</form>
-												
-												<form   id="formFinalizar" name="formFinalizar"  onsubmit="return false" novalidate>
-													<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="finalizar-trigger">
-													
-													<div id="infoValidas" hidden class="form-card col-sm-12 animate__animated animate__zoomInDown animate__slow">
-														<h3 class="fs-title text-center">Todas as Informações foram validadas com sucesso!</h3>
-														<br>
-														<div class="row justify-content-center col-sm-12">
-															
-															<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:100px"></i>
-															
-														</div>
-														<br>
-														<div id="mensagemSalvar" class="row justify-content-center">
-															<div class="col-7 text-center">
-																<h5 id="mensagemFinalizar">Clique no botão "Salvar" para cadastrar este processo.</h5>
-															</div>
-														</div>
-													</div>
-
-													<div id="infoInvalidas" hidden class="form-card col-sm-12 animate__animated animate__wobble">
-														<h3 class="fs-title text-center">Há campos que precisam ser corrigidos!</h3>
-														<br>
-														<div class="row justify-content-center col-sm-12">
-															
-															<i class="fa-solid fa-circle-xmark" style="color:#dc3545;font-size:100px"></i>
-															
-														</div>
-														<br>
-														<div id="mensagemSalvar" class="row justify-content-center">
-															<div class="col-7 text-center">
-																<h5>Corrija os campos destacados e tente novamente.</h5>
-															</div>
-														</div>
-													</div>
-
-													<div style="margin-top:10px;display:flex;justify-content:space-between" >
-														<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
-														<button id="btSalvar" class="btn  btn-success animate__animated animate__bounceIn animate__slow animate__delay-2s " >Salvar</button>
-														<button id="btCancelar"  class="btn  btn-danger " >Cancelar</button>
-													</div>
-
 												</div>
-												</form>																
-																	
+											</form>
 
+											<form id="formAval_valorEstimado" name="formAval_valorEstimado"   onsubmit="return false" novalidate>
+												<div id="aval_valorEstimado" class="content" role="tabpanel" aria-labelledby="aval_valorEstimado-trigger">
+													<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+														<div class="row  " >
+														
+															<div class="col-sm-12">
+																<fieldset style="padding:0px!important">
+																	<legend style="margin-left:20px">Potencial Valor Estimado a Recuperar:</legend>
+																	<div class="form-group d-flex align-items-center" style="margin-left:20px">
+																		
+																		<div id="btn_groupValorRecuperar" name="btn_groupValorRecuperar" class="btn-group mr-4" role="group" aria-label="Basic example">
+																			<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-recuperar" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+																			<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-recuperar" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+																		</div>
+																		<div>
+																			<input id="pcValorRecuperar" name="pcValorRecuperar" style="display: none;margin-right:10px" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+																		</div>
+																	</div>
+																</fieldset>
+															</div>
+																
 
+															<div class="col-sm-12">	
+																<fieldset style="margin-top:20px;padding:0px!important">
+																	<legend style="margin-left:20px">Potencial Valor Estimado em Risco ou Valor Envolvido:</legend>
+																	<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+																		<div id="btn_groupValorRisco" name="btn_groupValorRisco" class="btn-group mr-4" role="group" aria-label="Basic example">
+																			<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-risco" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+																			<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-risco" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+																		</div>
+																		<div>
+																			<input id="pcValorRisco" name="pcValorRisco" style="display: none;margin-right:10px" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+																		</div>
+																	</div>
+																</fieldset>
+															</div>	
+															<div class="col-sm-12">	
+																<fieldset style="margin-top:20px;padding:0px!important">
+																	<legend style="margin-left:20px">Potencial Valor Estimado Não Planejado/Extrapolado/Sobra:</legend>
+																	<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+																		<div id="btn_groupValorNaoPlanejado" name="btn_groupValorNaoPlanejado" class="btn-group mr-4" role="group" aria-label="Basic example">
+																			<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-NaoPlanejado" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+																			<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-NaoPlanejado" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+																		</div>
+																		<div>
+																			<input id="pcValorNaoPlanejado" name="pcValorNaoPlanejado" style="display: none;margin-right:10px" type="text" class="form-control money animate__animated animate__zoomInDown" inputmode="text" placeholder="R$ 0,00">
+																		</div>
+																	</div>
+																</fieldset>
+																
+															</div>															
+															
+														</div>
+														<div style="margin-top:10px;display:flex;justify-content:space-between">
+															<div>	
+																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																<button class="btn btn-primary" onclick="inicializarValidacaoStep4()">Próximo</button>
+															</div>
+															<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+														</div>
+													</div>
+												</div>
+											</form>		
 
+											<form id="formAval_criteriosReferencias" name="formAval_criteriosReferencias"   onsubmit="return false" novalidate>
+												<div id="aval_criteriosReferencias" class="content" role="tabpanel" aria-labelledby="aval_criteriosReferencias-trigger">
+													<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
+														<div class="row  " >
+															<div class="col-sm-12">
+																<div class="form-group">
+																	<label for="pcCriterioRef" >Critérios e Referências Normativas:</label>
+																	<select id="pcCriterioRef" name="pcCriterioRef" class="form-control" >
+																		<option value="" disabled selected></option>
+																		<option value="0" >Outros</option>
+																		<cfoutput query="rsCriteriosRef">
+																			<option value="#pc_aval_criterioRef_id#">#pc_aval_criterioRef_descricao#</option>
+																		</cfoutput>
+																	</select>
+																</div>
+															</div>
 
+															<div id="pcCriterioRefOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
+																<label for="pcCriterioRefOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição dos Critérios e Referências Normativas:</label>
+																<div class="input-group date" id="reservationdate" data-target-input="nearest">
+																	<textarea id="pcCriterioRefOutrosDesc" name="pcCriterioRefOutrosDesc" class="form-control" rows="3"  inputmode="text" placeholder="Informe os Critérios e Referências Normativas..."></textarea>
+																</div>
+																<span id="pcCriterioRefOutrosDescCharCounter" class="badge badge-secondary"></span>
+																<div id="pcCriterioRefOutrosAlert" class="alert alert-info col-sm-12 animate__animated animate__zoomInDown animate__delay-1s" style="text-align: center;font-size:1.2em;margin-top:5px">
+																	Atenção: Ao finalizar o cadastro deste item, este novo critério/referência descrito acima também será cadastrado e disponibilizado para seleção em futuros itens.
+																</div>
+															</div>
+														</div>
+														<div style="margin-top:10px;display:flex;justify-content:space-between">
+															<div>	
+																<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+																<button class="btn btn-primary" onclick="inicializarValidacaoStep5()">Próximo</button>
+															</div>
+															<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+														</div>
+													</div>
+												</div>
+											</form>
+											
+											<form   id="formFinalizar" name="formFinalizar"  onsubmit="return false" novalidate>
+												<div id="Finalizar" class="content" role="tabpanel" aria-labelledby="finalizar-trigger">
+												
+												<div id="infoValidas" hidden class="form-card col-sm-12 animate__animated animate__zoomInDown animate__slow">
+													<h3 class="fs-title text-center">Todas as Informações foram validadas com sucesso!</h3>
+													<br>
+													<div class="row justify-content-center col-sm-12">
+														
+														<i class="fa-solid fa-circle-check" style="color:#28a745;font-size:100px"></i>
+														
+													</div>
+													<br>
+													<div id="mensagemSalvar" class="row justify-content-center">
+														<div class="col-7 text-center">
+															<h5 id="mensagemFinalizar">Clique no botão "Salvar" para cadastrar este processo.</h5>
+														</div>
+													</div>
+												</div>
+
+												<div id="infoInvalidas" hidden class="form-card col-sm-12 animate__animated animate__wobble">
+													<h3 class="fs-title text-center">Há campos que precisam ser corrigidos!</h3>
+													<br>
+													<div class="row justify-content-center col-sm-12">
+														
+														<i class="fa-solid fa-circle-xmark" style="color:#dc3545;font-size:100px"></i>
+														
+													</div>
+													<br>
+													<div id="mensagemSalvar" class="row justify-content-center">
+														<div class="col-7 text-center">
+															<h5>Corrija os campos destacados e tente novamente.</h5>
+														</div>
+													</div>
+												</div>
+
+												<div style="margin-top:10px;display:flex;justify-content:space-between" >
+													<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
+													<button id="btSalvar" class="btn  btn-success animate__animated animate__bounceIn animate__slow animate__delay-2s " >Salvar</button>
+													<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+												</div>
 
 											</div>
+											</form>																
+																
+
+
+
+
+
 										</div>
 									</div>
 								</div>
-
 							</div>
+
 						</div>
-					</div>			
+					</div>
+				</div>			
 					
 					
 
@@ -1369,7 +1384,6 @@
 
 						// Inicializar validação ao clicar no botão Próximo do primeiro passo
 						window.inicializarValidacaoStep1 = function() {
-							
 							 if ($("#formAval_testeControle").valid()) {
 								// Ir para o próximo passo
 								stepper.next();
@@ -1449,6 +1463,15 @@
 								$this.removeClass('is-invalid').addClass('is-valid');
 								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
 								
+							}
+						});
+
+						// Adiciona manipuladores de eventos para validar os campos
+						$('textarea, input, select').on('change blur keyup', function() {
+							var $this = $(this);
+							if ($this.val()) {
+								$this.removeClass('is-invalid').addClass('is-valid');
+								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
 							}
 						});
 
@@ -1658,24 +1681,6 @@
 						exibirTabAvaliacoes();
 
 						
-
-						//preenche todos os campos com dados fictícios
-						// $('#pcTeste').val('Teste de controle de qualidade do processo de avaliação de riscos.');
-						// $('#pcControleTestado').val('Controle de qualidade do processo de avaliação de riscos.');
-						// $('#pcAvaliacaoTipoControle').val('1').trigger('change');
-						// $('#pcAvaliacaoCategoriaControle').val('1').trigger('change');
-						// $('#pcNumSituacaoEncontrada').val('1');
-						// $('#pcTituloSituacaoEncontrada').val('Título da situação encontrada.');
-						// $('#pcSintese').val('Síntese do ponto (achado) identificado.');
-						// $('#pcAvaliacaoRisco').val('1').trigger('change');
-						// $('#pcTipoClassificacao').val('G').trigger('change');
-						// //selects dinamicos
-						// //popula o select dinâmico do COSO
-						// var pc_aval_coso_id = 1;
-						// let dataLevels2 = ['COMPONENTE', 'PRINCIPIO'];
-						// let labelNames2 = ['Componente', 'Princípio'];
-						// initializeSelectsAjax('#dados-container-coso', dataLevels2, 'ID', labelNames2, 'idCoso',[],'cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso');
-						// populateSelectsFromIDAjax('cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso',pc_aval_coso_id, dataLevels2,'idCoso');
 					});
 
 					 
@@ -1762,15 +1767,17 @@
 
   						$('#cadastro').CardWidget('collapse')
 						$('#cabecalhoAccordion').text("Clique aqui para cadastrar um item (1° Passo)");	
+						$('#pc_aval_id').val('')
+						stepper.to(1);
 								
 					};
 
-					$('#btCancelar').on('click', function (event)  {
-						//cancela e  não propaga o event click original no botão
-						event.preventDefault()
-						event.stopPropagation()
-						resetFormFields();								
-					});
+					// $('#btCancelar').on('click', function (event)  {
+					// 	//cancela e  não propaga o event click original no botão
+					// 	event.preventDefault()
+					// 	event.stopPropagation()
+					// 	resetFormFields();								
+					// });
 					
 					$('#pcTipoClassificacao').on('change', function (event)  {
 						if($('#pcTipoClassificacao').val() == 'L' && !$('#pc_aval_id').val() == ''){
@@ -1834,9 +1841,10 @@
 							
 										async: false,
 										success: function(result) {	
-											resetFormFields();	
-											exibirTabAvaliacoes()
-											$('#CadastroAvaliacaoRelato').html("")
+											//resetFormFields();	
+											//exibirTabAvaliacoes()
+											//$('#CadastroAvaliacaoRelato').html("")
+											mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);
 											$('#modalOverlay').delay(1000).hide(0, function() {
 												$('#modalOverlay').modal('hide');
 												toastr.success('Operação realizada com sucesso!');
@@ -2467,19 +2475,19 @@
 								let pc_aval_valorEstimadoNaoPlanejado = item.PC_AVAL_VALORESTIMADONAOPLANEJADO;
 								let pc_aval_criterioRef_id = item.PC_AVAL_CRITERIOREF_ID;
 
-								$('#pcNumSituacaoEncontrada').val(pcNumSituacaoEncontrada);
-								$('#pcTituloSituacaoEncontrada').val(pcTituloSituacaoEncontrada);
+								$('#pcNumSituacaoEncontrada').val(pcNumSituacaoEncontrada).trigger('change');
+								$('#pcTituloSituacaoEncontrada').val(pcTituloSituacaoEncontrada).trigger('change');
 								$('#pcTipoClassificacao').val(pcTipoClassificacao).trigger('change');
-								$('#pc_aval_id').val(pc_aval_id);
-								$('#pcTeste').val(pc_aval_teste);
-								$('#pcControleTestado').val(pc_aval_controleTestado);
+								$('#pc_aval_id').val(pc_aval_id).trigger('change');
+								$('#pcTeste').val(pc_aval_teste).trigger('change');
+								$('#pcControleTestado').val(pc_aval_controleTestado).trigger('change');
 								$('#pcAvaliacaoTipoControle').val(pc_aval_controleTestado).trigger('change');
-								$('#pcSintese').val(pc_aval_sintese);
+								$('#pcSintese').val(pc_aval_sintese).trigger('change');
 
 								
-								$('#pcValorRecuperar').val(formatCurrency(pc_aval_valorEstimadoRecuperar));
-								$('#pcValorRisco').val(formatCurrency(pc_aval_valorEstimadoRisco));
-								$('#pcValorNaoPlanejado').val(formatCurrency(pc_aval_valorEstimadoNaoPlanejado));
+								$('#pcValorRecuperar').val(formatCurrency(pc_aval_valorEstimadoRecuperar)).trigger('change');
+								$('#pcValorRisco').val(formatCurrency(pc_aval_valorEstimadoRisco)).trigger('change');
+								$('#pcValorNaoPlanejado').val(formatCurrency(pc_aval_valorEstimadoNaoPlanejado)).trigger('change');
 								$('#pcCriterioRef').val(pc_aval_criterioRef_id).trigger('change');
 						
 								//popula o select dinâmico do COSO
@@ -2528,6 +2536,8 @@
 									$('#btn-nao-aplica-NaoPlanejado').removeClass('active btn-dark').addClass('btn-light');
 									$('#pcValorNaoPlanejado').show();
 								}
+
+								
 							
 												
 								$('#cabecalhoAccordion').text("Editar o item N°:" + ' ' + pcNumSituacaoEncontrada);
@@ -2535,7 +2545,7 @@
 								$('#mensagemFinalizar').html('<h5>Clique no botão "Salvar" para <span style="color: green;font-size: 1.5rem">EDITAR</span> o Item'  + ' <span style="color: green;font-size: 1.5rem"><strong>' + pcNumSituacaoEncontrada + '</strong></span></h5>');
 								$("#btSalvar").attr("hidden",false);
 								$("#mensagemSalvar").attr("hidden",false);
-									
+
 								$('#cadastro').CardWidget('expand')
 								$('html, body').animate({ scrollTop: ($('#cadastro').offset().top - 80)} , 500);
 
