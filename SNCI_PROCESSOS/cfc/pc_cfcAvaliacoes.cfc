@@ -3967,8 +3967,7 @@
 						$(element).addClass('is-valid').removeClass('is-invalid');
 					},
 					submitHandler: function(form) {
-						validateButtonGroupsOrientacao();
-						 if (validateButtonGroupsOrientacao()) {		
+								
 							$('#modalOverlay').modal('show')
 							setTimeout(function() {
 								$.ajax({
@@ -4008,7 +4007,7 @@
 							$('#modalOverlay').delay(1000).hide(0, function() {
 								$('#modalOverlay').modal('hide');
 							});	
-						 }
+						
 
 						
 					}
@@ -4031,6 +4030,7 @@
 						$('#btn-nao-aplica').removeClass('btn-light').addClass('btn-dark');
 						$('#btn-descricao').removeClass('btn-primary').addClass('btn-light');
 						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val('');
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc-error').remove();
 					} else {
 						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
 						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val('');
@@ -4049,10 +4049,10 @@
 						$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-dark').addClass('btn-light');
 					} else if (selectedValue === 'btn-nao-aplica-BeneficioFinanceiro') {
 						$('#pcValorBeneficioFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
-						
 						$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-dark');
 						$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-primary').addClass('btn-light');
 						$('#pcValorBeneficioFinanceiro').val('');
+						$('#pcValorBeneficioFinanceiro-error').remove();
 					} else {
 						$('#pcValorBeneficioFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
 						$('#pcValorBeneficioFinanceiro').val('');
@@ -4074,6 +4074,7 @@
 						$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-light').addClass('btn-dark');
 						$('#btn-quantificado-CustoFinanceiro').removeClass('btn-primary').addClass('btn-light');
 						$('#pcValorCustoFinanceiro').val('');
+						$('#pcValorCustoFinanceiro-error').remove();
 					} else {
 						$('#pcValorCustoFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
 						$('#pcValorCustoFinanceiro').val('');
