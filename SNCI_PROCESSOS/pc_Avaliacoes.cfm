@@ -93,8 +93,8 @@
 
 			   //ABRE O FORM PARA UPLOAD DA AVALIAÇÃO, ANEXOS, RECOMENDAÇÕES, ETC...
 			function mostraCadastroAvaliacaoRelato(idAvaliacao,linha) {
-				event.preventDefault()
-				event.stopPropagation()
+				//event.preventDefault()
+				//event.stopPropagation()
 
 				$(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
                 $('#modalOverlay').modal('show')

@@ -3143,16 +3143,7 @@
 						.tab-pane{
 							min-height: 300px;
 						}
-						label{
-							font-size: 0.8rem;
-						}
-						.btnValorNaoSeAplica{
-							border-radius: 25px 0 0 25px !important;
-						}
-
-						.btnValorQuantificado{
-							border-radius: 0 25px 25px 0 !important;
-						}
+						
 						
 
 
@@ -3325,110 +3316,16 @@
 								</div>
 
 								<div class="tab-pane fade " id="custom-tabs-one-4passo" role="tabpanel" aria-labelledby="custom-tabs-one-4passo-tab" style="font-size:16px">
-								    <form   id="formAvalOrientacaoCadastro" name="formAvalOrientacaoCadastro"   onsubmit="return false" novalidate>
-										<input id="pcOrientacaoId" hidden>
+								   
 										<cfif rsProcAval.pc_aval_classificacao neq 'L'>
 											<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
-												<div class="row" style="font-size:16px">
-													<div class="col-sm-12">
-														<div class="form-group">
-															<label id="labelOrientacao" for="pcOrientacao">Orientação:</label>
-															<textarea class="form-control" id="pcOrientacao" rows="2" required=""  name="pcOrientacao" class="form-control"></textarea>
-														</div>										
-													</div>
-													<div class="col-sm-4">
-														<div class="form-group">
-															<label for="pcOrgaoRespOrientacao">Órgão Responsável:</label>
-															<select id="pcOrgaoRespOrientacao" required="" name="pcOrgaoRespOrientacao" class="form-control"  style="height:40px">
-																<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
-																<cfoutput query="rs_OrgAvaliado">
-																	<option value="#pc_org_mcu#">#pc_org_sigla#</option>
-																</cfoutput>
-															</select>
-														</div>
-													</div>
-													<cfquery name="rsAvalOrientacaoCategoriaControle" datasource="#application.dsn_processos#">
-														SELECT pc_avaliacao_categoriaControle.*
-														FROM pc_avaliacao_categoriaControle
-														WHERE  pc_aval_categoriaControle_status = 'A'
-													</cfquery>
-													<div class="col-sm-8">
-														<div class="form-group">
-															<label for="pcAvalOrientacaoCategoriaControle" >Categoria do Controle Proposto:</label>
-															<select id="pcAvalOrientacaoCategoriaControle" required="" name="pcAvalOrientacaoCategoriaControle" class="form-control" multiple="multiple">
-																<cfoutput query="rsAvalOrientacaoCategoriaControle">
-																	<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
-																</cfoutput>
-															</select>
-														</div>
-													</div>
-
-													<div class="col-sm-12">
-														<fieldset style="padding:0px!important">
-															<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
-															<div class="form-group d-flex align-items-center" style="margin-left:20px">
-																
-																<div id="btn_groupAvalOrientacaoBenefNaoFinanceiro" name="btn_groupAvalOrientacaoBenefNaoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
-																	<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica" name="btn-nao-aplica"  style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
-																	<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-descricao" name="btn-descricao" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Descrever</button>
-																</div>
-																
-																<div style="width:100%;position:relative;margin-top:13px">
-																	<div class="form-group">
-																		<textarea class="form-control" id="pcAvalOrientacaoBenefNaoFinanceiroDesc" name="pcAvalOrientacaoBenefNaoFinanceiroDesc" style="display: none;margin-right:10px;width:98%" rows="3" name="pcAvalOrientacaoBenefNaoFinanceiro" class="form-control" placeholder="Informe os Benefícios não financeiros..."></textarea>
-																	</div>
-																</div>
-															</div>
-														</fieldset>
-													</div>
-														
-
-													<div class="col-sm-12">	
-														<fieldset style="margin-top:20px;padding:0px!important">
-															<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
-															<div class="form-group d-flex align-items-center"  style="margin-left:20px">
-																<div id="btn_groupValorBeneficioFinanceiro" name="btn_groupValorBeneficioFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
-																	<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-BeneficioFinanceiro" name="btn-nao-aplica-BeneficioFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
-																	<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-BeneficioFinanceiro" name="btn-quantificado-BeneficioFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
-																</div>
-																<div style="display:flex">
-																	<input id="pcValorBeneficioFinanceiro" name="pcValorBeneficioFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
-																</div>
-															</div>
-														</fieldset>
-													</div>	
-													<div class="col-sm-12">	
-														<fieldset style="margin-top:20px;padding:0px!important">
-															<legend style="margin-left:20px">Estimativa do Custo Financeiro da Medida/Orientação para Regularização:</legend>
-															<div class="form-group d-flex align-items-center"  style="margin-left:20px">
-																<div id="btn_groupValorCustoFinanceiro" name="btn_groupValorCustoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
-																	<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-CustoFinanceiro" name="btn-nao-aplica-CustoFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
-																	<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-CustoFinanceiro" name="btn-quantificado-CustoFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
-																</div>
-																<div style="display:flex">
-																	<input id="pcValorCustoFinanceiro" name="pcValorCustoFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
-																</div>
-															</div>
-														</fieldset>
-														
-													</div>
-													<div style="justify-content:center; display: flex; width: 100%;">
-														<div>
-															<button id="btSalvarOrientacao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
-														</div>
-														<div style="margin-left:100px">
-															<button id="btCancelarOrientacao"  class="btn btn-block btn-danger " >Cancelar</button>
-														</div>
-														
-													</div>	
-												</div>
+												<div id="formAvalOrientacaoCadastroDiv"></div>
 											</cfif>
 											<div id="tabOrientacoesDiv" style="margin-top:20px"></div>
 										<cfelse>
 											<p style="font-size:16px;color:red">Não se aplica para itens com classificação "LEVE".</p>
 										</cfif>
 									</form>
-
 								</div>
 
 
@@ -3597,6 +3494,7 @@
 
 			<cfoutput>
 				var modalidadeProcesso = '#rsProcAval.pc_modalidade#'
+				var numOrgaoAvaliado = '#rsProcAval.pc_num_orgao_avaliado#'
 			</cfoutput>
 
 			if(modalidadeProcesso ==='N'){
@@ -3615,14 +3513,6 @@
 				
 			$(document).ready(function() {
 				
-				//Initialize Select2 Elements
-				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"]').select2({
-					theme: 'bootstrap4',
-					placeholder: 'Selecione...',
-					allowClear: true
-				});
-
-				
 
 				//INICIALIZA O POPOVER NOS ÍCONES
 				$(function () {
@@ -3636,16 +3526,7 @@
 					$('[data-mask]').inputmask()//mascara para os inputs
 				});
 
-				$(".money").inputmask( 'currency',{"autoUnmask": true,
-						radixPoint:",",
-						groupSeparator: ".",
-						allowMinus: false,
-						prefix: 'R$ ',            
-						digits: 2,
-						digitsOptional: false,
-						rightAlign: true,
-						unmaskAsNumber: true
-				});
+				
 				
 				<cfoutput>
 					var pc_aval_status = '#rsProcAval.pc_aval_status#';
@@ -3664,6 +3545,9 @@
 				if(pc_aval_status==3){
 					activaTab('custom-tabs-one-6passo')
 				}
+
+				
+				
 
 				mostraRelatoPDF();
 				$('#custom-tabs-one-2passo-tab').click(function(){
@@ -3685,6 +3569,7 @@
 					$('#tabAnexosDiv').html('')
 					$('#tabMelhoriasDiv').html('')
 					$('#pendenciasDiv').html('')
+					mostraFormAvalOrientacaoCadastro();
 					mostraTabOrientacoes();
 				});
 				$('#custom-tabs-one-5passo-tab').click(function(){
@@ -3829,315 +3714,14 @@
 					})
 				}
 
-				// Função de validação customizada
-				function validateButtonGroupsOrientacao() {
-					var isValid = true;
-
-					$(".btn-group").each(function() {
-						var $group = $(this);
-						var hasActive = $group.find(".active").length > 0;
-						var $error = $group.next("span.error");
-
-						if (!hasActive) {
-							$group.addClass("is-invalid").removeClass("is-valid");
-							if ($error.length === 0) {
-								$("<span class='error invalid-feedback' >Selecione, pelo menos, uma opção.</span>").insertAfter($group);
-							}
-							isValid = false;
-						} else {
-							$group.removeClass("is-invalid").addClass("is-valid");
-							$error.remove();
-						}
-					});
-
-					return isValid;
-				}
+				
 				
 
-				// Adicione métodos de validação personalizados para verificar visibilidade e valor não zero
-				$.validator.addMethod("requiredIfVisibleAndNotZero", function(value, element) {
-					if (!$(element).is(":visible")) {
-						return true; // Se o campo não estiver visível, considere-o válido
-					}
-					// Converta o valor para string e verifique se não é zero
-					var stringValue = String(value);
-					var numericValue = parseFloat(stringValue.replace(/[^0-9,-]+/g, '').replace(',', '.'));
-					return numericValue > 0;
-				}, "Campo obrigatório e deve ser maior que zero.");
-
-				// Adicione e remova a classe 'active' quando os botões forem clicados
-				$("#btn_groupAvalOrientacaoBenefNaoFinanceiro button").on("click", function() {
-					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-					validateButtonGroupsOrientacao()
-				});
-				$("#btn_groupValorBeneficioFinanceiro button").on("click", function() {
-					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-					validateButtonGroupsOrientacao()
-				});
-				$("#btn_groupValorCustoFinanceiro button").on("click", function() {
-					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-					validateButtonGroupsOrientacao()
-				});
-
-				// Adicione um método de validação personalizado para verificar visibilidade e valor não vazio
-				$.validator.addMethod("requiredIfVisibleAndNotEmpty", function(value, element) {
-					//console.log("Validando:", element, "Valor:", value, "Visível:", $(element).is(":visible"));
-					if (!$(element).is(":visible")) {
-						return true; // Se o campo não estiver visível, considere-o válido
-					}
-					return $.trim(value).length > 0; // Verifica se o valor não está vazio (após remover espaços em branco)
-				}, "Este campo é obrigatório.");
-
-				// Adiciona método de validação personalizado para verificar se um botão foi selecionado em cada grupo
-				$.validator.addMethod('requiredButtonGroup', function(value, element, params) {
-					let isValid = false;
-					$(params.groups).each(function() {
-						if ($(this).find('.btn.active').length > 0) {
-							isValid = true;
-						}
-					});
-					return isValid;
-				}, 'Por favor, selecione uma opção para cada grupo.');
-
-
-				$('#formAvalOrientacaoCadastro').validate({
-					ignore: [], // Não ignorar os elementos ocultos para que a validação funcione corretamente
-					rules: {
-						pcOrientacao: {
-							required: true
-						},
-						pcOrgaoRespOrientacao: {
-							required: true
-						},
-						pcAvalOrientacaoCategoriaControle: {
-							required: true
-						},
-						pcAvalOrientacaoBenefNaoFinanceiroDesc: {
-							requiredIfVisibleAndNotEmpty: true
-						},
-						pcValorBeneficioFinanceiro: {
-							requiredIfVisibleAndNotZero: true
-						},
-						pcValorCustoFinanceiro: {
-							requiredIfVisibleAndNotZero: true
-						}
-					},
-					messages: {
-						pcOrientacao: {
-							required: "Campo obrigatório."
-						},
-						pcOrgaoRespOrientacao: {
-							required: "Campo obrigatório."
-						},
-						pcAvalOrientacaoCategoriaControle: {
-							required: "Campo obrigatório."
-						},
-						pcAvalOrientacaoBenefNaoFinanceiroDesc: {
-							requiredIfVisibleAndNotEmpty: "Por favor, preencha este campo."
-						},
-						pcValorBeneficioFinanceiro: {
-							requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
-						},
-						pcValorCustoFinanceiro: {
-							requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
-						}
-					},
-
-					errorElement: 'div',
-					errorPlacement: function(error, element) {
-						error.addClass('invalid-feedback');
-                         validateButtonGroupsOrientacao();
-						 error.addClass('invalid-feedback');
-						if (element.attr('name') === 'pcAvalOrientacaoBenefNaoFinanceiroDesc') {
-							error.insertAfter('#pcAvalOrientacaoBenefNaoFinanceiroDesc');
-						} else if (element.attr('name') === 'pcValorBeneficioFinanceiro') {
-							error.insertAfter('#pcValorBeneficioFinanceiro');
-						} else if (element.attr('name') === 'pcValorCustoFinanceiro') {
-							error.insertAfter('#pcValorCustoFinanceiro');
-						} else {
-							//error.insertAfter(element); // Para outros elementos
-							element.closest(".form-group").append(error);
-						}
-						
-					},
-					highlight: function(element, errorClass, validClass) {
-						$(element).addClass('is-invalid').removeClass('is-valid');
-					},
-					unhighlight: function(element, errorClass, validClass) {
-						$(element).addClass('is-valid').removeClass('is-invalid');
-					},
-					submitHandler: function(form) {
-								
-							$('#modalOverlay').modal('show')
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcAvaliacoes.cfc",
-									data:{
-										method: "cadOrientacoes",
-										pc_aval_id: pc_aval_id,
-										pc_aval_orientacao_id: $('#pcOrientacaoId').val(),
-										pc_aval_orientacao_descricao: $('#pcOrientacao').val(),
-										pc_aval_orientacao_mcu_orgaoResp:  $('#pcOrgaoRespOrientacao').val()
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {
-									$('#pcOrientacaoId').val('')
-									$('#pcOrientacao').val('')
-									$('#pcOrgaoRespOrientacao').val('')
-									//mostraPendencias()
-									mostraTabOrientacoes()
-									$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);		
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-									$('#modal-danger').modal('show')
-									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-									$('#modal-danger').find('.modal-body').text(thrownError)
-
-								})//fim fail
-							}, 1000);
-							$('#labelOrientacao').html('Orientação:')	
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});	
-						
-
-						
-					}
-					
-				});
-
-				$('#btn_groupAvalOrientacaoBenefNaoFinanceiro .btn').click(function() {
-					$('#btn_groupAvalOrientacaoBenefNaoFinanceiro .btn').removeClass('active');
-					$(this).addClass('active');
-					
-					var selectedValue = $(this).attr('id');
-
-					if (selectedValue === 'btn-descricao') {
-					    $('#pcAvalOrientacaoBenefNaoFinanceiroDesc').addClass('animate__animated animate__fast animate__fadeInLeft') 
-						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').show();
-						$('#btn-descricao').removeClass('btn-light').addClass('btn-primary');
-						$('#btn-nao-aplica').removeClass('btn-dark').addClass('btn-light');
-					} else if (selectedValue === 'btn-nao-aplica') {
-					  	$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
-						$('#btn-nao-aplica').removeClass('btn-light').addClass('btn-dark');
-						$('#btn-descricao').removeClass('btn-primary').addClass('btn-light');
-						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val('');
-						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc-error').remove();
-					} else {
-						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
-						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val('');
-					}
-				});
-
-				$('#btn_groupValorBeneficioFinanceiro .btn').click(function() {
-					$('#btn_groupValorBeneficioFinanceiro .btn').removeClass('active');
-					$(this).addClass('active');
-
-					var selectedValue = $(this).attr('id');
-
-					if (selectedValue === 'btn-quantificado-BeneficioFinanceiro') {
-						$('#pcValorBeneficioFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
-						$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-primary');
-						$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-dark').addClass('btn-light');
-					} else if (selectedValue === 'btn-nao-aplica-BeneficioFinanceiro') {
-						$('#pcValorBeneficioFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
-						$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-dark');
-						$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-primary').addClass('btn-light');
-						$('#pcValorBeneficioFinanceiro').val('');
-						$('#pcValorBeneficioFinanceiro-error').remove();
-					} else {
-						$('#pcValorBeneficioFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
-						$('#pcValorBeneficioFinanceiro').val('');
-					}
-				});
-
-				$('#btn_groupValorCustoFinanceiro .btn').click(function() {
-					$('#btn_groupValorCustoFinanceiro .btn').removeClass('active');
-					$(this).addClass('active');
-
-					var selectedValue = $(this).attr('id');
-
-					if (selectedValue === 'btn-quantificado-CustoFinanceiro') {
-						$('#pcValorCustoFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
-						$('#btn-quantificado-CustoFinanceiro').removeClass('btn-light').addClass('btn-primary');
-						$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-dark').addClass('btn-light');
-					} else if (selectedValue === 'btn-nao-aplica-CustoFinanceiro') {
-						$('#pcValorCustoFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
-						$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-light').addClass('btn-dark');
-						$('#btn-quantificado-CustoFinanceiro').removeClass('btn-primary').addClass('btn-light');
-						$('#pcValorCustoFinanceiro').val('');
-						$('#pcValorCustoFinanceiro-error').remove();
-					} else {
-						$('#pcValorCustoFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
-						$('#pcValorCustoFinanceiro').val('');
-					}
-				});
-
-				// $('#formAvalMelhoriaCadastro').validate({
-				// 	rules: {
-						
-				// 		pcMelhoria: {
-				// 			required: true
-				// 		},
-				// 		pcOrgaoRespMelhoria: {
-				// 			required: true
-				// 		},
-				// 		pcStatusMelhoria: {
-				// 			required: true
-				// 		},
-				// 		pcDataPrev: {
-				// 			required: true
-				// 		},
-				// 		pcOrgaoRespSugeridoMelhoria: {
-				// 			required: true
-				// 		},
-				// 		pcRecusaJustMelhoria: {
-				// 			required: true
-				// 		},
-				// 		pcNovaAcaoMelhoria: {
-				// 			required: true
-				// 		}
-				// 	},
-				// 	messages: {
-						
-				// 		pcMelhoria: {
-				// 			required: "Campo obrigatório."
-				// 		},
-				// 		pcOrgaoRespMelhoria: {
-				// 			required: "Campo obrigatório."
-				// 		},
-				// 		pcStatusMelhoria: {
-				// 			required: "Campo obrigatório."
-				// 		},
-				// 		pcDataPrev: {
-				// 			required: "Campo obrigatório."
-				// 		},
-				// 		pcOrgaoRespSugeridoMelhoria: {
-				// 			required: "Campo obrigatório."
-				// 		},
-				// 		pcRecusaJustMelhoria: {
-				// 			required: "Campo obrigatório."
-				// 		},
-				// 		pcNovaAcaoMelhoria: {
-				// 			required: "Campo obrigatório."
-				// 		}
-				// 	}
-					
-				// });
+				
 						
 			})
 
-			$(function () {
-				$('[data-mask]').inputmask()
-			})
+			
 
 
 			<cfoutput>
@@ -4204,17 +3788,11 @@
 				}	
 			})
 
-			$('#btCancelarOrientacao').on('click', function (event)  {
-				//cancela e  não propaga o event click original no botão
-				event.preventDefault()
-				event.stopPropagation()
-				$('#pcOrientacao').val('') 
-				$('#pcOrgaoRespOrientacao').val('') 
-				$('#pcOrientacaoId').val('')
-				$('#labelOrientacao').html('Orientação:')	
-				
-			});
+			function activaTab(tab){
+				$('.nav-tabs a[href="#' + tab + '"]').tab('show');
+			};
 
+			
 			$('#btCancelarMelhoria').on('click', function (event)  {
 				//cancela e  não propaga o event click original no botão
 				event.preventDefault()
@@ -4233,37 +3811,37 @@
 			
 
 
-			function mostraChatValidacaoForm(){
-				$('#modalOverlay').modal('show');
-				$.ajax({
-					type: "POST",
-					url:"cfc/pc_cfcAvaliacoes.cfc",
-					data:{
-						method: "chatValidacaoForm",
-						pc_aval_id: pc_aval_id
-					},
-					async: false
-				})//fim ajax
-				.done(function(result) {
-					$('#divChatValidacaoForm6passo').html(result)
-					$('#divChatValidacaoForm7passo').html(result)
+			// function mostraChatValidacaoForm(){
+			// 	$('#modalOverlay').modal('show');
+			// 	$.ajax({
+			// 		type: "POST",
+			// 		url:"cfc/pc_cfcAvaliacoes.cfc",
+			// 		data:{
+			// 			method: "chatValidacaoForm",
+			// 			pc_aval_id: pc_aval_id
+			// 		},
+			// 		async: false
+			// 	})//fim ajax
+			// 	.done(function(result) {
+			// 		$('#divChatValidacaoForm6passo').html(result)
+			// 		$('#divChatValidacaoForm7passo').html(result)
 					
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});	
+			// 		$('#modalOverlay').delay(1000).hide(0, function() {
+			// 			$('#modalOverlay').modal('hide');
+			// 		});	
 							
-				})//fim done
-				.fail(function(xhr, ajaxOptions, thrownError) {
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});	
-					$('#modal-danger').modal('show')
-					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-					$('#modal-danger').find('.modal-body').text(thrownError)
+			// 	})//fim done
+			// 	.fail(function(xhr, ajaxOptions, thrownError) {
+			// 		$('#modalOverlay').delay(1000).hide(0, function() {
+			// 			$('#modalOverlay').modal('hide');
+			// 		});	
+			// 		$('#modal-danger').modal('show')
+			// 		$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+			// 		$('#modal-danger').find('.modal-body').text(thrownError)
 
-				})//fim fail
+			// 	})//fim fail
 
-			}
+			// }
 
 			function mostraTabAvaliacaoVersoes(){
 				$('#modalOverlay').modal('show');
@@ -4441,72 +4019,6 @@
 
 
 
-			
-
-
-			$('#btSalvarOrientacao2').on('click', function (event)  {
-				event.preventDefault()
-				event.stopPropagation()
-			    // //console.log($("#formAvalOrientacaoCadastro").valid())
-				// //return false;
-				// $("#formAvalOrientacaoCadastro").validate().form();
-				// if (!$("#formAvalOrientacaoCadastro").valid()) {
-				// 	console.log('invalido')
-				// 	toastr.error('Todos os campos devem ser preenchidos!');
-				// 	return false;
-				// }
-			
-				//verifica se os campos necessários foram preenchidos
-				// if ($('#pcOrientacao').val().length == 0 || $('#pcOrgaoRespOrientacao').val()==null )
-				// {   
-				// 	//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
-				// 	toastr.error('Todos os campos devem ser preenchidos!');
-				// 	return false;
-				// }
-
-					$('#modalOverlay').modal('show')
-					setTimeout(function() {
-						$.ajax({
-							type: "post",
-							url: "cfc/pc_cfcAvaliacoes.cfc",
-							data:{
-								method: "cadOrientacoes",
-								pc_aval_id: pc_aval_id,
-								pc_aval_orientacao_id: $('#pcOrientacaoId').val(),
-								pc_aval_orientacao_descricao: $('#pcOrientacao').val(),
-								pc_aval_orientacao_mcu_orgaoResp:  $('#pcOrgaoRespOrientacao').val()
-							},
-							async: false
-						})//fim ajax
-						.done(function(result) {
-							$('#pcOrientacaoId').val('')
-							$('#pcOrientacao').val('')
-							$('#pcOrgaoRespOrientacao').val('')
-							//mostraPendencias()
-							mostraTabOrientacoes()
-							$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);		
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-						})//fim done
-						.fail(function(xhr, ajaxOptions, thrownError) {
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-							$('#modal-danger').modal('show')
-							$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-							$('#modal-danger').find('.modal-body').text(thrownError)
-
-						})//fim fail
-					}, 1000);
-					$('#labelOrientacao').html('Orientação:')	
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});		
-			});
-
-
-
 
 
 			$('#btSalvarMelhoria').on('click', function (event)  {
@@ -4650,6 +4162,35 @@
 							$('#modalOverlay').modal('hide');
 			
 						});	
+					})//fim done
+					.fail(function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+						$('#modal-danger').find('.modal-body').text(thrownError)
+
+					})//fim fail
+				}, 1000);
+			}
+
+			function mostraFormAvalOrientacaoCadastro(){
+				setTimeout(function(){
+					$.ajax({
+						type: "post",
+						url: "cfc/pc_cfcAvaliacoes.cfc",
+						data:{
+							method: "formAvalOrientacaoCadastro",
+							numOrgaoAvaliado: numOrgaoAvaliado
+
+						},
+						async: false
+					})//fim ajax
+					.done(function(result) {
+						$('#formAvalOrientacaoCadastroDiv').html(result)
+						//move o scroll ate o id tabOrientacoesDiv
+						$('html, body').animate({ scrollTop: ($('#tabOrientacoesDiv').offset().top)} , 500);
 					})//fim done
 					.fail(function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -4848,6 +4389,475 @@
 		</script>
 		
     </cffunction>
+
+
+	<cffunction name="formAvalOrientacaoCadastro" access="remote" hint="Formulário de cadastro de Orientações">
+		<cfargument name="numOrgaoAvaliado" type="string" required="true"/>
+		<form   id="formAvalOrientacaoCadastro" name="formAvalOrientacaoCadastro"   onsubmit="return false" novalidate>
+			<style>
+				label{
+					font-size: 0.8rem;
+				}
+				.btnValorNaoSeAplica{
+					border-radius: 25px 0 0 25px !important;
+				}
+
+				.btnValorQuantificado{
+					border-radius: 0 25px 25px 0 !important;
+				}
+			</style>
+			<input id="pcOrientacaoId" hidden>
+			<div class="row" style="font-size:16px">
+				<div class="col-sm-12">
+					<div class="form-group">
+						<label id="labelOrientacao" for="pcOrientacao">Orientação:</label>
+						<textarea class="form-control" id="pcOrientacao" rows="2" required=""  name="pcOrientacao" class="form-control"></textarea>
+					</div>										
+				</div>
+
+				<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
+					SELECT pc_orgaos.*
+					FROM pc_orgaos
+					WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#' or pc_org_mcu = '#arguments.numOrgaoAvaliado#' 
+							or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#'))
+					ORDER BY pc_org_sigla
+				</cfquery>
+				
+				<div class="col-sm-4">
+					<div class="form-group">
+						<label for="pcOrgaoRespOrientacao">Órgão Responsável:</label>
+						<select id="pcOrgaoRespOrientacao" required="" name="pcOrgaoRespOrientacao" class="form-control"  style="height:40px">
+							<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
+							<cfoutput query="rs_OrgAvaliado">
+								<option value="#pc_org_mcu#">#pc_org_sigla#</option>
+							</cfoutput>
+						</select>
+					</div>
+				</div>
+				<cfquery name="rsAvalOrientacaoCategoriaControle" datasource="#application.dsn_processos#">
+					SELECT pc_avaliacao_categoriaControle.*
+					FROM pc_avaliacao_categoriaControle
+					WHERE  pc_aval_categoriaControle_status = 'A'
+				</cfquery>
+				<div class="col-sm-8">
+					<div class="form-group">
+						<label for="pcAvalOrientacaoCategoriaControle" >Categoria do Controle Proposto:</label>
+						<select id="pcAvalOrientacaoCategoriaControle" required="" name="pcAvalOrientacaoCategoriaControle" class="form-control" multiple="multiple">
+							<cfoutput query="rsAvalOrientacaoCategoriaControle">
+								<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
+							</cfoutput>
+						</select>
+					</div>
+				</div>
+
+				<div class="col-sm-12">
+					<fieldset style="padding:0px!important">
+						<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+						<div class="form-group d-flex align-items-center" style="margin-left:20px">
+							
+							<div id="btn_groupAvalOrientacaoBenefNaoFinanceiro" name="btn_groupAvalOrientacaoBenefNaoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+								<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica" name="btn-nao-aplica"  style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+								<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-descricao" name="btn-descricao" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Descrever</button>
+							</div>
+							
+							<div style="width:100%;position:relative;margin-top:13px">
+								<div class="form-group">
+									<textarea class="form-control" id="pcAvalOrientacaoBenefNaoFinanceiroDesc" name="pcAvalOrientacaoBenefNaoFinanceiroDesc" style="display: none;margin-right:10px;width:98%" rows="3" name="pcAvalOrientacaoBenefNaoFinanceiro" class="form-control" placeholder="Informe os Benefícios não financeiros..."></textarea>
+								</div>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+					
+
+				<div class="col-sm-12">	
+					<fieldset style="margin-top:20px;padding:0px!important">
+						<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+						<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+							<div id="btn_groupValorBeneficioFinanceiro" name="btn_groupValorBeneficioFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+								<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-BeneficioFinanceiro" name="btn-nao-aplica-BeneficioFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+								<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-BeneficioFinanceiro" name="btn-quantificado-BeneficioFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+							</div>
+							<div style="display:flex">
+								<input id="pcValorBeneficioFinanceiro" name="pcValorBeneficioFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
+							</div>
+						</div>
+					</fieldset>
+				</div>	
+				<div class="col-sm-12">	
+					<fieldset style="margin-top:20px;padding:0px!important">
+						<legend style="margin-left:20px">Estimativa do Custo Financeiro da Medida/Orientação para Regularização:</legend>
+						<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+							<div id="btn_groupValorCustoFinanceiro" name="btn_groupValorCustoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+								<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-CustoFinanceiro" name="btn-nao-aplica-CustoFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+								<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-CustoFinanceiro" name="btn-quantificado-CustoFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+							</div>
+							<div style="display:flex">
+								<input id="pcValorCustoFinanceiro" name="pcValorCustoFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
+							</div>
+						</div>
+					</fieldset>
+					
+				</div>
+				<div style="justify-content:center; display: flex; width: 100%;">
+					<div>
+						<button id="btSalvarOrientacao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
+					</div>
+					<div style="margin-left:100px">
+						<button id="btCancelarOrientacao"  class="btn btn-block btn-danger " >Cancelar</button>
+					</div>
+					
+				</div>	
+			</div>
+		</form>
+
+		<script language="JavaScript">
+			$(".money").inputmask( 'currency',{"autoUnmask": true,
+				radixPoint:",",
+				groupSeparator: ".",
+				allowMinus: false,
+				prefix: 'R$ ',            
+				digits: 2,
+				digitsOptional: false,
+				rightAlign: true,
+				unmaskAsNumber: true
+			});
+
+			$(function () {
+				$('[data-mask]').inputmask()
+			})
+
+			$(document).ready(function() {
+				
+				//Initialize Select2 Elements
+				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"]').select2({
+					theme: 'bootstrap4',
+					placeholder: 'Selecione...',
+					allowClear: true
+				});
+				// Função de validação customizada
+				function validateButtonGroupsOrientacao() {
+					var isValid = true;
+
+					$("#formAvalOrientacaoCadastro .btn-group").each(function() {
+						var $group = $(this);
+						var hasActive = $group.find(".active").length > 0;
+						var $error = $group.next("span.error");
+
+						if (!hasActive) {
+							$group.addClass("is-invalid").removeClass("is-valid");
+							if ($error.length === 0) {
+								$("<span class='error invalid-feedback' >Selecione, pelo menos, uma opção.</span>").insertAfter($group);
+							}
+							isValid = false;
+						} else {
+							$group.removeClass("is-invalid").addClass("is-valid");
+							$error.remove();
+						}
+					});
+
+					return isValid;
+				}
+
+				// Adicione métodos de validação personalizados para verificar visibilidade e valor não zero
+				$.validator.addMethod("requiredIfVisibleAndNotZero", function(value, element) {
+					if (!$(element).is(":visible")) {
+						return true; // Se o campo não estiver visível, considere-o válido
+					}
+					// Converta o valor para string e verifique se não é zero
+					var stringValue = String(value);
+					var numericValue = parseFloat(stringValue.replace(/[^0-9,-]+/g, '').replace(',', '.'));
+					return numericValue > 0;
+				}, "Campo obrigatório e deve ser maior que zero.");
+
+				// Adicione e remova a classe 'active' quando os botões forem clicados
+				$("#btn_groupAvalOrientacaoBenefNaoFinanceiro button").on("click", function() {
+					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+					validateButtonGroupsOrientacao()
+				});
+				$("#btn_groupValorBeneficioFinanceiro button").on("click", function() {
+					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+					validateButtonGroupsOrientacao()
+				});
+				$("#btn_groupValorCustoFinanceiro button").on("click", function() {
+					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+					validateButtonGroupsOrientacao()
+				});
+
+				// Adicione um método de validação personalizado para verificar visibilidade e valor não vazio
+				$.validator.addMethod("requiredIfVisibleAndNotEmpty", function(value, element) {
+					//console.log("Validando:", element, "Valor:", value, "Visível:", $(element).is(":visible"));
+					if (!$(element).is(":visible")) {
+						return true; // Se o campo não estiver visível, considere-o válido
+					}
+					return $.trim(value).length > 0; // Verifica se o valor não está vazio (após remover espaços em branco)
+				}, "Este campo é obrigatório.");
+
+				// Adiciona método de validação personalizado para verificar se um botão foi selecionado em cada grupo
+				$.validator.addMethod('requiredButtonGroup', function(value, element, params) {
+					let isValid = false;
+					$(params.groups).each(function() {
+						if ($(this).find('.btn.active').length > 0) {
+							isValid = true;
+						}
+					});
+					return isValid;
+				}, 'Por favor, selecione uma opção para cada grupo.');
+               
+
+				$('#formAvalOrientacaoCadastro').validate({
+					ignore: [], // Não ignorar os elementos ocultos para que a validação funcione corretamente
+					rules: {
+						pcOrientacao: {
+							required: true
+						},
+						pcOrgaoRespOrientacao: {
+							required: true
+						},
+						pcAvalOrientacaoCategoriaControle: {
+							required: true
+						},
+						pcAvalOrientacaoBenefNaoFinanceiroDesc: {
+							requiredIfVisibleAndNotEmpty: true
+						},
+						pcValorBeneficioFinanceiro: {
+							requiredIfVisibleAndNotZero: true
+						},
+						pcValorCustoFinanceiro: {
+							requiredIfVisibleAndNotZero: true
+						}
+					},
+					messages: {
+						pcOrientacao: {
+							required: "Campo obrigatório."
+						},
+						pcOrgaoRespOrientacao: {
+							required: "Campo obrigatório."
+						},
+						pcAvalOrientacaoCategoriaControle: {
+							required: "Campo obrigatório."
+						},
+						pcAvalOrientacaoBenefNaoFinanceiroDesc: {
+							requiredIfVisibleAndNotEmpty: "Campo obrigatório."
+						},
+						pcValorBeneficioFinanceiro: {
+							requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
+						},
+						pcValorCustoFinanceiro: {
+							requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
+						}
+					},
+
+					errorElement: 'div',
+					errorPlacement: function(error, element) {
+						
+						error.addClass('invalid-feedback');
+                         validateButtonGroupsOrientacao();
+						 error.addClass('invalid-feedback');
+						if (element.attr('name') === 'pcAvalOrientacaoBenefNaoFinanceiroDesc') {
+							error.insertAfter('#pcAvalOrientacaoBenefNaoFinanceiroDesc');
+						} else if (element.attr('name') === 'pcValorBeneficioFinanceiro') {
+							error.insertAfter('#pcValorBeneficioFinanceiro');
+						} else if (element.attr('name') === 'pcValorCustoFinanceiro') {
+							error.insertAfter('#pcValorCustoFinanceiro');
+						} else {
+							//error.insertAfter(element); // Para outros elementos
+							element.closest(".form-group").append(error);
+						}
+						
+					},
+					highlight: function(element, errorClass, validClass) {
+						$(element).addClass('is-invalid').removeClass('is-valid');
+					},
+					unhighlight: function(element, errorClass, validClass) {
+						$(element).addClass('is-valid').removeClass('is-invalid');
+					},
+					submitHandler: function(form) {
+						if(validateButtonGroupsOrientacao()){		
+							$('#modalOverlay').modal('show')
+							setTimeout(function() {
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcAvaliacoes.cfc",
+									data:{
+										method: "cadOrientacoes",
+										pc_aval_id: pc_aval_id,
+										pc_aval_orientacao_id: $('#pcOrientacaoId').val(),
+										pc_aval_orientacao_descricao: $('#pcOrientacao').val(),
+										pc_aval_orientacao_mcu_orgaoResp:  $('#pcOrgaoRespOrientacao').val()
+									},
+									async: false
+								})//fim ajax
+								.done(function(result) {
+									mostraTabOrientacoes();
+									toastr.success('Operação realizada com sucesso!');
+									mostraFormAvalOrientacaoCadastro();
+								})//fim done
+								.fail(function(xhr, ajaxOptions, thrownError) {
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+									$('#modal-danger').modal('show')
+									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+									$('#modal-danger').find('.modal-body').text(thrownError)
+
+								})//fim fail
+							}, 1000);
+							$('#labelOrientacao').html('Orientação:')	
+							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
+							});	
+						}
+
+						
+					}
+					
+				});
+
+				$('#btn_groupAvalOrientacaoBenefNaoFinanceiro .btn').click(function() {
+					$('#btn_groupAvalOrientacaoBenefNaoFinanceiro .btn').removeClass('active');
+					$(this).addClass('active');
+					
+					var selectedValue = $(this).attr('id');
+
+					if (selectedValue === 'btn-descricao') {
+					    $('#pcAvalOrientacaoBenefNaoFinanceiroDesc').addClass('animate__animated animate__fast animate__fadeInLeft') 
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').show();
+						$('#btn-descricao').removeClass('btn-light').addClass('btn-primary');
+						$('#btn-nao-aplica').removeClass('btn-dark').addClass('btn-light');
+					} else if (selectedValue === 'btn-nao-aplica') {
+					  	$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-nao-aplica').removeClass('btn-light').addClass('btn-dark');
+						$('#btn-descricao').removeClass('btn-primary').addClass('btn-light');
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val('');
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc-error').remove();
+					} else {
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val('');
+					}
+				});
+
+				$('#btn_groupValorBeneficioFinanceiro .btn').click(function() {
+					$('#btn_groupValorBeneficioFinanceiro .btn').removeClass('active');
+					$(this).addClass('active');
+
+					var selectedValue = $(this).attr('id');
+
+					if (selectedValue === 'btn-quantificado-BeneficioFinanceiro') {
+						$('#pcValorBeneficioFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-primary');
+						$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-dark').addClass('btn-light');
+					} else if (selectedValue === 'btn-nao-aplica-BeneficioFinanceiro') {
+						$('#pcValorBeneficioFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-dark');
+						$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-primary').addClass('btn-light');
+						$('#pcValorBeneficioFinanceiro').val('');
+						$('#pcValorBeneficioFinanceiro-error').remove();
+					} else {
+						$('#pcValorBeneficioFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#pcValorBeneficioFinanceiro').val('');
+					}
+				});
+
+				$('#btn_groupValorCustoFinanceiro .btn').click(function() {
+					$('#btn_groupValorCustoFinanceiro .btn').removeClass('active');
+					$(this).addClass('active');
+
+					var selectedValue = $(this).attr('id');
+
+					if (selectedValue === 'btn-quantificado-CustoFinanceiro') {
+						$('#pcValorCustoFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-quantificado-CustoFinanceiro').removeClass('btn-light').addClass('btn-primary');
+						$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-dark').addClass('btn-light');
+					} else if (selectedValue === 'btn-nao-aplica-CustoFinanceiro') {
+						$('#pcValorCustoFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-light').addClass('btn-dark');
+						$('#btn-quantificado-CustoFinanceiro').removeClass('btn-primary').addClass('btn-light');
+						$('#pcValorCustoFinanceiro').val('');
+						$('#pcValorCustoFinanceiro-error').remove();
+					} else {
+						$('#pcValorCustoFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#pcValorCustoFinanceiro').val('');
+					}
+				});
+
+
+
+				// $('#formAvalMelhoriaCadastro').validate({
+					// 	rules: {
+							
+					// 		pcMelhoria: {
+					// 			required: true
+					// 		},
+					// 		pcOrgaoRespMelhoria: {
+					// 			required: true
+					// 		},
+					// 		pcStatusMelhoria: {
+					// 			required: true
+					// 		},
+					// 		pcDataPrev: {
+					// 			required: true
+					// 		},
+					// 		pcOrgaoRespSugeridoMelhoria: {
+					// 			required: true
+					// 		},
+					// 		pcRecusaJustMelhoria: {
+					// 			required: true
+					// 		},
+					// 		pcNovaAcaoMelhoria: {
+					// 			required: true
+					// 		}
+					// 	},
+					// 	messages: {
+							
+					// 		pcMelhoria: {
+					// 			required: "Campo obrigatório."
+					// 		},
+					// 		pcOrgaoRespMelhoria: {
+					// 			required: "Campo obrigatório."
+					// 		},
+					// 		pcStatusMelhoria: {
+					// 			required: "Campo obrigatório."
+					// 		},
+					// 		pcDataPrev: {
+					// 			required: "Campo obrigatório."
+					// 		},
+					// 		pcOrgaoRespSugeridoMelhoria: {
+					// 			required: "Campo obrigatório."
+					// 		},
+					// 		pcRecusaJustMelhoria: {
+					// 			required: "Campo obrigatório."
+					// 		},
+					// 		pcNovaAcaoMelhoria: {
+					// 			required: "Campo obrigatório."
+					// 		}
+					// 	}
+						
+				// });
+
+
+				$('#pcOrgaoRespOrientacao, #pcAvalOrientacaoCategoriaControle, #pcValorBeneficioFinanceiro, #pcValorCustoFinanceiro').on('change', function() {
+					$(this).trigger('input');
+					 $(this).valid(); 
+				});
+
+				$('#btCancelarOrientacao').on('click', function (event)  {
+					//cancela e  não propaga o event click original no botão
+					event.preventDefault()
+					event.stopPropagation()
+					
+				});
+
+
+
+			});
+
+			
+
+		</script>
+
+
+	</cffunction>
 
 	
 
