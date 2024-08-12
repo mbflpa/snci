@@ -3001,6 +3001,7 @@
 
 
 	<cffunction name="cadastroAvaliacaoRelato"   access="remote" hint="valida (ou  não) a avaliação e, se foi a Última avaliação a ser validada, envia o processo para o Órgão responsável.">
+		
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
 
@@ -3251,116 +3252,32 @@
 
 								<div class="tab-pane fade " id="custom-tabs-one-4passo" role="tabpanel" aria-labelledby="custom-tabs-one-4passo-tab" style="font-size:16px">
 								   
-										<cfif rsProcAval.pc_aval_classificacao neq 'L'>
-											<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
-												<div id="formAvalOrientacaoCadastroDiv"></div>
-											</cfif>
-											<div id="tabOrientacoesDiv" style="margin-top:20px"></div>
-										<cfelse>
-											<p style="font-size:16px;color:red">Não se aplica para itens com classificação "LEVE".</p>
+									<cfif rsProcAval.pc_aval_classificacao neq 'L'>
+										<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
+											<div id="formAvalOrientacaoCadastroDiv"></div>
 										</cfif>
-									</form>
+										<div id="tabOrientacoesDiv" style="margin-top:20px"></div>
+									<cfelse>
+										<p style="font-size:16px;color:red">Não se aplica para itens com classificação "LEVE".</p>
+									</cfif>
+								
 								</div>
 
 
-
+                                <!-- @note custom-tabs-one-5passo-->
 								<div class="tab-pane fade " id="custom-tabs-one-5passo" role="tabpanel" aria-labelledby="custom-tabs-one-5passo-tab">
-									<form   id="formAvalMelhoriaCadastro" name="formAvalMelhoriaCadastro"   onsubmit="return false" novalidate>
-										<input id="pcMelhoriaId" hidden>
-										<cfif rsProcAval.pc_aval_classificacao neq 'L'>
-											<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
-												<div class="row" style="font-size:16px">
-													<div class="col-sm-12">
-														<div class="form-group">
-															<label id="labelMelhoria" for="pcMelhoria">Proposta de Melhoria:</label>
-															<textarea class="form-control" id="pcMelhoria" rows="4" required=""  name="pcMelhoria" class="form-control"></textarea>
-														</div>										
-													</div>
-													<div class="col-sm-4">
-														<div class="form-group">
-															<label  for="pcOrgaoRespMelhoria">Órgão Responsável:</label>
-															<select id="pcOrgaoRespMelhoria" required="" name="pcOrgaoRespMelhoria" class="form-control"  style="height:40px">
-																<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
-																<cfoutput query="rs_OrgAvaliado">
-																	<option value="#pc_org_mcu#">#pc_org_sigla#</option>
-																</cfoutput>
-															</select>
-														</div>
-													</div>											
-													<cfif #rsProcAval.pc_modalidade# eq 'A' or #rsProcAval.pc_modalidade# eq 'E'>
-														<div class="col-sm-4">
-															<div class="form-group">
-																<label  for="pcStatusMelhoria">Status:</label>
-																<select id="pcStatusMelhoria" required="" name="pcStatusMelhoria" class="form-control"  style="height:40px">
-																	<cfif #rsProcAval.pc_modalidade# eq 'E'>
-																		<option value="P">PENDENTE</option>
-																	<cfelse>
-																		<option value="P">PENDENTE</option>
-																		<option value="A">ACEITA</option>
-																		<option value="R">RECUSA</option>
-																		<option value="T">TROCA</option>
-																		<option value="N">NÃO INFORMADO</option>
-																	</cfif>
-																</select>
-															</div>
-														</div>
 
-														<div id="pcDataPrevDiv" class="col-md-3" hidden>
-															<div class="form-group">
-																<label for="pcDataPrev">Data prevista para Implementação:</label>
-																<div class="input-group date" id="reservationdate" data-target-input="nearest">
-																	<input  id="pcDataPrev"  name="pcDataPrev" required  type="date" class="form-control" placeholder="dd/mm/aaaa" >
-																</div>
-															</div>
-														</div>
-
-														<div id="pcOrgaoRespSugeridoMelhoriaDiv" class="col-sm-4" hidden>
-															<div class="form-group">
-																<label  for="pcOrgaoRespSugeridoMelhoria">Órgão Responsável Sugerido pelo órgão:</label>
-																<select id="pcOrgaoRespSugeridoMelhoria" required="" name="pcOrgaoRespSugeridoMelhoria" class="form-control"  style="height:40px">
-																	<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
-																	<cfoutput query="rs_OrgAvaliado">
-																		<option value="#pc_org_mcu#">#pc_org_sigla#</option>
-																	</cfoutput>
-																</select>
-															</div>
-														</div>
-
-														<div id="pcRecusaJustMelhoriaDiv" class="col-sm-12" hidden>
-															<div class="form-group">
-																<label id="labelPcRecusaJustMelhoria" for="pcRecusaJustMelhoria">Informe as justificativa do órgão para Recusa:</label>
-																<textarea class="form-control" id="pcRecusaJustMelhoria" rows="4" required=""  name="pcRecusaJustMelhoria" class="form-control"></textarea>
-															</div>										
-														</div>
-
-														<div id="pcNovaAcaoMelhoriaDiv" class="col-sm-12" hidden>
-															<div class="form-group">
-																<label id="labelPcRecusaJustMelhoria" for="pcNovaAcaoMelhoria">Informe as ações que o órgão julgou necessárias:</label>
-																<textarea class="form-control" id="pcNovaAcaoMelhoria" rows="4" required=""  name="pcNovaAcaoMelhoria" class="form-control"></textarea>
-															</div>										
-														</div>
-													</cfif>
-
-
-
-
-													<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
-														<div >
-															<button id="btSalvarMelhoria"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
-														</div>
-														<div style="margin-left:100px">
-															<button id="btCancelarMelhoria"  class="btn btn-block btn-danger " >Cancelar</button>
-														</div>
-													</div>	
-												</div>
-											</cfif>
-											
-											<div id="tabMelhoriasDiv" style="margin-top:20px;"></div>
-										<cfelse>
-											<p style="font-size:16px;color:red">Não se aplica para itens com classificação "LEVE".</p>
-										</cfif>	
-									</form>
+									<cfif rsProcAval.pc_aval_classificacao neq 'L'>
+										<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
+											<div id="formAvalMelhoriaCadastroDiv"></div>
+										</cfif>
+										<div id="tabMelhoriasDiv" style="margin-top:20px;"></div>
+									<cfelse>
+										<p style="font-size:16px;color:red">Não se aplica para itens com classificação "LEVE".</p>
+									</cfif>
+									
 								</div>
+
 								<cfif #arguments.passoapasso# eq "true">	
 									<div  class="tab-pane fade"  id="custom-tabs-one-6passo" role="tabpanel" aria-labelledby="custom-tabs-one-6passo-tab">
 																			
@@ -3511,6 +3428,7 @@
 					$('#tabAnexosDiv').html('')
 					$('#tabOrientacoesDiv').html('')
 					$('#pendenciasDiv').html('')
+					mostraFormAvalMelhoriaCadastro();
 					mostraTabMelhorias();
 				});
 				$('#custom-tabs-one-6passo-tab').click(function(){
@@ -3953,130 +3871,6 @@
 
 
 
-
-
-			$('#btSalvarMelhoria').on('click', function (event)  {
-				event.preventDefault()
-				event.stopPropagation()
-			
-				
-				//verifica se os campos necessários foram preenchidos
-				<cfoutput>
-					let modalidade = '#rsProcAval.pc_modalidade#';
-				</cfoutput>
-			
-				if(modalidade =="A" || modalidade =="E"  ){
-					if (
-						$('#pcMelhoria').val().length == 0 || 
-						$('#pcOrgaoRespMelhoria').val() == null ||
-						$('#pcStatusMelhoria').val() == null ||
-						($('#pcStatusMelhoria').val()=='A' && !$('#pcDataPrev').val())||
-						($('#pcStatusMelhoria').val()=='R' && $('#pcRecusaJustMelhoria').val().length == 0 )||
-						($('#pcStatusMelhoria').val()=='T' && (!$('#pcDataPrev').val()||$('#pcNovaAcaoMelhoria').val().length == 0 ||$('#pcOrgaoRespSugeridoMelhoria').val().length == 0))
-					){   
-						//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
-						toastr.error('Todos os campos devem ser preenchidos!');
-						return false;
-					}
-				}else{
-					if (
-						$('#pcMelhoria').val().length == 0 || 
-						$('#pcOrgaoRespMelhoria').val()==null ){   
-						//mostra mensagem de erro, se algum campo necessário nesta fase  não estiver preenchido	
-						toastr.error('Todos os campos devem ser preenchidos!');
-						return false;
-					}
-				}
-
-
-				$('#modalOverlay').modal('show')
-				setTimeout(function() {
-					if(modalidade =="A" || modalidade =="E"  ){
-						$.ajax({
-							type: "post",
-							url: "cfc/pc_cfcAvaliacoes.cfc",
-							data:{
-								method: "cadMelhorias",
-								modalidade: modalidade,
-								pc_aval_id: pc_aval_id,
-								pc_aval_melhoria_id: $('#pcMelhoriaId').val(),
-								pc_aval_melhoria_descricao: $('#pcMelhoria').val(),
-								pc_aval_melhoria_num_orgao:  $('#pcOrgaoRespMelhoria').val(),
-								pc_aval_melhoria_status:$('#pcStatusMelhoria').val(),
-								pc_aval_melhoria_dataPrev: $('#pcDataPrev').val(),
-								pc_aval_melhoria_sugestao: $('#pcNovaAcaoMelhoria').val(),
-								pc_aval_melhoria_sug_orgao_mcu:$('#pcOrgaoRespSugeridoMelhoria').val(),
-								pc_aval_melhoria_naoAceita_justif:$('#pcRecusaJustMelhoria').val()
-							},
-							async: false
-						})//fim ajax
-						.done(function(result) {
-							$('#pcMelhoriaId').val('')
-							$('#pcMelhoria').val('') 
-							$('#pcOrgaoRespMelhoria').val('') 
-							$('#pcDataPrev').val('')
-							$('#pcRecusaJustMelhoria').val('')
-							$('#pcNovaAcaoMelhoria').val('')
-							$('#pcOrgaoRespSugeridoMelhoria').val('')		
-							$('#pcStatusMelhoria').val('P').trigger('change')
-							//mostraPendencias()
-							mostraTabMelhorias()
-							$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);	
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});	
-						})//fim done
-						.fail(function(xhr, ajaxOptions, thrownError) {
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-							$('#modal-danger').modal('show')
-							$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-							$('#modal-danger').find('.modal-body').text(thrownError)
-
-						})//fim fail
-						$('#labelMelhoria').html('Proposta de Melhoria:')	
-					}else{
-						$.ajax({
-						type: "post",
-						url: "cfc/pc_cfcAvaliacoes.cfc",
-						data:{
-							method: "cadMelhorias",
-							modalidade: modalidade,
-							pc_aval_id: pc_aval_id,
-							pc_aval_melhoria_id: $('#pcMelhoriaId').val(),
-							pc_aval_melhoria_descricao: $('#pcMelhoria').val(),
-							pc_aval_melhoria_num_orgao:  $('#pcOrgaoRespMelhoria').val()	
-						},
-						async: false
-						})//fim ajax
-						.done(function(result) {
-							$('#pcMelhoriaId').val('')
-							$('#pcMelhoria').val('') 
-							$('#pcOrgaoRespMelhoria').val('') 
-							
-							//mostraPendencias()
-							mostraTabMelhorias()
-							$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);	
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});	
-						})//fim done
-						.fail(function(xhr, ajaxOptions, thrownError) {
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-							$('#modal-danger').modal('show')
-							$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-							$('#modal-danger').find('.modal-body').text(thrownError)
-
-						})//fim fail
-						$('#labelMelhoria').html('Proposta de Melhoria:')
-					}	
-				}, 1000);		
-			});
-
-
 			function mostraTabAnexos(){
 				$('#modalOverlay').modal('show')
 				setTimeout(function(){ 
@@ -4105,6 +3899,7 @@
 						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
 						$('#modal-danger').find('.modal-body').text(thrownError)
 
+						
 					})//fim fail
 				}, 1000);
 			}
@@ -4138,6 +3933,37 @@
 				}, 1000);
 			}
 
+            //@audit trabalhado mostraFormAvalMelhoriaCadastro
+			function mostraFormAvalMelhoriaCadastro(){
+				
+				setTimeout(function(){
+					$.ajax({
+						type: "post",
+						url: "cfc/pc_cfcAvaliacoes.cfc",
+						data:{
+							method: "formAvalMelhoriaCadastro",
+							numOrgaoAvaliado: numOrgaoAvaliado,
+							modalidade: modalidadeProcesso
+
+						},
+						async: false
+					})//fim ajax
+					.done(function(result) {
+						$('#formAvalMelhoriaCadastroDiv').html(result)
+						//move o scroll ate o id tabMelhoriasDiv
+						$('html, body').animate({ scrollTop: ($('#tabMelhoriasDiv').offset().top)} , 500);
+					})//fim done
+					.fail(function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+						$('#modal-danger').find('.modal-body').text(thrownError)
+
+					})//fim fail
+				}, 1000);
+			}
 
 			function mostraTabOrientacoes(){
 				$('#modalOverlay').modal('show')
@@ -4326,22 +4152,23 @@
 
 
 	<cffunction name="formAvalOrientacaoCadastro" access="remote" hint="Formulário de cadastro de Orientações">
+        <!-- @note finalizado formAvalOrientacaoCadastro -->
 		<cfargument name="numOrgaoAvaliado" type="string" required="true"/>
-
+        
 		<div id="accordionCadOrientacao"  style="display: flex; justify-content: left;">
 			<div  id="cadOrientacao" class="card card-primary collapsed-card" >
 				<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
-					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
+					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
 						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-						</button></i><span id="cabecalhoAccordionCadOrientacao">Clique aqui para cadastrar uma orientação</span>
+						</button></i><span id="cabecalhoAccordionCadOrientacao">Clique aqui para cadastrar uma Medida/Orientação para Regularização</span>
 					</a>
 				</div>
 				<div class="card-body" style="border: solid 3px #0083ca;" >
 					<div class="card card-default">
 						<div class="card-body p-0">
-							<h6  class="font-weight-light text-center" style="top:-15px;font-size:20px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
-								<span id="infoTipoCadOrientacao" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Nova Orientação:</span>
-							</h6>
+							<h7  class="font-weight-light text-center" style="top:-15px;font-size:14px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+								<span id="infoTipoCadOrientacao" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Nova Medida/Orientação para Regularização:</span>
+							</h7>
 							<form   id="formAvalOrientacaoCadastro" name="formAvalOrientacaoCadastro" style="padding:10px"  onsubmit="return false" novalidate>
 								<style>
 									label{
@@ -4356,7 +4183,7 @@
 									}
 								</style>
 								<input id="pcOrientacaoId" hidden>
-								<div class="row" style="font-size:16px">
+								<div class="row" style="font-size:14px">
 									<div class="col-sm-12">
 										<div class="form-group">
 											<label id="labelOrientacao" for="pcOrientacao">Orientação:</label>
@@ -4432,7 +4259,8 @@
 												</div>
 											</div>
 										</fieldset>
-									</div>	
+									</div>
+
 									<div class="col-sm-12">	
 										<fieldset style="margin-top:20px;padding:0px!important">
 											<legend style="margin-left:20px">Estimativa do Custo Financeiro da Medida/Orientação para Regularização:</legend>
@@ -4448,6 +4276,7 @@
 										</fieldset>
 										
 									</div>
+
 									<div style="justify-content:center; display: flex; width: 100%;">
 										<div>
 											<button id="btSalvarOrientacao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
@@ -4743,60 +4572,6 @@
 				});
 
 
-
-				// $('#formAvalMelhoriaCadastro').validate({
-					// 	rules: {
-							
-					// 		pcMelhoria: {
-					// 			required: true
-					// 		},
-					// 		pcOrgaoRespMelhoria: {
-					// 			required: true
-					// 		},
-					// 		pcStatusMelhoria: {
-					// 			required: true
-					// 		},
-					// 		pcDataPrev: {
-					// 			required: true
-					// 		},
-					// 		pcOrgaoRespSugeridoMelhoria: {
-					// 			required: true
-					// 		},
-					// 		pcRecusaJustMelhoria: {
-					// 			required: true
-					// 		},
-					// 		pcNovaAcaoMelhoria: {
-					// 			required: true
-					// 		}
-					// 	},
-					// 	messages: {
-							
-					// 		pcMelhoria: {
-					// 			required: "Campo obrigatório."
-					// 		},
-					// 		pcOrgaoRespMelhoria: {
-					// 			required: "Campo obrigatório."
-					// 		},
-					// 		pcStatusMelhoria: {
-					// 			required: "Campo obrigatório."
-					// 		},
-					// 		pcDataPrev: {
-					// 			required: "Campo obrigatório."
-					// 		},
-					// 		pcOrgaoRespSugeridoMelhoria: {
-					// 			required: "Campo obrigatório."
-					// 		},
-					// 		pcRecusaJustMelhoria: {
-					// 			required: "Campo obrigatório."
-					// 		},
-					// 		pcNovaAcaoMelhoria: {
-					// 			required: "Campo obrigatório."
-					// 		}
-					// 	}
-						
-				// });
-
-
 				$('#pcOrgaoRespOrientacao, #pcAvalOrientacaoCategoriaControle, #pcValorBeneficioFinanceiro, #pcValorCustoFinanceiro').on('change', function() {
 					$(this).trigger('input');
 					 $(this).valid(); 
@@ -4823,6 +4598,569 @@
 			
 
 		</script>
+
+
+	</cffunction>
+
+	<cffunction name="formAvalMelhoriaCadastro" access="remote" hint="Formulário de cadastro das Propostas de Melhoria">
+		<!-- @audit  trabalhando formAvalMelhoriaCadastro -->
+		<cfargument name="numOrgaoAvaliado" type="string" required="true"/>
+		<cfargument name="modalidade" type="string" required="true"  />	
+
+		<div id="accordionCadMelhoria"  style="display: flex; justify-content: left;">
+			<div  id="caMelhoria" class="card card-primary collapsed-card" >
+				<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
+						</button></i><span id="cabecalhoAccordionCadMelhoria">Clique aqui para cadastrar uma Propostas de Melhoria</span>
+					</a>
+				</div>
+				<div class="card-body" style="border: solid 3px #0083ca;" >
+					<div class="card card-default">
+						<div class="card-body p-0">
+							<h6  class="font-weight-light text-center" style="top:-15px;font-size:14px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+								<span id="infoTipoCadMelhoria" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Nova Proposta de Melhoria:</span>
+							</h6>
+							<form   id="formAvalMelhoriaCadastro" name="formAvalMelhoriaCadastro"  style="padding:10px"  onsubmit="return false" novalidate>
+								<style>
+									label{
+										font-size: 0.8rem;
+									}
+									.btnValorNaoSeAplicaMelhoria{
+										border-radius: 25px 0 0 25px !important;
+									}
+
+									.btnValorQuantificadoMelhoria{
+										border-radius: 0 25px 25px 0 !important;
+									}
+								</style>
+								<input id="pcMelhoriaId" hidden>
+								<div class="row" style="font-size:14px">
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label id="labelMelhoria" for="pcMelhoria">Proposta de Melhoria:</label>
+											<textarea class="form-control" id="pcMelhoria" rows="2"   name="pcMelhoria" class="form-control"></textarea>
+										</div>										
+									</div>
+									<cfquery name="rs_OrgAvaliadoMelhoria" datasource="#application.dsn_processos#">
+										SELECT pc_orgaos.*
+										FROM pc_orgaos
+										WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#' or pc_org_mcu = '#arguments.numOrgaoAvaliado#' 
+												or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#'))
+										ORDER BY pc_org_sigla
+									</cfquery>
+									<div class="col-sm-4">
+										<div class="form-group">
+											<label  for="pcOrgaoRespMelhoria">Órgão Responsável:</label>
+											<select id="pcOrgaoRespMelhoria"  name="pcOrgaoRespMelhoria" class="form-control"  style="height:40px">
+												<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
+												<cfoutput query="rs_OrgAvaliadoMelhoria">
+													<option value="#pc_org_mcu#">#pc_org_sigla#</option>
+												</cfoutput>
+											</select>
+										</div>
+									</div>
+																			
+									<cfif arguments.modalidade eq "E">
+										<div hidden>
+											<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px;" >
+												<option value="P">PENDENTE</option>
+											</select>
+										</div>
+									<cfelse>
+										<div class="col-sm-4">
+											<div class="form-group">
+												<label  for="pcStatusMelhoria">Status:</label>
+												<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
+													<option value="P">PENDENTE</option>
+													<option value="A">ACEITA</option>
+													<option value="R">RECUSA</option>
+													<option value="T">TROCA</option>
+													<option value="N">NÃO INFORMADO</option>
+												</select>
+											</div>
+										</div>
+									</cfif>
+										
+									
+
+									<div id="pcDataPrevDiv" class="col-md-3" hidden>
+										<div class="form-group">
+											<label for="pcDataPrev">Data prevista para Implementação:</label>
+											<div class="input-group date" id="reservationdate" data-target-input="nearest">
+												<input  id="pcDataPrev"  name="pcDataPrev" required  type="date" class="form-control" placeholder="dd/mm/aaaa" >
+											</div>
+										</div>
+									</div>
+
+									<div id="pcOrgaoRespSugeridoMelhoriaDiv" class="col-sm-4" hidden>
+										<div class="form-group">
+											<label  for="pcOrgaoRespSugeridoMelhoria">Órgão Responsável Sugerido pelo órgão:</label>
+											<select id="pcOrgaoRespSugeridoMelhoria"  name="pcOrgaoRespSugeridoMelhoria" class="form-control"  style="height:40px">
+												<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
+												<cfoutput query="rs_OrgAvaliadoMelhoria">
+													<option value="#pc_org_mcu#">#pc_org_sigla#</option>
+												</cfoutput>
+											</select>
+										</div>
+									</div>
+
+									<div id="pcRecusaJustMelhoriaDiv" class="col-sm-12" hidden>
+										<div class="form-group">
+											<label id="labelPcRecusaJustMelhoria" for="pcRecusaJustMelhoria">Informe as justificativa do órgão para Recusa:</label>
+											<textarea class="form-control" id="pcRecusaJustMelhoria" rows="4"  name="pcRecusaJustMelhoria" class="form-control"></textarea>
+										</div>										
+									</div>
+
+									<div id="pcNovaAcaoMelhoriaDiv" class="col-sm-12" hidden>
+										<div class="form-group">
+											<label id="labelPcRecusaJustMelhoria" for="pcNovaAcaoMelhoria">Informe as ações que o órgão julgou necessárias:</label>
+											<textarea class="form-control" id="pcNovaAcaoMelhoria" rows="4"  name="pcNovaAcaoMelhoria" class="form-control"></textarea>
+										</div>										
+									</div>
+									
+									<cfquery name="rsAvalMelhoriaCategoriaControle" datasource="#application.dsn_processos#">
+										SELECT pc_avaliacao_categoriaControle.*
+										FROM pc_avaliacao_categoriaControle
+										WHERE  pc_aval_categoriaControle_status = 'A'
+									</cfquery>
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label for="pcAvalMelhoriaCategoriaControle" >Categoria do Controle Proposto:</label>
+											<select id="pcAvalMelhoriaCategoriaControle" name="pcAvalMelhoriaCategoriaControle" class="form-control" multiple="multiple">
+												<cfoutput query="rsAvalMelhoriaCategoriaControle">
+													<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
+												</cfoutput>
+											</select>
+										</div>
+									</div>
+
+									<div class="col-sm-12">
+										<fieldset style="padding:0px!important">
+											<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+											<div class="form-group d-flex align-items-center" style="margin-left:20px">
+												
+												<div id="btn_groupAvalMelhoriaBenefNaoFinanceiro" name="btn_groupAvalMelhoriaBenefNaoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplicaMelhoria" id="btn-nao-aplicaMelhoria" name="btn-nao-aplicaMelhoria"  style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificadoMelhoria" id="btn-descricaoMelhoria" name="btn-descricaoMelhoria" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Descrever</button>
+												</div>
+												
+												<div style="width:100%;position:relative;margin-top:13px">
+													<div class="form-group">
+														<textarea class="form-control" id="pcAvalMelhoriaBenefNaoFinanceiroDesc" name="pcAvalMelhoriaBenefNaoFinanceiroDesc" style="display: none;margin-right:10px;width:98%" rows="3" name="pcAvalMelhoriaBenefNaoFinanceiro" class="form-control" placeholder="Informe os Benefícios não financeiros..."></textarea>
+													</div>
+												</div>
+											</div>
+										</fieldset>
+									</div>
+										
+
+									<div class="col-sm-12">	
+										<fieldset style="margin-top:20px;padding:0px!important">
+											<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+											<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+												<div id="btn_groupValorBeneficioFinanceiroMelhoria" name="btn_groupValorBeneficioFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplicaMelhoria" id="btn-nao-aplica-BeneficioFinanceiroMelhoria" name="btn-nao-aplica-BeneficioFinanceiroMelhoria" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificadoMelhoria" id="btn-quantificado-BeneficioFinanceiroMelhoria" name="btn-quantificado-BeneficioFinanceiroMelhoria" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+												</div>
+												<div style="display:flex">
+													<input id="pcValorBeneficioFinanceiroMelhoria" name="pcValorBeneficioFinanceiroMelhoria" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
+												</div>
+											</div>
+										</fieldset>
+									</div>
+
+									<div class="col-sm-12">	
+										<fieldset style="margin-top:20px;padding:0px!important">
+											<legend style="margin-left:20px">Estimativa do Custo Financeiro da Medida/Orientação para Regularização:</legend>
+											<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+												<div id="btn_groupValorCustoFinanceiroMelhoria" name="btn_groupValorCustoFinanceiroMelhoria" class="btn-group mr-4" role="group" aria-label="Basic example">
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplicaMelhoria" id="btn-nao-aplica-CustoFinanceiroMelhoria" name="btn-nao-aplica-CustoFinanceiroMelhoria" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificadoMelhoria" id="btn-quantificado-CustoFinanceiroMelhoria" name="btn-quantificado-CustoFinanceiroMelhoria" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+												</div>
+												<div style="display:flex">
+													<input id="pcValorCustoFinanceiroMelhoria" name="pcValorCustoFinanceiroMelhoria" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
+												</div>
+											</div>
+										</fieldset>
+										
+									</div>
+									
+									<div style="justify-content:center; display: flex; width: 100%;">
+										<div>
+											<button id="btSalvarMelhoria"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
+										</div>
+										<div style="margin-left:100px">
+											<button id="btCancelarMelhoria"  class="btn btn-block btn-danger " >Cancelar</button>
+										</div>
+										
+									</div>	
+									</div>	
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+  	
+		<script language="JavaScript">
+			$(".money").inputmask( 'currency',{"autoUnmask": true,
+				radixPoint:",",
+				groupSeparator: ".",
+				allowMinus: false,
+				prefix: 'R$ ',            
+				digits: 2,
+				digitsOptional: false,
+				rightAlign: true,
+				unmaskAsNumber: true
+			});
+
+			$(function () {
+				$('[data-mask]').inputmask()
+			})
+
+			$(document).ready(function() {
+				
+				//Initialize Select2 Elements
+				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"]').select2({
+					theme: 'bootstrap4',
+					placeholder: 'Selecione...',
+					allowClear: true
+					
+				});
+				
+				
+				// Função de validação customizada
+				function validateButtonGroupsMelhoria() {
+					var isValid = true;
+
+					$("#formAvalMelhoriaCadastro .btn-group").each(function() {
+						var $group = $(this);
+						var hasActive = $group.find(".active").length > 0;
+						var $error = $group.next("span.error");
+
+						if (!hasActive) {
+							$group.addClass("is-invalid").removeClass("is-valid");
+							if ($error.length === 0) {
+								$("<span class='error invalid-feedback' >Selecione, pelo menos, uma opção.</span>").insertAfter($group);
+							}
+							isValid = false;
+						} else {
+							$group.removeClass("is-invalid").addClass("is-valid");
+							$error.remove();
+						}
+					});
+
+					return isValid;
+				}
+
+				// Adicione métodos de validação personalizados para verificar visibilidade e valor não zero
+				$.validator.addMethod("requiredIfVisibleAndNotZero", function(value, element) {
+					if (!$(element).is(":visible")) {
+						return true; // Se o campo não estiver visível, considere-o válido
+					}
+					// Converta o valor para string e verifique se não é zero
+					var stringValue = String(value);
+					var numericValue = parseFloat(stringValue.replace(/[^0-9,-]+/g, '').replace(',', '.'));
+					return numericValue > 0;
+				}, "Campo obrigatório e deve ser maior que zero.");
+
+				// Adicione e remova a classe 'active' quando os botões forem clicados
+				$("#btn_groupAvalMelhoriaBenefNaoFinanceiro button").on("click", function() {
+					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+					validateButtonGroupsMelhoria()
+				});
+				$("#btn_groupValorBeneficioFinanceiroMelhoria button").on("click", function() {
+					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+					validateButtonGroupsMelhoria()
+				});
+				$("#btn_groupValorCustoFinanceiroMelhoria button").on("click", function() {
+					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+					validateButtonGroupsMelhoria()
+				});
+
+				// Adicione um método de validação personalizado para verificar visibilidade e valor não vazio
+				$.validator.addMethod("requiredIfVisibleAndNotEmpty", function(value, element) {
+					//console.log("Validando:", element, "Valor:", value, "Visível:", $(element).is(":visible"));
+					if (!$(element).is(":visible")) {
+						return true; // Se o campo não estiver visível, considere-o válido
+					}
+					return $.trim(value).length > 0; // Verifica se o valor não está vazio (após remover espaços em branco)
+				}, "Este campo é obrigatório.");
+
+				// Adiciona método de validação personalizado para verificar se um botão foi selecionado em cada grupo
+				$.validator.addMethod('requiredButtonGroup', function(value, element, params) {
+					let isValid = false;
+					$(params.groups).each(function() {
+						if ($(this).find('.btn.active').length > 0) {
+							isValid = true;
+						}
+					});
+					return isValid;
+				}, 'Por favor, selecione uma opção para cada grupo.');
+               
+
+				$('#formAvalMelhoriaCadastro').validate({
+					
+					ignore: [], // Não ignorar os elementos ocultos para que a validação funcione corretamente
+					rules: {
+						pcMelhoria: {
+							required: true
+						},
+						pcOrgaoRespMelhoria: {
+							required: true
+						},
+						pcAvalMelhoriaCategoriaControle: {
+							required: true
+						},
+						pcAvalMelhoriaBenefNaoFinanceiroDesc: {
+							requiredIfVisibleAndNotEmpty: true
+						},
+						pcValorBeneficioFinanceiroMelhoria: {
+							requiredIfVisibleAndNotZero: true
+						},
+						pcValorCustoFinanceiroMelhoria: {
+							requiredIfVisibleAndNotZero: true
+						}
+					},
+					messages: {
+						pcMelhoria: {
+							required: "Campo obrigatório."
+						},
+						pcOrgaoRespMelhoria: {
+							required: "Campo obrigatório."
+						},
+						pcAvalMelhoriaCategoriaControle: {
+							required: "Campo obrigatório."
+						},
+						pcAvalMelhoriaBenefNaoFinanceiroDesc: {
+							requiredIfVisibleAndNotEmpty: "Campo obrigatório."
+						},
+						pcValorBeneficioFinanceiroMelhoria: {
+							requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
+						},
+						pcValorCustoFinanceiroMelhoria: {
+							requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
+						}
+					},
+
+					errorElement: 'div',
+					errorPlacement: function(error, element) {
+						
+						error.addClass('invalid-feedback');
+                         validateButtonGroupsMelhoria();
+						 error.addClass('invalid-feedback');
+						if (element.attr('name') === 'pcAvalMelhoriaBenefNaoFinanceiroDesc') {
+							error.insertAfter('#pcAvalMelhoriaBenefNaoFinanceiroDesc');
+						} else if (element.attr('name') === 'pcValorBeneficioFinanceiroMelhoria') {
+							error.insertAfter('#pcValorBeneficioFinanceiroMelhoria');
+						} else if (element.attr('name') === 'pcValorCustoFinanceiroMelhoria') {
+							error.insertAfter('#pcValorCustoFinanceiroMelhoria');
+						} else {
+							//error.insertAfter(element); // Para outros elementos
+							element.closest(".form-group").append(error);
+						}
+						
+					},
+					highlight: function(element, errorClass, validClass) {
+						$(element).addClass('is-invalid').removeClass('is-valid');
+					},
+					unhighlight: function(element, errorClass, validClass) {
+						$(element).addClass('is-valid').removeClass('is-invalid');
+					},
+					submitHandler: function(form) {
+						if(validateButtonGroupsMelhoria()){	
+							console.log("Validação do formulário passou com sucesso!");	
+							//verifica se os campos necessários foram preenchidos
+							<cfoutput>
+								let modalidade = '#arguments.modalidade#';
+							</cfoutput>
+							$('#modalOverlay').modal('show')
+							setTimeout(function() {
+								if(modalidade =="A" || modalidade =="E"  ){
+									$.ajax({
+										type: "post",
+										url: "cfc/pc_cfcAvaliacoes.cfc",
+										data:{
+											method: "cadMelhorias",
+											modalidade: modalidade,
+											pc_aval_id: pc_aval_id,
+											pc_aval_melhoria_id: $('#pcMelhoriaId').val(),
+											pc_aval_melhoria_descricao: $('#pcMelhoria').val(),
+											pc_aval_melhoria_num_orgao:  $('#pcOrgaoRespMelhoria').val(),
+											pc_aval_melhoria_status:$('#pcStatusMelhoria').val(),
+											pc_aval_melhoria_dataPrev: $('#pcDataPrev').val(),
+											pc_aval_melhoria_sugestao: $('#pcNovaAcaoMelhoria').val(),
+											pc_aval_melhoria_sug_orgao_mcu:$('#pcOrgaoRespSugeridoMelhoria').val(),
+											pc_aval_melhoria_naoAceita_justif:$('#pcRecusaJustMelhoria').val()
+										},
+										async: false
+									})//fim ajax
+									.done(function(result) {
+										$('#pcMelhoriaId').val('')
+										$('#pcMelhoria').val('') 
+										$('#pcOrgaoRespMelhoria').val('') 
+										$('#pcDataPrev').val('')
+										$('#pcRecusaJustMelhoria').val('')
+										$('#pcNovaAcaoMelhoria').val('')
+										$('#pcOrgaoRespSugeridoMelhoria').val('')		
+										$('#pcStatusMelhoria').val('P').trigger('change')
+										//mostraPendencias()
+										mostraTabMelhorias()
+										$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);	
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});	
+									})//fim done
+									.fail(function(xhr, ajaxOptions, thrownError) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});
+										$('#modal-danger').modal('show')
+										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+										$('#modal-danger').find('.modal-body').text(thrownError)
+
+									})//fim fail
+									$('#labelMelhoria').html('Proposta de Melhoria:')	
+								}else{
+									$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcAvaliacoes.cfc",
+									data:{
+										method: "cadMelhorias",
+										modalidade: modalidade,
+										pc_aval_id: pc_aval_id,
+										pc_aval_melhoria_id: $('#pcMelhoriaId').val(),
+										pc_aval_melhoria_descricao: $('#pcMelhoria').val(),
+										pc_aval_melhoria_num_orgao:  $('#pcOrgaoRespMelhoria').val()	
+									},
+									async: false
+									})//fim ajax
+									.done(function(result) {
+										$('#pcMelhoriaId').val('')
+										$('#pcMelhoria').val('') 
+										$('#pcOrgaoRespMelhoria').val('') 
+										
+										//mostraPendencias()
+										mostraTabMelhorias()
+										$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);	
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});	
+									})//fim done
+									.fail(function(xhr, ajaxOptions, thrownError) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});
+										$('#modal-danger').modal('show')
+										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+										$('#modal-danger').find('.modal-body').text(thrownError)
+
+									})//fim fail
+									$('#labelMelhoria').html('Proposta de Melhoria:')
+								}	
+							}, 1000);		
+						}
+					}
+				});
+			
+
+				$('#btn_groupAvalMelhoriaBenefNaoFinanceiro .btn').click(function() {
+					$('#btn_groupAvalMelhoriaBenefNaoFinanceiro .btn').removeClass('active');
+					$(this).addClass('active');
+					
+					var selectedValue = $(this).attr('id');
+
+					if (selectedValue === 'btn-descricaoMelhoria') {
+						$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').addClass('animate__animated animate__fast animate__fadeInLeft') 
+						$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').show();
+						$('#btn-descricaoMelhoria').removeClass('btn-light').addClass('btn-primary');
+						$('#btn-nao-aplicaMelhoria').removeClass('btn-dark').addClass('btn-light');
+					} else if (selectedValue === 'btn-nao-aplicaMelhoria') {
+						$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-nao-aplicaMelhoria').removeClass('btn-light').addClass('btn-dark');
+						$('#btn-descricaoMelhoria').removeClass('btn-primary').addClass('btn-light');
+						$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').val('');
+						$('#pcAvalMelhoriaBenefNaoFinanceiroDesc-error').remove();
+					} else {
+						$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').val('');
+					}
+				});
+
+				$('#btn_groupValorBeneficioFinanceiroMelhoria .btn').click(function() {
+					$('#btn_groupValorBeneficioFinanceiroMelhoria .btn').removeClass('active');
+					$(this).addClass('active');
+
+					var selectedValue = $(this).attr('id');
+
+					if (selectedValue === 'btn-quantificado-BeneficioFinanceiroMelhoria') {
+						$('#pcValorBeneficioFinanceiroMelhoria').show().addClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-quantificado-BeneficioFinanceiroMelhoria').removeClass('btn-light').addClass('btn-primary');
+						$('#btn-nao-aplica-BeneficioFinanceiroMelhoria').removeClass('btn-dark').addClass('btn-light');
+					} else if (selectedValue === 'btn-nao-aplica-BeneficioFinanceiroMelhoria') {
+						$('#pcValorBeneficioFinanceiroMelhoria').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-nao-aplica-BeneficioFinanceiroMelhoria').removeClass('btn-light').addClass('btn-dark');
+						$('#btn-quantificado-BeneficioFinanceiroMelhoria').removeClass('btn-primary').addClass('btn-light');
+						$('#pcValorBeneficioFinanceiroMelhoria').val('');
+						$('#pcValorBeneficioFinanceiroMelhoria-error').remove();
+					} else {
+						$('#pcValorBeneficioFinanceiroMelhoria').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#pcValorBeneficioFinanceiroMelhoria').val('');
+					}
+				});
+
+				$('#btn_groupValorCustoFinanceiroMelhoria .btn').click(function() {
+					$('#btn_groupValorCustoFinanceiroMelhoria .btn').removeClass('active');
+					$(this).addClass('active');
+
+					var selectedValue = $(this).attr('id');
+
+					if (selectedValue === 'btn-quantificado-CustoFinanceiroMelhoria') {
+						$('#pcValorCustoFinanceiroMelhoria').show().addClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-quantificado-CustoFinanceiroMelhoria').removeClass('btn-light').addClass('btn-primary');
+						$('#btn-nao-aplica-CustoFinanceiroMelhoria').removeClass('btn-dark').addClass('btn-light');
+					} else if (selectedValue === 'btn-nao-aplica-CustoFinanceiroMelhoria') {
+						$('#pcValorCustoFinanceiroMelhoria').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-nao-aplica-CustoFinanceiroMelhoria').removeClass('btn-light').addClass('btn-dark');
+						$('#btn-quantificado-CustoFinanceiroMelhoria').removeClass('btn-primary').addClass('btn-light');
+						$('#pcValorCustoFinanceiroMelhoria').val('');
+						$('#pcValorCustoFinanceiroMelhoria-error').remove();
+					} else {
+						$('#pcValorCustoFinanceiroMelhoria').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#pcValorCustoFinanceiroMelhoria').val('');
+					}
+				});
+
+				$('#pcOrgaoRespMelhoria, #pcAvalMelhoriaCategoriaControle, #pcValorBeneficioFinanceiroMelhoria, #pcValorCustoFinanceiroMelhoria').on('change', function() {
+					$(this).trigger('input');
+						$(this).valid(); 
+				});
+
+				$('#btCancelarMelhoria').on('click', function (event)  {
+					//cancela e  não propaga o event click original no botão
+					event.preventDefault();
+					event.stopPropagation();
+					$('#modalOverlay').modal('show')
+					setTimeout(function() {
+						mostraFormAvalMelhoriaCadastro();
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					}, 1000);
+					
+				});
+
+			});
+
+
+			
+
+			
+
+		</script>
+						
 
 
 	</cffunction>
@@ -5537,7 +5875,7 @@
 			function editarOrientacao(linha) {
 				event.preventDefault()
 				event.stopPropagation()
-				$('#labelOrientacao').html('Editar Orientação:')
+				$('#labelOrientacao').html('Editar Medida/Orientação para Regularização:')
 				
 				$(linha).closest("tr").children("td:nth-child(5)").click();//seleciona a linha onde o botão foi clicado	
 				
@@ -5548,14 +5886,16 @@
 				var pc_aval_orientacao_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(6)").text();
 				var pc_aval_orientacao_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(7)").text();
 				var pc_aval_orientacao_descricao = $(linha).closest("tr").children("td:nth-child(8)").text();
+
+				console.log(pc_aval_orientacao_custoFinanceiro)
 	
 				$('#pcOrientacaoId').val(pc_aval_orientacao_id);
 				$('#pcOrientacao').val(pc_aval_orientacao_descricao);
-				$('#pcOrgaoRespOrientacao').val(pc_aval_orientacao_mcu_orgaoResp);
+				$('#pcOrgaoRespOrientacao').val(pc_aval_orientacao_mcu_orgaoResp).trigger('change');
 				$('#pcAvalOrientacaoCategoriaControle').val(pc_aval_orientacao_categoriaControle_id).trigger('change');
-				$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val(pc_aval_orientacao_beneficioNaoFinanceiro);
-				$('#pcValorBeneficioFinanceiro').val(pc_aval_orientacao_beneficioFinanceiro);
-				$('#pcValorCustoFinanceiro').val(pc_aval_orientacao_custoFinanceiro);
+				$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val(pc_aval_orientacao_beneficioNaoFinanceiro).trigger('change');
+				$('#pcValorBeneficioFinanceiro').val(pc_aval_orientacao_beneficioFinanceiro).trigger('change');
+				$('#pcValorCustoFinanceiro').val(pc_aval_orientacao_custoFinanceiro).trigger('change');
 
 				if(!pc_aval_orientacao_beneficioNaoFinanceiro == ''){
 					$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').addClass('animate__animated animate__fast animate__fadeInLeft') 
@@ -5591,8 +5931,8 @@
 					
 
 
-				$('#cabecalhoAccordionCadOrientacao').text("Editar Orientacao ID:" + ' ' + pc_aval_orientacao_id);
-				$('#infoTipoCadOrientacao').text("Editando Orientacao ID:" + ' ' + pc_aval_orientacao_id);
+				$('#cabecalhoAccordionCadOrientacao').text("Editar Medida/Orientação para Regularização ID:" + ' ' + pc_aval_orientacao_id);
+				$('#infoTipoCadOrientacao').text("Editando Medida/Orientação para Regularização ID:" + ' ' + pc_aval_orientacao_id);
 		        $('#cadOrientacao').CardWidget('expand')
 				$('html, body').animate({ scrollTop: ($('#cadOrientacao').offset().top - 80)} , 500); 
 			};	
