@@ -327,70 +327,7 @@
 					width: auto!important;
 				}
 
-				/* Evita que campos de datas e textos tenham o ícone verde */
-				.form-control[type="text"].is-valid {
-					background-image: none !important;
-					background-position:0 !important;
-					background-size: 0 !important;
-					padding-right:0 !important;
-				}	
-				/* Evita que campos de datas e textos tenham o ícone verde */
-				.form-control[type="text"].is-invalid {
-					background-image: none !important;
-					background-position:0 !important;
-					background-size: 0 !important;
-					padding-right:0 !important;
-				}
-
-				/* Evita que campos de datas tenham o ícone verde */
-				.form-control[type="date"].is-valid {
-					background-image: none !important;
-					background-position:0 !important;
-					background-size: 0 !important;
-					padding-right:0.75rem !important;
-				}
-
-				/* Evita que campos de datas tenham o ícone verde */
-				.form-control[type="date"].is-invalid {
-					background-image: none !important;
-					background-position:0 !important;
-					background-size: 0 !important;
-					padding-right:0.75rem !important;
-				}
-				/* Evita que campos de textarea tenham o ícone verde */
-				.form-control[type="textarea"].is-valid {
-					background-image: none !important;
-					background-position:0 !important;
-					background-size: 0 !important;
-					padding-right:0 !important;
-				}
-
-				/* Evita que campos de textarea tenham o ícone verde */
-				.form-control[type="textarea"].is-invalid {
-					background-image: none !important;
-					background-position:0 !important;
-					background-size: 0 !important;
-					padding-right:0 !important;
-				}
-
-
-				/* Evita que campos de datas e textos tenham o ícone verde */
-				.form-control[type="input"].is-valid {
-					background-image: none !important;
-					/*background-position:0 !important;*/
-					/*background-size: 0 !important;*/
-					padding-right:0 !important;
-				}	
-
-				/* Evita que campos de datas tenham o ícone verde */
-				.form-control[type="input"].is-invalid {
-					background-image: none !important;
-					/*background-position:0 !important;*/
-					/*background-size: 0 !important;*/
-					padding-right:0.75rem !important;
-				}
-
-				
+							
 
 				.cardBodyStepper {
 						border: solid 1px rgba(108, 117, 125, 0.3);
@@ -481,10 +418,7 @@
 					background-image: none !important;
 					padding-right: 10px !important;
 				}
-
-				
-
-				
+			
 
 				.cardBodyStepper {
 						border: solid 1px rgba(108, 117, 125, 0.3);
@@ -4393,123 +4327,143 @@
 
 	<cffunction name="formAvalOrientacaoCadastro" access="remote" hint="Formulário de cadastro de Orientações">
 		<cfargument name="numOrgaoAvaliado" type="string" required="true"/>
-		<form   id="formAvalOrientacaoCadastro" name="formAvalOrientacaoCadastro"   onsubmit="return false" novalidate>
-			<style>
-				label{
-					font-size: 0.8rem;
-				}
-				.btnValorNaoSeAplica{
-					border-radius: 25px 0 0 25px !important;
-				}
 
-				.btnValorQuantificado{
-					border-radius: 0 25px 25px 0 !important;
-				}
-			</style>
-			<input id="pcOrientacaoId" hidden>
-			<div class="row" style="font-size:16px">
-				<div class="col-sm-12">
-					<div class="form-group">
-						<label id="labelOrientacao" for="pcOrientacao">Orientação:</label>
-						<textarea class="form-control" id="pcOrientacao" rows="2" required=""  name="pcOrientacao" class="form-control"></textarea>
-					</div>										
+		<div id="accordionCadOrientacao"  style="display: flex; justify-content: left;">
+			<div  id="cadOrientacao" class="card card-primary collapsed-card" >
+				<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
+						</button></i><span id="cabecalhoAccordionCadOrientacao">Clique aqui para cadastrar uma orientação</span>
+					</a>
 				</div>
+				<div class="card-body" style="border: solid 3px #0083ca;" >
+					<div class="card card-default">
+						<div class="card-body p-0">
+							<h6  class="font-weight-light text-center" style="top:-15px;font-size:20px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+								<span id="infoTipoCadOrientacao" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Nova Orientação:</span>
+							</h6>
+							<form   id="formAvalOrientacaoCadastro" name="formAvalOrientacaoCadastro" style="padding:10px"  onsubmit="return false" novalidate>
+								<style>
+									label{
+										font-size: 0.8rem;
+									}
+									.btnValorNaoSeAplica{
+										border-radius: 25px 0 0 25px !important;
+									}
 
-				<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
-					SELECT pc_orgaos.*
-					FROM pc_orgaos
-					WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#' or pc_org_mcu = '#arguments.numOrgaoAvaliado#' 
-							or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#'))
-					ORDER BY pc_org_sigla
-				</cfquery>
-				
-				<div class="col-sm-4">
-					<div class="form-group">
-						<label for="pcOrgaoRespOrientacao">Órgão Responsável:</label>
-						<select id="pcOrgaoRespOrientacao" required="" name="pcOrgaoRespOrientacao" class="form-control"  style="height:40px">
-							<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
-							<cfoutput query="rs_OrgAvaliado">
-								<option value="#pc_org_mcu#">#pc_org_sigla#</option>
-							</cfoutput>
-						</select>
-					</div>
-				</div>
-				<cfquery name="rsAvalOrientacaoCategoriaControle" datasource="#application.dsn_processos#">
-					SELECT pc_avaliacao_categoriaControle.*
-					FROM pc_avaliacao_categoriaControle
-					WHERE  pc_aval_categoriaControle_status = 'A'
-				</cfquery>
-				<div class="col-sm-8">
-					<div class="form-group">
-						<label for="pcAvalOrientacaoCategoriaControle" >Categoria do Controle Proposto:</label>
-						<select id="pcAvalOrientacaoCategoriaControle" required="" name="pcAvalOrientacaoCategoriaControle" class="form-control" multiple="multiple">
-							<cfoutput query="rsAvalOrientacaoCategoriaControle">
-								<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
-							</cfoutput>
-						</select>
-					</div>
-				</div>
+									.btnValorQuantificado{
+										border-radius: 0 25px 25px 0 !important;
+									}
+								</style>
+								<input id="pcOrientacaoId" hidden>
+								<div class="row" style="font-size:16px">
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label id="labelOrientacao" for="pcOrientacao">Orientação:</label>
+											<textarea class="form-control" id="pcOrientacao" rows="2" required=""  name="pcOrientacao" class="form-control"></textarea>
+										</div>										
+									</div>
 
-				<div class="col-sm-12">
-					<fieldset style="padding:0px!important">
-						<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
-						<div class="form-group d-flex align-items-center" style="margin-left:20px">
-							
-							<div id="btn_groupAvalOrientacaoBenefNaoFinanceiro" name="btn_groupAvalOrientacaoBenefNaoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
-								<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica" name="btn-nao-aplica"  style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
-								<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-descricao" name="btn-descricao" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Descrever</button>
-							</div>
-							
-							<div style="width:100%;position:relative;margin-top:13px">
-								<div class="form-group">
-									<textarea class="form-control" id="pcAvalOrientacaoBenefNaoFinanceiroDesc" name="pcAvalOrientacaoBenefNaoFinanceiroDesc" style="display: none;margin-right:10px;width:98%" rows="3" name="pcAvalOrientacaoBenefNaoFinanceiro" class="form-control" placeholder="Informe os Benefícios não financeiros..."></textarea>
+									<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
+										SELECT pc_orgaos.*
+										FROM pc_orgaos
+										WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#' or pc_org_mcu = '#arguments.numOrgaoAvaliado#' 
+												or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#'))
+										ORDER BY pc_org_sigla
+									</cfquery>
+									
+									<div class="col-sm-4">
+										<div class="form-group">
+											<label for="pcOrgaoRespOrientacao">Órgão Responsável:</label>
+											<select id="pcOrgaoRespOrientacao" required="" name="pcOrgaoRespOrientacao" class="form-control"  style="height:40px">
+												<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
+												<cfoutput query="rs_OrgAvaliado">
+													<option value="#pc_org_mcu#">#pc_org_sigla#</option>
+												</cfoutput>
+											</select>
+										</div>
+									</div>
+									<cfquery name="rsAvalOrientacaoCategoriaControle" datasource="#application.dsn_processos#">
+										SELECT pc_avaliacao_categoriaControle.*
+										FROM pc_avaliacao_categoriaControle
+										WHERE  pc_aval_categoriaControle_status = 'A'
+									</cfquery>
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label for="pcAvalOrientacaoCategoriaControle" >Categoria do Controle Proposto:</label>
+											<select id="pcAvalOrientacaoCategoriaControle" required="" name="pcAvalOrientacaoCategoriaControle" class="form-control" multiple="multiple">
+												<cfoutput query="rsAvalOrientacaoCategoriaControle">
+													<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
+												</cfoutput>
+											</select>
+										</div>
+									</div>
+
+									<div class="col-sm-12">
+										<fieldset style="padding:0px!important">
+											<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+											<div class="form-group d-flex align-items-center" style="margin-left:20px">
+												
+												<div id="btn_groupAvalOrientacaoBenefNaoFinanceiro" name="btn_groupAvalOrientacaoBenefNaoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica" name="btn-nao-aplica"  style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-descricao" name="btn-descricao" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Descrever</button>
+												</div>
+												
+												<div style="width:100%;position:relative;margin-top:13px">
+													<div class="form-group">
+														<textarea class="form-control" id="pcAvalOrientacaoBenefNaoFinanceiroDesc" name="pcAvalOrientacaoBenefNaoFinanceiroDesc" style="display: none;margin-right:10px;width:98%" rows="3" name="pcAvalOrientacaoBenefNaoFinanceiro" class="form-control" placeholder="Informe os Benefícios não financeiros..."></textarea>
+													</div>
+												</div>
+											</div>
+										</fieldset>
+									</div>
+										
+
+									<div class="col-sm-12">	
+										<fieldset style="margin-top:20px;padding:0px!important">
+											<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+											<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+												<div id="btn_groupValorBeneficioFinanceiro" name="btn_groupValorBeneficioFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-BeneficioFinanceiro" name="btn-nao-aplica-BeneficioFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-BeneficioFinanceiro" name="btn-quantificado-BeneficioFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+												</div>
+												<div style="display:flex">
+													<input id="pcValorBeneficioFinanceiro" name="pcValorBeneficioFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
+												</div>
+											</div>
+										</fieldset>
+									</div>	
+									<div class="col-sm-12">	
+										<fieldset style="margin-top:20px;padding:0px!important">
+											<legend style="margin-left:20px">Estimativa do Custo Financeiro da Medida/Orientação para Regularização:</legend>
+											<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+												<div id="btn_groupValorCustoFinanceiro" name="btn_groupValorCustoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-CustoFinanceiro" name="btn-nao-aplica-CustoFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-CustoFinanceiro" name="btn-quantificado-CustoFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+												</div>
+												<div style="display:flex">
+													<input id="pcValorCustoFinanceiro" name="pcValorCustoFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
+												</div>
+											</div>
+										</fieldset>
+										
+									</div>
+									<div style="justify-content:center; display: flex; width: 100%;">
+										<div>
+											<button id="btSalvarOrientacao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
+										</div>
+										<div style="margin-left:100px">
+											<button id="btCancelarOrientacao"  class="btn btn-block btn-danger " >Cancelar</button>
+										</div>
+										
+									</div>	
 								</div>
-							</div>
+							</form>
 						</div>
-					</fieldset>
-				</div>
-					
-
-				<div class="col-sm-12">	
-					<fieldset style="margin-top:20px;padding:0px!important">
-						<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
-						<div class="form-group d-flex align-items-center"  style="margin-left:20px">
-							<div id="btn_groupValorBeneficioFinanceiro" name="btn_groupValorBeneficioFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
-								<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-BeneficioFinanceiro" name="btn-nao-aplica-BeneficioFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
-								<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-BeneficioFinanceiro" name="btn-quantificado-BeneficioFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
-							</div>
-							<div style="display:flex">
-								<input id="pcValorBeneficioFinanceiro" name="pcValorBeneficioFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
-							</div>
-						</div>
-					</fieldset>
-				</div>	
-				<div class="col-sm-12">	
-					<fieldset style="margin-top:20px;padding:0px!important">
-						<legend style="margin-left:20px">Estimativa do Custo Financeiro da Medida/Orientação para Regularização:</legend>
-						<div class="form-group d-flex align-items-center"  style="margin-left:20px">
-							<div id="btn_groupValorCustoFinanceiro" name="btn_groupValorCustoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
-								<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-CustoFinanceiro" name="btn-nao-aplica-CustoFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
-								<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-CustoFinanceiro" name="btn-quantificado-CustoFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
-							</div>
-							<div style="display:flex">
-								<input id="pcValorCustoFinanceiro" name="pcValorCustoFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
-							</div>
-						</div>
-					</fieldset>
-					
-				</div>
-				<div style="justify-content:center; display: flex; width: 100%;">
-					<div>
-						<button id="btSalvarOrientacao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
 					</div>
-					<div style="margin-left:100px">
-						<button id="btCancelarOrientacao"  class="btn btn-block btn-danger " >Cancelar</button>
-					</div>
-					
-				</div>	
+				</div>
 			</div>
-		</form>
+		</div>
 
 		<script language="JavaScript">
 			$(".money").inputmask( 'currency',{"autoUnmask": true,
@@ -4534,7 +4488,10 @@
 					theme: 'bootstrap4',
 					placeholder: 'Selecione...',
 					allowClear: true
+					
 				});
+				
+				
 				// Função de validação customizada
 				function validateButtonGroupsOrientacao() {
 					var isValid = true;
@@ -4684,7 +4641,11 @@
 										pc_aval_id: pc_aval_id,
 										pc_aval_orientacao_id: $('#pcOrientacaoId').val(),
 										pc_aval_orientacao_descricao: $('#pcOrientacao').val(),
-										pc_aval_orientacao_mcu_orgaoResp:  $('#pcOrgaoRespOrientacao').val()
+										pc_aval_orientacao_mcu_orgaoResp:  $('#pcOrgaoRespOrientacao').val(),
+										pc_aval_orientacao_categoriaControle_id: $('#pcAvalOrientacaoCategoriaControle').val().join(','),
+										pc_aval_orientacao_beneficioNaoFinanceiro: $('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val(),
+										pc_aval_orientacao_beneficioFinanceiro: $('#pcValorBeneficioFinanceiro').val(),
+										pc_aval_orientacao_custoFinanceiro: $('#pcValorCustoFinanceiro').val()
 									},
 									async: false
 								})//fim ajax
@@ -4843,8 +4804,15 @@
 
 				$('#btCancelarOrientacao').on('click', function (event)  {
 					//cancela e  não propaga o event click original no botão
-					event.preventDefault()
-					event.stopPropagation()
+					event.preventDefault();
+					event.stopPropagation();
+					$('#modalOverlay').modal('show')
+					setTimeout(function() {
+						mostraFormAvalOrientacaoCadastro();
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					}, 1000);
 					
 				});
 
@@ -5498,6 +5466,10 @@
 											</cfif>
 											<th hidden >pc_aval_orientacao_id</th>
 											<th hidden >pc_aval_orientacao_mcu_orgaoResp</th>
+											<th hidden >pc_aval_orientacao_categoriaControle_id</th>
+											<th hidden >pc_aval_orientacao_beneficioNaoFinanceiro</th>
+											<th hidden >pc_aval_orientacao_beneficioFinanceiro</th>
+											<th hidden >pc_aval_orientacao_custoFinanceiro</th>
 											<th>Orientação</th>
 											<th >Órgão Responsável</th>
 										</tr>
@@ -5505,6 +5477,11 @@
 								
 									<tbody>
 										<cfloop query="rsOrientacoes" >
+										    <cfquery name="rsCategoriasControlesOrientacoes" datasource="#application.dsn_processos#">
+												SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_orientacao_categoriasControles 
+												WHERE pc_aval_orientacao_id = #pc_aval_orientacao_id#
+											</cfquery>
+											<cfset listaCategoriasControlesOrientacao = ValueList(rsCategoriasControlesOrientacoes.pc_aval_categoriaControle_id,',')>
 											<cfoutput>
 
 												<tr style="font-size:14px;color:##000" onClick="<cfif #rsOrientacoes.pc_num_status# eq 4>javascript:mostraTimeline(#pc_aval_orientacao_id#) </cfif>">
@@ -5518,6 +5495,10 @@
 													</cfif>
 													<td hidden >#pc_aval_orientacao_id#</td>
 													<td hidden>#pc_aval_orientacao_mcu_orgaoResp#</td>
+													<td hidden>#listaCategoriasControlesOrientacao#</td>
+													<td hidden>#pc_aval_orientacao_beneficioNaoFinanceiro#</td>
+													<td hidden>#pc_aval_orientacao_beneficioFinanceiro#</td>
+													<td hidden>#pc_aval_orientacao_custoFinanceiro#</td>
 													<td style="vertical-align:middle !important"><textarea class="textareaTab" rows="3" disabled>#pc_aval_orientacao_descricao#</textarea></td>
 													<td style="vertical-align:middle !important;width:20%">#pc_org_sigla#</td>
 												</tr>
@@ -5540,12 +5521,13 @@
 			$(function () {
 				
 				$("#tabOrientacoes").DataTable({
-					"destroy": true,
-			     	"stateSave": false,
-					"responsive": true, 
-					"lengthChange": false, 
-					"autoWidth": false,
-					"select": true
+					destroy: true,
+			     	stateSave: false,
+					responsive: true, 
+					lengthChange: false, 
+					utoWidth: false,
+					select: true,
+					searching:false
 				});
 					
 			});
@@ -5555,17 +5537,64 @@
 			function editarOrientacao(linha) {
 				event.preventDefault()
 				event.stopPropagation()
-				$('#labelOrientacao').html('Editar Orientação:')	
+				$('#labelOrientacao').html('Editar Orientação:')
+				
 				$(linha).closest("tr").children("td:nth-child(5)").click();//seleciona a linha onde o botão foi clicado	
 				
 				var pc_aval_orientacao_id = $(linha).closest("tr").children("td:nth-child(2)").text();
 				var pc_aval_orientacao_mcu_orgaoResp = $(linha).closest("tr").children("td:nth-child(3)").text();
-				var pc_aval_orientacao_descricao = $(linha).closest("tr").children("td:nth-child(4)").text();
+				var pc_aval_orientacao_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(4)").text();
+				var pc_aval_orientacao_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(5)").text();
+				var pc_aval_orientacao_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(6)").text();
+				var pc_aval_orientacao_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(7)").text();
+				var pc_aval_orientacao_descricao = $(linha).closest("tr").children("td:nth-child(8)").text();
 	
 				$('#pcOrientacaoId').val(pc_aval_orientacao_id);
 				$('#pcOrientacao').val(pc_aval_orientacao_descricao);
 				$('#pcOrgaoRespOrientacao').val(pc_aval_orientacao_mcu_orgaoResp);
-		
+				$('#pcAvalOrientacaoCategoriaControle').val(pc_aval_orientacao_categoriaControle_id).trigger('change');
+				$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val(pc_aval_orientacao_beneficioNaoFinanceiro);
+				$('#pcValorBeneficioFinanceiro').val(pc_aval_orientacao_beneficioFinanceiro);
+				$('#pcValorCustoFinanceiro').val(pc_aval_orientacao_custoFinanceiro);
+
+				if(!pc_aval_orientacao_beneficioNaoFinanceiro == ''){
+					$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').addClass('animate__animated animate__fast animate__fadeInLeft') 
+					$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').show();
+					$('#btn-descricao').removeClass('btn-light').addClass('btn-primary');
+					$('#btn-nao-aplica').removeClass('btn-dark').addClass('btn-light');
+				}else{
+					$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide();
+					$('#btn-descricao').removeClass('btn-primary').addClass('btn-light');
+					$('#btn-nao-aplica').removeClass('btn-light').addClass('btn-dark');
+				}
+
+				if(!pc_aval_orientacao_beneficioFinanceiro == '0.0'){
+					$('#pcValorBeneficioFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
+					$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-primary');
+					$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-dark').addClass('btn-light');
+				}else{
+					$('#pcValorBeneficioFinanceiro').hide();
+					$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-primary').addClass('btn-light');
+					$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-dark');
+				}
+
+				if(!pc_aval_orientacao_custoFinanceiro == '0.0'){
+					
+					$('#pcValorCustoFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
+					$('#btn-quantificado-CustoFinanceiro').removeClass('btn-light').addClass('btn-primary');
+					$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-dark').addClass('btn-light');
+				}else{
+					$('#pcValorCustoFinanceiro').hide();
+					$('#btn-quantificado-CustoFinanceiro').removeClass('btn-primary').addClass('btn-light');
+					$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-light').addClass('btn-dark');
+				}
+					
+
+
+				$('#cabecalhoAccordionCadOrientacao').text("Editar Orientacao ID:" + ' ' + pc_aval_orientacao_id);
+				$('#infoTipoCadOrientacao').text("Editando Orientacao ID:" + ' ' + pc_aval_orientacao_id);
+		        $('#cadOrientacao').CardWidget('expand')
+				$('html, body').animate({ scrollTop: ($('#cadOrientacao').offset().top - 80)} , 500); 
 			};	
 
 			function excluirOrientacao(pc_aval_orientacao_id)  {
@@ -6845,19 +6874,53 @@
 		<cfargument name="pc_aval_orientacao_descricao" type="string" required="true"/>
 		<cfargument name="pc_aval_orientacao_mcu_orgaoResp" type="string" required="true"/>
 		<cfargument name="pc_aval_orientacao_id" type="string" required="false" default=""/>
+		<cfargument name="pc_aval_orientacao_categoriaControle_id" type="string" required="true"/>
+		<cfargument name="pc_aval_orientacao_beneficioNaoFinanceiro" type="string" required="true"/>
+		<cfargument name="pc_aval_orientacao_beneficioFinanceiro" type="string" required="true"/>
+		<cfargument name="pc_aval_orientacao_custoFinanceiro" type="string" required="true"/>
 
-		<cfquery datasource="#application.dsn_processos#" >
+		<cftransaction>
+			<cfquery datasource="#application.dsn_processos#"  name="rsOrientacao">
+				<cfif #arguments.pc_aval_orientacao_id# eq ''>
+					INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login, pc_aval_orientacao_beneficioNaoFinanceiro, pc_aval_orientacao_beneficioFinanceiro, pc_aval_orientacao_custoFinanceiro)
+					VALUES (	0
+								,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+								,'#application.rsUsuarioParametros.pc_usu_login#'
+								,<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
+								,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_descricao#">
+								,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
+								,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+								,'#application.rsUsuarioParametros.pc_usu_login#'
+								,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioNaoFinanceiro#">
+								,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioFinanceiro#">
+								,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_custoFinanceiro#">
+							)
+					SELECT SCOPE_IDENTITY() AS newIdOrientacao;
+					
+				<cfelse>
+					UPDATE pc_avaliacao_orientacoes
+					SET    pc_aval_orientacao_descricao = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_descricao#">,
+						pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">,
+						pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#',
+						pc_aval_orientacao_beneficioNaoFinanceiro = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioNaoFinanceiro#">,
+						pc_aval_orientacao_beneficioFinanceiro = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioFinanceiro#">,
+						pc_aval_orientacao_custoFinanceiro = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_custoFinanceiro#">
+					WHERE  pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+				</cfif>
+			</cfquery>
+
 			<cfif #arguments.pc_aval_orientacao_id# eq ''>
-				INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login)
-				VALUES (0, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
-			<cfelse>
-				UPDATE pc_avaliacao_orientacoes
-				SET    pc_aval_orientacao_descricao = '#arguments.pc_aval_orientacao_descricao#',
-					   pc_aval_orientacao_mcu_orgaoResp = '#arguments.pc_aval_orientacao_mcu_orgaoResp#',
-					   pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
-				WHERE  pc_aval_orientacao_id = #arguments.pc_aval_orientacao_id#	
+				<!-- cadastra orientacao x categorias de controles-->
+				<cfloop list="#arguments.pc_aval_orientacao_categoriaControle_id#" index="i"> 
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT INTO pc_avaliacao_orientacao_categoriasControles (pc_aval_orientacao_id, pc_aval_categoriaControle_id)
+						VALUES ('#rsOrientacao.newIdOrientacao#', '#i#')
+					</cfquery>
+				</cfloop>
 			</cfif>
-		</cfquery>
+		</cftransaction>
+
+
 		
   	</cffunction>
 
@@ -6870,11 +6933,23 @@
 
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" default=""/>
 
-		<cfquery datasource="#application.dsn_processos#" > 
-			DELETE FROM pc_avaliacao_orientacoes
-			WHERE(pc_aval_orientacao_id = #arguments.pc_aval_orientacao_id#)
-		</cfquery>
+		<cftransaction>	
+
+            <cfquery datasource="#application.dsn_processos#" >
+				DELETE FROM pc_avaliacao_orientacao_categoriasControles
+				WHERE pc_aval_orientacao_id= '#arguments.pc_aval_orientacao_id#'
+			</cfquery> 
+			
+			<cfquery datasource="#application.dsn_processos#" > 
+				DELETE FROM pc_avaliacao_orientacoes
+				WHERE(pc_aval_orientacao_id = #arguments.pc_aval_orientacao_id#)
+			</cfquery>
+
+			
+		</cftransaction>
+
 		<cfreturn true />
+
 	</cffunction>
 
 
