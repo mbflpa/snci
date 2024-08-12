@@ -4357,17 +4357,22 @@
 				}, "Campo obrigatório e deve ser maior que zero.");
 
 				// Adicione e remova a classe 'active' quando os botões forem clicados
-				$("#btn_groupAvalOrientacaoBenefNaoFinanceiro button").on("click", function() {
-					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-					validateButtonGroupsOrientacao()
-				});
-				$("#btn_groupValorBeneficioFinanceiro button").on("click", function() {
-					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-					validateButtonGroupsOrientacao()
-				});
-				$("#btn_groupValorCustoFinanceiro button").on("click", function() {
-					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-					validateButtonGroupsOrientacao()
+				// $("#btn_groupAvalOrientacaoBenefNaoFinanceiro button").on("click", function() {
+				// 	$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+				// 	validateButtonGroupsOrientacao()
+				// });
+				// $("#btn_groupValorBeneficioFinanceiro button").on("click", function() {
+				// 	$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+				// 	validateButtonGroupsOrientacao()
+				// });
+				// $("#btn_groupValorCustoFinanceiro button").on("click", function() {
+				// 	$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
+				// 	validateButtonGroupsOrientacao()
+				// });
+				$("#formAvalOrientacaoCadastro .btn-group .btn").on("click", function() {
+					$(this).siblings().removeClass("active");
+					$(this).addClass("active");
+					validateButtonGroupsOrientacao();
 				});
 
 				// Adicione um método de validação personalizado para verificar visibilidade e valor não vazio
@@ -5638,6 +5643,16 @@
 	
 			});
 
+			function formatCurrency(value) {
+				// Formata o valor como moeda brasileira
+				let formatter = new Intl.NumberFormat('pt-BR', {
+					style: 'currency',
+					currency: 'BRL',
+					minimumFractionDigits: 2
+				});
+				return formatter.format(value);
+			}
+
 			function editarMelhoria(linha) {
 				event.preventDefault()
 				event.stopPropagation()
@@ -5870,7 +5885,15 @@
 					
 			});
 
-			
+			function formatCurrency(value) {
+				// Formata o valor como moeda brasileira
+				let formatter = new Intl.NumberFormat('pt-BR', {
+					style: 'currency',
+					currency: 'BRL',
+					minimumFractionDigits: 2
+				});
+				return formatter.format(value);
+			}
 
 			function editarOrientacao(linha) {
 				event.preventDefault()
@@ -5887,46 +5910,46 @@
 				var pc_aval_orientacao_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(7)").text();
 				var pc_aval_orientacao_descricao = $(linha).closest("tr").children("td:nth-child(8)").text();
 
-				console.log(pc_aval_orientacao_custoFinanceiro)
 	
 				$('#pcOrientacaoId').val(pc_aval_orientacao_id);
 				$('#pcOrientacao').val(pc_aval_orientacao_descricao);
 				$('#pcOrgaoRespOrientacao').val(pc_aval_orientacao_mcu_orgaoResp).trigger('change');
 				$('#pcAvalOrientacaoCategoriaControle').val(pc_aval_orientacao_categoriaControle_id).trigger('change');
 				$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val(pc_aval_orientacao_beneficioNaoFinanceiro).trigger('change');
-				$('#pcValorBeneficioFinanceiro').val(pc_aval_orientacao_beneficioFinanceiro).trigger('change');
-				$('#pcValorCustoFinanceiro').val(pc_aval_orientacao_custoFinanceiro).trigger('change');
+				$('#pcValorBeneficioFinanceiro').val(formatCurrency(pc_aval_orientacao_beneficioFinanceiro)).trigger('change');
+				$('#pcValorCustoFinanceiro').val(formatCurrency(pc_aval_orientacao_custoFinanceiro)).trigger('change');
 
-				if(!pc_aval_orientacao_beneficioNaoFinanceiro == ''){
-					$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').addClass('animate__animated animate__fast animate__fadeInLeft') 
-					$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').show();
-					$('#btn-descricao').removeClass('btn-light').addClass('btn-primary');
-					$('#btn-nao-aplica').removeClass('btn-dark').addClass('btn-light');
-				}else{
+				// Inicializa o estado dos botões com base no valor de pcAvalOrientacaoBenefNaoFinanceiroDesc
+				if ($('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val() === '') {
+					$('#btn-nao-aplica').addClass('active btn-dark').removeClass('btn-light');
+					$('#btn-descricao').removeClass('active btn-primary').addClass('btn-light');
 					$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide();
-					$('#btn-descricao').removeClass('btn-primary').addClass('btn-light');
-					$('#btn-nao-aplica').removeClass('btn-light').addClass('btn-dark');
+				} else {
+					$('#btn-descricao').addClass('active btn-primary').removeClass('btn-light');
+					$('#btn-nao-aplica').removeClass('active btn-dark').addClass('btn-light');
+					$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').show();
 				}
 
-				if(!pc_aval_orientacao_beneficioFinanceiro == '0.0'){
-					$('#pcValorBeneficioFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
-					$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-primary');
-					$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-dark').addClass('btn-light');
-				}else{
+				// Inicializa o estado dos botões com base no valor de pcValorBeneficioFinanceiro
+				if ($('#pcValorBeneficioFinanceiro').val() === '' || $('#pcValorBeneficioFinanceiro').val() == 'R$ 0,00') {
+					$('#btn-nao-aplica-BeneficioFinanceiro').addClass('active btn-dark').removeClass('btn-light');
+					$('#btn-quantificado-BeneficioFinanceiro').removeClass('active btn-primary').addClass('btn-light');
 					$('#pcValorBeneficioFinanceiro').hide();
-					$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-primary').addClass('btn-light');
-					$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-dark');
+				} else {
+					$('#btn-quantificado-BeneficioFinanceiro').addClass('active btn-primary').removeClass('btn-light');
+					$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('active btn-dark').addClass('btn-light');
+					$('#pcValorBeneficioFinanceiro').show();
 				}
 
-				if(!pc_aval_orientacao_custoFinanceiro == '0.0'){
-					
-					$('#pcValorCustoFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
-					$('#btn-quantificado-CustoFinanceiro').removeClass('btn-light').addClass('btn-primary');
-					$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-dark').addClass('btn-light');
-				}else{
+				// Inicializa o estado dos botões com base no valor de pcValorCustoFinanceiro
+				if ($('#pcValorCustoFinanceiro').val() === '' || $('#pcValorCustoFinanceiro').val() == 'R$ 0,00') {
+					$('#btn-nao-aplica-CustoFinanceiro').addClass('active btn-dark').removeClass('btn-light');
+					$('#btn-quantificado-CustoFinanceiro').removeClass('active btn-primary').addClass('btn-light');
 					$('#pcValorCustoFinanceiro').hide();
-					$('#btn-quantificado-CustoFinanceiro').removeClass('btn-primary').addClass('btn-light');
-					$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-light').addClass('btn-dark');
+				} else {
+					$('#btn-quantificado-CustoFinanceiro').addClass('active btn-primary').removeClass('btn-light');
+					$('#btn-nao-aplica-CustoFinanceiro').removeClass('active btn-dark').addClass('btn-light');
+					$('#pcValorCustoFinanceiro').show();
 				}
 					
 
