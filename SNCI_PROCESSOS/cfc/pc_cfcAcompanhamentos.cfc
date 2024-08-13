@@ -990,295 +990,295 @@
 				mostraRelatoPDF();
 				mostraTabAnexos();
 
-				$('#start-tour2').on('click', function() {
-					hopscotch.endTour();
-					var customI18n2 = {
-						nextBtn: 'Próximo',
-						prevBtn: 'Anterior',
-						doneBtn: 'Concluir',
-						skipBtn: 'Pulartab-manifestacao#',
-						closeTooltip: 'Fechar',
-						stepNums: ['7','8', '9','10','11','12', '13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33',],
+				// $('#start-tour2').on('click', function() {
+				// 	hopscotch.endTour();
+				// 	var customI18n2 = {
+				// 		nextBtn: 'Próximo',
+				// 		prevBtn: 'Anterior',
+				// 		doneBtn: 'Concluir',
+				// 		skipBtn: 'Pulartab-manifestacao#',
+				// 		closeTooltip: 'Fechar',
+				// 		stepNums: ['7','8', '9','10','11','12', '13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33',],
 					
-					};
-					const tourAcompanhamento = {
-						id: 'orgaoAvaliado-acompanhamento-tour',
-						steps: [
+				// 	};
+				// 	const tourAcompanhamento = {
+				// 		id: 'orgaoAvaliado-acompanhamento-tour',
+				// 		steps: [
 							
-							//etapas Informações da orientação                       
-							{
-								title: '<p style="font-size:20px">Descrição do Item</p>',
-								content: 'Ao clicar em um status na aba Medidas/Orientações para regularização, você será direcionado para este conteúdo.<br><br>Aqui você visualiza o número e a decrição do item ao qual a Medida/Orientação para regularização pertence (orientação selecionada por você na tabela acima).',
-								target: 'descricaoItem',
-								placement: 'bottom',
-								width: 700,
-								onNext: function() {
-									$("#custom-tabs-one-Orientacao-tab").click();
-								}
-							},
-							{
-								title: '<p style="font-size:20px">Medida/Orientação para regularização</p>',
-								content: 'Nesta aba você visualiza a descrição da Medida/Orientação para regularização e seu identificador único (ID), além do órgão responsável pela regularização.',
-								target: 'custom-tabs-one-Orientacao-tab',
-								placement: 'top',
-								width: 500,
+				// 			//etapas Informações da orientação                       
+				// 			{
+				// 				title: '<p style="font-size:20px">Descrição do Item</p>',
+				// 				content: 'Ao clicar em um status na aba Medidas/Orientações para regularização, você será direcionado para este conteúdo.<br><br>Aqui você visualiza o número e a decrição do item ao qual a Medida/Orientação para regularização pertence (orientação selecionada por você na tabela acima).',
+				// 				target: 'descricaoItem',
+				// 				placement: 'bottom',
+				// 				width: 700,
+				// 				onNext: function() {
+				// 					$("#custom-tabs-one-Orientacao-tab").click();
+				// 				}
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Medida/Orientação para regularização</p>',
+				// 				content: 'Nesta aba você visualiza a descrição da Medida/Orientação para regularização e seu identificador único (ID), além do órgão responsável pela regularização.',
+				// 				target: 'custom-tabs-one-Orientacao-tab',
+				// 				placement: 'top',
+				// 				width: 500,
 								
-								onNext: function() {
-									$("#custom-tabs-one-InfProcesso-tab").click();
-								},
+				// 				onNext: function() {
+				// 					$("#custom-tabs-one-InfProcesso-tab").click();
+				// 				},
 								
-							},
-							{
-								title: '<p style="font-size:20px">Informações do Processo</p>',
-								content: 'Nesta aba você visualiza todas as informações do processo ao qual a Medida/Orientação para regularização pertence.',
-								target: 'custom-tabs-one-InfProcesso-tab',
-								placement: 'top',
-								width: 400,
-								onPrev: function() {
-									$("#custom-tabs-one-Orientacao-tab").click();
-								},
-							},
-							{
-								title: '<p style="font-size:20px">Processo SNCI nº</p>',
-								content: 'Observe que existem dois núneros de identificação do processo. O primeiro é este, identificação única do processo gerada pelo SNCI. ',
-								target: 'numSNCI',
-								placement: 'top',
-								width: 400,
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Informações do Processo</p>',
+				// 				content: 'Nesta aba você visualiza todas as informações do processo ao qual a Medida/Orientação para regularização pertence.',
+				// 				target: 'custom-tabs-one-InfProcesso-tab',
+				// 				placement: 'top',
+				// 				width: 400,
+				// 				onPrev: function() {
+				// 					$("#custom-tabs-one-Orientacao-tab").click();
+				// 				},
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Processo SNCI nº</p>',
+				// 				content: 'Observe que existem dois núneros de identificação do processo. O primeiro é este, identificação única do processo gerada pelo SNCI. ',
+				// 				target: 'numSNCI',
+				// 				placement: 'top',
+				// 				width: 400,
 								
-							},
-							{
-								title: '<p style="font-size:20px">Processo SEI nº</p>',
-								content: 'O segundo número de identificação é o número do processo no SEI.',
-								target: 'numSEI',
-								placement: 'top',
-								width: 300,
-								onNext: function() {
-									$("#custom-tabs-one-InfItem-tab").click();
-								},
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Processo SEI nº</p>',
+				// 				content: 'O segundo número de identificação é o número do processo no SEI.',
+				// 				target: 'numSEI',
+				// 				placement: 'top',
+				// 				width: 300,
+				// 				onNext: function() {
+				// 					$("#custom-tabs-one-InfItem-tab").click();
+				// 				},
 								
-							},
-							{
-								title: '<p style="font-size:20px">Informações do Item</p>',
-								content: 'Nesta aba você visualiza o número e a descrição do item que a Medida/Orientação para regularização pertence, além da sua Classificação, que pode ser: LEVE, MEDIANA ou GRAVE.',
-								target: 'custom-tabs-one-InfItem-tab',
-								placement: 'top',
-								width: 400,
-								xOffset: -370,
-								arrowOffset: 385,
-								onNext: function() {
-									$("#custom-tabs-one-Avaliacao-tab").click();
-								},
-								onPrev: function() {
-										$("#custom-tabs-one-InfProcesso-tab").click();
-										// Diminua o índice da etapa atual em 2 para evitar erro quando voltar para a etapa anterior que aponta para um id dentro da aba
-										var currentStepIndex=hopscotch.getCurrStepNum();
-										currentStepIndex -= 2;
-										// Verifique se o índice é menor que zero para evitar erros
-										if (currentStepIndex < 0) {
-											currentStepIndex = 0;
-										}
-										// Reinicie o tour para a etapa atual
-										hopscotch.showStep(currentStepIndex);
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Informações do Item</p>',
+				// 				content: 'Nesta aba você visualiza o número e a descrição do item que a Medida/Orientação para regularização pertence, além da sua Classificação, que pode ser: LEVE, MEDIANA ou GRAVE.',
+				// 				target: 'custom-tabs-one-InfItem-tab',
+				// 				placement: 'top',
+				// 				width: 400,
+				// 				xOffset: -370,
+				// 				arrowOffset: 385,
+				// 				onNext: function() {
+				// 					$("#custom-tabs-one-Avaliacao-tab").click();
+				// 				},
+				// 				onPrev: function() {
+				// 						$("#custom-tabs-one-InfProcesso-tab").click();
+				// 						// Diminua o índice da etapa atual em 2 para evitar erro quando voltar para a etapa anterior que aponta para um id dentro da aba
+				// 						var currentStepIndex=hopscotch.getCurrStepNum();
+				// 						currentStepIndex -= 2;
+				// 						// Verifique se o índice é menor que zero para evitar erros
+				// 						if (currentStepIndex < 0) {
+				// 							currentStepIndex = 0;
+				// 						}
+				// 						// Reinicie o tour para a etapa atual
+				// 						hopscotch.showStep(currentStepIndex);
 
-								},
+				// 				},
 							
-							},
-							{
-								title: '<p style="font-size:20px">Relatório</p>',
-								content: 'Nesta aba você visualiza o(s) relatório(s) produzido(s) no SEI e anexado(s) em formato PDF.',
-								target: 'custom-tabs-one-Avaliacao-tab',
-								placement: 'top',
-								width: 400,
-								xOffset: -370,
-								arrowOffset: 385,
-								onPrev: function() {
-									$("#custom-tabs-one-InfItem-tab").click();
-								},
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Relatório</p>',
+				// 				content: 'Nesta aba você visualiza o(s) relatório(s) produzido(s) no SEI e anexado(s) em formato PDF.',
+				// 				target: 'custom-tabs-one-Avaliacao-tab',
+				// 				placement: 'top',
+				// 				width: 400,
+				// 				xOffset: -370,
+				// 				arrowOffset: 385,
+				// 				onPrev: function() {
+				// 					$("#custom-tabs-one-InfItem-tab").click();
+				// 				},
 								
-							},
-							{
-								title: '<p style="font-size:20px">Visualizar Relatório</p>',
-								content: 'Clicando neste ícone, você visualizará o relatório em formato PDF.',
-								target: '.fa-plus',
-								placement: 'left',
-								width: 400,
-								yOffset:-22,
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Visualizar Relatório</p>',
+				// 				content: 'Clicando neste ícone, você visualizará o relatório em formato PDF.',
+				// 				target: '.fa-plus',
+				// 				placement: 'left',
+				// 				width: 400,
+				// 				yOffset:-22,
 								
-							},
+				// 			},
 							
-							{
-								title: '<p style="font-size:20px">Maximizar Relatório</p>',
-								content: 'Clicando neste ícone, você maximizará a visualização do relatório em formato PDF. <br><br> <strong>Obs.:</strong> Para voltar a visualização normal, basta clicar novamente no ícone.',
-								target: '.fa-expand',
-								placement: 'left',
-								width: 500,
-								yOffset:-22,
-								onNext: function() {
-									$("#custom-tabs-one-Anexos-tab").click();
-								},
+				// 			{
+				// 				title: '<p style="font-size:20px">Maximizar Relatório</p>',
+				// 				content: 'Clicando neste ícone, você maximizará a visualização do relatório em formato PDF. <br><br> <strong>Obs.:</strong> Para voltar a visualização normal, basta clicar novamente no ícone.',
+				// 				target: '.fa-expand',
+				// 				placement: 'left',
+				// 				width: 500,
+				// 				yOffset:-22,
+				// 				onNext: function() {
+				// 					$("#custom-tabs-one-Anexos-tab").click();
+				// 				},
 								
-							},
-							{
-								title: '<p style="font-size:20px">Anexos</p>',
-								content: 'Nesta aba, visualizamos todos os arquivos anexados por você, por outros usuários do seu órgão de lotação ou pelo controle interno.<br> Estes anexos podem estar relacionados com o item ao qual esta orientação pertence ou apenas à esta orientação.',
-								target: 'custom-tabs-one-Anexos-tab',
-								placement: 'top',
-								width: 500,
-								xOffset: -470,
-								arrowOffset: 485,
-								onPrev: function() {
-										$("#custom-tabs-one-Avaliacao-tab").click();
-										// Diminua o índice da etapa atual em 2 para evitar erro quando voltar para a etapa anterior que aponta para um id dentro da aba
-										var currentStepIndex=hopscotch.getCurrStepNum();
-										currentStepIndex -= 2;
-										// Verifique se o índice é menor que zero para evitar erros
-										if (currentStepIndex < 0) {
-											currentStepIndex = 0;
-										}
-										// Reinicie o tour para a etapa atual
-										hopscotch.showStep(currentStepIndex);
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Anexos</p>',
+				// 				content: 'Nesta aba, visualizamos todos os arquivos anexados por você, por outros usuários do seu órgão de lotação ou pelo controle interno.<br> Estes anexos podem estar relacionados com o item ao qual esta orientação pertence ou apenas à esta orientação.',
+				// 				target: 'custom-tabs-one-Anexos-tab',
+				// 				placement: 'top',
+				// 				width: 500,
+				// 				xOffset: -470,
+				// 				arrowOffset: 485,
+				// 				onPrev: function() {
+				// 						$("#custom-tabs-one-Avaliacao-tab").click();
+				// 						// Diminua o índice da etapa atual em 2 para evitar erro quando voltar para a etapa anterior que aponta para um id dentro da aba
+				// 						var currentStepIndex=hopscotch.getCurrStepNum();
+				// 						currentStepIndex -= 2;
+				// 						// Verifique se o índice é menor que zero para evitar erros
+				// 						if (currentStepIndex < 0) {
+				// 							currentStepIndex = 0;
+				// 						}
+				// 						// Reinicie o tour para a etapa atual
+				// 						hopscotch.showStep(currentStepIndex);
 
-								},
-							},
-							//etapas Histórico de Manifestações
-							{
-								title: '<p style="font-size:20px">Manifestações</p>',
-								content: 'Aqui, você visualiza o histórico de manifestações.',
-								target: 'accordionCadItemPainel',
-								placement: 'top',
-								width: 500,
-								onPrev: function() {
-									$("#custom-tabs-one-Anexos-tab").click();
-								},
-							},
+				// 				},
+				// 			},
+				// 			//etapas Histórico de Manifestações
+				// 			{
+				// 				title: '<p style="font-size:20px">Manifestações</p>',
+				// 				content: 'Aqui, você visualiza o histórico de manifestações.',
+				// 				target: 'accordionCadItemPainel',
+				// 				placement: 'top',
+				// 				width: 500,
+				// 				onPrev: function() {
+				// 					$("#custom-tabs-one-Anexos-tab").click();
+				// 				},
+				// 			},
 
-							{
-								title: '<p style="font-size:20px">Visualizar todas/Recolher todas</p>',
-								content: 'Clicando neste ícone, você poderá recolher o conteúdo das manifestações. Clicando novamente, o conteúdo das manifestações voltará a ser visualizado.',
-								target: 'btRecolherPosic',
-								placement: 'left',
-								width: 500,
-								yOffset:-19,
-							},
-							//etapas Inserir Manifestações 
-							{
-								title: '<p style="font-size:20px">INSERIR MANIFESTAÇÃO DO ÓRGÃO</p>',
-								content: 'Neste campo, você deve inserir a manisfetação do órgão sobre a Medida/Orientação para regularização selecionada.<br><br>Obs.: Caso queira aumentar a altura deste campo, basta clicar e arrastar o canto inferior direito.',
-								target: 'pcPosicAcomp',
-								placement: 'top',
-								width: 500,
-								xOffset:"center"
-							},
-							{
-								title: '<p style="font-size:20px">Anexar Documentos</p>',
-								content: 'Clicando aqui, você poderá selecionar e anexar documento em formato PDF (.pdf), EXCEL (.xlsx) e compactado (.zip). O documento anexado estará vinculado à orientação.',
-								target: 'anexosAcomp',
-								placement: 'top',
-								width: 400,
-								xOffset:"center"
-							},
-							{
-								title: '<p style="font-size:20px">Enviar Manifestação</p>',
-								content: 'Clicando em "Enviar", seu posicionamento será cadastrado e ficará disponível para avaliação do Controle Interno.',
-								target: 'btEnviar',
-								placement: 'top',
-								width: 400,
-								onNext: function() {
-									$("#custom-tabs-one-MelhoriaAcomp-tab").click();
-                            	}, 
+				// 			{
+				// 				title: '<p style="font-size:20px">Visualizar todas/Recolher todas</p>',
+				// 				content: 'Clicando neste ícone, você poderá recolher o conteúdo das manifestações. Clicando novamente, o conteúdo das manifestações voltará a ser visualizado.',
+				// 				target: 'btRecolherPosic',
+				// 				placement: 'left',
+				// 				width: 500,
+				// 				yOffset:-19,
+				// 			},
+				// 			//etapas Inserir Manifestações 
+				// 			{
+				// 				title: '<p style="font-size:20px">INSERIR MANIFESTAÇÃO DO ÓRGÃO</p>',
+				// 				content: 'Neste campo, você deve inserir a manisfetação do órgão sobre a Medida/Orientação para regularização selecionada.<br><br>Obs.: Caso queira aumentar a altura deste campo, basta clicar e arrastar o canto inferior direito.',
+				// 				target: 'pcPosicAcomp',
+				// 				placement: 'top',
+				// 				width: 500,
+				// 				xOffset:"center"
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Anexar Documentos</p>',
+				// 				content: 'Clicando aqui, você poderá selecionar e anexar documento em formato PDF (.pdf), EXCEL (.xlsx) e compactado (.zip). O documento anexado estará vinculado à orientação.',
+				// 				target: 'anexosAcomp',
+				// 				placement: 'top',
+				// 				width: 400,
+				// 				xOffset:"center"
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Enviar Manifestação</p>',
+				// 				content: 'Clicando em "Enviar", seu posicionamento será cadastrado e ficará disponível para avaliação do Controle Interno.',
+				// 				target: 'btEnviar',
+				// 				placement: 'top',
+				// 				width: 400,
+				// 				onNext: function() {
+				// 					$("#custom-tabs-one-MelhoriaAcomp-tab").click();
+                //             	}, 
 
-							},
-							//tab PROPOSTA DE MELHORIA
-							{
-								title: 'PROPOSTAS DE MELHORIA',
-								content: 'Agora, vamos falar sobre a aba Propostas de Melhoria.<br>Nesta aba, são listadas todas as Propostas de Melhoria pendentes, sob responsabilidade do seu órgão de lotação.',
-								target: 'custom-tabs-one-MelhoriaAcomp-tab',
-								placement: 'right',  
-								width: 400, 
-								yOffset: -15,
-								showPrevButton:false,
-								onNext: function() {
-									if ($('#tabMelhoriasPendentes').length==0) {
-										$('#custom-tabs-one-OrientacaoAcomp-tab').click();
-									}
-								},
+				// 			},
+				// 			//tab PROPOSTA DE MELHORIA
+				// 			{
+				// 				title: 'PROPOSTAS DE MELHORIA',
+				// 				content: 'Agora, vamos falar sobre a aba Propostas de Melhoria.<br>Nesta aba, são listadas todas as Propostas de Melhoria pendentes, sob responsabilidade do seu órgão de lotação.',
+				// 				target: 'custom-tabs-one-MelhoriaAcomp-tab',
+				// 				placement: 'right',  
+				// 				width: 400, 
+				// 				yOffset: -15,
+				// 				showPrevButton:false,
+				// 				onNext: function() {
+				// 					if ($('#tabMelhoriasPendentes').length==0) {
+				// 						$('#custom-tabs-one-OrientacaoAcomp-tab').click();
+				// 					}
+				// 				},
 								                                          
-							},
-							{
-								title: 'Coluna STATUS',
-								content: 'Nesta coluna, são mostrados os status das Propostas de Melhoria.',
-								target: 'colunaStatusProposta',
-								placement: 'top',
-								width: 450,	
-								onNext: function() {
-									$('#statusMelhorias').last().parent().click();
-                            	}, 
+				// 			},
+				// 			{
+				// 				title: 'Coluna STATUS',
+				// 				content: 'Nesta coluna, são mostrados os status das Propostas de Melhoria.',
+				// 				target: 'colunaStatusProposta',
+				// 				placement: 'top',
+				// 				width: 450,	
+				// 				onNext: function() {
+				// 					$('#statusMelhorias').last().parent().click();
+                //             	}, 
 											
-							},
-							{
-								title: 'Coluna STATUS',
-								content: 'Clicando sobre um status, serão disponibilizadas diversas outras informações e o formulário para aceitação, recusa ou troca da proposta de melhoria.',
-								target: 'tabMelhoriasPendentes',
-								placement: 'bottom',
-								width: 450,	
+				// 			},
+				// 			{
+				// 				title: 'Coluna STATUS',
+				// 				content: 'Clicando sobre um status, serão disponibilizadas diversas outras informações e o formulário para aceitação, recusa ou troca da proposta de melhoria.',
+				// 				target: 'tabMelhoriasPendentes',
+				// 				placement: 'bottom',
+				// 				width: 450,	
 								 
 											
-							},
-							{
-								title: '<p style="font-size:20px">Formulário Informar Status</p>',
-								content: '<p>Ao clicar no status de uma Proposta de Melhoria, você visualizará as informações sobre o item ao qual essa Proposta de Melhoria pertence, além de diversas outras informações separadas por abas.</p>',
-								target: 'formManifMelhorias',
-								placement: 'top',
-								width: 500,
-								xOffset: -15,
-								onNext: function() {
-									$('#custom-tabs-one-Melhoria-tab').click();
-								},
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Formulário Informar Status</p>',
+				// 				content: '<p>Ao clicar no status de uma Proposta de Melhoria, você visualizará as informações sobre o item ao qual essa Proposta de Melhoria pertence, além de diversas outras informações separadas por abas.</p>',
+				// 				target: 'formManifMelhorias',
+				// 				placement: 'top',
+				// 				width: 500,
+				// 				xOffset: -15,
+				// 				onNext: function() {
+				// 					$('#custom-tabs-one-Melhoria-tab').click();
+				// 				},
 								
-							},
-							{
-								title: '<p style="font-size:20px">Proposta de Melhoria p/ Manifestação</p>',
-								content: '<p>Nesta aba, selecione o status da Proposta de Melhoria, preencha os demais campos que aparecerão após a seleção e clique em Enviar.</p>',
-								target: 'custom-tabs-one-Melhoria-tab',
-								placement: 'top',
-								width: 500,
-								xOffset: -15,
-								onNext: function() {
-									$('#custom-tabs-one-OrientacaoAcomp-tab').click();
-								},
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Proposta de Melhoria p/ Manifestação</p>',
+				// 				content: '<p>Nesta aba, selecione o status da Proposta de Melhoria, preencha os demais campos que aparecerão após a seleção e clique em Enviar.</p>',
+				// 				target: 'custom-tabs-one-Melhoria-tab',
+				// 				placement: 'top',
+				// 				width: 500,
+				// 				xOffset: -15,
+				// 				onNext: function() {
+				// 					$('#custom-tabs-one-OrientacaoAcomp-tab').click();
+				// 				},
 								
-							},
-							{
-								title: '<p style="font-size:20px">Fim do Tour</p>',
-								content: '<p>Finalizamos nosso tour pelas funcionalidades da página "Acompanhamento".</p>',
-								target: 'start-tour',
-								placement: 'bottom',
-								width: 500,
-								xOffset: -15,
+				// 			},
+				// 			{
+				// 				title: '<p style="font-size:20px">Fim do Tour</p>',
+				// 				content: '<p>Finalizamos nosso tour pelas funcionalidades da página "Acompanhamento".</p>',
+				// 				target: 'start-tour',
+				// 				placement: 'bottom',
+				// 				width: 500,
+				// 				xOffset: -15,
 								
-							},
+				// 			},
 
 
-						],
-						showPrevButton: true,
-						i18n: customI18n2, // Use as opções de i18n personalizadas definidas acima
-						onEnd: function() {
-									$("#custom-tabs-one-Orientacao-tab").click();
+				// 		],
+				// 		showPrevButton: true,
+				// 		i18n: customI18n2, // Use as opções de i18n personalizadas definidas acima
+				// 		onEnd: function() {
+				// 					$("#custom-tabs-one-Orientacao-tab").click();
 									
-								},
-						onClose: function() {
-									$("#custom-tabs-one-Orientacao-tab").click();
+				// 				},
+				// 		onClose: function() {
+				// 					$("#custom-tabs-one-Orientacao-tab").click();
 									
-								},
+				// 				},
 						
-					};
+				// 	};
 
-					hopscotch.startTour(tourAcompanhamento);
-				});
+				// 	hopscotch.startTour(tourAcompanhamento);
+				// });
 
-				if(hopscotch.getState()==="orgaoAvaliado-acompanhamento-tour:7"){
-					$('#start-tour2').click();
-				}
+				// if(hopscotch.getState()==="orgaoAvaliado-acompanhamento-tour:7"){
+				// 	$('#start-tour2').click();
+				// }
 				
 				$('#tab-manifestacao').click(function() {
 					$('html, body').animate({ scrollTop: ($('#tab-manifestacao').offset().top)-60} , 1000);

@@ -75,8 +75,8 @@
 
 	
 
-	<!-- Tour -->
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">
+	<!-- Tour 
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">-->
 
   <!-- Theme style -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
@@ -333,7 +333,7 @@
     <script  src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/searchPanes.bootstrap4.min.js"></script>	
 
       <!-- bs-stepper -->
-     <script src="plugins/bs-stepper/js/bs-stepper.min.js"></script>
+     <script src="../SNCI_PROCESSOS/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 
 
     <!-- Tour 
