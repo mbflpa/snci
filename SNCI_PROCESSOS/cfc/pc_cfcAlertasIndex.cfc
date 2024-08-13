@@ -1,8 +1,7 @@
 <cfcomponent >
 <cfprocessingdirective pageencoding = "utf-8">
 
-	<!-- iCheck -->
-	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">	
+	
 
 	<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
 		WITH OrgHierarchy AS (
