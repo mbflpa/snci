@@ -5895,13 +5895,36 @@
 				return formatter.format(value);
 			}
 
+			// Função de validação customizada
+				function validateButtonGroupsOrientacao() {
+					var isValid = true;
+
+					$("#formAvalOrientacaoCadastro .btn-group").each(function() {
+						var $group = $(this);
+						var hasActive = $group.find(".active").length > 0;
+						var $error = $group.next("span.error");
+
+						if (!hasActive) {
+							$group.addClass("is-invalid").removeClass("is-valid");
+							if ($error.length === 0) {
+								$("<span class='error invalid-feedback' >Selecione, pelo menos, uma opção.</span>").insertAfter($group);
+							}
+							isValid = false;
+						} else {
+							$group.removeClass("is-invalid").addClass("is-valid");
+							$error.remove();
+						}
+					});
+
+					return isValid;
+				}
+
 			function editarOrientacao(linha) {
 				event.preventDefault()
 				event.stopPropagation()
 				$('#labelOrientacao').html('Editar Medida/Orientação para Regularização:')
 				
 				$(linha).closest("tr").children("td:nth-child(5)").click();//seleciona a linha onde o botão foi clicado	
-				
 				var pc_aval_orientacao_id = $(linha).closest("tr").children("td:nth-child(2)").text();
 				var pc_aval_orientacao_mcu_orgaoResp = $(linha).closest("tr").children("td:nth-child(3)").text();
 				var pc_aval_orientacao_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(4)").text();
@@ -5911,10 +5934,16 @@
 				var pc_aval_orientacao_descricao = $(linha).closest("tr").children("td:nth-child(8)").text();
 
 	
+
+	
 				$('#pcOrientacaoId').val(pc_aval_orientacao_id);
 				$('#pcOrientacao').val(pc_aval_orientacao_descricao);
 				$('#pcOrgaoRespOrientacao').val(pc_aval_orientacao_mcu_orgaoResp).trigger('change');
-				$('#pcAvalOrientacaoCategoriaControle').val(pc_aval_orientacao_categoriaControle_id).trigger('change');
+				// Divide a string em um array
+				var valoresArray = pc_aval_orientacao_categoriaControle_id.split(',');
+				// Atribue o array ao select e acione o evento 'change'
+				$('#pcAvalOrientacaoCategoriaControle').val(valoresArray).trigger('change');
+				
 				$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val(pc_aval_orientacao_beneficioNaoFinanceiro).trigger('change');
 				$('#pcValorBeneficioFinanceiro').val(formatCurrency(pc_aval_orientacao_beneficioFinanceiro)).trigger('change');
 				$('#pcValorCustoFinanceiro').val(formatCurrency(pc_aval_orientacao_custoFinanceiro)).trigger('change');
@@ -5951,7 +5980,7 @@
 					$('#btn-nao-aplica-CustoFinanceiro').removeClass('active btn-dark').addClass('btn-light');
 					$('#pcValorCustoFinanceiro').show();
 				}
-					
+				validateButtonGroupsOrientacao();		
 
 
 				$('#cabecalhoAccordionCadOrientacao').text("Editar Medida/Orientação para Regularização ID:" + ' ' + pc_aval_orientacao_id);
@@ -7280,6 +7309,19 @@
 						VALUES ('#rsOrientacao.newIdOrientacao#', '#i#')
 					</cfquery>
 				</cfloop>
+			<cfelse>
+			    <!-- exclui orientacao x categorias de controles-->
+				<cfquery datasource="#application.dsn_processos#">
+					DELETE FROM pc_avaliacao_orientacao_categoriasControles
+					WHERE pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+				</cfquery>
+				<!-- cadastra orientacao x categorias de controles-->
+				<cfloop list="#arguments.pc_aval_orientacao_categoriaControle_id#" index="i"> 
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT INTO pc_avaliacao_orientacao_categoriasControles (pc_aval_orientacao_id, pc_aval_categoriaControle_id)
+						VALUES ('#arguments.pc_aval_orientacao_id#', '#i#')
+					</cfquery>
+				</cfloop>	
 			</cfif>
 		</cftransaction>
 
@@ -7557,7 +7599,7 @@
 		<cfreturn data/>
 	</cffunction>
 			
-			       
+	       
 				
 
 </cfcomponent>
