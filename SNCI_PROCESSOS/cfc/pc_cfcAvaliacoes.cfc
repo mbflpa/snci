@@ -3078,12 +3078,6 @@
 						.tab-pane{
 							min-height: 300px;
 						}
-						
-						
-
-
-
-						
 					</style>
 						
 					<div class="card-header" style="background-color: #0083CA;border-bottom:solid 2px #fff" >
@@ -3250,7 +3244,7 @@
 
 								</div>
 
-								<div class="tab-pane fade " id="custom-tabs-one-4passo" role="tabpanel" aria-labelledby="custom-tabs-one-4passo-tab" style="font-size:16px">
+								<div class="tab-pane fade " id="custom-tabs-one-4passo" role="tabpanel" aria-labelledby="custom-tabs-one-4passo-tab" >
 								   
 									<cfif rsProcAval.pc_aval_classificacao neq 'L'>
 										<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
@@ -4356,19 +4350,7 @@
 					return numericValue > 0;
 				}, "Campo obrigatório e deve ser maior que zero.");
 
-				// Adicione e remova a classe 'active' quando os botões forem clicados
-				// $("#btn_groupAvalOrientacaoBenefNaoFinanceiro button").on("click", function() {
-				// 	$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-				// 	validateButtonGroupsOrientacao()
-				// });
-				// $("#btn_groupValorBeneficioFinanceiro button").on("click", function() {
-				// 	$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-				// 	validateButtonGroupsOrientacao()
-				// });
-				// $("#btn_groupValorCustoFinanceiro button").on("click", function() {
-				// 	$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-				// 	validateButtonGroupsOrientacao()
-				// });
+				
 				$("#formAvalOrientacaoCadastro .btn-group .btn").on("click", function() {
 					$(this).siblings().removeClass("active");
 					$(this).addClass("active");
@@ -4397,7 +4379,7 @@
                
 
 				$('#formAvalOrientacaoCadastro').validate({
-					ignore: [], // Não ignorar os elementos ocultos para que a validação funcione corretamente
+					//ignore: [], // Não ignorar os elementos ocultos para que a validação funcione corretamente
 					rules: {
 						pcOrientacao: {
 							required: true
@@ -4596,6 +4578,25 @@
 					
 				});
 
+				// Adiciona manipuladores de eventos de mudança para os campos select2
+				$('select').on('change.select2', function() {
+					var $this = $(this);
+					if ($this.val()) {
+						$this.removeClass('is-invalid').addClass('is-valid');
+						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						
+					}
+				});
+
+				// Adiciona manipuladores de eventos para validar os campos
+				$('textarea, input, select').on('change blur keyup', function() {
+					var $this = $(this);
+					if ($this.val()) {
+						$this.removeClass('is-invalid').addClass('is-valid');
+						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+					}
+				});
+
 
 
 			});
@@ -4613,7 +4614,7 @@
 		<cfargument name="modalidade" type="string" required="true"  />	
 
 		<div id="accordionCadMelhoria"  style="display: flex; justify-content: left;">
-			<div  id="caMelhoria" class="card card-primary collapsed-card" >
+			<div  id="cadMelhoria" class="card card-primary collapsed-card" >
 				<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
 					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
 						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
@@ -4872,17 +4873,10 @@
 				}, "Campo obrigatório e deve ser maior que zero.");
 
 				// Adicione e remova a classe 'active' quando os botões forem clicados
-				$("#btn_groupAvalMelhoriaBenefNaoFinanceiro button").on("click", function() {
-					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-					validateButtonGroupsMelhoria()
-				});
-				$("#btn_groupValorBeneficioFinanceiroMelhoria button").on("click", function() {
-					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-					validateButtonGroupsMelhoria()
-				});
-				$("#btn_groupValorCustoFinanceiroMelhoria button").on("click", function() {
-					$(this).addClass("active").siblings().removeClass("active");//adiciona active no botão e remove active dos seua irmãos do mesmo grupo
-					validateButtonGroupsMelhoria()
+				$("#formAvalMelhoriaCadastro .btn-group .btn").on("click", function() {
+					$(this).siblings().removeClass("active");
+					$(this).addClass("active");
+					validateButtonGroupsMelhoria();
 				});
 
 				// Adicione um método de validação personalizado para verificar visibilidade e valor não vazio
@@ -4908,11 +4902,11 @@
 
 				$('#formAvalMelhoriaCadastro').validate({
 					
-					ignore: [], // Não ignorar os elementos ocultos para que a validação funcione corretamente
+					//ignore: [], // Não ignorar os elementos ocultos para que a validação funcione corretamente
 					rules: {
 						pcMelhoria: {
 							required: true
-						},
+						 },
 						pcOrgaoRespMelhoria: {
 							required: true
 						},
@@ -4976,60 +4970,15 @@
 					},
 					submitHandler: function(form) {
 						if(validateButtonGroupsMelhoria()){	
-							console.log("Validação do formulário passou com sucesso!");	
+							
 							//verifica se os campos necessários foram preenchidos
 							<cfoutput>
 								let modalidade = '#arguments.modalidade#';
 							</cfoutput>
 							$('#modalOverlay').modal('show')
 							setTimeout(function() {
-								if(modalidade =="A" || modalidade =="E"  ){
-									$.ajax({
-										type: "post",
-										url: "cfc/pc_cfcAvaliacoes.cfc",
-										data:{
-											method: "cadMelhorias",
-											modalidade: modalidade,
-											pc_aval_id: pc_aval_id,
-											pc_aval_melhoria_id: $('#pcMelhoriaId').val(),
-											pc_aval_melhoria_descricao: $('#pcMelhoria').val(),
-											pc_aval_melhoria_num_orgao:  $('#pcOrgaoRespMelhoria').val(),
-											pc_aval_melhoria_status:$('#pcStatusMelhoria').val(),
-											pc_aval_melhoria_dataPrev: $('#pcDataPrev').val(),
-											pc_aval_melhoria_sugestao: $('#pcNovaAcaoMelhoria').val(),
-											pc_aval_melhoria_sug_orgao_mcu:$('#pcOrgaoRespSugeridoMelhoria').val(),
-											pc_aval_melhoria_naoAceita_justif:$('#pcRecusaJustMelhoria').val()
-										},
-										async: false
-									})//fim ajax
-									.done(function(result) {
-										$('#pcMelhoriaId').val('')
-										$('#pcMelhoria').val('') 
-										$('#pcOrgaoRespMelhoria').val('') 
-										$('#pcDataPrev').val('')
-										$('#pcRecusaJustMelhoria').val('')
-										$('#pcNovaAcaoMelhoria').val('')
-										$('#pcOrgaoRespSugeridoMelhoria').val('')		
-										$('#pcStatusMelhoria').val('P').trigger('change')
-										//mostraPendencias()
-										mostraTabMelhorias()
-										$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);	
-										$('#modalOverlay').delay(1000).hide(0, function() {
-											$('#modalOverlay').modal('hide');
-										});	
-									})//fim done
-									.fail(function(xhr, ajaxOptions, thrownError) {
-										$('#modalOverlay').delay(1000).hide(0, function() {
-											$('#modalOverlay').modal('hide');
-										});
-										$('#modal-danger').modal('show')
-										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-										$('#modal-danger').find('.modal-body').text(thrownError)
-
-									})//fim fail
-									$('#labelMelhoria').html('Proposta de Melhoria:')	
-								}else{
-									$.ajax({
+								
+								$.ajax({
 									type: "post",
 									url: "cfc/pc_cfcAvaliacoes.cfc",
 									data:{
@@ -5038,33 +4987,36 @@
 										pc_aval_id: pc_aval_id,
 										pc_aval_melhoria_id: $('#pcMelhoriaId').val(),
 										pc_aval_melhoria_descricao: $('#pcMelhoria').val(),
-										pc_aval_melhoria_num_orgao:  $('#pcOrgaoRespMelhoria').val()	
+										pc_aval_melhoria_num_orgao:  $('#pcOrgaoRespMelhoria').val(),
+										pc_aval_melhoria_status:$('#pcStatusMelhoria').val(),
+										pc_aval_melhoria_dataPrev: $('#pcDataPrev').val(),
+										pc_aval_melhoria_sugestao: $('#pcNovaAcaoMelhoria').val(),
+										pc_aval_melhoria_sug_orgao_mcu:$('#pcOrgaoRespSugeridoMelhoria').val(),
+										pc_aval_melhoria_naoAceita_justif:$('#pcRecusaJustMelhoria').val(),
+										pc_aval_melhoria_categoriaControle_id: $('#pcAvalMelhoriaCategoriaControle').val().join(','),
+										pc_aval_melhoria_beneficioNaoFinanceiro: $('#pcAvalMelhoriaBenefNaoFinanceiroDesc').val(),
+										pc_aval_melhoria_beneficioFinanceiro: $('#pcValorBeneficioFinanceiroMelhoria').val(),
+										pc_aval_melhoria_custoFinanceiro: $('#pcValorCustoFinanceiroMelhoria').val()
 									},
 									async: false
-									})//fim ajax
-									.done(function(result) {
-										$('#pcMelhoriaId').val('')
-										$('#pcMelhoria').val('') 
-										$('#pcOrgaoRespMelhoria').val('') 
-										
-										//mostraPendencias()
-										mostraTabMelhorias()
-										$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);	
-										$('#modalOverlay').delay(1000).hide(0, function() {
-											$('#modalOverlay').modal('hide');
-										});	
-									})//fim done
-									.fail(function(xhr, ajaxOptions, thrownError) {
-										$('#modalOverlay').delay(1000).hide(0, function() {
-											$('#modalOverlay').modal('hide');
-										});
-										$('#modal-danger').modal('show')
-										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-										$('#modal-danger').find('.modal-body').text(thrownError)
+								})//fim ajax
+								.done(function(result) {
+									
+									mostraTabMelhorias()
+									toastr.success('Operação realizada com sucesso!');
+									mostraFormAvalMelhoriaCadastro();	
+								})//fim done
+								.fail(function(xhr, ajaxOptions, thrownError) {
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+									$('#modal-danger').modal('show')
+									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+									$('#modal-danger').find('.modal-body').text(thrownError)
 
-									})//fim fail
-									$('#labelMelhoria').html('Proposta de Melhoria:')
-								}	
+								})//fim fail
+								$('#labelMelhoria').html('Proposta de Melhoria:')	
+								
 							}, 1000);		
 						}
 					}
@@ -5155,6 +5107,25 @@
 						});
 					}, 1000);
 					
+				});
+
+				// Adiciona manipuladores de eventos de mudança para os campos select2
+				$('select').on('change.select2', function() {
+					var $this = $(this);
+					if ($this.val()) {
+						$this.removeClass('is-invalid').addClass('is-valid');
+						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						
+					}
+				});
+
+				// Adiciona manipuladores de eventos para validar os campos
+				$('textarea, input, select').on('change blur keyup', function() {
+					var $this = $(this);
+					if ($this.val()) {
+						$this.removeClass('is-invalid').addClass('is-valid');
+						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+					}
 				});
 
 			});
@@ -5553,6 +5524,11 @@
 												<th style="vertical-align:middle !important;">Justificativa do órgão: </th>
 												<th style="vertical-align:middle !important;">Sugestão de Melhoria<br> (sugerida pelo órgão): </th>
 											</cfif>
+											<th hidden></th>
+											<th hidden></th>
+											<th hidden></th>
+											<th hidden></th>
+											
 
 
 
@@ -5561,6 +5537,12 @@
 								
 									<tbody>
 										<cfloop query="rsMelhorias" >
+										    <cfquery name="rsCategoriasControlesMelhorias" datasource="#application.dsn_processos#">
+												SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_melhoria_categoriasControles 
+												WHERE pc_aval_melhoria_id = #pc_aval_melhoria_id#
+											</cfquery>
+											<cfset listaCategoriasControlesMelhoria = ValueList(rsCategoriasControlesMelhorias.pc_aval_categoriaControle_id,',')>
+											
 											<cfoutput>					
 												<cfswitch expression="#pc_aval_melhoria_status#">
 													<cfcase value="P">
@@ -5586,7 +5568,7 @@
 													</cfdefaultcase>
 													
 												</cfswitch>
-												<tr style="font-size:14px;color:##000" >
+												<tr style="font-size:12px;color:##000" >
 													<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
 														<td style="text-align: center; vertical-align:middle !important;width:10%">	
 															<div style="display:flex;justify-content:space-around;">
@@ -5599,16 +5581,20 @@
 													<td hidden>#pc_aval_melhoria_num_orgao#</td>
 													<td hidden>#pc_aval_melhoria_sug_orgao_mcu#</td>
 													<td hidden>#pc_aval_melhoria_dataPrev#</td>
-													<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="3"  disabled>#pc_aval_melhoria_descricao#</textarea></td>
+													<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2"  disabled>#pc_aval_melhoria_descricao#</textarea></td>
 													<td style="vertical-align:middle !important;">#pc_org_sigla#</td>
 													<td style="vertical-align:middle !important;">#statusMelhoria#</td>
 													<cfif #rsStatus.pc_modalidade# neq 'E'>
 														<cfset dataHora = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY')>
 														<td style="vertical-align:middle !important;">#dataHora#</td>
 														<td style="vertical-align:middle !important;">#siglaOrgSug#</td>
-														<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="3" disabled>#pc_aval_melhoria_naoAceita_justif#</textarea></td>
-														<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="3" disabled>#pc_aval_melhoria_sugestao#</textarea></td>
+														<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_naoAceita_justif#</textarea></td>
+														<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_sugestao#</textarea></td>
 													</cfif>
+													<td hidden>#listaCategoriasControlesMelhoria#</td>
+													<td hidden>#pc_aval_melhoria_beneficioNaoFinanceiro#</td>
+													<td hidden>#pc_aval_melhoria_beneficioFinanceiro#</td>
+													<td hidden>#pc_aval_melhoria_custoFinanceiro#</td>
 												
 												</tr>
 											</cfoutput>
@@ -5630,13 +5616,14 @@
 			$(function () {
 				
 				$("#tabMelhorias").DataTable({
-					"destroy": true,
-			     	"stateSave": false,
-					"responsive": true, 
-					"lengthChange": false, 
-					"autoWidth": false,
-					"select": true,
-					"columnDefs": [
+					destroy: true,
+			     	stateSave: false,
+					responsive: true, 
+					lengthChange: false, 
+					autoWidth: false,
+					select: true,
+					searching:false,
+					columnDefs: [
 						{ "className": "dt-center", "targets": "_all" } // Alinha todos os elementos verticalmente
 					]
 				})
@@ -5653,9 +5640,38 @@
 				return formatter.format(value);
 			}
 
+			// Função de validação customizada
+			function validateButtonGroupsMelhoria() {
+				var isValid = true;
+
+				$("#formAvalMelhoriaCadastro .btn-group").each(function() {
+					var $group = $(this);
+					var hasActive = $group.find(".active").length > 0;
+					var $error = $group.next("span.error");
+
+					if (!hasActive) {
+						$group.addClass("is-invalid").removeClass("is-valid");
+						if ($error.length === 0) {
+							$("<span class='error invalid-feedback' >Selecione, pelo menos, uma opção.</span>").insertAfter($group);
+						}
+						isValid = false;
+					} else {
+						$group.removeClass("is-invalid").addClass("is-valid");
+						$error.remove();
+					}
+				});
+
+				return isValid;
+			}
+
 			function editarMelhoria(linha) {
 				event.preventDefault()
 				event.stopPropagation()
+				
+				$('#labelMelhoria').html('Editar Proposta de Melhoria:')
+
+				<cfoutput> var modalidade = '#rsStatus.pc_modalidade#'; </cfoutput>
+				
 				$(linha).closest("tr").children("td:nth-child(6)").click();//seleciona a linha onde o botão foi clicado	
 				var pc_aval_melhoria_id = $(linha).closest("tr").children("td:nth-child(2)").text();
 				var pc_aval_melhoria_num_orgao = $(linha).closest("tr").children("td:nth-child(3)").text();
@@ -5663,7 +5679,7 @@
 				var pc_aval_melhoria_dataPrev = $(linha).closest("tr").children("td:nth-child(5)").text()
 				var pc_aval_melhoria_descricao = $(linha).closest("tr").children("td:nth-child(6)").text();
 				
-
+				
 				
 				var pc_aval_melhoria_status = "";
 
@@ -5694,16 +5710,79 @@
 				var pc_aval_melhoria_naoAceita_justif = $(linha).closest("tr").children("td:nth-child(11)").text();
 				var pc_aval_melhoria_sugestao = $(linha).closest("tr").children("td:nth-child(12)").text();
 
-				$('#labelMelhoria').html('Editar Proposta de Melhoria:')
-				$('#pcMelhoriaId').val(pc_aval_melhoria_id);
-				$('#pcMelhoria').val(pc_aval_melhoria_descricao);
-				$('#pcOrgaoRespMelhoria').val(pc_aval_melhoria_num_orgao);
+
+                if(modalidade != 'E'){
+					var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(13)").text();
+					var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(14)").text();
+					var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(15)").text();
+					var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(16)").text();
+				}else{
+					var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(9)").text();
+					var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(10)").text();
+					var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(11)").text();
+					var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(12)").text();
+				}
+                 
+
+
+
+				$('#pcMelhoriaId').val(pc_aval_melhoria_id).trigger('change');
+				$('#pcMelhoria').val(pc_aval_melhoria_descricao).trigger('change');
+				$('#pcOrgaoRespMelhoria').val(pc_aval_melhoria_num_orgao).trigger('change');
 
 				$('#pcStatusMelhoria').val(pc_aval_melhoria_status).trigger('change');
-				$('#pcDataPrev').val(pc_aval_melhoria_dataPrev);
-				$('#pcOrgaoRespSugeridoMelhoria').val(pc_aval_melhoria_sug_orgao_mcu);
-				$('#pcRecusaJustMelhoria').val(pc_aval_melhoria_naoAceita_justif);
-				$('#pcNovaAcaoMelhoria').val(pc_aval_melhoria_sugestao);
+				$('#pcDataPrev').val(pc_aval_melhoria_dataPrev).trigger('change');
+				$('#pcOrgaoRespSugeridoMelhoria').val(pc_aval_melhoria_sug_orgao_mcu).trigger('change');
+				$('#pcRecusaJustMelhoria').val(pc_aval_melhoria_naoAceita_justif).trigger('change');
+				$('#pcNovaAcaoMelhoria').val(pc_aval_melhoria_sugestao).trigger('change');
+
+				// Divide a string em um array
+				var valoresArray = pc_aval_melhoria_categoriaControle_id.split(',');
+				// Atribue o array ao select e acione o evento 'change'
+				$('#pcAvalMelhoriaCategoriaControle').val(valoresArray).trigger('change');
+				
+				$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').val(pc_aval_melhoria_beneficioNaoFinanceiro).trigger('change');
+				$('#pcValorBeneficioFinanceiroMelhoria').val(formatCurrency(pc_aval_melhoria_beneficioFinanceiro)).trigger('change');
+				$('#pcValorCustoFinanceiroMelhoria').val(formatCurrency(pc_aval_melhoria_custoFinanceiro)).trigger('change');
+
+				// Inicializa o estado dos botões com base no valor de pcAvalMelhoriaBenefNaoFinanceiroDesc
+				if ($('#pcAvalMelhoriaBenefNaoFinanceiroDesc').val() === '') {
+					$('#btn-nao-aplicaMelhoria').addClass('active btn-dark').removeClass('btn-light');
+					$('#btn-descricaoMelhoria').removeClass('active btn-primary').addClass('btn-light');
+					$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').hide();
+				} else {
+					$('#btn-descricaoMelhoria').addClass('active btn-primary').removeClass('btn-light');
+					$('#btn-nao-aplicaMelhoria').removeClass('active btn-dark').addClass('btn-light');
+					$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').show();
+				}
+
+				// Inicializa o estado dos botões com base no valor de pcValorBeneficioFinanceiropcValorBeneficioFinanceiro
+				if ($('#pcValorBeneficioFinanceiroMelhoria').val() === '' || $('#pcValorBeneficioFinanceiroMelhoria').val() == 'R$ 0,00') {
+					$('#btn-nao-aplica-BeneficioFinanceiroMelhoria').addClass('active btn-dark').removeClass('btn-light');
+					$('#btn-quantificado-BeneficioFinanceiroMelhoria').removeClass('active btn-primary').addClass('btn-light');
+					$('#pcValorBeneficioFinanceiroMelhoria').hide();
+				} else {
+					$('#btn-quantificado-BeneficioFinanceiroMelhoria').addClass('active btn-primary').removeClass('btn-light');
+					$('#btn-nao-aplica-BeneficioFinanceiroMelhoria').removeClass('active btn-dark').addClass('btn-light');
+					$('#pcValorBeneficioFinanceiroMelhoria').show();
+				}
+
+				// Inicializa o estado dos botões com base no valor de pcValorCustoFinanceiro
+				if ($('#pcValorCustoFinanceiroMelhoria').val() === '' || $('#pcValorCustoFinanceiroMelhoria').val() == 'R$ 0,00') {
+					$('#btn-nao-aplica-CustoFinanceiroMelhoria').addClass('active btn-dark').removeClass('btn-light');
+					$('#btn-quantificado-CustoFinanceiroMelhoria').removeClass('active btn-primary').addClass('btn-light');
+					$('#pcValorCustoFinanceiroMelhoria').hide();
+				} else {
+					$('#btn-quantificado-CustoFinanceiroMelhoria').addClass('active btn-primary').removeClass('btn-light');
+					$('#btn-nao-aplica-CustoFinanceiroMelhoria').removeClass('active btn-dark').addClass('btn-light');
+					$('#pcValorCustoFinanceiroMelhoria').show();
+				}
+				validateButtonGroupsMelhoria();	
+
+				$('#cabecalhoAccordionCadMelhoria').text("Editar Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
+				$('#infoTipoCadMelhoria').text("Editando Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
+		        $('#cadMelhoria').CardWidget('expand')
+				$('html, body').animate({ scrollTop: ($('#cadMelhoria').offset().top - 80)} , 500); 
 
 			};	
 
@@ -5805,71 +5884,71 @@
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
             
-				<div class="row">
-					<div class="col-12">
-						<div class="card">
-							<!-- /.card-header -->
-							<div class="card-body">
-							    
-								<table id="tabOrientacoes" class="table table-bordered table-hover  ">
-									<thead style="background: #0083ca;color:#fff">
-										<tr style="font-size:14px">
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<!-- /.card-header -->
+					<div class="card-body">
+						
+						<table id="tabOrientacoes" class="table table-bordered table-hover  ">
+							<thead style="background: #0083ca;color:#fff">
+								<tr style="font-size:14px">
+									<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
+										<th>Controles</th>
+									</cfif>
+									<th hidden >pc_aval_orientacao_id</th>
+									<th hidden >pc_aval_orientacao_mcu_orgaoResp</th>
+									<th hidden >pc_aval_orientacao_categoriaControle_id</th>
+									<th hidden >pc_aval_orientacao_beneficioNaoFinanceiro</th>
+									<th hidden >pc_aval_orientacao_beneficioFinanceiro</th>
+									<th hidden >pc_aval_orientacao_custoFinanceiro</th>
+									<th>Orientação</th>
+									<th >Órgão Responsável</th>
+								</tr>
+							</thead>
+						
+							<tbody>
+								<cfloop query="rsOrientacoes" >
+									<cfquery name="rsCategoriasControlesOrientacoes" datasource="#application.dsn_processos#">
+										SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_orientacao_categoriasControles 
+										WHERE pc_aval_orientacao_id = #pc_aval_orientacao_id#
+									</cfquery>
+									<cfset listaCategoriasControlesOrientacao = ValueList(rsCategoriasControlesOrientacoes.pc_aval_categoriaControle_id,',')>
+									<cfoutput>
+
+										<tr style="font-size:12px;color:##000" onClick="<cfif #rsOrientacoes.pc_num_status# eq 4>javascript:mostraTimeline(#pc_aval_orientacao_id#) </cfif>">
 											<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
-												<th>Controles</th>
+												<td style="text-align: center; vertical-align:middle !important;width:10%">	
+													<div style="display:flex;justify-content:space-around;">
+														<i id="btExcluirOrientacao" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px"   onClick="javascript:excluirOrientacao(#pc_aval_orientacao_id#)" title="Excluir" ></i>
+														<i id="btEditarOrientacao" class="fas fa-edit efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:5px" onClick="javascript:editarOrientacao(this);"   title="Editar" ></i>
+													</div>
+												</td>													
 											</cfif>
-											<th hidden >pc_aval_orientacao_id</th>
-											<th hidden >pc_aval_orientacao_mcu_orgaoResp</th>
-											<th hidden >pc_aval_orientacao_categoriaControle_id</th>
-											<th hidden >pc_aval_orientacao_beneficioNaoFinanceiro</th>
-											<th hidden >pc_aval_orientacao_beneficioFinanceiro</th>
-											<th hidden >pc_aval_orientacao_custoFinanceiro</th>
-											<th>Orientação</th>
-											<th >Órgão Responsável</th>
+											<td hidden >#pc_aval_orientacao_id#</td>
+											<td hidden>#pc_aval_orientacao_mcu_orgaoResp#</td>
+											<td hidden>#listaCategoriasControlesOrientacao#</td>
+											<td hidden>#pc_aval_orientacao_beneficioNaoFinanceiro#</td>
+											<td hidden>#pc_aval_orientacao_beneficioFinanceiro#</td>
+											<td hidden>#pc_aval_orientacao_custoFinanceiro#</td>
+											<td style="vertical-align:middle !important"><textarea class="textareaTab" rows="2" disabled>#pc_aval_orientacao_descricao#</textarea></td>
+											<td style="vertical-align:middle !important;width:20%">#pc_org_sigla#</td>
 										</tr>
-									</thead>
+									</cfoutput>
+								</cfloop>	
+							</tbody>
 								
-									<tbody>
-										<cfloop query="rsOrientacoes" >
-										    <cfquery name="rsCategoriasControlesOrientacoes" datasource="#application.dsn_processos#">
-												SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_orientacao_categoriasControles 
-												WHERE pc_aval_orientacao_id = #pc_aval_orientacao_id#
-											</cfquery>
-											<cfset listaCategoriasControlesOrientacao = ValueList(rsCategoriasControlesOrientacoes.pc_aval_categoriaControle_id,',')>
-											<cfoutput>
-
-												<tr style="font-size:14px;color:##000" onClick="<cfif #rsOrientacoes.pc_num_status# eq 4>javascript:mostraTimeline(#pc_aval_orientacao_id#) </cfif>">
-													<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
-														<td style="text-align: center; vertical-align:middle !important;width:10%">	
-															<div style="display:flex;justify-content:space-around;">
-																<i id="btExcluirOrientacao" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px"   onClick="javascript:excluirOrientacao(#pc_aval_orientacao_id#)" title="Excluir" ></i>
-																<i id="btEditarOrientacao" class="fas fa-edit efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:5px" onClick="javascript:editarOrientacao(this);"   title="Editar" ></i>
-															</div>
-														</td>													
-													</cfif>
-													<td hidden >#pc_aval_orientacao_id#</td>
-													<td hidden>#pc_aval_orientacao_mcu_orgaoResp#</td>
-													<td hidden>#listaCategoriasControlesOrientacao#</td>
-													<td hidden>#pc_aval_orientacao_beneficioNaoFinanceiro#</td>
-													<td hidden>#pc_aval_orientacao_beneficioFinanceiro#</td>
-													<td hidden>#pc_aval_orientacao_custoFinanceiro#</td>
-													<td style="vertical-align:middle !important"><textarea class="textareaTab" rows="3" disabled>#pc_aval_orientacao_descricao#</textarea></td>
-													<td style="vertical-align:middle !important;width:20%">#pc_org_sigla#</td>
-												</tr>
-											</cfoutput>
-										</cfloop>	
-									</tbody>
-										
-									
-								</table>
-							</div>
-
-							<!-- /.card-body -->
-						</div>
-						<!-- /.card -->
+							
+						</table>
 					</div>
-				<!-- /.col -->
+
+					<!-- /.card-body -->
 				</div>
-				<!-- /.row -->
+				<!-- /.card -->
+			</div>
+		<!-- /.col -->
+		</div>
+		<!-- /.row -->
 		<script language="JavaScript">
 			$(function () {
 				
@@ -5880,7 +5959,10 @@
 					lengthChange: false, 
 					utoWidth: false,
 					select: true,
-					searching:false
+					searching:false,
+					columnDefs: [
+						{ "className": "dt-center", "targets": "_all" } // Alinha todos os elementos verticalmente
+					]
 				});
 					
 			});
@@ -5896,28 +5978,28 @@
 			}
 
 			// Função de validação customizada
-				function validateButtonGroupsOrientacao() {
-					var isValid = true;
+			function validateButtonGroupsOrientacao() {
+				var isValid = true;
 
-					$("#formAvalOrientacaoCadastro .btn-group").each(function() {
-						var $group = $(this);
-						var hasActive = $group.find(".active").length > 0;
-						var $error = $group.next("span.error");
+				$("#formAvalOrientacaoCadastro .btn-group").each(function() {
+					var $group = $(this);
+					var hasActive = $group.find(".active").length > 0;
+					var $error = $group.next("span.error");
 
-						if (!hasActive) {
-							$group.addClass("is-invalid").removeClass("is-valid");
-							if ($error.length === 0) {
-								$("<span class='error invalid-feedback' >Selecione, pelo menos, uma opção.</span>").insertAfter($group);
-							}
-							isValid = false;
-						} else {
-							$group.removeClass("is-invalid").addClass("is-valid");
-							$error.remove();
+					if (!hasActive) {
+						$group.addClass("is-invalid").removeClass("is-valid");
+						if ($error.length === 0) {
+							$("<span class='error invalid-feedback' >Selecione, pelo menos, uma opção.</span>").insertAfter($group);
 						}
-					});
+						isValid = false;
+					} else {
+						$group.removeClass("is-invalid").addClass("is-valid");
+						$error.remove();
+					}
+				});
 
-					return isValid;
-				}
+				return isValid;
+			}
 
 			function editarOrientacao(linha) {
 				event.preventDefault()
@@ -6795,7 +6877,7 @@
 										<cfif FileExists(pc_anexo_caminho)>
 											<cfoutput>					
 												<cfset arquivo = ListLast(pc_anexo_caminho,'\')>
-												<tr style="font-size:12px" >
+												<tr >
 													<td style="width:10%">	
 														<div style="display:flex;justify-content:space-around;">
 
@@ -6812,7 +6894,7 @@
 													<td class="idColumn">#pc_anexo_id#</td>
 
 													<cfset data = DateFormat(#pc_anexo_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_anexo_datahora#,'HH:mm:ss') & ')'>
-														<td >
+													<td >
 														<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
 															<i class="fas fa-file-pdf " style="margin-right:10px;color:red;font-size:20px"></i>
 														<cfelseif right(#pc_anexo_caminho#,3) eq 'zip'>
@@ -6820,7 +6902,7 @@
 														<cfelse>
 															<i class="fas fa-file-excel" style="margin-right:10px;color:green;font-size:20px"></i>
 														</cfif>												
-														#pc_anexo_nome#
+															#pc_anexo_nome#
 													</td>
 													
 													<td >#pc_org_sigla# (#pc_usu_nome#)</td>
@@ -7186,50 +7268,74 @@
 		<cfargument name="pc_aval_melhoria_naoAceita_justif" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_status" type="string"  required="false"  default=""/>
 		
+		<cfargument name="pc_aval_melhoria_categoriaControle_id" type="string" required="true"/>
+		<cfargument name="pc_aval_melhoria_beneficioNaoFinanceiro" type="string" required="true"/>
+		<cfargument name="pc_aval_melhoria_beneficioFinanceiro" type="string" required="true"/>
+		<cfargument name="pc_aval_melhoria_custoFinanceiro" type="numeric" required="true"/>
 	
-		<cfquery datasource="#application.dsn_processos#" >
-			<cfif '#arguments.modalidade#' eq 'A' OR '#arguments.modalidade#' eq 'E'>
-				<cfif #arguments.pc_aval_melhoria_id# eq ''>
-					<cfif '#arguments.pc_aval_melhoria_dataPrev#' eq "">
-						INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif,  pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora)
-						VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#',  '#arguments.pc_aval_melhoria_status#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">)
-					<cfelse>
-						INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login,pc_aval_melhoria_dataPrev, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif,  pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora)
-						VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#arguments.pc_aval_melhoria_dataPrev#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#',  '#arguments.pc_aval_melhoria_status#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">)
-					
-					</cfif>
-				<cfelse>
-					UPDATE pc_avaliacao_melhorias
-					SET    pc_aval_melhoria_descricao = '#arguments.pc_aval_melhoria_descricao#',
-						pc_aval_melhoria_num_orgao = '#arguments.pc_aval_melhoria_num_orgao#',
-						<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
-							pc_aval_melhoria_dataPrev = '#arguments.pc_aval_melhoria_dataPrev#',
-						<cfelse>
-						    pc_aval_melhoria_dataPrev = null,
-						</cfif>
-						pc_aval_melhoria_sugestao = '#arguments.pc_aval_melhoria_sugestao#',
-						pc_aval_melhoria_sug_orgao_mcu = '#arguments.pc_aval_melhoria_sug_orgao_mcu#',
-						pc_aval_melhoria_naoAceita_justif = '#arguments.pc_aval_melhoria_naoAceita_justif#',
-						pc_aval_melhoria_sug_matricula = '#application.rsUsuarioParametros.pc_usu_matricula#',
-						pc_aval_melhoria_status = '#arguments.pc_aval_melhoria_status#',
-						pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
 
-					WHERE  pc_aval_melhoria_id = #arguments.pc_aval_melhoria_id#	
+
+		<cfquery datasource="#application.dsn_processos#" name="rsMelhoria">
+			<cfif arguments.pc_aval_melhoria_id eq ''>
+			
+				<cfif '#arguments.pc_aval_melhoria_dataPrev#' eq "">
+				
+					INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif,  pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora, pc_aval_melhoria_beneficioNaoFinanceiro, pc_aval_melhoria_beneficioFinanceiro, pc_aval_melhoria_custoFinanceiro)
+					VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#',  '#arguments.pc_aval_melhoria_status#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, <cfqueryparam value="#arguments.pc_aval_melhoria_beneficioNaoFinanceiro#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#arguments.pc_aval_melhoria_beneficioFinanceiro#" cfsqltype="cf_sql_money">,<cfqueryparam value="#arguments.pc_aval_melhoria_custoFinanceiro#" cfsqltype="cf_sql_money">)
+					SELECT SCOPE_IDENTITY() AS newIdMelhoria;
+				<cfelse>
+					INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login, pc_aval_melhoria_dataPrev, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif,  pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora, pc_aval_melhoria_beneficioNaoFinanceiro, pc_aval_melhoria_beneficioFinanceiro, pc_aval_melhoria_custoFinanceiro)	
+					VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#arguments.pc_aval_melhoria_dataPrev#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#',  '#arguments.pc_aval_melhoria_status#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,<cfqueryparam value="#arguments.pc_aval_melhoria_beneficioNaoFinanceiro#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#arguments.pc_aval_melhoria_beneficioFinanceiro#" cfsqltype="cf_sql_money">,<cfqueryparam value="#arguments.pc_aval_melhoria_custoFinanceiro#" cfsqltype="cf_sql_money">)
+					SELECT SCOPE_IDENTITY() AS newIdMelhoria;
 				</cfif>
+
+				
 			<cfelse>
-				<cfif #arguments.pc_aval_melhoria_id# eq ''>
-					INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login)
-					VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
-				<cfelse>
-					UPDATE pc_avaliacao_melhorias
-					SET    pc_aval_melhoria_descricao = '#arguments.pc_aval_melhoria_descricao#',
-						   pc_aval_melhoria_num_orgao = '#arguments.pc_aval_melhoria_num_orgao#'
-					WHERE  pc_aval_melhoria_id = #arguments.pc_aval_melhoria_id#	
-				</cfif>
+				UPDATE pc_avaliacao_melhorias
+				SET    pc_aval_melhoria_descricao = '#arguments.pc_aval_melhoria_descricao#',
+					pc_aval_melhoria_num_orgao = '#arguments.pc_aval_melhoria_num_orgao#',
+					<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
+						pc_aval_melhoria_dataPrev = '#arguments.pc_aval_melhoria_dataPrev#',
+					<cfelse>
+						pc_aval_melhoria_dataPrev = null,
+					</cfif>
+					pc_aval_melhoria_sugestao = '#arguments.pc_aval_melhoria_sugestao#',
+					pc_aval_melhoria_sug_orgao_mcu = '#arguments.pc_aval_melhoria_sug_orgao_mcu#',
+					pc_aval_melhoria_naoAceita_justif = '#arguments.pc_aval_melhoria_naoAceita_justif#',
+					pc_aval_melhoria_sug_matricula = '#application.rsUsuarioParametros.pc_usu_matricula#',
+					pc_aval_melhoria_status = '#arguments.pc_aval_melhoria_status#',
+					pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+					pc_aval_melhoria_beneficioNaoFinanceiro = <cfqueryparam value="#arguments.pc_aval_melhoria_beneficioNaoFinanceiro#" cfsqltype="cf_sql_varchar">,
+					pc_aval_melhoria_beneficioFinanceiro = <cfqueryparam value="#arguments.pc_aval_melhoria_beneficioFinanceiro#" cfsqltype="cf_sql_money">,
+					pc_aval_melhoria_custoFinanceiro = <cfqueryparam value="#arguments.pc_aval_melhoria_custoFinanceiro#" cfsqltype="cf_sql_money">
+				WHERE  pc_aval_melhoria_id = #arguments.pc_aval_melhoria_id#	
 			</cfif>
-
-
 		</cfquery>
+		
+		<cfif arguments.pc_aval_melhoria_id eq ''>
+			<!-- cadastra melhoria x categorias de controles-->
+			<cfloop list="#arguments.pc_aval_melhoria_categoriaControle_id#" index="i"> 
+				<cfquery datasource="#application.dsn_processos#">
+					INSERT INTO pc_avaliacao_melhoria_categoriasControles (pc_aval_melhoria_id, pc_aval_categoriaControle_id)
+					VALUES ('#rsMelhoria.newIdMelhoria#', '#i#')
+				</cfquery>
+			</cfloop>
+		<cfelse>
+			<!-- exclui melhoria x categorias de controles-->
+			<cfquery datasource="#application.dsn_processos#">
+				DELETE FROM pc_avaliacao_melhoria_categoriasControles
+				WHERE pc_aval_melhoria_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_melhoria_id#">
+			</cfquery>
+			<!-- cadastra melhoria x categorias de controles-->
+			<cfloop list="#arguments.pc_aval_melhoria_categoriaControle_id#" index="i"> 
+				<cfquery datasource="#application.dsn_processos#">
+					INSERT INTO pc_avaliacao_melhoria_categoriasControles (pc_aval_melhoria_id, pc_aval_categoriaControle_id)
+					VALUES ('#arguments.pc_aval_melhoria_id#', '#i#')
+				</cfquery>
+			</cfloop>	
+		</cfif>
+
+		
 		
   	</cffunction>
 
@@ -7245,6 +7351,11 @@
 	<cffunction name="delMelhorias"   access="remote" returntype="boolean" hint="exclui uma proposta de melhoria">
 
 		<cfargument name="pc_aval_melhoria_id" type="numeric" required="true" default=""/>
+
+		<cfquery datasource="#application.dsn_processos#" >
+			DELETE FROM pc_avaliacao_melhoria_categoriasControles
+			WHERE pc_aval_melhoria_id= '#arguments.pc_aval_melhoria_id#'
+		</cfquery> 
 
 		<cfquery datasource="#application.dsn_processos#" > 
 			DELETE FROM pc_avaliacao_melhorias
