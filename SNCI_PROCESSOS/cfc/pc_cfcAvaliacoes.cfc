@@ -3252,7 +3252,7 @@
 										</cfif>
 										<div id="tabOrientacoesDiv" style="margin-top:20px"></div>
 									<cfelse>
-										<p style="font-size:16px;color:red">Não se aplica para itens com classificação "LEVE".</p>
+										<div class="badge " style=" background-color:#e83e8c;color:#fff;font-size:20px;">Não se aplica para itens com classificação "LEVE".</div>
 									</cfif>
 								
 								</div>
@@ -3267,7 +3267,7 @@
 										</cfif>
 										<div id="tabMelhoriasDiv" style="margin-top:20px;"></div>
 									<cfelse>
-										<p style="font-size:16px;color:red">Não se aplica para itens com classificação "LEVE".</p>
+										<div class="badge " style=" background-color:#e83e8c;color:#fff;font-size:20px;">Não se aplica para itens com classificação "LEVE".</div>
 									</cfif>
 									
 								</div>
@@ -5002,7 +5002,7 @@
 								})//fim ajax
 								.done(function(result) {
 									
-									mostraTabMelhorias()
+									mostraTabMelhorias();
 									toastr.success('Operação realizada com sucesso!');
 									mostraFormAvalMelhoriaCadastro();	
 								})//fim done
@@ -5757,7 +5757,7 @@
 				}
 
 				// Inicializa o estado dos botões com base no valor de pcValorBeneficioFinanceiropcValorBeneficioFinanceiro
-				if ($('#pcValorBeneficioFinanceiroMelhoria').val() === '' || $('#pcValorBeneficioFinanceiroMelhoria').val() == 'R$ 0,00') {
+				if ($('#pcValorBeneficioFinanceiroMelhoria').val() == 0) {
 					$('#btn-nao-aplica-BeneficioFinanceiroMelhoria').addClass('active btn-dark').removeClass('btn-light');
 					$('#btn-quantificado-BeneficioFinanceiroMelhoria').removeClass('active btn-primary').addClass('btn-light');
 					$('#pcValorBeneficioFinanceiroMelhoria').hide();
@@ -5768,7 +5768,7 @@
 				}
 
 				// Inicializa o estado dos botões com base no valor de pcValorCustoFinanceiro
-				if ($('#pcValorCustoFinanceiroMelhoria').val() === '' || $('#pcValorCustoFinanceiroMelhoria').val() == 'R$ 0,00') {
+				if ($('#pcValorCustoFinanceiroMelhoria').val() == 0) {
 					$('#btn-nao-aplica-CustoFinanceiroMelhoria').addClass('active btn-dark').removeClass('btn-light');
 					$('#btn-quantificado-CustoFinanceiroMelhoria').removeClass('active btn-primary').addClass('btn-light');
 					$('#pcValorCustoFinanceiroMelhoria').hide();
@@ -5811,12 +5811,9 @@
 								async: false
 							})//fim ajax
 							.done(function(result) {	
-								//mostraPendencias()	
 								mostraTabMelhorias();
-								$('#modalOverlay').delay(1000).hide(0, function() {
-									$('#modalOverlay').modal('hide');
-									toastr.success('Operação realizada com sucesso!');
-								});
+								toastr.success('Operação realizada com sucesso!');
+								mostraFormAvalMelhoriaCadastro();
 							})//fim done
 							.fail(function(xhr, ajaxOptions, thrownError) {
 								$('#modalOverlay').delay(800).hide(0, function() {
@@ -6042,7 +6039,7 @@
 				}
 
 				// Inicializa o estado dos botões com base no valor de pcValorBeneficioFinanceiro
-				if ($('#pcValorBeneficioFinanceiro').val() === '' || $('#pcValorBeneficioFinanceiro').val() == 'R$ 0,00') {
+				if ($('#pcValorBeneficioFinanceiro').val() == 0) {
 					$('#btn-nao-aplica-BeneficioFinanceiro').addClass('active btn-dark').removeClass('btn-light');
 					$('#btn-quantificado-BeneficioFinanceiro').removeClass('active btn-primary').addClass('btn-light');
 					$('#pcValorBeneficioFinanceiro').hide();
@@ -6053,7 +6050,7 @@
 				}
 
 				// Inicializa o estado dos botões com base no valor de pcValorCustoFinanceiro
-				if ($('#pcValorCustoFinanceiro').val() === '' || $('#pcValorCustoFinanceiro').val() == 'R$ 0,00') {
+				if ($('#pcValorCustoFinanceiro').val() == 0) {
 					$('#btn-nao-aplica-CustoFinanceiro').addClass('active btn-dark').removeClass('btn-light');
 					$('#btn-quantificado-CustoFinanceiro').removeClass('active btn-primary').addClass('btn-light');
 					$('#pcValorCustoFinanceiro').hide();
@@ -6097,12 +6094,10 @@
 									async: false
 								})//fim ajax
 								.done(function(result) {	
-									//mostraPendencias()	
+										
 									mostraTabOrientacoes();
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										toastr.success('Operação realizada com sucesso!');
-									});
+									toastr.success('Operação realizada com sucesso!');
+									mostraFormAvalOrientacaoCadastro();
 								})//fim done
 								.fail(function(xhr, ajaxOptions, thrownError) {
 									$('#modalOverlay').delay(800).hide(0, function() {
