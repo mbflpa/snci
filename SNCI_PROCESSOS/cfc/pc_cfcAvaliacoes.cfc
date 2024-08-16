@@ -4678,6 +4678,7 @@
 											<div class="form-group">
 												<label  for="pcStatusMelhoria">Status:</label>
 												<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
+													<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
 													<option value="P">PENDENTE</option>
 													<option value="A">ACEITA</option>
 													<option value="R">RECUSA</option>
@@ -4910,6 +4911,9 @@
 						pcOrgaoRespMelhoria: {
 							required: true
 						},
+						pcStatusMelhoria: {
+							requiredIfVisibleAndNotEmpty: true
+						},
 						pcAvalMelhoriaCategoriaControle: {
 							required: true
 						},
@@ -4929,6 +4933,9 @@
 						},
 						pcOrgaoRespMelhoria: {
 							required: "Campo obrigatório."
+						},
+						pcStatusMelhoria: {
+							requiredIfVisibleAndNotEmpty: "Campo obrigatório."
 						},
 						pcAvalMelhoriaCategoriaControle: {
 							required: "Campo obrigatório."

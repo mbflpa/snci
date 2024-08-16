@@ -3206,118 +3206,158 @@
 
 	<cffunction name="deletarTodoProcesso"   access="remote" returntype="boolean" hint="Deleta o processo e todos os registros associados. Utilizado apenas pelos desenvolvedores.">
 		<cfargument name="numProc" type="string" required="true" default=""/>
+			<cftransaction>
+				<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos"> 
+					SELECT pc_anexos.*, pc_avaliacoes.*    FROM  pc_anexos
+					inner join pc_avaliacoes on pc_avaliacoes.pc_aval_id = pc_anexos.pc_anexo_avaliacao_id
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
 
-			<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos"> 
-				SELECT pc_anexos.*, pc_avaliacoes.*    FROM  pc_anexos
-				inner join pc_avaliacoes on pc_avaliacoes.pc_aval_id = pc_anexos.pc_anexo_avaliacao_id
-				WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery>
+				<cfloop query="rsPc_anexos" >
 
-			<cfloop query="rsPc_anexos" >
+					<cfif FileExists(pc_anexo_caminho)>
+						<cffile action = "delete" File = "#pc_anexo_caminho#">
+					</cfif>
 
-				<cfif FileExists(pc_anexo_caminho)>
-					<cffile action = "delete" File = "#pc_anexo_caminho#">
-				</cfif>
+					<cfquery datasource="#application.dsn_processos#">
+						DELETE FROM pc_anexos
+						WHERE pc_anexo_id = #pc_anexo_id#
+					</cfquery> 	
+					
+				</cfloop>
 
-				<cfquery datasource="#application.dsn_processos#">
-					DELETE FROM pc_anexos
-					WHERE pc_anexo_id = #pc_anexo_id#
-				</cfquery> 	
-				
-			</cfloop>
-
-			<cfquery datasource="#application.dsn_processos#" name="rsPc_anexosRelatorios"> 
-				SELECT pc_anexos.*   FROM  pc_anexos
-				WHERE pc_anexo_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery>
-
-			<cfloop query="rsPc_anexosRelatorios" >
-
-				<cfif FileExists(pc_anexo_caminho)>
-					<cffile action = "delete" File = "#pc_anexo_caminho#">
-				</cfif>
-
-				<cfquery datasource="#application.dsn_processos#">
-					DELETE FROM pc_anexos
+				<cfquery datasource="#application.dsn_processos#" name="rsPc_anexosRelatorios"> 
+					SELECT pc_anexos.*   FROM  pc_anexos
 					WHERE pc_anexo_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-				</cfquery> 	
+				</cfquery>
+
+				<cfloop query="rsPc_anexosRelatorios" >
+
+					<cfif FileExists(pc_anexo_caminho)>
+						<cffile action = "delete" File = "#pc_anexo_caminho#">
+					</cfif>
+
+					<cfquery datasource="#application.dsn_processos#">
+						DELETE FROM pc_anexos
+						WHERE pc_anexo_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+					</cfquery> 	
+					
+				</cfloop>
+
+
+
+				<cfquery datasource="#application.dsn_processos#" name="Deleta_pc_avaliacao_categoriasControles">
+					DELETE FROM pc_avaliacao_categoriasControles
+					FROM pc_avaliacao_categoriasControles
+					INNER JOIN pc_avaliacoes on pc_avaliacoes.pc_aval_id = pc_avaliacao_categoriasControles.pc_aval_id
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+
+				<cfquery datasource="#application.dsn_processos#" name="Deleta_pc_avaliacao_melhoria_categoriasControles">
+					DELETE FROM pc_avaliacao_melhoria_categoriasControles 
+					FROM pc_avaliacao_melhoria_categoriasControles 
+					INNER JOIN pc_avaliacao_melhorias on pc_avaliacao_melhorias.pc_aval_melhoria_id = pc_avaliacao_melhoria_categoriasControles .pc_aval_melhoria_id
+					INNER JOIN pc_avaliacoes on pc_avaliacoes.pc_aval_id = pc_avaliacao_melhorias.pc_aval_melhoria_num_aval
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+
+				<cfquery datasource="#application.dsn_processos#" name="Deleta_pc_avaliacao_orientacao_categoriasControles">
+					DELETE FROM pc_avaliacao_orientacao_categoriasControles 
+					FROM pc_avaliacao_orientacao_categoriasControles 
+					INNER JOIN pc_avaliacao_orientacoes on pc_avaliacao_orientacoes.pc_aval_orientacao_id = pc_avaliacao_orientacao_categoriasControles.pc_aval_orientacao_id
+					INNER JOIN pc_avaliacoes on pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+
+				<cfquery datasource="#application.dsn_processos#" name="Deleta_pc_avaliacao_riscos">
+					DELETE FROM pc_avaliacao_riscos
+					FROM pc_avaliacao_riscos
+					INNER JOIN pc_avaliacoes on pc_avaliacoes.pc_aval_id = pc_avaliacao_riscos.pc_aval_id
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+
+				<cfquery datasource="#application.dsn_processos#" name="Deleta_pc_avaliacao_tiposControles">
+					DELETE FROM pc_avaliacao_tiposControles
+					FROM pc_avaliacao_tiposControles
+					INNER JOIN pc_avaliacoes on pc_avaliacoes.pc_aval_id = pc_avaliacao_tiposControles.pc_aval_id
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+
+				<cfquery datasource="#application.dsn_processos#" name="Deleta_pc_processos_indEstrategicos">
+					DELETE FROM pc_processos_indEstrategicos
+					WHERE pc_processos_indEstrategicos.pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+
+				<cfquery datasource="#application.dsn_processos#" name="Deleta_pc_processos_objEstrategicos">
+					DELETE FROM pc_processos_objEstrategicos
+					WHERE pc_processos_objEstrategicos.pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+
+				<cfquery datasource="#application.dsn_processos#" name="Deleta_pc_processos_riscosEstrategicos">
+					DELETE FROM pc_processos_riscosEstrategicos
+					WHERE pc_processos_riscosEstrategicos.pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+
+
+
+
+
+
+				<cfquery datasource="#application.dsn_processos#" name="DeletaValidacoes">
+					DELETE FROM pc_validacoes_chat
+					FROM pc_validacoes_chat INNER JOIN pc_avaliacoes on pc_aval_id = pc_validacao_chat_num_aval
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery> 
+
+				<cfquery datasource="#application.dsn_processos#" name="DeletaValidacoes">
+					DELETE FROM pc_avaliacao_versoes
+					FROM pc_avaliacao_versoes INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_versao_num_aval
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery> 
+
 				
-			</cfloop>
-
-
-
-
-
-			<cfquery datasource="#application.dsn_processos#" name="DeletaValidacoes">
-				DELETE FROM pc_validacoes_chat
-				FROM pc_validacoes_chat INNER JOIN pc_avaliacoes on pc_aval_id = pc_validacao_chat_num_aval
-				WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery> 
-
-			<cfquery datasource="#application.dsn_processos#" name="DeletaValidacoes">
-				DELETE FROM pc_avaliacao_versoes
-				FROM pc_avaliacao_versoes INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_versao_num_aval
-				WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery> 
+				<cfquery datasource="#application.dsn_processos#" name="DeletaMelhorias">
+					DELETE FROM pc_avaliacao_melhorias
+					FROM        pc_avaliacao_melhorias 
+					INNER JOIN  pc_avaliacoes ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery> 	
 
 			
-			<cfquery datasource="#application.dsn_processos#" name="DeletaMelhorias">
-				DELETE FROM pc_avaliacao_melhorias
-				FROM        pc_avaliacao_melhorias 
-                INNER JOIN  pc_avaliacoes ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
-				WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery> 	
+				<cfquery datasource="#application.dsn_processos#" name="DeletaPosicionamentos">
+					DELETE FROM  pc_avaliacao_posicionamentos
+					FROM         pc_avaliacao_posicionamentos 
+					INNER JOIN   pc_avaliacao_orientacoes on pc_aval_orientacao_id = pc_aval_posic_num_orientacao
+					INNER JOIN   pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+					INNER JOIN   pc_processos on pc_processo_id = pc_aval_processo         
+					WHERE pc_processo_id  = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery> 
 
+				<cfquery datasource="#application.dsn_processos#" name="DeletaOrientacoes">
+					DELETE FROM  pc_avaliacao_orientacoes
+					FROM         pc_avaliacao_orientacoes
+					INNER JOIN   pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+					INNER JOIN   pc_processos on pc_processo_id = pc_aval_processo         
+					WHERE pc_processo_id  = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery> 
 
+				<cfquery datasource="#application.dsn_processos#" name="DeletaAvaliadores">
+					DELETE FROM pc_avaliadores
+					WHERE pc_avaliadores.pc_avaliador_id_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery> 
 
-			
-			<cfquery datasource="#application.dsn_processos#" name="DeletaPosicionamentos">
-				DELETE FROM  pc_avaliacao_posicionamentos
-				FROM         pc_avaliacao_posicionamentos 
-			    INNER JOIN   pc_avaliacao_orientacoes on pc_aval_orientacao_id = pc_aval_posic_num_orientacao
-				INNER JOIN   pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
-                INNER JOIN   pc_processos on pc_processo_id = pc_aval_processo         
-				WHERE pc_processo_id  = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery> 
+				
 
-			<cfquery datasource="#application.dsn_processos#" name="DeletaOrientacoes">
-				DELETE FROM  pc_avaliacao_orientacoes
-				FROM         pc_avaliacao_orientacoes
-			    INNER JOIN   pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
-                INNER JOIN   pc_processos on pc_processo_id = pc_aval_processo         
-				WHERE pc_processo_id  = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery> 
+				<cfquery datasource="#application.dsn_processos#" name="DeletaAvaliacoes">
+					DELETE FROM pc_avaliacoes
+					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery> 
 
-			<cfquery datasource="#application.dsn_processos#" name="DeletaAvaliadores">
-				DELETE FROM pc_avaliadores
-				WHERE pc_avaliadores.pc_avaliador_id_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery> 
-
-			<cfquery datasource="#application.dsn_processos#" name="DeletaObjEstrategicos">
-				DELETE FROM pc_processos_objEstrategicos
-				WHERE pc_processos_objEstrategicos.pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery>
-
-			<cfquery datasource="#application.dsn_processos#" name="DeletaRiscosEstrategicos">
-				DELETE FROM pc_processos_riscosEstrategicos
-				WHERE pc_processos_riscosEstrategicos.pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery>
-
-			<cfquery datasource="#application.dsn_processos#" name="DeletaMebitda">
-				DELETE FROM pc_processos_mebitda
-				WHERE pc_processos_mebitda.pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery>
-
-			<cfquery datasource="#application.dsn_processos#" name="DeletaAvaliacoes">
-				DELETE FROM pc_avaliacoes
-				WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery> 
-
-			<cfquery datasource="#application.dsn_processos#" name="DeletaProcessos">
-				DELETE FROM pc_processos
-				WHERE pc_processos.pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
-			</cfquery>
-
+				<cfquery datasource="#application.dsn_processos#" name="DeletaProcessos">
+					DELETE FROM pc_processos
+					WHERE pc_processos.pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+			</cftransaction>
 			
 				
 
