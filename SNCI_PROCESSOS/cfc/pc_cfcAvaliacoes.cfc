@@ -586,7 +586,7 @@
 										<div class="step" data-target="#aval_testeControle">
 											<button type="button" class="step-trigger animate__animated animate__bounce" role="tab" aria-controls="aval_testeControle" id="aval_testeControle-trigger">
 												<span class="bs-stepper-circle">1</span>
-												<span class="bs-stepper-label " id="aval_testeControleLabel">Teste / Controle</span>
+												<span class="bs-stepper-label " id="aval_testeControleLabel"></span>
 											</button>
 										</div>
 
@@ -595,7 +595,7 @@
 										<div class="step" data-target="#aval_item">
 											<button type="button" class="step-trigger" role="tab" aria-controls="aval_item" id="aval_item-trigger">
 												<span class="bs-stepper-circle">2</span>
-												<span class="bs-stepper-label" id="aval_itemLabel">Item</span>
+												<span class="bs-stepper-label" id="aval_itemLabel"></span>
 											</button>
 										</div>
 
@@ -604,7 +604,7 @@
 										<div class="step" data-target="#aval_riscoCoso">
 											<button type="button" class="step-trigger" role="tab" aria-controls="aval_riscoCoso" id="aval_riscoCoso-trigger">
 												<span class="bs-stepper-circle">3</span>
-												<span class="bs-stepper-label" id="aval_riscoCosoLabel">Coso 2013</span>
+												<span class="bs-stepper-label" id="aval_riscoCosoLabel"></span>
 											</button>
 										</div>
 
@@ -614,7 +614,7 @@
 										<div class="step" data-target="#aval_valorEstimado">
 											<button type="button" class="step-trigger" role="tab" aria-controls="aval_valorEstimado" id="aval_valorEstimado-trigger">
 												<span class="bs-stepper-circle">4</span>
-												<span class="bs-stepper-label" id="aval_valorEstimadoLabel">Valor Estimado</span>
+												<span class="bs-stepper-label" id="aval_valorEstimadoLabel"></span>
 											</button>
 										</div>
 
@@ -623,7 +623,7 @@
 										<div class="step" data-target="#aval_criteriosReferencias">
 											<button type="button" class="step-trigger" role="tab" aria-controls="aval_criteriosReferencias" id="aval_criteriosReferencias-trigger">
 												<span class="bs-stepper-circle">5</span>
-												<span class="bs-stepper-label" id="aval_criteriosReferenciasLabel">Critérios / Referências</span>
+												<span class="bs-stepper-label" id="aval_criteriosReferenciasLabel"></span>
 											</button>
 										</div>
 
@@ -632,7 +632,7 @@
 										<div class="step" data-target="#Finalizar">
 											<button type="button" class="step-trigger" role="tab" aria-controls="finalizar" id="finalizar-trigger">
 												<span class="bs-stepper-circle">6</span>
-												<span class="bs-stepper-label" id="finalizarLabelLabel">Finalizar</span>
+												<span class="bs-stepper-label" id="finalizarLabelLabel"></span>
 											</button>
 										</div>
 
