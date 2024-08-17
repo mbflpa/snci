@@ -621,8 +621,8 @@
 					$(document).ready(function() {
 
 						$('#cadastro').on('expanded.lte.cardwidget', function() {
-							//obter a largura de formAcomp
-							let largura = $('#formAcomp').width();
+							//obter a largura de exibirTab
+							let largura = $('#exibirTab').width();
 							$('#cadastro').css('width', largura );
 						});
 
