@@ -563,11 +563,11 @@
 				
 			<input id="pcProcessoId" value="<cfoutput>#rsProcForm.pc_processo_id#</cfoutput>" hidden>
 
-			<div id="accordion"  style="display: flex; justify-content: center;">
-				<div  id="cadastro" class="card card-primary collapsed-card"  style="width:95%">
+			<div id="accordion"  style="display: flex; justify-content: left;">
+				<div  id="cadastro" class="card card-primary collapsed-card"   style="margin-left: 25px;">
 					<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
-						<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
-							<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
+						<a  id="btnCadastroItem" class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
+							<button  type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 							</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (1° Passo)</span>
 						</a>
 					</div>
@@ -972,6 +972,19 @@
 
 				
 				$(document).ready(function(){
+
+					
+					$('#cadastro').on('expanded.lte.cardwidget', function() {
+						//obter a largura de infoProcesso
+						let largura = $('#infoProcesso').width();
+						$('#cadastro').css('width', largura );
+					});
+
+					$('#cadastro').on('collapsed.lte.cardwidget', function() {
+						$('#cadastro').css('width', 'auto');
+					});
+
+
 					//Initialize Select2 Elements
 					$('select').not('[name="tabProcAcompCards_length"]').select2({
 						theme: 'bootstrap4',
@@ -2364,6 +2377,8 @@
 				});
 				return formatter.format(value);
 			}
+
+			
 
 			function editarAvaliacaoTitulo(linha) {
 				event.preventDefault()

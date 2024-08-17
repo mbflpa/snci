@@ -172,7 +172,7 @@
 			</head>
 			<body >
 				<!--acordion-->
-				<div id="accordion">
+				<div id="accordion" style="display: flex; justify-content: left;">
 				
 			
 					<div id="cadastro" class="card card-primary collapsed-card " style="margin-left:8px;">
@@ -619,6 +619,17 @@
 				<script language="JavaScript">
 				
 					$(document).ready(function() {
+
+						$('#cadastro').on('expanded.lte.cardwidget', function() {
+							//obter a largura de formAcomp
+							let largura = $('#formAcomp').width();
+							$('#cadastro').css('width', largura );
+						});
+
+						$('#cadastro').on('collapsed.lte.cardwidget', function() {
+							$('#cadastro').css('width', 'auto');
+						});
+
 						window.stepper = new Stepper($('.bs-stepper')[0], {
 							animation: true
 						});
