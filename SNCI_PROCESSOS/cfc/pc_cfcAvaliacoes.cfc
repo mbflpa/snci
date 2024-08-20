@@ -978,6 +978,10 @@
 						//obter a largura de infoProcesso
 						let largura = $('#infoProcesso').width();
 						$('#cadastro').css('width', largura );
+						//move o cursor para o id cadastro
+						$('html, body').animate({
+							scrollTop: $("#cadastro").offset().top-60
+						}, 1000);
 					});
 
 					$('#cadastro').on('collapsed.lte.cardwidget', function() {
@@ -4166,7 +4170,7 @@
         
 		<div id="accordionCadOrientacao"  style="display: flex; justify-content: left;">
 			<div  id="cadOrientacao" class="card card-primary collapsed-card" >
-				<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+				<div id="btnCadastrarOrientacao" class="card-header text-left" style="background-color: #0083ca;color:#fff;">
 					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
 						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 						</button></i><span id="cabecalhoAccordionCadOrientacao">Clique aqui para cadastrar uma Medida/Orientação para Regularização</span>
@@ -4320,6 +4324,13 @@
 			})
 
 			$(document).ready(function() {
+
+				$('#btnCadastrarOrientacao').on('expanded.lte.cardwidget', function() {
+					//move o cursor para o id btnCadastrarOrientacao
+					$('html, body').animate({
+						scrollTop: $("#btnCadastrarOrientacao").offset().top-60
+					}, 1000);
+				});
 				
 				//Initialize Select2 Elements
 				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"]').select2({
@@ -4630,7 +4641,7 @@
 
 		<div id="accordionCadMelhoria"  style="display: flex; justify-content: left;">
 			<div  id="cadMelhoria" class="card card-primary collapsed-card" >
-				<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+				<div id="btnCadastrarMelhoria" class="card-header text-left" style="background-color: #0083ca;color:#fff;">
 					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
 						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 						</button></i><span id="cabecalhoAccordionCadMelhoria">Clique aqui para cadastrar uma Propostas de Melhoria</span>
@@ -4843,6 +4854,13 @@
 			})
 
 			$(document).ready(function() {
+
+				$('#btnCadastrarMelhoria').on('expanded.lte.cardwidget', function() {
+					//move o cursor para o id btnCadastrarMelhoria
+					$('html, body').animate({
+						scrollTop: $("#btnCadastrarMelhoria").offset().top-60
+					}, 1000);
+				});
 				
 				//Initialize Select2 Elements
 				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"]').select2({
