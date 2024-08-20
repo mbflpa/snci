@@ -297,3 +297,22 @@ td{
 .is-invalid {
     background-image: none !important;
 }
+
+
+
+.card-header a.d-block{
+	padding: 0.75rem 1.25rem!important;
+}
+
+.card-header:has(a.d-block) {
+    padding: 0!important;
+}
+
+
+.card-header a.d-block:hover {
+    box-shadow: 0 0 5px 0 #fff inset, 0 0 5px 0.5px #fff!important;
+}
+
+tr .small-box:hover {
+    box-shadow: 0 0 5px 0 #6c757d inset, 0 0 7px 5px #6c757d !important;
+}
