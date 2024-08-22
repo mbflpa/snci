@@ -979,6 +979,8 @@
 
 					
 					$('#cadastro').on('expanded.lte.cardwidget', function() {
+						//limpa o conteúdo de CadastroAvaliacaoRelato
+						$('#CadastroAvaliacaoRelato').html('')
 						//obter a largura de infoProcesso
 						let largura = $('#infoProcesso').width();
 						$('#cadastro').css('width', largura );

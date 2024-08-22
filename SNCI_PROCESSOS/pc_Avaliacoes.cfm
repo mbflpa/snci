@@ -111,7 +111,7 @@
 						async: false
 					})//fim ajax
 					.done(function(result) {
-						
+						resetFormFields();
 						$('#CadastroAvaliacaoRelato').html(result)
 						$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);
 						
