@@ -777,13 +777,17 @@
 												<div class="card-body cardBodyStepper animate__animated animate__zoomInDown" >
 													<div class="row  " >
 														<div class="col-sm-12">
-															<div class="form-group">
-																<input id="idCoso" hidden></input>
-																<div id="dados-container-coso" class="dados-container">
+															<fieldset >
+																<legend >COSO 2023:</legend>
+																<div class="form-group">
+																	<input id="idCoso" hidden></input>
+																	
+																	<div id="dados-container-coso" class="dados-container">
+																		
+																	</div>
 																	
 																</div>
-																
-															</div>
+															</fieldset>
 														</div>
 													</div>
 													<div style="margin-top:10px;display:flex;justify-content:space-between">
@@ -878,7 +882,7 @@
 															</div>
 														</div>
 
-														<div id="pcCriterioRefOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;padding-left: 0;">
+														<div id="pcCriterioRefOutrosDescricaoDiv" class="form-group col-sm-12 animate__animated animate__fadeInDown" hidden style="margin-top:10px;">
 															<label for="pcCriterioRefOutrosDesc" class="font-weight-bold" style="display: block; margin-bottom: 5px;">Descrição dos Critérios e Referências Normativas:</label>
 															<div class="input-group date" id="reservationdate" data-target-input="nearest">
 																<textarea id="pcCriterioRefOutrosDesc" name="pcCriterioRefOutrosDesc" class="form-control" rows="3"  inputmode="text" placeholder="Informe os Critérios e Referências Normativas..."></textarea>
@@ -4241,7 +4245,7 @@
 
 									<div class="col-sm-12">
 										<fieldset style="padding:0px!important">
-											<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+											<legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>
 											<div class="form-group d-flex align-items-center" style="margin-left:20px">
 												
 												<div id="btn_groupAvalOrientacaoBenefNaoFinanceiro" name="btn_groupAvalOrientacaoBenefNaoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
@@ -4770,7 +4774,7 @@
 
 									<div class="col-sm-12">
 										<fieldset style="padding:0px!important">
-											<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+											<legend style="margin-left:20px">Benefício Não Financeiro da Proposta de Melhoria:</legend>
 											<div class="form-group d-flex align-items-center" style="margin-left:20px">
 												
 												<div id="btn_groupAvalMelhoriaBenefNaoFinanceiro" name="btn_groupAvalMelhoriaBenefNaoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
@@ -4790,7 +4794,7 @@
 
 									<div class="col-sm-12">	
 										<fieldset style="margin-top:20px;padding:0px!important">
-											<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+											<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Proposta de Melhoria:</legend>
 											<div class="form-group d-flex align-items-center"  style="margin-left:20px">
 												<div id="btn_groupValorBeneficioFinanceiroMelhoria" name="btn_groupValorBeneficioFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
 													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplicaMelhoria" id="btn-nao-aplica-BeneficioFinanceiroMelhoria" name="btn-nao-aplica-BeneficioFinanceiroMelhoria" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
@@ -4805,7 +4809,7 @@
 
 									<div class="col-sm-12">	
 										<fieldset style="margin-top:20px;padding:0px!important">
-											<legend style="margin-left:20px">Estimativa do Custo Financeiro da Medida/Orientação para Regularização:</legend>
+											<legend style="margin-left:20px">Estimativa do Custo Financeiro da Proposta de Melhoria:</legend>
 											<div class="form-group d-flex align-items-center"  style="margin-left:20px">
 												<div id="btn_groupValorCustoFinanceiroMelhoria" name="btn_groupValorCustoFinanceiroMelhoria" class="btn-group mr-4" role="group" aria-label="Basic example">
 													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplicaMelhoria" id="btn-nao-aplica-CustoFinanceiroMelhoria" name="btn-nao-aplica-CustoFinanceiroMelhoria" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
