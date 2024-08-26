@@ -32,6 +32,7 @@
 				<div class="container-fluid">
 							
 					<div id="formCadProcesso" class="card-body" style="display:flex;flex-direction:column;"></div>	
+					
 					<div class="card-body" style="display:flex;flex-direction:column;">
 						<div style="justify-content:right;  width: 100%;">
 							<div style="margin-right: 30px;float:right">
@@ -121,7 +122,6 @@
 				})//fim fail
 
 			},500);
-			
 		}
 
 		

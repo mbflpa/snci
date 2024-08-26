@@ -620,15 +620,33 @@
 				
 					$(document).ready(function() {
 
-						$('#cadastro').on('expanded.lte.cardwidget', function() {
-							//obter a largura de exibirTab
-							let largura = $('#exibirTab').width();
-							$('#cadastro').css('width', largura );
-						});
+						// Obtém o nome do arquivo atual
+						var currentPage = window.location.pathname.split("/").pop();
+						// Verifica se a página atual é 'pc_Processos.cfm'
+						if (currentPage === 'pc_Processos.cfm') {
+							$('#cadastro').on('expanded.lte.cardwidget', function() {
+								//obter a largura de exibirTab
+								let largura = $('#exibirTab').width();
+								$('#cadastro').css('width', largura );
+							});
+						}
+
+						// Verifica se a página atual é 'pc_Processos_Editar.cfm'
+						if (currentPage === 'pc_Processos_Editar.cfm') {
+							$('#cadastro').on('expanded.lte.cardwidget', function() {
+								//obter a largura de exibirCards
+								let largura = $('#exibirCards').width();
+								$('#cadastro').css('width', largura );
+							});
+							// Bloqueia o campo com id pcOrgaoAvaliado
+       						$('#pcOrgaoAvaliado').prop('disabled', true);
+						}
 
 						$('#cadastro').on('collapsed.lte.cardwidget', function() {
 							$('#cadastro').css('width', 'auto');
 						});
+
+
 
 						window.stepper = new Stepper($('.bs-stepper')[0], {
 							animation: true
@@ -1279,19 +1297,19 @@
 							//$("#pcTipoClassificacaoDiv").attr("hidden",true)	
 						}
 
-						if($('#pcModalidade').val() == 'E'){
+						if($('#pcModalidade').val() == 'E' ){
 							$('#pcBloquearDiv').attr("hidden",false)
 							$('#pcBloquear').val(null).trigger('change')
 						}else{
 							$('#pcBloquearDiv').attr("hidden",true)
-							$('#pcBloquear').val('N').trigger('change')
+ 							$('#pcBloquear').val('N').trigger('change')
 						}
 
 
 					});
 
 					
-
+	
 						
 					
 					$('#btSalvar').on('click', function (event)  {
@@ -1301,8 +1319,6 @@
 						event.stopPropagation()
 						var sei=$("#pcNumSEI").val().replace(/([^\d])+/gim, '');
 						var seiRelatorio=$("#pcNumRelatorio").val().replace(/([^\d])+/gim, '');
-						
-
 						
 
 						if (($('#pcModalidade').val() == 'A' || $('#pcModalidade').val()=='E') && $('#pcDataFimAvaliacao').val() < $('#pcDataInicioAvaliacao').val())
@@ -1386,66 +1402,32 @@
 											async: false
 										})//fim ajax
 										.done(function(result) {
-												
-											$('#modalOverlay').delay(1000).hide(0, function() {
-												$('#modalOverlay').modal('hide');
-												toastr.success('Operação realizada com sucesso!');
-												// // Oculta todos os elementos com a classe step-trigger, exceto aquele com o ID infoInicial-trigger
-												// $('.step-trigger').not('#infoInicial-trigger').hide();
-												// stepper.to(0);
-												// // Após o cadastro, resetar o estado de validação de todos os formulários
-												// $("#formInfoInicial").validate().resetForm();
-												// $("#formTipoAvaliacao").validate().resetForm();
-												// $("#formInfoEstrategicas").validate().resetForm();
-												// $("#formEquipe").validate().resetForm();
-												// // Remover classes .is-valid e .is-invalid de todos os elementos da página
-												// $('*').removeClass('is-valid is-invalid');
+											toastr.success('Operação realizada com sucesso!');								// // Oculta todos os elementos com a classe step-trigger, exceto aquele com o ID infoInicial-trigger
+											// Obtém o nome do arquivo atual
+											var currentPage = window.location.pathname.split("/").pop();
+											// Verifica se a página atual é 'pc_Processos_Editar.cfm'
+											if(currentPage === 'pc_Processos.cfm') {
+												if(localStorage.getItem('mostraTab')){
+													mostraTab = localStorage.getItem('mostraTab');
+												}
+												if(mostraTab == '1'){
+													$('#btExibirTab').removeClass('fa-th')
+													$('#btExibirTab').addClass('fa-table')
+													exibirTabela();
+												}else{
+													$('#btExibirTab').removeClass('fa-table')
+													$('#btExibirTab').addClass('fa-th')
+													ocultarTabela();
+												}
 												exibirFormCadProcesso();//function que consta na página pc_Processos.cfm
-												
-
-											});
-
-											if(localStorage.getItem('mostraTab')){
-												mostraTab = localStorage.getItem('mostraTab');
 											}
-											
-											$('#pcOrgaoAvaliado').removeAttr('disabled');
-											$('#pcProcessoId').val(null);
-											$('#pcNumSEI').val(null);
-											$('#pcNumRelatorio').val(null);
-											$('#pcDataInicioAvaliacao').val(null);
-											$('#pcDataFimAvaliacao').val(null);
-											$('#pcOrigem').val(null).trigger('change');
-											$('#pcModalidade').val(null).trigger('change');
-											$('#pcTipoClassificacao').val(null).trigger('change');
-											$('#selectDinamicoMACROPROCESSOS').val(null).trigger('change');
-											$('#pcOrgaoAvaliado').val(null).trigger('change');
-											$('#pcObjetivoEstrategico').val(null).trigger('change');
-											$('#pcRiscoEstrategico').val(null).trigger('change');
-											$('#pcIndEstrategico').val(null).trigger('change');
-											$('#pcAvaliadores').val(null).trigger('change');
-											$('#pcCoordenador').val(null).trigger('change');
-											$('#pcCoordNacional').val(null).trigger('change');
-											$('#pcTipoDemanda').val(null).trigger('change');
-											$('#pcAnoPacin').val(null).trigger('change'); 
-
-											if(mostraTab == '1'){
-												$('#btExibirTab').removeClass('fa-th')
-												$('#btExibirTab').addClass('fa-table')
-												exibirTabela();
-											}else{
-												$('#btExibirTab').removeClass('fa-table')
-												$('#btExibirTab').addClass('fa-th')
-												ocultarTabela();
+											// Verifica se a página atual é 'pc_Processos_Editar.cfm'
+											if(currentPage === 'pc_Processos_Editar.cfm') {
+												radioValue = $("input[name='opcaoAno']:checked").val();
+												exibirCards(radioValue);//function que consta na página pc_Processos_Editar.cfm
 											}
-
-											$('#cadastro').CardWidget('collapse')
+										
 											
-											$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Processo");
-
-											$('#modalOverlay').delay(1000).hide(0, function() {
-												$('#modalOverlay').modal('hide');
-											});
 												
 										})//fim done
 										.fail(function(xhr, ajaxOptions, thrownError) {
@@ -1487,6 +1469,9 @@
 			</body>
 		</html>
 	</cffunction>
+	
+
+
 	
 	
 	<cffunction name="cadProc"   access="remote" returntype="any">
