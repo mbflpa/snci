@@ -1194,6 +1194,8 @@
 					$('#pcBloquear').val(bloquear).trigger('change');
 					if(pc_num_status != 3){//Se o cadastro processo não for "INICIADO" = 3
 						$('#pcBloquear').prop('disabled', true);// Bloqueia o campo com id pcBloquear
+						$('#pcBloquearLabel').text('Processo Iniciou Bloqueado?');// Altera o label do campo com id pcBloquearLabel
+						
 					}
 					
 					//popula os selects dinâmicos	

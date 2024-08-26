@@ -379,7 +379,7 @@
 															
 															<div id="pcBloquearDiv" class="col-sm-2" hidden>
 																<div class="form-group">
-																	<label for="pcBloquear" >Bloquear Processo:</label>
+																	<label id="pcBloquearLabel" for="pcBloquear" >Bloquear Processo?</label>
 																	<select id="pcBloquear" required  name="pcBloquear" class="form-control" >
 																		<option selected="" disabled="" value="">Selecione...</option>
 																		<option value="N">NÃO</option>
