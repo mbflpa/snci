@@ -420,7 +420,7 @@
 					$('#modalOverlay').delay(1000).hide(0, function() {
 						$('#modalOverlay').modal('hide');
 					});
-				},500);
+				},1000);
 			}
 			
 			$('#btCancelar').on('click', function (event)  {
@@ -1064,10 +1064,16 @@
 
 					$('#divFormCadProcessoAte2023').attr("hidden",false)
 
+					$('html, body').animate({
+						scrollTop: $('#cadastroEditar').offset().top - 60
+					},'slow');
+
 					$('#modalOverlay').delay(1000).hide(0, function() {
 						$('#modalOverlay').modal('hide');
 					});
-				},500);
+
+
+				},1000);
 
 			
 
@@ -1226,9 +1232,7 @@
 					
 						$('#cadastro').CardWidget('expand')
 				
-						$('html, body').animate({
-							scrollTop: $('#cadastro').offset().top - 80
-						},'slow');
+						
 					})
 					.fail(function(error) {
 						$('#modal-danger').modal('show')
@@ -1238,6 +1242,10 @@
 					//fim popula os selects dinâmicos
 
 					$('#divFormCadProcesso2024').attr("hidden",false)
+
+                    $('html, body').animate({
+						scrollTop: $('#cadastro').offset().top - 60
+					},'slow');
 				
 					$('#modalOverlay').delay(1000).hide(0, function() {
 						$('#modalOverlay').modal('hide');
@@ -2360,7 +2368,7 @@
 										)
 									})
 								})//fim fail
-							},500);	
+							},1000);	
 						}
 					})
 			}
