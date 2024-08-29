@@ -2218,18 +2218,18 @@
 											<div style="display:flex;justify-content:space-around;">
 												<cfif '#pc_aval_status#' eq '1' or '#pc_aval_status#' eq '3'>
 													<cfif #rsAnexoAvaliacao.RecordCount# eq 0 && #rsOrientacoes.RecordCount# eq 0 && #rsMelhorias.RecordCount# eq 0>
-														<i  class="fas fa-trash-alt efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px" onclick="javascript:excluirAvaliacao(<cfoutput>'#pc_aval_id#'</cfoutput>,this);"    title="Excluir" ></i>
+														<i  class="fas fa-trash-alt efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px" onclick="javascript:excluirAvaliacao(<cfoutput>'#pc_aval_id#'</cfoutput>);"    title="Excluir" ></i>
 													<cfelse>
 														<i  class="fas fa-trash-alt efeito-grow"  style="margin-right:10px;pedding:3px;cursor: pointer;z-index:100;font-size:20px" onclick="javascript:mensErro('Não é possível excluir avaliações com anexos, medidas/orientações para regularização e propostas de melhoria cadastrados!<br>Exclua todos os anexos, medidas/orientações para regularização e as propostas de melhoria e tente novamente.'); "   title="Excluir" ></i>
 													</cfif>
-													<i class="fas fa-edit efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:editarAvaliacaoTitulo(this)"    title="Editar"></i>
+													<i class="fas fa-edit efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:editarAvaliacaoTitulo(<cfoutput>'#pc_aval_id#'</cfoutput>)"    title="Editar"></i>
 												</cfif>
 
 												<cfif '#pc_aval_status#' eq '5' &&  (#application.rsUsuarioParametros.pc_usu_perfil# eq 3 || #application.rsUsuarioParametros.pc_usu_perfil# eq 7 || #application.rsUsuarioParametros.pc_usu_perfil# eq 8 || #application.rsUsuarioParametros.pc_usu_perfil# eq 11)>
-													<i class="fas fa-redo efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:reverterValidacao(this)"    title="Reverter Validação"></i>
+													<i class="fas fa-redo efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:reverterValidacao(<cfoutput>'#pc_aval_id#'</cfoutput>)"    title="Reverter Validação"></i>
 												</cfif>
 
-												<i  class="fas fa-boxes-packing efeito-grow" onclick="javascript:mostraCadastroAvaliacaoRelato(<cfoutput>'#pc_aval_id#'</cfoutput>,this);"  style="cursor: pointer;z-index:100;font-size:20px"    title="Mostrar próximos passos." ></i>
+												<i  class="fas fa-boxes-packing efeito-grow" onclick="javascript:mostraCadastroAvaliacaoRelato(<cfoutput>'#pc_aval_id#'</cfoutput>);"  style="cursor: pointer;z-index:100;font-size:20px"    title="Mostrar próximos passos." ></i>
 
 											</div>
 										</td>
@@ -2313,11 +2313,11 @@
 
 			
 
-			function reverterValidacao(linha){
+			function reverterValidacao(id){
 				event.preventDefault()
 				event.stopPropagation()
-				$(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
-				var pc_aval_id = $(linha).closest("tr").children("td:nth-child(8)").text();
+				//$(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
+				var pc_aval_id = id;
                 var mensagem = "Deseja reverter a validação deste item?";
 				
 				swalWithBootstrapButtons.fire({//sweetalert2
@@ -2390,7 +2390,7 @@
 
 			
 
-			function editarAvaliacaoTitulo(linha) {
+			function editarAvaliacaoTitulo(id) {
 				event.preventDefault()
 				event.stopPropagation()
                 resetFormFields();
@@ -2398,7 +2398,7 @@
 				//incializa no primeiro step
 				stepper.to(1);
 
-                let pc_aval_id = $(linha).closest("tr").children("td:nth-child(7)").text();
+                let pc_aval_id = id;
 
 
 				$('#modalOverlay').modal('show')	
@@ -2547,7 +2547,7 @@
 			}
 
 			
-			function excluirAvaliacao(pc_aval_id, linha)  {
+			function excluirAvaliacao(pc_aval_id)  {
 				event.preventDefault()
 		        event.stopPropagation()
 			   
@@ -5517,14 +5517,11 @@
 
 
 
-
-
-
 	<cffunction name="tabMelhorias" returntype="any" access="remote" hint="Criar a tabela de propostas de melhoria e envia para a páginas pc_CadastroRelato">
 
-	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
+		<cfargument name="pc_aval_id" type="numeric" required="true"/>
 
-        <cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
+		<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
 			Select pc_avaliacao_melhorias.* , pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
 			FROM pc_avaliacao_melhorias 
 			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
@@ -5543,127 +5540,126 @@
 			INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
 			WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
-		
-            
-				<div class="row">
-					<div class="col-12">
-						<div class="card">
-							<!-- /.card-header -->
-							<div class="card-body">
-							    
-								<table id="tabMelhorias" class="table table-bordered  table-hover ">
-									<thead style="background: #0083ca;color:#fff">
-										<tr style="font-size:14px">
-											<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
-												<th style="width: 10%;vertical-align:middle !important;">Controles</th>
-											</cfif>
-											<th hidden></th>
-											<th hidden></th>
-											<th hidden></th>
-											<th hidden></th>
-											<th style="width: <cfif #rsStatus.pc_modalidade# neq 'E'>30%<cfelse>50%</cfif>;vertical-align:middle !important;">Melhoria:</th>
-											<th style="vertical-align:middle !important;">Órgão Responsável:</th>
-											<th style="vertical-align:middle !important;">Status: </th>
-											<cfif #rsStatus.pc_modalidade# neq 'E'>
-												<th style="vertical-align:middle !important;">Data Prevista: </th>
-												<th style="vertical-align:middle !important;">Órgão Responsável <br>(sugerido pelo órgão): </th>
-												<th style="vertical-align:middle !important;">Justificativa do órgão: </th>
-												<th style="vertical-align:middle !important;">Sugestão de Melhoria<br> (sugerida pelo órgão): </th>
-											</cfif>
-											<th hidden></th>
-											<th hidden></th>
-											<th hidden></th>
-											<th hidden></th>
-											
 
-
-
-										</tr>
-									</thead>
-								
-									<tbody>
-										<cfloop query="rsMelhorias" >
-										    <cfquery name="rsCategoriasControlesMelhorias" datasource="#application.dsn_processos#">
-												SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_melhoria_categoriasControles 
-												WHERE pc_aval_melhoria_id = #pc_aval_melhoria_id#
-											</cfquery>
-											<cfset listaCategoriasControlesMelhoria = ValueList(rsCategoriasControlesMelhorias.pc_aval_categoriaControle_id,',')>
-											
-											<cfoutput>					
-												<cfswitch expression="#pc_aval_melhoria_status#">
-													<cfcase value="P">
-														<cfset statusMelhoria = "PENDENTE">
-													</cfcase>
-													<cfcase value="A">
-														<cfset statusMelhoria = "ACEITA">
-													</cfcase>
-													<cfcase value="R">
-														<cfset statusMelhoria = "RECUSA">
-													</cfcase>
-													<cfcase value="T">
-														<cfset statusMelhoria = "TROCA">
-													</cfcase>
-													<cfcase value="N">
-														<cfset statusMelhoria = "NÃO INFORMADO">
-													</cfcase>
-													<cfcase value="B">
-														<cfset statusMelhoria = "BLOQUEADO">
-													</cfcase>
-													<cfdefaultcase>
-														<cfset statusMelhoria = "">	
-													</cfdefaultcase>
-													
-												</cfswitch>
-												<tr style="font-size:12px;color:##000" >
-													<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
-														<td style="text-align: center; vertical-align:middle !important;width:10%">	
-															<div style="display:flex;justify-content:space-around;">
-																<i id="btExcluirMelhoria" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px"   onClick="javascript:excluirMelhoria(#pc_aval_melhoria_id#)" title="Excluir" ></i>
-																<i id="btEditarMelhoria" class="fas fa-edit efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:5px" onClick="javascript:editarMelhoria(this);"   title="Editar" ></i>
-															</div>
-														</td>													
-													</cfif>
-													<td hidden>#pc_aval_melhoria_id#</td>
-													<td hidden>#pc_aval_melhoria_num_orgao#</td>
-													<td hidden>#pc_aval_melhoria_sug_orgao_mcu#</td>
-													<td hidden>#pc_aval_melhoria_dataPrev#</td>
-													<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2"  disabled>#pc_aval_melhoria_descricao#</textarea></td>
-													<td style="vertical-align:middle !important;">#pc_org_sigla#</td>
-													<td style="vertical-align:middle !important;">#statusMelhoria#</td>
-													<cfif #rsStatus.pc_modalidade# neq 'E'>
-														<cfset dataHora = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY')>
-														<td style="vertical-align:middle !important;">#dataHora#</td>
-														<td style="vertical-align:middle !important;">#siglaOrgSug#</td>
-														<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_naoAceita_justif#</textarea></td>
-														<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_sugestao#</textarea></td>
-													</cfif>
-													<td hidden>#listaCategoriasControlesMelhoria#</td>
-													<td hidden>#pc_aval_melhoria_beneficioNaoFinanceiro#</td>
-													<td hidden>#pc_aval_melhoria_beneficioFinanceiro#</td>
-													<td hidden>#pc_aval_melhoria_custoFinanceiro#</td>
-												
-												</tr>
-											</cfoutput>
-										</cfloop>	
-									</tbody>
-										
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<!-- /.card-header -->
+					<div class="card-body">
+						
+						<table id="tabMelhorias" class="table table-bordered  table-hover ">
+							<thead style="background: #0083ca;color:#fff">
+								<tr style="font-size:14px">
+									<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
+										<th style="width: 10%;vertical-align:middle !important;">Controles</th>
+									</cfif>
+									<th hidden></th>
+									<th hidden></th>
+									<th hidden></th>
+									<th hidden></th>
+									<th style="width: <cfif #rsStatus.pc_modalidade# neq 'E'>30%<cfelse>50%</cfif>;vertical-align:middle !important;">Melhoria:</th>
+									<th style="vertical-align:middle !important;">Órgão Responsável:</th>
+									<th style="vertical-align:middle !important;">Status: </th>
+									<cfif #rsStatus.pc_modalidade# neq 'E'>
+										<th style="vertical-align:middle !important;">Data Prevista: </th>
+										<th style="vertical-align:middle !important;">Órgão Responsável <br>(sugerido pelo órgão): </th>
+										<th style="vertical-align:middle !important;">Justificativa do órgão: </th>
+										<th style="vertical-align:middle !important;">Sugestão de Melhoria<br> (sugerida pelo órgão): </th>
+									</cfif>
+									<th hidden></th>
+									<th hidden></th>
+									<th hidden></th>
+									<th hidden></th>
 									
-								</table>
-							</div>
 
-							<!-- /.card-body -->
-						</div>
-						<!-- /.card -->
+
+
+								</tr>
+							</thead>
+						
+							<tbody>
+								<cfloop query="rsMelhorias" >
+									<cfquery name="rsCategoriasControlesMelhorias" datasource="#application.dsn_processos#">
+										SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_melhoria_categoriasControles 
+										WHERE pc_aval_melhoria_id = #pc_aval_melhoria_id#
+									</cfquery>
+									<cfset listaCategoriasControlesMelhoria = ValueList(rsCategoriasControlesMelhorias.pc_aval_categoriaControle_id,',')>
+									
+									<cfoutput>					
+										<cfswitch expression="#pc_aval_melhoria_status#">
+											<cfcase value="P">
+												<cfset statusMelhoria = "PENDENTE">
+											</cfcase>
+											<cfcase value="A">
+												<cfset statusMelhoria = "ACEITA">
+											</cfcase>
+											<cfcase value="R">
+												<cfset statusMelhoria = "RECUSA">
+											</cfcase>
+											<cfcase value="T">
+												<cfset statusMelhoria = "TROCA">
+											</cfcase>
+											<cfcase value="N">
+												<cfset statusMelhoria = "NÃO INFORMADO">
+											</cfcase>
+											<cfcase value="B">
+												<cfset statusMelhoria = "BLOQUEADO">
+											</cfcase>
+											<cfdefaultcase>
+												<cfset statusMelhoria = "">	
+											</cfdefaultcase>
+											
+										</cfswitch>
+										<tr style="font-size:12px;color:##000" >
+											<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
+												<td style="text-align: center; vertical-align:middle !important;width:10%">	
+													<div style="display:flex;justify-content:space-around;">
+														<i id="btExcluirMelhoria" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px"   onClick="javascript:excluirMelhoria(#pc_aval_melhoria_id#)" title="Excluir" ></i>
+														<i id="btEditarMelhoria" class="fas fa-edit efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:5px" onClick="javascript:editarMelhoria(this);"   title="Editar" ></i>
+													</div>
+												</td>													
+											</cfif>
+											<td hidden>#pc_aval_melhoria_id#</td>
+											<td hidden>#pc_aval_melhoria_num_orgao#</td>
+											<td hidden>#pc_aval_melhoria_sug_orgao_mcu#</td>
+											<td hidden>#pc_aval_melhoria_dataPrev#</td>
+											<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2"  disabled>#pc_aval_melhoria_descricao#</textarea></td>
+											<td style="vertical-align:middle !important;">#pc_org_sigla#</td>
+											<td style="vertical-align:middle !important;">#statusMelhoria#</td>
+											<cfif #rsStatus.pc_modalidade# neq 'E'>
+												<cfset dataHora = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY')>
+												<td style="vertical-align:middle !important;">#dataHora#</td>
+												<td style="vertical-align:middle !important;">#siglaOrgSug#</td>
+												<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_naoAceita_justif#</textarea></td>
+												<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_sugestao#</textarea></td>
+											</cfif>
+											<td hidden>#listaCategoriasControlesMelhoria#</td>
+											<td hidden>#pc_aval_melhoria_beneficioNaoFinanceiro#</td>
+											<td hidden>#pc_aval_melhoria_beneficioFinanceiro#</td>
+											<td hidden>#pc_aval_melhoria_custoFinanceiro#</td>
+										
+										</tr>
+									</cfoutput>
+								</cfloop>	
+							</tbody>
+								
+							
+						</table>
 					</div>
-				<!-- /.col -->
+
+					<!-- /.card-body -->
 				</div>
-				<!-- /.row -->
+				<!-- /.card -->
+			</div>
+		<!-- /.col -->
+		</div>
+		<!-- /.row -->
 		<script language="JavaScript">
 			$(function () {
 				
 				$("#tabMelhorias").DataTable({
 					destroy: true,
-			     	stateSave: false,
+					stateSave: false,
 					responsive: true, 
 					lengthChange: false, 
 					autoWidth: false,
@@ -5673,7 +5669,7 @@
 						{ "className": "dt-center", "targets": "_all" } // Alinha todos os elementos verticalmente
 					]
 				})
-	
+
 			});
 
 			function formatCurrency(value) {
@@ -5757,7 +5753,7 @@
 				var pc_aval_melhoria_sugestao = $(linha).closest("tr").children("td:nth-child(12)").text();
 
 
-                if(modalidade != 'E'){
+				if(modalidade != 'E'){
 					var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(13)").text();
 					var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(14)").text();
 					var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(15)").text();
@@ -5768,7 +5764,7 @@
 					var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(11)").text();
 					var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(12)").text();
 				}
-                 
+					
 
 
 
@@ -5827,14 +5823,14 @@
 
 				$('#cabecalhoAccordionCadMelhoria').text("Editar Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
 				$('#infoTipoCadMelhoria').text("Editando Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
-		        $('#cadMelhoria').CardWidget('expand')
+				$('#cadMelhoria').CardWidget('expand')
 				$('html, body').animate({ scrollTop: ($('#cadMelhoria').offset().top - 80)} , 500); 
 
 			};	
 
 			function excluirMelhoria(pc_aval_melhoria_id)  {
 				event.preventDefault()
-		        event.stopPropagation()
+				event.stopPropagation()
 
 				var dataEditor = $('.editor').html();
 				var mensagem = "Deseja excluir esta Proposta de Melhoria?"
@@ -5885,12 +5881,7 @@
 				
 			};
 
-			
-
 		</script>				
-			
-			
-	
 
 	</cffunction>
 
@@ -5899,26 +5890,20 @@
 
 
 
-
-
-
-
-
-
 	<cffunction name="tabOrientacoes" returntype="any" access="remote" hint="Criar a tabela de medidas/orientações para regularização e envia para a páginas pc_CadastroRelato">
 
-	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
+		<cfargument name="pc_aval_id" type="numeric" required="true"/>
 
-        <cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
+		<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 			Select pc_avaliacao_orientacoes.* , pc_orgaos.pc_org_sigla, pc_processos.pc_num_status
 			FROM pc_avaliacao_orientacoes 
 			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-			    WHERE pc_aval_id = #arguments.pc_aval_id# 
+				WHERE pc_aval_id = #arguments.pc_aval_id# 
 			<cfelse>
-                 WHERE pc_aval_id = #arguments.pc_aval_id#  and pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_aval_orientacao_status in (2,4,5) 
+				WHERE pc_aval_id = #arguments.pc_aval_id#  and pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_aval_orientacao_status in (2,4,5) 
 			</cfif>
 			order By pc_aval_orientacao_id desc
 		</cfquery>
@@ -5926,7 +5911,7 @@
 		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
-            
+			
 		<div class="row">
 			<div class="col-12">
 				<div class="card">
@@ -5997,7 +5982,7 @@
 				
 				$("#tabOrientacoes").DataTable({
 					destroy: true,
-			     	stateSave: false,
+					stateSave: false,
 					responsive: true, 
 					lengthChange: false, 
 					utoWidth: false,
@@ -6058,9 +6043,9 @@
 				var pc_aval_orientacao_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(7)").text();
 				var pc_aval_orientacao_descricao = $(linha).closest("tr").children("td:nth-child(8)").text();
 
-	
 
-	
+
+
 				$('#pcOrientacaoId').val(pc_aval_orientacao_id);
 				$('#pcOrientacao').val(pc_aval_orientacao_descricao);
 				$('#pcOrgaoRespOrientacao').val(pc_aval_orientacao_mcu_orgaoResp).trigger('change');
@@ -6110,13 +6095,13 @@
 
 				$('#cabecalhoAccordionCadOrientacao').text("Editar Medida/Orientação para Regularização ID:" + ' ' + pc_aval_orientacao_id);
 				$('#infoTipoCadOrientacao').text("Editando Medida/Orientação para Regularização ID:" + ' ' + pc_aval_orientacao_id);
-		        $('#cadOrientacao').CardWidget('expand')
+				$('#cadOrientacao').CardWidget('expand')
 				$('html, body').animate({ scrollTop: ($('#cadOrientacao').offset().top - 80)} , 500); 
 			};	
 
 			function excluirOrientacao(pc_aval_orientacao_id)  {
 				event.preventDefault()
-		        event.stopPropagation()
+				event.stopPropagation()
 				var dataEditor = $('.editor').html();
 
 
@@ -6205,21 +6190,12 @@
 						
 			}
 
-			
-
 		</script>				
-			
-			
-	
 
 	</cffunction>
 
 
 	
-
-
-
-
 
 
 	

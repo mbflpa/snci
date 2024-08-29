@@ -159,6 +159,8 @@
 		function exibirCards(anoMostra){
 			$('#modalOverlay').modal('show')
 			$('#exibirCards').html('')
+			$('#TabAvaliacao').html('')
+			$('#cadAvaliacaoForm').html('');
 			
 			$('#divFormCadProcessoAte2023').attr("hidden",true)
 			$('#divFormCadProcesso2024').attr("hidden",true)

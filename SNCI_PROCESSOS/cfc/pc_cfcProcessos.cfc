@@ -1265,47 +1265,22 @@
 						$('#pcDataFimAvaliacao').attr("min",$('#pcDataInicioAvaliacao').val())	
 					});
 
-					
-					
-
-					
-				
+									
 					$('#pcModalidade').on('change', function (event){
-						if($('#pcModalidade').val() == 'A' || $('#pcModalidade').val() == 'E'){
-							//$('#pcNumSEI').val(null).trigger('change')
-							$('#pcNumSEIDiv').attr("hidden",false)	
-
-							//$('#pcNumRelatorio').val(null).trigger('change')
-							$('#pcNumRelatorioDiv').attr("hidden",false)	
-
-							//$('#pcDataFimAvaliacao').val(null).trigger('change')
-							$('#pcDataFimAvaliacaoDiv').attr("hidden",false)
-
-							//$('#pcTipoClassificacao').val(null).trigger('change')
-							$("#pcTipoClassificacaoDiv").attr("hidden",false);	
-						}else{
-							$('#pcNumSEI').val(null).trigger('change')
-							//$('#pcNumSEIDiv').attr("hidden",true)	
-
-							$('#pcNumRelatorio').val(null).trigger('change')
-							//$('#pcNumRelatorioDiv').attr("hidden",true)	
-
-							$('#pcDataFimAvaliacao').val(null).trigger('change')
-							//$('#pcDataFimAvaliacaoDiv').attr("hidden",true)
-
-							$("#pcTipoClassificacao").val('6')
-							//$("#pcTipoClassificacaoDiv").attr("hidden",true)	
-						}
-
 						if($('#pcModalidade').val() == 'E' ){
 							$('#pcBloquearDiv').attr("hidden",false)
-							$('#pcBloquear').val(null).trigger('change')
+							let currentPage = window.location.pathname.split("/").pop();
+							// Verifica se a página atual é 'pc_Processos_Editar.cfm'
+							if (currentPage === 'pc_Processos_Editar.cfm') {
+								$('#pcBloquear').val('N').trigger('change')
+							}else{
+								$('#pcBloquear').val(null).trigger('change')
+							}
+
 						}else{
 							$('#pcBloquearDiv').attr("hidden",true)
  							$('#pcBloquear').val('N').trigger('change')
 						}
-
-
 					});
 
 					
