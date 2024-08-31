@@ -91,7 +91,7 @@
 
 			}
 
-			   //ABRE O FORM PARA UPLOAD DA AVALIAÇÃO, ANEXOS, RECOMENDAÇÕES, ETC...
+			//ABRE O FORM PARA UPLOAD DA AVALIAÇÃO, ANEXOS, RECOMENDAÇÕES, ETC...
 			function mostraCadastroAvaliacaoRelato(idAvaliacao,linha) {
 				//event.preventDefault()
 				//event.stopPropagation()

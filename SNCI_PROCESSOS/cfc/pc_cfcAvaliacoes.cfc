@@ -996,6 +996,7 @@
 
 
 					//Initialize Select2 Elements
+					// as exceções são os selects que não devem ser inicializados com o select2 e que estão em todas as páginas que utilizam este componente.
 					$('select').not('[name="tabProcAcompCards_length"]').select2({
 						theme: 'bootstrap4',
 						placeholder: 'Selecione...',
@@ -4171,7 +4172,7 @@
 
 
 	<cffunction name="formAvalOrientacaoCadastro" access="remote" hint="Formulário de cadastro de Orientações">
-        <!-- @note finalizado formAvalOrientacaoCadastro -->
+        
 		<cfargument name="numOrgaoAvaliado" type="string" required="true"/>
         
 		<div id="accordionCadOrientacao"  style="display: flex; justify-content: left;">
@@ -4339,7 +4340,8 @@
 				});
 				
 				//Initialize Select2 Elements
-				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"]').select2({
+				// as exceções são os selects que não devem ser inicializados com o select2 e que estão em todas as páginas que utilizam este componente.
+				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"], [name="tabProcCards_length"], [name="tabAvaliacoes2024_length"]').select2({
 					theme: 'bootstrap4',
 					placeholder: 'Selecione...',
 					allowClear: true
@@ -4350,7 +4352,6 @@
 				// Função de validação customizada
 				function validateButtonGroupsOrientacao() {
 					var isValid = true;
-
 					$("#formAvalOrientacaoCadastro .btn-group").each(function() {
 						var $group = $(this);
 						var hasActive = $group.find(".active").length > 0;
@@ -4370,6 +4371,11 @@
 
 					return isValid;
 				}
+
+				// Adiciona o método de validação personalizado para múltipla seleção
+				$.validator.addMethod("atLeastOneSelected", function(value, element) {
+					return $(element).find('option:selected').length > 0;
+				}, "Pelo menos uma opção deve ser selecionada.");
 
 				// Adicione métodos de validação personalizados para verificar visibilidade e valor não zero
 				$.validator.addMethod("requiredIfVisibleAndNotZero", function(value, element) {
@@ -4420,7 +4426,8 @@
 							required: true
 						},
 						pcAvalOrientacaoCategoriaControle: {
-							required: true
+							required: true,
+							atLeastOneSelected: true
 						},
 						pcAvalOrientacaoBenefNaoFinanceiroDesc: {
 							requiredIfVisibleAndNotEmpty: true
@@ -4440,7 +4447,8 @@
 							required: "Campo obrigatório."
 						},
 						pcAvalOrientacaoCategoriaControle: {
-							required: "Campo obrigatório."
+							required: "Campo obrigatório.",
+							atLeastOneSelected: "Selecione pelo menos uma opção."
 						},
 						pcAvalOrientacaoBenefNaoFinanceiroDesc: {
 							requiredIfVisibleAndNotEmpty: "Campo obrigatório."
@@ -4639,6 +4647,8 @@
 
 
 	</cffunction>
+
+
 
 	<cffunction name="formAvalMelhoriaCadastro" access="remote" hint="Formulário de cadastro das Propostas de Melhoria">
 		<!-- @audit  trabalhando formAvalMelhoriaCadastro -->
@@ -4869,6 +4879,7 @@
 				});
 				
 				//Initialize Select2 Elements
+				// as exceções são os selects que não devem ser inicializados com o select2 e que estão em todas as páginas que utilizam este componente.
 				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"]').select2({
 					theme: 'bootstrap4',
 					placeholder: 'Selecione...',
