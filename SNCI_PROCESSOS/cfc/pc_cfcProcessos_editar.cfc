@@ -2,175 +2,6 @@
 <cfcomponent>
 <cfprocessingdirective pageencoding = "utf-8">	
 
-
-	<cffunction name="cadProc2"   access="remote" returntype="any">
-
-	    <cfargument name="pcProcessoId" type="string" required="false" default=''/>
-		<cfargument name="pcNumSEI" type="string" required="true" />
-		<cfargument name="pcNumRelatorio" type="string" required="true" />
-		<cfargument name="pcOrigem" type="string" required="true" />
-		<cfargument name="pcDataInicioAvaliacao" type="date" required="true" />
-		<cfargument name="pcDataFimAvaliacao" type="any" required="false" />
-		<cfargument name="pcTipoAvaliado" type="string" required="true" />
-		<cfargument name="pcTipoAvalDescricao" type="string" required="false" default=''/>
-		<cfargument name="pcModalidade" type="string" required="true" />
-		<cfargument name="pcTipoClassif" type="string" required="true" />
-		<cfargument name="pcOrgaoAvaliado" type="string" required="true" />
-		<cfargument name="pcAvaliadores" type="any" required="true" />
-		<cfargument name="pcCoordenador" type="string" required="false" default=''/>
-		<cfargument name="pcCoordNacional" type="string" required="true"/>
-        <cfargument name="pcTipoDemanda" type="string" required="true"/>
-		<cfargument name="pcAnoPacin" type="string" required="true"/>
-		
-		<cfset ano = year(#arguments.pcDataInicioAvaliacao#)>
-		<cfset login = '#application.rsUsuarioParametros.pc_usu_login#'>
-
-		<cfquery name="rsSEorgAvaliado" datasource="#application.dsn_processos#">
-		  SELECT pc_org_se from pc_orgaos where pc_org_mcu = #arguments.pcOrgaoAvaliado#
-        </cfquery>
-
-		<cfquery name="rsSeq" datasource="#application.dsn_processos#">
-			SELECT Max(pc_processo_id) AS Max
-			FROM pc_processos 
-			WHERE pc_processo_id like '%#ano#' AND pc_processo_id like '#rsSEorgAvaliado.pc_org_se#%'
-		</cfquery>
-
-		
-
-        <cfif rsSeq.Max eq "">
-            <cfset NumID = 1>
-        <cfelse>
-            <cfset NumID = val(mid(rsSeq.Max,3,4) + 1)>			
-        </cfif>	
-
-        <cfswitch expression="#len(NumID)#">
-            <cfcase value="1">
-                <cfset NumID = '000' & NumID>
-            </cfcase>
-            <cfcase value="2">
-                <cfset NumID = '00' & NumID>
-            </cfcase>
-            <cfcase value="3">
-                <cfset NumID = '0' & NumID>
-            </cfcase>
-        </cfswitch>
-
-        <cfset NumID = '#rsSEorgAvaliado.pc_org_se#' & NumID & ano>
-        <cfset aux_sei = Trim('#arguments.pcNumSEI#')>
-        <cfset aux_sei = Replace(aux_sei,'.','',"All")>
-        <cfset aux_sei = Replace(aux_sei,'/','','All')>
-        <cfset aux_sei = Replace(aux_sei,'-','','All')>
-       
-
-		
-		<!--Se o ano da data de início da avaliação, um novo processo é cadastrado e o processo antigo é excluído-->
-		<cfquery datasource="#application.dsn_processos#" name="qProcessoEditar">
-			SELECT pc_data_inicioAvaliacao, pc_usu_matricula_cadastro, pc_num_status, pc_org_se,pc_num_orgao_avaliado  FROM pc_processos 
-			INNER JOIN pc_orgaos ON pc_orgaos.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-			WHERE pc_processo_id = '#arguments.pcProcessoId#'
-		</cfquery>
-		<cfset anoAntes = year(#qProcessoEditar.pc_data_inicioAvaliacao#)>
-		
-
-		<cfif anoAntes neq ano >
-			<cfquery datasource="#application.dsn_processos#">
-				INSERT pc_processos (pc_processo_id, pc_usu_matricula_cadastro, pc_datahora_cadastro, pc_num_sei, pc_num_orgao_origem, pc_num_rel_sei, pc_num_orgao_avaliado, pc_num_avaliacao_tipo, pc_aval_tipo_nao_aplica_descricao,pc_num_classificacao, pc_data_inicioAvaliacao, pc_data_fimAvaliacao, pc_num_status, pc_alteracao_datahora, pc_alteracao_login, pc_usu_matricula_coordenador,pc_usu_matricula_coordenador_nacional, pc_Modalidade,pc_tipo_demanda, pc_ano_pacin)
-				VALUES ('#NumID#', '#qProcessoEditar.pc_usu_matricula_cadastro#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#aux_sei#', '#arguments.pcOrigem#', '#arguments.pcNumRelatorio#', '#arguments.pcOrgaoAvaliado#', '#arguments.pcTipoAvaliado#','#arguments.pcTipoAvalDescricao#','#arguments.pcTipoClassif#', '#arguments.pcDataInicioAvaliacao#', '#arguments.pcDataFimAvaliacao#', '#qProcessoEditar.pc_num_status#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#', '#arguments.pcCoordenador#',  '#arguments.pcCoordNacional#', '#arguments.pcModalidade#', '#arguments.pcTipoDemanda#', '#arguments.pcAnoPacin#')
-			</cfquery> 	
-	
-            <cftransaction>
-				<!--Cadastra avaliadores -->
-				<cfloop list="#arguments.pcAvaliadores#" index="i">  
-					<cfset matriculaAvaliador = '#i#'>
-					<cfquery datasource="#application.dsn_processos#">
-						INSERT pc_avaliadores (pc_avaliador_matricula,  pc_avaliador_id_processo)
-						VALUES ('#matriculaAvaliador#',  '#NumID#')
-					</cfquery>
-				</cfloop>
-				<!--Fim Cadastra avaliadores -->
-
-				<!--Edita todos os registros nas outras tabelas com o novo ID do processo-->
-				<cfquery datasource="#application.dsn_processos#" name="EditaTabelas">
-					UPDATE pc_avaliacoes
-					SET pc_avaliacoes.pc_aval_processo = '#NumID#'
-					WHERE pc_avaliacoes.pc_aval_processo = '#arguments.pcProcessoId#'
-
-					UPDATE pc_anexos
-					SET pc_anexos.pc_anexo_processo_id = '#NumID#'
-					WHERE pc_anexos.pc_anexo_processo_id = '#arguments.pcProcessoId#'
-				</cfquery>
-				<!--Fim Edita todos os registros nas outras tabelas com o novo ID do processo-->
-
-				
-				<!--Exclui avaliadores antigos-->
-				<cfquery datasource="#application.dsn_processos#" name="DeletaAvaliadores">
-					DELETE FROM pc_avaliadores
-					WHERE pc_avaliadores.pc_avaliador_id_processo = '#arguments.pcProcessoId#'
-				</cfquery> 
-				<!--Fim Exclui avaliadores antigos-->
-
-				<!--Exclui processo antigo-->
-				<cfquery datasource="#application.dsn_processos#" name="DeletaProcessos">
-					DELETE FROM pc_processos
-					WHERE pc_processos.pc_processo_id = '#arguments.pcProcessoId#'
-				</cfquery>
-				<!--Fim Exclui avaliadores e processo antigos-->
-			</cftransaction>	
-		<!--Se nem o ano de início da avaliação for alterado, editar o processo normalmente-->
-		<cfelse>
-			<cftransaction>
-				<cfquery datasource="#application.dsn_processos#" >
-					UPDATE pc_processos
-					SET 
-						pc_num_orgao_origem = '#arguments.pcOrigem#',
-						pc_num_sei = '#aux_sei#',
-						pc_num_rel_sei = '#arguments.pcNumRelatorio#',
-						pc_num_avaliacao_tipo = '#arguments.pcTipoAvaliado#',
-						pc_aval_tipo_nao_aplica_descricao = '#arguments.pcTipoAvalDescricao#',
-						pc_Modalidade = '#arguments.pcModalidade#',
-						pc_num_classificacao = '#arguments.pcTipoClassif#',
-						pc_data_inicioAvaliacao = '#arguments.pcDataInicioAvaliacao#',
-						pc_data_fimAvaliacao = '#arguments.pcDataFimAvaliacao#',
-						pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#',
-						pc_usu_matricula_coordenador =  '#arguments.pcCoordenador#',
-						pc_usu_matricula_coordenador_nacional =  '#arguments.pcCoordNacional#',
-						pc_tipo_demanda = '#arguments.pcTipoDemanda#',
-						pc_ano_pacin = '#arguments.pcAnoPacin#'
-					WHERE pc_processo_id = '#arguments.pcProcessoId#'
-				</cfquery> 	
-
-				<cfquery datasource="#application.dsn_processos#" >
-					DELETE FROM pc_avaliadores
-					WHERE pc_avaliador_id_processo= '#arguments.pcProcessoId#'
-				</cfquery> 	
-
-
-				<cfloop list="#arguments.pcAvaliadores#" index="i">  
-					<cfset matriculaAvaliador = '#i#'>
-					<cfif '#matriculaAvaliador#' eq  "#arguments.pcCoordenador#">
-						<cfset coordena ='S'>
-					<cfelse>
-						<cfset coordena ='N'>
-					</cfif>
-
-					<cfquery datasource="#application.dsn_processos#">
-						INSERT pc_avaliadores (pc_avaliador_matricula, pc_avaliador_id_processo)
-						VALUES ('#matriculaAvaliador#', '#arguments.pcProcessoId#')
-					</cfquery>
-				</cfloop>
-
-			</cftransaction>
-		</cfif>
-
-      
-
-
-		<cfreturn true />
-	</cffunction>
-
-
-	
 	<cffunction name="cardsProcessos" returntype="any" access="remote" hint="Criar os cards dos processos e envia para a páginas pc_CadastroProcesso">
 	   
 		<cfargument name="ano" type="string" required="true" />
@@ -322,7 +153,7 @@
 																												
 																												data-toggle="tooltip"  tilte="Editar"></i>
 																												<cfif pc_num_status neq 3>
-																													<i  class="fas fa-boxes-packing efeito-grow" onclick="javascript:mostraCadastroRelato(<cfoutput>'#pc_processo_id#','#anoProcesso#',</cfoutput>);"  style="cursor: pointer;z-index:100;font-size:20px"    title="Mostrar próximos passos." ></i>
+																													<i  class="fas fa-boxes-packing efeito-grow" onclick="javascript:mostraCadastroItem(<cfoutput>'#pc_processo_id#','#anoProcesso#',</cfoutput>);"  style="cursor: pointer;z-index:100;font-size:20px"    title="Mostrar próximos passos." ></i>
 																												</cfif>
 																											</div>
 																										</a>
@@ -394,7 +225,7 @@
 				$('#divFormCadProcesso').html('')
 				
 
-				$('#tabAvaliacaoDiv').html('')
+				$('#tabItemsDiv').html('')
 				$('#cadAvaliacaoForm').html('');
 				
 				$.ajax({
@@ -564,11 +395,11 @@
 				}, 500);
 			}
 
-			function mostraCadastroRelato(numProcesso, anoProcesso) {
+			function mostraCadastroItem(numProcesso, anoProcesso) {
                 //cancela e  não propaga o event click original no botão
 				event.preventDefault()
 				event.stopPropagation()
-                let cadProcAvaliacaoForm ='';
+                let editarItemForm ='';
 				
 				$('#formEditarProcesso').attr("hidden",true)
 				$('#divFormCadProcesso').html('')
@@ -580,8 +411,8 @@
 							type: "post",
 							url: "cfc/pc_cfcProcessos_editar.cfc",
 							data:{
-								method: "cadProcAvaliacaoForm",
-								pc_aval_processoForm: numProcesso
+								method: "editarItemForm",
+								numProcesso: numProcesso
 							},
 							async: false,
 							success: function(response) {
@@ -612,10 +443,10 @@
 
 
 
-	<cffunction name="cadProcAvaliacaoForm"   access="remote"  returntype="any" hint="Insere o formulario de cadastro do título da avaliação na páginas pc_CadastroAvaliacaoPainel">
+	<cffunction name="editarItemForm"   access="remote"  returntype="any" hint="Insere o formulario de cadastro do título da avaliação na páginas pc_CadastroAvaliacaoPainel">
 
 
-        <cfargument name="pc_aval_processoForm" type="string" required="true"/>
+        <cfargument name="numProcesso" type="string" required="true"/>
 
        
 
@@ -637,7 +468,7 @@
 						pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id INNER JOIN
 						pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu INNER JOIN
 						pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
-			WHERE  pc_processo_id = '#arguments.pc_aval_processoForm#'														
+			WHERE  pc_processo_id = '#arguments.numProcesso#'														
 		</cfquery>
 	
 
@@ -829,7 +660,7 @@
 		</head>
 		<body >
 
-			<form id="formCadItem"  class="needs-validation was-validated" name="formCadItem" format="html"  style="height: auto;padding-left:25px;padding-right:25px;">
+			<form id="formEditarItem"  class="needs-validation was-validated" name="formEditarItem" format="html"  style="height: auto;padding-left:25px;padding-right:25px;">
 				<div class="modal fade" id="modal-danger">
 					<div class="modal-dialog">
 						<div class="modal-content bg-danger">
@@ -1066,7 +897,7 @@
 												</div>
 												<div style="margin-top:10px;display:flex;justify-content:space-between">
 													<button class="btn btn-primary" onclick="inicializarValidacaoStep1();" >Próximo</button>
-													<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+													<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroItem(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
 												</div>
 											</div>
 										</form>
@@ -1141,7 +972,7 @@
 															<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
 															<button class="btn btn-primary" onclick="inicializarValidacaoStep2()">Próximo</button>
 														</div>
-														<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+														<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroItem(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
 													</div>
 												</div>
 											</div>
@@ -1170,7 +1001,7 @@
 															<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
 															<button class="btn btn-primary" onclick="inicializarValidacaoStep3()">Próximo</button>
 														</div>
-														<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+														<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroItem(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
 													</div>
 												</div>
 											</div>
@@ -1234,7 +1065,7 @@
 															<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
 															<button class="btn btn-primary" onclick="inicializarValidacaoStep4()">Próximo</button>
 														</div>
-														<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+														<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroItem(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
 													</div>
 												</div>
 											</div>
@@ -1273,7 +1104,7 @@
 															<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
 															<button class="btn btn-primary" onclick="inicializarValidacaoStep5()">Próximo</button>
 														</div>
-														<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+														<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroItem(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
 													</div>
 												</div>
 											</div>
@@ -1317,7 +1148,7 @@
 											<div style="margin-top:10px;display:flex;justify-content:space-between" >
 												<button class="btn btn-secondary" onclick="stepper.previous()" >Anterior</button>
 												<button id="btSalvar" class="btn  btn-success animate__animated animate__bounceIn animate__slow animate__delay-2s " >Salvar</button>
-												<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
+												<button id="btCancelar"  class="btn  btn-danger " onclick="javascript:mostraCadastroItem(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);">Cancelar</button>
 											</div>
 
 										</div>
@@ -1342,9 +1173,9 @@
 			
 			
 			<div id="editarItemDiv" style="margin-bottom:50px"></div>
-			<div id="tabAvaliacaoDiv" style="margin-bottom:50px"></div>
+			<div id="tabItemsDiv" style="margin-bottom:50px"></div>
 
-			<div id="cadastroAvaliacaoRelatoDiv" style="padding-left:25px;padding-right:25px"></div>
+			<div id="cadastroItemDiv" style="padding-left:25px;padding-right:25px"></div>
 
 			<script language="JavaScript">
 				
@@ -1354,8 +1185,8 @@
 
 					
 					$('#cadastro').on('expanded.lte.cardwidget', function() {
-						//limpa o conteúdo de cadastroAvaliacaoRelatoDiv
-						$('#cadastroAvaliacaoRelatoDiv').html('')
+						//limpa o conteúdo de cadastroItemDiv
+						$('#cadastroItemDiv').html('')
 						//obter a largura de infoProcesso
 						let largura = $('#infoProcesso').width();
 						$('#cadastro').css('width', largura );
@@ -1400,13 +1231,6 @@
 					$('.step-trigger').not('#aval_testeControle-trigger').hide();
 
 					
-					
-					
-					// Oculta todos os elementos com a classe step-trigger, exceto aquele com o ID aval_testeControle-trigger
-					//$('.step-trigger').not('#aval_testeControle-trigger').hide();
-
-					//Início da validção dos forms do bs-stepper (etapas do cadastro de processo)
-					// Adicionar classe 'is-invalid' a todos os campos
 
 					// Adiciona o método de validação personalizado para múltipla seleção
 					$.validator.addMethod("atLeastOneSelected", function(value, element) {
@@ -1487,6 +1311,8 @@
 						validateButtonGroups()
 					});
 
+					//@audit validação dos form de edição de item
+
 					$('#formAval_testeControle').validate({
 						errorPlacement: function(error, element) {
 							error.appendTo(element.closest('.form-group'));
@@ -1502,11 +1328,9 @@
 								maxlength: 7500
 							},
 							pcAvaliacaoTipoControle: {
-								required: true,
 								atLeastOneSelected: true
 							},
 							pcAvaliacaoCategoriaControle: {
-								required: true,
 								atLeastOneSelected: true
 							}
 						},
@@ -1520,11 +1344,9 @@
 								maxlength: "O campo deve conter no máximo 7500 caracteres."
 							},
 							pcAvaliacaoTipoControle: {
-								required: "Campo obrigatório.",
 								atLeastOneSelected: "Selecione pelo menos uma opção."
 							},
 							pcAvaliacaoCategoriaControle: {
-								required: "Campo obrigatório.",
 								atLeastOneSelected: "Selecione pelo menos uma opção."
 							}
 						},
@@ -2013,11 +1835,8 @@
 						}
 					});
 
-					
-
 					exibirTabAvaliacoes();
 
-					
 				});
 
 					
@@ -2177,11 +1996,8 @@
 									},
 						
 									async: false,
-									success: function(result) {	
-										//resetFormFields();	
-										//exibirTabAvaliacoes()
-										//$('#cadastroAvaliacaoRelatoDiv').html("")
-										mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);
+									success: function(result) {		
+										mostraCadastroItem(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);
 										$('#modalOverlay').delay(1000).hide(0, function() {
 											$('#modalOverlay').modal('hide');
 											toastr.success('Operação realizada com sucesso!');
@@ -2228,12 +2044,12 @@
 						type: "post",
 						url: "cfc/pc_cfcProcessos_editar.cfc",
 						data:{
-							method: "tabAvaliacoes",
+							method: "tabItens",
 							numProcesso: numProcesso
 						},
 						async: false,
 						success: function(result) {
-							$('#tabAvaliacaoDiv').html(result)
+							$('#tabItemsDiv').html(result)
 							
 						},
 						error: function(xhr, ajaxOptions, thrownError) {
@@ -2441,67 +2257,8 @@
 
 
 
-	<cffunction name="cadProcAvaliacaoItem"   access="remote"  returntype="any"> 
-	
-	    <cfargument name="pc_aval_id" type="string" required="false" default=''/>
-		<cfargument name="pc_aval_processo" type="string" required="true"/>
-		<cfargument name="pc_aval_numeracao" type="string" required="true"/><!--Numeração da Titulo. Inicialmente será manual-->
-		<cfargument name="pc_aval_descricao" type="string" required="true"/><!--Manchete-->
-		<cfargument name="pc_aval_classificacao" type="string" required="true"/>
-		<cfargument name="pc_aval_vaFalta" type="string" required="false"/>
-		<cfargument name="pc_aval_vaRisco" type="string" required="false"/>
-		<cfargument name="pc_aval_vaSobra" type="string" required="false"/>
-		
 
-        <cfif '#arguments.pc_aval_id#' eq '' >
-			<cftransaction>
-				<cfquery datasource="#application.dsn_processos#" >
-					INSERT INTO pc_avaliacoes
-									(pc_aval_processo, pc_aval_numeracao, pc_aval_datahora, pc_aval_atualiz_datahora,pc_aval_atualiz_login,
-									pc_aval_avaliador_matricula, pc_aval_descricao, pc_aval_status, pc_aval_vaFalta, pc_aval_vaRisco, pc_aval_vaSobra, pc_aval_classificacao)
-					VALUES     		('#arguments.pc_aval_processo#', '#arguments.pc_aval_numeracao#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#application.rsUsuarioParametros.pc_usu_matricula#, '#arguments.pc_aval_descricao#', '1',  '#arguments.pc_aval_vaFalta#', '#arguments.pc_aval_vaRisco#','#arguments.pc_aval_vaSobra#','#arguments.pc_aval_classificacao#')
-			
-				</cfquery>
-
-				<cfquery datasource="#application.dsn_processos#" >
-					UPDATE pc_processos
-					SET pc_num_status = 3
-					WHERE  pc_processo_id = '#arguments.pc_aval_processo#'
-				</cfquery> 	
-			</cftransaction>
-		<cfelse>
-			<cftransaction>
-				<cfquery datasource="#application.dsn_processos#" >
-					UPDATE pc_avaliacoes
-					SET pc_aval_numeracao = '#arguments.pc_aval_numeracao#',
-						pc_aval_descricao =  '#arguments.pc_aval_descricao#',
-						pc_aval_classificacao = '#arguments.pc_aval_classificacao#',
-						pc_aval_vaFalta =  '#arguments.pc_aval_vaFalta#',
-						pc_aval_vaRisco =  '#arguments.pc_aval_vaRisco#',
-						pc_aval_vaSobra =  '#arguments.pc_aval_vaSobra#',
-						pc_aval_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
-
-					WHERE  pc_aval_id = #arguments.pc_aval_id#
-				</cfquery> 	
-				<!--Se a classificação for modificada para Leve, todas as orientações e propostas de melhoria do item serão excluídas-->
-				<cfif '#arguments.pc_aval_classificacao#' eq 'L'>
-					<cfquery datasource="#application.dsn_processos#" >
-						Delete from pc_avaliacao_orientacoes WHERE  pc_aval_orientacao_num_aval = #arguments.pc_aval_id#
-						Delete from pc_avaliacao_melhorias WHERE  pc_aval_melhoria_num_aval = #arguments.pc_aval_id#
-					</cfquery>
-				</cfif>
-			</cftransaction>
-		</cfif>
-
-		
-
-	</cffunction>
-
-
-
-
-	<cffunction name="tabAvaliacoes" returntype="any" access="remote" hint="Criar a tabela das avaliações e envia para a páginas pc_PcCadastroAvaliacaoPainel">
+	<cffunction name="tabItens" returntype="any" access="remote" hint="Criar a tabela das avaliações e envia para a páginas pc_PcCadastroAvaliacaoPainel">
 	
 	 
 		<cfargument name="numProcesso" type="string" required="true"/>
@@ -2522,7 +2279,7 @@
 				<div class="card">
 					<!-- /.card-header -->
 					<div class="card-body">
-						<table id="tabAvaliacoes" class="table table-bordered  table-hover table-striped">
+						<table id="tabItens" class="table table-bordered  table-hover table-striped">
 						<thead style="background: #0083ca;color:#fff">
 							<tr style="font-size:12px!important">
 								<th >Controles</th>
@@ -2584,7 +2341,7 @@
 									<tr style="font-size:12px" >
 										<td style="vertical-align: middle;">
 											<div style="display:flex;justify-content:space-around;">
-												<i class="fas fa-edit efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:editarAvaliacaoTitulo(<cfoutput>'#pc_aval_id#'</cfoutput>)"    title="Editar"></i>
+												<i class="fas fa-edit efeito-grow"   style="margin-right:10px;cursor: pointer;z-index:100;font-size:20px"  onclick="javascript:editarItem(<cfoutput>'#pc_aval_id#'</cfoutput>)"    title="Editar"></i>
 												<i  class="fas fa-boxes-packing efeito-grow" onclick="javascript:mostraCadastroAvaliacaoRelato(<cfoutput>'#pc_aval_id#'</cfoutput>,this);"  style="cursor: pointer;z-index:100;font-size:20px"    title="Mostrar próximos passos." ></i>
 											</div>
 										</td>
@@ -2617,7 +2374,7 @@
 
 		
 			$(function () {
-				$("#tabAvaliacoes").DataTable({
+				$("#tabItens").DataTable({
 					columnDefs: [
 						{ "orderable": false, "targets": 0 }//impede que a primeira coluna seja ordenada
 					],
@@ -2655,7 +2412,7 @@
 						type: "post",
 						url: "cfc/pc_cfcProcessos_editar.cfc",
 						data:{
-							method: 'cadastroAvaliacaoRelato',
+							method: 'formCadastroAvaliacaoRelato',
 							idAvaliacao:idAvaliacao
 							
 						},
@@ -2759,9 +2516,40 @@
 				return formatter.format(value);
 			}
 
-			
+			function validateSelect2Fields() {
+    // Selecione todos os elementos Select2 múltiplos
+    $('select.select2[multiple]').each(function() {
+        var selectElement = $(this);
+        var value = selectElement.val();
+        
+        // Remove as classes existentes
+        selectElement.removeClass('is-valid is-invalid');
+        
+        // Verifica se o valor é nulo, vazio, ou contém apenas uma string vazia
+        if (!value || value.length === 0 || (value.length === 1 && value[0] === "")) {
+            // Adiciona a classe 'is-invalid' se a lista estiver vazia ou contiver uma string vazia
+            selectElement.addClass('is-invalid');
+        } else {
+            // Adiciona a classe 'is-valid' se houver valores selecionados
+            selectElement.addClass('is-valid');
+        }
 
-			function editarAvaliacaoTitulo(id) {
+        // Atualiza o contêiner do Select2 para refletir as classes no input real
+        var select2Container = selectElement.next('.select2-container');
+        if (select2Container.length) {
+            select2Container.removeClass('is-valid is-invalid');
+            if (!value || value.length === 0 || (value.length === 1 && value[0] === "")) {
+                select2Container.addClass('is-invalid');
+            } else {
+                select2Container.addClass('is-valid');
+            }
+        }
+    });
+}
+
+			
+            //@audit editarItem(id) 
+			function editarItem(id) {
 				event.preventDefault()
 				event.stopPropagation()
                 resetFormFields();
@@ -2787,6 +2575,9 @@
 						async: true
 					})
 					.done(function(result) {
+							// Limpa as classes de validação
+							$('#formAval_testeControle').find('.is-valid, .is-invalid').removeClass('is-valid is-invalid');
+							            				
 							let data = JSON.parse(result);
 
 							// Verifique se os dados são um array e têm pelo menos um elemento
@@ -2816,15 +2607,12 @@
 								$('#pc_aval_id').val(pc_aval_id).trigger('change');
 								$('#pcTeste').val(pc_aval_teste).trigger('change');
 								$('#pcControleTestado').val(pc_aval_controleTestado).trigger('change');
-								$('#pcAvaliacaoTipoControle').val(pc_aval_controleTestado).trigger('change');
 								$('#pcSintese').val(pc_aval_sintese).trigger('change');
 
-								
 								$('#pcValorRecuperar').val(formatCurrency(pc_aval_valorEstimadoRecuperar)).trigger('change');
 								$('#pcValorRisco').val(formatCurrency(pc_aval_valorEstimadoRisco)).trigger('change');
 								$('#pcValorNaoPlanejado').val(formatCurrency(pc_aval_valorEstimadoNaoPlanejado)).trigger('change');
 								$('#pcCriterioRef').val(pc_aval_criterioRef_id).trigger('change');
-						
 								//popula o select dinâmico do COSO
 								let dataLevels = ['COMPONENTE', 'PRINCIPIO'];
 								let labelNames = ['Componente', 'Princípio'];
@@ -2832,13 +2620,14 @@
 								populateSelectsFromIDAjax('cfc/pc_cfcAvaliacoes.cfc','getAvaliacaoCoso',pc_aval_coso_id, dataLevels,'idCoso');
 								//fim popula o select dinâmico do COSO
 
-
 								//popula os selects multiplos
 								$('#pcAvaliacaoTipoControle').val(listTiposControles).trigger('change');
 								$('#pcAvaliacaoCategoriaControle').val(listCategoriasControles).trigger('change');
 								$('#pcAvaliacaoRisco').val(listRiscos).trigger('change');
+								//fim popula os selects multiplos
 
 								// Inicializa o estado dos botões com base no valor de pc_aval_valorEstimadoRecuperar
+								
 								if (pc_aval_valorEstimadoRecuperar == 0) {
 									$('#btn-nao-aplica-recuperar').addClass('active btn-dark').removeClass('btn-light');
 									$('#btn-quantificado-recuperar').removeClass('active btn-primary').addClass('btn-light');
@@ -2871,10 +2660,23 @@
 									$('#btn-nao-aplica-NaoPlanejado').removeClass('active btn-dark').addClass('btn-light');
 									$('#pcValorNaoPlanejado').show();
 								}
+								
+								$('select' ).each(function() {
+									var $select = $(this);
+									if ($select.val() == "" || $select.val() == null) { // Verifica se há pelo menos uma opção selecionada
+										$select.removeClass('is-valid is-invalid');
+									}
+								});
+								// Para textarea e input
+								$('textarea, input').each(function() {
+									var $textarea = $(this);
+									if ($textarea.val() == "") { // Verifica se o campo está vazio
+										$textarea.removeClass('is-valid is-invalid');
+									}
+								});
 
 								
-							
-												
+
 								$('#cabecalhoAccordion').text("Editar o item N°:" + ' ' + pcNumSituacaoEncontrada);
 								$('#infoTipoCadastro').text("Editando o Item N°:" + ' ' + pcNumSituacaoEncontrada);
 								$('#mensagemFinalizar').html('<h5>Clique no botão "Salvar" para <span style="color: green;font-size: 1.5rem">EDITAR</span> o Item'  + ' <span style="color: green;font-size: 1.5rem"><strong>' + pcNumSituacaoEncontrada + '</strong></span></h5>');
@@ -2884,7 +2686,7 @@
 
 								$('#cadastro').CardWidget('expand')
 								$('html, body').animate({ scrollTop: ($('#cadastro').offset().top - 80)} , 500);
-                                
+                               
 
 							}
 							$('#modalOverlay').delay(1000).hide(0, function() {
@@ -2920,127 +2722,14 @@
 				)
 			}
 
-			
-			function excluirAvaliacao(pc_aval_id)  {
-				event.preventDefault()
-		        event.stopPropagation()
-			   
-				<cfoutput>var pc_aval_processo = '#arguments.numProcesso#';</cfoutput>
-                var mensagem = "Deseja excluir este item?";
-				
-				
-				swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!',
-					}).then((result) => {
-						if (result.isConfirmed) {
-							$('#modalOverlay').modal('show')
-							//var dataEditor = $('.editor').html();
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcAvaliacoes.cfc",
-									data:{
-										method: "delAvaliacao",
-										pc_aval_id: pc_aval_id,
-										pc_aval_processo: pc_aval_processo
-										
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {
-									 resetFormFields();	
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										toastr.success('Operação realizada com sucesso!');
-									});	
-									exibirTabAvaliacoes()
-									mostraCads()
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
-													+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
-										const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
-										
-										swalWithBootstrapButtons.fire(
-											{...erroSistema}
-										)
-									})
-								})//fim fail
-							}, 1000);//fim setTimeout
-						}else {
-							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
-							$('#modalOverlay').modal('hide');
-							Swal.fire({
-								title: 'Operação Cancelada',
-								html: logoSNCIsweetalert2(''),
-								icon: 'info'
-							});
-						}
-					})
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});	
-			}
+
 		</script>				
 
 
 	</cffunction>
 
 
-
-
-	<cffunction name="delAvaliacao"   access="remote" hint="deleta avaliação páginas pc_Avaliacoes.cfm tabela chamada pelo metodo tabAvaliacoesAte2023">
-		<cfargument name="pc_aval_id" type="numeric" required="true" />
-		<cfargument name="pc_aval_processo" type="string" required="true" />
-
-		<cfquery datasource="#application.dsn_processos#" name="rsAnexoAvaliacao">
-			SELECT pc_anexos.pc_anexo_avaliacao_id FROM pc_anexos WHERE pc_anexo_avaliacao_id = #arguments.pc_aval_id# 
-		</cfquery> 
-
-		<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
-			SELECT pc_avaliacao_melhorias.pc_aval_melhoria_num_aval FROM pc_avaliacao_melhorias WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id#
-		</cfquery>
-
-		<cfquery datasource="#application.dsn_processos#" >
-			DELETE FROM pc_validacoes_chat
-			WHERE pc_validacao_chat_num_aval= '#arguments.pc_aval_id#'
-		</cfquery>
-
-   
-
-		<cfif #rsAnexoAvaliacao.RecordCount# eq 0 && #rsMelhorias.RecordCount# eq 0>
-			<cfquery datasource="#application.dsn_processos#" >
-				DELETE FROM pc_avaliacoes
-				WHERE pc_aval_id= '#arguments.pc_aval_id#'
-			</cfquery> 
-		</cfif>
-
-
-
-		<cfquery datasource="#application.dsn_processos#" name="rsAvaliacoes">
-			SELECT pc_avaliacoes.pc_aval_id FROM pc_avaliacoes WHERE pc_aval_processo = '#arguments.pc_aval_processo#'
-		</cfquery>
-
-
-
-		<cfif #rsAvaliacoes.recordCount#  eq 0>
-			<cfquery datasource="#application.dsn_processos#" >
-				UPDATE pc_processos
-				SET pc_num_status = 2
-				WHERE  pc_processo_id = '#arguments.pc_aval_processo#'
-			</cfquery> 	
-		</cfif>
-	</cffunction>
-
-
-
-
-	<cffunction name="cadastroAvaliacaoRelato"   access="remote" hint="valida (ou  não) a avaliação e, se foi a Última avaliação a ser validada, envia o processo para o Órgão responsável.">
+	<cffunction name="formCadastroAvaliacaoRelato"   access="remote" hint="valida (ou  não) a avaliação e, se foi a Última avaliação a ser validada, envia o processo para o Órgão responsável.">
 		
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
@@ -3206,18 +2895,7 @@
 
 									<div id="anexoAvaliacaoDiv"></div>
 
-
-									<cfif #rsProcAval.pc_modalidade# eq 'N' >
-										<div align="center">
-											<div class="container">
-												<textarea  id="pcSituacaoEncontrada" name="pcSituacaoEncontrada"><cfoutput>#rsProcAval.pc_aval_relato#</cfoutput></textarea>							
-											</div>
-											
-											<div style="margin-top:10px;">
-												<div id="tabAvaliacaoDivVersoes"></div>
-											</div>
-										</div>
-									</cfif>
+									
 
 								</div>
 
@@ -3285,7 +2963,6 @@
 								</div>
 
 
-                                <!-- @note custom-tabs-one-5passo-->
 								<div class="tab-pane fade " id="custom-tabs-one-5passo" role="tabpanel" aria-labelledby="custom-tabs-one-5passo-tab">
 
 									<cfif rsProcAval.pc_aval_classificacao neq 'L'>
@@ -3873,7 +3550,6 @@
     </cffunction>
 
 	
-
 	<cffunction name="tabMelhorias" returntype="any" access="remote" hint="Criar a tabela de propostas de melhoria e envia para a páginas pc_CadastroRelato">
 
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
@@ -4377,462 +4053,6 @@
 		</script>				
 
 	</cffunction>
-
-
-	<cffunction name="tabAnexos" returntype="any" access="remote" hint="Criar a tabela dos anexos e envia para a páginas pc_CadastroRelato">
-
-	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
-		<cfargument name="pc_orientacao_id" type="string" required="false" default=""/>
-		
-
-        <cfquery datasource="#application.dsn_processos#" name="rsAnexos">
-			Select pc_anexos.*, pc_orgaos.*, pc_usu_nome FROM pc_anexos 
-			Left JOIN pc_orgaos on pc_org_mcu = pc_anexo_mcu_orgao
-			LEFT JOIN pc_usuarios ON pc_usu_matricula = RIGHT(pc_anexo_login,8)
-			WHERE pc_anexo_avaliacaoPDF ='N' AND pc_anexo_avaliacao_id = #arguments.pc_aval_id# 
-
-			
-			order By pc_anexo_id desc
-		</cfquery>
-
-		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
-			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
-		</cfquery>
-			
-            <cfif rsAnexos.recordcount neq 0>
-				<div class="row">
-					<div class="col-12">
-						<div class="card">
-						
-							<!-- /.card-header -->
-							<div class="card-body">
-							   
-								<table id="tabAnexos" class="table table-bordered table-striped table-hover text-nowrap">
-									<thead style="background: #0083ca;color:#fff">
-										<tr style="font-size:14px">
-											<th>Controles:</th>
-											<th style="width:25%">Arquivo: </th>
-											<th>Anexado por: </th>
-											<th style="width:10px">Data: </th>
-										</tr>
-									</thead>
-									
-									<tbody>
-										<cfloop query="rsAnexos" >
-											<cfif FileExists(pc_anexo_caminho)>
-												<cfoutput>					
-													<cfset arquivo = ListLast(pc_anexo_caminho,'\')>
-													<tr style="font-size:12px" >
-														<td style="width:10%">	
-															<div style="display:flex;justify-content:space-around;">
-																<i id="btExcluir" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:18px" onclick="javascript:excluirAnexo(#pc_anexo_id#);"   title="Excluir" ></i>
-																<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
-																	<i id="btAbrirAnexo" class="fas fa-eye efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:10px" onClick="window.open('pc_Anexos.cfm?arquivo=#arquivo#&nome=#pc_anexo_nome#','_blank')"   title="Excluir" ></i>
-																<cfelse>
-																	<i id="btAbrirAnexo" class="fas fa-download efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:10px" onClick="window.open('pc_Anexos.cfm?arquivo=#arquivo#&nome=#pc_anexo_nome#','_self')"   title="Excluir" ></i>
-																</cfif>
-															
-															</div>
-														</td>
-
-														<cfset data = DateFormat(#pc_anexo_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_anexo_datahora#,'HH:mm:ss') & ')'>
-															
-														<td >
-															<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
-																<i class="fas fa-file-pdf " style="margin-right:10px;color:red;font-size:20px"></i>
-															<cfelseif right(#pc_anexo_caminho#,3) eq 'zip'>
-																<i class="fas  fa-file-zipper" style="margin-right:10px;color:blue;font-size:20px"></i>
-															<cfelse>
-																<i class="fas fa-file-excel" style="margin-right:10px;color:green;font-size:20px"></i>
-															</cfif>												
-															#pc_anexo_nome#
-														</td>
-														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-															<td >#pc_org_sigla#</td>
-														<cfelse>
-														    <cfif #pc_org_controle_interno# eq 'S'>
-																<td >Controle Interno</td> 
-															<cfelse>
-																<td >#pc_org_sigla#/#pc_usu_nome#</td>
-															</cfif>
-														</cfif>
-														<td  style="width:100px">#data#</td>
-													</tr>
-												</cfoutput>
-											</cfif>
-											 
-										</cfloop>	
-									</tbody>
-										
-									
-								</table>
-							</div>
-
-							
-							<!-- /.card-body -->
-						</div>
-						<!-- /.card -->
-					</div>
-				<!-- /.col -->
-				</div>
-				<!-- /.row -->
-			<cfelse>
-				<h5>Nenhum anexo foi adicionado.</h5>
-			</cfif>
-
-
-		<script >
-			$(function () {
-				$("#tabAnexos").DataTable({
-					"destroy": true,
-			    	"stateSave": false,
-					"responsive": true, 
-					"lengthChange": false, 
-					"autoWidth": false
-				})
-					
-			});
-
-			function abrirAnexo(pc_anexo_caminho)  {
-				event.preventDefault()
-		        event.stopPropagation()
-				return false
-				window.location.href = "pc_Anexos.cfm?arquivo=" + pc_anexo_caminho;
-			}
-
-			function excluirAnexo(pc_anexo_id)  {
-				event.preventDefault()
-		        event.stopPropagation()
-				
-			
-				let mensagem = "Deseja excluir este anexo?";
-				swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							$('#modalOverlay').modal('show')
-							var dataEditor = $('.editor').html();
-							setTimeout(function() {	
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcProcessos_editar.cfc",
-									data:{
-										method: "delAnexos",
-										pc_anexo_id: pc_anexo_id
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {	
-									mostraTabAnexos();
-								
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide')
-										toastr.success('Operação realizada com sucesso!')
-									});	
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
-													+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
-										const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
-										swalWithBootstrapButtons.fire(
-											{...erroSistema}
-										)
-									})
-								})//fim fail
-							}, 500);
-						}
-					});
-				$('#modalOverlay').delay(1000).hide(0, function() {
-					$('#modalOverlay').modal('hide')
-				});	
-						
-			};
-
-			
-
-		</script>				
-			
-			
-	</cffunction>
-
-
-
-	<cffunction name="anexoAvaliacao"   access="remote" hint="retorna os anexos que contem 'S' no campo pc_anexo_avaliacao indicando que é a avaliação e  não um anexo comum">
-		<cfargument name="pc_aval_id" type="numeric" required="true" returntype="any"/>
-		<cfargument name="todosOsRelatorios" type="string" required="false" default="N"/>
-		
-		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
-			SELECT pc_avaliacoes.pc_aval_status, pc_avaliacoes.pc_aval_processo FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
-		</cfquery>
-
-		<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos" > 
-			SELECT pc_anexos.*   FROM  pc_anexos
-			<cfif #arguments.todosOsRelatorios# eq "N">
-				WHERE pc_anexo_avaliacao_id = #arguments.pc_aval_id# and pc_anexo_avaliacaoPDF = 'S'
-			<cfelse>
-				WHERE (pc_anexo_avaliacao_id = #arguments.pc_aval_id# OR pc_anexo_processo_id = '#rsStatus.pc_aval_processo#')  and pc_anexo_avaliacaoPDF = 'S'
-			</cfif>
-		</cfquery>
-
-
-		
-		<cfloop query="rsPc_anexos" >
-		    <cfif FileExists(pc_anexo_caminho)>
-				<cfset caminho = "#pc_anexo_caminho#">
-			<cfelse>
-				<cfset caminho = "Caminho  não encontrado">
-			</cfif>
-			
-				<div class="card-body" style="padding:0px;">
-					<div  id ="cardAvaliacaoPDF" class="card card-primary card-tabs collapsed-card" style="transition: all 0.15s ease 0s; height: inherit; width: inherit;">
-						<div class="card-header" style="background-color:#00416b;">
-						
-							<h3 class="card-title" style="font-size:16px;position:relative;top:3px;cursor:pointer" data-card-widget="collapse"><i class="fas fa-file-pdf" style="margin-right:10px;"></i><cfoutput> #pc_anexo_nome#</cfoutput></h3>
-						    <div  class="card-tools">
-								
-								<button type="button"  id="btExcluir" class="btn btn-tool  " style="font-size:16px" onclick="javascript:excluirAnexoAvaliacao(<cfoutput>#pc_anexo_id#</cfoutput>);"  ><i class="fas fa-trash-alt"></i></button>
-								<button  type="button" class="btn btn-tool" data-card-widget="collapse" style="font-size:16px;margin-left:50px"><i  class="fas fa-plus"></i></button>
-								<button  type="button" class="btn btn-tool" data-card-widget="maximize" style="font-size:16px;margin-left:50px"><i  class="exp fas fa-expand"></i></button>
-							</div>
-						</div>
-						
-						<div class="card-body" style="height: 100%;background-color:#00416B;padding-top: 0px;">											
-							<embed id="relatoPDFdiv" type="application/pdf" src="pc_Anexos.cfm?arquivo=<cfoutput>#caminho#</cfoutput>" style="width: 100%;height:90vh;" >
-						</div>			
-					</div>
-				</div>
-			
-		</cfloop>
-
-		<script language="JavaScript">
-    
-			function excluirAnexoAvaliacao(pc_anexo_id)  {
-				
-				
-				let mensagem = "Deseja excluir este anexo?";
-				swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							$('#modalOverlay').modal('show')
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcProcessos_editar.cfc",
-									data:{
-										method: "delAnexos",
-										pc_anexo_id: pc_anexo_id
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {	
-									mostraTabAnexos();
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										mostraRelatoPDF()
-										toastr.success('Operação realizada com sucesso!');
-									});	
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});	
-									$('#modal-danger').modal('show')
-									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-									$('#modal-danger').find('.modal-body').text(thrownError)
-								})//fim fail
-							}, 500);
-					    }
-				    });
-			};
-
-		</script>	
-		
-	</cffunction>
-
-
-
-
-
-	<cffunction name="cadOrientacoes"   access="remote"  returntype="any" hint="cadastra/edita orientacao">
-		
-		<cfargument name="pc_aval_id" type="numeric" required="true"/>
-		<cfargument name="pc_aval_orientacao_descricao" type="string" required="true"/>
-		<cfargument name="pc_aval_orientacao_mcu_orgaoResp" type="string" required="true"/>
-		<cfargument name="pc_aval_orientacao_id" type="string" required="false" default=""/>
-		<!--Adiciona 30 dias úteis à data atual para gerar a data prevista para resposta que constara np texto do manifestação-->
-		<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio">
-		<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias = 30 />
-		<cfset dataPTBR = obterDataPrevista.Data_Prevista_Formatada>
-		<cfset dataCFQUERY = "#DateFormat(obterDataPrevista.Data_Prevista,'YYYY-MM-DD')#">
-		<!--Se pc_aval_orientacao_id igual a '' significa que é um cadastro de orientação-->
-		<!--Se for um cadastro de orientação-->
-		<cfif #arguments.pc_aval_orientacao_id# eq ''>
-			<cfquery datasource="#application.dsn_processos#" name="rsProcesso">
-				SELECT pc_num_status,pc_modalidade FROM   pc_processos
-				INNER JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
-				WHERE  pc_aval_id = #arguments.pc_aval_id#
-			</cfquery>
-				
-
-			<!--Se o processo for da modalidade ACOMPANHAMENTO-->
-			<cfif rsProcesso.pc_modalidade eq 'A' >
-				<!--Se o processo estiver bloqueado-->
-				<cfif rsProcesso.pc_num_status eq 6>
-					<cfquery datasource="#application.dsn_processos#" name="qCadastraOrientacao">
-						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login)
-						VALUES (14, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
-						SELECT SCOPE_IDENTITY() AS NewID;
-					</cfquery>
-					<cfset IDdaOriencaoCadastrada = qCadastraOrientacao.NewID>
-					<cfset posicaoInicial = "Processo BLOQUEADO.<br>Este relatório aguarda a finalização de análises complementares do controle interno e/ou outros órgãos da empresa para liberação ao ÓRGÃO AVALIADO. Favor aguardar.">
-					<cfset orgaoResp = ''>
-					<cfset posic_status = 14>
-					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
-					<cfquery datasource="#application.dsn_processos#">
-						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
-						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#, 1)
-					</cfquery>
-				<cfelse>
-					<!--Se o processo não estiver bloqueado, a orientação ficará pendente de posicionamento inicial do controle interno-->
-					<cfquery datasource="#application.dsn_processos#" >
-						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login)
-						VALUES (1, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
-					</cfquery>
-				</cfif>
-			<cfelse>
-				<!--Se o processo for da modalidade ENTREGA DO RELATÓRIO-->
-				<!--Se o processo estiver bloqueado-->
-				<cfif rsProcesso.pc_num_status eq 6>
-					<cfquery datasource="#application.dsn_processos#"  name="qCadastraOrientacao">
-						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login)
-						VALUES (14, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
-						SELECT SCOPE_IDENTITY() AS NewID;
-					</cfquery>
-					<cfset IDdaOriencaoCadastrada = qCadastraOrientacao.NewID>
-					<cfset posicaoInicial = "Processo BLOQUEADO.<br>Este relatório aguarda a finalização de análises complementares do controle interno e/ou outros órgãos da empresa para liberação ao ÓRGÃO AVALIADO. Favor aguardar.">
-					<cfset orgaoResp = ''>
-					<cfset posic_status = 14>
-					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
-					<cfquery datasource="#application.dsn_processos#">
-						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
-						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#, 1)
-					</cfquery>
-				<cfelse>
-					<cfquery datasource="#application.dsn_processos#"  name="qCadastraOrientacao">
-						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login,pc_aval_orientacao_dataPrevistaResp)
-						VALUES (4, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#arguments.pc_aval_id#, '#arguments.pc_aval_orientacao_descricao#','#arguments.pc_aval_orientacao_mcu_orgaoResp#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#dataCFQUERY#')
-						SELECT SCOPE_IDENTITY() AS NewID;
-					</cfquery>
-					<cfset IDdaOriencaoCadastrada = qCadastraOrientacao.NewID>
-					<cfset posicaoInicial = "Para registro de sua manifestação orienta-se a atentar para as “Orientações/Medidas de Regularização” emitidas pela equipe de Controle Interno, bem como anexar no sistema SNCI as evidências de implementação das ações adotadas. Também solicita-se sua manifestação para as 'Propostas de Melhoria' conforme opções disponíveis no sistema.">
-					<cfset orgaoResp = '#arguments.pc_aval_orientacao_mcu_orgaoResp#'>
-					<cfset posic_status = 4>
-					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
-					<cfquery datasource="#application.dsn_processos#">
-						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
-						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#, 1)
-					</cfquery>
-				</cfif>
-			</cfif>
-		<!--Se for edição de uma orientação-->		
-		<cfelse>
-			<cfquery datasource="#application.dsn_processos#" >
-				UPDATE 	pc_avaliacao_orientacoes
-				SET    	pc_aval_orientacao_descricao = '#arguments.pc_aval_orientacao_descricao#',
-						pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
-				WHERE  	pc_aval_orientacao_id = #arguments.pc_aval_orientacao_id#	
-			</cfquery>	
-		</cfif>
-		
-		
-  	</cffunction>
-	
-	
-	<cffunction name="cadMelhorias"   access="remote"  returntype="any" hint="cadastra/edita as propostas de melhoria">
-		
-		<cfargument name="modalidade" type="string" required="true"/>
-		<cfargument name="pc_aval_id" type="numeric" required="true"/>
-		<cfargument name="pc_aval_melhoria_descricao" type="string" required="true"/>
-		<cfargument name="pc_aval_melhoria_num_orgao" type="string" required="true"/>
-
-		<cfargument name="pc_aval_melhoria_id" type="string" required="false" default=""/>
-
-		<cfargument name="pc_aval_melhoria_dataPrev" type="string" required="false" default=""/>
-		<cfargument name="pc_aval_melhoria_sugestao" type="string" required="false" default=""/>
-		<cfargument name="pc_aval_melhoria_sug_orgao_mcu" type="string" required="false" default=""/>
-		<cfargument name="pc_aval_melhoria_naoAceita_justif" type="string" required="false" default=""/>
-		<cfargument name="pc_aval_melhoria_status" type="string"  required="false"  default=""/>
-		
-	
-		<cfquery datasource="#application.dsn_processos#" >
-			<cfif '#arguments.modalidade#' eq 'A' OR '#arguments.modalidade#' eq 'E'>
-				<cfif #arguments.pc_aval_melhoria_id# eq ''>
-					<cfif '#arguments.pc_aval_melhoria_dataPrev#' eq "">
-						INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif, pc_aval_melhoria_sug_matricula, pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora)
-						VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#', '#application.rsUsuarioParametros.pc_usu_matricula#', '#arguments.pc_aval_melhoria_status#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">)
-					<cfelse>
-						INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login,pc_aval_melhoria_dataPrev, pc_aval_melhoria_sugestao, pc_aval_melhoria_sug_orgao_mcu, pc_aval_melhoria_naoAceita_justif, pc_aval_melhoria_sug_matricula, pc_aval_melhoria_status, pc_aval_melhoria_sug_datahora)
-						VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#','#arguments.pc_aval_melhoria_dataPrev#','#arguments.pc_aval_melhoria_sugestao#', '#arguments.pc_aval_melhoria_sug_orgao_mcu#','#arguments.pc_aval_melhoria_naoAceita_justif#', '#application.rsUsuarioParametros.pc_usu_matricula#', '#arguments.pc_aval_melhoria_status#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">)
-					
-					</cfif>
-				<cfelse>
-					UPDATE pc_avaliacao_melhorias
-					SET    pc_aval_melhoria_descricao = '#arguments.pc_aval_melhoria_descricao#',
-						pc_aval_melhoria_num_orgao = '#arguments.pc_aval_melhoria_num_orgao#',
-						<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
-							pc_aval_melhoria_dataPrev = '#arguments.pc_aval_melhoria_dataPrev#',
-						<cfelse>
-						    pc_aval_melhoria_dataPrev = null,
-						</cfif>
-						pc_aval_melhoria_sugestao = '#arguments.pc_aval_melhoria_sugestao#',
-						pc_aval_melhoria_sug_orgao_mcu = '#arguments.pc_aval_melhoria_sug_orgao_mcu#',
-						pc_aval_melhoria_naoAceita_justif = '#arguments.pc_aval_melhoria_naoAceita_justif#',
-						pc_aval_melhoria_sug_matricula = '#application.rsUsuarioParametros.pc_usu_matricula#',
-						pc_aval_melhoria_status = '#arguments.pc_aval_melhoria_status#',
-						pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
-
-					WHERE  pc_aval_melhoria_id = #arguments.pc_aval_melhoria_id#	
-				</cfif>
-			<cfelse>
-				<cfif #arguments.pc_aval_melhoria_id# eq ''>
-					INSERT pc_avaliacao_melhorias (pc_aval_melhoria_num_aval,pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao, pc_aval_melhoria_datahora, pc_aval_melhoria_login)
-					VALUES (#arguments.pc_aval_id#,'#arguments.pc_aval_melhoria_descricao#','#arguments.pc_aval_melhoria_num_orgao#',  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#')
-				<cfelse>
-					UPDATE pc_avaliacao_melhorias
-					SET    pc_aval_melhoria_descricao = '#arguments.pc_aval_melhoria_descricao#',
-						   pc_aval_melhoria_num_orgao = '#arguments.pc_aval_melhoria_num_orgao#'
-					WHERE  pc_aval_melhoria_id = #arguments.pc_aval_melhoria_id#	
-				</cfif>
-			</cfif>
-
-
-		</cfquery>
-		
-  	</cffunction>
-	
-	<cffunction name="delMelhorias"   access="remote" returntype="boolean" hint="exclui uma proposta de melhoria">
-
-		<cfargument name="pc_aval_melhoria_id" type="numeric" required="true" default=""/>
-
-		<cfquery datasource="#application.dsn_processos#" > 
-			DELETE FROM pc_avaliacao_melhorias
-			WHERE(pc_aval_melhoria_id = #arguments.pc_aval_melhoria_id#)
-		</cfquery>
-		<cfreturn true />
-	</cffunction>
-
-
-
-
 
 
 
