@@ -61,9 +61,8 @@
 							<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 						</div>
 
-						<div id="divFormCadProcessoAte2023" hidden class="card-body" ></div>
 
-						<div id="divFormCadProcesso2024" hidden class="card-body" ></div>
+						<div id="divFormCadProcesso" hidden class="card-body" ></div>
 
 						<div id="exibirCards" style="margin-top:10px"></div>
 					</div>	<!-- fim card-body -->
@@ -146,10 +145,8 @@
 		function exibirFormCadProcesso(){
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {
-             	$('#divFormCadProcessoAte2023').attr("hidden",true)
-				$('#divFormCadProcesso2024').attr("hidden",true)
-				$('#divFormCadProcessoAte2023').html('')
-				$('#divFormCadProcesso2024').html('')
+             	$('#divFormCadProcesso').attr("hidden",true)
+				$('#divFormCadProcesso').html('')
 				$('#modalOverlay').delay(1000).hide(0, function() {
 					$('#modalOverlay').modal('hide');
 				});
@@ -162,10 +159,8 @@
 			$('#TabAvaliacao').html('')
 			$('#cadAvaliacaoForm').html('');
 			
-			$('#divFormCadProcessoAte2023').attr("hidden",true)
-			$('#divFormCadProcesso2024').attr("hidden",true)
-			$('#divFormCadProcessoAte2023').html('')
-			$('#divFormCadProcesso2024').html('')
+			$('#divFormCadProcesso').attr("hidden",true)
+			$('#divFormCadProcesso').html('')
 			setTimeout(function() {
 				$.ajax({
 					type: "post",

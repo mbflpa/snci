@@ -3,7 +3,7 @@
 <cfprocessingdirective pageencoding = "utf-8">	
 
 
-	<cffunction name="cadProc"   access="remote" returntype="any">
+	<cffunction name="cadProc2"   access="remote" returntype="any">
 
 	    <cfargument name="pcProcessoId" type="string" required="false" default=''/>
 		<cfargument name="pcNumSEI" type="string" required="true" />
@@ -317,11 +317,9 @@
 																											<div style="display:flex;justify-content: space-around;" >
 																												<input id="pcNumProcessoCard" name="pcNumProcessoCard" type="text" hidden >												
 																												<i id="btEdit" class="fas fa-edit efeito-grow"  onMouseOver="this.style.color='#000'" onMouseOut="this.style.color='#ffF'"  style="cursor: pointer;z-index:100;font-size:20px" 
-																												<cfif anoProcesso lt 2024>
-																													onclick="javascript:processoEditarCardAte2023(<cfoutput>'#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#')</cfoutput>;" 
-																												<cfelse>
-																												    onclick="javascript:processoEditarCard2024(<cfoutput>'#pc_num_status#','#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;"
-																												</cfif>
+																												
+																												onclick="javascript:processoEditarCard(<cfoutput>'#pc_num_status#','#pc_processo_id#','#pc_num_sei#','#pc_num_rel_sei#', '#pc_num_orgao_origem#','#pc_data_inicioAvaliacao#','#pc_data_fimAvaliacao#','#pc_num_avaliacao_tipo#','#pc_aval_tipo_nao_aplica_descricao#','#pc_num_orgao_avaliado#','#pc_usu_matricula_coordenador#','#pc_usu_matricula_coordenador_nacional#','#pc_num_classificacao#','#avaliadores#','#pc_modalidade#','#pc_tipo_demanda#','#pc_ano_pacin#','#pc_iniciarBloqueado#','#objetivosEstrategicos#','#riscosEstrategicos#','#indEstrategicos#')</cfoutput>;"
+																												
 																												data-toggle="tooltip"  tilte="Editar"></i>
 																												<cfif pc_num_status neq 3>
 																													<i  class="fas fa-boxes-packing efeito-grow" onclick="javascript:mostraCadastroRelato(<cfoutput>'#pc_processo_id#','#anoProcesso#',</cfoutput>);"  style="cursor: pointer;z-index:100;font-size:20px"    title="Mostrar próximos passos." ></i>
@@ -388,119 +386,13 @@
 					
 			});
 
-			function processoEditarCardAte2023(processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin) {
+			function processoEditarCard(pc_num_status, processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin, bloquear, objetivoEstrategico, riscoEstrategico, indEstrategico) {
 				event.preventDefault()
 				event.stopPropagation()
 				$('#modalOverlay').modal('show');
-				$('#formEditarProcesso2024').attr("hidden",true)
-				$('#divFormCadProcesso2024').html('')
-				$('#formEditarProcessoAte2023').attr("hidden",true)
-				$('#divFormCadProcessoAte2023').html('')
-				$('#tabAvaliacaoDiv').html('')
-				$('#cadAvaliacaoForm').html('');
-
-				$.ajax({
-					url: 'cfc/pc_cfcProcessos_editar.cfc',
-					data: {
-						method: 'formEditarProcessoAte2023',
-					},
-					async: false
-				})
-				.done(function(response){
-					$("#divFormCadProcessoAte2023").html(response);
-				})//fim done
-				.fail(function(xhr, ajaxOptions, thrownError) {
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-						var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
-									+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
-						const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
-						swalWithBootstrapButtons.fire(
-							{...erroSistema}
-						)
-					});
-				})//fim fail
-
-
-				setTimeout(function() {	
-					var listAvaliadores = avaliadores.split(",");
-					$('#cabecalhoAccordion').text("Editar o Processo:" + ' ' + processoId);
-					$("#btSalvarDiv").attr("hidden",false)
-					
-					
-					$('#pcModalidade').val(modalidade).trigger('change');
-
-					$('#pcNumSEI').val(sei);
-					$('#pcProcessoId').val(processoId);			
-					$('#pcTipoClassificacao').val(classificacao).trigger('change');
-					$('#pcNumRelatorio').val(relSei);
-					$('#pcOrigem').val(orgaoOrigem).trigger('change');
-					$('#pcDataInicioAvaliacao').val(dataInicio);
-					$('#pcDataInicioAvaliacaoAnterior').val(dataInicio);
-					$('#pcDataFimAvaliacao').val(dataFim);
-					$('#pcTipoAvaliado').val(processoAvaliado).trigger('change');
-					$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
-					
-
-					$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
-					$( "#pcProcessoId" ).focus();	
-
-					if(coordenador==''){
-						$('#pcCoordenador').val(0).trigger('change');
-					}else{
-						$('#pcCoordenador').val(coordenador).trigger('change');
-					}
-
-					if(coordNacional==''){
-						$('#pcCoordNacional').val(0).trigger('change');
-					}else{
-						$('#pcCoordNacional').val(coordNacional).trigger('change');
-					}
-
-
-					$('#pcTipoDemanda').val(tipoDemanda).trigger('change');
-					if (tipoDemanda == 'E'){
-						anoPacin = null;
-					}
-					$('#pcAnoPacin').val(anoPacin).trigger('change');
-
-
-					var selectedValues = new Array();
-					$.each(listAvaliadores, function(index,value){
-						selectedValues[index] = value;
-					});
-					
-					$('#pcAvaliadores').val(selectedValues).trigger('change');
+				$('#formEditarProcesso').attr("hidden",true)
+				$('#divFormCadProcesso').html('')
 				
-					$('#cadastroEditar').CardWidget('expand')
-				
-					$('body')[0].scrollIntoView(true);
-
-					$('#divFormCadProcessoAte2023').attr("hidden",false)
-
-					$('html, body').animate({
-						scrollTop: $('#cadastroEditar').offset().top - 60
-					},'slow');
-
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});
-
-
-				},1000);
-
-			
-
-			}
-
-			function processoEditarCard2024(pc_num_status, processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin, bloquear, objetivoEstrategico, riscoEstrategico, indEstrategico) {
-				event.preventDefault()
-				event.stopPropagation()
-				$('#modalOverlay').modal('show');
-				$('#formEditarProcesso2024').attr("hidden",true)
-				$('#divFormCadProcesso2024').html('')
-				$('#formEditarProcessoAte2023').attr("hidden",true)
-				$('#divFormCadProcessoAte2023').html('')
 
 				$('#tabAvaliacaoDiv').html('')
 				$('#cadAvaliacaoForm').html('');
@@ -513,7 +405,7 @@
 					async: false
 				})
 				.done(function(response){
-					$("#divFormCadProcesso2024").html(response);
+					$("#divFormCadProcesso").html(response);
 					$('.step-trigger').show();
 				})//fim done
 				.fail(function(xhr, ajaxOptions, thrownError) {
@@ -660,7 +552,7 @@
 					});
 					//fim popula os selects dinâmicos
 
-					$('#divFormCadProcesso2024').attr("hidden",false)
+					$('#divFormCadProcesso').attr("hidden",false)
 
                     $('html, body').animate({
 						scrollTop: $('#cadastro').offset().top - 60
@@ -677,15 +569,10 @@
 				event.preventDefault()
 				event.stopPropagation()
                 let cadProcAvaliacaoForm ='';
-				if(anoProcesso < 2024){
-					cadProcAvaliacaoForm = 'cadProcAvaliacaoFormAte2023';
-					$('#formEditarProcessoAte2023').attr("hidden",true)
-					$('#divFormCadProcessoAte2023').html('')
-				}else{
-					cadProcAvaliacaoForm = 'cadProcAvaliacaoForm2024';
-					$('#formEditarProcesso2024').attr("hidden",true)
-					$('#divFormCadProcesso2024').html('')
-				}
+				
+				$('#formEditarProcesso').attr("hidden",true)
+				$('#divFormCadProcesso').html('')
+				
 			
 				$('#modalOverlay').modal('show')
 					setTimeout(function() {
@@ -693,7 +580,7 @@
 							type: "post",
 							url: "cfc/pc_cfcProcessos_editar.cfc",
 							data:{
-								method: cadProcAvaliacaoForm,
+								method: "cadProcAvaliacaoForm",
 								pc_aval_processoForm: numProcesso
 							},
 							async: false,
@@ -725,7 +612,7 @@
 
 
 
-	<cffunction name="cadProcAvaliacaoForm2024"   access="remote"  returntype="any" hint="Insere o formulario de cadastro do título da avaliação na páginas pc_CadastroAvaliacaoPainel">
+	<cffunction name="cadProcAvaliacaoForm"   access="remote"  returntype="any" hint="Insere o formulario de cadastro do título da avaliação na páginas pc_CadastroAvaliacaoPainel">
 
 
         <cfargument name="pc_aval_processoForm" type="string" required="true"/>
@@ -1457,7 +1344,7 @@
 			<div id="editarItemDiv" style="margin-bottom:50px"></div>
 			<div id="tabAvaliacaoDiv" style="margin-bottom:50px"></div>
 
-			<div id="cadastroAvaliacaoRelato2024Div" style="padding-left:25px;padding-right:25px"></div>
+			<div id="cadastroAvaliacaoRelatoDiv" style="padding-left:25px;padding-right:25px"></div>
 
 			<script language="JavaScript">
 				
@@ -1467,8 +1354,8 @@
 
 					
 					$('#cadastro').on('expanded.lte.cardwidget', function() {
-						//limpa o conteúdo de cadastroAvaliacaoRelato2024Div
-						$('#cadastroAvaliacaoRelato2024Div').html('')
+						//limpa o conteúdo de cadastroAvaliacaoRelatoDiv
+						$('#cadastroAvaliacaoRelatoDiv').html('')
 						//obter a largura de infoProcesso
 						let largura = $('#infoProcesso').width();
 						$('#cadastro').css('width', largura );
@@ -1485,7 +1372,7 @@
 
 					//Initialize Select2 Elements
 					// as exceções são os selects que não devem ser inicializados com o select2 e que estão em todas as páginas que utilizam este componente.
-					$('select').not('[name="tabProcCards_length"], [name="tabAvaliacoes2024_length"]').select2({
+					$('select').not('[name="tabProcCards_length"], [name="tabAvaliacoes_length"]').select2({
 						
 						theme: 'bootstrap4',
 						placeholder: 'Selecione...',
@@ -2293,7 +2180,7 @@
 									success: function(result) {	
 										//resetFormFields();	
 										//exibirTabAvaliacoes()
-										//$('#cadastroAvaliacaoRelato2024Div').html("")
+										//$('#cadastroAvaliacaoRelatoDiv').html("")
 										mostraCadastroRelato(<cfoutput>'#rsProcForm.pc_processo_id#'</cfoutput>);
 										$('#modalOverlay').delay(1000).hide(0, function() {
 											$('#modalOverlay').modal('hide');
@@ -2341,7 +2228,7 @@
 						type: "post",
 						url: "cfc/pc_cfcProcessos_editar.cfc",
 						data:{
-							method: "tabAvaliacoes2024",
+							method: "tabAvaliacoes",
 							numProcesso: numProcesso
 						},
 						async: false,
@@ -2614,7 +2501,7 @@
 
 
 
-	<cffunction name="tabAvaliacoes2024" returntype="any" access="remote" hint="Criar a tabela das avaliações e envia para a páginas pc_PcCadastroAvaliacaoPainel">
+	<cffunction name="tabAvaliacoes" returntype="any" access="remote" hint="Criar a tabela das avaliações e envia para a páginas pc_PcCadastroAvaliacaoPainel">
 	
 	 
 		<cfargument name="numProcesso" type="string" required="true"/>
@@ -2635,7 +2522,7 @@
 				<div class="card">
 					<!-- /.card-header -->
 					<div class="card-body">
-						<table id="tabAvaliacoes2024" class="table table-bordered  table-hover table-striped">
+						<table id="tabAvaliacoes" class="table table-bordered  table-hover table-striped">
 						<thead style="background: #0083ca;color:#fff">
 							<tr style="font-size:12px!important">
 								<th >Controles</th>
@@ -2730,7 +2617,7 @@
 
 		
 			$(function () {
-				$("#tabAvaliacoes2024").DataTable({
+				$("#tabAvaliacoes").DataTable({
 					columnDefs: [
 						{ "orderable": false, "targets": 0 }//impede que a primeira coluna seja ordenada
 					],
@@ -2768,7 +2655,7 @@
 						type: "post",
 						url: "cfc/pc_cfcProcessos_editar.cfc",
 						data:{
-							method: 'cadastroAvaliacaoRelato2024',
+							method: 'cadastroAvaliacaoRelato',
 							idAvaliacao:idAvaliacao
 							
 						},
@@ -3153,7 +3040,7 @@
 
 
 
-	<cffunction name="cadastroAvaliacaoRelato2024"   access="remote" hint="valida (ou  não) a avaliação e, se foi a Última avaliação a ser validada, envia o processo para o Órgão responsável.">
+	<cffunction name="cadastroAvaliacaoRelato"   access="remote" hint="valida (ou  não) a avaliação e, se foi a Última avaliação a ser validada, envia o processo para o Órgão responsável.">
 		
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
@@ -3390,7 +3277,7 @@
 										
 										<div id="formAvalOrientacaoCadastroDiv"></div>
 										
-										<div id="tabOrientacoes2024Div" style="margin-top:20px"></div>
+										<div id="tabOrientacoesDiv" style="margin-top:20px"></div>
 									<cfelse>
 										<div class="badge " style=" background-color:#e83e8c;color:#fff;font-size:20px;">Não se aplica para itens com classificação "LEVE".</div>
 									</cfif>
@@ -3492,14 +3379,14 @@
 				mostraRelatoPDF();
 				$('#custom-tabs-one-2passo-tab').click(function(){
 					$('#tabAnexosDiv').html('')
-					$('#tabOrientacoes2024Div').html('')
+					$('#tabOrientacoesDiv').html('')
 					$('#tabMelhoriasDiv').html('')
 					$('#pendenciasDiv').html('')
 					mostraRelatoPDF();
 				});	
 				$('#custom-tabs-one-3passo-tab').click(function(){
 					$('#anexoAvaliacaoDiv').html('')
-					$('#tabOrientacoes2024Div').html('')
+					$('#tabOrientacoesDiv').html('')
 					$('#tabMelhoriasDiv').html('')
 					$('#pendenciasDiv').html('')
 					mostraTabAnexos();
@@ -3510,13 +3397,13 @@
 					$('#tabMelhoriasDiv').html('')
 					$('#pendenciasDiv').html('')
 					$('#formAvalOrientacaoCadastroDiv').html('')
-					mostraTabOrientacoes2024();
+					mostratabOrientacoes();
 					
 				});
 				$('#custom-tabs-one-5passo-tab').click(function(){
 					$('#anexoAvaliacaoDiv').html('')
 					$('#tabAnexosDiv').html('')
-					$('#tabOrientacoes2024Div').html('')
+					$('#tabOrientacoesDiv').html('')
 					$('#pendenciasDiv').html('')
 					mostraFormAvalMelhoriaCadastro();
 					mostraTabMelhorias();
@@ -3524,7 +3411,7 @@
 				$('#custom-tabs-one-6passo-tab').click(function(){
 					$('#anexoAvaliacaoDiv').html('')
 					$('#tabAnexosDiv').html('')
-					$('#tabOrientacoes2024Div').html('')
+					$('#tabOrientacoesDiv').html('')
 					$('#tabMelhoriasDiv').html('')
 					mostraPendencias();	
 				});
@@ -3805,8 +3692,8 @@
 					})//fim ajax
 					.done(function(result) {
 						$('#formAvalOrientacaoCadastroDiv').html(result)
-						//move o scroll ate o id tabOrientacoes2024Div
-						$('html, body').animate({ scrollTop: ($('#tabOrientacoes2024Div').offset().top)} , 500);
+						//move o scroll ate o id tabOrientacoesDiv
+						$('html, body').animate({ scrollTop: ($('#tabOrientacoesDiv').offset().top)} , 500);
 					})//fim done
 					.fail(function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -3852,20 +3739,20 @@
 				}, 1000);
 			}
 
-			function mostraTabOrientacoes2024(){
+			function mostratabOrientacoes(){
 				$('#modalOverlay').modal('show')
 				setTimeout(function(){
 					$.ajax({
 						type: "post",
 						url: "cfc/pc_cfcProcessos_editar.cfc",
 						data:{
-							method: "tabOrientacoes2024",
+							method: "tabOrientacoes",
 							pc_aval_id: pc_aval_id
 						},
 						async: false
 					})//fim ajax
 					.done(function(result) {
-						$('#tabOrientacoes2024Div').html(result)
+						$('#tabOrientacoesDiv').html(result)
 						$('html, body').animate({ scrollTop: ($('#custom-tabs-one-4passo-tab').offset().top)-60} , 500);
 						$('#modalOverlay').delay(1000).hide(0, function() {
 							$('#modalOverlay').modal('hide');
@@ -4221,7 +4108,7 @@
 	</cffunction>
 
 
-	<cffunction name="tabOrientacoes2024" returntype="any" access="remote" hint="Criar a tabela de medidas/orientações para regularização e envia para a páginas pc_CadastroRelato">
+	<cffunction name="tabOrientacoes" returntype="any" access="remote" hint="Criar a tabela de medidas/orientações para regularização e envia para a páginas pc_CadastroRelato">
 
 		<cfargument name="pc_aval_id" type="numeric" required="true"/>
 
@@ -4249,7 +4136,7 @@
 					<!-- /.card-header -->
 					<div class="card-body">
 						
-						<table id="tabOrientacoes2024" class="table table-bordered table-hover  ">
+						<table id="tabOrientacoes" class="table table-bordered table-hover  ">
 							<thead style="background: #0083ca;color:#fff">
 								<tr style="font-size:14px">
 									<th>Controles</th>
@@ -4308,7 +4195,7 @@
 		<script language="JavaScript">
 			$(function () {
 				
-				$("#tabOrientacoes2024").DataTable({
+				$("#tabOrientacoes").DataTable({
 					destroy: true,
 					stateSave: false,
 					responsive: true, 
