@@ -1032,10 +1032,7 @@
 					//Início da validção dos forms do bs-stepper (etapas do cadastro de processo)
 					// Adicionar classe 'is-invalid' a todos os campos
 
-					// Adiciona o método de validação personalizado para múltipla seleção
-					$.validator.addMethod("atLeastOneSelected", function(value, element) {
-						return $(element).find('option:selected').length > 0;
-					}, "Pelo menos uma opção deve ser selecionada.");
+					
 
 					// Adiciona validação aos campos option zero foi selecionado
 					$.validator.addMethod("requiredIfSelectDinamicoZero", function(value, element) {
@@ -1111,11 +1108,13 @@
 						validateButtonGroups()
 					});
 
+					// Adiciona o método de validação personalizado para múltipla seleção
+					$.validator.addMethod("atLeastOneSelected", function(value, element) {
+						return $(element).find('option:selected').length > 0;
+					}, "Pelo menos uma opção deve ser selecionada.");
+
 					$('#formAval_testeControle').validate({
-						errorPlacement: function(error, element) {
-							error.appendTo(element.closest('.form-group'));
-							$(element).removeClass('is-valid').addClass('is-invalid');
-						},
+						
 						rules: {
 							pcTeste: {
 								required: true,
@@ -1126,11 +1125,9 @@
 								maxlength: 7500
 							},
 							pcAvaliacaoTipoControle: {
-								required: true,
 								atLeastOneSelected: true
 							},
 							pcAvaliacaoCategoriaControle: {
-								required: true,
 								atLeastOneSelected: true
 							}
 						},
@@ -1144,11 +1141,9 @@
 								maxlength: "O campo deve conter no máximo 7500 caracteres."
 							},
 							pcAvaliacaoTipoControle: {
-								required: "Campo obrigatório.",
 								atLeastOneSelected: "Selecione pelo menos uma opção."
 							},
 							pcAvaliacaoCategoriaControle: {
-								required: "Campo obrigatório.",
 								atLeastOneSelected: "Selecione pelo menos uma opção."
 							}
 						},
@@ -1405,12 +1400,6 @@
 							$('#btSalvar').attr("hidden",true);
 						}
 					};
-
-
-
-					
-
-					
 
 
 
