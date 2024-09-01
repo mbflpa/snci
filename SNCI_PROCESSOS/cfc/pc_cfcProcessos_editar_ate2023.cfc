@@ -192,7 +192,9 @@
                 WHERE not pc_status_id IN ('2','5') and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'	
 			</cfif>
 			<cfif '#arguments.ano#' neq 'TODOS'>
-				AND right(pc_processo_id,4) = '#arguments.ano#'
+				AND right(pc_processo_id,4) = '#arguments.ano#' 
+			<cfelse>
+				AND right(pc_processo_id,4) < 2024
 			</cfif>	
 			ORDER BY pc_datahora_cadastro desc 	
 		</cfquery>
@@ -357,7 +359,7 @@
 					setTimeout(function() {
 						$.ajax({
 							type: "post",
-							url: "cfc/pc_cfcProcessos_editar.cfc",
+							url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 							data:{
 								method:"cadProcAvaliacaoForm",
 								pc_aval_processoForm: numProcesso
@@ -679,7 +681,7 @@
 					previewNode.parentNode.removeChild(previewNode)
 
 					var myDropzoneRelatorio = new Dropzone("#processosCadastrados", { // Make the whole body a dropzone
-						url: "cfc/pc_cfcProcessos_editar.cfc?method=uploadArquivos", // Set the url
+						url: "cfc/pc_cfcProcessos_editar_ate2023.cfc?method=uploadArquivos", // Set the url
 						autoProcessQueue :true,
 						maxFiles: 1,
 						maxFilesize:20,
@@ -743,7 +745,7 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url:"cfc/pc_cfcProcessos_editar.cfc",
+						url:"cfc/pc_cfcProcessos_editar_ate2023.cfc",
 						data:{
 							method: "anexoRelatorio",
 							pc_anexo_processo_id: pc_processo_id
@@ -860,7 +862,7 @@
 						setTimeout(function() {	
 							$.ajax({
 								type: "post",
-								url: "cfc/pc_cfcProcessos_editar.cfc",
+								url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 								data:{
 									method:"cadProcAvaliacaoTitulo",
 									pc_aval_id: $('#pc_aval_id').val(),
@@ -930,7 +932,7 @@
 					
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcProcessos_editar.cfc",
+						url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 						data:{
 							method: "tabAvaliacoes",
 							numProcesso: numProcesso
@@ -1017,7 +1019,7 @@
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcProcessos_editar.cfc",
+									url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 									data:{
 										method: "delAnexos",
 										pc_anexo_id: pc_anexo_id
@@ -1436,7 +1438,7 @@
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
-									url: "pc_cfcProcessos_editar.cfc",
+									url: "pc_cfcProcessos_editar_ate2023.cfc",
 									data:{
 										method: "delAvaliacao",
 										pc_aval_id: pc_aval_id,
@@ -1481,7 +1483,7 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcProcessos_editar.cfc",
+						url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 						data:{
 							method: 'cadastroAvaliacaoRelato',
 							idAvaliacao:idAvaliacao
@@ -2063,7 +2065,7 @@
 					previewNode.parentNode.removeChild(previewNode)
 
 					var myDropzone = new Dropzone("div#custom-tabs-one-2passo", { // Make the whole body a dropzone
-						url: "cfc/pc_cfcProcessos_editar.cfc?method=uploadArquivos", // Set the url
+						url: "cfc/pc_cfcProcessos_editar_ate2023.cfc?method=uploadArquivos", // Set the url
 						autoProcessQueue :true,
 						maxFiles: 1,
 						maxFilesize:20,
@@ -2127,7 +2129,7 @@
 				previewNode.parentNode.removeChild(previewNode)
 
 				var myDropzone2 = new Dropzone("div#custom-tabs-one-3passo", { // Make the whole body a dropzone
-					url: "cfc/pc_cfcProcessos_editar.cfc?method=uploadArquivos", // Set the url
+					url: "cfc/pc_cfcProcessos_editar_ate2023.cfc?method=uploadArquivos", // Set the url
 					autoProcessQueue :true,
 					thumbnailWidth: 80,
 					thumbnailHeight: 80,
@@ -2279,7 +2281,7 @@
 				$('#modalOverlay').modal('show');
 				$.ajax({
 					type: "POST",
-					url:"cfc/pc_cfcProcessos_editar.cfc",
+					url:"cfc/pc_cfcProcessos_editar_ate2023.cfc",
 					data:{
 						method: "tabAvaliacaoVersoes",
 						pc_aval_id: pc_aval_id
@@ -2347,7 +2349,7 @@
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcProcessos_editar.cfc",
+									url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 									data:{
 										method: "cadOrientacoes",
 										pc_aval_id: pc_aval_id,
@@ -2433,7 +2435,7 @@
 					setTimeout(function() {	
 						$.ajax({
 							type: "post",
-							url: "cfc/pc_cfcProcessos_editar.cfc",
+							url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 							data:{
 								method: "cadMelhorias",
 								modalidade: modalidade,
@@ -2481,7 +2483,7 @@
 					setTimeout(function() {
 						$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcProcessos_editar.cfc",
+						url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 						data:{
 							method: "cadMelhorias",
 							modalidade: modalidade,
@@ -2524,7 +2526,7 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcProcessos_editar.cfc",
+						url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 						data:{
 							method: "tabAnexos",
 							pc_aval_id: pc_aval_id
@@ -2561,7 +2563,7 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcProcessos_editar.cfc",
+						url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 						data:{
 							method: "tabOrientacoes",
 							pc_aval_id: pc_aval_id
@@ -2594,7 +2596,7 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcProcessos_editar.cfc",
+						url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 						data:{
 							method: "tabMelhorias",
 							pc_aval_id: pc_aval_id
@@ -2625,7 +2627,7 @@
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
-						url:"cfc/pc_cfcProcessos_editar.cfc",
+						url:"cfc/pc_cfcProcessos_editar_ate2023.cfc",
 						data:{
 							method: "anexoAvaliacao",
 							pc_aval_id: pc_aval_id
@@ -2673,7 +2675,7 @@
 				
 				$.ajax({
 					type: "post",
-					url: "cfc/pc_cfcProcessos_editar.cfc",
+					url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 					data:{
 						method: "cadTextoAvaliacao",
 						pc_aval_id: pc_aval_id,
@@ -2907,7 +2909,7 @@
 					setTimeout(function() {
 						$.ajax({
 							type: "post",
-							url: "cfc/pc_cfcProcessos_editar.cfc",
+							url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 							data:{
 								method: "delMelhorias",
 								pc_aval_melhoria_id: pc_aval_melhoria_id
@@ -3213,7 +3215,7 @@
 							setTimeout(function() {	
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcProcessos_editar.cfc",
+									url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 									data:{
 										method: "delAnexos",
 										pc_anexo_id: pc_anexo_id
@@ -3321,7 +3323,7 @@
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcProcessos_editar.cfc",
+									url: "cfc/pc_cfcProcessos_editar_ate2023.cfc",
 									data:{
 										method: "delAnexos",
 										pc_anexo_id: pc_anexo_id

@@ -16,7 +16,7 @@
 				LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
-	WHERE NOT pc_num_status IN (2,3) 	
+	WHERE NOT pc_num_status IN (2,3) and right(pc_processos.pc_processo_id,4) >=2024	
 	
 	ORDER BY ano
 </cfquery>	

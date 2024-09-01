@@ -195,6 +195,8 @@
 			</cfif>
 			<cfif arguments.ano neq 'TODOS'>
 				AND right(pc_processo_id,4) = '#arguments.ano#'
+			<cfelse>
+				AND right(pc_processo_id,4) >= 2024
 			</cfif>	
 			ORDER BY pc_datahora_cadastro desc 	
 		</cfquery>
