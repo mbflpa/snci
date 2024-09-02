@@ -1605,13 +1605,6 @@
 					};
 
 
-
-					
-
-					
-
-
-
 					// Adiciona manipuladores de eventos de mudança para os campos select2
 					$('select').on('change.select2', function() {
 						var $this = $(this);
@@ -1621,6 +1614,8 @@
 							
 						}
 					});
+
+					
 
 					// Adiciona manipuladores de eventos para validar os campos
 					$('textarea, input, select').on('change blur keyup', function() {
@@ -1653,10 +1648,6 @@
 							$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
 						}
 					});
-
-					
-					
-					
 
 
 					// se for selecionado outros em pcAvaliacaoRisco, exibe o campo de descrição
@@ -1834,6 +1825,16 @@
 							$('#pcValorNaoPlanejado').val('');
 						}
 					});
+
+					$('select, textarea, input').on('change', function() {
+						var $this = $(this);
+						// Verifica se o valor do select é vazio ou nulo
+						if ($this.val() == "" || $this.val() == null || $this.val().length === 0) {
+							// Trigger the validation for the select element
+							$this.valid(); // This will validate the select element based on your jQuery Validate rules
+						}
+					});
+
 
 					exibirTabAvaliacoes();
 
@@ -2516,37 +2517,7 @@
 				return formatter.format(value);
 			}
 
-			function validateSelect2Fields() {
-    // Selecione todos os elementos Select2 múltiplos
-    $('select.select2[multiple]').each(function() {
-        var selectElement = $(this);
-        var value = selectElement.val();
-        
-        // Remove as classes existentes
-        selectElement.removeClass('is-valid is-invalid');
-        
-        // Verifica se o valor é nulo, vazio, ou contém apenas uma string vazia
-        if (!value || value.length === 0 || (value.length === 1 && value[0] === "")) {
-            // Adiciona a classe 'is-invalid' se a lista estiver vazia ou contiver uma string vazia
-            selectElement.addClass('is-invalid');
-        } else {
-            // Adiciona a classe 'is-valid' se houver valores selecionados
-            selectElement.addClass('is-valid');
-        }
-
-        // Atualiza o contêiner do Select2 para refletir as classes no input real
-        var select2Container = selectElement.next('.select2-container');
-        if (select2Container.length) {
-            select2Container.removeClass('is-valid is-invalid');
-            if (!value || value.length === 0 || (value.length === 1 && value[0] === "")) {
-                select2Container.addClass('is-invalid');
-            } else {
-                select2Container.addClass('is-valid');
-            }
-        }
-    });
-}
-
+			
 			
             //@audit editarItem(id) 
 			function editarItem(id) {

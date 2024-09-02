@@ -892,13 +892,13 @@
 							},
 							messages: {
 								pcObjetivoEstrategico: {
-									atLeastOne: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+									atLeastOne: '<span style="color:red;font-size:10px">Selecione pelo menos uma opção.</span>'
 								},
 								pcRiscoEstrategico: {
-									atLeastOne: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+									atLeastOne: '<span style="color:red;font-size:10px">Selecione pelo menos uma opção.</span>'
 								},
 								pcIndEstrategico: {
-									atLeastOne: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+									atLeastOne: '<span style="color:red;font-size:10px">Selecione pelo menos uma opção.</span>'
 								}
 							},
 							errorPlacement: function(error, element) {
@@ -927,7 +927,7 @@
 							},
 							messages: {
 								pcAvaliadores: {
-									required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
+									required: '<span style="color:red;font-size:10px">Selecione pelo menos um inspetor.</span>'
 								},
 								pcCoordenador: {
 									required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
@@ -950,7 +950,9 @@
 						
 						// Adiciona manipuladores de eventos de mudança para os campos select2
 						$('select').on('change.select2', function() {
+							 
 							var $this = $(this);
+							$this.valid(); // Força a validação do campo
 							if ($this.val()) {
 								$this.removeClass('is-invalid').addClass('is-valid');
 								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
@@ -959,11 +961,33 @@
 						});
 
 						// Adiciona manipuladores de eventos para validar os campos
-						$('textarea, input, select').on('change blur keyup', function() {
+						$('select').on('change blur keyup', function() {
 							var $this = $(this);
 							if ($this.val()) {
 								$this.removeClass('is-invalid').addClass('is-valid');
 								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+							}
+						});
+
+						// Adiciona manipuladores de eventos para validar os campos
+						$('textarea, input').on('change blur keyup', function() {
+							var $this = $(this);
+							if ($this.val()) {
+								$this.removeClass('is-invalid').addClass('is-valid');
+								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+							}else{
+								$this.removeClass('is-valid').addClass('is-invalid');
+								$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+								 // Adiciona erro manualmente para o select
+								$this.rules("add", {
+									required: true,
+									messages: {
+										required: "Informação obrigatória."
+									}
+								});
+								// Trigger a validação
+        						$this.valid();
+
 							}
 						});
 
@@ -973,7 +997,7 @@
 							$(this).rules('add', {
 								required: true,
 								messages: {
-									required: '<span style="color:red;font-size:10px">Este campo é obrigatório.</span>'
+									required: '<span style="color:red;font-size:10px">Informação obrigatória.</span>'
 								}
 							});
 						});
@@ -1240,6 +1264,18 @@
 							}
 				
 						});
+
+
+
+						$('select').on('change', function() {
+							var $this = $(this);
+							// Verifica se o valor do select é vazio ou nulo
+							if ($this.val() == "" || $this.val() == null || $this.val().length === 0) {
+								// Trigger the validation for the select element
+								$this.valid(); // This will validate the select element based on your jQuery Validate rules
+							}
+						});
+
 						$("#btSalvar").attr("hidden",false);
 
 					
