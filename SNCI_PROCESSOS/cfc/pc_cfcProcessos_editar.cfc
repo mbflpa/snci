@@ -2421,8 +2421,8 @@
 					})//fim ajax
 					.done(function(result) {
 						resetFormFields();
-						$('#CadastroAvaliacaoRelatoAte2023Div').html(result)
-						$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelatoAte2023Div').offset().top)} , 500);
+						$('#cadastroItemDiv').html(result)
+						$('html, body').animate({ scrollTop: ($('#cadastroItemDiv').offset().top)} , 500);
 						
 						$('#modalOverlay').delay(2000).hide(0, function() {
 							$('#modalOverlay').modal('hide');
@@ -2441,71 +2441,6 @@
 			}
 
 			
-
-			function reverterValidacao(linha){
-				event.preventDefault()
-				event.stopPropagation()
-				$(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
-				var pc_aval_id = $(linha).closest("tr").children("td:nth-child(8)").text();
-                var mensagem = "Deseja reverter a validação deste item?";
-				
-				swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!',
-					}).then((result) => {
-						if (result.isConfirmed) {
-							$('#modalOverlay').modal('show')
-							//var dataEditor = $('.editor').html();
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcAvaliacoes.cfc",
-									data:{
-										method: "reverterValidacaoItem",
-										pc_aval_id: pc_aval_id
-										
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {	
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										toastr.success('Operação realizada com sucesso!');
-									});	
-									exibirTabAvaliacoes()
-									$('#CadastroAvaliacaoRelatoAte2023Div').html("")
-									
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
-													+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
-										const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
-										
-										swalWithBootstrapButtons.fire(
-											{...erroSistema}
-										)
-									})
-								})//fim fail
-							}, 1000);
-						}else {
-							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
-							$('#modalOverlay').modal('hide');
-							Swal.fire({
-								title: 'Operação Cancelada',
-								html: logoSNCIsweetalert2(''),
-								icon: 'info'
-							});
-						}
-					})
-				$('#modalOverlay').delay(1000).hide(0, function() {
-					$('#modalOverlay').modal('hide');
-				});
-			}
-
          
             function formatCurrency(value) {
 				// Formata o valor como moeda brasileira
@@ -3330,7 +3265,7 @@
 				setTimeout(function(){
 					$.ajax({
 						type: "post",
-						url: "cfc/pc_cfcAvaliacoes.cfc",
+						url: "cfc/pc_cfcProcessos_editar.cfc",
 						data:{
 							method: "formAvalOrientacaoCadastro",
 							numOrgaoAvaliado: numOrgaoAvaliado
@@ -3340,6 +3275,7 @@
 					})//fim ajax
 					.done(function(result) {
 						$('#formAvalOrientacaoCadastroDiv').html(result)
+						$("#accordionCadOrientacao").attr("hidden", true); 
 						//move o scroll ate o id tabOrientacoesDiv
 						$('html, body').animate({ scrollTop: ($('#tabOrientacoesDiv').offset().top)} , 500);
 					})//fim done
@@ -3521,240 +3457,6 @@
     </cffunction>
 
 	
-	<cffunction name="tabMelhorias" returntype="any" access="remote" hint="Criar a tabela de propostas de melhoria e envia para a páginas pc_CadastroRelato">
-
-	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
-
-        <cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
-			Select pc_avaliacao_melhorias.* , pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
-			FROM pc_avaliacao_melhorias 
-			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
-			LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
-			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-				WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id# 
-			<cfelse>
-				WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id# and pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-			</cfif>
-			order By pc_aval_melhoria_id desc
-			
-		</cfquery>
-
-		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
-			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
-		</cfquery>
-		
-            
-				<div class="row">
-					<div class="col-12">
-						<div class="card">
-							<!-- /.card-header -->
-							<div class="card-body">
-							    
-								<table id="tabMelhorias" class="table table-bordered  table-hover ">
-									<thead style="background: #0083ca;color:#fff">
-										<tr style="font-size:14px">
-											<th style="width: 10%;vertical-align:middle !important;">Controles</th>
-											<th hidden></th>
-											<th hidden></th>
-											<th hidden></th>
-											<th hidden></th>
-											<th style="width: 30%;vertical-align:middle !important;">Melhoria:</th>
-											<th style="vertical-align:middle !important;">Órgão Responsável:</th>
-											<th style="vertical-align:middle !important;">Status: </th>
-											<th style="vertical-align:middle !important;">Data Prevista: </th>
-											<th style="vertical-align:middle !important;">Órgão Responsável <br>(sugerido pelo órgão): </th>
-											<th style="vertical-align:middle !important;">Justificativa do órgão: </th>
-											<th style="vertical-align:middle !important;">Sugestão de Melhoria<br> (sugerida pelo órgão): </th>
-
-
-
-										</tr>
-									</thead>
-								
-									<tbody>
-										<cfloop query="rsMelhorias" >
-											<cfoutput>					
-												<cfswitch expression="#pc_aval_melhoria_status#">
-													<cfcase value="P">
-														<cfset statusMelhoria = "PENDENTE">
-													</cfcase>
-													<cfcase value="A">
-														<cfset statusMelhoria = "ACEITA">
-													</cfcase>
-													<cfcase value="R">
-														<cfset statusMelhoria = "RECUSA">
-													</cfcase>
-													<cfcase value="T">
-														<cfset statusMelhoria = "TROCA">
-													</cfcase>
-													<cfcase value="N">
-														<cfset statusMelhoria = "NÃO INFORMADO">
-													</cfcase>
-													<cfcase value="B">
-														<cfset statusMelhoria = "BLOQUEADO">
-													</cfcase>
-													<cfdefaultcase>
-														<cfset statusMelhoria = "">	
-													</cfdefaultcase>
-													
-												</cfswitch>
-												<tr style="font-size:14px;color:##000" >
-													<td style="text-align: center; vertical-align:middle !important;width:10%">	
-														<div style="display:flex;justify-content:space-around;">
-															<i id="btExcluirMelhoria" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px"   onClick="javascript:excluirMelhoria(#pc_aval_melhoria_id#)" title="Excluir" ></i>
-															<i id="btEditarMelhoria" class="fas fa-edit efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:5px" onClick="javascript:editarMelhoria(this);"   title="Editar" ></i>
-														</div>
-													</td>													
-													<td hidden>#pc_aval_melhoria_id#</td>
-													<td hidden>#pc_aval_melhoria_num_orgao#</td>
-													<td hidden>#pc_aval_melhoria_sug_orgao_mcu#</td>
-													<td hidden>#pc_aval_melhoria_dataPrev#</td>
-													<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="3"  disabled>#pc_aval_melhoria_descricao#</textarea></td>
-													<td style="vertical-align:middle !important;">#pc_org_sigla#</td>
-													<td style="vertical-align:middle !important;">#statusMelhoria#</td>
-													
-													<cfset dataHora = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY')>
-													<td style="vertical-align:middle !important;">#dataHora#</td>
-													<td style="vertical-align:middle !important;">#siglaOrgSug#</td>
-													<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="3" disabled>#pc_aval_melhoria_naoAceita_justif#</textarea></td>
-													<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="3" disabled>#pc_aval_melhoria_sugestao#</textarea></td>
-													
-												
-												</tr>
-											</cfoutput>
-										</cfloop>	
-									</tbody>
-										
-									
-								</table>
-							</div>
-
-							<!-- /.card-body -->
-						</div>
-						<!-- /.card -->
-					</div>
-				<!-- /.col -->
-				</div>
-				<!-- /.row -->
-		<script language="JavaScript">
-			$(function () {
-				
-				$("#tabMelhorias").DataTable({
-					"destroy": true,
-			     	"stateSave": false,
-					"responsive": true, 
-					"lengthChange": false, 
-					"autoWidth": false,
-					"select": true
-				})
-	
-			});
-
-			function editarMelhoria(linha) {
-				event.preventDefault()
-				event.stopPropagation()
-				$('#divMelhorias').attr('hidden',false);
-				$(linha).closest("tr").children("td:nth-child(6)").click();//seleciona a linha onde o botão foi clicado	
-				var pc_aval_melhoria_id = $(linha).closest("tr").children("td:nth-child(2)").text();
-				var pc_aval_melhoria_num_orgao = $(linha).closest("tr").children("td:nth-child(3)").text();
-				var pc_aval_melhoria_sug_orgao_mcu = $(linha).closest("tr").children("td:nth-child(4)").text();
-				var pc_aval_melhoria_dataPrev = $(linha).closest("tr").children("td:nth-child(5)").text()
-				var pc_aval_melhoria_descricao = $(linha).closest("tr").children("td:nth-child(6)").text();
-				
-
-				
-				var pc_aval_melhoria_status = "";
-
-				switch( $(linha).closest("tr").children("td:nth-child(8)").text()) {
-					case "PENDENTE":
-						pc_aval_melhoria_status = "P"
-					break;
-					case "ACEITA":
-						pc_aval_melhoria_status = "A"
-					break;
-					case "RECUSA":
-						pc_aval_melhoria_status = "R"
-					break;
-					case "TROCA":
-						pc_aval_melhoria_status = "T"
-					break;
-					case "NÃO INFORMADO":
-						pc_aval_melhoria_status = "N"
-					break;
-					case "BLOQUEADO":
-						pc_aval_melhoria_status = "B"
-					break;
-
-					default:
-						pc_aval_melhoria_status = ""
-				}  
-				
-				var pc_aval_melhoria_naoAceita_justif = $(linha).closest("tr").children("td:nth-child(11)").text();
-				var pc_aval_melhoria_sugestao = $(linha).closest("tr").children("td:nth-child(12)").text();
-
-				$('#labelMelhoria').html('Editar Proposta de Melhoria:')
-				$('#pcMelhoriaId').val(pc_aval_melhoria_id);
-				$('#pcMelhoria').val(pc_aval_melhoria_descricao);
-				$('#pcOrgaoRespMelhoria').val(pc_aval_melhoria_num_orgao);
-
-				$('#pcStatusMelhoria').val(pc_aval_melhoria_status).trigger('change');
-				$('#pcDataPrev').val(pc_aval_melhoria_dataPrev);
-				$('#pcOrgaoRespSugeridoMelhoria').val(pc_aval_melhoria_sug_orgao_mcu);
-				$('#pcRecusaJustMelhoria').val(pc_aval_melhoria_naoAceita_justif);
-				$('#pcNovaAcaoMelhoria').val(pc_aval_melhoria_sugestao);
-
-			};	
-
-			function excluirMelhoria(pc_aval_melhoria_id)  {
-				event.preventDefault()
-		        event.stopPropagation()
-
-				if(confirm("Deseja excluir esta proposta de melhoria?")){
-					var dataEditor = $('.editor').html();
-					$('#modalOverlay').modal('show')
-					setTimeout(function() {
-						$.ajax({
-							type: "post",
-							url: "cfc/pc_cfcProcessos_editar.cfc",
-							data:{
-								method: "delMelhorias",
-								pc_aval_melhoria_id: pc_aval_melhoria_id
-							},
-							async: false
-						})//fim ajax
-						.done(function(result) {	
-							//mostraPendencias()	
-							mostraTabMelhorias();
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-								toastr.success('Operação realizada com sucesso!');
-							});
-						})//fim done
-						.fail(function(xhr, ajaxOptions, thrownError) {
-							$('#modalOverlay').delay(800).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-							$('#modal-danger').modal('show')
-							$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-							$('#modal-danger').find('.modal-body').text(thrownError)
-
-						})//fim fail
-					}, 500);
-					
-				}
-				
-			};
-
-			
-
-		</script>				
-			
-			
-	
-
-	</cffunction>
-
-
 	<cffunction name="tabOrientacoes" returntype="any" access="remote" hint="Criar a tabela de medidas/orientações para regularização e envia para a páginas pc_CadastroRelato">
 
 		<cfargument name="pc_aval_id" type="numeric" required="true"/>
@@ -3811,7 +3513,6 @@
 											
 											<td style="text-align: center; vertical-align:middle !important;width:10%">	
 												<div style="display:flex;justify-content:space-around;">
-													<i id="btExcluirOrientacao" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px"   onClick="javascript:excluirOrientacao(#pc_aval_orientacao_id#)" title="Excluir" ></i>
 													<i id="btEditarOrientacao" class="fas fa-edit efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:5px" onClick="javascript:editarOrientacao(this);"   title="Editar" ></i>
 												</div>
 											</td>													
@@ -3898,9 +3599,10 @@
 				//$("#accordionCadOrientacao").attr("hidden", true);
 				mostraFormAvalOrientacaoCadastro()
 				setTimeout(function(){ 
-					
 					$('#labelOrientacao').html('Editar Medida/Orientação para Regularização:')
 					
+					// Limpa as classes de validação
+					//$('#formAvalOrientacaoCadastro').find('.is-valid, .is-invalid').removeClass('is-valid is-invalid');
 					
 					$(linha).closest("tr").children("td:nth-child(5)").click();//seleciona a linha onde o botão foi clicado	
 					var pc_aval_orientacao_id = $(linha).closest("tr").children("td:nth-child(2)").text();
@@ -3914,52 +3616,72 @@
 
 
 
-					$('#pcOrientacaoId').val(pc_aval_orientacao_id);
-					$('#pcOrientacao').val(pc_aval_orientacao_descricao);
+					$('#pcOrientacaoId').val(pc_aval_orientacao_id).trigger('change');
+					$('#pcOrientacao').val(pc_aval_orientacao_descricao).trigger('change');
 					$('#pcOrgaoRespOrientacao').val(pc_aval_orientacao_mcu_orgaoResp).trigger('change');
 					// Divide a string em um array
 					var valoresArray = pc_aval_orientacao_categoriaControle_id.split(',');
 					// Atribue o array ao select e acione o evento 'change'
+                   
 					$('#pcAvalOrientacaoCategoriaControle').val(valoresArray).trigger('change');
+					
+
 					
 					$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val(pc_aval_orientacao_beneficioNaoFinanceiro).trigger('change');
 					$('#pcValorBeneficioFinanceiro').val(formatCurrency(pc_aval_orientacao_beneficioFinanceiro)).trigger('change');
 					$('#pcValorCustoFinanceiro').val(formatCurrency(pc_aval_orientacao_custoFinanceiro)).trigger('change');
 
-					// Inicializa o estado dos botões com base no valor de pcAvalOrientacaoBenefNaoFinanceiroDesc
-					if ($('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val() === '') {
-						$('#btn-nao-aplica').addClass('active btn-dark').removeClass('btn-light');
-						$('#btn-descricao').removeClass('active btn-primary').addClass('btn-light');
+					if($('#pcAvalOrientacaoCategoriaControle').val()!='' && $('#pcAvalOrientacaoCategoriaControle').val()!=null){
+						
+						// Inicializa o estado dos botões com base no valor de pcAvalOrientacaoBenefNaoFinanceiroDesc
+						if ($('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val() === '') {
+							$('#btn-nao-aplica').addClass('active btn-dark').removeClass('btn-light');
+							$('#btn-descricao').removeClass('active btn-primary').addClass('btn-light');
+							$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide();
+						} else {
+							$('#btn-descricao').addClass('active btn-primary').removeClass('btn-light');
+							$('#btn-nao-aplica').removeClass('active btn-dark').addClass('btn-light');
+							$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').show();
+						}
+
+						// Inicializa o estado dos botões com base no valor de pcValorBeneficioFinanceiro
+						if ($('#pcValorBeneficioFinanceiro').val() == 0) {
+							$('#btn-nao-aplica-BeneficioFinanceiro').addClass('active btn-dark').removeClass('btn-light');
+							$('#btn-quantificado-BeneficioFinanceiro').removeClass('active btn-primary').addClass('btn-light');
+							$('#pcValorBeneficioFinanceiro').hide();
+						} else {
+							$('#btn-quantificado-BeneficioFinanceiro').addClass('active btn-primary').removeClass('btn-light');
+							$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('active btn-dark').addClass('btn-light');
+							$('#pcValorBeneficioFinanceiro').show();
+						}
+		
+						// Inicializa o estado dos botões com base no valor de pcValorCustoFinanceiro
+						if ($('#pcValorCustoFinanceiro').val() == 0) {
+							$('#btn-nao-aplica-CustoFinanceiro').addClass('active btn-dark').removeClass('btn-light');
+							$('#btn-quantificado-CustoFinanceiro').removeClass('active btn-primary').addClass('btn-light');
+							$('#pcValorCustoFinanceiro').hide();
+						} else {
+							$('#btn-quantificado-CustoFinanceiro').addClass('active btn-primary').removeClass('btn-light');
+							$('#btn-nao-aplica-CustoFinanceiro').removeClass('active btn-dark').addClass('btn-light');
+							$('#pcValorCustoFinanceiro').show();
+						}
+					}else{
+						$('#pcAvalOrientacaoCategoriaControle').closest(".form-group").append('<div id="pcAvalOrientacaoCategoriaControle-error" class="error invalid-feedback">Selecione, pelo menos, uma opção.</div>');
+						$('#btn-nao-aplica').addClass('btn-light').removeClass('active btn-dark');
+						$('#btn-descricao').removeClass('btn-primary').addClass('btn-light');
 						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide();
-					} else {
-						$('#btn-descricao').addClass('active btn-primary').removeClass('btn-light');
-						$('#btn-nao-aplica').removeClass('active btn-dark').addClass('btn-light');
-						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').show();
-					}
-
-					// Inicializa o estado dos botões com base no valor de pcValorBeneficioFinanceiro
-					if ($('#pcValorBeneficioFinanceiro').val() == 0) {
-						$('#btn-nao-aplica-BeneficioFinanceiro').addClass('active btn-dark').removeClass('btn-light');
-						$('#btn-quantificado-BeneficioFinanceiro').removeClass('active btn-primary').addClass('btn-light');
+						$('#btn-nao-aplica-BeneficioFinanceiro').addClass('btn-light').removeClass('active btn-dark');
+						$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-primary').addClass('btn-light');
 						$('#pcValorBeneficioFinanceiro').hide();
-					} else {
-						$('#btn-quantificado-BeneficioFinanceiro').addClass('active btn-primary').removeClass('btn-light');
-						$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('active btn-dark').addClass('btn-light');
-						$('#pcValorBeneficioFinanceiro').show();
-					}
-	
-					// Inicializa o estado dos botões com base no valor de pcValorCustoFinanceiro
-					if ($('#pcValorCustoFinanceiro').val() == 0) {
-						$('#btn-nao-aplica-CustoFinanceiro').addClass('active btn-dark').removeClass('btn-light');
-						$('#btn-quantificado-CustoFinanceiro').removeClass('active btn-primary').addClass('btn-light');
+						$('#btn-nao-aplica-CustoFinanceiro').addClass('btn-light').removeClass('active btn-dark');
+						$('#btn-quantificado-CustoFinanceiro').removeClass('btn-primary').addClass('btn-light');
 						$('#pcValorCustoFinanceiro').hide();
-					} else {
-						$('#btn-quantificado-CustoFinanceiro').addClass('active btn-primary').removeClass('btn-light');
-						$('#btn-nao-aplica-CustoFinanceiro').removeClass('active btn-dark').addClass('btn-light');
-						$('#pcValorCustoFinanceiro').show();
-					}
-					validateButtonGroupsOrientacao();		
 
+					}
+
+					validateButtonGroupsOrientacao();	
+
+					
 					$("#accordionCadOrientacao").attr("hidden", false); 
 					$('#cabecalhoAccordionCadOrientacao').text("Editar Medida/Orientação para Regularização ID:" + ' ' + pc_aval_orientacao_id);
 					$('#infoTipoCadOrientacao').text("Editando Medida/Orientação para Regularização ID:" + ' ' + pc_aval_orientacao_id);
@@ -3973,39 +3695,739 @@
 				}, 1000);
 			};	
 
-			function excluirOrientacao(pc_aval_orientacao_id)  {
+
+		</script>				
+
+	</cffunction>
+
+	<cffunction name="tabMelhorias" returntype="any" access="remote" hint="Criar a tabela de propostas de melhoria e envia para a páginas pc_CadastroRelato">
+
+		<cfargument name="pc_aval_id" type="numeric" required="true"/>
+
+		<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
+			Select pc_avaliacao_melhorias.* , pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
+			FROM pc_avaliacao_melhorias 
+			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
+			LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
+			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
+				WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id# 
+			<cfelse>
+				WHERE pc_aval_melhoria_num_aval = #arguments.pc_aval_id# and pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+			</cfif>
+			order By pc_aval_melhoria_id desc
+			
+		</cfquery>
+
+		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
+			SELECT pc_avaliacoes.pc_aval_status,pc_processos.pc_modalidade  FROM pc_avaliacoes 
+			INNER JOIN pc_processos ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+			WHERE pc_aval_id = #arguments.pc_aval_id#
+		</cfquery>
+
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<!-- /.card-header -->
+					<div class="card-body">
+						
+						<table id="tabMelhorias" class="table table-bordered  table-hover ">
+							<thead style="background: #0083ca;color:#fff">
+								<tr style="font-size:14px">
+									<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
+										<th style="width: 10%;vertical-align:middle !important;">Controles</th>
+									</cfif>
+									<th hidden></th>
+									<th hidden></th>
+									<th hidden></th>
+									<th hidden></th>
+									<th style="width: <cfif #rsStatus.pc_modalidade# neq 'E'>30%<cfelse>50%</cfif>;vertical-align:middle !important;">Melhoria:</th>
+									<th style="vertical-align:middle !important;">Órgão Responsável:</th>
+									<th style="vertical-align:middle !important;">Status: </th>
+									<cfif #rsStatus.pc_modalidade# neq 'E'>
+										<th style="vertical-align:middle !important;">Data Prevista: </th>
+										<th style="vertical-align:middle !important;">Órgão Responsável <br>(sugerido pelo órgão): </th>
+										<th style="vertical-align:middle !important;">Justificativa do órgão: </th>
+										<th style="vertical-align:middle !important;">Sugestão de Melhoria<br> (sugerida pelo órgão): </th>
+									</cfif>
+									<th hidden></th>
+									<th hidden></th>
+									<th hidden></th>
+									<th hidden></th>
+									
+
+
+
+								</tr>
+							</thead>
+						
+							<tbody>
+								<cfloop query="rsMelhorias" >
+									<cfquery name="rsCategoriasControlesMelhorias" datasource="#application.dsn_processos#">
+										SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_melhoria_categoriasControles 
+										WHERE pc_aval_melhoria_id = #pc_aval_melhoria_id#
+									</cfquery>
+									<cfset listaCategoriasControlesMelhoria = ValueList(rsCategoriasControlesMelhorias.pc_aval_categoriaControle_id,',')>
+									
+									<cfoutput>					
+										<cfswitch expression="#pc_aval_melhoria_status#">
+											<cfcase value="P">
+												<cfset statusMelhoria = "PENDENTE">
+											</cfcase>
+											<cfcase value="A">
+												<cfset statusMelhoria = "ACEITA">
+											</cfcase>
+											<cfcase value="R">
+												<cfset statusMelhoria = "RECUSA">
+											</cfcase>
+											<cfcase value="T">
+												<cfset statusMelhoria = "TROCA">
+											</cfcase>
+											<cfcase value="N">
+												<cfset statusMelhoria = "NÃO INFORMADO">
+											</cfcase>
+											<cfcase value="B">
+												<cfset statusMelhoria = "BLOQUEADO">
+											</cfcase>
+											<cfdefaultcase>
+												<cfset statusMelhoria = "">	
+											</cfdefaultcase>
+											
+										</cfswitch>
+										<tr style="font-size:12px;color:##000" >
+											<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
+												<td style="text-align: center; vertical-align:middle !important;width:10%">	
+													<div style="display:flex;justify-content:space-around;">
+														<i id="btExcluirMelhoria" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px"   onClick="javascript:excluirMelhoria(#pc_aval_melhoria_id#)" title="Excluir" ></i>
+														<i id="btEditarMelhoria" class="fas fa-edit efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:5px" onClick="javascript:editarMelhoria(this);"   title="Editar" ></i>
+													</div>
+												</td>													
+											</cfif>
+											<td hidden>#pc_aval_melhoria_id#</td>
+											<td hidden>#pc_aval_melhoria_num_orgao#</td>
+											<td hidden>#pc_aval_melhoria_sug_orgao_mcu#</td>
+											<td hidden>#pc_aval_melhoria_dataPrev#</td>
+											<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2"  disabled>#pc_aval_melhoria_descricao#</textarea></td>
+											<td style="vertical-align:middle !important;">#pc_org_sigla#</td>
+											<td style="vertical-align:middle !important;">#statusMelhoria#</td>
+											<cfif #rsStatus.pc_modalidade# neq 'E'>
+												<cfset dataHora = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY')>
+												<td style="vertical-align:middle !important;">#dataHora#</td>
+												<td style="vertical-align:middle !important;">#siglaOrgSug#</td>
+												<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_naoAceita_justif#</textarea></td>
+												<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_sugestao#</textarea></td>
+											</cfif>
+											<td hidden>#listaCategoriasControlesMelhoria#</td>
+											<td hidden>#pc_aval_melhoria_beneficioNaoFinanceiro#</td>
+											<td hidden>#pc_aval_melhoria_beneficioFinanceiro#</td>
+											<td hidden>#pc_aval_melhoria_custoFinanceiro#</td>
+										
+										</tr>
+									</cfoutput>
+								</cfloop>	
+							</tbody>
+								
+							
+						</table>
+					</div>
+
+					<!-- /.card-body -->
+				</div>
+				<!-- /.card -->
+			</div>
+		<!-- /.col -->
+		</div>
+		<!-- /.row -->
+		<script language="JavaScript">
+			$(function () {
+				
+				$("#tabMelhorias").DataTable({
+					destroy: true,
+					stateSave: false,
+					responsive: true, 
+					lengthChange: false, 
+					autoWidth: false,
+					select: true,
+					searching:false,
+					columnDefs: [
+						{ "className": "dt-center", "targets": "_all" } // Alinha todos os elementos verticalmente
+					]
+				})
+
+			});
+
+			function formatCurrency(value) {
+				// Formata o valor como moeda brasileira
+				let formatter = new Intl.NumberFormat('pt-BR', {
+					style: 'currency',
+					currency: 'BRL',
+					minimumFractionDigits: 2
+				});
+				return formatter.format(value);
+			}
+
+			// Função de validação customizada
+			function validateButtonGroupsMelhoria() {
+				var isValid = true;
+
+				$("#formAvalMelhoriaCadastro .btn-group").each(function() {
+					var $group = $(this);
+					var hasActive = $group.find(".active").length > 0;
+					var $error = $group.next("span.error");
+
+					if (!hasActive) {
+						$group.addClass("is-invalid").removeClass("is-valid");
+						if ($error.length === 0) {
+							$("<span class='error invalid-feedback' >Selecione, pelo menos, uma opção.</span>").insertAfter($group);
+						}
+						isValid = false;
+					} else {
+						$group.removeClass("is-invalid").addClass("is-valid");
+						$error.remove();
+					}
+				});
+
+				return isValid;
+			}
+
+			function editarMelhoria(linha) {
 				event.preventDefault()
 				event.stopPropagation()
+				
+				$('#labelMelhoria').html('Editar Proposta de Melhoria:')
+
+				<cfoutput> var modalidade = '#rsStatus.pc_modalidade#'; </cfoutput>
+				
+				$(linha).closest("tr").children("td:nth-child(6)").click();//seleciona a linha onde o botão foi clicado	
+				var pc_aval_melhoria_id = $(linha).closest("tr").children("td:nth-child(2)").text();
+				var pc_aval_melhoria_num_orgao = $(linha).closest("tr").children("td:nth-child(3)").text();
+				var pc_aval_melhoria_sug_orgao_mcu = $(linha).closest("tr").children("td:nth-child(4)").text();
+				var pc_aval_melhoria_dataPrev = $(linha).closest("tr").children("td:nth-child(5)").text()
+				var pc_aval_melhoria_descricao = $(linha).closest("tr").children("td:nth-child(6)").text();
+				
+				
+				
+				var pc_aval_melhoria_status = "";
+
+				switch( $(linha).closest("tr").children("td:nth-child(8)").text()) {
+					case "PENDENTE":
+						pc_aval_melhoria_status = "P"
+					break;
+					case "ACEITA":
+						pc_aval_melhoria_status = "A"
+					break;
+					case "RECUSA":
+						pc_aval_melhoria_status = "R"
+					break;
+					case "TROCA":
+						pc_aval_melhoria_status = "T"
+					break;
+					case "NÃO INFORMADO":
+						pc_aval_melhoria_status = "N"
+					break;
+					case "BLOQUEADO":
+						pc_aval_melhoria_status = "B"
+					break;
+
+					default:
+						pc_aval_melhoria_status = ""
+				}  
+				
+				var pc_aval_melhoria_naoAceita_justif = $(linha).closest("tr").children("td:nth-child(11)").text();
+				var pc_aval_melhoria_sugestao = $(linha).closest("tr").children("td:nth-child(12)").text();
+
+
+				if(modalidade != 'E'){
+					var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(13)").text();
+					var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(14)").text();
+					var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(15)").text();
+					var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(16)").text();
+				}else{
+					var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(9)").text();
+					var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(10)").text();
+					var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(11)").text();
+					var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(12)").text();
+				}
+					
+
+
+
+				$('#pcMelhoriaId').val(pc_aval_melhoria_id).trigger('change');
+				$('#pcMelhoria').val(pc_aval_melhoria_descricao).trigger('change');
+				$('#pcOrgaoRespMelhoria').val(pc_aval_melhoria_num_orgao).trigger('change');
+
+				$('#pcStatusMelhoria').val(pc_aval_melhoria_status).trigger('change');
+				$('#pcDataPrev').val(pc_aval_melhoria_dataPrev).trigger('change');
+				$('#pcOrgaoRespSugeridoMelhoria').val(pc_aval_melhoria_sug_orgao_mcu).trigger('change');
+				$('#pcRecusaJustMelhoria').val(pc_aval_melhoria_naoAceita_justif).trigger('change');
+				$('#pcNovaAcaoMelhoria').val(pc_aval_melhoria_sugestao).trigger('change');
+
+				// Divide a string em um array
+				var valoresArray = pc_aval_melhoria_categoriaControle_id.split(',');
+				// Atribue o array ao select e acione o evento 'change'
+				$('#pcAvalMelhoriaCategoriaControle').val(valoresArray).trigger('change');
+				
+				$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').val(pc_aval_melhoria_beneficioNaoFinanceiro).trigger('change');
+				$('#pcValorBeneficioFinanceiroMelhoria').val(formatCurrency(pc_aval_melhoria_beneficioFinanceiro)).trigger('change');
+				$('#pcValorCustoFinanceiroMelhoria').val(formatCurrency(pc_aval_melhoria_custoFinanceiro)).trigger('change');
+
+				// Inicializa o estado dos botões com base no valor de pcAvalMelhoriaBenefNaoFinanceiroDesc
+				if ($('#pcAvalMelhoriaBenefNaoFinanceiroDesc').val() === '') {
+					$('#btn-nao-aplicaMelhoria').addClass('active btn-dark').removeClass('btn-light');
+					$('#btn-descricaoMelhoria').removeClass('active btn-primary').addClass('btn-light');
+					$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').hide();
+				} else {
+					$('#btn-descricaoMelhoria').addClass('active btn-primary').removeClass('btn-light');
+					$('#btn-nao-aplicaMelhoria').removeClass('active btn-dark').addClass('btn-light');
+					$('#pcAvalMelhoriaBenefNaoFinanceiroDesc').show();
+				}
+
+				// Inicializa o estado dos botões com base no valor de pcValorBeneficioFinanceiropcValorBeneficioFinanceiro
+				if ($('#pcValorBeneficioFinanceiroMelhoria').val() == 0) {
+					$('#btn-nao-aplica-BeneficioFinanceiroMelhoria').addClass('active btn-dark').removeClass('btn-light');
+					$('#btn-quantificado-BeneficioFinanceiroMelhoria').removeClass('active btn-primary').addClass('btn-light');
+					$('#pcValorBeneficioFinanceiroMelhoria').hide();
+				} else {
+					$('#btn-quantificado-BeneficioFinanceiroMelhoria').addClass('active btn-primary').removeClass('btn-light');
+					$('#btn-nao-aplica-BeneficioFinanceiroMelhoria').removeClass('active btn-dark').addClass('btn-light');
+					$('#pcValorBeneficioFinanceiroMelhoria').show();
+				}
+
+				// Inicializa o estado dos botões com base no valor de pcValorCustoFinanceiro
+				if ($('#pcValorCustoFinanceiroMelhoria').val() == 0) {
+					$('#btn-nao-aplica-CustoFinanceiroMelhoria').addClass('active btn-dark').removeClass('btn-light');
+					$('#btn-quantificado-CustoFinanceiroMelhoria').removeClass('active btn-primary').addClass('btn-light');
+					$('#pcValorCustoFinanceiroMelhoria').hide();
+				} else {
+					$('#btn-quantificado-CustoFinanceiroMelhoria').addClass('active btn-primary').removeClass('btn-light');
+					$('#btn-nao-aplica-CustoFinanceiroMelhoria').removeClass('active btn-dark').addClass('btn-light');
+					$('#pcValorCustoFinanceiroMelhoria').show();
+				}
+				validateButtonGroupsMelhoria();	
+
+				$('#cabecalhoAccordionCadMelhoria').text("Editar Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
+				$('#infoTipoCadMelhoria').text("Editando Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
+				$('#cadMelhoria').CardWidget('expand')
+				$('html, body').animate({ scrollTop: ($('#cadMelhoria').offset().top - 80)} , 500); 
+
+			};	
+
+			function excluirMelhoria(pc_aval_melhoria_id)  {
+				event.preventDefault()
+				event.stopPropagation()
+
 				var dataEditor = $('.editor').html();
+				var mensagem = "Deseja excluir esta Proposta de Melhoria?"
+				swalWithBootstrapButtons.fire({//sweetalert2
+				html: logoSNCIsweetalert2(mensagem),
+				showCancelButton: true,
+				confirmButtonText: 'Sim!',
+				cancelButtonText: 'Cancelar!'
+				}).then((result) => {
+					if (result.isConfirmed) {
+						$('#modalOverlay').modal('show');
+						setTimeout(function() {
+							$.ajax({
+								type: "post",
+								url: "cfc/pc_cfcAvaliacoes.cfc",
+								data:{
+									method: "delMelhorias",
+									pc_aval_melhoria_id: pc_aval_melhoria_id
+								},
+								async: false
+							})//fim ajax
+							.done(function(result) {	
+								mostraTabMelhorias();
+								toastr.success('Operação realizada com sucesso!');
+								mostraFormAvalMelhoriaCadastro();
+							})//fim done
+							.fail(function(xhr, ajaxOptions, thrownError) {
+								$('#modalOverlay').delay(800).hide(0, function() {
+									$('#modalOverlay').modal('hide');
+								});
+								$('#modal-danger').modal('show')
+								$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+								$('#modal-danger').find('.modal-body').text(thrownError)
+
+							})//fim fail
+
+						}, 500);
+					}else {
+						// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+						$('#modalOverlay').modal('hide');
+						Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
+					}
+				})
+				
+			};
+
+		</script>				
+
+	</cffunction>
 
 
-					var mensagem = "Deseja excluir esta Medida/Orientação?"
-					swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							$('#modalOverlay').modal('show');
+	<cffunction name="formAvalOrientacaoCadastro" access="remote" hint="Formulário de cadastro de Orientações">
+        
+		<cfargument name="numOrgaoAvaliado" type="string" required="true"/>
+        
+		<div id="accordionCadOrientacao"  style="display: flex; justify-content: left;">
+			<div  id="cadOrientacao" class="card card-primary collapsed-card" >
+				<div id="btnCadastrarOrientacao" class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
+						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
+						</button></i><span id="cabecalhoAccordionCadOrientacao">Clique aqui para cadastrar uma Medida/Orientação para Regularização</span>
+					</a>
+				</div>
+				<div class="card-body" style="border: solid 3px #0083ca;" >
+					<div class="card card-default">
+						<div class="card-body p-0">
+							<h7  class="font-weight-light text-center" style="top:-15px;font-size:14px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+								<span id="infoTipoCadOrientacao" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Nova Medida/Orientação para Regularização:</span>
+							</h7>
+							<form   id="formAvalOrientacaoCadastro" name="formAvalOrientacaoCadastro" style="padding:10px"  onsubmit="return false" novalidate>
+								<style>
+									label{
+										font-size: 0.8rem;
+									}
+									.btnValorNaoSeAplica{
+										border-radius: 25px 0 0 25px !important;
+									}
+
+									.btnValorQuantificado{
+										border-radius: 0 25px 25px 0 !important;
+									}
+								</style>
+								<input id="pcOrientacaoId" hidden>
+								<div class="row" style="font-size:14px">
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label id="labelOrientacao" for="pcOrientacao">Orientação:</label>
+											<textarea class="form-control" id="pcOrientacao" rows="2" required=""  name="pcOrientacao" class="form-control"></textarea>
+										</div>										
+									</div>
+
+									<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
+										SELECT pc_orgaos.*
+										FROM pc_orgaos
+										WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#' or pc_org_mcu = '#arguments.numOrgaoAvaliado#' 
+												or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#arguments.numOrgaoAvaliado#'))
+										ORDER BY pc_org_sigla
+									</cfquery>
+									
+									<div class="col-sm-4">
+										<div class="form-group">
+											<label for="pcOrgaoRespOrientacao">Órgão Responsável:</label>
+											<select id="pcOrgaoRespOrientacao" required="" name="pcOrgaoRespOrientacao" class="form-control"  style="height:40px">
+												<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
+												<cfoutput query="rs_OrgAvaliado">
+													<option value="#pc_org_mcu#">#pc_org_sigla#</option>
+												</cfoutput>
+											</select>
+										</div>
+									</div>
+									<cfquery name="rsAvalOrientacaoCategoriaControle" datasource="#application.dsn_processos#">
+										SELECT pc_avaliacao_categoriaControle.*
+										FROM pc_avaliacao_categoriaControle
+										WHERE  pc_aval_categoriaControle_status = 'A'
+									</cfquery>
+									<div class="col-sm-8">
+										<div class="form-group">
+											<label for="pcAvalOrientacaoCategoriaControle" >Categoria do Controle Proposto:</label>
+											<select id="pcAvalOrientacaoCategoriaControle" required="" name="pcAvalOrientacaoCategoriaControle" class="form-control" multiple="multiple">
+												<cfoutput query="rsAvalOrientacaoCategoriaControle">
+													<option value="#pc_aval_categoriaControle_id#">#pc_aval_categoriaControle_descricao#</option>
+												</cfoutput>
+											</select>
+										</div>
+									</div>
+
+									<div class="col-sm-12">
+										<fieldset style="padding:0px!important">
+											<legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>
+											<div class="form-group d-flex align-items-center" style="margin-left:20px">
+												
+												<div id="btn_groupAvalOrientacaoBenefNaoFinanceiro" name="btn_groupAvalOrientacaoBenefNaoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica" name="btn-nao-aplica"  style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-descricao" name="btn-descricao" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Descrever</button>
+												</div>
+												
+												<div style="width:100%;position:relative;margin-top:13px">
+													<div class="form-group">
+														<textarea class="form-control" id="pcAvalOrientacaoBenefNaoFinanceiroDesc" name="pcAvalOrientacaoBenefNaoFinanceiroDesc" style="display: none;margin-right:10px;width:98%" rows="3" name="pcAvalOrientacaoBenefNaoFinanceiro" class="form-control" placeholder="Informe os Benefícios não financeiros..."></textarea>
+													</div>
+												</div>
+											</div>
+										</fieldset>
+									</div>
+										
+
+									<div class="col-sm-12">	
+										<fieldset style="margin-top:20px;padding:0px!important">
+											<legend style="margin-left:20px">Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:</legend>
+											<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+												<div id="btn_groupValorBeneficioFinanceiro" name="btn_groupValorBeneficioFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-BeneficioFinanceiro" name="btn-nao-aplica-BeneficioFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-BeneficioFinanceiro" name="btn-quantificado-BeneficioFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+												</div>
+												<div style="display:flex">
+													<input id="pcValorBeneficioFinanceiro" name="pcValorBeneficioFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
+												</div>
+											</div>
+										</fieldset>
+									</div>
+
+									<div class="col-sm-12">	
+										<fieldset style="margin-top:20px;padding:0px!important">
+											<legend style="margin-left:20px">Estimativa do Custo Financeiro da Medida/Orientação para Regularização:</legend>
+											<div class="form-group d-flex align-items-center"  style="margin-left:20px">
+												<div id="btn_groupValorCustoFinanceiro" name="btn_groupValorCustoFinanceiro" class="btn-group mr-4" role="group" aria-label="Basic example">
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorNaoSeAplica" id="btn-nao-aplica-CustoFinanceiro" name="btn-nao-aplica-CustoFinanceiro" style="font-size: 0.8rem; white-space: nowrap;">Não se aplica</button>
+													<button type="button" class="btn btn-light btn-sm p-1 btnValorQuantificado" id="btn-quantificado-CustoFinanceiro" name="btn-quantificado-CustoFinanceiro" style="font-size: 0.8rem; margin-left:5px; white-space: nowrap;">Quantificado</button>
+												</div>
+												<div style="display:flex">
+													<input id="pcValorCustoFinanceiro" name="pcValorCustoFinanceiro" style="display: none;margin-right:10px;height: 29px;" type="text" class="form-control money" inputmode="text" placeholder="R$ 0,00">
+												</div>
+											</div>
+										</fieldset>
+										
+									</div>
+
+									<div style="justify-content:center; display: flex; width: 100%;">
+										<div>
+											<button id="btSalvarOrientacao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
+										</div>
+										<div style="margin-left:100px">
+											<button id="btCancelarOrientacao"  class="btn btn-block btn-danger " >Cancelar</button>
+										</div>
+										
+									</div>	
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script language="JavaScript">
+			$(".money").inputmask( 'currency',{"autoUnmask": true,
+				radixPoint:",",
+				groupSeparator: ".",
+				allowMinus: false,
+				prefix: 'R$ ',            
+				digits: 2,
+				digitsOptional: false,
+				rightAlign: true,
+				unmaskAsNumber: true
+			});
+
+			$(function () {
+				$('[data-mask]').inputmask()
+			})
+
+			$(document).ready(function() {
+
+				$('#btnCadastrarOrientacao').on('expanded.lte.cardwidget', function() {
+					//move o cursor para o id btnCadastrarOrientacao
+					$('html, body').animate({
+						scrollTop: $("#btnCadastrarOrientacao").offset().top-60
+					}, 1000);
+				});
+				
+				//Initialize Select2 Elements
+				// as exceções são os selects que não devem ser inicializados com o select2 e que estão em todas as páginas que utilizam este componente.
+				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"], [name="tabProcCards_length"], [name="tabAvaliacoes2024_length"], [name="tabItens_length"]').select2({
+					theme: 'bootstrap4',
+					placeholder: 'Selecione...',
+					allowClear: true
+					
+				});
+				
+				
+				// Função de validação customizada
+				function validateButtonGroupsOrientacao() {
+					var isValid = true;
+					$("#formAvalOrientacaoCadastro .btn-group").each(function() {
+						var $group = $(this);
+						var hasActive = $group.find(".active").length > 0;
+						var $error = $group.next("span.error");
+
+						if (!hasActive) {
+							$group.addClass("is-invalid").removeClass("is-valid");
+							if ($error.length === 0) {
+								$("<span class='error invalid-feedback' >Selecione, pelo menos, uma opção.</span>").insertAfter($group);
+							}
+							isValid = false;
+						} else {
+							$group.removeClass("is-invalid").addClass("is-valid");
+							$error.remove();
+						}
+					});
+
+					return isValid;
+				}
+
+				// Adiciona o método de validação personalizado para múltipla seleção
+				$.validator.addMethod("atLeastOneSelected", function(value, element) {
+					return $(element).find('option:selected').length > 0;
+				}, "Pelo menos uma opção deve ser selecionada.");
+
+				// Adicione métodos de validação personalizados para verificar visibilidade e valor não zero
+				$.validator.addMethod("requiredIfVisibleAndNotZero", function(value, element) {
+					if (!$(element).is(":visible")) {
+						return true; // Se o campo não estiver visível, considere-o válido
+					}
+					// Converta o valor para string e verifique se não é zero
+					var stringValue = String(value);
+					var numericValue = parseFloat(stringValue.replace(/[^0-9,-]+/g, '').replace(',', '.'));
+					return numericValue > 0;
+				}, "Campo obrigatório e deve ser maior que zero.");
+
+				
+				$("#formAvalOrientacaoCadastro .btn-group .btn").on("click", function() {
+					$(this).siblings().removeClass("active");
+					$(this).addClass("active");
+					validateButtonGroupsOrientacao();
+				});
+
+				// Adicione um método de validação personalizado para verificar visibilidade e valor não vazio
+				$.validator.addMethod("requiredIfVisibleAndNotEmpty", function(value, element) {
+					//console.log("Validando:", element, "Valor:", value, "Visível:", $(element).is(":visible"));
+					if (!$(element).is(":visible")) {
+						return true; // Se o campo não estiver visível, considere-o válido
+					}
+					return $.trim(value).length > 0; // Verifica se o valor não está vazio (após remover espaços em branco)
+				}, "Este campo é obrigatório.");
+
+				// Adiciona método de validação personalizado para verificar se um botão foi selecionado em cada grupo
+				$.validator.addMethod('requiredButtonGroup', function(value, element, params) {
+					let isValid = false;
+					$(params.groups).each(function() {
+						if ($(this).find('.btn.active').length > 0) {
+							isValid = true;
+						}
+					});
+					return isValid;
+				}, 'Por favor, selecione uma opção para cada grupo.');
+               
+
+				$('#formAvalOrientacaoCadastro').validate({
+					//ignore: [], // Não ignorar os elementos ocultos para que a validação funcione corretamente
+					rules: {
+						pcOrientacao: {
+							required: true
+						},
+						pcOrgaoRespOrientacao: {
+							required: true
+						},
+						pcAvalOrientacaoCategoriaControle: {
+							required: true
+						},
+						pcAvalOrientacaoBenefNaoFinanceiroDesc: {
+							requiredIfVisibleAndNotEmpty: true
+						},
+						pcValorBeneficioFinanceiro: {
+							requiredIfVisibleAndNotZero: true
+						},
+						pcValorCustoFinanceiro: {
+							requiredIfVisibleAndNotZero: true
+						}
+					},
+					messages: {
+						pcOrientacao: {
+							required: "Campo obrigatório."
+						},
+						pcOrgaoRespOrientacao: {
+							required: "Campo obrigatório."
+						},
+						pcAvalOrientacaoCategoriaControle: {
+							required: "Selecione, pelo menos, uma opção."
+						},
+						pcAvalOrientacaoBenefNaoFinanceiroDesc: {
+							requiredIfVisibleAndNotEmpty: "Campo obrigatório."
+						},
+						pcValorBeneficioFinanceiro: {
+							requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
+						},
+						pcValorCustoFinanceiro: {
+							requiredIfVisibleAndNotZero: "Campo obrigatório e deve ser maior que zero."
+						}
+					},
+
+					errorElement: 'div',
+					errorPlacement: function(error, element) {
+						
+						error.addClass('invalid-feedback');
+						validateButtonGroupsOrientacao();
+						error.addClass('invalid-feedback');
+						// Verifica se a mensagem de erro já existe antes de adicioná-la
+						var errorElementId = element.attr('name') + "-error";
+						
+						if ($('#' + errorElementId).length === 0) {
+							if (element.attr('name') === 'pcAvalOrientacaoBenefNaoFinanceiroDesc') {
+								error.insertAfter('#pcAvalOrientacaoBenefNaoFinanceiroDesc');
+							} else if (element.attr('name') === 'pcValorBeneficioFinanceiro') {
+								error.insertAfter('#pcValorBeneficioFinanceiro');
+							} else if (element.attr('name') === 'pcValorCustoFinanceiro') {
+								error.insertAfter('#pcValorCustoFinanceiro');
+							} else {
+								//error.insertAfter(element); // Para outros elementos
+								element.closest(".form-group").append(error);
+							}
+						}
+					},
+					highlight: function(element, errorClass, validClass) {
+						$(element).addClass('is-invalid').removeClass('is-valid');
+					},
+					unhighlight: function(element, errorClass, validClass) {
+						$(element).addClass('is-valid').removeClass('is-invalid');
+					},
+					submitHandler: function(form) {
+						if(validateButtonGroupsOrientacao()){		
+							$('#modalOverlay').modal('show')
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
 									url: "cfc/pc_cfcAvaliacoes.cfc",
 									data:{
-										method: "delOrientacoes",
-										pc_aval_orientacao_id: pc_aval_orientacao_id
+										method: "cadOrientacoes",
+										pc_aval_id: pc_aval_id,
+										pc_aval_orientacao_id: $('#pcOrientacaoId').val(),
+										pc_aval_orientacao_descricao: $('#pcOrientacao').val(),
+										pc_aval_orientacao_mcu_orgaoResp:  $('#pcOrgaoRespOrientacao').val(),
+										pc_aval_orientacao_categoriaControle_id: $('#pcAvalOrientacaoCategoriaControle').val().join(','),
+										pc_aval_orientacao_beneficioNaoFinanceiro: $('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val(),
+										pc_aval_orientacao_beneficioFinanceiro: $('#pcValorBeneficioFinanceiro').val(),
+										pc_aval_orientacao_custoFinanceiro: $('#pcValorCustoFinanceiro').val()
 									},
 									async: false
 								})//fim ajax
-								.done(function(result) {	
-										
-									mostraTabOrientacoes();
+								.done(function(result) {
+									$.ajax({
+										type: "post",
+										url: "cfc/pc_cfcProcessos_editar.cfc",
+										data:{
+											method: "tabOrientacoes",
+											pc_aval_id: pc_aval_id
+										},
+										async: false
+									})//fim ajax
+									.done(function(result) {
+										$('#tabOrientacoesDiv').html(result)
+										$('html, body').animate({ scrollTop: ($('#custom-tabs-one-4passo-tab').offset().top)-60} , 500);
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});
+
+									})//fim done
 									toastr.success('Operação realizada com sucesso!');
 									mostraFormAvalOrientacaoCadastro();
 								})//fim done
 								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(800).hide(0, function() {
+									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide');
 									});
 									$('#modal-danger').modal('show')
@@ -4013,15 +4435,150 @@
 									$('#modal-danger').find('.modal-body').text(thrownError)
 
 								})//fim fail
-							}, 500);
+							}, 1000);
+							$('#labelOrientacao').html('Orientação:')	
+							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
+							});	
 						}
-					})
 
-			};
+						
+					}
+					
+				});
+
+				$('#btn_groupAvalOrientacaoBenefNaoFinanceiro .btn').click(function() {
+					$('#btn_groupAvalOrientacaoBenefNaoFinanceiro .btn').removeClass('active');
+					$(this).addClass('active');
+					
+					var selectedValue = $(this).attr('id');
+
+					if (selectedValue === 'btn-descricao') {
+					    $('#pcAvalOrientacaoBenefNaoFinanceiroDesc').addClass('animate__animated animate__fast animate__fadeInLeft') 
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').show();
+						$('#btn-descricao').removeClass('btn-light').addClass('btn-primary');
+						$('#btn-nao-aplica').removeClass('btn-dark').addClass('btn-light');
+					} else if (selectedValue === 'btn-nao-aplica') {
+					  	$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-nao-aplica').removeClass('btn-light').addClass('btn-dark');
+						$('#btn-descricao').removeClass('btn-primary').addClass('btn-light');
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val('');
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc-error').remove();
+					} else {
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#pcAvalOrientacaoBenefNaoFinanceiroDesc').val('');
+					}
+				});
+
+				$('#btn_groupValorBeneficioFinanceiro .btn').click(function() {
+					$('#btn_groupValorBeneficioFinanceiro .btn').removeClass('active');
+					$(this).addClass('active');
+
+					var selectedValue = $(this).attr('id');
+
+					if (selectedValue === 'btn-quantificado-BeneficioFinanceiro') {
+						$('#pcValorBeneficioFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-primary');
+						$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-dark').addClass('btn-light');
+					} else if (selectedValue === 'btn-nao-aplica-BeneficioFinanceiro') {
+						$('#pcValorBeneficioFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-nao-aplica-BeneficioFinanceiro').removeClass('btn-light').addClass('btn-dark');
+						$('#btn-quantificado-BeneficioFinanceiro').removeClass('btn-primary').addClass('btn-light');
+						$('#pcValorBeneficioFinanceiro').val('');
+						$('#pcValorBeneficioFinanceiro-error').remove();
+					} else {
+						$('#pcValorBeneficioFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#pcValorBeneficioFinanceiro').val('');
+					}
+				});
+
+				$('#btn_groupValorCustoFinanceiro .btn').click(function() {
+					$('#btn_groupValorCustoFinanceiro .btn').removeClass('active');
+					$(this).addClass('active');
+
+					var selectedValue = $(this).attr('id');
+
+					if (selectedValue === 'btn-quantificado-CustoFinanceiro') {
+						$('#pcValorCustoFinanceiro').show().addClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-quantificado-CustoFinanceiro').removeClass('btn-light').addClass('btn-primary');
+						$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-dark').addClass('btn-light');
+					} else if (selectedValue === 'btn-nao-aplica-CustoFinanceiro') {
+						$('#pcValorCustoFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#btn-nao-aplica-CustoFinanceiro').removeClass('btn-light').addClass('btn-dark');
+						$('#btn-quantificado-CustoFinanceiro').removeClass('btn-primary').addClass('btn-light');
+						$('#pcValorCustoFinanceiro').val('');
+						$('#pcValorCustoFinanceiro-error').remove();
+					} else {
+						$('#pcValorCustoFinanceiro').hide().removeClass('animate__animated animate__fast animate__fadeInLeft');
+						$('#pcValorCustoFinanceiro').val('');
+					}
+				});
+
+
+				$('#pcOrgaoRespOrientacao, #pcAvalOrientacaoCategoriaControle, #pcValorBeneficioFinanceiro, #pcValorCustoFinanceiro').on('change', function() {
+					$(this).trigger('input');
+					 $(this).valid(); 
+				});
+
+				$('#btCancelarOrientacao').on('click', function (event)  {
+					//cancela e  não propaga o event click original no botão
+					event.preventDefault();
+					event.stopPropagation();
+					$('#modalOverlay').modal('show')
+					setTimeout(function() {
+						
+						mostraFormAvalOrientacaoCadastro();
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					}, 1000);
+					
+				});
+
+				// // Adiciona manipuladores de eventos de mudança para os campos select2
+				// $('select').on('change.select2', function() {
+				// 	var $this = $(this);
+				// 	if ($this.val()) {
+				// 		$this.removeClass('is-invalid').addClass('is-valid');
+				// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						
+				// 	}
+				// });
+
+				// // Adiciona manipuladores de eventos para validar os campos
+				// $('textarea, input, select').on('change blur keyup', function() {
+				// 	var $this = $(this);
+				// 	if ($this.val()) {
+				// 		$this.removeClass('is-invalid').addClass('is-valid');
+				// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+				// 	}
+				// });
+
+				$('select, textarea, input').on('change blur keyup', function() {
+					var $this = $(this);
+					// Verifica se o valor do select é vazio ou nulo
+					if ($this.val() == "" || $this.val() == null || $this.val().length === 0) {
+						$this.removeClass('is-valid').addClass('is-invalid');
+						$this.closest('.form-group').find('div.is-invalid').css('display', 'block');
+						$this.valid(); // This will validate the select element based on your jQuery Validate rules
+					}else{
+						$this.removeClass('is-invalid').addClass('is-valid');
+						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						$this.valid();
+					}
+				});
+
+				
+
+
+
+
+			});
 
 			
 
-		</script>				
+		</script>
+
 
 	</cffunction>
 

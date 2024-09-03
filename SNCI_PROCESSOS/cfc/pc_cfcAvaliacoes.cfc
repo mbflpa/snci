@@ -4330,7 +4330,7 @@
 				
 				//Initialize Select2 Elements
 				// as exceções são os selects que não devem ser inicializados com o select2 e que estão em todas as páginas que utilizam este componente.
-				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"], [name="tabProcCards_length"], [name="tabAvaliacoes2024_length"]').select2({
+				$('select').not('[name="tabProcAcompCards_length"], [name="tabAvaliacoes_length"], [name="tabProcCards_length"], [name="tabAvaliacoes2024_length"], [name="tabItens_length"]').select2({
 					theme: 'bootstrap4',
 					placeholder: 'Selecione...',
 					allowClear: true
@@ -4436,7 +4436,7 @@
 							required: "Campo obrigatório."
 						},
 						pcAvalOrientacaoCategoriaControle: {
-							required: "Campo obrigatório.",
+							required: "Selecione pelo menos uma opção.",
 							atLeastOneSelected: "Selecione pelo menos uma opção."
 						},
 						pcAvalOrientacaoBenefNaoFinanceiroDesc: {
@@ -4607,22 +4607,38 @@
 					
 				});
 
-				// Adiciona manipuladores de eventos de mudança para os campos select2
-				$('select').on('change.select2', function() {
-					var $this = $(this);
-					if ($this.val()) {
-						$this.removeClass('is-invalid').addClass('is-valid');
-						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+				// // Adiciona manipuladores de eventos de mudança para os campos select2
+				// $('select').on('change.select2', function() {
+				// 	var $this = $(this);
+				// 	if ($this.val()) {
+				// 		$this.removeClass('is-invalid').addClass('is-valid');
+				// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
 						
-					}
-				});
+				// 	}
+				// });
 
-				// Adiciona manipuladores de eventos para validar os campos
-				$('textarea, input, select').on('change blur keyup', function() {
+				// // Adiciona manipuladores de eventos para validar os campos
+				// $('textarea, input, select').on('change blur keyup', function() {
+				// 	var $this = $(this);
+				// 	if ($this.val()) {
+				// 		$this.removeClass('is-invalid').addClass('is-valid');
+				// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+				// 	}
+				// });
+
+				$('select, textarea, input').on('change blur keyup', function() {
 					var $this = $(this);
-					if ($this.val()) {
+					// Verifica se o valor do select é vazio ou nulo
+					if ($this.val() == "" || $this.val() == null || $this.val().length === 0) {
+						// Trigger the validation for the select element
+						
+						$this.removeClass('is-valid').addClass('is-invalid');
+						$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+						$("#formAvalOrientacaoCadastro").valid(); // This will validate the select element based on your jQuery Validate rules
+					}else{
 						$this.removeClass('is-invalid').addClass('is-valid');
 						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						$("#formAvalOrientacaoCadastro").valid(); // This will validate the select element based on your jQuery Validate rules
 					}
 				});
 
@@ -4954,7 +4970,8 @@
 							requiredIfVisibleAndNotEmpty: true
 						},
 						pcAvalMelhoriaCategoriaControle: {
-							required: true
+							required: true,
+							atLeastOneSelected: true
 						},
 						pcAvalMelhoriaBenefNaoFinanceiroDesc: {
 							requiredIfVisibleAndNotEmpty: true
@@ -4977,7 +4994,8 @@
 							requiredIfVisibleAndNotEmpty: "Campo obrigatório."
 						},
 						pcAvalMelhoriaCategoriaControle: {
-							required: "Campo obrigatório."
+							required: "Selecione pelo menos uma opção.",
+							atLeastOneSelected: "Selecione pelo menos uma opção."
 						},
 						pcAvalMelhoriaBenefNaoFinanceiroDesc: {
 							requiredIfVisibleAndNotEmpty: "Campo obrigatório."
@@ -5171,6 +5189,15 @@
 					if ($this.val()) {
 						$this.removeClass('is-invalid').addClass('is-valid');
 						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+					}
+				});
+
+				$('select, textarea, input').on('change blur keyup', function() {
+					var $this = $(this);
+					// Verifica se o valor do select é vazio ou nulo
+					if ($this.val() == "" || $this.val() == null || $this.val().length === 0) {
+						// Trigger the validation for the select element
+						$this.valid(); // This will validate the select element based on your jQuery Validate rules
 					}
 				});
 
@@ -6046,8 +6073,8 @@
 
 
 
-				$('#pcOrientacaoId').val(pc_aval_orientacao_id);
-				$('#pcOrientacao').val(pc_aval_orientacao_descricao);
+				$('#pcOrientacaoId').val(pc_aval_orientacao_id).trigger('change');
+				$('#pcOrientacao').val(pc_aval_orientacao_descricao).trigger('change');
 				$('#pcOrgaoRespOrientacao').val(pc_aval_orientacao_mcu_orgaoResp).trigger('change');
 				// Divide a string em um array
 				var valoresArray = pc_aval_orientacao_categoriaControle_id.split(',');

@@ -30,7 +30,62 @@
 
 <title>SNCI</title>
 <link rel="icon" type="image/x-icon" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">
-   
+   <style>
+		fieldset{
+					border: 1px solid #ced4da!important;
+					border-radius: 8px!important;
+					padding: 20px!important;
+					margin-bottom: 10px!important;
+					background: none!important;
+					-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+					-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+					box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+				}
+
+				legend {
+					font-size: 0.8rem!important;
+					color: #fff!important;
+					background-color: #0083ca!important;
+					border: 1px solid #ced4da!important;
+					border-radius: 5px!important;
+					padding: 5px!important;
+					width: auto!important;
+				}
+
+							
+
+				.cardBodyStepper {
+						border: solid 1px rgba(108, 117, 125, 0.3);
+						border-radius: 0.5rem;
+						box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.05);
+				}
+
+				.form-group.d-flex .form-control {
+					width: auto;
+					flex-grow: 1;
+				}
+
+				fieldset{
+					border: 1px solid #ced4da!important;
+					border-radius: 8px!important;
+					padding: 20px!important;
+					margin-bottom: 10px!important;
+					background: none!important;
+					-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+					-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+					box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+				}
+
+				legend {
+					font-size: 0.8rem!important;
+					color: #fff!important;
+					background-color: #0083ca!important;
+					border: 1px solid #ced4da!important;
+					border-radius: 5px!important;
+					padding: 5px!important;
+					width: auto!important;
+				}
+   </style>
       
      
 
@@ -290,6 +345,8 @@
 
 
 		}
+
+
 	</script>
 
 
