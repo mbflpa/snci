@@ -248,103 +248,103 @@
 		}
 
 				
-		function processoEditarTab(linha,processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin) {
-			event.preventDefault()
-			event.stopPropagation()
-			$('#formEditarProcessoAte2023').attr("hidden",false)
-			$(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
-			var listAvaliadores = avaliadores.split(",");
-			$('#cabecalhoAccordion').text("Editar o Processo:" + ' ' + processoId);
-			$("#btSalvarDiv").attr("hidden",false)
+		// function processoEditarTab(linha,processoId, sei, relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin) {
+		// 	event.preventDefault()
+		// 	event.stopPropagation()
+		// 	$('#formEditarProcessoAte2023').attr("hidden",false)
+		// 	$(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
+		// 	var listAvaliadores = avaliadores.split(",");
+		// 	$('#cabecalhoAccordion').text("Editar o Processo:" + ' ' + processoId);
+		// 	$("#btSalvarDiv").attr("hidden",false)
 			
 			
-			$('#pcModalidade').val(modalidade).trigger('change');
+		// 	$('#pcModalidade').val(modalidade).trigger('change');
 
-			$('#pcNumSEI').val(sei);
-			$('#pcProcessoId').val(processoId);			
-			$('#pcTipoClassificacao').val(classificacao).trigger('change');
-			$('#pcNumRelatorio').val(relSei);
-			$('#pcOrigem').val(orgaoOrigem).trigger('change');
-			$('#pcDataInicioAvaliacao').val(dataInicio);
-			$('#pcDataInicioAvaliacaoAnterior').val(dataInicio);
-			$('#pcDataFimAvaliacao').val(dataFim);
-			$('#pcTipoAvaliado').val(processoAvaliado).trigger('change');
-			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
+		// 	$('#pcNumSEI').val(sei);
+		// 	$('#pcProcessoId').val(processoId);			
+		// 	$('#pcTipoClassificacao').val(classificacao).trigger('change');
+		// 	$('#pcNumRelatorio').val(relSei);
+		// 	$('#pcOrigem').val(orgaoOrigem).trigger('change');
+		// 	$('#pcDataInicioAvaliacao').val(dataInicio);
+		// 	$('#pcDataInicioAvaliacaoAnterior').val(dataInicio);
+		// 	$('#pcDataFimAvaliacao').val(dataFim);
+		// 	$('#pcTipoAvaliado').val(processoAvaliado).trigger('change');
+		// 	$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 
-			$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
-			$( "#pcProcessoId" ).focus();	
-			//var avaliadoresList = avaliadores;
-			//$('#pcAvaliadores').val([avaliadoresList]).trigger('change');
-			$('#pcCoordenador').val(coordenador).trigger('change');
-			$('#pcCoordNacional').val(coordNacional).trigger('change');
+		// 	$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
+		// 	$( "#pcProcessoId" ).focus();	
+		// 	//var avaliadoresList = avaliadores;
+		// 	//$('#pcAvaliadores').val([avaliadoresList]).trigger('change');
+		// 	$('#pcCoordenador').val(coordenador).trigger('change');
+		// 	$('#pcCoordNacional').val(coordNacional).trigger('change');
 	
-			$('#pcTipoDemanda').val(tipoDemanda).trigger('change');
-			if (tipoDemanda == 'E'){
-				anoPacin = null;
-			}
-			$('#pcAnoPacin').val(anoPacin).trigger('change');	
+		// 	$('#pcTipoDemanda').val(tipoDemanda).trigger('change');
+		// 	if (tipoDemanda == 'E'){
+		// 		anoPacin = null;
+		// 	}
+		// 	$('#pcAnoPacin').val(anoPacin).trigger('change');	
 
 
-			var selectedValues = new Array();
-			$.each(listAvaliadores, function(index,value){
-				selectedValues[index] = value;
-			});
+		// 	var selectedValues = new Array();
+		// 	$.each(listAvaliadores, function(index,value){
+		// 		selectedValues[index] = value;
+		// 	});
 			
-			$('#pcAvaliadores').val(selectedValues).trigger('change');
+		// 	$('#pcAvaliadores').val(selectedValues).trigger('change');
 		
-			$('#cadastroEditar').CardWidget('expand')
+		// 	$('#cadastroEditar').CardWidget('expand')
 		
-			$('body')[0].scrollIntoView(true);
+		// 	$('body')[0].scrollIntoView(true);
 
 		
 
-		}
+		// }
 
-		function processoVisualizar(processoId,sei,relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin) {
-			event.preventDefault()
-			event.stopPropagation()
-				$('#formEditarProcessoAte2023').attr("hidden",false)
-			var listAvaliadores = avaliadores.split(",");
-			$('#cabecalhoAccordion').text("Visualizando o Processo:" + ' ' + processoId);
-			$("#btSalvarDiv").attr("hidden",true);
-			$('#pcDataInicioAvaliacao').removeAttr('disabled');
+		// function processoVisualizar(processoId,sei,relSei, orgaoOrigem, dataInicio, dataFim, processoAvaliado, naoAplicaDesc, orgaoAvaliado, coordenador, coordNacional, classificacao, avaliadores, modalidade, tipoDemanda, anoPacin) {
+		// 	event.preventDefault()
+		// 	event.stopPropagation()
+		// 		$('#formEditarProcessoAte2023').attr("hidden",false)
+		// 	var listAvaliadores = avaliadores.split(",");
+		// 	$('#cabecalhoAccordion').text("Visualizando o Processo:" + ' ' + processoId);
+		// 	$("#btSalvarDiv").attr("hidden",true);
+		// 	$('#pcDataInicioAvaliacao').removeAttr('disabled');
 			
-			$('#pcModalidade').val(modalidade).trigger('change');
+		// 	$('#pcModalidade').val(modalidade).trigger('change');
 
-			$('#pcNumSEI').val(sei);
-			$('#pcProcessoId').val(processoId);			
-			$('#pcTipoClassificacao').val(classificacao).trigger('change');
-			$('#pcNumRelatorio').val(relSei);
-			$('#pcOrigem').val(orgaoOrigem).trigger('change');
-			$('#pcDataInicioAvaliacao').val(dataInicio);
-			$('#pcDataFimAvaliacao').val(dataFim);
-			$('#pcTipoAvaliado').val(processoAvaliado).trigger('change');
-			$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
+		// 	$('#pcNumSEI').val(sei);
+		// 	$('#pcProcessoId').val(processoId);			
+		// 	$('#pcTipoClassificacao').val(classificacao).trigger('change');
+		// 	$('#pcNumRelatorio').val(relSei);
+		// 	$('#pcOrigem').val(orgaoOrigem).trigger('change');
+		// 	$('#pcDataInicioAvaliacao').val(dataInicio);
+		// 	$('#pcDataFimAvaliacao').val(dataFim);
+		// 	$('#pcTipoAvaliado').val(processoAvaliado).trigger('change');
+		// 	$('#pcTipoAvalDescricao').val(naoAplicaDesc).trigger('change');
 
-			$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
-			$( "#pcProcessoId" ).focus();	
-			//var avaliadoresList = avaliadores;
-			//$('#pcAvaliadores').val([avaliadoresList]).trigger('change');
-			$('#pcCoordenador').val(coordenador).trigger('change');
-			$('#pcCoordNacional').val(coordNacional).trigger('change');
-			$('#pcTipoDemanda').val(tipoDemanda).trigger('change');
-			$('#pcAnoPacin').val(anoPacin).trigger('change');	
+		// 	$('#pcOrgaoAvaliado').val(orgaoAvaliado).trigger('change');
+		// 	$( "#pcProcessoId" ).focus();	
+		// 	//var avaliadoresList = avaliadores;
+		// 	//$('#pcAvaliadores').val([avaliadoresList]).trigger('change');
+		// 	$('#pcCoordenador').val(coordenador).trigger('change');
+		// 	$('#pcCoordNacional').val(coordNacional).trigger('change');
+		// 	$('#pcTipoDemanda').val(tipoDemanda).trigger('change');
+		// 	$('#pcAnoPacin').val(anoPacin).trigger('change');	
 
 		
 
-			var selectedValues = new Array();
-			$.each(listAvaliadores, function(index,value){
-				selectedValues[index] = value;
-			});
+		// 	var selectedValues = new Array();
+		// 	$.each(listAvaliadores, function(index,value){
+		// 		selectedValues[index] = value;
+		// 	});
 			
-			$('#pcAvaliadores').val(selectedValues).trigger('change');
+		// 	$('#pcAvaliadores').val(selectedValues).trigger('change');
 		
-			$('#cadastroEditar').CardWidget('expand')
+		// 	$('#cadastroEditar').CardWidget('expand')
 		
-			$('body')[0].scrollIntoView(true);
+		// 	$('body')[0].scrollIntoView(true);
 
 
-		}
+		// }
 
 
 	</script>
