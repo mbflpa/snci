@@ -2083,9 +2083,6 @@
 				</cfif>	
 				<!-- fim cadastro dos riscos selecionados e outros-->
 
-				
-
-
 				<!--Se a classificação for modificada para Leve, todas as orientações e propostas de melhoria do item serão excluídas-->
 				<cfif '#arguments.pc_aval_classificacao#' eq 'L'>
 					<cfquery datasource="#application.dsn_processos#" >
@@ -2093,6 +2090,14 @@
 						Delete from pc_avaliacao_melhorias WHERE  pc_aval_melhoria_num_aval = #arguments.pc_aval_id#
 					</cfquery>
 				</cfif>
+
+				<!--Após a edição insere null nos campos pc_aval_vaFalta, pc_aval_vaSobra e pc_aval_vaRisco-->
+				<cfquery datasource="#application.dsn_processos#" >
+					UPDATE pc_avaliacoes
+					SET pc_aval_vaFalta = null, pc_aval_vaSobra = null, pc_aval_vaRisco = null
+					WHERE  pc_aval_id = '#arguments.pc_aval_id#'
+				</cfquery>
+
 			</cftransaction>
 		</cfif>
 
