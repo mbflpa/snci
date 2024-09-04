@@ -12,7 +12,6 @@
 								pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 								, pc_classificacoes.pc_class_descricao,  pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu, pc_avaliacao_orientacoes.*,
 								pc_orgao_OrientacaoResp.pc_org_sigla as orgaoRespOrientacao, pc_orgao_OrientacaoResp.pc_org_mcu as mcuOrgaoRespOrientacao
-								,pc_orgaos_heranca.*, pc_orgaos_2.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_2.pc_org_se_sigla as seOrgRespHerdeiro
 								, pc_orientacao_status.pc_orientacao_status_finalizador
 
 			FROM        pc_processos INNER JOIN
@@ -24,8 +23,6 @@
 								pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id right JOIN
 								pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id INNER JOIN
 								pc_orgaos as pc_orgao_OrientacaoResp on pc_orgao_OrientacaoResp.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-								LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_aval_orientacao_mcu_orgaoResp
-								LEFT JOIN pc_orgaos AS pc_orgaos_2 ON pc_orgaos_2.pc_org_mcu = pc_orgHerancaMcuPara
 								INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
 			WHERE pc_aval_orientacao_id  = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> 	 
 

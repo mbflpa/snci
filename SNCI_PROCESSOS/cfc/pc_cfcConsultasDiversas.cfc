@@ -2,43 +2,6 @@
 <cfprocessingdirective pageencoding = "utf-8">	
 
 
-	<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
-		SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
-
-		union
-
-		SELECT  pc_orgaos2.pc_org_mcu
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
-
-		union
-
-		select pc_orgaos.pc_org_mcu AS mcuHerdado
-		from pc_orgaos
-		LEFT JOIN pc_orgaos_heranca ON pc_orgHerancaMcuDe = pc_org_mcu
-		where pc_orgaos.pc_org_mcu_subord_tec in(SELECT  pc_orgaos2.pc_org_mcu
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-		FROM pc_orgaos_heranca
-		LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-		WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
-	</cfquery>
-
-	<cfquery dbtype="query" name="rsHeranca"> 
-		SELECT mcuHerdado FROM rsHerancaUnion WHERE not mcuHerdado is null
-	</cfquery>
-
-	<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
 
 	<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
 		WITH OrgHierarchy AS (
@@ -69,7 +32,12 @@
 						, pc_classificacoes.pc_class_descricao
 						,pc_usuarios.pc_usu_nome  as coordRegional
 						,pc_usuCoodNacional.pc_usu_nome  as coordNacional
-						
+						, CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						) as tipoProcesso
 			FROM        pc_processos 
 						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
 						LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
@@ -222,8 +190,12 @@
 														<td>#siglaOrgOrigem#</td>
 														<td>#siglaOrgAvaliado#</td>
 
-														<cfif pc_num_avaliacao_tipo neq 2>
-															<td>#pc_aval_tipo_descricao#</td>
+														<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
+															<cfif pc_aval_tipo_descricao neq ''>
+																<td>#pc_aval_tipo_descricao#</td>
+															<cfelse>
+																<td>#tipoProcesso#</td>
+															</cfif>
 														<cfelse>
 															<td>#pc_aval_tipo_nao_aplica_descricao#</td>
 														</cfif>
@@ -411,7 +383,13 @@
 						,pc_usuCoodNacional.pc_usu_nome  as coordNacional
 						,pc_aval_numeracao, pc_aval_descricao, pc_aval_id 
 						,pc_aval_status_descricao, pc_aval_classificacao
-						,pc_aval_vaFalta,pc_aval_vaSobra,pc_aval_vaRisco   
+						,pc_aval_vaFalta,pc_aval_vaSobra,pc_aval_vaRisco  
+						, CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						) as tipoProcesso
 
 
 			FROM        pc_processos 
@@ -577,8 +555,12 @@
 															<td>#siglaOrgOrigem#</td>
 															<td>#siglaOrgAvaliado#</td>
 
-															<cfif pc_num_avaliacao_tipo neq 2>
-																<td>#pc_aval_tipo_descricao#</td>
+															<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
+																<cfif pc_aval_tipo_descricao neq ''>
+																	<td>#pc_aval_tipo_descricao#</td>
+																<cfelse>
+																	<td>#tipoProcesso#</td>
+																</cfif>
 															<cfelse>
 																<td>#pc_aval_tipo_nao_aplica_descricao#</td>
 															</cfif>
@@ -812,6 +794,12 @@
 							WHEN  CONVERT(VARCHAR(10), pc_aval_orientacao_dataPrevistaResp, 102)  < CONVERT(VARCHAR(10), GETDATE(), 102) AND pc_aval_orientacao_status IN (4, 5) THEN 'PENDENTE'
 							ELSE pc_orientacao_status_descricao
 						END AS statusDescricao
+						, CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						) as tipoProcesso
 			FROM        pc_processos 
 						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
 						LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
@@ -968,8 +956,12 @@
 															<td>#siglaOrgOrigem#</td>
 															<td>#siglaOrgAvaliado#</td>
 
-															<cfif pc_num_avaliacao_tipo neq 2>
-																<td>#pc_aval_tipo_descricao#</td>
+															<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
+																<cfif pc_aval_tipo_descricao neq ''>
+																	<td>#pc_aval_tipo_descricao#</td>
+																<cfelse>
+																	<td>#tipoProcesso#</td>
+																</cfif>
 															<cfelse>
 																<td>#pc_aval_tipo_nao_aplica_descricao#</td>
 															</cfif>
@@ -1222,6 +1214,12 @@
 						,pc_aval_melhoria_sugestao, pc_aval_melhoria_naoAceita_justif
 						,pc_aval_vaFalta,pc_aval_vaSobra,pc_aval_vaRisco
 						,pc_aval_id, pc_aval_melhoria_id
+						, CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						) as tipoProcesso
 
 			FROM        pc_processos 
 						INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
@@ -1379,8 +1377,12 @@
 															<td>#siglaOrgOrigem#</td>
 															<td>#siglaOrgAvaliado#</td>
 
-															<cfif pc_num_avaliacao_tipo neq 2>
-																<td>#pc_aval_tipo_descricao#</td>
+															<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
+																<cfif pc_aval_tipo_descricao neq ''>
+																	<td>#pc_aval_tipo_descricao#</td>
+																<cfelse>
+																	<td>#tipoProcesso#</td>
+																</cfif>
 															<cfelse>
 																<td>#pc_aval_tipo_nao_aplica_descricao#</td>
 															</cfif>

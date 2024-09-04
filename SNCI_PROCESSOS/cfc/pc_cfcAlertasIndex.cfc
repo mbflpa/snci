@@ -23,19 +23,27 @@
 	<cffunction name="alertasOA"   access="remote" hint="mostra alertas para os órgão avaliados na página index.">
         <cfquery datasource="#application.dsn_processos#" name="qPosicionamentos">
 			select pc_avaliacao_orientacoes.*, pc_orientacao_status.*, pc_processos.pc_num_status  from pc_avaliacao_orientacoes
-			inner join pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
-			inner join pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
-			inner join pc_processos on pc_processo_id = pc_aval_processo
+			INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
+			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
 			where pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar"> AND pc_aval_orientacao_status in (4,5) AND pc_num_status in(4)
 		</cfquery> 
 
 		<cfquery datasource="#application.dsn_processos#" name="qPosicionamentosSubordinados">
 			select pc_avaliacao_orientacoes.*, pc_orientacao_status.*, pc_orgaos.*, pc_processos.pc_num_status from pc_avaliacao_orientacoes
-			inner join pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
-			inner join pc_orgaos ON pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-			inner join pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
-			inner join pc_processos on pc_processo_id = pc_aval_processo
-			where pc_aval_orientacao_status in (4,5) AND pc_aval_orientacao_mcu_orgaoResp in (#orgaosHierarquiaList#) AND pc_num_status in(4)
+			INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
+			INNER JOIN pc_orgaos ON pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
+			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
+			WHERE 
+			<!---Se o órgão tiver subordinados--->
+			<cfif ListLen(orgaosHierarquiaList) GT 0>
+				pc_aval_orientacao_status IN (4,5) 
+				AND pc_aval_orientacao_mcu_orgaoResp IN (#orgaosHierarquiaList#)
+				AND pc_num_status IN (4)
+			<cfelse>
+				pc_num_status = 0
+			</cfif>
 		</cfquery> 
 
 		<cfquery name="qMelhoriasPendentes" datasource="#application.dsn_processos#">
@@ -45,7 +53,7 @@
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-			LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_aval_melhoria_num_orgao
+
 			WHERE pc_aval_melhoria_status = 'P' AND pc_aval_melhoria_num_orgao = '#application.rsUsuarioParametros.pc_usu_lotacao#' AND pc_processos.pc_num_status in(4,5)
 			
 		</cfquery>
@@ -175,51 +183,7 @@
 				and pc_orgaos3.pc_org_mcu = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
 			</cfif>
 
-			UNION
-
-			SELECT DISTINCT pc_orgHerancaMcuPara as mcuOrgaoResp
-						   ,pc_orgaos2.pc_org_sigla as siglaOrgaoResp
-						   ,pc_orgaos3.pc_org_mcu as mcuOrigem
-						   ,pc_orgaos3.pc_org_sigla as siglaOrigem
-			FROM pc_orgaos_heranca
-			LEFT JOIN pc_avaliacao_melhorias on pc_avaliacao_melhorias.pc_aval_melhoria_num_orgao = pc_orgHerancaMcuDe
-			LEFT JOIN pc_avaliacao_melhorias as pc_avaliacao_melhorias2  on pc_avaliacao_melhorias2.pc_aval_melhoria_sug_orgao_mcu = pc_orgHerancaMcuDe
-			inner join pc_avaliacoes on pc_aval_id = pc_avaliacao_melhorias.pc_aval_melhoria_num_aval
-			inner join pc_processos on pc_processo_id = pc_aval_processo
-            LEFT JOIN pc_usuarios on pc_usu_lotacao = pc_orgHerancaMcuPara
-			LEFT JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_orgHerancaMcuDe
-			LEFT JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_orgHerancaMcuPara
-			LEFT JOIN pc_orgaos as pc_orgaos3 on pc_orgaos3.pc_org_mcu = pc_num_orgao_origem
-			<cfif "#application.rsUsuarioParametros.pc_usu_perfil#" eq 3 or "#application.rsUsuarioParametros.pc_usu_perfil#" eq 11>
-				WHERE pc_usuarios.pc_usu_lotacao is null and pc_avaliacao_melhorias.pc_aval_melhoria_status = 'P'
-			<cfelse>
-				WHERE pc_usuarios.pc_usu_lotacao is null and pc_avaliacao_melhorias.pc_aval_melhoria_status = 'P' 
-				and pc_orgaos3.pc_org_mcu = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
-			</cfif>
-            
-
-			UNION
 			
-			SELECT DISTINCT pc_orgHerancaMcuPara as mcuOrgaoResp
-						   ,pc_orgaos2.pc_org_sigla as siglaOrgaoResp
-						   ,pc_orgaos3.pc_org_mcu as mcuOrigem
-						   ,pc_orgaos3.pc_org_sigla as siglaOrigem
-			FROM pc_orgaos_heranca
-			LEFT JOIN pc_avaliacao_orientacoes on pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = pc_orgHerancaMcuDe
-			inner join pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
-			inner join pc_processos on pc_processo_id = pc_aval_processo
-			inner join pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
-            LEFT JOIN pc_usuarios on pc_usu_lotacao = pc_orgHerancaMcuPara
-			LEFT JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_orgHerancaMcuDe
-			LEFT JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_orgHerancaMcuPara
-			LEFT JOIN pc_orgaos as pc_orgaos3 on pc_orgaos3.pc_org_mcu = pc_num_orgao_origem
-			<cfif "#application.rsUsuarioParametros.pc_usu_perfil#" eq 3 or "#application.rsUsuarioParametros.pc_usu_perfil#" eq 11>
-				WHERE pc_usu_lotacao is null and pc_orientacao_status_finalizador = 'N'
-			<cfelse>
-				WHERE pc_usu_lotacao is null and pc_orientacao_status_finalizador = 'N' 
-				and pc_num_orgao_origem = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
-			</cfif>
-
             ORDER BY siglaOrgaoResp
 			
 		</cfquery>

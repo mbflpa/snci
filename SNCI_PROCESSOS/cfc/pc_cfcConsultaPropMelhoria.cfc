@@ -338,6 +338,12 @@
 									,pc_num_orgao_avaliado as mcuOrgAvaliado,  pc_orgaos2.pc_org_sigla as siglaOrgAvaliado
 									,pc_num_orgao_origem as mcuOrgOrigem,  pc_orgaos3.pc_org_sigla as siglaOrgOrigem
 									,pc_avaliacao_tipos.*, pc_classificacoes.* ,pc_status_card_style_ribbon, pc_status_card_nome_ribbon
+									,CONCAT(
+										'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+										' -> N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+										' -> N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+										' -> N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
+									) as tipoProcesso
 						FROM        pc_processos 
 									INNER JOIN pc_avaliacoes on pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo 
 									INNER JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
@@ -467,8 +473,12 @@
 																</cfif></p>
 																
 																<p style="font-size: 1em;">Tipo de Avaliação: 
-																<cfif rsProcAval.pc_num_avaliacao_tipo neq 2>
-																	<strong style="color:##0692c6">#rsProcAval.pc_aval_tipo_descricao#</strong></p>
+																<cfif rsProcAval.pc_num_avaliacao_tipo neq 2 and rsProcAval.pc_num_avaliacao_tipo neq 445>
+																	<cfif rsProcAval.pc_aval_tipo_descricao neq ''>
+																		<strong style="color:##0692c6">#rsProcAval.pc_aval_tipo_descricao#</strong></p>
+																	<cfelse>
+																		<strong style="color:##0692c6">#rsProcAval.tipoProcesso#</strong></p>
+																	</cfif>
 																<cfelse>
 																	<strong style="color:##0692c6">#rsProcAval.pc_aval_tipo_nao_aplica_descricao#</strong></p>
 																</cfif>

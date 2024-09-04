@@ -9,7 +9,7 @@
 						, pc_usuCoodNacional.pc_usu_nome as nome_coordenadorNacional
 						, pc_usuCoodNacional.pc_usu_matricula as matricula_coordenadorNacional, pc_avaliacoes.*, pc_avaliacao_orientacoes.*
 						, pc_orgaos_2.pc_org_se_sigla as seOrgResp, pc_orgaos_2.pc_org_sigla as siglaOrgResp , pc_orgaos_2.pc_org_mcu as mcuOrgResp 
-						, pc_orientacao_status.*, pc_orgaos_heranca.*, pc_orgaos_3.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_3.pc_org_se_sigla as seOrgRespHerdeiro
+						, pc_orientacao_status.*
 						, pc_processos.pc_num_orgao_origem as orgaoOrigem
 						, pc_orgaos_4.pc_org_sigla as orgaoAvaliado
 						, pc_orgaos_5.pc_org_sigla as orgaoOrigemSigla
@@ -24,8 +24,6 @@
 						LEFT JOIN pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 						LEFT JOIN pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
 						LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
-						LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_aval_orientacao_mcu_orgaoResp
-						LEFT JOIN pc_orgaos AS pc_orgaos_3 ON pc_orgaos_3.pc_org_mcu = pc_orgHerancaMcuPara
 						LEFT JOIN pc_orgaos AS pc_orgaos_4 ON pc_orgaos_4.pc_org_mcu = pc_num_orgao_avaliado
 						LEFT JOIN pc_orgaos AS pc_orgaos_5 ON pc_orgaos_5.pc_org_mcu = pc_num_orgao_origem
 						LEFT JOIN pc_avaliacao_tipos on pc_num_avaliacao_tipo = pc_aval_tipo_id
@@ -118,21 +116,14 @@
 														</cfif>
 													</cfif>
 													
-													<cfif #pc_orgHerancaMcuPara# neq '' and (#pc_orientacao_status_finalizador# neq 'S' or DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
-														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
-														<cfelse>
-															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #siglaOrgResp# (#mcuOrgResp#)</span></td>
-														</cfif>
-														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgRespHerdeiro#</td>
+													
+													<cfif pc_aval_orientacao_distribuido eq 1>
+														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
 													<cfelse>
-														<cfif pc_aval_orientacao_distribuido eq 1>
-															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
-														<cfelse>
-															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
-														</cfif>
-														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgResp#</td>
+														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#siglaOrgResp# (#mcuOrgResp#)</td>
 													</cfif>
+													<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#seOrgResp#</td>
+													
 
 													<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
 													<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#)">#sei#</td>
@@ -508,8 +499,6 @@
 									,pc_num_orgao_avaliado as mcuOrgAvaliado,  pc_orgaos2.pc_org_sigla as siglaOrgAvaliado
 									,pc_num_orgao_origem as mcuOrgOrigem,  pc_orgaos3.pc_org_sigla as siglaOrgOrigem
 									,pc_avaliacao_tipos.*, pc_classificacoes.*
-									,pc_orgaos_heranca.pc_orgHerancaMcuDe,pc_orgaos_heranca.pc_orgHerancaMcuPara,pc_orgaos_heranca.pc_orgHerancaDataInicio, pc_orgaos_4.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_4.pc_org_se_sigla as seOrgRespHerdeiro
-									,pc_orgaos_heranca2.pc_orgHerancaMcuDe as pc_orgHerancaMcuDeAvaliado,pc_orgaos_heranca2.pc_orgHerancaMcuPara as pc_orgHerancaMcuParaAvaliado,pc_orgaos_heranca2.pc_orgHerancaDataInicio as pc_orgHerancaDataInicioAvaliado, pc_orgaos_5.pc_org_sigla as siglaOrgAvaliadoHerdeiro
 						            ,pc_status_card_style_ribbon, pc_status_card_nome_ribbon
 						FROM        pc_processos 
 									INNER JOIN pc_avaliacoes on pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo 
@@ -519,10 +508,6 @@
 									INNER JOIN pc_orgaos as pc_orgaos3 on pc_orgaos3.pc_org_mcu = pc_num_orgao_origem
 									INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
 									INNER JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
-									LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_aval_orientacao_mcu_orgaoResp
-									LEFT JOIN pc_orgaos AS pc_orgaos_4 ON pc_orgaos_4.pc_org_mcu = pc_orgHerancaMcuPara
-									LEFT JOIN pc_orgaos_heranca as  pc_orgaos_heranca2 on  pc_orgaos_heranca2.pc_orgHerancaMcuDe = pc_num_orgao_avaliado
-									LEFT JOIN pc_orgaos AS pc_orgaos_5 ON pc_orgaos_5.pc_org_mcu =  pc_orgaos_heranca2.pc_orgHerancaMcuPara
 									LEFT JOIN pc_status on pc_status.pc_status_id = pc_processos.pc_num_status
 						WHERE  pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#"> 
 						and pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idOrientacao#">	 													
@@ -563,11 +548,9 @@
 								<li class="nav-item" style="">
 									<a  class="nav-link  active" id="custom-tabs-one-Orientacao-tab"  data-toggle="pill" href="#custom-tabs-one-Orientacao" role="tab" aria-controls="custom-tabs-one-Orientacao" aria-selected="true">
 									<cfoutput>
-										<cfif #rsProcAval.pc_orgHerancaMcuPara# neq '' and (DateFormat(rsProcAval.pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(rsProcAval.pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
-											Orientação p/ regularização: ID <strong>#rsProcAval.pc_aval_orientacao_id#</strong> - #rsProcAval.siglaOrgRespHerdeiro# (#rsProcAval.pc_orgHerancaMcuPara#)
-										<cfelse>
-											Orientação p/ regularização: ID <strong>#rsProcAval.pc_aval_orientacao_id#</strong> - #rsProcAval.siglaOrgResp# (#rsProcAval.mcuOrgResp#)
-										</cfif>
+										
+										Orientação p/ regularização: ID <strong>#rsProcAval.pc_aval_orientacao_id#</strong> - #rsProcAval.siglaOrgResp# (#rsProcAval.mcuOrgResp#)
+										
 									</cfoutput>
 									</a>
 								</li>
@@ -614,11 +597,9 @@
 															</div>
 															<div class="card-header" style="height:auto">
 																<p style="font-size: 1.5em;">Processo SNCI n°: <strong id="numSNCI" style="color:##0692c6;margin-right:30px">#rsProcAval.pc_processo_id#
-																    <cfif #rsProcAval.pc_orgHerancaMcuParaAvaliado# neq '' and (DateFormat(Now(),"dd/mm/yyyy ") gte DateFormat(rsProcAval.pc_orgHerancaDataInicioAvaliado,"dd/mm/yyyy"))>
-																		</strong> Órgão Avaliado: <strong style="color:##0692c6">#rsProcAval.siglaOrgAvaliadoHerdeiro#</strong><span style="font-size:10px;color:red"> (transf. de: #rsProcAval.siglaOrgAvaliado#)</span></p>
-																	<cfelse>	
-																		</strong> Órgão Avaliado: <strong style="color:##0692c6">#rsProcAval.siglaOrgAvaliado#</strong></p>
-																	</cfif>
+																   	
+																	</strong> Órgão Avaliado: <strong style="color:##0692c6">#rsProcAval.siglaOrgAvaliado#</strong></p>
+																	
 																<p style="font-size: 1em;">Origem: <strong style="color:##0692c6;margin-right:30px">#rsProcAval.siglaOrgOrigem#</strong>
 																
 																<cfif #rsProcAval.pc_modalidade# eq 'A' OR  #rsProcAval.pc_modalidade# eq 'E'>
@@ -1423,13 +1404,12 @@
 		<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_melhorias.*, pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_num_sei
 			,pc_avaliacoes.pc_aval_numeracao , pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu
-			,pc_orgaos_heranca.*, pc_orgaos_2.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_2.pc_org_se_sigla as seOrgRespHerdeiro
+			
 			FROM pc_avaliacao_melhorias
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-			LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_num_orgao_avaliado
-			LEFT JOIN pc_orgaos AS pc_orgaos_2 ON pc_orgaos_2.pc_org_mcu = pc_orgHerancaMcuPara
+			
 			WHERE pc_aval_melhoria_status = 'P' and pc_num_status in(4,5) and pc_aval_melhoria_distribuido = 1
 			      and pc_aval_melhoria_num_orgao in (SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 			or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
@@ -1468,14 +1448,8 @@
 												<td align="center">#pc_aval_melhoria_id#</td>	
 												<td align="center">#pc_processo_id#</td>
 												<td align="center">#pc_aval_numeracao#</td>
-												<cfif #pc_orgHerancaMcuPara# neq '' and  DateFormat(Now(),"dd/mm/yyyy ") gte DateFormat(pc_orgHerancaDataInicio,"dd/mm/yyyy")>
-													<td align="center">#siglaOrgRespHerdeiro# (#pc_orgHerancaMcuPara#) <span style="font-size:10px;">transf. de: #pc_org_sigla# (#pc_org_mcu#)</span></td>
-													<td align="center">#seOrgRespHerdeiro#</td>
-												<cfelse>
-													<td align="center">#pc_org_sigla# (#pc_org_mcu#)</td>
-													<td align="center">#pc_org_se_sigla#</td>
-												</cfif>
-
+												<td align="center">#pc_org_sigla# (#pc_org_mcu#)</td>
+												<td align="center">#pc_org_se_sigla#</td>
 												<cfif #rsMelhoriasPendentes.pc_modalidade# eq 'A' or #rsMelhoriasPendentes.pc_modalidade# eq 'E'>
 													<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
 													<td align="center">#sei#</td>
@@ -1614,7 +1588,6 @@
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-			LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_aval_melhoria_num_orgao
 			WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.idMelhoria#" cfsqltype="cf_sql_numeric">
 		</cfquery>
 
@@ -2387,10 +2360,7 @@
 								pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 								, pc_classificacoes.pc_class_descricao,  pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu, pc_avaliacao_orientacoes.*,
 								pc_orgao_OrientacaoResp.pc_org_sigla as orgaoRespOrientacao, pc_orgao_OrientacaoResp.pc_org_mcu as mcuOrgaoRespOrientacao
-								,pc_orgaos_heranca.*, pc_orgaos_2.pc_org_sigla as siglaOrgRespHerdeiro, pc_orgaos_2.pc_org_se_sigla as seOrgRespHerdeiro
 								
-						
-
 			FROM        pc_processos INNER JOIN
 								pc_avaliacoes on pc_processo_id =  pc_aval_processo INNER JOIN
 								pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id INNER JOIN
@@ -2400,8 +2370,7 @@
 								pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id right JOIN
 								pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id INNER JOIN
 								pc_orgaos as pc_orgao_OrientacaoResp on pc_orgao_OrientacaoResp.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-								LEFT JOIN pc_orgaos_heranca on pc_orgHerancaMcuDe = pc_aval_orientacao_mcu_orgaoResp
-								LEFT JOIN pc_orgaos AS pc_orgaos_2 ON pc_orgaos_2.pc_org_mcu = pc_orgHerancaMcuPara
+								
 
 			WHERE pc_aval_orientacao_id  = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
 
@@ -2432,11 +2401,9 @@
 						<h4 class="card-title ">	
 							<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#fff;font-weight: bold;"> 
 								<i class="fas fa-clock" style="margin-top:4px;"></i><span style="margin-left:10px;font-size:16px;">
-								<cfif #rsProc.pc_orgHerancaMcuPara# neq '' and (DateFormat(rsProc.pc_aval_orientacao_status_datahora,"dd/mm/yyyy ") gte DateFormat(rsProc.pc_orgHerancaDataInicio,"dd/mm/yyyy"))>
-									MANIFESTAÇÕES: <cfoutput>Orientação (ID: #rsProc.pc_aval_orientacao_id#) para #rsProc.siglaOrgRespHerdeiro# (item: #rsProc.pc_aval_numeracao# - Processo: #rsProc.pc_processo_id# )</cfoutput></span>
-								<cfelse>
-									MANIFESTAÇÕES: <cfoutput>Orientação (ID: #rsProc.pc_aval_orientacao_id#) para #rsProc.orgaoRespOrientacao# (item: #rsProc.pc_aval_numeracao# - Processo: #rsProc.pc_processo_id# )</cfoutput></span>
-								</cfif>
+								
+								MANIFESTAÇÕES: <cfoutput>Orientação (ID: #rsProc.pc_aval_orientacao_id#) para #rsProc.orgaoRespOrientacao# (item: #rsProc.pc_aval_numeracao# - Processo: #rsProc.pc_processo_id# )</cfoutput></span>
+								
 							</a>	
 						</h4>
 						<div class="card-tools" align="center">

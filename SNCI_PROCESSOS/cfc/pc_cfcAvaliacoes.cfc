@@ -103,7 +103,7 @@
 																										</div>
 																										
 
-																										<div class="card-header" style="height:120px;width:250px;    font-weight: normal!important;">
+																										<div class="card-header" style="height:120px;width:250px;font-weight:normal!important;">
 																											<p style="font-size:1em;margin-bottom:0rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
 																											<p style="font-size:1em;margin-bottom:0rem!important;"><cfoutput>#siglaOrgAvaliado#</cfoutput></p>
 																											<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
