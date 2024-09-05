@@ -48,7 +48,8 @@
 						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
 						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
 						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
-						) as tipoProcesso
+						) as tipoProcesso,
+						CASE WHEN pc_orientacao_status.pc_orientacao_status_finalizador = 'S' THEN 'SIM' ELSE 'NÃO' END AS statusFinalizador
 
 
 
@@ -159,6 +160,7 @@
 											<th id="colunaEmAnalise"style="text-align: center!important;">Colocar<br>em análise</th>
 										</cfif>
 										<th style="width:50px">Status:</th>
+										<th >Status Finalizador?</th>
 										<th style="text-align: center!important;">N° Processo SNCI</th>
 										<th >N° Item:</th>
 										<th style="text-align: center!important;">ID da<br>Orientação</th>
@@ -172,7 +174,8 @@
 										<th >Órgão Origem: </th>
 										<th >Órgão Avaliado: </th>
 										<th style="display:none"></th>
-										<th style="display:none"></th>	
+										<th style="display:none"></th>
+
 									</tr>
 								</thead>
 								
@@ -203,6 +206,7 @@
 													<cfelse>
 														<td align="center"><span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;" >#pc_orientacao_status_descricao#</span></td>
 													</cfif>
+													<td align="center">#statusFinalizador#</td>
 													<td align="center">#pc_processo_id#</td>
 													<td align="center">#pc_aval_numeracao#</td>	
 													<td align="center">#pc_aval_orientacao_id#</td>
@@ -288,9 +292,9 @@
 				}
 
 				if ($('#colunaEmAnalise').is(':visible')) {
-				 var colunasMostrar = [1,6,7,10,12,13];
+				 var colunasMostrar = [1,2,7,8,11,13,14];
 				} else {
-				 var colunasMostrar = [0,5,6,9,11,12];
+				 var colunasMostrar = [0,1,6,7,10,12,13];
 				}
 
 				const tabOrientacoesProcessosAcomp = $('#tabProcessos').DataTable( {
