@@ -384,6 +384,9 @@
 						,pc_aval_numeracao, pc_aval_descricao, pc_aval_id 
 						,pc_aval_status_descricao, pc_aval_classificacao
 						,pc_aval_vaFalta,pc_aval_vaSobra,pc_aval_vaRisco  
+						,pc_aval_valorEstimadoRecuperar
+						,pc_aval_valorEstimadoRisco
+						,pc_aval_valorEstimadoNaoPlanejado
 						, CONCAT(
 						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
 						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
@@ -513,8 +516,10 @@
 												<th>Valor Envolvido (FALTA)</th>
 												<th>Valor Envolvido (SOBRA)</th>
 												<th>Valor Envolvido (RISCO)</th>
+												<th>P.V.E. Recuperar</th>
+												<th>P.V.E. Risco ou Valor Envolvido</th>
+												<th>P.V.E. Não Planejado/Extrapolado/Sobra</th>
 												<th>Status do Item</th>
-												
 											</tr>
 										</thead>
 										
@@ -603,12 +608,12 @@
 															</cfif>	
 
 															<td>#classifRisco#</td>
-															<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
-															<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
-															<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
-															<td>#vaFalta#</td>
-															<td>#vaSobra#</td>
-															<td>#vaRisco#</td>
+															<td>#LSCurrencyFormat(pc_aval_vaFalta, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_vaSobra, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_vaRisco, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_valorEstimadoRecuperar, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_valorEstimadoRisco, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_valorEstimadoNaoPlanejado, 'local')#</td>
 															<td>#pc_aval_status_descricao#</td> 
 															
 			
@@ -788,7 +793,10 @@
 						,pc_aval_orientacao_descricao,pc_aval_orientacao_dataPrevistaResp,pc_aval_orientacao_status
 						,pc_orgaos_resp.pc_org_sigla + ' (' + pc_aval_orientacao_mcu_orgaoResp + ')' as orientacaoOrgaoResp
 						,pc_orientacao_status.pc_orientacao_status_descricao, pc_aval_status_descricao,pc_aval_classificacao
-						,pc_aval_orientacao_dataPrevistaResp,pc_aval_vaFalta,pc_aval_vaSobra,pc_aval_vaRisco   
+						,pc_aval_orientacao_dataPrevistaResp,pc_aval_vaFalta,pc_aval_vaSobra,pc_aval_vaRisco  
+						,pc_aval_valorEstimadoRecuperar
+						,pc_aval_valorEstimadoRisco
+						,pc_aval_valorEstimadoNaoPlanejado 
 						,pc_orientacao_status.pc_orientacao_status_finalizador,
 						CASE
 							WHEN  CONVERT(VARCHAR(10), pc_aval_orientacao_dataPrevistaResp, 102)  < CONVERT(VARCHAR(10), GETDATE(), 102) AND pc_aval_orientacao_status IN (4, 5) THEN 'PENDENTE'
@@ -909,6 +917,9 @@
 												<th>Valor Envolvido (FALTA)</th>
 												<th>Valor Envolvido (SOBRA)</th>
 												<th>Valor Envolvido (RISCO)</th>
+												<th>P.V.E. Recuperar</th>
+												<th>P.V.E. Risco ou Valor Envolvido</th>
+												<th>P.V.E. Não Planejado/Extrapolado/Sobra</th>
 												<th>Status do Item</th>
 												<th >Cód. Orientação</th>
 												<th >Orientação</th>
@@ -1003,12 +1014,13 @@
 																<cfset classifRisco = "Não Classificado">
 															</cfif>	
 															<td>#classifRisco#</td>
-															<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
-															<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
-															<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
-															<td>#vaFalta#</td>
-															<td>#vaSobra#</td>
-															<td>#vaRisco#</td>
+															<td>#LSCurrencyFormat(pc_aval_vaFalta, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_vaSobra, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_vaRisco, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_valorEstimadoRecuperar, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_valorEstimadoRisco, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_valorEstimadoNaoPlanejado, 'local')#</td>
+															
 															<td>#pc_aval_status_descricao#</td> 
 															<td >#pc_aval_orientacao_id#</td>
 															<td >#pc_aval_orientacao_descricao#</td>
@@ -1213,6 +1225,9 @@
 						,pc_orgaos_melhoria_sug.pc_org_sigla + '(' + pc_orgaos_melhoria_sug.pc_org_mcu + ')' as orgaoRespSug
 						,pc_aval_melhoria_sugestao, pc_aval_melhoria_naoAceita_justif
 						,pc_aval_vaFalta,pc_aval_vaSobra,pc_aval_vaRisco
+						,pc_aval_valorEstimadoRecuperar
+						,pc_aval_valorEstimadoRisco
+						,pc_aval_valorEstimadoNaoPlanejado
 						,pc_aval_id, pc_aval_melhoria_id
 						, CONCAT(
 						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
@@ -1327,6 +1342,9 @@
 												<th>Valor Envolvido (FALTA)</th>
 												<th>Valor Envolvido (SOBRA)</th>
 												<th>Valor Envolvido (RISCO)</th>
+												<th>P.V.E. Recuperar</th>
+												<th>P.V.E. Risco ou Valor Envolvido</th>
+												<th>P.V.E. Não Planejado/Extrapolado/Sobra</th>
 												<th>Status do Item</th>
 												<th>Cód. Prop. Melhoria</th>
 												<th>Proposta de Melhoria</th>
@@ -1424,12 +1442,13 @@
 																<cfset classifRisco = "Não Classificado">
 															</cfif>	
 															<td>#classifRisco#</td>
-															<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
-															<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
-															<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
-															<td>#vaFalta#</td>
-															<td>#vaSobra#</td>
-															<td>#vaRisco#</td>
+															<td>#LSCurrencyFormat(pc_aval_vaFalta, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_vaSobra, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_vaRisco, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_valorEstimadoRecuperar, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_valorEstimadoRisco, 'local')#</td>
+															<td>#LSCurrencyFormat(pc_aval_valorEstimadoNaoPlanejado, 'local')#</td>
+															
 															<td>#pc_aval_status_descricao#</td> 
 															<td>#pc_aval_melhoria_id#</td>
 															<td>#pc_aval_melhoria_descricao#</td>

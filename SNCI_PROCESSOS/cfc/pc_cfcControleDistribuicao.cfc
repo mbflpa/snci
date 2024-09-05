@@ -699,7 +699,9 @@
 															
 																<p style="font-size: 1.3em;">Item: <span style="color:##0692c6;">#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</span></p>
 																<p style="font-size: 1.3em;">Classificação: <span style="color:##0692c6;">#classifRisco#</span></p>
-															<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
+																
+																<cfset ano = RIGHT(#rsProcAval.pc_processo_id#,4)>
+																<cfif #ano# lte 2023>
 																	<cfif #rsProcAval.pc_aval_vaFalta# gt 0 or  #rsProcAval.pc_aval_vaSobra# gt 0 or  #rsProcAval.pc_aval_vaRisco# gt 0 >
 																 		<p style="font-size: 1.3em;">Valor Envolvido: 
 																			<cfif #rsProcAval.pc_aval_vaFalta# gt 0>
@@ -718,8 +720,17 @@
 																	<cfelse>
 																		<p style="font-size: 1.3em;">Valor Envolvido: <span style="color:##0692c6;">Não quantificado</span></p>
 																	</cfif>
-																		
-															</cfif>	
+																<cfelse>
+																	<cfif rsProcAval.pc_aval_valorEstimadoRecuperar gt 0>
+																		<p style="font-size: 1.3em;">Potencial Valor Estimado a Recuperar: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRecuperar, 'local')#</span></p>
+																	</cfif>
+																	<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
+																		<p style="font-size: 1.3em;">Potencial Valor Estimado em Risco ou Valor Envolvido: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRisco, 'local')#</span></p>
+																	</cfif>
+																	<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
+																		<p style="font-size: 1.3em;">Potencial Valor Estimado Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoNaoPlanejado, 'local')#</span></p>
+																	</cfif>
+																</cfif>	
 																
 						
 															</div>
@@ -1999,7 +2010,8 @@
 																<p style="font-size: 1.3em;">Item: <span style="color:##0692c6;">#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</span></p>
 																<p style="font-size: 1.3em;">Classificação: <span style="color:##0692c6;">#classifRisco#</span></p>
 																
-																<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
+																<cfset ano = RIGHT(#rsProcAval.pc_processo_id#,4)>
+																<cfif #ano# lte 2023>
 																	<cfif #rsProcAval.pc_aval_vaFalta# gt 0 or  #rsProcAval.pc_aval_vaSobra# gt 0 or  #rsProcAval.pc_aval_vaRisco# gt 0 >
 																 		<p style="font-size: 1.3em;">Valor Envolvido: 
 																			<cfif #rsProcAval.pc_aval_vaFalta# gt 0>
@@ -2017,6 +2029,16 @@
 																		</p>
 																	<cfelse>
 																		<p style="font-size: 1.3em;">Valor Envolvido: <span style="color:##0692c6;">Não quantificado</span></p>
+																	</cfif>
+																<cfelse>
+																	<cfif rsProcAval.pc_aval_valorEstimadoRecuperar gt 0>
+																		<p style="font-size: 1.3em;">Potencial Valor Estimado a Recuperar: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRecuperar, 'local')#</span></p>
+																	</cfif>
+																	<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
+																		<p style="font-size: 1.3em;">Potencial Valor Estimado em Risco ou Valor Envolvido: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRisco, 'local')#</span></p>
+																	</cfif>
+																	<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
+																		<p style="font-size: 1.3em;">Potencial Valor Estimado Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoNaoPlanejado, 'local')#</span></p>
 																	</cfif>
 																</cfif>		
 																

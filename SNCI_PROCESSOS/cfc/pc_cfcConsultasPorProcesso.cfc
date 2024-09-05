@@ -2252,9 +2252,7 @@
 											<th align="center">Item N°:</th>
 											<th>Situação Encontrada </th>
 											<th>Classificação: </th>
-											<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >
-												<th>Valor Envolvido:</th>
-											</cfif>
+											
 										</tr>
 									</thead>
 									
@@ -2284,13 +2282,7 @@
 													<td>#pc_aval_numeracao# </td>
 													<td>#pc_aval_descricao#</td>
 													<td>#classifRisco#</td>
-													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >
-														<cfif #vaFalta# eq 'R$ 0,00' and #vaRisco# eq 'R$ 0,00' and #vaSobra# eq 'R$ 0,00' >
-															<td>Não Quantificado</td>
-														<cfelse>
-															<td>Falta: #vaFalta# / Risco: #vaRisco# / Sobra: #vaSobra#</td>
-														</cfif>
-													</cfif>
+													
 
 												</tr>
 											</cfoutput>
