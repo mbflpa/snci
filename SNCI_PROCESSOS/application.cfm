@@ -66,3 +66,19 @@ applicationtimeout="#createtimespan(0,6,0,0)#">
 						
 </cfquery>
 
+<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
+	WITH OrgHierarchy AS (
+		SELECT pc_org_mcu, pc_org_mcu_subord_tec
+		FROM pc_orgaos
+		WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+		UNION ALL
+		SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
+		FROM pc_orgaos o
+		INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+	)
+	SELECT pc_org_mcu
+	FROM OrgHierarchy
+</cfquery>
+
+<cfset application.orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
+

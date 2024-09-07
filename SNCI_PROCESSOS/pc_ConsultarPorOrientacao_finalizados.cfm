@@ -2,21 +2,7 @@
 
 
 
-<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
-	WITH OrgHierarchy AS (
-		SELECT pc_org_mcu, pc_org_mcu_subord_tec
-		FROM pc_orgaos
-		WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
-		UNION ALL
-		SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
-		FROM pc_orgaos o
-		INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
-	)
-	SELECT pc_org_mcu
-	FROM OrgHierarchy
-</cfquery>
 
-<cfset orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
 
 <cfquery name="rsProcAno" datasource="#application.dsn_processos#" timeout="120" >
 	SELECT   distinct   right(pc_processos.pc_processo_id,4) as ano
@@ -53,9 +39,9 @@
 		   	and (
 					pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					OR pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					<cfif getOrgHierarchy.recordCount gt 0>
-						OR pc_processos.pc_num_orgao_avaliado IN (#orgaosHierarquiaList#)
-						OR pc_aval_orientacao_mcu_orgaoResp IN (#orgaosHierarquiaList#)
+					<cfif ListLen(application.orgaosHierarquiaList) GT 0>
+						OR pc_processos.pc_num_orgao_avaliado IN (#application.orgaosHierarquiaList#)
+						OR pc_aval_orientacao_mcu_orgaoResp IN (#application.orgaosHierarquiaList#)
 					</cfif>
 				)
 		</cfif>

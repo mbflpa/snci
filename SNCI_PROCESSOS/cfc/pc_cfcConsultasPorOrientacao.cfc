@@ -10,22 +10,6 @@
 	   	<cfargument name="ano" type="string" required="true"  />
 	  	<cfargument name="processoEmAcompanhamento" type="boolean" required="false" default="true" />
 
-
-		<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
-			WITH OrgHierarchy AS (
-				SELECT pc_org_mcu, pc_org_mcu_subord_tec
-				FROM pc_orgaos
-				WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
-				UNION ALL
-				SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
-				FROM pc_orgaos o
-				INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
-			)
-			SELECT pc_org_mcu
-			FROM OrgHierarchy
-		</cfquery>
-
-		<cfset orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
 	
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT      pc_processos.*,
@@ -114,13 +98,13 @@
 					AND (
 							pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 							OR  pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-							<cfif getOrgHierarchy.recordCount gt 0>
-								OR pc_processos.pc_num_orgao_avaliado IN (#orgaosHierarquiaList#)
-								OR pc_aval_orientacao_mcu_orgaoResp IN (#orgaosHierarquiaList#)
+							<cfif ListLen(application.orgaosHierarquiaList) GT 0>
+								OR pc_processos.pc_num_orgao_avaliado IN (#application.orgaosHierarquiaList#)
+								OR pc_aval_orientacao_mcu_orgaoResp IN (#application.orgaosHierarquiaList#)
 							</cfif>
 						)
 					<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
-					<cfif getOrgHierarchy.recordCount gt 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+					<cfif ListLen(application.orgaosHierarquiaList) GT 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
 							<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
 							and NOT (
 									pc_aval_orientacao_status not in (13)
@@ -129,7 +113,7 @@
 							<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
 							and NOT (
 									pc_aval_orientacao_status = 13
-									AND pc_num_orgao_avaliado NOT IN (#orgaosHierarquiaList#)
+									AND pc_num_orgao_avaliado NOT IN (#application.orgaosHierarquiaList#)
 								)
 					</cfif>
 				</cfif>	

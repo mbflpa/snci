@@ -3,23 +3,6 @@
 
 	
 
-	<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
-		WITH OrgHierarchy AS (
-			SELECT pc_org_mcu, pc_org_mcu_subord_tec
-			FROM pc_orgaos
-			WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
-			UNION ALL
-			SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
-			FROM pc_orgaos o
-			INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
-		)
-		SELECT pc_org_mcu
-		FROM OrgHierarchy
-	</cfquery>
-
-	<cfset orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
-
-
 	<cffunction name="alertasOA"   access="remote" hint="mostra alertas para os órgão avaliados na página index.">
         <cfquery datasource="#application.dsn_processos#" name="qPosicionamentos">
 			select pc_avaliacao_orientacoes.*, pc_orientacao_status.*, pc_processos.pc_num_status  from pc_avaliacao_orientacoes
@@ -37,9 +20,9 @@
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
 			WHERE 
 			<!---Se o órgão tiver subordinados--->
-			<cfif ListLen(orgaosHierarquiaList) GT 0>
+			<cfif ListLen(application.orgaosHierarquiaList) GT 0>
 				pc_aval_orientacao_status IN (4,5) 
-				AND pc_aval_orientacao_mcu_orgaoResp IN (#orgaosHierarquiaList#)
+				AND pc_aval_orientacao_mcu_orgaoResp IN (#application.orgaosHierarquiaList#)
 				AND pc_num_status IN (4)
 			<cfelse>
 				pc_num_status = 0
