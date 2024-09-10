@@ -648,6 +648,17 @@
 							padding: 5px!important;
 							width: auto!important;
 						}
+
+						.borderTexto{
+							border: 1px solid #ced4da!important;
+							border-radius: 8px!important;
+							padding: 10px!important;
+							background: none!important;
+							-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+
+						}
 					
 					</style>
 						
@@ -695,7 +706,7 @@
 						</div>
 						<div class="card-body">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
-								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" style="max-height: 200px; overflow-y: auto;">	
+								<div disable class="borderTexto tab-pane fade  active show " id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" style="max-height: 200px; overflow-y: auto;">	
 									
 									<cfif rsProcAval.pc_aval_orientacao_distribuido eq 1>
 										<div style=" display: inline;background-color: #e83e8c;color:#fff;padding: 3px;margin-left: 10px;">Orientação distribuída pelo órgão subordinador:</div>
@@ -717,46 +728,81 @@
 													<cfoutput>
 														<div class="small-box " style=" font-weight: bold;">
 															<div class="ribbon-wrapper ribbon-xl" >
-																<div class="ribbon" style="font-size:18px!important;left:8px;<cfoutput>#rsProcAval.pc_status_card_style_ribbon#</cfoutput>"><cfoutput>#rsProcAval.pc_status_card_nome_ribbon#</cfoutput></div>
+																<div class="ribbon" style="font-size:15px!important;left:8px;<cfoutput>#rsProcAval.pc_status_card_style_ribbon#</cfoutput>"><cfoutput>#rsProcAval.pc_status_card_nome_ribbon#</cfoutput></div>
 															</div>
+
 															<div class="card-header" style="height:auto">
-																<p style="font-size: 1.5em;">Processo SNCI n°: <strong id="numSNCI" style="color:##0692c6;margin-right:30px">#rsProcAval.pc_processo_id#
-																   	
-																	</strong> Órgão Avaliado: <strong style="color:##0692c6">#rsProcAval.siglaOrgAvaliado#</strong></p>
+																<fieldset style="padding:0px!important;min-height: 90px;">
+																	<legend style="margin-left:20px">Informações Principais:</legend>
+
+																	<p style="font-size: 1.5em;margin-left:20px">Processo SNCI n°: <strong id="numSNCI" style="color:##0692c6;margin-right:30px">#rsProcAval.pc_processo_id#
+																		
+																		</strong> Órgão Avaliado: <strong style="color:##0692c6">#rsProcAval.siglaOrgAvaliado#</strong></p>
+																		
+																	<p style="font-size: 1em;margin-left:20px">Origem: <strong style="color:##0692c6;margin-right:30px">#rsProcAval.siglaOrgOrigem#</strong>
 																	
-																<p style="font-size: 1em;">Origem: <strong style="color:##0692c6;margin-right:30px">#rsProcAval.siglaOrgOrigem#</strong>
-																
-																<cfif #rsProcAval.pc_modalidade# eq 'A' OR  #rsProcAval.pc_modalidade# eq 'E'>
-																	<span >Processo SEI n°: </span> <strong  id="numSEI" style="color:##0692c6">#aux_sei#</strong> <span style="margin-left:20px">Relatório n°:</span> <strong  style="color:##0692c6">#rsProcAval.pc_num_rel_sei#</strong>
-																</cfif></p>
-																
-																
-																<cfif rsProcAval.pc_num_avaliacao_tipo neq 445 and rsProcAval.pc_num_avaliacao_tipo neq 2>
-																	<cfif rsProcAval.pc_aval_tipo_descricao neq ''>
-																		<p style="font-size: 1em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcAval.pc_aval_tipo_descricao#</strong></p>
+																	<cfif #rsProcAval.pc_modalidade# eq 'A' OR  #rsProcAval.pc_modalidade# eq 'E'>
+																		<span >Processo SEI n°: </span> <strong  id="numSEI" style="color:##0692c6">#aux_sei#</strong> <span style="margin-left:20px">Relatório n°:</span> <strong  style="color:##0692c6">#rsProcAval.pc_num_rel_sei#</strong>
+																	</cfif></p>
+																	
+																	
+																	<cfif rsProcAval.pc_num_avaliacao_tipo neq 445 and rsProcAval.pc_num_avaliacao_tipo neq 2>
+																		<cfif rsProcAval.pc_aval_tipo_descricao neq ''>
+																			<p style="font-size: 1em;margin-left:20px">Tipo de Avaliação: <span style="color:##0692c6">#rsProcAval.pc_aval_tipo_descricao#</span></p>
+																		<cfelse>
+																			<p style="font-size: 1em;margin-left:20px">Tipo de Avaliação: <span style="color:##0692c6" >#rsProcAval.tipoProcesso#</span></p>
+																		</cfif>
 																	<cfelse>
-																		<p style="font-size: 1em;">Tipo de Avaliação: <span style="color:##0692c6" >#rsProcAval.tipoProcesso#</span></p>
+																		<p style="font-size: 1em;margin-left:20px">Tipo de Avaliação: <span style="color:##0692c6">#rsProcAval.pc_aval_tipo_nao_aplica_descricao#</span></p>
 																	</cfif>
-																<cfelse>
-																	<p style="font-size: 1em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcAval.pc_aval_tipo_nao_aplica_descricao#</strong></p>
-																</cfif>
+																	
+																	
+																	<p style="font-size: 1em;margin-left:20px">
+																		Classificação: <span style="color:##0692c6;margin-right:50px">#rsProcAval.pc_class_descricao#</span>
+																		<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
+																			Modalidade: 
+																			<cfif #rsProcAval.pc_modalidade# eq 'N'>
+																				<span style="color:##0692c6">Normal</span>
+																			</cfif>
+																			<cfif #rsProcAval.pc_modalidade# eq 'A'>
+																				<span style="color:##0692c6">ACOMPANHAMENTO</span>
+																			</cfif>
+																			<cfif #rsProcAval.pc_modalidade# eq 'E'>
+																				<span style="color:##0692c6">ENTREGA DE RELATÓRIO</span>
+																			</cfif>
+																		</cfif>
+																	</p>
+																</fieldset>
 																
-																
-																<p style="font-size: 1em;">
-																	Classificação: <strong style="color:##0692c6;margin-right:50px">#rsProcAval.pc_class_descricao#</strong>
-																	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
-																		Modalidade: 
-																		<cfif #rsProcAval.pc_modalidade# eq 'N'>
-																			<strong style="color:##0692c6">Normal</strong>
-																		</cfif>
-																		<cfif #rsProcAval.pc_modalidade# eq 'A'>
-																			<strong style="color:##0692c6">ACOMPANHAMENTO</strong>
-																		</cfif>
-																		<cfif #rsProcAval.pc_modalidade# eq 'E'>
-																			<strong style="color:##0692c6">ENTREGA DE RELATÓRIO</strong>
-																		</cfif>
-																	</cfif>
-																</p>
+
+																<cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
+																	SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
+																	INNER JOIN pc_objetivo_estrategico on pc_objetivo_estrategico.pc_objEstrategico_id = pc_processos_objEstrategicos.pc_objEstrategico_id
+																	WHERE pc_processos_objEstrategicos.pc_processo_id = '#rsProcAval.pc_processo_id#'
+																</cfquery>
+																<cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,", ")>
+
+																<cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
+																	SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
+																	INNER JOIN pc_risco_estrategico on pc_risco_estrategico.pc_riscoEstrategico_id = pc_processos_riscosEstrategicos.pc_riscoEstrategico_id
+																	WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#rsProcAval.pc_processo_id#'
+																</cfquery>
+																<cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,", ")>
+
+																<cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
+																	SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
+																	INNER JOIN pc_indicador_estrategico on pc_indicador_estrategico.pc_indEstrategico_id = pc_processos_indEstrategicos.pc_indEstrategico_id
+																	WHERE pc_processos_indEstrategicos.pc_processo_id = '#rsProcAval.pc_processo_id#'
+																</cfquery>
+																<cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,", ")>
+
+
+																<fieldset style="padding:0px!important;min-height: 90px;">
+																	<legend style="margin-left:20px">Informações Estratégicas:</legend>
+																	<p style="font-size: 1em;margin-left:20px">Objetivo(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#objetivosEstrategicosList#.</span></p>
+																	<p style="font-size: 1em;margin-left:20px">Risco(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#riscosEstrategicosList#.</span></p>
+																	<p style="font-size: 1em;margin-left:20px">Indicador(es) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#indicadoresEstrategicosList#.</span></p>	
+																</fieldset>
 
 																<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorRegional">
 																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
@@ -770,30 +816,31 @@
 																</cfquery>
 
 																<cfquery datasource="#application.dsn_processos#" name="rsAvaliadores">
-																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_avaliadores
+																	SELECT CONCAT(pc_usu_nome, ' (', pc_org_se_sigla, ')') AS avaliadores FROM pc_avaliadores
 																	INNER JOIN pc_usuarios on pc_usu_matricula = pc_avaliador_matricula
 																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
 																	WHERE pc_avaliador_id_processo = '#rsProcAval.pc_processo_id#'
 																</cfquery>
+																<cfset avaliadoresList = ValueList(rsAvaliadores.avaliadores,";<br>")>
 
-
-																<p style="font-size: 1em;">
-																	<cfif rsCoordenadorRegional.recordcount neq 0>
-																		Coordenador Regional: <strong style="color:##0692c6;margin-right:50px">#rsCoordenadorRegional.pc_usu_nome# (#rsCoordenadorRegional.pc_org_se_sigla#)</strong>
-																	</cfif>
-																	<cfif rsCoordenadorNacional.recordcount neq 0>	
-																		Coordenador Nacional: <strong style="color:##0692c6;margin-right:50px">#rsCoordenadorNacional.pc_usu_nome# (#rsCoordenadorNacional.pc_org_se_sigla#)</strong>
-																	</cfif>
-																</p>
-
-																<cfif rsAvaliadores.recordcount neq 0>
-																	<p style="font-size: 1em;">
-																		Avaliadores:<br> 
-																		<cfloop query="rsAvaliadores">
-																			<strong style="color:##0692c6;margin-right:50px">#pc_usu_nome# (#pc_org_se_sigla#)</strong><br>
-																		</cfloop>
+																<fieldset style="padding:0px!important;min-height: 90px;">
+																	<legend style="margin-left:20px">Equipe:</legend>				
+																	<p style="font-size: 1em;margin-left:20px">
+																		<cfif rsCoordenadorRegional.recordcount neq 0>
+																			Coordenador Regional: <span style="color:##0692c6;margin-right:50px">#rsCoordenadorRegional.pc_usu_nome# (#rsCoordenadorRegional.pc_org_se_sigla#)</span>
+																		</cfif>
+																		<cfif rsCoordenadorNacional.recordcount neq 0>	
+																			Coordenador Nacional: <span style="color:##0692c6;margin-right:50px">#rsCoordenadorNacional.pc_usu_nome# (#rsCoordenadorNacional.pc_org_se_sigla#)</span>
+																		</cfif>
 																	</p>
-																</cfif>
+
+																	<cfif rsAvaliadores.recordcount neq 0>
+																		<p style="font-size: 1em;margin-left:20px">
+																			Avaliadores:<br> 
+																			<span style="color:##0692c6;margin-right:50px">#avaliadoresList#.</span><br>
+																		</p>
+																	</cfif>
+																</fieldset>
 
 															</div>
 														</div>
@@ -882,14 +929,14 @@
 																		<!-- @audit item-->
 																		<div class="card-body">
 																			<div class="tab-content" id="custom-tabs-infoItem-tabContent">
-																				<div disable class="tab-pane fade  active show" id="custom-tabs-infoItem-titulo"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-titulo-tab" >	
-																					<pre style="color:##0083ca!important"><cfoutput>#rsProcAval.pc_aval_descricao#</cfoutput></pre>
+																				<div disable class="borderTexto tab-pane fade  active show" id="custom-tabs-infoItem-titulo"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-titulo-tab" style="">	
+																					<pre style="color:##0083ca!important;font-size: 1em;"><cfoutput>#rsProcAval.pc_aval_descricao#</cfoutput></pre>
 																				</div>
-																				<div disable class="tab-pane fade" id="custom-tabs-infoItem-sintese" role="tabpanel" aria-labelledby="custom-tabs-infoItem-sintese-tab" style="max-height: 200px; overflow-y: auto;">
-																					<pre style="color:##0083ca!important"><cfoutput>#rsProcAval.pc_aval_sintese#</cfoutput></pre>
+																				<div disable class="borderTexto tab-pane fade" id="custom-tabs-infoItem-sintese" role="tabpanel" aria-labelledby="custom-tabs-infoItem-sintese-tab" style="max-height: 200px; overflow-y: auto;">
+																					<pre style="color:##0083ca!important;font-size: 1em;"><cfoutput>#rsProcAval.pc_aval_sintese#</cfoutput></pre>
 																				</div>
-																				<div disable class="tab-pane fade" id="custom-tabs-infoItem-teste"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-teste-tab" style="max-height: 200px; overflow-y: auto;">	
-																					<pre style="color:##0083ca!important"><cfoutput>#rsProcAval.pc_aval_teste#</cfoutput></pre>
+																				<div disable class="borderTexto tab-pane fade" id="custom-tabs-infoItem-teste"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-teste-tab" style="max-height: 200px; overflow-y: auto;">	
+																					<pre style="color:##0083ca!important;font-size: 1em;"><cfoutput>#rsProcAval.pc_aval_teste#</cfoutput></pre>
 																				</div>
 																				<div disable class="tab-pane fade" id="custom-tabs-infoItem-controleTestado"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-controleTestado-tab" >	
 																					<cfquery name="rsAvaliacaoTiposControles" datasource="#application.dsn_processos#">
@@ -2252,6 +2299,26 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						.nav-tabs {
 							border-bottom: none!important;
 						}
+						fieldset{
+							border: 1px solid #ced4da!important;
+							border-radius: 8px!important;
+							padding: 20px!important;
+							margin-bottom: 10px!important;
+							background: none!important;
+							-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+						}
+
+						legend {
+							font-size: 0.8rem!important;
+							color: #fff!important;
+							background-color: #0083ca!important;
+							border: 1px solid #ced4da!important;
+							border-radius: 5px!important;
+							padding: 5px!important;
+							width: auto!important;
+						}
 					
 					</style>
 						
@@ -2405,6 +2472,10 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 																	</cfif>
 																</p>
 
+																<p style="font-size: 1em;">
+
+																</p>
+
 																<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorRegional">
 																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
 																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
@@ -2423,24 +2494,26 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 																	WHERE pc_avaliador_id_processo = '#rsProcAval.pc_processo_id#'
 																</cfquery>
 
-
-																<p style="font-size: 1em;">
-																	<cfif rsCoordenadorRegional.recordcount neq 0>
-																		Coordenador Regional: <strong style="color:##0692c6;margin-right:50px">#rsCoordenadorRegional.pc_usu_nome# (#rsCoordenadorRegional.pc_org_se_sigla#)</strong>
-																	</cfif>
-																	<cfif rsCoordenadorNacional.recordcount neq 0>	
-																		Coordenador Nacional: <strong style="color:##0692c6;margin-right:50px">#rsCoordenadorNacional.pc_usu_nome# (#rsCoordenadorNacional.pc_org_se_sigla#)</strong>
-																	</cfif>
-																</p>
-
-																<cfif rsAvaliadores.recordcount neq 0>
+																<fieldset style="padding:0px!important;min-height: 90px;">
+																	<legend style="margin-left:20px">Equipe:</legend>
 																	<p style="font-size: 1em;">
-																		Avaliadores:<br> 
-																		<cfloop query="rsAvaliadores">
-																			<strong style="color:##0692c6;margin-right:50px">#pc_usu_nome# (#pc_org_se_sigla#)</strong><br>
-																		</cfloop>
+																		<cfif rsCoordenadorRegional.recordcount neq 0>
+																			Coordenador Regional: <strong style="color:##0692c6;margin-right:50px">#rsCoordenadorRegional.pc_usu_nome# (#rsCoordenadorRegional.pc_org_se_sigla#)</strong>
+																		</cfif>
+																		<cfif rsCoordenadorNacional.recordcount neq 0>	
+																			Coordenador Nacional: <strong style="color:##0692c6;margin-right:50px">#rsCoordenadorNacional.pc_usu_nome# (#rsCoordenadorNacional.pc_org_se_sigla#)</strong>
+																		</cfif>
 																	</p>
-																</cfif>
+
+																	<cfif rsAvaliadores.recordcount neq 0>
+																		<p style="font-size: 1em;">
+																			Avaliadores:<br> 
+																			<cfloop query="rsAvaliadores">
+																				<strong style="color:##0692c6;margin-right:50px">#pc_usu_nome# (#pc_org_se_sigla#)</strong><br>
+																			</cfloop>
+																		</p>
+																	</cfif>
+																</fieldset>
 
 															</div>
 														</div>
