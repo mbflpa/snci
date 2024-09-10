@@ -1494,7 +1494,7 @@
 					mostraRelatorioPDF()
 
 					setupCharCounter('pcTeste', 'pcTesteCounter', 5000);
-					setupCharCounter('pcControleTestado', 'pcControleTestadoCounter', 7500);
+					setupCharCounter('pcControleTestado', 'pcControleTestadoCounter', 500);
 					setupCharCounter('pcSintese', 'pcSinteseCounter', 7500);
 					setupCharCounter('pcTituloSituacaoEncontrada', 'pcTituloSituacaoEncontradaCounter', 500);
 					setupCharCounter('pcCriterioRefOutrosDesc', 'pcCriterioRefOutrosDescCharCounter', 350);

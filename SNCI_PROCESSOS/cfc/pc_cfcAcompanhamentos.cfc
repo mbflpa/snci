@@ -625,12 +625,35 @@
 						.nav-tabs {
 							border-bottom: none!important;
 						}
+						.card-header p {
+							margin-bottom: 5px;
+						}
+						fieldset{
+							border: 1px solid #ced4da!important;
+							border-radius: 8px!important;
+							padding: 20px!important;
+							margin-bottom: 10px!important;
+							background: none!important;
+							-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+						}
+
+						legend {
+							font-size: 0.8rem!important;
+							color: #fff!important;
+							background-color: #0083ca!important;
+							border: 1px solid #ced4da!important;
+							border-radius: 5px!important;
+							padding: 5px!important;
+							width: auto!important;
+						}
 					
 					</style>
 						
 					<div class="card-header" style="background-color: #0083CA;border-bottom:solid 2px #fff" >
 						<cfoutput>
-							<p id="descricaoItem" style="font-size: 1.3em;color:##fff"><strong>Item: #rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong>
+							<p id="descricaoItem" style="font-size: 1em;color:##fff"><strong>Item: #rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong>
 							<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
 							<!--<i id="start-tour2" style="color:##8cc63f;margin-left:20px;font-size: 1.3em;" class="fas fa-question-circle grow-icon"></i>-->
 							</cfif>
@@ -672,7 +695,7 @@
 						</div>
 						<div class="card-body">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
-								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >	
+								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" style="max-height: 200px; overflow-y: auto;">	
 									
 									<cfif rsProcAval.pc_aval_orientacao_distribuido eq 1>
 										<div style=" display: inline;background-color: #e83e8c;color:#fff;padding: 3px;margin-left: 10px;">Orientação distribuída pelo órgão subordinador:</div>
@@ -802,13 +825,13 @@
 														<div class="small-box " style=" font-weight: bold;">
 															
 															<div class="card-header" style="height:auto">
-															
-																<p style="font-size: 1.3em;">Item: <span style="color:##0692c6;">#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</span></p>
-																<p style="font-size: 1.3em;">Classificação: <span style="color:##0692c6;">#classifRisco#</span></p>
-																<cfset ano = RIGHT(#rsProcAval.pc_processo_id#,4)>
+															    <cfset ano = RIGHT(#rsProcAval.pc_processo_id#,4)>
 																<cfif #ano# lte 2023>
+																	<p style="font-size: 1em;">Item: <span style="color:##0692c6;">#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</span></p>
+																	<p style="font-size: 1em;">Classificação: <span style="color:##0692c6;">#classifRisco#</span></p>
+																	
 																	<cfif #rsProcAval.pc_aval_vaFalta# gt 0 or  #rsProcAval.pc_aval_vaSobra# gt 0 or  #rsProcAval.pc_aval_vaRisco# gt 0 >
-																 		<p style="font-size: 1.3em;">Valor Envolvido: 
+																 		<p style="font-size: 1em;">Valor Envolvido: 
 																			<cfif #rsProcAval.pc_aval_vaFalta# gt 0>
 																				<cfset valorApurado = #LSCurrencyFormat( rsProcAval.pc_aval_vaFalta, 'local')#>
 																				<span style="color:##0692c6;">Falta =  #valorApurado#; </span>
@@ -823,18 +846,116 @@
 																			</cfif>
 																		</p>
 																	<cfelse>
-																		<p style="font-size: 1.3em;">Valor Envolvido: <span style="color:##0692c6;">Não quantificado</span></p>
+																		<p style="font-size: 1em;">Valor Envolvido: <span style="color:##0692c6;">Não quantificado</span></p>
 																	</cfif>
 																<cfelse>
-																	<cfif rsProcAval.pc_aval_valorEstimadoRecuperar gt 0>
-																		<p style="font-size: 1.3em;">Potencial Valor Estimado a Recuperar: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRecuperar, 'local')#</span></p>
-																	</cfif>
-																	<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
-																		<p style="font-size: 1.3em;">Potencial Valor Estimado em Risco ou Valor Envolvido: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRisco, 'local')#</span></p>
-																	</cfif>
-																	<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
-																		<p style="font-size: 1.3em;">Potencial Valor Estimado Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoNaoPlanejado, 'local')#</span></p>
-																	</cfif>
+																	<div class="card card-primary card-tabs"  style="widht:100%">
+																		<div class="card-header p-0 pt-1" style="background-color:##0e406a;">
+																			<ul class="nav nav-tabs" id="custom-tabs-infoItem" role="tablist" style="font-size:14px;">
+																				<li class="nav-item " style="">
+																					<a  class="nav-link  active" id="custom-tabs-infoItem-titulo-tab"  data-toggle="pill" href="##custom-tabs-infoItem-titulo" role="tab" aria-controls="custom-tabs-infoItem-titulo" aria-selected="true">Título da Situação Encontrada</a>
+																				</li>
+
+																				<li class="nav-item" style="">
+																					<a  class="nav-link " id="custom-tabs-infoItem-InfItem-sintese-tab"  data-toggle="pill" href="##custom-tabs-infoItem-sintese" role="tab" aria-controls="custom-tabs-infoItem-sintese" aria-selected="true">Síntese</a>
+																				</li>
+
+																				<li class="nav-item" style="">
+																					<a  class="nav-link " id="custom-tabs-infoItem-InfItem-teste-tab"  data-toggle="pill" href="##custom-tabs-infoItem-teste" role="tab" aria-controls="custom-tabs-infoItem-teste" aria-selected="true">Teste (Pergunta do plano)</a>
+																				</li>
+
+																				<li class="nav-item" style="">
+																					<a  class="nav-link " id="custom-tabs-infoItem-InfItem-controleTestado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-controleTestado" role="tab" aria-controls="custom-tabs-infoItem-controleTestado" aria-selected="true">Controle Testado</a>
+																				</li>
+
+																				<li class="nav-item" style="">
+																					<a  class="nav-link " id="custom-tabs-infoItem-InfItem-riscoClassif-tab"  data-toggle="pill" href="##custom-tabs-infoItem-riscoClassif" role="tab" aria-controls="custom-tabs-infoItem-riscoClassif" aria-selected="true">COSO / Classificação / Risco</a>
+																				</li>
+
+																				<li class="nav-item" style="">
+																					<a  class="nav-link " id="custom-tabs-infoItem-InfItem-valorEstimado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-valorEstimado" role="tab" aria-controls="custom-tabs-infoItem-valorEstimado" aria-selected="true">Potencial Valor Estimado</a>
+																				</li>	
+
+
+																			</ul>
+																		</div>
+																		<!-- @audit item-->
+																		<div class="card-body">
+																			<div class="tab-content" id="custom-tabs-infoItem-tabContent">
+																				<div disable class="tab-pane fade  active show" id="custom-tabs-infoItem-titulo"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-titulo-tab" >	
+																					<pre style="color:##0083ca!important"><cfoutput>#rsProcAval.pc_aval_descricao#</cfoutput></pre>
+																				</div>
+																				<div disable class="tab-pane fade" id="custom-tabs-infoItem-sintese" role="tabpanel" aria-labelledby="custom-tabs-infoItem-sintese-tab" style="max-height: 200px; overflow-y: auto;">
+																					<pre style="color:##0083ca!important"><cfoutput>#rsProcAval.pc_aval_sintese#</cfoutput></pre>
+																				</div>
+																				<div disable class="tab-pane fade" id="custom-tabs-infoItem-teste"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-teste-tab" style="max-height: 200px; overflow-y: auto;">	
+																					<pre style="color:##0083ca!important"><cfoutput>#rsProcAval.pc_aval_teste#</cfoutput></pre>
+																				</div>
+																				<div disable class="tab-pane fade" id="custom-tabs-infoItem-controleTestado"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-controleTestado-tab" >	
+																					<cfquery name="rsAvaliacaoTiposControles" datasource="#application.dsn_processos#">
+																						SELECT pc_aval_tipoControle_descricao FROM pc_avaliacao_tiposControles 
+																						INNER JOIN pc_avaliacao_tipoControle on pc_avaliacao_tipoControle.pc_aval_tipoControle_id = pc_avaliacao_tiposControles.pc_aval_tipoControle_id
+																						WHERE pc_avaliacao_tiposControles.pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#"> 
+																					</cfquery>
+																					<cfset tiposControlesList = ValueList(rsAvaliacaoTiposControles.pc_aval_tipoControle_descricao, ', ')>
+																					
+																					<cfquery name="rsAvaliacaoCategoriasControles" datasource="#application.dsn_processos#">
+																						SELECT pc_aval_categoriaControle_descricao FROM pc_avaliacao_categoriasControles	
+																						INNER JOIN pc_avaliacao_categoriaControle on pc_avaliacao_categoriaControle.pc_aval_categoriaControle_id = pc_avaliacao_categoriasControles.pc_aval_categoriaControle_id
+																						WHERE pc_avaliacao_categoriasControles.pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
+																					</cfquery>
+																					<cfset categoriasControlesList = ValueList(rsAvaliacaoCategoriasControles.pc_aval_categoriaControle_descricao, ', ')>
+
+																					<fieldset style="padding:0px!important;min-height: 90px;">
+																						<legend style="margin-left:20px">Controle Testado:</legend>
+																						<pre style="font-size: 1em;color:##0083ca!important;margin-left:10px"><cfoutput>#rsProcAval.pc_aval_controleTestado#</cfoutput></pre>
+																					</fieldset>
+																					<fieldset style="padding:0px!important;min-height: 90px;">
+																						<legend style="margin-left:20px">Tipo / Categoria:</legend>
+																						<p style="font-size: 1em;margin-left:20px">Tipo(s) de Controle: <span style="color:##0692c6;">#tiposControlesList#.</span></p>
+																						<p style="font-size: 1em;margin-left:20px">Categoria(s) do Controle Testado: <span style="color:##0692c6;">#categoriasControlesList#.</span></p>
+																					</fieldset>
+																				</div>
+																				<div disable class="tab-pane fade" id="custom-tabs-infoItem-riscoClassif"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-riscoClassif-tab" >	
+																					<cfquery name="rsAvaliacaoRiscos" datasource="#application.dsn_processos#">
+																						SELECT pc_aval_risco_descricao FROM pc_avaliacao_riscos
+																						INNER JOIN pc_avaliacao_risco on pc_avaliacao_risco.pc_aval_risco_id = pc_avaliacao_riscos.pc_aval_risco_id
+																						WHERE pc_avaliacao_riscos.pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
+																					</cfquery>
+																					<cfset riscosList = ValueList(rsAvaliacaoRiscos.pc_aval_risco_descricao, ', ')>
+																					
+																					
+
+																					<cfquery name="rsAvaliacaoCoso" datasource="#application.dsn_processos#">	
+																						SELECT pc_aval_cosoComponente, pc_aval_cosoPrincipio FROM pc_avaliacao_coso
+																						WHERE pc_aval_coso_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#rsProcAval.pc_aval_coso_id#">
+																					</cfquery>		
+																					<fieldset style="padding:0px!important;min-height: 90px;">
+																						<legend style="margin-left:20px">COSO 2003:</legend>
+																						<p style="font-size: 1em;margin-left:20px">Componente: <span style="color:##0692c6;">#rsAvaliacaoCoso.pc_aval_cosoComponente#</span></p>
+																						<p style="font-size: 1em;margin-left:20px">Princípio: <span style="color:##0692c6;">#rsAvaliacaoCoso.pc_aval_cosoPrincipio#</span></p>
+																					</fieldset>
+																					<fieldset style="padding:0px!important;min-height: 90px;">
+																						<legend style="margin-left:20px">Classificação / Risco:</legend>
+																						<p style="font-size: 1em;margin-left:20px">Classificação: <span style="color:##0692c6;">#classifRisco#.</span></p>
+																						<p style="font-size: 1em;margin-left:20px">Risco(s) Identificado: <span style="color:##0692c6;">#riscosList#.</span></p>
+																					</fieldset>
+																					
+																				</div>
+																				<div disable class="tab-pane fade" id="custom-tabs-infoItem-valorEstimado"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-valorEstimado-tab" >	
+																					<cfif rsProcAval.pc_aval_valorEstimadoRecuperar gt 0>
+																						<p style="font-size: 1em;">A Recuperar: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRecuperar, 'local')#</span></p>
+																					</cfif>
+																					<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
+																						<p style="font-size: 1em;">Em Risco ou Valor Envolvido: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRisco, 'local')#</span></p>
+																					</cfif>
+																					<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
+																						<p style="font-size: 1em;">Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoNaoPlanejado, 'local')#</span></p>
+																					</cfif>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
 																</cfif>
 																
 						
