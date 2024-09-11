@@ -961,35 +961,46 @@
 						});
 
 						// Adiciona manipuladores de eventos para validar os campos
-						$('select').on('change blur keyup', function() {
-							var $this = $(this);
-							if ($this.val()) {
-								$this.removeClass('is-invalid').addClass('is-valid');
-								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
-							}
-						});
+						// $('textarea, input').on('change blur keyup', function() {
+						// 	var $this = $(this);
+						// 	if ($this.val()) {
+						// 		$this.removeClass('is-invalid').addClass('is-valid');
+						// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						// 	}else{
+						// 		$this.removeClass('is-valid').addClass('is-invalid');
+						// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+						// 		 // Adiciona erro manualmente para o select
+						// 		$this.rules("add", {
+						// 			required: true,
+						// 			messages: {
+						// 				required: "Informação obrigatória."
+						// 			}
+						// 		});
+						// 		// Trigger a validação
+        				// 		$this.valid();
+
+						// 	}
+						// });
 
 						// Adiciona manipuladores de eventos para validar os campos
-						$('textarea, input').on('change blur keyup', function() {
+						// $('select').on('change blur keyup', function() {
+						// 	var $this = $(this);
+						// 	if ($this.val()) {
+						// 		$this.removeClass('is-invalid').addClass('is-valid');
+						// 		$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						// 	}
+						// });
+
+						// Adiciona manipuladores de eventos para validar os campos
+						$('textarea, input, select').on('change blur keyup', function() {
 							var $this = $(this);
 							if ($this.val()) {
 								$this.removeClass('is-invalid').addClass('is-valid');
 								$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
-							}else{
-								$this.removeClass('is-valid').addClass('is-invalid');
-								$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
-								 // Adiciona erro manualmente para o select
-								$this.rules("add", {
-									required: true,
-									messages: {
-										required: "Informação obrigatória."
-									}
-								});
-								// Trigger a validação
-        						$this.valid();
-
 							}
 						});
+
+						
 
 						
 						// Aplicar validação aos selects cujo id contenha selectDinamico
