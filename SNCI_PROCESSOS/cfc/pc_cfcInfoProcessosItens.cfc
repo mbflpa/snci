@@ -105,13 +105,15 @@
                                         </cfquery>
                                         <cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,", ")>
 
+                                        <cfif rsObjetivosEstrategicos.recordcount neq 0 or rsRiscosEstrategicos.recordcount neq 0 or rsIndicadoresEstrategicos.recordcount neq 0>
+                                            <fieldset style="padding:0px!important;min-height: 90px;">
+                                                <legend style="margin-left:20px">Informações Estratégicas:</legend>
+                                                <p style="font-size: 1em;margin-left:20px">Objetivo(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#objetivosEstrategicosList#.</span></p>
+                                                <p style="font-size: 1em;margin-left:20px">Risco(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#riscosEstrategicosList#.</span></p>
+                                                <p style="font-size: 1em;margin-left:20px">Indicador(es) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#indicadoresEstrategicosList#.</span></p>	
+                                            </fieldset>
+                                        </cfif>
 
-                                        <fieldset style="padding:0px!important;min-height: 90px;">
-                                            <legend style="margin-left:20px">Informações Estratégicas:</legend>
-                                            <p style="font-size: 1em;margin-left:20px">Objetivo(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#objetivosEstrategicosList#.</span></p>
-                                            <p style="font-size: 1em;margin-left:20px">Risco(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#riscosEstrategicosList#.</span></p>
-                                            <p style="font-size: 1em;margin-left:20px">Indicador(es) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#indicadoresEstrategicosList#.</span></p>	
-                                        </fieldset>
                                     </cfif>
 
                                     <cfquery datasource="#application.dsn_processos#" name="rsCoordenadorRegional">
@@ -193,7 +195,7 @@
                                 
                                 <div class="card-header" style="height:auto">
                                     <cfset ano = RIGHT(#arguments.pc_processo_id#,4)>
-                                    <cfif #ano# lte 2023>
+                                    <cfif #ano# lte 2023 or rsInfoItem.pc_aval_sintese eq ''>
                                         <p style="font-size: 1em;">Item: <span style="color:##0692c6;">#rsInfoItem.pc_aval_numeracao# - #rsInfoItem.pc_aval_descricao#</span></p>
                                         <p style="font-size: 1em;">Classificação: <span style="color:##0692c6;">#classifRisco#</span></p>
                                         
@@ -295,7 +297,12 @@
 
                                                         <cfquery name="rsAvaliacaoCoso" datasource="#application.dsn_processos#">	
                                                             SELECT pc_aval_cosoComponente, pc_aval_cosoPrincipio FROM pc_avaliacao_coso
-                                                            WHERE pc_aval_coso_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#rsInfoItem.pc_aval_coso_id#">
+                                                            <cfif rsInfoItem.pc_aval_coso_id neq ''>
+                                                                WHERE pc_aval_coso_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#rsInfoItem.pc_aval_coso_id#">
+                                                            <cfelse>
+                                                                WHERE pc_aval_coso_id = 0
+                                                            </cfif>
+
                                                         </cfquery>		
                                                         <fieldset style="padding:0px!important;min-height: 90px;">
                                                             <legend style="margin-left:20px">COSO 2003:</legend>
@@ -336,5 +343,8 @@
         </section>
 
     </cffunction>
+
+
+    
 
 </cfcomponent>

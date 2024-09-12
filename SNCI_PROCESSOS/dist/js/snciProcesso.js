@@ -987,3 +987,68 @@ function mostraInfoItem(divId, pc_processo_id, pc_aval_id){
     
 
 }
+
+function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios){
+    $('#modalOverlay').modal('show');
+    $('#infoItemDiv').html('');
+    setTimeout(function() {
+        $.ajax({
+            type: "post",
+            url:"cfc/pc_cfcAvaliacoes.cfc",
+            data:{
+                method: "anexoAvaliacao",
+                pc_aval_id: pc_aval_id,
+                todosOsRelatorios: todosRelatorios
+            },
+            async: false
+        })//fim ajax
+        .done(function(result){
+            $('#' + divId).html(result);
+        })//fim done
+        .fail(function(xhr, ajaxOptions, thrownError) {
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+            $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(thrownError)
+
+        })//fim fail
+        $('#modalOverlay').delay(1000).hide(0, function() {
+            $('#modalOverlay').modal('hide');
+        });
+    }, 200);
+
+}
+
+function mostraTabAnexos(divId, pc_aval_id, pc_orientacao_id){
+    $('#modalOverlay').modal('show');
+    $('#infoItemDiv').html('');
+    setTimeout(function() {    
+        $.ajax({
+            type: "post",
+            url: "cfc/pc_cfcAvaliacoes.cfc",
+            data:{
+                method: "tabAnexos",
+                pc_aval_id: pc_aval_id,
+                pc_orientacao_id: pc_orientacao_id
+            },
+            async: false
+        })//fim ajax
+        .done(function(result) {
+            $('#' + divId).html(result);
+        })//fim done
+        .fail(function(xhr, ajaxOptions, thrownError) {
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+            $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(thrownError)
+
+        })//fim fail
+        $('#modalOverlay').delay(1000).hide(0, function() {
+            $('#modalOverlay').modal('hide');
+        });
+    }, 200);
+}

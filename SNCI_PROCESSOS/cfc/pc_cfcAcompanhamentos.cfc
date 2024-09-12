@@ -874,11 +874,7 @@
 					var pc_orientacao_id = '#rsProcAval.pc_aval_orientacao_id#';
 					var pc_processo_id = '#rsProcAval.pc_processo_id#';
 				</cfoutput>
-				mostraRelatoPDF();
-				mostraTabAnexos();
-				
-
-				
+								
 				$('#tab-manifestacao').click(function() {
 					$('html, body').animate({ scrollTop: ($('#tab-manifestacao').offset().top)-60} , 1000);
 				});
@@ -895,6 +891,14 @@
 				$('#custom-tabs-one-InfItem-tab').on('click', function (event){
 					mostraInfoItem('infoItemDiv',pc_processo_id,pc_aval_id);
 				});	
+
+				$('#custom-tabs-one-Avaliacao-tab').on('click', function (event){
+					mostraRelatoPDF('anexoAvaliacaoDiv',pc_aval_id,'S');
+				});
+
+				$('#custom-tabs-one-Anexos-tab').on('click', function (event){
+					mostraTabAnexos('tabAnexosDiv',pc_aval_id,pc_orientacao_id);
+				});
 				
 				
 			})
@@ -983,61 +987,7 @@
 
 			});
 
-			function mostraTabAnexos(){
-				$.ajax({
-						type: "post",
-						url: "cfc/pc_cfcAvaliacoes.cfc",
-						data:{
-							method: "tabAnexos",
-							pc_aval_id: pc_aval_id,
-							pc_orientacao_id: pc_orientacao_id
-						},
-						async: false
-					})//fim ajax
-					.done(function(result) {
-						$('#tabAnexosDiv').html(result)
-					})//fim done
-					.fail(function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-						$('#modal-danger').modal('show')
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-						$('#modal-danger').find('.modal-body').text(thrownError)
-
-					})//fim fail
-
-			}
-
-			function mostraRelatoPDF(){
-				
-				$.ajax({
-					type: "post",
-					url:"cfc/pc_cfcAvaliacoes.cfc",
-					data:{
-						method: "anexoAvaliacao",
-						pc_aval_id: pc_aval_id,
-						todosOsRelatorios: "S"
-					},
-					async: false
-				})//fim ajax
-				.done(function(result){
-					
-					$('#anexoAvaliacaoDiv').html(result)
-					
-				})//fim done
-				.fail(function(xhr, ajaxOptions, thrownError) {
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});
-					$('#modal-danger').modal('show')
-					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-					$('#modal-danger').find('.modal-body').text(thrownError)
-
-				})//fim fail
-			
-			}
-
+		
 
 		</script>
 
@@ -2514,56 +2464,58 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					</div>
 				
 					<!--ANEXOS -->
-					<div class="row">
-						<div class="col-md-12">
-							<div class="card card-default">
-								
-								<div class="card-body">
-									<div id="actions" class="row" >
-										<div class="col-lg-12" align="left">
-											<div class="btn-group w-30">
-													<cfif directoryExists(application.diretorio_anexos)>
-														<span id="anexosAcomp" class="btn btn-success col fileinput-button" style="background:#0083CA">
-															<i class="fas fa-upload"></i>
-															<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
-														</span>
-													</cfif>
-												
-											</div>
-										</div>
-									</div>
+					<cfif rsProc.pc_num_status neq 6>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card card-default">
 									
-									<div class="table table-striped files" id="previewsAcomp">
-									<div id="templateAcomp" class="row mt-2">
-										<div class="col-auto">
-											<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
-										</div>
-										<div class="col d-flex align-items-center">
-											<p class="mb-0">
-											<span class="lead" data-dz-name></span>
-											(<span data-dz-size></span>)
-											</p>
-											<strong class="error text-danger" data-dz-errormessage></strong>
-										</div>
-										<div class="col-4 d-flex align-items-center" >
-											<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
-												<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
+									<div class="card-body">
+										<div id="actions" class="row" >
+											<div class="col-lg-12" align="left">
+												<div class="btn-group w-30">
+														<cfif directoryExists(application.diretorio_anexos)>
+															<span id="anexosAcomp" class="btn btn-success col fileinput-button" style="background:#0083CA">
+																<i class="fas fa-upload"></i>
+																<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
+															</span>
+														</cfif>
+													
+												</div>
 											</div>
 										</div>
 										
+										<div class="table table-striped files" id="previewsAcomp">
+										<div id="templateAcomp" class="row mt-2">
+											<div class="col-auto">
+												<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
+											</div>
+											<div class="col d-flex align-items-center">
+												<p class="mb-0">
+												<span class="lead" data-dz-name></span>
+												(<span data-dz-size></span>)
+												</p>
+												<strong class="error text-danger" data-dz-errormessage></strong>
+											</div>
+											<div class="col-4 d-flex align-items-center" >
+												<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
+													<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
+												</div>
+											</div>
+											
+										</div>
 									</div>
+									
+										<div id="tabAnexosAcompDiv" style="margin-top:30px;margin-bottom:50px"></div>
+									
+									
 								</div>
 								
-									<div id="tabAnexosAcompDiv" style="margin-top:30px;margin-bottom:50px"></div>
-								
-								
+								</div>
+								<!-- /.card -->
 							</div>
 							
-							</div>
-							<!-- /.card -->
 						</div>
-						
-					</div>
+					</cfif>
 					<!--FIM ANEXOS-->
 				
 				
@@ -2690,59 +2642,57 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 				// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
 				var previewNode = document.querySelector("#templateAcomp")
-				previewNode.id = ""
-				var previewTemplate = previewNode.parentNode.innerHTML
-				previewNode.parentNode.removeChild(previewNode)
+				if(previewNode){
+					previewNode.id = ""
+					var previewTemplate = previewNode.parentNode.innerHTML
+					previewNode.parentNode.removeChild(previewNode)
 
-				var myDropzoneAcomp = new Dropzone("div#tabAnexosAcompDiv", { // Make the whole body a dropzone
-					url: "cfc/pc_cfcAcompanhamentos.cfc?method=uploadArquivosOrientacao", // Set the url
-					autoProcessQueue :true,
-					thumbnailWidth: 80,
-					thumbnailHeight: 80,
-					parallelUploads: 1,
-					maxFilesize:4,
-					acceptedFiles: '.pdf,.xls,.xlsx,.zip',
-					previewTemplate: previewTemplate,
-					autoQueue: true, // Make sure the files aren't queued until manually added
-					previewsContainer: "#previewsAcomp", // Define the container to display the previews
-					clickable: "#anexosAcomp", // Define the element that should be used as click trigger to select files.
-					headers: {"pc_anexo_orientacao_id":pc_anexo_orientacao_id,
-							  "pc_anexo_avaliacao_id":pc_anexo_avaliacao_id,
-							  "pc_aval_processo":pc_aval_processo} , 							
-					init: function() {
-						this.on('error', function(file, errorMessage) {	
-							toastr.error(errorMessage);
+					var myDropzoneAcomp = new Dropzone("div#tabAnexosAcompDiv", { // Make the whole body a dropzone
+						url: "cfc/pc_cfcAcompanhamentos.cfc?method=uploadArquivosOrientacao", // Set the url
+						autoProcessQueue :true,
+						thumbnailWidth: 80,
+						thumbnailHeight: 80,
+						parallelUploads: 1,
+						maxFilesize:4,
+						acceptedFiles: '.pdf,.xls,.xlsx,.zip',
+						previewTemplate: previewTemplate,
+						autoQueue: true, // Make sure the files aren't queued until manually added
+						previewsContainer: "#previewsAcomp", // Define the container to display the previews
+						clickable: "#anexosAcomp", // Define the element that should be used as click trigger to select files.
+						headers: {"pc_anexo_orientacao_id":pc_anexo_orientacao_id,
+								"pc_anexo_avaliacao_id":pc_anexo_avaliacao_id,
+								"pc_aval_processo":pc_aval_processo} , 							
+						init: function() {
+							this.on('error', function(file, errorMessage) {	
+								toastr.error(errorMessage);
+							});
+						}
+						
+					})
+
+					
+
+					// Update the total progress bar
+					// myDropzoneAcomp.on("totaluploadprogress", function(progress) {
+					// 	document.querySelector(".progress-bar").style.width = progress + "%"
+					// })
+
+					myDropzoneAcomp.on("sending", function(file) {
+						$('#modalOverlay').modal('show')
+					})
+
+					// Hide the total progress bar when nothing's uploading anymore
+					myDropzoneAcomp.on("queuecomplete", function(progress) {
+						mostraTabAnexosOrientacoes();
+						mostraTabAnexos();
+						
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
 						});
-					}
-					
-				})
-
-				
-
-				// Update the total progress bar
-				// myDropzoneAcomp.on("totaluploadprogress", function(progress) {
-				// 	document.querySelector(".progress-bar").style.width = progress + "%"
-				// })
-
-				myDropzoneAcomp.on("sending", function(file) {
-					$('#modalOverlay').modal('show')
-				})
-
-				// Hide the total progress bar when nothing's uploading anymore
-				myDropzoneAcomp.on("queuecomplete", function(progress) {
-					mostraTabAnexosOrientacoes();
-					mostraTabAnexos();
-					
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});
-					myDropzoneAcomp.removeAllFiles(true);
-					
-				})
-
-			
-
-				
+						myDropzoneAcomp.removeAllFiles(true);
+						
+					})
+				}
 				
 				// DropzoneJS Demo Code End
 
