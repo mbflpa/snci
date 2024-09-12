@@ -31,7 +31,7 @@
 
         <cfset aux_sei = Trim('#rsInfoProcesso.pc_num_sei#')>
         <cfset aux_sei = Left(aux_sei,"5") & "." & Mid(aux_sei,"6","6") & "/" &  Mid(aux_sei,"12","4")& "-" & Right(aux_sei,"2")>
-
+        <cfset ano = RIGHT(#arguments.pc_processo_id#,4)>
         <section class="content" >
             <div id="processosCadastrados" class="container-fluid" >
                 <div class="row">
@@ -83,35 +83,36 @@
                                         </p>
                                     </fieldset>
                                     
+                                    <cfif #ano# gte 2024>
+                                        <cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
+                                            SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
+                                            INNER JOIN pc_objetivo_estrategico on pc_objetivo_estrategico.pc_objEstrategico_id = pc_processos_objEstrategicos.pc_objEstrategico_id
+                                            WHERE pc_processos_objEstrategicos.pc_processo_id = '#rsInfoProcesso.pc_processo_id#'
+                                        </cfquery>
+                                        <cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,", ")>
 
-                                    <cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
-                                        SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
-                                        INNER JOIN pc_objetivo_estrategico on pc_objetivo_estrategico.pc_objEstrategico_id = pc_processos_objEstrategicos.pc_objEstrategico_id
-                                        WHERE pc_processos_objEstrategicos.pc_processo_id = '#rsInfoProcesso.pc_processo_id#'
-                                    </cfquery>
-                                    <cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,", ")>
+                                        <cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
+                                            SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
+                                            INNER JOIN pc_risco_estrategico on pc_risco_estrategico.pc_riscoEstrategico_id = pc_processos_riscosEstrategicos.pc_riscoEstrategico_id
+                                            WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#rsInfoProcesso.pc_processo_id#'
+                                        </cfquery>
+                                        <cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,", ")>
 
-                                    <cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
-                                        SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
-                                        INNER JOIN pc_risco_estrategico on pc_risco_estrategico.pc_riscoEstrategico_id = pc_processos_riscosEstrategicos.pc_riscoEstrategico_id
-                                        WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#rsInfoProcesso.pc_processo_id#'
-                                    </cfquery>
-                                    <cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,", ")>
-
-                                    <cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
-                                        SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
-                                        INNER JOIN pc_indicador_estrategico on pc_indicador_estrategico.pc_indEstrategico_id = pc_processos_indEstrategicos.pc_indEstrategico_id
-                                        WHERE pc_processos_indEstrategicos.pc_processo_id = '#rsInfoProcesso.pc_processo_id#'
-                                    </cfquery>
-                                    <cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,", ")>
+                                        <cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
+                                            SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
+                                            INNER JOIN pc_indicador_estrategico on pc_indicador_estrategico.pc_indEstrategico_id = pc_processos_indEstrategicos.pc_indEstrategico_id
+                                            WHERE pc_processos_indEstrategicos.pc_processo_id = '#rsInfoProcesso.pc_processo_id#'
+                                        </cfquery>
+                                        <cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,", ")>
 
 
-                                    <fieldset style="padding:0px!important;min-height: 90px;">
-                                        <legend style="margin-left:20px">Informações Estratégicas:</legend>
-                                        <p style="font-size: 1em;margin-left:20px">Objetivo(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#objetivosEstrategicosList#.</span></p>
-                                        <p style="font-size: 1em;margin-left:20px">Risco(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#riscosEstrategicosList#.</span></p>
-                                        <p style="font-size: 1em;margin-left:20px">Indicador(es) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#indicadoresEstrategicosList#.</span></p>	
-                                    </fieldset>
+                                        <fieldset style="padding:0px!important;min-height: 90px;">
+                                            <legend style="margin-left:20px">Informações Estratégicas:</legend>
+                                            <p style="font-size: 1em;margin-left:20px">Objetivo(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#objetivosEstrategicosList#.</span></p>
+                                            <p style="font-size: 1em;margin-left:20px">Risco(s) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#riscosEstrategicosList#.</span></p>
+                                            <p style="font-size: 1em;margin-left:20px">Indicador(es) Estratégico(s): <span style="color:##0692c6;margin-right:50px">#indicadoresEstrategicosList#.</span></p>	
+                                        </fieldset>
+                                    </cfif>
 
                                     <cfquery datasource="#application.dsn_processos#" name="rsCoordenadorRegional">
                                         SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
@@ -131,7 +132,7 @@
                                         WHERE pc_avaliador_id_processo = '#rsInfoProcesso.pc_processo_id#'
                                     </cfquery>
                                     <cfset avaliadoresList = ValueList(rsAvaliadores.avaliadores,";<br>")>
-
+                                    
                                     <fieldset style="padding:0px!important;min-height: 90px;">
                                         <legend style="margin-left:20px">Equipe:</legend>				
                                         <p style="font-size: 1em;margin-left:20px">
