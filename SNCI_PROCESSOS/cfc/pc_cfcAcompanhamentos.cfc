@@ -568,6 +568,10 @@
 		<cfargument name="idOrientacao" type="numeric" required="true" />
 		<cfargument name="idProcesso" type="string" required="true" />
 
+		<cfquery name="rsItemNum" datasource="#application.dsn_processos#">
+			SELECT pc_aval_numeracao FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
+		</cfquery>
+
 		<session class="content-header"  >
 					
 			<!-- /.card-header -->
@@ -641,7 +645,7 @@
 
 								<li class="nav-item" style="">
 									<a  class="nav-link " id="custom-tabs-one-InfItem-tab"  data-toggle="pill" href="#custom-tabs-one-InfItem" role="tab" aria-controls="custom-tabs-one-InfItem" aria-selected="true">
-									Inf. Item ( ID <strong><cfoutput>#arguments.idAvaliacao#</cfoutput></strong> )</a>
+									<cfoutput>Inf. Item ( N° <strong>#rsItemNum.pc_aval_numeracao#</strong> - ID <strong>#arguments.idAvaliacao#</strong> )</cfoutput></a>
 								</li>
 								
 								<li class="nav-item" style="">

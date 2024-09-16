@@ -348,7 +348,8 @@
                                             <div class="card-body">
                                                 <div class="tab-content" id="custom-tabs-infoItem-tabContent" >
                                                     <div disable class="borderTexto tab-pane fade  active show" id="custom-tabs-infoItem-titulo"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-titulo-tab" style="">	
-                                                        <pre class="font-weight-light" style="color:##0083ca!important;font-size: 1em;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_descricao#</cfoutput></pre>
+                                                        
+                                                        <span class="font-weight-light" style="color:##0083ca!important;font-size: 1em;margin-left:10px"><cfoutput>N° ITEM: #rsInfoItem.pc_aval_numeracao# </cfoutput></span><pre class="font-weight-light" style="color:##0083ca!important;font-size: 1em;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_descricao#</cfoutput></pre>
                                                     </div>
                                                     <div disable class="borderTexto tab-pane fade" id="custom-tabs-infoItem-sintese" role="tabpanel" aria-labelledby="custom-tabs-infoItem-sintese-tab" style="max-height: 200px; overflow-y: auto;">
                                                         <pre class="font-weight-light" style="color:##0083ca!important;font-size: 1em;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_sintese#</cfoutput></pre>
@@ -417,7 +418,7 @@
                                                             <li >A Recuperar: <span style="color:##0692c6;">#LSCurrencyFormat(rsInfoItem.pc_aval_valorEstimadoRecuperar, 'local')#.</span></li>
                                                         </cfif>
                                                         <cfif rsInfoItem.pc_aval_valorEstimadoRisco gt 0>
-                                                            <li >Em Risco ou Valor Envolvido: <span style="color:##0692c6;">#LSCurrencyFormat(rsInfoItem.pc_aval_valorEstimadoRisco, 'local')#.</span></p>
+                                                            <li >Em Risco ou Valor Envolvido: <span style="color:##0692c6;">#LSCurrencyFormat(rsInfoItem.pc_aval_valorEstimadoRisco, 'local')#.</span></li>
                                                         </cfif>
                                                         <cfif rsInfoItem.pc_aval_valorEstimadoRisco gt 0>
                                                             <li >Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">#LSCurrencyFormat(rsInfoItem.pc_aval_valorEstimadoNaoPlanejado, 'local')#.</span></li>
