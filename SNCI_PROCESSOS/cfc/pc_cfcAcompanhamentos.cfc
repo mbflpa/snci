@@ -156,7 +156,7 @@
 													<cfelse>
 														<td  align="center"><span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;"  >#pc_orientacao_status_descricao#</span></td>
 													</cfif>
-													<td align="center">#pc_processo_id#</td>
+													<td id="pcProcId" align="center">#pc_processo_id#</td>
 													<td align="center">#pc_aval_numeracao#</td>	
 													<td align="center">#pc_aval_orientacao_id#</td>	
 													
@@ -333,16 +333,17 @@
 					var $row = $(this);
 					
 					// Obtém os valores das células ocultas
+					var pcProcID = $row.find('#pcProcId').text();
 					var pcAvalId = $row.find('#pcAvalId').text();
 					var pcAvalOrientacaoId = $row.find('#pcAvalOrientacaoId').text();
 
 					// Chama a função mostraInformacoesItensAcompanhamento com os valores
-					mostraInformacoesItensAcompanhamento(pcAvalId, pcAvalOrientacaoId);
+					mostraInformacoesItensAcompanhamento(pcProcID,pcAvalId, pcAvalOrientacaoId);
 				});
 			});
 
 			
-			function mostraInformacoesItensAcompanhamento(idAvaliacao, idOrientacao){
+			function mostraInformacoesItensAcompanhamento(idProcesso,idAvaliacao, idOrientacao){
 				
 				$('#modalOverlay').modal('show')
 				
@@ -354,18 +355,15 @@
 						data:{
 							method: "informacoesItensAcompanhamento",
 							idAvaliacao: idAvaliacao,
-							idOrientacao: idOrientacao
+							idOrientacao: idOrientacao,
+							idProcesso: idProcesso
 						},
 						async: false
 					})//fim ajax
 					.done(function(result) {
 						$('#informacoesItensAcompanhamentoDiv').html(result)
 						$(".content-wrapper").css("height","auto");//para o background cinza da div content-wrapper se estender até o final do timeline
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('html, body').animate({ scrollTop: ($('#informacoesItensAcompanhamentoDiv').offset().top-80)} , 1000);
-							$('#modalOverlay').modal('hide');
-							
-						});	
+						$('html, body').animate({ scrollTop: ($('#informacoesItensAcompanhamentoDiv').offset().top-80)} , 1000);
 					})//fim done
 					.fail(function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -568,8 +566,7 @@
 	<cffunction name="informacoesItensAcompanhamento"   access="remote" hint="envia para a página acomanhamento.cfm tabs com informações do item.">
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="idOrientacao" type="numeric" required="true" />
-
-		
+		<cfargument name="idProcesso" type="string" required="true" />
 
 		<session class="content-header"  >
 					
@@ -579,42 +576,7 @@
 
 
 					<div id="idAvaliacao" hidden></div>
-
-					<cfquery name="rsProcAval" datasource="#application.dsn_processos#">
-						SELECT      pc_processos.*, pc_avaliacoes.*,pc_avaliacao_orientacoes.*,pc_aval_orientacao_mcu_orgaoResp as mcuOrgaoResp
-									,pc_aval_orientacao_mcu_orgaoResp as mcuOrgResp, pc_orgaos.pc_org_sigla as siglaOrgResp
-									,pc_num_orgao_avaliado as mcuOrgAvaliado,  pc_orgaos2.pc_org_sigla as siglaOrgAvaliado
-									,pc_num_orgao_origem as mcuOrgOrigem,  pc_orgaos3.pc_org_sigla as siglaOrgOrigem
-									,pc_avaliacao_tipos.*, pc_classificacoes.*
-						            ,pc_status_card_style_ribbon, pc_status_card_nome_ribbon
-									,CONCAT(
-									'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-									' -> N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-									' -> N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-									' -> N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
-									) as tipoProcesso
-						FROM        pc_processos 
-									INNER JOIN pc_avaliacoes on pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo 
-									INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval =  pc_aval_id
-									INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-									INNER JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_num_orgao_avaliado
-									INNER JOIN pc_orgaos as pc_orgaos3 on pc_orgaos3.pc_org_mcu = pc_num_orgao_origem
-									INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
-									INNER JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
-									LEFT JOIN pc_status on pc_status.pc_status_id = pc_processos.pc_num_status
-						WHERE  pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#"> 
-						and pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idOrientacao#">	 													
-					</cfquery>	
-
-					<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
-						SELECT pc_orgaos.*FROM pc_orgaos
-						WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#'  
-								or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#rsProcAval.pc_num_orgao_avaliado#'))
-						ORDER BY pc_org_sigla
-					</cfquery>
-
-
-				
+		
 					<input id="pcProcessoId"  required="" hidden  value="#arguments.idAvaliacao#">
 			
 				
@@ -634,6 +596,7 @@
 							-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 							-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							font-weight: 400 !important;
 						}
 
 						legend {
@@ -656,30 +619,19 @@
 							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 
 						}
+
+						
 					
 					</style>
 						
-					<div class="card-header" style="background-color: #0083CA;border-bottom:solid 2px #fff" >
-						<cfoutput>
-							<p id="descricaoItem" style="font-size: 1em;color:##fff"><strong>Item: #rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong>
-							<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
-							<!--<i id="start-tour2" style="color:##8cc63f;margin-left:20px;font-size: 1.3em;" class="fas fa-question-circle grow-icon"></i>-->
-							</cfif>
-							</p>
-						</cfoutput>	
-					</div>
+					
 					<div class="card card-primary card-tabs"  style="widht:100%">
 						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
 								<li class="nav-item" style="">
 									<a  class="nav-link  active" id="custom-tabs-one-Orientacao-tab"  data-toggle="pill" href="#custom-tabs-one-Orientacao" role="tab" aria-controls="custom-tabs-one-Orientacao" aria-selected="true">
-									<cfoutput>
-										
-										Orientação p/ regularização: ID <strong>#rsProcAval.pc_aval_orientacao_id#</strong> - #rsProcAval.siglaOrgResp# (#rsProcAval.mcuOrgResp#)
-										
-									</cfoutput>
-									</a>
+									Medida/Orientação ID (<strong><cfoutput>#arguments.idOrientacao#</cfoutput></strong>)</a>
 								</li>
 								
 
@@ -688,7 +640,8 @@
 								</li>
 
 								<li class="nav-item" style="">
-									<a  class="nav-link " id="custom-tabs-one-InfItem-tab"  data-toggle="pill" href="#custom-tabs-one-InfItem" role="tab" aria-controls="custom-tabs-one-InfItem" aria-selected="true">Inf. Item</a>
+									<a  class="nav-link " id="custom-tabs-one-InfItem-tab"  data-toggle="pill" href="#custom-tabs-one-InfItem" role="tab" aria-controls="custom-tabs-one-InfItem" aria-selected="true">
+									Inf. Item ( ID <strong><cfoutput>#arguments.idAvaliacao#</cfoutput></strong> )</a>
 								</li>
 								
 								<li class="nav-item" style="">
@@ -703,13 +656,8 @@
 						</div>
 						<div class="card-body">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
-								<div disable class="borderTexto tab-pane fade  active show " id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" style="max-height: 200px; overflow-y: auto;">	
-									
-									<cfif rsProcAval.pc_aval_orientacao_distribuido eq 1>
-										<div style=" display: inline;background-color: #e83e8c;color:#fff;padding: 3px;margin-left: 10px;">Orientação distribuída pelo órgão subordinador:</div>
-									</cfif>
-																						
-									<pre style="color:#0083ca!important"><cfoutput><strong>#rsProcAval.pc_aval_orientacao_descricao#</strong></cfoutput></pre>
+								<div disable class="tab-pane fade  active show " id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >	
+									<div id="infoOrientacaoDiv" ></div>
 								</div>
 
 
@@ -869,10 +817,9 @@
 				});
 
 				<cfoutput>
-					var pc_aval_status = '#rsProcAval.pc_aval_status#'
-					var pc_aval_id = '#rsProcAval.pc_aval_id#';
-					var pc_orientacao_id = '#rsProcAval.pc_aval_orientacao_id#';
-					var pc_processo_id = '#rsProcAval.pc_processo_id#';
+					var pc_aval_id = '#arguments.idAvaliacao#';
+					var pc_aval_orientacao_id = '#arguments.idOrientacao#';
+					var pc_processo_id = '#arguments.idProcesso#';
 				</cfoutput>
 								
 				$('#tab-manifestacao').click(function() {
@@ -882,6 +829,10 @@
 
 				$('#tab-distribuicao').click(function() {
 					$('html, body').animate({ scrollTop: ($('#tab-distribuicao').offset().top)-60} , 1000);
+				});
+
+				$('#custom-tabs-one-Orientacao-tab').on('click', function (event){
+					mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id);
 				});
 
 				$('#custom-tabs-one-InfProcesso-tab').on('click', function (event){
@@ -897,16 +848,17 @@
 				});
 
 				$('#custom-tabs-one-Anexos-tab').on('click', function (event){
-					mostraTabAnexos('tabAnexosDiv',pc_aval_id,pc_orientacao_id);
+					mostraTabAnexos('tabAnexosDiv',pc_aval_id,pc_aval_orientacao_id);
 				});
 				
+				mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id);
 				
 			})
 
 			
 			<cfoutput>
-				var pc_aval_id = '#rsProcAval.pc_aval_id#';
-				var pc_orientacao_id = '#rsProcAval.pc_aval_orientacao_id#';
+				var pc_aval_id = '#arguments.idAvaliacao#';
+				var pc_aval_orientacao_id = '#arguments.idOrientacao#';
 			</cfoutput>
 
 			
@@ -947,7 +899,7 @@
 									url: "cfc/pc_cfcAcompanhamentos.cfc",
 									data:{
 										method: "distribuirOrientacoes",
-										pc_aval_orientacao_id: pc_orientacao_id,
+										pc_aval_orientacao_id: pc_aval_orientacao_id,
 										pcAreasDistribuir: $('#pcOrgaoRespDistribuicao').val().join(','),
 										pcOrientacaoResposta: $('#pcOrientacaoResposta').val()
 									},
@@ -1431,14 +1383,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 			WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.idMelhoria#" cfsqltype="cf_sql_numeric">
 		</cfquery>
 
-		<cfquery name="rs_OrgAvaliado" datasource="#application.dsn_processos#">
-			SELECT pc_orgaos.*FROM pc_orgaos
-			WHERE pc_org_controle_interno ='N' AND (pc_org_Status = 'A') and (pc_org_mcu_subord_tec = '#rsMelhoriaPosic.pc_num_orgao_avaliado#' or pc_org_mcu = '#rsMelhoriaPosic.pc_num_orgao_avaliado#' 
-					or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#rsMelhoriaPosic.pc_num_orgao_avaliado#'))
-			ORDER BY pc_org_sigla
-		</cfquery>
-
-	
+		
 		
 
 		<div class="card-header" style="background-color:#ececec;" >
@@ -1679,6 +1624,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 							-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 							-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							font-weight: 400 !important;
 						}
 
 						legend {
@@ -3073,7 +3019,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 			function mostraTabAnexosOrientacoes(){
 				
 				<cfoutput>
-					var  pc_orientacao_id = '#rsProc.pc_aval_orientacao_id#';
+					var  pc_aval_orientacao_id = '#rsProc.pc_aval_orientacao_id#';
 				</cfoutput>
 				setTimeout(function() {
 					$.ajax({
@@ -3081,7 +3027,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 							url: "cfc/pc_cfcAvaliacoes.cfc",
 							data:{
 								method: "tabAnexosOrientacoes",
-								pc_orientacao_id: pc_orientacao_id
+								pc_orientacao_id: pc_aval_orientacao_id
 							},
 							async: false
 						})//fim ajax
@@ -3666,7 +3612,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 			function mostraTabAnexosOrientacoes(){
 				////$('#modalOverlay').modal('show')
 				<cfoutput>
-					var  pc_orientacao_id = '#rsProc.pc_aval_orientacao_id#';
+					var  pc_aval_orientacao_id = '#rsProc.pc_aval_orientacao_id#';
 				</cfoutput>
 					setTimeout(function() {	
 						$.ajax({
@@ -3674,7 +3620,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 							url: "cfc/pc_cfcAvaliacoes.cfc",
 							data:{
 								method: "tabAnexosOrientacoes",
-								pc_orientacao_id: pc_orientacao_id
+								pc_orientacao_id: pc_aval_orientacao_id
 							},
 							async: false
 						})//fim ajax

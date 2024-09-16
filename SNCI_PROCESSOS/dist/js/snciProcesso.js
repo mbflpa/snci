@@ -913,9 +913,46 @@ function setupCharCounter(inputId, spanId, maxChars) {
     });
 }
 
+function mostraInfoOrientacao(divId, pc_processo_id, pc_aval_orientacao_id){
+    $('#modalOverlay').modal('show');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
+    setTimeout(function() {
+        $.ajax({
+            type: "post",
+            url:"cfc/pc_cfcInfoProcessosItens.cfc",
+            data:{
+                method: "infoOrientacao",
+                pc_processo_id: pc_processo_id,
+                pc_aval_orientacao_id: pc_aval_orientacao_id
+            },
+            async: false
+        })//fim ajax
+        .done(function(result){
+            $('#' + divId).html(result);
+            //$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfOrientacao-tab').offset().top)-60} , 1000);
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#' + divId).attr("hidden",false);
+                $('#modalOverlay').modal('hide');
+            });
+        })//fim done
+        .fail(function(xhr, ajaxOptions, thrownError) {
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+            $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(thrownError)
+
+        })//fim fail
+
+    }, 200);
+}
+
 function mostraInfoProcesso(divId, pc_processo_id){
     $('#modalOverlay').modal('show');
-    $('#infoProcessoDiv').html('');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
     setTimeout(function() {
         $.ajax({
             type: "post",
@@ -930,6 +967,7 @@ function mostraInfoProcesso(divId, pc_processo_id){
             $('#' + divId).html(result);
             //$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfProcesso-tab').offset().top)-60} , 1000);
             $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#' + divId).attr("hidden",false);
                 $('#modalOverlay').modal('hide');
             });
         })//fim done
@@ -942,9 +980,7 @@ function mostraInfoProcesso(divId, pc_processo_id){
             $('#modal-danger').find('.modal-body').text(thrownError)
 
         })//fim fail
-        $('#modalOverlay').delay(1000).hide(0, function() {
-            $('#modalOverlay').modal('hide');
-        });
+       
     }, 200);
     
 
@@ -952,7 +988,8 @@ function mostraInfoProcesso(divId, pc_processo_id){
 
 function mostraInfoItem(divId, pc_processo_id, pc_aval_id){
     $('#modalOverlay').modal('show');
-    $('#infoItemDiv').html('');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
     setTimeout(function() {
         $.ajax({
             type: "post",
@@ -968,6 +1005,7 @@ function mostraInfoItem(divId, pc_processo_id, pc_aval_id){
             $('#' + divId).html(result);
             //$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfItem-tab').offset().top)-60} , 1000);
             $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#' + divId).attr("hidden",false);
                 $('#modalOverlay').modal('hide');
             });
         })//fim done
@@ -980,9 +1018,7 @@ function mostraInfoItem(divId, pc_processo_id, pc_aval_id){
             $('#modal-danger').find('.modal-body').text(thrownError)
 
         })//fim fail
-        $('#modalOverlay').delay(1000).hide(0, function() {
-            $('#modalOverlay').modal('hide');
-        });
+       
     }, 200);
     
 
@@ -990,7 +1026,8 @@ function mostraInfoItem(divId, pc_processo_id, pc_aval_id){
 
 function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios){
     $('#modalOverlay').modal('show');
-    $('#infoItemDiv').html('');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
     setTimeout(function() {
         $.ajax({
             type: "post",
@@ -1004,6 +1041,10 @@ function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios){
         })//fim ajax
         .done(function(result){
             $('#' + divId).html(result);
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+                $('#' + divId).attr("hidden",false);
+            });
         })//fim done
         .fail(function(xhr, ajaxOptions, thrownError) {
             $('#modalOverlay').delay(1000).hide(0, function() {
@@ -1014,16 +1055,15 @@ function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios){
             $('#modal-danger').find('.modal-body').text(thrownError)
 
         })//fim fail
-        $('#modalOverlay').delay(1000).hide(0, function() {
-            $('#modalOverlay').modal('hide');
-        });
+        
     }, 200);
 
 }
 
 function mostraTabAnexos(divId, pc_aval_id, pc_orientacao_id){
     $('#modalOverlay').modal('show');
-    $('#infoItemDiv').html('');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
     setTimeout(function() {    
         $.ajax({
             type: "post",
@@ -1037,6 +1077,10 @@ function mostraTabAnexos(divId, pc_aval_id, pc_orientacao_id){
         })//fim ajax
         .done(function(result) {
             $('#' + divId).html(result);
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#' + divId).attr("hidden",false);
+                $('#modalOverlay').modal('hide');
+            });
         })//fim done
         .fail(function(xhr, ajaxOptions, thrownError) {
             $('#modalOverlay').delay(1000).hide(0, function() {
@@ -1047,8 +1091,43 @@ function mostraTabAnexos(divId, pc_aval_id, pc_orientacao_id){
             $('#modal-danger').find('.modal-body').text(thrownError)
 
         })//fim fail
-        $('#modalOverlay').delay(1000).hide(0, function() {
-            $('#modalOverlay').modal('hide');
-        });
+       
+    }, 200);
+}
+
+
+function mostraInfoMelhoria(divId, pc_processo_id, pc_aval_melhoria_id){
+    $('#modalOverlay').modal('show');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
+    setTimeout(function() {
+        $.ajax({
+            type: "post",
+            url:"cfc/pc_cfcInfoProcessosItens.cfc",
+            data:{
+                method: "infoMelhoria",
+                pc_processo_id: pc_processo_id,
+                pc_aval_melhoria_id: pc_aval_melhoria_id
+            },
+            async: false
+        })//fim ajax
+        .done(function(result){
+            $('#' + divId).html(result);
+            //$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfMelhoria-tab').offset().top)-60} , 1000);
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#' + divId).attr("hidden",false);
+                $('#modalOverlay').modal('hide');
+            });
+        })//fim done
+        .fail(function(xhr, ajaxOptions, thrownError) {
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+            $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(thrownError)
+
+        })//fim fail
+
     }, 200);
 }

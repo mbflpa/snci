@@ -40,6 +40,7 @@
 					-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 					-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 					box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+					font-weight: 400 !important;
 				}
 
 				legend {
@@ -74,6 +75,7 @@
 					-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 					-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
 					box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+					font-weight: 400 !important;
 				}
 
 				legend {
