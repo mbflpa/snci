@@ -191,7 +191,7 @@
 														<td align="center"><span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;" >#pc_orientacao_status_descricao#</span></td>
 													</cfif>
 													<td align="center">#statusFinalizador#</td>
-													<td align="center">#pc_processo_id#</td>
+													<td id="pcProcId" align="center">#pc_processo_id#</td>
 													<td align="center">#pc_aval_numeracao#</td>	
 													<td align="center">#pc_aval_orientacao_id#</td>
 													
@@ -375,11 +375,12 @@
 					var $row = $(this);
 					
 					// Obtém os valores das células ocultas
+					var pcProcID = $row.find('#pcProcId').text();
 					var pcAvalId = $row.find('#pcAvalId').text();
 					var pcAvalOrientacaoId = $row.find('#pcAvalOrientacaoId').text();
 
 					// Chama a função mostraInformacoesItensConsulta com os valores
-					mostraInformacoesItensConsulta(pcAvalId, pcAvalOrientacaoId);
+					mostraInformacoesItensConsulta(pcProcID, pcAvalId, pcAvalOrientacaoId);
 				});
 
 
@@ -388,7 +389,7 @@
 
 			
 
-			function mostraInformacoesItensConsulta(idAvaliacao, idOrientacao){
+			function mostraInformacoesItensConsulta(idProcesso,idAvaliacao, idOrientacao){
 				
 
 				$('#modalOverlay').modal('show')
@@ -401,7 +402,8 @@
 							data:{
 								method: "informacoesItensConsulta",
 								idAvaliacao: idAvaliacao,
-								idOrientacao: idOrientacao
+								idOrientacao: idOrientacao,
+								idProcesso: idProcesso
 							},
 							async: false
 						})//fim ajax
@@ -743,6 +745,7 @@
 	<cffunction name="informacoesItensConsulta"   access="remote" hint="envia para a página acomanhamento.cfm tabs com informações do item.">
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="idOrientacao" type="numeric" required="true" />
+		<cfargument name="idProcesso" type="string" required="true" />
 
 		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam value="#arguments.idAvaliacao#" cfsqltype="cf_sql_integer">
@@ -757,31 +760,9 @@
 
 					<div id="idAvaliacao" hidden></div>
 
-					<cfquery name="rsProcAval" datasource="#application.dsn_processos#">
-						SELECT      pc_processos.*, pc_avaliacoes.*,pc_avaliacao_orientacoes.*,pc_aval_orientacao_mcu_orgaoResp as mcuOrgaoResp
-									,pc_aval_orientacao_mcu_orgaoResp as mcuOrgResp, pc_orgaos.pc_org_sigla as siglaOrgResp
-									,pc_num_orgao_avaliado as mcuOrgAvaliado,  pc_orgaos2.pc_org_sigla as siglaOrgAvaliado
-									,pc_num_orgao_origem as mcuOrgOrigem,  pc_orgaos3.pc_org_sigla as siglaOrgOrigem
-									,pc_avaliacao_tipos.*, pc_classificacoes.*
-									,pc_status_card_style_ribbon, pc_status_card_nome_ribbon
-									, CONCAT(
-										'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
-										' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
-										' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
-										' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
-									) as tipoProcesso
-						FROM        pc_processos 
-									INNER JOIN pc_avaliacoes on pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo 
-									INNER JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval =  pc_aval_id
-									INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-									INNER JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_num_orgao_avaliado
-									INNER JOIN pc_orgaos as pc_orgaos3 on pc_orgaos3.pc_org_mcu = pc_num_orgao_origem
-									INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
-									INNER JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
-									LEFT JOIN pc_status on pc_status.pc_status_id = pc_processos.pc_num_status
-						WHERE  pc_aval_id = <cfqueryparam value="#arguments.idAvaliacao#" cfsqltype="cf_sql_integer"> 	 
-						and pc_aval_orientacao_id = <cfqueryparam value="#arguments.idOrientacao#" cfsqltype="cf_sql_integer"> 	 													
-					</cfquery>	
+					<cfquery name="rsItemNum" datasource="#application.dsn_processos#">
+						SELECT pc_aval_numeracao FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
+					</cfquery>
 
 					
 
@@ -796,26 +777,51 @@
 						.nav-tabs {
 							border-bottom: none!important;
 						}
-						
+						.card-header p {
+							margin-bottom: 5px;
+						}
+						fieldset{
+							border: 1px solid #ced4da!important;
+							border-radius: 8px!important;
+							padding: 20px!important;
+							margin-bottom: 10px!important;
+							background: none!important;
+							-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							font-weight: 400 !important;
+						}
+
+						legend {
+							font-size: 0.8rem!important;
+							color: #fff!important;
+							background-color: #0083ca!important;
+							border: 1px solid #ced4da!important;
+							border-radius: 5px!important;
+							padding: 5px!important;
+							width: auto!important;
+						}
+
+						.borderTexto{
+							border: 1px solid #ced4da!important;
+							border-radius: 8px!important;
+							padding: 10px!important;
+							background: none!important;
+							-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+
+						}
 					</style>
 						
-					<div class="card-header" style="background-color: #0083CA;border-bottom:solid 2px #fff" >
-						<cfoutput>
-							<p style="font-size: 1.3em;color:##fff"><strong>Item: #rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong></p>
-						</cfoutput>	
-					</div>
+					
 					<div class="card card-primary card-tabs"  style="widht:100%">
 						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
 								<li class="nav-item" style="">
 									<a  class="nav-link  active" id="custom-tabs-one-Orientacao-tab"  data-toggle="pill" href="#custom-tabs-one-Orientacao" role="tab" aria-controls="custom-tabs-one-Orientacao" aria-selected="true">
-									<cfoutput>
-										
-										ORIENTAÇÃO: ID <strong>#rsProcAval.pc_aval_orientacao_id#</strong> - #rsProcAval.siglaOrgAvaliado# (#rsProcAval.mcuOrgResp#)
-										
-									</cfoutput>
-									</a>
+									Medida/Orientação ID (<strong><cfoutput>#arguments.idOrientacao#</cfoutput></strong>)</a>
 								</li>
 								
 
@@ -824,7 +830,8 @@
 								</li>
 
 								<li class="nav-item" style="">
-									<a  class="nav-link " id="custom-tabs-one-InfItem-tab"  data-toggle="pill" href="#custom-tabs-one-InfItem" role="tab" aria-controls="custom-tabs-one-InfItem" aria-selected="true">Inf. Item</a>
+									<a  class="nav-link " id="custom-tabs-one-InfItem-tab"  data-toggle="pill" href="#custom-tabs-one-InfItem" role="tab" aria-controls="custom-tabs-one-InfItem" aria-selected="true">
+									<cfoutput>Inf. Item ( N° <strong>#rsItemNum.pc_aval_numeracao#</strong> - ID <strong>#arguments.idAvaliacao#</strong> )</cfoutput></a>
 								</li>
 								
 								<li class="nav-item" style="">
@@ -839,198 +846,17 @@
 						</div>
 						<div class="card-body">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
-								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >		
-										<cfif rsProcAval.pc_aval_orientacao_distribuido eq 1>
-											<div style=" display: inline;background-color: #e83e8c;color:#fff;padding: 3px;margin-left: 10px;">Orientação distribuída pelo órgão subordinador:</div>
-										</cfif>						
-										<pre style="color:#0083ca!important"><cfoutput><strong>#rsProcAval.pc_aval_orientacao_descricao#</strong></cfoutput></pre>
+								<div disable class="tab-pane fade  active show " id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >	
+									<div id="infoOrientacaoDiv" ></div>
 								</div>
 
-                               
-
-								
 
 								<div disable class="tab-pane fade" id="custom-tabs-one-InfProcesso"  role="tabpanel" aria-labelledby="custom-tabs-one-InfProcesso-tab" >								
-									<cfset aux_sei = Trim('#rsProcAval.pc_num_sei#')>
-									<cfset aux_sei = Left(aux_sei,"5") & "." & Mid(aux_sei,"6","6") & "/" &  Mid(aux_sei,"12","4")& "-" & Right(aux_sei,"2")>
-		
-									<section class="content" >
-										<div id="processosCadastrados" class="container-fluid" >
-											<div class="row">
-												<div id="cartao" style="width:100%;" >
-													<!-- small card -->
-													<cfoutput>
-														<div class="small-box " style=" font-weight: bold;">
-															<div class="ribbon-wrapper ribbon-xl" >
-																<div class="ribbon" style="font-size:18px!important;left:8px;<cfoutput>#rsProcAval.pc_status_card_style_ribbon#</cfoutput>"><cfoutput>#rsProcAval.pc_status_card_nome_ribbon#</cfoutput></div>
-															</div>
-															<div class="card-header" style="height:auto">
-																<p style="font-size: 1.5em;">Processo SNCI n°: <strong style="color:##0692c6;margin-right:30px">#rsProcAval.pc_processo_id#</strong> 
-																	
-																</strong> Órgão Avaliado: <strong style="color:##0692c6">#rsProcAval.siglaOrgAvaliado#</strong></p>
-																
-																
-																<p style="font-size: 1em;">Origem: <strong style="color:##0692c6;margin-right:30px">#rsProcAval.siglaOrgOrigem#</strong>
-																
-																<cfif #rsProcAval.pc_modalidade# eq 'A' OR #rsProcAval.pc_modalidade# eq 'E'>
-																	<span >Processo SEI n°: </span> <strong style="color:##0692c6">#aux_sei#</strong> <span style="margin-left:20px">Relatório n°:</span> <strong style="color:##0692c6">#rsProcAval.pc_num_rel_sei#</strong>
-																</cfif></p>
-																
-																
-																<cfif rsProcAval.pc_num_avaliacao_tipo neq 445 and rsProcAval.pc_num_avaliacao_tipo neq 2>
-																	<cfif rsProcAval.pc_aval_tipo_descricao neq ''>
-																		<p style="font-size: 1em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcAval.pc_aval_tipo_descricao#</strong></p>
-																	<cfelse>
-																		<p style="font-size: 1em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcAval.tipoProcesso#</strong></p>
-																	</cfif>
-																<cfelse>
-																	<p style="font-size: 1em;">Tipo de Avaliação: <strong style="color:##0692c6">#rsProcAval.pc_aval_tipo_nao_aplica_descricao#</strong></p>
-																</cfif>
-
-
-
-
-																<p style="font-size: 1em;">
-																	Classificação: <strong style="color:##0692c6;margin-right:50px">#rsProcAval.pc_class_descricao#</strong>
-																	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' >	
-																		Modalidade: 
-																		<cfif #rsProcAval.pc_modalidade# eq 'N'>
-																			<strong style="color:##0692c6;margin-right:50px">Normal</strong>
-																		</cfif>
-																		<cfif #rsProcAval.pc_modalidade# eq 'A'>
-																			<strong style="color:##0692c6;margin-right:50px">ACOMPANHAMENTO</strong>
-																		</cfif>
-																		<cfif #rsProcAval.pc_modalidade# eq 'E'>
-																			<strong style="color:##0692c6;margin-right:50px">ENTREGA DO RELATÓRIO</strong>
-																		</cfif>
-																	</cfif>
-																	Tipo de Demanda: 
-																	<cfif #rsProcAval.pc_tipo_demanda# eq 'P'>
-																		<strong style="color:##0692c6;margin-right:50px">PLANEJADA</strong>
-																	<cfelseif #rsProcAval.pc_tipo_demanda# eq 'E'>
-																		<strong style="color:##0692c6">EXTRAORDINÁRIA</strong>
-																	<cfelse>
-																		<strong style="color:##0692c6">Não informado</strong>
-																	</cfif>
-
-																	<cfif #rsProcAval.pc_tipo_demanda# eq 'P' >
-																		Ano PACIN: <strong style="color:##0692c6;margin-right:50px">#rsProcAval.pc_ano_pacin#</strong>
-																	</cfif>
-																</p>
-
-																<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorRegional">
-																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
-																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
-																	WHERE pc_usu_matricula = '#rsProcAval.pc_usu_matricula_coordenador#'
-																</cfquery>
-																<cfquery datasource="#application.dsn_processos#" name="rsCoordenadorNacional">
-																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_usuarios
-																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
-																	WHERE pc_usu_matricula = '#rsProcAval.pc_usu_matricula_coordenador_nacional#'
-																</cfquery>
-
-																<cfquery datasource="#application.dsn_processos#" name="rsAvaliadores">
-																	SELECT pc_usu_matricula, pc_usu_nome, pc_org_se_sigla FROM pc_avaliadores
-																	INNER JOIN pc_usuarios on pc_usu_matricula = pc_avaliador_matricula
-																	INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
-																	WHERE pc_avaliador_id_processo = '#rsProcAval.pc_processo_id#'
-																</cfquery>
-
-
-																<p style="font-size: 1em;">
-																	<cfif rsCoordenadorRegional.recordcount neq 0>
-																		Coordenador Regional: <strong style="color:##0692c6;margin-right:50px">#rsCoordenadorRegional.pc_usu_nome# (#rsCoordenadorRegional.pc_org_se_sigla#)</strong>
-																	</cfif>
-																	<cfif rsCoordenadorNacional.recordcount neq 0>	
-																		Coordenador Nacional: <strong style="color:##0692c6;margin-right:50px">#rsCoordenadorNacional.pc_usu_nome# (#rsCoordenadorNacional.pc_org_se_sigla#)</strong>
-																	</cfif>
-																</p>
-
-																<cfif rsAvaliadores.recordcount neq 0>
-																	<p style="font-size: 1em;">
-																		Avaliadores:<br> 
-																		<cfloop query="rsAvaliadores">
-																			<strong style="color:##0692c6;margin-right:50px">#pc_usu_nome# (#pc_org_se_sigla#)</strong><br>
-																		</cfloop>
-																	</p>
-																</cfif>
-
-
-																
-																
-
-															</div>
-														</div>
-													</cfoutput>
-												</div>
-											</div>
-										</div>
-										
-									</section>
+									<div id="infoProcessoDiv" ></div>
 								</div>
 
 								<div disable class="tab-pane fade" id="custom-tabs-one-InfItem"  role="tabpanel" aria-labelledby="custom-tabs-one-InfItem-tab" >								
-									<cfset classifRisco = "">
-									<cfif #rsProcAval.pc_aval_classificacao# eq 'L'>
-										<cfset classifRisco = "Leve">
-									</cfif>	
-									<cfif #rsProcAval.pc_aval_classificacao# eq 'M'>
-										<cfset classifRisco = "Mediana">
-									</cfif>	
-									<cfif #rsProcAval.pc_aval_classificacao# eq 'G'>
-										<cfset classifRisco = "Grave">
-									</cfif>	
-									<section class="content" >
-										<div id="processosCadastrados" class="container-fluid" >
-											<div class="row">
-												<div id="cartao" style="width:100%;" >
-													<!-- small card -->
-													<cfoutput>
-														<div class="small-box " style=" font-weight: bold;">
-															
-															<div class="card-header" style="height:auto">
-																<p style="font-size: 1.3em;">Item: <span style="color:##0692c6;">#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</span></p>
-																<p style="font-size: 1.3em;">Classificação: <span style="color:##0692c6;">#classifRisco#</span></p>
-																
-																<cfset ano = RIGHT(#rsProcAval.pc_processo_id#,4)>
-																<cfif #ano# lte 2023>
-																	<cfif #rsProcAval.pc_aval_vaFalta# gt 0 or  #rsProcAval.pc_aval_vaSobra# gt 0 or  #rsProcAval.pc_aval_vaRisco# gt 0 >
-																 		<p style="font-size: 1.3em;">Valor Envolvido: 
-																			<cfif #rsProcAval.pc_aval_vaFalta# gt 0>
-																				<cfset valorApurado = #LSCurrencyFormat( rsProcAval.pc_aval_vaFalta, 'local')#>
-																				<span style="color:##0692c6;">Falta =  #valorApurado#; </span>
-																			</cfif>
-																			<cfif #rsProcAval.pc_aval_vaSobra# gt 0>
-																				<cfset valorApurado = #LSCurrencyFormat( rsProcAval.pc_aval_vaSobra, 'local')#>
-																				<span style="color:##0692c6;">Sobra =  #valorApurado#; </span>
-																			</cfif>
-																			<cfif #rsProcAval.pc_aval_vaRisco# gt 0>
-																				<cfset valorApurado = #LSCurrencyFormat( rsProcAval.pc_aval_vaRisco, 'local')#>
-																				<span style="color:##0692c6;">Risco =  #valorApurado#; </span>
-																			</cfif>
-																		</p>
-																	<cfelse>
-																		<p style="font-size: 1.3em;">Valor Envolvido: <span style="color:##0692c6;">Não quantificado</span></p>
-																	</cfif>
-																<cfelse>
-																	<cfif rsProcAval.pc_aval_valorEstimadoRecuperar gt 0>
-																		<p style="font-size: 1.3em;">Potencial Valor Estimado a Recuperar: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRecuperar, 'local')#</span></p>
-																	</cfif>
-																	<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
-																		<p style="font-size: 1.3em;">Potencial Valor Estimado em Risco ou Valor Envolvido: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoRisco, 'local')#</span></p>
-																	</cfif>
-																	<cfif rsProcAval.pc_aval_valorEstimadoRisco gt 0>
-																		<p style="font-size: 1.3em;">Potencial Valor Estimado Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">#LSCurrencyFormat(rsProcAval.pc_aval_valorEstimadoNaoPlanejado, 'local')#</span></p>
-																	</cfif>
-																</cfif>
-															</div>
-														</div>
-													</cfoutput>
-												</div>
-											</div>
-										</div>
-										
-									</section>
+									<div id="infoItemDiv" ></div>
 								</div>
 								
 								<div disable class="tab-pane fade" id="custom-tabs-one-Avaliacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Avaliacao-tab" >								
@@ -1067,13 +893,31 @@
 
 			$(document).ready(function() {	
 				<cfoutput>
-					var pc_aval_status = '#rsProcAval.pc_aval_status#'
-					
+					var pc_aval_id = '#arguments.idAvaliacao#';
+					var pc_aval_orientacao_id = '#arguments.idOrientacao#';
+					var pc_processo_id = '#arguments.idProcesso#';
 				</cfoutput>
-				mostraRelatoPDF();
-				mostraTabAnexos();
-				//mostraTabOrientacoes();
-				//mostraTabMelhorias();
+				$('#custom-tabs-one-Orientacao-tab').on('click', function (event){
+					mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id);
+				});
+
+				$('#custom-tabs-one-InfProcesso-tab').on('click', function (event){
+					mostraInfoProcesso('infoProcessoDiv',pc_processo_id);
+				});
+
+				$('#custom-tabs-one-InfItem-tab').on('click', function (event){
+					mostraInfoItem('infoItemDiv',pc_processo_id,pc_aval_id);
+				});	
+
+				$('#custom-tabs-one-Avaliacao-tab').on('click', function (event){
+					mostraRelatoPDF('anexoAvaliacaoDiv',pc_aval_id,'S');
+				});
+
+				$('#custom-tabs-one-Anexos-tab').on('click', function (event){
+					mostraTabAnexos('tabAnexosDiv',pc_aval_id,pc_aval_orientacao_id);
+				});
+				
+				mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id,'custom-tabs-one-Orientacao-tab');
 			})
 
 			$(function () {
@@ -1081,68 +925,9 @@
 			})
 
 
-			<cfoutput>
-				var pc_aval_id = '#arguments.idAvaliacao#';
-				var pc_orientacao_id = '#arguments.idOrientacao#';
-			</cfoutput>
-
-			function mostraTabAnexos(){
-				
-				$.ajax({
-						type: "post",
-						url: "cfc/pc_cfcAvaliacoes.cfc",
-						data:{
-							method: "tabAnexos",
-							pc_aval_id: pc_aval_id,
-							pc_orientacao_id: pc_orientacao_id
-						},
-						async: false
-					})//fim ajax
-					.done(function(result) {
-						$('#tabAnexosDiv').html(result)
-						
-						
-					})//fim done
-					.fail(function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-						$('#modal-danger').modal('show')
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-						$('#modal-danger').find('.modal-body').text(thrownError)
-
-					})//fim fail
-
-			}
-
-			function mostraRelatoPDF(){
-				
-				$.ajax({
-					type: "post",
-					url:"cfc/pc_cfcAvaliacoes.cfc",
-					data:{
-						method: "anexoAvaliacao",
-						pc_aval_id: pc_aval_id,
-						todosOsRelatorios:'S'
-					},
-					async: false
-				})//fim ajax
-				.done(function(result){
-					
-					$('#anexoAvaliacaoDiv').html(result)
-					
-				})//fim done
-				.fail(function(xhr, ajaxOptions, thrownError) {
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});
-					$('#modal-danger').modal('show')
-					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-					$('#modal-danger').find('.modal-body').text(thrownError)
-
-				})//fim fail
 			
-			}
+
+			
 
 
 
