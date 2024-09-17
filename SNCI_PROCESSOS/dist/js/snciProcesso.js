@@ -913,7 +913,7 @@ function setupCharCounter(inputId, spanId, maxChars) {
     });
 }
 
-function mostraInfoOrientacao(divId, pc_processo_id, pc_aval_orientacao_id){
+function mostraInfoOrientacao(divId, pc_processo_id, pc_aval_orientacao_id, tab){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
     $('#' + divId).attr("hidden",true);
@@ -933,6 +933,12 @@ function mostraInfoOrientacao(divId, pc_processo_id, pc_aval_orientacao_id){
             //$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfOrientacao-tab').offset().top)-60} , 1000);
             $('#modalOverlay').delay(1000).hide(0, function() {
                 $('#' + divId).attr("hidden",false);
+                // Verifica se tab foi informado e realiza o scroll
+                if (tab) {
+                    $('html, body').animate({
+                        scrollTop: ($('#' + tab).offset().top) - 60
+                    }, 1000);
+                }
                 $('#modalOverlay').modal('hide');
             });
         })//fim done
@@ -949,7 +955,7 @@ function mostraInfoOrientacao(divId, pc_processo_id, pc_aval_orientacao_id){
     }, 200);
 }
 
-function mostraInfoProcesso(divId, pc_processo_id){
+function mostraInfoProcesso(divId, pc_processo_id, tab){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
     $('#' + divId).attr("hidden",true);
@@ -968,6 +974,12 @@ function mostraInfoProcesso(divId, pc_processo_id){
             //$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfProcesso-tab').offset().top)-60} , 1000);
             $('#modalOverlay').delay(1000).hide(0, function() {
                 $('#' + divId).attr("hidden",false);
+                // Verifica se tab foi informado e realiza o scroll
+                if (tab) {
+                    $('html, body').animate({
+                        scrollTop: ($('#' + tab).offset().top) - 60
+                    }, 1000);
+                }
                 $('#modalOverlay').modal('hide');
             });
         })//fim done
@@ -986,7 +998,7 @@ function mostraInfoProcesso(divId, pc_processo_id){
 
 }
 
-function mostraInfoItem(divId, pc_processo_id, pc_aval_id){
+function mostraInfoItem(divId, pc_processo_id, pc_aval_id, tab){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
     $('#' + divId).attr("hidden",true);
@@ -1006,6 +1018,12 @@ function mostraInfoItem(divId, pc_processo_id, pc_aval_id){
             //$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfItem-tab').offset().top)-60} , 1000);
             $('#modalOverlay').delay(1000).hide(0, function() {
                 $('#' + divId).attr("hidden",false);
+                // Verifica se tab foi informado e realiza o scroll
+                if (tab) {
+                    $('html, body').animate({
+                        scrollTop: ($('#' + tab).offset().top) - 60
+                    }, 1000);
+                }
                 $('#modalOverlay').modal('hide');
             });
         })//fim done
@@ -1024,7 +1042,7 @@ function mostraInfoItem(divId, pc_processo_id, pc_aval_id){
 
 }
 
-function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios){
+function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios, tab){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
     $('#' + divId).attr("hidden",true);
@@ -1042,8 +1060,14 @@ function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios){
         .done(function(result){
             $('#' + divId).html(result);
             $('#modalOverlay').delay(1000).hide(0, function() {
-                $('#modalOverlay').modal('hide');
                 $('#' + divId).attr("hidden",false);
+                // Verifica se tab foi informado e realiza o scroll
+                if (tab) {
+                    $('html, body').animate({
+                        scrollTop: ($('#' + tab).offset().top) - 60
+                    }, 1000);
+                }
+                $('#modalOverlay').modal('hide');
             });
         })//fim done
         .fail(function(xhr, ajaxOptions, thrownError) {
@@ -1060,7 +1084,7 @@ function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios){
 
 }
 
-function mostraTabAnexos(divId, pc_aval_id, pc_orientacao_id){
+function mostraTabAnexos(divId, pc_aval_id, pc_orientacao_id,tab){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
     $('#' + divId).attr("hidden",true);
@@ -1079,6 +1103,12 @@ function mostraTabAnexos(divId, pc_aval_id, pc_orientacao_id){
             $('#' + divId).html(result);
             $('#modalOverlay').delay(1000).hide(0, function() {
                 $('#' + divId).attr("hidden",false);
+                // Verifica se tab foi informado e realiza o scroll
+                if (tab) {
+                    $('html, body').animate({
+                        scrollTop: ($('#' + tab).offset().top) - 60
+                    }, 1000);
+                }
                 $('#modalOverlay').modal('hide');
             });
         })//fim done

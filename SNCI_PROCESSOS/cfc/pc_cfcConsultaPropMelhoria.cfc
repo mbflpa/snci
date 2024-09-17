@@ -535,17 +535,17 @@
 				
 		
 				$('#custom-tabs-one-InfProcesso-tab').click(function() {
-					mostraInfoProcesso('infoProcessoDiv',pc_processo_id);
+					mostraInfoProcesso('infoProcessoDiv',pc_processo_id, 'custom-tabs-one-InfProcesso-tab');
 				});
 				$('#custom-tabs-one-InfItem-tab').click(function() {
-					mostraInfoItem('infoItemDiv',pc_processo_id,pc_aval_id);
+					mostraInfoItem('infoItemDiv',pc_processo_id,pc_aval_id, 'custom-tabs-one-InfItem-tab');
 				});
 				$('#custom-tabs-one-Avaliacao-tab').click(function() {
-					mostraRelatoPDF('anexoAvaliacaoDiv',pc_aval_id,'S');
+					mostraRelatoPDF('anexoAvaliacaoDiv',pc_aval_id,'S', 'custom-tabs-one-Avaliacao-tab');
 				});
 				$('#custom-tabs-one-Anexos-tab').click(function() {
 					//se ir da orientação for '', a função retorna apenas os anexos dos itens
-					mostraTabAnexos('tabAnexosDiv',pc_aval_id,'');
+					mostraTabAnexos('tabAnexosDiv',pc_aval_id,'', 'custom-tabs-one-Anexos-tab');
 				});
 
 			})
