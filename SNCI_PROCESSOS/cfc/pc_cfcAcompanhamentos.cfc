@@ -363,7 +363,7 @@
 					.done(function(result) {
 						$('#informacoesItensAcompanhamentoDiv').html(result)
 						$(".content-wrapper").css("height","auto");//para o background cinza da div content-wrapper se estender até o final do timeline
-						$('html, body').animate({ scrollTop: ($('#informacoesItensAcompanhamentoDiv').offset().top-80)} , 1000);
+						//$('html, body').animate({ scrollTop: ($('#informacoesItensAcompanhamentoDiv').offset().top-80)} , 1000);
 					})//fim done
 					.fail(function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -855,7 +855,7 @@
 					mostraTabAnexos('tabAnexosDiv',pc_aval_id,pc_aval_orientacao_id);
 				});
 				
-				mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id);
+				mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id,'custom-tabs-one-Orientacao-tab');
 				
 			})
 
@@ -1907,20 +1907,24 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 				
 
 
-				
+				$("#custom-tabs-one-Melhoria-tab").click(function() {
+					$('html, body').animate({
+						scrollTop: ($('#custom-tabs-one-Melhoria-tab').offset().top) - 60
+					}, 1000);
+				});
 
 				$('#custom-tabs-one-InfProcesso-tab').click(function() {
-					mostraInfoProcesso('infoProcessoDiv',pc_processo_id);
+					mostraInfoProcesso('infoProcessoDiv',pc_processo_id,'custom-tabs-one-InfProcesso-tab');
 				});
 				$('#custom-tabs-one-InfItem-tab').click(function() {
-					mostraInfoItem('infoItemDiv',pc_processo_id,pc_aval_id);
+					mostraInfoItem('infoItemDiv',pc_processo_id,pc_aval_id,'custom-tabs-one-InfItem-tab');
 				});
 				$('#custom-tabs-one-Avaliacao-tab').click(function() {
-					mostraRelatoPDF('anexoAvaliacaoDiv',pc_aval_id,'S');
+					mostraRelatoPDF('anexoAvaliacaoDiv',pc_aval_id,'S','custom-tabs-one-Avaliacao-tab');
 				});
 				$('#custom-tabs-one-Anexos-tab').click(function() {
 					//se ir da orientação for '', a função retorna apenas os anexos dos itens
-					mostraTabAnexos('tabAnexosDiv',pc_aval_id,'');
+					mostraTabAnexos('tabAnexosDiv',pc_aval_id,'','custom-tabs-one-Anexos-tab');
 				});
 
 			

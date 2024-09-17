@@ -533,6 +533,11 @@
 					var idMelhoria = #arguments.idMelhoria#;
 				</cfoutput>	
 				
+				$("#custom-tabs-one-Melhoria-tab").click(function() {
+					$('html, body').animate({
+						scrollTop: ($('#custom-tabs-one-Melhoria-tab').offset().top) - 60
+					}, 1000);
+				});
 		
 				$('#custom-tabs-one-InfProcesso-tab').click(function() {
 					mostraInfoProcesso('infoProcessoDiv',pc_processo_id, 'custom-tabs-one-InfProcesso-tab');
