@@ -1,6 +1,66 @@
 <cfcomponent >
     <cfprocessingdirective pageencoding = "utf-8">
 
+
+    <cffunction name="infoOrientacao"   access="remote" hint="">
+        <cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
+        <cfargument name="pc_processo_id" type="string" required="true" />
+
+        <cfquery name="rsAvalOrentacao" datasource="#application.dsn_processos#">
+            SELECT      pc_avaliacao_orientacoes.*
+                        ,pc_aval_orientacao_mcu_orgaoResp as mcuOrgaoResp
+                        ,pc_aval_orientacao_mcu_orgaoResp as mcuOrgResp
+                        ,pc_orgaos.pc_org_sigla as siglaOrgResp
+            FROM        pc_avaliacao_orientacoes
+                        INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
+            WHERE pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">	 													
+        </cfquery>
+
+        <cfquery name="rsCategoriaControle" datasource="#application.dsn_processos#">
+            SELECT pc_aval_categoriaControle_descricao FROM pc_avaliacao_orientacao_categoriasControles	
+            INNER JOIN pc_avaliacao_categoriaControle on pc_avaliacao_categoriaControle.pc_aval_categoriaControle_id = pc_avaliacao_orientacao_categoriasControles.pc_aval_categoriaControle_id
+            WHERE pc_avaliacao_orientacao_categoriasControles.pc_aval_orientacao_id =<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+        </cfquery>
+        <cfset categoriaControleList = ValueList(rsCategoriaControle.pc_aval_categoriaControle_descricao, ', ')>
+
+
+        <cfif rsAvalOrentacao.pc_aval_orientacao_distribuido eq 1>
+            <div style=" display: inline;background-color: #e83e8c;color:#fff;padding: 3px;margin-left: 10px;">Orientação distribuída pelo órgão subordinador:</div>
+        </cfif>
+        <cfoutput> 
+              
+             
+                <fieldset style="padding:0px!important;min-height: 90px;">
+                    <legend style="margin-left:20px">Medida/Orientação p/ regularização: ID <strong>#rsAvalOrentacao.pc_aval_orientacao_id#</strong> - #rsAvalOrentacao.siglaOrgResp# (#rsAvalOrentacao.mcuOrgResp#):</legend>                                         
+                    <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_descricao#</pre>
+                </fieldset>
+         
+            <cfset ano = RIGHT(#arguments.pc_processo_id#,4)>
+            <cfif #ano# gte 2024 and rsCategoriaControle.recordcount gt 0> 
+                <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro neq ''>
+                    <fieldset style="padding:0px!important;min-height: 90px;">
+                        <legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>                                         
+                        <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro#</pre>
+                    </fieldset>
+                </cfif>
+
+                <li >Categoria(s) do Controle Proposto: <span style="color:##0692c6;">#categoriaControleList#.</span></li>
+
+                <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioFinanceiro gt 0>
+                    <cfset beneficioFinanceiro = #LSCurrencyFormat(rsAvalOrentacao.pc_aval_orientacao_beneficioFinanceiro, 'local')#>
+                     <li >Potencial Benefício Financeiro da Implementação da Medida/Orientação p/ Regularização: <span style="color:##0692c6;">#beneficioFinanceiro#.</span></li>
+                </cfif>
+
+                <cfif rsAvalOrentacao.pc_aval_orientacao_custoFinanceiro gt 0>
+                    <cfset custoEstimado = #LSCurrencyFormat(rsAvalOrentacao.pc_aval_orientacao_custoFinanceiro, 'local')#>
+                    <li >Estimativa do Custo Financeiro da Medida/Orientação para Regularização: <span style="color:##0692c6;">#custoEstimado#.</span></li>
+                </cfif>
+            </cfif>
+        </cfoutput>
+
+
+    </cffunction>
+
     <cffunction name="infoProcesso"   access="remote" hint="">
         <cfargument name="pc_processo_id" type="string" required="true" /> 
 
@@ -440,69 +500,5 @@
         </section>
 
     </cffunction>
-
-    <cffunction name="infoOrientacao"   access="remote" hint="">
-        <cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
-        <cfargument name="pc_processo_id" type="string" required="true" />
-
-        <cfquery name="rsAvalOrentacao" datasource="#application.dsn_processos#">
-            SELECT      pc_avaliacao_orientacoes.*
-                        ,pc_aval_orientacao_mcu_orgaoResp as mcuOrgaoResp
-                        ,pc_aval_orientacao_mcu_orgaoResp as mcuOrgResp
-                        ,pc_orgaos.pc_org_sigla as siglaOrgResp
-            FROM        pc_avaliacao_orientacoes
-                        INNER JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-            WHERE pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">	 													
-        </cfquery>
-
-         <cfquery name="rsCategoriaControle" datasource="#application.dsn_processos#">
-            SELECT pc_aval_categoriaControle_descricao FROM pc_avaliacao_orientacao_categoriasControles	
-            INNER JOIN pc_avaliacao_categoriaControle on pc_avaliacao_categoriaControle.pc_aval_categoriaControle_id = pc_avaliacao_orientacao_categoriasControles.pc_aval_categoriaControle_id
-            WHERE pc_avaliacao_orientacao_categoriasControles.pc_aval_orientacao_id =<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
-        </cfquery>
-        <cfset categoriaControleList = ValueList(rsCategoriaControle.pc_aval_categoriaControle_descricao, ', ')>
-
-
-        <cfif rsAvalOrentacao.pc_aval_orientacao_distribuido eq 1>
-            <div style=" display: inline;background-color: #e83e8c;color:#fff;padding: 3px;margin-left: 10px;">Orientação distribuída pelo órgão subordinador:</div>
-        </cfif>
-        <cfoutput> 
-              
-             
-                <fieldset style="padding:0px!important;min-height: 90px;">
-                    <legend style="margin-left:20px">Medida/Orientação p/ regularização: ID <strong>#rsAvalOrentacao.pc_aval_orientacao_id#</strong> - #rsAvalOrentacao.siglaOrgResp# (#rsAvalOrentacao.mcuOrgResp#):</legend>                                         
-                    <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_descricao#</pre>
-                </fieldset>
-         
-            <cfset ano = RIGHT(#arguments.pc_processo_id#,4)>
-            <cfif #ano# gte 2024 and rsCategoriaControle.recordcount gte 0> 
-                <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro neq ''>
-                    <fieldset style="padding:0px!important;min-height: 90px;">
-                        <legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>                                         
-                        <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro#</pre>
-                    </fieldset>
-                </cfif>
-
-                <li >Categoria(s) do Controle Proposto: <span style="color:##0692c6;">#categoriaControleList#.</span></li>
-
-                <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioFinanceiro gt 0>
-                    <cfset beneficioFinanceiro = #LSCurrencyFormat(rsAvalOrentacao.pc_aval_orientacao_beneficioFinanceiro, 'local')#>
-                     <li >Potencial Benefício Financeiro da Implementação da Medida/Orientação p/ Regularização: <span style="color:##0692c6;">#beneficioFinanceiro#.</span></li>
-                </cfif>
-
-                <cfif rsAvalOrentacao.pc_aval_orientacao_custoFinanceiro gt 0>
-                    <cfset custoEstimado = #LSCurrencyFormat(rsAvalOrentacao.pc_aval_orientacao_custoFinanceiro, 'local')#>
-                    <li >Estimativa do Custo Financeiro da Medida/Orientação para Regularização: <span style="color:##0692c6;">#custoEstimado#.</span></li>
-                </cfif>
-            </cfif>
-        </cfoutput>
-
-
-    </cffunction>
-
-    
-
-
-
 
 </cfcomponent>

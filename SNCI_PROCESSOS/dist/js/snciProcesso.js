@@ -1096,38 +1096,4 @@ function mostraTabAnexos(divId, pc_aval_id, pc_orientacao_id){
 }
 
 
-function mostraInfoMelhoria(divId, pc_processo_id, pc_aval_melhoria_id){
-    $('#modalOverlay').modal('show');
-    $('#' + divId).html('');
-    $('#' + divId).attr("hidden",true);
-    setTimeout(function() {
-        $.ajax({
-            type: "post",
-            url:"cfc/pc_cfcInfoProcessosItens.cfc",
-            data:{
-                method: "infoMelhoria",
-                pc_processo_id: pc_processo_id,
-                pc_aval_melhoria_id: pc_aval_melhoria_id
-            },
-            async: false
-        })//fim ajax
-        .done(function(result){
-            $('#' + divId).html(result);
-            //$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfMelhoria-tab').offset().top)-60} , 1000);
-            $('#modalOverlay').delay(1000).hide(0, function() {
-                $('#' + divId).attr("hidden",false);
-                $('#modalOverlay').modal('hide');
-            });
-        })//fim done
-        .fail(function(xhr, ajaxOptions, thrownError) {
-            $('#modalOverlay').delay(1000).hide(0, function() {
-                $('#modalOverlay').modal('hide');
-            });
-            $('#modal-danger').modal('show')
-            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-            $('#modal-danger').find('.modal-body').text(thrownError)
 
-        })//fim fail
-
-    }, 200);
-}
