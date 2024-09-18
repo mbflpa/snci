@@ -15,10 +15,10 @@
 						,pc_usuarios.pc_usu_nome  as coordRegional
 						,pc_usuCoodNacional.pc_usu_nome  as coordNacional
 						, CONCAT(
-						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
-						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
-						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
-						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+						' - N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+						' - N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+						' - N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
 						) as tipoProcesso
 			FROM        pc_processos 
 						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
@@ -131,13 +131,37 @@
 											<th >Avaliador(es)</th>
 											<th >Coordenador Regional</th>
 											<th >Coordenador Nacional</th>
-											
+											<th>Objetivos Estrategicos</th>
+											<th>Riscos Estrategicos</th>
+											<th>Indicadores Estrategicos</th>
 										</tr>
 									</thead>
 									
 									<tbody>
 										<cfloop query="rsProcTab" >
 											<cfset status = "#pc_status_id#"> 
+
+											<cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
+												SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
+												INNER JOIN pc_objetivo_estrategico on pc_objetivo_estrategico.pc_objEstrategico_id = pc_processos_objEstrategicos.pc_objEstrategico_id
+												WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
+											</cfquery>
+											<cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,"; ")>
+
+											<cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
+												SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
+												INNER JOIN pc_risco_estrategico on pc_risco_estrategico.pc_riscoEstrategico_id = pc_processos_riscosEstrategicos.pc_riscoEstrategico_id
+												WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
+											</cfquery>
+											<cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,"; ")>
+
+											<cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
+												SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
+												INNER JOIN pc_indicador_estrategico on pc_indicador_estrategico.pc_indEstrategico_id = pc_processos_indEstrategicos.pc_indEstrategico_id
+												WHERE pc_processos_indEstrategicos.pc_processo_id = '#pc_processo_id#'
+											</cfquery>
+											<cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,"; ")>
+
 											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 												SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
 												FROM    pc_avaliadores 
@@ -146,7 +170,7 @@
 												WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
 											</cfquery>	 
 										
-											<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
+											<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; ')>
 
 											<cfoutput>					
 												<tr style="cursor:pointer;font-size:12px" >
@@ -202,6 +226,9 @@
 														<td>#avaliadores#</td>
 														<td>#coordRegional#</td>
 														<td>#coordNacional#</td>
+														<td>#objetivosEstrategicosList#</td>
+														<td>#riscosEstrategicosList#</td>
+														<td>#indicadoresEstrategicosList#</td>
 														
 												</tr>
 											</cfoutput>
@@ -370,10 +397,10 @@
 						,pc_aval_valorEstimadoRisco
 						,pc_aval_valorEstimadoNaoPlanejado
 						, CONCAT(
-						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
-						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
-						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
-						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+						' - N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+						' - N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+						' - N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
 						) as tipoProcesso
 
 
@@ -491,6 +518,9 @@
 												<th >Avaliador(es)</th>
 												<th >Coordenador Regional</th>
 												<th >Coordenador Nacional</th>
+												<th>Objetivos Estrategicos</th>
+												<th>Riscos Estrategicos</th>
+												<th>Indicadores Estrategicos</th>
 												<th >Cód. Item</th>
 												<th >N° do Item</th>
 												<th>Título da situação encontrada</th>
@@ -507,7 +537,28 @@
 										
 										<tbody>
 											<cfloop query="rsProcTab" >
-												<cfset status = "#pc_status_id#"> 
+												<cfset status = "#pc_status_id#">
+												<cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
+													SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
+													INNER JOIN pc_objetivo_estrategico on pc_objetivo_estrategico.pc_objEstrategico_id = pc_processos_objEstrategicos.pc_objEstrategico_id
+													WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
+												</cfquery>
+												<cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,"; ")>
+
+												<cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
+													SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
+													INNER JOIN pc_risco_estrategico on pc_risco_estrategico.pc_riscoEstrategico_id = pc_processos_riscosEstrategicos.pc_riscoEstrategico_id
+													WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
+												</cfquery>
+												<cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,"; ")>
+
+												<cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
+													SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
+													INNER JOIN pc_indicador_estrategico on pc_indicador_estrategico.pc_indEstrategico_id = pc_processos_indEstrategicos.pc_indEstrategico_id
+													WHERE pc_processos_indEstrategicos.pc_processo_id = '#pc_processo_id#'
+												</cfquery>
+												<cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,"; ")>
+ 
 												<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 													SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
 													FROM    pc_avaliadores 
@@ -516,7 +567,7 @@
 													WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
 												</cfquery>	 
 											
-												<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
+												<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; ')>
 		
 												<cfoutput>					
 													<tr style="cursor:pointer;font-size:12px" >
@@ -572,6 +623,9 @@
 															<td>#avaliadores#</td>
 															<td>#coordRegional#</td>
 															<td>#coordNacional#</td>
+															<td>#objetivosEstrategicosList#</td>
+															<td>#riscosEstrategicosList#</td>
+															<td>#indicadoresEstrategicosList#</td>
 															<td >#pc_aval_id#</td>
 															<td >#pc_aval_numeracao#</td>
 															<td >#pc_aval_descricao#</td>
@@ -785,10 +839,10 @@
 							ELSE pc_orientacao_status_descricao
 						END AS statusDescricao
 						, CONCAT(
-						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
-						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
-						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
-						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+						' - N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+						' - N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+						' - N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
 						) as tipoProcesso
 			FROM        pc_processos 
 						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
@@ -892,6 +946,9 @@
 												<th >Avaliador(es)</th>
 												<th >Coordenador Regional</th>
 												<th >Coordenador Nacional</th>
+												<th>Objetivos Estrategicos</th>
+												<th>Riscos Estrategicos</th>
+												<th>Indicadores Estrategicos</th>
 												<th >Cód. Item</th>
 												<th >N° do Item</th>
 												<th>Título da situação encontrada</th>
@@ -915,6 +972,28 @@
 										<tbody>
 											<cfloop query="rsProcTab" >
 												<cfset status = "#pc_status_id#"> 
+
+												<cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
+													SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
+													INNER JOIN pc_objetivo_estrategico on pc_objetivo_estrategico.pc_objEstrategico_id = pc_processos_objEstrategicos.pc_objEstrategico_id
+													WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
+												</cfquery>
+												<cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,"; ")>
+
+												<cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
+													SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
+													INNER JOIN pc_risco_estrategico on pc_risco_estrategico.pc_riscoEstrategico_id = pc_processos_riscosEstrategicos.pc_riscoEstrategico_id
+													WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
+												</cfquery>
+												<cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,"; ")>
+
+												<cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
+													SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
+													INNER JOIN pc_indicador_estrategico on pc_indicador_estrategico.pc_indEstrategico_id = pc_processos_indEstrategicos.pc_indEstrategico_id
+													WHERE pc_processos_indEstrategicos.pc_processo_id = '#pc_processo_id#'
+												</cfquery>
+												<cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,"; ")>
+
 												<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 													SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
 													FROM    pc_avaliadores 
@@ -923,7 +1002,7 @@
 													WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
 												</cfquery>	 
 											
-												<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
+												<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; ')>
 		
 												<cfoutput>					
 													<tr style="cursor:pointer;font-size:12px" >
@@ -979,6 +1058,9 @@
 															<td>#avaliadores#</td>
 															<td>#coordRegional#</td>
 															<td>#coordNacional#</td>
+															<td>#objetivosEstrategicosList#</td>
+															<td>#riscosEstrategicosList#</td>
+															<td>#indicadoresEstrategicosList#</td>
 															<td >#pc_aval_id#</td>
 															<td >#pc_aval_numeracao#</td>
 															<td >#pc_aval_descricao#</td>
@@ -1212,10 +1294,10 @@
 						,pc_aval_valorEstimadoNaoPlanejado
 						,pc_aval_id, pc_aval_melhoria_id
 						, CONCAT(
-						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
-						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
-						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
-						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+						' - N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+						' - N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+						' - N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
 						) as tipoProcesso
 
 			FROM        pc_processos 
@@ -1317,6 +1399,9 @@
 												<th >Avaliador(es)</th>
 												<th >Coordenador Regional</th>
 												<th >Coordenador Nacional</th>
+												<th>Objetivos Estrategicos</th>
+												<th>Riscos Estrategicos</th>
+												<th>Indicadores Estrategicos</th>
 												<th >Cód. Item</th>
 												<th >N° do Item</th>
 												<th>Título da situação encontrada</th>
@@ -1343,6 +1428,28 @@
 										<tbody>
 											<cfloop query="rsProcTab" >
 												<cfset status = "#pc_status_id#"> 
+
+												<cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
+													SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
+													INNER JOIN pc_objetivo_estrategico on pc_objetivo_estrategico.pc_objEstrategico_id = pc_processos_objEstrategicos.pc_objEstrategico_id
+													WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
+												</cfquery>
+												<cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,"; ")>
+
+												<cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
+													SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
+													INNER JOIN pc_risco_estrategico on pc_risco_estrategico.pc_riscoEstrategico_id = pc_processos_riscosEstrategicos.pc_riscoEstrategico_id
+													WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
+												</cfquery>
+												<cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,"; ")>
+
+												<cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
+													SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
+													INNER JOIN pc_indicador_estrategico on pc_indicador_estrategico.pc_indEstrategico_id = pc_processos_indEstrategicos.pc_indEstrategico_id
+													WHERE pc_processos_indEstrategicos.pc_processo_id = '#pc_processo_id#'
+												</cfquery>
+												<cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,"; ")>
+
 												<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 													SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
 													FROM    pc_avaliadores 
@@ -1351,7 +1458,7 @@
 													WHERE 	pc_avaliador_id_processo = '#pc_processo_id#'
 												</cfquery>	 
 											
-												<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; <br>')>
+												<cfset avaliadores = ValueList(rsAvaliadores.avaliadores,'; ')>
 		
 												<cfoutput>					
 													<tr style="cursor:pointer;font-size:12px" >
@@ -1407,6 +1514,9 @@
 															<td>#avaliadores#</td>
 															<td>#coordRegional#</td>
 															<td>#coordNacional#</td>
+															<td>#objetivosEstrategicosList#</td>
+															<td>#riscosEstrategicosList#</td>
+															<td>#indicadoresEstrategicosList#</td>
 															<td >#pc_aval_id#</td>
 															<td >#pc_aval_numeracao#</td>
 															<td >#pc_aval_descricao#</td>
