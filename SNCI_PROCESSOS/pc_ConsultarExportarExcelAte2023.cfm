@@ -18,7 +18,7 @@
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
 				LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
-	WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)>=2024	
+	WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)<=2023
 	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
 		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
@@ -31,7 +31,7 @@
 		<!---Se o perfil for 7 - 'GESTOR' --->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
 			AND pc_orgaos.pc_org_se = 	#application.rsUsuarioParametros.pc_org_se#
-		</cfif>  
+		</cfif>
 	<cfelse>
 		<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
@@ -262,7 +262,7 @@
 			setTimeout(function() {
 				$.ajax({
 					type: "post",
-					url: "cfc/pc_cfcConsultasDiversas.cfc",
+					url: "cfc/pc_cfcConsultasDiversasAte2023.cfc",
 					data:{
 						method: tipoConsulta,
 						ano: ano
