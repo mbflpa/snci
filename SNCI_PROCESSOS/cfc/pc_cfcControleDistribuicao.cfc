@@ -1454,7 +1454,7 @@
 								<tbody>
 									<cfloop query="rsMelhoriasPendentes" >
 										<cfoutput>					
-											<tr style="font-size:12px;cursor:pointer;z-index:2;"  onclick="javascript:mostraInfMelhoriaAcomp(#pc_aval_melhoria_id#)">
+											<tr style="font-size:12px;cursor:pointer;z-index:2;"  onclick="javascript:mostraInfMelhoriaAcomp('#pc_processo_id#',#pc_aval_id#,#pc_aval_melhoria_id#)">
 												<td id="statusMelhorias"align="center" ><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;">PENDENTE</span></td>
 												<td align="center">#pc_aval_melhoria_id#</td>	
 												<td align="center">#pc_processo_id#</td>
@@ -1531,7 +1531,7 @@
 
 			} );
 
-			function mostraInfMelhoriaAcomp(idMelhoria){
+			function mostraInfMelhoriaAcomp(idProcesso,idAvaliacao,idMelhoria){
 				$('#tabMelhoriasPendentes tr').each(function () {
 					$(this).removeClass('selected');
 				}); 
@@ -1547,7 +1547,9 @@
 						url: "cfc/pc_cfcControleDistribuicao.cfc",
 						data:{
 							method: "infItensMelhoriasDistribuidas",
-							idMelhoria: idMelhoria
+							idMelhoria: idMelhoria,
+							idAvaliacao: idAvaliacao,
+							idProcesso: idProcesso
 						},
 						async: false
 					})//fim ajax

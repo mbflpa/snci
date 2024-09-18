@@ -1232,7 +1232,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 								<tbody>
 									<cfloop query="rsMelhoriasPendentes" >
 										<cfoutput>					
-											<tr style="font-size:12px;cursor:pointer;z-index:2;"  onclick="javascript:mostraInfMelhoriaAcomp(#pc_processo_id#,#pc_aval_id#,#pc_aval_melhoria_id#)">
+											<tr style="font-size:12px;cursor:pointer;z-index:2;"  onclick="javascript:mostraInfMelhoriaAcomp('#pc_processo_id#',#pc_aval_id#,#pc_aval_melhoria_id#)">
 												<td id="statusMelhorias"align="center" ><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;">PENDENTE</span></td>
 												<td align="center">#pc_aval_melhoria_id#</td>	
 												<td align="center">#pc_processo_id#</td>
@@ -1694,7 +1694,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 												<legend style="margin-left:20px">Proposta de Melhoria:</legend> 
 												<pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsMelhoria.pc_aval_melhoria_descricao#</pre>									
 											</fieldset>
-											<cfset ano = RIGHT(#arguments.idProcesso#,4)>
+											<cfset ano = RIGHT('#arguments.idProcesso#',4)>
 											<cfif #ano# gte 2024 and rsCategoriaControle.recordcount gt 0> 
 												<cfif rsMelhoria.pc_aval_melhoria_beneficioNaoFinanceiro neq ''>
 													<fieldset style="padding:0px!important;min-height: 90px;">
