@@ -15,10 +15,10 @@
 						,pc_usuarios.pc_usu_nome  as coordRegional
 						,pc_usuCoodNacional.pc_usu_nome  as coordNacional
 						, CONCAT(
-						'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-						' - N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-						' - N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-						' - N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
+						'MP - ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+						' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+						' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+						' - N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3
 						) as tipoProcesso
 			FROM        pc_processos 
 						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
@@ -405,10 +405,10 @@
 						,pc_aval_cosoPrincipio
 						,pc_aval_criterioRef_descricao
 						, CONCAT(
-						'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-						' - N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-						' - N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-						' - N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
+						'MP - ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+						' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+						' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+						' - N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3
 						) as tipoProcesso
 
 
@@ -890,10 +890,10 @@
 							ELSE pc_orientacao_status_descricao
 						END AS statusDescricao
 						, CONCAT(
-						'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-						' - N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-						' - N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-						' - N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
+						'MP - ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+						' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+						' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+						' - N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3
 						) as tipoProcesso
 						,pc_aval_orientacao_beneficioNaoFinanceiro
 						,pc_aval_orientacao_beneficioFinanceiro
@@ -1407,10 +1407,10 @@
 						,pc_aval_criterioRef_descricao
 						,pc_aval_id, pc_aval_melhoria_id
 						, CONCAT(
-						'Macroprocesso: ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-						' - N1: ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-						' - N2: ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-						' - N3: ', pc_avaliacao_tipos.pc_aval_tipo_processoN3, '.'
+						'MP - ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+						' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+						' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+						' - N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3
 						) as tipoProcesso
 						,pc_aval_melhoria_beneficioNaoFinanceiro
 						,pc_aval_melhoria_beneficioFinanceiro
