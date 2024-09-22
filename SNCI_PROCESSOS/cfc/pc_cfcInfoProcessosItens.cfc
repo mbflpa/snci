@@ -25,7 +25,7 @@
 
 
         <cfif rsAvalOrentacao.pc_aval_orientacao_distribuido eq 1>
-            <div style=" display: inline;background-color: #e83e8c;color:#fff;padding: 3px;margin-left: 10px;">Orientação distribuída pelo órgão subordinador:</div>
+            <div class="badge" style="background-color: #e83e8c;color:#fff;margin-left:23px;margin-bottom:10px;font-weight: 400!important;font-size: 0.8rem;">Orientação distribuída pelo órgão subordinador</div>
         </cfif>
         <cfoutput> 
               
