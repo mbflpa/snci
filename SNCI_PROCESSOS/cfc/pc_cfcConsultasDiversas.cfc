@@ -14,12 +14,41 @@
 						, pc_classificacoes.pc_class_descricao
 						,pc_usuarios.pc_usu_nome  as coordRegional
 						,pc_usuCoodNacional.pc_usu_nome  as coordNacional
-						, CONCAT(
-						'MP - ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-						' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-						' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-						' - N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3
-						) as tipoProcesso
+						,CASE 
+							WHEN pc_num_avaliacao_tipo <> 445 AND pc_num_avaliacao_tipo <> 2 
+								THEN CASE 
+										WHEN pc_aval_tipo_descricao <> '' 
+										THEN pc_aval_tipo_descricao 
+										ELSE CONCAT(
+												'MP - ', pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+												' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+												' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2
+											)
+									END
+							ELSE pc_aval_tipo_nao_aplica_descricao
+						END AS AvaliacaoDescricao
+						,CASE 
+							WHEN pc_avaliacao_tipos.pc_aval_tipo_processoN3 IS NOT NULL AND pc_avaliacao_tipos.pc_aval_tipo_processoN3 <> '' 
+							THEN CONCAT('N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3)
+							ELSE 'NÃO DEFINIDO'
+						END AS tipoProcessoN3
+						,CASE 
+							WHEN pc_Modalidade = 'A' THEN 'Acompanhamento'
+							WHEN pc_Modalidade = 'E' THEN 'ENTREGA DO RELATÓRIO'
+							ELSE 'Normal'
+						END AS ModalidadeDescricao
+						,CASE 
+							WHEN pc_tipo_demanda = 'P' THEN 'PLANEJADA'
+							WHEN pc_tipo_demanda = 'E' THEN 'EXTRAORDINÁRIA'
+							ELSE 'Não informado'
+						END AS TipoDemandaDescricao
+						,FORMAT(pc_data_finalizado, 'dd-MM-yyyy') AS dataFimProcesso
+						,LEFT(pc_num_sei, 5) + '.' + 
+							SUBSTRING(pc_num_sei, 6, 6) + '/' + 
+							SUBSTRING(pc_num_sei, 12, 4) + '-' + 
+							RIGHT(pc_num_sei, 2) AS sei
+						,FORMAT(pc_data_inicioAvaliacao, 'dd-MM-yyyy') AS dataInicio
+						,FORMAT(pc_data_fimAvaliacao, 'dd-MM-yyyy') AS dataFim
 			FROM        pc_processos 
 						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
 						LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
@@ -125,6 +154,7 @@
 											<th >Órgão Origem</th>
 											<th >Órgão Avaliado</th>
 											<th >Tipo de Avaliação</th>
+											<th >Tipo de Avaliação - N3</th>
 											<th >Modalidade</th>
 											<th >Classificação</th>
 											<th >Tipo Demanda</th>
@@ -177,59 +207,26 @@
 																	
 														<td align="center"> #pc_processo_id#</td>
 														<td>#pc_status_descricao#</td>
-
-														<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
 														<td>#dataFimProcesso#</td>
-
 														<td>#seOrgAvaliado#</td>
 														<td>#pc_ano_pacin#</td>
-														<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
 														<td>#sei#</td>
 														<td>#pc_num_rel_sei#</td>
-														
-														<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
 														<td>#dataInicio#</td>
-														
-														<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
 														<td>#dataFim#</td>
-
 														<td>#siglaOrgOrigem#</td>
 														<td>#siglaOrgAvaliado#</td>
-
-														<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
-															<cfif pc_aval_tipo_descricao neq ''>
-																<td>#pc_aval_tipo_descricao#</td>
-															<cfelse>
-																<td>#tipoProcesso#</td>
-															</cfif>
-														<cfelse>
-															<td>#pc_aval_tipo_nao_aplica_descricao#</td>
-														</cfif>
-														
-														<td>
-															<cfif #pc_Modalidade# eq 'A'>
-																Acompanhamento
-															<cfelseif #pc_Modalidade# eq 'E'>
-																ENTREGA DO RELATÓRIO
-															<cfelse>
-																Normal
-															</cfif>
-														</td>
+														<td>#AvaliacaoDescricao#</td>
+														<td>#tipoProcessoN3#</td>
+														<td>#ModalidadeDescricao#</td>
 														<td>#pc_class_descricao#</td>
-														<cfif #pc_tipo_demanda# eq 'P'>
-															<td>PLANEJADA</td>
-														<cfelseif #pc_tipo_demanda# eq 'E'>
-															<td>EXTRAORDINÁRIA</td>
-														<cfelse>
-															<td>Não informado</td>
-														</cfif>
+														<td>#TipoDemandaDescricao#</td>
 														<td>#avaliadores#</td>
 														<td>#coordRegional#</td>
 														<td>#coordNacional#</td>
 														<td>#objetivosEstrategicosList#</td>
 														<td>#riscosEstrategicosList#</td>
 														<td>#indicadoresEstrategicosList#</td>
-														
 												</tr>
 											</cfoutput>
 										</cfloop>	
@@ -404,12 +401,41 @@
 						,pc_aval_cosoComponente
 						,pc_aval_cosoPrincipio
 						,pc_aval_criterioRef_descricao
-						, CONCAT(
-						'MP - ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-						' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-						' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-						' - N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3
-						) as tipoProcesso
+						,CASE 
+							WHEN pc_num_avaliacao_tipo <> 445 AND pc_num_avaliacao_tipo <> 2 
+								THEN CASE 
+										WHEN pc_aval_tipo_descricao <> '' 
+										THEN pc_aval_tipo_descricao 
+										ELSE CONCAT(
+												'MP - ', pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+												' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+												' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2
+											)
+									END
+							ELSE pc_aval_tipo_nao_aplica_descricao
+						END AS AvaliacaoDescricao
+						,CASE 
+							WHEN pc_avaliacao_tipos.pc_aval_tipo_processoN3 IS NOT NULL AND pc_avaliacao_tipos.pc_aval_tipo_processoN3 <> '' 
+							THEN CONCAT('N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3)
+							ELSE 'NÃO DEFINIDO'
+						END AS tipoProcessoN3
+						,CASE 
+							WHEN pc_Modalidade = 'A' THEN 'Acompanhamento'
+							WHEN pc_Modalidade = 'E' THEN 'ENTREGA DO RELATÓRIO'
+							ELSE 'Normal'
+						END AS ModalidadeDescricao
+						,CASE 
+							WHEN pc_tipo_demanda = 'P' THEN 'PLANEJADA'
+							WHEN pc_tipo_demanda = 'E' THEN 'EXTRAORDINÁRIA'
+							ELSE 'Não informado'
+						END AS TipoDemandaDescricao
+						,FORMAT(pc_data_finalizado, 'dd-MM-yyyy') AS dataFimProcesso
+						,LEFT(pc_num_sei, 5) + '.' + 
+							SUBSTRING(pc_num_sei, 6, 6) + '/' + 
+							SUBSTRING(pc_num_sei, 12, 4) + '-' + 
+							RIGHT(pc_num_sei, 2) AS sei
+						,FORMAT(pc_data_inicioAvaliacao, 'dd-MM-yyyy') AS dataInicio
+						,FORMAT(pc_data_fimAvaliacao, 'dd-MM-yyyy') AS dataFim
 
 
 			FROM        pc_processos 
@@ -522,6 +548,7 @@
 												<th >Órgão Origem</th>
 												<th >Órgão Avaliado</th>
 												<th >Tipo de Avaliação</th>
+												<th >Tipo de Avaliação - N3</th>
 												<th >Modalidade</th>
 												<th >Classificação</th>
 												<th >Tipo Demanda</th>
@@ -612,52 +639,20 @@
 																		
 															<td align="center"> #pc_processo_id#</td>
 															<td>#pc_status_descricao#</td>
-
-															<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
 															<td>#dataFimProcesso#</td>
-
 															<td>#seOrgAvaliado#</td>
 															<td>#pc_ano_pacin#</td>
-															<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
 															<td>#sei#</td>
 															<td>#pc_num_rel_sei#</td>
-															
-															<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
 															<td>#dataInicio#</td>
-															
-															<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
 															<td>#dataFim#</td>
-
 															<td>#siglaOrgOrigem#</td>
 															<td>#siglaOrgAvaliado#</td>
-
-															<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
-																<cfif pc_aval_tipo_descricao neq ''>
-																	<td>#pc_aval_tipo_descricao#</td>
-																<cfelse>
-																	<td>#tipoProcesso#</td>
-																</cfif>
-															<cfelse>
-																<td>#pc_aval_tipo_nao_aplica_descricao#</td>
-															</cfif>
-															
-															<td>
-																<cfif #pc_Modalidade# eq 'A'>
-																	Acompanhamento
-																<cfelseif #pc_Modalidade# eq 'E'>
-																	ENTREGA DO RELATÓRIO
-																<cfelse>
-																	Normal
-																</cfif>
-															</td>
+															<td>#AvaliacaoDescricao#</td>
+															<td>#tipoProcessoN3#</td>
+															<td>#ModalidadeDescricao#</td>
 															<td>#pc_class_descricao#</td>
-															<cfif #pc_tipo_demanda# eq 'P'>
-																<td>PLANEJADA</td>
-															<cfelseif #pc_tipo_demanda# eq 'E'>
-																<td>EXTRAORDINÁRIA</td>
-															<cfelse>
-																<td>Não informado</td>
-															</cfif>
+															<td>#TipoDemandaDescricao#</td>
 															<td>#avaliadores#</td>
 															<td>#coordRegional#</td>
 															<td>#coordNacional#</td>
@@ -889,12 +884,41 @@
 							WHEN  CONVERT(VARCHAR(10), pc_aval_orientacao_dataPrevistaResp, 102)  < CONVERT(VARCHAR(10), GETDATE(), 102) AND pc_aval_orientacao_status IN (4, 5) THEN 'PENDENTE'
 							ELSE pc_orientacao_status_descricao
 						END AS statusDescricao
-						, CONCAT(
-						'MP - ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-						' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-						' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-						' - N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3
-						) as tipoProcesso
+						,CASE 
+							WHEN pc_num_avaliacao_tipo <> 445 AND pc_num_avaliacao_tipo <> 2 
+								THEN CASE 
+										WHEN pc_aval_tipo_descricao <> '' 
+										THEN pc_aval_tipo_descricao 
+										ELSE CONCAT(
+												'MP - ', pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+												' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+												' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2
+											)
+									END
+							ELSE pc_aval_tipo_nao_aplica_descricao
+						END AS AvaliacaoDescricao
+						,CASE 
+							WHEN pc_avaliacao_tipos.pc_aval_tipo_processoN3 IS NOT NULL AND pc_avaliacao_tipos.pc_aval_tipo_processoN3 <> '' 
+							THEN CONCAT('N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3)
+							ELSE 'NÃO DEFINIDO'
+						END AS tipoProcessoN3
+						,CASE 
+							WHEN pc_Modalidade = 'A' THEN 'Acompanhamento'
+							WHEN pc_Modalidade = 'E' THEN 'ENTREGA DO RELATÓRIO'
+							ELSE 'Normal'
+						END AS ModalidadeDescricao
+						,CASE 
+							WHEN pc_tipo_demanda = 'P' THEN 'PLANEJADA'
+							WHEN pc_tipo_demanda = 'E' THEN 'EXTRAORDINÁRIA'
+							ELSE 'Não informado'
+						END AS TipoDemandaDescricao
+						,FORMAT(pc_data_finalizado, 'dd-MM-yyyy') AS dataFimProcesso
+						,LEFT(pc_num_sei, 5) + '.' + 
+							SUBSTRING(pc_num_sei, 6, 6) + '/' + 
+							SUBSTRING(pc_num_sei, 12, 4) + '-' + 
+							RIGHT(pc_num_sei, 2) AS sei
+						,FORMAT(pc_data_inicioAvaliacao, 'dd-MM-yyyy') AS dataInicio
+						,FORMAT(pc_data_fimAvaliacao, 'dd-MM-yyyy') AS dataFim
 						,pc_aval_orientacao_beneficioNaoFinanceiro
 						,pc_aval_orientacao_beneficioFinanceiro
 						,pc_aval_orientacao_custoFinanceiro
@@ -996,6 +1020,7 @@
 												<th >Órgão Origem</th>
 												<th >Órgão Avaliado</th>
 												<th >Tipo de Avaliação</th>
+												<th >Tipo de Avaliação - N3</th>
 												<th >Modalidade</th>
 												<th >Classificação</th>
 												<th >Tipo Demanda</th>
@@ -1105,52 +1130,20 @@
 																		
 															<td align="center"> #pc_processo_id#</td>
 															<td>#pc_status_descricao#</td>
-
-															<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
 															<td>#dataFimProcesso#</td>
-
 															<td>#seOrgAvaliado#</td>
 															<td>#pc_ano_pacin#</td>
-															<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
 															<td>#sei#</td>
 															<td>#pc_num_rel_sei#</td>
-															
-															<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
 															<td>#dataInicio#</td>
-															
-															<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
 															<td>#dataFim#</td>
-
 															<td>#siglaOrgOrigem#</td>
 															<td>#siglaOrgAvaliado#</td>
-
-															<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
-																<cfif pc_aval_tipo_descricao neq ''>
-																	<td>#pc_aval_tipo_descricao#</td>
-																<cfelse>
-																	<td>#tipoProcesso#</td>
-																</cfif>
-															<cfelse>
-																<td>#pc_aval_tipo_nao_aplica_descricao#</td>
-															</cfif>
-															
-															<td>
-																<cfif #pc_Modalidade# eq 'A'>
-																	Acompanhamento
-																<cfelseif #pc_Modalidade# eq 'E'>
-																	ENTREGA DO RELATÓRIO
-																<cfelse>
-																	Normal
-																</cfif>
-															</td>
+															<td>#AvaliacaoDescricao#</td>
+															<td>#tipoProcessoN3#</td>
+															<td>#ModalidadeDescricao#</td>
 															<td>#pc_class_descricao#</td>
-															<cfif #pc_tipo_demanda# eq 'P'>
-																<td>PLANEJADA</td>
-															<cfelseif #pc_tipo_demanda# eq 'E'>
-																<td>EXTRAORDINÁRIA</td>
-															<cfelse>
-																<td>Não informado</td>
-															</cfif>
+															<td>#TipoDemandaDescricao#</td>
 															<td>#avaliadores#</td>
 															<td>#coordRegional#</td>
 															<td>#coordNacional#</td>
@@ -1406,12 +1399,41 @@
 						,pc_aval_cosoPrincipio
 						,pc_aval_criterioRef_descricao
 						,pc_aval_id, pc_aval_melhoria_id
-						, CONCAT(
-						'MP - ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-						' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-						' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-						' - N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3
-						) as tipoProcesso
+						,CASE 
+							WHEN pc_num_avaliacao_tipo <> 445 AND pc_num_avaliacao_tipo <> 2 
+								THEN CASE 
+										WHEN pc_aval_tipo_descricao <> '' 
+										THEN pc_aval_tipo_descricao 
+										ELSE CONCAT(
+												'MP - ', pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+												' - N1 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+												' - N2 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN2
+											)
+									END
+							ELSE pc_aval_tipo_nao_aplica_descricao
+						END AS AvaliacaoDescricao
+						,CASE 
+							WHEN pc_avaliacao_tipos.pc_aval_tipo_processoN3 IS NOT NULL AND pc_avaliacao_tipos.pc_aval_tipo_processoN3 <> '' 
+							THEN CONCAT('N3 - ', pc_avaliacao_tipos.pc_aval_tipo_processoN3)
+							ELSE 'NÃO DEFINIDO'
+						END AS tipoProcessoN3
+						,CASE 
+							WHEN pc_Modalidade = 'A' THEN 'Acompanhamento'
+							WHEN pc_Modalidade = 'E' THEN 'ENTREGA DO RELATÓRIO'
+							ELSE 'Normal'
+						END AS ModalidadeDescricao
+						,CASE 
+							WHEN pc_tipo_demanda = 'P' THEN 'PLANEJADA'
+							WHEN pc_tipo_demanda = 'E' THEN 'EXTRAORDINÁRIA'
+							ELSE 'Não informado'
+						END AS TipoDemandaDescricao
+						,FORMAT(pc_data_finalizado, 'dd-MM-yyyy') AS dataFimProcesso
+						,LEFT(pc_num_sei, 5) + '.' + 
+							SUBSTRING(pc_num_sei, 6, 6) + '/' + 
+							SUBSTRING(pc_num_sei, 12, 4) + '-' + 
+							RIGHT(pc_num_sei, 2) AS sei
+						,FORMAT(pc_data_inicioAvaliacao, 'dd-MM-yyyy') AS dataInicio
+						,FORMAT(pc_data_fimAvaliacao, 'dd-MM-yyyy') AS dataFim
 						,pc_aval_melhoria_beneficioNaoFinanceiro
 						,pc_aval_melhoria_beneficioFinanceiro
 						,pc_aval_melhoria_custoFinanceiro
@@ -1510,6 +1532,7 @@
 												<th >Órgão Origem</th>
 												<th >Órgão Avaliado</th>
 												<th >Tipo de Avaliação</th>
+												<th >Tipo de Avaliação - N3</th>
 												<th >Modalidade</th>
 												<th >Classificação</th>
 												<th >Tipo Demanda</th>
@@ -1621,52 +1644,20 @@
 																		
 															<td align="center"> #pc_processo_id#</td>
 															<td>#pc_status_descricao#</td>
-
-															<cfset dataFimProcesso = DateFormat(#pc_data_finalizado#,'DD-MM-YYYY') >
 															<td>#dataFimProcesso#</td>
-
 															<td>#seOrgAvaliado#</td>
 															<td>#pc_ano_pacin#</td>
-															<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
 															<td>#sei#</td>
 															<td>#pc_num_rel_sei#</td>
-															
-															<cfset dataInicio = DateFormat(#pc_data_inicioAvaliacao#,'DD-MM-YYYY') >
 															<td>#dataInicio#</td>
-															
-															<cfset dataFim = DateFormat(#pc_data_fimAvaliacao#,'DD-MM-YYYY') >
 															<td>#dataFim#</td>
-
 															<td>#siglaOrgOrigem#</td>
 															<td>#siglaOrgAvaliado#</td>
-
-															<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
-																<cfif pc_aval_tipo_descricao neq ''>
-																	<td>#pc_aval_tipo_descricao#</td>
-																<cfelse>
-																	<td>#tipoProcesso#</td>
-																</cfif>
-															<cfelse>
-																<td>#pc_aval_tipo_nao_aplica_descricao#</td>
-															</cfif>
-															
-															<td>
-																<cfif #pc_Modalidade# eq 'A'>
-																	Acompanhamento
-																<cfelseif #pc_Modalidade# eq 'E'>
-																	ENTREGA DO RELATÓRIO
-																<cfelse>
-																	Normal
-																</cfif>
-															</td>
+															<td>#AvaliacaoDescricao#</td>
+															<td>#tipoProcessoN3#</td>
+															<td>#ModalidadeDescricao#</td>
 															<td>#pc_class_descricao#</td>
-															<cfif #pc_tipo_demanda# eq 'P'>
-																<td>PLANEJADA</td>
-															<cfelseif #pc_tipo_demanda# eq 'E'>
-																<td>EXTRAORDINÁRIA</td>
-															<cfelse>
-																<td>Não informado</td>
-															</cfif>
+															<td>#TipoDemandaDescricao#</td>
 															<td>#avaliadores#</td>
 															<td>#coordRegional#</td>
 															<td>#coordNacional#</td>
