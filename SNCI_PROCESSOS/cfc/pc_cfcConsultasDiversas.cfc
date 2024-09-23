@@ -8,10 +8,15 @@
 		
 
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
-			SELECT  DISTINCT    pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
-						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
-						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
-						, pc_classificacoes.pc_class_descricao
+			SELECT  DISTINCT    pc_processos.*
+						,pc_orgaos.pc_org_descricao as descOrgAvaliado
+						,pc_orgaos.pc_org_sigla as siglaOrgAvaliado
+						,pc_status.* 
+						,pc_avaliacao_tipos.pc_aval_tipo_descricao
+						,pc_orgaos.pc_org_se_sigla as seOrgAvaliado
+						,pc_orgaos_1.pc_org_descricao AS descOrgOrigem
+						,pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
+						,pc_classificacoes.pc_class_descricao
 						,pc_usuarios.pc_usu_nome  as coordRegional
 						,pc_usuCoodNacional.pc_usu_nome  as coordNacional
 						,CASE 
@@ -177,6 +182,9 @@
 												WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
 											</cfquery>
 											<cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,"; ")>
+											<cfif objetivosEstrategicosList EQ "">
+												<cfset objetivosEstrategicosList = "NÃO DEFINIDO">
+											</cfif>
 
 											<cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
 												SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
@@ -184,6 +192,9 @@
 												WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
 											</cfquery>
 											<cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,"; ")>
+											<cfif riscosEstrategicosList EQ "">
+												<cfset riscosEstrategicosList = "NÃO DEFINIDO">
+											</cfif>
 
 											<cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
 												SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
@@ -191,6 +202,9 @@
 												WHERE pc_processos_indEstrategicos.pc_processo_id = '#pc_processo_id#'
 											</cfquery>
 											<cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,"; ")>
+											<cfif indicadoresEstrategicosList EQ "">
+												<cfset indicadoresEstrategicosList = "NÃO DEFINIDO">
+											</cfif>
 
 											<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 												SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
@@ -588,6 +602,9 @@
 													WHERE pc_avaliacao_tiposControles.pc_aval_id = '#pc_aval_id#'
 												</cfquery>
 												<cfset tiposControlesList=ValueList(rsTiposControles.pc_aval_tipoControle_descricao,"; ")>
+												<cfif tiposControlesList EQ "">
+													<cfset tiposControlesList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsCategoriasControles">
 													SELECT pc_aval_categoriaControle_descricao FROM pc_avaliacao_categoriasControles
@@ -595,6 +612,9 @@
 													WHERE pc_avaliacao_categoriasControles.pc_aval_id = '#pc_aval_id#'
 												</cfquery>
 												<cfset categoriasControlesList=ValueList(rsCategoriasControles.pc_aval_categoriaControle_descricao,"; ")>
+												<cfif categoriasControlesList EQ "">
+													<cfset categoriasControlesList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsRiscos">
 													SELECT pc_aval_risco_descricao FROM pc_avaliacao_riscos
@@ -602,6 +622,9 @@
 													WHERE pc_avaliacao_riscos.pc_aval_id = '#pc_aval_id#'
 												</cfquery>
 												<cfset riscosList=ValueList(rsRiscos.pc_aval_risco_descricao,"; ")>
+												<cfif riscosList EQ "">
+													<cfset riscosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
 													SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
@@ -609,6 +632,9 @@
 													WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
 												</cfquery>
 												<cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,"; ")>
+												<cfif objetivosEstrategicosList EQ "">
+													<cfset objetivosEstrategicosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
 													SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
@@ -616,6 +642,9 @@
 													WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
 												</cfquery>
 												<cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,"; ")>
+												<cfif riscosEstrategicosList EQ "">
+													<cfset riscosEstrategicosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
 													SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
@@ -623,6 +652,9 @@
 													WHERE pc_processos_indEstrategicos.pc_processo_id = '#pc_processo_id#'
 												</cfquery>
 												<cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,"; ")>
+												<cfif indicadoresEstrategicosList EQ "">
+													<cfset indicadoresEstrategicosList = "NÃO DEFINIDO">
+												</cfif>
  
 												<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 													SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
@@ -1070,6 +1102,9 @@
 													WHERE pc_avaliacao_tiposControles.pc_aval_id = '#pc_aval_id#'
 												</cfquery>
 												<cfset tiposControlesList=ValueList(rsTiposControles.pc_aval_tipoControle_descricao,"; ")>
+												<cfif tiposControlesList EQ "">
+													<cfset tiposControlesList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsCategoriasControles">
 													SELECT pc_aval_categoriaControle_descricao FROM pc_avaliacao_categoriasControles
@@ -1077,6 +1112,9 @@
 													WHERE pc_avaliacao_categoriasControles.pc_aval_id = '#pc_aval_id#'
 												</cfquery>
 												<cfset categoriasControlesList=ValueList(rsCategoriasControles.pc_aval_categoriaControle_descricao,"; ")>
+												<cfif categoriasControlesList EQ "">
+													<cfset categoriasControlesList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsRiscos">
 													SELECT pc_aval_risco_descricao FROM pc_avaliacao_riscos
@@ -1084,7 +1122,9 @@
 													WHERE pc_avaliacao_riscos.pc_aval_id = '#pc_aval_id#'
 												</cfquery>
 												<cfset riscosList=ValueList(rsRiscos.pc_aval_risco_descricao,"; ")>
-
+												<cfif riscosList EQ "">
+													<cfset riscosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
 													SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
@@ -1092,6 +1132,9 @@
 													WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
 												</cfquery>
 												<cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,"; ")>
+												<cfif objetivosEstrategicosList EQ "">
+													<cfset objetivosEstrategicosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
 													SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
@@ -1099,6 +1142,9 @@
 													WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
 												</cfquery>
 												<cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,"; ")>
+												<cfif riscosEstrategicosList EQ "">
+													<cfset riscosEstrategicosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
 													SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
@@ -1106,6 +1152,9 @@
 													WHERE pc_processos_indEstrategicos.pc_processo_id = '#pc_processo_id#'
 												</cfquery>
 												<cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,"; ")>
+												<cfif indicadoresEstrategicosList EQ "">
+													<cfset indicadoresEstrategicosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 													SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
@@ -1123,6 +1172,9 @@
 													WHERE pc_avaliacao_orientacao_categoriasControles.pc_aval_orientacao_id = '#pc_aval_orientacao_id#'
 												</cfquery>
 												<cfset categoriasControlesOrientacaoList=ValueList(rsOrientacaoCategoriasControles.pc_aval_categoriaControle_descricao,"; ")>
+												<cfif categoriasControlesOrientacaoList EQ "">
+													<cfset categoriasControlesOrientacaoList = "NÃO DEFINIDO">
+												</cfif>
 												
 												<cfoutput>	
 
@@ -1585,6 +1637,9 @@
 													WHERE pc_avaliacao_tiposControles.pc_aval_id = '#pc_aval_id#'
 												</cfquery>
 												<cfset tiposControlesList=ValueList(rsTiposControles.pc_aval_tipoControle_descricao,"; ")>
+												<cfif tiposControlesList EQ "">
+													<cfset tiposControlesList = "NÃO DEFINIDO">
+												</cfif>	
 
 												<cfquery datasource="#application.dsn_processos#" name="rsCategoriasControles">
 													SELECT pc_aval_categoriaControle_descricao FROM pc_avaliacao_categoriasControles
@@ -1592,6 +1647,9 @@
 													WHERE pc_avaliacao_categoriasControles.pc_aval_id = '#pc_aval_id#'
 												</cfquery>
 												<cfset categoriasControlesList=ValueList(rsCategoriasControles.pc_aval_categoriaControle_descricao,"; ")>
+												<cfif categoriasControlesList EQ "">
+													<cfset categoriasControlesList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsRiscos">
 													SELECT pc_aval_risco_descricao FROM pc_avaliacao_riscos
@@ -1599,6 +1657,9 @@
 													WHERE pc_avaliacao_riscos.pc_aval_id = '#pc_aval_id#'
 												</cfquery>
 												<cfset riscosList=ValueList(rsRiscos.pc_aval_risco_descricao,"; ")>
+												<cfif riscosList EQ "">
+													<cfset riscosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsObjetivosEstrategicos">
 													SELECT pc_objEstrategico_descricao FROM pc_processos_objEstrategicos
@@ -1606,6 +1667,9 @@
 													WHERE pc_processos_objEstrategicos.pc_processo_id = '#pc_processo_id#'
 												</cfquery>
 												<cfset objetivosEstrategicosList=ValueList(rsObjetivosEstrategicos.pc_objEstrategico_descricao,"; ")>
+												<cfif objetivosEstrategicosList EQ "">
+													<cfset objetivosEstrategicosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsRiscosEstrategicos">
 													SELECT pc_riscoEstrategico_descricao FROM pc_processos_riscosEstrategicos
@@ -1613,6 +1677,9 @@
 													WHERE pc_processos_riscosEstrategicos.pc_processo_id = '#pc_processo_id#'
 												</cfquery>
 												<cfset riscosEstrategicosList=ValueList(rsRiscosEstrategicos.pc_riscoEstrategico_descricao,"; ")>
+												<cfif riscosEstrategicosList EQ "">
+													<cfset riscosEstrategicosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery datasource="#application.dsn_processos#" name="rsIndicadoresEstrategicos">
 													SELECT pc_indEstrategico_descricao FROM pc_processos_indEstrategicos
@@ -1620,6 +1687,9 @@
 													WHERE pc_processos_indEstrategicos.pc_processo_id = '#pc_processo_id#'
 												</cfquery>
 												<cfset indicadoresEstrategicosList=ValueList(rsIndicadoresEstrategicos.pc_indEstrategico_descricao,"; ")>
+												<cfif indicadoresEstrategicosList EQ "">
+													<cfset indicadoresEstrategicosList = "NÃO DEFINIDO">
+												</cfif>
 
 												<cfquery name="rsAvaliadores" datasource="#application.dsn_processos#">
 													SELECT  pc_avaliadores.* ,  pc_usuarios.pc_usu_nome as avaliadores
@@ -1637,8 +1707,10 @@
 													WHERE pc_avaliacao_melhoria_categoriasControles.pc_aval_Melhoria_id = '#pc_aval_melhoria_id#'
 												</cfquery>
 												<cfset categoriasControlesMelhoriaList=ValueList(rsMelhoriaCategoriasControles.pc_aval_categoriaControle_descricao,"; ")>
-												
-		
+												<cfif categoriasControlesMelhoriaList EQ "">
+													<cfset categoriasControlesMelhoriaList = "NÃO DEFINIDO">
+												</cfif>
+
 												<cfoutput>					
 													<tr style="cursor:pointer;font-size:12px" >
 																		

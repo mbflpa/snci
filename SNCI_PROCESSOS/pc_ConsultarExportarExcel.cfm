@@ -100,20 +100,23 @@
 				border-radius: 5px!important;
 			}
 			div.dt-button-collection.fixed.three-column {
-				margin-left:-400!important;
-				width: 900px!important;
+				margin-left:-500px!important;
+				width: auto!important;
 				padding:10px!important;
+				
 			}
 			div.dt-button-collection.fixed.four-column {
-				margin-left:-400!important;
-				width: 1045px!important;
+				margin-left:-500px!important;
+				width: auto!important;
 				padding:10px!important;
 			}
 			.dropdown-item.active, .dropdown-item:active {
 				color: #fff;
-				text-decoration: none;
 				background-color: #2581c8!important;
-				border: 1px solid #fff!important;
+				
+			}
+			.dropdown-item {
+				font-size: 0.7rem!important;
 			}
 			
 			
