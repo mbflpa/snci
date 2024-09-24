@@ -82,7 +82,7 @@
 						LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
 						LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
 						LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
-			WHERE NOT pc_num_status IN (2,3) 
+			WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)<=2023
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#"> 
 			</cfif>	
@@ -427,7 +427,7 @@
 						LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
 						LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
 						LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
-			WHERE NOT pc_num_status IN (2,3) 
+			WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)<=2023
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
@@ -827,7 +827,7 @@
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
 					    LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
 						LEFT JOIN pc_orgaos AS pc_orgaoResp ON pc_orgaoResp.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-			WHERE NOT pc_num_status IN (2,3)  and pc_aval_orientacao_id is not null
+			WHERE NOT pc_num_status IN (2,3)  and pc_aval_orientacao_id is not null and  right(pc_processos.pc_processo_id,4)<=2023
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
@@ -1238,7 +1238,7 @@
 						INNER JOIN pc_orgaos as  pc_orgaos_melhoria on pc_orgaos_melhoria.pc_org_mcu = pc_aval_melhoria_num_orgao
 						LEFT JOIN  pc_orgaos as pc_orgaos_melhoria_sug on pc_orgaos_melhoria_sug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
 			            
-			WHERE NOT pc_num_status IN (2,3) 
+			WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)<=2023
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
