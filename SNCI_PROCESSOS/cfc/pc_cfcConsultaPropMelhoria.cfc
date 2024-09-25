@@ -550,7 +550,7 @@
 				});
 				$('#custom-tabs-one-Anexos-tab').click(function() {
 					//se ir da orientação for '', a função retorna apenas os anexos dos itens
-					mostraTabAnexos('tabAnexosDiv',pc_aval_id,'', 'custom-tabs-one-Anexos-tab');
+					mostraTabAnexosJS('tabAnexosDiv',pc_aval_id,'', 'custom-tabs-one-Anexos-tab');
 				});
 
 			})

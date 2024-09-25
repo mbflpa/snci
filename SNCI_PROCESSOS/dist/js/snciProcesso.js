@@ -1082,7 +1082,7 @@ function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios, tab){
 
 }
 
-function mostraTabAnexos(divId, pc_aval_id, pc_orientacao_id,tab){
+function mostraTabAnexosJS(divId, pc_aval_id, pc_orientacao_id,tab){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
     $('#' + divId).attr("hidden",true);

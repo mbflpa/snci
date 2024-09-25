@@ -3223,7 +3223,7 @@
 									async: false
 								})//fim ajax
 								.done(function(result) {	
-									mostraTabAnexos();
+									mostraTabAnexosJS('tabAnexosDiv',pc_anexo_id,'','');
 								
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide')
@@ -3331,7 +3331,7 @@
 									async: false
 								})//fim ajax
 								.done(function(result) {	
-									mostraTabAnexos();
+									mostraTabAnexosJS('tabAnexosDiv',pc_anexo_id,'','');
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide');
 										mostraRelatoPDF()

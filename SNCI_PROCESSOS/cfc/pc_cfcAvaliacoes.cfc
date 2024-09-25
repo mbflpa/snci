@@ -6592,6 +6592,8 @@
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
 		<cfargument name="pc_orientacao_id" type="string" required="false" default=""/>
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
+		<cfargument name="ehEdicao" type="string" required="false" default="N"/>
+		
 
         <cfquery datasource="#application.dsn_processos#" name="rsAnexos">
 			Select pc_anexos.*, pc_orgaos.*, pc_usu_nome  FROM pc_anexos 
@@ -6645,7 +6647,7 @@
 															<td style="width:10%">	
 																<div style="display:flex;justify-content:space-around;">
 																	
-																	<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3  or (#arguments.passoapasso# eq "false"	 and datediff("n",  #pc_anexo_datahora#,now()) lt 5) and #application.rsUsuarioParametros.pc_usu_lotacao# eq #pc_org_mcu#>
+																	<cfif #arguments.ehEdicao# eq 'S' or #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3  or (#arguments.passoapasso# eq "false"	 and datediff("n",  #pc_anexo_datahora#,now()) lt 5) and #application.rsUsuarioParametros.pc_usu_lotacao# eq #pc_org_mcu#>
 																		<i id="btExcluir" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:18px" onclick="javascript:excluirAnexo(#pc_anexo_id#);"   title="Excluir" ></i>
 																	</cfif>
 																
@@ -6751,7 +6753,7 @@
 									async: false
 								})//fim ajax
 								.done(function(result) {	
-									mostraTabAnexos();
+									mostraTabAnexosJS('tabAnexosDiv',pc_anexo_id,'','');
 									if (passoapasso == false){
 										mostraTabAnexosOrientacoes()
 									}
@@ -7036,7 +7038,7 @@
 									async: false
 								})//fim ajax
 								.done(function(result) {	
-									mostraTabAnexos();
+									mostraTabAnexosJS('tabAnexosDiv',pc_anexo_id,'','');
 									mostraTabAnexosOrientacoes()
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide')
@@ -7077,6 +7079,7 @@
 	<cffunction name="anexoAvaliacao"   access="remote" hint="retorna os anexos que contem 'S' no campo pc_anexo_avaliacao indicando que é a avaliação e  não um anexo comum">
 		<cfargument name="pc_aval_id" type="numeric" required="true" returntype="any"/>
 		<cfargument name="todosOsRelatorios" type="string" required="false" default="N"/>
+		<cfargument name="ehEdicao" type="string" required="false" default="N"/>
 		
 		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status, pc_avaliacoes.pc_aval_processo FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
@@ -7105,7 +7108,7 @@
 							
 								<h3 class="card-title" style="font-size:16px;position:relative;top:3px;cursor:pointer" data-card-widget="collapse"><i class="fas fa-file-pdf" style="margin-right:10px;"></i><cfoutput> #pc_anexo_nome#</cfoutput></h3>
 								<div  class="card-tools">
-									<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
+									<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3 or #arguments.ehEdicao# eq "S">
 										<button type="button"  id="btExcluir" class="btn btn-tool  " style="font-size:16px" onclick="javascript:excluirAnexoAvaliacao(<cfoutput>#pc_anexo_id#</cfoutput>);"  ><i class="fas fa-trash-alt"></i></button>
 									</cfif>
 									<button  type="button" class="btn btn-tool" data-card-widget="collapse" style="font-size:16px;margin-left:50px"><i  class="fas fa-plus"></i></button>
@@ -7151,7 +7154,7 @@
 									async: false
 								})//fim ajax
 								.done(function(result) {	
-									mostraTabAnexos();
+									mostraTabAnexosJS('tabAnexosDiv',pc_anexo_id,'','');
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide');
 										mostraRelatoPDF()

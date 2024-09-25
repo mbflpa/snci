@@ -914,7 +914,7 @@
 				});
 
 				$('#custom-tabs-one-Anexos-tab').on('click', function (event){
-					mostraTabAnexos('tabAnexosDiv',pc_aval_id,pc_aval_orientacao_id);
+					mostraTabAnexosJS('tabAnexosDiv',pc_aval_id,pc_aval_orientacao_id);
 				});
 				
 				mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id,'custom-tabs-one-Orientacao-tab');

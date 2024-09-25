@@ -3232,7 +3232,8 @@
 						url: "cfc/pc_cfcAvaliacoes.cfc",
 						data:{
 							method: "tabAnexos",
-							pc_aval_id: pc_aval_id
+							pc_aval_id: pc_aval_id,
+							ehEdicao: "S"
 						},
 						async: false
 					})//fim ajax
@@ -3396,7 +3397,8 @@
 						url:"cfc/pc_cfcAvaliacoes.cfc",
 						data:{
 							method: "anexoAvaliacao",
-							pc_aval_id: pc_aval_id
+							pc_aval_id: pc_aval_id,
+							ehEdicao: 'S'
 						},
 						async: false
 					})//fim ajax

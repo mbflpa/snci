@@ -852,7 +852,7 @@
 				});
 
 				$('#custom-tabs-one-Anexos-tab').on('click', function (event){
-					mostraTabAnexos('tabAnexosDiv',pc_aval_id,pc_aval_orientacao_id);
+					mostraTabAnexosJS('tabAnexosDiv',pc_aval_id,pc_aval_orientacao_id);
 				});
 				
 				mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id,'custom-tabs-one-Orientacao-tab');
@@ -1924,7 +1924,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 				});
 				$('#custom-tabs-one-Anexos-tab').click(function() {
 					//se ir da orientação for '', a função retorna apenas os anexos dos itens
-					mostraTabAnexos('tabAnexosDiv',pc_aval_id,'','custom-tabs-one-Anexos-tab');
+					mostraTabAnexosJS('tabAnexosDiv',pc_aval_id,'','custom-tabs-one-Anexos-tab');
 				});
 
 			
@@ -2459,7 +2459,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					// Hide the total progress bar when nothing's uploading anymore
 					myDropzoneAcomp.on("queuecomplete", function(progress) {
 						mostraTabAnexosOrientacoes();
-						mostraTabAnexos();
+						mostraTabAnexosJS('tabAnexosDiv',pc_anexo_avaliacao_id,'','');
 						
 						$('#modalOverlay').delay(1000).hide(0, function() {
 							$('#modalOverlay').modal('hide');
@@ -3180,7 +3180,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 				// Hide the total progress bar when nothing's uploading anymore
 				myDropzoneAcomp.on("queuecomplete", function(progress) {
 					mostraTabAnexosOrientacoes();
-					mostraTabAnexos();
+					mostraTabAnexosJS('tabAnexosDiv',pc_anexo_avaliacao_id,'','');
 					
 					$('#modalOverlay').delay(1000).hide(0, function() {
 						$('#modalOverlay').modal('hide');
