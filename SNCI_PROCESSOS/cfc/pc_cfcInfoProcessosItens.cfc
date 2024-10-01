@@ -480,7 +480,7 @@
                                                         <cfif rsInfoItem.pc_aval_valorEstimadoRisco gt 0>
                                                             <li >Em Risco ou Valor Envolvido: <span style="color:##0692c6;">#LSCurrencyFormat(rsInfoItem.pc_aval_valorEstimadoRisco, 'local')#.</span></li>
                                                         </cfif>
-                                                        <cfif rsInfoItem.pc_aval_valorEstimadoRisco gt 0>
+                                                        <cfif rsInfoItem.pc_aval_valorEstimadoNaoPlanejado gt 0>
                                                             <li >Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">#LSCurrencyFormat(rsInfoItem.pc_aval_valorEstimadoNaoPlanejado, 'local')#.</span></li>
                                                         </cfif>
                                                     </div>
