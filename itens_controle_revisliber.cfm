@@ -242,6 +242,9 @@
   <!--- Excluir anexo --->
 	 <cfif Form.acao is 'Excluir_Anexo'>
 	  <!--- Verificar se anexo existe --->
+ <cfoutput>
+  form.vCodigo: #form.vCodigo#
+ </cfoutput>
 
 		 <cfquery datasource="#dsn_inspecao#" name="qAnexos">
 			SELECT Ane_Codigo, Ane_Caminho FROM Anexos
@@ -545,13 +548,15 @@
 				</cfif>
 
 		        <!---   <cfset sdestina = "gilvanm@correios.com.br">  --->
+<cfoutput>
 				<cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="Relatório de Avaliação de Controle Interno" type="HTML">
 					Mensagem automática. Não precisa responder!<br><br>
 					Ao Gestor do(a) #Ucase(auxsigla)#. <br><br><br>
-					&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  "#situacao#" para  manifestação  desse órgão.<br><br>
+					&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  "#situacao#" para  manifestação desse órgão.<br><br>
 					&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
 					&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a>Relatório N° #FORM.ninsp#, Grupo: #FORM.ngrup#  e Item: #FORM.nitem#.<br><br>
 				</cfmail>
+</cfoutput>				
 				<!--- Fim da Intencao de passar a area ---> 
 	</cfif>
 	<cfif isDefined("Session.E01")>
@@ -1393,9 +1398,9 @@ function abrirPopup(url,w,h)
 		  <td bgcolor="eeeeee"><cfoutput>
               <div align="center">
 				<cfif (resp neq 24 and cla eq qAnexos.recordcount)>
-                   <input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value=this.codigo" value="Excluir" codigo="#qAnexos.Ane_Codigo#">
+                   <input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value='#qAnexos.Ane_Codigo#'" value="Excluir" codigo="#qAnexos.Ane_Codigo#">		   
                 <cfelse>
-                   <input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value=this.codigo" value="Excluir" codigo="#qAnexos.Ane_Codigo#" disabled>
+                   <input name="submit" type="submit" class="botao" onClick="document.form1.acao.value='Excluir_Anexo';document.form1.vCodigo.value='#qAnexos.Ane_Codigo#'" value="Excluir" codigo="#qAnexos.Ane_Codigo#" disabled>
 				</cfif>
 		        </div>
 		  </cfoutput></td>

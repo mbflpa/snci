@@ -1,0 +1,15 @@
+* {
+    box-shadow: inset 0px 0px 4px rgba(0, 0, 0, 1);
+}
+
+.red {
+    box-shadow: inset 0px 0px 4px rgba(255, 0, 0, 1);
+}
+
+.green {
+    box-shadow: inset 0px 0px 4px rgba(0, 150, 0, 1);
+}
+
+.blue {
+    box-shadow: inset 0px 0px 4px rgba(0, 0, 255, 1 );
+}

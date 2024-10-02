@@ -246,7 +246,7 @@
 					WHERE INP_NumInspecao = '#url.numInspecao#'
 				</cfquery>	
 	    </cfif>				
-		<cflocation url = "cadastro_inspecao_inspetores_alt.cfm?numInspecao=#url.NumInspecao#&Unid=#url.Unid#&coordenador=#url.coordenador#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=#RIPMatricAvaliador###tabInsp" addToken = "no">
+		<cflocation url = "cadastro_inspecao_inspetores_alt.cfm?numInspecao=#url.NumInspecao#&Unid=#url.Unid#&coordenador=#url.coordenador#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=#RIPMatricAvaliador#&telaretorno=#url.telaretorno#&##tabInsp" addToken = "no">
 	</cfif>
 <!---  --->	
 	<cfif '#url.acao#' eq 'altInspetor'>
@@ -254,7 +254,7 @@
 					UPDATE Inspecao SET INP_Coordenador = '#url.numMatricula#' 
 					 WHERE INP_NumInspecao = trim('#url.numInspecao#')
 					</cfquery>
-					<cflocation url = "cadastro_inspecao_inspetores_alt.cfm?numInspecao=#url.NumInspecao#&Unid=#url.Unid#&coordenador=#url.numMatricula#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=N##tabInsp" addToken = "no">
+					<cflocation url = "cadastro_inspecao_inspetores_alt.cfm?numInspecao=#url.NumInspecao#&Unid=#url.Unid#&coordenador=#url.numMatricula#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=N&telaretorno=#url.telaretorno#&##tabInsp" addToken = "no">
 	</cfif>
 </cfif>
 
@@ -645,11 +645,12 @@ if (x == 'altcadastro') {
 				<img i="imagAguarde" name="imgAguarde"" src="figuras/aguarde.png" width="100px"  border="0" style="position:relative;top:200px"></img>
 		    </div>
 	<!--- <cfinclude template="cabecalho.cfm"> --->
+<cfoutput>	
 	<div align="left" style="margin:10px">
 		
-	<a href="itens_inspetores_avaliacao.cfm?numInspecao=<cfoutput>#url.numInspecao#</cfoutput>&Unid=<cfoutput>#url.Unid#</cfoutput>" onClick="aguarde();" class="botaoCad" style="position:relative;left:13px;"><img src="figuras/voltar.png" width="25"  border="0" style="position:absolute;left:5px;top:3px"></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voltar à Página Anterior</a>
+	<a href="#url.telaretorno#?numInspecao=#url.numInspecao#&Unid=#url.Unid#" onClick="aguarde();" class="botaoCad" style="position:relative;left:13px;"><img src="figuras/voltar.png" width="25"  border="0" style="position:absolute;left:5px;top:3px"></img>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voltar à Página Anterior</a>
 	</div>
-
+</cfoutput>
 	
 
 	
@@ -714,8 +715,10 @@ if (x == 'altcadastro') {
 															&dtInicInspecao=#url.dtInicInspecao#
 															&dtFimInspecao=#url.dtFimInspecao#
 															&RIPMatricAvaliador=N
+															&telaretorno=#url.telaretorno#
+															&##tabInsp
 														</cfoutput>
-														#tabInsp">
+														">
 
 				<cfif isDefined("url.numInspecao")>
 					<cfquery datasource="#dsn_inspecao#" name="rsInspecao">
@@ -985,7 +988,7 @@ if (x == 'altcadastro') {
 										 <cfif auxcoord neq 'Sim' and grpacesso neq 'INSPETORES'>
 											<div align="center"><a
 													onclick="return confirm('Confirma alterar este Inspetor para ser coordenador desta Avaliação? \n#trim(nomeInspCad.Usu_Apelido)#')"
-													href="cadastro_inspecao_inspetores_alt.cfm?numInspecao=#IPT_NumInspecao#&Unid=#url.Unid#&numMatricula=#IPT_MatricInspetor#&coordenador=#url.Coordenador#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=N&acao=altInspetor"><img
+													href="cadastro_inspecao_inspetores_alt.cfm?numInspecao=#IPT_NumInspecao#&Unid=#url.Unid#&numMatricula=#IPT_MatricInspetor#&coordenador=#url.Coordenador#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=N&telaretorno=#url.telaretorno#&acao=altInspetor"><img
 														src="icones/monitora.png" width="20" height="20" border="0" alt="Clique para mudar de Coordenador desta Avaliação"></img></a>
 											</div>
 										</cfif>
@@ -1005,7 +1008,7 @@ if (x == 'altcadastro') {
 										<cfif auxcoord neq 'Sim' and qtdinspetores gt 2 and grpacesso neq 'INSPETORES'>	
 											<div align="center"><a
 													onclick="return confirm('Confirma a exclusão deste Inspetor como participante desta Inspeção? \n#trim(nomeInspCad.Usu_Apelido)#')"
-													href="cadastro_inspecao_inspetores_alt.cfm?numInspecao=#IPT_NumInspecao#&Unid=#url.Unid#&numMatricula=#IPT_MatricInspetor#&coordenador=#url.Coordenador#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=#RIP_MatricAvaliador#&acao=excInspetor"><img
+													href="cadastro_inspecao_inspetores_alt.cfm?numInspecao=#IPT_NumInspecao#&Unid=#url.Unid#&numMatricula=#IPT_MatricInspetor#&coordenador=#url.Coordenador#&dtInicDeslocamento=#url.dtInicDeslocamento#&dtFimDeslocamento=#url.dtFimDeslocamento#&dtInicInspecao=#url.dtInicInspecao#&dtFimInspecao=#url.dtFimInspecao#&RIPMatricAvaliador=#RIP_MatricAvaliador#&telaretorno=#url.telaretorno#&acao=excInspetor"><img
 														src="icones/lixeiraRosa.png" width="20" height="20" border="0"></img></a>
 											</div>
 										</cfif>

@@ -64,7 +64,6 @@ SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<c
 	<cfcase value="12">
 		<cfset mes = "Dezembro">
 	</cfcase>
-
 </cfswitch>
 
 <cfquery name="rsMetasAntes" datasource="#dsn_inspecao#">
@@ -78,7 +77,6 @@ SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<c
   </cfif>
   ORDER BY Met_Mes
 </cfquery>
-
 
 <cfquery name="rsMetas" datasource="#dsn_inspecao#">
     SELECT Met_Codigo, Met_Ano, Met_SE_STO, Met_SLNC, Met_PRCI, Met_DGCI, Met_SLNC_Acum, Met_PRCI_Acum, Met_SLNC_AcumPeriodo, Met_PRCI_AcumPeriodo, Met_SLNC_Mes, Met_PRCI_Mes, Met_DGCI_Mes
@@ -128,10 +126,10 @@ Result_Acum: #Result_Acum#<br>
 function trocar(a){
 //alert(a);
 	if (a == 1) {
-	   document.frmopc.action="Rel_Indicadores_Solucao_Ref.cfm"; 
+	   document.frmopc.action="slnc_ref.cfm"; 
 	}
 	if (a == 2) {
-	   document.frmopc.action="itens_Gestao_Andamento_ref.cfm";   
+	   document.frmopc.action="prci_ref.cfm";   
 	}
 	if (a == 3) {
 	   document.frmopc.action="Rel_ClassifInspecao_Ref.cfm";   
@@ -361,13 +359,14 @@ function Hint(objNome, action){
 	<cfset AcumPerAno = AcumPerAno + MetDGCIAcumAtual>
 	<cfset MetDGCIAcum = trim(NumberFormat(Result_Acum,999.0))> 
 	
-<!--- 	<cfoutput>  #MetDGCIAcumPeriodo#</cfoutput> --->
+<!--- 	<cfoutput>  #MetDGCIAcumPeriodo#</cfoutput> 
 	 <cfif grpacesso eq 'GESTORMASTER' and aux_mes eq #month(dtlimit)# and day(now()) lte 10>
         <cfquery datasource="#dsn_inspecao#">
         UPDATE Metas SET Met_DGCI = '#MetDGCIMesAntes#', Met_DGCI_Mes = '#MetDGCIMesAntes#', Met_DGCI_Acum = '#MetDGCIAcum#', Met_DGCI_AcumPeriodo = '#MetDGCIAcumPeriodo#' 
         WHERE Met_Codigo='#url.dr#' and Met_Ano = #YEAR(dtlimit)# and Met_Mes = #aux_mes#
        </cfquery>  
-	 </cfif>	   
+	 </cfif>	
+  --->   
             <tr>
               <td colspan="2"><hr></td>
             </tr>

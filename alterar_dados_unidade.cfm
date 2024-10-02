@@ -16,8 +16,10 @@
 </cfquery>
 <!--- Criado por: Marcelo Bittencourt em 09/07/2020; Procedimento: Atualizar unidade centralizadora --->
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
-  SELECT Usu_DR FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
+  SELECT Usu_DR,Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
 </cfquery>
+<cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
+
 <cfquery name="qUnidCentraliza" datasource = "#dsn_inspecao#">
   SELECT   Und_Codigo, Und_Descricao 
   FROM     Unidades
@@ -31,7 +33,10 @@ FROM Unidades
 WHERE Und_Codigo = '#form.Codigo#'
 </cfquery>
 <cfquery name="qtipo" datasource = "#dsn_inspecao#">
-  SELECT TUN_codigo, TUN_Descricao FROM Tipo_Unidades WHERE TUN_codigo = #qVisualiza.Und_TipoUnidade#
+  SELECT TUN_codigo, TUN_Descricao FROM Tipo_Unidades 
+  <cfif grpacesso neq 'GESTORES' and grpacesso neq 'GESTORMASTER'>
+    WHERE TUN_codigo = #qVisualiza.Und_TipoUnidade#
+  </cfif>
 </cfquery>
 <cfquery name="qcategoria" datasource ="#dsn_inspecao#">
   SELECT Cat_Descricao, Cat_Codigo FROM CategoriaUnidades WHERE Cat_Status = 'A' ORDER BY Cat_Descricao

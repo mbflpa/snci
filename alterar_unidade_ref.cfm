@@ -48,7 +48,7 @@ function trocar(a,b){
 		      <td colspan="4"><div align="center"><span class="titulos">Superintendência:</span></div></td>
 	  </tr>
 
-	   <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' AND qAcesso.Usu_DR eq '01'>
+	   <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where Dir_Codigo <> '01'
 			</cfquery>

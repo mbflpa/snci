@@ -101,7 +101,7 @@
 	<cfif qUsuarioGestorMaster.recordcount neq 0 >
 		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,25,26,27,29,31,51)) 
 	<cfelse>
-		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,25,26,27,29,31,51))
+		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,24,25,26,27,29,31,51))
     </cfif>	
 	 AND (INP_NumInspecao = '#txtNum_Inspecao#')
 	<!--- AND 1 = CASE WHEN Pos_Situacao_Resp IN (1,6,7,22) THEN 0 ELSE 1 END  --->	
@@ -134,7 +134,7 @@
 	<cfif qUsuarioGestorMaster.recordcount neq 0 >
 		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,25,26,27,29,31,51)) 
 	<cfelse>
-		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,25,26,27,29,31,51)) 
+		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,24,25,26,27,29,31,51)) 
     </cfif>	
    </cfquery>
  </cfif> 
@@ -219,7 +219,7 @@
 	<cfif qUsuarioGestorMaster.recordcount neq 0>
 		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,25,26,27,29,31,51) 
 	<cfelse>
-		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,25,26,27,29,31,51)
+		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,24,25,26,27,29,31,51)
     </cfif>	
 	
 	<!---  AND 1 = CASE WHEN Pos_Situacao_Resp IN (1,6,7,22) THEN 0 ELSE 1 END    --->
@@ -317,7 +317,7 @@
     <cfif qUsuarioGestorMaster.recordcount neq 0>
 		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,25,26,27,29,31,51) 
 	<cfelse>
-		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,25,26,27,29,31,51) 
+		(Pos_Situacao_Resp not in (3,9,12,13,15,16,18,19,23,24,25,26,27,29,31,51) 
     </cfif>	
 	
 	 <!--- AND 1 = CASE WHEN Pos_Situacao_Resp IN (1,6,7,22) THEN 0 ELSE 1 END    --->

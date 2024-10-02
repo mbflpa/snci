@@ -1,6 +1,7 @@
 <cfprocessingdirective pageEncoding ="utf-8"/> 
-<!---   <cfoutput>se:#se#&dtlimit:#dtlimit# anoexerc:#anoexerc#<br></cfoutput> 
-<CFSET GIL = GIL>   --->
+
+<!---  <cfoutput>se:#se#&dtlimit:#dtlimit# anoexerc:#anoexerc#<br></cfoutput> --->
+<!--- <CFSET GIL = GIL>  --->
 <cfsetting requesttimeout="15000"> 
 <cfoutput>
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
@@ -27,12 +28,10 @@
 <script language="javascript">
 //=============================
 
-function listar(a,b,c,d,e){
+function listar(a,b,c){
 	document.formx.lis_se.value=a;
 	document.formx.lis_grpace.value=b;
     document.formx.lis_mes.value=c;
-	document.formx.lis_soluc.value=d;
-	document.formx.lis_outros.value=e;
 	document.formx.submit(); 
 }
 </script>
@@ -86,8 +85,8 @@ function listar(a,b,c,d,e){
 <cfset GE_OUT_TOT = 0>
 <cfset GE_NOV_TOT = 0>
 <cfset GE_DEZ_TOT = 0>
-<cfset Ger_Total = 0> 
 <cfset Acum_GE = 0>
+<cfset Ger_Total = 0> 
 <!--- Solucionados por GERENCIAS --->
 <cfset Soluc_Tot_Jan_GE = 0>
 <cfset Soluc_Tot_Fev_GE = 0>
@@ -179,49 +178,46 @@ function listar(a,b,c,d,e){
 <!---  <cfset dtlimit = CreateDate(2021,02,28)>  --->
 <!--- Criar linha de metas --->
 <cfquery name="rsMetas" datasource="#dsn_inspecao#">
-	SELECT Met_Codigo, Met_Ano, Met_Mes, Met_SE_STO, Met_SLNC, Met_PRCI, Met_EFCI, Met_DGCI, Met_SLNC_Acum, Met_PRCI_Acum, Met_EFCI_Acum, Met_SLNC
+	SELECT Met_Codigo, Met_Ano, Met_Mes, Met_SE_STO, Met_SLNC, Met_PRCI, Met_EFCI, Met_DGCI, Met_SLNC_Acum, Met_PRCI_Acum, Met_EFCI_Acum
 	FROM Metas
 	WHERE Met_Codigo='#se#' and Met_Ano = #anoexerc# and Met_Mes = 1
 </cfquery>
 <!--- criação dos meses por SE --->
 <!--- <cfoutput>
-#int(month(now()) - 1)#<br>
-#int(month(dtlimit))#<br>
-#day(now())#<br>
+#int(month(dtlimit))#
 <cfset gil=gil>
-</cfoutput>  --->
+</cfoutput> --->
 <cfset nCont = 1>
-
-<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and day(now()) lte 10>
-	<cfloop condition="nCont lte int(month(dtlimit))">
-		<cfset metprci = trim(rsMetas.Met_PRCI)>
-		<cfset metslnc = trim(rsMetas.Met_SLNC)>
-		<cfset metdgci = trim(rsMetas.Met_DGCI)>
-
-		<cfquery datasource="#dsn_inspecao#" name="rsCrMes">
-			SELECT Met_Ano
-			FROM Metas
-			WHERE Met_Codigo ='#se#' AND Met_Ano = #anoexerc# AND Met_Mes = #nCont#
-		</cfquery>	
-		<cfif rsCrMes.recordcount lte 0>	
-<!---			
-			<cfquery datasource="#dsn_inspecao#">
-				insert into Metas (Met_Codigo,Met_Ano,Met_Mes,Met_SE_STO, Met_SLNC,Met_SLNC_Mes,Met_SLNC_Acum,Met_SLNC_AcumPeriodo,Met_PRCI,Met_PRCI_Mes,Met_PRCI_Acum,Met_PRCI_AcumPeriodo,Met_DGCI,Met_DGCI_Mes,Met_DGCI_Acum,Met_DGCI_AcumPeriodo) 
-				values ('#se#',#year(dtlimit)#,#nCont#,'#rsMetas.Met_SE_STO#','#metslnc#','#metslnc#','0.0','0.0','0.0','0.0','0.0','0.0','0.0','0.0','0.0','0.0')
-			</cfquery>  
---->			
-		</cfif>
-<!---		
+<cfloop condition="nCont lte int(month(dtlimit))">
+	<cfset metprci = trim(numberFormat(rsMetas.Met_PRCI,999.0))>
+	<cfset metslnc = rsMetas.Met_SLNC>
+	<!--- <cfset metdgci = numberFormat(((metslnc * 0.6) + (metprci * 0.4)),999.0)> --->
+	<cfset metdgci = rsMetas.Met_DGCI>
+	<cfset metslncmes = numberFormat(((metslnc / 12) * nCont),999.0)>
+	<cfset metdgcimes = numberFormat(((metslncmes * 0.6) + (metprci * 0.4)),999.0)>
+  <cfquery datasource="#dsn_inspecao#" name="rsCrMes">
+	  SELECT Met_Codigo, Met_Ano, Met_Mes, Met_SE_STO, Met_SLNC, Met_PRCI, Met_EFCI, Met_DGCI, Met_SLNC_Acum, Met_PRCI_Acum, Met_EFCI_Acum
+	  FROM Metas
+	  WHERE Met_Codigo ='#se#' AND Met_Ano = #anoexerc# AND Met_Mes = #nCont#
+  </cfquery>	
+  <cfif rsCrMes.recordcount lte 0>
+<!---  		
 		<cfquery datasource="#dsn_inspecao#">
-			UPDATE Metas SET Met_SLNC='#metslnc#',Met_SLNC_Mes='#metslnc#'
-			WHERE Met_Codigo = '#se#' and Met_Ano = #anoexerc# and Met_Mes = #nCont#
-		</cfquery> 	
-<!---			
-		<cfset nCont = nCont + 1>
-	</cfloop>
-</cfif>
-<cfset metslnc = trim(rsMetas.Met_SLNC)>
-
+		 insert into Metas (Met_Codigo, Met_Ano, Met_Mes, Met_SE_STO, Met_PRCI, Met_SLNC, Met_DGCI, Met_PRCI_Mes, Met_SLNC_Mes, Met_DGCI_Mes, Met_PRCI_Acum, Met_SLNC_Acum, Met_DGCI_Acum, Met_PRCI_AcumPeriodo, Met_SLNC_AcumPeriodo, Met_DGCI_AcumPeriodo) 
+		  values ('#se#', #year(dtlimit)#, #nCont#, '#rsMetas.Met_SE_STO#', '#metprci#', '#metslnc#', '#metdgci#', '#metprci#', '#metslncmes#', '#metdgcimes#', '0.0', '0.0', '0.0', '0.0', '0.0', '0.0')
+		</cfquery>    
+--->		 
+  </cfif>
+	<cfif nCont eq 1>
+	<!---
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE Metas SET Met_DGCI='#metdgci#', Met_PRCI_Mes='#metprci#', Met_SLNC_Mes='#metslncmes#', Met_DGCI_Mes = '#metdgcimes#'
+			WHERE Met_Codigo = '#se#' and Met_Ano = #anoexerc# and Met_Mes = 1
+		</cfquery>  	
+		--->	
+	</cfif>  
+  <cfset nCont = nCont + 1>
+</cfloop>
 <!--- fim criar linhas de metas --->
 <cfset cont_mes = 1> 
 <cfloop condition="#cont_mes# lte int(month(dtlimit))">  
@@ -286,6 +282,7 @@ function listar(a,b,c,d,e){
 	        <cfset auxStantes = rs3SO.Andt_RespAnt>
 			<cfif (auxStantes is 1 or auxStantes is 17 or auxStantes is 2 or auxStantes is 15 or auxStantes is 18 or auxStantes is 20)>
 				<cfset rs3SO_UN = rs3SO_UN + 1>
+				<!--- mes:#aux_mes# contador:#rs3SO_UN#<br> --->
 			</cfif>
 			<cfif auxStantes is 6 or auxStantes is 5 or auxStantes is 19>
 				<cfset rs3SO_GE = rs3SO_GE + 1>
@@ -444,7 +441,6 @@ function listar(a,b,c,d,e){
 	</cfif>
 			<!--- AREAS --->
 	<cfif rsMes_status is 5 or rsMes_status is 19>
-<!--- 	#rsBaseB.Andt_Resp#<br> --->
 			<cfswitch expression="#aux_mes#">
 			   <cfcase value="1">
 					  <cfset GE_JAN_TOT = GE_JAN_TOT + 1>
@@ -614,277 +610,289 @@ function listar(a,b,c,d,e){
         <tr class="exibir">
         <td><div align="center"><strong>JAN</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jan_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_JAN_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jan_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Jan_UN/(UN_JAN_TOT + Soluc_Tot_Jan_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>
 
         <td><div align="center"><strong>#(UN_JAN_TOT + Soluc_Tot_Jan_UN)#</strong></div></td>
        <td><div align="center">#NumberFormat(Per,999.0)#</div></td> 	
-		<cfset Acum_UN = Acum_UN + UN_JAN_TOT>
-		<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',1,<cfoutput>#Soluc_Tot_Jan_UN#</cfoutput>,<cfoutput>#UN_JAN_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div>		 </td>	
+		<cfset Acum_UN = UN_JAN_TOT>
+		<CFIF Soluc_Tot_Jan_UN NEQ 0>
+			<td width="19%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',1);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',1);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
+
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 2>
         <tr class="exibir">
         <td><div align="center"><strong>FEV</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Fev_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_FEV_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>		
 		<cfif Soluc_Tot_Fev_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Fev_UN/(UN_FEV_TOT + Soluc_Tot_Fev_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
 				
         <td><div align="center"><strong>#(UN_FEV_TOT + Soluc_Tot_Fev_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_UN = Acum_UN + UN_FEV_TOT>
-		<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',2,<cfoutput>#Soluc_Tot_FEV_UN#</cfoutput>,<cfoutput>#UN_FEV_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div>		</td>	
+		<CFIF Soluc_Tot_Fev_UN NEQ 0>
+			<td width="19%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',2);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',2);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 3>
         <tr class="exibir">
         <td><div align="center"><strong>MAR</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Mar_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_MAR_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Mar_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Mar_UN/(UN_MAR_TOT + Soluc_Tot_Mar_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         
         <td><div align="center"><strong>#(UN_MAR_TOT + Soluc_Tot_Mar_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_UN = Acum_UN + UN_MAR_TOT>
-		<td width="19%" class="exibir"><div align="center">
-			<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',3,<cfoutput>#Soluc_Tot_MAR_UN#</cfoutput>,<cfoutput>#UN_MAR_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-		</div></td>			
+		<CFIF Soluc_Tot_Mar_UN NEQ 0>
+			<td width="19%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',3);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',3);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 4>
         <tr class="exibir">
         <td><div align="center"><strong>ABR</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Abr_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_ABR_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Abr_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Abr_UN/(UN_ABR_TOT + Soluc_Tot_Abr_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>			
         		
         <td><div align="center"><strong>#(UN_ABR_TOT + Soluc_Tot_Abr_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_UN = Acum_UN + UN_ABR_TOT>
+		<CFIF Soluc_Tot_Abr_UN NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',4,<cfoutput>#Soluc_Tot_ABR_UN#</cfoutput>,<cfoutput>#UN_ABR_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div>			</td>		
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',4);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',4);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 5>
         <tr class="exibir">
         <td><div align="center"><strong>MAI</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Mai_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_MAI_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Mai_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Mai_UN/(UN_MAI_TOT + Soluc_Tot_Mai_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>				
         
         <td><div align="center"><strong>#(UN_MAI_TOT + Soluc_Tot_Mai_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_UN = Acum_UN + UN_MAI_TOT>
+		<CFIF Soluc_Tot_Mai_UN NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',5,<cfoutput>#Soluc_Tot_MAI_UN#</cfoutput>,<cfoutput>#UN_MAI_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div></td>	
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',5);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',5);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		  </tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 6>
         <tr class="exibir">
         <td><div align="center"><strong>JUN</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jun_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_JUN_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jun_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Jun_UN/(UN_JUN_TOT + Soluc_Tot_Jun_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(UN_JUN_TOT + Soluc_Tot_Jun_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_UN = Acum_UN + UN_JUN_TOT>
-
+ 		<CFIF Soluc_Tot_Jun_UN NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',6,<cfoutput>#Soluc_Tot_JUN_UN#</cfoutput>,<cfoutput>#UN_JUN_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',6);">Listar</button>
 			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',6);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 7>
         <tr class="exibir">
         <td><div align="center"><strong>JUL</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jul_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_JUL_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jul_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Jul_UN/(UN_JUL_TOT + Soluc_Tot_Jul_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(UN_JUL_TOT + Soluc_Tot_Jul_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_UN = Acum_UN + UN_JUL_TOT>
+  		<CFIF Soluc_Tot_Jul_UN NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',7,<cfoutput>#Soluc_Tot_JUL_UN#</cfoutput>,<cfoutput>#UN_JUL_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div></td>		
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',7);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',7);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
       </CFIF>
 	  <CFIF aux_mes gte 8>
         <tr class="exibir">
         <td><div align="center"><strong>AGO</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Ago_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_AGO_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Ago_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Ago_UN/(UN_AGO_TOT + Soluc_Tot_Ago_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(UN_AGO_TOT + Soluc_Tot_Ago_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_UN = Acum_UN + UN_AGO_TOT>
+		<CFIF Soluc_Tot_Ago_UN NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',8,<cfoutput>#Soluc_Tot_AGO_UN#</cfoutput>,<cfoutput>#UN_AGO_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div></td>			
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',8);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',8);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	   </CFIF>
       <CFIF aux_mes gte 9>
         <tr class="exibir">
         <td><div align="center"><strong>SET</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Set_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_SET_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Set_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Set_UN/(UN_SET_TOT + Soluc_Tot_Set_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>
         
         <td><div align="center"><strong>#(UN_SET_TOT + Soluc_Tot_Set_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_UN = Acum_UN + UN_SET_TOT>
+		<cfset Acum_UN = Acum_UN + UN_SET_TOT>			
+		<CFIF Soluc_Tot_Set_UN NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',9,<cfoutput>#Soluc_Tot_SET_UN#</cfoutput>,<cfoutput>#UN_SET_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div></td>			
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',9);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',9);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
       <CFIF aux_mes gte 10>
         <tr class="exibir">
         <td><div align="center"><strong>OUT</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Out_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_OUT_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Out_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Out_UN/(UN_OUT_TOT + Soluc_Tot_Out_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(UN_OUT_TOT + Soluc_Tot_Out_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_UN = Acum_UN + UN_OUT_TOT>	
+		<cfset Acum_UN = Acum_UN + UN_OUT_TOT>		
+		<CFIF Soluc_Tot_Out_UN NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',10,<cfoutput>#Soluc_Tot_OUT_UN#</cfoutput>,<cfoutput>#UN_OUT_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div></td>			
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',10);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',10);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 11>
         <tr class="exibir">
         <td><div align="center"><strong>NOV</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Nov_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_NOV_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Nov_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Nov_UN/(UN_NOV_TOT + Soluc_Tot_Nov_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(UN_NOV_TOT + Soluc_Tot_Nov_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_UN = Acum_UN + UN_NOV_TOT>
+		<CFIF Soluc_Tot_Nov_UN NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',11,<cfoutput>#Soluc_Tot_NOV_UN#</cfoutput>,<cfoutput>#UN_NOV_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div></td>		
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',11);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',11);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 12>
         <tr class="exibir">
         <td><div align="center"><strong>DEZ</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Dez_UN#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif UN_DEZ_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Dez_UN neq 0>
 			<cfset Per = left((Soluc_Tot_Dez_UN/(UN_DEZ_TOT + Soluc_Tot_Dez_UN)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(UN_DEZ_TOT + Soluc_Tot_Dez_UN)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_UN = Acum_UN + UN_DEZ_TOT>
-		<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',12,<cfoutput>#Soluc_Tot_DEZ_UN#</cfoutput>,<cfoutput>#UN_DEZ_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-			</div></td>		
+		<CFIF Soluc_Tot_Dez_UN NEQ 0>
+			<td width="19%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',12);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un',12);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <tr class="exibir">
@@ -901,18 +909,21 @@ function listar(a,b,c,d,e){
         <td class="red_titulo"><div align="center">#Acum_UN#</div></td>
         <td class="red_titulo"><div align="center"><strong>#Acum_Per_UN#</strong>
           </div></td>
-
-		 <td class="red_titulo">
-		   <div align="center">
-		     <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'un',0,<cfoutput>#Soluc_Geral_UN#</cfoutput>,<cfoutput>#(Acum_UN-Soluc_Geral_UN)#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar(Todos)</button>
-           </div></td>
+		 
+		<CFIF Soluc_Geral_UN NEQ 0>
+			<td class="red_titulo"><span class="titulos">
+			  <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'un',0);">Listar(Todos)</button></span></td>
+			<cfelse>
+			<td class="red_titulo"><span class="titulos">
+			  <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'un',0);" disabled>Listar(Todos)</button></span></td>
+		  </cfif>
 		</tr>	
 </cfif>		
 
 <!--- AREAS --->		
 <cfif Ger_Total neq 0>
       <tr class="exibir">
-	      <td colspan="17" class="titulos"><div align="center"><strong>Gerências Regionais e Áreas de Suporte</strong></div></td>
+	      <td colspan="17" class="titulos"><div align="center"><strong>Ger&ecirc;ncias Regionais e &Aacute;reas de Suporte</strong></div></td>
       </tr>
       <tr class="exibir">
         <td><div align="center"><strong>M&Ecirc;S</strong></div></td>
@@ -926,292 +937,287 @@ function listar(a,b,c,d,e){
         <tr class="exibir">
         <td><div align="center"><strong>JAN</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jan_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_JAN_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jan_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Jan_GE/(GE_JAN_TOT + Soluc_Tot_Jan_GE)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>
         
         <td><div align="center"><strong>#(GE_JAN_TOT + Soluc_Tot_Jan_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_JAN_TOT>	        
-		<td width="19%" class="exibir"><div align="center">
-			<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',1,<cfoutput>#Soluc_Tot_Jan_GE#</cfoutput>,<cfoutput>#GE_JAN_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
-		</div></td>				
-
+		<cfset Acum_GE= Acum_GE+ GE_JAN_TOT>	        
+		<CFIF Soluc_Tot_Jan_GE NEQ 0>
+			<td width="19%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',1);">Listar</button>
+			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',1);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 2>
         <tr class="exibir">
         <td><div align="center"><strong>FEV</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Fev_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_FEV_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Fev_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Fev_GE/(GE_FEV_TOT + Soluc_Tot_Fev_GE)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(GE_FEV_TOT + Soluc_Tot_Fev_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_FEV_TOT>	        
+		<cfset Acum_GE= Acum_GE+ GE_FEV_TOT>	        
+		<CFIF Soluc_Tot_Fev_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',2,<cfoutput>#Soluc_Tot_FEV_GE#</cfoutput>,<cfoutput>#GE_FEV_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',2);">Listar</button>
 			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',2);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 3>
         <tr class="exibir">
         <td><div align="center"><strong>MAR</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Mar_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_MAR_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Mar_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Mar_GE/(GE_MAR_TOT + Soluc_Tot_Mar_GE)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         
         <td><div align="center"><strong>#(GE_MAR_TOT + Soluc_Tot_Mar_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_MAR_TOT>	        
+		<cfset Acum_GE= Acum_GE+ GE_MAR_TOT>	        
+		<CFIF Soluc_Tot_Mar_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',3,<cfoutput>#Soluc_Tot_MAR_GE#</cfoutput>,<cfoutput>#GE_MAR_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',3);">Listar</button>
 			</div></td>				
-
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',3);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 4>
         <tr class="exibir">
         <td><div align="center"><strong>ABR</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Abr_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_ABR_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Abr_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Abr_GE/(GE_ABR_TOT + Soluc_Tot_Abr_GE)) * 100,4)>	
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         	
         <td><div align="center"><strong>#(GE_ABR_TOT + Soluc_Tot_Abr_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_ABR_TOT>	        
+		<cfset Acum_GE= Acum_GE+ GE_ABR_TOT>	        
+		<CFIF Soluc_Tot_Abr_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',4,<cfoutput>#Soluc_Tot_ABR_GE#</cfoutput>,<cfoutput>#GE_ABR_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',4);">Listar</button>
 			</div></td>				
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',4);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 5>
         <tr class="exibir">
         <td><div align="center"><strong>MAI</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Mai_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_MAI_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Mai_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Mai_GE/(GE_MAI_TOT + Soluc_Tot_Mai_GE)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         
         <td><div align="center"><strong>#(GE_MAI_TOT + Soluc_Tot_Mai_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_MAI_TOT>	        
+		<cfset Acum_GE= Acum_GE+ GE_MAI_TOT>	        
+		<CFIF Soluc_Tot_Mai_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',5,<cfoutput>#Soluc_Tot_MAI_GE#</cfoutput>,<cfoutput>#GE_MAI_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',5);">Listar</button>
 			</div></td>				
-
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',5);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		  </tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 6>
         <tr class="exibir">
         <td><div align="center"><strong>JUN</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jun_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_JUN_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jun_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Jun_GE/(GE_JUN_TOT + Soluc_Tot_Jun_GE)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(GE_JUN_TOT + Soluc_Tot_Jun_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_JUN_TOT>	        		
-
+		<cfset Acum_GE= Acum_GE+ GE_JUN_TOT>	        		
+		<CFIF Soluc_Tot_Jun_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',6,<cfoutput>#Soluc_Tot_JUN_GE#</cfoutput>,<cfoutput>#GE_JUN_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',6);">Listar</button>
 			</div></td>				
-
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',6);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 7>
         <tr class="exibir">
         <td><div align="center"><strong>JUL</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jul_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_JUL_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jul_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Jul_GE/(GE_JUL_TOT + Soluc_Tot_Jul_GE)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(GE_JUL_TOT + Soluc_Tot_Jul_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_JUL_TOT>	         		
-
+		<cfset Acum_GE= Acum_GE+ GE_JUL_TOT>	         		
+		<CFIF Soluc_Tot_Jul_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',7,<cfoutput>#Soluc_Tot_JUL_GE#</cfoutput>,<cfoutput>#GE_JUL_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',7);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',7);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
       </CFIF>
 	  <CFIF aux_mes gte 8>
         <tr class="exibir">
         <td><div align="center"><strong>AGO</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Ago_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_AGO_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Ago_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Ago_GE/(GE_AGO_TOT + Soluc_Tot_Ago_GE)) * 100,4)>	
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         	
         <td><div align="center"><strong>#(GE_AGO_TOT + Soluc_Tot_Ago_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_AGO_TOT>	        	
-		
+		<cfset Acum_GE= Acum_GE+ GE_AGO_TOT>	        	
+		<CFIF Soluc_Tot_Ago_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',8,<cfoutput>#Soluc_Tot_AGO_GE#</cfoutput>,<cfoutput>#GE_AGO_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',8);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',8);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	   </CFIF>
       <CFIF aux_mes gte 9>
         <tr class="exibir">
         <td><div align="center"><strong>SET</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Set_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_SET_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Set_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Set_GE/(GE_SET_TOT + Soluc_Tot_Set_GE)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         <td><div align="center"><strong>#(GE_SET_TOT + Soluc_Tot_Set_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_SET_TOT>	        	
-		
+		<cfset Acum_GE= Acum_GE+ GE_SET_TOT>	        	
+		<CFIF Soluc_Tot_Set_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',9,<cfoutput>#Soluc_Tot_SET_GE#</cfoutput>,<cfoutput>#GE_SET_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',9);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',9);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
       <CFIF aux_mes gte 10>
         <tr class="exibir">
         <td><div align="center"><strong>OUT</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Out_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_OUT_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Out_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Out_GE/(GE_OUT_TOT + Soluc_Tot_Out_GE)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
        		
         <td><div align="center"><strong>#(GE_OUT_TOT + Soluc_Tot_Out_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_OUT_TOT>	        
-		
+		<cfset Acum_GE= Acum_GE+ GE_OUT_TOT>	        
+		<CFIF Soluc_Tot_Out_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',10,<cfoutput>#Soluc_Tot_OUT_GE#</cfoutput>,<cfoutput>#GE_OUT_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',10);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',10);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 11>
         <tr class="exibir">
         <td><div align="center"><strong>NOV</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Nov_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_NOV_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Nov_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Nov_GE/(GE_NOV_TOT + Soluc_Tot_Nov_GE)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(GE_NOV_TOT + Soluc_Tot_Nov_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_NOV_TOT>	        	
-		
+		<cfset Acum_GE= Acum_GE+ GE_NOV_TOT>	        	
+		<CFIF Soluc_Tot_Nov_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',11,<cfoutput>#Soluc_Tot_NOV_GE#</cfoutput>,<cfoutput>#GE_NOV_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',11);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',11);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 12>
         <tr class="exibir">
         <td><div align="center"><strong>DEZ</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Dez_GE#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif GE_DEZ_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Dez_GE neq 0>
 			<cfset Per = left((Soluc_Tot_Dez_GE/(GE_DEZ_TOT + Soluc_Tot_Dez_GE)) * 100,4)>	
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         	
         <td><div align="center"><strong>#(GE_DEZ_TOT + Soluc_Tot_Dez_GE)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_GE = Acum_GE + GE_DEZ_TOT>	        	
-		
+		<cfset Acum_GE= Acum_GE+ GE_DEZ_TOT>	        	
+		<CFIF Soluc_Tot_Dez_GE NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',12,<cfoutput>#Soluc_Tot_DEZ_GE#</cfoutput>,<cfoutput>#GE_DEZ_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',12);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',12);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <tr class="exibir">
@@ -1229,14 +1235,14 @@ function listar(a,b,c,d,e){
         <td class="red_titulo"><div align="center">#Acum_GE#</div></td>
         <td class="red_titulo"><div align="center"><strong>#Acum_Per_GE#</strong>
           </div></td>
-
-
-			<td class="red_titulo">
-			  <div align="center"><span class="titulos">
-			    <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',0,<cfoutput>#Soluc_Geral_GE#</cfoutput>,<cfoutput>#(Acum_GE-Soluc_Geral_GE)#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>
-		        Listar(Todos)</button>
-		      </span></div></td>
-
+		 
+		<CFIF Soluc_Geral_GE NEQ 0>
+			<td class="red_titulo"><span class="titulos">
+			  <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',0);">Listar(Todos)</button></span></td>
+			<cfelse>
+			<td class="red_titulo"><span class="titulos">
+		    <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',0);" disabled>Listar(Todos)</button></span></td>
+		  </cfif>
 		</tr>	  
 </cfif>		
 
@@ -1244,7 +1250,7 @@ function listar(a,b,c,d,e){
 <cfif Sub_Total neq 0>
 
 	  <tr class="exibir">
-	      <td colspan="17" class="titulos"><div align="center">Órgãos Subordinadores</div></td>
+	      <td colspan="17" class="titulos"><div align="center">&Oacute;rg&atilde;os Subordinadores</div></td>
       </tr>
  	  <tr class="exibir">
         <td><div align="center"><strong>M&Ecirc;S</strong></div></td>
@@ -1258,300 +1264,289 @@ function listar(a,b,c,d,e){
         <tr class="exibir">
         <td><div align="center"><strong>JAN</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jan_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_JAN_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jan_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Jan_SB/(SB_JAN_TOT + Soluc_Tot_Jan_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         
         <td><div align="center"><strong>#(SB_JAN_TOT + Soluc_Tot_Jan_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_JAN_TOT>	                
-		
+		<cfset Acum_SB = SB_JAN_TOT>	                
+		<CFIF Soluc_Tot_Jan_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',1,<cfoutput>#Soluc_Tot_JAN_SB#</cfoutput>,<cfoutput>#SB_JAN_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',1);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',1);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
+
 		</tr>
 	  </CFIF>
 	 <CFIF aux_mes gte 2>
         <tr class="exibir">
         <td><div align="center"><strong>FEV</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Fev_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_FEV_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Fev_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Fev_SB/(SB_FEV_TOT + Soluc_Tot_Fev_SB)) * 100,4)>	
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         	
         <td><div align="center"><strong>#(SB_FEV_TOT + Soluc_Tot_Fev_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_FEV_TOT>		
-		
+		<cfset Acum_SB = Acum_SB + SB_FEV_TOT>		
+		<CFIF Soluc_Tot_Fev_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',2,<cfoutput>#Soluc_Tot_FEV_SB#</cfoutput>,<cfoutput>#SB_FEV_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',2);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',2);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 3>
         <tr class="exibir">
         <td><div align="center"><strong>MAR</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Mar_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_MAR_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Mar_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Mar_SB/(SB_MAR_TOT + Soluc_Tot_Mar_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>
         
         <td><div align="center"><strong>#(SB_MAR_TOT + Soluc_Tot_Mar_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_MAR_TOT>
-		
+		<cfset Acum_SB = Acum_SB + SB_MAR_TOT>
+		<CFIF Soluc_Tot_Mar_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',3,<cfoutput>#Soluc_Tot_MAR_SB#</cfoutput>,<cfoutput>#SB_MAR_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',3);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',3);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 4>
         <tr class="exibir">
         <td><div align="center"><strong>ABR</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Abr_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_ABR_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Abr_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Abr_SB/(SB_ABR_TOT + Soluc_Tot_Abr_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(SB_ABR_TOT + Soluc_Tot_Abr_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_ABR_TOT>
-		
+		<cfset Acum_SB = Acum_SB + SB_ABR_TOT>
+		<CFIF Soluc_Tot_Abr_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',4,<cfoutput>#Soluc_Tot_ABR_SB#</cfoutput>,<cfoutput>#SB_ABR_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',4);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',4);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 5>
         <tr class="exibir">
         <td><div align="center"><strong>MAI</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Mai_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_MAI_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Mai_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Mai_SB/(SB_MAI_TOT + Soluc_Tot_Mai_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         
         <td><div align="center"><strong>#(SB_MAI_TOT + Soluc_Tot_Mai_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_MAI_TOT>	
-		
+		<cfset Acum_SB = Acum_SB + SB_MAI_TOT>	
+		<CFIF Soluc_Tot_Mai_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',5,<cfoutput>#Soluc_Tot_MAI_SB#</cfoutput>,<cfoutput>#SB_MAI_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',5);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',5);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		  </tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 6>
         <tr class="exibir">
         <td><div align="center"><strong>JUN</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jun_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_JUN_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jun_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Jun_SB/(SB_JUN_TOT + Soluc_Tot_Jun_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(SB_JUN_TOT + Soluc_Tot_Jun_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_JUN_TOT>	
- 		
+		<cfset Acum_SB = Acum_SB + SB_JUN_TOT>	
+ 		<CFIF Soluc_Tot_Jun_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',6,<cfoutput>#Soluc_Tot_JUN_SB#</cfoutput>,<cfoutput>#SB_JUN_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',6);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',6);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 7>
         <tr class="exibir">
         <td><div align="center"><strong>JUL</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jul_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_JUL_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jul_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Jul_SB/(SB_JUL_TOT + Soluc_Tot_Jul_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(SB_JUL_TOT + Soluc_Tot_Jul_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_JUL_TOT>	
-  		
+		<cfset Acum_SB = Acum_SB + SB_JUL_TOT>	
+  		<CFIF Soluc_Tot_Jul_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',7,<cfoutput>#Soluc_Tot_JUL_SB#</cfoutput>,<cfoutput>#SB_JUL_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',7);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',7);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
       </CFIF>
 	  <CFIF aux_mes gte 8>
         <tr class="exibir">
         <td><div align="center"><strong>AGO</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Ago_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_AGO_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Ago_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Ago_SB/(SB_AGO_TOT + Soluc_Tot_Ago_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(SB_AGO_TOT + Soluc_Tot_Ago_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_AGO_TOT>
-		
+		<cfset Acum_SB = Acum_SB + SB_AGO_TOT>
+		<CFIF Soluc_Tot_Ago_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',8,<cfoutput>#Soluc_Tot_AGO_SB#</cfoutput>,<cfoutput>#SB_AGO_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',8);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',8);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	   </CFIF>
       <CFIF aux_mes gte 9>
         <tr class="exibir">
         <td><div align="center"><strong>SET</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Set_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_SET_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Set_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Set_SB/(SB_SET_TOT + Soluc_Tot_Set_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         
         <td><div align="center"><strong>#(SB_SET_TOT + Soluc_Tot_Set_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_SET_TOT>
-		
+		<cfset Acum_SB = Acum_SB + SB_SET_TOT>
+		<CFIF Soluc_Tot_Set_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',9,<cfoutput>#Soluc_Tot_SET_SB#</cfoutput>,<cfoutput>#SB_SET_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',9);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',9);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
       <CFIF aux_mes gte 10>
         <tr class="exibir">
         <td><div align="center"><strong>OUT</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Out_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_OUT_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Out_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Out_SB/(SB_OUT_TOT + Soluc_Tot_Out_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(SB_OUT_TOT + Soluc_Tot_Out_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_OUT_TOT>	
-		
+		<cfset Acum_SB = Acum_SB + SB_OUT_TOT>	
+		<CFIF Soluc_Tot_Out_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',10,<cfoutput>#Soluc_Tot_OUT_SB#</cfoutput>,<cfoutput>#SB_OUT_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',10);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',10);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 11>
         <tr class="exibir">
         <td><div align="center"><strong>NOV</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Nov_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_NOV_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Nov_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Nov_SB/(SB_NOV_TOT + Soluc_Tot_Nov_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(SB_NOV_TOT + Soluc_Tot_Nov_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_NOV_TOT>	
-		
+		<cfset Acum_SB = Acum_SB + SB_NOV_TOT>	
+		<CFIF Soluc_Tot_Nov_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',11,<cfoutput>#Soluc_Tot_NOV_SB#</cfoutput>,<cfoutput>#SB_NOV_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',11);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',11);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 12>
         <tr class="exibir">
         <td><div align="center"><strong>DEZ</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Dez_SB#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_DEZ_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Dez_SB neq 0>
 			<cfset Per = left((Soluc_Tot_Dez_SB/(SB_DEZ_TOT + Soluc_Tot_Dez_SB)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         		
         <td><div align="center"><strong>#(SB_DEZ_TOT + Soluc_Tot_Dez_SB)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
-		<cfset Acum_SB =  Acum_SB + SB_DEZ_TOT>	
-		
+		<cfset Acum_SB = Acum_SB + SB_DEZ_TOT>	
+		<CFIF Soluc_Tot_Dez_SB NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',12,<cfoutput>#Soluc_Tot_DEZ_SB#</cfoutput>,<cfoutput>#SB_DEZ_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',12);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',12);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <tr class="exibir">
@@ -1571,18 +1566,19 @@ function listar(a,b,c,d,e){
         <td class="red_titulo"><div align="center"><strong>#Acum_Per_SB#</strong>
           </div></td>
 		 
-			<td class="red_titulo">
-			  <div align="center"><span class="titulos">
-			    <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',0,<cfoutput>#Soluc_Geral_SB#</cfoutput>,<cfoutput>#(Acum_SB-Soluc_Geral_SB)#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>
-		        Listar(Todos)</button>
-		      </span></div></td>
-		
+		<CFIF Soluc_Geral_SB NEQ 0>
+			<td class="red_titulo"><span class="titulos">
+			  <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',0);">Listar(Todos)</button></span></td>
+			<cfelse>
+			<td class="red_titulo"><span class="titulos">
+		    <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',0);" disabled>Listar(Todos)</button></span></td>
+		  </cfif>
 		</tr>		  
 </cfif>	
 <!--- SUPERINTENDENTES --->		
 <cfif Sup_Total neq 0>
       <tr class="exibir">
-	      <td colspan="17" class="titulos"><div align="center">Superintendência</div></td>
+	      <td colspan="17" class="titulos"><div align="center">Superintend&ecirc;ncia</div></td>
       </tr>
  	  <tr class="exibir">
         <td><div align="center"><strong>M&Ecirc;S</strong></div></td>
@@ -1596,294 +1592,289 @@ function listar(a,b,c,d,e){
         <tr class="exibir">
         <td><div align="center"><strong>JAN</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jan_SU#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SB_JAN_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Jan_SU neq 0>
-	        <cfset Per = left((Soluc_Tot_Jan_SU/(SU_JAN_TOT + Soluc_Tot_Jan_SU)) * 100,4)>	
+	        <cfset Per = left((Soluc_Tot_Jan_SU/(SB_JAN_TOT + Soluc_Tot_Jan_SU)) * 100,4)>	
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>
         <td><div align="center"><strong>#(SU_JAN_TOT + Soluc_Tot_Jan_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = SU_JAN_TOT>
-		
+		<CFIF Soluc_Tot_Jan_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',1,<cfoutput>#Soluc_Tot_JAN_SU#</cfoutput>,<cfoutput>#SU_JAN_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',1);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',1);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
+
 		</tr>
 	  </CFIF> 
 	<CFIF aux_mes gte 2> 
         <tr class="exibir">
         <td><div align="center"><strong>FEV</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Fev_SU#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SU_FEV_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Fev_SU neq 0>
 	        <cfset Per = left((Soluc_Tot_Fev_SU/(SU_FEV_TOT + Soluc_Tot_Fev_SU)) * 100,4)>	
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>
         	
         <td><div align="center"><strong>#(SU_FEV_TOT + Soluc_Tot_Fev_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_FEV_TOT>
-		
+		<CFIF Soluc_Tot_Fev_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',2,<cfoutput>#Soluc_Tot_FEV_SU#</cfoutput>,<cfoutput>#SU_FEV_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',2);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',2);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	</CFIF> 
 	<CFIF aux_mes gte 3> 
         <tr class="exibir">
         <td><div align="center"><strong>MAR</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Mar_SU#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SU_MAR_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
+
 		<cfif Soluc_Tot_Mar_SU neq 0>
         	<cfset Per = left((Soluc_Tot_Mar_SU/(SU_MAR_TOT + Soluc_Tot_Mar_SU)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>
         <td><div align="center"><strong>#(SU_MAR_TOT + Soluc_Tot_Mar_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_MAR_TOT>	
-		
+		<CFIF Soluc_Tot_Mar_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',3,<cfoutput>#Soluc_Tot_MAR_SU#</cfoutput>,<cfoutput>#SU_MAR_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',3);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',3);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	</CFIF>
 	<CFIF aux_mes gte 4> 
         <tr class="exibir">
         <td><div align="center"><strong>ABR</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Abr_SU#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SU_ABR_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>		
 		<cfif Soluc_Tot_Abr_SU neq 0>
         	<cfset Per = left((Soluc_Tot_Abr_SU/(SU_ABR_TOT + Soluc_Tot_Abr_SU)) * 100,4)>	
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
 	
         <td><div align="center"><strong>#(SU_ABR_TOT + Soluc_Tot_Abr_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_ABR_TOT>
-		
+		<CFIF Soluc_Tot_Abr_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',4,<cfoutput>#Soluc_Tot_ABR_SU#</cfoutput>,<cfoutput>#SU_ABR_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',4);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',4);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	</CFIF>
 	<CFIF aux_mes gte 5> 
         <tr class="exibir">
         <td><div align="center"><strong>MAI</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Mai_SU#</strong></div></td>
-        <cfset habunidsn = ''>
-		<cfif SU_MAI_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif> 
+        
 		<cfif Soluc_Tot_Mai_SU neq 0>
         	<cfset Per = left((Soluc_Tot_Mai_SU/(SU_MAI_TOT + Soluc_Tot_Mai_SU)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>			
         <td><div align="center"><strong>#(SU_MAI_TOT + Soluc_Tot_Mai_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_MAI_TOT>
-		
+		<CFIF Soluc_Tot_Mai_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',5,<cfoutput>#Soluc_Tot_MAI_SU#</cfoutput>,<cfoutput>#SU_MAI_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',5);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',5);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		  </tr>
 	</CFIF> 
 	<CFIF aux_mes gte 6> 
         <tr class="exibir">
         <td><div align="center"><strong>JUN</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jun_SU#</strong></div></td>
-        <cfset habunidsn = ''>
-		<cfif SU_JUN_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
+        
 		<cfif Soluc_Tot_Jun_SU neq 0>
         	<cfset Per = left((Soluc_Tot_Jun_SU/(SU_JUN_TOT + Soluc_Tot_Jun_SU)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>				
         <td><div align="center"><strong>#(SU_JUN_TOT + Soluc_Tot_Jun_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_JUN_TOT>
- 		
+ 		<CFIF Soluc_Tot_Jun_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',6,<cfoutput>#Soluc_Tot_JUN_SU#</cfoutput>,<cfoutput>#SU_JUN_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',6);">Listar</button>
 			</div></td>				
-	
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',6);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	</CFIF> 
     <CFIF aux_mes gte 7> 
         <tr class="exibir">
         <td><div align="center"><strong>JUL</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Jul_SU#</strong></div></td>
-        <cfset habunidsn = ''>
-		<cfif SU_JUL_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
+        
 		<cfif Soluc_Tot_Jul_SU neq 0>
 			<cfset Per = left((Soluc_Tot_Jul_SU/(SU_JUL_TOT + Soluc_Tot_Jul_SU)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>		
         <td><div align="center"><strong>#(SU_JUL_TOT + Soluc_Tot_Jul_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_JUL_TOT> 		
-		
+		<CFIF Soluc_Tot_Jul_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',7,<cfoutput>#Soluc_Tot_JUL_SU#</cfoutput>,<cfoutput>#SU_JUL_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',7);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',7);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
        </CFIF>
 	   <CFIF aux_mes gte 8>  
         <tr class="exibir">
         <td><div align="center"><strong>AGO</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Ago_SU#</strong></div></td>
-        <cfset habunidsn = ''>
-		<cfif SU_AGO_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
+        
 		<cfif Soluc_Tot_Ago_SU neq 0>
 			<cfset Per = left((Soluc_Tot_Ago_SU/(SU_AGO_TOT + Soluc_Tot_Ago_SU)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>				
         <td><div align="center"><strong>#(SU_AGO_TOT + Soluc_Tot_Ago_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_AGO_TOT>
-		
+		<CFIF Soluc_Tot_Ago_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',8,<cfoutput>#Soluc_Tot_AGO_SU#</cfoutput>,<cfoutput>#SU_AGO_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',8);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',8);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
       </CFIF> 
       <CFIF aux_mes gte 9> 
         <tr class="exibir">
         <td><div align="center"><strong>SET</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Set_SU#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SU_SET_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
+		
 		<cfif Soluc_Tot_Set_SU neq 0>
 			<cfset Per = left((Soluc_Tot_Set_SU/(SU_SET_TOT + Soluc_Tot_Set_SU)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>	
         
         <td><div align="center"><strong>#(SU_SET_TOT + Soluc_Tot_Set_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_SET_TOT>
-		
+		<CFIF Soluc_Tot_Set_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',9,<cfoutput>#Soluc_Tot_SET_SU#</cfoutput>,<cfoutput>#SU_SET_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',9);">Listar</button>
 			</div></td>				
-	
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',9);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
       <CFIF aux_mes gte 10> 
         <tr class="exibir">
         <td><div align="center"><strong>OUT</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Out_SU#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SU_OUT_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Out_SU neq 0>
 			<cfset Per = left((Soluc_Tot_Out_SU/(SU_OUT_TOT + Soluc_Tot_Out_SU)) * 100,4)>
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>			
         		
         <td><div align="center"><strong>#(SU_OUT_TOT + Soluc_Tot_Out_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_OUT_TOT>
-		
+		<CFIF Soluc_Tot_Out_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',10,<cfoutput>#Soluc_Tot_OUT_SU#</cfoutput>,<cfoutput>#SU_OUT_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',10);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',10);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 11> 
         <tr class="exibir">
         <td><div align="center"><strong>NOV</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Nov_SU#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SU_NOV_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Nov_SU neq 0>
 			<cfset Per = left((Soluc_Tot_Nov_SU/(SU_NOV_TOT + Soluc_Tot_Nov_SU)) * 100,4)>	
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>			
         	
         <td><div align="center"><strong>#(SU_NOV_TOT + Soluc_Tot_Nov_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_NOV_TOT>	
-		
+		<CFIF Soluc_Tot_Nov_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',11,<cfoutput>#Soluc_Tot_NOV_SU#</cfoutput>,<cfoutput>#SU_NOV_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',11);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',11);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <CFIF aux_mes gte 12> 
         <tr class="exibir">
         <td><div align="center"><strong>DEZ</strong></div></td>
         <td><div align="center"><strong>#Soluc_Tot_Dez_SU#</strong></div></td>
-		<cfset habunidsn = ''>
-		<cfif SU_DEZ_TOT eq 0>
-			<cfset habunidsn = 'disabled'>
-		</cfif>
 		<cfif Soluc_Tot_Dez_SU neq 0>
 			<cfset Per = left((Soluc_Tot_Dez_SU/(SU_DEZ_TOT + Soluc_Tot_Dez_SU)) * 100,4)>	
 		<cfelse>
 			<cfset Per = 0>
-
 		</cfif>			
         		
         <td><div align="center"><strong>#(SU_DEZ_TOT + Soluc_Tot_Dez_SU)#</strong></div></td>
         <td><div align="center">#NumberFormat(Per,999.0)#</div></td>
 		<cfset Acum_SU = Acum_SU + SU_DEZ_TOT>	
-		
+		<CFIF Soluc_Tot_Dez_SU NEQ 0>
 			<td width="19%" class="exibir"><div align="center">
-				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',12,<cfoutput>#Soluc_Tot_DEZ_SU#</cfoutput>,<cfoutput>#SU_DEZ_TOT#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button>
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',12);">Listar</button>
 			</div></td>				
-		
+		<cfelse>
+			<td width="15%" class="exibir"><div align="center">
+				<button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su',12);" disabled>Listar</button>			
+			</div></td>				
+		</CFIF>
 		</tr>
 	  </CFIF>
 	  <tr class="exibir">
@@ -1902,24 +1893,15 @@ function listar(a,b,c,d,e){
         <td class="red_titulo"><div align="center"><strong>#Acum_Per_SU#</strong>
           </div></td>
 		 
-			<td class="red_titulo">
-			  <div align="center"><span class="titulos">
-			    <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'su',0,<cfoutput>#Soluc_Geral_SU#</cfoutput>,<cfoutput>#(Acum_SU-Soluc_Geral_SU)#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>
-		        Listar(Todos)</button>
-		      </span></div></td>
-			
+		<CFIF Soluc_Geral_SU NEQ 0>
+			<td class="red_titulo"><span class="titulos">
+			  <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'su',0);">Listar(Todos)</button></span></td>
+			<cfelse>
+			<td class="red_titulo"><span class="titulos">
+		    <button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'su',0);" disabled>Listar(Todos)</button></span></td>
+		  </cfif>
 		</tr>			  
 </cfif>	 
-      <tr class="exibir">
-        <td colspan="17" class="titulos">&nbsp;</td>
-      </tr>
-  	   <tr class="tituloC">
-	   			<td class="red_titulo"><div align="center"><strong>&nbsp;</strong></div></td>
-				<td class="red_titulo"><div align="center">Listar Solucionados</div></td>
-				<td class="red_titulo"><div align="center"><strong>&nbsp;</strong></div></td>
-				<td class="red_titulo"><div align="center"><strong>&nbsp;</strong></div></td>
-				<td class="red_titulo"><div align="center"><button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'geral',0,100,101);">Listar(Geral)</button></div></td>
-		</tr>
       <tr class="exibir">
         <td colspan="17" class="titulos">&nbsp;</td>
       </tr>
@@ -1944,14 +1926,14 @@ function listar(a,b,c,d,e){
 </cfloop>
 <cffile action="write" addnewline="no" file="#slocal##sarquivo#" output=''>
 <cffile action="Append" file="#slocal##sarquivo#" output='SOLUÇÃO DE NÃO CONFORMIDADES (SLNC) - #auxfilta#' >
-<!--- <cffile action="Append" file="#slocal##sarquivo#" output='Meta Mensal : (#rsMetas.Met_SLNC# %)' > --->
-<cffile action="Append" file="#slocal##sarquivo#" output=';;A;B*;C**;D;E=((C*100)/D);'>
-<cffile action="Append" file="#slocal##sarquivo#" output='SE;Mês;Quantidade (Solucionados);Total;% de SL do mês;Meta Mensal;% Em Relação à meta Mensal;Resultado'>
+<cffile action="Append" file="#slocal##sarquivo#" output='Meta Anual : (#rsMetas.Met_SLNC# %)' >
+<cffile action="Append" file="#slocal##sarquivo#" output=';;A;B*;C**;D***;E****;F;G = ((E * 100)/F);'>
+<cffile action="Append" file="#slocal##sarquivo#" output='SE;MÊS;Quantidade (Solucionados);Total;% de SL do mês;Total Acumulado Período;% Resultado Acumulativo Mensal;Distribuição Meta Acumulativa Mensal;Em relação à Meta Mensal;Resultado'>
 
  <cfset auxRazao = rsMetas.Met_SLNC> 
 <!---<cfset auxRazao = numberFormat((rsMetas.Met_SLNC/12),999.0)>--->
 
-<table width="56%" border="1" align="center" cellpadding="0" cellspacing="0">
+<table width="62%" border="1" align="center" cellpadding="0" cellspacing="0">
 
   <tr>
 	<td colspan="13"><div align="right"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/csv.png" width="45" height="45" border="0"></a></div></td>
@@ -1959,9 +1941,9 @@ function listar(a,b,c,d,e){
   <tr>
     <td colspan="23" class="titulos"><div align="center"><strong>SOLU&Ccedil;&Atilde;O DE N&Atilde;O CONFORMIDADES (SLNC) </strong></div></td>
   </tr>
-  <!--- <tr>
+  <tr>
     <td colspan="23" class="titulos">Meta Anual : (#rsMetas.Met_SLNC# %)</td>
-  </tr> --->
+  </tr>
   <tr>
     <td colspan="23" class="exibir"><div align="center"></div></td>
   </tr>
@@ -1971,25 +1953,27 @@ function listar(a,b,c,d,e){
     </tr>
 <tr class="exibir">
       <td colspan="2">&nbsp;</td>
-      <td><div align="center">A</div></td>
+      <td class="exibir"><div align="center">A</div></td>
       <td><div align="center">B*</div></td>
       <td><div align="center">C**</div></td>
-   <!---    <td><div align="center">D</div></td> --->
-<!---       <td><div align="center">E</div></td> --->
-      <td><div align="center">D</div></td>
-      <td><div align="center">E = ((C * 100)/D) </div></td>
+      <td><div align="center">D***</div></td>
+      <td><div align="center">E****</div></td>
+      <td><div align="center">F</div></td>
+      <td><div align="center">G = ((E * 100)/F) </div></td>
       <td>&nbsp;</td>
     </tr>
   <tr class="exibir">
     <td width="4%" rowspan="2" valign="middle"><div align="center"><strong>SE</strong></div></td>
-    <td width="7%" rowspan="2" valign="middle"><div align="center"><strong>Mês</strong></div></td>
+    <td width="7%" rowspan="2" valign="middle"><div align="center"><strong>M&ecirc;s</strong></div></td>
     <td class="exibir"><div align="center"><strong>Quantidade (Solucionados)</strong></div>      
-    <div align="center"></div><div align="center"></div></td>
+    <div align="center"></div>      <div align="center"></div></td>
     <td width="7%" class="exibir"><div align="center"><strong>Total</strong></div></td>
-    <td width="8%" class="exibir"><div align="center"><strong>% de SL do mês </strong></div></td>
-    <td width="10%" class="exibir"><div align="center"><strong>Meta<br>Mensal</strong> </div></td>
-    <td width="14%" class="exibir"><div align="center"><strong>Em relação à Meta Mensal</strong> </div></td>
-    <td width="16%" class="exibir"><div align="center"><strong>Resultado</strong> </div></td>
+    <td width="8%" class="exibir"><div align="center"><strong>% de SL do m&ecirc;s </strong></div></td>
+    <td width="9%" class="exibir"><div align="center"><strong> Total Acumulado Per&iacute;odo&nbsp;&nbsp;&nbsp;&nbsp; </strong> </div></td>
+    <td width="11%" class="exibir"><div align="center"><strong> % Resultado Acumulado Per&iacute;odo</strong> </div></td>
+    <td width="10%" class="exibir"><div align="center"><strong> Distribui&ccedil;&atilde;o Meta Acumulativa Mensal</strong> </div></td>
+    <td width="14%" class="exibir"><div align="center"><strong> Em rela&ccedil;&atilde;o &agrave; Meta Mensal</strong> </div></td>
+    <td width="16%" class="exibir"><div align="center"><strong> Resultado</strong> </div></td>
   </tr>
     <tr class="exibir">
     <td colspan="11" class="exibir"><div align="center" class="titulos"></div>      <div align="center" class="titulos"></div>      <div align="center" class="titulos"></div></td>
@@ -2007,9 +1991,6 @@ function listar(a,b,c,d,e){
 <CFSET TOTOUT = 0>
 <CFSET TOTNOV = 0>
 <CFSET TOTDEZ = 0>
-<CFSET colbano = 0>
-<CFSET colcano = 0>
-<cfset mesbase = int(cont_mes - 1)>
 
 <!--- JAN --->	
  <cfif (UN_JAN_TOT gt 0) or (GE_JAN_TOT gt 0) or (SB_JAN_TOT gt 0) or (SU_JAN_TOT gt 0)>
@@ -2024,18 +2005,21 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>JAN</strong></div></td>
     <td width="14%" class="exibir"><div align="center"><strong>#Soluc_Tot_Jan#</strong></div></td>
 	<cfset colB = NumberFormat((TOTJAN + Soluc_Tot_Jan),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
 	<cfset colC = NumberFormat(((Soluc_Tot_Jan/colB) * 100),999.0)>	
-	<td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
+    <td><div align="center">#colC#</div></td>
+	<cfset colD = colB>
+     <td><div align="center">#colD#</div></td> 
+	<cfset ColE = NumberFormat(((Soluc_Tot_Jan/colD) * 100),999.0)>
     <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset ColF = numberFormat((auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET colG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#colG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-    <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
@@ -2046,18 +2030,13 @@ function listar(a,b,c,d,e){
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
     </tr>
 	<cfset  auxultmes = 1>
-	<!--- <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>--->
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)> 
-	
-	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>
-<!---		
-		<cfquery datasource="#dsn_inspecao#">
-			UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#'  WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 1
-		</cfquery> 
---->		
-	</cfif>		
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;JAN;#Soluc_Tot_Jan#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>
+	<cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)> 
+<!---	
+   <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#'  WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 1
+  </cfquery>	
+--->
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;JAN;#Soluc_Tot_Jan#;#colB#;#colC#;0;#ColE#;#ColF#;#colG#;#resultado#'>
  </cfif>
 <!--- FEV --->
  <cfif (UN_FEV_TOT gt 0) or (GE_FEV_TOT gt 0) or (SB_FEV_TOT gt 0) or (SU_FEV_TOT gt 0)>
@@ -2073,18 +2052,21 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>FEV</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Fev#</strong></div></td>
 	<cfset colB = NumberFormat((TOTFEV + Soluc_Tot_Fev),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
 	<cfset colC = NumberFormat(((Soluc_Tot_Fev/colB) * 100),999.0)>
     <td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
+	<cfset colD = NumberFormat((Soluc_Tot_Jan + colB),999)>
+    <td><div align="center">#colD#</div></td>
+	<cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev)/colD) * 100),999.0)>
     <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset ColF = numberFormat(2 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
@@ -2094,16 +2076,13 @@ function listar(a,b,c,d,e){
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cfset  auxultmes = 2>
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)> 
-		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>
-<!---		
-	  <cfquery datasource="#dsn_inspecao#">
-	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 2
-	  </cfquery> 
---->	  
-	</cfif>			  
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;FEV;#Soluc_Tot_Fev#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
+  <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
+<!---  
+  <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 2
+  </cfquery> 
+--->
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;FEV;#Soluc_Tot_Fev#;#colB#;#colC#;#colD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
  </cfif>
 <!--- MAR --->
  <cfif (UN_MAR_TOT gt 0) or (GE_MAR_TOT gt 0) or (SB_MAR_TOT gt 0) or (SU_MAR_TOT gt 0)>
@@ -2121,39 +2100,37 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>MAR</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Mar#</strong></div></td>
 	<cfset colB = NumberFormat((TOTMAR + Soluc_Tot_Mar),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>	
     <cfset colC = NumberFormat(((Soluc_Tot_Mar/colB) * 100),999.0)>		
     <td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
-    <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + colB),999)>
+    <td><div align="center">#colD#</div></td>
+	<cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar)/colD) * 100),999.0)>
+    <td><div align="center">#ColE#</div></td>	
+	<cfset ColF = numberFormat(3 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
-	</cfif>	
+	</cfif>		
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>	
   </tr>
   <cfset  auxultmes = 3>
-<!---   <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
-<cfset MetSLNCAcumPeriodo = trim(MetSLNCAcumPeriodo)> --->
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)> 
-		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>
-	  <!---
-	  <cfquery datasource="#dsn_inspecao#">
-	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 3
-	  </cfquery>
---->	  
-	</cfif>			     
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;MAR;#Soluc_Tot_Mar#;#colB#;#colC#;#ColD#;#ColE#;#resultado#'>  
+  <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
+  <!---
+   <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 3
+  </cfquery>  
+  ---> 
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;MAR;#Soluc_Tot_Mar#;#colB#;#colC#;#ColD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
  </cfif> 
 <!--- ABR --->
  <cfif (UN_ABR_TOT gt 0) or (GE_ABR_TOT gt 0) or (SB_ABR_TOT gt 0) or (SU_ABR_TOT gt 0)>
@@ -2169,18 +2146,21 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>ABR</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Abr#</strong></div></td>
 	<cfset colB = NumberFormat((TOTABR + Soluc_Tot_Abr),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
     <cfset colC = NumberFormat(((Soluc_Tot_Abr/colB) * 100),999.0)>	
     <td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
-    <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + colB),999)>
+    <td><div align="center">#colD#</div></td>
+	<cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr)/colD) * 100),999.0)>
+    <td><div align="center">#ColE#</div></td>		
+	<cfset ColF = numberFormat(4 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
@@ -2189,18 +2169,14 @@ function listar(a,b,c,d,e){
 	</cfif>			
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
-  
   <cfset  auxultmes = 4>
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)> 
- 		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
-<!---	 
-	  <cfquery datasource="#dsn_inspecao#">
-	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 4
-	  </cfquery> 
---->	  
-	</cfif>			    
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;ABR;#Soluc_Tot_Abr#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
+  <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
+<!---  
+  <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 4
+  </cfquery>  
+  --->  
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;ABR;#Soluc_Tot_Abr#;#colB#;#colC#;#colD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
  </cfif> 
 <!--- MAI --->
  <cfif (UN_MAI_TOT gt 0) or (GE_MAI_TOT gt 0) or (SB_MAI_TOT gt 0) or (SU_MAI_TOT gt 0)>
@@ -2215,18 +2191,21 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>MAI</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Mai#</strong></div></td>
 	<cfset colB = NumberFormat((TOTMAI + Soluc_Tot_Mai),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
     <cfset colC = NumberFormat(((Soluc_Tot_Mai/colB) * 100),999.0)>
     <td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
-    <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + colB),999)>
+    <td><div align="center">#colD#</div></td>
+	<cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai)/colD) * 100),999.0)>
+    <td><div align="center">#ColE#</div></td>		
+	<cfset ColF = numberFormat(5 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
@@ -2236,17 +2215,14 @@ function listar(a,b,c,d,e){
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cfset  auxultmes = 5>
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
-    	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
-<!---		
-		<cfquery datasource="#dsn_inspecao#">
-			UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 5
-		</cfquery>
---->		
-    </cfif> 	  
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;MAI;#Soluc_Tot_Mai#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
-  </cfif>  
+  <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
+  <!---
+<cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 5
+  </cfquery>  
+  ---> 
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;MAI;#Soluc_Tot_Mai#;#colB#;#colC#;#colD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
+ </cfif>  
 <!--- JUN --->
  <cfif (UN_JUN_TOT gt 0) or (GE_JUN_TOT gt 0) or (SB_JUN_TOT gt 0) or (SU_JUN_TOT gt 0)>
 	<cfset TOTJUN = NumberFormat((UN_JUN_TOT + GE_JUN_TOT + SB_JUN_TOT + SU_JUN_TOT),999)>
@@ -2260,18 +2236,21 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>JUN</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Jun#</strong></div></td>
 	<cfset colB = NumberFormat((TOTJUN + Soluc_Tot_Jun),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
     <cfset colC = NumberFormat(((Soluc_Tot_Jun/colB) * 100),999.0)>	    
 	<td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
-    <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + colB),999)>
+    <td><div align="center">#colD#</div></td>	
+    <cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun)/colD) * 100),999.0)>
+    <td><div align="center">#ColE#</div></td>	
+	<cfset ColF = numberFormat(6 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
@@ -2281,16 +2260,13 @@ function listar(a,b,c,d,e){
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cfset  auxultmes = 6>
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
-	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
-<!---	  
-	  <cfquery datasource="#dsn_inspecao#">
-	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 6
-	  </cfquery>  
---->	  
-	</cfif>			   
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;JUN;#Soluc_Tot_Jun#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
+  <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
+  <cfquery datasource="#dsn_inspecao#">
+  <!---
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 6
+  </cfquery>  
+  --->
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;JUN;#Soluc_Tot_Jun#;#colB#;#colC#;#colD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
  </cfif> 
  <!--- JUL --->	
  <cfif (UN_JUL_TOT gt 0) or (GE_JUL_TOT gt 0) or (SB_JUL_TOT gt 0) or (SU_JUL_TOT gt 0)>
@@ -2305,18 +2281,21 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>JUL</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Jul#</strong></div></td>
 	<cfset colB = NumberFormat((TOTJUL + Soluc_Tot_Jul),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
     <cfset colC = NumberFormat(((Soluc_Tot_Jul/colB) * 100),999.0)>	
     <td><div align="center">#colC#</div></td>
-    <cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + colB),999)>
+    <td><div align="center">#colD#</div></td>
+    <cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul)/colD) * 100),999.0)>
     <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset ColF = numberFormat(7 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
@@ -2327,15 +2306,12 @@ function listar(a,b,c,d,e){
   </tr>
   <cfset  auxultmes = 7>
   <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
-<cfset MetSLNCAcumPeriodo = trim(MetSLNCAcumPeriodo)>
-		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
-<!---		
-		<cfquery datasource="#dsn_inspecao#">
-		UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 7
-		</cfquery> 
---->		
-	</cfif>		  
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;JUL;#Soluc_Tot_Jul#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
+  <!---
+ <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 7
+  </cfquery>  
+--->  
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;JUL;#Soluc_Tot_Jul#;#colB#;#colC#;#colD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
  </cfif>
 <!--- AGO --->
  <cfif (UN_AGO_TOT gt 0) or (GE_AGO_TOT gt 0) or (SB_AGO_TOT gt 0) or (SU_AGO_TOT gt 0)>
@@ -2350,18 +2326,21 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>AGO</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Ago#</strong></div></td>
 	<cfset colB = NumberFormat((TOTAGO + Soluc_Tot_Ago),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
     <cfset colC = NumberFormat(((Soluc_Tot_Ago/colB) * 100),999.0)>	
     <td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + colB),999)>
+    <td><div align="center">#colD#</div></td>
+    <cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago)/colD) * 100),999.0)>
     <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset ColF = numberFormat(8 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
@@ -2371,16 +2350,13 @@ function listar(a,b,c,d,e){
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cfset  auxultmes = 8>
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
- 	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
-<!---	 
-	  <cfquery datasource="#dsn_inspecao#">
-	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 8
-	  </cfquery> 
---->	  
- </cfif>			   
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;AGO;#Soluc_Tot_Ago#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
+  <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
+<!---  
+   <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 8
+  </cfquery> 
+---> 
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;AGO;#Soluc_Tot_Ago#;#colB#;#colC#;#colD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
  </cfif>
 <!--- SET --->
  <cfif (UN_SET_TOT gt 0) or (GE_SET_TOT gt 0) or (SB_SET_TOT gt 0) or (SU_SET_TOT gt 0)>
@@ -2395,37 +2371,37 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>SET</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Set#</strong></div></td>
 	<cfset colB = NumberFormat((TOTSET + Soluc_Tot_Set),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
     <cfset colC = NumberFormat(((Soluc_Tot_Set/colB) * 100),999.0)>		
     <td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago + colB),999)>
+    <td><div align="center">#colD#</div></td>		
+    <cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago + Soluc_Tot_Set)/colD) * 100),999.0)>
     <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset ColF = numberFormat(9 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
-	</cfif>			
+	</cfif>		
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cfset  auxultmes = 9>
   <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
-<cfset MetSLNCAcumPeriodo = trim(MetSLNCAcumPeriodo)>
-		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>   
-<!---		
-		<cfquery datasource="#dsn_inspecao#">
-		UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 9
-		</cfquery>  
---->		
-	</cfif>		  
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;SET;#Soluc_Tot_Set#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
+  <!---
+  <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 9
+  </cfquery>  
+--->  
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;SET;#Soluc_Tot_Set#;#colB#;#colC#;#colD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
  </cfif> 
 <!--- OUT --->
  <cfif (UN_OUT_TOT gt 0) or (GE_OUT_TOT gt 0) or (SB_OUT_TOT gt 0) or (SU_OUT_TOT gt 0)>
@@ -2440,37 +2416,37 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>OUT</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Out#</strong></div></td>
 	<cfset colB = NumberFormat((TOTOUT + Soluc_Tot_Out),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
 	<cfset colC = NumberFormat(((Soluc_Tot_Out/colB) * 100),999.0)>		
     <td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago + Soluc_Tot_Set + colB),999)>
+    <td><div align="center">#colD#</div></td>		
+    <cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago + Soluc_Tot_Set + Soluc_Tot_Out)/colD) * 100),999.0)>
     <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset ColF = numberFormat(10 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
-	</cfif>	
-	<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
+	</cfif>		
+    <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cfset  auxultmes = 10>
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
- 		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
-<!---	  
-	  <cfquery datasource="#dsn_inspecao#">
-	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 10
-	  </cfquery>
---->	  
-	</cfif>			     
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;OUT;#Soluc_Tot_Out#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
+  <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
+<!---  
+  <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 10
+  </cfquery>   
+--->
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;OUT;#Soluc_Tot_Out#;#colB#;#colC#;#colD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
  </cfif> 
 <!--- NOV --->
  <cfif (UN_NOV_TOT gt 0) or (GE_NOV_TOT gt 0) or (SB_NOV_TOT gt 0) or (SU_NOV_TOT gt 0)>
@@ -2485,37 +2461,37 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>NOV</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Nov#</strong></div></td>
 	<cfset colB = NumberFormat((TOTNOV + Soluc_Tot_Nov),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
     <cfset colC = NumberFormat(((Soluc_Tot_Nov/colB) * 100),999.0)>	
     <td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago + Soluc_Tot_Set + Soluc_Tot_Out + colB),999)>
+    <td><div align="center">#colD#</div></td>		
+    <cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago + Soluc_Tot_Set + Soluc_Tot_Out + Soluc_Tot_Nov)/colD) * 100),999.0)>
     <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset ColF = numberFormat(11 * (auxRazao/12),999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
-	</cfif>	
-	<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
+	</cfif>		
+    <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cfset  auxultmes = 11>
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
-    	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
-<!---	  
-	  <cfquery datasource="#dsn_inspecao#">
-	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 11
-	  </cfquery>   
---->	  
-	</cfif>			  
-    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;NOV;#Soluc_Tot_Nov#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
+  <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
+  <!---
+  <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 11
+  </cfquery> 
+  --->   
+    <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;NOV;#Soluc_Tot_Nov#;#colB#;#colC#;#colD#;#ColE#;#ColF#;#ColG#;#resultado#'>  
  </cfif>  
 <!--- DEZ --->
  <cfif (UN_DEZ_TOT gt 0) or (GE_DEZ_TOT gt 0) or (SB_DEZ_TOT gt 0) or (SU_DEZ_TOT gt 0)>
@@ -2530,18 +2506,21 @@ function listar(a,b,c,d,e){
     <td><div align="center"><strong>DEZ</strong></div></td>
     <td><div align="center"><strong>#Soluc_Tot_Dez#</strong></div></td>
 	<cfset colB = NumberFormat((TOTDEZ + Soluc_Tot_Dez),999)>
-	<cfset colbano = colbano + colb>
     <td><div align="center"><strong>#colB#</strong></div></td>
 	<cfset colC = NumberFormat(((Soluc_Tot_Dez/colB) * 100),999.0)>	
     <td><div align="center">#colC#</div></td>
-	<cfset ColD = metslnc>    
-	<td><div align="center">#ColD#</div></td>
-	<CFSET ColE = numberFormat(((colC * 100)/ColD),999.0)>
+	<cfset colD = NumberFormat( (Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago + Soluc_Tot_Set + Soluc_Tot_Out + Soluc_Tot_Nov + colB),999)>
+    <td><div align="center">#colD#</div></td>		
+    <cfset ColE = NumberFormat((((Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago + Soluc_Tot_Set + Soluc_Tot_Out + Soluc_Tot_Nov + Soluc_Tot_Dez)/colD) * 100),999.0)>
     <td><div align="center">#ColE#</div></td>
-	<cfif ColC gt ColD>
+	<cfset ColF = numberFormat(auxRazao,999.0)>
+    <td><div align="center">#ColF#</div></td>
+	<CFSET ColG = numberFormat(((ColE * 100)/ColF),999.0)>
+    <td><div align="center">#ColG#</div></td>
+	<cfif ColE gt ColF>
 		<cfset resultado = "ACIMA DO ESPERADO">
 		<cfset auxcor = "##33CCFF">
-   <cfelseif ColC eq ColD>		
+    <cfelseif ColE eq ColF>		
 		<cfset resultado = "DENTRO DO ESPERADO">
 		<cfset auxcor = "##339900">
     <cfelse>
@@ -2551,64 +2530,70 @@ function listar(a,b,c,d,e){
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cfset  auxultmes = 12>
-	<cfset colcano = colcano + colC>
-	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
-   	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
-<!---	  
-	  <cfquery datasource="#dsn_inspecao#">
-	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 12
-	  </cfquery>
-<!---	  
-	</cfif>			     
-  <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;DEZ;#Soluc_Tot_Dez#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>
+  <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
+<!---  
+  <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#MetSLNCAcumPeriodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 12
+  </cfquery>   
+--->  
+  <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;DEZ;#Soluc_Tot_Dez#;#colB#;#colC#;colD;#ColE#;#ColF#;#ColG#;#resultado#'>
  </cfif>
  
- <cfset colcano = NumberFormat(((Soluc_Geral/colbano) * 100),999.0)>	
- <cfset ColD = metslnc> 
- <CFSET ColE = numberFormat(((colcano * 100)/ColD),999.0)>
-<tr class="titulos">
-    <td><div align="center" class="red_titulo"><strong>#sg#</strong></div></td>  
-    <td class="red_titulo"><div align="center"><strong>Geral</strong></div></td>
-    <td><div align="center" class="red_titulo"><strong>#Soluc_Geral#</strong></div></td>
-    <td><div align="center" class="red_titulo"><strong>#colbano#</strong></div></td>
-    <td><div align="center" class="red_titulo"><strong>#colcano#</strong></div></td>
-    <td><div align="center" class="red_titulo"><strong>#ColD#</strong></div></td>
-    <td><div align="center" class="red_titulo"><strong>#ColE#</strong></div></td>
+ <!--- <cfset TOTGER = TOTJAN + TOTFEV + TOTMAR + TOTABR + TOTMAI + TOTJUN + TOTJUL + TOTAGO + TOTSET + TOTOUT + TOTNOV + TOTDEZ> --->
+ <!--- <cfset TOTGER = Uni_Total + Ger_Total + Sub_Total + Sup_Total> --->
+<!---   <cfset Soluc_Geral = int(Soluc_Tot_Jan + Soluc_Tot_Fev + Soluc_Tot_Mar + Soluc_Tot_Abr + Soluc_Tot_Mai + Soluc_Tot_Jun + Soluc_Tot_Jul + Soluc_Tot_Ago + Soluc_Tot_Set + Soluc_Tot_Out + Soluc_Tot_Nov + Soluc_Tot_Dez)> --->
+<!---  <cfset Per = left((Soluc_Geral/(TOTGER + Soluc_Geral)) * 100,4)>	 --->
 
-   <cfif colcano gt ColD>
-		<cfset resultado = "ACIMA DO ESPERADO">
-		<cfset auxcor = "##33CCFF">
-   <cfelseif colcano eq ColD>		
-		<cfset resultado = "DENTRO DO ESPERADO">
-		<cfset auxcor = "##339900">
-    <cfelse>
-		<cfset resultado = "ABAIXO DO ESPERADO">
-		<cfset auxcor = "##FF3300">
-	</cfif>	
-    <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
+  <tr class="red_titulo">
+    <td><div align="center"><strong>#sg#</strong></div></td>
+    <td><div align="center"><strong>#MesAC#</strong></div></td>
+	<td><div align="center"><strong>#Soluc_Geral#</strong></div></td>
+	<td><div align="center"><strong>#ResTot#</strong></div></td>
+	<td><div align="center">#ResPer#</div></td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
+    <td><div align="center">&nbsp;</div></td>
+    <td>&nbsp;</td>
+    <td>&nbsp;</td>
   </tr>
- <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;Geral;#Soluc_Geral#;#colbano#;#colcano#;#colD#;#ColE#;#resultado#'>
+<!---  se:#se#  ano: #year(dtlimit)# Met_SLNC_Acum:#ResPer#
+ <cfset gil = gil> --->
+ <!---
+   <cfquery datasource="#dsn_inspecao#">
+   UPDATE Metas SET Met_SLNC_AcumPeriodo = '#ResPer#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = #auxultmes#
+  </cfquery> 
+--->  
+<cffile action="Append" file="#slocal##sarquivo#" output='#sg#;#MesAC#;#Soluc_Geral#;#ResTot#;#ResPer#;;;;;'>
+<!---   <tr class="exibir">
+    <td colspan="6">&nbsp;</td>
+  </tr>
+ --->
+
+
   <tr class="exibir">
     <td colspan="12" class="exibir"><strong>Legenda: </strong></td>
   </tr>
-   <cffile action="Append" file="#slocal##sarquivo#" output='Legenda:'>
   <tr class="exibir">
-    <td colspan="12"><strong>* Total B - Soma ((pendentes + tratamento com mais de  30(trinta) dias úteis  da liberação dos pontos) + ( solucionados do m&ecirc;s)) </strong></td>
+    <td colspan="12"><strong>* Total B - &Eacute; o somat&oacute;rio dos itens com os status pendentes + em tratamento + solucionados do m&ecirc;s </strong></td>
   </tr>
-  <cffile action="Append" file="#slocal##sarquivo#" output='* Total B - Soma ((pendentes + tratamento com mais de  30(trinta) dias úteis  da liberação dos pontos) + ( solucionados do mês)) ' >
+  <cffile action="Append" file="#slocal##sarquivo#" output='* Total - É o somatório dos itens com os status pendentes + em tratamento + solucionados do mês' >
   <tr class="exibir">
     <td colspan="12"><strong>** % de SL do m&ecirc;s = ((A/B) * 100) </strong></td>
   </tr>
-   <cffile action="Append" file="#slocal##sarquivo#" output='** % de SL do mês = A/B * 100'>  
-
+  <cffile action="Append" file="#slocal##sarquivo#" output='** % de SL do mês = A/B * 100'>  
+  <tr class="exibir">
+    <td colspan="12"><strong>*** Total Acumulado Per&iacute;odo (D) = total solucionado meses anteriores (A1+A2+A3...) + Total B do m&ecirc;s de refer&ecirc;ncia</strong></td>
+  </tr>
+  <cffile action="Append" file="#slocal##sarquivo#" output='*** Total acumulado do período (D) = total solucionado meses anteriores (A1+A2+A3...) + Total B do mês de referência'>    
+  <tr class="exibir">
+    <td colspan="12"><p><strong>**** % Acumulado do Per&iacute;odo (E) =( total solucionado at&eacute; o m&ecirc;s de refer&ecirc;ncia (A1+A2+A3...)/Total Acumulado Per&iacute;odo (D) * 100</strong>)</p>
+      </td>
+  <cffile action="Append" file="#slocal##sarquivo#" output='*** % Acumulado do período (E) = total solucionado até o mês de referência (A1+A2+A3...)/Total acumulado período (D) * 100'>    	  
+    <!---     <td colspan="2"><input name="Submit1" type="submit" class="botao" id="Submit1" value="+Detalhes"></td> --->
+  </tr>
     <tr class="exibir">
     <td colspan="12"><p><strong>SL = SOLUCIONADO <br></strong></p>
       </td>
-<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and day(now()) lte 10> 
-  <cfquery datasource="#dsn_inspecao#">
-   UPDATE Metas SET Met_SLNC_AcumPeriodo = '#colcano#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = #auxultmes#
-  </cfquery>
-</cfif>  	  
   <cffile action="Append" file="#slocal##sarquivo#" output='SL = SOLUCIONADO'>    	  	  
     <!---     <td colspan="2"><input name="Submit1" type="submit" class="botao" id="Submit1" value="+Detalhes"></td> --->
   </tr>
@@ -2619,12 +2604,10 @@ function listar(a,b,c,d,e){
 
 <!--- fim exibicao --->
 </form>
-<form name="formx" method="post" action="Rel_Indicadores_Solucao2.cfm" target="_blank">
+<form name="formx" method="POST" action="Rel_Indicadores_Solucao2.cfm" target="_blank">
     <input name="lis_anoexerc" type="hidden" value="#anoexerc#">
 	<input name="lis_se" type="hidden" value="#se#">
 	<input name="lis_mes" type="hidden" value="">
-	<input name="lis_soluc" type="hidden" value="">
-	<input name="lis_outros" type="hidden" value="">
 	<input name="lis_grpace" type="hidden" value="">
 </form>
   <cfinclude template="rodape.cfm">

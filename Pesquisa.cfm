@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/>
+<cfprocessingdirective pageEncoding ="utf-8">
 <cfif isDefined("Form.acao") and #form.acao# is 'salvar'>
 <cfoutput>
 	<cfquery datasource="#dsn_inspecao#" name="rsExiste">
@@ -462,14 +462,14 @@ alert(texto);
     </div>      <div align="center"></div>      <div align="center"></div>      <div align="center"></div>      <div align="center"></div>      <div align="center"></div>      <div align="center"></div>      <div align="center"></div>      <div align="center"></div>      <div align="center"></div>    </td>
     </tr>
   <tr>
-    <td colspan="2" class="exibir"><strong>Atributos (neste itens ser&atilde;o aplicados os intervalos acima):</strong></td>
+    <td colspan="2" class="exibir"><strong>Atributos (nestes itens serão aplicados os intervalos acima):</strong></td>
   </tr>
 
   <tr>
     <td colspan="2"><table width="99%" border="0">
       <tr bgcolor="#E5E5E5">
         <td width="2%" class="exibir"><div align="center"><strong>1.</strong></div></td>
-        <td width="92%" class="exibir"><strong>Comunica&ccedil;&atilde;o Pessoal com o gestor da unidade &ndash; Compreens&atilde;o Recíproca </strong></td>
+        <td width="92%" class="exibir"><strong>Comunicação Pessoal com o gestor da unidade ; Compreensão Recíproca </strong></td>
         <td width="6%"><div align="center">
           <select name="atrib01" id="atrib01">
               <option value="---">---</option>
@@ -488,7 +488,7 @@ alert(texto);
       </tr>
       <tr bgcolor="#FFFFFF">
         <td class="exibir"><div align="center"><strong>2.</strong></div></td>
-        <td class="exibir"><strong> Postura durante o trabalho &ndash; &Eacute;tica, Educa&ccedil;&atilde;o e Cortesia </strong></td>
+        <td class="exibir"><strong>Postura durante o trabalho ; Êtica, Educação e Cortesia </strong></td>
         <td><div align="center">
           <select name="atrib02" id="atrib02">
               <option value="---">---</option>
@@ -507,7 +507,7 @@ alert(texto);
       </tr>
       <tr bgcolor="#E5E5E5">
         <td class="exibir"><div align="center"><strong>3.</strong></div></td>
-        <td class="exibir"><strong>Condu&ccedil;&atilde;o dos trabalhos &ndash; Simultaneidade com o m&iacute;nimo de interrup&ccedil;&atilde;o das atividades da unidade </strong></td>
+        <td class="exibir"><strong>Condução dos trabalhos ; Simultaneidade com o mínimo de interrupção das atividades da unidade </strong></td>
         <td><div align="center">
           <select name="atrib03" id="atrib03">
               <option value="---">---</option>
@@ -526,7 +526,7 @@ alert(texto);
       </tr>
       <tr bgcolor="#FFFFFF">
         <td class="exibir"><div align="center"><strong>4.</strong></div></td>
-        <td class="exibir"><strong>Orienta&ccedil;&otilde;es &ndash; Valor e Pertin&ecirc;ncia </strong></td>
+        <td class="exibir"><strong>Orientações ; Valor e Pertinência </strong></td>
         <td><div align="center">
           <select name="atrib04" id="atrib04">
               <option value="---">---</option>
@@ -545,7 +545,7 @@ alert(texto);
       </tr>
       <tr bgcolor="#E5E5E5">
         <td class="exibir"><div align="center"><strong>5.</strong></div></td>
-        <td class="exibir"><strong>Reuni&atilde;o de Encerramento &ndash; Simplicidade, Objetividade e Clareza </strong></td>
+        <td class="exibir"><strong>Reunião de Encerramento ; Simplicidade, Objetividade e Clareza </strong></td>
         <td><div align="center">
           <select name="atrib05" id="atrib05">
               <option value="---">---</option>
@@ -564,7 +564,7 @@ alert(texto);
       </tr>
       <tr>
         <td class="exibir"><div align="center"><strong>6.</strong></div></td>
-        <td class="exibir"><strong>Relat&oacute;rio &ndash; Clareza, Consist&ecirc;ncia e Objetividade da Reda&ccedil;&atilde;o</strong></td>
+        <td class="exibir"><strong>Relatório ; Clareza, Consistência e Objetividade da Redação</strong></td>
         <td><div align="center">
           <select name="atrib06" id="atrib06">
               <option value="---">---</option>
@@ -583,7 +583,7 @@ alert(texto);
       </tr>
       <tr bgcolor="#E5E5E5">
         <td class="exibir"><div align="center"><strong>7.</strong></div></td>
-        <td bgcolor="#E5E5E5" class="exibir"><strong> Pós avaliação - Esclarecimento de Dúvidas, Disponibilidade, Presteza e Comunicação </strong></td>
+        <td bgcolor="#E5E5E5" class="exibir"><strong>Pós Avaliação - Esclarecimento de Dúvidas, Disponibilidade, Presteza e Comunicação </strong></td>
         <td><div align="center">
           <select name="atrib07" id="atrib07">
               <option value="---">---</option>
@@ -602,7 +602,7 @@ alert(texto);
       </tr>
 	  <tr bgcolor="#FFFFFF">
         <td class="exibir"><div align="center"><strong>8.</strong></div></td>
-        <td class="exibir"><strong> Import&acirc;ncia dos Trabalhos de Verifica&ccedil;&atilde;o de Controles Internos para o Aprimoramento da Unidade</strong></td>
+        <td class="exibir"><strong> Importância dos Trabalhos de Verificação de Controles Internos para o Aprimoramento da Unidade</strong></td>
         <td><div align="center">
           <select name="atrib08" id="atrib08">
               <option value="---">---</option>
@@ -620,7 +620,7 @@ alert(texto);
         </div></td>
       </tr><tr bgcolor="#E5E5E5">
         <td class="exibir"><div align="center"><strong>9.</strong></div></td>
-        <td class="exibir"><strong> Import&acirc;ncia dos Trabalhos de Verifica&ccedil;&atilde;o de Controles Internos para o Aprimoramento da Operação como um todo </strong></td>
+        <td class="exibir"><strong> Importância dos Trabalhos de Verificação de Controles Internos para o Aprimoramento da Operação como um todo </strong></td>
         <td><div align="center">
           <select name="atrib09" id="atrib09">
               <option value="---">---</option>
@@ -649,7 +649,7 @@ alert(texto);
       </tr>
       <tr class="exibir">
         <td><div align="center"><strong>1.</strong></div></td>
-        <td colspan="2"><strong> As Atividades da equipe de Controle Interno foram iniciadas na unidade antes do in&iacute;cio do atendimento ao P&uacute;blico e suprimento dos Caixas de Atendimento (somente AC ) </strong></td>
+        <td colspan="2"><strong> As Atividades da equipe de Controle Interno foram iniciadas na unidade antes do início do atendimento ao público e suprimento dos Caixas de Atendimento (somente AC ) </strong></td>
       </tr>
       <tr class="exibir">
         <td>&nbsp;</td>

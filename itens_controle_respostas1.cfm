@@ -490,8 +490,8 @@
   WHERE Und_Codigo = '#URL.Unid#'
 </cfquery>
 
- <cfset strIDGestor = #URL.Unid#>
- <cfset strNomeGestor = #rsMod.Und_Descricao#>
+ <cfset posarea = #URL.Unid#>
+ <cfset posnomearea = #rsMod.Und_Descricao#>
  <cfset Gestor = '#rsMod.Und_Descricao#'>
 
 <cfif IsDefined("FORM.MM_UpdateRecord") AND FORM.MM_UpdateRecord EQ "form1" And IsDefined("FORM.acao") And Form.acao is "Salvar2">
@@ -509,19 +509,31 @@
 			  SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsMod.Und_Centraliza#'
 		   </cfquery>
 		   <cfif rsCDD.recordcount gt 0>
-			  <cfset strIDGestor = #rsCDD.Und_Codigo#>
+			  <cfset posarea = #rsCDD.Und_Codigo#>
 		   </cfif>
 	  </cfif>
-	  <cfset auxposarea = #strIDGestor#>
+	  <cfset auxposarea = #posarea#>
 	<cfelseif Form.frmResp is 3>
 	  <cfset auxposarea = '#qSituacaoResp.Pos_Area#'>
+	<cfelseif (Form.frmResp is 3 or Form.frmResp is 12 or Form.frmResp is 13) AND (Form.posSitRespAntes is 21 or Form.posSitRespAntes is 24 or Form.posSitRespAntes is 28)>
+		<cfquery name="rsPosArea" datasource="#dsn_inspecao#">
+			SELECT And_Area
+			FROM Andamento
+			WHERE And_Unidade = '#FORM.unid#' AND 
+			And_NumInspecao = '#FORM.ninsp#' AND 
+			And_NumGrupo = #FORM.ngrup# AND 
+			And_NumItem = #FORM.nitem# and  And_Situacao_Resp in (0,11,14,1,24,5,6,7,8,15,16,17,18,19,20,22,23,25,26,27)
+			order by And_DtPosic desc, And_HrPosic desc
+		</cfquery>
+		<cfset auxposarea = '#rsPosArea.And_Area#'>
 	<cfelseif Form.frmResp is 4>
 	  <cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
 		   <!--- uma AC  => verificar se centralizada --->
-		  <cfset strIDGestor = #rsMod.Und_Centraliza#>
+		  <cfset posarea = #rsMod.Und_Centraliza#>
 	  </cfif>
 	  <cfquery name="rsReop" datasource="#dsn_inspecao#">
-		  SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
+		  SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop 
+		  WHERE Und_Codigo='#posarea#'
 	  </cfquery>
 	  <cfset auxposarea = #rsReop.Rep_Codigo#>
 	<cfelseif Form.frmResp is 5 or Form.frmResp is 10 or Form.frmResp is 19 or Form.frmResp is 25 or Form.frmResp is 26>
@@ -531,13 +543,13 @@
 	<cfelseif Form.frmResp is 9 or Form.frmResp is 24 or Form.frmResp is 29>
 		<cfset auxposarea = #Form.cbareaCS#>
 	<cfelseif Form.frmResp is 12 or Form.frmResp is 13 or Form.frmResp is 18 or Form.frmResp is 20>
-		<cfset auxposarea = #strIDGestor#>
+		<cfset auxposarea = #posarea#>
 	<cfelseif Form.frmResp is 16>
 		<cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
-		  <cfset strIDGestor = #rsMod.Und_Centraliza#>
+		  <cfset posarea = #rsMod.Und_Centraliza#>
 		</cfif>
 		<cfquery name="rsReop" datasource="#dsn_inspecao#">
-		  SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
+		  SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#posarea#'
 		</cfquery>
 		<cfset auxposarea = #rsReop.Rep_Codigo#>
 	<cfelseif Form.frmResp is 23>
@@ -651,8 +663,8 @@
 			 FROM Areas WHERE Ars_Status = 'A' AND (Left(Ars_Codigo,2) = '#scia_se#') and (Ars_Sigla Like '%/SCIA%' OR Ars_Sigla Like '%DCINT/GCOP/SGCIN/SCIA')
 			 ORDER BY Ars_Sigla
 			</cfquery>				
-			<cfset strIDGestor = #rsSCIA.Ars_Codigo#>
-			<cfset strNomeGestor = #rsSCIA.Ars_Sigla#>
+			<cfset posarea = #rsSCIA.Ars_Codigo#>
+			<cfset posnomearea = #rsSCIA.Ars_Sigla#>
 		</cfif>			
 		<!--- ===================== --->
 		<cfquery datasource="#dsn_inspecao#">
@@ -669,8 +681,8 @@
 						FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
 						WHERE Und_Codigo = '#form.cbunidtransfer#'
 					</cfquery>
-					<cfset strIDGestor = #form.cbunidtransfer#>
-					<cfset strNomeGestor = #rsMod.Und_Descricao#>
+					<cfset posarea = #form.cbunidtransfer#>
+					<cfset posnomearea = #rsMod.Und_Descricao#>
 					<cfset Gestor = '#rsMod.Und_Descricao#'>
 				</cfif>			
 				<!--- Atualizar variaveis com os dados do CDD ---> 
@@ -681,27 +693,27 @@
 						SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsMod.Und_Centraliza#'
 					</cfquery>
 					<cfif rsCDD.recordcount gt 0>
-						<cfset strIDGestor = #rsCDD.Und_Codigo#>
-						<cfset strNomeGestor = #rsCDD.Und_Descricao#>
-						<cfset Gestor = '#strNomeGestor#'>
+						<cfset posarea = #rsCDD.Und_Codigo#>
+						<cfset posnomearea = #rsCDD.Und_Descricao#>
+						<cfset Gestor = '#posnomearea#'>
 					</cfif>
 				</cfif>
 				, Pos_Situacao = 'PU'
-				, Pos_Area = '#strIDGestor#'
-				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_Area = '#posarea#'
+				, Pos_NomeArea = '#posnomearea#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
 				<cfset situacao = 'PENDENTE DE UNIDADE'>
-				<cfset IDArea = #strIDGestor#>
+				<cfset IDArea = #posarea#>
 			</cfcase>
 			<cfcase value=3>
 				, Pos_Situacao = 'SO'
-				<!---, Pos_Area = '#strIDGestor#'
-				, Pos_NomeArea = '#strNomeGestor#'--->
+				, Pos_Area = '#posarea#'
+				, Pos_NomeArea = '#posnomearea#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
 				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-				<cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
+				<cfset Gestor = '#posnomearea#'>
 				<cfset situacao = 'SOLUCIONADO'>
-				<cfset IDArea = '#qSituacaoResp.Pos_Area#'>
+				<cfset IDArea = '#posarea#'>
 			</cfcase>
 			<cfcase value=4>
 				<cfif form.frmtransfer eq 'S'>
@@ -711,10 +723,10 @@
 				<cfelse>
 					<cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
 						<!--- uma AC  => verificar se centralizada --->
-						<cfset strIDGestor = #rsMod.Und_Centraliza#>
+						<cfset posarea = #rsMod.Und_Centraliza#>
 					</cfif>
 					<cfquery name="rsReop" datasource="#dsn_inspecao#">
-						SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
+						SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#posarea#'
 					</cfquery>		
 				</cfif>		  
 				, Pos_Situacao = 'PO'
@@ -793,23 +805,23 @@
 			</cfcase>
 			<cfcase value=12>
 				, Pos_Situacao = 'PI'
-				, Pos_Area = '#strIDGestor#'
-				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_Area = '#posarea#'
+				, Pos_NomeArea = '#posnomearea#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
 				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-				<cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
+				<cfset Gestor = '#posnomearea#'>
 				<cfset situacao = 'PONTO IMPROCEDENTE'>
-				<cfset IDArea = #strIDGestor#>
+				<cfset IDArea = #posarea#>
 			</cfcase>
 			<cfcase value=13>
 				, Pos_Situacao = 'OC'
-				, Pos_Area = '#strIDGestor#'
-				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_Area = '#posarea#'
+				, Pos_NomeArea = '#posnomearea#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
 				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
-				<cfset Gestor = '#qSituacaoResp.Pos_NomeArea#'>
+				<cfset Gestor = '#posnomearea#'>
 				<cfset situacao = 'ORIENTACAO CANCELADA'>
-				<cfset IDArea = #strIDGestor#>
+				<cfset IDArea = #posarea#>
 			</cfcase>
 			<cfcase value=15>
 				<cfif form.frmtransfer eq 'S'>
@@ -818,8 +830,8 @@
 						FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
 						WHERE Und_Codigo = '#form.cbunidtransfer#'
 					</cfquery>
-					<cfset strIDGestor = #form.cbunidtransfer#>
-					<cfset strNomeGestor = #rsMod.Und_Descricao#>
+					<cfset posarea = #form.cbunidtransfer#>
+					<cfset posnomearea = #rsMod.Und_Descricao#>
 					<cfset Gestor = '#rsMod.Und_Descricao#'>
 				</cfif>
 				<!--- Atualizar variaveis com os dados do CDD ---> 
@@ -830,18 +842,18 @@
 						SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsMod.Und_Centraliza#'
 					</cfquery>
 					<cfif rsCDD.recordcount gt 0>
-						<cfset strIDGestor = #rsCDD.Und_Codigo#>
-						<cfset strNomeGestor = #rsCDD.Und_Descricao#>
-						<cfset Gestor = '#strNomeGestor#'>
+						<cfset posarea = #rsCDD.Und_Codigo#>
+						<cfset posnomearea = #rsCDD.Und_Descricao#>
+						<cfset Gestor = '#posnomearea#'>
 					</cfif>
 				</cfif>
 				, Pos_Situacao = 'TU'
-				, Pos_Area = '#strIDGestor#'
-				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_Area = '#posarea#'
+				, Pos_NomeArea = '#posnomearea#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
 				<!---   <cfset Gestor = '#rsMod.Und_Descricao#'> --->
 				<cfset situacao = 'TRATAMENTO UNIDADE'>
-				<cfset IDArea = #strIDGestor#>
+				<cfset IDArea = #posarea#>
 				<cfset sdestina = #rsMod.Und_Email#>
 				<cfset nomedestino = #rsMod.Und_Descricao#>
 			</cfcase>
@@ -853,10 +865,10 @@
 				<cfelse>
 					<cfif (trim(rsMod.Und_Centraliza) neq "") and (sfrmTipoUnidade eq 4)>
 						<!--- uma AC  => verificar se centralizada --->
-						<cfset strIDGestor = #rsMod.Und_Centraliza#>
+						<cfset posarea = #rsMod.Und_Centraliza#>
 					</cfif>
 					<cfquery name="rsReop" datasource="#dsn_inspecao#">
-						SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
+						SELECT Rep_Codigo, Rep_Nome, Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#posarea#'
 					</cfquery>		
 				</cfif>	
 				, Pos_Situacao = 'TS'
@@ -876,17 +888,17 @@
 					FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
 					WHERE Und_Codigo = '#form.cbterctransfer#'
 					</cfquery>
-					<cfset strIDGestor = #form.cbterctransfer#>
-					<cfset strNomeGestor = #rsMod.Und_Descricao#>
+					<cfset posarea = #form.cbterctransfer#>
+					<cfset posnomearea = #rsMod.Und_Descricao#>
 					<cfset Gestor = '#rsMod.Und_Descricao#'>
 				</cfif>
 				, Pos_Situacao = 'TF'
-				, Pos_Area = '#strIDGestor#'
-				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_Area = '#posarea#'
+				, Pos_NomeArea = '#posnomearea#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 				<cfset Gestor = '#rsMod.Und_Descricao#'>
 				<cfset situacao = 'TRATAMENTO TERCEIRIZADA'>
-				<cfset IDArea = #strIDGestor#>
+				<cfset IDArea = #posarea#>
 				<cfset sdestina = #rsMod.Und_Email#>
 				<cfset nomedestino = #rsMod.Und_Descricao#>
 			</cfcase>
@@ -911,26 +923,26 @@
 					FROM Unidades INNER JOIN Diretoria ON Und_CodDiretoria = Dir_Codigo
 					WHERE Und_Codigo = '#form.cbterctransfer#'
 					</cfquery>
-					<cfset strIDGestor = #form.cbterctransfer#>
-					<cfset strNomeGestor = #rsMod.Und_Descricao#>
+					<cfset posarea = #form.cbterctransfer#>
+					<cfset posnomearea = #rsMod.Und_Descricao#>
 					<cfset Gestor = '#rsMod.Und_Descricao#'>
 				</cfif>	
 				, Pos_Situacao = 'PF'
-				, Pos_Area = '#strIDGestor#'
-				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_Area = '#posarea#'
+				, Pos_NomeArea = '#posnomearea#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 				<cfset Gestor = '#rsMod.Und_Descricao#'>
 				<cfset situacao = 'PENDENTE DE TERCEIRIZADA'>
-				<cfset IDArea = #strIDGestor#>
+				<cfset IDArea = #posarea#>
 			</cfcase>
 			<cfcase value=21>
 				, Pos_Situacao = 'RV'
-				, Pos_Area = '#strIDGestor#'
-				, Pos_Nomearea = '#strNomeGestor#'
+				, Pos_Area = '#posarea#'
+				, Pos_Nomearea = '#posnomearea#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(now()),month(now()),day(now())))#
 				<cfset dtnovoprazo = CreateDate(year(now()),month(now()),day(now()))>
 				<cfset situacao = 'REAVALIACAO'>
-				<cfset IDArea = #strIDGestor#>
+				<cfset IDArea = #posarea#>
 			</cfcase>
 			<cfcase value=23>
 				<!--- Status: Tratamento pela SE --->
@@ -998,15 +1010,15 @@
 			</cfcase>	   
 			<cfcase value=28>
 				, Pos_Situacao = 'EA'
-				, Pos_Area = '#strIDGestor#'
-				, Pos_NomeArea = '#strNomeGestor#'
+				, Pos_Area = '#posarea#'
+				, Pos_NomeArea = '#posnomearea#'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
 				<cfset situacao = 'EM ANÁLISE'>
-				<cfset IDArea = #strIDGestor#>
+				<cfset IDArea = #posarea#>
 			</cfcase>	
 			<cfcase value=29>
-				, Pos_Area = '#strIDGestor#'	   
-				, Pos_Nomearea = '#strNomeGestor#'
+				, Pos_Area = '#posarea#'	   
+				, Pos_Nomearea = '#posnomearea#'
 				, Pos_Situacao = 'EC'
 				, Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))#
 				<cfset situacao = 'ENCERRADO'>
@@ -1142,7 +1154,7 @@
 	  <cfif Form.frmResp is 15 or Form.frmResp is 18>
 			<!--- Participar ao Orgao subordinador --->
 			 <cfquery name="rsOrgSub" datasource="#dsn_inspecao#">
-				SELECT Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#strIDGestor#'
+				SELECT Rep_Email FROM Reops INNER JOIN Unidades ON Rep_Codigo = Und_CodReop WHERE Und_Codigo='#posarea#'
 			 </cfquery>
 			 <cfset sdestina = #sdestina# & ';' & #rsOrgSub.Rep_Email#>
 	  </cfif>
@@ -1211,6 +1223,7 @@
  Pos_VLRecuperado, 
  Pos_DtPrev_Solucao, 
  Pos_DtPosic, 
+ Pos_Sit_Resp_Antes,
  DATEDIFF(dd,Pos_DtPosic,GETDATE()) AS diasOcor, 
  Pos_SEI, 
  Pos_Situacao_Resp, 
@@ -1551,7 +1564,6 @@ function exibe(a){
 //  alert('exibe: ' + a); 
  exibirjudicializado(a);
  exibirArea(a);
- exibirAreaCS(a);
  exibirValor(a);
  dtprazo(a);
  exibirscoi(a);
@@ -1560,6 +1572,7 @@ function exibe(a){
  exibirsubortransfer(a);
  exibirterctransfer(a);
  exibirsuspenso(a);
+ exibirAreaCS(a);
 }
 
 //==============
@@ -1599,7 +1612,7 @@ function exibirsuspenso(ind){
 			if ((frmobserv == '' || ind != K) && (auxacao == '' || auxacao == 'Salvar2')) {
 		    document.form1.observacao.value = '';
 		
-          var sinformes = "Com base na manifestação registrada, considera-se o item SOLUCIONADO. \n\nÉ oportuno informar que a efetividade das ações de regularização adotadas poderá ser verificada em futuras Avaliações de Controle realizadas pelas equipes do Controle Interno. \n\nCabe destacar que, caso a unidade avaliada incorra novamente na irregularidade apontada, tal situação será passível de ser considerada como reincidência."
+          var sinformes = "Com base na manifestação registrada, considera-se o item SOLUCIONADO.\n\nÉ oportuno informar que a efetividade das ações de regularização adotadas poderá ser verificada em futuras Avaliações de Controle realizadas pelas equipes do Controle Interno.\n\nCabe destacar que, caso a unidade avaliada incorra novamente na irregularidade apontada, tal situação será passível de ser considerada como reincidência."
             var parecer =  sinformes; 
             document.form1.observacao.value = parecer;
 			}
@@ -1648,7 +1661,7 @@ function exibirscia(ind){
 //alert('exibirscia: ' + ind);
   
   document.form1.cbscia.disabled=false;
-if (ind==210) {
+if (ind==21) {
           window.dAreascia.style.visibility = 'visible'; 
 		  travarcombo('SEC ACOMP CONTR INTERNO/SGCIN','cbscia');
   
@@ -1736,7 +1749,7 @@ if (ind==5 || ind==10 || ind==19 || ind==25 || ind==26){
 		if(ind==25)
 	    {
 		    document.form1.observacao.value = ''
-            <cfset sinformes = "Encaminhamos achado de Controle interno, constatado na agência terceirizada referenciada neste Relatório, para conhecimento, análise, acompanhamento da regularização (se for o caso) e aplicação das providências de competência desse órgão, conforme previsto no instrumento contratual regente. Após a ciência,  o controle da baixa desse  item passará a ser de responsabilidade dessa área e a efetividade e regularidade das ações adotadas poderão serem avaliadas em futuros trabalhos das áreas de Controle Interno da Empresa (2° e 3° linha) ou de Órgãos Externos.">
+            <cfset sinformes = "Encaminhamos achado de Controle interno, constatado na agência terceirizada referenciada nesta Avaliação, para conhecimento, análise, acompanhamento da regularização (se for o caso) e aplicação das providências de competência desse órgão, conforme previsto no instrumento contratual regente.\n\nApós a ciência, o controle da baixa desse item passará a ser de responsabilidade dessa área e a efetividade e regularidade das ações adotadas poderão ser avaliadas em futuros trabalhos das áreas de Controle Interno da Empresa (2° e 3° linha) ou de Órgãos Externos.">
             var area = "#trim(areaDaUnidade)#"; 
             var parecer =  "#sinformes#"; 
             travarcombo(area,'cbarea');
@@ -2206,6 +2219,7 @@ window.open(page, "Popup", windowprops);
   <form name="form1" method="post" onSubmit="return validarform()" enctype="multipart/form-data" action="itens_controle_respostas1.cfm">
   <cfoutput>
 	    <input type="hidden" name="scodresp" id="scodresp" value="#qResposta.Pos_Situacao_Resp#">
+		<input type="hidden" name="posSitRespAntes" id="posSitRespAntes" value="#qResposta.Pos_Sit_Resp_Antes#">
 		<input type="hidden" name="sfrmPosArea" id="sfrmPosArea" value="#qResposta.Pos_Area#">
 		<input type="hidden" name="sfrmPosNomeArea" id="sfrmPosNomeArea" value="#qResposta.Pos_NomeArea#">
 		<input type="hidden" name="sfrmTipoUnidade" id="sfrmTipoUnidade" value="#qResposta.Itn_TipoUnidade#">

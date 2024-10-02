@@ -212,9 +212,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 <div id="div2" align="center" name ="div2">
 <!--- 10/11/2022 --->
 	<cfif ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Unid_Oper,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Reop,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Departamento,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
-
 	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('Avisosgrupos_botao.cfm?botaosn=S', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/avisos.png" width="200" height="90" border="0" /></a></div>
-
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>  
@@ -229,9 +227,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	</cfif>
 
 	<cfif ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login))>
-
 		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img	onClick="abrirPopup('cadastro_inspecao.cfm',700,400)" src="icones/CadastroInspecao.jpg" width="200" height="90" border="0" /></a></div>
-
 		<cfset snci.permitir=True>
 		<cfset Session.vPermissao = True>
     </cfif>
@@ -252,9 +248,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	
 
 	<cfif Left(snci.login,Len(Login_Agencia)) eq Login_Agencia Or Left(snci.login,Len(Login_CDD)) eq Login_CDD Or ListContains(ListQualify(Lista_Unid_Oper,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Coordenador,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
-
         <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('itens_unidades_controle_respostas_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/RelatorioUnidade.jpg" width="200" height="90" border="0" /></a></div>
-
 	  	<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>
@@ -366,22 +360,22 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	 </cfif>
 	  
 	 <cfif ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Reop,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(snci.login))>
-			<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('se_indicadores_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Consulta_Indicadores.png" width="200" height="90" border="0" /></a></div>
+			<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('dgci_Ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/Consulta_Indicadores.png" width="200" height="90" border="0" /></a></div>
 			<cfset snci.permitir = True>
 			<cfset Session.vPermissao = True>
 	 </cfif>	 
-	 <cfif ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login))>
+	 <cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login))>
 		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('abrir_pdf_act.cfm?arquivo=\\\\sac0424\\SISTEMAS\\SNCI\\GUIAS\\GUIA_GESTORES.PDF','_blank')" src="icones/ManualGestores.png" width="200" height="90" border="0" /></a></div>
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>
-	 <cfif ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login))>
+	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login))>
 		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('abrir_pdf_act.cfm?arquivo=\\\\sac0424\\SISTEMAS\\SNCI\\GUIAS\\Guia_SCOI.pdf','_blank')" src="icones/GuiaOrientacao.png" width="200" height="90" border="0" /></a></div>
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>
 	
-    <cfif ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
+    <cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) OR ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
 		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('abrir_pdf_act.cfm?arquivo=\\\\sac0424\\SISTEMAS\\SNCI\\GUIAS\\Guia_SCIA.PDF','_blank')" src="icones/GuiaInspetores.png" width="200" height="90" border="0" /></a></div>
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
@@ -441,15 +435,13 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	  	<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>
-<cfif ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
-		
-		<div class="icones" width="10%" colspan="2" align="center"><a href="#">
-		
+<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
+		<div class="icones" width="10%" colspan="2" align="center"><a href="#">	
 		<img onClick="window.open('Rel_itensverificacao_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')"  src="icones/Listarchecklist.png" width="200" height="90" border="0" /></a></div> 
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 </cfif>
-	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login))>
+	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login))>
 	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('https://app.powerbi.com/reportEmbed?reportId=2c84bd6e-8587-4c00-a8a0-f3f36cc75d75&amp;autoAuth=true&amp;ctid=349047e4-8aa4-4867-b4f7-bc3cb08bbb60&amp;config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLW5vcnRoLWV1cm9wZS1oLXByaW1hcnktcmVkaXJlY3QuYW5hbHlzaXMud2luZG93cy5uZXQvIn0%3D', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/dashboardMonitoramento.png" width="200" height="90" border="0" /></a></div>	  </tr>
 	  <cfset snci.permitir = True>
 	  <cfset Session.vPermissao = True>
@@ -481,12 +473,14 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>	
-	 <cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login))>
+	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login))>
 		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('abrir_pdf_act.cfm?arquivo=\\\\sac0424\\SISTEMAS\\SNCI\\GUIAS\\GUIA SNCI_GESTORMASTER.PDF','_blank')" src="icones/GuiaUnidade.png" width="200" height="90" border="0" /></a></div>
 		<cfset snci.permitir = True>
 		<cfset Session.vPermissao = True>
 	</cfif>	
-	
+	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Departamento,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Coordenador,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
+		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('http://intranetsistemaspe/snci/snci_processos/index.cfm','_blank')" src="icones/snciprocessos.png" width="200" height="90" border="0" /></a></div>
+	</cfif>
 
 <!--- 	<cfif ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login))>
 	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('Itens_Analise_Manifestacao_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/AnaliseManifestacao.png" width="200" height="90" border="0" /></a></div>	  </tr>

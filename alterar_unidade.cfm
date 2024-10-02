@@ -89,8 +89,8 @@ function voltar(){
 	   <tr>	  
     <cfoutput query="rsTipoUnid">
       <cfset ntam = len(trim(#TUN_Descricao#))>
-      <cfset ntam = 14 - ntam>
-        <cfset strnome = RepeatString(" ", ntam / 2) & left(trim(TUN_Descricao),14) & RepeatString(" ", ntam / 2)>
+      <cfset ntam = 20 - ntam>
+        <cfset strnome = RepeatString(" ", ntam / 2) & left(trim(TUN_Descricao),20) & RepeatString(" ", ntam / 2)>
       <cfif qtdcol gte 10>
         <tr>		  </tr> 
         <cfset qtdcol = 0>

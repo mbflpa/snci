@@ -89,7 +89,7 @@
 	<cfif '#grpacesso#' eq "INSPETORES">
 		<!---AO ENTRAR NO ITEM, SE AINDA NÃO TIVER SIDO AVALIADO, SALVA NA TELA RESULTADO_INSPECAO A MATRÍCULA DO AVALIADOR. AO SAIR SEM AVALIAR, ENTRADO NA TELA ANTERIOR--->
 		<cfquery datasource="#dsn_inspecao#">
-			UPDATE Resultado_Inspecao SET RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#' 
+			UPDATE Resultado_Inspecao SET RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#', RIP_Data_Avaliador = CONVERT(char, GETDATE(), 120)
 			where  (rtrim(ltrim(RIP_MatricAvaliador)) is null or rtrim(ltrim(RIP_MatricAvaliador)) ='') and RIP_NumInspecao='#ninsp#'  and RIP_NumGrupo = '#ngrup#' and RIP_NumItem ='#nitem#' and RIP_Resposta ='A'
 		</cfquery>
 	
@@ -180,7 +180,12 @@
 				RIP_ReincGrupo = #RIPReincGrupo#,
 				RIP_ReincItem = #RIPReincItem#,
 				RIP_UserName = '#CGI.REMOTE_USER#',
-				RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#',
+				<cfif #FORM.RIPRecomendacaoInspetor# eq ''>
+					RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#',
+					RIP_Data_Avaliador = CONVERT(char, GETDATE(), 120),
+				<cfelse>
+					RIP_Matricula_Reanalise = '#qAcesso.Usu_Matricula#',
+				</cfif>
 				RIP_DtUltAtu = CONVERT(char, GETDATE(), 120),
 				RIP_Resposta ='#FORM.avalItem#'									
 		  		WHERE 
@@ -253,7 +258,12 @@
 				RIP_ReincGrupo = #RIPReincGrupo#,
 				RIP_ReincItem = #RIPReincItem#,
 				RIP_UserName = '#CGI.REMOTE_USER#',
-				RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#',
+				<cfif #FORM.RIPRecomendacaoInspetor# eq ''>
+					RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#',
+					RIP_Data_Avaliador = CONVERT(char, GETDATE(), 120),
+				<cfelse>
+					RIP_Matricula_Reanalise = '#qAcesso.Usu_Matricula#',
+				</cfif>
 				RIP_DtUltAtu = CONVERT(char, GETDATE(), 120),
 				RIP_Resposta ='#FORM.avalItem#'									
 		  		WHERE 
@@ -310,8 +320,13 @@
 			, RIP_ReincGrupo = 0
 			, RIP_ReincItem = 0	 
 		</cfif>
-			, RIP_UserName = '#CGI.REMOTE_USER#'
-			, RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
+			, RIP_UserName = '#CGI.REMOTE_USER#'					
+			<cfif #FORM.RIPRecomendacaoInspetor# eq ''>
+				, RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
+				, RIP_Data_Avaliador = CONVERT(char, GETDATE(), 120)
+			<cfelse>
+				, RIP_Matricula_Reanalise = '#qAcesso.Usu_Matricula#'
+			</cfif>			
 			, RIP_DtUltAtu = CONVERT(char, GETDATE(), 120)
 			, RIP_Resposta ='#FORM.avalItem#'
 		<cfquery name="qRecomendacao" datasource="#dsn_inspecao#">
@@ -429,7 +444,7 @@
       <!--- 	Fim da rotina que abre o form de inclusão de resposta ao gestor	 --->
           
 		<cfquery datasource="#dsn_inspecao#" name="rsVerificaAvaliador">
-			SELECT RIP_MatricAvaliador, RIP_Resposta, RIP_Falta, RIP_Sobra, RIP_EmRisco RIP_REINCINSPECAO FROM Resultado_Inspecao 
+			SELECT RIP_MatricAvaliador,RIP_Resposta,RIP_Falta,RIP_Sobra,RIP_EmRisco,RIP_REINCINSPECAO FROM Resultado_Inspecao 
 			WHERE  (RIP_MatricAvaliador !='' or RIP_MatricAvaliador is not null) and RIP_NumInspecao='#FORM.Ninsp#' 
 			And RIP_NumGrupo = '#FORM.Ngrup#' and RIP_NumItem ='#FORM.Nitem#' 
 		</cfquery>
@@ -1564,51 +1579,52 @@ if (auxjustfa.length > 0)
 
    <cfquery name="rsItem" datasource="#dsn_inspecao#">
 	SELECT RIP_Unidade,
-		   Und_Descricao,
-		   Und_TipoUnidade,
-		   RIP_NumInspecao,
-		   RIP_CodReop,
-		   RIP_CodDiretoria,
-		   Dir_Descricao,
-		   RIP_Resposta,
-		   RIP_NumGrupo,
-		   Grp_Descricao, 
-		   RIP_NumItem, 
-		   Itn_Descricao, 
-		   NIP_DtIniPrev, 
-		   Itn_Ano, 
-		   Grp_Ano,
-		   INP_Modalidade,
-		   INP_TNCClassificacao,
-		   INP_TNCPontuacao,
-		   INP_NCClassificacao,
-		   INP_NCPontuacao,		   
-		   RIP_CARACTVLR,
-		   RIP_FALTA,
-		   RIP_SOBRA,
-		   RIP_EMRISCO,
-		   INP_DTINICINSPECAO,
-		   RIP_VALOR,
-		   RIP_COMENTARIO,
-		   RIP_RECOMENDACOES,
-		   RIP_RECOMENDACAO, 
-		   RIP_REINCINSPECAO,
-		   RIP_REINCGRUPO,
-		   RIP_REINCITEM,
-		   RIP_Caractvlr,   
-		   RIP_NCISEI,
-		   Itn_Amostra,
-		   Itn_Norma,
-		   Itn_Pontuacao,
-		   Itn_Classificacao,
-		   Itn_PTC_Seq,
-		   Itn_PreRelato,
-		   Itn_OrientacaoRelato,
-		   Itn_ImpactarTipos,
-		   Pos_ClassificacaoPonto,
-		   TNC_ClassifInicio, 
- 		   TNC_ClassifAtual
- 		   FROM Numera_Inspecao 
+		RIP_NumInspecao,
+		RIP_CodReop,
+		RIP_CodDiretoria,		   
+		RIP_CARACTVLR,
+		RIP_FALTA,
+		RIP_SOBRA,
+		RIP_EMRISCO,
+		RIP_Resposta,
+		RIP_NumGrupo,
+		RIP_NumItem,		
+		RIP_VALOR,
+		RIP_COMENTARIO,
+		RIP_RECOMENDACOES,
+		RIP_RECOMENDACAO, 
+		RIP_REINCINSPECAO,
+		RIP_REINCGRUPO,
+		RIP_REINCITEM,
+		RIP_Caractvlr,   
+		RIP_NCISEI,
+		RIP_Recomendacao_Inspetor,	
+		Und_Descricao,
+		Und_TipoUnidade,
+		Dir_Descricao,
+		Grp_Descricao, 
+		Itn_Descricao, 
+		NIP_DtIniPrev, 
+		Itn_Ano, 
+		Grp_Ano,
+		INP_Modalidade,
+		INP_TNCClassificacao,
+		INP_TNCPontuacao,
+		INP_NCClassificacao,
+		INP_NCPontuacao,		   
+		INP_DTINICINSPECAO,
+		Itn_Amostra,
+		Itn_Norma,
+		Itn_Pontuacao,
+		Itn_Classificacao,
+		Itn_PTC_Seq,
+		Itn_PreRelato,
+		Itn_OrientacaoRelato,
+		Itn_ImpactarTipos,
+		Pos_ClassificacaoPonto,
+		TNC_ClassifInicio, 
+		TNC_ClassifAtual
+		FROM Numera_Inspecao 
 			INNER JOIN (((Resultado_Inspecao 
 			INNER JOIN Inspecao ON (RIP_NumInspecao =INP_NumInspecao) AND (RIP_Unidade =INP_Unidade)) 
 			INNER JOIN Itens_Verificacao ON (RIP_NumItem = Itn_NumItem) AND (RIP_NumGrupo = Itn_NumGrupo) AND (convert(char(4),RIP_Ano) = Itn_Ano)) 
@@ -1901,8 +1917,8 @@ auxvlr: #auxvlr# <br>
       </tr>
 
     <tr class="exibir">
-      <td bgcolor="eeeeee">Nº Relatório</td>
-      <td colspan="6" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In&iacute;cio Inspe&ccedil;&atilde;o &nbsp;<strong class="exibir"><cfoutput>#DateFormat(rsItem.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>
+      <td bgcolor="eeeeee">Nº Avaliação</td>
+      <td colspan="6" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Data Início da Avaliação&nbsp;<strong class="exibir"><cfoutput>#DateFormat(rsItem.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>
       </tr>
     <tr class="exibir">
       <td bgcolor="eeeeee">Grupo</td>
@@ -2037,7 +2053,7 @@ auxvlr: #auxvlr# <br>
 </tr>
 
 <textarea  hidden name="ripcomentariojustif" id="ripcomentariojustif" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#auxjustificativa#</cfoutput></textarea>
-<textarea  hidden name="ripcomentario" id="ripcomentario" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.RIP_Comentario)#</cfoutput></textarea>
+<textarea  hidden name="ripcomentario" id="ripcomentario" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL"><cfoutput>#trim(rsItem.RIP_Comentario)#</cfoutput></textarea>
 <textarea  hidden name="itnprerelato" id="itnprerelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.Itn_PreRelato)#<strong>Ref. Normativa: </strong>#trim(rsItem.Itn_Norma)#</cfoutput></textarea>
 <!---
 <textarea  hidden name="itnprerelato" id="itnprerelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.Itn_PreRelato)#<strong>Ref. Normativa: </strong>#trim(rsItem.Itn_Norma)#<p><strong>Possíveis Consequências da Situação Encontrada:</strong></p></cfoutput></textarea>
@@ -2147,21 +2163,24 @@ auxvlr: #auxvlr# <br>
 		</cfif>
       </cfoutput></td>
     </tr>
-	
-    <input type="hidden" name="frmexisteanexos" id="frmexisteanexos" value="<cfoutput>#existeanexos#</cfoutput>">
-	<input type="hidden" name="frmrestringirsn" id="frmrestringirsn" value="<cfoutput>#restringirSN#</cfoutput>">
-	<input type="hidden" name="frmauxvlr" id="frmauxvlr" value="<cfoutput>#trim(auxvlr)#</cfoutput>">
-	<input type="hidden" name="retornosn" id="retornosn" value="<cfoutput>#URL.retornosn#</cfoutput>">
-	<input type="hidden" name="frmsituantes" id="frmsituantes" value="<cfoutput>#URL.frmsituantes#</cfoutput>">
-	<input type="hidden" name="frmdescantes" id="frmdescantes" value="<cfoutput>#URL.frmdescantes#</cfoutput>">
- 	<input name="ripresposta" id="ripresposta" type="hidden" value="<cfoutput>#rsItem.RIP_Resposta#</cfoutput>">
-	<input name="frminspreincidente" id="frminspreincidente" type="hidden" value="<cfoutput>#url.frminspreincidente#</cfoutput>">
-	<input name="frmgruporeincidente" id="frmgruporeincidente" type="hidden" value="<cfoutput>#url.frmgruporeincidente#</cfoutput>">
-	<input name="frmitemreincidente" id="frmitemreincidente" type="hidden" value="<cfoutput>#url.frmitemreincidente#</cfoutput>">
-	<input type="hidden" name="frmimpactofin" id="frmimpactofin" value="<cfoutput>#impactofin#</cfoutput>">
-	<input type="hidden" name="frmimpactofalta" id="frmimpactofalta" value="<cfoutput>#impactofalta#</cfoutput>">
-	<input type="hidden" name="frmimpactosobra" id="frmimpactosobra" value="<cfoutput>#impactosobra#</cfoutput>">
-	<input type="hidden" name="frmimpactoemrisco" id="frmimpactoemrisco" value="<cfoutput>#impactoemrisco#</cfoutput>">
+	<cfoutput>	
+		<input type="hidden" name="frmexisteanexos" id="frmexisteanexos" value="#existeanexos#">
+		<input type="hidden" name="frmrestringirsn" id="frmrestringirsn" value="#restringirSN#">
+		<input type="hidden" name="frmauxvlr" id="frmauxvlr" value="#trim(auxvlr)#">
+		<input type="hidden" name="retornosn" id="retornosn" value="#URL.retornosn#">
+		<input type="hidden" name="frmsituantes" id="frmsituantes" value="#URL.frmsituantes#">
+		<input type="hidden" name="frmdescantes" id="frmdescantes" value="#URL.frmdescantes#">
+		<input name="ripresposta" id="ripresposta" type="hidden" value="#rsItem.RIP_Resposta#">
+		<input name="frminspreincidente" id="frminspreincidente" type="hidden" value="#url.frminspreincidente#">
+		<input name="frmgruporeincidente" id="frmgruporeincidente" type="hidden" value="#url.frmgruporeincidente#">
+		<input name="frmitemreincidente" id="frmitemreincidente" type="hidden" value="#url.frmitemreincidente#">
+		<input type="hidden" name="frmimpactofin" id="frmimpactofin" value="#impactofin#">
+		<input type="hidden" name="frmimpactofalta" id="frmimpactofalta" value="#impactofalta#">
+		<input type="hidden" name="frmimpactosobra" id="frmimpactosobra" value="#impactosobra#">
+		<input type="hidden" name="frmimpactoemrisco" id="frmimpactoemrisco" value="#impactoemrisco#">
+		<input type="hidden" name="RIPRecomendacaoInspetor" id="RIPRecomendacaoInspetor" value="#trim(rsItem.RIP_Recomendacao_Inspetor)#">
+		
+	</cfoutput>
 	
 <!---     <cfabort> --->
  </form>
@@ -2178,6 +2197,48 @@ auxvlr: #auxvlr# <br>
 </body>
 
 <script>
+CKEDITOR.replace('melhoria', {
+      // Define the toolbar groups as it is a more accessible solution.
+	  width: '1020',
+		height: 300,
+		removePlugins: 'scayt',
+        disableNativeSpellChecker: false,
+		line_height:'1px',
+      toolbarGroups: [
+		{
+          "name": "document",
+          "groups": ["mode"]
+        },
+		{
+          "name": "basicstyles",
+          "groups": ["basicstyles"]
+        },
+        {
+          "name": "links",
+          "groups": ["links"]
+        },
+        {
+          "name": "paragraph",
+          "groups": ["list", "blocks"]
+        },
+
+        {
+          "name": "insert",
+          "groups": ["insert"]
+        },
+        {
+          "name": "styles",
+          "groups": ["styles"]
+        },
+		{
+          "name": "about",
+          "groups": ["about"]
+        }
+      ],
+      // Remove the redundant buttons from toolbar groups defined above.
+      //removeButtons: 'Strike,Subscript,Superscript,Specialchar,PasteFromWord'
+    });
+/*
 CKEDITOR.replace('melhoria', {
 		width: '1020',
 		height: 200,
@@ -2198,6 +2259,7 @@ CKEDITOR.replace('melhoria', {
 					
 		]
     });
+*/
 	CKEDITOR.replace('recomendacoes', {
 		width: '1020',
 		height: 100,

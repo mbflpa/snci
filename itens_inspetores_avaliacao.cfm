@@ -61,14 +61,14 @@
 			FROM Resultado_Inspecao 
 			where RIP_NumInspecao='#url.numInspecao#' AND RIP_Resposta <> 'A'	
 	</cfquery> 
-	
-	<cfif rsVerificar.recordcount lte 0>
+	<cfif rsVerificar.recordcount lte 0>	
 		<cfquery name="rsID" datasource="#dsn_inspecao#">
 			SELECT RIP_NumInspecao,RIP_Unidade,RIP_NumGrupo,RIP_NumItem,INP_Modalidade,Und_TipoUnidade,RIP_Ano,Und_CodDiretoria,Und_CodReop
 			FROM Inspecao INNER JOIN (Resultado_Inspecao 
 			INNER JOIN Unidades ON RIP_Unidade = Und_Codigo) ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)
 			where RIP_NumInspecao='#url.numInspecao#' 
 		</cfquery> 
+
 		<!--- Verificar por desligamento de item e excluir da Resultadoinspecao --->
 		<cfquery name="rsDesligado" datasource="#dsn_inspecao#">
 			SELECT RIP_Unidade, 
@@ -93,12 +93,19 @@
 				RIP_NumGrupo=#rsDesligado.RIP_NumGrupo# and
 				RIP_NumItem=#rsDesligado.RIP_NumItem#   
 			</cfquery>
-		</cfoutput>
+		</cfoutput>	
+
 		<!--- Verificar por item Ativado e ou Novo => Adicionar na Resultadoinspecao --->
+		<cfquery name="rsID" datasource="#dsn_inspecao#">
+			SELECT INP_Unidade,INP_Modalidade,Und_TipoUnidade,Und_CodDiretoria,Und_CodReop
+			FROM Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo
+			where INP_NumInspecao='#url.numInspecao#' 
+		</cfquery>
+			
 		<cfquery name="rsAtivos" datasource="#dsn_inspecao#">
 			SELECT Itn_NumGrupo,Itn_NumItem,Itn_PTC_Seq
 			FROM Itens_Verificacao
-			WHERE Itn_Ano='#rsID.RIP_Ano#' AND 
+			WHERE Itn_Ano=#right(url.numInspecao,4)# AND 
 			Itn_Modalidade=#rsID.INP_Modalidade# AND 
 			Itn_TipoUnidade=#rsID.Und_TipoUnidade# AND
 			Itn_Situacao='A'
@@ -109,7 +116,7 @@
 				SELECT RIP_Unidade
 				FROM Resultado_Inspecao
 				WHERE RIP_NumInspecao='#url.numInspecao#' and 
-				RIP_Unidade = '#rsID.RIP_Unidade#' And
+				RIP_Unidade = '#rsID.INP_Unidade#' And
 				RIP_NumGrupo = #rsAtivos.Itn_NumGrupo# And
 				RIP_NumItem = #rsAtivos.Itn_NumItem#
 			</cfquery>	
@@ -121,7 +128,7 @@
 				</cfif>
 				<cfquery datasource="#dsn_inspecao#">
 				INSERT INTO Resultado_Inspecao (RIP_Unidade,RIP_NumInspecao,RIP_NumGrupo,RIP_NumItem,RIP_CodDiretoria,RIP_CodReop,RIP_Ano,RIP_Resposta,RIP_Comentario,RIP_DtUltAtu,RIP_UserName,RIP_Caractvlr,RIP_Falta,RIP_Sobra,RIP_EmRisco) 
-				VALUES ('#rsID.RIP_Unidade#','#url.numInspecao#',#rsAtivos.Itn_NumGrupo#,#rsAtivos.Itn_NumItem#,'#rsID.Und_CodDiretoria#','#rsID.Und_CodReop#',#rsID.RIP_Ano#,'A','',CONVERT(char, GETDATE(), 120),'#qAcesso.Usu_Matricula#','#RIPCaractvlr#',#auxvlr#,#auxvlr#,#auxvlr#)
+				VALUES ('#rsID.INP_Unidade#','#url.numInspecao#',#rsAtivos.Itn_NumGrupo#,#rsAtivos.Itn_NumItem#,'#rsID.Und_CodDiretoria#','#rsID.Und_CodReop#',#right(url.numInspecao,4)#,'A','',CONVERT(char, GETDATE(), 120),'#qAcesso.Usu_Matricula#','#RIPCaractvlr#',#auxvlr#,#auxvlr#,#auxvlr#)
 				</cfquery>	
 			</cfif>
 		</cfoutput>
@@ -196,6 +203,7 @@
 			   Itn_Ano, 
 			   Grp_Ano,
 			   INP_Modalidade,
+			   INP_DTConcluirAvaliacao,
 			   INP_Situacao,
 			   TUI_Classificacao,
 			   TUI_Pontuacao,	   
@@ -251,7 +259,8 @@ INNER JOIN Grupos_Verificacao ON (Itn_NumGrupo = Grp_Codigo) AND (Itn_Ano = Grp_
 
 		<cfif isdefined("url.Unid")>
 			<cfoutput>
-				<cfif rsVerificaFinalizacao.recordcount eq 0 and rsInspecaoConcluida.recordcount eq 0 and '#rsMatricCoord.INP_Coordenador#' eq '#qAcesso.Usu_Matricula#'>
+				<!--- <cfif rsVerificaFinalizacao.recordcount eq 0 and rsInspecaoConcluida.recordcount eq 0 and '#rsMatricCoord.INP_Coordenador#' eq '#qAcesso.Usu_Matricula#'> --->
+				<cfif rsVerificaFinalizacao.recordcount eq 0 and rsInspecaoConcluida.recordcount eq 0>
 					<cfif grpacesso eq "INSPETORES">
 						window.setTimeout('liberar()', 100);
 					</cfif>
@@ -770,6 +779,7 @@ background:#6699CC;
 	</cfif>
 
 <cfif isdefined("url.acao")>
+<cfoutput>
     <cfif "#url.acao#" eq "ConcluirAvaliacao">
 		<!--- Rotina de finalização da avaliação--->
 		<cfquery name="rsInspecaoFinalizar" datasource="#dsn_inspecao#">
@@ -816,7 +826,7 @@ background:#6699CC;
 				WHERE INP_NumInspecao = '#url.numInspecao#' 
 			</cfquery> 
 
-			<cfif "#rsInspecaoFinalizar.recordcount#" eq 0 and "#rsInspecaoFinalizarNC.recordcount#" neq 0>
+			<cfif "#rsInspecaoFinalizar.recordcount#" eq 0 and "#rsInspecaoFinalizarNC.recordcount#" neq 0>		
 				<!---Insert na tabela ProcessoParecerUnidade --->
 				<cfquery datasource="#dsn_inspecao#" name="rsExistePRPAUN">
 				   SELECT Pro_Unidade FROM ProcessoParecerUnidade 
@@ -833,10 +843,10 @@ background:#6699CC;
 					SELECT * FROM Resultado_Inspecao 
 					INNER JOIN Inspecao ON (RIP_NumInspecao = INP_NumInspecao) AND (RIP_Unidade =INP_Unidade) 
 					WHERE RIP_NumInspecao='#url.numInspecao#' and RIP_Resposta='N'
-				</cfquery>
+				</cfquery>			
 				<!---  --->
 				<!--- Realizar um loop cadastrando os itens não conformes nas tabelas ParecerUnidade e Andamento --->
-                <cfoutput query="rsInspecaoFinal">
+                <cfloop query="rsInspecaoFinal">
 					<!--- Dado default para registro no campo Pos_Area --->
 					<cfset posarea_cod = '#rsInspecaoFinal.RIP_Unidade#'>
 					<!--- Obter o tipo da Unidade e sua descrição para alimentar o Pos_AreaNome --->
@@ -930,8 +940,7 @@ background:#6699CC;
 						INNER JOIN Unidades ON Und_Codigo = RIP_Unidade and (Itn_TipoUnidade = Und_TipoUnidade)
 						WHERE ((RTRIM(RIP_Resposta)= 'E' AND Itn_ValidacaoObrigatoria=1) OR RTRIM(RIP_Resposta)= 'V') AND RTRIM(RIP_Recomendacao) IS NULL AND RIP_NumInspecao='#rsInspecaoFinal.RIP_NumInspecao#' and RIP_Unidade='#rsInspecaoFinal.RIP_Unidade#' 
 					</cfquery>
-				</cfoutput>
-				<!---  --->
+				</cfloop>
 				<cfquery datasource="#dsn_inspecao#" >
 					UPDATE Inspecao SET INP_Situacao = 'CO'
 					, INP_DtEncerramento =  CONVERT(char, GETDATE(), 102)
@@ -946,10 +955,16 @@ background:#6699CC;
 				<!---SE NÃO EXISTIREM MAIS ITENS PARA AVALIAÇÃO E NÃO EXISTIREM ITENS NÃO CONFORME--->
 				<!---Insert na tabela ProcessoParecerUnidade --->				
 				<cfif "#rsInspecaoFinalizar.recordcount#" eq 0 and "#rsInspecaoFinalizarNC.recordcount#" eq 0>
-					<cfquery datasource="#dsn_inspecao#">
-						INSERT INTO ProcessoParecerUnidade (Pro_Unidade, Pro_Inspecao, Pro_Situacao, Pro_DtEncerr, Pro_username, Pro_dtultatu) 
-						VALUES ('#url.Unid#', '#url.numInspecao#', 'AB', NULL, '#qAcesso.Usu_Matricula#', GETDATE())
-					</cfquery> 
+					<cfquery datasource="#dsn_inspecao#" name="rsExistePRPAUN">
+						SELECT Pro_Unidade FROM ProcessoParecerUnidade 
+						WHERE Pro_Inspecao = '#url.numInspecao#'
+					</cfquery>
+					<cfif rsExistePRPAUN.recordcount lte 0>
+						<cfquery datasource="#dsn_inspecao#">
+							INSERT INTO ProcessoParecerUnidade (Pro_Unidade, Pro_Inspecao, Pro_Situacao, Pro_DtEncerr, Pro_username, Pro_dtultatu) 
+							VALUES ('#url.Unid#', '#url.numInspecao#', 'AB', NULL, '#qAcesso.Usu_Matricula#', GETDATE())
+						</cfquery> 
+					</cfif>
 		
 					<!---UPDATE em Inspecao--->
 											
@@ -962,442 +977,419 @@ background:#6699CC;
 						WHERE INP_NumInspecao='#url.numInspecao#' 
 					</cfquery> 
 					<!---Fim UPDATE em Inspecao --->
-				</cfif>
 			</cfif>
-	    </cftransaction>
+			
+	</cfif>
+	</cftransaction>
 		<script language="javascript">
 		//	window.opener.location.reload() ;
 			alert('Ação: Concluir e Liberar Avaliação para Revisão, Realizada com sucesso!');
-			<cfoutput>
+			//<cfoutput>
 			//window.open(window.location,'_self');
-			</cfoutput>
+			//</cfoutput>
 		</script>
 	</cfif>
-
+	</cfoutput>
 </cfif>
 
-
 <td valign="top" align="center">
-	
-<!--- Área de conteúdo   --->
-
-        <cfif '#grpacesso#' eq "INSPETORES">   
+	<!--- Área de conteúdo   --->
+	<cfif '#grpacesso#' eq "INSPETORES">   
 		<!---Inspeções NA = não avaliadas, ER = em reavaliação, RA =reavaliada--->
-			<cfquery datasource="#dsn_inspecao#" name="rsInspecoes">
-				SELECT * 
-				FROM (Numera_Inspecao INNER JOIN Inspecao ON (NIP_Unidade = INP_Unidade) AND (NIP_NumInspecao = INP_NumInspecao)) 
-				INNER JOIN Inspetor_Inspecao ON (INP_Unidade = IPT_CodUnidade) AND (INP_NumInspecao = IPT_NumInspecao)
-				WHERE (Rtrim(INP_Situacao) = 'NA' or Rtrim(INP_Situacao) = 'ER') 
-					and NIP_Situacao = 'A'
-					and IPT_MatricInspetor ='#qAcesso.Usu_Matricula#' 
-				ORDER BY INP_DtInicInspecao
-			</cfquery>
-		</cfif> 
-		<cfif '#grpacesso#' eq "GESTORES" OR '#grpacesso#' eq "DESENVOLVEDORES">  
+		<cfquery datasource="#dsn_inspecao#" name="rsInspecoes">
+			SELECT * 
+			FROM (Numera_Inspecao INNER JOIN Inspecao ON (NIP_Unidade = INP_Unidade) AND (NIP_NumInspecao = INP_NumInspecao)) 
+			INNER JOIN Inspetor_Inspecao ON (INP_Unidade = IPT_CodUnidade) AND (INP_NumInspecao = IPT_NumInspecao)
+			WHERE (Rtrim(INP_Situacao) = 'NA' or Rtrim(INP_Situacao) = 'ER') 
+				and NIP_Situacao = 'A'
+				and IPT_MatricInspetor ='#qAcesso.Usu_Matricula#' 
+			ORDER BY INP_DtInicInspecao
+		</cfquery>
+	</cfif> 
+	<cfif '#grpacesso#' eq "GESTORES" OR '#grpacesso#' eq "DESENVOLVEDORES">  
 		<!---Inspeções NA = não avaliadas, ER = em reavaliação, RA =reavaliada--->  
-			<cfquery datasource="#dsn_inspecao#" name="rsInspecoes">
-				SELECT *  
-				FROM (Numera_Inspecao INNER JOIN Inspecao ON (NIP_Unidade = INP_Unidade) AND (NIP_NumInspecao = INP_NumInspecao)) 
-				INNER JOIN Inspetor_Inspecao ON (INP_Unidade = IPT_CodUnidade) AND (INP_NumInspecao = IPT_NumInspecao)
-				WHERE (Rtrim(INP_Situacao) = 'NA' or Rtrim(INP_Situacao) = 'ER')
-					and NIP_Situacao = 'A'
-					and left(INP_NumInspecao,2) in(#se#)
-				ORDER BY INP_DtInicInspecao
-			</cfquery>
+		<cfquery datasource="#dsn_inspecao#" name="rsInspecoes">
+			SELECT *  
+			FROM (Numera_Inspecao INNER JOIN Inspecao ON (NIP_Unidade = INP_Unidade) AND (NIP_NumInspecao = INP_NumInspecao)) 
+			INNER JOIN Inspetor_Inspecao ON (INP_Unidade = IPT_CodUnidade) AND (INP_NumInspecao = IPT_NumInspecao)
+			WHERE (Rtrim(INP_Situacao) = 'NA' or Rtrim(INP_Situacao) = 'ER')
+				and NIP_Situacao = 'A'
+				and left(INP_NumInspecao,2) in(#se#)
+			ORDER BY INP_DtInicInspecao
+		</cfquery>
+	</cfif>
+
+	<div id="form_container" align="center" style="background:transparent;margin-bottom:0px">
+		<div align="center"><strong class="titulo1">AVALIAÇÃO DOS ITENS DE CONTROLE INTERNO</strong></div>
+		<br>
+		<cfif '#rsInspecoes.recordCount#' lte 0>
+			<h1 style="background:#005782">
+				<div align="center"><label style="font-size:14px;font-family:Verdana, Arial, Helvetica, sans-serif" >NÃO EXISTEM AVALIAÇÕES PENDENTES PARA O INSPETOR <br><cfoutput>#qAcesso.Usu_Apelido# (#trim(qAcesso.Usu_Matricula)#)</cfoutput></label><br></div>
+			</h1>
+			<cfif isdefined("url.numInspecao") AND '#url.numInspecao#' NEQ "">
+				<cfquery datasource="#dsn_inspecao#" name="rsInspecoesFinalizada">
+					SELECT * FROM Inspecao 
+					WHERE INP_Situacao = 'NA' and INP_NumInspecao = '#url.numInspecao#';
+				</cfquery>
+		
+				<cfquery datasource="#dsn_inspecao#" name="rsInspecoesFinalizada2">
+					SELECT * FROM Inspecao 	
+					INNER JOIN Inspetor_Inspecao on IPT_NumInspecao = INP_NumInspecao				
+					WHERE INP_Situacao = 'CO' and IPT_MatricInspetor ='#qAcesso.Usu_Matricula#'  and INP_NumInspecao = '#url.numInspecao#'
+				</cfquery>
+				<cfquery datasource="#dsn_inspecao#" name="rsUnidade">
+					SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo ='#rsInspecoesFinalizada2.INP_Unidade#'
+				</cfquery>
+				<br><br>
+				<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782"><strong ><cfoutput>#url.numInspecao# - #trim(rsUnidade.Und_Descricao)# (#rsUnidade.Und_Codigo#)</cfoutput></strong></div>
+				<br>
+				<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782"><strong >Todos os itens da Avaliação de Controle realizada na unidade foram executados com sucesso e foram submetidos à REVISÃO da SCOI.<BR>Os itens estarão liberados para visualização dos Inspetores Regionais e da unidade verificada após o término da revisão.</strong>
+					<br><br>
+					<button onClick="window.close()" class="botao">Fechar</button> 
+				</div>
+				<br>
+			<cfelse>
+				<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782">
+					<br><br>
+					<button onClick="window.close()" class="botao">Fechar</button> 
+				</div>
+			</cfif> 
+		<cfelse>
+			<h1>
+				<!--- <img src="figuras/apontar.png" width="38"  border="0" style="position:absolute;right:120px;top:57px"></img> --->
+				<div align="center"><label style="font-size:14px;font-family:Verdana, Arial, Helvetica, sans-serif">SELECIONE UMA AVALIAÇÃO</label><br>
+				</div>
+			</h1>
 		</cfif>
-
-		<div id="form_container" align="center" style="background:transparent;margin-bottom:0px">
-				<div align="center"><strong class="titulo1">AVALIAÇÃO DOS ITENS DE CONTROLE INTERNO</strong></div>
-			<br>
-			<cfif '#rsInspecoes.recordCount#' lte 0>
-				<h1 style="background:#005782">
-					<div align="center"><label style="font-size:14px;font-family:Verdana, Arial, Helvetica, sans-serif" >NÃO EXISTEM AVALIAÇÕES PENDENTES PARA O INSPETOR <br><cfoutput>#qAcesso.Usu_Apelido# (#trim(qAcesso.Usu_Matricula)#)</cfoutput></label><br>
-					</div>
-				</h1>
-					<cfif isdefined("url.numInspecao") AND '#url.numInspecao#' NEQ "">
-
-						<cfquery datasource="#dsn_inspecao#" name="rsInspecoesFinalizada">
+		<cfset comItemEmRevisao=0>
+		<cfif '#rsInspecoes.recordCount#' neq 0>
+	        <div align="center" style="padding:10px;background:lavender; font-family:Verdana, Arial, Helvetica, sans-serif">
+				<select name="selInspecoes" id="selInspecoes"  onchange="abrirInspecao(this.value)" style="width:500px">
+					<option selected="selected" value="" ></option>
+					<cfoutput query="rsInspecoes">
+						<cfquery datasource="#dsn_inspecao#" name="rsInspecao">
 							SELECT * FROM Inspecao 
-							WHERE INP_Situacao = 'NA' and INP_NumInspecao = '#url.numInspecao#';
+							WHERE (INP_Situacao = 'NA' or INP_Situacao = 'ER')  and INP_NumInspecao='#rsInspecoes.INP_NumInspecao#'  
 						</cfquery>
-           
+						<cfquery datasource="#dsn_inspecao#" name="rsCoordenador" >
+							select Usu_Matricula, Usu_Apelido from usuarios where Usu_Matricula = Convert(varchar,#rsInspecao.INP_Coordenador#)
+						</cfquery>
+						<cfquery datasource="#dsn_inspecao#" name="rsUnidades">
+							SELECT Und_Codigo, Und_Descricao, Und_NomeGerente FROM Unidades WHERE Und_Status='A' and Und_Codigo =#rsInspecao.INP_Unidade#
+						</cfquery>
+						<cfquery name="rsVerifComItemEmRevisao" datasource="#dsn_inspecao#">
+							SELECT RIP_Resposta FROM Resultado_Inspecao 
+							WHERE RIP_Recomendacao='S' AND RIP_NumInspecao='#rsInspecao.INP_NumInspecao#'
+						</cfquery>
+								
+						<cfif '#comItemEmRevisao#' eq 0>
+							<cfset comItemEmRevisao='#rsVerifComItemEmRevisao.recordcount#'>
+						</cfif>
+																
+						<cfparam name="coordenador" default="#rsCoordenador.Usu_Matricula#">
+									
+						<option  value="itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#rsUnidades.Und_Codigo#" style="<cfif rsVerifComItemEmRevisao.recordcount neq 0 >color:red</cfif>">
+								#rsInspecao.INP_NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#) <cfif rsVerifComItemEmRevisao.recordcount neq 0 > - Reanálise: #rsVerifComItemEmRevisao.recordcount#<cfif #rsVerifComItemEmRevisao.recordcount# gt 1> itens<cfelse> item</cfif> </cfif>
+						</option>			
+					</cfoutput>
+				</select>
+						
+				<cfif isdefined("coordenador") AND '#coordenador#' NEQ "" and isdefined("url.numInspecao") AND '#url.numInspecao#' NEQ "">
+					<cfquery datasource="#dsn_inspecao#" name="rsInspecao2">
+						SELECT * FROM Inspecao 
+						WHERE (INP_Situacao = 'NA' or INP_Situacao = 'ER') and INP_NumInspecao=convert(varchar,'#url.numInspecao#'  )
+					</cfquery>
+					<cfquery datasource="#dsn_inspecao#" name="rsInspecoesFinalizada">
+						SELECT * FROM Inspecao 
+							WHERE (INP_Situacao = 'NA' or INP_Situacao = 'ER') and  INP_NumInspecao = '#url.numInspecao#';
+					</cfquery>
+					<cfquery datasource="#dsn_inspecao#" name="rsCoordenador" >
+						select Usu_Matricula, Usu_Apelido from usuarios where Usu_Matricula = Convert(varchar,#coordenador#)
+					</cfquery>
+						
+					<cfquery datasource="#dsn_inspecao#" name="rsUnidades">
+						<cfif isdefined('url.Unid')>
+							SELECT Und_Codigo, Und_Descricao, Und_NomeGerente FROM Unidades WHERE Und_Status='A' and Und_Codigo =#url.Unid#
+						<cfelse>
+							SELECT Und_Codigo, Und_Descricao, Und_NomeGerente FROM Unidades WHERE Und_Status='A' and Und_Codigo =#rsInspecao2.INP_Unidade#
+						</cfif>
+					</cfquery>   
+                    <cfif '#rsInspecoesFinalizada.recordCount#' neq  0>
+						<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782"><strong ><cfoutput>#url.numInspecao# - #trim(rsUnidades.Und_Descricao)# (#url.Unid#)</cfoutput></strong></div>
+						<br>
+									
+						<cfquery datasource="#dsn_inspecao#" name="rsNumeraInspecao2">
+							SELECT NIP_DtIniPrev FROM Numera_Inspecao WHERE NIP_NumInspecao=convert(varchar,'#url.NumInspecao#') AND NIP_Situacao='A'
+						</cfquery>
+
+						<cfquery datasource="#dsn_inspecao#" name="rsInspetorInspecao">
+							SELECT IPT_MatricInspetor,Fun_Nome,INP_Coordenador,INP_Modalidade,Dir_Sigla,INP_DtFimInspecao,INP_DtInicDeslocamento,INP_DtFimDeslocamento,INP_DtInicInspecao FROM Inspetor_Inspecao 
+							INNER JOIN Funcionarios on IPT_MatricInspetor=Fun_Matric
+							INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR 
+							INNER JOIN Inspecao on IPT_NumInspecao = INP_NumInspecao
+							WHERE IPT_NumInspecao=convert(varchar,'#url.NumInspecao#') 
+							ORDER BY Fun_Nome ASC
+						</cfquery>
+								
+						<cfquery datasource="#dsn_inspecao#" name="rsCoordenador2" >
+							select Usu_Matricula, Usu_Apelido, Dir_Sigla from usuarios 
+							INNER JOIN Diretoria ON  Dir_Codigo = Usu_DR 
+							where Usu_Matricula = Convert(varchar,'#rsInspetorInspecao.INP_Coordenador#')
+						</cfquery>
+						<cfset dtIniPrev = dateformat("#rsNumeraInspecao2.NIP_DtIniPrev#",'dd/mm/yyyy')>
+						<div align="left">
+							<label style="font-size:12px;color:#005782" class="exibir">
+								<cfoutput>
+									Mod.: <cfif '#rsInspetorInspecao.INP_Modalidade#' eq 0>PRESENCIAL<cfelse>A DISTÂNCIA</cfif> - Coord.: #Trim(rsCoordenador2.Usu_Apelido)# (#Trim(rsCoordenador2.Dir_Sigla)#) - Data Prevista Início.: #dtIniPrev#
+								</cfoutput>
+							</label>
+							<br>
+							<label style="font-size:12px;color:#005782" class="exibir">
+								<cfoutput>Gerente da Unidade: #rsUnidades.Und_NomeGerente#</cfoutput>
+							</label>
+							<br><br>
+							<!--- <cfif (grpacesso eq "GESTORES")> --->
+							<label style="font-size:12px;color:#005782" class="form">
+								<!--- <cfoutput> --->
+								<div align="center"><a  href="cadastro_inspecao_inspetores_alt.cfm?
+										numInspecao=<cfoutput>#url.NumInspecao#</cfoutput>
+										&Unid=<cfoutput>#url.Unid#</cfoutput>											
+										&coordenador=<cfoutput>#rsInspetorInspecao.INP_Coordenador#</cfoutput>
+										&dtInicDeslocamento=<cfoutput>#DateFormat(rsInspetorInspecao.INP_DtInicDeslocamento,'dd/mm/yyyy')#</cfoutput>
+										&dtFimDeslocamento=<cfoutput>#DateFormat(rsInspetorInspecao.INP_DtFimDeslocamento,'dd/mm/yyyy')#</cfoutput>
+										&dtInicInspecao=<cfoutput>#DateFormat(rsInspetorInspecao.INP_DtInicInspecao,'dd/mm/yyyy')#</cfoutput>
+										&dtFimInspecao=<cfoutput>#DateFormat(rsInspetorInspecao.INP_DtFimInspecao,'dd/mm/yyyy')#</cfoutput>
+										&RIPMatricAvaliador=N
+										&telaretorno=itens_inspetores_avaliacao.cfm
+										##formCad" style="background-color:#CCCCCC"><strong class="titulo1">ALTERAR GESTOR DA UNIDADE</strong></a>
+								</div>
+								<!--- </cfoutput>  --->
+							</label>
+							<!---	</cfif>		--->						
+							<!--- <br> --->
+							<label style="font-size:12px;color:#005782;position:relative;top=15px" class="exibir">Inspetores:</label>
+							<label style="font-size:12px;color:#005782;position:relative;left:90px" class="exibir">	
+								<cfoutput query = "rsInspetorInspecao">
+									<cfset maskmatrusu = left(IPT_MatricInspetor,1) & '.' & mid(IPT_MatricInspetor,2,3) & '.***-' & right(IPT_MatricInspetor,1)>													
+									<br>#maskmatrusu# - #Fun_Nome# (#Trim(Dir_Sigla)#)
+								</cfoutput>
+							</label>
+							<!---Início da barra de status--->
+							<cfif isdefined('url.Unid') and rsVerificaFinalizacao.recordcount neq 0>
+								<cfquery datasource="#dsn_inspecao#" name="rsItensAvaliados">
+										Select count(RIP_Resposta) as avaliados FROM Resultado_Inspecao
+										Where RIP_NumInspecao = '#url.numInspecao#' and RIP_Resposta!='A' and (RIP_Recomendacao!='S' or RIP_Recomendacao is null)
+								</cfquery>
+								<cfquery datasource="#dsn_inspecao#" name="rsItensTotais">
+										Select count(RIP_Resposta) as total FROM Resultado_Inspecao
+										Where RIP_NumInspecao = '#url.numInspecao#'
+								</cfquery>
+								<cfif '#rsItensAvaliados.avaliados#' gt 0 >
+									<cfset perc=round(('#rsItensAvaliados.avaliados#' / '#rsItensTotais.total#' )*100)>
+									<cfif '#perc#' lt 1>
+										<cfset perc='1%'>
+											<cfelse>
+												<cfset perc=round(('#rsItensAvaliados.avaliados#' / '#rsItensTotais.total#' )*100) & '%'>
+									</cfif>
+									<cfif '#perc#' gte 99.5 and '#perc#' lt 100>
+										<cfset perc="99%">
+									</cfif>
+								</cfif>
+								<cfoutput>
+									<cfif '#rsItensAvaliados.avaliados#' gt 0 >
+										<div align="center" style="background:red;width:'#perc#';height:5%;padding:2px;margin-top:10px">
+											<div align="center" style="color:white;widht:720px;font-family:Verdana, Arial, Helvetica, sans-serif">#perc#</div>
+										</div>
+									</cfif>
+								</cfoutput>
+							</cfif>
+								<!---Fim da barra de status--->
+	                    </div>
+					<cfelse>
 						<cfquery datasource="#dsn_inspecao#" name="rsInspecoesFinalizada2">
-							SELECT * FROM Inspecao 	
-							INNER JOIN Inspetor_Inspecao on IPT_NumInspecao = INP_NumInspecao				
-							WHERE INP_Situacao = 'CO' and IPT_MatricInspetor ='#qAcesso.Usu_Matricula#'  and INP_NumInspecao = '#url.numInspecao#'
+							SELECT * FROM Inspecao 				
+							WHERE INP_Situacao = 'CO' and INP_NumInspecao = '#url.numInspecao#'
 						</cfquery>
 						<cfquery datasource="#dsn_inspecao#" name="rsUnidade">
 							SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo ='#rsInspecoesFinalizada2.INP_Unidade#'
 						</cfquery>
 
-
-						<br><br>
 						<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782"><strong ><cfoutput>#url.numInspecao# - #trim(rsUnidade.Und_Descricao)# (#rsUnidade.Und_Codigo#)</cfoutput></strong></div>
 						<br>
-						<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782"><strong >Todos os itens da Avaliação de Controle realizada na unidade foram executados com sucesso e foram submetidos à REVISÃO da SCOI.<BR>Os itens estarão liberados para visualização dos Inspetores Regionais e da unidade verificada após o término da revisão.</strong>
-							<br><br>
-							<button onClick="window.close()" class="botao">Fechar</button> 
-						</div>
-						<br>
-					<cfelse>
-						<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782">
-							<br><br>
-							<button onClick="window.close()" class="botao">Fechar</button> 
-						</div>
-					</cfif> 
-
-				<cfelse>
-					<h1>
-						<!--- <img src="figuras/apontar.png" width="38"  border="0" style="position:absolute;right:120px;top:57px"></img> --->
-						<div align="center"><label style="font-size:14px;font-family:Verdana, Arial, Helvetica, sans-serif">SELECIONE UMA AVALIAÇÃO</label><br>
-						</div>
-					</h1>
-					
-			</cfif>
-			<cfset comItemEmRevisao=0>
-			<cfif '#rsInspecoes.recordCount#' neq 0>
-
-	            <div align="center" style="padding:10px;background:lavender; font-family:Verdana, Arial, Helvetica, sans-serif">
-				
-						<select name="selInspecoes" id="selInspecoes"  onchange="abrirInspecao(this.value)" style="width:500px">
-							<option selected="selected" value="" ></option>
-							
-							<cfoutput query="rsInspecoes">
-									<cfquery datasource="#dsn_inspecao#" name="rsInspecao">
-										SELECT * FROM Inspecao 
-										WHERE (INP_Situacao = 'NA' or INP_Situacao = 'ER')  and INP_NumInspecao='#rsInspecoes.INP_NumInspecao#'  
-									</cfquery>
-									<cfquery datasource="#dsn_inspecao#" name="rsCoordenador" >
-										select Usu_Matricula, Usu_Apelido from usuarios where Usu_Matricula = Convert(varchar,#rsInspecao.INP_Coordenador#)
-									</cfquery>
-									<cfquery datasource="#dsn_inspecao#" name="rsUnidades">
-										SELECT Und_Codigo, Und_Descricao, Und_NomeGerente FROM Unidades WHERE Und_Status='A' and Und_Codigo =#rsInspecao.INP_Unidade#
-									</cfquery>
-									<cfquery name="rsVerifComItemEmRevisao" datasource="#dsn_inspecao#">
-										SELECT RIP_Resposta FROM Resultado_Inspecao 
-										WHERE RIP_Recomendacao='S' AND RIP_NumInspecao='#rsInspecao.INP_NumInspecao#'
-									</cfquery>
-									
-									<cfif '#comItemEmRevisao#' eq 0>
-									   <cfset comItemEmRevisao='#rsVerifComItemEmRevisao.recordcount#'>
+						<div align="center" style="position:relative;top:10px;font-size:16px;color:#005782"><strong >Todos os itens da Avaliação de Controle realizada na unidade foram executados com sucesso e foram submetidos à REVISÃO da SCOI.<BR>Os itens estarão liberados para visualização dos Inspetores Regionais e da unidade verificada após o término da revisão.</strong></div>
+						<br><br>
+						<button onClick="window.close()" class="botao">Fechar</button> 
+					</cfif>
+				</cfif>
+			</div>
+		</cfif>
+	</div>
+	<cfif isdefined("url.numInspecao")>
+		<!---Inspeções NA = não avaliadas, ER = em reavaliação, RA =reavaliado, CO = concluída--->
+		<cfquery datasource="#dsn_inspecao#" name="rsInspecaoFinalizada">
+			SELECT * FROM Inspecao 
+			WHERE (Rtrim(INP_Situacao) = 'NA' or Rtrim(INP_Situacao) = 'ER') 
+			and INP_NumInspecao = '#url.numInspecao#';
+		</cfquery>
+		<cfif '#rsInspecaoFinalizada.recordCount#' neq  0>	
+			<table id="tabelaItens" width="100%" class="exibir"  >
+				<div align="center" class="titulosClaro"><cfoutput><div align="left">Qt. Itens: #rsItem.recordCount#</div></cfoutput></div>
+				<cfif rsItem.recordCount neq 0>
+					<thead >
+						<tr id="trItens" class="titulosClaro" title="Clique para classificar.">
+							<th width="3%" bgcolor="eeeeee" class="exibir" onClick="sorting(tbodyItens, 0)" style="cursor:pointer">Ordem Priorização Execução<div><img id="classifCrescente0" src="Figuras/classifCrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"><img id="classifDecrescente0" src="Figuras/classifDecrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"></div></th>
+							<th width="3%" bgcolor="eeeeee" class="exibir" onClick="sorting(tbodyItens, 1)" style="cursor:pointer">Status<div><img id="classifCrescente1" src="Figuras/classifCrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"><img id="classifDecrescente1" src="Figuras/classifDecrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"></div></th>
+							<th width="10%" bgcolor="eeeeee" class="exibir" onClick="sorting(tbodyItens, 2)" style="cursor:pointer">Grupo<div><img id="classifCrescente2" src="Figuras/classifCrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"><img id="classifDecrescente2" src="Figuras/classifDecrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"></div></th>
+							<th width="20%" bgcolor="eeeeee" class="exibir" >Item</th>
+						</tr>
+					</thead>
+					<tbody id="tbodyItens">
+						<cfoutput query="rsItem">
+							<cfquery name="rsResultadoInspecao" datasource="#dsn_inspecao#">
+								Select RIP_Resposta FROM Resultado_Inspecao 
+								where RIP_Unidade = '#RIP_Unidade#' AND RIP_NumInspecao = '#Rip_NumInspecao#' AND RIP_NumGrupo = #RIP_NumGrupo# AND RIP_NumItem = #RIP_NumItem#
+							</cfquery>
+							<cfset avaliacao = "#rsResultadoInspecao.RIP_Resposta#"> 
+							<cfset aval = ""> 
+							<cfswitch expression="#avaliacao#"> 
+								<cfcase value="C"><cfset aval = "CONFORME"><cfset cor ="green"></cfcase>
+								<cfcase value="N"><cfset aval = "NÃO CONFORME"><cfset cor ="red"></cfcase>
+								<cfcase value="V"><cfset aval = "NÃO VERIFICADO"><cfset cor ="blue"></cfcase>
+								<cfcase value="E"><cfset aval = "NÃO EXECUTA"><cfset cor ="cornflowerblue"></cfcase>
+								<cfdefaultcase>
+									<cfif trim('#RIP_MatricAvaliador#') eq '' AND '#avaliacao#' eq 'A'>
+										<cfset aval = ""><cfset cor ="gray">
 									</cfif>
-																		
-									<cfparam name="coordenador" default="#rsCoordenador.Usu_Matricula#">
-											
-								 <option  value="itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#rsUnidades.Und_Codigo#" style="<cfif rsVerifComItemEmRevisao.recordcount neq 0 >color:red</cfif>">
-						     		#rsInspecao.INP_NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#) <cfif rsVerifComItemEmRevisao.recordcount neq 0 > - Reanálise: #rsVerifComItemEmRevisao.recordcount#<cfif #rsVerifComItemEmRevisao.recordcount# gt 1> itens<cfelse> item</cfif> </cfif>
-							     </option>
-								 						
-							</cfoutput>
-						</select>
-						
-						<cfif isdefined("coordenador") AND '#coordenador#' NEQ "" and isdefined("url.numInspecao") AND '#url.numInspecao#' NEQ "">
-							<cfquery datasource="#dsn_inspecao#" name="rsInspecao2">
-								SELECT * FROM Inspecao 
-								WHERE (INP_Situacao = 'NA' or INP_Situacao = 'ER') and INP_NumInspecao=convert(varchar,'#url.numInspecao#'  )
-							</cfquery>
-							<cfquery datasource="#dsn_inspecao#" name="rsInspecoesFinalizada">
-								SELECT * FROM Inspecao 
-								 WHERE (INP_Situacao = 'NA' or INP_Situacao = 'ER') and  INP_NumInspecao = '#url.numInspecao#';
-							</cfquery>
-							<cfquery datasource="#dsn_inspecao#" name="rsCoordenador" >
-								select Usu_Matricula, Usu_Apelido from usuarios where Usu_Matricula = Convert(varchar,#coordenador#)
-							</cfquery>
-							
-							<cfquery datasource="#dsn_inspecao#" name="rsUnidades">
-							<cfif isdefined('url.Unid')>
-								SELECT Und_Codigo, Und_Descricao, Und_NomeGerente FROM Unidades WHERE Und_Status='A' and Und_Codigo =#url.Unid#
-							<cfelse>
-							    SELECT Und_Codigo, Und_Descricao, Und_NomeGerente FROM Unidades WHERE Und_Status='A' and Und_Codigo =#rsInspecao2.INP_Unidade#
-							</cfif>
-							
-                            </cfquery>   
-                             <cfif '#rsInspecoesFinalizada.recordCount#' neq  0>
-									<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782"><strong ><cfoutput>#url.numInspecao# - #trim(rsUnidades.Und_Descricao)# (#url.Unid#)</cfoutput></strong></div>
-									<br>
-									
-									<cfquery datasource="#dsn_inspecao#" name="rsNumeraInspecao2">
-										SELECT NIP_DtIniPrev FROM Numera_Inspecao WHERE NIP_NumInspecao=convert(varchar,'#url.NumInspecao#') AND NIP_Situacao='A'
-									</cfquery>
-
-									<cfquery datasource="#dsn_inspecao#" name="rsInspetorInspecao">
-										SELECT IPT_MatricInspetor,Fun_Nome,INP_Coordenador,INP_Modalidade,Dir_Sigla,INP_DtFimInspecao,INP_DtInicDeslocamento,INP_DtFimDeslocamento,INP_DtInicInspecao FROM Inspetor_Inspecao 
-										INNER JOIN Funcionarios on IPT_MatricInspetor=Fun_Matric
-										INNER JOIN Diretoria ON  Dir_Codigo = Fun_DR 
-										INNER JOIN Inspecao on IPT_NumInspecao = INP_NumInspecao
-										WHERE IPT_NumInspecao=convert(varchar,'#url.NumInspecao#') 
-										ORDER BY Fun_Nome ASC
-									</cfquery>
-								
-									<cfquery datasource="#dsn_inspecao#" name="rsCoordenador2" >
-										select Usu_Matricula, Usu_Apelido, Dir_Sigla from usuarios 
-										INNER JOIN Diretoria ON  Dir_Codigo = Usu_DR 
-										where Usu_Matricula = Convert(varchar,'#rsInspetorInspecao.INP_Coordenador#')
-									</cfquery>
-									<cfset dtIniPrev = dateformat("#rsNumeraInspecao2.NIP_DtIniPrev#",'dd/mm/yyyy')>
-									
-									<div align="left">
-										<label style="font-size:12px;color:#005782" class="exibir">
-											<cfoutput>
-												Mod.: <cfif '#rsInspetorInspecao.INP_Modalidade#' eq 0>PRESENCIAL<cfelse>A DISTÂNCIA</cfif> - Coord.: #Trim(rsCoordenador2.Usu_Apelido)# (#Trim(rsCoordenador2.Dir_Sigla)#) - Data Prev.: #dtIniPrev#
-											</cfoutput>
-										</label>
-										<br>
-										<label style="font-size:12px;color:#005782" class="exibir">
-											<cfoutput>Gerente da Unidade: #rsUnidades.Und_NomeGerente#</cfoutput>
-							            </label>
-									 <br><br>
-							<!--- <cfif (grpacesso eq "GESTORES")> --->
-									<label style="font-size:12px;color:#005782" class="form">
-								<!--- <cfoutput> --->
-									<div align="center"><a  href="cadastro_inspecao_inspetores_alt.cfm?
-											numInspecao=<cfoutput>#url.NumInspecao#</cfoutput>
-											&Unid=<cfoutput>#url.Unid#</cfoutput>											
-											&coordenador=<cfoutput>#rsInspetorInspecao.INP_Coordenador#</cfoutput>
-											&dtInicDeslocamento=<cfoutput>#DateFormat(rsInspetorInspecao.INP_DtInicDeslocamento,'dd/mm/yyyy')#</cfoutput>
-											&dtFimDeslocamento=<cfoutput>#DateFormat(rsInspetorInspecao.INP_DtFimDeslocamento,'dd/mm/yyyy')#</cfoutput>
-											&dtInicInspecao=<cfoutput>#DateFormat(rsInspetorInspecao.INP_DtInicInspecao,'dd/mm/yyyy')#</cfoutput>
-											&dtFimInspecao=<cfoutput>#DateFormat(rsInspetorInspecao.INP_DtFimInspecao,'dd/mm/yyyy')#</cfoutput>
-											&RIPMatricAvaliador=N
-											##formCad" style="background-color:#CCCCCC"><strong class="titulo1">ALTERAR CADASTRO DE AVALIAÇÃO</strong></a></div>
-									<!--- </cfoutput>  --->
-									</label>
- 				<!---			</cfif>	 		--->						
-				
-										<!--- <br> --->
-										<label style="font-size:12px;color:#005782;position:relative;top=15px" class="exibir">Inspetores:</label>
-										<label style="font-size:12px;color:#005782;position:relative;left:90px" class="exibir">	
-												<cfoutput query = "rsInspetorInspecao">
-													<cfset maskmatrusu = left(IPT_MatricInspetor,1) & '.' & mid(IPT_MatricInspetor,2,3) & '.***-' & right(IPT_MatricInspetor,1)>													
-													<br>#maskmatrusu# - #Fun_Nome# (#Trim(Dir_Sigla)#)
-												</cfoutput>
-										  </label>
-								
-
-									 <!---Início da barra de status--->
-	 
-									<cfif isdefined('url.Unid') and rsVerificaFinalizacao.recordcount neq 0>
-									
-										<cfquery datasource="#dsn_inspecao#" name="rsItensAvaliados">
-												Select count(RIP_Resposta) as avaliados FROM Resultado_Inspecao
-												Where RIP_NumInspecao = '#url.numInspecao#' and RIP_Resposta!='A' and (RIP_Recomendacao!='S' or RIP_Recomendacao is null)
-										</cfquery>
-										<cfquery datasource="#dsn_inspecao#" name="rsItensTotais">
-												Select count(RIP_Resposta) as total FROM Resultado_Inspecao
-												Where RIP_NumInspecao = '#url.numInspecao#'
-										</cfquery>
-										<cfif '#rsItensAvaliados.avaliados#' gt 0 >
-										
-											<cfset perc=round(('#rsItensAvaliados.avaliados#' / '#rsItensTotais.total#' )*100)>
-												<cfif '#perc#' lt 1>
-													<cfset perc='1%'>
-														<cfelse>
-															<cfset perc=round(('#rsItensAvaliados.avaliados#' / '#rsItensTotais.total#' )*100) & '%'>
-												</cfif>
-												<cfif '#perc#' gte 99.5 and '#perc#' lt 100>
-													<cfset perc="99%">
-												</cfif>
-										</cfif>
-										<cfoutput>
-										<cfif '#rsItensAvaliados.avaliados#' gt 0 >
-										
-											<div align="center" style="background:red;width:'#perc#';height:5%;padding:2px;margin-top:10px">
-												<div align="center" style="color:white;widht:720px;font-family:Verdana, Arial, Helvetica, sans-serif">#perc#</div>
-											</div>
-										</cfif>
-										</cfoutput>
+									<cfif trim('#RIP_MatricAvaliador#') neq '' AND '#avaliacao#' eq 'A'>
+										<cfset aval = ""><cfset cor ="black">
 									</cfif>
-									<!---Fim da barra de status--->
-	                             </div>
-							<cfelse>
-								<cfquery datasource="#dsn_inspecao#" name="rsInspecoesFinalizada2">
-									SELECT * FROM Inspecao 				
-									WHERE INP_Situacao = 'CO' and INP_NumInspecao = '#url.numInspecao#'
-								</cfquery>
-								<cfquery datasource="#dsn_inspecao#" name="rsUnidade">
-									SELECT Und_Codigo, Und_Descricao FROM Unidades WHERE Und_Codigo ='#rsInspecoesFinalizada2.INP_Unidade#'
-								</cfquery>
 
-								<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782"><strong ><cfoutput>#url.numInspecao# - #trim(rsUnidade.Und_Descricao)# (#rsUnidade.Und_Codigo#)</cfoutput></strong></div>
-								<br>
-								<div align="center" style="position:relative;top:10px;font-size:16px;color:#005782"><strong >Todos os itens da Avaliação de Controle realizada na unidade foram executados com sucesso e foram submetidos à REVISÃO da SCOI.<BR>Os itens estarão liberados para visualização dos Inspetores Regionais e da unidade verificada após o término da revisão.</strong></div>
-								<br><br>
-							    <button onClick="window.close()" class="botao">Fechar</button> 
-							</cfif>
-						</cfif>
-			   </div>
-		   </cfif>
+								</cfdefaultcase> 
+							</cfswitch>
 
-		</div>
+							<tr id="#rsItem.CurrentRow#" bgcolor="f7f7f7" class="exibir"
+								onMouseOver="mouseOver(this);" 
+								onMouseOut="mouseOut(this);" onclick="gravaOrdLinha(this);capturaPosicaoScroll();window.open('itens_inspetores_avaliacao1.cfm?Unid=#rsItem.RIP_Unidade#&Ninsp=#rsItem.Rip_NumInspecao#&Ngrup=#rsItem.RIP_NumGrupo#&Nitem=#rsItem.RIP_NumItem#&reop=#rsItem.RIP_CodReop#&SE=#rsItem.RIP_CodDiretoria#&numInspecao=#url.numInspecao#&pontuacaorip=#rsItem.TUI_Pontuacao#&tpunid=#rsItem.Und_TipoUnidade#&modal=#rsItem.INP_Modalidade#&frminspreincidente=#trim(rsItem.RIP_ReincInspecao)#&frmgruporeincidente=&frmitemreincidente=&retornosn=&frmsituantes=0&frmdescantes=&itnreincidentes=#Itn_Reincidentes#&GRPITMSQL=','_self')"
+								style="cursor:pointer;position:relative;">	
+							<td width="2%"><div align="center">#rsItem.RankByPontuacao#</td>
+							<td width="3%" bgcolor="#cor#"><div align="center" ><a onClick="capturaPosicaoScroll()" href="itens_inspetores_avaliacao1.cfm?Unid=#rsItem.RIP_Unidade#&Ninsp=#rsItem.Rip_NumInspecao#&Ngrup=#rsItem.RIP_NumGrupo#&Nitem=#rsItem.RIP_NumItem#&reop=#rsItem.RIP_CodReop#&SE=#rsItem.RIP_CodDiretoria#&numInspecao=#url.numInspecao#&pontuacaorip=#rsItem.TUI_Pontuacao#&tpunid=#rsItem.Und_TipoUnidade#&modal=#rsItem.INP_Modalidade#&frminspreincidente=#trim(rsItem.RIP_ReincInspecao)#&frmgruporeincidente=&frmitemreincidente=&retornosn=&frmsituantes=0&frmdescantes=&itnreincidentes=#Itn_Reincidentes#&GRPITMSQL="  class="exibir"><cfif '#avaliacao#' eq 'A' and trim('#RIP_MatricAvaliador#') eq ''>NÃO AVALIADO</cfif><cfif '#avaliacao#' eq 'C'>CONFORME<br>(#RIP_MatricAvaliador#)</cfif><cfif '#avaliacao#' eq 'N'>NÃO CONFORME<br>(#RIP_MatricAvaliador#)</cfif><cfif '#avaliacao#' eq 'E'>NÃO EXECUTA<br>(#RIP_MatricAvaliador#)</cfif><cfif '#avaliacao#' eq 'V'>NÃO VERIFICADO<br>(#RIP_MatricAvaliador#)</cfif><cfif trim('#RIP_MatricAvaliador#') neq '' AND '#avaliacao#' eq 'A'>EM AVALIAÇÃO<BR>(#RIP_MatricAvaliador#)</cfif><cfif '#trim(rsItem.RIP_NCISEI)#' neq ''><span style="color:white"><br>com NCI</span></cfif><cfif #RIP_Recomendacao# eq 'S'><div style="color:white;margin-top:4px"><span style="background:darkred;padding:2px">REANÁLISE</span></div></cfif></a></div></td>
+							<td width="10%"><div align="center">#rsItem.RIP_NumGrupo# - #rsItem.Grp_Descricao#</div></td>
+							<td  width="20%"><div align="left" style="padding:10px"><cfif #rsItem.RIP_NumItem# le 9>0#rsItem.RIP_NumItem#<cfelse>#rsItem.RIP_NumItem#</cfif>-&nbsp;#rsItem.Itn_Descricao#</div></td>
+						</cfoutput>
+					</tbody>	
+				</cfif>
+			</table>
+			<cfquery name="rsBusca" datasource="#dsn_inspecao#">
+				SELECT RIP_Unidade, RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_Recomendacao, RIP_Falta, RIP_Sobra, RIP_EmRisco, RIP_ReincInspecao, RIP_ReincGrupo, RIP_ReincItem
+				FROM Resultado_Inspecao
+				WHERE RIP_NumInspecao='#numInspecao#'
+			</cfquery>       
+			<cfset qtdc = 0>
+			<cfset qtdn = 0>
+			<cfset qtdv = 0>
+			<cfset qtde = 0>
+			<cfset qtdrecR = 0>
+			<cfset qtdrecV = 0>
+			<cfset qtdrecS = 0>
+			<cfset falta = 0>
+			<cfset sobra = 0>
+			<cfset risco = 0>
+			<cfset reincinde = 0>
 
-<cfif isdefined("url.numInspecao")>
-<!---Inspeções NA = não avaliadas, ER = em reavaliação, RA =reavaliado, CO = concluída--->
-	<cfquery datasource="#dsn_inspecao#" name="rsInspecaoFinalizada">
-		SELECT * FROM Inspecao 
-		WHERE (Rtrim(INP_Situacao) = 'NA' or Rtrim(INP_Situacao) = 'ER') 
-		and INP_NumInspecao = '#url.numInspecao#';
-	</cfquery>
-<cfif '#rsInspecaoFinalizada.recordCount#' neq  0>	
-
-	<table id="tabelaItens" width="100%" class="exibir"  >
-	
-
-		<div align="center" class="titulosClaro"><cfoutput><div align="left">Qt. Itens: #rsItem.recordCount#</div></cfoutput></div>
-		<cfif rsItem.recordCount neq 0>
- 		<thead >
-			<tr id="trItens" class="titulosClaro" title="Clique para classificar.">
-				<th width="3%" bgcolor="eeeeee" class="exibir" onClick="sorting(tbodyItens, 0)" style="cursor:pointer">Ordem Priorização Execução<div><img id="classifCrescente0" src="Figuras/classifCrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"><img id="classifDecrescente0" src="Figuras/classifDecrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"></div></th>
-				<th width="3%" bgcolor="eeeeee" class="exibir" onClick="sorting(tbodyItens, 1)" style="cursor:pointer">Status<div><img id="classifCrescente1" src="Figuras/classifCrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"><img id="classifDecrescente1" src="Figuras/classifDecrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"></div></th>
-				<th width="10%" bgcolor="eeeeee" class="exibir" onClick="sorting(tbodyItens, 2)" style="cursor:pointer">Grupo<div><img id="classifCrescente2" src="Figuras/classifCrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"><img id="classifDecrescente2" src="Figuras/classifDecrescente.png" width="20" style="display:none;visibility:hidden;cursor:pointer;margin-left:0px;position:relative;margin-top:0px"></div></th>
-				<th width="20%" bgcolor="eeeeee" class="exibir" >Item</th>
-			</tr>
- 		</thead>
- 		<tbody id="tbodyItens">
-			<cfoutput query="rsItem">
-
-			<cfquery name="rsResultadoInspecao" datasource="#dsn_inspecao#">
-				Select RIP_Resposta FROM Resultado_Inspecao 
-				where RIP_Unidade = '#RIP_Unidade#' AND RIP_NumInspecao = '#Rip_NumInspecao#' AND RIP_NumGrupo = #RIP_NumGrupo# AND RIP_NumItem = #RIP_NumItem#
+			<cfquery dbtype="query" name="rsC">
+				SELECT RIP_Resposta 
+				FROM  rsBusca
+				where RIP_Resposta = 'C'
 			</cfquery>
-				<cfset avaliacao = "#rsResultadoInspecao.RIP_Resposta#"> 
-				<cfset aval = ""> 
-				<cfswitch expression="#avaliacao#"> 
-					<cfcase value="C"><cfset aval = "CONFORME"><cfset cor ="green"></cfcase>
-					<cfcase value="N"><cfset aval = "NÃO CONFORME"><cfset cor ="red"></cfcase>
-					<cfcase value="V"><cfset aval = "NÃO VERIFICADO"><cfset cor ="blue"></cfcase>
-					<cfcase value="E"><cfset aval = "NÃO EXECUTA"><cfset cor ="cornflowerblue"></cfcase>
-					<cfdefaultcase>
-						<cfif trim('#RIP_MatricAvaliador#') eq '' AND '#avaliacao#' eq 'A'>
-							<cfset aval = ""><cfset cor ="gray">
-						</cfif>
-						<cfif trim('#RIP_MatricAvaliador#') neq '' AND '#avaliacao#' eq 'A'>
-							<cfset aval = ""><cfset cor ="black">
-						</cfif>
-
-					</cfdefaultcase> 
-				</cfswitch>
-
-				<tr id="#rsItem.CurrentRow#" bgcolor="f7f7f7" class="exibir"
-					onMouseOver="mouseOver(this);" 
-					onMouseOut="mouseOut(this);" onclick="gravaOrdLinha(this);capturaPosicaoScroll();window.open('itens_inspetores_avaliacao1.cfm?Unid=#rsItem.RIP_Unidade#&Ninsp=#rsItem.Rip_NumInspecao#&Ngrup=#rsItem.RIP_NumGrupo#&Nitem=#rsItem.RIP_NumItem#&reop=#rsItem.RIP_CodReop#&SE=#rsItem.RIP_CodDiretoria#&numInspecao=#url.numInspecao#&pontuacaorip=#rsItem.TUI_Pontuacao#&tpunid=#rsItem.Und_TipoUnidade#&modal=#rsItem.INP_Modalidade#&frminspreincidente=#trim(rsItem.RIP_ReincInspecao)#&frmgruporeincidente=&frmitemreincidente=&retornosn=&frmsituantes=0&frmdescantes=&itnreincidentes=#Itn_Reincidentes#&GRPITMSQL=','_self')"
-					style="cursor:pointer;position:relative;">	
-				<td width="2%"><div align="center">#rsItem.RankByPontuacao#</td>
-				<td width="3%" bgcolor="#cor#"><div align="center" ><a onClick="capturaPosicaoScroll()" href="itens_inspetores_avaliacao1.cfm?Unid=#rsItem.RIP_Unidade#&Ninsp=#rsItem.Rip_NumInspecao#&Ngrup=#rsItem.RIP_NumGrupo#&Nitem=#rsItem.RIP_NumItem#&reop=#rsItem.RIP_CodReop#&SE=#rsItem.RIP_CodDiretoria#&numInspecao=#url.numInspecao#&pontuacaorip=#rsItem.TUI_Pontuacao#&tpunid=#rsItem.Und_TipoUnidade#&modal=#rsItem.INP_Modalidade#&frminspreincidente=#trim(rsItem.RIP_ReincInspecao)#&frmgruporeincidente=&frmitemreincidente=&retornosn=&frmsituantes=0&frmdescantes=&itnreincidentes=#Itn_Reincidentes#&GRPITMSQL="  class="exibir"><cfif '#avaliacao#' eq 'A' and trim('#RIP_MatricAvaliador#') eq ''>NÃO AVALIADO</cfif><cfif '#avaliacao#' eq 'C'>CONFORME<br>(#RIP_MatricAvaliador#)</cfif><cfif '#avaliacao#' eq 'N'>NÃO CONFORME<br>(#RIP_MatricAvaliador#)</cfif><cfif '#avaliacao#' eq 'E'>NÃO EXECUTA<br>(#RIP_MatricAvaliador#)</cfif><cfif '#avaliacao#' eq 'V'>NÃO VERIFICADO<br>(#RIP_MatricAvaliador#)</cfif><cfif trim('#RIP_MatricAvaliador#') neq '' AND '#avaliacao#' eq 'A'>EM AVALIAÇÃO<BR>(#RIP_MatricAvaliador#)</cfif><cfif '#trim(rsItem.RIP_NCISEI)#' neq ''><span style="color:white"><br>com NCI</span></cfif><cfif #RIP_Recomendacao# eq 'S'><div style="color:white;margin-top:4px"><span style="background:darkred;padding:2px">REANÁLISE</span></div></cfif></a></div></td>
-				<td width="10%"><div align="center">#rsItem.RIP_NumGrupo# - #rsItem.Grp_Descricao#</div></td>
-				<td  width="20%"><div align="left" style="padding:10px"><cfif #rsItem.RIP_NumItem# le 9>0#rsItem.RIP_NumItem#<cfelse>#rsItem.RIP_NumItem#</cfif>-&nbsp;#rsItem.Itn_Descricao#</div></td>
-				
-				
-			</cfoutput>
-		</tbody>	
-	</cfif>
-	</table>
-  <cfquery name="rsBusca" datasource="#dsn_inspecao#">
-            SELECT RIP_Unidade, RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_Recomendacao, RIP_Falta, RIP_Sobra, RIP_EmRisco, RIP_ReincInspecao, RIP_ReincGrupo, RIP_ReincItem
-            FROM Resultado_Inspecao
-            WHERE RIP_NumInspecao='#numInspecao#'
-          </cfquery>       
-          <cfset qtdc = 0>
-          <cfset qtdn = 0>
-          <cfset qtdv = 0>
-          <cfset qtde = 0>
-          <cfset qtdrecR = 0>
-          <cfset qtdrecV = 0>
-          <cfset qtdrecS = 0>
-          <cfset falta = 0>
-          <cfset sobra = 0>
-          <cfset risco = 0>
-          <cfset reincinde = 0>
-
-          <cfquery dbtype="query" name="rsC">
-            SELECT RIP_Resposta 
-            FROM  rsBusca
-            where RIP_Resposta = 'C'
-          </cfquery>
-          <cfquery dbtype="query" name="rsN">
-            SELECT RIP_Resposta 
-            FROM  rsBusca
-            where RIP_Resposta = 'N'
-          </cfquery>
-          <cfquery dbtype="query" name="rsV">
-            SELECT RIP_Resposta 
-            FROM  rsBusca
-            where RIP_Resposta = 'V'
-          </cfquery>
-          <cfquery dbtype="query" name="rsE">
-            SELECT RIP_Resposta 
-            FROM  rsBusca
-            where RIP_Resposta = 'E'
-          </cfquery>                
-          <cfquery dbtype="query" name="rsSomas">
-          SELECT RIP_NumInspecao, Sum(RIP_Falta) AS ripFalta, Sum(RIP_Sobra) AS ripSobra, Sum(RIP_EmRisco) AS ripEmRisco
-          FROM rsBusca
-          GROUP BY RIP_NumInspecao
-          </cfquery>
-          <cfquery dbtype="query" name="rsReincide">
-          SELECT RIP_ReincGrupo
-          FROM rsBusca where RIP_ReincGrupo > 0
-          </cfquery>  
-<!---          --->   
-      <table width="900" border="1" align="center" class="exibir"> 
-          <tr bgcolor="">
-            <td><div align="center">Conforme</div></td>
-            <td><div align="center">NãoConforme</div></td>
-            <td><div align="center">NãoVerificado</div></td>
-            <td><div align="center">NãoExecuta</div></td>
-            <td><div align="center">Total</div></td>                   
-            <td><div align="center">Falta</div></td>
-            <td><div align="center">Sobra</div></td>
-            <td><div align="center">EmRisco</div></td>
-			    <td><div align="center">Reicidentes</div></td>
-          </tr>
-      <cfoutput>
-        <cfset qtdc = rsC.recordcount>
-        <cfset qtdn = rsN.recordcount>
-        <cfset qtdv = rsV.recordcount>
-        <cfset qtde = rsE.recordcount>
-        <cfset falta = lscurrencyformat(rsSomas.ripFalta,'Local')>
-        <cfset sobra = lscurrencyformat(rsSomas.ripSobra,'Local')>
-        <cfset risco = lscurrencyformat(rsSomas.ripEmRisco,'Local')>
-        <cfset reincinde = rsReincide.recordcount>     
-        <tr bgcolor="" class="exibir">
-          <td><div align="center">#qtdc#</div></td>
-          <td><div align="center">#qtdn#</div></td>
-          <td><div align="center">#qtdv#</div></td>
-          <td><div align="center">#qtde#</div></td>
-          <td><div align="center">#rsBusca.recordcount#</div></td>
-          <td><div align="center">#falta#</div></td>
-          <td><div align="center">#sobra#</div></td>
-          <td><div align="center">#risco#</div></td>
-          <td><div align="center">#reincinde#</div></td>
-        </tr>
-      </cfoutput>
-	  </table>      
-            <div align="center" style="position:relative;top:10px">
+			<cfquery dbtype="query" name="rsN">
+				SELECT RIP_Resposta 
+				FROM  rsBusca
+				where RIP_Resposta = 'N'
+			</cfquery>
+			<cfquery dbtype="query" name="rsV">
+				SELECT RIP_Resposta 
+				FROM  rsBusca
+				where RIP_Resposta = 'V'
+			</cfquery>
+			<cfquery dbtype="query" name="rsE">
+				SELECT RIP_Resposta 
+				FROM  rsBusca
+				where RIP_Resposta = 'E'
+			</cfquery>                
+			<cfquery dbtype="query" name="rsSomas">
+				SELECT RIP_NumInspecao, Sum(RIP_Falta) AS ripFalta, Sum(RIP_Sobra) AS ripSobra, Sum(RIP_EmRisco) AS ripEmRisco
+				FROM rsBusca
+				GROUP BY RIP_NumInspecao
+			</cfquery>
+			<cfquery dbtype="query" name="rsReincide">
+				SELECT RIP_ReincGrupo
+				FROM rsBusca where RIP_ReincGrupo > 0
+			</cfquery>  
+			<!---          --->   
+      		<table width="900" border="1" align="center" class="exibir"> 
+				<tr bgcolor="">
+					<td><div align="center">Conforme</div></td>
+					<td><div align="center">NãoConforme</div></td>
+					<td><div align="center">NãoVerificado</div></td>
+					<td><div align="center">NãoExecuta</div></td>
+					<td><div align="center">Total</div></td>                   
+					<td><div align="center">Falta</div></td>
+					<td><div align="center">Sobra</div></td>
+					<td><div align="center">EmRisco</div></td>
+					<td><div align="center">Reicidentes</div></td>
+				</tr>
+				<cfoutput>
+					<cfset qtdc = rsC.recordcount>
+					<cfset qtdn = rsN.recordcount>
+					<cfset qtdv = rsV.recordcount>
+					<cfset qtde = rsE.recordcount>
+					<cfset falta = lscurrencyformat(rsSomas.ripFalta,'Local')>
+					<cfset sobra = lscurrencyformat(rsSomas.ripSobra,'Local')>
+					<cfset risco = lscurrencyformat(rsSomas.ripEmRisco,'Local')>
+					<cfset reincinde = rsReincide.recordcount>     
+					<tr bgcolor="" class="exibir">
+						<td><div align="center">#qtdc#</div></td>
+						<td><div align="center">#qtdn#</div></td>
+						<td><div align="center">#qtdv#</div></td>
+						<td><div align="center">#qtde#</div></td>
+						<td><div align="center">#rsBusca.recordcount#</div></td>
+						<td><div align="center">#falta#</div></td>
+						<td><div align="center">#sobra#</div></td>
+						<td><div align="center">#risco#</div></td>
+						<td><div align="center">#reincinde#</div></td>
+					</tr>
+				</cfoutput>
+	  		</table>    
+			<cfif rsBusca.recordcount eq 0>
+				<script>
+					alert('O Plano de Testes para avaliação desse tipo de unidade encontra-se desativado.\nA Avaliação poderá ser realizada somente após ativação do Plano de Testes.');
+					if ('<cfoutput>#grpacesso#</cfoutput>' == 'INSPETORES') {
+						window.open('itens_inspetores_avaliacao.cfm','_self');
+					} else {window.close();}
+				</script>
+			</cfif>  
+        	<div align="center" style="position:relative;top:10px">
 				<button onClick="window.close()" class="botao">Fechar</button>
 				<br><br><br>
-				<!---Botão de validação para transmissão da Avaliação--->
-					<cfif rsVerificaFinalizacao.recordcount eq 0 and grpacesso eq "INSPETORES">	
-<!---	<button style="margin-left:150px" onClick="document.frmopc.acao.value='liberaval';liberar();" class="botao">Liberar Avaliação para Revisão</button> --->
-     <a style="cursor:pointer;" onClick="document.frmopc.acao.value='liberaval';liberar();">
-    <div ><img  alt="Liberar" src="figuras/liberada.png" width="25" border="0" /></div>
-    <div style="color:darkred;position:relative;font-size:25px">Concluir e Liberar Avaliação para Revisão</div>
-    </a> 
-					</cfif>	
-				<!---Fim botão de validação para transmissão da Avaliação--->
+					<!---Botão de validação para transmissão da Avaliação--->
+				<cfif rsVerificaFinalizacao.recordcount eq 0 and grpacesso eq "INSPETORES" and trim(rsItem.INP_DTConcluirAvaliacao) eq ''>	
+					<!---	<button style="margin-left:150px" onClick="document.frmopc.acao.value='liberaval';liberar();" class="botao">Liberar Avaliação para Revisão</button> --->
+					<a style="cursor:pointer;" onClick="document.frmopc.acao.value='liberaval';liberar();">
+						<div ><img  alt="Liberar" src="figuras/liberada.png" width="50" border="0" /></div>
+						<div style="color:darkred;position:relative;font-size:25px">Concluir e Liberar Avaliação para Revisão</div>
+					</a> 
+				</cfif>	
+					<!---Fim botão de validação para transmissão da Avaliação--->
 			</div>
-      
-
-	</cfif>
-	</div>
-	<!--- Fim Área de conteúdo --->	 
-	</td>
-	</tr>
-
-</table>
+		</cfif>
+		</div>	
+		<!--- Fim Área de conteúdo --->	 
+		</td>
+		</tr>
+	</table>
 </cfif>
-<input name="acao" type="hidden">
-</form>
-
+	<input name="acao" type="hidden">
+	</form>
 <cfinclude template="rodape.cfm">
 <script>
 	entrada()

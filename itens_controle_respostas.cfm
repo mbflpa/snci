@@ -158,7 +158,7 @@
 	<cfif grpacesso eq 'GESTORMASTER'>
 		(Pos_Situacao_Resp not in (0,3,10,11,12,13,24,25,26,27,31,51)) 
 	<cfelseif grpacesso eq 'GOVERNANCA'>
-		(Pos_Situacao_Resp not in (0,3,10,11,12,13,21,24,25,26,27,31,51) 
+		(Pos_Situacao_Resp not in (0,3,10,11,12,13,21,24,25,26,27,31,51))
 	<cfelse>
 		(Pos_Situacao_Resp not in (0,3,9,10,11,12,13,24,25,26,27,31,51)) 
     </cfif>	
@@ -668,7 +668,7 @@ function Hint(objNome, action){
 		 <cfif isDefined("ckTipo") And ckTipo eq "inspecao">
 			 <cfif qVerifEmReanalise.recordcount eq 0 >
 				<tr bgcolor="f7f7f7" class="exibir">
-				  <td colspan="17" align="center"><strong>Sr. Inspetor, todos os itens deste relatório foram solucionados, portanto a inspeção encontra-se encerrada.</strong></td>
+				  <td colspan="17" align="center"><strong>Caro(a). Usuário, todos os itens deste relatório foram solucionados, portanto a Avaliação encontra-se encerrada.</strong></td>
 				</tr>
 				<tr><td colspan="17" align="center">&nbsp;</td></tr>
 			 </cfif>

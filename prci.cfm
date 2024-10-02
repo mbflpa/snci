@@ -1,7 +1,6 @@
 <!---  
   <cfdump  var="#url#">
- 
- <cfoutput>
+  <cfoutput>
  #dtlimit#
  </cfoutput>
 --->
@@ -74,7 +73,6 @@
 <script language="javascript">
 
 //=============================
-
 function listar(a,b,c,d){
 	document.formx.lis_se.value=a;
 	document.formx.lis_grpace.value=b;
@@ -149,7 +147,7 @@ function listar(a,b,c,d){
         <cfquery dbtype="query" name="rstotmesunidDPFP">
             SELECT Andt_Prazo 
             FROM  rsBaseB
-            where Andt_Resp in (1,17,2,14,15,18,20) and Andt_Mes = #aux_mes#
+            where Andt_Resp in (1,17,2,14,15,18,20) and Andt_Mes <= #month(dtlimit)#
         </cfquery>
         <cfset totmesunidDPFP = rstotmesunidDPFP.recordcount>
 
@@ -158,7 +156,7 @@ function listar(a,b,c,d){
         <cfquery dbtype="query" name="rstotmesgeDPFP">
             SELECT Andt_Prazo 
             FROM  rsBaseB
-            where Andt_Resp in (6,5,19) and Andt_Mes = #aux_mes#
+            where Andt_Resp in (6,5,19) and Andt_Mes <= #month(dtlimit)#
         </cfquery>
         <cfset totmesgeDPFP = rstotmesgeDPFP.recordcount>
 
@@ -167,7 +165,7 @@ function listar(a,b,c,d){
         <cfquery dbtype="query" name="rstotmessbDPFP">
             SELECT Andt_Prazo 
             FROM  rsBaseB
-            where Andt_Resp in (4,7,16) and Andt_Mes = #aux_mes#
+            where Andt_Resp in (4,7,16) and Andt_Mes <= #month(dtlimit)#
         </cfquery>
         <cfset totmessbDPFP = rstotmessbDPFP.recordcount>
 
@@ -176,7 +174,7 @@ function listar(a,b,c,d){
         <cfquery dbtype="query" name="rstotmessuDPFP">
             SELECT Andt_Prazo 
             FROM  rsBaseB
-            where Andt_Resp in (8,22,23) 
+            where Andt_Resp in (8,22,23) and Andt_Mes <= #month(dtlimit)#
         </cfquery>
         <cfset totmessuDPFP = rstotmessuDPFP.recordcount>  
 
@@ -535,7 +533,7 @@ function listar(a,b,c,d){
                         <td><div align="center"><strong>#totmessbFP#</strong></div></td>
                         <td><div align="center" class="red_titulo">#PerFP#</div></td>
                         <td><div align="center"><strong>#totmessbDPFP#</strong></div></td>
-                        <td width="13%" class="exibir"><div align="center"><button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un','#aux_mes_sb#',<cfoutput>#year(dtlimit)#</cfoutput>);">Listar</button></div><td>
+                        <td width="13%" class="exibir"><div align="center"><button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb','#aux_mes_sb#',<cfoutput>#year(dtlimit)#</cfoutput>);">Listar</button></div><td>
                     </tr>
                     <cfset sb_dp_soma = sb_dp_soma + totmessbDP>
                     <cfset sb_fp_soma = sb_fp_soma + totmessbFP>
@@ -665,7 +663,7 @@ function listar(a,b,c,d){
                         <td><div align="center"><strong>#totmessuFP#</strong></div></td>
                         <td><div align="center" class="red_titulo">#PerFP#</div></td>
                         <td><div align="center"><strong>#totmessuDPFP#</strong></div></td>
-                        <td width="13%" class="exibir"><div align="center"><button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un','#aux_mes_su#',<cfoutput>#year(dtlimit)#</cfoutput>);">Listar</button></div><td>
+                        <td width="13%" class="exibir"><div align="center"><button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su','#aux_mes_su#',<cfoutput>#year(dtlimit)#</cfoutput>);">Listar</button></div><td>
                     </tr>
                     <cfset su_dp_soma = su_dp_soma + totmessuDP>
                     <cfset su_fp_soma = su_fp_soma + totmessuFP>
@@ -755,9 +753,9 @@ function listar(a,b,c,d){
       <div align="center"></div>      <div align="center"></div>      <div align="center"></div></td>
     <td class="exibir"><div align="center">%(FP)</div></td>
     <td width="9%" class="exibir"><div align="center"></div>      <div align="center"><strong>TOTAL</strong></div></td>
-    <td width="12%" class="exibir"><div align="center"><strong> META MENSAL (%)</strong> </div></td>
-    <td width="14%" class="exibir"><div align="center"><strong> RESULTADO EM RELAÇÃO À META (%) </strong></div></td>
-    <td width="15%" class="exibir"><div align="center"><strong> RESULTADO </strong> </div></td>
+    <td width="12%" class="exibir"><div align="center"><strong>META MENSAL (%)</strong> </div></td>
+    <td width="14%" class="exibir"><div align="center"><strong>RESULTADO EM RELAÇÃO À META (%)</strong></div></td>
+    <td width="15%" class="exibir"><div align="center"><strong>RESULTADO</strong> </div></td>
   </tr>
     <tr class="exibir">
       <td colspan="17" valign="middle"><div align="center" class="titulos"></div>        <div align="center" class="titulos"></div>        <div align="center" class="titulos"></div></td>
@@ -924,6 +922,12 @@ function listar(a,b,c,d){
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
 	</cfif>	
+  <cfif #frmano# eq 2024 and #se# eq '64'>
+    <cfset resultado = "SUSPENSO">
+    <cfset auxcor = "">
+    <cfset totmaiDP=0>
+    <cfset totmaiFP=0>
+  </cfif>
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;MAI;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>
@@ -957,6 +961,12 @@ function listar(a,b,c,d){
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
 	</cfif>	
+  <cfif #frmano# eq 2024 and #se# eq '64'>
+    <cfset resultado = "SUSPENSO">
+    <cfset auxcor = "">
+    <cfset totjunDP=0>
+    <cfset totjunFP=0>
+  </cfif>  
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;JUN;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>  
@@ -990,6 +1000,12 @@ function listar(a,b,c,d){
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
 	</cfif>	
+  <cfif #frmano# eq 2024 and #se# eq '64'>
+    <cfset resultado = "SUSPENSO">
+    <cfset auxcor = "">
+    <cfset totjulDP=0>
+    <cfset totjulFP=0>
+  </cfif>  
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;JUL;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>  
@@ -1023,6 +1039,12 @@ function listar(a,b,c,d){
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
 	</cfif>	
+  <cfif #frmano# eq 2024 and #se# eq '64'>
+    <cfset resultado = "SUSPENSO">
+    <cfset auxcor = "">
+    <cfset totagoDP=0>
+    <cfset totagoFP=0>
+  </cfif>  
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;AGO;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>  
@@ -1056,6 +1078,12 @@ function listar(a,b,c,d){
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
 	</cfif>	
+    <cfif #frmano# eq 2024 and #se# eq '64'>
+    <cfset resultado = "SUSPENSO">
+    <cfset auxcor = "">
+    <cfset totsetDP=0>
+    <cfset totsetFP=0>
+  </cfif>
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;SET;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>    
@@ -1089,6 +1117,12 @@ function listar(a,b,c,d){
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
 	</cfif>	
+  <cfif #frmano# eq 2024 and #se# eq '64'>
+    <cfset resultado = "SUSPENSO">
+    <cfset auxcor = "">
+    <cfset totoutDP=0>
+    <cfset totoutFP=0>
+  </cfif>  
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;OUT;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>    
@@ -1122,6 +1156,12 @@ function listar(a,b,c,d){
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
 	</cfif>	
+  <cfif #frmano# eq 2024 and #se# eq '64'>
+    <cfset resultado = "SUSPENSO">
+    <cfset auxcor = "">
+    <cfset totnovDP=0>
+    <cfset totnovFP=0>
+  </cfif>  
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;NOV;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>    
@@ -1155,11 +1195,16 @@ function listar(a,b,c,d){
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
 	</cfif>	
+  <cfif #frmano# eq 2024 and #se# eq '64'>
+    <cfset resultado = "SUSPENSO">
+    <cfset auxcor = "">
+    <cfset totdezDP=0>
+    <cfset totdezFP=0>
+  </cfif>  
     <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;DEZ;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>    
  </cfif>    
-
    <!--- Imprimir em tela o acumulado --->
      <!--- tabela final --->
   <cfset totgerDP = totjanDP + totfevDP + totmarDP + totabrDP + totmaiDP + totjunDP + totjulDP + totagoDP + totsetDP + totoutDP + totnovDP + totdezDP>
@@ -1189,7 +1234,7 @@ function listar(a,b,c,d){
 		<cfset resultado = "ABAIXO DO ESPERADO">
 		<cfset auxcor = "##FF3300">
 	</cfif>	
-    <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
+  <td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
   </tr>
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;Geral;#totgerDP#;#PerDP#;#totgerFP#;#PerFP#;#TOTGER#;#metames#;#ResultMeta#;#resultado#'>
   <tr class="exibir">

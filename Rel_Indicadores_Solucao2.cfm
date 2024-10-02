@@ -323,6 +323,7 @@ function valida_form(a,b) {
 	</cfif>
 	<!--- Fim obter orgao condutor --->
 	<!--- #rs3SO.Andt_Mes# #rs14STDT#<br> --->	
+	<!---
 	<cfquery datasource="#dsn_inspecao#">
 	UPDATE Andamento_Temp SET Andt_DTEnvio = #rs14STDT# 
 	, Andt_NomeOrgCondutor = '#auxarea#'
@@ -336,7 +337,8 @@ function valida_form(a,b) {
 	Andt_Unid = '#rs3SO.Andt_Unid#' and 
 	Andt_Grp = #rs3SO.Andt_Grp# and 
 	Andt_Item = #rs3SO.Andt_Item# 
-	</cfquery> 	 
+	</cfquery> 
+	--->	 
  </cfif> 
  </cfoutput>
 
