@@ -1,6 +1,6 @@
 
 /**
-  Funções para exibição do menu, validação de formulários e utilidades
+  Funï¿½ï¿½es para exibiï¿½ï¿½o do menu, validaï¿½ï¿½o de formulï¿½rios e utilidades
  */
 function Menu(label, mw, mh, fnt, fs, fclr, fhclr, bg, bgh, halgn, valgn, pad, space, to, sx, sy, srel, opq, vert, idt, aw, ah) 
 {
@@ -757,7 +757,7 @@ function moveYbySlicePos (y, img) {
 // somente letras
 function soletra() {
   var tecla = window.event.keyCode;
-//permite digitação das teclas letras
+//permite digitaï¿½ï¿½o das teclas letras
   if ((tecla < 65 || tecla > 90) && (tecla < 97 || tecla > 122)) {
 	 event.returnValue = false;
   }
@@ -781,10 +781,10 @@ function Mascara_SEI(x)
 
 
 //============================
-//permite digitaçao apenas de valores numéricos
+//permite digitaï¿½ao apenas de valores numï¿½ricos
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitaï¿½ï¿½o das teclas numï¿½ricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 	
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -795,7 +795,7 @@ var tecla = window.event.keyCode;
 	}
 //}
 }
-//Validação de campos vazios em formulário
+//Validaï¿½ï¿½o de campos vazios em formulï¿½rio
 function valida_form(form) {
  var frm = document.forms[form];
  var quant = frm.elements.length;
@@ -819,7 +819,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia  inválido!');
+		      alert('Valor para o dia  invï¿½lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -829,7 +829,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o Mês inválido!');
+		      alert('Valor para o Mï¿½s invï¿½lido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -880,19 +880,19 @@ function validacao()
 		}
 */
 		if (ctrl && tecla==86) {
-			//alert("CTRL+V não permitido!");
+			//alert("CTRL+V nï¿½o permitido!");
 			event.keyCode=0;
 			event.returnValue=false;
 		}
 	}
 
-//foco no primeiro elemento do formulário
+//foco no primeiro elemento do formulï¿½rio
 function foco() {
   if (document.forms[0]) {
     document.forms[0].elements[0].focus();
   }
 }
-//Restrito a valores numéricos
+//Restrito a valores numï¿½ricos
 function moeda_dig(a) {
 	var tecla = window.event.keyCode;
    // if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) { return = false;}
@@ -918,7 +918,9 @@ function moeda_edit(a){
     if (a == 'frmsobra'){var vlr = document.form1.frmsobra.value;}
     if (a == 'frmemrisco'){var vlr = document.form1.frmemrisco.value;}
     if (a == 'VLRecuperado'){var vlr = document.form1.VLRecuperado.value;}
-    
+	if (a == 'pbfimor'){var vlr = document.form1.pbfimor.value;}
+	if (a == 'ecfmor'){var vlr = document.form1.ecfmor.value;}
+	
     var tecla = window.event.keyCode;
 	//alert(vlr);
     for (i=1 ; i <= vlr.length ; i++){
@@ -962,6 +964,8 @@ function moeda_edit(a){
     if (a == 'frmsobra'){document.form1.frmsobra.value = vlre}
     if (a == 'frmemrisco'){document.form1.frmemrisco.value = vlre}
     if (a == 'VLRecuperado'){document.form1.VLRecuperado.value = vlre}  
+	if (a == 'pbfimor'){document.form1.pbfimor.value = vlre}  
+	if (a == 'ecfmor'){document.form1.ecfmor.value = vlre}  
 }
 
 //==================================
@@ -970,6 +974,9 @@ function ajuste_campo(a){
     if (a == 'frmsobra'){var vlr = document.form1.frmsobra.value;}
     if (a == 'frmemrisco'){var vlr = document.form1.frmemrisco.value;}
     if (a == 'VLRecuperado'){var vlr = document.form1.VLRecuperado.value;}
+	if (a == 'pbfimor'){var vlr = document.form1.pbfimor.value;}
+	if (a == 'ecfmor'){var vlr = document.form1.ecfmor.value;}
+	
     
   //  alert(vlr);
     if (vlr.length == 0 || vlr == '') 
@@ -978,6 +985,8 @@ function ajuste_campo(a){
     if (a == 'frmsobra'){document.form1.frmsobra.value = '0,00'}
     if (a == 'frmemrisco'){document.form1.frmemrisco.value = '0,00'}
     if (a == 'VLRecuperado'){document.form1.VLRecuperado.value = '0,00'}  
+	if (a == 'pbfimor'){document.form1.pbfimor.value = '0,00'}  
+	if (a == 'ecfmor'){document.form1.ecfmor.value = '0,00'}
 	}
 }
 
@@ -1031,9 +1040,9 @@ function largura() {
    //envio de e-mail
   function email(titulo) 
   {
-//  window.open('mailto:pecst@correios.com.br?subject=' + titulo + '&body=' + escape('\nFavor enviar telegrama abaixo:\n\n' + location.href + '\n\nAtenciosamente,\n\nAmbulatório Médico'));
+//  window.open('mailto:pecst@correios.com.br?subject=' + titulo + '&body=' + escape('\nFavor enviar telegrama abaixo:\n\n' + location.href + '\n\nAtenciosamente,\n\nAmbulatï¿½rio Mï¿½dico'));
   }
-  //confirmação de operação
+  //confirmaï¿½ï¿½o de operaï¿½ï¿½o
   function confirmThis(message) 
   {
 	if(confirm(message)) return true;
