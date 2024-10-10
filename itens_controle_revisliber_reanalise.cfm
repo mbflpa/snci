@@ -96,6 +96,7 @@
 </cfif>
 
 <cfif isDefined("Form.acao") and "#form.acao#" eq 'validar'>
+
 	<cfquery datasource="#dsn_inspecao#" name="rsVerificaItem">
 		SELECT  RIP_Resposta, RIP_Unidade, RIP_NCISEI FROM Resultado_Inspecao 
 		WHERE RIP_NumInspecao='#FORM.Ninsp#' And RIP_NumGrupo = '#FORM.Ngrup#' and RIP_NumItem ='#FORM.Nitem#' 
@@ -110,7 +111,7 @@
 		WHERE RIP_NumInspecao = '#URL.Ninsp#' and RIP_NumGrupo ='#url.Ngrup#' and RIP_NumItem ='#url.Nitem#'
 	</cfquery>
 
-	<!---Veirifica se esta inspeção possui algum item em reanálise --->
+	<!---Verifica se esta inspeção possui algum item em reanálise --->
 	<cfquery datasource="#dsn_inspecao#" name="qVerifEmReanalise">
 		SELECT RIP_Resposta, RIP_Recomendacao FROM Resultado_Inspecao 
 		WHERE (RIP_Recomendacao='S' OR RIP_Recomendacao='R') and RIP_NumInspecao='#ninsp#'  
@@ -187,10 +188,11 @@
 			</cfquery>
 			<cfif #grpacesso# eq 'GESTORES' or #grpacesso# eq 'DESENVOLVEDORES'>
 				<!--- Update na tabela Inspecao com sigla  NA = não avaliada, ER = em reavaliação, RA = reavaliada, CO = concluída--->
-				<cfquery datasource="#dsn_inspecao#">
+			<cfquery datasource="#dsn_inspecao#">
 					UPDATE Inspecao set INP_Situacao ='ER',INP_DtEncerramento =  CONVERT(char, GETDATE(), 102), INP_DtUltAtu =  CONVERT(char, GETDATE(), 120), INP_UserName ='#CGI.REMOTE_USER#'
 					WHERE INP_NumInspecao = '#URL.Ninsp#' 
 				</cfquery>
+
 				<cfquery name="rsEmail" datasource="#dsn_inspecao#">
 					SELECT RIP_NumGrupo, RIP_NumItem, RIP_NumInspecao, RIP_MatricAvaliador, Usu_Matricula, Usu_Apelido, Und_Codigo, LTRIM(RTRIM(Und_Descricao)) as Und_Descricao, LTRIM(RTRIM(Usu_Email)) as Usu_Email ,
 					       CASE WHEN LTRIM(RTRIM(RIP_MatricAvaliador))=LTRIM(RTRIM(Usu_Matricula)) THEN 1 ELSE 0 END AS Avaliador 
@@ -217,22 +219,21 @@
 				<cfif auxdr eq '04' or auxdr eq '12' or auxdr eq '18' or auxdr eq '30' or auxdr eq '32' or auxdr eq '34' or auxdr eq '60' or auxdr eq '70'>
 					<cfset sdestina = sdestina & ';' & 'EDIMIR@correios.com.br'>
 				</cfif>
-
+			<cfoutput>
   			 <cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
-				<cfoutput>
 					<div>
-						<p><strong>Atencao! E-mail automatico, nao responder.</strong></p>
+						<p><strong>Atenção! E-mail automático, não responder.</strong></p>
 						<p>Prezados inspetores,</p>
-						<p>Informa-se que existem itens no SNCI pendentes de REANALISE. Favor acessar a opcao "Avaliacao e Reanalise de Itens" na tela inicial do sistema e realizar os ajustes solicitados pelo revisor.</p> 
-						<p>Avaliacao: <span style="color:blue"><strong>#trim(Num_Insp)#</strong></span></p>
+						<p>Informa-se que existem itens no SNCI pendentes de REANÁLISE. Favor acessar a opção "Avaliação e Reanálise de Itens" na tela inicial do sistema e realizar os ajustes solicitados pelo revisor.</p> 
+						<p>Avaliação: <span style="color:blue"><strong>#trim(Num_Insp)#</strong></span></p>
 						<p>Item: <span style="color:blue"><strong>#rsEmail.RIP_NumGrupo#.#rsEmail.RIP_NumItem#</strong></span></p>
 						<p>Unidade: <span style="color:blue"><strong>#trim(rsEmail.Und_Descricao)#</strong></span></p>
 						<p>Item avaliado por: <span style="color:blue"><strong>#Num_Matricula# - #trim(rsAvaliador.Usu_Apelido)#</strong></span></p>
 						<cfmailparam disposition="inline" contentid="topoginsp" file="#myImgPath#topoginsp.jpg">
 						<p><a href="http://intranetsistemaspe/SNCI/rotinas_inspecao.cfm"><img src="cid:topoginsp.jpg" width="50%" align=middle >Acesse o SNCI endereço: 'http://intranetsistemaspe/snci/rotinas_inspecao.cfm'</a></p>
 					</div>
-				</cfoutput>
-				</cfmail> 
+			</cfmail> 
+		</cfoutput>					
 			 </cfif> 
 		</cftransaction>
 		<script>	
@@ -526,10 +527,3 @@
  
 	</body>
 </html>
-
-
-
-
-
-	
-

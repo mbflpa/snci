@@ -574,3 +574,554 @@ function periodoPorExtenso(mes,ano) {
     let nomeMesExtenso = meses[mes - 1];
     return nomeMesExtenso + "_de_" + ano;
 }
+
+/*
+    cria selects a partir de um array de objetos JSON 
+    Forma de utilização:
+    Inserir o código abaixo no arquivo HTML:
+    Tem que existir apenas a div com id dados-container e o input com id idSelecionado (pode usar outro id se desejar)
+    <div class="container mt-5">
+        <h2>Selecione o Processo</h2>
+        <div id="dados-container" class="dados-container">
+            <!-- Os selects serão adicionados aqui -->
+        </div>
+        <div id="selectedInfo" style="margin-top: 20px;">
+            <p><strong>Id selecionado:</strong><input id="idSelecionado"></input></p>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: 'cfc/pc_cfcAvaliacoes.cfc',
+                data: {
+                    method: 'getAvaliacaoTipos',
+                },
+                dataType: "json",
+                async: false
+            })//fim ajax
+            .done(function(data) {
+                // Define os níveis de dados e nomes dos labels
+                let dataLevels = ['MACROPROCESSOS', 'PROCESSO_N1', 'PROCESSO_N2', 'PROCESSO_N3'];
+                let labelNames = ['Macroprocesso', 'Processo N1', 'Processo N2', 'Processo N3'];
+                let outrosOptions = [
+                    { dataLevel:'PROCESSO_N3', text: "OUTROS", value: 0 },
+                ];
+                // Inicializa os selects dinâmicos
+                initializeSelects(data, dataLevels, 'ID', labelNames, 'idSelecionado',outrosOptions);
+                
+
+            })//fim done
+            .fail(function(xhr, ajaxOptions, thrownError) {
+                $('#modalOverlay').delay(1000).hide(0, function() {
+                    $('#modalOverlay').modal('hide');
+                });
+                $('#modal-danger').modal('show')
+                $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+                $('#modal-danger').find('.modal-body').text(thrownError)
+
+            })//fim fail
+        });
+    </script>
+*/
+
+function initializeSelects(containerId,data, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions = []) {
+
+    // Limpa o container de selects e adiciona o primeiro select
+    $(containerId).empty().append('<div class="select-container-initializeSelects"><label class="dynamic-label-initializeSelects" style="text-align: left;">' + labelNames[0] + ': </label><select class="form-control process-select" id="selectDinamico' + dataLevels[0] + '" name="selectDinamico' + dataLevels[0] + '" style="width: 100%;"></select></div>');
+
+    // Função para preencher os selects
+    function populateSelect(level, parentSelections) {
+        // Obtém o nível atual a partir de dataLevels
+        var currentLevel = dataLevels[level];
+        if (!currentLevel) return;  // Se não há mais níveis, sai da função
+
+        // Filtra os dados com base nas seleções dos níveis superiores
+        var filteredData = data;
+        for (var i = 0; i < level; i++) {
+            filteredData = filteredData.filter(item => item[dataLevels[i]] === parentSelections[i]);
+        }
+
+        // Obtém opções únicas para o select atual
+        var uniqueOptions = [...new Set(filteredData.map(item => item[currentLevel]))];
+
+        var $select = $('#selectDinamico' + currentLevel);
+
+        if ($select.length === 0) {
+            // Cria um novo select se ele não existir
+            $select = $('<select class="form-control process-select dynamic-select animate__animated animate__fadeInDown" id="selectDinamico' + currentLevel + '" name="selectDinamico' + currentLevel + '" style="width: 100%;"></select>');
+            var $container = $('<div class="select-container-initializeSelects animate__animated animate__fadeInDown"></div>');
+            $container.append('<label class="dynamic-label-initializeSelects" style="text-align: left;">' + labelNames[level] + ': </label>');
+            $container.append($select);
+            $(containerId).append($container);
+        }
+
+        // Preenche o select com opções
+        $select.empty().append('<option></option>');
+
+        uniqueOptions.forEach(item => {
+            let option = $('<option></option>').val(item).text(item);
+            $select.append(option);
+        });
+
+        // Adiciona opções "OUTROS" com base no array outrosOptions
+        outrosOptions.forEach(outrosOption => {
+            if (dataLevels[level] === outrosOption.dataLevel) {
+                $select.append($('<option></option>').val(outrosOption.value).text(outrosOption.text));
+            }
+        });
+
+        // Calcula a largura necessária com base na largura dos textos dos options
+        var maxWidth = 0;
+        $select.children('option').each(function() {
+            var optionWidth = $('<span>').text($(this).text()).css({
+                'font-family': $select.css('font-family'),
+                'font-size': $select.css('font-size'),
+                'visibility': 'hidden',
+                'white-space': 'nowrap'
+            }).appendTo('body').width();
+            maxWidth = Math.max(maxWidth, optionWidth);
+        });
+
+        // Adiciona padding à largura calculada e ajusta a largura do select
+        var padding = 45; // 40px de padding adicional
+        if (maxWidth + padding < 100) {
+            $select.css('width', '100px');
+        } else {
+            $select.css('width', (maxWidth + padding) + 'px');
+        }
+    }
+
+    // Inicializa o primeiro select
+    populateSelect(0, []);
+
+    // Inicializa o select2 para todos os selects
+    $('.process-select').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Selecione...'
+    });
+
+    // Evento de mudança para selects dinâmicos
+    $(containerId).on('change', '.process-select', function() {
+        var level = dataLevels.indexOf($(this).attr('id').replace('selectDinamico', ''));
+        var parentSelections = [];
+        for (var i = 0; i <= level; i++) {
+            parentSelections.push($('#selectDinamico' + dataLevels[i]).val());
+        }
+
+        // Verifica se o primeiro select (MACROPROCESSOS) é 'Não se aplica'
+        if (parentSelections[0] === 'Não se aplica') {
+            var finalSelection = data.find(item => item.MACROPROCESSOS === 'Não se aplica');
+            if (finalSelection) {
+                $('#' + inputAlvo).val(finalSelection[idAttributeName]);
+            }
+            // Remove todos os selects além do primeiro
+            $('.process-select').parent().slice(1).remove();
+            return; // Sai da função, não preenche os selects adicionais
+        }
+
+        // Remove selects de níveis mais baixos
+        $('.process-select').each(function() {
+            var currentLevel = dataLevels.indexOf($(this).attr('id').replace('selectDinamico', ''));
+            if (currentLevel > level) {
+                $(this).parent().remove();
+            }
+        });
+
+        // Preenche o próximo nível de select
+        if (parentSelections[level]) {
+            populateSelect(level + 1, parentSelections);
+        } else {
+            $('#' + inputAlvo).val('');
+        }
+
+        // Atualiza o ID selecionado se for o último nível
+        if (!$('#selectDinamico' + dataLevels[level + 1]).length && parentSelections.every(selection => selection)) {
+            var $select = $('#selectDinamico' + dataLevels[level]);
+            var selectedOption = $select.val();
+
+            // Verifica se a opção selecionada está em outrosOptions
+            var isOutrosOption = outrosOptions.some(option => option.value.toString() === selectedOption);
+            if (isOutrosOption) {
+                $('#' + inputAlvo).val(selectedOption);
+                return;
+            }
+
+            var finalSelection = data.find(item => {
+                return dataLevels.every((process, index) => item[process] === parentSelections[index]);
+            });
+
+            if (finalSelection) {
+                $('#' + inputAlvo).val(finalSelection[idAttributeName]);
+            }
+        } else {
+            $('#' + inputAlvo).val('');
+        }
+
+        // Inicializa o select2 para os selects dinâmicos
+        $('.process-select').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Selecione...'
+        });
+    });
+
+    
+}
+
+/*Função para inicializar selects com Ajax:*/
+function initializeSelectsAjax(containerId, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions = [], cfc, metodo) {
+    $.ajax({
+        url: cfc,
+        method: "GET", // ou "POST", dependendo do seu endpoint
+        data: {
+            method: metodo,
+        },
+        dataType: "json",
+        async: false
+    })
+    .done(function(data) {
+        // Inicializa os selects dinâmicos
+        initializeSelects(containerId, data, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions);
+    })
+    .fail(function(xhr, ajaxOptions, thrownError) {
+        console.log('AJAX call failed', thrownError);
+        $('#modalOverlay').delay(1000).hide(0, function() {
+            $('#modalOverlay').modal('hide');
+        });
+        $('#modal-danger').modal('show');
+        $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
+        $('#modal-danger').find('.modal-body').text(thrownError);
+    });
+}
+
+
+
+/* Função para preencher selects a partir de um ID informado:
+Use essa função dentro do success do ajax que retornou o json.
+Exemplo:
+    $.ajax({
+        url: 'cfc/pc_cfcAvaliacoes.cfc',
+        data: {
+            method: 'getAvaliacaoTipos',
+        },
+        dataType: "json",
+        method: 'GET'
+    })
+    .done(function(data) {
+        // Define os IDs dos selects
+        let selectIDs = ['selectDinamicoMACROPROCESSOS', 'selectDinamicoPROCESSO_N1', 'selectDinamicoPROCESSO_N2', 'selectDinamicoPROCESSO_N3'];
+        
+        // Inicializa os selects (se necessário)
+        // initializeSelects(data, dataLevels, 'ID', labelNames, 'idTipoAvaliacao');
+        
+        // Exemplo de uso da função para preencher os selects a partir de um ID
+        const exampleID = processoAvaliado; // Mude para o ID desejado
+        
+        populateSelectsFromID(data, exampleID, selectIDs, 'idTipoAvaliacao');
+    })
+    .fail(function(error) {
+        $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(error)
+    });
+*/
+
+function populateSelectsFromID(data, id, dataLevels, inputAlvo) {
+    const selectedData = data.find(item => item.ID == id);
+    if (!selectedData) {
+        console.error("ID inválido.");
+        return;
+    }
+
+    // Preenche os selects
+    dataLevels.forEach(selectID => {
+        const value = selectedData[selectID];
+        $(`#selectDinamico${selectID}`).val(value).trigger('change');
+    });
+
+    // Atualiza o campo de destino com o ID correto
+    $('#' + inputAlvo).val(selectedData.ID);
+}
+function populateSelectsFromIDAjax(cfc, metodo, id, dataLevels, inputAlvo) {
+    $.ajax({
+        url: cfc,
+        method: "GET", // ou "POST", dependendo do seu endpoint
+        data: {
+            method: metodo,
+        },
+        dataType: "json",
+        async: false
+    })
+    .done(function(data) {
+        populateSelectsFromID(data, id, dataLevels, inputAlvo);
+    })
+    .fail(function(xhr, ajaxOptions, thrownError) {
+        console.log('AJAX call failed', thrownError);
+        $('#modalOverlay').delay(1000).hide(0, function() {
+            $('#modalOverlay').modal('hide');
+        });
+        $('#modal-danger').modal('show');
+        $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
+        $('#modal-danger').find('.modal-body').text(thrownError);
+    });
+}
+
+
+
+/*Função para contar a quantidade decaracteres digitados em um input ou textarea
+Forma de utilização:
+Inserir o código abaixo no arquivo HTML:
+<div class="form-group" style="margin-bottom:25px">
+        <label for="myInput">Input Text</label>
+        <input type="text" id="myInput" class="form-control" >
+    </div>
+    ou 
+    <div class="form-group">
+        <label for="myTextarea">Textarea</label>
+        <textarea id="myTextarea" class="form-control"></textarea>
+    </div>
+    <script>
+        $(document).ready(function() {
+            setupCharCounter('myInput', 10);
+            setupCharCounter('myTextarea', 50);
+        });
+    </script>
+*/
+
+function setupCharCounter(inputId, spanId, maxChars) {
+    const inputElem = $('#' + inputId);
+    const charCountElem = $('#' + spanId);
+    charCountElem.attr("hidden",true);
+    inputElem.on('input', function() {
+        charCountElem.attr("hidden",false);
+        const currentLength = inputElem.val().length;
+
+        if (currentLength > maxChars) {
+            inputElem.val(inputElem.val().substring(0, maxChars));
+            Swal.fire({
+                icon: 'warning',
+                title: 'Limite de caracteres ultrapassado!',
+                html: logoSNCIsweetalert2('O máximo permitido é ' + maxChars + ' caracteres.' + '<br>O texto foi cortado para atender ao limite.'),
+             }).then(() => {
+                inputElem.focus();
+            }).catch((error) => {
+                console.error('SweetAlert2 Error:', error);
+            });
+        }
+
+        charCountElem.text(`Caracteres: ${inputElem.val().length}/${maxChars}`);
+    });
+}
+
+function mostraInfoOrientacao(divId, pc_processo_id, pc_aval_orientacao_id, tab){
+    $('#modalOverlay').modal('show');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
+    setTimeout(function() {
+        $.ajax({
+            type: "post",
+            url:"cfc/pc_cfcInfoProcessosItens.cfc",
+            data:{
+                method: "infoOrientacao",
+                pc_processo_id: pc_processo_id,
+                pc_aval_orientacao_id: pc_aval_orientacao_id
+            },
+            async: false
+        })//fim ajax
+        .done(function(result){
+            $('#' + divId).html(result);
+            //$('html, body').animate({ scrollTop: ($('#custom-tabs-one-InfOrientacao-tab').offset().top)-60} , 1000);
+            $('#' + divId).attr("hidden",false);
+            // Verifica se tab foi informado e realiza o scroll
+            if (tab) {
+                $('html, body').animate({
+                    scrollTop: ($('#' + tab).offset().top) - 60
+                }, 1000);
+            }
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+        })//fim done
+        .fail(function(xhr, ajaxOptions, thrownError) {
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+            $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(thrownError)
+
+        })//fim fail
+
+    }, 200);
+}
+
+function mostraInfoProcesso(divId, pc_processo_id, tab){
+    $('#modalOverlay').modal('show');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
+    setTimeout(function() {
+        $.ajax({
+            type: "post",
+            url:"cfc/pc_cfcInfoProcessosItens.cfc",
+            data:{
+                method: "infoProcesso",
+                pc_processo_id: pc_processo_id
+            },
+            async: false
+        })//fim ajax
+        .done(function(result){
+            $('#' + divId).html(result);
+            $('#' + divId).attr("hidden",false);
+            // Verifica se tab foi informado e realiza o scroll
+            if (tab) {
+                $('html, body').animate({
+                    scrollTop: ($('#' + tab).offset().top) - 60
+                }, 1000);
+            }
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+        })//fim done
+        .fail(function(xhr, ajaxOptions, thrownError) {
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+            $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(thrownError)
+
+        })//fim fail
+       
+    }, 200);
+    
+
+}
+
+function mostraInfoItem(divId, pc_processo_id, pc_aval_id, tab){
+    $('#modalOverlay').modal('show');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
+    setTimeout(function() {
+        $.ajax({
+            type: "post",
+            url:"cfc/pc_cfcInfoProcessosItens.cfc",
+            data:{
+                method: "infoItem",
+                pc_processo_id: pc_processo_id,
+                pc_aval_id: pc_aval_id
+            },
+            async: false
+        })//fim ajax
+        .done(function(result){
+            $('#' + divId).html(result);
+            $('#' + divId).attr("hidden",false);
+            // Verifica se tab foi informado e realiza o scroll
+            if (tab) {
+                $('html, body').animate({
+                    scrollTop: ($('#' + tab).offset().top) - 60
+                }, 1000);
+            }
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+        })//fim done
+        .fail(function(xhr, ajaxOptions, thrownError) {
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+            $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(thrownError)
+
+        })//fim fail
+       
+    }, 200);
+    
+
+}
+
+function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios, tab){
+    $('#modalOverlay').modal('show');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
+    setTimeout(function() {
+        $.ajax({
+            type: "post",
+            url:"cfc/pc_cfcAvaliacoes.cfc",
+            data:{
+                method: "anexoAvaliacao",
+                pc_aval_id: pc_aval_id,
+                todosOsRelatorios: todosRelatorios
+            },
+            async: false
+        })//fim ajax
+        .done(function(result){
+            $('#' + divId).html(result);
+            $('#' + divId).attr("hidden",false);
+            // Verifica se tab foi informado e realiza o scroll
+            if (tab) {
+                $('html, body').animate({
+                    scrollTop: ($('#' + tab).offset().top) - 60
+                }, 1000);
+            }
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+        })//fim done
+        .fail(function(xhr, ajaxOptions, thrownError) {
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+            $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(thrownError)
+
+        })//fim fail
+        
+    }, 200);
+
+}
+
+function mostraTabAnexosJS(divId, pc_aval_id, pc_orientacao_id,tab){
+    $('#modalOverlay').modal('show');
+    $('#' + divId).html('');
+    $('#' + divId).attr("hidden",true);
+    setTimeout(function() {    
+        $.ajax({
+            type: "post",
+            url: "cfc/pc_cfcAvaliacoes.cfc",
+            data:{
+                method: "tabAnexos",
+                pc_aval_id: pc_aval_id,
+                pc_orientacao_id: pc_orientacao_id
+            },
+            async: false
+        })//fim ajax
+        .done(function(result) {
+            $('#' + divId).html(result);
+            $('#' + divId).attr("hidden",false);
+            // Verifica se tab foi informado e realiza o scroll
+            if (tab) {
+                $('html, body').animate({
+                    scrollTop: ($('#' + tab).offset().top) - 60
+                }, 1000);
+            }
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+        })//fim done
+        .fail(function(xhr, ajaxOptions, thrownError) {
+            $('#modalOverlay').delay(1000).hide(0, function() {
+                $('#modalOverlay').modal('hide');
+            });
+            $('#modal-danger').modal('show')
+            $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+            $('#modal-danger').find('.modal-body').text(thrownError)
+
+        })//fim fail
+       
+    }, 200);
+}
+
+
+

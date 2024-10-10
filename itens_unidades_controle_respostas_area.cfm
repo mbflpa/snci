@@ -611,7 +611,7 @@ var index;      // cell index
                                    <tr bgcolor="f7f7f7" class="exibir">										
                                      <td width="6%" bgcolor="#STO_Cor#">
                                        <div align="center"><a <cfif ckTipo eq 2>target="_blank"</cfif>
-                                           href="itens_unidades_controle_respostas1_area.cfm?cktipo=#URL.ckTipo#&Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&DGrup=#rsItem.Grp_Descricao#&Nitem=#rsItem.Pos_NumItem#&Desc=#rsItem.Itn_Descricao#&Situacao=#rsItem.Pos_Situacao_Resp#&areaSubordinados=#rsItem.Ars_CodGerencia#&diasdecor=#data#"
+                                           href="itens_unidades_controle_respostas1_area.cfm?cktipo=#URL.ckTipo#&Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&Nitem=#rsItem.Pos_NumItem#&Situacao=#rsItem.Pos_Situacao_Resp#&areaSubordinados=#rsItem.Ars_CodGerencia#&diasdecor=#data#"
                                            class="exibir" onMouseMove="Hint('#STO_Sigla#',2)"
                                            onMouseOut="Hint('#STO_Sigla#',1)"><strong>#trim(STO_Descricao)#</strong></a>                                       </div>                                     </td>
 									 <td width="6%">

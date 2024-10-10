@@ -1,4 +1,9 @@
-	<cfprocessingdirective pageEncoding ="utf-8"/>
+<!---
+<cfoutput>
+<cfdump  var="#form#">
+</cfoutput>
+--->
+	<cfprocessingdirective pageEncoding ="utf-8">
 	<!--- <cfoutput>#form.dr# #form.area_usu#</cfoutput> --->
 	<cfquery name="qAcesso" datasource="#dsn_inspecao#">
 		SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena
@@ -576,7 +581,7 @@ function grupoacesso(){
             <td colspan="6">&nbsp;</td>
           </tr>
           <tr valign="baseline">
-            <td height="19" colspan="6"><span class="titulos">Lota&ccedil;&atilde;o:</span></td>
+            <td height="19" colspan="6"><span class="titulos">Lotação:</span></td>
           </tr>
           <tr valign="baseline">
             <cfif form.area_usu eq "UNIDADES">
@@ -603,7 +608,7 @@ function grupoacesso(){
               <br>
               <cfelseif form.area_usu eq "SUBORDINADORREGIONAL">
               <cfquery name="rsSUBREG" datasource="#dsn_inspecao#">
-      SELECT Ars_Codigo, Ars_Descricao, Ars_Sigla FROM Areas WHERE Ars_Status = 'A' and Ars_GrupoAcesso = 'SUBREG' AND (LEFT(Ars_Codigo,2) = '#form.dr#' OR LEFT(Ars_Codigo,2) = '#form.dr#') ORDER BY Ars_Descricao
+      			SELECT Ars_Codigo, Ars_Descricao, Ars_Sigla FROM Areas WHERE Ars_Status = 'A' and Ars_GrupoAcesso = 'SUBREG' AND (LEFT(Ars_Codigo,2) = '#form.dr#' OR LEFT(Ars_Codigo,2) = '#form.dr#') ORDER BY Ars_Descricao
               </cfquery>
               <td colspan="2"><div id="subrega"><strong><span class="titulos">Subordinador Regional</span></strong></div></td>
               <td><div id="subregb"><span class="exibir"><strong><strong>
@@ -664,9 +669,9 @@ function grupoacesso(){
               </strong></strong></strong></strong></span></div></td>
               <cfelseif form.area_usu eq "SUPERINTENDENTE">
               <cfquery name="rsSuper" datasource="#dsn_inspecao#">
-      SELECT Dir_Sto, Dir_Descricao FROM Diretoria WHERE Dir_Status = 'A' and (Dir_Codigo = '#form.dr#' or Dir_Sto = '#form.dr#')
+      			SELECT Dir_Sto, Dir_Descricao FROM Diretoria WHERE Dir_Status = 'A' and (Dir_Codigo = '#form.dr#' or Dir_Sto = '#form.dr#')
               </cfquery>
-              <td colspan="2"><div id="supa"><strong><span class="titulos">Superintend&ecirc;ncia</span></strong></div></td>
+              <td colspan="2"><div id="supa"><strong><span class="titulos">Superintendência</span></strong></div></td>
               <td width="77%"><div id="supb"><span class="exibir"><strong>
                   <select name="lotacao" class="form">
                     <option selected="selected" value="---">---</option>

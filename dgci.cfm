@@ -161,10 +161,10 @@ Result_Acum: #Result_Acum#<br>
 function trocar(a){
 //alert(a);
 	if (a == 1) {
-	   document.frmopc.action="Rel_Indicadores_Solucao_Ref.cfm"; 
+	   document.frmopc.action="slnc_ref.cfm"; 
 	}
 	if (a == 2) {
-	   document.frmopc.action="itens_Gestao_Andamento_ref.cfm";   
+	   document.frmopc.action="prci_ref.cfm";   
 	}
 	if (a == 3) {
 	   document.frmopc.action="Rel_ClassifInspecao_Ref.cfm";   
@@ -329,7 +329,10 @@ function Hint(objNome, action){
     </cfif>
     <cfset AcumPerAno = AcumPerAno + MetDGCIAcumAntes>
     <cfset acumper = trim(NumberFormat((AcumPerAno/rsMetasAntes.Met_Mes),999.0))>
-
+    <cfif #aux_ano# eq 2024 and rsMetasAntes.Met_Mes gt 4 and #url.dr# eq '64'>
+			<cfset Result_AcumAntes = "SUSPENSO">
+      <cfset auxcorantes = "">
+		</cfif>	
     <tr bgcolor="#FFFFFF" class="exibir">
       <td colspan="6"><cfoutput><span class="titulos">#mesantes#</span></cfoutput></td>
       <cfset auximp = MetDGCIAcumAntes>
@@ -370,7 +373,10 @@ function Hint(objNome, action){
 				<cfset resultado = "ABAIXO DO ESPERADO">
 				<cfset auxcor = "##FF3300">
 			</cfif>
-
+    <cfif #aux_ano# eq 2024 and mes gt 4 and #url.dr# eq '64'>
+			<cfset resultado = "SUSPENSO">
+      <cfset auxcor = "">
+		</cfif>	      
           <tr>
             <td class="exibir"><div align="center" class="exibir" onMouseMove="Hint('RA',2)" onMouseOut="Hint('RA',1)"><strong><cfoutput>#MetDGCIMesAntes#</cfoutput></strong></div></td>
             <td colspan="9" class="exibir"><div align="center" class="exibir" onMouseMove="Hint('PA',2)" onMouseOut="Hint('PA',1)"><strong><cfoutput>#Result_Acum#</cfoutput></strong></div></td>

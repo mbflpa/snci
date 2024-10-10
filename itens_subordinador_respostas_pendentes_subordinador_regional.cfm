@@ -211,7 +211,7 @@
       <tr>
         <td height="20%" colspan="13"><div align="center"><span class="style5"><cfoutput>#sigla#</cfoutput></span></div></td>
       </tr><br>
-	   <tr><td colspan="13" align="center"> <button onClick="window.close()" class="botao">Fechar</button></td></tr>
+	   <tr><td colspan="13" align="center"><button onClick="window.close()" class="botao">Fechar</button></td></tr>
       <tr>
         <cfif isDefined("dtinicial") and isDefined("dtfinal") and dtinicial neq '' and dtfinal neq ''> 
               <td colspan="13"><div align="right"><a target="_blank"  href="itens_subordinador_respostas_pendentes_subordinador_regional_XLS.cfm?<cfoutput>ckTipo=#ckTipo#&dtinicial=#dtinicial#&dtfinal=#dtfinal#&frmResp=#frmResp#"</cfoutput>><img src="icones/excel.jpg" width="50" height="35" border="0"></a></div></td>

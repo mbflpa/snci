@@ -1,58 +1,24 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
-<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
-	SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
 
-	union
 
-	SELECT  pc_orgaos2.pc_org_mcu
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
 
-	union
-
-	select pc_orgaos.pc_org_mcu AS mcuHerdado
-	from pc_orgaos
-	LEFT JOIN pc_orgaos_heranca ON pc_orgHerancaMcuDe = pc_org_mcu
-	where pc_orgaos.pc_org_mcu_subord_tec in(SELECT  pc_orgaos2.pc_org_mcu
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
-</cfquery>
-
-<cfquery dbtype="query" name="rsHeranca"> 
-	SELECT mcuHerdado FROM rsHerancaUnion WHERE not mcuHerdado is null
-</cfquery>
-
-<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
 
 <cfquery name="rsProcAno" datasource="#application.dsn_processos#" timeout="120" >
 	SELECT distinct   right(pc_processos.pc_processo_id,4) as ano
-
 	FROM        pc_processos INNER JOIN
-				pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id INNER JOIN
-				pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu INNER JOIN
-				pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id INNER JOIN
-				pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu INNER JOIN
+				pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id LEFT JOIN
+				pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu LEFT JOIN
+				pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id LEFT JOIN
+				pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu LEFT JOIN
 				pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
 				LEFT JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
 				LEFT JOIN pc_avaliacao_posicionamentos on pc_aval_posic_num_orientacao = pc_aval_id
 				LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
-	WHERE NOT pc_num_status IN (2,3) 	
+				LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
+	WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)>=2024	
 	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
 		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
@@ -65,16 +31,43 @@
 		<!---Se o perfil for 7 - 'GESTOR' --->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
 			AND pc_orgaos.pc_org_se = 	#application.rsUsuarioParametros.pc_org_se#
-		</cfif>
+		</cfif>  
 	<cfelse>
 		<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-				AND  pc_aval_orientacao_status not in (9,12,14) and pc_num_status not in(6)
+			AND	pc_num_status not in(6)
 		<cfelse>
-			AND (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-			or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-			or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-			<cfif #mcusHeranca# neq ''>or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>)
+			AND pc_num_status not in(6)
+			AND (
+					pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					<cfif ListLen(application.orgaosHierarquiaList) GT 0>
+						OR pc_aval_orientacao_mcu_orgaoResp in (#application.orgaosHierarquiaList#)
+						OR pc_aval_melhoria_num_orgao in (#application.orgaosHierarquiaList#)
+						OR pc_aval_melhoria_sug_orgao_mcu in (#application.orgaosHierarquiaList#)
+						OR pc_processos.pc_num_orgao_avaliado in (#application.orgaosHierarquiaList#)
+					</cfif>
+				) 
+			<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
+			<cfif ListLen(application.orgaosHierarquiaList) GT 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
+					<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
+					and NOT (
+							pc_aval_orientacao_status not in (13)
+							AND pc_orgaos_2.pc_org_status IN ('O')
+						)
+					<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
+					and NOT (
+							pc_aval_orientacao_status = 13
+							AND pc_num_orgao_avaliado NOT IN (#application.orgaosHierarquiaList#)
+						)
+					and NOT (
+								pc_processos.pc_num_orgao_avaliado not in (#application.orgaosHierarquiaList#)
+								OR pc_aval_melhoria_num_orgao not in (#application.orgaosHierarquiaList#)
+								OR pc_aval_melhoria_sug_orgao_mcu  not in (#application.orgaosHierarquiaList#)
+							)
+			</cfif>
 		</cfif>  
 	</cfif>	
 	ORDER BY ano
@@ -107,20 +100,23 @@
 				border-radius: 5px!important;
 			}
 			div.dt-button-collection.fixed.three-column {
-				margin-left:-400!important;
-				width: 900px!important;
+				margin-left:-500px!important;
+				width: auto!important;
 				padding:10px!important;
+				
 			}
 			div.dt-button-collection.fixed.four-column {
-				margin-left:-400!important;
-				width: 1045px!important;
+				margin-left:-500px!important;
+				width: auto!important;
 				padding:10px!important;
 			}
 			.dropdown-item.active, .dropdown-item:active {
 				color: #fff;
-				text-decoration: none;
 				background-color: #2581c8!important;
-				border: 1px solid #fff!important;
+				
+			}
+			.dropdown-item {
+				font-size: 0.7rem!important;
 			}
 			
 			
@@ -231,10 +227,41 @@
 
 			$('#modalOverlay').modal('show');
 			let tipoConsulta = "";
-			if(tipo ==='p'){tipoConsulta ="tabConsultaExportarProcessos"};
-			if(tipo ==='i'){tipoConsulta ="tabConsultaExportarItens"};
-			if(tipo ==='o'){tipoConsulta ="tabConsultaExportarOrientacoes"};
-			if(tipo ==='m'){tipoConsulta ="tabConsultaExportarMelhorias"};
+			let tipoSelecao = "";
+			
+			if(tipo ==='p'){
+				tipoConsulta ="tabConsultaExportarProcessos"; 
+				if(ano === undefined){
+					tipoSelecao="PROCESSOS (não selecionou o ano)";
+				}else{
+					tipoSelecao="PROCESSOS de " + ano;
+				}
+			}
+
+			if(tipo ==='i'){
+				tipoConsulta ="tabConsultaExportarItens"
+				if(ano === undefined){
+					tipoSelecao="ITENS (não selecionou o ano)";
+				}else{
+					tipoSelecao="ITENS de " + ano;
+				}
+			};
+			if(tipo ==='o'){
+				tipoConsulta ="tabConsultaExportarOrientacoes";
+				if(ano === undefined){
+					tipoSelecao="ORIENTAÇÕES (não selecionou o ano)";
+				}else{
+					tipoSelecao="ORIENTAÇÕES de " + ano;
+				}
+			};
+			if(tipo ==='m'){
+				tipoConsulta ="tabConsultaExportarMelhorias";
+				if(ano === undefined){
+					tipoSelecao="PROPOSTAS DE MELHORIA (não selecionou o ano)";
+				}else{
+					tipoSelecao="PROPOSTAS DE MELHORIA de " + ano;
+				}
+			};
 			setTimeout(function() {
 				$.ajax({
 					type: "post",
@@ -245,8 +272,24 @@
 					},
 					async: false,
 					success: function(result) {
-						$('#exibirTabExportarDiv').html(result)		
+						let comDados = "";
+						try {
+							xmlDoc = $.parseXML(result);
+							var $xml = $(xmlDoc);
+							comDados = $xml.find("string").text();
+						} catch (e) {
+							comDados = 'S';
+						}
+						if(comDados=='N'){
+							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
+							});
+							$('#exibirTabExportarDiv').html('<h5 align="center" style="margin-top:50px">Nenhum registro foi localizado para os parâmetros informados: ' + tipoSelecao + '</h5>')
+							return;
+						}
+						$('#exibirTabExportarDiv').html(result)	
 						var table = $('#tabProcessos').DataTable();
+
   						if( tipoConsulta !=null && ano !=null ){
 							table.on('draw.dt', function() {		
 								$('#modalOverlay').delay(1000).hide(0, function() {

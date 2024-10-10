@@ -380,15 +380,19 @@ function listar(a,b,c,d){
 			WHERE Met_Codigo ='#se#' AND Met_Ano = #anoexerc# AND Met_Mes = #nCont#
 		</cfquery>	
 		<cfif rsCrMes.recordcount lte 0>		
+<!---			
 				<cfquery datasource="#dsn_inspecao#">
 				insert into Metas (Met_Codigo, Met_Ano, Met_Mes, Met_SE_STO, Met_PRCI, Met_PRCI_Mes, Met_SLNC, Met_DGCI,  Met_SLNC_Mes, Met_DGCI_Mes, Met_PRCI_Acum, Met_SLNC_Acum, Met_DGCI_Acum, Met_PRCI_AcumPeriodo, Met_SLNC_AcumPeriodo, Met_DGCI_AcumPeriodo) 
 				values ('#se#', #year(dtlimit)#, #nCont#, '#rsMetas.Met_SE_STO#', '#metprci#', '#metprci#', '0.0', '0.0',  '0.0', '0.0', '0.0', '0.0', '0.0', '0.0', '0.0', '0.0')
 				</cfquery>   
+--->				
 		</cfif>
+<!---		
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Metas SET Met_PRCI='#metprci#', Met_PRCI_Mes='#metprci#'
 			WHERE Met_Codigo = '#se#' and Met_Ano = #anoexerc# and Met_Mes = #nCont#
-		</cfquery>				
+		</cfquery>		
+--->				
 		<cfset nCont = nCont + 1>
 	</cfloop>
 </cfif>
@@ -469,11 +473,11 @@ function listar(a,b,c,d){
 					   <cfset AndtPrazo = 'FP'>
 					</cfif>		
 					
-					<!--- garantir a inclusão para PRCI --->
+					<!--- garantir a inclusão para PRCI 
 					<cfquery datasource="#dsn_inspecao#">
 						insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto)  
 						values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCIr2.Pos_Inspecao#', '#rsPRCIr2.Pos_Unidade#', #rsPRCIr2.Pos_NumGrupo#, #rsPRCIr2.Pos_NumItem#, #AndtDPosic#, '#AndtHPosic#', #auxsta#, #rsPRCIr2.Und_TipoUnidade#, 0, 0, '#rsPRCIr2.pos_username#', CONVERT(char, GETDATE(), 120), '#rsPRCIr2.Pos_Area#', '#rsPRCIr2.Pos_NomeArea#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCIr2.Pos_PontuacaoPonto#, '#rsPRCIr2.Pos_ClassificacaoPonto#')
-					</cfquery>
+					</cfquery>--->
 			</cfoutput> 
 <!--- fim rotina 2  --->			
 
@@ -499,10 +503,10 @@ function listar(a,b,c,d){
 					<cfset AndtPrazo = 'FP'>
 				</cfif>		
 					
-				<!--- garantir a inclusão para PRCI --->
+				<!--- garantir a inclusão para PRCI 
 				<cfquery datasource="#dsn_inspecao#">
 					insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto)  values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCIa.Pos_Inspecao#', '#rsPRCIa.Pos_Unidade#', #rsPRCIa.Pos_NumGrupo#, #rsPRCIa.Pos_NumItem#, #AndtDPosica#, '#AndtHPosica#', #auxsta#, #rsPRCIa.Und_TipoUnidade#, 0, 0, '#rsPRCIa.pos_username#', CONVERT(char, GETDATE(), 120), '#rsPRCIa.Pos_Area#', '#rsPRCIa.Pos_NomeArea#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCIa.Pos_PontuacaoPonto#, '#rsPRCIa.Pos_ClassificacaoPonto#')
-				</cfquery>
+				</cfquery>--->
 				<cfif auxsta neq 14 and day(#AndtDPosica#) gt 1>
 					<!--- FAZER BUSCAS POR outras possíveis ocorrências(PEND/TRAT) na andamento dentro do MêS/migração do mês anterior para PRCI --->
 					<!--- Apenas nos maiores que o dia primeiro do mês trabalhado --->
@@ -547,10 +551,12 @@ function listar(a,b,c,d){
 						</cfquery>	
 								
 						<cfif (rsExiste.recordcount lte 0) and (salvarSN eq 'S')>
+						<!---
 							<cfquery datasource="#dsn_inspecao#">
 								insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) 
 								values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCIa.Pos_Inspecao#', '#rsPRCIa.Pos_Unidade#', #rsPRCIa.Pos_NumGrupo#, #rsPRCIa.Pos_NumItem#, #AndtDPosicb#, '#AndtHPosicb#', #auxsta#, #rsPRCIa.Und_TipoUnidade#, 0, 0, '#rsPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsPENDTRAT.And_Area#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCIa.Pos_PontuacaoPonto#, '#rsPRCIa.Pos_ClassificacaoPonto#')
 							</cfquery> 
+						--->							
 						</cfif>
 					</cfif>						
 					<cfif dateformat(#AndtDPosicb#,"YYYYMMDD") lte dateformat(#dtini#,"YYYYMMDD")> 
@@ -624,9 +630,11 @@ function listar(a,b,c,d){
 							<cfset salvarSN = 'N'>
 						</cfif>
 						<cfif (rsExisteb.recordcount lte 0) and (salvarSN eq 'S')>
+<!---						
 							<cfquery datasource="#dsn_inspecao#">
 								insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsPRCI5.Pos_Inspecao#', '#rsPRCI5.Pos_Unidade#', #rsPRCI5.Pos_NumGrupo#, #rsPRCI5.Pos_NumItem#, #AndtDPosicc#, '#AndtHPosicc#', #auxsta#, #rsPRCI5.Und_TipoUnidade#, 0, 0, '#rsNRPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsNRPENDTRAT.And_Area#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsPRCI5.Pos_PontuacaoPonto#, '#rsPRCI5.Pos_ClassificacaoPonto#')
 							</cfquery> 
+--->							
 						</cfif>
 						<cfif dateformat(#AndtDPosicc#,"YYYYMMDD") lte dateformat(#dtini#,"YYYYMMDD")>
 							<cfset salvarSN = 'N'>				
@@ -649,6 +657,7 @@ function listar(a,b,c,d){
 				<cfset auxgrp = rsGRIT.Andt_Grp>
 				<cfset auxitm = rsGRIT.Andt_Item>
 				<cfif (auxgrp is 9 and auxitm is 9) or (auxgrp is 29 and auxitm is 4) or (auxgrp is 68 and auxitm is 3) or (auxgrp is 96 and auxitm is 3) or (auxgrp is 122 and auxitm is 3) or (auxgrp is 209 and auxitm is 3) or (auxgrp is 241 and auxitm is 3) or (auxgrp is 308 and auxitm is 3) or (auxgrp is 278 and auxitm is 2) or (auxgrp is 337 and auxitm is 2)>
+					<!---
 					<cfquery datasource="#dsn_inspecao#">
 					   UPDATE Andamento_Temp SET Andt_Prazo = 'EX'
 					   WHERE Andt_Unid='#rsGRIT.Andt_Unid#' AND 
@@ -656,6 +665,7 @@ function listar(a,b,c,d){
 					   Andt_Grp=#rsGRIT.Andt_Grp# AND 
 					   Andt_Item=#rsGRIT.Andt_Item#
 					</cfquery>	
+					--->
 	        	</cfif>
 			</cfoutput>			
 <!--- FIM ROTINA 5 ---> 
@@ -682,6 +692,7 @@ function listar(a,b,c,d){
 					Ars_Sigla Like '%/SCORG%')
 				</cfquery>
             	<cfif rsNegar.recordcount gt 0>
+<!---				
 					<cfquery datasource="#dsn_inspecao#">
 					   UPDATE Andamento_Temp SET Andt_Prazo = 'EX'
 					   WHERE Andt_Unid='#AndtArea.Andt_Unid#' AND 
@@ -689,6 +700,7 @@ function listar(a,b,c,d){
 					   Andt_Grp=#AndtArea.Andt_Grp# AND 
 					   Andt_Item=#AndtArea.Andt_Item#
 				 	</cfquery>	
+--->					
 				</cfif>			 	
 		</cfoutput>
 <!--- FIM ROTINA 6 ---> 
@@ -750,11 +762,12 @@ function listar(a,b,c,d){
 		</cfif>
        <cfset aux_mes = aux_mes + 1>
 </cfloop>
-<!--- EXCLUIR --->
+<!--- EXCLUIR 
 <cfquery datasource="#dsn_inspecao#">
    delete from Andamento_Temp 
    where Andt_Prazo = 'EX'
-</cfquery>  
+</cfquery> 
+ --->
 <!--- <cfoutput>dtlimit#dtlimit# dtini #dtini# dtfim #dtfim#</cfoutput>
 <cfset gil = gil> --->
 <!--- exibicao em tela --->
@@ -2337,9 +2350,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
    	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+	 <!---
 	   <cfquery datasource="#dsn_inspecao#">
 	   	UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 1
 	  </cfquery>
+	--->
    </cfif>  
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;JAN;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>
  </cfif>
@@ -2380,9 +2395,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
    	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>   
+	  <!---
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 2
 	  </cfquery>
+--->	  
    </cfif>    
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;FEV;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>
  </cfif>
@@ -2422,9 +2439,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
    	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>    
+<!---	  
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 3
 	  </cfquery>
+--->   
    </cfif>  	  
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;MAR;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>
  </cfif>
@@ -2464,9 +2483,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
   	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---	 
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 4
 	  </cfquery>
+--->	  
    </cfif>  	  
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;ABR;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>  
  </cfif> 
@@ -2506,9 +2527,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
  	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---	
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 5
 	  </cfquery>
+--->	  
    </cfif>  	  
     <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;MAI;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>
  </cfif>  
@@ -2548,9 +2571,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)> 
   	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---	 
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 6
 	  </cfquery>
+--->	  
    </cfif>  	  
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;JUN;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>  
  </cfif> 
@@ -2590,9 +2615,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
    	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>    
+<!---	  
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 7
 	  </cfquery>
+	  --->
    </cfif>  	  
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;JUL;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>  
  </cfif>
@@ -2632,9 +2659,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
   	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>    
+<!---	  
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 8
 	  </cfquery>
+--->	  
    </cfif>  	  
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;AGO;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>  
  </cfif>
@@ -2674,9 +2703,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
   	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>    
+<!---	 
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 9
 	  </cfquery>
+--->	  
    </cfif>  	  
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;SET;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>    
  </cfif> 
@@ -2716,9 +2747,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
   	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>    
+<!---	  
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 10
 	  </cfquery>
+--->	  
    </cfif>  	  
   
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;OUT;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>    
@@ -2759,9 +2792,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
   	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>  
+<!---	  
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 11
 	  </cfquery>
+--->
    </cfif>  	  
   
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;NOV;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>    
@@ -2802,9 +2837,11 @@ function listar(a,b,c,d){
    <cfset colB = colB + PerDP>
    <cfset metprciacumperiodo = NumberFormat((colB/auxultmes),999.0)>
   	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>  
+<!---	 
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_PRCI_Acum = '#PerDP#', met_prci_acumperiodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 12
 	  </cfquery>
+--->	  
    </cfif>    
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;DEZ;#TOTMES_DP#;#PerDP#;#TOTMES_FP#;#PerFP#;#(TOTMES_DP + TOTMES_FP)#;#metames#;#ResultMeta#;#resultado#'>    
  </cfif>    
@@ -2842,9 +2879,11 @@ function listar(a,b,c,d){
   </tr>
   <cfset metprciacumperiodo = NumberFormat((SomaDPAnual/SomaDPFPAnual)* 100,999.0)> 
 	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and day(now()) lte 10> 
+<!---		
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Metas SET Met_PRCI_AcumPeriodo = '#metprciacumperiodo#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = #auxultmes#
 		</cfquery>  
+--->		
 	</cfif>  
   <cffile action="Append" file="#slocal##sarquivo#" output='#auxsigl#;Geral;#totgerDP#;#PerDP#;#totgerFP#;#PerFP#;#TOTGER#;#metames#;#ResultMeta#;#resultado#'>
 

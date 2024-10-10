@@ -1,8 +1,7 @@
 <cfcomponent >
 <cfprocessingdirective pageencoding = "utf-8">
 
-	<!-- iCheck -->
-	<link rel="stylesheet" href="plugins/icheck-bootstrap/icheck-bootstrap.min.css">	
+	
 
 	
 	<cffunction name="FormCadFaq"   access="remote" hint="mostra form de cadastro do FAQ.">

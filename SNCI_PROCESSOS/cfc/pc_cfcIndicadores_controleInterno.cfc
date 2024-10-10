@@ -234,7 +234,7 @@
 									
 									<thead>
 										<tr style="font-size:14px">
-											<th colspan="12" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>#monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+											<th colspan="11" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>#monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
 										</tr>
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
@@ -543,7 +543,7 @@
 									
 									<thead>
 										<tr style="font-size:14px">
-											<th colspan="14" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>Janeiro a #monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+											<th colspan="13" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>Janeiro a #monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
 										</tr>
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>

@@ -1,4 +1,4 @@
-
+<cfprocessingdirective pageEncoding ="utf-8"/>
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
   SELECT Usu_GrupoAcesso, Usu_Lotacao, Und_TipoUnidade, Und_Descricao, Und_Centraliza FROM Usuarios INNER JOIN Unidades ON Usu_Lotacao = Und_Codigo WHERE Usu_Login = '#CGI.REMOTE_USER#' 
 </cfquery>
@@ -55,7 +55,7 @@
 				  </cfif>
 			</cfoutput>
 			<cfquery name="rsItem" datasource="#dsn_inspecao#">
-				SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, INP_DTFIMINSPECAO, INP_DTENCERRAMENTO, INP_TNCClassificacao, Pos_Unidade, INP_Responsavel, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_DtPosic, DATEDIFF(dd, Pos_DtPosic, GETDATE()) AS Quant, POS_DTPREV_SOLUCAO, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Itn_ValorDeclarado, Grp_Descricao, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area
+				SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, INP_DTFIMINSPECAO, INP_DTENCERRAMENTO, INP_TNCClassificacao, Pos_Unidade, INP_Responsavel, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_DtPosic, DATEDIFF(dd, Pos_DtPosic, GETDATE()) AS Quant, POS_DTPREV_SOLUCAO, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Itn_ValorDeclarado, Grp_Descricao, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area,Pos_DtPosic,Pos_DtPrev_Solucao
 				FROM ((Inspecao 
 				INNER JOIN (ParecerUnidade 
 				INNER JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo) 
@@ -70,7 +70,7 @@
 		   </cfquery>
 		<cfelse>
 		   <cfquery name="rsItem" datasource="#dsn_inspecao#">
-				SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, INP_TNCCLASSIFICACAO, Pos_Unidade, INP_Responsavel, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Itn_ValorDeclarado, Grp_Descricao, Itn_ValorDeclarado, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area
+				SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, INP_TNCCLASSIFICACAO, Pos_Unidade, INP_Responsavel, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Itn_ValorDeclarado, Grp_Descricao, Itn_ValorDeclarado, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area,Pos_DtPosic,Pos_DtPrev_Solucao
 				FROM ((Inspecao 
 				INNER JOIN (ParecerUnidade 
 				INNER JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo) 
@@ -86,7 +86,7 @@
 		</cfif>
 <cfelseif (qUsuario.Und_TipoUnidade eq 9 OR qUsuario.Und_TipoUnidade eq 30) and (AC_em_CDD_SN eq "S")>
 		<cfquery name="rsItem" datasource="#dsn_inspecao#">
-			SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, Pos_Unidade, INP_Responsavel, INP_TNCCLASSIFICACAO, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Itn_ValorDeclarado, Grp_Descricao, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area
+			SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, Pos_Unidade, INP_Responsavel, INP_TNCCLASSIFICACAO, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Itn_ValorDeclarado, Grp_Descricao, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area,Pos_DtPosic,Pos_DtPrev_Solucao
 			FROM ((Inspecao 
 			INNER JOIN (ParecerUnidade 
 			INNER JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo) 
@@ -102,7 +102,7 @@
 		</cfquery>
 <cfelseif (qUsuario.Und_TipoUnidade eq 9 OR qUsuario.Und_TipoUnidade eq 30) and (AC_em_CDD_SN eq "N")>
 		<cfquery name="rsItem" datasource="#dsn_inspecao#">
-			SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, Pos_Unidade, INP_Responsavel, INP_TNCCLASSIFICACAO, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Grp_Descricao, Itn_ValorDeclarado, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area
+			SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, Pos_Unidade, INP_Responsavel, INP_TNCCLASSIFICACAO, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Grp_Descricao, Itn_ValorDeclarado, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area,Pos_DtPosic,Pos_DtPrev_Solucao
 			FROM ((Inspecao 
 			INNER JOIN (ParecerUnidade 
 			INNER JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo) 
@@ -118,7 +118,7 @@
 		</cfquery>
 <cfelse>
 		<cfquery name="rsItem" datasource="#dsn_inspecao#">
-			SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, Pos_Unidade, INP_Responsavel, INP_TNCCLASSIFICACAO, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Grp_Descricao, Itn_ValorDeclarado, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area
+			SELECT DATEDIFF(dd,Pos_DtPosic,GETDATE()) as dias, INP_DtInicInspecao, Pos_Unidade, INP_Responsavel, INP_TNCCLASSIFICACAO, Und_Descricao, Pos_Inspecao, Pos_Parecer, Pos_NumGrupo, Pos_NumItem, Pos_dtultatu, Itn_Descricao, Grp_Descricao, Itn_ValorDeclarado, Pos_Situacao_Resp, STO_Codigo, STO_Sigla, STO_Cor, STO_Descricao, Pos_ClassificacaoPonto, Pos_Area,Pos_DtPosic,Pos_DtPrev_Solucao
 			FROM ((Inspecao 
 			INNER JOIN (ParecerUnidade 
 			INNER JOIN Situacao_Ponto ON Pos_Situacao_Resp = STO_Codigo) 
@@ -145,7 +145,7 @@
 	<table border="0">
 	<tr>
 	<td>
-	   N„o h· Ìtens pendentes para este RelatÛrio de AvaliaÁ„o de Controle Interno.
+	   N√£oo h√° √≠tens pendentes para este Relat√≥rio de Avalia√ß√£o de Controle Interno.
 	<br><br>
 
 	<input name="" value="fechar" type="button" onClick="self.close(); ">
@@ -180,7 +180,7 @@
 <cfset DtEncerramento = DateFormat(qVerificaData.INP_DtEncerramento,'DD/MM/YYYY')>
 
 
-<!--- VerificaÁ„o para acessar o relatorio de inspeÁ„o em diferentes perfis --->
+<!--- VerificaÔøΩÔøΩo para acessar o relatorio de inspeÔøΩÔøΩo em diferentes perfis --->
 
 <cfset Vacesse = 0>
 
@@ -284,30 +284,34 @@ function Hint(objNome, action){
 </script>
 <cfinclude template="cabecalho.cfm">
 
-<table width="90%" height="45%">
+<table width="98%" height="45%">
 
-<table width="90%" border="0" align="center">
+<table width="95%" border="0" align="center">
 
 	<br><br>
 <cfif form.rdCentraliz neq "S">
 	 <cfset Num_Insp = Left(rsItem.Pos_Inspecao,2) & '.' & Mid(rsItem.Pos_Inspecao,3,4) & '/' & Right(rsItem.Pos_Inspecao,4)>
 	<tr>
-	  <td bgcolor="eeeeee"><span class="titulos">N∫ RelatÛrio</span></td>
+	  <td bgcolor="eeeeee"><span class="titulos">N¬∫ Avalia√ß√£o</span></td>
 	  <td bgcolor="f7f7f7"><cfoutput><span class="titulosClaro">#Num_Insp#</span></cfoutput></td>
-	  <td bgcolor="eeeeee"><span class="titulos">InÌcio: <cfoutput><span class="titulosClaro">#DateFormat(rsItem.INP_DtInicInspecao,"dd/mm/yyyy")#</span></cfoutput></span></td>
-	  <td align="center" bgcolor="eeeeee" class="titulos"></td> 
-<!--- 	  <td align="center" bgcolor="eeeeee" class="titulos"></td> --->
+	  <td bgcolor="eeeeee"><span class="titulos">In√≠cio: <cfoutput><span class="titulosClaro">#DateFormat(rsItem.INP_DtInicInspecao,"dd/mm/yyyy")#</span></cfoutput></span></td>
+	  <td bgcolor="eeeeee"><span class="titulos"></span></td>
+	  <td bgcolor="eeeeee"><span class="titulos"></span></td>
+	  <td bgcolor="eeeeee"><span class="titulos"></span></td>
+	  <td bgcolor="eeeeee"><span class="titulos"></span></td>
 	  <td align="center" bgcolor="eeeeee" class="titulos">Imprimir</td>
 	</tr>
 	<tr>
 	  <td bgcolor="eeeeee"><span class="titulos">Unidade</span></td>
 	  <td bgcolor="f7f7f7"><cfoutput><span class="titulosClaro">#rsItem.Und_Descricao#</span></cfoutput></td>
-	  <td bgcolor="eeeeee"><span class="titulos">Respons·vel: <cfoutput><span class="titulosClaro">#rsItem.INP_Responsavel#</span></cfoutput></span></td>
- 	  <td align="center" bgcolor="eeeeee" class="titulos"></td>
-<!---	  <td align="center" bgcolor="eeeeee" class="titulos"></td> --->
-      <td align="center" bgcolor="f7f7f7">
+	  <td bgcolor="eeeeee"><span class="titulos">Respons√°vel: <cfoutput><span class="titulosClaro">#rsItem.INP_Responsavel#</span></cfoutput></span></td>
+	  <td bgcolor="eeeeee"><span class="titulos"></span></td>
+	  <td bgcolor="eeeeee"><span class="titulos"></span></td>
+	  <td bgcolor="eeeeee"><span class="titulos"></span></td>
+	  <td bgcolor="eeeeee"><span class="titulos"></span></td>
+	  <td align="center" bgcolor="f7f7f7">
 	    <form action="GeraRelatorio/gerador/dsp/relatorioHTML.cfm" name="frmHtml" method="post" target="_blank">
-	      <img src="icones/relatorio.jpg" height="48" alt="Visualizar relatÛrio em HTML" border="0" onClick="forms[0].submit()" onMouseOver="this.style.cursor='hand';" onMouseOut="this.style.cursor='pointer';">
+	      <img src="icones/relatorio.jpg" height="48" alt="Visualizar relat√≥rio em HTML" border="0" onClick="forms[0].submit()" onMouseOver="this.style.cursor='hand';" onMouseOut="this.style.cursor='pointer';">
 		  <input type="hidden" name="id" value="<cfoutput>#FORM.nu_inspecao#</cfoutput>">
 	    </form>
 	  </td>
@@ -320,14 +324,14 @@ function Hint(objNome, action){
 	    <span class="titulos">Inspetores</span>
 	  </cfif>
 	  </td>
-	  <td colspan="3" bgcolor="f7f7f7">
-	  <table width="500" border="0">
-	    <cfloop query="qInspetor">
-        <tr>
-          <td><strong class="titulosClaro">-&nbsp;<cfoutput>#qInspetor.Fun_Nome#</cfoutput></span></td>
-        </tr>
-		</cfloop>
-      </table>
+	  <td bgcolor="f7f7f7">
+		<table width="500" border="0">
+			<cfloop query="qInspetor">
+			<tr>
+			<td><strong class="titulosClaro">-&nbsp;<cfoutput>#qInspetor.Fun_Nome#</cfoutput></span></td>
+			</tr>
+			</cfloop>
+		</table>
 	  </td>
 	 </tr>
 
@@ -335,10 +339,11 @@ function Hint(objNome, action){
     <td width="5%" bgcolor="eeeeee" class="titulos" height="16"><div align="center">Status</div></td>
     <td width="3%" bgcolor="eeeeee" class="titulos"><div align="center">Grupo</div></td>
     <td width="4%" bgcolor="eeeeee" class="titulos"><div align="center">Item</div></td>
- 	<td width="4%" bgcolor="eeeeee" class="titulos"></td>
 	<td width="1%" bgcolor="eeeeee" class="titulos"></td>
-
-	<td width="3%" bgcolor="eeeeee" class="titulos" height="16"><div align="center">ClassificaÁ„o</div></td>
+	<td width="3%" align="center" bgcolor="eeeeee" class="exibir"><strong>Posi√ß√£o</strong></td>
+    <td width="4%" align="center" bgcolor="eeeeee" class="exibir"><strong>Prev_Solu√ß√£o</strong></td>
+	<td width="1%" bgcolor="eeeeee" class="titulos"></td>
+	<td width="3%" bgcolor="eeeeee" class="titulos" height="16"><div align="center">Classifica√ß√£o</div></td>
   </tr>
  <cfelse>
    <tr>
@@ -346,21 +351,22 @@ function Hint(objNome, action){
   </tr>
   <tr class="titulosClaro">
     <td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Status</div></td>
-	<td width="2%" bgcolor="eeeeee" class="exibir"><div align="center">PosiÁ„o</div></td>
-    <td width="3%" bgcolor="eeeeee" class="exibir"><div align="center">Previs„o</div></td>
-    <td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">InÌcio</div></td>
+	<td width="2%" bgcolor="eeeeee" class="exibir"><div align="center">Posi√ß√£o</div></td>
+    <td width="3%" bgcolor="eeeeee" class="exibir"><div align="center">Previs√£o</div></td>
+    <td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">In√≠cio</div></td>
     <td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Fim</div></td>
 	<td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Envio Ponto</div></td>
     <td width="12%" bgcolor="eeeeee" class="exibir"><div align="center">Nome da Unidade</div></td>
-    <td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">RelatÛrio</div></td>
+    <td width="5%" bgcolor="eeeeee" class="exibir"><div align="center">Relat√≥rio</div></td>
     <td width="17%" bgcolor="eeeeee" class="exibir"><div align="center">Grupo</div></td>
     <td width="20%" bgcolor="eeeeee" class="exibir"><div align="center">Item</div></td>
-	<td width="5%" bgcolor="eeeeee" class="titulos" height="16"><div align="center">ClassificaÁ„o</div></td>
+	<td width="5%" bgcolor="eeeeee" class="titulos" height="16"><div align="center">Classifica√ß√£o</div></td>
   </tr>
 </cfif>
   <cfset numlinhas = int(rsItem.recordCount)>
 
  <cfoutput query="rsItem"> 
+	<cfset auxtelaprev = DateFormat(rsItem.Pos_DtPrev_Solucao,'DD/MM/YYYY')>
 	<cfquery name="rsReincide" datasource="#dsn_inspecao#">
 		SELECT RIP_ReincInspecao, RIP_ReincGrupo, RIP_ReincItem 
 		FROM Resultado_Inspecao 
@@ -385,26 +391,25 @@ function Hint(objNome, action){
 
    <cfif form.rdCentraliz neq "S">
 	<tr bgcolor="f7f7f7" class="exibir" align="center">
-    	
 		<cfif btnSN eq 'N'>
-			<td width="5%" height="16" bgcolor="#STO_Cor#"><div align="center">
+			<td width="6%" height="16" bgcolor="#STO_Cor#"><div align="center">
 				<a href="itens_unidades_controle_respostas1.cfm?Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&Nitem=#rsItem.Pos_NumItem#&rdCentraliz=#form.rdCentraliz#&vlrdec=#rsItem.Itn_ValorDeclarado#&perdaprzsn=#btnSN#&posarea=#rsItem.Pos_Area#"  class="exibir" onMouseMove="Hint('#STO_Sigla#',2)" onMouseOut="Hint('#STO_Sigla#',1)"><strong>#trim(STO_Descricao)#</strong></a></div>
 			</td> 
 		<cfelse>
-			<td width="5%" height="16" bgcolor="A80643"><div align="center">
+			<td width="6%" height="16" bgcolor="A80643"><div align="center">
 				<a href="itens_unidades_controle_respostas1.cfm?Unid=#rsItem.Pos_Unidade#&Ninsp=#rsItem.Pos_Inspecao#&Ngrup=#rsItem.Pos_NumGrupo#&Nitem=#rsItem.Pos_NumItem#&rdCentraliz=#form.rdCentraliz#&vlrdec=#rsItem.Itn_ValorDeclarado#&perdaprzsn=#btnSN#&posarea=#rsItem.Pos_Area#"  class="exibir" onMouseMove="Hint('#STO_Sigla#',2)" onMouseOut="Hint('#STO_Sigla#',1)"><strong>PERDA PRAZO UNIDADE</strong></a></div>
 			</td> 
-			
 		</cfif>
 		<cfset numReincInsp = ''>
 		<cfif rsReincide.recordcount gt 0>
 		      <cfset numReincInsp = 'item REINCIDENTE (' & Left(rsReincide.RIP_ReincInspecao,2) & '.' & Mid(rsReincide.RIP_ReincInspecao,3,4) & '/' & Right(rsReincide.RIP_ReincInspecao,4) & ')'>
 		</cfif>
-		<td width="25%" height="16"><div align="left"><strong>#rsItem.Pos_NumGrupo#</strong> - #rsItem.Grp_Descricao#</div></td>
-        <td width="35%" height="16"><div align="left"><strong>#rsItem.Pos_NumItem#</strong> - &nbsp;#rsItem.Itn_Descricao#</div><td>
+		<td width="15%" height="16"><div align="left"><strong>#rsItem.Pos_NumGrupo#</strong> - #rsItem.Grp_Descricao#</div></td>
+        <td width="25%" height="16"><div align="left"><strong>#rsItem.Pos_NumItem#</strong> - &nbsp;#rsItem.Itn_Descricao#</div><td>
+		<cfset auxtela = DateFormat(rsItem.Pos_DtPosic,'DD/MM/YYYY')>
+		<td width="3%"><div align="center">#auxtela#</div></td>
+		<td width="3%"><div align="center">#auxtelaprev#</div></td>
 		<td width="11%" class="red_titulo">#numReincInsp#</td>
-		
-	 <!--- 	<td height="16"><div align="left">##</div><td>  --->
 		<cfset auxs = rsItem.Pos_ClassificacaoPonto>
 	    <td width="3%" height="16"><div align="center"><div align="center">#auxs#</div></td>
     </tr> 
@@ -422,8 +427,8 @@ function Hint(objNome, action){
 		</cfif>
       <cfset auxtela = DateFormat(rsItem.Pos_DtPosic,'DD/MM/YYYY')>
 	  <td width="5%"><div align="center">#auxtela#</div></td>
-	  <cfset auxtela = DateFormat(rsItem.Pos_DtPrev_Solucao,'DD/MM/YYYY')>
-	  <td width="5%"><div align="center">#auxtela#</div></td>
+	  <!--- <cfset auxtela = DateFormat(rsItem.Pos_DtPrev_Solucao,'DD/MM/YYYY')> --->
+	  <td width="5%"><div align="center">#auxtelaprev#</div></td>
 	  <cfset auxtela = DateFormat(rsItem.INP_DtInicInspecao,'DD/MM/YYYY')>
       <td width="5%"><div align="center">#auxtela#</div></td>
 	  <cfset auxtela = DateFormat(rsItem.INP_DtFimInspecao,'DD/MM/YYYY')>
@@ -436,7 +441,7 @@ function Hint(objNome, action){
       <td width="17%"><div align="center"><strong>#rsItem.Pos_NumGrupo#</strong> - #rsItem.Grp_Descricao#</div></td>
       <td width="20%"><div align="justify"><strong>#rsItem.Pos_NumItem#</strong> - &nbsp;#rsItem.Itn_Descricao#</div></td>
 	  <cfset auxs = rsItem.Pos_ClassificacaoPonto>
-	    <td width="4%"><div align="center"><div align="center">#auxs#</div></td>
+	  <td width="4%"><div align="center"><div align="center">#auxs#</div></td>
 	 <!--- </tr> --->
 	</cfif>
 
@@ -445,19 +450,19 @@ function Hint(objNome, action){
 </cfoutput>
 </table>
 
-<!--- Fim aÅrea de conteudo --->
+<!--- Fim aÔøΩrea de conteudo --->
 	  </td>
   </tr>
 </table>
 <table width="90%" border="0" align="center">
 
 	<tr>
-		<td colspan="5" class="titulos"><div align="center">Quantidade de pontos do Relat&oacute;rio de Avalia&ccedil;&atilde;o de Controle Interno com SituaÁ„o Encontrada: <font class="red_titulo"><cfoutput>#numlinhas#</cfoutput></font></div></td>
+		<td colspan="5" class="titulos"><div align="center">Quantidade de pontos do Relat√≥rio de Avalia√ß√£o de Controle Interno com Situa√ß√£o Encontrada: <font class="red_titulo"><cfoutput>#numlinhas#</cfoutput></font></div></td>
 	</tr>
 <!---           <tr>
             <td colspan="4"><div align="center"><span class="exibir">Classifica&ccedil;&atilde;o da Unidade:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="exibir"><strong><cfoutput>#rsItem.INP_TNCClassificacao#</cfoutput></strong></span></div></td>
           </tr>	 --->
-	<!--- Fim da ClassificaÁ„o --->
+	<!--- Fim da ClassificaÔøΩÔøΩo --->
   <tr><td width="72">&nbsp;</td></tr>
    <tr class="exibir" align="center">
        <td height="26" colspan="5" align="center"><input type="button" class="botao"  onClick="voltar()" value="Voltar"></td>
@@ -467,4 +472,7 @@ function Hint(objNome, action){
     </form>
 </body>
 </html>
+
+
+
 

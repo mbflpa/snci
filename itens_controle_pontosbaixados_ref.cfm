@@ -18,6 +18,10 @@
 
 <cfset grpacesso = ucase(Trim(qUsu.Usu_GrupoAcesso))>
 
+<cfif len(trim(qUsu.Usu_email)) lte 0>
+	<cflocation url="Alterar_permissao_rotinas_inspecao.cfm?svolta=index.cfm?opcao=inspecao2"> 
+ </cfif>
+
 <cfif grpacesso neq 'GESTORMASTER' and grpacesso neq 'GOVERNANCA'>
 	<cfquery name="qSE" datasource="#dsn_inspecao#">
 		SELECT distinct Dir_Codigo, Dir_Sigla
@@ -35,24 +39,19 @@
 </cfif>
 
 <!--- =========================== --->
-<cfif grpacesso neq 'GESTORMASTER' and grpacesso neq 'GOVERNANCA'>
-	<cfquery name="rsStatus" datasource="#dsn_inspecao#">
-	  SELECT STO_Codigo, STO_Sigla, STO_Descricao
-	  FROM Situacao_Ponto where STO_Status = 'A' and 
-	  <cfif trim(qUsu.Usu_GrupoAcesso) eq 'GOVERNANCA'>
-	  	(STO_Codigo in (3,24,25,26,27,29,31)) 
-	  <cfelse>
-	  	(STO_Codigo in (3,12,13,24,25,26,27,29,31))
-	  </cfif>
-	  order by Sto_Sigla
-	</cfquery>
-<cfelse>
-	<cfquery name="rsStatus" datasource="#dsn_inspecao#">
-	  SELECT STO_Codigo, STO_Sigla, STO_Descricao
-	  FROM Situacao_Ponto where (STO_Status = 'A') and (STO_Codigo in (3,9,12,13,24,25,26,27,29,31)) order by Sto_Sigla
-	</cfquery>
+<cfset auxsit = '3,12,13,24,25,26,27,29,31'>
+<cfif ucase(trim(qUsu.Usu_GrupoAcesso)) eq 'GOVERNANCA'>
+	<cfset auxsit = '3,24,25,26,27,29,31'>
 </cfif>
-
+<cfquery name="rsStatus" datasource="#dsn_inspecao#">
+	SELECT STO_Codigo, STO_Sigla, STO_Descricao
+	FROM Situacao_Ponto 
+	where STO_Codigo in (<cfoutput>#auxsit#</cfoutput>)
+	<cfif grpacesso eq 'GESTORMASTER'>
+	  or STO_Codigo = 9
+	</cfif>
+	order by Sto_Sigla
+  </cfquery>
 <!--- =========================== --->
 <html>
 <head>

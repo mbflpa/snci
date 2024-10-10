@@ -89,7 +89,7 @@
 	<cfif '#grpacesso#' eq "INSPETORES">
 		<!---AO ENTRAR NO ITEM, SE AINDA NÃO TIVER SIDO AVALIADO, SALVA NA TELA RESULTADO_INSPECAO A MATRÍCULA DO AVALIADOR. AO SAIR SEM AVALIAR, ENTRADO NA TELA ANTERIOR--->
 		<cfquery datasource="#dsn_inspecao#">
-			UPDATE Resultado_Inspecao SET RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#' 
+			UPDATE Resultado_Inspecao SET RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#', RIP_Data_Avaliador = CONVERT(char, GETDATE(), 120)
 			where  (rtrim(ltrim(RIP_MatricAvaliador)) is null or rtrim(ltrim(RIP_MatricAvaliador)) ='') and RIP_NumInspecao='#ninsp#'  and RIP_NumGrupo = '#ngrup#' and RIP_NumItem ='#nitem#' and RIP_Resposta ='A'
 		</cfquery>
 	
@@ -161,6 +161,11 @@
 				<cfset auxfrmsobra = Replace(FORM.frmsobra,'.','','All')>
 				<cfset auxfrmsobra = Replace(auxfrmsobra,',','.','All')>
 			</cfif> 
+			<cfset auxpbfimor = Replace(FORM.pbfimor,'.','','All')>
+			<cfset auxpbfimor = Replace(auxpbfimor,',','.','All')>
+			<cfset auxecfmor = Replace(FORM.ecfmor,'.','','All')>
+			<cfset auxecfmor = Replace(auxecfmor,',','.','All')>	
+
 			<cfset RIPReincInspecao = ''>
 			<cfset RIPReincGrupo = 0>
 			<cfset RIPReincItem = 0>
@@ -176,11 +181,18 @@
 				RIP_Falta= #auxfrmfalta#,
 				RIP_Sobra=#auxfrmsobra#,
 				RIP_EmRisco=#auxfrmemrisco#,
+				RIP_PotencialBeneficioFinanceiro = #auxpbfimor#,
+				RIP_EstimativaCustoFinanceiro = #auxecfmor#,
 				RIP_ReincInspecao = '#RIPReincInspecao#',
 				RIP_ReincGrupo = #RIPReincGrupo#,
 				RIP_ReincItem = #RIPReincItem#,
 				RIP_UserName = '#CGI.REMOTE_USER#',
-				RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#',
+				<cfif #FORM.RIPRecomendacaoInspetor# eq ''>
+					RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#',
+					RIP_Data_Avaliador = CONVERT(char, GETDATE(), 120),
+				<cfelse>
+					RIP_Matricula_Reanalise = '#qAcesso.Usu_Matricula#',
+				</cfif>
 				RIP_DtUltAtu = CONVERT(char, GETDATE(), 120),
 				RIP_Resposta ='#FORM.avalItem#'									
 		  		WHERE 
@@ -234,6 +246,12 @@
 				<cfset auxfrmemrisco = Replace(FORM.frmemrisco,'.','','All')>
 				<cfset auxfrmemrisco = Replace(auxfrmemrisco,',','.','All')>
 			</cfif> 
+
+			<cfset auxpbfimor = Replace(FORM.pbfimor,'.','','All')>
+			<cfset auxpbfimor = Replace(auxpbfimor,',','.','All')>
+			<cfset auxecfmor = Replace(FORM.ecfmor,'.','','All')>
+			<cfset auxecfmor = Replace(auxecfmor,',','.','All')>	
+			
 			<cfset RIPReincInspecao = ''>
 			<cfset RIPReincGrupo = 0>
 			<cfset RIPReincItem = 0>
@@ -250,10 +268,17 @@
 				RIP_Sobra=#auxfrmsobra#,
 				RIP_EmRisco=#auxfrmemrisco#,
 				RIP_ReincInspecao = '#RIPReincInspecao#',
+				RIP_PotencialBeneficioFinanceiro = #auxpbfimor#,
+				RIP_EstimativaCustoFinanceiro = #auxecfmor#,
 				RIP_ReincGrupo = #RIPReincGrupo#,
 				RIP_ReincItem = #RIPReincItem#,
 				RIP_UserName = '#CGI.REMOTE_USER#',
-				RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#',
+				<cfif #FORM.RIPRecomendacaoInspetor# eq ''>
+					RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#',
+					RIP_Data_Avaliador = CONVERT(char, GETDATE(), 120),
+				<cfelse>
+					RIP_Matricula_Reanalise = '#qAcesso.Usu_Matricula#',
+				</cfif>
 				RIP_DtUltAtu = CONVERT(char, GETDATE(), 120),
 				RIP_Resposta ='#FORM.avalItem#'									
 		  		WHERE 
@@ -297,9 +322,17 @@
 			<cfset auxfrmemrisco = Replace(FORM.frmemrisco,'.','','All')>
 			<cfset auxfrmemrisco = Replace(auxfrmemrisco,',','.','All')>
 		</cfif>	
-		, RIP_Falta= #auxfrmfalta#
+		, RIP_Falta=#auxfrmfalta#
 		, RIP_Sobra=#auxfrmsobra#
 		, RIP_EmRisco=#auxfrmemrisco#
+
+		<cfset auxpbfimor = Replace(FORM.pbfimor,'.','','All')>
+		<cfset auxpbfimor = Replace(auxpbfimor,',','.','All')>
+		<cfset auxecfmor = Replace(FORM.ecfmor,'.','','All')>
+		<cfset auxecfmor = Replace(auxecfmor,',','.','All')>	
+
+		,RIP_PotencialBeneficioFinanceiro = #auxpbfimor#
+		,RIP_EstimativaCustoFinanceiro = #auxecfmor#
 
 		<cfif FORM.avalItem eq 'N' and IsDefined("FORM.frmreincInsp") and form.frmrsIncidencia neq 0>
 			, RIP_ReincInspecao = '#FORM.frmreincInsp#'
@@ -310,8 +343,13 @@
 			, RIP_ReincGrupo = 0
 			, RIP_ReincItem = 0	 
 		</cfif>
-			, RIP_UserName = '#CGI.REMOTE_USER#'
-			, RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
+			, RIP_UserName = '#CGI.REMOTE_USER#'					
+			<cfif #FORM.RIPRecomendacaoInspetor# eq ''>
+				, RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
+				, RIP_Data_Avaliador = CONVERT(char, GETDATE(), 120)
+			<cfelse>
+				, RIP_Matricula_Reanalise = '#qAcesso.Usu_Matricula#'
+			</cfif>			
 			, RIP_DtUltAtu = CONVERT(char, GETDATE(), 120)
 			, RIP_Resposta ='#FORM.avalItem#'
 		<cfquery name="qRecomendacao" datasource="#dsn_inspecao#">
@@ -427,16 +465,15 @@
 			    
 		   </cfif>
       <!--- 	Fim da rotina que abre o form de inclusão de resposta ao gestor	 --->
-          
 		<cfquery datasource="#dsn_inspecao#" name="rsVerificaAvaliador">
-			SELECT RIP_MatricAvaliador, RIP_Resposta, RIP_Falta, RIP_Sobra, RIP_EmRisco RIP_REINCINSPECAO FROM Resultado_Inspecao 
+			SELECT RIP_MatricAvaliador,RIP_Resposta,RIP_Falta,RIP_Sobra,RIP_EmRisco,RIP_REINCINSPECAO,RIP_PotencialBeneficioFinanceiro,RIP_EstimativaCustoFinanceiro FROM Resultado_Inspecao 
 			WHERE  (RIP_MatricAvaliador !='' or RIP_MatricAvaliador is not null) and RIP_NumInspecao='#FORM.Ninsp#' 
 			And RIP_NumGrupo = '#FORM.Ngrup#' and RIP_NumItem ='#FORM.Nitem#' 
 		</cfquery>
 
 		<!--- Verifica se o item era uma reanálise e foi reanalisado--->
 		<cfquery name="qRecomendacao" datasource="#dsn_inspecao#">
-	        SELECT RIP_Recomendacao, RIP_Falta
+	        SELECT RIP_Recomendacao, RIP_Falta,RIP_Sobra,RIP_EmRisco,RIP_REINCINSPECAO,RIP_PotencialBeneficioFinanceiro,RIP_EstimativaCustoFinanceiro
 			FROM Resultado_Inspecao 
 			WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_NumItem=#FORM.nitem#
         </cfquery>
@@ -699,8 +736,7 @@
 <title>Sistema Nacional de Controle Interno</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
-
+<script type="text/javascript" src="public\jquery-3.2.1.min.js"></script>
 <script type="text/javascript">
  <cfinclude template="mm_menu.js"> 
 
@@ -719,7 +755,38 @@
 			abrirPopup('itens_controle_revisliber_reanalise.cfm?<cfoutput>ninsp=#url.ninsp#&unid=#url.unid#&ngrup=#url.ngrup#&nitem=#url.nitem#&tpunid=#rsVerificaStatus.Und_TipoUnidade#&modal=#modal#</cfoutput>',800,600)
 		}
    }   
+   function naoseaplica(a,b){
+		
+		if (b == 'cd_frmemrisco') { 
+			if (document.form1.cd_frmemrisco.checked) {
+				document.form1.frmemrisco.value = '0,00';
+			} else {
+				document.form1.frmemrisco.value = a;
+			}
+		}		
+		if (b == 'cd_frmsobra') { 
+			if (document.form1.cd_frmsobra.checked) {
+				document.form1.frmsobra.value = '0,00';
+			} else {
+				document.form1.frmsobra.value = a;
+			}
+		}
 
+		if (b == 'cb_pbfimor') { 
+			if (document.form1.cb_pbfimor.checked) {
+				document.form1.pbfimor.value = '0,00';
+			} else {
+				document.form1.pbfimor.value = a;
+			}
+		}
+		if (b == 'cb_ecfmor') { 
+			if (document.form1.cb_ecfmor.checked) {
+				document.form1.ecfmor.value = '0,00';
+			} else {
+				document.form1.ecfmor.value = a;
+			}
+		}	
+	}
 	//simula maximização redimencionando a página para tamanho da tela.
 	top.window.moveTo(0,0);
 	if (document.all)
@@ -1118,13 +1185,13 @@ function avisoreincidencia(a,b,c,d,e,f){
 //alert(a + ' ' + b + ' ' + c + ' ' + d);
   var g = b.substring(0,2) + '.' + b.substring(2,6) + '/' + b.substring(6,10)
 
-  if (a == 'C' && d == 'S') {var texto = 'Sr(a). Inspetor(a),\n\nCom base na informação prestada, o item avaliado será reconduzido para CONFORME, tendo em vista que a situação identificada encontra-se em fase de regularização (item ' + e + '.' + f + ' - Relatório: ' + g + ').\nAo salvar o relato as informações sobre conformidade serão automaticamente registradas.';
+  if (a == 'C' && d == 'S') {var texto = 'Sr(a). Inspetor(a),\n\nCom base na informação prestada, o item avaliado será reconduzido para CONFORME, tendo em vista que a situação identificada encontra-se em fase de regularização (item ' + e + '.' + f + ' - Relatório: ' + g + ').\Não salvar o relato as informações sobre conformidade serão automaticamente registradas.';
  // alert(texto);
  // document.form1.avalItem.selectedIndex = 1;
   AvaliacaoOnChangeModelos('C');
   }
   
- if (a == 'N' && d == 'S' && c != 'SOLUCIONADO' && c != 'ENCERRADO') {var texto = 'Sr(a). Inspetor(a),\n\nCom base nas informações prestadas, o item avaliado será mantido como NÃO CONFORME com o agravante de REINCIDÊNCIA(item ' + e + '.' + f + ' - Relatório: ' + g + ').\nAo salvar o relato da Não Conformidade identificada, as informações de Reincidência serão automaticamente registradas.';
+ if (a == 'N' && d == 'S' && c != 'SOLUCIONADO' && c != 'ENCERRADO') {var texto = 'Sr(a). Inspetor(a),\n\nCom base nas informações prestadas, o item avaliado será mantido como NÃO CONFORME com o agravante de REINCIDÊNCIA(item ' + e + '.' + f + ' - Relatório: ' + g + ').\Não salvar o relato da Não Conformidade identificada, as informações de Reincidência serão automaticamente registradas.';
 // alert(texto);
 // document.form1.avalItem.selectedIndex = 0;
  AvaliacaoOnChangeModelos('N');
@@ -1281,7 +1348,51 @@ function validarform(){
 			document.getElementById("aguarde").style.visibility = "hidden";
 			return false;
 		}
-//alert('Linha 1077');		
+//alert('Linha 1077');	
+// críticas dos novos campos pontencial e estimativa
+		if ((frm.pbfimor.value == '0,00' || frm.pbfimor.value == '') && frm.avalItem.value =='N'){
+			if(frm.cb_pbfimor.checked){
+			}else{
+				msg='Sr(a) Inspetor(a), informar valor no campo Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização: ';
+				alert(msg);
+				frm.pbfimor.focus();
+				document.getElementById("aguarde").style.visibility = "hidden";
+				return false;
+			}
+		} 
+		if ((frm.ecfmor.value == '0,00' || frm.ecfmor.value == '') && frm.avalItem.value =='N'){		
+			if(frm.cb_ecfmor.checked){
+			}else{
+				msg='Sr(a) Inspetor(a), informar valor no campo Estimativa Do Custo Financeiro Da Medida/Orientação Para Regularização:  ';
+				alert(msg);
+				frm.ecfmor.focus();
+				document.getElementById("aguarde").style.visibility = "hidden";
+				return false;
+			}
+		} 		
+/*
+// com jquery nao funciona no IE
+if(($('#pbfimor').val() == '0,00' || $('#pbfimor').val() == '')){
+	if ($('#cb_pbfimor').is (':checked')) {
+	} else {
+		msg='Sr(a) Inspetor(a), informar valor no campo Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização: ';
+		alert(msg);
+		document.getElementById("aguarde").style.visibility = "hidden";
+		frm.pbfimor.focus();
+		return false;
+	}
+ }
+ if(($('#ecfmor').val() == '0,00' || $('#ecfmor').val() == '')){
+	if ($('#cb_ecfmor').is (':checked')) {
+	} else {
+		msg='Sr(a) Inspetor(a), informar valor no campo Estimativa Do Custo Financeiro Da Medida/Orientação Para Regularização:  ';
+		alert(msg);
+		document.getElementById("aguarde").style.visibility = "hidden";
+		frm.ecfmor.focus();
+		return false;
+	}
+ }
+*/
 //====  Ponto possui impacto financeiro ==========================
 		var impactofinSN = frm.frmimpactofin.value;
 
@@ -1297,74 +1408,162 @@ function validarform(){
 			
 			if (impactoF == 'F' || impactoS == 'S' || impactoR ==  'R') 
 			{
-				if (impactoF == 'F' && impactoS == 'S' && impactoR ==  'R') 
+				if (impactoF == 'F' && impactoS == 'S' && impactoR ==  'R') //ok
 				{
 					if (vlrfalta == '0,00' && vlrsobra == '0,00' && vlremrisco ==  '0,00') 
 					{
-						alert ('Sr(a) Inspetor(a), informar valores para Falta(R$) ou Sobra(R$) ou Em Risco(R$)');
+						if(frm.cd_frmsobra.checked && frm.cd_frmemrisco.checked){
+							msg='Sr(a) Inspetor(a), informar valor no campo Estimado a Recuperar(R$)';
+						} else if (frm.cd_frmemrisco.checked) {
+							msg = 'Sr(a) Inspetor(a), informar valores no campo Estimado a Recuperar(R$) e Estimado Não Planejado/Extrapolado/Sobra:(R$)';
+						} else {
+							msg ='Sr(a) Inspetor(a), informar valores no campo Estimado a Recuperar(R$) e Estimado em Risco ou Envolvido(R$)';
+						}
+						alert(msg);
+						document.getElementById("aguarde").style.visibility = "hidden";
+						frm.frmfalta.focus();
+						return false;						
+/*						
+						if($('#cd_frmsobra').is(':checked') && $('#cd_frmemrisco').is(':checked')){
+							msg='Sr(a) Inspetor(a), informar valor no campo Estimado a Recuperar(R$)';
+						} else if ($('#cd_frmemrisco').is(':checked')) {
+							msg = 'Sr(a) Inspetor(a), informar valores no campo Estimado a Recuperar(R$) e Estimado Não Planejado/Extrapolado/Sobra:(R$)';
+						} else {
+							msg ='Sr(a) Inspetor(a), informar valores no campo Estimado a Recuperar(R$) e Estimado em Risco ou Envolvido(R$)';
+						}
+						alert(msg);
 						document.getElementById("aguarde").style.visibility = "hidden";
 						frm.frmfalta.focus();
 						return false;
+*/						
 					}
 				}
-				if (impactoF == 'F' && impactoS == 'S' && impactoR ==  'N') 
+				if (impactoF == 'F' && impactoS == 'S' && impactoR ==  'N') //ok
 				{
 					if (vlrfalta == '0,00' && vlrsobra == '0,00') 
 					{
-						alert ('Sr(a) Inspetor(a), informar valores para Falta(R$) ou Sobra(R$)');
+						msg = 'Sr(a) Inspetor(a), informar valores no campo Estimado a Recuperar(R$) e Estimado Não Planejado/Extrapolado/Sobra:(R$)';
+						if(frm.cd_frmsobra.checked){
+							msg='Sr(a) Inspetor(a), informar valor no campo Estimado a Recuperar(R$)';
+						}
+						alert(msg);
+						document.getElementById("aguarde").style.visibility = "hidden";
+						frm.frmfalta.focus();
+						return false;						
+/*						if($('#cd_frmsobra').is(':checked')){
+							msg='Sr(a) Inspetor(a), informar valor no campo Estimado a Recuperar(R$)';
+						}
+						alert(msg);
 						document.getElementById("aguarde").style.visibility = "hidden";
 						frm.frmfalta.focus();
 						return false;
+*/	
 					}
 				}
-				if (impactoF == 'F' && impactoR == 'R' && impactoS == 'N') 
+				if (impactoF == 'F' && impactoR == 'R' && impactoS == 'N') //ok
 				{
 					if (vlrfalta == '0,00' && vlremrisco == '0,00') 
 					{
-						alert ('Sr(a) Inspetor(a), informar valores para Falta(R$) ou Em Risco(R$)');
+						msg ='Sr(a) Inspetor(a), informar valores no campo Estimado a Recuperar(R$) e Estimado em Risco ou Envolvido(R$)';
+						if(frm.cd_frmemrisco.checked){
+							msg='Sr(a) Inspetor(a), informar valor no campo Estimado a Recuperar(R$)';
+						}
+						alert(msg);
 						document.getElementById("aguarde").style.visibility = "hidden";
 						frm.frmfalta.focus();
 						return false;
+/*
+						if($('#cd_frmemrisco').is(':checked')){
+							msg='Sr(a) Inspetor(a), informar valor no campo Estimado a Recuperar(R$)';
+						}
+						alert(msg);
+						document.getElementById("aguarde").style.visibility = "hidden";
+						frm.frmfalta.focus();
+						return false;
+*/
 					}
 				}
-				if (impactoS == 'S' && impactoR ==  'R' && impactoF == 'N') 
+
+				if (impactoS == 'S' && impactoR ==  'R' && impactoF == 'N') //ok
 				{
 					if (vlrsobra == '0,00' && vlremrisco == '0,00') 
 					{
-						alert ('Sr(a) Inspetor(a), informar valores para  Sobra(R$) ou Em Risco(R$)');
-						document.getElementById("aguarde").style.visibility = "hidden";
-						frm.frmsobra.focus();
-						return false;
+						msg ='Sr(a) Inspetor(a), informar valores no campo Estimado Não Planejado/Extrapolado/Sobra:(R$) e Estimado em Risco ou Envolvido(R$)';
+						if(frm.cd_frmsobra.checked && frm.cd_frmemrisco.checked){
+							msg='Sr(a) Inspetor(a), informar valor no campo Estimado a Recuperar(R$)';
+						} else {
+							alert (msg);
+							document.getElementById("aguarde").style.visibility = "hidden";
+							frm.frmsobra.focus();
+							return false;
+						}
+/*
+						if($('#cd_frmsobra').is(':checked') && $('#cd_frmemrisco').is(':checked')){
+							msg='Sr(a) Inspetor(a), informar valor no campo Estimado a Recuperar(R$)';
+						} else {
+							alert (msg);
+							document.getElementById("aguarde").style.visibility = "hidden";
+							frm.frmsobra.focus();
+							return false;
+						}
+*/
 					}
 				}
-				if (impactoF == 'F' && impactoS == 'N' && impactoR ==  'N') 
+				if (impactoF == 'F' && impactoS == 'N' && impactoR ==  'N') //ok
 				{
 					if (vlrfalta == '0,00') 
 					{
-						alert ('Sr(a) Inspetor(a), informar valor para Falta(R$)');
+						alert ('Sr(a) Inspetor(a), informar valor no campo Estimado a Recuperar(R$)');
 						document.getElementById("aguarde").style.visibility = "hidden";
 						frm.frmfalta.focus();
 						return false;
 					}
 				}
-				if (impactoS == 'S' && impactoF == 'N' && impactoR ==  'N') 
+				if (impactoS == 'S' && impactoF == 'N' && impactoR ==  'N') //ok
 				{
 					if (vlrsobra == '0,00') 
 					{
-						alert ('Sr(a) Inspetor(a), informar valor para Sobra(R$)');
-						document.getElementById("aguarde").style.visibility = "hidden";
-						frm.frmsobra.focus();
-						return false;
+						msg ='Sr(a) Inspetor(a), informar valores no campo Estimado Não Planejado/Extrapolado/Sobra:(R$)';
+						if(frm.cd_frmsobra.checked){
+						} else {
+							alert (msg);
+							document.getElementById("aguarde").style.visibility = "hidden";
+							frm.frmsobra.focus();
+							return false;
+						}
+
+/*
+						if($('#cd_frmsobra').is(':checked')){
+						} else {
+							alert (msg);
+							document.getElementById("aguarde").style.visibility = "hidden";
+							frm.frmsobra.focus();
+							return false;
+						}
+*/
 					}
 				}
-				if (impactoR == 'R' && impactoS == 'N' && impactoF == 'N') 
+				if (impactoR == 'R' && impactoS == 'N' && impactoF == 'N') //ok
 				{
 					if (vlremrisco == '0,00') 
 					{
-						alert ('Sr(a) Inspetor(a), informar valor para Em Risco(R$)');
-						document.getElementById("aguarde").style.visibility = "hidden";
-						frm.frmemrisco.focus();
-						return false;
+						msg ='Sr(a) Inspetor(a), informar valores no campo Estimado em Risco ou Envolvido(R$)';
+						if(frm.cd_frmemrisco.checked){
+						} else {
+							alert (msg);
+							document.getElementById("aguarde").style.visibility = "hidden";
+							frm.frmemrisco.focus();
+							return false;
+						}						
+/*						
+						if($('#cd_frmemrisco').is(':checked')){
+						} else {
+							alert (msg);
+							document.getElementById("aguarde").style.visibility = "hidden";
+							frm.frmemrisco.focus();
+							return false;
+						}
+*/
 					}
 				}								
 			}
@@ -1544,6 +1743,7 @@ if (auxjustfa.length > 0)
 
 }	
 
+
 </script>
 <style>
 	
@@ -1564,51 +1764,55 @@ if (auxjustfa.length > 0)
 
    <cfquery name="rsItem" datasource="#dsn_inspecao#">
 	SELECT RIP_Unidade,
-		   Und_Descricao,
-		   Und_TipoUnidade,
-		   RIP_NumInspecao,
-		   RIP_CodReop,
-		   RIP_CodDiretoria,
-		   Dir_Descricao,
-		   RIP_Resposta,
-		   RIP_NumGrupo,
-		   Grp_Descricao, 
-		   RIP_NumItem, 
-		   Itn_Descricao, 
-		   NIP_DtIniPrev, 
-		   Itn_Ano, 
-		   Grp_Ano,
-		   INP_Modalidade,
-		   INP_TNCClassificacao,
-		   INP_TNCPontuacao,
-		   INP_NCClassificacao,
-		   INP_NCPontuacao,		   
-		   RIP_CARACTVLR,
-		   RIP_FALTA,
-		   RIP_SOBRA,
-		   RIP_EMRISCO,
-		   INP_DTINICINSPECAO,
-		   RIP_VALOR,
-		   RIP_COMENTARIO,
-		   RIP_RECOMENDACOES,
-		   RIP_RECOMENDACAO, 
-		   RIP_REINCINSPECAO,
-		   RIP_REINCGRUPO,
-		   RIP_REINCITEM,
-		   RIP_Caractvlr,   
-		   RIP_NCISEI,
-		   Itn_Amostra,
-		   Itn_Norma,
-		   Itn_Pontuacao,
-		   Itn_Classificacao,
-		   Itn_PTC_Seq,
-		   Itn_PreRelato,
-		   Itn_OrientacaoRelato,
-		   Itn_ImpactarTipos,
-		   Pos_ClassificacaoPonto,
-		   TNC_ClassifInicio, 
- 		   TNC_ClassifAtual
- 		   FROM Numera_Inspecao 
+		RIP_NumInspecao,
+		RIP_CodReop,
+		RIP_CodDiretoria,		   
+		RIP_CARACTVLR,
+		RIP_FALTA,
+		RIP_SOBRA,
+		RIP_EMRISCO,
+		RIP_Resposta,
+		RIP_NumGrupo,
+		RIP_NumItem,		
+		RIP_VALOR,
+		RIP_COMENTARIO,
+		RIP_RECOMENDACOES,
+		RIP_RECOMENDACAO, 
+		RIP_REINCINSPECAO,
+		RIP_REINCGRUPO,
+		RIP_REINCITEM,
+		RIP_Caractvlr,   
+		RIP_NCISEI,
+		RIP_Recomendacao_Inspetor,	
+		RIP_PotencialBeneficioFinanceiro,
+        RIP_EstimativaCustoFinanceiro,
+		Und_Descricao,
+		Und_TipoUnidade,
+		Dir_Descricao,
+		Grp_Descricao, 
+		Itn_Descricao, 
+		NIP_DtIniPrev, 
+		Itn_Ano, 
+		Grp_Ano,
+		INP_Modalidade,
+		INP_TNCClassificacao,
+		INP_TNCPontuacao,
+		INP_NCClassificacao,
+		INP_NCPontuacao,		   
+		INP_DTINICINSPECAO,
+		Itn_Amostra,
+		Itn_Norma,
+		Itn_Pontuacao,
+		Itn_Classificacao,
+		Itn_PTC_Seq,
+		Itn_PreRelato,
+		Itn_OrientacaoRelato,
+		Itn_ImpactarTipos,
+		Itn_Manchete,
+		Pos_ClassificacaoPonto,
+		TNC_ClassifInicio, 
+		TNC_ClassifAtual
+		FROM Numera_Inspecao 
 			INNER JOIN (((Resultado_Inspecao 
 			INNER JOIN Inspecao ON (RIP_NumInspecao =INP_NumInspecao) AND (RIP_Unidade =INP_Unidade)) 
 			INNER JOIN Itens_Verificacao ON (RIP_NumItem = Itn_NumItem) AND (RIP_NumGrupo = Itn_NumGrupo) AND (convert(char(4),RIP_Ano) = Itn_Ano)) 
@@ -1901,8 +2105,8 @@ auxvlr: #auxvlr# <br>
       </tr>
 
     <tr class="exibir">
-      <td bgcolor="eeeeee">Nº Relatório</td>
-      <td colspan="6" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In&iacute;cio Inspe&ccedil;&atilde;o &nbsp;<strong class="exibir"><cfoutput>#DateFormat(rsItem.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>
+      <td bgcolor="eeeeee">Nº Avaliação</td>
+      <td colspan="6" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Data Início da Avaliação&nbsp;<strong class="exibir"><cfoutput>#DateFormat(rsItem.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>
       </tr>
     <tr class="exibir">
       <td bgcolor="eeeeee">Grupo</td>
@@ -1966,11 +2170,11 @@ auxvlr: #auxvlr# <br>
 	</cfif>
 
 		 <tr class="red_titulo">
-	  <td bgcolor="eeeeee"><div id="reincidA">Reincidência</div></td>  
+	  		<td bgcolor="eeeeee"><div id="reincidA">Reincidência</div></td>  
 	   
-	      <input type="hidden" name="db_reincSN" id="db_reincSN" value="#reincSN#">
+	      	<input type="hidden" name="db_reincSN" id="db_reincSN" value="#reincSN#">
 		   
-	<td colspan="6"  bgcolor="eeeeee"><div id="reincidB">Nº Relatório:
+			<td colspan="6"  bgcolor="eeeeee"><div id="reincidB">Nº Relatório:
 			<input name="frmreincInsp" type="text" class="form" id="frmreincInsp" size="16" maxlength="10" value="#db_reincInsp#" style="background:white" onKeyPress="numericos()" readonly="">
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Nº Grupo:
 			<input name="frmreincGrup" type="text" class="form" id="frmreincGrup" size="8" maxlength="5" value="#db_reincGrup#" style="background:white" onKeyPress="numericos()" readonly="">
@@ -2009,17 +2213,23 @@ auxvlr: #auxvlr# <br>
 	    <cfset impactoemrisco = 'R'>
 	</cfif>	  
  	<tr class="exibir">
-      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
+      <td bgcolor="eeeeee"><div id="impactofin">Potencial Valor</div></td>
       <td colspan="6" bgcolor="eeeeee">
 		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
 			<tr class="exibir">
-				<td width="23%" bgcolor="eeeeee"><div id="impactofalta">Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></div></td>
-				<td width="26%" bgcolor="eeeeee"><div id="impactosobra">Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></div></td>
-				<td width="27%" bgcolor="eeeeee"><div id="impactoemrisco">Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></div></td>
+				<td width="20%" bgcolor="eeeeee"><div id="impactofalta">Estimado a Recuperar(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></div></td>
+				<td width="15%"></td>
+				<td width="25%" bgcolor="eeeeee"><div id="impactosobra">Estimado Não Planejado/Extrapolado/Sobra:(R$):&nbsp;<input id="frmsobra" name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"><input type="checkbox" id="cd_frmsobra" name="cd_frmsobra" title="#sobra#" onClick="naoseaplica(this.title,'cd_frmsobra')">Não se Aplica</div></td>
+				<td width="15%"></td>
+				<td width="25%" bgcolor="eeeeee"><div id="impactoemrisco">Estimado em Risco ou Envolvido(R$):&nbsp;<input id="frmemrisco" name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"><input type="checkbox" id="cd_frmemrisco" name="cd_frmemrisco" title="#emrisco#" onClick="naoseaplica(this.title,'cd_frmemrisco')">Não se Aplica</div></td>
 			</tr>
 		  </table>		  
 	  </td>
-    </tr> 	  
+    </tr> 	 
+	<tr>
+		<td bgcolor="eeeeee" align="center"><span class="titulos">Manchete:</span></td>
+		<td colspan="6" bgcolor="eeeeee"><textarea  name="manchete" id="manchete" cols="166" rows="3" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.Itn_Manchete#</cfoutput></textarea></td>
+	</tr>	 
    </cfoutput>
    <cfset auxOrient = rsItem.RIP_Recomendacoes>
 
@@ -2037,7 +2247,7 @@ auxvlr: #auxvlr# <br>
 </tr>
 
 <textarea  hidden name="ripcomentariojustif" id="ripcomentariojustif" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#auxjustificativa#</cfoutput></textarea>
-<textarea  hidden name="ripcomentario" id="ripcomentario" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.RIP_Comentario)#</cfoutput></textarea>
+<textarea  hidden name="ripcomentario" id="ripcomentario" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL"><cfoutput>#trim(rsItem.RIP_Comentario)#</cfoutput></textarea>
 <textarea  hidden name="itnprerelato" id="itnprerelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.Itn_PreRelato)#<strong>Ref. Normativa: </strong>#trim(rsItem.Itn_Norma)#</cfoutput></textarea>
 <!---
 <textarea  hidden name="itnprerelato" id="itnprerelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.Itn_PreRelato)#<strong>Ref. Normativa: </strong>#trim(rsItem.Itn_Norma)#<p><strong>Possíveis Consequências da Situação Encontrada:</strong></p></cfoutput></textarea>
@@ -2051,9 +2261,17 @@ auxvlr: #auxvlr# <br>
 <textarea  hidden name="riprecomendacoes" id="riprecomendacoes" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea>
 <textarea  hidden name="itnorientacaorelato" id="itnorientacaorelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.Itn_OrientacaoRelato#</cfoutput></textarea>
 <textarea  hidden name="frmanexosrecomendacoes" id="frmanexosrecomendacoes" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.recomendacoes#</cfoutput></textarea>
-
+<cfset editpbfimor = trim(Replace(NumberFormat(rsItem.RIP_PotencialBeneficioFinanceiro,999.00),'.',',','All'))> 
+<cfset editecfmor = trim(Replace(NumberFormat(rsItem.RIP_EstimativaCustoFinanceiro,999.00),'.',',','All'))> 
+<tr class="exibir">
+	<td bgcolor="eeeeee"></td>
+	<td bgcolor="eeeeee" colspan="4"><div>Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:&nbsp;&nbsp;<input id="pbfimor" name="pbfimor" type="text" class="form" value="<cfoutput>#editpbfimor#</cfoutput>" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"><input type="checkbox" id="cb_pbfimor" name="cb_pbfimor" title="<cfoutput>#editpbfimor#</cfoutput>" onClick="naoseaplica(this.title,'cb_pbfimor')">Não se Aplica</div></td>
+</tr> 
+<tr class="exibir">
+	<td bgcolor="eeeeee"></td>
+	<td bgcolor="eeeeee"  colspan="4"><div>Estimativa Do Custo Financeiro Da Medida/Orientação Para Regularização:&nbsp;&nbsp;<input  id="ecfmor" name="ecfmor" type="text" class="form" value="<cfoutput>#editecfmor#</cfoutput>" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"><input type="checkbox" id="cb_ecfmor" name="cb_ecfmor" title="<cfoutput>#editecfmor#</cfoutput>" onClick="naoseaplica(this.title,'cb_ecfmor')">Não se Aplica</div></td>
+</tr> 	
 <cfset existeanexos = 'N'>
-
 <tr bgcolor="eeeeee">
 			<cfif trim(rsItem.RIP_NCISEI) eq "">
 				<cfset auxnci = "N">
@@ -2147,21 +2365,24 @@ auxvlr: #auxvlr# <br>
 		</cfif>
       </cfoutput></td>
     </tr>
-	
-    <input type="hidden" name="frmexisteanexos" id="frmexisteanexos" value="<cfoutput>#existeanexos#</cfoutput>">
-	<input type="hidden" name="frmrestringirsn" id="frmrestringirsn" value="<cfoutput>#restringirSN#</cfoutput>">
-	<input type="hidden" name="frmauxvlr" id="frmauxvlr" value="<cfoutput>#trim(auxvlr)#</cfoutput>">
-	<input type="hidden" name="retornosn" id="retornosn" value="<cfoutput>#URL.retornosn#</cfoutput>">
-	<input type="hidden" name="frmsituantes" id="frmsituantes" value="<cfoutput>#URL.frmsituantes#</cfoutput>">
-	<input type="hidden" name="frmdescantes" id="frmdescantes" value="<cfoutput>#URL.frmdescantes#</cfoutput>">
- 	<input name="ripresposta" id="ripresposta" type="hidden" value="<cfoutput>#rsItem.RIP_Resposta#</cfoutput>">
-	<input name="frminspreincidente" id="frminspreincidente" type="hidden" value="<cfoutput>#url.frminspreincidente#</cfoutput>">
-	<input name="frmgruporeincidente" id="frmgruporeincidente" type="hidden" value="<cfoutput>#url.frmgruporeincidente#</cfoutput>">
-	<input name="frmitemreincidente" id="frmitemreincidente" type="hidden" value="<cfoutput>#url.frmitemreincidente#</cfoutput>">
-	<input type="hidden" name="frmimpactofin" id="frmimpactofin" value="<cfoutput>#impactofin#</cfoutput>">
-	<input type="hidden" name="frmimpactofalta" id="frmimpactofalta" value="<cfoutput>#impactofalta#</cfoutput>">
-	<input type="hidden" name="frmimpactosobra" id="frmimpactosobra" value="<cfoutput>#impactosobra#</cfoutput>">
-	<input type="hidden" name="frmimpactoemrisco" id="frmimpactoemrisco" value="<cfoutput>#impactoemrisco#</cfoutput>">
+	<cfoutput>	
+		<input type="hidden" name="frmexisteanexos" id="frmexisteanexos" value="#existeanexos#">
+		<input type="hidden" name="frmrestringirsn" id="frmrestringirsn" value="#restringirSN#">
+		<input type="hidden" name="frmauxvlr" id="frmauxvlr" value="#trim(auxvlr)#">
+		<input type="hidden" name="retornosn" id="retornosn" value="#URL.retornosn#">
+		<input type="hidden" name="frmsituantes" id="frmsituantes" value="#URL.frmsituantes#">
+		<input type="hidden" name="frmdescantes" id="frmdescantes" value="#URL.frmdescantes#">
+		<input name="ripresposta" id="ripresposta" type="hidden" value="#rsItem.RIP_Resposta#">
+		<input name="frminspreincidente" id="frminspreincidente" type="hidden" value="#url.frminspreincidente#">
+		<input name="frmgruporeincidente" id="frmgruporeincidente" type="hidden" value="#url.frmgruporeincidente#">
+		<input name="frmitemreincidente" id="frmitemreincidente" type="hidden" value="#url.frmitemreincidente#">
+		<input type="hidden" name="frmimpactofin" id="frmimpactofin" value="#impactofin#">
+		<input type="hidden" name="frmimpactofalta" id="frmimpactofalta" value="#impactofalta#">
+		<input type="hidden" name="frmimpactosobra" id="frmimpactosobra" value="#impactosobra#">
+		<input type="hidden" name="frmimpactoemrisco" id="frmimpactoemrisco" value="#impactoemrisco#">
+		<input type="hidden" name="RIPRecomendacaoInspetor" id="RIPRecomendacaoInspetor" value="#trim(rsItem.RIP_Recomendacao_Inspetor)#">
+		
+	</cfoutput>
 	
 <!---     <cfabort> --->
  </form>
@@ -2174,10 +2395,108 @@ auxvlr: #auxvlr# <br>
 			avisoreincidencia('<cfoutput>#auxvlr#</cfoutput>','<cfoutput>#frminspreincidente#</cfoutput>','<cfoutput>#trim(frmdescantes)#</cfoutput>','<cfoutput>#restringirSN#</cfoutput>', '<cfoutput>#url.Ngrup#</cfoutput>','<cfoutput>#Nitem#</cfoutput>')
 		</script>
 </cfif>	
-
+<div id="mensagem">
+	<p></p>
+</div>
 </body>
 
 <script>
+
+ //==============================
+ $('#cb_pbfimor').click(function(){
+	//alert($('#pbfimor').val());
+	var vlr = $(this).attr("title");
+	
+	if($(this).is(':checked')) {
+		$('#pbfimor').val('0,00');
+		$("#pbfimor").prop('readonly', true);
+	}else{
+		$("#pbfimor").prop('readonly', false);
+		$('#pbfimor').val(vlr);
+	}
+ })
+  //==============================
+  $('#cb_ecfmor').click(function(){
+	//alert($('#pbfimor').val());
+	var vlr = $(this).attr("title");
+
+	if($(this).is(':checked')) {
+		$('#ecfmor').val('0,00');		
+		$("#ecfmor").prop('readonly', true);
+	}else{
+		$("#ecfmor").prop('readonly', false);
+		$('#ecfmor').val(vlr);
+	}
+ })
+//==============================
+$('#cd_frmsobra').click(function(){
+//	alert($('#frmsobra').val());
+	var vlr = $(this).attr("title");
+	
+	if($(this).is(':checked')) {
+		$('#frmsobra').val('0,00');
+		$("#frmsobra").prop('readonly', true);
+	}else{
+		$("#frmsobra").prop('readonly', false);
+		$('#frmsobra').val(vlr);
+	}
+ })
+ //==============================
+ $('#cd_frmemrisco').click(function(){
+	//alert($('#frmemrisco').val());
+	var vlr = $(this).attr("title");
+	
+	if($(this).is(':checked')) {
+		$('#frmemrisco').val('0,00');
+		$("#frmemrisco").prop('readonly', true);
+	}else{
+		$("#frmemrisco").prop('readonly', false);
+		$('#frmemrisco').val(vlr);
+	}
+ })
+ 
+CKEDITOR.replace('melhoria', {
+      // Define the toolbar groups as it is a more accessible solution.
+	  width: '1020',
+		height: 300,
+		removePlugins: 'scayt',
+        disableNativeSpellChecker: false,
+		line_height:'1px',
+      toolbarGroups: [
+		{
+          "name": "document",
+          "groups": ["mode"]
+        },
+		{
+          "name": "basicstyles",
+          "groups": ["basicstyles"]
+        },
+        {
+          "name": "links",
+          "groups": ["links"]
+        },
+        {
+          "name": "paragraph",
+          "groups": ["list", "blocks"]
+        },
+
+        {
+          "name": "insert",
+          "groups": ["insert"]
+        },
+        {
+          "name": "styles",
+          "groups": ["styles"]
+        },
+		{
+          "name": "about",
+          "groups": ["about"]
+        }
+      ],
+      // Remove the redundant buttons from toolbar groups defined above.
+      //removeButtons: 'Strike,Subscript,Superscript,Specialchar,PasteFromWord'
+    });
+/*
 CKEDITOR.replace('melhoria', {
 		width: '1020',
 		height: 200,
@@ -2198,6 +2517,7 @@ CKEDITOR.replace('melhoria', {
 					
 		]
     });
+*/
 	CKEDITOR.replace('recomendacoes', {
 		width: '1020',
 		height: 100,
@@ -2218,8 +2538,8 @@ CKEDITOR.replace('melhoria', {
 			
     });
 
-</script>
 
+</script>
 </html>
 
 

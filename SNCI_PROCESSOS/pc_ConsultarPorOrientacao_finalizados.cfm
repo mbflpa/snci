@@ -1,42 +1,8 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
-<cfquery name="rsHerancaUnion" datasource="#application.dsn_processos#">
-	SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' 
 
-	union
 
-	SELECT  pc_orgaos2.pc_org_mcu
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )) 
 
-	union
-
-	select pc_orgaos.pc_org_mcu AS mcuHerdado
-	from pc_orgaos
-	LEFT JOIN pc_orgaos_heranca ON pc_orgHerancaMcuDe = pc_org_mcu
-	where pc_orgaos.pc_org_mcu_subord_tec in(SELECT  pc_orgaos2.pc_org_mcu
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	LEFT JOIN pc_orgaos as pc_orgaos2 ON pc_orgaos2.pc_org_mcu_subord_tec = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and (pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' or pc_orgaos2.pc_org_mcu_subord_tec in(SELECT pc_orgaos.pc_org_mcu AS mcuHerdado
-	FROM pc_orgaos_heranca
-	LEFT JOIN pc_orgaos ON pc_org_mcu = pc_orgHerancaMcuDe
-	WHERE pc_orgHerancaDataInicio <= CONVERT (date, GETDATE()) and pc_orgHerancaMcuPara ='#application.rsUsuarioParametros.pc_usu_lotacao#' )))
-</cfquery>
-
-<cfquery dbtype="query" name="rsHeranca"> 
-	SELECT mcuHerdado FROM rsHerancaUnion WHERE not mcuHerdado is null
-</cfquery>
-
-<cfset mcusHeranca = ValueList(rsHeranca.mcuHerdado) />
 
 <cfquery name="rsProcAno" datasource="#application.dsn_processos#" timeout="120" >
 	SELECT   distinct   right(pc_processos.pc_processo_id,4) as ano
@@ -50,7 +16,7 @@
 				LEFT JOIN pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
-	WHERE  not pc_aval_orientacao_status in (1) AND pc_num_status in (5)
+	WHERE  pc_num_status in (5)
 	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
 		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
@@ -68,12 +34,16 @@
 	<cfelse>
 		<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-				AND not pc_aval_orientacao_status in (9,12)
+				AND not pc_aval_orientacao_status in (0,19,12)
 		<cfelse>
-			and (pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-			or pc_aval_orientacao_mcu_orgaoResp in (SELECT pc_orgaos.pc_org_mcu	FROM pc_orgaos WHERE (pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-			or pc_org_mcu_subord_tec in( SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
-			<cfif #mcusHeranca# neq ''> or pc_aval_orientacao_mcu_orgaoResp in (#mcusHeranca#)</cfif>) )
+		   	and (
+					pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					OR pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+					<cfif ListLen(application.orgaosHierarquiaList) GT 0>
+						OR pc_processos.pc_num_orgao_avaliado IN (#application.orgaosHierarquiaList#)
+						OR pc_aval_orientacao_mcu_orgaoResp IN (#application.orgaosHierarquiaList#)
+					</cfif>
+				)
 		</cfif>
 	</cfif>
 	

@@ -1,8 +1,5 @@
 <!--- #se#  === #frmano#<br> --->
 <cfprocessingdirective pageEncoding ="utf-8"> 
-  <!--- <cfif day(now()) lte 10>
-	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Favor aguardar ate o dia 11 do mes para gerar o relatorio de METAS com os dados atualizados ao mes anterior!">
-  </cfif> --->
 <cfoutput>
 	<cfif frmano lte 2022>
 		<cflocation url="Rel_indicadoresglobal_2022.cfm?frmano=#frmano#&frmmes=#frmmes#&Submit1=Confirmar&frmanoatual=#frmanoatual#&frmmesatual=#frmmesatual#">
@@ -16,12 +13,16 @@
 	select Usu_GrupoAcesso,Usu_Matricula,Usu_Coordena,Usu_DR from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 <cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
-
+<!---
+<cfif frmano eq year(now()) and frmmes lt 5 and grpacesso neq 'GESTORMASTER'>
+	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Favor aguardar, tela em manutencao para o ano/mes selecionado!">
+</cfif> 
+--->
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 
 <cfset total=0>
 
-<cfinclude template="cabecalho.cfm">
+<cfinclude template="cabecalho.cfm"><br>
 <html>
 <head>
 <title>Sistema Nacional de Controle Interno</title>
@@ -43,7 +44,7 @@ function listar(a,b,c){
 </head>
 <body>
 <form action="" method="post" target="_blank" name="form1">
-<cfset dtlimit = CreateDate(#frmano#,#frmmes#,day(now()))>
+<cfset dtlimit = CreateDate(#frmano#,#frmmes#,1)>
 <!---  
 <cfif grpacesso eq 'GESTORMASTER'>
   <cfset dtlimit = CreateDate(#frmano#,#frmmes#,day(now()))>
@@ -95,6 +96,7 @@ function listar(a,b,c){
 	<cfset dtlimit = (year(dtlimit)) & "/12/31">				
 	<cfset cabec = 'Dez/' & year(dtlimit)>	   
 </cfif>
+
 <cfoutput>
 <cfset dtini = dateformat(now(),"DD/MM/YYYY")>
 <cfset dtini = '01' & right(dtini,8)>
@@ -112,18 +114,42 @@ dtlimit: #dtlimit#<br>
 <cfset gil = gil>  --->
 </cfoutput>
 <!--- exibicao em tela --->
+<cfset fazgestaoRS='N'>
 <cfif grpacesso eq 'GESTORMASTER' or grpacesso eq 'GOVERNANCA'>
 	<cfquery name="rsMetas" datasource="#dsn_inspecao#">
 		SELECT Met_Codigo,Met_Ano,Dir_Sigla,Met_SE_STO,Met_SLNC,Met_SLNC_Mes,Met_PRCI,Met_PRCI_Mes,Met_PRCI_Acum,Met_DGCI,Met_SLNC_Acum,Met_SLNC_AcumPeriodo,Met_PRCI_AcumPeriodo,Met_DGCI_Mes,Met_DGCI_Acum,Met_DGCI_AcumPeriodo,Met_Resultado
 		FROM Metas INNER JOIN Diretoria ON Met_Codigo = Dir_Codigo
 		WHERE (Met_Ano = #frmano#) and Met_Mes = #frmmes#
+    <cfif frmano eq 2024 and frmmes gt 4>
+      and Met_Codigo <> '64'
+    </cfif>
 		ORDER BY Met_Resultado desc, Met_DGCI_Acum desc
 	</cfquery>
 <cfelseif grpacesso eq 'GESTORES' or grpacesso eq 'ANALISTAS'>  
+  <cfset UsuCoordena = ''>
+  <cfif frmano eq 2024 and frmmes gt 4>
+      <cfloop index="ind" list="#qUsuario.Usu_Coordena#">
+          <cfif ind neq '64'>
+            <cfif UsuCoordena eq ''>
+              <cfset UsuCoordena = ind>
+            <cfelse>
+              <cfset UsuCoordena = UsuCoordena & ',' & ind>
+            </cfif>
+          <cfelse>
+            <cfset fazgestaoRS='S'>
+          </cfif>
+      </cfloop> 
+  <cfelse>
+    <cfset UsuCoordena = qUsuario.Usu_Coordena>
+  </cfif>
+  <cfif UsuCoordena eq ''>
+    <cfset UsuCoordena = qUsuario.Usu_Coordena>
+    <cfset grpacesso = 'GERENTES'>
+  </cfif>
 	<cfquery name="rsMetas" datasource="#dsn_inspecao#">
 		SELECT Met_Codigo,Met_Ano,Dir_Sigla,Met_SE_STO,Met_SLNC,Met_SLNC_Mes,Met_PRCI,Met_PRCI_Mes,Met_PRCI_Acum,Met_DGCI,Met_SLNC_Acum,Met_SLNC_AcumPeriodo,Met_PRCI_AcumPeriodo,Met_DGCI_Mes,Met_DGCI_Acum,Met_DGCI_AcumPeriodo,Met_Resultado 
 		FROM Metas INNER JOIN Diretoria ON Met_Codigo = Dir_Codigo
-		WHERE (Met_Ano = #frmano#) and Met_Mes = #frmmes# and Met_Codigo in(#qUsuario.Usu_Coordena#)
+		WHERE (Met_Ano = #frmano#) and Met_Mes = #frmmes# and Met_Codigo in(#UsuCoordena#)
 		ORDER BY Met_Resultado desc, Met_DGCI_Acum desc
 	</cfquery>
 <cfelse>
@@ -134,11 +160,19 @@ dtlimit: #dtlimit#<br>
 		ORDER BY Met_Resultado desc
 	</cfquery>
 </cfif>
-	<cfquery name="rsNacional" datasource="#dsn_inspecao#">
-		SELECT Met_PRCI,Met_SLNC,Met_DGCI
-		FROM Metas 
-		WHERE Met_Ano = #frmano# and Met_Mes = 1
-	</cfquery>
+
+<cfquery name="rsNacional" datasource="#dsn_inspecao#">
+  SELECT Met_PRCI,Met_SLNC,Met_DGCI,Met_Codigo
+  FROM Metas 
+  WHERE Met_Ano = #frmano# and Met_Mes = 1 
+  <cfif frmano eq 2024 and frmmes gt 4>
+    and Met_Codigo <> '64' and Met_Codigo <> '01'
+  <cfelse>
+    <cfif qUsuario.Usu_DR neq '01'>
+      and Met_Codigo = '#qUsuario.Usu_DR#'
+    </cfif>
+  </cfif>
+</cfquery>
 
 <!--- Criacao do arquivo CSV --->
 <cfset sdata = dateformat(now(),"YYYYMMDDHH")>
@@ -160,7 +194,6 @@ dtlimit: #dtlimit#<br>
 <cffile action="Append" file="#slocal##sarquivo#" output='SE;Meta Mensal;Realizado;Resultado Mensal;Acumulado Realizado;Resultado Acumulado Realizado;Meta Mensal;Realizado;Resultado Mensal;Acumulado Realizado;Resultado Acumulado Realizado;Meta Mensal;Realizado;Resultado Mensal;Acumulado Realizado;Resultado Acumulado Realizado;Resultado em Relação à Meta Mensal'>
 
 <table width="98%" border="1" align="center" cellpadding="0" cellspacing="0">
-  
   <tr>
     <td colspan="18" class="exibir"><div align="right"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/csv.png" width="37" height="38" border="0"></a></div></td>
     </tr>
@@ -219,7 +252,7 @@ dtlimit: #dtlimit#<br>
     <!--- PRCI --->
     <cfset MetPRCI = numberFormat(rsMetas.Met_PRCI,999.0)>
     <cfset MetPRCIAcum = numberFormat(rsMetas.Met_PRCI_Acum,999.0)>
-	
+
     <cfif MetPRCIAcum gt MetPRCI>
 		  <cfset PRCIRes = "ACIMA DO ESPERADO">
 		  <cfset scord1 = "##33CCFF">
@@ -299,12 +332,36 @@ dtlimit: #dtlimit#<br>
     </cfif>
 	
     <cfset permeta = rsMetas.Met_Resultado>
-    
     <cfif cla lt 10>
-	  <cfset cl = '0' & cla & 'º'>
-	<cfelse>
-	  <cfset cl = cla & 'º'>
-	</cfif>
+      <cfset cl = '0' & cla & 'º'>
+    <cfelse>
+      <cfset cl = cla & 'º'>
+    </cfif>
+    <cfif frmano eq 2024 and rsMetas.Met_Codigo eq '64' and frmmes gt 4> 
+      <cfset PRCIRes = "SUSPENSO">
+		  <cfset scord1 = "">
+      <cfset PRCIAcuPerRealRes = "SUSPENSO">
+      <cfset scorf1 = "">
+      <cfset SLNCRes = "SUSPENSO">
+      <cfset scroi1 = "">
+      <cfset SLNCAcuPerRealRes = "SUSPENSO">
+		  <cfset scrok1 = "">
+      <cfset DGCIRes = "SUSPENSO">
+      <cfset scorn1 = "">
+      <cfset DGCIAcuPerRealRes = "SUSPENSO">
+      <cfset scorp1 = "">
+      <cfset MetPRCI = '---'>
+      <cfset MetPRCIAcum = '---'>
+      <cfset MetPRCIAcumPeriodo = '---'>
+      <cfset MetSLNC = '---'>
+      <cfset MetSLNCAcum = '---'>
+      <cfset MetSLNCAcumPeriodo = '---'>
+      <cfset MetDGCI = '---'>
+      <cfset MetDGCIAcum = '---'>
+      <cfset MetDGCIAcumPeriodo = '---'>
+      <cfset permeta = '---'>    
+      <cfset cl = '---'> 
+    </cfif>
     <tr>
       <td class="exibir"><div align="center">#cl#</div></td>
       <td class="exibir"><div align="center"><strong>#se#</strong></div></td>
@@ -323,8 +380,17 @@ dtlimit: #dtlimit#<br>
       <td bgcolor="#scorn1#" class="exibir"><div align="center">#DGCIRes#</div></td>
       <td class="exibir"><div align="center"><strong>#MetDGCIAcumPeriodo#</strong></div></td>
       <td bgcolor="#scorp1#" class="exibir"><div align="center">#DGCIAcuPerRealRes#</div></td>
-	  <td class="exibir"><div align="center"><strong>#permeta#</strong></div></td>
+	    <td class="exibir"><div align="center"><strong>#permeta#</strong></div></td>
     </tr>
+    <cfif frmano eq 2024 and rsMetas.Met_Codigo eq '64' and frmmes gt 4>
+      <cfset MetPRCIAcumPeriodo=0>
+      <cfset MetPRCIAcum=0>
+      <cfset MetSLNCAcumPeriodo=0>
+      <cfset MetSLNCAcum=0>
+      <cfset MetDGCIAcum=0>
+      <cfset MetDGCIAcumPeriodo=0>
+      <cfset permeta=0>   
+    </cfif>
 
     <cfset prciacurealnac = prciacurealnac + MetPRCIAcumPeriodo>
     <cfset PRCIAPnac = PRCIAPnac + MetPRCIAcum>
@@ -336,21 +402,54 @@ dtlimit: #dtlimit#<br>
     
     <cffile action="Append" file="#slocal##sarquivo#" output='#se#;#MetPRCI#;#MetPRCIAcum#;#PRCIRes#;#MetPRCIAcumPeriodo#;#PRCIAcuPerRealRes#;#MetSLNC#;#MetSLNCAcum#;#SLNCRes#;#MetSLNCAcumPeriodo#;#SLNCAcuPerRealRes#;#MetDGCI#;#MetDGCIAcum#;#DGCIRes#;#Met_DGCI_AcumPeriodo#;#DGCIAcuPerRealRes#;#permeta#'>
   </cfoutput>
+  <cfif grpacesso eq 'GESTORMASTER' or grpacesso eq 'GOVERNANCA' or grpacesso eq 'GESTORES' or grpacesso eq 'ANALISTAS'>
+    <cfif grpacesso eq 'GESTORES' or grpacesso eq 'ANALISTAS'>
+    <cfelse>
+      <cfset fazgestaoRS='S'>
+    </cfif>
+  
+    <cfif frmano eq 2024 and frmmes gt 4 and fazgestaoRS eq 'S'>
+      <cfoutput>
+      <tr>
+          <td class="exibir"><div align="center">---</div></td>
+          <td class="exibir"><div align="center"><strong>RS</strong></div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+          <td class="exibir"><div align="center">SUSPENSO</div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+          <td class="exibir"><div align="center">SUSPENSO</div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+          <td class="exibir"><div align="center">SUSPENSO</div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+          <td class="exibir"><div align="center">SUSPENSO</div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+          <td class="exibir"><div align="center">SUSPENSO</div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+          <td class="exibir"><div align="center">SUSPENSO</div></td>
+          <td class="exibir"><div align="center"><strong>---</strong></div></td>
+        </tr>
+        <cffile action="Append" file="#slocal##sarquivo#" output='RS;---;---;SUSPENSO;---;SUSPENSO;---;---;SUSPENSO;---;SUSPENSO;---;---;SUSPENSO;---;SUSPENSO;---'>
+      </cfoutput>
+  </cfif>
+</cfif>
   <cfloop query="rsNacional">
-    <cfset PRCInac = PRCInac + rsNacional.Met_PRCI>
-    <cfset SLNCnac = SLNCnac + rsNacional.Met_SLNC>
-    <cfset DGCInac = DGCInac + rsNacional.Met_DGCI>
+      <cfset PRCInac = PRCInac + rsNacional.Met_PRCI>
+      <cfset SLNCnac = SLNCnac + rsNacional.Met_SLNC>
+      <cfset DGCInac = DGCInac + rsNacional.Met_DGCI>  
   </cfloop>
-	<cfset PRCInac = numberFormat((PRCInac/rsNacional.recordcount),999.0)>
-	<cfset prciacurealnac = numberFormat((prciacurealnac/rsMetas.recordcount),999.0)>
-	<cfset PRCIAPnac = numberFormat((PRCIAPnac/rsMetas.recordcount),999.0)>
-	<cfset SLNCnac = numberFormat((SLNCnac/rsNacional.recordcount),999.0)>
-	<cfset slncacurealnac = numberFormat((slncacurealnac/rsMetas.recordcount),999.0)>
-	<cfset SLNCAPnac = numberFormat((SLNCAPnac/rsMetas.recordcount),999.0)>
-	<cfset DGCInac = numberFormat((DGCInac/rsNacional.recordcount),999.0)>
-	<cfset dgciacurealnac = numberFormat((dgciacurealnac/rsMetas.recordcount),999.0)>
-	<cfset DGCIAPnac = numberFormat((DGCIAPnac/rsMetas.recordcount),999.0)>
-	<cfset RESMETnac = numberFormat((DGCIAPnac/DGCInac)*100,999.0)> 
+ 
+  <cfset PRCInac = numberFormat((PRCInac/rsNacional.recordcount),999.0)>
+  <cfset prciacurealnac = numberFormat((prciacurealnac/rsMetas.recordcount),999.0)>
+  <cfset PRCIAPnac = numberFormat((PRCIAPnac/rsMetas.recordcount),999.0)>
+  <cfset SLNCnac = numberFormat((SLNCnac/rsNacional.recordcount),999.0)>
+  <cfset slncacurealnac = numberFormat((slncacurealnac/rsMetas.recordcount),999.0)>
+  <cfset SLNCAPnac = numberFormat((SLNCAPnac/rsMetas.recordcount),999.0)>
+  <cfset DGCInac = numberFormat((DGCInac/rsNacional.recordcount),999.0)>
+  <cfset dgciacurealnac = numberFormat((dgciacurealnac/rsMetas.recordcount),999.0)>
+  <cfset DGCIAPnac = numberFormat((DGCIAPnac/rsMetas.recordcount),999.0)>
+  <cfset RESMETnac = numberFormat((DGCIAPnac/DGCInac)*100,999.0)>
 
 	<cfif PRCIAPnac gt PRCInac>
 		<cfset PRCIResNac = "ACIMA DO ESPERADO">
@@ -415,7 +514,32 @@ dtlimit: #dtlimit#<br>
 		<cfset dgciacurealnacres = "ABAIXO DO ESPERADO">
 		<cfset scorp2 = "##FF3300">
 	</cfif>  
-  <!---  --->
+  <cfif grpacesso neq 'GESTORMASTER' and grpacesso neq 'GOVERNANCA' and grpacesso neq 'GESTORES' and grpacesso neq 'ANALISTAS'>
+    <cfif frmano eq 2024 and rsMetas.Met_Codigo eq '64' and frmmes gt 4>
+      <cfset PRCInac = '---'>
+      <cfset prciacurealnac = '---'>
+      <cfset PRCIAPnac = '---'>
+      <cfset SLNCnac = '---'>
+      <cfset slncacurealnac = '---'>
+      <cfset SLNCAPnac = '---'>
+      <cfset DGCInac = '---'>
+      <cfset dgciacurealnac = '---'>
+      <cfset DGCIAPnac = '---'>
+      <cfset RESMETnac = '---'> 
+      <cfset PRCIResNac = 'SUSPENSO'> 
+      <cfset scord2 = "">
+      <cfset prciacurealnacres = 'SUSPENSO'> 
+      <cfset scorf2 = "">
+      <cfset SLNCResNac = 'SUSPENSO'> 
+      <cfset scroi2 = "">
+      <cfset slncacurealnacres = 'SUSPENSO'> 
+      <cfset scrok2 = "">
+      <cfset DGCIResNac = 'SUSPENSO'> 
+      <cfset scorn2 = "">
+      <cfset dgciacurealnacres = 'SUSPENSO'> 
+      <cfset scorp2 = "">
+    </cfif>
+  </cfif>
   <cfoutput>
   <tr bgcolor="CCCCCC" class="exibir">
       <td colspan="2" class="exibir">&nbsp;</td>
@@ -444,22 +568,22 @@ dtlimit: #dtlimit#<br>
     </tr>
     <tr class="exibir">
       <td colspan="2" class="exibir">&nbsp;</td>
-      <td class="exibir"><div align="center"><strong>#PRCInac#%</strong></div></td>
-      <td class="exibir"><div align="center"><strong>#PRCIAPnac#%</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#PRCInac#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#PRCIAPnac#</strong></div></td>
       <td bgcolor="#scord2#" class="exibir"><div align="center"><strong>#PRCIResNac#</strong></div></td>
-      <td class="exibir"><div align="center"><strong>#prciacurealnac#%</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#prciacurealnac#</strong></div></td>
       <td bgcolor="#scorf2#" class="exibir"><div align="center">#prciacurealnacres#</div></td>
-      <td class="exibir"><div align="center"><strong>#SLNCnac#%</strong></div></td>
-      <td class="exibir"><div align="center"><strong>#SLNCAPnac#%</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#SLNCnac#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#SLNCAPnac#</strong></div></td>
       <td bgcolor="#scroi2#" class="exibir"><div align="center"><strong>#SLNCResNac#</strong></div></td>
-      <td class="exibir"><div align="center"><strong>#slncacurealnac#%</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#slncacurealnac#</strong></div></td>
       <td bgcolor="#scrok2#" class="exibir"><div align="center">#slncacurealnacres#</div></td>
-      <td class="exibir"><div align="center"><strong>#DGCInac#%</strong></div></td>
-      <td class="exibir"><div align="center"><strong>#DGCIAPnac#%</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#DGCInac#</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#DGCIAPnac#</strong></div></td>
       <td bgcolor="#scorn2#" class="exibir"><div align="center"><strong>#DGCIResNac#</strong></div></td>
-      <td class="exibir"><div align="center"><strong>#dgciacurealnac#%</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#dgciacurealnac#</strong></div></td>
       <td bgcolor="#scorp2#" class="exibir"><div align="center">#dgciacurealnacres#</div></td>
-      <td class="exibir"><div align="center"><strong>#RESMETnac#%</strong></div></td>
+      <td class="exibir"><div align="center"><strong>#RESMETnac#</strong></div></td>
     </tr>	
     <tr class="exibir">
       <td colspan="18" class="exibir"><strong>(*)DGCI Realizado = (PRCI Realizado * 0,55) + (SLNC Realizado * 0,45)</strong></td>
@@ -473,7 +597,7 @@ dtlimit: #dtlimit#<br>
     <cffile action="Append" file="#slocal##sarquivo#" output=';Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;Meta Nacional;Resultado Nacional;;Acumulado Realizado Nacional;;;'>
     <!---    <CFSET RESMETnac = numberFormat((DGCIAPnac/DGCInac)*100,999.0)> --->
     
-<cffile action="Append" file="#slocal##sarquivo#" output=';#PRCInac#%;#PRCIAPnac#%;#PRCIResNac#;#prciacurealnac#%;#prciacurealnacres#;#SLNCnac#%;#SLNCAPnac#%;#SLNCResNac#;#slncacurealnac#%;#slncacurealnacres#;#DGCInac#%;#DGCIAPnac#%;#DGCIResNac#;#dgciacurealnac#%;#dgciacurealnacres#;#RESMETnac#%'>
+<cffile action="Append" file="#slocal##sarquivo#" output=';#PRCInac#;#PRCIAPnac#;#PRCIResNac#;#prciacurealnac#;#prciacurealnacres#;#SLNCnac#;#SLNCAPnac#;#SLNCResNac#;#slncacurealnac#;#slncacurealnacres#;#DGCInac#;#DGCIAPnac#;#DGCIResNac#;#dgciacurealnac#;#dgciacurealnacres#;#RESMETnac#%'>
 <cffile action="Append" file="#slocal##sarquivo#" output='(*) DGCI Realizado = (PRCI Realizado * 0,55) + (SLNC Realizado * 0,45)'>
 <cffile action="Append" file="#slocal##sarquivo#" output='(**)DGCI Acumulado Realizado = (PRCI Acumulado Realizado * 0,55) + (SLNC Acumulado Realizado * 0,45)'>
 <cffile action="Append" file="#slocal##sarquivo#" output='(***)Resultado em Relação à Meta Mensal = (DGCI Realizado / DGCI Meta Mensal) * 100'>
@@ -485,4 +609,3 @@ dtlimit: #dtlimit#<br>
   <cfinclude template="rodape.cfm">
 </body>
 </html>
-

@@ -1487,7 +1487,6 @@ function exibe(a){
 //alert('exibe: ' + a); 
  exibirjudicializado(a);
  exibirArea(a);
- exibirAreaCS(a);
  exibirValor(a);
  dtprazo(a);
  exibirscoi(a);
@@ -1495,6 +1494,7 @@ function exibe(a){
  exibirsubortransfer(a);
  exibirterctransfer(a);
  exibirsuspenso(a);
+ exibirAreaCS(a);
 }
 //==============
 var ind
@@ -1635,7 +1635,7 @@ function exibirArea(ind){
 		if(ind==25)
 	    {
 		    document.form1.observacao.value = ''
-            <cfset sinformes = "Encaminhamos achado de Controle interno, constatado na agência terceirizada referenciada neste Relatório, para conhecimento, análise, acompanhamento da regularização (se for o caso) e aplicação das providências de competência desse órgão, conforme previsto no instrumento contratual regente. Após a ciência,  o controle da baixa desse  item passará a ser de responsabilidade dessa área e a efetividade e regularidade das ações adotadas poderão serem avaliadas em futuros trabalhos das áreas de Controle Interno da Empresa (2° e 3° linha) ou de Órgãos Externos.">
+            <cfset sinformes = "Encaminhamos achado de Controle interno, constatado na agência terceirizada referenciada nesta Avaliação, para conhecimento, análise, acompanhamento da regularização (se for o caso) e aplicação das providências de competência desse órgão, conforme previsto no instrumento contratual regente.\n\nApós a ciência, o controle da baixa desse item passará a ser de responsabilidade dessa área e a efetividade e regularidade das ações adotadas poderão ser avaliadas em futuros trabalhos das áreas de Controle Interno da Empresa (2° e 3° linha) ou de Órgãos Externos.">
             var area = "#trim(areaDaUnidade)#"; 
             var parecer =  "#sinformes#"; 
             travarcombo(area,'cbarea');

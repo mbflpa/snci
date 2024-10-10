@@ -15,8 +15,7 @@
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/fontawesome-free/css/fontawesome.min.css">
 	<!-- Tempusdominus Bootstrap 4 -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-	<!-- iCheck -->
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+
 	
 	<!-- overlayScrollbars -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
@@ -38,19 +37,15 @@
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-select/css/select.bootstrap4.min.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-scroller/css/scroller.bootstrap4.min.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-searchpanes/css/searchPanes.bootstrap4.min.css">
-	
-	
+		
 	<!-- Select2 -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2/css/select2.min.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
  
-
-	
-
 	<!-- Tour -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">
 
-  <!-- Theme style -->
+    <!-- Theme style -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
 

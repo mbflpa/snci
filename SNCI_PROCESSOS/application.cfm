@@ -39,10 +39,10 @@ applicationtimeout="#createtimespan(0,6,0,0)#">
 	SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
 	INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
 	INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
-	<cfif application.auxsite neq "localhost">
-		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
-	<cfelse>
+	<cfif FindNoCase("localhost", application.auxsite)>
 		WHERE pc_usu_login = 'CORREIOSNET\80859992'
+	<cfelse>
+		WHERE pc_usu_login = '#cgi.REMOTE_USER#'
 	</cfif>
 </cfquery>
 
@@ -65,4 +65,20 @@ applicationtimeout="#createtimespan(0,6,0,0)#">
 								or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_controle_interno ='N' AND pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#'))
 						
 </cfquery>
+
+<cfquery name="getOrgHierarchy" datasource="#application.dsn_processos#" timeout="120">
+	WITH OrgHierarchy AS (
+		SELECT pc_org_mcu, pc_org_mcu_subord_tec
+		FROM pc_orgaos
+		WHERE pc_org_mcu_subord_tec = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+		UNION ALL
+		SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
+		FROM pc_orgaos o
+		INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+	)
+	SELECT pc_org_mcu
+	FROM OrgHierarchy
+</cfquery>
+
+<cfset application.orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
 

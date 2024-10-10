@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8">  
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="permissao_negada.htm">
 	<cfabort>
@@ -35,7 +36,7 @@
     <cfif '#rsGrupo.recordcount#' eq 0>
        <script>
        <cfoutput>
-         alert('N„o existem Grupos cadastrados para o ano ' + '#form.selCadItemAno#' + '.');
+         alert('N√£o existem Grupos cadastrados para o ano ' + '#form.selCadItemAno#' + '.');
        </cfoutput>
        </script>
     </cfif>
@@ -56,7 +57,7 @@
 
 
     <cfif '#rsItemExiste.recordcount#' eq 0>
-         <!---Retorna o maior cÛdigo de item cadastrado para o grupo selecionado e adiciona 1 para gerar o cÛdigo do item a ser cadastrado ---> 
+         <!---Retorna o maior c√≥digo de item cadastrado para o grupo selecionado e adiciona 1 para gerar o c√≥digo do item a ser cadastrado ---> 
         <cfquery datasource="#dsn_inspecao#" name="rsNumItem">
             SELECT MAX(Itn_NumItem) + 1 as numItem FROM Itens_Verificacao
             WHERE Itn_Ano = #form.selCadItemAno# AND Itn_NumGrupo = '#form.selCadItemGrupo#'
@@ -103,7 +104,7 @@
 				</cfif>					
 				<cfset auxpontua = form.selCadItemPontuacaoAGF>	
 		  </cfif>
-		<!--- Obter a pontuaÁ„o max pelo ano e tipo da unidade --->
+		<!--- Obter a Pontua√ß√£o max pelo ano e tipo da unidade --->
 		<cfquery name="rsPtoMax" datasource="#dsn_inspecao#">
 			SELECT TUP_PontuacaoMaxima 
 			FROM Tipo_Unidade_Pontuacao 
@@ -134,16 +135,16 @@
                         VALUES('1',#tipo#,#form.selCadItemGrupo#,#numItem#,CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#',#form.selCadItemAno#,0) 
                     </cfquery>
 					<cfquery datasource="#dsn_inspecao#">
-					INSERT INTO Itens_Verificacao(Itn_Modalidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_TipoUnidade,Itn_Ano,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato)
-					VALUES('0',#form.selCadItemGrupo#, #numItem#, '#form.cadItemDescricao#','#form.cadItemOrientacao#'
-							, 'D', CONVERT(DATETIME, getdate(), 103), '#qAcesso.Usu_Matricula#', '#form.selCadItemValorDec#', #tipo#, #form.selCadItemAno#
-							,'#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#')                                    
-					</cfquery>
+                        INSERT INTO Itens_Verificacao(Itn_Modalidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_TipoUnidade,Itn_Ano,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Manchete)
+                        VALUES('0',#form.selCadItemGrupo#, #numItem#, '#form.cadItemDescricao#','#form.cadItemOrientacao#'
+                                , 'D', CONVERT(DATETIME, getdate(), 103), '#qAcesso.Usu_Matricula#', '#form.selCadItemValorDec#', #tipo#, #form.selCadItemAno#
+                                ,'#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#','#form.cadItemManchete#')                                    
+                        </cfquery>
 					<cfquery datasource="#dsn_inspecao#">
-						INSERT INTO Itens_Verificacao(Itn_Modalidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_TipoUnidade,Itn_Ano,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato)
+						INSERT INTO Itens_Verificacao(Itn_Modalidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_TipoUnidade,Itn_Ano,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Manchete)
 						VALUES('1',#form.selCadItemGrupo#, #numItem#, '#form.cadItemDescricao#','#form.cadItemOrientacao#'
 								, 'D', CONVERT(DATETIME, getdate(), 103), '#qAcesso.Usu_Matricula#', '#form.selCadItemValorDec#', #tipo#, #form.selCadItemAno#
-								,'#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#')
+								,'#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#','#form.cadItemManchete#')
 					</cfquery>	
 					<!---  --->	
 					<cfif tipo neq 12>
@@ -173,10 +174,11 @@
                         VALUES('#form.selModalidade#',#tipo#,#form.selCadItemGrupo#,#numItem#,CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#',#form.selCadItemAno#,0) 
                     </cfquery>
 					<cfquery datasource="#dsn_inspecao#">
-						INSERT INTO Itens_Verificacao(Itn_Modalidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_TipoUnidade,Itn_Ano,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato)
+						INSERT INTO Itens_Verificacao(Itn_Modalidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_TipoUnidade,Itn_Ano,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Manchete)
 							VALUES('#form.selModalidade#',#form.selCadItemGrupo#, #numItem#, '#form.cadItemDescricao#','#form.cadItemOrientacao#'
 										, 'D', CONVERT(DATETIME, getdate(), 103), '#qAcesso.Usu_Matricula#', '#form.selCadItemValorDec#', #tipo#, #form.selCadItemAno#
-										,'#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#')                    </cfquery>		
+										,'#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#','#form.cadItemManchete#')                    
+                    </cfquery>		
 					<!---  --->	
 					<cfif tipo neq 12>
 						<cfquery datasource="#dsn_inspecao#">
@@ -221,13 +223,13 @@
 
         <script>
             var numItem = <cfoutput>#form.selCadItemGrupo#.#numItem#</cfoutput>;
-            alert('Item cadastrado com sucesso!\n\nN∞ do Item gerado automaticamente: ' + numItem + '\n\nSituaÁ„o: DESATIVADO');
+            alert('Item cadastrado com sucesso!\n\nN¬∫ do Item gerado automaticamente: ' + numItem + '\n\nSitua√ß√£o: DESATIVADO');
             window.open('cadastroGruposItens.cfm','_self');
         </script>
 
     <cfelse>
       <script>
-        alert('J· existe um item cadastrado com a mesma DescriÁ„o e Ano.\n\nEsta aÁ„o foi cancelada.');
+        alert('J√° existe um item cadastrado com a mesma Descri√ß√£o e Ano.\n\nEsta a√ß√£o foi cancelada.');
       </script>
     </cfif> 
 
@@ -294,7 +296,7 @@
             var frm = document.getElementById('formCadItem');
 
             if (frm.selCadItemAno.value == '') {
-				alert('Informe o ano que este item ser· utilizado!');
+				alert('Informe o ano que este item ser√° utilizado!');
 				frm.selCadItemAno.focus();
 				return false;
 			}
@@ -306,20 +308,26 @@
 			}
 
             if (frm.selCadItemValorDec.value == '') {
-				alert('Informe se o item prevÍ ou n„o valor declarado!');
+				alert('Informe se o item prev√™ ou n√£o valor declarado!');
 				frm.selCadItemValorDec.focus();
 				return false;
 			}
             
             if (frm.selCadItemValidObrig.value == '') {
-				alert('Informe se o item deve obrigatoriamente ser validado pelo gestor em caso de avaliaÁ„o "N√O EXECUTA"!');
+				alert('Informe se o item deve obrigatoriamente ser validado pelo gestor em caso de avalia√ß√£o "N√ÉO EXECUTA"!');
 				frm.selCadItemValidObrig.focus();
 				return false;
 			}
 
             if (frm.cadItemDescricao.value == '') {
-				alert('Informe uma descriÁ„o para item!');
+				alert('Informe uma descri√ß√£o para item!');
 				frm.cadItemDescricao.focus();
+				return false;
+			}
+
+            if (frm.cadItemManchete.value == '') {
+				alert('Informar a Manchete para item!');
+				frm.cadItemManchete.focus();
 				return false;
 			}
 
@@ -349,7 +357,7 @@
 			}
             
             if (CKEDITOR.instances.cadItemOrientacaoRelato.getData()== '') {
-				alert('Informe uma orientaÁ„o para o Ûrg„o.');
+				alert('Informe uma orienta√ß√£o para o √≥rg√£o.');
 				CKEDITOR.instances.cadItemOrientacaoRelato.focus();
 				return false;
 			}
@@ -361,18 +369,18 @@
 			}
 
             if (tiposSelecionados == '') {
-				alert('Selecione, pelo menos, 01(um) tipo de unidade para o qual o item ser· aplicado nas avaliaÁıes!');
+				alert('Selecione, pelo menos, 01(um) tipo de unidade para o qual o item ser√° aplicado nas avalia√ß√µes!');
 				return false;
 			}
 
             if (frm.selCadItemPontuacao.value == '' || frm.selCadItemPontuacao.value == 0) {
-				alert('Informe a PontuaÁ„o para o item.\n\nObs.: Utilizar a "Calculadora de PontuaÁ„o".');
+				alert('Informe a Pontua√ß√£o para o item.\n\nObs.: Utilizar a "Calculadora de Pontua√ß√£o".');
                 frm.selCadItemPontuacao.focus();
 				return false;
 			}  
 
             if ((frm.selCadItemPontuacaoAGF.value == '' || frm.selCadItemPontuacaoAGF.value == 0) && isVisible(document.getElementById('selCadItemPontuacaoAGF'))==true) {
-				alert('Informe a PontuaÁ„o do item para AGF.\n\nObs.: Utilizar a "Calculadora de PontuaÁ„o".');
+				alert('Informe a Pontua√ß√£o do item para AGF.\n\nObs.: Utilizar a "Calculadora de Pontua√ß√£o".');
                 frm.selCadItemPontuacaoAGF.focus();
 				return false;
 			}
@@ -391,7 +399,7 @@
 
         }  
         
-        //script para calculadora de pontuaÁ„o
+        //script para calculadora de Pontua√ß√£o
         
         // apos load muda cor dos tipos de unidades conforme item selecionado
         
@@ -498,7 +506,7 @@
 		
 	function inserePontuacaoCad(){
 	if (document.getElementById('selCadItemPontuacaoAGF').value == 0 && isVisible(document.getElementById('checkPontuacaoCadAGF'))==true) {
-			alert('Selecione a pontuaÁ„o adicional para a AGF.');
+			alert('Selecione a pontua√ß√£o adicional para a AGF.');
 			document.getElementById('checkPontuacaoCadAGF').focus();
 			return false;
 		}else{  
@@ -523,7 +531,7 @@
 
         function inserePontuacaoCad(){
             if (document.getElementById('checkPontuacaoCadAGF').value =="" && isVisible(document.getElementById('checkPontuacaoCadAGF'))==true) {
-				alert('Selecione a pontuaÁ„o adicional para a AGF.');
+				alert('Selecione a Pontua√ß√£o adicional para a AGF.');
                 document.getElementById('checkPontuacaoCadAGF').focus();
 				return false;
 			}else{           
@@ -551,7 +559,7 @@
             document.getElementById("calculadoraPontuacaoCad").style.display = 'none';
             
         }
-        //Fim script para calculadora de pontuaÁ„o
+        //Fim script para calculadora de Pontua√ß√£o
 
         function getPosicaoElemento(elemID){
             var offsetTrail = document.getElementById(elemID);
@@ -696,35 +704,40 @@ function selecptosAGFcad(a){
                                         </select>              		
                             </div> 
 
-                            <div style="margin-bottom:10px;float:left;position:relative;top:-13px;LEFT:10px" title="Impede a visualizaÁ„o e tratamento do item em todas as p·ginas.">
+                            <div style="margin-bottom:10px;float:left;position:relative;top:-13px;LEFT:10px" title="Impede a visualiza√ß√£o e tratamento do item em todas as p√°ginas.">
                                 <label  for="selCadItemValorDec" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                                 VALOR<br>DECLARADO:</label>
                                 <br>
                                 <select name="selCadItemValorDec" id="selCadItemValorDec"  class="form" onChange="" style="display:inline-block;">
                                     <option selected="selected" value=""></option>
-                                    <option value="N">N„o</option>
+                                    <option value="N">N√£o</option>
                                     <option value="S">Sim</option>
                                 </select>										
                             </div>
 
-                            <div style="margin-bottom:10px;margin-left:40px;position:relative;top:-13px;left:20px" title="Obriga que o gestor valide este item em caso de avaliaÁ„o N√O EXECUTA.">
+                            <div style="margin-bottom:10px;margin-left:40px;position:relative;top:-13px;left:20px" title="Obriga que o gestor valide este item em caso de avalia√ß√£o N√ÉO EXECUTA.">
                                 <label  for="selCadItemValidObrig" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
-                                VALIDA«√O<br>OBRIGAT”RIA:</label>
+                                VALIDA√á√ÉO<br>OBRIGAT√ìRIA:</label>
                                 <br>
                                 <select name="selCadItemValidObrig" id="selCadItemValidObrig"  class="form" onChange="" style="display:inline-block;">
                                     <option selected="selected" value=""></option>
-                                    <option value="0">N„o</option>
+                                    <option value="0">N√£o</option>
                                     <option value="1">Sim</option>
                                 </select>										
                             </div>
 
                             <div style="margin-bottom:10px;">
                                 <label  for="cadItemDescricao" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
-                                DESCRI«√O DO ITEM:</label>	
+                                DESCRI√á√ÉO DO ITEM:</label>	
                                 <br>
                                 <textarea  name="cadItemDescricao"  id="cadItemDescricao" cols="113" rows="2" wrap="VIRTUAL" class="form" style="background:#fff;font-family:Verdana, Arial, Helvetica, sans-serif"></textarea>		
                             </div>
-
+                            <div style="margin-bottom:10px;">
+                                <label  for="cadItemManchete" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                                MANCHETE:</label>	
+                                <br>
+                                <textarea  name="cadItemManchete"  id="cadItemManchete" cols="113" rows="2" wrap="VIRTUAL" class="form" style="background:#fff;font-family:Verdana, Arial, Helvetica, sans-serif"></textarea>		
+                            </div>  
                             <div style="margin-bottom:10px;">
                                 <label  for="cadItemOrientacao" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">COMO EXERCUTAR/PROCEDIMENTOS ADOTADOS:</label>	
                                 <br>
@@ -750,7 +763,7 @@ function selecptosAGFcad(a){
                             </div>
 
                             <div style="margin-bottom:10px;">
-                                <label  for="cadItemOrientacaoRelato" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">ORIENTA«’ES UNIDADE/”RG√O:</label>	
+                                <label  for="cadItemOrientacaoRelato" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">ORIENTA√á√ïES UNIDADE/√ìRG√ÉO:</label>	
                                 <br>
                                 <textarea  name="cadItemOrientacaoRelato" id="cadItemOrientacaoRelato" style="display:none!important;background:#fff;font-family:Verdana, Arial, Helvetica, sans-serif"></textarea>		
                             </div>
@@ -770,13 +783,13 @@ function selecptosAGFcad(a){
                                 <option selected="selected" value=""></option>
                                     <option value="todas">TODAS</option>
                                     <option value="0">PRESENCIAL</option>
-									<option value="1">A DIST¬NCIA</option>
+									<option value="1">A DIST√ÅNCIA</option>
 							</select>
 						</div>
                        
                         <div style="margin-bottom:30px;width:680px;text-align:justify" >
                             <label  for="selCadItemTipoUnidade"  style="font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-                            TIPO DE UNIDADE: <span style="color:yellow">(Selecione os tipos de unidade que ter„o este item em seu PLANO DE TESTE)</span></label>
+                            TIPO DE UNIDADE: <span style="color:yellow">(Selecione os tipos de unidade que ter√£o este item em seu PLANO DE TESTE)</span></label>
                             <br>
                             <cfoutput query="qTipoUnidades">
                                 <div style="float:left;margin-right:15px;border:1px solid transparent;font-size:12px">
@@ -790,12 +803,12 @@ function selecptosAGFcad(a){
                             <div align="left" style="float:left;margin-right:20px;">
                                 <button id="btCalculadoraCad" onClick="mostraCalculadoraCad();PosicaoElemento(this,'calculadoraPontuacaoCad');" onmouseOver="this.style.backgroundColor='cornflowerBlue';" onMouseOut="this.style.backgroundColor='blue';"
                                 class="botaoCad" style="position:relative;top:-22px;background-color:blue;color:#fff;font-size:10px;width:66px;padding:2px;">
-                                <span><img src="figuras/calculadora.png" width="30"  border="0"  ></img></span><div></div>Calculadora<br>PontuaÁ„o</button>                     
+                                <span><img src="figuras/calculadora.png" width="30"  border="0"  ></img></span><div></div>Calculadora<br>Pontua√ß√£o</button>                     
                             </div>
 
                             <div id="selCadItemPontuacaoDiv" align="left" style="float:left;margin-right:20px;visibility:hidden;">
                                 <label  for="selCadItemPontuacao"  style="font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-                                PONTUA«√O:</label> 
+                                PONTUA√á√ÉO:</label> 
                                 <div></div>
                                 <input readonly type="text" id="selCadItemPontuacao" name="selCadItemPontuacao" size="3" onkeypress='return SomenteNumero(event)' style="position:relative;top:2px;text-align:center" 
                                 ></input>
@@ -804,7 +817,7 @@ function selecptosAGFcad(a){
                         
                             <div id="selCadItemPontuacaoAGFdiv" align="left" style="visibility:hidden;">
                                 <label  for="selCadItemPontuacaoAGF"  style="font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-                                PONTUA«√O AGF:</label> 
+                                PONTUA√á√ÉO AGF:</label> 
                                 <div></div>
                                 <input readonly type="text" id="selCadItemPontuacaoAGF" name="selCadItemPontuacaoAGF" size="3" onkeypress='return SomenteNumero(event)' style="position:relative;top:2px;text-align:center" 
                                 ></input>
@@ -819,17 +832,17 @@ function selecptosAGFcad(a){
 
                     <div align="center">
 						<a type="button" onClick="return valida_formCadItem()" href="#" class="botaoCad" style="background:blue;color:#fff;font-size:12px">Cadastrar</a>     
-                         <a type="button" onClick="javascript:if(confirm('Deseja cancelar este cadastro?\n\nObs: Esta aÁ„o n„o cancela cadastros j· confirmados.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
+                         <a type="button" onClick="javascript:if(confirm('Deseja cancelar este cadastro?\n\nObs: Esta a√ß√£o n√£o cancela cadastros j√° confirmados.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
                                     Cancelar</a>
                     </div> 
 
-                    <!---Calculadora de PontuaÁ„o--->
+                    <!---Calculadora de Pontua√ß√£o--->
                     
                     <div id="calculadoraPontuacaoCad" align="left" style="visibility:hidden;display:none;z-index:1000;background-color:#003390;position:absolute;padding:10px;border:3px solid lightGray;width:620px;">
                         <div align="left" style="">   
                             <span class="tituloDivCadItem" style="padding:4px;font-size:12px;border:2px solid lightGray;position:relative;top:-24px;background-color:#003390;">
                             <img src="figuras/calculadora.png" width="20"  border="0" style="position:relative;top:2px" ></img>                                   
-                            Calculadora de PontuaÁ„o</span>
+                            Calculadora de Pontua√ß√£o</span>
                         </div>
 
                         <div style="border:1px solid transparent;font-size:12px">
@@ -841,20 +854,20 @@ function selecptosAGFcad(a){
 							</cfoutput> 
 <!---                             <input type="checkbox"  name="checkPontuacaoCad" value="9" onclick="calcularPontuacaoCad();">TEM IMPACTO FINANCEIRO DIRETO = <strong>9 pontos</strong></input>
                             <div></div>
-                            <input type="checkbox"  name="checkPontuacaoCad" value="4" onclick="calcularPontuacaoCad();">PODE ENSEJAR INDENIZA«√O/PENALIZA«√O ¿ ECT/MULTAS CONTRATUAIS OU LEGAIS = <strong>4 pontos</strong></input>
+                            <input type="checkbox"  name="checkPontuacaoCad" value="4" onclick="calcularPontuacaoCad();">PODE ENSEJAR INDENIZA√á√ÉO/PENALIZA√áAO √Ä ECT/MULTAS CONTRATUAIS OU LEGAIS = <strong>4 pontos</strong></input>
                             <div></div>
                             <input type="checkbox"  name="checkPontuacaoCad" value="2" onclick="calcularPontuacaoCad();">DESCUMPRIMENTO DE LEI/NORMA EXTERNA = <strong>2 pontos</strong></input>
                             <div></div>
                             <input type="checkbox"  name="checkPontuacaoCad" value="1" onclick="calcularPontuacaoCad();">DESCUMPRIMENTO DE NORMA INTERNA = <strong>1 ponto</strong></input>
                             <div></div>
-                            <input type="checkbox"  name="checkPontuacaoCad" value="3" onclick="calcularPontuacaoCad();">RISCO ¿ SEGURAN«A E INTEGRIDADE DO PATRIM‘NIO, BENS, OBJETOS E PESSOAS = <strong>3 pontos</strong></input>
+                            <input type="checkbox"  name="checkPontuacaoCad" value="3" onclick="calcularPontuacaoCad();">RISCO √Ä SEGURAN√áA E INTEGRIDADE DO PATRIM√îNIO, BENS, OBJETOS E PESSOAS = <strong>3 pontos</strong></input>
                             <div></div>
-                            <input type="checkbox"  name="checkPontuacaoCad" value="2" onclick="calcularPontuacaoCad();">RISCO ¿ IMAGEM DA ECT = <strong>2 pontos</strong></input> 
+                            <input type="checkbox"  name="checkPontuacaoCad" value="2" onclick="calcularPontuacaoCad();">RISCO √Ä IMAGEM DA ECT = <strong>2 pontos</strong></input> 
 --->
                             
                             <div id="checkPontuacaoCadAGFdiv" style="margin-top:10px;visiblity:hidden;display:none">
-                                PontuaÁ„o Adicional p/ AGF:<div></div>
-								  <input  type="radio" name="checkPontuacaoCadAGF" value="0" onClick="calcularPontuacaoCad('0')" checked>PontuaÁ„o Inicial</input>								
+                                Pontua√ß√£o Adicional p/ AGF:<div></div>
+								  <input  type="radio" name="checkPontuacaoCadAGF" value="0" onClick="calcularPontuacaoCad('0')" checked>Pontua√ß√£o Inicial</input>								
 								  <div></div>
 						          <cfoutput query="rsPta">
 								   <cfif rsPta.PTC_Franquia is 'S'>
@@ -864,10 +877,10 @@ function selecptosAGFcad(a){
 							      </cfoutput> 
 <!---                                 <select id="checkPontuacaoCadAGF" name="checkPontuacaoCadAGF" onchange="calcularPontuacaoCad();">
                                     <option value=""  selected></option> 
-                                    <option value="1">PONTUA«√O PREVISTA NO CFP IGUAL A 0(ZERO) = <strong>1 ponto</strong></option>
-                                    <option value="3">PONTUA«√O PREVISTA NO CFP ENTRE 1 E 10 = <strong>3 pontos</strong></option>
-                                    <option value="6">PONTUA«√O PREVISTA NO CFP ENTRE 11 E 49 = <strong>6 pontos</strong></option>
-                                    <option value="9" >PONTUA«√O PREVISTA NO CFP MAIOR OU IGUAL A 50 = <strong>9 pontos</strong></option>
+                                    <option value="1">PONTUA√á√ÉO PREVISTA NO CFP IGUAL A 0(ZERO) = <strong>1 ponto</strong></option>
+                                    <option value="3">PONTUA√á√ÉO PREVISTA NO CFP ENTRE 1 E 10 = <strong>3 pontos</strong></option>
+                                    <option value="6">PONTUA√á√ÉO PREVISTA NO CFP ENTRE 11 E 49 = <strong>6 pontos</strong></option>
+                                    <option value="9" >PONTUA√á√ÉO PREVISTA NO CFP MAIOR OU IGUAL A 50 = <strong>9 pontos</strong></option>
                                 </select> 
 --->
                             </div>
@@ -885,7 +898,7 @@ function selecptosAGFcad(a){
  
                             <div align="right" style="margin-top:20px;float:left">
                                 <button onClick="inserePontuacaoCad()" onmouseOver="this.style.backgroundColor='cornflowerBlue';" onMouseOut="this.style.backgroundColor='blue';"
-                                class="botaoCad" style="background:blue;color:#fff;font-size:12px;width:121px">Inserir PontuaÁ„o</button> 
+                                class="botaoCad" style="background:blue;color:#fff;font-size:12px;width:121px">Inserir Pontua√ß√£o</button> 
                             </div>
                             <div align="right" style="margin-top:20px;">
                                 <button onClick="fechaCalculadoraCad()" onmouseOver="this.style.backgroundColor='red';" onMouseOut="this.style.backgroundColor='darkred';"
@@ -893,7 +906,7 @@ function selecptosAGFcad(a){
                             </div>
                         </div>
                     </div>
-                    <!---Fim Calculadora de PontuaÁ„o--->   
+                    <!---Fim Calculadora de Pontua√ß√£o--->   
             </form>
 
 
@@ -930,7 +943,7 @@ function selecptosAGFcad(a){
         CKEDITOR.replace('cadItemPreRelato', {
             width: '100%',
             height: 50,
-            removePlugins: 'scayt',//corretor ortogr·fico
+            removePlugins: 'scayt',//corretor ortografico
             disableNativeSpellChecker: false,
             toolbar: [
                 ['Preview', 'Print', '-' ],
@@ -947,7 +960,7 @@ function selecptosAGFcad(a){
         CKEDITOR.replace('cadItemOrientacaoRelato', {
             width: '100%',
             height: 50,
-            removePlugins: 'scayt',//corretor ortogr·fico
+            removePlugins: 'scayt',//corretor ortografico
             disableNativeSpellChecker: false,
             toolbar: [
                 ['Preview', 'Print', '-' ],

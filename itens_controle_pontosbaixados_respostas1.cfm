@@ -1526,10 +1526,9 @@ function hanci(){
 
 //=================
 function exibe(a){
-//  alert('exibe: ' + a); 
+ // alert('exibe: ' + a); 
  exibirjudicializado(a);
  exibirArea(a);
- exibirAreaCS(a);
  exibirValor(a);
  dtprazo(a);
  exibirscoi(a);
@@ -1538,8 +1537,9 @@ function exibe(a){
  exibirsubortransfer(a);
  exibirterctransfer(a);
  exibirsuspenso(a);
+ exibirAreaCS(a);
 }
-
+//==============
 //==============
 var ind
 function exibirjudicializado(ind){
@@ -1577,7 +1577,7 @@ function exibirsuspenso(ind){
 			if ((frmobserv == '' || ind != K) && (auxacao == '' || auxacao == 'Salvar2')) {
 		    document.form1.observacao.value = '';
 		
-          var sinformes = "Com base na manifestação registrada, considera-se o item SOLUCIONADO. \n\nÉ oportuno informar que a efetividade das ações de regularização adotadas poderá ser verificada em futuras Avaliações de Controle realizadas pelas equipes do Controle Interno. \n\nCabe destacar que, caso a unidade avaliada incorra novamente na irregularidade apontada, tal situação será passível de ser considerada como reincidência."
+          var sinformes = "Com base na manifestação registrada, considera-se o item SOLUCIONADO.\n\nÉ oportuno informar que a efetividade das ações de regularização adotadas poderá ser verificada em futuras Avaliações de Controle realizadas pelas equipes do Controle Interno.\n\nCabe destacar que, caso a unidade avaliada incorra novamente na irregularidade apontada, tal situação será passível de ser considerada como reincidência."
             var parecer =  sinformes; 
             document.form1.observacao.value = parecer;
 			}
@@ -1626,7 +1626,7 @@ function exibirscia(ind){
 //alert('exibirscia: ' + ind);
   
   document.form1.cbscia.disabled=false;
-if (ind==210) {
+if (ind==21) {
           window.dAreascia.style.visibility = 'visible'; 
 		  travarcombo('SEC ACOMP CONTR INTERNO/SGCIN','cbscia');
   
@@ -1714,7 +1714,7 @@ if (ind==5 || ind==10 || ind==19 || ind==25 || ind==26){
 		if(ind==25)
 	    {
 		    document.form1.observacao.value = ''
-            <cfset sinformes = "Encaminhamos achado de Controle interno, constatado na agência terceirizada referenciada neste Relatório, para conhecimento, análise, acompanhamento da regularização (se for o caso) e aplicação das providências de competência desse órgão, conforme previsto no instrumento contratual regente. Após a ciência,  o controle da baixa desse  item passará a ser de responsabilidade dessa área e a efetividade e regularidade das ações adotadas poderão serem avaliadas em futuros trabalhos das áreas de Controle Interno da Empresa (2° e 3° linha) ou de Órgãos Externos.">
+            <cfset sinformes = "Encaminhamos achado de Controle interno, constatado na agência terceirizada referenciada nesta Avaliação, para conhecimento, análise, acompanhamento da regularização (se for o caso) e aplicação das providências de competência desse órgão, conforme previsto no instrumento contratual regente.\n\nApós a ciência, o controle da baixa desse item passará a ser de responsabilidade dessa área e a efetividade e regularidade das ações adotadas poderão ser avaliadas em futuros trabalhos das áreas de Controle Interno da Empresa (2° e 3° linha) ou de Órgãos Externos.">
             var area = "#trim(areaDaUnidade)#"; 
             var parecer =  "#sinformes#"; 
             travarcombo(area,'cbarea');
@@ -1740,7 +1740,8 @@ if (ind==5 || ind==10 || ind==19 || ind==25 || ind==26){
 //==================
 var idx
 function exibirAreaCS(idx){
-//alert(idx);
+//
+//alert('exibirAreaCS status: ' + idx);
 //alert(document.form1.houveProcSN.value);
    window.dAreaCS.style.visibility = 'visible';
 
@@ -1784,6 +1785,8 @@ function exibirValor(vlr){
 		}   
   }
 }
+//==============
+
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 function validarform(){
 //var tamresp = document.form1.frmResp.value;
@@ -2165,7 +2168,7 @@ window.open(page, "Popup", windowprops);
 </style>
 </head>
 
-<body onLoad="if(document.form1.houveProcSN.value != 'S') {exibe(document.form1.frmResp.value)} else {exibe(24)}; hanci(); controleNCI(); exibir_Area011(this.value)"> 
+<body onLoad="exibe(document.form1.frmResp.value);if(document.form1.houveProcSN.value != 'S') {exibe(document.form1.frmResp.value)} else {exibe(24)}; hanci(); controleNCI(); exibir_Area011(this.value)"> 
 <cfset Form.acao = ''>
  <cfinclude template="cabecalho.cfm">
 <table width="70%"  align="center" bordercolor="f7f7f7">
@@ -2446,11 +2449,12 @@ window.open(page, "Popup", windowprops);
 	<cfif qApura.recordcount gt 0>
 	    <input type="hidden" name="houveProcSN" value="S">
 	    <input type="hidden" name="mensSN" value="S">
-	<cfelse>
-		<input type="hidden" name="houveProcSN" value="<cfoutput>#houveProcSN#</cfoutput>">
-		<input type="hidden" name="mensSN" value="N">
 	</cfif>
+<cfelse>
+	<input type="hidden" name="houveProcSN" value="<cfoutput>#houveProcSN#</cfoutput>">
+	<input type="hidden" name="mensSN" value="N">
 </cfif>
+
 <!--- FIM - Direcionar ponto para APURACAO  --->		  
 		     
     </tr>
@@ -2885,20 +2889,27 @@ window.open(page, "Popup", windowprops);
 <!---    <input name="button" type="button" class="botao" onClick="window.open('itens_controle_pontosbaixados_respostas.cfm?ckTipo=inspecao&txtNum_Inspecao=#URL.Ninsp#&Submit2=Confirmar','_self')" value="Voltar"> --->
 	   <cfset auxdtini = dateformat(dtinic,"dd/mm/yyyy")>
 	   <cfset auxdtfim = dateformat(dtfim,"dd/mm/yyyy")>
-	   <cfif houveProcSN neq "S">
+<!---	   <cfif houveProcSN neq "S"> --->
 	     <input name="button" type="button" class="botao" onClick="window.open('itens_controle_pontosbaixados_respostas.cfm?ninsp=#URL.Ninsp#&unid=#URL.Unid#&ngrup=#URL.Ngrup#&nitem=#URL.Nitem#&dtfim=#auxdtfim#&dtinic=#auxdtini#&SE=#url.SE#&cktipo=#url.cktipo#&selstatus=#selstatus#&StatusSE=#StatusSE#','_self')" value="Voltar">
-       <cfelse>
+<!---       <cfelse>
          <input name="button" type="button" class="botao" value="Voltar" disabled>       
        </cfif>
+--->
       </cfoutput> &nbsp;&nbsp;&nbsp;&nbsp;
 
 	<!---   <cfoutput>sn:#habslvsn#</cfoutput> --->
      <cfset numdias = qResposta.diasOcor>
-	 <cfif ((resp is 3) or (resp is 24) or (resp is 31) or (habslvsn eq 'N'))> 
+	 <cfif grpacesso eq 'GOVERNANCA'>
+	    <input name="Salvar2" type="submit" class="botao" value="Salvar" onClick="CKupdate();document.form1.acao.value='Salvar2'" disabled>
+	 <cfelse>
+		<input name="Salvar2" type="submit" class="botao" value="Salvar" onClick="CKupdate();document.form1.acao.value='Salvar2'">
+     </cfif>
+<!---	 <cfif ((resp is 3) or (resp is 24) or (resp is 31) or (habslvsn eq 'N'))> 
 	 		<input name="Salvar2" type="submit" class="botao" value="Salvar" onClick="CKupdate();document.form1.acao.value='Salvar2';" disabled>
 	  <cfelse>
             <input name="Salvar2" type="submit" class="botao" value="Salvar" onClick="CKupdate();document.form1.acao.value='Salvar2'" <cfoutput>#halbtgeral#</cfoutput>>
       </cfif>
+--->	  
       </div>	  </td>
     </tr>
 

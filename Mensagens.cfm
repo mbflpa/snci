@@ -7,7 +7,7 @@
 </cfif>
 <cfset gil = gil> --->
 
-<cfsetting requesttimeout="15000">
+<cfsetting requesttimeout="20000">
 
 <cfset auxdt = dateformat(now(),"YYYYMMDD")>
 <cfquery name="rsDia" datasource="#dsn_inspecao#">
@@ -129,15 +129,15 @@
 	</cfloop>	
 </cfif>
  
-<cfloop condition="rotina lte 31">   
+<cfloop condition="rotina lte 33">   
 	<cfif rotina eq 1>
 	    <cfset auxano = year(now())>
 	    <!--- Prover ajustes na tabela Andamento para todos os status --->
 		<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
 		<cfquery name="rsAtuAND" datasource="#dsn_inspecao#">
 			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_Situacao_Resp, pos_username, Pos_Area, Pos_NomeArea, pos_dtultatu
-			FROM ParecerUnidade LEFT JOIN Andamento ON (Pos_Situacao_Resp = And_Situacao_Resp) AND (Pos_DtPosic = And_DtPosic) AND (Pos_NumItem = And_NumItem) AND (Pos_NumGrupo = And_NumGrupo) AND 
-			(Pos_Unidade = And_Unidade) AND ([Pos_Inspecao] = [And_NumInspecao])
+			FROM ParecerUnidade LEFT JOIN Andamento ON (Pos_Situacao_Resp = And_Situacao_Resp) AND (Pos_DtPosic = And_DtPosic) AND (Pos_NumItem = And_NumItem) AND 
+			(Pos_NumGrupo = And_NumGrupo) AND (Pos_Unidade = And_Unidade) AND ([Pos_Inspecao] = [And_NumInspecao])
 			WHERE And_NumInspecao Is Null
 			order by Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 		</cfquery>
@@ -203,17 +203,20 @@
 		</cfoutput>	
 		
 		<!--- Fim Criar linha de metas para o exercício do PACIN --->
-
-		<!--- atualizar a tabela SLNCPRCIDCGIMES com os dados da PARACERUNIDADE --->
+		<!--- atualizar a tabela SLNCPRCIDCGIANOMES com os dados da PARACERUNIDADE --->
 		<!--- limpar tabela temp --->
 		<cfquery datasource="#dsn_inspecao#">
-			delete from SLNCPRCIDCGIMES where Pos_Mes=#aux_mes#
+			delete from SLNCPRCIDCGIANOMES where Pos_Ano=#anoexerc# and Pos_Mes=#aux_mes#
 		</cfquery>	
-
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,30)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>
+		<!--- obter os solucionados do mês --->
 		<!--- obter os solucionados do mês --->
 		<cfquery name="rs3SO" datasource="#dsn_inspecao#">
-			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Situacao, pos_dtultatu, pos_username, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
-			FROM ParecerUnidade INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			SELECT INP_DTConcluirRevisao, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Situacao, pos_dtultatu, pos_username, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
+			FROM Inspecao INNER JOIN (ParecerUnidade INNER JOIN Unidades ON Pos_Unidade = Und_Codigo) ON (INP_NumInspecao = Pos_Inspecao) AND (INP_Unidade = Pos_Unidade)
 			WHERE Pos_Situacao_Resp = 3 and Pos_DtPosic between #dtini# and #dtfim# 
 		</cfquery>	
 
@@ -224,6 +227,8 @@
 
 		<cfloop query="rs3SO">
 			<cfset PosDtPosic = CreateDate(year(rs3SO.Pos_DtPosic),month(rs3SO.Pos_DtPosic),day(rs3SO.Pos_DtPosic))>
+			<cfset INPDTConcluirRevisao  = CreateDate(year(rs3SO.INP_DTConcluirRevisao),month(rs3SO.INP_DTConcluirRevisao),day(rs3SO.INP_DTConcluirRevisao))>
+			
 			<cfif len(trim(rs3SO.Pos_DtPrev_Solucao)) neq 0>
 				<cfset PosDtPrevSolucao = CreateDate(year(rs3SO.Pos_DtPrev_Solucao),month(rs3SO.Pos_DtPrev_Solucao),day(rs3SO.Pos_DtPrev_Solucao))>
 			<cfelse>
@@ -238,21 +243,32 @@
 			</cfif>					
 			<cfset posdtultatu = CreateDate(year(rs3SO.pos_dtultatu),month(rs3SO.pos_dtultatu),day(rs3SO.pos_dtultatu))>
 			<cfset auxsta = rs3SO.Pos_Situacao_Resp> 
-			<cfset auxantes = 0>
-			<cfif rs3SO.Pos_Sit_Resp_Antes gt 0>
-				<cfset auxantes = rs3SO.Pos_Situacao_Resp>
-			</cfif>					
+			<cfset auxantes = trim(rs3SO.Pos_Sit_Resp_Antes)>
+			<cfif auxantes is '' or auxantes is 0 or auxantes is 11 or auxantes is 14 or auxantes is 21 or auxantes is 28 or auxantes is 29>
+				<cfset auxantes = 1> 
+			</cfif>		
+			<cfquery name="rsAnd" datasource="#dsn_inspecao#">
+				SELECT And_HrPosic
+				FROM Andamento
+				WHERE And_NumInspecao='#rs3SO.Pos_Inspecao#' AND 
+				And_Unidade='#rs3SO.Pos_Unidade#' AND 
+				And_NumGrupo=#rs3SO.Pos_NumGrupo# AND 
+				And_NumItem=#rs3SO.Pos_NumItem# AND 
+				And_Situacao_Resp=3 and
+				And_DtPosic=#PosDtPosic#
+				order by And_DtPosic desc, And_HrPosic desc
+			</cfquery>	
+			<cfset AndHrPosic = #trim(rsAnd.And_HrPosic)#>
 			<cfquery datasource="#dsn_inspecao#">
-				insert into SLNCPRCIDCGIMES (Pos_Mes,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, pos_dtultatu, Pos_Situacao_Resp, Pos_Situacao, pos_username, Pos_Area, Pos_NomeArea, Pos_DtPrev_Solucao, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes) 
-				values 
-					(#aux_mes#,'#rs3SO.Pos_Unidade#', '#rs3SO.Pos_Inspecao#', #rs3SO.Pos_NumGrupo#, #rs3SO.Pos_NumItem#, #PosDtPosic#, #posdtultatu#, #auxsta#, '#rs3SO.Pos_Situacao#', '#rs3SO.pos_username#', '#rs3SO.Pos_Area#', '#rs3SO.Pos_NomeArea#', #PosDtPrevSolucao#, #PosPontuacaoPonto#, '#PosClassificacaoPonto#', #auxantes#)
+				insert into SLNCPRCIDCGIANOMES (Pos_Ano,Pos_Mes,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, pos_dtultatu, Pos_Situacao_Resp, Pos_Situacao, pos_username, Pos_Area, Pos_NomeArea, Pos_DtPrev_Solucao, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes,INPDTConcluirRevisao,andHrPosic) 
+				values (#anoexerc#,#aux_mes#,'#rs3SO.Pos_Unidade#', '#rs3SO.Pos_Inspecao#', #rs3SO.Pos_NumGrupo#, #rs3SO.Pos_NumItem#, #PosDtPosic#, #posdtultatu#, #auxsta#, '#rs3SO.Pos_Situacao#', '#rs3SO.pos_username#', '#rs3SO.Pos_Area#', '#rs3SO.Pos_NomeArea#', #PosDtPrevSolucao#, #PosPontuacaoPonto#, '#PosClassificacaoPonto#', #auxantes#,#INPDTConcluirRevisao#,'#AndHrPosic#')
 			</cfquery>		
 		</cfloop>	
 
 		<!--- NAO RESPONDIDO PENDENTES E TRATAMENTOS --->
 		<cfquery name="rsNRPENDTRAT" datasource="#dsn_inspecao#">
-			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Situacao, pos_dtultatu, pos_username, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
-			FROM ParecerUnidade INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			SELECT INP_DTConcluirRevisao, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Situacao, pos_dtultatu, pos_username, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
+			FROM Inspecao INNER JOIN (ParecerUnidade INNER JOIN Unidades ON Pos_Unidade = Und_Codigo) ON (INP_NumInspecao = Pos_Inspecao) AND (INP_Unidade = Pos_Unidade)
 			WHERE Pos_Situacao_Resp In (14,2,4,5,8,15,16,18,19,20,23) 
 		</cfquery>
 
@@ -263,6 +279,7 @@
 
 		<cfloop query="rsNRPENDTRAT">
 			<cfset PosDtPosic = CreateDate(year(rsNRPENDTRAT.Pos_DtPosic),month(rsNRPENDTRAT.Pos_DtPosic),day(rsNRPENDTRAT.Pos_DtPosic))>
+			<cfset INPDTConcluirRevisao  = CreateDate(year(rsNRPENDTRAT.INP_DTConcluirRevisao),month(rsNRPENDTRAT.INP_DTConcluirRevisao),day(rsNRPENDTRAT.INP_DTConcluirRevisao))>
 			<cfif len(trim(rsNRPENDTRAT.Pos_DtPrev_Solucao)) neq 0>
 			<cfset PosDtPrevSolucao = CreateDate(year(rsNRPENDTRAT.Pos_DtPrev_Solucao),month(rsNRPENDTRAT.Pos_DtPrev_Solucao),day(rsNRPENDTRAT.Pos_DtPrev_Solucao))>
 			<cfelse>
@@ -277,20 +294,34 @@
 			</cfif>						
 			<cfset posdtultatu = CreateDate(year(rsNRPENDTRAT.pos_dtultatu),month(rsNRPENDTRAT.pos_dtultatu),day(rsNRPENDTRAT.pos_dtultatu))>
 			<cfset auxsta = rsNRPENDTRAT.Pos_Situacao_Resp>
-			<cfset auxantes = 0>
-			<cfif rsNRPENDTRAT.Pos_Sit_Resp_Antes gt 0>
-				<cfset auxantes = rsNRPENDTRAT.Pos_Situacao_Resp>
-			</cfif>							
+			<cfset auxantes = trim(rsNRPENDTRAT.Pos_Sit_Resp_Antes)>
+			<cfif auxantes is '' or auxantes is 0 or auxantes is 11 or auxantes is 14 or auxantes is 21 or auxantes is 28 or auxantes is 29>
+				<cfset auxantes = 1> 
+			</cfif>	
+			<cfset AndHrPosic = '000014'>
+			<cfif auxsta neq 14>
+				<cfquery name="rsAnd" datasource="#dsn_inspecao#">
+					SELECT And_HrPosic
+					FROM Andamento
+					WHERE And_NumInspecao='#rsNRPENDTRAT.Pos_Inspecao#' AND 
+					And_Unidade='#rsNRPENDTRAT.Pos_Unidade#' AND 
+					And_NumGrupo=#rsNRPENDTRAT.Pos_NumGrupo# AND 
+					And_NumItem=#rsNRPENDTRAT.Pos_NumItem# AND 
+					And_Situacao_Resp=#auxsta# and
+					And_DtPosic=#PosDtPosic#
+					order by And_DtPosic desc, And_HrPosic desc
+				</cfquery>	
+				<cfset AndHrPosic = #trim(rsAnd.And_HrPosic)#>
+			</cfif>									
 			<cfquery datasource="#dsn_inspecao#">
-				insert into SLNCPRCIDCGIMES (Pos_Mes,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, pos_dtultatu, Pos_Situacao_Resp, Pos_Situacao, 
-				pos_username, Pos_Area, Pos_NomeArea, Pos_DtPrev_Solucao, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes) values (#aux_mes#,'#rsNRPENDTRAT.Pos_Unidade#', '#rsNRPENDTRAT.Pos_Inspecao#', #rsNRPENDTRAT.Pos_NumGrupo#, #rsNRPENDTRAT.Pos_NumItem#, #PosDtPosic#, #posdtultatu#, #auxsta#, '#rsNRPENDTRAT.Pos_Situacao#', '#rsNRPENDTRAT.pos_username#', '#rsNRPENDTRAT.Pos_Area#', '#rsNRPENDTRAT.Pos_NomeArea#', #PosDtPrevSolucao#, #PosPontuacaoPonto#, '#PosClassificacaoPonto#', #auxantes#)
+				insert into SLNCPRCIDCGIANOMES (Pos_Ano,Pos_Mes,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, pos_dtultatu, Pos_Situacao_Resp, Pos_Situacao,pos_username, Pos_Area, Pos_NomeArea, Pos_DtPrev_Solucao, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes,INPDTConcluirRevisao,andHrPosic) values (#anoexerc#,#aux_mes#,'#rsNRPENDTRAT.Pos_Unidade#', '#rsNRPENDTRAT.Pos_Inspecao#', #rsNRPENDTRAT.Pos_NumGrupo#, #rsNRPENDTRAT.Pos_NumItem#, #PosDtPosic#, #posdtultatu#, #auxsta#, '#rsNRPENDTRAT.Pos_Situacao#', '#rsNRPENDTRAT.pos_username#', '#rsNRPENDTRAT.Pos_Area#', '#rsNRPENDTRAT.Pos_NomeArea#', #PosDtPrevSolucao#, #PosPontuacaoPonto#, '#PosClassificacaoPonto#', #auxantes#,#INPDTConcluirRevisao#,'#AndHrPosic#')
 			</cfquery>	
-		</cfloop>			
-		<!--- RESPOSTAS, CS, PI, OC, RV, AP, RC, NC, BX, EA, EC e TP (DENTRO DO MES)--->	
+		</cfloop>	
+		<!--- RESPOSTAS, CS, RV, AP, RC, NC, BX, EA, EC e TP (DENTRO DO MES)--->	
 		<cfquery name="rsOutros" datasource="#dsn_inspecao#">
-			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Situacao, pos_dtultatu, pos_username, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
-			FROM ParecerUnidade INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-			WHERE Pos_Situacao_Resp In (1,6,7,17,22,9,10,12,13,21,24,25,26,27,28,29,30) and Pos_DtPosic between #dtini# and #dtfim# 
+			SELECT INP_DTConcluirRevisao, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Situacao, pos_dtultatu, pos_username, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
+			FROM Inspecao INNER JOIN (ParecerUnidade INNER JOIN Unidades ON Pos_Unidade = Und_Codigo) ON (INP_NumInspecao = Pos_Inspecao) AND (INP_Unidade = Pos_Unidade)
+			WHERE Pos_Situacao_Resp In (1,6,7,17,22,9,10,21,24,25,26,27,28,29,30) and Pos_DtPosic between #dtini# and #dtfim# 
 		</cfquery>
 
 		<cfset startTime = CreateTime(0,0,0)> 
@@ -300,6 +331,7 @@
 
 		<cfloop query="rsOutros">
 			<cfset PosDtPosic = CreateDate(year(rsOutros.Pos_DtPosic),month(rsOutros.Pos_DtPosic),day(rsOutros.Pos_DtPosic))>
+			<cfset INPDTConcluirRevisao  = CreateDate(year(rsOutros.INP_DTConcluirRevisao),month(rsOutros.INP_DTConcluirRevisao),day(rsOutros.INP_DTConcluirRevisao))>
 			<cfif len(trim(rsOutros.Pos_DtPrev_Solucao)) neq 0>
 				<cfset PosDtPrevSolucao = CreateDate(year(rsOutros.Pos_DtPrev_Solucao),month(rsOutros.Pos_DtPrev_Solucao),day(rsOutros.Pos_DtPrev_Solucao))>
 			<cfelse>
@@ -314,13 +346,28 @@
 			</cfif>						
 			<cfset posdtultatu = CreateDate(year(rsOutros.pos_dtultatu),month(rsOutros.pos_dtultatu),day(rsOutros.pos_dtultatu))>
 			<cfset auxsta = rsOutros.Pos_Situacao_Resp> 
-			<cfset auxantes = 0>
-			<cfif rsOutros.Pos_Sit_Resp_Antes gt 0>
-				<cfset auxantes = rsOutros.Pos_Situacao_Resp>
+			<cfset auxantes = trim(rsOutros.Pos_Sit_Resp_Antes)>
+			<cfif auxantes is '' or auxantes is 0 or auxantes is 11 or auxantes is 14 or auxantes is 21 or auxantes is 28 or auxantes is 29>
+				<cfset auxantes = 1> 
 			</cfif>	
+
+			<cfquery name="rsAnd" datasource="#dsn_inspecao#">
+				SELECT And_HrPosic
+				FROM Andamento
+				WHERE And_NumInspecao='#rsOutros.Pos_Inspecao#' AND 
+				And_Unidade='#rsOutros.Pos_Unidade#' AND 
+				And_NumGrupo=#rsOutros.Pos_NumGrupo# AND 
+				And_NumItem=#rsOutros.Pos_NumItem# AND 
+				And_Situacao_Resp=#auxsta# and
+				And_DtPosic=#PosDtPosic#
+				order by And_DtPosic desc, And_HrPosic desc
+			</cfquery>	
+			<cfset AndHrPosic = trim(#rsAnd.And_HrPosic#)>
+							
 			<cfquery datasource="#dsn_inspecao#">
-				insert into SLNCPRCIDCGIMES (Pos_Mes,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, pos_dtultatu, Pos_Situacao_Resp, Pos_Situacao, 
-				pos_username, Pos_Area, Pos_NomeArea, Pos_DtPrev_Solucao, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes) values (#aux_mes#,'#rsOutros.Pos_Unidade#', '#rsOutros.Pos_Inspecao#', #rsOutros.Pos_NumGrupo#, #rsOutros.Pos_NumItem#, #PosDtPosic#, #posdtultatu#, #auxsta#, '#rsOutros.Pos_Situacao#', '#rsOutros.pos_username#', '#rsOutros.Pos_Area#', '#rsOutros.Pos_NomeArea#', #PosDtPrevSolucao#, #PosPontuacaoPonto#, '#PosClassificacaoPonto#', #auxantes#)
+				insert into SLNCPRCIDCGIANOMES (Pos_Ano,Pos_Mes,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, pos_dtultatu, Pos_Situacao_Resp, Pos_Situacao,pos_username, Pos_Area, Pos_NomeArea, Pos_DtPrev_Solucao, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes,INPDTConcluirRevisao,andHrPosic) 
+				values 
+				(#anoexerc#,#aux_mes#,'#rsOutros.Pos_Unidade#', '#rsOutros.Pos_Inspecao#', #rsOutros.Pos_NumGrupo#, #rsOutros.Pos_NumItem#, #PosDtPosic#, #posdtultatu#, #auxsta#, '#rsOutros.Pos_Situacao#', '#rsOutros.pos_username#', '#rsOutros.Pos_Area#', '#rsOutros.Pos_NomeArea#', #PosDtPrevSolucao#, #PosPontuacaoPonto#, '#PosClassificacaoPonto#', #auxantes#,#INPDTConcluirRevisao#,'#AndHrPosic#')
 			</cfquery>		
 		</cfloop>	
 
@@ -336,19 +383,19 @@
 		</cfquery>
 
 		<!---  --->
-		<cfset dt14limitprci_slnc  = #dtini#>
-		<cfset nCont = 0>
+		<cfset dt14nrlimiteslnc  = #dtfim#>
+		<cfset nCont = 1>
 		<cfset dsusp = 0>
-		<cfloop condition="nCont lte 9"> 
-			<cfset dt14limitprci_slnc  = DateAdd("d", -1, #dt14limitprci_slnc#)>	
-			<cfset vDiaSem = DayOfWeek(dt14limitprci_slnc )>
+		<cfloop condition="nCont lte 30"> 
+			<cfset dt14nrlimiteslnc  = DateAdd("d", -1, #dt14nrlimiteslnc#)>	
+			<cfset vDiaSem = DayOfWeek(dt14nrlimiteslnc )>
 			<cfif (vDiaSem neq 1) and (vDiaSem neq 7)>
 				<cfif rsFer.recordcount gt 0> 
-						<cfloop query="rsFer">
-							<cfif dateformat(rsFer.Fer_Data,"YYYYMMDD") eq dateformat(dt14limitprci_slnc ,"YYYYMMDD")>
-								<cfset nCont = nCont - 1>
-							</cfif>
-						</cfloop> 
+					<cfloop query="rsFer">
+						<cfif dateformat(rsFer.Fer_Data,"YYYYMMDD") eq dateformat(dt14nrlimiteslnc ,"YYYYMMDD")>
+							<cfset nCont = nCont - 1>
+						</cfif>
+					</cfloop> 
 				</cfif>
 			<cfelse>
 				<cfif (vDiaSem eq 1) or (vDiaSem eq 7)> 
@@ -357,7 +404,6 @@
 			</cfif>
 			<cfset nCont = nCont + 1> 
 		</cfloop> 
-
 		<!--- ================ GERAR INDICADOR PRCI ====================== --->
 		<!--- Garantir integridade dos dados com a exclusão de dados do mês a ser gerado (PRCI=1 e SLNC=2) --->
 		<cfquery datasource="#dsn_inspecao#">
@@ -365,14 +411,14 @@
 			where  Andt_AnoExerc='#year(dtlimit)#' and Andt_Mes = #month(dtlimit)#
 		</cfquery>	
 
-		<!--- rotina 1--->
+<!--- rotina 1--->
 		<!--- COMPOR O PRCI COM OS 14-NR, PENDENTES E TRATAMENTOS DO MES ANTERIOR--->
 		<!--- TODAS UNIDADES --->
 		<cfquery name="rsRot1" datasource="#dsn_inspecao#">
-			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, 
-			andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
-			FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-			WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) and Pos_DtPosic < #dtini# and Pos_Mes=#aux_mes#
+			SELECT andHrPosic,INPDTConcluirRevisao,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, 
+			Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
+			FROM SLNCPRCIDCGIANOMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) and Pos_DtPosic < #dtini# and Pos_Ano=#anoexerc# and Pos_Mes=#aux_mes#
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 		</cfquery>
 
@@ -383,6 +429,7 @@
 
 		<cfoutput query="rsRot1">
 			<cfset AndtDPosic = CreateDate(year(rsRot1.Pos_DtPosic),month(rsRot1.Pos_DtPosic),day(rsRot1.Pos_DtPosic))>
+			<cfset AndtDTEnvio = CreateDate(year(rsRot1.INPDTConcluirRevisao),month(rsRot1.INPDTConcluirRevisao),day(rsRot1.INPDTConcluirRevisao))>
 			<cfset AndtHPosic = rsRot1.andHrPosic>
 			<cfset AndtCodSE = rsRot1.Und_CodDiretoria>
 			<cfset auxsta = rsRot1.Pos_Situacao_Resp>			
@@ -390,21 +437,70 @@
 				<cfset AndtPrazo = 'DP'>
 			<cfelse>
 				<cfset AndtPrazo = 'FP'>
+			</cfif>	
+
+			<cfset auxsta_antes = rsRot1.Pos_Sit_Resp_Antes> 
+			<cfif auxsta_antes is 0 or auxsta_antes is 11 or auxsta_antes is 14 or auxsta_antes is 21 or auxsta_antes is 28 or auxsta_antes is 29>
+				<cfset auxsta_antes = 1> 
 			</cfif>		
+			<cfset AndtNomeOrgCondutor = trim(rsRot1.Pos_NomeArea)>
+			<cfif len(trim(rsRot1.Pos_NomeArea)) lt 0>
+				<cfquery datasource="#dsn_inspecao#" name="rsdep">
+					SELECT Dep_Descricao FROM Departamento where Dep_Codigo = '#rsRot1.Pos_Area#'
+				</cfquery>
+				<cfif rsdep.recordcount gt 0>
+					<cfset AndtNomeOrgCondutor = trim(rsdep.Dep_Descricao)>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsunid">
+						SELECT Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsRot1.Pos_Area#'
+					</cfquery>
+					<cfif rsunid.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsunid.Und_Descricao)>
+					</cfif>
+				</cfif>				
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsreop">
+						SELECT Rep_Nome FROM Reops WHERE Rep_Codigo = '#rsRot1.Pos_Area#'
+					</cfquery>							
+					<cfif rsreop.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsreop.Rep_Nome)>
+					</cfif>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsarea">
+						SELECT Ars_Sigla FROM Areas WHERE Ars_Codigo = '#rsRot1.Pos_Area#'
+					</cfquery>							
+					<cfif rsarea.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsarea.Ars_Sigla)>
+					</cfif>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsse">
+						SELECT Dir_Descricao FROM Diretoria WHERE Dir_Sto = '#rsRot1.Pos_Area#'
+					</cfquery>								
+					<cfif rsse.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsse.Dir_Descricao)>
+					</cfif>
+				</cfif>	
+			</cfif>	
+								
 			<!--- garantir a inclusão para PRCI --->
 			<cfquery datasource="#dsn_inspecao#">
-				insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsRot1.Pos_Inspecao#', '#rsRot1.Pos_Unidade#', #rsRot1.Pos_NumGrupo#, #rsRot1.Pos_NumItem#, #AndtDPosic#, '#AndtHPosic#', #auxsta#, #rsRot1.Und_TipoUnidade#, 0, 0, '#rsRot1.pos_username#', CONVERT(char, GETDATE(), 120), '#rsRot1.Pos_Area#', '#rsRot1.Pos_NomeArea#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsRot1.Pos_PontuacaoPonto#, '#rsRot1.Pos_ClassificacaoPonto#')
+				insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto,Andt_DTEnvio) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsRot1.Pos_Inspecao#', '#rsRot1.Pos_Unidade#', #rsRot1.Pos_NumGrupo#, #rsRot1.Pos_NumItem#, #AndtDPosic#, '#AndtHPosic#', #auxsta#, #rsRot1.Und_TipoUnidade#, 0, 0, '#rsRot1.pos_username#', CONVERT(char, GETDATE(), 120), '#rsRot1.Pos_Area#', '#AndtNomeOrgCondutor#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1,'#auxsta_antes#', #rsRot1.Pos_PontuacaoPonto#, '#rsRot1.Pos_ClassificacaoPonto#',#AndtDTEnvio#)
 			</cfquery>
 		</cfoutput> 
+
 		<!--- fim rotina 1  --->
 		<!--- rotina 2 --->
 		<!--- COMPOR O PRCI COM OS 14-NR, PENDENTES E TRATAMENTOS DENTRO DO MES E COMO MIGRARAM AO MÊS CORRENTE --->
 		<!--- TODAS UNIDADES --->
 		<cfquery name="rsRot2" datasource="#dsn_inspecao#">
-			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, 
-			andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
-			FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-			WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) and Pos_DtPosic >= #dtini# and Pos_Mes=#aux_mes#
+			SELECT andHrPosic,INPDTConcluirRevisao,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu,Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
+			FROM SLNCPRCIDCGIANOMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			WHERE Pos_Situacao_Resp In (14,2,4,5,8,20,15,16,18,19,23) and 
+			Pos_DtPosic >= #dtini# and 
+			Pos_Ano=#anoexerc# and Pos_Mes=#aux_mes#
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 		</cfquery>
 
@@ -414,7 +510,9 @@
 		</cfloop>
 
 		<cfoutput query="rsRot2">
+			<cfset auxsit = rsRot2.Pos_Situacao_Resp>
 			<cfset AndtDPosica = CreateDate(year(rsRot2.Pos_DtPosic),month(rsRot2.Pos_DtPosic),day(rsRot2.Pos_DtPosic))>
+			<cfset AndtDTEnvio = CreateDate(year(rsRot2.INPDTConcluirRevisao),month(rsRot2.INPDTConcluirRevisao),day(rsRot2.INPDTConcluirRevisao))>
 			<cfset AndtHPosica = rsRot2.andHrPosic>
 			<cfset AndtCodSE = rsRot2.Und_CodDiretoria>
 			<cfset auxsta = rsRot2.Pos_Situacao_Resp>			
@@ -423,19 +521,63 @@
 			<cfelse>
 				<cfset AndtPrazo = 'FP'>
 			</cfif>		
-		
+			<cfset auxsta_antes = rsRot2.Pos_Sit_Resp_Antes> 
+			<cfif auxsta_antes is 0 or auxsta_antes is 11 or auxsta_antes is 14 or auxsta_antes is 21 or auxsta_antes is 28 or auxsta_antes is 29>
+				<cfset auxsta_antes = 1> 
+			</cfif>		
+			<cfset AndtNomeOrgCondutor = trim(rsRot2.Pos_NomeArea)>
+			<cfif len(trim(rsRot2.Pos_NomeArea)) lt 0>
+				<cfquery datasource="#dsn_inspecao#" name="rsdep">
+					SELECT Dep_Descricao FROM Departamento where Dep_Codigo = '#rsRot2.Pos_Area#'
+				</cfquery>
+				<cfif rsdep.recordcount gt 0>
+					<cfset AndtNomeOrgCondutor = trim(rsdep.Dep_Descricao)>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsunid">
+						SELECT Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsRot2.Pos_Area#'
+					</cfquery>
+					<cfif rsunid.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsunid.Und_Descricao)>
+					</cfif>
+				</cfif>				
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsreop">
+						SELECT Rep_Nome FROM Reops WHERE Rep_Codigo = '#rsRot2.Pos_Area#'
+					</cfquery>							
+					<cfif rsreop.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsreop.Rep_Nome)>
+					</cfif>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsarea">
+						SELECT Ars_Sigla FROM Areas WHERE Ars_Codigo = '#rsRot2.Pos_Area#'
+					</cfquery>							
+					<cfif rsarea.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsarea.Ars_Sigla)>
+					</cfif>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsse">
+						SELECT Dir_Descricao FROM Diretoria WHERE Dir_Sto = '#rsRot2.Pos_Area#'
+					</cfquery>								
+					<cfif rsse.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsse.Dir_Descricao)>
+					</cfif>
+				</cfif>	
+			</cfif>		
 			<!--- garantir a inclusão para PRCI --->
 			<cfquery datasource="#dsn_inspecao#">
-				insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto)  values ('#year(dtlimit)#', #month(dtlimit)#, '#rsRot2.Pos_Inspecao#', '#rsRot2.Pos_Unidade#', #rsRot2.Pos_NumGrupo#, #rsRot2.Pos_NumItem#, #AndtDPosica#, '#AndtHPosica#', #auxsta#, #rsRot2.Und_TipoUnidade#, 0, 0, '#rsRot2.pos_username#', CONVERT(char, GETDATE(), 120), '#rsRot2.Pos_Area#', '#rsRot2.Pos_NomeArea#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsRot2.Pos_PontuacaoPonto#, '#rsRot2.Pos_ClassificacaoPonto#')
+				insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto,Andt_DTEnvio)  values ('#year(dtlimit)#', #month(dtlimit)#, '#rsRot2.Pos_Inspecao#', '#rsRot2.Pos_Unidade#', #rsRot2.Pos_NumGrupo#, #rsRot2.Pos_NumItem#, #AndtDPosica#, '#AndtHPosica#', #auxsta#, #rsRot2.Und_TipoUnidade#, 0, 0, '#rsRot2.pos_username#', CONVERT(char, GETDATE(), 120), '#rsRot2.Pos_Area#', '#AndtNomeOrgCondutor#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, '#auxsta_antes#', #rsRot2.Pos_PontuacaoPonto#, '#rsRot2.Pos_ClassificacaoPonto#',#AndtDTEnvio#)
 			</cfquery>
+		
 			<cfif auxsta neq 14 and day(#AndtDPosica#) gt 1>
 				<!--- FAZER BUSCAS POR outras possíveis ocorrências(PEND/TRAT) na andamento dentro do MêS/migração do mês anterior para PRCI --->
 				<!--- Apenas nos maiores que o dia primeiro do mês trabalhado --->
 				<cfset salvarSN = 'S'>
-
 				<cfquery name="rsPENDTRAT" datasource="#dsn_inspecao#">
-					SELECT And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area
-					FROM Andamento 
+					SELECT INP_DTConcluirRevisao,And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area
+					FROM Inspecao INNER JOIN Andamento ON (INP_NumInspecao = And_NumInspecao) AND (INP_Unidade = And_Unidade)
 					WHERE And_Unidade = '#rsRot2.Pos_Unidade#' AND 
 					And_NumInspecao = '#rsRot2.Pos_Inspecao#' AND 
 					And_NumGrupo = #rsRot2.Pos_NumGrupo# AND 
@@ -443,14 +585,23 @@
 					And_DtPosic <= #AndtDPosica# and And_HrPosic <> '#AndtHPosica#'
 					order by And_DtPosic desc, And_HrPosic desc
 				</cfquery>
-		
+				<cfset startTime = CreateTime(0,0,0)> 
+				<cfset endTime = CreateTime(0,0,45)> 
+				<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+				</cfloop>
+				<cfset salvarSN = 'S'>
 				<cfloop query="rsPENDTRAT"> 
 					<cfset auxsta = rsPENDTRAT.And_Situacao_Resp>
 					<cfset AndtDPosicb = CreateDate(year(rsPENDTRAT.And_DtPosic),month(rsPENDTRAT.And_DtPosic),day(rsPENDTRAT.And_DtPosic))>
+					<cfset AndtDTEnvio = CreateDate(year(rsPENDTRAT.INP_DTConcluirRevisao),month(rsPENDTRAT.INP_DTConcluirRevisao),day(rsPENDTRAT.INP_DTConcluirRevisao))>
 					<cfset AndtHPosicb = rsPENDTRAT.And_HrPosic>
-					<cfif auxsta eq 2 or auxsta eq 4 or auxsta eq 5 or auxsta eq 8 or auxsta eq 20 or auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>
-						<cfset auxsta = rsPENDTRAT.And_Situacao_Resp>			
-						<cfif auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>
+					<cfif auxsta neq 14 and auxsta neq 2 and auxsta neq 4 and auxsta neq 5 and auxsta neq 8 and auxsta neq 20 and auxsta neq 15 and auxsta neq 16 and auxsta neq 18 and auxsta neq 19 and auxsta neq 23>						
+						   <cfif (dateformat(#AndtDPosicb#,"YYYYMMDD") lte dateformat(#dtini#,"YYYYMMDD"))>
+								<cfset salvarSN = 'N'>
+						   </cfif> 
+					</cfif>
+					<cfif auxsta eq 14 or auxsta eq 2 or auxsta eq 4 or auxsta eq 5 or auxsta eq 8 or auxsta eq 20 or auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>		
+						<cfif auxsta eq 14 or auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>
 							<cfset AndtPrazo = 'DP'>
 						<cfelse>
 							<cfset AndtPrazo = 'FP'>
@@ -472,9 +623,54 @@
 						</cfquery>	
 								
 						<cfif (rsExiste.recordcount lte 0) and (salvarSN eq 'S')>
+							<cfset auxsta_antes = rsPENDTRAT.And_Situacao_Resp> 
+							<cfif auxsta_antes is 0 or auxsta_antes is 11 or auxsta_antes is 14 or auxsta_antes is 21 or auxsta_antes is 28 or auxsta_antes is 29>
+								<cfset auxsta_antes = 1> 
+							</cfif>		
+							<cfset AndtNomeOrgCondutor = ''>
+							<cfquery datasource="#dsn_inspecao#" name="rsdep">
+								SELECT Dep_Descricao FROM Departamento where Dep_Codigo = '#rsPENDTRAT.And_Area#'
+							</cfquery>
+							<cfif rsdep.recordcount gt 0>
+								<cfset AndtNomeOrgCondutor = trim(rsdep.Dep_Descricao)>
+							</cfif>
+							<cfif AndtNomeOrgCondutor is ''>
+								<cfquery datasource="#dsn_inspecao#" name="rsunid">
+									SELECT Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsPENDTRAT.And_Area#'
+								</cfquery>
+								<cfif rsunid.recordcount gt 0>
+									<cfset AndtNomeOrgCondutor = trim(rsunid.Und_Descricao)>
+								</cfif>
+							</cfif>				
+							<cfif AndtNomeOrgCondutor is ''>
+								<cfquery datasource="#dsn_inspecao#" name="rsreop">
+									SELECT Rep_Nome FROM Reops WHERE Rep_Codigo = '#rsPENDTRAT.And_Area#'
+								</cfquery>							
+								<cfif rsreop.recordcount gt 0>
+									<cfset AndtNomeOrgCondutor = trim(rsreop.Rep_Nome)>
+								</cfif>
+							</cfif>
+							<cfif AndtNomeOrgCondutor is ''>
+								<cfquery datasource="#dsn_inspecao#" name="rsarea">
+									SELECT Ars_Sigla FROM Areas WHERE Ars_Codigo = '#rsPENDTRAT.And_Area#'
+								</cfquery>							
+								<cfif rsarea.recordcount gt 0>
+									<cfset AndtNomeOrgCondutor = trim(rsarea.Ars_Sigla)>
+								</cfif>
+							</cfif>
+							<cfif AndtNomeOrgCondutor is ''>
+								<cfquery datasource="#dsn_inspecao#" name="rsse">
+									SELECT Dir_Descricao FROM Diretoria WHERE Dir_Sto = '#rsPENDTRAT.And_Area#'
+								</cfquery>								
+								<cfif rsse.recordcount gt 0>
+									<cfset AndtNomeOrgCondutor = trim(rsse.Dir_Descricao)>
+								</cfif>
+							</cfif>		
+							<!---	--->			
 							<cfquery datasource="#dsn_inspecao#">
-								insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsRot2.Pos_Inspecao#', '#rsRot2.Pos_Unidade#', #rsRot2.Pos_NumGrupo#, #rsRot2.Pos_NumItem#, #AndtDPosicb#, '#AndtHPosicb#', #auxsta#, #rsRot2.Und_TipoUnidade#, 0, 0, '#rsPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsPENDTRAT.And_Area#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsRot2.Pos_PontuacaoPonto#, '#rsRot2.Pos_ClassificacaoPonto#')
+								insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto,Andt_DTEnvio) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsRot2.Pos_Inspecao#', '#rsRot2.Pos_Unidade#', #rsRot2.Pos_NumGrupo#, #rsRot2.Pos_NumItem#, #AndtDPosicb#, '#AndtHPosicb#', #auxsta#, #rsRot2.Und_TipoUnidade#, 0, 0, '#rsPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsPENDTRAT.And_Area#', '#AndtNomeOrgCondutor#','#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, '#auxsta_antes#', #rsRot2.Pos_PontuacaoPonto#, '#rsRot2.Pos_ClassificacaoPonto#',#AndtDTEnvio#)
 							</cfquery> 
+							
 						</cfif>
 					</cfif>						
 					<cfif dateformat(#AndtDPosicb#,"YYYYMMDD") lte dateformat(#dtini#,"YYYYMMDD")> 
@@ -482,15 +678,18 @@
 					</cfif>
 				</cfloop> 
 			</cfif>
-		</cfoutput> 
-
+		</cfoutput> 		
 		<!--- fim rotina 2  --->
+
 		<!--- ROTINA 3 --->
-		<!--- OBTER NA ANDAMENTO POSSÍVEIS STATUS (14-NR, PEND OU TRAT) PARA COMPOR PRCI  DOS PONTOS TRAZIDOS DA PARECERUNIDADE (RESPOSTAS, SO, CS, PI, OC, RV AP, RC, NC, BX, EA, EC e TP --->
+		<!--- OBTER NA ANDAMENTO POSSÍVEIS STATUS (14-NR, PEND OU TRAT) PARA COMPOR PRCI  DOS PONTOS TRAZIDOS DA PARECERUNIDADE (RESPOSTAS, SO, CS, RV AP, RC, NC, BX, EA, EC e TP --->
 		<cfquery name="rsRot3" datasource="#dsn_inspecao#">
-			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
-			FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-			WHERE Pos_Situacao_Resp In (3,1,6,7,17,22) AND Pos_DtPosic between #dtini# and #dtfim# and Pos_Mes=#aux_mes#
+			SELECT andHrPosic,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, Und_CodDiretoria, pos_dtultatu,Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Situacao_Resp, Pos_Sit_Resp_Antes
+			FROM SLNCPRCIDCGIANOMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			WHERE Pos_Situacao_Resp In (3,1,6,7,17,22,9,21,24,25,26,27,28,29,30) AND 
+			Pos_DtPosic between #dtini# and #dtfim# and 
+			Pos_Ano=#anoexerc# and 
+			Pos_Mes=#aux_mes#
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 		</cfquery>
 
@@ -500,12 +699,13 @@
 		</cfloop>
 
 		<cfoutput query="rsRot3">
+			<cfset auxsit = rsRot3.Pos_Situacao_Resp>
 			<cfset AndtDPosic = CreateDate(year(rsRot3.Pos_DtPosic),month(rsRot3.Pos_DtPosic),day(rsRot3.Pos_DtPosic))>
 			<cfset AndtHPosic = rsRot3.andHrPosic>
 			<cfif day(AndtDPosic) gt 1>
 				<cfquery name="rsNRPENDTRAT" datasource="#dsn_inspecao#">
-					SELECT And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area
-					FROM Andamento
+					SELECT INP_DTConcluirRevisao,And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area
+					FROM Inspecao INNER JOIN Andamento ON (INP_NumInspecao = And_NumInspecao) AND (INP_Unidade = And_Unidade)
 					WHERE And_Unidade = '#rsRot3.Pos_Unidade#' AND 
 					And_NumInspecao = '#rsRot3.Pos_Inspecao#' AND 
 					And_NumGrupo = #rsRot3.Pos_NumGrupo# AND 
@@ -513,17 +713,23 @@
 					And_DtPosic <= #AndtDPosic# AND 
 					And_HrPosic <> '#AndtHPosic#'
 					order by And_DtPosic desc, And_HrPosic desc
-				</cfquery>					
-				<cfset auxantes = 0>
-				<cfif rsRot3.Pos_Sit_Resp_Antes gt 0>
-					<cfset auxantes = rsRot3.Pos_Situacao_Resp>
-				</cfif>
+				</cfquery>	
+				<cfset startTime = CreateTime(0,0,0)> 
+				<cfset endTime = CreateTime(0,0,45)> 
+				<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+				</cfloop>								
 				<cfset salvarSN = 'S'>
 		
-				<cfloop query="rsNRPENDTRAT">  
+				<cfloop query="rsNRPENDTRAT">  			
 					<cfset auxsta = rsNRPENDTRAT.And_Situacao_Resp>	
 					<cfset AndtDPosicc = CreateDate(year(rsNRPENDTRAT.And_DtPosic),month(rsNRPENDTRAT.And_DtPosic),day(rsNRPENDTRAT.And_DtPosic))>
+					<cfset AndtDTEnvio = CreateDate(year(rsNRPENDTRAT.INP_DTConcluirRevisao),month(rsNRPENDTRAT.INP_DTConcluirRevisao),day(rsNRPENDTRAT.INP_DTConcluirRevisao))>
 					<cfset AndtHPosicc = rsNRPENDTRAT.And_HrPosic>
+					<cfif auxsta neq 14 and auxsta neq 2 and auxsta neq 4 and auxsta neq 5 and auxsta neq 8 and auxsta neq 20 and auxsta neq 15 and auxsta neq 16 and auxsta neq 18 and auxsta neq 19 and auxsta neq 23>						
+						   <cfif (dateformat(#AndtDPosicc#,"YYYYMMDD") lte dateformat(#dtini#,"YYYYMMDD"))>
+							<cfset salvarSN = 'N'>
+						   </cfif> 
+					</cfif>
 					<cfif auxsta eq 14 or auxsta eq 2 or auxsta eq 4 or auxsta eq 5 or auxsta eq 8 or auxsta eq 20 or auxsta eq 15 or auxsta eq 16 or auxsta eq 18 or auxsta eq 19 or auxsta eq 23>					
 						<cfset AndtCodSE = rsRot3.Und_CodDiretoria>
 
@@ -547,13 +753,56 @@
 							Andt_Resp = #auxsta# and
 							Andt_TipoRel = 1
 						</cfquery>	
-						<cfif auxsta eq 14 and dateformat(AndtDPosicc,"YYYYMMDD") lt dateformat(dt14limitprci_slnc,"YYYYMMDD")>
-							<cfset salvarSN = 'N'>
-						</cfif>
+						<cfif auxsta eq 14 and dateformat(AndtDPosicc,"YYYYMMDD") lt dateformat(dt14nrlimiteslnc,"YYYYMMDD")>
+							<!--- <cfset salvarSN = 'N'> --->
+						</cfif>		
 						<cfif (rsExisteb.recordcount lte 0) and (salvarSN eq 'S')>
-							<cfquery datasource="#dsn_inspecao#">
-								insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsRot3.Pos_Inspecao#', '#rsRot3.Pos_Unidade#', #rsRot3.Pos_NumGrupo#, #rsRot3.Pos_NumItem#, #AndtDPosicc#, '#AndtHPosicc#', #auxsta#, #rsRot3.Und_TipoUnidade#, 0, 0, '#rsNRPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsNRPENDTRAT.And_Area#', '#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, 0, #rsRot3.Pos_PontuacaoPonto#, '#rsRot3.Pos_ClassificacaoPonto#')
-							</cfquery> 
+							<cfset auxsta_antes = rsNRPENDTRAT.And_Situacao_Resp> 
+							<cfif auxsta_antes is 0 or auxsta_antes is 11 or auxsta_antes is 14 or auxsta_antes is 21 or auxsta_antes is 28 or auxsta_antes is 29>
+								<cfset auxsta_antes = 1> 
+							</cfif>		
+							<cfset AndtNomeOrgCondutor = ''>
+							<cfquery datasource="#dsn_inspecao#" name="rsdep">
+								SELECT Dep_Descricao FROM Departamento where Dep_Codigo = '#rsNRPENDTRAT.And_Area#'
+							</cfquery>
+							<cfif rsdep.recordcount gt 0>
+								<cfset AndtNomeOrgCondutor = trim(rsdep.Dep_Descricao)>
+							</cfif>
+							<cfif AndtNomeOrgCondutor is ''>
+								<cfquery datasource="#dsn_inspecao#" name="rsunid">
+									SELECT Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsNRPENDTRAT.And_Area#'
+								</cfquery>
+								<cfif rsunid.recordcount gt 0>
+									<cfset AndtNomeOrgCondutor = trim(rsunid.Und_Descricao)>
+								</cfif>
+							</cfif>				
+							<cfif AndtNomeOrgCondutor is ''>
+								<cfquery datasource="#dsn_inspecao#" name="rsreop">
+									SELECT Rep_Nome FROM Reops WHERE Rep_Codigo = '#rsNRPENDTRAT.And_Area#'
+								</cfquery>							
+								<cfif rsreop.recordcount gt 0>
+									<cfset AndtNomeOrgCondutor = trim(rsreop.Rep_Nome)>
+								</cfif>
+							</cfif>
+							<cfif AndtNomeOrgCondutor is ''>
+								<cfquery datasource="#dsn_inspecao#" name="rsarea">
+									SELECT Ars_Sigla FROM Areas WHERE Ars_Codigo = '#rsNRPENDTRAT.And_Area#'
+								</cfquery>							
+								<cfif rsarea.recordcount gt 0>
+									<cfset AndtNomeOrgCondutor = trim(rsarea.Ars_Sigla)>
+								</cfif>
+							</cfif>
+							<cfif AndtNomeOrgCondutor is ''>
+								<cfquery datasource="#dsn_inspecao#" name="rsse">
+									SELECT Dir_Descricao FROM Diretoria WHERE Dir_Sto = '#rsNRPENDTRAT.And_Area#'
+								</cfquery>								
+								<cfif rsse.recordcount gt 0>
+									<cfset AndtNomeOrgCondutor = trim(rsse.Dir_Descricao)>
+								</cfif>
+							</cfif>	
+								<cfquery datasource="#dsn_inspecao#">
+									insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto,Andt_DTEnvio) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsRot3.Pos_Inspecao#', '#rsRot3.Pos_Unidade#', #rsRot3.Pos_NumGrupo#, #rsRot3.Pos_NumItem#, #AndtDPosicc#, '#AndtHPosicc#', #auxsta#, #rsRot3.Und_TipoUnidade#, 0, 0, '#rsNRPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsNRPENDTRAT.And_Area#', '#AndtNomeOrgCondutor#','#AndtCodSE#', #dtfim#, '#AndtPrazo#', 1, '#auxsta_antes#', #rsRot3.Pos_PontuacaoPonto#, '#rsRot3.Pos_ClassificacaoPonto#',#AndtDTEnvio#)
+								</cfquery> 
 						</cfif>
 						<cfif dateformat(#AndtDPosicc#,"YYYYMMDD") lte dateformat(#dtini#,"YYYYMMDD")>
 							<cfset salvarSN = 'N'>				
@@ -561,168 +810,90 @@
 					</cfif>	
 				</cfloop>
 			</cfif>
-		</cfoutput>  
-		<!--- FIM ROTINA 3 ---> 
-		<!--- ROTINA 4 --->
-		<!--- VALIDAR PONTOS NA TABELA: Andamento_Temp  --->
-		<!--- GRUPOS E ITENS NÃO PERMITIDOS  --->
-		<cfquery name="rsGRIT" datasource="#dsn_inspecao#">
-			SELECT Andt_AnoExerc, Andt_TipoRel, Andt_Mes, Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item, Andt_Resp, Andt_Area
-			FROM Andamento_Temp 
-			WHERE Andt_AnoExerc ='#year(dtlimit)#' AND Andt_TipoRel=1 AND Andt_Mes = #month(dtlimit)#
-		</cfquery>
-
-		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,25)> 
-		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-		</cfloop>
-
-		<cfoutput query="rsGRIT">
-			<cfset auxgrp = rsGRIT.Andt_Grp>
-			<cfset auxitm = rsGRIT.Andt_Item>
-			<cfif (auxgrp is 9 and auxitm is 9) or (auxgrp is 29 and auxitm is 4) or (auxgrp is 68 and auxitm is 3) or (auxgrp is 96 and auxitm is 3) or (auxgrp is 122 and auxitm is 3) or (auxgrp is 209 and auxitm is 3) or (auxgrp is 241 and auxitm is 3) or (auxgrp is 308 and auxitm is 3) or (auxgrp is 278 and auxitm is 2) or (auxgrp is 337 and auxitm is 2)>
-				<cfquery datasource="#dsn_inspecao#">
-					UPDATE Andamento_Temp SET Andt_Prazo = 'EX'
-					WHERE Andt_Unid='#rsGRIT.Andt_Unid#' AND 
-					Andt_Insp='#rsGRIT.Andt_Insp#' AND 
-					Andt_Grp=#rsGRIT.Andt_Grp# AND 
-					Andt_Item=#rsGRIT.Andt_Item#
-				</cfquery>	
-			</cfif>
-		</cfoutput>			
-
-		<!--- POS_NOMEAREA NAO PERMITIDOS  --->
-		<cfquery name="AndtArea" datasource="#dsn_inspecao#">
-			SELECT Andt_AnoExerc, Andt_TipoRel, Andt_Mes, Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item, Andt_Resp, Andt_Area, Andt_PosClassificacaoPonto, Andt_Unid
-			FROM Andamento_Temp 
-			WHERE Andt_AnoExerc ='#year(dtlimit)#' AND Andt_TipoRel=2 AND Andt_Mes = #month(dtlimit)# 
-		</cfquery>
-
-		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,25)> 
-		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-		</cfloop>
-
-		<cfloop query="AndtArea">
-			<cfquery name="rsNegar" datasource="#dsn_inspecao#">
-				SELECT Ars_Sigla 
-				FROM Areas 
-				WHERE Ars_Codigo = '#AndtArea.Andt_Area#' and 
-				(Ars_Sigla Like '%CCOP/SCIA%' Or 
-				Ars_Sigla Like '%CCOP/SCOI%' Or 
-				Ars_Sigla Like '%GCOP/CCOP%' Or
-				Ars_Sigla Like '%GSOP/CSEC%' Or 
-				Ars_Sigla Like '%CORR%' Or 
-				Ars_Sigla Like '%GCOP/SGCIN%' Or 
-				Ars_Sigla Like '%GAAV/SGSEC%' OR 
-				Ars_Sigla Like '%/SCORG%')
-			</cfquery>
-			<cfset AndtPosClassificacaoPonto = trim(ucase(AndtArea.Andt_PosClassificacaoPonto))>
-			<!--- <cfif rsNegar.recordcount gt 0 or (AndtPosClassificacaoPonto eq 'LEVE' and Andt_Unid neq 12)>  --->
-			<cfif rsNegar.recordcount gt 0> 
-				<cfquery datasource="#dsn_inspecao#">
-				UPDATE Andamento_Temp SET Andt_Prazo = 'EX'
-				WHERE Andt_Unid='#AndtArea.Andt_Unid#' AND 
-				Andt_Insp='#AndtArea.Andt_Insp#' AND 
-				Andt_Grp=#AndtArea.Andt_Grp# AND 
-				Andt_Item=#AndtArea.Andt_Item#
-				</cfquery>	
-			</cfif>			 	
-		</cfloop>
-
-		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,45)> 
-		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-		</cfloop>
-
-		<cfquery datasource="#dsn_inspecao#">
-		delete from Andamento_Temp where Andt_Prazo = 'EX'
-		</cfquery>  
-		<!--- FIM ROTINA 4 ---> 
-
-		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,45)> 
-		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-		</cfloop>
-
-		<!--- ROTINA 5 --->
-		<cfquery dbtype="query" name="rsRegMeta">
-			SELECT Met_Codigo, Met_SE_STO 
-			FROM rsMetas
-			order by Met_Codigo
-		</cfquery>
-		<cfoutput query="rsRegMeta">
-			<cfset se = rsRegMeta.Met_Codigo>
-			<!--- <cfset gil = gil> --->
-			<cfquery name="rsPRCIBase" datasource="#dsn_inspecao#">
-				SELECT Andt_Unid as UNID, Andt_Insp as INSP, Andt_Grp as Grupo, Andt_Item as Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_Mes, Andt_Prazo
-				FROM Andamento_Temp 
-				where (Andt_CodSE = '#se#' and Andt_TipoRel = 1 and Andt_AnoExerc = '#anoexerc#' and Andt_Mes <= #month(dtlimit)#)
-				order by Andt_Mes
-			</cfquery>
-
-			<cfset startTime = CreateTime(0,0,0)> 
-			<cfset endTime = CreateTime(0,0,30)> 
-			<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-			</cfloop>
-
-			<cfset totmesDP = 0>
-			<cfset TOTMESDPFP = 0>
-				<!--- contar unidade DP e FP --->
-				<cfquery dbtype="query" name="rstotmesDP">
-					SELECT Andt_Prazo 
-					FROM  rsPRCIBase
-					where Andt_Prazo = 'DP' and Andt_Mes = #month(dtlimit)#
-				</cfquery>
-				<cfset totmesDP = rstotmesDP.recordcount>
-
-				<cfquery dbtype="query" name="rsTOTMESDPFP">
-					SELECT Andt_Prazo 
-					FROM rsPRCIBase  
-					where Andt_Mes = #month(dtlimit)#
-				</cfquery>		
-				<cfset TOTMESDPFP = rsTOTMESDPFP.recordcount>
-
-					<!--- Quant. FP --->
-				<cfset totmesFP = (TOTMESDPFP - totmesDP)>
-
-				<cfset PercDPmes = '100.0'>
-				<cfif TOTMESDPFP gt 0>
-					<cfset PercDPmes = trim(NumberFormat((totmesDP/TOTMESDPFP) * 100,999.0))>
-				</cfif>
-
-				<!---    ==============================  --->
-				<!--- Quant. DP --->
-				<cfquery dbtype="query" name="rstotgerDP">
-					SELECT Andt_Prazo 
-					FROM  rsPRCIBase
-					where Andt_Prazo = 'DP'
-				</cfquery>		
-				<cfset totgerDP = rstotgerDP.recordcount>
-
-				<cfquery dbtype="query" name="rsTOTGER">
-					SELECT Andt_Prazo 
-					FROM rsPRCIBase 
-				</cfquery>		
-				<cfset TOTGER = rsTOTGER.recordcount>
-
-				<cfset metprciacumperiodo = trim(NumberFormat((totgerDP/TOTGER)* 100,999.0))> 
-
-				<cfquery datasource="#dsn_inspecao#">
-					UPDATE Metas SET Met_PRCI_Acum='#PercDPmes#',Met_PRCI_AcumPeriodo='#metprciacumperiodo#'
-					WHERE Met_Codigo='#se#' and Met_Ano = #anoexerc# and Met_Mes = #month(dtlimit)#
-				</cfquery>  
-		<!---
-		se: #se#  DP:#totgerDP#  DP+FP:#TOTGER#   metprciacumperiodo:#metprciacumperiodo#    (PercDPmes = Met_PRCI_Acum): #PercDPmes# totmesDP: #totmesDP# totmesFP: #totmesFP# <br>
-		--->
-		</cfoutput>	
-		<!--- FIM ROTINA 5 ---> 
+			<!--- fim rot03  --->
+		</cfoutput> 
 		<!--- ================  FINAL PRCI ======================= --->
+
 		<!--- ================  INICIO SLNC ====================== --->
 		<cfquery name="rsSLNC" datasource="#dsn_inspecao#">
-			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
-			FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-			WHERE (((Pos_Situacao_Resp) In (2,4,5,8,15,16,19,23)) AND ((Und_TipoUnidade)<>12 And (Und_TipoUnidade)<>16)) and Pos_Mes=#aux_mes#
+			SELECT andHrPosic,INPDTConcluirRevisao, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, pos_dtultatu, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes
+			FROM SLNCPRCIDCGIANOMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			WHERE (((Pos_Situacao_Resp) In (2,4,5,8,15,16,19,23)) AND ((Und_TipoUnidade)<>12 And (Und_TipoUnidade)<>16))  
+			and Pos_Ano=#anoexerc# 
+			and Pos_Mes=#aux_mes#
+			AND INPDTConcluirRevisao < #dt14nrlimiteslnc#
+			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
+		</cfquery>
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,50)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>
+
+		<cfoutput query="rsSLNC">
+			<cfset AndtDPosic = CreateDate(year(rsSLNC.Pos_DtPosic),month(rsSLNC.Pos_DtPosic),day(rsSLNC.Pos_DtPosic))>
+			<cfset AndtDTEnvio = CreateDate(year(rsSLNC.INPDTConcluirRevisao),month(rsSLNC.INPDTConcluirRevisao),day(rsSLNC.INPDTConcluirRevisao))>
+			<cfset AndtHPosic = rsSLNC.andHrPosic>
+			<cfset auxsta = rsSLNC.Pos_Situacao_Resp>
+		
+			<!--- ponto pode ser salvo para compor SLNC --->
+			<cfset PosDtPosic = CreateDate(year(rsSLNC.Pos_DtPosic),month(rsSLNC.Pos_DtPosic),day(rsSLNC.Pos_DtPosic))>
+			<cfset AndtCodSE = left(rsSLNC.Pos_Unidade,2)>
+			<cfset auxsta = rsSLNC.Pos_Situacao_Resp>
+			<cfset auxsta_antes = rsSLNC.Pos_Sit_Resp_Antes> 
+			<cfif auxsta_antes is 0 or auxsta_antes is 11 or auxsta_antes is 14 or auxsta_antes is 21 or auxsta_antes is 28 or auxsta_antes is 29>
+				<cfset auxsta_antes = 1> 
+			</cfif>		
+			<cfset AndtNomeOrgCondutor = trim(rsSLNC.Pos_NomeArea)>
+			<cfif len(trim(rsSLNC.Pos_NomeArea)) lt 0>
+				<cfquery datasource="#dsn_inspecao#" name="rsdep">
+					SELECT Dep_Descricao FROM Departamento where Dep_Codigo = '#rsSLNC.Pos_Area#'
+				</cfquery>
+				<cfif rsdep.recordcount gt 0>
+					<cfset AndtNomeOrgCondutor = trim(rsdep.Dep_Descricao)>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsunid">
+						SELECT Und_Descricao FROM Unidades WHERE Und_Codigo = '#rsSLNC.Pos_Area#'
+					</cfquery>
+					<cfif rsunid.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsunid.Und_Descricao)>
+					</cfif>
+				</cfif>				
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsreop">
+						SELECT Rep_Nome FROM Reops WHERE Rep_Codigo = '#rsSLNC.Pos_Area#'
+					</cfquery>							
+					<cfif rsreop.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsreop.Rep_Nome)>
+					</cfif>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsarea">
+						SELECT Ars_Sigla FROM Areas WHERE Ars_Codigo = '#rsSLNC.Pos_Area#'
+					</cfquery>							
+					<cfif rsarea.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsarea.Ars_Sigla)>
+					</cfif>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsse">
+						SELECT Dir_Descricao FROM Diretoria WHERE Dir_Sto = '#rsSLNC.Pos_Area#'
+					</cfquery>								
+					<cfif rsse.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsse.Dir_Descricao)>
+					</cfif>
+				</cfif>	
+			</cfif>						
+			<cfquery datasource="#dsn_inspecao#">
+				insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto,Andt_DTEnvio) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsSLNC.Pos_Inspecao#', '#rsSLNC.Pos_Unidade#', #rsSLNC.Pos_NumGrupo#, #rsSLNC.Pos_NumItem#, #PosDtPosic#, '#AndtHPosic#', #auxsta#, #rsSLNC.Und_TipoUnidade#, 0, 0, '#rsSLNC.pos_username#', CONVERT(char, GETDATE(), 120), '#rsSLNC.Pos_Area#', '#AndtNomeOrgCondutor#', '#AndtCodSE#', #dtfim#, 'NN', 2, '#auxsta_antes#', #rsSLNC.Pos_PontuacaoPonto#, '#rsSLNC.Pos_ClassificacaoPonto#',#AndtDTEnvio#)
+			</cfquery>	
+		</cfoutput>
+
+		<!--- COMPOR O SLNC COM OS solucionados do Mês --->
+		<cfquery name="rs3SO" datasource="#dsn_inspecao#">
+			SELECT andHrPosic,INPDTConcluirRevisao,Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, pos_dtultatu, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes,Und_CodDiretoria
+			FROM SLNCPRCIDCGIANOMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			WHERE Pos_Situacao_Resp = 3 and Pos_Ano=#anoexerc# and Pos_Mes=#aux_mes#
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
 		</cfquery>
 
@@ -731,349 +902,193 @@
 		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
 		</cfloop>
 
-		<cfoutput query="rsSLNC">
-			<cfset SalvarSN = 'S'>
-			<cfquery name="rs14" datasource="#dsn_inspecao#">
-				SELECT And_DtPosic, And_HrPosic
-				FROM Andamento
-				WHERE And_Unidade = '#rsSLNC.Pos_Unidade#' AND 
-				And_NumInspecao = '#rsSLNC.Pos_Inspecao#' AND 
-				And_NumGrupo = #rsSLNC.Pos_NumGrupo# AND 
-				And_NumItem = #rsSLNC.Pos_NumItem# AND 
-				And_Situacao_Resp = 14 and And_DtPosic >= #dt14limitprci_slnc#
-			</cfquery>
-				<cfif rs14.recordcount gt 0> 
-				<cfset SalvarSN = 'N'>
-			</cfif> 
-			<cfif SalvarSN is 'S'>
-				<cfset AndtDPosic = CreateDate(year(rsSLNC.Pos_DtPosic),month(rsSLNC.Pos_DtPosic),day(rsSLNC.Pos_DtPosic))>
-				<cfset AndtHPosic = rsSLNC.andHrPosic>
-				<cfset auxsta = rsSLNC.Pos_Situacao_Resp>
-				<cfquery name="rsExiste" datasource="#dsn_inspecao#">
-						select Andt_Insp 
-						from Andamento_Temp 
-						where Andt_AnoExerc = '#year(dtlimit)#' and
-						Andt_Mes = #month(dtlimit)# and
-						Andt_Insp = '#rsSLNC.Pos_Inspecao#' and
-						Andt_Unid = '#rsSLNC.Pos_Unidade#' and
-						Andt_Grp = #rsSLNC.Pos_NumGrupo# and 
-						Andt_Item = #rsSLNC.Pos_NumItem# and 
-						Andt_DPosic = #AndtDPosic# and
-						Andt_HPosic = '#AndtHPosic#' and
-						Andt_Resp = #auxsta# and
-						Andt_TipoRel = 2
-				</cfquery>			
-				<cfif rsExiste.recordcount lte 0>
-					<!--- ponto pode ser salvo para compor SLNC --->
-					<cfset PosDtPosic = CreateDate(year(rsSLNC.Pos_DtPosic),month(rsSLNC.Pos_DtPosic),day(rsSLNC.Pos_DtPosic))>
-					<cfset AndtHPosic = TimeFormat(now(),"hh:mm:ssss")> 
-					<cfset AndtCodSE = left(rsSLNC.Pos_Unidade,2)>
-					<cfset auxsta = rsSLNC.Pos_Situacao_Resp>
-					<cfset auxantes = 0>
-					<cfif rsSLNC.Pos_Sit_Resp_Antes gt 0>
-						<cfset auxantes = rsSLNC.Pos_Situacao_Resp>
-					</cfif>							
-					<cfquery datasource="#dsn_inspecao#">
-					insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt, Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rsSLNC.Pos_Inspecao#', '#rsSLNC.Pos_Unidade#', #rsSLNC.Pos_NumGrupo#, #rsSLNC.Pos_NumItem#, #PosDtPosic#, '#AndtHPosic#', #auxsta#, #rsSLNC.Und_TipoUnidade#, 0, 0, '#rsSLNC.pos_username#', CONVERT(char, GETDATE(), 120), '#rsSLNC.Pos_Area#', '#trim(rsSLNC.Pos_NomeArea)#', '#AndtCodSE#', #dtfim#, 'NN', 2, '#auxantes#', #rsSLNC.Pos_PontuacaoPonto#, '#rsSLNC.Pos_ClassificacaoPonto#')
-					</cfquery>	
-				</cfif>					
-			</cfif>
-		</cfoutput>
-
-		<!--- COMPOR O SLNC COM OS solucionados do Mês --->
-		<cfquery name="rs3SO" datasource="#dsn_inspecao#">
-			SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, pos_dtultatu, pos_username, Pos_Situacao_Resp, Pos_Situacao, Pos_Area, Pos_NomeArea, Und_TipoUnidade, pos_dtultatu, andHrPosic, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, Pos_Sit_Resp_Antes,Und_CodDiretoria
-			FROM SLNCPRCIDCGIMES INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
-			WHERE Pos_Situacao_Resp = 3 and Pos_Mes=#aux_mes#
-			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic
-		</cfquery>
-
-		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,25)> 
-		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-		</cfloop>
-
 		<cfoutput query="rs3SO">
-			<!--- <cfset auxsta_antes = rs3SO.Pos_Sit_Resp_Antes> --->
-			<!---  <cfif auxsta_antes is 0 or auxsta_antes is ''> --->
 			<cfset PosDtPosic = CreateDate(year(rs3SO.Pos_DtPosic),month(rs3SO.Pos_DtPosic),day(rs3SO.Pos_DtPosic))>
+			<cfset AndtDTEnvio = CreateDate(year(rs3SO.INPDTConcluirRevisao),month(rs3SO.INPDTConcluirRevisao),day(rs3SO.INPDTConcluirRevisao))>
 			<cfset AndtHPosic = rs3SO.andHrPosic>
 			<cfset AndtCodSE = left(rs3SO.Pos_Unidade,2)>
+			
 			<cfset auxsta = rs3SO.Pos_Situacao_Resp>
-		
-			<cfset auxsta_antes = 'F'>
-			<cfquery datasource="#dsn_inspecao#" name="rsunid">
-				SELECT Und_Codigo FROM Unidades WHERE Und_Codigo = '#rs3SO.Pos_Area#'
-			</cfquery>
-			<cfif rsunid.recordcount gt 0>
-				<cfset auxsta_antes = 1>
-			</cfif>
-			<cfif auxsta_antes is 'F'>
-				<cfquery datasource="#dsn_inspecao#" name="rsreop">
-					SELECT Rep_Codigo FROM Reops WHERE Rep_Codigo = '#rs3SO.Pos_Area#'
-				</cfquery>							
-			
-				<cfif rsreop.recordcount gt 0>
-					<cfset auxsta_antes = 7>
-				</cfif>
-			</cfif>
-			<cfif auxsta_antes is 'F'>
-				<cfquery datasource="#dsn_inspecao#" name="rsarea">
-					SELECT Ars_Codigo FROM Areas WHERE Ars_Codigo = '#rs3SO.Pos_Area#'
-				</cfquery>							
-			
-				<cfif rsarea.recordcount gt 0>
-					<cfset auxsta_antes = 6>
-				</cfif>
-			</cfif>
-			<cfif auxsta_antes is 'F'>
-				<cfquery datasource="#dsn_inspecao#" name="rsse">
-					SELECT Dir_Sto FROM Diretoria WHERE Dir_Sto = '#rs3SO.Pos_Area#'
-				</cfquery>								
-			
-				<cfif rsse.recordcount gt 0>
-					<cfset auxsta_antes = 22>
-				</cfif>
+			<cfset auxsta_antes = rs3SO.Pos_Sit_Resp_Antes> 
+			<cfif auxsta_antes is 0 or auxsta_antes is 11 or auxsta_antes is 14 or auxsta_antes is 21 or auxsta_antes is 28 or auxsta_antes is 29>
+				<cfset auxsta_antes = 1> 
 			</cfif>		
-			<cfquery datasource="#dsn_inspecao#">
-				insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor,Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt,Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rs3SO.Pos_Inspecao#', '#rs3SO.Pos_Unidade#',#rs3SO.Pos_NumGrupo#, #rs3SO.Pos_NumItem#, #PosDtPosic#, '#AndtHPosic#', #auxsta#, #rs3SO.Und_TipoUnidade#, 0, 0, '#rs3SO.pos_username#', CONVERT(char, GETDATE(), 120), '#rs3SO.Pos_Area#', '#trim(rs3SO.Pos_NomeArea)#', '#AndtCodSE#', #dtfim#, 'NN', 2, '#auxsta_antes#', #rs3SO.Pos_PontuacaoPonto#, '#rs3SO.Pos_ClassificacaoPonto#')
-			</cfquery>	
-			<!---  ======================================  --->
-			<cfset AndtDPosic = CreateDate(year(PosDtPosic),month(PosDtPosic),day(PosDtPosic))>
-			<cfset AndtHPosic = AndtHPosic>
-			<cfif day(AndtDPosic) gt 1>
-				<cfquery name="rsNRPENDTRAT" datasource="#dsn_inspecao#">
-					SELECT And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area
-					FROM Andamento
-					WHERE And_Unidade = '#rs3SO.Pos_Unidade#' AND 
-					And_NumInspecao = '#rs3SO.Pos_Inspecao#' AND 
-					And_NumGrupo = #rs3SO.Pos_NumGrupo# AND 
-					And_NumItem = #rs3SO.Pos_NumItem# AND 
-					And_DtPosic <= #AndtDPosic# AND 
-					And_HrPosic <> '#AndtHPosic#'
-					order by And_DtPosic desc, And_HrPosic desc
-				</cfquery>					
-				<cfset auxantes = 0>
-				<cfif rs3SO.Pos_Sit_Resp_Antes gt 0>
-					<cfset auxantes = rs3SO.Pos_Situacao_Resp>
+			<cfset AndtNomeOrgCondutor = trim(rs3SO.Pos_NomeArea)>
+			<cfif len(trim(rs3SO.Pos_NomeArea)) lt 0>
+				<cfquery datasource="#dsn_inspecao#" name="rsdep">
+					SELECT Dep_Descricao FROM Departamento where Dep_Codigo = '#rs3SO.Pos_Area#'
+				</cfquery>
+				<cfif rsdep.recordcount gt 0>
+					<cfset AndtNomeOrgCondutor = trim(rsdep.Dep_Descricao)>
 				</cfif>
-				<cfset salvarSN = 'S'>
-		
-				<cfloop query="rsNRPENDTRAT">  
-					<cfset auxstab = rsNRPENDTRAT.And_Situacao_Resp>	
-					<cfset AndtDPosicc = CreateDate(year(rsNRPENDTRAT.And_DtPosic),month(rsNRPENDTRAT.And_DtPosic),day(rsNRPENDTRAT.And_DtPosic))>
-					<cfset AndtHPosicc = rsNRPENDTRAT.And_HrPosic>
-					<cfif auxstab eq 14 or auxstab eq 2 or auxstab eq 4 or auxstab eq 5 or auxstab eq 8 or auxstab eq 20 or auxstab eq 15 or auxstab eq 16 or auxstab eq 18 or auxstab eq 19 or auxstab eq 23>					
-						<cfset AndtCodSE = rs3SO.Und_CodDiretoria>
-
-						<cfquery name="rsExisteb" datasource="#dsn_inspecao#">
-							select Andt_Insp 
-							from Andamento_Temp 
-							where Andt_AnoExerc = '#year(dtlimit)#' and
-							Andt_Mes = #month(dtlimit)# and
-							Andt_Insp = '#rs3SO.Pos_Inspecao#' and
-							Andt_Unid = '#rs3SO.Pos_Unidade#' and
-							Andt_Grp = #rs3SO.Pos_NumGrupo# and 
-							Andt_Item = #rs3SO.Pos_NumItem# and 
-							Andt_DPosic = #AndtDPosicc# and
-							Andt_HPosic = '#AndtHPosicc#' and
-							Andt_Resp <> 3 and
-							Andt_TipoRel = 2
-						</cfquery>	
-						<cfif auxstab eq 14 and dateformat(AndtDPosicc,"YYYYMMDD") lt dateformat(dt14limitprci_slnc,"YYYYMMDD")>
-							<cfset salvarSN = 'N'>
-						</cfif>
-						<cfif (rsExisteb.recordcount lte 0) and (salvarSN eq 'S')>
-							<cfquery datasource="#dsn_inspecao#">
-								insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor,Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt,Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto) values ('#year(dtlimit)#', #month(dtlimit)#, '#rs3SO.Pos_Inspecao#', '#rs3SO.Pos_Unidade#',#rs3SO.Pos_NumGrupo#, #rs3SO.Pos_NumItem#, #AndtDPosicc#, '#AndtHPosicc#', #auxstab#, #rs3SO.Und_TipoUnidade#, 0, 0, '#rsNRPENDTRAT.And_username#', CONVERT(char, GETDATE(), 120), '#rsNRPENDTRAT.And_Area#', '#AndtCodSE#', '#AndtCodSE#', #dtfim#, 'NN', 2, '3', #rs3SO.Pos_PontuacaoPonto#, '#rs3SO.Pos_ClassificacaoPonto#')									
-							</cfquery> 
-							<cfset salvarSN = 'N'>
-						</cfif>
-					</cfif>	
-				</cfloop>
-			</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsunid">
+						SELECT Und_Descricao FROM Unidades WHERE Und_Codigo = '#rs3SO.Pos_Area#'
+					</cfquery>
+					<cfif rsunid.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsunid.Und_Descricao)>
+					</cfif>
+				</cfif>				
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsreop">
+						SELECT Rep_Nome FROM Reops WHERE Rep_Codigo = '#rs3SO.Pos_Area#'
+					</cfquery>							
+					<cfif rsreop.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsreop.Rep_Nome)>
+					</cfif>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsarea">
+						SELECT Ars_Sigla FROM Areas WHERE Ars_Codigo = '#rs3SO.Pos_Area#'
+					</cfquery>							
+					<cfif rsarea.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsarea.Ars_Sigla)>
+					</cfif>
+				</cfif>
+				<cfif AndtNomeOrgCondutor is ''>
+					<cfquery datasource="#dsn_inspecao#" name="rsse">
+						SELECT Dir_Descricao FROM Diretoria WHERE Dir_Sto = '#rs3SO.Pos_Area#'
+					</cfquery>								
+					<cfif rsse.recordcount gt 0>
+						<cfset AndtNomeOrgCondutor = trim(rsse.Dir_Descricao)>
+					</cfif>
+				</cfif>	
+			</cfif>	
+			<cfquery datasource="#dsn_inspecao#">
+				insert into Andamento_Temp (Andt_AnoExerc, Andt_Mes, Andt_Insp, Andt_Unid, Andt_Grp, Andt_Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor,Andt_Uteis, Andt_user, Andt_dtultatu, Andt_Area, Andt_NomeOrgCondutor, Andt_CodSE, Andt_DTRefer, Andt_Prazo, Andt_TipoRel, Andt_RespAnt,Andt_PosPontuacaoPonto, Andt_PosClassificacaoPonto,Andt_DTEnvio) values ('#year(dtlimit)#', #month(dtlimit)#, '#rs3SO.Pos_Inspecao#', '#rs3SO.Pos_Unidade#',#rs3SO.Pos_NumGrupo#, #rs3SO.Pos_NumItem#, #PosDtPosic#, '#AndtHPosic#', #auxsta#, #rs3SO.Und_TipoUnidade#, 0, 0, '#rs3SO.pos_username#', CONVERT(char, GETDATE(), 120), '#rs3SO.Pos_Area#', '#AndtNomeOrgCondutor#', '#AndtCodSE#', #dtfim#, 'NN', 2, '#auxsta_antes#', #rs3SO.Pos_PontuacaoPonto#, '#rs3SO.Pos_ClassificacaoPonto#',#AndtDTEnvio#)
+			</cfquery>	
 		</cfoutput>
-
-		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,45)> 
-		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-		</cfloop>
-
 		<!--- VALIDAR PONTOS NA TABELA: Andamento_Temp  --->
 		<!--- GRUPOS E ITENS NAO PERMITIDOS  --->
 		<cfquery name="rsGRIT" datasource="#dsn_inspecao#">
 			SELECT Andt_AnoExerc, Andt_TipoRel, Andt_Mes, Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item, Andt_Resp, Andt_Area
 			FROM Andamento_Temp 
-			WHERE Andt_AnoExerc ='#year(dtlimit)#' AND Andt_TipoRel=2 AND Andt_Mes = #month(dtlimit)#
+			WHERE Andt_AnoExerc ='#year(dtlimit)#' AND Andt_Mes = #month(dtlimit)#
 		</cfquery>
 
 		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,10)> 
+		<cfset endTime = CreateTime(0,0,50)> 
 		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
 		</cfloop>
 
 		<cfloop query="rsGRIT">
+			<cfset excSN='N'>
 			<cfset auxgrp = rsGRIT.Andt_Grp>
 			<cfset auxitm = rsGRIT.Andt_Item>
-			<cfif (auxgrp is 9 and auxitm is 9) or (auxgrp is 29 and auxitm is 4) or (auxgrp is 68 and auxitm is 3) or (auxgrp is 96 and auxitm is 3) or (auxgrp is 122 and auxitm is 3) or (auxgrp is 209 and auxitm is 3) or (auxgrp is 241 and auxitm is 3) or (auxgrp is 308 and auxitm is 3) or (auxgrp is 278 and auxitm is 2) or (auxgrp is 337 and auxitm is 2)>
-				<cfquery datasource="#dsn_inspecao#">
-				UPDATE Andamento_Temp SET Andt_Prazo = 'EX'
-				WHERE Andt_Unid='#rsGRIT.Andt_Unid#' AND 
-				Andt_Insp='#rsGRIT.Andt_Insp#' AND 
-				Andt_Grp=#rsGRIT.Andt_Grp# AND 
-				Andt_Item=#rsGRIT.Andt_Item#
-				</cfquery>		
+			<cfif auxgrp is 9 and auxitm is 9>
+				<cfset excSN='S'>
+			<cfelseif auxgrp is 29 and auxitm is 4>
+				<cfset excSN='S'>
+			<cfelseif auxgrp is 68 and auxitm is 3>
+				<cfset excSN='S'>
+			<cfelseif auxgrp is 96 and auxitm is 3>
+				<cfset excSN='S'>
+			<cfelseif auxgrp is 122 and auxitm is 3>
+				<cfset excSN='S'>			
+			<cfelseif auxgrp is 209 and auxitm is 3>
+				<cfset excSN='S'>
+			<cfelseif auxgrp is 278 and auxitm is 2>
+				<cfset excSN='S'>
+			<cfelseif auxgrp is 241 and auxitm is 3>
+				<cfset excSN='S'>
+			<cfelseif auxgrp is 308 and auxitm is 3>
+				<cfset excSN='S'>
+			<cfelseif auxgrp is 337 and auxitm is 2>
+				<cfset excSN='S'>
 			</cfif>
-		</cfloop>			
+			<cfif excSN eq 'S'>
+			    <cfif rsGRIT.Andt_TipoRel eq 1>
+					<cfset AndtTipoRel= 11>
+				<cfelse>
+					<cfset AndtTipoRel= 22>
+				</cfif>
+				<cfquery datasource="#dsn_inspecao#">
+					UPDATE Andamento_Temp SET Andt_TipoRel = #AndtTipoRel#
+					WHERE Andt_AnoExerc='#rsGRIT.Andt_AnoExerc#' AND
+					Andt_Mes=#rsGRIT.Andt_Mes# AND
+					Andt_TipoRel=#rsGRIT.Andt_TipoRel# AND
+					Andt_Unid='#rsGRIT.Andt_Unid#' AND 
+					Andt_Insp='#rsGRIT.Andt_Insp#' AND 
+					Andt_Grp=#rsGRIT.Andt_Grp# AND 
+					Andt_Item=#rsGRIT.Andt_Item# AND
+					Andt_Resp=#rsGRIT.Andt_Resp# AND
+					Andt_Area='#rsGRIT.Andt_Area#'
+				</cfquery>
+			</cfif>		
+		</cfloop>		
 		<!--- FIM ROTINA  ---> 
 				
 		<!--- ROTINA  --->
 		<!--- POS_NOMEAREA NAO PERMITIDOS  --->
 		<cfquery name="AndtArea" datasource="#dsn_inspecao#">
-			SELECT Andt_AnoExerc, Andt_TipoRel, Andt_Mes, Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item, Andt_Resp, Andt_Area, Andt_PosClassificacaoPonto, Andt_Unid
-			FROM Andamento_Temp 
-			WHERE Andt_AnoExerc ='#year(dtlimit)#' AND Andt_TipoRel=2 AND Andt_Mes = #month(dtlimit)# 
+			SELECT Ars_Descricao, Andt_AnoExerc, Andt_TipoRel, Andt_Mes, Andt_Unid, Andt_Insp, Andt_Grp, Andt_Item, Andt_Resp, Andt_Area, Andt_PosClassificacaoPonto, Andt_Unid
+			FROM Andamento_Temp INNER JOIN Areas ON Andt_Area = Ars_Codigo  
+			WHERE Andt_AnoExerc ='#year(dtlimit)#' AND Andt_Mes = #month(dtlimit)# 
 		</cfquery>
 
 		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,10)> 
+		<cfset endTime = CreateTime(0,0,50)> 
 		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
 		</cfloop>
 
 		<cfloop query="AndtArea">
-			<cfquery name="rsNegar" datasource="#dsn_inspecao#">
-				SELECT Ars_Sigla 
-				FROM Areas 
-				WHERE Ars_Codigo = '#AndtArea.Andt_Area#' and 
-				(Ars_Sigla Like '%CCOP/SCIA%' Or 
-				Ars_Sigla Like '%CCOP/SCOI%' Or 
-				Ars_Sigla Like '%GCOP/CCOP%' Or
-				Ars_Sigla Like '%GSOP/CSEC%' Or 
-				Ars_Sigla Like '%CORR%' Or 
-				Ars_Sigla Like '%GCOP/SGCIN%' Or 
-				Ars_Sigla Like '%GAAV/SGSEC%' OR 
-				Ars_Sigla Like '%/SCORG%')
-			</cfquery>
-			<cfset AndtPosClassificacaoPonto = trim(ucase(AndtArea.Andt_PosClassificacaoPonto))>
-			<!--- <cfif rsNegar.recordcount gt 0 or (AndtPosClassificacaoPonto eq 'LEVE' and Andt_Unid neq 12)>  --->
-			<cfif rsNegar.recordcount gt 0> 
-				<cfquery datasource="#dsn_inspecao#">
-				UPDATE Andamento_Temp SET Andt_Prazo = 'EX'
-				WHERE Andt_Unid='#AndtArea.Andt_Unid#' AND 
-				Andt_Insp='#AndtArea.Andt_Insp#' AND 
-				Andt_Grp=#AndtArea.Andt_Grp# AND 
-				Andt_Item=#AndtArea.Andt_Item#
-				</cfquery>	
-			</cfif>			 	
-		</cfloop>
-
-		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,45)> 
-		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-		</cfloop>
-
-		<!--- FIM ROTINA  ---> 
-		<cfquery datasource="#dsn_inspecao#">
-		delete from Andamento_Temp where Andt_Prazo = 'EX'
-		</cfquery>  
-
-		<!---  gerar o met_slnc_acum e Met_slnc_AcumPeriodo --->
-		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,45)> 
-		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-		</cfloop>
-
-		<cfquery name="rsAno" datasource="#dsn_inspecao#">
-			SELECT Andt_CodSE,Andt_Mes,Andt_Resp
-			FROM Andamento_Temp
-			WHERE Andt_AnoExerc = '#anoexerc#' AND Andt_Mes <= #month(dtlimit)# AND Andt_TipoRel = 2
-			order by Andt_CodSE 
-		</cfquery> 
-
-		<!---  gerar o met_slnc_acum e Met_slnc_AcumPeriodo --->
-		<cfset startTime = CreateTime(0,0,0)> 
-		<cfset endTime = CreateTime(0,0,45)> 
-		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
-		</cfloop>	
-
-		<cfquery dbtype="query" name="rsRegMeta">
-			SELECT Met_Codigo, Met_SE_STO 
-			FROM rsMetas
-			order by Met_Codigo 
-		</cfquery>	
-		<cfoutput query="rsRegMeta">
-			<cfset totmessegeral = 0>	
-			<cfset totmessesol = 0>	
-			<cfset totmessependtrat = 0>	
-			<cfset slnc_acummes = 0>	
-			<cfset dgci_acummes = 0>	
-			<cfset totanosegeral = 0>	
-			<cfset totanosesol = 0>	
-			<cfset totanosependtrat = 0>			
-			<cfset slnc_acperiodo = 0>	
-			<cfset dgci_acperiodo = 0>
-			<cfset MetasResult = 0>
-			<!--- Obter PRCI mes corrente --->
-			<cfquery name="rsprciacum" datasource="#dsn_inspecao#">
-				SELECT Met_PRCI_Acum, Met_PRCI_AcumPeriodo,Met_DGCI_Mes
-				FROM Metas
-				WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' AND Met_Ano = #anoexerc# AND Met_Mes = #month(dtlimit)#
-			</cfquery>		
-			<!--- quant. (3-SOL) no mês por SE --->
-			<cfquery dbtype="query" name="rstotmessesol">
-				SELECT Andt_Resp 
-				FROM  rsAno
-				where Andt_Resp = 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#' and Andt_Mes = #month(dtlimit)#
-			</cfquery>
-			<cfset totmessesol = rstotmessesol.recordcount>
-			<!--- quant. (Pendentes + Tratamentos) no mês por SE --->
-			<cfquery dbtype="query" name="rstotmessependtrat">
-				SELECT Andt_Resp 
-				FROM  rsAno
-				where Andt_Resp <> 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#' and Andt_Mes = #month(dtlimit)#
-			</cfquery>
-			<cfset totmessependtrat = rstotmessependtrat.recordcount>
-			<cfset totmessegeral = totmessesol + totmessependtrat>
-
-			<!--- slncacum ---> 
-			<cfset slnc_acummes = '100.0'>
-			<cfif totmessegeral gt 0>
-				<cfset slnc_acummes = trim(NumberFormat(((totmessesol/totmessegeral) * 100),999.0))>
+			<cfset ArsDescricao = ucase(trim(AndtArea.Ars_Descricao))>
+			<cfset excSN='N'>
+			<cfif ArsDescricao eq 'SEC ACOMP CONTR INTERNO/SCIA'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'SEC ACOMP CONTR INTERNO/SGCIN'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'SUP CONTR INTERNO/CCOP'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'SEC AVAL CONT INTERNO/SCOI'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'SEC AVAL CONT INTERNO/SGCIN'>
+				<cfset excSN='S'>	
+			<cfelseif ArsDescricao eq 'COORD CONTR INT OPER/CCOP'>
+				<cfset excSN='S'>		
+			<cfelseif ArsDescricao eq 'COORD SEG CORPOR/GSOP'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'COORD SEG CORPORATIVA/GSEP'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'COORD SEG CORPOR 01/GSOP'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'SUBG SEG CORPOR/GAAV'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'CORREGEDORIA/PRESI'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'CORREGEDORIA SEDE/SCORG'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'COORD REG CORREICAO/CORR'>
+				<cfset excSN='S'>
+			<cfelseif ArsDescricao eq 'SUP CSC LOCAL TEC INF/CESTI'>
+				<cfset excSN='S'>				
+			<cfelseif left(ArsDescricao,22) eq 'GER DE SERVICOS DE TIC'>
+				<cfset excSN='S'>				
 			</cfif>
-
-			<cfset dgci_acummes = trim(numberFormat((slnc_acummes * 0.45) + (rsprciacum.Met_PRCI_Acum * 0.55),999.0))>  
-
-			<!--- slncacumperiodo --->
-			<!--- quant. (3-SOL) no ano por SE --->
-			<cfquery dbtype="query" name="rstotanosesol">
-				SELECT Andt_Resp 
-				FROM  rsAno
-				where Andt_Resp = 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#'
-			</cfquery>
-			<cfset totanosesol = rstotanosesol.recordcount>
-
-			<!--- quant. (Pendentes + Tratamentos) no ano por SE --->
-			<cfquery dbtype="query" name="rstotanosependtrat">
-				SELECT Andt_Resp 
-				FROM  rsAno
-				where Andt_Resp <> 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#'
-			</cfquery>
-			<cfset totanosependtrat = rstotanosependtrat.recordcount>
-
-			<cfset totanosegeral = totanosesol + totanosependtrat>
-
-			<cfset slnc_acperiodo = trim(NumberFormat(((totanosesol/totanosegeral) * 100),999.0))>
-
-			<cfset auxmetprciacumper = rsprciacum.Met_PRCI_AcumPeriodo>
-			<cfset dgci_acperiodo = trim(numberFormat((slnc_acperiodo * 0.45) + (auxmetprciacumper * 0.55),999.0))>  
-
-			<cfset MetasResult = numberFormat((dgci_acummes / rsprciacum.Met_DGCI_Mes)*100,999.0)>
-
-			<cfquery datasource="#dsn_inspecao#">
-				UPDATE Metas SET Met_SLNC_Acum= '#slnc_acummes#',Met_SLNC_AcumPeriodo='#slnc_acperiodo#',Met_DGCI_Acum='#dgci_acummes#',Met_DGCI_AcumPeriodo='#dgci_acperiodo#',Met_Resultado='#MetasResult#'
-				WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' and Met_Ano = '#anoexerc#' and Met_Mes = #month(dtlimit)#
-			</cfquery> 
-		</cfoutput>	
+			<cfif excSN eq 'S'>
+				<cfif AndtArea.Andt_TipoRel eq 1>
+					<cfset AndtTipoRel= 11>
+				<cfelse>
+					<cfset AndtTipoRel= 22>
+				</cfif>
+				<cfquery datasource="#dsn_inspecao#">
+					UPDATE Andamento_Temp SET Andt_TipoRel = #AndtTipoRel#
+					WHERE Andt_AnoExerc='#AndtArea.Andt_AnoExerc#' AND
+					Andt_Mes=#AndtArea.Andt_Mes# AND
+					Andt_TipoRel=#AndtArea.Andt_TipoRel# AND
+					Andt_Unid='#AndtArea.Andt_Unid#' AND 
+					Andt_Insp='#AndtArea.Andt_Insp#' AND 
+					Andt_Grp=#AndtArea.Andt_Grp# AND 
+					Andt_Item=#AndtArea.Andt_Item# AND
+					Andt_Resp=#AndtArea.Andt_Resp# AND
+					Andt_Area='#AndtArea.Andt_Area#'
+				</cfquery>
+			</cfif>	 				 	
+		</cfloop>
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,45)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>
 	</cfif>
 	<!--- ************** MUDAR STATUS ****************** --->
 	<!--- ###### UNIDADES ###### --->
@@ -1094,7 +1109,6 @@
 			(Pos_DtPrev_Solucao < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00')) 
 			ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 		</cfquery>
-
 	  	<cfoutput query="rs14NR_2PU">
 			<!--- Proprias --->
 			<cfset rot3_IDStatus = 2>
@@ -1258,34 +1272,39 @@
 		FROM Unidades 
 		INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade 
 		INNER JOIN Reops ON Und_CodReop = Rep_Codigo
-		WHERE Pos_Situacao_Resp in (14) and Und_TipoUnidade in (12,16) and DATEDIFF(d,Pos_DtPosic,GETDATE()) >= 11
+		WHERE Pos_Situacao_Resp in (14) and 
+		Und_TipoUnidade in (12,16) and 
+		(Pos_DtPrev_Solucao < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00'))
 		ORDER BY Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 	   </cfquery>
 	    <!--- Opiniao da CCOP --->
 		<cfset Encaminhamento = "Opinião do Controle Interno">
 		<cfoutput query="rs14NR_20PF">
-			<!--- Obter o a data util para 10(dez) dias --->
+			<!--- Obter o a data util para 10(dez) dias da data de liberação--->
 			<cfset dt10terc = CreateDate(year(rs14NR_20PF.Pos_DtPosic),month(rs14NR_20PF.Pos_DtPosic),day(rs14NR_20PF.Pos_DtPosic))>
-			<cfset nCont = 1>
-			<cfloop condition="nCont lt 10">
-				<cfset dt10terc = DateAdd( "d", 1, dt10terc)>
-				<cfset vDiaSem = DayOfWeek(dt10terc)>
-				<cfif vDiaSem neq 1 and vDiaSem neq 7>
+			<cfif dateformat(now(),"YYYYMMDD") gt dateformat(dt10terc,"YYYYMMDD")>
+				<!--- complementar os 20 dias úteis da data de liberação para compor os 30  dias úteis--->
+				<cfset dt30terc = CreateDate(year(dt10terc),month(dt10terc),day(dt10terc))>
+				<cfset nCont = 1>
+				<cfloop condition="nCont lte 30">
+					<cfset dt30terc = DateAdd( "d", 1, dt30terc)>
+					<cfset vDiaSem = DayOfWeek(dt30terc)>
+					<cfif vDiaSem neq 1 and vDiaSem neq 7>
 					<!--- verificar se Feriado Nacional --->
 					<cfquery name="rsFeriado" datasource="#dsn_inspecao#">
-						SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dt10terc#
+						SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dt30terc#
 					</cfquery>
 					<cfif rsFeriado.recordcount gt 0>
+						<cfset nCont = nCont - 1>
+					</cfif>
+					</cfif>
+					<!--- Verifica se final de semana  --->
+					<cfif vDiaSem eq 1 or vDiaSem eq 7>
 					<cfset nCont = nCont - 1>
 					</cfif>
-				</cfif>
-				<!--- Verifica se final de semana  --->
-				<cfif vDiaSem eq 1 or vDiaSem eq 7>
-					<cfset nCont = nCont - 1>
-				</cfif>	
-				<cfset nCont = nCont + 1>
-			</cfloop>
-			<cfif dateformat(now(),"YYYYMMDD") gt dateformat(dt10terc,"YYYYMMDD")>
+					<cfset nCont = nCont + 1>
+				</cfloop> 	
+
 				<cfset rot6_IDStatus = 20>
 				<cfset rot6_SglStatus = 'PF'>
 				<cfset rot6_DescStatus = 'PENDENTE DE TERCEIRIZADA'>
@@ -1298,17 +1317,17 @@
 				<cfset Encaminhamento = "Opinião do Controle Interno">
 				<cfset aux_obs = #rs14NR_20PF.Pos_Parecer# & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: ' & #rot6_DescStatus# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
 				<cfquery datasource="#dsn_inspecao#">
-					UPDATE ParecerUnidade SET Pos_Area = '#aux_posarea#', Pos_NomeArea = '#aux_posnomearea#', Pos_Situacao_Resp = #rot6_IDStatus#, Pos_Situacao = '#rot6_SglStatus#', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 14 WHERE Pos_Unidade='#rs14NR_20PF.Pos_Unidade#' AND Pos_Inspecao='#rs14NR_20PF.Pos_Inspecao#' AND Pos_NumGrupo=#rs14NR_20PF.Pos_NumGrupo# AND Pos_NumItem=#rs14NR_20PF.Pos_NumItem#
+					UPDATE ParecerUnidade SET Pos_Area = '#aux_posarea#', Pos_NomeArea = '#aux_posnomearea#', Pos_Situacao_Resp = #rot6_IDStatus#, Pos_Situacao = '#rot6_SglStatus#', Pos_DtUltAtu = CONVERT(char, GETDATE(), 120), Pos_DtPosic = #dtatual#, Pos_DtPrev_Solucao = #dt30terc#, Pos_Parecer = '#aux_obs#', Pos_Sit_Resp_Antes = 14 WHERE Pos_Unidade='#rs14NR_20PF.Pos_Unidade#' AND Pos_Inspecao='#rs14NR_20PF.Pos_Inspecao#' AND Pos_NumGrupo=#rs14NR_20PF.Pos_NumGrupo# AND Pos_NumItem=#rs14NR_20PF.Pos_NumItem#
 				</cfquery>
 		
 				<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '>' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'À(O) ' & #trim(aux_posnomearea)# & CHR(13) & CHR(13) & #sinformes# & CHR(13) & CHR(13) & 'Situação: ' & #rot6_DescStatus# & CHR(13) & CHR(13) & 'Responsável: SUBG CONTR INT OPER/GCOP' & CHR(13) & CHR(13) & '--------------------------------------------------------------------------------------------------------------'>
-                <cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
-                <cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
-                <cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>	 
+				<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+				<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+				<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>	 
 		
 				<cfquery datasource="#dsn_inspecao#">
 					insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Parecer, And_Area) values ('#rs14NR_20PF.Pos_Inspecao#', '#rs14NR_20PF.Pos_Unidade#', #rs14NR_20PF.Pos_NumGrupo#, #rs14NR_20PF.Pos_NumItem#, convert(char, getdate(), 102), 'Rotina_Automatica', #rot6_IDStatus#, '#hhmmssdc#', '#and_obs#', '#aux_posarea#')
-				</cfquery>
+				</cfquery>		
 			</cfif>		   
 		</cfoutput> 
 	</cfif>
@@ -1487,6 +1506,7 @@
 			</cfquery>		
 
 			<cfset rot12_sdestina = rs14NR.Und_Email>
+			<!--- <cfset rot12_sdestina = #rot12_sdestina# & ';gilvanm@correios.com.br'>--->
 			<cfif findoneof("@", #trim(rot12_sdestina)#) eq 0>
 			 <cfset rot12_sdestina = "gilvanm@correios.com.br">
 			</cfif>
@@ -1562,6 +1582,7 @@
 			</cfquery>		
 
 			<cfset rot13_sdestina = rs14NR.Und_Email>
+			<!--- <cfset rot13_sdestina = #rot13_sdestina# & ';gilvanm@correios.com.br'>--->
 			<cfif findoneof("@", #trim(rot13_sdestina)#) eq 0>
 			 <cfset rot13_sdestina = "gilvanm@correios.com.br">
 			</cfif>
@@ -1638,12 +1659,10 @@
 				ORDER BY Und_CodDiretoria, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 			</cfquery>
 		    <cfset rot14_sdestina = rs15TU.Und_Email>
+			<!--- <cfset rot14_sdestina = #rot14_sdestina# & ';gilvanm@correios.com.br'>--->
 			<cfif findoneof("@", #trim(rot14_sdestina)#) eq 0>
 				 <cfset rot14_sdestina = "gilvanm@correios.com.br">
 			</cfif>
-
-<!--- 	      <cfset rot14_sdestina = #rot14_sdestina# & ';gilvanm@correios.com.br'> --->
-	   <!--- <cfset rot14_sdestina = "gilvanm@correios.com.br">  --->
 	   <cfif rs15TU.recordcount gt 0>
 	   <cfmail from="SNCI@correios.com.br" to="#rot14_sdestina#" subject="Avaliação TRATAMENTO UNIDADE" type="HTML">
 			 Mensagem automática. Não precisa responder!<br><br>
@@ -1715,12 +1734,11 @@
 				ORDER BY Und_CodDiretoria, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 			</cfquery>
 		    <cfset rot15_sdestina = rs18TF.Und_Email>
+			<!--- <cfset rot15_sdestina = #rot15_sdestina# & ';gilvanm@correios.com.br'>--->
 			<cfif findoneof("@", #trim(rot15_sdestina)#) eq 0>
 				 <cfset rot15_sdestina = "gilvanm@correios.com.br">
 			</cfif>
 
-<!--- 	          <cfset rot15_sdestina = #rot15_sdestina# & ';gilvanm@correios.com.br'>  --->
-	   <!--- <cfset rot15_sdestina = "gilvanm@correios.com.br">  --->
 	   <cfif rs18TF.recordcount gt 0>
 	   
 	   <cfmail from="SNCI@correios.com.br" to="#rot15_sdestina#" subject="Avaliação TRATAMENTO TERCEIRIZADA" type="HTML">
@@ -1795,12 +1813,11 @@
 			</cfquery>	 
 			<cfif rs16TS.recordcount gt 0>
              	<cfset rot16_sdestina = rs16TSGRP.Rep_Email>
+				<!--- <cfset rot16_sdestina = #rot16_sdestina# & ';gilvanm@correios.com.br'>--->
 				<cfif findoneof("@", #trim(rot16_sdestina)#) eq 0>
 					 <cfset rot16_sdestina = "gilvanm@correios.com.br">
 				</cfif>
 
-<!--- 				 <cfset rot16_sdestina = #rot16_sdestina# & ';gilvanm@correios.com.br'> --->
-				 <!---   <cfset rot16_sdestina = "gilvanm@correios.com.br">  --->
 				 <cfmail from="SNCI@correios.com.br" to="#rot16_sdestina#" subject="Avaliação TRATAMENTO ÓRGÃO SUBORDINADOR" type="HTML">
 					 Mensagem automática. Não precisa responder!<br><br>
 					<strong>
@@ -1877,16 +1894,11 @@
 		  <cfset sdestina = "">
 		  <cfif rs19TA.recordcount gt 0>
 			 <cfset rot17_sdestina = rs19TAGRP.Ars_Email>
+			 <!--- <cfset rot17_sdestina = #rot17_sdestina# & ';gilvanm@correios.com.br'>--->
 				<cfif findoneof("@", #trim(rot17_sdestina)#) eq 0>
 					 <cfset rot17_sdestina = "gilvanm@correios.com.br">
 				</cfif>
 
-<!--- 			 <cfif left(rs19TA.Pos_Unidade,2) is '32'>
-				   <cfset rot17_sdestina = #rot17_sdestina# & ';edimir@correios.com.br'>
-			 </cfif> --->
-			<!---  	   ---> 
-<!--- 			<cfset rot17_sdestina = #rot17_sdestina# & ';gilvanm@correios.com.br'> --->
-			<!--- <cfset rot17_sdestina = "gilvanm@correios.com.br"> --->
 			  <cfmail from="SNCI@correios.com.br" to="#rot17_sdestina#" subject="Avaliação TRATAMENTO DA ÁREA" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
@@ -1961,17 +1973,12 @@
 
 		  <cfset sdestina = "">
 		  <cfif rs23TO.recordcount gt 0>
-			 <cfset rot18_sdestina = rs23TOGRP.Dir_Email>
+			 	<cfset rot18_sdestina = rs23TOGRP.Dir_Email>
+				<!--- <cfset rot18_sdestina = #rot18_sdestina# & ';gilvanm@correios.com.br'>--->
 				<cfif findoneof("@", #trim(rot18_sdestina)#) eq 0>
 					 <cfset rot18_sdestina = "gilvanm@correios.com.br">
 				</cfif>
 
-<!--- 			 <cfif left(rs23TO.Pos_Unidade,2) is '32'>
-				   <cfset rot18_sdestina = #rot18_sdestina# & ';edimir@correios.com.br'>
-			 </cfif> --->
-			<!---  	   ---> 
-<!--- 			<cfset rot18_sdestina = #rot18_sdestina# & ';gilvanm@correios.com.br'> --->
-			<!--- <cfset rot18_sdestina = "gilvanm@correios.com.br"> --->
 			  <cfmail from="SNCI@correios.com.br" to="#rot18_sdestina#" subject="Avaliação TRATAMENTO SE" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
@@ -2053,10 +2060,8 @@
 				 <cfelse>
 					<cfset rot19_sdestina = #trim(rs4POGRP.Rep_Email)#>
 			 	</cfif>
-
+				<!--- <cfset rot19_sdestina = #rot19_sdestina# & ';gilvanm@correios.com.br'>--->
 				<!---    ---> 
-<!--- 				<cfset rot19_sdestina = #rot19_sdestina# & ';gilvanm@correios.com.br'> --->
-				<!--- <cfset rot19_sdestina = "gilvanm@correios.com.br"> --->
 			    <cfmail from="SNCI@correios.com.br" to="#rot19_sdestina#" subject="Avaliação PENDENTE DO ÓRGÃO SUBORDINADOR" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
@@ -2132,14 +2137,12 @@
 					 <cfelse>
 						<cfset rot20_sdestina = #trim(rs2PU20PF.Und_Email)#>
 					</cfif>
-
+					<!--- <cfset rot20_sdestina = #rot20_sdestina# & ';gilvanm@correios.com.br'>--->
 					<cfset rot20_assunto = 'AVALIAÇÃO PENDENTE DA UNIDADE'>
 					<cfif rs2PU20PF.Und_TipoUnidade is 12 or rs2PU20PF.Und_TipoUnidade is 16>
 						<cfset rot20_assunto = 'AVALIAÇÃO PENDENTE DE TERCEIRIZADA'>
 					</cfif>
 					<!---    ---> 
-<!--- 					<cfset rot20_sdestina = #rot20_sdestina# & ';gilvanm@correios.com.br'> --->
-					<!--- <cfset rot20_sdestina = "gilvanm@correios.com.br"> --->
 			   		<cfmail from="SNCI@correios.com.br" to="#rot20_sdestina#" subject="#rot20_assunto#" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
@@ -2214,10 +2217,8 @@
 				 <cfelse>
 					<cfset rot21_sdestina = #trim(rs5PAGRP.Ars_Email)#>
 			 	</cfif>
-
+				<!--- <cfset rot21_sdestina = #rot21_sdestina# & ';gilvanm@correios.com.br'>--->
 				<!---    ---> 
-<!--- 				<cfset rot21_sdestina = #rot21_sdestina# & ';gilvanm@correios.com.br'> --->
-				<!--- <cfset rot21_sdestina = "gilvanm@correios.com.br"> --->
 			    <cfmail from="SNCI@correios.com.br" to="#rot21_sdestina#" subject="Avaliação PENDENTE DA ÁREA" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
@@ -2285,7 +2286,7 @@
 				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Situacao, Pos_Parecer, Und_Email, Und_Descricao 
 				FROM Unidades 
 				INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade
-				WHERE (Pos_Area = '#rs08SEGRP.Dir_Sto#') and (Pos_Situacao_Resp = 5) and (Pos_DtPosic < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00'))
+				WHERE (Pos_Area = '#rs08SEGRP.Dir_Sto#') and (Pos_Situacao_Resp = 8) and (Pos_DtPosic < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00'))
 				ORDER BY Und_CodDiretoria, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 		   </cfquery>
 		   <cfif rs08SE.recordcount gt 0>
@@ -2294,10 +2295,8 @@
 				 <cfelse>
 					<cfset rot22_sdestina = #trim(rs08SEGRP.Dir_Email)#>
 			 	</cfif>
-
+				<!--- <cfset rot22_sdestina = #rot22_sdestina# & ';gilvanm@correios.com.br'>--->
 				<!---    ---> 
-<!--- 				<cfset rot22_sdestina = #rot22_sdestina# & ';gilvanm@correios.com.br'> --->
-				<!--- <cfset rot22_sdestina = "gilvanm@correios.com.br"> --->
 			    <cfmail from="SNCI@correios.com.br" to="#rot22_sdestina#" subject="Avaliação PENDENTE SE" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
@@ -2358,7 +2357,7 @@
 	
 		<cfoutput query="rsRot23">
 	        
-			<cfquery name="rs01117" datasource="#dsn_inspecao#">
+			<cfquery name="rs011" datasource="#dsn_inspecao#">
 				SELECT Und_CodDiretoria, Und_Descricao, Pos_Inspecao 
 				FROM Unidades 
 				INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade
@@ -2367,27 +2366,23 @@
 				GROUP BY Und_CodDiretoria, Und_Descricao, Pos_Inspecao 
 			</cfquery>	
 			<cfset scoi_coordena = ''>			
-			<cfif rs01117.recordcount gt 0>
-				<cfset scoi_coordena = rs01117.Und_CodDiretoria>
-				<cfif rs01117.Und_CodDiretoria eq '03'>
+			<cfif rs011.recordcount gt 0>
+				<cfset scoi_coordena = rs011.Und_CodDiretoria>
+				<cfif scoi_coordena eq '03' or scoi_coordena eq '05' or scoi_coordena eq '65'>
 					<cfset scoi_coordena = '10'>
-				<cfelseif rs01117.Und_CodDiretoria eq '05'>
-				     <cfset scoi_coordena = '10'>
-				<cfelseif rs01117.Und_CodDiretoria eq '65'>
-				     <cfset scoi_coordena = '10'>	
-				<cfelseif rs01117.Und_CodDiretoria eq '70'>
-				     <cfset scoi_coordena = '04'>						 					 				 
+				<cfelseif scoi_coordena eq '70'>
+					<cfset scoi_coordena = '04'>						 					 				 
 				</cfif>
 	
 				<cfquery name="rsGes" datasource="#dsn_inspecao#">
 					SELECT Ars_Sigla, Ars_Email 
 					FROM Areas 
-					WHERE (trim(Ars_Sigla) Like '%GCOP/SGCIN/SCOI') AND (left(Ars_Codigo,2)= '#scoi_coordena#') and Ars_Status = 'A'
+					WHERE (left(Ars_Codigo,2)= '#scoi_coordena#') AND (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SCOI%' OR Ars_Descricao Like '%SUP CONTR INTERNO/SCOI%')
 				</cfquery>
 
 				<cfset auxnomearea = rsGes.Ars_Sigla>
 				<cfset rot23_sdestina = rsGes.Ars_Email>
-		
+				<!--- <cfset rot23_sdestina = #rot23_sdestina# & ';gilvanm@correios.com.br'>--->
 				<cfif findoneof("@", #trim(rot23_sdestina)#) eq 0>
 					 <cfset rot23_sdestina = "gilvanm@correios.com.br">
 				</cfif>
@@ -2398,7 +2393,7 @@
 				<strong>
 				   Ao Gestor(a) da #Ucase(auxnomearea)#. <br><br><br>
 		
-		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  para  REVISÃO, LIBERAÇÃO ou RESPOSTA DA TERCEIRIZADA desse Órgão.<br><br>
+		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  para  REVISÃO, LIBERAÇÃO desse Órgão.<br><br>
 		&nbsp;&nbsp;&nbsp;Para registro de suas Análises ou encaminhamentos acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">SNCI</a><br><br>
 				
 					<table>
@@ -2410,10 +2405,10 @@
 					<td>-----------------------------------------------</td>
 					<td>----------------</td>
 					</tr>
-					<cfloop query="rs01117">
+					<cfloop query="rs011">
 						<tr>
-						<td align="left"><strong>#rs01117.Und_Descricao#</strong></td>
-						<td align="center"><strong>#rs01117.Pos_Inspecao#</strong></td>
+						<td align="left"><strong>#rs011.Und_Descricao#</strong></td>
+						<td align="center"><strong>#rs011.Pos_Inspecao#</strong></td>
 						</tr>
 					</cfloop>
 					</table>
@@ -2484,33 +2479,26 @@
 				<!---  --->
 				<cfif (nFinal - 15) lte 0>
 					<cfset scoi_coordena = rs16722.Und_CodDiretoria>
-					<cfif rs16722.Und_CodDiretoria eq '03'>
+					<cfset scoi_coordena = rs011.Und_CodDiretoria>
+					<cfif scoi_coordena eq '03' or scoi_coordena eq '05' or scoi_coordena eq '65'>
 						<cfset scoi_coordena = '10'>
-					<cfelseif rs16722.Und_CodDiretoria eq '05'>
-						 <cfset scoi_coordena = '10'>
-					<cfelseif rs16722.Und_CodDiretoria eq '65'>
-						 <cfset scoi_coordena = '10'>	
-					<cfelseif rs16722.Und_CodDiretoria eq '70'>
-						 <cfset scoi_coordena = '04'>						 					 				 
-					</cfif>		
+					<cfelseif scoi_coordena eq '70'>
+						<cfset scoi_coordena = '04'>						 					 				 
+					</cfif>	
 
 					<cfquery name="rsGes" datasource="#dsn_inspecao#">
 						SELECT Ars_Sigla, Ars_Email 
 						FROM Areas 
-						WHERE (trim(Ars_Sigla) Like '%GCOP/SGCIN/SCOI') AND (left(Ars_Codigo,2)= '#scoi_coordena#') and (Ars_Status = 'A') 
+						WHERE AND left(Ars_Codigo,2)= '#scoi_coordena#' and (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SCOI%' OR Ars_Descricao Like '%SUP CONTR INTERNO/SCOI%') 
 					</cfquery>
 		
 					<cfset auxnomearea = rsGes.Ars_Sigla>
 					<cfset rot24_sdestina = rsGes.Ars_Email>
-		
+					<!--- <cfset rot24_sdestina = #rot24_sdestina# & ';gilvanm@correios.com.br'>--->
 					<cfif findoneof("@", #trim(rot24_sdestina)#) eq 0>
 						 <cfset rot24_sdestina = "gilvanm@correios.com.br">
 					</cfif>
 			
-					<!--- <cfset gil= gil>	 --->
-					<!---    --->
-<!--- 					<cfset rot24_sdestina = #rot24_sdestina# & ';gilvanm@correios.com.br'> --->
-				<!--- 	<cfset rot24_sdestina = "gilvanm@correios.com.br"> --->
 					<cfmail from="SNCI@correios.com.br" to="#rot24_sdestina#" subject="GESTORES - Respostas" type="HTML">  
 			
 						 Mensagem automática. Não precisa responder!<br><br>
@@ -2613,7 +2601,8 @@
 					
 					<cfquery name="rsSCIA" datasource="#dsn_inspecao#">
 					 SELECT DISTINCT Ars_Codigo, Ars_Sigla, Ars_Descricao, Ars_Email, Ars_EmailCoordenador
-					 FROM Areas WHERE Ars_Status = 'A' AND (Left(Ars_Codigo,2) = '#scia_se#') and (Ars_Sigla Like '%/SCIA%' OR Ars_Sigla Like '%DCINT/GCOP/SGCIN/SCIA')
+					 FROM Areas 
+					 WHERE Left(Ars_Codigo,2) = '#scia_se#' and (Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SCIA%' OR Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SCIA%')
 					 ORDER BY Ars_Sigla
 					</cfquery>					
 					<!---  --->				
@@ -2621,7 +2610,7 @@
 					<cfset auxnomearea = rsSCIA.Ars_Sigla>
 					<cfset rot25_sdestina = rsSCIA.Ars_Email>
 					<cfset rot25_sdestina = rot25_sdestina & ';' & rsSCIA.Ars_EmailCoordenador>
-					
+					<!--- <cfset rot25_sdestina = #rot25_sdestina# & ';gilvanm@correios.com.br'>--->
 					<cfif findoneof("@", #trim(rot25_sdestina)#) eq 0>
 						 <cfset rot25_sdestina = "gilvanm@correios.com.br">
 					</cfif>
@@ -2906,7 +2895,8 @@
 					
 					<cfquery name="rsSCIA" datasource="#dsn_inspecao#">
 					 SELECT DISTINCT Ars_Codigo, Ars_Sigla, Ars_Descricao, Ars_Email, Ars_EmailCoordenador
-					 FROM Areas WHERE Ars_Status = 'A' AND (Left(Ars_Codigo,2) = '#scia_se#') and (Ars_Sigla Like '%/SCIA%' OR Ars_Sigla Like '%DCINT/GCOP/SGCIN/SCIA')
+					 FROM Areas 
+					 WHERE Left(Ars_Codigo,2) = '#scia_se#' and (Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SCIA%' OR Ars_Descricao Like '%SEC ACOMP CONTR INTERNO/SCIA%')
 					 ORDER BY Ars_Sigla
 					</cfquery>					
 					<!---  --->				
@@ -2914,7 +2904,7 @@
 					<cfset auxnomearea = rsSCIA.Ars_Sigla>
 					<cfset rot27_sdestina = rsSCIA.Ars_Email>
 					<cfset rot27_sdestina = rot27_sdestina & ';' & rsSCIA.Ars_EmailCoordenador>
-					
+					<!--- <cfset rot27_sdestina = #rot27_sdestina# & ';gilvanm@correios.com.br'>--->
 					<cfif findoneof("@", #trim(rot27_sdestina)#) eq 0>
 						 <cfset rot27_sdestina = "gilvanm@correios.com.br">
 					</cfif>
@@ -2988,12 +2978,13 @@
 		</cfquery>
 		
 		<cfloop query="rsAviso1">
-			<cfset rsAviso1_destina = rsAviso1.Und_Email>
-			<cfif findoneof("@", #trim(rsAviso1_destina)#) eq 0>
-				<cfset rsAviso1_destina = "gilvanm@correios.com.br">
+			<cfset rot29a_sdestina = rsAviso1.Und_Email>
+			<!--- <cfset rot29a_sdestina = #rot29a_sdestina# & ';gilvanm@correios.com.br'>--->
+			<cfif findoneof("@", #trim(rot29a_sdestina)#) eq 0>
+				<cfset rot29a_sdestina = "gilvanm@correios.com.br">
 			</cfif>
 
-			<cfmail from="SNCI@correios.com.br" to="#rsAviso1_destina#" subject="Pesquisa de Opinião" type="HTML">
+			<cfmail from="SNCI@correios.com.br" to="#rot29a_sdestina#" subject="Pesquisa de Opinião" type="HTML">
 					 Mensagem automática. Não precisa responder!<br><br>
 					<strong>
 					   Ao Gestor(a) do(a) #Ucase(rsAviso1.Und_Descricao)#. <br><br><br>
@@ -3019,12 +3010,13 @@
 			order by Pes_Inspecao
 		</cfquery>
 		<cfloop query="rsAviso2">
-			<cfset rsAviso2_destina = rsAviso2.Und_Email>
-			<cfif findoneof("@", #trim(rsAviso2_destina)#) eq 0>
-				<cfset rsAviso2_destina = "gilvanm@correios.com.br">
+			<cfset rot29b_sdestina = rsAviso2.Und_Email>
+			<!--- <cfset rot29b_sdestina = #rot29b_sdestina# & ';gilvanm@correios.com.br'>--->
+			<cfif findoneof("@", #trim(rot29b_sdestina)#) eq 0>
+				<cfset rot29b_sdestina = "gilvanm@correios.com.br">
 			</cfif>
 
-			<cfmail from="SNCI@correios.com.br" to="#rsAviso2_destina#" subject="Pesquisa de Opinião" type="HTML">
+			<cfmail from="SNCI@correios.com.br" to="#rot29b_sdestina#" subject="Pesquisa de Opinião" type="HTML">
 					 Mensagem automática. Não precisa responder!<br><br>
 					<strong>
 					   Ao Gestor(a) do(a) #Ucase(rsAviso2.Und_Descricao)#. <br><br><br>
@@ -3050,12 +3042,13 @@
 		</cfquery>	
 		<!--- aviso 3 e ultimo --->
 		<cfloop query="rsAviso3">
-			<cfset rsAviso3_destina = rsAviso3.Und_Email>
-			<cfif findoneof("@", #trim(rsAviso3_destina)#) eq 0>
-				<cfset rsAviso3_destina = "gilvanm@correios.com.br">
+			<cfset rot29c_sdestina = rsAviso3.Und_Email>
+			<!--- <cfset rot29c_sdestina = #rot29c_sdestina# & ';gilvanm@correios.com.br'>--->
+			<cfif findoneof("@", #trim(rot29c_sdestina)#) eq 0>
+				<cfset rot29c_sdestina = "gilvanm@correios.com.br">
 			</cfif>
 
-			<cfmail from="SNCI@correios.com.br" to="#rsAviso3_destina#" subject="Pesquisa de Opinião" type="HTML">
+			<cfmail from="SNCI@correios.com.br" to="#rot29c_sdestina#" subject="Pesquisa de Opinião" type="HTML">
 					 Mensagem automática. Não precisa responder!<br><br>
 					<strong>
 					   Ao Gestor(a) do(a) #Ucase(rsAviso3.Und_Descricao)#. <br><br><br>
@@ -3077,11 +3070,417 @@
 	</cfif>
 	<!---  --->
 	<cfif rotina eq 30>
+		<!--- ajustes de campos para exibição --->
+		<cfset aux_mes = month(dtlimit)>
+		<cfset anoexerc = year(dtlimit)>
+		<!--- Criar linha de metas para o exercício do PACIN --->
+		<cfquery name="rsMetas" datasource="#dsn_inspecao#">
+			SELECT Met_Codigo, Met_SE_STO, Met_PRCI, Met_SLNC, Met_DGCI, Met_Mes
+			FROM Metas
+			WHERE Met_Ano = '#anoexerc#' and Met_Mes = 1
+			order by Met_Codigo
+		</cfquery>
+
+		<cfset nMes = aux_mes>
+		<cfoutput query="rsMetas">
+			<cfset metprci = trim(rsMetas.Met_PRCI)>
+			<cfset metslnc = trim(rsMetas.Met_SLNC)>
+			<cfset metdgci = trim(rsMetas.Met_DGCI)>
+			<cfquery name="rsMes" datasource="#dsn_inspecao#">
+				SELECT Met_Ano
+				FROM Metas
+				WHERE Met_Codigo ='#rsMetas.Met_Codigo#' AND Met_Ano = #anoexerc# AND Met_Mes = #aux_mes#
+			</cfquery>
+		</cfoutput>	
+
+		<!--- PRCI --->
+		<cfquery dbtype="query" name="rsRegMeta">
+			SELECT Met_Codigo, Met_SE_STO 
+			FROM rsMetas
+			order by Met_Codigo
+		</cfquery>
+		<cfoutput query="rsRegMeta">
+			<cfset se = rsRegMeta.Met_Codigo>
+			<!--- <cfset gil = gil> --->
+			<cfquery name="rsPRCIBase" datasource="#dsn_inspecao#">
+				SELECT Andt_Unid as UNID, Andt_Insp as INSP, Andt_Grp as Grupo, Andt_Item as Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_Mes, Andt_Prazo
+				FROM Andamento_Temp 
+				where (Andt_CodSE = '#rsRegMeta.Met_Codigo#' and Andt_TipoRel = 1 and Andt_AnoExerc = '#anoexerc#' and Andt_Mes <= #aux_mes#)
+				order by Andt_Mes
+			</cfquery>
+
+			<cfset startTime = CreateTime(0,0,0)> 
+			<cfset endTime = CreateTime(0,0,30)> 
+			<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+			</cfloop>
+
+			<cfset totmesDP = 0>
+			<cfset TOTMESDPFP = 0>
+				<!--- contar unidade DP e FP --->
+				<cfquery dbtype="query" name="rstotmesDP">
+					SELECT Andt_Prazo 
+					FROM  rsPRCIBase
+					where Andt_Prazo = 'DP' and Andt_Mes = #aux_mes#
+				</cfquery>
+				<cfset totmesDP = rstotmesDP.recordcount>
+
+				<cfquery dbtype="query" name="rsTOTMESDPFP">
+					SELECT Andt_Prazo 
+					FROM rsPRCIBase  
+					where Andt_Mes = #aux_mes#
+				</cfquery>		
+				<cfset TOTMESDPFP = rsTOTMESDPFP.recordcount>
+
+					<!--- Quant. FP --->
+				<cfset totmesFP = (TOTMESDPFP - totmesDP)>
+
+				<cfset PercDPmes = '100.0'>
+				<cfif TOTMESDPFP gt 0>
+					<cfset PercDPmes = trim(NumberFormat((totmesDP/TOTMESDPFP) * 100,999.0))>
+				</cfif>
+			<!---    ==============================  --->
+				<!--- Quant. DP --->
+				<cfquery dbtype="query" name="rstotgerDP">
+					SELECT Andt_Prazo 
+					FROM  rsPRCIBase
+					where Andt_Prazo = 'DP'
+				</cfquery>		
+				<cfset totgerDP = rstotgerDP.recordcount>
+
+				<cfquery dbtype="query" name="rsTOTGER">
+					SELECT Andt_Prazo 
+					FROM rsPRCIBase 
+				</cfquery>		
+				<cfset TOTGER = rsTOTGER.recordcount>
+
+				<cfset metprciacumperiodo = trim(NumberFormat((totgerDP/TOTGER)* 100,999.0))> 
+<!---
+        rsRegMeta.Met_Codigo: #rsRegMeta.Met_Codigo#  PercDPmes: #PercDPmes#	metprciacumperiodo: #metprciacumperiodo#<br>			
+--->
+				<cfquery datasource="#dsn_inspecao#">
+					UPDATE Metas SET Met_PRCI_Acum='#PercDPmes#',Met_PRCI_AcumPeriodo='#metprciacumperiodo#'
+					WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' and Met_Ano = #anoexerc# and Met_Mes = #aux_mes#
+				</cfquery>  
+		</cfoutput>	
+    <!--- fim PRCI --->
+    <!---  SLNC, DGCI e MET_RESULTADO  --->
+		<cfquery name="rsAno" datasource="#dsn_inspecao#">
+			SELECT Andt_CodSE,Andt_Mes,Andt_Resp
+			FROM Andamento_Temp
+			WHERE Andt_AnoExerc = '#anoexerc#' AND Andt_Mes <= #aux_mes# AND Andt_TipoRel = 2
+			order by Andt_CodSE 
+		</cfquery> 
+
+		<!---  gerar o met_slnc_acum e Met_slnc_AcumPeriodo --->
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,45)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>	
+
+		<cfquery dbtype="query" name="rsRegMeta">
+			SELECT Met_Codigo, Met_SE_STO 
+			FROM rsMetas
+			order by Met_Codigo 
+		</cfquery>	
+		<cfoutput query="rsRegMeta">
+			<cfset totmessegeral = 0>	
+			<cfset totmessesol = 0>	
+			<cfset totmessependtrat = 0>	
+			<cfset slnc_acummes = 0>	
+			<cfset dgci_acummes = 0>	
+			<cfset totanosegeral = 0>	
+			<cfset totanosesol = 0>	
+			<cfset totanosependtrat = 0>			
+			<cfset slnc_acperiodo = 0>	
+			<cfset dgci_acperiodo = 0>
+			<cfset MetasResult = 0>
+			<!--- Obter PRCI mes corrente --->
+			<cfquery name="rsprciacum" datasource="#dsn_inspecao#">
+				SELECT Met_PRCI_Acum, Met_PRCI_AcumPeriodo,Met_DGCI_Mes
+				FROM Metas
+				WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' AND Met_Ano = #anoexerc# AND Met_Mes = #aux_mes#
+			</cfquery>		
+			<!--- quant. (3-SOL) no mês por SE --->
+			<cfquery dbtype="query" name="rstotmessesol">
+				SELECT Andt_Resp 
+				FROM  rsAno
+				where Andt_Resp = 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#' and Andt_Mes = #aux_mes#
+			</cfquery>
+			<cfset totmessesol = rstotmessesol.recordcount>
+			<!--- quant. (Pendentes + Tratamentos) no mês por SE --->
+			<cfquery dbtype="query" name="rstotmessependtrat">
+				SELECT Andt_Resp 
+				FROM  rsAno
+				where Andt_Resp <> 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#' and Andt_Mes = #aux_mes#
+			</cfquery>
+			<cfset totmessependtrat = rstotmessependtrat.recordcount>
+			<cfset totmessegeral = totmessesol + totmessependtrat>
+
+			<!--- slncacum ---> 
+			<cfset slnc_acummes = '100.0'>
+			<cfif totmessegeral gt 0>
+				<cfset slnc_acummes = trim(NumberFormat(((totmessesol/totmessegeral) * 100),999.0))>
+			</cfif>
+
+			<cfset dgci_acummes = trim(numberFormat((slnc_acummes * 0.45) + (rsprciacum.Met_PRCI_Acum * 0.55),999.0))>  
+
+			<!--- slncacumperiodo --->
+			<!--- quant. (3-SOL) no ano por SE --->
+			<cfquery dbtype="query" name="rstotanosesol">
+				SELECT Andt_Resp 
+				FROM  rsAno
+				where Andt_Resp = 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#'
+			</cfquery>
+			<cfset totanosesol = rstotanosesol.recordcount>
+
+			<!--- quant. (Pendentes + Tratamentos) no ano por SE --->
+			<cfquery dbtype="query" name="rstotanosependtrat">
+				SELECT Andt_Resp 
+				FROM  rsAno
+				where Andt_Resp <> 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#'
+			</cfquery>
+			<cfset totanosependtrat = rstotanosependtrat.recordcount>
+
+			<cfset totanosegeral = totanosesol + totanosependtrat>
+
+			<cfset slnc_acperiodo = trim(NumberFormat(((totanosesol/totanosegeral) * 100),999.0))>
+
+			<cfset auxmetprciacumper = rsprciacum.Met_PRCI_AcumPeriodo>
+			<cfset dgci_acperiodo = trim(numberFormat((slnc_acperiodo * 0.45) + (auxmetprciacumper * 0.55),999.0))>  
+
+			<cfset MetasResult = numberFormat((dgci_acummes / rsprciacum.Met_DGCI_Mes)*100,999.0)>
+  <!---
+  ANO:#anoexerc#' Met_Mes = #aux_mes# Met_Codigo='#rsRegMeta.Met_Codigo#' Met_SLNC_Acum= '#slnc_acummes#' Met_SLNC_AcumPeriodo='#slnc_acperiodo#' Met_DGCI_Acum='#dgci_acummes#',Met_DGCI_AcumPeriodo='#dgci_acperiodo#',Met_Resultado='#MetasResult#'<BR>    
+--->
+			<cfquery datasource="#dsn_inspecao#">
+				UPDATE Metas SET Met_SLNC_Acum= '#slnc_acummes#',Met_SLNC_AcumPeriodo='#slnc_acperiodo#',Met_DGCI_Acum='#dgci_acummes#',Met_DGCI_AcumPeriodo='#dgci_acperiodo#',Met_Resultado='#MetasResult#'
+				WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' and Met_Ano = '#anoexerc#' and Met_Mes = #aux_mes#
+			</cfquery> 
+		</cfoutput>	
+    <!--- FIM  SLNC, DGCI e MET_RESULTADO --->
+<!--- fim ajustes de campos para exibição --->
+	</cfif>		
+	
+	<cfif rotina eq 31>	
+	<cfoutput>
+		<!--- envio por e-mail das conclusões de revisão no dia anterior --->
+		<cfquery name="rsfimRevisao" datasource="#dsn_inspecao#">
+			SELECT INP_NumInspecao
+			FROM Inspecao
+			WHERE INP_DTConcluirRevisao='#dateformat(dtlimit,"YYYY-MM-DD")#'
+		</cfquery>
+		<cfloop query="rsfimRevisao">
+			<!--- Início - e-mail automático por unidade com NC --->
+			<cfquery name="rsEnvio" datasource="#dsn_inspecao#">
+				SELECT Usu_Email, Und_Email, Fun_Email, Rep_Email, INP_NumInspecao, INP_Unidade, INP_DTConcluirRevisao, Und_TipoUnidade, Und_Descricao, Und_CodReop, INP_DtInicInspecao, INP_Coordenador
+				FROM (Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo) 
+				INNER JOIN Reops ON Und_CodReop = Rep_Codigo 
+				INNER JOIN Usuarios ON INP_UserName = Usu_Login
+				INNER JOIN Funcionarios ON INP_Coordenador = Fun_Matric 
+				WHERE INP_NumInspecao = '#rsfimRevisao.INP_NumInspecao#'
+			</cfquery>
+			<cfset startTime = CreateTime(0,0,0)> 
+			<cfset endTime = CreateTime(0,0,45)> 
+			<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+			</cfloop> 
+			<cfset sdestina =''>
+				
+			<cfset emailrevisor = #rsEnvio.Usu_Email#>
+			<cfset emailunid = #rsEnvio.Und_Email#>
+			<cfset emailreopunid = #rsEnvio.Rep_Email#>
+			<cfset emailcoord = #rsEnvio.Fun_Email#>
+			<cfset emailscoi="">
+
+			<!--- adquirir o email do SCOI da SE --->
+			<cfset scoi_se = left(rsEnvio.INP_Unidade,2)>
+			<cfif scoi_se eq '03' or scoi_se eq '05' or scoi_se eq '65'>
+				<cfset scoi_se = '10'>
+			<cfelseif scoi_se eq '70'>
+				<cfset scoi_se = '04'>						 					 				 
+			</cfif>
+
+			<cfquery name="rsSCOIEmail" datasource="#dsn_inspecao#">
+				SELECT Ars_Email
+				FROM Areas
+				WHERE left(Ars_Codigo,2) = '#scoi_se#'  and (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SGCIN%')
+			</cfquery>
+			<cfset startTime = CreateTime(0,0,0)> 
+			<cfset endTime = CreateTime(0,0,15)> 
+			<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+			</cfloop>
+			<cfset emailscoi = #rsSCOIEmail.Ars_Email#>
+				
+			<cfif emailunid neq "">
+				<cfset sdestina = #sdestina# & ';' & #emailunid#>
+			</cfif>
+
+			<cfif emailreopunid neq "">
+				<cfset sdestina = #sdestina# & ';' & #emailreopunid#>
+			</cfif>
+
+			<cfif emailcoord neq "">
+				<cfset sdestina = #sdestina# & ';' & #emailcoord#>
+			</cfif>
+
+			<cfif emailrevisor neq "">
+				<cfset sdestina = #sdestina# & ';' & #emailrevisor#>
+			</cfif>
+			
+			<cfset sdestina = #sdestina# & ';' & #emailscoi#>
+
+			<cfif findoneof("@", trim(sdestina)) eq 0>
+				<cfset sdestina = "gilvanm@correios.com.br">
+			</cfif>
+
+			<cfset sdestina = #sdestina# & ';teciogomes@correios.com.br;gilvanm@correios.com.br'> 
+			<cfset assunto = 'Relatório de Controle Interno - ' & #trim(rsEnvio.Und_Descricao)# & ' - Avaliação de Controle Interno ' & #rsEnvio.INP_NumInspecao#>
+			<cfquery name="rsNC" datasource="#dsn_inspecao#">
+				SELECT Pos_Inspecao
+				FROM ParecerUnidade
+				WHERE Pos_Inspecao='#rsEnvio.INP_NumInspecao#'
+			</cfquery>
+			<cfif rsNC.recordcount gt 0>			
+				<cfif rsEnvio.Und_TipoUnidade neq 12 and rsEnvio.Und_TipoUnidade neq 16>  	
+					<cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
+						Mensagem automática. Não precisa responder!<br><br>
+						<strong>
+						Prezado(a) Gerente do(a) #trim(Ucase(rsEnvio.Und_Descricao))#, informamos que está disponível na intranet o Relatório de Controle Interno: Nº #rsEnvio.INP_NumInspecao#, realizada nessa Unidade na Data: #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br>
+
+						&nbsp;&nbsp;&nbsp;Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:<br><br>
+
+						&nbsp;&nbsp;&nbsp;a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA); <br>
+
+						&nbsp;&nbsp;&nbsp;b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;<br>
+
+						&nbsp;&nbsp;&nbsp;c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).<br><br>
+
+						&nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório. <br>
+						&nbsp;&nbsp;&nbsp;O não cumprimento ensejará em perda de prazo.<br><br>
+
+						&nbsp;&nbsp;&nbsp;Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a><br><br>
+
+						&nbsp;&nbsp;&nbsp;Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação. <br><br>
+
+						&nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #emailscoi#.<br><br>
+						<table>
+							<tr>
+								<td><strong>Unidade : #rsEnvio.INP_Unidade# - #rsEnvio.Und_Descricao#</strong></td>
+							</tr>
+							<tr>
+								<td><strong>Relatório: #rsEnvio.INP_NumInspecao#</strong></td>
+							</tr>
+							<tr>
+								<td><strong>------------------------------------------</strong></td>
+							</tr>
+						</table>
+						<br>
+						&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
+						</strong>
+					</cfmail>
+					<cfset posparecer = DateFormat(rsEnvio.INP_DTConcluirRevisao,"DD/MM/YYYY") & '>Conclusão da Revisão e Liberação da Avaliação' & CHR(13) & CHR(13)
+					& 'Prezado(a) Gerente do(a)' & #trim(Ucase(rsEnvio.Und_Descricao))# & ', informamos que está disponível na intranet o Relatório de Controle Interno: Nº' & #rsEnvio.INP_NumInspecao# & ', realizada nessa Unidade na Data: ' & #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")# & CHR(13) & CHR(13) 
+					& 'Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:' & CHR(13) & CHR(13) 
+					& 'a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA);' & CHR(13) 
+					& 'b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;' & CHR(13) 
+					& 'c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).' & CHR(13) & CHR(13) 
+					& 'Registrar a resposta no Sistema Nacional de Controle Interno - SNCI num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório.' & CHR(13) 
+					& 'O não cumprimento ensejará em perda de prazo.' & CHR(13) & CHR(13) 
+					& 'Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: Relatório de Controle Interno.' & CHR(13) & CHR(13) 
+					& 'Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação.' & CHR(13) & CHR(13) 
+					& 'Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:' & CHR(13) & CHR(13) 
+					& 'Unidade : ' & #rsEnvio.INP_Unidade# & '-' & #rsEnvio.Und_Descricao# & CHR(13) 
+					& 'Relatório:' &  #rsEnvio.INP_NumInspecao# 
+					& CHR(13) & CHR(13) & 'Desde já agradecemos a sua atenção.' 
+					& CHR(13)
+					& '-----------------------------------------------------------------------------------------------------------------------'>
+				<cfelse>
+					<cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
+						Mensagem automática. Não precisa responder!<br><br>
+						<strong>
+						Prezado(a) Gerente do(a) #trim(Ucase(rsEnvio.Und_Descricao))#, informamos que está disponível na intranet o Relatório de Controle Interno: Nº #rsEnvio.INP_NumInspecao#, realizada nessa Unidade na Data: #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br>
+
+						&nbsp;&nbsp;&nbsp;Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:<br><br>
+
+						&nbsp;&nbsp;&nbsp;a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA); <br>
+
+						&nbsp;&nbsp;&nbsp;b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;<br>
+
+						&nbsp;&nbsp;&nbsp;c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).<br><br>
+
+						&nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório. <br>
+						&nbsp;&nbsp;&nbsp;O não cumprimento ensejará em perda de prazo.<br><br>
+
+						&nbsp;&nbsp;&nbsp;Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a><br><br>
+
+						&nbsp;&nbsp;&nbsp;Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação, <br>
+						&nbsp;&nbsp;&nbsp;desde que esteja dentro do prazo de 30 dias úteis a contar da entrega do Relatório. <br><br>   
+
+						&nbsp;&nbsp;&nbsp;Após esse prazo, a situação será direcionada diretamente para área gestora do Contrato de Terceirizadas para adoção das ações previstas em contrato. <br><br>                      
+
+						&nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:  #emailscoi#.<br><br>
+
+						<table>
+						<tr>
+						<td><strong>Unidade : #rsEnvio.INP_Unidade# - #rsEnvio.Und_Descricao#</strong></td>
+						</tr>
+						<tr>
+						<td><strong>Relatório: #rsEnvio.INP_NumInspecao#</strong></td>
+						</tr>
+						<tr>
+						<td><strong>------------------------------------------</strong></td>
+						</tr>
+						</table>
+						<br>
+						&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
+						</strong>
+					</cfmail>
+		
+					<cfset posparecer = DateFormat(rsEnvio.INP_DTConcluirRevisao,"DD/MM/YYYY") & '>Conclusão da Revisão e Liberação da Avaliação' & CHR(13) & CHR(13)
+					& 'Prezado(a) Gerente do(a)' & #trim(Ucase(rsEnvio.Und_Descricao))# & ', informamos que está disponível na intranet o Relatório de Controle Interno: Nº' & #rsEnvio.INP_NumInspecao# & ', realizada nessa Unidade na Data: ' & #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")# & CHR(13) & CHR(13) 
+					& 'Solicitamos acessá-lo para registro de sua resposta, conforme orientações a seguir:' & CHR(13) & CHR(13) 
+					& 'a) Informar a Justificativa para ocorrência da falha: o que ocasionou o Problema (CAUSA);' & CHR(13) 
+					& 'b) Informar o Plano de Ações adotado para regularização da falha detectada, com prazo de implementação;' & CHR(13) 
+					& 'c) Anexar no sistema os Comprovantes de regularização da situação encontrada e/ou das Ações implementadas (em PDF).' & CHR(13) & CHR(13) 
+					& 'Registrar a resposta no Sistema Nacional de Controle Interno - SNCI num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório.' & CHR(13) 
+					& 'O não cumprimento ensejará em perda de prazo.' & CHR(13) & CHR(13) 
+					& 'Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: Relatório de Controle Interno.' & CHR(13) & CHR(13) 
+					& 'Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação.' & CHR(13) 
+					& 'Desde que esteja dentro do prazo de 30 dias úteis a contar da entrega do Relatório.' & CHR(13) & CHR(13) 
+					& 'Após esse prazo, a situação será direcionada diretamente para área gestora do Contrato de Terceirizadas para adoção das ações previstas em contrato.' & CHR(13) & CHR(13) 
+					& 'Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:' & CHR(13) & CHR(13) 
+					& 'Unidade : ' & #rsEnvio.INP_Unidade# & '-' & #rsEnvio.Und_Descricao# & CHR(13) 
+					& 'Relatório:' &  #rsEnvio.INP_NumInspecao# 
+					& CHR(13) & CHR(13) & 'Desde já agradecemos a sua atenção.' 
+					& CHR(13)
+					& '-----------------------------------------------------------------------------------------------------------------------'>      
+				</cfif>          
+				<!--- Update na tabela parecer unidade --->
+				<cfquery datasource="#dsn_inspecao#">
+					UPDATE ParecerUnidade SET Pos_Parecer = '#posparecer#'
+					WHERE Pos_Inspecao='#rsEnvio.INP_NumInspecao#' and Pos_Situacao_Resp = 14
+				</cfquery>    		    
+			<cfelse>	
+					<!--- SEM NC --->
+				<cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="#assunto#" type="HTML">
+					Mensagem automática. Não precisa responder!<br><br>
+					<strong>
+					Prezado(a) Gerente do(a) #trim(Ucase(rsEnvio.Und_Descricao))#<br><br>
+					&nbsp;&nbsp;&nbsp;informamos que não houve Não Conformidades no Relatório de Controle Interno: Nº #rsEnvio.INP_NumInspecao#, realizada nessa Unidade na Data: #dateformat(rsEnvio.INP_DtInicInspecao,"dd/mm/yyyy")#. <br><br>
+					&nbsp;&nbsp;&nbsp;Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico: #emailscoi#.<br><br>
+					<br>
+					&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
+					</strong>
+				</cfmail>   			
+			</cfif>
+		</cfloop>		
+	</cfoutput>		
+	</cfif>
+	<cfif rotina eq 32>
 		 <cfquery datasource="#dsn_inspecao#">
 		  UPDATE AvisosGrupos SET AVGR_status = 'D', AVGR_DT_DES = convert(char, getdate(), 102) WHERE AVGR_status = 'A' and AVGR_DT_FINAL < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00')
 		 </cfquery> 
 	</cfif>	
-	<cfif rotina eq 31>
+	<cfif rotina eq 33>
 		<cfset auxdt = dateformat(now(),"YYYYMMDD")>
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Mensagem SET MSG_Realizado = '#auxdt#', MSG_Status = 'D' WHERE MSG_Codigo = 1

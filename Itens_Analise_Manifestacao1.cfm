@@ -18,7 +18,7 @@
 <cfset total=0>
 <cfset url.dtInicio = CreateDate(Right(dtinic,4), Mid(dtinic,4,2), Left(dtinic,2))>
 <cfset url.dtFinal = CreateDate(Right(url.dtfim,4), Mid(url.dtfim,4,2), Left(url.dtfim,2))>
-<cfset auxfiltro = "Periodo/Superintendencia  -  Data Inicial : " & DateFormat(url.dtInicio,"dd/mm/yyyy") & "  -  Data Final : " & DateFormat(url.dtFinal,"dd/mm/yyyy") & "         Superintend�ncia : " & url.SE & " - " & #qDR.Dir_Sigla#>
+<cfset auxfiltro = "Período/Superintendência  -  Data Inicial : " & DateFormat(url.dtInicio,"dd/mm/yyyy") & "  -  Data Final : " & DateFormat(url.dtFinal,"dd/mm/yyyy") & "         Superintendência : " & url.SE & " - " & #qDR.Dir_Sigla#>
 <cfset auxdtmaxlimit = dateformat(url.dtFinal,"YYYYMMDD")>
 <cfset auxdtmaxlimit = CreateDate(Left(auxdtmaxlimit,4), Mid(auxdtmaxlimit,5,2), Right(auxdtmaxlimit,2))>
 <cfoutput>
@@ -90,7 +90,7 @@ bIsNav = sAgent.indexOf("Mozilla") > -1 && !bIsIE;
   </tr>
 
   <tr>
-    <td height="10" colspan="17"><div align="center"><span class="titulo1">AN&Aacute;LISES  DAS MANIFESTA&Ccedil;&Otilde;ES</span></div>      
+    <td height="10" colspan="17"><div align="center"><span class="titulo1">ANÁLISES  DAS MANIFESTAÇÕES</span></div>      
       <div align="center"></div></td>
   </tr>
   <tr>
@@ -128,16 +128,16 @@ bIsNav = sAgent.indexOf("Mozilla") > -1 && !bIsIE;
 	    </tr>
 	  <tr bgcolor="##BFDAFC" class="titulosClaro">
 	  <td width="54" class="exibir">Data <br>
-	    Avalia&ccedil;&atilde;o</td>
+	    Avaliação</td>
 	    <td width="63" class="exibir">Hora<br>
-	      Avalia&ccedil;&atilde;o</td>
-		<td width="70" class="exibir"><div align="center">N&ordm; Relat&oacute;rio </div></td>
+	      Avaliação</td>
+		<td width="70" class="exibir"><div align="center">Nº Avaliação</div></td>
 		<td width="205" class="exibir">Nome Unidade </td>
 		<td width="48" class="exibir">Grupo</td>
-		<td width="309" class="exibir">Grupo Descri&ccedil;&atilde;o </td>
+		<td width="309" class="exibir">Grupo Descrição </td>
 		<td width="48" class="exibir">Item</td>
-		<td width="477" class="exibir"> Item Descri&ccedil;&atilde;o</td>
-	    <td width="143" class="exibir">Situa&ccedil;&atilde;o Descri&ccedil;&atilde;o</td>
+		<td width="477" class="exibir"> Item Descrição</td>
+	    <td width="143" class="exibir">Situação Descrição</td>
 	    </tr> 
 </cfif>
 <!--- 	<cfoutput query="rsItem"> --->
@@ -145,7 +145,8 @@ bIsNav = sAgent.indexOf("Mozilla") > -1 && !bIsIE;
 		  <!--- <cfset auxcol = dateformat(AndDtPosic,"DD/MM/YYYY")> --->
 		  <cfset auxcol = AndDtPosic>
 		  <td><div align="left">#auxcol#</div></td>
-		  <cfset auxcol = And_HrPosic>
+		  <cfset auxcol = trim(And_HrPosic)>
+		  <cfset auxcol = left(auxcol,2) & ':' & mid(auxcol,3,2) & ':' & mid(auxcol,5,2)>
 		  <td><div align="center">#auxcol#</div></td>
 		  <cfset auxcol = And_NumInspecao>
 		  <td width="70"><div align="center">#auxcol#</div></td>

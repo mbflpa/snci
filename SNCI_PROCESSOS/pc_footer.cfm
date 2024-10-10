@@ -6,6 +6,7 @@
 		position: fixed!important;
 		right: 0!important;
 		z-index: 1032!important;
+		padding:0.3rem!important;
 	}
 
 </style>
@@ -13,9 +14,9 @@
 	<div class="float-left d-none d-sm-block">
 		Template por <a href="https://adminlte.io/docs/3.1/about">AdminLTE</a>
 	</div>
-	CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno 
+	CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais  
 	<div class="float-right d-none d-sm-block">
-		SNCI - Versão <b>1.2.0</b>
+		SNCI - Versão <b>2.0.0</b>
 	</div>
 	<button id="scrollTopBtn" class="scrollTopBtn" title="Voltar ao Topo">
 		<i class="fas fa-circle-arrow-up fa-3x grow-icon" ></i>

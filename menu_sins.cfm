@@ -32,7 +32,7 @@
       <tr>
         <td width="90%">
 		<table width="112%" border="0" cellpadding="0" cellspacing="4" class="menu">
-		<cfif grpacesso neq "GOVERNANCA" and grpacesso neq "ANALISTAS">
+		<cfif grpacesso neq "GOVERNANCA">
 		 <tr>
             <td width="6%"><img src="smallArrow.gif" width="16" height="5" /></td>
             <td width="94%"><a href="index.cfm?opcao=permissao0">Unidades</a></td>

@@ -100,11 +100,9 @@ aux_ano:#aux_ano#  === aux_mes:#aux_mes#<br>
 <CFSET GIL = GIL>   
 </cfoutput>
 --->
-
 <cfoutput>
 <cfif grpacesso eq 'SUPERINTENDENTE' OR grpacesso eq 'GERENTES' OR grpacesso eq 'ORGAOSUBORDINADOR' OR grpacesso eq 'SUBORDINADORREGIONAL'>
-	
-    <cflocation url="slnc.cfm?se=#qAcesso.Usu_DR#&anoexerc=#year(dtlimit)#&dtlimit=#dtlimit#&frmano=#year(dtlimit)#">
+    <cflocation url="slnc.cfm?se=#qAcesso.Usu_DR#&frmano=#year(dtlimit)#&anoexerc=#year(dtlimit)#&dtlimit=#dtlimit#&anoatual=year(now())">
 	<!--- <cfinclude template="cabecalho.cfm"> --->
 </cfif>
 </cfoutput>

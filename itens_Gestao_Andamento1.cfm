@@ -124,6 +124,7 @@
 		
     <cfset auxdtposic = CreateDate(year(rsAjuste.Andt_DPosic),month(rsAjuste.Andt_DPosic),day(rsAjuste.Andt_DPosic))>
 	<!--- <cfif UCASE(TRIM(rsAjuste.Andt_user)) eq "F"> --->
+<!---	
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Andamento_Temp SET Andt_NomeOrgCondutor = '#trim(auxarea)#', Andt_user = '#cgi.REMOTE_USER#'
 			WHERE Andt_Mes = #rsAjuste.Andt_Mes# and Andt_TipoRel = 1 and Andt_AnoExerc = '#form.lis_ano#' and
@@ -135,6 +136,7 @@
 			Andt_HPosic = '#rsAjuste.Andt_HPosic#' and
 			Andt_Resp = #rsAjuste.Andt_Resp#
 		</cfquery> 
+--->		
        <!---  <cfquery datasource="#dsn_inspecao#">
 			UPDATE Andamento_Temp SET Andt_Uteis = #dduteis#, Andt_NomeOrgCondutor = '#trim(auxarea)#', Andt_user = '#cgi.REMOTE_USER#'
 			WHERE Andt_Mes = #rsAjuste.Andt_Mes# and Andt_TipoRel = 1 and Andt_AnoExerc = '#form.lis_ano#' and

@@ -32,7 +32,10 @@
 	</cfif>
 	order by RIP_NumInspecao
 </cfquery>   
-
+<cfset startTime = CreateTime(0,0,0)> 
+<cfset endTime = CreateTime(0,0,55)> 
+<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+</cfloop>
 <!--- <cfquery name="rsClas" datasource="#dsn_inspecao#">
 	SELECT distinct RIP_Unidade, RIP_NumInspecao
 	FROM Inspecao 
@@ -75,7 +78,7 @@
 		WHERE Itn_Ano='#form.frmano#' AND INP_NumInspecao='#rsClas.RIP_NumInspecao#'
 	</cfquery> 
 	<cfset startTime = CreateTime(0,0,0)> 
-	<cfset endTime = CreateTime(0,0,45)> 
+	<cfset endTime = CreateTime(0,0,55)> 
 	<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
 	</cfloop>						
 	<cfquery dbtype="query" name="rsCNVE">

@@ -13,10 +13,10 @@
 	dtlimit:#dtlimit#  se: #se#   <br>
 --->
 
-	<cfquery name="qUsuario" datasource="#dsn_inspecao#">
-		select Usu_GrupoAcesso, Usu_Matricula from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
-	</cfquery>
-	<cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
+<cfquery name="qUsuario" datasource="#dsn_inspecao#">
+	select Usu_GrupoAcesso, Usu_Matricula from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+</cfquery>
+<cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
 
 <cfif grpacesso neq 'GESTORMASTER'>
 	<cfset aux_mes = month(dtlimit)>
@@ -116,22 +116,26 @@
 	<cfset totmesunsol = 0>	
 	<cfset totmesgesol = 0>	
 	<cfset totmessbsol = 0>	
-	<cfset totmessusol = 0>				
-
+	<cfset totmessusol = 0>		
+	
 	<cfquery name="rsTodos" datasource="#dsn_inspecao#">
-		SELECT Andt_AnoExerc, Andt_Mes, Andt_DTRefer, Andt_Resp, Andt_RespAnt
+		SELECT Andt_RespAnt,Andt_Unid as UNID, Andt_Insp as INSP, Andt_Grp as Grupo, Andt_Item as Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_Mes, Andt_Prazo
 		FROM Andamento_Temp
 		WHERE (Andt_AnoExerc = '#anoexerc#') AND  (Andt_Mes <= #month(dtlimit)#) AND (Andt_TipoRel = 2) and (Andt_CodSE =  '#se#')
 		order by Andt_Mes
 	</cfquery> 
-	<cfset aux_mes = rsTodos.Andt_Mes>
+	<cfset startTime = CreateTime(0,0,0)> 
+	<cfset endTime = CreateTime(0,0,50)> 
+	<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+	</cfloop>	
+	<cfset aux_mes = month(dtlimit)>
 
 	<!--- quant. (3-SOL) no mês --->
-	<!--- Unidades --->
+	<!--- Unidades --->	
 	<cfquery dbtype="query" name="rsExisteUN">
 		SELECT Andt_RespAnt 
 		FROM  rsTodos
-		where Andt_RespAnt in (1,14,17,2,15,18,20) and (Andt_Mes <= #month(dtlimit)#)
+		where (Andt_RespAnt in (1,2,15,14,11) or Andt_Resp in (2,15)) and (Andt_Mes <= #month(dtlimit)#)
 	</cfquery>
 	<cfset totExisteUN = rsExisteUN.recordcount>
 
@@ -159,15 +163,17 @@
 	</cfquery>
 	<cfset totExisteSU = rsExisteSU.recordcount>
 	
-	<!--- exibicao em tela --->
+	<!--- exibicao em tela 
 	<cfquery name="rsBaseB" datasource="#dsn_inspecao#">
 		SELECT Andt_Unid as UNID, Andt_Insp as INSP, Andt_Grp as Grupo, Andt_Item as Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_Mes, Andt_Prazo
 		FROM Andamento_Temp 
 		WHERE (Andt_AnoExerc = '#anoexerc#') AND  (Andt_Mes <= #month(dtlimit)#) AND (Andt_Resp <> 3) and (Andt_TipoRel = 2) and (Andt_CodSE =  '#se#')
 		order by Andt_Mes
 	</cfquery>
+	--->
 	<cfset auxtit = "SE: " & #qAcesso.Dir_codigo# & "-" & #qAcesso.Dir_Sigla#>
-	<cfset MesAC = 'Resultado do Periodo'>  
+	<cfset MesAC = 'Resultado do Período'>  
+	<br>
   	<table width="39%" border="1" align="center" cellpadding="0" cellspacing="0">
       <tr>
         <td colspan="17"><div align="center" class="titulo1"><strong>#auxfilta#</strong></div></td>
@@ -194,6 +200,7 @@
 		<tr class="exibir">
 			<td width="10%"><div align="center"><strong>Mês</strong></div></td>
 			<td width="30%"><div align="center"><strong>Quantidade (Solucionados)</strong></div></td> 
+			<td width="30%"><div align="center"><strong>Outras</strong></div></td>
 			<td width="16%"><div align="center"><strong>Total (*)</strong></div></td>
 			<td width="10%"><div align="center">%</div></td>
 			<td class="exibir">&nbsp;</td>
@@ -204,7 +211,7 @@
 			<cfquery dbtype="query" name="rstotsolmes">
 				SELECT Andt_RespAnt 
 				FROM  rsTodos
-				where Andt_RespAnt in (1,14,17,2,15,18,20) and Andt_Mes = #aux_mes_un# AND (Andt_Resp=3)
+				where Andt_RespAnt in (1,2,15,14,11) and Andt_Mes = #aux_mes_un# AND (Andt_Resp=3)
 			</cfquery>	
 			<!--- Quant. UNIDADES SOLUCIONADO --->
 			<cfset totsolmes = rstotsolmes.recordcount>
@@ -212,11 +219,15 @@
 			<!--- Obter PENDENTES + TRATAMENTOS DO MES  --->     
 			<cfquery dbtype="query" name="rstotpendtratmes">
 				SELECT Andt_Resp 
-				FROM  rsBaseB
-				where Andt_Resp in (2,14,15,18,20) and Andt_Mes = #aux_mes_un# 
+				FROM  rsTodos
+				where Andt_Resp in (2,15) and Andt_Mes = #aux_mes_un# 
 			</cfquery>				
 			<cfset totpendtratmes = rstotpendtratmes.recordcount>
-
+<!---
+<cfoutput>
+aux_mes_un:#aux_mes_un# totpendtratmes: #totpendtratmes#<br>
+</cfoutput>
+--->
 			<cfif aux_mes_un is 1>
 				<cfset mestext = 'JAN'>
 				<cfset totsoljan = totsoljan + totsolmes>
@@ -282,6 +293,7 @@
 					<cfset Per = 0>
 				</cfif>
 
+				<td><div align="center"><strong>#totpendtratmes#</strong></div></td>
 				<td><div align="center"><strong>#(totsolmes + totpendtratmes)#</strong></div></td>
 				<td><div align="center">#NumberFormat(Per,999.0)#</div></td> 	
 				<td width="19%" class="exibir"><div align="center"><button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'un','#aux_mes_un#',<cfoutput>#totsolmes#</cfoutput>,<cfoutput>#totpendtratmes#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button></div></td>	
@@ -294,18 +306,20 @@
 		</tr>
 
 		<cfset totparcialunsolpendtrat = (totparcialunsol + totparcialunpendtrat)>
-
+		<cfset pendtrat=(totparcialunsolpendtrat - totparcialunsol)>
 		<cfset Acum_Per_UN = 0> 
 		<cfif totparcialunsol gt 0>
 			<cfset Acum_Per_UN = NumberFormat(((totparcialunsol/totparcialunsolpendtrat) * 100),999.0)>
 		</cfif>		
+		
 		<tr class="tituloC">
 			<td class="red_titulo"><div align="center">#MesAC#</div></td>
 			<td class="red_titulo"><div align="center"><strong>#totparcialunsol#</strong></div></td>
+			<td class="red_titulo"><div align="center">#pendtrat#</div></td>
 			<td class="red_titulo"><div align="center">#totparcialunsolpendtrat#</div></td>
 			<td class="red_titulo"><div align="center"><strong>#Acum_Per_UN#</strong></div></td>
 			<td class="red_titulo">
-				<div align="center"><button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'un',0,<cfoutput>#totparcialunsol#</cfoutput>,<cfoutput>#totparcialunsolpendtrat#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar(Todos)</button></div></td>
+				<div align="center"><button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'un',0,<cfoutput>#totparcialunsol#</cfoutput>,<cfoutput>#pendtrat#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar(Todos)</button></div></td>
 		</tr>	
 	</cfif>
 <!--- AREAS --->	
@@ -318,6 +332,7 @@
 		<tr class="exibir">
 			<td width="10%"><div align="center"><strong>Mês</strong></div></td>
 			<td width="30%"><div align="center"><strong>Quantidade (Solucionados)</strong></div></td> 
+			<td width="30%"><div align="center"><strong>Outras</strong></div></td>
 			<td width="16%"><div align="center"><strong>Total (*)</strong></div></td>
 			<td width="10%"><div align="center">%</div></td>
 			<td class="exibir">&nbsp;</td>
@@ -336,7 +351,7 @@
 			<!--- Obter PENDENTES + TRATAMENTOS DO MES  --->     
 			<cfquery dbtype="query" name="rstotpendtratmes">
 				SELECT Andt_Resp 
-				FROM  rsBaseB
+				FROM  rsTodos
 				where Andt_Resp in (5,19) and Andt_Mes = #aux_mes_ge#
 			</cfquery>				
 			<cfset totpendtratmes = rstotpendtratmes.recordcount>
@@ -404,7 +419,7 @@
 				<cfelse>
 					<cfset Per = 0>
 				</cfif>
-
+				<td><div align="center"><strong>#totpendtratmes#</strong></div></td>
 				<td><div align="center"><strong>#(totsolmes + totpendtratmes)#</strong></div></td>
 				<td><div align="center">#NumberFormat(Per,999.0)#</div></td> 	
 				<td width="19%" class="exibir"><div align="center"><button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'ge','#aux_mes_ge#',<cfoutput>#totsolmes#</cfoutput>,<cfoutput>#totpendtratmes#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button></div></td>	
@@ -416,7 +431,7 @@
 		</tr>
 
 		<cfset totparcialgesolpendtrat = (totparcialgesol + totparcialgependtrat)>
-
+		<cfset pendtrat=(totparcialgesolpendtrat - totparcialgesol)>
 		<cfset Acum_Per_GE = 0> 
 		<cfif totparcialgesol gt 0>
 			<cfset Acum_Per_GE = NumberFormat(((totparcialgesol/totparcialgesolpendtrat) * 100),999.0)>
@@ -424,10 +439,11 @@
 		<tr class="tituloC">
 			<td class="red_titulo"><div align="center">#MesAC#</div></td>
 			<td class="red_titulo"><div align="center"><strong>#totparcialgesol#</strong></div></td>
+			<td class="red_titulo"><div align="center">#pendtrat#</div></td>
 			<td class="red_titulo"><div align="center">#totparcialgesolpendtrat#</div></td>
 			<td class="red_titulo"><div align="center"><strong>#Acum_Per_GE#</strong></div></td>
 			<td class="red_titulo">
-				<div align="center"><button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',0,<cfoutput>#totparcialgesol#</cfoutput>,<cfoutput>#totparcialgesolpendtrat#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar(Todos)</button></div></td>
+				<div align="center"><button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'ge',0,<cfoutput>#totparcialgesol#</cfoutput>,<cfoutput>#pendtrat#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar(Todos)</button></div></td>
 		</tr>	
 	</cfif>
 	<!--- SUBORDINADORES --->	
@@ -440,6 +456,7 @@
 		<tr class="exibir">
 			<td width="10%"><div align="center"><strong>Mês</strong></div></td>
 			<td width="30%"><div align="center"><strong>Quantidade (Solucionados)</strong></div></td> 
+			<td width="30%"><div align="center"><strong>Outras</strong></div></td>
 			<td width="16%"><div align="center"><strong>Total (*)</strong></div></td>
 			<td width="10%"><div align="center">%</div></td>
 			<td class="exibir">&nbsp;</td>
@@ -458,7 +475,7 @@
 			<!--- Obter PENDENTES + TRATAMENTOS DO MES  --->     
 			<cfquery dbtype="query" name="rstotpendtratmes">
 				SELECT Andt_Resp 
-				FROM  rsBaseB
+				FROM  rsTodos
 				where Andt_Resp in (4,16) and Andt_Mes = #aux_mes_sb#
 			</cfquery>				
 			<cfset totpendtratmes = rstotpendtratmes.recordcount>
@@ -526,7 +543,7 @@
 				<cfelse>
 					<cfset Per = 0>
 				</cfif>
-
+				<td><div align="center"><strong>#totpendtratmes#</strong></div></td>
 				<td><div align="center"><strong>#(totsolmes + totpendtratmes)#</strong></div></td>
 				<td><div align="center">#NumberFormat(Per,999.0)#</div></td> 	
 				<td width="19%" class="exibir"><div align="center"><button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'sb','#aux_mes_sb#',<cfoutput>#totsolmes#</cfoutput>,<cfoutput>#totpendtratmes#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button></div></td>	
@@ -538,7 +555,7 @@
 			<td colspan="17"><hr></td>
 		</tr>
 		<cfset totparcialsbsolpendtrat = (totparcialsbsol + totparcialsbpendtrat)>
-
+		<cfset pendtrat=(totparcialsbsolpendtrat - totparcialsbsol)>
 		<cfset Acum_Per_SB = 0> 
 		<cfif totparcialsbsol gt 0>
 			<cfset Acum_Per_SB = NumberFormat(((totparcialsbsol/totparcialsbsolpendtrat) * 100),999.0)>
@@ -546,10 +563,11 @@
 		<tr class="tituloC">
 			<td class="red_titulo"><div align="center">#MesAC#</div></td>
 			<td class="red_titulo"><div align="center"><strong>#totparcialsbsol#</strong></div></td>
+			<td class="red_titulo"><div align="center">#pendtrat#</div></td>
 			<td class="red_titulo"><div align="center">#totparcialsbsolpendtrat#</div></td>
 			<td class="red_titulo"><div align="center"><strong>#Acum_Per_SB#</strong></div></td>
 			<td class="red_titulo">
-				<div align="center"><button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',0,<cfoutput>#totparcialsbsol#</cfoutput>,<cfoutput>#totparcialsbsolpendtrat#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar(Todos)</button></div></td>
+				<div align="center"><button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'sb',0,<cfoutput>#totparcialsbsol#</cfoutput>,<cfoutput>#pendtrat#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar(Todos)</button></div></td>
 		</tr>	
 	</cfif>
 	<!--- SUPERINTENDENTES --->	
@@ -562,6 +580,7 @@
 		<tr class="exibir">
 			<td width="10%"><div align="center"><strong>Mês</strong></div></td>
 			<td width="30%"><div align="center"><strong>Quantidade (Solucionados)</strong></div></td> 
+			<td width="30%"><div align="center"><strong>Outras</strong></div></td>
 			<td width="16%"><div align="center"><strong>Total (*)</strong></div></td>
 			<td width="10%"><div align="center">%</div></td>
 			<td class="exibir">&nbsp;</td>
@@ -580,7 +599,7 @@
 			<!--- Obter PENDENTES + TRATAMENTOS DO MES  --->     
 			<cfquery dbtype="query" name="rstotpendtratmes">
 				SELECT Andt_Resp 
-				FROM  rsBaseB
+				FROM  rsTodos
 				where Andt_Resp in (8,23) and Andt_Mes = #aux_mes_su# 
 			</cfquery>				
 			<cfset totpendtratmes = rstotpendtratmes.recordcount>
@@ -648,7 +667,7 @@
 				<cfelse>
 					<cfset Per = 0>
 				</cfif>
-
+				<td><div align="center"><strong>#totpendtratmes#</strong></div></td>
 				<td><div align="center"><strong>#(totsolmes + totpendtratmes)#</strong></div></td>
 				<td><div align="center">#NumberFormat(Per,999.0)#</div></td> 	
 				<td width="19%" class="exibir"><div align="center"><button type="button" class="botao" onClick="listar(<cfoutput>#se#</cfoutput>,'su','#aux_mes_su#',<cfoutput>#totsolmes#</cfoutput>,<cfoutput>#totpendtratmes#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar</button></div></td>	
@@ -661,7 +680,7 @@
 		</tr>
 
 		<cfset totparcialsusolpendtrat = (totparcialsusol + totparcialsupendtrat)>
-
+		<cfset pendtrat=(totparcialsusolpendtrat - totparcialsusol)>
 		<cfset Acum_Per_SU = 0> 
 		<cfif totparcialsusol gt 0>
 			<cfset Acum_Per_SU = NumberFormat(((totparcialsusol/totparcialsusolpendtrat) * 100),999.0)>
@@ -669,10 +688,11 @@
 		<tr class="tituloC">
 			<td class="red_titulo"><div align="center">#MesAC#</div></td>
 			<td class="red_titulo"><div align="center"><strong>#totparcialsusol#</strong></div></td>
+			<td class="red_titulo"><div align="center">#pendtrat#</div></td>
 			<td class="red_titulo"><div align="center">#totparcialsusolpendtrat#</div></td>
 			<td class="red_titulo"><div align="center"><strong>#Acum_Per_SU#</strong></div></td>
 			<td class="red_titulo">
-				<div align="center"><button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'su',0,<cfoutput>#totparcialsusol#</cfoutput>,<cfoutput>#totparcialsusolpendtrat#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar(Todos)</button></div></td>
+				<div align="center"><button type="button" class="titulos" onClick="listar(<cfoutput>#se#</cfoutput>,'su',0,<cfoutput>#totparcialsusol#</cfoutput>,<cfoutput>#pendtrat#</cfoutput>);" <cfoutput>#habunidsn#</cfoutput>>Listar(Todos)</button></div></td>
 		</tr>	
 	</cfif> 
   </table>
@@ -701,7 +721,7 @@
 	<td colspan="13"><div align="right"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/csv.png" width="45" height="45" border="0"></a></div></td>
 </tr>
   <tr>
-    <td colspan="23" class="titulos"><div align="center"><strong>SOLU&Ccedil;&Atilde;O DE N&Atilde;O CONFORMIDADES (SLNC) </strong></div></td>
+    <td colspan="23" class="titulos"><div align="center"><strong>SOLUÇÃO DE NÃO CONFORMIDADES (SLNC) </strong></div></td>
   </tr>
   <tr>
     <td colspan="23" class="exibir"><div align="center"></div></td>
@@ -917,7 +937,8 @@
 		<cfset colC = trim(NumberFormat(((totsolmai/colB) * 100),999.0))>	
 		<cfif (totsolmai + totpendtratmai) eq 0>
 		 	<cfset colC='100.0'>
-		</cfif>				
+		</cfif>	
+	
 		<td><div align="center">#colC#</div></td>
 		<cfset ColD = rsMetas.Met_SLNC_Mes>    
 		<td><div align="center">#ColD#</div></td>
@@ -933,6 +954,12 @@
 			<cfset resultado = "ABAIXO DO ESPERADO">
 			<cfset auxcor = "##FF3300">
 		</cfif>	
+		<cfif #anoexerc# eq 2024 and #se# eq '64'>
+			<cfset resultado = "SUSPENSO">
+			<cfset auxcor = "">
+			<cfset totsolmai=0>
+			<cfset colbano = colbano - colb>
+		</cfif> 
 		<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
     </tr>
 	<cfset  auxultmes = 5>
@@ -972,6 +999,12 @@
 			<cfset resultado = "ABAIXO DO ESPERADO">
 			<cfset auxcor = "##FF3300">
 		</cfif>	
+		<cfif #anoexerc# eq 2024 and #se# eq '64'>
+			<cfset resultado = "SUSPENSO">
+			<cfset auxcor = "">
+			<cfset totsoljun=0>
+			<cfset colbano = colbano - colb>
+		</cfif>		
 		<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
     </tr>
 	<cfset  auxultmes = 6>
@@ -1010,6 +1043,12 @@
 		<cfelse>
 			<cfset resultado = "ABAIXO DO ESPERADO">
 			<cfset auxcor = "##FF3300">
+		</cfif>	
+		<cfif #anoexerc# eq 2024 and #se# eq '64'>
+			<cfset resultado = "SUSPENSO">
+			<cfset auxcor = "">
+			<cfset totsoljul=0>
+			<cfset colbano = colbano - colb>
 		</cfif>	
 		<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
     </tr>
@@ -1050,6 +1089,12 @@
 			<cfset resultado = "ABAIXO DO ESPERADO">
 			<cfset auxcor = "##FF3300">
 		</cfif>	
+		<cfif #anoexerc# eq 2024 and #se# eq '64'>
+			<cfset resultado = "SUSPENSO">
+			<cfset auxcor = "">
+			<cfset totsolago=0>
+			<cfset colbano = colbano - colb>
+		</cfif>	
 		<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
     </tr>
 	<cfset  auxultmes = 8>
@@ -1089,6 +1134,12 @@
 			<cfset resultado = "ABAIXO DO ESPERADO">
 			<cfset auxcor = "##FF3300">
 		</cfif>	
+		<cfif #anoexerc# eq 2024 and #se# eq '64'>
+			<cfset resultado = "SUSPENSO">
+			<cfset auxcor = "">
+			<cfset totsolset=0>
+			<cfset colbano = colbano - colb>
+		</cfif>			
 		<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
     </tr>
 	<cfset  auxultmes = 9>
@@ -1127,6 +1178,12 @@
 		<cfelse>
 			<cfset resultado = "ABAIXO DO ESPERADO">
 			<cfset auxcor = "##FF3300">
+		</cfif>	
+		<cfif #anoexerc# eq 2024 and #se# eq '64'>
+			<cfset resultado = "SUSPENSO">
+			<cfset auxcor = "">
+			<cfset totsolout=0>
+			<cfset colbano = colbano - colb>
 		</cfif>	
 		<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
     </tr>
@@ -1167,6 +1224,12 @@
 			<cfset resultado = "ABAIXO DO ESPERADO">
 			<cfset auxcor = "##FF3300">
 		</cfif>	
+		<cfif #anoexerc# eq 2024 and #se# eq '64'>
+			<cfset resultado = "SUSPENSO">
+			<cfset auxcor = "">
+			<cfset totsolnov=0>
+			<cfset colbano = colbano - colb>
+		</cfif>			
 		<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
     </tr>
 	<cfset  auxultmes = 11>
@@ -1205,6 +1268,12 @@
 		<cfelse>
 			<cfset resultado = "ABAIXO DO ESPERADO">
 			<cfset auxcor = "##FF3300">
+		</cfif>	
+		<cfif #anoexerc# eq 2024 and #se# eq '64'>
+			<cfset resultado = "SUSPENSO">
+			<cfset auxcor = "">
+			<cfset totsoldez=0>
+			<cfset colbano = colbano - colb>
 		</cfif>	
 		<td bgcolor="#auxcor#"><div align="center"><strong>#resultado#</strong></div></td>
     </tr>

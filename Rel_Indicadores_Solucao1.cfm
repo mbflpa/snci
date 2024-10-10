@@ -203,16 +203,20 @@ function listar(a,b,c,d,e){
 			FROM Metas
 			WHERE Met_Codigo ='#se#' AND Met_Ano = #anoexerc# AND Met_Mes = #nCont#
 		</cfquery>	
-		<cfif rsCrMes.recordcount lte 0>		
+		<cfif rsCrMes.recordcount lte 0>	
+<!---			
 			<cfquery datasource="#dsn_inspecao#">
 				insert into Metas (Met_Codigo,Met_Ano,Met_Mes,Met_SE_STO, Met_SLNC,Met_SLNC_Mes,Met_SLNC_Acum,Met_SLNC_AcumPeriodo,Met_PRCI,Met_PRCI_Mes,Met_PRCI_Acum,Met_PRCI_AcumPeriodo,Met_DGCI,Met_DGCI_Mes,Met_DGCI_Acum,Met_DGCI_AcumPeriodo) 
 				values ('#se#',#year(dtlimit)#,#nCont#,'#rsMetas.Met_SE_STO#','#metslnc#','#metslnc#','0.0','0.0','0.0','0.0','0.0','0.0','0.0','0.0','0.0','0.0')
 			</cfquery>  
+--->			
 		</cfif>
+<!---		
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Metas SET Met_SLNC='#metslnc#',Met_SLNC_Mes='#metslnc#'
 			WHERE Met_Codigo = '#se#' and Met_Ano = #anoexerc# and Met_Mes = #nCont#
-		</cfquery> 		
+		</cfquery> 	
+<!---			
 		<cfset nCont = nCont + 1>
 	</cfloop>
 </cfif>
@@ -2047,9 +2051,11 @@ function listar(a,b,c,d,e){
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)> 
 	
 	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>
+<!---		
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#'  WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 1
 		</cfquery> 
+--->		
 	</cfif>		
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;JAN;#Soluc_Tot_Jan#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>
  </cfif>
@@ -2091,9 +2097,11 @@ function listar(a,b,c,d,e){
 	<cfset colcano = colcano + colC>
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)> 
 		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>
+<!---		
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 2
 	  </cfquery> 
+--->	  
 	</cfif>			  
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;FEV;#Soluc_Tot_Fev#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
  </cfif>
@@ -2139,9 +2147,11 @@ function listar(a,b,c,d,e){
 	<cfset colcano = colcano + colC>
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)> 
 		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>
+	  <!---
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 3
 	  </cfquery>
+--->	  
 	</cfif>			     
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;MAR;#Soluc_Tot_Mar#;#colB#;#colC#;#ColD#;#ColE#;#resultado#'>  
  </cfif> 
@@ -2184,9 +2194,11 @@ function listar(a,b,c,d,e){
 	<cfset colcano = colcano + colC>
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)> 
  		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---	 
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 4
 	  </cfquery> 
+--->	  
 	</cfif>			    
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;ABR;#Soluc_Tot_Abr#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
  </cfif> 
@@ -2227,9 +2239,11 @@ function listar(a,b,c,d,e){
 	<cfset colcano = colcano + colC>
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
     	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---		
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 5
 		</cfquery>
+--->		
     </cfif> 	  
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;MAI;#Soluc_Tot_Mai#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
   </cfif>  
@@ -2270,9 +2284,11 @@ function listar(a,b,c,d,e){
 	<cfset colcano = colcano + colC>
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
 	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---	  
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 6
 	  </cfquery>  
+--->	  
 	</cfif>			   
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;JUN;#Soluc_Tot_Jun#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
  </cfif> 
@@ -2313,9 +2329,11 @@ function listar(a,b,c,d,e){
   <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
 <cfset MetSLNCAcumPeriodo = trim(MetSLNCAcumPeriodo)>
 		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---		
 		<cfquery datasource="#dsn_inspecao#">
 		UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 7
 		</cfquery> 
+--->		
 	</cfif>		  
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;JUL;#Soluc_Tot_Jul#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
  </cfif>
@@ -2356,9 +2374,11 @@ function listar(a,b,c,d,e){
 	<cfset colcano = colcano + colC>
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
  	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---	 
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 8
 	  </cfquery> 
+--->	  
  </cfif>			   
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;AGO;#Soluc_Tot_Ago#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
  </cfif>
@@ -2399,9 +2419,11 @@ function listar(a,b,c,d,e){
   <cfset MetSLNCAcumPeriodo  = NumberFormat((SomaSolucionado/colD) * 100,999.0)>
 <cfset MetSLNCAcumPeriodo = trim(MetSLNCAcumPeriodo)>
 		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10>   
+<!---		
 		<cfquery datasource="#dsn_inspecao#">
 		UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 9
 		</cfquery>  
+--->		
 	</cfif>		  
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;SET;#Soluc_Tot_Set#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
  </cfif> 
@@ -2442,9 +2464,11 @@ function listar(a,b,c,d,e){
 	<cfset colcano = colcano + colC>
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
  		<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---	  
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 10
 	  </cfquery>
+--->	  
 	</cfif>			     
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;OUT;#Soluc_Tot_Out#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
  </cfif> 
@@ -2485,9 +2509,11 @@ function listar(a,b,c,d,e){
 	<cfset colcano = colcano + colC>
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
     	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---	  
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 11
 	  </cfquery>   
+--->	  
 	</cfif>			  
     <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;NOV;#Soluc_Tot_Nov#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>  
  </cfif>  
@@ -2528,9 +2554,11 @@ function listar(a,b,c,d,e){
 	<cfset colcano = colcano + colC>
 	<cfset acumper = NumberFormat((colcano/auxultmes),999.0)>
    	<cfif ucase(trim(qUsuario.Usu_GrupoAcesso)) eq 'GESTORMASTER' and auxultmes eq #month(dtlimit)# and day(now()) lte 10> 
+<!---	  
 	  <cfquery datasource="#dsn_inspecao#">
 	   UPDATE Metas SET Met_SLNC_Acum = '#colC#', Met_SLNC_AcumPeriodo = '#acumper#' WHERE Met_Codigo='#se#' and Met_Ano = #year(dtlimit)# and Met_Mes = 12
 	  </cfquery>
+<!---	  
 	</cfif>			     
   <cffile action="Append" file="#slocal##sarquivo#" output='#sg#;DEZ;#Soluc_Tot_Dez#;#colB#;#colC#;#colD#;#ColE#;#resultado#'>
  </cfif>

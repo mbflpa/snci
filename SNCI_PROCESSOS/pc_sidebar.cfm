@@ -43,8 +43,7 @@
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/fontawesome-free/css/fontawesome.min.css">
 	<!-- Tempusdominus Bootstrap 4 -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-	<!-- iCheck -->
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+	
 	
 	<!-- overlayScrollbars -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
@@ -75,12 +74,15 @@
 
 	
 
-	<!-- Tour -->
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">
+	<!-- Tour 
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">-->
 
   <!-- Theme style -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
+
+  <!-- stepper -->
+  <link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/bs-stepper/css/bs-stepper.min.css">
 
 
     <style>
@@ -329,9 +331,12 @@
     <script  src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/dataTables.searchPanes.js"></script>	
     <script  src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/searchPanes.bootstrap4.min.js"></script>	
 
+      <!-- bs-stepper -->
+     <script src="../SNCI_PROCESSOS/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 
-    <!-- Tour -->
-    <script  src="../SNCI_PROCESSOS/plugins/tour/dist/js/hopscotch.min.js"></script>
+
+    <!-- Tour 
+    <script  src="../SNCI_PROCESSOS/plugins/tour/dist/js/hopscotch.min.js"></script>-->
 
     
     <!-- SNCI -->
@@ -341,6 +346,8 @@
     <!-- AdminLTE App -->
 		<script  src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
  
+    <!-- dotdotdot plugin JavaScript utilizado para truncar conteúdo de múltiplas linhas-->
+		<script  src="../SNCI_PROCESSOS/plugins/dotdotdot/dotdotdot.js"></script>
 
 
    <script language="JavaScript">
@@ -362,7 +369,7 @@
 
         }else{
           logo= '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
-              + '<span class="font-weight-light" style="font-size:20px!important;color:#00416B">SNCI - Processos</span></div>'
+              + '<span class="font-weight-light" style="font-size:20px!important;color:#00416B;widht:100%">SNCI - Processos</span></div>'
               +'<div class="font-weight-light" style="color:#00416B;margin-top:20px">'+ mens + '</div>';
 
         }

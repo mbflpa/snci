@@ -91,10 +91,10 @@
 
 			}
 
-			   //ABRE O FORM PARA UPLOAD DA AVALIAÇÃO, ANEXOS, RECOMENDAÇÕES, ETC...
+			//ABRE O FORM PARA UPLOAD DA AVALIAÇÃO, ANEXOS, RECOMENDAÇÕES, ETC...
 			function mostraCadastroAvaliacaoRelato(idAvaliacao,linha) {
-				event.preventDefault()
-				event.stopPropagation()
+				//event.preventDefault()
+				//event.stopPropagation()
 
 				$(linha).closest("tr").children("td:nth-child(2)").click();//seleciona a linha onde o botão foi clicado
                 $('#modalOverlay').modal('show')
@@ -111,7 +111,7 @@
 						async: false
 					})//fim ajax
 					.done(function(result) {
-						
+						resetFormFields();
 						$('#CadastroAvaliacaoRelato').html(result)
 						$('html, body').animate({ scrollTop: ($('#CadastroAvaliacaoRelato').offset().top)} , 500);
 						

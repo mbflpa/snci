@@ -14,15 +14,70 @@
     <section class="content" style="margin-bottom:50px;position:relative; top:-20px">
         <div class="row" >
             <div class="col-12" id="accordion">
-                <div class="card card-primary card-outline">
-                    <a class="d-block w-100" data-toggle="collapse" href="#collapse3">
+                 <div class="card card-primary card-outline">
+                    <a class="d-block w-100" data-toggle="collapse" href="#collapse200">
                         <div class="card-header">
                             <h4 class="card-title w-100">
+                                Versão 2.0.0 - 01/07/2024
+                            </h4>
+                        </div>
+                    </a>
+                    <div id="collapse200" class="collapse show" data-parent="#accordion">
+                        <div class="card-body">
+                            <h5>Novidades:</h5>
+                            <ul>
+                                <li></li>
+                            </ul>
+
+                            <h5>Melhorias:</h5>
+                            <ul>
+                                <li></li> 
+
+                            </ul>
+                            <h5>Correções:</h5>
+                            <ul>
+                                <li></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                 <div class="card card-secondary card-outline">
+                    <a class="d-block w-100" data-toggle="collapse" href="#collapse121">
+                        <div class="card-header">
+                            <h4 class="card-title w-100" style="color:gray">
+                                Versão 1.2.1 - 19/07/2024
+                            </h4>
+                        </div>
+                    </a>
+                    <div id="collapse121" class="collapse" data-parent="#accordion">
+                        <div class="card-body">
+                            <h5>Novidades:</h5>
+                            <ul>
+                                <li>Criado o perfil "DIRETORIA".</li>
+                            </ul>
+
+                            <h5>Correções:</h5>
+                            <ul>
+                                <li>Corrigida a seleção de orientações para toda a linha das tabelas de acompanhamento e consulta por orientação.</li>
+                            </ul>
+
+                            <h5 style="color:#dc3545">Observação:</h5>
+                            <ul style="color:#dc3545">
+                                <li>No momento, os resultados do indicador DGCI - Processos, demonstrados neste módulo, não são considerados no resultado do DGCI - Unidades, que consta no Plano de Trabalho das SE.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-secondary card-outline">
+                    <a class="d-block w-100" data-toggle="collapse" href="#collapse3">
+                        <div class="card-header">
+                            <h4 class="card-title w-100" style="color:gray">
                                 Versão 1.2.0 - 23/05/2024
                             </h4>
                         </div>
                     </a>
-                    <div id="collapse3" class="collapse show" data-parent="#accordion">
+                    <div id="collapse3" class="collapse" data-parent="#accordion">
                         <div class="card-body">
                             <h5>Novidades:</h5>
                             <ul>
@@ -49,10 +104,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="card card-primary card-outline">
+                <div class="card card-secondary card-outline">
                     <a class="d-block w-100" data-toggle="collapse" href="#collapse2">
                         <div class="card-header">
-                            <h4 class="card-title w-100">
+                            <h4 class="card-title w-100" style="color:gray">
                                 Versão 1.1.1 - 02/01/2024
                             </h4>
                         </div>
@@ -74,10 +129,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="card card-primary card-outline">
+                <div class="card card-secondary card-outline">
                     <a class="d-block w-100" data-toggle="collapse" href="#collapse1">
                         <div class="card-header">
-                            <h4 class="card-title w-100">
+                            <h4 class="card-title w-100" style="color:gray">
                                 Versão 1.1.0 - 02/11/2023
                             </h4>
                         </div>
