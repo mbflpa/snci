@@ -26,7 +26,7 @@
                         <div class="card-body">
                             <h5>Novidades:</h5>
                             <ul>
-                                <li>Criados nos campos para cadastro de Processos, Itens, Orientações e Propostas de Melhoria (objetivando o alinhamento das avaliações de controles com o Plano Estratégico Correios 2024/2028);</li>
+                                <li>Novos campos para cadastro de Processos, Itens, Orientações e Propostas de Melhoria (com o objetivo de alinhar as avaliações de controles ao Plano Estratégico dos Correios 2024-2028);</li>
                                 <li>Edição e Exportação de Processos, Itens, Orientações e Propostas de Melhoria, agora, possuem links separados (até 2023 e a partir de 2024).</li>
                             </ul>
 
@@ -39,7 +39,7 @@
                             <h5>Correções:</h5>
                             <ul>
                                 <li>Corrigido erro de id que ocorria quando um anexo era inserido ou excluído;</li>
-                                <li>Corrigdo css do filtro de colunas das exportações.</li>
+                                <li>Corrigido estilo do filtro de colunas das exportações.</li>
                             </ul>
                         </div>
                     </div>
