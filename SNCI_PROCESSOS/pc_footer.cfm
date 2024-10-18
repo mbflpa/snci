@@ -11,11 +11,8 @@
 
 </style>
 <footer class="main-footer" style="font-size:14px;bottom:-60px;right:-27px; text-align: center;">
-	<div class="float-left d-none d-sm-block">
-		Template por <a href="https://adminlte.io/docs/3.1/about">AdminLTE</a>
-	</div>
 	CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais  
-	<div class="float-right d-none d-sm-block">
+	<div class="float-right d-none d-sm-block" style="margin-right:20px">
 		SNCI - Versão <b>2.0.0</b>
 	</div>
 	<button id="scrollTopBtn" class="scrollTopBtn" title="Voltar ao Topo">

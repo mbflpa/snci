@@ -18,7 +18,7 @@
                     <a class="d-block w-100" data-toggle="collapse" href="#collapse200">
                         <div class="card-header">
                             <h4 class="card-title w-100">
-                                Versão 2.0.0 - 01/07/2024
+                                Versão 2.0.0 - 28/10/2024
                             </h4>
                         </div>
                     </a>
@@ -26,18 +26,20 @@
                         <div class="card-body">
                             <h5>Novidades:</h5>
                             <ul>
-                                <li></li>
+                                <li>Novos campos para cadastro de Processos, Itens, Orientações e Propostas de Melhoria (com o objetivo de alinhar as avaliações de controles ao Plano Estratégico dos Correios 2024-2028);</li>
+                                <li>Edição e Exportação de Processos, Itens, Orientações e Propostas de Melhoria, agora, possuem links separados (até 2023 e a partir de 2024).</li>
                             </ul>
 
                             <h5>Melhorias:</h5>
                             <ul>
-                                <li></li> 
-
+                                <li>Incluída a coluna "Status Finalizador?" nas Consultas por Orientação;</li> 
+                                <li>Em exportações, modificada a forma como as informações sobre o tipo de avaliação são exibidas (demanda do DECRI).</li>
                             </ul>
+
                             <h5>Correções:</h5>
                             <ul>
-                                <li></li>
-
+                                <li>Corrigido erro de id que ocorria quando um anexo era inserido ou excluído;</li>
+                                <li>Corrigido estilo do filtro de colunas das exportações.</li>
                             </ul>
                         </div>
                     </div>
