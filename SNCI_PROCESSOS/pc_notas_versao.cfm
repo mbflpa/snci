@@ -18,7 +18,7 @@
                     <a class="d-block w-100" data-toggle="collapse" href="#collapse200">
                         <div class="card-header">
                             <h4 class="card-title w-100">
-                                Versão 2.0.0 - 01/07/2024
+                                Versão 2.0.0 - 28/10/2024
                             </h4>
                         </div>
                     </a>
