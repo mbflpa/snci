@@ -119,7 +119,8 @@
     <script>aguarde();</script>
 </cfif>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="pt-BR">
 
     <head>
         <title>SNCI - CADASTRO DE GRUPOS E ITENS</title>
@@ -160,7 +161,11 @@
     </style>
 
     <script type="text/javascript">
-        
+$(document).on('click', 'a', function(e){ 
+    e.preventDefault(); 
+    var url = $(this).attr('href'); 
+    window.open(url, '_blank');
+});        
   
         function mudarFiltroAno(){
             var frm = document.getElementById('formConsulta');
@@ -289,19 +294,19 @@
        
     </head>
 
-    <body id="main_body" style="background:#fff;" onLoad="">
+    <body id="main_body" style="background:#fff" onLoad="">
    
-        <div align="left" >
+        <div align="left">
             <form id="formConsulta" nome="formConsulta" enctype="multipart/form-data" method="post" >
             <input type="hidden" value="" id="acao" name="acao">
                 <div align="left" style="padding:10px;border:1px solid #fff;margin-bottom:10px">
                         <div align="left">
-								<span class="tituloDivConsulta" >Filtro</span>
+								<span class="tituloDivConsulta" >Consultar PLANO DE TESTE</span>
 						</div>
                        
                         <div align="left" style="">
                             <div style="margin-bottom:10px;float:left;margin-right:10px;">
-                                <label  for="selAnoConsulta" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">ANO:*</label>
+                                <label  for="selAnoConsulta" style="color:#369;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>ANO:*</strong></label>
                                 <div ></div>	
                                 <select name="selAnoConsulta" id="selAnoConsulta" onChange="mudarFiltroAno();mudarFiltro();" class="form" style="display:inline-block;">										   
                                     <option selected="selected" value=""></option>
@@ -311,7 +316,7 @@
                                 </select>		
                             </div>
                             <div style="margin-bottom:10px;float:left;margin-right:10px;">
-                                <label  for="selTipoConsulta" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">TIPO UNID.:</label>
+                                <label  for="selTipoConsulta" style="color:#369;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>TIPO UNID.:</strong></label>
                                 <div ></div>
                                 <select name="selTipoConsulta" id="selTipoConsulta" class="form" onChange="mudarFiltroTipo();submeterForm()"  
                                         style="display:inline-block;width:100px;">
@@ -327,8 +332,8 @@
 								</select>
 							</div> 
                             <div style="margin-bottom:10px;float:left;margin-right:10px;">
-                                <label  for="selModConsulta" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-                                MODALIDADE:</label>
+                                <label  for="selModConsulta" style="color:#369;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
+                                <strong>MODALIDADE:</strong></label>
                                 <br>	
                                 <select name="selModConsulta" id="selModConsulta"  class="form" onChange="mudarFiltroMod();submeterForm()" 
                                 style="display:inline-block;width:110px;">
@@ -347,8 +352,8 @@
 						    </div>
                         
                             <div style="margin-bottom:10px;float:left;margin-right:10px;">
-                                <label  for="selGrupoConsulta" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-                                GRUPO:</label>
+                                <label  for="selGrupoConsulta" style="color:#369;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
+                                <strong>GRUPO:</strong></label>
                                 <div ></div>	
                                         <select name="selGrupoConsulta" id="selGrupoConsulta"   class="form" onChange="mudarFiltroGrupo();submeterForm()"
                                         style="display:inline-block;width:290px;">										
@@ -366,7 +371,7 @@
                                         </select>              		
                             </div>
                             <div style="margin-bottom:10px;float:left;margin-right:10px;">
-                                <label  for="selSitConsulta" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">SITUAÇÃO:</label>
+                                <label  for="selSitConsulta" style="color:#369;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>SITUAÇÃO:</strong></label>
                                 <div ></div>
                                 <select name="selSitConsulta" id="selSitConsulta" class="form"  onchange="mudarFiltroSit();submeterForm()" 
                                         style="display:inline-block;width:110px;">
@@ -382,7 +387,7 @@
                                 </select>
 							</div>
                             <div style="margin-bottom:10px;">
-                                <label  for="selValDecConsulta" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">VAL.DEC.:</label>
+                                <label  for="selValDecConsulta" style="color:#369;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>VAL.DEC.:</strong></label>
                                 <div ></div>
                                 <select name="selValDecConsulta" id="selValDecConsulta" class="form" onChange="submeterForm()"
                                         style="display:inline-block;width:100px;">
@@ -406,54 +411,62 @@
                                 <cfif '#modalidade#' eq ''>
                                   <cfset modalidade ='#rsModFiltro.TUI_Modalidade#'>
                                 </cfif>
-<div align="center" style="width:70px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/PlanodeTeste_com_pontuacao.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=n')</cfoutput>">
-                                    <div style="position:relative;top:10px">
-                                        <img src="figuras/print.png" width="25"  border="0"  ></img>
-                                    </div>
-                                    <div >
-                                        <span style="font-size:10px">Pontuações / Classificações</span>
-                                    </div>   
-                          </div>
-																
-<div align="center" style="width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/planoDeTeste.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=n')</cfoutput>">
+                                <div align="center" style="color:#036;width:70px;float:left;cursor:pointer" onClick="window.open('GeraRelatorio/gerador/dsp/PlanodeTeste_com_pontuacao.cfm?ano=<cfoutput>#form.selAnoConsulta#</cfoutput>&tipo=<cfoutput>#form.selTipoConsulta#</cfoutput>&mod=<cfoutput>#modalidade#</cfoutput>&grupo=<cfoutput>#form.selGrupoConsulta#</cfoutput>&sit=<cfoutput>#form.selSitConsulta#</cfoutput>&valDec=<cfoutput>#form.selValDecConsulta#</cfoutput>&comOrientacao=n,_blank')">
                                     <div style="position:relative;top:10px">
                                         <img src="figuras/print.png" width="25"  border="0"></img>
                                     </div>
+                                    <br>
+                                    <div >
+                                        <span style="font-size:10px">Pontuações / Classificações</span>
+                                    </div>   
+                                </div>
+																
+                                <div align="center" style="color:#036;width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/planoDeTeste.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=n,_blank')</cfoutput>">
+                                    <div style="color:#036;position:relative;top:10px">
+                                        <img src="figuras/print.png" width="25"  border="0"></img>
+                                    </div>
+                                    <br>
                                     <div >
                                         <span style="font-size:10px">s/ Como Executar</span>
                                     </div>   
-                          </div>
+                                </div>
                             
-<div align="center" style="width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/planoDeTeste.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=s')</cfoutput>">
-                                    <div style="position:relative;top:10px">
-                                        <img src="figuras/print.png" width="25"  border="0"  ></img>
+                                <div align="center" style="color:#036;width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/planoDeTeste.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=s,_blank')</cfoutput>">
+                                    <div style="color:#036;position:relative;top:10px">
+                                        <img src="figuras/print.png" width="25"  border="0"></img>
                                     </div>
+                                    <br>
                                     <div>
                                         <span style="font-size:10px">c/Como Executar</span>
                                     </div>   
-                          </div>
-<div align="center" style="width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('Gerar_planilha_relevancia.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=s')</cfoutput>">
-                                    <div style="position:relative;top:10px">
-                                        <img src="figuras/print.png" width="25"  border="0"  ></img>
+                                </div>
+                                <div align="center" style="color:#036;width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('Gerar_planilha_relevancia.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=s,_blank')</cfoutput>">
+                                    <div style="color:#036;position:relative;top:10px">
+                                        <img src="figuras/print.png" width="25"  border="0"></img>
                                     </div>
+                                    <br>
                                     <div>
                                         <span style="font-size:10px">Relevância</span>
                                     </div>   
-                          </div>						  
-						  
-          </div>
+                                </div>						  
+        
+                        </div>
                         
                     </cfif>
                 </cfif>
-
+                <div class="row"></div>
                 <div align="left" >
                     <cfif isDefined("form.acao") and '#form.acao#' eq 'filtrar'>
                         <cfif rsChecklistFiltrado.recordCount neq 0>
-                          <div style="position:relative;left:-20px;top:35px;"> <img src="figuras/lupa.png" width="16"  style="position:relative; left:24px;top:2px;">
-                              <input name="text" type="text"  id="myInput" style="color:blue;margin-left:0x;padding-left:20px;text-align: left;border:1px solid #3bd1f3;width:200px" onBlur='searchTable()' onChange="searchTable();"  onKeyUp="searchTable();">
+                          <div style="position:relative;left:-20px;top:35px;"> 
+                            <img src="figuras/lupa.png" width="16"  style="position:relative; left:25px;top:2px;">
+                            <input name="text" type="text"  id="myInput" onBlur='searchTable()' onChange="searchTable();"  onKeyUp="searchTable();">
                           </div>
-                          <div align="left" style="position:relative;left:277px;top:13px;"><h1 id="qItens" style="font-size:10px;background:transarent">PLANO DE TESTE FILTRADO: <cfoutput>#rsChecklistFiltrado.recordcount#</cfoutput> registros encontrados</h1></div>
-                            
+                         
+                          <div align="left" style="position:relative;left:152px;top:13px;">
+                            <h1 id="qItens" style="color:#369;font-size:10px;background:transparent"><strong>PLANO DE TESTE FILTRADO: <cfoutput>#rsChecklistFiltrado.recordcount#</cfoutput> registros encontrados</strong></h1>
+                          </div>
+                                                   
                             <div id="form_container" style="width:840px;height:300px;overflow-y:auto;">
                                  
                               

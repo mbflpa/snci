@@ -41,7 +41,23 @@
 	</cfif>
 </cfif>
 
-
+<cfif grpacesso eq 'GESTORMASTER' OR grpacesso eq 'GOVERNANCA'>
+	<cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
+		 <cfset aux_mes = 12>
+		 <cfset aux_ano = aux_ano - 1>
+	</cfif>
+	<cfif auxdia gt 10>
+	<!--- <cfset aux_mes = (aux_mes - 1)>  --->
+	</cfif>
+ <cfelse>
+	<cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
+		 <cfset aux_mes = 12>
+		 <cfset aux_ano = aux_ano - 1>
+	<cfelse>
+			<cfset aux_mes = (aux_mes - 1)>
+	</cfif>
+ </cfif>--->
+<!---
  <cfoutput>aux_ano:#aux_ano#  === aux_mes:#aux_mes#</cfoutput><BR> 
 <cfset gil = gil> 
 --->

@@ -3,7 +3,31 @@
     <cffunction name="init">
         <cfreturn this>
     </cffunction>
-    
+    <!--- Este método retorna grupos --->
+    <cffunction  name="pontuacao" access="remote" ReturnFormat="json" returntype="query">
+        <cfargument name="anogrupo" required="true">
+        <cftransaction>
+           <cfquery name="rspontuacao" datasource="DBSNCI">
+            SELECT PTC_Seq,PTC_Valor,PTC_Descricao,PTC_Franquia 
+            FROM Pontuacao 
+            WHERE PTC_Ano = '#anogrupo#'
+          </cfquery>
+          <cfreturn rspontuacao>
+        </cftransaction>
+    </cffunction>     
+
+    <!--- Este método retorna grupos --->
+    <cffunction  name="gruposverificacao" access="remote" ReturnFormat="json" returntype="any">
+        <cfargument name="anogrupo" required="true">
+        <cftransaction>
+           <cfquery name="rsgrpverif" datasource="DBSNCI">
+            SELECT Grp_Codigo, Grp_Descricao
+            FROM Grupos_Verificacao
+            WHERE Grp_Ano = <cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">
+          </cfquery>
+          <cfreturn rsgrpverif>
+        </cftransaction>
+    </cffunction>    
     <!--- Este método retorna classificacao do controle --->
     <cffunction  name="classifctrl" access="remote" ReturnFormat="json" returntype="any">
          <cftransaction>
@@ -25,7 +49,16 @@
             </cfquery>
           <cfreturn rscategcontrole> 
         </cftransaction>
-    </cffunction>    
+    </cffunction>   
+        <!--- Este método retorna categoria risco --->
+        <cffunction  name="categoriarisco" access="remote" ReturnFormat="json" returntype="query">
+            <cftransaction>
+                <cfquery name="rscategoriarisco" datasource="DBSNCI">
+                    SELECT CTRC_ID, CTRC_DESCRICAO FROM UN_CATEGORIARISCO
+                </cfquery>
+              <cfreturn rscategoriarisco> 
+            </cftransaction>
+        </cffunction>   
     <!--- Este método retorna risco identificado --->
     <cffunction  name="riscoidentificado" access="remote" ReturnFormat="json" returntype="query">
         <cftransaction>

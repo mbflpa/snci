@@ -20,6 +20,7 @@
 <cfset sitGrupo = ''>
 <cfset anoGrupo = ''>
 <cfif isDefined("form.acao") and "#form.acao#" eq 'cadGrupo'>
+
     <cfquery datasource="#dsn_inspecao#" name="rsGrupoExiste">
         SELECT * FROM Grupos_Verificacao WHERE Grp_Descricao = '#form.cadGrupoDescricao#' AND Grp_Ano = #form.selCadGrupoAno#
     </cfquery>
@@ -33,7 +34,7 @@
         <cfelse>
             <cfset numGrupo = '1'> 
         </cfif>
-        <cfset gpDesc = '#Ucase(form.cadGrupoDescricao)#'>
+        <cfset gpDesc = '#ucase(form.cadGrupoDescricao)#'>
         <cfset orientacao ="Vide orientações em cada item do grupo (opção do Sistema - Ajuda a Comentário do Item)">
         <cfquery datasource="#dsn_inspecao#">
             INSERT INTO Grupos_Verificacao VALUES('#numGrupo#','#gpDesc#','#orientacao#'
@@ -58,7 +59,8 @@
 </cfif>
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="pt-BR">
 
     <head>
         <title>SNCI - CADASTRO DE GRUPOS E ITENS</title>
@@ -73,7 +75,7 @@
             position:relative;
             top: -29px;
             background: #003366;
-            border: 1px solid #fff;
+            border: 1px solid #036;
 
         }
     </style>
@@ -108,37 +110,36 @@
         }
     </script>
 
-    <body id="main_body" style="background:#fff;"  >
-        <div align="left" >
+    <body id="main_body" style="background:#036;"  >
+        <div align="left" style="background: #036">
             <form id="formCadGrupo" nome="formCadGrupo" enctype="multipart/form-data" method="post" >
                 <input type="hidden" value="" id="acao" name="acao">   
-                <div align="left" style="float: left;padding:20px;border:1px solid #fff">
+                <div align="left" style="float: left;padding:20px;border:1px solid: #036">
                     <div align="left" style="position:relative;top:-10px">
-                        <span class="tituloDivAltGrupo" >Grupo</span>
+                        <span class="tituloDivAltGrupo">Cadastrar Grupo</span>
                     </div> 
                     <div style="margin-bottom:10px;">
-						<label  for="selCadGrupoAno" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">ANO:</label>
+						<label  for="selCadGrupoAno" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">ANO:</label>
 						<br>
-                        <select name="selCadGrupoAno" id="selCadGrupoAno" class="form" onkeyup="this.value = this.value.toUpperCase();" style="display:inline-block;">										
+                        <select name="selCadGrupoAno" id="selCadGrupoAno" class="form-select" onkeyup="this.value = this.value.toUpperCase();" style="display:inline-block;">										
 							<cfset anoInic = year(Now())> 							
 							<cfset anoFinal = anoInic + 1>
-							<option selected="selected" value=""></option>
+							<option selected="selected" value="">---</option>
 							<cfoutput>
+								<option  value="#anoFinal#">#anoFinal#</option>                                
 								<option  value="#anoInic#">#anoInic#</option>
-								<option  value="#anoFinal#">#anoFinal#</option>
 							</cfoutput>
 						</select>		
 					</div>
 					<div style="margin-bottom:10px;">
-						<label  for="cadGrupoDescricao" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">DESCRIÇÃO:</label>	
+						<label  for="cadGrupoDescricao" class="form-control">DESCRIÇÃO:</label>	
 						<br>
                         <textarea  name="cadGrupoDescricao"  id="cadGrupoDescricao" style="background:#fff;text-transform: uppercase" cols="50" rows="2" wrap="VIRTUAL" class="form" style="font-family:Verdana, Arial, Helvetica, sans-serif"></textarea>		
 					</div>	
              	
                     <div align="center">
-						<a type="button" onclick="return valida_formCadGrupo()" href="#" class="botaoCad" style="background:blue;color:#fff;font-size:12px">Cadastrar</a>     
-                         <a type="button" onclick="javascript:if(confirm('Deseja cancelar este cadastro?\n\nObs: Esta ação não cancela cadastros já confirmados.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
-                                    Cancelar</a>
+						<a type="button" onclick="return valida_formCadGrupo()" href="#" class="btn btn-primary">Cadastrar</a>     
+                         <a type="button" onclick="javascript:if(confirm('Deseja cancelar este cadastro?\n\nObs: Esta ação não cancela cadastros já confirmados.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="btn btn-danger">Cancelar</a>
                     </div>    
                 
                 </div>

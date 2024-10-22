@@ -29,7 +29,7 @@
   </cfif>
 
   <cfquery name="qAnosCadastrados" datasource="#dsn_inspecao#">
-    SELECT DISTINCT TUI_Ano FROM TipoUnidade_ItemVerificacao
+    SELECT DISTINCT TUI_Ano FROM TipoUnidade_ItemVerificacao order by TUI_Ano desc
   </cfquery>
 
  
@@ -260,12 +260,14 @@ CONVERT(DATETIME,getdate(),103),
 <!---FIM ROTINA REPLICAR--->
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="pt-BR">
 
 <head>
 	<title>SNCI - CADASTRO DE GRUPOS E ITENS</title>
 <!--- 	<cfinclude template="cabecalho.cfm"> --->
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<link rel="stylesheet" href="public/bootstrap/bootstrap.min.css"> 
 </head>
 
 
@@ -277,12 +279,13 @@ CONVERT(DATETIME,getdate(),103),
 	position:relative;
 	top: -22px;
 	background: #003366;
-	border:3px solid #fff;
+	border:3px solid #036;
 
 }
 
 </style>
-
+<script src="public/bootstrap/bootstrap.bundle.min.js"></script>
+        <script src="public/jquery-3.7.1.min.js"></script>
 <script language="JavaScript" type="text/JavaScript">
 
 		//fun��es que validam os formul�rios
@@ -358,21 +361,20 @@ CONVERT(DATETIME,getdate(),103),
 
 </script>
 
-<body id="main_body" style="background:#fff;" onLoad="" >
-    <div align="left" >
-					<form id="formReplicar" nome="formReplicar" enctype="multipart/form-data" method="post" >
+<body id="main_body" style="background:#036;" onLoad="" >
+    <div align="left" style="background:#003366">
+					<form id="formReplicar" nome="formReplicar" enctype="multipart/form-data" method="post">
 						
 						<input type="hidden" value="" id="acao" name="acao">
 
-						<div align="left" style="float: left;width:45%;padding:20px;border:1px solid #fff"> 
-							<!---<div align="center">
-								<span class="tituloDiv" >Replicar PLANO DE TESTE</span>
-							</div>--->
+						<div align="left" style="float: left;width:45%;padding:20px;border:1px"> 
+							<div align="left">
+								<span class="tituloDivConsulta" >Replicar PLANO DE TESTE</span>
+							</div>
 							<div style="margin-bottom:10px;">
-								<label  for="selAnoDe" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">REPLICAR DO ANO:</label>	
-								<select name="selAnoDe" id="selAnoDe" class="form" onChange="aguarde(); setTimeout('javascript:formReplicar.submit();',2000)"  style="margin-left:21px;display:inline-block;">
-									<option selected="selected" value=""></option>
-								
+								<label  for="selAnoDe" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>REPLICAR DO ANO:</strong></label>	
+								<select name="selAnoDe" id="selAnoDe" class="form-select" onChange="aguarde(); setTimeout('javascript:formReplicar.submit();',2000)">
+									<option selected="selected" value="">---</option>
 									<cfoutput query="qAnosCadastrados">
 										<option <cfif '#TUI_Ano#' eq "#form.selAnoDe#">selected</cfif> value="#TUI_Ano#">#TUI_Ano#</option>
 									</cfoutput>
@@ -381,22 +383,22 @@ CONVERT(DATETIME,getdate(),103),
 							</div>
 						
 							<div style="margin-bottom:10px;">
-								<label  for="selAnoPara" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">REPLICAR P/ O ANO:</label>
-								<select name="selAnoPara" id="selAnoPara" class="form" onChange="aguarde(); setTimeout('javascript:formReplicar.submit();',2000)" style="margin-left:12px;display:inline-block;">										
+								<label  for="selAnoPara" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>REPLICAR P/ O ANO:</strong></label>
+								<select name="selAnoPara" id="selAnoPara" class="form-select" onChange="aguarde(); setTimeout('javascript:formReplicar.submit();',2000)">										
 									<cfset anoInic = year(Now())> 							
 									<cfset anoFinal = anoInic + 1>
-									<option selected="selected" value=""></option>
+									<option selected="selected" value="">---</option>
 									<cfoutput>
-										<option <cfif "#anoInic#" eq "#form.selAnoPara#">selected</cfif> value="#anoInic#">#anoInic#</option>
 										<option <cfif "#anoFinal#" eq "#form.selAnoPara#">selected</cfif> value="#anoFinal#">#anoFinal#</option>
+										<option <cfif "#anoInic#" eq "#form.selAnoPara#">selected</cfif> value="#anoInic#">#anoInic#</option>
 									</cfoutput>
 								</select>
 							</div>
 
 							<div style="margin-bottom:10px;">
-								<label  for="selTipoUnidade" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">TIPO DE UNIDADE:</label>
-								<select name="selTipoUnidade" id="selTipoUnidade" class="form" onChange="aguarde(); setTimeout('javascript:formReplicar.submit();',2000)"  style="margin-left:24px;display:inline-block;">			
-									<option selected value=""></option>
+								<label  for="selTipoUnidade" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>TIPO DE UNIDADE:</strong></label>
+								<select name="selTipoUnidade" id="selTipoUnidade" class="form-select" onChange="aguarde(); setTimeout('javascript:formReplicar.submit();',2000)">			
+									<option selected value="">---</option>
 									<cfif qTipoUnidades.recordcount neq 0>
 									    <cfif qTipoUnidades.recordcount gt 1>
 									        <option <cfif '#form.selTipoUnidade#' eq 'todos'>selected</cfif> value="todos">TODOS</option>
@@ -409,8 +411,8 @@ CONVERT(DATETIME,getdate(),103),
 							</div>
 
 							<div style="margin-bottom:20px;">
-								<label  for="selModalidade" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">MODALIDADE:</label>
-								<select name="selModalidade" id="selModalidade" class="form" onChange="aguarde(); setTimeout('javascript:formReplicar.submit();',2000)" style="margin-left:50px;display:inline-block;">			
+								<label  for="selModalidade" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>MODALIDADE:</strong></label>
+								<select name="selModalidade" id="selModalidade" class="form-select" onChange="aguarde(); setTimeout('javascript:formReplicar.submit();',2000)">			
 									<option selected="selected" value=""></option>
 									<cfif qTipoUnidades.recordcount neq 0>
 										
@@ -426,10 +428,13 @@ CONVERT(DATETIME,getdate(),103),
 							</div>
 						
 							
-							<div align="center">
-							<a type="button" onClick="return valida_formReplicar()" href="#" class="botaoCad" style="color:#333;font-size:12px">Replicar</a>     
-							 <a type="button" onClick="javascript:if(confirm('Deseja cancelar esta replicação?\n\nObs: Esta ação não cancela as replicações já confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
-                                    Cancelar</a>
+							<div class="row">   
+								<div class="col" align="center">
+									<a type="button" onClick="return valida_formReplicar()" href="#" class="btn btn-primary">Replicar</a>   
+								</div> 	
+								<div class="col" align="center">						  
+							 		<a type="button" onClick="javascript:if(confirm('Deseja cancelar esta replicação?\n\nObs: Esta ação não cancela as replicações já confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="btn btn-danger">Cancelar</a>
+								</div> 
 							</div>                        
 						</div>
 						<!---In�cio da tabela com a apresenta��o dos itns selecionados--->

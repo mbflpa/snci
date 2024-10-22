@@ -48,7 +48,7 @@ ORDER BY Andt_AnoExerc DESC
 		<cfset aux_ano = aux_ano - 1>
    </cfif>
    <cfif auxdia gt 10>
-   		<cfset aux_mes = (aux_mes - 1)> 
+   <!--- <cfset aux_mes = (aux_mes - 1)>  --->
    </cfif>
 <cfelse>
    <cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
