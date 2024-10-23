@@ -540,6 +540,12 @@
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 						pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 						, pc_classificacoes.pc_class_descricao
+						, CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						) as tipoProcesso
 
 			FROM        pc_processos INNER JOIN
 						pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id INNER JOIN
@@ -675,8 +681,12 @@
 														<td>#siglaOrgAvaliado#</td>
 
 														
-														<cfif pc_num_avaliacao_tipo neq 2>
-															<td>#pc_aval_tipo_descricao#</td>
+														<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
+															<cfif pc_aval_tipo_descricao neq ''>
+																<td>#pc_aval_tipo_descricao#</td>
+															<cfelse>
+																<td>#tipoProcesso#</td>
+															</cfif>
 														<cfelse>
 															<td>#pc_aval_tipo_nao_aplica_descricao#</td>
 														</cfif>
