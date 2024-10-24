@@ -757,7 +757,7 @@
 							<p>Estamos à disposição para prestar informações adicionais a respeito do 
 							assunto, caso seja necessário.</p>
 						
-							<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
+							<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
 							
 							<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
 						</div>
@@ -817,7 +817,7 @@
 							<p>Estamos à disposição para prestar informações adicionais a respeito do 
 							assunto, caso seja necessário.</p>
 						
-							<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
+							<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
 							
 							<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
 						</div>
@@ -1243,7 +1243,7 @@
 										</cfif> 
 										<div style="background-color: rgba(255, 255, 255, 1); color: rgba(0, 65, 107, 1); border-radius: 10px; padding-top: 2px; padding-bottom: 2px; padding-left: 15px; padding-right: 10px; box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); width: 600px;">
 											<p>Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
-											<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
+											<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
 											<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
 										</div>
 									</cfoutput>
@@ -1440,7 +1440,7 @@
 										</cfif> 
 										<div style="background-color: rgba(255, 255, 255, 1); color: rgba(0, 65, 107, 1); border-radius: 10px; padding-top: 2px; padding-bottom: 2px; padding-left: 15px; padding-right: 10px; box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); width: 600px;">
 											<p>Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
-											<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
+											<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
 											<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
 										</div>
 									</cfoutput>
@@ -1701,7 +1701,7 @@
 								</cfif> 
 								<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;width:600px">
 									<p>Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
-									<p><strong>CS/DIGOE/SUGOV/DCINT/GPCI - Gerência de Planejamento de Controle Interno</strong></p>
+									<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
 									<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
 								</div>
 							</cfoutput>

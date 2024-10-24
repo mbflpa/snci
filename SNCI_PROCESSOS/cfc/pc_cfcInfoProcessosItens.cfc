@@ -69,7 +69,7 @@
 
     </cffunction>
 
-    <cffunction name="infoProcesso"   access="remote" hint="">
+    <cffunction name="infoProcesso"   access="remote"  hint="">
         <cfargument name="pc_processo_id" type="string" required="true" /> 
 
         <cfquery name="rsInfoProcesso" datasource="#application.dsn_processos#">
