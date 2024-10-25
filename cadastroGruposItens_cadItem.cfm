@@ -1,12 +1,9 @@
-
-<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
-	<cfinclude template="permissao_negada.htm">
-	<cfabort>
-</cfif>  
 <cfprocessingdirective pageEncoding ="utf-8">  
-
-
-
+<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
+<!---	<cfinclude template="permissao_negada.htm">
+	<cfabort>
+--->
+</cfif>  
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	select Usu_DR,Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena from usuarios 
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
@@ -30,6 +27,7 @@
         FROM Pontuacao 
         GROUP BY PTC_Ano 
         HAVING (PTC_Ano) >= '#year(now())#'
+        order by PTC_Ano desc
     </cfquery>    
     <cfquery name="rsPta" datasource="#dsn_inspecao#">
         SELECT PTC_Seq, PTC_Valor, PTC_Descricao, PTC_Status, PTC_dtultatu, PTC_Username, PTC_Franquia 
@@ -1033,7 +1031,7 @@
 <!--- Final acordeon geral --->   
                 <div class="row">   
                     <div class="col" align="center">                                         
-                        <a type="button" onClick="return valida_formCadItem()" href="#" class="btn btn-primary">Cadastrar</a>     
+                        <a type="button" onClick="return valida_formCadItem()" class="btn btn-primary">Cadastrar</a>     
                     </div>
                     <div class="col" align="center">    
                         <a type="button" onClick="javascript:if(confirm('Deseja cancelar este cadastro?\n\nObs: Esta ação não cancela cadastros já confirmados.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="btn btn-danger">Cancelar</a>
@@ -1342,7 +1340,7 @@
                 //console.log(json);
                 const dados = json.DATA;
                 dados.map((ret) => {
-                prots += '<option value="' + ret[0] + '">' + ret[1] + '</option>';
+                prots += '<option value="' + ret[0] + '">' +ret[0]+'-'+ret[1]+'</option>';
                 });
                 $('#selCadItemGrupo').html(prots);
             }) 
