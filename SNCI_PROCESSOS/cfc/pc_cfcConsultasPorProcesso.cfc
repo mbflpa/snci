@@ -1839,9 +1839,13 @@
 			
 		</cfquery>
 
+		
+
 		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
 		</cfquery>
+
+
 		<!DOCTYPE html>
 		<html lang="pt-br">
 			<head>
@@ -1881,12 +1885,22 @@
 											<th>Órgão Responsável</th>
 											<th>Status</th>
 											<th hidden></th>
+											<th hidden></th>
 										</tr>
 									</thead>
 								
 									<tbody>
 										<cfloop query="rsMelhorias" >
-											<cfoutput>					
+											<cfoutput>			
+											    <cfquery datasource="#application.dsn_processos#" name="rsMelhoriaCategoriasControles">
+												SELECT pc_aval_categoriaControle_descricao FROM pc_avaliacao_melhoria_categoriasControles
+												INNER JOIN pc_avaliacao_categoriaControle on pc_avaliacao_categoriaControle.pc_aval_categoriaControle_id = pc_avaliacao_melhoria_categoriasControles.pc_aval_categoriaControle_id
+												WHERE pc_avaliacao_melhoria_categoriasControles.pc_aval_Melhoria_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#pc_aval_melhoria_id#">
+											</cfquery>
+											<cfset categoriasControlesMelhoriaList=ValueList(rsMelhoriaCategoriasControles.pc_aval_categoriaControle_descricao,"; ")>
+											<cfif categoriasControlesMelhoriaList EQ "">
+												<cfset categoriasControlesMelhoriaList = "NÃO DEFINIDO">
+											</cfif>		
 
 												<cfswitch expression="#pc_aval_melhoria_status#">
 													<cfcase value="P">
@@ -1907,6 +1921,9 @@
 													<cfcase value="B">
 														<cfset statusMelhoria = "BLOQUEADO">
 													</cfcase>
+													<cfdefaultcase>
+														<cfset statusMelhoria = "NÃO INFORMADO">
+													</cfdefaultcase>
 												</cfswitch>
 												<tr style="font-size:14px;color:##000;cursor:pointer" onClick="javascript:visualizarMelhoria(this);">
 													<td hidden>#pc_aval_melhoria_descricao#</td>
@@ -1920,9 +1937,31 @@
 													<td style="vertical-align:middle !important;white-space: pre-wrap;">#siglaOrgaoResp# (#mcuOrgaoResp#)</td>
 													<td align="center" style="vertical-align:middle !important;white-space: pre-wrap;">#statusMelhoria#</td>
 													<td hidden >#pc_aval_melhoria_distribuido#</td>
+													<td hidden >#categoriasControlesMelhoriaList#</td>
+
+													<cfif pc_aval_melhoria_beneficioNaoFinanceiro eq ''>
+														<cfset pc_aval_melhoria_beneficioNaoFinanceiro = 'NÃO SE APLICA'>
+													<cfelse>
+														<cfset pc_aval_melhoria_beneficioNaoFinanceiro = pc_aval_melhoria_beneficioNaoFinanceiro>
+													</cfif>
+													<cfif pc_aval_melhoria_beneficioFinanceiro gt 0>
+														<cfset pc_aval_melhoria_beneficioFinanceiro = pc_aval_melhoria_beneficioFinanceiro>	
+													<cfelse>
+														<cfset pc_aval_melhoria_beneficioFinanceiro = 'NÃO SE APLICA'>
+													</cfif>
+													<cfif pc_aval_melhoria_custoFinanceiro gt 0>
+														<cfset pc_aval_melhoria_custoFinanceiro = pc_aval_melhoria_custoFinanceiro>
+													<cfelse>
+														<cfset pc_aval_melhoria_custoFinanceiro = 'NÃO SE APLICA'>
+													</cfif>
+													
+													<td hidden >#pc_aval_melhoria_beneficioNaoFinanceiro#</td>
+													<td hidden >#pc_aval_melhoria_beneficioFinanceiro#</td>
+													<td hidden >#pc_aval_melhoria_custoFinanceiro#</td>
 												
 												</tr>
 											</cfoutput>
+											
 										</cfloop>	
 									</tbody>
 										
@@ -1972,10 +2011,35 @@
 								<textarea id="pcRecusaJustMelhoria" class="form-control"  rows="4" required=""  name="pcRecusaJustMelhoria" class="form-control"></textarea>
 							</div>										
 						</div>
-					
-						
 
-					</div>
+						<div id="categoriasControlesMelhoriaDiv" class="col-sm-12">
+							<div class="form-group">
+								<label for="categoriasControlesMelhoria">Categorias de Controles Internos: </label>
+								<span id ="categoriasControlesMelhoria"></span>
+							</div>
+						</div>
+						
+						<div id="pcBeneficioNaoFinanceiroDiv" class="col-sm-12" >
+							<div class="form-group">
+								<label for="pcBeneficioNaoFinanceiro">Benefício Não Financeiro:</label>
+								<textarea id="pcBeneficioNaoFinanceiro" class="form-control"  rows="4" required=""  name="pcBeneficioNaoFinanceiro" class="form-control"></textarea>
+							</div>
+						</div>
+
+						<div class="col-sm-12">
+							<div class="form-group">
+								<label for="pcBeneficioFinanceiro">Benefício Financeiro:</label>
+								<span id="pcBeneficioFinanceiro"></span>
+							</div>
+						</div>
+
+						<div class="col-sm-12">
+							<div class="form-group">
+								<label for="pcCustoFinanceiro">Custo Financeiro:</label>
+								<span id="pcCustoFinanceiro"></span>
+							</div>
+						</div>
+						 
 				<!-- /.col -->
 				</div>
 				<!-- /.row -->
@@ -2024,7 +2088,28 @@
 						var pc_aval_melhoria_naoAceita_justif = $(linha).closest("tr").children("td:nth-child(6)").text();
 						var pc_aval_melhoria_status = $(linha).closest("tr").children("td:nth-child(8)").text();
 						var pc_aval_melhoria_distribuido = $(linha).closest("tr").children("td:nth-child(10)").text();
-
+						var categoriasControlesMelhoriaList = $(linha).closest("tr").children("td:nth-child(11)").text();
+						if(categoriasControlesMelhoriaList == ''){
+							categoriasControlesMelhoriaList = 'NÃO DEFINIDO';
+						}
+						var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(12)").text();
+						if(pc_aval_melhoria_beneficioNaoFinanceiro == ''){
+							pc_aval_melhoria_beneficioNaoFinanceiro = 'NÃO SE APLICA';
+						}
+						//pc_aval_melhoria_beneficioFinanceiro currencyFormat
+						var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(13)").text();
+						pc_aval_melhoria_beneficioFinanceiro = parseFloat(pc_aval_melhoria_beneficioFinanceiro.replace(/[^0-9.-]+/g,""));
+						pc_aval_melhoria_beneficioFinanceiro = pc_aval_melhoria_beneficioFinanceiro.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+						if($(linha).closest("tr").children("td:nth-child(13)").text() == 0){
+							pc_aval_melhoria_beneficioFinanceiro = 'NÃO SE APLICA';
+						}
+						
+						var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(14)").text();
+						pc_aval_melhoria_custoFinanceiro = parseFloat(pc_aval_melhoria_custoFinanceiro.replace(/[^0-9.-]+/g,""));
+						pc_aval_melhoria_custoFinanceiro = pc_aval_melhoria_custoFinanceiro.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+						if($(linha).closest("tr").children("td:nth-child(14)").text()==0){
+							pc_aval_melhoria_custoFinanceiro = 'NÃO SE APLICA';
+						}
 						
 						if(!pc_aval_melhoria_sugestao == '' ){
 							$('#pcNovaAcaoMelhoriaDiv').attr('hidden', false);
@@ -2050,8 +2135,10 @@
 						}else{	
 							$('#labelMelhoria').html('Proposta de Melhoria Sugerida pelo Controle Interno:');
 						}
-							
-
+						$('#categoriasControlesMelhoria').html(categoriasControlesMelhoriaList);
+						$('#pcBeneficioNaoFinanceiro').val(pc_aval_melhoria_beneficioNaoFinanceiro);
+						$('#pcBeneficioFinanceiro').html(pc_aval_melhoria_beneficioFinanceiro);
+						$('#pcCustoFinanceiro').html(pc_aval_melhoria_custoFinanceiro);
 
 					};	
 
