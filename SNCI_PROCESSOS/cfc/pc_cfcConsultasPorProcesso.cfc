@@ -939,9 +939,7 @@
 						.nav-tabs {
 							border-bottom: none!important;
 						}
-						.tab-pane{
-							min-height: 300px;
-						}
+						
 					</style>
 						
 					
@@ -1289,25 +1287,19 @@
 						.nav-tabs {
 							border-bottom: none!important;
 						}
-						.tab-pane{
-							min-height: 300px;
-						}
+						
 					</style>
 						
-					<div class="card-header" style="background-color: #0083CA;border-bottom:solid 2px #fff" >
-						<cfoutput>
-							<p style="font-size: 1.3em;color:##fff" class="text-limita2linhas"><strong>#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong></p>
-						</cfoutput>	
-					</div>
-					<div class="card card-primary card-tabs"  style="widht:100%">
+					
+					<div class="card card-primary card-tabs"  style="width:100%">
 						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
-								<!--<li class="nav-item" style="">
-									<a  class="nav-link active" id="custom-tabs-one-Consulta-tab"  data-toggle="pill" href="#custom-tabs-one-Consulta" role="tab" aria-controls="custom-tabs-one-Consulta" aria-selected="true">Consulta</a>
-								</li>-->
+								<li class="nav-item  ">
+									<a  class="nav-link active" id="custom-tabs-one-Item-tab"  data-toggle="pill" href="#custom-tabs-one-Item" role="tab" aria-controls="custom-tabs-one-Item" aria-selected="true">Item</a>
+								</li>
 								<li class="nav-item">
-									<a  class="nav-link active" id="custom-tabs-one-Orientacoes-tab"  data-toggle="pill" href="#custom-tabs-one-Orientacoes" role="tab" aria-controls="custom-tabs-one-Orientacoes" aria-selected="true">Medida/Orientação para Regularização</a>
+									<a  class="nav-link " id="custom-tabs-one-Orientacoes-tab"  data-toggle="pill" href="#custom-tabs-one-Orientacoes" role="tab" aria-controls="custom-tabs-one-Orientacoes" aria-selected="true">Medida/Orientação para Regularização</a>
 								</li>
 								
 								<li class="nav-item" style="">
@@ -1328,10 +1320,13 @@
 						<div class="card-body">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 
-								<!--<div disable class="tab-pane fade active show" id="custom-tabs-one-Consulta"  role="tabpanel" aria-labelledby="custom-tabs-one-Consulta-tab" >						
-									<div id="tabConsultaDiv"></div>
-								</div>-->
-								<div class="tab-pane fade active show " id="custom-tabs-one-Orientacoes" role="tabpanel" aria-labelledby="custom-tabs-one-Orientacoes-tab" style="font-size:16px">									
+								<div class="tab-pane fade  active show" id="custom-tabs-one-Item" role="tabpanel" aria-labelledby="custom-tabs-one-Item-tab" style="font-size:16px">									
+									<cfinvoke component="pc_cfcInfoProcessosItens" method="infoItem" returnvariable="infoinfoItem">
+										<cfinvokeargument name="pc_aval_id" value="#arguments.idAvaliacao#">
+										<cfinvokeargument name="pc_processo_id" value="#rsProcAval.pc_processo_id#">
+									</cfinvoke>
+								</div>
+								<div class="tab-pane fade" id="custom-tabs-one-Orientacoes" role="tabpanel" aria-labelledby="custom-tabs-one-Orientacoes-tab" style="font-size:16px">									
 									<div id="tabOrientacoesDiv" style="margin-top:20px"></div>
 								</div>
 
@@ -1701,11 +1696,6 @@
 				$('#infoOrientacaoDiv').html('');
 				$('#timelineViewAcompDiv').html('');
 
-
-				
-
-				
-
 				$('#modalOverlay').modal('show')
 				setTimeout(function() {
 					$.ajax({
@@ -1805,6 +1795,7 @@
 					, CASE  WHEN pc_aval_melhoria_sug_orgao_mcu=''THEN pc_orgaos.pc_org_sigla ELSE pc_orgaoSug.pc_org_sigla END as siglaOrgaoResp
 					, pc_orgaos.pc_org_sigla
 					, pc_orgaoSug.pc_org_sigla as siglaOrgSug
+					,pc_avaliacoes.pc_aval_processo
 			FROM pc_avaliacao_melhorias 
 			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao
 			LEFT JOIN pc_orgaos as pc_orgaoSug ON pc_orgaoSug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
@@ -1886,6 +1877,11 @@
 											<th>Status</th>
 											<th hidden></th>
 											<th hidden></th>
+											<th hidden></th>
+											<th hidden></th>
+											<th hidden></th>
+											<th hidden></th>
+
 										</tr>
 									</thead>
 								
@@ -1900,7 +1896,11 @@
 											<cfset categoriasControlesMelhoriaList=ValueList(rsMelhoriaCategoriasControles.pc_aval_categoriaControle_descricao,"; ")>
 											<cfif categoriasControlesMelhoriaList EQ "">
 												<cfset categoriasControlesMelhoriaList = "NÃO DEFINIDO">
-											</cfif>		
+											</cfif>	
+											<!-- Extrair os quatro últimos caracteres e converter para inteiro -->
+											<cfset anoProcesso = right(rsMelhorias.pc_aval_processo, 4)>
+											<cfset anoProcesso = int(anoProcesso)>
+
 
 												<cfswitch expression="#pc_aval_melhoria_status#">
 													<cfcase value="P">
@@ -1937,8 +1937,9 @@
 													<td style="vertical-align:middle !important;white-space: pre-wrap;">#siglaOrgaoResp# (#mcuOrgaoResp#)</td>
 													<td align="center" style="vertical-align:middle !important;white-space: pre-wrap;">#statusMelhoria#</td>
 													<td hidden >#pc_aval_melhoria_distribuido#</td>
+													
+													
 													<td hidden >#categoriasControlesMelhoriaList#</td>
-
 													<cfif pc_aval_melhoria_beneficioNaoFinanceiro eq ''>
 														<cfset pc_aval_melhoria_beneficioNaoFinanceiro = 'NÃO SE APLICA'>
 													<cfelse>
@@ -1958,6 +1959,8 @@
 													<td hidden >#pc_aval_melhoria_beneficioNaoFinanceiro#</td>
 													<td hidden >#pc_aval_melhoria_beneficioFinanceiro#</td>
 													<td hidden >#pc_aval_melhoria_custoFinanceiro#</td>
+													<td hidden >#anoProcesso#</td>
+													
 												
 												</tr>
 											</cfoutput>
@@ -1985,14 +1988,14 @@
 					</div>
 					<div id = "detalhesDiv" class="col-7" hidden>
 						<div class="col-sm-12">
-							<div class="form-group">	
+							<div class="form-group" style="margin-bottom:0.2rem">	
 								<label id="labelMelhoria" for="pcMelhoria"></label>
 								<textarea class="form-control" id="pcMelhoria" rows="6" required=""  name="pcMelhoria" class="form-control"></textarea>
 							</div>										
 						</div>
 
 						<div id="pcNovaAcaoMelhoriaDiv" class="col-sm-12" hidden >
-							<div class="form-group">
+							<div class="form-group" style="margin-bottom:0.2rem">
 								<label id="labelPcRecusaJustMelhoria" for="pcNovaAcaoMelhoria">Proposta de Melhoria Sugerida pelo Órgão Responsável:</label>
 								<textarea id="pcNovaAcaoMelhoria" class="form-control" rows="6" required=""  name="pcNovaAcaoMelhoria" class="form-control"></textarea>
 							</div>										
@@ -2000,45 +2003,48 @@
 															
 					
 						<div id="pcDataPrevDiv" class="col-md-6" >
-							<div class="form-group">
-								<label id="pcDataPrev"></label>			
+							<div class="form-group" style="margin-bottom:0.2rem">
+								<label for="pcDataPrev">Data Prevista p/ Implementação:</label>
+								<span id="pcDataPrev"></span>		
 							</div>
 						</div>
 					
 						<div id="pcRecusaJustMelhoriaDiv" class="col-sm-12" hidden>
-							<div class="form-group">
+							<div class="form-group" style="margin-bottom:0.2rem">
 								<label id="labelPcRecusaJustMelhoria" for="pcRecusaJustMelhoria">Justificativa do órgão para Recusa:</label>
 								<textarea id="pcRecusaJustMelhoria" class="form-control"  rows="4" required=""  name="pcRecusaJustMelhoria" class="form-control"></textarea>
 							</div>										
 						</div>
 
-						<div id="categoriasControlesMelhoriaDiv" class="col-sm-12">
-							<div class="form-group">
+						<div id="categoriasControlesMelhoriaDiv" class="col-sm-12" hidden>
+							<div class="form-group" style="margin-bottom:0.2rem">
 								<label for="categoriasControlesMelhoria">Categorias de Controles Internos: </label>
 								<span id ="categoriasControlesMelhoria"></span>
 							</div>
 						</div>
 						
-						<div id="pcBeneficioNaoFinanceiroDiv" class="col-sm-12" >
-							<div class="form-group">
+						<div id="pcBeneficioNaoFinanceiroDiv" class="col-sm-12" hidden>
+							<div class="form-group" style="margin-bottom:0.2rem">
 								<label for="pcBeneficioNaoFinanceiro">Benefício Não Financeiro:</label>
 								<textarea id="pcBeneficioNaoFinanceiro" class="form-control"  rows="4" required=""  name="pcBeneficioNaoFinanceiro" class="form-control"></textarea>
 							</div>
 						</div>
 
-						<div class="col-sm-12">
-							<div class="form-group">
+						<div id="pcBeneficioFinanceiroDiv" class="col-sm-12" hidden>
+							<div class="form-group" style="margin-bottom:0.2rem">
 								<label for="pcBeneficioFinanceiro">Benefício Financeiro:</label>
 								<span id="pcBeneficioFinanceiro"></span>
 							</div>
 						</div>
 
-						<div class="col-sm-12">
-							<div class="form-group">
+						<div id="pcCustoFinanceiroDiv" class="col-sm-12" hidden>
+							<div class="form-group" style="margin-bottom:0.2rem">
 								<label for="pcCustoFinanceiro">Custo Financeiro:</label>
 								<span id="pcCustoFinanceiro"></span>
 							</div>
 						</div>
+
+
 						 
 				<!-- /.col -->
 				</div>
@@ -2079,9 +2085,9 @@
 						var pc_aval_melhoria_descricao = $(linha).closest("tr").children("td:nth-child(1)").text();
 						var pc_aval_melhoria_sugestao = $(linha).closest("tr").children("td:nth-child(2)").text();
 						if($(linha).closest("tr").children("td:nth-child(5)").text()!=''){
-							var pc_aval_melhoria_dataPrev = 'Data Prevista p/ Implementação: ' + $(linha).closest("tr").children("td:nth-child(5)").text();
+							var pc_aval_melhoria_dataPrev = $(linha).closest("tr").children("td:nth-child(5)").text();
 						}else{
-							var pc_aval_melhoria_dataPrev = 'Data Prevista p/ Implementação: Não informado.';
+							var pc_aval_melhoria_dataPrev = 'NÃO INFORMADO';
 						}
 						
 						
@@ -2110,7 +2116,11 @@
 						if($(linha).closest("tr").children("td:nth-child(14)").text()==0){
 							pc_aval_melhoria_custoFinanceiro = 'NÃO SE APLICA';
 						}
-						
+
+						var anoProcesso = $(linha).closest("tr").children("td:nth-child(15)").text();
+						//transforma anoProcesso em inteiro
+						anoProcesso = parseInt(anoProcesso);
+
 						if(!pc_aval_melhoria_sugestao == '' ){
 							$('#pcNovaAcaoMelhoriaDiv').attr('hidden', false);
 							$('#pcDataPrevDiv').attr('hidden', false);
@@ -2135,10 +2145,26 @@
 						}else{	
 							$('#labelMelhoria').html('Proposta de Melhoria Sugerida pelo Controle Interno:');
 						}
-						$('#categoriasControlesMelhoria').html(categoriasControlesMelhoriaList);
+						$('#categoriasControlesMelhoria').html(categoriasControlesMelhoriaList + '.');
 						$('#pcBeneficioNaoFinanceiro').val(pc_aval_melhoria_beneficioNaoFinanceiro);
 						$('#pcBeneficioFinanceiro').html(pc_aval_melhoria_beneficioFinanceiro);
 						$('#pcCustoFinanceiro').html(pc_aval_melhoria_custoFinanceiro);
+						console.log(anoProcesso);
+						if(anoProcesso < 2024){
+							$('#categoriasControlesMelhoriaDiv').attr('hidden',true);
+							$('#pcBeneficioNaoFinanceiroDiv').attr('hidden',true);
+							$('#pcBeneficioFinanceiroDiv').attr('hidden',true);
+							$('#pcCustoFinanceiroDiv').attr('hidden',true);
+						}else{
+							$('#categoriasControlesMelhoriaDiv').attr('hidden',false);
+							$('#pcBeneficioNaoFinanceiroDiv').attr('hidden',false);
+							$('#pcBeneficioFinanceiroDiv').attr('hidden',false);
+							$('#pcCustoFinanceiroDiv').attr('hidden',false);
+						}
+
+						//mover o scroll para custom-tabs-one-Melhorias-tab
+						$('html, body').animate({ scrollTop: ($('#custom-tabs-one-Melhorias-tab').offset().top-80)} , 1000);
+
 
 					};	
 
@@ -2162,34 +2188,29 @@
 	
 	 
 		<cfargument name="numProcesso" type="string" required="true"/>
-		<section class="content">
+		
+		<section class="content" style="padding:10px">
 			<div class="container-fluid">
-				<!-- Main content -->
-				<section class="content">
-					<div class="container-fluid">
-						<div id="accordionCadItemPainel col-sm-12" style="margin-bottom:80px" >
-							<div class="card card-success" >
-								<div class="card-header" style="background-color: #ffD400;">
-									<h4 class="card-title ">
-										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#00416b;font-weight: bold;"> 
-											<i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title">Informações do Processo</span>
-										</a>
-									</h4>
-								</div>
-								<div class="card-body">
-									<!--- Chama o componente timelineViewPosicionamentos em pc_cfcComponenteTimelinePosicionamentos.cfc --->
-									<cfinvoke component="pc_cfcInfoProcessosItens" method="infoProcesso" returnvariable="processoId">
-										<cfinvokeargument name="pc_processo_id" value="#arguments.numProcesso#">
-									</cfinvoke>
-								</div>
-							</div><!--fim card card-success -->	
-						</div><!--fim acordion -->
-					</div><!--fim container-fluid -->
-				</section><!--fim section content -->
+				<div id="accordionCadItemPainel col-sm-12" style="margin-bottom:30px" >
+					<div class="card card-success" >
+						<div class="card-header" style="background-color: #ffD400;">
+							<h4 class="card-title ">
+								<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#00416b;font-weight: bold;"> 
+									<i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title">Informações do Processo</span>
+								</a>
+							</h4>
+						</div>
+						<div class="card-body">
+							<!--- Chama o componente timelineViewPosicionamentos em pc_cfcComponenteTimelinePosicionamentos.cfc --->
+							<cfinvoke component="pc_cfcInfoProcessosItens" method="infoProcesso" returnvariable="processoId">
+								<cfinvokeargument name="pc_processo_id" value="#arguments.numProcesso#">
+							</cfinvoke>
+						</div>
+					</div><!--fim card card-success -->	
+				</div><!--fim acordion -->
 			</div><!--fim container-fluid -->
 		</section><!--fim section content -->
-
-
+			
 		<cfquery name="rsAvalTab" datasource="#application.dsn_processos#">
 			SELECT pc_processos.pc_processo_id, pc_avaliacoes.* FROM pc_processos
 			INNER JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
@@ -2198,88 +2219,96 @@
 			 order by  pc_avaliacoes.pc_aval_numeracao        
 		</cfquery>
 
-		<div class="row" style="margin-bottom:50px;padding-left:20px;padding-right:20px;">
-		
-			<div class="col-12" >
-				<div class="card">
-					<!-- /.card-header -->
-					<div class="card-body">
-						<h5 style="color:#0083ca">Clique em um dos itens abaixo para mais informações:</h5>
-						<table id="tabAvalConsulta" class="table table-bordered table-striped table-hover text-nowrap" style="margin-bottom:50px">
-							<thead style="background: #0083ca;color:#fff">
-								<tr style="font-size:14px">
-									<th align="center">Item N°:</th>
-									<th>Situação Encontrada </th>
-									<th>Classificação: </th>
-									
-								</tr>
-							</thead>
-							
-							<tbody>
-								<cfloop query="rsAvalTab" >
-									<cfset classifRisco = "">
-									<cfif #pc_aval_classificacao# eq 'L'>
-										<cfset classifRisco = "Leve">
-									</cfif>	
-									<cfif #pc_aval_classificacao# eq 'M'>
-										<cfset classifRisco = "Mediana">
-									</cfif>	
-									<cfif #pc_aval_classificacao# eq 'G'>
-										<cfset classifRisco = "Grave">
-									</cfif>	
-
-									<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
-									<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
-									<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
-
-									<cfoutput>	
-										<cfset controleInterno = 'N'>
-										<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-											<cfset controleInterno = 'S'>
-										</cfif>				
-										<tr onclick="javascript:mostraInfoAval(#pc_aval_id#,'#controleInterno#')" style="font-size:16px;cursor: pointer;">
-											<td>#pc_aval_numeracao# </td>
-											<td>#pc_aval_descricao#</td>
-											<td>#classifRisco#</td>
-										</tr>
-									</cfoutput>
-								</cfloop>	
-							</tbody>
-						</table>
-
-						<div id="mostraInfoAvalDiv"  style="margin-top:30px; "></div>
-						<div id="infoOrientacaoCardDiv" class="card" hidden>
-							<div class="card-header" style="background-color:#ececec;">
-								<h4 class="card-title ">
-									<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:gray;font-weight: bold;"> 
-										<i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title">Informações da Medida/Orientação para regularização</span>
-									</a>
-								</h4>
-							</div>
-							<div class="card-body">
-								<div id="infoOrientacaoDiv" style=""></div>
-							</div>
+		<section class="content" id="itensContent">
+			<div class="container-fluid">
+				<div class="col-12" style="margin-bottom:30px;">
+					<div class="card">
+						<!-- /.card-header -->
+						<div class="card-header" style="background-color:#ffD400;">
+							<h4 class="card-title ">
+								<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:20px;color:#00416b;font-weight: bold;"> 
+									<i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title">Itens</span>
+								</a>
+							</h4>
 						</div>
+						<div class="card-body">
+							<h6 style="color:#0083ca">Clique em um dos itens abaixo para mais informações:</h6>
+							<table id="tabAvalConsulta" class="table table-bordered table-striped table-hover text-nowrap" style="margin-bottom:50px">
+								<thead style="background: #0083ca;color:#fff">
+									<tr style="font-size:14px">
+										<th align="center">Item N°:</th>
+										<th>Situação Encontrada </th>
+										<th>Classificação: </th>
+										
+									</tr>
+								</thead>
+								
+								<tbody>
+									<cfloop query="rsAvalTab" >
+										<cfset classifRisco = "">
+										<cfif #pc_aval_classificacao# eq 'L'>
+											<cfset classifRisco = "Leve">
+										</cfif>	
+										<cfif #pc_aval_classificacao# eq 'M'>
+											<cfset classifRisco = "Mediana">
+										</cfif>	
+										<cfif #pc_aval_classificacao# eq 'G'>
+											<cfset classifRisco = "Grave">
+										</cfif>	
+
+										<cfset vaFalta = #LSCurrencyFormat(pc_aval_vaFalta, 'local')#>
+										<cfset vaRisco = #LSCurrencyFormat(pc_aval_vaRisco, 'local')#>
+										<cfset vaSobra = #LSCurrencyFormat(pc_aval_vaSobra, 'local')#>
+
+										<cfoutput>	
+											<cfset controleInterno = 'N'>
+											<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
+												<cfset controleInterno = 'S'>
+											</cfif>				
+											<tr onclick="javascript:mostraInfoAval(#pc_aval_id#,'#controleInterno#')" style="font-size:16px;cursor: pointer;">
+												<td>#pc_aval_numeracao# </td>
+												<td>#pc_aval_descricao#</td>
+												<td>#classifRisco#</td>
+											</tr>
+										</cfoutput>
+									</cfloop>	
+								</tbody>
+							</table>
+
+							<div id="mostraInfoAvalDiv"  style="margin-top:30px; "></div>
+							<div id="infoOrientacaoCardDiv" class="card" hidden>
+								<div class="card-header" style="background-color:#ececec;">
+									<h4 class="card-title ">
+										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:gray;font-weight: bold;"> 
+											<i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title">Informações da Medida/Orientação para regularização</span>
+										</a>
+									</h4>
+								</div>
+								<div class="card-body">
+									<div id="infoOrientacaoDiv" style=""></div>
+								</div>
+							</div>
+								
+							<div id="timelineViewAcompDiv" ></div>
 							
-						<div id="timelineViewAcompDiv" ></div>
-						
 
 
 
+						</div>
+
+					
+						<!-- /.card-body -->
 					</div>
+					<!-- /.card -->
 
-				
-					<!-- /.card-body -->
+					
+
 				</div>
-				<!-- /.card -->
-
-				
-
 			</div>
-			<!-- /.col -->
-		
-		</div>
-		<!-- /.row -->
+			<!-- /.container-fluid -->
+		</section>
+		<!-- /.content -->
+			
 
 		<script language="JavaScript">
 			
