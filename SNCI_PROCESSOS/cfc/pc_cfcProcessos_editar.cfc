@@ -722,7 +722,7 @@
 														<div class="btn-group w-30">
 															<span id="relatorios" class="btn btn-success col fileinput-button" style="background:##0083CA">
 																<i class="fas fa-upload"></i>
-																<span style="margin-left:5px">Clique aqui para anexar o Relatório do Processo e Anexos I, II e III em PDF</span>
+																<span style="margin-left:5px">Clique aqui para anexar o Relatório do Processo e Anexos I, II e III em PDF (1° passo)</span>
 															</span>																	
 														</div>
 													</div>
@@ -774,7 +774,7 @@
 					<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
 						<a  id="btnCadastroItem" class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
 							<button  type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-							</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (1° Passo)</span>
+							</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (2° Passo)</span>
 						</a>
 					</div>
 
@@ -2725,11 +2725,9 @@
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
 							
 								
-								<li class="nav-item" style="">
-									<a  class="nav-link active" id="custom-tabs-one-2passo-tab"  data-toggle="pill" href="#custom-tabs-one-2passo" role="tab" aria-controls="custom-tabs-one-2passo" aria-selected="true"><cfif '#arguments.passoapasso#' eq "true">2° Passo - Relatório do Item<cfelse>Relatório do Item</cfif></a>
-								</li>
+								
 								<li class="nav-item">
-									<a  class="nav-link " id="custom-tabs-one-3passo-tab"  data-toggle="pill" href="#custom-tabs-one-3passo" role="tab" aria-controls="custom-tabs-one-3passo" aria-selected="true"><cfif '#arguments.passoapasso#' eq "true">3° Passo - Anexos<cfelse>Anexos</cfif></a>
+									<a  class="nav-link active" id="custom-tabs-one-3passo-tab"  data-toggle="pill" href="#custom-tabs-one-3passo" role="tab" aria-controls="custom-tabs-one-3passo" aria-selected="true"><cfif '#arguments.passoapasso#' eq "true">3° Passo - Anexos<cfelse>Anexos</cfif></a>
 								</li>
 								
 								<li class="nav-item">
@@ -2747,64 +2745,7 @@
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 								
 							
-								<div disable class="tab-pane fade active show" id="custom-tabs-one-2passo"  role="tabpanel" aria-labelledby="custom-tabs-one-2passo-tab" >
-									
-									
-										<cfif (#rsProcAval.pc_modalidade# eq 'A' or #rsProcAval.pc_modalidade# eq 'E')>
-											<div class="row">
-												<div class="col-md-12">
-													<div class="card card-default">
-														
-														<div class="card-body">
-															<div id="actions" class="row" >
-																<div class="col-lg-12" align="center">
-																	<div class="btn-group w-30">
-																		<span id="avaliacoes" class="btn btn-success col fileinput-button" style="background:#0083CA">
-																			<i class="fas fa-upload"></i>
-																			<span style="margin-left:5px">Clique aqui para anexar o Relatório em PDF, exclusivo deste item (caso exista)</span>
-																		</span>																	
-																	</div>
-																</div>
-															</div>
-															
-															<div class="table table-striped files" id="previews">
-															<div id="template" class="row mt-2">
-																<div class="col-auto">
-																	<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
-																</div>
-																<div class="col d-flex align-items-center">
-																	<p class="mb-0">
-																	<span class="lead" data-dz-name></span>
-																	(<span data-dz-size></span>)
-																	</p>
-																	<strong class="error text-danger" data-dz-errormessage></strong>
-																</div>
-																<div class="col-4 d-flex align-items-center" >
-																	<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
-																		<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
-																	</div>
-																</div>
-																
-															</div>
-														</div>
-
-														
-													</div>
-													
-													</div>
-													<!-- /.card -->
-												</div>
-											</div>
-										</cfif>
-								
-
-									<div id="anexoAvaliacaoDiv"></div>
-
-									
-
-								</div>
-
-								<div class="tab-pane fade " id="custom-tabs-one-3passo" role="tabpanel" aria-labelledby="custom-tabs-one-3passo-tab">
+								<div class="tab-pane fade active show" id="custom-tabs-one-3passo" role="tabpanel" aria-labelledby="custom-tabs-one-3passo-tab">
 									
 									
 									<div id="actions2" class="row" >
@@ -2957,15 +2898,8 @@
 
 				
 				
-
-				mostraRelatoPDF();
-				$('#custom-tabs-one-2passo-tab').click(function(){
-					$('#tabAnexosDiv').html('')
-					$('#tabOrientacoesDiv').html('')
-					$('#tabMelhoriasDiv').html('')
-					$('#pendenciasDiv').html('')
-					mostraRelatoPDF();
-				});	
+				mostraTabAnexos();
+					
 				$('#custom-tabs-one-3passo-tab').click(function(){
 					$('#anexoAvaliacaoDiv').html('')
 					$('#tabOrientacoesDiv').html('')
@@ -3002,70 +2936,6 @@
 				<cfoutput>
 					let modalidade = '#rsProcAval.pc_modalidade#'
 				</cfoutput>
-
-				if(modalidade ==='A' || modalidade ==='E'){
-					// DropzoneJS Demo Code Start
-					Dropzone.autoDiscover = false
-
-					// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-					var previewNode = document.querySelector("#template")
-					//previewNode.id = ""
-					var previewTemplate ='';
-					if (previewNode !== null) {
-						var previewTemplate = previewNode.parentNode.innerHTML
-						previewNode.parentNode.removeChild(previewNode)
-				
-						var myDropzone = new Dropzone("div#custom-tabs-one-2passo", { // Make the whole body a dropzone
-							url: "cfc/pc_cfcAvaliacoes.cfc?method=uploadArquivos", // Set the url
-							autoProcessQueue :true,
-							maxFiles: 1,
-							maxFilesize:20,
-							thumbnailWidth: 80,
-							thumbnailHeight: 80,
-							parallelUploads: 1,
-							acceptedFiles: '.pdf',
-							previewTemplate: previewTemplate,
-							autoQueue: true, // Make sure the files aren't queued until manually added
-							previewsContainer: "#previews", // Define the container to display the previews
-							clickable: "#avaliacoes", // Define the element that should be used as click trigger to select files.
-							headers: { "pc_aval_id":pc_aval_id, 
-									"pc_aval_processo":pc_aval_processo, 
-									"pc_anexo_avaliacaoPDF":"S",
-									"arquivoParaTodosOsItens":"N"},//informar "S" se o arquivo deve ser exibido em todos os itens do processo
-							init: function() {
-								this.on('error', function(file, errorMessage) {	
-									toastr.error(errorMessage);
-									return false;
-								});
-							}
-						})
-					
-						// Update the total progress bar
-						myDropzone.on("totaluploadprogress", function(progress) {
-							document.querySelector(".progress-bar").style.width = progress + "%"
-						})
-
-						myDropzone.on("sending", function(file) {
-							$('#modalOverlay').modal('show')
-						})
-
-
-
-						// Hide the total progress bar when nothing's uploading anymore
-						myDropzone.on("queuecomplete", function(progress) {
-							//toastr.success("Arquivo(s) enviado(s) com sucesso!")
-							myDropzone.removeAllFiles(true);
-							mostraRelatoPDF();
-
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-						})
-					}
-					
-					// DropzoneJS 1 Demo Code End
-				}
-
 
 				// DropzoneJS 2 Demo Code Start
 				Dropzone.autoDiscover = false
@@ -3389,39 +3259,7 @@
 				}, 1000);
 			}
 
-			function mostraRelatoPDF(){
-				$('#modalOverlay').modal('show')
-				setTimeout(function() {
-					//mostraPendencias()
-					$.ajax({
-						type: "post",
-						url:"cfc/pc_cfcAvaliacoes.cfc",
-						data:{
-							method: "anexoAvaliacao",
-							pc_aval_id: pc_aval_id,
-							ehEdicao: 'S'
-						},
-						async: false
-					})//fim ajax
-					.done(function(result){
-						
-						$('#anexoAvaliacaoDiv').html(result)
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-					})//fim done
-					.fail(function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-						$('#modal-danger').modal('show')
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-						$('#modal-danger').find('.modal-body').text(thrownError)
-
-					})//fim fail
-				}, 1000);
-			}
-
+			
 			function mostraPendencias(){
 				$('#modalOverlay').modal('show')
 				setTimeout(function() {
