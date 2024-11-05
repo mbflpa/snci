@@ -121,12 +121,9 @@
 
 <!DOCTYPE html>
 <html lang="pt-BR">
-
     <head>
         <title>SNCI - CADASTRO DE GRUPOS E ITENS</title>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-       
-
     <style type="text/css">    
         .tituloDivConsulta{
             padding:5px;
@@ -156,8 +153,6 @@
         tbody {
             height: auto;
         }
-
-            
     </style>
 
     <script type="text/javascript">
@@ -279,13 +274,10 @@ $(document).on('click', 'a', function(e){
                 } else {
                     tr[i].style.display = "none";
                 }
-               
-            
             }
             h1 = document.getElementById('qItens');
             h1.innerHTML = "PLANO DE TESTE FILTRADO: " + qLinhas +  " registros encontrados";
             td = tr.getElementsByTagName("td");
-            
         }
         //Fim fun��o de filtro de tabela
         
@@ -317,7 +309,7 @@ $(document).on('click', 'a', function(e){
                             </div>
                             <div style="margin-bottom:10px;float:left;margin-right:10px;">
                                 <label  for="selTipoConsulta" style="color:#369;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>TIPO UNID.:</strong></label>
-                                <div ></div>
+                                <div></div>
                                 <select name="selTipoConsulta" id="selTipoConsulta" class="form" onChange="mudarFiltroTipo();submeterForm()"  
                                         style="display:inline-block;width:100px;">
                                     <option selected value=""></option>
@@ -346,7 +338,7 @@ $(document).on('click', 'a', function(e){
                                     </cfif> 
 
                                     <cfoutput query="rsModFiltro">
-                                        <option <cfif '#form.selModConsulta#' eq '#TUI_Modalidade#' >selected</cfif> value="#TUI_Modalidade#"><cfif #TUI_Modalidade# eq 0>PRESENCIAL<cfelse>A DIST�NCIA</cfif></option>                                   
+                                        <option <cfif '#form.selModConsulta#' eq '#TUI_Modalidade#' >selected</cfif> value="#TUI_Modalidade#"><cfif #TUI_Modalidade# eq 0>PRESENCIAL<cfelse>A DISTÂNCIA</cfif></option>                                   
                                     </cfoutput>
                                 </select>
 						    </div>
@@ -370,9 +362,10 @@ $(document).on('click', 'a', function(e){
                                             
                                         </select>              		
                             </div>
+                            <div class="row">
                             <div style="margin-bottom:10px;float:left;margin-right:10px;">
                                 <label  for="selSitConsulta" style="color:#369;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>SITUAÇÃO:</strong></label>
-                                <div ></div>
+                                <div></div>
                                 <select name="selSitConsulta" id="selSitConsulta" class="form"  onchange="mudarFiltroSit();submeterForm()" 
                                         style="display:inline-block;width:110px;">
                                     
@@ -386,6 +379,8 @@ $(document).on('click', 'a', function(e){
                                     </cfoutput>
                                 </select>
 							</div>
+                        </div>
+                            <div class="row">
                             <div style="margin-bottom:10px;">
                                 <label  for="selValDecConsulta" style="color:#369;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>VAL.DEC.:</strong></label>
                                 <div ></div>
@@ -400,7 +395,7 @@ $(document).on('click', 'a', function(e){
                                     </cfoutput>        
 								</select>
 							</div>
-                                   
+                        </div>        
                         </div> 
         
                 </div> 

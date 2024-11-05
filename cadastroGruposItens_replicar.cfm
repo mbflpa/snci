@@ -421,7 +421,7 @@ CONVERT(DATETIME,getdate(),103),
 										</cfif>
 
 										<cfoutput query="qModalidade">
-											<option <cfif '#form.selModalidade#' eq  '#TUI_Modalidade#' and '#form.selModalidade#' neq  'todas'>selected</cfif> value="#TUI_Modalidade#"><cfif "#TUI_Modalidade#" eq 0>PRESENCIAL<CFELSE>A DIST�NCIA</cfif></option>
+											<option <cfif '#form.selModalidade#' eq  '#TUI_Modalidade#' and '#form.selModalidade#' neq  'todas'>selected</cfif> value="#TUI_Modalidade#"><cfif "#TUI_Modalidade#" eq 0>PRESENCIAL<CFELSE>A DISTÂNCIA</cfif></option>
 										</cfoutput>
 									</cfif>
 								</select>
