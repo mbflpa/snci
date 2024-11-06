@@ -448,6 +448,11 @@
 															<legend style="margin-left:20px">Benefício Não Financeiro da Proposta de Melhoria:</legend>                                         
 															<pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsMelhoria.pc_aval_melhoria_beneficioNaoFinanceiro#</pre>
 														</fieldset>
+													<cfelse>
+														<fieldset style="padding:0px!important;min-height: 90px;">
+															<legend style="margin-left:20px">Benefício Não Financeiro da Proposta de Melhoria:</legend>                                         
+															<pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">Não se aplica</pre>
+														</fieldset>
 													</cfif>
 													<div style="margin-bottom:20px">
 														<li >Categoria(s) do Controle Proposto: <span style="color:##0692c6;">#categoriaControleList#.</span></li>
@@ -455,11 +460,15 @@
 														<cfif rsMelhoria.pc_aval_melhoria_beneficioFinanceiro gt 0>
 															<cfset beneficioFinanceiro = #LSCurrencyFormat(rsMelhoria.pc_aval_melhoria_beneficioFinanceiro, 'local')#>
 															<li >Potencial Benefício Financeiro da Implementação da Proposta de Melhoria: <span style="color:##0692c6;">#beneficioFinanceiro#.</span></li>
+														<cfelse>
+															<li >Potencial Benefício Financeiro da Implementação da Proposta de Melhoria: <span style="color:##0692c6;">Não se aplica.</span></li>
 														</cfif>
 
 														<cfif rsMelhoria.pc_aval_melhoria_custoFinanceiro gt 0>
 															<cfset custoEstimado = #LSCurrencyFormat(rsMelhoria.pc_aval_melhoria_custoFinanceiro, 'local')#>
 															<li >Estimativa do Custo Financeiro da Proposta de Melhoria: <span style="color:##0692c6;">#custoEstimado#.</span></li>
+														<cfelse>
+															<li >Estimativa do Custo Financeiro da Proposta de Melhoria: <span style="color:##0692c6;">Não se aplica.</span></li>
 														</cfif>
 													</div>
 												</cfif>

@@ -409,6 +409,10 @@
 
                                                     <li class="nav-item" style="">
                                                         <a  class="nav-link " id="custom-tabs-infoItem-InfItem-valorEstimado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-valorEstimado" role="tab" aria-controls="custom-tabs-infoItem-valorEstimado" aria-selected="true">Potencial Valor Estimado</a>
+                                                    </li>
+
+                                                    <li class="nav-item" style="">
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-criterioRefNormativa-tab"  data-toggle="pill" href="##custom-tabs-infoItem-criterioRefNormativa" role="tab" aria-controls="custom-tabs-infoItem-criterioRefNormativa" aria-selected="true">Critérios e Referências Normativas</a>
                                                     </li>	
 
 
@@ -500,6 +504,15 @@
                                                             <li >Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">Não se aplica.</span></li>
                                                         </cfif>
                                                     </div>
+                                                    <div disable class="tab-pane fade" id="custom-tabs-infoItem-criterioRefNormativa"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-criterioRefNormativa-tab" >	
+                                                        <cfquery name="rsAvaliacaoNormativas" datasource="#application.dsn_processos#">
+                                                            SELECT pc_aval_criterioRef_descricao FROM pc_avaliacao_criterioReferencia
+                                                            INNER JOIN pc_avaliacoes on pc_avaliacoes.pc_aval_criterioRef_id = pc_avaliacao_criterioReferencia.pc_aval_criterioRef_id
+                                                            WHERE pc_avaliacoes.pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
+                                                        </cfquery>
+                                                        <cfset normativasList = ValueList(rsAvaliacaoNormativas.pc_aval_criterioRef_descricao, ', ')>
+                                                        <p style="margin-left:20px"><span style="color:##0692c6;">#normativasList#.</span></p>
+                                                       
                                                 </div>
                                             </div>
                                         </div>
