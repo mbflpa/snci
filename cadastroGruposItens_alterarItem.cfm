@@ -27,7 +27,7 @@
     SELECT PTC_Seq, PTC_Valor, PTC_Descricao, PTC_Status, PTC_dtultatu, PTC_Username, PTC_Franquia 
     FROM Pontuacao WHERE PTC_Ano = '#year(now())#'
 </cfquery> 
-<cfif isDefined("form.acaoalt") and "#form.acaoalt#" eq 'altItem'>
+<cfif isDefined("form.acaoalt") and "#form.acaoalt#" eq 'altItem'>  
     <cfquery name="rsPta" datasource="#dsn_inspecao#">
         SELECT PTC_Seq, PTC_Valor, PTC_Descricao, PTC_Status, PTC_dtultatu, PTC_Username, PTC_Franquia 
         FROM Pontuacao WHERE PTC_Ano = '#form.selAltItemAno#'
@@ -64,7 +64,8 @@
     frm.pontuacaoCalculadaAltAGF.value ==> pontuação unidade AGF
     frm.checkPontuacaoAltseq.value     ==> Itn_PTC_Seq unidadde próprias
     frm.checkPontuacaoAltagfseq.value  ==> Itn_PTC_Seq unidade AGF
---->		
+--->	
+
         <!---Iincluir ou Alterar as tabelas TipoUnidade_ItemVerificacao e Itens_Verificacao --->               
         <cfloop list="#tiposunidselec#" index="i">
             <cfset tipo = "#i#">
@@ -94,7 +95,27 @@
                 <cfset ClassifITEM = 'MEDIANO'> 
             <cfelseif PercClassifItem lte 10>
                 <cfset ClassifITEM = 'LEVE'> 
-            </cfif>			
+            </cfif>		
+            <!--- Ajustes de campos para Não aplicar Processo N1 --->
+            <cfif form.processon1naoaplicarSNAlt eq 'S'>
+                <cfset altprocesson1 = 0>
+                <cfset altprocesson2 = 0>
+                <cfset altprocesson3 = 0>
+                <cfset form.altprocesson3outros=''>
+                <cfset form.processon3outrosSNAlt='S'>
+            <cfelse>
+                <cfset altprocesson1 = #form.altprocesson1#>
+                <cfset form.altprocesson1naoseaplica=''>
+                <cfset altprocesson2 = #form.altprocesson2#>
+            </cfif>
+
+            <cfif form.processon3outrosSNAlt eq 'S'>
+                <cfset altprocesson3 = 0>
+            <cfelse>
+                <cfset form.altprocesson3outros=''>
+                <cfset altprocesson3 = #form.altprocesson3#>                    
+            </cfif>
+         	
 			<!--- Incluir ou alterar a tabela TipoUnidade_ItemVerificacao --->
             <cfquery datasource="#dsn_inspecao#" name="rsExisteTPITEM">
                 select TUI_Modalidade
@@ -336,7 +357,6 @@
                                 <label for="selAltModalidade" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
                                     Modalidade
                                 </label>
-                                <p></p>
                                 <select name="selAltModalidade" id="selAltModalidade" class="form-select" aria-label="Default select example">                                      
                                     <option selected="selected" value="">---</option>
                                 </select>                                                                    
@@ -864,7 +884,7 @@
                         <a type="button" onClick="return valida_formExcItem()" href="#" class="btn btn-warning">Excluir este Item</a>
                     </div>                    
                     <div class="col" align="center">    
-                        <a type="button" onClick="javascript:if(confirm('Deseja cancelar as alterções realizadas?\n\nObs.: Esta ação não cancela as alterações já confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="btn btn-danger">Cancelar</a>
+                        <a type="button" onClick="javascript:if(confirm('Deseja cancelar as alterações realizadas?\n\nObs.: Esta ação não cancela as alterações já confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="btn btn-danger">Cancelar</a>
                     </div>
                     <p></p>
                 </div>    
@@ -1064,7 +1084,7 @@
                     //console.log(json);
                     const dados = json.DATA;
                     dados.map((ret) => {
-                    prots += '<option value="' + ret[0] + '">' +ret[0]+'-'+ret[1]+'</option>';
+                    prots += '<option value="' + ret[0] + '">'+ret[1]+'</option>';
                     });
                     $('#selAltModalidade').html(prots);
                 })
@@ -1114,12 +1134,12 @@
                 })
                 .then(data =>{
                     let prots = '<option value="">---</option>';
-                    let vlrdeclarado = '<option value="" selected>---</option>';
-                    let visualizar = '<option value="" selected>---</option>';
-                    let validarobrig = '<option value="" selected>---</option>';
-                    $('#selAltItemValorDec').html(vlrdeclarado);
-                    $('#selAltVisualizacao').html(visualizar);
-                    $('#selAltValidObrig').html(validarobrig);
+                    let vlrdeclarado = '';
+                    let visualizar = '';
+                    let validarobrig = '';
+                    $('#selAltItemValorDec').html(prots);
+                    $('#selAltVisualizacao').html(prots);
+                    $('#selAltValidObrig').html(prots);
                     $("#propriasalt").hide();
                     $("#franquiaalt").hide();
                     
@@ -1152,29 +1172,9 @@
                     dados.map((ret) => {
                         $('#altItemDescricao').val(ret[1]) // descrição do item
                         $('#altItemManchete').val(ret[2])  // manchete do item
-                        if(ret[3] == 'S') {
-                            vlrdeclarado += '<option value="S" selected>Sim</option>'
-                            vlrdeclarado += '<option value="N">Não</option>'
-                        }else{
-                            vlrdeclarado += '<option value="S">Sim</option>'
-                            vlrdeclarado += '<option value="N" selected>Não</option>'
-                        } // valor declarado
-
-                        if(ret[0] == '99') {
-                            visualizar += '<option value="S" selected>Sim</option>'
-                            visualizar += '<option value="N">Não</option>'
-                        }else{
-                            visualizar += '<option value="S">Sim</option>'
-                            visualizar += '<option value="N" selected>Não</option>'
-                        }  // visualização                  
-
-                        if(ret[4] == '1') {
-                            validarobrig += '<option value="S" selected>Sim</option>'
-                            validarobrig += '<option value="N">Não</option>'
-                        }else{
-                            validarobrig += '<option value="S">Sim</option>'
-                            validarobrig += '<option value="N" selected>Não</option>'
-                        }  // validação obrigatória                     
+                        visualizar = ret[0] 
+                        vlrdeclarado = ret[3] 
+                        validarobrig = ret[4]                  
                         $('#altItemOrientacao').val(ret[5])  // Como executar/Procedimentos Adotados
                         $('#altItemAmostra').val(ret[6])  // Amostras
                         $('#altItemNorma').val(ret[7])  // Normas
@@ -1185,13 +1185,11 @@
                         catctrl = ret[12]
                         catriscoident = ret[13]
                         $('#altcategoriariscooutros').val(ret[14])
-                        $("#altriscoidentif-outros").hide();
-                        if ($('#altcategoriariscooutros').val() != '') {$('#altriscoidentif-outros').show()}
                         macropro = ret[15]
                         $('#altmacroprocesso_sel').val(ret[15]) 
                         procn1 = ret[16] 
                         $('#altprocesson1_sel').val(ret[16])               
-                        $('#altprocesson1naoseaplica').val(ret[17])                
+                        $('#altprocesson1naoseaplica').val(ret[17])        
                         procn2 = ret[18]
                         $('#altprocesson2_sel').val(ret[18])
                         procn3 = ret[19]
@@ -1211,9 +1209,41 @@
                         }
 
                     });
+                    if(visualizar == '99') {
+                        visualizar = '<option value="">---</option>'
+                        visualizar += '<option value="S" selected>Sim</option>'
+                        visualizar += '<option value="N">Não</option>'
+                    }else{
+                        visualizar = '<option value="">---</option>'
+                        visualizar += '<option value="S">Sim</option>'
+                        visualizar += '<option value="N" selected>Não</option>'
+                    }  // visualização                     
+                    if(vlrdeclarado == 'S') {
+                        vlrdeclarado = '<option value="">---</option>'
+                        vlrdeclarado += '<option value="S" selected>Sim</option>'
+                        vlrdeclarado += '<option value="N">Não</option>'
+                    }else{
+                        vlrdeclarado = '<option value="">---</option>'
+                        vlrdeclarado += '<option value="S">Sim</option>'
+                        vlrdeclarado += '<option value="N" selected>Não</option>'
+                    } // valor declarado
+                    if(validarobrig == '1') {
+                        validarobrig = '<option value="">---</option>'
+                        validarobrig += '<option value="S" selected>Sim</option>'
+                        validarobrig += '<option value="N">Não</option>'
+                    }else{
+                        validarobrig = '<option value="">---</option>'
+                        validarobrig += '<option value="S">Sim</option>'
+                        validarobrig += '<option value="N" selected>Não</option>'
+                    }  // validação obrigatória                     
                     $('#selAltItemValorDec').html(vlrdeclarado);
                     $('#selAltVisualizacao').html(visualizar);
                     $('#selAltValidObrig').html(validarobrig);
+                    $("#altriscoidentif-outros").hide();
+                    if ($('#altcategoriariscooutros').val() != '') {$('#altriscoidentif-outros').show()}
+                    
+                    //$('#processon3outrosSNAlt').val('N')
+                   // if($('#altprocesson3outros').val() !== '') {$('#processon3outrosSNAlt').val('S')}  
                     editar_altItemOrientacao();
                     altItem_altItemAmostra();
                     altItem_altItemNorma();
@@ -1233,7 +1263,10 @@
                         $("#altprocesson3").attr('disabled', true);
                         $("#cd_altprocesson3").attr('disabled', true);
                         $("#altprocesson3-outros").hide();
+                        $('#processon3outrosSNAlt').val('N')
+                        $('#processon1naoaplicarSNAlt').val('S')
                     }else{
+                        $('#processon1naoaplicarSNAlt').val('N')
                         ProcessoN1(macropro,"'"+procn1+"'")
                         $("#cd_altprocesson1").prop("checked", false);
                         ProcessoN2(macropro,procn1,"'"+procn2+"'")
@@ -2191,7 +2224,7 @@
                     return false;
                 }  
                 //alert('processon1naoaplicarSNAlt: '+$('#processon1naoaplicarSNAlt').val() + ' altprocesson1naoseaplica: '+$('#altprocesson1naoseaplica').val())   
-                    
+                //alert('processon1naoaplicarSNAlt: '+$('#processon1naoaplicarSNAlt').val() + ' altprocesson1: '+$('#altprocesson1').val())                     
                 if ($('#processon1naoaplicarSNAlt').val() == 'N' && $('#altprocesson1').val() == '') {
                     alert('Selecione um Processo N1 como Tipo de Avaliação.');
                     frm.altprocesson1.focus();
@@ -2204,7 +2237,7 @@
                         alert('Selecione um Processo N2 como Tipo de Avaliação.');
                         frm.altprocesson2.focus();
                         return false;
-                    }   
+                    }                    
                     if ($('#processon3outrosSNAlt').val() == 'S'  && $('#altprocesson3outros').val() == '') {
                         alert('Informe a descrição para opção Outros selecionada como Processo N3.');
                         frm.altprocesson3outros.focus();

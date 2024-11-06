@@ -101,11 +101,11 @@
         <cfargument name="anogrupo" required="true">
         <cftransaction>
            <cfquery name="rsgrpverif" datasource="DBSNCI">
-            SELECT Grp_Codigo,trim(Grp_Descricao)
-            FROM Grupos_Verificacao 
-            WHERE Grp_Ano=<cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">
-            group by Grp_Codigo,Grp_Descricao
-            order by Grp_Codigo,Grp_Descricao
+                SELECT Grp_Codigo,trim(Grp_Descricao),Grp_Ano
+                FROM Grupos_Verificacao INNER JOIN Itens_Verificacao ON (Grp_Ano = Itn_Ano) AND (Grp_Codigo = Itn_NumGrupo)
+                GROUP BY Grp_Ano,Grp_Codigo, Grp_Descricao
+                HAVING Grp_Ano=<cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">
+                ORDER BY Grp_Codigo, Grp_Descricao
           </cfquery>
           <cfreturn rsgrpverif>
         </cftransaction>
