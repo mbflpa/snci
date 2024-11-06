@@ -3853,12 +3853,6 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 	</cffunction>
 
-
-
-
-
-
-
 	<cffunction name="uploadArquivosOrientacao" access="remote"  returntype="boolean" output="false" hint="realiza o upload dos anexos das orientacoes">
 
 		

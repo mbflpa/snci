@@ -337,6 +337,11 @@
                 font-weight: 400 !important;
             }
 
+            .tituloTab{
+                display: flex!important;
+                text-align: center!important;
+            }
+
             
         
         </style>
@@ -388,31 +393,31 @@
                                             <div class="card-header p-0 pt-1" style="background-color:##0e406a;">
                                                 <ul class="nav nav-tabs" id="custom-tabs-infoItem" role="tablist" style="font-size:14px;font-weight: 400 !important;">
                                                     <li class="nav-item " style="">
-                                                        <a  class="nav-link  active" id="custom-tabs-infoItem-titulo-tab"  data-toggle="pill" href="##custom-tabs-infoItem-titulo" role="tab" aria-controls="custom-tabs-infoItem-titulo" aria-selected="true">Título da Situação Encontrada</a>
+                                                        <a  class="nav-link  active" id="custom-tabs-infoItem-titulo-tab"  data-toggle="pill" href="##custom-tabs-infoItem-titulo" role="tab" aria-controls="custom-tabs-infoItem-titulo" aria-selected="true"><span class="tituloTab">Título Situação<br>Encontrada</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-sintese-tab"  data-toggle="pill" href="##custom-tabs-infoItem-sintese" role="tab" aria-controls="custom-tabs-infoItem-sintese" aria-selected="true">Síntese</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-sintese-tab"  data-toggle="pill" href="##custom-tabs-infoItem-sintese" role="tab" aria-controls="custom-tabs-infoItem-sintese" aria-selected="true"><span class="tituloTab"><br>Síntese</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-teste-tab"  data-toggle="pill" href="##custom-tabs-infoItem-teste" role="tab" aria-controls="custom-tabs-infoItem-teste" aria-selected="true">Teste (Pergunta do plano)</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-teste-tab"  data-toggle="pill" href="##custom-tabs-infoItem-teste" role="tab" aria-controls="custom-tabs-infoItem-teste" aria-selected="true"><span class="tituloTab">Teste<br>(Pergunta do plano)</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-controleTestado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-controleTestado" role="tab" aria-controls="custom-tabs-infoItem-controleTestado" aria-selected="true">Controle Testado</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-controleTestado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-controleTestado" role="tab" aria-controls="custom-tabs-infoItem-controleTestado" aria-selected="true"><span class="tituloTab"><br>Controle Testado</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-riscoClassif-tab"  data-toggle="pill" href="##custom-tabs-infoItem-riscoClassif" role="tab" aria-controls="custom-tabs-infoItem-riscoClassif" aria-selected="true">COSO / Classificação / Risco</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-riscoClassif-tab"  data-toggle="pill" href="##custom-tabs-infoItem-riscoClassif" role="tab" aria-controls="custom-tabs-infoItem-riscoClassif" aria-selected="true"><span class="tituloTab"><br>COSO/Classificação/Risco</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-valorEstimado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-valorEstimado" role="tab" aria-controls="custom-tabs-infoItem-valorEstimado" aria-selected="true">Potencial Valor Estimado</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-valorEstimado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-valorEstimado" role="tab" aria-controls="custom-tabs-infoItem-valorEstimado" aria-selected="true"><span class="tituloTab">Potencial<br>Valor Estimado</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-criterioRefNormativa-tab"  data-toggle="pill" href="##custom-tabs-infoItem-criterioRefNormativa" role="tab" aria-controls="custom-tabs-infoItem-criterioRefNormativa" aria-selected="true">Critérios e Referências Normativas</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-criterioRefNormativa-tab"  data-toggle="pill" href="##custom-tabs-infoItem-criterioRefNormativa" role="tab" aria-controls="custom-tabs-infoItem-criterioRefNormativa" aria-selected="true"><span class="tituloTab">Critérios e<br>Ref. Normativas</span></a>
                                                     </li>	
 
 
