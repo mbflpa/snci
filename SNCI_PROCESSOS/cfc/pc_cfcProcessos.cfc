@@ -3393,10 +3393,10 @@
 			WHERE pc_aval_tipo_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idTipoProcesso#">
 		</cfquery>
 
-		<cfset var descricao = "" />
-
 		<cfif rsTipoProcesso.recordCount gt 0>
 			<cfset descricao = rsTipoProcesso.pc_aval_tipo_comentario />
+		<cfelse>
+		    <cfset descricao = "" />
 		</cfif>
 
 		<!--- Serializa o resultado manualmente em JSON ou texto simples --->

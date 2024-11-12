@@ -7464,7 +7464,7 @@
 
 
 	<cffunction name="getAvaliacaoTipos" access="remote" returntype="any" returnformat="json" output="false">
-        <cfset var result = "" />
+        
         <cfquery name="qAvaliacaoTipos" datasource="#application.dsn_processos#">
             SELECT 
                 pc_aval_tipo_id, 
@@ -7478,17 +7478,18 @@
                 pc_aval_tipo_status = 'A' 
         </cfquery>
         
-        <cfset var data = [] />
-        <cfloop query="qAvaliacaoTipos">
-            <cfset var tipos = {
-                id: qAvaliacaoTipos.pc_aval_tipo_id,
-                macroprocessos: qAvaliacaoTipos.pc_aval_tipo_macroprocessos,
-                processo_n1: qAvaliacaoTipos.pc_aval_tipo_processoN1,
-                processo_n2: qAvaliacaoTipos.pc_aval_tipo_processoN2,
-                processo_n3: qAvaliacaoTipos.pc_aval_tipo_processoN3
-            } />
-            <cfset ArrayAppend(data, tipos) />
-        </cfloop>
+        <cfset var data = ArrayNew(1) />
+		<cfloop query="qAvaliacaoTipos">
+			<cfset var tipos = StructNew() />
+			<cfset tipos.id = qAvaliacaoTipos.pc_aval_tipo_id />
+			<cfset tipos.macroprocessos = qAvaliacaoTipos.pc_aval_tipo_macroprocessos />
+			<cfset tipos.processo_n1 = qAvaliacaoTipos.pc_aval_tipo_processoN1 />
+			<cfset tipos.processo_n2 = qAvaliacaoTipos.pc_aval_tipo_processoN2 />
+			<cfset tipos.processo_n3 = qAvaliacaoTipos.pc_aval_tipo_processoN3 />
+			
+			<cfset ArrayAppend(data, tipos) />
+		</cfloop>
+
         
         
         
@@ -7496,7 +7497,7 @@
     </cffunction>
 
     <cffunction name="getAvaliacaoCoso" access="remote" returntype="any" returnformat="json" output="false">
-		<cfset var result = "" />
+		
 		<cfquery name="qAvaliacaoCoso" datasource="#application.dsn_processos#">
 			SELECT 
 				pc_aval_coso_id, 
@@ -7508,15 +7509,16 @@
 				pc_aval_cosoStatus = 'A' 
 		</cfquery>
 		
-		<cfset var data = [] />
+		<cfset var data = ArrayNew(1) />
 		<cfloop query="qAvaliacaoCoso">
-			<cfset var coso = {
-				id: qAvaliacaoCoso.pc_aval_coso_id,
-				componente: qAvaliacaoCoso.pc_aval_cosoComponente,
-				principio: qAvaliacaoCoso.pc_aval_cosoPrincipio
-			} />
+			<cfset var coso = StructNew() />
+			<cfset coso.id = qAvaliacaoCoso.pc_aval_coso_id />
+			<cfset coso.componente = qAvaliacaoCoso.pc_aval_cosoComponente />
+			<cfset coso.principio = qAvaliacaoCoso.pc_aval_cosoPrincipio />
+			
 			<cfset ArrayAppend(data, coso) />
 		</cfloop>
+
 		
 		
 		
@@ -7525,7 +7527,7 @@
 
 	<cffunction name="getAvaliacaoDadosParaEdicao" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="pc_aval_id" type="numeric" required="true" />
-		<cfset var result = "" />
+		
 		<cfquery name="qAvaliacaoDados" datasource="#application.dsn_processos#">
 			SELECT pc_aval_id
 					,pc_aval_processo
