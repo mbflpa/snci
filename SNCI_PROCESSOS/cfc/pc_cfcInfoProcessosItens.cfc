@@ -37,23 +37,31 @@
          
             <cfset ano = RIGHT(#arguments.pc_processo_id#,4)>
             <cfif #ano# gte 2024 and rsCategoriaControle.recordcount gt 0> 
-                <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro neq ''>
+                
                     <fieldset style="padding:0px!important;min-height: 90px;">
-                        <legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>                                         
-                        <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro#</pre>
+                        <legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>   
+                        <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro neq ''>                                      
+                            <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro#</pre>
+                        <cfelse>
+                            <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">Não se aplica</pre>
+                        </cfif>
                     </fieldset>
-                </cfif>
+                
 
                 <li >Categoria(s) do Controle Proposto: <span style="color:##0692c6;">#categoriaControleList#.</span></li>
 
                 <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioFinanceiro gt 0>
                     <cfset beneficioFinanceiro = #LSCurrencyFormat(rsAvalOrentacao.pc_aval_orientacao_beneficioFinanceiro, 'local')#>
                      <li >Potencial Benefício Financeiro da Implementação da Medida/Orientação p/ Regularização: <span style="color:##0692c6;">#beneficioFinanceiro#.</span></li>
+                <cfelse>
+                    <li >Potencial Benefício Financeiro da Implementação da Medida/Orientação p/ Regularização: <span style="color:##0692c6;">Não se aplica.</span></li>     
                 </cfif>
 
                 <cfif rsAvalOrentacao.pc_aval_orientacao_custoFinanceiro gt 0>
                     <cfset custoEstimado = #LSCurrencyFormat(rsAvalOrentacao.pc_aval_orientacao_custoFinanceiro, 'local')#>
                     <li >Estimativa do Custo Financeiro da Medida/Orientação para Regularização: <span style="color:##0692c6;">#custoEstimado#.</span></li>
+                <cfelse>
+                    <li >Estimativa do Custo Financeiro da Medida/Orientação para Regularização: <span style="color:##0692c6;">Não se aplica.</span></li>
                 </cfif>
             </cfif>
         </cfoutput>
@@ -61,7 +69,7 @@
 
     </cffunction>
 
-    <cffunction name="infoProcesso"   access="remote" hint="">
+    <cffunction name="infoProcesso"   access="remote"  hint="">
         <cfargument name="pc_processo_id" type="string" required="true" /> 
 
         <cfquery name="rsInfoProcesso" datasource="#application.dsn_processos#">
@@ -160,8 +168,10 @@
                                         <cfif #rsInfoProcesso.pc_modalidade# eq 'A' OR  #rsInfoProcesso.pc_modalidade# eq 'E'>
                                             <span >Processo SEI n°: </span> <strong  id="numSEI" style="color:##0692c6">#aux_sei#</strong> <span style="margin-left:20px">Relatório n°:</span> <strong  style="color:##0692c6">#rsInfoProcesso.pc_num_rel_sei#</strong>
                                         </cfif></p>
-                                        
-                                        
+                                         
+                                        <p style="margin-left:20px;">Data de Início da Avaliação: <strong style="color:##0692c6;margin-right:30px">#DateFormat(rsInfoProcesso.pc_data_inicioAvaliacao, "dd/mm/yyyy")#</strong>
+                                             Data de Conclusão da Avaliação: <strong style="color:##0692c6">#DateFormat(rsInfoProcesso.pc_data_fimAvaliacao, "dd/mm/yyyy")#</strong></p>   
+                                       
                                         <cfif rsInfoProcesso.pc_num_avaliacao_tipo neq 445 and rsInfoProcesso.pc_num_avaliacao_tipo neq 2>
                                             <cfif rsInfoProcesso.pc_aval_tipo_descricao neq ''>
                                                 <p style="margin-left:20px;">Tipo de Avaliação: <span style="color:##0692c6">#rsInfoProcesso.pc_aval_tipo_descricao#</span></p>
@@ -327,6 +337,11 @@
                 font-weight: 400 !important;
             }
 
+            .tituloTab{
+                display: flex!important;
+                text-align: center!important;
+            }
+
             
         
         </style>
@@ -378,27 +393,31 @@
                                             <div class="card-header p-0 pt-1" style="background-color:##0e406a;">
                                                 <ul class="nav nav-tabs" id="custom-tabs-infoItem" role="tablist" style="font-size:14px;font-weight: 400 !important;">
                                                     <li class="nav-item " style="">
-                                                        <a  class="nav-link  active" id="custom-tabs-infoItem-titulo-tab"  data-toggle="pill" href="##custom-tabs-infoItem-titulo" role="tab" aria-controls="custom-tabs-infoItem-titulo" aria-selected="true">Título da Situação Encontrada</a>
+                                                        <a  class="nav-link  active" id="custom-tabs-infoItem-titulo-tab"  data-toggle="pill" href="##custom-tabs-infoItem-titulo" role="tab" aria-controls="custom-tabs-infoItem-titulo" aria-selected="true"><span class="tituloTab">Título Situação<br>Encontrada</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-sintese-tab"  data-toggle="pill" href="##custom-tabs-infoItem-sintese" role="tab" aria-controls="custom-tabs-infoItem-sintese" aria-selected="true">Síntese</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-sintese-tab"  data-toggle="pill" href="##custom-tabs-infoItem-sintese" role="tab" aria-controls="custom-tabs-infoItem-sintese" aria-selected="true"><span class="tituloTab"><br>Síntese</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-teste-tab"  data-toggle="pill" href="##custom-tabs-infoItem-teste" role="tab" aria-controls="custom-tabs-infoItem-teste" aria-selected="true">Teste (Pergunta do plano)</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-teste-tab"  data-toggle="pill" href="##custom-tabs-infoItem-teste" role="tab" aria-controls="custom-tabs-infoItem-teste" aria-selected="true"><span class="tituloTab">Teste<br>(Pergunta do plano)</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-controleTestado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-controleTestado" role="tab" aria-controls="custom-tabs-infoItem-controleTestado" aria-selected="true">Controle Testado</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-controleTestado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-controleTestado" role="tab" aria-controls="custom-tabs-infoItem-controleTestado" aria-selected="true"><span class="tituloTab"><br>Controle Testado</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-riscoClassif-tab"  data-toggle="pill" href="##custom-tabs-infoItem-riscoClassif" role="tab" aria-controls="custom-tabs-infoItem-riscoClassif" aria-selected="true">COSO / Classificação / Risco</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-riscoClassif-tab"  data-toggle="pill" href="##custom-tabs-infoItem-riscoClassif" role="tab" aria-controls="custom-tabs-infoItem-riscoClassif" aria-selected="true"><span class="tituloTab"><br>COSO/Classificação/Risco</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-valorEstimado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-valorEstimado" role="tab" aria-controls="custom-tabs-infoItem-valorEstimado" aria-selected="true">Potencial Valor Estimado</a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-valorEstimado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-valorEstimado" role="tab" aria-controls="custom-tabs-infoItem-valorEstimado" aria-selected="true"><span class="tituloTab">Potencial<br>Valor Estimado</span></a>
+                                                    </li>
+
+                                                    <li class="nav-item" style="">
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-criterioRefNormativa-tab"  data-toggle="pill" href="##custom-tabs-infoItem-criterioRefNormativa" role="tab" aria-controls="custom-tabs-infoItem-criterioRefNormativa" aria-selected="true"><span class="tituloTab">Critérios e<br>Ref. Normativas</span></a>
                                                     </li>	
 
 
@@ -476,14 +495,29 @@
                                                     <div disable class="tab-pane fade" id="custom-tabs-infoItem-valorEstimado"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-valorEstimado-tab" >	
                                                         <cfif rsInfoItem.pc_aval_valorEstimadoRecuperar gt 0>
                                                             <li >A Recuperar: <span style="color:##0692c6;">#LSCurrencyFormat(rsInfoItem.pc_aval_valorEstimadoRecuperar, 'local')#.</span></li>
+                                                        <cfelse>
+                                                            <li >A Recuperar: <span style="color:##0692c6;">Não se aplica.</span></li>
                                                         </cfif>
                                                         <cfif rsInfoItem.pc_aval_valorEstimadoRisco gt 0>
                                                             <li >Em Risco ou Valor Envolvido: <span style="color:##0692c6;">#LSCurrencyFormat(rsInfoItem.pc_aval_valorEstimadoRisco, 'local')#.</span></li>
+                                                        <cfelse>
+                                                            <li >Em Risco ou Valor Envolvido: <span style="color:##0692c6;">Não se aplica.</span></li>
                                                         </cfif>
                                                         <cfif rsInfoItem.pc_aval_valorEstimadoNaoPlanejado gt 0>
                                                             <li >Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">#LSCurrencyFormat(rsInfoItem.pc_aval_valorEstimadoNaoPlanejado, 'local')#.</span></li>
+                                                        <cfelse>
+                                                            <li >Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">Não se aplica.</span></li>
                                                         </cfif>
                                                     </div>
+                                                    <div disable class="tab-pane fade" id="custom-tabs-infoItem-criterioRefNormativa"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-criterioRefNormativa-tab" >	
+                                                        <cfquery name="rsAvaliacaoNormativas" datasource="#application.dsn_processos#">
+                                                            SELECT pc_aval_criterioRef_descricao FROM pc_avaliacao_criterioReferencia
+                                                            INNER JOIN pc_avaliacoes on pc_avaliacoes.pc_aval_criterioRef_id = pc_avaliacao_criterioReferencia.pc_aval_criterioRef_id
+                                                            WHERE pc_avaliacoes.pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
+                                                        </cfquery>
+                                                        <cfset normativasList = ValueList(rsAvaliacaoNormativas.pc_aval_criterioRef_descricao, ', ')>
+                                                        <p style="margin-left:20px"><span style="color:##0692c6;">#normativasList#.</span></p>
+                                                       
                                                 </div>
                                             </div>
                                         </div>

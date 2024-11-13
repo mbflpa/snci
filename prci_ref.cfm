@@ -46,7 +46,7 @@ ORDER BY Andt_AnoExerc DESC
 		<cfset aux_ano = aux_ano - 1>
    </cfif>
    <cfif auxdia gt 10>
-   		<cfset aux_mes = (aux_mes - 1)> 
+   <!---		<cfset aux_mes = (aux_mes - 1)>  --->
    </cfif>
 <cfelse>
    <cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
@@ -86,7 +86,7 @@ ORDER BY Andt_AnoExerc DESC
 <cfelseif aux_mes is 10>
 	   <cfset dtlimit = aux_ano & "/10/31">	
 <cfelseif aux_mes is 11>	
-		<cfset dtlimit = aux_ano & "/11/30">	   				   
+	   <cfset dtlimit = aux_ano & "/11/30">	   				   
 <cfelse>
 	   <cfset dtlimit = aux_ano & "/12/31">				   
 </cfif>

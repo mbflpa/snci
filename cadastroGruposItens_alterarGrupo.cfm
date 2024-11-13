@@ -70,7 +70,7 @@
 
 <!--- Retorna todos os anos cadastrados na tabela  Grupos_Verificacao --->
 <cfquery datasource="#dsn_inspecao#" name="rsAnoGrupo">
-    SELECT DISTINCT Grp_Ano FROM Grupos_Verificacao
+    SELECT DISTINCT Grp_Ano FROM Grupos_Verificacao order by Grp_Ano desc
 </cfquery>
 
 <cfif isDefined("form.selAltGrupoAno") and "#form.selAltGrupoAno#" neq ''>
@@ -87,8 +87,8 @@
 </cfif>
 
 
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="pt-BR">
 
     <head>
         <title>SNCI - CADASTRO DE GRUPOS E ITENS</title>
@@ -193,13 +193,13 @@
             <form id="formAltGrupo" nome="formAltGrupo" enctype="multipart/form-data" method="post" >
                 <input type="hidden" value="" id="acao" name="acao">   
                 <div align="left" style="margin-left:100px;margin-left:140px">
-                    <div align="left" style="padding:10px;border:1px solid #fff;width:523px;">
+                    <div align="left" style="padding:10px;border:1px solid #036;width:523px;">
                         <div align="left">
-								<span class="tituloDivAltGrupo" >Filtro</span>
+								<span class="tituloDivAltGrupo" >Alterar Grupos</span>
 						</div>
                         <div style="margin-bottom:10px;float: left;">
-                            <label  for="selAltGrupoAno" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-                            ANO:</label>
+                            <label  for="selAltGrupoAno" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
+                            <strong>ANO:</strong></label>
                             <br>
                             <select name="selAltGrupoAno" id="selAltGrupoAno" class="form" style="display:inline-block;background:#c5d4ea"
                             onchange="aguarde(); setTimeout('javascript:formAltGrupo.submit();',2000)">										
@@ -212,8 +212,8 @@
                         </div>
 
                         <div style="margin-bottom:10px;">
-                            <label  for="selAltGrupo" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-                            GRUPO:</label>
+                            <label  for="selAltGrupo" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
+                            <strong>GRUPO:</strong></label>
                             <br>
                             <select name="selAltGrupo" id="selAltGrupo"  class="form" style="display:inline-block;width:443px;background:#c5d4ea"
                                     onchange="aguarde(); setTimeout('javascript:formAltGrupo.submit();',2000)">										 
@@ -243,11 +243,11 @@
                                 </div>	
 
                                 <div align="center">
-                                    <a type="button" onClick="return valida_formAltGrupo()" href="#" class="botaoCad" style="background:blue;color:#fff;font-size:12px;">
+                                    <a type="button" onClick="return valida_formAltGrupo()" href="#" class="btn btn-primary">
                                     Alterar</a> 
-                                    <a type="button" onClick="return valida_formExcGrupo()" href="#" class="botaoCad" style="margin-left:100px;background:red;color:#fff;font-size:12px;">
+                                    <a type="button" onClick="return valida_formExcGrupo()" href="#" class="btn btn-warning">
                                     Excluir este Grupo</a>   
-                                    <a type="button" onClick="javascript:if(confirm('Deseja cancelar as alterações realizadas?\n\nObs.: Esta ação não cancela as alterações já confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:50px;background:red;color:#fff;font-size:12px;">
+                                    <a type="button" onClick="javascript:if(confirm('Deseja cancelar as alterações realizadas?\n\nObs.: Esta ação não cancela as alterações já confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="btn btn-danger">
                                     Cancelar</a>
                                 </div> 
                          </div> 

@@ -1,7 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<info>
-	<infoitem key="UD_qVerifica" value="name:Pos_Inspecao;datatype:" />
-	<infoitem key="UD_qVerificaData" value="name:INP_DtInicInspecao;datatype:" />
-	<infoitem key="UD_rsItem" value="name:INP_DtInicInspecao;datatype:,name:Pos_Unidade;datatype:,name:INP_Responsavel;datatype:,name:Und_Descricao;datatype:,name:Pos_Inspecao;datatype:,name:Pos_NumGrupo;datatype:,name:Pos_NumItem;datatype:,name:Pos_DtUltAtu;datatype:,name:Itn_Descricao;datatype:,name:Grp_Descricao;datatype:,name:Pos_Situacao_Resp;datatype:" />
-	<infoitem key="UD_qInspetor" value="name:IPT_MatricInspetor;datatype:,name:Fun_Nome;datatype:" />
-</info>

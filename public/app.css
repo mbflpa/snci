@@ -11,5 +11,6 @@
 }
 
 .blue {
-    box-shadow: inset 0px 0px 4px rgba(0, 0, 255, 1 );
+    box-shadow: inset 0px 0px 4px hwb(240 1% 13% / 0.795);
+    background-color: #121212;
 }

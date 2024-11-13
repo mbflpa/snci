@@ -3,12 +3,118 @@
     <cffunction name="init">
         <cfreturn this>
     </cffunction>
-    
+    <!--- Este método retorna se item já está em uso --->
+    <cffunction  name="verificarUsoItem" access="remote" ReturnFormat="json" returntype="any">
+        <cfargument name="ano" required="true">
+        <cfargument name="grupo" required="true">
+        <cfargument name="itm" required="true">  
+        <cfargument name="modal" required="true"> 
+        <cftransaction>
+           <cfquery name="rsUsoItem" datasource="DBSNCI">
+                SELECT  top 1 RIP_NumInspecao
+                FROM Resultado_Inspecao
+                INNER JOIN Inspecao ON INP_NumInspecao = RIP_NumInspecao
+                WHERE RIP_Ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> and 
+                    RIP_NumGrupo = <cfqueryparam value="#grupo#" cfsqltype="cf_sql_integer"> and
+                    RIP_NumItem = <cfqueryparam value="#itm#" cfsqltype="cf_sql_integer"> and 
+                    INP_Modalidade = <cfqueryparam value="#modal#" cfsqltype="cf_sql_char">
+                    group by RIP_NumInspecao 
+          </cfquery>
+          <cfreturn rsUsoItem>
+        </cftransaction>
+    </cffunction>     
+    <!--- Este método retorna pontuação --->
+    <cffunction  name="pontuacao" access="remote" ReturnFormat="json" returntype="query">
+        <cfargument name="anogrupo" required="true">
+        <cftransaction>
+           <cfquery name="rspontuacao" datasource="DBSNCI">
+            SELECT PTC_Seq,PTC_Valor,trim(PTC_Descricao),PTC_Franquia 
+            FROM Pontuacao 
+            WHERE PTC_Ano = '#anogrupo#'
+          </cfquery>
+          <cfreturn rspontuacao>
+        </cftransaction>
+    </cffunction> 
+    <!--- Este método retornar dados para alteração de item  --->
+    <cffunction  name="alteraritens" access="remote" ReturnFormat="json" returntype="any">
+        <cfargument name="ano" required="true">
+        <cfargument name="grupo" required="true">
+        <cfargument name="itm" required="true">  
+        <cfargument name="modal" required="true">   
+           
+        <cftransaction>
+            <cfquery name="rsAlterarITM" datasource="DBSNCI">
+                SELECT Itn_TipoUnidade,Itn_Descricao,Itn_Manchete,Itn_ValorDeclarado,Itn_ValidacaoObrigatoria,Itn_Orientacao,Itn_Amostra,Itn_Norma,Itn_PreRelato,Itn_OrientacaoRelato,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcesso,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios,Itn_PTC_Seq
+                FROM Itens_Verificacao
+                WHERE Itn_Ano=<cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> AND 
+                Itn_Modalidade=<cfqueryparam value="#modal#" cfsqltype="cf_sql_char"> AND 
+                Itn_NumGrupo=<cfqueryparam value="#grupo#" cfsqltype="cf_sql_integer"> AND 
+                Itn_NumItem=<cfqueryparam value="#itm#" cfsqltype="cf_sql_integer">
+                ORDER BY Itn_NumGrupo,Itn_NumItem
+            </cfquery>
+            <cfreturn rsAlterarITM>
+        </cftransaction>
+    </cffunction>      
+    <!--- Este método retorna Modalidade --->
+    <cffunction  name="modalidade" access="remote" ReturnFormat="json" returntype="any">
+        <cfargument name="ano" required="true">
+        <cfargument name="grupo" required="true">
+        <cfargument name="itm" required="true">       
+        <cftransaction>
+            <cfquery name="rsModalidade" datasource="DBSNCI">
+                SELECT TUI_Modalidade,
+                CASE 
+                    WHEN TUI_Modalidade = 0 THEN 'Presencial'
+                    WHEN TUI_Modalidade = 1 THEN 'A Distância'
+                    ELSE 'Mista'
+                END as nome_modalidade
+                FROM Itens_Verificacao 
+                INNER JOIN TipoUnidade_ItemVerificacao ON TUI_GrupoItem = Itn_NumGrupo and 
+                TUI_ItemVerif = Itn_NumItem AND TUI_Ano = Itn_Ano
+                WHERE TUI_Ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> and 
+                Itn_NumGrupo = <cfqueryparam value="#grupo#" cfsqltype="cf_sql_integer"> and
+                Itn_NumItem = <cfqueryparam value="#itm#" cfsqltype="cf_sql_integer"> 
+                group by TUI_Modalidade
+                order by TUI_Modalidade
+            </cfquery>
+            <cfreturn rsModalidade>
+        </cftransaction>
+    </cffunction>     
+    <!--- Este método retorna itens --->
+    <cffunction  name="itensverificacao" access="remote" ReturnFormat="json" returntype="any">
+        <cfargument name="ano" required="true">
+        <cfargument name="grupo" required="true">
+        <cftransaction>
+           <cfquery name="rsitmverif" datasource="DBSNCI">
+            SELECT Itn_NumItem, trim(Itn_Descricao)
+            FROM Itens_Verificacao
+            WHERE Itn_Ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> and 
+            Itn_NumGrupo = <cfqueryparam value="#grupo#" cfsqltype="cf_sql_integer"> 
+            group by Itn_NumItem,Itn_Descricao
+            order by Itn_NumItem,Itn_Descricao
+          </cfquery>
+          <cfreturn rsitmverif>
+        </cftransaction>
+    </cffunction>  
+    <!--- Este método retorna grupos --->
+    <cffunction  name="gruposverificacao" access="remote" ReturnFormat="json" returntype="any">
+        <cfargument name="anogrupo" required="true">
+        <cftransaction>
+           <cfquery name="rsgrpverif" datasource="DBSNCI">
+                SELECT Grp_Codigo,trim(Grp_Descricao),Grp_Ano
+                FROM Grupos_Verificacao INNER JOIN Itens_Verificacao ON (Grp_Ano = Itn_Ano) AND (Grp_Codigo = Itn_NumGrupo)
+                GROUP BY Grp_Ano,Grp_Codigo, Grp_Descricao
+                HAVING Grp_Ano=<cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">
+                ORDER BY Grp_Codigo, Grp_Descricao
+          </cfquery>
+          <cfreturn rsgrpverif>
+        </cftransaction>
+    </cffunction>    
     <!--- Este método retorna classificacao do controle --->
     <cffunction  name="classifctrl" access="remote" ReturnFormat="json" returntype="any">
          <cftransaction>
             <cfquery name="rsClassCtrl" datasource="DBSNCI">
-                SELECT TPCT_ID, TPCT_DESCRICAO
+                SELECT TPCT_ID, trim(TPCT_DESCRICAO)
                 FROM UN_TIPOCONTROLETESTADO
                 ORDER BY TPCT_DESCRICAO
            </cfquery>
@@ -19,18 +125,28 @@
     <cffunction  name="categcontrole" access="remote" ReturnFormat="json" returntype="query">
         <cftransaction>
             <cfquery name="rscategcontrole" datasource="DBSNCI">
-                SELECT CTCT_ID, CTCT_DESCRICAO
+                SELECT CTCT_ID, trim(CTCT_DESCRICAO)
                 FROM UN_CATEGORIACONTROLE 
                 order by CTCT_DESCRICAO
             </cfquery>
           <cfreturn rscategcontrole> 
         </cftransaction>
-    </cffunction>    
+    </cffunction>   
+        <!--- Este método retorna categoria risco --->
+        <cffunction  name="categoriarisco" access="remote" ReturnFormat="json" returntype="query">
+            <cftransaction>
+                <cfquery name="rscategoriarisco" datasource="DBSNCI">
+                    SELECT CTRC_ID, trim(CTRC_DESCRICAO)
+                    FROM UN_CATEGORIARISCO
+                </cfquery>
+              <cfreturn rscategoriarisco> 
+            </cftransaction>
+        </cffunction>   
     <!--- Este método retorna risco identificado --->
     <cffunction  name="riscoidentificado" access="remote" ReturnFormat="json" returntype="query">
         <cftransaction>
             <cfquery name="rsRiscoID" datasource="DBSNCI">
-                SELECT RCID_ID, RCID_Descricao
+                SELECT RCID_ID, trim(RCID_Descricao)
                 FROM UN_RISCOIDENTIFICADO
                 order by RCID_Descricao
             </cfquery>
@@ -41,7 +157,7 @@
     <cffunction  name="macroprocesso" access="remote" ReturnFormat="json" returntype="query">
         <cftransaction>
             <cfquery name="rsMacroproc" datasource="DBSNCI">
-                SELECT MAPC_ID, MAPC_Descricao
+                SELECT MAPC_ID, trim(MAPC_Descricao)
                 FROM UN_MACROPROCESSO
                 ORDER BY MAPC_Descricao
             </cfquery>
@@ -52,7 +168,7 @@
     <cffunction  name="gestorprocesso" access="remote" ReturnFormat="json" returntype="query">
         <cftransaction>
             <cfquery name="rsgespro" datasource="DBSNCI">
-                SELECT DPGP_ID, DPGP_SIGLA
+                SELECT DPGP_ID, trim(DPGP_SIGLA)
                 FROM UN_GESTORPROCESSO_DEPARTAMENTO
                 order by DPGP_SIGLA
             </cfquery>
@@ -63,7 +179,7 @@
     <cffunction  name="objetivoestrategico" access="remote" ReturnFormat="json" returntype="query">
         <cftransaction>
             <cfquery name="rsobjestrat" datasource="DBSNCI">
-                SELECT OBES_ID, OBES_Descricao
+                SELECT OBES_ID, trim(OBES_Descricao)
                 FROM UN_OBJETIVOESTRATEGICO
                 order by OBES_Descricao
             </cfquery>
@@ -74,7 +190,7 @@
     <cffunction  name="riscoestrategico" access="remote" ReturnFormat="json" returntype="query">
         <cftransaction>
             <cfquery name="rsRiscoID" datasource="DBSNCI">
-                SELECT RCES_ID, RCES_Descricao
+                SELECT RCES_ID, trim(RCES_Descricao)
                 FROM UN_RISCOESTRATEGICO
                 order by RCES_Descricao
             </cfquery>
@@ -85,7 +201,7 @@
     <cffunction  name="indicadorestrategico" access="remote" ReturnFormat="json" returntype="query">
         <cftransaction>
             <cfquery name="rsindestrat" datasource="DBSNCI">
-                SELECT IDES_ID, IDES_Descricao 
+                SELECT IDES_ID, trim(IDES_Descricao) 
                 FROM UN_INDICADORESTRATEGICO
                 order by IDES_Descricao
             </cfquery>
@@ -96,7 +212,7 @@
     <cffunction  name="componentecoso" access="remote" ReturnFormat="json" returntype="query">
         <cftransaction>
             <cfquery name="rscomponentecoso" datasource="DBSNCI">
-                SELECT CPCS_ID, CPCS_DESCRICAO 
+                SELECT CPCS_ID, trim(CPCS_DESCRICAO)
                 FROM UN_COMPONENTECOSO
                 order by CPCS_DESCRICAO
             </cfquery>
@@ -108,7 +224,7 @@
         <cfargument name="PRCSCPCSID" required="true">
         <cftransaction>
             <cfquery name="rsprincipioscoso" datasource="DBSNCI">
-                SELECT PRCS_ID, PRCS_Descricao
+                SELECT PRCS_ID, trim(PRCS_Descricao)
                 FROM UN_PRINCIPIOCOSO
                 WHERE PRCS_CPCS_ID= <cfqueryparam value="#PRCSCPCSID#" cfsqltype="cf_sql_integer">
             </cfquery>
@@ -120,7 +236,7 @@
         <cfargument name="PCN1MAPCID" required="true">
         <cftransaction>
             <cfquery name="rsproc01" datasource="DBSNCI">
-                SELECT PCN1_ID, PCN1_Descricao
+                SELECT PCN1_ID, trim(PCN1_Descricao)
                 FROM UN_PROCESSON1
                 WHERE PCN1_MAPC_ID= <cfqueryparam value="#PCN1MAPCID#" cfsqltype="cf_sql_integer">
             </cfquery>
@@ -133,7 +249,7 @@
         <cfargument name="PCN1ID" required="true">
         <cftransaction>
             <cfquery name="rsproc02" datasource="DBSNCI">
-                SELECT PCN2_ID, PCN2_Descricao
+                SELECT PCN2_ID, trim(PCN2_Descricao)
                 FROM UN_PROCESSON2
                 WHERE 
                 PCN2_PCN1_MAPC_ID=<cfqueryparam value="#PCN1MAPCID#" cfsqltype="cf_sql_integer"> AND 
@@ -149,7 +265,7 @@
         <cfargument name="PCN3PCN2ID" required="true">
         <cftransaction>
             <cfquery name="rsproc03" datasource="DBSNCI">
-            SELECT PCN3_ID, PCN3_Descricao
+            SELECT PCN3_ID, trim(PCN3_Descricao)
             FROM UN_PROCESSON3
             WHERE 
             PCN3_PCN2_PCN1_MAPC_ID=<cfqueryparam value="#PCN3PCN2PCN1MAPCID#" cfsqltype="cf_sql_integer"> AND 

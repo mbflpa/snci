@@ -722,7 +722,7 @@
 														<div class="btn-group w-30">
 															<span id="relatorios" class="btn btn-success col fileinput-button" style="background:##0083CA">
 																<i class="fas fa-upload"></i>
-																<span style="margin-left:5px">Clique aqui para anexar o Relatório do Processo e Anexos I, II e III em PDF</span>
+																<span style="margin-left:5px">Clique aqui para anexar o Relatório do Processo e Anexos I, II e III em PDF (1° passo)</span>
 															</span>																	
 														</div>
 													</div>
@@ -774,7 +774,7 @@
 					<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
 						<a  id="btnCadastroItem" class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
 							<button  type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-							</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (1° Passo)</span>
+							</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (2° Passo)</span>
 						</a>
 					</div>
 
@@ -2725,11 +2725,9 @@
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
 							
 								
-								<li class="nav-item" style="">
-									<a  class="nav-link active" id="custom-tabs-one-2passo-tab"  data-toggle="pill" href="#custom-tabs-one-2passo" role="tab" aria-controls="custom-tabs-one-2passo" aria-selected="true"><cfif '#arguments.passoapasso#' eq "true">2° Passo - Relatório do Item<cfelse>Relatório do Item</cfif></a>
-								</li>
+								
 								<li class="nav-item">
-									<a  class="nav-link " id="custom-tabs-one-3passo-tab"  data-toggle="pill" href="#custom-tabs-one-3passo" role="tab" aria-controls="custom-tabs-one-3passo" aria-selected="true"><cfif '#arguments.passoapasso#' eq "true">3° Passo - Anexos<cfelse>Anexos</cfif></a>
+									<a  class="nav-link active" id="custom-tabs-one-3passo-tab"  data-toggle="pill" href="#custom-tabs-one-3passo" role="tab" aria-controls="custom-tabs-one-3passo" aria-selected="true"><cfif '#arguments.passoapasso#' eq "true">3° Passo - Anexos<cfelse>Anexos</cfif></a>
 								</li>
 								
 								<li class="nav-item">
@@ -2747,64 +2745,7 @@
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 								
 							
-								<div disable class="tab-pane fade active show" id="custom-tabs-one-2passo"  role="tabpanel" aria-labelledby="custom-tabs-one-2passo-tab" >
-									
-									
-										<cfif (#rsProcAval.pc_modalidade# eq 'A' or #rsProcAval.pc_modalidade# eq 'E')>
-											<div class="row">
-												<div class="col-md-12">
-													<div class="card card-default">
-														
-														<div class="card-body">
-															<div id="actions" class="row" >
-																<div class="col-lg-12" align="center">
-																	<div class="btn-group w-30">
-																		<span id="avaliacoes" class="btn btn-success col fileinput-button" style="background:#0083CA">
-																			<i class="fas fa-upload"></i>
-																			<span style="margin-left:5px">Clique aqui para anexar o Relatório em PDF, exclusivo deste item (caso exista)</span>
-																		</span>																	
-																	</div>
-																</div>
-															</div>
-															
-															<div class="table table-striped files" id="previews">
-															<div id="template" class="row mt-2">
-																<div class="col-auto">
-																	<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
-																</div>
-																<div class="col d-flex align-items-center">
-																	<p class="mb-0">
-																	<span class="lead" data-dz-name></span>
-																	(<span data-dz-size></span>)
-																	</p>
-																	<strong class="error text-danger" data-dz-errormessage></strong>
-																</div>
-																<div class="col-4 d-flex align-items-center" >
-																	<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
-																		<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
-																	</div>
-																</div>
-																
-															</div>
-														</div>
-
-														
-													</div>
-													
-													</div>
-													<!-- /.card -->
-												</div>
-											</div>
-										</cfif>
-								
-
-									<div id="anexoAvaliacaoDiv"></div>
-
-									
-
-								</div>
-
-								<div class="tab-pane fade " id="custom-tabs-one-3passo" role="tabpanel" aria-labelledby="custom-tabs-one-3passo-tab">
+								<div class="tab-pane fade active show" id="custom-tabs-one-3passo" role="tabpanel" aria-labelledby="custom-tabs-one-3passo-tab">
 									
 									
 									<div id="actions2" class="row" >
@@ -2921,7 +2862,7 @@
 
 							
 			$(document).ready(function() {
-				
+				$("#accordionCadMelhoria").attr("hidden", false);
 
 				//INICIALIZA O POPOVER NOS ÍCONES
 				$(function () {
@@ -2957,15 +2898,8 @@
 
 				
 				
-
-				mostraRelatoPDF();
-				$('#custom-tabs-one-2passo-tab').click(function(){
-					$('#tabAnexosDiv').html('')
-					$('#tabOrientacoesDiv').html('')
-					$('#tabMelhoriasDiv').html('')
-					$('#pendenciasDiv').html('')
-					mostraRelatoPDF();
-				});	
+				mostraTabAnexos();
+					
 				$('#custom-tabs-one-3passo-tab').click(function(){
 					$('#anexoAvaliacaoDiv').html('')
 					$('#tabOrientacoesDiv').html('')
@@ -2979,6 +2913,7 @@
 					$('#tabMelhoriasDiv').html('')
 					$('#pendenciasDiv').html('')
 					$('#formAvalOrientacaoCadastroDiv').html('')
+					mostraFormAvalOrientacaoCadastro();
 					mostratabOrientacoes();
 					
 				});
@@ -2987,7 +2922,7 @@
 					$('#tabAnexosDiv').html('')
 					$('#tabOrientacoesDiv').html('')
 					$('#pendenciasDiv').html('')
-					//mostraFormAvalMelhoriaCadastro();
+					mostraFormAvalMelhoriaCadastro();
 					mostraTabMelhorias();
 				});
 				$('#custom-tabs-one-6passo-tab').click(function(){
@@ -3001,70 +2936,6 @@
 				<cfoutput>
 					let modalidade = '#rsProcAval.pc_modalidade#'
 				</cfoutput>
-
-				if(modalidade ==='A' || modalidade ==='E'){
-					// DropzoneJS Demo Code Start
-					Dropzone.autoDiscover = false
-
-					// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-					var previewNode = document.querySelector("#template")
-					//previewNode.id = ""
-					var previewTemplate ='';
-					if (previewNode !== null) {
-						var previewTemplate = previewNode.parentNode.innerHTML
-						previewNode.parentNode.removeChild(previewNode)
-				
-						var myDropzone = new Dropzone("div#custom-tabs-one-2passo", { // Make the whole body a dropzone
-							url: "cfc/pc_cfcAvaliacoes.cfc?method=uploadArquivos", // Set the url
-							autoProcessQueue :true,
-							maxFiles: 1,
-							maxFilesize:20,
-							thumbnailWidth: 80,
-							thumbnailHeight: 80,
-							parallelUploads: 1,
-							acceptedFiles: '.pdf',
-							previewTemplate: previewTemplate,
-							autoQueue: true, // Make sure the files aren't queued until manually added
-							previewsContainer: "#previews", // Define the container to display the previews
-							clickable: "#avaliacoes", // Define the element that should be used as click trigger to select files.
-							headers: { "pc_aval_id":pc_aval_id, 
-									"pc_aval_processo":pc_aval_processo, 
-									"pc_anexo_avaliacaoPDF":"S",
-									"arquivoParaTodosOsItens":"N"},//informar "S" se o arquivo deve ser exibido em todos os itens do processo
-							init: function() {
-								this.on('error', function(file, errorMessage) {	
-									toastr.error(errorMessage);
-									return false;
-								});
-							}
-						})
-					
-						// Update the total progress bar
-						myDropzone.on("totaluploadprogress", function(progress) {
-							document.querySelector(".progress-bar").style.width = progress + "%"
-						})
-
-						myDropzone.on("sending", function(file) {
-							$('#modalOverlay').modal('show')
-						})
-
-
-
-						// Hide the total progress bar when nothing's uploading anymore
-						myDropzone.on("queuecomplete", function(progress) {
-							//toastr.success("Arquivo(s) enviado(s) com sucesso!")
-							myDropzone.removeAllFiles(true);
-							mostraRelatoPDF();
-
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-						})
-					}
-					
-					// DropzoneJS 1 Demo Code End
-				}
-
 
 				// DropzoneJS 2 Demo Code Start
 				Dropzone.autoDiscover = false
@@ -3275,7 +3146,7 @@
 					})//fim ajax
 					.done(function(result) {
 						$('#formAvalOrientacaoCadastroDiv').html(result)
-						$("#accordionCadOrientacao").attr("hidden", true); 
+						//$("#accordionCadOrientacao").attr("hidden", true); 
 						//move o scroll ate o id tabOrientacoesDiv
 						$('html, body').animate({ scrollTop: ($('#tabOrientacoesDiv').offset().top)} , 500);
 					})//fim done
@@ -3308,7 +3179,7 @@
 					})//fim ajax
 					.done(function(result) {
 						$('#formAvalMelhoriaCadastroDiv').html(result)
-						$("#accordionCadMelhoria").attr("hidden", true); 
+						//$("#accordionCadMelhoria").attr("hidden", true); 
 						//move o scroll ate o id tabMelhoriasDiv
 						$('html, body').animate({ scrollTop: ($('#tabMelhoriasDiv').offset().top)} , 500);
 					})//fim done
@@ -3388,39 +3259,7 @@
 				}, 1000);
 			}
 
-			function mostraRelatoPDF(){
-				$('#modalOverlay').modal('show')
-				setTimeout(function() {
-					//mostraPendencias()
-					$.ajax({
-						type: "post",
-						url:"cfc/pc_cfcAvaliacoes.cfc",
-						data:{
-							method: "anexoAvaliacao",
-							pc_aval_id: pc_aval_id,
-							ehEdicao: 'S'
-						},
-						async: false
-					})//fim ajax
-					.done(function(result){
-						
-						$('#anexoAvaliacaoDiv').html(result)
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-					})//fim done
-					.fail(function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-						$('#modal-danger').modal('show')
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-						$('#modal-danger').find('.modal-body').text(thrownError)
-
-					})//fim fail
-				}, 1000);
-			}
-
+			
 			function mostraPendencias(){
 				$('#modalOverlay').modal('show')
 				setTimeout(function() {
@@ -3683,7 +3522,7 @@
 					validateButtonGroupsOrientacao();	
 
 					
-					$("#accordionCadOrientacao").attr("hidden", false); 
+					//$("#accordionCadOrientacao").attr("hidden", false); 
 					$('#cabecalhoAccordionCadOrientacao').text("Editar Medida/Orientação para Regularização ID:" + ' ' + pc_aval_orientacao_id);
 					$('#infoTipoCadOrientacao').text("Editando Medida/Orientação para Regularização ID:" + ' ' + pc_aval_orientacao_id);
 
@@ -4020,7 +3859,7 @@
 					}
 					validateButtonGroupsMelhoria();	
 
-					$("#accordionCadMelhoria").attr("hidden", false); 
+					//$("#accordionCadMelhoria").attr("hidden", false); 
 					$('#cabecalhoAccordionCadMelhoria').text("Editar Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
 					$('#infoTipoCadMelhoria').text("Editando Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
 					
@@ -4412,7 +4251,7 @@
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
-									url: "cfc/pc_cfcAvaliacoes.cfc",
+									url: "cfc/pc_cfcProcessos_editar.cfc",
 									data:{
 										method: "cadOrientacoes",
 										pc_aval_id: pc_aval_id,
@@ -5116,7 +4955,7 @@
 					event.stopPropagation();
 					$('#modalOverlay').modal('show')
 					setTimeout(function() {
-						$('#formAvalMelhoriaCadastroDiv').html('');
+						mostraFormAvalMelhoriaCadastro();
 						$('#modalOverlay').delay(1000).hide(0, function() {
 							$('#modalOverlay').modal('hide');
 						});
@@ -5173,6 +5012,178 @@
 
 
 	</cffunction>
+
+
+
+
+
+
+
+	<cffunction name="cadOrientacoes"   access="remote"  returntype="any" hint="cadastra/edita orientacao">
+		
+		<cfargument name="pc_aval_id" type="numeric" required="true"/>
+		<cfargument name="pc_aval_orientacao_descricao" type="string" required="true"/>
+		<cfargument name="pc_aval_orientacao_mcu_orgaoResp" type="string" required="true"/>
+		<cfargument name="pc_aval_orientacao_id" type="string" required="false" default=""/>
+		<cfargument name="pc_aval_orientacao_categoriaControle_id" type="string" required="true"/>
+		<cfargument name="pc_aval_orientacao_beneficioNaoFinanceiro" type="string" required="true"/>
+		<cfargument name="pc_aval_orientacao_beneficioFinanceiro" type="string" required="true"/>
+		<cfargument name="pc_aval_orientacao_custoFinanceiro" type="string" required="true"/>
+		<!--Adiciona 30 dias úteis à data atual para gerar a data prevista para resposta que constara np texto do manifestação-->
+		<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio">
+		<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias = 30 />
+		<cfset dataPTBR = obterDataPrevista.Data_Prevista_Formatada>
+		<cfset dataCFQUERY = "#DateFormat(obterDataPrevista.Data_Prevista,'YYYY-MM-DD')#">
+		<!--Se pc_aval_orientacao_id igual a '' significa que é um cadastro de orientação-->
+		<!--Se for um cadastro de orientação-->
+		<cfif #arguments.pc_aval_orientacao_id# eq ''>
+			<cfquery datasource="#application.dsn_processos#" name="rsProcesso">
+				SELECT pc_num_status,pc_modalidade FROM   pc_processos
+				INNER JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
+				WHERE  pc_aval_id = #arguments.pc_aval_id#
+			</cfquery>
+				
+
+			<!--Se o processo for da modalidade ACOMPANHAMENTO-->
+			<cfif rsProcesso.pc_modalidade eq 'A' >
+				<!--Se o processo estiver bloqueado-->
+				<cfif rsProcesso.pc_num_status eq 6>
+					<cfquery datasource="#application.dsn_processos#" name="qCadastraOrientacao">
+						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login, pc_aval_orientacao_beneficioNaoFinanceiro, pc_aval_orientacao_beneficioFinanceiro, pc_aval_orientacao_custoFinanceiro)
+						VALUES (	14
+									,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+									,'#application.rsUsuarioParametros.pc_usu_login#'
+									,<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_descricao#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
+									,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+									,'#application.rsUsuarioParametros.pc_usu_login#'
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioNaoFinanceiro#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioFinanceiro#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_custoFinanceiro#">
+								)
+						SELECT SCOPE_IDENTITY() AS NewID;
+					</cfquery>
+					<cfset IDdaOriencaoCadastrada = qCadastraOrientacao.NewID>
+					<cfset posicaoInicial = "Processo BLOQUEADO.<br>Este relatório aguarda a finalização de análises complementares do controle interno e/ou outros órgãos da empresa para liberação ao ÓRGÃO AVALIADO. Favor aguardar.">
+					<cfset orgaoResp = ''>
+					<cfset posic_status = 14>
+					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status,  pc_aval_posic_enviado)
+						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#, 1)
+					</cfquery>
+				<cfelse>
+					<!--Se o processo não estiver bloqueado, a orientação ficará pendente de posicionamento inicial do controle interno-->
+					<cfquery datasource="#application.dsn_processos#" >
+						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login, pc_aval_orientacao_beneficioNaoFinanceiro, pc_aval_orientacao_beneficioFinanceiro, pc_aval_orientacao_custoFinanceiro)
+						VALUES (	1
+									,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+									,'#application.rsUsuarioParametros.pc_usu_login#'
+									,<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_descricao#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
+									,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+									,'#application.rsUsuarioParametros.pc_usu_login#'
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioNaoFinanceiro#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioFinanceiro#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_custoFinanceiro#">
+								)
+					</cfquery>
+				</cfif>
+			<cfelse>
+				<!--Se o processo for da modalidade ENTREGA DO RELATÓRIO-->
+				<!--Se o processo estiver bloqueado-->
+				<cfif rsProcesso.pc_num_status eq 6>
+					<cfquery datasource="#application.dsn_processos#"  name="qCadastraOrientacao">
+						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login, pc_aval_orientacao_beneficioNaoFinanceiro, pc_aval_orientacao_beneficioFinanceiro, pc_aval_orientacao_custoFinanceiro)
+						VALUES (	14
+									,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+									,'#application.rsUsuarioParametros.pc_usu_login#'
+									,<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_descricao#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
+									,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+									,'#application.rsUsuarioParametros.pc_usu_login#'
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioNaoFinanceiro#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioFinanceiro#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_custoFinanceiro#">
+								)
+						SELECT SCOPE_IDENTITY() AS NewID;
+					</cfquery>
+					<cfset IDdaOriencaoCadastrada = qCadastraOrientacao.NewID>
+					<cfset posicaoInicial = "Processo BLOQUEADO.<br>Este relatório aguarda a finalização de análises complementares do controle interno e/ou outros órgãos da empresa para liberação ao ÓRGÃO AVALIADO. Favor aguardar.">
+					<cfset orgaoResp = ''>
+					<cfset posic_status = 14>
+					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
+						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#, 1)
+					</cfquery>
+				<cfelse>
+					<cfquery datasource="#application.dsn_processos#"  name="qCadastraOrientacao">
+						INSERT pc_avaliacao_orientacoes(pc_aval_orientacao_status, pc_aval_orientacao_status_datahora,pc_aval_orientacao_atualiz_login,pc_aval_orientacao_num_aval, pc_aval_orientacao_descricao, pc_aval_orientacao_mcu_orgaoResp, pc_aval_orientacao_datahora, pc_aval_orientacao_login, pc_aval_orientacao_beneficioNaoFinanceiro, pc_aval_orientacao_beneficioFinanceiro, pc_aval_orientacao_custoFinanceiro,pc_aval_orientacao_dataPrevistaResp)
+						VALUES (	4
+									,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+									,'#application.rsUsuarioParametros.pc_usu_login#'
+									,<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_id#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_descricao#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
+									,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+									,'#application.rsUsuarioParametros.pc_usu_login#'
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioNaoFinanceiro#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioFinanceiro#">
+									,<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_custoFinanceiro#">
+									,'#dataCFQUERY#'
+								)
+						SELECT SCOPE_IDENTITY() AS NewID;
+					</cfquery>
+					<cfset IDdaOriencaoCadastrada = qCadastraOrientacao.NewID>
+					<cfset posicaoInicial = "Para registro de sua manifestação orienta-se a atentar para as “Orientações/Medidas de Regularização” emitidas pela equipe de Controle Interno, bem como anexar no sistema SNCI as evidências de implementação das ações adotadas. Também solicita-se sua manifestação para as 'Propostas de Melhoria' conforme opções disponíveis no sistema.">
+					<cfset orgaoResp = '#arguments.pc_aval_orientacao_mcu_orgaoResp#'>
+					<cfset posic_status = 4>
+					<!--Insere a manifestação inicial do controle interno para a orientação com prazo de 30 dias como data prevista para resposta -->
+					<cfquery datasource="#application.dsn_processos#">
+						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
+						VALUES (#IDdaOriencaoCadastrada#, '#posicaoInicial#',<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataCFQUERY#',#posic_status#, 1)
+					</cfquery>
+				</cfif>
+			</cfif>
+			<!-- cadastra orientacao x categorias de controles-->
+			<cfloop list="#arguments.pc_aval_orientacao_categoriaControle_id#" index="i"> 
+				<cfquery datasource="#application.dsn_processos#">
+					INSERT INTO pc_avaliacao_orientacao_categoriasControles (pc_aval_orientacao_id, pc_aval_categoriaControle_id)
+					VALUES ('#qCadastraOrientacao.NewID#', '#i#')
+				</cfquery>
+			</cfloop>
+		<!--Se for edição de uma orientação-->		
+		<cfelse>
+			<cfquery datasource="#application.dsn_processos#" >
+				UPDATE pc_avaliacao_orientacoes
+				SET    pc_aval_orientacao_descricao = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_descricao#">,
+					pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">,
+					pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#',
+					pc_aval_orientacao_beneficioNaoFinanceiro = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioNaoFinanceiro#">,
+					pc_aval_orientacao_beneficioFinanceiro = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_beneficioFinanceiro#">,
+					pc_aval_orientacao_custoFinanceiro = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_custoFinanceiro#">
+				WHERE  pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+			</cfquery>	
+			<!-- exclui orientacao x categorias de controles-->
+			<cfquery datasource="#application.dsn_processos#">
+				DELETE FROM pc_avaliacao_orientacao_categoriasControles
+				WHERE pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+			</cfquery>
+			<!-- cadastra orientacao x categorias de controles-->
+			<cfloop list="#arguments.pc_aval_orientacao_categoriaControle_id#" index="i"> 
+				<cfquery datasource="#application.dsn_processos#">
+					INSERT INTO pc_avaliacao_orientacao_categoriasControles (pc_aval_orientacao_id, pc_aval_categoriaControle_id)
+					VALUES ('#arguments.pc_aval_orientacao_id#', '#i#')
+				</cfquery>
+			</cfloop>	
+		</cfif>
+
+		
+  	</cffunction>
 
 	
 

@@ -43,7 +43,7 @@
 	<cfquery name="qAnosCadAtivarDesativar" datasource="#dsn_inspecao#">
 		SELECT DISTINCT TUI_Ano FROM TipoUnidade_ItemVerificacao 
 		 <cfif '#form.selAtivar#' eq 0>WHERE TUI_Ativo = 1 <cfelseif '#form.selAtivar#' eq 1>WHERE TUI_Ativo = 0 <cfelse>WHERE TUI_Ativo = null</cfif>
-		ORDER BY TUI_Ano asc
+		ORDER BY TUI_Ano desc
 	</cfquery>
 	
 	<cfquery name="qTipoUnidadesAtivarDesativar" datasource="#dsn_inspecao#">
@@ -326,13 +326,14 @@
 					<form id="formAtivarDesativar" nome="formAtivarDesativar" enctype="multipart/form-data" method="post" >
 						
 						 <input type="hidden" value="" id="acao" name="acao">
-						
-						<div align="left" style="float:left;border:1px solid #fff; width:55%;padding:20px;"> 
-							
+						 <div align="left" style="float: left;padding:20px;border:1px solid: #036">
+							<div align="left">
+								<span class="tituloDivConsulta" >Ativar Itens / PLANO DE TESTE</span>
+							</div>							
 
-							<div style="margin-bottom:10px;">
-								<label  for="selAtivar" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">ATIVAR/DESATIVAR:</label>
-								<select name="selAtivar" id="selAtivar" class="form" onChange="aguarde(); setTimeout('javascript:formAtivarDesativar.submit();',2000)" style="margin-left:20px;display:inline-block;">			
+							<div style="color:#036;margin-bottom:10px;">
+								<label  for="selAtivar" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>ATIVAR/DESATIVAR:</strong></label>
+								<select name="selAtivar" id="selAtivar" class="form" onChange="aguarde(); setTimeout('javascript:formAtivarDesativar.submit();',2000)">			
 									<option selected="selected" value=""></option>
 									<option <cfif '#form.selAtivar#' eq '1'>selected</cfif> value="1">ATIVAR</option>
 									<option <cfif '#form.selAtivar#' eq '0'>selected</cfif>  value="0">DESATIVAR</option>
@@ -340,7 +341,7 @@
 							</div>
 
 							<div style="margin-bottom:10px;">
-								<label  for="selAnoGrupoItem" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">ANO:</label>	
+								<label  for="selAnoGrupoItem" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>ANO:</strong></label>	
 								<select name="selAnoGrupoItem" id="selAnoGrupoItem" class="form" onChange="aguarde(); setTimeout('javascript:formAtivarDesativar.submit();',2000)" style="margin-left:105px;display:inline-block;">
 									
 										<option selected="selected" value=""></option>
@@ -353,7 +354,7 @@
 
 						
 							<div style="margin-bottom:10px;">
-								<label  for="selTipoUnidadeGrupoItem" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">TIPO UNIDADE:</label>
+								<label  for="selTipoUnidadeGrupoItem" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"><strong>TIPO UNIDADE:</strong></label>
 								<select name="selTipoUnidadeGrupoItem" id="selTipoUnidadeGrupoItem" class="form" onChange="aguarde(); setTimeout('javascript:formAtivarDesativar.submit();',2000)"  
 								        style="margin-left:47px;display:inline-block;">			
 									<option selected="selected" value=""></option>
@@ -369,7 +370,7 @@
 							</div>
 
 							<div style="margin-bottom:10px;">
-								<label  for="selModalidadeGrupoItem" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">MODALIDADE:</label>
+								<label  for="selModalidadeGrupoItem" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px"></strong>MODALIDADE:</strong></label>
 								<select name="selModalidadeGrupoItem" id="selModalidadeGrupoItem" class="form" onChange="aguarde(); setTimeout('javascript:formAtivarDesativar.submit();',2000)" style="margin-left:55px;display:inline-block;">			
 									<option selected="selected" value=""></option>
 									<cfif qModalidadeGrupoItem.recordcount neq 0>
@@ -386,8 +387,8 @@
 							</div>
 
 							<div style="margin-bottom:10px;">
-								<label  for="selGrupo" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-								GRUPO:</label>
+								<label  for="selGrupo" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
+								<strong>GRUPO:</strong></label>
 								<select name="selGrupo" id="selGrupo" class="form" onChange="aguarde(); setTimeout('javascript:formAtivarDesativar.submit();',2000)" style="margin-left:88px;width:280px">			
 									<option selected="selected" value="todos">TODOS</option>
 									
@@ -400,8 +401,8 @@
 							</div>
 
 							<div style="margin-bottom:20px;">
-								<label  for="selItem" style="color:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-								ITEM:</label>
+								<label  for="selItem" style="color:#036;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
+								<strong>ITEM:</strong></label>
 								<select name="selItem" id="selItem" class="form" onChange="aguarde(); setTimeout('javascript:formAtivarDesativar.submit();',2000)" style="margin-left:101px;width:280px">			
 									<option selected="selected" value="todos">TODOS</option>
 									<cfif qItensCadAtivarDesativar.recordcount neq 0>
@@ -421,8 +422,9 @@
 							</cfif>
 
 							<div align="center">     									
-								<a type="button" onClick="return valida_formAtivarDesativar();" href="#" class="botaoCad" style="background:blue;color:#fff;font-size:12px;"><cfif #form.selAtivar# eq 0>Desativar<cfelseif #form.selAtivar# eq 1>Ativar<cfelse>Ativar/Desativar</cfif></a>     
-							 	<a type="button" onClick="javascript:if(confirm('Deseja cancelar esta Ativação/Desativação?\n\nObs: Esta ação não cancela as Ativações/Desativações já confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="botaoCad" style="margin-left:150px;background:red;color:#fff;font-size:12px;">
+								<a type="button" onClick="return valida_formAtivarDesativar();" href="#" class="btn btn-primary">
+									<cfif #form.selAtivar# eq 0>Desativar<cfelseif #form.selAtivar# eq 1>Ativar<cfelse>Ativar/Desativar</cfif></a>     
+							 	<a type="button" onClick="javascript:if(confirm('Deseja cancelar esta Ativação/Desativação?\n\nObs: Esta ação não cancela as Ativações/Desativações já confirmadas.\n\nCaso afirmativo, clique em OK.')){window.open('cadastroGruposItens.cfm','_self')}" href="#" class="btn btn-danger">
                                     Cancelar</a>
 							</div>  
 						</div>

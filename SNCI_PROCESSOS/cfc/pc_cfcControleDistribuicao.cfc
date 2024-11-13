@@ -13,7 +13,12 @@
 						, pc_processos.pc_num_orgao_origem as orgaoOrigem
 						, pc_orgaos_4.pc_org_sigla as orgaoAvaliado
 						, pc_orgaos_5.pc_org_sigla as orgaoOrigemSigla
-
+						, CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						) as tipoProcesso
 
 			FROM        pc_processos 
 						LEFT JOIN pc_orgaos ON  pc_orgaos.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
@@ -129,11 +134,20 @@
 													<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#, '#pc_processo_id#')">#sei#</td>
 													<td align="center" onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#, '#pc_processo_id#')">#pc_num_rel_sei#</td>
 													
-													<cfif pc_num_avaliacao_tipo neq 2>
-														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#, '#pc_processo_id#')">#pc_aval_tipo_descricao#</td>
+													
+
+													<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
+														<cfif pc_aval_tipo_descricao neq ''>
+															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#, '#pc_processo_id#')">#pc_aval_tipo_descricao#</td>
+														<cfelse>
+															<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#, '#pc_processo_id#')">#tipoProcesso#</td>
+														</cfif>
 													<cfelse>
 														<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#, '#pc_processo_id#')">#pc_aval_tipo_nao_aplica_descricao#</td>
 													</cfif>
+
+
+
 													<td onclick="javascript:mostrainfItensOrientacoesDistribuidas(#pc_aval_id#, #pc_aval_orientacao_id#, '#pc_processo_id#')">#DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy")# - #TimeFormat(pc_aval_orientacao_status_datahora,"HH:mm")#</td>	
 													
 													<td>#orgaoOrigemSigla#</td>	
