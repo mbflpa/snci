@@ -7464,40 +7464,40 @@
 
 
 	<cffunction name="getAvaliacaoTipos" access="remote" returntype="any" returnformat="json" output="false">
-        
-        <cfquery name="qAvaliacaoTipos" datasource="#application.dsn_processos#">
-            SELECT 
-                pc_aval_tipo_id, 
-                pc_aval_tipo_macroprocessos, 
-                pc_aval_tipo_processoN1, 
-                pc_aval_tipo_processoN2, 
-                pc_aval_tipo_processoN3
-            FROM 
-                pc_avaliacao_tipos
-            WHERE
-                pc_aval_tipo_status = 'A' 
-        </cfquery>
-        
-        <cfset var data = ArrayNew(1) />
-		<cfloop query="qAvaliacaoTipos">
-			<cfset var tipos = StructNew() />
-			<cfset tipos.id = qAvaliacaoTipos.pc_aval_tipo_id />
-			<cfset tipos.macroprocessos = qAvaliacaoTipos.pc_aval_tipo_macroprocessos />
-			<cfset tipos.processo_n1 = qAvaliacaoTipos.pc_aval_tipo_processoN1 />
-			<cfset tipos.processo_n2 = qAvaliacaoTipos.pc_aval_tipo_processoN2 />
-			<cfset tipos.processo_n3 = qAvaliacaoTipos.pc_aval_tipo_processoN3 />
-			
-			<cfset ArrayAppend(data, tipos) />
-		</cfloop>
-
-        
-        
-        
-        <cfreturn data/>
-    </cffunction>
-
-    <cffunction name="getAvaliacaoCoso" access="remote" returntype="any" returnformat="json" output="false">
+	    <cfset data = []>
+        <cfset tipo = {}>
+		<cfquery name="qAvaliacaoTipos" datasource="#application.dsn_processos#">
+			SELECT 
+				pc_aval_tipo_id, 
+				pc_aval_tipo_macroprocessos, 
+				pc_aval_tipo_processoN1, 
+				pc_aval_tipo_processoN2, 
+				pc_aval_tipo_processoN3
+			FROM 
+				pc_avaliacao_tipos
+			WHERE
+				pc_aval_tipo_status = 'A' 
+		</cfquery>
 		
+		
+		<cfloop query="qAvaliacaoTipos">
+			<cfset tipo = {}>
+			<cfset tipo.id = qAvaliacaoTipos.pc_aval_tipo_id>
+			<cfset tipo.macroprocessos = qAvaliacaoTipos.pc_aval_tipo_macroprocessos>
+			<cfset tipo.processo_n1 = qAvaliacaoTipos.pc_aval_tipo_processoN1>
+			<cfset tipo.processo_n2 = qAvaliacaoTipos.pc_aval_tipo_processoN2>
+			<cfset tipo.processo_n3 = qAvaliacaoTipos.pc_aval_tipo_processoN3>
+			
+			<cfset ArrayAppend(data, tipo)>
+		</cfloop>
+		
+		<cfreturn data>
+	</cffunction>
+
+
+	<cffunction name="getAvaliacaoCoso" access="remote" returntype="any" returnformat="json" output="false">
+		<cfset data = []>
+		<cfset coso = {}>
 		<cfquery name="qAvaliacaoCoso" datasource="#application.dsn_processos#">
 			SELECT 
 				pc_aval_coso_id, 
@@ -7509,40 +7509,32 @@
 				pc_aval_cosoStatus = 'A' 
 		</cfquery>
 		
-		<cfset var data = ArrayNew(1) />
+		
+		
 		<cfloop query="qAvaliacaoCoso">
-			<cfset var coso = StructNew() />
-			<cfset coso.id = qAvaliacaoCoso.pc_aval_coso_id />
-			<cfset coso.componente = qAvaliacaoCoso.pc_aval_cosoComponente />
-			<cfset coso.principio = qAvaliacaoCoso.pc_aval_cosoPrincipio />
+			<cfset coso = {}>
+			<cfset coso.id = qAvaliacaoCoso.pc_aval_coso_id>
+			<cfset coso.componente = qAvaliacaoCoso.pc_aval_cosoComponente>
+			<cfset coso.principio = qAvaliacaoCoso.pc_aval_cosoPrincipio>
 			
-			<cfset ArrayAppend(data, coso) />
+			<cfset ArrayAppend(data, coso)>
 		</cfloop>
-
 		
-		
-		
-		<cfreturn data/>
+		<cfreturn data>
 	</cffunction>
+
 
 	<cffunction name="getAvaliacaoDadosParaEdicao" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="pc_aval_id" type="numeric" required="true" />
-		
+		<cfset data = []>
+		<cfset avaliacao = {}>
 		<cfquery name="qAvaliacaoDados" datasource="#application.dsn_processos#">
-			SELECT pc_aval_id
-					,pc_aval_processo
-					,pc_aval_numeracao
-					,pc_aval_descricao
-					,pc_aval_relato
-					,pc_aval_classificacao
-					,pc_aval_teste
-					,pc_aval_controleTestado
-					,pc_aval_sintese
-					,pc_aval_coso_id
-					,pc_aval_valorEstimadoRecuperar
-					,pc_aval_valorEstimadoRisco
-					,pc_aval_valorEstimadoNaoPlanejado
-					,pc_aval_criterioRef_id
+			SELECT 
+				pc_aval_id, pc_aval_processo, pc_aval_numeracao, pc_aval_descricao, 
+				pc_aval_relato, pc_aval_classificacao, pc_aval_teste, pc_aval_controleTestado, 
+				pc_aval_sintese, pc_aval_coso_id, pc_aval_valorEstimadoRecuperar, 
+				pc_aval_valorEstimadoRisco, pc_aval_valorEstimadoNaoPlanejado, 
+				pc_aval_criterioRef_id
 			FROM pc_avaliacoes
 			WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
@@ -7551,50 +7543,49 @@
 			SELECT pc_aval_tipoControle_id FROM pc_avaliacao_tiposControles 
 			WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
-		<cfset listaTiposControles = ValueList(rsTiposControles.pc_aval_tipoControle_id,',')>
+		<cfset listaTiposControles = ValueList(rsTiposControles.pc_aval_tipoControle_id, ',')>
 
 		<cfquery name="rsCategoriasControles" datasource="#application.dsn_processos#">
 			SELECT pc_aval_categoriaControle_id FROM pc_avaliacao_categoriasControles 
 			WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
-		<cfset listaCategoriasControles = ValueList(rsCategoriasControles.pc_aval_categoriaControle_id,',')>
+		<cfset listaCategoriasControles = ValueList(rsCategoriasControles.pc_aval_categoriaControle_id, ',')>
 
 		<cfquery name="rsRiscos" datasource="#application.dsn_processos#">
 			SELECT pc_aval_risco_id FROM pc_avaliacao_riscos 
 			WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
-		<cfset listaRiscos = ValueList(rsRiscos.pc_aval_risco_id,',')>
+		<cfset listaRiscos = ValueList(rsRiscos.pc_aval_risco_id, ',')>
 
-		<cfset var data = ArrayNew(1) />
+		
 		<cfloop query="qAvaliacaoDados">
-			<cfset var avaliacao = StructNew() />
+			<cfset avaliacao = {}>
+			<cfset avaliacao.pc_aval_id = qAvaliacaoDados.pc_aval_id>
+			<cfset avaliacao.pc_aval_processo = qAvaliacaoDados.pc_aval_processo>
+			<cfset avaliacao.pc_aval_numeracao = qAvaliacaoDados.pc_aval_numeracao>
+			<cfset avaliacao.pc_aval_descricao = qAvaliacaoDados.pc_aval_descricao>
+			<cfset avaliacao.pc_aval_relato = qAvaliacaoDados.pc_aval_relato>
+			<cfset avaliacao.pc_aval_classificacao = qAvaliacaoDados.pc_aval_classificacao>
+			<cfset avaliacao.pc_aval_teste = qAvaliacaoDados.pc_aval_teste>
+			<cfset avaliacao.pc_aval_controleTestado = qAvaliacaoDados.pc_aval_controleTestado>
+			<cfset avaliacao.pc_aval_sintese = qAvaliacaoDados.pc_aval_sintese>
+			<cfset avaliacao.pc_aval_coso_id = qAvaliacaoDados.pc_aval_coso_id>
+			<cfset avaliacao.pc_aval_valorEstimadoRecuperar = qAvaliacaoDados.pc_aval_valorEstimadoRecuperar>
+			<cfset avaliacao.pc_aval_valorEstimadoRisco = qAvaliacaoDados.pc_aval_valorEstimadoRisco>
+			<cfset avaliacao.pc_aval_valorEstimadoNaoPlanejado = qAvaliacaoDados.pc_aval_valorEstimadoNaoPlanejado>
+			<cfset avaliacao.pc_aval_criterioRef_id = qAvaliacaoDados.pc_aval_criterioRef_id>
 			
-			<cfset avaliacao.pc_aval_id = qAvaliacaoDados.pc_aval_id />
-			<cfset avaliacao.pc_aval_processo = qAvaliacaoDados.pc_aval_processo />
-			<cfset avaliacao.pc_aval_numeracao = qAvaliacaoDados.pc_aval_numeracao />
-			<cfset avaliacao.pc_aval_descricao = qAvaliacaoDados.pc_aval_descricao />
-			<cfset avaliacao.pc_aval_relato = qAvaliacaoDados.pc_aval_relato />
-			<cfset avaliacao.pc_aval_classificacao = qAvaliacaoDados.pc_aval_classificacao />
-			<cfset avaliacao.pc_aval_teste = qAvaliacaoDados.pc_aval_teste />
-			<cfset avaliacao.pc_aval_controleTestado = qAvaliacaoDados.pc_aval_controleTestado />
-			<cfset avaliacao.pc_aval_sintese = qAvaliacaoDados.pc_aval_sintese />
-			<cfset avaliacao.pc_aval_coso_id = qAvaliacaoDados.pc_aval_coso_id />
-			<cfset avaliacao.pc_aval_valorEstimadoRecuperar = qAvaliacaoDados.pc_aval_valorEstimadoRecuperar />
-			<cfset avaliacao.pc_aval_valorEstimadoRisco = qAvaliacaoDados.pc_aval_valorEstimadoRisco />
-			<cfset avaliacao.pc_aval_valorEstimadoNaoPlanejado = qAvaliacaoDados.pc_aval_valorEstimadoNaoPlanejado />
-			<cfset avaliacao.pc_aval_criterioRef_id = qAvaliacaoDados.pc_aval_criterioRef_id />
+			<!--- Dados adicionais --->
+			<cfset avaliacao.avaliacao_categoria_controle = listaCategoriasControles>
+			<cfset avaliacao.avaliacao_tipo_controle = listaTiposControles>
+			<cfset avaliacao.avaliacao_riscos = listaRiscos>
 			
-			<!--- Arrays e listas passadas diretamente (não extraídas da query) --->
-			<cfset avaliacao.avaliacao_categoria_controle = listaCategoriasControles />
-			<cfset avaliacao.avaliacao_tipo_controle = listaTiposControles />
-			<cfset avaliacao.avaliacao_riscos = listaRiscos />
-			
-			<cfset ArrayAppend(data, avaliacao) />
+			<cfset ArrayAppend(data, avaliacao)>
 		</cfloop>
 
-
-		<cfreturn data/>
+		<cfreturn data>
 	</cffunction>
+
 			
 	       
 				
