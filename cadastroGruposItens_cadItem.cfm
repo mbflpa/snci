@@ -711,7 +711,7 @@
                                             </div>
                                         </div>  
                                         <div id="ptoagf" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">     
-                                            <input type="radio" class="checkPontuacaoCadAGF checkponto" name="checkPontuacaoCadAGF" title="0" value="0" checked>&nbsp;&nbsp;Pontuação Inicial</input>
+  <!---                                          <input type="radio" class="checkPontuacaoCadAGF checkponto" name="checkPontuacaoCadAGF" title="0" value="0" checked>&nbsp;&nbsp;Pontuação Inicial</input> --->
                                             <cfoutput query="rsPta">
                                                 <cfif rsPta.PTC_Franquia is 'S'>
                                                     <div class="row">
@@ -1448,6 +1448,7 @@
             var total = eval(totala) + eval(totalb) 
             $('#pontuacaoCalculadaCadAGF').val(total);
         }
+
         // Categoria do controle testado
         $('#categcontrole').click(function() {
               $("#exibir-categcontrole").hide();
@@ -1740,9 +1741,14 @@
 			}
 
             if (frm.pontuacaoCalculadaCad.value == 0) {
-				alert('Selecione, pelo menos, 01(um) Tipo de Unidade para o qual o item será aplicado nas avaliações\n\nSelecionar a composição da pontuação do Item!');
+				alert('Selecione, ao menos, 01(um) Tipo de Unidade para o qual o item será aplicado nas avaliações.\nSelecionar a Composição de Pontuação do Item!');
 				return false;
 			}
+        
+            if ((tiposSelecionados.indexOf(12) !== -1) && (frm.pontuacaoCalculadaCad.value == frm.pontuacaoCalculadaCadAGF.value)) {
+                alert('Informar o ponto adicional para o tipo de unidade AGF!')
+                return false;
+            } 
 
             if(window.confirm('Deseja cadastrar  este Item?')){  
                 //frm.tipos.value=tiposSelecionados; 

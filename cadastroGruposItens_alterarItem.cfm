@@ -120,7 +120,7 @@
             <cfquery datasource="#dsn_inspecao#" name="rsExisteTPITEM">
                 select TUI_Modalidade
                 FROM TipoUnidade_ItemVerificacao
-                WHERE TUI_Ano='#form.selAltItemAno#' AND 
+                WHERE TUI_Ano=#form.selAltItemAno# AND 
                 TUI_Modalidade='#form.selAltModalidade#' AND 
                 TUI_GrupoItem=#form.selAltItemGrupo# AND 
                 TUI_ItemVerif=#form.selAltItem# AND 
@@ -133,8 +133,9 @@
                     INSERT INTO TipoUnidade_ItemVerificacao 
                     (TUI_Ano,TUI_Modalidade,TUI_TipoUnid,TUI_GrupoItem,TUI_ItemVerif,TUI_DtUltAtu,TUI_UserName,TUI_Ativo,TUI_Pontuacao,TUI_Pontuacao_Seq,TUI_Classificacao)
                     VALUES 
-                    ('#form.selAltItemAno#,#form.selAltModalidade#',#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#',0,#pontuacao#'#altpontuacaoseq#','#ClassifITEM#') 
+                    (#form.selAltItemAno#,'#form.selAltModalidade#',#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#',0,#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#') 
                 </cfquery>
+              
             <cfelse>
                 <!-- Alteração -->
                 <cfquery datasource="#dsn_inspecao#">
@@ -144,10 +145,10 @@
                     , TUI_DtUltAtu = CONVERT(DATETIME, getdate(), 103)
                     , TUI_UserName = '#qAcesso.Usu_Matricula#'
                     WHERE 
-                    TUI_Ano = '#form.selAltItemAno#' AND 
+                    TUI_Ano = #form.selAltItemAno# AND 
                     TUI_Modalidade = '#form.selAltModalidade#' and 
                     TUI_TipoUnid = #tipo# AND 
-                    TUI_GrupoItem = '#form.selAltItemGrupo#' AND 
+                    TUI_GrupoItem = #form.selAltItemGrupo# AND 
                     TUI_ItemVerif = #form.selAltItem# 
                 </cfquery>                
             </cfif>
@@ -157,10 +158,10 @@
                     from Itens_Verificacao 
                 WHERE 
                     Itn_Modalidade = '#form.selAltModalidade#' AND 
-                    Itn_Ano = '#form.selAltItemAno#' AND 
+                    Itn_Ano = #form.selAltItemAno# AND 
                     Itn_TipoUnidade = #tipo# AND 
-                    Itn_NumGrupo = '#form.selAltItemGrupo#' AND 
-                    Itn_NumItem = '#form.selAltItem#' 
+                    Itn_NumGrupo = #form.selAltItemGrupo# AND 
+                    Itn_NumItem = #form.selAltItem# 
             </cfquery>
             <cfif rsExisteItemVerif.recordcount lte 0>
                 <!-- Inclusão -->
@@ -168,7 +169,7 @@
                     INSERT INTO Itens_Verificacao 
                         (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcesso,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                     VALUES 
-                        ('#form.selAltModalidade#','#form.selAltItemAno#',#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#',#form.altcategoriarisco#,'#form.altcategoriariscooutros#',#form.altmacroprocesso#,#altprocesson1#,'#form.altprocesson1naoseaplica#',#altprocesson2#,#altprocesson3#,'#form.altprocesson3outros#',#form.altgestorprocesso#,'#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
+                        ('#form.selAltModalidade#',#form.selAltItemAno#,#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#',#form.altcategoriarisco#,'#form.altcategoriariscooutros#',#form.altmacroprocesso#,#altprocesson1#,'#form.altprocesson1naoseaplica#',#altprocesson2#,#altprocesson3#,'#form.altprocesson3outros#',#form.altgestorprocesso#,'#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
                 </cfquery>	 
             <cfelse>
                 <!-- Alteração -->
@@ -208,7 +209,7 @@
                                 ,Itn_Coso2013Principios=#form.altprincipioscoso#
                             WHERE
                                 Itn_Modalidade = '#form.selAltModalidade#' AND 
-                                Itn_Ano = '#form.selAltItemAno#' AND 
+                                Itn_Ano = #form.selAltItemAno# AND 
                                 Itn_TipoUnidade = #tipo# AND 
                                 Itn_NumGrupo = #form.selAltItemGrupo# AND 
                                 Itn_NumItem = #form.selAltItem#                             
@@ -845,7 +846,7 @@
                                             </div>
                                         </div>  
                                         <div id="ptoagfalt" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">     
-                                            <input type="radio" class="checkPontuacaoAltAGF checkponto" name="checkPontuacaoAltAGF" title="0" value="0" checked>&nbsp;&nbsp;Pontuação Inicial</input>
+<!---                                            <input type="radio" class="checkPontuacaoAltAGF checkponto" name="checkPontuacaoAltAGF" title="0" value="0" checked>&nbsp;&nbsp;Pontuação Inicial</input> --->
                                             <cfoutput query="rsPta">
                                                 <cfif rsPta.PTC_Franquia is 'S'>
                                                     <div class="row">
@@ -1140,8 +1141,8 @@
                     $('#selAltItemValorDec').html(prots);
                     $('#selAltVisualizacao').html(prots);
                     $('#selAltValidObrig').html(prots);
-                    $("#propriasalt").hide();
-                    $("#franquiaalt").hide();
+                    $("#propriasalt").hide(500);
+                    $("#franquiaalt").hide(500);
                     
                     let classcontrole = '';
                     let catctrl = '';
@@ -1157,7 +1158,7 @@
                     let compcoso2013 = ''
                     let princoso2013 = ''
                     let itnptcseq=''
-                    let tipounid=''
+                    let itntpunid='0'
                     
 
                     //console.log(data.data)
@@ -1202,12 +1203,7 @@
                         compcoso2013 = ret[25]
                         princoso2013 = ret[26]
                         itnptcseq = ret[27]
-                        if (tipounid == ''){
-                            tipounid = ret[0]
-                        }else{
-                            tipounid += ','+ret[0]
-                        }
-
+                        itntpunid += ','+ret[0]
                     });
                     if(visualizar == '99') {
                         visualizar = '<option value="">---</option>'
@@ -1239,8 +1235,8 @@
                     $('#selAltItemValorDec').html(vlrdeclarado);
                     $('#selAltVisualizacao').html(visualizar);
                     $('#selAltValidObrig').html(validarobrig);
-                    $("#altriscoidentif-outros").hide();
-                    if ($('#altcategoriariscooutros').val() != '') {$('#altriscoidentif-outros').show()}
+                    $("#altriscoidentif-outros").hide(500);
+                    if ($('#altcategoriariscooutros').val() != '') {$('#altriscoidentif-outros').show(500)}
                     
                     //$('#processon3outrosSNAlt').val('N')
                    // if($('#altprocesson3outros').val() !== '') {$('#processon3outrosSNAlt').val('S')}  
@@ -1253,16 +1249,16 @@
                     categoriacontrole("'"+catctrl+"'")
                     categoriarisco("'"+catriscoident+"'")
                     macroprocesso("'"+macropro+"'")
-                    $("#altprocesson1-naoseaplica").hide();
+                    $("#altprocesson1-naoseaplica").hide(500);
                     if ($('#altprocesson1naoseaplica').val() != '') {
-                        $('#altprocesson1-naoseaplica').show()
+                        $('#altprocesson1-naoseaplica').show(500)
                         $("#cd_altprocesson1").prop("checked", true);
                         $("#altprocesson1").html(prots);
                         $("#altprocesson1").attr('disabled', true);
                         $("#altprocesson2").attr('disabled', true);
                         $("#altprocesson3").attr('disabled', true);
                         $("#cd_altprocesson3").attr('disabled', true);
-                        $("#altprocesson3-outros").hide();
+                        $("#altprocesson3-outros").hide(500);
                         $('#processon3outrosSNAlt').val('N')
                         $('#processon1naoaplicarSNAlt').val('S')
                     }else{
@@ -1273,13 +1269,13 @@
                         if ($('#altprocesson3outros').val() != '') {
                             $("#altprocesson3").html(prots);
                             $("#altprocesson3").attr('disabled', true);
-                            $('#altprocesson3-outros').show()
+                            $('#altprocesson3-outros').show(500)
                             $("#cd_altprocesson3").prop("checked", true); 
                         }else{
-                            $('#altprocesson3-outros').hide()
+                            $('#altprocesson3-outros').hide(500)
                             ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'")  
                             $("#cd_altprocesson3").prop("checked", false); 
-                            $("#altprocesson3-outros").hide();
+                            $("#altprocesson3-outros").hide(500);
                         }                    
                     }   
                     gestorprocesso("'"+gestor+"'")
@@ -1288,7 +1284,7 @@
                     indicadorestrategico("'"+indicestrat+"'")
                     componentecoso("'"+compcoso2013+"'")
                     principioscoso(compcoso2013,"'"+princoso2013+"'")
-                    exibirplanoteste("'"+tipounid+"'","'"+itnptcseq+"'")
+                    exibirplanoteste(itntpunid,itnptcseq)
                     
                 })
                 }) // FIM BUSCAR dados para alteração dos tipos de Unidades    
@@ -1609,13 +1605,13 @@
                 } //buscar o principios do coso2013                                                                                    
                 //************************************************
                 $('#altcategoriarisco').click(function() {
-                    $("#altriscoidentif-outros").hide();
+                    $("#altriscoidentif-outros").hide(500);
                     var auxselect = '';
                     $('#altcategoriarisco  > option:selected').each(function() {
                         auxselect += $(this).text();
                     })
                     if(auxselect == 'Outros'){
-                        $("#altriscoidentif-outros").show();
+                        $("#altriscoidentif-outros").show(500);
                         $("#riscoidentificadoSNAlt").val('S');
                     }else{
                         $("#riscoidentificadoSNAlt").val('N');
@@ -1630,19 +1626,19 @@
                     let PCN1MAPCID = $(this).val(); 
                     if(PCN1MAPCID == ''){
                         $("#altprocesson1").attr('disabled', true);
-                        $('#altprocesson1-naoseaplica').hide()
+                        $('#altprocesson1-naoseaplica').hide(500)
                         $("#cd_altprocesson1").prop("checked", false); 
                         $("#cd_altprocesson1").attr('disabled', true);  
 
                         $("#altprocesson2").attr('disabled', true);
 
                         $("#altprocesson3").attr('disabled', true);
-                        $('#altprocesson3outros').hide()
+                        $('#altprocesson3outros').hide(500)
                         $("#cd_altprocesson3").prop("checked", false); 
                         $("#cd_altprocesson3").attr('disabled', true);                  
                     }else{                        
                         $("#altprocesson1").attr('disabled', false);
-                        $('#altprocesson1-naoseaplica').hide()
+                        $('#altprocesson1-naoseaplica').hide(500)
                         $("#cd_altprocesson1").prop("checked", false); 
                         $("#cd_altprocesson1").attr('disabled', false);          
                         axios.get("CFC/grupoitem.cfc",{
@@ -1675,7 +1671,7 @@
                         $("#altprocesson2").attr('disabled', true);
 
                         $("#altprocesson3").attr('disabled', true);
-                        $('#altprocesson3outros').hide()
+                        $('#altprocesson3outros').hide(500)
                         $("#cd_altprocesson3").prop("checked", false); 
                         $("#cd_altprocesson3").attr('disabled', true);                  
                     }else{ 
@@ -1710,7 +1706,7 @@
                     var PCN3PCN2ID = $(this).val();
                     if(PCN3PCN2ID == ''){
                         $("#altprocesson3").attr('disabled', true);
-                        $('#altprocesson3outros').hide()
+                        $('#altprocesson3outros').hide(500)
                         $("#cd_altprocesson3").prop("checked", false); 
                         $("#cd_altprocesson3").attr('disabled', true);                  
                     }else{ 
@@ -1742,11 +1738,11 @@
                 //==============================
                 $('#cd_altprocesson3').click(function(){
                     let prots = '<option value="" selected>---</option>';
-                    $("#altprocesson3-outros").hide();
+                    $("#altprocesson3-outros").hide(500);
                     $("#altprocesson3").html(prots);
                     if($(this).is(':checked')) {
                         $("#altprocesson3").attr('disabled', true);
-                        $("#altprocesson3-outros").show();
+                        $("#altprocesson3-outros").show(500);
                         $("#processon3outrosSNAlt").val('S');
                     }else{
                         $("#processon3outrosSNAlt").val('N');
@@ -1804,12 +1800,12 @@
                 $('#cd_altprocesson1').click(function(){
                     let prots = '<option value="" selected>---</option>';
                     $("#processon1naoaplicarSNAlt").val('N');
-                    $('#altprocesson3-outros').hide()
+                    $('#altprocesson3-outros').hide(500)
                     if($(this).is(':checked')) {
                         $("#altprocesson1_sel").val($("#altprocesson1").val());
                         $("#altprocesson2_sel").val($("#altprocesson2").val());
                         $("#altprocesson3_sel").val($("#altprocesson3").val());
-                        $('#altprocesson1-naoseaplica').show()
+                        $('#altprocesson1-naoseaplica').show(500)
                         $("#processon1naoaplicarSNAlt").val('S');
                         $("#altprocesson1").html(prots);
                         $("#altprocesson1").attr('disabled', true);
@@ -1819,7 +1815,7 @@
                         $("#altprocesson3").attr('disabled', true);
                         $("#cd_altprocesson3").attr('disabled', true);
                     }else{
-                        $('#altprocesson1-naoseaplica').hide()
+                        $('#altprocesson1-naoseaplica').hide(500)
                         $("#altprocesson1").attr('disabled', false);
                         $("#altprocesson2").attr('disabled', false);
                         $("#altprocesson3").attr('disabled', false); 
@@ -1831,11 +1827,11 @@
                         if ($('#altprocesson3outros').val() != '') {
                             $("#altprocesson3").html(prots);
                             $("#altprocesson3").attr('disabled', true);
-                            $('#altprocesson3-outros').show()
+                            $('#altprocesson3-outros').show(500)
                             $("#cd_altprocesson3").prop("checked", true); 
                             $("#cd_altprocesson3").attr('disabled', true);
                         }else{
-                            $('#altprocesson3-outros').hide()
+                            $('#altprocesson3-outros').hide(500)
                             let procn3 = $("#altprocesson3_sel").val();
                             ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'")  
                             $("#cd_altprocesson3").prop("checked", false); 
@@ -1846,12 +1842,12 @@
                 //Ocultar ou Recompor o select processon3
                 $('#cd_altprocesson3').click(function(){
                     let prots = '<option value="" selected>---</option>';
-                    $('#altprocesson3-outros').hide()
+                    $('#altprocesson3-outros').hide(500)
                     if($(this).is(':checked')) {
                         $("#altprocesson3_sel").val($("#altprocesson3").val());
                         $("#altprocesson3").html(prots);
                         $("#altprocesson3").attr('disabled', true)
-                        $('#altprocesson3-outros').show()
+                        $('#altprocesson3-outros').show(500)
                     }else{
                         $("#altprocesson3").attr('disabled', false)
                         let macropro = $("#altmacroprocesso").val();
@@ -1863,34 +1859,56 @@
                 }) //Ocultar ou Recompor o select processon3                  
                 //**************************************************        
                 //Ajustar os tipos e os check/radio e a pontuação         
-                function exibirplanoteste(a,b){
+                function exibirplanoteste(a,b){                   
                     //alert(a + '  '+b)
+                    let altArray = a.split(',')
                     let alttpunid = ''
+                    var selecionarsn = ''
                     $('.alttipounid').each(function( index ) {
                         alttpunid = $(this).attr("id");
+                        selecionarsn = 'N'
+                        $(this).attr("title","0");
+                        // alterar a class do botão
+                        $(this).attr("class","alttipounid btn btn-primary");
+                        $(this).css('box-shadow', '10px 10px 5px 0');                          
                         //alert(alttpunid)
-                        if (a.indexOf(alttpunid) !== -1) {
-                            //deve está selecionado
-                            //ajustar para contagem
-                            $(this).attr("title","1");
-                            //alterar a class do botão
-                            $(this).attr("class","alttipounid btn btn-success");
-                            $(this).css('box-shadow', '10px 10px 5px #888')
-                        }else{
-                            $(this).attr("title","0");
-                            // alterar a class do botão
-                            $(this).attr("class","alttipounid btn btn-primary");
-                            $(this).css('box-shadow', '10px 10px 5px 0');  
+                        $.each(altArray, function( key, value ) {
+                            //alert('value: '+value)
+                            if (value == alttpunid) {
+                                selecionarsn = 'S'
+                                if (alttpunid==12) {$("#franquiaalt").show(500)}
+                                //alert('value: '+value)
+                            }
+                        })
+                        if (selecionarsn == 'S') {
+                                selecionarsn = 'S'
+                                $(this).attr("title","1");
+                                //alterar a class do botão
+                                $(this).attr("class","alttipounid btn btn-success");
+                                $(this).css('box-shadow', '10px 10px 5px #888')
                         }
                     }) 
                     
                     let ponto =''
+                    let altseqarray=b.split(',')
                     $('.checkponto').each(function( index ) {
+                        selecionarsn = 'N'
                         ponto = $(this).attr("title");
-                        if (b.indexOf(ponto) !== -1) {
+                        //alert(b)
+                        $.each(altseqarray, function( key, value ) {
+                            //alert('value: '+value)
+                            if (value == ponto) {
+                                selecionarsn = 'S'
+                                //alert('value: '+value)
+                            }
+                        })
+                        
+                        if (selecionarsn == 'S') {
                             $(this).prop('checked',true);
+                            //alert(ponto)
                         }else{
                             $(this).prop('checked',false);
+                            //alert(ponto)
                         }
                     }) 
                     
@@ -1900,17 +1918,19 @@
                             totala = totala + eval($(this).val())
                         }
                     });               
-                    if(totala !== 0){$("#propriasalt").show()}
+                    if(totala !== 0){$("#propriasalt").show(500)}
                     $('#pontuacaoCalculadaAlt').val(totala); 
 
                     var totalb = 0
                     $( ".checkPontuacaoAltAGF" ).each(function( index ) {
+                       // alert( index + ": " + $(this).val());
                         if($(this).is(':checked')){
-                            //alert( index + ": " + $(this).val());
+                           // alert( index + ": " + $(this).val());
                             totalb = totalb + eval($(this).val())
                         }
                     });
-                    if(totalb !== 0){$("#franquiaalt").show()}
+                   // $("#franquiaalt").show();
+                    if(totalb !== 0){$("#franquiaalt").show(500)}
                     var total = eval(totala) + eval(totalb) 
                     $('#pontuacaoCalculadaAltAGF').val(total);                
                 }//Ajustar os tipos e os check/radio e a pontuação    
@@ -1987,26 +2007,25 @@
                         alttpunid = $(this).attr("id")
                         if(alttpunid == 12){altagfsn = 'N'} 
                     } 
-                //alert(altagfsn); 
-                if((altoutros != 0) || (altoutros == 0 && title == 0) || title == 1){ 
-                    $("#propriasalt").show(500);
-                }
-                if(altoutros == 1 && title == 0){ 
-                    $("#propriasalt").hide(500);
-                    $("#franquiaalt").hide(500);
-                }  
-                if(altagfsn == 'S'){$("#franquiaalt").show(500);}                
-                if(altagfsn == 'N'){
-                    $( ".checkPontuacaoAltAGF" ).each(function( index ) {
-                        if($(this).val() == 0){
-                            // $(this).prop('checked',true);
-                            totalb = 0
-                        }
-                    });
-                    altsomaragf();
-                    $("#franquiaalt").hide(500);
-                }
-                // alert(altoutros + '  ' + title)           
+                    //alert(altagfsn); 
+                    if((altoutros != 0) || (altoutros == 0 && title == 0) || title == 1){ 
+                        $("#propriasalt").show(500);
+                    }
+                    if(altoutros == 1 && title == 0){ 
+                        $("#propriasalt").hide(500);
+                        $("#franquiaalt").hide(500);
+                    }  
+                    if(altagfsn == 'S'){$("#franquiaalt").show(500);}                
+                    if(altagfsn == 'N'){
+                        $( ".checkPontuacaoAltAGF" ).each(function( index ) {
+                            if($(this).val() == 0){
+                                // $(this).prop('checked',true);
+                                totalb = 0
+                            }
+                        });
+                        altsomaragf();
+                        $("#franquiaalt").hide(500);
+                    }// alert(altoutros + '  ' + title)           
             }) // fim // BUSCAR dados para alteração com o evento selAltModalidade.change()
             //=======================================================================         
             // Para realizar a críticas do submit
@@ -2296,21 +2315,18 @@
                 }
 
                 if (frm.pontuacaoCalculadaAlt.value == 0) {
-                    alert('Selecione, pelo menos, 01(um) Tipo de Unidade para o qual o item será aplicado nas avaliações\n\nSelecionar a composição da pontuação do Item!');
+                    alert('Selecione, pelo menos, 01(um) Tipo de Unidade para o qual o item será aplicado nas avaliações\nSelecionar a Composição de Pontuação do Item!');
                     return false;
                 }
 
                 if (frm.pontuacaoCalculadaAlt.value == 0 && frm.pontuacaoCalculadaAltAGF.value == 0) {
-                    alert('Selecione, pelo menos, 01(um) Tipo de Unidade para o qual o item será aplicado nas avaliações\n\nSelecionar a composição da pontuação do Item!');
-                    return false;
+                  //  alert('Selecione, pelo menos, 01(um) Tipo de Unidade para o qual o item será aplicado nas avaliações\n\nSelecionar a composição da pontuação do Item!');
+                 //   return false;
                 }
 
                 if ((tiposSelec.indexOf(12) !== -1) && (frm.pontuacaoCalculadaAlt.value == frm.pontuacaoCalculadaAltAGF.value)) {
-                    if(window.confirm('Deseja manter a Pontuação da AGF igual ao(s) outro(s) tipo(s) de Unidade(s)?\n\n Pontuação aferida para AGF: '+frm.pontuacaoCalculadaAltAGF.value+' pontos')){  
-                        //não fazer retorno
-                    }else{
-                        return false;
-                    }
+                    alert('Informar o ponto adicional para o tipo de unidade AGF!')
+                    return false;
                 }      
 
                 //alert("tiposSelec: "+frm.tiposalt.value)
@@ -2345,7 +2361,8 @@
                     }else{return false;}
                 }
             }            
-            // fim da críticas do submit                                                
+            // fim da críticas do submit     
+                                                     
         </script>
     </body>
 </html>

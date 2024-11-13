@@ -275,136 +275,182 @@
           <cfreturn rsproc03> 
         </cftransaction>
     </cffunction>                           
-<!--- 
-<!--- inclusao de transportadora  --->
-    <cffunction name="inserir_transportadora"   access="remote" returntype="any">
-        <cfset nome       = #form.nometransportadora#>
-        <cfset endereco   = #form.endereco#>
-        <cfset cidade     = #form.cidade#>
-        <cfset estado     = #form.estados#>
-        <cfset erro = 'V'>
-        <cftry>
-            <cfquery name="rsteste" datasource="db_andes">
-                INSERT INTO transportadoras (nometransportadora,endereco,cidade,estadoID)
-                values
-                ('#nome#','#endereco#','#cidade#', #estado#)
-            </cfquery>
-            <cfcatch type="any">
-                <cfset erro = 'F'>
-            </cfcatch>
-        </cftry>
-        <cfreturn #erro#>
-    </cffunction>
-    <!--- alterar de transportadora --->
-    <cffunction name="alterar_transportadora"   access="remote" returntype="any">
-        <cfargument name="transportadoraID" required="true">
-        <cfargument name="nometransportadora" type="string" required="true">
-        <cfargument name="endereco" required="true">
-        <cfargument name="telefone" required="false">
-        <cfargument name="cidade" required="true">
-        <cfargument name="estados" required="true">
-        <cfargument name="cep" required="false">
-        <cfargument name="cnpj" required="false">
-
-        <cfset arguments.transportadoraID  = #form.transportadoraID#>
-        <cfset arguments.nometransportadora  = #form.nometransportadora#>
-        <cfset arguments.endereco  = #form.endereco#>
-        <cfset arguments.cidade  = #form.cidade#>
-        <cfset arguments.estados  = #form.estados# >
-        <cfset arguments.cep  = 52090260>
-        <cfset arguments.telefone  = 32686435>
-        <cfset arguments.cnpj  = 33370818434>
-        <cfset erro = 'V'>
-        <cftry>
-            <cfquery datasource="db_andes">
-                update transportadoras set 
-                        nometransportadora = <cfqueryparam value="#arguments.nometransportadora#" cfsqltype="CF_SQL_VARCHAR">, 
-                        endereco = <cfqueryparam value="#arguments.endereco#" cfsqltype="CF_SQL_VARCHAR">,
-                        telefone = <cfqueryparam value="#arguments.telefone#" cfsqltype="CF_SQL_VARCHAR">,
-                        cidade = <cfqueryparam value="#arguments.cidade#" cfsqltype="CF_SQL_VARCHAR">, 
-                        estadoID = <cfqueryparam value="#arguments.estados#" cfsqltype="cf_sql_integer">, 
-                        cep = <cfqueryparam value="#arguments.cep#" cfsqltype="CF_SQL_VARCHAR">, 
-                        cnpj = <cfqueryparam value="#arguments.cnpj#" cfsqltype="CF_SQL_VARCHAR">
-                where 
-                        transportadoraID = <cfqueryparam value="#arguments.transportadoraID#" cfsqltype="cf_sql_integer">
-
-            </cfquery>
-            <cfcatch type="any">
-                <cfset erro = 'F'>
-            </cfcatch>
-        </cftry>
-        <cfreturn #erro#>
-    </cffunction>
-
-    <cffunction name="excluir_transportadora"   access="remote" returntype="any">
-        <cfargument name="transportadoraID" required="true">
-        <cfset arguments.transportadoraID  = #form.transportadoraID#>
-        <cfset erro = 'V'>
-        <cftry>
-            <cfquery datasource="db_andes">
-               DELETE FROM transportadoras
-               where 
-               transportadoraID = <cfqueryparam value="#arguments.transportadoraID#" cfsqltype="cf_sql_integer">
-
-            </cfquery>
-            <cfcatch type="any">
-                <cfset erro = 'F'>
-            </cfcatch>
-        </cftry>
-        <cfreturn #erro#>
-    </cffunction>
-
-    <cffunction  name="retornarCategoria" access="remote" returntype="query">
-         <cfquery name="rsCategoria" datasource="db_andes">
-            SELECT categoriaID, nomecategoria FROM categorias
-        </cfquery>
-        <cfset categ = ''>
-        <cfset nomecateg = ''>
-        <cfoutput query="rsCategoria">
-            <cfif categ eq ''>
-                <cfset categ = #rsCategoria.categoriaID#>
-                <cfset nomecateg = #rsCategoria.nomecategoria#>
-            <cfelse>
-                <cfset categ = categ & ',' & #rsCategoria.categoriaID#>
-                <cfset nomecateg = nomecateg & ',' & #rsCategoria.nomecategoria#>
-            </cfif>
-        </cfoutput>
-        <cfreturn rsCategoria>
-    </cffunction>
-    <!--- este método retorna dados Produtos --->
-    <cffunction  name="retornarProdutos" access="remote" ReturnFormat="json" returntype="query">
-       <!--- <cfargument name="categoriaID"  required="yes"> --->
-        <cftransaction>
-        <cfquery name="listaProdutos" datasource="db_andes">
-           SELECT produtoID, nomeproduto FROM produtos
-          
-        </cfquery>
-        <cfreturn listaProdutos> 
-        </cftransaction>
-    </cffunction>
-
-    <!--- este método retorna dados federativo --->
-    <cffunction  name="retornarEstados"  access="remote" returntype="Query">
-        <cfheader name="Content-Type" value="application/json">
-        <cfquery name="qEstados" datasource="db_andes">
-            select * from estados
-        </cfquery>
-        <cfreturn #serializeJSON(qEstados, 'STRUCT')#>
-    </cffunction>
-
-    <!--- este método retorna dados transportadoras --->
-    <cffunction  name="retornarTransportadoras"  access="remote" returntype="any">
-        <cfargument name="codigo"  required="yes">
+    <!--- incluir/alterar/excluir Classificação do Controle  --->
+    <cffunction name="cad_classifctrl" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="tpctid" required="true">
+        <cfargument name="tpctdesc" required="true">
         
-        <cfquery name="listaTransportadoras" datasource="db_andes">
-            select * from transportadoras
-    
-            <cfif arguments.codigo neq 0>
-                where transportadoraID = <cfqueryparam value="#arguments.codigo#" cfsqltype="cf_sql_integer">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(TPCT_ID)+1 as novoid 
+                    FROM UN_TIPOCONTROLETESTADO
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_TIPOCONTROLETESTADO 
+                        (TPCT_ID,TPCT_DESCRICAO,TPCT_username,TPCT_DtCriar,TPCT_DtAlter)
+                    values 
+                        (#rsNovo.novoid#,<cfqueryparam value="#tpctdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
             </cfif>
-
-        </cfquery>
-        <cfreturn listaTransportadoras>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_TIPOCONTROLETESTADO set
+                        TPCT_DESCRICAO = <cfqueryparam value="#tpctdesc#" cfsqltype="cf_sql_char">
+                        ,TPCT_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,TPCT_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        TPCT_ID = <cfqueryparam value="#tpctid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_ClassificacaoControle In ('#tpctid#')
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_TIPOCONTROLETESTADO 
+                        where 
+                            TPCT_ID = <cfqueryparam value="#tpctid#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui a Classificação Selecionada!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
     </cffunction>
-    --->    
+    <!--- incluir/alterar/excluir Categoria do Controle  --->
+    <cffunction name="cad_categctrl" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="ctctid" required="true">
+        <cfargument name="ctctdesc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(CTCT_ID)+1 as novoid 
+                    FROM UN_CATEGORIACONTROLE
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_CATEGORIACONTROLE 
+                        (CTCT_ID,CTCT_DESCRICAO,CTCT_username,CTCT_DtCriar,CTCT_DtAlter)
+                    values 
+                        (#rsNovo.novoid#,<cfqueryparam value="#ctctdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_CATEGORIACONTROLE set
+                         CTCT_DESCRICAO = <cfqueryparam value="#ctctdesc#" cfsqltype="cf_sql_char">
+                        ,CTCT_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,CTCT_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        CTCT_ID = <cfqueryparam value="#ctctid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_CategoriaControle In ('#ctctid#')
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_CATEGORIACONTROLE 
+                        where 
+                            CTCT_ID = <cfqueryparam value="#ctctid#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui a Classificação Selecionada!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>
+    <!--- incluir/alterar/excluir Categoria do Controle  --->
+    <cffunction name="cad_categrisco" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="ctrcid" required="true">
+        <cfargument name="ctrcdesc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(CTRC_ID)+1 as novoid 
+                    FROM UN_CATEGORIARISCO
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_CATEGORIARISCO 
+                        (CTRC_ID,CTRC_DESCRICAO,CTRC_username,CTRC_DtCriar,CTRC_DtAlter)
+                    values 
+                        (#rsNovo.novoid#,<cfqueryparam value="#ctrcdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_CATEGORIARISCO set
+                         CTRC_DESCRICAO = <cfqueryparam value="#ctrcdesc#" cfsqltype="cf_sql_char">
+                        ,CTRC_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,CTRC_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        CTRC_ID = <cfqueryparam value="#ctrcid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_RiscoIdentificado In ('#ctrcid#')
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_CATEGORIARISCO 
+                        where 
+                            CTRC_ID = <cfqueryparam value="#ctrcid#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui a Classificação Selecionada!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>    
 </cfcomponent>
