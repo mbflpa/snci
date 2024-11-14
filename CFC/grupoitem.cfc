@@ -394,7 +394,7 @@
         </cftry>
         <cfreturn #ret#>
     </cffunction>
-    <!--- incluir/alterar/excluir Categoria do Controle  --->
+    <!--- incluir/alterar/excluir Categoria de Risco  --->
     <cffunction name="cad_categrisco" access="remote" returntype="any">
         <cfargument name="acao" required="true">
         <cfargument name="ctrcid" required="true">
@@ -428,7 +428,7 @@
                 <cfquery datasource="DBSNCI" name="rsExiste">
                     SELECT Itn_ClassificacaoControle
                     FROM Itens_Verificacao
-                    WHERE Itn_RiscoIdentificado In ('#ctrcid#')
+                    WHERE Itn_RiscoIdentificado = #ctrcid#
                 </cfquery>
                 <cfif rsExiste.recordcount lte 0>
                     <cfquery datasource="DBSNCI">
@@ -452,5 +452,126 @@
             </cfcatch>
         </cftry>
         <cfreturn #ret#>
-    </cffunction>    
+    </cffunction> 
+    <!--- incluir/alterar/excluir Macroprocesso  --->
+    <cffunction name="cad_macproc" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="mapcid" required="true">
+        <cfargument name="mapcdesc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(MAPC_ID)+1 as novoid 
+                    FROM UN_MACROPROCESSO
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_MACROPROCESSO 
+                        (MAPC_ID,MAPC_Descricao,MAPC_username,MAPC_DtCriar,MAPC_DtAlter)
+                    values 
+                        (#rsNovo.novoid#,<cfqueryparam value="#mapcdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_MACROPROCESSO set
+                         MAPC_Descricao = <cfqueryparam value="#mapcdesc#" cfsqltype="cf_sql_char">
+                        ,MAPC_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,MAPC_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        MAPC_ID = <cfqueryparam value="#mapcid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_MacroProcesso = #mapcid#
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_MACROPROCESSO 
+                        where 
+                            MAPC_ID = <cfqueryparam value="#mapcid#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Macroprocesso selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>  
+    <!--- incluir/alterar/excluir Processo-N1  --->
+    <cffunction name="cad_procn1" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="pcn1mapcid" required="true">
+        <cfargument name="pcn1id" required="true">
+        <cfargument name="pcn1desc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(PCN1_ID)+1 as novoid 
+                    FROM UN_PROCESSON1
+                    WHERE PCN1_MAPC_ID = #pcn1mapcid#
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_PROCESSON1 
+                        (PCN1_MAPC_ID,PCN1_ID,PCN1_Descricao,PCN1_username,PCN1_DtCriar,PCN1_DtAlter)
+                    values 
+                        (#pcn1mapcid#,#rsNovo.novoid#,<cfqueryparam value="#pcn1desc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_PROCESSON1 set
+                        PCN1_Descricao = <cfqueryparam value="#pcn1desc#" cfsqltype="cf_sql_char">
+                        ,PCN1_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,PCN1_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> AND PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_ProcessoN1 = #pcn1id#
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_PROCESSON1 
+                        where 
+                        PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> AND PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Macroprocesso selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>       
+           
 </cfcomponent>
