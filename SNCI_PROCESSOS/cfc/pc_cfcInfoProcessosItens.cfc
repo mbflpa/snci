@@ -32,19 +32,15 @@
              
                 <fieldset style="padding:0px!important;min-height: 90px;">
                     <legend style="margin-left:20px">Medida/Orientação p/ regularização: ID <strong>#rsAvalOrentacao.pc_aval_orientacao_id#</strong> - #rsAvalOrentacao.siglaOrgResp# (#rsAvalOrentacao.mcuOrgResp#):</legend>                                         
-                    <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_descricao#</pre>
+                    <pre class="font-weight-light azul_claro_correios_textColor" style="font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_descricao#</pre>
                 </fieldset>
          
             <cfset ano = RIGHT(#arguments.pc_processo_id#,4)>
             <cfif #ano# gte 2024 and rsCategoriaControle.recordcount gt 0> 
                 
                     <fieldset style="padding:0px!important;min-height: 90px;">
-                        <legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>   
-                        <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro neq ''>                                      
-                            <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro#</pre>
-                        <cfelse>
-                            <pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">Não se aplica</pre>
-                        </cfif>
+                        <legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>                                         
+                        <pre class="font-weight-light azul_claro_correios_textColor" style="font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro#</pre>
                     </fieldset>
                 
 
@@ -118,7 +114,7 @@
             legend {
                 font-size: 0.8rem!important;
                 color: #fff!important;
-                background-color: #0083ca!important;
+                background-color: var(--azul_claro_correios)!important;
                 border: 1px solid #ced4da!important;
                 border-radius: 5px!important;
                 padding: 5px!important;
@@ -315,7 +311,7 @@
             legend {
                 font-size: 0.8rem!important;
                 color: #fff!important;
-                background-color: #0083ca!important;
+                background-color: var(--azul_claro_correios)!important;
                 border: 1px solid #ced4da!important;
                 border-radius: 5px!important;
                 padding: 5px!important;
@@ -389,36 +385,38 @@
                                             <p style="">Valor Envolvido: <span style="color:##0692c6;">Não quantificado</span></p>
                                         </cfif>
                                     <cfelse>
-                                        <div class="card card-primary card-tabs"  style="widht:100%">
-                                            <div class="card-header p-0 pt-1" style="background-color:##0e406a;">
+                                        <div class="card card-primary card-tabs card_border_correios2"  style="width:100%">
+                                            <div class="card-header p-0 pt-1 card-header_navbar_backgroundColor" >
                                                 <ul class="nav nav-tabs" id="custom-tabs-infoItem" role="tablist" style="font-size:14px;font-weight: 400 !important;">
                                                     <li class="nav-item " style="">
                                                         <a  class="nav-link  active" id="custom-tabs-infoItem-titulo-tab"  data-toggle="pill" href="##custom-tabs-infoItem-titulo" role="tab" aria-controls="custom-tabs-infoItem-titulo" aria-selected="true"><span class="tituloTab">Título Situação<br>Encontrada</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-sintese-tab"  data-toggle="pill" href="##custom-tabs-infoItem-sintese" role="tab" aria-controls="custom-tabs-infoItem-sintese" aria-selected="true"><span class="tituloTab"><br>Síntese</span></a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-sintese-tab"  data-toggle="pill" href="##custom-tabs-infoItem-sintese" role="tab" aria-controls="custom-tabs-infoItem-sintese" aria-selected="true"><span class="tituloTab"><br>Síntese</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-teste-tab"  data-toggle="pill" href="##custom-tabs-infoItem-teste" role="tab" aria-controls="custom-tabs-infoItem-teste" aria-selected="true"><span class="tituloTab">Teste<br>(Pergunta do plano)</span></a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-teste-tab"  data-toggle="pill" href="##custom-tabs-infoItem-teste" role="tab" aria-controls="custom-tabs-infoItem-teste" aria-selected="true"><span class="tituloTab">Teste<br>(Pergunta do plano)</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-controleTestado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-controleTestado" role="tab" aria-controls="custom-tabs-infoItem-controleTestado" aria-selected="true"><span class="tituloTab"><br>Controle Testado</span></a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-controleTestado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-controleTestado" role="tab" aria-controls="custom-tabs-infoItem-controleTestado" aria-selected="true"><span class="tituloTab"><br>Controle Testado</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-riscoClassif-tab"  data-toggle="pill" href="##custom-tabs-infoItem-riscoClassif" role="tab" aria-controls="custom-tabs-infoItem-riscoClassif" aria-selected="true"><span class="tituloTab"><br>COSO/Classificação/Risco</span></a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-riscoClassif-tab"  data-toggle="pill" href="##custom-tabs-infoItem-riscoClassif" role="tab" aria-controls="custom-tabs-infoItem-riscoClassif" aria-selected="true"><span class="tituloTab">COSO/<br>Classificação/Risco</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-InfItem-valorEstimado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-valorEstimado" role="tab" aria-controls="custom-tabs-infoItem-valorEstimado" aria-selected="true"><span class="tituloTab">Potencial<br>Valor Estimado</span></a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-valorEstimado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-valorEstimado" role="tab" aria-controls="custom-tabs-infoItem-valorEstimado" aria-selected="true"><span class="tituloTab">Potencial<br>Valor Estimado</span></a>
                                                     </li>
-
+                                                    <li class="nav-item" style="">
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-anexosItem-tab"  data-toggle="pill" href="##custom-tabs-infoItem-anexosItem" role="tab" aria-controls="custom-tabs-infoItem-anexosItem" aria-selected="true"><span class="tituloTab"><br>Anexos do Item</span></a>
+                                                    </li>
                                                     <li class="nav-item" style="">
                                                         <a  class="nav-link " id="custom-tabs-infoItem-InfItem-criterioRefNormativa-tab"  data-toggle="pill" href="##custom-tabs-infoItem-criterioRefNormativa" role="tab" aria-controls="custom-tabs-infoItem-criterioRefNormativa" aria-selected="true"><span class="tituloTab">Critérios e<br>Ref. Normativas</span></a>
-                                                    </li>	
+                                                    </li>		
 
 
                                                 </ul>
@@ -428,13 +426,13 @@
                                                 <div class="tab-content" id="custom-tabs-infoItem-tabContent" >
                                                     <div disable class="borderTexto tab-pane fade  active show" id="custom-tabs-infoItem-titulo"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-titulo-tab" style="">	
                                                         
-                                                        <span class="font-weight-light" style="color:##0083ca!important;font-size: 1em;margin-left:10px"><cfoutput>N° ITEM: #rsInfoItem.pc_aval_numeracao# </cfoutput></span><pre class="font-weight-light" style="color:##0083ca!important;font-size: 1em;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_descricao#</cfoutput></pre>
+                                                        <span class="font-weight-light azul_claro_correios_textColor" style="font-size: 1em;margin-left:10px"><cfoutput>N° ITEM: #rsInfoItem.pc_aval_numeracao# </cfoutput></span><pre class="font-weight-light azul_claro_correios_textColor" style="font-size: 1em;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_descricao#</cfoutput></pre>
                                                     </div>
                                                     <div disable class="borderTexto tab-pane fade" id="custom-tabs-infoItem-sintese" role="tabpanel" aria-labelledby="custom-tabs-infoItem-sintese-tab" style="max-height: 200px; overflow-y: auto;">
-                                                        <pre class="font-weight-light" style="color:##0083ca!important;font-size: 1em;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_sintese#</cfoutput></pre>
+                                                        <pre class="font-weight-light azul_claro_correios_textColor" style="font-size: 1em;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_sintese#</cfoutput></pre>
                                                     </div>
                                                     <div disable class="borderTexto tab-pane fade" id="custom-tabs-infoItem-teste"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-teste-tab" style="max-height: 200px; overflow-y: auto;">	
-                                                        <pre class="font-weight-light" style="color:##0083ca!important;font-size: 1em;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_teste#</cfoutput></pre>
+                                                        <pre class="font-weight-light azul_claro_correios_textColor" style="font-size: 1em;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_teste#</cfoutput></pre>
                                                     </div>
                                                     <div disable class="tab-pane fade" id="custom-tabs-infoItem-controleTestado"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-controleTestado-tab" >	
                                                         <cfquery name="rsAvaliacaoTiposControles" datasource="#application.dsn_processos#">
@@ -453,7 +451,7 @@
 
                                                         <fieldset style="padding:0px!important;min-height: 90px;">
                                                             <legend style="margin-left:20px">Controle Testado:</legend>
-                                                            <pre  class="font-weight-light" class="font-weight-light" style="font-size: 1em;color:##0083ca!important;margin-left:10px;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_controleTestado#</cfoutput></pre>
+                                                            <pre  class="font-weight-light" class="font-weight-light azul_claro_correios_textColor" style="font-size: 1em;margin-left:10px;font-style: italic"><cfoutput>#rsInfoItem.pc_aval_controleTestado#</cfoutput></pre>
                                                         </fieldset>
                                                         <fieldset style="padding:0px!important;min-height: 90px;">
                                                             <legend style="margin-left:20px">Tipo / Categoria:</legend>
@@ -509,6 +507,9 @@
                                                             <li >Não Planejado/Extrapolado/Sobra: <span style="color:##0692c6;">Não se aplica.</span></li>
                                                         </cfif>
                                                     </div>
+                                                    <div disable class="tab-pane fade" id="custom-tabs-infoItem-anexosItem"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-anexosItem-tab" >	
+                                                        <div id="tabAnexosDiv" style="margin-top:20px"></div>
+                                                    </div>
                                                     <div disable class="tab-pane fade" id="custom-tabs-infoItem-criterioRefNormativa"  role="tabpanel" aria-labelledby="custom-tabs-infoItem-criterioRefNormativa-tab" >	
                                                         <cfquery name="rsAvaliacaoNormativas" datasource="#application.dsn_processos#">
                                                             SELECT pc_aval_criterioRef_descricao FROM pc_avaliacao_criterioReferencia
@@ -532,6 +533,16 @@
             </div>
             
         </section>
+	<script language="JavaScript">
+        $(document).ready(function() {	
+            <cfoutput>
+                var pc_aval_id = '#arguments.pc_aval_id#';
+            </cfoutput>
+            $('#custom-tabs-infoItem-anexosItem-tab').on('click', function (event){
+                mostraTabAnexosJS('tabAnexosDiv',pc_aval_id);
+            });
+        });
+    </script>
 
     </cffunction>
 

@@ -29,52 +29,75 @@
 		</cfquery>	
 
         <cfquery name="rsPosicionamentos" datasource="#application.dsn_processos#">
-			SELECT pc_avaliacao_posicionamentos.*
-				, pc_orgaos.* 
-				, pc_usuarios.*
-				,  pc_orgaos2.pc_org_sigla as orgaoResp
-				, pc_orgaos2.pc_org_mcu as mcuOrgaoResp
-				, CONVERT(char, pc_aval_posic_datahora, 103) as dataPosic
-				, pc_orientacao_status.pc_orientacao_status_finalizador as eHstatusFinalizador
-			FROM pc_avaliacao_posicionamentos
-			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_posic_num_orgao
-			LEFT JOIN pc_orgaos as pc_orgaos2 on pc_orgaos2.pc_org_mcu = pc_aval_posic_num_orgaoResp
-			INNER JOIN pc_usuarios on pc_usu_matricula = pc_aval_posic_matricula
-			INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_posic_status
-			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 1
-                 <cfif arguments.paraControleInterno eq 'N'>  
-                    and not pc_aval_posic_status IN(13,14)  
-                </cfif>
+            SELECT pc_avaliacao_posicionamentos.*
+                , pc_orgaos.* 
+                , pc_usuarios.*
+                , pc_orgaos2.pc_org_sigla AS orgaoResp
+                , pc_orgaos2.pc_org_mcu AS mcuOrgaoResp
+                , CONVERT(CHAR, pc_aval_posic_datahora, 103) AS dataPosic
+                , pc_orientacao_status.pc_orientacao_status_finalizador AS eHstatusFinalizador
+                , pc_orientacao_status.pc_orientacao_status_card_style_header
+                , CASE 
+                    WHEN pc_aval_posic_status IN (4, 5) THEN 
+                        CASE 
+                            WHEN CAST(pc_aval_posic_dataPrevistaResp AS DATE) < (
+                                SELECT TOP 1 CAST(subquery.pc_aval_posic_datahora AS DATE)
+                                FROM pc_avaliacao_posicionamentos AS subquery
+                                WHERE subquery.pc_aval_posic_num_orientacao =  <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+                                AND subquery.pc_aval_posic_id > pc_avaliacao_posicionamentos.pc_aval_posic_id
+                                
+                                ORDER BY subquery.pc_aval_posic_id ASC
+                            ) THEN 'PENDENTE'
+                            ELSE pc_orientacao_status.pc_orientacao_status_descricao
+                        END
+                    ELSE pc_orientacao_status.pc_orientacao_status_descricao
+                END AS statusDescricao
+               
+                , CASE 
+                    WHEN pc_aval_posic_id = (
+                        SELECT MAX(pc_aval_posic_id)
+                        FROM pc_avaliacao_posicionamentos AS subquery
+                        WHERE subquery.pc_aval_posic_num_orientacao =  <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+                            AND subquery.pc_aval_posic_enviado = 1
+                    ) THEN 1
+                    ELSE 0
+                END AS ehMaiorId
+            FROM pc_avaliacao_posicionamentos
+            INNER JOIN pc_orgaos ON pc_org_mcu = pc_aval_posic_num_orgao
+            LEFT JOIN pc_orgaos AS pc_orgaos2 ON pc_orgaos2.pc_org_mcu = pc_aval_posic_num_orgaoResp
+            INNER JOIN pc_usuarios ON pc_usu_matricula = pc_aval_posic_matricula
+            INNER JOIN pc_orientacao_status ON pc_orientacao_status_id = pc_aval_posic_status
+            WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+            AND pc_aval_posic_enviado = 1
+            <cfif arguments.paraControleInterno EQ 'N'>  
+                AND NOT pc_aval_posic_status IN (13, 14, 17)
+            </cfif>
+            ORDER BY pc_aval_posic_dataHora DESC, pc_aval_posic_id DESC
+        </cfquery>
 
-			ORDER BY pc_aval_posic_dataHora desc, pc_aval_posic_id desc		
-		</cfquery>
         
         <!--timeline -->
-        <div id="accordionCadItemPainel" >
-                            
-            <div class="card card-success"  style="padding-bottom: 20px;">
-                
-                <div class="card-header" style="background-color: #ececec;" >
-                        
+        <div id="accordionCadItemPainel" style="margin-bottom:100px">
+                <div class="card-header card-header_backgroundColor" >
                     <h4 class="card-title ">	
-                        <div  class="d-block" style="font-size:20px;color:gray;font-weight: bold;"> 
-                            <i class="fas fa-clock" style="margin-top:4px;"></i><span style="margin-left:10px;font-size:16px;">
+                        <div  class="d-block" style="font-size:20px;color:#fff;font-weight: bold;"> 
+                            <i class="fas fa-comments" style="margin-top:4px;"></i><span style="margin-left:10px;font-size:16px;">
                             <span id="tituloParaPDF">
                                 MANIFESTAÇÕES: <cfoutput>Orientação (ID: #rsProcessos.pc_aval_orientacao_id#) para #rsProcessos.orgaoRespOrientacao# (item: #rsProcessos.pc_aval_numeracao# - Processo: #rsProcessos.pc_processo_id#)</cfoutput></span>
                             </span>
                         </div>
                     </h4>
                     <div class="card-tools" align="center">
-                        <i id="exportarTimelinePDF"  class="fas fa-file-pdf fa-2x grow-icon" style="color:#b30b00;cursor:pointer;margin-right:20px" title="Exportar o Histórico para PDF" ></i>	
-                        <i id="btRecolherPosic"  class="fas fa-eye-slash fa-2x grow-icon" style="color:gray;cursor:pointer;margin-right:20px" title="Recolher todos os posicionamentos" ></i>	
+                        <i id="exportarTimelinePDF"  class="fas fa-file-pdf fa-2x grow-icon" style="color:#ad0001;cursor:pointer;margin-right:20px" title="Exportar o Histórico para PDF" ></i>	
+                        <i id="btRecolherPosic"  class="fas fa-eye-slash fa-2x grow-icon" style="color:color:#fff;cursor:pointer;margin-right:20px" title="Recolher todas as manifestações" ></i>	
                     </div>
                 </div>
                 
-                <div id="collapseTwo" class="" data-parent="#accordion" style="max-height:400px;overflow: auto">
-                    <div class="card-body" >
+                <div id="collapseTwo" class="" data-parent="#accordion" style="max-height:400px;">
+                    <div class="card-body card_border_correios" >
 
                         <!-- Timelime -->
-                        <div class="row">
+                        <div class="row" style="max-height:400px;overflow: auto">
                             <div class="timeline" >
                                 <cfoutput query = "rsPosicionamentos" group="dataPosic">
                                     <!-- timeline time label -->
@@ -87,7 +110,7 @@
                                         <!-- timeline item -->
                                         <cfif #pc_org_controle_interno# eq 'S' >
                                             <div>
-                                                <cfif #pc_aval_posic_status# eq 13>
+                                                <cfif #pc_aval_posic_status# eq 13 OR #pc_aval_posic_status# eq 17>
                                                     <cfset icone = "fa-gear">
                                                 <cfelseif #pc_aval_posic_status# eq 14>
                                                     <cfset icone = "fa-lock">
@@ -97,7 +120,7 @@
                                                         <cfset icone = "fa-user">
                                                 </cfif>
 
-                                                <cfif ListFind("13,14,16", #pc_aval_posic_status#)>
+                                                <cfif ListFind("13,14,16,17", #pc_aval_posic_status#)>
                                                     <cfset cor = "##dc3545 ">
                                                      <i class="fas #icone# bg-red"  style="margin-top:6px;color:##fff"></i>
                                                 <cfelse>
@@ -123,19 +146,36 @@
                                                             <a class="d-block" data-toggle="collapse" href="##collapseOne" style="font-size:14px;color:<cfif #cor# neq "##ececec">##fff<cfelse>##00416b</cfif>" data-card-widget="collapse">
                                                                 <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:<cfif #cor# neq "##ececec">##fff<cfelse>gray</cfif>"></i>
                                                                 </button></i>
-                                                                <cfif arguments.paraControleInterno eq 'S'>     
-                                                                    <cfif pc_aval_posic_status eq 13 or pc_aval_posic_status eq 14  or eHstatusFinalizador eq 'S'>
-                                                                        De: #pc_org_sigla# (#pc_usu_nome#) 
+                                                                                    
+                                                                    <cfif arguments.paraControleInterno eq 'S'>     
+                                                                        <cfif pc_aval_posic_status eq 13 OR pc_aval_posic_status eq 17 or pc_aval_posic_status eq 14  or eHstatusFinalizador eq 'S'>
+                                                                            De: #pc_org_sigla# (#pc_usu_nome#) 
+                                                                        <cfelse>
+                                                                            De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#)
+                                                                        </cfif>
                                                                     <cfelse>
-                                                                        De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#)
+                                                                        <cfif eHstatusFinalizador eq 'N'>
+                                                                            De: Controle Interno -> Para: #orgaoResp# (#mcuOrgaoResp#)  
+                                                                        <cfelse>
+                                                                            De: Controle Interno
+                                                                        </cfif>
+
+                                                                    </cfif>
+                                                                
+                                                                <cfif #statusDescricao# eq 'PENDENTE' OR (#ehMaiorId# EQ 1   AND #pc_aval_posic_dataPrevistaResp# neq '' and DATEFORMAT(#pc_aval_posic_dataPrevistaResp#,"yyyy-mm-dd")  lt DATEFORMAT(Now(),"yyyy-mm-dd") and (#pc_aval_posic_status# eq 4 or #pc_aval_posic_status# eq 5))>
+                                                                    <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
+                                                                        <td align="center"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;font-size: 10px;float: right;margin-left:20px" >PENDENTE</span></td>
+                                                                    <cfelse>
+                                                                        <td align="center"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;font-size: 10px;float: right;margin-left:20px" >PENDENTE</span></td>
+                                                                    </cfif>
+                                                                <cfelseif #pc_aval_posic_status# eq 3>
+                                                                    <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
+                                                                        <span  class="statusOrientacoes" style="background:##FFA500;color:##fff;font-size: 10px;float: right;margin-left:20px" >#statusDescricao#</span>
+                                                                    <cfelse>
+                                                                        <span  class="statusOrientacoes" style="background:##dc3545;color:##fff;font-size: 10px;float: right;margin-left:20px" >#statusDescricao#</span>
                                                                     </cfif>
                                                                 <cfelse>
-                                                                    <cfif eHstatusFinalizador eq 'N'>
-                                                                        De: Controle Interno -> Para: #orgaoResp# (#mcuOrgaoResp#)  
-                                                                    <cfelse>
-                                                                        De: Controle Interno
-                                                                    </cfif>
-
+                                                                    <span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;font-size: 10px;float: right;margin-left:20px"  >#statusDescricao#</span>
                                                                 </cfif>
                                                             </a>
                                                         
@@ -198,6 +238,21 @@
                                                                             De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
                                                                         </cfif>
                                                                         
+                                                                        <cfif #statusDescricao# eq 'PENDENTE' OR (#ehMaiorId# EQ 1   AND #pc_aval_posic_dataPrevistaResp# neq '' and DATEFORMAT(#pc_aval_posic_dataPrevistaResp#,"yyyy-mm-dd")  lt DATEFORMAT(Now(),"yyyy-mm-dd") and (#pc_aval_posic_status# eq 4 or #pc_aval_posic_status# eq 5))>
+                                                                            <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
+                                                                                <td align="center"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;font-size: 10px;float: right;margin-left:20px" >PENDENTE</span></td>
+                                                                            <cfelse>
+                                                                                <td align="center"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;font-size: 10px;float: right;margin-left:20px" >PENDENTE</span></td>
+                                                                            </cfif>
+                                                                        <cfelseif #pc_aval_posic_status# eq 3>
+                                                                            <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
+                                                                                <span  class="statusOrientacoes" style="background:##FFA500;color:##fff;font-size: 10px;float: right;margin-left:20px" >#statusDescricao#</span>
+                                                                            <cfelse>
+                                                                                <span  class="statusOrientacoes" style="background:##dc3545;color:##fff;font-size: 10px;float: right;margin-left:20px" >#statusDescricao#</span>
+                                                                            </cfif>
+                                                                        <cfelse>
+                                                                            <span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;font-size: 10px;float: right;margin-left:20px"  >#statusDescricao#</span>
+                                                                        </cfif>       
                                                                 </a>
                                                             </div>
                                                         <cfelse>
@@ -220,16 +275,31 @@
                                                                 <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus" style="color:gray"></i>
                                                                 </button></i>
                                                             </cfif>
-                                                                    <cfif pc_aval_posic_status eq 3>
-                                                                        De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+                                                            <cfif pc_aval_posic_status eq 3>
+                                                                De: #pc_org_sigla# (#pc_usu_nome#) -> Para: Controle Interno
+                                                            <cfelse>
+                                                                De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
+                                                            </cfif>
+                                                                    <cfif #statusDescricao# eq 'PENDENTE' OR (#ehMaiorId# EQ 1   AND #pc_aval_posic_dataPrevistaResp# neq '' and DATEFORMAT(#pc_aval_posic_dataPrevistaResp#,"yyyy-mm-dd")  lt DATEFORMAT(Now(),"yyyy-mm-dd") and (#pc_aval_posic_status# eq 4 or #pc_aval_posic_status# eq 5))>
+                                                                        <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
+                                                                            <td align="center"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;font-size: 10px;float: right;margin-left:20px" >PENDENTE</span></td>
+                                                                        <cfelse>
+                                                                            <td align="center"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;font-size: 10px;float: right;margin-left:20px" >PENDENTE</span></td>
+                                                                        </cfif>
+                                                                    <cfelseif #pc_aval_posic_status# eq 3>
+                                                                        <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
+                                                                            <span  class="statusOrientacoes" style="background:##FFA500;color:##fff;font-size: 10px;float: right;margin-left:20px" >#statusDescricao#</span>
+                                                                        <cfelse>
+                                                                            <span  class="statusOrientacoes" style="background:##dc3545;color:##fff;font-size: 10px;float: right;margin-left:20px" >#statusDescricao#</span>
+                                                                        </cfif>
                                                                     <cfelse>
-                                                                        De: #pc_org_sigla# (#pc_usu_nome#) -> Para: #orgaoResp# (#mcuOrgaoResp#) 
+                                                                        <span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;font-size: 10px;float: right;margin-left:20px"  >#statusDescricao#</span>
                                                                     </cfif>
                                                                 </a>
                                                             
                                                             </div>
                                                         </cfif>
-
+                                                        
 
 
                                                         <div class="card-body" >
@@ -255,7 +325,7 @@
                                                             </cfquery>
                                                             <cfif rsAnexosPosic.recordcount neq 0 >
                                                                
-                                                                <table id="tabAnexosPosic_#rsAnexosPosic.pc_anexo_aval_posic#" class="table table-bordered table-striped table-hover text-nowrap">
+                                                                <table id="tabAnexosPosic_#rsAnexosPosic.pc_anexo_aval_posic#" class="table table-striped table-hover text-nowrap  table-responsive">
 
                                                                     <thead>
                                                                         <tr>
@@ -315,7 +385,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+           
         
         </div>
 
@@ -351,7 +421,10 @@
                             "lengthChange": false,
                             "autoWidth": false,
                             "searching": false,
-                            "pageLength": 5
+                            "pageLength": 5,
+                            language: {
+                                url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+                            }
                         });
                     }
                 });
@@ -364,13 +437,13 @@
 					$('.posicOrgAvaliado').CardWidget('collapse')
 					$('#btRecolherPosic').removeClass('fa-eye-slash')
 					$('#btRecolherPosic').addClass('fa-eye')
-					$('#btRecolherPosic').attr('title','Expandir todos os posicionamentos')
+					$('#btRecolherPosic').attr('title','Expandir todas as manifestações')
 				}else{
 					$('.posicContInterno').CardWidget('expand')
 					$('.posicOrgAvaliado').CardWidget('expand')
 					$('#btRecolherPosic').removeClass('fa-eye')
 					$('#btRecolherPosic').addClass('fa-eye-slash')
-					$('#btRecolherPosic').attr('title','Recolher todos os posicionamentos')
+					$('#btRecolherPosic').attr('title','Recolher todas as manifestações')
 
 				}
 		    });

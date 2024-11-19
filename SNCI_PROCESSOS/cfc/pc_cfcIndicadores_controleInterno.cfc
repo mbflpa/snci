@@ -79,11 +79,11 @@
 						<div class="card-body" >
 						
 							<div class="table-responsive">
-								<table id="tabPRCIdetalhe" class="table table-bordered table-striped text-nowrap" style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+								<table id="tabPRCIdetalhe" class="table table-striped text-nowrap table-responsive " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
-									<thead >
+									<thead  class="table_thead_backgroundColor" >
 									    <tr style="font-size:14px">
-											<th colspan="12" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do PRCI: <cfoutput><strong>#monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+											<th colspan="12" style="padding:5px"><h5 style="margin-left: 10px">Dados utilizados no cálculo do PRCI: <cfoutput><strong>#monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
 										</tr>
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
@@ -156,7 +156,7 @@
 				destroy: true, // Destruir a tabela antes de recriá-la
 				stateSave: false,
 				deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-				scrollX: true, // Permitir rolagem horizontal
+				 // Permitir rolagem horizontal
 				autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 				pageLength: 5,
 				
@@ -170,7 +170,10 @@
 						className: 'btExcel',
 					}
 
-				]
+				],
+				language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 				
 
 			})
@@ -230,11 +233,11 @@
 														
 						
 							<div class="table-responsive">
-								<table id="tabSLNCdetalhe" class="table table-bordered table-striped text-nowrap" style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+								<table id="tabSLNCdetalhe" class="table table-striped text-nowrap table-responsive " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
-									<thead>
+									<thead  class="table_thead_backgroundColor" >
 										<tr style="font-size:14px">
-											<th colspan="11" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>#monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+											<th colspan="11" style="padding:5px"><h5 style="margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>#monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
 										</tr>
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
@@ -308,11 +311,9 @@
 					destroy: true, // Destruir a tabela antes de recriá-la
 					stateSave: false,
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					scrollX: true, // Permitir rolagem horizontal
         			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 					pageLength: 5,
-					
-					dom: "<'row'<'col-sm-3'B><'col-sm-4 text-center' p><'col-sm-4 text-right'i>>"  ,
+					dom: "<'row'<'col-sm-3'B><'col-sm-5 text-center' p><'col-sm-3 text-right'i>>"  ,
 					order: [[1, 'asc'], [2, 'asc']], // Ordena a segunda e a terceira coluna em ordem crescente
 					buttons: [
 						{
@@ -322,7 +323,11 @@
 							className: 'btExcel',
 						}
 
-					]
+					],
+					
+					language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 					
 
 				})
@@ -386,11 +391,11 @@
 						<div class="card-body" >
 						
 							<div class="table-responsive">
-								<table id="tabPRCIdetalheAcumulado" class="table table-bordered table-striped text-nowrap" style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+								<table id="tabPRCIdetalheAcumulado" class="table table-striped text-nowrap table-responsive " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
-									<thead >
+									<thead  class="table_thead_backgroundColor" >
 									    <tr style="font-size:14px">
-											<th colspan="14" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do PRCI: <cfoutput><strong>Janeiro a #monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+											<th colspan="14" style="padding:5px"><h5 style="margin-left: 10px">Dados utilizados no cálculo do PRCI: <cfoutput><strong>Janeiro a #monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
 										</tr>
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
@@ -464,7 +469,7 @@
 				destroy: true, // Destruir a tabela antes de recriá-la
 				stateSave: false,
 				deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-				scrollX: true, // Permitir rolagem horizontal
+				 // Permitir rolagem horizontal
 				autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 				pageLength: 5,
 				
@@ -478,7 +483,10 @@
 						className: 'btExcel',
 					}
 
-				]
+				],
+				language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 				
 
 			})
@@ -539,11 +547,11 @@
 														
 						
 							<div class="table-responsive">
-								<table id="tabSLNCdetalheAcumulado" class="table table-bordered table-striped text-nowrap" style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+								<table id="tabSLNCdetalheAcumulado" class="table table-striped text-nowrap table-responsive " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									
-									<thead>
+									<thead  class="table_thead_backgroundColor" >
 										<tr style="font-size:14px">
-											<th colspan="13" style="padding:5px"><h5 style="color:#0083ca;margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>Janeiro a #monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
+											<th colspan="13" style="padding:5px"><h5 style="margin-left: 10px">Dados utilizados no cálculo do SLNC: <cfoutput><strong>Janeiro a #monthAsString(mes)#/#ano#</strong></cfoutput></h5></th>
 										</tr>
 										<tr style="font-size:14px">
 											<th style="width: 10px">Posic ID</th>
@@ -619,7 +627,7 @@
 					destroy: true, // Destruir a tabela antes de recriá-la
 					stateSave: false,
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					scrollX: true, // Permitir rolagem horizontal
+					 // Permitir rolagem horizontal
         			autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 					pageLength: 5,
 					
@@ -633,7 +641,10 @@
 							className: 'btExcel',
 						}
 
-					]
+					],
+					language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 					
 
 				})
@@ -660,9 +671,9 @@
 						<!-- card-body -->
 						<div class="card-body" >
 							<div class="table-responsive ">
-								<table id="tabPRCIporOrgaoSubordinador" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+								<table id="tabPRCIporOrgaoSubordinador" class="table table-striped text-nowrap table-responsive  " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									<cfoutput>
-										<thead  style="text-align: center;">
+										<thead  class="table_thead_backgroundColor" style="text-align: center;">
 											<tr style="font-size:14px">
 												<th colspan="7" style="padding:5px">PRCI - <span>#monthAsString(mes)#/#ano#</span></th>
 											</tr>
@@ -770,7 +781,7 @@
 				destroy: true, // Destruir a tabela antes de recriá-la
 				stateSave: false,
 				deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-				scrollX: true, // Permitir rolagem horizontal
+				 // Permitir rolagem horizontal
 				autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 				pageLength: 5,//quantidade de registros por página
 				lengthMenu: [
@@ -794,26 +805,29 @@
 							}
 						},
 						//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
-						action: function (e, dt, button, config) {
-							// Armazenar a página atual
-							var currentPage = dt.page();
+						// action: function (e, dt, button, config) {
+						// 	// Armazenar a página atual
+						// 	var currentPage = dt.page();
 
-							// Exibir temporariamente todas as páginas
-							dt.page.len(-1).draw('page');
+						// 	// Exibir temporariamente todas as páginas
+						// 	dt.page.len(-1).draw('page');
 
-							// Exportar os dados
-							$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+						// 	// Exportar os dados
+						// 	$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
 
-							// Restaurar o número padrão de linhas por página e a página original
-							dt.page.len(5).draw('page');
-							dt.page(currentPage).draw('page');
-						}
+						// 	// Restaurar o número padrão de linhas por página e a página original
+						// 	dt.page.len(5).draw('page');
+						// 	dt.page(currentPage).draw('page');
+						// }
 						
 					}
 				],
 				drawCallback: function (settings) {
 					aplicarEstiloNasTDsComClasseTdResult();
-				}
+				},
+				language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 			})
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
@@ -841,9 +855,9 @@
 						<!-- card-body -->
 						<div class="card-body" >
 							<div class="table-responsive ">
-								<table id="tabSLNCporOrgaoSubordinador" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+								<table id="tabSLNCporOrgaoSubordinador" class="table table-striped text-nowrap table-responsive  " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									<cfoutput>
-										<thead  style="text-align: center;">
+										<thead  class="table_thead_backgroundColor" style="text-align: center;">
 											<tr style="font-size:14px">
 												<th colspan="7" style="padding:5px">SLNC - <span>#monthAsString(mes)#/#ano#</span></th>
 											</tr>
@@ -941,7 +955,7 @@
 					destroy: true, // Destruir a tabela antes de recriá-la
 					stateSave: false,
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					scrollX: true, // Permitir rolagem horizontal
+					// // Permitir rolagem horizontal
 					autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 					pageLength: 5,//quantidade de registros por página
 					lengthMenu: [
@@ -965,25 +979,28 @@
 									}
 								},
 							//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
-							action: function (e, dt, button, config) {
-								// Armazenar a página atual
-								var currentPage = dt.page();
+							// action: function (e, dt, button, config) {
+							// 	// Armazenar a página atual
+							// 	var currentPage = dt.page();
 
-								// Exibir temporariamente todas as páginas
-								dt.page.len(-1).draw('page');
+							// 	// Exibir temporariamente todas as páginas
+							// 	dt.page.len(-1).draw('page');
 
-								// Exportar os dados
-								$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+							// 	// Exportar os dados
+							// 	$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
 
-								// Restaurar o número padrão de linhas por página e a página original
-								dt.page.len(5).draw('page');
-								dt.page(currentPage).draw('page');
-							}
+							// 	// Restaurar o número padrão de linhas por página e a página original
+							// 	dt.page.len(5).draw('page');
+							// 	dt.page(currentPage).draw('page');
+							// }
 						}
 					],
 					drawCallback: function (settings) {
 						aplicarEstiloNasTDsComClasseTdResult();
-					}
+					},
+					language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 				})
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
@@ -1012,9 +1029,9 @@
 						<!-- card-body -->
 						<div class="card-body" >
 							<div class="table-responsive ">
-								<table id="tabDGCIporOrgaoSubordinador" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+								<table id="tabDGCIporOrgaoSubordinador" class="table table-striped text-nowrap table-responsive  " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									<cfoutput>
-										<thead  style="text-align: center;">
+										<thead  class="table_thead_backgroundColor" style="text-align: center;">
 											<tr style="font-size:14px">
 												<th colspan="9" style="padding:5px">DGCI - <span>#monthAsString(mes)#/#ano#</span></th>
 											</tr>
@@ -1137,7 +1154,7 @@
 					destroy: true, // Destruir a tabela antes de recriá-la
 					stateSave: false,
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					scrollX: true, // Permitir rolagem horizontal
+					 // Permitir rolagem horizontal
 					autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 					pageLength: 5,//quantidade de registros por página
 					lengthMenu: [
@@ -1161,25 +1178,28 @@
 								}
 							},
 							//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
-							action: function (e, dt, button, config) {
-								// Armazenar a página atual
-								var currentPage = dt.page();
+							// action: function (e, dt, button, config) {
+							// 	// Armazenar a página atual
+							// 	var currentPage = dt.page();
 
-								// Exibir temporariamente todas as páginas
-								dt.page.len(-1).draw('page');
+							// 	// Exibir temporariamente todas as páginas
+							// 	dt.page.len(-1).draw('page');
 
-								// Exportar os dados
-								$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+							// 	// Exportar os dados
+							// 	$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
 
-								// Restaurar o número padrão de linhas por página e a página original
-								dt.page.len(5).draw('page');
-								dt.page(currentPage).draw('page');
-							}
+							// 	// Restaurar o número padrão de linhas por página e a página original
+							// 	dt.page.len(5).draw('page');
+							// 	dt.page(currentPage).draw('page');
+							// }
 						}
 					],
 					drawCallback: function (settings) {
 						aplicarEstiloNasTDsComClasseTdResult();
-					}
+					},
+					language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 				})
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
@@ -1206,9 +1226,9 @@
 						<!-- card-body -->
 						<div class="card-body" >
 							<div class="table-responsive ">
-								<table id="tabDGCIporOrgaoResponsavel" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+								<table id="tabDGCIporOrgaoResponsavel" class="table table-striped text-nowrap table-responsive  " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 									<cfoutput>
-										<thead  style="text-align: center;">
+										<thead  class="table_thead_backgroundColor" style="text-align: center;">
 											<tr style="font-size:14px">
 												<th colspan="10" style="padding:5px">DGCI - <span>#monthAsString(mes)#/#ano#</span></th>
 											</tr>
@@ -1345,7 +1365,7 @@
 				destroy: true, // Destruir a tabela antes de recriá-la
 				stateSave: false,
 				deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-				scrollX: true, // Permitir rolagem horizontal
+				 // Permitir rolagem horizontal
 				autoWidth: true,// Ajustar automaticamente o tamanho das colunas
 				pageLength: 5,//quantidade de registros por página
 				lengthMenu: [
@@ -1369,25 +1389,28 @@
 							}
 						},
 						//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
-						action: function (e, dt, button, config) {
-							// Armazenar a página atual
-							var currentPage = dt.page();
+						// action: function (e, dt, button, config) {
+						// 	// Armazenar a página atual
+						// 	var currentPage = dt.page();
 
-							// Exibir temporariamente todas as páginas
-							dt.page.len(-1).draw('page');
+						// 	// Exibir temporariamente todas as páginas
+						// 	dt.page.len(-1).draw('page');
 
-							// Exportar os dados
-							$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+						// 	// Exportar os dados
+						// 	$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
 
-							// Restaurar o número padrão de linhas por página e a página original
-							dt.page.len(5).draw('page');
-							dt.page(currentPage).draw('page');
-						}
+						// 	// Restaurar o número padrão de linhas por página e a página original
+						// 	dt.page.len(5).draw('page');
+						// 	dt.page(currentPage).draw('page');
+						// }
 					}
 				],
 				drawCallback: function (settings) {
 					aplicarEstiloNasTDsComClasseTdResult();
-				}
+				},
+				language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 			})
 			$(document).ready(function() {
 				$(".content-wrapper").css("height", "auto");
@@ -1421,7 +1444,7 @@
 
 								<div class="table-responsive " style="width: 850px; margin: 0 auto;">
 									<h4 style=" text-align: center;">DGCI ECT <cfoutput>#arguments.ano#</cfoutput> por Mês:</h4>
-									<table id="tabIndicadorDGCI_Mes_a_Mes" class="table table-bordered table-striped text-nowrap " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
+									<table id="tabIndicadorDGCI_Mes_a_Mes" class="table table-striped text-nowrap table-responsive  " style="border-left: 1px solid #dee2e6;border-bottom: 1px solid #dee2e6;">
 										
 										<thead >
 											<tr style="font-size:14px;text-align: center;">
@@ -1460,7 +1483,7 @@
 													
 
 													<cfif Replace(ROUND(media_resultadoMes*10)/10,',','.') gt  metaDGCI and  metaDGCI neq 0>
-														<td style="color: blue;"><span class="statusOrientacoes" style="background:##0083CA;color:##fff;">ACIMA DO ESPERADO</span></td>
+														<td style="color: blue;"><span class="statusOrientacoes azul_claro_correios_backgroundColor" style="color:##fff;">ACIMA DO ESPERADO</span></td>
 													<cfelseif Replace(ROUND(media_resultadoMes*10)/10,',','.') lt  metaDGCI and  metaDGCI neq 0>
 														<td ><span class="statusOrientacoes" style="background:##dc3545;color:##fff;">ABAIXO DO ESPERADO</span></td>	
 													<cfelseif Replace(ROUND(media_resultadoMes*10)/10,',','.') eq  metaDGCI and  metaDGCI neq 0>
@@ -1554,22 +1577,25 @@
 							}
 						},
 						//código para exibir todas apáginas, exportar e voltar para a página original. Isso porque só a página atual estava sendo exportada com a formatação correta da função updateTDresultIndicadores
-						action: function (e, dt, button, config) {
-							// Armazenar a página atual
-							var currentPage = dt.page();
+						// action: function (e, dt, button, config) {
+						// 	// Armazenar a página atual
+						// 	var currentPage = dt.page();
 
-							// Exibir temporariamente todas as páginas
-							dt.page.len(-1).draw('page');
+						// 	// Exibir temporariamente todas as páginas
+						// 	dt.page.len(-1).draw('page');
 
-							// Exportar os dados
-							$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
+						// 	// Exportar os dados
+						// 	$.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, button, config);
 
-							// Restaurar o número padrão de linhas por página e a página original
-							dt.page.len(5).draw('page');
-							dt.page(currentPage).draw('page');
-						}
+						// 	// Restaurar o número padrão de linhas por página e a página original
+						// 	dt.page.len(5).draw('page');
+						// 	dt.page(currentPage).draw('page');
+						// }
 					}
-				]
+				],
+				language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 			})
 
 			$(document).ready(function() {

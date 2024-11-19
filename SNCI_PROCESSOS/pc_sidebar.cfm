@@ -2,11 +2,11 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
 
-<cfif Not ListContains(application.Lista_usuariosCad,UCase(application.rsUsuarioParametros.pc_usu_login))>
+<cfif application.rsUsuarioParametros.pc_usu_status neq 'A'>
   <cflocation url = "sem_acesso_sistema.html" addToken = "no">
 </cfif>  
 <!--cgi.script_name retorna a página atual e verifica na tabela pc_controle_acesso se u perfil do usuario atual tem acesso a essa página -->
-<cfif NOT ListContains(UCase(application.Lista_paginasPerfilUsuario),UCase(cgi.script_name)) and UCase(cgi.script_name) neq '/snci/snci_processos/index.cfm'>
+<cfif NOT ListContains(UCase(application.Lista_paginasPerfilUsuario),UCase(cgi.script_name)) and UCase(cgi.script_name) neq '/snci/snci_processos/index.cfm'and application.rsUsuarioParametros.pc_usu_status neq 'A'>
   <cflocation url = "sem_acesso_pagina.html?pagina=#cgi.script_name#" addToken = "no">
 </cfif> 
  
@@ -58,27 +58,22 @@
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/bootstrap4-duallistbox/bootstrap-duallistbox.css">
 	<!-- dropzonejs -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/dropzone/min/dropzone.min.css">
-	<!-- DataTables -->
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-select/css/select.bootstrap4.min.css">
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-scroller/css/scroller.bootstrap4.min.css">
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables-searchpanes/css/searchPanes.bootstrap4.min.css">
+	
 	
 	
 	<!-- Select2 -->
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2/css/select2.min.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
  
-
+  <!-- DataTables -->
+  <link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/datatables/datatables.min.css">
 	
 
 	<!-- Tour 
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/plugins/tour/dist/css/hopscotch.css">-->
 
   <!-- Theme style -->
-	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.css">
+	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.min.css">
 	<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/stylesSNCI.css">
 
   <!-- stepper -->
@@ -88,11 +83,14 @@
     <style>
           .select2-container--bootstrap4 .select2-dropdown .select2-results__option[aria-selected="true"] {
             color: #fff!important;
-            background-color: #00416b!important;
+            background-color:var(--azul_correios)!important
           }
           .select2-results__option{
             font-size:11px!important;
           }
+          <cfif listLast(cgi.script_name, "/") eq "pc_Navegacao_por_abas.cfm">
+           
+          </cfif>
         
     </style>
 </head>
@@ -105,11 +103,11 @@
       
           <a href="../SNCI_PROCESSOS/index.cfm" class="brand-link" style="background-color:#f4f6f9;height: auto;" >
             <img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png" class="brand-image" style="position:relative;left:-5px;top:2px">
-            <span class="brand-text font-weight-light" style="font-size:20px!important;color:#00416B">SNCI - Processos</span>
+            <span class="brand-text font-weight-light azul_correios_textColor" style="font-size:20px!important;">SNCI - Processos</span>
           </a>
   
         <!-- Sidebar -->
-        <div class="sidebar os-host os-theme-light os-host-overflow os-host-resize-disabled os-host-transition os-host-overflow-y os-host-scrollbar-horizontal-hidden" style="background-color:#00416B;">
+        <div class="sidebar os-host os-theme-light os-host-overflow os-host-resize-disabled os-host-transition os-host-overflow-y os-host-scrollbar-horizontal-hidden sidebar_correios_backgroundColor" >
           <!-- Sidebar user panel (optional) -->
           <a href="../SNCI_PROCESSOS/index.cfm" class="user-panel brand-link user-panel" style="height: auto; display: flex; align-items: center;">
             <img src="../SNCI_PROCESSOS/dist/img/avatardefault.png" class="img-circle elevation-2" alt="User Image" style="width: 3rem;">
@@ -158,7 +156,7 @@
                   <cfset id1 = REReplace(id1, "[óòôõ]", "o", "ALL")>
                   <cfset id1 = REReplace(id1, "[úùû]", "u", "ALL")>
                   <li id="#id1#" class="nav-item ">
-                    <a href="../SNCI_PROCESSOS/##" class="nav-link ">
+                    <a href="##" class="nav-link ">
                       <i class="nav-icon fas #pc_controle_acesso_grupo_icone#"></i>
                       <p >
                         #pc_controle_acesso_grupoMenu#
@@ -193,7 +191,7 @@
                           <cfset id3 = REReplace(id3, "[óòôõ]", "o", "ALL")>
                           <cfset id3 = REReplace(id3, "[úùû]", "u", "ALL")>
                           <li id="#id3#" class="nav-item">  
-                              <a href="../SNCI_PROCESSOS/##" class="nav-link">
+                              <a href="##" class="nav-link">
                                 <i class="far <cfif #pc_controle_acesso_subgrupo_icone# eq ''>fa-circle <cfelse>fas #pc_controle_acesso_subgrupo_icone#</cfif> nav-icon"></i>
                                 <p >
                                   #pc_controle_acesso_subgrupoMenu#
@@ -313,30 +311,20 @@
     <!-- Toastr -->
     <script  src="../SNCI_PROCESSOS/plugins/toastr/toastr.min.js"></script>
 
-    <!-- DataTables  & Plugins -->
-    <script  src="../SNCI_PROCESSOS/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-fixedheader/js/dataTables.fixedHeader.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-fixedheader/js/fixedHeader.bootstrap4.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-rowreorder/js/dataTables.rowReorder.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/jszip/jszip.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>	
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-select/js/dataTables.select.min.js"></script>	
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/dataTables.searchPanes.js"></script>	
-    <script  src="../SNCI_PROCESSOS/plugins/datatables-searchpanes/js/searchPanes.bootstrap4.min.js"></script>	
+     
 
+
+    <!-- DataTables  & Plugins -->
+    <script  src="../SNCI_PROCESSOS/plugins/datatables/datatables.min.js"></script>
+    	
+<!-- Bootstrap -->
+    <script src="../SNCI_PROCESSOS/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+   
       <!-- bs-stepper -->
      <script src="../SNCI_PROCESSOS/plugins/bs-stepper/js/bs-stepper.min.js"></script>
 
-
-    <!-- Tour 
-    <script  src="../SNCI_PROCESSOS/plugins/tour/dist/js/hopscotch.min.js"></script>-->
+    
+   
 
     
     <!-- SNCI -->
@@ -344,12 +332,13 @@
   
 
     <!-- AdminLTE App -->
-		<script  src="../SNCI_PROCESSOS/dist/js/adminlte.js"></script>
+		<script  src="../SNCI_PROCESSOS/dist/js/adminlte.min.js"></script>
  
    
 
 
    <script language="JavaScript">
+     
       //para sweetalert2
       const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
@@ -363,14 +352,12 @@
       function logoSNCIsweetalert2(mens){
         let logo='';
         if(mens == ''){
-          logo= '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
-              + '<span class="font-weight-light" style="font-size:20px!important;color:#00416B">SNCI - Processos</span></div>';
-
+          logo= '<div  class="logoDivSwal2Correios"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image logoImagemSwal2Correios" >'
+              + '<span class="font-weight-light azul_correios_textColor" style="font-size:20px!important;position:relative;top:3px">SNCI - Processos</span></div>';
         }else{
-          logo= '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
-              + '<span class="font-weight-light" style="font-size:20px!important;color:#00416B;widht:100%">SNCI - Processos</span></div>'
-              +'<div class="font-weight-light" style="color:#00416B;margin-top:20px">'+ mens + '</div>';
-
+          logo= '<div  class="logoDivSwal2Correios"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image logoImagemSwal2Correios" >'
+              + '<span class="font-weight-light azul_correios_textColor " style="font-size:20px!important;width:100%;position:relative;top:3px">SNCI - Processos</span></div>'
+              +'<div class="font-weight-light " style="margin-top:20px;color:#fff">'+ mens + '</div>';
         }
 
         
@@ -492,6 +479,7 @@
     }
 
     $(document).ready(function() {	//executa quando a página terminar de carregar
+       
       //verifica se o órgão é subordinador
       <cfoutput>
         var subordinador = '#application.rsOrgaoSubordinados.recordcount#';

@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8">  
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
     <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
@@ -36,12 +37,12 @@ function validarform() {
 	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
 	{
 	if (eval(messelec) >= eval(mesatual)){
-	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
+	alert('Gestor(a), o mï¿½s selecionado para o ano selecionado ainda nï¿½o gerado!');
 	return false;
 	}
 
     if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmdia.value <= 10){
-	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
+	alert('Gestor(a), o mï¿½s selecionado para o ano selecionado ainda nï¿½o gerado!');
 	return false;
 	}	
 	} 
@@ -60,7 +61,7 @@ function validarform() {
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- Área de conteúdo   --->
+<!--- ï¿½rea de conteï¿½do   --->
 	<form action="Pacin_Permuta_Avaliacaob.cfm" method="post" target="_blank" name="frmObjeto" onSubmit="return validarform()">
 	  <table width="50%" align="center">
        
@@ -87,7 +88,7 @@ function validarform() {
  
           <tr>
             <td>&nbsp;</td>
-            <td width="39%" class="exibir"><strong>Superintend&ecirc;ncia : </strong></td>
+            <td width="39%" class="exibir"><strong>SuperintendÃªncia : </strong></td>
             <td width="59%" colspan="2">
 
             <cfset auxcord = trim(qAcesso.Usu_Coordena)>
@@ -95,7 +96,8 @@ function validarform() {
 				  <cfoutput query="rsSE">
 		          	<option value="#rsSE.codse#">#Ucase(trim(rsSE.Dir_Sigla))#</option>
 				  </cfoutput>
-		        </select> 		</td>
+		        </select> 		
+          </td>
           </tr>
 
 		  <cfset cont = 0>		  

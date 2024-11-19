@@ -31,7 +31,7 @@
 			<cfelseif #application.rsUsuarioParametros.pc_usu_perfil# eq 8>
 			    WHERE  pc_status.pc_status_id IN ('2','3')  and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 			<cfelseif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#)>
-				WHERE  pc_status.pc_status_id IN ('2','3') and pc_num_orgao_origem IN('00436698','00436697','00438080') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+				WHERE  pc_status.pc_status_id IN ('2','3') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
 			<cfelse>
 				WHERE  pc_status.pc_status_id = 0
 			</cfif>
@@ -42,6 +42,7 @@
 			#tabProcAcompCards_wrapper #tabProcAcompCards_paginate ul.pagination {
 				justify-content: center!important;
 			}	
+			
 		</style>
 		
 		<!-- Main content -->
@@ -53,15 +54,15 @@
 						<!--acordion-->
 						<div id="accordionCadItemPainel" style="margin-bottom:80px">
 							<div class="card card-success" >
-								<div class="card-header" style="background-color: #ffD400;">
+								<div class="card-header card-header_backgroundColor" >
 									<h4 class="card-title ">
-										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#00416b;font-weight: bold;"> 
+										<span class="d-block" data-toggle="collapse" href="#collapseTwo" style="color:#fff;font-size:20px;font-weight: bold;"> 
 											<i class="fas fa-file-alt" style="margin-right:10px"> </i>Selecione um Processo
-										</a>
+										</span>
 									</h4>
 								</div>
 								<div id="collapseTwo" class="" data-parent="#accordion">							
-									<div class="card-body" style="border: solid 3px #ffD400;width:100%">
+									<div class="card-body card_border_correios" >
 										
 										<div class="row" style="justify-content: space-around;">
 											<cfif #rsProcCadAvaliacao.recordcount# eq 0 >
@@ -78,6 +79,9 @@
 														
 														<tbody class="grid-container" >
 															<cfloop query="rsProcCadAvaliacao" >
+															<cfset cardClass ="" >
+															
+
 																
 																<tr style="width:270px;border:none;">
 																	<td style="background: none;border:none;white-space:normal!important;" >	
@@ -87,44 +91,45 @@
 
 																							<div class="row">
 																								<div id="cartao" style="width:270px;" >
-																								
-																									<!-- small card -->
-																									<div class="small-box " style="<cfoutput>#pc_status_card_style_header#</cfoutput> font-weight: normal;">
-																										<cfif #pc_iniciarBloqueado# eq "S">
-																									  	  <i id="btBloquear" class="fas fa-lock grow-icon" style="position:absolute;color: red;left: 2px;top:2px;z-index:1;cursor: default" data-toggle="popover" data-trigger="hover" data-placement="top" title="Processo Bloqueado" data-content="O encaminhamento ao órgão avaliado só ocorrerá após o seu desbloqueio."></i>
-																										</cfif>	
-																										<cfif #pc_modalidade# eq "A">
-																											<span style="font-size:1em;color:#fff;position:relative;float:right;margin-right:10px;"><strong>A</strong></span>
-																										<cfelseif #pc_modalidade# eq "E">
-																									     	<span style="font-size:1em;color:#fff;position:relative;float:right;margin-right:5px;"><strong>E</strong></span>
-																										</cfif>
-																										<div class="ribbon-wrapper ribbon-lg" >
-																											<div class="ribbon " style="font-size:12px;left:8px;<cfoutput>#pc_status_card_style_ribbon#</cfoutput>"><cfoutput>#pc_status_card_nome_ribbon#</cfoutput></div>
-																										</div>
-																										
-
-																										<div class="card-header" style="height:120px;width:250px;font-weight:normal!important;">
-																											<p style="font-size:1em;margin-bottom:0rem!important;"><cfoutput>Processo n°: #pc_processo_id#</cfoutput></p>
-																											<p style="font-size:1em;margin-bottom:0rem!important;"><cfoutput>#siglaOrgAvaliado#</cfoutput></p>
-																											<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
-																												<cfif pc_aval_tipo_descricao neq ''>
-																													<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_descricao#</cfoutput></p>
-																												<cfelse>
-																													<p class="text-ellipsis" ><cfoutput>#tipoProcesso#</cfoutput></p>
-																												</cfif>
-																											<cfelse>
-																												<p style="font-size:12px;margin-bottom: 0!important;"><cfoutput>#pc_aval_tipo_nao_aplica_descricao#</cfoutput></p>
+																								    <cfoutput>
+																										<!-- small card -->
+																										<div class="small-box " style="#pc_status_card_style_header# font-weight: normal;">
+																											<cfif #pc_iniciarBloqueado# eq "S">
+																											<i id="btBloquear" class="fas fa-lock grow-icon" style="position:absolute;color: red;left: 2px;top:2px;z-index:1;cursor: default" data-toggle="popover" data-trigger="hover" data-placement="top" title="Processo Bloqueado" data-content="O encaminhamento ao órgão avaliado só ocorrerá após o seu desbloqueio."></i>
+																											</cfif>	
+																											<cfif #pc_modalidade# eq "A">
+																												<span style="font-size:1em;color:##fff;position:relative;float:right;margin-right:10px;"><strong>A</strong></span>
+																											<cfelseif #pc_modalidade# eq "E">
+																												<span style="font-size:1em;color:##fff;position:relative;float:right;margin-right:5px;"><strong>E</strong></span>
 																											</cfif>
+																											<div class="ribbon-wrapper ribbon-lg" >
+																												<div class="ribbon " style="font-size:12px;left:8px;#pc_status_card_style_ribbon#">#pc_status_card_nome_ribbon#</div>
+																											</div>
 																											
-																											
-																										</div>
-																										<div class="icon">
-																											<i class="fas fa-search" style="opacity:0.6;left:100px;top:30px"></i>
-																										</div>
 
-																										
+																											<div class="card-header" style="height:120px;width:250px;font-weight:normal!important;">
+																												<p style="font-size:1em;margin-bottom:0rem!important;">Processo n°: #pc_processo_id#</p>
+																												<p style="font-size:1em;margin-bottom:0rem!important;">#siglaOrgAvaliado#</p>
+																												<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
+																													<cfif pc_aval_tipo_descricao neq ''>
+																														<p style="font-size:12px;margin-bottom: 0!important;">#pc_aval_tipo_descricao#</p>
+																													<cfelse>
+																														<p class="text-ellipsis" >#tipoProcesso#</p>
+																													</cfif>
+																												<cfelse>
+																													<p style="font-size:12px;margin-bottom: 0!important;">#pc_aval_tipo_nao_aplica_descricao#</p>
+																												</cfif>
+																												
+																												
+																											</div>
+																											<div class="icon">
+																												<i class="fas fa-search" style="opacity:0.6;left:100px;top:30px"></i>
+																											</div>
+
 																											
-																									</div>
+																												
+																										</div>
+																									</cfoutput>
 																								</div>
 																							</div>
 																						
@@ -170,7 +175,10 @@
 					"lengthMenu": [
 						[10, 25, 50, -1],
 						[10, 25, 50, 'All'],
-					]
+					],
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 				})
 					
 			});
@@ -320,7 +328,7 @@
 				legend {
 					font-size: 0.8rem!important;
 					color: #fff!important;
-					background-color: #0083ca!important;
+					background-color: var(--azul_claro_correios)!important;
 					border: 1px solid #ced4da!important;
 					border-radius: 5px!important;
 					padding: 5px!important;
@@ -354,7 +362,7 @@
 				legend {
 					font-size: 0.8rem!important;
 					color: #fff!important;
-					background-color: #0083ca!important;
+					background-color:  var(--azul_claro_correios)!important;
 					border: 1px solid #ced4da!important;
 					border-radius: 5px!important;
 					padding: 5px!important;
@@ -470,116 +478,32 @@
 					<!-- /.modal-dialog -->
 				</div>
 				<!-- /.modal -->
-				<cfset aux_sei = Trim('#rsProcForm.pc_num_sei#')>
-				<cfset aux_sei = Left(aux_sei,"5") & "." & Mid(aux_sei,"6","6") & "/" &  Mid(aux_sei,"12","4")& "-" & Right(aux_sei,"2")>
-			
-				<section class="content" id="infoProcesso">
-						<div id="processosCadastrados" class="container-fluid" >
-							<div class="row">
-								<div id="cartao" style="width:100%;" >
-									<!-- small card -->
-									<cfoutput>
-										<div class="small-box " style=" font-weight: bold;">
-											<div class="ribbon-wrapper ribbon-xl" >
-												<div class="ribbon " style="font-size:18px!important;left:8px;<cfoutput>#rsProcForm.pc_status_card_style_ribbon#</cfoutput>"><cfoutput>#rsProcForm.pc_status_card_nome_ribbon#</cfoutput></div>
-											</div>
-											<div class="card-header" style="height:auto">
-												<p style="font-size: 1.8em;">Processo SNCI n°: <span style="color:##0692c6;margin-right:30px">#rsProcForm.pc_processo_id#</span> Órgão Avaliado: <span style="color:##0692c6">#rsProcForm.siglaOrgAvaliado#</span></p>
-												<p style="font-size: 1.3em;">Origem: <span style="color:##0692c6;margin-right:30px">#rsProcForm.siglaOrgOrigem#</span>
-												<cfif #rsProcForm.pc_modalidade# eq 'A' or #rsProcForm.pc_modalidade# eq 'E'>
-													<span >Processo SEI n°: </span> <span style="color:##0692c6">#aux_sei#</span> 
-													<span style="margin-left:20px">Relatório n°:</span> 
-													<span style="color:##0692c6">#rsProcForm.pc_num_rel_sei#</span></p>
-												</cfif>	
-												<cfif rsProcForm.pc_num_avaliacao_tipo neq 2 and rsProcForm.pc_num_avaliacao_tipo neq 445>
-													<cfif rsProcForm.pc_aval_tipo_descricao neq ''>
-														<p style="font-size: 1.3em;">Tipo de Avaliação: <span style="color:##0692c6">#rsProcForm.pc_aval_tipo_descricao#</span></p>
-													<cfelse>
-														<p style="font-size: 1.3em;margin-right:30px">Tipo de Avaliação: <span style="color:##0692c6; ">#rsProcForm.tipoProcesso#</span></p>
-													</cfif>
-												<cfelse>
-													<p style="font-size: 1.3em;">Tipo de Avaliação: <span style="color:##0692c6">#rsProcForm.pc_aval_tipo_nao_aplica_descricao#</span></p>
-												</cfif>
-												
-												
-											
-												<cfif #rsProcForm.pc_modalidade# eq 'A' or #rsProcForm.pc_modalidade# eq 'E'>
-												
-													<div id="actions" class="row" >
-														<div class="col-lg-12" align="center">
-															<div class="btn-group w-30">
-																<span id="relatorios" class="btn btn-success col fileinput-button" style="background:##0083CA">
-																	<i class="fas fa-upload"></i>
-																	<span style="margin-left:5px">Clique aqui para anexar o Relatório do Processo e Anexos I, II e III em PDF (1° Passo)</span>
-																</span>																	
-															</div>
-														</div>
-													</div>
-													
-													<div class="table table-striped files" id="previewsRelatorio">
-														<div id="templateRelatorio" class="row mt-2">
-															<div class="col-auto">
-																<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
-															</div>
-															<div class="col d-flex align-items-center">
-																<p class="mb-0">
-																<span class="lead" data-dz-name></span>
-																(<span data-dz-size></span>)
-																</p>
-																<strong class="error text-danger" data-dz-errormessage></strong>
-															</div>
-															<div class="col-4 d-flex align-items-center" >
-																<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
-																	<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
-																</div>
-															</div>
-															
-														</div>
-													</div>
 
-													<div id="anexoRelatorioDiv"></div>
-												
-												</cfif>	
-											</div>									
-										</div>
-									</cfoutput>
-
-
-
-								</div>
-							</div>
-
-							
-						</div>
-
-						
+				<cfobject component = "pc_cfcInfoProcesso" name = "pc_cfcInfoProcesso"/>
+				<cfinvoke component="#pc_cfcInfoProcesso#" method="infoProcesso" pc_aval_processoForm="#rsProcForm.pc_processo_id#"/>
 				
-
-						
-					
-				</section>
-
+				
 			</form><!-- fim formCadAvaliacao -->
 				
 			<input id="pcProcessoId" value="<cfoutput>#rsProcForm.pc_processo_id#</cfoutput>" hidden>
 
 			<div id="accordion"  style="display: flex; justify-content: left;">
 				<div  id="cadastro" class="card card-primary collapsed-card"   style="margin-left: 25px;">
-					<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+					<div class="card-header text-left card-header_backgroundColor" style="color:#fff;">
 						<a  id="btnCadastroItem" class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
 							<button  type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-							</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (2° Passo)</span>
+							</button></i><span id="cabecalhoAccordion" style="margin-right:80px;">Clique aqui para cadastrar um item (2° Passo)</span>
 						</a>
 					</div>
 
 					<input id="pc_aval_id" hidden>
-					<div class="card-body" style="border: solid 3px #0083ca;" >
+					<div class="card-body card_border_correios" >
 					
 						<div class="card card-default">
 							<div class="card-body p-0">
 								
-								<h6  class="font-weight-light text-center" style="top:-15px;font-size:20px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
-									<span id="infoTipoCadastro" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Novo Item</span>
+								<h6  class="font-weight-light text-center azul_correios_textColor" style="top:-15px;font-size:20px!important;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+									<span id="infoTipoCadastro"  style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Novo Item</span>
 								</h6>
 								<div class="bs-stepper" >
 									<div class="bs-stepper-header" role="tablist" >
@@ -976,7 +900,10 @@
 
 				
 				$(document).ready(function(){
-
+                    <cfoutput>
+						let pc_processo_id_info = '#rsProcForm.pc_processo_id#'
+					</cfoutput>
+					
 					
 					$('#cadastro').on('expanded.lte.cardwidget', function() {
 						//limpa o conteúdo de CadastroAvaliacaoRelato
@@ -1502,64 +1429,7 @@
 
 
 					
-					<cfoutput>
-						let modalidade = '#rsProcForm.pc_modalidade#'
-						let pc_processo_id = '#rsProcForm.pc_processo_id#'
-					</cfoutput>
-
-					if(modalidade ==='A' || modalidade ==='E'){
-						// DropzoneJS Demo Code Start
-						Dropzone.autoDiscover = false
-
-						// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-						var previewNode = document.querySelector("#templateRelatorio")
-						//previewNode.id = ""
-						var previewTemplate = previewNode.parentNode.innerHTML
-						previewNode.parentNode.removeChild(previewNode)
-
-						var myDropzoneRelatorio = new Dropzone("#processosCadastrados", { // Make the whole body a dropzone
-							url: "cfc/pc_cfcAvaliacoes.cfc?method=uploadArquivos", // Set the url
-							autoProcessQueue :true,
-							maxFiles: 1,
-							maxFilesize:20,
-							thumbnailWidth: 80,
-							thumbnailHeight: 80,
-							parallelUploads: 1,
-							acceptedFiles: '.pdf',
-							previewTemplate: previewTemplate,
-							autoQueue: true, // Make sure the files aren't queued until manually added
-							previewsContainer: "#previewsRelatorio", // Define the container to display the previews
-							clickable: "#relatorios", // Define the element that should be used as click trigger to select files.
-							headers: { "pc_aval_id":"", 
-									"pc_aval_processo":pc_processo_id, 
-									"pc_anexo_avaliacaoPDF":"S",
-									"arquivoParaTodosOsItens":"S"},//informar "S" se o arquivo deve ser exibido em todos os itens do processo
-							init: function() {
-								this.on('error', function(file, errorMessage) {	
-									toastr.error(errorMessage);
-									return false;
-								});
-							}
-							
-						})
-
-						
-
-
-						// Hide the total progress bar when nothing's uploading anymore
-						myDropzoneRelatorio.on("queuecomplete", function(progress) {
-							//toastr.success("Arquivo(s) enviado(s) com sucesso!")
-							myDropzoneRelatorio.removeAllFiles(true);
-							mostraRelatorioPDF();
-
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-						})
-
-						
-						// DropzoneJS 1 Demo Code End
-					}
+					
 
 
 					$('#btn_groupValorRecuperar .btn').click(function() {
@@ -1635,39 +1505,7 @@
 
 					
 
-				function mostraRelatorioPDF(){
-					<cfoutput>
-						let pc_processo_id = '#rsProcForm.pc_processo_id#'
-					</cfoutput>
-					$('#modalOverlay').modal('show')
-					setTimeout(function() {
-						$.ajax({
-							type: "post",
-							url:"cfc/pc_cfcAvaliacoes.cfc",
-							data:{
-								method: "anexoRelatorio",
-								pc_anexo_processo_id: pc_processo_id
-							},
-							async: false
-						})//fim ajax
-						.done(function(result){
-							
-							$('#anexoRelatorioDiv').html(result)
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-						})//fim done
-						.fail(function(xhr, ajaxOptions, thrownError) {
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-							$('#modal-danger').modal('show')
-							$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-							$('#modal-danger').find('.modal-body').text(thrownError)
-
-						})//fim fail
-					}, 1000);
-				}
+				
 
 				function resetFormFields()  {
 					
@@ -1878,7 +1716,6 @@
 
 
 	<cffunction name="cadProcAvaliacaoItem"   access="remote"  returntype="any"> 
-	
 	    <cfargument name="pc_aval_id" type="string" required="false" default=''/>
 		<cfargument name="pc_aval_processo" type="string" required="true"/>
 		<cfargument name="pc_aval_teste" type="string" required="true"/>
@@ -1898,211 +1735,209 @@
 		<cfargument name="pc_aval_criterioRef_id" type="numeric" required="true"/>
 		<cfargument name="pcCriterioRefOutrosDesc" type="string" required="false"/>
 		
-		
-        <cfif arguments.pc_aval_id eq '' >
-			<cftransaction>
+		<cflock name="cadProcAvaliacaoItem_#arguments.pc_aval_processo#" type="exclusive" timeout="10">
+			<cfif arguments.pc_aval_id eq '' >
+				<cftransaction>
 
-				<!--cadastra critério e referências se pc_criteroRef_id for igual a zero-->
-				<cfif arguments.pc_aval_criterioRef_id eq 0>
-					<cfquery datasource="#application.dsn_processos#" name="rsCriterioRef">
-						INSERT INTO pc_avaliacao_criterioReferencia (pc_aval_criterioRef_descricao)
-						VALUES ('#arguments.pcCriterioRefOutrosDesc#')
-						SELECT SCOPE_IDENTITY() AS newIDcriterioRef;
-					</cfquery>
-					<cfset arguments.pc_aval_criterioRef_id = rsCriterioRef.newIDcriterioRef>
-				</cfif>
-				<!--fim cadastro criterio e referências se pc_criteroRef_id for igual a zero-->
+					<!--cadastra critério e referências se pc_criteroRef_id for igual a zero-->
+					<cfif arguments.pc_aval_criterioRef_id eq 0>
+						<cfquery datasource="#application.dsn_processos#" name="rsCriterioRef">
+							INSERT INTO pc_avaliacao_criterioReferencia (pc_aval_criterioRef_descricao)
+							VALUES ('#arguments.pcCriterioRefOutrosDesc#')
+							SELECT SCOPE_IDENTITY() AS newIDcriterioRef;
+						</cfquery>
+						<cfset arguments.pc_aval_criterioRef_id = rsCriterioRef.newIDcriterioRef>
+					</cfif>
+					<!--fim cadastro criterio e referências se pc_criteroRef_id for igual a zero-->
 
-				<!--cadastra avaliação-->
-				<cfquery datasource="#application.dsn_processos#" name="rsAvaliacao">
-					INSERT INTO pc_avaliacoes
-									(pc_aval_status, pc_aval_processo, pc_aval_numeracao, pc_aval_datahora, pc_aval_atualiz_datahora,pc_aval_atualiz_login,
-									pc_aval_avaliador_matricula, pc_aval_teste, pc_aval_controleTestado, 
-									pc_aval_descricao, pc_aval_sintese,  pc_aval_coso_id, pc_aval_classificacao,
-									pc_aval_valorEstimadoRecuperar, pc_aval_valorEstimadoRisco, pc_aval_valorEstimadoNaoPlanejado, pc_aval_criterioRef_id)
-					VALUES     		(1,'#arguments.pc_aval_processo#', '#arguments.pc_aval_numeracao#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#application.rsUsuarioParametros.pc_usu_matricula#,
-										'#arguments.pc_aval_teste#',  '#arguments.pc_aval_controleTestado#', 
-										'#arguments.pc_aval_descricao#', '#arguments.pc_aval_sintese#', '#arguments.pc_aval_coso_id#', '#arguments.pc_aval_classificacao#',
-										'#arguments.pc_aval_valorEstimadoRecuperar#', '#arguments.pc_aval_valorEstimadoRisco#', '#arguments.pc_aval_valorEstimadoNaoPlanejado#', '#arguments.pc_aval_criterioRef_id#')
-			        SELECT SCOPE_IDENTITY() AS newIDaval;
-				</cfquery>  
-				<!--fim cadastro avaliação-->
+					<!--cadastra avaliação-->
+					<cfquery datasource="#application.dsn_processos#" name="rsAvaliacao">
+						INSERT INTO pc_avaliacoes
+										(pc_aval_status, pc_aval_processo, pc_aval_numeracao, pc_aval_datahora, pc_aval_atualiz_datahora,pc_aval_atualiz_login,
+										pc_aval_avaliador_matricula, pc_aval_teste, pc_aval_controleTestado, 
+										pc_aval_descricao, pc_aval_sintese,  pc_aval_coso_id, pc_aval_classificacao,
+										pc_aval_valorEstimadoRecuperar, pc_aval_valorEstimadoRisco, pc_aval_valorEstimadoNaoPlanejado, pc_aval_criterioRef_id)
+						VALUES     		(1,'#arguments.pc_aval_processo#', '#arguments.pc_aval_numeracao#', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#',#application.rsUsuarioParametros.pc_usu_matricula#,
+											'#arguments.pc_aval_teste#',  '#arguments.pc_aval_controleTestado#', 
+											'#arguments.pc_aval_descricao#', '#arguments.pc_aval_sintese#', '#arguments.pc_aval_coso_id#', '#arguments.pc_aval_classificacao#',
+											'#arguments.pc_aval_valorEstimadoRecuperar#', '#arguments.pc_aval_valorEstimadoRisco#', '#arguments.pc_aval_valorEstimadoNaoPlanejado#', '#arguments.pc_aval_criterioRef_id#')
+						SELECT SCOPE_IDENTITY() AS newIDaval;
+					</cfquery>  
+					<!--fim cadastro avaliação-->
 
-				<!-- cadastra avaliacao x tipos de controles-->	
-				<cfloop list="#arguments.pc_aval_tipoControle_id#" index="i"> 
-					<cfquery datasource="#application.dsn_processos#" name="rsAvalTipoControle">
-						INSERT INTO pc_avaliacao_tiposControles (pc_aval_id, pc_aval_tipoControle_id)
-						VALUES ('#rsAvaliacao.newIDaval#', '#i#')
-					</cfquery>
-				</cfloop>
-				<!--fim cadastro avaliacao x tipos de controles-->
-
-				<!-- cadastra avaliacao x categorias de controles-->
-				<cfloop list="#arguments.pc_aval_categoriaControle_id#" index="i"> 
-					<cfquery datasource="#application.dsn_processos#" name="rsAvalCategoriaControle">
-						INSERT INTO pc_avaliacao_categoriasControles (pc_aval_id, pc_aval_categoriaControle_id)
-						VALUES ('#rsAvaliacao.newIDaval#', '#i#')
-					</cfquery>
-				</cfloop>
-				<!--fim cadastro avaliacao x categorias de controles-->
-
-				<!-- início cadastro dos riscos selecionados e outros-->
-				<!-- se arguments.pc_aval_risco_id não for igual a zero-->
-				<cfif arguments.pc_aval_risco_id neq 0>
-					<cfset  idAvalRisco = arguments.pc_aval_risco_id>
-					<cfloop list="#idAvalRisco#" index="i"> 
-						<!-- se i não for zero-->
-						<cfif '#i#' neq 0>
-						    <!--cadastra avaliação x riscos-->
-							<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
-								INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
-								VALUES ('#rsAvaliacao.newIDaval#', '#i#')
-							</cfquery>
-						</cfif>
+					<!-- cadastra avaliacao x tipos de controles-->	
+					<cfloop list="#arguments.pc_aval_tipoControle_id#" index="i"> 
+						<cfquery datasource="#application.dsn_processos#" name="rsAvalTipoControle">
+							INSERT INTO pc_avaliacao_tiposControles (pc_aval_id, pc_aval_tipoControle_id)
+							VALUES ('#rsAvaliacao.newIDaval#', '#i#')
+						</cfquery>
 					</cfloop>
-				</cfif>
-				<!-- se pc_aval_risco_outros não estiver vazio, ou seja, se algum texto existir-->	
-				<cfif arguments.pc_aval_risco_outros neq ''>
-					<!--cadastra o novo risco (pc_aval_risco_outros)-->	
-					<cfquery datasource="#application.dsn_processos#" name="rsRiscoOutros">
-						INSERT INTO pc_avaliacao_risco (pc_aval_risco_descricao)
-						VALUES ('#arguments.pc_aval_risco_outros#')
-						SELECT SCOPE_IDENTITY() AS newIDrisco;
-					</cfquery>
-					<cfset  idAvalRisco = rsRiscoOutros.newIDrisco>
-					<!--cadastra avaliação x riscos-->
-					<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
-						INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
-						VALUES ('#rsAvaliacao.newIDaval#', '#idAvalRisco#')
-					</cfquery>
-				</cfif>	
-				<!-- fim cadastro dos riscos selecionados e outros-->
+					<!--fim cadastro avaliacao x tipos de controles-->
 
-				<!--mudar o status do processo de 2-Cadastrado para 3-Iniciado-->	
-				<cfquery datasource="#application.dsn_processos#" >
-					UPDATE pc_processos
-					SET pc_num_status = 3
-					WHERE  pc_processo_id = '#arguments.pc_aval_processo#'
-				</cfquery> 	
-				<!--fim mudar o status do processo de 2-Cadastrado para 3-Iniciado-->
-			</cftransaction>
-
-		<cfelse><!--se for edição-->
-			<cftransaction>
-				<!--cadastra critério e referências se pc_criteroRef_id for igual a zero-->
-				<cfif arguments.pc_aval_criterioRef_id eq 0>
-					<cfquery datasource="#application.dsn_processos#" name="rsCriterioRef">
-						INSERT INTO pc_avaliacao_criterioReferencia (pc_aval_criterioRef_descricao)
-						VALUES ('#arguments.pcCriterioRefOutrosDesc#')
-						SELECT SCOPE_IDENTITY() AS newIDcriterioRef;
-					</cfquery>
-					<cfset arguments.pc_aval_criterioRef_id = rsCriterioRef.newIDcriterioRef>
-				</cfif>
-				<!--fim cadastro criterio e referências se pc_criteroRef_id for igual a zero-->
-
-				<!--atualiza avaliação-->
-				<cfquery datasource="#application.dsn_processos#" >
-					UPDATE pc_avaliacoes
-					SET pc_aval_teste = '#arguments.pc_aval_teste#',
-						pc_aval_controleTestado = '#arguments.pc_aval_controleTestado#',
-						pc_aval_numeracao = '#arguments.pc_aval_numeracao#',
-						pc_aval_descricao = '#arguments.pc_aval_descricao#',
-						pc_aval_sintese = '#arguments.pc_aval_sintese#',
-						pc_aval_coso_id = '#arguments.pc_aval_coso_id#',
-						pc_aval_classificacao = '#arguments.pc_aval_classificacao#',
-						pc_aval_valorEstimadoRecuperar = '#arguments.pc_aval_valorEstimadoRecuperar#',
-						pc_aval_valorEstimadoRisco = '#arguments.pc_aval_valorEstimadoRisco#',
-						pc_aval_valorEstimadoNaoPlanejado = '#arguments.pc_aval_valorEstimadoNaoPlanejado#',
-						pc_aval_criterioRef_id = '#arguments.pc_aval_criterioRef_id#',
-						pc_aval_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
-					WHERE  pc_aval_id = '#arguments.pc_aval_id#'
-				</cfquery> 
-				<!--fim atualiza avaliação-->
-
-
-
-
-				<!--cadastra avaliação x tipos de controles-->
-				<cfquery datasource="#application.dsn_processos#" >
-					DELETE FROM pc_avaliacao_tiposControles WHERE pc_aval_id = '#arguments.pc_aval_id#'
-				</cfquery>
-				<cfloop list="#arguments.pc_aval_tipoControle_id#" index="i"> 
-					<cfquery datasource="#application.dsn_processos#" name="rsAvalTipoControle">
-						INSERT INTO pc_avaliacao_tiposControles (pc_aval_id, pc_aval_tipoControle_id)
-						VALUES ('#arguments.pc_aval_id#', '#i#')
-					</cfquery>
-				</cfloop>
-				<!--fim cadastro avaliação x tipos de controles-->
-
-				<!--cadastra avaliação x categorias de controles-->
-				<cfquery datasource="#application.dsn_processos#" >
-					DELETE FROM pc_avaliacao_categoriasControles WHERE pc_aval_id = '#arguments.pc_aval_id#'
-				</cfquery>
-				<cfloop list="#arguments.pc_aval_categoriaControle_id#" index="i"> 
-					<cfquery datasource="#application.dsn_processos#" name="rsAvalCategoriaControle">
-						INSERT INTO pc_avaliacao_categoriasControles (pc_aval_id, pc_aval_categoriaControle_id)
-						VALUES ('#arguments.pc_aval_id#', '#i#')
-					</cfquery>
-				</cfloop>
-
-				<!--cadastra avaliação x riscos-->
-				<cfquery datasource="#application.dsn_processos#" >
-					DELETE FROM pc_avaliacao_riscos WHERE pc_aval_id = '#arguments.pc_aval_id#'
-				</cfquery>
-				<!-- início cadastro dos riscos selecionados e outros-->
-				<!-- se arguments.pc_aval_risco_id não for igual a zero-->
-				<cfif arguments.pc_aval_risco_id neq 0>
-					<cfset  idAvalRisco = arguments.pc_aval_risco_id>
-					<cfloop list="#idAvalRisco#" index="i"> 
-						<!-- se i não for zero-->
-						<cfif '#i#' neq 0>
-						    <!--cadastra avaliação x riscos-->
-							<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
-								INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
-								VALUES ('#arguments.pc_aval_id#', '#i#')
-							</cfquery>
-						</cfif>
+					<!-- cadastra avaliacao x categorias de controles-->
+					<cfloop list="#arguments.pc_aval_categoriaControle_id#" index="i"> 
+						<cfquery datasource="#application.dsn_processos#" name="rsAvalCategoriaControle">
+							INSERT INTO pc_avaliacao_categoriasControles (pc_aval_id, pc_aval_categoriaControle_id)
+							VALUES ('#rsAvaliacao.newIDaval#', '#i#')
+						</cfquery>
 					</cfloop>
-				</cfif>
+					<!--fim cadastro avaliacao x categorias de controles-->
 
-				<!-- se pc_aval_risco_outros não estiver vazio, ou seja, se algum texto existir-->	
-				<cfif arguments.pc_aval_risco_outros neq ''>
-					<!--cadastra o novo risco (pc_aval_risco_outros)-->	
-					<cfquery datasource="#application.dsn_processos#" name="rsRiscoOutros">
-						INSERT INTO pc_avaliacao_risco (pc_aval_risco_descricao)
-						VALUES ('#arguments.pc_aval_risco_outros#')
-						SELECT SCOPE_IDENTITY() AS newIDrisco;
-					</cfquery>
-					<cfset  idAvalRisco = rsRiscoOutros.newIDrisco>
-					<!--cadastra avaliação x riscos-->
-					<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
-						INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
-						VALUES ('#arguments.pc_aval_id#', '#idAvalRisco#')
-					</cfquery>
-				</cfif>	
-				<!-- fim cadastro dos riscos selecionados e outros-->
+					<!-- início cadastro dos riscos selecionados e outros-->
+					<!-- se arguments.pc_aval_risco_id não for igual a zero-->
+					<cfif arguments.pc_aval_risco_id neq 0>
+						<cfset  idAvalRisco = arguments.pc_aval_risco_id>
+						<cfloop list="#idAvalRisco#" index="i"> 
+							<!-- se i não for zero-->
+							<cfif '#i#' neq 0>
+								<!--cadastra avaliação x riscos-->
+								<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
+									INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
+									VALUES ('#rsAvaliacao.newIDaval#', '#i#')
+								</cfquery>
+							</cfif>
+						</cfloop>
+					</cfif>
+					<!-- se pc_aval_risco_outros não estiver vazio, ou seja, se algum texto existir-->	
+					<cfif arguments.pc_aval_risco_outros neq ''>
+						<!--cadastra o novo risco (pc_aval_risco_outros)-->	
+						<cfquery datasource="#application.dsn_processos#" name="rsRiscoOutros">
+							INSERT INTO pc_avaliacao_risco (pc_aval_risco_descricao)
+							VALUES ('#arguments.pc_aval_risco_outros#')
+							SELECT SCOPE_IDENTITY() AS newIDrisco;
+						</cfquery>
+						<cfset  idAvalRisco = rsRiscoOutros.newIDrisco>
+						<!--cadastra avaliação x riscos-->
+						<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
+							INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
+							VALUES ('#rsAvaliacao.newIDaval#', '#idAvalRisco#')
+						</cfquery>
+					</cfif>	
+					<!-- fim cadastro dos riscos selecionados e outros-->
 
-				<!--Se a classificação for modificada para Leve, todas as orientações e propostas de melhoria do item serão excluídas-->
-				<cfif '#arguments.pc_aval_classificacao#' eq 'L'>
+					<!--mudar o status do processo de 2-Cadastrado para 3-Iniciado-->	
 					<cfquery datasource="#application.dsn_processos#" >
-						Delete from pc_avaliacao_orientacoes WHERE  pc_aval_orientacao_num_aval = #arguments.pc_aval_id#
-						Delete from pc_avaliacao_melhorias WHERE  pc_aval_melhoria_num_aval = #arguments.pc_aval_id#
+						UPDATE pc_processos
+						SET pc_num_status = 3
+						WHERE  pc_processo_id = '#arguments.pc_aval_processo#'
+					</cfquery> 	
+					<!--fim mudar o status do processo de 2-Cadastrado para 3-Iniciado-->
+				</cftransaction>
+
+			<cfelse><!--se for edição-->
+				<cftransaction>
+					<!--cadastra critério e referências se pc_criteroRef_id for igual a zero-->
+					<cfif arguments.pc_aval_criterioRef_id eq 0>
+						<cfquery datasource="#application.dsn_processos#" name="rsCriterioRef">
+							INSERT INTO pc_avaliacao_criterioReferencia (pc_aval_criterioRef_descricao)
+							VALUES ('#arguments.pcCriterioRefOutrosDesc#')
+							SELECT SCOPE_IDENTITY() AS newIDcriterioRef;
+						</cfquery>
+						<cfset arguments.pc_aval_criterioRef_id = rsCriterioRef.newIDcriterioRef>
+					</cfif>
+					<!--fim cadastro criterio e referências se pc_criteroRef_id for igual a zero-->
+
+					<!--atualiza avaliação-->
+					<cfquery datasource="#application.dsn_processos#" >
+						UPDATE pc_avaliacoes
+						SET pc_aval_teste = '#arguments.pc_aval_teste#',
+							pc_aval_controleTestado = '#arguments.pc_aval_controleTestado#',
+							pc_aval_numeracao = '#arguments.pc_aval_numeracao#',
+							pc_aval_descricao = '#arguments.pc_aval_descricao#',
+							pc_aval_sintese = '#arguments.pc_aval_sintese#',
+							pc_aval_coso_id = '#arguments.pc_aval_coso_id#',
+							pc_aval_classificacao = '#arguments.pc_aval_classificacao#',
+							pc_aval_valorEstimadoRecuperar = '#arguments.pc_aval_valorEstimadoRecuperar#',
+							pc_aval_valorEstimadoRisco = '#arguments.pc_aval_valorEstimadoRisco#',
+							pc_aval_valorEstimadoNaoPlanejado = '#arguments.pc_aval_valorEstimadoNaoPlanejado#',
+							pc_aval_criterioRef_id = '#arguments.pc_aval_criterioRef_id#',
+							pc_aval_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#'
+						WHERE  pc_aval_id = '#arguments.pc_aval_id#'
+					</cfquery> 
+					<!--fim atualiza avaliação-->
+
+
+
+
+					<!--cadastra avaliação x tipos de controles-->
+					<cfquery datasource="#application.dsn_processos#" >
+						DELETE FROM pc_avaliacao_tiposControles WHERE pc_aval_id = '#arguments.pc_aval_id#'
 					</cfquery>
-				</cfif>
+					<cfloop list="#arguments.pc_aval_tipoControle_id#" index="i"> 
+						<cfquery datasource="#application.dsn_processos#" name="rsAvalTipoControle">
+							INSERT INTO pc_avaliacao_tiposControles (pc_aval_id, pc_aval_tipoControle_id)
+							VALUES ('#arguments.pc_aval_id#', '#i#')
+						</cfquery>
+					</cfloop>
+					<!--fim cadastro avaliação x tipos de controles-->
 
-				<!--Após a edição insere null nos campos pc_aval_vaFalta, pc_aval_vaSobra e pc_aval_vaRisco-->
-				<cfquery datasource="#application.dsn_processos#" >
-					UPDATE pc_avaliacoes
-					SET pc_aval_vaFalta = null, pc_aval_vaSobra = null, pc_aval_vaRisco = null
-					WHERE  pc_aval_id = '#arguments.pc_aval_id#'
-				</cfquery>
+					<!--cadastra avaliação x categorias de controles-->
+					<cfquery datasource="#application.dsn_processos#" >
+						DELETE FROM pc_avaliacao_categoriasControles WHERE pc_aval_id = '#arguments.pc_aval_id#'
+					</cfquery>
+					<cfloop list="#arguments.pc_aval_categoriaControle_id#" index="i"> 
+						<cfquery datasource="#application.dsn_processos#" name="rsAvalCategoriaControle">
+							INSERT INTO pc_avaliacao_categoriasControles (pc_aval_id, pc_aval_categoriaControle_id)
+							VALUES ('#arguments.pc_aval_id#', '#i#')
+						</cfquery>
+					</cfloop>
 
-			</cftransaction>
-		</cfif>
+					<!--cadastra avaliação x riscos-->
+					<cfquery datasource="#application.dsn_processos#" >
+						DELETE FROM pc_avaliacao_riscos WHERE pc_aval_id = '#arguments.pc_aval_id#'
+					</cfquery>
+					<!-- início cadastro dos riscos selecionados e outros-->
+					<!-- se arguments.pc_aval_risco_id não for igual a zero-->
+					<cfif arguments.pc_aval_risco_id neq 0>
+						<cfset  idAvalRisco = arguments.pc_aval_risco_id>
+						<cfloop list="#idAvalRisco#" index="i"> 
+							<!-- se i não for zero-->
+							<cfif '#i#' neq 0>
+								<!--cadastra avaliação x riscos-->
+								<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
+									INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
+									VALUES ('#arguments.pc_aval_id#', '#i#')
+								</cfquery>
+							</cfif>
+						</cfloop>
+					</cfif>
 
-		
+					<!-- se pc_aval_risco_outros não estiver vazio, ou seja, se algum texto existir-->	
+					<cfif arguments.pc_aval_risco_outros neq ''>
+						<!--cadastra o novo risco (pc_aval_risco_outros)-->	
+						<cfquery datasource="#application.dsn_processos#" name="rsRiscoOutros">
+							INSERT INTO pc_avaliacao_risco (pc_aval_risco_descricao)
+							VALUES ('#arguments.pc_aval_risco_outros#')
+							SELECT SCOPE_IDENTITY() AS newIDrisco;
+						</cfquery>
+						<cfset  idAvalRisco = rsRiscoOutros.newIDrisco>
+						<!--cadastra avaliação x riscos-->
+						<cfquery datasource="#application.dsn_processos#" name="rsAvalRisco">
+							INSERT INTO pc_avaliacao_riscos (pc_aval_id, pc_aval_risco_id)
+							VALUES ('#arguments.pc_aval_id#', '#idAvalRisco#')
+						</cfquery>
+					</cfif>	
+					<!-- fim cadastro dos riscos selecionados e outros-->
 
+					<!--Se a classificação for modificada para Leve, todas as orientações e propostas de melhoria do item serão excluídas-->
+					<cfif '#arguments.pc_aval_classificacao#' eq 'L'>
+						<cfquery datasource="#application.dsn_processos#" >
+							Delete from pc_avaliacao_orientacoes WHERE  pc_aval_orientacao_num_aval = #arguments.pc_aval_id#
+							Delete from pc_avaliacao_melhorias WHERE  pc_aval_melhoria_num_aval = #arguments.pc_aval_id#
+						</cfquery>
+					</cfif>
+
+					<!--Após a edição insere null nos campos pc_aval_vaFalta, pc_aval_vaSobra e pc_aval_vaRisco-->
+					<cfquery datasource="#application.dsn_processos#" >
+						UPDATE pc_avaliacoes
+						SET pc_aval_vaFalta = null, pc_aval_vaSobra = null, pc_aval_vaRisco = null
+						WHERE  pc_aval_id = '#arguments.pc_aval_id#'
+					</cfquery>
+
+				</cftransaction>
+			</cfif>
+		</cflock>
 	</cffunction>
 
 
@@ -2134,8 +1969,8 @@
 				<div class="card">
 					<!-- /.card-header -->
 					<div class="card-body">
-						<table id="tabAvaliacoes" class="table table-bordered  table-hover table-striped">
-						<thead style="background: #0083ca;color:#fff">
+						<table id="tabAvaliacoes" class="table  table-hover table-striped">
+						<thead  class="table_thead_backgroundColor">
 							<tr style="font-size:12px!important">
 								<th >Controles</th>
 								<th >Status: </th>
@@ -2297,6 +2132,9 @@
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
 						className: 'btExcel',
 					}],
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 				}).buttons().container().appendTo('#tabAvaliacoes_wrapper .col-md-6:eq(0)');
 					
 			});
@@ -2910,35 +2748,39 @@
 							</cfif>
 							<!--Se o tipo de demanda for "P" (Plano Anual de Controle Interno - PACIN), usa o texto abaixo-->
 							<cfif #rsProcesso.pc_tipo_demanda# eq "P">
-								<cfset textoEmail = '<p>Em cumprimento ao Plano Anual de Controle Interno – PACIN #anoPacin#, que consolida o planejamento das ações a serem realizadas pelo Departamento de Controle Interno – DCINT, encaminhamos o Relatório - SEI e seus respectivos anexos, referentes à avaliação de controles no processo "#tipoAvaliacao#", para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>
-													<p>Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.<br><br>O plano de ação deverá apresentar providências focadas nas "Situações Encontradas" registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III.</p>
-													<p>O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>
-													<p>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
-													<p>As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
+								<cfset textoEmail = '<p style="text-align: justify;">Em cumprimento ao Plano Anual de Controle Interno – PACIN #anoPacin#, que consolida o planejamento das ações a serem realizadas pelo Departamento de Controle Interno – DCINT, encaminhamos o Relatório - SEI e seus respectivos anexos, referentes à avaliação de controles no processo "#tipoAvaliacao#", para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>
+													<p style="text-align: justify;">Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.<br><br>O plano de ação deverá apresentar providências focadas nas "Situações Encontradas" registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III.</p>
+													<p style="text-align: justify;">O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>
+													<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
+													<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
 														<ul>
-															<li>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
-															<li>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
-															<li>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
+															<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
+															<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
+															<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
 														</ul>
-													<p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
-													<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>'>
+													<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+													<p style="text-align:center;">
+														<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+													</p>'>
 							
 							<cfelse>
 
-								<cfset textoEmail = '<p>A par de cumprimentá-lo, informa-se que o Departamento de Controle Interno (DCINT), no cumprimento de suas atribuições, realiza avaliações de controles extraordinárias, de acordo com as normas internas.</p> 
-													<p>Nesse sentido, em consonância com o MANORG, Módulo 04, Capítulo 08, subitem 4.10, foi realizada avaliação de controle interno no processo "#tipoAvaliacao#". </p> 
-													<p>Após a finalização dos trabalhos, encaminha-se o Relatório de Avaliação de Controles Internos e seus respectivos anexos, referentes a essa avaliação de controles, para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>  
-													<p>Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA” apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.</p>   
-													<p>O plano de ação deverá apresentar providências focadas nas “Situações Encontradas registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III. O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>  
-													<p>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
-													<p>As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
+								<cfset textoEmail = '<p style="text-align: justify;">A par de cumprimentá-lo, informa-se que o Departamento de Controle Interno (DCINT), no cumprimento de suas atribuições, realiza avaliações de controles extraordinárias, de acordo com as normas internas.</p> 
+													<p style="text-align: justify;">Nesse sentido, em consonância com o MANORG, Módulo 04, Capítulo 08, subitem 4.10, foi realizada avaliação de controle interno no processo "#tipoAvaliacao#". </p> 
+													<p style="text-align: justify;">Após a finalização dos trabalhos, encaminha-se o Relatório de Avaliação de Controles Internos e seus respectivos anexos, referentes a essa avaliação de controles, para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>  
+													<p style="text-align: justify;">Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA” apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.</p>   
+													<p style="text-align: justify;">O plano de ação deverá apresentar providências focadas nas “Situações Encontradas registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III. O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>  
+													<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
+													<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
 														<ul>
-															<li>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li> <br>  
-															<li>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li>   <br>  
-															<li>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li> 
+															<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li> <br>  
+															<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li>   <br>  
+															<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li> 
 														</ul>
-													<p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
-													<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>'>
+													<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+													<p style="text-align:center;">
+														<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+													</p>'>
 
 							</cfif>
 
@@ -3020,7 +2862,7 @@
 
 
 
-	<cffunction name="cadastroAvaliacaoRelato"   access="remote" hint="valida (ou  não) a avaliação e, se foi a Última avaliação a ser validada, envia o processo para o Órgão responsável.">
+	<cffunction name="cadastroAvaliacaoRelato"   access="remote" hint="Form de cadastro uma avaliação de relato">
 		
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
@@ -3100,13 +2942,13 @@
 						}
 					</style>
 						
-					<div class="card-header" style="background-color: #0083CA;border-bottom:solid 2px #fff" >
+					<div class="card-header card-header_backgroundColor" style="margin-bottom:5px;" >
 						<cfoutput>
-							<p style="font-size: 1.3em;color:##fff"><strong>#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong></p>
+							<p class="justificado" style="color:##fff;max-width: 85%;">#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</p>
 						</cfoutput>	
 					</div>
-					<div id="tabsCadItem" class="card card-primary card-tabs"  style="widht:100%">
-						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+					<div id="tabsCadItem" class="card card-primary card-tabs card_border_correios2"  style="width:100%">
+						<div class="card-header p-0 pt-1 card-header_navbar_backgroundColor" >
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
 							
@@ -3141,6 +2983,7 @@
 						<div class="card-body" style="align-items: center;">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 								
+							
 								<div class="tab-pane fade active show" id="custom-tabs-one-3passo" role="tabpanel" aria-labelledby="custom-tabs-one-3passo-tab">
 									
 									<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>	
@@ -3229,7 +3072,7 @@
 									<div class="tab-pane fade "  id="custom-tabs-one-7passo" role="tabpanel" aria-labelledby="custom-tabs-one-7passo-tab">
 										<div  class="row">							
 											<div class="col-sm-4">
-												<select id="pcValidar" required="" name="pcValidar" class="form-control"  style="height:40px;background-color: #00416b;color: #fff;font-size: 20px;">
+												<select id="pcValidar" required="" name="pcValidar" class="form-control card-header_backgroundColor"  style="height:40px;color: #fff;font-size: 20px;">
 													<option selected="" disabled="" value="" >Selecione o que deseja fazer..</option>
 													<option  value="1" >Validar este item</option>
 													<option  value="2" >Não validar</option>
@@ -3805,7 +3648,6 @@
 				}, 1000);
 			}
 
-            //@audit trabalhado mostraFormAvalMelhoriaCadastro
 			function mostraFormAvalMelhoriaCadastro(){
 				
 				setTimeout(function(){
@@ -3867,8 +3709,6 @@
 					})//fim fail
 				}, 1000);
 			}
-
-
 
 			function mostraTabMelhorias(){
 				$('#modalOverlay').modal('show')
@@ -3998,17 +3838,17 @@
 		<cfargument name="numOrgaoAvaliado" type="string" required="true"/>
         
 		<div id="accordionCadOrientacao"  style="display: flex; justify-content: left;">
-			<div  id="cadOrientacao" class="card card-primary collapsed-card" >
-				<div id="btnCadastrarOrientacao" class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+			<div  id="cadOrientacao" class="card card-primary collapsed-card " >
+				<div id="btnCadastrarOrientacao" class="card-header text-left card-header_backgroundColor" style="color:#fff;">
 					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
 						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-						</button></i><span id="cabecalhoAccordionCadOrientacao">Clique aqui para cadastrar uma Medida/Orientação para Regularização</span>
+						</button></i><span id="cabecalhoAccordionCadOrientacao" style="margin-right:80px;">Clique aqui para cadastrar uma Medida/Orientação para Regularização</span>
 					</a>
 				</div>
-				<div class="card-body" style="border: solid 3px #0083ca;" >
+				<div class="card-body card_border_correios"  >
 					<div class="card card-default">
 						<div class="card-body p-0">
-							<h7  class="font-weight-light text-center" style="top:-15px;font-size:14px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+							<h7  class="font-weight-light text-center azul_correios_textColor" style="top:-15px;font-size:14px!important;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
 								<span id="infoTipoCadOrientacao" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Nova Medida/Orientação para Regularização:</span>
 							</h7>
 							<form   id="formAvalOrientacaoCadastro" name="formAvalOrientacaoCadastro" style="padding:10px"  onsubmit="return false" novalidate>
@@ -4121,7 +3961,7 @@
 
 									<div style="justify-content:center; display: flex; width: 100%;">
 										<div>
-											<button id="btSalvarOrientacao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
+											<button id="btSalvarOrientacao"  class="btn btn-block  azul_claro_correios_backgroundColor" style="color:#fff">Salvar</button>
 										</div>
 										<div style="margin-left:100px">
 											<button id="btCancelarOrientacao"  class="btn btn-block btn-danger " >Cancelar</button>
@@ -4489,22 +4329,21 @@
 
 
 	<cffunction name="formAvalMelhoriaCadastro" access="remote" hint="Formulário de cadastro das Propostas de Melhoria">
-		<!-- @audit  trabalhando formAvalMelhoriaCadastro -->
 		<cfargument name="numOrgaoAvaliado" type="string" required="true"/>
 		<cfargument name="modalidade" type="string" required="true"  />	
 
 		<div id="accordionCadMelhoria"  style="display: flex; justify-content: left;">
 			<div  id="cadMelhoria" class="card card-primary collapsed-card" >
-				<div id="btnCadastrarMelhoria" class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+				<div id="btnCadastrarMelhoria" class="card-header text-left card-header_backgroundColor" style="color:#fff;">
 					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
 						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-						</button></i><span id="cabecalhoAccordionCadMelhoria">Clique aqui para cadastrar uma Propostas de Melhoria</span>
+						</button></i><span id="cabecalhoAccordionCadMelhoria" style="margin-right:80px;">Clique aqui para cadastrar uma Propostas de Melhoria</span>
 					</a>
 				</div>
-				<div class="card-body" style="border: solid 3px #0083ca;" >
+				<div class="card-body card_border_correios">
 					<div class="card card-default">
 						<div class="card-body p-0">
-							<h6  class="font-weight-light text-center" style="top:-15px;font-size:14px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+							<h6  class="font-weight-light text-center azul_correios_textColor" style="top:-15px;font-size:14px!important;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
 								<span id="infoTipoCadMelhoria" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Nova Proposta de Melhoria:</span>
 							</h6>
 							<form   id="formAvalMelhoriaCadastro" name="formAvalMelhoriaCadastro"  style="padding:10px"  onsubmit="return false" novalidate>
@@ -4675,7 +4514,7 @@
 									
 									<div style="justify-content:center; display: flex; width: 100%;">
 										<div>
-											<button id="btSalvarMelhoria"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
+											<button id="btSalvarMelhoria"  class="btn btn-block  azul_claro_correios_backgroundColor" style="color:#fff">Salvar</button>
 										</div>
 										<div style="margin-left:100px">
 											<button id="btCancelarMelhoria"  class="btn btn-block btn-danger " >Cancelar</button>
@@ -5107,7 +4946,7 @@
 		</cfif>
 		
 		<cfif #rsOrientacoes.RecordCount# eq 0 and #rsMelhorias.RecordCount# eq 0 and #rsModalidadeProcesso.pc_aval_classificacao# neq "L">
-			<cfset mensagem = mensagem  & '<i class="fas fa-exclamation-triangle" style="color:red"></i> Necessário cadastrar, pelo menos, uma  Orientação e/ou uma Proposta de Melhoria- (4° e 5° Passos)<br>' >
+			<cfset mensagem = mensagem  & '<i class="fas fa-exclamation-triangle" style="color:red"></i> Necessário cadastrar, pelo menos, uma  Orientação e/ou uma Proposta de Melhoria (4° e 5° Passos)<br>' >
 		</cfif>
 
 
@@ -5129,7 +4968,7 @@
 						<br><br>
                      	<cfif  '#mensagem#' eq 'Sem pendências' and (rsOrientacoes.pc_aval_status eq 1 or rsOrientacoes.pc_aval_status eq 3 or rsOrientacoes.recordCount eq 0) and #rsModalidadeProcesso.pc_num_status# neq 4>
 							<div class="moveChat" style="display:flex;margin-bottom:30px;align-items: center;" >
-								<i class="fas fa-check" style="color:green;font-size:20px"></i><h2 class="card-title" style="color:#00416b; margin-left:10px"><cfoutput>#mensagem#</cfoutput> </h1>
+								<i class="fas fa-check azul_correios_textColor" style="color:green;font-size:20px"></i><h2 class="card-title" style=" margin-left:10px"><cfoutput>#mensagem#</cfoutput> </h1>
 							</div>
 
 							
@@ -5139,19 +4978,19 @@
 									<cfif #rsAvaliacoesValidadas.recordcount# eq 1 ><!-- Se essa for o último item a ser validado-->
 										<cfif rsProcessoComOrientacoes.recordCount neq 0><!--Se o processo tiver, pelo menos, uma orientação-->
 										    <cfif rsModalidadeProcesso.pc_iniciarBloqueado eq 'S'><!--Se o processo estiver bloqueado-->
-												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;widht:100px"  >Este é o último item para validação, porém, o processo foi BLOQUEADO.<br>As medidas/orientações para regularização e/ou Propostas de Melhoria não serão encaminhadas para os órgãos reponsáveis e só serão visíveis pelos órgãos do controle interno em Consultas.<br>Clique aqui para manter o bloqueio e concluir o cadastro dos itens.</button>
+												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação, porém, o processo foi <span style="color: #fff;background-color: red; padding: 2px;">BLOQUEADO</span>.<br>As medidas/orientações para regularização e/ou Propostas de Melhoria não serão encaminhadas para os órgãos reponsáveis e só serão visíveis pelos órgãos do controle interno em Consultas.<br>Clique aqui para manter o bloqueio e concluir o cadastro dos itens.</button>
 										    <cfelse>
-												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;widht:100px"  >Este é o último item para validação e existem medidas/orientações para regularização para acompanhamento neste processo.<br>Clique aqui para enviar o Processo para fase de Acompanhamento.</button>
+												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação e existem medidas/orientações para regularização para acompanhamento neste processo.<br>Clique aqui para enviar o Processo para fase de Acompanhamento.</button>
 											</cfif>
 										<cfelse>
 											<cfif rsProcessoComMelhorias.recordCount neq 0><!--Se o processo tiver, pelo menos, uma propostas de melhoria-->
-												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;widht:100px"  >Este é o último item para validação e não existem medidas/orientações para regularização para acompanhamento em nenhum item deste processo.<br> Clique aqui para Finalizar Processo.</button>
+												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação e não existem medidas/orientações para regularização para acompanhamento em nenhum item deste processo.<br> Clique aqui para Finalizar Processo.</button>
 											<cfelse>
-												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;widht:100px"  >Este é o último item para validação e não existem medidas/orientações para regularização para acompanhamento ou propostas de melhoria em nenhum item deste processo.<br> Clique aqui para Finalizar Processo.</button>
+												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação e não existem medidas/orientações para regularização para acompanhamento ou propostas de melhoria em nenhum item deste processo.<br> Clique aqui para Finalizar Processo.</button>
 											</cfif>
 										</cfif>
 									<cfelse>
-										<button id="btValidar"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;widht:100px"  >Validar e Finalizar o Cadastro deste item</button>
+										<button id="btValidar"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Validar e Finalizar o Cadastro deste item</button>
 									</cfif>
 								</div>
 							<cfelse>
@@ -5171,7 +5010,7 @@
 						<cfelse>
 						    <cfif  '#mensagem#' eq 'Sem pendências'>
 								<div style="display:flex;margin-bottom:30px;align-items: center;" >
-									<i class="fas fa-check" style="color:green;font-size:20px"></i><h2 class="card-title" style="color:#00416b; margin-left:10px"><cfoutput>#mensagem#</cfoutput> </h1>
+									<i class="fas fa-check azul_correios_textColor" style="color:green;font-size:20px"></i><h2 class="card-title" style="margin-left:10px"><cfoutput>#mensagem#</cfoutput> </h1>
 								</div>
 							<cfelse>
 								<div style="display:flex; font-size:14px">
@@ -5301,7 +5140,7 @@
 				var mensagemConfirmacao = "Deseja validar e finalizar o cadastro deste item?"
 				if(ultimoItemValidado==1){
 					if(processoBloqueado=='S'){
-						mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado, porém, o processo foi <strong style="color:red">BLOQUEADO</strong>.\nAs medidas/orientações para regularização e/ou Propostas de Melhoria não serão encaminhadas para os órgãos reponsáveis e só serão visíveis pelos órgãos do controle interno em Consultas.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados.</p>'
+						mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado, porém, o processo foi <span style="color: #fff;background-color: red; padding: 2px;">BLOQUEADO</span>.\nAs medidas/orientações para regularização e/ou Propostas de Melhoria não serão encaminhadas para os órgãos reponsáveis e só serão visíveis pelos órgãos do controle interno em Consultas.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados.</p>'
 					}else{
 						mensagemConfirmacao = '<p>Deseja validar e finalizar o cadastro deste item?</p><p>Este é o último item a ser validado neste processo.\nEste processo será encaminhado para acompanhamento.</p><p>Só clique em "Sim!" se todos os itens deste processo estiverem cadastrados.</p>'
 					}
@@ -5407,8 +5246,8 @@
 					<!-- /.card-header -->
 					<div class="card-body">
 						
-						<table id="tabMelhorias" class="table table-bordered  table-hover ">
-							<thead style="background: #0083ca;color:#fff">
+						<table id="tabMelhorias" style="width: 100%;" class="table  table-hover ">
+							<thead  class="table_thead_backgroundColor" >
 								<tr style="font-size:14px">
 									<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
 										<th style="width: 10%;vertical-align:middle !important;">Controles</th>
@@ -5527,7 +5366,10 @@
 					searching:false,
 					columnDefs: [
 						{ "className": "dt-center", "targets": "_all" } // Alinha todos os elementos verticalmente
-					]
+					],
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 				})
 
 			});
@@ -5772,14 +5614,14 @@
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
 			
-		<div class="row">
+		<div class="row" >
 			<div class="col-12">
 				<div class="card">
 					<!-- /.card-header -->
 					<div class="card-body">
 						
-						<table id="tabOrientacoes" class="table table-bordered table-hover  ">
-							<thead style="background: #0083ca;color:#fff">
+						<table id="tabOrientacoes" style="width: 100%;" class="table table-hover  table-responsive">
+							<thead  class="table_thead_backgroundColor">
 								<tr style="font-size:14px">
 									<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3>
 										<th>Controles</th>
@@ -5845,12 +5687,15 @@
 					stateSave: false,
 					responsive: true, 
 					lengthChange: false, 
-					utoWidth: false,
+					autoWidth: false,
 					select: true,
 					searching:false,
 					columnDefs: [
 						{ "className": "dt-center", "targets": "_all" } // Alinha todos os elementos verticalmente
-					]
+					],
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 				});
 					
 			});
@@ -6104,8 +5949,8 @@
 			
 			<div style="width:60vh;margin-bottom:40px">
 				<h6 style="margin-bottom: 0px!important;">Versões</h6>
-				<table  id="tabVersoes" class="table table-bordered table-striped table-hover text-nowrap" >
-					<thead style="background: #0083ca;color:#fff;text-align:center;">
+				<table  id="tabVersoes" class="table table-striped table-hover text-nowrap  table-responsive" >
+					<thead  class="table_thead_backgroundColor"  style="text-align:center;">
 						<tr style="font-size:0.9em;"  >
 							<th >Data/Hora</th>
 							<th>Matrícula</th>
@@ -6139,7 +5984,7 @@
 				$(function () {
 					$("#tabVersoes").DataTable({
 						destroy: true,
-						scrollX: false,
+						//scrollX: false,
 						scrollY: '10vh',
 						scrollCollapse: true,
 						stateSave: false,
@@ -6157,6 +6002,9 @@
 								className:'dt-body-center'
 							}
 						],
+						language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 					});		
 				});
 
@@ -6455,8 +6303,8 @@
 									<cfif #arguments.passoapasso# eq "false">
 										<h6>Arquivos anexados hoje por <cfoutput>#application.rsUsuarioParametros.pc_usu_nome#</cfoutput></h6>
 									</cfif>								
-									<table id="tabAnexos" class="table table-bordered table-striped table-hover text-nowrap">
-										<thead style="background: #0083ca;color:#fff">
+									<table id="tabAnexos" style="width: 100%;" class="table table-striped table-hover text-nowrap  table-responsive">
+										<thead  class="table_thead_backgroundColor">
 											<tr style="font-size:14px">
 												<th>Controles:</th>
 												<th style="width:5%">ID:</th>
@@ -6540,7 +6388,10 @@
 					responsive: true, 
 					lengthChange: false, 
 					autoWidth: false,
-					searching: false
+					searching: false,
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 				})
 					
 			});
@@ -6583,7 +6434,9 @@
 								.done(function(result) {	
 									mostraTabAnexosJS('tabAnexosDiv',pc_anexo_id,'','');
 									if (passoapasso == false){
-										mostraTabAnexosOrientacoes()
+										mostraTabAnexosOrientacoes();
+									}else{
+										mostraTabAnexos();
 									}
 									
 									$('#modalOverlay').delay(1000).hide(0, function() {
@@ -6654,8 +6507,8 @@
 							
 							<h6>Arquivos anexados hoje por <cfoutput>#application.rsUsuarioParametros.pc_usu_nome#</cfoutput></h6>
 							
-							<table id="tabAnexos" class="table table-bordered table-striped table-hover text-nowrap">
-								<thead style="background: #0083ca;color:#fff">
+							<table id="tabAnexos" style="width: 100%;" class="table table-striped table-hover text-nowrap  table-responsive">
+								<thead  class="table_thead_backgroundColor">
 									<tr style="font-size:14px">
 										<th>Controles:</th>
 										<th>ID:</th>
@@ -6740,8 +6593,8 @@
 							
 							<h6>Arquivo(s) anexado(s) e ainda não enviado(s):</h6>
 							
-							<table id="tabAnexosNaoEnviados" class="table table-bordered table-striped table-hover text-nowrap">
-								<thead style="background: #0083ca;color:#fff">
+							<table id="tabAnexosNaoEnviados" class="table table-striped table-hover text-nowrap  table-responsive">
+								<thead  class="table_thead_backgroundColor">
 									<tr style="font-size:14px">
 										<th>Controles:</th>
 										<th>ID:</th>
@@ -6760,7 +6613,7 @@
 													<td style="width:10%">	
 														<div style="display:flex;justify-content:space-around;">
 
-															<i id="btExcluir" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:18px" onclick="javascript:excluirAnexo(#pc_anexo_id#);"   title="Excluir" ></i>
+															<i id="btExcluir" class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;z-index:100;font-size:18px" onclick="javascript:excluirAnexoNaoEnviado(#pc_anexo_id#);"   title="Excluir" ></i>
 
 															<cfif right(#pc_anexo_caminho#,3) eq 'pdf'>
 																<i id="btAbrirAnexo" class="fas fa-eye efeito-grow"   style="cursor: pointer;z-index:100;font-size:20px;margin-left:10px" onClick="window.open('pc_Anexos.cfm?arquivo=#arquivo#&nome=#pc_anexo_nome#','_blank')"   title="Visualizar" ></i>
@@ -6819,7 +6672,10 @@
 					responsive: true, 
 					lengthChange: false, 
 					autoWidth: false,
-					searching: false
+					searching: false,
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 				})
 
 				$("#tabAnexosNaoEnviados").DataTable({
@@ -6829,7 +6685,10 @@
 					lengthChange: false, 
 					autoWidth: false,
 					searching: false,
-					paging: false // Desativa a paginação
+					paging: false, // Desativa a paginação
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 				})
 					
 			});
@@ -6841,7 +6700,7 @@
 				window.location.href = "pc_Anexos.cfm?arquivo=" + pc_anexo_caminho;
 			}
 
-			function excluirAnexo(pc_anexo_id)  {
+			function excluirAnexoNaoEnviado(pc_anexo_id)  {
 				event.preventDefault()
 		        event.stopPropagation()
 				
@@ -6924,32 +6783,44 @@
 
 
 			<cfif directoryExists(application.diretorio_avaliacoes)>
-				<cfloop query="rsPc_anexos" >
-					<cfif  FileExists(pc_anexo_caminho)>
-						<cfset caminho = "#pc_anexo_caminho#">
-					<cfelse>
-						<cfset caminho = "Caminho  não encontrado">
-					</cfif>
-					<div class="card-body" style="padding:0px;">
-						<div  id ="cardAvaliacaoPDF" class="card card-primary card-tabs collapsed-card" style="transition: all 0.15s ease 0s; height: inherit; width: inherit;">
-							<div class="card-header" style="background-color:#00416b;">
-							
-								<h3 class="card-title" style="font-size:16px;position:relative;top:3px;cursor:pointer" data-card-widget="collapse"><i class="fas fa-file-pdf" style="margin-right:10px;"></i><cfoutput> #pc_anexo_nome#</cfoutput></h3>
-								<div  class="card-tools">
+				<div class="anexos-container" style="display: flex; flex-wrap: wrap; gap: 3px; flex-direction: column;">
+					<cfloop query="rsPc_anexos">
+						<cfif FileExists(pc_anexo_caminho)>
+							<cfif FindNoCase("localhost", application.auxsite)>
+								<cfset caminho = ListLast(pc_anexo_caminho, '\')>
+							<cfelse>
+								<cfset caminho = "#pc_anexo_caminho#">
+							</cfif>
+						<cfelse>
+							<cfset caminho = "Caminho não encontrado">
+						</cfif>
+
+						<!-- Container flex para anexos -->
+						<div style="padding: 0px; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal(<cfoutput>#pc_anexo_id#,'#jsStringFormat(caminho)#'</cfoutput>)">
+							<!-- Card com anexo -->
+							<div id="cardRelatorioPDF" class="card card-primary card-tabs collapsed-card card_hover_correios" 
+								style="transition: all 0.15s ease 0s; height: inherit; width: 100%; margin: 0;">
+								<div class="card-header" style="display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
+									<h3 class="card-title" style="font-size: 16px; cursor: pointer; 
+										white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+										flex: 1;" >
+										<i class="fas fa-file-pdf"></i>
+										<cfoutput>#pc_anexo_nome#</cfoutput>
+									</h3>
+									<div class="card-tools" style="margin-left: 20px;">
 									<cfif #rsStatus.pc_aval_status# eq 1 or  #rsStatus.pc_aval_status# eq 3 or #arguments.ehEdicao# eq "S">
-										<button type="button"  id="btExcluir" class="btn btn-tool  " style="font-size:16px" onclick="javascript:excluirAnexoAvaliacao(<cfoutput>#pc_anexo_id#</cfoutput>);"  ><i class="fas fa-trash-alt"></i></button>
+										<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px"
+											onclick="javascript:excluirAnexoAvaliacao(<cfoutput>#pc_anexo_id#</cfoutput>);">
+											<i class="fas fa-trash-alt"></i>
+										</button>
 									</cfif>
-									<button  type="button" class="btn btn-tool" data-card-widget="collapse" style="font-size:16px;margin-left:50px"><i  class="fas fa-plus"></i></button>
-									<button  type="button" class="btn btn-tool" data-card-widget="maximize" style="font-size:16px;margin-left:50px"><i  class="exp fas fa-expand"></i></button>
+								</div>
 								</div>
 							</div>
-							
-							<div class="card-body" style="height: 100%;background-color:#00416B;padding-top: 0px;">											
-								<embed id="relatoPDFdiv" type="application/pdf" src="pc_Anexos.cfm?arquivo=<cfoutput>#caminho#</cfoutput>" style="width: 100%;height:90vh;" >
-							</div>			
 						</div>
-					</div>
-				</cfloop>
+						
+					</cfloop>
+				</div>
 			<cfelse>
 				<h5 style="color:red">Servidor de arquivos não localizado.</h5>
 			</cfif>	
@@ -6970,6 +6841,8 @@
 					cancelButtonText: 'Cancelar!'
 					}).then((result) => {
 						if (result.isConfirmed) {
+							// Fechar o modal do PDF aqui
+                        	$(`#pdfModal${pc_anexo_id}`).modal('hide');
 							$('#modalOverlay').modal('show')
 							setTimeout(function() {
 								$.ajax({
@@ -6998,7 +6871,10 @@
 									$('#modal-danger').find('.modal-body').text(thrownError)
 								})//fim fail
 							}, 500);
-					    }
+					    }else{
+							// Fechar o modal do PDF aqui
+                        	$(`#pdfModal${pc_anexo_id}`).modal('hide');
+						}
 				    });
 			};
 
@@ -7017,43 +6893,50 @@
 			SELECT pc_anexos.*   FROM  pc_anexos
 			WHERE pc_anexo_processo_id = '#arguments.pc_anexo_processo_id#'
 		</cfquery>
+		
+			<div class="anexos-container" style="display: flex; flex-wrap: wrap; gap: 3px; flex-direction: column;">
+				<cfloop query="rsPc_anexos">
+					<cfif FileExists(pc_anexo_caminho)>
+						<cfif FindNoCase("localhost", application.auxsite)>
+							<cfset caminho = ListLast(pc_anexo_caminho, '\')>
+						<cfelse>
+							<cfset caminho = "#pc_anexo_caminho#">
+						</cfif>
+					<cfelse>
+						<cfset caminho = "Caminho não encontrado">
+					</cfif>
 
-		<cfloop query="rsPc_anexos" >
-		    <cfif FileExists(pc_anexo_caminho)>
-				<cfset caminho = "#pc_anexo_caminho#">
-			<cfelse>
-				<cfset caminho = "Caminho  não encontrado">
-			</cfif>
-			
-				<div class="card-body" style="padding:0px;">
-					<div  id ="cardRelatorioPDF" class="card card-primary card-tabs collapsed-card" style="transition: all 0.15s ease 0s; height: inherit; width: inherit;">
-						<div class="card-header" style="background-color:#00416b;">
-						
-							<h3 class="card-title" style="font-size:16px;position:relative;top:3px;cursor:pointer" data-card-widget="collapse"><i class="fas fa-file-pdf" style="margin-right:10px;"></i><cfoutput> #pc_anexo_nome#</cfoutput></h3>
-						    <div  class="card-tools">
-								<button type="button"  id="btExcluir" class="btn btn-tool  " style="font-size:16px" onclick="javascript:excluirAnexoRelatorio(<cfoutput>#pc_anexo_id#</cfoutput>);"  ><i class="fas fa-trash-alt"></i></button>
-								<button  type="button" class="btn btn-tool" data-card-widget="collapse" style="font-size:16px;margin-left:50px"><i  class="fas fa-plus"></i></button>
-								<button  type="button" class="btn btn-tool" data-card-widget="maximize" style="font-size:16px;margin-left:50px"><i  class="exp fas fa-expand"></i></button>
+					<!-- Container flex para anexos -->
+					<div style="padding: 0px; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal(<cfoutput>#pc_anexo_id#,'#jsStringFormat(caminho)#'</cfoutput>)" >
+						<!-- Card com anexo -->
+						<div id="cardRelatorioPDF" class="card card-primary card-tabs collapsed-card card_hover_correios" 
+							style="transition: all 0.15s ease 0s; height: inherit; width: 100%; margin: 0;">
+							<div class="card-header" style="display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
+								<h3 class="card-title" style="font-size: 16px; cursor: pointer; 
+									white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+									flex: 1;" >
+									<i class="fas fa-file-pdf"></i>
+									<cfoutput>#pc_anexo_nome#</cfoutput>
+								</h3>
+								<div class="card-tools" style="margin-left: 20px;">
+									<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px"
+										onclick="javascript:excluirAnexoRelatorio(<cfoutput>#pc_anexo_id#</cfoutput>);">
+										<i class="fas fa-trash-alt"></i>
+									</button>
+								</div>
 							</div>
 						</div>
-						
-						<div class="card-body" style="height: 100%;background-color:#00416B;padding-top: 0px;">											
-							<embed id="relatoPDFdiv" type="application/pdf" src="pc_Anexos.cfm?arquivo=<cfoutput>#caminho#</cfoutput>" style="width: 100%;height:90vh;" >
-						</div>			
 					</div>
-				</div>
-	
-		</cfloop>
+					
+				</cfloop>
+			</div>
+
+			
 
 		<script language="JavaScript">
-    
-			
-
-			
 
 			function excluirAnexoRelatorio(pc_anexo_id)  {
-				
-				
+
 				let mensagem = "Deseja excluir este anexo?";
 				swalWithBootstrapButtons.fire({//sweetalert2
 					html: logoSNCIsweetalert2(mensagem),
@@ -7062,6 +6945,8 @@
 					cancelButtonText: 'Cancelar!'
 					}).then((result) => {
 						if (result.isConfirmed) {
+							// Fechar o modal do PDF aqui
+                        	$(`#pdfModal${pc_anexo_id}`).modal('hide');
 							$('#modalOverlay').modal('show')
 							setTimeout(function() {
 								$.ajax({
@@ -7076,7 +6961,6 @@
 								.done(function(result) {	
 						
 									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
 										mostraRelatorioPDF()
 										toastr.success('Operação realizada com sucesso!');
 									});	
@@ -7090,7 +6974,11 @@
 									$('#modal-danger').find('.modal-body').text(thrownError)
 								})//fim fail
 							}, 500);
-					    }
+					    }else{
+							// Fechar o modal do PDF aqui
+                        	$(`#pdfModal${pc_anexo_id}`).modal('hide');
+						}
+
 				    });
 			};
 

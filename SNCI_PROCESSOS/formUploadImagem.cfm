@@ -30,11 +30,8 @@
           <link rel="stylesheet" href="plugins/dropzone/min/dropzone.min.css">
 
                <!-- DataTables -->
-          <link rel="stylesheet" href="plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-          <link rel="stylesheet" href="plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-          <link rel="stylesheet" href="plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
-          <link rel="stylesheet" href="plugins/datatables-select/css/select.bootstrap4.min.css">
-          <link rel="stylesheet" href="plugins/datatables-scroller/css/scroller.bootstrap4.min.css">
+          <link rel="stylesheet" href="plugins/datatables/datatables.min.css">
+          
      </head>
      <body class="hold-transition " data-panel-auto-height-mode="height" >
       <cfinclude template="pc_Modal_preloader.cfm">
@@ -113,7 +110,7 @@
 							<div class="card card-success" >
 								<div class="card-header" style="background-color: #ffD400;">
 									<h4 class="card-title ">
-										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:#00416b;font-weight: bold;"> 
+										<a class="d-block " data-toggle="collapse" href="#collapseTwo" style="color:#00416B;font-size:16px;font-weight: bold;"> 
 											<i class="fas fa-images fa-2x" style="margin-right:10px"> </i>Imagens Salvas no Servidor
 										</a>
 									</h4>

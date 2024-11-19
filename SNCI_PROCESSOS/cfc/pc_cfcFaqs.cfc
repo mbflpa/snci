@@ -25,7 +25,7 @@
 						<!--acordion-->
 						<div id="accordionCadFaq" >
 							<div id="cadastroFaq" class="card card-primary collapsed-card" style="margin-left: -21px;">
-								<div  class="card-header" style="background-color: #0083ca;color:#fff;">
+								<div  class="card-header azul_claro_correios_backgroundColor" style="color:#fff;">
 									<a   class="d-block" data-toggle="collapse" href="#collapseCad"  data-card-widget="collapse">
 										<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 										</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um novo FAQ</span>
@@ -444,8 +444,8 @@
 					<div class="card">
 						<!-- /.card-header -->
 						<div class="card-body">
-							<table id="tabFaq" class="table table-bordered  table-hover table-striped">
-								<thead style="background: #0083ca;color:#fff">
+							<table id="tabFaq" class="table  table-hover table-striped">
+								<thead  class="table_thead_backgroundColor">
 									<tr style="font-size:12px!important">
 										<th align="center">Controles</th>
 										<th >ID</th>
@@ -500,6 +500,9 @@
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
 						className: 'btExcel',
 					}],
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 				}).buttons().container().appendTo('#tabFaq_wrapper .col-md-6:eq(0)');
 					
 			});

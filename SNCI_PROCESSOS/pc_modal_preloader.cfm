@@ -38,7 +38,8 @@
 			<!-- /.modal-dialog -->
 		</div>
 		<!-- /.modal -->
-		
+		<!-- jQuery -->
+		<script src="../SNCI_PROCESSOS/plugins/jquery/jquery.min.js"></script>
 		<style>
 			.modalOverlay{
 				height:100%;
@@ -51,12 +52,12 @@
 			#bodyConfirm.modal-body{
 				font-size:16px!important;
 				color:#fff!important;
-				background-color:#00416B!important;
+				background-color:var(--azul_correios)!important
 				
 			}
 			#contentConfirm.modal-content{
 				opacity:0.8;
-				background-color:#00416B!important;
+				background-color:var(--azul_correios)!important
 				color:#fff!important;
 			}
 

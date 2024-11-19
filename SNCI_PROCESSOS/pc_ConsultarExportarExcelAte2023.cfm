@@ -1,80 +1,5 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
-
-
-
-
-<cfquery name="rsProcAno" datasource="#application.dsn_processos#" timeout="120" >
-	SELECT distinct   right(pc_processos.pc_processo_id,4) as ano
-	FROM        pc_processos INNER JOIN
-				pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id LEFT JOIN
-				pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu LEFT JOIN
-				pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id LEFT JOIN
-				pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu LEFT JOIN
-				pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
-				LEFT JOIN pc_avaliacoes on pc_aval_processo = pc_processo_id
-				LEFT JOIN pc_avaliacao_posicionamentos on pc_aval_posic_num_orientacao = pc_aval_id
-				LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
-				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
-				LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
-				LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
-	WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)<=2023
-	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
-		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-			AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-		</cfif>
-		<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-			AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-		</cfif>
-		<!---Se o perfil for 7 - 'GESTOR' --->
-		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 7 and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-			AND pc_orgaos.pc_org_se = 	#application.rsUsuarioParametros.pc_org_se#
-		</cfif>
-	<cfelse>
-		<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
-		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-			AND	pc_num_status not in(6)
-		<cfelse>
-			AND pc_num_status not in(6)
-			AND (
-					pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					OR pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-					OR pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-					<cfif ListLen(application.orgaosHierarquiaList) GT 0>
-						OR pc_aval_orientacao_mcu_orgaoResp in (#application.orgaosHierarquiaList#)
-						OR pc_aval_melhoria_num_orgao in (#application.orgaosHierarquiaList#)
-						OR pc_aval_melhoria_sug_orgao_mcu in (#application.orgaosHierarquiaList#)
-						OR pc_processos.pc_num_orgao_avaliado in (#application.orgaosHierarquiaList#)
-					</cfif>
-				) 
-			<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
-			<cfif ListLen(application.orgaosHierarquiaList) GT 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
-					<!--- Não mostrará as orientações que não estão em análise e que tem os órgãos origem de processos como responsáveis--->
-					and NOT (
-							pc_aval_orientacao_status not in (13)
-							AND pc_orgaos_2.pc_org_status IN ('O')
-						)
-					<!--- Não mostrará as orientações em análise que não são de processos cujo órgão avaliado esta abaixo da hierarquia desta diretoria--->
-					and NOT (
-							pc_aval_orientacao_status = 13
-							AND pc_num_orgao_avaliado NOT IN (#application.orgaosHierarquiaList#)
-						)
-					and NOT (
-								pc_processos.pc_num_orgao_avaliado not in (#application.orgaosHierarquiaList#)
-								OR pc_aval_melhoria_num_orgao not in (#application.orgaosHierarquiaList#)
-								OR pc_aval_melhoria_sug_orgao_mcu  not in (#application.orgaosHierarquiaList#)
-							)
-			</cfif>
-		</cfif>  
-	</cfif>	
-	ORDER BY ano
-</cfquery>	
-
-
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -137,7 +62,7 @@
 		<section class="content-header">
 			<div class="container-fluid">
 				
-				<div class="row mb-2" style="margin-top:10px;margin-bottom:0px!important;">
+				<div class="row mb-2" style="margin-bottom:0px!important;">
 					<div class="col-sm-6">
 						<h4>Consulta para Exportação</h4>
 					</div>
@@ -150,7 +75,7 @@
 		<section class="content">
 			<div class="container-fluid" >
 				<div style="display: flex;align-items: center;">
-					<span style="color:#0083ca;font-size:20px;margin-right:10px">Consultar Por:</span>
+					<span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Consultar Por:</span>
 					<div id="opcaoTipoConsulta" class="btn-group btn-group-toggle" data-toggle="buttons">
 						<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="btn bg-yellow active efeito-grow"><input type="radio" checked="" name="opcaoTipoConsulta" id="tipoProcesso" autocomplete="off" value="p" /> PROCESSOS</label><br>
 						<label style="border:none!important;border-radius:10px!important;margin-left:2px" class="btn bg-yellow active efeito-grow"><input type="radio"  name="opcaoTipoConsulta" id="tipoItens" autocomplete="off" value="i" /> ITENS</label><br>
@@ -159,11 +84,26 @@
 					</div>
 				</div>
 				<div style="display: flex;align-items: center;">
-					<span style="color:#0083ca;font-size:20px;margin-right:10px">Ano:</span>
+					<span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Ano:</span>
 					<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons" style=" margin-left: 82px;"></div><br><br>
 				</div>
 				
-				<div id="exibirTabExportarDiv"></div>
+				<div class="row" id="divTabela">
+				<div class="col-12">
+					<div class="card card-success" style="margin-top:20px;">
+						<div class="card-header card-header_backgroundColor"></div>
+						<!-- /.card-header -->
+						<div class="card-body card_border_correios">
+							<table id="tabProcessos" class="table table-striped table-hover text-nowrap table-responsive" ></table>
+						</div>
+						<!-- /.card-body -->
+						<div id="exibirGrafico"></div>
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
 			</div>
 		</section>
 		<!-- /.content -->
@@ -177,19 +117,18 @@
     <!-- Gráficos -->
     <script src="plugins/chart.js/Chart.js"></script>
     <script src="plugins/chart.js/Chart.bundle.min.js"></script>
-	
+	<!--Para charmar o plugin que inclui lengenda dentro do gráfico-->		
+	<script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
 	<script language="JavaScript">
 		
 		$(window).on("load",function(){
            
 			const radio_name="opcaoAno";
-			const ano = [];
+			const ano = [2019,2020,2021,2022,2023];
 			const anoCorrente = new Date();
 			const anoAtual = anoCorrente.getFullYear();
 
-			<cfoutput query = "rsProcAno" >
-				ano.push(#rsProcAno.ano#)
-			</cfoutput>
+			
 			
 			if( ano.length === 0 ){
 				ano.push(anoAtual);
@@ -206,8 +145,8 @@
 				}
 			})
 
-			var radioValueAno = $("input[name='opcaoAno']:checked").val();
-			var radioValueTipo = $("input[name='opcaoTipoConsulta']:checked").val();
+			let radioValueAno = $("input[name='opcaoAno']:checked").val();
+			let radioValueTipo = $("input[name='opcaoTipoConsulta']:checked").val();
 				
 			
 			exibirTabExportarDiv(radioValueTipo,radioValueAno);		
@@ -224,17 +163,21 @@
 
 
 		function exibirTabExportarDiv(tipo, ano){
-
-			$('#modalOverlay').modal('show');
 			let tipoConsulta = "";
 			let tipoSelecao = "";
-			
+			let metodo = "";
+			let titleExportarExcel = "";
+			let columns = [];
 			if(tipo ==='p'){
 				tipoConsulta ="tabConsultaExportarProcessos"; 
 				if(ano === undefined){
 					tipoSelecao="PROCESSOS (não selecionou o ano)";
 				}else{
-					tipoSelecao="PROCESSOS de " + ano;
+					tipoSelecao="PROCESSOS: " + ano;
+					$('.card-header_backgroundColor').html(tipoSelecao);
+					metodo = "getProcessosJSON";
+					titleExportarExcel = "SNCI_Processos_";
+					$('#modalOverlay').modal('show');
 				}
 			}
 
@@ -243,7 +186,12 @@
 				if(ano === undefined){
 					tipoSelecao="ITENS (não selecionou o ano)";
 				}else{
-					tipoSelecao="ITENS de " + ano;
+					tipoSelecao="ITENS: " + ano;
+					$('.card-header_backgroundColor').html(tipoSelecao);
+					metodo = "getItensJSON";
+					titleExportarExcel = "SNCI_Itens_";
+					
+					$('#modalOverlay').modal('show');
 				}
 			};
 			if(tipo ==='o'){
@@ -251,7 +199,12 @@
 				if(ano === undefined){
 					tipoSelecao="ORIENTAÇÕES (não selecionou o ano)";
 				}else{
-					tipoSelecao="ORIENTAÇÕES de " + ano;
+					tipoSelecao="ORIENTAÇÕES: " + ano;
+					$('.card-header_backgroundColor').html(tipoSelecao);
+					metodo = "getOrientacoesJSON";
+					titleExportarExcel = "SNCI_Orientacoes_";
+
+					$('#modalOverlay').modal('show');
 				}
 			};
 			if(tipo ==='m'){
@@ -259,59 +212,281 @@
 				if(ano === undefined){
 					tipoSelecao="PROPOSTAS DE MELHORIA (não selecionou o ano)";
 				}else{
-					tipoSelecao="PROPOSTAS DE MELHORIA de " + ano;
+					tipoSelecao="PROPOSTAS DE MELHORIA: " + ano;
+					$('.card-header_backgroundColor').html(tipoSelecao);
+					metodo = "getPropostasMelhoriaJSON";
+					titleExportarExcel = "SNCI_Propostas_Melhoria_";
+					
+					$('#modalOverlay').modal('show');
 				}
 			};
-			setTimeout(function() {
-				$.ajax({
-					type: "post",
-					url: "cfc/pc_cfcConsultasDiversasAte2023.cfc",
-					data:{
-						method: tipoConsulta,
-						ano: ano
-					},
-					async: false,
-					success: function(result) {
-						let comDados = "";
-						try {
-							xmlDoc = $.parseXML(result);
-							var $xml = $(xmlDoc);
-							comDados = $xml.find("string").text();
-						} catch (e) {
-							comDados = 'S';
-						}
-						if(comDados=='N'){
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-							$('#exibirTabExportarDiv').html('<h5 align="center" style="margin-top:50px">Nenhum registro foi localizado para os parâmetros informados: ' + tipoSelecao + '</h5>')
-							return;
-						}
-						$('#exibirTabExportarDiv').html(result)	
-						var table = $('#tabProcessos').DataTable();
+			
+			var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
 
-  						if( tipoConsulta !=null && ano !=null ){
-							table.on('draw.dt', function() {		
-								$('#modalOverlay').delay(1000).hide(0, function() {
-									$('#modalOverlay').modal('hide');
-								});	  
-							});
-						}else{
+			var d = day + "-" + month + "-" + year;	
+			
+			// Criação dinâmica do array de colunas
+			columns = [
+				{ data: 'PC_PROCESSO_ID', title: 'N°Processo SNCI' },
+				{ data: 'PC_STATUS_DESCRICAO', title: 'Status do Processo' },
+				{ data: 'DATA_FIM_PROCESSO', title: 'Data Fim Processo' },
+				{ data: 'SE_ORGAO_AVALIADO', title: 'SE/CS' },
+				{ data: 'PC_ANO_PACIN', title: 'Ano PACIN' },
+				{ data: 'PC_NUM_SEI', title: 'N° SEI' },
+				{ data: 'PC_NUM_REL_SEI', title: 'N° Relat. SEI' },
+				{ data: 'DATA_INICIO', title: 'Início Avaliação' },
+				{ data: 'DATA_FIM', title: 'Fim Avaliação' },
+				{ data: 'SIGLA_ORGAO_ORIGEM', title: 'Órgão Origem' },
+				{ data: 'SIGLA_ORGAO_AVALIADO', title: 'Órgão Avaliado' },
+				{ data: 'PC_AVAL_TIPO_DESCRICAO', title: 'Tipo de Avaliação' },
+				{ data: 'MODALIDADE', title: 'Modalidade' },
+				{ data: 'PC_CLASS_DESCRICAO', title: 'Classificação' },
+				{ data: 'TIPO_DEMANDA', title: 'Tipo Demanda' },
+				{ data: 'AVALIADORES', title: 'Avaliador(es)' },
+				{ data: 'COORDENADOR_REGIONAL', title: 'Coordenador Regional' },
+				{ data: 'COORDENADOR_NACIONAL', title: 'Coordenador Nacional' }
+			];
+
+			// Adiciona colunas adicionais com base no tipo
+			if (tipo === 'i' || tipo === 'o' || tipo === 'm') {
+				columns.push(
+					{ data: 'PC_AVAL_ID', title: 'Cód. Item' },
+					{ data: 'PC_AVAL_NUMERACAO', title: 'N° do Item' },
+					{ data: 'PC_AVAL_DESCRICAO', title: 'Título da situação encontrada' },
+					{ data: 'CLASSIFICACAO_RISCO', title: 'Classificação do Item' },
+					{ data: 'VALOR_ENVOLVIDO_FALTA', title: 'Valor Envolvido (FALTA)' },
+					{ data: 'VALOR_ENVOLVIDO_SOBRA', title: 'Valor Envolvido (SOBRA)' },
+					{ data: 'VALOR_ENVOLVIDO_RISCO', title: 'Valor Envolvido (RISCO)' },
+					{ data: 'STATUS_ITEM', title: 'Status do Item' },
+					
+				);
+			}
+
+			if (tipo === 'o') {
+				columns.push(
+					{ data: 'PC_AVAL_ORIENTACAO_ID', title: 'Cód. Orientação' },
+					{ data: 'PC_AVAL_ORIENTACAO_DESCRICAO', title: 'Orientação' },
+					{ data: 'ORIENTACAO_ORGAO_RESP', title: 'Órgão Responsável' },
+					{ data: 'STATUS_ORIENTACAO', title: 'Status da Orientação' },
+					{ data: 'DATA_PREV_RESP', title: 'Data Prev. Resp.' },
+					{ data: 'ACOMP_FINALIZADO', title: 'Acomp. Finalizado?' }
+				);
+			}
+
+			if (tipo === 'm') {
+				columns.push(
+					{ data: 'PC_AVAL_MELHORIA_ID', title: 'Cód. Prop. Melhoria' },
+					{ data: 'PC_AVAL_MELHORIA_DESCRICAO', title: 'Proposta de Melhoria' },
+					{ data: 'ORGAO_RESP', title: 'Órgão Responsável' },
+					{ data: 'STATUS_MELHORIA', title: 'Status da Prop. Melhoria' },
+					{ data: 'DATA_PREV', title: 'Data Prev.' },
+					{ data: 'MELHORIA_SUGERIDA', title: 'Melhoria Sugerida pelo Órgão' },
+					{ data: 'ORGAO_RESP_SUGERIDO', title: 'Órgão Resp. Sugerido' },
+					{ data: 'JUSTIFICATIVA_RECUSA', title: 'Justificativa da Recusa' }
+				);
+			}
+
+			if ($.fn.DataTable.isDataTable('#tabProcessos')) {
+				$('#tabProcessos').DataTable().clear().destroy(); // Remove a tabela anterior e dados
+				$('#tabProcessos').empty(); // Remove a tabela anterior do DOM
+			}
+			
+			$('#divTabela').css('visibility', 'hidden');
+			
+			if(ano !== undefined){
+				$(function () {
+					$('#tabProcessos').DataTable( {
+						ajax: {
+							url: `cfc/pc_cfcConsultasDiversasAte2023.cfc?method=${metodo}`, // URL para obter dados JSON
+							dataType: "json",
+							dataSrc: "", // Usamos uma string vazia para evitar problemas com objetos aninhados
+							data: {
+								ano: ano // Valor estático para o parâmetro ano
+							}
+						},
+						destroy: true,
+						ordering: false,
+						stateSave: false,
+						filter: false,
+						autoWidth: true,
+						deferRender: true, // Aumentar desempenho para tabelas com muitos registros
+						pageLength: 3,
+						buttons: [{
+								extend: 'excelHtml5',
+								text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
+								title : titleExportarExcel + d,
+								className: 'btExcel',
+								exportOptions: {
+									columns: ':visible',
+									format: {
+										body: function(data, row, column, node) {
+											// Verifica se a coluna é a de "N° do Item"
+											if (column === $('th:contains("N° do Item")').index()) {
+												// Verifica se data é uma string antes de aplicar replace
+												if (typeof data === 'string') {
+													// Substitui todos os pontos por " . "
+													return data.replace(/\./g, ' . '); // Usando replace para compatibilidade
+												}
+											}
+											// Retorna o dado original se não for a coluna desejada ou não for uma string
+											return data;
+										}
+									}
+								},
+								customize: function(xlsx) {
+									var sheet = xlsx.xl.worksheets['sheet1.xml'];
+									
+									$('row:eq(0) c', sheet).attr('s','50');//centraliza 1° linha (título)
+									$('row:eq(0) c', sheet).attr('s','2');//1° linha em negrito
+									$('row:eq(1) c', sheet).attr('s','51');//2° linha centralizada
+									$('row:eq(1) c', sheet).attr('s','2');//2° linha em negrito
+								
+									//PARA PERCORRER TODAS AS COLUNAS E APLICAR UM STYLE
+									// var twoDecPlacesCols = ['A','B','C','D','E','F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];           
+									// for ( i=0; i < twoDecPlacesCols.length; i++ ) {
+									// 	$('row c[r^='+twoDecPlacesCols[i]+']', sheet).attr( 's', '25' );
+									// }
+								},
+								customizeData: function (data) {
+									// Percorre os dados exportados
+									for (var i = 0; i < data.body.length; i++) {
+										var rowData = data.body[i];
+										// Percorre as células da linha
+										for (var j = 0; j < rowData.length; j++) {
+											var cellData = rowData[j];
+											// Verifica se cellData é uma string e contém "&nbsp;"
+											if (typeof cellData === 'string' && cellData.includes('&nbsp;')) {
+												// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
+												rowData[j] = cellData.replace(/&nbsp;/g, ' ');
+											}
+										}
+									}
+								}
+							},
+							{
+								extend: 'colvis',
+								text: 'Selecionar Colunas',
+								className: 'btSelecionarColuna',
+								collectionLayout: 'fixed four-column',
+								colvisButton: true,
+								
+							},
+								
+							{
+								text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(true);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+
+								}
+							},
+							{
+								text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
+								action: function (e, dt, node, config) {
+									$('#modalOverlay').modal('show');
+									setTimeout(function() {
+										dt.columns().visible(false);
+									}, 500);
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+
+								}
+							},
+						],
+						dom: "<'row'<'col-sm-4'<'dtsp-dataTable'Bf>><'col-sm-8 text-left'p>>" + "<'col-sm-12 text-left'i>" + "<'row'<'col-sm-12'tr>>",
+						
+						language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						},
+						columns: columns,
+						drawCallback: function(settings) {//após a tabela se renderizada
+							
+						},
+						initComplete: function () {
+  
 							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#divTabela').css('visibility', 'visible');
+								$('.table thead').addClass('table_thead_backgroundColor'); // Aplica a classe ao <thead> ao finalizar a inicialização
+								if(tipo ==='p'){
+									$("#exibirGrafico").html(`
+										<div style="display:flex;justify-content: space-around;margin-bottom:80px;">
+											<div style="margin-top:10px;width:500px;">
+												<canvas id="pieChartProcessos" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+											</div>
+											<div style="margin-top:10px;width:500px">
+												<canvas id="pieChartProcessos2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+											</div>
+										</div>
+									`);
+									setTimeout(function() {
+										graficoPizza ('pie','tabProcessos','CLASSIFICAÇÃO (PROCESSOS)','Classificação','pieChartProcessos')	
+										graficoPizza ('pie','tabProcessos','STATUS (PROCESSOS)','Status do Processo','pieChartProcessos2')	
+									}, 0);
+									
+								}
+								if(tipo ==='i'){
+									$("#exibirGrafico").html(`
+										<div style="display:flex;justify-content: space-around;">
+											<div style="margin-top:10px;width:500px;margin-bottom:80px;">
+												<canvas id="pieChartItens" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+											</div>
+											<div style="margin-top:10px;width:500px;margin-bottom:80px;">
+												<canvas id="pieChartItens2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+											</div>
+										</div>
+									`);
+									setTimeout(function() {
+										graficoPizza ('pie','tabProcessos','CLASSIFICAÇÃO (ITENS)','Classificação do Item','pieChartItens')	
+										graficoPizza ('pie','tabProcessos','STATUS (ITENS)','Status do Item','pieChartItens2')	
+									}, 0);
+								
+								}
+								if(tipo ==='o'){
+									$("#exibirGrafico").html(`
+											<div style = "display:flex;justify-content: space-around;margin-bottom:80px;">
+												<canvas id="pieChartOrientacoes" style="max-width: 50%;margin-left:10px;"></canvas>
+												<div style="margin-top:10px;width:500px">
+													<canvas id="pieChartOrientacoes2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+												</div>
+											</div>
+									`);
+									setTimeout(function() {
+										graficoBarra ('tabProcessos','STATUS (ORIENTAÇÕES)','Status da Orientação','pieChartOrientacoes')	
+										graficoPizza ('pie','tabProcessos','ACOMPANHAMENTO FINALIZADO (ORIENTAÇÕES)','Acomp. Finalizado?','pieChartOrientacoes2') 
+									},0);
+									
+								}
+								if(tipo ==='m'){
+									$("#exibirGrafico").html(`
+										<div style = "display:flex;justify-content: space-around;margin-bottom:80px;">
+											<div style="margin-top:10px;margin-bottom:80px;width:500px;">
+												<canvas id="pieChartMelhorias" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
+											</div>
+										</div>
+									`);
+									setTimeout(function() {
+										graficoBarra ('tabProcessos','STATUS (PROPOSTAS DE MELHORIA)','Status da Prop. Melhoria','pieChartMelhorias')
+									}, 0);
+								}
 								$('#modalOverlay').modal('hide');
 							});
-						}
-					},
-					error: function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-						$('#modal-danger').modal('show')
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-						$('#modal-danger').find('.modal-body').text(thrownError)
-					}
-				});
-			}, 500);
+							
+						},
+						
+
+					}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
+				} );
+				
+			}	
 
 			
 			

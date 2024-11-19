@@ -50,15 +50,15 @@
 						<!--acordion-->
 						<div id="accordionCadItemPainel" >
 							<div id="accordionCadItemPainelCard" class="card card-success" >
-								<div class="card-header" style="background-color: #ffD400;">
+								<div class="card-header card-header_backgroundColor"
 									<h4 class="card-title ">
-										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#00416b;font-weight: bold;"> 
-											<i class="fas fa-file-alt" style="margin-right:10px"> </i>Processos Em Acompanhamento ou Finalizados
-										</a>
+										<span class="d-block" data-toggle="collapse" href="#collapseTwo" style="color:#fff;font-size:20px;font-weight: bold;"> 
+											<i class="fas fa-file-alt" style="margin-right:10px;"> </i>Processos Iniciados, Em Acompanhamento ou Finalizados
+										</span>
 									</h4>
 								</div>
 								<div id="collapseTwo" class="" data-parent="#accordion">							
-									<div class="card-body" style="border: solid 3px #ffD400;width:100%">
+									<div class="card-body card_border_correios" style="border: solid 3px #ffD400;width:100%">
 										
 										<div class="row" style="justify-content: space-around;">
 											<cfif #rsProcCard.recordcount# eq 0 >
@@ -212,7 +212,8 @@
 					"lengthMenu": [
 						[10, 25, 50, -1],
 						[10, 25, 50, 'All'],
-					]
+					],
+					language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
 				})
 					
 			});
@@ -532,7 +533,7 @@
 				legend {
 					font-size: 0.8rem!important;
 					color: #fff!important;
-					background-color: #0083ca!important;
+					background-color: var(--azul_claro_correios)!important;
 					border: 1px solid #ced4da!important;
 					border-radius: 5px!important;
 					padding: 5px!important;
@@ -566,7 +567,7 @@
 				legend {
 					font-size: 0.8rem!important;
 					color: #fff!important;
-					background-color: #0083ca!important;
+					background-color: var(--azul_claro_correios)!important;
 					border: 1px solid #ced4da!important;
 					border-radius: 5px!important;
 					padding: 5px!important;
@@ -681,89 +682,9 @@
 					</div>
 					<!-- /.modal-dialog -->
 				</div>
-				<!-- /.modal -->
-				<cfset aux_sei = Trim('#rsProcForm.pc_num_sei#')>
-				<cfset aux_sei = Left(aux_sei,"5") & "." & Mid(aux_sei,"6","6") & "/" &  Mid(aux_sei,"12","4")& "-" & Right(aux_sei,"2")>
-			
-				<section class="content" id="infoProcesso">
-					<div id="processosCadastrados" class="container-fluid" >
-						<div class="row">
-							<div id="cartao" style="width:100%;" >
-								<!-- small card -->
-								<cfoutput>
-									<div class="small-box " style=" font-weight: bold;">
-										<div class="ribbon-wrapper ribbon-xl" >
-											<div class="ribbon " style="font-size:18px!important;left:8px;<cfoutput>#rsProcForm.pc_status_card_style_ribbon#</cfoutput>"><cfoutput>#rsProcForm.pc_status_card_nome_ribbon#</cfoutput></div>
-										</div>
-										<div class="card-header" style="height:auto">
-											<p style="font-size: 1.8em;">Processo SNCI n°: <span style="color:##0692c6;margin-right:30px">#rsProcForm.pc_processo_id#</span> Órgão Avaliado: <span style="color:##0692c6">#rsProcForm.siglaOrgAvaliado#</span></p>
-											<p style="font-size: 1.3em;">Origem: <span style="color:##0692c6;margin-right:30px">#rsProcForm.siglaOrgOrigem#</span>
-											<cfif #rsProcForm.pc_modalidade# eq 'A' or #rsProcForm.pc_modalidade# eq 'E'>
-												<span >Processo SEI n°: </span> <span style="color:##0692c6">#aux_sei#</span> 
-												<span style="margin-left:20px">Relatório n°:</span> 
-												<span style="color:##0692c6">#rsProcForm.pc_num_rel_sei#</span></p>
-											</cfif>	
-											<cfif rsProcForm.pc_num_avaliacao_tipo neq 2 and rsProcForm.pc_num_avaliacao_tipo neq 445>
-												<cfif rsProcForm.pc_aval_tipo_descricao neq ''>
-													<p style="font-size: 1.3em;">Tipo de Avaliação: <span style="color:##0692c6">#rsProcForm.pc_aval_tipo_descricao#</span></p>
-												<cfelse>
-													<p style="font-size: 1.3em;margin-right:30px">Tipo de Avaliação: <span style="color:##0692c6; ">#rsProcForm.tipoProcesso#</span></p>
-												</cfif>
-											<cfelse>
-												<p style="font-size: 1.3em;">Tipo de Avaliação: <span style="color:##0692c6">#rsProcForm.pc_aval_tipo_nao_aplica_descricao#</span></p>
-											</cfif>
-											
-											
-										
-											<cfif #rsProcForm.pc_modalidade# eq 'A' or #rsProcForm.pc_modalidade# eq 'E'>
-											
-												<div id="actions" class="row" >
-													<div class="col-lg-12" align="center">
-														<div class="btn-group w-30">
-															<span id="relatorios" class="btn btn-success col fileinput-button" style="background:##0083CA">
-																<i class="fas fa-upload"></i>
-																<span style="margin-left:5px">Clique aqui para anexar o Relatório do Processo e Anexos I, II e III em PDF (1° passo)</span>
-															</span>																	
-														</div>
-													</div>
-												</div>
-												
-												<div class="table table-striped files" id="previewsRelatorio">
-													<div id="templateRelatorio" class="row mt-2">
-														<div class="col-auto">
-															<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
-														</div>
-														<div class="col d-flex align-items-center">
-															<p class="mb-0">
-															<span class="lead" data-dz-name></span>
-															(<span data-dz-size></span>)
-															</p>
-															<strong class="error text-danger" data-dz-errormessage></strong>
-														</div>
-														<div class="col-4 d-flex align-items-center" >
-															<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
-																<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
-															</div>
-														</div>
-														
-													</div>
-												</div>
-
-												<div id="anexoRelatorioDiv"></div>
-											
-											</cfif>	
-										</div>									
-									</div>
-								</cfoutput>
-
-
-
-							</div>
-						</div>
-
-						
-					</div>
-				</section>
+							
+				<cfobject component = "pc_cfcInfoProcesso" name = "pc_cfcInfoProcesso"/>
+				<cfinvoke component="#pc_cfcInfoProcesso#" method="infoProcesso" pc_aval_processoForm="#rsProcForm.pc_processo_id#"/>
 
 			</form><!-- fim formCadAvaliacao -->
 				
@@ -771,7 +692,7 @@
 
 			<div hidden id="accordionTitulo"  style="display: flex; justify-content: left;">
 				<div  id="cadastro" class="card card-primary collapsed-card"   style="margin-left: 25px;">
-					<div class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+					<div class="card-header text-left card-header_backgroundColor" style="color:#fff;">
 						<a  id="btnCadastroItem" class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
 							<button  type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 							</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um item (2° Passo)</span>
@@ -779,12 +700,12 @@
 					</div>
 
 					<input id="pc_aval_id" hidden>
-					<div class="card-body" style="border: solid 3px #0083ca;" >
+					<div class="card-body card_border_correios"  >
 					
 						<div class="card card-default">
 							<div class="card-body p-0">
 								
-								<h6  class="font-weight-light text-center" style="top:-15px;font-size:20px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+								<h6  class="font-weight-light text-center azul_correios_textColor" style="top:-15px;font-size:20px!important;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
 									<span id="infoTipoCadastro" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Novo Item</span>
 								</h6>
 								<div class="bs-stepper" >
@@ -1690,7 +1611,7 @@
 							unmaskAsNumber: true
 					});
 
-					mostraRelatorioPDF()
+					
 
 					setupCharCounter('pcTeste', 'pcTesteCounter', 5000);
 					setupCharCounter('pcControleTestado', 'pcControleTestadoCounter', 7500);
@@ -1699,66 +1620,6 @@
 					setupCharCounter('pcCriterioRefOutrosDesc', 'pcCriterioRefOutrosDescCharCounter', 350);
 					setupCharCounter('pcAvaliacaoRiscoOutrosDesc', 'pcAvaliacaoRiscoOutrosDescCharCounter', 100);
 
-
-					
-					<cfoutput>
-						let modalidade = '#rsProcForm.pc_modalidade#'
-						let pc_processo_id = '#rsProcForm.pc_processo_id#'
-					</cfoutput>
-
-					if(modalidade ==='A' || modalidade ==='E'){
-						// DropzoneJS Demo Code Start
-						Dropzone.autoDiscover = false
-
-						// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
-						var previewNode = document.querySelector("#templateRelatorio")
-						//previewNode.id = ""
-						var previewTemplate = previewNode.parentNode.innerHTML
-						previewNode.parentNode.removeChild(previewNode)
-
-						var myDropzoneRelatorio = new Dropzone("#processosCadastrados", { // Make the whole body a dropzone
-							url: "cfc/pc_cfcAvaliacoes.cfc?method=uploadArquivos", // Set the url
-							autoProcessQueue :true,
-							maxFiles: 1,
-							maxFilesize:20,
-							thumbnailWidth: 80,
-							thumbnailHeight: 80,
-							parallelUploads: 1,
-							acceptedFiles: '.pdf',
-							previewTemplate: previewTemplate,
-							autoQueue: true, // Make sure the files aren't queued until manually added
-							previewsContainer: "#previewsRelatorio", // Define the container to display the previews
-							clickable: "#relatorios", // Define the element that should be used as click trigger to select files.
-							headers: { "pc_aval_id":"", 
-									"pc_aval_processo":pc_processo_id, 
-									"pc_anexo_avaliacaoPDF":"S",
-									"arquivoParaTodosOsItens":"S"},//informar "S" se o arquivo deve ser exibido em todos os itens do processo
-							init: function() {
-								this.on('error', function(file, errorMessage) {	
-									toastr.error(errorMessage);
-									return false;
-								});
-							}
-							
-						})
-
-						
-
-
-						// Hide the total progress bar when nothing's uploading anymore
-						myDropzoneRelatorio.on("queuecomplete", function(progress) {
-							//toastr.success("Arquivo(s) enviado(s) com sucesso!")
-							myDropzoneRelatorio.removeAllFiles(true);
-							mostraRelatorioPDF();
-
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-						})
-
-						
-						// DropzoneJS 1 Demo Code End
-					}
 
 
 					$('#btn_groupValorRecuperar .btn').click(function() {
@@ -1841,39 +1702,7 @@
 
 					
 
-				function mostraRelatorioPDF(){
-					<cfoutput>
-						let pc_processo_id = '#rsProcForm.pc_processo_id#'
-					</cfoutput>
-					$('#modalOverlay').modal('show')
-					setTimeout(function() {
-						$.ajax({
-							type: "post",
-							url:"cfc/pc_cfcAvaliacoes.cfc",
-							data:{
-								method: "anexoRelatorio",
-								pc_anexo_processo_id: pc_processo_id
-							},
-							async: false
-						})//fim ajax
-						.done(function(result){
-							
-							$('#anexoRelatorioDiv').html(result)
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-						})//fim done
-						.fail(function(xhr, ajaxOptions, thrownError) {
-							$('#modalOverlay').delay(1000).hide(0, function() {
-								$('#modalOverlay').modal('hide');
-							});
-							$('#modal-danger').modal('show')
-							$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-							$('#modal-danger').find('.modal-body').text(thrownError)
-
-						})//fim fail
-					}, 1000);
-				}
+			
 
 				function resetFormFields()  {
 					
@@ -2090,8 +1919,8 @@
 			</cfif>
 			
 				<div class="card-body" style="padding:0px;">
-					<div  id ="cardRelatorioPDF" class="card card-primary card-tabs collapsed-card" style="transition: all 0.15s ease 0s; height: inherit; width: inherit;">
-						<div class="card-header" style="background-color:#00416b;">
+					<div  id ="cardRelatorioPDF" class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease 0s; height: inherit; width: inherit;">
+						<div class="card-header azul_claro_correios_backgroundColor" >
 						
 							<h3 class="card-title" style="font-size:16px;position:relative;top:3px;cursor:pointer" data-card-widget="collapse"><i class="fas fa-file-pdf" style="margin-right:10px;"></i><cfoutput> #pc_anexo_nome#</cfoutput></h3>
 						    <div  class="card-tools">
@@ -2101,7 +1930,7 @@
 							</div>
 						</div>
 						
-						<div class="card-body" style="height: 100%;background-color:#00416B;padding-top: 0px;">											
+						<div class="card-body azul_claro_correios_backgroundColor" style="height: 100%;padding-top: 0px;">											
 							<embed id="relatoPDFdiv" type="application/pdf" src="pc_Anexos.cfm?arquivo=<cfoutput>#caminho#</cfoutput>" style="width: 100%;height:90vh;" >
 						</div>			
 					</div>
@@ -2279,8 +2108,8 @@
 				<div class="card">
 					<!-- /.card-header -->
 					<div class="card-body">
-						<table id="tabItens" class="table table-bordered  table-hover table-striped">
-						<thead style="background: #0083ca;color:#fff">
+						<table id="tabItens" class="table  table-hover table-striped">
+						<thead  class="table_thead_backgroundColor">
 							<tr style="font-size:12px!important">
 								<th >Controles</th>
 								<th >Item N°:</th>
@@ -2390,6 +2219,7 @@
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
 						className: 'btExcel',
 					}],
+					language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
 				}).buttons().container().appendTo('#tabAvaliacoes_wrapper .col-md-6:eq(0)');
 					
 			});
@@ -2714,13 +2544,13 @@
 						}
 					</style>
 						
-					<div class="card-header" style="background-color: #0083CA;border-bottom:solid 2px #fff" >
+					<div class="card-header card-header_navbar_backgroundColor" style="margin-bottom:5px" >
 						<cfoutput>
 							<p style="font-size: 1.3em;color:##fff"><strong>#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong></p>
 						</cfoutput>	
 					</div>
-					<div id="tabsCadItem" class="card card-primary card-tabs"  style="widht:100%">
-						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+					<div id="tabsCadItem" class="card card-primary card-tabs card_border_correios2"  style="width:100%">
+						<div class="card-header p-0 pt-1 card-header_navbar_backgroundColor" >
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
 							
@@ -3326,8 +3156,8 @@
 					<!-- /.card-header -->
 					<div class="card-body">
 						
-						<table id="tabOrientacoes" class="table table-bordered table-hover  ">
-							<thead style="background: #0083ca;color:#fff">
+						<table id="tabOrientacoes" class="table table-hover  ">
+							<thead  class="table_thead_backgroundColor">
 								<tr style="font-size:14px">
 									<th>Controles</th>
 									<th hidden >pc_aval_orientacao_id</th>
@@ -3394,7 +3224,8 @@
 					searching:false,
 					columnDefs: [
 						{ "className": "dt-center", "targets": "_all" } // Alinha todos os elementos verticalmente
-					]
+					],
+					language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
 				});
 					
 			});
@@ -3572,8 +3403,8 @@
 					<!-- /.card-header -->
 					<div class="card-body">
 						
-						<table id="tabMelhorias" class="table table-bordered  table-hover ">
-							<thead style="background: #0083ca;color:#fff">
+						<table id="tabMelhorias" class="table  table-hover ">
+							<thead  class="table_thead_backgroundColor">
 								<tr style="font-size:14px">
 									
 									<th style="width: 10%;vertical-align:middle !important;">Controles</th>
@@ -3691,7 +3522,8 @@
 					searching:false,
 					columnDefs: [
 						{ "className": "dt-center", "targets": "_all" } // Alinha todos os elementos verticalmente
-					]
+					],
+					language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
 				})
 
 			});
@@ -3936,7 +3768,7 @@
         
 		<div id="accordionCadOrientacao"  style="display: flex; justify-content: left;">
 			<div  id="cadOrientacao" class="card card-primary collapsed-card" >
-				<div id="btnCadastrarOrientacao" class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+				<div id="btnCadastrarOrientacao" class="card-header text-left azul_claro_correios_backgroundColor" style="color:#fff;">
 					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
 						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 						</button></i><span id="cabecalhoAccordionCadOrientacao">Clique aqui para cadastrar uma Medida/Orientação para Regularização</span>
@@ -3945,7 +3777,7 @@
 				<div class="card-body" style="border: solid 3px #0083ca;" >
 					<div class="card card-default">
 						<div class="card-body p-0">
-							<h7  class="font-weight-light text-center" style="top:-15px;font-size:14px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+							<h7  class="font-weight-light text-center azul_correios_textColor" style="top:-15px;font-size:14px!important;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
 								<span id="infoTipoCadOrientacao" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Nova Medida/Orientação para Regularização:</span>
 							</h7>
 							<form   id="formAvalOrientacaoCadastro" name="formAvalOrientacaoCadastro" style="padding:10px"  onsubmit="return false" novalidate>
@@ -4058,7 +3890,7 @@
 
 									<div style="justify-content:center; display: flex; width: 100%;">
 										<div>
-											<button id="btSalvarOrientacao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
+											<button id="btSalvarOrientacao"  class="btn btn-block  azul_claro_correios_backgroundColor" style="color:#fff">Salvar</button>
 										</div>
 										<div style="margin-left:100px">
 											<button id="btCancelarOrientacao"  class="btn btn-block btn-danger " >Cancelar</button>
@@ -4449,7 +4281,7 @@
 
 		<div id="accordionCadMelhoria"  style="display: flex; justify-content: left;">
 			<div  id="cadMelhoria" class="card card-primary collapsed-card" >
-				<div id="btnCadastrarMelhoria" class="card-header text-left" style="background-color: #0083ca;color:#fff;">
+				<div id="btnCadastrarMelhoria" class="card-header text-left azul_claro_correios_backgroundColor" style="color:#fff;">
 					<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:14px;" data-card-widget="collapse">
 						<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 						</button></i><span id="cabecalhoAccordionCadMelhoria">Clique aqui para cadastrar uma Propostas de Melhoria</span>
@@ -4458,7 +4290,7 @@
 				<div class="card-body" style="border: solid 3px #0083ca;" >
 					<div class="card card-default">
 						<div class="card-body p-0">
-							<h6  class="font-weight-light text-center" style="top:-15px;font-size:14px!important;color:#00416B;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
+							<h6  class="font-weight-light text-center azul_correios_textColor" style="top:-15px;font-size:14px!important;position:absolute;width:100%;left:50%;transform:translateX(-50%);">
 								<span id="infoTipoCadMelhoria" style=" background-color:#fff;border:1px solid rgb(229, 231, 235);padding-left:7px;padding-right:7px;border-radius: 5px;">Cadastrando Nova Proposta de Melhoria:</span>
 							</h6>
 							<form   id="formAvalMelhoriaCadastro" name="formAvalMelhoriaCadastro"  style="padding:10px"  onsubmit="return false" novalidate>
@@ -4629,7 +4461,7 @@
 									
 									<div style="justify-content:center; display: flex; width: 100%;">
 										<div>
-											<button id="btSalvarMelhoria"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Salvar</button>
+											<button id="btSalvarMelhoria"  class="btn btn-block azul_claro_correios_backgroundColor" style="color:#fff">Salvar</button>
 										</div>
 										<div style="margin-left:100px">
 											<button id="btCancelarMelhoria"  class="btn btn-block btn-danger " >Cancelar</button>

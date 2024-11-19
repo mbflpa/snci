@@ -1,12 +1,11 @@
 <cfcomponent >
-   <cfproperty  name="dsn" type="String">
-   <cfset dsn = 'DBSNCI'>
-    <cffunction name="acao">
-      <cftransaction>  <!--- Inclus�o: Marcelo Bittencourt em 14/07/2020; DEMANDA: Update na unidade centralizadora; Se um UPDATE ou INSERT falhar, todas as altera��es feitas ter�o roll back autom�tico--->
-    <cfoutput>
-    <cfquery name="rsReopAtu" datasource="#dsn#">
-            Select Und_CodReop  from Unidades WHERE Und_Codigo = '#form.codigo#'
-    </cfquery>
+  <cfprocessingdirective pageencoding = "utf-8">	
+<cffunction name="acao">
+	<cftransaction>  <!--- Inclus�o: Marcelo Bittencourt em 14/07/2020; DEMANDA: Update na unidade centralizadora; Se um UPDATE ou INSERT falhar, todas as altera��es feitas ter�o roll back autom�tico--->
+<cfoutput>
+  <cfquery name="rsReopAtu" datasource="#dsn_inspecao#">
+           Select Und_CodReop  from Unidades WHERE Und_Codigo = '#form.codigo#'
+  </cfquery>
   
   <!--- INCLUS�O: Marcelo Bittencourt em 09/07/2020; DEMANDA: Update na unidade centralizadora---> 
    
@@ -23,7 +22,7 @@
  		  
   <!--- ALTERA��O: Marcelo Bittencourt em 09/07/2020; DEMANDA: Update na unidade centralizadora---> 
 
-  <cfquery name="qAtualizaUnidade" datasource="#dsn#">
+  <cfquery name="qAtualizaUnidade" datasource="#dsn_inspecao#">
            UPDATE Unidades SET Und_NomeGerente = '#form.gerente#', Und_CatOperacional = #form.categoria#, Und_Email = '#form.email#',
 	       Und_CodReop = '#form.reop#', Und_Endereco = '#form.endereco#', Und_Status = '#form.Status#', Und_Centraliza ='#form.centralizador#', 
 	       Und_Username = '#rsUsuarioLogado.Username#', Und_DtUltAtu = convert(char, getdate(), 102)    
@@ -34,17 +33,17 @@
   <!--- Fim: Marcelo --->
   
   <!--- Atualizar Resultado_Inspecao --->
-  <cfquery name="rsRIP" datasource="#dsn#">
+  <cfquery name="rsRIP" datasource="#dsn_inspecao#">
   SELECT RIP_Unidade, RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_CodReop FROM Resultado_Inspecao WHERE RIP_Unidade = '#form.codigo#'
 </cfquery>
 </cfoutput>
 <!--- <cfset gil = gil> --->
 <cfoutput query="rsRIP">
-  <cfquery name="rsPOS" datasource="#dsn#">
+  <cfquery name="rsPOS" datasource="#dsn_inspecao#">
 		 SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp FROM ParecerUnidade WHERE Pos_Unidade = '#form.codigo#' AND Pos_Inspecao = '#RIP_NumInspecao#' AND Pos_NumGrupo = #RIP_NumGrupo# AND Pos_NumItem = #RIP_NumItem# AND (Pos_Situacao_Resp <> 3 And Pos_Situacao_Resp <> 12 And Pos_Situacao_Resp <> 13)
 		</cfquery>
   <cfif rsPos.recordcount gt 0>
-    <cfquery datasource="#dsn#">
+    <cfquery datasource="#dsn_inspecao#">
 			 UPDATE Resultado_Inspecao SET RIP_CodReop = '#form.reop#' where RIP_Unidade = '#form.codigo#' and RIP_NumInspecao = '#RIP_NumInspecao#' and RIP_NumGrupo = #RIP_NumGrupo# and RIP_NumItem = #RIP_NumItem#
 		   </cfquery>
   </cfif>
@@ -55,7 +54,7 @@
   
 
 <!---Busca na tabela ParecerUnidade todos os itens da unidade (form.codigo) que possuem o Itn_TipoUnidade = 4 na tabela Itens_Verificacao --->
-<cfquery name="rsPOSalteraCentraliza" datasource="#dsn#">
+<cfquery name="rsPOSalteraCentraliza" datasource="#dsn_inspecao#">
   SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp,
     Pos_Parecer, Pos_DtPrev_Solucao 
 	FROM ParecerUnidade 
@@ -127,7 +126,7 @@
           </cfif>
  
 		  <cfset pos_aux_hist = '#rsPOSalteraCentraliza.Pos_Parecer#' & CHR(13) & CHR(13) & '#pos_aux#'>
-		  <cfquery datasource="#dsn#">
+		  <cfquery datasource="#dsn_inspecao#">
 				  UPDATE ParecerUnidade SET Pos_Area = '#posArea#', Pos_NomeArea = '#posNomeArea#', Pos_Parecer = '#pos_aux_hist#', Pos_DtPosic  = convert(char, getdate(), 102), pos_dtultatu = getdate() 
 			      WHERE Pos_Unidade = '#form.codigo#' AND Pos_Inspecao = '#Pos_Inspecao#' AND Pos_NumGrupo = '#Pos_NumGrupo#' AND Pos_NumItem = '#Pos_NumItem#'  
 		 </cfquery>	
@@ -154,16 +153,16 @@
 			
 
 <!--- Atualizar ParecerUnidade --->
-<cfquery name="rsArea" datasource="#dsn#">
+<cfquery name="rsArea" datasource="#dsn_inspecao#">
 		 SELECT Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_Situacao_Resp 
 		 FROM ParecerUnidade 
 		 WHERE Pos_Area = '#rsReopAtu.Und_CodReop#' AND Pos_Unidade = '#form.codigo#' AND Pos_Inspecao = '#rsRIP.RIP_NumInspecao#' AND Pos_Situacao_Resp <> 0 AND Pos_Situacao_Resp <> 11 AND Pos_Situacao_Resp <> 3 And Pos_Situacao_Resp <> 12 And Pos_Situacao_Resp <> 13
 </cfquery>
 <cfoutput query="rsArea">
-  <cfquery name="rsREOP" datasource="#dsn#">
+  <cfquery name="rsREOP" datasource="#dsn_inspecao#">
            SELECT Rep_Nome FROM Reops WHERE Rep_Codigo = '#form.reop#'
   </cfquery>
-  <cfquery datasource="#dsn#">
+  <cfquery datasource="#dsn_inspecao#">
           UPDATE ParecerUnidade SET Pos_Area = '#form.reop#', Pos_NomeArea = '#rsREOP.Rep_Nome#' WHERE Pos_Unidade = '#form.codigo#' and Pos_Inspecao = '#rsArea.Pos_Inspecao#' and Pos_NumGrupo = #rsArea.Pos_NumGrupo# and Pos_NumItem = #rsArea.Pos_NumItem#
   </cfquery>
 </cfoutput>

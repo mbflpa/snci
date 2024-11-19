@@ -27,6 +27,12 @@
     WHERE pc_aval_melhoria_status = 'P'	and pc_num_status in(4,5)
 </cfquery>
 
+<cfquery name="verificarExecucao" datasource="#application.dsn_processos#">
+    SELECT pc_rotina_ultima_execucao 
+    FROM pc_rotinas_execucao_emails_log 
+    WHERE pc_rotina_nome = <cfqueryparam value="rotinaMensal" cfsqltype="cf_sql_varchar">
+</cfquery>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -51,21 +57,33 @@
             <section class="content-header">
 
                 <div class="container-fluid" style="margin-bottom:80px;">
-                    <div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
-                        <div class="col-sm-6">
+                    <div class="row mb-2" style="margin-bottom:0px!important;">
+                        <div class="col-sm-12">
                             <h4>Rotina de Verificação de Propostas de Melhoria Pendentes</h4>
+                            <cfset ultima_execucao = '#DateFormat(verificarExecucao.pc_rotina_ultima_execucao, "dd/mm/yyyy")# às #TimeFormat(verificarExecucao.pc_rotina_ultima_execucao, "HH:mm")#'>
+                            <div class="alert d-inline-flex align-items-center" style="background-color: #d52e44;border-color:#973450;color:#fff">
+                                <i class="fas fa-calendar-day" style="font-size: 3rem;margin-right:20px"></i>
+                                <div>
+                                    <cfif verificarExecucao.recordcount eq 0>
+                                        <h5 class="mb-1">Última execução automática: <b>ainda não executada</b> (executada uma vez por mês)</h5>
+                                    <cfelse>
+                                        <h5 class="mb-1">Última execução automática: <b><cfoutput>#ultima_execucao#</cfoutput></b> (executada uma vez por mês)</h5>
+                                    </cfif>
+                                    <small>Obs.: Esta rotina é executada automaticamente sempre que um usuário do perfil CI - MASTER ACOMPANHAMENTO (Gestor Nível 4) entra no sistema.</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <h6 style="margin-top:30px">SERVIDOR: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#application.auxsite#</cfoutput></span></h6>
-                    <h6 style="margin-top:30px">Quant. Órgãos com Propostas de Melhoria Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComMelhoriasPendentes.recordcount,"00")#</cfoutput></span></h6>
-                    <h6>Total de Propostas de Melhoria Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#rsMelhoriasPendentes.recordcount#</cfoutput></span></h6>
+                    <h6 style="margin-top:30px">SERVIDOR: <span class="azul_claro_correios_backgroundColor" style="color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#application.auxsite#</cfoutput></span></h6>
+                    <h6 style="margin-top:30px">Quant. Órgãos com Propostas de Melhoria Pendentes: <span class="azul_claro_correios_backgroundColor" style="color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComMelhoriasPendentes.recordcount,"00")#</cfoutput></span></h6>
+                    <h6>Total de Propostas de Melhoria Pendentes: <span class="azul_claro_correios_backgroundColor" style="color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#rsMelhoriasPendentes.recordcount#</cfoutput></span></h6>
                     <cfset quantPendentes = 0>
                     <cfif rsOrgaosComMelhoriasPendentesParaTeste.recordcount gt 0>
                          <cfif FindNoCase("intranetsistemaspe", application.auxsite)>
                             <cfset myQuery = "rsOrgaosComMelhoriasPendentes">
                         <cfelse>
                            <cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
-                            <h6>Quant. Órgãos com Propostas de Melhoria pendentes para teste de envio de e-mail: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComMelhoriasPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
+                            <h6>Quant. Órgãos com Propostas de Melhoria pendentes para teste de envio de e-mail: <span class="azul_claro_correios_backgroundColor" style="color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComMelhoriasPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
                         </cfif>
                         <div style="margin-bottom:30px;justify-content:center; display: flex; width: 100%;margin-top:20px">
                             <div>
@@ -129,7 +147,7 @@
                                 type: "post",
                                 url: "cfc/pc_cfcPaginasApoio.cfc",
                                 data:{
-                                    method: "rotinaMensalMelhoriasPendentesTeste",
+                                    method: "rotinaMensalMelhoriasPendentes",
                                 },
                                 async: false,
                                 success: function(result) {

@@ -83,12 +83,12 @@
 			<div class="container-fluid" >
 
 				<div style="display: flex;align-items: center;">
-					<span style="color:#0083ca;font-size:1rem;margin-right:10px">Ano:</span>
+					<span class="azul_claro_correios_textColor" style="font-size:1rem;margin-right:10px">Ano:</span>
 					<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
 				<div style="display: flex;align-items: center;">
-                    <span style="color:#0083ca;font-size:1rem;margin-right:10px">Mês:</span>
+                    <span class="azul_claro_correios_textColor" style=";font-size:1rem;margin-right:10px">Mês:</span>
                     <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons" ></div><br><br>
 				</div>
 
@@ -146,25 +146,25 @@
 							</div>
 
 							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporOrgaoSubord"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporOrgaoSubord-tab" >	
-							    <div><h5 style="color:#0083ca;margin-left: 10px">DGCI por órgão subordinador:</h5></div>														
+							    <div><h5 class="azul_claro_correios_textColor" style="margin-left: 10px">DGCI por órgão subordinador:</h5></div>														
 								<div id="divIndicadorDGCIporOrgaoSubord" ></div>
 							</div>
 
 							<div disable class="tab-pane fade " id="custom-tabs-one-DGCIporGerencia"  role="tabpanel" aria-labelledby="custom-tabs-one-DGCIporGerencia-tab" >
 							    <div style="margin-left: 10px">
-									<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
+									<h5 class="azul_claro_correios_textColor" >DGCI por órgão responsável:</h5>
 									<h6 >Atenção: Nesta tabela, também aparecerão os órgãos subordinadores que possuem ou possuíram orientações sob sua responsabilidade no período selecionado.</h6>
 								</div>															
 								<div id="divIndicadorDGCIporOrgaoResponsavel" ></div>
 							</div>
 
 							<div disable class="tab-pane fade " id="custom-tabs-one-PRCIporOrgaoSubordinador"  role="tabpanel" aria-labelledby="custom-tabs-one-PRCIporOrgaoSubordinador-tab" >	
-								<div><h5 style="color:#0083ca;margin-left: 10px">PRCI por órgão subordinador:</h5></div>													
+								<div><h5 class="azul_claro_correios_textColor" style="margin-left: 10px">PRCI por órgão subordinador:</h5></div>													
 								<div id="divIndicadorPRCIporOrgaoSubordinador" ></div>
 							</div>
 
 							<div disable class="tab-pane fade  " id="custom-tabs-one-SLNCporOrgaoSubordinador"  role="tabpanel" aria-labelledby="custom-tabs-one-SLNCporOrgaoSubordinador-tab" >	
-								<div><h5 style="color:#0083ca;margin-left: 10px">SLNC por órgão subordinador:</h5></div>													
+								<div><h5 class="azul_claro_correios_textColor" style="margin-left: 10px">SLNC por órgão subordinador:</h5></div>													
 								<div id="divIndicadorSLNCporOrgaoSubordinador" ></div>
 							</div>
 

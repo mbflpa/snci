@@ -161,7 +161,7 @@
 					<H4>Nenhuma Imagem no servidor.</H4>
 				<cfelse>
 					<table id="tabImagens" class="table  " style="background: none;border:none;width:100%">
-						<thead >
+						<thead  class="table_thead_backgroundColor" >
 							<tr style="background: none;border:none">
 								<th style="background: none;border:none"></th>
 							</tr>
@@ -233,7 +233,10 @@
 					"lengthMenu": [
 						[10, 25, 50, -1],
 						[10, 25, 50, 'All'],
-					]
+					],
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 				})
 					
 			});

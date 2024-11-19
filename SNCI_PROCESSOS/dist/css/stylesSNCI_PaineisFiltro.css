@@ -58,7 +58,7 @@ input.dtsp-paneInputButton:hover {
 
 /* Estilo para as linhas selecionadas nos painéis de filtro */
 div.dtsp-panesContainer div.dtsp-searchPanes div.dataTables_scrollBody tr.selected {
-    background-color: #0083ca!important; /* Cor de fundo da linha selecionada */
+    background-color: var(--azul_claro_correios)!important; /* Cor de fundo da linha selecionada */
     font-weight: bold!important;
     color: #fff!important;
     box-shadow: 0 7px 14px rgb(0 0 0 / 25%), 0 3px 6px rgb(0 0 0 / 22%)!important;

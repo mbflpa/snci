@@ -1,3 +1,12 @@
+/**
+ * A função `generateColors` gera um array de valores de cor RGBA aleatórios com um número especificado
+ * de cores, incluindo algumas cores padrão no início.
+ * @param numColors - O parâmetro `numColors` na função `generateColors` representa o número de cores
+ * aleatórias que serão geradas e retornadas em um array.
+ * @returns A função `generateColors` retorna um array de cores aleatórias no formato RGBA com um
+ * valor alfa de 0.5. Além disso, insere quatro cores padrão no início do array.
+ */
+
 function generateColors(numColors) {
     var colors = [];
   
@@ -13,6 +22,28 @@ function generateColors(numColors) {
     return colors;
 }
 
+/**
+ * A função `graficoPizza` gera um gráfico de rosca (donut) utilizando dados de uma DataTable e o exibe em um
+ * elemento canvas especificado.
+ * @param tipo - O parâmetro `tipo` na função `graficoPizza` representa o tipo de gráfico a ser exibido.
+ * Pode ser "pie" para um gráfico de pizza ou "doughnut" para um gráfico de rosca. Este parâmetro
+ * determina a representação visual dos dados no gráfico.
+ * @param tabela - O parâmetro `tabela` na função `graficoPizza` é usado para especificar o ID do elemento de
+ * tabela HTML que contém os dados dos quais o gráfico de pizza será gerado.
+ * @param titulo - O parâmetro `titulo` na função `graficoPizza` representa o título do gráfico de pizza que
+ * será exibido. É o texto que será mostrado na parte superior do gráfico para fornecer uma breve descrição
+ * ou contexto para os dados sendo visualizados.
+ * @param nomeColuna - O parâmetro `nomeColuna` na função `graficoPizza` representa o nome da coluna na
+ * DataTable que você deseja usar para criar o gráfico de pizza. Esta função recupera os dados da coluna
+ * especificada e gera um gráfico de pizza com base nas frequências de diferentes valores nessa coluna.
+ * @param canvasID - O parâmetro `canvasID` na função `graficoPizza` é usado para especificar o ID do
+ * elemento de canvas onde o gráfico de pizza será renderizado. Este ID é usado para selecionar o elemento
+ * canvas usando jQuery e, em seguida, desenhar o gráfico de pizza nesse canvas.
+ * @returns A função `graficoPizza` retorna um gráfico de rosca criado usando a biblioteca Chart.js com base
+ * nos dados fornecidos na tabela especificada pelo parâmetro `tabela`. O gráfico de rosca exibirá as
+ * frequências dos valores na coluna especificada (`nomeColuna`) da tabela. O gráfico terá um título
+ * (`titulo`) e será exibido no elemento canvas especificado identificado por `canvasID`.
+ */
 function graficoPizza (tipo, tabela, titulo, nomeColuna, canvasID){
 				
     var table =  $('#' + tabela).DataTable();
@@ -166,6 +197,27 @@ function graficoPizza (tipo, tabela, titulo, nomeColuna, canvasID){
 };
 
 
+/**
+ * A função `graficoBarra` gera um gráfico de barras com base nos dados de uma coluna de tabela
+ * especificada e o exibe em um elemento de canvas indicado.
+ * @param tabela - O parâmetro `tabela` na função `graficoBarra` representa o ID do elemento de tabela
+ * HTML que contém os dados que você deseja visualizar no gráfico de barras.
+ * @param titulo - O parâmetro `titulo` na função `graficoBarra` representa o título do gráfico de barras
+ * que será exibido. É o título que será mostrado na parte superior do gráfico para fornecer uma breve
+ * descrição ou contexto para os dados sendo visualizados.
+ * @param nomeColuna - O parâmetro `nomeColuna` na função `graficoBarra` representa o nome da coluna
+ * na DataTable da qual você deseja gerar o gráfico de barras. Esta função irá extrair dados desta
+ * coluna específica para criar a visualização do gráfico de barras.
+ * @param canvasID - O parâmetro `canvasID` na função `graficoBarra` é usado para especificar o ID
+ * do elemento de canvas onde o gráfico de barras será renderizado. Este ID é usado para selecionar o
+ * elemento canvas usando jQuery e, em seguida, desenhar o gráfico de barras nesse canvas.
+ * @returns A função `graficoBarra` retorna um gráfico de barras criado usando a biblioteca Chart.js com
+ * base nos dados fornecidos na coluna da tabela especificada pelo `nomeColuna`. O gráfico é exibido no
+ * elemento canvas especificado identificado por `canvasID`. O gráfico inclui o título especificado,
+ * rótulos de dados e dicas de ferramenta mostrando os valores e porcentagens dos dados. Os rótulos do
+ * eixo x são girados para melhor legibilidade.
+ */
+
 function graficoBarra (tabela, titulo, nomeColuna, canvasID){
 				
     var table =  $('#' + tabela).DataTable();
@@ -295,7 +347,16 @@ function graficoBarra (tabela, titulo, nomeColuna, canvasID){
 };
 
 
-// Exporta o timeline(histórico) das manifestações para PDF
+
+/**
+ * A função `exportarTimelineParaPDF` permite que o usuário gere um arquivo PDF contendo uma linha do tempo
+ * de eventos com opções de orientação personalizáveis.
+ * @returns A função `exportarTimelineParaPDF` é uma função assíncrona que solicita ao usuário que
+ * selecione uma orientação de PDF (paisagem ou retrato) usando um diálogo modal da biblioteca SweetAlert2.
+ * Com base na seleção do usuário, ela gera um arquivo PDF contendo o conteúdo de um elemento HTML específico
+ * (`.timeline`) usando a biblioteca `html2pdf.js`.
+ */
+
 async function exportarTimelineParaPDF() {
     var mensagem = '<p style="text-align: justify;">Deseja gerar um arquivo PDF contendo o histórico das manifestações?</p>Escolha uma orientação para o PDF:</p>';
 
@@ -320,8 +381,8 @@ async function exportarTimelineParaPDF() {
             }
         },
         inputOptions: {
-            '1': '<span style="margin-right: 50px;"><i class="fas fa-file fa-rotate-270 fa-3x" ></i></span>',//horizontal
-            '2': '<span style="margin-right: 8px;"><i class="fas fa-file fa-3x"></i></span>'//vertical
+            '1': '<span style="margin-right: 50px;"><i style="color:#fff" class="fas fa-file fa-rotate-270 fa-3x" ></i></span>',//horizontal
+            '2': '<span style="margin-right: 8px;"><i style="color:#fff" class="fas fa-file fa-3x"></i></span>'//vertical
  
         }
     });
@@ -414,17 +475,28 @@ async function exportarTimelineParaPDF() {
         // Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
         $('#modalOverlay').modal('hide');
         Swal.fire({
-								title: 'Operação Cancelada',
-								html: '<div style="position:absolute;top:5px;left:5px;whidth:100%;display:flex;justify-content: center;align-items: center;margin-bottom:10px"><img src="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png"class="brand-image" style="width:33px;margin-right:10px">'
-                                + '<span class="font-weight-light" style="font-size:20px!important;color:#00416B">SNCI - Processos</span></div>',
-								icon: 'info'
-							});
+            title: 'Operação Cancelada',
+            html: logoSNCIsweetalert2(''),
+            icon: 'info'
+        });
     }
  
 }
 
 
-// Função para inicializar o Control Sidebar e inseri-lo na div de classe wrapper
+/**
+ * A função inicializa painéis de busca e uma barra lateral de controle para um DataTable, permitindo que os usuários
+ * filtrem dados e gerenciem painéis de busca de forma eficiente.
+ * @param tableSelector - O parâmetro `tableSelector` na função `initializeSearchPanesAndSidebar`
+ * é utilizado para especificar o seletor para o DataTable que você deseja aprimorar com painéis de busca
+ * e uma barra lateral de controle. Este seletor deve direcionar o elemento de tabela específico que
+ * está inicializado como um DataTable.
+ * @param alteraPlaceholder - O parâmetro `alteraPlaceholder` na função
+ * `initializeSearchPanesAndSidebar` é usado para personalizar o texto do placeholder do campo de
+ * entrada de busca no DataTable. Ao passar um valor de string para este parâmetro, você pode definir um
+ * texto de placeholder específico para o campo de entrada de busca.
+ */
+
 function initializeSearchPanesAndSidebar(tableSelector, alteraPlaceholder) {
 			
     // Crie o conteúdo do Control Sidebar
@@ -433,7 +505,7 @@ function initializeSearchPanesAndSidebar(tableSelector, alteraPlaceholder) {
             <aside id="sidebarPaineis" class="control-sidebar " style="width: 500px!important;overflow-y: auto;">
                 <div class="p-3">
                     <div style="display: flex; justify-content: space-between; align-items: center;margin-bottom:10px">
-                    <h4 class="font-weight-light" style="color: #0083ca; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;">Painéis de Pesquisa</h4>
+                    <h4 class="font-weight-light" style="color: #000; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;">Painéis de Pesquisa</h4>
                         <button class="btn btn-secondary btn-close-sidebar" data-widget="control-sidebar" style="font-size: 0.675rem;padding: 0.25rem 0.5rem;">
                             <i class="fas fa-times"></i>
                         </button>
@@ -470,16 +542,16 @@ function initializeSearchPanesAndSidebar(tableSelector, alteraPlaceholder) {
    
     dataTable.on('draw.dt', function () {
         var isFiltered = dataTable.rows({ search: 'applied' }).data().length !== dataTable.rows().data().length;
+        var $info = $(dataTable.table().container()).find('.dt-info');
         if (isFiltered) {
-            $('.dataTables_info').addClass('tabelaFiltrada');
+            $info.addClass('tabelaFiltrada');
             $('#iconRetirarFiltro').remove();
-            $('.dataTables_info').after(clearFilterIcon);
-           
+            $info.after(clearFilterIcon);
         } else {
-            $('.dataTables_info').removeClass('tabelaFiltrada');
+            $info.removeClass('tabelaFiltrada');
             $('#iconRetirarFiltro').remove();
         }
-    });
+    });    
    
    // Delegar o evento de clique para o documento
    $(document).on('click', '#iconRetirarFiltro', function() {
@@ -523,7 +595,14 @@ function initializeSearchPanesAndSidebar(tableSelector, alteraPlaceholder) {
     
 }	
 
-// Mostra ou esconde o botão conforme a posição do scroll
+
+/* O código está criando um ouvinte de evento de rolagem no objeto window. Quando o
+usuário rola para baixo na página e a posição de rolagem vertical é maior que 100 pixels a partir do
+topo, ele fará o elemento com o id 'scrollTopBtn' aparecer gradualmente. Se a posição de rolagem for
+menor ou igual a 100 pixels, o elemento 'scrollTopBtn' desaparecerá gradualmente. Essa funcionalidade
+é comumente usada para mostrar ou ocultar um botão que permite aos usuários rolar rapidamente de volta
+para o topo da página. */
+
 $(window).scroll(function(){
     if ($(this).scrollTop() > 100) {
         $('#scrollTopBtn').fadeIn();
@@ -532,13 +611,24 @@ $(window).scroll(function(){
     }
 });
 
-// Scroll suave ao clicar no botão
-$('#scrollTopBtn').click(function(){
-    $('html, body').animate({scrollTop : 0},800);
-    return false;
+/* Adicionando um ouvinte de evento de clique a um elemento com o ID
+"scrollTopBtn". Quando este elemento é clicado, ele irá animar a rolagem da página para o topo 
+(scrollTop: 0) ao longo de uma duração de 800 milissegundos. A instrução `return false;` é usada 
+para prevenir o comportamento padrão do elemento, que neste caso é evitar que a 
+página salte para o topo quando o botão é clicado. */
+
+$('#scrollTopBtn').click(function(event){
+    event.preventDefault(); // Previne comportamento padrão
+    $('html, body').animate({scrollTop : 0}, 800);
 });
 
-// Atualiza a cor da fita do resultado do indicador
+/**
+ * A função `updateRibbon` recebe um elemento de fita e atualiza seu texto e estilo com base em um
+ * valor numérico.
+ * @param ribbon - O parâmetro `ribbon` na função `updateRibbon` 
+ * recupera um valor numérico de um atributo de dados e atualiza seu texto e estilo com base no valor.
+ */
+
 function updateRibbon(ribbon) {
     const metaValue = parseFloat(ribbon.data('value'));
 
@@ -553,8 +643,13 @@ function updateRibbon(ribbon) {
     }
 }
 
-//Atualiza a td das tabelas com indicadores
-
+/**
+ * A função `updateTDresultIndicadores` atualiza o texto e o estilo de uma célula da tabela com base em
+ * uma comparação com um valor alvo.
+ * @param tdResult - O parâmetro `tdResult` na função `updateTDresultIndicadores` deve ser um objeto
+ * jQuery que representa um elemento de célula de tabela (`<td>`). A função recupera um valor numérico
+ * armazenado em um atributo `data-value` do elemento `tdResult` e, em seguida, atualiza o texto.
+ */
 function updateTDresultIndicadores(tdResult) {
     const metaValue = parseFloat(tdResult.data('value'));
 
@@ -569,6 +664,16 @@ function updateTDresultIndicadores(tdResult) {
     }
 }
 
+/**
+ * A função "periodoPorExtenso" recebe um mês e ano como entrada e retorna o nome completo do mês
+ * seguido por "_de_" e o ano.
+ * @param mes - O parâmetro `mes` representa o mês no formato numérico (1 para janeiro, 2 para
+ * fevereiro, e assim por diante).
+ * @param ano - O parâmetro `ano` representa o ano na função `periodoPorExtenso`. É o ano para o qual
+ * você deseja gerar o período em português.
+ * @returns o mês e o ano em português no formato como "janeiro_de_2022", com base no mês e ano
+ * fornecidos.
+ */
 function periodoPorExtenso(mes,ano) {
     let meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
     let nomeMesExtenso = meses[mes - 1];
@@ -624,6 +729,39 @@ function periodoPorExtenso(mes,ano) {
         });
     </script>
 */
+
+/**
+ * A função `initializeSelects` popula dinamicamente dropdowns (elementos select) com base nos dados e níveis
+ * fornecidos, com a capacidade de lidar com seleções em cascata e opções adicionais como "OUTROS".
+ * @param containerId - O parâmetro `containerId` é usado para especificar o ID do elemento container
+ * onde os elementos select dinâmicos serão gerados. Este container conterá os selects criados dinamicamente
+ * com base nos dados e configurações fornecidos.
+ * @param data - O parâmetro `data` na função `initializeSelects` representa o array de objetos contendo
+ * os dados para popular os selects dinâmicos. Cada objeto no array deve ter propriedades correspondentes
+ * aos níveis de dados especificados no array `dataLevels`.
+ * @param dataLevels - O parâmetro `dataLevels` na função `initializeSelects` é um array que especifica
+ * os níveis ou hierarquia dos dados no objeto `data` fornecido. Cada nível corresponde a uma chave no
+ * objeto de dados que representa uma categoria ou atributo específico. Este array ajuda a organizar e
+ * filtrar os dados.
+ * @param idAttributeName - O parâmetro `idAttributeName` na função `initializeSelects` é usado para
+ * especificar o nome do atributo do item selecionado que será armazenado no campo de entrada alvo
+ * (`inputAlvo`). Este nome de atributo é usado para recuperar o valor correspondente do item selecionado
+ * no array de dados.
+ * @param labelNames - O parâmetro `labelNames` na função `initializeSelects` é um array que contém os
+ * rótulos a serem exibidos para cada elemento select na dropdown dinâmica. Cada rótulo corresponde a
+ * um nível específico na hierarquia da dropdown. Por exemplo, `labelNames[0]` seria o rótulo do primeiro nível.
+ * @param inputAlvo - O parâmetro `inputAlvo` na função `initializeSelects` representa o ID do elemento de
+ * entrada onde o valor final da seleção será armazenado. Este elemento de entrada será atualizado com base
+ * nas seleções feitas nos elementos select gerados dinamicamente dentro do container especificado.
+ * @param [outrosOptions] - O parâmetro `outrosOptions` na função `initializeSelects` é um array opcional
+ * que permite adicionar opções adicionais aos elementos select gerados dinamicamente com base em critérios
+ * específicos. Essas opções são adicionadas ao elemento select se a propriedade `dataLevel` do
+ * `outrosOption` corresponder.
+ * @returns A função `initializeSelects` não retorna explicitamente nenhum valor. Ela inicializa uma série
+ * de elementos select dinâmicos com base nos dados e parâmetros fornecidos e configura ouvintes de eventos
+ * para lidar com mudanças nos elementos select. A função modifica o DOM adicionando elementos select e
+ * populando-os com opções com base nos dados fornecidos.
+ */
 
 function initializeSelects(containerId,data, dataLevels, idAttributeName, labelNames, inputAlvo, outrosOptions = []) {
 
@@ -842,6 +980,29 @@ function populateSelectsFromID(data, id, dataLevels, inputAlvo) {
     // Atualiza o campo de destino com o ID correto
     $('#' + inputAlvo).val(selectedData.ID);
 }
+
+/**
+ * A função `populateSelectsFromIDAjax` faz uma chamada AJAX para recuperar dados e preencher os elementos
+ * select com base na resposta.
+ * @param cfc - O parâmetro `cfc` na função `populateSelectsFromIDAjax` é utilizado para
+ * especificar a URL do componente ColdFusion (CFC) que irá lidar com a solicitação AJAX e fornecer os
+ * dados necessários para preencher os elementos select na página web.
+ * @param metodo - O parâmetro `metodo` na função `populateSelectsFromIDAjax` representa o método
+ * que será chamado no componente ColdFusion (CFC) especificado pelo parâmetro `cfc`. Esse método irá
+ * recuperar os dados que serão usados para preencher os elementos select.
+ * @param id - O parâmetro `id` na função `populateSelectsFromIDAjax` representa o ID do elemento
+ * no documento HTML que você deseja preencher com os dados recuperados pela chamada AJAX. Esse ID
+ * é utilizado para direcionar o elemento HTML específico onde os dados serão exibidos ou populados.
+ * @param dataLevels - O parâmetro `dataLevels` na função `populateSelectsFromIDAjax` é utilizado
+ * para especificar os níveis de dados que serão preenchidos nos elementos select com base nos dados
+ * retornados pela chamada AJAX. Ele ajuda a determinar como os dados devem ser estruturados e exibidos
+ * nos elementos select.
+ * @param inputAlvo - O parâmetro `inputAlvo` na função `populateSelectsFromIDAjax` é utilizado para
+ * especificar o elemento de entrada alvo onde os dados recuperados pela chamada AJAX serão
+ * populados. Esse elemento de entrada geralmente é um select dropdown ou um campo de formulário similar
+ * que será preenchido dinamicamente com os dados.
+ */
+
 function populateSelectsFromIDAjax(cfc, metodo, id, dataLevels, inputAlvo) {
     $.ajax({
         url: cfc,
@@ -887,7 +1048,6 @@ Inserir o código abaixo no arquivo HTML:
         });
     </script>
 */
-
 function setupCharCounter(inputId, spanId, maxChars) {
     const inputElem = $('#' + inputId);
     const charCountElem = $('#' + spanId);
@@ -913,8 +1073,26 @@ function setupCharCounter(inputId, spanId, maxChars) {
     });
 }
 
+/**
+ * A função `mostraInfoOrientacao` faz uma solicitação AJAX para recuperar informações e exibi-las em
+ * uma div especificada, com rolagem opcional para uma aba e tratamento de erros.
+ * @param divId - O parâmetro `divId` na função `mostraInfoOrientacao` é o ID do elemento HTML
+ * onde as informações serão exibidas ou atualizadas. Ele é usado para direcionar e manipular o
+ * conteúdo dentro dessa div específica na página.
+ * @param pc_processo_id - O parâmetro `pc_processo_id` na função `mostraInfoOrientacao` é
+ * utilizado para especificar o ID de um processo. Esse ID  é usado para recuperar
+ * informações ou realizar ações relacionadas a um processo específico dentro do sistema. Ao chamar a função `mostraInfoOrientacao`.
+ * @param pc_aval_orientacao_id - O parâmetro `pc_aval_orientacao_id` na função `mostraInfoOrientacao`
+ * é utilizado para especificar o ID da orientação sendo solicitada para um determinado processo. Esse
+ * ID é então utilizado na chamada AJAX para recuperar informações sobre essa orientação específica para
+ * o processo fornecido.
+ * @param tab - O parâmetro `tab` na função `mostraInfoOrientacao` é utilizado para especificar o ID de
+ * um elemento de aba na página. Se este parâmetro for fornecido, a função rolará a página para trazer
+ * a aba especificada para a visualização após o carregamento do conteúdo.
+ */
 function mostraInfoOrientacao(divId, pc_processo_id, pc_aval_orientacao_id, tab){
     $('#modalOverlay').modal('show');
+    
     $('#' + divId).html('');
     $('#' + divId).attr("hidden",true);
     setTimeout(function() {
@@ -955,6 +1133,18 @@ function mostraInfoOrientacao(divId, pc_processo_id, pc_aval_orientacao_id, tab)
     }, 200);
 }
 
+/**
+ * A função `mostraInfoProcesso` faz uma solicitação AJAX para recuperar informações sobre um processo,
+ * exibe o resultado em uma div especificada e, opcionalmente, rola para uma aba específica na página.
+ * @param divId - O parâmetro `divId` é o ID do elemento HTML onde o conteúdo será
+ * exibido após a chamada AJAX ser realizada.
+ * @param pc_processo_id - O parâmetro `pc_processo_id` na função `mostraInfoProcesso` é utilizado
+ * para identificar um processo específico dentro do sistema. Ele é passado como parâmetro para
+ * a função para recuperar informações relacionadas a esse processo em particular.
+ * @param tab - O parâmetro `tab` na função `mostraInfoProcesso` é utilizado para especificar o ID de
+ * um elemento de aba na página. Se esse parâmetro for fornecido, a função rolará a página para trazer
+ * a aba especificada para a visualização após o carregamento das informações do processo.
+ */
 function mostraInfoProcesso(divId, pc_processo_id, tab){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
@@ -997,6 +1187,22 @@ function mostraInfoProcesso(divId, pc_processo_id, tab){
 
 }
 
+/**
+ * A função `mostraInfoItem` faz uma solicitação AJAX para recuperar informações sobre um item específico
+ * e exibi-las em uma div especificada, com a opção de rolar para uma aba específica.
+ * @param divId - O parâmetro `divId` é o ID do elemento HTML onde as informações serão
+ * exibidas após a chamada AJAX ser realizada.
+ * @param pc_processo_id - O parâmetro `pc_processo_id` é utilizado para identificar um processo ou
+ * item específico dentro do sistema. Geralmente é um identificador único associado a um processo ou
+ * item. Na função `mostraInfoItem`, esse parâmetro é passado como parte do objeto de dados
+ * em uma solicitação AJAX.
+ * @param pc_aval_id - O parâmetro `pc_aval_id` na função `mostraInfoItem` é utilizado para passar o
+ * ID do item para o método no servidor que recupera as informações sobre um item específico em
+ * um processo. Esse ID é essencial para identificar o item associado à orientação consultada.
+ * @param tab - O parâmetro `tab` na função `mostraInfoItem` é utilizado para especificar o ID de uma aba
+ * na página. Se o parâmetro `tab` for fornecido, a função rolará a página para trazer
+ * essa aba à visualização após o carregamento do conteúdo.
+ */
 function mostraInfoItem(divId, pc_processo_id, pc_aval_id, tab){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
@@ -1040,7 +1246,24 @@ function mostraInfoItem(divId, pc_processo_id, pc_aval_id, tab){
 
 }
 
-function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios, tab){
+/**
+ * A função `mostraRelatoPDF` exibe um relatório em PDF em um elemento HTML especificado após fazer uma
+ * requisição AJAX para recuperar os dados do relatório.
+ * @param divId - O parâmetro `divId` na função `mostraRelatoPDF` é o ID do elemento HTML onde o relatório
+ * em PDF será exibido.
+ * @param pc_aval_id - O parâmetro `pc_aval_id` é usado para identificar um item no
+ * sistema. É um identificador único associado aos dados do item no banco de dados.
+ * Esse parâmetro é passado para o código no lado do servidor para recuperar as informações correspondentes
+ * do item e gerar o relatório em PDF para exibição ao usuário.
+ * @param todosRelatorios - O parâmetro `todosRelatorios` é usado na função `mostraRelatoPDF` para
+ * determinar se todos os relatórios devem ser incluídos no processo de geração do PDF. Ele é passado como
+ * parâmetro na requisição AJAX para o método `anexoAvaliacao` no servidor junto com outros parâmetros.
+ * @param tab - O parâmetro `tab` na função `mostraRelatoPDF` é utilizado para especificar o ID de um
+ * elemento de aba na página. Se o parâmetro `tab` for fornecido, a função irá rolar a página para trazer
+ * a aba especificada à visualização após carregar o conteúdo do PDF.
+ */
+
+function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios, aba){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
     $('#' + divId).attr("hidden",true);
@@ -1058,10 +1281,10 @@ function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios, tab){
         .done(function(result){
             $('#' + divId).html(result);
             $('#' + divId).attr("hidden",false);
-            // Verifica se tab foi informado e realiza o scroll
-            if (tab) {
+            // Verifica se a aba foi informada e realiza o scroll
+            if (aba) {
                 $('html, body').animate({
-                    scrollTop: ($('#' + tab).offset().top) - 60
+                    scrollTop: ($('#' + aba).offset().top) - 60
                 }, 1000);
             }
             $('#modalOverlay').delay(1000).hide(0, function() {
@@ -1082,7 +1305,23 @@ function mostraRelatoPDF(divId, pc_aval_id, todosRelatorios, tab){
 
 }
 
-function mostraTabAnexosJS(divId, pc_aval_id, pc_orientacao_id,tab){
+/**
+ * A função `mostraTabAnexosJS` faz uma requisição AJAX para carregar anexos em um elemento `div`
+ * especificado, opcionalmente rolando até uma aba específica dentro do conteúdo.
+ * @param divId - O parâmetro `divId` é o ID do elemento HTML onde o conteúdo será exibido ou atualizado
+ * após a chamada AJAX ser realizada.
+ * @param pc_aval_id - O parâmetro `pc_aval_id` é usado para passar o ID de item 
+ * para a função `mostraTabAnexosJS`. Esse ID é então utilizado na requisição AJAX para recuperar
+ * informações específicas relacionadas a esse item.
+ * @param pc_orientacao_id - O parâmetro `pc_orientacao_id` na função `mostraTabAnexosJS` é utilizado
+ * para especificar o ID relacionado à orientação em um determinado contexto. Esse ID é
+ * usado dentro da função para recuperar ou manipular dados associados a uma orientação específica.
+ * @param tab - O parâmetro `tab` na função `mostraTabAnexosJS` é utilizado para especificar o ID de um
+ * elemento dentro do conteúdo carregado via AJAX. Após o carregamento bem-sucedido do conteúdo, a função
+ * irá rolar a página para trazer o elemento da aba especificada à visualização.
+ */
+
+function mostraTabAnexosJS(divId, pc_aval_id, pc_orientacao_id,aba){
     $('#modalOverlay').modal('show');
     $('#' + divId).html('');
     $('#' + divId).attr("hidden",true);
@@ -1100,10 +1339,10 @@ function mostraTabAnexosJS(divId, pc_aval_id, pc_orientacao_id,tab){
         .done(function(result) {
             $('#' + divId).html(result);
             $('#' + divId).attr("hidden",false);
-            // Verifica se tab foi informado e realiza o scroll
-            if (tab) {
+            // Verifica se a aba foi informada e realiza o scroll
+            if (aba) {
                 $('html, body').animate({
-                    scrollTop: ($('#' + tab).offset().top) - 60
+                    scrollTop: ($('#' + aba).offset().top) - 60
                 }, 1000);
             }
             $('#modalOverlay').delay(1000).hide(0, function() {
@@ -1123,5 +1362,334 @@ function mostraTabAnexosJS(divId, pc_aval_id, pc_orientacao_id,tab){
     }, 200);
 }
 
+/**
+ * A função "colocarEmAnalise" em JavaScript é usada para lidar com o processo de colocar uma
+ * orientação em análise com base em certas condições e interações do usuário, incluindo exibição
+ * de mensagens e execução de requisições AJAX.
+ * @param idProcesso 
+ * @param idAvaliacao 
+ * @param idOrientacao 
+ * @param orgaoOrigem
+ * @param orgaoOrigemSigla 
+ * @param orgaoResp
+ * @param statusOrientacao 
+ * @param lotacaoUsuario 
+ * @param lotacaoUsuarioSigla 
+ */
+
+function colocarEmAnalise(idProcesso, idAvaliacao, idOrientacao, orgaoOrigem, orgaoOrigemSigla, orgaoResp, statusOrientacao, lotacaoUsuario, lotacaoUsuarioSigla){
+				
+    // Dividir a sequência usando a barra (/) como delimitador epegar a última
+    lotacaoUsuarioSigla = lotacaoUsuarioSigla.split("/").pop();
+    orgaoOrigemSigla = orgaoOrigemSigla.split("/").pop();
 
 
+    $('#tabProcessos tr').each(function () {
+        $(this).removeClass('selected');
+    }); 
+    $('#tabProcessos tbody').on('click', 'tr', function () {
+        $(this).addClass('selected');
+    });
+    sessionStorage.setItem('emAnalise',idOrientacao);
+    
+    var analiseOrgaoOrigem = 0;
+    if(statusOrientacao==13 || statusOrientacao==17){
+        if(statusOrientacao==17){
+            var mensagem = '<p style="text-align: justify;">Deseja enviar a orientação ID <strong >' + idOrientacao + '</strong> para análise do órgão de origem do processo <strong>' + orgaoOrigemSigla + ' </strong>(perfil CI - GESTOR MASTER - EXECUÇÃO) ?</p>';
+            analiseOrgaoOrigem = 1;
+        }else{
+            var mensagem = '<p style="text-align: justify;">Deseja enviar a orientação ID <strong >' + idOrientacao + '</strong> para análise da <strong>' + lotacaoUsuarioSigla + ' </strong>(perfil CI-MASTER ACOMPANHAMENTO) ?</p>';
+            analiseOrgaoOrigem = 0;
+        }
+
+        if(orgaoOrigem != lotacaoUsuario && orgaoResp == lotacaoUsuario){
+            orgaoOrigemParaAnalise = orgaoOrigem
+        }else{
+            orgaoOrigemParaAnalise = lotacaoUsuario
+        }
+
+        Swal.fire({//sweetalert2
+        html: logoSNCIsweetalert2(mensagem),
+        showCancelButton: true,
+        confirmButtonText: 'Sim!',
+        cancelButtonText: 'Cancelar!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                
+                $('#modalOverlay').modal('show')
+                setTimeout(function() {
+                    $.ajax({
+                        type: "post",
+                        url: "cfc/pc_cfcConsultasPorOrientacao.cfc",
+                        data:{
+                            method: "colocarEmAnalise",
+                            idProcesso: idProcesso,
+                            idAvaliacao: idAvaliacao,
+                            idOrientacao: idOrientacao,
+                            orgaoOrigem: orgaoOrigemParaAnalise,
+                            analiseOrgaoOrigem: analiseOrgaoOrigem
+                        },
+                        async: false
+                    })//fim ajax
+                    .done(function(result) {
+                        var currentPage = window.location.pathname.split("/").pop();
+                        if (currentPage == 'pc_ConsultarPorOrientacao.cfm') {
+                            var valorRadio = $('input[name="opcaoAno"]:checked').val();
+                            exibirTabela(valorRadio);
+                        }else{
+                            exibirTabela();
+                        }
+                        if(currentPage == 'pc_ConsultarPorOrientacao.cfm'){
+                            var mensagemSucessos = '<br><p class="font-weight-light" >A Orientação ID <span>' + idOrientacao + '</span> foi enviada para análise da <span >' + orgaoOrigemSigla + '</span> (perfil CI-GESTOR MASTER - EXECUÇÃO) com sucesso!</p>';
+                        }else{
+                            var mensagemSucessos = '<br><p class="font-weight-light" >A Orientação ID <span>' + idOrientacao + '</span> foi enviada para análise da <span  >' + orgaoOrigemSigla+ '</span> (perfil CI-GESTOR MASTER - EXECUÇÃO) com sucesso!<br><br><span  style="font-size:0.8em;"><strong>Atenção:</strong> Como a gerência e perfil que analisará esta orientação não é a sua gerência de lotação e perfil, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
+                        }
+                        $('#modalOverlay').delay(1000).hide(0, function() {
+                            Swal.fire({
+                                title: mensagemSucessos,
+                                html: logoSNCIsweetalert2(''),
+                                icon: 'success'
+                            });
+                            $('#modalOverlay').modal('hide');
+                        });	
+                                        
+                    })//fim done
+                    .fail(function(xhr, ajaxOptions, thrownError) {
+                        $('#modalOverlay').delay(1000).hide(0, function() {
+                            $('#modalOverlay').modal('hide');
+                        });
+                        $('#modal-danger').modal('show')
+                        $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+                        $('#modal-danger').find('.modal-body').text(thrownError)
+
+                    })//fim fail
+                }, 500);
+
+            } else {
+                // Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+                $('#modalOverlay').modal('hide');
+                Swal.fire({
+                    title: 'Operação Cancelada',
+                    html: logoSNCIsweetalert2(''),
+                    icon: 'info'
+                });
+            }
+            
+        })
+    
+    }else{
+        var mensagem = '<p style="text-align: justify;">Deseja enviar a orientação ID <strong>'+idOrientacao+'</strong> para análise da <strong>'+lotacaoUsuarioSigla+'</strong> (perfil CI-MASTER ACOMPANHAMENTO)?</p>';
+        Swal.fire({//sweetalert2
+        html: logoSNCIsweetalert2(mensagem),
+        input: 'checkbox',
+        inputValue: 0,
+        inputPlaceholder:
+            '<span class="font-weight-light" style="text-align: justify;font-size:14px">Assinale ao lado, para enviar essa orientação para análise do órgão de origem do processo <strong>'+orgaoOrigemSigla+'</strong> (perfil CI - GESTOR MASTER - EXECUÇÃO).</span>',
+        showCancelButton: true,
+        confirmButtonText: 'Sim!',
+        cancelButtonText: 'Cancelar!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var enviaOrgaoOrigem=result.value;
+                $('#modalOverlay').modal('show')
+                setTimeout(function() {
+                    $.ajax({
+                        type: "post",
+                        url: "cfc/pc_cfcConsultasPorOrientacao.cfc",
+                        data:{
+                            method: "colocarEmAnalise",
+                            idProcesso: idProcesso,
+                            idAvaliacao: idAvaliacao,
+                            idOrientacao: idOrientacao,
+                            orgaoOrigem: orgaoOrigem,
+                            analiseOrgaoOrigem: enviaOrgaoOrigem
+                        },
+                        async: false
+                    })//fim ajax
+                    .done(function(result) {
+                        var currentPage = window.location.pathname.split("/").pop();
+                        if (currentPage == 'pc_ConsultarPorOrientacao.cfm') {
+                            var valorRadio = $('input[name="opcaoAno"]:checked').val();
+                            exibirTabela(valorRadio);
+                        }else{
+                            exibirTabela();
+                        }
+                        var mensagemSucessos ='';
+                        // Obtém o nome do arquivo atual
+                        var currentPage = window.location.pathname.split("/").pop();
+                        if(!enviaOrgaoOrigem){
+                            mensagemSucessos = '<br><p class="font-weight-light" >A Orientação ID ' + idOrientacao + '</span> foi enviada para análise da <span>' + lotacaoUsuarioSigla + '</span> (perfil CI-MASTER ACOMPANHAMENTO) com sucesso!</p>';
+                        }else{
+                            if(currentPage != 'pc_ConsultarPorOrientacao.cfm'){
+                                mensagemSucessos = '<br><p class="font-weight-light" >A Orientação ID ' + idOrientacao + '</span> foi enviada para análise da <span>' + orgaoOrigemSigla + '</span> com sucesso!<br><br><span style="font-size:0.8em;"><strong>Atenção:</strong> Como a gerência e perfil que analisará esta orientação não é a sua gerência de lotação e perfil, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
+                            }else{
+                                mensagemSucessos = '<br><p class="font-weight-light" >A Orientação ID ' + idOrientacao + '</span> foi enviada para análise da <span>' + orgaoOrigemSigla + '</span> com sucesso!</p>';
+                            }    
+                        }
+                        $('#modalOverlay').delay(1000).hide(0, function() {
+                            Swal.fire({
+                                title: mensagemSucessos,
+                                html: logoSNCIsweetalert2(''),
+                                icon: 'success'
+                            });
+                            $('#modalOverlay').modal('hide');
+                            
+                        });	
+                                        
+                    })//fim done
+                    .fail(function(xhr, ajaxOptions, thrownError) {
+                        $('#modalOverlay').delay(1000).hide(0, function() {
+                            $('#modalOverlay').modal('hide');
+                        });
+                        $('#modal-danger').modal('show')
+                        $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+                        $('#modal-danger').find('.modal-body').text(thrownError)
+
+                    })//fim fail
+                }, 500);
+
+            } else {
+                // Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+                $('#modalOverlay').modal('hide');
+                Swal.fire({
+                    title: 'Operação Cancelada',
+                    html: logoSNCIsweetalert2(''),
+                    icon: 'info'
+                });
+            }
+        
+        })
+    }
+
+    $('#modalOverlay').delay(1000).hide(0, function() {
+        $('#modalOverlay').modal('hide');
+    });
+}
+
+
+/**
+ * A função `openPdfModal` cria dinamicamente e exibe um modal com um PDF incorporado
+ * e opções para abrir o PDF em uma nova aba do navegador ou fechar o modal.
+ * @param pc_anexo_id - O parâmetro `pc_anexo_id` na função `openPdfModal` representa
+ * um identificador para o modal de PDF que está sendo aberto. Ele é usado para identificar
+ * de forma exclusiva o elemento modal e seu conteúdo dentro do documento HTML. Esse identificador
+ * é utilizado para criar e gerenciar dinamicamente várias instâncias do PDF.
+ * @param caminho - O parâmetro `caminho` na função `openPdfModal` representa o caminho para o
+ * arquivo PDF que você deseja exibir no modal. Esse caminho é usado para carregar dinamicamente
+ * o arquivo PDF em um iframe dentro do modal. Ele deve ser um caminho válido para o arquivo PDF.
+ */
+
+function openPdfModal(pc_anexo_id, caminho) {
+    // Verificar se o modal já existe, se sim, removê-lo antes de criar outro
+    if ($('#pdfModal' + pc_anexo_id).length) {
+        $('#pdfModal' + pc_anexo_id).remove();
+    }
+   
+    // Criar o HTML do modal dinamicamente
+    var modalHtml = `
+        <div class="modal fade" id="pdfModal${pc_anexo_id}" tabindex="-1" role="dialog" aria-labelledby="pdfModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content" style="max-height: 90vh;background:#323639;border:0; display: flex; flex-direction: column;">
+                    <div class="modal-body" style="padding:0;background:none;position:relative;top:4px;flex-grow: 1; overflow-y: auto;">
+                        <!-- PDF embutido dinamicamente -->
+                        <iframe id="pdfEmbed${pc_anexo_id}" src="pc_Anexos.cfm?arquivo=${caminho}#zoom=page-width"  
+                                width="100%" style="flex-grow: 1; min-height: 70vh; border: none;" loading="eager"></iframe>
+                    </div>
+                    <div class="modal-footer p-0 card-header_backgroundColor"
+                        style="display:flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                        <!-- Link para abrir PDF em nova aba -->
+                        <a id="pdfLink${pc_anexo_id}" href="pc_Anexos.cfm?arquivo=${caminho}" target="_blank" class="btn btn-danger" style="margin: 0 auto;">
+                            <i class="fas fa-file-pdf" style="margin-right:5px;"></i>Abrir PDF em Nova Aba do Navegador
+                        </a>
+                        <!-- Botão de fechar -->
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Inserir o HTML do modal no corpo do documento
+    $('body').append(modalHtml);
+
+    // Exibir o modal
+    $('#pdfModal' + pc_anexo_id).modal('show');
+}
+
+
+
+$('#btEnviarDistribuicao').on('click', function (event)  {
+				event.preventDefault()
+				event.stopPropagation()
+                
+				if ($('#pcOrgaoRespDistribuicao').val().length == 0){
+					Swal.fire({
+								title: 'Informe, pelo menos, uma área para distribuição.',
+								html: logoSNCIsweetalert2(''),
+								icon: 'error'
+							});
+					return false;
+				}
+
+				if ($('#pcOrientacaoResposta').val().length == 0){
+					Swal.fire({
+								title: 'Informe uma orientação para a resposta da(s) área(s).',
+								html: logoSNCIsweetalert2(''),
+								icon: 'error'
+							});
+					return false;
+				}
+				swalWithBootstrapButtons.fire({//sweetalert2
+					html: logoSNCIsweetalert2("Deseja distribuir essa Medida/Orientação para Regularização às áreas selecionadas?"),
+					showCancelButton: true,
+					confirmButtonText: 'Sim!',
+					cancelButtonText: 'Cancelar!',
+					}).then((result) => {
+						if (result.isConfirmed) {
+							$('#modalOverlay').modal('show');
+							setTimeout(function() {
+								//inicio ajax
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcAcompanhamentos.cfc",
+									data:{
+										method: "distribuirOrientacoes",
+										pc_aval_orientacao_id: pc_aval_orientacao_id,
+										pcAreasDistribuir: $('#pcOrgaoRespDistribuicao').val().join(','),
+										pcOrientacaoResposta: $('#pcOrientacaoResposta').val()
+									},
+									async: false
+								})//fim ajax
+								.done(function(result) {
+									
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										toastr.success('Distribuição realizada com sucesso!');
+										ocultaInformacoes()
+										exibirTabela();
+										$('#modalOverlay').modal('hide');
+										//location.reload();
+										
+
+									});
+									
+								})//fim done
+								.fail(function(xhr, ajaxOptions, thrownError) {
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
+									$('#modal-danger').modal('show')
+									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+									$('#modal-danger').find('.modal-body').text(thrownError)
+
+								})//fim fail
+							}, 1000);		
+						} else if (result.dismiss === Swal.DismissReason.cancel) {
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
+						}
+					})//fim sweetalert2		
+
+			});

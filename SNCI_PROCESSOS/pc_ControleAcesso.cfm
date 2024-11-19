@@ -76,7 +76,7 @@
 				</div>
 					<form id="formcadLinkAcesso" name="formcadLinkAcesso" class="row g-3 "  format="html"  style="height: auto;">
 						<div id="cadastroLinks" class="card card-primary collapsed-card" >
-							<div  class="card-header" style="background-color: #0083ca;color:#fff;">
+							<div  class="card-header azul_claro_correios_backgroundColor" style="color:#fff;">
 								<a   class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
 									<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 									</button></i><span id="cabecalhoAccordion">Clique aqui para inserir um novo Link no menu</span>
@@ -190,6 +190,12 @@
 												</cfloop>
 											</select>	</div>
 									</div>
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label for="nomeMenuRapido" >Nome para o menu rápido <span class="font-weight-light" style="color:red">(deixe em branco se não quiser mostrar no menu da página index)</span>:</label>
+											<input id="nomeMenuRapido"  required="true"  name="nomeMenuRapido" type="text" class="form-control "  inputmode="text" placeholder="Informe o nome para o menu rápido...">
+										</div>
+									</div>
 
 									<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
 										<div id="btSalvarDiv" >
@@ -214,7 +220,7 @@
 							<div class="card card-success" >
 								<div class="card-header" style="background-color: #ffD400;">
 									<h4 class="card-title ">
-										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:#00416b;font-weight: bold;"> 
+										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="color:#00416B;font-size:16px;font-weight: bold;"> 
 											<i class="fas fa-file-alt" style="margin-right:10px"> </i>Páginas
 										</a>
 									</h4>
@@ -354,7 +360,8 @@
 							pc_controle_acesso_grupo_icone: $('#iconesGrupo').val(),
 							pc_controle_acesso_subgrupo_icone: $('#iconesSubgrupo').val(),
 							pc_controle_acesso_menu_icone: $('#iconesLink').val(),
-							pc_controle_acesso_ordem:ordem
+							pc_controle_acesso_ordem:ordem,
+							pc_controle_acesso_rapido_nome: $('#nomeMenuRapido').val()
 							
 						},
 						async: false
@@ -410,12 +417,13 @@
 				$('#iconesSubgrupo').val(null).trigger('change');
 				$('#iconesLink').val(null).trigger('change');
 				$('#ordemExibicao').val(null).trigger('change');
+				$('#nomeMenuRapido').val(null);
 
 				$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Link");
 				
 		})
 
-		function controleEditar(controleId,controleNomeLink,controlePagina,perfisAutorizados,controleNomeGrupo,controleNomeSubgrupo,iconesGrupo,iconesSubgrupo,iconesLink,ordemExibicao)  {
+		function controleEditar(controleId,controleNomeLink,controlePagina,perfisAutorizados,controleNomeGrupo,controleNomeSubgrupo,iconesGrupo,iconesSubgrupo,iconesLink,ordemExibicao,nomeMenuRapido)  {
 			event.preventDefault()
 			event.stopPropagation()
 			var listPerfisAutorizados = perfisAutorizados.split(",");
@@ -430,6 +438,7 @@
 			$('#iconesSubgrupo').val(iconesSubgrupo).trigger('change');
 			$('#iconesLink').val(iconesLink).trigger('change');
 			$('#ordemExibicao').val(ordemExibicao).trigger('change');
+			$('#nomeMenuRapido').val(nomeMenuRapido);
 
 
 			var selectedValues = new Array();

@@ -53,13 +53,13 @@
 
 	</style>
 
-	<body id="main_body" style="background:#fff;"  >
+	 <body id="main_body" style="background:#fff;"> 
 
 			<div id="aguarde" name="aguarde" align="center"  style="width:100%;height:100%;top:0px;left:0px; background:transparent;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F86b2ff,endColorstr=#7F86b2ff);z-index:1000;visibility:hidden;position:absolute;" >
 										
 				<img id="imgAguarde" name="imgAguarde" src="figuras/aguarde.png" width="100px"  border="0" style="position:relative;top:50%" ></img>
 			</div>
-			<div >
+			<div class="tituloDivConsulta">
 					<h1 id="titulo" style="background:<cfoutput>#trim(arguments.cor)#</cfoutput>;font-size:14px;width:<cfoutput>#trim(arguments.largura)#px</cfoutput>;text-align:center"><STRONG><cfoutput>#trim(arguments.titulo)#</cfoutput></STRONG></h1>
 					<div id="tab"  style="background:<cfoutput>#trim(arguments.cor)#</cfoutput>;width:<cfoutput>#trim(arguments.largura)#</cfoutput>px;">
 						
@@ -107,11 +107,11 @@
 				}
 				//fim controle cor das abas em hover e out
 
-				//Início do bloco de funções que controlam as linhas de uma tabela
-				//remove a informação da linha clicada em uma tabela
+				//Inï¿½cio do bloco de funï¿½ï¿½es que controlam as linhas de uma tabela
+				//remove a informaï¿½ï¿½o da linha clicada em uma tabela
 				sessionStorage.removeItem('idLinha');
 				
-				//muda cor da linha ao passar o mouse (se a linha não tiver sido selecionada)
+				//muda cor da linha ao passar o mouse (se a linha nï¿½o tiver sido selecionada)
 				function mouseOver(linha){ 
 					if(linha.id !=sessionStorage.getItem('idLinha')){
 						linha.style.backgroundColor='#6699CC';
@@ -119,7 +119,7 @@
 					}   
 				}
 				
-				//restaura cor da linha ao retirar o mouse (se a linha não tiver sido selecionada)
+				//restaura cor da linha ao retirar o mouse (se a linha nï¿½o tiver sido selecionada)
 				function mouseOut(linha){
 					if(linha.id !=sessionStorage.getItem('idLinha')){
 						linha.style.backgroundColor = ''; 
@@ -142,7 +142,7 @@
 					linha.style.backgroundColor='#053c7e';
 					linha.style.color='#fff';
 				}
-				//Fim do bloco de funções que controlam as linhas de uma tabela
+				//Fim do bloco de funï¿½ï¿½es que controlam as linhas de uma tabela
 
 				//Inicio abre janela popup
 				function abrirPopup(url,w,h) {
@@ -166,7 +166,7 @@
 				}else{
 					document.getElementById('aba1').click();  
 				}
-				//função que aciona a espera do submit
+				//funï¿½ï¿½o que aciona a espera do submit
 				function aguarde(t){
 					t="tab";
 					if(t !== undefined){
@@ -200,7 +200,7 @@
 				}
 
 
-				//funções que controlam as tabs
+				//funï¿½ï¿½es que controlam as tabs
 				function getElementsByClassName(node, classname) {
 					var a = [];
 					var re = new RegExp('(^| )'+classname+'( |$)');
@@ -228,7 +228,7 @@
 					sessionStorage.setItem('abaAtual', elmnt.id);
 					
 				}
-				//fim funções que contronlam as tabs
+				//fim funï¿½ï¿½es que contronlam as tabs
 
 			</script>
 			

@@ -63,7 +63,7 @@
 						<h5 style="color:##000;text-align: center;">Dados gerados para os indicadores de <strong>#arguments.ano#</strong></h5>
 						
 					</cfoutput>
-					<table id="tabelaDados" class="table table-bordered table-striped text-nowrap no-footer" style="user-select: none;width: 100%; margin: 0 auto;margin-bottom:200px">
+					<table id="tabelaDados" class="table table-striped text-nowrap no-footer" style="user-select: none;width: 100%; margin: 0 auto;margin-bottom:200px">
 						<thead>
 							<tr style="text-align: center;"  >
 								<th>Mês/Ano</th>
@@ -113,8 +113,8 @@
 					lengthChange: false, // Desabilita a opção de seleção da quantidade de páginas
 					paging: false, // Remove a paginação
 					info: false, // Remove a exibição da quantidade de registros
-					searching: false // Remove o campo de busca
-					
+					searching: false, // Remove o campo de busca
+					language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
 				});
 				$(".content-wrapper").css("height", "auto");
 			});

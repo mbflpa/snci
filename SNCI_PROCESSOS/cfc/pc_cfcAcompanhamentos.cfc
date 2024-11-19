@@ -65,7 +65,7 @@
 					</cfif>
 					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4)--->
 					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and ListFind("11",#application.rsUsuarioParametros.pc_usu_perfil#) >
-							OR (pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_aval_orientacao_status in (1,3,14)) OR (pc_aval_orientacao_status in (13) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
+							OR (pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' and pc_aval_orientacao_status in (1,3,14)) OR (pc_aval_orientacao_status in (17) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
 					</cfif>
 					<!---Se a lotação do usuario não for um orgao origem de processos e não estiver desativado(status 'AD) e o perfil for 4 - 'AVALIADOR') --->
 					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' neq 'D'>
@@ -73,7 +73,7 @@
 					</cfif>
 					<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1) - Execução' ou 14 - 'CI - REGIONAL - SCIA - Acompanhamento', com origem na GCOP--->
 					<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'D'>
-							and (pc_orgaos.pc_org_se = 	'#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)) and pc_processos.pc_num_orgao_origem IN('00436698','00436697','00438080')
+							and (pc_orgaos.pc_org_se = 	'#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)) 
 					</cfif>
 					
 					
@@ -88,124 +88,123 @@
 		</cfquery>	
 
 		<div class="row">
-			
+		
+			<cfset colunaEmAnalise = 0>
 			<div class="col-12">
-				<div class="card"  style="margin-bottom:50px">
-				    
+				<div class="card"  >
+				   
 					<!-- /.card-header -->
-					<div class="card-body" >
-						<cfif #rsProcTab.recordcount# eq 0 >
-							<h5 align="center">Nenhuma Orientação para acompanhamento foi localizada para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
-						<cfelse>
-						
-							<div id="filtroSpan" style="display: none;text-align:right;font-size:18px;position:absolute;top:-54px;right:24px;"><span class="statusOrientacoes" style="background:#008000;color:#fff;">Atenção! Um filtro foi aplicado.</span><br><i class="fa fa-2x fa-hand-point-down" style="color:#008000;position:relative;top:8px;right:117px"></i></div>
-			
-							<table id="tabProcessos" class="table table-bordered table-striped table-hover text-nowrap">
-								<thead style="background: #0083ca;color:#fff">
-									<tr style="font-size:14px">
-									   
-									    <cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
-											<th id="colunaEmAnalise" style="text-align: center!important;width: 20px!important;">Colocar<br>em análise</th>
-										</cfif>
-										<th id="colunaStatus" style="width: 30px!important;">Status:</th>
-										<th style="text-align: center!important;width: 20px!important;">N° Processo<br>SNCI</th>
-										<th >N° Item:</th>
-										<th style="text-align: center!important;width: 20px!important;">ID da<br>Orientação</th>
-										<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N' >
-											<th style="text-align: center!important;width: 20px!important;">Data Prevista<br>p/ Resposta</th>
-										</cfif>
-										<th>Órgão Responsável: </th>
-										<th >SE/CS:</th>
-										<th >N° SEI: </th>
-										<th style="text-align: center!important;width: 20px!important;">N° Relatório<br>SEI</th>
-										<th >Tipo de Avaliação:</th>	
-										<th >Data Hora Status: </th>
-										<th >Órgão Origem: </th>
-										<th >Órgão Avaliado: </th>
-
-										<th style="display:none;">ID</th>
-										<th style="display:none;">ID Orientação</th>
-									</tr>
-								</thead>
-								
-								<tbody>
-									<cfloop query="rsProcTab" >
-										<cfoutput>					
-											<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
-											        
-													<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
-														<td align="center" >
-															<cfif #pc_aval_orientacao_status# eq 2 or #pc_aval_orientacao_status# eq 3 or #pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5 or (#pc_aval_orientacao_status# eq 13 && '#orgaoOrigem#' neq '#mcuOrgResp#')>
-																<i onclick="javascript:colocarEmAnalise('#pc_processo_id#',#pc_aval_id#,#pc_aval_orientacao_id#,'#orgaoOrigem#','#orgaoOrigemSigla#','#mcuOrgResp#',#pc_aval_orientacao_status#)"class="fas fa-file-medical-alt grow-icon clickable-icon" style="color:##0083ca;font-size:20px;margin-right:10px;z-index:10000"> </i>
-															</cfif>
-														</td>
-													</cfif>
-													<cfif #pc_aval_orientacao_dataPrevistaResp# neq '' and DATEFORMAT(#pc_aval_orientacao_dataPrevistaResp#,"yyyy-mm-dd")  lt DATEFORMAT(Now(),"yyyy-mm-dd") and (#pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5)>
-														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-															<td align="center"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;" >PENDENTE</span></td>
-														<cfelse>
-															<td align="center"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >PENDENTE</span></td>
-														</cfif>
-													<cfelseif #pc_aval_orientacao_status# eq 3>
-														<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
-															<td align="center"><span  class="statusOrientacoes" style="background:##FFA500;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
-														<cfelse>
-															<td align="center"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
-														</cfif>
-											
-													<cfelse>
-														<td  align="center"><span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;"  >#pc_orientacao_status_descricao#</span></td>
-													</cfif>
-													<td id="pcProcId" align="center">#pc_processo_id#</td>
-													<td align="center">#pc_aval_numeracao#</td>	
-													<td align="center">#pc_aval_orientacao_id#</td>	
-													
-													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N' >
-														<cfif ListFind("4,5,16", #pc_aval_orientacao_status#)>
-															<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
-															<td align="center">#dataPrev#</td>
-														<cfelse>
-															<td></td>
-														</cfif>
-													</cfif>
-													
-													
-													<cfif pc_aval_orientacao_distribuido eq 1>
-														<td>#siglaOrgResp# (#mcuOrgResp#)</td>
-													<cfelse>
-														<td>#siglaOrgResp# (#mcuOrgResp#)</td>
-													</cfif>
-													<td>#seOrgResp#</td>
-													
-
-													<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
-													<td align="center">#sei#</td>
-													<td align="center">#pc_num_rel_sei#</td>
-													
-													<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
-													    <cfif pc_aval_tipo_descricao neq ''>
-															<td>#pc_aval_tipo_descricao#</td>
-														<cfelse>
-														    <td>#tipoProcesso#</td>
-														</cfif>
-													<cfelse>
-														<td>#pc_aval_tipo_nao_aplica_descricao#</td>
-													</cfif>
-													<td>#DateFormat(pc_aval_orientacao_status_datahora,"dd/mm/yyyy")# - #TimeFormat(pc_aval_orientacao_status_datahora,"HH:mm")#</td>	
-													
-													<td class="group">#orgaoOrigemSigla#</td>	
-													<td class="group">#orgaoAvaliado#</td>	
-													
-													<td id="pcAvalId" style="display:none;">#pc_aval_id#</td>
-													<td id="pcAvalOrientacaoId" style="display:none;">#pc_aval_orientacao_id#</td>
-											</tr>
-										</cfoutput>
-									</cfloop>	
-								</tbody>
-								
+					<div class="card-body">
+						<table id="tabProcessos" class="table table-striped table-hover text-nowrap table-responsive">
 							
-							</table>
-						</cfif>
+							<thead  class="table_thead_backgroundColor" >
+								<tr style="font-size:14px">
+									
+									<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
+										<cfset colunaEmAnalise = 1>
+										<th class="fixar-coluna" id="colunaEmAnalise" style="text-align: center!important;width: 20px!important;">Colocar<br>em análise</th>
+									</cfif>
+									<th id="colunaStatus" style="width: 30px!important;">Status:</th>
+									<th style="text-align: center!important;width: 20px!important;">N° Processo<br>SNCI</th>
+									<th >N° Item:</th>
+									<th style="text-align: center!important;width: 20px!important;">ID da<br>Orientação</th>
+									<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N' >
+										<th style="text-align: center!important;width: 20px!important;">Data Prevista<br>p/ Resposta</th>
+									</cfif>
+									<th>Órgão Responsável: </th>
+									<th >SE/CS:</th>
+									<th >N° SEI: </th>
+									<th style="text-align: center!important;width: 20px!important;">N° Relatório<br>SEI</th>
+									<th >Tipo de Avaliação:</th>	
+									<th >Data Hora Status: </th>
+									<th >Órgão Origem: </th>
+									<th >Órgão Avaliado: </th>
+
+									<th style="display:none;">ID</th>
+									<th style="display:none;">ID Orientação</th>
+								</tr>
+							</thead>
+							
+							<tbody>
+								<cfloop query="rsProcTab" >
+									<cfoutput>					
+										<tr style="font-size:12px;cursor:pointer;z-index:2;"  >
+												
+												<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
+													<td class="fixar-coluna fixar-coluna-fundo-branco" align="center" >
+														<cfif ListFind("2,3,4,5,13,17", pc_aval_orientacao_status)>
+															<i onclick="colocarEmAnalise('#pc_processo_id#',#pc_aval_id#,#pc_aval_orientacao_id#,'#orgaoOrigem#','#orgaoOrigemSigla#','#mcuOrgResp#',#pc_aval_orientacao_status#, '#application.rsUsuarioParametros.pc_usu_lotacao#','#application.rsUsuarioParametros.pc_org_sigla#')"class="fas fa-file-medical-alt grow-icon clickable-icon azul_claro_correios_textColor" style="font-size:20px;margin-right:10px;z-index:10000"> </i>
+														</cfif>
+													</td>
+												</cfif>
+												<cfif #pc_aval_orientacao_dataPrevistaResp# neq '' and DATEFORMAT(#pc_aval_orientacao_dataPrevistaResp#,"yyyy-mm-dd")  lt DATEFORMAT(Now(),"yyyy-mm-dd") and (#pc_aval_orientacao_status# eq 4 or #pc_aval_orientacao_status# eq 5)>
+													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
+														<td align="center"><span class="statusOrientacoes" style="background:##FFA500;color:##fff;" >PENDENTE</span></td>
+													<cfelse>
+														<td align="center"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >PENDENTE</span></td>
+													</cfif>
+												<cfelseif #pc_aval_orientacao_status# eq 3>
+													<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>
+														<td align="center"><span  class="statusOrientacoes" style="background:##FFA500;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
+													<cfelse>
+														<td align="center"><span  class="statusOrientacoes" style="background:##dc3545;color:##fff;" >#pc_orientacao_status_descricao#</span></td>
+													</cfif>
+										
+												<cfelse>
+													<td  align="center"><span class="statusOrientacoes" style="#pc_orientacao_status_card_style_header#;"  >#pc_orientacao_status_descricao#</span></td>
+												</cfif>
+												<td id="pcProcId" align="center">#pc_processo_id#</td>
+												<td align="center">#pc_aval_numeracao#</td>	
+												<td align="center">#pc_aval_orientacao_id#</td>	
+												
+												<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N' >
+													<cfif ListFind("4,5,16", #pc_aval_orientacao_status#)>
+														<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
+														<td align="center">#dataPrev#</td>
+													<cfelse>
+														<td></td>
+													</cfif>
+												</cfif>
+												
+												
+												<cfif pc_aval_orientacao_distribuido eq 1>
+													<td>#siglaOrgResp# (#mcuOrgResp#)</td>
+												<cfelse>
+													<td>#siglaOrgResp# (#mcuOrgResp#)</td>
+												</cfif>
+												<td>#seOrgResp#</td>
+												
+
+												<cfset sei = left(#pc_num_sei#,5) & '.'& mid(#pc_num_sei#,6,6) &'/'& mid(#pc_num_sei#,12,4) &'-'&right(#pc_num_sei#,2)>
+												<td align="center">#sei#</td>
+												<td align="center">#pc_num_rel_sei#</td>
+												
+												<cfif pc_num_avaliacao_tipo neq 445 and pc_num_avaliacao_tipo neq 2>
+													<cfif pc_aval_tipo_descricao neq ''>
+														<td>#pc_aval_tipo_descricao#</td>
+													<cfelse>
+														<td>#tipoProcesso#</td>
+													</cfif>
+												<cfelse>
+													<td>#pc_aval_tipo_nao_aplica_descricao#</td>
+												</cfif>
+												
+												<cfset dataHora = pc_aval_orientacao_status_datahora>
+												<cfset dataFormatada = DateFormat(dataHora, "dd/mm/yyyy") & " - " & TimeFormat(dataHora, "HH:mm")>
+												<td data-order="#DateFormat(dataHora, 'yyyy-mm-dd')# #TimeFormat(dataHora, 'HH:mm:ss')#">#dataFormatada#</td>
+												
+												<td class="group">#orgaoOrigemSigla#</td>	
+												<td class="group">#orgaoAvaliado#</td>	
+												
+												<td id="pcAvalId" style="display:none;">#pc_aval_id#</td>
+												<td id="pcAvalOrientacaoId" style="display:none;">#pc_aval_orientacao_id#</td>
+										</tr>
+									</cfoutput>
+								</cfloop>	
+							</tbody>
+							
+						
+						</table>
 					</div>
 					<!-- /.card-body -->
 				</div>
@@ -228,9 +227,9 @@
 			$(function () {
 				<cfoutput>	
 					 var controleInterno = '#application.rsUsuarioParametros.pc_org_controle_interno#';
+					 var colunaEmAnalise = '#colunaEmAnalise#';
 				</cfoutput>
-
-				if ($('#colunaEmAnalise').is(':visible')) {
+				if (colunaEmAnalise ==1) {
 				  var colunasMostrar = [1,5,6,9,11,12];
 				} else {
 				  if(controleInterno == 'S'){
@@ -241,16 +240,14 @@
 				 
 				}
 				//initialize datatable
-				const tabOrientacoesAcomp = $('#tabProcessos').DataTable( {
+				let tabOrientacoesAcomp = $('#tabProcessos').DataTable( {
 					stateSave: true,
-					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					scrollX: true, // Habilitar rolagem horizontal
         			autoWidth: true, //largura da tabela de acordo com o conteúdo
 					pageLength: 5,
 					dom: 
-								"<'row'<'col-sm-4 dtsp-verticalContainer'<'dtsp-verticalPanes'P><'dtsp-dataTable'Bf>><'col-sm-8 text-left'p>>" +
-								"<'col-sm-12 text-left'i>" +
-								"<'row'<'col-sm-12'tr>>" ,
+						"<'row d-flex align-items-center'<'col-auto dtsp-verticalContainer'P><'col-auto'B><'col-auto'f><'col-auto'p>>" + // Botões, filtros e paginação na mesma linha, alinhados à esquerda
+						"<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
+						"<'row'<'col-12'tr>>",  // Tabela com todos os dados
 					buttons: [
 						{
 							extend: 'excel',
@@ -263,18 +260,7 @@
 							className: 'btFiltro',
 						},
 					],
-					language: {
-						searchPanes: {
-							clearMessage: 'Retirar filtro',
-							loadMessage: 'Carregando Painéis de Pesquisa...',
-							showMessage: 'Mostrar painéis',
-							collapseMessage: 'Recolher painéis',
-							title: 'Filtros Ativos - %d',
-							emptyMessage: '<em>Sem dados</em>',
-               				emptyPanes: 'Sem painéis de filtragem relevantes para exibição',
-							
-						}
-					},
+					
 					searchPanes: {
 						cascadePanes: true, // Exibir apenas opções que combinam com os filtros anteriores
 						columns: colunasMostrar,// Colunas que terão filtro
@@ -284,14 +270,21 @@
 					},
 					initComplete: function () {// Função executada ao finalizar a inicialização do DataTable
 						initializeSearchPanesAndSidebar(this)//inicializa o searchPanes dentro do controlSidebar
+						$('#exibirTab').show();
+						$('#exibirTabSpinner').html('');
+					},
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
 					}
    
 				})
 
 			} );
-           
+          
 
 			$(document).ready(function() {
+				
+
 				// Verificar se há um valor armazenado em sessionStorage e seleciona a orientação que acabou de ser colocada em análise
 				var idOrientacao = sessionStorage.getItem('emAnalise');
 				if (idOrientacao) {
@@ -308,46 +301,40 @@
 				}
 
 				// Adicionar evento de clique às linhas da tabela para selecionar
-				$('#tabProcessos tbody').on('click', 'tr', function() {
-					// Remove a classe 'selected' de todas as linhas
-					$('#tabProcessos tr').removeClass('selected');
-					
-					// Adiciona a classe 'selected' à linha clicada
-					$(this).addClass('selected');
-				});
-
-				// Adicionar evento de clique às linhas da tabela para selecionar
 				$('#tabProcessos tbody').on('click', 'tr', function(event) {
-					// Verifica se o clique foi em um botão
-					if ($(event.target).hasClass('clickable-icon')) {
-						return; // Ignora a ação da TR se o clique foi em um botão
+
+					// Verifica se o clique foi em uma célula da colunaEmAnalise
+					var colunaStatusIndex = $('#tabProcessos th#colunaEmAnalise').index();
+					var tdIndex = $(event.target).closest('td').index();
+
+					// Se o clique foi na colunaStatus, sai da função
+					if (tdIndex === colunaStatusIndex) {
+						return;
 					}
-					
+
 					// Remove a classe 'selected' de todas as linhas
 					$('#tabProcessos tr').removeClass('selected');
-					
+
 					// Adiciona a classe 'selected' à linha clicada
 					$(this).addClass('selected');
 
 					// Pega a linha (tr) em que a célula foi clicada
 					var $row = $(this);
-					
+
 					// Obtém os valores das células ocultas
 					var pcProcID = $row.find('#pcProcId').text();
 					var pcAvalId = $row.find('#pcAvalId').text();
 					var pcAvalOrientacaoId = $row.find('#pcAvalOrientacaoId').text();
 
 					// Chama a função mostraInformacoesItensAcompanhamento com os valores
-					mostraInformacoesItensAcompanhamento(pcProcID,pcAvalId, pcAvalOrientacaoId);
+					mostraInformacoesItensAcompanhamento(pcProcID, pcAvalId, pcAvalOrientacaoId);
 				});
+
 			});
 
 			
 			function mostraInformacoesItensAcompanhamento(idProcesso,idAvaliacao, idOrientacao){
-				
 				$('#modalOverlay').modal('show')
-				
-				$('#informacoesItensAcompanhamentoDiv').html('');
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
@@ -361,6 +348,7 @@
 						async: false
 					})//fim ajax
 					.done(function(result) {
+						//$('#informacoesItensAcompanhamentoDiv').html('');
 						$('#informacoesItensAcompanhamentoDiv').html(result)
 						$(".content-wrapper").css("height","auto");//para o background cinza da div content-wrapper se estender até o final do timeline
 						//$('html, body').animate({ scrollTop: ($('#informacoesItensAcompanhamentoDiv').offset().top-80)} , 1000);
@@ -379,172 +367,7 @@
 
 			}
 
-			function colocarEmAnalise(idProcesso, idAvaliacao, idOrientacao, orgaoOrigem, orgaoOrigemSigla, orgaoResp, statusOrientacao){
-				<cfoutput>	
-					 var lotacaoUsuario = '#application.rsUsuarioParametros.pc_usu_lotacao#';
-					 var lotacaoUsuarioSigla = '#application.rsUsuarioParametros.pc_org_sigla#';
-				</cfoutput>
-
-				// Dividir a sequência usando a barra (/) como delimitador epegar a última
-				lotacaoUsuarioSigla = lotacaoUsuarioSigla.split("/").pop();
-				orgaoOrigemSigla = orgaoOrigemSigla.split("/").pop();
-
-
-				$('#tabProcessos tr').each(function () {
-					$(this).removeClass('selected');
-				}); 
-				$('#tabProcessos tbody').on('click', 'tr', function () {
-					$(this).addClass('selected');
-				});
-				sessionStorage.setItem('emAnalise',idOrientacao);
-                
-
-				if(orgaoResp==lotacaoUsuario && statusOrientacao==13){
-					if(orgaoOrigem==lotacaoUsuario){
-						var mensagem = '<p style="text-align: justify;">Deseja colocar esta orientação ID <strong style="color:red">' + idOrientacao + '</strong> "EM ANÁLISE" sob responsabilidade da (<strong>'+orgaoOrigemSigla+'</strong>)?</p>';
-					}else{
-						var mensagem = '<p style="text-align: justify;">Deseja colocar esta orientação ID <strong style="color:red">' + idOrientacao + '</strong> "EM ANÁLISE" sob responsabilidade do órgão de origem do processo (<strong>'+orgaoOrigemSigla+'</strong>)?</p>';
-					
-					}
-					Swal.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							
-							$('#modalOverlay').modal('show')
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcConsultasPorOrientacao.cfc",
-									data:{
-										method: "colocarEmAnalise",
-										idProcesso: idProcesso,
-										idAvaliacao: idAvaliacao,
-										idOrientacao: idOrientacao,
-										orgaoOrigem: orgaoOrigem,
-										analiseOrgaoOrigem: 1
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {
-									
-									exibirTabela();
-									$('#informacoesItensAcompanhamentoDiv').html('')	
-									var mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">'+idOrientacao+'</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla+'</span> com sucesso!<br><br><span style="color:#00416B;font-size:0.8em;"><strong>Atenção:</strong> Como a gerência que analisará esta orientação não é a sua gerência de lotação, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										Swal.fire({
-											title: mensagemSucessos,
-											html: logoSNCIsweetalert2(''),
-											icon: 'success'
-										});
-										$('#modalOverlay').modal('hide');
-									});	
-													
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-									$('#modal-danger').modal('show')
-									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-									$('#modal-danger').find('.modal-body').text(thrownError)
-
-								})//fim fail
-							}, 500);
-
-						} else {
-							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
-							$('#modalOverlay').modal('hide');
-							Swal.fire({
-								title: 'Operação Cancelada',
-								html: logoSNCIsweetalert2(''),
-								icon: 'info'
-							});
-						}
-						
-					})
-				
-				}else{
-					var mensagem = '<p style="text-align: justify;">Deseja colocar esta orientação ID <strong style="color:red">'+idOrientacao+'</strong> "EM ANÁLISE"?</p>';
-					Swal.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					input: 'checkbox',
-					inputValue: 0,
-					inputPlaceholder:
-						'<span class="font-weight-light" style="text-align: justify;font-size:14px">Assinale ao lado, para enviar essa orientação para análise do órgão de origem do processo (<strong>'+orgaoOrigemSigla+'</strong>) ou deixe em branco para encaminhar para análise da <strong>'+lotacaoUsuarioSigla+'</strong>.</span>',
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							var enviaOrgaoOrigem=result.value;
-							$('#modalOverlay').modal('show')
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcConsultasPorOrientacao.cfc",
-									data:{
-										method: "colocarEmAnalise",
-										idProcesso: idProcesso,
-										idAvaliacao: idAvaliacao,
-										idOrientacao: idOrientacao,
-										orgaoOrigem: orgaoOrigem,
-										analiseOrgaoOrigem: enviaOrgaoOrigem
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {
-									
-									exibirTabela();
-									$('#informacoesItensAcompanhamentoDiv').html('')	
-									var mensagemSucessos ='';
-									if(!enviaOrgaoOrigem){
-										mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">' + idOrientacao + '</span> foi enviada para análise da <span style="color:#00416B">'+lotacaoUsuarioSigla+'</span> com sucesso!</p>';
-									}else{
-										mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">' + idOrientacao + '</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla +'</span> com sucesso!<br><br><span style="color:#00416B;font-size:0.8em;"><strong>Atenção:</strong> Como a gerência que analisará esta orientação não é a sua gerência de lotação, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
-									}
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										Swal.fire({
-											title: mensagemSucessos,
-											html: logoSNCIsweetalert2(''),
-											icon: 'success'
-										});
-										$('#modalOverlay').modal('hide');
-										
-									});	
-													
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-									$('#modal-danger').modal('show')
-									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-									$('#modal-danger').find('.modal-body').text(thrownError)
-
-								})//fim fail
-							}, 500);
-
-						} else {
-							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
-							$('#modalOverlay').modal('hide');
-							Swal.fire({
-								title: 'Operação Cancelada',
-								html: logoSNCIsweetalert2(''),
-								icon: 'info'
-							});
-						}
-					
-					})
-				}
-
-				$('#modalOverlay').delay(1000).hide(0, function() {
-					$('#modalOverlay').modal('hide');
-				});
-			}
+			
 
 			
 
@@ -573,136 +396,143 @@
 		</cfquery>
 
 		<session class="content-header"  >
-					
-			<!-- /.card-header -->
-			<session class="card-body" >
-				<form id="formCadItem" name="formCadItem" format="html"  style="height: auto;" style="margin-bottom:100px">
+			<div class="card card-primary card-tabs card_border_correios"  style="width:100%">
+				<div class="card-header card-header_backgroundColor" >
+					<h4 class="card-title ">	
+						<div  class="d-block" style="font-size:20px;color:#fff;font-weight: bold;"> 
+							<i class="fas fa-file-alt" style="margin-top:4px;"></i><span id="texto_card-title" style="margin-left:10px;font-size:16px;">Medida/Orientação p/ regularização</span>
+						</div>
+					</h4>
+				</div>
+				<div class="card-body">
+					<form id="formCadItem" name="formCadItem" format="html"  style="height: auto;" style="margin-bottom:100px">
 
 
-					<div id="idAvaliacao" hidden></div>
-		
-					<input id="pcProcessoId"  required="" hidden  value="#arguments.idAvaliacao#">
+						<div id="idAvaliacao" hidden></div>
 			
+						<input id="pcProcessoId"  required="" hidden  value="#arguments.idAvaliacao#">
 				
-					<style>
-						.nav-tabs {
-							border-bottom: none!important;
-						}
-						.card-header p {
-							margin-bottom: 5px;
-						}
-						fieldset{
-							border: 1px solid #ced4da!important;
-							border-radius: 8px!important;
-							padding: 20px!important;
-							margin-bottom: 10px!important;
-							background: none!important;
-							-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
-							-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
-							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
-							font-weight: 400 !important;
-						}
-
-						legend {
-							font-size: 0.8rem!important;
-							color: #fff!important;
-							background-color: #0083ca!important;
-							border: 1px solid #ced4da!important;
-							border-radius: 5px!important;
-							padding: 5px!important;
-							width: auto!important;
-						}
-
-						.borderTexto{
-							border: 1px solid #ced4da!important;
-							border-radius: 8px!important;
-							padding: 10px!important;
-							background: none!important;
-							-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
-							-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
-							box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
-
-						}
-
-						
 					
-					</style>
+						<style>
+							.nav-tabs {
+								border-bottom: none!important;
+							}
+							.card-header p {
+								margin-bottom: 5px;
+							}
+							fieldset{
+								border: 1px solid #ced4da!important;
+								border-radius: 8px!important;
+								padding: 20px!important;
+								margin-bottom: 10px!important;
+								background: none!important;
+								-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+								-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+								box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+								font-weight: 400 !important;
+							}
+
+							legend {
+								font-size: 0.8rem!important;
+								color: #fff!important;
+								background-color: var(--azul_claro_correios)!important;
+								border: 1px solid #ced4da!important;
+								border-radius: 5px!important;
+								padding: 5px!important;
+								width: auto!important;
+							}
+
+							.borderTexto{
+								border: 1px solid #ced4da!important;
+								border-radius: 8px!important;
+								padding: 10px!important;
+								background: none!important;
+								-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+								-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+								box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+
+							}
+
+							
 						
-					
-					<div class="card card-primary card-tabs"  style="widht:100%">
-						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+						</style>
 							
-							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
-								<li class="nav-item" style="">
-									<a  class="nav-link  active" id="custom-tabs-one-Orientacao-tab"  data-toggle="pill" href="#custom-tabs-one-Orientacao" role="tab" aria-controls="custom-tabs-one-Orientacao" aria-selected="true">
-									Medida/Orientação ID (<strong><cfoutput>#arguments.idOrientacao#</cfoutput></strong>)</a>
-								</li>
+						
+						<div class="card card-primary card-tabs card_border_correios2"  style="width:100%">
+							<div class="card-header p-0 pt-1 card-header_navbar_backgroundColor " >
 								
+								<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
+									<li class="nav-item">
+										<a  class="nav-link  active" id="custom-tabs-one-Orientacao-tab"  data-toggle="pill" href="#custom-tabs-one-Orientacao" role="tab" aria-controls="custom-tabs-one-Orientacao" aria-selected="true">
+										Medida/Orientação ID (<strong><cfoutput>#arguments.idOrientacao#</cfoutput></strong>)</a>
+									</li>
+									
 
-								<li class="nav-item" style="">
-									<a  class="nav-link " id="custom-tabs-one-InfProcesso-tab"  data-toggle="pill" href="#custom-tabs-one-InfProcesso" role="tab" aria-controls="custom-tabs-one-InfProcesso" aria-selected="true">Inf. Processo</a>
-								</li>
+									<li class="nav-item" style="">
+										<a  class="nav-link " id="custom-tabs-one-InfProcesso-tab"  data-toggle="pill" href="#custom-tabs-one-InfProcesso" role="tab" aria-controls="custom-tabs-one-InfProcesso" aria-selected="true">Inf. Processo</a>
+									</li>
 
-								<li class="nav-item" style="">
-									<a  class="nav-link " id="custom-tabs-one-InfItem-tab"  data-toggle="pill" href="#custom-tabs-one-InfItem" role="tab" aria-controls="custom-tabs-one-InfItem" aria-selected="true">
-									<cfoutput>Inf. Item ( N° <strong>#rsItemNum.pc_aval_numeracao#</strong> - ID <strong>#arguments.idAvaliacao#</strong> )</cfoutput></a>
-								</li>
+									<li class="nav-item" style="">
+										<a  class="nav-link " id="custom-tabs-one-InfItem-tab"  data-toggle="pill" href="#custom-tabs-one-InfItem" role="tab" aria-controls="custom-tabs-one-InfItem" aria-selected="true">
+										<cfoutput>Inf. Item ( N° <strong>#rsItemNum.pc_aval_numeracao#</strong> - ID <strong>#arguments.idAvaliacao#</strong> )</cfoutput></a>
+									</li>
+									
+									<li class="nav-item" style="">
+										<a  class="nav-link  " id="custom-tabs-one-Avaliacao-tab"  data-toggle="pill" href="#custom-tabs-one-Avaliacao" role="tab" aria-controls="custom-tabs-one-Avaliacao" aria-selected="true">Relatório</a>
+									</li>
+									<li class="nav-item">
+										<a  class="nav-link " id="custom-tabs-one-Anexos-tab"  data-toggle="pill" href="#custom-tabs-one-Anexos" role="tab" aria-controls="custom-tabs-one-Anexos" aria-selected="true">Anexos da Medida/Orientação ID (<strong><cfoutput>#arguments.idOrientacao#</cfoutput></strong>)</a>
+									</li>
+									
+								</ul>
 								
-								<li class="nav-item" style="">
-									<a  class="nav-link  " id="custom-tabs-one-Avaliacao-tab"  data-toggle="pill" href="#custom-tabs-one-Avaliacao" role="tab" aria-controls="custom-tabs-one-Avaliacao" aria-selected="true">Relatório</a>
-								</li>
-								<li class="nav-item">
-									<a  class="nav-link " id="custom-tabs-one-Anexos-tab"  data-toggle="pill" href="#custom-tabs-one-Anexos" role="tab" aria-controls="custom-tabs-one-Anexos" aria-selected="true">Anexos</a>
-								</li>
-								
-							</ul>
-							
-						</div>
-						<div class="card-body">
-							<div class="tab-content" id="custom-tabs-one-tabContent">
-								<div disable class="tab-pane fade  active show " id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >	
-									<div id="infoOrientacaoDiv" ></div>
-								</div>
-
-
-								<div disable class="tab-pane fade" id="custom-tabs-one-InfProcesso"  role="tabpanel" aria-labelledby="custom-tabs-one-InfProcesso-tab" >								
-									<div id="infoProcessoDiv" ></div>
-								</div>
-
-								<div disable class="tab-pane fade" id="custom-tabs-one-InfItem"  role="tabpanel" aria-labelledby="custom-tabs-one-InfItem-tab" >								
-									<div id="infoItemDiv" ></div>
-								</div>
-								
-								<div disable class="tab-pane fade" id="custom-tabs-one-Avaliacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Avaliacao-tab" >								
-									<div id="anexoAvaliacaoDiv"></div>
-								</div>
-
-								<div class="tab-pane fade " id="custom-tabs-one-Anexos" role="tabpanel" aria-labelledby="custom-tabs-one-Anexos-tab">	
-									<div id="tabAnexosDiv" style="margin-top:20px"></div>
-								</div>
-
 							</div>
+							<div class="card-body ">
+								<div class="tab-content" id="custom-tabs-one-tabContent">
+									<div disable class="tab-pane fade  active show " id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >	
+										<div id="infoOrientacaoDiv" ></div>
+									</div>
 
-						
+
+									<div disable class="tab-pane fade" id="custom-tabs-one-InfProcesso"  role="tabpanel" aria-labelledby="custom-tabs-one-InfProcesso-tab" >								
+										<div id="infoProcessoDiv" ></div>
+									</div>
+
+									<div disable class="tab-pane fade" id="custom-tabs-one-InfItem"  role="tabpanel" aria-labelledby="custom-tabs-one-InfItem-tab" >								
+										<div id="infoItemDiv" ></div>
+									</div>
+									
+									<div disable class="tab-pane fade" id="custom-tabs-one-Avaliacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Avaliacao-tab" >								
+										<div id="anexoAvaliacaoDiv"></div>
+									</div>
+
+									<div class="tab-pane fade " id="custom-tabs-one-Anexos" role="tabpanel" aria-labelledby="custom-tabs-one-Anexos-tab">	
+										<div id="tabAnexosDiv" style="margin-top:20px"></div>
+									</div>
+
+								</div>
+
+							
+							</div>
+							
 						</div>
-						
-					</div>
-				
-				</form><!-- fim formCadAvaliacao -->
 					
+					</form><!-- fim formCadAvaliacao -->
+				</div>
+			</div>	
 				<!--Inseri as tab de acompanhamento e distribuição se o a lotação do usuário for um órgão-->	
 				<cfif application.rsUsuarioParametros.pc_org_controle_interno eq 'S'>
 					<cfset timelineViewAcomp(arguments.idOrientacao)>
 				<cfelse>
 					<cfif application.rsOrgaoSubordinados.recordcount neq 0>
 						<cfset timelineViewAcompOrgaoAvaliado(arguments.idOrientacao)>
-						<div class="row" style="margin-bottom:50px">
+						<div class="row" style="margin-top:60px;margin-bottom:50px;">
 							<div class="col-md-12">
 							    
-								<div class="card card-primary card-tabs" style="widht:100%">
+								<div class="card card-primary card-tabs card_border_correios" style="width:100%">
 									
-									<div class="card-header p-0 pt-1" style="">
-									    <div class="col-md-12"  style="border-bottom: 1px solid; padding: 10px;">
+									<div class="card-header p-0 pt-1 card-header_backgroundColor" >
+									    <div class="col-md-12"  style="padding: 10px;max-width: 85%;">
 											<p>Senhor(a) gestor(a),</p>
 											<li>Escolha a seguir entre as opções: <strong><i class="fas fa-user-pen"></i> Manifestação</strong> ou <strong><i class="fas fa-sitemap"></i> Distribuição</strong>;</li>
 											<li>A opção "MANIFESTAÇÃO" possibilita o registro da resposta diretamente por esse gestor para envio ao Controle Interno;</li>
@@ -714,23 +544,23 @@
 										</div>
 										<ul class="nav nav-tabs">
 											<li class="nav-item">
-												<a class="nav-link" id="tab-manifestacao" data-toggle="tab" href="#content-manifestacao" style="font-size:20px;"><i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Manifestação</span></a>
+												<a class="nav-link active" id="tab-manifestacao" data-toggle="tab" href="#content-manifestacao" style="font-size:20px;"><i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Manifestação</span></a>
 											</li>
 											<li class="nav-item">
 												<a class="nav-link" id="tab-distribuicao" data-toggle="tab" href="#content-distribuicao" style="font-size:20px;"><i class="fas fa-sitemap" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">Distribuição</span></a>
 											</li>
 										</ul>
 									</div>
-									<div class="card-body">
+									<div class="card-body  ">
 										<div class="tab-content">
-											<div class="tab-pane fade " id="content-manifestacao">
+											<div class="tab-pane fade active show" id="content-manifestacao">
 												<cfset formPosicionamentoOrgaoAvaliado(arguments.idOrientacao)>
 											</div>
 											<div class="tab-pane fade" id="content-distribuicao">
 												<div id="pcOrgaoRespDistribuicaoDiv" class="col-sm-8" >
 													<div class="form-group">
 														<label    for="pcOrgaoRespDistribuicao">
-															<div class="alertaDivMagenta" >Senhor(a) gestor(a), <br>
+															<div class="alert alert-warning d-inline-flex " >Senhor(a) gestor(a), <br>
 																Selecione, a seguir, as áreas para as quais pretende distribuir esse item para 
 																manifestação. Antes da distribuição orientamos a ler atentamente a situação encontrada 
 																de modo a melhor identificar a área responsável para tratamento do item. Se necessário, 
@@ -754,7 +584,7 @@
 												</div>
 												<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
 													<div >
-														<button id="btEnviarDistribuicao"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Distribuir</button>
+														<button id="btEnviarDistribuicao"  class="btn btn-block azul_claro_correios_backgroundColor" style="color:#fff">Distribuir</button>
 													</div>
 												</div>	
 											</div>
@@ -855,7 +685,7 @@
 					mostraTabAnexosJS('tabAnexosDiv',pc_aval_id,pc_aval_orientacao_id);
 				});
 				
-				mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id,'custom-tabs-one-Orientacao-tab');
+				mostraInfoOrientacao('infoOrientacaoDiv',pc_processo_id,pc_aval_orientacao_id,'informacoesItensAcompanhamentoDiv');
 				
 			})
 
@@ -952,70 +782,88 @@
 	<cffunction name="distribuirMelhoria" returntype="any" access="remote" hint="Distribui as Propostas de Melhoria para áreas selecionadas pelo órgão avaliado.">
 		<cfargument name="pc_aval_melhoria_id" type="string" required="true" />
 		<cfargument name="pcAreasDistribuir" type="any" required="true" />
-
+	
 		<cfquery name="rsMelhoria" datasource="#application.dsn_processos#">
 			SELECT * FROM pc_avaliacao_melhorias
 			WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">
 		</cfquery>
-
+	
 		<cftransaction>
-			<cfloop list="#arguments.pcAreasDistribuir#" index="i">
-				<cfquery  datasource="#application.dsn_processos#">
-					INSERT pc_avaliacao_melhorias(pc_aval_melhoria_num_aval, pc_aval_melhoria_descricao,pc_aval_melhoria_num_orgao,pc_aval_melhoria_datahora,pc_aval_melhoria_login, pc_aval_melhoria_status, pc_aval_melhoria_distribuido )
-                    VALUES (
-							<cfqueryparam value="#rsMelhoria.pc_aval_melhoria_num_aval#" cfsqltype="cf_sql_numeric">, 
-							<cfqueryparam value="#rsMelhoria.pc_aval_melhoria_descricao#" cfsqltype="cf_sql_varchar">, 
-							<cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">, 
-							<cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">, 
-							'#application.rsUsuarioParametros.pc_usu_login#', 
-							'P', 
-							1
-						)
-				</cfquery>
-
-			<cftry>
-				<!--Informações do órgão responsável-->
-				<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
-					SELECT pc_org_emaiL, pc_org_sigla FROM pc_orgaos
-					WHERE pc_org_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">
-				</cfquery>
-
-				<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
-				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
-			    <cfset pronomeTrat = "Senhor(a) Gestor da #siglaOrgaoResponsavel#">
-				
-				<cfset textoEmail = 'Seu órgão subordinador distribuiu novas Propostas de Melhoria para conhecimento e providências. Favor atentar para o prazo de resposta. 
-
-Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:
-
-<a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a>'>
-							
-				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
-				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
-							para = "#to#"
-							pronomeTratamento = "#pronomeTrat#"
-							texto="#textoEmail#"
-				/>
-				<cfcatch type="any">
-				<cfset de="SNCI@correios.com.br">
-				<cfif FindNoCase("localhost", application.auxsite)>
-					<cfset de="mbflpa@yahoo.com.br">
-				</cfif>
-					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
-					</cfmail>
-				</cfcatch>
-			</cftry>
-
-			</cfloop>
-
-			<cfquery datasource="#application.dsn_processos#">
-				DELETE FROM pc_avaliacao_melhorias
-				WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">
-			</cfquery>
-
+			<!-- Lock Exclusivo para evitar concorrência -->
+			<cflock name="distribuirMelhoriaLock_#arguments.pc_aval_melhoria_id#" type="exclusive" timeout="10">
+				<cfloop list="#arguments.pcAreasDistribuir#" index="i">
+					<cftry>
+						<!-- Inserção com proteção contra concorrência -->
+						<cflock name="insertLock_#arguments.pc_aval_melhoria_id#_#i#" type="exclusive" timeout="10">
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT INTO pc_avaliacao_melhorias (
+									pc_aval_melhoria_num_aval, 
+									pc_aval_melhoria_descricao,
+									pc_aval_melhoria_num_orgao,
+									pc_aval_melhoria_datahora,
+									pc_aval_melhoria_login, 
+									pc_aval_melhoria_status, 
+									pc_aval_melhoria_distribuido
+								) VALUES (
+									<cfqueryparam value="#rsMelhoria.pc_aval_melhoria_num_aval#" cfsqltype="cf_sql_numeric">, 
+									<cfqueryparam value="#rsMelhoria.pc_aval_melhoria_descricao#" cfsqltype="cf_sql_varchar">, 
+									<cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">, 
+									<cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">, 
+									<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">, 
+									<cfqueryparam value="P" cfsqltype="cf_sql_varchar">, 
+									<cfqueryparam value="1" cfsqltype="cf_sql_numeric">
+								)
+							</cfquery>
+						</cflock>
+	
+						<!-- Envio de E-mail -->
+						<!-- Informações do órgão responsável -->
+						<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
+							SELECT pc_org_email, pc_org_sigla FROM pc_orgaos
+							WHERE pc_org_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">
+						</cfquery>
+	
+						<cfset to = Trim(rsOrgaoResp.pc_org_email)>
+						<cfset siglaOrgaoResponsavel = Trim(rsOrgaoResp.pc_org_sigla)>
+						<cfset pronomeTrat = "Senhor(a) Gestor da #siglaOrgaoResponsavel#">
+	
+						<cfset textoEmail = '
+							<p style="text-align: justify;">Seu órgão subordinador distribuiu novas Propostas de Melhoria para conhecimento e providências. Favor atentar para o prazo de resposta.</p>
+							<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
+							<p style="text-align:center;">
+								<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+							</p>
+						'>
+	
+						<cfobject component="pc_cfcPaginasApoio" name="pc_cfcPaginasApoioDist"/>
+						<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
+								 para="#to#"
+								 pronomeTratamento="#pronomeTrat#"
+								 texto="#textoEmail#"
+						/>
+					<cfcatch type="any">
+						<cfset de = "SNCI@correios.com.br">
+						<cfif FindNoCase("localhost", application.auxsite)>
+							<cfset de = "mbflpa@yahoo.com.br">
+						</cfif>
+						<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#" subject="ERRO - SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+							<cfoutput>
+								Erro na rotina "distribuirMelhoria" de distribuição de propostas de melhoria: #cfcatch.message#
+							</cfoutput>
+						</cfmail>
+					</cfcatch>
+					</cftry>
+				</cfloop>
+	
+				<!-- Deleção com proteção contra concorrência -->
+				<cflock name="deleteLock_#arguments.pc_aval_melhoria_id#" type="exclusive" timeout="10">
+					<cfquery datasource="#application.dsn_processos#">
+						DELETE FROM pc_avaliacao_melhorias
+						WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">
+					</cfquery>
+				</cflock>
+			</cflock>
 		</cftransaction>
-
 	</cffunction>
 
 
@@ -1110,11 +958,13 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Mel
 				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
 			    <cfset pronomeTrat = "Senhor(a) Gestor da #siglaOrgaoResponsavel#">
 				
-				<cfset textoEmail = 'Seu órgão subordinador distribuiu novas orientações para conhecimento e providências. Favor atentar para o prazo de resposta. 
-
-Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e inserir sua resposta:
-
-<a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a>'>
+				<cfset textoEmail = '
+				<p style="text-align: justify;">Seu órgão subordinador distribuiu novas orientações para conhecimento e providências. Favor atentar para o prazo de resposta.</p> 
+				<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e inserir sua resposta:</p> 
+				<p style="text-align:center;">
+					<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+				</p>
+				'>
 							
 				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
 				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
@@ -1141,12 +991,9 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 		<cfargument name="pcAreasDistribuir" type="any" required="true" />
 		<cfargument name="pcOrientacaoResposta" type="string" required="true" />
 
-
-			<cfloop list="#arguments.pcAreasDistribuir#" index="i">
+		<cfloop list="#arguments.pcAreasDistribuir#" index="i">
 			<cftry>
 			    <cfset orgaoResp = "#i#">
-				
-
 				<!--Informações do órgão responsável-->
 				<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
 					SELECT * FROM pc_orgaos
@@ -1157,11 +1004,13 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
 			    <cfset pronomeTrat = "Senhor(a) Gestor da #siglaOrgaoResponsavel#">
 				
-				<cfset textoEmail = 'Seu órgão subordinador distribuiu novas orientações e/ou Propostas de Melhoria para conhecimento e providências. Favor atentar para o prazo de resposta. 
-
-Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:
-
-<a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a>'>
+				<cfset textoEmail = '
+						<p style="text-align: justify;">Seu órgão subordinador distribuiu novas orientações para conhecimento e providências. Favor atentar para o prazo de resposta.</p> 
+						<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e inserir sua resposta:</p> 
+						<p style="text-align:center;">
+							<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+						</p>
+					'>
 							
 				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
 				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
@@ -1169,26 +1018,14 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 							pronomeTratamento = "#pronomeTrat#"
 							texto="#textoEmail#"
 				/>
-				 <cfcatch type="any">
-       <cfmail from="SNCI@correios.com.br" to="marceloferreira@correios.com.br" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-	   			<cfoutput>#cfcatch.message# <cfdump var ="#rsOrgaoResp#"></cfoutput>
-	   </cfmail>
-	   
-     
-    </cfcatch>
-</cftry>
-			</cfloop>
-
-	
-
-
+				<cfcatch type="any">
+					<cfmail from="SNCI@correios.com.br" to="marceloferreira@correios.com.br" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+								<cfoutput>#cfcatch.message# <cfdump var ="#rsOrgaoResp#"></cfoutput>
+					</cfmail>
+				</cfcatch>
+			</cftry>
+		</cfloop>
 	</cffunction>
-
-
-
-
-
-
 
 
 	<cffunction name="tabMelhoriasPendentes" access="remote" hint="Criar a tabela das propostas de melhoria e envia para a página pcAcompanhamento.cfm">
@@ -1214,8 +1051,8 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						<cfif #rsMelhoriasPendentes.recordcount# eq 0 >
 							<h5 align="center">Nenhuma Proposta de Melhoria pendente foi localizada para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
 						<cfelse>
-							<table id="tabMelhoriasPendentes" class="table table-bordered table-striped table-hover text-nowrap">
-								<thead style="background: #0083ca;color:#fff">
+							<table id="tabMelhoriasPendentes" class="table table-striped table-hover text-nowrap  table-responsive">
+								<thead  class="table_thead_backgroundColor">
 									<tr style="font-size:14px">
 									    <th id="colunaStatusProposta">Status:</th>
 										<th >ID:</th>
@@ -1311,6 +1148,9 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						[5,10, 25, 50, -1],
 						[5,10, 25, 50, 'Todos'],
 					],
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					}
 					
 					});
 
@@ -1437,7 +1277,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 				<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
 					<div >
-						<button id="btSalvarMelhoriaPosic"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Enviar</button>
+						<button id="btSalvarMelhoriaPosic"  class="btn btn-block  azul_claro_correios_backgroundColor" style="color:#fff">Enviar</button>
 					</div>
 				</div>	
 				
@@ -1643,7 +1483,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						legend {
 							font-size: 0.8rem!important;
 							color: #fff!important;
-							background-color: #0083ca!important;
+							background-color: var(--azul_claro_correios)!important;
 							border: 1px solid #ced4da!important;
 							border-radius: 5px!important;
 							padding: 5px!important;
@@ -1652,11 +1492,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					
 					</style>
 					
-					<div class="card card-primary card-tabs"  style="widht:100%">
-						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+					<div class="card card-primary card-tabs card_border_correios"  style="width:100%">
+						<div class="card-header p-0 pt-1 card-header_backgroundColor" >
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
-								<li class="nav-item" style="">
+								<li class="nav-item">
 									<a  class="nav-link  active" id="custom-tabs-one-Melhoria-tab"  data-toggle="pill" href="#custom-tabs-one-Melhoria" role="tab" aria-controls="custom-tabs-one-Melhoria" aria-selected="true"> Proposta de Melhoria p/ Manifestação: ID <cfoutput><strong>#rsMelhoria.pc_aval_melhoria_id#</strong> - #rsMelhoria.siglaOrgResp# (#rsMelhoria.mcuOrgResp#)</cfoutput></a>
 								</li>
 								
@@ -1680,7 +1520,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 							</ul>
 							
 						</div>
-						<div class="card-body">
+						<div class="card-body ">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Melhoria"  role="tabpanel" aria-labelledby="custom-tabs-one-Melhoria-tab" >														
 									<div class="col-md-12">
@@ -1693,14 +1533,14 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 							           		
 											<fieldset style="padding:0px!important;min-height: 90px;">
 												<legend style="margin-left:20px">Proposta de Melhoria:</legend> 
-												<pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsMelhoria.pc_aval_melhoria_descricao#</pre>									
+												<pre class="font-weight-light azul_claro_correios_textColor" style="font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsMelhoria.pc_aval_melhoria_descricao#</pre>									
 											</fieldset>
 											<cfset ano = RIGHT('#arguments.idProcesso#',4)>
 											<cfif #ano# gte 2024 and rsCategoriaControle.recordcount gt 0> 
 												<cfif rsMelhoria.pc_aval_melhoria_beneficioNaoFinanceiro neq ''>
 													<fieldset style="padding:0px!important;min-height: 90px;">
 														<legend style="margin-left:20px">Benefício Não Financeiro da Proposta de Melhoria:</legend>                                         
-														<pre class="font-weight-light " style="color:##0083ca!important;font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsMelhoria.pc_aval_melhoria_beneficioNaoFinanceiro#</pre>
+														<pre class="font-weight-light azul_claro_correios_textColor" style="font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsMelhoria.pc_aval_melhoria_beneficioNaoFinanceiro#</pre>
 													</fieldset>
 												<cfelse>
 												    <fieldset style="padding:0px!important;min-height: 90px;">
@@ -1729,9 +1569,9 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 										</cfoutput>
 
-										<div class="card card-primary card-tabs" style="widht:100%;">
+										<div class="card card-primary card-tabs card_border_correios" style="width:100%;">
 											
-											<div class="card-header p-0 pt-1" style="">
+											<div class="card-header p-0 pt-1 card-header_backgroundColor" >
 												
 												<ul class="nav nav-tabs">
 													<li class="nav-item">
@@ -1746,7 +1586,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 												</ul>
 											</div>
-											<div class="card-body">
+											<div class="card-body ">
 												<div class="tab-content">
 													<div class="tab-pane fade  active show" id="content-responder">
 														<div id="informacoesMelhoriasDiv"></div>
@@ -1756,7 +1596,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 															<div id="pcOrgaoRespDistribuicaoDiv" class="col-sm-8" >
 																<div class="form-group">
 																	<label    for="pcOrgaoRespDistribuicao">
-																		<div class="alertaDivMagenta" >Senhor(a) gestor(a), <br>
+																		<div class="alert alert-warning d-inline-flex  align-items-center" >Senhor(a) gestor(a), <br>
 																			Selecione, a seguir, as áreas para as quais pretende distribuir essa Proposta de Melhoria. Antes da distribuição orientamos a ler atentamente a situação encontrada 
 																			de modo a melhor identificar a área para direcionamento. Se necessário, a mesma pode ser direcionada, simultaneamente, para até 04 áreas.
 																		</div>
@@ -1772,7 +1612,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 															
 															<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
 																<div >
-																	<button id="btEnviarDistribuicaoMelhoria"  class="btn btn-block  " style="background-color:#0083ca;color:#fff">Distribuir</button>
+																	<button id="btEnviarDistribuicaoMelhoria"  class="btn btn-block  azul_claro_correios_backgroundColor" style="color:#fff">Distribuir</button>
 																</div>
 															</div>	
 														</div>
@@ -2028,7 +1868,6 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 
 	<cffunction name="cadMelhoriasPosic"   access="remote"  returntype="any" hint="cadastra os posicionamentos dos órgãos sobre as propostas de melhoria">
-		
 		<cfargument name="pc_aval_id" type="numeric" required="true"/>
 		<cfargument name="pc_aval_melhoria_id" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_dataPrev" type="string" required="false" default=""/>
@@ -2036,24 +1875,23 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 		<cfargument name="pc_aval_melhoria_naoAceita_justif" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_status" type="string"  required="false"  default=""/>
 		
-
-		<cfquery datasource="#application.dsn_processos#" >
-			UPDATE pc_avaliacao_melhorias
-			SET 				
-				pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
-				pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
-				pc_aval_melhoria_sug_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-				pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
-				pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-				<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
-					pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
-				<cfelse>
-					pc_aval_melhoria_dataPrev = null
-				</cfif>
-			WHERE  pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">	
-		</cfquery>
-
-					
+		<cflock name="cadMelhoriasPosic_#arguments.pc_aval_melhoria_id#" type="exclusive" timeout="10">	
+			<cfquery datasource="#application.dsn_processos#" >
+				UPDATE pc_avaliacao_melhorias
+				SET 				
+					pc_aval_melhoria_sugestao = <cfqueryparam value="#arguments.pc_aval_melhoria_sugestao#" cfsqltype="cf_sql_varchar">,
+					pc_aval_melhoria_naoAceita_justif = <cfqueryparam value="#arguments.pc_aval_melhoria_naoAceita_justif#" cfsqltype="cf_sql_varchar">,
+					pc_aval_melhoria_sug_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+					pc_aval_melhoria_status = <cfqueryparam value="#arguments.pc_aval_melhoria_status#" cfsqltype="cf_sql_varchar">,
+					pc_aval_melhoria_sug_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+					<cfif '#arguments.pc_aval_melhoria_dataPrev#' neq "">
+						pc_aval_melhoria_dataPrev = <cfqueryparam value="#arguments.pc_aval_melhoria_dataPrev#" cfsqltype="cf_sql_date">
+					<cfelse>
+						pc_aval_melhoria_dataPrev = null
+					</cfif>
+				WHERE  pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">	
+			</cfquery>
+		</cflock>
   	</cffunction>
 
 
@@ -2126,13 +1964,13 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 			
 			
-		<div id="accordionCadItemPainel" style="margin-top:30px;hright:100vh">
-			<div class="card card-success" style="margin-bottom:10px">
-				<div class="card-header" style="background-color:#ececec;">
+		<div id="accordionCadItemPainel " style="margin-top:30px;hright:100vh">
+			<div class="card card-success card_border_correios" style="margin-top:60px;margin-bottom:10px">
+				<div class="card-header card-header_backgroundColor" >
 					<h4 class="card-title ">
-						<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:gray;font-weight: bold;"> 
-							<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">INSERIR MANIFESTAÇÃO DO CONTROLE INTERNO</span>
-						</a>
+						<span class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:gray;font-weight: bold;"> 
+							<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;color:#fff"></i><span style="margin-left:5px;color:#fff">INSERIR MANIFESTAÇÃO DO CONTROLE INTERNO</span>
+						</span>
 					</h4>
 				</div>
 				<div id="collapseTwo" class="" data-parent="#accordion">
@@ -2252,51 +2090,46 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					<cfif rsProc.pc_num_status neq 6>
 						<div class="row">
 							<div class="col-md-12">
-								<div class="card card-default">
-									
-									<div class="card-body">
-										<div id="actions" class="row" >
-											<div class="col-lg-12" align="left">
-												<div class="btn-group w-30">
-														<cfif directoryExists(application.diretorio_anexos)>
-															<span id="anexosAcomp" class="btn btn-success col fileinput-button" style="background:#0083CA">
-																<i class="fas fa-upload"></i>
-																<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
-															</span>
-														</cfif>
-													
-												</div>
+	
+								<div class="card-body">
+									<div id="actions" class="row" >
+										<div class="col-lg-12" align="left">
+											<div class="btn-group w-30">
+													<cfif directoryExists(application.diretorio_anexos)>
+														<span id="anexosAcomp" class="btn btn-success col fileinput-button azul_claro_correios_backgroundColor" >
+															<i class="fas fa-upload"></i>
+															<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
+														</span>
+													</cfif>
+												
 											</div>
-										</div>
-										
-										<div class="table table-striped files" id="previewsAcomp">
-										<div id="templateAcomp" class="row mt-2">
-											<div class="col-auto">
-												<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
-											</div>
-											<div class="col d-flex align-items-center">
-												<p class="mb-0">
-												<span class="lead" data-dz-name></span>
-												(<span data-dz-size></span>)
-												</p>
-												<strong class="error text-danger" data-dz-errormessage></strong>
-											</div>
-											<div class="col-4 d-flex align-items-center" >
-												<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
-													<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
-												</div>
-											</div>
-											
 										</div>
 									</div>
 									
-										<div id="tabAnexosAcompDiv" style="margin-top:30px;margin-bottom:50px"></div>
-									
-									
+									<div class="table table-striped files" id="previewsAcomp">
+									<div id="templateAcomp" class="row mt-2">
+										<div class="col-auto">
+											<span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
+										</div>
+										<div class="col d-flex align-items-center">
+											<p class="mb-0">
+											<span class="lead" data-dz-name></span>
+											(<span data-dz-size></span>)
+											</p>
+											<strong class="error text-danger" data-dz-errormessage></strong>
+										</div>
+										<div class="col-4 d-flex align-items-center" >
+											<div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
+												<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
+											</div>
+										</div>
+										
+									</div>
 								</div>
 								
-								</div>
-								<!-- /.card -->
+								<div id="tabAnexosAcompDiv" style="margin-top:30px;margin-bottom:50px"></div>
+								
+								
 							</div>
 							
 						</div>
@@ -2304,7 +2137,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 					<!--FIM ANEXOS-->
 				
 				
-					<div id = "divBtSalvarEnviar"style="justify-content:center; display: flex; width: 100%;margin-bottom:50px;border-top:1px solid #ced4da; padding:20px">
+					<div id = "divBtSalvarEnviar"style="justify-content:center; display: flex; width: 100%;padding:20px">
 						<div class="form-group" style="margin-right:150px;">
 							<button id="btSalvar" class="btn btn-block btn-primary " style="background-color: #28a745;"> <i class="fas fa-floppy-disk" style="margin-right:5px"></i>Salvar manifestação p/ envio posterior</button>
 						</div>
@@ -2315,8 +2148,6 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 				</cfif>
 			</div>
-
-			
 		</div>
 			
 
@@ -2337,7 +2168,6 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 			$(document).ready(function() {
 				
-
 				var dataPrev = '';
 				var dataPrevista='';
 				var dataPrevistaFormatada ='';
@@ -2561,6 +2391,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 			})
 
+
 			$('#btSalvar').on('click', function (event)  {
 				//cancela e  não propaga o event click original no botão
 				event.preventDefault()
@@ -2766,7 +2597,17 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 									
 									$('#modalOverlay').delay(1000).hide(0, function() {
+											
 										$('#modalOverlay').modal('hide');
+										//verifica se está em pc_navegacao_por_abas.cfm e fecha as outras abas abertas
+										// if (url.pathname.toLowerCase() !== '/snci/snci_processos/pc_navegacao_por_abas.cfm'){
+										 	
+										// 	var elemento = window.parent.document.querySelector('a[data-widget="iframe-close"][data-type="all-other"]');
+										// 	if (elemento) {
+										// 		elemento.click();
+										// 		toastr.success('Se existiam outras abas abertas, foram fechadas. Caso queira, reabra-as para refletirem esta atualização!');
+										// 	}
+										// }
 										toastr.success('Operação realizada com sucesso!');
 									});			
 
@@ -2826,6 +2667,15 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 									$('#timelineViewAcompDiv').html('')
 
 									$('#modalOverlay').delay(1000).hide(0, function() {
+										//verifica se está em pc_navegacao_por_abas.cfm e fecha as outras abas abertas
+										// if (url.pathname.toLowerCase() !== '/snci/snci_processos/pc_navegacao_por_abas.cfm'){
+										 	
+										// 	var elemento = window.parent.document.querySelector('a[data-widget="iframe-close"][data-type="all-other"]');
+										// 	if (elemento) {
+										// 		elemento.click();
+										// 		toastr.success('Se existiam outras abas abertas, foram fechadas. Caso queira, reabra-as para refletirem esta atualização!');
+										// 	}
+										// }
 										$('#modalOverlay').modal('hide');
 										toastr.success('Operação realizada com sucesso!');
 									});			
@@ -3012,11 +2862,11 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						<div  style="margin-bottom:10px">
 					<cfelse>
 						<div class="card card-success" style="margin-bottom:10px">
-							<div class="card-header" style="background-color:#0083CA;">
+							<div class="card-header card-header_backgroundColor" >
 								<h4 class="card-title ">
-									<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:#fff;font-weight: bold;"> 
+									<span class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:#fff;font-weight: bold;"> 
 										<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">INSERIR MANIFESTAÇÃO DO ÓRGÃO: <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></span>
-									</a>
+									</span>
 								</h4>
 							</div>	
 					</cfif>	
@@ -3045,7 +2895,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 											<div class="col-lg-12" align="left">
 												<div class="btn-group w-30">
 												    <cfif directoryExists(application.diretorio_anexos)>
-														<span id="anexosAcomp" class="btn btn-success col fileinput-button" style="background:#0083CA">
+														<span id="anexosAcomp" class="btn btn-success col fileinput-button azul_claro_correios_backgroundColor" >
 															<i class="fas fa-upload"></i>
 															<span style="margin-left:5px">Clique aqui para anexar um documento (PDF, EXCEL ou ZIP)</span>
 														</span>
@@ -3090,7 +2940,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						<!--FIM ANEXOS-->
 						
 
-						<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px;border-top:1px solid #ced4da;padding:20px">
+						<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px;padding:20px">
 							<div class="form-group" style="margin-right:150px;">
 								<button id="btSalvar" class="btn btn-block btn-primary " style="background-color: #28a745;"> <i class="fas fa-floppy-disk" style="margin-right:5px"></i>Salvar manifestação p/ envio posterior</button>
 							</div>
@@ -3116,7 +2966,10 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 						"responsive": true, 
 						"lengthChange": false, 
 						"autoWidth": false,
-						"searching": false
+						"searching": false,
+						language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 					})
 				}	
 			});
@@ -3246,8 +3099,6 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 
 				swalWithBootstrapButtons.fire({//sweetalert2
 					html: logoSNCIsweetalert2(mensagem), 
-
-
 					showCancelButton: true,
 					confirmButtonText: 'Sim!',
 					cancelButtonText: 'Cancelar!'
@@ -3564,145 +3415,147 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 		<cfargument name="pc_aval_orientacao_numProcJudicial" type="string" required="false" default=''/>
 		<cfargument name="idAnexos" type="string" required="true">
 		
-    	<cftransaction>
+		<cflock name="salvaPosicControleInterno_#arguments.pc_aval_orientacao_id#" type="exclusive" timeout="10">
+			<cftransaction>
 
-			<cfquery datasource = "#application.dsn_processos#" >
-				DELETE FROM pc_avaliacao_posicionamentos 
-				WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 0
-			</cfquery>
+				<cfquery datasource = "#application.dsn_processos#" >
+					DELETE FROM pc_avaliacao_posicionamentos 
+					WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 0
+				</cfquery>
 
-			<cfquery datasource = "#application.dsn_processos#" name="rsOrgao">
-				SELECT 	pc_orgaos.* FROM pc_orgaos WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
-			</cfquery>
-			<cfif #arguments.pc_aval_orientacao_status# eq 5 OR #arguments.pc_aval_orientacao_status# eq 16>
-				<cfset data="#DateFormat(arguments.pc_aval_orientacao_dataPrevistaResp,'DD-MM-YYYY')#">
-				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
-				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado, pc_aval_posic_numProcJudicial)
+				<cfquery datasource = "#application.dsn_processos#" name="rsOrgao">
+					SELECT 	pc_orgaos.* FROM pc_orgaos WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
+				</cfquery>
 				
-					VALUES (
-						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
-						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
-					)
-					SELECT SCOPE_IDENTITY() AS idPosic;
-				</cfquery>
-
-				<cfquery datasource = "#application.dsn_processos#" >
-					UPDATE 	pc_avaliacao_orientacoes
-					SET 
-						pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-						pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
-						pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
-						pc_aval_orientacao_dataPrevistaResp = <cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
-					    pc_aval_orientacao_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
-					WHERE 
-						pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
-
-				</cfquery>
-
-
-			<cfelse>
-
-				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
-
-				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_enviado, pc_aval_posic_num_orgaoResp, pc_aval_posic_numProcJudicial)
-					VALUES (
-						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
-						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
-					)
-					SELECT SCOPE_IDENTITY() AS idPosic;
-				
-				</cfquery>
-
-				<cfquery datasource = "#application.dsn_processos#" >
-					UPDATE 	pc_avaliacao_orientacoes
-					SET 
-						pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-						pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
-						pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
-						pc_aval_orientacao_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
-					WHERE 
-						pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
-				</cfquery>
-
-
-			</cfif>
-			<!--- Verifica se ainda existem no item orientação com status que não é finalizador--->
-			<cfquery datasource = "#application.dsn_processos#" name="rsItem" >
-				SELECT pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval FROM  pc_avaliacao_orientacoes WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
-			</cfquery>
-			<cfquery datasource = "#application.dsn_processos#" name="rsProcesso" >
-				SELECT pc_avaliacoes.pc_aval_processo FROM pc_avaliacoes where pc_aval_id = #rsItem.pc_aval_orientacao_num_aval#
-			</cfquery>
-
-			<cfquery datasource = "#application.dsn_processos#" name="quantStatusNaoFinalizItem" >
-				SELECT pc_processos.pc_processo_id, pc_avaliacao_orientacoes.pc_aval_orientacao_id
-				FROM    pc_processos LEFT JOIN
-						pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo LEFT JOIN
-						pc_avaliacao_orientacoes ON pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval LEFT JOIN
-						pc_orientacao_status ON pc_avaliacao_orientacoes.pc_aval_orientacao_status = pc_orientacao_status.pc_orientacao_status_id
-				where   pc_orientacao_status_finalizador = 'N' and pc_aval_id = #rsItem.pc_aval_orientacao_num_aval#
-			</cfquery>
-			
-			<cfif quantStatusNaoFinalizItem.recordcount eq 0>
-				<cfquery datasource = "#application.dsn_processos#" >
-					UPDATE 	pc_avaliacoes
-					SET    	pc_aval_status = '7'
-					WHERE 	pc_aval_id = #rsItem.pc_aval_orientacao_num_aval#
-				</cfquery>
-			</cfif>
-
-			<cfquery datasource = "#application.dsn_processos#" name="quantStatusNaoFinalizProcesso" >
-				SELECT pc_processos.pc_processo_id, pc_avaliacao_orientacoes.pc_aval_orientacao_id
-				FROM    pc_processos LEFT JOIN
-						pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo LEFT JOIN
-						pc_avaliacao_orientacoes ON pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval LEFT JOIN
-						pc_orientacao_status ON pc_avaliacao_orientacoes.pc_aval_orientacao_status = pc_orientacao_status.pc_orientacao_status_id
-				where   PC_ORIENTACAO_STATUS_FINALIZADOR = 'N' and pc_processo_id = '#rsProcesso.pc_aval_processo#'
-			</cfquery>
-
-			<cfif quantStatusNaoFinalizProcesso.recordcount eq 0>
-				<cfquery datasource = "#application.dsn_processos#" >
-					UPDATE 	pc_processos
-					SET    	pc_num_status = '5',
-							pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
-					WHERE 	pc_processo_id = '#rsProcesso.pc_aval_processo#'
-				</cfquery>
-			</cfif>
-			
-			<!--Insere nos anexos o ID do posicionamento para exibir os anexos no respectivo posicionamento no timeline -->
-			<cfset idPosicCadastrado = rsCadPosic.idPosic>
-			<cfset idArray = ListToArray(arguments.idAnexos)>
-			<cfif IsArray(#idArray#) AND ArrayLen(#idArray#) gt 0>
-				<cfloop array="#idArray#" index="id">
-					<cfquery datasource = "#application.dsn_processos#" >
-						UPDATE 	pc_anexos set
-								pc_anexo_aval_posic = #idPosicCadastrado#,
-								pc_anexo_enviado = 1
-						where pc_anexo_id = #id# and pc_anexo_aval_posic is null
+				<cfif #arguments.pc_aval_orientacao_status# eq 5 OR #arguments.pc_aval_orientacao_status# eq 16>
+					<cfset data="#DateFormat(arguments.pc_aval_orientacao_dataPrevistaResp,'DD-MM-YYYY')#">
+					<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
+					<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
+						INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado, pc_aval_posic_numProcJudicial)
+					
+						VALUES (
+							<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
+							<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
+							<cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
+						)
+						SELECT SCOPE_IDENTITY() AS idPosic;
 					</cfquery>
-				</cfloop>
-			</cfif>
-		</cftransaction>			
-		
+
+					<cfquery datasource = "#application.dsn_processos#" >
+						UPDATE 	pc_avaliacao_orientacoes
+						SET 
+							pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+							pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
+							pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
+							pc_aval_orientacao_dataPrevistaResp = <cfqueryparam value="#arguments.pc_aval_orientacao_dataPrevistaResp#" cfsqltype="cf_sql_varchar">,
+							pc_aval_orientacao_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
+						WHERE 
+							pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
+
+					</cfquery>
+
+
+				<cfelse>
+
+					<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
+
+					<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
+						INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_enviado, pc_aval_posic_num_orgaoResp, pc_aval_posic_numProcJudicial)
+						VALUES (
+							<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
+							<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
+							<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
+						)
+						SELECT SCOPE_IDENTITY() AS idPosic;
+					
+					</cfquery>
+
+					<cfquery datasource = "#application.dsn_processos#" >
+						UPDATE 	pc_avaliacao_orientacoes
+						SET 
+							pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+							pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
+							pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
+							pc_aval_orientacao_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
+						WHERE 
+							pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
+					</cfquery>
+
+
+				</cfif>
+				<!--- Verifica se ainda existem no item orientação com status que não é finalizador--->
+				<cfquery datasource = "#application.dsn_processos#" name="rsItem" >
+					SELECT pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval FROM  pc_avaliacao_orientacoes WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
+				</cfquery>
+				<cfquery datasource = "#application.dsn_processos#" name="rsProcesso" >
+					SELECT pc_avaliacoes.pc_aval_processo FROM pc_avaliacoes where pc_aval_id = #rsItem.pc_aval_orientacao_num_aval#
+				</cfquery>
+
+				<cfquery datasource = "#application.dsn_processos#" name="quantStatusNaoFinalizItem" >
+					SELECT pc_processos.pc_processo_id, pc_avaliacao_orientacoes.pc_aval_orientacao_id
+					FROM    pc_processos LEFT JOIN
+							pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo LEFT JOIN
+							pc_avaliacao_orientacoes ON pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval LEFT JOIN
+							pc_orientacao_status ON pc_avaliacao_orientacoes.pc_aval_orientacao_status = pc_orientacao_status.pc_orientacao_status_id
+					where   pc_orientacao_status_finalizador = 'N' and pc_aval_id = #rsItem.pc_aval_orientacao_num_aval#
+				</cfquery>
+				
+				<cfif quantStatusNaoFinalizItem.recordcount eq 0>
+					<cfquery datasource = "#application.dsn_processos#" >
+						UPDATE 	pc_avaliacoes
+						SET    	pc_aval_status = '7'
+						WHERE 	pc_aval_id = #rsItem.pc_aval_orientacao_num_aval#
+					</cfquery>
+				</cfif>
+
+				<cfquery datasource = "#application.dsn_processos#" name="quantStatusNaoFinalizProcesso" >
+					SELECT pc_processos.pc_processo_id, pc_avaliacao_orientacoes.pc_aval_orientacao_id
+					FROM    pc_processos LEFT JOIN
+							pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo LEFT JOIN
+							pc_avaliacao_orientacoes ON pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval LEFT JOIN
+							pc_orientacao_status ON pc_avaliacao_orientacoes.pc_aval_orientacao_status = pc_orientacao_status.pc_orientacao_status_id
+					where   PC_ORIENTACAO_STATUS_FINALIZADOR = 'N' and pc_processo_id = '#rsProcesso.pc_aval_processo#'
+				</cfquery>
+
+				<cfif quantStatusNaoFinalizProcesso.recordcount eq 0>
+					<cfquery datasource = "#application.dsn_processos#" >
+						UPDATE 	pc_processos
+						SET    	pc_num_status = '5',
+								pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+						WHERE 	pc_processo_id = '#rsProcesso.pc_aval_processo#'
+					</cfquery>
+				</cfif>
+				
+				<!--Insere nos anexos o ID do posicionamento para exibir os anexos no respectivo posicionamento no timeline -->
+				<cfset idPosicCadastrado = rsCadPosic.idPosic>
+				<cfset idArray = ListToArray(arguments.idAnexos)>
+				<cfif IsArray(#idArray#) AND ArrayLen(#idArray#) gt 0>
+					<cfloop array="#idArray#" index="id">
+						<cfquery datasource = "#application.dsn_processos#" >
+							UPDATE 	pc_anexos set
+									pc_anexo_aval_posic = #idPosicCadastrado#,
+									pc_anexo_enviado = 1
+							where pc_anexo_id = #id# and pc_anexo_aval_posic is null
+						</cfquery>
+					</cfloop>
+				</cfif>
+			</cftransaction>			
+		</cflock>
 
 	</cffunction>
 
@@ -3721,49 +3574,45 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orient
 			SELECT pc_aval_posic_id, pc_aval_posic_enviado FROM pc_avaliacao_posicionamentos 
 			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 0
 		</cfquery>
-		
-    	<cftransaction>
-			<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
+		<cflock name="salvaPosicionamento_#arguments.pc_aval_orientacao_id#" type="exclusive" timeout="10">
+			<cftransaction>
+				<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 
-			<cfif rsPosicNaoEnviada.recordcount eq 0>
-				<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
-					INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_num_orgaoResp, pc_aval_posic_numProcJudicial)
-					VALUES (
-						<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
-						<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_posic_num_orgaoResp#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_aval_posic_numProcJudicial#" cfsqltype="cf_sql_varchar">
-					)
-					SELECT SCOPE_IDENTITY() AS idPosic;
+				<cfif rsPosicNaoEnviada.recordcount eq 0>
+					<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
+						INSERT pc_avaliacao_posicionamentos	(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_dataHora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_status, pc_aval_posic_num_orgaoResp, pc_aval_posic_numProcJudicial)
+						VALUES (
+							<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">,
+							<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#arguments.pc_aval_posic_num_orgaoResp#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#arguments.pc_aval_posic_numProcJudicial#" cfsqltype="cf_sql_varchar">
+						)
+						SELECT SCOPE_IDENTITY() AS idPosic;
+					
+					</cfquery>
+				<cfelse>
+					<cfquery datasource = "#application.dsn_processos#" >
+						UPDATE 	pc_avaliacao_posicionamentos
+						SET 
+							pc_aval_posic_texto = <cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
+							pc_aval_posic_dataHora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+							pc_aval_posic_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+							pc_aval_posic_num_orgao = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+							pc_aval_posic_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
+							pc_aval_posic_num_orgaoResp = <cfqueryparam value="#arguments.pc_aval_posic_num_orgaoResp#" cfsqltype="cf_sql_varchar">,
+							pc_aval_posic_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_posic_numProcJudicial#" cfsqltype="cf_sql_varchar">
+						WHERE 
+							pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
+							and pc_aval_posic_enviado = 0
+					</cfquery>
+				</cfif>
 				
-				</cfquery>
-		
-			<cfelse>
-				<cfquery datasource = "#application.dsn_processos#" >
-					UPDATE 	pc_avaliacao_posicionamentos
-					SET 
-						pc_aval_posic_texto = <cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
-						pc_aval_posic_dataHora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-						pc_aval_posic_matricula = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-						pc_aval_posic_num_orgao = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
-						pc_aval_posic_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
-					    pc_aval_posic_num_orgaoResp = <cfqueryparam value="#arguments.pc_aval_posic_num_orgaoResp#" cfsqltype="cf_sql_varchar">,
-						pc_aval_posic_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_posic_numProcJudicial#" cfsqltype="cf_sql_varchar">
-					WHERE 
-						pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
-						and pc_aval_posic_enviado = 0
-				</cfquery>
-
-				
-
-			</cfif>
-			
-		</cftransaction>			
-		
+			</cftransaction>			
+		</cflock>
 
 	</cffunction>
 

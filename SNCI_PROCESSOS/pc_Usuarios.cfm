@@ -22,6 +22,7 @@
 			flex-direction: column;
 			justify-content: center;
 			position: relative; /* Adiciona posição relativa para posicionar o ícone */
+			border-left: 4px solid var(--azul_claro_correios);
 		}
 
 		.user-card .fa-user {
@@ -31,9 +32,11 @@
 		.user-card:hover .fa-user {
 			transform: scale(1.3);
 		}
+
 		
 		.user-card-desativado {
-			background: #ff6a6a;
+			background-color: #f8d7da;
+			border-left: 4px solid #dc3545;
 		}
 		
 		.user-card-cell {
@@ -86,14 +89,6 @@
 			text-overflow: ellipsis;
 		}
 
-		
-		.user-desativado {
-			color: #fff;
-		}
-		
-
-				
-
 		.user-controles {
 			font-size: 12px;
 			font-weight: bold;
@@ -140,19 +135,18 @@
 
 						<form id="formCadUsuarios" class="row g-3 needs-validation was-validated" novalidate format="html"   name="formCadUsuarios" format="html"  style="height: auto;">
 							<div id="cadastroUsuarios" class="card card-primary collapsed-card" style="margin-left: 8px;">
-								<div  class="card-header" style="background-color: #0083ca;color:#fff;">
+								<div  class="card-header card-header_backgroundColor" style="color:#fff;">
 									<a   class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:16px;" data-card-widget="collapse">
 										<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-										</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um novo Usuário</span>
+										</button></i><span id="cabecalhoAccordion" style="margin-right:100px">Clique aqui para cadastrar um novo Usuário</span>
 									</a>
-									
 								</div>
 								
 								
 								<input id="usuarioEditar" hidden></input>
 								<div id="matriculaCadastradaDiv"></div>
 
-								<div class="card-body" style="border: solid 3px #0083ca">
+								<div class="card-body card_border_correios" >
 									<div class="row" style="font-size:16px">
 
 										<div class="col-sm-2">
@@ -233,17 +227,25 @@
 
 						<!--xxxxxxxxxxxxxxx TABELA XXXXXXXX-->						
 						<div id="tabUsuarios">
-							<div class="card-body" style="border: solid 3px #ffD400;background: #fff;">
+							<div id="accordionCadUsuariosPainel" style="margin-bottom:80px">
+								<div class="card card-success" >
+									<div class="card-header card-header_backgroundColor" >
+										<h4 class="card-title ">
+											<span class="d-block" data-toggle="collapse" href="#collapseTwo" style="color:#fff;font-size:20px;font-weight: bold;"> 
+												<i class="fas fa-file-alt" style="margin-right:10px"> </i>Usuários Cadastrados
+											</span>
+										</h4>
+									</div>
 								
-									<table id="tabUsuariosCad" class="table ">
-										<thead>
-											<tr style="background: none;border:none">
-												<th style="background: none;border:none"></th>
-											</tr>
-										</thead>
-										<tbody class="grid-container" style="min-height:275px"></tbody>
-									</table>
-								
+									<div class="card-body card_border_correios" >
+										
+											<table id="tabUsuariosCad" class="table table-responsive">
+												
+												<tbody class="grid-container" style="min-height:275px"></tbody>
+											</table>
+										
+									</div>
+								</div>
 							</div>
 						</div>
 						<!--xxxxxxxxxxxxxxx FIM TABELA XXXXXXXX-->
@@ -276,23 +278,24 @@
 
 		// Inicializa o DataTable com configurações e dados via AJAX
 		const tabUsuariosCad = $('#tabUsuariosCad').DataTable({
+			destroy: true,
 			ajax: {
 				url: "cfc/pc_cfcPaginasApoio.cfc?method=getUsuariosJSON", // URL para obter dados JSON
 				dataType: "json",
 				dataSrc: "", // Usamos uma string vazia para evitar problemas com objetos aninhados
 			},
-			select: true, // Permitir seleção de linhas
+			stateSave: true, // Salvar o estado da tabela (página, filtros, etc) no localStorage
+			select: false, // Permitir seleção de linhas
 			ordering: false, // Desativar ordenação
 			responsive: true, // Tornar a tabela responsiva
 			lengthChange: true, // Permitir ao usuário alterar o número de itens exibidos por página
 			autoWidth: false, // Desativar ajuste automático da largura das colunas
 			deferRender: true, // Aumentar desempenho para tabelas com muitos registros
 			pageLength:10,
-			//dom: '<"dtsp-verticalContainer"<"dtsp-verticalPanes"P><"dtsp-dataTable"Brfitp>>',
 			dom: 
-								"<'row'<'col-sm-4 dtsp-verticalContainer'<'dtsp-verticalPanes'P><'dtsp-dataTable'Bf>><'col-sm-8 text-left'p>>" +
-								"<'col-sm-12 text-left'i>" +
-								"<'row'<'col-sm-12'tr>>" ,
+				"<'row d-flex align-items-center'<'col-auto dtsp-verticalContainer'P><'col-auto'B><'col-auto'f><'col-auto'p>>" + // Botões, filtros e paginação na mesma linha, alinhados à esquerda
+				"<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
+				"<'row'<'col-12'tr>>",  // Tabela com todos os dados
 			buttons: [
 				{
 					extend: 'excel', // Botão de exportação para Excel
@@ -311,18 +314,7 @@
 				},
 				
 			],
-			language: {
-				searchPanes: {
-					clearMessage: 'Retirar filtro',
-					loadMessage: 'Carregando Painéis de Pesquisa...',
-					showMessage: 'Mostrar painéis',
-					collapseMessage: 'Recolher painéis',
-					title: 'Filtros Ativos - %d',
-					emptyMessage: '<em>Sem dados</em>',
-					emptyPanes: 'Sem painéis de filtragem relevantes para exibição',
-					
-				}
-			},
+			
 			columns: [
 				{
 					// Coluna dos cards
@@ -345,7 +337,7 @@
 				// Renderizar os dados como cards
 				//const cardCell = $(row).find('.user-card-cell');
 				var buttonsHtml = '';	// HTML dos botões de ação
-				if (perfilUsuario === 3) {	// Se o usuário for do perfil 3 (Desenvolvedor)
+				if (perfilUsuario === 3 || perfilUsuario === 11) {	// Se o usuário for do perfil 3 (Desenvolvedor) ou 11 - CI -MASTER ACOMPANHAMENTO
 					buttonsHtml = `
 						 <div class="card-icons">
 						 	<i class="fas fa-user-edit grow-icon edit-button" onclick="usuarioEditar('${data.PC_USU_MATRICULA}', '${data.PC_USU_NOME}', '${data.PC_USU_STATUS}', '${String(data.PC_USU_MCU)}', ${data.PC_USU_TIPO_ID}, this);" data-toggle="tooltip" title="Editar" style="cursor: pointer;z-index:100;font-size:15px;color:${data.PC_USU_STATUS === 'A' ? '#0083ca' : 'user-desativado'}"></i>
@@ -397,8 +389,14 @@
 			},
 			initComplete: function () {// Função executada ao finalizar a inicialização do DataTable
 				initializeSearchPanesAndSidebar(this,'nome ou matrícula')//inicializa o searchPanes dentro do controlSidebar
-			}
-			
+			},
+			language: {
+				url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+			},
+			headerCallback: function(thead, data, start, end, display) {
+				$(thead).remove();  // Remove o cabeçalho da tabela
+			},
+
 		});
 		// Fim da função de inicialização do DataTable
 
@@ -408,7 +406,7 @@
 		function atualizarTabela() {
 			$('#modalOverlay').modal('show');
 			setTimeout(function () {
-				tabUsuariosCad.ajax.reload(); // Recarregar a tabela usando AJAX
+				tabUsuariosCad.ajax.reload(null, false); // Recarregar a tabela usando AJAX sem perder o estado atual
 				$('#modalOverlay').delay(1000).hide(0, function() {
 					toastr.success('Operação realizada com sucesso!');
 					$('#modalOverlay').modal('hide');
@@ -575,53 +573,61 @@
 			$('html, body').animate({ scrollTop: ($('.wrapper').offset().top)-50} , 500);
 		}
 
-		function excluirUsuario(usuarioMatricula){
+		function excluirUsuario(usuarioMatricula) {
 			var mensagem = "Deseja excluir o usuário matrícula: " + usuarioMatricula;
-			swalWithBootstrapButtons.fire({//sweetalert2
-			html: logoSNCIsweetalert2(mensagem),
-			showCancelButton: true,
-			confirmButtonText: 'Sim!',
-			cancelButtonText: 'Cancelar!'
+			swalWithBootstrapButtons.fire({
+				html: logoSNCIsweetalert2(mensagem),
+				showCancelButton: true,
+				confirmButtonText: 'Sim!',
+				cancelButtonText: 'Cancelar!'
 			}).then((result) => {
-				if (result.isConfirmed) {		
+				if (result.isConfirmed) {
 					$('#modalOverlay').modal('show');
-					setTimeout(function() {
-						$.ajax({
-							type: "post",
-							url: "cfc/pc_cfcPaginasApoio.cfc",
-							data:{
-								method:"delUsuario",
-								pc_usu_matricula: usuarioMatricula
-							},
-							async: false,
-							success: function(result) {	
-								//limpa painéis de pesquisa
+					
+					// Chamada assíncrona para evitar travamento de interface
+					$.ajax({
+						type: "post",
+						url: "cfc/pc_cfcPaginasApoio.cfc",
+						data: {
+							method: "delUsuario",
+							pc_usu_matricula: usuarioMatricula
+						},
+						success: function(response) {
+							console.log(response);	
+							if (response=="true") {
 								$('#tabUsuariosCad').DataTable().searchPanes.clearSelections();
-								//atualiza a tabela
 								atualizarTabela();
-							},
-							error: function(xhr, ajaxOptions, thrownError) {
+							} else {
 								$('#modalOverlay').delay(1000).hide(0, function() {
 									$('#modalOverlay').modal('hide');
-								});	
-								$('#modal-danger').modal('show')
-								$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-								$('#modal-danger').find('.modal-body').text(thrownError)				
+										Swal.fire({
+										title: 'Operação Cancelada',
+										html: logoSNCIsweetalert2('O usuário não pode ser excluído porque está vinculado a um ou mais registros no sistema.'),
+										icon: 'info'
+									});	
+								});
 							}
-						})
-					}, 500);
-
-				}else {
-					// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
-					$('#modalOverlay').modal('hide');
-					Swal.fire({
-								title: 'Operação Cancelada',
-								html: logoSNCIsweetalert2(''),
-								icon: 'info'
+						},
+						error: function(xhr, ajaxOptions, thrownError) {
+							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
 							});
+							$('#modal-danger').modal('show')
+								.find('.modal-title').text('Erro na solicitação')
+								.end().find('.modal-body').text(thrownError);
+						}
+					});
+				} else {
+					// Lidar com cancelamento da operação
+					Swal.fire({
+						title: 'Operação Cancelada',
+						html: logoSNCIsweetalert2(''),
+						icon: 'info'
+					});
 				}
-			})
+			});
 		}
+
 
 	
 

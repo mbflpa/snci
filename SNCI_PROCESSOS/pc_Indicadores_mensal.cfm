@@ -91,12 +91,12 @@
 			<div class="container-fluid" >
 
 				<div style="display: flex;align-items: center;">
-					<span style="color:#0083ca;font-size:20px;margin-right:10px">Ano:</span>
+					<span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Ano:</span>
 					<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
 				<div style="display: flex;align-items: center;">
-                    <span style="color:#0083ca;font-size:20px;margin-right:10px">Mês:</span>
+                    <span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Mês:</span>
                     <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
@@ -111,7 +111,7 @@
 					<div id="divTabsIndicadores" style="display:none">
 					    <cfset orgaoAvaliado = application.rsUsuarioParametros.pc_org_orgaoAvaliado>
 						
-						<cfoutput><h5 style="color:##0083ca;">#application.rsUsuarioParametros.pc_org_sigla#: <strong><span id="mesAno"></span></strong></h5></cfoutput>
+						<cfoutput><h5 class="azul_claro_correios_textColor" >#application.rsUsuarioParametros.pc_org_sigla#: <strong><span id="mesAno"></span></strong></h5></cfoutput>
 						<div class="card-header p-0 pt-1" >
 							<ul class="nav nav-pills nav-pills-abasIndicadoresMensal" id="myTabs" role="tablist" style="font-size:14px;">
 								<li class="nav-item " style="text-align: center;">
@@ -158,17 +158,17 @@
 								</div>
 								<cfif orgaoAvaliado eq 1>
 									<div class="tab-pane fade" id="divTabResumoDGCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoDGCIorgaos" style="width:100%;">
-										<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
+										<h5 class="azul_claro_correios_textColor" >DGCI por órgão responsável:</h5>
 										<div id="divTabDGCI"></div>
 									</div>
 								
 									<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
-										<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
+										<h5 class="azul_claro_correios_textColor" >PRCI por órgão responsável:</h5>
 										<div id="divTabPRCI"></div>
 									</div>
 
 									<div class="tab-pane fade" id="divTabResumoSLNCorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoSLNCorgaos" >
-										<h5 style="color:#0083ca;">SLNC por órgão responsável:</h5>
+										<h5 class="azul_claro_correios_textColor" >SLNC por órgão responsável:</h5>
 										<div id="divTabSLNC"></div>
 									</div>
 								</cfif>

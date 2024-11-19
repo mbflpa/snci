@@ -55,8 +55,8 @@
 						
 							<div id="filtroSpan" style="display: none;text-align:right;font-size:18px;position:absolute;top:-54px;right:24px;"><span class="statusOrientacoes" style="background:#008000;color:#fff;">Atenção! Um filtro foi aplicado.</span><br><i class="fa fa-2x fa-hand-point-down" style="color:#008000;position:relative;top:8px;right:117px"></i></div>
 			
-							<table id="tabProcessos" class="table table-bordered table-striped table-hover text-nowrap">
-								<thead style="background: #0083ca;color:#fff">
+							<table id="tabProcessos" class="table table-striped table-hover text-nowrap  table-responsive">
+								<thead  class="table_thead_backgroundColor" >
 									<tr style="font-size:14px">
 									    
 									    <cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11>
@@ -200,13 +200,13 @@
 				const tabOrientacoesAcomp = $('#tabProcessos').DataTable( {
 					stateSave: true,
 					deferRender: true, // Aumentar desempenho para tabelas com muitos registros
-					scrollX: true, // Habilitar rolagem horizontal
+					//scrollX: true, // Habilitar rolagem horizontal
         			autoWidth: true, //largura da tabela de acordo com o conteúdo
 					pageLength: 5,
 					dom: 
-								"<'row'<'col-sm-4 dtsp-verticalContainer'<'dtsp-verticalPanes'P><'dtsp-dataTable'Bf>><'col-sm-8 text-left'p>>" +
-								"<'col-sm-12 text-left'i>" +
-								"<'row'<'col-sm-12'tr>>" ,
+						"<'row d-flex align-items-center'<'col-auto dtsp-verticalContainer'P><'col-auto'B><'col-auto'f><'col-auto'p>>" + // Botões, filtros e paginação na mesma linha, alinhados à esquerda
+						"<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
+						"<'row'<'col-12'tr>>",  // Tabela com todos os dados
 					buttons: [
 						{
 							extend: 'excel',
@@ -219,18 +219,7 @@
 							className: 'btFiltro',
 						},
 					],
-					language: {
-						searchPanes: {
-							clearMessage: 'Retirar filtro',
-							loadMessage: 'Carregando Painéis de Pesquisa...',
-							showMessage: 'Mostrar painéis',
-							collapseMessage: 'Recolher painéis',
-							title: 'Filtros Ativos - %d',
-							emptyMessage: '<em>Sem dados</em>',
-               				emptyPanes: 'Sem painéis de filtragem relevantes para exibição',
-							
-						}
-					},
+					
 					searchPanes: {
 						cascadePanes: true, // Exibir apenas opções que combinam com os filtros anteriores
 						columns: colunasMostrar,// Colunas que terão filtro
@@ -240,6 +229,9 @@
 					},
 					initComplete: function () {// Função executada ao finalizar a inicialização do DataTable
 						initializeSearchPanesAndSidebar(this)//inicializa o searchPanes dentro do controlSidebar
+					},
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
 					}
    
 				})
@@ -310,169 +302,7 @@
 
 			}
 
-			function colocarEmAnalise(idProcesso, idAvaliacao, idOrientacao, orgaoOrigem, orgaoOrigemSigla, orgaoResp, statusOrientacao){
-				<cfoutput>	
-					 var lotacaoUsuario = '#application.rsUsuarioParametros.pc_usu_lotacao#';
-					 var lotacaoUsuarioSigla = '#application.rsUsuarioParametros.pc_org_sigla#';
-				</cfoutput>
-
-				// Dividir a sequência usando a barra (/) como delimitador epegar a última
-				lotacaoUsuarioSigla = lotacaoUsuarioSigla.split("/").pop();
-				orgaoOrigemSigla = orgaoOrigemSigla.split("/").pop();
-
-
-				$('#tabProcessos tr').each(function () {
-					$(this).removeClass('selected');
-				}); 
-				$('#tabProcessos tbody').on('click', 'tr', function () {
-					$(this).addClass('selected');
-				});
-				sessionStorage.setItem('emAnalise',idOrientacao);
-                
-
-				if(orgaoResp==lotacaoUsuario && statusOrientacao==13){
-					if(orgaoOrigem==lotacaoUsuario){
-						var mensagem = '<p style="text-align: justify;">Deseja colocar esta orientação ID <strong style="color:red">' + idOrientacao + '</strong> "EM ANÁLISE" sob responsabilidade da (<strong>'+orgaoOrigemSigla+'</strong>)?</p>';
-					}else{
-						var mensagem = '<p style="text-align: justify;">Deseja colocar esta orientação ID <strong style="color:red">' + idOrientacao + '</strong> "EM ANÁLISE" sob responsabilidade do órgão de origem do processo (<strong>'+orgaoOrigemSigla+'</strong>)?</p>';
-					
-					}
-					Swal.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							
-							$('#modalOverlay').modal('show')
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcConsultasPorOrientacao.cfc",
-									data:{
-										method: "colocarEmAnalise",
-										idProcesso: idProcesso,
-										idAvaliacao: idAvaliacao,
-										idOrientacao: idOrientacao,
-										orgaoOrigem: orgaoOrigem,
-										analiseOrgaoOrigem: 1
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {
-									
-									exibirTabela();
-									$('#infItensOrientacoesDistribuidasDiv').html('')	
-									var mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">'+idOrientacao+'</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla+'</span> com sucesso!<br><br><span style="color:#00416B;font-size:0.8em;"><strong>Atenção:</strong> Como a gerência que analisará esta orientação não é a sua gerência de lotação, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										toastr.success('Operação realizada com sucesso!');
-										$('#modalOverlay').modal('hide');
-									});	
-													
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-									$('#modal-danger').modal('show')
-									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-									$('#modal-danger').find('.modal-body').text(thrownError)
-
-								})//fim fail
-							}, 500);
-
-						} else {
-							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
-							$('#modalOverlay').modal('hide');
-							Swal.fire({
-								title: 'Operação Cancelada',
-								html: logoSNCIsweetalert2(''),
-								icon: 'info'
-							});
-						}
-						
-					})
-				
-				}else{
-					var mensagem = '<p style="text-align: justify;">Deseja colocar esta orientação ID <strong style="color:red">'+idOrientacao+'</strong> "EM ANÁLISE"?</p>';
-					Swal.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					input: 'checkbox',
-					inputValue: 0,
-					inputPlaceholder:
-						'<span class="font-weight-light" style="text-align: justify;font-size:14px">Assinale ao lado, para enviar essa orientação para análise do órgão de origem do processo (<strong>'+orgaoOrigemSigla+'</strong>) ou deixe em branco para encaminhar para análise da <strong>'+lotacaoUsuarioSigla+'</strong>.</span>',
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							var enviaOrgaoOrigem=result.value;
-							$('#modalOverlay').modal('show')
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcConsultasPorOrientacao.cfc",
-									data:{
-										method: "colocarEmAnalise",
-										idProcesso: idProcesso,
-										idAvaliacao: idAvaliacao,
-										idOrientacao: idOrientacao,
-										orgaoOrigem: orgaoOrigem,
-										analiseOrgaoOrigem: enviaOrgaoOrigem
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {
-									
-									exibirTabela();
-									$('#infItensOrientacoesDistribuidasDiv').html('')	
-									var mensagemSucessos ='';
-									if(!enviaOrgaoOrigem){
-										mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">' + idOrientacao + '</span> foi enviada para análise da <span style="color:#00416B">'+lotacaoUsuarioSigla+'</span> com sucesso!</p>';
-									}else{
-										mensagemSucessos = '<br><p class="font-weight-light" style="color:#28a745;text-align: justify;">A Orientação ID <span style="color:#00416B">' + idOrientacao + '</span> foi enviada para análise da <span style="color:#00416B">'+orgaoOrigemSigla +'</span> com sucesso!<br><br><span style="color:#00416B;font-size:0.8em;"><strong>Atenção:</strong> Como a gerência que analisará esta orientação não é a sua gerência de lotação, você não poderá visualizar esta orientação em "Acompanhamento", apenas em "Consulta por Orientação", portanto, orientamos anotar o ID da orientação, informado acima, e realizar uma consulta para verificar se essa rotina realmente foi executada com sucesso.</span></p>';
-									}
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										Swal.fire({
-											title: mensagemSucessos,
-											html: logoSNCIsweetalert2(''),
-											icon: 'success'
-										});
-										$('#modalOverlay').modal('hide');
-										
-									});	
-													
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-									$('#modal-danger').modal('show')
-									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-									$('#modal-danger').find('.modal-body').text(thrownError)
-
-								})//fim fail
-							}, 500);
-
-						} else {
-							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
-							$('#modalOverlay').modal('hide');
-							Swal.fire({
-								title: 'Operação Cancelada',
-								html: logoSNCIsweetalert2(''),
-								icon: 'info'
-							});
-						}
-					
-					})
-				}
-
-				$('#modalOverlay').delay(1000).hide(0, function() {
-					$('#modalOverlay').modal('hide');
-				});
-			}
-
+			
 			
 
 		</script>	
@@ -568,11 +398,11 @@
 					</style>
 						
 					
-					<div class="card card-primary card-tabs"  style="widht:100%">
-						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+					<div class="card card-primary card-tabs card_border_correios"  style="width:100%">
+						<div class="card-header p-0 pt-1 card-header_backgroundColor" >
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
-								<li class="nav-item" style="">
+								<li class="nav-item">
 									<a  class="nav-link  active" id="custom-tabs-one-Orientacao-tab"  data-toggle="pill" href="#custom-tabs-one-Orientacao" role="tab" aria-controls="custom-tabs-one-Orientacao" aria-selected="true">
 									Medida/Orientação ID (<strong><cfoutput>#arguments.idOrientacao#</cfoutput></strong>)</a>
 								</li>
@@ -597,7 +427,7 @@
 							</ul>
 							
 						</div>
-						<div class="card-body">
+						<div class="card-body ">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 								<div disable class="tab-pane fade  active show " id="custom-tabs-one-Orientacao"  role="tabpanel" aria-labelledby="custom-tabs-one-Orientacao-tab" >	
 									<div id="infoOrientacaoDiv" ></div>
@@ -891,6 +721,7 @@
 			or pc_org_mcu_subord_tec in (SELECT pc_orgaos.pc_org_mcu FROM pc_orgaos WHERE pc_org_mcu_subord_tec = '#application.rsUsuarioParametros.pc_usu_lotacao#')))
 		</cfquery>
 		
+		
 		<div class="row" >
 			<div class="col-12">
 				<div class="card"  >
@@ -901,8 +732,9 @@
 						<cfif #rsMelhoriasPendentes.recordcount# eq 0 >
 							<h5 align="center">Nenhuma Proposta de Melhoria Distribuída pelo órgão <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>, com status PENDENTE, foi localizada.</h5>
 						<cfelse>
-							<table id="tabMelhoriasPendentes" class="table table-bordered table-striped table-hover text-nowrap">
-								<thead style="background: #0083ca;color:#fff">
+
+							<table id="tabMelhoriasPendentes" class="display table table-striped table-hover text-nowrap table-responsive">
+								<thead  class="table_thead_backgroundColor" >
 									<tr style="font-size:14px">
 									    <th id="colunaStatusProposta">Status:</th>
 										<th >ID:</th>
@@ -937,6 +769,7 @@
 								
 							
 							</table>
+					
 						</cfif>
 					</div>
 					<!-- /.card-body -->
@@ -991,6 +824,13 @@
 						[5,10, 25, 50, -1],
 						[5,10, 25, 50, 'Todos'],
 					],
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+					},
+					dom: 
+						"<'row d-flex align-items-center'<'col-auto'f><'col-auto'p>>" + // Botões, filtros e paginação na mesma linha, alinhados à esquerda
+						"<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
+						"<'row'<'col-12'tr>>",  // Tabela com todos os dados
 					
 				});
 
@@ -1332,8 +1172,8 @@
 					</style>
 						
 					
-					<div class="card card-primary card-tabs"  style="widht:100%">
-						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+					<div class="card card-primary card-tabs card_border_correios"  style="width:100%">
+						<div class="card-header card-header_backgroundColor">
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
 								<li class="nav-item" style="">
@@ -1359,7 +1199,7 @@
 							</ul>
 							
 						</div>
-						<div class="card-body">
+						<div class="card-body ">
 							<div class="tab-content" id="custom-tabs-one-tabContent">
 								<div disable class="tab-pane fade  active show" id="custom-tabs-one-Melhoria"  role="tabpanel" aria-labelledby="custom-tabs-one-Melhoria-tab" >														
 									<div class="col-md-12">
@@ -1646,14 +1486,14 @@
 
 
 		</cfquery>		
-				<div id="accordionCadItemPainel" style="margin-top:0px;hright:100vh">
+				<div id="accordionCadItemPainel" style="margin-top:60px;hright:100vh">
 					
-					<div class="card card-success" style="margin-bottom:10px">
-						<div class="card-header" style="background-color:#0083CA;">
+					<div class="card card-success card_border_correios" style="margin-bottom:10px">
+						<div class="card-header card-header_backgroundColor" >
 							<h4 class="card-title ">
-								<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:#fff;font-weight: bold;"> 
+								<span class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:16px;color:#fff;font-weight: bold;"> 
 									<i class="fas fa-user-pen" style="margin-top:4px;font-size: 20px;"></i><span style="margin-left:5px">INSERIR MANIFESTAÇÃO DO ÓRGÃO: <cfoutput>#application.rsUsuarioParametros.pc_org_sigla#</cfoutput></span>
-								</a>
+								</span>
 							</h4>
 						</div>	
 					
@@ -1677,7 +1517,7 @@
 							<div class="col-md-12">
 								<div >
 									
-									<div class="card-body">
+									<div class="card-body ">
 										<div id="actions" class="row" >
 											<div class="col-lg-12" align="left">
 												<div class="btn-group w-30">
@@ -1727,7 +1567,7 @@
 						<!--FIM ANEXOS-->
 						
 
-						<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px;border-top:1px solid #ced4da;padding:20px">
+						<div style="justify-content:center; display: flex; width: 100%;margin-bottom:50px;padding:20px">
 							<div class="form-group" style="margin-right:150px;">
 								<button id="btSalvar" class="btn btn-block btn-primary " style="background-color: #28a745;"> <i class="fas fa-floppy-disk" style="margin-right:5px"></i>Salvar manifestação p/ envio posterior</button>
 							</div>
@@ -1753,7 +1593,10 @@
 						"responsive": true, 
 						"lengthChange": false, 
 						"autoWidth": false,
-						"searching": false
+						"searching": false,
+						language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 					})
 				}	
 			});

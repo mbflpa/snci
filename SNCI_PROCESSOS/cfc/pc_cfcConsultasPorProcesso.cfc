@@ -38,7 +38,7 @@
 			</head>
 			<body>
 
-				<div class="card-body" style="border: solid 3px #ffD400;width:100%">
+				<div class="card-body" >
 				    <div id="filtroSpan" style="display: none;text-align:right;font-size:18px;position:absolute;top:0px;right:24px;"><span class="statusOrientacoes" style="background:#008000;color:#fff;">Atenção! Um filtro foi aplicado.</span><br><i class="fa fa-2x fa-hand-point-down" style="color:#008000;position:relative;top:8px;right:117px"></i></div>
 			
 					<div class="row" style="justify-content: space-around;">
@@ -78,17 +78,22 @@
 									<cfelse>
 											AND pc_num_status in(5)
 									</cfif>
-									<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
-									<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-										AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-									</cfif>
-									<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-									<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-										AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-									</cfif>
-									<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
-									<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-										AND pc_num_orgao_origem IN('00436698','00436697','00438080') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+									<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
+									<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
+										AND pc_processo_id IS NOT NULL 
+									<cfelse>
+										<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
+										<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+											AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+										</cfif>
+										<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
+										<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+											AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
+										</cfif>
+										<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' - o órgão de origem será sempre GCOP--->
+										<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+											AND pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)
+										</cfif>
 									</cfif>
 								<cfelse>
 							        <!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento, caso contrário, mostra processos finalizados--->
@@ -300,7 +305,10 @@
 						"lengthMenu": [
 							[10, 25, 50, -1],
 							[10, 25, 50, 'All'],
-						]
+						],
+						language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 					})
 						
 				});
@@ -416,7 +424,7 @@
 				// }
 
 				function bloquearProcesso(numProcesso, siglaOrgaoAvaliado){
-					var mensagem = "Deseja <strong style='color:green'>BLOQUEAR</strong> o processo <strong style='color:green'>" + numProcesso + "</strong> do órgão avaliado <strong style='color:green'>" + siglaOrgaoAvaliado + "</strong>?<br><div style='background-color:#dc3545;color:#fff;text-align:justify;border-radius:0.8rem;padding:15px;'><span style='display: block;font-weight: bold;font-size: 20px;text-align: center;'>ATENÇÃO!</span>Este Processo, todos os seu Itens, Medidas/Orientações para regularização e Propostas de Melhoria receberão o status 'BLOQUEADO' e só poderão ser visualizados pelos órgãos do Controle Interno.</div>"
+					var mensagem = "Deseja <strong >BLOQUEAR</strong> o processo <strong >" + numProcesso + "</strong> do órgão avaliado <strong >" + siglaOrgaoAvaliado + "</strong>?<br><div style='background-color:#dc3545;color:#fff;text-align:justify;border-radius:0.8rem;padding:15px;'><span style='display: block;font-weight: bold;font-size: 20px;text-align: center;'>ATENÇÃO!</span>Este Processo, todos os seu Itens, Medidas/Orientações para regularização e Propostas de Melhoria receberão o status 'BLOQUEADO' e só poderão ser visualizados pelos órgãos do Controle Interno.</div>"
 					swalWithBootstrapButtons.fire({//sweetalert2
 					html: logoSNCIsweetalert2(mensagem),
 					showCancelButton: true,
@@ -457,7 +465,7 @@
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
 							Swal.fire({
-								title: 'Bloqueio <span style="color:red">cancelado</span> pelo usuário.',
+								title: 'Bloqueio <span style="color:var(--amarelo_prisma_claro_correios)">cancelado</span> pelo usuário.',
 								html: logoSNCIsweetalert2(''),
 								icon: 'info'
 							});
@@ -468,7 +476,7 @@
 				}
 
 				function desbloquearProcesso(numProcesso, siglaOrgaoAvaliado){
-					var mensagem = "Deseja <strong style='color:green'>DESBLOQUEAR</strong> o processo <strong style='color:green'>" + numProcesso + "</strong> do órgão avaliado <strong style='color:green'>" + siglaOrgaoAvaliado + "</strong>?<div style='background-color:#dc3545;color:#fff;text-align:justify;border-radius: 0.8rem;padding-right:15px;'><ol style:'list-style-type: decimal'><span style='display: block;font-weight: bold;font-size: 20px;text-align: center;margin-left:-34px'>ATENÇÃO!</span><li>Esse Processo e seus Itens receberão o status 'ACOMPANHAMENTO';</li><li> Suas Medidas/Orientações para regularização receberão o status 'NÃO RESPONDIDO' e serão disponibilizadas aos respectivos órgãos responsáveis;</li><li>Suas Propostas de Melhoria receberão o status 'PENDENTE' e serão disponibilizadas aos respectivos órgãos responsáveis.</li></div>"
+					var mensagem = "Deseja <strong >DESBLOQUEAR</strong> o processo <strong >" + numProcesso + "</strong> do órgão avaliado <strong >" + siglaOrgaoAvaliado + "</strong>?<div style='background-color:#dc3545;color:#fff;text-align:justify;border-radius: 0.8rem;padding-right:15px;'><ol style:'list-style-type: decimal'><span style='display: block;font-weight: bold;font-size: 20px;text-align: center;margin-left:-34px'>ATENÇÃO!</span><li>Esse Processo e seus Itens receberão o status 'ACOMPANHAMENTO';</li><li> Suas Medidas/Orientações para regularização receberão o status 'NÃO RESPONDIDO' e serão disponibilizadas aos respectivos órgãos responsáveis;</li><li>Suas Propostas de Melhoria receberão o status 'PENDENTE' e serão disponibilizadas aos respectivos órgãos responsáveis.</li></div>"
 					swalWithBootstrapButtons.fire({//sweetalert2
 					html: logoSNCIsweetalert2(mensagem),
 					showCancelButton: true,
@@ -509,7 +517,7 @@
 							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
 							$('#modalOverlay').modal('hide');
 							Swal.fire({
-								title: 'Desbloqueio <span style="color:red">cancelado</span> pelo usuário.',
+								title: 'Desbloqueio <span style="color:var(--amarelo_prisma_claro_correios)">cancelado</span> pelo usuário.',
 								html: logoSNCIsweetalert2(''),
 								icon: 'info'
 							});
@@ -569,17 +577,22 @@
 				<cfelse>
 						AND pc_num_status in(5)
 				</cfif>
-				<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
-				<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-					AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-				</cfif>
-				<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-				<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-					AND pc_avaliador_matricula = '#application.rsUsuarioParametros.pc_usu_matricula#'	or pc_usu_matricula_coordenador = '#application.rsUsuarioParametros.pc_usu_matricula#' or pc_usu_matricula_coordenador_nacional = '#application.rsUsuarioParametros.pc_usu_matricula#'
-				</cfif>
-				<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' ou 14 -'CI - REGIONAL - SCIA - Acompanhamento' - o órgão de origem será sempre GCOP--->
-				<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-					AND pc_num_orgao_origem IN('00436698','00436697','00438080') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+				<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
+				<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
+					AND pc_processo_id IS NOT NULL 
+				<cfelse>
+					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
+					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+						AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+					</cfif>
+					<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
+					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+						AND pc_avaliador_matricula = '#application.rsUsuarioParametros.pc_usu_matricula#'	or pc_usu_matricula_coordenador = '#application.rsUsuarioParametros.pc_usu_matricula#' or pc_usu_matricula_coordenador_nacional = '#application.rsUsuarioParametros.pc_usu_matricula#'
+					</cfif>
+					<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1)' ou 14 -'CI - REGIONAL - SCIA - Acompanhamento' - o órgão de origem será sempre GCOP--->
+					<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+						AND pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)
+					</cfif>
 				</cfif>
 			<cfelse>
 			    <!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento, caso contrário, mostra processos finalizados--->
@@ -624,8 +637,8 @@
 								<h5 align="center">Nenhum processo para acompanhamento foi localizado para <cfoutput>#application.rsUsuarioParametros.pc_org_sigla# e perfil: #application.rsUsuarioParametros.pc_perfil_tipo_descricao#</cfoutput>.</h5>
 							</cfif>
 							<cfif #rsProcTab.recordcount# neq 0 >
-								<table id="tabProcessos" class="table table-bordered table-striped table-hover text-nowrap">
-									<thead style="background: #0083ca;color:#fff">
+								<table id="tabProcessos" class="table table-striped table-hover text-nowrap  table-responsive">
+									<thead  class="table_thead_backgroundColor">
 										<tr style="font-size:14px">
 											
 											<th>N°Processo SNCI:</th>
@@ -748,7 +761,7 @@
 			}
 			$('#tabProcessos').DataTable( {
 				stateSave: true,
-				scrollX: true, // Habilitar rolagem horizontal
+				//scrollX: true, // Habilitar rolagem horizontal
 				autoWidth: false,
 				lengthMenu: [
 						[5,10, 25, 50, -1],
@@ -760,6 +773,9 @@
 						title : tituloExcel + d,
 						className: 'btExcel',
 					},],
+				language: {
+					url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+				}
 				
 
 				}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
@@ -943,8 +959,8 @@
 					</style>
 						
 					
-					<div class="card card-primary card-tabs"  style="widht:100%">
-						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+					<div class="card card-primary card-tabs card_border_correios2"  style="width:100%">
+						<div class="card-header p-0 pt-1 card-header_navbar_backgroundColor" >
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
 							    <li class="nav-item  ">
@@ -1290,9 +1306,13 @@
 						
 					</style>
 						
-					
-					<div class="card card-primary card-tabs"  style="width:100%">
-						<div class="card-header p-0 pt-1" style="background-color: #0083CA;">
+					<div class="card-header azul_claro_correios_backgroundColorcard-header_navbar_backgroundColor" style="border-bottom:solid 2px #fff;margin-bottom:5px" >
+						<cfoutput>
+							<p style="font-size: 1.3em;color:##fff" class="text-limita2linhas"><strong>#rsProcAval.pc_aval_numeracao# - #rsProcAval.pc_aval_descricao#</strong></p>
+						</cfoutput>	
+					</div>
+					<div class="card card-primary card-tabs card_border_correios2"  style="width:100%">
+						<div class="card-header p-0 pt-1 card-header_navbar_backgroundColor" >
 							
 							<ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist" style="font-size:14px;">
 								<li class="nav-item  ">
@@ -1577,9 +1597,9 @@
 							<!-- /.card-header -->
 							<div class="card-body">
 							    <cfif #rsOrientacoes.recordcount# neq 0>
-									<h6 style="color:#0083ca">Clique em uma linha para visualizar a Medida/Orientação para regularização e o Histórico das Manifestações:</h6>
-									<table id="tabOrientacoes" class="table table-bordered table-striped table-hover text-nowrap">
-										<thead style="background: #0083ca;color:#fff">
+									<h6 class="azul_claro_correios_textColor">Clique em uma linha para visualizar a Medida/Orientação para regularização e o Histórico das Manifestações:</h6>
+									<table id="tabOrientacoes" class="table table-striped table-hover text-nowrap  table-responsive">
+										<thead  class="table_thead_backgroundColor">
 											<tr align="center"  style="font-size:14px">
 												<th>ID</th>
 												<th>Status</th>
@@ -1672,7 +1692,10 @@
 					searching:false,
 					filter: false,
 					info: false,
-					paging: false
+					paging: false,
+					language: {
+							url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+						}
 				})
 
 				select: {
@@ -1857,13 +1880,13 @@
 			<body>
 
 				<div class="row">
-					<div class="col-5">
+					<div class="col-6">
 						<div class="card">
 							<!-- /.card-header -->
 							<div class="card-body">
-							   <h5  style="color: #0083ca;">Clique em uma linha para mais informações:</h5>
-								<table id="tabMelhorias" class="table table-bordered  table-hover ">
-									<thead style="background: #0083ca;color:#fff">
+							   <h5 class="azul_claro_correios_textColor" >Clique em uma linha para mais informações:</h5>
+								<table id="tabMelhorias" class="table  table-hover ">
+									<thead  class="table_thead_backgroundColor">
 										<tr align="center" style="font-size:14px">
 										
 											<th hidden></th>
@@ -1973,20 +1996,24 @@
 							</div>
 
 							<!-- /.card-body -->
-							<cfif application.rsOrgaoSubordinados.recordcount eq 0>	
-								<h6 style="color:#ff0080;padding:10px;line-height:1.7;">Obs.: A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
-								Caso o status seja 'PENDENTE', o órgão responsável necessita selecionar um status (Aceita / Troca / Recusa), em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".</h6>
-							<cfelse>
-								<h6 style="color:#ff0080;padding:10px;line-height:1.7;">Obs.: A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
-								Caso o status seja 'PENDENTE', o órgão responsável, se for um órgão subordinador, necessita selecionar a aba "Propostas de Melhoria" em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span> e
-								selecionar umas das abas: "Responder" (e selecionar um status: Aceita / Troca / Recusa) ou "Distribuir". Caso o órgão responsável não seja um órgão subordinador, o mesmo necessita selecionar um status (Aceita / Troca / Recusa), em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".</h6>
-								
-								</h6>
-							</cfif>
+							<div class="alert alert-warning d-inline-flex  align-items-center" style="margin-right: 20px;margin-left:20px">
+								<cfif application.rsOrgaoSubordinados.recordcount eq 0>	
+									<p style="line-height:1.7;font-size:1.1em">A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
+										Caso o status seja 'PENDENTE', o órgão responsável necessita selecionar um status (Aceita / Troca / Recusa), em 
+										<span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".
+									</p>
+								<cfelse>
+									<p style="line-height:1.7;font-size:1.1em">A implementação das propostas de melhoria não são acompanhadas pelo SNCI.
+										Caso o status seja 'PENDENTE', o órgão responsável, se for um órgão subordinador, necessita selecionar a aba "Propostas de Melhoria" em 
+										<span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span> e
+										selecionar umas das abas: "Responder" (e selecionar um status: Aceita / Troca / Recusa) ou "Distribuir". Caso o órgão responsável não seja um órgão subordinador, o mesmo necessita selecionar um status (Aceita / Troca / Recusa), em <span class="statusOrientacoes" style="color:#fff;background-color:#0e406a;padding:3px;font-size:1em;margin-right:10px;"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>, aba "Propostas de Melhoria".</p>
+									</p>
+								</cfif>
+							</div>
 						</div>
 						<!-- /.card -->
 					</div>
-					<div id = "detalhesDiv" class="col-7" hidden>
+					<div id = "detalhesDiv" class="col-6" hidden>
 						<div class="col-sm-12">
 							<div class="form-group" style="margin-bottom:0.2rem">	
 								<label id="labelMelhoria" for="pcMelhoria"></label>
@@ -2062,7 +2089,10 @@
 							searching:false,
 							filter: false,
 							info: false,
-							paging: false
+							paging: false,
+							language: {
+								url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+							}
 						})
 
 						select: {
@@ -2192,10 +2222,10 @@
 		<section class="content" style="padding:10px">
 			<div class="container-fluid">
 				<div id="accordionCadItemPainel col-sm-12" style="margin-bottom:30px" >
-					<div class="card card-success" >
-						<div class="card-header" style="background-color: #ffD400;">
+					<div class="card card-success card_border_correios" >
+						<div class="card-header card-header_backgroundColor">
 							<h4 class="card-title ">
-								<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#00416b;font-weight: bold;"> 
+								<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#fff;font-weight: bold;"> 
 									<i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title">Informações do Processo</span>
 								</a>
 							</h4>
@@ -2222,11 +2252,11 @@
 		<section class="content" id="itensContent">
 			<div class="container-fluid">
 				<div class="col-12" style="margin-bottom:30px;">
-					<div class="card">
+					<div class="card card-success card_border_correios" >
 						<!-- /.card-header -->
-						<div class="card-header" style="background-color:#ffD400;">
+						<div class="card-header card-header_backgroundColor" >
 							<h4 class="card-title ">
-								<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:20px;color:#00416b;font-weight: bold;"> 
+								<a class="d-block" data-toggle="collapse" href="#collapseOne" style="font-size:20px;color:#fff;font-weight: bold;"> 
 									<i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title">Itens</span>
 								</a>
 							</h4>
@@ -2234,9 +2264,9 @@
 						<div class="card-body">
 							<h6 style="color:#0083ca">Clique em um dos itens abaixo para mais informações:</h6>
 							<table id="tabAvalConsulta" class="table table-bordered table-striped table-hover text-nowrap" style="margin-bottom:50px">
-								<thead style="background: #0083ca;color:#fff">
+								<thead class="table_thead_backgroundColor">
 									<tr style="font-size:14px">
-										<th align="center">Item N°:</th>
+										<th style="width:30px">Item N°:</th>
 										<th>Situação Encontrada </th>
 										<th>Classificação: </th>
 										
@@ -2276,10 +2306,10 @@
 							</table>
 
 							<div id="mostraInfoAvalDiv"  style="margin-top:30px; "></div>
-							<div id="infoOrientacaoCardDiv" class="card" hidden>
-								<div class="card-header" style="background-color:#ececec;">
+							<div id="infoOrientacaoCardDiv" class="card card-success card_border_correios" hidden>
+								<div class="card-header card-header_navbar_backgroundColor" >
 									<h4 class="card-title ">
-										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:gray;font-weight: bold;"> 
+										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#fff;font-weight: bold;"> 
 											<i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title">Informações da Medida/Orientação para regularização</span>
 										</a>
 									</h4>
@@ -2633,35 +2663,39 @@
 			</cfif>
 			<!--Se o tipo de demanda for "P" (Plano Anual de Controle Interno - PACIN), usa o texto abaixo-->
 			<cfif #rsProcesso.pc_tipo_demanda# eq "P">
-				<cfset textoEmail = '<p>Em cumprimento ao Plano Anual de Controle Interno – PACIN #anoPacin#, que consolida o planejamento das ações a serem realizadas pelo Departamento de Controle Interno – DCINT, encaminhamos o Relatório - SEI e seus respectivos anexos, referentes à avaliação de controles no processo "#tipoAvaliacao#", para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>
-									<p>Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.<br><br>O plano de ação deverá apresentar providências focadas nas "Situações Encontradas" registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III.</p>
-									<p>O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>
-									<p>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
-									<p>As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
+				<cfset textoEmail = '<p style="text-align: justify;">Em cumprimento ao Plano Anual de Controle Interno – PACIN #anoPacin#, que consolida o planejamento das ações a serem realizadas pelo Departamento de Controle Interno – DCINT, encaminhamos o Relatório - SEI e seus respectivos anexos, referentes à avaliação de controles no processo "#tipoAvaliacao#", para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>
+									<p style="text-align: justify;">Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.<br><br>O plano de ação deverá apresentar providências focadas nas "Situações Encontradas" registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III.</p>
+									<p style="text-align: justify;">O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>
+									<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
+									<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
 										<ul>
-											<li>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
-											<li>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
-											<li>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
+											<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
+											<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
+											<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
 										</ul>
-									<p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
-									<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>'>
+									<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+									<p style="text-align:center;">
+										<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+									</p>'>
 			
 			<cfelse>
 
-				<cfset textoEmail = '<p>A par de cumprimentá-lo, informa-se que o Departamento de Controle Interno (DCINT), no cumprimento de suas atribuições, realiza avaliações de controles extraordinárias, de acordo com as normas internas.</p> 
-									<p>Nesse sentido, em consonância com o MANORG, Módulo 04, Capítulo 08, subitem 4.10, foi realizada avaliação de controle interno no processo "#tipoAvaliacao#". </p> 
-									<p>Após a finalização dos trabalhos, encaminha-se o Relatório de Avaliação de Controles Internos e seus respectivos anexos, referentes a essa avaliação de controles, para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>  
-									<p>Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA” apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.</p>   
-									<p>O plano de ação deverá apresentar providências focadas nas “Situações Encontradas registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III. O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>  
-									<p>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
-									<p>As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
+				<cfset textoEmail = '<p style="text-align: justify;">A par de cumprimentá-lo, informa-se que o Departamento de Controle Interno (DCINT), no cumprimento de suas atribuições, realiza avaliações de controles extraordinárias, de acordo com as normas internas.</p> 
+									<p style="text-align: justify;">Nesse sentido, em consonância com o MANORG, Módulo 04, Capítulo 08, subitem 4.10, foi realizada avaliação de controle interno no processo "#tipoAvaliacao#". </p> 
+									<p style="text-align: justify;">Após a finalização dos trabalhos, encaminha-se o Relatório de Avaliação de Controles Internos e seus respectivos anexos, referentes a essa avaliação de controles, para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>  
+									<p style="text-align: justify;">Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA” apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.</p>   
+									<p style="text-align: justify;">O plano de ação deverá apresentar providências focadas nas “Situações Encontradas registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III. O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>  
+									<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
+									<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
 										<ul>
-											<li>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li> <br>  
-											<li>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li>   <br>  
-											<li>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li> 
+											<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li> <br>  
+											<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li>   <br>  
+											<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li> 
 										</ul>
-									<p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
-									<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>'>
+									<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+									<p style="text-align:center;">
+										<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+									</p>'>
 
 			</cfif>
 

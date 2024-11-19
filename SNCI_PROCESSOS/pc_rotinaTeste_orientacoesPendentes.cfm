@@ -22,6 +22,12 @@
     WHERE pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate()
 </cfquery>
 
+<cfquery name="verificarExecucao" datasource="#application.dsn_processos#">
+    SELECT pc_rotina_ultima_execucao 
+    FROM pc_rotinas_execucao_emails_log 
+    WHERE pc_rotina_nome = <cfqueryparam value="rotinaSemanal" cfsqltype="cf_sql_varchar">
+</cfquery>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -30,88 +36,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <style>
-        
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: rgba(0,0,0,.05);
-        }
-
-        .text-nowrap {
-            white-space: nowrap !important;
-        }
-        .table-bordered {
-            border: 1px solid #dee2e6;
-        }
-       
-      
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
-        table {
-            width: 100%;
-            margin-bottom: 1rem;
-            color: #212529;
-            background-color: transparent;
-            display: table;
-            border-collapse: separate;
-            box-sizing: border-box;
-            text-indent: initial;
-            border-spacing: 2px;
-            border-color: gray;
-        }
-        .card-body {
-            text-align: justify!important;
-        }
-        .card {
-            position: relative;
-            display: -ms-flexbox;
-            display: flex;
-            -ms-flex-direction: column;
-            flex-direction: column;
-            min-width: 0;
-            word-wrap: break-word;
-            background-color: #fff;
-            background-clip: border-box;
-            border: 0 solid rgba(0, 0, 0, 0.125);
-            border-radius: 0.25rem;
-        }
-        .card {
-            position: relative;
-            display: -ms-flexbox;
-            display: flex;
-            -ms-flex-direction: column;
-            flex-direction: column;
-            min-width: 0;
-            word-wrap: break-word;
-            background-color: #fff;
-            background-clip: border-box;
-            border: 0 solid rgba(0, 0, 0, 0.125);
-            border-radius: 0.25rem;
-        }
-        body {
-           
-            font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            font-size: 0.8rem;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #212529;
-            text-align: left;
-            background-color: #fff;
-        }
-        th {
-            text-align: center;
-            padding-left: 0.75rem;
-            padding-right: 0.75rem;
-
-        }
-        tr {
-           text-align: center;
-        }
-
-
-       
-    </style>
 </head>
 <body class="layout-footer-fixed hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
 
@@ -127,14 +51,27 @@
             <section class="content-header">
 
                 <div class="container-fluid" style="margin-bottom:80px;">
-                    <div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
-                        <div class="col-sm-6">
+                    <div class="row mb-2" style="margin-bottom:0px!important;">
+                        <div class="col-sm-12" >
                             <h4>Rotina de Verificação de Orientações Pendentes</h4>
+                            
+                                <div class="alert d-inline-flex align-items-center" style="background-color: #d52e44;border-color:#973450;color:#fff">
+                                    <i class="fas fa-calendar-minus " style="font-size: 3rem;margin-right:20px"></i>
+                                    <div>
+                                        <cfset ultima_execucao = '#DateFormat(verificarExecucao.pc_rotina_ultima_execucao, "dd/mm/yyyy")# às #TimeFormat(verificarExecucao.pc_rotina_ultima_execucao, "HH:mm")#'>
+                                        <cfif verificarExecucao.recordcount eq 0>
+                                            <h5 class="mb-1">Última execução automática: <b>ainda não executada</b> (executada semanalmente)</h5>
+                                        <cfelse>
+                                            <h5 class="mb-1">Última execução automática: <b><cfoutput>#ultima_execucao#</cfoutput></b> (executada semanalmente)</h5>
+                                        </cfif>
+                                        <small>Obs.: Esta rotina é executada automaticamente sempre que um usuário do perfil CI - MASTER ACOMPANHAMENTO (Gestor Nível 4) entra no sistema.</small>
+                                    </div>
+                                </div>
                         </div>
                     </div>
-                    <h6 style="margin-top:30px">SERVIDOR: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#application.auxsite#</cfoutput></span></h6>
-                    <h6 style="margin-top:30px">Quant. Órgãos com Orientações Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentes.recordcount,"00")#</cfoutput></span></h6>
-                    <h6>Total de Orientações Pendentes: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#rsOrientacoesPendentes.recordcount#</cfoutput></span></h6>
+                    <h6 style="margin-top:30px">SERVIDOR: <span class="azul_claro_correios_backgroundColor" style="color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#application.auxsite#</cfoutput></span></h6>
+                    <h6 style="margin-top:30px">Quant. Órgãos com Orientações Pendentes: <span style="color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentes.recordcount,"00")#</cfoutput></span></h6>
+                    <h6>Total de Orientações Pendentes: <span class="azul_claro_correios_backgroundColor" style="color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#rsOrientacoesPendentes.recordcount#</cfoutput></span></h6>
 
                     <cfset quantPendentes = 0>
                     <cfif rsOrgaosComOrientacoesPendentesParaTeste.recordcount gt 0>
@@ -142,7 +79,7 @@
                             <cfset myQuery = "rsOrgaosComOrientacoesPendentes">
                         <cfelse>
                             <cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
-                            <h6>Quant. Órgãos com Orientações pendentes para envio de e-mail: <span style="background: #0083ca;color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
+                            <h6>Quant. Órgãos com Orientações pendentes para envio de e-mail: <span class="azul_claro_correios_backgroundColor" style="color:#fff;padding-left:4px;padding-right:4px;border-radius: 5px;"><cfoutput>#NumberFormat(rsOrgaosComOrientacoesPendentesParaTeste.recordcount,"00")#</cfoutput></span></h6>
 
                         </cfif>
                         <div style="margin-bottom:30px;justify-content:center; display: flex; width: 100%;margin-top:20px">

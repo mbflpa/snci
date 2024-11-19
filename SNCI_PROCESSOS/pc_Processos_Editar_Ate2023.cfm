@@ -91,7 +91,7 @@
 			<div class="content-header" style="background:  #f4f6f9;">
 			
 				<div class="container-fluid">
-				   	<div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
+				   	<div class="row mb-2" style="margin-bottom:0px!important;">
 						<div class="col-sm-6">
 							<h4>Editar Processos</h4>
 						</div>
@@ -101,7 +101,7 @@
 				
 					<div class="card-body" style="display:flex;flex-direction:column">
 							<div style="display: flex;align-items: center;margin-bottom:10px">
-								<span style="color:#0083ca;font-size:20px;margin-right:10px">Ano:</span>
+								<span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Ano:</span>
 								<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 							</div>
 						<form hidden class="row g-3 "   id="myForm" name="myForm" format="html"  style="height: auto;">
@@ -110,7 +110,7 @@
 							<!--acordion-->
 							<div id="accordion" >
 								<div id="cadastro" class="card card-primary collapsed-card" style="margin-left:8px">
-									<div  class="card-header" style="background-color: #0083ca;color:#fff;">
+									<div  class="card-header card-header_backgroundColor" style="color:#fff;">
 										<a   class="d-block" data-toggle="collapse" href="#collapseOne"  data-card-widget="collapse">
 											<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
 											</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um novo Processo</span>
@@ -120,7 +120,7 @@
 									
 									<input id="pcProcessoId" hidden>
 
-									<div class="card-body" style="border: solid 3px #0083ca">
+									<div class="card-body card_border_correios" >
 										<div class="row" >
 
 											<div class="col-sm-3">

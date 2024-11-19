@@ -83,7 +83,7 @@
 							<cfset mes = month(now())>
 							<cfset mes = monthAsString(mes)>
 							<cfset ano = year(now())>
-							<cfoutput><h5 style="color:##0083ca;">Resultado dos Indicadores do órgão #application.rsUsuarioParametros.pc_org_sigla#: <strong>#mes#/#ano#</strong></h5></cfoutput>
+							<cfoutput><h5 class="azul_claro_correios_textColor" >Resultado dos Indicadores do órgão #application.rsUsuarioParametros.pc_org_sigla#: <strong>#mes#/#ano#</strong></h5></cfoutput>
 						
 						
 						</div>
@@ -139,18 +139,18 @@
 									</div>
 								</div>
 								<cfif orgaoAvaliado eq 1>
-									<div class="tab-pane fade" id="divTabResumoDGCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoDGCIorgaos" style="width:100%;">
-										<h5 style="color:#0083ca;">DGCI por órgão responsável:</h5>
+									<div class="tab-pane fade" id="divTabResumoDGCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoDGCIorgaos" >
+										<h5 class="azul_claro_correios_textColor" >DGCI por órgão responsável:</h5>
 										<div id="divTabResumoDGCIorgaos"></div>
 									</div>
 								</cfif>
 								<cfif orgaoAvaliado eq 1>
 									<div class="tab-pane fade" id="divTabResumoPRCIorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoPRCIorgaos" >
-										<h5 style="color:#0083ca;">PRCI por órgão responsável:</h5>
+										<h5 class="azul_claro_correios_textColor" >PRCI por órgão responsável:</h5>
 										<div id="divTabResumoPRCIorgaos"></div>
 									</div>
 									<div class="tab-pane fade" id="divTabResumoSLNCorgaosContent" role="tabpanel" aria-labelledby="tabTabResumoSLNCorgaos" >
-										<h5 style="color:#0083ca;">SLNC por órgão responsável:</h5>
+										<h5 class="azul_claro_correios_textColor" >SLNC por órgão responsável:</h5>
 										<div id="divTabResumoSLNCorgaos"></div>
 									</div>
 								</cfif>
@@ -185,10 +185,10 @@
 
 			// Obtém o ano atual
 			const currentYear = new Date().getFullYear();
-//const currentYear = 2023;
+			//const currentYear = 2023;
 			// Obtém o mês atual
 			const currentMonth = new Date().getMonth() + 1;
-//const currentMonth = 12;
+			//const currentMonth = 12;
 			$('#modalOverlay').modal('show')
 			setTimeout(function() {	
 				

@@ -17,6 +17,12 @@
     order by pc_aval_orientacao_dataPrevistaResp desc
 </cfquery>
 
+<cfquery name="verificarExecucao" datasource="#application.dsn_processos#">
+    SELECT pc_rotina_ultima_execucao  
+    FROM pc_rotinas_execucao_emails_log 
+    WHERE pc_rotina_nome = <cfqueryparam value="rotinaDiaria" cfsqltype="cf_sql_varchar">
+</cfquery>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -49,9 +55,21 @@
             <section class="content-header">
                 <div class="container-fluid">
 
-                    <div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
-                        <div class="col-sm-6">
+                    <div class="row mb-2" style="margin-bottom:0px!important;">
+                        <div class="col-sm-12">
                             <h4>Rotina de Verificação das Orientações Suspensas Vencidas</h4>
+                            <cfset ultima_execucao = '#DateFormat(verificarExecucao.pc_rotina_ultima_execucao, "dd/mm/yyyy")# às #TimeFormat(verificarExecucao.pc_rotina_ultima_execucao, "HH:mm")#'>
+                            <div class="alert d-inline-flex align-items-center" style="background-color: #d52e44;border-color:#973450;color:#fff">
+                                <i class="fas fa-calendar-alt" style="font-size: 3rem;margin-right:20px"></i>
+                                <div>
+                                    <cfif verificarExecucao.recordcount eq 0>
+                                        <h5>Última execução automática: <b>ainda não executada</b> (executada diariamente)</h5>
+                                    <cfelse>
+                                        <h5>Última execução automática: <b><cfoutput>#ultima_execucao#</cfoutput></b> (executada diariamente)</h5>
+                                    </cfif>
+                                    <small>Obs.: Esta rotina é executada automaticamente sempre que um usuário do perfil CI - MASTER ACOMPANHAMENTO (Gestor Nível 4) entra no sistema.</small>
+                                </div>
+                            </div>                      
                         </div>
                     </div>
 
@@ -59,7 +77,7 @@
                     <cfoutput>
                         <li>Quantidade de Orientações Suspensas: <b>#rsOrientacaoSuspensa.recordcount#</b></li>
                         <!--table das orientações suspensas vencidas-->
-                        <table class="table table-bordered table-striped dataTable" id="tabelaOrientacaoSuspensaVencido" role="grid" aria-describedby="tabelaOrientacaoSuspensaVencido_info">
+                        <table class="table table-striped dataTable" id="tabelaOrientacaoSuspensaVencido" role="grid" aria-describedby="tabelaOrientacaoSuspensaVencido_info">
                             <thead>
                                 <tr role="row">
                                     <th class="sorting" tabindex="0" aria-controls="tabelaOrientacaoSuspensaVencido" rowspan="1" colspan="1" aria-label="Processo: Ordenar colunas de forma ascendente" style="width: 100px;">Processo</th>
@@ -80,7 +98,7 @@
                         <br>
                         <li>Quantidade de Orientações Suspensas Vencidas: <b>#rsOrientacaoSuspensaPrazoVencido.recordcount#</b></li>
                         <!--table das orientações suspensas vencidas-->
-                        <table class="table table-bordered table-striped dataTable" id="tabelaOrientacaoSuspensaVencido" role="grid" aria-describedby="tabelaOrientacaoSuspensaVencido_info">
+                        <table class="table table-striped dataTable" id="tabelaOrientacaoSuspensaVencido" role="grid" aria-describedby="tabelaOrientacaoSuspensaVencido_info">
                             <thead>
                                 <tr role="row">
                                     <th class="sorting" tabindex="0" aria-controls="tabelaOrientacaoSuspensaVencido" rowspan="1" colspan="1" aria-label="Processo: Ordenar colunas de forma ascendente" style="width: 100px;">Processo</th>
@@ -165,7 +183,7 @@
                                 type: "post",
                                 url: "cfc/pc_cfcPaginasApoio.cfc",
                                 data:{
-                                    method: "rotinaDiariaOrientacoesSuspensasTeste",
+                                    method: "rotinaDiariaOrientacoesSuspensas",
                                 },
                                 async: false,
                                 success: function(result) {

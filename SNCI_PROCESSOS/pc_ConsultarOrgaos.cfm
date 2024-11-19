@@ -44,7 +44,7 @@
             <!-- Content Header (Page header) -->
             <section class="content-header">
                 <div class="container-fluid">
-                    <div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
+                    <div class="row mb-2" style="margin-bottom:0px!important;">
                         <div class="col-sm-6">
                             <h4>Consultar Órgãos</h4>
                         </div>

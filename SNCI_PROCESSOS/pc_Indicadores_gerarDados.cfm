@@ -65,12 +65,12 @@
 			<div class="container-fluid">
 
 				<div style="display: flex;align-items: center;">
-					<span style="color:#0083ca;font-size:20px;margin-right:10px">Ano:</span>
+					<span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Ano:</span>
 					<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
 				<div style="display: flex;align-items: center;">
-                    <span style="color:#0083ca;font-size:20px;margin-right:10px">Mês:</span>
+                    <span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Mês:</span>
                     <div id="opcoesMes" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
 
@@ -196,9 +196,11 @@
 				let mes = parseInt($('input[name=mes]:checked').val());
 				//se existeDados for true, pergunta se deseja gerar novamente, caso contrário, gera os dados
 				if(existeDados > 0){
-					var mensagem = 'Já existem dados gerados para <strong style="color:#2581c8">' + monthNames[mes - 1] + '/' + ano + '</strong>. Deseja gerar novamente?<br><br><span style="color:red"><strong>Atenção:</strong> Ao clicar em "Sim", os dados gerados anteriormente serão substituídos.</span>';
+					var mensagem = 'Já existem dados gerados para ' + monthNames[mes - 1] + '/' + ano + '. Deseja gerar novamente?<br><br><span >Atenção: Ao clicar em "Sim", os dados gerados anteriormente serão substituídos.</span>';
 					Swal.fire({
 						title: mensagem,
+						html: logoSNCIsweetalert2(''),
+						icon: 'info',
 						showDenyButton: true,
 						confirmButtonText: `Sim`,
 						denyButtonText: `Não`,
@@ -251,7 +253,11 @@
 						} else{
 							
 								$('#modalOverlay').modal('hide');
-								Swal.fire('Operação cancelada', '', 'info')
+								Swal.fire({
+									title: 'Operação Cancelada',
+									html: logoSNCIsweetalert2(''),
+									icon: 'info'
+								});
 								$('#opcoesMes').find('label').removeClass('active');
 						}
 						
@@ -260,7 +266,13 @@
 					$('#modalOverlay').delay(1000).hide(0, function() {
 						$('#modalOverlay').modal('hide');
 						$('#opcoesMes').find('label').removeClass('active');
-						Swal.fire('Não foram encontrados todos os pesos dos indicadores para <strong>' +ano + '</strong>. Cadastre na tabela os pesos dos respectivos indicadores conforme o ano selecionado e tente novamente!', '', 'info')
+						//Swal.fire('Não foram encontrados todos os pesos dos indicadores para ' +ano + '. Cadastre na tabela os pesos dos respectivos indicadores conforme o ano selecionado e tente novamente!', '', 'info')
+					   let mens='Não foram encontrados todos os pesos dos indicadores para ' +ano + '. Cadastre na tabela os pesos dos respectivos indicadores conforme o ano selecionado e tente novamente!';
+						Swal.fire({
+									title: 'A solicitação não pode ser executada.',
+									html: logoSNCIsweetalert2(mens),
+									icon: 'info'
+								});
 					});
 				}else{
 					var mensagem = 'Deseja gerar os dados para ' + monthNames[mes - 1] + '/' + ano + '?';
@@ -293,7 +305,7 @@
 										obterDados();
 										$('#modalOverlay').modal('hide');
 										if(quantDados == 0){
-											Swal.fire('Não foram encontrados dados para <strong>' + monthNames[mes - 1] + '/' + ano + '</strong> que possam ser utilizados nos cálculos dos indicadores!', '', 'info')
+											Swal.fire('Não foram encontrados dados para ' + monthNames[mes - 1] + '/' + ano + ' que possam ser utilizados nos cálculos dos indicadores!', '', 'info')
 										}else{
 											Swal.fire('Dados gerados com sucesso!', '', 'success')
 										}
@@ -316,7 +328,11 @@
 						} else if (result.isDenied) {
 							
 							$('#modalOverlay').modal('hide');
-							Swal.fire('Operação cancelada', '', 'info')
+							Swal.fire({
+								title: 'Operação Cancelada',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
 								
 						}
 					})

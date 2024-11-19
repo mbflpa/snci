@@ -19,22 +19,27 @@
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
 				LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
-	WHERE pc_num_status IN (4,6) 	
-	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
-		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-			AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-		</cfif>
-		<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
-		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-			AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-		</cfif>
-		<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1) - Execução' ou 14 - 'CI - REGIONAL - SCIA - Acompanhamento', com origem na GCOP---> --->
-		<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-			and pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+	WHERE pc_num_status IN (4,6)	
+	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>	   	
+		<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
+		<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
+			AND pc_processo_id IS NOT NULL 
+		<cfelse>
+			<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
+			<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+				AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+			</cfif>
+			<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'AVALIADOR') --->
+			<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+				AND pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
+			</cfif>
+			<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1) - Execução' ou 14 - 'CI - REGIONAL - SCIA - Acompanhamento', com origem na GCOP---> --->
+			<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+				and pc_num_orgao_origem IN('00436698') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+			</cfif>
 		</cfif>
 	<cfelse>
-	    AND NOT pc_num_status IN (6) 
+		AND NOT pc_num_status IN (6)	
 		<!---Se o perfil não for 13 - 'CONSULTA' (AUDIT e RISCO)--->
 		<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
 			AND (
@@ -109,12 +114,12 @@
 		<section class="content-header">
 			<div class="container-fluid">
 						
-				<div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
+				<div class="row mb-2" style="margin-bottom:0px!important;">
 					<div class="col-sm-12">
 						<div style="display: flex; align-items: center;">
 							<h4 style="margin-right: 10px;">Consulta por Processo (Em Acompanhamento)</h4>
-							<i id="info-icon" class="fas fa-circle-info " style="color: #0083ca;cursor: pointer;font-size: 17px;position: relative;bottom: 13px;" 
-							title="Consulta por Processo (Em Acompanhamento)" data-toggle="popover" data-trigger="hover" 
+							<i id="info-icon" class="fas fa-circle-info azul_claro_correios_textColor" style="cursor: pointer;font-size: 17px;position: relative;bottom: 13px;" 
+							title="Consulta por Processo (Em Acompanhamento)" 
 							data-placement="right" data-content="Nessa tela é possível consultar Processos avaliados pelo Controle Interno em que exista ao menos um Item/Orientação com acompanhamento que ainda não foi finalizado."></i>
 						</div>
 					</div>
@@ -135,19 +140,19 @@
 				<div class="card-body" >
 					<form id="formAcomp" name="formAcomp" format="html"  style="height: auto;">
 						<div style="display: flex;align-items: center;margin-bottom:10px">
-							<span style="color:#0083ca;font-size:20px;margin-right:10px">Ano:</span>
+							<span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Ano:</span>
 							<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 						</div>
 
 						
 						<!--acordion-->
-						<div id="accordionCadItemPainel" >
-							<div class="card card-success" >
-								<div class="card-header" style="background-color: #ffD400;">
+						<div id="accordionCadItemPainel" style="margin-bottom:80px">
+							<div class="card card-success card_border_correios" >
+								<div class="card-header card-header_backgroundColor">
 									<h4 class="card-title ">
-										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="font-size:20px;color:#00416b;font-weight: bold;"> 
+										<span class="d-block" data-toggle="collapse" href="#collapseTwo" style="color:#fff;font-size:20px;font-weight: bold;"> 
 											<i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title">Selecione um Processo</span>
-										</a>
+										</span>
 									</h4>
 								</div>
 																
@@ -173,12 +178,12 @@
 
 	<script language="JavaScript">
 		//inicializa o popover (bloquear/desbloquear processo)
-		$(function () {
-			$('[data-toggle="popover"]').popover()
-		})	
-		$('.popover-dismiss').popover({
-			trigger: 'hover'
-		})
+		// $(function () {
+		// 	$('[data-toggle="popover"]').popover()
+		// })	
+		// $('.popover-dismiss').popover({
+		// 	trigger: 'hover'
+		// })
 		$(document).ready(function () {
 			$("#modalOverlay").modal("show");
 			// Ajustar a altura do elemento ".content-wrapper" para se estender até o final do timeline
@@ -225,7 +230,7 @@
 			let radioValue = $("input[name='opcaoAno']:checked").val();
 
 			// Atualizar o título do card com o valor selecionado inicialmente
-			$("#texto_card-title").html(`Selecione um Processo <span style="font-size:14px;color:gray!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
+			$("#texto_card-title").html(`Selecione um Processo <span style="font-size:14px;color:#fff!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
 
 			// Esconder o overlay após 1 segundo
 			// $("#modalOverlay").delay(1000).hide(0, function () {
@@ -269,7 +274,7 @@
 				$("#modalOverlay").delay(1000).hide(0, function () {
 					$("#modalOverlay").modal("hide");
 				});
-				$("#texto_card-title").html(`Selecione um Processo <span style="font-size:14px;color:gray!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
+				$("#texto_card-title").html(`Selecione um Processo <span style="font-size:14px;color:#fff!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
 			});
 
 			// Lidar com o clique do botão de exibir tabela/cards

@@ -14,75 +14,96 @@
 
 		</head>
 		<body>
-					<div class="card-body" style="border: solid 3px #ffD400;">
-							<cfquery name="rsPerfisCards" datasource="#application.dsn_processos#">
-								SELECT pc_perfil_tipos.* from pc_perfil_tipos 
-							</cfquery>	
+			<div class="card-body" style="border: solid 3px #ffD400;">
+					<cfquery name="rsPerfisCards" datasource="#application.dsn_processos#">
+						SELECT pc_perfil_tipos.* from pc_perfil_tipos 
+					</cfquery>	
+					
+					<table id="tabPerfisCards" class="table  " style="background: none;border:none;width:100%">
+						
+						<thead  class="table_thead_backgroundColor" >
+							<tr style="background: none;border:none">
+								<th style="background: none;border:none"></th>
+							</tr>
+						</thead>
+						
+						<tbody class="grid-container" >
+														<cfloop query="rsPerfisCards">
+								<tr style="width:270px; border:none">
+									<td style="background: none; border:none">
+										<cfquery name="rsQuantUsuariosPorPerfil" datasource="#application.dsn_processos#">
+											SELECT pc_usu_perfil 
+											FROM pc_usuarios 
+											INNER JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
+											WHERE pc_usu_perfil = #pc_perfil_tipo_id# AND pc_usu_status = 'A'
+										</cfquery>
 							
-							<table id="tabPerfisCards" class="table  " style="background: none;border:none;width:100%">
-								
-								<thead >
-									<tr style="background: none;border:none">
-										<th style="background: none;border:none"></th>
-									</tr>
-								</thead>
-								
-								<tbody class="grid-container" >
-									<cfloop query="rsPerfisCards" >
-									
-										<tr style="width:270px;border:none">
-
-											<td style="background: none;border:none">
-
-												<cfquery name="rsQuantUsuariosPorPerfil" datasource="#application.dsn_processos#">
-													SELECT pc_usuarios.pc_usu_perfil from pc_usuarios 
-													INNER JOIN pc_orgaos on pc_org_mcu = pc_usu_lotacao
-													where pc_usu_perfil = #pc_perfil_tipo_id# and pc_usu_status = 'A'
-												</cfquery>
-
-												<section class="content" >
-													<div id="cartaoPerfil" style="width:270px;border:none" >
-														<!-- small card -->
-														<div class="small-box " style="font-weight: normal;background: <cfif '#pc_perfil_tipo_status#' eq 'A'>#0083CA<cfelse>gray</cfif>;color: #fff;font-weight: normal;">
-															
-															<div class="card-header" style="height:130px;width:250px;border-bottom:none; font-weight: normal!important">
-																<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3>
-																	<p style="font-size:14px;margin-bottom: 0.3rem!important;"><strong><cfoutput>#pc_perfil_tipo_descricao#</strong> (id:#pc_perfil_tipo_id#)</cfoutput></p>
-																<cfelse>
-																	<p style="font-size:14px;margin-bottom: 0.3rem!important;"><strong><cfoutput>#pc_perfil_tipo_descricao#</strong></cfoutput></p>
-																</cfif>
-																<cfif '#pc_perfil_tipo_status#' neq 'A'>
-																	<div align="center">
-																		<p style="font-size:12px;margin-bottom: 0!important;"><strong>DESATIVADO</strong></p>
-																	</div>
-																</cfif>
-																<div style="font-size:12px;margin-bottom: 0!important;text-align: justify;margin-right: -18px;"><cfoutput>#pc_perfil_tipo_comentario#</cfoutput></div>
-																
-																
-																
+										<section class="content">
+											<div id="cartaoPerfil" style="width:270px; border:none">
+												<div class="small-box" style="font-weight: normal; background: <cfif '#pc_perfil_tipo_status#' eq 'A'>#0083CA<cfelse>gray</cfif>; color: #fff;">
+													<div class="card-header" style="height:130px; width:250px; border-bottom:none; font-weight: normal!important">
+														<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 3>
+															<p style="font-size:12px; margin-bottom: 0.2rem!important;">
+																<strong><cfoutput>#pc_perfil_tipo_descricao#</strong> (id:#pc_perfil_tipo_id#)</cfoutput>
+															</p>
+														<cfelse>
+															<p style="font-size:12px; margin-bottom: 0.2rem!important;">
+																<strong><cfoutput>#pc_perfil_tipo_descricao#</strong></cfoutput>
+															</p>
+														</cfif>
+														<cfif '#pc_perfil_tipo_status#' neq 'A'>
+															<div align="center">
+																<p style="font-size:12px; margin-bottom: 0!important;"><strong>DESATIVADO</strong></p>
 															</div>
-															<div class="icon">
-																<i class="fas fa-users" style="opacity:0.6;left:100px;top:30px;font-size:70px"></i>
-															</div>
-
-															<a href="##"  target="_self" class="small-box-footer"   >
-																<div style="display:flex;justify-content: space-around;" >
-																	<input id="pcNumProcessoCard" name="pcNumProcessoCard" type="text" hidden >
-																	<i id="btEdit" class="fas fa-edit efeito-grow"    style="cursor: pointer;z-index:100;font-size:16px" onclick="javascript:perfilEditar(<cfoutput>#pc_perfil_tipo_id#, '#pc_perfil_tipo_descricao#' ,'#pc_perfil_tipo_comentario#','#pc_perfil_tipo_status#'</cfoutput>)" data-toggle="tooltip"  tilte="Editar"></i>
-																	<i id="btUsuarios" class="fas fa-users efeito-grow"    style="cursor: pointer;z-index:100;font-size:16px" onclick="javascript:mostraTabUsuariosPerfis(<cfoutput>#pc_perfil_tipo_id#</cfoutput>);" data-toggle="tooltip"  tilte="Usuarios"> = <cfoutput>#rsQuantUsuariosPorPerfil.recordcount#</cfoutput></i>
-															
-																</div>
-															</a>
+														</cfif>
+														<div style="
+															font-size:12px; 
+															margin-bottom: 0!important; 
+															text-align: justify; 
+															margin-right: -18px; 
+															overflow: hidden; 
+															display: -webkit-box; 
+															-webkit-line-clamp: 3; 
+															-webkit-box-orient: vertical;">
+															<cfoutput>#pc_perfil_tipo_comentario#</cfoutput>
 														</div>
 													</div>
-												</section>
+													<div class="icon">
+														<i class="fas fa-users" style="opacity:0.6; left:100px; top:30px; font-size:70px"></i>
+													</div>
+							
+													<a href="##" target="_self" class="small-box-footer">
+														<div style="display:flex; justify-content: space-around;">
+															<input id="pcNumProcessoCard" name="pcNumProcessoCard" type="text" hidden>
+															<cfoutput>
+																<i  id="btEdit" 
+																	class="fas fa-edit efeito-grow edit-perfil" 
+																	style="cursor: pointer; z-index:100; font-size:16px"
+																	data-id='#pc_perfil_tipo_id#'
+																	data-descricao='#pc_perfil_tipo_descricao#'
+																	data-comentario='#pc_perfil_tipo_comentario#'
+																	data-status='#pc_perfil_tipo_status#'
+																	data-toggle='tooltip' 
+																	title='Editar'>
+																</i>
 
-											</td>
-										</tr>
-									</cfloop>
-								</tbody>
-							</table>
-					</div>
+																<i id="btUsuarios" class="fas fa-users efeito-grow" style="cursor: pointer; z-index:100; font-size:16px"
+																	onclick="javascript:mostraTabUsuariosPerfis(<cfoutput>#pc_perfil_tipo_id#</cfoutput>);" 
+																	data-toggle="tooltip" title="Usuarios"> 
+																	= #rsQuantUsuariosPorPerfil.recordcount#
+																</i>
+															</cfoutput>
+														</div>
+													</a>
+												</div>
+											</div>
+										</section>
+									</td>
+								</tr>
+							</cfloop>
+						</tbody>
+					</table>
+			</div>
 		</body>
 
 				<script language="JavaScript">
@@ -102,9 +123,27 @@
 							"lengthMenu": [
 								[10, 25, 50, -1],
 								[10, 25, 50, 'All'],
-							]
+							],
+							language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
 						})
 							
+					});
+
+					$(document).ready(function() {
+						// Captura o clique em todos os elementos com a classe 'edit-perfil'
+						$(".edit-perfil").on("click", function(event) {
+							event.preventDefault();
+							event.stopPropagation();
+
+							// Obtém os dados dos atributos data-*
+							const perfilId = $(this).data('id');
+							const perfilDescricao = $(this).data('descricao');
+							const perfilComentario = $(this).data('comentario');
+							const perfilStatus = $(this).data('status');
+
+							// Chama a função perfilEditar com os dados obtidos
+							perfilEditar(perfilId, perfilDescricao, perfilComentario, perfilStatus);
+						});
 					});
 
 					function mostraTabUsuariosPerfis(perfilId){
@@ -152,15 +191,6 @@
 	</cffunction>
 
 
-
-
-
-
-
-
-
-
-
 	<cffunction name="cadPerfil"   access="remote"  returntype="any" hint="cadastra/edita as propostas de melhoria">
 		<cfargument name="pc_perfil_tipo_id" type="string" required="false"/>
 		<cfargument name="pc_perfil_tipo_descricao" type="string" required="true"/>
@@ -183,14 +213,6 @@
 		</cfquery>
 		
   	</cffunction>
-
-
-
-
-
-
-
-
 
 
 	<cffunction name="tabUsuariosPerfis" returntype="any" access="remote" hint="Criar a tabela de usuarios por perfil e envia para a páginas pc_Perfis">
@@ -218,9 +240,9 @@
 							<div class="card">
 								<!-- /.card-header -->
 								<div class="card-body">
-									<h5 style="color:#0083ca">Usuários Cadastrados com o Perfil: <strong><cfoutput>#rsPerfilSelecionado.pc_perfil_tipo_descricao#</cfoutput> </strong></h5>
-									<table id="tabUsuariosPerfis" class="table table-bordered table-striped table-hover text-nowrap ">
-										<thead style="background: #0083ca;color:#fff">
+									<h5 class="azul_claro_correios_textColor" >Usuários Cadastrados com o Perfil: <strong><cfoutput>#rsPerfilSelecionado.pc_perfil_tipo_descricao#</cfoutput> </strong></h5>
+									<table id="tabUsuariosPerfis" class="table table-striped table-hover text-nowrap  table-responsive ">
+										<thead  class="table_thead_backgroundColor">
 											<tr style="font-size:14px">
 												<th>Matrícula:</th>
 												<th>Nome:</th>
@@ -270,6 +292,7 @@
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
 						className: 'btExcel',
 					},],
+					language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
 				}).buttons().container().appendTo('#tabUsuariosPerfis_wrapper .col-md-6:eq(0)');
 					
 			});
@@ -282,11 +305,6 @@
 	
 
 	</cffunction>
-
-
-
-
-
 
 
 	<cffunction name="cadUsuario"   access="remote"  returntype="any" hint="cadastra/edita usuarios">
@@ -328,23 +346,44 @@
   	</cffunction>
 
 
-
-
-
-
-
-	<cffunction name="delUsuario"   access="remote"  returntype="any" hint="exclui usuários. Disponível apenas para perfil desenvolvedores">
+	<cffunction name="delUsuario" access="remote"  returntype="any" returnformat="json" hint="Exclui usuários. Disponível apenas para perfil desenvolvedores">
 		
 		<cfargument name="pc_usu_matricula" type="string" required="true"/>
-
-		<cfquery datasource="#application.dsn_processos#" >
-			DELETE FROM pc_usuarios
-			WHERE pc_usu_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+		
+		<!--- Verifica se o usuário existe nas tabelas relacionadas --->
+		<cfquery name="checkUserDependencies" datasource="#application.dsn_processos#">
+			SELECT 
+				(SELECT COUNT(*) FROM pc_processos WHERE pc_usu_matricula_cadastro = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar"> or pc_usu_matricula_coordenador = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar"> or pc_usu_matricula_coordenador_nacional = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">) AS processo_count,
+				(SELECT COUNT(*) FROM pc_avaliacoes WHERE pc_aval_avaliador_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">) AS avaliacao_count,
+				(SELECT COUNT(*) FROM pc_avaliadores WHERE pc_avaliador_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">) AS avaliador_count,
+				(SELECT COUNT(*) FROM pc_avaliacao_posicionamentos WHERE pc_aval_posic_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">) AS posicionamento_count,
+				(SELECT COUNT(*) FROM pc_avaliacao_distribuicoes WHERE pc_aval_dist_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">) AS distribuicao_count,
+				(SELECT COUNT(*) FROM pc_indicadores_dados WHERE pc_indDados_matriculaGeracao = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">) AS indicador_count
 		</cfquery>
 		
-  	</cffunction>
+		<!--- Verifica se o usuário tem dependências nas tabelas relacionadas --->
+		<cfif checkUserDependencies.processo_count GT 0 OR 
+			checkUserDependencies.avaliacao_count GT 0 OR 
+			checkUserDependencies.avaliador_count GT 0 OR 
+			checkUserDependencies.posicionamento_count GT 0 OR
+			checkUserDependencies.distribuicao_count GT 0 OR
+			checkUserDependencies.indicador_count GT 0>
+			
+			<!--- Se existir dependências, retorna mensagem de erro --->
+			<cfset exclusao = false>	
+		<cfelse>
+			<!--- Se não existir dependências, realiza a exclusão --->
+			<cfquery datasource="#application.dsn_processos#">
+				DELETE FROM pc_usuarios
+				WHERE pc_usu_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+			</cfquery>
 
-	
+			<!--- Retorna mensagem de sucesso --->
+			<cfset exclusao = true>
+		</cfif>
+		<cfreturn serializeJSON(exclusao)>
+	</cffunction>
+
 	<cffunction name="getUsuariosJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfquery name="rsCadUsuarios" datasource="#application.dsn_processos#">
 			SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
@@ -373,10 +412,6 @@
 	</cffunction>
 
 
-
-
-
-
 	<cffunction name="verificaMatricula"   access="remote"  hint="verifica se matrícula já existe no cadastro de usuários">
 
 		<cfargument name="pc_usu_matricula" type="string" required="true"/>
@@ -394,10 +429,6 @@
 		</div>
 		
 	</cffunction>
-
-
-
-
 
 
     <cffunction name="cardsLinks"   access="remote" hint="enviar os cards dos Controle para a páginas pc_Pefis">
@@ -421,7 +452,7 @@
 						</cfquery>	
 						
 						<table id="tabControleCards" class="table  " style="background: none;border:none;width:100%">
-							<thead >
+							<thead  class="table_thead_backgroundColor" >
 								<tr style="background: none;border:none">
 									<th style="background: none;border:none"></th>
 								</tr>
@@ -437,7 +468,7 @@
 											<section class="content" >
 												<div id="cartaoPerfil" style="width:270px;border:none" >
 													<!-- small card -->
-													<div class="small-box " style="font-weight: normal;background:#0083CA;color: #fff;font-weight: normal;">
+													<div class="small-box azul_claro_correios_backgroundColor" style="font-weight: normal;color: #fff;font-weight: normal;">
 														<cfset grupo= ''>
 														<cfset subgrupo= ''>
 														<cfif #pc_controle_acesso_grupoMenu# neq ''>
@@ -467,7 +498,7 @@
 																onclick="javascript:controleExcluir(<cfoutput>#pc_controle_acesso_id#</cfoutput>)" data-toggle="tooltip"  tilte="Excluir"></i>
 																
 																<i id="btEdit" class="fas fa-edit efeito-grow"    style="cursor: pointer;z-index:100;font-size:16px;color:#fff" 
-																onclick="javascript:controleEditar(<cfoutput>#pc_controle_acesso_id#,'#pc_controle_acesso_nomeMenu#','#pc_controle_acesso_pagina#','#pc_controle_acesso_perfis#','#pc_controle_acesso_grupoMenu#','#pc_controle_acesso_subgrupoMenu#','#pc_controle_acesso_grupo_icone#','#pc_controle_acesso_subgrupo_icone#','#pc_controle_acesso_menu_icone#','#pc_controle_acesso_ordem#'</cfoutput>)" data-toggle="tooltip"  tilte="Editar"></i>
+																onclick="javascript:controleEditar(<cfoutput>#pc_controle_acesso_id#,'#pc_controle_acesso_nomeMenu#','#pc_controle_acesso_pagina#','#pc_controle_acesso_perfis#','#pc_controle_acesso_grupoMenu#','#pc_controle_acesso_subgrupoMenu#','#pc_controle_acesso_grupo_icone#','#pc_controle_acesso_subgrupo_icone#','#pc_controle_acesso_menu_icone#','#pc_controle_acesso_ordem#','#pc_controle_acesso_rapido_nome#'</cfoutput>)" data-toggle="tooltip"  tilte="Editar"></i>
 																
 															</div>
 														</a>
@@ -500,7 +531,8 @@
 						"lengthMenu": [
 							[10, 25, 50, -1],
 							[10, 25, 50, 'All'],
-						]
+						],
+						language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
 						
 					})
 
@@ -517,9 +549,6 @@
 	</cffunction>
 
 
-
-
-
 	<cffunction name="cadLink"   access="remote"  returntype="any" hint="cadastra/edita links do menu">
 		<cfargument name="pc_controle_acesso_id" type="string" required="false"/>
 
@@ -534,12 +563,15 @@
 		<cfargument name="pc_controle_acesso_subgrupo_icone" type="string" required="false"  default=''/>
 		<cfargument name="pc_controle_acesso_menu_icone" type="string" required="false"  default=''/>
 		<cfargument name="pc_controle_acesso_ordem" type="numeric" required="false"  default=1/>
+		<cfargument name="pc_controle_acesso_rapido_nome" type="string" required="true"/>
+
+		
 
 		<cfquery datasource="#application.dsn_processos#" >
 			<cfif #arguments.pc_controle_acesso_id# eq ''>
 				INSERT pc_controle_acesso (pc_controle_acesso_nomeMenu,pc_controle_acesso_pagina,pc_controle_acesso_perfis,pc_controle_acesso_grupoMenu
 				        ,pc_controle_acesso_subgrupoMenu,pc_controle_acesso_grupo_icone,pc_controle_acesso_subgrupo_icone
-						,pc_controle_acesso_menu_icone,pc_controle_acesso_ordem)
+						,pc_controle_acesso_menu_icone,pc_controle_acesso_ordem,pc_controle_acesso_rapido_nome)
 				VALUES (
 						<cfqueryparam value="#arguments.pc_controle_acesso_nomeMenu#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_controle_acesso_pagina#" cfsqltype="cf_sql_varchar">,
@@ -549,7 +581,8 @@
 						<cfqueryparam value="#arguments.pc_controle_acesso_grupo_icone#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_controle_acesso_subgrupo_icone#" cfsqltype="cf_sql_varchar">,
 						<cfqueryparam value="#arguments.pc_controle_acesso_menu_icone#" cfsqltype="cf_sql_varchar">,
-						<cfqueryparam value="#arguments.pc_controle_acesso_ordem#" cfsqltype="cf_sql_integer">
+						<cfqueryparam value="#arguments.pc_controle_acesso_ordem#" cfsqltype="cf_sql_integer">,
+						<cfqueryparam value="#arguments.pc_controle_acesso_rapido_nome#" cfsqltype="cf_sql_varchar">
 						)
 
 
@@ -564,19 +597,14 @@
 					pc_controle_acesso_grupo_icone = <cfqueryparam value="#arguments.pc_controle_acesso_grupo_icone#" cfsqltype="cf_sql_varchar">,
 					pc_controle_acesso_subgrupo_icone = <cfqueryparam value="#arguments.pc_controle_acesso_subgrupo_icone#" cfsqltype="cf_sql_varchar">,
 					pc_controle_acesso_menu_icone  = <cfqueryparam value="#arguments.pc_controle_acesso_menu_icone#" cfsqltype="cf_sql_varchar">,
-					pc_controle_acesso_ordem = <cfqueryparam value="#arguments.pc_controle_acesso_ordem#" cfsqltype="cf_sql_integer">
+					pc_controle_acesso_ordem = <cfqueryparam value="#arguments.pc_controle_acesso_ordem#" cfsqltype="cf_sql_integer">,
+					pc_controle_acesso_rapido_nome = <cfqueryparam value="#arguments.pc_controle_acesso_rapido_nome#" cfsqltype="cf_sql_varchar">
 				WHERE pc_controle_acesso_id = <cfqueryparam value="#arguments.pc_controle_acesso_id#" cfsqltype="cf_sql_integer">
 
 			</cfif>
 		</cfquery>
 		
   	</cffunction>
-
-
-
-
-
-
 
 
 	<cffunction name="delLink"   access="remote"  returntype="any" hint="exclui links do menu">
@@ -714,130 +742,11 @@
 		<cfreturn isFeriado>
 	</cffunction>
 
-	<cffunction name="EnviaEmails" access="public" returntype="string" hint="Cria o formado dos e-mails e envia. Se não for executado em produção, o email será enviado para application.rsUsuarioParametros.pc_usu_email">
-            
-        <cfargument name="para" type="string" required="true">
-        <cfargument name="copiaPara" type="string" required="false" default="">
-        <cfargument name="pronomeTratamento" type="string" required="true">
-        <cfargument name="texto" type="string" required="true">
-
-        <cfset to = "#arguments.para#">
-		<cfset cc = "">
-		<cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "" and (arguments.copiaPara neq arguments.para)>
-			<cfset cc = "#arguments.copiaPara#">
-		</cfif> 
-
-        <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-			<cfif #cc# neq "" >
-				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
-			<cfelse>
-				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>.">
-			</cfif>
-			<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
-			<cfset cc = "">
-        </cfif>
-
-		<cftry> 
-			<cfset de="SNCI@correios.com.br">
-		    <cfif FindNoCase("localhost", application.auxsite)>
-				<cfset de="mbflpa@yahoo.com.br">
-			</cfif>
-			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-			    <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
-				</cfif>
-				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
-					<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;text-align: center;">
-						<p style="font-size:20px">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</p> 
-					</div> 
-					<cfoutput>
-						<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#arguments.pronomeTratamento#,</pre>
-						<div style="text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">#texto#</div>
-						<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;">
-							<p>Estamos à disposição para prestar informações adicionais a respeito do 
-							assunto, caso seja necessário.</p>
-						
-							<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
-							
-							<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
-						</div>
-					</cfoutput>
-				</div>
-			</cfmail>
-			<cfset sucesso = true>
-			<cfcatch type="any">
-				<cfset sucesso = false>
-			</cfcatch>
-
-			
-    	</cftry>
-		<cfreturn #sucesso# />
-    </cffunction>
-
-	<cffunction name="EnviaEmailsTeste" access="public" returntype="string" hint="Cria o formado dos e-mails e envia. Utilizado nas rotinas manuais. Se não for executado em produção, o email será enviado parao usuário que executou">
-            
-        <cfargument name="para" type="string" required="true">
-        <cfargument name="copiaPara" type="string" required="false" default="">
-        <cfargument name="pronomeTratamento" type="string" required="true">
-        <cfargument name="texto" type="string" required="true">
-
-        <cfset to = "#arguments.para#">
-		<cfset cc = "">
-		<cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "" and (arguments.copiaPara neq arguments.para)>
-			<cfset cc = "#arguments.copiaPara#">
-		</cfif> 
-
-        <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-			<cfif #cc# neq "" >
-				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
-			<cfelse>
-				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>.">
-			</cfif>
-			<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
-			<cfset cc = "">
-        </cfif>
-
-		<cftry> 
-			<cfset de="SNCI@correios.com.br">
-		    <cfif FindNoCase("localhost", application.auxsite)>
-				<cfset de="mbflpa@yahoo.com.br">
-			</cfif>
-			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-			    <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-					<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
-				</cfif>
-				<div style="background-color: ##00416B; color:##fff; border-radius: 10px; padding: 20px; box-shadow: 0px 0px 10px ##888888; max-width: 700px; margin: 0 auto; float: left;">
-					<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;text-align: center;">
-						<p style="font-size:20px">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</p> 
-					</div> 
-					<cfoutput>
-						<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#arguments.pronomeTratamento#,</pre>
-						<div style="text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">#texto#</div>
-						<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;">
-							<p>Estamos à disposição para prestar informações adicionais a respeito do 
-							assunto, caso seja necessário.</p>
-						
-							<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
-							
-							<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
-						</div>
-					</cfoutput>
-				</div>
-			</cfmail>
-			<cfset sucesso = true>
-			<cfcatch type="any">
-				<cfset sucesso = false>
-			</cfcatch>
-
-			
-    	</cftry>
-		<cfreturn #sucesso# />
-    </cffunction>
+	
 
 
 
-
-	<cffunction name="rotinaDiariaOrientacoesSuspensas" access="remote"  hint="Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
+	<cffunction name="rotinaDiariaOrientacoesSuspensas" access="remote"  hint="Utilizado nas rotinas manuais. Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
 		<cfquery name="rsPontoSuspensoPrazoVencido" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_orientacoes.*, pc_avaliacoes.pc_aval_processo
 			FROM pc_avaliacao_orientacoes
@@ -870,87 +779,7 @@
 							,<cfqueryparam value="#posicionamento#" cfsqltype="cf_sql_varchar">
 							,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
 							,'99999999'
-							,'00436699'
-							,'#pc_aval_orientacao_mcu_orgaoResp#'
-							,'#dataCFQUERY#'
-							,5
-							,1
-						)
-				</cfquery>
-
-				<cftry>
-					<!--Informações do órgão responsável-->
-					<cfquery name="rsOrgaoResp" datasource="#application.dsn_processos#">
-						SELECT pc_org_emaiL, pc_org_sigla FROM pc_orgaos
-						WHERE pc_org_mcu = <cfqueryparam value="#pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-
-					<cfset to = "#LTrim(RTrim(rsOrgaoResp.pc_org_email))#">
-					<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
-					<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
-					
-					<cfset textoEmail = '<p>Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas.</p> 
-										 <p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:</p>
-										 <p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>'>
-								
-					<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
-					<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
-								para = "#to#"
-								pronomeTratamento = "#pronomeTrat#"
-								texto="#textoEmail#"
-					/>
-					<cfcatch type="any">
-					<cfset de="SNCI@correios.com.br">
-					<cfif FindNoCase("localhost", application.auxsite)>
-						<cfset de="mbflpa@yahoo.com.br">
-					</cfif>
-						<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-							<cfoutput>Erro rotina "rotinaDiariaOrientacoesSuspensas" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
-						</cfmail>
-					</cfcatch>
-				</cftry>
-
-				
-			</cftransaction>
-			
-
-		</cfoutput>
-	</cffunction>
-
-	<cffunction name="rotinaDiariaOrientacoesSuspensasTeste" access="remote"  hint="Utilizado nas rotinas manuais. Verifica os pontos suspensos vencidos e transforma em TRATAMENTO, insere um posicionamento e envia um e-mail de alerta.">
-		<cfquery name="rsPontoSuspensoPrazoVencido" datasource="#application.dsn_processos#">
-			SELECT pc_avaliacao_orientacoes.*, pc_avaliacoes.pc_aval_processo
-			FROM pc_avaliacao_orientacoes
-			INNER JOIN pc_avaliacoes ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
-			WHERE pc_aval_orientacao_status = 16 and DATEDIFF(DAY, pc_aval_orientacao_dataPrevistaResp, GETDATE()) >0
-		</cfquery>
-
-
-		<cfoutput query= "rsPontoSuspensoPrazoVencido" >
-						
-			<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio"/>
-			<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias='15' />
-			<cfset posicionamento = "Prezado gestor,<br>Solicita-se atualizar as informações do andamento das ações para regularização do item apontado considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas."/>						
-			<cfset dataCFQUERY = "#DateFormat(obterDataPrevista.Data_Prevista,'YYYY-MM-DD')#">	
-			
-			<cftransaction >
-
-				<cfquery datasource="#application.dsn_processos#">
-					UPDATE pc_avaliacao_orientacoes 
-					SET    
-						pc_aval_orientacao_status = 5,
-						pc_aval_orientacao_dataPrevistaResp =#obterDataPrevista.Data_Prevista#
-					WHERE pc_aval_orientacao_id = #pc_aval_orientacao_id#
-				</cfquery>
-
-				<cfquery datasource="#application.dsn_processos#">
-					INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
-					VALUES (
-							<cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
-							,<cfqueryparam value="#posicionamento#" cfsqltype="cf_sql_varchar">
-							,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
-							,'99999999'
-							,'00436699'
+							,'00438080'
 							,'#pc_aval_orientacao_mcu_orgaoResp#'
 							,'#dataCFQUERY#'
 							,5
@@ -983,12 +812,14 @@
 				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrgaoResp.pc_org_sigla))#">
 				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 				
-				<cfset textoEmail = '<p>Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas.</p> 
+				<cfset textoEmail = '<p<cfset textoEmail =>Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas.</p> 
 										<p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:</p>
-										<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>'>
+										<p style="text-align:center;">
+											<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+										</p>'>
 							
 				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
-				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmailsTeste" returnVariable="sucessoEmail" 
+				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
 							para = "#to#"
 							pronomeTratamento = "#pronomeTrat#"
 							texto="#textoEmail#"
@@ -1002,263 +833,6 @@
 		</cfoutput>
 	</cffunction>
 
-
-
-	<cffunction name="rotinaSemanalOrientacoesPendentes" access="remote"  hint="Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
-		
-		<cfquery name="rsOrgaosComOrientacoesPendentes" datasource="#application.dsn_processos#" >
-			SELECT DISTINCT pc_aval_orientacao_mcu_orgaoResp
-			FROM pc_avaliacao_orientacoes
-			WHERE pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) 
-			and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null 
-			and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate()
-		</cfquery>
-
-		<cfquery name="rsOrgaosComOrientacoesPendentesParaTeste" datasource="#application.dsn_processos#">
-			SELECT DISTINCT TOP 5 pc_aval_orientacao_mcu_orgaoResp
-			FROM pc_avaliacao_orientacoes
-			WHERE pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate()
-		</cfquery>
-
-
-		
-		<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
-			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
-		<cfelse>
-			<cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
-		</cfif>
-
-		<cfloop query="#myQuery#">
-            <cfif Len(Trim(pc_aval_orientacao_mcu_orgaoResp))>            
-				<cfquery name="rsOrientacoesPendentes" datasource="#application.dsn_processos#" >
-					SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id 
-							,pc_orientacao_status.pc_orientacao_status_descricao
-							,pc_avaliacoes.pc_aval_numeracao
-							,pc_processos.pc_processo_id 
-							,pc_processos.pc_num_sei
-							,pc_processos.pc_num_rel_sei
-							,pc_processos.pc_num_avaliacao_tipo
-							,pc_avaliacao_tipos.pc_aval_tipo_descricao
-							,pc_processos.pc_aval_tipo_nao_aplica_descricao
-							,pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp 
-							,pc_avaliacao_orientacoes.pc_aval_orientacao_status 
-							,orgaoAvaliado.pc_org_mcu as mcuOrgaoAvaliado
-							,orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
-							,orgaoAvaliado.pc_org_emaiL as emailOrgaoAvaliado
-							,orgaoResp.pc_org_mcu as mcuOrgaoResp
-							,orgaoResp.pc_org_sigla as siglaOrgaoResp
-							,orgaoResp.pc_org_emaiL as emailOrgaoResp
-					FROM pc_avaliacao_orientacoes
-					LEFT JOIN pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
-					LEFT JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
-					LEFT JOIN pc_avaliacao_tipos on pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
-					LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-					LEFT JOIN pc_orgaos as orgaoAvaliado on orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-					LEFT JOIN pc_orgaos as orgaoResp on orgaoResp.pc_org_mcu = pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp
-
-					WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate() 
-					ORDER BY pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp
-				</cfquery>
-
-				<cfquery name="rsOrientacoesOutrosStatus" datasource="#application.dsn_processos#" >
-					SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id, pc_orientacao_status.pc_orientacao_status_descricao                
-					FROM pc_avaliacao_orientacoes
-					right JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-					WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (2,16)  or (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp >= getdate()))
-				</cfquery>
-
-				<!-- Verifica se o e-mail é válido e não está em branco -->
-				<cfif IsValid("email", rsOrientacoesPendentes.emailOrgaoResp) and Len(Trim(rsOrientacoesPendentes.emailOrgaoResp))>
-						<cfset to = rsOrientacoesPendentes.emailOrgaoResp>
-						
-						<cfif IsValid("email", rsOrientacoesPendentes.emailOrgaoAvaliado) and Len(Trim(rsOrientacoesPendentes.emailOrgaoAvaliado))>
-							<cfset cc = rsOrientacoesPendentes.emailOrgaoAvaliado>
-						<cfelse>
-							<cfset cc = "">
-						</cfif>
-
-						<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-							<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
-							<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
-							<cfset cc = "">
-						</cfif>
-							
-						<cfset de="SNCI@correios.com.br">
-						<cfif FindNoCase("localhost", application.auxsite)>
-							<cfset de="mbflpa@yahoo.com.br">
-						</cfif>
-					
-						
-						<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
-						<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
-						<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-							<!DOCTYPE html>
-							<html lang="pt-br">
-							<head>
-								<meta charset="UTF-8">
-								<meta http-equiv="X-UA-Compatible" content="IE=edge">
-								<meta name="viewport" content="width=device-width, initial-scale=1.0">
-								<style>
-									
-									*, *::before, *::after {
-										box-sizing: border-box;
-									}
-									
-									body {
-										font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-										font-size: 0.8rem;
-										font-weight: 400;
-										line-height: 1.5;
-										color: rgba(33, 37, 41, 1); 
-										text-align: left;
-										background-color: rgba(255, 255, 255, 1); 
-									}
-									
-									table {
-										width: 100%;
-										margin-bottom: 1rem;
-										color: rgba(33, 37, 41, 1); 
-										background-color: transparent;
-										display: table;
-										border-collapse: separate;
-										box-sizing: border-box;
-										text-indent: initial;
-										border-spacing: 2px;
-										border-color: gray;
-									}
-
-									th {
-										text-align: center;
-										padding-left: 0.75rem;
-										padding-right: 0.75rem;
-									}
-
-									
-									.table-striped tbody tr:nth-of-type(odd) {
-										background-color: rgba(0, 0, 0, 0.05);
-									}
-
-									.text-nowrap {
-										white-space: nowrap !important;
-									}
-
-									.table-bordered {
-										border: 1px solid rgba(222, 226, 230, 1); 
-									}
-
-									.card {
-										position: relative;
-										display: flex;
-										flex-direction: column;
-										min-width: 0;
-										word-wrap: break-word;
-										background-color: rgba(255, 255, 255, 1); 
-										background-clip: border-box;
-										border: 0 solid rgba(0, 0, 0, 0.125);
-										border-radius: 0.25rem;
-										box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-										margin: 0 auto;
-										float: left;
-									}
-
-									.card-header {
-										background-color: rgba(255, 255, 255, 1); 
-										color: rgba(0, 65, 107, 1); 
-										border-radius: 10px;
-										box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-										text-align: center;
-										font-size: 20px;
-									}
-
-									.pre-style {
-										font-family: inherit;
-										font-weight: 500;
-										line-height: 1.2;
-									}
-
-									.info-text {
-										text-align: justify;
-										font-family: inherit;
-										font-weight: 500;
-										line-height: 1.2;
-										font-size: 14px;
-									}
-								</style>
-							</head>
-							<body>
-								 <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-									<pre class="pre-style">#mensagemParaTeste#</pre>
-								</cfif>
-								<div class="card" style="background-color: rgba(0, 65, 107, 1);color: rgba(255, 255, 255, 1);  border-radius: 15px; padding: 5px;">
-									<div class="card-header">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</div>
-									<cfoutput>
-										<pre class="pre-style">#pronomeTrat#,</pre>
-										<cfif rsOrientacoesPendentes.recordcount eq 1>
-											<p class="info-text">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, ao qual solicitamos especial atenção, conforme segue: </p>
-										<cfelseif rsOrientacoesPendentes.recordcount gt 1>
-											<p class="info-text">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, aos quais solicitamos especial atenção, conforme relação a seguir: </p>
-										</cfif>
-										<table id="tabOrientacoes" class="table-hover table-striped">
-											<thead style="background: rgba(0, 131, 202, 1); color: rgba(255, 255, 255, 1); ">
-												<tr style="font-size: 14px;">
-													<th>ID da Orientação</th>
-													<th>N° Processo SNCI</th>
-													<th>N° Item</th>
-													<th>Data Prevista p/ Resposta</th>
-													<th>N° SEI</th>
-													<th>N° Relatório SEI</th>
-													<th>Tipo de Avaliação:</th>    
-												</tr>
-											</thead>
-											
-											<tbody>
-												<cfloop query="#rsOrientacoesPendentes#">
-													<cfoutput>                
-														<tr style="font-size: 12px; cursor: pointer; z-index: 2;color: rgba(255, 255, 255, 1); ">
-															<td align="center">#pc_aval_orientacao_id#</td>
-															<td align="center">#pc_processo_id#</td>
-															<td align="center">#pc_aval_numeracao#</td>    
-															<td align="center">#DateFormat(pc_aval_orientacao_dataPrevistaResp, 'DD-MM-YYYY')#</td>
-															<cfset sei = left(#pc_num_sei#,5) & "."& mid(#pc_num_sei#,6,6) &"/"& mid(#pc_num_sei#,12,4) &"-"&right(#pc_num_sei#,2)>
-															<td align="center" >#sei#</td>
-															<td align="center">#pc_num_rel_sei#</td>
-															<cfif pc_num_avaliacao_tipo neq 2>
-																<td >#pc_aval_tipo_descricao#</td>
-															<cfelse>
-																<td >#pc_aval_tipo_nao_aplica_descricao#</td>
-															</cfif>
-														</tr>
-													
-												    </cfoutput>
-                                                </cfloop>
-											</tbody>
-										</table>
-										<p>Para regularizar a situação, solicitamos acessar o link abaixo, tela "Acompanhamento", aba “Medidas / Orientações para regularização” e inserir sua resposta:<br><a style="color: rgba(255, 255, 255, 1); " href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
-										<p>Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
-										<p>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</p>
-										<cfif rsOrientacoesOutrosStatus.recordcount gt 1>    
-											<p>Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
-										<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
-											<p>Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
-										</cfif> 
-										<div style="background-color: rgba(255, 255, 255, 1); color: rgba(0, 65, 107, 1); border-radius: 10px; padding-top: 2px; padding-bottom: 2px; padding-left: 15px; padding-right: 10px; box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); width: 600px;">
-											<p>Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
-											<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
-											<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
-										</div>
-									</cfoutput>
-								</div>
-							</body>
-							</html>
-						</cfmail>
-				</cfif>		
-			</cfif>		
-
-			
-		</cfloop>
-
-
-	</cffunction>
 
 	<cffunction name="rotinaSemanalOrientacoesPendentesSemTab" access="remote"  hint="Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
 		
@@ -1348,103 +922,77 @@
 						<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
 						<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 						<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-							<!DOCTYPE html>
+														<!DOCTYPE html>
 							<html lang="pt-br">
 							<head>
 								<meta charset="UTF-8">
 								<meta http-equiv="X-UA-Compatible" content="IE=edge">
 								<meta name="viewport" content="width=device-width, initial-scale=1.0">
-								<style>
-									
-									*, *::before, *::after {
-										box-sizing: border-box;
-									}
-									
-									body {
-										font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-										font-size: 0.8rem;
-										font-weight: 400;
-										line-height: 1.5;
-										color: rgba(33, 37, 41, 1); 
-										text-align: left;
-										background-color: rgba(255, 255, 255, 1); 
-									}
-									
-									
-									.text-nowrap {
-										white-space: nowrap !important;
-									}
-
-									
-
-									.card {
-										position: relative;
-										display: flex;
-										flex-direction: column;
-										min-width: 0;
-										word-wrap: break-word;
-										background-color: rgba(255, 255, 255, 1); 
-										background-clip: border-box;
-										border: 0 solid rgba(0, 0, 0, 0.125);
-										border-radius: 0.25rem;
-										box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-										margin: 0 auto;
-										float: left;
-									}
-
-									.card-header {
-										background-color: rgba(255, 255, 255, 1); 
-										color: rgba(0, 65, 107, 1); 
-										border-radius: 10px;
-										box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-										text-align: center;
-										font-size: 20px;
-									}
-
-									.pre-style {
-										font-family: inherit;
-										font-weight: 500;
-										line-height: 1.2;
-									}
-
-									.info-text {
-										text-align: justify;
-										font-family: inherit;
-										font-weight: 500;
-										line-height: 1.2;
-										font-size: 14px;
-									}
-								</style>
+								<title>SNCI - Sistema Nacional de Controle Interno</title>
 							</head>
-							<body>
+							<body style="Margin:0; padding:0; background-color:##ffffff;">
 								<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-									<pre class="pre-style">#mensagemParaTeste#</pre>
+									<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 								</cfif>
-								<div class="card" style="background-color: rgba(0, 65, 107, 1);color: rgba(255, 255, 255, 1);  border-radius: 15px; padding: 5px;">
-									<div class="card-header">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</div>
-									<cfoutput>
-										<pre class="pre-style">#pronomeTrat#,</pre>
-										<cfif rsOrientacoesPendentes.recordcount eq 1>
-											<p class="info-text">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI - Processos, ao qual solicitamos especial atenção. </p>
-										<cfelseif rsOrientacoesPendentes.recordcount gt 1>
-											<p class="info-text">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI - Processos, aos quais solicitamos especial atenção. </p>
-										</cfif>
-
-										<p>Para regularizar a situação, solicitamos acessar o link abaixo, tela "Acompanhamento", aba “Medidas / Orientações para regularização” e inserir sua resposta:<br><a style="color: rgba(255, 255, 255, 1); " href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
-										<p>Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
-										<p>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</p>
-										<cfif rsOrientacoesOutrosStatus.recordcount gt 1>    
-											<p>Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
-										<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
-											<p>Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
-										</cfif> 
-										<div style="background-color: rgba(255, 255, 255, 1); color: rgba(0, 65, 107, 1); border-radius: 10px; padding-top: 2px; padding-bottom: 2px; padding-left: 15px; padding-right: 10px; box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); width: 600px;">
-											<p>Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
-											<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
-											<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
-										</div>
-									</cfoutput>
-								</div>
+								<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:##ffffff;">
+									<tr>
+										<td align="center" style="padding: 20px 0;">
+											<table width="600" cellpadding="0" cellspacing="0" border="0" style="border:1px solid ##0083CA; border-radius:5px; overflow:hidden;">
+												<!-- Cabeçalho do Card com Imagem -->
+												<tr>
+													<td align="center" bgcolor="##00416B" style="padding:20px; background-color:##00416B;">
+														<table width="100%" cellpadding="0" cellspacing="0" border="0">
+															<tr>
+																<td align="left" style="vertical-align: middle;text-align: center;">
+																	<h2 style="margin:0; color:##ffffff; font-family: Arial, sans-serif; font-size:20px;">
+																		SNCI - Sistema Nacional de Controle Interno<br>Módulo: Processos
+																	</h2>
+																</td>
+															</tr>
+														</table>
+													</td>
+												</tr>
+												<!-- Corpo do E-mail -->
+												<tr>
+													<td style="padding:20px; font-family: Arial, sans-serif; color:##212529; font-size:14px; line-height:1.5;">
+														<p style="margin:0 0 10px 0; text-align: justify;">#pronomeTrat#,</p>
+														
+														<cfif rsOrientacoesPendentes.recordcount eq 1>
+															<p style="text-align: justify;">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, ao qual solicitamos especial atenção.</p>
+														<cfelseif rsOrientacoesPendentes.recordcount gt 1>
+															<p style="text-align: justify;">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, aos quais solicitamos especial atenção.</p>
+														</cfif>
+									
+														<p style="text-align: justify;">Para regularizar a situação, solicitamos acessar o link abaixo, tela <strong>Acompanhamento</strong>, aba <strong>Medidas / Orientações para regularização</strong> e inserir sua resposta:</p>
+														
+														<p style="text-align:center;">
+															<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+														</p>
+									
+														<p style="text-align: justify;">Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
+														<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</p>
+									
+														<cfif rsOrientacoesOutrosStatus.recordcount gt 1>
+															<p style="text-align: justify;">Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>
+														<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
+															<p style="text-align: justify;">Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>
+														</cfif>
+									
+														<p style="margin-top:20px; text-align: justify;">Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
+									
+													</td>
+												</tr>
+												<!-- Rodapé do Card -->
+												<tr>
+													<td bgcolor="##f2f2f2" style="padding:10px; text-align:center; font-family: Arial, sans-serif; font-size:12px; color:##212529;">
+														<p>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</p>
+														<p>Este é um e-mail automático, por favor não responda.</p>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
 							</body>
 							</html>
 						</cfmail>
@@ -1456,278 +1004,143 @@
 
 
 	</cffunction>
-
-
-
-
-
-
-
-
-	<cffunction name="rotinaSemanalOrientacoesPendentesTeste" access="remote"  hint="Utilizado nas rotinas manuais. Verifica or órgãos responsáveis pelas orientações pendentes e encaminha e-mail de alerta.">
-		
-		<cfquery name="rsOrgaosComOrientacoesPendentes" datasource="#application.dsn_processos#" >
-			SELECT DISTINCT pc_aval_orientacao_mcu_orgaoResp
-			FROM pc_avaliacao_orientacoes
-			WHERE pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate()
-		</cfquery>
-
-		<cfquery name="rsOrgaosComOrientacoesPendentesParaTeste" datasource="#application.dsn_processos#">
-			SELECT DISTINCT TOP 30 pc_aval_orientacao_mcu_orgaoResp
-			FROM pc_avaliacao_orientacoes
-			WHERE pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate()
-		</cfquery>
-
-
-		
-
-		<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
-			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
-		<cfelse>
-			<cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
-		</cfif>
-
-		<cfloop query="#myQuery#">
-                        
-			<cfquery name="rsOrientacoesPendentes" datasource="#application.dsn_processos#" >
-				SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id 
-						,pc_orientacao_status.pc_orientacao_status_descricao
-						,pc_avaliacoes.pc_aval_numeracao
-						,pc_processos.pc_processo_id 
-						,pc_processos.pc_num_sei
-						,pc_processos.pc_num_rel_sei
-						,pc_processos.pc_num_avaliacao_tipo
-						,pc_avaliacao_tipos.pc_aval_tipo_descricao
-						,pc_processos.pc_aval_tipo_nao_aplica_descricao
-						,pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp 
-						,pc_avaliacao_orientacoes.pc_aval_orientacao_status 
-						,orgaoAvaliado.pc_org_mcu as mcuOrgaoAvaliado
-						,orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
-						,orgaoAvaliado.pc_org_emaiL as emailOrgaoAvaliado
-						,orgaoResp.pc_org_mcu as mcuOrgaoResp
-						,orgaoResp.pc_org_sigla as siglaOrgaoResp
-						,orgaoResp.pc_org_emaiL as emailOrgaoResp
-				FROM pc_avaliacao_orientacoes
-				LEFT JOIN pc_avaliacoes on pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
-				LEFT JOIN pc_processos on pc_processo_id = pc_avaliacoes.pc_aval_processo
-				LEFT JOIN pc_avaliacao_tipos on pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
-				LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-				LEFT JOIN pc_orgaos as orgaoAvaliado on orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-				LEFT JOIN pc_orgaos as orgaoResp on orgaoResp.pc_org_mcu = pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp
-
-				WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp is not null and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp < getdate() 
-				ORDER BY pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp
-			</cfquery>
-
-			<cfquery name="rsOrientacoesOutrosStatus" datasource="#application.dsn_processos#" >
-				SELECT  pc_avaliacao_orientacoes.pc_aval_orientacao_id, pc_orientacao_status.pc_orientacao_status_descricao                
-				FROM pc_avaliacao_orientacoes
-				right JOIN pc_orientacao_status on pc_orientacao_status_id = pc_avaliacao_orientacoes.pc_aval_orientacao_status
-				WHERE pc_aval_orientacao_mcu_orgaoResp = '#pc_aval_orientacao_mcu_orgaoResp#' and (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (2,16)  or (pc_avaliacao_orientacoes.pc_aval_orientacao_status in (4,5) and pc_avaliacao_orientacoes.pc_aval_orientacao_dataPrevistaResp >= getdate()))
-			</cfquery>
-
-			
-			<cftry>
-				<cfset to = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoResp))#">
-				<cfset cc = "#LTrim(RTrim(rsOrientacoesPendentes.emailOrgaoAvaliado))#">
-
-				 <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-					<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
-					<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
-					<cfset cc = "">
-				</cfif>
-					
-				<cfset de="SNCI@correios.com.br">
-				<cfif FindNoCase("localhost", application.auxsite)>
-					<cfset de="mbflpa@yahoo.com.br">
-				</cfif>
-			
-				
-				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
-				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
-				<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-					<!DOCTYPE html>
-					<html lang="pt-br">
-					<head>
-						<meta charset="UTF-8">
-						<meta http-equiv="X-UA-Compatible" content="IE=edge">
-						<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-						<style>
-							
-							*, *::before, *::after {
-								box-sizing: border-box;
-							}
-							
-							body {
-								font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-								font-size: 0.8rem;
-								font-weight: 400;
-								line-height: 1.5;
-								color: rgba(33, 37, 41, 1); 
-								text-align: left;
-								background-color: rgba(255, 255, 255, 1); 
-							}
-							
-							table {
-								width: 100%;
-								margin-bottom: 1rem;
-								color: rgba(33, 37, 41, 1); 
-								background-color: transparent;
-								display: table;
-								border-collapse: separate;
-								box-sizing: border-box;
-								text-indent: initial;
-								border-spacing: 2px;
-								border-color: gray;
-							}
-
-							th {
-								text-align: center;
-								padding-left: 0.75rem;
-								padding-right: 0.75rem;
-							}
-
-							
-							.table-striped tbody tr:nth-of-type(odd) {
-								background-color: rgba(0, 0, 0, 0.05);
-							}
-
-							.text-nowrap {
-								white-space: nowrap !important;
-							}
-
-							.table-bordered {
-								border: 1px solid rgba(222, 226, 230, 1); 
-							}
-
-							.card {
-								position: relative;
-								display: flex;
-								flex-direction: column;
-								min-width: 0;
-								word-wrap: break-word;
-								background-color: rgba(255, 255, 255, 1); 
-								background-clip: border-box;
-								border: 0 solid rgba(0, 0, 0, 0.125);
-								border-radius: 0.25rem;
-								box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-								margin: 0 auto;
-								float: left;
-							}
-
-							.card-header {
-								background-color: rgba(255, 255, 255, 1); 
-								color: rgba(0, 65, 107, 1); 
-								border-radius: 10px;
-								box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-								text-align: center;
-								font-size: 20px;
-							}
-
-							.pre-style {
-								font-family: inherit;
-								font-weight: 500;
-								line-height: 1.2;
-							}
-
-							.info-text {
-								text-align: justify;
-								font-family: inherit;
-								font-weight: 500;
-								line-height: 1.2;
-								font-size: 14px;
-							}
-						</style>
-					</head>
-					<body>
-
-						<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-							<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
-						</cfif>
-						<div style="background-color: ##00416B; color:##fff; border-radius: 15px; padding: 5px; box-shadow: 0px 0px 10px ##888888; margin: 0 auto; float: left;">
-							<div style="background-color:##fff ; color:##00416B; border-radius: 10px;box-shadow: 0px 0px 10px ##888888;text-align: center;">
-								<span style="font-size:20px">SNCI - Sistema Nacional de Controle Interno - Módulo: Processos</span> 
-							</div> 
-							<cfoutput>
-								<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#pronomeTrat#,</pre>
-								<cfif rsOrientacoesPendentes.recordcount eq 1>
-									<p style="text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount,"00")# apontamento registrado pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, ao qual solicitamos especial atenção, conforme segue: </p>
-								<cfelseif rsOrientacoesPendentes.recordcount gt 1>
-									<p style="text-align: justify;font-family: inherit;font-weight: 500;line-height: 1.2;">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount,"00")# apontamentos registrados pelo Controle Interno, status “PENDENTE”, com prazo de resposta expirado no Sistema SNCI, aos quais solicitamos especial atenção, conforme relação a seguir: </p>
-								</cfif>
-								<table id="tabOrientacoes" class="table-hover table-striped">
-									<thead style="background: ##0083ca;color:##fff">
-										<tr style="font-size:14px">
-											<th >ID da Orientação</th>
-											<th >N° Processo SNCI</th>
-											<th >N° Item</th>
-											<th >Data Prevista p/ Resposta</th>
-											<th >N° SEI</th>
-											<th >N° Relatório SEI</th>
-											<th >Tipo de Avaliação:</th>	
-										</tr>
-									</thead>
-									
-									<tbody>
-										<cfloop query="#rsOrientacoesPendentes#" >
-											<cfoutput>					
-												<tr style="font-size:12px;cursor:pointer;z-index:2;color: rgba(255, 255, 255, 1); "  >
-													<td align="center" >#pc_aval_orientacao_id#</td>
-													<td align="center" >#pc_processo_id#</td>
-													<td align="center" >#pc_aval_numeracao#</td>	
-													<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,"DD-MM-YYYY") >
-													<td align="center" >#dataPrev#</td>
-													<cfset sei = left(#pc_num_sei#,5) & "."& mid(#pc_num_sei#,6,6) &"/"& mid(#pc_num_sei#,12,4) &"-"&right(#pc_num_sei#,2)>
-													<td align="center" >#sei#</td>
-													<td align="center" >#pc_num_rel_sei#</td>
-													<cfif pc_num_avaliacao_tipo neq 2>
-														<td >#pc_aval_tipo_descricao#</td>
-													<cfelse>
-														<td >#pc_aval_tipo_nao_aplica_descricao#</td>
-													</cfif>
-												</tr>
-											</cfoutput>
-										</cfloop>	
-									</tbody>
-								</table>
-								<p>Para regularizar a situação, solicitamos a acessar o link abaixo, tela "Acompanhamento", aba “Medidas / Orientações para regularização” e inserir sua resposta:<br><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
-								<p>Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
-								<P>Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</P>
-								<cfif rsOrientacoesOutrosStatus.recordcount gt 1>    
-									<p>Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount,"00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
-								<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
-									<p>Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount,"00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p> 
-								</cfif> 
-								<div style="background-color:##fff ; color:##00416B; border-radius: 10px; padding-top: 2px;padding-bottom: 2px;padding-left: 15px;padding-right: 10px; box-shadow: 0px 0px 10px ##888888;width:600px">
-									<p>Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
-									<p><strong>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</strong></p>
-									<p><strong>Obs:</strong> Este é um e-mail automático, por favor não responda.</p>
-								</div>
-							</cfoutput>
-						</div>
-
-					</body>
-					</html> 
-				</cfmail>            
-				<cfcatch type="any">
-				<cfset de="SNCI@correios.com.br">
-				<cfif FindNoCase("localhost", application.auxsite)>
-					<cfset de="mbflpa@yahoo.com.br">
-				</cfif>
-					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "rotinaSemanalOrientacoesPendentesTeste": #cfcatch.message#</cfoutput>
-					</cfmail>
-				</cfcatch>
-			</cftry> 
-
-			
-		</cfloop>
-
-
-	</cffunction>
-
 	
+
+	<cffunction name="EnviaEmails" access="public" returntype="string" hint="Cria o formado dos e-mails e envia. Utilizado nas rotinas manuais. Se não for executado em produção, o email será enviado parao usuário que executou">
+            
+        <cfargument name="para" type="string" required="true">
+        <cfargument name="copiaPara" type="string" required="false" default="">
+        <cfargument name="pronomeTratamento" type="string" required="true">
+        <cfargument name="texto" type="string" required="true">
+
+        <cfset to = "#arguments.para#">
+		<cfset cc = "">
+		<cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "" and (arguments.copiaPara neq arguments.para)>
+			<cfset cc = "#arguments.copiaPara#">
+		</cfif> 
+
+        <cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
+			<cfif #cc# neq "" >
+				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>, com cópia para <strong>#cc#</strong>.">
+			<cfelse>
+				<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong>.">
+			</cfif>
+			<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
+			<cfset cc = "">
+        </cfif>
+
+		<cftry> 
+			<cfset de="SNCI@correios.com.br">
+		    <cfif FindNoCase("localhost", application.auxsite)>
+				<cfset de="mbflpa@yahoo.com.br">
+			</cfif>
+			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+				<!DOCTYPE html>
+				<html lang="pt-br">
+				<head>
+					<meta charset="UTF-8">
+					<meta http-equiv="X-UA-Compatible" content="IE=edge">
+					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+					<style>
+						
+						
+						
+						
+						.card {
+							position: relative;
+							display: flex;
+							flex-direction: column;
+							min-width: 0;
+							word-wrap: break-word;
+							background: rgba(0, 65, 107, 1);
+							color: rgba(255, 255, 255, 1);
+							background-clip: border-box;
+							border: 0 solid rgba(0, 0, 0, 0.125);
+							border-radius: 0.25rem;
+							box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
+							margin: 0 auto;
+							float: left;
+							margin-left: 10px;
+							padding: 20px;
+							max-width: 800px;
+						}
+
+						.card-header {
+							background-color: rgba(255, 255, 255, 1); 
+							color: rgba(0, 65, 107, 1); 
+							border-radius: 10px;
+							box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
+							text-align: center;
+							font-size: 20px;
+						}
+
+						.rodape{
+							background-color: rgba(255, 255, 255, 1); 
+							color: rgba(0, 65, 107, 1); 
+							border-radius: 10px;
+							box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
+							text-align: center;
+							margin-top: 20px;
+							}
+
+						
+					</style>
+				</head>
+				<body style="Margin:0; padding:0; background-color:##ffffff;">
+					<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
+						<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
+					</cfif>
+						<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:##ffffff;">
+							<tr>
+								<td align="center" style="padding: 20px 0;">
+									<table width="600" cellpadding="0" cellspacing="0" border="0" style="border:1px solid ##0083CA; border-radius:5px; overflow:hidden;">
+										<!-- Cabeçalho do Card com Imagem -->
+										<tr>
+											<td align="center" bgcolor="##00416B" style="padding:20px; background-color:##00416B;">
+												<table width="100%" cellpadding="0" cellspacing="0" border="0">
+													<tr>
+														<td align="left" style="vertical-align: middle;text-align: center;">
+															<h2 style="margin:0; color:##ffffff; font-family: Arial, sans-serif; font-size:20px;">
+																SNCI - Sistema Nacional de Controle Interno<br>Módulo: Processos
+															</h2>
+														</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+										<!-- Corpo do E-mail -->
+										<tr>
+											<td style="padding:20px; font-family: Arial, sans-serif; color:##212529; font-size:14px; line-height:1.5;">
+												<cfoutput>
+													<p style="margin:0 0 10px 0; text-align: justify;">#arguments.pronomeTratamento#,</pre>
+													#texto#
+												</cfoutput>
+											</td>
+										</tr>
+										<!-- Rodapé do Card -->
+										<tr>
+											<td bgcolor="##f2f2f2" style="padding:10px; text-align:center; font-family: Arial, sans-serif; font-size:12px; color:##212529;">
+												<p>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</p>
+												<p>Este é um e-mail automático, por favor não responda.</p>
+											</td>
+										</tr>
+									</table>
+								</td>
+							</tr>
+						</table>
+				</body>
+				</html>
+			</cfmail>
+			<cfset sucesso = true>
+			<cfcatch type="any">
+				<cfset sucesso = false>
+			</cfcatch>
+
+			
+    	</cftry>
+		<cfreturn #sucesso# />
+    </cffunction>
 
 	<cffunction name="rotinaMensalMelhoriasPendentes" access="remote"  hint="Verifica or órgãos responsáveis pelas propostas de melhoria pendentes e encaminha e-mail de alerta.">
 		
@@ -1771,15 +1184,20 @@
 
 				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsMelhoriasPendentes.siglaOrgaoResp))#">
 				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
-				<cfset textoEmail = '<p>Informamos que existe(m) #NumberFormat(rsMelhoriasPendentes.recordcount,"00")# Proposta(s) de Melhoria registrada(s) pelo Controle Interno, no Sistema SNCI, com status “PENDENTE”, aguardando manifestação do gestor responsável.</p> 
-									    <p>Para regularizar a situação, solicitamos acessar o sistema por meio do link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
-										<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
-								        <p>As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
+				<cfset textoEmail = '<p style="text-align: justify;">Informamos que existe(m) #NumberFormat(rsMelhoriasPendentes.recordcount,"00")# Proposta(s) de Melhoria registrada(s) pelo Controle Interno, no Sistema SNCI, com status “PENDENTE”, aguardando manifestação do gestor responsável.</p> 
+									    <p style="text-align: justify;">Para regularizar a situação, solicitamos acessar o sistema por meio do link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
+										<p style="text-align:center;">
+											<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+										</p>
+								        <p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
 										<ul>
-											<li>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
-											<li>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
-											<li>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
-										</ul>'>
+											<li style="text-align: justify;">ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
+											<li style="text-align: justify;">RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
+											<li style="text-align: justify;">TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
+										</ul>
+										
+										<p style="margin-top:20px; text-align: justify;">Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
+										'>
 										
 				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
 				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
@@ -1802,78 +1220,126 @@
 		</cfloop>
 
 	</cffunction>
+	
+	
 
-	<cffunction name="rotinaMensalMelhoriasPendentesTeste" access="remote"  hint="Utilizado nas rotinas manuais. Verifica or órgãos responsáveis pelas propostas de melhoria pendentes e encaminha e-mail de alerta.">
-		
-		<cfquery name="rsOrgaosComMelhoriasPendentes" datasource="#application.dsn_processos#" >
-			SELECT DISTINCT pc_aval_melhoria_num_orgao
-			FROM pc_avaliacao_melhorias
-			WHERE pc_aval_melhoria_status = 'P'	
-		</cfquery>
+	<cffunction name="executaRotinasEmailsCobranca" access="remote" returntype="any" output="false" hint="Executa as rotinas de envio de e-mails de cobrança de orientações e propostas de melhoria.">
+		<cfset currentDate = Now()>
+		<cfset currentDayOfWeek = DayOfWeek(currentDate)>
+		<cfset currentDay = Day(currentDate)>
 
-		<cfquery name="rsOrgaosComMelhoriasPendentesParaTeste" datasource="#application.dsn_processos#" >
-			SELECT DISTINCT TOP 5 pc_aval_melhoria_num_orgao
-			FROM pc_avaliacao_melhorias
-			WHERE pc_aval_melhoria_status = 'P'	
-		</cfquery>
-
-		<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
-			<cfset myQuery = "rsOrgaosComMelhoriasPendentes">
-		<cfelse>
-			<cfset myQuery = "rsOrgaosComMelhoriasPendentesParaTeste">
+		<!-- Rotina Diária -->
+		<cfif not rotinaJaExecutadaEmailsCobranca("rotinaDiaria", currentDate)>
+			<cfinvoke component="pc_cfcPaginasApoio" method="rotinaDiariaOrientacoesSuspensas" returnVariable="rotinaDiariaOrientacoesSuspensas" />
+			<cfset atualizarLogExecucao("rotinaDiaria")>
 		</cfif>
 
-		<cfloop query="#myQuery#">
-			<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
-				SELECT 
-				  pc_orgaos.pc_org_sigla as siglaOrgaoResp
-				, pc_orgaos.pc_org_emaiL as emailOrgaoResp
-				, pc_orgaosAvaliado.pc_org_emaiL as emailOrgaoAvaliado
-				FROM pc_avaliacao_melhorias
-				LEFT JOIN pc_orgaos on pc_orgaos.pc_org_mcu = pc_aval_melhoria_num_orgao
-				LEFT JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
-				LEFT JOIN pc_processos on pc_processo_id = pc_aval_processo
-				LEFT JOIN pc_orgaos as pc_orgaosAvaliado on pc_orgaosAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-				WHERE pc_aval_melhoria_num_orgao = '#pc_aval_melhoria_num_orgao#' and pc_aval_melhoria_status = 'P' and pc_num_status in(4,5)
-			</cfquery>
+		<!-- Rotina Semanal - Executar uma vez por semana em qualquer dia útil -->
+		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("rotinaSemanal", currentDate)>
+			<cfinvoke component="pc_cfcPaginasApoio" method="rotinaSemanalOrientacoesPendentesSemTab" returnVariable="rotinaSemanalOrientacoesPendentes" />
+			<cfset atualizarLogExecucao("rotinaSemanal")>
+		</cfif>
 
-			<cftry>
-				<cfset to = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoResp))#">
-				<cfset cc = "#LTrim(RTrim(rsMelhoriasPendentes.emailOrgaoAvaliado))#">
-
-				<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsMelhoriasPendentes.siglaOrgaoResp))#">
-				<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
-				<cfset textoEmail = '<p>Informamos que existe(m) #NumberFormat(rsMelhoriasPendentes.recordcount,"00")# Proposta(s) de Melhoria registrada(s) pelo Controle Interno, no Sistema SNCI, com status “PENDENTE”, aguardando manifestação do gestor responsável.</p> 
-									    <p>Para regularizar a situação, solicitamos acessar o sistema por meio do link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
-										<p><a style="color:##fff" href="http://intranetsistemaspe/snci/snci_processos/index.cfm">http://intranetsistemaspe/snci/snci_processos/index.cfm</a></p>
-								        <p>As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
-										<ul>
-											<li>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
-											<li>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
-											<li>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
-										</ul>'>
-										
-				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
-				<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmailsTeste" returnVariable="sucessoEmail" 
-							para = "#to#"
-							copiaPara = "#cc#"
-							pronomeTratamento = "#pronomeTrat#"
-							texto="#textoEmail#"
-				/>
-				<cfcatch type="any">
-				<cfset de="SNCI@correios.com.br">
-				<cfif FindNoCase("localhost", application.auxsite)>
-					<cfset de="mbflpa@yahoo.com.br">
-				</cfif>
-					<cfmail from="#de#" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "rotinaMensalMelhoriasPendentesTeste" de distribuição de propostas de melhoria: #cfcatch.message#</cfoutput>
-					</cfmail>
-				</cfcatch>
-			</cftry>
-
-		</cfloop>
-
+		<!-- Rotina Mensal - Executar em qualquer dia útil do mês, uma vez por mês -->
+		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("rotinaMensal", currentDate)>
+			<cfinvoke component="pc_cfcPaginasApoio" method="rotinaMensalMelhoriasPendentes" returnVariable="rotinaMensalMelhoriasPendentes" />
+			<cfset atualizarLogExecucao("rotinaMensal")>
+		</cfif>
+		
 	</cffunction>
+	
+	<cffunction name="rotinaJaExecutadaEmailsCobranca" access="private" returntype="boolean" output="false" hint="Verifica se a rotina já foi executada.">
+		<cfargument name="rotinaNome" type="string" required="true">
+		<cfargument name="currentDate" type="date" required="true"> <!-- Novo Argumento -->
+		<cfset var resultado = false>
+		<cfset var lastExecDate = "">
+	
+		<cfquery name="verificarExecucao" datasource="#application.dsn_processos#">
+			SELECT pc_rotina_ultima_execucao 
+			FROM pc_rotinas_execucao_emails_log 
+			WHERE pc_rotina_nome = <cfqueryparam value="#arguments.rotinaNome#" cfsqltype="cf_sql_varchar">
+		</cfquery>
+	
+		<cfif arguments.rotinaNome eq "rotinaMensal">
+			<!-- Verificar se a rotina mensal já foi executada no mês atual -->
+			<cfif verificarExecucao.recordCount EQ 1>
+				<cfset lastExecDate = verificarExecucao.pc_rotina_ultima_execucao[1]>
+				<cfif Year(lastExecDate) EQ Year(arguments.currentDate) AND Month(lastExecDate) EQ Month(arguments.currentDate)>
+					<cfset resultado = true>
+				</cfif>
+			</cfif>
+		<cfelseif arguments.rotinaNome eq "rotinaSemanal">
+			<!-- Verificar se a rotina semanal já foi executada nesta semana -->
+			<cfif verificarExecucao.recordCount EQ 1>
+				<cfset lastExecDate = verificarExecucao.pc_rotina_ultima_execucao[1]>
+				<cfif isSameWeek(lastExecDate, arguments.currentDate)>
+					<cfset resultado = true>
+				</cfif>
+			</cfif>
+		<cfelse>
+			<!-- Verificar se a rotina já foi executada hoje -->
+			<cfif verificarExecucao.recordCount EQ 1 AND DateCompare(verificarExecucao.pc_rotina_ultima_execucao, arguments.currentDate, "d") EQ 0>
+				<cfset resultado = true>
+			</cfif>
+		</cfif>
+	
+		<cfreturn resultado>
+	</cffunction>
+	
+	<cffunction name="atualizarLogExecucao" access="private" returntype="void" output="false" hint="Atualiza a data da última execução da rotina.">
+		<cfargument name="rotinaNome" type="string" required="true">
+	
+		<!-- Verificar se a rotina já existe no log -->
+		<cfquery name="verificarExistencia" datasource="#application.dsn_processos#">
+			SELECT COUNT(*) AS total
+			FROM pc_rotinas_execucao_emails_log
+			WHERE pc_rotina_nome = <cfqueryparam value="#arguments.rotinaNome#" cfsqltype="cf_sql_varchar">
+		</cfquery>
+	
+		<cfif verificarExistencia.total EQ 1>
+			<!-- Atualizar última execução se já existe -->
+			<cfquery datasource="#application.dsn_processos#">
+				UPDATE pc_rotinas_execucao_emails_log 
+				SET pc_rotina_ultima_execucao = <cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">
+				WHERE pc_rotina_nome = <cfqueryparam value="#arguments.rotinaNome#" cfsqltype="cf_sql_varchar">
+			</cfquery>
+		<cfelse>
+			<!-- Inserir nova entrada se não existe -->
+			<cfquery datasource="#application.dsn_processos#">
+				INSERT INTO pc_rotinas_execucao_emails_log (pc_rotina_nome, pc_rotina_ultima_execucao)
+				VALUES (<cfqueryparam value="#arguments.rotinaNome#" cfsqltype="cf_sql_varchar">, <cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">)
+			</cfquery>
+		</cfif>
+	</cffunction>
+	
+
+	<cffunction name="isBusinessDay" access="private" returntype="boolean" output="false" hint="Verifica se a data é um dia útil (segunda a sexta-feira).">
+		<cfargument name="currentDate" type="date" required="true">
+		<cfset var dayOfWeek = DayOfWeek(arguments.currentDate)>
+		<cfreturn (dayOfWeek NEQ 1 AND dayOfWeek NEQ 7)>
+	</cffunction>
+	
+
+	<cffunction name="getStartOfWeek" access="private" returntype="date" output="false" hint="Retorna a data de segunda-feira da semana da data fornecida.">
+		<cfargument name="someDate" type="date" required="true">
+		<cfset var dayOfWeek = DayOfWeek(arguments.someDate)>
+		<cfset var startOfWeek = DateAdd("d", - (dayOfWeek - 2), arguments.someDate)>
+		<cfif dayOfWeek LT 2>
+			<!-- Se o dia da semana for domingo (1), ajustar para a semana anterior -->
+			<cfset startOfWeek = DateAdd("d", -6, arguments.someDate)>
+		</cfif>
+		<cfreturn startOfWeek>
+	</cffunction>
+	
+
+	<cffunction name="isSameWeek" access="private" returntype="boolean" output="false" hint="Verifica se duas datas estão na mesma semana.">
+		<cfargument name="date1" type="date" required="true">
+		<cfargument name="date2" type="date" required="true">
+		<cfset var startOfWeek1 = getStartOfWeek(arguments.date1)>
+		<cfset var startOfWeek2 = getStartOfWeek(arguments.date2)>
+		<cfreturn (DateFormat(startOfWeek1, "yyyy-mm-dd") EQ DateFormat(startOfWeek2, "yyyy-mm-dd"))>
+	</cffunction>
+
 
 		
 	<cffunction name="trocaSubordTecnicaOrgao" access="remote"  hint="troca a subordinação técnica do órgão na consulta por órgão.">
@@ -2357,7 +1823,43 @@
 		<cfreturn true>
 
 	</cffunction>
+
+	<cffunction name="dashboardMenuRapido" access="remote" hint="criar um dashboard contendo atalhos para as páginas mais importantes.">
+		<cfquery name="rsMenuRapido" datasource="#application.dsn_processos#">
+			SELECT "pc_controle_acesso".* FROM pc_controle_acesso 
+			WHERE pc_controle_acesso_perfis LIKE '%#application.rsUsuarioParametros.pc_usu_perfil#%' 
+			AND pc_controle_acesso_rapido_nome IS NOT NULL AND pc_controle_acesso_rapido_nome <> ''
+			ORDER BY pc_controle_acesso_rapido_nome
+		</cfquery>
+     
+		
+				
+		<div align="center" class="">	
+			<div class="menuRapidoGrid">
+				<div class="menuRapido_legendGrid ">Páginas Principais</div> 
+				<cfloop query="rsMenuRapido">
+					<cfoutput>
+						<cfset link = "../SNCI_PROCESSOS/./" & pc_controle_acesso_pagina>
+						<a href="#link#">
+							<div class="menuRapido_iconGrid">
+								<i class="fas #pc_controle_acesso_menu_icone#"></i>
+								<span class="font-weight-light">#pc_controle_acesso_rapido_nome#</span>
+							</div>
+						</a>
+					</cfoutput>
+				</cfloop>
+			</div>
+		</div>
+		
+		
+				
+	</cffunction>
+
 	
+	
+
+	
+
 
 
 	

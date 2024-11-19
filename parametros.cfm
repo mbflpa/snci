@@ -59,7 +59,7 @@
 <cfset Login_Agencia = 'PE\PEAC'> <!--- Parte inicial do login das agências (comum a todas as agências) --->
 <cfset Login_CDD = 'PE\PECDD'> <!--- Parte inicial do login dos CDDs (comum a todos os CDDs) --->
 
-<script type="text/javascript" src="ckeditor\ckeditor.js"></script>
+<!--- <script type="text/javascript" src="ckeditor\ckeditor.js"></script> --->
 
 <!--- Pastas onde serão armazenados arquivos anexados às Avaliações --->
 <cfset auxsite =  trim(ucase(cgi.server_name))>

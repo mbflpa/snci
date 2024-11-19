@@ -23,25 +23,15 @@
 				<!-- Content Header (Page header) -->
 				<div class="content-header" style="background:  #f4f6f9;">
 					<div class="container-fluid">
-						<div class="row mb-2" style="margin-top:10px;margin-bottom:0px!important;">
+						<div class="row mb-2" style="margin-bottom:0px!important;">
 							<div class="col-sm-6">
 								<h4>Cadastrar Avaliações do Processo</h4>
 							</div>
 						</div>
-					
-												
-						<div id="cardsAvaliacao"></div>
-										
-						<div id="cadAvaliacaoForm"></div>
-						
 					</div><!--Fim container-fluid-->
-					
-
-
 				</div><!--Fim ontent-header-->
-
-
-
+				<div id="cardsAvaliacao" ></div>
+				<div id="cadAvaliacaoForm"></div>
 			</div><!--Fim content-wrapper-->
 		
 									

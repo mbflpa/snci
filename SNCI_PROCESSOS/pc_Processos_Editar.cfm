@@ -46,7 +46,7 @@
 				legend {
 					font-size: 0.8rem!important;
 					color: #fff!important;
-					background-color: #0083ca!important;
+					background-color: var(--azul_claro_correios)!important;
 					border: 1px solid #ced4da!important;
 					border-radius: 5px!important;
 					padding: 5px!important;
@@ -81,7 +81,7 @@
 				legend {
 					font-size: 0.8rem!important;
 					color: #fff!important;
-					background-color: #0083ca!important;
+					background-color: var(--azul_claro_correios)!important;
 					border: 1px solid #ced4da!important;
 					border-radius: 5px!important;
 					padding: 5px!important;
@@ -106,7 +106,7 @@
 			<div class="content-header" style="background:  #f4f6f9;">
 			
 				<div class="container-fluid">
-				   	<div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
+				   	<div class="row mb-2" style="margin-bottom:0px!important;">
 						<div class="col-sm-6">
 							<h4>Editar Processos</h4>
 						</div>
@@ -114,7 +114,7 @@
 
 					<div class="card-body" style="display:flex;flex-direction:column;">
 						<div style="display: flex;align-items: center;margin-bottom:10px">
-							<span style="color:#0083ca;font-size:20px;margin-right:10px">Ano:</span>
+							<span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Ano:</span>
 							<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 						</div>
 

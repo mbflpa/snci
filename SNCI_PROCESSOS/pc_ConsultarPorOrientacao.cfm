@@ -14,28 +14,31 @@
 				LEFT JOIN pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
 				LEFT JOIN pc_avaliadores on pc_avaliador_id_processo = pc_processo_id
 				INNER JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
-	WHERE  not pc_aval_orientacao_status in (1) 
+	WHERE  not pc_aval_orientacao_status in (0,1) 
 	<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-		<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
-		<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-			and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-		</cfif>
-		<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
-		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-			and pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
-		</cfif>
-		<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1) - Execução' ou 14 - 'CI - REGIONAL - SCIA - Acompanhamento', com origem na GCOP---> --->
-		<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
-			and pc_num_orgao_origem IN('00436698','00436697','00438080') and (pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#))
+	    AND pc_num_status in(4,6)
+		<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
+		<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
+			AND pc_processo_id IS NOT NULL 
+		<cfelse>
+			<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI) --->
+			<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
+				and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+			</cfif>
+			<!---Se a lotação do usuario não for um orgao origem de processos(status 'A') e o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
+			<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+				and pc_avaliador_matricula = #application.rsUsuarioParametros.pc_usu_matricula#	or pc_usu_matricula_coordenador = #application.rsUsuarioParametros.pc_usu_matricula# or pc_usu_matricula_coordenador_nacional = #application.rsUsuarioParametros.pc_usu_matricula#
+			</cfif>
+			<!---Se o perfil for 7 - 'CI - REGIONAL (Gestor Nível 1) - Execução' ou 14 - 'CI - REGIONAL - SCIA - Acompanhamento', com origem na GCOP---> --->
+			<cfif ListFind("7,14",#application.rsUsuarioParametros.pc_usu_perfil#) and '#application.rsUsuarioParametros.pc_org_status#' neq 'O'  and '#application.rsUsuarioParametros.pc_org_status#' eq 'A'>
+				and pc_orgaos.pc_org_se = '#application.rsUsuarioParametros.pc_org_se#' OR pc_orgaos.pc_org_se in(#application.seAbrangencia#)
+			</cfif>
 		</cfif>
 		
 	<cfelse>
-		<!---Se o perfil for 13 - 'CONSULTA' (AUDIT e RISCO)--->
-		<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 13 >
-				AND not pc_aval_orientacao_status in (9,12,14)
-		<cfelse>
-			<!---Não exibe orientações pendentes de posicionamento inicial do controle interno, canceladas, improcedentes e bloqueadas--->
-			AND pc_aval_orientacao_status not in (1,9,12,14)
+	    AND pc_num_status in(4) AND not pc_aval_orientacao_status in (9,12,14)
+		<!---Se o perfil não for 13 - 'CONSULTA' (AUDIT e RISCO)--->
+		<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
 			AND (
 					pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					OR pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
@@ -105,11 +108,11 @@
 		<section class="content-header">
 			<div class="container-fluid">
 						
-				<div class="row mb-2" style="margin-top:20px;margin-bottom:0px!important;">
+				<div class="row mb-2" style="margin-bottom:0px!important;">
 					<div class="col-sm-12">
 						<div style="display: flex; align-items: center;">
 							<h4 style="margin-right: 10px;">Consulta por Orientação (Processos Em Acompanhamento)</h4>
-							<i id="info-icon" class="fas fa-circle-info " style="color: #0083ca;cursor: pointer;font-size: 17px;position: relative;bottom: 13px;" 
+							<i id="info-icon" class="fas fa-circle-info azul_claro_correios_textColor" style="cursor: pointer;font-size: 17px;position: relative;bottom: 13px;" 
 							title="Consulta por Orientação (Processos em Acompanhamento)" data-toggle="popover" data-trigger="hover" 
 							data-placement="right" data-content="Nessa tela é possível consultar Processos avaliados pelo Controle Interno em que exista ao menos um Item/Orientação com acompanhamento que ainda não foi finalizado."></i>
 						</div>
@@ -123,11 +126,24 @@
 		<section class="content">
 			<div class="container-fluid" >
 				<div style="display: flex;align-items: center;">
-					<span style="color:#0083ca;font-size:20px;margin-right:10px">Ano:</span>
+					<span class="azul_claro_correios_textColor" style="font-size:20px;margin-right:10px">Ano:</span>
 					<div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons"></div><br><br>
 				</div>
-				<h5 style="color:#0083ca"><i class="fas fa-file-alt" style="margin-right:10px"> </i><span id="texto_card-title" >Selecione um Processo</span></h5>
-				<div id="exibirTab"></div>
+				<!-- /.card-header -->
+				<session class="card-body" >
+					<div class="card-header card-header_backgroundColor">
+							
+						<h4 class="card-title ">	
+							<div  class="d-block" style="font-size:20px;color:#fff;font-weight: bold;"> 
+								<i class="fas fa-file-alt" style="margin-top:4px;"></i><span id="texto_card-title" style="margin-left:10px;font-size:16px;">Selecione um Processo</span>
+							</div>
+						</h4>
+					</div>
+					<div class="card-body card_border_correios" >
+						<div id="exibirTabSpinner"></div>
+						<div id="exibirTab"></div>
+					</div>
+				</session>
 				<div id="informacoesItensConsultaDiv"></div>
 				<div id="timelineViewConsultaDiv"></div>
 			</div>
@@ -193,7 +209,7 @@
 			let radioValue = $("input[name='opcaoAno']:checked").val();
 
 			// Atualizar o título do card com o valor selecionado inicialmente
-			$("#texto_card-title").html(`Selecione uma Orientação <span style="font-size:14px;color:gray!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
+			$("#texto_card-title").html(`Selecione uma Orientação <span style="font-size:14px;color:#fff!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
 
 			// Esconder o overlay após 1 segundo
 			// $("#modalOverlay").delay(1000).hide(0, function () {
@@ -206,7 +222,7 @@
 			// Lidar com a mudança de seleção dos botões de rádio
 			$("input[type='radio']").click(function () {
 				radioValue = $("input[name='opcaoAno']:checked").val();
-				$("#texto_card-title").html(`Selecione uma Orientação <span style="font-size:14px;color:gray!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
+				$("#texto_card-title").html(`Selecione uma Orientação <span style="font-size:14px;color:#fff!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
 				exibirTabela(radioValue);
 			});
 		});
@@ -214,7 +230,9 @@
 		// Função para exibir a tabela com base no ano selecionado
 		function exibirTabela(anoMostra) {
 			$("#modalOverlay").modal("show");
-			$("#exibirTab").html('<h3 style="margin-left:50px">Carregando...</h3>');
+			$('#exibirTab').hide();
+			$("#exibirTab").html('');
+			$("#exibirTabSpinner").html('<h1 style="margin-left:50px;color:#e83e8c"><i class="fas fa-spinner fa-spin"></i><span style="font-size:20px"> Carregando dados, aguarde...</span></h1>');
 			setTimeout(function () {
 				$.ajax({
 					type: "post",
@@ -226,9 +244,11 @@
 					},
 					async: false,
 					success: function (result) {
+						// Esconde a tabela inicialmente
 						$("#exibirTab").html(result);
 						$("#informacoesItensConsultaDiv").html("");
 						$("#timelineViewConsultaDiv").html("");
+						$("#exibirTabSpinner").html("");
 						$("#modalOverlay").delay(1000).hide(0, function () {
 							$("#modalOverlay").modal("hide");
 						});
