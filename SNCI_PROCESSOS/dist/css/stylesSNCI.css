@@ -725,26 +725,38 @@ word-wrap: break-word;  /* Permite a quebra de palavras longas */
     background-color: #f4f6f9!important;
 }
 
-/* HTML: <i class="loaderAlert fas fa-bell"></i> */
+
+/* HTML: <div class="loaderAlert"></div> */
 .loaderAlert {
-    color: #910a0a; /* Cor do ícone (vermelho forte) */
-    animation: l2 0.8s 10; /* Animação infinita */
-    display: inline-block; /* Permite usar animações em ícones */
-    filter: drop-shadow(0 0 0 #910a0a); /* Sombra inicial */
+    transform-origin: 50% -3px;
+    animation: l10-1 7s 1 ease-out forwards; /* 6s de duração total para 10 ciclos */
 }
 
-@keyframes l2 {
-    0% { 
-        filter: drop-shadow(0 0 0 #910a0a); /* Sem sombra */
-        transform: scale(1); /* Tamanho normal */
-    }
-    50% { 
-        filter: drop-shadow(0 0 15px #ff0000); /* Sombra vermelha mais intensa */
-        transform: scale(1.1); /* Aumenta um pouco o tamanho */
-    }
-    100% { 
-        filter: drop-shadow(0 0 0 #910a0a); /* Retorna à sombra inicial */
-        transform: scale(1); /* Tamanho normal */
-    }
+@keyframes l10-1 {
+    0%   { transform: rotate(0deg); }
+    5%  { transform: rotate(10deg); }
+    10%  { transform: rotate(-10deg); }
+    15%  { transform: rotate(10deg); }
+    20%  { transform: rotate(-10deg); }
+    25%  { transform: rotate(10deg); }
+    30%  { transform: rotate(-10deg); }
+    35%  { transform: rotate(10deg); }
+    40%  { transform: rotate(-10deg); }
+    45%  { transform: rotate(10deg); }
+    50%  { transform: rotate(-10deg); }
+    55%  { transform: rotate(10deg); }
+    60%  { transform: rotate(-10deg); }
+    65%  { transform: rotate(10deg); }
+    70%  { transform: rotate(-10deg); }
+    75%  { transform: rotate(10deg); }
+    80%  { transform: rotate(-10deg); }
+    85%  { transform: rotate(10deg); }
+    90%  { transform: rotate(-10deg); }
+    95%  { transform: rotate(10deg); }
+    100% { transform: rotate(0deg); }
+    
+
 }
+
+
 
