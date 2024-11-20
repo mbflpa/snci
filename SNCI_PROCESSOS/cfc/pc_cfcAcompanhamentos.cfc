@@ -2,7 +2,15 @@
 <cfprocessingdirective pageencoding = "utf-8">	
 	
    	<cffunction name="tabAcompanhamento" returntype="any" access="remote" hint="Criar a tabela das orientacoes pendentes e envia para a página pcAcompanhamento.cfm">
-		
+		<!-- Declaração de todas as variáveis locais no início da função -->
+		<cfset var colunaEmAnalise = 0>
+		<cfset var dataPrev = "">
+		<cfset var dataHora = "">
+		<cfset var dataFormatada = "">
+		<cfset var sei = "">
+		<cfset var controleInterno = "">
+		<cfset var rsProcTab = "">
+		<cfset var idArray = "">
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#">
 			SELECT      pc_processos.*, pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_descricao as descOrgAvaliado
 						, pc_usuarios.pc_usu_nome
@@ -89,7 +97,7 @@
 
 		<div class="row">
 		
-			<cfset colunaEmAnalise = 0>
+			
 			<div class="col-12">
 				<div class="card"  >
 				   
@@ -380,16 +388,11 @@
 
 
 
-
-
-
-
-
-
 	<cffunction name="informacoesItensAcompanhamento"   access="remote" hint="envia para a página acomanhamento.cfm tabs com informações do item.">
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="idOrientacao" type="numeric" required="true" />
 		<cfargument name="idProcesso" type="string" required="true" />
+		<cfset var rsItemNum = "">
 
 		<cfquery name="rsItemNum" datasource="#application.dsn_processos#">
 			SELECT pc_aval_numeracao FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
@@ -782,7 +785,7 @@
 	<cffunction name="distribuirMelhoria" returntype="any" access="remote" hint="Distribui as Propostas de Melhoria para áreas selecionadas pelo órgão avaliado.">
 		<cfargument name="pc_aval_melhoria_id" type="string" required="true" />
 		<cfargument name="pcAreasDistribuir" type="any" required="true" />
-	
+	    <cfset var de ="">
 		<cfquery name="rsMelhoria" datasource="#application.dsn_processos#">
 			SELECT * FROM pc_avaliacao_melhorias
 			WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">
@@ -823,17 +826,6 @@
 							WHERE pc_org_mcu = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">
 						</cfquery>
 	
-						<cfset to = Trim(rsOrgaoResp.pc_org_email)>
-						<cfset siglaOrgaoResponsavel = Trim(rsOrgaoResp.pc_org_sigla)>
-						<cfset pronomeTrat = "Senhor(a) Gestor da #siglaOrgaoResponsavel#">
-	
-						<cfset textoEmail = '
-							<p style="text-align: justify;">Seu órgão subordinador distribuiu novas Propostas de Melhoria para conhecimento e providências. Favor atentar para o prazo de resposta.</p>
-							<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
-							<p style="text-align:center;">
-								<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
-							</p>
-						'>
 	
 						<cfobject component="pc_cfcPaginasApoio" name="pc_cfcPaginasApoioDist"/>
 						<cfinvoke component="#pc_cfcPaginasApoioDist#" method="EnviaEmails" returnVariable="sucessoEmail" 
@@ -874,6 +866,15 @@
 		<cfargument name="pc_aval_orientacao_id" type="string" required="true" />
 		<cfargument name="pcAreasDistribuir" type="any" required="true" />
 		<cfargument name="pcOrientacaoResposta" type="string" required="true" />
+		<cfset var firstItem = "" >
+		<cfset var dataPrevista = "" >
+		<cfset var posic_status = "" >
+		<cfset var insertedIdOrientacao = "" >
+		<cfset var orgaoResp = "" >
+		<cfset var rsOrientacao = "" >
+		<cfset var rsPosicionamentosParaReplicacao = "" >
+		<cfset var rsInserirOrientacao = "" >
+		
 
 		<cfquery name="rsOrientacao" datasource="#application.dsn_processos#">
 			SELECT * FROM pc_avaliacao_orientacoes
@@ -990,6 +991,14 @@
 		<cfargument name="pc_aval_orientacao_id" type="string" required="true" />
 		<cfargument name="pcAreasDistribuir" type="any" required="true" />
 		<cfargument name="pcOrientacaoResposta" type="string" required="true" />
+		<cfset var orgaoResp ="">
+		<cfset var rsOrgaoResp = "">
+		<cfset var to = "">
+		<cfset var siglaOrgaoResponsavel = "">
+		<cfset var pronomeTrat = "">
+		<cfset var textoEmail = "">
+
+	
 
 		<cfloop list="#arguments.pcAreasDistribuir#" index="i">
 			<cftry>
@@ -1029,6 +1038,8 @@
 
 
 	<cffunction name="tabMelhoriasPendentes" access="remote" hint="Criar a tabela das propostas de melhoria e envia para a página pcAcompanhamento.cfm">
+		<cfset var rsMelhoriasPendentes = "">
+		<cfset var sei = "">
 		
 		<cfquery name="rsMelhoriasPendentes" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_melhorias.*, pc_processos.pc_modalidade, pc_processos.pc_processo_id, pc_processos.pc_num_sei
@@ -1202,10 +1213,7 @@
 
 			}
 
-			</script>
-
-
-
+		</script>
 
 	</cffunction>
 
@@ -1217,7 +1225,6 @@
 
 
 	<cffunction name="formMelhoriaPosic"   access="remote" hint="envia para a página acomanhamento.cfm o form de melhorias para manifestação">
-
 		<cfargument name="idMelhoria" type="numeric" required="true" />
 
 		<cfquery name="rsMelhoriaPosic" datasource="#application.dsn_processos#">
@@ -1427,7 +1434,16 @@
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="idMelhoria" type="numeric" required="true" />
 		<cfargument name="idProcesso" type="string" required="true" />
-
+        <cfset var ano = "">
+		<cfset var rsMelhoria = "">
+		<cfset var rsCategoriaControle = "">
+		<cfset var categoriaControleList = "">
+		<cfset var rsItemNum = "">
+		<cfset var rsOrgaoResp = "">
+		<cfset var sei = "">
+		<cfset var categoriaControleList = "">
+		<cfset var beneficioFinanceiro = "">
+		<cfset var custoEstimado = "">
 
 
 		<session class="content-header"  >
@@ -1899,6 +1915,12 @@
 
 	<cffunction name="timelineViewAcomp"   access="remote" hint="enviar o componente timeline dos processos em acompanhamento para a páginas pc_Acompanhamento chama pela função tabAvaliacoesAcompanhamento">
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
+		<cfset var rsProc = "">
+		<cfset var rsSe_Area = "">
+		<cfset var rsAreasTodas = "">
+		<cfset var rsAreasUnion = "">
+		<cfset var areasDaSE = "">
+	
 
 		<cfquery name="rsProc" datasource="#application.dsn_processos#">
 
@@ -3414,6 +3436,13 @@
 		<cfargument name="pc_aval_orientacao_status" type="numeric" required="true" />
 		<cfargument name="pc_aval_orientacao_numProcJudicial" type="string" required="false" default=''/>
 		<cfargument name="idAnexos" type="string" required="true">
+
+		<cfset var data = ''>
+		<cfset var textoPosic = ''>
+		<cfset var rsCadPosic = ''>
+		<cfset var rsOrgao = ''>
+		<cfset var idPosicCadastrado = ''>
+		<cfset var idArray = []>
 		
 		<cflock name="salvaPosicControleInterno_#arguments.pc_aval_orientacao_id#" type="exclusive" timeout="10">
 			<cftransaction>
@@ -3570,6 +3599,11 @@
 		<cfargument name="pc_aval_posic_numProcJudicial" type="string" required="false" default=''/>
 		<cfargument name="idAnexos" type="string" required="true">
 
+		<cfset var textoPosic = ''>
+		<cfset var rsCadPosic = ''>
+		<cfset var rsPosicNaoEnviada = ''>
+	
+
 		<cfquery datasource = "#application.dsn_processos#" name="rsPosicNaoEnviada">
 			SELECT pc_aval_posic_id, pc_aval_posic_enviado FROM pc_avaliacao_posicionamentos 
 			WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 0
@@ -3626,6 +3660,14 @@
 		<cfargument name="pc_aval_orientacao_dataPrevistaResp" type="string" required="false" default=''/>
 		<cfargument name="pc_aval_orientacao_mcu_orgaoResp" type="string" required="true" />
 		<cfargument name="idAnexos" type="string" required="true">
+
+		<cfset var textoPosic = ''>
+		<cfset var rsCadPosic = ''>
+		<cfset var rsDataPrevista = ''>
+		<cfset var rsOrgao = ''>
+		<cfset var idPosicCadastrado = ''>
+		<cfset var idArray = []>
+
 
 		<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 		<cftransaction>
@@ -3703,7 +3745,12 @@
 	</cffunction>
 
 	<cffunction name="uploadArquivosOrientacao" access="remote"  returntype="boolean" output="false" hint="realiza o upload dos anexos das orientacoes">
-
+		<cfset var thisDir = "">
+		<cfset var data = "">
+		<cfset var origem = "">
+		<cfset var destino = "">
+		<cfset var nomeDoAnexo = "">
+		<cfset var mcuOrgao = "">
 		
 		<cfset thisDir = expandPath(".")>
 
@@ -3745,6 +3792,9 @@
 
 	<cffunction name="dataHoraPosicSalvo" access="remote"  hint="Mostra a data/hora e nome do usuário que salvou o posicionamento">
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
+
+		<cfset var data = ''>
+		<cfset var hora = ''>
         <!-- Verifica se existe manifestação salva -->
 		<cfquery datasource="#application.dsn_processos#" name="rsManifestacaoSalva">
 			Select pc_avaliacao_posicionamentos.*, pc_orgaos.pc_org_sigla, pc_usuarios.pc_usu_nome FROM pc_avaliacao_posicionamentos 
