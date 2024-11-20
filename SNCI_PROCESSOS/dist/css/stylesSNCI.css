@@ -724,3 +724,27 @@ word-wrap: break-word;  /* Permite a quebra de palavras longas */
   .wrapper{
     background-color: #f4f6f9!important;
 }
+
+/* HTML: <i class="loaderAlert fas fa-bell"></i> */
+.loaderAlert {
+    color: #910a0a; /* Cor do ícone (vermelho forte) */
+    animation: l2 0.8s 10; /* Animação infinita */
+    display: inline-block; /* Permite usar animações em ícones */
+    filter: drop-shadow(0 0 0 #910a0a); /* Sombra inicial */
+}
+
+@keyframes l2 {
+    0% { 
+        filter: drop-shadow(0 0 0 #910a0a); /* Sem sombra */
+        transform: scale(1); /* Tamanho normal */
+    }
+    50% { 
+        filter: drop-shadow(0 0 15px #ff0000); /* Sombra vermelha mais intensa */
+        transform: scale(1.1); /* Aumenta um pouco o tamanho */
+    }
+    100% { 
+        filter: drop-shadow(0 0 0 #910a0a); /* Retorna à sombra inicial */
+        transform: scale(1); /* Tamanho normal */
+    }
+}
+
