@@ -40,7 +40,7 @@
 							</div>
 						</div>
 						
-						<div id="exibirTab" style="margin-top:10px"></div>
+						<div id="exibirTab" ></div>
 						
 							
 					</div>	<!-- fim card-body -->

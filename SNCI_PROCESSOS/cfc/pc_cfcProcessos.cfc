@@ -172,7 +172,7 @@
 			</head>
 			<body >
 				<!--acordion-->
-				<div id="accordion" style="display: flex; justify-content: left;">
+				<div id="accordion" style="display: flex; justify-content: left;margin-bottom: -54px;">
 				
 			
 					<div id="cadastro" class="card card-primary collapsed-card " style="margin-left:8px;">
