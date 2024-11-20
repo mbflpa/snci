@@ -13,7 +13,7 @@
 <cfquery name="rsAvaliacaoTipo" datasource="#application.dsn_processos#">
 	SELECT pc_aval_tipo_id, pc_aval_tipo_descricao
 	FROM pc_avaliacao_tipos
-	WHERE pc_aval_tipo_status = 'A'
+	WHERE pc_aval_tipo_status = 'D'
 	ORDER BY pc_aval_tipo_descricao
 </cfquery> 
 
