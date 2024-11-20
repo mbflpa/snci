@@ -4,6 +4,8 @@
 	
 
 	<cffunction name="cardsAvaliacao"   access="remote" hint="enviar os cards dos processos cadastrados e iniciados pata a páginas pc_Avaliacao">
+		<cfset var rsProcCadAvaliacao = "" >
+		<cfset var cardClass = "" >
 
 
 		<!-- Cards com os processos cadastrados e iniciados-->
@@ -1734,6 +1736,14 @@
 		<cfargument name="pc_aval_valorEstimadoNaoPlanejado" type="string" required="false"/>
 		<cfargument name="pc_aval_criterioRef_id" type="numeric" required="true"/>
 		<cfargument name="pcCriterioRefOutrosDesc" type="string" required="false"/>
+
+		<cfset var idAvalRisco = "">
+		<cfset var rsCriterioRef = "">
+		<cfset var rsAvaliacao = "">
+		<cfset var rsAvalTipoControle = "">
+		<cfset var rsAvalCategoriaControle = "">
+		<cfset var rsAvalRisco = "">
+		
 		
 		<cflock name="cadProcAvaliacaoItem_#arguments.pc_aval_processo#" type="exclusive" timeout="10">
 			<cfif arguments.pc_aval_id eq '' >
@@ -1949,9 +1959,26 @@
 
 	 
 	<cffunction name="tabAvaliacoes" returntype="any" access="remote" hint="Criar a tabela das avaliações e envia para a páginas pc_PcCadastroAvaliacaoPainel">
-	
-	 
 		<cfargument name="numProcesso" type="string" required="true"/>
+
+		<cfset var rsAvalTab = "">
+		<cfset var rsAnexoAvaliacao = "">
+		<cfset var rsMelhorias = "">
+		<cfset var rsOrientacoes = "">
+		<cfset var rsTiposControles = "">
+		<cfset var listaTiposControles = "">
+		<cfset var rsCategoriasControles = "">
+		<cfset var listaCategoriasControles = "">
+		<cfset var rsRiscos = "">
+		<cfset var listaRiscos = "">
+		<cfset classifRisco = "">
+		<cfset var vaFalta = "">
+		<cfset var vaSobra = "">
+		<cfset var vaRisco = "">
+		<cfset var dataHora = "">
+
+
+
 
 
 		<cfquery name="rsAvalTab" datasource="#application.dsn_processos#">
@@ -2523,7 +2550,28 @@
 		<cfargument name="pc_validacao_chat_matricula_para" type="string" required="false" />
 		<cfargument name="pc_validacao_chat_texto" type="string" required="false" />
 
-		
+		<cfset var rsAvaliacoesValidadas = "">
+		<cfset var rsProcessoComOrientacoes = "">
+		<cfset var rsPropostasMelhoria = "">
+		<cfset var listaEmailsOrgaos = "">
+		<cfset var rsProcesso = "">
+		<cfset var dataPTBR = "">
+		<cfset var dataCFQUERY = "">
+		<cfset var orgaoResp = ''>
+		<cfset var posic_status = ''>
+		<cfset var to = ''>
+		<cfset var cc = ''>
+		<cfset var siglaOrgaoAvaliado = ''>
+		<cfset var anoPacin = "">
+		<cfset var tipoAvaliacao = "">
+		<cfset var pronomeTrat = "">
+		<cfset var textoEmail = "">
+		<cfset var matriculaPara = "">
+
+
+
+
+
 		
 		<cfif #arguments.pcValidar# eq 1><!--Se a opção seleciona foi 1 - "Validar este item"-->
 			<cftransaction>
@@ -2863,9 +2911,18 @@
 
 
 	<cffunction name="cadastroAvaliacaoRelato"   access="remote" hint="Form de cadastro uma avaliação de relato">
-		
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
+
+		<cfset var rsStatus = "">
+		<cfset var rsProcAval = "">
+		<cfset var rsAvalStatusTipos = "">
+		<cfset var rs_OrgAvaliado = "">
+		<cfset var rsModalidadeProcesso = "">
+		<cfset var rsProcessoComOrientacoes = "">
+		<cfset var rsAvaliacoesValidadas = "">
+
+
 
 		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.idAvaliacao#
@@ -3062,7 +3119,7 @@
 									
 								</div>
 
-								<cfif #arguments.passoapasso# eq "true">	
+								<cfif arguments.passoapasso eq "true">	
 									<div  class="tab-pane fade"  id="custom-tabs-one-6passo" role="tabpanel" aria-labelledby="custom-tabs-one-6passo-tab">
 																			
 										<div id="pendenciasDiv"></div>
@@ -4892,7 +4949,17 @@
 	<cffunction name="verificaPendenciasRelato"   access="remote" hint="retorna se existem pendências no relato da avaliação método  cadastroAvaliacaoRelato, 6° Passo">
 		<cfargument name="pc_aval_id" type="numeric" required="true"/>
 
-		<cfset mensagem = ''>
+		<cfset var mensagem = ''>
+		<cfset var quantLetrasRelato = 0>
+		<cfset var rsOrientacoes = ''>
+		<cfset var rsMelhorias = ''>
+		<cfset var rsModalidadeProcesso = ''>
+		<cfset var rsAnexoAvaliacao = ''>
+		<cfset var rsProcessoComOrientacoes = ''>
+		<cfset var rsProcessoComMelhorias = ''>
+
+
+
 
 		
 		 
@@ -5219,6 +5286,13 @@
 	<cffunction name="tabMelhorias" returntype="any" access="remote" hint="Criar a tabela de propostas de melhoria e envia para a páginas pc_CadastroRelato">
 
 		<cfargument name="pc_aval_id" type="numeric" required="true"/>
+
+		<cfset var rsMelhorias = ''>
+		<cfset var rsStatus = ''>
+		<cfset var statusMelhoria = ''>
+		<cfset var listaCategoriasControlesMelhoria = ''>
+		<cfset var rsCategoriasControlesMelhorias = ''>
+		<cfset dataHora = ''>
 
 		<cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
 			Select pc_avaliacao_melhorias.* , pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
@@ -5593,8 +5667,12 @@
 
 
 	<cffunction name="tabOrientacoes" returntype="any" access="remote" hint="Criar a tabela de medidas/orientações para regularização e envia para a páginas pc_CadastroRelato">
-
 		<cfargument name="pc_aval_id" type="numeric" required="true"/>
+
+		<cfset var rsOrientacoes = ''>
+		<cfset var rsStatus = ''>
+		<cfset var listaCategoriasControlesOrientacao = ''>
+		<cfset var rsCategoriasControlesOrientacoes = ''>
 
 		<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 			Select pc_avaliacao_orientacoes.* , pc_orgaos.pc_org_sigla, pc_processos.pc_num_status
@@ -5905,9 +5983,9 @@
 
 	
 	<cffunction name="cadTextoAvaliacao"   access="remote"  returntype="any" hint="cadastra o texto da avaliação">
-		
 		<cfargument name="pc_aval_id" type="numeric" required="true"/>
 		<cfargument name="pc_aval_relato" type="string" required="true"/>
+		
 		<cftransaction>
 			<cfquery datasource="#application.dsn_processos#" >
 					UPDATE pc_avaliacoes
@@ -5933,6 +6011,9 @@
 
 	<cffunction name="tabAvaliacaoVersoes"   access="remote"  returntype="any" hint="mostra versões das avaliações na página avaliações no 2° Passo">
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
+
+		<cfset var rsAvaliacaoVersoes = ''>
+		<cfset var dataHoraVersao = ''>
 
 		<cfquery datasource="#application.dsn_processos#" name="rsAvaliacaoVersoes">
 			SELECT  pc_aval_versao_id, pc_aval_versao_num_aval, pc_aval_versao_num_matricula, pc_aval_versao_DataHora FROM pc_avaliacao_versoes
@@ -6062,7 +6143,10 @@
 	    <cfargument name="pc_aval_versao_id" type="numeric" required="true"/>
 		<cfargument name="pc_aval_versao_num_aval" type="numeric" required="true"/>
 
-
+		<cfset var rsVisualizaAvaliacaoVersoes = ''>
+		<cfset var rsUsuarioVersao = ''>
+		<cfset var rsUltimaVersao = ''>
+		<cfset var dataHoraVersao = ''>
 
 		<cfquery datasource="#application.dsn_processos#" name="rsVisualizaAvaliacaoVersoes">
 			SELECT pc_avaliacao_versoes.* FROM pc_avaliacao_versoes
@@ -6161,9 +6245,12 @@
 
    
 	<cffunction name="uploadArquivos" access="remote"  returntype="boolean" output="false" hint="realiza o upload das avaliações e dos anexos">
-
-		
-		<cfset thisDir = expandPath(".")>
+		<cfset var thisDir = expandPath(".")>
+		<cfset var data = ''>
+		<cfset var origem = ''>
+		<cfset var destino = ''>
+		<cfset var nomeDoAnexo = ''>
+		<cfset var mcuOrgao = ''>
 
 	
 
@@ -6264,11 +6351,15 @@
 
    
 	<cffunction name="tabAnexos" returntype="any" access="remote" hint="Criar a tabela dos anexos e envia para a páginas pc_CadastroRelato">
-
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
 		<cfargument name="pc_orientacao_id" type="string" required="false" default=""/>
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
 		<cfargument name="ehEdicao" type="string" required="false" default="N"/>
+
+		<cfset var rsAnexos = ''>
+		<cfset var rsStatus = ''>
+		<cfset var arquivo = ''>
+		<cfset var data = ''>
 		
 
         <cfquery datasource="#application.dsn_processos#" name="rsAnexos">
@@ -6475,9 +6566,12 @@
 
 
 	<cffunction name="tabAnexosOrientacoes" returntype="any" access="remote" hint="Criar a tabela dos anexos e envia para a página Acompanhamento">
-
-	    
 		<cfargument name="pc_orientacao_id" type="string" required="false" default=null/>
+
+		<cfset var rsAnexosEnviados = ''>
+		<cfset var rsAnexosNaoEnviados = ''>
+		<cfset var arquivo = ''>
+		<cfset var data = ''>
 	
 
         <cfquery datasource="#application.dsn_processos#" name="rsAnexosEnviados">
@@ -6768,6 +6862,13 @@
 		<cfargument name="todosOsRelatorios" type="string" required="false" default="N"/>
 		<cfargument name="ehEdicao" type="string" required="false" default="N"/>
 		
+		<cfset var rsStatus = ''>
+		<cfset var rsPc_anexos = ''>
+		<cfset var caminho = ''>
+
+		
+
+		
 		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status, pc_avaliacoes.pc_aval_processo FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
 		</cfquery>
@@ -6889,6 +6990,10 @@
 	<cffunction name="anexoRelatorio"   access="remote" hint="retorna os anexos que contem informação do processo no campo pc_anexo_processo_id indicando que é um anexo para todos os itens">
 		<cfargument name="pc_anexo_processo_id" type="string" required="true"/>
 
+		<cfset var rsPc_anexos = ''>
+		<cfset var caminho = ''>
+
+
 		<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos" > 
 			SELECT pc_anexos.*   FROM  pc_anexos
 			WHERE pc_anexo_processo_id = '#arguments.pc_anexo_processo_id#'
@@ -6993,6 +7098,7 @@
 
 	<cffunction name="delAnexos"   access="remote" returntype="boolean">
 		<cfargument name="pc_anexo_id" type="numeric" required="true" default=""/>
+		<cfset var rsPc_anexos = ''>
 
 		<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos"> 
 			SELECT pc_anexos.*   FROM  pc_anexos
@@ -7041,7 +7147,8 @@
 		<cfargument name="pc_aval_melhoria_beneficioFinanceiro" type="string" required="true"/>
 		<cfargument name="pc_aval_melhoria_custoFinanceiro" type="numeric" required="true"/>
 	
-
+		<cfset var rsMelhoria = ''>
+		
 
 		<cfquery datasource="#application.dsn_processos#" name="rsMelhoria">
 			<cfif arguments.pc_aval_melhoria_id eq ''>
@@ -7150,6 +7257,8 @@
 		<cfargument name="pc_aval_orientacao_beneficioFinanceiro" type="string" required="true"/>
 		<cfargument name="pc_aval_orientacao_custoFinanceiro" type="string" required="true"/>
 
+		<cfset var rsOrientacao = ''>
+
 		<cftransaction>
 			<cfquery datasource="#application.dsn_processos#"  name="rsOrientacao">
 				<cfif #arguments.pc_aval_orientacao_id# eq ''>
@@ -7244,6 +7353,10 @@
 
     <cffunction name="chatValidacaoForm"   access="remote" hint="envia um chat para cadastroAvaliacaoRelato, 6° Passo e 7° Passo.">
 		<cfargument name="pc_aval_id" type="numeric" required="true" />
+
+		<cfset var rsChat = ''>
+		<cfset var rsChatAvaliacao = ''>
+		<cfset var dataHora = ''>
 
 		<cfquery datasource="#application.dsn_processos#" name="rsChat">
 			SELECT pc_validacoes_chat.*
@@ -7352,8 +7465,10 @@
 
 
 	<cffunction name="getAvaliacaoTipos" access="remote" returntype="any" returnformat="json" output="false">
-	    <cfset data = []>
-        <cfset tipo = {}>
+	    <cfset var data = []>
+        <cfset var tipo = {}>
+		<cfset var qAvaliacaoTipos = ''>
+
 		<cfquery name="qAvaliacaoTipos" datasource="#application.dsn_processos#">
 			SELECT 
 				pc_aval_tipo_id, 
@@ -7384,8 +7499,10 @@
 
 
 	<cffunction name="getAvaliacaoCoso" access="remote" returntype="any" returnformat="json" output="false">
-		<cfset data = []>
-		<cfset coso = {}>
+		<cfset var data = []>
+		<cfset var coso = {}>
+		<cfset var qAvaliacaoCoso = ''>
+
 		<cfquery name="qAvaliacaoCoso" datasource="#application.dsn_processos#">
 			SELECT 
 				pc_aval_coso_id, 
@@ -7414,8 +7531,17 @@
 
 	<cffunction name="getAvaliacaoDadosParaEdicao" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="pc_aval_id" type="numeric" required="true" />
-		<cfset data = []>
-		<cfset avaliacao = {}>
+		<cfset var data = []>
+		<cfset var avaliacao = {}>
+		<cfset var qAvaliacaoDados = ''>
+		<cfset var rsTiposControles = ''>
+		<cfset var listaTiposControles = ''>
+		<cfset var rsCategoriasControles = ''>
+		<cfset var listaCategoriasControles = ''>
+		<cfset var rsRiscos = ''>
+		<cfset var listaRiscos = ''>
+		<cfset var avaliacao = {}>
+
 		<cfquery name="qAvaliacaoDados" datasource="#application.dsn_processos#">
 			SELECT 
 				pc_aval_id, pc_aval_processo, pc_aval_numeracao, pc_aval_descricao, 
