@@ -23,8 +23,15 @@
         <cfargument name="pcTipoDemanda" type="string" required="true"/>
 		<cfargument name="pcAnoPacin" type="string" required="true"/>
 		
-		<cfset ano = year(#arguments.pcDataInicioAvaliacao#)>
-		<cfset login = '#application.rsUsuarioParametros.pc_usu_login#'>
+		<cfset var ano = year(#arguments.pcDataInicioAvaliacao#)>
+		<cfset var login = '#application.rsUsuarioParametros.pc_usu_login#'>
+		<cfset var NumID = ''>
+		<cfset var aux_sei = ''>
+		<cfset var rsSeq = ''>
+		<cfset var rsSEorgAvaliado = ''>
+		<cfset var anoAntes = ''>
+		<cfset var matriculaAvaliador = ''>
+		<cfset var coordena = ''>
 
 		<cfquery name="rsSEorgAvaliado" datasource="#application.dsn_processos#">
 		  SELECT pc_org_se from pc_orgaos where pc_org_mcu = #arguments.pcOrgaoAvaliado#
@@ -176,8 +183,13 @@
 
 	
 	<cffunction name="cardsProcessos" returntype="any" access="remote" hint="Criar os cards dos processos e envia para a páginas pc_CadastroProcesso">
-	   
 		<cfargument name="ano" type="string" required="true" />
+
+		<cfset var rsProcCard = ''>
+		<cfset var aux_sei = ''>
+		<cfset var rsAvaliadores = ''>
+		<cfset var avaliadores = ''>
+
 
 		<cfquery name="rsProcCard" datasource="#application.dsn_processos#">
 			SELECT DISTINCT pc_processos.*,pc_orgaos.pc_org_descricao,pc_orgaos.pc_org_sigla, pc_status.*,pc_avaliacao_tipos.pc_aval_tipo_descricao
@@ -395,11 +407,11 @@
 
 
 	<cffunction name="cadProcAvaliacaoForm"   access="remote"  returntype="any" hint="Insere o formulario de cadastro do título da avaliação na páginas pc_CadastroAvaliacaoPainel">
-
-
         <cfargument name="pc_aval_processoForm" type="string" required="true"/>
         
-       
+		<cfset var rsProcForm = ''>
+		<cfset var rs_OrgAvaliado = ''>
+		<cfset var aux_sei = ''>
 
 		<cfquery name="rsProcForm" datasource="#application.dsn_processos#">
 			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
@@ -786,6 +798,9 @@
 	<cffunction name="anexoRelatorio"   access="remote" hint="retorna os anexos que contem informação do processo no campo pc_anexo_processo_id indicando que é um anexo para todos os itens">
 		<cfargument name="pc_anexo_processo_id" type="string" required="true"/>
 
+		<cfset var rsPc_anexos = ''>
+		<cfset var caminho = ''>
+
 		<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos" > 
 			SELECT pc_anexos.*   FROM  pc_anexos
 			WHERE pc_anexo_processo_id = '#arguments.pc_anexo_processo_id#'
@@ -875,11 +890,13 @@
 
 
 	<cffunction name="uploadArquivos" access="remote"  returntype="boolean" output="false" hint="realiza o upload das avaliações e dos anexos">
+		<cfset var thisDir = expandPath(".")>
+		<cfset var data = ''>
+		<cfset var origem = ''>
+		<cfset var destino = ''>
+		<cfset var nomeDoAnexo = ''>
+		<cfset var mcuOrgao = ''>
 
-		
-		<cfset thisDir = expandPath(".")>
-
-	
 
 		<cfif pc_anexo_avaliacaoPDF eq 'S'>
 			<cffile action="upload" filefield="file" destination="#application.diretorio_avaliacoes#" nameconflict="skip">
@@ -944,6 +961,8 @@
 
 	<cffunction name="delAnexos"   access="remote" returntype="boolean">
 		<cfargument name="pc_anexo_id" type="numeric" required="true" default=""/>
+
+		<cfset var rsPc_anexos = ''>
 
 		<cfquery datasource="#application.dsn_processos#" name="rsPc_anexos"> 
 			SELECT pc_anexos.*   FROM  pc_anexos
@@ -1027,10 +1046,17 @@
 
 
 	<cffunction name="tabAvaliacoes" returntype="any" access="remote" hint="Criar a tabela das avaliações e envia para a páginas pc_PcCadastroAvaliacaoPainel">
-	
-	 
 		<cfargument name="numProcesso" type="string" required="true"/>
 
+		<cfset var rsAvalTab = ''>
+		<cfset var rsAnexoAvaliacao = ''>
+		<cfset var rsMelhorias = ''>
+		<cfset var rsOrientacoes = ''>
+		<cfset var classifRisco = ''>
+		<cfset var vaFalta = ''>
+		<cfset var vaRisco = ''>
+		<cfset var vaSobra = ''>
+		<cfset var dataHora = ''>
 
 		<cfquery name="rsAvalTab" datasource="#application.dsn_processos#">
 			SELECT      pc_avaliacoes.* 
@@ -1346,6 +1372,10 @@
 		<cfargument name="pc_aval_id" type="numeric" required="true" />
 		<cfargument name="pc_aval_processo" type="string" required="true" />
 
+		<cfset var rsAnexoAvaliacao = ''>
+		<cfset var rsMelhorias = ''>
+		<cfset var rsAvaliacoes = ''>
+
 		<cfquery datasource="#application.dsn_processos#" name="rsAnexoAvaliacao">
 			SELECT pc_anexos.pc_anexo_avaliacao_id FROM pc_anexos WHERE pc_anexo_avaliacao_id = #arguments.pc_aval_id# 
 		</cfquery> 
@@ -1392,6 +1422,15 @@
 	<cffunction name="cadastroAvaliacaoRelato"   access="remote" hint="valida (ou  não) a avaliação e, se foi a Última avaliação a ser validada, envia o processo para o Órgão responsável.">
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="passoapasso" type="string" required="false" default="true"/>
+
+		<cfset var rsStatus = ''>
+		<cfset var rsProcAval = ''>
+		<cfset var rsAvalStatusTipos = ''>
+		<cfset var rs_OrgAvaliado = ''>
+		<cfset var rsModalidadeProcesso = ''>
+		<cfset var rsProcessoComOrientacoes = ''>
+		<cfset var rsAvaliacoesValidadas = ''>
+		
 
 		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = #arguments.idAvaliacao#
@@ -2537,8 +2576,12 @@
 	
 
 	<cffunction name="tabMelhorias" returntype="any" access="remote" hint="Criar a tabela de propostas de melhoria e envia para a páginas pc_CadastroRelato">
-
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
+
+		<cfset var rsMelhorias = "" />
+		<cfset var rsStatus = "" />
+		<cfset var statusMelhoria = "" />
+		<cfset var dataHora = "" />
 
         <cfquery datasource="#application.dsn_processos#" name="rsMelhorias">
 			Select pc_avaliacao_melhorias.* , pc_orgaos.pc_org_sigla, pc_orgaoSug.pc_org_sigla as siglaOrgSug
@@ -2773,8 +2816,10 @@
 
 
 	<cffunction name="tabOrientacoes" returntype="any" access="remote" hint="Criar a tabela de medidas/orientações para regularização e envia para a páginas pc_CadastroRelato">
-
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
+
+		<cfset var rsOrientacoes = "" />
+		<cfset var rsStatus = "" />
 
         <cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
 			Select pc_avaliacao_orientacoes.* , pc_orgaos.pc_org_sigla, pc_processos.pc_num_status
@@ -2900,9 +2945,13 @@
 
 
 	<cffunction name="tabAnexos" returntype="any" access="remote" hint="Criar a tabela dos anexos e envia para a páginas pc_CadastroRelato">
-
 	    <cfargument name="pc_aval_id" type="numeric" required="true"/>
 		<cfargument name="pc_orientacao_id" type="string" required="false" default=""/>
+
+		<cfset var rsAnexos = "" />
+		<cfset var rsStatus = "" />
+		<cfset var arquivo = "" />
+		<cfset var data = "" />
 		
 
         <cfquery datasource="#application.dsn_processos#" name="rsAnexos">
@@ -3086,6 +3135,10 @@
 	<cffunction name="anexoAvaliacao"   access="remote" hint="retorna os anexos que contem 'S' no campo pc_anexo_avaliacao indicando que é a avaliação e  não um anexo comum">
 		<cfargument name="pc_aval_id" type="numeric" required="true" returntype="any"/>
 		<cfargument name="todosOsRelatorios" type="string" required="false" default="N"/>
+
+		<cfset var rsStatus = "" />
+		<cfset var rsPc_anexos = "" />
+		<cfset var caminho = "" />
 		
 		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status, pc_avaliacoes.pc_aval_processo FROM pc_avaliacoes WHERE pc_aval_id = #arguments.pc_aval_id#
@@ -3187,6 +3240,21 @@
 		<cfargument name="pc_aval_orientacao_descricao" type="string" required="true"/>
 		<cfargument name="pc_aval_orientacao_mcu_orgaoResp" type="string" required="true"/>
 		<cfargument name="pc_aval_orientacao_id" type="string" required="false" default=""/>
+
+
+		<cfset var dataPTBR = "" />
+		<cfset var dataCFQUERY = "" />
+		<cfset var rsProcesso = "" />
+		<cfset var qCadastraOrientacao = "" />
+		<cfset var IDdaOriencaoCadastrada = "" />
+		<cfset var posicaoInicial = "" />
+		<cfset var orgaoResp = "" />
+		<cfset var posic_status = "" />
+		<cfset var qCadastraOrientacao = "" />
+		<cfset var qCadastraOrientacao = "" />
+
+		
+
 		<!--Adiciona 30 dias úteis à data atual para gerar a data prevista para resposta que constara np texto do manifestação-->
 		<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio">
 		<cfinvoke component="#pc_cfcPaginasApoio#" method="obterDataPrevista" returnVariable="obterDataPrevista" qtdDias = 30 />
@@ -3279,14 +3347,11 @@
 	
 	
 	<cffunction name="cadMelhorias"   access="remote"  returntype="any" hint="cadastra/edita as propostas de melhoria">
-		
 		<cfargument name="modalidade" type="string" required="true"/>
 		<cfargument name="pc_aval_id" type="numeric" required="true"/>
 		<cfargument name="pc_aval_melhoria_descricao" type="string" required="true"/>
 		<cfargument name="pc_aval_melhoria_num_orgao" type="string" required="true"/>
-
 		<cfargument name="pc_aval_melhoria_id" type="string" required="false" default=""/>
-
 		<cfargument name="pc_aval_melhoria_dataPrev" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_sugestao" type="string" required="false" default=""/>
 		<cfargument name="pc_aval_melhoria_sug_orgao_mcu" type="string" required="false" default=""/>

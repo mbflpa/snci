@@ -5,6 +5,18 @@
         <cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
         <cfargument name="paraControleInterno" type="string" required="true" />
 
+        <cfset var rsProcessos = "" />
+        <cfset var rsPosicionamentos = "" />
+        <cfset var data = "" />
+        <cfset var icone = "" />
+        <cfset var cor = "" />
+        <cfset var hora = "" />
+        <cfset var arquivo = "" />
+        <cfset var dataPrev = "" />
+        <cfset var rsAnexosPosic = "" />
+        
+        
+
         <cfquery name="rsProcessos" datasource="#application.dsn_processos#">
 
 			SELECT      pc_processos.*, pc_avaliacoes.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_mcu as mcuAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 

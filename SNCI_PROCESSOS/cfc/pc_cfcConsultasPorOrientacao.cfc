@@ -1,14 +1,16 @@
 <cfcomponent >
 <cfprocessingdirective pageencoding = "utf-8">	
 
-    
-
-
-
    	<cffunction name="tabConsulta" returntype="any" access="remote" hint="Criar a tabela dos processos e envia para a página pcConsulta.cfm">
-	   	
 	   	<cfargument name="ano" type="string" required="true"  />
 	  	<cfargument name="processoEmAcompanhamento" type="boolean" required="false" default="true" />
+
+		<cfset var rsProcTab = "">
+		<cfset var colunaEmAnalise = 0>
+		<cfset var dataPrev = "">
+		<cfset var sei = "">
+		<cfset var dataHora = "">
+		<cfset var dataFormatada = "">
 
 	
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
@@ -129,7 +131,7 @@
 		</cfquery>
 
 		<div class="row">
-			<cfset colunaEmAnalise = 0>			 
+				 
 			<div class="col-12">
 				<div class="card"  >
 					
@@ -447,6 +449,12 @@
 		<cfargument name="idOrientacao" type="numeric" required="true" />
 		<cfargument name="orgaoOrigem" type="string" required="true" />-->
 		<cfargument name="analiseOrgaoOrigem" type="numeric" required="true" />
+
+		<cfset var orgaoRespOrientacao = "">
+		<cfset var statusOrientacao = "">
+		<cfset var textoPosic = "">
+
+
 		<!--Se for marcado checkbox, o órgão responsável será o órgão de origem do processo, caso contrário será o órgão de lotação do usuário--> 
 		<cfif arguments.analiseOrgaoOrigem eq 0>
 			<cfset orgaoRespOrientacao = "#application.rsUsuarioParametros.pc_usu_lotacao#">
@@ -522,6 +530,8 @@
 		<cfargument name="idOrientacao" type="numeric" required="true" />
 		<cfargument name="idProcesso" type="string" required="true" />
 
+		<cfset var rsStatus = "">
+		
 		<cfquery datasource="#application.dsn_processos#" name="rsStatus">
 			SELECT pc_avaliacoes.pc_aval_status FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam value="#arguments.idAvaliacao#" cfsqltype="cf_sql_integer">
 		</cfquery>

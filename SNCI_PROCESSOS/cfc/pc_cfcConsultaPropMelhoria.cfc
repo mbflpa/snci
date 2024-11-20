@@ -4,6 +4,12 @@
 
 
     <cffunction name="tabMelhoriasConsulta" access="remote" hint="Criar a tabela das propostas de melhoria e envia para a página pc_ConsultarMelhorias.cfm">
+		<cfset var rsMelhorias = "">
+		<cfset var statusMelhoria = "">
+		<cfset var corStatusMelhoria = "">
+		<cfset var sei = "">
+		<cfset var dataHora = "">
+		<cfset var dataFormatada = "">
 
 		<cfquery name="rsMelhorias" datasource="#application.dsn_processos#" timeout="120">
 			SELECT pc_avaliacao_melhorias.*
@@ -315,6 +321,11 @@
 		<cfargument name="idAvaliacao" type="numeric" required="true" />
 		<cfargument name="idMelhoria" type="numeric" required="true" />
 		<cfargument name="idProcesso" type="string" required="true" />
+
+		<cfset var rsMelhoria = "">
+		<cfset var categoriaControleList = "">
+		<cfset var rsCategoriaControle = "">
+		<cfset var rsItemNum = "">
 
 		<form id="formCadItem" name="formCadItem" format="html"  style="height: auto;" style="margin-bottom:100px">
 

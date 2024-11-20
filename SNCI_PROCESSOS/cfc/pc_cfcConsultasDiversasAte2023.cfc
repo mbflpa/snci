@@ -3,6 +3,12 @@
 
 	<cffunction name="getProcessosJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
+		
+		
+		<cfset var rsProcTab = "">
+		<cfset var processos = []>
+		<cfset var processo = {}>
+		
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT  DISTINCT    pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
@@ -100,8 +106,7 @@
 			</cfif>
 			
 		</cfquery>
-		<!-- Create an empty array to hold the processo data -->
-		<cfset processos = []>
+		
 
 		<!-- Loop through the query result 'rsProcTab' -->
 		<cfloop query="rsProcTab">
@@ -158,6 +163,12 @@
 
 	<cffunction name="getItensJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
+
+		<cfset var rsProcTab = "">
+		<cfset var itens = []>
+		<cfset var item = {}>
+		<cfset var classifRisco = "">
+
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT  DISTINCT  pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
 						pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
@@ -260,8 +271,7 @@
 		
 			
 		</cfquery>		
-		<!-- Create an empty array to hold the item data -->
-		<cfset itens = []>
+		
 
 		<!-- Loop through the query result 'rsProcTab' -->
 		<cfloop query="rsProcTab">
@@ -341,6 +351,15 @@
 	  
     <cffunction name="getOrientacoesJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
+
+		<cfset var rsProcTab = "">
+		<cfset var orientacoes = []>
+		<cfset var orientacao = {}>
+		<cfset var classifRisco = "">
+		<cfset var vaFalta = "">
+		<cfset var vaSobra = "">
+		<cfset var vaRisco = "">
+
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 
 			SELECT  DISTINCT    pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
@@ -438,9 +457,6 @@
 
 		</cfquery>
 		
-		
-		<!-- Create an empty array to hold the orientacao data --
-		<cfset orientacoes = []>
 
 		<!-- Loop through the query result 'rsProcTab' -->
 		<cfloop query="rsProcTab">
@@ -537,6 +553,17 @@
 
 	<cffunction name="getPropostasMelhoriaJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
+
+		<cfset var rsProcTab = "">
+		<cfset var propostasMelhoria = []>
+		<cfset var proposta = {}>
+		<cfset var classifRisco = "">
+		<cfset var vaFalta = "">
+		<cfset var vaSobra = "">
+		<cfset var vaRisco = "">
+		<cfset var statusMelhoria = "">
+		<cfset var dataPrev = "">
+
 		<!-- Query to fetch data -->
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
@@ -631,9 +658,7 @@
 
 			
 		</cfquery>	
-		<!-- Create an empty array to hold the propostasMelhoria data -->
-		<cfset propostasMelhoria = []>
-
+		
 		<!-- Loop through the query result 'rsProcTab' -->
 		<cfloop query="rsProcTab">
 		    

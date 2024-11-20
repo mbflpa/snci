@@ -5,7 +5,8 @@
 	<cffunction name="tabConsultaExportarProcessos"   access="remote" hint="gera a consulta para exportação de qualquer informação sobre os processos">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
 		
-		
+		<cfset var rsProcTab = ''>
+		<cfset var status = ''>
 
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT  DISTINCT    *
@@ -389,6 +390,10 @@
 
 	<cffunction name="getProcessosJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
+
+		<cfset var rsProcTab = ''>
+		<cfset var processos = []>
+		<cfset var processo = {}>
 		
 		<!-- Query to fetch data -->
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
@@ -596,7 +601,11 @@
 	<cffunction name="tabConsultaExportarItens"   access="remote" hint="gera a consulta para exportação de qualquer informação sobre os processos">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
 		
-		
+		<cfset var rsProcTab = ''>
+		<cfset var status = ''>
+		<cfset var classifRisco = "">
+
+	
 
 		<cfquery name="rsProcTabInicio" datasource="#application.dsn_processos#" timeout="120" >
 			SELECT  DISTINCT  *, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
@@ -1070,6 +1079,12 @@
 
 	<cffunction name="getItensJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
+
+		<cfset var rsProcTab = "" />
+		<cfset var itens = [] />
+		<cfset var item = {} />
+		<cfset var classifRisco = "" />
+
 		
 		<!-- Query to fetch data -->
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
@@ -1339,6 +1354,15 @@
     <cffunction name="tabConsultaExportarOrientacoes"   access="remote" hint="gera a consulta para exportação de qualquer informação sobre os processos">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
 		
+		<cfset var rsProcTabInicio = "" />
+		<cfset var rsProcTab = "" />
+		<cfset var status = "" />
+		<cfset var classifRisco = "" />
+		<cfset var rsOrientacaoCategoriasControles = "" />
+		<cfset var categoriasControlesOrientacaoList = "" />
+		<cfset var classifRisco = "" />
+
+
 		<cfquery name="rsProcTabInicio" datasource="#application.dsn_processos#" timeout="120" >
 
 			SELECT      pc_processos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
@@ -1860,6 +1884,11 @@
 	<cffunction name="getOrientacoesJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
 		
+		<cfset var rsProcTab = "" />
+		<cfset var orientacoes = []>
+		<cfset var orientacao = {}>
+		<cfset var classifRisco = "">
+
 		<!-- Query to fetch data -->
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
 
@@ -2366,6 +2395,13 @@
 
 	<cffunction name="getPropostasMelhoriaJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfargument name="ano" type="string" required="false" default="Não selecionado"/>
+
+		<cfset var rsProcTab = "">
+		<cfset var propostasMelhoria = []>
+		<cfset var proposta = {}>
+		<cfset var classifRisco = "">
+		<cfset var statusMelhoria = "">
+		
 		
 		<!-- Query to fetch data -->
 		<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120" >
