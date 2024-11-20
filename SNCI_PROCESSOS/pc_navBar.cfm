@@ -40,8 +40,8 @@
 					</li>
 				<cfelse>
 					<li class="nav-item dropdown " id="alertasDropdownCI">
-						<a class="nav-link grow-icon animate__animated animate__heartBeat animate__delay-2s animate__fast" style="animation-iteration-count:2" data-toggle="dropdown" href="#" >
-							<i class="fas fa-bell fa-2x " style="color:#00416B"></i>
+						<a class="nav-link grow-icon " style="animation-iteration-count:2" data-toggle="dropdown" href="#" >
+							<i class="fas fa-bell fa-2x loaderAlert" style="color:#00416B"></i>
 							<span id="badgeAlertaCI" class="badge badge-danger navbar-badge" style="font-size:12px;top: 2px;"></span>
 						</a>
 						<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right alertaNavBar" style="margin-top: 5px;">
