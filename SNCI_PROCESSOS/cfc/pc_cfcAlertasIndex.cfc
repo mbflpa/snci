@@ -2,6 +2,7 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
 	<cffunction name="getTotalOrientacoes" access="public" returntype="numeric">
+	    <cfset var qPosicionamentos = 0>
 		<cfquery datasource="#application.dsn_processos#" name="qPosicionamentos">
 			SELECT COUNT(pc_aval_orientacao_id) AS totalOrientacoes
 			FROM pc_avaliacao_orientacoes
@@ -16,6 +17,7 @@
 	</cffunction>
     
     <cffunction name="getTotalOrientacoesSubordinados" access="public" returntype="numeric">
+	    <cfset var qOrientacoesSubordinados = 0>
         <cfquery datasource="#application.dsn_processos#" name="qOrientacoesSubordinados">
             SELECT count(pc_aval_orientacao_id) as totalOrientacoesSubordinados
             FROM pc_avaliacao_orientacoes
@@ -36,6 +38,7 @@
     </cffunction>
     
     <cffunction name="getTotalMelhoriasPendentes" access="public" returntype="numeric">
+	    <cfset var qMelhoriasPendentes = 0>
         <cfquery datasource="#application.dsn_processos#" name="qMelhoriasPendentes">
             SELECT count(pc_aval_melhoria_id) as totalMelhoriasPendentes
             FROM pc_avaliacao_melhorias
@@ -174,6 +177,7 @@
 
 
 	<cffunction name="getTotalPosicionamentosIniciaisCI" access="public" returntype="numeric">
+		<cfset var qPosicionamentos = 0>
 		<cfquery datasource="#application.dsn_processos#" name="qPosicionamentos">
 			SELECT COUNT(pc_aval_orientacao_id) AS totalOrientacoes 
 			FROM pc_avaliacao_orientacoes
@@ -192,6 +196,7 @@
 
 
 	<cffunction name="getOrgaosSemUsuarioCI" access="private" returntype="query">
+	    <cfset var qOrgaosSemUsuario = "">
 		<cfquery datasource="#application.dsn_processos#" name="qOrgaosSemUsuario">
 			SELECT DISTINCT 
 				pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp AS mcuOrgaoResp,
@@ -249,6 +254,7 @@
 	</cffunction>
 
 	<cffunction name="getTotalOrgaosSemUsuarioCI" access="public" returntype="numeric">
+		<cfset var qOrgaosSemUsuarioCount = 0>
 		<cfquery datasource="#application.dsn_processos#" name="qOrgaosSemUsuarioCount">
 			SELECT COUNT(DISTINCT mcuOrgaoResp) AS totalOrgaos
 			FROM (
