@@ -57,7 +57,7 @@
 	<div class="wrapper">
 	
 		
-		<cfinclude template="pc_Modal_preloader.cfm">
+		
 		<cfinclude template="pc_NavBar.cfm">
 
 	<!-- Content Wrapper. Contains page content -->

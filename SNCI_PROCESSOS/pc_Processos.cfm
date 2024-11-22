@@ -16,7 +16,7 @@
 <body id="bodyPrincipal" class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
 	<div class="wrapper">
 
-		<cfinclude template="pc_Modal_preloader.cfm">
+		
 		<cfinclude template="pc_NavBar.cfm">
 		
 		<!-- Content Wrapper. Contains page content -->

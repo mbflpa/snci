@@ -34,7 +34,7 @@
           
      </head>
      <body class="hold-transition " data-panel-auto-height-mode="height" >
-      <cfinclude template="pc_Modal_preloader.cfm">
+      
           <!-- Site wrapper -->
           <div class="wrapper">
                <!-- Content Wrapper. Contains page content -->

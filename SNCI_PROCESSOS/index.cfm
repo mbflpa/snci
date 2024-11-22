@@ -18,7 +18,7 @@
 
 
 <body class="layout-footer-fixed hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
-    <cfinclude template="pc_Modal_preloader.cfm">
+    
 	
 	<div class="wrapper">
 
