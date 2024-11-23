@@ -333,10 +333,22 @@
                 font-weight: 400 !important;
             }
 
-            .tituloTab{
-                display: flex!important;
-                text-align: center!important;
+           
+
+            .nav-item {
+                display: flex; /* Necessário para alinhar os filhos */ 
             }
+
+            /* .tituloTab herda a altura */
+            .tituloTab {
+                flex: 1; /* Garante que ocupe toda a altura disponível */
+                display: flex;
+                align-items: center; /* Centraliza verticalmente */
+                justify-content: center; /* Opcional */
+                text-align: center; /* Centraliza texto em várias linhas */
+                height: 100%; /* Ocupa toda a altura do pai */
+            }
+
 
             
         
@@ -393,7 +405,7 @@
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-sintese-tab"  data-toggle="pill" href="##custom-tabs-infoItem-sintese" role="tab" aria-controls="custom-tabs-infoItem-sintese" aria-selected="true"><span class="tituloTab"><br>Síntese</span></a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-sintese-tab"  data-toggle="pill" href="##custom-tabs-infoItem-sintese" role="tab" aria-controls="custom-tabs-infoItem-sintese" aria-selected="true"><span class="tituloTab">Síntese</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
@@ -401,7 +413,7 @@
                                                     </li>
 
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-controleTestado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-controleTestado" role="tab" aria-controls="custom-tabs-infoItem-controleTestado" aria-selected="true"><span class="tituloTab"><br>Controle Testado</span></a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-controleTestado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-controleTestado" role="tab" aria-controls="custom-tabs-infoItem-controleTestado" aria-selected="true"><span class="tituloTab">Controle<br>Testado</span></a>
                                                     </li>
 
                                                     <li class="nav-item" style="">
@@ -412,7 +424,7 @@
                                                         <a  class="nav-link " id="custom-tabs-infoItem-valorEstimado-tab"  data-toggle="pill" href="##custom-tabs-infoItem-valorEstimado" role="tab" aria-controls="custom-tabs-infoItem-valorEstimado" aria-selected="true"><span class="tituloTab">Potencial<br>Valor Estimado</span></a>
                                                     </li>
                                                     <li class="nav-item" style="">
-                                                        <a  class="nav-link " id="custom-tabs-infoItem-anexosItem-tab"  data-toggle="pill" href="##custom-tabs-infoItem-anexosItem" role="tab" aria-controls="custom-tabs-infoItem-anexosItem" aria-selected="true"><span class="tituloTab"><br>Anexos do Item</span></a>
+                                                        <a  class="nav-link " id="custom-tabs-infoItem-anexosItem-tab"  data-toggle="pill" href="##custom-tabs-infoItem-anexosItem" role="tab" aria-controls="custom-tabs-infoItem-anexosItem" aria-selected="true"><span class="tituloTab">Anexos<br>do Item</span></a>
                                                     </li>
                                                     <li class="nav-item" style="">
                                                         <a  class="nav-link " id="custom-tabs-infoItem-InfItem-criterioRefNormativa-tab"  data-toggle="pill" href="##custom-tabs-infoItem-criterioRefNormativa" role="tab" aria-controls="custom-tabs-infoItem-criterioRefNormativa" aria-selected="true"><span class="tituloTab">Critérios e<br>Ref. Normativas</span></a>
