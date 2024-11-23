@@ -41,7 +41,7 @@
             </div>
             <div class="tab-content">
                 <div class="tab-empty">
-                    <div class="display-5">Clique em uma página no menu ao lado para incluir aqui!</div>
+                    <div class="display-5">Clique em um link no menu ao lado para incluir aqui!</div>
                 </div>
             </div>
         </div>
