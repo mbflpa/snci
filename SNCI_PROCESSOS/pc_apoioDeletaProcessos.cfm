@@ -52,24 +52,11 @@
 			<div class="content-header" style="background:  #f4f6f9;">
 			
 				<div class="container-fluid">
-				<h4>Excluir Processos</h4>
-				
 					<div class="card-body" >
-
-                  
-						
 						<div id="exibirTab"></div>
-
-							
+						<div id="exibirTabExcluidos"></div>
 					</div>	<!-- fim card-body -->
-
-					
-			
-					
 				</div>
-
-
-				
 			</div>
 
 			
@@ -103,6 +90,7 @@
 		$(window).on("load",function(){
 	        //$('#modalOverlay').modal('show');
 			exibirTabela();
+			exibirTabelaExcluidos()
 			//$('#modalOverlay').modal('hide');
 
 
@@ -136,7 +124,8 @@
 							
 						})//fim ajax
 						.done(function(result) {
-							exibirTabela()
+							exibirTabela();
+							exibirTabelaExcluidos();
 							$('#modalOverlay').delay(1000).hide(0, function() {
 								$('#modalOverlay').modal('hide');
 								toastr.success('Operação realizada com sucesso!');
@@ -192,6 +181,31 @@
 			
 			
 		}
+
+		function exibirTabelaExcluidos(){
+		
+			$.ajax({
+				type: "post",
+				url: "cfc/pc_cfcProcessos.cfc",
+				data:{
+					method: "tabProcessosExcluidos",
+				},
+				async: false,
+				success: function(result) {
+					$('#exibirTabExcluidos').html(result)
+				},
+				error: function(xhr, ajaxOptions, thrownError) {
+					$('#modal-danger').modal('show')
+					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+					$('#modal-danger').find('.modal-body').text(thrownError)
+				}
+			})	
+			
+			
+		}
+
+
+
         
         
 

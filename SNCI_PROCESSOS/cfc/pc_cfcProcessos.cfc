@@ -3040,8 +3040,10 @@
 			<div class="row">
 				<div class="col-12">
 					<div class="card">
-					
-						<!-- /.card-header -->
+					    <div class="card-header card-header_backgroundColor">
+							<h3 class="card-title">Excluir Processos</h3>
+						</div>
+						
 						<div class="card-body">
 							<table id="tabProcessos" class="table table-striped table-hover text-nowrap  table-responsive">
 							<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
@@ -3158,18 +3160,21 @@
 		<script language="JavaScript">
 			$(function () {
 				$("#tabProcessos").DataTable({
-				"destroy": true,
-				"stateSave": false,
-				"responsive": true, 
-				"lengthChange": true, 
-				"autoWidth": false,
-				"buttons": [{
-						extend: 'excel',
-						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
-						className: 'btExcel',
-					}],
-				language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
-				}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
+					destroy: true,
+					stateSave: true,
+					autoWidth: true, //largura da tabela de acordo com o conteúdo
+					pageLength: 5,
+					dom: 
+						"<'row d-flex align-items-center'<'col-auto'B><'col-auto'f><'col-auto'p>>" + // Botões, filtros e paginação na mesma linha, alinhados à esquerda
+						"<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
+						"<'row'<'col-12'tr>>",  // Tabela com todos os dados
+					buttons: [{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
+							className: 'btExcel',
+						}],
+					language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
+				});
 					
 			});
 
@@ -3177,6 +3182,85 @@
 	
 
 	</cffunction>
+
+    <cffunction name="tabProcessosExcluidos" returntype="any" access="remote" hint="Criar a tabela de todos processos e envia para a páginas pc_apoioDeletaProcessos.APENAS PARA DESENVOLVEDORES">
+	 	<cfquery name="rsProcExcluidosTab" datasource="#application.dsn_processos#">
+			SELECT   pc_processos_excluidos.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_usuarios.pc_usu_nome
+			FROM    pc_processos_excluidos
+			INNER JOIN pc_orgaos ON pc_processos_excluidos.pc_procExcluido_orgaoAvaliado = pc_orgaos.pc_org_mcu
+			INNER JOIN pc_usuarios ON pc_usuarios.pc_usu_matricula = pc_processos_excluidos.pc_procExcluido_matriculaUsuario
+			ORDER BY 	pc_processos_excluidos.pc_procExcluido_id DESC
+		</cfquery>
+
+		<div class="row">
+				<div class="col-12">
+					<div class="card">
+					    <div class="card-header card-header_backgroundColor">
+							<h3 class="card-title">Processos Excluídos</h3>
+						</div>
+						<!-- /.card-header -->
+						<div class="card-body">
+							<table id="tabProcessosExcluidos" class="table table-striped table-hover text-nowrap table-responsive">
+							<thead  class="table_thead_backgroundColor">
+								<tr style="font-size:14px">
+									<th>N° Processo SNCI</th>
+									<th>N° SEI</th>
+									<th>N° Relat. SEI</th>
+									<th>Órgão Avaliado</th>
+									<th>Data Hora Exclusão</th>
+									<th>Usuário Exclusão</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<cfloop query="rsProcExcluidosTab" >
+									<cfoutput>					
+										<tr style="font-size:12px">
+											<td>#pc_procExcluido_num#</td>
+											<td>#pc_procExcluido_sei#</td>
+											<td>#pc_procExcluido_relSei#</td>
+											<td>#descOrgAvaliado#</td>
+											<cfset dataHoraExclusao = DateFormat(#pc_procExcluido_datahora#,'DD-MM-YYYY') & ' (' & TimeFormat(#pc_procExcluido_datahora#,'HH:mm:ss') & ')'>
+											<td>#dataHoraExclusao#</td>
+											<td>#pc_usu_nome#</td>
+										</tr>
+									</cfoutput>
+								</cfloop>
+							</tbody>
+
+							</table>
+						</div>
+						<!-- /.card-body -->
+					</div>
+					<!-- /.card -->
+				</div>
+			<!-- /.col -->
+			</div>
+			<!-- /.row -->
+
+		<script language="JavaScript">
+			$(function () {
+				$("#tabProcessosExcluidos").DataTable({
+					destroy: true,
+					stateSave: true,
+        			autoWidth: true, //largura da tabela de acordo com o conteúdo
+					pageLength: 5,
+					dom: 
+						"<'row d-flex align-items-center'<'col-auto'f><'col-auto'p>>" + // Botões, filtros e paginação na mesma linha, alinhados à esquerda
+						"<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
+						"<'row'<'col-12'tr>>",  // Tabela com todos os dados
+					language: {url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"}
+				});
+					
+			});
+
+		</script>	
+
+	</cffunction>
+
+				
+
+
 
 
 
@@ -3330,10 +3414,37 @@
 					WHERE pc_avaliacoes.pc_aval_processo = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
 				</cfquery> 
 
+				
+
+				<cfquery datasource="#application.dsn_processos#" name="rsProcTab">
+					SELECT * FROM pc_processos
+					WHERE pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+				</cfquery>
+
+				<cfquery datasource="#application.dsn_processos#" name="rsProcessosExcluidos">
+					INSERT INTO pc_processos_excluidos
+						(pc_procExcluido_num
+						,pc_procExcluido_sei
+						,pc_procExcluido_relSei
+						,pc_procExcluido_orgaoAvaliado
+						,pc_procExcluido_matriculaUsuario)
+					VALUES
+						(
+							<cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
+							,<cfqueryparam cfsqltype="cf_sql_varchar" value="#rsProcTab.pc_num_sei#">
+							,<cfqueryparam cfsqltype="cf_sql_varchar" value="#rsProcTab.pc_num_rel_sei#">
+							,<cfqueryparam cfsqltype="cf_sql_varchar" value="#rsProcTab.pc_num_orgao_avaliado#">
+							,<cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_matricula#">
+						)
+				</cfquery>
+			    
+
 				<cfquery datasource="#application.dsn_processos#" name="DeletaProcessos">
 					DELETE FROM pc_processos
 					WHERE pc_processos.pc_processo_id = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.numProc#">
 				</cfquery>
+
+
 			</cftransaction>
 			
 				
