@@ -13,7 +13,7 @@
 <footer class="main-footer" style="font-size:14px;bottom:-60px;right:-27px; text-align: center;">
 	CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais  
 	<div class="float-right d-none d-sm-block" style="margin-right:20px">
-		SNCI - Versão <b>2.0.0</b>
+		SNCI - Versão <b>2.1.0</b>
 	</div>
 	<button id="scrollTopBtn" class="scrollTopBtn" title="Voltar ao Topo">
 		<i class="fas fa-circle-arrow-up fa-3x grow-icon" ></i>
