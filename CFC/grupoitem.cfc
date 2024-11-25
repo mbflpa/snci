@@ -44,7 +44,7 @@
            
         <cftransaction>
             <cfquery name="rsAlterarITM" datasource="DBSNCI">
-                SELECT Itn_TipoUnidade,Itn_Descricao,Itn_Manchete,Itn_ValorDeclarado,Itn_ValidacaoObrigatoria,Itn_Orientacao,Itn_Amostra,Itn_Norma,Itn_PreRelato,Itn_OrientacaoRelato,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcesso,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios,Itn_PTC_Seq
+                SELECT Itn_TipoUnidade,Itn_Descricao,Itn_Manchete,Itn_ValorDeclarado,Itn_ValidacaoObrigatoria,Itn_Orientacao,Itn_Amostra,Itn_Norma,Itn_PreRelato,Itn_OrientacaoRelato,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios,Itn_PTC_Seq
                 FROM Itens_Verificacao
                 WHERE Itn_Ano=<cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> AND 
                 Itn_Modalidade=<cfqueryparam value="#modal#" cfsqltype="cf_sql_char"> AND 
@@ -101,9 +101,10 @@
         <cfargument name="anogrupo" required="true">
         <cftransaction>
            <cfquery name="rsgrpverif" datasource="DBSNCI">
-                SELECT Grp_Codigo,trim(Grp_Descricao),Grp_Ano
-                FROM Grupos_Verificacao INNER JOIN Itens_Verificacao ON (Grp_Ano = Itn_Ano) AND (Grp_Codigo = Itn_NumGrupo)
-                GROUP BY Grp_Ano,Grp_Codigo, Grp_Descricao
+                SELECT Grp_Codigo,trim(Grp_Descricao),Grp_Ano,Itn_Ano
+                FROM Grupos_Verificacao 
+                left JOIN Itens_Verificacao ON (Grp_Ano = Itn_Ano) AND (Grp_Codigo = Itn_NumGrupo)
+                GROUP BY Grp_Ano,Grp_Codigo, Grp_Descricao,Itn_Ano
                 HAVING Grp_Ano=<cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">
                 ORDER BY Grp_Codigo, Grp_Descricao
           </cfquery>
@@ -179,13 +180,13 @@
     <cffunction  name="gestorprocesso" access="remote" ReturnFormat="json" returntype="query">
         <cfargument name="digpid" required="true">
         <cftransaction>
-            <cfquery name="rsgespro" datasource="DBSNCI">
+            <cfquery name="rsgesdepto" datasource="DBSNCI">
                 SELECT DPGP_ID, trim(DPGP_SIGLA)
                 FROM UN_GESTORPROCESSO_DEPARTAMENTO
                 where DPGP_DIGP_ID = <cfqueryparam value="#digpid#" cfsqltype="cf_sql_integer">
                 order by DPGP_SIGLA
             </cfquery>
-          <cfreturn rsgespro> 
+          <cfreturn rsgesdepto> 
         </cftransaction>
     </cffunction>   
     <!--- Este método retorna Objetivo estratégico --->
