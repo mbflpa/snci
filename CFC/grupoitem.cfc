@@ -44,7 +44,7 @@
            
         <cftransaction>
             <cfquery name="rsAlterarITM" datasource="DBSNCI">
-                SELECT Itn_TipoUnidade,Itn_Descricao,Itn_Manchete,Itn_ValorDeclarado,Itn_ValidacaoObrigatoria,Itn_Orientacao,Itn_Amostra,Itn_Norma,Itn_PreRelato,Itn_OrientacaoRelato,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcesso,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios,Itn_PTC_Seq
+                SELECT Itn_TipoUnidade,Itn_Descricao,Itn_Manchete,Itn_ValorDeclarado,Itn_ValidacaoObrigatoria,Itn_Orientacao,Itn_Amostra,Itn_Norma,Itn_PreRelato,Itn_OrientacaoRelato,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios,Itn_PTC_Seq
                 FROM Itens_Verificacao
                 WHERE Itn_Ano=<cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> AND 
                 Itn_Modalidade=<cfqueryparam value="#modal#" cfsqltype="cf_sql_char"> AND 
@@ -101,9 +101,10 @@
         <cfargument name="anogrupo" required="true">
         <cftransaction>
            <cfquery name="rsgrpverif" datasource="DBSNCI">
-                SELECT Grp_Codigo,trim(Grp_Descricao),Grp_Ano
-                FROM Grupos_Verificacao INNER JOIN Itens_Verificacao ON (Grp_Ano = Itn_Ano) AND (Grp_Codigo = Itn_NumGrupo)
-                GROUP BY Grp_Ano,Grp_Codigo, Grp_Descricao
+                SELECT Grp_Codigo,trim(Grp_Descricao),Grp_Ano,Itn_Ano
+                FROM Grupos_Verificacao 
+                left JOIN Itens_Verificacao ON (Grp_Ano = Itn_Ano) AND (Grp_Codigo = Itn_NumGrupo)
+                GROUP BY Grp_Ano,Grp_Codigo, Grp_Descricao,Itn_Ano
                 HAVING Grp_Ano=<cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">
                 ORDER BY Grp_Codigo, Grp_Descricao
           </cfquery>
@@ -163,16 +164,29 @@
             </cfquery>
           <cfreturn rsMacroproc> 
         </cftransaction>
-    </cffunction>   
+    </cffunction>  
+    <!--- Este método retorna gestor do processo --->
+    <cffunction  name="gestordiretoria" access="remote" ReturnFormat="json" returntype="query">
+        <cftransaction>
+            <cfquery name="rsgesdir" datasource="DBSNCI">
+                SELECT DIGP_ID, trim(DIGP_SIGLA)
+                FROM UN_GESTORPROCESSO_DIRETORIA
+                order by DIGP_SIGLA
+            </cfquery>
+          <cfreturn rsgesdir> 
+        </cftransaction>
+    </cffunction>      
     <!--- Este método retorna gestor do processo --->
     <cffunction  name="gestorprocesso" access="remote" ReturnFormat="json" returntype="query">
+        <cfargument name="digpid" required="true">
         <cftransaction>
-            <cfquery name="rsgespro" datasource="DBSNCI">
+            <cfquery name="rsgesdepto" datasource="DBSNCI">
                 SELECT DPGP_ID, trim(DPGP_SIGLA)
                 FROM UN_GESTORPROCESSO_DEPARTAMENTO
+                where DPGP_DIGP_ID = <cfqueryparam value="#digpid#" cfsqltype="cf_sql_integer">
                 order by DPGP_SIGLA
             </cfquery>
-          <cfreturn rsgespro> 
+          <cfreturn rsgesdepto> 
         </cftransaction>
     </cffunction>   
     <!--- Este método retorna Objetivo estratégico --->
@@ -540,7 +554,8 @@
                         ,PCN1_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
                         ,PCN1_DtAlter =  CONVERT(char, GETDATE(), 120)
                     where 
-                        PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> AND PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer">
+                        PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> 
+                        AND PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer">
                 </cfquery> 
                 <cfset ret = 'Alteração realizada com sucesso!'> 
             </cfif>
@@ -548,17 +563,19 @@
                 <cfquery datasource="DBSNCI" name="rsExiste">
                     SELECT Itn_ClassificacaoControle
                     FROM Itens_Verificacao
-                    WHERE Itn_ProcessoN1 = #pcn1id#
+                    WHERE Itn_MacroProcesso = #pcn1mapcid# 
+                    and Itn_ProcessoN1 = #pcn1id#
                 </cfquery>
                 <cfif rsExiste.recordcount lte 0>
                     <cfquery datasource="DBSNCI">
                         delete from  UN_PROCESSON1 
                         where 
-                        PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> AND PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer">
+                        PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> 
+                        AND PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer">
                     </cfquery> 
                     <cfset ret = 'Exclusão realizada com sucesso!'> 
                 <cfelse>    
-                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Macroprocesso selecionado!'>                     
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Processo-N1 selecionado!'>                     
                 </cfif> 
             </cfif>
             <cfcatch type="any">
@@ -572,6 +589,569 @@
             </cfcatch>
         </cftry>
         <cfreturn #ret#>
-    </cffunction>       
-           
+    </cffunction>  
+    <!--- incluir/alterar/excluir Processo-N2  --->
+    <cffunction name="cad_procn2" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="pcn1mapcid" required="true">
+        <cfargument name="pcn1id" required="true">
+        <cfargument name="pcn2id" required="true">
+        <cfargument name="pcn2desc" required="true">            
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(PCN2_ID)+1 as novoid 
+                    FROM UN_PROCESSON2
+                    WHERE PCN2_PCN1_MAPC_ID = #pcn1mapcid# 
+                    AND PCN2_PCN1_ID = #pcn1id#
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_PROCESSON2 
+                        (PCN2_PCN1_MAPC_ID,PCN2_PCN1_ID,PCN2_ID,PCN2_Descricao,PCN2_username,PCN2_DtCriar,PCN2_DtAlter)
+                    values 
+                        (#pcn1mapcid#,#pcn1id#,#rsNovo.novoid#,<cfqueryparam value="#pcn2desc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_PROCESSON2 set
+                        PCN2_Descricao = <cfqueryparam value="#pcn2desc#" cfsqltype="cf_sql_char">
+                        ,PCN2_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,PCN2_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        PCN2_PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> 
+                        AND PCN2_PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer"> 
+                        AND PCN2_ID = <cfqueryparam value="#pcn2id#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_MacroProcesso = #pcn1mapcid# 
+                    and Itn_ProcessoN1 = #pcn1id# 
+                    and Itn_ProcessoN2 = #pcn2id#
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_PROCESSON2
+                        where 
+                        PCN2_PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> 
+                        AND PCN2_PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer"> 
+                        AND PCN2_ID = <cfqueryparam value="#pcn2id#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Processo-N2 selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction> 
+    <!--- incluir/alterar/excluir Processo-N3  --->
+    <cffunction name="cad_procn3" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="pcn1mapcid" required="true">
+        <cfargument name="pcn1id" required="true">
+        <cfargument name="pcn2id" required="true">
+        <cfargument name="pcn3id" required="true">
+        <cfargument name="pcn3desc" required="true">            
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(PCN3_ID)+1 as novoid 
+                    FROM UN_PROCESSON3
+                    WHERE PCN3_PCN2_PCN1_MAPC_ID = #pcn1mapcid# 
+                    AND PCN3_PCN2_PCN1_ID = #pcn1id# 
+                    and PCN3_PCN2_ID = #pcn2id#
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_PROCESSON3 
+                        (PCN3_PCN2_PCN1_MAPC_ID,PCN3_PCN2_PCN1_ID,PCN3_PCN2_ID,PCN3_ID,PCN3_Descricao,PCN3_username,PCN3_DtCriar,PCN3_DtAlter)
+                    values 
+                        (#pcn1mapcid#,#pcn1id#,#pcn2id#,#rsNovo.novoid#,<cfqueryparam value="#pcn3desc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_PROCESSON3 set
+                        PCN3_Descricao = <cfqueryparam value="#pcn3desc#" cfsqltype="cf_sql_char">
+                        ,PCN3_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,PCN3_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        PCN3_PCN2_PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> 
+                        AND PCN3_PCN2_PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer"> 
+                        AND PCN3_PCN2_ID = <cfqueryparam value="#pcn2id#" cfsqltype="cf_sql_integer">
+                        AND PCN3_ID = <cfqueryparam value="#pcn3id#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_MacroProcesso = #pcn1mapcid# 
+                    and Itn_ProcessoN1 = #pcn1id# 
+                    and Itn_ProcessoN2 = #pcn2id# 
+                    and Itn_ProcessoN3 = #pcn3id#
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_PROCESSON3
+                        where 
+                        PCN3_PCN2_PCN1_MAPC_ID = <cfqueryparam value="#pcn1mapcid#" cfsqltype="cf_sql_integer"> 
+                        AND PCN3_PCN2_PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer"> 
+                        AND PCN3_PCN2_ID = <cfqueryparam value="#pcn2id#" cfsqltype="cf_sql_integer">
+                        AND PCN3_ID = <cfqueryparam value="#pcn3id#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Processo-N2 selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction> 
+    <!--- incluir/alterar/excluir Gestor do Processo Diretoria --->
+    <cffunction name="cad_gestordir" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="digpid" required="true">
+        <cfargument name="digpdesc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(DIGP_ID)+1 as novoid 
+                    FROM UN_GESTORPROCESSO_DIRETORIA
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_GESTORPROCESSO_DIRETORIA 
+                        (DIGP_ID,DIGP_SIGLA,DIGP_username,DIGP_DtCriar,DIGP_DtAlter)
+                    values 
+                        (#rsNovo.novoid#,<cfqueryparam value="#digpdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_GESTORPROCESSO_DIRETORIA set
+                         DIGP_SIGLA = <cfqueryparam value="#digpdesc#" cfsqltype="cf_sql_char">
+                        ,DIGP_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,DIGP_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        DIGP_ID = <cfqueryparam value="#digpid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_GestorProcessoDir = #digpid# 
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_GESTORPROCESSO_DIRETORIA 
+                        where 
+                            DIGP_ID = <cfqueryparam value="#digpid#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela UN_GESTORPROCESSO_DEPARTAMENTO possui a Diretoria do Processo Selecionada!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>  
+    <!--- incluir/alterar/excluir Gestor do Processo Departamento--->
+    <cffunction name="cad_gestordepto" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="dpgpdigpid" required="true">
+        <cfargument name="dpgpid" required="true">
+        <cfargument name="dpgpsigla" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(DPGP_ID)+1 as novoid 
+                    FROM UN_GESTORPROCESSO_DEPARTAMENTO
+                    where DPGP_DIGP_ID = #dpgpdigpid#
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_GESTORPROCESSO_DEPARTAMENTO 
+                        (DPGP_DIGP_ID,DPGP_ID,DPGP_SIGLA,DPGP_username,DPGP_DtCriar,DPGP_DtAlter)
+                    values 
+                        (#dpgpdigpid#,#rsNovo.novoid#,<cfqueryparam value="#dpgpsigla#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_GESTORPROCESSO_DEPARTAMENTO set
+                         DPGP_SIGLA = <cfqueryparam value="#dpgpsigla#" cfsqltype="cf_sql_char">
+                        ,DPGP_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,DPGP_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                    DPGP_DIGP_ID = <cfqueryparam value="#dpgpdigpid#" cfsqltype="cf_sql_integer"> and 
+                    DPGP_ID = <cfqueryparam value="#dpgpid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_GestorProcessoDir=#dpgpdigpid# and Itn_GestorProcessoDepto = #dpgpid#
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_GESTORPROCESSO_DEPARTAMENTO 
+                        where 
+                            DPGP_DIGP_ID = <cfqueryparam value="#dpgpdigpid#" cfsqltype="cf_sql_integer"> and 
+                            DPGP_ID = <cfqueryparam value="#dpgpid#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui a Departamento do Processo Selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>   
+    <!--- incluir/alterar/excluir Objetivo estrategico  --->
+    <cffunction name="cad_objtestra" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="obesid" required="true">
+        <cfargument name="obesdesc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(OBES_ID)+1 as novoid 
+                    FROM UN_OBJETIVOESTRATEGICO
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_OBJETIVOESTRATEGICO 
+                        (OBES_ID,OBES_DESCRICAO,OBES_username,OBES_DtCriar,OBES_DtAlter)
+                    values 
+                        (#rsNovo.novoid#,<cfqueryparam value="#obesdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_OBJETIVOESTRATEGICO set
+                         OBES_DESCRICAO = <cfqueryparam value="#obesdesc#" cfsqltype="cf_sql_char">
+                        ,OBES_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,OBES_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        OBES_ID = <cfqueryparam value="#obesid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_ObjetivoEstrategico In ('#obesid#')
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_OBJETIVOESTRATEGICO 
+                        where 
+                            OBES_ID = <cfqueryparam value="#obesid#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui a Objetivo Estratégico Selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>  
+    <!--- incluir/alterar/excluir Objetivo estrategico  --->
+    <cffunction name="cad_riscestra" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="rcesid" required="true">
+        <cfargument name="rcesdesc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(RCES_ID)+1 as novoid 
+                    FROM UN_RISCOESTRATEGICO
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_RISCOESTRATEGICO 
+                        (RCES_ID,RCES_DESCRICAO,RCES_username,RCES_DtCriar,RCES_DtAlter)
+                    values 
+                        (#rsNovo.novoid#,<cfqueryparam value="#rcesdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_RISCOESTRATEGICO set
+                         RCES_DESCRICAO = <cfqueryparam value="#rcesdesc#" cfsqltype="cf_sql_char">
+                        ,RCES_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,RCES_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        RCES_ID = <cfqueryparam value="#rcesid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_RiscoEstrategico = '#rcesid#'
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_RISCOESTRATEGICO 
+                        where 
+                            RCES_ID = #rcesid#
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui a Risco Estratégico Selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>   
+    <!--- incluir/alterar/excluir Indicador estrategico  --->
+    <cffunction name="cad_indiestra" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="idesid" required="true">
+        <cfargument name="idesdesc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(IDES_ID)+1 as novoid 
+                    FROM UN_INDICADORESTRATEGICO
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_INDICADORESTRATEGICO 
+                        (IDES_ID,IDES_DESCRICAO,IDES_username,IDES_DtCriar,IDES_DtAlter)
+                    values 
+                        (#rsNovo.novoid#,<cfqueryparam value="#idesdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_INDICADORESTRATEGICO set
+                         IDES_DESCRICAO = <cfqueryparam value="#idesdesc#" cfsqltype="cf_sql_char">
+                        ,IDES_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,IDES_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        IDES_ID = <cfqueryparam value="#idesid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_IndicadorEstrategico = '#idesid#'
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_INDICADORESTRATEGICO 
+                        where 
+                            IDES_ID = #idesid#
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui a Indicador Estratégico Selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>  
+    <!--- incluir/alterar/excluir composição do COSO-2013  --->
+    <cffunction name="cad_compcoso2013" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="cpcsid" required="true">
+        <cfargument name="cpcsdesc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(CPCS_ID)+1 as novoid 
+                    FROM UN_COMPONENTECOSO
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_COMPONENTECOSO 
+                        (CPCS_ID,CPCS_DESCRICAO,CPCS_username,CPCS_DtCriar,CPCS_DtAlter)
+                    values 
+                        (#rsNovo.novoid#,<cfqueryparam value="#cpcsdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_COMPONENTECOSO set
+                         CPCS_DESCRICAO = <cfqueryparam value="#cpcsdesc#" cfsqltype="cf_sql_char">
+                        ,CPCS_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,CPCS_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        CPCS_ID = <cfqueryparam value="#cpcsid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_Coso2013Componente = #cpcsid#
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_COMPONENTECOSO 
+                        where 
+                            CPCS_ID = #cpcsid#
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui O Componente COSO-2013 Selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction> 
+    <!--- incluir/alterar/excluir composição do COSO-2013  --->
+    <cffunction name="cad_princoso2013" access="remote" returntype="any">
+        <cfargument name="acao" required="true">
+        <cfargument name="prcscpcsid" required="true">
+        <cfargument name="prcsid" required="true">
+        <cfargument name="prcsdesc" required="true">
+        <cftry>
+            <cfif acao eq 'inc'>
+                <cfquery datasource="DBSNCI" name="rsNovo">
+                    SELECT Max(PRCS_ID)+1 as novoid 
+                    FROM UN_PRINCIPIOCOSO
+                    where PRCS_CPCS_ID = #prcscpcsid#
+                </cfquery>
+                <cfquery datasource="DBSNCI">
+                    insert into UN_PRINCIPIOCOSO 
+                        (PRCS_CPCS_ID,PRCS_ID,PRCS_DESCRICAO,PRCS_username,PRCS_DtCriar,PRCS_DtAlter)
+                    values 
+                        (#prcscpcsid#,#rsNovo.novoid#,<cfqueryparam value="#prcsdesc#" cfsqltype="cf_sql_char">,<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120)) 
+                </cfquery>  
+                <cfset ret = 'Inclusão realizada com sucesso!'>              
+            </cfif>
+            <cfif acao eq 'alt'>
+                <cfquery datasource="DBSNCI">
+                    update UN_PRINCIPIOCOSO set
+                         PRCS_DESCRICAO = <cfqueryparam value="#prcsdesc#" cfsqltype="cf_sql_char">
+                        ,PRCS_username = <cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">
+                        ,PRCS_DtAlter =  CONVERT(char, GETDATE(), 120)
+                    where 
+                        PRCS_CPCS_ID = <cfqueryparam value="#prcscpcsid#" cfsqltype="cf_sql_integer">
+                        and PRCS_ID = <cfqueryparam value="#prcsid#" cfsqltype="cf_sql_integer">
+                </cfquery> 
+                <cfset ret = 'Alteração realizada com sucesso!'> 
+            </cfif>
+            <cfif acao eq 'exc'>
+                <cfquery datasource="DBSNCI" name="rsExiste">
+                    SELECT Itn_ClassificacaoControle
+                    FROM Itens_Verificacao
+                    WHERE Itn_Coso2013Principios = #prcsid#
+                </cfquery>
+                <cfif rsExiste.recordcount lte 0>
+                    <cfquery datasource="DBSNCI">
+                        delete from  UN_PRINCIPIOCOSO 
+                        where 
+                        PRCS_CPCS_ID = <cfqueryparam value="#prcscpcsid#" cfsqltype="cf_sql_integer">
+                        and PRCS_ID = <cfqueryparam value="#prcsid#" cfsqltype="cf_sql_integer">
+                    </cfquery> 
+                    <cfset ret = 'Exclusão realizada com sucesso!'> 
+                <cfelse>    
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui O Componente COSO-2013 Selecionado!'>                     
+                </cfif> 
+            </cfif>
+            <cfcatch type="any">
+                <cfif acao eq 'inc'>
+                    <cfset ret = 'Inclusão Falhou!'>  
+                <cfelseif acao eq 'alt'>
+                    <cfset ret = 'Alteração Falhou!'>  
+                <cfelse>
+                    <cfset ret = 'Exclusão Falhou!'>  
+                </cfif>
+            </cfcatch>
+        </cftry>
+        <cfreturn #ret#>
+    </cffunction>                                                
 </cfcomponent>

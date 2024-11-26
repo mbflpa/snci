@@ -167,9 +167,9 @@
                 <!-- Inclusão -->
                 <cfquery datasource="#dsn_inspecao#">
                     INSERT INTO Itens_Verificacao 
-                        (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcesso,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
+                        (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                     VALUES 
-                        ('#form.selAltModalidade#',#form.selAltItemAno#,#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#',#form.altcategoriarisco#,'#form.altcategoriariscooutros#',#form.altmacroprocesso#,#altprocesson1#,'#form.altprocesson1naoseaplica#',#altprocesson2#,#altprocesson3#,'#form.altprocesson3outros#',#form.altgestorprocesso#,'#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
+                        ('#form.selAltModalidade#',#form.selAltItemAno#,#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#',#form.altcategoriarisco#,'#form.altcategoriariscooutros#',#form.altmacroprocesso#,#altprocesson1#,'#form.altprocesson1naoseaplica#',#altprocesson2#,#altprocesson3#,'#form.altprocesson3outros#',#form.altgestordir#,#form.altgestordepto#,'#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
                 </cfquery>	 
             <cfelse>
                 <!-- Alteração -->
@@ -201,7 +201,8 @@
                                 ,Itn_ProcessoN2=#altprocesson2#
                                 ,Itn_ProcessoN3=#altprocesson3#
                                 ,Itn_ProcessoN3Outros='#form.altprocesson3outros#'
-                                ,Itn_GestorProcesso=#form.altgestorprocesso#
+                                ,Itn_GestorProcessoDir=#form.altgestordir#
+                                ,Itn_GestorProcessoDepto=#form.altgestordepto#
                                 ,Itn_ObjetivoEstrategico='#form.itnaltobjetivoestrategicoAlt#'
                                 ,Itn_RiscoEstrategico='#form.itnaltriscoestrategicoAlt#'
                                 ,Itn_IndicadorEstrategico='#form.itnaltindicadorestrategicoAlt#'
@@ -542,7 +543,6 @@
                                 <div class="row">
                                     <div class="col">
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">CATEGORIA DO CONTROLE</label>
-                                        <p></p>
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
                                             <select id="altcategcontrole" name="altcategcontrole" multiple="multiple" class="form-select" aria-label="Default select example">
                                             </select>  
@@ -551,21 +551,24 @@
                                     <div class="row">
                                         <div class="col">
                                             <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <p></p>
                                         </div>
                                     </div>                                        
                                 </div>  
+                                
                                 <div class="row">
                                     <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">RISCO IDENTIFICADO</label>
-                                        <p></p>
+                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">RISCO IDENTIFICADO</label>                                     
+                                    </div>
+                                    <div class="row">
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
                                             <select id="altcategoriarisco" name="altcategoriarisco" class="form-select" aria-label="Default select example">
                                             </select>
                                         </label>  
-                                        <div class="row">
-                                            <div id="altriscoidentif-outros"><textarea name="altcategoriariscooutros" id="altcategoriariscooutros" cols="105" rows="2" wrap="VIRTUAL" class="form-control" placeholder="Outros - Informar Descrição aqui."></textarea></div>
-                                        </div>                                       
                                     </div>
+                                    <div class="row">
+                                        <div id="altriscoidentif-outros"><textarea name="altcategoriariscooutros" id="altcategoriariscooutros" cols="105" rows="2" wrap="VIRTUAL" class="form-control" placeholder="Outros - Informar Descrição aqui."></textarea></div>
+                                    </div>  
                                     <div class="row"> 
                                         <div class="col">
                                             <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
@@ -589,7 +592,6 @@
                                         <div class="col">
                                             <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">MACROPROCESSO</label>
                                         </div>
-
                                     </div>  
                                     <div class="row">
                                         <div class="col">
@@ -659,15 +661,28 @@
                                 </div>                               
                                 <p></p>                                                             
                                 <div class="row">
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">GESTOR PROCESSO(DEPTº)
-                                        </label>
-                                        <p></p>
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select id="altgestorprocesso" name="altgestorprocesso" class="form-select" aria-label="Default select example">
-                                            </select>
-                                        </label>                                        
-                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Diretoria do Processo</label>
+                                        </div>
+                                        <div class="col">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Departamento do Processo</label>
+                                        </div>
+                                    </div> 
+                                    <div class="row">
+                                        <div class="col">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                                <select id="altgestordir" name="altgestordir" class="form-select" aria-label="Default select example">
+                                                </select>
+                                            </label>                                        
+                                        </div>                                        
+                                        <div class="col">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                                <select id="altgestordepto" name="altgestordepto" class="form-select" aria-label="Default select example">
+                                                </select>
+                                            </label>                                        
+                                        </div>
+                                    </div>                                                                        
                                     <div class="row"> 
                                         <div class="col">
                                             <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________
@@ -679,33 +694,36 @@
                                 <div class="row">
                                     <div class="col">
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">OBJETIVO ESTRATÉGICO</label>
-                                        <p></p>
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select id="altobjetivoestrategico" name="altobjetivoestrategico" multiple="multiple" class="form-select" aria-label="Default select example">
-                                            </select>
-                                        </label>                                        
+                                        <div class="row">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                                <select id="altobjetivoestrategico" name="altobjetivoestrategico" multiple="multiple" class="form-select" aria-label="Default select example">
+                                                </select>
+                                            </label>  
+                                        </div>                                      
                                     </div>
                                 </div>                                 
                                 <p></p>
                                 <div class="row">
                                     <div class="col">
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">RISCO ESTRATÉGICO</label>
-                                        <p></p>
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select id="altriscoestrategico" name="altriscoestrategico" multiple="multiple" class="form-select" aria-label="Default select example">
-                                            </select>
-                                        </label>                                        
+                                        <div class="row">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                                <select id="altriscoestrategico" name="altriscoestrategico" multiple="multiple" class="form-select" aria-label="Default select example">
+                                                </select>
+                                            </label>  
+                                        </div>                                                                                   
                                     </div>
                                 </div> 
                                 <p></p>
                                 <div class="row">
                                     <div class="col">
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">INDICADOR ESTRATÉGICO</label>
-                                        <p></p>
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select id="altindicadorestrategico" name="altindicadorestrategico" multiple="multiple" class="form-select" aria-label="Default select example">
-                                            </select>
-                                        </label>                                        
+                                        <div class="row">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                                <select id="altindicadorestrategico" name="altindicadorestrategico" multiple="multiple" class="form-select" aria-label="Default select example">
+                                                </select>
+                                            </label>   
+                                        </div>                                                                                 
                                     </div>
                                     <div class="row"> 
                                         <div class="col">
@@ -1152,7 +1170,8 @@
                     let procn1 = ''
                     let procn2 = ''
                     let procn3 = ''
-                    let gestor = ''
+                    let dirproc = ''
+                    let deptoproc = ''
                     let objestrat = ''
                     let indicestrat = ''
                     let compcoso2013 = ''
@@ -1160,7 +1179,6 @@
                     let itnptcseq=''
                     let itntpunid='0'
                     
-
                     //console.log(data.data)
                     //console.log(data.data.indexOf("COLUMNS"));
                     var vlr_ini = data.data.indexOf("COLUMNS");
@@ -1195,14 +1213,15 @@
                         $('#altprocesson2_sel').val(ret[18])
                         procn3 = ret[19]
                         $('#altprocesson3_sel').val(ret[19])
-                        $('#altprocesson3outros').val(ret[20])                  
-                        gestor = ret[21]
-                        objestrat = ret[22]
-                        riscoestrat = ret[23]
-                        indicestrat = ret[24]
-                        compcoso2013 = ret[25]
-                        princoso2013 = ret[26]
-                        itnptcseq = ret[27]
+                        $('#altprocesson3outros').val(ret[20]) 
+                        dirproc = ret[21]                 
+                        deptoproc = ret[22]
+                        objestrat = ret[23]
+                        riscoestrat = ret[24]
+                        indicestrat = ret[25]
+                        compcoso2013 = ret[26]
+                        princoso2013 = ret[27]
+                        if(itnptcseq.length < ret[28].length) {itnptcseq = ret[28]}
                         itntpunid += ','+ret[0]
                     });
                     if(visualizar == '99') {
@@ -1251,34 +1270,36 @@
                     macroprocesso("'"+macropro+"'")
                     $("#altprocesson1-naoseaplica").hide(500);
                     if ($('#altprocesson1naoseaplica').val() != '') {
-                        $('#altprocesson1-naoseaplica').show(500)
-                        $("#cd_altprocesson1").prop("checked", true);
-                        $("#altprocesson1").html(prots);
-                        $("#altprocesson1").attr('disabled', true);
-                        $("#altprocesson2").attr('disabled', true);
-                        $("#altprocesson3").attr('disabled', true);
-                        $("#cd_altprocesson3").attr('disabled', true);
-                        $("#altprocesson3-outros").hide(500);
-                        $('#processon3outrosSNAlt').val('N')
-                        $('#processon1naoaplicarSNAlt').val('S')
-                    }else{
-                        $('#processon1naoaplicarSNAlt').val('N')
-                        ProcessoN1(macropro,"'"+procn1+"'")
-                        $("#cd_altprocesson1").prop("checked", false);
-                        ProcessoN2(macropro,procn1,"'"+procn2+"'")
-                        if ($('#altprocesson3outros').val() != '') {
-                            $("#altprocesson3").html(prots);
+                            $('#altprocesson1-naoseaplica').show(500)
+                            $("#cd_altprocesson1").prop("checked", true);
+                            $("#altprocesson1").html(prots);
+                            $("#altprocesson1").attr('disabled', true);
+                            $("#altprocesson2").attr('disabled', true);
                             $("#altprocesson3").attr('disabled', true);
-                            $('#altprocesson3-outros').show(500)
-                            $("#cd_altprocesson3").prop("checked", true); 
-                        }else{
-                            $('#altprocesson3-outros').hide(500)
-                            ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'")  
-                            $("#cd_altprocesson3").prop("checked", false); 
+                            $("#cd_altprocesson3").attr('disabled', true);
                             $("#altprocesson3-outros").hide(500);
-                        }                    
-                    }   
-                    gestorprocesso("'"+gestor+"'")
+                            $('#processon3outrosSNAlt').val('N')
+                            $('#processon1naoaplicarSNAlt').val('S')
+                        }else{
+                            $('#processon1naoaplicarSNAlt').val('N')
+                            ProcessoN1(macropro,"'"+procn1+"'")
+                            $("#cd_altprocesson1").prop("checked", false);
+                            ProcessoN2(macropro,procn1,"'"+procn2+"'")
+                            if ($('#altprocesson3outros').val() != '') {
+                                $("#altprocesson3").html(prots);
+                                $("#altprocesson3").attr('disabled', true);
+                                $('#altprocesson3-outros').show(500)
+                                $("#cd_altprocesson3").prop("checked", true); 
+                                $('#processon3outrosSNAlt').val('S')
+                            }else{
+                                $('#processon3outrosSNAlt').val('N')
+                                $('#altprocesson3-outros').hide(500)
+                                ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'")  
+                                $("#cd_altprocesson3").prop("checked", false); 
+                            }                    
+                    }  
+                    dirprocesso("'"+dirproc+"'") 
+                    deptoprocesso(dirproc,"'"+deptoproc+"'")
                     objetivoestrategico("'"+objestrat+"'")
                     riscoestrategico("'"+riscoestrat+"'")
                     indicadorestrategico("'"+indicestrat+"'")
@@ -1464,11 +1485,11 @@
                         $("#altprocesson3").html(prots);
                     })
                 } //final buscar altprocessoN3   
-                // buscar gestor do processo
-                function gestorprocesso(a){
+                // buscar diretoria do processo
+                function dirprocesso(a){
                     axios.get("CFC/grupoitem.cfc",{
                         params: {
-                        method: "gestorprocesso"
+                        method: "gestordiretoria"
                         }
                     })
                     .then(data =>{
@@ -1484,9 +1505,33 @@
                             if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
-                        $("#altgestorprocesso").html(prots);
+                        $("#altgestordir").html(prots);
                     })  
-                } // buscar gestor do processo   
+                } // buscar diretoria do processo                  
+                // buscar depto do processo
+                function deptoprocesso(a,b){
+                    axios.get("CFC/grupoitem.cfc",{
+                        params: {
+                        method: "gestorprocesso",
+                        digpid: a
+                        }
+                    })
+                    .then(data =>{
+                        let prots = '<option value="">---</option>';
+                        let selecionar = ''
+                        var vlr_ini = data.data.indexOf("COLUMNS");
+                        var vlr_fin = data.data.length
+                        vlr_ini = (vlr_ini - 2);
+                        const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
+                        const dados = json.DATA;
+                        dados.map((ret) => {
+                            selecionar = ''
+                            if (b.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
+                        });
+                        $("#altgestordepto").html(prots);
+                    })  
+                } // buscar depto do processo   
                 //busca do objetivo estrategico  
                 function objetivoestrategico(a) {    
                     axios.get("CFC/grupoitem.cfc",{
@@ -1738,7 +1783,7 @@
                 //==============================
                 $('#cd_altprocesson3').click(function(){
                     let prots = '<option value="" selected>---</option>';
-                    $("#altprocesson3-outros").hide(500);
+                   // $("#altprocesson3-outros").hide(500);
                     $("#altprocesson3").html(prots);
                     if($(this).is(':checked')) {
                         $("#altprocesson3").attr('disabled', true);
@@ -1842,7 +1887,7 @@
                 //Ocultar ou Recompor o select processon3
                 $('#cd_altprocesson3').click(function(){
                     let prots = '<option value="" selected>---</option>';
-                    $('#altprocesson3-outros').hide(500)
+                    //$('#altprocesson3-outros').hide(500)
                     if($(this).is(':checked')) {
                         $("#altprocesson3_sel").val($("#altprocesson3").val());
                         $("#altprocesson3").html(prots);
@@ -1854,7 +1899,9 @@
                         let procn1 = $("#altprocesson1").val();
                         let procn2 = $("#altprocesson2").val();
                         let procn3 = $("#altprocesson3_sel").val();
+                        $('#altprocesson3-outros').hide(500)
                         ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'") 
+                        //alert(macropro+' '+procn1+' '+procn2+' '+procn3)
                     }             
                 }) //Ocultar ou Recompor o select processon3                  
                 //**************************************************        
@@ -1891,10 +1938,11 @@
                     
                     let ponto =''
                     let altseqarray=b.split(',')
+                   // alert(altseqarray)
                     $('.checkponto').each(function( index ) {
                         selecionarsn = 'N'
                         ponto = $(this).attr("title");
-                        //alert(b)
+                        //alert(ponto)
                         $.each(altseqarray, function( key, value ) {
                             //alert('value: '+value)
                             if (value == ponto) {
@@ -2027,6 +2075,31 @@
                         $("#franquiaalt").hide(500);
                     }// alert(altoutros + '  ' + title)           
             }) // fim // BUSCAR dados para alteração com o evento selAltModalidade.change()
+            //buscar o departamento do processo
+            $('#altgestordir').change(function(e){ 
+                let prots = '<option value="" selected>---</option>';
+                $("#altgestordepto").html(prots);  
+                let digpid = $(this).val(); 
+                if(altgestordir != ''){                         
+                    axios.get("CFC/grupoitem.cfc",{
+                        params: {
+                            method: "gestorprocesso",
+                            digpid: digpid
+                        }
+                    })
+                    .then(data =>{
+                    var vlr_ini = data.data.indexOf("COLUMNS");
+                    var vlr_fin = data.data.length
+                    vlr_ini = (vlr_ini - 2);
+                    const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
+                    const dados = json.DATA;
+                    dados.map((ret) => {
+                        prots += '<option value="' + ret[0] + '">' + ret[1] + '</option>';
+                    });
+                    $("#altgestordepto").html(prots);
+                    })  
+                }
+            })//fim buscar o departamento do processo            
             //=======================================================================         
             // Para realizar a críticas do submit
             function alttpunidselec() {
@@ -2261,17 +2334,22 @@
                         alert('Informe a descrição para opção Outros selecionada como Processo N3.');
                         frm.altprocesson3outros.focus();
                         return false;
-                    }   
+                    }  
+                    //alert($('#processon3outrosSNAlt').val()) 
                     if ($('#processon3outrosSNAlt').val() == 'N'  && $('#altprocesson3').val() == '') {
                         alert('Selecione um Processo N3 como Tipo de Avaliação.');
                         frm.altprocesson3.focus();
                         return false;
                     }                                            
                 }  
-
-                if ($('#altgestorprocesso').val() == '') {
-                    alert('Selecione um Gestor Processo.');
-                    frm.altgestorprocesso.focus();
+                if ($('#altgestordir').val() == '') {
+                    alert('Selecione uma Diretoria do Processo.');
+                    frm.altgestordir.focus();
+                    return false;
+                } 
+                if ($('#altgestordepto').val() == '') {
+                    alert('Selecione um Departamento do Processo.');
+                    frm.altgestordepto.focus();
                     return false;
                 } 
                     

@@ -133,9 +133,9 @@
                     </cfquery>
                     <cfquery datasource="#dsn_inspecao#">
                         INSERT INTO Itens_Verificacao 
-                            (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcesso,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
+                            (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,,,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                         VALUES 
-                            ('0',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestorprocesso#,'#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
+                            ('0',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestordir#,#form.gestordepto#,'#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
                     </cfquery>                    
                     <cfquery datasource="#dsn_inspecao#">
                         INSERT INTO TipoUnidade_ItemVerificacao 
@@ -145,9 +145,9 @@
                     </cfquery>
                     <cfquery datasource="#dsn_inspecao#">
                         INSERT INTO Itens_Verificacao 
-                            (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcesso,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
+                            (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                         VALUES 
-                            ('1',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestorprocesso#,'#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
+                            ('1',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestordir#,#form.gestordepto#,'#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
                     </cfquery>   		
             <cfelse>                      
                 <cfquery datasource="#dsn_inspecao#">
@@ -159,9 +159,9 @@
               
                 <cfquery datasource="#dsn_inspecao#">
                     INSERT INTO Itens_Verificacao 
-                        (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcesso,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
+                        (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                     VALUES 
-                        ('#form.selModalidade#',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestorprocesso#,'#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
+                        ('#form.selModalidade#',#form.selCadItemAno#,#tipoCad#,#form.selCadItemGrupo#,#numItem#,'#form.cadItemDescricao#','#form.cadItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selCadItemValorDec#','#form.cadItemAmostra#','#form.cadItemNorma#','#form.selCadItemValidObrig#','#form.cadItemPreRelato#','#form.cadItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.cadItemManchete#','#form.itnclassificacontrole#','#form.controletestado#','#form.itncategoriacontrole#',#form.categoriarisco#,'#form.categoriariscooutros#',#form.macroprocesso#,#processon1#,'#form.macroprocesson1naoseaplica#',#processon2#,#processon3#,'#form.macroprocesson3outros#',#form.gestordir#,#form.gestordepto#,'#form.itnobjetivoestrategico#','#form.itnriscoestrategico#','#form.itnindicadorestrategico#',#form.componentecoso#,#form.principioscoso#)                                    
                 </cfquery>  
             </cfif>            
         </cfloop>
@@ -195,10 +195,8 @@
             }
         </style>
     </head>
-    <body id="main_body" style="background:#ccc;" onLoad="buscarclassificacaocontrole();">
-  
+    <body id="main_body" style="background:#ccc;" onLoad="">
         <div align="left" style="background:#003366">
-            
             <form id="formCadItem" nome="formCadItem" enctype="multipart/form-data" method="post" >
                 <input type="hidden" value="" id="acao" name="acao">
                 <input type="hidden" value="" id="tiposCad" name="tiposCad"> 
@@ -224,7 +222,7 @@
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Ano</label>
                                     </div>
                                     <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Grupo</label>
+                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Grupos</label>
                                     </div>
                                 </div>
                                 <div class="row">
@@ -513,13 +511,27 @@
                                 </div>                               
                                 <p></p>                                                             
                                 <div class="row">
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">GESTOR PROCESSO(DEPTº)</label>
-                                        <br>
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select id="gestorprocesso" name="gestorprocesso" class="form-select" aria-label="Default select example">
-                                            </select>
-                                        </label>                                        
+                                    <div class="row">
+                                        <div class="col">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Diretoria do Processo</label>
+                                        </div>
+                                        <div class="col">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Departamento do Processo</label>
+                                        </div>
+                                    </div>  
+                                    <div class="row">
+                                        <div class="col">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                                <select id="gestordir" name="gestordir" class="form-select" aria-label="Default select example">
+                                                </select>
+                                            </label>                                        
+                                        </div>                                        
+                                        <div class="col">
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                                <select id="gestordepto" name="gestordepto" class="form-select" aria-label="Default select example">
+                                                </select>
+                                            </label>                                        
+                                        </div>
                                     </div>
                                     <div class="row"> 
                                         <div class="col">
@@ -925,10 +937,10 @@
               });
               $("#macroprocesso").html(prots);
             }) 
-            // buscar gestor do processo  
+            // buscar diretoria do processo  
             axios.get("CFC/grupoitem.cfc",{
               params: {
-              method: "gestorprocesso"
+              method: "gestordiretoria"
               }
             })
             .then(data =>{
@@ -941,8 +953,7 @@
                 dados.map((ret) => {
                 prots += '<option value="' + ret[0] + '">' + ret[1] + '</option>';
               });
-              $("#gestorprocesso").html(prots);
-              //$("#mensagem").html(prots);
+              $("#gestordir").html(prots);
             })   
               
             //busca da objetivo estrategico     
@@ -1041,7 +1052,7 @@
                 params: {
                 method: "gruposverificacao",
                 anogrupo: anogrupo
-            }
+                }
             })
             .then(data =>{
                 let prots = '<option value="" selected>---</option>';
@@ -1054,8 +1065,11 @@
                 const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
                 //console.log(json);
                 const dados = json.DATA;
+                let usadoSN=''
                 dados.map((ret) => {
-                prots += '<option value="' + ret[0] + '">' +ret[0]+'-'+ret[1]+'</option>';
+                    if(ret[3] == null){usadoSN = '(sem itens) '}
+                    
+                    prots += '<option value="' + ret[0] + '">' +usadoSN+ret[0]+'-'+ret[1]+'</option>';
                 });
                 $('#selCadItemGrupo').html(prots);
             }) 
@@ -1198,8 +1212,7 @@
                 $("#macroprocesson2").html(prots);
                 //$("#mensagem").html(prots);
             })  
-        }) 
-        //final buscar macroporcessoN2   
+        })//final buscar macroporcessoN2   
         //inicio buscar macroprocessoN3
         $('#macroprocesson2').change(function(e){
             $("#cd_macroprocesson3").attr('disabled', false);
@@ -1301,8 +1314,32 @@
                 $("#principioscoso").html(prots);
                 //$("#mensagem").html(prots);
             }) 
-        })  
-
+        }) 
+        //buscar o departamento do processo
+        $('#gestordir').change(function(e){ 
+            let prots = '<option value="" selected>---</option>';
+            $("#gestordepto").html(prots);  
+            let digpid = $(this).val(); 
+            if(gestordir != ''){                         
+                axios.get("CFC/grupoitem.cfc",{
+                    params: {
+                        method: "gestorprocesso",
+                        digpid: digpid
+                    }
+                })
+                .then(data =>{
+                var vlr_ini = data.data.indexOf("COLUMNS");
+                var vlr_fin = data.data.length
+                vlr_ini = (vlr_ini - 2);
+                const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
+                const dados = json.DATA;
+                dados.map((ret) => {
+                    prots += '<option value="' + ret[0] + '">' + ret[1] + '</option>';
+                });
+                $("#gestordepto").html(prots);
+                })  
+            }
+        })//fim buscar o departamento do processo
         function processosajustes(a){
           if (a == 'abertura'){
           //  alert(a);
@@ -1697,9 +1734,16 @@
                     return false;
                 }                                            
             }  
-            if ($('#gestorprocesso').val() == '') {
-                alert('Selecione um Gestor Processo.');
-                frm.gestorprocesso.focus();
+            
+            if ($('#gestordir').val() == '') {
+                alert('Selecione uma Diretoria do Processo.');
+                frm.gestordir.focus();
+                return false;
+            }   
+
+            if ($('#gestordepto').val() == '') {
+                alert('Selecione um Departamento do Processo.');
+                frm.gestordepto.focus();
                 return false;
             }  
 
