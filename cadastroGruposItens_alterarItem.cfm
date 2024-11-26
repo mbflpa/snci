@@ -1270,31 +1270,33 @@
                     macroprocesso("'"+macropro+"'")
                     $("#altprocesson1-naoseaplica").hide(500);
                     if ($('#altprocesson1naoseaplica').val() != '') {
-                        $('#altprocesson1-naoseaplica').show(500)
-                        $("#cd_altprocesson1").prop("checked", true);
-                        $("#altprocesson1").html(prots);
-                        $("#altprocesson1").attr('disabled', true);
-                        $("#altprocesson2").attr('disabled', true);
-                        $("#altprocesson3").attr('disabled', true);
-                        $("#cd_altprocesson3").attr('disabled', true);
-                        $("#altprocesson3-outros").hide(500);
-                        $('#processon3outrosSNAlt').val('N')
-                        $('#processon1naoaplicarSNAlt').val('S')
-                    }else{
-                        $('#processon1naoaplicarSNAlt').val('N')
-                        ProcessoN1(macropro,"'"+procn1+"'")
-                        $("#cd_altprocesson1").prop("checked", false);
-                        ProcessoN2(macropro,procn1,"'"+procn2+"'")
-                        if ($('#altprocesson3outros').val() != '') {
-                            $("#altprocesson3").html(prots);
+                            $('#altprocesson1-naoseaplica').show(500)
+                            $("#cd_altprocesson1").prop("checked", true);
+                            $("#altprocesson1").html(prots);
+                            $("#altprocesson1").attr('disabled', true);
+                            $("#altprocesson2").attr('disabled', true);
                             $("#altprocesson3").attr('disabled', true);
-                            $('#altprocesson3-outros').show(500)
-                            $("#cd_altprocesson3").prop("checked", true); 
+                            $("#cd_altprocesson3").attr('disabled', true);
+                            $("#altprocesson3-outros").hide(500);
+                            $('#processon3outrosSNAlt').val('N')
+                            $('#processon1naoaplicarSNAlt').val('S')
                         }else{
-                            $('#altprocesson3-outros').hide(500)
-                            ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'")  
-                            $("#cd_altprocesson3").prop("checked", false); 
-                        }                    
+                            $('#processon1naoaplicarSNAlt').val('N')
+                            ProcessoN1(macropro,"'"+procn1+"'")
+                            $("#cd_altprocesson1").prop("checked", false);
+                            ProcessoN2(macropro,procn1,"'"+procn2+"'")
+                            if ($('#altprocesson3outros').val() != '') {
+                                $("#altprocesson3").html(prots);
+                                $("#altprocesson3").attr('disabled', true);
+                                $('#altprocesson3-outros').show(500)
+                                $("#cd_altprocesson3").prop("checked", true); 
+                                $('#processon3outrosSNAlt').val('S')
+                            }else{
+                                $('#processon3outrosSNAlt').val('N')
+                                $('#altprocesson3-outros').hide(500)
+                                ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'")  
+                                $("#cd_altprocesson3").prop("checked", false); 
+                            }                    
                     }  
                     dirprocesso("'"+dirproc+"'") 
                     deptoprocesso(dirproc,"'"+deptoproc+"'")
@@ -1936,7 +1938,7 @@
                     
                     let ponto =''
                     let altseqarray=b.split(',')
-                    alert(altseqarray)
+                   // alert(altseqarray)
                     $('.checkponto').each(function( index ) {
                         selecionarsn = 'N'
                         ponto = $(this).attr("title");
@@ -2332,7 +2334,8 @@
                         alert('Informe a descrição para opção Outros selecionada como Processo N3.');
                         frm.altprocesson3outros.focus();
                         return false;
-                    }   
+                    }  
+                    //alert($('#processon3outrosSNAlt').val()) 
                     if ($('#processon3outrosSNAlt').val() == 'N'  && $('#altprocesson3').val() == '') {
                         alert('Selecione um Processo N3 como Tipo de Avaliação.');
                         frm.altprocesson3.focus();
