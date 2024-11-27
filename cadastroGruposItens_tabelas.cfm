@@ -1,10 +1,11 @@
 <cfprocessingdirective pageEncoding ="utf-8">  
 <!DOCTYPE html>
+<cfinclude template="cabecalho.cfm">
 <html>
 
 <head>
 	<meta charset="UTF-8">
-	<title>novos campos</title>
+	<title>Novas tabelas do PACIN</title>
   <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css"> 
 	<link href="public/jquery-ui/jquery-ui.min.css" rel="stylesheet">
 	<link href="public/site.css" rel="stylesheet">
@@ -13,13 +14,14 @@
   <script src="public/getTime.js"></script>
   <script src="public/bootstrap/bootstrap.bundle.min.js"></script>
   <script type="text/javascript" src="public/axios.min.js"></script>
-	
 </head>
 <body>
 	<div class="wrapper"> 
+    <!---
 		<header>
 			SISTEMA NACIONAL DE CONTROLE INTERNO - SNCI (UNIDADES)
 		</header>  
+  --->    
 		<div class="content">
 			<div class="main">
 				<h1 align="center">Tabelas do PACIN</h1>
@@ -39,9 +41,9 @@
                     </label>
                 </div>
               </div>  
-              <p></p>          
+              <p></p><p></p>        
               <div>
-                <label for="clasctrl_desc" class="label">Descrição da Classificação</label>
+                <label for="clasctrl_desc" class="label">(Incluir/Alterar) - Classificação do Controle</label>
               </div>
               <div>
                 <textarea  name="clasctrl_desc" id="clasctrl_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -52,8 +54,8 @@
               <p></p>
               <div align="center">
                 <input id="inc_clasctrl" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','clasctrl','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_clasctrl" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','clasctrl','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_clasctrl" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','clasctrl','Confirmar Exclusão?')">
+                <input id="alt_clasctrl" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','clasctrl','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_clasctrl" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','clasctrl','Confirmar Exclusão?')">
               </div>  
             </div>
             <h2> Categoria do Controle</h2>
@@ -73,7 +75,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="categctrl_desc" class="label">Descrição da Categoria</label>
+                <label for="categctrl_desc" class="label">(Incluir/Alterar) - Categoria do Controle</label>
               </div>
               <div>
                 <textarea  name="categctrl_desc" id="categctrl_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -84,8 +86,8 @@
               <p></p>
               <div align="center">
                 <input id="inc_categctrl" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','categctrl','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_categctrl" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','categctrl','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_categctrl" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','categctrl','Confirmar Exclusão?')">
+                <input id="alt_categctrl" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','categctrl','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_categctrl" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','categctrl','Confirmar Exclusão?')">
               </div>  
             </div>
             <h2> Risco Identificado por Categoria</h2>
@@ -105,7 +107,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="categrisco_desc" class="label">Descrição do Risco por Categoria</label>
+                <label for="categrisco_desc" class="label">(Incluir/Alterar) - Risco Identificado por Categoria</label>
               </div>
               <div>
                 <textarea  name="categrisco_desc" id="categrisco_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -116,8 +118,8 @@
               <p></p>
               <div align="center">
                 <input id="inc_categrisco" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','categrisco','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_categrisco" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','categrisco','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_categrisco" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','categrisco','Confirmar Exclusão?')">
+                <input id="alt_categrisco" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','categrisco','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_categrisco" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','categrisco','Confirmar Exclusão?')">
               </div>  
             </div>
             <h2> Macroprocesso</h2>
@@ -137,7 +139,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="macproc_desc" class="label">Descrição do Macroprocesso</label>
+                <label for="macproc_desc" class="label">(Incluir/Alterar) - Macroprocesso</label>
               </div>
               <div>
                 <textarea  name="macproc_desc" id="macproc_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -148,8 +150,8 @@
               <p></p>
               <div align="center">
                 <input id="inc_macproc" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','macproc','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_macproc" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','macproc','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_macproc" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','macproc','Confirmar Exclusão?')">
+                <input id="alt_macproc" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','macproc','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_macproc" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','macproc','Confirmar Exclusão?')">
               </div>  
             </div> 
             <h2> Processo-N1</h2>
@@ -178,7 +180,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="procn1_desc" class="label">Descrição do Processo-N1</label>
+                <label for="procn1_desc" class="label">(Incluir/Alterar) - Processo-N1</label>
               </div>
               <div>
                 <textarea  name="procn1_desc" id="procn1_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -188,9 +190,9 @@
               </div>
               <p></p>
               <div align="center">
-                <input id="inc_procn1" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','procn1','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_procn1" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','procn1','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_procn1" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','procn1','Confirmar Exclusão?')">
+                <input id="inc_procn1" class="btn btn-primary" type="button" disabled value="Confirmar Inclusão" onclick="validarDados('inc','procn1','Confirmar Inclusão?')">&nbsp;&nbsp;
+                <input id="alt_procn1" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','procn1','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_procn1" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','procn1','Confirmar Exclusão?')">
               </div>  
             </div> 
             <h2> Processo-N2</h2>
@@ -233,7 +235,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="procn2_desc" class="label">Descrição do Processo-N2</label>
+                <label for="procn2_desc" class="label">(Incluir/Alterar) - Processo-N2</label>
               </div>
               <div>
                 <textarea  name="procn2_desc" id="procn2_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -243,9 +245,9 @@
               </div>
               <p></p>
               <div align="center">
-                <input id="inc_procn2" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','procn2','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_procn2" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','procn2','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_procn2" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','procn2','Confirmar Exclusão?')">
+                <input id="inc_procn2" class="btn btn-primary" type="button" disabled value="Confirmar Inclusão" onclick="validarDados('inc','procn2','Confirmar Inclusão?')">&nbsp;&nbsp;
+                <input id="alt_procn2" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','procn2','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_procn2" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','procn2','Confirmar Exclusão?')">
               </div>  
             </div>   
             <h2> Processo-N3</h2>
@@ -302,7 +304,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="procn3_desc" class="label">Descrição do Processo-N3</label>
+                <label for="procn3_desc" class="label">(Incluir/Alterar) - Processo-N3</label>
               </div>
               <div>
                 <textarea  name="procn3_desc" id="procn3_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -312,12 +314,12 @@
               </div>
               <p></p>
               <div align="center">
-                <input id="inc_procn3" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','procn3','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_procn3" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','procn3','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_procn3" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','procn3','Confirmar Exclusão?')">
+                <input id="inc_procn3" class="btn btn-primary" type="button" disabled value="Confirmar Inclusão" onclick="validarDados('inc','procn3','Confirmar Inclusão?')">&nbsp;&nbsp;
+                <input id="alt_procn3" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','procn3','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_procn3" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','procn3','Confirmar Exclusão?')">
               </div>  
             </div>  
-            <h2> Gestor do Processo (Diretoria)</h2>
+            <h2> Diretoria do Processo</h2>
             <div>
               <div class="row">
                 <div class="col">
@@ -334,7 +336,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="gestordir_desc" class="label">Descrição da Diretoria do Processo</label>
+                <label for="gestordir_desc" class="label">(Incluir/Alterar) - Diretoria do Processo</label>
               </div>
               <div>
                 <textarea  name="gestordir_desc" id="gestordir_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -345,20 +347,20 @@
               <p></p>
               <div align="center">
                 <input id="inc_gestordir" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','gestordir','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_gestordir" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','gestordir','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_gestordir" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','gestordir','Confirmar Exclusão?')">
+                <input id="alt_gestordir" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','gestordir','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_gestordir" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','gestordir','Confirmar Exclusão?')">
               </div>  
             </div>  
-            <h2> Gestor do Processo (Departamento)</h2>
+            <h2> Departamento do Processo</h2>
             <div>
               <div class="row">
                 <div class="col">
-                  <label class="label">Diretoria</label>
-              </div>
-                <div class="col">
-                    <label class="label">Departamentos Existentes</label>
+                  <label class="label">Diretorias do Processo</label>
                 </div>
-              </div> 
+                <div class="col">
+                    <label class="label">Departamentos do Processo Existentes</label>
+                </div>
+              </div>             
               <div class="row">
                 <div class="col">
                   <label>         
@@ -375,7 +377,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="gestordepto_desc" class="label">Descrição do Departamento</label>
+                <label for="gestordepto_desc" class="label">(Incluir/Alterar) - Departamento do Processo</label>
               </div>
               <div>
                 <textarea  name="gestordepto_desc" id="gestordepto_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -385,9 +387,9 @@
               </div>
               <p></p>
               <div align="center">
-                <input id="inc_gestordepto" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','gestordepto','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_gestordepto" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','gestordepto','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_gestordepto" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','gestordepto','Confirmar Exclusão?')">
+                <input id="inc_gestordepto" class="btn btn-primary" type="button" disabled value="Confirmar Inclusão" onclick="validarDados('inc','gestordepto','Confirmar Inclusão?')">&nbsp;&nbsp;
+                <input id="alt_gestordepto" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','gestordepto','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_gestordepto" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','gestordepto','Confirmar Exclusão?')">
               </div>  
             </div>  
             <h2> Objetivo Estratégico</h2>
@@ -407,7 +409,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="objtestra_desc" class="label">Descrição do Objetivo</label>
+                <label for="objtestra_desc" class="label">(Incluir/Alterar) - Objetivo Estratégico</label>
               </div>
               <div>
                 <textarea  name="objtestra_desc" id="objtestra_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -418,8 +420,8 @@
               <p></p>
               <div align="center">
                 <input id="inc_objtestra" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','objtestra','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_objtestra" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','objtestra','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_objtestra" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','objtestra','Confirmar Exclusão?')">
+                <input id="alt_objtestra" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','objtestra','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_objtestra" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','objtestra','Confirmar Exclusão?')">
               </div>  
             </div>    
             <h2> Risco Estratégico</h2>
@@ -439,7 +441,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="riscestra_desc" class="label">Descrição do Risco</label>
+                <label for="riscestra_desc" class="label">(Incluir/Alterar) - Risco Estratégico</label>
               </div>
               <div>
                 <textarea  name="riscestra_desc" id="riscestra_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -450,8 +452,8 @@
               <p></p>
               <div align="center">
                 <input id="inc_riscestra" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','riscestra','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_riscestra" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','riscestra','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_riscestra" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','riscestra','Confirmar Exclusão?')">
+                <input id="alt_riscestra" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','riscestra','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_riscestra" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','riscestra','Confirmar Exclusão?')">
               </div>  
             </div> 
             <h2> Indicador Estratégico</h2>
@@ -471,7 +473,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="indiestra_desc" class="label">Descrição do Indicador</label>
+                <label for="indiestra_desc" class="label">(Incluir/Alterar) - Indicador Estratégico</label>
               </div>
               <div>
                 <textarea  name="indiestra_desc" id="indiestra_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -482,8 +484,8 @@
               <p></p>
               <div align="center">
                 <input id="inc_indiestra" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','indiestra','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_indiestra" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','indiestra','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_indiestra" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','indiestra','Confirmar Exclusão?')">
+                <input id="alt_indiestra" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','indiestra','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_indiestra" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','indiestra','Confirmar Exclusão?')">
               </div>  
             </div>   
             <h2> Componente COSO-2013</h2>
@@ -503,7 +505,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="compcoso2013_desc" class="label">Descrição do Componente</label>
+                <label for="compcoso2013_desc" class="label">(Incluir/Alterar) - Componente COSO-2013</label>
               </div>
               <div>
                 <textarea  name="compcoso2013_desc" id="compcoso2013_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -514,8 +516,8 @@
               <p></p>
               <div align="center">
                 <input id="inc_compcoso2013" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','compcoso2013','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_compcoso2013" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','compcoso2013','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_compcoso2013" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','compcoso2013','Confirmar Exclusão?')">
+                <input id="alt_compcoso2013" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','compcoso2013','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_compcoso2013" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','compcoso2013','Confirmar Exclusão?')">
               </div>  
             </div>  
             <h2> Princípios COSO-2013</h2>
@@ -536,7 +538,7 @@
               <p></p>
               <div class="row">
                 <div class="col">
-                    <label class="label">Princípio COSO-2013</label>
+                    <label class="label">Princípios COSO-2013 Existentes</label>
                 </div>
               </div> 
               <div class="row">
@@ -549,7 +551,7 @@
               </div>  
               <p></p>          
               <div>
-                <label for="princoso2013_desc" class="label">Descrição do Princípio COSO-2013</label>
+                <label for="princoso2013_desc" class="label">(Incluir/Alterar) - Princípio COSO-2013</label>
               </div>
               <div>
                 <textarea  name="princoso2013_desc" id="princoso2013_desc" cols="80" rows="1" wrap="VIRTUAL" title="0"></textarea>		
@@ -559,9 +561,9 @@
               </div>
               <p></p>
               <div align="center">
-                <input id="inc_princoso2013" class="btn btn-primary" type="button" value="Confirmar Inclusão" onclick="validarDados('inc','princoso2013','Confirmar Inclusão?')">&nbsp;&nbsp;
-                <input id="alt_princoso2013" class="btn btn-warning" type="button" value="Confirmar Alteração" onclick="validarDados('alt','princoso2013','Confirmar Alteração?')">&nbsp;&nbsp;
-                <input id="exc_princoso2013" class="btn btn-danger" type="button" value="Confirmar Exclusão" onclick="validarDados('exc','princoso2013','Confirmar Exclusão?')">
+                <input id="inc_princoso2013" class="btn btn-primary" type="button" disabled value="Confirmar Inclusão" onclick="validarDados('inc','princoso2013','Confirmar Inclusão?')">&nbsp;&nbsp;
+                <input id="alt_princoso2013" class="btn btn-warning" type="button" disabled  value="Confirmar Alteração" onclick="validarDados('alt','princoso2013','Confirmar Alteração?')">&nbsp;&nbsp;
+                <input id="exc_princoso2013" class="btn btn-danger" type="button" disabled  value="Confirmar Exclusão" onclick="validarDados('exc','princoso2013','Confirmar Exclusão?')">
               </div>  
             </div>                                                                                                                         
 				</div>
@@ -630,7 +632,7 @@
 //*****************************************************
   //Críticas Gerais para Submit
   function validarDados(a,b,c){
-      //inicio críticas, front-end e back-end da Classificação do Controle
+      //inicio críticas, front-end e back-end
       //alert('a:  '+a+' b:  '+b+' c:  '+c)
       let continuarSN = 'S'
       if(b == 'clasctrl') {
@@ -700,7 +702,7 @@
           if(continuarSN == 'S'){       
             if(window.confirm(c)){  
                 // submeter ao banco de dados
-                //buscar classificação do controle
+                //buscar Categoria do controle
                 let ctctid = $('#categctrl_desc').attr("title")
                 let acao = a
                 let ctctdesc = $('#categctrl_desc').val()
@@ -719,7 +721,7 @@
                   $("#msgcategctrl").html(dados);
                   $("#msgcategctrl").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: categctrl
                 setTimeout(function() {
                   categctrl();
                 }, 500);
@@ -739,7 +741,7 @@
           if (a != 'exc') {
               $('#categrisco  > option').each(function() {
                 if($(this).text() == $('#categrisco_desc').val()) {
-                  alert('Texto Informado já existe no Cadastro: Risco por Categoria!');
+                  alert('Texto Informado já existe no Cadastro: Risco Identificado por Categoria!');
                   continuarSN = 'N'
                   return false;
                 }
@@ -748,7 +750,7 @@
           if(continuarSN == 'S'){       
             if(window.confirm(c)){  
                 // submeter ao banco de dados
-                //buscar classificação do controle
+                //buscar Risco Identificado por Categoria
                 let ctrcid = $('#categrisco_desc').attr("title")
                 let acao = a
                 let ctrcdesc = $('#categrisco_desc').val()
@@ -767,7 +769,7 @@
                   $("#msgcategrisco").html(dados);
                   $("#msgcategrisco").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: categrisco
                 setTimeout(function() {
                   categrisco();
                 }, 500);
@@ -796,7 +798,7 @@
           if(continuarSN == 'S'){       
             if(window.confirm(c)){  
                 // submeter ao banco de dados
-                //buscar classificação do controle
+                //buscar Macroprocesso
                 let mapcid = $('#macproc_desc').attr("title")
                 let acao = a
                 let mapcdesc = $('#macproc_desc').val()
@@ -815,7 +817,7 @@
                   $("#msgmacproc").html(dados);
                   $("#msgmacproc").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: macproc
                 setTimeout(function() {
                   macproc();
                 }, 500);
@@ -844,11 +846,14 @@
           if(continuarSN == 'S'){       
             if(window.confirm(c)){  
                 // submeter ao banco de dados
-                //buscar classificação do controle
+                //buscar Processo-N1
                 let acao = a
                 let pcn1mapcid = $('#macprocn1').val()
                 let pcn1id = $('#procn1_desc').attr("title")
+                if(a == 'inc'){pcn1id = pcn1mapcid}                 
                 let pcn1desc = $('#procn1_desc').val()
+                //alert(acao + ' '+pcn1mapcid+'  '+pcn1id+ ' '+pcn1desc)
+                //return false;
                 axios.get("CFC/grupoitem.cfc",{
                   params: {
                     method: "cad_procn1",
@@ -865,7 +870,7 @@
                   $("#msgprocn1").html(dados);
                   $("#msgprocn1").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: procn1
                 setTimeout(function() {
                   procn1();
                 }, 500);
@@ -899,6 +904,7 @@
                 let pcn1mapcid = $('#macprocn2').val()
                 let pcn1id = $('#procn1n2').val()
                 let pcn2id = $('#procn2_desc').attr("title")
+                if(a == 'inc'){pcn2id = pcn1id}   
                 let pcn2desc = $('#procn2_desc').val()
                 //alert('pcn1mapcid: '+pcn1mapcid+' pcn1id: '+pcn1id+' pcn2id: '+pcn2id+' pcn2desc: '+pcn2desc)
                 //return false
@@ -919,7 +925,7 @@
                   $("#msgprocn2").html(dados);
                   $("#msgprocn2").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: procn2
                 setTimeout(function() {
                   procn2();
                 }, 500);
@@ -948,12 +954,13 @@
           if(continuarSN == 'S'){       
             if(window.confirm(c)){  
                 // submeter ao banco de dados
-                //buscar classificação do controle              
+                //buscar Processo-N3              
                 let acao = a
                 let pcn1mapcid = $('#macprocn3').val()
                 let pcn1id = $('#procn1n2n3').val()
                 let pcn2id = $('#procn2n3').val()
                 let pcn3id = $('#procn3_desc').attr("title")
+                if(a == 'inc'){pcn3id = pcn2id}   
                 let pcn3desc = $('#procn3_desc').val()
                 axios.get("CFC/grupoitem.cfc",{
                   params: {
@@ -973,7 +980,7 @@
                   $("#msgprocn3").html(dados);
                   $("#msgprocn3").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: procn3
                 setTimeout(function() {
                   procn3();
                 }, 500);
@@ -1053,7 +1060,8 @@
                 //buscar departamento
                 let acao = a
                 let dpgpdigpid = $('#gestordirdepto').val()
-                let dpgpid = $('#gestordepto_desc').attr("title")                
+                let dpgpid = $('#gestordepto_desc').attr("title")  
+                if(a == 'inc'){dpgpid = dpgpdigpid}                
                 let dpgpsigla = $('#gestordepto_desc').val()
                 axios.get("CFC/grupoitem.cfc",{
                   params: {
@@ -1119,7 +1127,7 @@
                   $("#msgobjtestra").html(dados);
                   $("#msgobjtestra").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: objtestra
                 setTimeout(function() {
                   objtestra();
                 }, 500);
@@ -1167,7 +1175,7 @@
                   $("#msgriscestra").html(dados);
                   $("#msgriscestra").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: riscestra
                 setTimeout(function() {
                   riscestra();
                 }, 500);
@@ -1196,7 +1204,7 @@
           if(continuarSN == 'S'){       
             if(window.confirm(c)){  
                 // submeter ao banco de dados
-                //buscar Risco estratégico              
+                //buscar Indicador Estratégico              
                 let idesid = $('#indiestra_desc').attr("title")
                 let acao = a
                 let idesdesc = $('#indiestra_desc').val()
@@ -1215,7 +1223,7 @@
                   $("#msgindiestra").html(dados);
                   $("#msgindiestra").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: indiestra
                 setTimeout(function() {
                   indiestra();
                 }, 500);
@@ -1263,7 +1271,7 @@
                   $("#msgcompcoso2013").html(dados);
                   $("#msgcompcoso2013").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: compcoso2013
                 setTimeout(function() {
                   compcoso2013();
                 }, 500);
@@ -1275,7 +1283,7 @@
       }// final críticas, front-end e back-end da Componente COSO 2013     
       if(b == 'princoso2013') {
           if ($('#princoso2013_desc').val() == '' || $('#princoso2013_desc').val() == '---') {
-              alert('Informar a Descrição do Componente COSO-2013!');
+              alert('Informar a Descrição do Princípio COSO-2013!');
               $('#princoso2013_desc').focus()
               continuarSN = 'N'
               return false;
@@ -1283,7 +1291,7 @@
           if (a != 'exc') {
               $('#princoso2013  > option').each(function() {
                 if($(this).text() == $('#princoso2013_desc').val()) {
-                  alert('Texto Informado já existe no Cadastro: Componente COSO-2013!');
+                  alert('Texto Informado já existe no Cadastro: Princípio COSO-2013!');
                   continuarSN = 'N'
                   return false;
                 }
@@ -1295,6 +1303,8 @@
                 //buscar Princípio COSO-2013     
                 let prcscpcsid = $('#compcoso2013princ').val()    
                 let prcsid = $('#princoso2013_desc').attr("title")
+                if(a == 'inc'){prcsid = prcscpcsid} 
+                //alert(prcscpcsid + ' ' +prcsid)
                 let acao = a
                 let prcsdesc = $('#princoso2013_desc').val()
                 axios.get("CFC/grupoitem.cfc",{
@@ -1313,7 +1323,7 @@
                   $("#msgprincoso2013").html(dados);
                   $("#msgprincoso2013").show(500);
                 })
-                // refazer e atualizar o select: clasctrl
+                // refazer e atualizar o select: princoso2013
                 setTimeout(function() {
                   princoso2013();
                 }, 500);
@@ -1331,6 +1341,15 @@
     $('#clasctrl_desc').val($('#clasctrl option:selected').html());
     let auxval = $('#clasctrl').val()
     $('#clasctrl_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_clasctrl").attr('disabled', true);
+      $("#alt_clasctrl").attr('disabled', false);
+      $("#exc_clasctrl").attr('disabled', false);
+    }else{
+      $("#inc_clasctrl").attr('disabled', false);
+      $("#alt_clasctrl").attr('disabled', true);
+      $("#exc_clasctrl").attr('disabled', true);
+    }
     //alert($('#clasctrl option:selected').html())
   });
   $('.btn').hover(function() {
@@ -1339,13 +1358,21 @@
   $('#clasctrl_desc').focus(function() {
     $("#msgclasctrl").hide();
   })//(Classificação do Controle)
-
   //(Categoria do Controle)
   $('#categctrl').click(function() {
     $("#msgcategctrl").hide();
     $('#categctrl_desc').val($('#categctrl option:selected').html());
     let auxval = $('#categctrl').val()
     $('#categctrl_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_categctrl").attr('disabled', true);
+      $("#alt_categctrl").attr('disabled', false);
+      $("#exc_categctrl").attr('disabled', false);
+    }else{
+      $("#inc_categctrl").attr('disabled', false);
+      $("#alt_categctrl").attr('disabled', true);
+      $("#exc_categctrl").attr('disabled', true);
+    }
     //alert($('#categctrl option:selected').html())
   });
   $('.btn').hover(function() {
@@ -1361,6 +1388,15 @@
     $('#categrisco_desc').val($('#categrisco option:selected').html());
     let auxval = $('#categrisco').val()
     $('#categrisco_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_categrisco").attr('disabled', true);
+      $("#alt_categrisco").attr('disabled', false);
+      $("#exc_categrisco").attr('disabled', false);
+    }else{
+      $("#inc_categrisco").attr('disabled', false);
+      $("#alt_categrisco").attr('disabled', true);
+      $("#exc_categrisco").attr('disabled', true);
+    }
     //alert($('#categrisco option:selected').html())
   });
   $('.btn').hover(function() {
@@ -1376,6 +1412,15 @@
     $('#macproc_desc').val($('#macproc option:selected').html());
     let auxval = $('#macproc').val()
     $('#macproc_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_macproc").attr('disabled', true);
+      $("#alt_macproc").attr('disabled', false);
+      $("#exc_macproc").attr('disabled', false);
+    }else{
+      $("#inc_macproc").attr('disabled', false);
+      $("#alt_macproc").attr('disabled', true);
+      $("#exc_macproc").attr('disabled', true);
+    }
     //alert($('#macproc option:selected').html())
   });
   $('.btn').hover(function() {
@@ -1384,6 +1429,19 @@
   $('#macproc_desc').focus(function() {
     $("#msgmacproc").hide();
   })//(Macroprocesso) 
+  $('#macprocn1').click(function(e){ 
+    let auxval = $('#macprocn1').val()
+    $('#procn1_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_procn1").attr('disabled', false);
+      $("#alt_procn1").attr('disabled', true);
+      $("#exc_procn1").attr('disabled', true);
+    }else{
+      $("#inc_procn1").attr('disabled', true);
+      $("#alt_procn1").attr('disabled', true);
+      $("#exc_procn1").attr('disabled', true);
+    }
+  })// Processo-N1 inclusão
 
   //(Processo-N1)
   $('#procn1').click(function() {
@@ -1391,6 +1449,15 @@
     $('#procn1_desc').val($('#procn1 option:selected').html());
     let auxval = $('#procn1').val()
     $('#procn1_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_procn1").attr('disabled', true);
+      $("#alt_procn1").attr('disabled', false);
+      $("#exc_procn1").attr('disabled', false);
+    }else{
+      $("#inc_procn1").attr('disabled', false);
+      $("#alt_procn1").attr('disabled', true);
+      $("#exc_procn1").attr('disabled', true);
+    }
     //alert($('#procn1 option:selected').html())
   });
   $('.btn').hover(function() {
@@ -1406,8 +1473,54 @@
     $('#procn2_desc').val($('#procn2 option:selected').html());
     let auxval = $('#procn2').val()
     $('#procn2_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_procn2").attr('disabled', true);
+      $("#alt_procn2").attr('disabled', false);
+      $("#exc_procn2").attr('disabled', false);
+    }else{
+      $("#inc_procn2").attr('disabled', false);
+      $("#alt_procn2").attr('disabled', true);
+      $("#exc_procn2").attr('disabled', true);
+    }
     //alert($('#procn2 option:selected').html())
   });
+  $('#procn2n3').click(function(e){
+    let auxval = $('#procn2n3').val()
+    $('#procn3_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_procn3").attr('disabled', false);
+    }else{
+      $("#inc_procn3").attr('disabled', true);
+    }
+  }) //(Processo-N3 inclusão)
+  $('#compcoso2013princ').click(function(e){
+    let auxval = $('#compcoso2013princ').val()
+    $('#princoso2013_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_princoso2013").attr('disabled', false);
+    }else{
+      $("#inc_princoso2013").attr('disabled', true);
+    }
+  }) //(Princípios do COSO 2013 inclusão)    
+    
+  $('#gestordirdepto').click(function(e){
+    let auxval = $('#gestordirdepto').val()
+    $('#gestordepto_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_gestordepto").attr('disabled', false);
+    }else{
+      $("#inc_gestordepto").attr('disabled', true);
+    }
+  }) //(Departamento do Processo inclusão)    
+  $('#procn1n2').click(function(e){
+    let auxval = $('#procn1n2').val()
+    $('#procn2_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_procn2").attr('disabled', false);
+    }else{
+      $("#inc_procn2").attr('disabled', true);
+    }
+  }) //(Processo-N2 inclusão)
   $('.btn').hover(function() {
     $("#msgprocn2").hide();
   })
@@ -1421,6 +1534,15 @@
     $('#procn3_desc').val($('#procn3 option:selected').html());
     let auxval = $('#procn3').val()
     $('#procn3_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_procn3").attr('disabled', true);
+      $("#alt_procn3").attr('disabled', false);
+      $("#exc_procn3").attr('disabled', false);
+    }else{
+      $("#inc_procn3").attr('disabled', false);
+      $("#alt_procn3").attr('disabled', true);
+      $("#exc_procn3").attr('disabled', true);
+    }    
     //alert($('#procn3 option:selected').html())
   });
   $('.btn').hover(function() {
@@ -1429,7 +1551,50 @@
   $('#procn3_desc').focus(function() {
     $("#msgprocn3").hide();
   })//(Processo-N3)   
-
+  //Desabilitar botões de Exclusão
+  $('#clasctrl_desc').change(function(e){ 
+    $("#exc_clasctrl").attr('disabled', true);
+  })
+  $('#categctrl_desc').change(function(e){ 
+    $("#exc_categctrl").attr('disabled', true);
+  })
+  $('#categrisco_desc').change(function(e){ 
+    $("#exc_categrisco").attr('disabled', true);
+  })  
+  $('#macproc_desc').change(function(e){ 
+    $("#exc_macproc").attr('disabled', true);
+  })  
+  $('#procn1_desc').change(function(e){ 
+    $("#exc_procn1").attr('disabled', true);
+  })  
+  $('#procn2_desc').change(function(e){ 
+    $("#exc_procn2").attr('disabled', true);
+  })  
+  $('#procn3_desc').change(function(e){ 
+    $("#exc_procn3").attr('disabled', true);
+  })     
+  $('#gestordir_desc').change(function(e){ 
+    $("#exc_gestordir").attr('disabled', true);
+  }) 
+  $('#gestordepto_desc').change(function(e){ 
+    $("#exc_gestordepto").attr('disabled', true);
+  })   
+  $('#objtestra_desc').change(function(e){ 
+    $("#exc_objtestra").attr('disabled', true);
+  })
+  $('#riscestra_desc').change(function(e){ 
+    $("#exc_riscestra").attr('disabled', true);
+  })   
+  $('#indiestra_desc').change(function(e){ 
+    $("#exc_indiestra").attr('disabled', true);
+  })     
+  $('#compcoso2013_desc').change(function(e){ 
+    $("#exc_compcoso2013").attr('disabled', true);
+  }) 
+  $('#princoso2013_desc').change(function(e){ 
+    $("#exc_princoso2013").attr('disabled', true);
+  })                                 
+  // Fim desabilitar botões Exclusão
   // inicio BUSCAS NA BASE PARA COMPOR AS TELAS
   //buscar classificação do controle
   function classifctrl() {
@@ -1747,6 +1912,9 @@
   } //buscar Principio coso2013   
   //fim busca na base para compor as telas
   $('#macprocn1').change(function(e){ 
+      $("#inc_procn1").attr('disabled', false);
+      $("#alt_procn1").attr('disabled', true);
+      $("#exc_procn1").attr('disabled', true);
       let prots = '<option value="" selected>---</option>';
       $("#procn1").html(prots);
       $('#procn1_desc').val('---');
@@ -1773,6 +1941,9 @@
       }
   })//buscar Processo-N1
   $('#macprocn2').change(function(e){ 
+      $("#inc_procn2").attr('disabled', true);
+      $("#alt_procn2").attr('disabled', true);
+      $("#exc_procn2").attr('disabled', true);
       let prots = '<option value="" selected>---</option>';
       $("#procn1n2").html(prots);
       $("#procn2").html(prots);
@@ -1800,6 +1971,9 @@
       }
   })//buscar procn1n2n3
   $('#macprocn3').change(function(e){ 
+      $("#inc_procn3").attr('disabled', true);
+      $("#alt_procn3").attr('disabled', true);
+      $("#exc_procn3").attr('disabled', true);
       let prots = '<option value="" selected>---</option>';
       $("#procn1n2n3").html(prots);
       $("#procn2n3").html(prots);
@@ -1828,6 +2002,9 @@
       }
   })//buscar procn1n2n3 
   $('#procn1n2').change(function(e){
+      $("#inc_procn2").attr('disabled', true);
+      $("#alt_procn2").attr('disabled', true);
+      $("#exc_procn2").attr('disabled', true);
       let prots = '<option value="" selected>---</option>';
       $("#procn2").html(prots);
       $('#procn2_desc').val('---');
@@ -1854,6 +2031,9 @@
       })  
   })//buscar Processo-N2   
   $('#procn1n2n3').change(function(e){
+      $("#inc_procn3").attr('disabled', true);
+      $("#alt_procn3").attr('disabled', true);
+      $("#exc_procn3").attr('disabled', true);
       let prots = '<option value="" selected>---</option>';
       $("#procn2n3").html(prots);
       $("#procn3").html(prots);
@@ -1881,6 +2061,9 @@
       })  
   })//buscar Processo-N2N3  
   $('#procn2n3').change(function(e){
+      $("#inc_procn3").attr('disabled', true);
+      $("#alt_procn3").attr('disabled', true);
+      $("#exc_procn3").attr('disabled', true);
       let prots = '<option value="" selected>---</option>';
       $("#procn3").html(prots);
       $('#procn3_desc').val('---');     
@@ -1910,6 +2093,9 @@
 
   })//buscar Departamento   
   $('#gestordirdepto').change(function(e){ 
+      $("#inc_gestordepto").attr('disabled', true);
+      $("#alt_gestordepto").attr('disabled', true);
+      $("#exc_gestordepto").attr('disabled', true);
       let prots = '<option value="" selected>---</option>';
       $("#gestordepto").html(prots);
       $('#gestordepto_desc').val('---');
@@ -1936,6 +2122,9 @@
       }
   })//buscar Departamento  
   $('#compcoso2013princ').change(function(e){ 
+      $("#inc_princoso2013").attr('disabled', true);
+      $("#alt_princoso2013").attr('disabled', true);
+      $("#exc_princoso2013").attr('disabled', true);
       let prots = '<option value="" selected>---</option>';
       $("#princoso2013").html(prots);
       $('#princoso2013_desc').val('---');
@@ -1960,12 +2149,21 @@
               $("#princoso2013").html(prots);
           })  
       }
-  })//buscar Princípio COSO-2013    
+  })//buscar Princípio COSO-2013   
   $('#gestordir').click(function() {
     $("#msggestordir").hide();
     $('#gestordir_desc').val($('#gestordir option:selected').html());
     let auxval = $('#gestordir').val()
     $('#gestordir_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_gestordir").attr('disabled', true);
+      $("#alt_gestordir").attr('disabled', false);
+      $("#exc_gestordir").attr('disabled', false);
+    }else{
+      $("#inc_gestordir").attr('disabled', false);
+      $("#alt_gestordir").attr('disabled', true);
+      $("#exc_gestordir").attr('disabled', true);
+    }
     //alert($('#gestordir option:selected').html())
   });
   $('.btn').hover(function() {
@@ -1979,6 +2177,15 @@
     $('#gestordepto_desc').val($('#gestordepto option:selected').html());
     let auxval = $('#gestordepto').val()
     $('#gestordepto_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_gestordepto").attr('disabled', true);
+      $("#alt_gestordepto").attr('disabled', false);
+      $("#exc_gestordepto").attr('disabled', false);
+    }else{
+      $("#inc_gestordepto").attr('disabled', false);
+      $("#alt_gestordepto").attr('disabled', true);
+      $("#exc_gestordepto").attr('disabled', true);
+    }
     //alert($('#gestordepto option:selected').html())
   });
   $('.btn').hover(function() {
@@ -1992,6 +2199,15 @@
     $('#objtestra_desc').val($('#objtestra option:selected').html());
     let auxval = $('#objtestra').val()
     $('#objtestra_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_objtestra").attr('disabled', true);
+      $("#alt_objtestra").attr('disabled', false);
+      $("#exc_objtestra").attr('disabled', false);
+    }else{
+      $("#inc_objtestra").attr('disabled', false);
+      $("#alt_objtestra").attr('disabled', true);
+      $("#exc_objtestra").attr('disabled', true);
+    }
     //alert($('#objtestra option:selected').html())
   });
   $('.btn').hover(function() {
@@ -2005,6 +2221,15 @@
     $('#riscestra_desc').val($('#riscestra option:selected').html());
     let auxval = $('#riscestra').val()
     $('#riscestra_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_riscestra").attr('disabled', true);
+      $("#alt_riscestra").attr('disabled', false);
+      $("#exc_riscestra").attr('disabled', false);
+    }else{
+      $("#inc_riscestra").attr('disabled', false);
+      $("#alt_riscestra").attr('disabled', true);
+      $("#exc_riscestra").attr('disabled', true);
+    }    
     //alert($('#riscestra option:selected').html())
   });
   $('.btn').hover(function() {
@@ -2018,6 +2243,15 @@
     $('#indiestra_desc').val($('#indiestra option:selected').html());
     let auxval = $('#indiestra').val()
     $('#indiestra_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_indiestra").attr('disabled', true);
+      $("#alt_indiestra").attr('disabled', false);
+      $("#exc_indiestra").attr('disabled', false);
+    }else{
+      $("#inc_indiestra").attr('disabled', false);
+      $("#alt_indiestra").attr('disabled', true);
+      $("#exc_indiestra").attr('disabled', true);
+    } 
     //alert($('#indiestra option:selected').html())
   });
   $('.btn').hover(function() {
@@ -2031,6 +2265,15 @@
     $('#compcoso2013_desc').val($('#compcoso2013 option:selected').html());
     let auxval = $('#compcoso2013').val()
     $('#compcoso2013_desc').attr("title",auxval);
+    if(auxval != ''){
+      $("#inc_compcoso2013").attr('disabled', true);
+      $("#alt_compcoso2013").attr('disabled', false);
+      $("#exc_compcoso2013").attr('disabled', false);
+    }else{
+      $("#inc_compcoso2013").attr('disabled', false);
+      $("#alt_compcoso2013").attr('disabled', true);
+      $("#exc_compcoso2013").attr('disabled', true);
+    } 
     //alert($('#compcoso2013 option:selected').html())
   });
   $('.btn').hover(function() {
@@ -2044,8 +2287,16 @@
     $('#princoso2013_desc').val($('#princoso2013 option:selected').html());
     let auxval = $('#princoso2013').val()
     $('#princoso2013_desc').attr("title",auxval);
-    //alert($('#princoso2013 option:selected').html())
-  });
+    if(auxval != ''){
+      $("#inc_princoso2013").attr('disabled', true);
+      $("#alt_princoso2013").attr('disabled', false);
+      $("#exc_princoso2013").attr('disabled', false);
+    }else{
+      $("#inc_princoso2013").attr('disabled', false);
+      $("#alt_princoso2013").attr('disabled', true);
+      $("#exc_princoso2013").attr('disabled', true);
+    }
+  })//alert($('#princoso2013 option:selected').html())
   $('.btn').hover(function() {
     $("#msgprincoso2013").hide();
   })
