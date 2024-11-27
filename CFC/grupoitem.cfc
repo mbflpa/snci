@@ -334,7 +334,7 @@
                     </cfquery> 
                     <cfset ret = 'Exclusão realizada com sucesso!'> 
                 <cfelse>    
-                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui a Classificação Selecionada!'>                     
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui a Classificação do Controle Selecionada!'>                     
                 </cfif> 
             </cfif>
             <cfcatch type="any">
@@ -498,12 +498,17 @@
                 <cfset ret = 'Alteração realizada com sucesso!'> 
             </cfif>
             <cfif acao eq 'exc'>
-                <cfquery datasource="DBSNCI" name="rsExiste">
+                <cfquery datasource="DBSNCI" name="rsExisteA">
                     SELECT Itn_ClassificacaoControle
                     FROM Itens_Verificacao
                     WHERE Itn_MacroProcesso = #mapcid#
                 </cfquery>
-                <cfif rsExiste.recordcount lte 0>
+                <cfquery datasource="DBSNCI" name="rsExisteB">
+                    SELECT PCN1_MAPC_ID
+                    FROM UN_PROCESSON1
+                    WHERE PCN1_MAPC_ID = #mapcid#
+                </cfquery>
+                <cfif rsExisteA.recordcount lte 0 and rsExisteB.recordcount lte 0>
                     <cfquery datasource="DBSNCI">
                         delete from  UN_MACROPROCESSO 
                         where 
@@ -511,7 +516,7 @@
                     </cfquery> 
                     <cfset ret = 'Exclusão realizada com sucesso!'> 
                 <cfelse>    
-                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Macroprocesso selecionado!'>                     
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao e/ou UN_PROCESSON1 possui o Macroprocesso selecionado!'>                     
                 </cfif> 
             </cfif>
             <cfcatch type="any">
@@ -539,6 +544,9 @@
                     FROM UN_PROCESSON1
                     WHERE PCN1_MAPC_ID = #pcn1mapcid#
                 </cfquery>
+                <cfif rsNovo.novoid is ''>
+                    <cfset rsNovo.novoid = 1>
+                </cfif>
                 <cfquery datasource="DBSNCI">
                     insert into UN_PROCESSON1 
                         (PCN1_MAPC_ID,PCN1_ID,PCN1_Descricao,PCN1_username,PCN1_DtCriar,PCN1_DtAlter)
@@ -560,13 +568,19 @@
                 <cfset ret = 'Alteração realizada com sucesso!'> 
             </cfif>
             <cfif acao eq 'exc'>
-                <cfquery datasource="DBSNCI" name="rsExiste">
+                <cfquery datasource="DBSNCI" name="rsExisteA">
                     SELECT Itn_ClassificacaoControle
                     FROM Itens_Verificacao
                     WHERE Itn_MacroProcesso = #pcn1mapcid# 
                     and Itn_ProcessoN1 = #pcn1id#
                 </cfquery>
-                <cfif rsExiste.recordcount lte 0>
+                <cfquery datasource="DBSNCI" name="rsExisteB">
+                    SELECT PCN2_PCN1_MAPC_ID, PCN2_PCN1_ID
+                    FROM UN_PROCESSON2
+                    WHERE PCN2_PCN1_MAPC_ID=#pcn1mapcid# AND PCN2_PCN1_ID=#pcn1id#
+                </cfquery>
+
+                <cfif rsExisteA.recordcount lte 0 and rsExisteB.recordcount lte 0>
                     <cfquery datasource="DBSNCI">
                         delete from  UN_PROCESSON1 
                         where 
@@ -574,8 +588,8 @@
                         AND PCN1_ID = <cfqueryparam value="#pcn1id#" cfsqltype="cf_sql_integer">
                     </cfquery> 
                     <cfset ret = 'Exclusão realizada com sucesso!'> 
-                <cfelse>    
-                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Processo-N1 selecionado!'>                     
+                <cfelse> 
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao e/ou UN_PROCESSON2 possui o Processo-N1 selecionado!'>                      
                 </cfif> 
             </cfif>
             <cfcatch type="any">
@@ -605,6 +619,9 @@
                     WHERE PCN2_PCN1_MAPC_ID = #pcn1mapcid# 
                     AND PCN2_PCN1_ID = #pcn1id#
                 </cfquery>
+                <cfif rsNovo.novoid is ''>
+                    <cfset rsNovo.novoid = 1>
+                </cfif>
                 <cfquery datasource="DBSNCI">
                     insert into UN_PROCESSON2 
                         (PCN2_PCN1_MAPC_ID,PCN2_PCN1_ID,PCN2_ID,PCN2_Descricao,PCN2_username,PCN2_DtCriar,PCN2_DtAlter)
@@ -627,14 +644,21 @@
                 <cfset ret = 'Alteração realizada com sucesso!'> 
             </cfif>
             <cfif acao eq 'exc'>
-                <cfquery datasource="DBSNCI" name="rsExiste">
+                <cfquery datasource="DBSNCI" name="rsExisteA">
                     SELECT Itn_ClassificacaoControle
                     FROM Itens_Verificacao
                     WHERE Itn_MacroProcesso = #pcn1mapcid# 
                     and Itn_ProcessoN1 = #pcn1id# 
                     and Itn_ProcessoN2 = #pcn2id#
                 </cfquery>
-                <cfif rsExiste.recordcount lte 0>
+                <cfquery datasource="DBSNCI" name="rsExisteB">
+                    SELECT PCN3_PCN2_ID
+                    FROM UN_PROCESSON3
+                    WHERE PCN3_PCN2_PCN1_MAPC_ID = #pcn1mapcid#
+                    AND PCN3_PCN2_PCN1_ID=#pcn1id# 
+                    AND PCN3_PCN2_ID=#pcn2id#
+                </cfquery>
+                <cfif rsExisteA.recordcount lte 0 and rsExisteB.recordcount lte 0>                
                     <cfquery datasource="DBSNCI">
                         delete from  UN_PROCESSON2
                         where 
@@ -643,8 +667,8 @@
                         AND PCN2_ID = <cfqueryparam value="#pcn2id#" cfsqltype="cf_sql_integer">
                     </cfquery> 
                     <cfset ret = 'Exclusão realizada com sucesso!'> 
-                <cfelse>    
-                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Processo-N2 selecionado!'>                     
+                <cfelse>     
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao e/ou UN_PROCESSON3 possui o Processo-N2 selecionado!'>                     
                 </cfif> 
             </cfif>
             <cfcatch type="any">
@@ -676,6 +700,9 @@
                     AND PCN3_PCN2_PCN1_ID = #pcn1id# 
                     and PCN3_PCN2_ID = #pcn2id#
                 </cfquery>
+                <cfif rsNovo.novoid is ''>
+                    <cfset rsNovo.novoid = 1>
+                </cfif>
                 <cfquery datasource="DBSNCI">
                     insert into UN_PROCESSON3 
                         (PCN3_PCN2_PCN1_MAPC_ID,PCN3_PCN2_PCN1_ID,PCN3_PCN2_ID,PCN3_ID,PCN3_Descricao,PCN3_username,PCN3_DtCriar,PCN3_DtAlter)
@@ -718,7 +745,7 @@
                     </cfquery> 
                     <cfset ret = 'Exclusão realizada com sucesso!'> 
                 <cfelse>    
-                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Processo-N2 selecionado!'>                     
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui o Processo-N3 selecionado!'>                     
                 </cfif> 
             </cfif>
             <cfcatch type="any">
@@ -765,9 +792,9 @@
             </cfif>
             <cfif acao eq 'exc'>
                 <cfquery datasource="DBSNCI" name="rsExiste">
-                    SELECT Itn_ClassificacaoControle
-                    FROM Itens_Verificacao
-                    WHERE Itn_GestorProcessoDir = #digpid# 
+                    SELECT DPGP_DIGP_ID
+                    FROM UN_GESTORPROCESSO_DEPARTAMENTO
+                    WHERE DPGP_DIGP_ID=#digpid#
                 </cfquery>
                 <cfif rsExiste.recordcount lte 0>
                     <cfquery datasource="DBSNCI">
@@ -805,6 +832,9 @@
                     FROM UN_GESTORPROCESSO_DEPARTAMENTO
                     where DPGP_DIGP_ID = #dpgpdigpid#
                 </cfquery>
+                <cfif rsNovo.novoid is ''>
+                    <cfset rsNovo.novoid = 1>
+                </cfif>
                 <cfquery datasource="DBSNCI">
                     insert into UN_GESTORPROCESSO_DEPARTAMENTO 
                         (DPGP_DIGP_ID,DPGP_ID,DPGP_SIGLA,DPGP_username,DPGP_DtCriar,DPGP_DtAlter)
@@ -831,7 +861,7 @@
                     FROM Itens_Verificacao
                     WHERE Itn_GestorProcessoDir=#dpgpdigpid# and Itn_GestorProcessoDepto = #dpgpid#
                 </cfquery>
-                <cfif rsExiste.recordcount lte 0>
+                <cfif rsExiste.recordcount lte 0>   
                     <cfquery datasource="DBSNCI">
                         delete from  UN_GESTORPROCESSO_DEPARTAMENTO 
                         where 
@@ -1063,12 +1093,17 @@
                 <cfset ret = 'Alteração realizada com sucesso!'> 
             </cfif>
             <cfif acao eq 'exc'>
-                <cfquery datasource="DBSNCI" name="rsExiste">
+                <cfquery datasource="DBSNCI" name="rsExisteA">
                     SELECT Itn_ClassificacaoControle
                     FROM Itens_Verificacao
-                    WHERE Itn_Coso2013Componente = #cpcsid#
+                    WHERE Itn_Coso2013Componente = #cpcsid# 
                 </cfquery>
-                <cfif rsExiste.recordcount lte 0>
+                <cfquery datasource="DBSNCI" name="rsExisteB">
+                    SELECT PRCS_CPCS_ID
+                    FROM UN_PRINCIPIOCOSO
+                    WHERE PRCS_CPCS_ID= #cpcsid#
+                </cfquery>
+                <cfif rsExisteA.recordcount lte 0 and rsExisteB.recordcount lte 0>                
                     <cfquery datasource="DBSNCI">
                         delete from  UN_COMPONENTECOSO 
                         where 
@@ -1076,7 +1111,7 @@
                     </cfquery> 
                     <cfset ret = 'Exclusão realizada com sucesso!'> 
                 <cfelse>    
-                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui O Componente COSO-2013 Selecionado!'>                     
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao e/ou UN_COMPONENTECOSO possui o Componentes Existentes Selecionado!'>                     
                 </cfif> 
             </cfif>
             <cfcatch type="any">
@@ -1104,6 +1139,9 @@
                     FROM UN_PRINCIPIOCOSO
                     where PRCS_CPCS_ID = #prcscpcsid#
                 </cfquery>
+                <cfif rsNovo.novoid is ''>
+                    <cfset rsNovo.novoid = 1>
+                </cfif>
                 <cfquery datasource="DBSNCI">
                     insert into UN_PRINCIPIOCOSO 
                         (PRCS_CPCS_ID,PRCS_ID,PRCS_DESCRICAO,PRCS_username,PRCS_DtCriar,PRCS_DtAlter)
@@ -1126,9 +1164,9 @@
             </cfif>
             <cfif acao eq 'exc'>
                 <cfquery datasource="DBSNCI" name="rsExiste">
-                    SELECT Itn_ClassificacaoControle
+                    SELECT Itn_Coso2013Principios
                     FROM Itens_Verificacao
-                    WHERE Itn_Coso2013Principios = #prcsid#
+                    WHERE Itn_Coso2013Componente=#prcscpcsid# and Itn_Coso2013Principios = #prcsid#
                 </cfquery>
                 <cfif rsExiste.recordcount lte 0>
                     <cfquery datasource="DBSNCI">
@@ -1139,7 +1177,7 @@
                     </cfquery> 
                     <cfset ret = 'Exclusão realizada com sucesso!'> 
                 <cfelse>    
-                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui O Componente COSO-2013 Selecionado!'>                     
+                    <cfset ret = 'Exclusão Cancelada - Tabela de Itens_Verificacao possui O Princípio COSO-2013 Selecionado!'>                     
                 </cfif> 
             </cfif>
             <cfcatch type="any">
