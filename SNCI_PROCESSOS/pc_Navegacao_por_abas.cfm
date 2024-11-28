@@ -27,8 +27,12 @@
             <div class="nav-item dropdown">
                 <a class="nav-link bg-danger dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Fechar</a>
                 <div class="dropdown-menu mt-0">
-                    <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all">Fechar Todas</a>
-                    <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all-other">Fechar Outras</a>
+                    <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all">
+                        <i class="fas fa-times-circle" ></i> Fechar todas as páginas
+                    </a>
+                    <a class="dropdown-item" href="#" data-widget="iframe-close" data-type="all-other">
+                        <i class="far fa-times-circle"></i> Fechar outras páginas
+                    </a>
                     <a class="dropdown-item" onclick="window.top.location.href='../SNCI_PROCESSOS/index.cfm';" role="button" style="color:#00416B">
                         <i class="fas fa-house" ></i> Sair da Navegação por Abas
                     </a>
