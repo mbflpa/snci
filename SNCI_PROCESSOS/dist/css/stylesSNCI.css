@@ -757,6 +757,8 @@ word-wrap: break-word;  /* Permite a quebra de palavras longas */
     
 
 }
-
-
+/* Correção da largura do .card-header em versões dos navegadores Chrome e Firefox. */
+.card-primary:not(.card-outline) > .card-header {
+    padding: 0!important;
+}
 
