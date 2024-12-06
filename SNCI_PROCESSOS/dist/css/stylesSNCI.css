@@ -316,3 +316,7 @@ td{
 tr .small-box:hover {
     box-shadow: 0 0 5px 0 #6c757d inset, 0 0 7px 5px #6c757d !important;
 }
+
+.card-primary:not(.card-outline) > .card-header {
+    padding: 0!important;
+}
