@@ -815,7 +815,7 @@
 			
 				<div class="card-body" style="padding:0px;">
 					<div  id ="cardRelatorioPDF" class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease 0s; height: inherit; width: inherit;">
-						<div class="card-header azul_correios_backgroundColor" >
+						<div class="card-header azul_correios_backgroundColor"  style='padding:10px!important;'>
 						
 							<h3 class="card-title" style="font-size:16px;position:relative;top:3px;cursor:pointer" data-card-widget="collapse"><i class="fas fa-file-pdf" style="margin-right:10px;"></i><cfoutput> #pc_anexo_nome#</cfoutput></h3>
 						    <div  class="card-tools">

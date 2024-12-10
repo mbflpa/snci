@@ -6901,7 +6901,7 @@
 							<!-- Card com anexo -->
 							<div id="cardRelatorioPDF" class="card card-primary card-tabs collapsed-card card_hover_correios" 
 								style="transition: all 0.15s ease 0s; height: inherit; width: 100%; margin: 0;">
-								<div class="card-header" style="display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
+								<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
 									<h3 class="card-title" style="font-size: 16px; cursor: pointer; 
 										white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
 										flex: 1;" >
@@ -7016,7 +7016,7 @@
 						<!-- Card com anexo -->
 						<div id="cardRelatorioPDF" class="card card-primary card-tabs collapsed-card card_hover_correios" 
 							style="transition: all 0.15s ease 0s; height: inherit; width: 100%; margin: 0;">
-							<div class="card-header" style="display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
+							<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
 								<h3 class="card-title" style="font-size: 16px; cursor: pointer; 
 									white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
 									flex: 1;" >
