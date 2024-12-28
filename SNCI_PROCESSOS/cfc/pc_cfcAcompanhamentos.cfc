@@ -400,7 +400,7 @@
 
 		<session class="content-header"  >
 			<div class="card card-primary card-tabs card_border_correios"  style="width:100%">
-				<div class="card-header card-header_backgroundColor" >
+				<div class="card-header card-header_backgroundColor" style="padding-top: 0.75rem!important;padding-right: 1.25rem!important;padding-bottom: 0.75rem!important;padding-left: 1.25rem!important;" >
 					<h4 class="card-title ">	
 						<div  class="d-block" style="font-size:20px;color:#fff;font-weight: bold;"> 
 							<i class="fas fa-file-alt" style="margin-top:4px;"></i><span id="texto_card-title" style="margin-left:10px;font-size:16px;">Medida/Orientação p/ regularização</span>
