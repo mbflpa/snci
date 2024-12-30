@@ -762,3 +762,10 @@ word-wrap: break-word;  /* Permite a quebra de palavras longas */
     padding: 0!important;
 }
 
+.card_border_correios .nav-item{
+    margin-top: 2px!important;
+}
+
+.card_border_correios2 .nav-item{
+    margin-top: 1px!important;
+}
