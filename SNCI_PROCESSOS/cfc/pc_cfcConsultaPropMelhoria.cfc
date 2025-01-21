@@ -108,7 +108,9 @@
 								
 								<tbody>
 									<cfloop query="rsMelhorias" >
-										<cfoutput>					
+										<cfoutput>	
+											<cfset statusMelhoria = "">
+											<cfset corStatusMelhoria = "">			
 										    <cfswitch expression="#pc_aval_melhoria_status#">
 												<cfcase value="P">
 													<cfset statusMelhoria = "PENDENTE">
@@ -136,6 +138,7 @@
 												</cfcase>
 												<cfdefaultcase>
 													<cfset statusMelhoria = "">	
+													<cfset corStatusMelhoria ="">
 												</cfdefaultcase>
 												
 											</cfswitch>
