@@ -1011,7 +1011,7 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Mel
 
 			<cfquery datasource="#application.dsn_processos#">
 				DELETE FROM pc_avaliacao_melhorias
-				WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">
+				WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_integer">
 			</cfquery>
 
 		</cftransaction>
