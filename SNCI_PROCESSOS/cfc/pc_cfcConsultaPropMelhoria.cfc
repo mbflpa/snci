@@ -137,8 +137,8 @@
 													<cfset corStatusMelhoria = "background:##dc3545;color:##fff;">
 												</cfcase>
 												<cfdefaultcase>
-													<cfset statusMelhoria = "">	
-													<cfset corStatusMelhoria ="">
+													<cfset statusMelhoria = "NÃO INFORMADO">
+													<cfset corStatusMelhoria = "background:##000;color:##fff;">
 												</cfdefaultcase>
 												
 											</cfswitch>
