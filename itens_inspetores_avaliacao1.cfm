@@ -62,6 +62,7 @@
 	<cfif isDefined("Form.SE")><cfset Session.E01.SE = Form.SE><cfelse><cfset Session.E01.SE = ''></cfif>
     <cfif isDefined("Form.txtNum_Inspecao")><cfset Session.E01.txtNum_Inspecao = Form.txtNum_Inspecao><cfelse><cfset Session.E01.txtNum_Inspecao = ''></cfif>
 	<cfif isDefined("Form.modal")><cfset Session.E01.modal = Form.modal><cfelse><cfset Session.E01.modal = ''></cfif>
+	<cfif isDefined("Form.manchete")><cfset Session.E01.manchete = Form.manchete><cfelse><cfset Session.E01.manchete = ''></cfif>
 	    
 		<cfset numncisei = "">
 		<!--- <cfif not isDefined("Form.Submit")> --->
@@ -161,11 +162,12 @@
 				<cfset auxfrmsobra = Replace(FORM.frmsobra,'.','','All')>
 				<cfset auxfrmsobra = Replace(auxfrmsobra,',','.','All')>
 			</cfif> 
+<!---			
 			<cfset auxpbfimor = Replace(FORM.pbfimor,'.','','All')>
 			<cfset auxpbfimor = Replace(auxpbfimor,',','.','All')>
 			<cfset auxecfmor = Replace(FORM.ecfmor,'.','','All')>
 			<cfset auxecfmor = Replace(auxecfmor,',','.','All')>	
-
+--->
 			<cfset RIPReincInspecao = ''>
 			<cfset RIPReincGrupo = 0>
 			<cfset RIPReincItem = 0>
@@ -178,11 +180,13 @@
 				UPDATE Resultado_Inspecao SET
 				RIP_Comentario = '#aux_melhoria#',
 				RIP_Recomendacoes='#aux_recomendacoes#',
+				RIP_Manchete='#form.manchete#',
 				RIP_Falta= #auxfrmfalta#,
 				RIP_Sobra=#auxfrmsobra#,
 				RIP_EmRisco=#auxfrmemrisco#,
-				RIP_PotencialBeneficioFinanceiro = #auxpbfimor#,
+<!---			RIP_PotencialBeneficioFinanceiro = #auxpbfimor#,
 				RIP_EstimativaCustoFinanceiro = #auxecfmor#,
+--->				
 				RIP_ReincInspecao = '#RIPReincInspecao#',
 				RIP_ReincGrupo = #RIPReincGrupo#,
 				RIP_ReincItem = #RIPReincItem#,
@@ -246,12 +250,12 @@
 				<cfset auxfrmemrisco = Replace(FORM.frmemrisco,'.','','All')>
 				<cfset auxfrmemrisco = Replace(auxfrmemrisco,',','.','All')>
 			</cfif> 
-
+<!---
 			<cfset auxpbfimor = Replace(FORM.pbfimor,'.','','All')>
 			<cfset auxpbfimor = Replace(auxpbfimor,',','.','All')>
 			<cfset auxecfmor = Replace(FORM.ecfmor,'.','','All')>
 			<cfset auxecfmor = Replace(auxecfmor,',','.','All')>	
-			
+--->			
 			<cfset RIPReincInspecao = ''>
 			<cfset RIPReincGrupo = 0>
 			<cfset RIPReincItem = 0>
@@ -264,12 +268,15 @@
 				UPDATE Resultado_Inspecao SET
 				RIP_Comentario = '#aux_melhoria#',
 				RIP_Recomendacoes='#aux_recomendacoes#',
+				RIP_Manchete='#form.manchete#',
 				RIP_Falta= #auxfrmfalta#,
 				RIP_Sobra=#auxfrmsobra#,
 				RIP_EmRisco=#auxfrmemrisco#,
 				RIP_ReincInspecao = '#RIPReincInspecao#',
+<!---				
 				RIP_PotencialBeneficioFinanceiro = #auxpbfimor#,
 				RIP_EstimativaCustoFinanceiro = #auxecfmor#,
+--->				
 				RIP_ReincGrupo = #RIPReincGrupo#,
 				RIP_ReincItem = #RIPReincItem#,
 				RIP_UserName = '#CGI.REMOTE_USER#',
@@ -314,7 +321,7 @@
 		<cfset auxfrmsobra = '0.0'>
 		<cfset auxfrmemrisco = '0.0'>
 
-		<cfif  FORM.frmimpactofin eq 'S' and FORM.avalItem eq 'N'>
+		<cfif FORM.frmimpactofin eq 'S' and FORM.avalItem eq 'N'>
 			<cfset auxfrmfalta = Replace(FORM.frmfalta,'.','','All')>
 			<cfset auxfrmfalta = Replace(auxfrmfalta,',','.','All')>
 			<cfset auxfrmsobra = Replace(FORM.frmsobra,'.','','All')>
@@ -325,7 +332,7 @@
 		, RIP_Falta=#auxfrmfalta#
 		, RIP_Sobra=#auxfrmsobra#
 		, RIP_EmRisco=#auxfrmemrisco#
-
+<!---
 		<cfset auxpbfimor = Replace(FORM.pbfimor,'.','','All')>
 		<cfset auxpbfimor = Replace(auxpbfimor,',','.','All')>
 		<cfset auxecfmor = Replace(FORM.ecfmor,'.','','All')>
@@ -333,7 +340,7 @@
 
 		,RIP_PotencialBeneficioFinanceiro = #auxpbfimor#
 		,RIP_EstimativaCustoFinanceiro = #auxecfmor#
-
+--->
 		<cfif FORM.avalItem eq 'N' and IsDefined("FORM.frmreincInsp") and form.frmrsIncidencia neq 0>
 			, RIP_ReincInspecao = '#FORM.frmreincInsp#'
 			, RIP_ReincGrupo = #FORM.frmreincGrup#
@@ -362,7 +369,7 @@
 		  
 		<!--- N° SEI da NCI --->
 		<cfset aux_sei_nci = "">
-			, RIP_NCISEI =
+		,RIP_NCISEI =
 		<cfif IsDefined("FORM.nci") AND FORM.nci EQ "S">
 		<!--- As linhas abaixo servem para substituir o uso de aspas simples e duplas, a fim de evitar erros em instruções SQL --->
 		  <cfset aux_sei_nci = Trim(FORM.frmnumseinci)>
@@ -374,9 +381,10 @@
 		    '#aux_sei_nci#'
 		</cfif>
 		<cfif grpacesso eq 'GESTORES'>
-		, RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
-		, RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)
-		</cfif>	  		
+			,RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
+			,RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)
+		</cfif>	
+		,RIP_Manchete = '#form.manchete#' 		
 		  <!---Para a propagação da avalição quando FORM.propagaAval tiversido definido como sim e a avaliação for Nao executa--->
 		  <cfif IsDefined("FORM.propagaAval") and '#FORM.propagaAval#' eq 's' and '#FORM.avalItem#' eq 'E'>
 			 WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_Resposta ='A'
@@ -756,7 +764,7 @@
 		}
    }   
    function naoseaplica(a,b){
-		
+		//alert(a + '  '  + b);
 		if (b == 'cd_frmemrisco') { 
 			if (document.form1.cd_frmemrisco.checked) {
 				document.form1.frmemrisco.value = '0,00';
@@ -771,7 +779,7 @@
 				document.form1.frmsobra.value = a;
 			}
 		}
-
+/*
 		if (b == 'cb_pbfimor') { 
 			if (document.form1.cb_pbfimor.checked) {
 				document.form1.pbfimor.value = '0,00';
@@ -786,6 +794,7 @@
 				document.form1.ecfmor.value = a;
 			}
 		}	
+*/			
 	}
 	//simula maximização redimencionando a página para tamanho da tela.
 	top.window.moveTo(0,0);
@@ -901,6 +910,7 @@ function AvaliacaoOnChange(a){
 //alert('AvaliacaoOnChange linha 593 ' + a);
 //-------------------------------------------------------
 		var frm = document.forms[0];
+		document.getElementById("manchete").readOnly = true;
 //-------------------------------------------------------		
 		window.reincidA.style.visibility = 'hidden';
 		window.reincidB.style.visibility = 'hidden';
@@ -978,6 +988,9 @@ function AvaliacaoOnChange(a){
 			CKEDITOR.instances['melhoria'].setData(auxmelhoria);
 			document.getElementById("recomendacoes").readOnly = false;
 			CKEDITOR.instances['recomendacoes'].setData(auxrecomendacoes);
+			document.getElementById("manchete").readOnly = false;
+			document.getElementById("manchete").value = document.getElementById("ripmanchete").value
+
 		}
 //-----------------------------------		
 		<cfoutput>
@@ -996,6 +1009,7 @@ habarea(a);
 //Quando o inspetor faz mudança da avaliação já salva em banco.
 //Valores diferente do salvo em banco e ou igual ao existentes em banco
 function AvaliacaoOnChangeModelos(a){
+	//alert('Aqui linha 1013')
 //-------------------------------------------------------
 	var frm = document.forms[0];
 	var ripresposta = frm.ripresposta.value;
@@ -1011,12 +1025,14 @@ function AvaliacaoOnChangeModelos(a){
 		document.getElementById("btnsalvar").disabled = false;
 		document.getElementById("melhoria").readOnly = false;
 	    document.getElementById("recomendacoes").readOnly = false;
+		document.getElementById("manchete").readOnly = false;
 //-------------------------------------------------------	
 	if (a == 'V' || a == 'E' || a == 'C' || a == 'A'){
 		frm.propagaAval.value='n';
 		frm.propagaAval.disabled = true;
 		frm.procurar.style.display = 'none';
 		frm.arquivo.style.display = 'none';
+		document.getElementById("manchete").readOnly = true;
 	}		
 //alert('Linha 694');	
 //-------------------------------------------------------	
@@ -1048,6 +1064,7 @@ function AvaliacaoOnChangeModelos(a){
 		document.getElementById("btnsalvar").disabled = true;
 		CKEDITOR.instances['melhoria'].setData('');
 		CKEDITOR.instances['recomendacoes'].setData('');
+		document.getElementById("manchete").value = '';
 		//return false;
 	}
 	
@@ -1068,7 +1085,8 @@ function AvaliacaoOnChangeModelos(a){
 		if (ripresposta == 'C') {
 		// 	oportunaprim = frm.ripcomentariojustif.value;
 		}
-			CKEDITOR.instances['melhoria'].setData(oportunaprim);
+		CKEDITOR.instances['melhoria'].setData(oportunaprim);
+		document.getElementById("manchete").value = '';
 	}	
 //alert('Linha 741');	
 //--------------------------------
@@ -1083,6 +1101,7 @@ function AvaliacaoOnChangeModelos(a){
 		}		
 
 		CKEDITOR.instances['melhoria'].setData(oportunaprim);
+		document.getElementById("manchete").value = '';
 	}	
 //--------------------------------
 	if (a == 'E' ){
@@ -1090,6 +1109,7 @@ function AvaliacaoOnChangeModelos(a){
 		frm.procurar.style.display = 'none';
 		frm.arquivo.style.display = 'none';
 		CKEDITOR.instances['melhoria'].setData('.');
+		document.getElementById("manchete").value = '';
 	}					
 //-----------------------------------
 	if (a == 'N'){
@@ -1126,6 +1146,8 @@ function AvaliacaoOnChangeModelos(a){
 		if (frm.frmrestringirsn.value != 'S'){
 			CKEDITOR.instances['melhoria'].setData(oportunaprim);
 			CKEDITOR.instances['recomendacoes'].setData(orientacao);
+			document.getElementById("manchete").value = document.getElementById("ripmanchete").value;
+			
 		}
 }
 
@@ -1227,9 +1249,8 @@ function reincidencia(a)
 
 //=============================================================
 function validarform(){
-		
-		// ==== critica do botão Salvar ===
-// if (document.form1.acao.value == 'Salvar' || document.form1.acao.value == 'anexar'){
+	// ==== critica do botão Salvar ===
+	// if (document.form1.acao.value == 'Salvar' || document.form1.acao.value == 'anexar'){
  if (document.form1.acao.value == 'Salvar'){
         document.getElementById("melhoria").readOnly = false;
 		document.getElementById("recomendacoes").readOnly = false;
@@ -1252,6 +1273,12 @@ function validarform(){
 		var recomed = frm.recomendacoes.value;
 		recomed = recomed.replace(/\s/g, '');
 
+		if (frm.manchete.value =='' && frm.avalItem.value =='N'){
+			alert('Informar o campo Manchete');
+			document.getElementById("aguarde").style.visibility = "hidden";
+			document.form1.manchete.focus();
+			return false;
+		}
 		if (frm.avalItem.value =='N' && frm.nci.value == ''){
 			alert('Informe se houve NCI!');
 			document.getElementById("aguarde").style.visibility = "hidden";
@@ -1350,6 +1377,7 @@ function validarform(){
 		}
 //alert('Linha 1077');	
 // críticas dos novos campos pontencial e estimativa
+/*
 		if ((frm.pbfimor.value == '0,00' || frm.pbfimor.value == '') && frm.avalItem.value =='N'){
 			if(frm.cb_pbfimor.checked){
 			}else{
@@ -1369,7 +1397,8 @@ function validarform(){
 				document.getElementById("aguarde").style.visibility = "hidden";
 				return false;
 			}
-		} 		
+		} 	
+*/	
 /*
 // com jquery nao funciona no IE
 if(($('#pbfimor').val() == '0,00' || $('#pbfimor').val() == '')){
@@ -1606,6 +1635,7 @@ if(($('#pbfimor').val() == '0,00' || $('#pbfimor').val() == '')){
 			if(confirm('Esta ação irá salvar esta avaliação.\nDeseja Continuar?')){
 			        document.getElementById("melhoria").readOnly = false;
 					document.getElementById("recomendacoes").readOnly = false;
+					document.getElementById("manchete").readOnly = false;
 					if (frm.avalItem.value != 'N'){ document.getElementById("recomendacoes").readOnly = true;}
 					if (frm.avalItem.value == 'E'){ document.getElementById("melhoria").readOnly = true;}
 					if (frm.avalItem.value == 'N'){ 
@@ -1786,6 +1816,7 @@ if (auxjustfa.length > 0)
 		RIP_Recomendacao_Inspetor,	
 		RIP_PotencialBeneficioFinanceiro,
         RIP_EstimativaCustoFinanceiro,
+		RIP_Manchete,
 		Und_Descricao,
 		Und_TipoUnidade,
 		Dir_Descricao,
@@ -1808,7 +1839,6 @@ if (auxjustfa.length > 0)
 		Itn_PreRelato,
 		Itn_OrientacaoRelato,
 		Itn_ImpactarTipos,
-		Itn_Manchete,
 		Pos_ClassificacaoPonto,
 		TNC_ClassifInicio, 
 		TNC_ClassifAtual
@@ -1829,11 +1859,10 @@ if (auxjustfa.length > 0)
 <cfset auxvlr = ''>
 <cfset auxjustificativa = ''>
 
-
 <cfset auxvlr = rsItem.RIP_Resposta>
 <cfif isDefined("Form.acao") And (Form.acao is 'Anexar' Or Form.acao is 'excluir_anexo')>
- <cfset auxvlr = 'N'>
- <cfset retornosn eq ''>
+	<cfset auxvlr = 'N'>
+	<cfset retornosn eq ''>
 </cfif> 
 <!--- <cfif isDefined('retornosn') And retornosn is 'S'>
     <cfset auxvlr = 'N'>
@@ -1851,7 +1880,6 @@ if (auxjustfa.length > 0)
 			
 		</cfif>	
 		<cfif retornosn eq 'N'>
-
 			<cfset auxjustificativa = ''> 
 			<cfset restringirSN = 'S'>
 			<cfset auxvlr = 'N'>
@@ -1867,9 +1895,10 @@ if (auxjustfa.length > 0)
 			<!---	<cfset Form.melhoria = #rsItem.Itn_PreRelato# & '<strong>Ref. Normativa:</strong>' & #Trim(rsItem.Itn_Norma)# & '<p><strong>Possíveis Consequências da Situação Encontrada:</strong>'> --->
 				<cfset Form.melhoria = #rsItem.Itn_PreRelato# & '<strong>Ref. Normativa:</strong>' & #Trim(rsItem.Itn_Norma)#>
 				<cfset form.recomendacoes = #rsItem.Itn_OrientacaoRelato#>	
-			<cfif retornosn eq 'N'>
-				<cfset restringirSN = 'N'>
-			</cfif>				
+				<cfset form.manchete = #rsItem.RIP_Manchete#>
+				<cfif retornosn eq 'N'>
+					<cfset restringirSN = 'N'>
+				</cfif>				
 		</cfif>	 	
 </cfif>	
 <!--- <cfoutput>
@@ -1962,7 +1991,8 @@ auxvlr: #auxvlr# <br>
 		]
 			
     });
-	 	hanci(); AvaliacaoOnChange(document.form1.frmauxvlr.value); if(document.form1.houveProcSN.value != 'S') {exibe(document.form1.frmResp.value)} else {exibe(24)}; exibe(document.form1.frmResp.value); controleNCI();">
+	<!--- hanci(); AvaliacaoOnChange(document.form1.frmauxvlr.value); if(document.form1.houveProcSN.value != 'S') {exibe(document.form1.frmResp.value)} else {exibe(24)}; exibe(document.form1.frmResp.value); controleNCI();" --->
+	 	hanci(); AvaliacaoOnChange(document.form1.frmauxvlr.value); controleNCI();">
 	
 		<cfinclude template="cabecalho.cfm">
  <div id="aguarde" name="aguarde" align="center"  style="width:100%;height:130%;top:105px;left:10px; background:transparent;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F86b2ff,endColorstr=#7F86b2ff);z-index:10000;visibility:hidden;position:absolute;" >		
@@ -2225,22 +2255,28 @@ auxvlr: #auxvlr# <br>
 			</tr>
 		  </table>		  
 	  </td>
-    </tr> 	 
-	<tr>
-		<td bgcolor="eeeeee" align="center"><span class="titulos">Manchete:</span></td>
-		<td colspan="6" bgcolor="eeeeee"><textarea  name="manchete" id="manchete" cols="166" rows="3" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.Itn_Manchete#</cfoutput></textarea></td>
-	</tr>	 
+    </tr> 	 	
    </cfoutput>
    <cfset auxOrient = rsItem.RIP_Recomendacoes>
 
 <cfif not isDefined("Form.acao")> 
 	<cfparam name="Form.melhoria" default="#rsItem.RIP_COMENTARIO#">
 	<cfparam name="form.recomendacoes" default="#rsItem.RIP_Recomendacoes#"> 
-<!--- </cfif>	
-<cfif isDefined("form.recomendacoes")> --->
+	<cfif grpacesso neq 'INSPETORES'>
+		<cfparam name="form.manchete" default="#rsItem.RIP_Manchete#">
+	<cfelse>
+		<cfparam name="form.manchete" default="">
+	</cfif>
+	
+	<!--- </cfif>	
+	<cfif isDefined("form.recomendacoes")> --->
 <cfelse>
- <!--- <cfset form.recomendacoes = Session.E01.recomendacoes>  --->
+ 	<!--- <cfset form.recomendacoes = Session.E01.recomendacoes>  --->
 </cfif>
+<tr>
+	<td bgcolor="eeeeee" align="center"><span class="titulos">Manchete:</span></td>
+	<td colspan="6" bgcolor="eeeeee"><textarea  name="manchete" id="manchete" cols="168" rows="3" wrap="VIRTUAL" class="form"><cfoutput>#form.manchete#</cfoutput></textarea></td>
+</tr>
 <tr>
 	<td bgcolor="#eeeeee" align="center"><span class="titulos">Situação Encontrada:</span></td>
 	<td colspan="6" bgcolor="eeeeee"><textarea name="melhoria" id="melhoria" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.melhoria#</cfoutput></textarea></td>
@@ -2261,8 +2297,10 @@ auxvlr: #auxvlr# <br>
 <textarea  hidden name="riprecomendacoes" id="riprecomendacoes" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea>
 <textarea  hidden name="itnorientacaorelato" id="itnorientacaorelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.Itn_OrientacaoRelato#</cfoutput></textarea>
 <textarea  hidden name="frmanexosrecomendacoes" id="frmanexosrecomendacoes" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.recomendacoes#</cfoutput></textarea>
+<!---
 <cfset editpbfimor = trim(Replace(NumberFormat(rsItem.RIP_PotencialBeneficioFinanceiro,999.00),'.',',','All'))> 
 <cfset editecfmor = trim(Replace(NumberFormat(rsItem.RIP_EstimativaCustoFinanceiro,999.00),'.',',','All'))> 
+
 <tr class="exibir">
 	<td bgcolor="eeeeee"></td>
 	<td bgcolor="eeeeee" colspan="4"><div>Potencial Benefício Financeiro da Implementação da Medida/Orientação para Regularização:&nbsp;&nbsp;<input id="pbfimor" name="pbfimor" type="text" class="form" value="<cfoutput>#editpbfimor#</cfoutput>" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"><input type="checkbox" id="cb_pbfimor" name="cb_pbfimor" title="<cfoutput>#editpbfimor#</cfoutput>" onClick="naoseaplica(this.title,'cb_pbfimor')">Não se Aplica</div></td>
@@ -2270,7 +2308,8 @@ auxvlr: #auxvlr# <br>
 <tr class="exibir">
 	<td bgcolor="eeeeee"></td>
 	<td bgcolor="eeeeee"  colspan="4"><div>Estimativa Do Custo Financeiro Da Medida/Orientação Para Regularização:&nbsp;&nbsp;<input  id="ecfmor" name="ecfmor" type="text" class="form" value="<cfoutput>#editecfmor#</cfoutput>" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"><input type="checkbox" id="cb_ecfmor" name="cb_ecfmor" title="<cfoutput>#editecfmor#</cfoutput>" onClick="naoseaplica(this.title,'cb_ecfmor')">Não se Aplica</div></td>
-</tr> 	
+</tr> 
+--->	
 <cfset existeanexos = 'N'>
 <tr bgcolor="eeeeee">
 			<cfif trim(rsItem.RIP_NCISEI) eq "">
@@ -2381,6 +2420,7 @@ auxvlr: #auxvlr# <br>
 		<input type="hidden" name="frmimpactosobra" id="frmimpactosobra" value="#impactosobra#">
 		<input type="hidden" name="frmimpactoemrisco" id="frmimpactoemrisco" value="#impactoemrisco#">
 		<input type="hidden" name="RIPRecomendacaoInspetor" id="RIPRecomendacaoInspetor" value="#trim(rsItem.RIP_Recomendacao_Inspetor)#">
+		<input type="hidden" name="ripmanchete" id="ripmanchete" value="#trim(rsItem.RIP_Manchete)#">
 		
 	</cfoutput>
 	
@@ -2403,6 +2443,7 @@ auxvlr: #auxvlr# <br>
 <script>
 
  //==============================
+ /*
  $('#cb_pbfimor').click(function(){
 	//alert($('#pbfimor').val());
 	var vlr = $(this).attr("title");
@@ -2428,6 +2469,7 @@ auxvlr: #auxvlr# <br>
 		$('#ecfmor').val(vlr);
 	}
  })
+*/
 //==============================
 $('#cd_frmsobra').click(function(){
 //	alert($('#frmsobra').val());
@@ -2496,28 +2538,7 @@ CKEDITOR.replace('melhoria', {
       // Remove the redundant buttons from toolbar groups defined above.
       //removeButtons: 'Strike,Subscript,Superscript,Specialchar,PasteFromWord'
     });
-/*
-CKEDITOR.replace('melhoria', {
-		width: '1020',
-		height: 200,
-		removePlugins: 'scayt',
-        disableNativeSpellChecker: false,
-		line_height:'1px',
 
-<!--- 		enterMode:CKEDITOR.ENTER_DIV, ao invés de <p> coloca <div> após enter--->
-<!--- 		enterMode:2,forceEnterMode:false,shiftEnterMode:1,  transforma enter em <br> shift+enter <p>--->
-		toolbar: [
-			[ 'Preview', 'Print', '-' ],
-			[ 'Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat', '-', 'Undo', 'Redo', '-','Find' ],
-			[ 'SelectAll', '-'],
-			[ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ],
-			[ 'NumberedList', 'BulletedList', '-',  'Blockquote','-','Outdent', 'Indent', '-'], 
-			[ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-'], 
-			[ 'HorizontalRule','SpecialChar', '-','TextColor', 'BGColor','-','Imagem', '-','Maximize','Table' ]
-					
-		]
-    });
-*/
 	CKEDITOR.replace('recomendacoes', {
 		width: '1020',
 		height: 100,
@@ -2537,8 +2558,6 @@ CKEDITOR.replace('melhoria', {
 		]
 			
     });
-
-
 </script>
 </html>
 

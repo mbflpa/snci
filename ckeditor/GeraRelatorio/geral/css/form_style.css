@@ -1,0 +1,56 @@
+.form { 
+ border: 1px solid #666699; 
+ padding: 5px; 
+}
+
+.texta { 
+ font-size: 10px; 
+ background-color: #CCCCCC; 
+ border: 1px solid #666666; 
+}
+
+.fieldcell input {    
+ width: 10px;    
+ font: 11px Verdana, Geneva, Arial, Helvetica, sans-serif;    
+ background-color: #D7E5F2;    
+ color: #102132;    
+ border: 1px solid #284279;    
+ margin-right: 0px;    
+}
+
+.labelcell {    
+ font: "Times New Roman", Times, serif;    
+ background-color: transparent;
+ font-size:12px;
+}
+
+.title{    
+ font: 11px "Times New Roman", Times, serif;    
+ background-color: transparent;
+ font-size:14px;
+}
+
+.buttons{
+font: 11px Verdana, Geneva, Arial, Helvetica, sans-serif;    
+ color: #3670A7;    
+ background-color: #FFCC00;
+ font-size:12px; 
+}    
+   
+.fieldcell {    
+ background-color: #F2F7FB;    
+ color: #000000;    
+ text-align: left;    
+ margin-right: 0px;    
+ padding-right: 0px;    
+}    
+
+.textareacell {    
+ background-color: #F2F7FB;    
+ color: #000000;    
+ text-align: left;    
+ margin-right: 0px;    
+ padding-right: 0px;    
+}
+
+

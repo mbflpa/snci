@@ -1,3 +1,4 @@
+
 <cfprocessingdirective pageEncoding ="utf-8">
 <!--- <cfif int(day(now())) is 1>
 <p>=================== Aguarde! =======================</p>
@@ -81,7 +82,7 @@
 </cfif>
 <!---  --->
 <cfif not isDefined("url.rotina")>
- <cfset rotina = 1>
+ 	<cfset rotina = 1>
 </cfif> 
 <cfif rotinaSN is 'S'>
 	<!--- Obter o a data util para 10(dez) dias --->
@@ -128,7 +129,7 @@
 		<cfset nCont = nCont + 1>
 	</cfloop>	
 </cfif>
- 
+
 <cfloop condition="rotina lte 33">   
 	<cfif rotina eq 1>
 	    <cfset auxano = year(now())>
@@ -2273,71 +2274,86 @@
 		 <cfset vDiaSem = DayOfWeek(dtatual)>
 		 <cfif int(vDiaSem) is 4>
 	       <!--- Quarta-feira --->
-		  <cfquery name="rs08SEGRP" datasource="#dsn_inspecao#">
-		     SELECT distinct Dir_Sto, Dir_Codigo, Dir_Sigla, Dir_Descricao, Dir_Email  
-			 FROM Diretoria INNER JOIN ParecerUnidade ON Dir_Sto = Pos_Area 
-			 WHERE Pos_Situacao_Resp = 8 and (Pos_DtPosic < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00'))
-			ORDER BY Dir_Codigo
-	      </cfquery>
+			<cfquery name="rsSEGRP" datasource="#dsn_inspecao#">
+				SELECT Dir_Sto, Dir_Codigo, Dir_Sigla, Dir_Descricao, Dir_Email  
+				FROM Diretoria 
+				where Dir_Codigo <> '01'
+				ORDER BY Dir_Codigo
+			</cfquery>
 
-		  <cfoutput query="rs08SEGRP">
-			<!--- fazer busca com filtro da REATE e classif. (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem) --->
-			<cfquery name="rs08SE" datasource="#dsn_inspecao#">
-				SELECT Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Situacao, Pos_Parecer, Und_Email, Und_Descricao 
-				FROM Unidades 
-				INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade
-				WHERE (Pos_Area = '#rs08SEGRP.Dir_Sto#') and (Pos_Situacao_Resp = 8) and (Pos_DtPosic < convert(datetime,convert(char(10),GETDATE(),102) + ' 00:00'))
-				ORDER BY Und_CodDiretoria, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
-		   </cfquery>
-		   <cfif rs08SE.recordcount gt 0>
-				<cfif findoneof("@", #trim(rs08SEGRP.Dir_Email)#) eq 0>
-					 <cfset rot22_sdestina = "gilvanm@correios.com.br">
-				 <cfelse>
-					<cfset rot22_sdestina = #trim(rs08SEGRP.Dir_Email)#>
-			 	</cfif>
-				<!--- <cfset rot22_sdestina = #rot22_sdestina# & ';gilvanm@correios.com.br'>--->
-				<!---    ---> 
-			    <cfmail from="SNCI@correios.com.br" to="#rot22_sdestina#" subject="Avaliação PENDENTE SE" type="HTML">
-				 Mensagem automática. Não precisa responder!<br><br>
-				<strong>
-				   Ao Gestor(a) do(a) #Ucase(rs08SEGRP.Dir_Descricao)#. <br><br><br>
-		
-		&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  em PENDENTE SUPERINTENDÊNCIA ESTADUAL  para  manifestação  desse Órgão.<br><br>
-		
-		&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
-		
-		&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
-		<table>
-		<tr>
-		<td><strong>Unidade</strong></td>
-		<td><strong>Avaliação</strong></td>
-		<td><strong>Grupo</strong></td>
-		<td><strong>Item</strong></td>
-		<td><strong>Dt.Posição</strong></td>
-		</tr>
-		<tr>
-		<td>-----------------------------------------</td>
-		<td>----------------</td>
-		<td>--------</td>
-		<td>------</td>
-		<td>----------------</td>
-		</tr>
-		<cfloop query="rs08SE">
-		<tr>
-		<td align="left"><strong>#rs08SE.Und_Descricao#</strong></td>
-		<td align="center"><strong>#rs08SE.Pos_Inspecao#</strong></td>
-		<td align="center"><strong>#rs08SE.Pos_NumGrupo#</strong></td>
-		<td align="center"><strong>#rs08SE.Pos_NumItem#</strong></td>
-		<td align="center"><strong>#dateformat(rs08SE.Pos_DtPosic,"DD/MM/YYYY")#</strong></td>
-		</tr>
-		</cfloop>
-		</table>
-		<br>
-		&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
-		</strong>
-		</cfmail>
-		</cfif>
-		</cfoutput>
+			<cfoutput query="rsSEGRP">
+				<!--- fazer busca com filtro da REATE e classif. (Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem) --->
+				<cfquery name="rsSE" datasource="#dsn_inspecao#">
+					SELECT trim(STO_Descricao) as situa, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Situacao, Und_Email, Und_Descricao 
+					FROM Unidades 
+					INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade
+					inner join Situacao_Ponto on STO_Codigo = Pos_Situacao_Resp
+					WHERE left(Pos_Area,2) = '#rsSEGRP.Dir_Codigo#' and Pos_Situacao_Resp in (2,4,5,8,11,14,15,16,18,19,20,23) 
+					ORDER BY Und_Descricao, Pos_Situacao_Resp, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
+				</cfquery>
+				<cfif rsSE.recordcount gt 0>
+					<cfif findoneof("@", #trim(rsSEGRP.Dir_Email)#) eq 0>
+						<cfset rot22_sdestina = "gilvanm@correios.com.br">
+					<cfelse>
+						<cfset rot22_sdestina = #trim(rsSEGRP.Dir_Email)#>
+					</cfif>
+	     
+					<cfmail from="SNCI@correios.com.br" to="#rot22_sdestina#" subject="Avaliação (SE)" type="HTML">
+						Mensagem automática. Não precisa responder!<br><br>
+						<strong>
+								Ao Gestor(a) do(a) #Ucase(rsSEGRP.Dir_Descricao)#. <br><br><br>
+
+						&nbsp;&nbsp;&nbsp;Comunicamos que há pontos  de Controle Interno  nas situações abaixo para  manifestação de seus gestores.<br><br>
+
+						&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, por  meio do preenchimento do campo "Manifestar-se" no Sistema SNCI, as suas manifestações acerca das inconsistências registradas.<br><br>
+
+						&nbsp;&nbsp;&nbsp;Para registro de suas manifestações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+						<table>
+							<tr>
+								<td><strong>Unidade</strong></td>
+								<td><strong>Avaliação</strong></td>
+								<td><strong>Grupo</strong></td>
+								<td><strong>Item</strong></td>
+								<td><strong>Dt.Posição</strong></td>
+								<td><strong>Dt.Previsão</strong></td>
+								<td><strong>Dias(Vencto)</strong></td>
+								<td><strong>Situação</strong></td>
+							</tr>
+							<tr>
+								<td>-----------------------------------------</td>
+								<td>----------------</td>
+								<td>--------</td>
+								<td>------</td>
+								<td>----------------</td>
+								<td>----------------</td>
+								<td>-----------------</td>
+								<td>-----------------------------------------------------------</td>
+							</tr>
+							<cfloop query="rsSE">
+								<cfset dtprevi = ''>
+								<cfset DIAS = ''>
+								<cfif rsSE.Pos_Situacao_Resp neq 11>
+									<cfset dtprevi = dateformat(rsSE.Pos_DtPrev_Solucao,"DD/MM/YYYY")>
+									<cfset DIAS = dateDiff("d", DateFormat(now(),"YYYY/MM/DD"),DateFormat(rsSE.Pos_DtPrev_Solucao,"YYYY/MM/DD"))>
+								</cfif>
+								<tr>
+									<td align="left"><strong>#rsSE.Und_Descricao#</strong></td>
+									<td align="center"><strong>#rsSE.Pos_Inspecao#</strong></td>
+									<td align="center"><strong>#rsSE.Pos_NumGrupo#</strong></td>
+									<td align="center"><strong>#rsSE.Pos_NumItem#</strong></td>
+									<td align="center"><strong>#dateformat(rsSE.Pos_DtPosic,"DD/MM/YYYY")#</strong></td>
+									<td align="center"><strong>#dtprevi#</strong></td>
+									<td align="center"><strong>#DIAS#</strong></td>
+									<td align="center"><strong>#rsSE.situa#</strong></td>
+								</tr>
+							</cfloop>
+						</table>
+						<br>
+						&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
+						</strong>    
+					</cfmail>
+				</cfif>
+			</cfoutput>
 	</cfif> 
 	<!--- fim email diarios --->
 	</cfif>		
@@ -2354,9 +2370,7 @@
 			WHERE (((Pos_Situacao_Resp)=0 Or (Pos_Situacao_Resp)=11) AND ((Pos_DtPosic)<GETDATE()))
 			GROUP BY Und_CodDiretoria
 		</cfquery>
-	
 		<cfoutput query="rsRot23">
-	        
 			<cfquery name="rs011" datasource="#dsn_inspecao#">
 				SELECT Und_CodDiretoria, Und_Descricao, Pos_Inspecao 
 				FROM Unidades 
@@ -2373,22 +2387,18 @@
 				<cfelseif scoi_coordena eq '70'>
 					<cfset scoi_coordena = '04'>						 					 				 
 				</cfif>
-	
 				<cfquery name="rsGes" datasource="#dsn_inspecao#">
 					SELECT Ars_Sigla, Ars_Email 
 					FROM Areas 
 					WHERE (left(Ars_Codigo,2)= '#scoi_coordena#') AND (Ars_Descricao Like '%SEC AVAL CONT INTERNO/SCOI%' OR Ars_Descricao Like '%SUP CONTR INTERNO/SCOI%')
 				</cfquery>
-
 				<cfset auxnomearea = rsGes.Ars_Sigla>
 				<cfset rot23_sdestina = rsGes.Ars_Email>
 				<!--- <cfset rot23_sdestina = #rot23_sdestina# & ';gilvanm@correios.com.br'>--->
 				<cfif findoneof("@", #trim(rot23_sdestina)#) eq 0>
 					 <cfset rot23_sdestina = "gilvanm@correios.com.br">
 				</cfif>
-			
 				<cfmail from="SNCI@correios.com.br" to="#rot23_sdestina#" subject="Revisões dos SCOIs" type="HTML"> 
-		
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
 				   Ao Gestor(a) da #Ucase(auxnomearea)#. <br><br><br>
@@ -3068,7 +3078,231 @@
 		</cfloop>	
 		</cfoutput>		
 	</cfif>
-	<!---  --->
+	<!-- a partir do dia 15/01/2025 -->
+	<cfif rotina eq 30>
+		<!--- ajustes de campos para exibição --->
+		<cfset aux_mes = month(dtlimit)>
+		<cfset anoexerc = year(dtlimit)>
+		<!--- Criar linha de metas para o exercício do PACIN --->
+		<cfquery name="rsMetas" datasource="#dsn_inspecao#">
+		   SELECT Met_Codigo, Met_SE_STO, Met_PRCI, Met_SLNC, Met_DGCI, Met_Mes
+		   FROM Metas
+		   WHERE Met_Ano = '#anoexerc#' and Met_Mes = 1
+		   order by Met_Codigo
+		</cfquery>
+
+		<cfset nMes = aux_mes>
+		<cfoutput query="rsMetas">
+		   <cfset metprci = trim(rsMetas.Met_PRCI)>
+		   <cfset metslnc = trim(rsMetas.Met_SLNC)>
+		   <cfset metdgci = trim(rsMetas.Met_DGCI)>
+		   <cfquery name="rsMes" datasource="#dsn_inspecao#">
+			  SELECT Met_Ano
+			  FROM Metas
+			  WHERE Met_Codigo ='#rsMetas.Met_Codigo#' AND Met_Ano = #anoexerc# AND Met_Mes = #aux_mes#
+		   </cfquery>
+		</cfoutput>	
+
+		<!--- PRCI --->
+		<cfquery dbtype="query" name="rsRegMeta">
+		   SELECT Met_Codigo, Met_SE_STO 
+		   FROM rsMetas
+		   order by Met_Codigo
+		</cfquery>
+		<cfoutput query="rsRegMeta">
+		   <cfset se = rsRegMeta.Met_Codigo>
+		   <!--- <cfset gil = gil> --->
+		   <cfquery name="rsPRCIBase" datasource="#dsn_inspecao#">
+			  SELECT Andt_Unid as UNID, Andt_Insp as INSP, Andt_Grp as Grupo, Andt_Item as Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_Mes, Andt_Prazo
+			  FROM Andamento_Temp 
+			  where (Andt_CodSE = '#rsRegMeta.Met_Codigo#' and Andt_TipoRel = 1 and Andt_AnoExerc = '#anoexerc#' and Andt_Mes <= #aux_mes#)
+			  order by Andt_Mes
+		   </cfquery>
+		   <cfset startTime = CreateTime(0,0,0)> 
+		   <cfset endTime = CreateTime(0,0,30)> 
+		   <cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		   </cfloop>
+		   <cfif rsPRCIBase.recordcount gt 0>
+			  <cfset totmesDP = 0>
+			  <cfset TOTMESDPFP = 0>
+			  <!--- contar unidade DP e FP --->
+			  <cfquery dbtype="query" name="rstotmesDP">
+				 SELECT Andt_Prazo 
+				 FROM  rsPRCIBase
+				 where Andt_Prazo = 'DP' and Andt_Mes = #aux_mes#
+			  </cfquery>
+			  <cfset totmesDP = rstotmesDP.recordcount>
+
+			  <cfquery dbtype="query" name="rsTOTMESDPFP">
+				 SELECT Andt_Prazo 
+				 FROM rsPRCIBase  
+				 where Andt_Mes = #aux_mes#
+			  </cfquery>		
+			  <cfset TOTMESDPFP = rsTOTMESDPFP.recordcount>
+
+			  <!--- Quant. FP --->
+			  <cfset totmesFP = (TOTMESDPFP - totmesDP)>
+
+			  <cfset PercDPmes = '100.0'>
+			  <cfif TOTMESDPFP gt 0 and TOTMESDPFP neq totmesDP>
+				 <cfset PercDPmes = trim(NumberFormat((totmesDP/TOTMESDPFP) * 100,999.0))>
+			  </cfif>
+			  <!---    ==============================  --->
+			  <!--- Quant. DP --->
+			  <cfquery dbtype="query" name="rstotgerDP">
+				 SELECT Andt_Prazo 
+				 FROM  rsPRCIBase
+				 where Andt_Prazo = 'DP'
+			  </cfquery>		
+			  <cfset totgerDP = rstotgerDP.recordcount>
+
+			  <cfquery dbtype="query" name="rsTOTGER">
+				 SELECT Andt_Prazo 
+				 FROM rsPRCIBase 
+			  </cfquery>		
+			  <cfset TOTGER = rsTOTGER.recordcount>
+
+			  <cfset metprciacumperiodo = trim(NumberFormat((totgerDP/TOTGER)* 100,999.0))> 
+			  <!---
+					rsRegMeta.Met_Codigo: #rsRegMeta.Met_Codigo#  PercDPmes: #PercDPmes#	metprciacumperiodo: #metprciacumperiodo#<br>			
+			  --->
+			  <cfquery datasource="#dsn_inspecao#">
+				 UPDATE Metas SET Met_PRCI_Acum='#PercDPmes#',Met_PRCI_AcumPeriodo='#metprciacumperiodo#'
+				 WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' and Met_Ano = #anoexerc# and Met_Mes = #aux_mes#
+			  </cfquery> 
+		   <cfelse>
+			  <cfquery datasource="#dsn_inspecao#">
+				 UPDATE Metas SET Met_PRCI_Acum='100.0',Met_PRCI_AcumPeriodo='100.0'
+				 WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' and Met_Ano = #anoexerc# and Met_Mes = #aux_mes#
+			  </cfquery> 
+		   </cfif> 
+		</cfoutput>	
+
+		<!--- fim PRCI --->
+		<!---  SLNC, DGCI e MET_RESULTADO  --->
+		<cfquery name="rsAno" datasource="#dsn_inspecao#">
+		   SELECT Andt_CodSE,Andt_Mes,Andt_Resp
+		   FROM Andamento_Temp
+		   WHERE Andt_AnoExerc = '#anoexerc#' AND Andt_Mes <= #aux_mes# AND Andt_TipoRel = 2
+		   order by Andt_CodSE 
+		</cfquery> 
+
+		<!---  gerar o met_slnc_acum e Met_slnc_AcumPeriodo --->
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,45)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>	
+
+		<cfquery dbtype="query" name="rsRegMeta">
+		   SELECT Met_Codigo, Met_SE_STO 
+		   FROM rsMetas
+		   order by Met_Codigo 
+		</cfquery>	
+		   <cfoutput query="rsRegMeta">
+			  <cfset totmessegeral = 0>	
+			  <cfset totmessesol = 0>	
+			  <cfset totmessependtrat = 0>	
+			  <cfset slnc_acummes = 0>	
+			  <cfset dgci_acummes = 0>	
+			  <cfset totanosegeral = 0>	
+			  <cfset totanosesol = 0>	
+			  <cfset totanosependtrat = 0>			
+			  <cfset slnc_acperiodo = 0>	
+			  <cfset dgci_acperiodo = 0>
+			  <cfset MetasResult = 0>
+			  <!--- Obter PRCI mes corrente --->
+			  <cfquery name="rsprciacum" datasource="#dsn_inspecao#">
+				 SELECT Met_PRCI_Acum, Met_PRCI_AcumPeriodo,Met_DGCI_Mes
+				 FROM Metas
+				 WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' AND Met_Ano = #anoexerc# AND Met_Mes = #aux_mes#
+			  </cfquery>	
+			  <!---  gerar o met_slnc_acum e Met_slnc_AcumPeriodo --->
+			  <cfset startTime = CreateTime(0,0,0)> 
+			  <cfset endTime = CreateTime(0,0,25)> 
+			  <cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+			  </cfloop>	
+			  
+				 <!--- quant. (3-SOL) no mês por SE --->
+				 <cfquery dbtype="query" name="rstotmessesol">
+					SELECT Andt_Resp 
+					FROM  rsAno
+					where Andt_Resp = 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#' and Andt_Mes = #aux_mes#
+				 </cfquery>
+				  <cfset totmessesol = 0>
+				 <cfif rstotmessesol.recordcount gt 0>
+					<cfset totmessesol = rstotmessesol.recordcount>
+				 </cfif> 
+				 <!--- quant. (Pendentes + Tratamentos) no mês por SE --->
+				 <cfquery dbtype="query" name="rstotmessependtrat">
+					SELECT Andt_Resp 
+					FROM  rsAno
+					where Andt_Resp <> 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#' and Andt_Mes = #aux_mes#
+				 </cfquery>
+
+				 <cfset totmessependtrat = 0>
+				 <cfset totmessegeral = totmessesol + totmessependtrat> 
+				 <cfif rstotmessependtrat.recordcount gt 0>
+					<cfset totmessependtrat = rstotmessependtrat.recordcount>
+					<cfset totmessegeral = totmessesol + totmessependtrat>
+				 </cfif>
+
+
+				 <!--- slncacum ---> 
+				 <cfset slnc_acummes = '100.0'>
+				 <cfif totmessegeral gt 0>
+					<cfset slnc_acummes = trim(NumberFormat(((totmessesol/totmessegeral) * 100),999.0))>
+				 </cfif>
+
+				 <cfset dgci_acummes = trim(numberFormat((slnc_acummes * 0.45) + (rsprciacum.Met_PRCI_Acum * 0.55),999.0))>  
+
+				 <!--- slncacumperiodo --->
+				 <!--- quant. (3-SOL) no ano por SE --->
+				 <cfquery dbtype="query" name="rstotanosesol">
+					SELECT Andt_Resp 
+					FROM  rsAno
+					where Andt_Resp = 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#'
+				 </cfquery>
+				 <cfset totanosesol = 0>
+				 <cfif rstotmessependtrat.recordcount gt 0>
+					<cfset totanosesol = rstotanosesol.recordcount>
+				 </cfif>
+				 
+
+				 <!--- quant. (Pendentes + Tratamentos) no ano por SE --->
+				 <cfquery dbtype="query" name="rstotanosependtrat">
+					SELECT Andt_Resp 
+					FROM  rsAno
+					where Andt_Resp <> 3 and Andt_CodSE = '#rsRegMeta.Met_Codigo#'
+				 </cfquery>
+				 <cfset totanosependtrat = 0>
+				 <cfif rstotanosependtrat.recordcount gt 0>
+					<cfset totanosependtrat = rstotanosependtrat.recordcount>
+				 </cfif>
+
+				 <cfset totanosegeral = totanosesol + totanosependtrat>
+
+				 <cfset slnc_acperiodo = '100.0'>
+				 <cfif totanosegeral gt 0>
+					<cfset slnc_acperiodo = trim(NumberFormat(((totanosesol/totanosegeral) * 100),999.0))>
+				 </cfif>
+
+				 <cfset auxmetprciacumper = rsprciacum.Met_PRCI_AcumPeriodo>
+				 <cfset dgci_acperiodo = trim(numberFormat((slnc_acperiodo * 0.45) + (auxmetprciacumper * 0.55),999.0))>  
+				 <cfset MetasResult = trim(NumberFormat(((dgci_acperiodo/rsprciacum.Met_DGCI_Mes) * 100),000.0))>
+								  
+			  <!---
+			  ANO:#anoexerc#' Met_Mes = #aux_mes# Met_Codigo='#rsRegMeta.Met_Codigo#' Met_SLNC_Acum= '#slnc_acummes#' Met_SLNC_AcumPeriodo='#slnc_acperiodo#' Met_DGCI_Acum='#dgci_acummes#',Met_DGCI_AcumPeriodo='#dgci_acperiodo#',Met_Resultado='#MetasResult#'<BR>    
+			  --->
+			  <cfquery datasource="#dsn_inspecao#">
+				 UPDATE Metas SET Met_SLNC_Acum= '#slnc_acummes#',Met_SLNC_AcumPeriodo='#slnc_acperiodo#',Met_DGCI_Acum='#dgci_acummes#',Met_DGCI_AcumPeriodo='#dgci_acperiodo#',Met_Resultado='#MetasResult#'
+				 WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' and Met_Ano = '#anoexerc#' and Met_Mes = #aux_mes#
+			  </cfquery> 
+		
+		   </cfoutput>	
+		   <!--- FIM  SLNC, DGCI e MET_RESULTADO --->
+		   <!--- fim ajustes de campos para exibição --->
+   </cfif>	
+	<!---  até 14/01/2025
 	<cfif rotina eq 30>
 		<!--- ajustes de campos para exibição --->
 		<cfset aux_mes = month(dtlimit)>
@@ -3154,16 +3388,16 @@
 				<cfset TOTGER = rsTOTGER.recordcount>
 
 				<cfset metprciacumperiodo = trim(NumberFormat((totgerDP/TOTGER)* 100,999.0))> 
-<!---
-        rsRegMeta.Met_Codigo: #rsRegMeta.Met_Codigo#  PercDPmes: #PercDPmes#	metprciacumperiodo: #metprciacumperiodo#<br>			
---->
+				<!---
+						rsRegMeta.Met_Codigo: #rsRegMeta.Met_Codigo#  PercDPmes: #PercDPmes#	metprciacumperiodo: #metprciacumperiodo#<br>			
+				--->
 				<cfquery datasource="#dsn_inspecao#">
 					UPDATE Metas SET Met_PRCI_Acum='#PercDPmes#',Met_PRCI_AcumPeriodo='#metprciacumperiodo#'
 					WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' and Met_Ano = #anoexerc# and Met_Mes = #aux_mes#
 				</cfquery>  
 		</cfoutput>	
-    <!--- fim PRCI --->
-    <!---  SLNC, DGCI e MET_RESULTADO  --->
+			<!--- fim PRCI --->
+			<!---  SLNC, DGCI e MET_RESULTADO  --->
 		<cfquery name="rsAno" datasource="#dsn_inspecao#">
 			SELECT Andt_CodSE,Andt_Mes,Andt_Resp
 			FROM Andamento_Temp
@@ -3249,18 +3483,18 @@
 			<cfset dgci_acperiodo = trim(numberFormat((slnc_acperiodo * 0.45) + (auxmetprciacumper * 0.55),999.0))>  
 
 			<cfset MetasResult = numberFormat((dgci_acummes / rsprciacum.Met_DGCI_Mes)*100,999.0)>
-  <!---
-  ANO:#anoexerc#' Met_Mes = #aux_mes# Met_Codigo='#rsRegMeta.Met_Codigo#' Met_SLNC_Acum= '#slnc_acummes#' Met_SLNC_AcumPeriodo='#slnc_acperiodo#' Met_DGCI_Acum='#dgci_acummes#',Met_DGCI_AcumPeriodo='#dgci_acperiodo#',Met_Resultado='#MetasResult#'<BR>    
---->
+			<!---
+			ANO:#anoexerc#' Met_Mes = #aux_mes# Met_Codigo='#rsRegMeta.Met_Codigo#' Met_SLNC_Acum= '#slnc_acummes#' Met_SLNC_AcumPeriodo='#slnc_acperiodo#' Met_DGCI_Acum='#dgci_acummes#',Met_DGCI_AcumPeriodo='#dgci_acperiodo#',Met_Resultado='#MetasResult#'<BR>    
+			--->
 			<cfquery datasource="#dsn_inspecao#">
 				UPDATE Metas SET Met_SLNC_Acum= '#slnc_acummes#',Met_SLNC_AcumPeriodo='#slnc_acperiodo#',Met_DGCI_Acum='#dgci_acummes#',Met_DGCI_AcumPeriodo='#dgci_acperiodo#',Met_Resultado='#MetasResult#'
 				WHERE Met_Codigo='#rsRegMeta.Met_Codigo#' and Met_Ano = '#anoexerc#' and Met_Mes = #aux_mes#
 			</cfquery> 
 		</cfoutput>	
-    <!--- FIM  SLNC, DGCI e MET_RESULTADO --->
-<!--- fim ajustes de campos para exibição --->
+		<!--- FIM  SLNC, DGCI e MET_RESULTADO --->
+		<!--- fim ajustes de campos para exibição --->
 	</cfif>		
-	
+	--->
 	<cfif rotina eq 31>	
 	<cfoutput>
 		<!--- envio por e-mail das conclusões de revisão no dia anterior --->

@@ -217,7 +217,7 @@
             <cfquery name="rsindestrat" datasource="DBSNCI">
                 SELECT IDES_ID, trim(IDES_Descricao) 
                 FROM UN_INDICADORESTRATEGICO
-                order by IDES_Descricao
+                order by IDES_ID
             </cfquery>
           <cfreturn rsindestrat> 
         </cftransaction>
@@ -859,7 +859,7 @@
                 <cfquery datasource="DBSNCI" name="rsExiste">
                     SELECT Itn_ClassificacaoControle
                     FROM Itens_Verificacao
-                    WHERE Itn_GestorProcessoDir=#dpgpdigpid# and Itn_GestorProcessoDepto = #dpgpid#
+                    WHERE Itn_GestorProcessoDir=#dpgpdigpid# and Itn_GestorProcessoDepto = '#dpgpid#'
                 </cfquery>
                 <cfif rsExiste.recordcount lte 0>   
                     <cfquery datasource="DBSNCI">

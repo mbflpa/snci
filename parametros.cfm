@@ -94,6 +94,11 @@
 	SELECT Usu_Login FROM Usuarios WHERE RTrim(Usu_GrupoAcesso) in ('GESTORES','DESENVOLVEDORES','GESTORMASTER','INSPETORES','ANALISTAS','GOVERNANCA')
 </cfquery>
 
+<cfset startTime = CreateTime(0,0,0)> 
+<cfset endTime = CreateTime(0,0,45)> 
+<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+</cfloop>
+
 <cfset Lista_SINS = UCase(ValueList(qSINS.Usu_Login))>
 
 

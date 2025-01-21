@@ -97,9 +97,6 @@
 	</cfif>
 </cfif>
 
-
-
-
 <cfquery datasource="#dsn_inspecao#" name="rsUnidades">
 	SELECT Und_Codigo, Und_Descricao,Und_NomeGerente,Und_TipoUnidade FROM Unidades 
 	WHERE Und_Status='A' and Und_CodDiretoria in(#se#)
@@ -113,8 +110,6 @@
 	WHERE rtrim(Usu_GrupoAcesso)='INSPETORES' and Usu_DR in(#se#)
 	ORDER BY Dir_Sigla, Usu_Apelido, Usu_DR
 </cfquery>
-
-
 
 <cfset nInsp =''>
 <cfif isDefined("form.dataPrevista")>
@@ -164,28 +159,18 @@
 							</cfquery>
 
 							<cfquery datasource="#dsn_inspecao#">
-							INSERT INTO Inspecao
+								INSERT INTO Inspecao
 								(INP_Unidade,INP_NumInspecao,INP_HrsPreInspecao,INP_DtInicDeslocamento,INP_DtFimDeslocamento,INP_HrsDeslocamento,INP_DtInicInspecao,INP_DtFimInspecao,INP_HrsInspecao,INP_Situacao,INP_DtEncerramento,INP_Coordenador,INP_Responsavel,INP_DtUltAtu,INP_UserName,INP_Motivo,INP_Modalidade)
 								VALUES
 								('#selUnidades#','#nInsp#','0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'0','NA',<cfqueryparam value="#dataPrevista#" cfsqltype="CF_SQL_DATE">,'#selCoordenador#','#resp#',convert(char,getdate(), 120),'#qAcesso.Usu_Login#','','#selModalidades#')
 							</cfquery>
 							<cfquery datasource="#dsn_inspecao#">
-							   UPDATE Unidades SET Und_NomeGerente = '#resp#' WHERE Und_Codigo ='#selUnidades#'
+							   	UPDATE Unidades SET Und_NomeGerente = '#resp#' WHERE Und_Codigo ='#selUnidades#'
 							</cfquery>
-               
 							<cflocation url = "cadastro_inspecao.cfm?acao=cadastrado&numInspecao=#nInsp#&selUnidades=#url.selUnidades#" addToken = "no">
-
-
-			</cfif>
-
-			
+			</cfif>	
 		</cfif>
-        
-
-		
-
 	</cfif>
-
 <cfelse>
 	<cfset nInsp =''>
 	<cfparam name="URL.selModalidades" default="">
@@ -195,10 +180,8 @@
 	<cfparam name="URL.NumInspecao" default="">
 	<cfparam name="URL.resp" default="">
 	<cfparam name="URL.acao" default="">
-	<cfparam name="URL.ANOATU" default="#YEAR(NOW())#">
-
+	<cfparam name="URL.ANOATU" default="#year(now())#">
 </cfif>
-
 
 <cfquery datasource="#dsn_inspecao#" name="rsNumeraInspecao">
 	SELECT Numera_Inspecao.*, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla FROM Numera_Inspecao
@@ -207,7 +190,6 @@
 	WHERE Left(NIP_NumInspecao,2) in(#se#) AND NIP_Situacao='P' 
 	ORDER BY Dir_sigla,Und_Descricao  
 </cfquery>
-
 
 <cfquery datasource="#dsn_inspecao#" name="rsUnidadesFiltradas">
 	SELECT DISTINCT Dir_Sigla, RTRIM(LTRIM(Und_Descricao)) AS Und_Descricao, Und_NomeGerente, Und_Codigo 
