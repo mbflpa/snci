@@ -1008,6 +1008,10 @@ Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Propostas de Mel
 			</cftry>
 
 			</cfloop>
+			<cfquery datasource="#application.dsn_processos#">
+				DELETE FROM pc_avaliacao_melhoria_categoriasControles
+				WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_integer">
+			</cfquery>
 
 			<cfquery datasource="#application.dsn_processos#">
 				DELETE FROM pc_avaliacao_melhorias
