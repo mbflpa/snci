@@ -4501,27 +4501,22 @@
 										</div>
 									</div>
 																			
-									<cfif arguments.modalidade eq "E">
-										<div hidden>
-											<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px;" >
+								
+									<div class="col-sm-4" <cfif arguments.modalidade eq "E">hidden</cfif>>
+										<div class="form-group">
+											<label  for="pcStatusMelhoria">Status:</label>
+											<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
+												<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
 												<option value="P">PENDENTE</option>
+												<option value="A">ACEITA</option>
+												<option value="R">RECUSA</option>
+												<option value="T">TROCA</option>
+												<option value="B">BLOQUEADO</option>
+												<option value="N">NÃO INFORMADO</option>
 											</select>
 										</div>
-									<cfelse>
-										<div class="col-sm-4">
-											<div class="form-group">
-												<label  for="pcStatusMelhoria">Status:</label>
-												<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
-													<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
-													<option value="P">PENDENTE</option>
-													<option value="A">ACEITA</option>
-													<option value="R">RECUSA</option>
-													<option value="T">TROCA</option>
-													<option value="N">NÃO INFORMADO</option>
-												</select>
-											</div>
-										</div>
-									</cfif>
+									</div>
+									
 										
 									
 
