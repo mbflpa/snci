@@ -4826,7 +4826,16 @@
 							</cfoutput>
 							$('#modalOverlay').modal('show')
 							setTimeout(function() {
-								
+								// Obtem o texto do span
+								let cabecalhoTexto = $("#cabecalhoAccordionCadMelhoria").text();
+
+								// Verifica o valor do texto
+								let status = "";
+								if (cabecalhoTexto === "Clique aqui para cadastrar uma Propostas de Melhoria" && modalidade === "E") {
+									status = "P";
+								}else{
+									status = $('#pcStatusMelhoria').val();
+								}
 								$.ajax({
 									type: "post",
 									url: "cfc/pc_cfcAvaliacoes.cfc",
@@ -4837,7 +4846,7 @@
 										pc_aval_melhoria_id: $('#pcMelhoriaId').val(),
 										pc_aval_melhoria_descricao: $('#pcMelhoria').val(),
 										pc_aval_melhoria_num_orgao:  $('#pcOrgaoRespMelhoria').val(),
-										pc_aval_melhoria_status:$('#pcStatusMelhoria').val(),
+										pc_aval_melhoria_status: status,
 										pc_aval_melhoria_dataPrev: $('#pcDataPrev').val(),
 										pc_aval_melhoria_sugestao: $('#pcNovaAcaoMelhoria').val(),
 										pc_aval_melhoria_sug_orgao_mcu:$('#pcOrgaoRespSugeridoMelhoria').val(),
