@@ -514,7 +514,8 @@
 	  </cfif>
 	  <cfset auxposarea = #posarea#>
 	<cfelseif Form.frmResp is 3>
-	  <cfset auxposarea = '#qSituacaoResp.Pos_Area#'>
+	  	<cfset posarea = #form.sfrmPosArea#>
+		<cfset posnomearea = #form.sfrmPosNomeArea#>
 	<cfelseif (Form.frmResp is 3 or Form.frmResp is 12 or Form.frmResp is 13) AND (Form.posSitRespAntes is 21 or Form.posSitRespAntes is 24 or Form.posSitRespAntes is 28)>
 		<cfquery name="rsPosArea" datasource="#dsn_inspecao#">
 			SELECT And_Area
@@ -904,7 +905,7 @@
 			</cfcase>
 			<cfcase value=19>
 				<cfquery name="qArea2" datasource="#dsn_inspecao#">
-					SELECT Ars_Sigla, Ars_Descricao, Ars_Email FROM Areas	WHERE Ars_Codigo = '#Form.cbarea#'
+					SELECT Ars_Sigla, Ars_Descricao, Ars_Email FROM Areas WHERE Ars_Codigo = '#Form.cbarea#'
 				</cfquery>
 				, Pos_Situacao = 'TA'
 				, Pos_Area = '#Form.cbarea#'
@@ -1102,7 +1103,7 @@
 <cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
 <cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")>	
   <cfquery datasource="#dsn_inspecao#">
-   INSERT into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area)
+   INSERT into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area,And_NomeArea)
    VALUES (
    '#form.ninsp#'
    ,
@@ -1131,6 +1132,7 @@
   </cfif>
   ,
   '#IDArea#'
+  ,'#Gestor#'
   )
  </cfquery> 
 
@@ -1210,6 +1212,7 @@
  RIP_ReincInspecao, 
  RIP_ReincGrupo, 
  RIP_ReincItem, 
+ RIP_Manchete,
  Dir_Descricao, 
  Dir_Codigo, 
  Pos_Processo, 
@@ -1591,33 +1594,43 @@ function exibirjudicializado(ind){
 //==============
 var ind
 function exibirsuspenso(ind){
+//	document.form1.Salvar2.disabled=false;
   //document.getElementById("observacao").readOnly = false;
  // document.form1.observacao.value = '';
-  if (ind=='10'){
-		    document.form1.observacao.value = '';
-            var sinformes = "Item suspenso por 90 (noventa) dias corridos para aguardar as tratativas dos Correios com o órgão externo, conforme registrado no histórico das manifestações."
-            var parecer =  sinformes; 
-            document.form1.observacao.value = parecer;
-            document.form1.observacao.disabled=true;
-			document.form1.cbdata.value = document.form1.dias90decorridos.value;
-			
-  }
+  	if (ind=='10'){
+		document.form1.observacao.value = '';
+		var sinformes = "Item suspenso por 90 (noventa) dias corridos para aguardar as tratativas dos Correios com o órgão externo, conforme registrado no histórico das manifestações."
+		var parecer =  sinformes; 
+		document.form1.observacao.value = parecer;
+		document.form1.observacao.disabled=true;
+		document.form1.cbdata.value = document.form1.dias90decorridos.value;		
+  	}
 //---------------------------------------  
-  if (ind=='3'){
-			var frmobserv = document.form1.observacao.value;
-			var K = document.form1.scodresp.value;
-			var auxacao = '<cfoutput>#Form.acao#</cfoutput>';
-			//var auxacao = document.form1.acao.value;
+/*	
+	if (ind=='3' ){ 
+		let codsitatual = document.form1.srespatual.value
+		if(codsitatual == 2 || codsitatual == 4 || codsitatual == 5 || codsitatual == 8 || codsitatual == 15 || codsitatual == 16 || codsitatual == 18 || codsitatual == 19 || codsitatual == 20 || codsitatual == 23){
+			document.form1.Salvar2.disabled=true;
+			//alert('')
+			return false
+		}
+	}	
+*/		
+  	if (ind=='3'){
+		var frmobserv = document.form1.observacao.value;
+		var K = document.form1.scodresp.value;
+		var auxacao = '<cfoutput>#Form.acao#</cfoutput>';
+		//var auxacao = document.form1.acao.value;
 //alert(ind + ' ' + K + 'auxacao: ' + auxacao);
-			if ((frmobserv == '' || ind != K) && (auxacao == '' || auxacao == 'Salvar2')) {
-		    document.form1.observacao.value = '';
+		if ((frmobserv == '' || ind != K) && (auxacao == '' || auxacao == 'Salvar2')) {
+			document.form1.observacao.value = '';
 		
-          var sinformes = "Com base na manifestação registrada, considera-se o item SOLUCIONADO.\n\nÉ oportuno informar que a efetividade das ações de regularização adotadas poderá ser verificada em futuras Avaliações de Controle realizadas pelas equipes do Controle Interno.\n\nCabe destacar que, caso a unidade avaliada incorra novamente na irregularidade apontada, tal situação será passível de ser considerada como reincidência."
-            var parecer =  sinformes; 
-            document.form1.observacao.value = parecer;
-			}
-		
-  }
+			var sinformes = "Com base na manifestação registrada, considera-se o item SOLUCIONADO.\n\nÉ oportuno informar que a efetividade das ações de regularização adotadas poderá ser verificada em futuras Avaliações de Controle realizadas pelas equipes do Controle Interno.\n\nCabe destacar que, caso a unidade avaliada incorra novamente na irregularidade apontada, tal situação será passível de ser considerada como reincidência."
+			var parecer =  sinformes; 
+			document.form1.observacao.value = parecer;
+		}	
+	}
+
  }
 //==============
 var ind
@@ -2218,6 +2231,11 @@ window.open(page, "Popup", windowprops);
   </tr>
   <form name="form1" method="post" onSubmit="return validarform()" enctype="multipart/form-data" action="itens_controle_respostas1.cfm">
   <cfoutput>
+<!---
+	qResposta.Pos_Area: #qResposta.Pos_Area# <br>
+	qResposta.Pos_NomeArea: #qResposta.Pos_NomeArea#<br>
+	qResposta.Pos_Situacao_Resp: #qResposta.Pos_Situacao_Resp#
+--->	
 	    <input type="hidden" name="scodresp" id="scodresp" value="#qResposta.Pos_Situacao_Resp#">
 		<input type="hidden" name="posSitRespAntes" id="posSitRespAntes" value="#qResposta.Pos_Sit_Resp_Antes#">
 		<input type="hidden" name="sfrmPosArea" id="sfrmPosArea" value="#qResposta.Pos_Area#">
@@ -2297,7 +2315,7 @@ window.open(page, "Popup", windowprops);
         <table width="1030" border="0">
           <tr>
             <td width="228"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput></td>
-            <td width="344"><span class="exibir">In&iacute;cio Avalia&ccedil;&atilde;o:</span> &nbsp;<strong class="exibir"><cfoutput>#DateFormat(qResposta.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>         
+            <td width="344"><span class="exibir">Início Avaliação:</span> &nbsp;<strong class="exibir"><cfoutput>#DateFormat(qResposta.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>         
             <td width="444"><span class="exibir">Modalidade:</span> <strong class="exibir"><cfoutput>#INPModalidade#</cfoutput></strong></td>
           </tr>
       </table></td>
@@ -2311,7 +2329,7 @@ window.open(page, "Popup", windowprops);
       <td colspan="4"><cfoutput><strong class="exibir">#URL.Nitem#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#qResposta.Itn_Descricao#</strong></cfoutput></td>
     </tr>
 
-<tr class="exibir">
+	<tr class="exibir">
 	  <td bgcolor="eeeeee">Relevância</td>
 	  <td colspan="4" bgcolor="f7f7f7"><table width="100%" border="0">
         <tr bgcolor="eeeeee" class="exibir">
@@ -2321,6 +2339,10 @@ window.open(page, "Popup", windowprops);
           <td width="500"><strong class="exibir"><cfoutput>#qResposta.Pos_ClassificacaoPonto#</cfoutput></strong></td>
         </tr>
       </table></td>
+    </tr>
+	<tr bgcolor="eeeeee" class="exibir">
+      <td>Manchete</td>
+      <td colspan="4"><cfoutput><strong class="exibir">#qResposta.RIP_Manchete#</strong></cfoutput></td>
     </tr>
 	<tr bgcolor="eeeeee" class="exibir">
 	  <td>Classificação Unidade</td>
@@ -2929,7 +2951,7 @@ window.open(page, "Popup", windowprops);
        <cfelse>
          <input name="button" type="button" class="botao" value="Voltar" disabled>       
        </cfif>
-      </cfoutput> &nbsp;&nbsp;&nbsp;&nbsp;
+    </cfoutput> &nbsp;&nbsp;&nbsp;&nbsp;
 
 	<!---   <cfoutput>sn:#habslvsn#</cfoutput> --->
      <cfset numdias = qResposta.diasOcor>
@@ -2938,7 +2960,8 @@ window.open(page, "Popup", windowprops);
 	  <cfelse>
             <input name="Salvar2" type="submit" class="botao" value="Salvar" onClick="CKupdate();document.form1.acao.value='Salvar2'" <cfoutput>#halbtgeral#</cfoutput>>
       </cfif>
-      </div>	  </td>
+      </div>	  
+	</td>
     </tr>
 
      <!--- </table> --->

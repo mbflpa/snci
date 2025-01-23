@@ -6,7 +6,7 @@
 </cfquery>
 
 <cfquery name="rsChecklistFiltrado" datasource="#dsn_inspecao#">
-    SELECT TUI_Modalidade,TUI_TipoUnid,TUI_Ativo, TUI_Ano, TUI_GRUPOITEM, TUI_ITEMVERIF, TUN_Descricao, Grp_Descricao, Itn_Descricao, Itn_Orientacao, Itn_ValorDeclarado, Itn_Amostra, Itn_Norma, Itn_Pontuacao, Itn_Classificacao, Itn_PTC_Seq, Itn_Ano, Itn_PreRelato, Itn_Situacao
+    SELECT TUI_Modalidade,TUI_TipoUnid,TUI_Ativo, TUI_Ano, TUI_GRUPOITEM, TUI_ITEMVERIF, TUN_Descricao, Grp_Descricao, Itn_Descricao, Itn_Orientacao, Itn_ValorDeclarado, Itn_Amostra, Itn_Norma, Itn_Pontuacao, Itn_Classificacao, Itn_PTC_Seq, Itn_Ano, Itn_PreRelato, Itn_Situacao,Itn_Manchete
     FROM TipoUnidade_ItemVerificacao 
     INNER JOIN Grupos_Verificacao ON Grp_Codigo = TUI_GrupoItem AND Grp_Ano = TUI_Ano 
     INNER JOIN Itens_Verificacao ON (TUI_Modalidade = Itn_Modalidade) and (TUI_TipoUnid = Itn_TipoUnidade) and Itn_NumItem = TUI_ItemVerif AND Itn_NumGrupo = TUI_GrupoItem AND Itn_Ano = TUI_Ano
@@ -56,7 +56,7 @@
 
     <body id="main_body" style="background:#fff">
 <cfif rsChecklistFiltrado.recordcount lte 0> 
-	<div class="noprint" align="left" >Checklist desativado para o Ano Corrente ou n&atilde;o foi gerado para o Tipo e o Ano Selecionado</div>
+	<div class="noprint" align="left" >Checklist desativado para o Ano Corrente ou não foi gerado para o Tipo e o Ano Selecionado</div>
 <cfabort>  
 </cfif> 
         
@@ -88,9 +88,9 @@
                     <cfif #url.frmmodal# eq 0>
                       PRESENCIAL
                         <cfelseif #url.frmmodal# eq 1>
-                      A DIST�NCIA
+                      A DISTÂNCIA
                       <cfelseif #url.frmmodal# eq '2'>
-                      PRESENCIAL e A DIST�NCIA
+                      PRESENCIAL e A DISTÂNCIA
                       <cfelse>
                       #rsChecklistFiltrado.TUI_Modalidade#
                     </cfif>
@@ -106,7 +106,7 @@
                   <tr>
                     <td colspan="10" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>GRUPO: #TUI_GRUPOITEM# #Grp_Descricao#</strong></div></td>
                   </tr>
-                  <cfoutput> 
+                <cfoutput> 
                     <tr>
 					<td colspan="10" valign="top" bordercolor="999999" bgcolor="" scope="row">
 					<div style="text-align: justify;"><strong>
@@ -125,21 +125,23 @@
 					<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>					
                     <tr>
                       <td><strong>Relev&acirc;ncia:</strong></td>
-                      <td width="18%"><div align="right"><strong>Pontua&ccedil;&atilde;o:</strong></div></td>
+                      <td width="18%"><div align="right"><strong>Pontuação:</strong></div></td>
                       <td width="14%"><div align="left"><strong>#Itn_Pontuacao#</strong></div></td>
-                      <td width="11%"><div align="right"><strong>Classifica&ccedil;&atilde;o:</strong></div></td>
+                      <td width="11%"><div align="right"><strong>Classificação:</strong></div></td>
                       <td width="15%"><strong>&nbsp;#Itn_Classificacao#</strong></td>
 					<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) neq 'INSPETORES'>					  
-                      <td width="16%"><div align="right"><strong>Situa&ccedil;&atilde;o do Ponto:</strong></div></td>
+                      <td width="16%"><div align="right"><strong>Situação do Ponto:</strong></div></td>
                       <td width="11%"><div align="left"><strong>#auxsitudesc#</strong></div></td>
 					</cfif>					  
                     </tr>
 					</cfif>
-				
+          <tr>
+            <td colspan="10" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>Manchete: #Itn_Manchete#</strong></div></td>
+          </tr>
 			<cfif '#url.frmacao#' eq 'S'>
 					<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>
                       <tr>
-                        <td colspan="10"><div align="left"><strong>Composi&ccedil;&atilde;o da Pontua&ccedil;&atilde;o</strong></div></td>
+                        <td colspan="10"><div align="left"><strong>Composição da Pontuação</strong></div></td>
                       </tr>
                       <cfset itnptcseq = trim(Itn_PTC_Seq)>
                       <cfif len(itnptcseq) lte 0>
@@ -153,7 +155,7 @@
                       <tr>
                         <td><div align="center"><strong>ID</strong></div></td>
                         <td><div align="center"><strong>Peso</strong></div></td>
-                        <td colspan="5" ><strong>Descri&ccedil;&atilde;o</strong></td>
+                        <td colspan="5" ><strong>Descrição</strong></td>
                       </tr>
                       <cfloop query="rsComp">
                         <tr>
@@ -168,7 +170,7 @@
                       ","<BR>" ,"All")>
                       <cfset ItnPreRelato = Replace(ItnPreRelato,"-----------------------------------------------------------------------------------------------------------------------","<BR>-----------------------------------------------------------------------------------------------------------------------<BR>" ,"All")>
                       <tr>
-                        <td colspan="7"><div align="left"><strong>Pr&eacute;-Relato</strong></div></td>
+                        <td colspan="7"><div align="left"><strong>Pré-Relato</strong></div></td>
                       </tr>
                       <tr>
                         <td colspan="7">#ItnPreRelato#</td>
@@ -203,7 +205,7 @@
                   <!---<tfoot>
                     <tr><td><div class="noprint" align="CENTER"><button type="button" onClick="window.print();">Imprimir</button></div></td></tr>
                     <tr><td><div class="divFooter" align="right" style="position:relative;left:0px;font-size:12px;float:left">SNCI - Sistema Nacional de Controle Interno</div>
-                    <div class="divFooter" align="right" style="position:relative;right:0px;font-size:12px">Data/Hora de Emiss�o:<cfoutput>#DateFormat(Now(),"DD/MM/YYYY")#</cfoutput> - <cfoutput>#TimeFormat(Now(),'HH:MM')#</cfoutput></div></td></tr>
+                    <div class="divFooter" align="right" style="position:relative;right:0px;font-size:12px">Data/Hora de Emiss�o:<cfoutput>#DateFormat(Now(),"DD/MM/YYYY")#</cfoutput> - <cfoutput>#TimeFormat(Now(),'HH:MM')#</cfoutput></div></td></tr>
                 </tfoot>--->
                 </tr>
               </table>

@@ -36,67 +36,112 @@
 function listar(a,b,c){
 	document.formx.lis_se.value=a;
 	document.formx.lis_grpace.value=b;
-    document.formx.lis_mes.value=c;
+  document.formx.lis_mes.value=c;
 	document.formx.submit(); 
 }
 
 </script>
 </head>
 <body>
-<form action="" method="post" target="_blank" name="form1">
-<cfset dtlimit = CreateDate(#frmano#,#frmmes#,1)>
-<!---  
-<cfif grpacesso eq 'GESTORMASTER'>
-  <cfset dtlimit = CreateDate(#frmano#,#frmmes#,day(now()))>
-<cfelse>
-  <cfset dtlimit = CreateDate(2023,11,30)>
-</cfif>
+  <!---
+  <cfoutput>
+    #frmano#,#frmmes#    
+  </cfoutput>
 --->
-<!--- Obter solucionados --->
-<cfset aux_mes = int(month(dtlimit))>
-<cfif aux_mes is 1>
-	<cfset dtlimit = (year(dtlimit)) & "/01/31">
-	<cfset cabec = 'Jan/' & year(dtlimit)>
-<cfelseif aux_mes is 2>
-    <cfset cabec = 'Fev/' & year(dtlimit)>
-	<cfif int(year(dtlimit)) mod 4 is 0>
-	<cfset dtlimit = (year(dtlimit)) & "/02/29">
-<cfelse>
-    <cfset cabec = 'Fev/' & year(dtlimit)>
-	<cfset dtlimit = (year(dtlimit)) & "/02/28">
+<form action="" method="post" target="_blank" name="form1">
+  <cfset dtlimit = CreateDate(#frmano#,#frmmes#,1)>
+  <cfset aux_mes = int(month(dtlimit))>
+  <cfset dia = day(now())>
+  <cfset mes = month(now())>
+  <cfset ano = year(now())>
+  <cfif (grpacesso neq 'GESTORMASTER') and (frmano neq ano) and (mes eq 1) and (dia lte 10)>
+    <cfset ano = frmano>
+  </cfif>
+<cfif grpacesso neq 'GESTORMASTER' and dia lte 10 and frmano eq ano>
+  <cfif frmmes is 1>
+		<cfset dtlimit = (frmano - 1) & "/12/31">
+    <cfset cabec = 'Dez/' & year(dtlimit)>
+	<cfelseif frmmes is 2>
+		<cfset dtlimit = frmano  & "/01/31">	
+    <cfset cabec = 'Jan/' & year(dtlimit)>	
+	<cfelseif frmmes is 3>  
+		<cfif int(frmano) mod 4 is 0>
+			<cfset dtlimit = frmano & "/02/29">
+		<cfelse>
+			<cfset dtlimit = frmano & "/02/28">
+		</cfif>
+    <cfset cabec = 'Fev/' & year(dtlimit)>	
+	<cfelseif frmmes is 4>
+		<cfset dtlimit = frmano & "/03/31">
+    <cfset cabec = 'Mar/' & year(dtlimit)>	
+	<cfelseif frmmes is 5>
+		<cfset dtlimit = frmano & "/04/30">	
+    <cfset cabec = 'Abr/' & year(dtlimit)>		
+	<cfelseif frmmes is 6>
+		<cfset dtlimit = frmano & "/05/31">		
+    <cfset cabec = 'Mai/' & year(dtlimit)>	
+	<cfelseif frmmes is 7>
+		<cfset dtlimit = frmano & "/06/30">		
+    <cfset cabec = 'Jun/' & year(dtlimit)>				   
+	<cfelseif frmmes is 8>
+		<cfset dtlimit = frmano & "/07/31">
+    <cfset cabec = 'Jul/' & year(dtlimit)>						   
+	<cfelseif frmmes is 9>
+		<cfset dtlimit = frmano & "/08/31">		
+    <cfset cabec = 'Ago/' & year(dtlimit)>				   
+	<cfelseif frmmes is 10>
+		<cfset dtlimit = frmano & "/09/30">		
+    <cfset cabec = 'Set/' & year(dtlimit)>				   
+	<cfelseif frmmes is 11>
+		<cfset dtlimit = frmano & "/10/31">	
+    <cfset cabec = 'Out/' & year(dtlimit)>	
+	<cfelseif frmmes is 12>	
+		<cfset dtlimit = frmano & "/11/30">	  
+    <cfset cabec = 'Nov/' & year(dtlimit)>	 				   			   
+	</cfif>
+<cfelse>  
+	<cfif frmmes is 1>
+    <cfset cabec = 'Jan/' & year(dtlimit)>	
+    <cfset dtlimit = frmano  & "/01/31">
+	<cfelseif frmmes is 2>  
+		<cfif int(frmano) mod 4 is 0>
+			<cfset dtlimit = frmano & "/02/29">
+		<cfelse>
+			<cfset dtlimit = frmano & "/02/28">
+		</cfif>
+    <cfset cabec = 'Fev/' & year(dtlimit)>	
+	<cfelseif frmmes is 3>
+		<cfset dtlimit = frmano & "/03/31">
+    <cfset cabec = 'Mar/' & year(dtlimit)>	
+	<cfelseif frmmes is 4>
+		<cfset dtlimit = frmano & "/04/30">	
+    <cfset cabec = 'Abr/' & year(dtlimit)>		
+	<cfelseif frmmes is 5>
+		<cfset dtlimit = frmano & "/05/31">		
+    <cfset cabec = 'Mai/' & year(dtlimit)>	
+	<cfelseif frmmes is 6>
+		<cfset dtlimit = frmano & "/06/30">		
+    <cfset cabec = 'Jun/' & year(dtlimit)>				   
+	<cfelseif frmmes is 7>
+		<cfset dtlimit = frmano & "/07/31">
+    <cfset cabec = 'Jul/' & year(dtlimit)>						   
+	<cfelseif frmmes is 8>
+		<cfset dtlimit = frmano & "/08/31">		
+    <cfset cabec = 'Ago/' & year(dtlimit)>				   
+	<cfelseif frmmes is 9>
+		<cfset dtlimit = frmano & "/09/30">		
+    <cfset cabec = 'Set/' & year(dtlimit)>				   
+	<cfelseif frmmes is 10>
+		<cfset dtlimit = frmano & "/10/31">	
+    <cfset cabec = 'Out/' & year(dtlimit)>	
+	<cfelseif frmmes is 11>	
+		<cfset dtlimit = frmano & "/11/30">	  
+    <cfset cabec = 'Nov/' & year(dtlimit)>	 
+	<cfelseif frmmes is 12>	
+		<cfset dtlimit = frmano & "/12/31">	  
+    <cfset cabec = 'Dez/' & year(dtlimit)>    				   			   
+	</cfif>
 </cfif>
-<cfelseif aux_mes is 3>
-	<cfset dtlimit = (year(dtlimit)) & "/03/31">
-	<cfset cabec = 'Mar/' & year(dtlimit)>  
-<cfelseif aux_mes is 4>
-	<cfset dtlimit = (year(dtlimit)) & "/04/30">		
-	<cfset cabec = 'Abr/' & year(dtlimit)>
-<cfelseif aux_mes is 5>
-	<cfset dtlimit = (year(dtlimit)) & "/05/31">	
-	<cfset cabec = 'Mai/' & year(dtlimit)>	
-<cfelseif aux_mes is 6>
-	<cfset dtlimit = (year(dtlimit)) & "/06/30">	
-	<cfset cabec = 'Jun/' & year(dtlimit)>				   
-<cfelseif aux_mes is 7>
-	<cfset dtlimit = (year(dtlimit)) & "/07/31">	
-	<cfset cabec = 'Jul/' & year(dtlimit)>				   
-<cfelseif aux_mes is 8>
-	<cfset dtlimit = (year(dtlimit)) & "/08/31">	
-	<cfset cabec = 'Ago/' & year(dtlimit)>				   
-<cfelseif aux_mes is 9>
-	<cfset dtlimit = (year(dtlimit)) & "/09/30">		
-	<cfset cabec = 'Set/' & year(dtlimit)>			   
-<cfelseif aux_mes is 10>
-	<cfset dtlimit = (year(dtlimit)) & "/10/31">		
-	<cfset cabec = 'Out/' & year(dtlimit)>			   
-<cfelseif aux_mes is 11>
-	<cfset dtlimit = (year(dtlimit)) & "/11/30">		
-	<cfset cabec = 'Nov/' & year(dtlimit)>			   
-<cfelse>
-	<cfset dtlimit = (year(dtlimit)) & "/12/31">				
-	<cfset cabec = 'Dez/' & year(dtlimit)>	   
-</cfif>
-
 <cfoutput>
 <cfset dtini = dateformat(now(),"DD/MM/YYYY")>
 <cfset dtini = '01' & right(dtini,8)>

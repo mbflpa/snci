@@ -18,9 +18,16 @@
 SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 <cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
-<cfif grpacesso neq 'GESTORMASTER'>
-	<cfset aux_mes = month(dtlimit)>
-	<cfset aux_ano = year(dtlimit)>
+<cfset dia = day(now())>
+<cfset mes = month(now())>
+<cfset ano = year(now())>
+<cfset aux_mes = month(dtlimit)>
+<cfset aux_ano = year(dtlimit)>
+
+<cfif (grpacesso neq 'GESTORMASTER') and (aux_ano neq ano) and (mes eq 1) and (dia lte 10)>
+  <cfset ano = aux_ano>
+</cfif>
+<cfif grpacesso neq 'GESTORMASTER' and dia lte 10 and aux_ano eq ano>
 	<cfif aux_mes is 1>
 		<cfset dtlimit = (aux_ano - 1) & "/12/31">
 	<cfelseif aux_mes is 2>

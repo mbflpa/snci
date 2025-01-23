@@ -850,6 +850,10 @@
 				<!-- Deleção com proteção contra concorrência -->
 				<cflock name="deleteLock_#arguments.pc_aval_melhoria_id#" type="exclusive" timeout="10">
 					<cfquery datasource="#application.dsn_processos#">
+						DELETE FROM pc_avaliacao_melhoria_categoriasControles
+						WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_integer">
+					</cfquery>
+					<cfquery datasource="#application.dsn_processos#">
 						DELETE FROM pc_avaliacao_melhorias
 						WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.pc_aval_melhoria_id#" cfsqltype="cf_sql_numeric">
 					</cfquery>
@@ -878,12 +882,12 @@
 
 		<cfquery name="rsOrientacao" datasource="#application.dsn_processos#">
 			SELECT * FROM pc_avaliacao_orientacoes
-			WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+			WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 		</cfquery>
 
 		<cfquery name="rsPosicionamentosParaReplicacao" datasource="#application.dsn_processos#">
 			SELECT * FROM pc_avaliacao_posicionamentos
-			WHERE pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+			WHERE pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 			      and pc_aval_posic_enviado = 1
 		</cfquery>
 
@@ -891,7 +895,7 @@
 			<!-- Exclui o posicionamento salvo (se existir) -->
 			<cfquery datasource="#application.dsn_processos#">
 				DELETE pc_avaliacao_posicionamentos
-				WHERE pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+				WHERE pc_aval_posic_num_orientacao = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 			      and pc_aval_posic_enviado = 0
 			</cfquery>
 					
@@ -911,14 +915,14 @@
 							pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#i#" cfsqltype="cf_sql_varchar">,
 							pc_aval_orientacao_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#',
 							pc_aval_orientacao_distribuido = 1
-						WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">
+						WHERE pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 					</cfquery>
 					
 					<!--Insere a manifestação inicial do controle interno para a orientação com a mesma data prevista e status da orientação original do órgão avaliado -->
 				
 					<cfquery datasource="#application.dsn_processos#">
 						INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
-						VALUES (<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_numeric">, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#',#posic_status#,1)
+						VALUES (<cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#pcOrientacaoResposta#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', '#orgaoResp#','#dataPrevista#',#posic_status#,1)
 					</cfquery>
 
 				
@@ -1234,7 +1238,7 @@
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-			WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.idMelhoria#" cfsqltype="cf_sql_numeric">
+			WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.idMelhoria#" cfsqltype="cf_sql_integer">
 		</cfquery>
 
 		

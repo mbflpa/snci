@@ -668,7 +668,7 @@
 
 <!--- Nova consulta para verificar respostas das unidades --->
 <cfquery name="qResposta" datasource="#dsn_inspecao#">
-	SELECT Pos_Abertura, Pos_VLRecuperado, Pos_DtPrev_Solucao, Pos_DtPosic, DATEDIFF(dd,Pos_DtPosic,GETDATE()) AS diasOcor, Pos_SEI, Pos_Situacao_Resp, Pos_Processo, Pos_Tipo_Processo, Pos_Area, Pos_NomeArea, Pos_Situacao_Resp, Pos_Parecer, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, RIP_Recomendacoes, RIP_Recomendacao, RIP_Comentario, RIP_Caractvlr, RIP_Falta, RIP_Sobra, RIP_EmRisco, RIP_Valor, RIP_ReincInspecao, RIP_ReincGrupo, RIP_ReincItem, Dir_Descricao, Dir_Codigo, INP_DtInicInspecao, Pos_NCISEI, Grp_Descricao, Und_TipoUnidade, INP_Modalidade, Itn_Descricao, Itn_TipoUnidade, Itn_PTC_Seq, Itn_ImpactarTipos, TNC_ClassifInicio, TNC_ClassifAtual
+	SELECT Pos_Abertura, Pos_VLRecuperado, Pos_DtPrev_Solucao, Pos_DtPosic, DATEDIFF(dd,Pos_DtPosic,GETDATE()) AS diasOcor, Pos_SEI, Pos_Situacao_Resp, Pos_Processo, Pos_Tipo_Processo, Pos_Area, Pos_NomeArea, Pos_Situacao_Resp, Pos_Parecer, Pos_PontuacaoPonto, Pos_ClassificacaoPonto, RIP_Recomendacoes, RIP_Recomendacao, RIP_Comentario, RIP_Caractvlr, RIP_Falta, RIP_Sobra, RIP_EmRisco, RIP_Valor, RIP_ReincInspecao, RIP_ReincGrupo, RIP_ReincItem, RIP_Manchete, Dir_Descricao, Dir_Codigo, INP_DtInicInspecao, Pos_NCISEI, Grp_Descricao, Und_TipoUnidade, INP_Modalidade, Itn_Descricao, Itn_TipoUnidade, Itn_PTC_Seq, Itn_ImpactarTipos, TNC_ClassifInicio, TNC_ClassifAtual
 	FROM  Inspecao 
 	INNER JOIN (Diretoria 
 	INNER JOIN ((Resultado_Inspecao 
@@ -1249,6 +1249,10 @@ function abrirPopup(url,w,h)
         </tr>
       </table></td>
     </tr>
+	<tr bgcolor="eeeeee" class="exibir">
+		<td>Manchete</td>
+		<td colspan="4"><cfoutput><strong class="exibir">#qResposta.RIP_Manchete#</strong></cfoutput></td>
+	  </tr>
 	<tr bgcolor="eeeeee" class="exibir">
 	  <td>Classificação Unidade</td>
 	  <td colspan="4"><table width="100%" border="0">

@@ -103,7 +103,7 @@
 		</cfquery>
 			
 		<cfquery name="rsAtivos" datasource="#dsn_inspecao#">
-			SELECT Itn_NumGrupo,Itn_NumItem,Itn_PTC_Seq
+			SELECT Itn_NumGrupo,Itn_NumItem,Itn_PTC_Seq,Itn_Manchete
 			FROM Itens_Verificacao
 			WHERE Itn_Ano=#right(url.numInspecao,4)# AND 
 			Itn_Modalidade=#rsID.INP_Modalidade# AND 
@@ -127,8 +127,8 @@
 					<cfset RIPCaractvlr = 'QUANTIFICADO'>
 				</cfif>
 				<cfquery datasource="#dsn_inspecao#">
-				INSERT INTO Resultado_Inspecao (RIP_Unidade,RIP_NumInspecao,RIP_NumGrupo,RIP_NumItem,RIP_CodDiretoria,RIP_CodReop,RIP_Ano,RIP_Resposta,RIP_Comentario,RIP_DtUltAtu,RIP_UserName,RIP_Caractvlr,RIP_Falta,RIP_Sobra,RIP_EmRisco) 
-				VALUES ('#rsID.INP_Unidade#','#url.numInspecao#',#rsAtivos.Itn_NumGrupo#,#rsAtivos.Itn_NumItem#,'#rsID.Und_CodDiretoria#','#rsID.Und_CodReop#',#right(url.numInspecao,4)#,'A','',CONVERT(char, GETDATE(), 120),'#qAcesso.Usu_Matricula#','#RIPCaractvlr#',#auxvlr#,#auxvlr#,#auxvlr#)
+				INSERT INTO Resultado_Inspecao (RIP_Unidade,RIP_NumInspecao,RIP_NumGrupo,RIP_NumItem,RIP_CodDiretoria,RIP_CodReop,RIP_Ano,RIP_Resposta,RIP_Comentario,RIP_DtUltAtu,RIP_UserName,RIP_Caractvlr,RIP_Falta,RIP_Sobra,RIP_EmRisco,RIP_Manchete) 
+				VALUES ('#rsID.INP_Unidade#','#url.numInspecao#',#rsAtivos.Itn_NumGrupo#,#rsAtivos.Itn_NumItem#,'#rsID.Und_CodDiretoria#','#rsID.Und_CodReop#',#right(url.numInspecao,4)#,'A','',CONVERT(char, GETDATE(), 120),'#qAcesso.Usu_Matricula#','#RIPCaractvlr#',#auxvlr#,#auxvlr#,#auxvlr#,'#rsAtivos.Itn_Manchete#')
 				</cfquery>	
 			</cfif>
 		</cfoutput>

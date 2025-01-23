@@ -187,11 +187,13 @@
 				</cfquery>
                 
 				<cfquery datasource="#dsn_inspecao#" name="rsItens">
-			       	   SELECT * FROM TipoUnidade_ItemVerificacao 
-						  WHERE TUI_Modalidade ='#rsInspecao.INP_Modalidade#' 
-						  and TUI_Ano=year('#rsInspecao.INP_DtInicInspecao#') 
-						  and TUI_TipoUnid='#rsUnidade.Und_TipoUnidade#'
-						  and TUI_Ativo = 1
+					SELECT * 
+					FROM Itens_Verificacao INNER JOIN TipoUnidade_ItemVerificacao ON (Itn_NumItem = TUI_ItemVerif) AND (Itn_NumGrupo = TUI_GrupoItem) AND (Itn_TipoUnidade = TUI_TipoUnid) AND 
+					(Itn_Modalidade = TUI_Modalidade) AND (Itn_Ano = TUI_Ano)
+					WHERE TUI_Modalidade ='#rsInspecao.INP_Modalidade#' 
+					and TUI_Ano=year('#rsInspecao.INP_DtInicInspecao#') 
+					and TUI_TipoUnid='#rsUnidade.Und_TipoUnidade#'
+					and TUI_Ativo = 1
 				</cfquery>
 				<cfset auxvlr = '0.00'>
 				<cfoutput query="rsItens">
@@ -201,8 +203,8 @@
 					</cfif>
 				     
 				    <cfquery datasource="#dsn_inspecao#">
-					    INSERT INTO Resultado_Inspecao (RIP_Unidade, RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_CodDiretoria, RIP_CodReop, RIP_Ano, RIP_Resposta, RIP_Comentario, RIP_DtUltAtu, RIP_UserName, RIP_Caractvlr, RIP_Falta, RIP_Sobra, RIP_EmRisco) 
-					    VALUES ('#rsUnidade.Und_Codigo#', '#url.numInspecao#', #TUI_GrupoItem#, #TUI_ItemVerif#, '#rsUnidade.Und_CodDiretoria#', '#rsUnidade.Und_CodReop#', #TUI_Ano#, 'A', '', CONVERT(char, GETDATE(), 120), '#qAcesso.Usu_Matricula#','#RIPCaractvlr#',#auxvlr#,#auxvlr#,#auxvlr#)
+					    INSERT INTO Resultado_Inspecao (RIP_Unidade, RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_CodDiretoria, RIP_CodReop, RIP_Ano, RIP_Resposta, RIP_Comentario, RIP_DtUltAtu, RIP_UserName, RIP_Caractvlr, RIP_Falta, RIP_Sobra, RIP_EmRisco,RIP_Manchete) 
+					    VALUES ('#rsUnidade.Und_Codigo#', '#url.numInspecao#', #TUI_GrupoItem#, #TUI_ItemVerif#, '#rsUnidade.Und_CodDiretoria#', '#rsUnidade.Und_CodReop#', #TUI_Ano#, 'A', '', CONVERT(char, GETDATE(), 120), '#qAcesso.Usu_Matricula#','#RIPCaractvlr#',#auxvlr#,#auxvlr#,#auxvlr#,'#rsItens.Itn_Manchete#')
 					</cfquery>
 				</cfoutput>
 			</cftransaction> 

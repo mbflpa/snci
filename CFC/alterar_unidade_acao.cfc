@@ -1,5 +1,4 @@
 <cfcomponent >
-  <cfprocessingdirective pageencoding = "utf-8">	
 <cffunction name="acao">
 	<cftransaction>  <!--- Inclus�o: Marcelo Bittencourt em 14/07/2020; DEMANDA: Update na unidade centralizadora; Se um UPDATE ou INSERT falhar, todas as altera��es feitas ter�o roll back autom�tico--->
 <cfoutput>

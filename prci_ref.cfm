@@ -39,11 +39,13 @@ ORDER BY Andt_AnoExerc DESC
 <cfset auxdia = int(day(now()))>
 <cfset aux_mes = int(month(now()))>
 <cfset aux_ano = int(year(now()))>
-<!---
+
 <cfif grpacesso eq 'GESTORMASTER' OR grpacesso eq 'GOVERNANCA'>
    <cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
-		<cfset aux_mes = 12>
+	<!---	
+	<cfset aux_mes = 12>
 		<cfset aux_ano = aux_ano - 1>
+	--->
    </cfif>
    <cfif auxdia gt 10>
    <!---		<cfset aux_mes = (aux_mes - 1)>  --->
@@ -56,7 +58,7 @@ ORDER BY Andt_AnoExerc DESC
    		<cfset aux_mes = (aux_mes - 1)>
    </cfif>
 </cfif>
---->
+
 <!---
  <cfoutput>aux_ano:#aux_ano#  === aux_mes:#aux_mes#</cfoutput><BR> 
 <cfset gil = gil> 
@@ -120,7 +122,7 @@ function valida_form() {
 	
 	if (frm.frmano.value < frm.anoatual.value)
 	{
-	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
+	alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 	
 //=========================================	
@@ -141,7 +143,19 @@ function valida_form() {
 	  alert('Informar o trimetre!');
 	  frm.trimetre.focus();
 	  return false;
-	} 	 
+	} 	
+/*
+	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value)){
+		if (eval(messelec) > eval(mesatual)){
+			alert('Usuário(a), o mês selecionado para o ano selecionado ainda não gerado!');
+			return false;
+		}
+			if (eval(messelec) == eval(mesatual) && (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
+			alert('Usuário(a), o mês selecionado para o ano selecionado ainda não gerado!');
+			return false;
+    	}	
+	} 
+*/
 //return false;
 }
 function mudar(a){

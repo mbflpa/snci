@@ -1,3 +1,4 @@
+<cfprocessingdirective pageEncoding ="utf-8"/>
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
    <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -47,12 +48,12 @@ function validarform() {
 	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
 	{
 	if (eval(messelec) >= eval(mesatual)){
-	alert('Gestor(a), o m�s selecionado para o ano selecionado ainda n�o gerado!');
+	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
 	return false;
 	}
 
     if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmdia.value <= 10){
-	alert('Gestor(a), o m�s selecionado para o ano selecionado ainda n�o gerado!');
+	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
 	return false;
 	}	
 	} 
@@ -71,12 +72,12 @@ function validarform() {
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- �rea de conte�do   --->
+<!--- �rea de conte�do   --->
 	<form action="Pacin_Unidades_Avaliadas.cfm" method="post" target="_blank" name="frmObjeto" onSubmit="return validarform()">
 	  <table width="38%" align="center">
        
         <tr>
-          <td colspan="5" align="center" class="titulo2">UNIDADES AVALIADAS/A AVALIAR POR EXERC�CIO</td>
+          <td colspan="5" align="center" class="titulo2">UNIDADES AVALIADAS/A AVALIAR POR EXERCÍCIO</td>
         </tr>
 		<tr>
           <td colspan="5" align="center" class="titulo1">&nbsp;</td>
@@ -85,7 +86,7 @@ function validarform() {
           <td colspan="5" align="center">&nbsp;</td>
         </tr>
         <tr>
-          <td colspan="5" align="center"><div align="left"><strong class="titulos">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Filtro de sele&ccedil;&atilde;o:
+          <td colspan="5" align="center"><div align="left"><strong class="titulos">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Filtro de seleção:
             
           </strong></div></td>
         </tr>
@@ -101,13 +102,13 @@ function validarform() {
           </span></strong></td>
         </tr>
 
- <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER' AND qAcesso.Usu_DR eq '01'>
+ <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria WHERE Dir_Codigo <> '01'
 			</cfquery>
 			 <tr valign="baseline">
 		     <td width="2%">&nbsp;</td>
-             <td width="39%" class="exibir"><strong>Superintend&ecirc;ncia : </strong></td>
+             <td width="39%" class="exibir"><strong>Superintendência : </strong></td>
 			 <td colspan="3">
 			   
 		       <div align="left">
@@ -129,7 +130,7 @@ function validarform() {
 			</cfoutput>
 			 <tr valign="baseline">
 		     <td width="2%">&nbsp;</td>
-             <td width="39%" class="exibir"><strong>Superintend&ecirc;ncia : </strong></td>
+             <td width="39%" class="exibir"><strong>Superintendência : </strong></td>
 			 <td colspan="3"><div align="left">
 			   <select name="se" id="se" class="form">
                  <option selected="selected" value="Todos">Todos</option>
@@ -142,7 +143,7 @@ function validarform() {
         <cfelseif qAcesso.Usu_DR eq '04'>
 			 <tr valign="baseline">
 		     <td width="2%">&nbsp;</td>
-             <td width="39%" class="exibir"><strong>Superintend&ecirc;ncia : </strong></td>
+             <td width="39%" class="exibir"><strong>Superintendência : </strong></td>
 		     <td colspan="3">
 			    <div align="left">
 			      <select name="se" id="se" class="form">
@@ -158,7 +159,7 @@ function validarform() {
 		 <cfelseif qAcesso.Usu_DR eq '10'>
 			 <tr valign="baseline">
 		     <td width="2%">&nbsp;</td>
-             <td width="39%" class="exibir"><strong>Superintend&ecirc;ncia : </strong></td>
+             <td width="39%" class="exibir"><strong>Superintendência : </strong></td>
 		     <td colspan="3">
 			   <div align="left">
 			     <select name="se"  id="se" class="form">
@@ -173,7 +174,7 @@ function validarform() {
 		<cfelseif qAcesso.Usu_DR eq '06'>
 			 <tr valign="baseline">
 		     <td width="2%">&nbsp;</td>
-             <td width="39%" class="exibir"><strong>Superintend&ecirc;ncia : </strong></td>
+             <td width="39%" class="exibir"><strong>Superintendência : </strong></td>
 		     <td colspan="3">
 			   <div align="left">
 			     <select name="se" id="se" class="form">
@@ -188,7 +189,7 @@ function validarform() {
 		<cfelseif qAcesso.Usu_DR eq '26'>
 			 <tr valign="baseline">
 		     <td width="2%">&nbsp;</td>
-             <td width="39%" class="exibir"><strong>Superintend&ecirc;ncia : </strong></td>
+             <td width="39%" class="exibir"><strong>Superintendência : </strong></td>
 		     <td colspan="3">
 			   <div align="left">
 			     <select name="se" id="se" class="form">
@@ -203,7 +204,7 @@ function validarform() {
 		 <cfelseif qAcesso.Usu_DR eq '28'>
 			 <tr valign="baseline">
 		     <td width="2%">&nbsp;</td>
-             <td width="39%" class="exibir"><strong>Superintend&ecirc;ncia : </strong></td>
+             <td width="39%" class="exibir"><strong>Superintendência : </strong></td>
 		     <td colspan="3">
 			   <div align="left">
 			     <select name="se" id="se" class="form">
@@ -230,7 +231,7 @@ function validarform() {
 		  <cfset cont = year(now())>		  
           <tr>
             <td>&nbsp;</td>
-            <td class="exibir"><strong>Exerc&iacute;cio &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
+            <td class="exibir"><strong>Exercício &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
             <td colspan="2">
 			<select name="frmano" class="exibir" id="frmano">
 			<option value="Todos" selected="selected">Todos</option>
