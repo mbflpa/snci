@@ -1277,11 +1277,11 @@
 		</cfquery>
 
 
-		<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
+		<!--<cfif FindNoCase("intranetsistemaspe", application.auxsite)>
 			<cfset myQuery = "rsOrgaosComOrientacoesPendentes">
-		<cfelse>
+		<cfelse>-->
 			<cfset myQuery = "rsOrgaosComOrientacoesPendentesParaTeste">
-		</cfif>
+		<!--</cfif>-->
 
 		<cfloop query="#myQuery#">
             <cfif Len(Trim(pc_aval_orientacao_mcu_orgaoResp))>            
@@ -1332,7 +1332,7 @@
 							<cfset cc = "">
 						</cfif>
 
-						<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
+						<cfif FindNoCase("intranetsistemaspe", application.auxsite) or FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 
 							<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
 							<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
