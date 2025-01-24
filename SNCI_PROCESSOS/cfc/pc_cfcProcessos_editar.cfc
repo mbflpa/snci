@@ -3738,7 +3738,13 @@
 				setTimeout(function(){ 
 					$('#labelMelhoria').html('Editar Proposta de Melhoria:')
 
-					<cfoutput> var modalidade = '#rsStatus.pc_modalidade#'; </cfoutput>
+					<cfoutput> 
+						var modalidade = '#rsStatus.pc_modalidade#'; 
+						var dataPrevista = '#rsMelhorias.pc_aval_melhoria_dataPrev#';
+						var orgaoSugerido = '#rsMelhorias.pc_aval_melhoria_sug_orgao_mcu#';
+						var naoAceita_justif = '#rsMelhorias.pc_aval_melhoria_naoAceita_justif#';
+						var sugestao = '#rsMelhorias.pc_aval_melhoria_sugestao#';
+					</cfoutput>
 					
 					$(linha).closest("tr").children("td:nth-child(6)").click();//seleciona a linha onde o botão foi clicado	
 					var pc_aval_melhoria_id = $(linha).closest("tr").children("td:nth-child(2)").text();
@@ -3775,22 +3781,29 @@
 							pc_aval_melhoria_status = ""
 					}  
 					
-					var pc_aval_melhoria_naoAceita_justif = $(linha).closest("tr").children("td:nth-child(11)").text();
-					var pc_aval_melhoria_sugestao = $(linha).closest("tr").children("td:nth-child(12)").text();
+					
 
 
 					if(modalidade != 'E'){
+						var pc_aval_melhoria_dataPrev = $(linha).closest("tr").children("td:nth-child(9)").text();
+						var pc_aval_melhoria_sug_orgao_mcu = $(linha).closest("tr").children("td:nth-child(10)").text();
+						var pc_aval_melhoria_naoAceita_justif = $(linha).closest("tr").children("td:nth-child(11)").text();
+						var pc_aval_melhoria_sugestao = $(linha).closest("tr").children("td:nth-child(12)").text();
 						var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(13)").text();
 						var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(14)").text();
 						var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(15)").text();
 						var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(16)").text();
 					}else{
+						var pc_aval_melhoria_dataPrev = dataPrevista;
+						var pc_aval_melhoria_sug_orgao_mcu = orgaoSugerido;
+						var pc_aval_melhoria_naoAceita_justif =naoAceita_justif;
+						var pc_aval_melhoria_sugestao = sugestao;
 						var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(9)").text();
 						var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(10)").text();
 						var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(11)").text();
 						var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(12)").text();
 					}
-						
+					
 					$('#pcMelhoriaId').val(pc_aval_melhoria_id).trigger('change');
 					$('#pcMelhoria').val(pc_aval_melhoria_descricao).trigger('change');
 					$('#pcOrgaoRespMelhoria').val(pc_aval_melhoria_num_orgao).trigger('change');
