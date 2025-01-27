@@ -122,12 +122,12 @@
                 background-color: #e9ecef!important;
             }
             
-            #avaliacaoModal .form-group:not(.no-zebra):nth-child(even) {
-                background-color: #ffffff !important; /* Cor para elementos pares */
+            #avaliacaoModal .form-group:not(.no-zebra):nth-child(odd) {
+                background-color: #ffffff !important; 
             }
 
-            #avaliacaoModal .form-group:not(.no-zebra):nth-child(odd) {
-                background-color: aliceblue /* Cor para elementos ímpares */
+            #avaliacaoModal .form-group:not(.no-zebra):nth-child(even) {
+                background-color: aliceblue !important; 
             }
 
             
