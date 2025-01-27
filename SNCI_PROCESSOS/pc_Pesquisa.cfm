@@ -137,7 +137,7 @@
 
     <body >
         <cfoutput>
-            <form action="processForm.cfm" method="post">   
+            <form id="formPesquisa">   
                 <div class="container">
                     <!-- Modal -->
                     <div class="modal fade" id="avaliacaoModal" tabindex="-1" role="dialog" aria-labelledby="avaliacaoModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
@@ -208,7 +208,7 @@
                                                     
                                                             <div class="form-check">
                                                                 <label class="form-check-label" for="comunicacao_#i#">#i#</label>
-                                                                <input class="form-check-input" type="radio" name="comunicacao" id="comunicacao_#i#" value="#i#" required>
+                                                                <input class="form-check-input" type="radio" name="pc_pesq_comunicacao" id="comunicacao_#i#" value="#i#" required>
                                                             </div>
                                                     
                                                     </cfloop>
@@ -223,7 +223,7 @@
                                                     <cfloop from="1" to="10" index="i">
                                                         <div class="form-check">
                                                             <label class="form-check-label" for="interlocucao_#i#">#i#</label>
-                                                            <input class="form-check-input" type="radio" name="interlocucao" id="interlocucao_#i#" value="#i#" required>
+                                                            <input class="form-check-input" type="radio" name="pc_pesq_interlocucao" id="interlocucao_#i#" value="#i#" required>
                                                         </div>
                                                     </cfloop>
                                                 </div>
@@ -237,7 +237,7 @@
                                                     <cfloop from="1" to="10" index="i">
                                                         <div class="form-check">
                                                             <label class="form-check-label" for="reuniao_#i#">#i#</label>
-                                                            <input class="form-check-input" type="radio" name="reuniao" id="reuniao_#i#" value="#i#" required>
+                                                            <input class="form-check-input" type="radio" name="pc_pesq_reuniao_encerramento" id="reuniao_#i#" value="#i#" required>
                                                         </div>
                                                     </cfloop>
                                                 </div>
@@ -251,7 +251,7 @@
                                                     <cfloop from="1" to="10" index="i">
                                                         <div class="form-check"  >
                                                             <label class="form-check-label" for="relatorio_#i#">#i#</label>
-                                                            <input class="form-check-input" type="radio" name="relatorio" id="relatorio_#i#" value="#i#" required>
+                                                            <input class="form-check-input" type="radio" name="pc_pesq_relatorio" id="relatorio_#i#" value="#i#" required>
                                                         </div>
                                                     </cfloop>
                                                 </div>
@@ -265,7 +265,7 @@
                                                     <cfloop from="1" to="10" index="i">
                                                         <div class="form-check">
                                                             <label class="form-check-label" for="pos_trabalho_#i#">#i#</label>
-                                                            <input class="form-check-input" type="radio" name="pos_trabalho" id="pos_trabalho_#i#" value="#i#" required>
+                                                            <input class="form-check-input" type="radio" name="pc_pesq_pos_trabalho" id="pos_trabalho_#i#" value="#i#" required>
                                                         </div>
                                                     </cfloop>
                                                 </div>
@@ -279,7 +279,7 @@
                                                     <cfloop from="1" to="10" index="i">
                                                         <div class="form-check">
                                                             <label class="form-check-label" for="importancia_#i#">#i#</label>
-                                                            <input class="form-check-input" type="radio" name="importancia" id="importancia_#i#" value="#i#" required>
+                                                            <input class="form-check-input" type="radio" name="pc_pesq_importancia_processo" id="importancia_#i#" value="#i#" required>
                                                         </div>
                                                     </cfloop>
                                                 </div>
@@ -294,11 +294,11 @@
                                                 <div class="radio-group align-near moverScroll " >
                                                     <div class="form-check" >
                                                         <label class="form-check-label" for="pontualidade_sim">Sim</label>
-                                                        <input class="form-check-input" type="radio" name="pontualidade" id="pontualidade_sim" value="Sim" required>
+                                                        <input class="form-check-input" type="radio" name="pc_pesq_pontualidade" id="pontualidade_sim" value=1 required>
                                                     </div>
                                                     <div class="form-check">
                                                         <label class="form-check-label" for="pontualidade_nao">Não</label>
-                                                        <input class="form-check-input" type="radio" name="pontualidade" id="pontualidade_nao" value="Não" required>
+                                                        <input class="form-check-input" type="radio" name="pc_pesq_pontualidade" id="pontualidade_nao" value=0 required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -306,14 +306,14 @@
 
                                             <div class="form-group no-zebra">
                                                 <label for="observacao" style="margin-right:5px">Observação:</label>
-                                                <textarea class="form-control" id="observacao" name="observacao" rows="2"></textarea>
+                                                <textarea class="form-control" id="observacao" name="pc_pesq_observacao" rows="2"></textarea>
                                             </div>
                                             
                                     
                                 </div>
                                 <div class="modal-footer p-0 card-header_navbar_backgroundColor" style="justify-content: space-between;">
                                     <div class="mx-auto">
-                                        <button type="submit" class="btn btn-success">Enviar</button>
+                                        <button type="button" id="btnSalvarPesquisa" class="btn btn-primary">Salvar</button>
                                     </div>
                                     <div>
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Não responder agora</button>
@@ -343,6 +343,42 @@
                     modalBody.animate({ scrollTop: modalBody.prop("scrollHeight") }, 2000);
                 });
             });
+            $('#btnSalvarPesquisa').on('click', function(e) {
+                e.preventDefault();
+                $('#modalOverlay').modal('show')
+				setTimeout(function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: "cfc/pc_cfcPesquisa.cfc",
+                        data:{
+                                method: "salvarPesquisa",
+                                pc_pesq_comunicacao: $('input[name="pc_pesq_comunicacao"]:checked').val(),
+                                pc_pesq_interlocucao: $('input[name="pc_pesq_interlocucao"]:checked').val(),
+                                pc_pesq_reuniao_encerramento: $('input[name="pc_pesq_reuniao_encerramento"]:checked').val(),
+                                pc_pesq_relatorio: $('input[name="pc_pesq_relatorio"]:checked').val(),
+                                pc_pesq_pos_trabalho: $('input[name="pc_pesq_pos_trabalho"]:checked').val(),
+                                pc_pesq_importancia_processo: $('input[name="pc_pesq_importancia_processo"]:checked').val(),
+                                pc_pesq_pontualidade: $('input[name="pc_pesq_pontualidade"]:checked').val(),
+                                pc_pesq_observacao: $('#observacao').val()
+                            },
+                            async: false
+                    })
+                    .done(function(result) {
+                        toastr.info('Agradecemos a sua colaboração!');	
+                        toastr.success('Pesquisa enviada com sucesso!');
+                        $('#avaliacaoModal').modal('hide');
+
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        console.log(jqXHR, textStatus, errorThrown);
+                        toastr.error('Erro ao realizar a operação!');
+                    }); 
+                }, 1000);
+                $('#modalOverlay').delay(1000).hide(0, function() {
+                    $('#modalOverlay').modal('hide');
+                });
+            });
+
         </script>
          
     </body>
