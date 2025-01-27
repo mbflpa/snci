@@ -98,19 +98,21 @@
 
             // Função para gerar os dados para os indicadores
             // Obtém o ano atual
-			const currentYear = new Date().getFullYear();
-			// Obtém o mês atual
-			const currentMonth = new Date().getMonth() + 1;
+            const currentYear = new Date().getFullYear();
+            // Obtém o mês atual (adiciona 1 porque os meses começam em 0)
+            const currentMonth = new Date().getMonth() + 1;
 
-            //executar a partir do primeiro dia do mês para gerar os dados do mês anterior
+            // Executar a partir do primeiro dia do mês para gerar os dados do mês anterior
             const firstDay = new Date(currentYear, currentMonth - 1, 1);
-          
-           //se a data de hoje for maior ou igual ao primeiro dia do mês e se o usuário for do controle interno, executa a função 
+
+            // Se a data de hoje for maior ou igual ao primeiro dia do mês e se o usuário for do controle interno, executa a função
             if (new Date() >= firstDay && usuarioControleInterno == 'S') {
-               //ontém o mês anterior
-                const previousMonth = new Date().getMonth();
-                // Obtém o ano atual e se o mês for janeiro, subtrai 1 do ano
-                const previousYear = new Date().getMonth() === 0 ? new Date().getFullYear() - 1 : new Date().getFullYear();
+                // Calcula o mês e o ano anterior
+                const now = new Date();
+                const previousMonth = now.getMonth() === 0 ? 12 : now.getMonth(); // Janeiro (0) vira dezembro (12)
+                const previousYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+
+                console.log("Gerar dados para indicadores do mês anterior: " + previousMonth + "/" + previousYear);
                 // Executa a função para gerar os dados para os indicadores
                 $.ajax({//AJAX PARA CONSULTAR OS INDICADORES
                     type: "post",
