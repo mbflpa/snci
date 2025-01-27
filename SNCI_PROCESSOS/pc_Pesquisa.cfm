@@ -200,7 +200,7 @@
                                 
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="comunicacao">1. Comunicação</label>
+                                                    <label for="comunicacao">1. Comunicação <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
                                                     <p class="description">Avalia a clareza, frequência e qualidade das interações com a equipe de Controle Interno. Considere se a equipe de Controle Interno foi acessível, transparente e eficaz ao transmitir informações sobre a condução dos trabalho.</p>
                                                 </div>
                                                 <div class="radio-group">
@@ -216,7 +216,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="interlocucao">2. Interlocução profissional</label>
+                                                    <label for="interlocucao">2. Interlocução profissional <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
                                                     <p class="description">Avalia o comportamento da equipe de Controle Interno ao longo do trabalho. Leve em conta o profissionalismo, o respeito e a atitude colaborativa demonstradas durante o processo.</p>
                                                 </div>
                                                 <div class="radio-group">
@@ -230,7 +230,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="reuniao">3. Reunião de encerramento e validação</label>
+                                                    <label for="reuniao">3. Reunião de encerramento e validação <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
                                                     <p class="description">Avalia a condução da reunião final da equipe de Controle Interno. Considere se a reunião foi clara, direta e se os tópicos foram abordados de maneira simples e objetiva, facilitando o fechamento do processo.</p>
                                                 </div>
                                                 <div class="radio-group">
@@ -244,7 +244,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="relatorio">4. Relatório</label>
+                                                    <label for="relatorio">4. Relatório <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
                                                     <p class="description">Avalia a qualidade do relatório entregue ao final do trabalho da equipe de Controle Interno. Considere se o documento foi redigido de forma clara, com informações consistentes e objetivas, facilitando o entendimento das conclusões e recomendações.</p>
                                                 </div>
                                                 <div class="radio-group moverScroll" >
@@ -258,7 +258,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="pos_trabalho">5. Pós-trabalho</label>
+                                                    <label for="pos_trabalho">5. Pós-trabalho <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
                                                     <p class="description">Avalia o suporte recebido após a conclusão do trabalho da equipe de Controle Interno. Considere se houve disponibilidade para responder dúvidas, se a comunicação foi eficaz e se o atendimento foi prestativo e ágil no período pós-trabalho.</p>
                                                 </div>
                                                 <div class="radio-group moverScroll">
@@ -272,7 +272,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="importancia">6. Importância da avaliação para o aprimoramento do processo</label>
+                                                    <label for="importancia">6. Importância da avaliação para o aprimoramento do processo <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
                                                     <p class="description">Avalia a percepção sobre a contribuição das atividades da equipe de Controle Interno para melhorar o processo avaliado. Considere se o trabalho ajudou a identificar oportunidades de melhoria e contribuiu para o fortalecimento dos controles internos.</p>
                                                 </div>
                                                 <div class="radio-group moverScroll">
@@ -288,7 +288,7 @@
 
                                             <div class="form-group groupPontualidade " >
                                                 <div>
-                                                    <label for="pontualidade" >Pontualidade</label>
+                                                    <label for="pontualidade" >Pontualidade <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
                                                     <p class="description" >Avalia se a equipe de Controle Interno cumpriu os prazos estabelecidos para a condução e entrega do trabalho.</p>
                                                 </div>
                                                 <div class="radio-group align-near moverScroll " >
@@ -329,7 +329,12 @@
        
         <script language="JavaScript">
             $(document).ready(function() {
-                
+                $('#avaliacaoModal').on('hidden.bs.modal', function () {
+                    // Limpa todos os campos de texto, selects e checkboxes
+                    $(this).find('input[type="text"], input[type="password"], textarea, select').val('');
+                    $(this).find('input[type="checkbox"], input[type="radio"]').prop('checked', false);
+                });
+
                 $('#comunicacao').select2();
                 $('#interlocucao').select2();
                 $('#reuniao').select2();
@@ -345,12 +350,25 @@
             });
             $('#btnSalvarPesquisa').on('click', function(e) {
                 e.preventDefault();
-                $('#modalOverlay').modal('show')
-				setTimeout(function() {
-                    $.ajax({
-                        type: 'POST',
-                        url: "cfc/pc_cfcPesquisa.cfc",
-                        data:{
+                var isValid = true;
+
+                // Verifica se todos os campos de rádio obrigatórios estão preenchidos
+                $('input[type="radio"][required]').each(function() {
+                    var name = $(this).attr('name');
+                    if ($('input[name="' + name + '"]:checked').length === 0) {
+                        isValid = false;
+                        toastr.error('Por favor, preencha todos os campos obrigatórios.');
+                        return false; // Sai do loop each
+                    }
+                });
+
+                if (isValid) {
+                    $('#modalOverlay').modal('show');
+                    setTimeout(function() {
+                        $.ajax({
+                            type: 'POST',
+                            url: "cfc/pc_cfcPesquisa.cfc",
+                            data: {
                                 method: "salvarPesquisa",
                                 pc_pesq_comunicacao: $('input[name="pc_pesq_comunicacao"]:checked').val(),
                                 pc_pesq_interlocucao: $('input[name="pc_pesq_interlocucao"]:checked').val(),
@@ -362,21 +380,21 @@
                                 pc_pesq_observacao: $('#observacao').val()
                             },
                             async: false
-                    })
-                    .done(function(result) {
-                        toastr.info('Agradecemos a sua colaboração!');	
-                        toastr.success('Pesquisa enviada com sucesso!');
-                        $('#avaliacaoModal').modal('hide');
-
-                    })
-                    .fail(function(jqXHR, textStatus, errorThrown) {
-                        console.log(jqXHR, textStatus, errorThrown);
-                        toastr.error('Erro ao realizar a operação!');
-                    }); 
-                }, 1000);
-                $('#modalOverlay').delay(1000).hide(0, function() {
-                    $('#modalOverlay').modal('hide');
-                });
+                        })
+                        .done(function(result) {
+                            toastr.info('Agradecemos a sua colaboração!');
+                            toastr.success('Pesquisa enviada com sucesso!');
+                            $('#avaliacaoModal').modal('hide');
+                        })
+                        .fail(function(jqXHR, textStatus, errorThrown) {
+                            console.log(jqXHR, textStatus, errorThrown);
+                            toastr.error('Erro ao salvar a pesquisa: ' + errorThrown);
+                        });
+                    }, 1000);
+                    $('#modalOverlay').delay(1000).hide(0, function() {
+                        $('#modalOverlay').modal('hide');
+                    });
+                }
             });
 
         </script>
