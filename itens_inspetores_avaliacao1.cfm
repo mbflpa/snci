@@ -456,7 +456,7 @@
 						var newH = h + 100;
 						var left = (screen.width-newW)/2;
 						var top = (screen.height-newH)/2;
-						var newwindow = window.open(url, 'name', 'width='+newW+',height='+newH+',left='+left+',top='+top+ ',scrollbars=yes');
+						var newwindow = window.open(url, 'name', 'width='+newW+',height='+newH+',left='+left+',top='+top+ ',scrollbars=yes','popup=true');
 						newwindow.resizeTo(newW, newH);
 						
 						//posiciona o popup no centro da tela
@@ -744,6 +744,8 @@
 <title>Sistema Nacional de Controle Interno</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">   
+<script src="public/bootstrap/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="public\jquery-3.2.1.min.js"></script>
 <script type="text/javascript">
  <cfinclude template="mm_menu.js"> 
@@ -1258,7 +1260,8 @@ function validarform(){
 		if (document.form1.acao.value == 'anexar'){
 				if(document.getElementById('arquivo').value==""){
 						alert('Selecione um arquivo para anexar!');
-						document.getElementById('arquivo').focus();
+						//document.getElementById('arquivo').focus();
+						$('#arquivo').focus()
 						document.getElementById("aguarde").style.visibility = "hidden";
 						return false;
 				}   
@@ -1276,12 +1279,14 @@ function validarform(){
 		if (frm.manchete.value =='' && frm.avalItem.value =='N'){
 			alert('Informar o campo Manchete');
 			document.getElementById("aguarde").style.visibility = "hidden";
-			document.form1.manchete.focus();
+			//document.form1.manchete.focus();
+			$('#manchete').focus()
 			return false;
 		}
 		if (frm.avalItem.value =='N' && frm.nci.value == ''){
 			alert('Informe se houve NCI!');
 			document.getElementById("aguarde").style.visibility = "hidden";
+			$('#nci').focus()
 			return false;
 		}
 //alert('Linha 985');		
@@ -1301,6 +1306,7 @@ function validarform(){
 			if (nsnci.length != 20 || nsnci==''){		
 				alert('N° SEI inválido:  (ex. 99999.999999/9999-99)');
 				document.getElementById("aguarde").style.visibility = "hidden";
+				$('#frmnumseinci').focus()
 				return false;
 			}
 		}
@@ -1312,7 +1318,8 @@ function validarform(){
 			if (x == 'Sim' && (k.length != 20 || k =='')){
 				alert("N° SEI da Apuração Inválido!:  (ex. 99999.999999/9999-99)");
 				document.getElementById("aguarde").style.visibility = "hidden";
-				document.form1.frmnumseinci.focus();
+				//document.form1.frmnumseinci.focus();
+				$('#frmnumseinci').focus()
 				return false;
 			}else{
 				document.getElementById("aguarde").style.visibility = "hidden";
@@ -1326,6 +1333,7 @@ function validarform(){
 		if (document.form1.nci.value == 'S' && el==null ){
 				alert('Para pontos com Nota de Controle Interno é necessário anexar a NCI.');
 				document.getElementById("aguarde").style.visibility = "hidden";
+				$('#nci').focus()
 				return false;
 		}
 //alert('Linha 1029');
@@ -1333,7 +1341,8 @@ function validarform(){
 		if (frm.avalItem.value =='A'){
 			alert('Avalie o item antes de continuar.');
 			document.getElementById("aguarde").style.visibility = "hidden";
-			frm.avalItem.focus();
+			//frm.avalItem.focus();
+			$('#avalItem').focus()
 			return false;
 		}
 //alert('Linha 1037');		
@@ -1343,6 +1352,7 @@ function validarform(){
 		alert('Inspetor(a), para a avaliação "NÃO CONFORME", o campo "Situação Encontrada e/ou Orientações" deve conter, no mínimo, 100 caracteres');
 		document.getElementById('arquivo').value='';
 		document.getElementById("aguarde").style.visibility = "hidden";
+		$('#melhoria').focus()
 		return false;
 		}
 //alert('Linha 1046');		
@@ -1352,6 +1362,7 @@ function validarform(){
 		alert('Inspetor(a), para a avaliação "NÃO CONFORME", o campo "Situação Encontrada e/ou Orientações" deve conter, no mínimo, 100 caracteres');
 		document.getElementById('arquivo').value='';
 		document.getElementById("aguarde").style.visibility = "hidden";
+		$('#melhoria').focus()
 		return false;
 		}	
 //alert('Linha 1055');			
@@ -1362,6 +1373,7 @@ function validarform(){
 			alert('Inspetor(a), para a avaliação "CONFORME", o campo "Situação Encontrada" deve ser preenchido com, pelo menos, 100(cem) caracteres!');
 			document.getElementById("melhoria").focus();
 			document.getElementById("aguarde").style.visibility = "hidden";
+			$('#melhoria').focus()
 			return false;
 		}
 //alert('Linha 1065');		
@@ -1373,6 +1385,7 @@ function validarform(){
 			alert('Inspetor(a), para a avaliação "NÃO VERIFICADO", o campo "Situação Encontrada" deve conter a justificativa com, pelo menos, 100(cem) caracteres!');
 			document.getElementById("melhoria").focus();
 			document.getElementById("aguarde").style.visibility = "hidden";
+			$('#melhoria').focus()
 			return false;
 		}
 //alert('Linha 1077');	
@@ -2001,18 +2014,18 @@ auxvlr: #auxvlr# <br>
 
 <table width="68%"  align="center" bordercolor="eeeeee">
   <tr>
-    <td height="20" colspan="6"><div align="center"><strong class="titulo2"><cfoutput>#rsItem.Dir_Descricao#</cfoutput></strong></div></td>
+    <td height="20" colspan="6" bgcolor="eeeeee"><div align="center"><strong class="titulo2"><cfoutput>#rsItem.Dir_Descricao#</cfoutput></strong></div></td>
   </tr>
   <tr>
-    <td height="20" colspan="6">&nbsp;</td>
+    <td height="20" colspan="6" bgcolor="eeeeee">&nbsp;</td>
   </tr>
   <tr>
-    <td height="10" colspan="6"><div align="center"><strong class="titulo1">AVALIAÇÃO ITEM</strong></div></td>
+    <td height="10" colspan="6" bgcolor="eeeeee"><div align="center"><strong class="titulo1">AVALIAÇÃO ITEM</strong></div></td>
   </tr>
   
 
   <tr>
-    <td height="20" colspan="6">&nbsp;</td>
+    <td height="20" colspan="6" bgcolor="eeeeee">&nbsp;</td>
   </tr>
   <form name="form1" method="post" onSubmit="return validarform()" enctype="multipart/form-data" action="itens_inspetores_avaliacao1.cfm">
 <!--- variaveis de formulario --->
@@ -2137,7 +2150,7 @@ auxvlr: #auxvlr# <br>
     <tr class="exibir">
       <td bgcolor="eeeeee">Nº Avaliação</td>
       <td colspan="6" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Data Início da Avaliação&nbsp;<strong class="exibir"><cfoutput>#DateFormat(rsItem.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>
-      </tr>
+    </tr>
     <tr class="exibir">
       <td bgcolor="eeeeee">Grupo</td>
       <td colspan="6" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ngrup#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#URL.DGrup#</strong></cfoutput></td>
@@ -2311,35 +2324,42 @@ auxvlr: #auxvlr# <br>
 </tr> 
 --->	
 <cfset existeanexos = 'N'>
-<tr bgcolor="eeeeee">
-			<cfif trim(rsItem.RIP_NCISEI) eq "">
-				<cfset auxnci = "N">
-				<cfset numncisei = "">
-			<cfelse>
-				<cfset auxnci = "S">
-				<cfset numncisei = trim(rsItem.RIP_NCISEI)>
-				<cfset numncisei = left(numncisei,5) & '.' & mid(numncisei,6,6) & '/' & mid(numncisei,12,4) & '-' & right(numncisei,2)>
-			</cfif>
-
-			<input type="hidden" name="nseincirel" id="nseincirel" value="<cfoutput>#numncisei#</cfoutput>">
-			<td colspan="2" valign="middle" bgcolor="white" class="exibir">Houve Nota de Controle?&nbsp;&nbsp;
-				<select name="nci" id="nci" class="form"  onChange="hanci();mensagemNCI();controleNCI();">
-						<option value="N"<cfif trim(rsItem.RIP_NCISEI) eq '' > selected</cfif>>Nao</option>
-						<option value="S" <cfif trim(rsItem.RIP_NCISEI) neq ''> selected</cfif>>Sim</option>
+<cfif trim(rsItem.RIP_NCISEI) eq "">
+	<cfset auxnci = "N">
+	<cfset numncisei = "">
+<cfelse>
+	<cfset auxnci = "S">
+	<cfset numncisei = trim(rsItem.RIP_NCISEI)>
+	<cfset numncisei = left(numncisei,5) & '.' & mid(numncisei,6,6) & '/' & mid(numncisei,12,4) & '-' & right(numncisei,2)>
+</cfif>
+<input type="hidden" name="nseincirel" id="nseincirel" value="<cfoutput>#numncisei#</cfoutput>">
+<tr class="exibir">
+	<td align="center" bgcolor="eeeeee"><strong>Nota de Controle?</strong></td>
+	<td colspan="6" bgcolor="eeeeee">
+		<div class="row"> 
+			<div class="col" align="center">
+				<select name="nci" id="nci" class="form-select"  onChange="hanci();mensagemNCI();controleNCI();">
+					<option value="N"<cfif trim(rsItem.RIP_NCISEI) eq '' > selected</cfif>>Não</option>
+					<option value="S" <cfif trim(rsItem.RIP_NCISEI) neq ''> selected</cfif>>Sim</option>
 				</select>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</div>
+			<div class="col" align="center">
+			</div>
+			<div class="col" align="center">
+			</div>
+			<div class="col" align="center">
+			</div>
+			<div class="col" align="left" name="ncisei" id="ncisei" style="POSITION: relative; LEFT: -280px;">Nº SEI da NCI:
+				<input name="frmnumseinci" id="frmnumseinci" type="text" class="form-control" onBlur="controleNCI()"  onKeyPress="numericos();" onKeyDown="validacao(); Mascara_SEI(this);" size="27" maxlength="20" value="<cfoutput>#numncisei#</cfoutput>">
+			</div>			
+		</div>
+	</td>
+</tr>
 <cfif numncisei neq "">
-						<script>
-							document.form1.nci.selectedIndex = 1;
-						</script>
-			  </cfif>			</td>
-			
-			<td  colspan="6" bgcolor="white" class="exibir">
-				<div name="ncisei" id="ncisei" style="POSITION: relative; LEFT: -280px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;N&ordm; SEI da NCI:
-					<input name="frmnumseinci" id="frmnumseinci" type="text" class="form" onBlur="controleNCI()"  onKeyPress="numericos();" onKeyDown="validacao(); Mascara_SEI(this);" size="27" maxlength="20" value="<cfoutput>#numncisei#</cfoutput>">
-				</div>			</td>
-	  </tr>
-
+	<script>
+		document.form1.nci.selectedIndex = 1;
+	</script>
+</cfif>
 	
 	<div id="divAnexos" name="divAnexos" >
 
@@ -2348,14 +2368,14 @@ auxvlr: #auxvlr# <br>
 		</tr>
 
 		<tr>
-			<td colspan="4" bgcolor="eeeeee" class="exibir"><strong class="exibir">Arquivo:</strong><input  id="arquivo" name="arquivo" class="botao" type="file" size="50" style="display:none"></td>
+			<td colspan="4" bgcolor="eeeeee">Arquivo:<input id="arquivo" name="arquivo" class="form-control" type="file" size="50" style="display:none"></td>
 			<cfif '#grpacesso#' eq "INSPETORES">
-				<td colspan="2" bgcolor="eeeeee" class="exibir" align="center"><input id="procurar"name="procurar" type="submit" style="display:none" class="botao" onClick="CKupdate();document.form1.acao.value='anexar';document.form1.recomendacoes.disabled = false;<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>" value="anexar"></td>			
+				<td colspan="2" bgcolor="eeeeee" align="center"><input id="procurar"name="procurar" type="submit" style="display:none" class="btn btn-info" onClick="CKupdate();document.form1.acao.value='anexar';document.form1.recomendacoes.disabled = false;<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>" value="Anexar"></td>			
 			</cfif>
 		</tr>
 		<tr>
-			<td colspan="6">&nbsp;</td>
-		</tr>
+			<td height="20" colspan="6" bgcolor="eeeeee">&nbsp;</td>
+		  </tr>
 		<cfset cla = 0>
 		<cfloop query= "qAnexos">
 			<cfif FileExists(qAnexos.Ane_Caminho)>
@@ -2371,15 +2391,15 @@ auxvlr: #auxvlr# <br>
 				<td colspan="1"bgcolor="#eeeeee"><cfset arquivo = ListLast(qAnexos.Ane_Caminho,'\')>
 						<div align="center">
 							&nbsp;
-							<input name="Abrir" id="Abrir" type="button" class="botao"  value="Abrir" onClick="window.open('abrir_pdf_act.cfm?arquivo=<cfoutput>#arquivo#</cfoutput>','_blank')" />
+							<input name="Abrir" id="Abrir" type="button" class="btn btn-info"  value="Abrir" onClick="window.open('abrir_pdf_act.cfm?arquivo=<cfoutput>#arquivo#</cfoutput>','_blank','popup=true')">
 				</div></td>
 				<td colspan="1" bgcolor="eeeeee">
 					<cfoutput>
 						<div align="center">
 						<cfif (cla eq qAnexos.recordcount)>
-							<input id="Excluir" name="Excluir" type="submit" class="botao" onClick="document.form1.acao.value='excluir_anexo';document.form1.vCodigo.value='#qAnexos.Ane_Codigo#';<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>;document.form1.recomendacoes.disabled = false;" value="Excluir" codigo="#qAnexos.Ane_Codigo#">
+							<input id="Excluir" name="Excluir" type="submit" class="btn btn-danger" onClick="document.form1.acao.value='excluir_anexo';document.form1.vCodigo.value='#qAnexos.Ane_Codigo#';<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>;document.form1.recomendacoes.disabled = false;" value="Excluir" codigo="#qAnexos.Ane_Codigo#">
 						<cfelse>
-							<input id="Excluir" name="Excluir" type="submit" class="botao" onClick="document.form1.acao.value='excluir_anexo';document.form1.vCodigo.value='#qAnexos.Ane_Codigo#';<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>;document.form1.recomendacoes.disabled = false;" value="Excluir" codigo="#qAnexos.Ane_Codigo#" disabled>					
+							<input id="Excluir" name="Excluir" type="submit" class="btn btn-danger" onClick="document.form1.acao.value='excluir_anexo';document.form1.vCodigo.value='#qAnexos.Ane_Codigo#';<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='S';</cfif>;document.form1.recomendacoes.disabled = false;" value="Excluir" codigo="#qAnexos.Ane_Codigo#" disabled>					
 						</cfif>
 						</div>
 					</cfoutput>
@@ -2389,19 +2409,24 @@ auxvlr: #auxvlr# <br>
 		</cfloop>
 	</div>
 	<tr>
-      <td colspan="6">&nbsp;</td>
+      <td colspan="6" bgcolor="eeeeee">&nbsp;</td>
     </tr>
 	    <tr>
-      <td colspan="6" align="center"><cfoutput>
+      <td colspan="6" align="center" bgcolor="eeeeee"><cfoutput>
 		<div style="position:absolute;top:145px;left:12px">
-		   <input  name="button" type="button" class="botao" style="cursor:pointer;font-size:18px;background:transparent;color:##000;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=##0a366bb0,endColorstr=##053c7e);" 
-		   onClick="window.open('itens_inspetores_avaliacao.cfm?numInspecao=#URL.Ninsp#&Unid=#url.Unid#','_self')" value="Voltar">
+		   <input  name="button" type="button" style="cursor:pointer;font-size:18px;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=##0a366bb0,endColorstr=##053c7e);" 
+		   onClick="window.open('itens_inspetores_avaliacao.cfm?numInspecao=#URL.Ninsp#&Unid=#url.Unid#','_self')" class="btn btn-warning" value="Voltar">
 		</div> 
-        <input name="button" type="button" class="botao" onClick="window.open('itens_inspetores_avaliacao.cfm?numInspecao=#URL.Ninsp#&Unid=#url.Unid#','_self')" value="Voltar">
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<cfif '#grpacesso#' eq "INSPETORES"> 
-            <input name="btnsalvar" id="btnsalvar" type="Submit" class="botao" value="Salvar" onClick="CKupdate();document.form1.acao.value='Salvar';<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='R';</cfif>">
-		</cfif>
+		<div class="row"> 
+        <div class="col" align="center">
+			<cfif '#grpacesso#' eq "INSPETORES"> 
+				<input name="btnsalvar" id="btnsalvar" type="Submit" class="btn btn-primary" value="Salvar" onClick="CKupdate();document.form1.acao.value='Salvar';<cfif "#rsItem.RIP_Recomendacao#" is 'S'>document.form1.emReanalise.value='R';</cfif>">
+			</cfif>
+		</div>  
+		<div class="col" align="center">
+			<input name="button" type="button" class="btn btn-warning" onClick="window.open('itens_inspetores_avaliacao.cfm?numInspecao=#URL.Ninsp#&Unid=#url.Unid#','_self')" value="Voltar">
+		</div> 
+	</div> 
       </cfoutput></td>
     </tr>
 	<cfoutput>	
