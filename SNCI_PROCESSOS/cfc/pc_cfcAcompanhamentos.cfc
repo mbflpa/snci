@@ -2864,8 +2864,6 @@
 								, pc_classificacoes.pc_class_descricao,  pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu, pc_avaliacao_orientacoes.*,
 								pc_orgao_OrientacaoResp.pc_org_sigla as orgaoRespOrientacao, pc_orgao_OrientacaoResp.pc_org_mcu as mcuOrgaoRespOrientacao
 								
-						
-
 			FROM        pc_processos INNER JOIN
 								pc_avaliacoes on pc_processo_id =  pc_aval_processo INNER JOIN
 								pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id INNER JOIN
@@ -2882,6 +2880,7 @@
 
 		</cfquery>		
 
+				<!--COLOCAR AQUI UMA CFQUERY QUE RETORNE SE É ÚLTIMO ITEM A SER AVALIADO-->
 			
 				<div id="accordionCadItemPainel" style="margin-top:0px;hright:100vh">
 					<cfif application.rsOrgaoSubordinados.recordcount neq 0>
@@ -3260,6 +3259,7 @@
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										//$('#modalOverlay').modal('hide');
 										toastr.success('Operação realizada com sucesso!');
+										$('#avaliacaoModal').modal('show');
 									});			
 
 								})//fim done
@@ -3306,6 +3306,7 @@
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide');
 										toastr.success('Operação realizada com sucesso!');
+										$('#avaliacaoModal').modal('show');
 									});			
 								})//fim done
 								.fail(function(xhr, ajaxOptions, thrownError) {

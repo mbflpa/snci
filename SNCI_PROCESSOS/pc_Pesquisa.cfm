@@ -131,22 +131,26 @@
             }
 
             .error-message {
-                position: absolute;
-                color: red;
-                font-size: 0.8rem;
-                margin-top: -3rem;
-                right: 0;
-                margin-right: 5rem;
+                position: absolute!important; 
+                color: red!important; 
+                font-size: 0.8rem!important; 
+                margin-top: -3rem!important; 
+                right: 0!important; 
+                margin-right: 5rem!important; 
             }
             .error-message-sim-nao{
-                position: absolute;
-                color: red;
-                font-size: 0.8rem;
-                margin-top: -3rem;
-                right: 0;
-                margin-right: 34rem;
+                position: absolute!important; 
+                color: red!important; 
+                font-size: 0.8rem!important; 
+                margin-top: -3rem!important; 
+                right: 0!important; 
+                margin-right: 34rem!important; 
             }
-            
+
+            #modalOverlay {
+                z-index:1051!important;  /* Valor superior ao do avaliacaoModal */
+            }
+
         </style>
 
     </head>
