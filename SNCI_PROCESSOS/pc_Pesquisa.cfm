@@ -130,6 +130,22 @@
                 background-color: aliceblue !important; 
             }
 
+            .error-message {
+                position: absolute;
+                color: red;
+                font-size: 0.8rem;
+                margin-top: -3rem;
+                right: 0;
+                margin-right: 5rem;
+            }
+            .error-message-sim-nao{
+                position: absolute;
+                color: red;
+                font-size: 0.8rem;
+                margin-top: -3rem;
+                right: 0;
+                margin-right: 34rem;
+            }
             
         </style>
 
@@ -200,7 +216,7 @@
                                 
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="comunicacao">1. Comunicação <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
+                                                    <label for="comunicacao">1. Comunicação </label>
                                                     <p class="description">Avalia a clareza, frequência e qualidade das interações com a equipe de Controle Interno. Considere se a equipe de Controle Interno foi acessível, transparente e eficaz ao transmitir informações sobre a condução dos trabalho.</p>
                                                 </div>
                                                 <div class="radio-group">
@@ -216,7 +232,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="interlocucao">2. Interlocução profissional <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
+                                                    <label for="interlocucao">2. Interlocução profissional </label>
                                                     <p class="description">Avalia o comportamento da equipe de Controle Interno ao longo do trabalho. Leve em conta o profissionalismo, o respeito e a atitude colaborativa demonstradas durante o processo.</p>
                                                 </div>
                                                 <div class="radio-group">
@@ -230,7 +246,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="reuniao">3. Reunião de encerramento e validação <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
+                                                    <label for="reuniao">3. Reunião de encerramento e validação </label>
                                                     <p class="description">Avalia a condução da reunião final da equipe de Controle Interno. Considere se a reunião foi clara, direta e se os tópicos foram abordados de maneira simples e objetiva, facilitando o fechamento do processo.</p>
                                                 </div>
                                                 <div class="radio-group">
@@ -244,7 +260,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="relatorio">4. Relatório <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
+                                                    <label for="relatorio">4. Relatório </label>
                                                     <p class="description">Avalia a qualidade do relatório entregue ao final do trabalho da equipe de Controle Interno. Considere se o documento foi redigido de forma clara, com informações consistentes e objetivas, facilitando o entendimento das conclusões e recomendações.</p>
                                                 </div>
                                                 <div class="radio-group moverScroll" >
@@ -258,7 +274,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="pos_trabalho">5. Pós-trabalho <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
+                                                    <label for="pos_trabalho">5. Pós-trabalho </label>
                                                     <p class="description">Avalia o suporte recebido após a conclusão do trabalho da equipe de Controle Interno. Considere se houve disponibilidade para responder dúvidas, se a comunicação foi eficaz e se o atendimento foi prestativo e ágil no período pós-trabalho.</p>
                                                 </div>
                                                 <div class="radio-group moverScroll">
@@ -272,7 +288,7 @@
                                             </div>
                                             <div class="form-group">
                                                 <div>
-                                                    <label for="importancia">6. Importância da avaliação para o aprimoramento do processo <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
+                                                    <label for="importancia">6. Importância da avaliação para o aprimoramento do processo </label>
                                                     <p class="description">Avalia a percepção sobre a contribuição das atividades da equipe de Controle Interno para melhorar o processo avaliado. Considere se o trabalho ajudou a identificar oportunidades de melhoria e contribuiu para o fortalecimento dos controles internos.</p>
                                                 </div>
                                                 <div class="radio-group moverScroll">
@@ -286,9 +302,9 @@
                                             </div>
 
 
-                                            <div class="form-group groupPontualidade " >
+                                            <div class="form-group erro2 groupPontualidade" >
                                                 <div>
-                                                    <label for="pontualidade" >Pontualidade <span style="color:red;font-size:0.5rem">(Obrigatório)</span></label>
+                                                    <label for="pontualidade" >Pontualidade </label>
                                                     <p class="description" >Avalia se a equipe de Controle Interno cumpriu os prazos estabelecidos para a condução e entrega do trabalho.</p>
                                                 </div>
                                                 <div class="radio-group align-near moverScroll " >
@@ -352,12 +368,24 @@
                 e.preventDefault();
                 var isValid = true;
 
+                // Remove mensagens de erro anteriores
+                $('.error-message').remove();
+                $('.error-message-sim-nao').remove();
+
                 // Verifica se todos os campos de rádio obrigatórios estão preenchidos
                 $('input[type="radio"][required]').each(function() {
                     var name = $(this).attr('name');
                     if ($('input[name="' + name + '"]:checked').length === 0) {
                         isValid = false;
-                        toastr.error('Por favor, preencha todos os campos obrigatórios.');
+                        
+                        var $formGroup = $(this).closest('.form-group');
+                        var errorMessage;
+                        if ($formGroup.hasClass('erro2')) {
+                            errorMessage = $('<div class="error-message-sim-nao">Por favor, selecione uma opção abaixo.</div>');
+                        } else {
+                            errorMessage = $('<div class="error-message">Por favor, selecione uma opção abaixo.</div>');
+                        }
+                        $formGroup.find('.radio-group').before(errorMessage);
                         return false; // Sai do loop each
                     }
                 });
