@@ -10,9 +10,7 @@
       <cfargument name="pc_pesq_importancia_processo" type="numeric" required="true">
       <cfargument name="pc_pesq_pontualidade" type="numeric" required="true">
       <cfargument name="pc_pesq_observacao" type="string" required="false" default="">
-      <cfargument name="pc_usu_matricula" type="string" required="false" default="88888888">
       <cfargument name="pc_processo_id" type="string" required="false" default="0100042024">
-      <cfargument name="pc_org_mcu" type="string" required="false" default="00436967">
 
       <!-- Tentativa de salvar os dados -->
       <cfquery datasource="#application.dsn_processos#">
@@ -25,8 +23,8 @@
               pc_pesq_importancia_processo,
               pc_pesq_pontualidade,
               pc_pesq_observacao,
-              pc_usu_matricula,
               pc_processo_id,
+              pc_usu_matricula,
               pc_org_mcu
           )
           VALUES (
@@ -38,9 +36,9 @@
               <cfqueryparam value="#arguments.pc_pesq_importancia_processo#" cfsqltype="cf_sql_integer">,
               <cfqueryparam value="#arguments.pc_pesq_pontualidade#" cfsqltype="cf_sql_integer">,
               <cfqueryparam value="#arguments.pc_pesq_observacao#" cfsqltype="cf_sql_varchar" maxlength="255">,
-              <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar" maxlength="50">,
               <cfqueryparam value="#arguments.pc_processo_id#" cfsqltype="cf_sql_varchar" maxlength="10">,
-              <cfqueryparam value="#arguments.pc_org_mcu#" cfsqltype="cf_sql_varchar" maxlength="8">
+              <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar" maxlength="50">,
+              <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar" maxlength="8">
           )
       </cfquery>
      

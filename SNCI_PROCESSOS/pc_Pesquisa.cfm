@@ -208,9 +208,10 @@
                                             </thead>
                                             <tbody>
                                                 <tr style="font-size:0.7rem">
-                                                    <td>0100012024</td>
-                                                    <td>33333.333333/3333-33</td>
-                                                    <td>33333333</td>
+                                                    <td>#rsProc.pc_processo_id#</td>
+                                                    <cfset sei = left(#rsProc.pc_num_sei#,5) & '.'& mid(#rsProc.pc_num_sei#,6,6) &'/'& mid(#rsProc.pc_num_sei#,12,4) &'-'&right(#rsProc.pc_num_sei#,2)>
+                                                    <td>#sei#</td>
+                                                    <td>#rsProc.pc_num_rel_sei#</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -402,6 +403,9 @@
                 });
 
                 if (isValid) {
+                    <cfoutput>
+                        let processoPesquisa = '#rsProc.pc_processo_id#';
+                    </cfoutput>
                     $('#modalOverlay').modal('show');
                     setTimeout(function() {
                         $.ajax({
@@ -416,7 +420,9 @@
                                 pc_pesq_pos_trabalho: $('input[name="pc_pesq_pos_trabalho"]:checked').val(),
                                 pc_pesq_importancia_processo: $('input[name="pc_pesq_importancia_processo"]:checked').val(),
                                 pc_pesq_pontualidade: $('input[name="pc_pesq_pontualidade"]:checked').val(),
-                                pc_pesq_observacao: $('#observacao').val()
+                                pc_pesq_observacao: $('#observacao').val(),
+                                pc_processo_id: processoPesquisa
+
                             },
                             async: false
                         })

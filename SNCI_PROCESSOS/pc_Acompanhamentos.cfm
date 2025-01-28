@@ -30,7 +30,7 @@
 		
 		
 		<cfinclude template="pc_NavBar.cfm">
-		<cfinclude template="pc_Pesquisa.cfm">
+	
 	<!-- Content Wrapper. Contains page content -->
 	<div class="content-wrapper" >
 		<!-- Content Header (Page header) -->

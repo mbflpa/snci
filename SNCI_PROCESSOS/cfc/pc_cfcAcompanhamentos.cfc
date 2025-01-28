@@ -2976,7 +2976,7 @@
 					
 					</div>
 
-					
+						<cfinclude template="../pc_Pesquisa.cfm">
 				</div>
 			
 
