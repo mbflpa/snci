@@ -1016,8 +1016,6 @@ tbody {
 											##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a></div>
 									</td>
 
-									
-									
 									<td width="5%">
 										<div align="center"><a onClick="return confExc('NaoFinalizadas','Confirma a exclusão desta Avaliação? \n#trim(NIP_NumInspecao)#-#trim(Und_Descricao)#(#trim(Und_Codigo)#)');" href="cadastro_inspecao.cfm?acao=excNumInsp&numInspecao=#NIP_NumInspecao#&unidade=#NIP_Unidade#"><img src="icones/lixeiraRosa.png" alt="Clique para excluir este cadastro" width="17" height="17" border="0" ></a></div>
 									</td>
@@ -1293,11 +1291,8 @@ tbody {
 							<td width="5%">
 								<div align="center">Inspetores</div>
 							</td>
-							
-
 						</tr>
 
-					
 					<cfset scor = 'white'>
 					<cfset avaliada = 0>
 					<cfoutput query="rsEmRevisaoFinalizadasSemNC">
@@ -1435,7 +1430,20 @@ tbody {
 										<div align="left">#UsuApelido#</div>
 									</td>
 									<td width="5%" height="25px">
-										<div align="center"><a  onclick="abrirFormInspetores('#rsInspCaInsp.INP_NumInspecao#',#rsInspCaInsp.INP_Coordenador#)" href="##0"><img src="figuras/usuario.png" alt="Clique para visualizar os inspetores desta Avaliação" width="20" height="20" border="0" ></img></a></div>
+										<!--- <div align="center"><a  onclick="abrirFormInspetores('#rsInspCaInsp.INP_NumInspecao#',#rsInspCaInsp.INP_Coordenador#)" href="##0"><img src="figuras/usuario.png" alt="Clique para visualizar os inspetores desta Avaliação" width="20" height="20" border="0" ></img></a></div> --->
+										<div align="center">
+											<a href="cadastro_inspecao_inspetores_alt.cfm?
+											numInspecao=#rsInspCaInsp.INP_NumInspecao#
+											&Unid=#rsInspCaInsp.INP_Unidade#
+											&coordenador=#rsInspCaInsp.INP_Coordenador#
+											&dtInicDeslocamento=#DateFormat(rsInspCaInsp.INP_DtInicDeslocamento,'dd/mm/yyyy')#
+											&dtFimDeslocamento=#DateFormat(rsInspCaInsp.INP_DtFimDeslocamento,'dd/mm/yyyy')#
+											&dtInicInspecao=#DateFormat(rsInspCaInsp.INP_DtInicInspecao,'dd/mm/yyyy')#
+											&dtFimInspecao=#DateFormat(rsInspCaInsp.INP_DtFimInspecao,'dd/mm/yyyy')#
+											&RIPMatricAvaliador=N
+											&telaretorno=cadastro_inspecao.cfm
+											##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a>													
+											</div>										
 									</td>
 							</tr>
 						
