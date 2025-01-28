@@ -3259,7 +3259,7 @@
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										//$('#modalOverlay').modal('hide');
 										toastr.success('Operação realizada com sucesso!');
-										$('#avaliacaoModal').modal('show');
+										
 									});			
 
 								})//fim done
@@ -3283,6 +3283,8 @@
 					cancelButtonText: 'Cancelar!'
 					}).then((result) => {
 						if (result.isConfirmed) {	
+							$('#avaliacaoModal').modal('show');
+							return false;
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
@@ -3306,7 +3308,7 @@
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide');
 										toastr.success('Operação realizada com sucesso!');
-										$('#avaliacaoModal').modal('show');
+										
 									});			
 								})//fim done
 								.fail(function(xhr, ajaxOptions, thrownError) {
