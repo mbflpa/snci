@@ -397,12 +397,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-Fechamento/
-
-/Fechamento/**
-
-/Fechamento
-
 .vscode/settings.json
 Desenv_Gilvan/*
 /Desenv_Gilvan/*
