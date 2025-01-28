@@ -363,6 +363,12 @@
                     var modalBody = $(this).closest('.modal').find('.modal-body');
                     modalBody.animate({ scrollTop: modalBody.prop("scrollHeight") }, 2000);
                 });
+
+                // Remove mensagem de erro ao selecionar uma opção
+                $('input[type="radio"]').on('change', function() {
+                    var $formGroup = $(this).closest('.form-group');
+                    $formGroup.find('.error-message, .error-message-sim-nao').remove();
+                });
             });
             $('#btnSalvarPesquisa').on('click', function(e) {
                 e.preventDefault();
@@ -379,14 +385,15 @@
                         isValid = false;
                         
                         var $formGroup = $(this).closest('.form-group');
-                        var errorMessage;
-                        if ($formGroup.hasClass('erro2')) {
-                            errorMessage = $('<div class="error-message-sim-nao">Por favor, selecione uma opção abaixo.</div>');
-                        } else {
-                            errorMessage = $('<div class="error-message">Por favor, selecione uma opção abaixo.</div>');
+                        if ($formGroup.find('.error-message, .error-message-sim-nao').length === 0) {
+                            var errorMessage;
+                            if ($formGroup.hasClass('erro2')) {
+                                errorMessage = $('<div class="error-message-sim-nao">Por favor, selecione uma opção abaixo.</div>');
+                            } else {
+                                errorMessage = $('<div class="error-message">Por favor, selecione uma opção abaixo.</div>');
+                            }
+                            $formGroup.find('.radio-group').before(errorMessage);
                         }
-                        $formGroup.find('.radio-group').before(errorMessage);
-                        return false; // Sai do loop each
                     }
                 });
 
@@ -410,11 +417,12 @@
                             async: false
                         })
                         .done(function(result) {
+                            $('#avaliacaoModal').modal('hide');
                             toastr.info('Agradecemos a sua colaboração!');
                             toastr.success('Pesquisa enviada com sucesso!');
-                            $('#avaliacaoModal').modal('hide');
                         })
                         .fail(function(jqXHR, textStatus, errorThrown) {
+                            $('#avaliacaoModal').modal('hide');
                             console.log(jqXHR, textStatus, errorThrown);
                             toastr.error('Erro ao salvar a pesquisa: ' + errorThrown);
                         });
