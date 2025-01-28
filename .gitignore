@@ -397,12 +397,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-Fechamento/
-
-/Fechamento/**
-
-/Fechamento
-
 .vscode/settings.json
 Desenv_Gilvan/*
 /Desenv_Gilvan/*
@@ -418,6 +412,5 @@ orlando/*
 IMAGENS_ICONES/*
 IMAGENS_ORIENTACOES/*
 IMAGENS_AVALIACOES/*
-Dados/REG_LOG_SNCI.csv
 
 IMAGENS_AVALIACOES/*
