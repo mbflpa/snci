@@ -352,6 +352,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+	<link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">  
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title><cfif #grpacesso# eq 'GESTORES' or #grpacesso# eq 'DESENVOLVEDORES'>SNCI - ENVIA O ITEM PARA REANÁLISE PELO INSPETOR<CFELSE>SNCI - RECOMENDAÇÕES AO INSPETOR</CFIF></title>
 <link rel="stylesheet" type="text/css" href="view.css" media="all">
@@ -450,7 +451,7 @@
 			</div>
 
             <div  style="background:#0a3865;border:1px solid #fff;font-family:Verdana, Arial, Helvetica, sans-serif">
-		    	<label style="color:white"><strong>Histórico das Recomenda&ccedil;&otilde;es ao Inspetor:</strong></label>
+		    	<label style="color:white"><strong>Histórico das Recomendações ao Inspetor:</strong></label>
 				<textarea  <cfif #grpacesso# eq "inspetores">readonly</cfif> id="auxrecomendacao" name="auxrecomendacao" 
 				style="background:#fff;color:black;text-align:justify;" cols="90" 
 				rows="8" 
@@ -458,7 +459,7 @@
 			</div>
 			<cfif #grpacesso# eq 'GESTORES'> 
 				<div  style="background:#0a3865;border:1px solid #fff;font-family:Verdana, Arial, Helvetica, sans-serif">
-					<label style="color:white"><strong>Recomenda&ccedil;&otilde;es ao Inspetor:</strong></label>
+					<label style="color:white"><strong>Recomendações ao Inspetor:</strong></label>
 					<textarea  <cfif #grpacesso# eq "INSPETORES">readonly</cfif> id="recomendacao" name="recomendacao" 
 					style="background:#fff;color:black;text-align:justify;" cols="90" 
 					rows="<cfif '#trim(qOrientacao.RIP_Recomendacao_Inspetor)#' neq ''>4<cfelse>6</cfif>" 
@@ -509,16 +510,16 @@
 	
 			<cfif #grpacesso# eq 'INSPETORES'>	
 
-			    	<button type="submit" class="botao" onClick="document.form1.acao.value='respostacomreanalise';return validarform();" 
-				 	style="white-space:normal;width:195px;height:45px;padding:2px;text-align:center;margin-top:10px;cursor:pointer;background-color:blue;color:#fff" >
+			    	<button type="submit" class="btn btn-primary" onClick="document.form1.acao.value='respostacomreanalise';return validarform();" 
+				 	style="white-space:normal;width:220px;height:90px;padding:2px;text-align:center;margin-top:10px;cursor:pointer;background-color:blue;color:#fff" >
 			        Salvar Resposta para o Gestor <br>e iniciar a Reanálise</button>
 
-					<button type="submit" class="botao" onClick="document.form1.acao.value='respSemAlteracao';return validarformSemReavaliar();" 
-				 	style="margin-left:40px;white-space:normal;width:195px;height:45px;padding:2px;text-align:center;margin-top:10px;cursor:pointer;background-color:red;color:#fff" >
+					<button type="submit" class="btn btn-danger" onClick="document.form1.acao.value='respSemAlteracao';return validarformSemReavaliar();" 
+				 	style="margin-left:40px;white-space:normal;width:220px;height:90px;padding:2px;text-align:center;margin-top:10px;cursor:pointer;background-color:red;color:#fff" >
 			        Salvar Resposta para o Gestor <br>sem realizar alterações no item</button>	
 			</cfif>
 
-			   <input type="button" class="botao" style="padding:2px;text-align:center;margin-left:40px;cursor:pointer" value="Fechar" onclick="window.close();"
+			   <input type="button" class="btn btn-info" style="padding:2px;text-align:center;margin-left:40px;cursor:pointer" value="Fechar" onclick="window.close();"
 		
 
 
