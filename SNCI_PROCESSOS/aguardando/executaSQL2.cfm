@@ -135,7 +135,7 @@
         <cfoutput>#registro.codigo#, </cfoutput>
     </cfloop>
 
-    <cfset totalRegistros = totalAceitos + totalPendentes + totalPendentesRefazer>
+    <cfset totalRegistros =  totalPendentes + totalPendentesRefazer>
 
     <cfoutput><h2>Total de registros atualizados: #totalRegistros#</h2></cfoutput>
 
