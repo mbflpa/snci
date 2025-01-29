@@ -374,11 +374,7 @@
                     var $formGroup = $(this).closest('.form-group');
                     $formGroup.find('.error-message, .error-message-sim-nao').remove();
                 });
-                //ouvinte para se o modal estiver em show, a mensagem será exibida
-                $('#avaliacaoModal').on('show.bs.modal', function() {
-                    toastr.info('Por favor, responda esta pesquisa de opinião.');
-                });
-
+                
             });
             $('#btnSalvarPesquisa').on('click', function(e) {
                 e.preventDefault();
