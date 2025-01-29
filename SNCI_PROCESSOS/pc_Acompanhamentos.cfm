@@ -54,10 +54,6 @@
 		<!-- Main content -->
 		<section class="content">
 			<div class="container-fluid">
-				 <!-- Botão para abrir o modal pesquisa-->
-				<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#avaliacaoModal">
-					<i class="fas fa-edit"></i> Abrir Avaliação
-				</button>
 				<div class="card card-primary card-tabs card_border_correios"  style="width:100%">
 					<div class="card-header p-0 pt-1 card-header_backgroundColor" >
 						

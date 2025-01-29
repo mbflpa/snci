@@ -3283,8 +3283,8 @@
 					cancelButtonText: 'Cancelar!'
 					}).then((result) => {
 						if (result.isConfirmed) {	
-							$('#avaliacaoModal').modal('show');
-							return false;
+							
+							
 							setTimeout(function() {
 								$.ajax({
 									type: "post",
@@ -3302,13 +3302,15 @@
 								})//fim ajax
 								.done(function(result) {	
 									$('#pcPosicAcomp').val('')
-									exibirTabela()
-									$('#informacoesItensAcompanhamentoDiv').html('')
-									$('#timelineViewAcompDiv').html('')
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										toastr.success('Operação realizada com sucesso!');
-										
+									toastr.success('Envio da manifestação realizado com sucesso!');
+									$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
+										$('#modalOverlay').modal('show');
+										exibirTabela();
+										$('#informacoesItensAcompanhamentoDiv').html('');
+										$('#timelineViewAcompDiv').html('');
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});
 									});			
 								})//fim done
 								.fail(function(xhr, ajaxOptions, thrownError) {
