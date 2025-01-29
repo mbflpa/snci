@@ -3310,6 +3310,8 @@
 										$('#timelineViewAcompDiv').html('');
 										$('#modalOverlay').delay(1000).hide(0, function() {
 											$('#modalOverlay').modal('hide');
+											$('.modal-backdrop').remove(); // Remove o backdrop
+        									$('body').removeClass('modal-open'); // Remove a classe que impede o scroll
 										});
 									});			
 								})//fim done
@@ -3367,6 +3369,7 @@
 			}
 
 			function exibirTabela(){
+				$('#modalOverlay').modal('show');
 				setTimeout(function() {
 					$.ajax({
 						type: "post",
@@ -3380,9 +3383,9 @@
 							
 						},
 						error: function(xhr, ajaxOptions, thrownError) {
-							//$('#modalOverlay').delay(1000).hide(0, function() {
-								//$('#modalOverlay').modal('hide');
-							//});
+							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
+							});
 							$('#modal-danger').modal('show')
 							$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
 							$('#modal-danger').find('.modal-body').text(thrownError)
