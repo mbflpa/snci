@@ -88,13 +88,14 @@
              LEFT(pc_processos.pc_num_sei, 5) + '.' + SUBSTRING(pc_processos.pc_num_sei, 6, 6) + '/' + SUBSTRING(pc_processos.pc_num_sei, 12, 4) + '-' + RIGHT(pc_processos.pc_num_sei, 2) AS sei,
              pc_processos.pc_num_rel_sei,
              pc_processos.pc_num_avaliacao_tipo,
+             pc_orgaos.pc_org_mcu AS orgao_avaliado_mcu,
+             pc_orgaos.pc_org_sigla AS orgao_avaliado_sigla,
+             pc_orgaos.pc_org_se_sigla AS orgao_avaliado_se_sigla,
              pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
              pc_avaliacao_tipos.pc_aval_tipo_processoN1,
              pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-             pc_avaliacao_tipos.pc_aval_tipo_processoN3,
-             pc_orgaos.pc_org_mcu AS orgao_avaliado_mcu,
-             pc_orgaos.pc_org_sigla AS orgao_avaliado_sigla,
-             pc_orgaos.pc_org_se_sigla AS orgao_avaliado_se_sigla
+             pc_avaliacao_tipos.pc_aval_tipo_processoN3
+             
       FROM pc_processos
       LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
       LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu
@@ -110,13 +111,14 @@
         sei: rsProcTab.sei,
         pc_num_rel_sei: rsProcTab.pc_num_rel_sei,
         pc_num_avaliacao_tipo: rsProcTab.pc_num_avaliacao_tipo,
+        orgao_avaliado_mcu: rsProcTab.orgao_avaliado_mcu,
+        orgao_avaliado_sigla: rsProcTab.orgao_avaliado_sigla,
+        orgao_avaliado_se_sigla: rsProcTab.orgao_avaliado_se_sigla,
         pc_aval_tipo_macroprocessos: rsProcTab.pc_aval_tipo_macroprocessos,
         pc_aval_tipo_processoN1: rsProcTab.pc_aval_tipo_processoN1,
         pc_aval_tipo_processoN2: rsProcTab.pc_aval_tipo_processoN2,
-        pc_aval_tipo_processoN3: rsProcTab.pc_aval_tipo_processoN3,
-        orgao_avaliado_mcu: rsProcTab.orgao_avaliado_mcu,
-        orgao_avaliado_sigla: rsProcTab.orgao_avaliado_sigla,
-        orgao_avaliado_se_sigla: rsProcTab.orgao_avaliado_se_sigla
+        pc_aval_tipo_processoN3: rsProcTab.pc_aval_tipo_processoN3
+        
       }>
       <cfset arrayAppend(processos, processo)>
     </cfloop>

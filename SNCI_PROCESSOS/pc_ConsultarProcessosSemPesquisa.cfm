@@ -67,13 +67,14 @@
 										<th>ID do Processo</th>
 										<th>Número SEI</th>
 										<th>Número Relatório SEI</th>
+                                        <th>Órgão Avaliado MCU</th>
+										<th>Órgão Avaliado Sigla</th>
+										<th>Órgão Avaliado SE Sigla</th>
 										<th>Macroprocessos</th>
 										<th>Processo N1</th>
 										<th>Processo N2</th>
 										<th>Processo N3</th>
-										<th>Órgão Avaliado MCU</th>
-										<th>Órgão Avaliado Sigla</th>
-										<th>Órgão Avaliado SE Sigla</th>
+										
 									</tr>
 								</thead>
 								<tbody></tbody>
@@ -133,9 +134,20 @@
 				$("#texto_card-title").html(`Selecione um Processo <span style="font-size:14px; color:#fff!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
 				exibirTabela(radioValue);
 			});
+
+            
 		});
 
+
+
 		function exibirTabela(anoMostra) {
+            let colunasMostrar = [4, 5, 6, 7, 8];
+            var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+
+			var d = day + "-" + month + "-" + year;	
 			$("#modalOverlay").modal("show");
 			$('#exibirTab').hide();
 			$("#exibirTab").html('');
@@ -151,7 +163,6 @@
 				success: function (result) {
 					try {
 						const data = typeof result === "string" ? JSON.parse(result) : result;
-						console.log("Dados recebidos:", data);
 
 						if (!Array.isArray(data) || data.length === 0) {
 							console.warn("Nenhum dado encontrado");
@@ -161,20 +172,21 @@
 
 						let tableHTML = "";
 						data.forEach(processo => {
-							tableHTML += `<tr>
-								<td>${processo.pc_processo_id}</td>
-								<td>${processo.sei}</td>
-								<td>${processo.pc_num_rel_sei}</td>
-								<td>${processo.pc_aval_tipo_macroprocessos}</td>
-								<td>${processo.pc_aval_tipo_processoN1}</td>
-								<td>${processo.pc_aval_tipo_processoN2}</td>
-								<td>${processo.pc_aval_tipo_processoN3}</td>
-								<td>${processo.orgao_avaliado_mcu}</td>
-								<td>${processo.orgao_avaliado_sigla}</td>
-								<td>${processo.orgao_avaliado_se_sigla}</td>
-							</tr>`;
-						});
-
+                            tableHTML += `<tr>
+                                <td>${processo.PC_PROCESSO_ID || 'N/A'}</td>
+                                <td>${processo.SEI || 'N/A'}</td>
+                                <td>${processo.PC_NUM_REL_SEI || 'N/A'}</td>
+                                <td>${processo.ORGAO_AVALIADO_MCU || 'N/A'}</td>
+                                <td>${processo.ORGAO_AVALIADO_SIGLA || 'N/A'}</td>
+                                <td>${processo.ORGAO_AVALIADO_SE_SIGLA || 'N/A'}</td>
+                                <td>${processo.PC_AVAL_TIPO_MACROPROCESSOS || 'N/A'}</td>
+                                <td>${processo.PC_AVAL_TIPO_PROCESSON1 || 'N/A'}</td>
+                                <td>${processo.PC_AVAL_TIPO_PROCESSON2 || 'N/A'}</td>
+                                <td>${processo.PC_AVAL_TIPO_PROCESSON3 || 'N/A'}</td>
+                                
+                            </tr>`;
+                        });
+                       
 						if ($.fn.DataTable.isDataTable("#tabProcessos")) {
 							$("#tabProcessos").DataTable().clear().draw();
 						}
@@ -183,90 +195,49 @@
 
 						setTimeout(() => {
 							$("#tabProcessos").DataTable({
-								destroy: true,
-								ordering: false,
-								stateSave: true,
-								scrollY: "150px",
-								filter: false,
-								scrollX: true,
-								scrollCollapse: true,
-								deferRender: true,
-								pageLength: 3,
-								buttons: [
-									{
-										extend: 'excelHtml5',
-										text: '<i class="fas fa-file-excel fa-2x grow-icon"></i>',
-										title: 'SNCI_Processos_' + new Date().toLocaleDateString('pt-BR'),
-										className: 'btExcel',
-										exportOptions: {
-											columns: ':visible'
-										},
-										customize: function (xlsx) {
-											var sheet = xlsx.xl.worksheets['sheet1.xml'];
-											$('row:eq(0) c', sheet).attr('s', '50');
-											$('row:eq(0) c', sheet).attr('s', '2');
-											$('row:eq(1) c', sheet).attr('s', '51');
-											$('row:eq(1) c', sheet).attr('s', '2');
-										},
-										customizeData: function (data) {
-											for (var i = 0; i < data.body.length; i++) {
-												var rowData = data.body[i];
-												for (var j = 0; j < rowData.length; j++) {
-													var cellData = rowData[j];
-													if (cellData.includes('&nbsp;')) {
-														rowData[j] = cellData.replace(/&nbsp;/g, ' ');
-													}
-												}
-											}
-										}
-									},
-									{
-										extend: 'colvis',
-										text: 'Selecionar Colunas',
-										className: 'btSelecionarColuna',
-										collectionLayout: 'fixed three-column',
-										colvisButton: true
-									},
-									{
-										text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
-										action: function (e, dt, node, config) {
-											$('#modalOverlay').modal('show');
-											setTimeout(function () {
-												dt.columns().visible(true);
-											}, 500);
-											$('#modalOverlay').delay(1000).hide(0, function () {
-												$('#modalOverlay').modal('hide');
-											});
-										}
-									},
-									{
-										text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
-										action: function (e, dt, node, config) {
-											$('#modalOverlay').modal('show');
-											setTimeout(function () {
-												dt.columns().visible(false);
-											}, 500);
-											$('#modalOverlay').delay(1000).hide(0, function () {
-												$('#modalOverlay').modal('hide');
-											});
-										}
-									}
-								],
-                                
-								dom: 
+								stateSave: false,
+                                autoWidth: true,// Ajustar automaticamente o tamanho das colunas
+                                pageLength: 5,
+                                dom: 
                                     "<'row d-flex align-items-center'<'col-auto dtsp-verticalContainer'P><'col-auto'B><'col-auto'f><'col-auto'p>>" + // Botões, filtros e paginação na mesma linha, alinhados à esquerda
                                     "<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
                                     "<'row'<'col-12'tr>>",  // Tabela com todos os dados
+                                        
+                                buttons: [
+                                    {
+                                        extend: 'excel',
+                                        text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
+                                        title : "Processos_sem_pesquisas_" + d,
+                                        className: 'btExcel',
+                                    },
+                                    {// Botão abertura do ctrol-sidebar com os filtros
+                                        text: '<i class="fas fa-filter fa-2x grow-icon" style="margin-right:30px" data-widget="control-sidebar"></i>',
+                                        className: 'btFiltro',
+                                    },
+
+                                ],
+                                
+                                searchPanes: {
+                                    cascadePanes: true, // Exibir apenas opções que combinam com os filtros anteriores
+                                    columns: colunasMostrar,// Colunas que terão filtro
+                                    threshold: 1,// Número mínimo de registros para exibir Painéis de Pesquisa
+                                    layout: 'columns-1', //layout do filtro com uma coluna
+                                    initCollapsed: true, // Colapsar Painéis de Pesquisa
+                                },
 								drawCallback: function (settings) {
-									$('#exibirTabExportarDiv').show();
-									$('#exibirTabExportarSpinnerDiv').html('');
+								
 								},
+                                initComplete: function () {// Função executada ao finalizar a inicialização do DataTable
+                                    initializeSearchPanesAndSidebar(this)//inicializa o searchPanes dentro do controlSidebar
+                                    $('#exibirTabExportarDiv').show();
+									$('#exibirTabExportarSpinnerDiv').html('');
+                                },
                                 
 								language: {
 									url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
 								}
-							}).buttons().container().appendTo('#tabProcessos_wrapper .col-md-6:eq(0)');
-						}, 300);
+							})
+						}, 1000);
 
 						$("#modalOverlay").delay(1000).hide(0, function () {
 							$("#modalOverlay").modal("hide");
