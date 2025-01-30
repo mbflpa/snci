@@ -24,7 +24,7 @@
 <link href="../../../css.css" rel="stylesheet" type="text/css" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <script>
-// Fun��o imprimir
+// Função imprimir
 function imprimir(){
     var quant = document.forms[0].elements.length;
       for(var i = 0; i < quant; i++){
@@ -68,7 +68,7 @@ function imprimir(){
 <table border="0" widtd="100%">
  <cfif qryRelatorio.recordcount is 0>
    <tr>
-    <td  valign="baseline" bordercolor="999999" bgcolor="F5F5F5" class="red_titulo"><div align="center"><span class="style2">Caro colaborador n&atilde;o h&aacute; registros para &agrave; unidade solicitada</span></div></td>
+    <td  valign="baseline" bordercolor="999999" bgcolor="F5F5F5" class="red_titulo"><div align="center"><span class="style2">Caro colaborador não há registros para unidade solicitada</span></div></td>
    </tr>
    </table>
    <cfabort>  
@@ -86,14 +86,14 @@ function imprimir(){
       <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left"><span class="style2">Departamento de Controle Interno</span></div></td>
     </tr>
     <tr>
-      <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left"> <span class="style2">Relat&oacute;rio de Controle Interno</span> </div></td>
+      <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left"> <span class="style2">Relatório de Controle Interno</span> </div></td>
     </tr>
     <tr>
       <td colspan="10" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row">&nbsp;</td>
     </tr>
     <tr>
       <td width="33" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left" class="labelcell"></div></td>
-      <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Superintend&ecirc;ncia:</div></th>
+      <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Superintendência:</div></th>
       <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify"><cfoutput>#qryRelatorio.Dir_Descricao#</cfoutput></div></td>
     </tr>
     <tr>
@@ -103,7 +103,7 @@ function imprimir(){
     </tr>
     <tr>
       <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left" class="labelcell"></div></td>
-      <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Per&iacute;odo do Relat&oacute;rio:</div></th>
+      <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Período do Relatório:</div></th>
       <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify"><cfoutput>#DateFormat(qryRelatorio.INP_DtInicInspecao,'dd/mm/yyyy')#</cfoutput>
               <label class="fieldcell"> a </label>
       <cfoutput>#DateFormat(qryRelatorio.INP_DtFimInspecao,'dd/mm/yyyy')#</cfoutput></div></td>
@@ -111,7 +111,7 @@ function imprimir(){
 	 <cfset Num_Insp = Left(qryRelatorio.INP_NumInspecao,2) & '.' & Mid(qryRelatorio.INP_NumInspecao,3,4) & '/' & Right(qryRelatorio.INP_NumInspecao,4)>
     <tr>
       <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left" class="labelcell"></div></td>
-      <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">N&ordm; do Relat&oacute;rio:</div></th>
+      <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Nº do Relatório:</div></th>
       <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify"><cfoutput>#Num_Insp#</cfoutput></div></td>
     </tr>
     <tr>
@@ -119,7 +119,7 @@ function imprimir(){
     </tr>
     <tr>
       <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row">&nbsp;</td>
-      <th colspan="9" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">4. Situa&ccedil;&atilde;o Encontrada e Orienta&ccedil;&otilde;es</div></th>
+      <th colspan="9" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">4. Situação Encontrada e Orientações</div></th>
     </tr>
     <tr>
       <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row">&nbsp;</td>
@@ -133,6 +133,8 @@ function imprimir(){
       <cfset CP = 0>
 
 <cfoutput query="qryRelatorio" group="Grp_Codigo">
+  <cfset situatual = qryRelatorio.Pos_Situacao_Resp>
+  <cfif situatual neq 0 and situatual neq 11 and situatual neq 12 and situatual neq 13>
       <tr>
         <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"> <label class="labelcell"> </label>
             <div align="left"></div></td>
@@ -161,26 +163,13 @@ function imprimir(){
 		 </cfif>	  
      <tr>
         <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row">&nbsp;</td>
-        <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Relev&acirc;ncia Ponto: </div></th>
-        <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Pontua&ccedil;&atilde;o:&nbsp;#auxpontua#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Classifica&ccedil;&atilde;o: #auxclassif#</div></td>
+        <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Relevância Ponto: </div></th>
+        <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Pontuação:&nbsp;#auxpontua#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Classificação: #auxclassif#</div></td>
         </tr> 
 
-<!---  --->	
-     <!---  <tr>
-        <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row">
-      �</td> --->
-       <!---  <th colspan="2" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Risco:</div></th>
-        <td colspan="6" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify">#SGrav#</div></td> --->
-        </tr>
-<!--- 		#RIP_Comentario#
-		<cfif len(trim(RIP_Comentario)) neq 0>
-			<cfset coment = Replace(RIP_Comentario,'','<BR>' ,'All')>
-		<cfelse>
-		    <cfset coment = "---------------------------------">
-		</cfif> --->
       <tr>
         <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row">&nbsp;</td>
-        <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Situa&ccedil;&atilde;o Encontrada:</div></th>
+        <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Situação Encontrada:</div></th>
         <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify">#Replace(RIP_Comentario,'IMAGENS_AVALIACOES/','../../../IMAGENS_AVALIACOES/','ALL')#</div></td>
       </tr>
 
@@ -195,48 +184,13 @@ function imprimir(){
          <cfset recom = Replace(recom,"-----------------------------------------------------------------------------------------------------------------------","<BR>-----------------------------------------------------------------------------------------------------------------------<BR>" ,"All")>
       <tr>
         <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left" class="labelcell"></div></td>
-        <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Orienta&ccedil;&otilde;es:</div></th>
+        <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Orientações:</div></th>
         <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row">#recom#</td>
       </tr>
 		 <cfset parecer = Replace(Pos_Parecer,"
 ","<BR>" ,"All")>
-		 <cfset parecer = Replace(parecer,"Respons�vel:","<BR>Respons�vel:" ,"All")>
+		 <cfset parecer = Replace(parecer,"Responsável:","<BR>Responsável:" ,"All")>
 		 <cfset parecer = Replace(parecer,"-----------------------------------------------------------------------------------------------------------------------","<BR>-----------------------------------------------------------------------------------------------------------------------<BR>" ,"All")>
-     <!--- <tr>
-        <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left" class="labelcell"></div></td>
-        <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Hist&oacute;rico das manifesta&ccedil;&otilde;es:</div></th>
-        <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5"><div align="justify">#parecer#</div></td>
-      </tr>
-      <tr>
-        <td valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left" class="labelcell">
-            <div align="center"></div>
-          </div>
-  �    </td>
-        <th colspan="2" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left">Situa&ccedil;&atilde;o:</div></th>
-        <td colspan="6" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify">
-              <cfif qryRelatorio.Pos_Situacao_Resp eq 0>
-                Responder
-                <cfelseif qryRelatorio.Pos_Situacao_Resp eq 1>
-                Resposta Unidade
-                <cfelseif qryRelatorio.Pos_Situacao_Resp eq 2>
-                Pendente Unidade
-                <cfelseif qryRelatorio.Pos_Situacao_Resp eq 3>
-                Solucionado
-                <cfelseif qryRelatorio.Pos_Situacao_Resp eq 4>
-                Pendente �rg�o Subordinador
-                <cfelseif qryRelatorio.Pos_Situacao_Resp eq 5>
-                Pendente �rea
-                <cfelseif qryRelatorio.Pos_Situacao_Resp eq 6>
-                Resposta �rea
-                <cfelseif qryRelatorio.Pos_Situacao_Resp eq 7>
-                Resposta �rg�o Subordinador
-                <cfelseif qryRelatorio.Pos_Situacao_Resp eq 8>
-                Corporativo DR
-                <cfelseif qryRelatorio.Pos_Situacao_Resp eq 9>
-                Corporativo AC
-            </cfif>
-        </div></td>
-        </tr>--->
   <tr>
     <td valign="top" bordercolor="999999" bgcolor="F5F5F5"></td>
     <cfinvoke component="#vRelatorio#.GeraRelatorio.gerador.ctrl.controller"
@@ -258,6 +212,7 @@ function imprimir(){
     <tr>
      <td colspan="10" valign="top" bordercolor="999999" bgcolor="CCCCCC" scope="row">&nbsp;</td>
     </tr>
+</cfif>    
 </cfoutput>
   <tr>
     <td bordercolor="999999" bgcolor="F5F5F5" scope="row">&nbsp;</td>
@@ -274,7 +229,7 @@ function imprimir(){
 	 <cfset matricula = (Left(mat,1) & '.' & Mid(mat,2,3) & '.***-' & Right(mat,1))>
      <tr>
        <th valign="top" bordercolor="999999" bgcolor="F5F5F5">&nbsp;</th>
-       <th width="10%" valign="top" bordercolor="999999" bgcolor="F5F5F5"><div align="left">Coordenador:</div></th>
+       <th width="10%" valign="top" bordercolor="999999" bgcolor="F5F5F5"><div align="left">Coordenador(a):</div></th>
        <td width="14%" valign="top" bordercolor="999999" bgcolor="F5F5F5"><div align="center"><cfoutput>
             <div align="center">#matricula#</div>
        </cfoutput></div></td>
@@ -301,7 +256,7 @@ function imprimir(){
     </tr>
     <tr>
       <th width="1%" bordercolor="999999" bgcolor="F5F5F5">&nbsp;</th>
-      <th colspan="3" bordercolor="999999" bgcolor="F5F5F5"><div align="right">Data/Hora de Emiss&atilde;o:</div></th>
+      <th colspan="3" bordercolor="999999" bgcolor="F5F5F5"><div align="right">Data/Hora de Emissão:</div></th>
       <td bordercolor="999999" bgcolor="F5F5F5"><cfoutput>#DateFormat(Now(),"DD/MM/YYYY")#</cfoutput> - <cfoutput>#TimeFormat(Now(),'HH:MM')#</cfoutput></td>
     </tr>
     <tr>
