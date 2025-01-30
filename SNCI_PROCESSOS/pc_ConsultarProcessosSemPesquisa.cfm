@@ -67,7 +67,6 @@
 										<th>ID do Processo</th>
 										<th>Número SEI</th>
 										<th>Número Relatório SEI</th>
-                                        <th>Órgão Avaliado MCU</th>
 										<th>Órgão Avaliado Sigla</th>
 										<th>Órgão Avaliado SE Sigla</th>
 										<th>Macroprocessos</th>
@@ -141,7 +140,7 @@
 
 
 		function exibirTabela(anoMostra) {
-            let colunasMostrar = [4, 5, 6, 7, 8];
+            let colunasMostrar = [3,4, 5, 6, 7, 8];
             var currentDate = new Date()
 			var day = currentDate.getDate()
 			var month = currentDate.getMonth() + 1
@@ -176,8 +175,7 @@
                                 <td>${processo.PC_PROCESSO_ID || 'N/A'}</td>
                                 <td>${processo.SEI || 'N/A'}</td>
                                 <td>${processo.PC_NUM_REL_SEI || 'N/A'}</td>
-                                <td>${processo.ORGAO_AVALIADO_MCU || 'N/A'}</td>
-                                <td>${processo.ORGAO_AVALIADO_SIGLA || 'N/A'}</td>
+                                <td>${processo.ORGAO_AVALIADO_SIGLA || 'N/A'} (${processo.ORGAO_AVALIADO_MCU || 'N/A'})</td>
                                 <td>${processo.ORGAO_AVALIADO_SE_SIGLA || 'N/A'}</td>
                                 <td>${processo.PC_AVAL_TIPO_MACROPROCESSOS || 'N/A'}</td>
                                 <td>${processo.PC_AVAL_TIPO_PROCESSON1 || 'N/A'}</td>
@@ -195,6 +193,7 @@
 
 						setTimeout(() => {
 							$("#tabProcessos").DataTable({
+                                destroy: true,
 								stateSave: false,
                                 autoWidth: true,// Ajustar automaticamente o tamanho das colunas
                                 pageLength: 5,
@@ -216,6 +215,21 @@
                                     },
 
                                 ],
+                                customizeData: function (data) {
+									// Percorre os dados exportados
+									for (var i = 0; i < data.body.length; i++) {
+										var rowData = data.body[i];
+										// Percorre as células da linha
+										for (var j = 0; j < rowData.length; j++) {
+											var cellData = rowData[j];
+											// Verifica se cellData é uma string e contém "&nbsp;"
+											if (typeof cellData === 'string' && cellData.includes('&nbsp;')) {
+												// Substitui todas as ocorrências de "&nbsp;" por espaços regulares
+												rowData[j] = cellData.replace(/&nbsp;/g, ' ');
+											}
+										}
+									}
+								},
                                 
                                 searchPanes: {
                                     cascadePanes: true, // Exibir apenas opções que combinam com os filtros anteriores
