@@ -75,4 +75,53 @@
     <cfreturn result>
   </cffunction>
 
+  <!-- Função para obter os processos sem pesquisa cadastrada em formato JSON -->
+  <cffunction name="getProcessosSemPesquisaJSON" access="remote" returntype="any" returnformat="json" output="false">
+    <cfargument name="ano" type="string" required="false" default="Não selecionado"/>
+
+    <cfset var rsProcTab = ''>
+    <cfset var processos = []>
+    <cfset var processo = {}>
+
+    <cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120">
+      SELECT pc_processos.pc_processo_id,
+             LEFT(pc_processos.pc_num_sei, 5) + '.' + SUBSTRING(pc_processos.pc_num_sei, 6, 6) + '/' + SUBSTRING(pc_processos.pc_num_sei, 12, 4) + '-' + RIGHT(pc_processos.pc_num_sei, 2) AS sei,
+             pc_processos.pc_num_rel_sei,
+             pc_processos.pc_num_avaliacao_tipo,
+             pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+             pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+             pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+             pc_avaliacao_tipos.pc_aval_tipo_processoN3,
+             pc_orgaos.pc_org_mcu AS orgao_avaliado_mcu,
+             pc_orgaos.pc_org_sigla AS orgao_avaliado_sigla,
+             pc_orgaos.pc_org_se_sigla AS orgao_avaliado_se_sigla
+      FROM pc_processos
+      LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
+      LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu
+      WHERE right(pc_processos.pc_processo_id, 4) >= 2024
+      <cfif '#arguments.ano#' neq 'TODOS'>
+        AND right(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
+      </cfif>
+    </cfquery>
+
+    <cfloop query="rsProcTab">
+      <cfset processo = {
+        pc_processo_id: rsProcTab.pc_processo_id,
+        sei: rsProcTab.sei,
+        pc_num_rel_sei: rsProcTab.pc_num_rel_sei,
+        pc_num_avaliacao_tipo: rsProcTab.pc_num_avaliacao_tipo,
+        pc_aval_tipo_macroprocessos: rsProcTab.pc_aval_tipo_macroprocessos,
+        pc_aval_tipo_processoN1: rsProcTab.pc_aval_tipo_processoN1,
+        pc_aval_tipo_processoN2: rsProcTab.pc_aval_tipo_processoN2,
+        pc_aval_tipo_processoN3: rsProcTab.pc_aval_tipo_processoN3,
+        orgao_avaliado_mcu: rsProcTab.orgao_avaliado_mcu,
+        orgao_avaliado_sigla: rsProcTab.orgao_avaliado_sigla,
+        orgao_avaliado_se_sigla: rsProcTab.orgao_avaliado_se_sigla
+      }>
+      <cfset arrayAppend(processos, processo)>
+    </cfloop>
+
+    <cfreturn processos>
+  </cffunction>
+
 </cfcomponent>

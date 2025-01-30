@@ -445,67 +445,7 @@
 							$('#modalOverlay').delay(1000).hide(0, function() {
 								$('#divTabela').css('visibility', 'visible');
 								$('.table thead').addClass('table_thead_backgroundColor'); // Aplica a classe ao <thead> ao finalizar a inicialização
-								if(tipo ==='p'){
-									$("#exibirGrafico").html(`
-										<div style="display:flex;justify-content: space-around;margin-bottom:80px;">
-											<div style="margin-top:10px;width:500px;">
-												<canvas id="pieChartProcessos" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-											</div>
-											<div style="margin-top:10px;width:500px">
-												<canvas id="pieChartProcessos2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-											</div>
-										</div>
-									`);
-									setTimeout(function() {
-										graficoPizza ('pie','tabProcessos','CLASSIFICAÇÃO (PROCESSOS)','Classificação','pieChartProcessos')	
-										graficoPizza ('pie','tabProcessos','STATUS (PROCESSOS)','Status do Processo','pieChartProcessos2')	
-									}, 0);
-									
-								}
-								if(tipo ==='i'){
-									$("#exibirGrafico").html(`
-										<div style="display:flex;justify-content: space-around;">
-											<div style="margin-top:10px;width:500px;margin-bottom:80px;">
-												<canvas id="pieChartItens" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-											</div>
-											<div style="margin-top:10px;width:500px;margin-bottom:80px;">
-												<canvas id="pieChartItens2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-											</div>
-										</div>
-									`);
-									setTimeout(function() {
-										graficoPizza ('pie','tabProcessos','CLASSIFICAÇÃO (ITENS)','Classificação do Item','pieChartItens')	
-										graficoPizza ('pie','tabProcessos','STATUS (ITENS)','Status do Item','pieChartItens2')	
-									}, 0);
 								
-								}
-								if(tipo ==='o'){
-									$("#exibirGrafico").html(`
-											<div style = "display:flex;justify-content: space-around;margin-bottom:80px;">
-												<canvas id="pieChartOrientacoes" style="max-width: 50%;margin-left:10px;"></canvas>
-												<div style="margin-top:10px;width:500px">
-													<canvas id="pieChartOrientacoes2" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-												</div>
-											</div>
-									`);
-									setTimeout(function() {
-										graficoBarra ('tabProcessos','STATUS (ORIENTAÇÕES)','Status da Orientação','pieChartOrientacoes')	
-										graficoPizza ('pie','tabProcessos','ACOMPANHAMENTO FINALIZADO (ORIENTAÇÕES)','Acomp. Finalizado?','pieChartOrientacoes2') 
-									},0);
-									
-								}
-								if(tipo ==='m'){
-									$("#exibirGrafico").html(`
-										<div style = "display:flex;justify-content: space-around;margin-bottom:80px;">
-											<div style="margin-top:10px;margin-bottom:80px;width:500px;">
-												<canvas id="pieChartMelhorias" style="min-height: 400px; height: 400px; max-height: 400px; max-width: 100%;"></canvas>
-											</div>
-										</div>
-									`);
-									setTimeout(function() {
-										graficoBarra ('tabProcessos','STATUS (PROPOSTAS DE MELHORIA)','Status da Prop. Melhoria','pieChartMelhorias')
-									}, 0);
-								}
 								$('#modalOverlay').modal('hide');
 							});
 							
