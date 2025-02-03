@@ -1,5 +1,4 @@
 <cfprocessingdirective pageEncoding ="utf-8">
-
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	<cfinclude template="permissao_negada.htm">
 	<cfabort>
@@ -1343,12 +1342,12 @@
                     } // valor declarado
                     if(validarobrig == '1') {
                         validarobrig = '<option value="">---</option>'
-                        validarobrig += '<option value="S" selected>Sim</option>'
-                        validarobrig += '<option value="N">Não</option>'
+                        validarobrig += '<option value="1" selected>Sim</option>'
+                        validarobrig += '<option value="0">Não</option>'
                     }else{
                         validarobrig = '<option value="">---</option>'
-                        validarobrig += '<option value="S">Sim</option>'
-                        validarobrig += '<option value="N" selected>Não</option>'
+                        validarobrig += '<option value="1">Sim</option>'
+                        validarobrig += '<option value="0" selected>Não</option>'
                     }  // validação obrigatória                     
                     $('#selAltItemValorDec').html(vlrdeclarado);
                     $('#selAltVisualizacao').html(visualizar);
