@@ -69,6 +69,7 @@
 										<th>Número Relatório SEI</th>
 										<th>Órgão Avaliado Sigla</th>
 										<th>Órgão Avaliado SE Sigla</th>
+										<th>Órgão Responsável</th>
 										<th>Macroprocessos</th>
 										<th>Processo N1</th>
 										<th>Processo N2</th>
@@ -177,6 +178,7 @@
                                 <td>${processo.PC_NUM_REL_SEI || 'N/A'}</td>
                                 <td>${processo.ORGAO_AVALIADO_SIGLA || 'N/A'} (${processo.ORGAO_AVALIADO_MCU || 'N/A'})</td>
                                 <td>${processo.ORGAO_AVALIADO_SE_SIGLA || 'N/A'}</td>
+								<td>${processo.ORGAO_RESPONSAVEL || 'N/A'} (${processo.ORGAO_RESPONSAVEL_MCU || 'N/A'})</td>
                                 <td>${processo.PC_AVAL_TIPO_MACROPROCESSOS || 'N/A'}</td>
                                 <td>${processo.PC_AVAL_TIPO_PROCESSON1 || 'N/A'}</td>
                                 <td>${processo.PC_AVAL_TIPO_PROCESSON2 || 'N/A'}</td>

@@ -94,12 +94,20 @@
              pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
              pc_avaliacao_tipos.pc_aval_tipo_processoN1,
              pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-             pc_avaliacao_tipos.pc_aval_tipo_processoN3
+             pc_avaliacao_tipos.pc_aval_tipo_processoN3,
+             orgaoResp.pc_org_mcu AS orgaoResp_mcu,
+             orgaoResp.pc_org_sigla AS orgaoResp_sigla
+
+
              
       FROM pc_processos
       LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
       LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu
+      INNER JOIN pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo
+      inner JOIN pc_avaliacao_orientacoes on pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
+      LEFT JOIN pc_orgaos as orgaoResp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = orgaoResp.pc_org_mcu
       WHERE right(pc_processos.pc_processo_id, 4) >= 2024
+      AND pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
       <cfif '#arguments.ano#' neq 'TODOS'>
         AND right(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
       </cfif>
@@ -114,6 +122,8 @@
         orgao_avaliado_mcu: rsProcTab.orgao_avaliado_mcu,
         orgao_avaliado_sigla: rsProcTab.orgao_avaliado_sigla,
         orgao_avaliado_se_sigla: rsProcTab.orgao_avaliado_se_sigla,
+        orgaoResp_mcu: rsProcTab.orgaoResp_mcu,
+        orgaoResp_sigla: rsProcTab.orgaoResp_sigla,
         pc_aval_tipo_macroprocessos: rsProcTab.pc_aval_tipo_macroprocessos,
         pc_aval_tipo_processoN1: rsProcTab.pc_aval_tipo_processoN1,
         pc_aval_tipo_processoN2: rsProcTab.pc_aval_tipo_processoN2,
