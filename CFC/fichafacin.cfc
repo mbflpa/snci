@@ -1,13 +1,14 @@
 <cfcomponent>
 	<cfprocessingdirective pageencoding = "utf-8">	
-	
 	<cfparam name = "dsnSNCI" default = "DBSNCI"> 
-	
+    <cffunction name="init">
+        <cfreturn this>
+    </cffunction>
 	<cffunction name="salvarPosic"   access="remote" hint="salva a manifestação de qualquer usuário">
-<!---
+		<!---
 		<cfdump var=#form#>
-<cfset gil = gil>		
---->	
+		<cfset gil = gil>		
+		--->	
 
 		<cfset form.acaofac = 'INC'>
 		<cfset form.acaofaca = 'INC'>
@@ -87,17 +88,17 @@
 			<!--- <cfdump var="#rsSalva#">  --->
 			<cfset grpitem = rsSalva.RIP_NumGrupo & '_' & rsSalva.RIP_NumItem>
 			<cfset matraval = rsSalva.RIP_NumGrupo & '_' & rsSalva.RIP_NumItem>
-	<!---
-			#grpitem#<br>
-			#RIP_MatricAvaliador#<br>
-	--->
+			<!---
+					#grpitem#<br>
+					#RIP_MatricAvaliador#<br>
+			--->
 			<cfloop collection="#form#" item="nomecampo">
 				<cfif right(nomecampo,8) eq '#RIP_MatricAvaliador#'>
-<!---
-					<tr>
-						<td>#nomecampo#</td> <td>#find("_",nomecampo)#</td> <td>#evaluate("form.#nomecampo#")#</td>
-					</tr>
---->
+			<!---
+				<tr>
+					<td>#nomecampo#</td> <td>#find("_",nomecampo)#</td> <td>#evaluate("form.#nomecampo#")#</td>
+				</tr>
+			--->
 					<!--- meta1 --->
 					<cfif nomecampo eq "FFIMETA1QTDITEM_#RIP_MatricAvaliador#">
 						<cfset FFIMETA1QTDITEM = #evaluate("form.#nomecampo#")#>
@@ -205,10 +206,44 @@
 		</cfif>
 		</cfoutput>
 
-	<cfoutput>
-		<!--- <cflocation url = "../ficha_facin.cfm?form.numinsp=#FACAVALIACAO#&form.grpitem=#form.grp#,#form.itm#"> --->
-		<cflocation url = "../ficha_facin_Ref.cfm?numinsp=#FACAVALIACAO#&acao=buscar"> 
-	</cfoutput>	   
+		<cfoutput>
+			<!--- <cflocation url = "../ficha_facin.cfm?form.numinsp=#FACAVALIACAO#&form.grpitem=#form.grp#,#form.itm#"> --->
+			<cflocation url = "../ficha_facin_Ref.cfm?numinsp=#FACAVALIACAO#&acao=buscar"> 
+		</cfoutput>	   
 	
 	</cffunction>
-	</cfcomponent>
+	<!--- Este método inspetores por ano e cod_se --->
+	<cffunction  name="inspetores" access="remote" ReturnFormat="json" returntype="any">
+		<cfargument name="ano" required="true">
+		<cfargument name="codse" required="true">
+		<cftransaction>
+			<cfquery name="rsInsp" datasource="DBSNCI">
+				SELECT FFI_Avaliador, Fun_Nome
+				FROM UN_Ficha_Facin_Individual 
+				INNER JOIN Funcionarios ON FFI_Avaliador = Fun_Matric
+				GROUP BY FFI_Avaliacao, FFI_Avaliador, Fun_Nome
+				HAVING (((FFI_Avaliacao) Like '%#ano#') AND ((FFI_Avaliacao) Like '#codse#%'))
+				ORDER BY Fun_Nome
+			</cfquery>
+			<cfreturn rsInsp>
+		</cftransaction>
+	</cffunction>  	
+    <!--- Este método Nº das avaliações por ano/cod_se e Matricula inspetor --->
+    <cffunction  name="avaliacao" access="remote" ReturnFormat="json" returntype="any">
+        <cfargument name="ano" required="true">
+        <cfargument name="codse" required="true">
+        <cfargument name="matr" required="true">
+        <cftransaction>
+            <cfquery name="rsavalia" datasource="DBSNCI">
+                SELECT FFI_Avaliacao, Und_Descricao
+                FROM Unidades 
+                INNER JOIN (Inspecao 
+                INNER JOIN UN_Ficha_Facin_Individual ON INP_NumInspecao = FFI_Avaliacao) ON Und_Codigo = INP_Unidade
+                GROUP BY FFI_Avaliador, FFI_Avaliacao, Und_Descricao
+                HAVING (((FFI_Avaliador)='#matr#') AND ((FFI_Avaliacao) Like '%#ano#'))
+                ORDER BY Und_Descricao
+            </cfquery>
+            <cfreturn rsavalia>
+        </cftransaction>
+    </cffunction>  	
+</cfcomponent>

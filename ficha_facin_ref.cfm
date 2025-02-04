@@ -18,26 +18,28 @@
 	<!--- ================= --->
 	<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
 		<cfquery datasource="#dsn_inspecao#" name="rsIncluir">
-			SELECT distinct RIP_NumGrupo, RIP_NumItem
+			SELECT  RIP_NumGrupo,RIP_NumItem,Fun_Nome
 			FROM Resultado_Inspecao 
 			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
+			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
 			left JOIN UN_Ficha_Facin_Avaliador ON (RIP_Unidade = FACA_Unidade) AND (RIP_NumInspecao = FACA_Avaliacao) and (RIP_NumGrupo=FACA_grupo) and (RIP_NumItem=FACA_Item)
-			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and 
-			INP_Situacao = 'CO' AND RIP_Resposta = 'N' and FACA_Avaliacao is null
+			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and RIP_Resposta <> 'A' and FACA_Avaliacao is null
 			<cfif grpacesso eq 'INSPETORES'>
 				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
 			</cfif>
+			order by RIP_NumGrupo, RIP_NumItem
 		</cfquery>	
 		<cfquery datasource="#dsn_inspecao#" name="rsalter">
-			SELECT distinct RIP_NumGrupo, RIP_NumItem
+			SELECT  RIP_NumGrupo,RIP_NumItem,Fun_Nome
 			FROM Resultado_Inspecao 
 			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
+			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
 			INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_Unidade = FACA_Unidade) AND (RIP_NumInspecao = FACA_Avaliacao) and (RIP_NumGrupo=FACA_grupo) and (RIP_NumItem=FACA_Item)
-			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and 
-			INP_Situacao = 'CO' AND RIP_Resposta = 'N' 
+			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and RIP_Resposta <> 'A' and FACA_Matricula = '#qAcesso.Usu_Matricula#'
 			<cfif grpacesso eq 'INSPETORES'>
 				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
 			</cfif>
+			order by RIP_NumGrupo, RIP_NumItem
 		</cfquery>
 	<cfelse>
 	<!--- 	<cfset url.acao = ''> --->
@@ -101,7 +103,7 @@ function valida_form() {
 		return false;
 	}
  // inicio criticas para o bot�o Salvar manifestaçao
-  if (document.form1.acao.value == 'Confirma')
+  if (document.form1.acao.value != '')
   {
 	document.formx.numinsp.value = numinsp;
 	//document.formx.grpitem.value = document.form1.grpitem.value;
@@ -120,16 +122,18 @@ function valida_form() {
 
 <body onLoad="form1.dtinic.focus()"><br>
 <cfif grpacesso neq 'INSPETORES'>
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
-      <cfinclude template="cabecalho.cfm">
-    </table>
-	<table width="100%" height="30%" border="0" align="center" cellpadding="0" cellspacing="0">
-  <tr valign="top">
-   <td width="25%">
-   <cfinclude template="menu_sins.cfm">
-   </td>
-   <td align="center" valign="top">
-   <br><br><br>
+	<cfif isDefined("url.acao") and url.acao eq 'buscar'>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	      <cfinclude template="cabecalho.cfm"> 
+		</table>
+		<table width="100%" height="30%" border="0" align="center" cellpadding="0" cellspacing="0">
+	<tr valign="top">
+	<td width="25%">
+	 <cfinclude template="menu_sins.cfm">
+	</td>
+	<td align="center" valign="top">
+	<br><br><br>
+	</cfif> 
 </cfif> 
 
 <p align="center" class="titulo1"><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><strong>Ficha Avaliação do Controle Interno (FACIN)</strong></font></p>
@@ -137,29 +141,50 @@ function valida_form() {
 <form name="form1" id="form1" method="get" onSubmit="return valida_form()" action="ficha_facin_ref.cfm" target="_self">
   <table width="481" align="center">
     <tr>
-      <td width="127"><span class="exibir"><strong>Nº Avaliação:</strong></span></td>
-      <td width="224">
-	  	<input id="numinsp" name="numinsp" type="text" vazio="false" size="14" maxlength="10" class="form" onKeyPress="numericos()" value="<cfoutput>#numinsp#</cfoutput>" onChange="if (this != '') {document.form1.acao.value = 'buscar'; document.form1.submit()};">
-		<td><input name="buscar" type="button" class="botao" value="Buscar Grupo/Item"></td>
+      <td>
+		<span class="exibir"><strong>Nº Avaliação:</strong></span>&nbsp;&nbsp;<input id="numinsp" name="numinsp" type="text" vazio="false" size="14" maxlength="10" class="form" onKeyPress="numericos()" value="<cfoutput>#numinsp#</cfoutput>" onChange="if (this != '') {document.form1.acao.value = 'buscar'; document.form1.submit()};">
 	  </td>
-	  <td></td>
+	  <td>
+		<input name="buscar" type="button" class="botao" value="Buscar Grupo/Item" align="center">
+	</td>
     </tr>
+
+	<tr>
+
+	</tr>
 	<cfif isDefined("acao")>
-		<tr></tr>
-		<tr></tr>
-		<tr></tr>
 		<tr>
-			<td class="exibir"><strong>Grupo/Item</strong></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+		</tr>
+		<tr>
+			<td colspan="3"><hr></td>
+		</tr>
+		<tr>
+			<td colspan="3" class="exibir" align="left"><strong>Grupo/Item</strong></td>
+		</tr>
+
+		<tr>
 			<td class="exibir"><strong>Incluir</strong></td>
 			<td class="exibir"><strong>Alterar</strong></td>
 		</tr>
 		<tr>
-			<td>&nbsp;</td>
+			<td colspan="3"><hr></td>
+		</tr>
+		<tr>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+		</tr>
+		<tr>
 			<td>
 				<select name="grpitem" id="grpitem" class="form">
 					<cfoutput query="rsIncluir">
 						<cfset grpitm = RIP_NumGrupo & ',' & RIP_NumItem>
-						<cfset nomegrpitm = RIP_NumGrupo & '_' & RIP_NumItem>
+						<cfset nomegrpitm = RIP_NumGrupo & '_' & RIP_NumItem & ' - ' & trim(Fun_Nome)>
 						<option value="#grpitm#">#nomegrpitm#</option>
 					</cfoutput>
 				</select>
@@ -169,7 +194,7 @@ function valida_form() {
 				<select name="grpitem2" id="grpitem2" class="form">
 					<cfoutput query="rsalter">
 						<cfset grpitm = RIP_NumGrupo & ',' & RIP_NumItem>
-						<cfset nomegrpitm = RIP_NumGrupo & '_' & RIP_NumItem>
+						<cfset nomegrpitm = RIP_NumGrupo & '_' & RIP_NumItem& ' - ' & trim(Fun_Nome)>
 						<option value="#grpitm#">#nomegrpitm#</option>
 					</cfoutput>
 				</select>
@@ -184,10 +209,18 @@ function valida_form() {
 <cfif rsalter.recordcount lte 0>
 	<cfset btnalt = 'disabled'>
 </cfif>
+<tr>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+</tr>
 		<tr>
-			<td>&nbsp;</td>
-			<td><input name="Submit1" type="button" class="botao" value="Incluir (FACIN)" onClick="document.form1.acao.value = 'Confirma';document.formx.grpitem.value = document.form1.grpitem.value;valida_form();" <cfoutput>#btninc#</cfoutput>></td>
-			<td><input name="Submit2" type="button" class="botao" value="Alterar (FACIN)" onClick="document.form1.acao.value = 'Confirma';document.formx.grpitem.value = document.form1.grpitem2.value;valida_form();" <cfoutput>#btnalt#</cfoutput>></td>
+			<td><input name="Submit1" type="button" class="botao" value="Incluir (FACIN)" onClick="document.form1.acao.value = 'inc';document.formx.grpitem.value = document.form1.grpitem.value;valida_form();" <cfoutput>#btninc#</cfoutput>></td>
+			<td><input name="Submit2" type="button" class="botao" value="Alterar (FACIN)" onClick="document.form1.acao.value = 'alt';document.formx.grpitem.value = document.form1.grpitem2.value;valida_form();" <cfoutput>#btnalt#</cfoutput>></td>
 		</tr>
 	</cfif>
 	<tr>
