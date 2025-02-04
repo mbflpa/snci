@@ -1234,7 +1234,7 @@
 		<cfquery name="rsMelhoriaPosic" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_melhorias.*, pc_processos.*,pc_avaliacoes.pc_aval_numeracao,pc_avaliacoes.pc_aval_descricao 
 			, pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla, pc_orgaos.pc_org_mcu
-			, pc_avaliacao_tipos.pc_aval_tipo_processoN2
+			, pc_avaliacao_tipos.pc_aval_tipo_processoN2,right(pc_processo_id,4) as ano
 			FROM pc_avaliacao_melhorias
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
@@ -1244,7 +1244,9 @@
 		</cfquery>
 
 		<cfquery name="rsDadosProcessoPesquisa" dbtype="query" >
-			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2, pc_org_sigla as orgaoRespOrientacao FROM rsMelhoriaPosic
+			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2
+			, pc_org_sigla as orgaoRespOrientacao , ano as anoPesquisa
+			FROM rsMelhoriaPosic
 		</cfquery>
 
 		<cfquery name="rsMelhoriaVerificaExistePesquisa" datasource="#application.dsn_processos#">
@@ -1311,12 +1313,6 @@
 
 		<script language="JavaScript">
 			
-			$(document).ready(function(){
-				// $('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
-					
-					
-				// });
-			});
 
 			$('#pcStatusMelhoria').on('change', function (event)  {
 
@@ -1381,6 +1377,7 @@
 					var orgAvaliado = '#rsMelhoriaPosic.pc_num_orgao_avaliado#'
 					var orgResp = '#rsMelhoriaPosic.pc_aval_melhoria_num_orgao#'
 					var existePesquisa 	= '#rsMelhoriaVerificaExistePesquisa.existePesquisa#';
+					var anoPesquisa = '#rsDadosProcessoPesquisa.anoPesquisa#';
 				</cfoutput>
 
 				//verifica se os campos necessários foram preenchidos
@@ -1413,7 +1410,7 @@
 						async: false
 					})//fim ajax
 					.done(function(result) {
-						if(existePesquisa == 0){
+						if(existePesquisa == 0 && anoPesquisa >=2025){
 							$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
 								$('#modalOverlay').modal('show');
 								$('#pcDataPrev').val('')
@@ -2910,7 +2907,7 @@
 								pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 								, pc_classificacoes.pc_class_descricao,  pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu, pc_avaliacao_orientacoes.*,
 								pc_orgao_OrientacaoResp.pc_org_sigla as orgaoRespOrientacao, pc_orgao_OrientacaoResp.pc_org_mcu as mcuOrgaoRespOrientacao
-								
+								,right(pc_processo_id,4) as ano
 			FROM        pc_processos INNER JOIN
 								pc_avaliacoes on pc_processo_id =  pc_aval_processo INNER JOIN
 								pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id INNER JOIN
@@ -2928,7 +2925,9 @@
 		</cfquery>	
 
 		<cfquery name="rsDadosProcessoPesquisa" dbtype="query" >
-			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2,orgaoRespOrientacao FROM rsProc 
+			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2
+			,orgaoRespOrientacao ,ano as anoPesquisa
+			FROM rsProc 
 		</cfquery>
 
 		<cfquery name="rsVerificaExistePesquisa" datasource="#application.dsn_processos#">
@@ -3279,6 +3278,7 @@
 					var pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
 					var numProcesso = "#rsProc.pc_processo_id#";
 					var existePesquisa 	= '#rsVerificaExistePesquisa.existePesquisa#';
+					var anoPesquisa = '#rsDadosProcessoPesquisa.anoPesquisa#';
 				</cfoutput>
 				var statusOrientacao = 3; //staus RESPOSTA DO ÓRGÃO SUBORDINADOR
 				if($('#pcOrientacaoStatus').val()){
@@ -3364,7 +3364,7 @@
 								.done(function(result) {	
 									$('#pcPosicAcomp').val('')
 									toastr.success('Envio da manifestação realizado com sucesso!');
-									if(existePesquisa == 0){
+									if(existePesquisa == 0 && anoPesquisa >=2025){
 										$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
 											$('#modalOverlay').modal('show');
 											exibirTabela();
