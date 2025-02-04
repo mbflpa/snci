@@ -169,52 +169,53 @@
                     INSERT INTO Itens_Verificacao 
                         (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                     VALUES 
-                        ('#form.selAltModalidade#',#form.selAltItemAno#,#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#',#form.altcategoriarisco#,'#form.altcategoriariscooutros#',#form.altmacroprocesso#,#altprocesson1#,'#form.altprocesson1naoseaplica#',#altprocesson2#,#altprocesson3#,'#form.altprocesson3outros#',#form.altgestordir#,#form.altgestordepto#,'#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
-                </cfquery>	 
+                        ('#form.selAltModalidade#',#form.selAltItemAno#,#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#',#form.altcategoriarisco#,'#form.altcategoriariscooutros#',#form.altmacroprocesso#,#altprocesson1#,'#form.altprocesson1naoseaplica#',#altprocesson2#,#altprocesson3#,'#form.altprocesson3outros#',#form.altgestordir#,'#form.altgestordepto#','#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
+                </cfquery>                 
             <cfelse>
                 <!-- Alteração -->
                 <cfquery datasource="#dsn_inspecao#">
-							UPDATE Itens_Verificacao SET
-                                Itn_Descricao='#form.altItemDescricao#'
-                                ,Itn_Orientacao='#form.altItemOrientacao#'
-                                ,Itn_Situacao='D'
-                                ,Itn_DtUltAtu=CONVERT(DATETIME, getdate(), 103)
-                                ,Itn_UserName='#qAcesso.Usu_Matricula#'
-                                ,Itn_ValorDeclarado='#form.selAltItemValorDec#'
-                                ,Itn_Amostra='#form.altItemAmostra#'
-                                ,Itn_Norma='#form.altItemNorma#'
-                                ,Itn_ValidacaoObrigatoria='#form.selAltValidObrig#'
-                                ,Itn_PreRelato='#form.altItemPreRelato#'
-                                ,Itn_OrientacaoRelato='#form.altItemOrientacaoRelato#'
-                                ,Itn_Pontuacao=#pontuacao#
-                                ,Itn_PTC_Seq='#altpontuacaoseq#'
-                                ,Itn_Classificacao='#ClassifITEM#'
-                                ,Itn_Manchete='#form.altItemManchete#'
-                                ,Itn_ClassificacaoControle='#form.altclassifcontrole#'
-                                ,Itn_ControleTestado='#form.altcontroletestado#'
-                                ,Itn_CategoriaControle='#form.itncategoriacontroleAlt#'
-                                ,Itn_RiscoIdentificado=#form.altcategoriarisco#
-                                ,Itn_RiscoIdentificadoOutros='#form.altcategoriariscooutros#'
-                                ,Itn_MacroProcesso=#form.altmacroprocesso#
-                                ,Itn_ProcessoN1=#altprocesson1#
-                                ,Itn_ProcessoN1NaoAplicar='#form.altprocesson1naoseaplica#'
-                                ,Itn_ProcessoN2=#altprocesson2#
-                                ,Itn_ProcessoN3=#altprocesson3#
-                                ,Itn_ProcessoN3Outros='#form.altprocesson3outros#'
-                                ,Itn_GestorProcessoDir=#form.altgestordir#
-                                ,Itn_GestorProcessoDepto=#form.altgestordepto#
-                                ,Itn_ObjetivoEstrategico='#form.itnaltobjetivoestrategicoAlt#'
-                                ,Itn_RiscoEstrategico='#form.itnaltriscoestrategicoAlt#'
-                                ,Itn_IndicadorEstrategico='#form.itnaltindicadorestrategicoAlt#'
-                                ,Itn_Coso2013Componente=#form.altcomponentecoso#
-                                ,Itn_Coso2013Principios=#form.altprincipioscoso#
-                            WHERE
-                                Itn_Modalidade = '#form.selAltModalidade#' AND 
-                                Itn_Ano = #form.selAltItemAno# AND 
-                                Itn_TipoUnidade = #tipo# AND 
-                                Itn_NumGrupo = #form.selAltItemGrupo# AND 
-                                Itn_NumItem = #form.selAltItem#                             
-                </cfquery>                
+                    UPDATE Itens_Verificacao SET
+                        Itn_Descricao='#form.altItemDescricao#'
+                        ,Itn_Orientacao='#form.altItemOrientacao#'
+                        ,Itn_Situacao='D'
+                        ,Itn_DtUltAtu=CONVERT(DATETIME, getdate(), 103)
+                        ,Itn_UserName='#qAcesso.Usu_Matricula#'
+                        ,Itn_ValorDeclarado='#form.selAltItemValorDec#'
+                        ,Itn_Amostra='#form.altItemAmostra#'
+                        ,Itn_Norma='#form.altItemNorma#'
+                        ,Itn_ValidacaoObrigatoria='#form.selAltValidObrig#'
+                        ,Itn_PreRelato='#form.altItemPreRelato#'
+                        ,Itn_OrientacaoRelato='#form.altItemOrientacaoRelato#'
+                        ,Itn_Pontuacao=#pontuacao#
+                        ,Itn_PTC_Seq='#altpontuacaoseq#'
+                        ,Itn_Classificacao='#ClassifITEM#'
+                        ,Itn_Manchete='#form.altItemManchete#'
+                        ,Itn_ClassificacaoControle='#form.altclassifcontrole#'
+                        ,Itn_ControleTestado='#form.altcontroletestado#'
+                        ,Itn_CategoriaControle='#form.itncategoriacontroleAlt#'
+                        ,Itn_RiscoIdentificado=#form.altcategoriarisco#
+                        ,Itn_RiscoIdentificadoOutros='#form.altcategoriariscooutros#'
+                        ,Itn_MacroProcesso=#form.altmacroprocesso#
+                        ,Itn_ProcessoN1=#altprocesson1#
+                        ,Itn_ProcessoN1NaoAplicar='#form.altprocesson1naoseaplica#'
+                        ,Itn_ProcessoN2=#altprocesson2#
+                        ,Itn_ProcessoN3=#altprocesson3#
+                        ,Itn_ProcessoN3Outros='#form.altprocesson3outros#'
+                        ,Itn_GestorProcessoDir=#form.altgestordir#
+                        ,Itn_GestorProcessoDepto='#form.altgestordepto#'
+                        ,Itn_ObjetivoEstrategico='#form.itnaltobjetivoestrategicoAlt#'
+                        ,Itn_RiscoEstrategico='#form.itnaltriscoestrategicoAlt#'
+                        ,Itn_IndicadorEstrategico='#form.itnaltindicadorestrategicoAlt#'
+                        ,Itn_Coso2013Componente=#form.altcomponentecoso#
+                        ,Itn_Coso2013Principios=#form.altprincipioscoso#
+                    WHERE
+                        Itn_Modalidade = '#form.selAltModalidade#' AND 
+                        Itn_Ano = #form.selAltItemAno# AND 
+                        Itn_TipoUnidade = #tipo# AND 
+                        Itn_NumGrupo = #form.selAltItemGrupo# AND 
+                        Itn_NumItem = #form.selAltItem#                             
+                </cfquery>
+                           
             </cfif> 
             <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
             <cfif listfind('#altpontuacaoseq#','10')>
@@ -232,7 +233,8 @@
         <script type="text/javascript"> 
             alert('Item Alterado com sucesso!');
             //var frm = document.getElementById('formAltItem');   
-            window.open('cadastroGruposItens.cfm','_self');         
+            window.open('cadastroGruposItens.cfm','_self');  
+           // window.close()       
         </script>        
     </cftransaction>
 </cfif>
@@ -256,7 +258,8 @@
     </cftransaction>
     <script type="text/javascript">           
         alert('Item Excluído com sucesso!');
-        window.open('cadastroGruposItens.cfm','_self');           
+        window.open('cadastroGruposItens.cfm','_self');    
+        //window.close()       
     </script>
 </cfif>
 
@@ -294,7 +297,80 @@
                     </div>                                                                     
                 </div> 
                 <!--- Inicio acordeon --->
+                <div style="background:#fff;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                    <h2 id="altum">
+                        <button  type="button" style="background:#ccf;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <strong>ANO / GRUPO / ITEM / MODALIDADE</strong>
+                        </button>
+                    </h2>
+                    <div id="altprimeiro"  aria-labelledby="altum" >
+                        <div >
+                            <div class="row">
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px;">Ano</label>
+                                </div>
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px;">Grupo</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">            
+                                        <select name="selAltItemAno" id="selAltItemAno" class="form-select" aria-label="Default select example">									                                                                                                                     
+                                            <option value="" selected>---</option>   
+                                            <cfloop query="rsAnoPontuacao">                                             
+                                                <option value="<cfoutput>#rsAnoPontuacao.PTC_Ano#</cfoutput>"><cfoutput>#rsAnoPontuacao.PTC_Ano#</cfoutput></option>
+                                            </cfloop>
+                                        </select>	
+                                    </label>
+                                </div>
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">           
+                                        <select name="selAltItemGrupo" id="selAltItemGrupo" class="form-select" aria-label="Default select example">	
+                                            <option selected="selected" value="">---</option>									
+                                        </select> 
+                                    </label>
+                                </div>
+                            </div>   
+                            <div class="row"> 
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________</label>
+                                </div>
+                            </div>   
+                            <div class="row">
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px;">Item</label>
+                                </div>   
+                            </div>                                  
+                            <div class="row">                            
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
+                                        <select id="selAltItem" name="selAltItem" class="form-select" aria-label="Default select example">
+                                            <option selected="selected" value="">---</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>   
+                            <div class="row"> 
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________
+
+                                    </label>
+                                </div>
+                            </div>  
+                            <label for="selAltModalidade" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px">
+                                Modalidade
+                            </label>
+                            <select name="selAltModalidade" id="selAltModalidade" class="form-select" aria-label="Default select example">                                      
+                                <option selected="selected" value="">---</option>
+                            </select>    
+                            <br>                                                                
+                        </div>
+                    </div>
+                </div>
+
                 <div class="accordion" id="acordion-altgrpitm">
+                    <!---
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altum">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#altprimeiro" aria-expanded="true" aria-controls="altprimeiro" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
@@ -365,10 +441,11 @@
                             </div>
                         </div>
                     </div>
+                --->
                     <!--- final altprimeiro --->
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altdois">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altsegundo" aria-expanded="false" aria-controls="altsegundo" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altsegundo" aria-expanded="false" aria-controls="altsegundo" style="background:#ccd;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                                 <strong>DESCRIÇÃO DO ITEM</strong>
                             </button>
                         </h2>
@@ -381,7 +458,7 @@
                     <!--- final altsegundo --->      
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="alttres">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altterceiro" aria-expanded="false" aria-controls="altterceiro" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altterceiro" aria-expanded="false" aria-controls="altterceiro" style="background:#ccf;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                                 <strong>MANCHETE</strong>
                             </button>
                         </h2>
@@ -394,7 +471,7 @@
                     <!--- final altterceiro --->    
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="alttresmeio">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altterceiromeio" aria-expanded="false" aria-controls="altterceiromeio" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altterceiromeio" aria-expanded="false" aria-controls="altterceiromeio" style="background:#ccd;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                                 <strong>VALOR / VISUALIZAÇÃO / VALIDAÇÃO</strong>
                             </button>
                         </h2>
@@ -440,7 +517,7 @@
                     <!--- final altterceiromeio --->                       
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altquatro">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altquarto" aria-expanded="false" aria-controls="altquarto" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altquarto" aria-expanded="false" aria-controls="altquarto" style="background:#ccf;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                             <strong>COMO EXECUTAR/PROCEDIMENTOS ADOTADOS</strong>
                             </button>
                         </h2>
@@ -453,7 +530,7 @@
                     <!--- final altquarto ---> 
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altcinco">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altquinto" aria-expanded="false" aria-controls="altquinto" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altquinto" aria-expanded="false" aria-controls="altquinto" style="background:#ccd;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                                 <strong>AMOSTRA</strong>
                             </button>
                         </h2>
@@ -466,7 +543,7 @@
                     <!---  final altquinto --->       
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altseis">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altsexto" aria-expanded="false" aria-controls="altsexto" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altsexto" aria-expanded="false" aria-controls="altsexto" style="background:#ccf;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                                 <strong>NORMA</strong>
                             </button>
                         </h2>
@@ -479,7 +556,7 @@
                     <!--- final altsexto --->    
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altsete">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altsetimo" aria-expanded="false" aria-controls="altsetimo" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altsetimo" aria-expanded="false" aria-controls="altsetimo" style="background:#ccd;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                             <strong>RELATO MODELO / PRÉ-RELATO</strong>
                             </button>
                         </h2>
@@ -492,7 +569,7 @@
                     <!--- final altsetimo --->    
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altoito">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altoitavo" aria-expanded="false" aria-controls="altoitavo" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altoitavo" aria-expanded="false" aria-controls="altoitavo" style="background:#ccf;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                                 <strong>ORIENTAÇÕES UNIDADE/ÓRGÃO</strong>
                             </button>
                         </h2>
@@ -505,7 +582,7 @@
                     <!--- final altoitavo --->  
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altnove">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altnono" aria-expanded="false" aria-controls="altnono" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altnono" aria-expanded="false" aria-controls="altnono" style="background:#ccd;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                             <strong>CONTROLE / RISCOS / PROCESSOS / ESTRATÉGIA / COSO-2013</strong>
                             </button>
                         </h2>
@@ -678,7 +755,7 @@
                                         </div>                                        
                                         <div class="col">
                                             <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                                <select id="altgestordepto" name="altgestordepto" class="form-select" aria-label="Default select example">
+                                                <select id="altgestordepto" name="altgestordepto" multiple="multiple" class="form-select" aria-label="Default select example">
                                                 </select>
                                             </label>                                        
                                         </div>
@@ -769,7 +846,7 @@
                     <!--- final cadnono --->                                                                                                                                                                 
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altdez">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altdecimo" aria-expanded="false" aria-controls="altdecimo" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altdecimo" aria-expanded="false" aria-controls="altdecimo" style="background:#ccf;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
                                 <strong>PLANO DE TESTE</strong>
                             </button>
                         </h2>
@@ -929,9 +1006,12 @@
         <script type="text/javascript" src="public/axios.min.js"></script>
         <script type="text/javascript"> 
             //alert('Dom inicializado!');     
-
+            function CKupdate(){
+                for ( instance in CKEDITOR.instances )
+                CKEDITOR.instances[instance].updateElement();
+            }
             //var local = "parametros.cfm";
-            function editar_altItemOrientacao(){
+//            function editar_altItemOrientacao(){
                 CKEDITOR.replace('altItemOrientacao', {
                     width: '100%',
                     height: 50,   
@@ -948,9 +1028,9 @@
                     ]
 
                 });
-            }
+//            }
 
-            function altItem_PreRelato(){    
+//            function altItem_PreRelato(){    
                 CKEDITOR.replace('altItemPreRelato', {
                     width: '100%',
                     height: 50,
@@ -966,9 +1046,9 @@
                         ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
                     ]
                 });
-            }   
+//            }   
 
-            function altItem_altItemOrientacaoRelato(){      
+//            function altItem_altItemOrientacaoRelato(){      
                 CKEDITOR.replace('altItemOrientacaoRelato', {
                     width: '100%',
                     height: 50,
@@ -985,9 +1065,9 @@
                     ]
 
                 });
-            }
+//            }
 
-            function altItem_altItemAmostra(){       
+//            function altItem_altItemAmostra(){       
                 CKEDITOR.replace('altItemAmostra', {
                 width: '100%',
                 height: 50,
@@ -997,9 +1077,10 @@
                     ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-','TextColor','Maximize','Table']
                 ]				
                 });
-            }
+//            }
 
-            function altItem_altItemNorma(){ 
+//            function altItem_altItemNorma(){ 
+//                alert('aqui linha 1080')
                 CKEDITOR.replace('altItemNorma', {
                 width: '100%',
                 height: 50,
@@ -1009,7 +1090,22 @@
                     ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-','TextColor','Maximize', 'Table' ]
                 ]	
                 });
-            }
+//            }
+            //Efetuar limpeza dos campos em tela
+            function ajustarcampos(){
+                let txt='';
+                $('#altItemDescricao').val(txt); 
+                $('#altItemManchete').val(txt); 
+                $('#selAltItemValorDec option[value=""]').attr('selected','selected');
+                $('#selAltVisualizacao option[value=""]').attr('selected','selected');
+                $('#selAltValidObrig option[value=""]').attr('selected','selected'); 
+                CKEDITOR.instances['altItemOrientacao'].setData(txt); 
+                CKEDITOR.instances['altItemAmostra'].setData(txt);   
+                CKEDITOR.instances['altItemNorma'].setData(txt);  
+                CKEDITOR.instances['altItemPreRelato'].setData(txt);  
+                CKEDITOR.instances['altItemOrientacaoRelato'].setData(txt);  
+                         
+            }            
             // BUSCAR OS GRUPOS PELO ANO SELECIONADO  
             $('#selAltItemAno').change(function(e){
                 var anogrupo = $(this).val(); 
@@ -1114,7 +1210,10 @@
                 let grupo = $('#selAltItemGrupo').val();
                 let itm = $('#selAltItem').val();
                 let modal = $(this).val();
-                if (modal == '') {return false}
+                if (modal == '') {
+                    ajustarcampos()
+                    return false
+                }
                 let resultado = 0
                 //Verificar item se está em uso na tabela ResultadoInspecao
                 axios.get("CFC/grupoitem.cfc",{
@@ -1136,7 +1235,6 @@
                     const dados = json.DATA;
                     dados.map((ret) => {
                         if(ret[0] !== '') {resultado = 1}
-
                     });
                     //alert(resultado)
                     $('#itmemuso').val(resultado)
@@ -1162,7 +1260,7 @@
                     $("#propriasalt").hide(500);
                     $("#franquiaalt").hide(500);
                     
-                    let classcontrole = '';
+                    let clasctrl = '';
                     let catctrl = '';
                     let catriscoident = '';
                     let catriscoidentoutros = '';
@@ -1199,7 +1297,7 @@
                         $('#altItemNorma').val(ret[7])  // Normas
                         $('#altItemPreRelato').val(ret[8])  // Relato Modelo - (Itn_PreRelato)
                         $('#altItemOrientacaoRelato').val(ret[9])  // Orientações Unidade/órgão - (Itn_OrientacaoRelato)
-                        classcontrole = ret[10]
+                        clasctrl = ret[10]
                         $('#altcontroletestado').val(ret[11])  // Orientações Unidade/órgão - (Itn_OrientacaoRelato)
                         catctrl = ret[12]
                         catriscoident = ret[13]
@@ -1244,30 +1342,36 @@
                     } // valor declarado
                     if(validarobrig == '1') {
                         validarobrig = '<option value="">---</option>'
-                        validarobrig += '<option value="S" selected>Sim</option>'
-                        validarobrig += '<option value="N">Não</option>'
+                        validarobrig += '<option value="1" selected>Sim</option>'
+                        validarobrig += '<option value="0">Não</option>'
                     }else{
                         validarobrig = '<option value="">---</option>'
-                        validarobrig += '<option value="S">Sim</option>'
-                        validarobrig += '<option value="N" selected>Não</option>'
+                        validarobrig += '<option value="1">Sim</option>'
+                        validarobrig += '<option value="0" selected>Não</option>'
                     }  // validação obrigatória                     
                     $('#selAltItemValorDec').html(vlrdeclarado);
                     $('#selAltVisualizacao').html(visualizar);
                     $('#selAltValidObrig').html(validarobrig);
                     $("#altriscoidentif-outros").hide(500);
                     if ($('#altcategoriariscooutros').val() != '') {$('#altriscoidentif-outros').show(500)}
+                    CKEDITOR.instances['altItemOrientacao'].setData(altItemOrientacao); 
+                    CKEDITOR.instances['altItemAmostra'].setData(altItemAmostra);   
+                    CKEDITOR.instances['altItemNorma'].setData(altItemNorma);  
+                    CKEDITOR.instances['altItemPreRelato'].setData(altItemPreRelato);  
+                    CKEDITOR.instances['altItemOrientacaoRelato'].setData(altItemOrientacaoRelato);  
+                
+                    if (clasctrl == undefined) { clasctrl = '0'}
+                    classificacaocontrole(clasctrl)
                     
-                    //$('#processon3outrosSNAlt').val('N')
-                   // if($('#altprocesson3outros').val() !== '') {$('#processon3outrosSNAlt').val('S')}  
-                    editar_altItemOrientacao();
-                    altItem_altItemAmostra();
-                    altItem_altItemNorma();
-                    altItem_PreRelato();
-                    altItem_altItemOrientacaoRelato();
-                    classificacaocontrole("'"+classcontrole+"'");
-                    categoriacontrole("'"+catctrl+"'")
+                    if (catctrl == undefined) { catctrl = '0'}
+                    categoriacontrole(catctrl)
+
+                    if (catriscoident == undefined) { catriscoident = '0'}
                     categoriarisco("'"+catriscoident+"'")
-                    macroprocesso("'"+macropro+"'")
+
+                    if (macropro == undefined) { macropro = '0'}
+                    macroprocesso(macropro)
+
                     $("#altprocesson1-naoseaplica").hide(500);
                     if ($('#altprocesson1naoseaplica').val() != '') {
                             $('#altprocesson1-naoseaplica').show(500)
@@ -1282,9 +1386,9 @@
                             $('#processon1naoaplicarSNAlt').val('S')
                         }else{
                             $('#processon1naoaplicarSNAlt').val('N')
-                            ProcessoN1(macropro,"'"+procn1+"'")
+                            ProcessoN1(macropro,procn1)
                             $("#cd_altprocesson1").prop("checked", false);
-                            ProcessoN2(macropro,procn1,"'"+procn2+"'")
+                            ProcessoN2(macropro,procn1,procn2)
                             if ($('#altprocesson3outros').val() != '') {
                                 $("#altprocesson3").html(prots);
                                 $("#altprocesson3").attr('disabled', true);
@@ -1294,23 +1398,35 @@
                             }else{
                                 $('#processon3outrosSNAlt').val('N')
                                 $('#altprocesson3-outros').hide(500)
-                                ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'")  
+                                ProcessoN3(macropro,procn1,procn2,procn3)  
                                 $("#cd_altprocesson3").prop("checked", false); 
                             }                    
                     }  
-                    dirprocesso("'"+dirproc+"'") 
-                    deptoprocesso(dirproc,"'"+deptoproc+"'")
-                    objetivoestrategico("'"+objestrat+"'")
-                    riscoestrategico("'"+riscoestrat+"'")
-                    indicadorestrategico("'"+indicestrat+"'")
-                    componentecoso("'"+compcoso2013+"'")
-                    principioscoso(compcoso2013,"'"+princoso2013+"'")
+                    if (dirproc == undefined) { dirproc = '0'}
+                    dirprocesso(dirproc) 
+                    if (deptoproc == undefined) { deptoproc='0'}
+                    deptoprocesso(dirproc,deptoproc)
+
+                    if (objestrat == undefined) { objestrat = '0'}
+                    objetivoestrategico(objestrat)
+
+                    if (riscoestrat == undefined) { riscoestrat = '0'}
+                    riscoestrategico(riscoestrat)
+
+                    if (indicestrat == undefined) { indicestrat = '0'}
+                    indicadorestrategico(indicestrat)
+
+                    if (compcoso2013 == undefined) { compcoso2013 = '0'}
+                    componentecoso(compcoso2013)
+                    if (princoso2013 == undefined) { princoso2013 = '0'}
+                    principioscoso(compcoso2013,princoso2013)
+
                     exibirplanoteste(itntpunid,itnptcseq)
                     
                 })
                 }) // FIM BUSCAR dados para alteração dos tipos de Unidades    
                 //Classificação do controle     
-                function  classificacaocontrole(a){
+                function classificacaocontrole(a){
                     axios.get("CFC/grupoitem.cfc",{
                         params: {
                         method: "classifctrl"
@@ -1319,25 +1435,31 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
-                        //console.log(data.data)
-                        //console.log(data.data.indexOf("COLUMNS"));
+                        const valordb = a.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
-                        // console.log('valor inicial: ' + vlr_fin);
                         const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
-                        //console.log(json);
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                           //valordb.forEach((item, index) => {
+                                //if(eval(item) == ret[0]) {selecionar = 'selected'}
+                          //  });
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
-                        $("#altclassifcontrole").html(prots);
-                    })
+                        setTimeout($("#altclassifcontrole").html(prots),500)
+                        $('#altclassifcontrole > option').each(function() {
+                            valordb.forEach((item, index) => {
+                                $("#altclassifcontrole option").filter(function() {
+                                    return $(this).val() == item;
+                                }).prop("selected", true);
+                            });
+                        });                    
+                    });
                 } // Fim Classificação do controle  
                 //Categoria do Controle     
-                function  categoriacontrole(a){           
+                function categoriacontrole(a){           
                     //busca da categoria   
                     axios.get("CFC/grupoitem.cfc",{
                         params: {
@@ -1347,6 +1469,7 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
+                        const valordb = a.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
@@ -1354,10 +1477,12 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            valordb.forEach((item, index) => {
+                                if(eval(item) == ret[0]) {selecionar = 'selected'}
+                            });
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
-                        $("#altcategcontrole").html(prots);
+                        $("#altcategcontrole").html(prots);       
                     }) 
                 } 
                 //Risco Identificado
@@ -1371,17 +1496,20 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
+                        const valordb = a.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
                         const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
                         const dados = json.DATA;
                         dados.map((ret) => {
-                            selecionar = ''
-                            if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            selecionar = ''          
+                            valordb.forEach((item, index) => {
+                                if(eval(item) == ret[0]) {selecionar = 'selected'}
+                            });
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
-                        $("#altcategoriarisco").html(prots);
+                        $("#altcategoriarisco").html(prots); 
                     })   
                 }             
                 // buscar macroprocesso             
@@ -1401,7 +1529,7 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            if(eval(a) == ret[0]) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altmacroprocesso").html(prots);
@@ -1426,7 +1554,7 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (b.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            if(eval(b) == ret[0]) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altprocesson1").html(prots);
@@ -1453,7 +1581,7 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (c.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            if(eval(c) == ret[0]) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altprocesson2").html(prots);
@@ -1479,7 +1607,7 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (d.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            if(eval(d) == ret[0]) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altprocesson3").html(prots);
@@ -1502,7 +1630,7 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            if(eval(a) == ret[0]) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altgestordir").html(prots);
@@ -1519,6 +1647,7 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
+                        const valordb = b.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
@@ -1526,7 +1655,9 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (b.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            valordb.forEach((item, index) => {
+                                if(eval(item) == ret[0]) {selecionar = 'selected'}
+                            });
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altgestordepto").html(prots);
@@ -1542,6 +1673,7 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
+                        const valordb = a.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
@@ -1549,7 +1681,9 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            valordb.forEach((item, index) => {
+                                if(eval(item) == ret[0]) {selecionar = 'selected'}
+                            });
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altobjetivoestrategico").html(prots);
@@ -1565,6 +1699,7 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
+                        const valordb = a.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
@@ -1572,7 +1707,9 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            valordb.forEach((item, index) => {
+                                if(eval(item) == ret[0]) {selecionar = 'selected'}
+                            });
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altriscoestrategico").html(prots);
@@ -1580,7 +1717,7 @@
                 }//busca do risco estrategico   
                 //busca da indicador estrategico 
                 function indicadorestrategico(a){
-                    //busca da indicador estrategico      
+                    //busca da indicador estrategico    
                     axios.get("CFC/grupoitem.cfc",{
                         params: {
                         method: "indicadorestrategico"
@@ -1589,6 +1726,7 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
+                        const valordb = a.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
@@ -1596,12 +1734,14 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            valordb.forEach((item, index) => {
+                                if(eval(item) == ret[0]) {selecionar = 'selected'}
+                            });
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altindicadorestrategico").html(prots);
                     })    
-                }//busca da indicador estrategico   
+                }//busca do indicador estrategico   
                 //componentecoso2013        
                 function componentecoso(a) { 
                     axios.get("CFC/grupoitem.cfc",{
@@ -1619,7 +1759,7 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if (a.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                            if(eval(a) == ret[0]) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altcomponentecoso").html(prots);
@@ -1635,6 +1775,7 @@
                         })
                         .then(data =>{
                             let prots = '<option value="">---</option>';
+                            let selecionar = ''
                             var vlr_ini = data.data.indexOf("COLUMNS");
                             var vlr_fin = data.data.length
                             vlr_ini = (vlr_ini - 2);
@@ -1642,7 +1783,7 @@
                             const dados = json.DATA;
                             dados.map((ret) => {
                                 selecionar = ''
-                                if (b.indexOf(ret[0]) !== -1) {selecionar = 'selected'}
+                                if(eval(b) == ret[0]) {selecionar = 'selected'}
                                 prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                             $("#altprincipioscoso").html(prots);
@@ -1866,9 +2007,9 @@
                         $("#altprocesson3").attr('disabled', false); 
                         let macropro = $("#altmacroprocesso").val();
                         let procn1 = $("#altprocesson1_sel").val();
-                        ProcessoN1(macropro,"'"+procn1+"'")   
+                        ProcessoN1(macropro,procn1)   
                         let procn2 = $("#altprocesson2_sel").val();
-                        ProcessoN2(macropro,procn1,"'"+procn2+"'")   
+                        ProcessoN2(macropro,procn1,procn2)   
                         if ($('#altprocesson3outros').val() != '') {
                             $("#altprocesson3").html(prots);
                             $("#altprocesson3").attr('disabled', true);
@@ -1878,7 +2019,7 @@
                         }else{
                             $('#altprocesson3-outros').hide(500)
                             let procn3 = $("#altprocesson3_sel").val();
-                            ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'")  
+                            ProcessoN3(macropro,procn1,procn2,procn3)  
                             $("#cd_altprocesson3").prop("checked", false); 
                             $("#cd_altprocesson3").attr('disabled', false);
                         }                      

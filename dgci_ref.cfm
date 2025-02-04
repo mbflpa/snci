@@ -19,35 +19,16 @@
 <cfset auxdia = int(day(now()))>
 <cfset aux_mes = int(month(now()))>
 <cfset aux_ano = int(year(now()))>
-<!---
-<cfif grpacesso eq 'GESTORMASTER' OR grpacesso eq 'GOVERNANCA'>
-   <cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
-		<cfset aux_mes = 12>
-		<cfset aux_ano = aux_ano - 1>
-	<cfelseif (aux_mes gt 2 and auxdia lte 10)>
-		<cfset aux_mes = (aux_mes - 1)>
-	<cfelse>
-		<cfset aux_mes = (aux_mes - 1)>		
-   </cfif>
 
-<cfelse>
-	<cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
-		<cfset aux_mes = 12>
-		<cfset aux_ano = aux_ano - 1>
-	<cfelseif (aux_mes gt 2 and auxdia lte 10)>
-		<cfset aux_mes = (aux_mes - 2)>
-	<cfelse>
-		<cfset aux_mes = (aux_mes - 1)>
-	</cfif>
-</cfif>
 
 <cfif grpacesso eq 'GESTORMASTER' OR grpacesso eq 'GOVERNANCA'>
 	<cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
-		 <cfset aux_mes = 12>
+		 <!--- <cfset aux_mes = 12>
 		 <cfset aux_ano = aux_ano - 1>
+		 --->
 	</cfif>
 	<cfif auxdia gt 10>
-	<!--- <cfset aux_mes = (aux_mes - 1)>  --->
+	<!---		<cfset aux_mes = (aux_mes - 1)>  --->
 	</cfif>
  <cfelse>
 	<cfif (aux_mes eq 1) or (aux_mes eq 2 and auxdia lte 10)>
@@ -56,7 +37,8 @@
 	<cfelse>
 			<cfset aux_mes = (aux_mes - 1)>
 	</cfif>
- </cfif>--->
+ </cfif>
+
 <!---
  <cfoutput>aux_ano:#aux_ano#  === aux_mes:#aux_mes#</cfoutput><BR> 
 <cfset gil = gil> 
@@ -133,7 +115,6 @@ function valida_form() {
 	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 
-
 }
 
 </script>
@@ -144,7 +125,7 @@ function valida_form() {
 <cfif grpacesso is 'SUPERINTENDENTE'> 
 	<cfinclude template="cabecalho.cfm">
 </cfif> 
-<form action="dgci.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return valida_form()">
+<form action="dgci.cfm" method="get" target="_blank" name="frmObjeto" onSubmit="return valida_form()"> 
 	    <table width="33%" border="0" align="center">
 	      <tr valign="baseline">
 	        <td colspan="2" class="exibir"><div align="center"><span class="titulo1">indicadores</span></div></td>
@@ -353,8 +334,9 @@ function valida_form() {
 	  <input name="dtlimitatual" type="hidden" value="<cfoutput>#dtlimit#</cfoutput>">
 	  <input name="anoexerc" type="hidden" value="<cfoutput>#year(dtLimit)#</cfoutput>">
 	  <input name="anoatual" type="hidden" value="<cfoutput>#year(now())#</cfoutput>">
-	  
-
+	  <input name="frmmesatual" type="hidden" value="<cfoutput>#month(now())#</cfoutput>">
+	  <input name="frmUsuGrupoAcesso" type="hidden" value="<cfoutput>#grpacesso#</cfoutput>">
+	  <input name="frmdia" type="hidden" value="<cfoutput>#day(now())#</cfoutput>">
 <!--- 	  
 <cfoutput>dtlimit:#dtlimit#</cfoutput><br>
 <cfoutput>#year(dtLimit)#</cfoutput><br>

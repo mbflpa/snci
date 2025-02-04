@@ -18,9 +18,15 @@
 </cfquery>
 <cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
 
-<cfif grpacesso neq 'GESTORMASTER'>
-	<cfset aux_mes = month(dtlimit)>
-	<cfset aux_ano = year(dtlimit)>
+<cfset dia = day(now())>
+<cfset mes = month(now())>
+<cfset ano = year(now())>
+<cfset aux_mes = month(dtlimit)>
+<cfset aux_ano = year(dtlimit)>
+<cfif (grpacesso neq 'GESTORMASTER') and (aux_ano neq ano) and (mes eq 1) and (dia lte 10)>
+	<cfset ano = aux_ano>
+</cfif>
+<cfif grpacesso neq 'GESTORMASTER' and dia lte 10 and aux_ano eq ano>
 	<cfif aux_mes is 1>
 		<cfset dtlimit = (aux_ano - 1) & "/12/31">
 	<cfelseif aux_mes is 2>
@@ -135,7 +141,7 @@
 	<cfquery dbtype="query" name="rsExisteUN">
 		SELECT Andt_RespAnt 
 		FROM  rsTodos
-		where (Andt_RespAnt in (1,2,15,14,11) or Andt_Resp in (2,15)) and (Andt_Mes <= #month(dtlimit)#)
+		where (Andt_RespAnt in (1,2,15,14,11)) and (Andt_Mes <= #month(dtlimit)#)
 	</cfquery>
 	<cfset totExisteUN = rsExisteUN.recordcount>
 
@@ -143,7 +149,7 @@
 	<cfquery dbtype="query" name="rsExisteGE">
 		SELECT Andt_RespAnt 
 		FROM  rsTodos
-		where Andt_RespAnt in (6,5,19) and (Andt_Mes <= #month(dtlimit)#)
+		where (Andt_RespAnt in (6,5,19)) and (Andt_Mes <= #month(dtlimit)#)
 	</cfquery>
 	<cfset totExisteGE = rsExisteGE.recordcount>
 
@@ -151,7 +157,7 @@
 	<cfquery dbtype="query" name="rsExisteSB">
 		SELECT Andt_RespAnt 
 		FROM  rsTodos
-		where Andt_RespAnt in (4,7,16) and (Andt_Mes <= #month(dtlimit)#)
+		where (Andt_RespAnt in (4,7,16)) and (Andt_Mes <= #month(dtlimit)#)
 	</cfquery>
 	<cfset totExisteSB = rsExisteSB.recordcount>
 	
@@ -159,7 +165,7 @@
 	<cfquery dbtype="query" name="rsExisteSU">
 		SELECT Andt_RespAnt 
 		FROM  rsTodos
-		where Andt_RespAnt in (8,22,23) and (Andt_Mes <= #month(dtlimit)#)
+		where (Andt_RespAnt in (8,22,23) or Andt_Resp in (8,23)) and (Andt_Mes <= #month(dtlimit)#)
 	</cfquery>
 	<cfset totExisteSU = rsExisteSU.recordcount>
 	
@@ -323,7 +329,7 @@ aux_mes_un:#aux_mes_un# totpendtratmes: #totpendtratmes#<br>
 		</tr>	
 	</cfif>
 <!--- AREAS --->	
-<cfif totExisteGE neq 0>	
+<cfif totExisteGE gt 0>	
 		<cfset totparcialgesol = 0>
 		<cfset totparcialgependtrat = 0>   
 		<tr class="exibir">

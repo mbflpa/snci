@@ -91,7 +91,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 <cfset auxsite =  cgi.server_name>
 
 <cfif (trim(rsDia.MSG_Realizado) neq auxdt)>
-   <cflocation url="Mensagens.cfm"> 
+   <cflocation url="Mensagens.cfm">  
 </cfif>
 
 <!DOCTYPE html>

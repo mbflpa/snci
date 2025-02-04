@@ -108,7 +108,9 @@
 								
 								<tbody>
 									<cfloop query="rsMelhorias" >
-										<cfoutput>					
+										<cfoutput>	
+											<cfset statusMelhoria = "">
+											<cfset corStatusMelhoria = "">			
 										    <cfswitch expression="#pc_aval_melhoria_status#">
 												<cfcase value="P">
 													<cfset statusMelhoria = "PENDENTE">
@@ -135,7 +137,8 @@
 													<cfset corStatusMelhoria = "background:##dc3545;color:##fff;">
 												</cfcase>
 												<cfdefaultcase>
-													<cfset statusMelhoria = "">	
+													<cfset statusMelhoria = "NÃO INFORMADO">
+													<cfset corStatusMelhoria = "background:##000;color:##fff;">
 												</cfdefaultcase>
 												
 											</cfswitch>

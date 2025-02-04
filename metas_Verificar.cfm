@@ -1,5 +1,4 @@
 <!--- #se#  === #frmano#<br> --->
-<cfset nometable=#nometable#>
 <cfprocessingdirective pageEncoding ="utf-8"> 
 <cfsetting requesttimeout="15000"> 
 <cfif IsDefined("url.ninsp")>
@@ -280,7 +279,7 @@ dtlimit: #dtlimit#<br>
 	</cfif>
     <cfquery name="rsPRCIBase" datasource="#dsn_inspecao#">
         SELECT Andt_TipoRel,Andt_Unid as UNID, Andt_Insp as INSP, Andt_Grp as Grupo, Andt_Item as Item, Andt_DPosic, Andt_HPosic, Andt_Resp, Andt_tpunid, Andt_DiasCor, Andt_Uteis, Andt_Mes, Andt_Prazo
-        FROM #nometable# 
+        FROM Andamento_Temp 
         where (Andt_CodSE = '#rsMetas.Met_Codigo#' and Andt_AnoExerc = '#frmano#' and Andt_Mes = #aux_mes#)
         order by Andt_Mes
     </cfquery>

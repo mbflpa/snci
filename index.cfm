@@ -222,6 +222,9 @@
         <cfcase value="permissao15">
 			  <cfinclude template="avisosgrupos_geral.cfm">
 	  	</cfcase>
+		<cfcase value="permissao29">
+			<!--- <cfinclude template="cadastroGruposItens_tabelas.cfm"> --->
+		</cfcase>		
         <cfcase value="permissao18">
 			  <cfinclude template="Pesquisa_ref.cfm">
 	  	</cfcase>	
@@ -239,6 +242,9 @@
 		</cfcase>	
 		<cfcase value="permissao27">
 			<cfinclude template="Pacin_GrupoItemReincidem_ref.cfm">
+		</cfcase>		
+		<cfcase value="permissao28">
+			<cfinclude template="ficha_facin_ref.cfm">
 		</cfcase>			
 <!--- 	    <cfcase value="permissao16">
 			<cfinclude template="Rel_itensverificacao_ref.cfm">
