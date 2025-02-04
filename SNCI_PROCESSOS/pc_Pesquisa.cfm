@@ -173,6 +173,13 @@
 
     </head>
 
+    <cfquery name="rsSiglaOrgao" datasource="#application.dsn_processos#">
+        SELECT
+            pc_org_mcu, pc_org_sigla FROM pc_orgaos
+        WHERE
+            pc_org_mcu= <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+    </cfquery>
+
     <body >
         <cfoutput>
             <form id="formPesquisa">   
@@ -216,7 +223,7 @@
                                         <table id="tabelaDadosProcesso" class="table table-bordered" style="width: 50%;">
                                             <thead>
                                                 <tr>
-                                                    <th colspan="5" style="font-size:0.7rem">Detalhes do Processo para Pesquisa de Opinião do Órgão <strong>#rsDadosProcessoPesquisa.orgaoRespOrientacao#</strong></th>
+                                                    <th colspan="5" style="font-size:0.7rem">Detalhes do Processo para Pesquisa de Opinião do Órgão <strong>#rsSiglaOrgao.pc_org_sigla# (#rsSiglaOrgao.pc_org_mcu#)</strong></th>
                                                 </tr>
                                                 <tr style="font-size:0.7rem">
                                                     <th>N° SNCI</th>

@@ -1,11 +1,5 @@
 <cfprocessingdirective pageencoding="utf-8">
 
-<cfquery name="rsProcAno" datasource="#application.dsn_processos#" timeout="120">
-	SELECT DISTINCT right(pc_processos.pc_processo_id, 4) as ano
-	FROM pc_processos
-	WHERE right(pc_processos.pc_processo_id, 4) >= 2024
-	ORDER BY ano
-</cfquery>
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -34,6 +28,7 @@
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
 	<div class="wrapper">
 		<cfinclude template="pc_NavBar.cfm">
+		
 		<div class="content-wrapper">
 			<section class="content-header">
 				<div class="container-fluid">
@@ -67,13 +62,11 @@
 										<th>ID do Processo</th>
 										<th>Número SEI</th>
 										<th>Número Relatório SEI</th>
-										<th>Órgão Avaliado Sigla</th>
-										<th>Órgão Avaliado SE Sigla</th>
-										<th>Órgão Responsável</th>
 										<th>Macroprocessos</th>
 										<th>Processo N1</th>
 										<th>Processo N2</th>
 										<th>Processo N3</th>
+
 										
 									</tr>
 								</thead>
@@ -82,6 +75,7 @@
 						</div>
 					</session>
 				</div>
+				<div id="exibirPesquisa"></div>
 			</section>
 		</div>
 		<cfinclude template="pc_Footer.cfm">
@@ -97,50 +91,14 @@
 		})
 
 		$(document).ready(function () {
-			$("#modalOverlay").modal("show");
-			const radio_name = "opcaoAno";
-			const ano = [];
-			const anoCorrente = new Date();
-			const anoAtual = anoCorrente.getFullYear();
-
-			<cfoutput query="rsProcAno">
-				ano.push(#rsProcAno.ano#);
-			</cfoutput>
-
-			if (ano.length === 0) {
-				ano.push(anoAtual);
-			}
-
-			if (ano.length > 1) {
-				ano.push("TODOS");
-			}
-
-			const anoq = ano.length - 1;
-
-			$.each(ano.sort().reverse(), function (i, val) {
-				const checkedClass = i === anoq ? " active" : "";
-				const radioHTML = `<label style="border:none!important; border-radius:10px!important; margin-left:2px" class="efeito-grow btn bg-yellow${checkedClass}">
-					<input type="radio" ${checkedClass ? 'checked=""' : ""} name="${radio_name}" id="option_b${i}" autocomplete="off" value="${val}" />${val}
-				</label><br>`;
-				$(radioHTML).prependTo("#opcoesAno");
-			});
-
-			let radioValue = $("input[name='opcaoAno']:checked").val();
-			$("#texto_card-title").html(`Selecione um Processo <span style="font-size:14px; color:#fff!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
-			exibirTabela(radioValue);
-
-			$("input[type='radio']").click(function () {
-				radioValue = $("input[name='opcaoAno']:checked").val();
-				$("#texto_card-title").html(`Selecione um Processo <span style="font-size:14px; color:#fff!important">(filtrado por ano: <strong>${radioValue}</strong>)</span>`);
-				exibirTabela(radioValue);
-			});
-
+			
+         exibirTabela();
             
 		});
 
 
 
-		function exibirTabela(anoMostra) {
+		function exibirTabela() {
             let colunasMostrar = [3,4, 5, 6, 7, 8];
             var currentDate = new Date()
 			var day = currentDate.getDate()
@@ -157,7 +115,6 @@
 				url: "cfc/pc_cfcPesquisa.cfc",
 				data: {
 					method: "getProcessosSemPesquisaJSON",
-					ano: anoMostra
 				},
 				async: true,
 				success: function (result) {
@@ -176,10 +133,7 @@
                                 <td>${processo.PC_PROCESSO_ID || 'N/A'}</td>
                                 <td>${processo.SEI || 'N/A'}</td>
                                 <td>${processo.PC_NUM_REL_SEI || 'N/A'}</td>
-                                <td>${processo.ORGAO_AVALIADO_SIGLA || 'N/A'} (${processo.ORGAO_AVALIADO_MCU || 'N/A'})</td>
-                                <td>${processo.ORGAO_AVALIADO_SE_SIGLA || 'N/A'}</td>
-								<td>${processo.ORGAO_RESPONSAVEL || 'N/A'} (${processo.ORGAO_RESPONSAVEL_MCU || 'N/A'})</td>
-                                <td>${processo.PC_AVAL_TIPO_MACROPROCESSOS || 'N/A'}</td>
+                                  <td>${processo.PC_AVAL_TIPO_MACROPROCESSOS || 'N/A'}</td>
                                 <td>${processo.PC_AVAL_TIPO_PROCESSON1 || 'N/A'}</td>
                                 <td>${processo.PC_AVAL_TIPO_PROCESSON2 || 'N/A'}</td>
                                 <td>${processo.PC_AVAL_TIPO_PROCESSON3 || 'N/A'}</td>
@@ -272,6 +226,36 @@
 				},
 			});
 		}
+
+		//ao clicar na linha da tabela
+		$("#tabProcessos tbody").on("click", "tr", function () {
+			var table = $("#tabProcessos").DataTable();
+			var data = table.row(this).data();
+			var processoId = data[1];
+			$.ajax({
+				type: "post",
+				url: "cfc/pc_cfcPesquisa.cfc",
+				data: {
+					method: "abreFormPesquisa",
+					pc_processo_id: processoId
+				},
+				async: true,
+				success: function (result) {
+					$("#exibirPesquisa").html(result);
+
+					$("#avaliacaoModal").modal("show").on("hidden.bs.modal", function () {
+						$("#exibirPesquisa").html("");
+						exibirTabela();
+					});
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					$("#modal-danger").modal("show");
+					$("#modal-danger").find(".modal-title").text("Não foi possível executar sua solicitação. Informe o erro abaixo ao administrador do sistema:");
+					$("#modal-danger").find(".modal-body").text(thrownError);
+				},
+			});
+			
+		});
 
 		$(window).on("beforeunload", function () {
 			if ($.fn.DataTable.isDataTable("#tabProcessos")) {

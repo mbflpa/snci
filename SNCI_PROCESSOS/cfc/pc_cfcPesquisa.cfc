@@ -10,7 +10,7 @@
       <cfargument name="pc_pesq_importancia_processo" type="numeric" required="true">
       <cfargument name="pc_pesq_pontualidade" type="numeric" required="true">
       <cfargument name="pc_pesq_observacao" type="string" required="false" default="">
-      <cfargument name="pc_processo_id" type="string" required="false" default="0100042024">
+      <cfargument name="pc_processo_id" type="string" required="true" >
 
       <!-- Tentativa de salvar os dados -->
       <cfquery datasource="#application.dsn_processos#">
@@ -77,14 +77,13 @@
 
   <!-- Função para obter os processos sem pesquisa cadastrada em formato JSON -->
   <cffunction name="getProcessosSemPesquisaJSON" access="remote" returntype="any" returnformat="json" output="false">
-    <cfargument name="ano" type="string" required="false" default="Não selecionado"/>
 
     <cfset var rsProcTab = ''>
     <cfset var processos = []>
     <cfset var processo = {}>
 
     <cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120">
-      SELECT pc_processos.pc_processo_id,
+      SELECT DISTINCT pc_processos.pc_processo_id,
              LEFT(pc_processos.pc_num_sei, 5) + '.' + SUBSTRING(pc_processos.pc_num_sei, 6, 6) + '/' + SUBSTRING(pc_processos.pc_num_sei, 12, 4) + '-' + RIGHT(pc_processos.pc_num_sei, 2) AS sei,
              pc_processos.pc_num_rel_sei,
              pc_processos.pc_num_avaliacao_tipo,
@@ -98,19 +97,16 @@
              orgaoResp.pc_org_mcu AS orgaoResp_mcu,
              orgaoResp.pc_org_sigla AS orgaoResp_sigla
 
-
-             
       FROM pc_processos
       LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
       LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu
       INNER JOIN pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo
-      inner JOIN pc_avaliacao_orientacoes on pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
-      LEFT JOIN pc_orgaos as orgaoResp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = orgaoResp.pc_org_mcu
+      LEFT JOIN pc_avaliacao_orientacoes on pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
+      INNER JOIN pc_orgaos as orgaoResp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = orgaoResp.pc_org_mcu
+      INNER JOIN pc_pesquisas ON pc_processos.pc_processo_id = pc_pesquisas.pc_processo_id and pc_pesquisas.pc_org_mcu = 
       WHERE right(pc_processos.pc_processo_id, 4) >= 2024
       AND pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
-      <cfif '#arguments.ano#' neq 'TODOS'>
-        AND right(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
-      </cfif>
+      
     </cfquery>
 
     <cfloop query="rsProcTab">
@@ -134,6 +130,24 @@
     </cfloop>
 
     <cfreturn processos>
+  </cffunction>
+
+
+
+
+  <cffunction name="abreFormPesquisa"   access="remote" hint="abre o modal avaliacaoModal da página pc_Pesquisa.cfm" >
+
+    <cfargument name="pc_processo_id" type="string" required="true" >
+    <cfquery name="rsDadosProcessoPesquisa" datasource="#application.dsn_processos#">
+      SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2
+      FROM pc_processos
+      INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
+      WHERE pc_processo_id = <cfqueryparam value="#arguments.pc_processo_id#" cfsqltype="cf_sql_varchar">
+    </cfquery>
+
+    
+    <cfinclude template="../pc_Pesquisa.cfm">
+   
   </cffunction>
 
 </cfcomponent>

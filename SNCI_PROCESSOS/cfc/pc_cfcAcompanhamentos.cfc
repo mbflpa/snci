@@ -1244,8 +1244,7 @@
 		</cfquery>
 
 		<cfquery name="rsDadosProcessoPesquisa" dbtype="query" >
-			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2
-			, pc_org_sigla as orgaoRespOrientacao , ano as anoPesquisa
+			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2 ,ano as anoPesquisa
 			FROM rsMelhoriaPosic
 		</cfquery>
 
@@ -2925,8 +2924,7 @@
 		</cfquery>	
 
 		<cfquery name="rsDadosProcessoPesquisa" dbtype="query" >
-			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2
-			,orgaoRespOrientacao ,ano as anoPesquisa
+			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2 ,ano as anoPesquisa
 			FROM rsProc 
 		</cfquery>
 
