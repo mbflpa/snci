@@ -382,6 +382,9 @@
                     $(this).find('input[type="text"], input[type="password"], textarea, select').val('');
                     $(this).find('input[type="checkbox"], input[type="radio"]').prop('checked', false);
                 });
+                $('#avaliacaoModal').on('shown.bs.modal', function () {
+                        $('#modalOverlay').modal('hide');
+                });
 
                 $('#comunicacao').select2();
                 $('#interlocucao').select2();
@@ -435,7 +438,7 @@
                         let processoPesquisa = '#rsDadosProcessoPesquisa.pc_processo_id#';
                     </cfoutput>
                      
-                     $('#modalOverlay').modal('show');
+                    $('#modalOverlay').modal('show');
                    
                     setTimeout(function() {
                         $.ajax({
@@ -467,10 +470,11 @@
                             toastr.error('Erro ao salvar a pesquisa: ' + errorThrown);
                         });
                     }, 1000);
-                    $('#modalOverlay').delay(1000).hide(0, function() {
-                        $('#modalOverlay').modal('hide');
-                    });
+                    
                 }
+                $('#modalOverlay').delay(1000).hide(0, function() {
+                    $('#modalOverlay').modal('hide');
+                });
             });
 
         </script>

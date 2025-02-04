@@ -82,32 +82,71 @@
     <cfset var processos = []>
     <cfset var processo = {}>
 
-    <cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120">
-      SELECT DISTINCT pc_processos.pc_processo_id,
-             LEFT(pc_processos.pc_num_sei, 5) + '.' + SUBSTRING(pc_processos.pc_num_sei, 6, 6) + '/' + SUBSTRING(pc_processos.pc_num_sei, 12, 4) + '-' + RIGHT(pc_processos.pc_num_sei, 2) AS sei,
-             pc_processos.pc_num_rel_sei,
-             pc_processos.pc_num_avaliacao_tipo,
-             pc_orgaos.pc_org_mcu AS orgao_avaliado_mcu,
-             pc_orgaos.pc_org_sigla AS orgao_avaliado_sigla,
-             pc_orgaos.pc_org_se_sigla AS orgao_avaliado_se_sigla,
-             pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
-             pc_avaliacao_tipos.pc_aval_tipo_processoN1,
-             pc_avaliacao_tipos.pc_aval_tipo_processoN2,
-             pc_avaliacao_tipos.pc_aval_tipo_processoN3,
-             orgaoResp.pc_org_mcu AS orgaoResp_mcu,
-             orgaoResp.pc_org_sigla AS orgaoResp_sigla
+    
 
-      FROM pc_processos
-      LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
-      LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu
-      INNER JOIN pc_avaliacoes ON pc_processos.pc_processo_id = pc_avaliacoes.pc_aval_processo
-      LEFT JOIN pc_avaliacao_orientacoes on pc_avaliacoes.pc_aval_id = pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval
-      INNER JOIN pc_orgaos as orgaoResp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = orgaoResp.pc_org_mcu
-      INNER JOIN pc_pesquisas ON pc_processos.pc_processo_id = pc_pesquisas.pc_processo_id and pc_pesquisas.pc_org_mcu = 
-      WHERE right(pc_processos.pc_processo_id, 4) >= 2024
-      AND pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
-      
+    <cfquery name="rsProcSemPesquisa" datasource="#application.dsn_processos#" timeout="120">
+      SELECT pc_processo_id FROM
+      (
+          SELECT DISTINCT pc_processos.pc_processo_id  
+          FROM pc_avaliacao_orientacoes
+          INNER JOIN pc_avaliacoes 
+              ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+          INNER JOIN pc_processos 
+              ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+          WHERE pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+              AND RIGHT(pc_processos.pc_processo_id, 4) >= 2025
+          AND pc_processos.pc_processo_id NOT IN 
+          (
+              SELECT pc_processo_id 
+              FROM pc_pesquisas 
+              WHERE pc_org_mcu = 
+                  <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+          )
+
+          UNION
+
+          SELECT DISTINCT pc_processos.pc_processo_id  
+          FROM pc_avaliacao_melhorias
+          INNER JOIN pc_avaliacoes 
+              ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
+          INNER JOIN pc_processos 
+              ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+          WHERE pc_aval_melhoria_num_orgao = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+              AND RIGHT(pc_processos.pc_processo_id, 4) >= 2025
+          AND pc_processos.pc_processo_id NOT IN 
+          (
+              SELECT pc_processo_id 
+              FROM pc_pesquisas 
+              WHERE pc_org_mcu = 
+                  <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+          )
+      ) AS unificado
     </cfquery>
+
+
+    <!--- Construção da lista de IDs para utilizar na cláusula IN --->
+<cfset var idList = ValueList(rsProcSemPesquisa.pc_processo_id)>
+
+
+<!--- Consulta para obter os dados dos processos utilizando a lista construída --->
+<cfquery name="rsProcTab" datasource="#application.dsn_processos#" timeout="120">
+  SELECT DISTINCT pc_processos.pc_processo_id,
+         LEFT(pc_processos.pc_num_sei, 5) + '.' + SUBSTRING(pc_processos.pc_num_sei, 6, 6) + '/' + SUBSTRING(pc_processos.pc_num_sei, 12, 4) + '-' + RIGHT(pc_processos.pc_num_sei, 2) AS sei,
+         pc_processos.pc_num_rel_sei,
+         pc_processos.pc_num_avaliacao_tipo,
+         pc_orgaos.pc_org_mcu AS orgao_avaliado_mcu,
+         pc_orgaos.pc_org_sigla AS orgao_avaliado_sigla,
+         pc_orgaos.pc_org_se_sigla AS orgao_avaliado_se_sigla,
+         pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,
+         pc_avaliacao_tipos.pc_aval_tipo_processoN1,
+         pc_avaliacao_tipos.pc_aval_tipo_processoN2,
+         pc_avaliacao_tipos.pc_aval_tipo_processoN3
+  FROM pc_processos
+  LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id
+  LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu
+  WHERE pc_processos.pc_processo_id in (<cfqueryparam value="#idList#" cfsqltype="cf_sql_varchar" list="true">)
+
+</cfquery>
 
     <cfloop query="rsProcTab">
       <cfset processo = {
@@ -118,8 +157,6 @@
         orgao_avaliado_mcu: rsProcTab.orgao_avaliado_mcu,
         orgao_avaliado_sigla: rsProcTab.orgao_avaliado_sigla,
         orgao_avaliado_se_sigla: rsProcTab.orgao_avaliado_se_sigla,
-        orgaoResp_mcu: rsProcTab.orgaoResp_mcu,
-        orgaoResp_sigla: rsProcTab.orgaoResp_sigla,
         pc_aval_tipo_macroprocessos: rsProcTab.pc_aval_tipo_macroprocessos,
         pc_aval_tipo_processoN1: rsProcTab.pc_aval_tipo_processoN1,
         pc_aval_tipo_processoN2: rsProcTab.pc_aval_tipo_processoN2,
