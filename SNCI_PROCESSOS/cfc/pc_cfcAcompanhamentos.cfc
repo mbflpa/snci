@@ -1233,17 +1233,30 @@
 
 		<cfquery name="rsMelhoriaPosic" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_melhorias.*, pc_processos.*,pc_avaliacoes.pc_aval_numeracao,pc_avaliacoes.pc_aval_descricao 
-			, pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla
+			, pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla, pc_orgaos.pc_org_mcu
+			, pc_avaliacao_tipos.pc_aval_tipo_processoN2
 			FROM pc_avaliacao_melhorias
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
 			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
+			INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
 			WHERE pc_aval_melhoria_id = <cfqueryparam value="#arguments.idMelhoria#" cfsqltype="cf_sql_integer">
 		</cfquery>
 
-		
-		
+		<cfquery name="rsDadosProcessoPesquisa" dbtype="query" >
+			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2, pc_org_sigla as orgaoRespOrientacao FROM rsMelhoriaPosic
+		</cfquery>
 
+		<cfquery name="rsMelhoriaVerificaExistePesquisa" datasource="#application.dsn_processos#">
+			SELECT CASE WHEN EXISTS (
+				SELECT 1
+				FROM pc_pesquisas
+				WHERE pc_processo_id = <cfqueryparam value="#rsMelhoriaPosic.pc_processo_id#" cfsqltype="cf_sql_varchar">
+				AND pc_org_mcu = <cfqueryparam value="#rsMelhoriaPosic.pc_org_mcu#" cfsqltype="cf_sql_varchar">
+			) THEN 1 ELSE 0 END AS existePesquisa
+		</cfquery>
+		
+        <cfinclude template="../pc_Pesquisa.cfm">
 		<div class="card-header" style="background-color:#ececec;" >
 			<div class="row" style="font-size: 1em;">
 
@@ -1293,10 +1306,17 @@
 				</div>	
 				
 			</div>
+			
 		</div>
 
 		<script language="JavaScript">
-
+			
+			$(document).ready(function(){
+				// $('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
+					
+					
+				// });
+			});
 
 			$('#pcStatusMelhoria').on('change', function (event)  {
 
@@ -1360,6 +1380,7 @@
                     var idMelhoria = '#arguments.idMelhoria#';
 					var orgAvaliado = '#rsMelhoriaPosic.pc_num_orgao_avaliado#'
 					var orgResp = '#rsMelhoriaPosic.pc_aval_melhoria_num_orgao#'
+					var existePesquisa 	= '#rsMelhoriaVerificaExistePesquisa.existePesquisa#';
 				</cfoutput>
 
 				//verifica se os campos necessários foram preenchidos
@@ -1392,17 +1413,39 @@
 						async: false
 					})//fim ajax
 					.done(function(result) {
-						$('#pcDataPrev').val('')
-						$('#pcRecusaJustMelhoria').val('')
-						$('#pcNovaAcaoMelhoria').val('')
-						$('#pcStatusMelhoria').val('').trigger('change')
-						$('#informacoesItensAcompanhamentoDiv').html('')
-						exibirTabelaMelhoriasPendentes()
-						$('#custom-tabs-one-MelhoriaAcomp-tab').html("PROPOSTAS DE MELHORIA");
-						$('html, body').animate({ scrollTop: ($('#custom-tabs-one-tabAcomp').offset().top)} , 500);	
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});	
+						if(existePesquisa == 0){
+							$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
+								$('#modalOverlay').modal('show');
+								$('#pcDataPrev').val('')
+								$('#pcRecusaJustMelhoria').val('')
+								$('#pcNovaAcaoMelhoria').val('')
+								$('#pcStatusMelhoria').val('').trigger('change')
+								$('#informacoesItensAcompanhamentoDiv').html('')
+								toastr.success('Envio da manifestação realizado com sucesso!');
+								exibirTabelaMelhoriasPendentes()
+								$('#custom-tabs-one-MelhoriaAcomp-tab').html("PROPOSTAS DE MELHORIA");
+								$('html, body').animate({ scrollTop: ($('#custom-tabs-one-tabAcomp').offset().top)} , 500);	
+								$('#modalOverlay').delay(1000).hide(0, function() {
+									$('#modalOverlay').modal('hide');
+									$('.modal-backdrop').remove(); // Remove o backdrop
+									$('body').removeClass('modal-open'); // Remove a classe que impede o scroll
+								});	
+							});
+						}else{
+							$('#modalOverlay').modal('show');
+							$('#pcDataPrev').val('')
+							$('#pcRecusaJustMelhoria').val('')
+							$('#pcNovaAcaoMelhoria').val('')
+							$('#pcStatusMelhoria').val('').trigger('change')
+							$('#informacoesItensAcompanhamentoDiv').html('')
+							exibirTabelaMelhoriasPendentes()
+							$('#custom-tabs-one-MelhoriaAcomp-tab').html("PROPOSTAS DE MELHORIA");
+							$('html, body').animate({ scrollTop: ($('#custom-tabs-one-tabAcomp').offset().top)} , 500);	
+							$('#modalOverlay').delay(1000).hide(0, function() {
+								$('#modalOverlay').modal('hide');
+								toastr.success('Envio da manifestação realizado com sucesso!');
+							});	
+						}
 					})//fim done
 					.fail(function(xhr, ajaxOptions, thrownError) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -1415,7 +1458,9 @@
 					});
 				}, 500);
 	
-						
+				$('#modalOverlay').delay(1000).hide(0, function() {
+					$('#modalOverlay').modal('hide');
+				});		
 			});
 
 
@@ -1480,6 +1525,8 @@
 					<cfquery name="rsItemNum" datasource="#application.dsn_processos#">
 						SELECT pc_aval_numeracao FROM pc_avaliacoes WHERE pc_aval_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.idAvaliacao#">
 					</cfquery>
+
+					
 
 
 
@@ -2859,7 +2906,7 @@
 		
 		<cfquery name="rsProc" datasource="#application.dsn_processos#">
 			SELECT      pc_processos.*, pc_avaliacoes.*, pc_orgaos.pc_org_descricao as descOrgAvaliado, pc_orgaos.pc_org_mcu as mcuAvaliado, pc_orgaos.pc_org_sigla as siglaOrgAvaliado, pc_status.*, 
-								pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
+								pc_avaliacao_tipos.pc_aval_tipo_descricao,pc_avaliacao_tipos.pc_aval_tipo_processoN2, pc_orgaos.pc_org_se_sigla as seOrgAvaliado,
 								pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 								, pc_classificacoes.pc_class_descricao,  pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu, pc_avaliacao_orientacoes.*,
 								pc_orgao_OrientacaoResp.pc_org_sigla as orgaoRespOrientacao, pc_orgao_OrientacaoResp.pc_org_mcu as mcuOrgaoRespOrientacao
@@ -2878,7 +2925,22 @@
 			WHERE pc_aval_orientacao_id  = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
 
 
-		</cfquery>		
+		</cfquery>	
+
+		<cfquery name="rsDadosProcessoPesquisa" dbtype="query" >
+			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2,orgaoRespOrientacao FROM rsProc 
+		</cfquery>
+
+		<cfquery name="rsVerificaExistePesquisa" datasource="#application.dsn_processos#">
+			SELECT CASE WHEN EXISTS (
+				SELECT 1
+				FROM pc_pesquisas
+				WHERE pc_processo_id = <cfqueryparam value="#rsProc.pc_processo_id#" cfsqltype="cf_sql_varchar">
+				AND pc_org_mcu = <cfqueryparam value="#rsProc.pc_org_mcu#" cfsqltype="cf_sql_varchar">
+			) THEN 1 ELSE 0 END AS existePesquisa
+		</cfquery>
+
+		
 
 				<!--COLOCAR AQUI UMA CFQUERY QUE RETORNE SE É ÚLTIMO ITEM A SER AVALIADO-->
 			
@@ -3013,7 +3075,6 @@
 
 			$(document).ready(function() {
 
-			
 				mostraTabAnexosOrientacoes();
 				<cfoutput>
 					var pc_anexo_avaliacao_id = '#rsProc.pc_aval_id#';
@@ -3212,12 +3273,12 @@
 			
 				var mensagem = "Deseja enviar esta manifestação?"
 				
-
 				<cfoutput>
-					var   pc_aval_id = '#rsProc.pc_aval_id#';
-					var   pc_aval_orientacao_mcu_orgaoResp = '#rsProc.pc_aval_orientacao_mcu_orgaoResp#';
-					var   pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
+					var pc_aval_id = '#rsProc.pc_aval_id#';
+					var pc_aval_orientacao_mcu_orgaoResp = '#rsProc.pc_aval_orientacao_mcu_orgaoResp#';
+					var pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
 					var numProcesso = "#rsProc.pc_processo_id#";
+					var existePesquisa 	= '#rsVerificaExistePesquisa.existePesquisa#';
 				</cfoutput>
 				var statusOrientacao = 3; //staus RESPOSTA DO ÓRGÃO SUBORDINADOR
 				if($('#pcOrientacaoStatus').val()){
@@ -3303,17 +3364,27 @@
 								.done(function(result) {	
 									$('#pcPosicAcomp').val('')
 									toastr.success('Envio da manifestação realizado com sucesso!');
-									$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
-										$('#modalOverlay').modal('show');
+									if(existePesquisa == 0){
+										$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
+											$('#modalOverlay').modal('show');
+											exibirTabela();
+											$('#informacoesItensAcompanhamentoDiv').html('');
+											$('#timelineViewAcompDiv').html('');
+											$('#modalOverlay').delay(1000).hide(0, function() {
+												$('#modalOverlay').modal('hide');
+												$('.modal-backdrop').remove(); // Remove o backdrop
+												$('body').removeClass('modal-open'); // Remove a classe que impede o scroll
+											});
+										});	
+									}else{
 										exibirTabela();
 										$('#informacoesItensAcompanhamentoDiv').html('');
 										$('#timelineViewAcompDiv').html('');
 										$('#modalOverlay').delay(1000).hide(0, function() {
 											$('#modalOverlay').modal('hide');
-											$('.modal-backdrop').remove(); // Remove o backdrop
-        									$('body').removeClass('modal-open'); // Remove a classe que impede o scroll
 										});
-									});			
+									}
+
 								})//fim done
 								.fail(function(xhr, ajaxOptions, thrownError) {
 									$('#modalOverlay').delay(1000).hide(0, function() {

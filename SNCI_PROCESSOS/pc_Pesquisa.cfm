@@ -151,6 +151,24 @@
                 z-index:1051!important;  /* Valor superior ao do avaliacaoModal */
             }
 
+            #tabelaDadosProcesso th, #tabelaDadosProcesso td,
+            #tabelaCriterios th, #tabelaCriterios td {
+                padding: 1px 3px!important;  /* Reduzindo ao mínimo */
+                line-height: 0.8!important;  /* Reduzindo altura da linha */
+                font-size: 0.7rem!important;  /* Mantendo a legibilidade */
+                height: 1px!important;  /* Forçando altura mínima */
+                white-space: nowrap!important;  /* Evita quebras de linha */
+            }
+            
+            #tabelaDadosProcesso th, #tabelaCriterios th {
+                font-weight: normal!important; /* Cabeçalhos normais */
+            }
+
+            #tabelaDadosProcesso td, #tabelaCriterios td {
+                font-weight: bold!important; /* Células em negrito */
+            }
+
+
         </style>
 
     </head>
@@ -172,7 +190,7 @@
                                 <div class="modal-body">
                                     
                                     <div class="table-container" style="display: flex; gap: 20px;justify-content: space-between;">
-                                        <table class="table table-bordered first-table" style="width: 60%;">
+                                        <table id="tabelaCriterios" class="table table-bordered first-table" style="width: 50%;">
                                             <thead>
                                                 <tr>
                                                     <th colspan="5" style="font-size:0.7rem">Por favor, avalie os seguintes itens com base nos seguintes critérios, considerando a escala:</th>
@@ -195,23 +213,25 @@
                                                 </tr>
                                             </tbody>
                                         </table>
-                                        <table class="table table-bordered" style="width: 40%;">
+                                        <table id="tabelaDadosProcesso" class="table table-bordered" style="width: 50%;">
                                             <thead>
                                                 <tr>
-                                                    <th colspan="3" style="font-size:0.7rem">Dados do Processo:</th>
+                                                    <th colspan="5" style="font-size:0.7rem">Detalhes do Processo para Pesquisa de Opinião do Órgão <strong>#rsDadosProcessoPesquisa.orgaoRespOrientacao#</strong></th>
                                                 </tr>
                                                 <tr style="font-size:0.7rem">
                                                     <th>N° SNCI</th>
                                                     <th>N° SEI</th>
                                                     <th>N° Rel. SEI</th>
+                                                    <th>Tipo de Avaliação (Proc. N2)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr style="font-size:0.7rem">
-                                                    <td>#rsProc.pc_processo_id#</td>
-                                                    <cfset sei = left(#rsProc.pc_num_sei#,5) & '.'& mid(#rsProc.pc_num_sei#,6,6) &'/'& mid(#rsProc.pc_num_sei#,12,4) &'-'&right(#rsProc.pc_num_sei#,2)>
+                                                    <td>#rsDadosProcessoPesquisa.pc_processo_id#</td>
+                                                    <cfset sei = left(#rsDadosProcessoPesquisa.pc_num_sei#,5) & '.'& mid(#rsDadosProcessoPesquisa.pc_num_sei#,6,6) &'/'& mid(#rsDadosProcessoPesquisa.pc_num_sei#,12,4) &'-'&right(#rsDadosProcessoPesquisa.pc_num_sei#,2)>
                                                     <td>#sei#</td>
-                                                    <td>#rsProc.pc_num_rel_sei#</td>
+                                                    <td>#rsDadosProcessoPesquisa.pc_num_rel_sei#</td>
+                                                    <td>#rsDadosProcessoPesquisa.pc_aval_tipo_processoN2#</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -405,7 +425,7 @@
 
                 if (isValid) {
                     <cfoutput>
-                        let processoPesquisa = '#rsProc.pc_processo_id#';
+                        let processoPesquisa = '#rsDadosProcessoPesquisa.pc_processo_id#';
                     </cfoutput>
                      
                      $('#modalOverlay').modal('show');
