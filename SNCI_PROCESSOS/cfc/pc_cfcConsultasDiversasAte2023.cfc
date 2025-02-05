@@ -532,6 +532,8 @@
 			<cfset orientacao.PC_AVAL_ORIENTACAO_DESCRICAO = rsProcTab.pc_aval_orientacao_descricao>
 			<cfset orientacao.ORIENTACAO_ORGAO_RESP = rsProcTab.orientacaoOrgaoResp>
 			<cfset orientacao.STATUS_ORIENTACAO = rsProcTab.statusDescricao>
+			<cfset dataStatusOrientacao = DateFormat(#pc_aval_orientacao_status_datahora#,'DD-MM-YYYY') >
+			<cfset orientacao.DATA_STATUS_ORIENTACAO = dataStatusOrientacao>
 			<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
 			<cfif pc_aval_orientacao_status eq 4 and pc_aval_orientacao_status eq 5>
 				<cfset orientacao.DATA_PREV_RESP = dataPrev>

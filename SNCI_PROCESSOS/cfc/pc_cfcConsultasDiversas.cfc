@@ -1902,7 +1902,7 @@
 						,pc_usuarios.pc_usu_nome  as coordRegional
 						,pc_usuCoodNacional.pc_usu_nome  as coordNacional
 						,pc_aval_numeracao,pc_aval_descricao , pc_aval_id, pc_aval_orientacao_id
-						,pc_aval_orientacao_descricao,pc_aval_orientacao_dataPrevistaResp,pc_aval_orientacao_status
+						,pc_aval_orientacao_descricao,pc_aval_orientacao_dataPrevistaResp,pc_aval_orientacao_status,pc_aval_orientacao_status_datahora
 						,pc_orgaos_resp.pc_org_sigla + ' (' + pc_aval_orientacao_mcu_orgaoResp + ')' as orientacaoOrgaoResp
 						,pc_orientacao_status.pc_orientacao_status_descricao, pc_aval_status_descricao,pc_aval_classificacao
 						,pc_aval_orientacao_dataPrevistaResp  
@@ -2155,6 +2155,8 @@
 			<cfset orientacao.PC_AVAL_ORIENTACAO_BENEFICIOFINANCEIRO = LSCurrencyFormat(rsProcTab.pc_aval_orientacao_beneficioFinanceiro, 'local')>
 			<cfset orientacao.PC_AVAL_ORIENTACAO_CUSTOFINANCEIRO = LSCurrencyFormat(rsProcTab.pc_aval_orientacao_custoFinanceiro, 'local')>
 			<cfset orientacao.PC_AVAL_ORIENTACAO_STATUS_DESCRICAO = rsProcTab.statusDescricao>
+			<cfset dataStatusOrientacao = DateFormat(#pc_aval_orientacao_status_datahora#,'DD-MM-YYYY') >
+			<cfset orientacao.PC_AVAL_ORIENTACAO_STATUS_DATA = dataStatusOrientacao>
 			<cfset orientacao.PC_AVAL_ORIENTACAO_DATA_PREVISTA_RESP = DateFormat(rsProcTab.pc_aval_orientacao_dataPrevistaResp,'DD-MM-YYYY')>
 			<cfif rsProcTab.pc_orientacao_status_finalizador eq "S">
 				<cfset orientacao.PC_ORIENTACAO_STATUS_FINALIZADOR = "Sim">

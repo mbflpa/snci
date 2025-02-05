@@ -271,6 +271,7 @@
 					{ data: 'PC_AVAL_ORIENTACAO_DESCRICAO', title: 'Orientação' },
 					{ data: 'ORIENTACAO_ORGAO_RESP', title: 'Órgão Responsável' },
 					{ data: 'STATUS_ORIENTACAO', title: 'Status da Orientação' },
+					{ data: 'DATA_STATUS_ORIENTACAO', title: 'Data Status Orientação' },
 					{ data: 'DATA_PREV_RESP', title: 'Data Prev. Resp.' },
 					{ data: 'ACOMP_FINALIZADO', title: 'Acomp. Finalizado?' }
 				);

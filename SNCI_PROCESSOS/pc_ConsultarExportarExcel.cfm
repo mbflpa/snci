@@ -295,6 +295,7 @@
 					{ data: 'PC_AVAL_ORIENTACAO_BENEFICIOFINANCEIRO', title: 'Benefício Financeiro' },
 					{ data: 'PC_AVAL_ORIENTACAO_CUSTOFINANCEIRO', title: 'Custo Financeiro' },
 					{ data: 'PC_AVAL_ORIENTACAO_STATUS_DESCRICAO', title: 'Status da Orientação' },
+					{ data: 'PC_AVAL_ORIENTACAO_STATUS_DATA', title: 'Data Status Orientação' },
 					{ data: 'PC_AVAL_ORIENTACAO_DATA_PREVISTA_RESP', title: 'Data Prev. Resp.' },
 					{ data: 'PC_ORIENTACAO_STATUS_FINALIZADOR', title: 'Acomp. Finalizado?' },
 
