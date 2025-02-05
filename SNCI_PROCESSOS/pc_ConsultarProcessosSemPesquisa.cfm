@@ -37,7 +37,7 @@
 			padding: 5px;
 			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 			width: 260px;
-			height: 150px;
+			height: 100px;
 			display: flex;
 			flex-direction: column;
 			justify-content: center;
@@ -68,7 +68,7 @@
 			top: 50%;
 			left: 50%;
 			transform: translate(-50%, -50%);
-			font-size: 85px;
+			font-size: 70px;
 			opacity: 0.1;
 			color: rgba(0, 0, 0, 62%);
 		}
@@ -87,7 +87,7 @@
 
 		.process-info {
 			font-size: 12px;
-			color: #6c757d;
+			color: #0e406a;
 			line-height: 1.2; /* Ajustar a altura da linha para melhor visibilidade */
 		}
 
@@ -112,8 +112,9 @@
 		}
 
 		.process-card:hover {
-			background-color:#f2f2b4;
+			background-color:#fcfced;
 			color:#000;
+			border-left: 4px solid green;
 		}
 		
 
@@ -128,8 +129,11 @@
 				<div class="container-fluid">
 					<div class="row mb-2" style="margin-bottom:0px!important;">
 						<div class="col-sm-12">
-							<div style="display: flex; align-items: center;">
-								<h4 style="margin-right: 10px;">Processos Sem Pesquisas de Opinião Respondidas</h4>
+							<div >
+								<cfoutput>
+									<h4 style="margin-right: 10px;">Processos com Pesquisas de Opinião não respondidas pelo órgão #application.rsUsuarioParametros.pc_org_sigla#</h4>
+									<h5 style="margin-right: 10px;">Obs.: aplicada em processos a partir de #application.anoPesquisaOpiniao#</h5>
+								</cfoutput>
 							</div>
 						</div>
 					</div>
@@ -217,10 +221,7 @@
 											<p><strong>ID do Processo:</strong> ${processo.PC_PROCESSO_ID || 'N/A'}</p>
 											<p><strong>Número SEI:</strong> ${processo.SEI || 'N/A'}</p>
 											<p><strong>Número Relatório SEI:</strong> ${processo.PC_NUM_REL_SEI || 'N/A'}</p>
-											<p><strong>Macroprocessos:</strong> ${processo.PC_AVAL_TIPO_MACROPROCESSOS || 'N/A'}</p>
-											<p><strong>Processo N1:</strong> ${processo.PC_AVAL_TIPO_PROCESSON1 || 'N/A'}</p>
 											<p><strong>Processo N2:</strong> ${processo.PC_AVAL_TIPO_PROCESSON2 || 'N/A'}</p>
-											<p><strong>Processo N3:</strong> ${processo.PC_AVAL_TIPO_PROCESSON3 || 'N/A'}</p>
 										</div>
 									</div>
 								`;

@@ -1244,7 +1244,7 @@
 		</cfquery>
 
 		<cfquery name="rsDadosProcessoPesquisa" dbtype="query" >
-			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2 ,ano as anoPesquisa
+			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2 ,ano as anoProcesso
 			FROM rsMelhoriaPosic
 		</cfquery>
 
@@ -1376,7 +1376,10 @@
 					var orgAvaliado = '#rsMelhoriaPosic.pc_num_orgao_avaliado#'
 					var orgResp = '#rsMelhoriaPosic.pc_aval_melhoria_num_orgao#'
 					var existePesquisa 	= '#rsMelhoriaVerificaExistePesquisa.existePesquisa#';
-					var anoPesquisa = '#rsDadosProcessoPesquisa.anoPesquisa#';
+					var anoProcesso = '#rsDadosProcessoPesquisa.anoProcesso#';
+					var anoPesquisaOpiniao = '#application.anoPesquisaOpiniao#';
+					
+
 				</cfoutput>
 
 				//verifica se os campos necessários foram preenchidos
@@ -1409,7 +1412,7 @@
 						async: false
 					})//fim ajax
 					.done(function(result) {
-						if(existePesquisa == 0 && anoPesquisa >=2025){
+						if(existePesquisa == 0 && anoProcesso >=anoPesquisaOpiniao){
 							$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
 								$('#modalOverlay').modal('show');
 								$('#pcDataPrev').val('')
@@ -2924,7 +2927,7 @@
 		</cfquery>	
 
 		<cfquery name="rsDadosProcessoPesquisa" dbtype="query" >
-			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2 ,ano as anoPesquisa
+			SELECT pc_processo_id, pc_num_sei, pc_num_rel_sei, pc_aval_tipo_processoN2 ,ano as anoProcesso
 			FROM rsProc 
 		</cfquery>
 
@@ -3276,7 +3279,9 @@
 					var pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
 					var numProcesso = "#rsProc.pc_processo_id#";
 					var existePesquisa 	= '#rsVerificaExistePesquisa.existePesquisa#';
-					var anoPesquisa = '#rsDadosProcessoPesquisa.anoPesquisa#';
+					var anoProcesso = '#rsDadosProcessoPesquisa.anoProcesso#';
+					var anoPesquisaOpiniao = '#application.anoPesquisaOpiniao#';
+
 				</cfoutput>
 				var statusOrientacao = 3; //staus RESPOSTA DO ÓRGÃO SUBORDINADOR
 				if($('#pcOrientacaoStatus').val()){
@@ -3362,7 +3367,7 @@
 								.done(function(result) {	
 									$('#pcPosicAcomp').val('')
 									toastr.success('Envio da manifestação realizado com sucesso!');
-									if(existePesquisa == 0 && anoPesquisa >=2025){
+									if(existePesquisa == 0 && anoProcesso >=anoPesquisaOpiniao){
 										$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
 											$('#modalOverlay').modal('show');
 											exibirTabela();

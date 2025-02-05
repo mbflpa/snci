@@ -95,3 +95,6 @@
 
 <cfset application.orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
 
+<cfset application.anoPesquisaOpiniao = 2019>
+
+
