@@ -807,7 +807,8 @@
 						,pc_orgaos_resp.pc_org_sigla + ' (' + pc_aval_orientacao_mcu_orgaoResp + ')' as orientacaoOrgaoResp
 						,pc_orientacao_status.pc_orientacao_status_descricao, pc_aval_status_descricao,pc_aval_classificacao
 						,pc_aval_orientacao_dataPrevistaResp,pc_aval_vaFalta,pc_aval_vaSobra,pc_aval_vaRisco   
-						,pc_orientacao_status.pc_orientacao_status_finalizador,
+						,pc_orientacao_status.pc_orientacao_status_finalizador
+						,pc_aval_orientacao_status_datahora,
 						CASE
 							WHEN  CONVERT(VARCHAR(10), pc_aval_orientacao_dataPrevistaResp, 102)  < CONVERT(VARCHAR(10), GETDATE(), 102) AND pc_aval_orientacao_status IN (4, 5) THEN 'PENDENTE'
 							ELSE pc_orientacao_status_descricao
@@ -926,6 +927,7 @@
 												<th >Orientação</th>
 												<th >Órgão Responsável</th>
 												<th >Status da Orientação</th>
+												<th >Data Status Orientação</th>
 												<th >Data Prev. Resp.</th>
 												<th >Acomp. Finalizado?</th>
 											</tr>
@@ -1022,7 +1024,7 @@
 															<td >#pc_aval_orientacao_descricao#</td>
 															<td>#orientacaoOrgaoResp#</td>
 															<td>#statusDescricao#</td>
-															
+															<td>#DateFormat(pc_aval_orientacao_status_datahora,'DD-MM-YYYY')#</td>
 															<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
 															<cfif pc_aval_orientacao_status eq 4 and pc_aval_orientacao_status eq 5>
 																<td>#dataPrev#</td>
