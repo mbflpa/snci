@@ -152,9 +152,9 @@
 									<cfif #qProcessosSemPesquisa# neq 0>
 										<cfoutput>
 											<cfif #qProcessosSemPesquisa# eq 1>
-												<li style="color:red;"><span  style="color:red;font-size:1.2em">Existe #qProcessosSemPesquisa# Pesquisa de Opinião pendente de resposta do órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
+												<li style="color:red;"><span  style="color:red;font-size:1.2em">Existe #qProcessosSemPesquisa# Pesquisa de Opinião não respondida pelo órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
 											<cfelse>
-												<li style="color:red;"><span  style="color:red;font-size:1.2em">Existem #qProcessosSemPesquisa# Pesquisas de Opinião pendentes de resposta do órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
+												<li style="color:red;"><span  style="color:red;font-size:1.2em">Existem #qProcessosSemPesquisa# Pesquisas de Opinião não respondidas pelo órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
 											</cfif>
 											<span style="color:red;font-size:1.2em">Clique no menu ao lado em <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em;margin-right:10px"><i class="nav-icon fas fa-search"></i> Consultas</span> e escolha a opção <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em"><i class="nav-icon fas fa-clipboard-list"></i> Pesquisas Não Resp.</span></span></li>
 										</cfoutput>
