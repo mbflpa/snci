@@ -1253,7 +1253,7 @@
 				SELECT 1
 				FROM pc_pesquisas
 				WHERE pc_processo_id = <cfqueryparam value="#rsMelhoriaPosic.pc_processo_id#" cfsqltype="cf_sql_varchar">
-				AND pc_org_mcu = <cfqueryparam value="#rsMelhoriaPosic.pc_org_mcu#" cfsqltype="cf_sql_varchar">
+				AND pc_org_mcu = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
 			) THEN 1 ELSE 0 END AS existePesquisa
 		</cfquery>
 		
@@ -2936,7 +2936,7 @@
 				SELECT 1
 				FROM pc_pesquisas
 				WHERE pc_processo_id = <cfqueryparam value="#rsProc.pc_processo_id#" cfsqltype="cf_sql_varchar">
-				AND pc_org_mcu = <cfqueryparam value="#rsProc.pc_org_mcu#" cfsqltype="cf_sql_varchar">
+				AND pc_org_mcu = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
 			) THEN 1 ELSE 0 END AS existePesquisa
 		</cfquery>
 
@@ -3283,6 +3283,7 @@
 					var anoPesquisaOpiniao = '#application.anoPesquisaOpiniao#';
 
 				</cfoutput>
+
 				var statusOrientacao = 3; //staus RESPOSTA DO ÓRGÃO SUBORDINADOR
 				if($('#pcOrientacaoStatus').val()){
 					statusOrientacao = 	$('#pcOrientacaoStatus').val()
@@ -3367,6 +3368,7 @@
 								.done(function(result) {	
 									$('#pcPosicAcomp').val('')
 									toastr.success('Envio da manifestação realizado com sucesso!');
+									
 									if(existePesquisa == 0 && anoProcesso >=anoPesquisaOpiniao){
 										$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
 											$('#modalOverlay').modal('show');
