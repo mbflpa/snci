@@ -901,6 +901,7 @@
 						,pc_aval_orientacao_descricao,pc_aval_orientacao_dataPrevistaResp,pc_aval_orientacao_status
 						,pc_orgaos_resp.pc_org_sigla + ' (' + pc_aval_orientacao_mcu_orgaoResp + ')' as orientacaoOrgaoResp
 						,pc_orientacao_status.pc_orientacao_status_descricao, pc_aval_status_descricao,pc_aval_classificacao
+						,pc_aval_orientacao_status_datahora
 						,pc_aval_orientacao_dataPrevistaResp  
 						,pc_aval_valorEstimadoRecuperar
 						,pc_aval_valorEstimadoRisco
@@ -1087,6 +1088,7 @@
 												<th>Benefício Financeiro</th>
 												<th>Custo Financeiro</th>
 												<th >Status da Orientação</th>
+												<th >Data Status Orientação</th>
 												<th >Data Prev. Resp.</th>
 												<th >Acomp. Finalizado?</th>
 											</tr>
@@ -1244,6 +1246,7 @@
 															<td>#LSCurrencyFormat(pc_aval_orientacao_custoFinanceiro, 'local')#</td>
 
 															<td>#statusDescricao#</td>
+															<td>#DateFormat(pc_aval_orientacao_status_datahora,'DD-MM-YYYY')#</td>
 															<cfset dataPrev = DateFormat(#pc_aval_orientacao_dataPrevistaResp#,'DD-MM-YYYY') >
 															<cfif pc_aval_orientacao_status eq 4 and pc_aval_orientacao_status eq 5>
 																<td>#dataPrev#</td>
