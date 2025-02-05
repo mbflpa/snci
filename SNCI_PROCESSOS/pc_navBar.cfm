@@ -34,6 +34,7 @@
 							<div class="mensagemAlertaNavBar" id="alertasOAOrientacoesNavBarDiv" ></div>
 							<div class="mensagemAlertaNavBar" id="alertasOAOrientacoesSubordinadosNavBarDiv" ></div>
 							<div class="mensagemAlertaNavBar" id="alertasOAPropostasMelhoriaNavBarDiv" ></div>
+							<div class="mensagemAlertaNavBar" id="alertasOAPesquisasNavBarDiv" ></div>
 							<!-- Message End -->
 							<div class="dropdown-arrow_navbar"></div>
 						</div>
@@ -94,6 +95,7 @@
 						mostraalertasOAOrientacoes();
 						mostraAlertasOAOrientacoesSubordinados();
 						mostraAlertasOAPropostasMelhoria();
+						mostraAlertasOAPesquisas();
 						atualizaBadgeAlertas();
 					} else {
 						mostraAlertasPosicionamentosIniciaisCI();
@@ -180,6 +182,33 @@
 					});
 				})//fim fail
 			}
+
+			function mostraAlertasOAPesquisas(){
+				$.ajax({
+					type: "post",
+					url: "cfc/pc_cfcAlertasIndex.cfc",
+					data:{
+						method: "alertasOAPesquisasNavBar"
+					},
+					async: false
+				})//fim ajax
+				.done(function(result) {
+					$('#alertasOAPesquisasNavBarDiv').html(result)
+				})//fim done
+				.fail(function(xhr, ajaxOptions, thrownError) {
+					$('#modalOverlay').delay(1000).hide(0, function() {
+						$('#modalOverlay').modal('hide');
+						var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
+									+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
+						const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
+						
+						swalWithBootstrapButtons.fire(
+							{...erroSistema}
+						)
+					});
+				})//fim fail
+			}
+
 
 			function atualizaBadgeAlertas(){
 				$.ajax({

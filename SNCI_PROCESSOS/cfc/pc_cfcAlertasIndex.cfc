@@ -52,12 +52,55 @@
         <cfreturn qMelhoriasPendentes.totalMelhoriasPendentes[1]>
     </cffunction>
 
+	<cffunction name="getTotalProcessosSemPesquisa" access="public" returntype="numeric">
+		<cfquery name="qProcSemPesquisa" datasource="#application.dsn_processos#" timeout="120">
+			SELECT count(pc_processo_id) as totalProcessosSemPesquisa FROM
+			(
+				SELECT DISTINCT pc_processos.pc_processo_id  
+				FROM pc_avaliacao_orientacoes
+				INNER JOIN pc_avaliacoes 
+					ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+				INNER JOIN pc_processos 
+					ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+				WHERE pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+					AND RIGHT(pc_processos.pc_processo_id, 4) >= 2000
+				AND pc_processos.pc_processo_id NOT IN 
+				(
+					SELECT pc_processo_id 
+					FROM pc_pesquisas 
+					WHERE pc_org_mcu = 
+						<cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+				)
+
+				UNION
+
+				SELECT DISTINCT pc_processos.pc_processo_id  
+				FROM pc_avaliacao_melhorias
+				INNER JOIN pc_avaliacoes 
+					ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
+				INNER JOIN pc_processos 
+					ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+				WHERE pc_aval_melhoria_num_orgao = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+					AND RIGHT(pc_processos.pc_processo_id, 4) >= 2000
+				AND pc_processos.pc_processo_id NOT IN 
+				(
+					SELECT pc_processo_id 
+					FROM pc_pesquisas 
+					WHERE pc_org_mcu = 
+						<cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+				)
+			) AS unificado
+		</cfquery>
+		<cfreturn qProcSemPesquisa.totalProcessosSemPesquisa[1]>
+	</cffunction>
+
 	<cffunction name="alertasOA"   access="remote" hint="mostra alertas para os órgão avaliados na página index.">
         <cfset var totalOrientacoes = getTotalOrientacoes()>
         <cfset var qOrientacoesSubordinados = getTotalOrientacoesSubordinados()>
         <cfset var qMelhoriasPendentes = getTotalMelhoriasPendentes()>
+		<cfset var qProcessosSemPesquisa = getTotalProcessosSemPesquisa()>
 	
-		<cfif #totalOrientacoes# neq 0 || #qOrientacoesSubordinados# neq 0 ||#qMelhoriasPendentes# neq 0>     
+		<cfif #totalOrientacoes# neq 0 || #qOrientacoesSubordinados# neq 0 ||#qMelhoriasPendentes# neq 0 || #qProcessosSemPesquisa# neq 0>    
 				<div id="rowAlertaOrgaoAvaliado" class="row" style="margin-top:30px">
 					<div class="col-md-12">
 						<div class="card card-danger ">
@@ -97,13 +140,25 @@
 										
 										<cfoutput>
 											<cfif #qMelhoriasPendentes# eq 1>
-												<li style="color:red;"><span  style="color:red;font-size:1.2em">Existe #qMelhoriasPendentes# Proposta de Melhoria para manifestação do órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
+												<li style="margin-bottom:20px;color:red;"><span  style="color:red;font-size:1.2em">Existe #qMelhoriasPendentes# Proposta de Melhoria para manifestação do órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
 											<cfelse>
-												<li style="color:red;"><span  style="color:red;font-size:1.2em">Existem #qMelhoriasPendentes# Propostas de Melhoria para manifestação do órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
+												<li style="margin-bottom:20px;color:red;"><span  style="color:red;font-size:1.2em">Existem #qMelhoriasPendentes# Propostas de Melhoria para manifestação do órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
 											</cfif>
 											<span style="color:red;font-size:1.2em">Clique no menu ao lado em <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em;margin-right:10px"><i class="nav-icon fas fa-list"></i> Acompanhamento</span>e selecione a aba "Propostas de Melhoria".</span></li>
 										
 										</cfoutput>
+									</cfif>
+
+									<cfif #qProcessosSemPesquisa# neq 0>
+										<cfoutput>
+											<cfif #qProcessosSemPesquisa# eq 1>
+												<li style="color:red;"><span  style="color:red;font-size:1.2em">Existe #qProcessosSemPesquisa# Pesquisa de Opinião pendente de resposta do órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
+											<cfelse>
+												<li style="color:red;"><span  style="color:red;font-size:1.2em">Existem #qProcessosSemPesquisa# Pesquisas de Opinião pendentes de resposta do órgão <strong>#application.rsUsuarioParametros.pc_org_sigla#</strong>.</span>
+											</cfif>
+											<span style="color:red;font-size:1.2em">Clique no menu ao lado em <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em;margin-right:10px"><i class="nav-icon fas fa-search"></i> Consultas</span> e escolha a opção <span class="statusOrientacoes" style="color:##fff;background-color:##0e406a;padding:3px;font-size:1em"><i class="nav-icon fas fa-clipboard-list"></i> Pesquisas Não Resp.</span></span></li>
+										</cfoutput>
+
 									</cfif>
 
 									
@@ -122,7 +177,7 @@
 		</cfif> 
 	</cffunction>
 
-	<cffunction name="alertasOAOrientacoesNavBar"   access="remote" hint="mostra alertas para os órgão avaliados na página index.">
+	<cffunction name="alertasOAOrientacoesNavBar"   access="remote" hint="mostra alertas para os órgão avaliados no NavBar.">
         <cfset var qOrientacoes = getTotalOrientacoes()>
 
 		<cfif #qOrientacoes# eq 1>
@@ -135,7 +190,7 @@
 			
 	</cffunction>
 
-	<cffunction name="alertasOAOrientacoesSubordinadosNavBar"   access="remote" hint="mostra alertas para os órgão avaliados na página index.">
+	<cffunction name="alertasOAOrientacoesSubordinadosNavBar"   access="remote" hint="mostra alertas para os órgão avaliados no NavBar.">
 		<cfset var qOrientacoesSubordinados = getTotalOrientacoesSubordinados()>
 		
 		<cfif #qOrientacoesSubordinados# eq 1>
@@ -150,7 +205,7 @@
 			
 	</cffunction>
 
-	<cffunction name="alertasOAPropostasMelhoriaNavBar"   access="remote" hint="mostra alertas para os órgão avaliados na página index.">
+	<cffunction name="alertasOAPropostasMelhoriaNavBar"   access="remote" hint="mostra alertas para os órgão avaliados no NavBar.">
 		<cfset var qMelhoriasPendentes = getTotalMelhoriasPendentes()>
 		
 		<cfif #qMelhoriasPendentes# eq 1>
@@ -163,13 +218,29 @@
 			
 	</cffunction>
 
+	<cffunction name="alertasOAPesquisasNavBar"   access="remote" hint="mostra alertas para os órgão avaliados no NavBar.">
+		<cfset var qProcessosSemPesquisa = getTotalProcessosSemPesquisa()>
+		
+		<cfif #qProcessosSemPesquisa# eq 1>
+			<a class="dropdown-item" href="../SNCI_PROCESSOS/./pc_ConsultarProcessosSemPesquisa.cfm" >Existe <strong>01</strong> Pesquisa de Opinião não respondida.</a>
+			
+		<cfelseif #qProcessosSemPesquisa# gt 1>
+			<a class="dropdown-item" href="../SNCI_PROCESSOS/./pc_ConsultarProcessosSemPesquisa.cfm" >Existem <cfoutput><strong>#qProcessosSemPesquisa#</strong></cfoutput> Pesquisas de Opinião não respondidas.</a>
+			
+		</cfif>	
+			
+	</cffunction>
+
+
+
 	<cffunction name="totalAlertas" access="remote" returntype="struct" returnformat="json" hint="Retorna o total de alertas">
 		<cfset var total = 0>
 		<cfset var qPos = getTotalOrientacoes()>
 		<cfset var qSub = getTotalOrientacoesSubordinados()>
 		<cfset var qMelhorias = getTotalMelhoriasPendentes()>
+		<cfset var qPesquisas = getTotalProcessosSemPesquisa()>
 		
-		<cfset total = qPos + qSub + qMelhorias>
+		<cfset total = qPos + qSub + qMelhorias + qPesquisas>
 		
 		<cfreturn { "total": total }>
 	</cffunction>
