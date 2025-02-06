@@ -23,14 +23,17 @@
         application.diretorio_anexos = baseDir & "SNCI_PROCESSOS_ANEXOS\";
         application.diretorio_avaliacoes = baseDir & "SNCI_PROCESSOS_AVALIACOES\";
         application.diretorio_faqs = baseDir & "SNCI_PROCESSOS_FAQS\";
+        application.anoPesquisaOpiniao = 2025;
     } else if (FindNoCase("homologacaope", application.auxsite) || FindNoCase("desenvolvimentope", application.auxsite)) {
         application.diretorio_anexos = baseDir & "SNCI_TESTE\";
         application.diretorio_avaliacoes = baseDir & "SNCI_TESTE\";
         application.diretorio_faqs = baseDir & "SNCI_TESTE\";
+        application.anoPesquisaOpiniao = 2000;
     } else {
         application.diretorio_anexos = testDir;
         application.diretorio_avaliacoes = testDir;
         application.diretorio_faqs = testDir;
+        application.anoPesquisaOpiniao = 2000;
     }
 </cfscript>
 
@@ -95,6 +98,6 @@
 
 <cfset application.orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu)>
 
-<cfset application.anoPesquisaOpiniao = 2019>
+
 
 
