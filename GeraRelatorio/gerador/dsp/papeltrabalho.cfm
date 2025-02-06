@@ -8,6 +8,13 @@
 	method="geraPapelTrabalho" returnvariable="qryPapelTrabalho">
 </cfinvoke>
 
+  <cfquery name="rsRevis" datasource="#dsn_inspecao#">
+    select Usu_Apelido 
+    from usuarios 
+    where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#qryPapelTrabalho.INP_RevisorLogin#">)
+  </cfquery>
+
+
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	select Usu_DR, Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido, Usu_Coordena 
 	from usuarios 
@@ -28,7 +35,6 @@
 	FROM ValorRelevancia
 	WHERE VLR_Ano = '#right(qryPapelTrabalho.INP_NumInspecao,4)#'
 </cfquery>
-
 
 <cfquery name = "rsQuatEmRevisao" dbtype = "query" >
     SELECT count(Pos_Situacao_Resp) as quantEmRevisao from rsSituacoes
@@ -85,6 +91,7 @@
   </cfloop>            
 </cfif>
 --->
+
 <cfquery name="rsItemReanalisado" datasource="#dsn_inspecao#">
       SELECT RIP_Resposta, RIP_NumGrupo, RIP_NumItem FROM Resultado_Inspecao 
       WHERE RTRIM(RIP_Recomendacao)='R' AND RIP_NumInspecao='#qryPapelTrabalho.INP_NumInspecao#' 
@@ -129,6 +136,12 @@
       WHERE RIP_Unidade = '#qryPapelTrabalho.RIP_Unidade#' and RIP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
       and RIP_NumGrupo ='#form.grupo#' and RIP_NumItem='#form.item#'
     </cfquery>
+    <cfif trim(qryPapelTrabalho.INP_RevisorLogin) lte 0>
+      <cfquery datasource="#dsn_inspecao#">
+        UPDATE Inspecao SET INP_RevisorLogin = '#CGI.REMOTE_USER#', INP_RevisorDTInic = CONVERT(varchar, getdate(), 120)
+        WHERE INP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'and INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
+      </cfquery>
+    </cfif>
     <!--- Atualizar dados na tela --->
     <cfinvoke component="#vRelatorio#.GeraRelatorio.gerador.ctrl.controller"
 	    method="geraPapelTrabalho" returnvariable="qryPapelTrabalho">
@@ -154,7 +167,6 @@
       <cfquery datasource="#dsn_inspecao#">
           UPDATE Inspecao SET INP_Situacao = 'CO'
           , INP_UserName = '#CGI.REMOTE_USER#'
-     <!---     , INP_DtEncerramento = convert(varchar, getdate(), 102) --->
           , INP_DTUltAtu = CONVERT(varchar, getdate(), 120)
           , INP_DTConcluirRevisao = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
           WHERE INP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
@@ -319,8 +331,8 @@
           </cfquery>
           <cfif rsExisteSN.recordcount lte 0>
             <cfquery datasource="#dsn_inspecao#">
-              insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
-              values ('#qryPapelTrabalho.INP_NumInspecao#', '#rs11.Pos_Unidade#', #rs11.Pos_NumGrupo#, #rs11.Pos_NumItem#, convert(varchar, getdate(), 102), '#CGI.REMOTE_USER#', 14, '000014', '#andparecer#', '#rs11.Pos_Unidade#')
+              insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area, And_NomeArea) 
+              values ('#qryPapelTrabalho.INP_NumInspecao#', '#rs11.Pos_Unidade#', #rs11.Pos_NumGrupo#, #rs11.Pos_NumItem#, convert(varchar, getdate(), 102), '#CGI.REMOTE_USER#', 14, '000014', '#andparecer#', '#rs11.Pos_Unidade#','#auxnomearea#')
             </cfquery>
           <cfelse>
             <cfquery datasource="#dsn_inspecao#">
@@ -530,7 +542,16 @@
 
     }
     //fim script botão voltar ao topo
-
+		function avisorevisor() {
+			<cfoutput>
+				let loginusuario = '#trim(cgi.REMOTE_USER)#';
+				let loginrevisor = '#trim(qryPapelTrabalho.INP_RevisorLogin)#';
+				let revisornome = '#trim(rsRevis.Usu_Apelido)#';
+			</cfoutput>
+			if (loginrevisor.length > 0 && loginusuario != loginrevisor){
+				  alert('Revisor(a), Avaliação está no Status de Revisão pelo gestor(a): '+revisornome)
+			}
+		}  
 
   </script>
 
@@ -539,8 +560,7 @@
 <cfset qtdrevisar = 0>
 <cfset qtdvalidar = 0>
 
-
-<body id="main_body" style="background:#fff">
+<body id="main_body" style="background:#fff" onload="avisorevisor()">
 <div id="aguarde" name="aguarde" align="center"  style="width:100%;height:200%;top:0px;left:0px; background:transparent;
 filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F86b2ff,endColorstr=#7F86b2ff);
 z-index:1000;visibility:hidden;position:absolute;" >		
