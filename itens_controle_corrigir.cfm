@@ -110,6 +110,17 @@
  </cfquery>
 
 <cfif IsDefined("FORM.submit") AND IsDefined("FORM.acao") And Form.acao is "corrigir">
+	<cfquery datasource="#dsn_inspecao#" name="rsRevis">
+		SELECT INP_RevisorLogin
+		FROM Inspecao
+		WHERE INP_NumInspecao='#FORM.ninsp#'
+	</cfquery>	
+	<cfif trim(rsRevis.INP_RevisorLogin) lte 0>
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE Inspecao SET INP_RevisorLogin = '#CGI.REMOTE_USER#', INP_RevisorDTInic = CONVERT(varchar, getdate(), 120)
+			WHERE INP_NumInspecao ='#FORM.ninsp#'
+		</cfquery>
+	</cfif>
 	<cfset aux_mel = CHR(13) & Form.Melhoria>
 	<cfset aux_recom = CHR(13) & FORM.recomendacao>	
 	<cfquery datasource="#dsn_inspecao#">

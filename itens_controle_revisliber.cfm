@@ -85,6 +85,17 @@
 
 <!---  --->
 <cfif isDefined("Form.acao")>
+	<cfquery datasource="#dsn_inspecao#" name="rsRevis">
+		SELECT INP_RevisorLogin
+		FROM Inspecao
+		WHERE INP_NumInspecao='#form.ninsp#'
+	</cfquery>
+	<cfif trim(rsRevis.INP_RevisorLogin) lte 0>
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE Inspecao SET INP_RevisorLogin = '#CGI.REMOTE_USER#', INP_RevisorDTInic = CONVERT(varchar, getdate(), 120)
+			WHERE INP_Unidade = '#Unid#'and INP_NumInspecao ='#form.ninsp#'
+		</cfquery>
+	</cfif>
 <!--- Verifica se o item ainda consta em ParecerUnidade pois pode ter sido enviado para Reanálise do Inspetor--->
     <cfquery datasource="#dsn_inspecao#" name="qVerificaParecerUnidade">
 		SELECT Pos_Inspecao FROM ParecerUnidade 
