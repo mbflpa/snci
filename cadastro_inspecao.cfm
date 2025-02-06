@@ -839,8 +839,8 @@ tbody {
 </style>
 
 <cfquery datasource="#dsn_inspecao#" name="rsInspecao" >
-				SELECT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_Coordenador, INP_DtInicInspecao, INP_DtFimInspecao, INP_Unidade, INP_Modalidade
-				, NIP_NumInspecao, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_Sigla  FROM  Inspecao
+				SELECT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_Coordenador, INP_DtInicInspecao, INP_DtFimInspecao, INP_Unidade, INP_Modalidade,INP_RevisorLogin,NIP_NumInspecao, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_Sigla  
+				FROM  Inspecao
 				INNER JOIN Numera_Inspecao ON INP_NumInspecao = NIP_NumInspecao
 				INNER JOIN Unidades ON Und_Codigo = INP_Unidade
 				INNER JOIN Diretoria ON  Dir_Codigo = Und_CodDiretoria
@@ -851,8 +851,7 @@ tbody {
 
 <!---Inspeções NA = não avaliadas, ER = em reavaliação, RA =reavaliado, CO = concluída--->
 <cfquery datasource="#dsn_inspecao#" name="rsEmRevisao">
-				SELECT DISTINCT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade
-				, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'comNC' as tipo FROM  Inspecao
+				SELECT DISTINCT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'comNC' as tipo FROM  Inspecao
 				LEFT JOIN ParecerUnidade ON Pos_Inspecao = INP_NumInspecao
 				LEFT JOIN ProcessoParecerUnidade ON Pro_Inspecao = INP_NumInspecao
 				LEFT JOIN Unidades ON Und_Codigo = INP_Unidade
@@ -880,8 +879,8 @@ tbody {
 </cfquery>
 
 <cfquery datasource="#dsn_inspecao#" name="rsFinalizadasSemNCencerrado" >
-			SELECT DISTINCT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade
-				, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao FROM  Inspecao
+			SELECT DISTINCT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade,INP_RevisorLogin,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao 
+			FROM  Inspecao
 			LEFT JOIN ParecerUnidade ON Pos_Inspecao = INP_NumInspecao 
 			LEFT JOIN ProcessoParecerUnidade ON Pro_Inspecao = INP_NumInspecao
 			LEFT JOIN Unidades ON Und_Codigo = INP_Unidade
@@ -1037,10 +1036,10 @@ tbody {
 		</div>
 
 		<div id="NaoAvaliadas" class="tabcontent">
-				<!---INICIO TABELA DE AVALIAÇÕES COM CADASTRO CONCLUÝDO, POREM, NÃO AVALIADAS--->
+				<!---INICIO TABELA DE AVALIAÇÕES COM CADASTRO CONCLUÍDO, POREM, NÃO AVALIADAS--->
 				
 				<cfif rsInspecao.recordCount neq 0>
-					<div id="form_container" name="divInsp" style="width:680px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+					<div id="form_container" name="divInsp" style="width:1100px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
 						<table border="0" align="center"  id="tabInsp" style="width:expression(this.scrollHeight>299?'683px':'700px');">
 							<tr>
 								<td colspan="7" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES COM CADASTRO FINALIZADO (Avaliações em Andamento)</h1></td>
@@ -1260,34 +1259,37 @@ tbody {
 				<!---INICIO TABELA DE AVALIAÇÕES EM REVISÃO--->
 				<cfif rsEmRevisaoFinalizadasSemNC.recordCount neq 0>
 					
-					<div id="form_container" name="divEmVerificacao" style="width:1000px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
-					<table border="0" align="center"  id="tabEmVerificacao" style="width:expression(this.scrollHeight>299?'683px':'700px');">
+					<div id="form_container" name="divEmVerificacao" style="width:1500px;height:expression(this.scrollHeight>299?'300px':'auto');overflow-y:auto;">
+					<table border="0" align="center"  id="tabEmVerificacao" style="width:expression(this.scrollHeight>299?'690px':'700px');">
 						<tr>
-							<td colspan="8" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES FINALIZADAS (Em Revisão)</h1></td>
+							<td colspan="9" align="center" class="titulos"><h1 style="font-size:14px;background:#6699CC">AVALIAÇÕES FINALIZADAS (Em Revisão)</h1></td>
 						</tr>
 						
 						<tr bgcolor="#6699CC" class="exibir" align="center" style="color:#fff">
-							<td width="8%">
+							<td width="5%">
 								<div align="center">Número</div>
 							</td>
 							<td width="25%">
 								<div align="center">Unidade</div>
 							</td>
-							<td width="5%">
-									<div align="center">Mod.</div>
+							<td width="3%">
+								<div align="center">Mod.</div>
 							</td>
 							<td width="8%">
 								<div align="center">Transmissão Avaliação</div>
 							</td>
-							<td width="12%">
+							<td width="8%">
 								<div align="center">Data Atualiz.</div>
 							</td>
-							<td width="20%">
+							<td width="15%">
 								<div align="center">Observações</div>
 							</td>
-							<td width="30%">
-								<div align="center">Empregado</div>
+							<td width="20%">
+								<div align="center">Última Transação</div>
 							</td>
+							<td width="25%">
+								<div align="center">Revisor</div>
+							</td>							
 							<td width="5%">
 								<div align="center">Inspetores</div>
 							</td>
@@ -1297,7 +1299,6 @@ tbody {
 					<cfset avaliada = 0>
 					<cfoutput query="rsEmRevisaoFinalizadasSemNC">
 						<form action="" method="POST" >
-							
 							<cfquery datasource="#dsn_inspecao#" name="rsItemNCI">
 								Select Pos_NCISEI FROM ParecerUnidade
 								Where Pos_Inspecao = '#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#' and Rtrim(Ltrim(Pos_NCISEI)) !=''
@@ -1356,7 +1357,7 @@ tbody {
 									</cfif>
 
 
-									<td width="8%">
+									<td width="5%">
 										<div align="left" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
 											#rsEmRevisaoFinalizadasSemNC.INP_NumInspecao#
 										</div>
@@ -1368,17 +1369,17 @@ tbody {
 										</div>
 									</td>
 									
-									<td width="5%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+									<td width="3%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
 											<div align="center"><cfif #INP_Modalidade# eq 0>PRES.<CFELSE>A DIST.</CFIF></div>
 									</td>
 									
 									<td width="8%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
 										<div align="center">#fimaval#</div>
 									</td>
-									<td width="12%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+									<td width="8%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
 										<div align="center">#perInspec#</div>
 									</td>
-									<td width="20%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+									<td width="15%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
 										<cfset temNCI="">
 										<cfset NCI="">
 										<cfif '#rsItemNCI.RecordCount#' gt 0>
@@ -1422,12 +1423,24 @@ tbody {
 										SELECT * from Inspecao INNER JOIN Usuarios ON INP_UserName = Usu_Login 
 										WHERE INP_NumInspecao = '#INP_NumInspecao#'
 									</cfquery>
+									<cfset revisor = 'SEM REVISOR(A)'>
+									<cfif trim(rsInspCaInsp.INP_RevisorLogin) gt 0>
+										<cfquery name="rsRevis" datasource="#dsn_inspecao#">
+											select Usu_Apelido 
+											from usuarios 
+											where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#rsInspCaInsp.INP_RevisorLogin#">)
+										</cfquery>
+										<cfset revisor = rsRevis.Usu_Apelido>
+									</cfif>
 <!---									<cfset UsuApelido = ''>
 									<cfif ucase(trim(rsInspCaInsp.Usu_GrupoAcesso)) eq 'GESTORES'> --->
 										<cfset UsuApelido = rsInspCaInsp.Usu_Apelido>
 <!---								</cfif> --->
-									<td width="30%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+									<td width="20%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
 										<div align="left">#UsuApelido#</div>
+									</td>
+									<td width="25%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
+										<div align="left">#revisor#</div>
 									</td>
 									<td width="5%" height="25px">
 										<!--- <div align="center"><a  onclick="abrirFormInspetores('#rsInspCaInsp.INP_NumInspecao#',#rsInspCaInsp.INP_Coordenador#)" href="##0"><img src="figuras/usuario.png" alt="Clique para visualizar os inspetores desta Avaliação" width="20" height="20" border="0" ></img></a></div> --->
@@ -1729,7 +1742,7 @@ tbody {
 			sessionStorage.setItem('abaAtual', elmnt.id);
 		
 		}
-		
+
 		<cfoutput>
 			var nf = '#rsNumeraInspecao.recordCount#';
 			var final = '#rsInspecao.recordCount#';
@@ -1777,8 +1790,7 @@ tbody {
 				}
 			}
 		}
-		//fim controle cor das abas em hover e out
-      
+		//fim controle cor das abas em hover e out 
 	</script>
 
 

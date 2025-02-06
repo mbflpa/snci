@@ -44,7 +44,19 @@
 	SELECT RIP_Recomendacao_Inspetor, RIP_Critica_Inspetor, RIP_Recomendacao FROM Resultado_Inspecao
 	WHERE RIP_NumInspecao = '#URL.Ninsp#' AND RIP_Recomendacao = 'R'
 </cfquery>
-
+<cfif isDefined("Form.acao") and (grpacesso eq 'GESTORES')>
+	<cfquery datasource="#dsn_inspecao#" name="rsRevis">
+		SELECT INP_RevisorLogin
+		FROM Inspecao
+		WHERE INP_NumInspecao='#URL.Ninsp#'
+	</cfquery>	
+	<cfif trim(rsRevis.INP_RevisorLogin) lte 0>
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE Inspecao SET INP_RevisorLogin = '#CGI.REMOTE_USER#', INP_RevisorDTInic = CONVERT(varchar, getdate(), 120)
+			WHERE INP_NumInspecao ='#URL.Ninsp#'
+		</cfquery>
+	</cfif>
+</cfif>	
 <cfif isDefined("Form.acao") and "#form.acao#" eq 'cancelarReanalise'>
 	<cfset maskcgiusu = ucase(trim(CGI.REMOTE_USER))>
 	<cfif left(maskcgiusu,8) eq 'EXTRANET'>
@@ -453,7 +465,7 @@
             <div  style="background:#0a3865;border:1px solid #fff;font-family:Verdana, Arial, Helvetica, sans-serif">
 		    	<label style="color:white"><strong>Histórico das Recomendações ao Inspetor:</strong></label>
 				<textarea  <cfif #grpacesso# eq "inspetores">readonly</cfif> id="auxrecomendacao" name="auxrecomendacao" 
-				style="background:#fff;color:black;text-align:justify;" cols="90" 
+				style="background:#fff;color:black;text-align:justify;" cols="80" 
 				rows="8" 
 				wrap="VIRTUAL" class="form" disabled><cfoutput>#qOrientacao.RIP_Recomendacao_Inspetor#</cfoutput></textarea>
 			</div>
@@ -461,7 +473,7 @@
 				<div  style="background:#0a3865;border:1px solid #fff;font-family:Verdana, Arial, Helvetica, sans-serif">
 					<label style="color:white"><strong>Recomendações ao Inspetor:</strong></label>
 					<textarea  <cfif #grpacesso# eq "INSPETORES">readonly</cfif> id="recomendacao" name="recomendacao" 
-					style="background:#fff;color:black;text-align:justify;" cols="90" 
+					style="background:#fff;color:black;text-align:justify;" cols="80" 
 					rows="<cfif '#trim(qOrientacao.RIP_Recomendacao_Inspetor)#' neq ''>4<cfelse>6</cfif>" 
 					wrap="VIRTUAL" class="form"></textarea>
 				</div>
@@ -470,39 +482,39 @@
 				<div  style="margin-top:20px;background:#0a3865;border:1px solid #fff;font-family:Verdana, Arial, Helvetica, sans-serif">
 					<label style="color:white;margin-top:40px"><strong>Histórico das Respostas do Inspetor:</strong></label>
 					<textarea  <cfif (#grpacesso# eq 'GESTORES' or #grpacesso# eq 'DESENVOLVEDORES')>readonly</cfif> id="auxrespInsp" name="auxrespInsp" 
-					style="background:#fff;color:black;text-align:justify;" cols="90" rows="8" wrap="VIRTUAL" class="form" disabled><cfoutput>#qOrientacao.RIP_Critica_Inspetor#</cfoutput></textarea>
+					style="background:#fff;color:black;text-align:justify;" cols="80" rows="8" wrap="VIRTUAL" class="form" disabled><cfoutput>#qOrientacao.RIP_Critica_Inspetor#</cfoutput></textarea>
 				</div>
           <!---   </cfif> --->
             <cfif #grpacesso# eq "INSPETORES">
 				<div  style="margin-top:20px;background:#0a3865;border:1px solid #fff;font-family:Verdana, Arial, Helvetica, sans-serif">
 					<label style="color:white;margin-top:40px"><strong>Resposta do Inspetor:</strong></label>
 					<textarea  <cfif (#grpacesso# eq 'GESTORES' or #grpacesso# eq 'DESENVOLVEDORES')>readonly</cfif> id="respInsp" name="respInsp" 
-					style="background:#fff;color:black;text-align:justify;" cols="90" rows="6" wrap="VIRTUAL" class="form"><cfoutput></cfoutput></textarea>
+					style="background:#fff;color:black;text-align:justify;" cols="80" rows="6" wrap="VIRTUAL" class="form"><cfoutput></cfoutput></textarea>
 				</div>
             </cfif>
 
 			<cfif (#grpacesso# eq 'GESTORES' or #grpacesso# eq 'DESENVOLVEDORES') and '#qOrientacao.RIP_Recomendacao#' eq 'R'>
 				<cfif qInspecaoLiberada.recordCount eq 0 and rsVerifValidados.recordCount eq 0 and qVerifEmReanalise.recordCount eq 1 >
-					<input type="submit" class="botao" 
+					<input type="submit" class="btn btn-danger" 
 					onclick="if(window.confirm('Atenção! Após a validação desta reanálise, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME. NÃO EXECUTA e NÃO VERIFICADO já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){document.form1.acao.value='validar'}" style="background-color:blue;color:#fff;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
 			        value="Validar Reanálise">	
 				<cfelse>
-					<input type="submit" class="botao" onClick="document.form1.acao.value='validar'" style="background-color:blue;color:#fff;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
+					<input type="submit" class="btn btn-danger" onClick="document.form1.acao.value='validar'" style="background-color:blue;color:#fff;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
 			        value="Validar Reanálise">	
 				</cfif>
             </cfif>
 
             <cfif (#grpacesso# eq 'GESTORES' or #grpacesso# eq 'DESENVOLVEDORES') and not isDefined('url.cancelar')>
-		        	<input type="submit" class="botao" onClick="document.form1.acao.value='respostacomreanalise'; return validarform();" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
+		        	<input type="submit" class="btn btn-danger" onClick="document.form1.acao.value='respostacomreanalise'; return validarform();" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
 			         value="Enviar para Reanálise do Inspetor"></input>	
 			</cfif>
 			
 			<cfif (#grpacesso# eq 'GESTORES' or #grpacesso# eq 'DESENVOLVEDORES') and isDefined('url.cancelar') and '#url.cancelar#' eq 's'>
 					<cfif qInspecaoLiberada.recordCount eq 0 and rsVerifValidados.recordCount eq 0 and qVerifEmReanalise.recordCount eq 1 and '#trim(qOrientacao.RIP_Resposta)#' neq 'N'>
-						<input type="submit" class="botao"	onclick="if(window.confirm('Atenção! Após o cancelamento desta reanálise, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME. NÃO EXECUTA e NÃO VERIFICADO já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){document.form1.acao.value='cancelarReanalise';return validarform()}else{window.close();}" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer"  
+						<input type="submit" class="btn btn-danger"	onclick="if(window.confirm('Atenção! Após o cancelamento desta reanálise, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME. NÃO EXECUTA e NÃO VERIFICADO já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){document.form1.acao.value='cancelarReanalise';return validarform()}else{window.close();}" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer"  
 						value="Cancelar Reanálise">	
 					<cfelse>
-						<input type="submit" class="botao" onClick="document.form1.acao.value='cancelarReanalise';return validarform()" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
+						<input type="submit" class="btn btn-danger" onClick="document.form1.acao.value='cancelarReanalise';return validarform()" style="background:red;color:#fff;margin-left:40px;padding:2px;text-align:center;margin-top:10px;cursor:pointer" 
 						value="Cancelar Reanálise">
 					</cfif>
 			</cfif>
