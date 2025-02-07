@@ -60,7 +60,12 @@ function validarform() {
       return false;
     }
   }
-
+  let difmes = mesatual - messelec
+  if ((frm.frmUsuGrupoAcesso.value != 'GESTORMASTER') && eval(frm.frmano.value) == eval(frm.frmanoatual.value) && difmes == 1 && (diaatual) <= 10) {
+      alert('Usuário(a), o resultado da Meta para ano/mês selecionado será liberado a partir do 11º dia do mês corrente');
+      return false;
+  }
+//alert("passou, linha 69")
 //return false;
 }
 </script>
