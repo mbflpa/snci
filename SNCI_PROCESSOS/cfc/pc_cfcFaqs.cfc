@@ -68,12 +68,42 @@
 										</div>
 										
 										<div class="col-sm-12" >
-									
-											<div align="center">
-												<div class="container">
-													<textarea  id="faqTexto" name="faqTexto"><cfoutput>#rsFaqEdit.pc_faq_texto#</cfoutput></textarea>							
+											<!-- Adição dos botões de opção para selecionar modo de envio -->
+											<div class="form-group">
+												<label>Selecione o tipo de envio:</label>
+												<div class="form-check form-check-inline">
+													<input class="form-check-input" type="radio" name="envioFaq" id="envioTexto" value="texto" checked>
+													<label class="form-check-label" for="envioTexto">Digite Texto</label>
+												</div>
+												<div class="form-check form-check-inline">
+													<input class="form-check-input" type="radio" name="envioFaq" id="envioArquivo" value="arquivo">
+													<label class="form-check-label" for="envioArquivo">Anexar PDF</label>
 												</div>
 											</div>
+
+											<!-- Container para textarea -->
+											<div id="containerTexto">
+												<div align="center">
+													<div class="container">
+														<textarea  id="faqTexto" name="faqTexto"><cfoutput>#rsFaqEdit.pc_faq_texto#</cfoutput></textarea>							
+													</div>
+												</div>
+											</div>
+
+											<!-- Container para upload de PDF via botão (oculto por padrão) -->
+											<div id="containerUpload" style="display:none;">
+												<div id="faqUploadActions" class="btn-group">
+													<span id="uploadFaqButton" class="btn btn-primary">
+														<i class="fas fa-upload"></i> Clique aqui para anexar o arquivo PDF
+													</span>
+												</div>
+												
+												<!-- Input file oculto -->
+												<input type="file" id="faqFileInput" accept=".pdf" style="display:none;">
+											</div>
+
+											<!-- Adicionado div para exibição do arquivo após upload -->
+											<div id="anexoFaqDiv" style="margin-top:15px;"></div>
 										</div>
 
 
@@ -124,8 +154,67 @@
 				});
 				$('#faqPerfis').val(selectedValues).trigger('change');
 
+				$('input[name="envioFaq"]').change(function(){
+					if($(this).val() === 'arquivo'){
+						$('#containerTexto').hide();
+						$('#containerUpload').show();
+						// Inicializa Dropzone para upload de PDF com clickable definido como o botão de upload
+						Dropzone.autoDiscover = false;
+						var myDropzoneFaq = new Dropzone("#containerUpload", {
+							url: "cfc/pc_cfcFaqs.cfc?method=uploadArquivosFaqs",
+							autoProcessQueue: true,
+							maxFiles: 1,
+							maxFilesize: 20,
+							acceptedFiles: '.pdf',
+							clickable: "#uploadFaqButton",
+							init: function(){
+								this.on("error", function(file, errorMessage){
+									toastr.error(errorMessage);
+									return false;
+								});
+								this.on("queuecomplete", function(){
+									toastr.success("Upload realizado com sucesso!");
+									this.removeAllFiles(true);
+									// Chama função para exibir o PDF enviado
+									mostraArquivoFaq();
+								});
+							}
+						});
+					} else {
+						$('#containerUpload').hide();
+						$('#containerTexto').show();
+					}
+				});
+				
+				// Removido: $('#uploadFaqButton').on('click', ...) e $('#faqFileInput').on('change', ...);
 			});
 
+			// Nova função para exibir o PDF enviado no FAQ, similar à função mostraRelatorioPDF
+			function mostraArquivoFaq(){
+				$('#modalOverlay').modal('show');
+				setTimeout(function() {
+					$.ajax({
+						type: "post",
+						url:"cfc/pc_cfcAvaliacoes.cfc",
+						data:{ method: "anexoFaq" },
+						async: false
+					})
+					.done(function(result){
+						$('#anexoFaqDiv').html(result);
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					})
+					.fail(function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show');
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
+						$('#modal-danger').find('.modal-body').text(thrownError);
+					});
+				}, 1000);
+			}
 
 			$('#btCancelar').on('click', function (event)  {
 				event.preventDefault()
@@ -146,7 +235,8 @@
 				}
 
 				var dataEditor = CKEDITOR.instances.faqTexto.getData();
-				if(dataEditor.length <100){
+				// Alterado: verificação se dataEditor tem menos de 100 caracteres e se o envio é do tipo "texto"
+				if(dataEditor.length < 100 && $('input[name="envioFaq"]:checked').val() === "texto"){
 					toastr.error('Insira um texto com, no mínimo, 100 caracteres.');
 					return false;
 				}
@@ -232,15 +322,15 @@
 
 
 
-	<cffunction name="cadFaq"   access="remote" hint="Cadastra o FAQ.">
+	<cffunction name="cadFaq" access="remote" hint="Cadastra o FAQ.">
 		<cfargument name="pc_faq_id" type="any" required="false" default=0/>
 		<cfargument name="pc_faq_status" type="string" required="true"/>
 		<cfargument name="pc_faq_titulo" type="string" required="true" />
 		<cfargument name="pc_faq_perfis" type="any" required="true" />
-		<cfargument name="pc_faq_texto" type="string" required="true"/>
-
+		<cfargument name="pc_faq_texto" type="string" required="false" default="null" />
+e	
 		<cfif '#arguments.pc_faq_id#' eq 0 or '#arguments.pc_faq_id#' eq '' >
-			<cfquery datasource="#application.dsn_processos#" >
+			<cfquery datasource="#application.dsn_processos#" result="resultFaq">
 				INSERT INTO pc_faqs
 								(pc_faq_titulo, pc_faq_perfis,pc_faq_status,pc_faq_texto,pc_faq_atualiz_datahora,pc_faq_matricula_atualiz)
 				VALUES     		(<cfqueryparam value="#arguments.pc_faq_titulo#" cfsqltype="cf_sql_varchar">,
@@ -249,6 +339,14 @@
 								 <cfqueryparam value="#arguments.pc_faq_texto#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 								 '#application.rsUsuarioParametros.pc_usu_matricula#')
+			</cfquery>
+			
+			<!-- Novo código: Atualiza pc_anexos atribuindo o novo FAQ id aos registros com pc_anexo_faq_id = 9999999 -->
+			<cfset newFaqId = resultFaq.generatedKey>
+			<cfquery datasource="#application.dsn_processos#">
+				UPDATE pc_anexos
+				SET pc_anexo_faq_id = <cfqueryparam value="#newFaqId#" cfsqltype="cf_sql_numeric">
+				WHERE pc_anexo_faq_id = 9999999
 			</cfquery>
 		<cfelse>
 		    <cfquery datasource="#application.dsn_processos#" >
@@ -263,6 +361,12 @@
 
 			</cfquery>
 		</cfif>
+		
+		<!-- Novo código: Exclui registros residuais com pc_anexo_faq_id = 9999999 -->
+		<cfquery datasource="#application.dsn_processos#">
+			DELETE FROM pc_anexos
+			WHERE pc_anexo_faq_id = 9999999
+		</cfquery>
     </cffunction>
 
 
@@ -659,8 +763,8 @@
 		<cfset mcuOrgao = "#application.rsUsuarioParametros.pc_org_mcu#">
 		<cfif FileExists(destino)>
 			<cfquery datasource="#application.dsn_processos#" >
-					INSERT pc_anexos(pc_anexo_avaliacao_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF, pc_anexo_enviado )
-					VALUES (#pc_aval_id#, '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', '#pc_anexo_avaliacaoPDF#', 1)
+					INSERT pc_anexos(pc_anexo_faq_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF, pc_anexo_enviado )
+					VALUES ('9999999', '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', 0, 1)
 			</cfquery>
 		</cfif>
 
