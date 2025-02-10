@@ -164,6 +164,7 @@
 				if ($('input[name="envioFaq"]:checked').val() === 'texto') {
 					$('#actions').hide();
 					$('#previewsArquivo').hide();
+					$('#arquivoFaqDiv').hide(); // Adicionada esta linha
 				}
 				
 				CKEDITOR.replace( 'faqTexto', {
@@ -183,16 +184,19 @@
 				$('#faqPerfis').val(selectedValues).trigger('change');
 
 				$('input[name="envioFaq"]').change(function(){
+					var anexoNome = $('#faqAnexoNome').val();
 					if($(this).val() === 'arquivo'){
+						
 						$('#containerTexto').hide();
 						$('#accordionCadFaq').show();
 						$('#actions').show();
+						$('#arquivoFaqDiv').show(); // Adicionada esta linha
 
 						if (
 							$('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" &&
 							$('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== ""
 						) {
-							$("#arquivoFaqDiv").html(`
+						    var cardHtml = `
 							<!-- Container flex para anexos -->
 							<div style="padding: 0px; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($('#faqAnexoCaminho').val(), $('#faqAnexoNome').val())">
 								<!-- Card com anexo -->
@@ -208,7 +212,8 @@
 										</div>
 									</div>
 								</div>
-							</div>`);
+							</div>`;
+                            setArquivoFaqDiv(cardHtml);
 						}
 						// Exibe o container de pré-visualizações para o Dropzone
 						$('#previewsArquivo').show();
@@ -254,7 +259,7 @@
 										$('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" &&
 										$('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== ""
 									) {
-										$("#arquivoFaqDiv").html(`
+									    var cardHtml = `
 											<!-- Container flex para anexos -->
 											<div style="padding: 0; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($('#faqAnexoCaminho').val(), $('#faqAnexoNome').val())">
 												<!-- Card com anexo -->
@@ -270,8 +275,8 @@
 														</div>
 													</div>
 												</div>
-											</div>
-										`);
+											</div>`;
+                                        setArquivoFaqDiv(cardHtml);
 									}
 									// Envia os dados após o upload, usando "null" para pc_faq_texto
 									submitFaq("null");
@@ -289,6 +294,7 @@
 						$('#actions').hide();
 						// Oculta a div de pré-visualizações quando o envio é por texto
 						$('#previewsArquivo').hide();
+						$('#arquivoFaqDiv').hide(); // Adicionada esta linha
 					}
 				});
 				
@@ -298,8 +304,17 @@
 			
 
 			$('#btCancelar').on('click', function (event)  {
-				event.preventDefault()
-				event.stopPropagation()
+				event.preventDefault();
+				event.stopPropagation();
+				// Limpa todos os campos do formulário
+				$('#myform').trigger("reset");
+				if (CKEDITOR.instances.faqTexto) {
+					CKEDITOR.instances.faqTexto.setData('');
+				}
+				$('#faqPerfis').val(null).trigger('change');
+				$('#faqStatus').val(null).trigger('change');
+				$('#faqId, #faqAnexoCaminho, #faqAnexoNome').val('');
+				$('#previewsArquivo').empty();
 				mostraFormCadFaq();
 			});
 
@@ -336,83 +351,135 @@
 				if (!$('#faqPerfis').val() || !$('#faqTitulo').val() || !$('#faqStatus').val()){
 					toastr.error('Todos os campos devem ser preenchidos.');
 					return false;
-				}
-                var envioTipo = $('input[name="envioFaq"]:checked').val();
-                var dataEditor; 
-                if(envioTipo === "texto"){
-                    dataEditor = CKEDITOR.instances.faqTexto.getData();
-                    if(dataEditor.length < 100){
-                        toastr.error('Insira um texto com, no mínimo, 100 caracteres.');
-                        return false;
-                    }
-                    // Removido: submitFaq(dataEditor);
-                } else {
-                    dataEditor = "null";
-                    if(!(window.myDropzoneFaq && window.myDropzoneFaq.getQueuedFiles().length > 0)){
-                        toastr.error('É necessário anexar um arquivo PDF.');
-                        return false;
-                    }
-                }
+					}
+					
+					var envioTipo = $('input[name="envioFaq"]:checked').val();
+					var dataEditor;
+					var existeArquivo = $('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "";
+					var existeTexto = CKEDITOR.instances.faqTexto.getData().trim() !== "";
 				
-				var mensagem = "";
-				if($('#faqId').val() == ''){
-					mensagem = "Deseja cadastrar este FAQ?";
-				} else {
-					mensagem = "Deseja editar este FAQ?";
-				}
-				
-				swalWithBootstrapButtons.fire({
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-				}).then((result) => {
-					if (result.isConfirmed) {
-						var perfisList = $('#faqPerfis').val();
-						$('#modalOverlay').modal('show');
-						setTimeout(function() {
-							$.ajax({
-								type: "post",
-								url: "cfc/pc_cfcFaqs.cfc",
-								dataType: "json",
-								data:{
-									method: "cadFaq",
-									pc_faq_id: $('#faqId').val(),
-									pc_faq_perfis: perfisList.join(','),
-									pc_faq_titulo: $('#faqTitulo').val(),
-									pc_faq_status: $('#faqStatus').val(),
-									pc_faq_texto: dataEditor,
-									pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
-									pc_faq_anexo_nome: $('#faqAnexoNome').val()
-								},
-								async: false
-							})
-							.done(function(result) {
-								console.log("cadFaq response:", result);
-								// NOVA LINHA: Atualiza o campo oculto com o FAQ_ID retornado para evitar inserção duplicada.
-								$('#faqId').val(result[0].FAQ_ID);
-								if(envioTipo==="arquivo" && window.myDropzoneFaq && window.myDropzoneFaq.getQueuedFiles().length > 0){
-									window.myDropzoneFaq.options.params = { pc_faq_id: result[0].FAQ_ID };
-									window.myDropzoneFaq.processQueue();
-								} else {
-									finalizeSubmission();
+					// Validações específicas baseadas no tipo de envio
+					if(envioTipo === "texto"){
+						dataEditor = CKEDITOR.instances.faqTexto.getData();
+						if(dataEditor.length < 100){
+							toastr.error('Insira um texto com, no mínimo, 100 caracteres.');
+							return false;
+						}
+						// Se existe arquivo cadastrado, alerta o usuário
+						if(existeArquivo){
+							swalWithBootstrapButtons.fire({
+								html: logoSNCIsweetalert2('Ao salvar o texto, o arquivo PDF anteriormente cadastrado será excluído. Deseja continuar?'),
+								showCancelButton: true,
+								confirmButtonText: 'Sim!',
+								cancelButtonText: 'Cancelar!'
+							}).then((result) => {
+								if (result.isConfirmed) {
+									// Se confirmou, exclui o arquivo e limpa os campos
+									if($('#faqAnexoCaminho').val()){
+										$.ajax({
+											type: "post",
+											url: "cfc/pc_cfcFaqs.cfc",
+											dataType: "json",
+											data: {
+												method: "delArquivoFaq",
+												pc_faq_anexo_caminho: $('#faqAnexoCaminho').val()
+											}
+										}).done(function(){
+											$('#faqAnexoNome').val('');
+											$('#faqAnexoCaminho').val('');
+											$('#arquivoFaqDiv').empty();
+											proceedWithSave(dataEditor);
+										});
+									} else {
+										proceedWithSave(dataEditor);
+									}
 								}
 							});
-						}, 500);
+							return false;
+						}
+					} else {
+						if(!(window.myDropzoneFaq && window.myDropzoneFaq.getQueuedFiles().length > 0) && !existeArquivo){
+							toastr.error('É necessário anexar um arquivo PDF.');
+							return false;
+						}
+						// Se existe texto cadastrado, alerta o usuário
+						if(existeTexto){
+							swalWithBootstrapButtons.fire({
+								html: logoSNCIsweetalert2('Ao salvar o arquivo, o texto anteriormente cadastrado será excluído. Deseja continuar?'),
+								showCancelButton: true,
+								confirmButtonText: 'Sim!',
+								cancelButtonText: 'Cancelar!'
+							}).then((result) => {
+								if (result.isConfirmed) {
+									dataEditor = "null";
+									proceedWithSave(dataEditor);
+								}
+							});
+							return false;
+						}
+						dataEditor = "null";
 					}
+					
+					proceedWithSave(dataEditor);
 				});
 				
-				$('#modalOverlay').delay(1000).hide(0, function() {
-					$('#modalOverlay').modal('hide');
-				});
-				
-			});
+				// Nova função auxiliar para centralizar o processo de salvamento
+				function proceedWithSave(dataEditor) {
+					var mensagem = "";
+					if($('#faqId').val() == ''){
+						mensagem = "Deseja cadastrar este FAQ?";
+					} else {
+						mensagem = "Deseja editar este FAQ?";
+					}
+					
+					swalWithBootstrapButtons.fire({
+						html: logoSNCIsweetalert2(mensagem),
+						showCancelButton: true,
+						confirmButtonText: 'Sim!',
+						cancelButtonText: 'Cancelar!'
+					}).then((result) => {
+						if (result.isConfirmed) {
+							var perfisList = $('#faqPerfis').val();
+							$('#modalOverlay').modal('show');
+							setTimeout(function() {
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcFaqs.cfc",
+									dataType: "json",
+									data:{
+										method: "cadFaq",
+										pc_faq_id: $('#faqId').val(),
+										pc_faq_perfis: perfisList.join(','),
+										pc_faq_titulo: $('#faqTitulo').val(),
+										pc_faq_status: $('#faqStatus').val(),
+										pc_faq_texto: dataEditor,
+										pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
+										pc_faq_anexo_nome: $('#faqAnexoNome').val()
+									},
+									async: false
+								})
+								.done(function(result) {
+									console.log("cadFaq response:", result);
+									$('#faqId').val(result[0].FAQ_ID);
+									
+									var envioTipo = $('input[name="envioFaq"]:checked').val();
+									if(envioTipo === "arquivo" && window.myDropzoneFaq && window.myDropzoneFaq.getQueuedFiles().length > 0){
+										window.myDropzoneFaq.options.params = { pc_faq_id: result[0].FAQ_ID };
+										window.myDropzoneFaq.processQueue();
+									} else {
+										finalizeSubmission();
+									}
+								});
+							}, 500);
+						}
+					});
+				}
 
 			// Função a ser chamada após o upload ou quando não há envio de anexo
             function finalizeSubmission(){
                 // Novo trecho para atualizar o container do anexo, caso exista
                 if ($('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" && $('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== "") {
-                    $("#arquivoFaqDiv").html(
+                    var cardHtml = 
                         '<div style="padding: 0; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($(\'#faqAnexoCaminho\').val(), $(\'#faqAnexoNome\').val())">'+
                             '<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease; height: inherit; width: 100%; margin: 0;">'+
                                 '<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">'+
@@ -426,8 +493,8 @@
                                     '</div>'+
                                 '</div>'+
                             '</div>'+
-                        '</div>'
-                    );
+                        '</div>';
+                    setArquivoFaqDiv(cardHtml);
                 }
                 mostraFormCadFaq();
                 mostraTabFaq();
@@ -442,8 +509,77 @@
                 }
             }
 
-			
+			// Função para excluir o arquivo do FAQ (usando delegação para elementos dinâmicos)
+			$(document).on('click', '#btExcluir', function(event) {
+				event.preventDefault();
+				event.stopPropagation();
+				var anexoCaminho = $('#faqAnexoCaminho').val();
+				if (anexoCaminho && anexoCaminho.trim() !== "") {
+					var mensagem = "Deseja excluir este arquivo PDF?";
+					swalWithBootstrapButtons.fire({
+						html: logoSNCIsweetalert2(mensagem),
+						showCancelButton: true,
+						confirmButtonText: 'Sim!',
+						cancelButtonText: 'Cancelar!'
+					}).then((result) => {
+						if (result.isConfirmed) {
+							$('#modalOverlay').modal('show');
+							setTimeout(function() {
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcFaqs.cfc",
+									dataType: "json",
+									data: {
+										method: "delArquivoFaq",
+										pc_faq_anexo_caminho: anexoCaminho
+									},
+									async: false
+								})
+								.done(function(result) {
+									if(result) {
+										$('#arquivoFaqDiv').empty();
+										$('#faqAnexoNome').val('');
+										$('#faqAnexoCaminho').val('');
+										$('#modalOverlay').modal('hide');
+										toastr.success("Arquivo excluído com sucesso!");
+									}
+								})
+								.fail(function() {
+									toastr.error("Erro ao excluir arquivo.");
+								});
+							}, 500);
+						}
+					});
+				}
+			});
 
+			// Função auxiliar para verificar se o arquivo existe e atualizar a div
+            function setArquivoFaqDiv(cardHtml) {
+                var filePath = $('#faqAnexoCaminho').val();
+                if(filePath && filePath.trim() !== ""){
+                    $.ajax({
+                        url: "cfc/pc_cfcFaqs.cfc",
+                        type: "GET",
+                        dataType: "json",
+                        data: {
+                            method: "checkArquivoExists",
+                            filePath: filePath
+                        },
+                        success: function(response) {
+                            if(response === true){
+                                $("#arquivoFaqDiv").html(cardHtml);
+                            } else {
+                                $("#arquivoFaqDiv").html("<h5 style='color:red'>O arquivo foi deletado ou não é possível o seu acesso</h5>");
+                            }
+                        },
+                        error: function() {
+                            $("#arquivoFaqDiv").html("O arquivo foi deletado ou não é possível o seu acesso");
+                        }
+                    });
+                }
+            }
+
+			
 
 		</script>
 	</cffunction>
@@ -592,7 +728,7 @@
 								// Exibe o nome do arquivo anexo, se disponível
 								var anexoNome = $('#faqAnexoNome').val();
 								if(anexoNome && anexoNome.trim() !== ""){
-									$("#arquivoFaqDiv").html(
+									var cardHtml = 
 										'<div style="padding: 0; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($(\'#faqAnexoCaminho\').val(), $(\'#faqAnexoNome\').val())">'+
 											'<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease; height: inherit; width: 100%; margin: 0;">'+
 												'<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">'+
@@ -606,8 +742,8 @@
 													'</div>'+
 												'</div>'+
 											'</div>'+
-										'</div>'
-									);
+										'</div>';
+									setArquivoFaqDiv(cardHtml);
 								}
 							}, 100);
 						}
@@ -889,7 +1025,7 @@
 		<cfreturn true />
 	</cffunction>
 
-	<cffunction name="delArquivoFaq"   access="remote" returntype="boolean">
+	<cffunction name="delArquivoFaq" access="remote" returntype="boolean" returnformat="json">
 		<cfargument name="pc_faq_anexo_caminho" type="string" required="true" />
 		<cfif FileExists(arguments.pc_faq_anexo_caminho)>
 			<cffile action = "delete" File = "#arguments.pc_faq_anexo_caminho#">
@@ -903,6 +1039,15 @@
 		<cfset thisDir = expandPath(".")>
 		
 		<cffile action="upload" filefield="file" destination="#application.diretorio_faqs#" nameconflict="skip" accept="application/pdf">
+ 		<cfquery datasource="#application.dsn_processos#" name="rsFaq_anexo"> 
+			SELECT pc_faq_anexo_caminho FROM pc_faqs
+			WHERE pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
+		</cfquery>
+		<cfif FileExists(rsFaq_anexo.pc_faq_anexo_caminho)>
+			<cffile action="delete" file="#rsFaq_anexo.pc_faq_anexo_caminho#">
+		</cfif>
+
+		<cffile action="upload" filefield="file" destination="#application.diretorio_faqs#" nameconflict="skip" accept="application/pdf">
 
 		<cfscript>
 			thread = CreateObject("java","java.lang.Thread");
@@ -914,7 +1059,7 @@
 		<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
 		
 		<!-- Destino contendo o ID do FAQ -->
-        <cfset destino = cffile.serverdirectory & '\Arquivo_faq_' & arguments.pc_faq_id & '_' & data & '.' & '#cffile.clientFileExt#'>
+        <cfset destino = cffile.serverdirectory & '\Arquivo_faq_id_' & arguments.pc_faq_id & '_' & data & '.' & '#cffile.clientFileExt#'>
 
 	    <cfobject component = "pc_cfcAvaliacoes" name = "tamanhoArquivo">
 		<cfinvoke component="#tamanhoArquivo#" method="renderFileSize" returnVariable="tamanhoDoArquivo" size ='#cffile.fileSize#' type='bytes'>
@@ -935,6 +1080,9 @@
     </cffunction>
 
 
-
+    <cffunction name="checkArquivoExists" access="remote" returntype="boolean" returnformat="json" hint="Verifica se o arquivo existe no servidor">
+        <cfargument name="filePath" type="string" required="true" />
+        <cfreturn FileExists(arguments.filePath)>
+    </cffunction>
 
 </cfcomponent>
