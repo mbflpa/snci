@@ -1,4 +1,4 @@
-<cfcomponent >
+<cfcomponent>
 <cfprocessingdirective pageencoding = "utf-8">
 
 	
@@ -32,9 +32,12 @@
 									</a>
 									
 								</div>
-								
-								<input id="faqId" value="<cfoutput>#rsFaqEdit.pc_faq_id#</cfoutput>" hidden>
-
+								<cfoutput>
+									<input id="faqId" value="#rsFaqEdit.pc_faq_id#" hidden>
+									<!-- Novos campos ocultos para armazenar anexo -->
+									<input id="faqAnexoCaminho" value="#rsFaqEdit.pc_faq_anexo_caminho#" hidden>
+									<input id="faqAnexoNome" value="#rsFaqEdit.pc_faq_anexo_nome#" hidden>
+								</cfoutput>
 								<div class="card-body" style="border: solid 3px #0083ca">
 									<div class="row" >
 										<div class="col-sm-10" >
@@ -91,19 +94,38 @@
 											</div>
 
 											<!-- Container para upload de PDF via botão (oculto por padrão) -->
-											<div id="containerUpload" style="display:none;">
-												<div id="faqUploadActions" class="btn-group">
-													<span id="uploadFaqButton" class="btn btn-primary">
-														<i class="fas fa-upload"></i> Clique aqui para anexar o arquivo PDF
-													</span>
+											<div id="actions" class="row" style="margin-top:20px">
+                                                <div class="col-lg-12" align="center">
+                                                    <div class="btn-group w-30">
+                                                        <span id="arquivo" class="btn btn-success col fileinput-button azul_claro_correios_backgroundColor" >
+															<i class="fas fa-upload"></i> Clique aqui para anexar o arquivo PDF
+														</span>
+													</div>
 												</div>
-												
-												<!-- Input file oculto -->
-												<input type="file" id="faqFileInput" accept=".pdf" style="display:none;">
 											</div>
+											<div class="table table-striped files" id="previewsArquivo">
+                                                <div id="templateArquivo" class="row mt-2">
+                                                    <div class="col-auto">
+                                                        <span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
+                                                    </div>
+                                                    <div class="col d-flex align-items-center">
+                                                        <p class="mb-0">
+                                                        <span class="lead" data-dz-name></span>
+                                                        (<span data-dz-size></span>)
+                                                        </p>
+                                                        <strong class="error text-danger" data-dz-errormessage></strong>
+                                                    </div>
+                                                    <div class="col-4 d-flex align-items-center" >
+                                                        <div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
+                                                            <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
 
 											<!-- Adicionado div para exibição do arquivo após upload -->
-											<div id="anexoFaqDiv" style="margin-top:15px;"></div>
+											<div id="arquivoFaqDiv" style="margin-top:15px;"></div>
 										</div>
 
 
@@ -138,6 +160,12 @@
 			});
 
 			$(document).ready(function() {	
+				// Inicialmente, se "texto" estiver selecionado, oculta as divs de ações e de pré-visualizações
+				if ($('input[name="envioFaq"]:checked').val() === 'texto') {
+					$('#actions').hide();
+					$('#previewsArquivo').hide();
+				}
+				
 				CKEDITOR.replace( 'faqTexto', {
 					width: '100%',
 					height: 300,
@@ -157,69 +185,121 @@
 				$('input[name="envioFaq"]').change(function(){
 					if($(this).val() === 'arquivo'){
 						$('#containerTexto').hide();
-						$('#containerUpload').show();
-						// Inicializa Dropzone para upload de PDF com clickable definido como o botão de upload
+						$('#accordionCadFaq').show();
+						$('#actions').show();
+
+						if (
+							$('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" &&
+							$('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== ""
+						) {
+							$("#arquivoFaqDiv").html(`
+							<!-- Container flex para anexos -->
+							<div style="padding: 0px; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($('#faqAnexoCaminho').val(), $('#faqAnexoNome').val())">
+								<!-- Card com anexo -->
+								<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease 0s; height: inherit; width: 100%; margin: 0;">
+									<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
+										<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">
+											<i class="fas fa-file-pdf"></i> ` + $('#faqAnexoNome').val() + `
+										</h3>
+										<div class="card-tools" style="margin-left: 20px;">
+											<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">
+												<i class="fas fa-trash-alt"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>`);
+						}
+						// Exibe o container de pré-visualizações para o Dropzone
+						$('#previewsArquivo').show();
 						Dropzone.autoDiscover = false;
-						var myDropzoneFaq = new Dropzone("#containerUpload", {
+						var previewNode = document.querySelector("#templateArquivo")
+						var previewTemplate = previewNode.parentNode.innerHTML
+						previewNode.parentNode.removeChild(previewNode)
+						
+						// Variável para armazenar o Dropzone
+						var myDropzoneFaq = new Dropzone("#accordionCadFaq", {
 							url: "cfc/pc_cfcFaqs.cfc?method=uploadArquivosFaqs",
-							autoProcessQueue: true,
+							autoProcessQueue: false, // Alterado: upload somente quando solicitado
 							maxFiles: 1,
-							maxFilesize: 20,
+							maxFilesize:20,
+							thumbnailWidth: 80,
+							thumbnailHeight: 80,
+							parallelUploads: 1,
 							acceptedFiles: '.pdf',
-							clickable: "#uploadFaqButton",
+							previewTemplate: previewTemplate,
+							previewsContainer: "#previewsArquivo",
+							clickable: "#arquivo",
 							init: function(){
+								var dzInstance = this;
 								this.on("error", function(file, errorMessage){
 									toastr.error(errorMessage);
 									return false;
 								});
+								this.on("success", function(file, response){
+									if (typeof response === 'string') {
+										response = JSON.parse(response);
+									}
+									console.log("uploadArquivosFaqs response:", response);
+									var data = response[0];
+									// Atualiza os campos ocultos com o nome e caminho final do arquivo
+									$('#faqAnexoCaminho').val(data.CAMINHO_ANEXO);
+									$('#faqAnexoNome').val(data.NOME_ANEXO);
+									
+								});
 								this.on("queuecomplete", function(){
 									toastr.success("Upload realizado com sucesso!");
+									var uploadedFile = this.getAcceptedFiles()[0]; // obtém o primeiro arquivo aceito
 									this.removeAllFiles(true);
-									// Chama função para exibir o PDF enviado
-									mostraArquivoFaq();
+									// Limpa o container para remover o progress bar
+									$("#previewsArquivo").empty();
+									// Atualiza a div somente se os dois campos tiverem valor
+									if (
+										$('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" &&
+										$('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== ""
+									) {
+										$("#arquivoFaqDiv").html(`
+										<!-- Container flex para anexos -->
+										<div style="padding: 0px; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($('#faqAnexoCaminho').val(), $('#faqAnexoNome').val())">
+											<!-- Card com anexo -->
+											<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease 0s; height: inherit; width: 100%; margin: 0;">
+												<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
+													<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">
+														<i class="fas fa-file-pdf"></i> ` + $('#faqAnexoNome').val() + `
+													</h3>
+													<div class="card-tools" style="margin-left: 20px;">
+														<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">
+															<i class="fas fa-trash-alt"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>`);
+									}
+									finalizeSubmission();
 								});
 							}
 						});
+						// Armazena a instância no elemento para acesso posterior (global)
+						window.myDropzoneFaq = myDropzoneFaq;
 					} else {
-						$('#containerUpload').hide();
+						//$('#accordionCadFaq').hide();
 						$('#containerTexto').show();
+						$('#actions').hide();
+						// Oculta a div de pré-visualizações quando o envio é por texto
+						$('#previewsArquivo').hide();
 					}
 				});
 				
 				// Removido: $('#uploadFaqButton').on('click', ...) e $('#faqFileInput').on('change', ...);
 			});
 
-			// Nova função para exibir o PDF enviado no FAQ, similar à função mostraRelatorioPDF
-			function mostraArquivoFaq(){
-				$('#modalOverlay').modal('show');
-				setTimeout(function() {
-					$.ajax({
-						type: "post",
-						url:"cfc/pc_cfcAvaliacoes.cfc",
-						data:{ method: "anexoFaq" },
-						async: false
-					})
-					.done(function(result){
-						$('#anexoFaqDiv').html(result);
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-					})
-					.fail(function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-						$('#modal-danger').modal('show');
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
-						$('#modal-danger').find('.modal-body').text(thrownError);
-					});
-				}, 1000);
-			}
+			
 
 			$('#btCancelar').on('click', function (event)  {
 				event.preventDefault()
 				event.stopPropagation()
-				mostraFormCadFaq()
+				mostraFormCadFaq();
 			});
 
 
@@ -233,14 +313,23 @@
 					toastr.error('Todos os campos devem ser preenchidos.');
 					return false;
 				}
-
-				var dataEditor = CKEDITOR.instances.faqTexto.getData();
-				// Alterado: verificação se dataEditor tem menos de 100 caracteres e se o envio é do tipo "texto"
-				if(dataEditor.length < 100 && $('input[name="envioFaq"]:checked').val() === "texto"){
-					toastr.error('Insira um texto com, no mínimo, 100 caracteres.');
-					return false;
-				}
-					
+                var envioTipo = $('input[name="envioFaq"]:checked').val();
+                var dataEditor, pc_faq_anexo_caminho = "", pc_faq_anexo_nome = "";
+                if(envioTipo === "texto"){
+                    dataEditor = CKEDITOR.instances.faqTexto.getData();
+                    if(dataEditor.length < 100){
+                        toastr.error('Insira um texto com, no mínimo, 100 caracteres.');
+                        return false;
+                    }
+                } else {
+                    dataEditor = "null";
+                    // Verifica se há arquivo na fila do dropzone
+                    if(!(window.myDropzoneFaq && window.myDropzoneFaq.getQueuedFiles().length > 0)){
+                        toastr.error('É necessário anexar um arquivo PDF.');
+                        return false;
+                    }
+                }
+				
 				var mensagem = ""
 				if($('#faqId').val() == ''){
 					var mensagem = "Deseja cadastrar este FAQ?"
@@ -263,44 +352,30 @@
 								$.ajax({
 									type: "post",
 									url: "cfc/pc_cfcFaqs.cfc",
+									dataType: "json",
 									data:{
 										method: "cadFaq",
 										pc_faq_id: $('#faqId').val(),
 										pc_faq_perfis:perfisList.join(','),
 										pc_faq_titulo:$('#faqTitulo').val(),
 										pc_faq_status: $('#faqStatus').val(),
-										pc_faq_texto: dataEditor	
+										pc_faq_texto: dataEditor,
+										pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
+										pc_faq_anexo_nome: $('#faqAnexoNome').val()
 									},
 									async: false
 								})//fim ajax
 								.done(function(result) {
-									mostraFormCadFaq()
-									mostraTabFaq()	
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										toastr.success('Operação realizada com sucesso!');
-									});
-
-									CKEDITOR.instances.faqTexto.setData('');
-									$('#cadastroFaq').CardWidget('collapse')
-									$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo FAQ");
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-									});
-										
+									console.log("cadFaq response:", result);
+									if(envioTipo==="arquivo" && window.myDropzoneFaq && window.myDropzoneFaq.getQueuedFiles().length > 0){
+										// Atribui o ID aos parâmetros e dispara o upload
+										window.myDropzoneFaq.options.params = { pc_faq_id: result[0].FAQ_ID };
+										window.myDropzoneFaq.processQueue();
+									} else {
+										finalizeSubmission();
+									}
 								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										$('#modalOverlay').modal('hide');
-										var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
-													+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
-										const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
-										
-										swalWithBootstrapButtons.fire(
-											{...erroSistema}
-										)
-									});
-								})//fim fail
+								
 							}, 500);
 						}
 						
@@ -313,6 +388,39 @@
 				
 			});
 
+			// Função a ser chamada após o upload ou quando não há envio de anexo
+            function finalizeSubmission(){
+                // Novo trecho para atualizar o container do anexo, caso exista
+                if ($('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" && $('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== "") {
+                    $("#arquivoFaqDiv").html(
+                        '<div style="padding: 0; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($(\'#faqAnexoCaminho\').val(), $(\'#faqAnexoNome\').val())">'+
+                            '<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease; height: inherit; width: 100%; margin: 0;">'+
+                                '<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">'+
+                                    '<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">'+
+                                        '<i class="fas fa-file-pdf"></i> ' + $('#faqAnexoNome').val() +
+                                    '</h3>'+
+                                    '<div class="card-tools" style="margin-left: 20px;">'+
+                                        '<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">'+
+                                            '<i class="fas fa-trash-alt"></i>'+
+                                        '</button>'+
+                                    '</div>'+
+                                '</div>'+
+                            '</div>'+
+                        '</div>'
+                    );
+                }
+                mostraFormCadFaq();
+                mostraTabFaq();
+                $('#modalOverlay').delay(1000).hide(0, function(){
+                    $('#modalOverlay').modal('hide');
+                    toastr.success('Operação realizada com sucesso!');
+                });
+                if ($('input[name="envioFaq"]:checked').val() === "texto") {
+                    CKEDITOR.instances.faqTexto.setData('');
+                    $('#cadastroFaq').CardWidget('collapse');
+                    $('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo FAQ");
+                }
+            }
 
 			
 
@@ -322,32 +430,30 @@
 
 
 
-	<cffunction name="cadFaq" access="remote" hint="Cadastra o FAQ.">
+	<cffunction name="cadFaq" access="remote" returntype="any" returnformat="json" output="false" hint="Cadastra o FAQ.">
 		<cfargument name="pc_faq_id" type="any" required="false" default=0/>
 		<cfargument name="pc_faq_status" type="string" required="true"/>
 		<cfargument name="pc_faq_titulo" type="string" required="true" />
 		<cfargument name="pc_faq_perfis" type="any" required="true" />
-		<cfargument name="pc_faq_texto" type="string" required="false" default="null" />
-e	
+		<cfargument name="pc_faq_texto" type="string" required="false" default="" />
+		<cfargument name="pc_faq_anexo_caminho" type="string" required="false" default="" />
+		<cfargument name="pc_faq_anexo_nome" type="string" required="false" default="" />
+	
 		<cfif '#arguments.pc_faq_id#' eq 0 or '#arguments.pc_faq_id#' eq '' >
 			<cfquery datasource="#application.dsn_processos#" result="resultFaq">
 				INSERT INTO pc_faqs
-								(pc_faq_titulo, pc_faq_perfis,pc_faq_status,pc_faq_texto,pc_faq_atualiz_datahora,pc_faq_matricula_atualiz)
+								(pc_faq_titulo, pc_faq_perfis,pc_faq_status,pc_faq_texto,pc_faq_anexo_caminho,pc_faq_anexo_nome,pc_faq_atualiz_datahora,pc_faq_matricula_atualiz)
 				VALUES     		(<cfqueryparam value="#arguments.pc_faq_titulo#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_perfis#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_status#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_texto#" cfsqltype="cf_sql_varchar">,
+								 <cfqueryparam value="#arguments.pc_faq_anexo_caminho#" cfsqltype="cf_sql_varchar">,
+								 <cfqueryparam value="#arguments.pc_faq_anexo_nome#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 								 '#application.rsUsuarioParametros.pc_usu_matricula#')
 			</cfquery>
-			
-			<!-- Novo código: Atualiza pc_anexos atribuindo o novo FAQ id aos registros com pc_anexo_faq_id = 9999999 -->
-			<cfset newFaqId = resultFaq.generatedKey>
-			<cfquery datasource="#application.dsn_processos#">
-				UPDATE pc_anexos
-				SET pc_anexo_faq_id = <cfqueryparam value="#newFaqId#" cfsqltype="cf_sql_numeric">
-				WHERE pc_anexo_faq_id = 9999999
-			</cfquery>
+			<!-- Retorna o ID gerado (assumindo que o datasource suporte generatedKey) -->
+            <cfset faqId = resultFaq.generatedKey>
 		<cfelse>
 		    <cfquery datasource="#application.dsn_processos#" >
 				UPDATE pc_faqs
@@ -355,18 +461,21 @@ e
 				       pc_faq_perfis = <cfqueryparam value="#arguments.pc_faq_perfis#" cfsqltype="cf_sql_varchar">,
 					   pc_faq_status = <cfqueryparam value="#arguments.pc_faq_status#" cfsqltype="cf_sql_varchar">,
 					   pc_faq_texto  = <cfqueryparam value="#arguments.pc_faq_texto#" cfsqltype="cf_sql_varchar">,
+ 					   pc_faq_anexo_caminho = <cfqueryparam value="#arguments.pc_faq_anexo_caminho#" cfsqltype="cf_sql_varchar">,
+					   pc_faq_anexo_nome = <cfqueryparam value="#arguments.pc_faq_anexo_nome#" cfsqltype="cf_sql_varchar">,
 				       pc_faq_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 					   pc_faq_matricula_atualiz =  <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
 				WHERE  pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
 
 			</cfquery>
+			<cfset faqId = arguments.pc_faq_id>
 		</cfif>
 		
-		<!-- Novo código: Exclui registros residuais com pc_anexo_faq_id = 9999999 -->
-		<cfquery datasource="#application.dsn_processos#">
-			DELETE FROM pc_anexos
-			WHERE pc_anexo_faq_id = 9999999
-		</cfquery>
+		<cfset dadosFaq = []>
+		<cfset faqRet = {}>
+		<cfset faqRet.FAQ_ID = faqId>
+		<cfset arrayAppend(dadosFaq, faqRet)>
+		<cfreturn dadosFaq>
     </cffunction>
 
 
@@ -393,7 +502,7 @@ e
 				}
 			</style>
 			<div class="col-12" id="accordion">
-				<cfloop query = "rsFaqs"  >
+				<cfloop query="rsFaqs">
 					<cfoutput>
 						<div class="card <cfif #pc_faq_status# eq 'D'>card-danger<cfelse>card-primary</cfif> card-outline">
 							
@@ -456,6 +565,33 @@ e
 						$("#btSalvarDiv").attr("hidden",false)
 						$("#faqStatus").attr("hidden",false)
 						
+						// Nova verificação com delay: se faqTexto for vazio ou "null", ativa envio de arquivo
+						if (!$('#faqTexto').val() || $('#faqTexto').val().trim() === "" || $('#faqTexto').val().trim().toLowerCase() === "null") {
+							setTimeout(function(){
+								$('input[name="envioFaq"][value="arquivo"]').prop("checked", true).trigger("change");
+								// Exibe o nome do arquivo anexo, se disponível
+								var anexoNome = $('#faqAnexoNome').val();
+								if(anexoNome && anexoNome.trim() !== ""){
+									$("#arquivoFaqDiv").html(
+										'<div style="padding: 0; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($(\'#faqAnexoCaminho\').val(), $(\'#faqAnexoNome\').val())">'+
+											'<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease; height: inherit; width: 100%; margin: 0;">'+
+												'<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">'+
+													'<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">'+
+														'<i class="fas fa-file-pdf"></i> ' + anexoNome +
+													'</h3>'+
+													'<div class="card-tools" style="margin-left: 20px;">'+
+														'<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">'+
+															'<i class="fas fa-trash-alt"></i>'+
+														'</button>'+
+													'</div>'+
+												'</div>'+
+											'</div>'+
+										'</div>'
+									);
+								}
+							}, 100);
+						}
+
 						$('#cadastroFaq').CardWidget('expand')
 						$('html, body').animate({ scrollTop: ($('#formCadFaqDiv').offset().top-80)} , 1000);
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -558,7 +694,7 @@ e
 								</thead>
 								
 								<tbody>
-									<cfloop query="rsFaqs" > 
+									<cfloop query="rsFaqs"> 
 										<cfset titulo_codificado = urlEncodedFormat(pc_faq_titulo)>
 										<cfoutput>
 											<tr style="font-size:12px;<cfif #pc_faq_status# eq 'D'>color:red</cfif>" >
@@ -634,6 +770,13 @@ e
 						$("#btSalvarDiv").attr("hidden",false)
 						$("#faqStatus").attr("hidden",false)
 						
+						// Nova verificação com delay: se faqTexto for vazio ou "null", ativa envio de arquivo
+						if (!$('#faqTexto').val() || $('#faqTexto').val().trim() === "" || $('#faqTexto').val().trim().toLowerCase() === "null") {
+							setTimeout(function(){
+								$('input[name="envioFaq"][value="arquivo"]').prop("checked", true).trigger("change");
+							}, 100);
+						}
+
 						$('#cadastroFaq').CardWidget('expand')
 						$('html, body').animate({ scrollTop: ($('#formCadFaqDiv').offset().top-80)} , 1000);
 						$('#modalOverlay').delay(1000).hide(0, function() {
@@ -707,33 +850,39 @@ e
  	</cffunction>
 
 
-
 	<cffunction name="delFaq"   access="remote" returntype="boolean">
 		<cfargument name="pc_faq_id" type="numeric" required="true" />
-
-		<cfquery datasource="#application.dsn_processos#" >
-			DELETE FROM pc_faqs
-			WHERE pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
-		</cfquery> 
-	
+		<cftransaction>
+			<!-- Exclui registros residuais com pc_anexo_faq_id igual a pc_faq_id-->
+			<cfquery datasource="#application.dsn_processos#" name="rsFaq_anexo"> 
+				SELECT pc_faq_anexo_caminho   FROM  pc_faqs
+				WHERE pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
+			</cfquery>
+			<cfif FileExists(rsFaq_anexo.pc_faq_anexo_caminho)>
+				<cffile action = "delete" File = "#rsFaq_anexo.pc_faq_anexo_caminho#">
+			</cfif>
+			<cfquery datasource="#application.dsn_processos#" >
+				DELETE FROM pc_faqs
+				WHERE pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
+			</cfquery> 
+		</cftransaction>
 		<cfreturn true />
 	</cffunction>
 
+	<cffunction name="delArquivoFaq"   access="remote" returntype="boolean">
+		<cfargument name="pc_faq_anexo_caminho" type="string" required="true" />
+		<cfif FileExists(arguments.pc_faq_anexo_caminho)>
+			<cffile action = "delete" File = "#arguments.pc_faq_anexo_caminho#">
+		</cfif>
+		<cfreturn true />
+	</cffunction>
 
-
-
-
-
-
-	<cffunction name="uploadArquivosFaqs" access="remote"  returntype="boolean" output="false" hint="AINDA NÃO FINALIZADO - realiza o upload dos FAQs em pdf">
-
-		
+	<cffunction name="uploadArquivosFaqs" access="remote" returntype="any" returnformat="json" output="false">
+    	<!-- Adicionado argumento para receber o ID do FAQ -->
+        <cfargument name="pc_faq_id" type="numeric" required="true">
 		<cfset thisDir = expandPath(".")>
-
 		
 		<cffile action="upload" filefield="file" destination="#application.diretorio_faqs#" nameconflict="skip" accept="application/pdf">
-		
-
 
 		<cfscript>
 			thread = CreateObject("java","java.lang.Thread");
@@ -744,14 +893,11 @@ e
 
 		<cfset origem = cffile.serverdirectory & '\' & cffile.serverfile>
 		
-		
-		<cfset destino = cffile.serverdirectory & '\Anexo_faq_id_' & '_'  & '#application.rsUsuarioParametros.pc_usu_matricula#'  & '_' & data  & '.' & '#cffile.clientFileExt#'>
-		
-
+		<!-- Destino contendo o ID do FAQ -->
+        <cfset destino = cffile.serverdirectory & '\Arquivo_faq_' & arguments.pc_faq_id & '_' & data & '.' & '#cffile.clientFileExt#'>
 
 	    <cfobject component = "pc_cfcAvaliacoes" name = "tamanhoArquivo">
 		<cfinvoke component="#tamanhoArquivo#" method="renderFileSize" returnVariable="tamanhoDoArquivo" size ='#cffile.fileSize#' type='bytes'>
-
 
 		<cfset nomeDoAnexo = '#cffile.clientFileName#'  & '.' & '#cffile.clientFileExt#' & ' (' & '#tamanhoDoArquivo#' & ')'>
 
@@ -759,18 +905,16 @@ e
 			<cffile action="rename" source="#origem#" destination="#destino#">
         </cfif>
 
-		        
-		<cfset mcuOrgao = "#application.rsUsuarioParametros.pc_org_mcu#">
-		<cfif FileExists(destino)>
-			<cfquery datasource="#application.dsn_processos#" >
-					INSERT pc_anexos(pc_anexo_faq_id, pc_anexo_login, pc_anexo_caminho, pc_anexo_nome, pc_anexo_mcu_orgao, pc_anexo_avaliacaoPDF, pc_anexo_enviado )
-					VALUES ('9999999', '#application.rsUsuarioParametros.pc_usu_login#', '#destino#', '#nomeDoAnexo#','#mcuOrgao#', 0, 1)
-			</cfquery>
-		</cfif>
+		<cfset dadosArquivo = []>
+		<cfset arquivo={}>
+		<cfset arquivo.CAMINHO_ANEXO = destino>
+		<cfset arquivo.NOME_ANEXO = nomeDoAnexo>
+		<cfset arrayAppend(dadosArquivo, arquivo)>
 
-	
-		<cfreturn true />
+		<cfreturn dadosArquivo>
     </cffunction>
+
+
 
 
 </cfcomponent>
