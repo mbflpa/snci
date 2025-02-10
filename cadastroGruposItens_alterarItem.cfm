@@ -56,7 +56,23 @@
         Itn_NumItem = #form.selAltItem# and
         Itn_TipoUnidade Not In (#tiposunidselec#) 
     </cfquery>
-        
+    //remover valores redundantes no form.altprocesson2
+    <cfset strList = trim(form.altprocesson2) />
+    <cfset listStruct = {} />
+    <cfloop list="#strList#" index="i">
+        <cfset listStruct[i] = i />
+    </cfloop>
+    <cfset saida = structKeyList(listStruct)>       
+    <cfset form.altprocesson2 = saida>
+
+    //remover valores redundantes no form.altprocesson3
+    <cfset strList = trim(form.altprocesson3) />
+    <cfset listStruct = {} />
+    <cfloop list="#strList#" index="i">
+        <cfset listStruct[i] = i />
+    </cfloop>
+    <cfset saida = structKeyList(listStruct)>       
+    <cfset form.altprocesson3 = saida>
     <cftransaction>
 <!--- 				    
     frm.tiposalt.value ==> Tipos de unidades selecionadas
@@ -66,7 +82,9 @@
     frm.checkPontuacaoAltagfseq.value  ==> Itn_PTC_Seq unidade AGF
 --->	
 
-        <!---Iincluir ou Alterar as tabelas TipoUnidade_ItemVerificacao e Itens_Verificacao --->               
+        <!---Iincluir ou Alterar as tabelas TipoUnidade_ItemVerificacao e Itens_Verificacao ---> 
+
+      
         <cfloop list="#tiposunidselec#" index="i">
             <cfset tipo = "#i#">
            	<!--- Obter a pontuação max pelo ano e tipo da unidade --->
@@ -169,7 +187,7 @@
                     INSERT INTO Itens_Verificacao 
                         (Itn_Modalidade,Itn_Ano,Itn_TipoUnidade,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Itn_Orientacao,Itn_Situacao,Itn_DtUltAtu,Itn_UserName,Itn_ValorDeclarado,Itn_Amostra,Itn_Norma,Itn_ValidacaoObrigatoria,Itn_PreRelato,Itn_OrientacaoRelato,Itn_Pontuacao,Itn_PTC_Seq,Itn_Classificacao,Itn_Manchete,Itn_ClassificacaoControle,Itn_ControleTestado,Itn_CategoriaControle,Itn_RiscoIdentificado,Itn_RiscoIdentificadoOutros,Itn_MacroProcesso,Itn_ProcessoN1,Itn_ProcessoN1NaoAplicar,Itn_ProcessoN2,Itn_ProcessoN3,Itn_ProcessoN3Outros,Itn_GestorProcessoDir,Itn_GestorProcessoDepto,Itn_ObjetivoEstrategico,Itn_RiscoEstrategico,Itn_IndicadorEstrategico,Itn_Coso2013Componente,Itn_Coso2013Principios)
                     VALUES 
-                        ('#form.selAltModalidade#',#form.selAltItemAno#,#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#',#form.altcategoriarisco#,'#form.altcategoriariscooutros#',#form.altmacroprocesso#,#altprocesson1#,'#form.altprocesson1naoseaplica#',#altprocesson2#,#altprocesson3#,'#form.altprocesson3outros#',#form.altgestordir#,'#form.altgestordepto#','#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
+                        ('#form.selAltModalidade#',#form.selAltItemAno#,#tipo#,#form.selAltItemGrupo#,#form.selAltItem#,'#form.altItemDescricao#','#form.altItemOrientacao#','D',CONVERT(DATETIME, getdate(), 103),'#qAcesso.Usu_Matricula#','#form.selAltItemValorDec#','#form.altItemAmostra#','#form.altItemNorma#','#form.selAltValidObrig#','#form.altItemPreRelato#','#form.altItemOrientacaoRelato#',#pontuacao#,'#altpontuacaoseq#','#ClassifITEM#','#form.altItemManchete#','#form.altclassifcontrole#','#form.altcontroletestado#','#form.itncategoriacontroleAlt#','#form.altcategoriarisco#','#form.altcategoriariscooutros#',#form.altmacroprocesso#,'#altprocesson1#','#form.altprocesson1naoseaplica#','#altprocesson2#','#altprocesson3#','#form.altprocesson3outros#',#form.altgestordir#,'#form.altgestordepto#','#form.itnaltobjetivoestrategicoAlt#','#form.itnaltriscoestrategicoAlt#','#form.itnaltindicadorestrategicoAlt#',#form.altcomponentecoso#,#form.altprincipioscoso#)                                    
                 </cfquery>                 
             <cfelse>
                 <!-- Alteração -->
@@ -177,7 +195,6 @@
                     UPDATE Itens_Verificacao SET
                         Itn_Descricao='#form.altItemDescricao#'
                         ,Itn_Orientacao='#form.altItemOrientacao#'
-                        ,Itn_Situacao='D'
                         ,Itn_DtUltAtu=CONVERT(DATETIME, getdate(), 103)
                         ,Itn_UserName='#qAcesso.Usu_Matricula#'
                         ,Itn_ValorDeclarado='#form.selAltItemValorDec#'
@@ -193,13 +210,13 @@
                         ,Itn_ClassificacaoControle='#form.altclassifcontrole#'
                         ,Itn_ControleTestado='#form.altcontroletestado#'
                         ,Itn_CategoriaControle='#form.itncategoriacontroleAlt#'
-                        ,Itn_RiscoIdentificado=#form.altcategoriarisco#
+                        ,Itn_RiscoIdentificado='#form.altcategoriarisco#'
                         ,Itn_RiscoIdentificadoOutros='#form.altcategoriariscooutros#'
                         ,Itn_MacroProcesso=#form.altmacroprocesso#
-                        ,Itn_ProcessoN1=#altprocesson1#
+                        ,Itn_ProcessoN1='#altprocesson1#'
                         ,Itn_ProcessoN1NaoAplicar='#form.altprocesson1naoseaplica#'
-                        ,Itn_ProcessoN2=#altprocesson2#
-                        ,Itn_ProcessoN3=#altprocesson3#
+                        ,Itn_ProcessoN2='#altprocesson2#'
+                        ,Itn_ProcessoN3='#altprocesson3#'
                         ,Itn_ProcessoN3Outros='#form.altprocesson3outros#'
                         ,Itn_GestorProcessoDir=#form.altgestordir#
                         ,Itn_GestorProcessoDepto='#form.altgestordepto#'
@@ -639,7 +656,7 @@
                                     </div>
                                     <div class="row">
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select id="altcategoriarisco" name="altcategoriarisco" class="form-select" aria-label="Default select example">
+                                            <select id="altcategoriarisco" name="altcategoriarisco" multiple="multiple" class="form-select" aria-label="Default select example">
                                             </select>
                                         </label>  
                                     </div>
@@ -687,7 +704,7 @@
                                     <div class="row">
                                         <div class="col">
                                             <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">          
-                                                <select id="altprocesson1" name="altprocesson1" class="form-select" aria-label="Default select example">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="cd_altprocesson1" name="cd_altprocesson1" title="">&nbsp;<strong>Não se Aplica</strong>
+                                                <select id="altprocesson1" name="altprocesson1" multiple="multiple" class="form-select" aria-label="Default select example">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="cd_altprocesson1" name="cd_altprocesson1" title="">&nbsp;<strong>Não se Aplica</strong>
                                                 </select>
                                                 <div class="row">
                                                     <div id="altprocesson1-naoseaplica">
@@ -706,7 +723,7 @@
                                     <div class="row">
                                         <div class="col">
                                             <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                                <select id="altprocesson2" name="altprocesson2" class="form-select" aria-label="Default select example">
+                                                <select id="altprocesson2" name="altprocesson2" multiple="multiple" class="form-select" aria-label="Default select example">
                                                 </select>
                                             </label>
                                         </div>
@@ -720,7 +737,7 @@
                                     <div class="row">
                                         <div class="col">
                                             <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                                <select id="altprocesson3" name="altprocesson3" class="form-select" aria-label="Default select example"><input type="checkbox" id="cd_altprocesson3" name="cd_altprocesson3" title="">&nbsp;<strong>Outros</strong>
+                                                <select id="altprocesson3" name="altprocesson3" multiple="multiple" class="form-select" aria-label="Default select example"><input type="checkbox" id="cd_altprocesson3" name="cd_altprocesson3" title="">&nbsp;<strong>Outros</strong>
                                                 </select>
                                             </label>
                                             <div class="row">
@@ -1367,7 +1384,7 @@
                     categoriacontrole(catctrl)
 
                     if (catriscoident == undefined) { catriscoident = '0'}
-                    categoriarisco("'"+catriscoident+"'")
+                    categoriarisco(catriscoident)
 
                     if (macropro == undefined) { macropro = '0'}
                     macroprocesso(macropro)
@@ -1443,11 +1460,10 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                           //valordb.forEach((item, index) => {
-                                //if(eval(item) == ret[0]) {selecionar = 'selected'}
-                          //  });
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
+                        $("#altclassifcontrole").html(prots); 
+
                         setTimeout($("#altclassifcontrole").html(prots),500)
                         $('#altclassifcontrole > option').each(function() {
                             valordb.forEach((item, index) => {
@@ -1477,20 +1493,27 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            valordb.forEach((item, index) => {
-                                if(eval(item) == ret[0]) {selecionar = 'selected'}
-                            });
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
-                        $("#altcategcontrole").html(prots);       
+                        $("#altcategcontrole").html(prots); 
+
+                        setTimeout($("#altcategcontrole").html(prots),500)
+                        $('#altcategcontrole > option').each(function() {
+                            valordb.forEach((item, index) => {
+                                $("#altcategcontrole option").filter(function() {
+                                    return $(this).val() == item;
+                                }).prop("selected", true);
+                            });
+                        });     
                     }) 
                 } 
                 //Risco Identificado
                 function categoriarisco(a){       
                     //buscar categoria risco     
+                    //alert(a)
                     axios.get("CFC/grupoitem.cfc",{
                         params: {
-                        method: "categoriarisco"
+                        method: "riscoidentificado"
                         }
                     })
                     .then(data =>{
@@ -1503,14 +1526,20 @@
                         const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
                         const dados = json.DATA;
                         dados.map((ret) => {
-                            selecionar = ''          
-                            valordb.forEach((item, index) => {
-                                if(eval(item) == ret[0]) {selecionar = 'selected'}
-                            });
+                            selecionar = ''
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
                         $("#altcategoriarisco").html(prots); 
-                    })   
+
+                        setTimeout($("#altcategoriarisco").html(prots),500)
+                        $('#altcategoriarisco > option').each(function() {
+                            valordb.forEach((item, index) => {
+                                $("#altcategoriarisco option").filter(function() {
+                                    return $(this).val() == item;
+                                }).prop("selected", true);
+                            });
+                        });                    
+                    });                     
                 }             
                 // buscar macroprocesso             
                 function macroprocesso(a) { 
@@ -1537,7 +1566,8 @@
                 }  
                 //buscar ProcessoN1
                 function ProcessoN1(a,b) {      
-                    //var PCN1MAPCID = $('#altmacroprocesso').val();          
+                    //var PCN1MAPCID = $('#altmacroprocesso').val();    
+                    //alert(a + ' '+b)      
                     axios.get("CFC/grupoitem.cfc",{
                         params: {
                         method: "macroprocesson1",
@@ -1547,6 +1577,7 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
+                        const valordb = b.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
@@ -1554,16 +1585,25 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if(eval(b) == ret[0]) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
-                        $("#altprocesson1").html(prots);
+                        $("#altprocesson1").html(prots); 
+
+                        setTimeout($("#altprocesson1").html(prots),500)
+                        $('#altprocesson1 > option').each(function() {
+                            valordb.forEach((item, index) => {
+                                $("#altprocesson1 option").filter(function() {
+                                    return $(this).val() == item;
+                                }).prop("selected", true);
+                            });
+                        });
                     })  
                 }     
                 //buscar ProcessoN2
                 function ProcessoN2(a,b,c) { 
                     //var PCN1MAPCID = $("#macroprocesso").val();
                     //var PCN1ID = $(this).val();
+
                     axios.get("CFC/grupoitem.cfc",{
                         params: {
                         method: "macroprocesson2",
@@ -1574,6 +1614,7 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
+                        const valordb = c.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
@@ -1581,14 +1622,23 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if(eval(c) == ret[0]) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
-                        $("#altprocesson2").html(prots);
+                        $("#altprocesson2").html(prots); 
+
+                        setTimeout($("#altprocesson2").html(prots),500)
+                        $('#altprocesson2 > option').each(function() {
+                            valordb.forEach((item, index) => {
+                                $("#altprocesson2 option").filter(function() {
+                                    return $(this).val() == item;
+                                }).prop("selected", true);
+                            });
+                        });
                     }) 
                 } //final buscar altProcessoN2  
                 //inicio buscar altprocessoN3
                 function ProcessoN3(a,b,c,d) { 
+                    //alert(a+' '+b+' '+c+' '+d)
                     axios.get("CFC/grupoitem.cfc",{
                         params: {
                         method: "macroprocesson3",
@@ -1600,6 +1650,7 @@
                     .then(data =>{
                         let prots = '<option value="">---</option>';
                         let selecionar = ''
+                        const valordb = d.split(',');
                         var vlr_ini = data.data.indexOf("COLUMNS");
                         var vlr_fin = data.data.length
                         vlr_ini = (vlr_ini - 2);
@@ -1607,10 +1658,18 @@
                         const dados = json.DATA;
                         dados.map((ret) => {
                             selecionar = ''
-                            if(eval(d) == ret[0]) {selecionar = 'selected'}
                             prots += '<option value="' + ret[0] + '"'+selecionar+'>' + ret[1] + '</option>';
                         });
-                        $("#altprocesson3").html(prots);
+                        $("#altprocesson3").html(prots); 
+
+                        setTimeout($("#altprocesson3").html(prots),500)
+                            $('#altprocesson3 > option').each(function() {
+                                valordb.forEach((item, index) => {
+                                    $("#altprocesson3 option").filter(function() {
+                                        return $(this).val() == item;
+                                    }).prop("selected", true);
+                            });
+                        });
                     })
                 } //final buscar altprocessoN3   
                 // buscar diretoria do processo
@@ -1852,10 +1911,10 @@
                     $("#altprocesson2").html(prots);
                     $("#altprocesson3").html(prots);
                     let PCN1MAPCID = $("#altmacroprocesso").val();
-                    let PCN1ID = $(this).val();
+                    let PCN1ID = $('#altprocesson1').val();
+                    PCN1ID = PCN1ID.toString()
                     if(PCN1ID == ''){
                         $("#altprocesson2").attr('disabled', true);
-
                         $("#altprocesson3").attr('disabled', true);
                         $('#altprocesson3outros').hide(500)
                         $("#cd_altprocesson3").prop("checked", false); 
@@ -1887,9 +1946,11 @@
                 $('#altprocesson2').change(function(e){
                     let prots = '<option value="" selected>---</option>';
                     $("#altprocesson3").html(prots);
-                    var PCN3PCN2PCN1MAPCID = $("#altmacroprocesso").val();
-                    var PCN3PCN2PCN1ID = $("#altprocesson1").val();
-                    var PCN3PCN2ID = $(this).val();
+                    let PCN3PCN2PCN1MAPCID = $("#altmacroprocesso").val();
+                    let PCN3PCN2PCN1ID = $("#altprocesson1").val();
+                    PCN3PCN2PCN1ID = PCN3PCN2PCN1ID.toString()
+                    let PCN3PCN2ID = $(this).val();
+                    PCN3PCN2ID = PCN3PCN2ID.toString()
                     if(PCN3PCN2ID == ''){
                         $("#altprocesson3").attr('disabled', true);
                         $('#altprocesson3outros').hide(500)
@@ -2157,7 +2218,8 @@
                     var total = eval(totala) + eval(totalb) 
                     $('#pontuacaoCalculadaAltAGF').val(total);
                 } //calcular total AGF 
-                // Botão do Tipo de unidade foi clicado   no Plano de Teste           
+                // Botão do Tipo de unidade foi clicado   no Plano de Teste    
+     
                 $('.alttipounid').click(function(){
                     var title = $(this).attr("title");
                     //alert($(this).attr("id"));
@@ -2241,7 +2303,7 @@
                     })  
                 }
             })//fim buscar o departamento do processo            
-            //=======================================================================         
+            //=======================================================================                    
             // Para realizar a críticas do submit
             function alttpunidselec() {
                 var alttpunid = ''
@@ -2482,7 +2544,8 @@
                         frm.altprocesson3.focus();
                         return false;
                     }                                            
-                }  
+                }     
+                                                                      
                 if ($('#altgestordir').val() == '') {
                     alert('Selecione uma Diretoria do Processo.');
                     frm.altgestordir.focus();
