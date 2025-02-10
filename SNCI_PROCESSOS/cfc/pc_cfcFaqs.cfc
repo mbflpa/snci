@@ -249,34 +249,35 @@
 								});
 								this.on("queuecomplete", function(){
 									toastr.success("Upload realizado com sucesso!");
-									var uploadedFile = this.getAcceptedFiles()[0]; // obtém o primeiro arquivo aceito
-									this.removeAllFiles(true);
-									// Limpa o container para remover o progress bar
-									$("#previewsArquivo").empty();
-									// Atualiza a div somente se os dois campos tiverem valor
+									// Atualiza a div do anexo se necessário
 									if (
 										$('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" &&
 										$('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== ""
 									) {
 										$("#arquivoFaqDiv").html(`
-										<!-- Container flex para anexos -->
-										<div style="padding: 0px; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($('#faqAnexoCaminho').val(), $('#faqAnexoNome').val())">
-											<!-- Card com anexo -->
-											<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease 0s; height: inherit; width: 100%; margin: 0;">
-												<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
-													<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">
-														<i class="fas fa-file-pdf"></i> ` + $('#faqAnexoNome').val() + `
-													</h3>
-													<div class="card-tools" style="margin-left: 20px;">
-														<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">
-															<i class="fas fa-trash-alt"></i>
-														</button>
+											<!-- Container flex para anexos -->
+											<div style="padding: 0; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($('#faqAnexoCaminho').val(), $('#faqAnexoNome').val())">
+												<!-- Card com anexo -->
+												<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease; height: inherit; width: 100%; margin: 0;">
+													<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
+														<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">
+															<i class="fas fa-file-pdf"></i> ` + $('#faqAnexoNome').val() + `
+														</h3>
+														<div class="card-tools" style="margin-left: 20px;">
+															<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">
+																<i class="fas fa-trash-alt"></i>
+															</button>
+														</div>
 													</div>
 												</div>
 											</div>
-										</div>`);
+										`);
 									}
-									finalizeSubmission();
+									// Envia os dados após o upload, usando "null" para pc_faq_texto
+									submitFaq("null");
+									// Limpa os arquivos e a pré-visualização
+									this.removeAllFiles(true);
+									$("#previewsArquivo").empty();
 								});
 							}
 						});
@@ -302,89 +303,108 @@
 				mostraFormCadFaq();
 			});
 
-
+			// Nova função para enviar os dados após upload (ou direto se texto)
+			function submitFaq(dataEditor) {
+				var perfisList = $('#faqPerfis').val();
+				$('#modalOverlay').modal('show');
+				$.ajax({
+					type: "post",
+					url: "cfc/pc_cfcFaqs.cfc",
+					dataType: "json",
+					data:{
+						method: "cadFaq",
+						pc_faq_id: $('#faqId').val(),
+						pc_faq_perfis: perfisList.join(','),
+						pc_faq_titulo: $('#faqTitulo').val(),
+						pc_faq_status: $('#faqStatus').val(),
+						pc_faq_texto: dataEditor,
+						pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
+						pc_faq_anexo_nome: $('#faqAnexoNome').val()
+					},
+					async: false
+				})
+				.done(function(result) {
+					console.log("cadFaq response:", result);
+					finalizeSubmission();
+				});
+			}
 
 			$('#btSalvar').on('click', function (event)  {
-				event.preventDefault()
-				event.stopPropagation()
+				event.preventDefault();
+				event.stopPropagation();
 
 				if (!$('#faqPerfis').val() || !$('#faqTitulo').val() || !$('#faqStatus').val()){
-					//mostra mensagem de erro, se algum campo necessário nesta fase não estiver preenchido	
 					toastr.error('Todos os campos devem ser preenchidos.');
 					return false;
 				}
                 var envioTipo = $('input[name="envioFaq"]:checked').val();
-                var dataEditor, pc_faq_anexo_caminho = "", pc_faq_anexo_nome = "";
+                var dataEditor; 
                 if(envioTipo === "texto"){
                     dataEditor = CKEDITOR.instances.faqTexto.getData();
                     if(dataEditor.length < 100){
                         toastr.error('Insira um texto com, no mínimo, 100 caracteres.');
                         return false;
                     }
+                    // Removido: submitFaq(dataEditor);
                 } else {
                     dataEditor = "null";
-                    // Verifica se há arquivo na fila do dropzone
                     if(!(window.myDropzoneFaq && window.myDropzoneFaq.getQueuedFiles().length > 0)){
                         toastr.error('É necessário anexar um arquivo PDF.');
                         return false;
                     }
                 }
 				
-				var mensagem = ""
+				var mensagem = "";
 				if($('#faqId').val() == ''){
-					var mensagem = "Deseja cadastrar este FAQ?"
-				}else{
-					var mensagem = "Deseja editar este FAQ?"
+					mensagem = "Deseja cadastrar este FAQ?";
+				} else {
+					mensagem = "Deseja editar este FAQ?";
 				}
 				
-				
-				swalWithBootstrapButtons.fire({//sweetalert2
+				swalWithBootstrapButtons.fire({
 					html: logoSNCIsweetalert2(mensagem),
 					showCancelButton: true,
 					confirmButtonText: 'Sim!',
 					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {
-							var perfisList = $('#faqPerfis').val();
-						
-							$('#modalOverlay').modal('show')
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcFaqs.cfc",
-									dataType: "json",
-									data:{
-										method: "cadFaq",
-										pc_faq_id: $('#faqId').val(),
-										pc_faq_perfis:perfisList.join(','),
-										pc_faq_titulo:$('#faqTitulo').val(),
-										pc_faq_status: $('#faqStatus').val(),
-										pc_faq_texto: dataEditor,
-										pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
-										pc_faq_anexo_nome: $('#faqAnexoNome').val()
-									},
-									async: false
-								})//fim ajax
-								.done(function(result) {
-									console.log("cadFaq response:", result);
-									if(envioTipo==="arquivo" && window.myDropzoneFaq && window.myDropzoneFaq.getQueuedFiles().length > 0){
-										// Atribui o ID aos parâmetros e dispara o upload
-										window.myDropzoneFaq.options.params = { pc_faq_id: result[0].FAQ_ID };
-										window.myDropzoneFaq.processQueue();
-									} else {
-										finalizeSubmission();
-									}
-								})//fim done
-								
-							}, 500);
-						}
-						
-					})
-
-					$('#modalOverlay').delay(1000).hide(0, function() {
-						$('#modalOverlay').modal('hide');
-					});
-					
+				}).then((result) => {
+					if (result.isConfirmed) {
+						var perfisList = $('#faqPerfis').val();
+						$('#modalOverlay').modal('show');
+						setTimeout(function() {
+							$.ajax({
+								type: "post",
+								url: "cfc/pc_cfcFaqs.cfc",
+								dataType: "json",
+								data:{
+									method: "cadFaq",
+									pc_faq_id: $('#faqId').val(),
+									pc_faq_perfis: perfisList.join(','),
+									pc_faq_titulo: $('#faqTitulo').val(),
+									pc_faq_status: $('#faqStatus').val(),
+									pc_faq_texto: dataEditor,
+									pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
+									pc_faq_anexo_nome: $('#faqAnexoNome').val()
+								},
+								async: false
+							})
+							.done(function(result) {
+								console.log("cadFaq response:", result);
+								// NOVA LINHA: Atualiza o campo oculto com o FAQ_ID retornado para evitar inserção duplicada.
+								$('#faqId').val(result[0].FAQ_ID);
+								if(envioTipo==="arquivo" && window.myDropzoneFaq && window.myDropzoneFaq.getQueuedFiles().length > 0){
+									window.myDropzoneFaq.options.params = { pc_faq_id: result[0].FAQ_ID };
+									window.myDropzoneFaq.processQueue();
+								} else {
+									finalizeSubmission();
+								}
+							});
+						}, 500);
+					}
+				});
+				
+				$('#modalOverlay').delay(1000).hide(0, function() {
+					$('#modalOverlay').modal('hide');
+				});
 				
 			});
 
@@ -439,7 +459,7 @@
 		<cfargument name="pc_faq_anexo_caminho" type="string" required="false" default="" />
 		<cfargument name="pc_faq_anexo_nome" type="string" required="false" default="" />
 	
-		<cfif '#arguments.pc_faq_id#' eq 0 or '#arguments.pc_faq_id#' eq '' >
+		<cfif arguments.pc_faq_id eq 0 or arguments.pc_faq_id eq "" >
 			<cfquery datasource="#application.dsn_processos#" result="resultFaq">
 				INSERT INTO pc_faqs
 								(pc_faq_titulo, pc_faq_perfis,pc_faq_status,pc_faq_texto,pc_faq_anexo_caminho,pc_faq_anexo_nome,pc_faq_atualiz_datahora,pc_faq_matricula_atualiz)
