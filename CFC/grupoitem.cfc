@@ -217,7 +217,7 @@
             <cfquery name="rsindestrat" datasource="DBSNCI">
                 SELECT IDES_ID, trim(IDES_Descricao) 
                 FROM UN_INDICADORESTRATEGICO
-                order by IDES_ID
+                order by IDES_Descricao
             </cfquery>
           <cfreturn rsindestrat> 
         </cftransaction>
@@ -252,7 +252,7 @@
             <cfquery name="rsproc01" datasource="DBSNCI">
                 SELECT PCN1_ID, trim(PCN1_Descricao)
                 FROM UN_PROCESSON1
-                WHERE PCN1_MAPC_ID= <cfqueryparam value="#PCN1MAPCID#" cfsqltype="cf_sql_integer">
+                WHERE PCN1_MAPC_ID = <cfqueryparam value="#PCN1MAPCID#" cfsqltype="cf_sql_integer">
             </cfquery>
           <cfreturn rsproc01> 
         </cftransaction>
@@ -260,14 +260,14 @@
     <!--- Este método retorna macrorocesso N2 --->
     <cffunction  name="macroprocesson2" access="remote" ReturnFormat="json" returntype="query">
         <cfargument name="PCN1MAPCID" required="true">
-        <cfargument name="PCN1ID" required="true">
+        <cfargument name="PCN1ID" required="true">  
         <cftransaction>
             <cfquery name="rsproc02" datasource="DBSNCI">
                 SELECT PCN2_ID, trim(PCN2_Descricao)
                 FROM UN_PROCESSON2
                 WHERE 
-                PCN2_PCN1_MAPC_ID=<cfqueryparam value="#PCN1MAPCID#" cfsqltype="cf_sql_integer"> AND 
-                PCN2_PCN1_ID=<cfqueryparam value="#PCN1ID#" cfsqltype="cf_sql_integer">
+                PCN2_PCN1_MAPC_ID = <cfqueryparam value="#PCN1MAPCID#" cfsqltype="cf_sql_integer"> AND 
+                PCN2_PCN1_ID in(#PCN1ID#)
             </cfquery>
           <cfreturn rsproc02> 
         </cftransaction>
@@ -283,8 +283,8 @@
             FROM UN_PROCESSON3
             WHERE 
             PCN3_PCN2_PCN1_MAPC_ID=<cfqueryparam value="#PCN3PCN2PCN1MAPCID#" cfsqltype="cf_sql_integer"> AND 
-            PCN3_PCN2_PCN1_ID=<cfqueryparam value="#PCN3PCN2PCN1ID#" cfsqltype="cf_sql_integer"> and 
-            PCN3_PCN2_ID=<cfqueryparam value="#PCN3PCN2ID#" cfsqltype="cf_sql_integer">
+            PCN3_PCN2_PCN1_ID in(#PCN3PCN2PCN1ID#) and
+            PCN3_PCN2_ID in(#PCN3PCN2ID#)
             </cfquery>
           <cfreturn rsproc03> 
         </cftransaction>
