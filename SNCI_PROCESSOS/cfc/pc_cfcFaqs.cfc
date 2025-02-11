@@ -123,10 +123,35 @@
                                                     
                                                 </div>
                                             </div>
-
+											
+											<cfif FileExists(rsFaqEdit.pc_faq_anexo_caminho)>
+												<cfif FindNoCase("localhost", application.auxsite)>
+													<cfset caminho = ListLast(rsFaqEdit.pc_faq_anexo_caminho, '\')>
+												<cfelse>
+													<cfset caminho = "#rsFaqEdit.pc_faq_anexo_caminho#">
+												</cfif>
+											<cfelse>
+												<cfset caminho = "Caminho não encontrado">
+											</cfif>
 											<!-- Adicionado div para exibição do arquivo após upload -->
-											<div id="arquivoFaqDiv" style="margin-top:15px;"></div>
-										</div>
+											<div  style="margin-top:15px;" hidden></div>
+												<!-- Container flex para anexos -->
+												<div style="padding: 0px; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal(<cfoutput>#rsFaqEdit.pc_faq_id#,'#jsStringFormat(caminho)#'</cfoutput>)">
+													<!-- Card com anexo -->
+													<div id="arquivoFaqDiv" class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease 0s; height: inherit; width: 100%; margin: 0;">
+														<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
+															<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">
+																<i class="fas fa-file-pdf"></i> <cfoutput>#rsFaqEdit.pc_faq_anexo_nome#</cfoutput>
+															</h3>
+															<div class="card-tools" style="margin-left: 20px;">
+																<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">
+																	<i class="fas fa-trash-alt"></i>
+																</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
 
 
 										<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
@@ -163,9 +188,9 @@
 				});
 				// Inicialmente, se "texto" estiver selecionado, oculta as divs de ações e de pré-visualizações
 				if ($('input[name="envioFaq"]:checked').val() === 'texto') {
-					$('#actions').hide();
-					$('#previewsArquivo').hide();
-					$('#arquivoFaqDiv').hide(); // Adicionada esta linha
+					$('#actions').attr("hidden", true);
+					$('#previewsArquivo').attr("hidden", true);
+					$('#arquivoFaqDiv').attr("hidden", true);
 				}
 				
 				CKEDITOR.replace( 'faqTexto', {
@@ -173,6 +198,8 @@
 					height: 300,
 					removeButtons: 'Save'
 				});
+
+				 setArquivoFaqDiv();
 
 				<cfoutput>
 				  var ListaPerfis ="#rsFaqEdit.pc_faq_perfis#"
@@ -184,55 +211,52 @@
 				});
 				$('#faqPerfis').val(selectedValues).trigger('change');
 
+				// Captura o template original do Dropzone na primeira carga
+				if (!window.dropzoneTemplate) {
+					var tempNode = document.querySelector("#templateArquivo");
+					if (tempNode) {
+						window.dropzoneTemplate = tempNode.parentNode.innerHTML;
+					} else {
+						window.dropzoneTemplate = "";
+						console.error("Elemento com id 'templateArquivo' não foi encontrado na carga inicial.");
+					}
+				}
+
 				$('input[name="envioFaq"]').change(function(){
+					
 					var anexoNome = $('#faqAnexoNome').val();
 					if($(this).val() === 'arquivo'){
 						
-						$('#containerTexto').hide();
+						$('#containerTexto').attr("hidden", true);
 						$('#accordionCadFaq').show();
-						$('#actions').show();
-						$('#arquivoFaqDiv').show(); // Adicionada esta linha
-
-						// Nova verificação: se arquivo existe, oculta o botão #arquivo
-						var filePath = $('#faqAnexoCaminho').val();
-						if (filePath && filePath.trim() !== "") {
-        					if (checkArquivoExists(filePath)) {
-								$('#arquivo').hide();
-							} else {
-								$('#arquivo').show();
-
-							}
-						}
-
-						if (
-							$('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" &&
-							$('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== ""
-						) {
-						    var cardHtml = `
-							<!-- Container flex para anexos -->
-							<div style="padding: 0px; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($('#faqAnexoCaminho').val(), $('#faqAnexoNome').val())">
-								<!-- Card com anexo -->
-								<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease 0s; height: inherit; width: 100%; margin: 0;">
-									<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
-										<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">
-											<i class="fas fa-file-pdf"></i> ` + $('#faqAnexoNome').val() + `
-										</h3>
-										<div class="card-tools" style="margin-left: 20px;">
-											<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">
-												<i class="fas fa-trash-alt"></i>
-											</button>
-										</div>
-									</div>
-								</div>
-							</div>`;
-                            setArquivoFaqDiv(cardHtml);
-						}
+						$('#actions').removeAttr("hidden");
+						$('#arquivoFaqDiv').removeAttr("hidden");
+ 						setArquivoFaqDiv();
+						
 						// Exibe o container de pré-visualizações para o Dropzone
-						$('#previewsArquivo').show();
+						$('#previewsArquivo').removeAttr("hidden");
+
+						// Se já existir uma instância do Dropzone, destrua-a
+						if(window.myDropzoneFaq){
+							window.myDropzoneFaq.destroy();
+							delete window.myDropzoneFaq;
+						}
+						
 						Dropzone.autoDiscover = false;
-						var previewNode = document.querySelector("#templateArquivo")
-						var previewTemplate = previewNode.parentNode.innerHTML
-						previewNode.parentNode.removeChild(previewNode)
+						// Verifica se o template existe, se não, reinsere-o
+						var previewNode = document.querySelector("#templateArquivo");
+						if(!previewNode && window.dropzoneTemplate){
+							// Reinsere o template no container de pré-visualizações
+							$("#previewsArquivo").html(window.dropzoneTemplate);
+							previewNode = document.querySelector("#templateArquivo");
+						}
+						var previewTemplate = "";
+						if(previewNode) {
+							previewTemplate = previewNode.parentNode.innerHTML;
+							previewNode.parentNode.removeChild(previewNode);
+						} else {
+							console.error("Elemento com id 'templateArquivo' não foi encontrado.");
+						}
 						
 					
 						var myDropzoneFaq = new Dropzone("#accordionCadFaq", {
@@ -283,24 +307,8 @@
 										$('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" &&
 										$('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== ""
 									) {
-									    var cardHtml = `
-											<!-- Container flex para anexos -->
-											<div style="padding: 0; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($('#faqAnexoCaminho').val(), $('#faqAnexoNome').val())">
-												<!-- Card com anexo -->
-												<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease; height: inherit; width: 100%; margin: 0;">
-													<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">
-														<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">
-															<i class="fas fa-file-pdf"></i> ` + $('#faqAnexoNome').val() + `
-														</h3>
-														<div class="card-tools" style="margin-left: 20px;">
-															<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">
-																<i class="fas fa-trash-alt"></i>
-															</button>
-														</div>
-													</div>
-												</div>
-											</div>`;
-                                        setArquivoFaqDiv(cardHtml);
+									    
+                                        setArquivoFaqDiv();
 									}
 									// Envia os dados após o upload
 									submitFaq();
@@ -314,11 +322,11 @@
 						window.myDropzoneFaq = myDropzoneFaq;
 					} else {
 						//$('#accordionCadFaq').hide();
-						$('#containerTexto').show();
-						$('#actions').hide();
+						$('#containerTexto').removeAttr("hidden");
+						$('#actions').attr("hidden", true);
 						// Oculta a div de pré-visualizações quando o envio é por texto
-						$('#previewsArquivo').hide();
-						$('#arquivoFaqDiv').hide(); // Adicionada esta linha
+						$('#previewsArquivo').attr("hidden", true);
+						$('#arquivoFaqDiv').attr("hidden", true);
 					}
 				});
 				
@@ -332,9 +340,14 @@
 				event.stopPropagation();
 				// Limpa todos os campos do formulário
 				$('#myform').trigger("reset");
-				if (CKEDITOR.instances.faqTexto) {
-					CKEDITOR.instances.faqTexto.setData('');
-				}
+				// try {
+				// 	var editor = CKEDITOR.instances.faqTexto;
+				// 	if (editor && typeof editor.setData === 'function') {
+				// 		editor.setData('');
+				// 	}
+				// } catch (e) {
+				// 	console.error("Erro ao limpar CKEditor:", e);
+				// }
 				$('#faqPerfis').val(null).trigger('change');
 				$('#faqStatus').val(null).trigger('change');
 				$('#faqId, #faqAnexoCaminho, #faqAnexoNome').val('');
@@ -378,11 +391,16 @@
 				var envioTipo = $('input[name="envioFaq"]:checked').val();
 				var dataEditor;
 				var existeArquivo = $('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "";
-				var existeTexto = CKEDITOR.instances.faqTexto.getData().trim() !== "";
+				var existeTexto = CKEDITOR.instances.faqTexto && typeof CKEDITOR.instances.faqTexto.getData === 'function' &&
+								  CKEDITOR.instances.faqTexto.getData().trim() !== "";
 			
 				// Validações específicas baseadas no tipo de envio
 				if(envioTipo === "texto"){
-					dataEditor = CKEDITOR.instances.faqTexto.getData();
+					if (CKEDITOR.instances.faqTexto && typeof CKEDITOR.instances.faqTexto.getData === 'function') {
+						dataEditor = CKEDITOR.instances.faqTexto.getData();
+					} else {
+						dataEditor = "";
+					}
 					if(dataEditor.length < 100){
 						toastr.error('Insira um texto com, no mínimo, 100 caracteres.');
 						return false;
@@ -498,25 +516,7 @@
 
 			// Função a ser chamada após o upload ou quando não há envio de anexo
             function finalizeSubmission(){
-                // Novo trecho para atualizar o container do anexo, caso exista
-                if ($('#faqAnexoNome').val() && $('#faqAnexoNome').val().trim() !== "" && $('#faqAnexoCaminho').val() && $('#faqAnexoCaminho').val().trim() !== "") {
-                    var cardHtml = 
-                        '<div style="padding: 0; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($(\'#faqAnexoCaminho\').val(), $(\'#faqAnexoNome\').val())">'+
-                            '<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease; height: inherit; width: 100%; margin: 0;">'+
-                                '<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">'+
-                                    '<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">'+
-                                        '<i class="fas fa-file-pdf"></i> ' + $('#faqAnexoNome').val() +
-                                    '</h3>'+
-                                    '<div class="card-tools" style="margin-left: 20px;">'+
-                                        '<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">'+
-                                            '<i class="fas fa-trash-alt"></i>'+
-                                        '</button>'+
-                                    '</div>'+
-                                '</div>'+
-                            '</div>'+
-                        '</div>';
-                    setArquivoFaqDiv(cardHtml);
-                }
+                setArquivoFaqDiv();
                 mostraFormCadFaq();
                 mostraTabFaq();
                 $('#modalOverlay').delay(1000).hide(0, function(){
@@ -544,6 +544,7 @@
 						cancelButtonText: 'Cancelar!'
 					}).then((result) => {
 						if (result.isConfirmed) {
+							$(`[id^='pdfModal']`).modal('hide');
 							$('#modalOverlay').modal('show');
 							setTimeout(function() {
 								$.ajax({
@@ -598,15 +599,23 @@
 			}
 
 			// Função auxiliar para atualizar a div
-			function setArquivoFaqDiv(cardHtml) {
+			function setArquivoFaqDiv() {
 				var filePath = $('#faqAnexoCaminho').val();
 				if (filePath && filePath.trim() !== "") {
+					
 					if (checkArquivoExists(filePath)) {
-						$("#arquivoFaqDiv").html(cardHtml);
+						 // Exibe a div e oculta o botão de upload se o arquivo existe
+						$("#arquivoFaqDiv").removeAttr("hidden");
+						$("#arquivo").hide();
 					} else {
-						$("#arquivoFaqDiv").html("<h5 style='color:red'>O arquivo foi deletado ou não é possível o seu acesso</h5>");
-				
+						// Oculta a div e exibe a mensagem de erro se o arquivo não existe
+						$("#arquivoFaqDiv")
+							.removeAttr("hidden")
+							.html("<h5 style='color:red'>O arquivo foi deletado ou não é possível o seu acesso</h5>");
 					}
+				} else {
+					// Oculta a div se não houver arquivo
+					$("#arquivoFaqDiv").attr("hidden", true);
 				}
 			}
 
@@ -754,6 +763,7 @@
 					ordering: false,
 					autoWidth: false,
 					lengthChange: false,   // Impede a seleção de quantidade de linhas
+					dom: 'lf<"clear">rtip', //Posiciona o input de pesquisa
 					language: {
 						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json",
 						info: "" // Remove a informação de registros
@@ -791,22 +801,8 @@
 								// Exibe o nome do arquivo anexo, se disponível
 								var anexoNome = $('#faqAnexoNome').val();
 								if(anexoNome && anexoNome.trim() !== ""){
-									var cardHtml = 
-										'<div style="padding: 0; width: 70%; margin: 0 auto;cursor:pointer" onclick="openPdfModal($(\'#faqAnexoCaminho\').val(), $(\'#faqAnexoNome\').val())">'+
-											'<div class="card card-primary card-tabs collapsed-card card_hover_correios" style="transition: all 0.15s ease; height: inherit; width: 100%; margin: 0;">'+
-												'<div class="card-header" style="padding:10px!important;display: flex; align-items: center; width: 100%; background: linear-gradient(45deg, #b00b1e, #d4145a);">'+
-													'<h3 class="card-title" style="font-size: 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">'+
-														'<i class="fas fa-file-pdf"></i> ' + anexoNome +
-													'</h3>'+
-													'<div class="card-tools" style="margin-left: 20px;">'+
-														'<button type="button" id="btExcluir" class="btn btn-tool grow-icon" style="font-size: 16px">'+
-															'<i class="fas fa-trash-alt"></i>'+
-														'</button>'+
-													'</div>'+
-												'</div>'+
-											'</div>'+
-										'</div>';
-									setArquivoFaqDiv(cardHtml);
+									
+									setArquivoFaqDiv();
 								}
 							}, 100);
 						}
@@ -940,14 +936,7 @@
 				<!-- /.col -->
 			</div>
 			<!-- /.row -->
-		<style>
-			/* Ajusta altura, padding e line-height da DataTable tabFaq */
-			#tabFaq tr, #tabFaq td, #tabFaq th {
-				padding: 2px !important;
-				line-height: 1 !important;
-				height: auto !important;
-			}
-		</style>
+		
 		<script language="JavaScript">	
 
 			$(function () {
@@ -959,7 +948,6 @@
 					destroy: true,
 					ordering: false,
 					stateSave: false,
-					filter: false,
 					autoWidth: true,
 					pageLength: 5,
 					lengthMenu: [
