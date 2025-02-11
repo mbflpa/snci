@@ -98,18 +98,8 @@
                     result = { type: "text", content: response };
                 }
 
-                var html = "";
-                if(result.type === "pdf"){
-                    if(result.arquivo && result.nome){
-                        var pdfUrl = "pc_Anexos.cfm?arquivo=" + encodeURIComponent(result.arquivo) +
-                                     "&nome=" + encodeURIComponent(result.nome);
-                        html = '<iframe src="' + pdfUrl + '" width="100%" height="600px" style="border:none;"></iframe>';
-                    } else {
-                        html = "<p>Dados do PDF indisponíveis.</p>";
-                    }
-                } else {
-                    html = result.content;
-                }
+                html = result.content;
+                
                 $('#formFaqDiv').html(html);
             })
             .fail(function(xhr, ajaxOptions, thrownError) {
