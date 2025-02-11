@@ -687,16 +687,19 @@
 				.maximized-card{
 					overflow-y: auto!important;
 				}
+				.card-header {
+					padding: .0rem 1rem!important;
+			    -}
 			</style>
 			<div class="col-12" id="accordion">
 				<cfloop query="rsFaqs">
 					<cfoutput>
-						<div class="card <cfif #pc_faq_status# eq 'D'>card-danger<cfelse>card-primary</cfif> card-outline">
+						<div class="card <cfif #pc_faq_status# eq 'D'>card-danger<cfelse>card-primary</cfif> card-outline" >
 							
 							<a class="d-block w-100 " data-toggle="collapse" href="##collapse#pc_faq_id#">
-								<div class="card-header" style="<cfif #pc_faq_status# eq 'D'>background-color: ##e5e5eb;color:red</cfif>">
+								<div class="card-header" style="<cfif #pc_faq_status# eq 'D'>background-color: ##e5e5eb;color:red</cfif>,padding: .0rem 1.0rem!important;">
 									<cfset dataFaq = DateFormat(#pc_faq_atualiz_datahora#,'DD-MM-YYYY') & '-' & TimeFormat(#pc_faq_atualiz_datahora#,'HH') & 'h' & TimeFormat(#pc_faq_atualiz_datahora#,'MM') & 'min' >
-									<h4 class="card-title 1-300" style="margin-bottom:5px">
+									<h4 class="card-title 1-300" style="margin-top:5px">
 										<cfif #pc_faq_status# eq 'D'><span class="badge badge-warning navbar-badge" style="float: left;right: initial;top: 1px;">Desativado</span></cfif>
 										#pc_faq_titulo#
 									</h4>
@@ -728,6 +731,7 @@
 		</div>
 		<script language="JavaScript">	
 			
+						
 			function mostraFormEditFaq(faqId,tit){
 				event.preventDefault()
 				event.stopPropagation()
