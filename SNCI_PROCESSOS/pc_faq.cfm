@@ -78,26 +78,48 @@
 
         function mostraFormFaq(){
             $.ajax({
-                    type: "post",
-                    url: "cfc/pc_cfcFaqs.cfc",
-                    data:{
-                        method: "formFaq",
-                        cadastro: 'N'
-                    },
-                    async: false
-                })//fim ajax
-                .done(function(result) {
-                    $('#formFaqDiv').html(result)
-                })//fim done
-                .fail(function(xhr, ajaxOptions, thrownError) {
-                    $('#modalOverlay').delay(1000).hide(0, function() {
-                        $('#modalOverlay').modal('hide');
-                    });
-                    $('#modal-danger').modal('show')
-                    $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-                    $('#modal-danger').find('.modal-body').text(thrownError)
+                type: "post",
+                url: "cfc/pc_cfcFaqs.cfc",
+                data: {
+                    method: "formFaq",
+                    cadastro: 'N'
+                },
+                dataType: "text"  // Mantido em "text" para lidar tanto com JSON quanto HTML
+            })
+            .done(function(response) {
+                if(!response || response.trim() === ""){
+                    $('#formFaqDiv').html("<p>Nenhum FAQ retornado pelo servidor.</p>");
+                    return;
+                }
+                var result;
+                try {
+                    result = JSON.parse(response);
+                } catch(e) {
+                    result = { type: "text", content: response };
+                }
 
-                })//fim fail
+                var html = "";
+                if(result.type === "pdf"){
+                    if(result.arquivo && result.nome){
+                        var pdfUrl = "pc_Anexos.cfm?arquivo=" + encodeURIComponent(result.arquivo) +
+                                     "&nome=" + encodeURIComponent(result.nome);
+                        html = '<iframe src="' + pdfUrl + '" width="100%" height="600px" style="border:none;"></iframe>';
+                    } else {
+                        html = "<p>Dados do PDF indisponíveis.</p>";
+                    }
+                } else {
+                    html = result.content;
+                }
+                $('#formFaqDiv').html(html);
+            })
+            .fail(function(xhr, ajaxOptions, thrownError) {
+                $('#modalOverlay').delay(1000).hide(0, function() {
+                    $('#modalOverlay').modal('hide');
+                });
+                $('#modal-danger').modal('show');
+                $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
+                $('#modal-danger').find('.modal-body').text(thrownError);
+            });
         }
 
         

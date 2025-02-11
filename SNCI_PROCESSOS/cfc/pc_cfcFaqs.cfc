@@ -153,13 +153,14 @@
 		</div>
 		<script language="JavaScript">
 
-			//Initialize Select2 Elements
-			$('select').select2({
-				theme: 'bootstrap4',
-				placeholder: 'Selecione...'
-			});
 
 			$(document).ready(function() {	
+				//Initialize Select2 Elements
+				$('select').not('[name="tabFaq_length"]').select2({
+					theme: 'bootstrap4',
+					placeholder: 'Selecione...',
+					allowClear: true
+				});
 				// Inicialmente, se "texto" estiver selecionado, oculta as divs de ações e de pré-visualizações
 				if ($('input[name="envioFaq"]:checked').val() === 'texto') {
 					$('#actions').hide();
@@ -248,6 +249,16 @@
 							clickable: "#arquivo",
 							init: function(){
 								var dzInstance = this;
+								// Adicionado: botão de exclusão para remover o arquivo selecionado
+								this.on("addedfile", function(file) {
+									var removeButton = Dropzone.createElement('<button class="btn btn-sm btn-danger remove-btn" style="margin-top:10px;">Excluir arquivo</button>');
+									file.previewElement.appendChild(removeButton);
+									removeButton.addEventListener("click", function(e) {
+										e.preventDefault();
+										e.stopPropagation();
+										dzInstance.removeFile(file);
+									});
+								});
 								this.on("error", function(file, errorMessage){
 									toastr.error(errorMessage);
 									return false;
@@ -291,8 +302,8 @@
 											</div>`;
                                         setArquivoFaqDiv(cardHtml);
 									}
-									// Envia os dados após o upload, usando "null" para pc_faq_texto
-									submitFaq("null");
+									// Envia os dados após o upload
+									submitFaq();
 									// Limpa os arquivos e a pré-visualização
 									this.removeAllFiles(true);
 									$("#previewsArquivo").empty();
@@ -331,8 +342,8 @@
 				mostraFormCadFaq();
 			});
 
-			// Nova função para enviar os dados após upload (ou direto se texto)
-			function submitFaq(dataEditor) {
+			// função para enviar os dados após upload (ou direto se texto)
+			function submitFaq() {
 				var perfisList = $('#faqPerfis').val();
 				$('#modalOverlay').modal('show');
 				$.ajax({
@@ -345,7 +356,6 @@
 						pc_faq_perfis: perfisList.join(','),
 						pc_faq_titulo: $('#faqTitulo').val(),
 						pc_faq_status: $('#faqStatus').val(),
-						pc_faq_texto: dataEditor,
 						pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
 						pc_faq_anexo_nome: $('#faqAnexoNome').val()
 					},
@@ -423,13 +433,13 @@
 							cancelButtonText: 'Cancelar!'
 						}).then((result) => {
 							if (result.isConfirmed) {
-								dataEditor = "null";
+								dataEditor = ""; // Alterado de "null" para ""
 								proceedWithSave(dataEditor);
 							}
 						});
 						return false;
 					}
-					dataEditor = "null";
+					dataEditor = ""; // Alterado de "null" para ""
 				}
 				
 				proceedWithSave(dataEditor);
@@ -657,7 +667,7 @@
 
 
 
-	<cffunction name="formFaq"   access="remote" hint="exibe os FAQs na página pc_faq.cfm.">
+	<cffunction name="formFaq" access="remote" hint="Exibe os FAQs na página pc_faq.cfm.">
         <cfargument name="cadastro" type="string" required="false" default="S"/>
 		
 		<cfquery datasource="#application.dsn_processos#" name="rsFaqs">
@@ -692,19 +702,18 @@
 									</h4>
 
 									<div  class="card-tools">
-										<cfif (#application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11) and '#arguments.cadastro#' eq 'S'>
-										    <cfset titulo_codificado = urlEncodedFormat(pc_faq_titulo)>
-											<button type="button"  id="btEditar" class="btn btn-tool  " style="font-size:20px" onclick="javascript:mostraFormEditFaq(<cfoutput>#pc_faq_id#,'#titulo_codificado#'</cfoutput>);"  ><i class="fas fa-edit"></i></button>
-											<button type="button"  id="btExcluir" class="btn btn-tool  " style="font-size:20px" onclick="javascript:excluirFaq(<cfoutput>#pc_faq_id#</cfoutput>);"  ><i class="fas fa-trash-alt"></i></button>
-										</cfif>
 										<button  type="button" class="btn btn-tool" data-card-widget="maximize" style="font-size:34px;"><i class="exp fas fa-expand"></i></button>
 									</div>	
 								</div>
 							</a>
 							<div id="collapse#pc_faq_id#" class="collapse" data-parent="##accordion">
 								<div class="card-body">
-									
-									<div>#pc_faq_texto#</div>
+									<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
+										<iframe src="/snci/SNCI_PROCESSOS/pc_exibePdfInline.cfm?arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&amp;nome=#URLEncodedFormat(pc_faq_anexo_nome)#" 
+											width="100%" height="600px" style="border:none;"></iframe>
+									<cfelse>
+										<div>#pc_faq_texto#</div>
+									</cfif>
 									<cfif (#application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11) and '#arguments.cadastro#' eq 'S'>
 										<div align="center" style="margin-top:30px;font-size:10px"><div>Última atualização: #pc_faq_matricula_atualiz# - #pc_usu_nome# (#dataFaq#)</div></div>
 									</cfif>
@@ -906,13 +915,17 @@
 						{ "orderable": false, "targets": 0 }//impede que a primeira coluna seja ordenada
 					],
 					order: [[ 1, "desc" ]],//ordena a segunda coluna como crescente
-					"destroy": true,
-			    	"stateSave": true,
-					"responsive": true, 
-					"lengthChange": true, 
-					"autoWidth": false,
-					"select": true,
-					"buttons": [{
+					destroy: true,
+					ordering: false,
+					stateSave: false,
+					filter: false,
+					autoWidth: true,
+					pageLength: 5,
+					lengthMenu: [
+						[5, 10, 25, 50, -1],
+						[5, 10, 25, 50, 'Todos']
+					],
+					buttons: [{
 						extend: 'excel',
 						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
 						className: 'btExcel',
@@ -920,7 +933,7 @@
 					language: {
 						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
 					}
-				}).buttons().container().appendTo('#tabFaq_wrapper .col-md-6:eq(0)');
+				})
 					
 			});
 			
