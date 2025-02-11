@@ -680,57 +680,86 @@
 				order by  pc_faq_titulo
 			</cfif>
 		</cfquery>
-
-	
+		<style>
+			
+			/* Ajusta altura, padding e line-height da DataTable gridFaq */
+			#gridFaq tr, #gridFaq td, #gridFaq th {
+				padding: 0px !important;
+				line-height: 1 !important;
+				height: auto !important;
+			}
+			
+		</style>
 		<div class="row">
-			<style>
-				.maximized-card{
-					overflow-y: auto!important;
-				}
-				.card-header {
-					padding: .0rem 1rem!important;
-			    -}
-			</style>
-			<div class="col-12" id="accordion">
-				<cfloop query="rsFaqs">
-					<cfoutput>
-						<div class="card <cfif #pc_faq_status# eq 'D'>card-danger<cfelse>card-primary</cfif> card-outline" >
-							
-							<a class="d-block w-100 " data-toggle="collapse" href="##collapse#pc_faq_id#">
-								<div class="card-header" style="<cfif #pc_faq_status# eq 'D'>background-color: ##e5e5eb;color:red</cfif>,padding: .0rem 1.0rem!important;">
-									<cfset dataFaq = DateFormat(#pc_faq_atualiz_datahora#,'DD-MM-YYYY') & '-' & TimeFormat(#pc_faq_atualiz_datahora#,'HH') & 'h' & TimeFormat(#pc_faq_atualiz_datahora#,'MM') & 'min' >
-									<h4 class="card-title 1-300" style="margin-top:5px">
-										<cfif #pc_faq_status# eq 'D'><span class="badge badge-warning navbar-badge" style="float: left;right: initial;top: 1px;">Desativado</span></cfif>
-										#pc_faq_titulo#
-									</h4>
-
-									<div  class="card-tools">
-										<button  type="button" class="btn btn-tool" data-card-widget="maximize" style="font-size:34px;"><i class="exp fas fa-expand"></i></button>
-									</div>	
-								</div>
-							</a>
-							<div id="collapse#pc_faq_id#" class="collapse" data-parent="##accordion">
-								<div class="card-body">
-									<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
-										<iframe src="/snci/SNCI_PROCESSOS/pc_exibePdfInline.cfm?arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&amp;nome=#URLEncodedFormat(pc_faq_anexo_nome)#" 
-											width="100%" height="600px" style="border:none;"></iframe>
-									<cfelse>
-										<div>#pc_faq_texto#</div>
-									</cfif>
-									<cfif (#application.rsUsuarioParametros.pc_usu_perfil# eq 3 or #application.rsUsuarioParametros.pc_usu_perfil# eq 11) and '#arguments.cadastro#' eq 'S'>
-										<div align="center" style="margin-top:30px;font-size:10px"><div>Última atualização: #pc_faq_matricula_atualiz# - #pc_usu_nome# (#dataFaq#)</div></div>
-									</cfif>
-								</div>
-							</div>
-
-							
-						</div>
-					</cfoutput>
-				</cfloop>
+			<div class="col-12">
+				<!-- Novo estilo para a tabela gridFaq com altura menor nas linhas -->
+				
+				<table id="gridFaq" class="table ">
+					<thead>
+						<tr>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<cfloop query="rsFaqs">
+							<cfoutput>
+							<tr>
+								<td>
+									<div class="card <cfif pc_faq_status eq 'D'>card-danger<cfelse>card-primary</cfif> card-outline">
+ 										<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
+											<div class="card-header" style="<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .0rem 1.0rem!important;">
+												<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
+												<h4 class="card-title 1-300" style="margin-top:5px">
+													<cfif pc_faq_status eq 'D'>
+														<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
+													</cfif>
+													#pc_faq_titulo#
+												</h4>
+												<div class="card-tools">
+													<button type="button" class="btn btn-tool" data-card-widget="maximize" style="font-size:34px;">
+														<i class="exp fas fa-expand"></i>
+													</button>
+												</div>
+											</div>
+										</a>
+										<div id="collapse#pc_faq_id#" class="collapse">
+											<div class="card-body">
+												<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
+													<iframe src="/snci/SNCI_PROCESSOS/pc_exibePdfInline.cfm?arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&amp;nome=#URLEncodedFormat(pc_faq_anexo_nome)#" 
+														width="100%" height="600px" style="border:none;"></iframe>
+												<cfelse>
+													<div>#pc_faq_texto#</div>
+												</cfif>
+												<cfif (application.rsUsuarioParametros.pc_usu_perfil eq 3 or application.rsUsuarioParametros.pc_usu_perfil eq 11) and arguments.cadastro eq 'S'>
+													<div align="center" style="margin-top:30px;font-size:10px">
+														<div>Última atualização: #pc_faq_matricula_atualiz# - #pc_usu_nome# (#dataFaq#)</div>
+													</div>
+												</cfif>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+							</cfoutput>
+						</cfloop>
+					</tbody>
+				</table>
 			</div>
 		</div>
 		<script language="JavaScript">	
-			
+			$(function(){
+				$("#gridFaq").DataTable({
+					responsive: true,
+					paging: false,         // Exibe todas as linhas (paginação desabilitada)
+					ordering: false,
+					autoWidth: false,
+					lengthChange: false,   // Impede a seleção de quantidade de linhas
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json",
+						info: "" // Remove a informação de registros
+					}
+				});
+			});
 						
 			function mostraFormEditFaq(faqId,tit){
 				event.preventDefault()
@@ -911,6 +940,14 @@
 				<!-- /.col -->
 			</div>
 			<!-- /.row -->
+		<style>
+			/* Ajusta altura, padding e line-height da DataTable tabFaq */
+			#tabFaq tr, #tabFaq td, #tabFaq th {
+				padding: 2px !important;
+				line-height: 1 !important;
+				height: auto !important;
+			}
+		</style>
 		<script language="JavaScript">	
 
 			$(function () {
