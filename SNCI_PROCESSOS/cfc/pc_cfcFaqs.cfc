@@ -83,13 +83,17 @@
 												<div class="input-group">
 													<select id="faqTipo" name="faqTipo" class="form-control">
 														<cfoutput query="rsFaqTipos">
-															<option value="#pc_faq_tipo_id#">#pc_faq_tipo_descricao#</option>
+															<option value="#pc_faq_tipo_id#" data-cor="#pc_faq_tipo_cor#" data-status="#pc_faq_tipo_status#">#pc_faq_tipo_descricao#</option>
 														</cfoutput>
 													</select>
 													<div class="input-group-append">
 														<button class="btn btn-outline-secondary btn-sm" type="button" onclick="openModalFaqTipo();" style="margin-left: 5px;">
 															<i class="fa fa-plus"></i>
 														</button>
+														<button class="btn btn-outline-secondary btn-sm" type="button" onclick="openModalEditFaqTipo($('#faqTipo').val());" style="margin-left: 5px;">
+															<i class="fa fa-edit"></i>
+														</button>
+														
 													</div>
 												</div>
 											</div>
@@ -211,14 +215,49 @@
 										<label for="novoFaqTipoDescricao">Descrição:</label>
 										<input type="text" class="form-control" id="novoFaqTipoDescricao">
 									</div>
-									<div class="form-group">
-										<label for="novoFaqTipoCor">Cor:</label>
-										<input type="color" class="form-control" id="novoFaqTipoCor" value="#007bff">
+									<div class="col-sm-4" >
+										<div class="form-group">
+											<label for="novoFaqTipoCor">Cor:</label>
+											<input type="color" class="form-control" id="novoFaqTipoCor" value="#007bff">
+										</div>
 									</div>
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
 									<button type="button" class="btn btn-primary" onclick="salvarNovoFaqTipo();">Salvar</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Nova modal para editar Tipo de FAQ -->
+					<div class="modal fade" id="modalEditFaqTipo" tabindex="-1" role="dialog" aria-labelledby="modalEditFaqTipoLabel" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="modalEditFaqTipoLabel">Editar Tipo de FAQ</h5>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"></button>
+								</div>
+								<div class="modal-body">
+									<div class="form-group">
+										<label for="editFaqTipoDescricao">Descrição</label>
+										<input type="text" id="editFaqTipoDescricao" class="form-control">
+									</div>
+									<div class="form-group">
+										<label for="editFaqTipoCor">Cor</label>
+										<input type="color" id="editFaqTipoCor" class="form-control" value="#007bff">
+									</div>
+									<div class="form-group">
+										<label for="editFaqTipoStatus">Status</label>
+										<select id="editFaqTipoStatus" class="form-control">
+											<option value="A">Ativo</option>
+											<option value="D">Desativar</option>
+										</select>
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+									<button type="button" class="btn btn-primary" onclick="salvarEditFaqTipo();">Salvar</button>
 								</div>
 							</div>
 						</div>
@@ -724,6 +763,76 @@
 					})//fim fail
 				}, 100);
 				
+				
+			}
+
+			// Função global para abrir o modal de edição do Tipo de FAQ
+			function openModalEditFaqTipo(faqTipoId) {
+				var $option = $("#faqTipo option[value='" + faqTipoId + "']");
+				var descricao = $option.text();
+				var cor = $option.data("cor") || "#007bff";
+				var status = $option.data("status") || "A";
+				$("#editFaqTipoDescricao").val(descricao);
+				$("#editFaqTipoCor").val(cor);
+				$("#editFaqTipoStatus").val(status);
+				$("#modalEditFaqTipo").data("faqTipoId", faqTipoId);
+				$("#modalEditFaqTipo").modal("show");
+			}
+
+			// Função global para salvar a edição do Tipo de FAQ via Ajax
+			function salvarEditFaqTipo() {
+				var faqTipoId = $("#modalEditFaqTipo").data("faqTipoId");
+				var descricao = $("#editFaqTipoDescricao").val().trim();
+				var cor = $("#editFaqTipoCor").val();
+				var status = $("#editFaqTipoStatus").val();
+				if(descricao === ""){
+					toastr.error("Informe a descrição.");
+					return;
+				}
+				$("#modalOverlay").modal("show");
+				$.ajax({
+					type: "post",
+					url: "cfc/pc_cfcFaqs.cfc",
+					dataType: "json",
+					data: {
+						method: "editFaqTipo",
+						pc_faq_tipo_id: faqTipoId,
+						pc_faq_tipo_descricao: descricao,
+						pc_faq_tipo_cor: cor,
+						pc_faq_tipo_status: status
+					},
+					async: false
+				})
+				.done(function(response){
+					// Tratamento similar ao salvarNovoFaqTipo(), usando response[0]
+					var resp = response[0];
+					var $option = $("#faqTipo option[value='" + faqTipoId + "']");
+					$option.text(resp.PC_FAQ_TIPO_DESCRICAO);
+					$option.data("cor", resp.PC_FAQ_TIPO_COR);
+					$option.data("status", resp.PC_FAQ_TIPO_STATUS);
+					 // Reinicializa o select2 para atualizar a exibição da nova descrição
+					$("#faqTipo").select2('destroy');
+					$("#faqTipo").select2({
+						theme: 'bootstrap4',
+						placeholder: 'Selecione...',
+						allowClear: true
+					});
+					$("#faqTipo").trigger("change");
+					$("#modalEditFaqTipo").modal("hide");
+					$('#modalOverlay').delay(1000).hide(0, function() {
+						$('#modalOverlay').modal('hide');
+					});
+					toastr.success("Tipo atualizado com sucesso!");
+					
+				})
+				.fail(function(jqXHR, textStatus, errorThrown){
+					$('#modalOverlay').delay(1000).hide(0, function() {
+						$('#modalOverlay').modal('hide');
+					});
+					$('#modal-danger').modal('show')
+					$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+					$('#modal-danger').find('.modal-body').text(errorThrown)
+				});
 			}
 
 		</script>
@@ -1274,5 +1383,27 @@
 		<cfset arrayAppend(novosTipos, novoTipo)>
 		<cfreturn novosTipos>
     </cffunction>
+
+	<cffunction name="editFaqTipo" access="remote" returntype="any" returnformat="json" output="false" hint="Edita o Tipo de FAQ.">
+		<cfargument name="pc_faq_tipo_id" type="numeric" required="true" />
+		<cfargument name="pc_faq_tipo_descricao" type="string" required="true" />
+		<cfargument name="pc_faq_tipo_cor" type="string" required="false" default=""/>
+		<cfargument name="pc_faq_tipo_status" type="string" required="true" />
+		<cfquery datasource="#application.dsn_processos#">
+			UPDATE pc_faq_tipos
+			SET pc_faq_tipo_descricao = <cfqueryparam value="#arguments.pc_faq_tipo_descricao#" cfsqltype="cf_sql_varchar">,
+				pc_faq_tipo_cor = <cfqueryparam value="#arguments.pc_faq_tipo_cor#" cfsqltype="cf_sql_varchar">,
+				pc_faq_tipo_status = <cfqueryparam value="#arguments.pc_faq_tipo_status#" cfsqltype="cf_sql_varchar">
+			WHERE pc_faq_tipo_id = <cfqueryparam value="#arguments.pc_faq_tipo_id#" cfsqltype="cf_sql_numeric">
+		</cfquery>
+		<cfset tiposEditados = []>
+		<cfset tipoEditado = {}>
+		<cfset tipoEditado.PC_FAQ_TIPO_ID = arguments.pc_faq_tipo_id>
+		<cfset tipoEditado.PC_FAQ_TIPO_DESCRICAO = arguments.pc_faq_tipo_descricao>
+		<cfset tipoEditado.PC_FAQ_TIPO_COR = arguments.pc_faq_tipo_cor>
+		<cfset tipoEditado.PC_FAQ_TIPO_STATUS = arguments.pc_faq_tipo_status>
+		<cfset arrayAppend(tiposEditados, tipoEditado)>
+		<cfreturn tiposEditados>
+	</cffunction>
 
 </cfcomponent>
