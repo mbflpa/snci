@@ -741,7 +741,7 @@
                                                 </select>
                                             </label>
                                             <div class="row">
-                                                <div id="altprocesson3-outros">
+                                                <div id="divaltprocesson3-outros">
                                                     <textarea name="altprocesson3outros" id="altprocesson3outros" cols="100" rows="2" wrap="VIRTUAL" class="form-control" placeholder="Outros - Informar Descrição aqui."></textarea>
                                                 </div>
                                             </div>                                            
@@ -1012,9 +1012,13 @@
                 <input type="hidden" id="checkPontuacaoAltseq" name="checkPontuacaoAltseq" value=""> 
                 <input type="hidden" id="checkPontuacaoAltagfseq" name="checkPontuacaoAltagfseq" value=""> 
                 <input type="hidden" id="altmacroprocesso_sel" name="altmacroprocesso_sel" value=""> 
+                <input type="hidden" id="altmacroprocesso_db" name="altmacroprocesso_db" value=""> 
                 <input type="hidden" id="altprocesson1_sel" name="altprocesson1_sel" value=""> 
+                <input type="hidden" id="altprocesson1_db" name="altprocesson1_db" value=""> 
                 <input type="hidden" id="altprocesson2_sel" name="altprocesson2_sel" value=""> 
+                <input type="hidden" id="altprocesson2_db" name="altprocesson2_db" value=""> 
                 <input type="hidden" id="altprocesson3_sel" name="altprocesson3_sel" value=""> 
+                <input type="hidden" id="altprocesson3_db" name="altprocesson3_db" value="">
             </form>
         </div>
 
@@ -1321,13 +1325,17 @@
                         $('#altcategoriariscooutros').val(ret[14])
                         macropro = ret[15]
                         $('#altmacroprocesso_sel').val(ret[15]) 
+                        $('#altmacroprocesso_db').val(ret[15])   
                         procn1 = ret[16] 
-                        $('#altprocesson1_sel').val(ret[16])               
+                        $('#altprocesson1_sel').val(ret[16])  
+                        $('#altprocesson1_db').val(ret[16])             
                         $('#altprocesson1naoseaplica').val(ret[17])        
                         procn2 = ret[18]
                         $('#altprocesson2_sel').val(ret[18])
+                        $('#altprocesson2_db').val(ret[18])
                         procn3 = ret[19]
                         $('#altprocesson3_sel').val(ret[19])
+                        $('#altprocesson3_db').val(ret[19])
                         $('#altprocesson3outros').val(ret[20]) 
                         dirproc = ret[21]                 
                         deptoproc = ret[22]
@@ -1391,33 +1399,34 @@
 
                     $("#altprocesson1-naoseaplica").hide(500);
                     if ($('#altprocesson1naoseaplica').val() != '') {
-                            $('#altprocesson1-naoseaplica').show(500)
-                            $("#cd_altprocesson1").prop("checked", true);
-                            $("#altprocesson1").html(prots);
-                            $("#altprocesson1").attr('disabled', true);
-                            $("#altprocesson2").attr('disabled', true);
+                        $('#altprocesson1-naoseaplica').show(500)
+                        $("#cd_altprocesson1").prop("checked", true);
+                        $("#altprocesson1").html(prots);
+                        $("#altprocesson1").attr('disabled', true);
+                        $("#altprocesson2").attr('disabled', true);
+                        $("#altprocesson3").attr('disabled', true);
+                        $("#cd_altprocesson3").attr('disabled', true);
+                        $("#divaltprocesson3-outros").hide(500);
+                        $('#processon3outrosSNAlt').val('N')
+                        $('#processon1naoaplicarSNAlt').val('S')
+                    }else{
+                        $('#processon1naoaplicarSNAlt').val('N')
+                        ProcessoN1(macropro,procn1)
+                        $("#cd_altprocesson1").prop("checked", false);
+                        ProcessoN2(macropro,procn1,procn2)
+                        if ($('#altprocesson3outros').val() != '') {
+                            $("#altprocesson3").html(prots);
                             $("#altprocesson3").attr('disabled', true);
-                            $("#cd_altprocesson3").attr('disabled', true);
-                            $("#altprocesson3-outros").hide(500);
-                            $('#processon3outrosSNAlt').val('N')
-                            $('#processon1naoaplicarSNAlt').val('S')
+                            $('#divaltprocesson3-outros').show(500)
+                            $("#cd_altprocesson3").prop("checked", true); 
+                            $('#processon3outrosSNAlt').val('S')
                         }else{
-                            $('#processon1naoaplicarSNAlt').val('N')
-                            ProcessoN1(macropro,procn1)
-                            $("#cd_altprocesson1").prop("checked", false);
-                            ProcessoN2(macropro,procn1,procn2)
-                            if ($('#altprocesson3outros').val() != '') {
-                                $("#altprocesson3").html(prots);
-                                $("#altprocesson3").attr('disabled', true);
-                                $('#altprocesson3-outros').show(500)
-                                $("#cd_altprocesson3").prop("checked", true); 
-                                $('#processon3outrosSNAlt').val('S')
-                            }else{
-                                $('#processon3outrosSNAlt').val('N')
-                                $('#altprocesson3-outros').hide(500)
-                                ProcessoN3(macropro,procn1,procn2,procn3)  
-                                $("#cd_altprocesson3").prop("checked", false); 
-                            }                    
+                            $('#processon3outrosSNAlt').val('N')
+                            $('#divaltprocesson3-outros').hide(500)
+                            let procn3 = $("#altprocesson3_db").val();
+                            ProcessoN3(macropro,procn1,procn2,procn3)  
+                            $("#cd_altprocesson3").prop("checked", false); 
+                        }                    
                     }  
                     if (dirproc == undefined) { dirproc = '0'}
                     dirprocesso(dirproc) 
@@ -1638,13 +1647,15 @@
                 } //final buscar altProcessoN2  
                 //inicio buscar altprocessoN3
                 function ProcessoN3(a,b,c,d) { 
-                    //alert(a+' '+b+' '+c+' '+d)
+                   // alert(a+' '+b+' '+c+' '+d)
+                    PCN3PCN2PCN1ID = b.toString()
+                    PCN3PCN2ID = c.toString()
                     axios.get("CFC/grupoitem.cfc",{
                         params: {
                         method: "macroprocesson3",
                         PCN3PCN2PCN1MAPCID: a,
-                        PCN3PCN2PCN1ID: b,
-                        PCN3PCN2ID: c
+                        PCN3PCN2PCN1ID: PCN3PCN2PCN1ID,
+                        PCN3PCN2ID: PCN3PCN2ID
                         }
                     })
                     .then(data =>{
@@ -1967,16 +1978,16 @@
                                 PCN3PCN2ID: PCN3PCN2ID
                             }
                         })
-                        .then(data =>{
-                            let prots = '<option value="" selected>---</option>';
-                            var vlr_ini = data.data.indexOf("COLUMNS");
-                            var vlr_fin = data.data.length
-                            vlr_ini = (vlr_ini - 2);
-                            const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
-                            const dados = json.DATA;
-                            dados.map((ret) => {
-                            prots += '<option value="' + ret[0] + '">' + ret[1] + '</option>';
-                        });
+                            .then(data =>{
+                                let prots = '<option value="" selected>---</option>';
+                                var vlr_ini = data.data.indexOf("COLUMNS");
+                                var vlr_fin = data.data.length
+                                vlr_ini = (vlr_ini - 2);
+                                const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
+                                const dados = json.DATA;
+                                dados.map((ret) => {
+                                prots += '<option value="' + ret[0] + '">' + ret[1] + '</option>';
+                            });
                             $("#altprocesson3").html(prots);
                         }) 
                     }
@@ -1984,39 +1995,24 @@
                 // inicio cd_altprocesson3
                 //==============================
                 $('#cd_altprocesson3').click(function(){
-                    let prots = '<option value="" selected>---</option>';
-                   // $("#altprocesson3-outros").hide(500);
+                    let prots = '';
+                   // $("#divaltprocesson3-outros").hide(500);
                     $("#altprocesson3").html(prots);
                     if($(this).is(':checked')) {
                         $("#altprocesson3").attr('disabled', true);
-                        $("#altprocesson3-outros").show(500);
+                        $("#divaltprocesson3-outros").show(500);
                         $("#processon3outrosSNAlt").val('S');
                     }else{
                         $("#processon3outrosSNAlt").val('N');
                         $("#altprocesson3").attr('disabled', false);
                         //realizar nova busca e preecher o altprocesson1
-                        var PCN3PCN2PCN1MAPCID = $("#altmacroprocesso").val();
-                        var PCN3PCN2PCN1ID = $("#altprocesson1").val();
-                        var PCN3PCN2ID = $("#altprocesson2").val();
-                        axios.get("CFC/grupoitem.cfc",{
-                            params: {
-                                method: "macroprocesson3",
-                                PCN3PCN2PCN1MAPCID: PCN3PCN2PCN1MAPCID,
-                                PCN3PCN2PCN1ID: PCN3PCN2PCN1ID,
-                                PCN3PCN2ID: PCN3PCN2ID
-                            }
-                        })
-                        .then(data =>{
-                            var vlr_ini = data.data.indexOf("COLUMNS");
-                            var vlr_fin = data.data.length
-                            vlr_ini = (vlr_ini - 2);
-                            const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
-                            const dados = json.DATA;
-                            dados.map((ret) => {
-                                prots += '<option value="' + ret[0] + '">' + ret[1] + '</option>';
-                            });
-                            $("#altprocesson3").html(prots);
-                        }) 
+                        let macropro = $("#altmacroprocesso").val();
+                        let procn1 = $("#altprocesson1").val();
+                        //PCN3PCN2PCN1ID = PCN3PCN2PCN1ID.toString()
+                        let procn2 = $("#altprocesson2").val();
+                        //PCN3PCN2ID = PCN3PCN2ID.toString()
+                        let procn3 = $("#altprocesson3_db").val();
+                        ProcessoN3(macropro,procn1,procn2,procn3)   
                     }            
                 })// fim cd_altprocesson3  
                 //buscar o principios do coso passando filtro do componentecoso
@@ -2047,11 +2043,11 @@
                 $('#cd_altprocesson1').click(function(){
                     let prots = '<option value="" selected>---</option>';
                     $("#processon1naoaplicarSNAlt").val('N');
-                    $('#altprocesson3-outros').hide(500)
+                    $('#divaltprocesson3-outros').hide(500)
                     if($(this).is(':checked')) {
                         $("#altprocesson1_sel").val($("#altprocesson1").val());
                         $("#altprocesson2_sel").val($("#altprocesson2").val());
-                        $("#altprocesson3_sel").val($("#altprocesson3").val());
+                       // $("#altprocesson3_sel").val($("#altprocesson3").val());
                         $('#altprocesson1-naoseaplica').show(500)
                         $("#processon1naoaplicarSNAlt").val('S');
                         $("#altprocesson1").html(prots);
@@ -2074,12 +2070,12 @@
                         if ($('#altprocesson3outros').val() != '') {
                             $("#altprocesson3").html(prots);
                             $("#altprocesson3").attr('disabled', true);
-                            $('#altprocesson3-outros').show(500)
+                            $('#divaltprocesson3-outros').show(500)
                             $("#cd_altprocesson3").prop("checked", true); 
                             $("#cd_altprocesson3").attr('disabled', true);
                         }else{
-                            $('#altprocesson3-outros').hide(500)
-                            let procn3 = $("#altprocesson3_sel").val();
+                            $('#divaltprocesson3-outros').hide(500)
+                            let procn3 = $("#altprocesson3_db").val();
                             ProcessoN3(macropro,procn1,procn2,procn3)  
                             $("#cd_altprocesson3").prop("checked", false); 
                             $("#cd_altprocesson3").attr('disabled', false);
@@ -2089,20 +2085,20 @@
                 //Ocultar ou Recompor o select processon3
                 $('#cd_altprocesson3').click(function(){
                     let prots = '<option value="" selected>---</option>';
-                    //$('#altprocesson3-outros').hide(500)
+                    //$('#divaltprocesson3-outros').hide(500)
                     if($(this).is(':checked')) {
                         $("#altprocesson3_sel").val($("#altprocesson3").val());
                         $("#altprocesson3").html(prots);
                         $("#altprocesson3").attr('disabled', true)
-                        $('#altprocesson3-outros').show(500)
+                        $('#divaltprocesson3-outros').show(500)
                     }else{
                         $("#altprocesson3").attr('disabled', false)
-                        let macropro = $("#altmacroprocesso").val();
-                        let procn1 = $("#altprocesson1").val();
-                        let procn2 = $("#altprocesson2").val();
-                        let procn3 = $("#altprocesson3_sel").val();
-                        $('#altprocesson3-outros').hide(500)
-                        ProcessoN3(macropro,procn1,procn2,"'"+procn3+"'") 
+                        let macropro = $("#altmacroprocesso_sel").val();
+                        let procn1 = $("#altprocesson1_sel").val();
+                        let procn2 = $("#altprocesson2_sel").val();
+                        let procn3 = $("#altprocesson3_db").val();
+                        $('#divaltprocesson3-outros').hide(500)
+                        ProcessoN3(macropro,procn1,procn2,procn3) 
                         //alert(macropro+' '+procn1+' '+procn2+' '+procn3)
                     }             
                 }) //Ocultar ou Recompor o select processon3                  
