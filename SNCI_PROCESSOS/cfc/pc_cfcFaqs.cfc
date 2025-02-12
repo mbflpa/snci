@@ -935,8 +935,9 @@
         <cfargument name="cadastro" type="string" required="false" default="S"/>
 		
 		<cfquery datasource="#application.dsn_processos#" name="rsFaqs">
-			SELECT pc_faqs.*, pc_usu_nome FROM  pc_faqs
+			SELECT pc_faqs.*, pc_usu_nome,pc_faq_tipo_cor FROM  pc_faqs
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_faq_matricula_atualiz
+			INNER JOIN pc_faq_tipos on pc_faq_tipo = pc_faq_tipo_id
 			<cfif ('#application.rsUsuarioParametros.pc_usu_perfil#' eq '3' or '#application.rsUsuarioParametros.pc_usu_perfil#' eq '11') and '#arguments.cadastro#' eq 'S'>
 				order by  pc_faq_status asc, pc_faq_atualiz_datahora desc
 			<cfelse>
@@ -969,7 +970,7 @@
 							<cfoutput>
 							<tr>
 								<td>
-									<div class="card <cfif pc_faq_status eq 'D'>card-danger<cfelse>card-primary</cfif> card-outline">
+									<div class="card  card-outline" style="    border-top: 3px solid #pc_faq_tipo_cor#;">
  										<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
 											<div class="card-header" style="<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .0rem 1.0rem!important;">
 												<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
