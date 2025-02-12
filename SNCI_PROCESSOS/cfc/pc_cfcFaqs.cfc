@@ -11,7 +11,7 @@
         <cfquery name="rsFaqTipos" datasource="#application.dsn_processos#">
             SELECT * FROM pc_faq_tipos 
             WHERE pc_faq_tipo_status = 'A'
-            ORDER BY pc_faq_tipo_descricao
+            ORDER BY pc_faq_tipo_id
         </cfquery>
 
 		<cfquery name="rsPerfis" datasource="#application.dsn_processos#">
@@ -22,9 +22,9 @@
 			SELECT pc_faqs.* FROM pc_faqs where pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
 		</cfquery>
 
-		<div class="content-header" style="background:  #f4f6f9;">
+		<div class="content-header" style="background:  #f4f6f9;padding-top: 0;">
 			<div class="container-fluid">
-				<div class="card-body" style="display:flex;flex-direction:column">
+				<div class="card-body" style="display:flex;flex-direction:column;padding-top: 0;">
 
 					<form  class="row g-3 needs-validation was-validated" novalidate  id="myform" name="myform" format="html"  style="height: auto;">
 						
@@ -81,16 +81,17 @@
 											<div class="form-group">
 												<label for="faqTipo">Tipo de FAQ:</label>
 												<div class="input-group">
-													<select id="faqTipo" name="faqTipo" class="form-control">
+													<select id="faqTipo" name="faqTipo" class="form-control" required>
+														<option value="">Selecione...</option>
 														<cfoutput query="rsFaqTipos">
-															<option value="#pc_faq_tipo_id#" data-cor="#pc_faq_tipo_cor#" data-status="#pc_faq_tipo_status#">#pc_faq_tipo_descricao#</option>
+															<option value="#pc_faq_tipo_id#" data-cor="#pc_faq_tipo_cor#" data-status="#pc_faq_tipo_status#" data-descricao="#pc_faq_tipo_descricao#" <cfif pc_faq_tipo_id eq rsFaqEdit.pc_faq_tipo>selected="selected"</cfif>>#pc_faq_tipo_nome#</option>
 														</cfoutput>
 													</select>
 													<div class="input-group-append">
 														<button class="btn btn-outline-secondary btn-sm" type="button" onclick="openModalFaqTipo();" style="margin-left: 5px;">
 															<i class="fa fa-plus"></i>
 														</button>
-														<button class="btn btn-outline-secondary btn-sm" type="button" onclick="openModalEditFaqTipo($('#faqTipo').val());" style="margin-left: 5px;">
+														<button class="btn btn-outline-secondary btn-sm" type="button" onclick="openModalEditFaqTipo($('#faqTipo').val());" style="margin-left: 5px;" id="btEditarFaqTipo">
 															<i class="fa fa-edit"></i>
 														</button>
 														
@@ -212,14 +213,19 @@
 								</div>
 								<div class="modal-body">
 									<div class="form-group">
-										<label for="novoFaqTipoDescricao">Descrição:</label>
-										<input type="text" class="form-control" id="novoFaqTipoDescricao">
+										<label for="novoFaqTipoNome">Nome:</label>
+										<input type="text" class="form-control" id="novoFaqTipoNome">
 									</div>
 									<div class="col-sm-4" >
 										<div class="form-group">
 											<label for="novoFaqTipoCor">Cor:</label>
 											<input type="color" class="form-control" id="novoFaqTipoCor" value="#007bff">
 										</div>
+									</div>
+									
+									<div class="form-group">
+										<label for="novoFaqTipoDescricao">Descrição:</label>
+										<textarea id="novoFaqTipoDescricao" class="form-control" maxlength="500" required></textarea>
 									</div>
 								</div>
 								<div class="modal-footer">
@@ -240,20 +246,31 @@
 								</div>
 								<div class="modal-body">
 									<div class="form-group">
-										<label for="editFaqTipoDescricao">Descrição</label>
-										<input type="text" id="editFaqTipoDescricao" class="form-control">
+										<label for="editFaqTipoNome">Nome</label>
+										<input type="text" id="editFaqTipoNome" class="form-control" required>
 									</div>
 									<div class="form-group">
-										<label for="editFaqTipoCor">Cor</label>
-										<input type="color" id="editFaqTipoCor" class="form-control" value="#007bff">
+										<label for="editFaqTipoDescricao">Descrição:</label>
+										<textarea id="editFaqTipoDescricao" class="form-control" maxlength="500" required></textarea>
 									</div>
-									<div class="form-group">
-										<label for="editFaqTipoStatus">Status</label>
-										<select id="editFaqTipoStatus" class="form-control">
-											<option value="A">Ativo</option>
-											<option value="D">Desativar</option>
-										</select>
+
+									<div class="col-sm-5" >
+										<div class="form-group">
+											<label for="editFaqTipoCor">Cor</label>
+											<input type="color" id="editFaqTipoCor" class="form-control" value="#007bff" required>
+										</div>
 									</div>
+									<div class="col-sm-5" >
+										<div class="form-group">
+											<label for="editFaqTipoStatus">Status</label>
+											<select id="editFaqTipoStatus" class="form-control" required>
+												<option value="A">Ativo</option>
+												<option value="D">Desativar</option>
+											</select>
+										</div>
+									</div>
+									
+									
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
@@ -300,6 +317,7 @@
 					selectedValues[index] = value;
 				});
 				$('#faqPerfis').val(selectedValues).trigger('change');
+
 
 				// Captura o template original do Dropzone na primeira carga
 				if (!window.dropzoneTemplate) {
@@ -421,6 +439,21 @@
 				});
 				
 				// Removido: $('#uploadFaqButton').on('click', ...) e $('#faqFileInput').on('change', ...);
+
+				// Lógica para exibir/ocultar o botão de editar do select faqTipo
+				if ($('#faqTipo').val() == null || $('#faqTipo').val().trim() === "") {
+					$('#btEditarFaqTipo').hide();
+				} else {
+					$('#btEditarFaqTipo').show();
+				}
+
+				$('#faqTipo').on('change', function() {
+					if ($(this).val() == null || $(this).val().trim() === "") {
+						$('#btEditarFaqTipo').hide();
+					} else {
+						$('#btEditarFaqTipo').show();
+					}
+				});
 			});
 
 			
@@ -440,6 +473,7 @@
 				// }
 				$('#faqPerfis').val(null).trigger('change');
 				$('#faqStatus').val(null).trigger('change');
+				$('#faqTipo').val(null).trigger('change');
 				$('#faqId, #faqAnexoCaminho, #faqAnexoNome').val('');
 				$('#previewsArquivo').empty();
 				mostraFormCadFaq();
@@ -459,6 +493,7 @@
 						pc_faq_perfis: perfisList.join(','),
 						pc_faq_titulo: $('#faqTitulo').val(),
 						pc_faq_status: $('#faqStatus').val(),
+						pc_faq_tipo: $('#faqTipo').val(),
 						pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
 						pc_faq_anexo_nome: $('#faqAnexoNome').val()
 					},
@@ -473,7 +508,8 @@
 				event.preventDefault();
 				event.stopPropagation();
 
-				if (!$('#faqPerfis').val() || !$('#faqTitulo').val() || !$('#faqStatus').val()){
+				// Alteração: Adicionada verificação para o select "#faqTipo"
+				if (!$('#faqPerfis').val() || !$('#faqTitulo').val() || !$('#faqStatus').val() || !$('#faqTipo').val()){
 					toastr.error('Todos os campos devem ser preenchidos.');
 					return false;
 				}
@@ -583,6 +619,7 @@
 									pc_faq_titulo: $('#faqTitulo').val(),
 									pc_faq_status: $('#faqStatus').val(),
 									pc_faq_texto: dataEditor,
+									pc_faq_tipo: $('#faqTipo').val(),
 									pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
 									pc_faq_anexo_nome: $('#faqAnexoNome').val()
 								},
@@ -721,14 +758,10 @@
 				}
 				window.isSavingFaqTipo = true;
 				
+				var nome = $('#novoFaqTipoNome').val().trim();
 				var descricao = $('#novoFaqTipoDescricao').val().trim();
-				// Obtém o valor da cor selecionada
 				var cor = $('#novoFaqTipoCor').val();
-				if (descricao === "") {
-					toastr.error("Informe a descrição do tipo de FAQ.");
-					window.isSavingFaqTipo = false;
-					return;
-				}
+				
 				$('#modalOverlay').modal('show')
 				setTimeout(function() {
 					$.ajax({
@@ -737,6 +770,7 @@
 						dataType: "json",
 						data: {
 							method: "novoFaqTipo",
+							pc_faq_tipo_nome: nome,
 							pc_faq_tipo_descricao: descricao,
 							pc_faq_tipo_cor: cor
 							}
@@ -744,23 +778,25 @@
 					.done(function(response) {
 						var novoTipo = response[0];
 						// Atualiza o select: adiciona nova opção e seleciona-a
-						$('#faqTipo').append('<option value="'+novoTipo.PC_FAQ_TIPO_ID+'" selected>'+novoTipo.PC_FAQ_TIPO_DESCRICAO+'</option>');
+						$('#faqTipo').append('<option value="'+novoTipo.PC_FAQ_TIPO_ID+'" selected>'+novoTipo.PC_FAQ_TIPO_NOME+'</option>');
 						$('#modalFaqTipo').modal('hide');
 						toastr.success("Novo tipo cadastrado com sucesso!");
 						$('#novoFaqTipoDescricao').val(''); // Reseta o campo
 							$('#novoFaqTipoCor').val('#007bff'); // Reseta a cor para padrão
+						window.isSavingFaqTipo = false;
 						$('#modalOverlay').delay(1000).hide(0, function() {
 							$('#modalOverlay').modal('hide');
 						});
 					})//fim done
-					.fail( function() {
+					 .fail(function(jqXHR, textStatus, errorThrown) {
 						$('#modalOverlay').delay(1000).hide(0, function() {
 							$('#modalOverlay').modal('hide');
 						});
 						$('#modal-danger').modal('show')
 						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-						$('#modal-danger').find('.modal-body').text(thrownError)
-					})//fim fail
+						$('#modal-danger').find('.modal-body').text(errorThrown || 'Erro desconhecido')
+						window.isSavingFaqTipo = false;
+					});
 				}, 100);
 				
 				
@@ -769,9 +805,11 @@
 			// Função global para abrir o modal de edição do Tipo de FAQ
 			function openModalEditFaqTipo(faqTipoId) {
 				var $option = $("#faqTipo option[value='" + faqTipoId + "']");
-				var descricao = $option.text();
+				var nome = $option.text();
+				var descricao = $option.data("descricao");
 				var cor = $option.data("cor") || "#007bff";
 				var status = $option.data("status") || "A";
+				$("#editFaqTipoNome").val(nome);
 				$("#editFaqTipoDescricao").val(descricao);
 				$("#editFaqTipoCor").val(cor);
 				$("#editFaqTipoStatus").val(status);
@@ -782,13 +820,11 @@
 			// Função global para salvar a edição do Tipo de FAQ via Ajax
 			function salvarEditFaqTipo() {
 				var faqTipoId = $("#modalEditFaqTipo").data("faqTipoId");
-				var descricao = $("#editFaqTipoDescricao").val().trim();
+				var nome = $("#editFaqTipoNome").val().trim();
+				var descricao = $("#editFaqTipoDescricao").val();
 				var cor = $("#editFaqTipoCor").val();
 				var status = $("#editFaqTipoStatus").val();
-				if(descricao === ""){
-					toastr.error("Informe a descrição.");
-					return;
-				}
+				
 				$("#modalOverlay").modal("show");
 				$.ajax({
 					type: "post",
@@ -797,6 +833,7 @@
 					data: {
 						method: "editFaqTipo",
 						pc_faq_tipo_id: faqTipoId,
+						pc_faq_tipo_nome: nome,
 						pc_faq_tipo_descricao: descricao,
 						pc_faq_tipo_cor: cor,
 						pc_faq_tipo_status: status
@@ -807,7 +844,8 @@
 					// Tratamento similar ao salvarNovoFaqTipo(), usando response[0]
 					var resp = response[0];
 					var $option = $("#faqTipo option[value='" + faqTipoId + "']");
-					$option.text(resp.PC_FAQ_TIPO_DESCRICAO);
+					$option.text(resp.pc_faq_tipo_nome);
+					$option.data("descricao", resp.PC_FAQ_TIPO_DESCRICAO);
 					$option.data("cor", resp.PC_FAQ_TIPO_COR);
 					$option.data("status", resp.PC_FAQ_TIPO_STATUS);
 					 // Reinicializa o select2 para atualizar a exibição da nova descrição
@@ -846,13 +884,14 @@
 		<cfargument name="pc_faq_titulo" type="string" required="true" />
 		<cfargument name="pc_faq_perfis" type="any" required="true" />
 		<cfargument name="pc_faq_texto" type="string" required="false" default="" />
+		<cfargument name="pc_faq_tipo" type="any" required="true"  />
 		<cfargument name="pc_faq_anexo_caminho" type="string" required="false" default="" />
 		<cfargument name="pc_faq_anexo_nome" type="string" required="false" default="" />
 	
 		<cfif arguments.pc_faq_id eq 0 or arguments.pc_faq_id eq "" >
 			<cfquery datasource="#application.dsn_processos#" result="resultFaq">
 				INSERT INTO pc_faqs
-								(pc_faq_titulo, pc_faq_perfis,pc_faq_status,pc_faq_texto,pc_faq_anexo_caminho,pc_faq_anexo_nome,pc_faq_atualiz_datahora,pc_faq_matricula_atualiz)
+								(pc_faq_titulo, pc_faq_perfis,pc_faq_status,pc_faq_texto,pc_faq_anexo_caminho,pc_faq_anexo_nome,pc_faq_atualiz_datahora,pc_faq_matricula_atualiz. pc_faq_tipo)
 				VALUES     		(<cfqueryparam value="#arguments.pc_faq_titulo#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_perfis#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_status#" cfsqltype="cf_sql_varchar">,
@@ -860,7 +899,8 @@
 								 <cfqueryparam value="#arguments.pc_faq_anexo_caminho#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_anexo_nome#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-								 '#application.rsUsuarioParametros.pc_usu_matricula#')
+								 '#application.rsUsuarioParametros.pc_usu_matricula#',
+								 <cfqueryparam value="#arguments.pc_faq_tipo#" cfsqltype="cf_sql_numeric">)
 			</cfquery>
 			<!-- Retorna o ID gerado (assumindo que o datasource suporte generatedKey) -->
             <cfset faqId = resultFaq.generatedKey>
@@ -874,7 +914,8 @@
  					   pc_faq_anexo_caminho = <cfqueryparam value="#arguments.pc_faq_anexo_caminho#" cfsqltype="cf_sql_varchar">,
 					   pc_faq_anexo_nome = <cfqueryparam value="#arguments.pc_faq_anexo_nome#" cfsqltype="cf_sql_varchar">,
 				       pc_faq_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-					   pc_faq_matricula_atualiz =  <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+					   pc_faq_matricula_atualiz =  <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+					   pc_faq_tipo = <cfqueryparam value="#arguments.pc_faq_tipo#" cfsqltype="cf_sql_numeric">
 				WHERE  pc_faq_id = <cfqueryparam value="#arguments.pc_faq_id#" cfsqltype="cf_sql_numeric">
 
 			</cfquery>
@@ -1093,22 +1134,28 @@
 		</script>
  	</cffunction>
 
-	<cffunction name="tabFaq"   access="remote" hint="exibe os FAQs na página pc_faq.cfm.">
+	<cffunction name="tabFaq" access="remote" hint="exibe os FAQs na página pc_faq.cfm.">
         <cfargument name="cadastro" type="string" required="false" default="S"/>
 		
+		<!--- Atualize a query para incluir a descrição do Tipo de FAQ --->
 		<cfquery datasource="#application.dsn_processos#" name="rsFaqs">
-			SELECT pc_faqs.*, pc_usu_nome FROM  pc_faqs
-			INNER JOIN pc_usuarios on pc_usu_matricula = pc_faq_matricula_atualiz
+			SELECT 
+				f.*, 
+				u.pc_usu_nome, 
+				t.pc_faq_tipo_nome 
+			FROM pc_faqs f
+			INNER JOIN pc_usuarios u ON u.pc_usu_matricula = f.pc_faq_matricula_atualiz
+			LEFT JOIN pc_faq_tipos t ON t.pc_faq_tipo_id = f.pc_faq_tipo
 			<cfif ('#application.rsUsuarioParametros.pc_usu_perfil#' eq '3' or '#application.rsUsuarioParametros.pc_usu_perfil#' eq '11') and '#arguments.cadastro#' eq 'S'>
-				order by  pc_faq_status asc, pc_faq_atualiz_datahora desc
+				ORDER BY f.pc_faq_status ASC, f.pc_faq_atualiz_datahora DESC
 			<cfelse>
-				where pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and pc_faq_status = 'A'
-				order by pc_faq_id desc
+				WHERE f.pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and f.pc_faq_status = 'A'
+				ORDER BY f.pc_faq_id DESC
 			</cfif>
 		</cfquery>
 
 	
-			<div class="row" style="padding-left:25px; padding-right:25px">
+			<div class="row" >
 				<div class="col-12">
 					<div class="card">
 						<!-- /.card-header -->
@@ -1119,6 +1166,8 @@
 										<th align="center">Controles</th>
 										<th >ID</th>
 										<th >Título</th>
+										<th>Tipo de FAQ</th>
+										<th>Conteúdo</th>
 									</tr>
 								</thead>
 								
@@ -1135,6 +1184,16 @@
 												</td>
 												<td style="vertical-align: middle;width:30px">#pc_faq_id#</td>
 												<td style="vertical-align: middle;">#pc_faq_titulo#</td>
+												<td style="vertical-align: middle;">#pc_faq_tipo_nome#</td>
+												<td style="vertical-align: middle;">
+													<cfif len(trim(pc_faq_texto)) GT 0>
+														Texto
+													<cfelseif len(trim(pc_faq_anexo_nome)) GT 0>
+														Arquivo
+													<cfelse>
+														-
+													</cfif>
+												</td>
 											</tr>
 										</cfoutput>
 									</cfloop>	
@@ -1365,11 +1424,13 @@
 
     <cffunction name="novoFaqTipo" access="remote" returntype="any" returnformat="json" output="false" hint="Cadastra um novo tipo de FAQ.">
         <!-- Adicionado argumento para a cor -->
+		<cfargument name="pc_faq_tipo_nome" type="string" required="true" />
 		<cfargument name="pc_faq_tipo_descricao" type="string" required="true" />
 		<cfargument name="pc_faq_tipo_cor" type="string" required="false" default=""/>
 		<cfquery datasource="#application.dsn_processos#" result="qryResult">
-			INSERT INTO pc_faq_tipos (pc_faq_tipo_descricao, pc_faq_tipo_cor, pc_faq_tipo_status)
+			INSERT INTO pc_faq_tipos (pc_faq_tipo_nome, pc_faq_tipo_descricao, pc_faq_tipo_cor, pc_faq_tipo_status)
 			VALUES (
+				<cfqueryparam value="#arguments.pc_faq_tipo_nome#" cfsqltype="cf_sql_varchar">,
 				<cfqueryparam value="#arguments.pc_faq_tipo_descricao#" cfsqltype="cf_sql_varchar">,
 				<cfqueryparam value="#arguments.pc_faq_tipo_cor#" cfsqltype="cf_sql_varchar">,
 				'A'
@@ -1378,6 +1439,7 @@
 		<cfset novosTipos = []>
 		<cfset novoTipo = {}>
 		<cfset novoTipo.PC_FAQ_TIPO_ID = qryResult.generatedKey>
+		<cfset novoTipo.PC_FAQ_TIPO_NOME = arguments.pc_faq_tipo_nome>
 		<cfset novoTipo.PC_FAQ_TIPO_DESCRICAO = arguments.pc_faq_tipo_descricao>
 		<cfset novoTipo.PC_FAQ_TIPO_COR = arguments.pc_faq_tipo_cor>
 		<cfset arrayAppend(novosTipos, novoTipo)>
@@ -1386,12 +1448,14 @@
 
 	<cffunction name="editFaqTipo" access="remote" returntype="any" returnformat="json" output="false" hint="Edita o Tipo de FAQ.">
 		<cfargument name="pc_faq_tipo_id" type="numeric" required="true" />
+		<cfargument name="pc_faq_tipo_nome" type="string" required="true" />
 		<cfargument name="pc_faq_tipo_descricao" type="string" required="true" />
 		<cfargument name="pc_faq_tipo_cor" type="string" required="false" default=""/>
 		<cfargument name="pc_faq_tipo_status" type="string" required="true" />
 		<cfquery datasource="#application.dsn_processos#">
 			UPDATE pc_faq_tipos
-			SET pc_faq_tipo_descricao = <cfqueryparam value="#arguments.pc_faq_tipo_descricao#" cfsqltype="cf_sql_varchar">,
+			SET pc_faq_tipo_nome = <cfqueryparam value="#arguments.pc_faq_tipo_nome#" cfsqltype="cf_sql_varchar">,
+				pc_faq_tipo_descricao = <cfqueryparam value="#arguments.pc_faq_tipo_descricao#" cfsqltype="cf_sql_varchar">,
 				pc_faq_tipo_cor = <cfqueryparam value="#arguments.pc_faq_tipo_cor#" cfsqltype="cf_sql_varchar">,
 				pc_faq_tipo_status = <cfqueryparam value="#arguments.pc_faq_tipo_status#" cfsqltype="cf_sql_varchar">
 			WHERE pc_faq_tipo_id = <cfqueryparam value="#arguments.pc_faq_tipo_id#" cfsqltype="cf_sql_numeric">
@@ -1399,6 +1463,7 @@
 		<cfset tiposEditados = []>
 		<cfset tipoEditado = {}>
 		<cfset tipoEditado.PC_FAQ_TIPO_ID = arguments.pc_faq_tipo_id>
+		<cfset tipoEditado.PC_FAQ_TIPO_NOME = arguments.pc_faq_tipo_nome>
 		<cfset tipoEditado.PC_FAQ_TIPO_DESCRICAO = arguments.pc_faq_tipo_descricao>
 		<cfset tipoEditado.PC_FAQ_TIPO_COR = arguments.pc_faq_tipo_cor>
 		<cfset tipoEditado.PC_FAQ_TIPO_STATUS = arguments.pc_faq_tipo_status>

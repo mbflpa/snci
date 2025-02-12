@@ -29,15 +29,14 @@
                 <div class="container-fluid">
                     <div class="row mb-2" >
                         <div class="col-sm-6">
-                            <h1>CADASTRAR FAQ</h1>
+                            <h3>CADASTRAR FAQ</h3>
                         </div>
                     </div>
                 </div><!-- /.container-fluid -->
             </section>
 
-            
             <!-- Main content -->
-            <section class="content">
+            <section class="content" style="margin-top: 0px!important">
                 <div id="formCadFaqDiv" ></div>
             </section>
 
