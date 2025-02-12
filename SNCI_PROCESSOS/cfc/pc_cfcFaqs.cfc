@@ -7,6 +7,13 @@
 	<cffunction name="FormCadFaq"   access="remote" hint="mostra form de cadastro do FAQ.">
         <cfargument name="pc_faq_id" type="numeric" required="false" default=0/>
 
+		<!--- Novas querys para FAQ Tipos --->
+        <cfquery name="rsFaqTipos" datasource="#application.dsn_processos#">
+            SELECT * FROM pc_faq_tipos 
+            WHERE pc_faq_tipo_status = 'A'
+            ORDER BY pc_faq_tipo_descricao
+        </cfquery>
+
 		<cfquery name="rsPerfis" datasource="#application.dsn_processos#">
 			SELECT pc_perfil_tipos.* from pc_perfil_tipos where pc_perfil_tipo_status='A' ORDER BY pc_perfil_tipo_descricao
 		</cfquery>
@@ -21,7 +28,6 @@
 
 					<form  class="row g-3 needs-validation was-validated" novalidate  id="myform" name="myform" format="html"  style="height: auto;">
 						
-
 						<!--acordion-->
 						<div id="accordionCadFaq" >
 							<div id="cadastroFaq" class="card card-primary collapsed-card" style="margin-left: -21px;">
@@ -59,16 +65,36 @@
 											</div>
 										</div>
 
-										<div class="col-sm-12" style="box-shadow:0!important">
+										
+										<div class="col-sm-9" style="box-shadow:0!important">
 											<div class="form-group " >
 												<label for="faqPerfis">Perfis que irão visualizar este FAQ:</label>
 												<select id="faqPerfis" required="true" class="form-control" multiple="multiple">
 													<cfoutput query="rsPerfis">
 														<option value="(#pc_perfil_tipo_id#)">#pc_perfil_tipo_descricao#</option>
 													</cfoutput>
-												</select>	
+												</select>
 											</div>
 										</div>
+
+										<div class="col-sm-3">
+											<div class="form-group">
+												<label for="faqTipo">Tipo de FAQ:</label>
+												<div class="input-group">
+													<select id="faqTipo" name="faqTipo" class="form-control">
+														<cfoutput query="rsFaqTipos">
+															<option value="#pc_faq_tipo_id#">#pc_faq_tipo_descricao#</option>
+														</cfoutput>
+													</select>
+													<div class="input-group-append">
+														<button class="btn btn-outline-secondary btn-sm" type="button" onclick="openModalFaqTipo();" style="margin-left: 5px;">
+															<i class="fa fa-plus"></i>
+														</button>
+													</div>
+												</div>
+											</div>
+										</div>
+										
 										
 										<div class="col-sm-12" >
 											<!-- Adição dos botões de opção para selecionar modo de envio -->
@@ -171,7 +197,32 @@
 						</div><!--fim acordion -->
 					</form><!-- fim myform -->
 
-					
+					<!-- Modal para cadastro de novo Tipo de FAQ -->
+					<!-- Alterado: Inserido input para descrição e seleção de cor -->
+					<div class="modal fade" id="modalFaqTipo" tabindex="-1" role="dialog" aria-labelledby="modalFaqTipoLabel" aria-hidden="true">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="modalFaqTipoLabel">Novo Tipo de FAQ</h5>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"></button>
+								</div>
+								<div class="modal-body">
+									<div class="form-group">
+										<label for="novoFaqTipoDescricao">Descrição:</label>
+										<input type="text" class="form-control" id="novoFaqTipoDescricao">
+									</div>
+									<div class="form-group">
+										<label for="novoFaqTipoCor">Cor:</label>
+										<input type="color" class="form-control" id="novoFaqTipoCor" value="#007bff">
+									</div>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+									<button type="button" class="btn btn-primary" onclick="salvarNovoFaqTipo();">Salvar</button>
+								</div>
+							</div>
+						</div>
+					</div>
 						
 				</div>	<!-- fim card-body -->
 			</div>
@@ -616,10 +667,64 @@
 				} else {
 					// Oculta a div se não houver arquivo
 					$("#arquivoFaqDiv").attr("hidden", true);
+					// Função para abrir o modal de cadastro de novo Tipo de FAQ
 				}
 			}
 
-			
+			function openModalFaqTipo() {
+				$('#modalFaqTipo').modal('show');
+			}
+
+			// Função para salvar o novo tipo via Ajax e atualizar o select
+			function salvarNovoFaqTipo() {
+				if (window.isSavingFaqTipo) {
+					return; // Impede múltiplos envios
+				}
+				window.isSavingFaqTipo = true;
+				
+				var descricao = $('#novoFaqTipoDescricao').val().trim();
+				// Obtém o valor da cor selecionada
+				var cor = $('#novoFaqTipoCor').val();
+				if (descricao === "") {
+					toastr.error("Informe a descrição do tipo de FAQ.");
+					window.isSavingFaqTipo = false;
+					return;
+				}
+				$('#modalOverlay').modal('show')
+				setTimeout(function() {
+					$.ajax({
+						type: "post",
+						url: "cfc/pc_cfcFaqs.cfc",
+						dataType: "json",
+						data: {
+							method: "novoFaqTipo",
+							pc_faq_tipo_descricao: descricao,
+							pc_faq_tipo_cor: cor
+							}
+					})//fim ajax
+					.done(function(response) {
+						var novoTipo = response[0];
+						// Atualiza o select: adiciona nova opção e seleciona-a
+						$('#faqTipo').append('<option value="'+novoTipo.PC_FAQ_TIPO_ID+'" selected>'+novoTipo.PC_FAQ_TIPO_DESCRICAO+'</option>');
+						$('#modalFaqTipo').modal('hide');
+						toastr.success("Novo tipo cadastrado com sucesso!");
+						$('#novoFaqTipoDescricao').val(''); // Reseta o campo
+							$('#novoFaqTipoCor').val('#007bff'); // Reseta a cor para padrão
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					})//fim done
+					.fail( function() {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+						$('#modal-danger').find('.modal-body').text(thrownError)
+					})//fim fail
+				}, 100);
+				
+			}
 
 		</script>
 	</cffunction>
@@ -1146,6 +1251,28 @@
     <cffunction name="checkArquivoExists" access="remote" returntype="boolean" returnformat="json" hint="Verifica se o arquivo existe no servidor">
         <cfargument name="filePath" type="string" required="true" />
         <cfreturn FileExists(arguments.filePath)>
+    </cffunction>
+
+
+    <cffunction name="novoFaqTipo" access="remote" returntype="any" returnformat="json" output="false" hint="Cadastra um novo tipo de FAQ.">
+        <!-- Adicionado argumento para a cor -->
+		<cfargument name="pc_faq_tipo_descricao" type="string" required="true" />
+		<cfargument name="pc_faq_tipo_cor" type="string" required="false" default=""/>
+		<cfquery datasource="#application.dsn_processos#" result="qryResult">
+			INSERT INTO pc_faq_tipos (pc_faq_tipo_descricao, pc_faq_tipo_cor, pc_faq_tipo_status)
+			VALUES (
+				<cfqueryparam value="#arguments.pc_faq_tipo_descricao#" cfsqltype="cf_sql_varchar">,
+				<cfqueryparam value="#arguments.pc_faq_tipo_cor#" cfsqltype="cf_sql_varchar">,
+				'A'
+			)
+		</cfquery>
+		<cfset novosTipos = []>
+		<cfset novoTipo = {}>
+		<cfset novoTipo.PC_FAQ_TIPO_ID = qryResult.generatedKey>
+		<cfset novoTipo.PC_FAQ_TIPO_DESCRICAO = arguments.pc_faq_tipo_descricao>
+		<cfset novoTipo.PC_FAQ_TIPO_COR = arguments.pc_faq_tipo_cor>
+		<cfset arrayAppend(novosTipos, novoTipo)>
+		<cfreturn novosTipos>
     </cffunction>
 
 </cfcomponent>
