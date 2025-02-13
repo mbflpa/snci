@@ -209,46 +209,46 @@
 					</form><!-- fim myform -->
 
 					<!-- Modal para cadastro de novo Tipo de FAQ -->
-					<!-- Alterado: Inserido input para descrição e seleção de cor -->
-					<div class="modal fade" id="modalFaqTipo" tabindex="-1" role="dialog" aria-labelledby="modalFaqTipoLabel" aria-hidden="true">
-						<div class="modal-dialog" role="document">
-							<div class="modal-content">
-								<div class="modal-header">
-									<h5 class="modal-title" id="modalFaqTipoLabel">Novo Tipo</h5>
-									<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"></button>
-								</div>
-								<div class="modal-body">
-									<div class="form-group">
-										<label for="novoFaqTipoNome">Nome:</label>
-										<input type="text" class="form-control" id="novoFaqTipoNome">
+					<form id="formFaqTipo" >
+						<div class="modal fade" id="modalFaqTipo" tabindex="-1" role="dialog" aria-labelledby="modalFaqTipoLabel" aria-hidden="true">
+							<div class="modal-dialog" role="document">
+								<div class="modal-content">
+									<div class="modal-header">
+										<h5 class="modal-title" id="modalFaqTipoLabel">Novo Tipo</h5>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"></button>
 									</div>
-									<div class="col-sm-4" >
+									<div class="modal-body">
 										<div class="form-group">
-											<label for="novoFaqTipoCor">Cor:</label>
-											<input type="color" class="form-control" id="novoFaqTipoCor" value="#007bff">
+											<label for="novoFaqTipoNome">Nome:</label>
+											<input type="text" class="form-control" id="novoFaqTipoNome" required>
+										</div>
+										<div class="col-sm-4" >
+											<div class="form-group">
+												<label for="novoFaqTipoCor">Cor:</label>
+												<input type="color" class="form-control" id="novoFaqTipoCor" value="#007bff" required>
+											</div>
+										</div>
+										
+										<div class="form-group">
+											<label for="novoFaqTipoDescricao">Descrição:</label>
+											<textarea id="novoFaqTipoDescricao" class="form-control" maxlength="500" required></textarea>
 										</div>
 									</div>
-									
-									<div class="form-group">
-										<label for="novoFaqTipoDescricao">Descrição:</label>
-										<textarea id="novoFaqTipoDescricao" class="form-control" maxlength="500" required></textarea>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+										<button type="button" class="btn btn-primary" onclick="salvarNovoFaqTipo();">Salvar</button>
 									</div>
-								</div>
-								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-									<button type="button" class="btn btn-primary" onclick="salvarNovoFaqTipo();">Salvar</button>
 								</div>
 							</div>
 						</div>
-					</div>
-
+					</form>
 					<!-- Nova modal para editar Tipo de FAQ -->
 					<div class="modal fade" id="modalEditFaqTipo" tabindex="-1" role="dialog" aria-labelledby="modalEditFaqTipoLabel" aria-hidden="true">
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
 								<div class="modal-header">
 									<h5 class="modal-title" id="modalEditFaqTipoLabel">Editar Tipo</h5>
-									<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"></button>
+									<button type="button" class="close" data-dismiss="modal" aria-label="Fechar" ></button>
 								</div>
 								<div class="modal-body">
 									<div class="form-group">
@@ -778,6 +778,12 @@
 
 			// Função para salvar o novo tipo via Ajax e atualizar o select
 			function salvarNovoFaqTipo() {
+				// Validação adicionada
+				if (!$('#novoFaqTipoNome').val() || !$('#novoFaqTipoDescricao').val() || !$('#novoFaqTipoCor').val()){
+					toastr.error('Todos os campos devem ser preenchidos.');
+					return false;
+				}
+				
 				if (window.isSavingFaqTipo) {
 					return; // Impede múltiplos envios
 				}
@@ -844,6 +850,12 @@
 
 			// Função global para salvar a edição do Tipo de FAQ via Ajax
 			function salvarEditFaqTipo() {
+				// Validação adicionada
+				if (!$('#editFaqTipoNome').val() || !$('#editFaqTipoDescricao').val() || !$('#editFaqTipoCor').val() || !$('#editFaqTipoStatus').val()){
+					toastr.error('Todos os campos devem ser preenchidos.');
+					return false;
+				}
+
 				var faqTipoId = $("#modalEditFaqTipo").data("faqTipoId");
 				var nome = $("#editFaqTipoNome").val().trim();
 				var descricao = $("#editFaqTipoDescricao").val();
