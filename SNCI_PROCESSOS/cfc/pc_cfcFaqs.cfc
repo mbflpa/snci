@@ -618,9 +618,9 @@
 			function proceedWithSave(dataEditor) {
 				var mensagem = "";
 				if($('#faqId').val() == ''){
-					mensagem = "Deseja cadastrar este FAQ?";
+					mensagem = "Deseja cadastrar esta informação/guia/tutorial?";
 				} else {
-					mensagem = "Deseja editar este FAQ?";
+					mensagem = "Deseja editar esta informação/guia/tutorial?";
 				}
 				
 				swalWithBootstrapButtons.fire({
@@ -1062,7 +1062,7 @@
 					.done(function(result) {
 						$('#formCadFaqDiv').html(result)
 						$('#faqTitulo').val(titulo)
-						$('#cabecalhoAccordion').text("Editar o FAQ ID " + faqId + ': ' + titulo)
+						$('#cabecalhoAccordion').text("Editar a informação ID " + faqId + ': ' + titulo)
 						$("#btSalvarDiv").attr("hidden",false)
 						$("#faqStatus").attr("hidden",false)
 						
@@ -1265,7 +1265,7 @@
 					.done(function(result) {
 						$('#formCadFaqDiv').html(result)
 						$('#faqTitulo').val(titulo)
-						$('#cabecalhoAccordion').text("Editar o FAQ ID " + faqId + ': ' + titulo)
+						$('#cabecalhoAccordion').text("Editar a informação ID " + faqId + ': ' + titulo)
 						$("#btSalvarDiv").attr("hidden",false)
 						$("#faqStatus").attr("hidden",false)
 						
@@ -1484,7 +1484,7 @@
 					.done(function(result) {
 						$('#formCadFaqDiv').html(result)
 						$('#faqTitulo').val(titulo)
-						$('#cabecalhoAccordion').text("Editar o FAQ ID " + faqId + ': ' + titulo)
+						$('#cabecalhoAccordion').text("Editar a informação ID " + faqId + ': ' + titulo)
 						$("#btSalvarDiv").attr("hidden",false)
 						$("#faqStatus").attr("hidden",false)
 						
