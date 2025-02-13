@@ -81,8 +81,7 @@
                 type: "post",
                 url: "cfc/pc_cfcFaqs.cfc",
                 data: {
-                    method: "formFaq",
-                    cadastro: 'N'
+                    method: "formFaq"
                 },
                 dataType: "text"  // Mantido em "text" para lidar tanto com JSON quanto HTML
             })

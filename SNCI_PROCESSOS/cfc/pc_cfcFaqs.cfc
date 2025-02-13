@@ -66,7 +66,7 @@
 										</div>
 
 										
-										<div class="col-sm-9" style="box-shadow:0!important">
+										<div class="col-sm-7" style="box-shadow:0!important">
 											<div class="form-group " >
 												<label for="faqPerfis">Perfis que irão visualizar este FAQ:</label>
 												<select id="faqPerfis" required="true" class="form-control" multiple="multiple">
@@ -77,7 +77,7 @@
 											</div>
 										</div>
 
-										<div class="col-sm-3">
+										<div class="col-sm-5">
 											<div class="form-group">
 												<label for="faqTipo">Tipo de FAQ:</label>
 												<div class="input-group">
@@ -97,11 +97,17 @@
 														
 													</div>
 												</div>
+												<!-- Novo card para descrição do tipo -->
+												<div id="faqTipoDescricaoCard" class="card" style="position: absolute;margin-top: 5px; display: none; border: 1px solid #ddd;">
+													<div class="card-body" style="padding: 10px; font-size: 12px;">
+														<p class="mb-0" id="faqTipoDescricaoText" style="color: #666; text-align: justify;"></p>
+													</div>
+												</div>
 											</div>
 										</div>
 										
 										
-										<div class="col-sm-12" >
+										<div class="col-sm-12" style="margin-top: 20px;">
 											<!-- Adição dos botões de opção para selecionar modo de envio -->
 											<div class="form-group">
 												<label>Selecione o tipo de envio:</label>
@@ -448,12 +454,31 @@
 				}
 
 				$('#faqTipo').on('change', function() {
+					var $selectedOption = $(this).find('option:selected');
+					var descricao = $selectedOption.data('descricao');
+					var cor = $selectedOption.data('cor');
+					
+					if (descricao && descricao.trim() !== '') {
+						$('#faqTipoDescricaoText').text(descricao);
+						$('#faqTipoDescricaoCard')
+							.show()
+							.css('border-left', '3px solid ' + (cor || '#007bff'));
+					} else {
+						$('#faqTipoDescricaoCard').hide();
+					}
+				
+					// Mantém a lógica existente do botão de editar
 					if ($(this).val() == null || $(this).val().trim() === "") {
 						$('#btEditarFaqTipo').hide();
 					} else {
 						$('#btEditarFaqTipo').show();
 					}
-				});
+					});
+				
+					// Trigger a change event se já houver um valor selecionado
+					if ($('#faqTipo').val()) {
+						$('#faqTipo').trigger('change');
+					}
 			});
 
 			
@@ -932,18 +957,15 @@
 
 
 	<cffunction name="formFaq" access="remote" hint="Exibe os FAQs na página pc_faq.cfm.">
-        <cfargument name="cadastro" type="string" required="false" default="S"/>
-		
+	
 		<cfquery datasource="#application.dsn_processos#" name="rsFaqs">
 			SELECT pc_faqs.*, pc_usu_nome,pc_faq_tipo_cor FROM  pc_faqs
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_faq_matricula_atualiz
 			INNER JOIN pc_faq_tipos on pc_faq_tipo = pc_faq_tipo_id
-			<cfif ('#application.rsUsuarioParametros.pc_usu_perfil#' eq '3' or '#application.rsUsuarioParametros.pc_usu_perfil#' eq '11') and '#arguments.cadastro#' eq 'S'>
-				order by  pc_faq_status asc, pc_faq_atualiz_datahora desc
-			<cfelse>
-				where pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and pc_faq_status = 'A'
-				order by  pc_faq_titulo
-			</cfif>
+			
+			where pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and pc_faq_status = 'A'
+			order by  pc_faq_tipo_id, pc_faq_titulo
+		
 		</cfquery>
 		<style>
 			
@@ -990,16 +1012,12 @@
 										<div id="collapse#pc_faq_id#" class="collapse">
 											<div class="card-body">
 												<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
-													<iframe src="/snci/SNCI_PROCESSOS/pc_exibePdfInline.cfm?arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&amp;nome=#URLEncodedFormat(pc_faq_anexo_nome)#" 
-														width="100%" height="600px" style="border:none;"></iframe>
+													<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
+                   									 width="100%" height="600px" style="border:none;"></iframe>
 												<cfelse>
 													<div>#pc_faq_texto#</div>
 												</cfif>
-												<cfif (application.rsUsuarioParametros.pc_usu_perfil eq 3 or application.rsUsuarioParametros.pc_usu_perfil eq 11) and arguments.cadastro eq 'S'>
-													<div align="center" style="margin-top:30px;font-size:10px">
-														<div>Última atualização: #pc_faq_matricula_atualiz# - #pc_usu_nome# (#dataFaq#)</div>
-													</div>
-												</cfif>
+												
 											</div>
 										</div>
 									</div>
@@ -1471,5 +1489,18 @@
 		<cfset arrayAppend(tiposEditados, tipoEditado)>
 		<cfreturn tiposEditados>
 	</cffunction>
+
+	<cffunction name="exibePdfInline" access="remote" output="true" hint="Exibe um arquivo PDF diretamente no navegador.">
+        <cfargument name="arquivo" type="string" required="true" />
+        <cfargument name="nome" type="string" required="false" default="documento.pdf" />
+
+        <cfif NOT FileExists(arguments.arquivo)>
+            <cfoutput>Arquivo não encontrado.</cfoutput>
+            <cfabort>
+        </cfif>
+
+        <cfheader name="Content-Disposition" value="inline; filename=#arguments.nome#">
+        <cfcontent type="application/pdf" file="#arguments.arquivo#" deleteFile="no">
+    </cffunction>
 
 </cfcomponent>
