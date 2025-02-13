@@ -200,7 +200,7 @@
                                         <table id="tabelaCriterios" class="table table-bordered first-table" style="width: 50%;">
                                             <thead>
                                                 <tr>
-                                                    <th colspan="5" style="font-size:0.7rem">Por favor, avalie os seguintes itens com base nos seguintes critérios, considerando a escala:</th>
+                                                    <th colspan="5" style="font-size:0.7rem">Por favor, avalie os itens com base nos seguintes critérios, considerando a escala:</th>
                                                 </tr>
                                                 <tr style="font-size:0.7rem">
                                                     <th>Ótimo</th>
@@ -249,7 +249,7 @@
                                             <div class="form-group">
                                                 <div>
                                                     <label for="comunicacao">1. Comunicação </label>
-                                                    <p class="description">Avalia a clareza, frequência e qualidade das interações com a equipe de Controle Interno. Considere se a equipe de Controle Interno foi acessível, transparente e eficaz ao transmitir informações sobre a condução dos trabalho.</p>
+                                                    <p class="description">Avalia a clareza, frequência e qualidade das interações com a equipe de Controle Interno. Considere se a equipe de Controle Interno foi acessível, transparente e eficaz ao transmitir informações sobre a condução dos trabalhos.</p>
                                                 </div>
                                                 <div class="radio-group">
                                                     <cfloop from="1" to="10" index="i">
@@ -265,7 +265,7 @@
                                             <div class="form-group">
                                                 <div>
                                                     <label for="interlocucao">2. Interlocução profissional </label>
-                                                    <p class="description">Avalia o comportamento da equipe de Controle Interno ao longo do trabalho. Leve em conta o profissionalismo, o respeito e a atitude colaborativa demonstradas durante o processo.</p>
+                                                    <p class="description">Avalia o comportamento da equipe de Controle Interno ao longo do trabalho. Leve em conta o profissionalismo, o respeito e a atitude colaborativa demonstrados durante o processo.</p>
                                                 </div>
                                                 <div class="radio-group">
                                                     <cfloop from="1" to="10" index="i">
