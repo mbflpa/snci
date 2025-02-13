@@ -39,8 +39,7 @@
                     </div>
                     
                     <div id="menuRapidoDiv" ></div>    
-                    
-                    
+
                     <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>     
                         <div  id="alertasOAdiv"></div>
                     </cfif>
@@ -48,6 +47,8 @@
                     <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
                         <div  id="alertasCIdiv"></div>
                     </cfif>
+
+                    <div id="formFaqDiv"></div>
 
                     <cfinclude template="pc_notas_versao.cfm">
                     
@@ -77,7 +78,7 @@
         </cfoutput>
         
         // Espera até que o documento esteja totalmente carregado
-         $(window).on('load', function() {
+        $(window).on('load', function() {
             
             
             menuRapido();
@@ -87,7 +88,7 @@
             } else {
                 mostraAlertasControleInterno();
             }
-
+            mostraFormFaq();
 
             <cfoutput>
                 var usuarioControleInterno = '#application.rsUsuarioParametros.pc_org_controle_interno#';
@@ -293,6 +294,41 @@
                     )
                 });
             })//fim fail
+        }
+
+         function mostraFormFaq(){
+            $.ajax({
+                type: "post",
+                url: "cfc/pc_cfcFaqs.cfc",
+                data: {
+                    method: "formFaqIndex"
+                },
+                dataType: "text"  // Mantido em "text" para lidar tanto com JSON quanto HTML
+            })
+            .done(function(response) {
+                if(!response || response.trim() === ""){
+                    $('#formFaqDiv').html("<p>Nenhum FAQ retornado pelo servidor.</p>");
+                    return;
+                }
+                var result;
+                try {
+                    result = JSON.parse(response);
+                } catch(e) {
+                    result = { type: "text", content: response };
+                }
+
+                html = result.content;
+                
+                $('#formFaqDiv').html(html);
+            })
+            .fail(function(xhr, ajaxOptions, thrownError) {
+                $('#modalOverlay').delay(1000).hide(0, function() {
+                    $('#modalOverlay').modal('hide');
+                });
+                $('#modal-danger').modal('show');
+                $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
+                $('#modal-danger').find('.modal-body').text(thrownError);
+            });
         }
 
         

@@ -29,11 +29,20 @@
             <!-- Content Header (Page header) -->
             <section class="content-header">
                 <div class="container-fluid">
-                    
+                    <cfquery name="qTiposFaq" datasource="#application.dsn_processos#">
+                        SELECT pc_faq_tipo_id, pc_faq_tipo_nome, pc_faq_tipo_cor from pc_faq_tipos WHERE pc_faq_tipo_status ='A' ORDER BY pc_faq_tipo_id
+                    </cfquery>
 
                     <div class="row mb-2" >
                         <div class="col-sm-6">
-                            <h1>FAQ <span style="font-size:14px">(perguntas frequentes)</span></h1>
+                            <h1>Guias & Tutoriais</h1>
+                            <div class="faq-legend" style="margin-top: 10px; font-size: 14px; display: flex; gap: 20px;">
+                             <cfoutput query="qTiposFaq">
+                           
+                                <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="color: #pc_faq_tipo_cor#;"></i> #pc_faq_tipo_nome#</p>
+                             </cfoutput>
+                            
+                            </div>
                         </div>
                     </div>
                 </div><!-- /.container-fluid -->

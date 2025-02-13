@@ -29,7 +29,7 @@
                 <div class="container-fluid">
                     <div class="row mb-2" >
                         <div class="col-sm-6">
-                            <h3>CADASTRAR FAQ</h3>
+                            <h3>Cadastrar Guias & Tutoriais</h3>
                         </div>
                     </div>
                 </div><!-- /.container-fluid -->

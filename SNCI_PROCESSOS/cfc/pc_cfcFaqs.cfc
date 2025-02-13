@@ -34,7 +34,7 @@
 								<div  class="card-header azul_claro_correios_backgroundColor" style="color:#fff;">
 									<a   class="d-block" data-toggle="collapse" href="#collapseCad"  data-card-widget="collapse">
 										<button type="button" class="btn btn-tool" data-card-widget="collapse"><i id="maisMenos" class="fas fa-plus"></i>
-										</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar um novo FAQ</span>
+										</button></i><span id="cabecalhoAccordion">Clique aqui para cadastrar</span>
 									</a>
 									
 								</div>
@@ -68,7 +68,7 @@
 										
 										<div class="col-sm-7" style="box-shadow:0!important">
 											<div class="form-group " >
-												<label for="faqPerfis">Perfis que irão visualizar este FAQ:</label>
+												<label for="faqPerfis">Perfis que irão visualizar:</label>
 												<select id="faqPerfis" required="true" class="form-control" multiple="multiple">
 													<cfoutput query="rsPerfis">
 														<option value="(#pc_perfil_tipo_id#)">#pc_perfil_tipo_descricao#</option>
@@ -79,7 +79,7 @@
 
 										<div class="col-sm-5">
 											<div class="form-group">
-												<label for="faqTipo">Tipo de FAQ:</label>
+												<label for="faqTipo">Tipo:</label>
 												<div class="input-group">
 													<select id="faqTipo" name="faqTipo" class="form-control" required>
 														<option value="">Selecione...</option>
@@ -110,14 +110,14 @@
 										<div class="col-sm-12" style="margin-top: 20px;">
 											<!-- Adição dos botões de opção para selecionar modo de envio -->
 											<div class="form-group">
-												<label>Selecione o tipo de envio:</label>
+												
 												<div class="form-check form-check-inline">
 													<input class="form-check-input" type="radio" name="envioFaq" id="envioTexto" value="texto" checked>
-													<label class="form-check-label" for="envioTexto">Digite Texto</label>
+													<label class="form-check-label" for="envioTexto" style="font-size:20px">Digite Texto</label>
 												</div>
 												<div class="form-check form-check-inline">
 													<input class="form-check-input" type="radio" name="envioFaq" id="envioArquivo" value="arquivo">
-													<label class="form-check-label" for="envioArquivo">Anexar PDF</label>
+													<label class="form-check-label" for="envioArquivo" style="font-size:20px">Anexar PDF</label>
 												</div>
 											</div>
 
@@ -214,7 +214,7 @@
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
 								<div class="modal-header">
-									<h5 class="modal-title" id="modalFaqTipoLabel">Novo Tipo de FAQ</h5>
+									<h5 class="modal-title" id="modalFaqTipoLabel">Novo Tipo</h5>
 									<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"></button>
 								</div>
 								<div class="modal-body">
@@ -247,7 +247,7 @@
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
 								<div class="modal-header">
-									<h5 class="modal-title" id="modalEditFaqTipoLabel">Editar Tipo de FAQ</h5>
+									<h5 class="modal-title" id="modalEditFaqTipoLabel">Editar Tipo</h5>
 									<button type="button" class="close" data-dismiss="modal" aria-label="Fechar"></button>
 								</div>
 								<div class="modal-body">
@@ -678,7 +678,7 @@
                 if ($('input[name="envioFaq"]:checked').val() === "texto") {
                     CKEDITOR.instances.faqTexto.setData('');
                     $('#cadastroFaq').CardWidget('collapse');
-                    $('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo FAQ");
+                    $('#cabecalhoAccordion').text("Clique aqui para cadastrar");
                 }
             }
 
@@ -916,7 +916,7 @@
 		<cfif arguments.pc_faq_id eq 0 or arguments.pc_faq_id eq "" >
 			<cfquery datasource="#application.dsn_processos#" result="resultFaq">
 				INSERT INTO pc_faqs
-								(pc_faq_titulo, pc_faq_perfis,pc_faq_status,pc_faq_texto,pc_faq_anexo_caminho,pc_faq_anexo_nome,pc_faq_atualiz_datahora,pc_faq_matricula_atualiz. pc_faq_tipo)
+								(pc_faq_titulo, pc_faq_perfis,pc_faq_status,pc_faq_texto,pc_faq_anexo_caminho,pc_faq_anexo_nome,pc_faq_atualiz_datahora,pc_faq_matricula_atualiz, pc_faq_tipo)
 				VALUES     		(<cfqueryparam value="#arguments.pc_faq_titulo#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_perfis#" cfsqltype="cf_sql_varchar">,
 								 <cfqueryparam value="#arguments.pc_faq_status#" cfsqltype="cf_sql_varchar">,
@@ -962,10 +962,8 @@
 			SELECT pc_faqs.*, pc_usu_nome,pc_faq_tipo_cor FROM  pc_faqs
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_faq_matricula_atualiz
 			INNER JOIN pc_faq_tipos on pc_faq_tipo = pc_faq_tipo_id
-			
 			where pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and pc_faq_status = 'A'
 			order by  pc_faq_tipo_id, pc_faq_titulo
-		
 		</cfquery>
 		<style>
 			
@@ -1037,7 +1035,210 @@
 					ordering: false,
 					autoWidth: false,
 					lengthChange: false,   // Impede a seleção de quantidade de linhas
-					dom: 'lf<"clear">rtip', //Posiciona o input de pesquisa
+					 dom: '<"row"<"col-sm-12 col-md-6"f><"col-sm-12 col-md-6">>t',             // Modificado: Apenas exibe a tabela, remove a busca
+					language: {
+						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json",
+						info: "" // Remove a informação de registros
+					}
+				});
+			});
+						
+			function mostraFormEditFaq(faqId,tit){
+				event.preventDefault()
+				event.stopPropagation()
+				var titulo =decodeURIComponent(tit);
+
+				$('#modalOverlay').modal('show')
+				setTimeout(function() {
+					$.ajax({
+						type: "post",
+						url: "cfc/pc_cfcFaqs.cfc",
+						data:{
+							method: "formCadFaq",
+							pc_faq_id:faqId
+						},
+						async: false
+					})//fim ajax
+					.done(function(result) {
+						$('#formCadFaqDiv').html(result)
+						$('#faqTitulo').val(titulo)
+						$('#cabecalhoAccordion').text("Editar o FAQ ID " + faqId + ': ' + titulo)
+						$("#btSalvarDiv").attr("hidden",false)
+						$("#faqStatus").attr("hidden",false)
+						
+						// Nova verificação com delay: se faqTexto for vazio ou "null", ativa envio de arquivo
+						if (!$('#faqTexto').val() || $('#faqTexto').val().trim() === "" || $('#faqTexto').val().trim().toLowerCase() === "null") {
+							setTimeout(function(){
+								$('input[name="envioFaq"][value="arquivo"]').prop("checked", true).trigger("change");
+								// Exibe o nome do arquivo anexo, se disponível
+								var anexoNome = $('#faqAnexoNome').val();
+								if(anexoNome && anexoNome.trim() !== ""){
+									
+									setArquivoFaqDiv();
+								}
+							}, 100);
+						}
+
+						$('#cadastroFaq').CardWidget('expand')
+						$('html, body').animate({ scrollTop: ($('#formCadFaqDiv').offset().top-80)} , 1000);
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+					})//fim done
+					.fail(function(xhr, ajaxOptions, thrownError) {
+						$('#modalOverlay').delay(1000).hide(0, function() {
+							$('#modalOverlay').modal('hide');
+						});
+						$('#modal-danger').modal('show')
+						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+						$('#modal-danger').find('.modal-body').text(thrownError)
+
+					});//fim fail
+				}, 500);
+       		}
+
+			function excluirFaq(faqId) {				
+				event.preventDefault()
+				event.stopPropagation()
+				var mensagem = "Deseja excluir este FAQ?";
+				swalWithBootstrapButtons.fire({//sweetalert2
+					html: logoSNCIsweetalert2(mensagem),
+					showCancelButton: true,
+					confirmButtonText: 'Sim!',
+					cancelButtonText: 'Cancelar!'
+					}).then((result) => {
+					if (result.isConfirmed) {
+						$('#modalOverlay').modal('show')
+						setTimeout(function() {
+							$.ajax({
+								type: "GET",
+								url: "cfc/pc_cfcFaqs.cfc",
+								data:{
+									method: "delFaq",
+									pc_faq_id: faqId
+								},
+							async: false
+
+							})//fim ajax
+							.done(function(result) {
+								mostraFormCadFaq()
+								mostraFormFaq()	
+								$('#modalOverlay').delay(1000).hide(0, function() {
+									$('#modalOverlay').modal('hide');
+									toastr.success('Operação realizada com sucesso!');
+								});
+								
+							})//fim done
+							.fail(function(xhr, ajaxOptions, thrownError) {
+							
+								$('#modalOverlay').delay(1000).hide(0, function() {
+									$('#modalOverlay').modal('hide');
+									var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
+												+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
+									const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
+									
+									swalWithBootstrapButtons.fire(
+										{...erroSistema}
+									)
+								});
+								
+							})//fim fail
+						}, 500);
+					}		
+				});	
+			}
+			
+		</script>
+ 	</cffunction>
+
+	<cffunction name="formFaqIndex" access="remote" hint="Exibe os FAQs na página index.cfm.">
+	
+		<cfquery datasource="#application.dsn_processos#" name="rsFaqs">
+			SELECT pc_faqs.*, pc_usu_nome,pc_faq_tipo_cor FROM  pc_faqs
+			INNER JOIN pc_usuarios on pc_usu_matricula = pc_faq_matricula_atualiz
+			INNER JOIN pc_faq_tipos on pc_faq_tipo = pc_faq_tipo_id
+			WHERE pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and pc_faq_status = 'A'
+			      AND pc_faq_tipo_id = 1
+			ORDER BY  pc_faq_tipo_id, pc_faq_titulo
+		</cfquery>
+		
+		<style>
+			/* Ajusta altura, padding e line-height da DataTable gridFaq */
+			#gridFaq tr, #gridFaq td, #gridFaq th {
+				padding: 0px !important;
+				line-height: 1 !important;
+				height: auto !important;
+			}
+		</style>
+		<cfif rsFaqs.recordCount>	
+			<div class="row" style="margin-top: 20px;">
+				<div class="col-12">
+					<!-- Novo estilo para a tabela gridFaq com altura menor nas linhas -->
+					<table id="gridFaq" class="table ">
+						<thead >
+							<tr>
+								<th style="border:none!important;"><h4 style="color:#2675fb;margin-bottom:20px!important;">
+									<cfif rsFaqs.recordCount eq 1>
+										Informação Importante
+									<cfelse>
+										Informações Importantes
+									</cfif>
+									</h4>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							<cfloop query="rsFaqs">
+								<cfoutput>
+								<tr>
+									<td>
+										<div class="card  card-outline" style="    border-top: 3px solid #pc_faq_tipo_cor#;">
+											<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
+												<div class="card-header" style="<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .2rem 1.0rem!important;">
+													<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
+													<h4 class="card-title 1-300" style="margin-top:7px">
+														<cfif pc_faq_status eq 'D'>
+															<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
+														</cfif>
+														#pc_faq_titulo#
+													</h4>
+													<div class="card-tools">
+														<button type="button" class="btn btn-tool" data-card-widget="maximize" style="font-size:34px;">
+															<i class="exp fas fa-expand"></i>
+														</button>
+													</div>
+												</div>
+											</a>
+											<div id="collapse#pc_faq_id#" class="collapse">
+												<div class="card-body">
+													<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
+														<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
+														width="100%" height="600px" style="border:none;"></iframe>
+													<cfelse>
+														<div>#pc_faq_texto#</div>
+													</cfif>
+													
+												</div>
+											</div>
+										</div>
+									</td>
+								</tr>
+								</cfoutput>
+							</cfloop>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</cfif>
+		<script language="JavaScript">	
+			$(function(){
+				$("#gridFaq").DataTable({
+					responsive: true,
+					paging: false,         // Exibe todas as linhas (paginação desabilitada)
+					ordering: false,
+					autoWidth: false,
+					lengthChange: false,   // Impede a seleção de quantidade de linhas
+					dom: 't',             // Modificado: Apenas exibe a tabela, remove a busca
 					language: {
 						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json",
 						info: "" // Remove a informação de registros
@@ -1183,9 +1384,9 @@
 								<thead  class="table_thead_backgroundColor">
 									<tr style="font-size:12px!important">
 										<th align="center">Controles</th>
-										<th >ID</th>
-										<th >Título</th>
-										<th>Tipo de FAQ</th>
+										<th>ID</th>
+										<th>Título</th>
+										<th>Tipo</th>
 										<th>Conteúdo</th>
 									</tr>
 								</thead>
