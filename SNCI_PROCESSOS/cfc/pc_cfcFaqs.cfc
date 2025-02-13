@@ -1171,7 +1171,7 @@
 			}
 		</style>
 		<cfif rsFaqs.recordCount>	
-			<div class="row" style="margin-top: 20px;">
+			<div class="row" >
 				<div class="col-12">
 					<!-- Novo estilo para a tabela gridFaq com altura menor nas linhas -->
 					<table id="gridFaq" class="table ">
@@ -1350,6 +1350,12 @@
 					}		
 				});	
 			}
+			$(document).on('click', '.card-header' , function(event){
+				// Scroll para o elemento
+				$('html, body').animate({
+					scrollTop: $(this).offset().top - 120
+				}, 1000);
+			});
 			
 		</script>
  	</cffunction>

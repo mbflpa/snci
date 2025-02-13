@@ -1834,7 +1834,7 @@
      
 		
 				
-		<div align="center" class="">	
+		<div align="center" style="margin-bottom:20px;">	
 			<div class="menuRapidoGrid">
 				<div class="menuRapido_legendGrid ">Páginas Principais</div> 
 				<cfloop query="rsMenuRapido">

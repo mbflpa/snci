@@ -101,7 +101,7 @@
 		<cfset var qProcessosSemPesquisa = getTotalProcessosSemPesquisa()>
 	
 		<cfif #totalOrientacoes# neq 0 || #qOrientacoesSubordinados# neq 0 ||#qMelhoriasPendentes# neq 0 || #qProcessosSemPesquisa# neq 0>    
-				<div id="rowAlertaOrgaoAvaliado" class="row" style="margin-top:30px">
+				<div id="rowAlertaOrgaoAvaliado" class="row" >
 					<div class="col-md-12">
 						<div class="card card-danger ">
 							<div class="card-header">
