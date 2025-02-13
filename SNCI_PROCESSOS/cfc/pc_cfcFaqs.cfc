@@ -48,7 +48,7 @@
 									<div class="row" >
 										<div class="col-sm-10" >
 											<div class="form-group " >
-												<label for="faqTitulo">Pergunta:</label>
+												<label for="faqTitulo">Título:</label>
 											<input id="faqTitulo" style="height:39px"   required=""  name="faqTitulo" type="text" class="form-control "  inputmode="text" placeholder="Insira uma pergunta...">
 
 											</div>
