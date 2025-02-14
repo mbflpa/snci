@@ -3870,8 +3870,26 @@
 						$('#btn-quantificado-CustoFinanceiroMelhoria').removeClass('active btn-primary').addClass('btn-light');
 						$('#pcValorCustoFinanceiroMelhoria').hide();
 					}
+
+if (pc_aval_melhoria_status === "P" || pc_aval_melhoria_status === "N") {
+    $("#div_pcStatusMelhoria").prop('hidden', false);
+    // Remove todas as opções que não sejam "P" ou "N"
+    $("#pcStatusMelhoria option").each(function() {
+        var value = $(this).val();
+        if (value !== "P" && value !== "N") {
+            $(this).remove();
+        }
+    });
+    // Atualiza o Select2 para refletir as alterações
+    $("#pcStatusMelhoria").trigger('change.select2');
+} else {
+    // Se for necessário restaurar todas as opções, será preciso recarregar o select
+    // por exemplo, recriando o conteúdo original ou recarregando a página.
+    $("#div_pcStatusMelhoria").prop('hidden', true);
+}
 					validateButtonGroupsMelhoria();	
-                    $("#div_pcStatusMelhoria").prop('hidden', false);
+					
+
 					//$("#accordionCadMelhoria").attr("hidden", false); 
 					$('#cabecalhoAccordionCadMelhoria').text("Editar Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
 					$('#infoTipoCadMelhoria').text("Editando Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
@@ -4514,33 +4532,22 @@
 										</div>
 									</div>
 																			
-									<cfif arguments.modalidade eq "A">
-										<div class="col-sm-2" >
-											<div class="form-group">
-												<label  for="pcStatusMelhoria">Status:</label>
-												<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
-													<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
-													<option value="P">PENDENTE</option>
-													<option value="A">ACEITA</option>
-													<option value="R">RECUSA</option>
-													<option value="T">TROCA</option>
-													<option value="B">BLOQUEADO</option>
-													<option value="N">NÃO INFORMADO</option>
-												</select>
-											</div>
+									
+									<div id="div_pcStatusMelhoria" class="col-sm-2" <cfif arguments.modalidade eq "E">hidden</cfif>>
+										<div class="form-group">
+											<label  for="pcStatusMelhoria">Status:</label>
+											<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
+												<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
+												<option value="P">PENDENTE</option>
+												<option value="A">ACEITA</option>
+												<option value="R">RECUSA</option>
+												<option value="T">TROCA</option>
+												<option value="B">BLOQUEADO</option>
+												<option value="N">NÃO INFORMADO</option>
+											</select>
 										</div>
-									<cfelse>
-										<div id="div_pcStatusMelhoria" class="col-sm-2" hidden>
-											<div class="form-group">
-												<label  for="pcStatusMelhoria">Status:</label>
-												<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
-													<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
-													<option value="P">PENDENTE</option>
-													<option value="N">NÃO INFORMADO</option>
-												</select>
-											</div>
-										</div>
-									</cfif>
+									</div>
+									
 										
 									
 
