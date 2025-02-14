@@ -3584,12 +3584,9 @@
 									<th style="width: <cfif #rsStatus.pc_modalidade# neq 'E'>30%<cfelse>50%</cfif>;vertical-align:middle !important;">Melhoria:</th>
 									<th style="vertical-align:middle !important;">Órgão Responsável:</th>
 									<th style="vertical-align:middle !important;">Status: </th>
-									<cfif #rsStatus.pc_modalidade# neq 'E'>
-										<th style="vertical-align:middle !important;">Data Prevista: </th>
-										<th style="vertical-align:middle !important;">Órgão Responsável <br>(sugerido pelo órgão): </th>
-										<th style="vertical-align:middle !important;">Justificativa do órgão: </th>
-										<th style="vertical-align:middle !important;">Sugestão de Melhoria<br> (sugerida pelo órgão): </th>
-									</cfif>
+									<th hidden> </th>
+									<th hidden> </th>
+									<th hidden> </th>
 									<th hidden></th>
 									<th hidden></th>
 									<th hidden></th>
@@ -3650,13 +3647,9 @@
 											<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2"  disabled>#pc_aval_melhoria_descricao#</textarea></td>
 											<td style="vertical-align:middle !important;">#pc_org_sigla#</td>
 											<td style="vertical-align:middle !important;">#statusMelhoria#</td>
-											<cfif #rsStatus.pc_modalidade# neq 'E'>
-												<cfset dataHora = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY')>
-												<td style="vertical-align:middle !important;">#dataHora#</td>
-												<td style="vertical-align:middle !important;">#siglaOrgSug#</td>
-												<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_naoAceita_justif#</textarea></td>
-												<td style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_sugestao#</textarea></td>
-											</cfif>
+											<td <cfif #rsStatus.pc_modalidade# eq 'E'>hidden</cfif> style="vertical-align:middle !important;">#siglaOrgSug#</td>
+											<td <cfif #rsStatus.pc_modalidade# eq 'E'>hidden</cfif> style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_sugestao#</textarea></td>
+											<td <cfif #rsStatus.pc_modalidade# eq 'E'>hidden</cfif> style="vertical-align:middle !important;"><textarea class="textareaTab" rows="2" disabled>#pc_aval_melhoria_naoAceita_justif#</textarea></td>
 											<td hidden>#listaCategoriasControlesMelhoria#</td>
 											<td hidden>#pc_aval_melhoria_beneficioNaoFinanceiro#</td>
 											<td hidden>#pc_aval_melhoria_beneficioFinanceiro#</td>
@@ -3740,21 +3733,11 @@
 
 					<cfoutput> 
 						var modalidade = '#rsStatus.pc_modalidade#'; 
-						var dataPrevista = '#rsMelhorias.pc_aval_melhoria_dataPrev#';
-						var orgaoSugerido = '#rsMelhorias.pc_aval_melhoria_sug_orgao_mcu#';
-						var naoAceita_justif = '#rsMelhorias.pc_aval_melhoria_naoAceita_justif#';
-						var sugestao = '#rsMelhorias.pc_aval_melhoria_sugestao#';
 					</cfoutput>
 					
+					
 					$(linha).closest("tr").children("td:nth-child(6)").click();//seleciona a linha onde o botão foi clicado	
-					var pc_aval_melhoria_id = $(linha).closest("tr").children("td:nth-child(2)").text();
-					var pc_aval_melhoria_num_orgao = $(linha).closest("tr").children("td:nth-child(3)").text();
-					var pc_aval_melhoria_sug_orgao_mcu = $(linha).closest("tr").children("td:nth-child(4)").text();
-					var pc_aval_melhoria_dataPrev = $(linha).closest("tr").children("td:nth-child(5)").text()
-					var pc_aval_melhoria_descricao = $(linha).closest("tr").children("td:nth-child(6)").text();
-					
-					
-					
+
 					var pc_aval_melhoria_status = "";
 
 					switch( $(linha).closest("tr").children("td:nth-child(8)").text()) {
@@ -3781,29 +3764,19 @@
 							pc_aval_melhoria_status = ""
 					}  
 					
+					var pc_aval_melhoria_id = $(linha).closest("tr").children("td:nth-child(2)").text();
+					var pc_aval_melhoria_num_orgao = $(linha).closest("tr").children("td:nth-child(3)").text();
+					var pc_aval_melhoria_dataPrev = $(linha).closest("tr").children("td:nth-child(5)").text()
+					var pc_aval_melhoria_descricao = $(linha).closest("tr").children("td:nth-child(6)").text();
+					var pc_aval_melhoria_sug_orgao_mcu = $(linha).closest("tr").children("td:nth-child(9)").text();
+					var pc_aval_melhoria_sugestao = $(linha).closest("tr").children("td:nth-child(10)").text();
+					var pc_aval_melhoria_naoAceita_justif =$(linha).closest("tr").children("td:nth-child(11)").text();
+					var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(12)").text();
+					var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(13)").text();
+					var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(14)").text();
+					var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(15)").text();
 					
 
-
-					if(modalidade != 'E'){
-						var pc_aval_melhoria_dataPrev = $(linha).closest("tr").children("td:nth-child(9)").text();
-						var pc_aval_melhoria_sug_orgao_mcu = $(linha).closest("tr").children("td:nth-child(10)").text();
-						var pc_aval_melhoria_naoAceita_justif = $(linha).closest("tr").children("td:nth-child(11)").text();
-						var pc_aval_melhoria_sugestao = $(linha).closest("tr").children("td:nth-child(12)").text();
-						var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(13)").text();
-						var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(14)").text();
-						var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(15)").text();
-						var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(16)").text();
-					}else{
-						var pc_aval_melhoria_dataPrev = dataPrevista;
-						var pc_aval_melhoria_sug_orgao_mcu = orgaoSugerido;
-						var pc_aval_melhoria_naoAceita_justif =naoAceita_justif;
-						var pc_aval_melhoria_sugestao = sugestao;
-						var pc_aval_melhoria_categoriaControle_id = $(linha).closest("tr").children("td:nth-child(9)").text();
-						var pc_aval_melhoria_beneficioNaoFinanceiro = $(linha).closest("tr").children("td:nth-child(10)").text();
-						var pc_aval_melhoria_beneficioFinanceiro = $(linha).closest("tr").children("td:nth-child(11)").text();
-						var pc_aval_melhoria_custoFinanceiro = $(linha).closest("tr").children("td:nth-child(12)").text();
-					}
-					
 					$('#pcMelhoriaId').val(pc_aval_melhoria_id).trigger('change');
 					$('#pcMelhoria').val(pc_aval_melhoria_descricao).trigger('change');
 					$('#pcOrgaoRespMelhoria').val(pc_aval_melhoria_num_orgao).trigger('change');
@@ -3871,22 +3844,22 @@
 						$('#pcValorCustoFinanceiroMelhoria').hide();
 					}
 
-if (pc_aval_melhoria_status === "P" || pc_aval_melhoria_status === "N") {
-    $("#div_pcStatusMelhoria").prop('hidden', false);
-    // Remove todas as opções que não sejam "P" ou "N"
-    $("#pcStatusMelhoria option").each(function() {
-        var value = $(this).val();
-        if (value !== "P" && value !== "N") {
-            $(this).remove();
-        }
-    });
-    // Atualiza o Select2 para refletir as alterações
-    $("#pcStatusMelhoria").trigger('change.select2');
-} else {
-    // Se for necessário restaurar todas as opções, será preciso recarregar o select
-    // por exemplo, recriando o conteúdo original ou recarregando a página.
-    $("#div_pcStatusMelhoria").prop('hidden', true);
-}
+					if (pc_aval_melhoria_status === "P" || pc_aval_melhoria_status === "N") {
+						$("#div_pcStatusMelhoria").prop('hidden', false);
+						// Remove todas as opções que não sejam "P" ou "N"
+						$("#pcStatusMelhoria option").each(function() {
+							var value = $(this).val();
+							if (value !== "P" && value !== "N") {
+								$(this).remove();
+							}
+						});
+						// Atualiza o Select2 para refletir as alterações
+						$("#pcStatusMelhoria").trigger('change.select2');
+					} else {
+						// Se for necessário restaurar todas as opções, será preciso recarregar o select
+						// por exemplo, recriando o conteúdo original ou recarregando a página.
+						$("#div_pcStatusMelhoria").prop('hidden', true);
+					}
 					validateButtonGroupsMelhoria();	
 					
 
