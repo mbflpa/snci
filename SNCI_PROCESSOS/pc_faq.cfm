@@ -37,11 +37,13 @@
                         <div class="col-sm-6">
                             <h1>Guias & Tutoriais</h1>
                             <div class="faq-legend" style="margin-top: 10px; font-size: 14px; display: flex; gap: 20px;">
-                             <cfoutput query="qTiposFaq">
-                           
-                                <p style="margin-bottom: 5px;"><i class="fas fa-circle" style="color: #pc_faq_tipo_cor#;"></i> #pc_faq_tipo_nome#</p>
-                             </cfoutput>
-                            
+                                <cfoutput query="qTiposFaq">
+                                    <div class="card card-outline" style="border-top: 3px solid #pc_faq_tipo_cor#; padding: 0;">
+                                        <div class="card-body" style="padding:2px 8px 2px 8px!important;">
+                                            #pc_faq_tipo_nome#
+                                        </div>
+                                    </div>
+                                </cfoutput>
                             </div>
                         </div>
                     </div>
