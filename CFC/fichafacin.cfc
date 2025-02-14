@@ -47,9 +47,9 @@
 			<cfif form.acaofac eq 'INC'>
 				<!--- inserir UN_Ficha_Facin --->
 				<cfquery datasource="#dsnSNCI#">
-					insert into UN_Ficha_Facin (FAC_Avaliacao,FAC_Unidade,FAC_Matricula,FAC_Ano,FAC_Data_SEI,FAC_Revisor,FAC_Qtd_Geral,FAC_Qtd_NC,FAC_Qtd_Devolvido,FAC_Pontos_Revisao_Meta1,FAC_Perc_Revisao_Meta1,FAC_Meta1_Peso_Item,FAC_Pontos_Revisao_Meta2,FAC_Perc_Revisao_Meta2,FAC_Meta2_Peso_Item,FAC_Data_Plan_Meta3,FAC_DifDia_Meta3,FAC_Perc_Meta3,FAC_Consideracao,FAC_DtCriar,FAC_DtAlter)
+					insert into UN_Ficha_Facin (FAC_Avaliacao,FAC_Unidade,FAC_Matricula,FAC_Ano,FAC_Data_SEI,FAC_Revisor,FAC_Qtd_Geral,FAC_Qtd_NC,FAC_Qtd_Devolvido,FAC_Pontos_Revisao_Meta1,FAC_Perc_Revisao_Meta1,FAC_Meta1_Peso_Item,FAC_Pontos_Revisao_Meta2,FAC_Perc_Revisao_Meta2,FAC_Meta2_Peso_Item,FAC_Data_Plan_Meta3,FAC_DifDia_Meta3,FAC_Perc_Meta3,FAC_DtCriar,FAC_DtAlter)
 					values
-					('#form.FACAVALIACAO#','#form.FACUNIDADE#','#form.FACMATRICULA#','#form.FACANO#','#form.FACDATASEI#','#form.FACREVISOR#',#form.FACQTDGERAL#,#form.FACQTDNC#,#form.FACQTDEVOLVIDO#,#form.FACPONTOSREVISAOMETA1#,#form.FACPERCREVISAOMETA1#,#form.FACMETA1PESOITEM#,#form.FACPONTOSREVISAOMETA2#,#form.FACPERCREVISAOMETA2#,#form.FACMETA2PESOITEM#,'#form.FACDATAPLANMETA3#',#form.FACDIFDIAMETA3#,#form.FACPERCMETA3#,'#form.considerar#',CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
+					('#form.FACAVALIACAO#','#form.FACUNIDADE#','#form.FACMATRICULA#','#form.FACANO#','#form.FACDATASEI#','#form.FACREVISOR#',#form.FACQTDGERAL#,#form.FACQTDNC#,#form.FACQTDEVOLVIDO#,#form.FACPONTOSREVISAOMETA1#,#form.FACPERCREVISAOMETA1#,#form.FACMETA1PESOITEM#,#form.FACPONTOSREVISAOMETA2#,#form.FACPERCREVISAOMETA2#,#form.FACMETA2PESOITEM#,'#form.FACDATAPLANMETA3#',#form.FACDIFDIAMETA3#,#form.FACPERCMETA3#,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
 				</cfquery>	
 			<cfelse>
 				<!--- alterar UN_Ficha_Facin --->
@@ -64,7 +64,6 @@
 					, FAC_Data_Plan_Meta3 = '#form.FACDATAPLANMETA3#'
 					, FAC_DifDia_Meta3 = #form.FACDIFDIAMETA3#
 					, FAC_Perc_Meta3 = #form.FACPERCMETA3#
-					, FAC_Consideracao = '#form.considerar#'
 					, FAC_DtAlter = CONVERT(char, GETDATE(), 120)
 					where FAC_Unidade = '#form.FACUNIDADE#' and FAC_Avaliacao = '#form.FACAVALIACAO#' and FAC_Matricula='#form.FACMATRICULA#'	
 				</cfquery>		
@@ -133,9 +132,9 @@
 		<cfif grpacesso neq 'INSPETORES'>
 			<cfif form.acaofaca eq 'INC'>
 				<cfquery datasource="#dsnSNCI#">
-					insert into UN_Ficha_Facin_Avaliador (FACA_Unidade,FACA_Avaliacao,FACA_Matricula,FACA_Avaliador,FACA_Grupo,FACA_Item,FACA_Meta1_AT_OrtoGram,FACA_Meta1_AT_CCCP,FACA_Meta1_AE_Tecn,FACA_Meta1_AE_Prob,FACA_Meta1_AE_Valor,FACA_Meta1_AE_Cosq,FACA_Meta1_AE_Norma,FACA_Meta1_AE_Docu,FACA_Meta1_AE_Class,FACA_Meta1_AE_Orient,FACA_Meta1_Pontos,FACA_Meta2_AR_Falta,FACA_Meta2_AR_Troca,FACA_Meta2_AR_Nomen,FACA_Meta2_AR_Ordem,FACA_Meta2_AR_Prazo,FACA_Meta2_Pontos,FACA_DtCriar,FACA_DtAlter)
+					insert into UN_Ficha_Facin_Avaliador (FACA_Unidade,FACA_Avaliacao,FACA_Matricula,FACA_Avaliador,FACA_Grupo,FACA_Item,FACA_Meta1_AT_OrtoGram,FACA_Meta1_AT_CCCP,FACA_Meta1_AE_Tecn,FACA_Meta1_AE_Prob,FACA_Meta1_AE_Valor,FACA_Meta1_AE_Cosq,FACA_Meta1_AE_Norma,FACA_Meta1_AE_Docu,FACA_Meta1_AE_Class,FACA_Meta1_AE_Orient,FACA_Meta1_Pontos,FACA_Meta2_AR_Falta,FACA_Meta2_AR_Troca,FACA_Meta2_AR_Nomen,FACA_Meta2_AR_Ordem,FACA_Meta2_AR_Prazo,FACA_Meta2_Pontos,FACA_Consideracao,FACA_DtCriar,FACA_DtAlter)
 					values
-					('#FACUNIDADE#','#FACAVALIACAO#','#FACMATRICULA#','#RIP_MatricAvaliador#',#form.facagrupo#,#form.facaitem#,'#form.meta1_atorgr#','#form.meta1_atcccp#','#form.meta1_aetecn#','#form.meta1_aeprob#','#form.meta1_aevalo#','#form.meta1_aecsqc#','#form.meta1_aenorm #','#form.meta1_aedocm#','#form.meta1_aeclas#','#form.meta1_orient#',#FACAMETA1PONTOS#,'#form.meta2_arfalt#','#form.meta2_artroc#','#form.meta2_arnomc#','#form.meta2_arorde#','#form.meta2_arpraz#',#FACAMETA2PONTOS#,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
+					('#FACUNIDADE#','#FACAVALIACAO#','#FACMATRICULA#','#RIP_MatricAvaliador#',#form.facagrupo#,#form.facaitem#,'#form.meta1_atorgr#','#form.meta1_atcccp#','#form.meta1_aetecn#','#form.meta1_aeprob#','#form.meta1_aevalo#','#form.meta1_aecsqc#','#form.meta1_aenorm #','#form.meta1_aedocm#','#form.meta1_aeclas#','#form.meta1_orient#',#FACAMETA1PONTOS#,'#form.meta2_arfalt#','#form.meta2_artroc#','#form.meta2_arnomc#','#form.meta2_arorde#','#form.meta2_arpraz#',#FACAMETA2PONTOS#,'#form.considerar#',CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
 				</cfquery>	
 			<cfelse>	
 				<cfquery datasource="#dsnSNCI#">
@@ -156,6 +155,7 @@
 					,FACA_Meta2_AR_Nomen = '#form.meta2_arnomc#'
 					,FACA_Meta2_AR_Ordem = '#form.meta2_arorde#'
 					,FACA_Meta2_AR_Prazo = '#form.meta2_arpraz#'
+					,FACA_Consideracao = '#form.considerar#'
 					,FACA_Meta2_Pontos = #FACAMETA2PONTOS#
 					,FACA_DtAlter = CONVERT(char, GETDATE(), 120)
 					WHERE 
@@ -245,5 +245,25 @@
             </cfquery>
             <cfreturn rsavalia>
         </cftransaction>
-    </cffunction>  	
+    </cffunction> 
+	<cffunction name="finalizarfacin" access="remote" returntype="any" hint="Registrar a finalização da facin para o gestor logado">
+			<cfargument name="unid" required="true">
+			<cfargument name="aval" required="true">
+			<cfargument name="matr" required="true">
+			
+			<cftry>
+				<cfquery datasource="DBSNCI">
+						update UN_Ficha_Facin set
+							FAC_DtConcluirFacin = CONVERT(char, GETDATE(), 120)
+						WHERE FAC_Unidade='#unid#' AND 
+						FAC_Avaliacao ='#aval#' AND 
+						FAC_Matricula = '#matr#'
+				</cfquery> 
+					<cfset ret = 'Conclusão da FACIN - realizada com sucesso!'> 
+				<cfcatch type="any">
+					<cfset ret = 'Conclusão da FACIN - Falhou!'>  
+				</cfcatch>
+			</cftry>
+			<cfreturn #ret#>
+	</cffunction>		
 </cfcomponent>

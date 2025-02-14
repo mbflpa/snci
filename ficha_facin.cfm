@@ -1,13 +1,19 @@
 <cfprocessingdirective pageEncoding ="utf-8">  
+<!--- 
+<cfoutput>
+<cfdump var="#form#">
+</cfoutput>
+--->
 <cfset grp = ''>
 <cfset itm = ''>
 <cfloop list="#form.grpitem#" index="vlr">
-  <cfif grp eq ''>
-    <cfset grp = vlr>
-  <cfelse>
-    <cfset itm = vlr>
-  </cfif>
-</cfloop>    
+    <cfif grp eq ''>
+        <cfset grp = vlr>
+    <cfelse>
+        <cfset itm = vlr>
+    </cfif>
+</cfloop>  
+
 <cfoutput>
     <cfquery name="qAcesso" datasource="#dsn_inspecao#">
         select Usu_Matricula,Usu_GrupoAcesso 
@@ -32,11 +38,12 @@
         INNER JOIN Diretoria AS Diretoria_2 ON Und_CodDiretoria = Diretoria_2.Dir_Codigo
         WHERE INP_NumInspecao = convert(varchar,'#form.numinsp#') 
     </cfquery>
+
  <cfif form.acao eq 'inc'>
     <cfif grpacesso neq 'INSPETORES'>
         <cfquery datasource="#dsn_inspecao#" name="rsItem">
             SELECT RIP_Resposta, Itn_NumGrupo, Itn_NumItem, Itn_Descricao, Grp_Descricao, RIP_MatricAvaliador, Fun_Nome, Fun_Email, FACA_Matricula, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, 
-            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao
+            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao
             FROM Unidades 
             INNER JOIN ((Inspecao 
             INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
@@ -50,7 +57,7 @@
     <cfelse>   
         <cfquery datasource="#dsn_inspecao#" name="rsItem">
             SELECT RIP_Resposta, Itn_NumGrupo, Itn_NumItem, Itn_Descricao, Grp_Descricao, RIP_MatricAvaliador, Fun_Nome, Fun_Email, FACA_Matricula, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, 
-            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao
+            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao
             FROM Unidades 
             INNER JOIN ((Inspecao 
             INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
@@ -65,7 +72,7 @@
 <cfelse>
     <cfquery datasource="#dsn_inspecao#" name="rsItem">
         SELECT RIP_Resposta, Itn_NumGrupo, Itn_NumItem, Itn_Descricao, Grp_Descricao, RIP_MatricAvaliador, Fun_Nome, Fun_Email, FACA_Matricula, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, 
-		FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao
+		FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao
         FROM Unidades 
         INNER JOIN ((Inspecao 
         INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
@@ -106,7 +113,7 @@
     <cfquery datasource="#dsn_inspecao#" name="rsExisteFacin">
         SELECT FAC_Qtd_Geral, FAC_Qtd_NC, FAC_Qtd_Devolvido, 
         FAC_Pontos_Revisao_Meta1, FAC_Perc_Revisao_Meta1, FAC_Meta1_Peso_Item, FAC_Pontos_Revisao_Meta2, FAC_Perc_Revisao_Meta2, FAC_Meta2_Peso_Item, FAC_Data_Plan_Meta3, 
-        FAC_DifDia_Meta3, FAC_Perc_Meta3, FAC_Consideracao,FAC_DtAlter
+        FAC_DifDia_Meta3, FAC_Perc_Meta3, FAC_DtAlter,FAC_DtConcluirFacin
         FROM UN_Ficha_Facin
         WHERE FAC_Avaliacao = convert(varchar,'#form.numinsp#') and FAC_Matricula = '#qAcesso.Usu_Matricula#'
     </cfquery>
@@ -146,25 +153,30 @@
         const day = hour * 24;
 
         function meta3(a,b){
+            //alert(a + '' + b)
           //  alert(document.formx.concaval.value);
           if (a.length == 10){
-            let date_ini = new Date(a);
-            let date_end = new Date(b);
-            var percent;
+            let date_realizado = new Date(a);
+            let date_planejado = new Date(b);
+            var percent=100;
             //alert(date_ini + '   ' + date_end);
-            let diff = date_end.getTime() - date_ini.getTime();
-            
+            let diff = date_planejado.getTime() - date_realizado.getTime();
             diff = Math.floor(diff / day);
-           // alert(diff);
+            //alert(diff);
            if(diff < 0){
-                diff = 0;
-                document.formx.meta3_dtplanej.value = a;
+                //diff = 0;
+                //document.formx.meta3_dtplanej.value = a;
             }
-            if(diff >= 4) {percent = 0;}
-            if(diff == 3) {percent = 30;}
-            if(diff == 2) {percent = 50;}
-            if(diff == 1) {percent = 70;}
-            if(diff <= 0) {percent = 100;}
+            
+            if(diff < 0){
+               // alert('linha 168')
+               if(diff == -1) {percent = 60}  
+               if(diff == -2) {percent = 40}
+               if(diff <= -3) {percent = 0;}
+            }else{
+                if(diff > 0) {percent = 110;}
+            }
+//alert(percent)
             document.getElementById('meta3_dif').innerText = diff;
             document.getElementById('meta3_percent').innerText = percent + '%';
             document.formx.facdataplanmeta3.value = b;
@@ -215,7 +227,6 @@
 <body onload="">
 <!--- <form name="facin" method="POST" action=""> --->
 <form name="formx" method="POST" action="cfc/fichafacin.cfc?method=salvarPosic" target="_self">
-
 <div class="container">
 	<div class="row align-items-center">
         <span class="border border-primary">
@@ -276,7 +287,7 @@
     <label for="" class="col-sm-3 col-form-label">&nbsp;Execução em campo</label>
     <label for="" class="col-sm-3 col-form-label">&nbsp;Conclusão Avaliação</label>
     <label for="" class="col-sm-3 col-form-label">&nbsp;Conclusão Revisão</label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Arquive-se SEI</label>
+    <label for="" class="col-sm-3 col-form-label">&nbsp;Conclusão SEI</label>
     <label for="" class="col-sm-3 col-form-label">&nbsp;Início: #dateformat(rsFicha.INP_DtInicInspecao,"DD/MM/YYYY")# Fim: #dateformat(rsFicha.INP_DtFimInspecao,"DD/MM/YYYY")#</label>
     <label id="concluiraval" for="" class="col-sm-3 col-form-label">#dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</label>
     <cfset datarevis = dateformat(rsFicha.INP_DTConcluirRevisao,"DD/MM/YYYY")>
@@ -548,13 +559,17 @@
             <!--- FIM Meta 2: Organizar documentos no SEI --->
         </tbody>
       </table>
+      <div class="row align-items-center">
+        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Considerações do Item</strong></label>
+        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerar" id="considerar" class="form-control" placeholder="Considerações para Grupo/Item" onblur="consideracao('<cfoutput>#grpitm#</cfoutput>',this.value)"><cfoutput>#trim(rsItem.FACA_Consideracao)#</cfoutput></textarea>	        
+    </div>  
       <cfset inspetorhd =''>
       <cfif grpacesso eq 'INSPETORES'>
         <cfset inspetorhd ='readonly'>       
       </cfif>
       <cfset form.considerar = ''>
       <cfif rsItem.FACA_Avaliacao neq ''>
-        <cfset form.considerar = trim(rsExisteFacin.FAC_Consideracao)>
+        <cfset form.considerar = trim(rsItem.FACA_Consideracao)>
       </cfif>      
     </div>
 </cfloop> 
@@ -564,13 +579,14 @@
 </div> 
 
 <cfoutput>
+  <!---  
     <div class="row align-items-center">
         <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>05-Considerações Gerais</strong></label>
-        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerar" id="considerar" class="form-control" placeholder="Considerações para Avaliação" onblur="consideracao('<cfoutput>#grpitm#</cfoutput>',this.value)"><cfoutput>#trim(rsExisteFacin.FAC_Consideracao)#</cfoutput></textarea>	        
+        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerar" id="considerar" class="form-control" placeholder="Considerações para Avaliação" onblur="consideracao('<cfoutput>#grpitm#</cfoutput>',this.value)"><cfoutput>#trim(rsItem.FACA_Consideracao)#</cfoutput></textarea>	        
     </div>    
-
+--->    
     <div class="row align-items-center">
-    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>06-Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):</strong></label>
+    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>05-Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):</strong></label>
     <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Meta 1</strong> - INSP - Redigir 100% dos apontamentos relativos às Não Conformidades (NC) identificadas, conforme critérios definidos pela SGCIN/PE. (Redigir apontamentos)</label>
     <cfloop query="rsAvalia">
         <cfset matraval = rsAvalia.RIP_MatricAvaliador>
@@ -658,8 +674,11 @@
     <cfif rsExisteFacin.recordcount gt 0>
         <cfset auxcompl = 'Salvar Facin (Grupo Acesso: ' & #grpacesso# & '    últ. atualiz.: ' & dateformat(rsExisteFacin.FAC_DtAlter,"DD/MM/YYYY") & ' ' & timeformat(rsExisteFacin.FAC_DtAlter,"HH:MM:SS") & ')'>
     </cfif>
-    
-    <input class="btn btn-primary" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>">
+    <cfset habsn = ''>
+    <cfif rsExisteFacin.FAC_DtConcluirFacin neq ''>
+        <cfset habsn = 'disabled'>
+    </cfif>
+    <input class="btn btn-primary" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#>
     <input class="btn btn-info" type="button" onClick="window.open('ficha_facin_Ref.cfm?numinsp=#form.numinsp#&acao=buscar','_self')" value="Voltar">
 </div> 
 <cfset meta1desconto = numberFormat((ptogrpitm/10),'___.0')>
@@ -697,6 +716,7 @@
         <input type="hidden" name="facmeta2pesoitem" id="facmeta2pesoitem" value="#trim(meta2desconto)#">
         <input type="hidden" name="facagrupo" id="facagrupo" value="#grp#">
         <input type="hidden" name="facaitem" id="facaitem" value="#itm#">
+        <input type="hidden" id="somenteavaliarmeta3" name="somenteavaliarmeta3" value="#form.somenteavaliarmeta3#">
              
         
     <cfloop query="rsAvalia">
@@ -836,10 +856,11 @@ $(function(e){
             return false;
         }
         
-        if (document.formx.considerar.value==''){
-          //  alert("Falta informar as suas considerações");
-          //  document.formx.considerar.focus();
-         //   return false;
+        if (document.formx.considerar.value == '' && document.formx.somenteavaliarmeta3.value == 'N'){
+            alert("Falta informar as suas considerações do Item selecionado!");
+            $('.accordion-button').trigger('click');
+            $('#considerar').focus();
+            return false;
         }   
                     
         document.formx.submit();  
