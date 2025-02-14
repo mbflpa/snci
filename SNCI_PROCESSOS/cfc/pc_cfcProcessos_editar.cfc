@@ -3871,7 +3871,7 @@
 						$('#pcValorCustoFinanceiroMelhoria').hide();
 					}
 					validateButtonGroupsMelhoria();	
-
+                    $("#div_pcStatusMelhoria").prop('hidden', false);
 					//$("#accordionCadMelhoria").attr("hidden", false); 
 					$('#cabecalhoAccordionCadMelhoria').text("Editar Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
 					$('#infoTipoCadMelhoria').text("Editando Proposta de Melhoria ID:" + ' ' + pc_aval_melhoria_id);
@@ -4514,22 +4514,33 @@
 										</div>
 									</div>
 																			
-								
-									<div class="col-sm-4" <cfif arguments.modalidade eq "E">hidden</cfif>>
-										<div class="form-group">
-											<label  for="pcStatusMelhoria">Status:</label>
-											<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
-												<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
-												<option value="P">PENDENTE</option>
-												<option value="A">ACEITA</option>
-												<option value="R">RECUSA</option>
-												<option value="T">TROCA</option>
-												<option value="B">BLOQUEADO</option>
-												<option value="N">NÃO INFORMADO</option>
-											</select>
+									<cfif arguments.modalidade eq "A">
+										<div class="col-sm-2" >
+											<div class="form-group">
+												<label  for="pcStatusMelhoria">Status:</label>
+												<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
+													<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
+													<option value="P">PENDENTE</option>
+													<option value="A">ACEITA</option>
+													<option value="R">RECUSA</option>
+													<option value="T">TROCA</option>
+													<option value="B">BLOQUEADO</option>
+													<option value="N">NÃO INFORMADO</option>
+												</select>
+											</div>
 										</div>
-									</div>
-									
+									<cfelse>
+										<div id="div_pcStatusMelhoria" class="col-sm-2" hidden>
+											<div class="form-group">
+												<label  for="pcStatusMelhoria">Status:</label>
+												<select id="pcStatusMelhoria"  name="pcStatusMelhoria" class="form-control"  style="height:40px">
+													<option selected="" disabled="" value="">Selecione o Órgão responsável...</option>
+													<option value="P">PENDENTE</option>
+													<option value="N">NÃO INFORMADO</option>
+												</select>
+											</div>
+										</div>
+									</cfif>
 										
 									
 
@@ -4573,7 +4584,7 @@
 										FROM pc_avaliacao_categoriaControle
 										WHERE  pc_aval_categoriaControle_status = 'A'
 									</cfquery>
-									<div class="col-sm-8">
+									<div class="col-sm-6">
 										<div class="form-group">
 											<label for="pcAvalMelhoriaCategoriaControle" >Categoria do Controle Proposto:</label>
 											<select id="pcAvalMelhoriaCategoriaControle" name="pcAvalMelhoriaCategoriaControle" class="form-control" multiple="multiple">
