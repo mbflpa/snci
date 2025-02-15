@@ -969,43 +969,50 @@
 
 
 	<cffunction name="formFaq" access="remote" hint="Exibe os FAQs na página pc_faq.cfm.">
-	
+	    <!-- Adiciona o parâmetro para filtrar, default 0 -->
+		<cfargument name="tipoFaq" type="numeric" required="false" default="0">
+
 		<cfquery datasource="#application.dsn_processos#" name="rsFaqs">
 			SELECT pc_faqs.*, pc_usu_nome,pc_faq_tipo_cor FROM  pc_faqs
 			INNER JOIN pc_usuarios on pc_usu_matricula = pc_faq_matricula_atualiz
 			INNER JOIN pc_faq_tipos on pc_faq_tipo = pc_faq_tipo_id
 			where pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and pc_faq_status = 'A'
+			<cfif arguments.tipoFaq neq 0>
+				  and pc_faq_tipo_id = <cfqueryparam value="#arguments.tipoFaq#" cfsqltype="cf_sql_numeric">
+			</cfif>
 			order by  pc_faq_tipo_id, pc_faq_titulo
 		</cfquery>
-		<style>
-			
-			/* Ajusta altura, padding e line-height da DataTable gridFaq */
-			#gridFaq tr, #gridFaq td, #gridFaq th {
-				padding: 0px !important;
-				line-height: 1 !important;
-				height: auto !important;
-			}
-			
-		</style>
-		<div class="row">
-			<div class="col-12">
-				<!-- Novo estilo para a tabela gridFaq com altura menor nas linhas -->
+			<style>
 				
-				<table id="gridFaq" class="table ">
-					<thead>
-						<tr>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						<cfloop query="rsFaqs">
-							<cfoutput>
+				/* Ajusta altura, padding e line-height da DataTable gridFaq */
+				#gridFaq tr, #gridFaq td, #gridFaq th {
+					padding: 0px !important;
+					line-height: 1 !important;
+					height: auto !important;
+				}
+				.dt-info {
+					margin-left: 20px!important;
+				}
+				
+			</style>
+			<div class="row">
+				<div class="col-12">
+					<!-- Novo estilo para a tabela gridFaq com altura menor nas linhas -->
+					
+					<table id="gridFaq" class="table ">
+						<thead>
 							<tr>
-								<td>
-									<div class="card  card-outline" style="    border-top: 3px solid #pc_faq_tipo_cor#;">
- 										<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
-											<div class="card-header" style="<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .0rem 1.0rem!important;">
-												<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<cfloop query="rsFaqs">
+								<cfoutput>
+								<tr>
+									<td>
+										<div class="card  card-outline" style="    border-top: 3px solid #pc_faq_tipo_cor#;">
+											<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
+												<div class="card-header" style="<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .0rem 1.0rem!important;">
 												<h4 class="card-title 1-300" style="margin-top:5px">
 													<cfif pc_faq_status eq 'D'>
 														<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
@@ -1042,15 +1049,15 @@
 		<script language="JavaScript">	
 			$(function(){
 				$("#gridFaq").DataTable({
+					destroy: true,
 					responsive: true,
 					paging: false,         // Exibe todas as linhas (paginação desabilitada)
 					ordering: false,
 					autoWidth: false,
 					lengthChange: false,   // Impede a seleção de quantidade de linhas
-					 dom: '<"row"<"col-sm-12 col-md-6"f><"col-sm-12 col-md-6">>t',             // Modificado: Apenas exibe a tabela, remove a busca
+					dom: '<"row"<"col-sm-12 d-flex align-items-center"f i>>t',             // Modificado: Apenas exibe a tabela, remove a busca
 					language: {
 						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json",
-						info: "" // Remove a informação de registros
 					}
 				});
 			});
