@@ -1385,12 +1385,7 @@
 					}		
 				});	
 			}
-			$(document).on('click', '.card-header' , function(event){
-				// Scroll para o elemento
-				$('html, body').animate({
-					scrollTop: $(this).offset().top - 120
-				}, 1000);
-			});
+			
 
 			function openCollapseContent(faqId) {
 				var el = document.getElementById('collapse' + faqId);

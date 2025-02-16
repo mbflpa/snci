@@ -14,8 +14,8 @@
         padding: 15px;
         overflow-y: auto;
         transform: translateX(100%);
-        transition: transform 0.3s ease;
-        z-index: 1050;
+        transition: transform 0.6s ease;
+        z-index: 998;
     }
     #importantSidebar.open {
         transform: translateX(0);
@@ -31,7 +31,7 @@
         padding: 5px 10px;
         border-radius: 5px 0 0 5px;
         cursor: pointer;
-        z-index: 1100;
+        z-index: 999;
         display: flex;
         align-items: center;
         transition: left 0.3s ease, right 0.3s ease;
@@ -97,7 +97,7 @@
             // Garante que o botão permaneça à direita
             $("#toggleSidebar").css({ left: "auto", right: "0" });
         });
-        $(document).on("click", function(e){
+        $(document).on("mousemove", function(e){
             if($("#importantSidebar").hasClass("open") &&
                $(e.target).closest("#importantSidebar, #toggleSidebar").length === 0){
                    $("#importantSidebar").removeClass("open");
