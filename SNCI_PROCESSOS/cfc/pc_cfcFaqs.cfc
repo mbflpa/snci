@@ -1210,7 +1210,7 @@
 					<table id="gridFaq" class="table ">
 						<thead >
 							<tr>
-								<th style="border:none!important;"><h4 style="color:#2675fb;margin-bottom:20px!important;">
+								<th style="border:none!important;"><h4 style="color:#cd0001;margin-bottom:20px!important;">
 									<cfif rsFaqs.recordCount eq 1>
 										Informação Importante
 									<cfelse>

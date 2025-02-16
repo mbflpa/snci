@@ -36,6 +36,7 @@
         align-items: center;
         transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         width: auto;
+        transform-origin: right top;
     }
     #toggleSidebar:hover {
         background: linear-gradient(to right, #FF0000, #D10000);
@@ -85,6 +86,32 @@
         width: auto;
         transform: scale(1);
     }
+
+    /* Efeito de sacudida tipo borracha */
+    @keyframes shake {
+        0% { transform: translateY(0); }
+        20% { transform: translateY(-10px); }
+        40% { transform: translateY(10px); }
+        60% { transform: translateY(-10px); }
+        80% { transform: translateY(10px); }
+        100% { transform: translateY(0); }
+    }
+    #toggleSidebar.shake {
+        animation: shake 0.5s;
+    }
+
+    /* Remove animação "shake" antiga e define nova animação de pêndulo */
+    @keyframes pendulum {
+        0% { transform: rotate(0deg); }
+        20% { transform: rotate(15deg); }
+        40% { transform: rotate(-10deg); }
+        60% { transform: rotate(5deg); }
+        80% { transform: rotate(-2deg); }
+        100% { transform: rotate(0deg); }
+    }
+    #toggleSidebar.pendulum {
+        animation: pendulum 0.8s ease-out;
+    }
 </style>
 
 <!-- HTML do Sidebar e Botão -->
@@ -104,32 +131,24 @@
 <!-- jQuery para controlar o comportamento do Sidebar -->
 <script>
     $(document).ready(function(){
-        // Substituir a antiga animação por uma sequência de transições
+        // Inicia a animação do estilingue 2000ms após a carga da página
         setTimeout(function() {
             const btn = $("#toggleSidebar");
-            
-            // Sequência de transições
             const animate = async () => {
                 btn.addClass('stretching');
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
+                await new Promise(resolve => setTimeout(resolve, 700)); // tempo de esticada
                 btn.addClass('returning').removeClass('stretching');
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                
+                // Removemos o delay para iniciar imediatamente o efeito de pêndulo
+                await new Promise(resolve => setTimeout(resolve, 0));
                 btn.removeClass('returning');
-                
-                // Pequena vibração suave no final
-                for(let i = 0; i < 3; i++) {
-                    btn.css('transform', 'translateX(-4px)');
-                    await new Promise(resolve => setTimeout(resolve, 50));
-                    btn.css('transform', 'translateX(4px)');
-                    await new Promise(resolve => setTimeout(resolve, 50));
-                }
+                // Aplica efeito de pêndulo imediatamente após o retorno
+                btn.addClass('pendulum');
+                await new Promise(resolve => setTimeout(resolve, 800));
+                btn.removeClass('pendulum');
                 btn.css('transform', '');
             };
-            
             animate();
-        }, 1000);
+        }, 2000); // alterado para 2000ms
 
         $("#toggleSidebar").click(function(e){
             e.stopPropagation();
