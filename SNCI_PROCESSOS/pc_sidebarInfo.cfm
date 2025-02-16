@@ -7,6 +7,7 @@
         left: 600px;
         right: 0;
         height: 100%;
+        max-height: calc(100vh - 60px); /* nova propriedade para limitar a altura */
         background: rgba(255, 255, 255, 0.5); /* fundo translúcido */
         backdrop-filter: blur(10px); /* efeito de vidro fosco */
         border-left: 2px solid #ddd;

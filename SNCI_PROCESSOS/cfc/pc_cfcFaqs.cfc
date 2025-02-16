@@ -1060,6 +1060,10 @@
 					language: {
 						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json",
 					}
+					});
+				// Nova regra para garantir que ao abrir um FAQ os demais sejam fechados (comportamento accordion)
+				$('.collapse').on('show.bs.collapse', function(){
+					$('.collapse').not(this).collapse('hide');
 				});
 			});
 						
@@ -1204,64 +1208,66 @@
 			}
 		</style>
 		<cfif rsFaqs.recordCount>	
-			<div class="row" >
+			<div class="row">
 				<div class="col-12">
-					<!-- Novo estilo para a tabela gridFaq com altura menor nas linhas -->
-					<table id="gridFaq" class="table ">
-						<thead >
-							<tr>
-								<th style="border:none!important;"><h4 style="color:#cd0001;margin-bottom:20px!important;">
-									<cfif rsFaqs.recordCount eq 1>
-										Informação Importante
-									<cfelse>
-										Informações Importantes
-									</cfif>
-									</h4>
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<cfloop query="rsFaqs">
-								<cfoutput>
+					<!-- Encapsula a tabela em um container, se necessário -->
+					<div id="accordionFaq">
+						<table id="gridFaq" class="table">
+							<thead>
 								<tr>
-									<td>
-										<div class="card  card-outline" style="border-top: 3px solid #pc_faq_tipo_cor#;">
-											<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
-												<div class="card-header" style="text-align: center;<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .2rem 1.0rem!important;">
-													<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
-													<h4 class="card-title 1-300" style="margin:8px">
-														<cfif pc_faq_status eq 'D'>
-															<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
-														</cfif>
-														#pc_faq_titulo#
-													</h4>
-													<div class="card-tools">
-														<!-- Alteração: botão que abre o card em outra aba -->
-														<button type="button" class="btn btn-tool" onclick="openCollapseContent(#pc_faq_id#)">
-															<i class="fas fa-expand" style="font-size:30px; display:block; margin:auto;margin-top: 10px;"></i>
-														</button>
+									<th style="border:none!important;"><h4 style="color:#cd0001;margin-bottom:20px!important;">
+										<cfif rsFaqs.recordCount eq 1>
+											Informação Importante
+										<cfelse>
+											Informações Importantes
+										</cfif>
+										</h4>
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								<cfloop query="rsFaqs">
+									<cfoutput>
+									<tr>
+										<td>
+											<div class="card  card-outline" style="border-top: 3px solid #pc_faq_tipo_cor#;">
+												<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
+													<div class="card-header" style="text-align: center;<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .2rem 1.0rem!important;">
+														<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
+														<h4 class="card-title 1-300" style="margin:8px">
+															<cfif pc_faq_status eq 'D'>
+																<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
+															</cfif>
+															#pc_faq_titulo#
+														</h4>
+														<div class="card-tools">
+															<!-- Alteração: botão que abre o card em outra aba -->
+															<button type="button" class="btn btn-tool" onclick="openCollapseContent(#pc_faq_id#)">
+																<i class="fas fa-expand" style="font-size:30px; display:block; margin:auto;margin-top: 10px;"></i>
+															</button>
+														</div>
+														
 													</div>
-													
-												</div>
-											</a>
-											<div id="collapse#pc_faq_id#" class="collapse <cfif rsFaqs.recordCount eq 1>show</cfif>">
-												<div class="card-body">
-													<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
-														<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
-														width="100%" height="600px" style="border:none;"></iframe>
-													<cfelse>
-														<div>#pc_faq_texto#</div>
-													</cfif>
-													
+												</a>
+												<div id="collapse#pc_faq_id#" class="collapse <cfif rsFaqs.recordCount eq 1>show</cfif>">
+													<div class="card-body">
+														<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
+															<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
+															width="100%" height="600px" style="border:none;"></iframe>
+														<cfelse>
+															<div>#pc_faq_texto#</div>
+														</cfif>
+														
+													</div>
 												</div>
 											</div>
-										</div>
-									</td>
-								</tr>
-								</cfoutput>
-							</cfloop>
-						</tbody>
-					</table>
+										</td>
+									</tr>
+									</cfoutput>
+								</cfloop>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</cfif>
@@ -1278,6 +1284,10 @@
 						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json",
 						info: "" // Remove a informação de registros
 					}
+					});
+				// Nova regra para garantir que ao abrir um FAQ os demais sejam fechados (comportamento accordion)
+				$('.collapse').on('show.bs.collapse', function(){
+					$('.collapse').not(this).collapse('hide');
 				});
 			});
 						
@@ -1553,7 +1563,7 @@
 						$('#modal-danger').find('.modal-body').text(thrownError)
 
 					});//fim fail
-				}, 500);
+					}, 500);
        		}
 
 			function excluirFaq(faqId) {				
