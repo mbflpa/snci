@@ -20,31 +20,33 @@
     #importantSidebar.open {
         transform: translateX(0);
     }
-    /* Estilos do botão de toggle */
+    /* Estilos do botão de toggle aprimorados com ajustes para posicionamento à direita */
     #toggleSidebar {
         position: fixed;
         top: 70px;
         right: 0;
-        background: linear-gradient(to right, #D10000, #FF0000);
+        background: linear-gradient(135deg, #ff416c, #ff4b2b);
         color: #fff;
         border: none;
-        padding: 5px 10px;
-        border-radius: 5px 0 0 5px;
+        padding: 5px 20px;
+        border-radius: 25px 0 0 25px; /* bordas arredondadas apenas à esquerda */
         cursor: pointer;
         z-index: 999;
         display: flex;
         align-items: center;
-        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        width: auto;
-        transform-origin: right top;
+        transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     #toggleSidebar:hover {
-        background: linear-gradient(to right, #FF0000, #D10000);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(135deg, #ff4b2b, #ff416c);
     }
     .icon-container {
         position: relative;
         display: inline-block;
         margin-right: 5px;
+        margin-left: -12px;
     }
     .dash-circle {
         display: inline-block;
@@ -87,6 +89,24 @@
         transform: scale(1);
     }
 
+    /* Adiciona o efeito .btn-5 ao botão quando retornar à posição normal */
+    .btn-5 {
+        border: 0 solid;
+        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0);
+        outline: 1px solid;
+        outline-color: rgba(255, 255, 255, 0.5);
+        outline-offset: 0px;
+        text-shadow: none;
+        transition: all 1250ms cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    .btn-5:hover {
+        border: 1px solid;
+        box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.2);
+        outline-color: rgba(255, 255, 255, 0);
+        outline-offset: 15px;
+        text-shadow: 1px 1px 2px #427388; 
+    }
+
     /* Efeito de sacudida tipo borracha */
     @keyframes shake {
         0% { transform: translateY(0); }
@@ -100,17 +120,16 @@
         animation: shake 0.5s;
     }
 
-    /* Remove animação "shake" antiga e define nova animação de pêndulo */
-    @keyframes pendulum {
-        0% { transform: rotate(0deg); }
-        20% { transform: rotate(15deg); }
-        40% { transform: rotate(-10deg); }
-        60% { transform: rotate(5deg); }
-        80% { transform: rotate(-2deg); }
-        100% { transform: rotate(0deg); }
+    
+
+    /* Efeito radiação pulsante moderno */
+    @keyframes radiate {
+        0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.85); }
+        50% { box-shadow: 0 0 25px 15px rgba(255,0,0,0.25); }
+        100% { box-shadow: 0 0 0 0 rgba(255,0,0,0.85); }
     }
-    #toggleSidebar.pendulum {
-        animation: pendulum 0.8s ease-out;
+    #toggleSidebar.radiate {
+        animation: radiate 1s infinite;
     }
 </style>
 
@@ -141,11 +160,11 @@
                 // Removemos o delay para iniciar imediatamente o efeito de pêndulo
                 await new Promise(resolve => setTimeout(resolve, 0));
                 btn.removeClass('returning');
-                // Aplica efeito de pêndulo imediatamente após o retorno
-                btn.addClass('pendulum');
-                await new Promise(resolve => setTimeout(resolve, 800));
-                btn.removeClass('pendulum');
                 btn.css('transform', '');
+                btn.addClass('btn-5'); // Aplica o efeito .btn-5 ao retornar
+                btn.addClass('radiate'); // Aplica efeito radiação moderno
+                await new Promise(resolve => setTimeout(resolve, 5000)); // Dura 5s
+                btn.removeClass('radiate');
             };
             animate();
         }, 2000); // alterado para 2000ms
@@ -153,14 +172,21 @@
         $("#toggleSidebar").click(function(e){
             e.stopPropagation();
             $("#importantSidebar").toggleClass("open");
-            // Garante que o botão permaneça à direita
             $("#toggleSidebar").css({ left: "auto", right: "0" });
+            // Pausar ou reiniciar a animação de .dash-circle e .circle-text
+            if($("#importantSidebar").hasClass("open")){
+                $(".dash-circle, .dash-circle .circle-text").css("animation-play-state", "paused");
+            } else {
+                $(".dash-circle, .dash-circle .circle-text").css("animation-play-state", "running");
+            }
         });
         $(document).on("mousemove", function(e){
             if($("#importantSidebar").hasClass("open") &&
                $(e.target).closest("#importantSidebar, #toggleSidebar").length === 0){
                    $("#importantSidebar").removeClass("open");
                    $("#toggleSidebar").css({ left: "auto", right: "0" });
+                   // Reinicia a animação quando o sidebar fechar
+                   $(".dash-circle, .dash-circle .circle-text").css("animation-play-state", "running");
             }
         });
     });
