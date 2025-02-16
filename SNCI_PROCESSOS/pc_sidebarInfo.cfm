@@ -34,7 +34,8 @@
         z-index: 999;
         display: flex;
         align-items: center;
-        transition: left 0.3s ease, right 0.3s ease;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        width: auto;
     }
     #toggleSidebar:hover {
         background: linear-gradient(to right, #FF0000, #D10000);
@@ -72,6 +73,18 @@
         from { transform: translate(-50%, -50%) rotate(0deg); }
         to { transform: translate(-50%, -50%) rotate(-360deg); }
     }
+
+    /* Substituir a animação antiga por classes de estado */
+    #toggleSidebar.stretching {
+        width: 50vw; /* 50% da largura da viewport */
+        box-shadow: 0 0 10px 5px rgba(255, 0, 0, 0.2);
+        transform: scale(1.05);
+    }
+
+    #toggleSidebar.returning {
+        width: auto;
+        transform: scale(1);
+    }
 </style>
 
 <!-- HTML do Sidebar e Botão -->
@@ -91,6 +104,33 @@
 <!-- jQuery para controlar o comportamento do Sidebar -->
 <script>
     $(document).ready(function(){
+        // Substituir a antiga animação por uma sequência de transições
+        setTimeout(function() {
+            const btn = $("#toggleSidebar");
+            
+            // Sequência de transições
+            const animate = async () => {
+                btn.addClass('stretching');
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                btn.addClass('returning').removeClass('stretching');
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                btn.removeClass('returning');
+                
+                // Pequena vibração suave no final
+                for(let i = 0; i < 3; i++) {
+                    btn.css('transform', 'translateX(-4px)');
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                    btn.css('transform', 'translateX(4px)');
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                }
+                btn.css('transform', '');
+            };
+            
+            animate();
+        }, 1000);
+
         $("#toggleSidebar").click(function(e){
             e.stopPropagation();
             $("#importantSidebar").toggleClass("open");
