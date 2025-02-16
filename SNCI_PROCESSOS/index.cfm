@@ -10,12 +10,7 @@
     <title>SNCI</title>
     <link rel="icon" type="image/x-icon" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">
     <link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/animate.min.css">
-   
 </head>
-
-
-
-
 
 <body class="layout-footer-fixed hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
     
@@ -48,7 +43,7 @@
                         <div  id="alertasCIdiv"></div>
                     </cfif>
 
-                    <div id="formFaqDiv"></div>
+                   
 
                     <cfinclude template="pc_notas_versao.cfm">
                     
@@ -65,8 +60,8 @@
 	<!-- ./wrapper -->
     <cfinclude template="pc_Sidebar.cfm">
 
-
-	
+    <!-- Inclua o novo componente do sidebar -->
+    <cfinclude template="pc_sidebarInfo.cfm">
 
     <script language="JavaScript">
 
@@ -88,6 +83,7 @@
             } else {
                 mostraAlertasControleInterno();
             }
+            // Chama a função que agora está definida em pc_sidebarInfo.cfm
             mostraFormFaq();
 
             <cfoutput>
@@ -295,43 +291,6 @@
                 });
             })//fim fail
         }
-
-         function mostraFormFaq(){
-            $.ajax({
-                type: "post",
-                url: "cfc/pc_cfcFaqs.cfc",
-                data: {
-                    method: "formFaqIndex"
-                },
-                dataType: "text"  // Mantido em "text" para lidar tanto com JSON quanto HTML
-            })
-            .done(function(response) {
-                if(!response || response.trim() === ""){
-                    $('#formFaqDiv').html("<p>Nenhum FAQ retornado pelo servidor.</p>");
-                    return;
-                }
-                var result;
-                try {
-                    result = JSON.parse(response);
-                } catch(e) {
-                    result = { type: "text", content: response };
-                }
-
-                html = result.content;
-                
-                $('#formFaqDiv').html(html);
-            })
-            .fail(function(xhr, ajaxOptions, thrownError) {
-                $('#modalOverlay').delay(1000).hide(0, function() {
-                    $('#modalOverlay').modal('hide');
-                });
-                $('#modal-danger').modal('show');
-                $('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:');
-                $('#modal-danger').find('.modal-body').text(thrownError);
-            });
-        }
-
-        
 
         
     </script>

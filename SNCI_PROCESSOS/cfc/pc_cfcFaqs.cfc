@@ -1012,16 +1012,17 @@
 									<td>
 										<div class="card  card-outline" style="    border-top: 3px solid #pc_faq_tipo_cor#;">
 											<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
-												<div class="card-header" style="<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .0rem 1.0rem!important;">
-												<h4 class="card-title 1-300" style="margin-top:5px">
+												<div class="card-header" style="<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .5rem 1.0rem!important;">
+												<h4 class="card-title 1-300" >
 													<cfif pc_faq_status eq 'D'>
 														<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
 													</cfif>
 													#pc_faq_titulo#
 												</h4>
 												<div class="card-tools">
-													<button type="button" class="btn btn-tool" data-card-widget="maximize" style="font-size:34px;">
-														<i class="exp fas fa-expand"></i>
+													<!-- Alteração: botão que abre o card em outra aba -->
+													<button type="button" class="btn btn-tool" onclick="openCollapseContent(#pc_faq_id#)">
+														<i class="fas fa-expand" style="font-size:30px; display:block;position: relative;top: 3px;"></i>
 													</button>
 												</div>
 											</div>
@@ -1166,6 +1167,19 @@
 					}		
 				});	
 			}
+
+			function openCollapseContent(faqId) {
+				var el = document.getElementById('collapse' + faqId);
+				if (el) {
+					var newWindow = window.open("", "_blank");
+					var title = "FAQ " + faqId; // Defina o nome desejado para a aba
+					var content = el.innerHTML.replace(/height="600px"/g, 'height="100%"');
+					newWindow.document.write("<html><head><title>SNCI-Processos:Informação</title></head><body>" + content + "</body></html>");
+					newWindow.document.close();
+				} else {
+					alert("Conteúdo não encontrado!");
+				}
+			}
 			
 		</script>
  	</cffunction>
@@ -1178,7 +1192,7 @@
 			INNER JOIN pc_faq_tipos on pc_faq_tipo = pc_faq_tipo_id
 			WHERE pc_faq_perfis like '%(#application.rsUsuarioParametros.pc_usu_perfil#)%' and pc_faq_status = 'A'
 			      AND pc_faq_tipo_id = 1
-			ORDER BY  pc_faq_tipo_id, pc_faq_titulo
+			ORDER BY  pc_faq_id desc, pc_faq_titulo
 		</cfquery>
 		
 		<style>
@@ -1211,24 +1225,26 @@
 								<cfoutput>
 								<tr>
 									<td>
-										<div class="card  card-outline" style="    border-top: 3px solid #pc_faq_tipo_cor#;">
+										<div class="card  card-outline" style="border-top: 3px solid #pc_faq_tipo_cor#;">
 											<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
-												<div class="card-header" style="<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .2rem 1.0rem!important;">
+												<div class="card-header" style="text-align: center;<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .2rem 1.0rem!important;">
 													<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
-													<h4 class="card-title 1-300" style="margin-top:7px">
+													<h4 class="card-title 1-300" style="margin:8px">
 														<cfif pc_faq_status eq 'D'>
 															<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
 														</cfif>
 														#pc_faq_titulo#
 													</h4>
 													<div class="card-tools">
-														<button type="button" class="btn btn-tool" data-card-widget="maximize" style="font-size:34px;">
-															<i class="exp fas fa-expand"></i>
+														<!-- Alteração: botão que abre o card em outra aba -->
+														<button type="button" class="btn btn-tool" onclick="openCollapseContent(#pc_faq_id#)">
+															<i class="fas fa-expand" style="font-size:30px; display:block; margin:auto;margin-top: 10px;"></i>
 														</button>
 													</div>
+													
 												</div>
 											</a>
-											<div id="collapse#pc_faq_id#" class="collapse">
+											<div id="collapse#pc_faq_id#" class="collapse <cfif rsFaqs.recordCount eq 1>show</cfif>">
 												<div class="card-body">
 													<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
 														<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
@@ -1302,7 +1318,7 @@
 						}
 
 						$('#cadastroFaq').CardWidget('expand')
-						$('html, body').animate({ scrollTop: ($('#formCadFaqDiv').offset().top-80)} , 1000);
+						//$('html, body').animate({ scrollTop: ($('#formCadFaqDiv').offset().top-80)} , 1000);
 						$('#modalOverlay').delay(1000).hide(0, function() {
 							$('#modalOverlay').modal('hide');
 						});
@@ -1375,6 +1391,19 @@
 					scrollTop: $(this).offset().top - 120
 				}, 1000);
 			});
+
+			function openCollapseContent(faqId) {
+				var el = document.getElementById('collapse' + faqId);
+				if (el) {
+					var newWindow = window.open("", "_blank");
+					var title = "FAQ " + faqId; // Defina o nome desejado para a aba
+					var content = el.innerHTML.replace(/height="600px"/g, 'height="100%"');
+					newWindow.document.write("<html><head><title>SNCI-Processos:Informação</title></head><body>" + content + "</body></html>");
+					newWindow.document.close();
+				} else {
+					alert("Conteúdo não encontrado!");
+				}
+			}
 			
 		</script>
  	</cffunction>
@@ -1645,7 +1674,7 @@
 	    <cfobject component = "pc_cfcAvaliacoes" name = "tamanhoArquivo">
 		<cfinvoke component="#tamanhoArquivo#" method="renderFileSize" returnVariable="tamanhoDoArquivo" size ='#cffile.fileSize#' type='bytes'>
 
-		<cfset nomeDoAnexo = '#cffile.clientFileName#'  & '.' & '#cffile.clientFileExt#' & ' (' & '#tamanhoDoArquivo#' & ')'>
+		<cfset nomeDoAnexo = '#cffile.clientFileName#'  & '.' & '#cffile.clientFileExt#'>
 
 		<cfif FileExists(origem)>
 			<cffile action="rename" source="#origem#" destination="#destino#">
