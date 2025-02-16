@@ -67,6 +67,27 @@
             .card-body{
                 font-size: 16px;
             }
+
+            /* Estilos para as legendas do FAQ */
+            .faq-card {
+                transition: all 0.3s ease;
+            }
+
+            .faq-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
+
+            .faq-card:active {
+                transform: translateY(0);
+                box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            }
+
+            .faq-card.active {
+                font-weight: bold;
+                transform: scale(1.05);
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            }
             </style>
 
            
@@ -94,12 +115,20 @@
         $(document).ready(function() {	
             mostraFormFaq(); // Carrega todos os FAQs por padrão
             $('.faq-card').on('click', function(){
+                // Remove a classe active de todos os cards
+                $('.faq-card').removeClass('active');
+                // Adiciona a classe active ao card clicado
+                $(this).addClass('active');
+                
                 var tipo = $(this).data('tipo');
                 // Atualiza o indicador de filtro com o texto do card clicado
                 var filtroTexto = $(this).find('.card-body').text().trim();
                 $('#filterIndicator').text(filtroTexto);
                 filtraFaq(tipo);
             });
+            
+            // Definir o card "Todos" como ativo inicialmente
+            $('.faq-card[data-tipo="0"]').addClass('active');
         });   
 
         function mostraFormFaq(){
