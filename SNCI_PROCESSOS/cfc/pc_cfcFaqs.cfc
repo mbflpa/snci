@@ -994,6 +994,35 @@
 					margin-left: 20px!important;
 				}
 				
+				/* Animação de pulsação com brilho vermelho */
+				@keyframes pulseAndGlow {
+					0% {
+						transform: scale(1);
+						filter: brightness(100%) drop-shadow(0 0 0px rgba(220, 53, 69, 0));
+					}
+					25% {
+						transform: scale(1.3);
+						filter: brightness(130%) drop-shadow(0 0 8px rgba(220, 53, 69, 0.8));
+					}
+					50% {
+						transform: scale(1);
+						filter: brightness(100%) drop-shadow(0 0 0px rgba(220, 53, 69, 0));
+					}
+					75% {
+						transform: scale(1.3);
+						filter: brightness(130%) drop-shadow(0 0 8px rgba(220, 53, 69, 0.8));
+					}
+					100% {
+						transform: scale(1);
+						filter: brightness(100%) drop-shadow(0 0 0px rgba(220, 53, 69, 0));
+					}
+				}
+
+				.expand-icon-highlight {
+					animation: pulseAndGlow 1.5s ease-in-out 2; /* 1.5s x 2 = 3 segundos total */
+					color: #dc3545; /* Cor vermelha do Bootstrap */
+				}
+				
 			</style>
 			<div class="row">
 				<div class="col-12">
@@ -1031,7 +1060,7 @@
 											<div class="card-body">
 												<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
 													<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
-                   									 width="100%" height="600px" style="border:none;"></iframe>
+                   									 width="100%" height="400px" style="border:none;"></iframe>
 												<cfelse>
 													<div>#pc_faq_texto#</div>
 												</cfif>
@@ -1063,6 +1092,24 @@
 					});
 				// Nova regra para garantir que ao abrir um FAQ os demais sejam fechados (comportamento accordion)
 				$('.collapse').on('show.bs.collapse', function(){
+					// Encontra o ícone de expansão dentro do card atual
+					var expandIcon = $(this).closest('.card').find('.fa-expand');
+					
+					// Remove classe de animação existente (se houver)
+					expandIcon.removeClass('expand-icon-highlight');
+					
+					// Força um reflow do DOM para reiniciar a animação
+					void expandIcon[0].offsetWidth;
+					
+					// Adiciona a classe para iniciar a animação
+					expandIcon.addClass('expand-icon-highlight');
+					
+					// Remove a classe após a animação terminar
+					setTimeout(() => {
+						expandIcon.removeClass('expand-icon-highlight');
+					}, 3000); // Alterado para 3000ms (3 segundos)
+
+					// Mantém o comportamento original de fechar outros FAQs
 					$('.collapse').not(this).collapse('hide');
 				});
 			});
@@ -1177,8 +1224,8 @@
 				if (el) {
 					var newWindow = window.open("", "_blank");
 					var title = "FAQ " + faqId; // Defina o nome desejado para a aba
-					var content = el.innerHTML.replace(/height="600px"/g, 'height="100%"');
-					newWindow.document.write("<html><head><title>SNCI-Processos:Informação</title></head><body>" + content + "</body></html>");
+					var content = el.innerHTML.replace(/height="400px"/g, 'height="100%"');
+					newWindow.document.write("<html><head><title>SNCI-Processos: Informação</title></head><body>" + content + "</body></html>");
 					newWindow.document.close();
 				} else {
 					alert("Conteúdo não encontrado!");
@@ -1205,6 +1252,35 @@
 				padding: 0px !important;
 				line-height: 1 !important;
 				height: auto !important;
+			}
+
+			/* Animação de pulsação com brilho vermelho */
+			@keyframes pulseAndGlow {
+				0% {
+					transform: scale(1);
+					filter: brightness(100%) drop-shadow(0 0 0px rgba(220, 53, 69, 0));
+				}
+				25% {
+					transform: scale(1.3);
+					filter: brightness(130%) drop-shadow(0 0 8px rgba(220, 53, 69, 0.8));
+				}
+				50% {
+					transform: scale(1);
+					filter: brightness(100%) drop-shadow(0 0 0px rgba(220, 53, 69, 0));
+				}
+				75% {
+					transform: scale(1.3);
+					filter: brightness(130%) drop-shadow(0 0 8px rgba(220, 53, 69, 0.8));
+				}
+				100% {
+					transform: scale(1);
+					filter: brightness(100%) drop-shadow(0 0 0px rgba(220, 53, 69, 0));
+				}
+			}
+
+			.expand-icon-highlight {
+				animation: pulseAndGlow 1.5s ease-in-out 2; /* 1.5s x 2 = 3 segundos total */
+				color: #dc3545; /* Cor vermelha do Bootstrap */
 			}
 		</style>
 		<cfif rsFaqs.recordCount>	
@@ -1253,7 +1329,7 @@
 													<div class="card-body">
 														<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
 															<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
-															width="100%" height="600px" style="border:none;"></iframe>
+															width="100%" height="400px" style="border:none;"></iframe>
 														<cfelse>
 															<div>#pc_faq_texto#</div>
 														</cfif>
@@ -1287,6 +1363,24 @@
 					});
 				// Nova regra para garantir que ao abrir um FAQ os demais sejam fechados (comportamento accordion)
 				$('.collapse').on('show.bs.collapse', function(){
+					// Encontra o ícone de expansão dentro do card atual
+					var expandIcon = $(this).closest('.card').find('.fa-expand');
+					
+					// Remove classe de animação existente (se houver)
+					expandIcon.removeClass('expand-icon-highlight');
+					
+					// Força um reflow do DOM para reiniciar a animação
+					void expandIcon[0].offsetWidth;
+					
+					// Adiciona a classe para iniciar a animação
+					expandIcon.addClass('expand-icon-highlight');
+					
+					// Remove a classe após a animação terminar
+					setTimeout(() => {
+						expandIcon.removeClass('expand-icon-highlight');
+					}, 3000); // Alterado para 3000ms (3 segundos)
+
+					// Mantém o comportamento original de fechar outros FAQs
 					$('.collapse').not(this).collapse('hide');
 				});
 			});
@@ -1402,8 +1496,8 @@
 				if (el) {
 					var newWindow = window.open("", "_blank");
 					var title = "FAQ " + faqId; // Defina o nome desejado para a aba
-					var content = el.innerHTML.replace(/height="600px"/g, 'height="100%"');
-					newWindow.document.write("<html><head><title>SNCI-Processos:Informação</title></head><body>" + content + "</body></html>");
+					var content = el.innerHTML.replace(/height="400px"/g, 'height="100%"');
+					newWindow.document.write("<html><head><title>SNCI-Processos: Informação</title></head><body>" + content + "</body></html>");
 					newWindow.document.close();
 				} else {
 					alert("Conteúdo não encontrado!");
