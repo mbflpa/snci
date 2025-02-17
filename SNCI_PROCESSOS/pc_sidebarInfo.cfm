@@ -132,24 +132,7 @@
     #toggleSidebar.radiate {
         animation: radiate 1s infinite;
     }
-    /* Novo estilo para as badges de leitura */
-			.read-status-badge {
-				position: absolute;
-				top: -12px;
-				left: 0px;
-				padding: 2px 8px;
-				border-radius: 10px;
-				font-size: 11px;
-				z-index: 1;
-				color: white;
-				white-space: nowrap;
-			}
-			.unread {
-				background-color: #dc3545;
-			}
-			.read {
-				background-color: #28a745;
-			}
+    
 </style>
 
 <!-- HTML do Sidebar e Botão -->
@@ -185,7 +168,7 @@
             // Só muda para verde se houver badges e todas estiverem lidas
             if (totalBadges > 0 && totalBadges === readBadges) {
                 btn.css({
-                    'background': '#28a745',
+                    'background': 'var(--azul_claro_correios)',
                     'box-shadow': 'none',
                     'transform': 'none'
                 });
@@ -367,7 +350,7 @@ $(document).ready(function() {
             // Remove o efeito de brilho/sombra
             $toggleButton.css({
                 'box-shadow': 'none',
-                'background': '#28a745', // Cor mais neutra quando todas estão lidas
+                'background': 'var(--azul_claro_correios)', // Cor mais neutra quando todas estão lidas
                 'transform': 'none'
             });
             

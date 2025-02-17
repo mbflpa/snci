@@ -1333,7 +1333,27 @@
 
 			.expand-icon-highlight {
 				animation: pulseAndGlow 1.5s ease-in-out 2; /* 1.5s x 2 = 3 segundos total */
-				color: #dc3545; /* Cor vermelha do Bootstrap */
+				color: #
+				dc3545; /* Cor vermelha do Bootstrap */
+			}
+			/* Novo estilo para as badges de leitura */
+			.read-status-badge {
+				margin-left: 5px;
+				padding: 2px 8px;
+				border-radius: 10px;
+				font-size: 11px;
+				z-index: 1;
+				color: white;
+				white-space: nowrap;
+			}
+			.unread {
+				background-color: #dc3545;
+			}
+			.read {
+				background-color: var(--azul_claro_correios);
+			}
+			.card{
+				margin-bottom: 0.5rem!important;
 			}
 
 			
@@ -1356,13 +1376,10 @@
 										<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
 											<div class="card-header" style="text-align: center;<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .3rem .5rem!important;">
 												<!-- Nova badge de status de leitura -->
-												<span class="read-status-badge unread" id="badge_#pc_faq_id#">Não lida</span>
+												
 												<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
-												<h4 class="card-title 1-300" style="margin:4px;font-size:0.95em">
-													<cfif pc_faq_status eq 'D'>
-														<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
-													</cfif>
-													#pc_faq_titulo#
+												<h4 class="card-title 1-300" style="margin:4px;font-size:1em">
+													#pc_faq_titulo# <span class="read-status-badge unread" id="badge_#pc_faq_id#">Não lida</span>
 												</h4>
 												<div class="card-tools">
 													<!-- Alteração: botão que abre o card em outra aba -->
@@ -1443,7 +1460,7 @@
 								.removeClass('unread')
 								.addClass('read')
 								.text('Lida');
-							card.css('border-top', '3px solid #28a745');
+							card.css('border-top', '3px solid var(--azul_claro_correios)');
 						} else {
 							card.css('border-top', '3px solid #dc3545');
 						}
@@ -1462,7 +1479,7 @@
 							.removeClass('unread')
 							.addClass('read')
 							.text('Lida');
-						card.css('border-top', '3px solid #28a745');
+						card.css('border-top', '3px solid var(--azul_claro_correios)');
 					}
 				}
 
