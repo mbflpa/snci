@@ -368,4 +368,52 @@ $(document).ready(function() {
     });
 });
 </script>
+
+<script>
+$(document).ready(function() {
+    // Função unificada para verificar status de leitura
+    function checkReadStatus() {
+        let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
+        $('.info-item').each(function() {
+            let faqId = $(this).data('faq-id');
+            if (readFaqs.includes(faqId.toString())) {
+                $(this).find('.unread-badge').remove();
+            }
+        });
+        
+        // Atualiza o contador de não lidas
+        updateUnreadCount();
+    }
+
+    // Função para atualizar o contador de não lidas
+    function updateUnreadCount() {
+        let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
+        let totalInfos = $('.info-item').length;
+        let readInfos = readFaqs.length;
+        let unreadCount = totalInfos - readInfos;
+        
+        if (unreadCount > 0) {
+            $('#unreadCount').text(unreadCount).show();
+        } else {
+            $('#unreadCount').hide();
+        }
+    }
+
+    // Quando clicar em uma informação
+    $('.info-item').on('click', function() {
+        let faqId = $(this).data('faq-id').toString();
+        let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
+        
+        if (!readFaqs.includes(faqId)) {
+            readFaqs.push(faqId);
+            localStorage.setItem('readFaqs', JSON.stringify(readFaqs));
+            $(this).find('.unread-badge').remove();
+            updateUnreadCount();
+        }
+    });
+
+    // Verifica o status inicial
+    checkReadStatus();
+});
+</script>
 <!-- Fim do componente do Sidebar -->
