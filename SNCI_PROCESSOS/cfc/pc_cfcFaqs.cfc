@@ -1282,6 +1282,25 @@
 				animation: pulseAndGlow 1.5s ease-in-out 2; /* 1.5s x 2 = 3 segundos total */
 				color: #dc3545; /* Cor vermelha do Bootstrap */
 			}
+
+			/* Novo estilo para as badges de leitura */
+			.read-status-badge {
+				position: absolute;
+				top: -8px;
+				left: 0px;
+				padding: 2px 8px;
+				border-radius: 10px;
+				font-size: 11px;
+				z-index: 1;
+				color: white;
+				white-space: nowrap;
+			}
+			.unread {
+				background-color: #dc3545;
+			}
+			.read {
+				background-color: #28a745;
+			}
 		</style>
 		<cfif rsFaqs.recordCount>	
 			<div class="row">
@@ -1309,6 +1328,8 @@
 											<div class="card  card-outline" style="border-top: 3px solid #pc_faq_tipo_cor#;">
 												<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
 													<div class="card-header" style="text-align: center;<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .2rem 1.0rem!important;">
+														<!-- Nova badge de status de leitura -->
+														<span class="read-status-badge unread" id="badge_#pc_faq_id#">Não lida</span>
 														<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
 														<h4 class="card-title 1-300" style="margin:8px">
 															<cfif pc_faq_status eq 'D'>
@@ -1382,7 +1403,48 @@
 
 					// Mantém o comportamento original de fechar outros FAQs
 					$('.collapse').not(this).collapse('hide');
+
+					// Marcar FAQ como lido
+					let faqId = $(this).attr('id').replace('collapse', '');
+					markAsRead(faqId);
 				});
+
+				// Função para verificar status de leitura dos FAQs
+				function checkReadStatus() {
+					let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
+					$('.read-status-badge').each(function() {
+						let faqId = $(this).attr('id').split('_')[1];
+						let card = $(this).closest('.card');
+						if (readFaqs.includes(faqId)) {
+							$(this)
+								.removeClass('unread')
+								.addClass('read')
+								.text('Lida');
+							card.css('border-top', '3px solid #28a745');
+						} else {
+							card.css('border-top', '3px solid #dc3545');
+						}
+					});
+				}
+
+				// Função para marcar FAQ como lido
+				function markAsRead(faqId) {
+					let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
+					if (!readFaqs.includes(faqId)) {
+						readFaqs.push(faqId);
+						localStorage.setItem('readFaqs', JSON.stringify(readFaqs));
+						let badge = $(`#badge_${faqId}`);
+						let card = badge.closest('.card');
+						badge
+							.removeClass('unread')
+							.addClass('read')
+							.text('Lida');
+						card.css('border-top', '3px solid #28a745');
+					}
+				}
+
+				// Verificar status inicial
+				checkReadStatus();
 			});
 						
 			function mostraFormEditFaq(faqId,tit){
