@@ -1022,6 +1022,64 @@
 					animation: pulseAndGlow 1.5s ease-in-out 2; /* 1.5s x 2 = 3 segundos total */
 					color: #dc3545; /* Cor vermelha do Bootstrap */
 				}
+
+				/* Animações para o botão toggle sidebar */
+				@keyframes shake {
+					0% { transform: rotate(0deg); }
+					25% { transform: rotate(-10deg); }
+					50% { transform: rotate(0deg); }
+					75% { transform: rotate(10deg); }
+					100% { transform: rotate(0deg); }
+				}
+
+				@keyframes wiggle {
+					0% { transform: scale(1); }
+					50% { transform: scale(1.2); }
+					100% { transform: scale(1); }
+				}
+
+				/* Estilo do botão toggle sidebar */
+				#toggleSidebar {
+					position: fixed;
+					left: 0;
+					top: 50%;
+					transform: translateY(-50%);
+					z-index: 1000;
+					width: 30px;
+					height: 60px;
+					background: #0083ca;
+					border: none;
+					border-radius: 0 5px 5px 0;
+					color: white;
+					cursor: pointer;
+					padding: 5px;
+					transition: all 0.3s ease;
+				}
+
+				#toggleSidebar:hover {
+					background: #005b8e;
+					animation: shake 0.5s ease-in-out;
+				}
+
+				#toggleSidebar i {
+					font-size: 18px;
+					line-height: 50px;
+				}
+
+				/* Classe para animação de wiggle */
+				.wiggle {
+					animation: wiggle 0.5s ease-in-out;
+				}
+
+				/* Estado expandido */
+				body.sidebar-collapse #toggleSidebar {
+					left: 0;
+				}
+
+				/* Estado recolhido */
+				body:not(.sidebar-collapse) #toggleSidebar {
+					left: 250px;
+				}
 				
 			</style>
 			<div class="row">
@@ -1247,12 +1305,7 @@
 		</cfquery>
 		
 		<style>
-			/* Ajusta altura, padding e line-height da DataTable gridFaq */
-			#gridFaq tr, #gridFaq td, #gridFaq th {
-				padding: 0px !important;
-				line-height: 1 !important;
-				height: auto !important;
-			}
+			
 
 			/* Animação de pulsação com brilho vermelho */
 			@keyframes pulseAndGlow {
@@ -1283,87 +1336,57 @@
 				color: #dc3545; /* Cor vermelha do Bootstrap */
 			}
 
-			/* Novo estilo para as badges de leitura */
-			.read-status-badge {
-				position: absolute;
-				top: -8px;
-				left: 0px;
-				padding: 2px 8px;
-				border-radius: 10px;
-				font-size: 11px;
-				z-index: 1;
-				color: white;
-				white-space: nowrap;
-			}
-			.unread {
-				background-color: #dc3545;
-			}
-			.read {
-				background-color: #28a745;
-			}
+			
 		</style>
 		<cfif rsFaqs.recordCount>	
 			<div class="row">
 				<div class="col-12">
 					<!-- Encapsula a tabela em um container, se necessário -->
 					<div id="accordionFaq">
-						<table id="gridFaq" class="table">
-							<thead>
-								<tr>
-									<th style="border:none!important;"><h4 style="color:#cd0001;margin-bottom:20px!important;">
-										<cfif rsFaqs.recordCount eq 1>
-											Informação Importante
-										<cfelse>
-											Informações Importantes
-										</cfif>
-										</h4>
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								<cfloop query="rsFaqs">
-									<cfoutput>
-									<tr>
-										<td>
-											<div class="card  card-outline" style="border-top: 3px solid #pc_faq_tipo_cor#;">
-												<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
-													<div class="card-header" style="text-align: center;<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .2rem 1.0rem!important;">
-														<!-- Nova badge de status de leitura -->
-														<span class="read-status-badge unread" id="badge_#pc_faq_id#">Não lida</span>
-														<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
-														<h4 class="card-title 1-300" style="margin:8px">
-															<cfif pc_faq_status eq 'D'>
-																<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
-															</cfif>
-															#pc_faq_titulo#
-														</h4>
-														<div class="card-tools">
-															<!-- Alteração: botão que abre o card em outra aba -->
-															<button type="button" class="btn btn-tool" onclick="openCollapseContent(#pc_faq_id#)">
-																<i class="fas fa-expand" style="font-size:30px; display:block; margin:auto;margin-top: 10px;"></i>
-															</button>
-														</div>
-														
-													</div>
-												</a>
-												<div id="collapse#pc_faq_id#" class="collapse <cfif rsFaqs.recordCount eq 1>show</cfif>">
-													<div class="card-body">
-														<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
-															<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
-															width="100%" height="400px" style="border:none;"></iframe>
-														<cfelse>
-															<div>#pc_faq_texto#</div>
-														</cfif>
-														
-													</div>
+						<h4 style="color:#cd0001;margin-bottom:20px!important;">
+						<cfif rsFaqs.recordCount eq 1>
+							Informação Importante
+						<cfelse>
+							Informações Importantes
+						</cfif>
+						</h4>
+						<cfloop query="rsFaqs">
+							<cfoutput>
+									<div class="card  card-outline" style="border-top: 3px solid #pc_faq_tipo_cor#;">
+										<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
+											<div class="card-header" style="text-align: center;<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .2rem 1.0rem!important;">
+												<!-- Nova badge de status de leitura -->
+												<span class="read-status-badge unread" id="badge_#pc_faq_id#">Não lida</span>
+												<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
+												<h4 class="card-title 1-300" style="margin:8px">
+													<cfif pc_faq_status eq 'D'>
+														<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
+													</cfif>
+													#pc_faq_titulo#
+												</h4>
+												<div class="card-tools">
+													<!-- Alteração: botão que abre o card em outra aba -->
+													<button type="button" class="btn btn-tool" onclick="openCollapseContent(#pc_faq_id#)">
+														<i class="fas fa-expand" style="font-size:30px; display:block; margin:auto;margin-top: 10px;"></i>
+													</button>
 												</div>
+												
 											</div>
-										</td>
-									</tr>
-									</cfoutput>
-								</cfloop>
-							</tbody>
-						</table>
+										</a>
+										<div id="collapse#pc_faq_id#" class="collapse <cfif rsFaqs.recordCount eq 1>show</cfif>">
+											<div class="card-body">
+												<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
+													<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
+													width="100%" height="400px" style="border:none;"></iframe>
+												<cfelse>
+													<div>#pc_faq_texto#</div>
+												</cfif>
+												
+											</div>
+										</div>
+									</div>
+							</cfoutput>
+						</cfloop>
 					</div>
 				</div>
 			</div>

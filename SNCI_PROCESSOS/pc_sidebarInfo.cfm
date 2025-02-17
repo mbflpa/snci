@@ -132,6 +132,24 @@
     #toggleSidebar.radiate {
         animation: radiate 1s infinite;
     }
+    /* Novo estilo para as badges de leitura */
+			.read-status-badge {
+				position: absolute;
+				top: -12px;
+				left: 0px;
+				padding: 2px 8px;
+				border-radius: 10px;
+				font-size: 11px;
+				z-index: 1;
+				color: white;
+				white-space: nowrap;
+			}
+			.unread {
+				background-color: #dc3545;
+			}
+			.read {
+				background-color: #28a745;
+			}
 </style>
 
 <!-- HTML do Sidebar e Botão -->
@@ -151,36 +169,97 @@
 <!-- jQuery para controlar o comportamento do Sidebar -->
 <script>
     $(document).ready(function(){
-        // Inicia a animação do estilingue 2000ms após a carga da página
+        // Define estilo inicial do botão como vermelho
+        const btn = $("#toggleSidebar");
+        btn.css({
+            'background': 'linear-gradient(135deg, #ff416c, #ff4b2b)',
+            'box-shadow': '0 4px 10px rgba(0,0,0,0.2)'
+        });
+
+        // Função que atualiza a aparência do botão baseado no status das FAQs
+        function updateButtonAppearance() {
+            let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
+            let totalBadges = $('.read-status-badge').length;
+            let readBadges = $('.read-status-badge.read').length;
+
+            // Só muda para verde se houver badges e todas estiverem lidas
+            if (totalBadges > 0 && totalBadges === readBadges) {
+                btn.css({
+                    'background': '#28a745',
+                    'box-shadow': 'none',
+                    'transform': 'none'
+                });
+            } else {
+                btn.css({
+                    'background': 'linear-gradient(135deg, #ff416c, #ff4b2b)',
+                    'box-shadow': '0 4px 10px rgba(0,0,0,0.2)'
+                });
+            }
+        }
+
+        // Função que controla todas as animações do botão
+        function controlButtonAnimations() {
+            let totalBadges = $('.read-status-badge').length;
+            let readBadges = $('.read-status-badge.read').length;
+            const btn = $("#toggleSidebar");
+
+            updateButtonAppearance(); // Atualiza a aparência primeiro
+            updateCircleAnimation(); // Nova chamada para controlar o círculo separadamente
+
+            // Se todas as FAQs estão lidas ou não há FAQs
+            if (totalBadges === 0 || totalBadges === readBadges) {
+                // Cancela e remove animações
+                clearTimeout(window.animationTimeout);
+                btn.removeClass('stretching returning btn-5 radiate shake');
+                $('.dash-circle, .circle-text').css('animation', 'none');
+                btn.off('mouseenter mouseleave');
+                return false;
+            }
+            return true;
+        }
+
+        // Verificação inicial ao carregar
         setTimeout(function() {
+            updateButtonAppearance();
             const btn = $("#toggleSidebar");
             const animate = async () => {
+                if (!controlButtonAnimations()) return; // Retorna se não deve animar
+                
                 btn.addClass('stretching');
-                await new Promise(resolve => setTimeout(resolve, 700)); // tempo de esticada
+                await new Promise(resolve => setTimeout(resolve, 700));
                 btn.addClass('returning').removeClass('stretching');
-                // Removemos o delay para iniciar imediatamente o efeito de pêndulo
                 await new Promise(resolve => setTimeout(resolve, 0));
                 btn.removeClass('returning');
                 btn.css('transform', '');
-                btn.addClass('btn-5'); // Aplica o efeito .btn-5 ao retornar
-                btn.addClass('radiate'); // Aplica efeito radiação moderno
-                await new Promise(resolve => setTimeout(resolve, 5000)); // Dura 5s
-                btn.removeClass('radiate');
+                if (controlButtonAnimations()) { // Verifica novamente antes de adicionar efeitos
+                    btn.addClass('btn-5 radiate');
+                    window.animationTimeout = setTimeout(() => {
+                        btn.removeClass('radiate');
+                    }, 5000);
+                }
             };
             animate();
-        }, 2000); // alterado para 2000ms
+        }, 2000);
 
+        // Verificações periódicas
+        setInterval(updateButtonAppearance, 500);
+        setInterval(controlButtonAnimations, 500);
+
+        // Modifica o click handler para verificar os efeitos
         $("#toggleSidebar").click(function(e){
             e.stopPropagation();
             $("#importantSidebar").toggleClass("open");
             $("#toggleSidebar").css({ left: "auto", right: "0" });
-            // Pausar ou reiniciar a animação de .dash-circle e .circle-text
+            
+            // Pausa a animação apenas quando o sidebar está aberto
             if($("#importantSidebar").hasClass("open")){
-                $(".dash-circle, .dash-circle .circle-text").css("animation-play-state", "paused");
+                $(".dash-circle, .circle-text").css("animation-play-state", "paused");
             } else {
-                $(".dash-circle, .dash-circle .circle-text").css("animation-play-state", "running");
+                // Ao fechar, verifica se deve voltar a girar
+                updateCircleAnimation();
             }
         });
+
         $(document).on("mousemove", function(e){
             if($("#importantSidebar").hasClass("open") &&
                $(e.target).closest("#importantSidebar, #toggleSidebar").length === 0){
@@ -190,6 +269,9 @@
                    $(".dash-circle, .dash-circle .circle-text").css("animation-play-state", "running");
             }
         });
+
+        // Verifica o status a cada 500ms
+        setInterval(controlButtonAnimations, 500);
     });
     
     // Adiciona função mostraFormFaq() para carregar os FAQs
@@ -235,5 +317,72 @@
             $('#modal-danger').find('.modal-body').text(thrownError);
         });
     }
+
+    // Função que controla as animações do círculo
+    function updateCircleAnimation() {
+        let totalBadges = $('.read-status-badge').length;
+        let readBadges = $('.read-status-badge.read').length;
+        const hasUnreadFaqs = totalBadges > 0 && totalBadges !== readBadges;
+
+        if (hasUnreadFaqs) {
+            // Se existem FAQs não lidas, reinicia as animações
+            $('.dash-circle').css('animation', 'spin 2s linear infinite');
+            $('.circle-text').css('animation', 'counter-spin 2s linear infinite');
+        } else if (totalBadges === 0) {
+            // Se não existem FAQs, para as animações
+            $('.dash-circle, .circle-text').css('animation', 'none');
+        }
+        // Se todas as FAQs estão lidas mas existem FAQs, mantém girando
+    }
+</script>
+
+<script>
+$(document).ready(function() {
+    checkUnreadFaqs();
+
+    // Função para verificar se existem FAQs não lidas
+    function checkUnreadFaqs() {
+        let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
+        let hasUnread = false;
+        let totalBadges = $('.read-status-badge').length;
+        let readBadges = $('.read-status-badge.read').length;
+
+        // Se todas as badges estão marcadas como lidas
+        if (totalBadges > 0 && totalBadges === readBadges) {
+            const $toggleButton = $('#toggleSidebar');
+            
+            // Remove todas as animações e efeitos
+            $toggleButton
+                .removeClass('stretching returning btn-5 radiate shake')
+                .find('.dash-circle, .circle-text')
+                .css('animation', 'none');
+            
+            // Para a animação do círculo
+            $('.dash-circle').css('animation', 'none');
+            $('.circle-text').css('animation', 'none');
+            
+            // Remove qualquer estilo inline residual
+            $toggleButton.attr('style', '');
+            
+            // Remove o efeito de brilho/sombra
+            $toggleButton.css({
+                'box-shadow': 'none',
+                'background': '#28a745', // Cor mais neutra quando todas estão lidas
+                'transform': 'none'
+            });
+            
+            // Desabilita os eventos de animação
+            $toggleButton.off('mouseenter mouseleave');
+        }
+    }
+
+    // Aumenta a frequência de verificação para 500ms
+    setInterval(checkUnreadFaqs, 500);
+
+    // Adiciona verificação após qualquer interação com FAQ
+    $(document).on('click', '.collapse', function() {
+        setTimeout(checkUnreadFaqs, 100);
+    });
+});
 </script>
 <!-- Fim do componente do Sidebar -->
