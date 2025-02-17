@@ -2525,41 +2525,19 @@ $('#cd_frmsobra').click(function(){
 CKEDITOR.replace('melhoria', {
       // Define the toolbar groups as it is a more accessible solution.
 	  width: '1020',
-		height: 300,
+		height: 350,
 		removePlugins: 'scayt',
         disableNativeSpellChecker: false,
 		line_height:'1px',
-      toolbarGroups: [
-		{
-          "name": "document",
-          "groups": ["mode"]
-        },
-		{
-          "name": "basicstyles",
-          "groups": ["basicstyles"]
-        },
-        {
-          "name": "links",
-          "groups": ["links"]
-        },
-        {
-          "name": "paragraph",
-          "groups": ["list", "blocks"]
-        },
-
-        {
-          "name": "insert",
-          "groups": ["insert"]
-        },
-        {
-          "name": "styles",
-          "groups": ["styles"]
-        },
-		{
-          "name": "about",
-          "groups": ["about"]
-        }
-      ],
+		toolbar: [
+			[ 'Preview', 'Print', '-' ],
+			[ 'Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat','-', 'Undo', 'Redo', '-','Find' ],
+			['SelectAll', '-'],
+			[ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-'],
+			[ 'NumberedList', 'BulletedList', '-',  'Blockquote','-','Outdent', 'Indent', '-' ], 
+			['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
+			['HorizontalRule','SpecialChar', '-','TextColor', 'BGColor','Maximize','Table'  ]
+		]
       // Remove the redundant buttons from toolbar groups defined above.
       //removeButtons: 'Strike,Subscript,Superscript,Specialchar,PasteFromWord'
     });
@@ -2576,7 +2554,7 @@ CKEDITOR.replace('melhoria', {
 			[ 'Preview', 'Print', '-' ],
 			[ 'Cut', 'Copy', 'Paste', 'PasteText', 'RemoveFormat','-', 'Undo', 'Redo', '-','Find' ],
 			['SelectAll', '-'],
-			[ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat' ],
+			[ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-' ],
 			[ 'NumberedList', 'BulletedList', '-',  'Blockquote','-','Outdent', 'Indent', '-'], 
 			['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
 			['HorizontalRule','SpecialChar', '-','TextColor', 'BGColor','Maximize','Table'  ]

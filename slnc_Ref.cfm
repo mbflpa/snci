@@ -102,6 +102,9 @@ aux_ano:#aux_ano#  === aux_mes:#aux_mes#<br>
 <CFSET GIL = GIL>   
 </cfoutput>
 --->
+<cfif (grpacesso eq 'SUPERINTENDENTE')>
+	<cfset dtlimit = "2024/12/31">
+</cfif>
 <cfoutput>
 <cfif grpacesso eq 'SUPERINTENDENTE' OR grpacesso eq 'GERENTES' OR grpacesso eq 'ORGAOSUBORDINADOR' OR grpacesso eq 'SUBORDINADORREGIONAL'>
     <cflocation url="slnc.cfm?se=#qAcesso.Usu_DR#&frmano=#year(dtlimit)#&anoexerc=#year(dtlimit)#&dtlimit=#dtlimit#&anoatual=year(now())">
@@ -117,6 +120,7 @@ aux_ano:#aux_ano#  === aux_mes:#aux_mes#<br>
 
 function valida_form() {
     var frm = document.forms[0];
+
     if (frm.se.value=='---'){
 	  alert('Informar a Superintendência!');
 	  frm.se.focus();
@@ -132,6 +136,11 @@ function valida_form() {
 	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 
+	if (eval(frm.frmano.value) == eval(frm.anoatual.value) && (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
+		alert('Usuário(a), o ano/mês selecionado ainda não disponível!');
+		frm.frmano.focus();
+		return false;
+	}		
 //alert(frm.anoatual.value + '  ' + frm.frmano.value + '  ' + frm.dtlimit.value);
 
 	//alert(frm.dtlimit.value);
@@ -154,8 +163,6 @@ function valida_form() {
 	  frm.trimetre.focus();
 	  return false;
 	} 	 
-
-//return false;
 }
 function mudar(a){
 //alert(a);
@@ -164,6 +171,7 @@ function mudar(a){
 //if (a == 'tri') {frm.mes.selectedIndex = 0;}
 }
 //================
+
 </script>
  <link href="css.css" rel="stylesheet" type="text/css">
 </head>
@@ -335,6 +343,7 @@ function mudar(a){
 	  <input name="dtlimitatual" type="hidden" value="<cfoutput>#dtlimit#</cfoutput>">
 	  <input name="anoexerc" type="hidden" value="<cfoutput>#year(dtLimit)#</cfoutput>">
 	  <input name="anoatual" type="hidden" value="<cfoutput>#year(now())#</cfoutput>">
+	  <input name="frmUsuGrupoAcesso" type="hidden" value="<cfoutput>#grpacesso#</cfoutput>">
 	   
 <!--- <cfoutput>#dtlimit#</cfoutput><br>
 <cfoutput>#dtlimit#</cfoutput><br>

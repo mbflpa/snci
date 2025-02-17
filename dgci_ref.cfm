@@ -115,6 +115,11 @@ function valida_form() {
 	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 
+	if (eval(frm.frmano.value) == eval(frm.anoatual.value)&& (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
+		alert('Usuário(a), o ano/mês selecionado ainda não disponível!');
+		frm.frmano.focus();
+		return false;
+  	}
 }
 
 </script>

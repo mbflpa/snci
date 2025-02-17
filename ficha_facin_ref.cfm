@@ -17,6 +17,7 @@
 <cfoutput>
 	<!--- ================= --->
 	<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
+		<cfset somenteavaliarmeta3='N'>		
 		<cfquery datasource="#dsn_inspecao#" name="rsIncluir">
 			SELECT  RIP_NumGrupo,RIP_NumItem,Fun_Nome
 			FROM Resultado_Inspecao 
@@ -29,7 +30,20 @@
 			</cfif>
 			order by RIP_NumGrupo, RIP_NumItem
 		</cfquery>	
-		<cfif rsIncluir.recordcount lte 0>
+
+		<cfquery datasource="#dsn_inspecao#" name="rsalter">
+			SELECT RIP_Unidade, RIP_NumGrupo,RIP_NumItem,Fun_Nome
+			FROM Resultado_Inspecao 
+			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
+			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
+			INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_Unidade = FACA_Unidade) AND (RIP_NumInspecao = FACA_Avaliacao) and (RIP_NumGrupo=FACA_grupo) and (RIP_NumItem=FACA_Item)
+			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and FACA_Matricula = '#qAcesso.Usu_Matricula#' and INP_DTConcluirRevisao is not null
+			<cfif grpacesso eq 'INSPETORES'>
+				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
+			</cfif>
+			order by RIP_NumGrupo, RIP_NumItem
+		</cfquery>
+		<cfif rsIncluir.recordcount lte 0 and rsalter.recordcount lte 0>
 			<cfquery datasource="#dsn_inspecao#" name="rsIncluir">
 				SELECT top 1 RIP_NumGrupo,RIP_NumItem,Fun_Nome
 				FROM Resultado_Inspecao 
@@ -43,40 +57,25 @@
 				order by RIP_NumGrupo, RIP_NumItem
 			</cfquery>	
 		</cfif>
-		<cfquery datasource="#dsn_inspecao#" name="rsalter">
-			SELECT RIP_Unidade, RIP_NumGrupo,RIP_NumItem,Fun_Nome
-			FROM Resultado_Inspecao 
-			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
-			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
-			INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_Unidade = FACA_Unidade) AND (RIP_NumInspecao = FACA_Avaliacao) and (RIP_NumGrupo=FACA_grupo) and (RIP_NumItem=FACA_Item)
-			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and FACA_Matricula = '#qAcesso.Usu_Matricula#' and INP_DTConcluirRevisao is not null
-			<cfif grpacesso eq 'INSPETORES'>
-				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
-			</cfif>
-			order by RIP_NumGrupo, RIP_NumItem
-		</cfquery>
-
 		<cfquery datasource="#dsn_inspecao#" name="rsBase">
 			SELECT RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_MatricAvaliador, RIP_Recomendacao_Inspetor, RIP_Data_Avaliador, RIP_Matricula_Reanalise, RIP_Correcao_Revisor, RIP_DtUltAtu_Revisor, RIP_UserName_Revisor,Fun_Nome,Usu_Apelido,INP_DTConcluirAvaliacao,INP_DTConcluirRevisao
 			FROM Resultado_Inspecao 
 			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
 			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
-			INNER JOIN Usuarios ON RIP_UserName_Revisor = Usu_Login
+			INNER JOIN Usuarios ON INP_RevisorLogin = Usu_Login
 			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and (RIP_Recomendacao_Inspetor is not null or RIP_Correcao_Revisor = '1') and INP_DTConcluirRevisao is not null
 		</cfquery>
-		<cfset somenteavaliarmeta3='N'>
 		<cfif rsBase.recordcount lte 0>
 			<cfquery datasource="#dsn_inspecao#" name="rsBase">
 				SELECT top 1 RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_MatricAvaliador, RIP_Recomendacao_Inspetor, RIP_Data_Avaliador, RIP_Matricula_Reanalise, RIP_Correcao_Revisor, RIP_DtUltAtu_Revisor, RIP_UserName_Revisor,Fun_Nome,Usu_Apelido,INP_DTConcluirAvaliacao,INP_DTConcluirRevisao
 				FROM Resultado_Inspecao 
 				INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
 				INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
-				INNER JOIN Usuarios ON RIP_UserName_Revisor = Usu_Login
+				INNER JOIN Usuarios ON INP_RevisorLogin = Usu_Login
 				WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and INP_DTConcluirRevisao is not null
 			</cfquery>
-			<cfif rsBase.recordcount gt 0><cfset somenteavaliarmeta3='S'></cfif>
 		</cfif>
-
+		<cfif rsIncluir.recordcount lte 0 and rsalter.recordcount gt 0><cfset somenteavaliarmeta3='S'></cfif>
 		<cfquery datasource="#dsn_inspecao#" name="rsFacin">
 			select FAC_DtConcluirFacin,Usu_Apelido
 			from UN_Ficha_Facin 
@@ -266,7 +265,12 @@
 			<cfset correcao = 'Não'>
 			<cfif trim(rsBase.RIP_Matricula_Reanalise) neq ''><cfset reanalise = 'Sim'></cfif>
 			<cfif trim(rsBase.RIP_Correcao_Revisor) neq ''><cfset correcao = 'Sim'></cfif>
-			<cfset h1 = DateDiff("h",rsBase.RIP_Data_Avaliador,rsBase.RIP_DtUltAtu_Revisor)>
+			<cfif trim(rsBase.RIP_DtUltAtu_Revisor) neq ''>
+				<cfset h1 = DateDiff("h",rsBase.RIP_Data_Avaliador,rsBase.RIP_DtUltAtu_Revisor)>
+			<cfelse>
+				<cfset h1 = 0>
+			</cfif>
+			
 			<cfset h2 = DateDiff("h",rsBase.RIP_Data_Avaliador,rsBase.INP_DTConcluirAvaliacao)>
 			<cfset h3 = DateDiff("h",rsBase.INP_DTConcluirAvaliacao,rsBase.INP_DTConcluirRevisao)>
 			<cfset ripresposta =  rsBase.RIP_Resposta>
