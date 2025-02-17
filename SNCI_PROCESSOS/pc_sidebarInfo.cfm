@@ -185,19 +185,25 @@
             let totalBadges = $('.read-status-badge').length;
             let readBadges = $('.read-status-badge.read').length;
             const btn = $("#toggleSidebar");
+            const sidebarOpen = $("#importantSidebar").hasClass("open");
 
             updateButtonAppearance(); // Atualiza a aparência primeiro
-            updateCircleAnimation(); // Nova chamada para controlar o círculo separadamente
+            updateCircleAnimation(); // Controla o círculo separadamente
 
-            // Se todas as FAQs estão lidas ou não há FAQs
-            if (totalBadges === 0 || totalBadges === readBadges) {
-                // Cancela e remove animações
-                clearTimeout(window.animationTimeout);
+            // Se todas as FAQs estão lidas, não há FAQs, ou o sidebar está aberto
+            if (totalBadges === 0 || totalBadges === readBadges || sidebarOpen) {
+                // Remove todas as animações
                 btn.removeClass('stretching returning btn-5 radiate shake');
                 $('.dash-circle, .circle-text').css('animation', 'none');
                 btn.off('mouseenter mouseleave');
                 return false;
             }
+
+            // Se chegou aqui, significa que há FAQs não lidas e o sidebar está fechado
+            if (!btn.hasClass('radiate')) {
+                btn.addClass('btn-5 radiate');
+            }
+            
             return true;
         }
 
@@ -216,9 +222,6 @@
                 btn.css('transform', '');
                 if (controlButtonAnimations()) { // Verifica novamente antes de adicionar efeitos
                     btn.addClass('btn-5 radiate');
-                    window.animationTimeout = setTimeout(() => {
-                        btn.removeClass('radiate');
-                    }, 5000);
                 }
             };
             animate();
@@ -234,11 +237,12 @@
             $("#importantSidebar").toggleClass("open");
             $("#toggleSidebar").css({ left: "auto", right: "0" });
             
-            // Pausa a animação apenas quando o sidebar está aberto
+            // Atualiza as animações baseado no estado do sidebar
             if($("#importantSidebar").hasClass("open")){
+                $(this).removeClass('radiate');
                 $(".dash-circle, .circle-text").css("animation-play-state", "paused");
             } else {
-                // Ao fechar, verifica se deve voltar a girar
+                controlButtonAnimations();
                 updateCircleAnimation();
             }
         });

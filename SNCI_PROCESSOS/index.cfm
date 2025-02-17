@@ -146,17 +146,17 @@
                 })//fim ajax
             }//
 
-            // $(".menuRapidoGrid .menuRapido_iconGrid").each(function (index) {
-            //     setTimeout(() => {    
-            //         $(this).delay(100 * index).queue(function (next) {
-            //             $(this).addClass("menuRapido_iconGrid_animacao");
-            //             setTimeout(() => {
-            //                 $(this).removeClass("menuRapido_iconGrid_animacao");
-            //             }, 200); // Tempo para remover a classe após a animação (500ms)
-            //             next();
-            //         });
-            //     }, 1000);     
-            // });
+            $(".menuRapidoGrid .menuRapido_iconGrid").each(function (index) {
+                setTimeout(() => {    
+                    $(this).delay(100 * index).queue(function (next) {
+                        $(this).addClass("menuRapido_iconGrid_animacao");
+                        setTimeout(() => {
+                            $(this).removeClass("menuRapido_iconGrid_animacao");
+                        }, 200); // Tempo para remover a classe após a animação (500ms)
+                        next();
+                    });
+                }, 1000);     
+            });
             //se o usuário for do perfil 11 (CI - MASTER ACOMPANHAMENTO (Gestor Nível 4)), executa a função para enviar os e-mails de cobrança
             if (usuarioPerfil == '11') {
                 executaRotinasEmailsCobranca();
