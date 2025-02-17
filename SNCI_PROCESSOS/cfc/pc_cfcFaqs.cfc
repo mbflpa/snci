@@ -1343,7 +1343,7 @@
 				<div class="col-12">
 					<!-- Encapsula a tabela em um container, se necessário -->
 					<div id="accordionFaq">
-						<h4 style="color:#cd0001;margin-bottom:20px!important;">
+						<h4 style="color:#808080;margin-bottom:20px!important;">
 						<cfif rsFaqs.recordCount eq 1>
 							Informação Importante
 						<cfelse>
@@ -1354,11 +1354,11 @@
 							<cfoutput>
 									<div class="card  card-outline" style="border-top: 3px solid #pc_faq_tipo_cor#;">
 										<a class="d-block w-100" data-toggle="collapse" href="##collapse#pc_faq_id#" role="button" aria-expanded="false">
-											<div class="card-header" style="text-align: center;<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .2rem 1.0rem!important;">
+											<div class="card-header" style="text-align: center;<cfif pc_faq_status eq 'D'>background-color: ##e5e5eb; color:red</cfif>; padding: .3rem .5rem!important;">
 												<!-- Nova badge de status de leitura -->
 												<span class="read-status-badge unread" id="badge_#pc_faq_id#">Não lida</span>
 												<cfset dataFaq = DateFormat(pc_faq_atualiz_datahora, 'DD-MM-YYYY') & '-' & TimeFormat(pc_faq_atualiz_datahora, 'HH') & 'h' & TimeFormat(pc_faq_atualiz_datahora, 'MM') & 'min'>
-												<h4 class="card-title 1-300" style="margin:8px">
+												<h4 class="card-title 1-300" style="margin:4px;font-size:0.95em">
 													<cfif pc_faq_status eq 'D'>
 														<span class="badge badge-warning navbar-badge" style="float: left; right: initial; top: 1px;">Desativado</span>
 													</cfif>
@@ -1367,7 +1367,7 @@
 												<div class="card-tools">
 													<!-- Alteração: botão que abre o card em outra aba -->
 													<button type="button" class="btn btn-tool" onclick="openCollapseContent(#pc_faq_id#)">
-														<i class="fas fa-expand" style="font-size:30px; display:block; margin:auto;margin-top: 10px;"></i>
+														<i class="fas fa-expand" style="font-size:30px; display:block; margin:auto;margin-top:0px;"></i>
 													</button>
 												</div>
 												
