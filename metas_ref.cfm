@@ -43,7 +43,11 @@ function validarform() {
 //alert(frm.frmdia.value);
 
 	//alert('frmanoselecionado ' + frm.frmano.value + ' Ano atual ' + frm.frmanoatual.value + ' Mes selecionado ' + frm.frmmes.value + ' mes atual: ' + mesatual);	
-	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
+	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value)&& (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
+    alert('Usuário(a), o ano/mês selecionado ainda não disponível!');
+    return false;
+  }
+  if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
 	{
     if (eval(messelec) > eval(mesatual)){
       alert('Usuário(a), o mês selecionado para o ano selecionado ainda não gerado!');

@@ -98,6 +98,9 @@ dtlimit:#dtlimit#
 <cfset gil=gil>
 </cfoutput>
 --->
+<cfif (grpacesso eq 'SUPERINTENDENTE')>
+	<cfset dtlimit = "2024/12/31">
+</cfif>
 <cfif grpacesso eq 'SUPERINTENDENTE' OR grpacesso eq 'GERENTES' OR grpacesso eq 'ORGAOSUBORDINADOR' OR grpacesso eq 'SUBORDINADORREGIONAL'>
     <cflocation url="prci.cfm?se=#qAcesso.Usu_DR#&anoexerc=#year(dtlimit)#&dtlimit=#dtlimit#&frmano=#year(dtlimit)#&anoatual=year(now())"> 
 	<!--- <cfinclude template="cabecalho.cfm"> --->
@@ -125,6 +128,11 @@ function valida_form() {
 	alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 	
+	if (eval(frm.frmano.value) == eval(frm.anoatual.value)&& (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
+		alert('Usuário(a), o ano/mês selecionado ainda não disponível!');
+		frm.frmano.focus();
+		return false;
+  	}	
 //=========================================	
 	if (frm.mes.value=='---'){
 	  alert('Informar o Mês!');
@@ -318,7 +326,7 @@ function mudar(a){
 			</td>
           </tr>
           <td>&nbsp;</td>
-          <td colspan="2"><div align="right">
+          <td colspan="2"><div align="center">
             <input name="Submit1" type="submit" class="botao" id="Submit1" value="Confirmar" onClick="document.frmObjeto.ckTipo.value='ano';">
           </div></td>
         </tr>
@@ -335,6 +343,7 @@ function mudar(a){
 	  <input name="dtlimitatual" type="hidden" value="<cfoutput>#dtlimit#</cfoutput>">
 	  <input name="anoexerc" type="hidden" value="<cfoutput>#year(dtLimit)#</cfoutput>">
 	  <input name="anoatual" type="hidden" value="<cfoutput>#year(now())#</cfoutput>">
+	  <input name="frmUsuGrupoAcesso" type="hidden" value="<cfoutput>#grpacesso#</cfoutput>">
 <!--- <cfoutput>#dtlimit#</cfoutput><br>
 <cfoutput>#dtlimit#</cfoutput><br>
 <cfoutput>#year(dtLimit)#</cfoutput><br>
