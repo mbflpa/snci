@@ -1409,19 +1409,9 @@
 			</div>
 		</cfif>
 		<script language="JavaScript">	
-			$(function(){
-				$("#gridFaq").DataTable({
-					responsive: true,
-					paging: false,         // Exibe todas as linhas (paginação desabilitada)
-					ordering: false,
-					autoWidth: false,
-					lengthChange: false,   // Impede a seleção de quantidade de linhas
-					dom: 't',             // Modificado: Apenas exibe a tabela, remove a busca
-					language: {
-						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json",
-						info: "" // Remove a informação de registros
-					}
-					});
+			$(document).ready(function() {
+				validarFaqsStorage();
+
 				// Nova regra para garantir que ao abrir um FAQ os demais sejam fechados (comportamento accordion)
 				$('.collapse').on('show.bs.collapse', function(){
 					// Encontra o ícone de expansão dentro do card atual
@@ -1605,6 +1595,28 @@
 					alert("Conteúdo não encontrado!");
 				}
 			}
+
+			function validarFaqsStorage() {
+				let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
+				if (readFaqs.length === 0) return;
+
+				$.ajax({
+					type: "POST",
+					url: "cfc/pc_cfcFaqs.cfc",
+					data: {
+						method: "validarFaqsExistentes",
+						faqIds: readFaqs.join(',')
+					},
+					dataType: "json",
+					success: function(response) {
+						// Filtra apenas os IDs que ainda existem no banco
+						let faqsValidos = readFaqs.filter(id => response.includes(parseInt(id)));
+						localStorage.setItem('readFaqs', JSON.stringify(faqsValidos));
+					}
+				});
+			}
+
+
 			
 		</script>
  	</cffunction>
@@ -1786,6 +1798,10 @@
 
 							})//fim ajax
 							.done(function(result) {
+								// Remove o ID do FAQ do localStorage
+								let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
+								readFaqs = readFaqs.filter(id => id !== faqId.toString());
+								localStorage.setItem('readFaqs', JSON.stringify(readFaqs));
 								mostraFormCadFaq()
 								mostraTabFaq()	
 								$('#modalOverlay').delay(1000).hide(0, function() {
@@ -1958,5 +1974,24 @@
         <cfheader name="Content-Disposition" value="inline; filename=#arguments.nome#">
         <cfcontent type="application/pdf" file="#arguments.arquivo#" deleteFile="no">
     </cffunction>
+
+	<cffunction name="validarFaqsExistentes" access="remote" returntype="array" returnformat="json" hint="Verifica se os FAQs existem no banco de dados. Utilizado na inicialização de formFaqIndex, para excluir do localStorage os id dos FAQ excluídos ou sem prioridade máxima">
+		<cfargument name="faqIds" type="string" required="true">
+		
+		<cfquery name="qryFaqs" datasource="#application.dsn_processos#">
+			SELECT pc_faq_id 
+			FROM pc_faqs 
+			WHERE pc_faq_id IN (<cfqueryparam value="#arguments.faqIds#" list="true" cfsqltype="cf_sql_numeric">)
+			      and pc_faq_status = 'A'
+				  and pc_faq_tipo = 1
+		</cfquery>
+		
+		<cfset validIds = []>
+		<cfloop query="qryFaqs">
+			<cfset arrayAppend(validIds, pc_faq_id)>
+		</cfloop>
+		
+		<cfreturn validIds>
+	</cffunction>
 
 </cfcomponent>

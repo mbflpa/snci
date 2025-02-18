@@ -132,6 +132,11 @@
     #toggleSidebar.radiate {
         animation: radiate 1s infinite;
     }
+    #toggleSidebar.all-read:hover {
+        background: linear-gradient(135deg, var(--azul_claro_correios), var(--azul_correios)) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 4px 15px rgba(0, 114, 235, 0.3) !important;
+    }
     
 </style>
 
@@ -165,18 +170,18 @@
             let totalBadges = $('.read-status-badge').length;
             let readBadges = $('.read-status-badge.read').length;
 
-            // Só muda para verde se houver badges e todas estiverem lidas
+            // Só muda para azul se houver badges e todas estiverem lidas
             if (totalBadges > 0 && totalBadges === readBadges) {
                 btn.css({
-                    'background': 'var(--azul_claro_correios)',
+                    'background': 'linear-gradient(135deg,var(--azul_correios) , var(--azul_claro_correios))',
                     'box-shadow': 'none',
                     'transform': 'none'
-                });
+                }).addClass('all-read');  // Adiciona classe para controlar o hover
             } else {
                 btn.css({
                     'background': 'linear-gradient(135deg, #ff416c, #ff4b2b)',
                     'box-shadow': '0 4px 10px rgba(0,0,0,0.2)'
-                });
+                }).removeClass('all-read');  // Remove a classe quando não estiver tudo lido
             }
         }
 
@@ -354,7 +359,7 @@ $(document).ready(function() {
             // Remove o efeito de brilho/sombra
             $toggleButton.css({
                 'box-shadow': 'none',
-                'background': 'var(--azul_claro_correios)', // Cor mais neutra quando todas estão lidas
+                'background': 'linear-gradient(135deg,var(--azul_correios) , var(--azul_claro_correios))', // Cor mais neutra quando todas estão lidas
                 'transform': 'none'
             });
             
