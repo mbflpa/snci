@@ -134,14 +134,12 @@
                       <td width="11%"><div align="left"><strong>#auxsitudesc#</strong></div></td>
 					</cfif>					  
                     </tr>
-					</cfif>
-<!---          
-          <tr>
-            <td colspan="10" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>Manchete: #Itn_Manchete#</strong></div></td>
-          </tr>
-        --->          
+					</cfif>       
 			<cfif '#url.frmacao#' eq 'S'>
-					<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>
+              <tr>
+                <td colspan="10" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>Manchete: #Itn_Manchete#</strong></div></td>
+              </tr>        
+					      <cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>
                       <tr>
                         <td colspan="10"><div align="left"><strong>Composição da Pontuação</strong></div></td>
                       </tr>
@@ -177,7 +175,7 @@
                       <tr>
                         <td colspan="7">#ItnPreRelato#</td>
                       </tr>
-					</cfif>					  
+					      </cfif>					  
                       <tr>
                         <td  valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
                       </tr>
@@ -193,7 +191,7 @@
                       <tr>
                         <td colspan="10" valign="top" bordercolor="999999" bgcolor="" scope="row"><div style="text-align: justify;"><strong><u><i>Norma: </i></u></strong>#Itn_Norma#</div></td>
                       </tr>
-                    </cfif>
+    </cfif>
 					
                     <tr>
                       <td  valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>

@@ -37,7 +37,7 @@
 			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
 			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
 			INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_Unidade = FACA_Unidade) AND (RIP_NumInspecao = FACA_Avaliacao) and (RIP_NumGrupo=FACA_grupo) and (RIP_NumItem=FACA_Item)
-			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and FACA_Matricula = '#qAcesso.Usu_Matricula#' and INP_DTConcluirRevisao is not null
+			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and INP_DTConcluirRevisao is not null
 			<cfif grpacesso eq 'INSPETORES'>
 				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
 			</cfif>
@@ -56,6 +56,7 @@
 				</cfif>
 				order by RIP_NumGrupo, RIP_NumItem
 			</cfquery>	
+			
 		</cfif>
 		<cfquery datasource="#dsn_inspecao#" name="rsBase">
 			SELECT RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_MatricAvaliador, RIP_Recomendacao_Inspetor, RIP_Data_Avaliador, RIP_Matricula_Reanalise, RIP_Correcao_Revisor, RIP_DtUltAtu_Revisor, RIP_UserName_Revisor,Fun_Nome,Usu_Apelido,INP_DTConcluirAvaliacao,INP_DTConcluirRevisao
@@ -75,7 +76,7 @@
 				WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and INP_DTConcluirRevisao is not null
 			</cfquery>
 		</cfif>
-		<cfif rsIncluir.recordcount lte 0 and rsalter.recordcount gt 0><cfset somenteavaliarmeta3='S'></cfif>
+		<cfif rsBase.recordcount eq 1><cfset somenteavaliarmeta3='S'></cfif>
 		<cfquery datasource="#dsn_inspecao#" name="rsFacin">
 			select FAC_DtConcluirFacin,Usu_Apelido
 			from UN_Ficha_Facin 
@@ -245,7 +246,7 @@
   </div>
   <div class="row"><br><br><br><br></div>
   <cfif (isDefined("acao") and (rsIncluir.recordcount gt 0 or rsalter.recordcount gt 0 or somenteavaliarmeta3 eq 'S'))>
-	<table width="1000" class="table table-striped table-hover table-active" style="background:#bae6ce">
+	<table width="1400" class="table table-striped table-hover table-active" style="background:#bae6ce">
 		<thead>
 			<th>Grupo</th>
 			<th>Item</th>
@@ -337,7 +338,7 @@
 	}
 	//================
 	function aviso() {
-		
+		//alert($('#grpitem').val())
 		$('div#aviso').hide()
 		if($('#concfacin').val() != '' && $('#concfacin').val() != undefined && $('#concfacin').val() != null){
 			$('#aviso').html('Conclusão da FACIN realizada em: '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
@@ -357,6 +358,9 @@
 				$('#aviso').show(500)
 			}
 		} 
+		if($('#concfacin').val() == '' && ($('#grpitem').val() == '' || $('#grpitem').val() == null) && $('#grpitem2').val() != null) {
+			$('#aviso').show(500)
+		}
    	}
 
 	function concluir(){
