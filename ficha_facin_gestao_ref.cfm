@@ -1,0 +1,415 @@
+<cfprocessingdirective pageEncoding ="utf-8">
+<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
+    <cfinclude template="aviso_sessao_encerrada.htm">
+	  <cfabort>  
+</cfif>   
+<!---  --->
+
+<cfquery name="qAcesso" datasource="#dsn_inspecao#">
+SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena, Dir_Descricao, Usu_Matricula
+FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR 
+WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+order by Dir_Sigla
+</cfquery>
+<!---  --->
+<cfquery name="rsAnoPacin" datasource="#dsn_inspecao#">    
+    SELECT PTC_Ano 
+    FROM Pontuacao 
+    GROUP BY PTC_Ano 
+    HAVING (PTC_Ano) >= 2018
+    order by PTC_Ano desc
+</cfquery>   
+
+<cfset auxanoatu = year(now())>
+<cfquery name="rsAno" datasource="#dsn_inspecao#">
+SELECT Andt_AnoExerc
+FROM Andamento_Temp
+GROUP BY Andt_AnoExerc
+HAVING Andt_AnoExerc  < '#auxanoatu#'
+ORDER BY Andt_AnoExerc DESC
+</cfquery>
+<!--- =========================== --->
+
+<html>
+<head>
+<title>Sistema Nacional de Controle Interno</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">  
+
+<script language="javascript">
+
+function validarform() {
+//alert('aqui....');
+    var frm = document.forms[0];
+	var messelec = frm.frmmes.value;
+	var mesatual = frm.frmmesatual.value;
+//alert(frm.frmUsuGrupoAcesso.value);
+//alert(frm.frmdia.value);
+
+	//alert('frmanoselecionado ' + frm.frmano.value + ' Ano atual ' + frm.frmanoatual.value + ' Mes selecionado ' + frm.frmmes.value + ' mes atual: ' + mesatual);	
+	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
+	{
+	if (eval(messelec) >= eval(mesatual)){
+	alert('Gestor(a), o m�s selecionado para o ano selecionado ainda n�o gerado!');
+	return false;
+	}
+
+    if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmdia.value <= 10){
+	alert('Gestor(a), o m�s selecionado para o ano selecionado ainda n�o gerado!');
+	return false;
+	}	
+	} 
+
+
+//return false;
+}
+</script>
+ <link href="css.css" rel="stylesheet" type="text/css">
+</head>
+<br>
+<body>
+
+<!--- <cfinclude template="cabecalho.cfm"> --->
+<tr>
+   <td colspan="6" align="center">&nbsp;</td>
+</tr>
+
+<!--- �rea de conte�do   --->
+	<form action="Pacin_Unidades_Avaliacao.cfm" method="post" target="_blank" name="frmObjeto" onSubmit="return validarform()">
+	  <table width="30%" align="center">
+       
+        <tr>
+          <td colspan="5" align="center" class="titulo2"><div class="row" align="center"><strong>FICHA DE AVALIAÇÃO (FACIN) - RESULTADOS</strong></div></td>
+        </tr>
+		    <tr>
+          <td colspan="5" align="center" class="titulo1">&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="5" align="center">&nbsp;</td>
+        </tr>
+        <tr>
+          <td colspan="5" align="center" class="titulos"><div class="row" align="left"><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Filtros seleção:
+          </strong></div></td>
+        </tr>
+        <tr>
+          <td width="2%"></td>
+          <td colspan="4"><strong>
+          </strong><strong><span class="exibir">
+          </span></strong></td>
+        </tr> 
+        <cfset cont = 0>		  
+        <tr>
+            <td>&nbsp;</td>
+            <td class="exibir"><strong>Exercício &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
+            <td colspan="2">
+                <select name="frmano" id="frmano" class="form-select">
+                    <cfloop query="rsAnoPacin">                                             
+                        <option value="<cfoutput>#rsAnoPacin.PTC_Ano#</cfoutput>"><cfoutput>#rsAnoPacin.PTC_Ano#</cfoutput></option>
+                    </cfloop>
+                </select>
+            </td>
+        </tr>
+        <tr><td>&nbsp;</td></tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td class="exibir"><strong>Período&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
+          <td>         
+            <div class="row" align="left">
+              <div class="col" align="center">
+                Início
+              </div>
+            </div>        
+          </td>
+          <td>            
+            <div class="row" align="left">
+              <div class="col" align="center">
+                Final
+              </div>
+            </div>  
+          </td>
+        </tr> 
+        <tr>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>
+            <div class="row" align="left">
+              <div class="col" align="left">
+                <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA">
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="row" align="left">
+              <div class="col" align="left">
+                <input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA">
+              </div>
+            </div>
+          </td>
+        </tr> 
+        <tr>
+          <td>&nbsp;</td>
+        </tr>   
+        <tr>
+          <td>&nbsp;</td>
+          <td width="39%" class="exibir"><strong>Superintendência: </strong></td>
+          <td width="59%" colspan="2">
+          <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>	
+                  <cfquery name="rsSE" datasource="#dsn_inspecao#">
+                    SELECT Dir_Codigo, Dir_Sigla
+                    FROM Diretoria
+                    WHERE Dir_Codigo <> '01'
+                  </cfquery>		
+                  <select name="frmse" id="frmse" class="form-select">
+                    <cfoutput query="rsSE">
+                        <option value="#Dir_Codigo#">#Dir_Sigla#</option>
+                    </cfoutput>
+                  </select>	
+          <cfelse>
+                <cfset auxcord = trim(qAcesso.Usu_Coordena)>
+                <cfquery name="rsSE" datasource="#dsn_inspecao#">
+                  SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where dir_codigo in(#auxcord#)
+                </cfquery>
+                <select name="frmse" id="frmse" class="form-select">
+                  <option value="" selected>---</option>
+                  <cfoutput query="rsSE">
+                        <option value="#rsSE.Dir_Codigo#">#Ucase(trim(rsSE.Dir_Sigla))#</option>
+                  </cfoutput>
+                </select>    
+          </cfif>	
+          <br>		
+          </td>
+        </tr>              
+        <tr>
+          <td>&nbsp;</td>
+          <td class="exibir"><strong>Inspetores&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
+          <td colspan="2">
+              <select name="frminspetores" id="frminspetores" class="form-select">                                          
+                      <option value="">---</option>
+              </select>
+          </td>
+        </tr> 
+        <tr><td>&nbsp;</td></tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td class="exibir"><strong>Avaliações&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
+          <td colspan="2">
+              <select name="frmavaliacao" id="frmavaliacao" class="form-select">                                          
+                  <option value="">---</option>
+              </select>
+          </td>
+        </tr>  
+        <tr><td>&nbsp;</td></tr>  
+        <tr><td>&nbsp;</td></tr>             
+        <tr> 
+          <td>&nbsp;</td>
+            <td colspan="3">
+              <div  class="row" align="center">
+                <input name="Submit1" type="submit" class="btn btn-primary" id="Submit1" value="Confirmar">
+              </div></td>
+          </tr>
+          <tr>
+          <td>&nbsp;</td>
+          <td colspan="3">&nbsp;</td>
+          </tr>
+      </table>
+      <!---  style="display:none;" --->
+	    <div id='table'>
+      </div>
+<!--- 	  <input name="grupoacesso" type="hidden" value="<cfoutput>#qAcesso.Usu_GrupoAcesso#</cfoutput>">
+	  <input name="usucoordena" type="hidden" value="<cfoutput>#qAcesso.Usu_Coordena#</cfoutput>"> --->
+	</form>
+</body>
+<script src="public/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="public/axios.min.js"></script>
+<script>
+      //buscar o inspetores
+      $('#frmse').change(function(e){ 
+        let prots = '<option value="" selected>---</option>';
+        let dtinic = $('#dtinic').val() 
+        dtinic += ' 23:59:59.000'
+        let dtfinal = $('#dtfinal').val()
+        dtfinal += ' 23:59:59.000'
+        if(dtinic == '' || dtfinal == ''){
+          alert('Selecionar o período (Início/Final) da FACIN')
+          $('#dtinic').focus()
+          return false
+         }
+        if($(this).val() != ''){     
+            let ano = $('#frmano').val(); 
+            let frmse = $(this).val(); 
+            axios.get("CFC/fichafacin.cfc",{
+                params: {
+                    method: "inspetores",
+                    ano: ano,
+                    dtinic: dtinic,
+                    dtfinal: dtfinal,
+                    codse: frmse
+                }
+            })
+            .then(data =>{
+            var vlr_ini = data.data.indexOf("COLUMNS");
+            var vlr_fin = data.data.length
+            vlr_ini = (vlr_ini - 2);
+            const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
+            const dados = json.DATA;
+            dados.map((ret) => {
+                prots += '<option value="' + ret[0] + '">' + ret[1] + '</option>';
+            });
+            $("#frminspetores").html(prots);
+            })  
+        }
+      })//fim buscar inspetores 
+      //buscar o avaliações
+      $('#frminspetores').change(function(e){ 
+        let prots = '<option value="" selected>---</option>';
+        prots += '<option value="t">Todas</option>'
+        if($(this).val() != ''){    
+            let dtinic = $('#dtinic').val() 
+            dtinic += ' 23:59:59.000'
+            let dtfinal = $('#dtfinal').val()
+            dtfinal += ' 23:59:59.000'
+            let ano = $('#frmano').val(); 
+            let frmse = $('#frmse').val(); 
+            let matr = $(this).val(); 
+            //alert(ano + ' ' + frmse + ' ' + matr)
+            axios.get("CFC/fichafacin.cfc",{
+                params: {
+                    method: "avaliacao",
+                    ano: ano,
+                    codse: frmse,
+                    dtinic: dtinic,
+                    dtfinal: dtfinal,
+                    matr: matr
+                }
+            })
+            .then(data =>{
+            var vlr_ini = data.data.indexOf("COLUMNS");
+            var vlr_fin = data.data.length
+            vlr_ini = (vlr_ini - 2);
+            const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
+            const dados = json.DATA;
+            dados.map((ret) => {
+                prots += '<option value="' + ret[0] + '">' + ret[0]+'-'+ret[1] + '</option>';
+            });
+            $("#frmavaliacao").html(prots);
+            })  
+        }
+      })//fim buscar avaliações   
+      //preencher tabela
+      $('#frmavaliacao').change(function(e){ 
+        $("#table").hide(500)
+        if($(this).val() != ''){    
+            let aval = $(this).val()
+            let matr = $('#frminspetores').val(); 
+            //alert(ano + ' ' + frmse + ' ' + matr)
+            axios.get("CFC/fichafacin.cfc",{
+                params: {
+                    method: "gestao",
+                    aval: aval,
+                    matr: matr
+                }
+            })
+            .then(data =>{
+              let numocor = 0
+              let medmeta1 = 0
+              let medmeta2 = 0
+              let medmeta3 = 0
+              let tab = '<table class="table table-bordered border-primary">'
+              tab += '<thead>'
+              tab += '<tr>'
+              tab +=  '<th scope="col">Nº Avaliação</th>'
+              tab +=  '<th scope="col">Tipo</th>'
+              tab +=  '<th scope="col">Qtd. Geral</th>'
+              tab +=  '<th scope="col">Qtd. Realizado</th>'
+              tab +=  '<th scope="col">Pto. Inicial(Meta1)</th>'
+              tab +=  '<th scope="col">Pto. Obtida(Meta1)</th>'
+              tab +=  '<th scope="col">Result(Meta1)</th>'
+              tab +=  '<th scope="col">Pto. Inicial(Meta2)</th>'
+              tab +=  '<th scope="col">Pto. Obtida(Meta2)</th>'
+              tab +=  '<th scope="col">Result(Meta2)</th>'
+              tab +=  '<th scope="col">Perc.(Meta3)</th>'
+              tab += '</tr>'
+              tab += '</thead>'
+              tab += '<tbody>'
+              var vlr_ini = data.data.indexOf("COLUMNS");
+              var vlr_fin = data.data.length
+              vlr_ini = (vlr_ini - 2);
+              const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
+              const dados = json.DATA;
+              dados.map((ret) => {
+                numocor++
+                medmeta1 = medmeta1 + ret[3]
+                medmeta2 = medmeta2 + ret[7]
+                medmeta3 = medmeta3 + ret[10]
+                let url = "href=ficha_facin_gestao_relat.cfm?ninsp="+aval+"&matr="+matr
+                alert(url)
+                tab += '<tr>'
+                  tab += '<td class="alert alert-primary"><a class="alert-link"'+url+' target="_blank">'+ret[8]+'</a></td>'
+                  tab += '<td>'+ret[11]+'</td>'
+                  tab += '<td>'+ret[9]+'</td>'
+                  tab += '<td>'+ret[0]+'</td>'
+                  tab += '<td>'+ret[1]+'</td>'
+                  tab += '<td>'+ret[2]+'</td>'
+                  tab += '<td>'+ret[3]+'</td>'
+                  tab += '<td>'+ret[5]+'</td>'
+                  tab += '<td>'+ret[6]+'</td>'
+                  tab += '<td>'+ret[7]+'</td>'
+                  tab += '<td>'+ret[10]+'</td>'
+                tab += '</tr>'
+              });
+              tab += '<tr>'
+                tab += '<td></td>'
+                tab += '<td></td>'
+                tab += '<td></td>'
+                tab += '<td></td>'
+                tab += '<td></td>'
+                tab += '<td></td>'
+                tab += '<td>'+medmeta1/numocor+'</td>'
+                tab += '<td></td>'
+                tab += '<td></td>'
+                tab += '<td>'+medmeta2/numocor+'</td>'
+                tab += '<td>'+medmeta3/numocor+'</td>'
+              tab += '</tr>'
+              tab += '</tbody>'
+              tab += '</table>'              
+              $("#table").html(tab);
+              $("#table").show(500)
+            })  
+        }
+      })//fim preencher tabela            
+      //Limpar os selects bases   
+      $('#frmano').change(function() {
+        $("#frmse").val("").change();
+        let prots = '<option value="" selected>---</option>';
+        $("#frminspetores").html(prots);
+        $("#frmavaliacao").html(prots);
+        $("#table").hide(500)
+      }); 
+      $('#frmse').change(function() {
+        let prots = '<option value="" selected>---</option>';
+        $("#frminspetores").html(prots);
+        $("#frmavaliacao").html(prots);
+        $("#table").hide(500)
+      }); 
+      $('#frminspetores').change(function() {
+        let prots = '<option value="" selected>---</option>';
+        $("#frmavaliacao").html(prots);
+        $("#table").hide(500)
+      });
+      $('#dtinic').change(function() {
+        $("#frmse").val("").change();
+        let prots = '<option value="" selected>---</option>';
+        $("#frminspetores").html(prots);
+        $("#frmavaliacao").html(prots);
+        $("#table").hide(500)
+      });
+      $('#dtfinal').change(function() {
+        $("#frmse").val("").change();
+        let prots = '<option value="" selected>---</option>';
+        $("#frminspetores").html(prots);
+        $("#frmavaliacao").html(prots);
+        $("#table").hide(500)
+      }); 
+      //final Limpar os selects bases
+</script>
+</html>

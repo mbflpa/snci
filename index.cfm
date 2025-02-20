@@ -245,7 +245,10 @@
 		</cfcase>		
 		<cfcase value="permissao28">
 			<cfinclude template="ficha_facin_ref.cfm">
-		</cfcase>			
+		</cfcase>
+		<cfcase value="permissao30">
+			<cfinclude template="ficha_facin_gestao_ref.cfm">
+		</cfcase>					
 <!--- 	    <cfcase value="permissao16">
 			<cfinclude template="Rel_itensverificacao_ref.cfm">
 		</cfcase> --->

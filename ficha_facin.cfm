@@ -43,7 +43,7 @@
     <cfif grpacesso neq 'INSPETORES'>
         <cfquery datasource="#dsn_inspecao#" name="rsItem">
             SELECT RIP_Resposta, Itn_NumGrupo, Itn_NumItem, Itn_Descricao, Grp_Descricao, RIP_MatricAvaliador, Fun_Nome, Fun_Email, FACA_Matricula, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, 
-            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao
+            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao,FACA_Consideracao_Inspetor
             FROM Unidades 
             INNER JOIN ((Inspecao 
             INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
@@ -57,7 +57,7 @@
     <cfelse>   
         <cfquery datasource="#dsn_inspecao#" name="rsItem">
             SELECT RIP_Resposta, Itn_NumGrupo, Itn_NumItem, Itn_Descricao, Grp_Descricao, RIP_MatricAvaliador, Fun_Nome, Fun_Email, FACA_Matricula, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, 
-            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao
+            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao,FACA_Consideracao_Inspetor
             FROM Unidades 
             INNER JOIN ((Inspecao 
             INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
@@ -72,7 +72,7 @@
 <cfelse>
     <cfquery datasource="#dsn_inspecao#" name="rsItem">
         SELECT RIP_Resposta, Itn_NumGrupo, Itn_NumItem, Itn_Descricao, Grp_Descricao, RIP_MatricAvaliador, Fun_Nome, Fun_Email, FACA_Matricula, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, 
-		FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao
+		FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao,FACA_Consideracao_Inspetor
         FROM Unidades 
         INNER JOIN ((Inspecao 
         INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
@@ -230,7 +230,7 @@
 <div class="container">
 	<div class="row align-items-center">
         <span class="border border-primary">
-            <p class="text-center"><strong>(FACIN) - FICHA DE AVALIAÇÃO DE CONTROLE INTERNO ANO 2024 - SGCIN/PE</strong></p>
+            <p class="text-center"><strong>FICHA DE AVALIAÇÃO DE CONTROLE INTERNO - (FACIN)</strong></p>
         </span>  
                 
         <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>01-Identificação</strong></label>
@@ -559,19 +559,22 @@
             <!--- FIM Meta 2: Organizar documentos no SEI --->
         </tbody>
       </table>
-      <div class="row align-items-center">
-        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Considerações do Item</strong></label>
-        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerar" id="considerar" class="form-control" placeholder="Considerações para Grupo/Item" onblur="consideracao('<cfoutput>#grpitm#</cfoutput>',this.value)"><cfoutput>#trim(rsItem.FACA_Consideracao)#</cfoutput></textarea>	        
-    </div>  
-      <cfset inspetorhd =''>
       <cfif grpacesso eq 'INSPETORES'>
-        <cfset inspetorhd ='readonly'>       
+        <cfset inspetorhd =''>   
+        <cfset gestorhd ='readonly'>  
+      <cfelse>
+        <cfset inspetorhd ='readonly'>   
+        <cfset gestorhd =''>  
       </cfif>
-      <cfset form.considerar = ''>
-      <cfif rsItem.FACA_Avaliacao neq ''>
-        <cfset form.considerar = trim(rsItem.FACA_Consideracao)>
-      </cfif>      
-    </div>
+      <div class="row align-items-center">
+        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Considerações do Item - GESTOR(A)</strong></label>
+        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerargestor" id="considerargestor" class="form-control" placeholder="Consideração para Grupo/Item" <cfoutput>#gestorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_Consideracao)#</cfoutput></textarea>	        
+      </div>  
+      <div class="row align-items-center">
+        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Considerações do Item - INSPETOR(A)</strong></label>
+        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerinspetor" id="considerinspetor" class="form-control" placeholder="Consideração para Grupo/Item" <cfoutput>#inspetorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_Consideracao_Inspetor)#</cfoutput></textarea>	        
+      </div>            
+    </div>     
 </cfloop> 
 </div>
 
@@ -579,11 +582,11 @@
 </div> 
 
 <cfoutput>
-  <!---  
+<!---    
     <div class="row align-items-center">
         <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>05-Considerações Gerais</strong></label>
-        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerar" id="considerar" class="form-control" placeholder="Considerações para Avaliação" onblur="consideracao('<cfoutput>#grpitm#</cfoutput>',this.value)"><cfoutput>#trim(rsItem.FACA_Consideracao)#</cfoutput></textarea>	        
-    </div>    
+        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerar" id="considerar" class="form-control" placeholder="Considerações para Avaliação"><cfoutput>#trim(rsItem.FACA_Consideracao_Inspetor)#</cfoutput></textarea>	        
+    </div>      
 --->    
     <div class="row align-items-center">
     <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>05-Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):</strong></label>
@@ -591,7 +594,7 @@
     <cfloop query="rsAvalia">
         <cfset matraval = rsAvalia.RIP_MatricAvaliador>
         <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
-            SELECT FFI_Meta1_Qtd_Item, FFI_Meta1_Pontuacao_Inicial, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado,FFI_Consideracao_Inspetor
+            SELECT FFI_Meta1_Qtd_Item, FFI_Meta1_Pontuacao_Inicial, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado
             FROM UN_Ficha_Facin_Individual
             WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' and  FFI_Matricula = '#qAcesso.Usu_Matricula#'
         </cfquery>
@@ -626,7 +629,7 @@
         <cfset matraval = rsAvalia.RIP_MatricAvaliador>
         
         <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
-            SELECT FFI_Meta2_Qtd_Item, FFI_Meta2_Pontuacao_Inicial, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado,FFI_Consideracao_Inspetor
+            SELECT FFI_Meta2_Qtd_Item, FFI_Meta2_Pontuacao_Inicial, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado
             FROM UN_Ficha_Facin_Individual
             WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' and FFI_Matricula = '#qAcesso.Usu_Matricula#'
         </cfquery>
@@ -667,7 +670,7 @@
         <cfset form.meta3_dif = #int(rsExisteFacin.fac_difdia_meta3)#>
         <cfset form.meta3_percent = #rsExisteFacin.fac_perc_meta3#>
     </cfif>
-    <label for="" class="col-sm-4 col-form-label"><input class="form-control" id="meta3_dtplanej" name="meta3_dtplanej" type="date" value="#form.meta3_dtplanej#" onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" onblur="meta3(document.formx.concaval.value,this.value)" size="14" maxlength="10" placeholder="DD/MM/AAAA" #inspetorhd#></label>
+    <label for="" class="col-sm-4 col-form-label"><input class="form-control" id="meta3_dtplanej" name="meta3_dtplanej" type="date" value="#form.meta3_dtplanej#" onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" onblur="meta3(document.formx.concaval.value,this.value)" size="14" maxlength="10" placeholder="DD/MM/AAAA" #gestorhd#></label>
     <label for="" class="col-sm-4 col-form-label"><div id="meta3_dif" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta3_dif#</div></label>
     <label for="" class="col-sm-4 col-form-label"><div id="meta3_percent" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta3_percent#%</div></label>
     <cfset auxcompl = 'Salvar Facin Grupo Acesso: ' & #grpacesso#>
@@ -675,7 +678,7 @@
         <cfset auxcompl = 'Salvar Facin (Grupo Acesso: ' & #grpacesso# & '    últ. atualiz.: ' & dateformat(rsExisteFacin.FAC_DtAlter,"DD/MM/YYYY") & ' ' & timeformat(rsExisteFacin.FAC_DtAlter,"HH:MM:SS") & ')'>
     </cfif>
     <cfset habsn = ''>
-    <cfif rsExisteFacin.FAC_DtConcluirFacin neq ''>
+    <cfif rsExisteFacin.FAC_DtConcluirFacin neq '' and grpacesso eq 'GESTORES'>
         <cfset habsn = 'disabled'>
     </cfif>
     <input class="btn btn-primary" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#>
@@ -721,7 +724,7 @@
         
     <cfloop query="rsAvalia">
         <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
-            SELECT FFI_Meta1_Qtd_Item, FFI_Meta1_Pontuacao_Inicial, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado,FFI_Meta2_Qtd_Item, FFI_Meta2_Pontuacao_Inicial, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado,FFI_Consideracao_Inspetor
+            SELECT FFI_Meta1_Qtd_Item, FFI_Meta1_Pontuacao_Inicial, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado,FFI_Meta2_Qtd_Item, FFI_Meta2_Pontuacao_Inicial, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado
             FROM UN_Ficha_Facin_Individual
             WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#'
         </cfquery>
@@ -820,7 +823,8 @@
         </cfif>        
     </cfloop>
         <input type="hidden" id="grpacesso" name="grpacesso" value="#grpacesso#">
-        <input type="hidden" id="FFIConsideracaoInspetor" name="FFIConsideracaoInspetor" value="#rsFacinInd.FFI_Consideracao_Inspetor#">
+        <input type="hidden" id="facaconsiderarinspetor" name="facaconsiderarinspetor" value="#trim(rsItem.FACA_Consideracao_Inspetor)#">
+        <input type="hidden" id="facaconsideracao" name="facaconsideracao" value="#trim(rsItem.FACA_Consideracao)#">
         <input type="hidden" name="grp" id="grp" value="#grp#">
         <input type="hidden" name="itm" id="itm" value="#itm#">
         <input type="hidden" name="matravaliador" id="matravaliador" value="#rsItem.RIP_MatricAvaliador#">      
@@ -834,19 +838,9 @@
 <script>
 $(function(e){
     //alert('Dom inicializado!');   
-    if($('#grpacesso').val() == 'INSPETORES') {
-        $('#considerar').val($('#FFIConsideracaoInspetor').val())
-    }
+    $('#considerargestor').val($('#facaconsideracao').val())
+    $('#considerinspetor').val($('#facaconsiderarinspetor').val())
 })
-//<input type="hidden" id="grpacesso" name="grpacesso" value="#grpacesso#">
-//<input type="hidden" id="FFIConsideracaoInspetor" name="FFIConsideracaoInspetor" value="#rsFacinInd.FFI_Consideracao_Inspetor#">
-
-//=============================================================
-        function consideracao(a,b){
-           //alert($("#considerar").val());
-           $("#facconsideracao").val(b);
-           // alert(a + '  ' + b + '  ' + $("#facaconsideracaoavaliador_702_3").val());
-        }  
 
 //=======================================================================
    function validarform(){
@@ -855,14 +849,21 @@ $(function(e){
             document.formx.meta3_dtplanej.focus();
             return false;
         }
-        
-        if (document.formx.considerar.value == '' && document.formx.somenteavaliarmeta3.value == 'N'){
+
+        if ($('#considerinspetor').val() == '' && $('#grpacesso').val()=='INSPETORES'){
             alert("Falta informar as suas considerações do Item selecionado!");
             $('.accordion-button').trigger('click');
-            $('#considerar').focus();
+            $('#considerinspetor').focus();
+            return false;
+        } 
+       
+        if ($('#considerargestor').val() == '' && $('#somenteavaliarmeta3').val() == 'N' && $('#grpacesso').val()=='GESTORES'){
+            alert("Falta informar as suas considerações do Item selecionado!");
+            $('.accordion-button').trigger('click');
+            $('#considerargestor').focus();
             return false;
         }   
-                    
+                 
         document.formx.submit();  
    }
  // ================================================================  

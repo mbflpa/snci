@@ -340,15 +340,32 @@
   <tr>
     <td height="25">
   <cfif grpacesso eq "GESTORES" and menusn eq "S">    
+
     <table width="98%" height="40" border="0" cellpadding="0" cellspacing="4" class="menu">
+      <tr>
+        <td>&nbsp;</td>
+      </tr>
           <tr>
             <td colspan="2"><a href="#">FICHA DE AVALIAÇÃO DE CI - (FACIN)</a></td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
           </tr>
           <tr>
               <td><img src="smallArrow.gif" width="16" height="5" /></td>
               <td width="94%"><a href="index.cfm?opcao=permissao28">Avaliar Inspetores</a></td>
           </tr>
-      </table>
+          <tr>
+            <td>&nbsp;</td>
+          </tr>
+          <tr>
+              <td><img src="smallArrow.gif" width="16" height="5" /></td>
+              <td width="94%"><a href="index.cfm?opcao=permissao30">Avaliar Resultados</a></td>
+          </tr>
+          <tr>
+            <td>&nbsp;</td>
+          </tr>
+    </table>
   </cfif>     
     </td>
   </tr>
