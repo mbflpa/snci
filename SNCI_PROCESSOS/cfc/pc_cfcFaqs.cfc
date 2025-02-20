@@ -26,7 +26,7 @@
 			<div class="container-fluid">
 				<div class="card-body" style="display:flex;flex-direction:column;padding-top: 0;">
 
-					<form  class="row g-3 needs-validation was-validated" novalidate  id="myform" name="myform" format="html"  style="height: auto;">
+					<form  class="row g-3 needs-validation" novalidate  id="myform" name="myform" format="html"  style="height: auto;">
 						
 						<!--acordion-->
 						<div id="accordionCadFaq" >
@@ -298,7 +298,21 @@
 					theme: 'bootstrap4',
 					placeholder: 'Selecione...',
 					allowClear: true
+				}).on('select2:select select2:unselect', function(e) {
+					$(this).trigger('change.select2');
+					// Dispara validação quando houver mudança
+					if (this.hasAttribute('required')) {
+						if ($(this).val() && $(this).val().length > 0) {
+							$(this).removeClass('is-invalid').addClass('is-valid');
+						} else {
+							$(this).removeClass('is-valid').addClass('is-invalid');
+						}
+					}
 				});
+
+				// Remove validação inicial
+				$('#myform').removeClass('was-validated');
+
 				// Inicialmente, se "texto" estiver selecionado, oculta as divs de ações e de pré-visualizações
 				if ($('input[name="envioFaq"]:checked').val() === 'texto') {
 					$('#actions').attr("hidden", true);
@@ -479,6 +493,31 @@
 					if ($('#faqTipo').val()) {
 						$('#faqTipo').trigger('change');
 					}
+
+					// Adicionar manipulador para modal
+					$('#modalOverlay').on('hidden.bs.modal', function () {
+						$('[aria-hidden]').removeAttr('aria-hidden');
+					});
+
+					// Modificar a inicialização do CKEditor
+					if (!CKEDITOR.instances.faqTexto) {
+						CKEDITOR.replace('faqTexto', {
+							width: '100%',
+							height: 300,
+							removeButtons: 'Save',
+							on: {
+								instanceReady: function(evt) {
+									this.dataProcessor.writer.setRules('p', {
+										indent: false,
+										breakBeforeOpen: true,
+										breakAfterOpen: false,
+										breakBeforeClose: false,
+										breakAfterClose: true
+									});
+								}
+							}
+						});
+					}
 			});
 
 			
@@ -532,6 +571,27 @@
 			$('#btSalvar').on('click', function (event)  {
 				event.preventDefault();
 				event.stopPropagation();
+
+				 // Validação dos campos obrigatórios
+				 const form = $('#myform')[0];
+				 let isValid = true;
+	 
+				 // Validação dos campos Select2
+				 $('select[required]').each(function() {
+					 if (!$(this).val() || $(this).val().length === 0) {
+						 $(this).addClass('is-invalid').removeClass('is-valid');
+						 isValid = false;
+					 } else {
+						 $(this).addClass('is-valid').removeClass('is-invalid');
+					 }
+				 });
+	 
+				 // Validação dos campos normais via Bootstrap
+				 if (!form.checkValidity() || !isValid) {
+					 form.classList.add('was-validated');
+					 toastr.error('Por favor, preencha todos os campos obrigatórios.');
+					 return false;
+				 }
 
 				// Alteração: Adicionada verificação para o select "#faqTipo"
 				if (!$('#faqPerfis').val() || !$('#faqTitulo').val() || !$('#faqStatus').val() || !$('#faqTipo').val()){
@@ -630,7 +690,15 @@
 					cancelButtonText: 'Cancelar!'
 				}).then((result) => {
 					if (result.isConfirmed) {
-						var perfisList = $('#faqPerfis').val();
+						// Destruir o CKEditor antes de mostrar o modal
+						if (CKEDITOR.instances.faqTexto) {
+							var editorData = CKEDITOR.instances.faqTexto.getData();
+							CKEDITOR.instances.faqTexto.destroy();
+						}
+
+						// Remover atributos aria-hidden
+						$('[aria-hidden]').removeAttr('aria-hidden');
+
 						$('#modalOverlay').modal('show');
 						setTimeout(function() {
 							$.ajax({
@@ -640,10 +708,10 @@
 								data:{
 									method: "cadFaq",
 									pc_faq_id: $('#faqId').val(),
-									pc_faq_perfis: perfisList.join(','),
+									pc_faq_perfis: $('#faqPerfis').val().join(','),
 									pc_faq_titulo: $('#faqTitulo').val(),
 									pc_faq_status: $('#faqStatus').val(),
-									pc_faq_texto: dataEditor,
+									pc_faq_texto: editorData || dataEditor,
 									pc_faq_tipo: $('#faqTipo').val(),
 									pc_faq_anexo_caminho: $('#faqAnexoCaminho').val(),
 									pc_faq_anexo_nome: $('#faqAnexoNome').val()
@@ -668,18 +736,45 @@
 
 			// Função a ser chamada após o upload ou quando não há envio de anexo
             function finalizeSubmission(){
+				// Remover atributos aria-hidden antes de manipular o modal
+				$('[aria-hidden]').removeAttr('aria-hidden');
+
                 setArquivoFaqDiv();
                 mostraFormCadFaq();
                 mostraTabFaq();
+                
                 $('#modalOverlay').delay(1000).hide(0, function(){
                     $('#modalOverlay').modal('hide');
                     toastr.success('Operação realizada com sucesso!');
+                    
+                    if ($('input[name="envioFaq"]:checked').val() === "texto") {
+                        // Recriar o CKEditor
+                        if (!CKEDITOR.instances.faqTexto) {
+                            CKEDITOR.replace('faqTexto', {
+                                width: '100%',
+                                height: 300,
+                                removeButtons: 'Save',
+                                on: {
+                                    instanceReady: function(evt) {
+                                        this.setData(''); // Limpa o conteúdo depois que o editor estiver pronto
+                                        this.dataProcessor.writer.setRules('p', {
+                                            indent: false,
+                                            breakBeforeOpen: true,
+                                            breakAfterOpen: false,
+                                            breakBeforeClose: false,
+                                            breakAfterClose: true
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            CKEDITOR.instances.faqTexto.setData('');
+                        }
+                        
+                        $('#cadastroFaq').CardWidget('collapse');
+                        $('#cabecalhoAccordion').text("Clique aqui para cadastrar");
+                    }
                 });
-                if ($('input[name="envioFaq"]:checked').val() === "texto") {
-                    CKEDITOR.instances.faqTexto.setData('');
-                    $('#cadastroFaq').CardWidget('collapse');
-                    $('#cabecalhoAccordion').text("Clique aqui para cadastrar");
-                }
             }
 
 			// Função para excluir o arquivo do FAQ (usando delegação para elementos dinâmicos)
