@@ -65,6 +65,9 @@
 			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
 			INNER JOIN Usuarios ON INP_RevisorLogin = Usu_Login
 			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and (RIP_Recomendacao_Inspetor is not null or RIP_Correcao_Revisor = '1') and INP_DTConcluirRevisao is not null
+			<cfif grpacesso eq 'INSPETORES'>
+				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
+			</cfif>
 		</cfquery>
 		<cfif rsBase.recordcount lte 0>
 			<cfquery datasource="#dsn_inspecao#" name="rsBase">
@@ -74,6 +77,9 @@
 				INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
 				INNER JOIN Usuarios ON INP_RevisorLogin = Usu_Login
 				WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and INP_DTConcluirRevisao is not null
+				<cfif grpacesso eq 'INSPETORES'>
+				 AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
+				</cfif>
 			</cfquery>
 		</cfif>
 		<cfif rsBase.recordcount eq 1><cfset somenteavaliarmeta3='S'></cfif>
@@ -98,8 +104,19 @@
 <link href="css.css" rel="stylesheet" type="text/css">
 
 </head>
-
 <body onLoad="aviso();form1.dtinic.focus()"><br>
+<cfif grpacesso eq 'INSPETORES'>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	      <cfinclude template="cabecalho.cfm"> 
+		</table>
+		<table width="100%" height="30%" border="0" align="center" cellpadding="0" cellspacing="0">
+	<tr valign="top">
+	<td width="25%">
+	 <!--- <cfinclude template="menu_sins.cfm"> --->
+	</td>
+	<td align="center" valign="top">
+	<br><br><br>
+</cfif> 
 <cfif grpacesso neq 'INSPETORES'>
 	<cfif isDefined("url.acao") and url.acao eq 'buscar'>
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -246,6 +263,7 @@
   </div>
   <div class="row"><br><br><br><br></div>
   <cfif (isDefined("acao") and (rsIncluir.recordcount gt 0 or rsalter.recordcount gt 0 or somenteavaliarmeta3 eq 'S'))>
+	<div id="tab">
 	<table width="1400" class="table table-striped table-hover table-active" style="background:#bae6ce">
 		<thead>
 			<th>Grupo</th>
@@ -296,8 +314,8 @@
 				</tr>
 			</tbody>
 		</cfoutput>
-
 	</table>
+	</div>	
  </cfif>
   <input type="hidden" id="acao" name="acao" value="">
   <cfif isDefined("url.acao")>
@@ -307,6 +325,7 @@
 			<input type="hidden" id="matr" name="matr" value="#trim(qAcesso.Usu_Matricula)#">
 			<input type="hidden" id="concfacin" name="concfacin" value="#trim(dateformat(rsFacin.FAC_DtConcluirFacin,"dd-mm-yyyy"))#">
 			<input type="hidden" id="concfacinnome" name="concfacinnome" value="#rsFacin.Usu_Apelido#">
+			<input type="hidden" id="grpacesso" name="grpacesso" value="#grpacesso#">
 		</cfoutput>
 	</cfif>	
   </form>
@@ -346,7 +365,7 @@
 		}
 
 		if($('#grpitem').val() == '' && $('#grpitem2').val() == '') {
-			$('#aviso').html('Nº avaliação inexistente ou está na fase de revisão!')
+			$('#aviso').html('Nº avaliação inexistente ou está na fase de Revisão!')
 			$('#aviso').show(500)
 		} 	
 		if($('#somenteavaliarmeta3').val() == 'S' && $('#grpitem2').val() != null) {
@@ -358,9 +377,16 @@
 				$('#aviso').show(500)
 			}
 		} 
-		if($('#concfacin').val() == '' && ($('#grpitem').val() == '' || $('#grpitem').val() == null) && $('#grpitem2').val() != null) {
+		if($('#grpacesso').val() == 'GESTORES' && $('#concfacin').val() == '' && ($('#grpitem').val() == '' || $('#grpitem').val() == null) && $('#grpitem2').val() != null) {
 			$('#aviso').show(500)
 		}
+		if($('#grpacesso').val() == 'INSPETORES' && $('#concfacin').val() == '') {
+			let prots = '<option value=""></option>'
+			$('#grpitem2').html(prots)
+			$('#aviso').html('Nº avaliação inexistente ou FACIN não concluída pelo Revisor!')
+			$('#tab').hide()
+			$('#aviso').show(500)
+		}		
    	}
 
 	function concluir(){

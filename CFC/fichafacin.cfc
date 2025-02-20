@@ -134,7 +134,7 @@
 				<cfquery datasource="#dsnSNCI#">
 					insert into UN_Ficha_Facin_Avaliador (FACA_Unidade,FACA_Avaliacao,FACA_Matricula,FACA_Avaliador,FACA_Grupo,FACA_Item,FACA_Meta1_AT_OrtoGram,FACA_Meta1_AT_CCCP,FACA_Meta1_AE_Tecn,FACA_Meta1_AE_Prob,FACA_Meta1_AE_Valor,FACA_Meta1_AE_Cosq,FACA_Meta1_AE_Norma,FACA_Meta1_AE_Docu,FACA_Meta1_AE_Class,FACA_Meta1_AE_Orient,FACA_Meta1_Pontos,FACA_Meta2_AR_Falta,FACA_Meta2_AR_Troca,FACA_Meta2_AR_Nomen,FACA_Meta2_AR_Ordem,FACA_Meta2_AR_Prazo,FACA_Meta2_Pontos,FACA_Consideracao,FACA_DtCriar,FACA_DtAlter)
 					values
-					('#FACUNIDADE#','#FACAVALIACAO#','#FACMATRICULA#','#RIP_MatricAvaliador#',#form.facagrupo#,#form.facaitem#,'#form.meta1_atorgr#','#form.meta1_atcccp#','#form.meta1_aetecn#','#form.meta1_aeprob#','#form.meta1_aevalo#','#form.meta1_aecsqc#','#form.meta1_aenorm #','#form.meta1_aedocm#','#form.meta1_aeclas#','#form.meta1_orient#',#FACAMETA1PONTOS#,'#form.meta2_arfalt#','#form.meta2_artroc#','#form.meta2_arnomc#','#form.meta2_arorde#','#form.meta2_arpraz#',#FACAMETA2PONTOS#,'#form.considerar#',CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
+					('#FACUNIDADE#','#FACAVALIACAO#','#FACMATRICULA#','#RIP_MatricAvaliador#',#form.facagrupo#,#form.facaitem#,'#form.meta1_atorgr#','#form.meta1_atcccp#','#form.meta1_aetecn#','#form.meta1_aeprob#','#form.meta1_aevalo#','#form.meta1_aecsqc#','#form.meta1_aenorm #','#form.meta1_aedocm#','#form.meta1_aeclas#','#form.meta1_orient#',#FACAMETA1PONTOS#,'#form.meta2_arfalt#','#form.meta2_artroc#','#form.meta2_arnomc#','#form.meta2_arorde#','#form.meta2_arpraz#',#FACAMETA2PONTOS#,'#form.considerargestor#',CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
 				</cfquery>	
 			<cfelse>	
 				<cfquery datasource="#dsnSNCI#">
@@ -195,13 +195,15 @@
 			<!--- GRUPO DE ACESSO INSPETORES SOMENTE UPDATE--->
 			<!--- alterar UN_Ficha_Facin_Avaliador --->
 			<cfquery datasource="#dsnSNCI#">
-				UPDATE UN_Ficha_Facin_Individual SET
-					FFI_Consideracao_Inspetor = '#form.considerar#'
-					,FFI_DtAlter = CONVERT(char, GETDATE(), 120)
+				UPDATE UN_Ficha_Facin_Avaliador SET
+					 FACA_Consideracao_Inspetor = '#form.considerinspetor#'
+					,FACA_DtAlter = CONVERT(char, GETDATE(), 120)
 				WHERE 
-					FFI_Avaliacao = '#FACAVALIACAO#' and 
-					FFI_Matricula = '#FACMATRICULA#' and
-					FFI_Avaliador = '#RIP_MatricAvaliador#'
+					FACA_Avaliacao = '#FACAVALIACAO#' and 
+					FACA_Matricula = '#FACMATRICULA#' and
+					FACA_Avaliador = '#RIP_MatricAvaliador#' and
+					FACA_Grupo=#rsSalva.RIP_NumGrupo# and 
+					FACA_Item=#rsSalva.RIP_NumItem#	
 			</cfquery>		
 		</cfif>
 		</cfoutput>
@@ -215,14 +217,17 @@
 	<!--- Este método inspetores por ano e cod_se --->
 	<cffunction  name="inspetores" access="remote" ReturnFormat="json" returntype="any">
 		<cfargument name="ano" required="true">
+		<cfargument name="dtinic" required="true">
+		<cfargument name="dtfinal" required="true">
 		<cfargument name="codse" required="true">
 		<cftransaction>
 			<cfquery name="rsInsp" datasource="DBSNCI">
-				SELECT FFI_Avaliador, Fun_Nome
-				FROM UN_Ficha_Facin_Individual 
+				SELECT distinct FFI_Avaliador, Fun_Nome
+				FROM UN_Ficha_Facin INNER JOIN UN_Ficha_Facin_Individual ON (FAC_Matricula = FFI_Matricula) AND (FAC_Avaliacao = FFI_Avaliacao)
 				INNER JOIN Funcionarios ON FFI_Avaliador = Fun_Matric
-				GROUP BY FFI_Avaliacao, FFI_Avaliador, Fun_Nome
-				HAVING (((FFI_Avaliacao) Like '%#ano#') AND ((FFI_Avaliacao) Like '#codse#%'))
+				GROUP BY FFI_Avaliacao, FFI_Avaliador, Fun_Nome, FAC_DtConcluirFacin
+				HAVING FFI_Avaliacao Like '%#ano#' AND FFI_Avaliacao Like '#codse#%' and
+				FAC_DtConcluirFacin between '#dtinic#' and '#dtfinal#'
 				ORDER BY Fun_Nome
 			</cfquery>
 			<cfreturn rsInsp>
@@ -233,15 +238,16 @@
         <cfargument name="ano" required="true">
         <cfargument name="codse" required="true">
         <cfargument name="matr" required="true">
+		<cfargument name="dtinic" required="true">
+		<cfargument name="dtfinal" required="true">
         <cftransaction>
             <cfquery name="rsavalia" datasource="DBSNCI">
-                SELECT FFI_Avaliacao, Und_Descricao
-                FROM Unidades 
-                INNER JOIN (Inspecao 
-                INNER JOIN UN_Ficha_Facin_Individual ON INP_NumInspecao = FFI_Avaliacao) ON Und_Codigo = INP_Unidade
-                GROUP BY FFI_Avaliador, FFI_Avaliacao, Und_Descricao
-                HAVING (((FFI_Avaliador)='#matr#') AND ((FFI_Avaliacao) Like '%#ano#'))
-                ORDER BY Und_Descricao
+				SELECT FFI_Avaliacao, Und_Descricao, FAC_DtConcluirFacin, FFI_Avaliador
+				FROM UN_Ficha_Facin 
+				INNER JOIN Unidades ON FAC_Unidade = Und_Codigo
+				INNER JOIN UN_Ficha_Facin_Individual ON (FAC_Matricula = FFI_Matricula) AND (FAC_Avaliacao = FFI_Avaliacao)
+				WHERE FFI_Avaliador='#matr#' AND FFI_Avaliacao Like '%#ano#' and FAC_DtConcluirFacin between '#dtinic#' and '#dtfinal#'
+				ORDER BY Und_Descricao
             </cfquery>
             <cfreturn rsavalia>
         </cftransaction>
@@ -265,5 +271,31 @@
 				</cfcatch>
 			</cftry>
 			<cfreturn #ret#>
-	</cffunction>		
+	</cffunction>	
+	<!--- Este método inspetores por ano e cod_se --->
+	<cffunction  name="gestao" access="remote" ReturnFormat="json" returntype="any">
+		<cfargument name="aval" required="true">
+		<cfargument name="matr" required="true">
+		<cftransaction>
+			<cfquery name="rsgestao" datasource="DBSNCI">
+				SELECT FFI_Meta1_Qtd_Item, FFI_Meta1_Pontuacao_Inicial, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado, FFI_Meta2_Qtd_Item, FFI_Meta2_Pontuacao_Inicial, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado, FFI_Avaliacao,FAC_Qtd_Geral, FAC_Perc_Meta3,TUN_Descricao
+				FROM (Unidades 
+				INNER JOIN (UN_Ficha_Facin 
+				INNER JOIN UN_Ficha_Facin_Individual ON (FAC_Matricula = FFI_Matricula) AND (FAC_Avaliacao = FFI_Avaliacao)) ON Und_Codigo = FAC_Unidade) 
+				INNER JOIN Tipo_Unidades ON Und_TipoUnidade = TUN_Codigo
+				WHERE FFI_Avaliador='#matr#' 
+				<cfif aval neq 't'>
+					and FFI_Avaliacao='#aval#'
+				</cfif>
+				ORDER BY FFI_Avaliacao
+			</cfquery>
+			<cfreturn rsgestao>
+		</cftransaction>
+	</cffunction>  	
+	
+
+
+
+
+
 </cfcomponent>

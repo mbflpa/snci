@@ -59,13 +59,13 @@ status 14: #hhmmssdc#<br>
 --->
 <cfset auxdt = createodbcdate(CreateDate(year(now()),month(now()),day(now())))>
 <cfquery name="rsAviso" datasource="#dsn_inspecao#">
-SELECT AVGR_ANO, AVGR_ID, AVGR_TITULO, AVGR_DT_INICIO, AVGR_DT_FINAL, AVGR_GRUPOACESSO, AVGR_AVISO, AVGR_status, AVGR_ANEXO
-FROM AvisosGrupos 
-WHERE (AVGR_DT_INICIO<=#auxdt# AND AVGR_DT_FINAL>=#auxdt# AND AVGR_status='A') AND 
-(AVGR_GRUPOACESSO ='#snci.grpacesso#' OR AVGR_GRUPOACESSO='GERAL' OR 
-(AVGR_GRUPOACESSO='GESTORINSPETOR' AND ('#snci.grpacesso#'='GESTORES' Or '#snci.grpacesso#'='INSPETORES'))
-OR (AVGR_GRUPOACESSO='GESTORINSPETORANALISTA' AND ('#snci.grpacesso#'='GESTORES' Or '#snci.grpacesso#'='INSPETORES' Or '#snci.grpacesso#'='ANALISTAS')))
-ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
+	SELECT AVGR_ANO, AVGR_ID, AVGR_TITULO, AVGR_DT_INICIO, AVGR_DT_FINAL, AVGR_GRUPOACESSO, AVGR_AVISO, AVGR_status, AVGR_ANEXO
+	FROM AvisosGrupos 
+	WHERE (AVGR_DT_INICIO<=#auxdt# AND AVGR_DT_FINAL>=#auxdt# AND AVGR_status='A') AND 
+	(AVGR_GRUPOACESSO ='#snci.grpacesso#' OR AVGR_GRUPOACESSO='GERAL' OR 
+	(AVGR_GRUPOACESSO='GESTORINSPETOR' AND ('#snci.grpacesso#'='GESTORES' Or '#snci.grpacesso#'='INSPETORES'))
+	OR (AVGR_GRUPOACESSO='GESTORINSPETORANALISTA' AND ('#snci.grpacesso#'='GESTORES' Or '#snci.grpacesso#'='INSPETORES' Or '#snci.grpacesso#'='ANALISTAS')))
+	ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 </cfquery>
 
 <cfset comReanalise = 0>
@@ -102,11 +102,7 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 
 
 <link href="CSS.css" rel="stylesheet" type="text/css">
-
-
-
 </head>
-
 <!--- Listas de permissões --->
 		<cfquery name="qLista_Unid_Oper" datasource="#dsn_inspecao#">
 			SELECT Usu_Login FROM usuarios WHERE RTrim(Usu_GrupoAcesso) = 'UNIDADES';
@@ -180,7 +176,10 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 		<cfset Session.vReop = ''>
 		<cfset Session.vSubordinadorRegional = ''>
 
-
+		<cfquery name="rsGrpAcesso" datasource="#dsn_inspecao#">
+			SELECT Usu_GrupoAcesso,Usu_Coordena FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
+		</cfquery> 
+		<cfset grpacesso = ucase(Trim(rsGrpAcesso.Usu_GrupoAcesso))>
 <!--- <body onLoad="abrirPopup('Avisos_Grupos.cfm?rotina=S',900,700);"> --->
  <body onLoad="pesquisa(); if ('<cfoutput>#rsAviso.recordcount#</cfoutput>' > 0) {abrirPopup('Avisos_Grupos.cfm?rotina=S',900,700)};"> 
 	<td align="center"><cfinclude template="cabecalho.cfm"></td>
@@ -481,11 +480,30 @@ ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
 	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Departamento,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Coordenador,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
 		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('http://intranetsistemaspe/snci/snci_processos/index.cfm','_blank')" src="icones/snciprocessos.png" width="200" height="90" border="0" /></a></div>
 	</cfif>
+	<cfoutput>
+		<cfset menusn ="N">
+		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','04')><cfset menusn = "S"></cfif>
+		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','12')><cfset menusn = "S"></cfif>
+		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','18')><cfset menusn = "S"></cfif>
+		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','30')><cfset menusn = "S"></cfif>
+		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','32')><cfset menusn = "S"></cfif>
+		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','34')><cfset menusn = "S"></cfif>
+		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','60')><cfset menusn = "S"></cfif>
+		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','70')><cfset menusn = "S"></cfif>
+	  </cfoutput>  
+	  <cfif grpacesso eq "INSPETORES" and menusn eq "S">
+		<cfif ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login))>
+			<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('ficha_facin_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/facininspetor.png" width="200" height="90" border="0" /></a></div>
+			<cfset snci.permitir = True>
+			<cfset Session.vPermissao = True>
+		</cfif>  
+	</cfif>		
 <!--- 	<cfif ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login))>
 	    <div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('Itens_Analise_Manifestacao_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/AnaliseManifestacao.png" width="200" height="90" border="0" /></a></div>	  </tr>
 	  <cfset snci.permitir = True>
 	  <cfset Session.vPermissao = True>
     </cfif>	 --->
+ 
 	<cfif not snci.permitir>
 	    <div class="icones" colspan="2" align="center" class="red_titulo style5">Caro colaborador, você não tem permissão para acessar essa página. Procure o administrador do sistema no Departamento de Controle Interno - DCINT.</div>
     </cfif>
