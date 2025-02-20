@@ -140,26 +140,109 @@
 													</div>
 												</div>
 											</div>
-											<div class="table table-striped files" id="previewsArquivo">
-                                                <div id="templateArquivo" class="row mt-2">
-                                                    <div class="col-auto">
-                                                        <span class="preview"><img src="data:," alt="" data-dz-thumbnail /></span>
+											<!-- Container para preview do arquivo -->
+											<div class="file-preview-container" id="previewsArquivo">
+                                                <div id="templateArquivo" class="file-preview-item">
+                                                    <div class="file-preview-content">
+                                                        <!-- Informações do Arquivo e Barra de Progresso -->
+														<div class="file-info">
+															<div class="file-details">
+																<i class="fas fa-file-pdf file-icon"></i>
+																<span class="file-name" data-dz-name></span>
+																<span class="file-size">(<span data-dz-size></span>)</span>
+															</div>
+															<!-- Movida a barra de progresso para dentro de file-info -->
+															<div class="progress-container" style="margin-top: 8px;">
+																<div class="progress upload-progress">
+																	<div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+																		role="progressbar" 
+																		data-dz-uploadprogress>
+																	</div>
+																</div>
+															</div>
+															<div class="error-message">
+																<strong class="text-danger" data-dz-errormessage></strong>
+															</div>
+														</div>
                                                     </div>
-                                                    <div class="col d-flex align-items-center">
-                                                        <p class="mb-0">
-                                                        <span class="lead" data-dz-name></span>
-                                                        (<span data-dz-size></span>)
-                                                        </p>
-                                                        <strong class="error text-danger" data-dz-errormessage></strong>
-                                                    </div>
-                                                    <div class="col-4 d-flex align-items-center" >
-                                                        <div class="progress progress-striped active w-100" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" >
-                                                            <div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress ></div>
-                                                        </div>
-                                                    </div>
-                                                    
                                                 </div>
                                             </div>
+
+                                            <style>
+                                            .file-preview-container {
+                                                margin: 1rem 0;
+                                                border-radius: 8px;
+                                                background: #f8f9fa;
+                                                padding: 1rem;
+                                            }
+
+                                            .file-preview-item {
+                                                border: 2px dashed #dee2e6;
+                                                border-radius: 6px;
+                                                padding: 1rem;
+                                                margin-bottom: 1rem;
+                                                transition: all 0.3s ease;
+                                            }
+
+                                            .file-preview-item:hover {
+                                                border-color: #0083ca;
+                                                background: #fff;
+                                                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                                            }
+
+                                            .file-preview-content {
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 1rem;
+                                            }
+
+                                            .file-info {
+                                                flex: 1;
+                                            }
+
+                                            .file-details {
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 0.5rem;
+                                                margin-bottom: 0.5rem;
+                                            }
+
+                                            .file-icon {
+                                                color: #dc3545;
+                                                font-size: 1.2rem;
+                                            }
+
+                                            .file-name {
+                                                font-weight: 500;
+                                                color: #2c3e50;
+                                            }
+
+                                            .file-size {
+                                                color: #6c757d;
+                                                font-size: 0.9rem;
+                                            }
+
+                                            .progress-container {
+                                                width: 100%; /* Alterado para ocupar toda a largura */
+                                            }
+
+                                            .upload-progress {
+                                                height: 4px; /* Diminuída a altura da barra */
+                                                background-color: #e9ecef;
+                                                border-radius: 4px;
+                                                overflow: hidden;
+                                                margin-bottom: 5px;
+                                            }
+
+                                            .progress-bar {
+                                                transition: width 0.3s ease;
+                                            }
+
+                                            .error-message {
+                                                font-size: 0.875rem;
+                                                margin-top: 0.25rem;
+                                            }
+                                            </style>
 											
 											<cfif FileExists(rsFaqEdit.pc_faq_anexo_caminho)>
 												<cfif FindNoCase("localhost", application.auxsite)>
@@ -392,8 +475,8 @@
 							autoProcessQueue: false, // Alterado: upload somente quando solicitado
 							maxFiles: 1,
 							maxFilesize:20,
-							thumbnailWidth: 80,
-							thumbnailHeight: 80,
+							thumbnailWidth: null,
+							thumbnailHeight: null,
 							parallelUploads: 1,
 							acceptedFiles: '.pdf',
 							previewTemplate: previewTemplate,
@@ -401,16 +484,29 @@
 							clickable: "#arquivo",
 							init: function(){
 								var dzInstance = this;
-								// Adicionado: botão de exclusão para remover o arquivo selecionado
+								 // Esconde o botão quando um arquivo é adicionado
 								this.on("addedfile", function(file) {
-									var removeButton = Dropzone.createElement('<button class="btn btn-sm btn-danger remove-btn" style="margin-top:10px;">Excluir arquivo</button>');
-									file.previewElement.appendChild(removeButton);
+									$("#arquivo").hide();
+									// Modificado: Troca o texto por ícone de lixeira
+									var removeButton = Dropzone.createElement(
+										'<button type="button" class="btn btn-link text-danger remove-btn" style="padding: 0; margin-left: 10px;">' +
+										'<i class="fas fa-trash-alt" style="font-size: 16px;"></i>' +
+										'</button>'
+									);
+									file.previewElement.querySelector('.file-details').appendChild(removeButton);
 									removeButton.addEventListener("click", function(e) {
 										e.preventDefault();
 										e.stopPropagation();
 										dzInstance.removeFile(file);
 									});
 								});
+
+								// Mostra o botão novamente quando um arquivo é removido
+								this.on("removedfile", function(file) {
+									$("#arquivo").show();
+								});
+
+								// Demais eventos existentes...
 								this.on("error", function(file, errorMessage){
 									toastr.error(errorMessage);
 									return false;
@@ -443,6 +539,7 @@
 									// Limpa os arquivos e a pré-visualização
 									this.removeAllFiles(true);
 									$("#previewsArquivo").empty();
+									$("#arquivo").show(); // Garante que o botão esteja visível após completar
 								});
 							}
 						});
@@ -810,17 +907,27 @@
 										$('#faqAnexoNome').val('');
 										$('#faqAnexoCaminho').val('');
 										$('#arquivo').show();
-										$('#modalOverlay').modal('hide');
-										toastr.success("Arquivo excluído com sucesso!");
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+											toastr.success("Arquivo excluído com sucesso!");
+										});
+										
 									}
 								})
 								.fail(function() {
 									toastr.error("Erro ao excluir arquivo.");
+									$('#modalOverlay').delay(1000).hide(0, function() {
+										$('#modalOverlay').modal('hide');
+									});
 								});
 							}, 500);
 						}
 					});
 				}
+
+				$('#modalOverlay').delay(1000).hide(0, function() {
+					$('#modalOverlay').modal('hide');
+				});
 			});
 
 			// Função auxiliar para verificar se o arquivo existe
@@ -1755,7 +1862,7 @@
 												<td style="vertical-align: middle;">
 													<div style="display:flex;justify-content:space-around;">
 														<i  class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;font-size:20px" onclick="javascript:excluirFaq(<cfoutput>#pc_faq_id#</cfoutput>);"    title="Excluir" ></i>
-														<i class="fas fa-edit efeito-grow"   style="cursor: pointer;font-size:20px"  onclick="javascript:mostraFormEditFaq(<cfoutput>#pc_faq_id#,'#titulo_codificado#'</cfoutput>);"    title="Editar"></i>									
+														<i class="fas fa-edit efeito-grow"   style="cursor: pointer;font-size:20px;margin-left:20px"  onclick="javascript:mostraFormEditFaq(<cfoutput>#pc_faq_id#,'#titulo_codificado#'</cfoutput>);"    title="Editar"></i>									
 													</div>
 												</td>
 												<td style="vertical-align: middle;width:30px">#pc_faq_id#</td>
