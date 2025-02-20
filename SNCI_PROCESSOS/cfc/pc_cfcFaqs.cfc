@@ -1155,10 +1155,7 @@
 					
 					// Remove classe de animação existente (se houver)
 					expandIcon.removeClass('expand-icon-highlight');
-					
-					// Força um reflow do DOM para reiniciar a animação
-					void expandIcon[0].offsetWidth;
-					
+										
 					// Adiciona a classe para iniciar a animação
 					expandIcon.addClass('expand-icon-highlight');
 					
@@ -1390,7 +1387,7 @@
 												
 											</div>
 										</a>
-										<div id="collapse#pc_faq_id#" class="collapse <cfif rsFaqs.recordCount eq 1>show</cfif>">
+										<div id="collapse#pc_faq_id#" class="collapse ">
 											<div class="card-body">
 												<cfif len(trim(pc_faq_anexo_caminho)) and len(trim(pc_faq_anexo_nome))>
 													<iframe src="cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=#URLEncodedFormat(pc_faq_anexo_caminho)#&nome=#URLEncodedFormat(pc_faq_anexo_nome)#"
@@ -1419,10 +1416,7 @@
 					
 					// Remove classe de animação existente (se houver)
 					expandIcon.removeClass('expand-icon-highlight');
-					
-					// Força um reflow do DOM para reiniciar a animação
-					void expandIcon[0].offsetWidth;
-					
+										
 					// Adiciona a classe para iniciar a animação
 					expandIcon.addClass('expand-icon-highlight');
 					
