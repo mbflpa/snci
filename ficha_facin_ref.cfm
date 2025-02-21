@@ -84,12 +84,20 @@
 		</cfif>
 		<cfif rsBase.recordcount eq 1><cfset somenteavaliarmeta3='S'></cfif>
 		<cfquery datasource="#dsn_inspecao#" name="rsFacin">
+			select FAC_DtConcluirFacin,Usu_Apelido,FAC_Matricula
+			from UN_Ficha_Facin 
+			INNER JOIN Usuarios ON FAC_Matricula = Usu_Matricula
+			WHERE FAC_Avaliacao = convert(varchar,'#url.numinsp#') 
+		</cfquery>
+		<!---
+			<cfquery datasource="#dsn_inspecao#" name="rsFacin">
 			select FAC_DtConcluirFacin,Usu_Apelido
 			from UN_Ficha_Facin 
 			INNER JOIN Usuarios ON FAC_Matricula = Usu_Matricula
 			WHERE FAC_Avaliacao = convert(varchar,'#url.numinsp#') and
 			FAC_Matricula = '#qAcesso.Usu_Matricula#'
 		</cfquery>
+		--->
 	</cfif>
 
 
@@ -323,6 +331,7 @@
 			<input type="hidden" id="unid" name="unid" value="#rsalter.RIP_Unidade#">
 			<input type="hidden" id="aval" name="aval" value="#url.numinsp#">
 			<input type="hidden" id="matr" name="matr" value="#trim(qAcesso.Usu_Matricula)#">
+			<input type="hidden" id="facmatricula" name="facmatricula" value="#trim(rsFacin.FAC_Matricula)#">
 			<input type="hidden" id="concfacin" name="concfacin" value="#trim(dateformat(rsFacin.FAC_DtConcluirFacin,"dd-mm-yyyy"))#">
 			<input type="hidden" id="concfacinnome" name="concfacinnome" value="#rsFacin.Usu_Apelido#">
 			<input type="hidden" id="grpacesso" name="grpacesso" value="#grpacesso#">
@@ -335,6 +344,7 @@
 			<input type="hidden" id="grpitem" name="grpitem" value="">
 			<input type="hidden" id="acao" name="acao" value="">
 			<input type="hidden" id="somenteavaliarmeta3" name="somenteavaliarmeta3" value="<cfoutput>#somenteavaliarmeta3#</cfoutput>">
+			<input type="hidden" id="salvarsn" name="salvarsn" value="S">
 		</form>
 	</cfif>
 </body>
@@ -386,7 +396,15 @@
 			$('#aviso').html('Nº avaliação inexistente ou FACIN não concluída pelo Revisor!')
 			$('#tab').hide()
 			$('#aviso').show(500)
-		}		
+		}
+		if($('#matr').val() != $('#facmatricula').val()) {
+			$('#salvarsn').val('N')
+			$('#aviso').html('FACIN está em fase de conclusão por: '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+			if($('#concfacin').val() != '' && $('#concfacin').val() != undefined && $('#concfacin').val() != null){
+				$('#aviso').html('Conclusão da FACIN realizada em: '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+			}
+			$('#aviso').show(500)
+		}
    	}
 
 	function concluir(){

@@ -175,7 +175,6 @@ status 14: #hhmmssdc#<br>
 		<cfset Session.vGerencia = ''>
 		<cfset Session.vReop = ''>
 		<cfset Session.vSubordinadorRegional = ''>
-
 		<cfquery name="rsGrpAcesso" datasource="#dsn_inspecao#">
 			SELECT Usu_GrupoAcesso,Usu_Coordena FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
 		</cfquery> 
@@ -480,17 +479,17 @@ status 14: #hhmmssdc#<br>
 	<cfif ListContains(ListQualify(Lista_Dcint,"'",",","CHAR"),ucase(snci.login)) Or ListContains(ListQualify(Lista_Governanca,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gestores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Desenvolvedores,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Gerentes,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_SubordinadorRegional,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Superintendente,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Departamento,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Coordenador,"'",",","CHAR"),ucase(snci.login)) or ListContains(ListQualify(Lista_Analistas,"'",",","CHAR"),ucase(snci.login))>
 		<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('http://intranetsistemaspe/snci/snci_processos/index.cfm','_blank')" src="icones/snciprocessos.png" width="200" height="90" border="0" /></a></div>
 	</cfif>
-	<cfoutput>
-		<cfset menusn ="N">
-		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','04')><cfset menusn = "S"></cfif>
-		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','12')><cfset menusn = "S"></cfif>
-		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','18')><cfset menusn = "S"></cfif>
-		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','30')><cfset menusn = "S"></cfif>
-		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','32')><cfset menusn = "S"></cfif>
-		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','34')><cfset menusn = "S"></cfif>
-		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','60')><cfset menusn = "S"></cfif>
-		<cfif listfind('#rsGrpAcesso.Usu_Coordena#','70')><cfset menusn = "S"></cfif>
-	  </cfoutput>  
+
+	<cfset menusn ="N">
+	<cfset coordena = trim(rsGrpAcesso.Usu_Coordena)>
+	<cfif listfind(coordena,'04')><cfset menusn = "S"></cfif>
+	<cfif listfind(coordena,'12')><cfset menusn = "S"></cfif>
+	<cfif listfind(coordena,'18')><cfset menusn = "S"></cfif>
+	<cfif listfind(coordena,'30')><cfset menusn = "S"></cfif>
+	<cfif listfind(coordena,'32')><cfset menusn = "S"></cfif>
+	<cfif listfind(coordena,'34')><cfset menusn = "S"></cfif>
+	<cfif listfind(coordena,'60')><cfset menusn = "S"></cfif>
+	<cfif listfind(coordena,'70')><cfset menusn = "S"></cfif>
 	  <cfif grpacesso eq "INSPETORES" and menusn eq "S">
 		<cfif ListContains(ListQualify(Lista_Inspetores,"'",",","CHAR"),ucase(snci.login))>
 			<div class="icones" width="10%" colspan="2" align="center"><a href="#"><img onClick="window.open('ficha_facin_ref.cfm', 'SINS','toolbar=no,location=no,directories=no,status=yes,menubar=no,scrollbars=yes,resizable=yes,fullscreen=no')" src="icones/facininspetor.png" width="200" height="90" border="0" /></a></div>

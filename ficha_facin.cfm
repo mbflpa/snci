@@ -21,7 +21,14 @@
         where Usu_login = '#cgi.REMOTE_USER#'
     </cfquery>
     <cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
-     
+ 
+  <cfif grpacesso eq 'INSPETORES'>
+    <cfset inspetorhd =''>   
+    <cfset gestorhd ='readonly'>  
+  <cfelse>
+    <cfset inspetorhd ='readonly'>   
+    <cfset gestorhd =''>  
+  </cfif>
     <cfquery datasource="#dsn_inspecao#" name="rsFicha">
         SELECT Diretoria.Dir_Sigla as siglainsp, INP_NumInspecao, INP_Unidade, INP_DtInicInspecao, INP_DtFimInspecao, INP_DTConcluirAvaliacao, INP_DTConcluirRevisao, 
         INP_Coordenador, Fun_Nome, Fun_Matric, IPT_MatricInspetor, 
@@ -66,7 +73,7 @@
             INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
             INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_NumInspecao = FACA_Avaliacao) AND (RIP_Unidade = FACA_Unidade) AND (RIP_MatricAvaliador = FACA_Avaliador) AND (Itn_NumGrupo = FACA_Grupo) AND (Itn_NumItem = FACA_Item)
             WHERE convert(char, RIP_Ano) = Itn_Ano AND INP_NumInspecao = convert(varchar,'#form.numinsp#') 
-            AND RIP_Resposta <> 'A' and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm# and RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
+            AND RIP_Resposta <> 'A' and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm# 
         </cfquery>      
     </cfif>
 <cfelse>
@@ -81,7 +88,7 @@
         INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
         INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_NumInspecao = FACA_Avaliacao) AND (RIP_Unidade = FACA_Unidade) AND (RIP_MatricAvaliador = FACA_Avaliador) AND (Itn_NumGrupo = FACA_Grupo) AND (Itn_NumItem = FACA_Item)
         WHERE convert(char, RIP_Ano) = Itn_Ano AND INP_NumInspecao = convert(varchar,'#form.numinsp#') 
-        AND RIP_Resposta <> 'A' and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm# and FACA_Matricula = '#qAcesso.Usu_Matricula#'
+        AND RIP_Resposta <> 'A' and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm# 
     </cfquery>    
 </cfif>    
    <cfquery datasource="#dsn_inspecao#" name="rsRIP">
@@ -115,7 +122,7 @@
         FAC_Pontos_Revisao_Meta1, FAC_Perc_Revisao_Meta1, FAC_Meta1_Peso_Item, FAC_Pontos_Revisao_Meta2, FAC_Perc_Revisao_Meta2, FAC_Meta2_Peso_Item, FAC_Data_Plan_Meta3, 
         FAC_DifDia_Meta3, FAC_Perc_Meta3, FAC_DtAlter,FAC_DtConcluirFacin
         FROM UN_Ficha_Facin
-        WHERE FAC_Avaliacao = convert(varchar,'#form.numinsp#') and FAC_Matricula = '#qAcesso.Usu_Matricula#'
+        WHERE FAC_Avaliacao = convert(varchar,'#form.numinsp#') 
     </cfquery>
 
     <cfif rsExisteFacin.recordcount lte 0>
@@ -559,13 +566,6 @@
             <!--- FIM Meta 2: Organizar documentos no SEI --->
         </tbody>
       </table>
-      <cfif grpacesso eq 'INSPETORES'>
-        <cfset inspetorhd =''>   
-        <cfset gestorhd ='readonly'>  
-      <cfelse>
-        <cfset inspetorhd ='readonly'>   
-        <cfset gestorhd =''>  
-      </cfif>
       <div class="row align-items-center">
         <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Considerações do Item - GESTOR(A)</strong></label>
         <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerargestor" id="considerargestor" class="form-control" placeholder="Consideração para Grupo/Item" <cfoutput>#gestorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_Consideracao)#</cfoutput></textarea>	        
@@ -596,7 +596,7 @@
         <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
             SELECT FFI_Meta1_Qtd_Item, FFI_Meta1_Pontuacao_Inicial, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado
             FROM UN_Ficha_Facin_Individual
-            WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' and  FFI_Matricula = '#qAcesso.Usu_Matricula#'
+            WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' 
         </cfquery>
         <cfset form.meta1_qggitens = #rsAvalia.totaval#>
         <cfset form.meta1_qgptop = (rsAvalia.totaval * ptogrpitm)>
@@ -631,7 +631,7 @@
         <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
             SELECT FFI_Meta2_Qtd_Item, FFI_Meta2_Pontuacao_Inicial, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado
             FROM UN_Ficha_Facin_Individual
-            WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' and FFI_Matricula = '#qAcesso.Usu_Matricula#'
+            WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' 
         </cfquery>
 
         <cfset form.meta2_qggitens = #rsAvalia.totaval#>
@@ -679,6 +679,9 @@
     </cfif>
     <cfset habsn = ''>
     <cfif rsExisteFacin.FAC_DtConcluirFacin neq '' and grpacesso eq 'GESTORES'>
+        <cfset habsn = 'disabled'>
+    </cfif>
+    <cfif form.salvarsn eq 'N'>
         <cfset habsn = 'disabled'>
     </cfif>
     <input class="btn btn-primary" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#>
