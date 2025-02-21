@@ -9,7 +9,7 @@
   SELECT DISTINCT Usu_GrupoAcesso FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#' and Usu_GrupoAcesso in ('#auxgrpacesso#')
 </cfquery>
 <cfquery name="rsGrpAcesso" datasource="#dsn_inspecao#">
-  SELECT Usu_GrupoAcesso,Usu_Coordena FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
+  SELECT Usu_GrupoAcesso,Usu_Coordena,Usu_AtivFacin FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
 </cfquery> 
 
 <cfset grpacesso = ucase(Trim(rsGrpAcesso.Usu_GrupoAcesso))>
@@ -325,18 +325,15 @@
    </td>
   </tr>
   <!--- =================================  --->
-<cfoutput>
   <cfset menusn ="N">
-  <cfif listfind('#rsGrpAcesso.Usu_Coordena#','04')><cfset menusn = "S"></cfif>
-  <cfif listfind('#rsGrpAcesso.Usu_Coordena#','12')><cfset menusn = "S"></cfif>
-  <cfif listfind('#rsGrpAcesso.Usu_Coordena#','18')><cfset menusn = "S"></cfif>
-  <cfif listfind('#rsGrpAcesso.Usu_Coordena#','30')><cfset menusn = "S"></cfif>
-  <cfif listfind('#rsGrpAcesso.Usu_Coordena#','32')><cfset menusn = "S"></cfif>
-  <cfif listfind('#rsGrpAcesso.Usu_Coordena#','34')><cfset menusn = "S"></cfif>
-  <cfif listfind('#rsGrpAcesso.Usu_Coordena#','60')><cfset menusn = "S"></cfif>
-  <cfif listfind('#rsGrpAcesso.Usu_Coordena#','70')><cfset menusn = "S"></cfif>
-</cfoutput>  
-
+  <cfset auxse = ''>
+  <cfset AtivFacin = ucase(trim(rsGrpAcesso.Usu_AtivFacin))>
+  <cfloop list="#AtivFacin#" index="i">
+    <cfset auxcol = "#i#">
+    <cfset auxse = auxcol>
+    <cfset menusn ="S">
+  </cfloop> 
+  
   <tr>
     <td height="25">
   <cfif grpacesso eq "GESTORES" and menusn eq "S">    
@@ -351,20 +348,24 @@
           <tr>
             <td>&nbsp;</td>
           </tr>
-          <tr>
-              <td><img src="smallArrow.gif" width="16" height="5" /></td>
-              <td width="94%"><a href="index.cfm?opcao=permissao28">Avaliar Inspetores</a></td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
-          <tr>
-              <td><img src="smallArrow.gif" width="16" height="5" /></td>
-              <td width="94%"><a href="index.cfm?opcao=permissao30">Avaliar Resultados</a></td>
-          </tr>
-          <tr>
-            <td>&nbsp;</td>
-          </tr>
+          <cfif AtivFacin eq 'A,I' OR AtivFacin eq 'A,I,R'>
+            <tr>
+                <td><img src="smallArrow.gif" width="16" height="5" /></td>
+                <td width="94%"><a href="index.cfm?opcao=permissao28">Avaliar Inspetores</a></td>
+            </tr>
+            <tr>
+              <td>&nbsp;</td>
+            </tr>
+          </cfif>
+          <cfif AtivFacin eq 'A,I,R' OR AtivFacin eq 'A,R,D'>
+            <tr>
+                <td><img src="smallArrow.gif" width="16" height="5" /></td>
+                <td width="94%"><a href="index.cfm?opcao=permissao30">Avaliar Resultados</a></td>
+            </tr>
+            <tr>
+              <td>&nbsp;</td>
+            </tr>
+        </cfif>
     </table>
   </cfif>     
     </td>

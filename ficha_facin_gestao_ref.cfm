@@ -6,10 +6,10 @@
 <!---  --->
 
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
-SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena, Dir_Descricao, Usu_Matricula
-FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR 
-WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
-order by Dir_Sigla
+  SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena, Dir_Descricao, Usu_Matricula,Usu_AtivFacin
+  FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR 
+  WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+  order by Dir_Sigla
 </cfquery>
 <!---  --->
 <cfquery name="rsAnoPacin" datasource="#dsn_inspecao#">    
@@ -22,12 +22,18 @@ order by Dir_Sigla
 
 <cfset auxanoatu = year(now())>
 <cfquery name="rsAno" datasource="#dsn_inspecao#">
-SELECT Andt_AnoExerc
-FROM Andamento_Temp
-GROUP BY Andt_AnoExerc
-HAVING Andt_AnoExerc  < '#auxanoatu#'
-ORDER BY Andt_AnoExerc DESC
+  SELECT Andt_AnoExerc
+  FROM Andamento_Temp
+  GROUP BY Andt_AnoExerc
+  HAVING Andt_AnoExerc  < '#auxanoatu#'
+  ORDER BY Andt_AnoExerc DESC
 </cfquery>
+<cfset auxse = ''>
+<cfset AtivFacin = ucase(trim(qAcesso.Usu_AtivFacin))>
+<cfloop list="#AtivFacin#" index="i">
+  <cfset auxcol = "#i#">
+  <cfset auxse = auxcol>
+</cfloop>  
 <!--- =========================== --->
 
 <html>
@@ -35,35 +41,6 @@ ORDER BY Andt_AnoExerc DESC
 <title>Sistema Nacional de Controle Interno</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">  
-
-<script language="javascript">
-
-function validarform() {
-//alert('aqui....');
-    var frm = document.forms[0];
-	var messelec = frm.frmmes.value;
-	var mesatual = frm.frmmesatual.value;
-//alert(frm.frmUsuGrupoAcesso.value);
-//alert(frm.frmdia.value);
-
-	//alert('frmanoselecionado ' + frm.frmano.value + ' Ano atual ' + frm.frmanoatual.value + ' Mes selecionado ' + frm.frmmes.value + ' mes atual: ' + mesatual);	
-	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
-	{
-	if (eval(messelec) >= eval(mesatual)){
-	alert('Gestor(a), o m�s selecionado para o ano selecionado ainda n�o gerado!');
-	return false;
-	}
-
-    if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmdia.value <= 10){
-	alert('Gestor(a), o m�s selecionado para o ano selecionado ainda n�o gerado!');
-	return false;
-	}	
-	} 
-
-
-//return false;
-}
-</script>
  <link href="css.css" rel="stylesheet" type="text/css">
 </head>
 <br>
@@ -87,10 +64,7 @@ function validarform() {
         <tr>
           <td colspan="5" align="center">&nbsp;</td>
         </tr>
-        <tr>
-          <td colspan="5" align="center" class="titulos"><div class="row" align="left"><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Filtros seleção:
-          </strong></div></td>
-        </tr>
+
         <tr>
           <td width="2%"></td>
           <td colspan="4"><strong>
@@ -148,21 +122,15 @@ function validarform() {
         </tr> 
         <tr>
           <td>&nbsp;</td>
-        </tr>   
+        </tr>  
         <tr>
           <td>&nbsp;</td>
           <td width="39%" class="exibir"><strong>Superintendência: </strong></td>
           <td width="59%" colspan="2">
-          <cfif UCase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>	
-                  <cfquery name="rsSE" datasource="#dsn_inspecao#">
-                    SELECT Dir_Codigo, Dir_Sigla
-                    FROM Diretoria
-                    WHERE Dir_Codigo <> '01'
-                  </cfquery>		
+          <cfif auxse eq 'D'>	
                   <select name="frmse" id="frmse" class="form-select">
-                    <cfoutput query="rsSE">
-                        <option value="#Dir_Codigo#">#Dir_Sigla#</option>
-                    </cfoutput>
+                        <option value="" selected>---</option>
+                        <option value="<cfoutput>#qAcesso.Usu_DR#</cfoutput>"><cfoutput>#qAcesso.Dir_Sigla#</cfoutput></option>
                   </select>	
           <cfelse>
                 <cfset auxcord = trim(qAcesso.Usu_Coordena)>
@@ -204,7 +172,7 @@ function validarform() {
           <td>&nbsp;</td>
             <td colspan="3">
               <div  class="row" align="center">
-                <input name="Submit1" type="submit" class="btn btn-primary" id="Submit1" value="Confirmar">
+           <!---     <input name="Submit1" type="submit" class="btn btn-primary" id="Submit1" value="Confirmar"> --->
               </div></td>
           </tr>
           <tr>
@@ -341,8 +309,8 @@ function validarform() {
                 medmeta1 = medmeta1 + ret[3]
                 medmeta2 = medmeta2 + ret[7]
                 medmeta3 = medmeta3 + ret[10]
-                let url = "href=ficha_facin_gestao_relat.cfm?ninsp="+aval+"&matr="+matr
-                alert(url)
+                let url = "href=ficha_facin_gestao_relat.cfm?ninsp="+ret[8]+"&matr="+matr
+                //alert(url)
                 tab += '<tr>'
                   tab += '<td class="alert alert-primary"><a class="alert-link"'+url+' target="_blank">'+ret[8]+'</a></td>'
                   tab += '<td>'+ret[11]+'</td>'
@@ -358,7 +326,7 @@ function validarform() {
                 tab += '</tr>'
               });
               tab += '<tr>'
-                tab += '<td></td>'
+                tab += '<td>Médias</td>'
                 tab += '<td></td>'
                 tab += '<td></td>'
                 tab += '<td></td>'
