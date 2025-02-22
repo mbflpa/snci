@@ -1,82 +1,25 @@
-<cfprocessingdirective pageencoding = "utf-8">	
-<cffunction name="stripHtml" returntype="string" access="public" output="false" hint="Converte HTML em texto plano formatado para Excel">
-    <cfargument name="htmlContent" type="string" required="true" hint="Conteúdo HTML a ser convertido">
-    
-    <!--- Tratar conteúdo nulo ou vazio --->
-    <cfif not len(trim(arguments.htmlContent))>
-        <cfreturn "">
-    </cfif>
-
-    <!--- Usar variável local para manipulação --->
-    <cfset var text = arguments.htmlContent>
-    
-    <!--- Tratar listas com quebras de linha do Excel --->
-    <cfset text = rereplace(text, "<ul[^>]*>", chr(13) & chr(10), "all")>
-    <cfset text = rereplace(text, "</ul>", chr(13) & chr(10), "all")>
-    <cfset text = rereplace(text, "<li[^>]*>", "* ", "all")>
-    <cfset text = rereplace(text, "</li>", chr(13) & chr(10), "all")>
-    
-    <!--- Tratar cabeçalhos --->
-    <cfset text = rereplace(text, "<h[1-6][^>]*>", chr(13) & chr(10), "all")>
-    <cfset text = rereplace(text, "</h[1-6]>", chr(13) & chr(10), "all")>
-    
-    <!--- Melhorar tratamento de tabelas para Excel --->
-    <cfset text = rereplace(text, "<thead[^>]*>|</thead>|<tbody[^>]*>|</tbody>", "", "all")>
-    <cfset text = rereplace(text, "<tr[^>]*>", "", "all")>
-    <cfset text = rereplace(text, "</tr>", chr(13) & chr(10), "all")>
-    <cfset text = rereplace(text, "<th[^>]*>", "", "all")>
-    <cfset text = rereplace(text, "</th>", chr(9), "all")>
-    <cfset text = rereplace(text, "<td[^>]*>", "", "all")>
-    <cfset text = rereplace(text, "</td>", chr(9), "all")>
-    
-    <!--- Tratar quebras de linha e parágrafos --->
-    <cfset text = rereplace(text, "<br\s*/?>", chr(13) & chr(10), "all")>
-    <cfset text = rereplace(text, "<p[^>]*>", "", "all")>
-    <cfset text = rereplace(text, "</p>", chr(13) & chr(10), "all")>
-    
-    <!--- Remover todas as outras tags HTML --->
-    <cfset text = rereplace(text, "<[^>]+>", "", "all")>
-
-    <!--- Tratar entidades HTML comuns --->
-    <cfset text = replace(text, "&nbsp;", " ", "all")>
-    <cfset text = replace(text, "&lt;", "<", "all")>
-    <cfset text = replace(text, "&gt;", ">", "all")>
-    <cfset text = replace(text, "&amp;", "&", "all")>
-    <cfset text = replace(text, "&quot;", """", "all")>
-    <cfset text = replace(text, "&apos;", "'", "all")>
-    <cfset text = replace(text, "&ccedil;", "ç", "all")>
-    
-    <!--- Remover múltiplas quebras de linha e espaços --->
-    <cfset text = rereplace(text, "(\r?\n){3,}", chr(13) & chr(10) & chr(13) & chr(10), "all")>
-    <cfset text = rereplace(text, "\s{2,}", " ", "all")>
-    
-    <cfreturn trim(text)>
-</cffunction>
-
+<cfprocessingdirective pageencoding="utf-8">	
+<!--- Exemplo 1: Inspeção de Segurança Alimentar --->
 <cfset htmlTeste = '
 <div class="relatorio">
-    <h1>Relatório de Inspeção</h1>
-    <p>Data: 21/02/2025</p>
-    <h2>Detalhes da Inspeção</h2>
-    <p>Inspeção realizada com sucesso.<br>Local: Setor Industrial<br>Responsável: João Silva</p>
-    <h3>Lista de Verificação</h3>
+    <p>Verificado em todos os contratos de manutenção e abastecimento, situações semelhantes relativos à não aplicação de penalidades por descumprimento contratual. Verificar a existência de cláusulas contratuais que prevejam a aplicação de penalidades por descumprimento contratual.</p>
+    <h3>Itens Verificados</h3>
     <ul>
-        <li>Equipamentos de proteção</li>
-        <li>Sinalização de segurança</li>
-        <li>Condições do ambiente</li>
+        <li>Higiene dos equipamentos</li>
+        <li>Armazenamento de alimentos</li>
+        <li>Temperatura das câmaras frias</li>
     </ul>
     <table border="1">
-        <thead><tr><th>Item Verificado</th><th>Status</th><th>Observações</th></tr></thead>
+        <thead><tr><th>Item</th><th>Status</th><th>Temperatura</th><th>Observações</th></tr></thead>
         <tbody>
-            <tr><td>Extintores</td><td>OK</td><td>Dentro do prazo de validade</td></tr>
-            <tr><td>Iluminação</td><td>Pendente</td><td>Necessita troca de lâmpadas</td></tr>
-            <tr><td>Saídas de emergência</td><td>OK</td><td>Desobstruídas</td></tr>
+            <tr><td>Câmara Fria 1</td><td>Crítico</td><td>12°C</td><td>Temperatura acima do permitido (máx. 5°C)</td></tr>
+            <tr><td>Freezer</td><td>OK</td><td>-18°C</td><td>Dentro dos padrões</td></tr>
+            <tr><td>Geladeira</td><td>OK</td><td>4°C</td><td>Funcionamento normal</td></tr>
         </tbody>
     </table>
-    <p><strong>Observações Gerais:</strong><br>Necessário agendar manutenção preventiva para o próximo mês.</p>
+    <p><strong>Observações Gerais:</strong><br>Necessária manutenção urgente na Câmara Fria 1. Risco de perda de produtos.</p>
+     <img src="logo.png"  style="width: 150px;">
 </div>'>
-
-
 
 <!--- Função auxiliar para formatar a tabela como lista simples --->
 <cffunction name="formatarTabela" returntype="string">
@@ -86,30 +29,34 @@
     <cfset var cabecalhos = []>
     <cfset var i = 0>
     
-    <!--- Processar cada linha da tabela --->
     <cfloop array="#linhas#" index="linha">
         <cfset i = i + 1>
         <cfset var colunas = reMatch("<t[dh]>.*?</t[dh]>", linha)>
         <cfset var textoLinha = "">
         
-        <!--- Primeira linha é o cabeçalho --->
-        <cfif i eq 1>
+        <cfif i eq 1 && reFind("<th", linha)>
             <cfloop array="#colunas#" index="coluna">
                 <cfset arrayAppend(cabecalhos, reReplace(coluna, "<[^>]*>", "", "ALL"))>
             </cfloop>
         <cfelse>
-            <!--- Linhas de dados --->
             <cfset var valores = []>
             <cfset var detalhes = []>
             <cfloop array="#colunas#" index="coluna">
                 <cfset arrayAppend(valores, reReplace(coluna, "<[^>]*>", "", "ALL"))>
             </cfloop>
-            <!--- Construir o texto da linha --->
             <cfloop from="1" to="#arrayLen(valores)#" index="j">
                 <cfif j eq 1>
-                    <cfset textoLinha = "- #cabecalhos[j]#: #valores[j]#">
+                    <cfif arrayLen(cabecalhos) gte j>
+                        <cfset textoLinha = "-#cabecalhos[j]#: #valores[j]#">
+                    <cfelse>
+                        <cfset textoLinha = "-Item #i-1#: #valores[j]#">
+                    </cfif>
                 <cfelse>
-                    <cfset arrayAppend(detalhes, "#cabecalhos[j]#: #valores[j]#")>
+                    <cfif arrayLen(cabecalhos) gte j>
+                        <cfset arrayAppend(detalhes, "#cabecalhos[j]#: #valores[j]#")>
+                    <cfelse>
+                        <cfset arrayAppend(detalhes, "Coluna #j#: #valores[j]#")>
+                    </cfif>
                 </cfif>
             </cfloop>
             <cfif arrayLen(detalhes) gt 0>
@@ -119,56 +66,79 @@
         </cfif>
     </cfloop>
     
-    <cfreturn resultado>
+    <cfreturn trim(resultado)>
 </cffunction>
 
-<!--- Função principal para limpar o HTML --->
 <cffunction name="limparHTML" returntype="string">
     <cfargument name="texto" type="string" required="true">
     <cfset var resultado = arguments.texto>
+    <cfset var crlf = chr(13) & chr(10)> <!--- Constante para CRLF --->
+    <cfset var quebraCabecalho = "##QUEBRACABECALHO##"> <!--- Marcador para três quebras --->
+    <!--- Passo 1: Remover todas as quebras de linha do HTML original --->
+    <cfset resultado = reReplace(resultado, "[\r\n]+", " ", "ALL")> <!--- Substitui quebras por espaço --->
     
-    <!--- Separar e processar a tabela --->
+    <!--- Passo 2: Tratar imagens --->
+    <cfset var imagens = reMatch("<img[^>]*>", resultado)>
+    <cfloop array="#imagens#" index="imgTag">
+        <cfset var altText = reReplace(imgTag, ".*alt\s*=\s*['""]([^'""]*)['""].*", "\1", "ONE")>
+        <cfset var substituto = len(trim(altText)) gt 0 && altText neq imgTag ? "[imagem removida: #altText#]" : "[imagem removida]">
+        <cfset resultado = replace(resultado, imgTag, substituto, "ALL")>
+    </cfloop>
+    
+    <!--- Passo 3: Tratar tabelas --->
     <cfset var tabelaMatch = reMatch("<table[^>]*>.*?</table>", resultado)>
     <cfif arrayLen(tabelaMatch) gt 0>
-        <cfset var tabelaFormatada = formatarTabela(tabelaMatch[1])>
+        <cfset var tabelaFormatada = "##QUEBRABLOCO##" & formatarTabela(tabelaMatch[1]) & "##QUEBRABLOCO##">
         <cfset resultado = replace(resultado, tabelaMatch[1], tabelaFormatada, "ALL")>
     </cfif>
     
-    <!--- Substituir quebras de linha HTML por CRLF --->
-    <cfset resultado = replace(resultado, "<br>", chr(13) & chr(10), "ALL")>
-    <cfset resultado = replace(resultado, "<br/>", chr(13) & chr(10), "ALL")>
-    <!--- Tratar parágrafos como quebras duplas --->
-    <cfset resultado = reReplace(resultado, "</p>\s*<p>", chr(13) & chr(10) & chr(13) & chr(10), "ALL")>
-    <cfset resultado = reReplace(resultado, "<p[^>]*>", "", "ALL")>
-    <cfset resultado = replace(resultado, "</p>", "", "ALL")>
-    <!--- Converter listas em texto com marcadores, uma linha por item --->
-    <cfset resultado = reReplace(resultado, "<li[^>]*>", "• ", "ALL")>
-    <cfset resultado = replace(resultado, "</li>", chr(13) & chr(10), "ALL")>
-    <cfset resultado = reReplace(resultado, "</?ul[^>]*>", "", "ALL")>
-    <cfset resultado = reReplace(resultado, "</?ol[^>]*>", "", "ALL")>
-    <!--- Remover strong sem adicionar [NEGRITO] --->
-    <cfset resultado = replace(resultado, "<strong>", "", "ALL")>
-    <cfset resultado = replace(resultado, "</strong>", "", "ALL")>
-    <!--- Remover outras tags --->
+    <!--- Passo 4: Substituir tags de bloco por quebras --->
+    <cfloop from="1" to="6" index="i">
+        <cfset resultado = replace(resultado, "<h#i#>", "", "ALL")>
+        <cfset resultado = replace(resultado, "</h#i#>", quebraCabecalho, "ALL")> <!--- Marcador para três quebras --->
+    </cfloop>
+    <cfset resultado = replace(resultado, "<p>", "", "ALL")>
+    <cfset resultado = replace(resultado, "</p>", "##QUEBRABLOCO##", "ALL")> <!--- Marcador para duas quebras --->
+    <cfset resultado = replace(resultado, "<br>", crlf, "ALL")>
+    <cfset resultado = replace(resultado, "<br/>", crlf, "ALL")>
+    <cfset resultado = replace(resultado, "<ul>", crlf, "ALL")> <!--- Uma quebra antes da lista --->
+    <cfset resultado = replace(resultado, "</ul>", crlf, "ALL")> <!--- Uma quebra após lista --->
+    <cfset resultado = replace(resultado, "<li>", "• ", "ALL")>
+    <cfset resultado = replace(resultado, "</li>", crlf, "ALL")> <!--- Uma quebra após itens da lista --->
+    
+    <!--- Passo 5: Remover tags restantes --->
     <cfset resultado = reReplace(resultado, "<[^>]*>", "", "ALL")>
-    <!--- Preservar espaçamento básico --->
-    <cfset resultado = trim(resultado)>
+    
+    <!--- Passo 6: Normalizar espaços --->
+    <cfset resultado = reReplace(resultado, "\s+", " ", "ALL")> <!--- Colapsa espaços múltiplos --->
+    <cfset resultado = trim(resultado)> <!--- Remove espaços no início e fim --->
+    
+    <!--- Passo 7: Reaplicar quebras --->
+    <cfset resultado = replace(resultado, "##QUEBRABLOCO##", crlf & crlf, "ALL")> <!--- Substitui marcador por duas quebras --->
+    <cfset resultado = replace(resultado, quebraCabecalho, crlf , "ALL")> <!--- Três quebras para <h#i#> --->
+    <cfset resultado = reReplace(resultado, "• ", crlf & "• ", "ALL")> <!--- Uma quebra antes de cada item da lista --->
+    <cfset resultado = reReplace(resultado, "-Item:", crlf & "-Item:", "ALL")> <!--- Uma quebra antes de cada item da tabela --->
+    
+    <!--- Passo 8: Limpar quebras excessivas --->
+    <cfset resultado = reReplace(resultado, "(#crlf#){3,}", crlf & crlf, "ALL")> <!--- Limita a 2 quebras, exceto após <h#i#> --->
+    <cfset resultado = reReplace(resultado, "^#crlf#+", "", "ALL")> <!--- Remove quebras no início --->
+    <cfset resultado = reReplace(resultado, "#crlf#+$", "", "ALL")> <!--- Remove quebras no fim --->
+    
     <cfreturn resultado>
 </cffunction>
 
-<!--- Processar o HTML --->
+<!--- Testar a saída na tela --->
 <cfset textoProcessado = limparHTML(htmlTeste)>
+<cfoutput><pre>#textoProcessado#</pre></cfoutput>
+<!--- <cfabort> ---> <!--- Comentei o abort para permitir a geração do Excel --->
+ 
+<!--- Criar planilha --->
+<cfset spreadsheetObj = spreadsheetNew("Sheet1", true)>
+<cfset spreadsheetSetCellValue(spreadsheetObj, textoProcessado, 1, 1)>
+<cfset spreadsheetFormatCell(spreadsheetObj, {textwrap=true}, 1, 1)>
+<cfset arquivo = expandPath('relatorio.xlsx')>
+<cfspreadsheet action="write" filename="#arquivo#" name="spreadsheetObj" overwrite="true">
 
-<!--- Criar uma query com uma única célula --->
-<cfset excelQuery = queryNew("Conteudo", "varchar")>
-<cfset queryAddRow(excelQuery)>
-<cfset querySetCell(excelQuery, "Conteudo", textoProcessado)>
-
-<!--- Exportar para Excel --->
-<cfspreadsheet action="write" filename="#expandPath('relatorio.xlsx')#" query="excelQuery" overwrite="true">
-
-<!--- Fazer o download --->
+<!--- Download --->
 <cfheader name="Content-Disposition" value="attachment; filename=relatorio.xlsx">
-<cfcontent type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" file="#expandPath('relatorio.xlsx')#">
-
-<cfoutput>#htmlTeste#</cfoutput>
+<cfcontent type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" file="#arquivo#" reset="true">
