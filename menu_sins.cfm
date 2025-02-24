@@ -357,7 +357,7 @@
               <td>&nbsp;</td>
             </tr>
           </cfif>
-          <cfif AtivFacin eq 'A,I,R' OR AtivFacin eq 'A,R,D'>
+          <cfif AtivFacin eq 'A,I,R' OR AtivFacin eq 'A,R,D' OR AtivFacin eq 'A,R,C'>
             <tr>
                 <td><img src="smallArrow.gif" width="16" height="5" /></td>
                 <td width="94%"><a href="index.cfm?opcao=permissao30">Avaliar Resultados</a></td>
