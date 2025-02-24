@@ -41,7 +41,7 @@
 
     <div class="wrapper">
         
-        <cfinclude template="pc_NavBar.cfm">
+        <cfinclude template="includes/pc_navBar.cfm">
 
     <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -96,9 +96,9 @@
         </div>
     </div>
     <!-- Footer -->
-    <cfinclude template="pc_Footer.cfm">   
+    <cfinclude template="includes/pc_footer.cfm">   
 
-    <cfinclude template="pc_Sidebar.cfm">
+    <cfinclude template="includes/pc_sidebar.cfm">
      <script language="JavaScript">
         //cria click em um botão para um ajax para executar cffunction metodo rotinaSemanalOrientacoesPendentes em pc_cfcPaginasApoio.cfc
         $(document).ready(function(){

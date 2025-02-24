@@ -1257,7 +1257,7 @@
 			) THEN 1 ELSE 0 END AS existePesquisa
 		</cfquery>
 		
-        <cfinclude template="../pc_Pesquisa.cfm">
+        <cfinclude template="../includes/pc_Pesquisa.cfm">
 		<div class="card-header" style="background-color:#ececec;" >
 			<div class="row" style="font-size: 1em;">
 
@@ -3038,7 +3038,7 @@
 					
 					</div>
 
-						<cfinclude template="../pc_Pesquisa.cfm">
+						<cfinclude template="../includes/pc_Pesquisa.cfm">
 				</div>
 			
 

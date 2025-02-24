@@ -98,7 +98,7 @@
 	<div class="wrapper">
 
 		
-		<cfinclude template="pc_NavBar.cfm">
+		<cfinclude template="includes/pc_navBar.cfm">
 		
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper" >
@@ -133,10 +133,10 @@
 			
 		</div>
 			
-		<cfinclude template="pc_Footer.cfm">
+		<cfinclude template="includes/pc_footer.cfm">
 		
 	</div>
-	<cfinclude template="pc_Sidebar.cfm">
+	<cfinclude template="includes/pc_sidebar.cfm">
 	
 	<!-- Select2 -->
 	<script src="plugins/select2/js/select2.full.min.js"></script>

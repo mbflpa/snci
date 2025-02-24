@@ -44,7 +44,7 @@
 				<span style="font-size:20px">AGUARDE...</span>
 			</div>
 
-			<cfinclude template="pc_NavBar.cfm">
+			<cfinclude template="includes/pc_navBar.cfm">
 		
 			<!-- Content Wrapper. Contains page content -->
 			<div class="content-wrapper">
@@ -63,7 +63,7 @@
 	
 		</div>
 
-		<cfinclude template="pc_Sidebar.cfm">
+		<cfinclude template="includes/pc_sidebar.cfm">
 
 
 		

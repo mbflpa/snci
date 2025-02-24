@@ -39,7 +39,7 @@
 	
 		
 		
-		<cfinclude template="pc_NavBar.cfm">
+		<cfinclude template="includes/pc_navBar.cfm">
 
 	<!-- Content Wrapper. Contains page content -->
 	<div class="content-wrapper" style="height:auto">
@@ -149,10 +149,10 @@
 		
 	</div>
 	<!-- /.content-wrapper -->
-	<cfinclude template="pc_Footer.cfm">
+	<cfinclude template="includes/pc_footer.cfm">
 	</div>
 	<!-- ./wrapper -->
-	<cfinclude template="pc_Sidebar.cfm">
+	<cfinclude template="includes/pc_sidebar.cfm">
 
 
 

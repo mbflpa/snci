@@ -172,7 +172,7 @@
 
 
 
-  <cffunction name="abreFormPesquisa"   access="remote" hint="abre o modal avaliacaoModal da página pc_Pesquisa.cfm" >
+  <cffunction name="abreFormPesquisa"   access="remote" hint="abre o modal avaliacaoModal da página includes/pc_Pesquisa.cfm" >
 
     <cfargument name="pc_processo_id" type="string" required="true" >
     <cfquery name="rsDadosProcessoPesquisa" datasource="#application.dsn_processos#">
@@ -183,7 +183,7 @@
     </cfquery>
 
     
-    <cfinclude template="../pc_Pesquisa.cfm">
+    <cfinclude template="../includes/pc_Pesquisa.cfm">
    
   </cffunction>
 

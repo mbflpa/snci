@@ -20,7 +20,7 @@
      
       
     <div class="wrapper">
-         <cfinclude template="pc_NavBar.cfm">
+         <cfinclude template="includes/pc_navBar.cfm">
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper iframe-mode" data-widget="iframe" >
             <div class="nav navbar navbar-expand navbar-white navbar-light border-bottom p-0">
@@ -51,10 +51,10 @@
         </div>
     </div>
     <!-- Footer -->
-    <cfinclude template="pc_Footer.cfm">   
+    <cfinclude template="includes/pc_footer.cfm">   
 	</div>
 	<!-- ./wrapper -->
-    <cfinclude template="pc_Sidebar.cfm">
+    <cfinclude template="includes/pc_sidebar.cfm">
 
     <script>
         $(document).ready(function() {

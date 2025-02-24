@@ -146,7 +146,7 @@
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
 	<div class="wrapper">
-		<cfinclude template="pc_NavBar.cfm">
+		<cfinclude template="includes/pc_navBar.cfm">
 		
 		<div class="content-wrapper">
 			<section class="content-header">
@@ -182,9 +182,9 @@
 				<div id="exibirPesquisa"></div>
 			</section>
 		</div>
-		<cfinclude template="pc_Footer.cfm">
+		<cfinclude template="includes/pc_footer.cfm">
 	</div>
-	<cfinclude template="pc_Sidebar.cfm">
+	<cfinclude template="includes/pc_sidebar.cfm">
 
 	<script language="JavaScript">
 		$(function () {

@@ -18,7 +18,7 @@
 	<div class="wrapper">
 
 		
-		<cfinclude template="pc_NavBar.cfm">
+		<cfinclude template="includes/pc_navBar.cfm">
 
 		<!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper" >
@@ -45,7 +45,7 @@
 
                    
 
-                    <cfinclude template="pc_notas_versao.cfm">
+                    <cfinclude template="includes/pc_notas_versao.cfm">
                     
 
 
@@ -55,13 +55,13 @@
         <!-- /.content-wrapper -->
     
     <!-- Footer -->
-    <cfinclude template="pc_Footer.cfm">   
+    <cfinclude template="includes/pc_footer.cfm">   
 	</div>
 	<!-- ./wrapper -->
-    <cfinclude template="pc_Sidebar.cfm">
+    <cfinclude template="includes/pc_sidebar.cfm">
 
     <!-- Inclua o novo componente do sidebar -->
-    <cfinclude template="pc_sidebarInfo.cfm">
+    <cfinclude template="includes/pc_sidebarInfo.cfm">
 
     <script language="JavaScript">
 
@@ -83,7 +83,7 @@
             } else {
                 mostraAlertasControleInterno();
             }
-            // Chama a função que agora está definida em pc_sidebarInfo.cfm
+            // Chama a função que agora está definida em includes/pc_sidebarInfo.cfm
             mostraFormFaq();
 
             <cfoutput>

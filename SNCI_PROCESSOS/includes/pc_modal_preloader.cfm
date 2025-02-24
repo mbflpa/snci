@@ -8,33 +8,22 @@
 
 		<!-- Theme style -->
 		<link rel="stylesheet" href="../SNCI_PROCESSOS/dist/css/adminlte.min.css">
-	
 
 		<!-- jQuery -->
 		<script src="../SNCI_PROCESSOS/plugins/jquery/jquery.min.js"></script>
 		
 		<style>
-			.modalOverlay{
-				height:100%;
-				display: flex!important;
-				justify-content: center;
-				align-items: center;
-				overflow:hidden;
-			}
-
 			#bodyConfirm.modal-body{
 				font-size:16px!important;
 				color:#fff!important;
 				background-color:var(--azul_correios)!important
-				
 			}
+			
 			#contentConfirm.modal-content{
 				opacity:0.8;
 				background-color:var(--azul_correios)!important
 				color:#fff!important;
 			}
-
-		
 
 			/* HTML: <div class="loader"></div> */
 			.loader {
@@ -42,11 +31,10 @@
 				height: 150px;
 				position: relative;
 				display: flex;
-				flex-direction: column; /* Coloca o texto embaixo da imagem */
+				flex-direction: column;
 				justify-content: center;
 				align-items: center;
 			}
-
 
 			.loader::before,
 			.loader::after {
@@ -90,9 +78,6 @@
 					1px 1px 0 #2581c8; /* Adiciona contorno preto ao texto */
 			}
 		</style>
-	
-		
-		
     </head>
     <body>
         <!-- Preloader -->
@@ -104,18 +89,5 @@
 		</div>
 		
 		
-		<div class="modal fade" id="modalOverlay">
-			<div class="modal-dialog modalOverlay">
-				<div class="loader" >
-					<img src="../SNCI_PROCESSOS/dist/img/correios.png"  alt="logo Correios">
-					<span class="texto-aguarde" >AGUARDE...</span>
-				</div>
-			</div>
-		</div>
-
-		
- 		
-		
     </body>
-	
 </html>
