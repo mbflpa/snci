@@ -116,8 +116,32 @@
 			color:#000;
 			border-left: 4px solid green;
 		}
-		
 
+		.process-card .overlay {
+			display: none;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(255, 255, 255, 0.9);
+			border-radius: 10px;
+			z-index: 1000;
+		}
+
+		.process-card .overlay-content {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			text-align: center;
+		}
+
+		.process-card .overlay i {
+			font-size: 24px;
+			color: var(--azul_claro_correios);
+		}
+		
 	</style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -250,40 +274,56 @@
 
 		// Adicione um evento de clique para os cartões de processo
 		$(document).on("click", ".process-card", function () {
-			$(".process-card").removeClass("clicked"); // Remove a classe 'clicked' de todos os cards
-			$(this).addClass("clicked"); // Adiciona a classe 'clicked' ao card clicado
-			var processoId = $(this).data("processo-id");
-			$("#modalOverlay").modal("show"); // Mostrar o modalOverlay ao abrir o avaliacaoModal
-			setTimeout(function() {
-				$.ajax({
-					type: "post",
-					url: "cfc/pc_cfcPesquisa.cfc",
-					data: {
-						method: "abreFormPesquisa",
-						pc_processo_id: processoId
-					},
-					async: true,
-					success: function (result) {
-						$("#exibirPesquisa").html(result);
-
-						$("#avaliacaoModal").modal("show").on("hidden.bs.modal", function () {
-							$("#exibirPesquisa").html("");
-							exibirTabela();
-							$('.modal-backdrop').remove(); // Remove o backdrop
-							$('body').removeClass('modal-open'); // Remove a classe que impede o scroll
-						});
-					},
-					error: function (xhr, ajaxOptions, thrownError) {
-						$("#modal-danger").modal("show");
-						$("#modal-danger").find(".modal-title").text("Não foi possível executar sua solicitação. Informe o erro abaixo ao administrador do sistema:");
-						$("#modal-danger").find(".modal-body").text(thrownError);
-					},
-				});
-				$("#avaliacaoModal").on("shown.bs.modal", function () {
-					$("#modalOverlay").modal("hide"); // Esconder o modalOverlay ao abrir o avaliacaoModal
-				});
-			}, 1000);
+			const $card = $(this);
+			const processoId = $card.data("processo-id");
 			
+			// Mostra o loading no card
+			$card.find('.overlay').remove(); // Remove overlay anterior se existir
+			$card.append(`
+				<div class="overlay">
+					<div class="overlay-content">
+						<i class="fas fa-2x fa-sync-alt fa-spin"></i>
+						<div class="text-bold pt-2">Carregando...</div>
+					</div>
+				</div>
+			`);
+			$card.find('.overlay').fadeIn();
+
+			// Remove a classe 'clicked' de todos os cards e adiciona ao atual
+			$(".process-card").removeClass("clicked");
+			$card.addClass("clicked");
+
+			$.ajax({
+				type: "post",
+				url: "cfc/pc_cfcPesquisa.cfc",
+				data: {
+					method: "abreFormPesquisa",
+					pc_processo_id: processoId
+				},
+				async: true,
+				success: function (result) {
+					$("#exibirPesquisa").html(result);
+					$("#avaliacaoModal").modal("show").on("hidden.bs.modal", function () {
+						$("#exibirPesquisa").html("");
+						exibirTabela();
+						$('.modal-backdrop').remove();
+						$('body').removeClass('modal-open');
+					});
+					// Remove o loading quando o modal é mostrado
+					$card.find('.overlay').fadeOut(function() {
+						$(this).remove();
+					});
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					// Remove o loading em caso de erro
+					$card.find('.overlay').fadeOut(function() {
+						$(this).remove();
+					});
+					$("#modal-danger").modal("show");
+					$("#modal-danger").find(".modal-title").text("Não foi possível executar sua solicitação. Informe o erro abaixo ao administrador do sistema:");
+					$("#modal-danger").find(".modal-body").text(thrownError);
+				}
+			});
 		});
 		
 	</script>
