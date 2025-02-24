@@ -205,6 +205,12 @@
 				RIP_NumGrupo=#FORM.ngrup# AND 
 				RIP_NumItem=#FORM.nitem#
 			</cfquery>
+			<!--- Confirmar atuação do inspetor na avaliação --->
+			<cfquery datasource="#dsn_inspecao#">
+				UPDATE Inspecao SET INP_AvaliacaoAtiva = 'S'
+				WHERE INP_NumInspecao='#FORM.ninsp#'
+			</cfquery>
+			
 			<!---	==================  --->		 
 	
 		   <cfcatch type="any">
@@ -294,8 +300,12 @@
 				RIP_NumGrupo=#FORM.ngrup# AND 
 				RIP_NumItem=#FORM.nitem#
 			</cfquery>
-			<!---	==================  --->				
-
+			<!---	==================  --->		
+			<!--- Confirmar atuação do inspetor na avaliação --->
+			<cfquery datasource="#dsn_inspecao#">
+				UPDATE Inspecao SET INP_AvaliacaoAtiva = 'S'
+				WHERE INP_NumInspecao='#FORM.ninsp#'
+			</cfquery>		
 		 </cfif>
   </cfif>  
   <!--- final excluir anexo --->
@@ -392,7 +402,11 @@
 			WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_NumItem=#FORM.nitem#
 		  </cfif>
 	    </cfquery>		
-
+		<!--- Confirmar atuação do inspetor na avaliação --->
+		<cfquery datasource="#dsn_inspecao#">
+			UPDATE Inspecao SET INP_AvaliacaoAtiva = 'S'
+			WHERE INP_NumInspecao='#FORM.ninsp#'
+		</cfquery>
 		<!--- Exclusão de todos os anexos para avaliação diferente de N - Não Conforme --->
 		<cfif FORM.avalItem neq 'N'>
 			<!--- Verificar se anexo existe --->
@@ -578,9 +592,10 @@
 				<cfif rsVerifItensEmReanalise.recordCount eq 0>
 						<!---UPDATE em Inspecao--->
 						<cfquery datasource="#dsn_inspecao#" ><!---Inspeções NA = Nao avaliadas, ER = em reavaliação, RA =reavaliado, CO = concluída---> 
-							UPDATE Inspecao SET INP_Situacao = 'RA', INP_DtEncerramento =  CONVERT(char, GETDATE(), 102), INP_DtUltAtu =  CONVERT(char, GETDATE(), 120), INP_UserName ='#CGI.REMOTE_USER#'
+							UPDATE Inspecao SET INP_Situacao = 'RA', INP_DtEncerramento =  CONVERT(char, GETDATE(), 102), INP_DtUltAtu =  CONVERT(char, GETDATE(), 120), INP_UserName ='#CGI.REMOTE_USER#', INP_AvaliacaoAtiva = 'S'
 							WHERE INP_Unidade='#FORM.unid#' AND INP_NumInspecao='#FORM.Ninsp#' 
 						</cfquery>
+									<!--- Confirmar atuação do inspetor na avaliação --->
 						<!---Fim UPDATE em Inspecao --->
 						<cflocation url = "itens_inspetores_avaliacao.cfm" addToken = "no">
 				</cfif>

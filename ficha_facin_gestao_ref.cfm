@@ -309,10 +309,10 @@
                 medmeta1 = medmeta1 + ret[3]
                 medmeta2 = medmeta2 + ret[7]
                 medmeta3 = medmeta3 + ret[10]
-                let url = "href=ficha_facin_gestao_relat.cfm?ninsp="+ret[8]+"&matr="+matr
+                let url = 'href=ficha_facin_gestao_relat.cfm?ninsp='+ret[8]+'&matr='+matr
                 //alert(url)
                 tab += '<tr>'
-                  tab += '<td class="alert alert-primary"><a class="alert-link"'+url+' target="_blank">'+ret[8]+'</a></td>'
+                  tab += '<td class="alert alert-primary"><a class="alert-link" '+url+' target="_blank">'+ret[8]+'</a></td>'
                   tab += '<td>'+ret[11]+'</td>'
                   tab += '<td>'+ret[9]+'</td>'
                   tab += '<td>'+ret[0]+'</td>'
@@ -379,5 +379,6 @@
         $("#table").hide(500)
       }); 
       //final Limpar os selects bases
+      $(".external").attr("target","_blank")
 </script>
 </html>
