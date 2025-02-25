@@ -241,12 +241,15 @@
 					anosMeses[item.ANO] = [];
 				}
 				anosMeses[item.ANO].push(monthNames[item.MES - 1]);
-			});
+				});
+
+			// Obter o último ano disponível (maior ano)
+			const lastAvailableYear = Math.max(...Object.keys(anosMeses).map(Number));
 
       	  // Mapeia cada ano para um botão de opção de rádio com o ano como rótulo e valor
 			const radioButtonsAno = Object.keys(anosMeses).map((ano, i) => {
-				// Converte 'ano' para um número antes de comparar
-				const checkedClass = Number(ano) === currentYear ? " active" : "";
+				 // Marca como checked o último ano disponível
+				const checkedClass = Number(ano) === lastAvailableYear ? " active" : "";
 				const label = `${ano}`;
 				const input = `<input type="radio" name="ano" value="${ano}" id="option_a${i}" autocomplete="off"${checkedClass ? ' checked=""' : ""}>`;
 				const radioButton = `<label style="border:none!important;border-radius:10px!important;margin-left:2px;font-size:0.8rem" class="efeito-grow btn bg-yellow${checkedClass}">${input}${label}</label><br>`;
@@ -258,8 +261,20 @@
 
 			// Função para criar botões de opção de rádio para os meses
 			function createMonthRadioButtons(selectedYear) {
-				// Cria um array de nomes de meses, começando em janeiro e indo até o mês atual, em ordem crescente, com base no ano selecionado
+				 // Verifica se o ano selecionado existe no objeto anosMeses
+				 if (!anosMeses[selectedYear]) {
+					console.log('Ano não encontrado:', selectedYear);
+					return; // Retorna se o ano não existir
+				}
+
+				// Obtém os meses disponíveis para o ano selecionado
 				const monthRange = anosMeses[selectedYear];
+				
+				if (!monthRange || !monthRange.length) {
+					console.log('Nenhum mês encontrado para o ano:', selectedYear);
+					$('#opcoesMes').html(''); // Limpa os botões se não houver meses
+					return;
+				}
 
 				// Mapeia cada mês para um botão de opção de rádio com o número do mês como valor e o nome do mês como rótulo
 				const radioButtonsMes = monthRange.map((mes, i) => {
@@ -274,8 +289,10 @@
 				$('#opcoesMes').html(radioButtonsMes.join(''));
 			}
 
-			// Chama a função para criar os botões de opção de rádio para os meses do ano atual
-			createMonthRadioButtons(currentYear);
+			// Chama a função para criar os botões de opção de rádio para os meses do último ano
+			if (anosMeses[lastAvailableYear]) {
+				createMonthRadioButtons(lastAvailableYear);
+			}
 
 			// Adiciona um ouvinte de eventos ao elemento HTML com o ID "opcoesAno"
 			$('#opcoesAno').on('change', function() {
