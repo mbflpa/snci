@@ -112,10 +112,15 @@
     <cfquery datasource="#dsn_inspecao#" name="rsDevol">
         SELECT RIP_NumInspecao, Count(RIP_NumInspecao) AS totdevol
         FROM Resultado_Inspecao
-        WHERE RIP_Recomendacao_Inspetor Is Not Null
+        WHERE (RIP_Recomendacao_Inspetor is not null and RIP_Matricula_Reanalise is not null) 
         GROUP BY RIP_NumInspecao
         HAVING RIP_NumInspecao = convert(varchar,'#form.numinsp#')
     </cfquery>
+    <cfquery datasource="#dsn_inspecao#" name="rsOrtog">
+        SELECT RIP_NumInspecao
+        FROM Resultado_Inspecao
+        WHERE RIP_NumInspecao = convert(varchar,'#form.numinsp#') and RIP_Recomendacao_Inspetor is null and RIP_Matricula_Reanalise is null and RIP_Correcao_Revisor = '1'
+    </cfquery>    
 
     <cfquery datasource="#dsn_inspecao#" name="rsExisteFacin">
         SELECT FAC_Qtd_Geral, FAC_Qtd_NC, FAC_Qtd_Devolvido, 
@@ -129,8 +134,11 @@
         <cfset form.ptogeral = #rsRIP.TotalRIP#>
         <cfset form.meta1 = 100>
         <cfset form.meta2 = 100>
-        <cfset form.ptorevismeta1 = #rsRIP.TotalRIP#>
+        <!--- <cfset form.ptorevismeta1 = #rsRIP.TotalRIP#>
         <cfset form.ptorevismeta2 = #rsRIP.TotalRIP#>
+        --->
+        <cfset form.ptorevismeta1 = 100>
+        <cfset form.ptorevismeta2 = 100>
     <cfelse>
         <cfset form.ptogeral = #rsExisteFacin.FAC_Qtd_Geral#>
         <cfset form.ptodev = #rsExisteFacin.FAC_Qtd_Devolvido#>
@@ -139,8 +147,7 @@
         <cfset form.ptorevismeta1 = #rsExisteFacin.FAC_Pontos_Revisao_Meta1#>
         <cfset form.ptorevismeta2 = #rsExisteFacin.FAC_Pontos_Revisao_Meta2#>
     </cfif>
-    <cfset ptogrpitm = numberFormat((100/form.ptogeral),'___.0')>
-
+    <cfset ptogrpitm = numberFormat((100/form.ptogeral),'___.00')>
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -305,7 +312,7 @@
     <label for="" class="col-sm-3 col-form-label">&nbsp;#datarevis#</label>
     <label for="" class="col-sm-3 col-form-label">&nbsp;#dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</label>
     <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>04.Avaliação</strong></label>
-    <label for="" class="col-sm-4 col-form-label">&nbsp;Qtd. Geral de Pontos &nbsp;<div id="ptogeral" class="badge bg-primary text-wrap" style="width: 4rem;">#form.ptogeral#</div></label>
+    <label for="" class="col-sm-3 col-form-label">&nbsp;Qtd. pontos avaliados &nbsp;<div id="ptogeral" class="badge bg-primary text-wrap" style="width: 4rem;">#form.ptogeral#</div></label>
     <!--- <cfif rsExisteFacin.recordcount lte 0> --->
         <cfset form.ptodev = 0>
         <cfset auxpercptodev = 0>
@@ -315,14 +322,16 @@
             <cfset auxpercptodev = numberFormat(auxpercptodev,'___.00')>
         </cfif>
     <!--- </cfif>     --->
-    <label for="" class="col-sm-4 col-form-label">&nbsp;Qtd. Pontos Devolvidos &nbsp;<div id="ptodev" class="badge bg-primary text-wrap" style="width: 3rem;">#form.ptodev#</div></label>
-    <label for="" class="col-sm-4 col-form-label">&nbsp;Percentual de Devolução&nbsp;<div id="perdev" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#auxpercptodev#</cfoutput>%</div></label>
-
+    <label for="" class="col-sm-3 col-form-label">&nbsp;Qtd. pontos com Reanálise &nbsp;<div id="ptodev" class="badge bg-primary text-wrap" style="width: 3rem;">#form.ptodev#</div></label>
+    <label for="" class="col-sm-3 col-form-label">&nbsp;Percentual com Reanálise&nbsp;<div id="perdev" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#auxpercptodev#</cfoutput>%</div></label>
+    <label for="" class="col-sm-3 col-form-label">&nbsp;Qtd. Correção texto &nbsp;<div id="ptodev" class="badge bg-primary text-wrap" style="width: 3rem;">#rsOrtog.recordcount#</div></label>
   
-    <label for="" class="col-sm-6 col-form-label">&nbsp;Pontos Obtidos na Revisão Geral (Meta1) <div id="meta1" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta1#%</div></label>
-    <label for="" class="col-sm-6 col-form-label">&nbsp;Pontos Obtidos na Revisão Geral (Meta2) <div id="meta2" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta2#%</div></label>
+    <label for="" class="col-sm-6 col-form-label">&nbsp;Percentual (Meta1) <div id="meta1" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta1#%</div></label>
+    <label for="" class="col-sm-6 col-form-label">&nbsp;Percentual (Meta2) <div id="meta2" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta2#%</div></label>
+<div style="display:none">
     <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta1" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta1#</cfoutput></div></label>
     <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta2" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta2#</cfoutput></div></label>
+</div>   
     <p class="text-center"><strong>METAS</strong></p>
 </cfoutput>
 
@@ -358,7 +367,7 @@
             <cfif rsItem.FACA_Avaliacao neq ''><cfset form.meta1_pto = #rsItem.FACA_Meta1_Pontos#></cfif>            
             <tr>
                 <tr>
-                    <td>Pontuação Obtida por Avaliador/Grupo_Item</td>
+                    <td>Pontuação Obtida por Grupo/Item</td>
                     <td>
                         <div class="badge bg-primary text-wrap" style="width: 5rem;">
                             <input class="form-control" type="text" id="meta1_pto_obtida" name="meta1_pto_obtida" value="<cfoutput>#form.meta1_pto#</cfoutput>" readonly>
@@ -496,7 +505,7 @@
             <cfset form.meta2_pto = #ptogrpitm#>
             <cfif rsItem.FACA_Avaliacao neq ''><cfset form.meta2_pto = #rsItem.FACA_Meta2_Pontos#></cfif>                
             <tr>
-                <td>Pontuação Obtida por Avaliador/Grupo_Item </td>
+                <td>Pontuação Obtida por Grupo/Item </td>
                 <td>
                     <div class="badge bg-primary text-wrap" style="width: 5rem;">
                         <input class="form-control" type="text" id="meta2_pto_obtida" name="meta2_pto_obtida" value="<cfoutput>#form.meta2_pto#</cfoutput>" readonly>
@@ -567,7 +576,7 @@
         </tbody>
       </table>
       <div class="row align-items-center">
-        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Considerações do Item - GESTOR(A)</strong></label>
+        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Considerações do Item - REVISOR(A)</strong></label>
         <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerargestor" id="considerargestor" class="form-control" placeholder="Consideração para Grupo/Item" <cfoutput>#gestorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_Consideracao)#</cfoutput></textarea>	        
       </div>  
       <div class="row align-items-center">
@@ -611,13 +620,15 @@
             <cfset form.meta1_percqggitens = #rsFacinInd.FFI_Meta1_Resultado#>
         </cfif>
         
-        <div class="col-sm-4">
+        <div class="col-sm-7">
             <label for="" class="">&nbsp;#rsAvalia.Fun_Nome#</label>  
         </div>
-        <div class="col-sm-8">
+        <div class="col-sm-5">
             <label>&nbsp;Qtd. Item Avaliado: &nbsp;<div id="meta1_qggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta1_qggitens#</div></label>
-            <label>&nbsp;Pontuação Inicial:&nbsp;<div id="meta1_qgptop_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta1_qgptop#</div></label>
-            <label>&nbsp;Pontuação Obtida:&nbsp;<div id="meta1_qgpto_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta1_qgpto#</div></label>
+            <div style="display:none">
+                <label>&nbsp;Pontuação Inicial:&nbsp;<div id="meta1_qgptop_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta1_qgptop#</div></label>
+                <label>&nbsp;Pontuação Obtida:&nbsp;<div id="meta1_qgpto_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta1_qgpto#</div></label>
+            </div>
             <!---<cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
             <cfset percent = numberFormat(percent,'___.00')> --->
             <label>&nbsp;Resultado: &nbsp;<div id="meta1_percqggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta1_percqggitens#%</div></label>
@@ -646,13 +657,15 @@
             <cfset form.meta2_qgpto = #rsFacinInd.FFI_Meta2_Pontuacao_Obtida#>
             <cfset form.meta2_percqggitens = #rsFacinInd.FFI_Meta2_Resultado#>
         </cfif>        
-        <div class="col-sm-4">
+        <div class="col-sm-7">
             <label for="" class="">&nbsp;#rsAvalia.Fun_Nome#</label>         
         </div>
-        <div class="col-sm-8">
+        <div class="col-sm-5">
             <label>&nbsp;Qtd. Item Avaliado: &nbsp;<div id="meta2_qggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta2_qggitens#</div></label>
+            <div style="display:none">
             <label>&nbsp;Pontuação Inicial:&nbsp;<div id="meta2_qgptop_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta2_qgptop#</div></label>            
             <label>&nbsp;Pontuação Obtida:&nbsp;<div id="meta2_qgpto_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta2_qgpto#</div></label>
+            </div>
   <!---          <cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
             <cfset percent = numberFormat(percent,'___.00')> --->
             <label>&nbsp;Resultado: &nbsp;<div id="meta2_percqggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta2_percqggitens#%</div></label>
@@ -687,8 +700,8 @@
     <input class="btn btn-primary" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#>
     <input class="btn btn-info" type="button" onClick="window.open('ficha_facin_Ref.cfm?numinsp=#form.numinsp#&acao=buscar','_self')" value="Voltar">
 </div> 
-<cfset meta1desconto = numberFormat((ptogrpitm/10),'___.0')>
-<cfset meta2desconto = numberFormat((ptogrpitm/5),'___.0')>
+<cfset meta1desconto = numberFormat((ptogrpitm/10),'___.000')>
+<cfset meta2desconto = numberFormat((ptogrpitm/5),'___.000')>
 <input type="hidden" id="meta1desconto" name="meta1desconto" value="#trim(meta1desconto)#">
 <input type="hidden" id="meta2desconto" name="meta2desconto" value="#trim(meta2desconto)#">
 <input type="hidden" id="totalNC" name="totalNC" value="#rsItem.recordcount#">
@@ -875,7 +888,7 @@ $(function(e){
         let ptometa1 = $('#meta1_pto_obtida').val()
         let ptobtida = $('#ptobtida').val()
         let meta1desconto = $('#meta1desconto').val()  
-    // alert(' meta1desconto:'+meta1desconto+' ptometa1:'+ptometa1+'  ptobtida:'+ptobtida);
+     //alert(' meta1desconto:'+meta1desconto+' ptometa1:'+ptometa1+'  ptobtida:'+ptobtida);
     
         let totcheckded=0
         $( ".meta1" ).each(function( index ) {
@@ -888,7 +901,7 @@ $(function(e){
             }
            // alert($('.'+auxnome).val())
         })
-        
+        //alert('totcheckded:' + totcheckded)
         //atualizar Pontuação Obtida por avaliador/Grupo_Item
         let novaptobtd = ptobtida;
         if(totcheckded > 0){
@@ -910,7 +923,7 @@ $(function(e){
             let novopontoobtido = eval(pontosobtidosatual - desconto).toFixed(2)
             $('#meta1_qgpto_' + matraval).html(novopontoobtido);
             $("#ffimeta1pontuacaoobtida_" + matraval).val(novopontoobtido)
-            let percmeta1 = parseFloat((novopontoobtido / pontuacaoinicial)*100).toFixed(2);
+            let percmeta1 = parseFloat((novopontoobtido / pontuacaoinicial)*100).toFixed(3);
             $('#meta1_percqggitens_' + matraval).html(percmeta1 + ' %');
             $("#ffimeta1resultado_" + matraval).val(percmeta1)
         }else{
@@ -927,9 +940,9 @@ $(function(e){
             facqtdgeral = $('#facqtdgeral').val();
             dbmeta1= $('#db_meta1').val(); 
             dbptorevismeta1= $('#db_ptorevismeta1').val(); 
-            
             let novoptorevismeta1 = eval(facqtdgeral - (totcheckded*meta1desconto)).toFixed(2)
             let percmeta1 = parseFloat((novoptorevismeta1/facqtdgeral)*100).toFixed(2);
+            
             if(totcheckded > 0){
                 $('#ptorevismeta1').html(novoptorevismeta1);
                 $('#meta1').html(percmeta1 + ' %');
@@ -1011,6 +1024,7 @@ $(function(e){
             $('#facpontosrevisaometa2').val(dbptorevismeta2);
             $('#facpercrevisaometa2').val(dbmeta2);                
         }
+        //alert($('#facpercrevisaometa2').val())
     // fim ajustar 04.Avaliação
 })    
 //*****************************************************************

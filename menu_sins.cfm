@@ -351,7 +351,7 @@
           <cfif AtivFacin eq 'A,I' OR AtivFacin eq 'A,I,R'>
             <tr>
                 <td><img src="smallArrow.gif" width="16" height="5" /></td>
-                <td width="94%"><a href="index.cfm?opcao=permissao28">Avaliar Inspetores</a></td>
+                <td width="94%"><a href="index.cfm?opcao=permissao28">Avaliar FACIN</a></td>
             </tr>
             <tr>
               <td>&nbsp;</td>
