@@ -155,7 +155,7 @@
 					,FACA_Meta2_AR_Nomen = '#form.meta2_arnomc#'
 					,FACA_Meta2_AR_Ordem = '#form.meta2_arorde#'
 					,FACA_Meta2_AR_Prazo = '#form.meta2_arpraz#'
-					,FACA_Consideracao = '#form.considerar#'
+					,FACA_Consideracao = '#form.considerargestor#'
 					,FACA_Meta2_Pontos = #FACAMETA2PONTOS#
 					,FACA_DtAlter = CONVERT(char, GETDATE(), 120)
 					WHERE 

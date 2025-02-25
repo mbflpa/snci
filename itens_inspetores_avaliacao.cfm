@@ -232,6 +232,7 @@ INNER JOIN Grupos_Verificacao ON (Itn_NumGrupo = Grp_Codigo) AND (Itn_Ano = Grp_
 <html>
 <head>
 <title>Sistema Nacional de Controle Interno</title>
+<link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">  
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <!--- <meta http-equiv="refresh" content="5" > Atualiza a página a cada 5 segundos--->
@@ -911,14 +912,15 @@ background:#6699CC;
 					</cfquery>
 					<cfif rsExisteSN.recordcount lte 0>	
 						<cfquery datasource="#dsn_inspecao#">
-							insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area) 
-							values ('#url.numInspecao#', '#rsInspecaoFinal.RIP_Unidade#', #rsInspecaoFinal.RIP_NumGrupo#, #rsInspecaoFinal.RIP_NumItem#, #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 0, '000000', '#andparecer#', '#rsInspecaoFinal.RIP_Unidade#')
+							insert into Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, and_Parecer, And_Area, And_NomeArea) 
+							values ('#url.numInspecao#', '#rsInspecaoFinal.RIP_Unidade#', #rsInspecaoFinal.RIP_NumGrupo#, #rsInspecaoFinal.RIP_NumItem#, #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 0, '000000', '#andparecer#', '#rsInspecaoFinal.RIP_Unidade#','#posarea_nome#')
 						</cfquery>
 					<cfelse>
 						<cfquery datasource="#dsn_inspecao#">
 							update Andamento set And_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
 							, And_username='#CGI.REMOTE_USER#'
 							, And_Area = '#rsInspecaoFinal.RIP_Unidade#'
+							, And_NomeArea = '#posarea_nome#'
 							, and_Parecer= '#andparecer#'
 							where And_Unidade = '#rsInspecaoFinal.RIP_Unidade#' and 
 							And_NumInspecao='#rsInspecaoFinal.RIP_NumInspecao#' and 
@@ -1015,7 +1017,7 @@ background:#6699CC;
 			WHERE (Rtrim(INP_Situacao) = 'NA' or Rtrim(INP_Situacao) = 'ER')
 				and NIP_Situacao = 'A'
 				and left(INP_NumInspecao,2) in(#se#)
-			ORDER BY INP_DtInicInspecao
+			ORDER BY INP_NumInspecao,INP_AvaliacaoAtiva,INP_DtInicInspecao
 		</cfquery>
 	</cfif>
 
@@ -1045,13 +1047,13 @@ background:#6699CC;
 				<br>
 				<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782"><strong >Todos os itens da Avaliação de Controle realizada na unidade foram executados com sucesso e foram submetidos à REVISÃO da SCOI.<BR>Os itens estarão liberados para visualização dos Inspetores Regionais e da unidade verificada após o término da revisão.</strong>
 					<br><br>
-					<button onClick="window.close()" class="botao">Fechar</button> 
+					<button onClick="window.close()" class="btn btn-warning">Fechar</button> 
 				</div>
 				<br>
 			<cfelse>
 				<div align="center" style="position:relative;top:10px;font-size:18px;color:#005782">
 					<br><br>
-					<button onClick="window.close()" class="botao">Fechar</button> 
+					<button onClick="window.close()" class="btn btn-warning">Fechar</button> 
 				</div>
 			</cfif> 
 		<cfelse>
@@ -1065,7 +1067,7 @@ background:#6699CC;
 		<cfif '#rsInspecoes.recordCount#' neq 0>
 	        <div align="center" style="padding:10px;background:lavender; font-family:Verdana, Arial, Helvetica, sans-serif">
 				<select name="selInspecoes" id="selInspecoes"  onchange="abrirInspecao(this.value)" style="width:500px">
-					<option selected="selected" value="" ></option>
+					<option selected="selected" value="">---</option>
 					<cfoutput query="rsInspecoes">
 						<cfquery datasource="#dsn_inspecao#" name="rsInspecao">
 							SELECT * FROM Inspecao 
@@ -1086,10 +1088,14 @@ background:#6699CC;
 							<cfset comItemEmRevisao='#rsVerifComItemEmRevisao.recordcount#'>
 						</cfif>
 																
-						<cfparam name="coordenador" default="#rsCoordenador.Usu_Matricula#">
+						<!--- <cfparam name="coordenador" default="#rsCoordenador.Usu_Matricula#"> --->
+						<cfset coordenador = #rsCoordenador.Usu_Matricula#>
+						<cfset avalinicsn = 'Não'>
+						<cfif INP_AvaliacaoAtiva eq 'S'>
+							<cfset avalinicsn = 'Sim'>
+						</cfif>
 									
-						<option  value="itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#rsUnidades.Und_Codigo#" style="<cfif rsVerifComItemEmRevisao.recordcount neq 0 >color:red</cfif>">
-								#rsInspecao.INP_NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#) <cfif rsVerifComItemEmRevisao.recordcount neq 0 > - Reanálise: #rsVerifComItemEmRevisao.recordcount#<cfif #rsVerifComItemEmRevisao.recordcount# gt 1> itens<cfelse> item</cfif> </cfif>
+						<option  value="itens_inspetores_avaliacao.cfm?numInspecao=#INP_NumInspecao#&Unid=#rsUnidades.Und_Codigo#" style="<cfif rsVerifComItemEmRevisao.recordcount neq 0 >color:red</cfif>">#rsInspecao.INP_NumInspecao# - #trim(rsUnidades.Und_Descricao)# (#rsUnidades.Und_Codigo#)-(Coordena:#coordenador#)-(Aval. Iniciada? #avalinicsn#)<cfif rsVerifComItemEmRevisao.recordcount neq 0 > - Reanálise: #rsVerifComItemEmRevisao.recordcount#<cfif #rsVerifComItemEmRevisao.recordcount# gt 1> itens<cfelse> item</cfif> </cfif>
 						</option>			
 					</cfoutput>
 				</select>
@@ -1218,7 +1224,7 @@ background:#6699CC;
 						<br>
 						<div align="center" style="position:relative;top:10px;font-size:16px;color:#005782"><strong >Todos os itens da Avaliação de Controle realizada na unidade foram executados com sucesso e foram submetidos à REVISÃO da SCOI.<BR>Os itens estarão liberados para visualização dos Inspetores Regionais e da unidade verificada após o término da revisão.</strong></div>
 						<br><br>
-						<button onClick="window.close()" class="botao">Fechar</button> 
+						<button onClick="window.close()" class="btn btn-warning">Fechar</button> 
 					</cfif>
 				</cfif>
 			</div>
@@ -1336,7 +1342,7 @@ background:#6699CC;
 					<td><div align="center">Falta</div></td>
 					<td><div align="center">Sobra</div></td>
 					<td><div align="center">EmRisco</div></td>
-					<td><div align="center">Reicidentes</div></td>
+					<td><div align="center">Reincidentes</div></td>
 				</tr>
 				<cfoutput>
 					<cfset qtdc = rsC.recordcount>
@@ -1369,7 +1375,7 @@ background:#6699CC;
 				</script>
 			</cfif>  
         	<div align="center" style="position:relative;top:10px">
-				<button onClick="window.close()" class="botao">Fechar</button>
+				<button onClick="window.close()" class="btn btn-warning">Fechar</button>
 				<br><br><br>
 					<!---Botão de validação para transmissão da Avaliação--->
 				<cfif rsVerificaFinalizacao.recordcount eq 0 and grpacesso eq "INSPETORES" and trim(rsItem.INP_DTConcluirAvaliacao) eq ''>	
