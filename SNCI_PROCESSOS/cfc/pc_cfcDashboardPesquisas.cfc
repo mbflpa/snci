@@ -1,10 +1,6 @@
 <cfcomponent>
     <cffunction name="getPesquisas" access="remote" returntype="string" returnformat="json">
-        <cfargument name="matricula" type="string" required="false" default="">
-        <cfargument name="processo" type="string" required="false" default="">
-        <cfargument name="mcu" type="string" required="false" default="">
-        <cfargument name="dataInicio" type="string" required="false" default="">
-        <cfargument name="dataFim" type="string" required="false" default="">
+        <cfargument name="ano" type="string" required="true">
         
         <cfquery name="qPesquisas" datasource="#application.dsn_processos#">
             SELECT 
@@ -22,22 +18,7 @@
                 pc_pesq_observacao,
                 pc_pesq_data_hora
             FROM pc_pesquisas
-            WHERE 1=1
-            <cfif len(arguments.matricula)>
-                AND pc_usu_matricula = <cfqueryparam value="#arguments.matricula#" cfsqltype="cf_sql_varchar">
-            </cfif>
-            <cfif len(arguments.processo)>
-                AND pc_processo_id = <cfqueryparam value="#arguments.processo#" cfsqltype="cf_sql_varchar">
-            </cfif>
-            <cfif len(arguments.mcu)>
-                AND pc_org_mcu = <cfqueryparam value="#arguments.mcu#" cfsqltype="cf_sql_varchar">
-            </cfif>
-            <cfif len(arguments.dataInicio) AND len(arguments.dataFim)>
-                AND pc_pesq_data_hora BETWEEN 
-                    <cfqueryparam value="#arguments.dataInicio#" cfsqltype="cf_sql_timestamp">
-                    AND 
-                    <cfqueryparam value="#arguments.dataFim#" cfsqltype="cf_sql_timestamp">
-            </cfif>
+            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
             ORDER BY pc_pesq_data_hora DESC
         </cfquery>
         
@@ -61,7 +42,7 @@
                 COALESCE(CAST(AVG(CAST(pc_pesq_pos_trabalho AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_pos_trabalho,
                 COALESCE(CAST(AVG(CAST(pc_pesq_pontualidade AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_pontualidade
             FROM pc_pesquisas 
-            WHERE YEAR(pc_pesq_data_hora) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
         </cfquery>
     
         <cfquery name="qryEvolucao" datasource="#application.dsn_processos#">
@@ -70,7 +51,7 @@
                 AVG((pc_pesq_comunicacao + pc_pesq_interlocucao + pc_pesq_reuniao_encerramento + 
                      pc_pesq_relatorio + pc_pesq_pos_trabalho) / 5.0) as media_geral
             FROM pc_pesquisas 
-            WHERE YEAR(pc_pesq_data_hora) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             GROUP BY FORMAT(pc_pesq_data_hora, 'yyyy-MM')
             ORDER BY mes
         </cfquery>
@@ -91,6 +72,17 @@
             })>
         </cfloop>
     
+        <cfquery name="rsQtdRespondidas" datasource="#application.dsn_processos#">
+            SELECT COUNT(*) as total_respondidas
+            FROM pc_pesquisas
+            WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+        </cfquery>
+        
+        <!--- Calcula o índice de respostas --->
+        <cfset var qtdSemPesquisa = getQuantidadeProcessosSemPesquisa(arguments.ano)>
+        <cfset var totalProcessos = qtdSemPesquisa + rsQtdRespondidas.total_respondidas>
+        <cfset var indiceRespostas = (totalProcessos GT 0) ? (rsQtdRespondidas.total_respondidas / totalProcessos) * 100 : 0>
+    
         <cfset retorno = {
             "total": qryPesquisas.total_pesquisas,
             "comunicacao": NumberFormat(qryPesquisas.media_comunicacao, "999.99"),
@@ -107,19 +99,49 @@
                 val(qryPesquisas.media_relatorio),
                 val(qryPesquisas.media_pos_trabalho)
             ],
-            "evolucaoTemporal": evolucaoArray
+            "evolucaoTemporal": evolucaoArray,
+            "indiceRespostas": NumberFormat(indiceRespostas, "99.99")
         }>
     
         <cfreturn retorno>
     </cffunction>
 
-    <cffunction name="exportarPDF" access="remote" returntype="void">
-        <cfargument name="filtros" type="string" required="false" default="">
-        
-        <cfcontent type="application/pdf">
-        <cfdocument format="PDF">
-            <cfinclude template="relatorio_pesquisas.cfm">
-        </cfdocument>
+    <cffunction name="getQuantidadeProcessosSemPesquisa" access="remote" returntype="numeric" output="false">
+        <cfargument name="ano" type="string" required="true">
+        <cfquery name="rsProcSemPesquisa" datasource="#application.dsn_processos#" timeout="120">
+            SELECT COUNT(DISTINCT processos_id) as total_sem_pesquisa 
+            FROM (
+                SELECT DISTINCT pc_processos.pc_processo_id as processos_id
+                FROM pc_avaliacao_orientacoes
+                INNER JOIN pc_avaliacoes 
+                    ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+                INNER JOIN pc_processos 
+                    ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                AND pc_processos.pc_processo_id NOT IN 
+                (
+                    SELECT pc_processo_id 
+                    FROM pc_pesquisas    
+                )
+
+                UNION
+
+                SELECT DISTINCT pc_processos.pc_processo_id
+                FROM pc_avaliacao_melhorias
+                INNER JOIN pc_avaliacoes 
+                    ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
+                INNER JOIN pc_processos 
+                    ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                AND pc_processos.pc_processo_id NOT IN 
+                (
+                    SELECT pc_processo_id 
+                    FROM pc_pesquisas 
+                )
+            ) AS unificado
+        </cfquery>
+
+        <cfreturn rsProcSemPesquisa.total_sem_pesquisa>
     </cffunction>
-    <!-- As funções acima serão consumidas via AJAX no dashboard -->
+
 </cfcomponent>

@@ -1,5 +1,5 @@
 <cfquery name="rsAnoDashboard" datasource="#application.dsn_processos#">
-    SELECT DISTINCT YEAR(pc_pesq_data_hora) AS ano FROM pc_pesquisas ORDER BY ano DESC
+    SELECT DISTINCT RIGHT(pc_processo_id, 4) AS ano FROM pc_pesquisas ORDER BY ano DESC
 </cfquery>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -7,12 +7,8 @@
     <meta charset="UTF-8">
     <title>Dashboard de Pesquisas</title>
     <link rel="stylesheet" href="dist/css/stylesSNCI_PaineisFiltro.css">
-    <!-- Incluir Chart.js e plugin -->
-    <script src="plugins/chart.js/Chart.min.js"></script>
-    <script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
-    <!-- Adicionar scripts para exportação PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+   
+
     <style>
         /* Estilos básicos inspirados no dashboard-export.html */
         body { background-color: #f7f7f7; }
@@ -140,6 +136,25 @@
             border-color: #0056b3 !important;
             color: white !important;
         }
+
+        /* Ajuste para manter altura consistente do card */
+        .small-box .inner {
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .small-box .inner h3 {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Novo estilo para o texto de 'não há pesquisas' */
+        .small-box .inner h3.texto-menor {
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <!-- Estrutura padrão do projeto -->
@@ -159,12 +174,7 @@
                             <div class="col-sm-6">
                                 <h1>Dashboard de Pesquisas</h1>
                             </div>
-                            <div class="col-sm-6">
-                                <button class="export-pdf-btn" onclick="exportarDashboard()">
-                                    <i class="fas fa-file-pdf"></i>
-                                    <span>Exportar PDF</span>
-                                </button>
-                            </div>
+                            
                         </div>
                     </div>
                 </section>
@@ -192,18 +202,29 @@
 
                         <!-- Cards de métricas -->
                         <div class="row">
-                            <div class="col-lg-4 col-6">
+                            <div class="col-lg-3 col-6">
                                 <div class="small-box bg-info">
                                     <div class="inner">
                                         <h3 id="totalPesquisas">0</h3>
-                                        <p>Total de Pesquisas</p>
+                                        <p>Total de Pesquisas Respondidas</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="fas fa-chart-bar"></i>
+                                        <i class="fas fa-file-text"></i>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-6">
+                            <div class="col-lg-3 col-6">
+                                <div class="small-box bg-primary">
+                                    <div class="inner">
+                                        <h3 id="indiceRespostas">0%</h3>
+                                        <p>Índice de Respostas</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-6">
                                 <div class="small-box bg-success">
                                     <div class="inner">
                                         <h3 id="mediaGeral">0</h3>
@@ -214,17 +235,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4 col-6">
+                            <div class="col-lg-3 col-6">
                                 <div class="small-box bg-warning">
                                     <div class="inner">
                                         <h3 id="mediaGeralPontualidade">0</h3>
-                                        <p>Média Geral Pontualidade</p>
+                                        <p>Pontualidade</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="fas fa-check-circle"></i>
+                                        <i class="fas fa-clock"></i>
                                     </div>
                                 </div>
                             </div>
+                           
                         </div>
 
                         <!-- Score Cards -->
@@ -354,7 +376,9 @@
             <cfinclude template="includes/pc_footer.cfm">
         </footer>
     </div>
-    
+
+    <script src="plugins/chart.js/Chart.min.js"></script>
+    <script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
     <script>
         // ...existing JavaScript de geração de filtros e gráficos...
         $(document).ready(function() {
@@ -401,14 +425,43 @@
             }
         
             function renderGraficoEvolucao(evolucao) {
-                if (!evolucao || !Array.isArray(evolucao) || evolucao.length === 0) {
-                    console.warn('Dados de evolução inválidos ou vazios:', evolucao);
-                    return;
-                }
-
+                // Removida a verificação que estava gerando warning desnecessário
                 var ctx = document.getElementById('graficoEvolucao').getContext('2d');
                 if (graficoEvolucao) { 
                     graficoEvolucao.destroy(); 
+                }
+
+                // Se não houver dados, criar gráfico vazio
+                if (!evolucao || !Array.isArray(evolucao) || evolucao.length === 0) {
+                    graficoEvolucao = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: [],
+                            datasets: [{
+                                label: 'Média Mensal',
+                                data: [],
+                                borderColor: '#17a2b8',
+                                backgroundColor: 'rgba(23, 162, 184, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: true, position: 'top' }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 10
+                                }
+                            }
+                        }
+                    });
+                    return;
                 }
 
                 // Formata os dados para exibição
@@ -422,6 +475,7 @@
                     return Number(item.media) || 0;
                 });
 
+                // Resto do código do gráfico permanece igual
                 graficoEvolucao = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -480,6 +534,13 @@
                 $("#totalPesquisas").text(resultado.total || '0');
                 $("#mediaGeral").text((resultado.mediaGeral || '0') + " / 10");
                 $("#mediaGeralPontualidade").text((resultado.pontualidadePercentual || '0') + "%");
+                
+                // Modificar lógica do índice de respostas
+                if (parseInt(resultado.total) === 0) {
+                    $("#indiceRespostas").text("Não há pesquisas respondidas").addClass('texto-menor');
+                } else {
+                    $("#indiceRespostas").text((resultado.indiceRespostas || '0') + "%").removeClass('texto-menor');
+                }
 
                 // Atualizar cards individuais 
                 const cards = [
@@ -552,7 +613,7 @@
                             // Atualiza totalizadores e cards
                             atualizarCards(resultado);
                             
-                            // Atualiza gráfico de média
+                            // Atualiza gráfico de médias
                             if (resultado.medias && Array.isArray(resultado.medias)) {
                                 renderGraficoMedia(resultado.medias);
                             }
@@ -576,96 +637,7 @@
             });
         });
 
-        async function exportarDashboard() {
-            try {
-                Swal.fire({
-                    title: 'Gerando PDF...',
-                    html: 'Por favor, aguarde...',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-
-                const dashboard = document.querySelector('#dashboard-content');
-                
-                // Garante que todos os elementos estejam visíveis
-                const originalHeight = dashboard.style.height;
-                dashboard.style.height = 'auto';
-                
-                // Aguarda os gráficos renderizarem completamente
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
-                // Captura a altura total do conteúdo
-                const scrollHeight = dashboard.scrollHeight;
-                
-                // Configurações aprimoradas do html2canvas
-                const canvas = await html2canvas(dashboard, {
-                    height: scrollHeight,
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    allowTaint: true,
-                    scrollY: -window.scrollY,
-                    windowHeight: scrollHeight
-                });
-
-                // Restaura a altura original
-                dashboard.style.height = originalHeight;
-
-                const imgData = canvas.toDataURL('image/jpeg', 1.0);
-                
-                // Criar PDF com orientação paisagem
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF({
-                    orientation: 'landscape',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                // Calcular dimensões mantendo proporção
-                const imgProps = pdf.getImageProperties(imgData);
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-                // Adicionar data/hora e título
-                const now = new Date();
-                const anoAtual = $("input[name='opcaoAno']:checked").val() || new Date().getFullYear();
-                const dataHora = now.toLocaleString('pt-BR');
-                pdf.setFontSize(12);
-                pdf.setTextColor(69, 69, 69);
-                pdf.text(`Dashboard de Pesquisas - ${anoAtual}`, 14, 15);
-                pdf.setFontSize(8);
-                pdf.text(`Gerado em: ${dataHora}`, 14, 20);
-
-                // Se o conteúdo exceder uma página, divide em múltiplas páginas
-                let heightLeft = pdfHeight;
-                let position = 0;
-                let pageHeight = pdf.internal.pageSize.getHeight();
-
-                pdf.addImage(imgData, 'JPEG', 0, 25, pdfWidth, pdfHeight);
-
-                while (heightLeft >= 0) {
-                    position = heightLeft - pageHeight;
-                    if (position < 0) break;
-                    
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, pdfHeight);
-                    heightLeft -= pageHeight;
-                }
-
-                pdf.save(`Dashboard_Pesquisas_${anoAtual}.pdf`);
-                Swal.close();
-                
-            } catch (error) {
-                console.error('Erro ao gerar PDF:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro',
-                    text: 'Não foi possível gerar o PDF. Tente novamente.'
-                });
-            }
-        }
+       
 
         // Configuração do DataTable similar ao pc_Usuarios.cfm
         function configurarDataTable() {
@@ -692,19 +664,19 @@
                         extend: 'colvis',
                         text: 'Selecionar Colunas',
                         className: 'btSelecionarColuna',
-                        collectionLayout: 'fixed three-column'
+                        collectionLayout: 'fixed three-column',
                     },
                     {
                         text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
                         action: function (e, dt, node, config) {
                             dt.columns().visible(true);
-                        }
+                        },
                     },
                     {
                         text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
                         action: function (e, dt, node, config) {
                             dt.columns().visible(false);
-                        }
+                        },
                     }
                 ],
                 columnDefs: [
