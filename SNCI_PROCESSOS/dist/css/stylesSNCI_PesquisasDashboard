@@ -1,0 +1,403 @@
+/* Definindo variáveis de cores para as categorias */
+:root {
+    /* Cores principais das categorias */
+    --cor-comunicacao: #17a2b8;
+    --cor-interlocucao: #6f42c1;
+    --cor-reuniao: #dc3545;
+    --cor-relatorio: #007bff;
+    --cor-pos-trabalho: #28a745;
+    --cor-pontualidade: #ffc107;
+    
+    /* Cores secundárias para gradientes */
+    --cor-comunicacao-gradiente: #138496;
+    --cor-interlocucao-gradiente: #5e35b1;
+    --cor-reuniao-gradiente: #c82333;
+    --cor-relatorio-gradiente: #0069d9;
+    --cor-pos-trabalho-gradiente: #218838;
+    --cor-pontualidade-gradiente: #e0a800;
+    
+    /* Cores de fundo para cards principais */
+    --cor-bg-info: #17a2b8;
+    --cor-bg-primary: #007bff;
+    --cor-bg-success: #28a745;
+    --cor-bg-warning: #ffc107;
+}
+
+/* Estilos básicos inspirados no dashboard-export.html */
+body { background-color: #f7f7f7; }
+.header { background-color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding: 1rem; }
+.header h1 { font-size: 1.5rem; color: #111827; text-align: center; }
+.content-wrapper { padding: 20px; overflow-y: auto; max-height: calc(100vh - 130px); }
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+.metric-card { background: #fff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.metric-label { font-size: 0.875rem; color: #6b7280; }
+.metric-value { font-size: 1.875rem; font-weight: 600; color: #111827; }
+
+/* Cores dos cards principais usando variáveis */
+.bg-info { background-color: var(--cor-bg-info) !important; }
+.bg-primary { background-color: var(--cor-bg-primary) !important; }
+.bg-success { background-color: var(--cor-bg-success) !important; }
+.bg-warning { background-color: var(--cor-bg-warning) !important; }
+
+/* Novos estilos modernos para os score cards */
+.score-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.score-card {
+    position: relative;
+    padding: 1.25rem 1rem;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.03);
+    margin-bottom: 0.5rem;
+    min-height: 110px;
+    border: none;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.score-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+}
+
+.score-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    border-radius: 6px 0 0 6px;
+}
+
+.score-card .heading-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.3rem;
+}
+
+.score-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+}
+
+/* Remover os ícones originais que ficam na frente dos títulos */
+.score-card h3 i.fas,
+.score-card h3 i.fa {
+    display: none;
+}
+
+/* Mantém visível apenas o ícone de tooltip */
+.score-card h3 i.tooltip-icon {
+    display: inline-block !important;
+}
+
+/* Estilo para o ícone de tooltip */
+.tooltip-icon {
+    margin-left: 5px;
+    font-size: 0.8rem;
+    color: rgba(0, 0, 0, 0.5);
+    cursor: help;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.tooltip-icon:hover {
+    opacity: 1;
+}
+
+/* Adicionando ajuste específico para ícones nos score cards */
+.score-card h3 .tooltip-icon {
+    color: inherit;
+    opacity: 0.6;
+}
+
+.score-card h3 .tooltip-icon:hover {
+    opacity: 1;
+}
+
+/* Novo estilo para os ícones grandes do lado direito */
+.score-card .card-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2.5rem;
+    opacity: 0.6;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+/* Cores dos ícones correspondentes às cores das barras de progresso usando variáveis */
+.comunicacao .card-icon {
+    color: var(--cor-comunicacao);
+}
+
+.interlocucao .card-icon {
+    color: var(--cor-interlocucao);
+}
+
+.reuniao .card-icon {
+    color: var(--cor-reuniao);
+}
+
+.relatorio .card-icon {
+    color: var(--cor-relatorio);
+}
+
+.pos-trabalho .card-icon {
+    color: var(--cor-pos-trabalho);
+}
+
+.pontualidade .card-icon {
+    color: var(--cor-pontualidade);
+}
+
+.score-card:hover .card-icon {
+    font-size: 2.7rem;
+    opacity: 0.8;
+}
+
+.score-card .icon-container {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    color: white;
+    display: none; /* Ocultando o contêiner original do ícone */
+}
+
+.score-card .metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.15rem 0 0.5rem;
+    color: #1a202c;
+}
+
+.progress-container {
+    position: relative;
+    width: 100%;
+    margin-top: auto;
+}
+
+.progress-bar {
+    height: 5px;
+    background: rgba(203, 213, 224, 0.3)!important;
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 9999px;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: #718096;
+    margin-top: 0.2rem;
+}
+
+/* Estilos específicos para cada tipo de score card usando variáveis */
+.comunicacao::before { background: var(--cor-comunicacao); }
+.comunicacao .icon-container { background: linear-gradient(135deg, var(--cor-comunicacao), var(--cor-comunicacao-gradiente)); }
+.comunicacao .progress-fill { background: linear-gradient(90deg, var(--cor-comunicacao), var(--cor-comunicacao-gradiente)); }
+
+.interlocucao::before { background: var(--cor-interlocucao); }
+.interlocucao .icon-container { background: linear-gradient(135deg, var(--cor-interlocucao), var(--cor-interlocucao-gradiente)); }
+.interlocucao .progress-fill { background: linear-gradient(90deg, var(--cor-interlocucao), var(--cor-interlocucao-gradiente)); }
+
+.reuniao::before { background: var(--cor-reuniao); }
+.reuniao .icon-container { background: linear-gradient(135deg, var(--cor-reuniao), var(--cor-reuniao-gradiente)); }
+.reuniao .progress-fill { background: linear-gradient(90deg, var(--cor-reuniao), var(--cor-reuniao-gradiente)); }
+
+.relatorio::before { background: var(--cor-relatorio); }
+.relatorio .icon-container { background: linear-gradient(135deg, var(--cor-relatorio), var(--cor-relatorio-gradiente)); }
+.relatorio .progress-fill { background: linear-gradient(90deg, var(--cor-relatorio), var(--cor-relatorio-gradiente)); }
+
+.pos-trabalho::before { background: var(--cor-pos-trabalho); }
+.pos-trabalho .icon-container { background: linear-gradient(135deg, var(--cor-pos-trabalho), var(--cor-pos-trabalho-gradiente)); }
+.pos-trabalho .progress-fill { background: linear-gradient(90deg, var(--cor-pos-trabalho), var(--cor-pos-trabalho-gradiente)); }
+
+.pontualidade::before { background: var(--cor-pontualidade); }
+.pontualidade .icon-container { background: linear-gradient(135deg, var(--cor-pontualidade), var(--cor-pontualidade-gradiente)); }
+.pontualidade .progress-fill { background: linear-gradient(90deg, var(--cor-pontualidade), var(--cor-pontualidade-gradiente)); }
+
+/* Adicionando animação para o valor */
+@keyframes countUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.score-card .metric-value {
+    animation: countUp 0.8s ease-out forwards;
+}
+
+/* Filtro de anos com rótulo */
+.filtro-ano-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.filtro-ano-label {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-right: 1rem;
+    color: #495057;
+    white-space: nowrap;
+}
+
+.btn-group .btn.active {
+    background-color: var(--cor-bg-primary) !important;
+    border-color: #0056b3 !important;
+    color: white !important;
+}
+
+/* Estilos para a tabela */
+.table-container { background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; margin-top:2rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; }
+
+.table-responsive {
+    margin: 2rem 0;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.table thead th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.table tbody td {
+    padding: 0.75rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #edf2f7;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 1rem;
+}
+
+.dataTables_wrapper .dataTables_info {
+    padding-top: 1rem;
+    color: #718096;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    padding-top: 1rem;
+}
+
+/* Estilo para o botão de exportação */
+.export-pdf-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    padding: 10px 15px;
+    border-radius: 4px;
+    background-color: var(--cor-bg-success);
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.export-pdf-btn:hover {
+    background-color: var(--cor-pos-trabalho-gradiente);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+@media print {
+    .export-pdf-btn {
+        display: none;
+    }
+}
+
+/* Ajuste para manter altura consistente do card */
+.small-box .inner {
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.small-box .inner h3 {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+/* Novo estilo para o texto de 'não há pesquisas' */
+.small-box .inner h3.texto-menor {
+    font-size: 1.2rem;
+}
+
+.formula-text {
+    font-size: 0.6rem!important;
+    color: rgba(255,255,255,0.7);
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    right: 10px;
+    margin: 0;
+    line-height: 1.1;
+    display: none;
+}
+
+.small-box {
+    position: relative;
+    overflow: visible;
+    margin-bottom: 20px;
+}
+
+/* Adicionando estilo para os containers dos gráficos */
+.card-body canvas {
+    min-height: 400px;
+}

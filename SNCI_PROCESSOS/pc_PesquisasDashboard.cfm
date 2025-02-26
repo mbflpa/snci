@@ -7,381 +7,8 @@
     <meta charset="UTF-8">
     <title>Dashboard de Pesquisas</title>
     <link rel="stylesheet" href="dist/css/stylesSNCI_PaineisFiltro.css">
-   
-    <style>
-        /* Estilos básicos inspirados no dashboard-export.html */
-        body { background-color: #f7f7f7; }
-        .header { background-color: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding: 1rem; }
-        .header h1 { font-size: 1.5rem; color: #111827; text-align: center; }
-        .content-wrapper { padding: 20px; overflow-y: auto; max-height: calc(100vh - 130px); }
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(250px,1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .metric-card { background: #fff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .metric-label { font-size: 0.875rem; color: #6b7280; }
-        .metric-value { font-size: 1.875rem; font-weight: 600; color: #111827; }
-
-        /* Novos estilos modernos para os score cards */
-        .score-cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        
-        .score-card {
-            position: relative;
-            padding: 1.25rem 1rem;
-            border-radius: 12px;
-            background: #fff;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.03);
-            margin-bottom: 0.5rem;
-            min-height: 110px;
-            border: none;
-            transition: all 0.3s ease;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        .score-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
-        }
-        
-        .score-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 6px;
-            height: 100%;
-            border-radius: 6px 0 0 6px;
-        }
-        
-        .score-card .heading-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.3rem;
-        }
-        
-        .score-card h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 0;
-            color: #2d3748;
-            display: flex;
-            align-items: center;
-        }
-        
-        /* Remover os ícones originais que ficam na frente dos títulos */
-        .score-card h3 i.fas,
-        .score-card h3 i.fa {
-            display: none;
-        }
-        
-        /* Mantém visível apenas o ícone de tooltip */
-        .score-card h3 i.tooltip-icon {
-            display: inline-block !important;
-        }
-        
-        /* Estilo para o ícone de tooltip */
-        .tooltip-icon {
-            margin-left: 5px;
-            font-size: 0.8rem;
-            color: rgba(0, 0, 0, 0.5);
-            cursor: help;
-            opacity: 0.8;
-            transition: opacity 0.3s ease;
-        }
-        
-        .tooltip-icon:hover {
-            opacity: 1;
-        }
-        
-        /* Adicionando ajuste específico para ícones nos score cards */
-        .score-card h3 .tooltip-icon {
-            color: inherit;
-            opacity: 0.6;
-        }
-        
-        .score-card h3 .tooltip-icon:hover {
-            opacity: 1;
-        }
-        
-        /* Novo estilo para os ícones grandes do lado direito */
-        .score-card .card-icon {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 2.5rem;
-            opacity: 0.6;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
-        
-        /* Cores dos ícones correspondentes às cores das barras de progresso */
-        .comunicacao .card-icon {
-            color: #17a2b8;
-        }
-        
-        .interlocucao .card-icon {
-            color: #6f42c1;
-        }
-        
-        .reuniao .card-icon {
-            color: #dc3545;
-        }
-        
-        .relatorio .card-icon {
-            color: #007bff;
-        }
-        
-        .pos-trabalho .card-icon {
-            color: #28a745;
-        }
-        
-        .pontualidade .card-icon {
-            color: #ffc107;
-        }
-        
-        .score-card:hover .card-icon {
-            font-size: 2.7rem;
-            opacity: 0.8;
-        }
-        
-        .score-card .icon-container {
-            position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            color: white;
-            display: none; /* Ocultando o contêiner original do ícone */
-        }
-        
-        .score-card .metric-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0.15rem 0 0.5rem;
-            color: #1a202c;
-        }
-        
-        .progress-container {
-            position: relative;
-            width: 100%;
-            margin-top: auto;
-        }
-        
-        .progress-bar {
-            height: 5px;
-            background: rgba(203, 213, 224, 0.3)!important;
-            border-radius: 9999px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            position: absolute;
-            top: 0;
-            left: 0;
-            border-radius: 9999px;
-        }
-        
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.65rem;
-            color: #718096;
-            margin-top: 0.2rem;
-        }
-        
-        /* Estilos específicos para cada tipo de score card */
-        .comunicacao::before { background: #17a2b8; }
-        .comunicacao .icon-container { background: linear-gradient(135deg, #17a2b8, #138496); }
-        .comunicacao .progress-fill { background: linear-gradient(90deg, #17a2b8, #138496); }
-        
-        .interlocucao::before { background: #6f42c1; }
-        .interlocucao .icon-container { background: linear-gradient(135deg, #6f42c1, #5e35b1); }
-        .interlocucao .progress-fill { background: linear-gradient(90deg, #6f42c1, #5e35b1); }
-        
-        .reuniao::before { background: #dc3545; }
-        .reuniao .icon-container { background: linear-gradient(135deg, #dc3545, #c82333); }
-        .reuniao .progress-fill { background: linear-gradient(90deg, #dc3545, #c82333); }
-        
-        .relatorio::before { background: #007bff; }
-        .relatorio .icon-container { background: linear-gradient(135deg, #007bff, #0069d9); }
-        .relatorio .progress-fill { background: linear-gradient(90deg, #007bff, #0069d9); }
-        
-        .pos-trabalho::before { background: #28a745; }
-        .pos-trabalho .icon-container { background: linear-gradient(135deg, #28a745, #218838); }
-        .pos-trabalho .progress-fill { background: linear-gradient(90deg, #28a745, #218838); }
-        
-        .pontualidade::before { background: #ffc107; }
-        .pontualidade .icon-container { background: linear-gradient(135deg, #ffc107, #e0a800); }
-        .pontualidade .progress-fill { background: linear-gradient(90deg, #ffc107, #e0a800); }
-
-        /* Adicionando animação para o valor */
-        @keyframes countUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .score-card .metric-value {
-            animation: countUp 0.8s ease-out forwards;
-        }
-
-        /* Filtro de anos com rótulo */
-        .filtro-ano-container {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        
-        .filtro-ano-label {
-            font-size: 1rem;
-            font-weight: 500;
-            margin-right: 1rem;
-            color: #495057;
-            white-space: nowrap;
-        }
-        
-        .btn-group .btn.active {
-            background-color: #007bff !important;
-            border-color: #0056b3 !important;
-            color: white !important;
-        }
-
-        /* Estilos para a tabela */
-        .table-container { background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; margin-top:2rem; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; }
-
-        .table-responsive {
-            margin: 2rem 0;
-            background: #fff;
-            padding: 1rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        }
-        
-        .table thead th {
-            background: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
-            color: #495057;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            padding: 1rem;
-            vertical-align: middle;
-        }
-        
-        .table tbody td {
-            padding: 0.75rem 1rem;
-            vertical-align: middle;
-            border-bottom: 1px solid #edf2f7;
-            color: #4a5568;
-            font-size: 0.9rem;
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .dataTables_wrapper .dataTables_length,
-        .dataTables_wrapper .dataTables_filter {
-            margin-bottom: 1rem;
-        }
-
-        .dataTables_wrapper .dataTables_info {
-            padding-top: 1rem;
-            color: #718096;
-        }
-
-        .dataTables_wrapper .dataTables_paginate {
-            padding-top: 1rem;
-        }
-
-        /* Estilo para o botão de exportação */
-        .export-pdf-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 10px 15px;
-            border-radius: 4px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .export-pdf-btn:hover {
-            background-color: #218838;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        
-        @media print {
-            .export-pdf-btn {
-                display: none;
-            }
-        }
-
-        /* Ajuste para manter altura consistente do card */
-        .small-box .inner {
-            min-height: 120px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .small-box .inner h3 {
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-        }
-
-        /* Novo estilo para o texto de 'não há pesquisas' */
-        .small-box .inner h3.texto-menor {
-            font-size: 1.2rem;
-        }
-
-        .formula-text {
-            font-size: 0.6rem!important;
-            color: rgba(255,255,255,0.7);
-            position: absolute;
-            bottom: 5px;
-            left: 10px;
-            right: 10px;
-            margin: 0;
-            line-height: 1.1;
-            display: none;
-        }
-
-        .small-box {
-            position: relative;
-            overflow: visible;
-            margin-bottom: 20px;
-        }
-
-        /* Adicionando estilo para os containers dos gráficos */
-        .card-body canvas {
-            min-height: 400px;
-        }
-    </style>
+    <link rel="stylesheet" href="dist/css/stylesSNCI_PesquisasDashboard">
+    
 </head>
 <!-- Estrutura padrão do projeto -->
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -623,6 +250,15 @@
             var graficoMedia, graficoEvolucao;
             var anos = [];
             var currentYear = new Date().getFullYear();
+            
+            // Obter cores das variáveis CSS para uso no JavaScript
+            var coresCategorias = {
+                comunicacao: getComputedStyle(document.documentElement).getPropertyValue('--cor-comunicacao').trim(),
+                interlocucao: getComputedStyle(document.documentElement).getPropertyValue('--cor-interlocucao').trim(),
+                reuniao: getComputedStyle(document.documentElement).getPropertyValue('--cor-reuniao').trim(),
+                relatorio: getComputedStyle(document.documentElement).getPropertyValue('--cor-relatorio').trim(),
+                postrabalho: getComputedStyle(document.documentElement).getPropertyValue('--cor-pos-trabalho').trim()
+            };
         
             // Preencher array com os anos da query rsAnoDashboard
             <cfoutput query="rsAnoDashboard">
@@ -661,6 +297,16 @@
             function renderGraficoMedia(medias) {
                 var ctx = document.getElementById('graficoMedia').getContext('2d');
                 if (graficoMedia) { graficoMedia.destroy(); }
+                
+                // Cores definidas para cada categoria igual às do score card
+                var cores = [
+                    coresCategorias.comunicacao, // Comunicação
+                    coresCategorias.interlocucao, // Interlocução
+                    coresCategorias.reuniao, // Reunião
+                    coresCategorias.relatorio, // Relatório
+                    coresCategorias.postrabalho  // Pós-Trabalho
+                ];
+                
                 graficoMedia = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -668,7 +314,7 @@
                         datasets: [{
                             label: 'Média',
                             data: medias,
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            backgroundColor: cores,
                             barPercentage: 0.5,
                             categoryPercentage: 0.8
                         }]
@@ -688,6 +334,21 @@
                                 right: 10,
                                 top: 10,
                                 bottom: 10
+                            }
+                        },
+                        plugins: {
+                            datalabels: {
+                                anchor: 'end',
+                                align: 'top',
+                                formatter: function(value) {
+                                    return value.toFixed(1);
+                                },
+                                font: {
+                                    weight: 'bold'
+                                },
+                                color: function(context) {
+                                    return context.dataset.backgroundColor;
+                                }
                             }
                         }
                     }
@@ -709,7 +370,7 @@
                             datasets: [{
                                 label: 'Média Mensal',
                                 data: [],
-                                borderColor: '#17a2b8',
+                                borderColor: coresCategorias.comunicacao,
                                 backgroundColor: 'rgba(23, 162, 184, 0.1)',
                                 borderWidth: 2,
                                 fill: true,
@@ -760,7 +421,7 @@
                         datasets: [{
                             label: 'Média Mensal',
                             data: dados,
-                            borderColor: '#17a2b8',
+                            borderColor: coresCategorias.comunicacao,
                             backgroundColor: 'rgba(23, 162, 184, 0.1)',
                             borderWidth: 2,
                             fill: true,
@@ -864,7 +525,7 @@
                 var tabela = configurarDataTable();
                 // Primeiro carrega os dados das pesquisas
                 $.ajax({
-                    url: 'cfc/pc_cfcDashboardPesquisas.cfc?method=getPesquisas&returnformat=json',
+                    url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getPesquisas&returnformat=json',
                     method: 'GET',
                     data: { ano: anoFiltro },
                     dataType: 'json',
@@ -900,7 +561,7 @@
 
                 // Depois carrega as estatísticas
                 $.ajax({
-                    url: 'cfc/pc_cfcDashboardPesquisas.cfc?method=getEstatisticas&returnformat=json',
+                    url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
                     method: 'GET',
                     data: { ano: anoFiltro },
                     dataType: 'json',
@@ -938,44 +599,34 @@
 
         // Configuração do DataTable similar ao pc_Usuarios.cfm
         function configurarDataTable() {
+            var currentDate = new Date()
+			var day = currentDate.getDate()
+			var month = currentDate.getMonth() + 1
+			var year = currentDate.getFullYear()
+
+			var d = day + "-" + month + "-" + year;
+
+            
             return $('#tabelaPesquisas').DataTable({
                 destroy: true,
                 processing: true,
                 serverSide: false,
                 responsive: true,
                 pageLength: 10,
-                dom: "<'row'<'col-sm-4'<'dtsp-dataTable'Bf>><'col-sm-8 text-left'p>>" + 
-                     "<'col-sm-12 text-left'i>" + 
-                     "<'row'<'col-sm-12'tr>>",
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
-                        className: 'btExcel',
-                        title: 'SNCI_Pesquisas_' + new Date().toLocaleDateString(),
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    },
-                    {
-                        extend: 'colvis',
-                        text: 'Selecionar Colunas',
-                        className: 'btSelecionarColuna',
-                        collectionLayout: 'fixed three-column',
-                    },
-                    {
-                        text: '<i class="fas fa-eye" title="Visualizar todas as colunas."></i>',
-                        action: function (e, dt, node, config) {
-                            dt.columns().visible(true);
-                        },
-                    },
-                    {
-                        text: '<i class="fas fa-eye-slash" title="Oculta todas as colunas."></i>',
-                        action: function (e, dt, node, config) {
-                            dt.columns().visible(false);
-                        },
-                    }
-                ],
+                dom: 
+    "<'row d-flex align-items-center'<'col-auto'B><'col-auto'f><'col-auto'p>>" + // Removido dtsp-verticalContainer e P
+    "<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
+    "<'row'<'col-12'tr>>",  // Tabela com todos os dados
+					buttons: [
+						{
+							extend: 'excel',
+							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
+							title : 'SNCI_Pesquisas_Respondidas_' + d,
+							className: 'btExcel',
+						}
+						
+					],
+
                 columnDefs: [
                     {
                         // Colunas numéricas (notas e média)
