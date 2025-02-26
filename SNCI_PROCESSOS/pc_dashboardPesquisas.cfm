@@ -8,7 +8,6 @@
     <title>Dashboard de Pesquisas</title>
     <link rel="stylesheet" href="dist/css/stylesSNCI_PaineisFiltro.css">
    
-
     <style>
         /* Estilos básicos inspirados no dashboard-export.html */
         body { background-color: #f7f7f7; }
@@ -19,42 +18,253 @@
         .metric-card { background: #fff; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .metric-label { font-size: 0.875rem; color: #6b7280; }
         .metric-value { font-size: 1.875rem; font-weight: 600; color: #111827; }
-        .score-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
-        .score-card { padding: 1rem; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.08); margin-bottom: 0.5rem; min-height: 130px; }
-        .score-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; color: #2d3748; display: flex; align-items: center; }
-        .score-card .metric-value { font-size: 1.5rem; font-weight: 700; margin: 0.5rem 0; color: #1a202c; }
-        .progress-bar { 
-            height: 8px; 
-            background: grey!important; /* Cor cinza base */
-            border-radius: 4px; 
-            overflow: hidden; 
-            margin-top: 0.5rem;
-            position: relative; /* Importante para posicionamento absoluto do fill */
+
+        /* Novos estilos modernos para os score cards */
+        .score-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
-        .progress-fill { 
-            height: 100%; 
-            transition: width 0.6s ease;
-            position: absolute; /* Posicionamento absoluto */
+        
+        .score-card {
+            position: relative;
+            padding: 1.25rem 1rem;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.03);
+            margin-bottom: 0.5rem;
+            min-height: 110px;
+            border: none;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .score-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
+        
+        .score-card::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
+            width: 6px;
+            height: 100%;
+            border-radius: 6px 0 0 6px;
         }
-        .comunicacao { border-left-color: #17a2b8; }
-        .comunicacao .progress-fill { background-color: #17a2b8; }
-        .interlocucao { border-left-color: #6f42c1; }
-        .interlocucao .progress-fill { background-color: #6f42c1; }
-        .reuniao { border-left-color: #dc3545; }
-        .reuniao .progress-fill { background-color: #dc3545; }
-        .relatorio { border-left-color: #ffc107; }
-        .relatorio .progress-fill { background-color: #ffc107; }
-        .pos-trabalho { border-left-color: #28a745; }
-        .pos-trabalho .progress-fill { background-color: #28a745; }
-        .pontualidade { border-left-color: #007bff; }
-        .pontualidade .progress-fill { background-color: #007bff; }
+        
+        .score-card .heading-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.3rem;
+        }
+        
+        .score-card h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Remover os ícones originais que ficam na frente dos títulos */
+        .score-card h3 i.fas,
+        .score-card h3 i.fa {
+            display: none;
+        }
+        
+        /* Mantém visível apenas o ícone de tooltip */
+        .score-card h3 i.tooltip-icon {
+            display: inline-block !important;
+        }
+        
+        /* Estilo para o ícone de tooltip */
+        .tooltip-icon {
+            margin-left: 5px;
+            font-size: 0.8rem;
+            color: rgba(0, 0, 0, 0.5);
+            cursor: help;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+        
+        .tooltip-icon:hover {
+            opacity: 1;
+        }
+        
+        /* Adicionando ajuste específico para ícones nos score cards */
+        .score-card h3 .tooltip-icon {
+            color: inherit;
+            opacity: 0.6;
+        }
+        
+        .score-card h3 .tooltip-icon:hover {
+            opacity: 1;
+        }
+        
+        /* Novo estilo para os ícones grandes do lado direito */
+        .score-card .card-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2.5rem;
+            opacity: 0.6;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        /* Cores dos ícones correspondentes às cores das barras de progresso */
+        .comunicacao .card-icon {
+            color: #17a2b8;
+        }
+        
+        .interlocucao .card-icon {
+            color: #6f42c1;
+        }
+        
+        .reuniao .card-icon {
+            color: #dc3545;
+        }
+        
+        .relatorio .card-icon {
+            color: #007bff;
+        }
+        
+        .pos-trabalho .card-icon {
+            color: #28a745;
+        }
+        
+        .pontualidade .card-icon {
+            color: #ffc107;
+        }
+        
+        .score-card:hover .card-icon {
+            font-size: 2.7rem;
+            opacity: 0.8;
+        }
+        
+        .score-card .icon-container {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            display: none; /* Ocultando o contêiner original do ícone */
+        }
+        
+        .score-card .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0.15rem 0 0.5rem;
+            color: #1a202c;
+        }
+        
+        .progress-container {
+            position: relative;
+            width: 100%;
+            margin-top: auto;
+        }
+        
+        .progress-bar {
+            height: 5px;
+            background: rgba(203, 213, 224, 0.3)!important;
+            border-radius: 9999px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 9999px;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            color: #718096;
+            margin-top: 0.2rem;
+        }
+        
+        /* Estilos específicos para cada tipo de score card */
+        .comunicacao::before { background: #17a2b8; }
+        .comunicacao .icon-container { background: linear-gradient(135deg, #17a2b8, #138496); }
+        .comunicacao .progress-fill { background: linear-gradient(90deg, #17a2b8, #138496); }
+        
+        .interlocucao::before { background: #6f42c1; }
+        .interlocucao .icon-container { background: linear-gradient(135deg, #6f42c1, #5e35b1); }
+        .interlocucao .progress-fill { background: linear-gradient(90deg, #6f42c1, #5e35b1); }
+        
+        .reuniao::before { background: #dc3545; }
+        .reuniao .icon-container { background: linear-gradient(135deg, #dc3545, #c82333); }
+        .reuniao .progress-fill { background: linear-gradient(90deg, #dc3545, #c82333); }
+        
+        .relatorio::before { background: #007bff; }
+        .relatorio .icon-container { background: linear-gradient(135deg, #007bff, #0069d9); }
+        .relatorio .progress-fill { background: linear-gradient(90deg, #007bff, #0069d9); }
+        
+        .pos-trabalho::before { background: #28a745; }
+        .pos-trabalho .icon-container { background: linear-gradient(135deg, #28a745, #218838); }
+        .pos-trabalho .progress-fill { background: linear-gradient(90deg, #28a745, #218838); }
+        
+        .pontualidade::before { background: #ffc107; }
+        .pontualidade .icon-container { background: linear-gradient(135deg, #ffc107, #e0a800); }
+        .pontualidade .progress-fill { background: linear-gradient(90deg, #ffc107, #e0a800); }
+
+        /* Adicionando animação para o valor */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .score-card .metric-value {
+            animation: countUp 0.8s ease-out forwards;
+        }
+
+        /* Filtro de anos com rótulo */
+        .filtro-ano-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .filtro-ano-label {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-right: 1rem;
+            color: #495057;
+            white-space: nowrap;
+        }
+        
+        .btn-group .btn.active {
+            background-color: #007bff !important;
+            border-color: #0056b3 !important;
+            color: white !important;
+        }
+
+        /* Estilos para a tabela */
         .table-container { background: #fff; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; margin-top:2rem; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; }
 
-        /* Estilos adicionais para a tabela */
         .table-responsive {
             margin: 2rem 0;
             background: #fff;
@@ -130,13 +340,6 @@
             }
         }
 
-        /* Ajustes no filtro de ano */
-        .btn-group .btn.active {
-            background-color: #007bff !important;
-            border-color: #0056b3 !important;
-            color: white !important;
-        }
-
         /* Ajuste para manter altura consistente do card */
         .small-box .inner {
             min-height: 120px;
@@ -154,6 +357,29 @@
         /* Novo estilo para o texto de 'não há pesquisas' */
         .small-box .inner h3.texto-menor {
             font-size: 1.2rem;
+        }
+
+        .formula-text {
+            font-size: 0.6rem!important;
+            color: rgba(255,255,255,0.7);
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            right: 10px;
+            margin: 0;
+            line-height: 1.1;
+            display: none;
+        }
+
+        .small-box {
+            position: relative;
+            overflow: visible;
+            margin-bottom: 20px;
+        }
+
+        /* Adicionando estilo para os containers dos gráficos */
+        .card-body canvas {
+            min-height: 400px;
         }
     </style>
 </head>
@@ -181,20 +407,13 @@
 
                 <section class="content">
                     <div class="container-fluid">
-                        <!-- Filtro por ano -->
-                        <div class="card card-default">
-                            <div class="card-header">
-                                <h3 class="card-title">Filtros</h3>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label>Ano:</label>
-                                            <div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons">
-                                                <!-- Botões gerados via JS -->
-                                            </div>
-                                        </div>
+                        <!-- Filtro por ano com texto descritivo -->
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="filtro-ano-container">
+                                    <div class="filtro-ano-label">Processos de:</div>
+                                    <div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <!-- Botões gerados via JS -->
                                     </div>
                                 </div>
                             </div>
@@ -222,13 +441,17 @@
                                     <div class="icon">
                                         <i class="fas fa-chart-line"></i>
                                     </div>
+                                    <p class="formula-text">
+                                        Fórmula: (Total Respondidas / Total Processos) × 100<br>
+                                        <span id="formulaDetalhes"></span>
+                                    </p>
                                 </div>
                             </div>
                             <div class="col-lg-3 col-6">
-                                <div class="small-box bg-success">
+                                <div class="small-box bg-success">  
                                     <div class="inner">
                                         <h3 id="mediaGeral">0</h3>
-                                        <p>Média Geral</p>
+                                        <p>Média Geral das Notas</p>
                                     </div>
                                     <div class="icon">
                                         <i class="fas fa-star"></i>
@@ -246,10 +469,9 @@
                                     </div>
                                 </div>
                             </div>
-                           
                         </div>
 
-                        <!-- Score Cards -->
+                        <!-- Score Cards com design moderno -->
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="card">
@@ -259,47 +481,53 @@
                                     <div class="card-body">
                                         <div class="score-cards">
                                             <div class="score-card comunicacao">
-                                                <h3><i class="fas fa-comments fa-lg"></i> Comunicação</h3>
-                                                <div id="comunicacao" class="metric-value">0 / 10</div>
+                                                <h3>Comunicação <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação da comunicação durante o processo"></i></h3>
+                                                <div id="comunicacao" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
+                                                <i class="fas fa-comments fa-lg card-icon"></i>
                                             </div>
                                             <div class="score-card interlocucao">
-                                                <h3><i class="fa fa-exchange"></i> Interlocução</h3>
-                                                <div id="interlocucao" class="metric-value">0 / 10</div>
+                                                <h3>Interlocução <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação da interlocução durante o processo"></i></h3>
+                                                <div id="interlocucao" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
+                                                <i class="fa fa-exchange card-icon"></i>
                                             </div>
                                             <div class="score-card reuniao">
-                                                <h3><i class="fa fa-users"></i> Reunião</h3>
-                                                <div id="reuniao" class="metric-value">0 / 10</div>
+                                                <h3>Reunião <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação das reuniões realizadas"></i></h3>
+                                                <div id="reuniao" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
+                                                <i class="fa fa-users card-icon"></i>
                                             </div>
                                             <div class="score-card relatorio">
-                                                <h3><i class="fa fa-file-text"></i> Relatório</h3>
-                                                <div id="relatorio" class="metric-value">0 / 10</div>
+                                                <h3>Relatório <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação dos relatórios entregues"></i></h3>
+                                                <div id="relatorio" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
+                                                <i class="fa fa-file-text card-icon"></i>
                                             </div>
                                             <div class="score-card pos-trabalho">
-                                                <h3><i class="fa fa-briefcase"></i> Pós-Trabalho</h3>
-                                                <div id="pos_trabalho" class="metric-value">0 / 10</div>
+                                                <h3>Pós-Trabalho <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação do trabalho pós-processo"></i></h3>
+                                                <div id="pos_trabalho" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
+                                                <i class="fa fa-briefcase card-icon"></i>
                                             </div>
                                             <!-- Card adicional para Pontualidade -->
                                             <div class="score-card pontualidade">
-                                                <h3><i class="fa fa-clock"></i> Pontualidade</h3>
+                                                <h3>Pontualidade <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação da pontualidade"></i></h3>
                                                 <div id="pontualidade" class="metric-value">0%</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
+                                                <i class="fa fa-clock card-icon"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -309,7 +537,7 @@
 
                         <!-- Gráficos -->
                         <div class="row" style="margin-top:2rem;">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="card">
                                     <div class="card-header">
                                         <h3 class="card-title">Médias por Categoria</h3>
@@ -319,7 +547,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-8">
                                 <div class="card">
                                     <div class="card-header">
                                         <h3 class="card-title">Evolução Temporal</h3>
@@ -350,7 +578,7 @@
                                             <th>Matrícula</th>
                                             <th>Processo</th>
                                             <th>MCU</th>
-                                            <th>Data/Hora</th>
+                                            <th>Data Resp.</th>
                                             <th>Comunicação</th>
                                             <th>Interlocução</th>
                                             <th>Reunião</th>
@@ -371,6 +599,8 @@
             </section>
         </div>
         
+
+
         <!-- Rodapé -->
         <footer class="main-footer text-center">
             <cfinclude template="includes/pc_footer.cfm">
@@ -380,8 +610,15 @@
     <script src="plugins/chart.js/Chart.min.js"></script>
     <script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
     <script>
-        // ...existing JavaScript de geração de filtros e gráficos...
         $(document).ready(function() {
+            // Inicializar tooltips com configurações avançadas
+            $('[data-toggle="tooltip"]').tooltip({
+                container: 'body',
+                html: true,
+                delay: {show: 100, hide: 100},
+                template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
+            });
+            
             var tabela = $('#tabelaPesquisas').DataTable();
             var graficoMedia, graficoEvolucao;
             var anos = [];
@@ -392,22 +629,35 @@
                 anos.push(parseInt("#rsAnoDashboard.ano#", 10));
             </cfoutput>
             if (anos.indexOf(currentYear) === -1) { anos.push(currentYear); }
-            anos = anos.sort(function(a, b){ return b - a; });
+            anos = anos.sort(function(a, b){ return a - b; }); // Modificado para ordem crescente
         
             var radioName = "opcaoAno";
             $("#opcoesAno").empty();
             anos.forEach(function(val) {
                 var isCurrent = (val === currentYear);
-                var activeClass = isCurrent ? " active" : "";
-                var btnClass = isCurrent ? "btn-primary" : "btn-outline-primary";
+                var btnClass = "btn-outline-primary";
                 var checked = isCurrent ? 'checked' : '';
-                var btn = `<label class="btn ${btnClass}${activeClass}" style="margin-left:2px;">
+                var btn = `<label class="btn ${btnClass}" style="margin-left:2px;">
                                 <input type="radio" name="${radioName}" ${checked} autocomplete="off" value="${val}"/> ${val}
                            </label>`;
                 $("#opcoesAno").append(btn);
             });
+
+            // Ativar o botão do ano atual após a geração
+            if (currentYear) {
+                $(`input[name="${radioName}"][value="${currentYear}"]`).parent().addClass('active');
+            }
+        
             var anoSelecionado = currentYear;
         
+            // Garantir que novos elementos também tenham tooltips
+            function reiniciarTooltips() {
+                $('[data-toggle="tooltip"]').tooltip('dispose').tooltip({
+                    container: 'body',
+                    html: true
+                });
+            }
+            
             function renderGraficoMedia(medias) {
                 var ctx = document.getElementById('graficoMedia').getContext('2d');
                 if (graficoMedia) { graficoMedia.destroy(); }
@@ -418,14 +668,33 @@
                         datasets: [{
                             label: 'Média',
                             data: medias,
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            barPercentage: 0.5,
+                            categoryPercentage: 0.8
                         }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 10
+                            }
+                        },
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 10,
+                                top: 10,
+                                bottom: 10
+                            }
+                        }
                     }
                 });
             }
         
             function renderGraficoEvolucao(evolucao) {
-                // Removida a verificação que estava gerando warning desnecessário
                 var ctx = document.getElementById('graficoEvolucao').getContext('2d');
                 if (graficoEvolucao) { 
                     graficoEvolucao.destroy(); 
@@ -458,6 +727,14 @@
                                     beginAtZero: true,
                                     max: 10
                                 }
+                            },
+                            layout: {
+                                padding: {
+                                    left: 10,
+                                    right: 10,
+                                    top: 10,
+                                    bottom: 10
+                                }
                             }
                         }
                     });
@@ -475,7 +752,7 @@
                     return Number(item.media) || 0;
                 });
 
-                // Resto do código do gráfico permanece igual
+                // Resto do código do gráfico
                 graficoEvolucao = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -524,6 +801,14 @@
                                     display: false
                                 }
                             }
+                        },
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 10,
+                                top: 10,
+                                bottom: 10
+                            }
                         }
                     }
                 });
@@ -532,14 +817,23 @@
             function atualizarCards(resultado) {
                 // Atualizar totalizadores principais
                 $("#totalPesquisas").text(resultado.total || '0');
-                $("#mediaGeral").text((resultado.mediaGeral || '0') + " / 10");
+                $("#mediaGeral").text(resultado.mediaGeral || '0');
                 $("#mediaGeralPontualidade").text((resultado.pontualidadePercentual || '0') + "%");
                 
                 // Modificar lógica do índice de respostas
-                if (parseInt(resultado.total) === 0) {
+                if (parseInt(resultado.total) === 0 || parseInt(resultado.totalProcessos) === 0) {
                     $("#indiceRespostas").text("Não há pesquisas respondidas").addClass('texto-menor');
+                    $(".formula-text").hide();
                 } else {
-                    $("#indiceRespostas").text((resultado.indiceRespostas || '0') + "%").removeClass('texto-menor');
+                    const totalRespondidas = parseInt(resultado.total) || 0;
+                    const totalProcessos = parseInt(resultado.totalProcessos) || 0;
+                    const indice = ((totalRespondidas / totalProcessos) * 100).toFixed(2);
+                    
+                    $("#indiceRespostas").text(indice + "%").removeClass('texto-menor');
+                    $("#formulaDetalhes").text(
+                        `Cálculo: (${totalRespondidas} / ${totalProcessos}) × 100 = ${indice}%`
+                    );
+                    $(".formula-text").show();
                 }
 
                 // Atualizar cards individuais 
@@ -560,7 +854,7 @@
                         el.text(`${valor.toFixed(1)}%`);
                         el.closest('.score-card').find('.progress-fill').css('width', `${valor}%`);
                     } else {
-                        el.text(`${valor.toFixed(1)} / 10`); 
+                        el.text(`${valor.toFixed(1)}`);
                         el.closest('.score-card').find('.progress-fill').css('width', `${(valor * 10)}%`);
                     }
                 });
@@ -582,19 +876,21 @@
                                             parseFloat(row[6]) + parseFloat(row[7]) + 
                                             parseFloat(row[8])) / 5).toFixed(2);
                                 
+                                var pontualidade = row[9] == 1 ? "Sim" : "Não"; // Convertendo 1/0 para Sim/Não
+                                
                                 tabela.row.add([
-                                    row[0],  // ID
-                                    row[1],  // Matrícula
-                                    row[2],  // Processo
-                                    row[3],  // MCU
-                                    row[12], // Data/Hora
-                                    row[4],  // Comunicação
-                                    row[5],  // Interlocução
-                                    row[6],  // Reunião
-                                    row[7],  // Relatório
-                                    row[8],  // Pós-Trabalho
-                                    row[9],  // Pontualidade
-                                    media    // Média
+                                    row[0],   // ID
+                                    row[1],   // Matrícula
+                                    row[2],   // Processo
+                                    row[3],   // MCU
+                                    row[12],  // Data/Hora
+                                    row[4],   // Comunicação
+                                    row[5],   // Interlocução
+                                    row[6],   // Reunião
+                                    row[7],   // Relatório
+                                    row[8],   // Pós-Trabalho
+                                    pontualidade, // Pontualidade como Sim/Não
+                                    media     // Média
                                 ]);
                             });
                             tabela.draw();
@@ -622,6 +918,9 @@
                             if (resultado.evolucaoTemporal && Array.isArray(resultado.evolucaoTemporal)) {
                                 renderGraficoEvolucao(resultado.evolucaoTemporal);
                             }
+                            
+                            // Reiniciar tooltips após atualizar o conteúdo
+                            setTimeout(reiniciarTooltips, 500);
                         }
                     },
                     error: function(xhr, status, error) {
@@ -636,8 +935,6 @@
                 carregarDashboard(novoAno);
             });
         });
-
-       
 
         // Configuração do DataTable similar ao pc_Usuarios.cfm
         function configurarDataTable() {
@@ -681,9 +978,52 @@
                 ],
                 columnDefs: [
                     {
-                        targets: [5,6,7,8,9,10,11],
+                        // Colunas numéricas (notas e média)
+                        targets: [5,6,7,8,9,11],
+                        className: 'text-center',
                         render: function(data, type, row) {
                             return parseFloat(data).toFixed(2);
+                        }
+                    },
+                    {
+                        // Coluna de pontualidade
+                        targets: [10],
+                        className: 'text-center',
+                        render: function(data, type, row) {
+                            return data;
+                        }
+                    },
+                    {
+                        // Coluna de data - Corrigido o formato da data
+                        targets: [4],
+                        render: function(data, type, row) {
+                            if (type === 'display') {
+                                // Verificar se a data está em um formato válido antes de processar
+                                if (data && data !== "") {
+                                    try {
+                                        // Tentar converter para um formato ISO primeiro
+                                        var dataParts = data.split(' ')[0].split('/');
+                                        if (dataParts.length === 3) {
+                                            // Formato dd/mm/yyyy para yyyy-mm-dd
+                                            var isoDate = dataParts[2] + '-' + dataParts[1] + '-' + dataParts[0];
+                                            return moment(isoDate, "YYYY-MM-DD").format('DD/MM/YYYY');
+                                        }
+                                        else if (data.includes('-')) {
+                                            // Já está em formato ISO yyyy-mm-dd
+                                            return moment(data.split(' ')[0], "YYYY-MM-DD").format('DD/MM/YYYY');
+                                        }
+                                        else {
+                                            // Caso seja uma data em formato timestamp
+                                            return moment.unix(data/1000).format('DD/MM/YYYY');
+                                        }
+                                    } catch (e) {
+                                        console.warn("Erro ao formatar data:", e);
+                                        return data; // Retorna o dado original em caso de erro
+                                    }
+                                }
+                                return data;
+                            }
+                            return data;
                         }
                     }
                 ],

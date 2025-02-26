@@ -3,6 +3,13 @@
         <cfargument name="ano" type="string" required="true">
         
         <cfquery name="qPesquisas" datasource="#application.dsn_processos#">
+            WITH PesquisasAno AS (
+                SELECT *,
+                       SUM(CASE WHEN pc_pesq_pontualidade = 1 THEN 1 ELSE 0 END) OVER() as total_pontuais,
+                       COUNT(*) OVER() as total_pesquisas
+                FROM pc_pesquisas
+                WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+            )
             SELECT 
                 pc_pesq_id,
                 pc_usu_matricula,
@@ -13,15 +20,19 @@
                 pc_pesq_reuniao_encerramento,
                 pc_pesq_relatorio,
                 pc_pesq_pos_trabalho,
+                pc_pesq_pontualidade, -- Retorna o valor original (1 ou 0)
                 pc_pesq_importancia_processo,
-                pc_pesq_pontualidade,
                 pc_pesq_observacao,
                 pc_pesq_data_hora
-            FROM pc_pesquisas
-            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+            FROM PesquisasAno
             ORDER BY pc_pesq_data_hora DESC
         </cfquery>
         
+        <cfset qPesquisas = qPesquisas>
+        <cfloop query="qPesquisas">
+            <cfset qPesquisas.pc_pesq_data_hora = formatDateForJSON(qPesquisas.pc_pesq_data_hora)>
+        </cfloop>
+
         <cfreturn serializeJSON(qPesquisas)>
     </cffunction>
 
@@ -78,13 +89,43 @@
             WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
         </cfquery>
         
-        <!--- Calcula o índice de respostas --->
-        <cfset var qtdSemPesquisa = getQuantidadeProcessosSemPesquisa(arguments.ano)>
-        <cfset var totalProcessos = qtdSemPesquisa + rsQtdRespondidas.total_respondidas>
-        <cfset var indiceRespostas = (totalProcessos GT 0) ? (rsQtdRespondidas.total_respondidas / totalProcessos) * 100 : 0>
-    
+        <!--- Obter quantidade total de processos --->
+        <cfquery name="qryTotalProcessos" datasource="#application.dsn_processos#">
+            SELECT COUNT(DISTINCT processos_id) as total_processos
+            FROM (
+                SELECT DISTINCT pc_processos.pc_processo_id as processos_id
+                FROM pc_processos 
+                WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+
+                UNION
+
+                SELECT DISTINCT processos_id
+                FROM (
+                    SELECT DISTINCT pc_processos.pc_processo_id as processos_id
+                    FROM pc_avaliacao_orientacoes
+                    INNER JOIN pc_avaliacoes 
+                        ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+                    INNER JOIN pc_processos 
+                        ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+
+                    UNION
+
+                    SELECT DISTINCT pc_processos.pc_processo_id
+                    FROM pc_avaliacao_melhorias
+                    INNER JOIN pc_avaliacoes 
+                        ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
+                    INNER JOIN pc_processos 
+                        ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                ) AS subquery
+            ) AS unificado
+        </cfquery>
+
+        <!--- Montar estrutura de retorno --->
         <cfset retorno = {
             "total": qryPesquisas.total_pesquisas,
+            "totalProcessos": qryTotalProcessos.total_processos,
             "comunicacao": NumberFormat(qryPesquisas.media_comunicacao, "999.99"),
             "interlocucao": NumberFormat(qryPesquisas.media_interlocucao, "999.99"),
             "reuniao": NumberFormat(qryPesquisas.media_reuniao, "999.99"), 
@@ -99,8 +140,7 @@
                 val(qryPesquisas.media_relatorio),
                 val(qryPesquisas.media_pos_trabalho)
             ],
-            "evolucaoTemporal": evolucaoArray,
-            "indiceRespostas": NumberFormat(indiceRespostas, "99.99")
+            "evolucaoTemporal": evolucaoArray
         }>
     
         <cfreturn retorno>
@@ -142,6 +182,15 @@
         </cfquery>
 
         <cfreturn rsProcSemPesquisa.total_sem_pesquisa>
+    </cffunction>
+
+    <cffunction name="formatDateForJSON" access="private" returntype="string">
+        <cfargument name="dateObj" required="true" type="any">
+        <cfif isDate(arguments.dateObj)>
+            <cfreturn dateFormat(arguments.dateObj, "yyyy-mm-dd") & "T" & timeFormat(arguments.dateObj, "HH:mm:ss")>
+        <cfelse>
+            <cfreturn "">
+        </cfif>
     </cffunction>
 
 </cfcomponent>
