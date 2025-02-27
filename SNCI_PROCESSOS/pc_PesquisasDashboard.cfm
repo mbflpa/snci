@@ -85,7 +85,7 @@
                                         <p>Média Geral das Notas</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="fas fa-star"></i>
+                                        <i class="fas fa-calculator"></i>
                                     </div>
                                 </div>
                             </div>
@@ -107,7 +107,7 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h3 class="card-title">Avaliações</h3>
+                                        <h3 class="card-title">Avaliações (média anual)</h3>
                                     </div>
                                     <div class="card-body">
                                         <div class="score-cards">
@@ -153,12 +153,12 @@
                                             </div>
                                             <!-- Novo card para Importância do Processo -->
                                             <div class="score-card importancia">
-                                                <h3>Importância <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a percepção sobre a importância e relevância do processo de controle interno para a melhoria dos procedimentos da unidade."></i></h3>
+                                                <h3>Importância <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a percepção sobre a contribuição das atividades da equipe de Controle Interno para melhorar o processo avaliado. Considere se o trabalho ajudou a identificar oportunidades de melhoria e contribuiu para o fortalecimento dos controles internos."></i></h3>
                                                 <div id="importancia" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
-                                                <i class="fa fa-balance-scale card-icon"></i>
+                                                <i class="fa fa-star card-icon"></i>
                                             </div>
                                             <!-- Card adicional para Pontualidade 
                                             <div class="score-card pontualidade">
@@ -335,6 +335,9 @@
                         }]
                     },
                     options: {
+                        legend: {
+                            display: false // Para Chart.js v2.x
+                        },
                         maintainAspectRatio: false,
                         responsive: true,
                         scales: {
@@ -352,6 +355,9 @@
                             }
                         },
                         plugins: {
+                            legend: {
+                                display: false // Para Chart.js v3.x
+                            },
                             datalabels: {
                                 anchor: 'end',
                                 align: 'top',
@@ -503,7 +509,7 @@
                 } else {
                     const totalRespondidas = parseInt(resultado.total) || 0;
                     const totalProcessos = parseInt(resultado.totalProcessos) || 0;
-                    const indice = ((totalRespondidas / totalProcessos) * 100).toFixed(2);
+                    const indice = ((totalRespondidas / totalProcessos) * 100).toFixed(1);
                     
                     $("#indiceRespostas").text(indice + "%").removeClass('texto-menor');
                     $("#formulaDetalhes").text(
@@ -551,7 +557,7 @@
                             data.DATA.forEach(function(row) {
                                 var media = ((parseFloat(row[4]) + parseFloat(row[5]) + 
                                             parseFloat(row[6]) + parseFloat(row[7]) + 
-                                            parseFloat(row[8]) + parseFloat(row[9])) / 6).toFixed(2);
+                                            parseFloat(row[8]) + parseFloat(row[9])) / 6).toFixed(1);
                                 
                                 var pontualidade = row[10] == 1 ? "Sim" : "Não"; // Convertendo 1/0 para Sim/Não
                                 
