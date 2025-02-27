@@ -19,7 +19,7 @@
     <div class="wrapper">
         <!-- Cabeçalho e Sidebar -->
         <cfinclude template="includes/pc_navBar.cfm">
-        <cfinclude template="includes/pc_sidebar.cfm">
+        
         
         <!-- Conteúdo principal -->
         <div class="content-wrapper">
@@ -238,14 +238,9 @@
                 </div>
             </section>
         </div>
-        
-
-
-        <!-- Rodapé -->
-        <footer class="main-footer text-center">
             <cfinclude template="includes/pc_footer.cfm">
-        </footer>
     </div>
+    <cfinclude template="includes/pc_sidebar.cfm">
 
     <script src="plugins/chart.js/Chart.min.js"></script>
     <script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
