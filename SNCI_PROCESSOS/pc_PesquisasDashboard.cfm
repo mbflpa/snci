@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <title>Dashboard de Pesquisas</title>
     <link rel="stylesheet" href="dist/css/stylesSNCI_PaineisFiltro.css">
-    <link rel="stylesheet" href="dist/css/stylesSNCI_PesquisasDashboard">
+    <link rel="stylesheet" href="dist/css/stylesSNCI_PesquisasDashboard.css">
     <style>
         #tabelaPesquisas th {
             font-size: smaller; /* Reduz o tamanho da fonte dos cabeçalhos */
@@ -151,7 +151,16 @@
                                                 </div>
                                                 <i class="fa fa-briefcase card-icon"></i>
                                             </div>
-                                            <!-- Card adicional para Pontualidade -->
+                                            <!-- Novo card para Importância do Processo -->
+                                            <div class="score-card importancia">
+                                                <h3>Importância <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a percepção sobre a importância e relevância do processo de controle interno para a melhoria dos procedimentos da unidade."></i></h3>
+                                                <div id="importancia" class="metric-value">0</div>
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: 0%"></div>
+                                                </div>
+                                                <i class="fa fa-balance-scale card-icon"></i>
+                                            </div>
+                                            <!-- Card adicional para Pontualidade 
                                             <div class="score-card pontualidade">
                                                 <h3>Pontualidade <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia se a equipe de Controle Interno cumpriu os prazos estabelecidos para a condução e entrega do trabalho."></i></h3>
                                                 <div id="pontualidade" class="metric-value">0%</div>
@@ -159,7 +168,7 @@
                                                     <div class="progress-fill" style="width: 0%"></div>
                                                 </div>
                                                 <i class="fa fa-clock card-icon"></i>
-                                            </div>
+                                            </div>-->
                                         </div>
                                     </div>
                                 </div>
@@ -214,6 +223,7 @@
                                             <th>Reunião</th>
                                             <th>Relatório</th>
                                             <th>Pós-Trabalho</th>
+                                            <th>Importância</th>
                                             <th>Pontualidade</th>
                                             <th>Média</th>
                                         </tr>
@@ -260,7 +270,8 @@
                 interlocucao: getComputedStyle(document.documentElement).getPropertyValue('--cor-interlocucao').trim(),
                 reuniao: getComputedStyle(document.documentElement).getPropertyValue('--cor-reuniao').trim(),
                 relatorio: getComputedStyle(document.documentElement).getPropertyValue('--cor-relatorio').trim(),
-                postrabalho: getComputedStyle(document.documentElement).getPropertyValue('--cor-pos-trabalho').trim()
+                postrabalho: getComputedStyle(document.documentElement).getPropertyValue('--cor-pos-trabalho').trim(),
+                importancia: getComputedStyle(document.documentElement).getPropertyValue('--cor-importancia').trim()
             };
         
             // Preencher array com os anos da query rsAnoDashboard
@@ -307,13 +318,14 @@
                     coresCategorias.interlocucao, // Interlocução
                     coresCategorias.reuniao, // Reunião
                     coresCategorias.relatorio, // Relatório
-                    coresCategorias.postrabalho  // Pós-Trabalho
+                    coresCategorias.postrabalho,  // Pós-Trabalho
+                    coresCategorias.importancia  // Importância
                 ];
                 
                 graficoMedia = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['Comunicação','Interlocução','Reunião','Relatório','Pós-Trabalho'],
+                        labels: ['Comunicação','Interlocução','Reunião','Relatório','Pós-Trabalho','Importância'],
                         datasets: [{
                             label: 'Média',
                             data: medias,
@@ -507,6 +519,7 @@
                     {id: 'reuniao', valor: resultado.reuniao},
                     {id: 'relatorio', valor: resultado.relatorio},
                     {id: 'pos_trabalho', valor: resultado.pos_trabalho},
+                    {id: 'importancia', valor: resultado.importancia},
                     {id: 'pontualidade', valor: resultado.pontualidadePercentual}
                 ];
 
@@ -538,9 +551,9 @@
                             data.DATA.forEach(function(row) {
                                 var media = ((parseFloat(row[4]) + parseFloat(row[5]) + 
                                             parseFloat(row[6]) + parseFloat(row[7]) + 
-                                            parseFloat(row[8])) / 5).toFixed(2);
+                                            parseFloat(row[8]) + parseFloat(row[9])) / 6).toFixed(2);
                                 
-                                var pontualidade = row[9] == 1 ? "Sim" : "Não"; // Convertendo 1/0 para Sim/Não
+                                var pontualidade = row[10] == 1 ? "Sim" : "Não"; // Convertendo 1/0 para Sim/Não
                                 
                                 tabela.row.add([
                                     row[0],   // ID
@@ -552,8 +565,9 @@
                                     row[6],   // Reunião
                                     row[7],   // Relatório
                                     row[8],   // Pós-Trabalho
+                                    row[9],   // Importância do Processo
                                     pontualidade, // Pontualidade como Sim/Não
-                                    media     // Média - última coluna, agora é índice 10
+                                    media     // Média - última coluna, agora é índice 11
                                 ]);
                             });
                             tabela.draw();
@@ -629,7 +643,7 @@
                     url: "plugins/datatables/traducao.json"
                 },
                 columnDefs: [
-                    { className: "text-center", targets: [4, 5, 6, 7, 8, 9, 10] }
+                    { className: "text-center", targets: [4, 5, 6, 7, 8, 9, 10, 11] }
                 ]
             });
         }

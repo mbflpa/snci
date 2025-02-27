@@ -13,8 +13,8 @@
                 pc_pesq_reuniao_encerramento,
                 pc_pesq_relatorio,
                 pc_pesq_pos_trabalho,
-                pc_pesq_pontualidade, 
                 pc_pesq_importancia_processo,
+                pc_pesq_pontualidade, 
                 pc_pesq_observacao,
                 FORMAT(pc_pesq_data_hora, 'dd/MM/yyyy') as pc_pesq_data_hora
             FROM pc_pesquisas
@@ -41,6 +41,7 @@
                 COALESCE(CAST(AVG(CAST(pc_pesq_reuniao_encerramento AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_reuniao,
                 COALESCE(CAST(AVG(CAST(pc_pesq_relatorio AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_relatorio,
                 COALESCE(CAST(AVG(CAST(pc_pesq_pos_trabalho AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_pos_trabalho,
+                COALESCE(CAST(AVG(CAST(pc_pesq_importancia_processo AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_importancia,
                 COALESCE(CAST(AVG(CAST(pc_pesq_pontualidade AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_pontualidade
             FROM pc_pesquisas 
             WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
@@ -50,7 +51,7 @@
             SELECT 
                 FORMAT(pc_pesq_data_hora, 'yyyy-MM') as mes,
                 AVG((pc_pesq_comunicacao + pc_pesq_interlocucao + pc_pesq_reuniao_encerramento + 
-                     pc_pesq_relatorio + pc_pesq_pos_trabalho) / 5.0) as media_geral
+                     pc_pesq_relatorio + pc_pesq_pos_trabalho + pc_pesq_importancia_processo) / 6.0) as media_geral
             FROM pc_pesquisas 
             WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             GROUP BY FORMAT(pc_pesq_data_hora, 'yyyy-MM')
@@ -62,8 +63,9 @@
             val(qryPesquisas.media_interlocucao) +
             val(qryPesquisas.media_reuniao) +
             val(qryPesquisas.media_relatorio) +
-            val(qryPesquisas.media_pos_trabalho)
-        ) / 5>
+            val(qryPesquisas.media_pos_trabalho) +
+            val(qryPesquisas.media_importancia)
+        ) / 6>
     
         <cfset var evolucaoArray = []>
         <cfloop query="qryEvolucao">
@@ -121,6 +123,7 @@
             "reuniao": NumberFormat(qryPesquisas.media_reuniao, "999.99"), 
             "relatorio": NumberFormat(qryPesquisas.media_relatorio, "999.99"),
             "pos_trabalho": NumberFormat(qryPesquisas.media_pos_trabalho, "999.99"),
+            "importancia": NumberFormat(qryPesquisas.media_importancia, "999.99"),
             "pontualidadePercentual": NumberFormat(qryPesquisas.media_pontualidade * 100, "999.99"),
             "mediaGeral": NumberFormat(mediaGeral, "999.99"),
             "medias": [
@@ -128,7 +131,8 @@
                 val(qryPesquisas.media_interlocucao),
                 val(qryPesquisas.media_reuniao),
                 val(qryPesquisas.media_relatorio),
-                val(qryPesquisas.media_pos_trabalho)
+                val(qryPesquisas.media_pos_trabalho),
+                val(qryPesquisas.media_importancia)
             ],
             "evolucaoTemporal": evolucaoArray
         }>
