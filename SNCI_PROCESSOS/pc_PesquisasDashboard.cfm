@@ -13,6 +13,8 @@
             font-size: smaller; /* Reduz o tamanho da fonte dos cabeçalhos */
         }
     </style>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud.min.css'>
+    
 </head>
 <!-- Estrutura padrão do projeto -->
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -198,6 +200,77 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-cloud"></i> Nuvem de Palavras - Observações de Pesquisas
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="minFreq"><i class="fas fa-filter"></i> Frequência Mínima</label>
+                                                    <input type="number" id="minFreq" class="form-control" value="2" min="1" max="10">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="form-group">
+                                                    <label for="maxWords"><i class="fas fa-text-width"></i> Máximo de Palavras</label>
+                                                    <input type="number" id="maxWords" class="form-control" value="100" min="10" max="200">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-6 d-flex align-items-end">
+                                                <button id="atualizarNuvem" class="btn btn-primary btn-block">
+                                                    <i class="fas fa-sync-alt"></i> Atualizar Nuvem
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <div class="word-cloud-container">
+                                                    <div id="loadingCloud" class="text-center py-5">
+                                                        <div class="spinner-border text-primary" role="status">
+                                                            <span class="sr-only">Carregando...</span>
+                                                        </div>
+                                                        <p class="mt-2">Gerando nuvem de palavras...</p>
+                                                    </div>
+                                                    <div id="wordCloud"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mt-4 palavra-info" id="palavraInfo">
+                                            <div class="col-12">
+                                                <div class="card border-info">
+                                                    <div class="card-header bg-info text-white">
+                                                        <h5 class="mb-0" id="palavraTitulo">Detalhes da Palavra</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <p><strong>Palavra:</strong> <span id="palavraTexto"></span></p>
+                                                        <p><strong>Frequência:</strong> <span id="palavraFreq"></span> ocorrências</p>
+                                                        <p><strong>Relevância:</strong> <span id="palavraRelevancia"></span>%</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mt-4">
+                                            <div class="col-12">
+                                                <div class="alert alert-info" role="alert">
+                                                    <i class="fas fa-info-circle"></i> Esta visualização apresenta as palavras mais frequentes nas observações das pesquisas. O tamanho de cada palavra representa sua frequência.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </section>
             </div>
@@ -244,6 +317,7 @@
 
     <script src="plugins/chart.js/Chart.min.js"></script>
     <script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud.min.js"></script>
     <script>
         $(document).ready(function() {
             // Inicializar tooltips com configurações avançadas
@@ -611,6 +685,115 @@
             $("input[name='opcaoAno']").change(function() {
                 var novoAno = $(this).val();
                 carregarDashboard(novoAno);
+            });
+
+            // Script para nuvem de palavras
+            let palavrasData;
+            let maxFrequency = 0;
+            
+            // Função para carregar dados da nuvem de palavras
+            function carregarNuvemPalavras() {
+                // Obter o ano selecionado dos botões de rádio em vez de um elemento que não existe
+                const ano = $("input[name='opcaoAno']:checked").val();
+                const minFreq = $("#minFreq").val();
+                const maxWords = $("#maxWords").val();
+                
+                $("#wordCloud").empty();
+                $("#loadingCloud").show();
+                $("#palavraInfo").hide();
+                
+                // Chamada AJAX para o CFC com verificação se o ano está definido
+                if (!ano) {
+                    $("#wordCloud").html('<div class="alert alert-warning">Por favor, selecione um ano para visualizar a nuvem de palavras.</div>');
+                    $("#loadingCloud").hide();
+                    return;
+                }
+                
+                $.ajax({
+                    url: "cfc/pc_cfcPesquisasDashboard.cfc",
+                    type: "GET",
+                    dataType: "json",
+                    data: {
+                        method: "getWordCloud",
+                        ano: ano,
+                        minFreq: minFreq,
+                        maxWords: maxWords
+                    },
+                    success: function(response) {
+                        palavrasData = response;
+                        
+                        if (palavrasData.length === 0) {
+                            $("#wordCloud").html('<div class="alert alert-warning">Nenhuma palavra encontrada para os critérios selecionados.</div>');
+                            $("#loadingCloud").hide();
+                            return;
+                        }
+                        
+                        // Encontrar a maior frequência para cálculos de relevância
+                        maxFrequency = palavrasData[0].weight;
+                        
+                        // Inicializar nuvem de palavras
+                        $("#wordCloud").jQCloud(palavrasData, {
+                            width: $("#wordCloud").width(),
+                            height: 400,
+                            delay: 50,
+                            shape: 'elliptic',
+                            afterCloudRender: function() {
+                                // Adicionar eventos de clique às palavras
+                                $(".jqcloud-word").click(function() {
+                                    const texto = $(this).text();
+                                    const palavra = palavrasData.find(function(p) { return p.text === texto; });
+                                    
+                                    if (palavra) {
+                                        const relevancia = ((palavra.weight / maxFrequency) * 100).toFixed(1);
+                                        
+                                        $("#palavraTexto").text(palavra.text);
+                                        $("#palavraTitulo").text("Detalhes da Palavra: " + palavra.text);
+                                        $("#palavraFreq").text(palavra.weight);
+                                        $("#palavraRelevancia").text(relevancia);
+                                        $("#palavraInfo").fadeIn();
+                                    }
+                                });
+                                
+                                $("#loadingCloud").hide();
+                            }
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Erro ao carregar dados da nuvem:", error);
+                        $("#wordCloud").html('<div class="alert alert-danger">Erro ao carregar a nuvem de palavras. Por favor, tente novamente.</div>');
+                        $("#loadingCloud").hide();
+                    }
+                });
+            }
+            
+            // Inicializar nuvem de palavras quando a página carregar
+            // Adicionado setTimeout para garantir que os outros elementos estejam carregados primeiro
+            setTimeout(function() {
+                carregarNuvemPalavras();
+            }, 1000);
+            
+            // Evento do botão atualizar nuvem
+            $("#atualizarNuvem").click(function() {
+                carregarNuvemPalavras();
+            });
+            
+            // Evento de mudança de ano - recarregar nuvem
+            // Modificado para usar o seletor correto
+            $("input[name='opcaoAno']").change(function() {
+                setTimeout(function() {
+                    carregarNuvemPalavras();
+                }, 500);
+            });
+            
+            // Responsividade - redimensionar a nuvem quando a janela mudar de tamanho
+            $(window).resize(function() {
+                if (palavrasData && palavrasData.length > 0) {
+                    $("#wordCloud").empty();
+                    $("#wordCloud").jQCloud(palavrasData, {
+                        width: $("#wordCloud").width(),
+                        height: 400
+                    });
+                }
             });
         });
 

@@ -187,4 +187,111 @@
         </cfif>
     </cffunction>
 
+    <cffunction name="getWordCloud" access="remote" returntype="string" returnformat="json">
+        <cfargument name="ano" type="string" required="true">
+        <cfargument name="minFreq" type="numeric" required="false" default="2">
+        <cfargument name="maxWords" type="numeric" required="false" default="100">
+        
+        <cfset var stopWords = "a,à,ao,aos,aquela,aquelas,aquele,aqueles,aquilo,as,às,até,com,como,da,das,de,dela,delas,dele,deles,depois,do,dos,e,é,ela,elas,ele,eles,em,entre,era,eram,éramos,essa,essas,esse,esses,esta,está,estamos,estão,estas,estava,estavam,este,esteja,estejam,estejamos,estes,esteve,estive,estivemos,estiver,estivera,estiveram,estiverem,estivermos,estou,eu,foi,fomos,for,fora,foram,fôramos,forem,formos,fosse,fossem,fôssemos,fui,há,haja,hajam,hajamos,hão,havemos,havia,hei,houve,houvemos,houver,houvera,houverá,houveram,houvéramos,houverão,houverei,houverem,houveremos,houveriam,houveríamos,houvermos,houvesse,houvessem,houvéssemos,isso,isto,já,lhe,lhes,mais,mas,me,mesmo,meu,meus,minha,minhas,muito,na,não,nas,nem,nenhum,nessa,nessas,nesta,nestas,no,nos,nós,nossa,nossas,nosso,nossos,num,numa,o,os,ou,para,pela,pelas,pelo,pelos,por,qual,quando,que,quem,são,se,seja,sejam,sejamos,sem,será,serão,serei,seremos,seria,seriam,seríamos,seu,seus,só,somos,sou,sua,suas,também,te,tem,tém,temos,tenha,tenham,tenhamos,tenho,terá,terão,terei,teremos,teria,teriam,teríamos,teu,teus,teve,tinha,tinham,tínhamos,tive,tivemos,tiver,tivera,tiveram,tivéramos,tiverem,tivermos,tivesse,tivessem,tivéssemos,toda,todas,todo,todos,tu,tua,tuas,um,uma,você,vocês,vos">
+        
+        <!--- Corrigida a consulta para não usar TRIM diretamente na coluna TEXT --->
+        <cfquery name="qObservacoes" datasource="#application.dsn_processos#">
+            SELECT pc_pesq_observacao
+            FROM pc_pesquisas
+            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            AND pc_pesq_observacao IS NOT NULL
+            AND DATALENGTH(pc_pesq_observacao) > 0
+        </cfquery>
+        
+        <cfset var palavras = {}>
+        <cfset var resultado = []>
+        <cfset var maxFrequency = 0>
+        
+        <cfloop query="qObservacoes">
+            <!--- Agora fazemos o TRIM no ColdFusion, não no SQL Server --->
+            <cfset observacao = Trim(pc_pesq_observacao)>
+            <cfif Len(observacao) GT 0>
+                <cfset texto = REReplace(observacao, "[^\w\sáàâãéèêíìîóòôõúùûçÁÀÂÃÉÈÊÍÌÎÓÒÔÕÚÙÛÇ]", " ", "ALL")>
+                <cfset texto = REReplace(texto, "\s+", " ", "ALL")>
+                <cfset texto = lCase(texto)>
+                
+                <cfloop list="#texto#" index="palavra" delimiters=" ">
+                    <cfset palavra = trim(palavra)>
+                    <cfif len(palavra) GT 2 AND NOT listFindNoCase(stopWords, palavra)>
+                        <cfif structKeyExists(palavras, palavra)>
+                            <cfset palavras[palavra] = palavras[palavra] + 1>
+                        <cfelse>
+                            <cfset palavras[palavra] = 1>
+                        </cfif>
+                        
+                        <!--- Acompanha a frequência máxima --->
+                        <cfif palavras[palavra] GT maxFrequency>
+                            <cfset maxFrequency = palavras[palavra]>
+                        </cfif>
+                    </cfif>
+                </cfloop>
+            </cfif>
+        </cfloop>
+        
+        <!--- Criar um array com as palavras e suas frequências --->
+        <cfset var tempArray = []>
+        <cfloop collection="#palavras#" item="palavra">
+            <cfif palavras[palavra] GTE arguments.minFreq>
+                <cfset arrayAppend(tempArray, {
+                    "text": palavra,
+                    "weight": palavras[palavra],
+                    "color": getColorByFrequency(palavras[palavra], maxFrequency)
+                })>
+            </cfif>
+        </cfloop>
+        
+        <!--- Ordenar manualmente por peso (decrescente) --->
+        <cfset sortPalavrasByWeight(tempArray)>
+        
+        <!--- Limitar ao máximo de palavras --->
+        <cfif arrayLen(tempArray) GT arguments.maxWords>
+            <cfset resultado = arraySlice(tempArray, 1, arguments.maxWords)>
+        <cfelse>
+            <cfset resultado = tempArray>
+        </cfif>
+        
+        <cfreturn serializeJSON(resultado)>
+    </cffunction>
+    
+    <cffunction name="sortPalavrasByWeight" access="private" returntype="void">
+        <cfargument name="arr" type="array" required="true">
+        
+        <!--- Implementação manual de ordenação (bubble sort) --->
+        <cfset var n = arrayLen(arguments.arr)>
+        <cfset var temp = {}>
+        <cfloop from="1" to="#n-1#" index="i">
+            <cfloop from="1" to="#n-i#" index="j">
+                <cfif arguments.arr[j].weight LT arguments.arr[j+1].weight>
+                    <cfset temp = arguments.arr[j]>
+                    <cfset arguments.arr[j] = arguments.arr[j+1]>
+                    <cfset arguments.arr[j+1] = temp>
+                </cfif>
+            </cfloop>
+        </cfloop>
+    </cffunction>
+    
+    <cffunction name="getColorByFrequency" access="private" returntype="string">
+        <cfargument name="frequency" type="numeric" required="true">
+        <cfargument name="maxFrequency" type="numeric" required="true">
+        
+        <cfset var intensity = min(100, round((arguments.frequency / arguments.maxFrequency) * 100))>
+        
+        <cfif intensity GT 80>
+            <cfreturn "##d9534f"> <!--- Bootstrap danger --->
+        <cfelseif intensity GT 60>
+            <cfreturn "##f0ad4e"> <!--- Bootstrap warning --->
+        <cfelseif intensity GT 40>
+            <cfreturn "##5bc0de"> <!--- Bootstrap info --->
+        <cfelseif intensity GT 20>
+            <cfreturn "##5cb85c"> <!--- Bootstrap success --->
+        <cfelse>
+            <cfreturn "##0275d8"> <!--- Bootstrap primary --->
+        </cfif>
+    </cffunction>
+
 </cfcomponent>
