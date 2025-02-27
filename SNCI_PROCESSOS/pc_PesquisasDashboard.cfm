@@ -28,14 +28,7 @@
             <!-- Área que será exportada para PDF -->
             <div id="dashboard-content">
                 <section class="content-header">
-                    <div class="container-fluid">
-                        <div class="row mb-2">
-                            <div class="col-sm-6">
-                                <h1>Dashboard de Pesquisas</h1>
-                            </div>
-                            
-                        </div>
-                    </div>
+                    <h1>Dashboard de Pesquisas</h1>
                 </section>
 
                 <section class="content">
@@ -108,7 +101,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="card">
-                                    <div class="card-header">
+                                    <div class="card-header card-header_backgroundColor">
                                         <h3 class="card-title">Avaliações (média anual)</h3>
                                     </div>
                                     <div class="card-body">
@@ -181,7 +174,7 @@
                         <div class="row" style="margin-top:2rem;">
                             <div class="col-md-4">
                                 <div class="card">
-                                    <div class="card-header">
+                                    <div class="card-header card-header_backgroundColor">
                                         <h3 class="card-title">Médias por Categoria</h3>
                                     </div>
                                     <div class="card-body">
@@ -191,7 +184,7 @@
                             </div>
                             <div class="col-md-8">
                                 <div class="card">
-                                    <div class="card-header">
+                                    <div class="card-header card-header_backgroundColor">
                                         <h3 class="card-title">Evolução Temporal</h3>
                                     </div>
                                     <div class="card-body">
@@ -204,7 +197,7 @@
                         <div class="row mt-4">
                             <div class="col-12">
                                 <div class="card">
-                                    <div class="card-header bg-primary text-white">
+                                    <div class="card-header card-header_backgroundColor">
                                         <h5 class="mb-0">
                                             <i class="fas fa-cloud"></i> Nuvem de Palavras - Observações de Pesquisas
                                         </h5>
@@ -263,11 +256,25 @@
                                         
                                         <div class="row mt-4">
                                             <div class="col-12">
-                                                <div class="alert alert-info" role="alert">
-                                                    <i class="fas fa-info-circle"></i> Esta visualização apresenta as palavras mais frequentes nas observações das pesquisas. O tamanho de cada palavra representa sua frequência.
+                                                
+                                                <div class="card border-primary">
+                                                    <div class="card-header alert-info text-white">
+                                                        <h5 class="mb-0"><i class="fas fa-question-circle"></i> Importância da Nuvem de Palavras</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <p>A Nuvem de Palavras é uma ferramenta poderosa de visualização de dados que permite identificar rapidamente os termos mais recorrentes nas observações registradas nas pesquisas de satisfação. O tamanho de cada palavra representa sua frequência. Sua importância está em:</p>
+                                                        <ul>
+                                                            <li><strong>Identificação de padrões:</strong> Destaca temas e preocupações recorrentes mencionados pelos respondentes;</li>
+                                                            <li><strong>Análise qualitativa:</strong> Complementa as métricas quantitativas, oferecendo uma dimensão mais profunda do feedback recebido;</li>
+                                                            <li><strong>Priorização de ações:</strong> Ajuda a identificar áreas que precisam de atenção imediata com base na frequência dos termos;</li>
+                                                            <li><strong>Percepção dos stakeholders:</strong> Fornece insights sobre como os processos e atividades são percebidos pelos participantes.</li>
+                                                        </ul>
+                                                        <p>Para melhor aproveitamento, analise tanto as palavras mais frequentes (maiores) quanto as de menor frequência, pois ambas podem revelar informações valiosas para a melhoria contínua dos processos.</p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -281,7 +288,7 @@
             <section class="content">
                 <div class="container-fluid">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header card-header_backgroundColor">
                             <h3 class="card-title">Listagem de Pesquisas</h3>
                         </div>
                         <div class="card-body">
@@ -354,6 +361,13 @@
         
             var radioName = "opcaoAno";
             $("#opcoesAno").empty();
+            
+            // Adicionar botão "Todos" antes dos anos específicos
+            var btnTodos = `<label class="btn btn-outline-secondary btn-todos">
+                            <input type="radio" name="${radioName}" autocomplete="off" value="Todos"/> Todos
+                       </label>`;
+            $("#opcoesAno").append(btnTodos);
+            
             anos.forEach(function(val) {
                 var isCurrent = (val === currentYear);
                 var btnClass = "btn-outline-primary";

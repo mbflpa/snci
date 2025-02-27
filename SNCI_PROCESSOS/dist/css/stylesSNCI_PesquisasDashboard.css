@@ -602,7 +602,7 @@ td {
 }
 
 .jqcloud {
-  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .jqcloud-word:hover {
@@ -614,4 +614,16 @@ td {
 .palavra-info {
   display: none;
   margin-top: 20px;
+}
+
+/* Estilo especial para o botão Todos */
+.btn-todos {
+  font-weight: 600;
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-todos.active {
+  background-color: #495057 !important;
+  border-color: #343a40 !important;
 }

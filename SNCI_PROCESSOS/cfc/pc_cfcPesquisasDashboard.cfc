@@ -19,7 +19,9 @@
                 FORMAT(pc_pesq_data_hora, 'dd/MM/yyyy') as pc_pesq_data_hora
             FROM pc_pesquisas
             INNER JOIN pc_orgaos ON pc_pesquisas.pc_org_mcu = pc_orgaos.pc_org_mcu
+            <cfif arguments.ano NEQ "Todos">
             WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            </cfif>
             ORDER BY pc_processo_id
         </cfquery>
         
@@ -44,7 +46,9 @@
                 COALESCE(CAST(AVG(CAST(pc_pesq_importancia_processo AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_importancia,
                 COALESCE(CAST(AVG(CAST(pc_pesq_pontualidade AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_pontualidade
             FROM pc_pesquisas 
+            <cfif arguments.ano NEQ "Todos">
             WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            </cfif>
         </cfquery>
     
         <cfquery name="qryEvolucao" datasource="#application.dsn_processos#">
@@ -53,7 +57,9 @@
                 AVG((pc_pesq_comunicacao + pc_pesq_interlocucao + pc_pesq_reuniao_encerramento + 
                      pc_pesq_relatorio + pc_pesq_pos_trabalho + pc_pesq_importancia_processo) / 6.0) as media_geral
             FROM pc_pesquisas 
+            <cfif arguments.ano NEQ "Todos">
             WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            </cfif>
             GROUP BY FORMAT(pc_pesq_data_hora, 'yyyy-MM')
             ORDER BY mes
         </cfquery>
@@ -87,7 +93,9 @@
             FROM (
                 SELECT DISTINCT pc_processos.pc_processo_id as processos_id
                 FROM pc_processos 
+                <cfif arguments.ano NEQ "Todos">
                 WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                </cfif>
 
                 UNION
 
@@ -99,7 +107,9 @@
                         ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
                     INNER JOIN pc_processos 
                         ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                    <cfif arguments.ano NEQ "Todos">
                     WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                    </cfif>
 
                     UNION
 
@@ -109,7 +119,9 @@
                         ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
                     INNER JOIN pc_processos 
                         ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                    <cfif arguments.ano NEQ "Todos">
                     WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                    </cfif>
                 ) AS subquery
             ) AS unificado
         </cfquery>
@@ -151,12 +163,20 @@
                     ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
                 INNER JOIN pc_processos 
                     ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                <cfif arguments.ano NEQ "Todos">
                 WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
                 AND pc_processos.pc_processo_id NOT IN 
                 (
                     SELECT pc_processo_id 
                     FROM pc_pesquisas    
                 )
+                <cfelse>
+                WHERE pc_processos.pc_processo_id NOT IN 
+                (
+                    SELECT pc_processo_id 
+                    FROM pc_pesquisas    
+                )
+                </cfif>
 
                 UNION
 
@@ -166,12 +186,20 @@
                     ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
                 INNER JOIN pc_processos 
                     ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                <cfif arguments.ano NEQ "Todos">
                 WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
                 AND pc_processos.pc_processo_id NOT IN 
                 (
                     SELECT pc_processo_id 
                     FROM pc_pesquisas 
                 )
+                <cfelse>
+                WHERE pc_processos.pc_processo_id NOT IN 
+                (
+                    SELECT pc_processo_id 
+                    FROM pc_pesquisas 
+                )
+                </cfif>
             ) AS unificado
         </cfquery>
 
@@ -198,9 +226,14 @@
         <cfquery name="qObservacoes" datasource="#application.dsn_processos#">
             SELECT pc_pesq_observacao
             FROM pc_pesquisas
+            <cfif arguments.ano NEQ "Todos">
             WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             AND pc_pesq_observacao IS NOT NULL
             AND DATALENGTH(pc_pesq_observacao) > 0
+            <cfelse>
+            WHERE pc_pesq_observacao IS NOT NULL
+            AND DATALENGTH(pc_pesq_observacao) > 0
+            </cfif>
         </cfquery>
         
         <cfset var palavras = {}>
