@@ -3,36 +3,26 @@
         <cfargument name="ano" type="string" required="true">
         
         <cfquery name="qPesquisas" datasource="#application.dsn_processos#">
-            WITH PesquisasAno AS (
-                SELECT *,
-                       SUM(CASE WHEN pc_pesq_pontualidade = 1 THEN 1 ELSE 0 END) OVER() as total_pontuais,
-                       COUNT(*) OVER() as total_pesquisas
-                FROM pc_pesquisas
-                WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
-            )
             SELECT 
                 pc_pesq_id,
                 pc_usu_matricula,
                 pc_processo_id,
-                pc_org_mcu,
+                CONCAT(pc_orgaos.pc_org_sigla,' (',pc_orgaos.pc_org_mcu,')') as orgaoResposta,
                 pc_pesq_comunicacao,
                 pc_pesq_interlocucao,
                 pc_pesq_reuniao_encerramento,
                 pc_pesq_relatorio,
                 pc_pesq_pos_trabalho,
-                pc_pesq_pontualidade, -- Retorna o valor original (1 ou 0)
+                pc_pesq_pontualidade, 
                 pc_pesq_importancia_processo,
                 pc_pesq_observacao,
-                pc_pesq_data_hora
-            FROM PesquisasAno
-            ORDER BY pc_pesq_data_hora DESC
+                FORMAT(pc_pesq_data_hora, 'dd/MM/yyyy') as pc_pesq_data_hora
+            FROM pc_pesquisas
+            INNER JOIN pc_orgaos ON pc_pesquisas.pc_org_mcu = pc_orgaos.pc_org_mcu
+            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            ORDER BY pc_processo_id
         </cfquery>
         
-        <cfset qPesquisas = qPesquisas>
-        <cfloop query="qPesquisas">
-            <cfset qPesquisas.pc_pesq_data_hora = formatDateForJSON(qPesquisas.pc_pesq_data_hora)>
-        </cfloop>
-
         <cfreturn serializeJSON(qPesquisas)>
     </cffunction>
 

@@ -8,7 +8,11 @@
     <title>Dashboard de Pesquisas</title>
     <link rel="stylesheet" href="dist/css/stylesSNCI_PaineisFiltro.css">
     <link rel="stylesheet" href="dist/css/stylesSNCI_PesquisasDashboard">
-    
+    <style>
+        #tabelaPesquisas th {
+            font-size: smaller; /* Reduz o tamanho da fonte dos cabeçalhos */
+        }
+    </style>
 </head>
 <!-- Estrutura padrão do projeto -->
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -108,7 +112,7 @@
                                     <div class="card-body">
                                         <div class="score-cards">
                                             <div class="score-card comunicacao">
-                                                <h3>Comunicação <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação da comunicação durante o processo"></i></h3>
+                                                <h3>Comunicação <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a clareza, frequência e qualidade das interações com a equipe de Controle Interno. Considere se a equipe de Controle Interno foi acessível, transparente e eficaz ao transmitir informações sobre a condução dos trabalhos."></i></h3>
                                                 <div id="comunicacao" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
@@ -116,7 +120,7 @@
                                                 <i class="fas fa-comments fa-lg card-icon"></i>
                                             </div>
                                             <div class="score-card interlocucao">
-                                                <h3>Interlocução <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação da interlocução durante o processo"></i></h3>
+                                                <h3>Interlocução <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia o comportamento da equipe de Controle Interno ao longo do trabalho. Leve em conta o profissionalismo, o respeito e a atitude colaborativa demonstrados durante o processo."></i></h3>
                                                 <div id="interlocucao" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
@@ -124,7 +128,7 @@
                                                 <i class="fa fa-exchange card-icon"></i>
                                             </div>
                                             <div class="score-card reuniao">
-                                                <h3>Reunião <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação das reuniões realizadas"></i></h3>
+                                                <h3>Reunião <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a condução da reunião final da equipe de Controle Interno. Considere se a reunião foi clara, direta e se os tópicos foram abordados de maneira simples e objetiva, facilitando o fechamento do processo."></i></h3>
                                                 <div id="reuniao" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
@@ -132,7 +136,7 @@
                                                 <i class="fa fa-users card-icon"></i>
                                             </div>
                                             <div class="score-card relatorio">
-                                                <h3>Relatório <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação dos relatórios entregues"></i></h3>
+                                                <h3>Relatório <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a qualidade do relatório entregue ao final do trabalho da equipe de Controle Interno. Considere se o documento foi redigido de forma clara, com informações consistentes e objetivas, facilitando o entendimento das conclusões e recomendações."></i></h3>
                                                 <div id="relatorio" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
@@ -140,7 +144,7 @@
                                                 <i class="fa fa-file-text card-icon"></i>
                                             </div>
                                             <div class="score-card pos-trabalho">
-                                                <h3>Pós-Trabalho <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação do trabalho pós-processo"></i></h3>
+                                                <h3>Pós-Trabalho <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia o suporte recebido após a conclusão do trabalho da equipe de Controle Interno. Considere se houve disponibilidade para responder dúvidas, se a comunicação foi eficaz e se o atendimento foi prestativo e ágil no período pós-trabalho."></i></h3>
                                                 <div id="pos_trabalho" class="metric-value">0</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
@@ -149,7 +153,7 @@
                                             </div>
                                             <!-- Card adicional para Pontualidade -->
                                             <div class="score-card pontualidade">
-                                                <h3>Pontualidade <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avaliação da pontualidade"></i></h3>
+                                                <h3>Pontualidade <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia se a equipe de Controle Interno cumpriu os prazos estabelecidos para a condução e entrega do trabalho."></i></h3>
                                                 <div id="pontualidade" class="metric-value">0%</div>
                                                 <div class="progress-bar">
                                                     <div class="progress-fill" style="width: 0%"></div>
@@ -202,9 +206,8 @@
                                     <thead>
                                         <tr>
                                             <th>ID</th>
-                                            <th>Matrícula</th>
                                             <th>Processo</th>
-                                            <th>MCU</th>
+                                            <th>Órgão (MCU)</th>
                                             <th>Data Resp.</th>
                                             <th>Comunicação</th>
                                             <th>Interlocução</th>
@@ -541,9 +544,8 @@
                                 
                                 tabela.row.add([
                                     row[0],   // ID
-                                    row[1],   // Matrícula
                                     row[2],   // Processo
-                                    row[3],   // MCU
+                                    row[3],   // órgao que respondeu
                                     row[12],  // Data/Hora
                                     row[4],   // Comunicação
                                     row[5],   // Interlocução
@@ -551,7 +553,7 @@
                                     row[7],   // Relatório
                                     row[8],   // Pós-Trabalho
                                     pontualidade, // Pontualidade como Sim/Não
-                                    media     // Média
+                                    media     // Média - última coluna, agora é índice 10
                                 ]);
                             });
                             tabela.draw();
@@ -603,10 +605,7 @@
 			var day = currentDate.getDate()
 			var month = currentDate.getMonth() + 1
 			var year = currentDate.getFullYear()
-
 			var d = day + "-" + month + "-" + year;
-
-            
             return $('#tabelaPesquisas').DataTable({
                 destroy: true,
                 processing: true,
@@ -614,73 +613,24 @@
                 responsive: true,
                 pageLength: 10,
                 dom: 
-    "<'row d-flex align-items-center'<'col-auto'B><'col-auto'f><'col-auto'p>>" + // Removido dtsp-verticalContainer e P
-    "<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
-    "<'row'<'col-12'tr>>",  // Tabela com todos os dados
-					buttons: [
-						{
-							extend: 'excel',
-							text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
-							title : 'SNCI_Pesquisas_Respondidas_' + d,
-							className: 'btExcel',
-						}
-						
-					],
-
-                columnDefs: [
+                    "<'row d-flex align-items-center'<'col-auto'B><'col-auto'f><'col-auto'p>>" + // Removido dtsp-verticalContainer e P
+                    "<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
+                    "<'row'<'col-12'tr>>",  // Tabela com todos os dados
+                buttons: [
                     {
-                        // Colunas numéricas (notas e média)
-                        targets: [5,6,7,8,9,11],
-                        className: 'text-center',
-                        render: function(data, type, row) {
-                            return parseFloat(data).toFixed(2);
-                        }
-                    },
-                    {
-                        // Coluna de pontualidade
-                        targets: [10],
-                        className: 'text-center',
-                        render: function(data, type, row) {
-                            return data;
-                        }
-                    },
-                    {
-                        // Coluna de data - Corrigido o formato da data
-                        targets: [4],
-                        render: function(data, type, row) {
-                            if (type === 'display') {
-                                // Verificar se a data está em um formato válido antes de processar
-                                if (data && data !== "") {
-                                    try {
-                                        // Tentar converter para um formato ISO primeiro
-                                        var dataParts = data.split(' ')[0].split('/');
-                                        if (dataParts.length === 3) {
-                                            // Formato dd/mm/yyyy para yyyy-mm-dd
-                                            var isoDate = dataParts[2] + '-' + dataParts[1] + '-' + dataParts[0];
-                                            return moment(isoDate, "YYYY-MM-DD").format('DD/MM/YYYY');
-                                        }
-                                        else if (data.includes('-')) {
-                                            // Já está em formato ISO yyyy-mm-dd
-                                            return moment(data.split(' ')[0], "YYYY-MM-DD").format('DD/MM/YYYY');
-                                        }
-                                        else {
-                                            // Caso seja uma data em formato timestamp
-                                            return moment.unix(data/1000).format('DD/MM/YYYY');
-                                        }
-                                    } catch (e) {
-                                        console.warn("Erro ao formatar data:", e);
-                                        return data; // Retorna o dado original em caso de erro
-                                    }
-                                }
-                                return data;
-                            }
-                            return data;
-                        }
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
+                        title : 'SNCI_Pesquisas_Respondidas_' + d,
+                        className: 'btExcel',
                     }
+                    
                 ],
                 language: {
                     url: "plugins/datatables/traducao.json"
-                }
+                },
+                columnDefs: [
+                    { className: "text-center", targets: [4, 5, 6, 7, 8, 9, 10] }
+                ]
             });
         }
     </script>
