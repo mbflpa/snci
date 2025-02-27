@@ -6,14 +6,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard de Pesquisas</title>
+    <link rel="stylesheet" href="plugins/jqcloud/jqcloud.min.css">
     <link rel="stylesheet" href="dist/css/stylesSNCI_PaineisFiltro.css">
     <link rel="stylesheet" href="dist/css/stylesSNCI_PesquisasDashboard.css">
+    
     <style>
         #tabelaPesquisas th {
             font-size: smaller; /* Reduz o tamanho da fonte dos cabeçalhos */
         }
     </style>
-    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud.min.css'>
+   
     
 </head>
 <!-- Estrutura padrão do projeto -->
@@ -326,7 +328,7 @@
 
     <script src="plugins/chart.js/Chart.min.js"></script>
     <script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqcloud/1.0.4/jqcloud.min.js"></script>
+    <script src="plugins/jqcloud/jqcloud.min.js"></script>
     <script>
         $(document).ready(function() {
             // Inicializar tooltips com configurações avançadas
@@ -725,34 +727,75 @@
                     return;
                 }
                 
+               
+                
                 $.ajax({
-                    url: "cfc/pc_cfcPesquisasDashboard.cfc",
+                    url: "cfc/pc_cfcPesquisasDashboard.cfc?method=getWordCloud&returnformat=json",
                     type: "GET",
                     dataType: "json",
                     data: {
-                        method: "getWordCloud",
                         ano: ano,
                         minFreq: minFreq,
                         maxWords: maxWords
                     },
                     success: function(response) {
+                                             
+                        // Verificar se a resposta é válida
+                        if (!response || typeof response !== 'object') {
+                            $("#wordCloud").html('<div class="alert alert-warning">Resposta inválida do servidor.</div>');
+                            $("#loadingCloud").hide();
+                            return;
+                        }
+                        
                         palavrasData = response;
                         
-                        if (palavrasData.length === 0) {
-                            $("#wordCloud").html('<div class="alert alert-warning">Nenhuma palavra encontrada para os critérios selecionados.</div>');
+                        if (!Array.isArray(palavrasData) || palavrasData.length === 0) {
+                            $("#wordCloud").html('<div class="alert alert-info">Nenhuma palavra encontrada para os critérios selecionados.</div>');
                             $("#loadingCloud").hide();
                             return;
                         }
                         
                         // Encontrar a maior frequência para cálculos de relevância
-                        maxFrequency = palavrasData[0].weight;
+                        maxFrequency = Math.max(...palavrasData.map(p => p.weight || 0));
+                        
+                        // Definir esquema de cores baseado no peso das palavras
+                        const getWordColor = function(weight) {
+                            // Calcular percentual em relação ao peso máximo
+                            const percentage = weight / maxFrequency;
+                            
+                            // Esquema de cores do mais frequente para o menos frequente
+                            if (percentage > 0.8) return "#FF5733"; // Vermelho para palavras muito frequentes
+                            if (percentage > 0.6) return "#FFA500"; // Laranja
+                            if (percentage > 0.4) return "#33A8FF"; // Azul
+                            if (percentage > 0.2) return "#4CAF50"; // Verde
+                            return "#9C27B0";                       // Roxo para palavras menos frequentes
+                        };
+                        
+                        // Garantir que os dados estejam no formato esperado pelo jQCloud
+                        const dadosFormatados = palavrasData.map(function(item) {
+                            const weight = parseFloat(item.weight) || 1;
+                            return {
+                                text: item.text || "",
+                                weight: weight,
+                                color: getWordColor(weight),
+                                html: { 
+                                    title: `${item.text} (${item.weight})`,
+                                    'data-weight': weight 
+                                }
+                            };
+                        });
                         
                         // Inicializar nuvem de palavras
-                        $("#wordCloud").jQCloud(palavrasData, {
-                            width: $("#wordCloud").width(),
+                        try {
+                            $("#wordCloud").jQCloud('destroy');
+                        } catch(e) { /* Ignora se não existir */ }
+                        
+                        $("#wordCloud").jQCloud(dadosFormatados, {
+                            width: $("#wordCloud").parent().width(),
                             height: 400,
                             delay: 50,
                             shape: 'elliptic',
+                            colors: ["#9C27B0", "#4CAF50", "#33A8FF", "#FFA500", "#FF5733"],
                             afterCloudRender: function() {
                                 // Adicionar eventos de clique às palavras
                                 $(".jqcloud-word").click(function() {
@@ -776,7 +819,13 @@
                     },
                     error: function(xhr, status, error) {
                         console.error("Erro ao carregar dados da nuvem:", error);
-                        $("#wordCloud").html('<div class="alert alert-danger">Erro ao carregar a nuvem de palavras. Por favor, tente novamente.</div>');
+                        console.log("Status:", status);
+                        console.log("Resposta:", xhr.responseText);
+                        $("#wordCloud").html(`<div class="alert alert-danger">
+                            <strong>Erro ao carregar a nuvem de palavras.</strong><br>
+                            Detalhes: ${error || "Sem detalhes disponíveis"}<br>
+                            Por favor, verifique o console para mais informações.
+                        </div>`);
                         $("#loadingCloud").hide();
                     }
                 });
@@ -804,16 +853,42 @@
             // Responsividade - redimensionar a nuvem quando a janela mudar de tamanho
             $(window).resize(function() {
                 if (palavrasData && palavrasData.length > 0) {
-                    $("#wordCloud").empty();
-                    $("#wordCloud").jQCloud(palavrasData, {
-                        width: $("#wordCloud").width(),
-                        height: 400
+                    try {
+                        $("#wordCloud").jQCloud('destroy');
+                    } catch(e) { /* Ignora se não existir */ }
+                    
+                    // Recalcular dados com cores ao redimensionar
+                    const dadosFormatados = palavrasData.map(function(item) {
+                        const weight = parseFloat(item.weight) || 1;
+                        // Recalcular cor baseada no peso
+                        const percentage = weight / maxFrequency;
+                        let color = "#9C27B0";
+                        if (percentage > 0.8) color = "#FF5733";
+                        else if (percentage > 0.6) color = "#FFA500";
+                        else if (percentage > 0.4) color = "#33A8FF";
+                        else if (percentage > 0.2) color = "#4CAF50";
+                        
+                        return {
+                            text: item.text || "",
+                            weight: weight,
+                            color: color,
+                            html: { 
+                                title: `${item.text} (${item.weight})`,
+                                'data-weight': weight 
+                            }
+                        };
+                    });
+                    
+                    $("#wordCloud").jQCloud(dadosFormatados, {
+                        width: $("#wordCloud").parent().width(),
+                        height: 400,
+                        colors: ["#9C27B0", "#4CAF50", "#33A8FF", "#FFA500", "#FF5733"],
                     });
                 }
             });
         });
 
-        // Configuração do DataTable similar ao pc_Usuarios.cfm
+
         function configurarDataTable() {
             var currentDate = new Date()
 			var day = currentDate.getDate()

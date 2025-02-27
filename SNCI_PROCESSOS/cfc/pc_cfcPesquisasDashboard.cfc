@@ -20,7 +20,7 @@
             FROM pc_pesquisas
             INNER JOIN pc_orgaos ON pc_pesquisas.pc_org_mcu = pc_orgaos.pc_org_mcu
             <cfif arguments.ano NEQ "Todos">
-            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
             ORDER BY pc_processo_id
         </cfquery>
@@ -215,7 +215,7 @@
         </cfif>
     </cffunction>
 
-    <cffunction name="getWordCloud" access="remote" returntype="string" returnformat="json">
+    <cffunction name="getWordCloud" access="remote" returntype="string" returnformat="json" hint="Retorna a nuvem de palavras das observações das pesquisas">
         <cfargument name="ano" type="string" required="true">
         <cfargument name="minFreq" type="numeric" required="false" default="2">
         <cfargument name="maxWords" type="numeric" required="false" default="100">
@@ -227,12 +227,12 @@
             SELECT pc_pesq_observacao
             FROM pc_pesquisas
             <cfif arguments.ano NEQ "Todos">
-            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-            AND pc_pesq_observacao IS NOT NULL
-            AND DATALENGTH(pc_pesq_observacao) > 0
+                WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                AND pc_pesq_observacao IS NOT NULL
+                AND DATALENGTH(pc_pesq_observacao) > 0
             <cfelse>
-            WHERE pc_pesq_observacao IS NOT NULL
-            AND DATALENGTH(pc_pesq_observacao) > 0
+                WHERE pc_pesq_observacao IS NOT NULL
+                AND DATALENGTH(pc_pesq_observacao) > 0
             </cfif>
         </cfquery>
         
@@ -272,8 +272,7 @@
             <cfif palavras[palavra] GTE arguments.minFreq>
                 <cfset arrayAppend(tempArray, {
                     "text": palavra,
-                    "weight": palavras[palavra],
-                    "color": getColorByFrequency(palavras[palavra], maxFrequency)
+                    "weight": palavras[palavra]
                 })>
             </cfif>
         </cfloop>
@@ -291,7 +290,7 @@
         <cfreturn serializeJSON(resultado)>
     </cffunction>
     
-    <cffunction name="sortPalavrasByWeight" access="private" returntype="void">
+    <cffunction name="sortPalavrasByWeight" access="private" returntype="void" hint="Ordena um array de palavras por peso (decrescente)">
         <cfargument name="arr" type="array" required="true">
         
         <!--- Implementação manual de ordenação (bubble sort) --->
@@ -308,23 +307,4 @@
         </cfloop>
     </cffunction>
     
-    <cffunction name="getColorByFrequency" access="private" returntype="string">
-        <cfargument name="frequency" type="numeric" required="true">
-        <cfargument name="maxFrequency" type="numeric" required="true">
-        
-        <cfset var intensity = min(100, round((arguments.frequency / arguments.maxFrequency) * 100))>
-        
-        <cfif intensity GT 80>
-            <cfreturn "##d9534f"> <!--- Bootstrap danger --->
-        <cfelseif intensity GT 60>
-            <cfreturn "##f0ad4e"> <!--- Bootstrap warning --->
-        <cfelseif intensity GT 40>
-            <cfreturn "##5bc0de"> <!--- Bootstrap info --->
-        <cfelseif intensity GT 20>
-            <cfreturn "##5cb85c"> <!--- Bootstrap success --->
-        <cfelse>
-            <cfreturn "##0275d8"> <!--- Bootstrap primary --->
-        </cfif>
-    </cffunction>
-
 </cfcomponent>
