@@ -210,23 +210,25 @@
                                         </h5>
                                     </div>
                                     <div class="card-body">
-                                        <div class="row mb-3">
-                                            <div class="col-md-3 col-sm-6">
+                                        <div class="row mb-2">
+                                            <div class="col-md-2 col-sm-6">
                                                 <div class="form-group">
                                                     <label for="minFreq"><i class="fas fa-filter"></i> Frequência Mínima</label>
                                                     <input type="number" id="minFreq" class="form-control" value="2" min="1" max="10">
                                                 </div>
                                             </div>
-                                            <div class="col-md-3 col-sm-6">
+                                            <div class="col-md-2 col-sm-6">
                                                 <div class="form-group">
                                                     <label for="maxWords"><i class="fas fa-text-width"></i> Máximo de Palavras</label>
                                                     <input type="number" id="maxWords" class="form-control" value="100" min="10" max="200">
                                                 </div>
                                             </div>
-                                            <div class="col-md-3 col-sm-6 d-flex align-items-end">
-                                                <button id="atualizarNuvem" class="btn btn-primary btn-block">
-                                                    <i class="fas fa-sync-alt"></i> Atualizar Nuvem
-                                                </button>
+                                            <div class="col-md-2 col-sm-6">
+                                                <div class="form-group">
+                                                    <button id="atualizarNuvem" class="btn btn-primary btn-block" style="margin-top: 24px;">
+                                                        <i class="fas fa-sync-alt"></i> Atualizar Nuvem
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                         
