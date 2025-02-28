@@ -1,0 +1,107 @@
+/* Estilos para a tabela de listagem de pesquisas */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
+
+#tabelaPesquisas {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+#tabelaPesquisas thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+  font-weight: 600;
+  padding: 12px 10px;
+  text-align: left;
+  font-size: 0.85rem;
+  color: #495057;
+  white-space: nowrap;
+}
+
+#tabelaPesquisas tbody tr {
+  transition: all 0.2s ease;
+}
+
+#tabelaPesquisas tbody tr:hover {
+  background-color: #f2f7ff;
+}
+
+#tabelaPesquisas tbody td {
+  padding: 10px;
+  border-top: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+/* Estilização dos botões do DataTables */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  margin: 0 3px;
+  padding: 5px 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #333;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background-color: #007bff;
+  color: #fff !important;
+  border-color: #007bff;
+}
+
+/* Estilo para o botão de exportação para Excel */
+.btExcel {
+  background-color: transparent;
+  border: none;
+  color: #28a745;
+}
+
+.btExcel:hover .grow-icon {
+  transform: scale(1.1);
+  color: #218838;
+}
+
+.grow-icon {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+  #tabelaPesquisas th,
+  #tabelaPesquisas td {
+    font-size: 0.8rem;
+    padding: 8px 6px;
+  }
+
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_length {
+    float: none;
+    text-align: left;
+    margin-bottom: 10px;
+  }
+}
+
+/* Ajustes para o layout do DataTables */
+.dataTables_wrapper .row {
+  margin: 0;
+  align-items: center;
+}
+
+.dataTables_info {
+  padding-top: 0.5rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.dataTables_filter input {
+  margin-left: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  padding: 0.375rem 0.75rem;
+}

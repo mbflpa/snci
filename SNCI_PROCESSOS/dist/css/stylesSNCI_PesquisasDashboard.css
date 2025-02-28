@@ -1,4 +1,4 @@
-/* Definindo variáveis de cores para as categorias */
+/* Definindo variáveis de cores para as categorias - mantido no CSS principal para garantir consistência */
 :root {
   /* Cores principais das categorias */
   --cor-comunicacao: #17a2b8;
@@ -25,46 +25,28 @@
   --cor-bg-warning: #ffc107;
 }
 
-/* Estilos básicos inspirados no dashboard-export.html */
+/* Estilos básicos do layout principal */
 body {
   background-color: #f7f7f7;
 }
+
 .header {
   background-color: #fff;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   padding: 1rem;
 }
+
 .header h1 {
   font-size: 1.5rem;
   color: #111827;
   text-align: center;
 }
+
 .content-wrapper {
   padding-left: 20px;
   padding-right: 20px;
   overflow-y: auto;
   max-height: calc(100vh - 130px);
-}
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-.metric-card {
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-.metric-label {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-.metric-value {
-  font-size: 1.875rem;
-  font-weight: 600;
-  color: #111827;
 }
 
 /* Cores dos cards principais usando variáveis */
@@ -79,357 +61,6 @@ body {
 }
 .bg-warning {
   background-color: var(--cor-bg-warning) !important;
-}
-
-/* Novos estilos modernos para os score cards */
-.score-cards {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.score-card {
-  position: relative;
-  padding: 1.25rem 1rem;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
-    0 4px 6px -2px rgba(0, 0, 0, 0.03);
-  margin-bottom: 0.5rem;
-  min-height: 110px;
-  border: none;
-  transition: all 0.3s ease;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.score-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.score-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 6px;
-  height: 100%;
-  border-radius: 6px 0 0 6px;
-}
-
-.score-card .heading-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.3rem;
-}
-
-.score-card h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0;
-  color: #2d3748;
-  display: flex;
-  align-items: center;
-}
-
-/* Remover os ícones originais que ficam na frente dos títulos */
-.score-card h3 i.fas,
-.score-card h3 i.fa {
-  display: none;
-}
-
-/* Mantém visível apenas o ícone de tooltip */
-.score-card h3 i.tooltip-icon {
-  display: inline-block !important;
-}
-
-/* Estilo para o ícone de tooltip */
-.tooltip-icon {
-  margin-left: 5px;
-  font-size: 0.8rem;
-  color: rgba(0, 0, 0, 0.5);
-  cursor: help;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
-}
-
-.tooltip-icon:hover {
-  opacity: 1;
-}
-
-/* Adicionando ajuste específico para ícones nos score cards */
-.score-card h3 .tooltip-icon {
-  color: inherit;
-  opacity: 0.6;
-}
-
-.score-card h3 .tooltip-icon:hover {
-  opacity: 1;
-}
-
-/* Novo estilo para os ícones grandes do lado direito */
-.score-card .card-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 2.5rem;
-  opacity: 0.6;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-/* Cores dos ícones correspondentes às cores das barras de progresso usando variáveis */
-.comunicacao .card-icon {
-  color: var(--cor-comunicacao);
-}
-
-.interlocucao .card-icon {
-  color: var(--cor-interlocucao);
-}
-
-.reuniao .card-icon {
-  color: var(--cor-reuniao);
-}
-
-.relatorio .card-icon {
-  color: var(--cor-relatorio);
-}
-
-.pos-trabalho .card-icon {
-  color: var(--cor-pos-trabalho);
-}
-
-.importancia .card-icon {
-  color: var(--cor-importancia);
-}
-
-.pontualidade .card-icon {
-  color: var(--cor-pontualidade);
-}
-
-.score-card:hover .card-icon {
-  font-size: 2.7rem;
-  opacity: 0.8;
-}
-
-.score-card .icon-container {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  color: white;
-  display: none; /* Ocultando o contêiner original do ícone */
-}
-
-.score-card .metric-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0.15rem 0 0.5rem;
-  color: #1a202c;
-}
-
-.progress-container {
-  position: relative;
-  width: 100%;
-  margin-top: auto;
-}
-
-.progress-bar {
-  height: 5px;
-  background: rgba(203, 213, 224, 0.3) !important;
-  border-radius: 9999px;
-  overflow: hidden;
-  position: relative;
-}
-
-.progress-fill {
-  height: 100%;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  position: absolute;
-  top: 0;
-  left: 0;
-  border-radius: 9999px;
-}
-
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.65rem;
-  color: #718096;
-  margin-top: 0.2rem;
-}
-
-/* Estilos específicos para cada tipo de score card usando variáveis */
-.comunicacao::before {
-  background: var(--cor-comunicacao);
-}
-.comunicacao .icon-container {
-  background: linear-gradient(
-    135deg,
-    var(--cor-comunicacao),
-    var(--cor-comunicacao-gradiente)
-  );
-}
-.comunicacao .progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--cor-comunicacao),
-    var(--cor-comunicacao-gradiente)
-  );
-}
-
-.interlocucao::before {
-  background: var(--cor-interlocucao);
-}
-.interlocucao .icon-container {
-  background: linear-gradient(
-    135deg,
-    var(--cor-interlocucao),
-    var(--cor-interlocucao-gradiente)
-  );
-}
-.interlocucao .progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--cor-interlocucao),
-    var(--cor-interlocucao-gradiente)
-  );
-}
-
-.reuniao::before {
-  background: var(--cor-reuniao);
-}
-.reuniao .icon-container {
-  background: linear-gradient(
-    135deg,
-    var(--cor-reuniao),
-    var(--cor-reuniao-gradiente)
-  );
-}
-.reuniao .progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--cor-reuniao),
-    var(--cor-reuniao-gradiente)
-  );
-}
-
-.relatorio::before {
-  background: var(--cor-relatorio);
-}
-.relatorio .icon-container {
-  background: linear-gradient(
-    135deg,
-    var(--cor-relatorio),
-    var(--cor-relatorio-gradiente)
-  );
-}
-.relatorio .progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--cor-relatorio),
-    var(--cor-relatorio-gradiente)
-  );
-}
-
-.pos-trabalho::before {
-  background: var(--cor-pos-trabalho);
-}
-.pos-trabalho .icon-container {
-  background: linear-gradient(
-    135deg,
-    var(--cor-pos-trabalho),
-    var(--cor-pos-trabalho-gradiente)
-  );
-}
-.pos-trabalho .progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--cor-pos-trabalho),
-    var(--cor-pos-trabalho-gradiente)
-  );
-}
-
-.importancia::before {
-  background: var(--cor-importancia);
-}
-.importancia .icon-container {
-  background: linear-gradient(
-    135deg,
-    var(--cor-importancia),
-    var(--cor-importancia-gradiente)
-  );
-}
-.importancia .progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--cor-importancia),
-    var(--cor-importancia-gradiente)
-  );
-}
-
-/* Correções específicas para garantir que as cores do card de importância sejam aplicadas corretamente */
-div.score-card.importancia::before {
-  background: var(--cor-importancia) !important;
-}
-
-div.score-card.importancia .progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--cor-importancia),
-    var(--cor-importancia-gradiente)
-  ) !important;
-}
-
-div.score-card.importancia .card-icon {
-  color: var(--cor-importancia) !important;
-}
-
-.pontualidade::before {
-  background: var(--cor-pontualidade);
-}
-.pontualidade .icon-container {
-  background: linear-gradient(
-    135deg,
-    var(--cor-pontualidade),
-    var(--cor-pontualidade-gradiente)
-  );
-}
-.pontualidade .progress-fill {
-  background: linear-gradient(
-    90deg,
-    var(--cor-pontualidade),
-    var(--cor-pontualidade-gradiente)
-  );
-}
-
-/* Adicionando animação para o valor */
-@keyframes countUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.score-card .metric-value {
-  animation: countUp 0.8s ease-out forwards;
 }
 
 /* Filtro de anos com rótulo */
@@ -453,97 +84,16 @@ div.score-card.importancia .card-icon {
   color: white !important;
 }
 
-/* Estilos para a tabela */
-.table-container {
-  background: #fff;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  margin-top: 2rem;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-th,
-td {
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.table-responsive {
-  margin: 2rem 0;
-  background: #fff;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-
-.table thead th {
-  background: #f8f9fa;
-  border-bottom: 2px solid #dee2e6;
-  color: #495057;
+/* Estilo especial para o botão Todos */
+.btn-todos {
   font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  padding: 1rem;
-  vertical-align: middle;
-}
-
-.table tbody td {
-  padding: 0.75rem 1rem;
-  vertical-align: middle;
-  border-bottom: 1px solid #edf2f7;
-  color: #4a5568;
-  font-size: 0.9rem;
-}
-
-.table-hover tbody tr:hover {
-  background-color: #f8fafc;
-}
-
-.dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_filter {
-  margin-bottom: 1rem;
-}
-
-.dataTables_wrapper .dataTables_info {
-  padding-top: 1rem;
-  color: #718096;
-}
-
-.dataTables_wrapper .dataTables_paginate {
-  padding-top: 1rem;
-}
-
-/* Estilo para o botão de exportação */
-.export-pdf-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  z-index: 1000;
-  padding: 10px 15px;
-  border-radius: 4px;
-  background-color: var(--cor-bg-success);
+  background-color: #6c757d;
   color: white;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
-.export-pdf-btn:hover {
-  background-color: var(--cor-pos-trabalho-gradiente);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-@media print {
-  .export-pdf-btn {
-    display: none;
-  }
+.btn-todos.active {
+  background-color: #495057 !important;
+  border-color: #343a40 !important;
 }
 
 /* Ajuste para manter altura consistente do card */
@@ -560,7 +110,7 @@ td {
   align-items: center;
 }
 
-/* Novo estilo para o texto de 'não há pesquisas' */
+/* Estilo para o texto de 'não há pesquisas' */
 .small-box .inner h3.texto-menor {
   font-size: 1.2rem;
 }
@@ -583,52 +133,8 @@ td {
   margin-bottom: 20px;
 }
 
-/* Adicionando estilo para os containers dos gráficos */
-.card-body canvas {
-  min-height: 400px;
-}
 
-.word-cloud-container {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 10px;
-  min-height: 400px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
 
-#wordCloud {
-  width: 100%;
-  height: 400px;
-}
-
-.jqcloud {
-  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-
-.jqcloud-word:hover {
-  transform: scale(1.1);
-  transition: transform 0.2s;
-  cursor: pointer;
-}
-
-.palavra-info {
-  display: none;
-  margin-top: 20px;
-}
-
-/* Estilo especial para o botão Todos */
-.btn-todos {
-  font-weight: 600;
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn-todos.active {
-  background-color: #495057 !important;
-  border-color: #343a40 !important;
-}
-
-/* Estilos para o sistema de abas moderno */
 .nav-dashboard-tabs {
   display: flex;
   border-bottom: 0;
@@ -721,14 +227,6 @@ td {
   }
 }
 
-/* Ajustar o espaço para os ícones nas abas sem os indicadores */
-.nav-dashboard-tabs .nav-link i {
-  margin-right: 10px; /* Aumentado ligeiramente para compensar a remoção dos indicadores */
-  font-size: 1.1rem; /* Aumentado ligeiramente para melhor visibilidade */
-  vertical-align: text-bottom;
-  transition: transform 0.2s ease;
-}
-
 /* Ícones nas abas */
 .nav-dashboard-tabs .nav-link i {
   margin-right: 8px;
@@ -742,22 +240,6 @@ td {
   transform: scale(1.2);
 }
 
-/* Contador nas abas */
-.item-count {
-  display: inline-block;
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  padding: 2px 8px;
-  font-size: 0.7rem;
-  margin-left: 6px;
-  color: #6c757d;
-}
-
-.nav-link.active .item-count {
-  background: rgba(0, 123, 255, 0.1);
-  color: var(--cor-bg-primary);
-}
-
 /* Controles de navegação para telas menores */
 .tabs-controls {
   position: absolute;
@@ -765,21 +247,6 @@ td {
   right: 0;
   display: none;
   z-index: 10;
-}
-
-@media (max-width: 768px) {
-  .tabs-controls {
-    display: flex;
-  }
-
-  .nav-dashboard-tabs {
-    padding-right: 70px;
-  }
-
-  .nav-dashboard-tabs .nav-link {
-    padding: 1rem 1.2rem;
-    font-size: 0.85rem;
-  }
 }
 
 .tab-control {
@@ -804,303 +271,55 @@ td {
   color: var(--cor-bg-primary);
 }
 
-/* Ajustes específicos para o conteúdo das abas */
-.tab-pane .score-cards {
-  grid-template-columns: repeat(
-    3,
-    1fr
-  ) !important; /* Forçar 3 cards por linha na aba de avaliações */
-  gap: 1rem;
-}
-
-@media (max-width: 991px) {
-  .tab-pane .score-cards {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
-
+/* Responsividade para telas pequenas */
 @media (max-width: 768px) {
-  .tab-pane .score-cards {
-    grid-template-columns: repeat(1, 1fr) !important;
+  .tabs-controls {
+    display: flex;
+  }
+
+  .nav-dashboard-tabs {
+    padding-right: 70px;
+  }
+
+  .nav-dashboard-tabs .nav-link {
+    padding: 1rem 1.2rem;
+    font-size: 0.85rem;
   }
 }
 
-/* Remover qualquer estilo item-count que não queremos mais */
-.item-count {
-  display: none !important;
-}
-
-/* Ajustes para os gráficos nas abas */
-.tab-pane .card-body canvas {
-  height: 300px !important; /* Altura fixa para os gráficos */
-  width: 100% !iant;
-}
-
-/* Garantir que os cards de gráficos tenham altura adequada */
-.tab-pane .card {
-  height: 100%;
-  margin-bottom: 1.5rem;
-}
-
-/* Ajuste especial para evitar sobreposições na exibição da tabela */
-#listagem .table-responsive {
-  margin-top: 0 !important;
-}
-
-/* Melhorar a visualização da tabela dentro da aba */
-#listagem .table {
-  margin-bottom: 0;
-}
-
-/* Separador entre os primeiros cards e as abas */
-.dashboard-divider {
-  margin: 1.5rem 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0),
-    rgba(0, 0, 0, 0.1),
-    rgba(0, 0, 0, 0)
-  );
-}
-
-/* Ajustes para garantir que o container da nuvem de palavras tenha dimensões adequadas */
-.word-cloud-container {
-  min-height: 400px !important;
-  min-width: 300px !important;
-}
-
-/* Garantir que as abas tenham altura mínima adequada, mesmo quando ocultas */
-.tab-pane {
+/* Estilo para loaders de componentes */
+.tab-loader-container {
   min-height: 200px;
+  position: relative;
 }
 
-/* Correção para tabs do Bootstrap que podem interferir na renderização */
-.tab-content > .tab-pane.active {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Melhorar a visibilidade das palavras na nuvem */
-.jqcloud-word {
-  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
-}
-
-/* Indicador de carregamento para a nuvem */
-#loadingCloud {
+.tab-loader {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.8);
-  padding: 15px 20px;
-  border-radius: 5px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 5;
-}
-
-/* Estilos para os controles de filtro da nuvem de palavras */
-#nuvem-palavras .form-control-sm {
-  width: 70px;
   text-align: center;
-  display: inline-block;
+  color: #6c757d;
 }
 
-#nuvem-palavras .form-row {
-  justify-content: flex-start;
-  flex-wrap: wrap;
+.tab-loader i {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  display: block;
 }
 
-#nuvem-palavras label {
-  margin-bottom: 0;
-  font-weight: 500;
-  color: #495057;
+/* Garantir que o modal fique invisível quando fechado */
+.modal-hide-force {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
 }
 
-#atualizarNuvem {
-  transition: all 0.3s ease;
+body.modal-closed {
+  overflow: auto !important;
+  padding-right: 0 !important;
 }
 
-#atualizarNuvem:hover {
-  transform: scale(1.05);
-}
-
-#atualizarNuvem .fa-sync-alt {
-  transition: transform 0.3s ease;
-}
-
-#atualizarNuvem:hover .fa-sync-alt {
-  transform: rotate(180deg);
-}
-
-/* Estilo adicional para a exibição de detalhes das palavras */
-.palavra-info {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 15px;
-  margin-top: 20px;
-  border-left: 4px solid var(--cor-interlocucao);
-}
-
-.palavra-selecionada {
-  margin: 0;
-  color: var(--cor-interlocucao);
-}
-
-/* Estilo para o card explicativo da nuvem de palavras */
-#nuvem-palavras .card-title.text-primary {
-  color: var(--cor-bg-primary) !important;
-  display: flex;
-  align-items: center;
-}
-
-#nuvem-palavras .card-title i {
-  margin-right: 10px;
-}
-
-#nuvem-palavras .card.mb-4 {
-  background-color: #f8fcff;
-  border-left: 4px solid var(--cor-bg-primary);
-}
-
-#nuvem-palavras .card.mb-4 .card-body {
-  padding: 1.25rem;
-}
-
-#nuvem-palavras .text-muted {
-  font-style: italic;
-}
-
-/* Melhorar o layout da tabela na aba listagem */
-#tabelaPesquisas {
-  width: 100%;
-  max-width: 100%;
-  margin-bottom: 0;
-  font-size: 0.9rem;
-}
-
-#tabelaPesquisas thead th {
-  white-space: nowrap;
-  vertical-align: middle;
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-  background: #f8f9fa;
-  z-index: 10;
-}
-
-#tabelaPesquisas td {
-  vertical-align: middle;
-}
-
-/* Estilos aprimorados para a área de detalhes da palavra na nuvem */
-.palavra-info {
-  border-left: 4px solid var(--cor-interlocucao);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.palavra-info .card-header {
-  background-color: rgba(111, 66, 193, 0.05);
-  border-bottom: 1px solid rgba(111, 66, 193, 0.2);
-}
-
-.palavra-info #palavraTitulo {
-  color: var(--cor-interlocucao);
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.palavra-info .card-body {
-  background-color: #fff;
-}
-
-.palavra-info p strong {
-  color: #495057;
-}
-
-.palavra-info #palavraTexto {
-  font-weight: 600;
-  color: var(--cor-interlocucao);
-}
-
-.palavra-info #palavraFreq,
-.palavra-info #palavraRelevancia {
-  font-weight: 600;
-}
-
-/* Ajustes para a tabela de dados na aba listagem */
-#tabelaPesquisas {
-  width: 100% !important;
-  font-size: 0.85rem;
-}
-
-#tabelaPesquisas thead th {
-  white-space: nowrap;
-  font-weight: 600;
-  vertical-align: middle;
-  background-color: #f8f9fa;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  padding: 0.75rem;
-}
-
-#tabelaPesquisas td {
-  vertical-align: middle;
-  padding: 0.5rem 0.75rem;
-}
-
-/* Destacar a coluna de média */
-#tabelaPesquisas td:last-child,
-#tabelaPesquisas th:last-child {
-  background-color: rgba(0, 123, 255, 0.05);
-  font-weight: 600;
-}
-
-/* Melhorar o status de carregamento da tabela */
-.dataTables_processing {
-  background: rgba(255, 255, 255, 0.9) !important;
-  color: var(--cor-bg-primary) !important;
-  border: none !important;
-  border-radius: 4px !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Melhorar o card explicativo na nuvem de palavras */
-#nuvem-palavras .card.mb-4 {
-  background-color: #f8fcff;
-  border-left: 4px solid var(--cor-bg-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-#nuvem-palavras .card.mb-4 .card-body {
-  padding: 1.25rem;
-}
-
-#nuvem-palavras .card-title.text-primary {
-  color: var(--cor-bg-primary) !important;
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-#nuvem-palavras .text-muted {
-  font-style: italic;
-  margin-top: 0.75rem;
-}
-
-/* Garantir que a nuvem de palavras esteja claramente visível */
-.jqcloud {
-  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-}
-
-.jqcloud-word {
-  cursor: pointer;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.jqcloud-word:hover {
-  transform: scale(1.15);
-  z-index: 100;
+.no-modal-backdrop {
+  background: none !important;
 }

@@ -1,0 +1,61 @@
+/* Estilização para os cards de gráficos */
+.card {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border: none;
+  margin-bottom: 25px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  padding: 12px 20px;
+  border-top-left-radius: 8px !important;
+  border-top-right-radius: 8px !important;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 0;
+  color: #495057;
+}
+
+.card-body {
+  padding: 20px;
+  position: relative;
+  overflow: visible !important;
+}
+
+/* Responsividade para gráficos */
+@media (max-width: 992px) {
+  .row .col-md-4,
+  .row .col-md-8 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  canvas {
+    min-height: 250px;
+  }
+}
+
+/* Estilo para animações de gráficos */
+.chart-container {
+  position: relative;
+  height: 100%;
+  min-height: 300px;
+}
+
+/* Ajustes para garantir que os valores apareçam acima das barras */
+#graficoMedia {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  height: 300px !important;
+}

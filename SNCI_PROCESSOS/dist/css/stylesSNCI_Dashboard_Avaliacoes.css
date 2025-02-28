@@ -1,0 +1,206 @@
+/* Estilização para os cartões de pontuação */
+.score-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Exatamente 3 cartões por linha */
+  gap: 20px;
+  margin-top: 15px;
+}
+
+/* Responsividade para diferentes tamanhos de tela */
+@media (max-width: 991px) {
+  .score-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .score-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Estilo base dos cartões - ajustado para ser mais compacto */
+.score-card {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 12px 15px; /* Padding reduzido de 20px para 15px horizontal e 12px vertical */
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-left: 4px solid #e9ecef;
+  min-height: 120px; /* Altura mínima para manter o alinhamento entre os cards */
+  display: flex;
+  flex-direction: column;
+}
+
+.score-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para o título do card - reduzido espaçamento */
+.score-card h3 {
+  font-size: 1.1rem; /* Ligeiramente menor para economizar espaço */
+  margin-bottom: 2px; /* Reduzido de 5px para 2px */
+  font-weight: 600;
+  color: #333; /* Cor padrão, será sobrescrita pelas classes específicas */
+  transition: color 0.3s ease;
+  padding-right: 0; /* Removido o padding, pois o ícone não está mais posicionado absolutamente */
+}
+
+/* Container flexível para o valor e o ícone */
+.score-card .value-icon-container {
+  display: flex;
+  justify-content: space-between; /* Espaça os elementos - valor à esquerda, ícone à direita */
+  align-items: center; /* Alinha verticalmente no centro */
+  margin: 5px 0;
+}
+
+/* Estilo do valor numérico - reduzido espaçamento */
+.score-card .metric-value {
+  font-size: 2.3rem; /* Ligeiramente menor para economizar espaço */
+  font-weight: 700;
+  margin: 0; /* Removido margin aqui pois já está no container */
+  color: #333; /* Cor padrão, será sobrescrita pelas classes específicas */
+  transition: color 0.3s ease;
+}
+
+/* Estilos da barra de progresso - mantido igual mas com menos margem */
+.score-card .progress-bar {
+  height: 6px; /* Reduzido de 8px para 6px */
+  background-color: #e9ecef;
+  border-radius: 4px;
+  margin-top: 5px; /* Reduzido de 10px para 5px */
+  overflow: hidden;
+}
+
+.score-card .progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+/* Estilo do ícone - aumentado tamanho significativamente */
+.score-card .card-icon {
+  position: static; /* Não mais posicionado absolutamente */
+  opacity: 0.5; /* Aumentada a opacidade para melhor visibilidade */
+  font-size: 40px; /* Aumentado ainda mais o tamanho */
+  margin-left: 10px; /* Espaço entre o valor e o ícone */
+  transition: all 0.3s ease;
+}
+
+/* Efeito hover para realçar o ícone */
+.score-card:hover .card-icon {
+  opacity: 0.6;
+  transform: scale(1.1);
+}
+
+/* === Cores específicas para cada categoria === */
+/* Comunicação */
+.score-card.comunicacao {
+  border-left-color: var(--cor-comunicacao, #17a2b8);
+}
+.score-card.comunicacao h3,
+.score-card.comunicacao .metric-value,
+.score-card.comunicacao .card-icon {
+  color: var(--cor-comunicacao, #17a2b8);
+}
+.score-card.comunicacao .progress-fill {
+  background-color: var(--cor-comunicacao, #17a2b8);
+}
+
+/* Interlocução */
+.score-card.interlocucao {
+  border-left-color: var(--cor-interlocucao, #6f42c1);
+}
+.score-card.interlocucao h3,
+.score-card.interlocucao .metric-value,
+.score-card.interlocucao .card-icon {
+  color: var(--cor-interlocucao, #6f42c1);
+}
+.score-card.interlocucao .progress-fill {
+  background-color: var(--cor-interlocucao, #6f42c1);
+}
+
+/* Reunião */
+.score-card.reuniao {
+  border-left-color: var(--cor-reuniao, #dc3545);
+}
+.score-card.reuniao h3,
+.score-card.reuniao .metric-value,
+.score-card.reuniao .card-icon {
+  color: var(--cor-reuniao, #dc3545);
+}
+.score-card.reuniao .progress-fill {
+  background-color: var(--cor-reuniao, #dc3545);
+}
+
+/* Relatório */
+.score-card.relatorio {
+  border-left-color: var(--cor-relatorio, #007bff);
+}
+.score-card.relatorio h3,
+.score-card.relatorio .metric-value,
+.score-card.relatorio .card-icon {
+  color: var(--cor-relatorio, #007bff);
+}
+.score-card.relatorio .progress-fill {
+  background-color: var(--cor-relatorio, #007bff);
+}
+
+/* Pós-trabalho */
+.score-card.pos-trabalho {
+  border-left-color: var(--cor-pos-trabalho, #28a745);
+}
+.score-card.pos-trabalho h3,
+.score-card.pos-trabalho .metric-value,
+.score-card.pos-trabalho .card-icon {
+  color: var(--cor-pos-trabalho, #28a745);
+}
+.score-card.pos-trabalho .progress-fill {
+  background-color: var(--cor-pos-trabalho, #28a745);
+}
+
+/* Importância */
+.score-card.importancia {
+  border-left-color: var(--cor-importancia, #fd7e14);
+}
+.score-card.importancia h3,
+.score-card.importancia .metric-value,
+.score-card.importancia .card-icon {
+  color: var(--cor-importancia, #fd7e14);
+}
+.score-card.importancia .progress-fill {
+  background-color: var(--cor-importancia, #fd7e14);
+}
+
+/* Tooltip de informações - mantido em cor neutra para melhor legibilidade */
+.tooltip-icon {
+  cursor: help;
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-left: 5px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.tooltip-icon:hover {
+  opacity: 1;
+}
+
+/* Animação para os valores numéricos */
+@keyframes fadeInValue {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.score-card .metric-value {
+  animation: fadeInValue 0.6s ease-out forwards;
+}

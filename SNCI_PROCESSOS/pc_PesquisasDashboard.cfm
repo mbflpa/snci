@@ -15,7 +15,6 @@
     <meta charset="UTF-8">
     <title>Dashboard de Pesquisas</title>
     <link rel="stylesheet" href="plugins/jqcloud/jqcloud.min.css">
-    <link rel="stylesheet" href="dist/css/stylesSNCI_PaineisFiltro.css">
     <link rel="stylesheet" href="dist/css/stylesSNCI_PesquisasDashboard.css">
     
     <style>
@@ -30,16 +29,34 @@
             gap: 20px;
             margin-bottom: 1.5rem;
         }
+        
+        /* Estilo para loaders de componentes */
+        .tab-loader-container {
+            min-height: 200px;
+            position: relative;
+        }
+        
+        .tab-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #6c757d;
+        }
+        
+        .tab-loader i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
     </style>
-   
-    
 </head>
 <!-- Estrutura padrão do projeto -->
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
     <div class="wrapper">
         <!-- Cabeçalho e Sidebar -->
         <cfinclude template="includes/pc_navBar.cfm">
-        
         
         <!-- Conteúdo principal -->
         <div class="content-wrapper">
@@ -55,7 +72,7 @@
                         <div class="filtros-container">
                             <!-- Filtro por ano -->
                             <div class="filtro-ano-container">
-                                <div class="filtro-ano-label">Processos de:</div>
+                                <div class="filtro-ano-label">Ano do Processo:</div>
                                 <div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons">
                                     <!-- Botões gerados via JS -->
                                 </div>
@@ -122,16 +139,14 @@
                             </div>
                         </div>
 
-                        <!--- Linha divisória entre os cards principais e o sistema de abas --->
-                        <div class="dashboard-divider"></div>
-
+                      
                         <!--- Sistema de abas --->
                         <div class="tabs-container">
-                          <!--- Navegação das abas (removendo os tab-indicator) --->
+                          <!--- Navegação das abas --->
                           <ul class="nav nav-dashboard-tabs" id="dashboardTabs" role="tablist">
                             <li class="nav-item">
                               <a class="nav-link active" id="avaliacoes-tab" data-toggle="tab" href="#avaliacoes" role="tab" aria-controls="avaliacoes" aria-selected="true">
-                                <i class="fas fa-star"></i>Avaliações
+                                <i class="fas fa-star"></i>Avaliações (Média das Notas por Pergunta)
                               </a>
                             </li>
                             <li class="nav-item">
@@ -161,186 +176,42 @@
                             </div>
                           </div>
                           
-                          <!--- Conteúdo das abas --->
+                          <!--- Conteúdo das abas - Modificado para carregar via AJAX --->
                           <div class="tab-content dashboard-tab-content" id="dashboardTabsContent">
                             
                             <!--- Aba de Avaliações --->
                             <div class="tab-pane fade show active" id="avaliacoes" role="tabpanel" aria-labelledby="avaliacoes-tab">
-                              <div class="score-cards">
-                                <div class="score-card comunicacao">
-                                    <h3>Comunicação <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a clareza, frequência e qualidade das interações com a equipe de Controle Interno. Considere se a equipe de Controle Interno foi acessível, transparente e eficaz ao transmitir informações sobre a condução dos trabalhos."></i></h3>
-                                    <div id="comunicacao" class="metric-value">0</div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
-                                    </div>
-                                    <i class="fas fa-comments fa-lg card-icon"></i>
-                                </div>
-                                <div class="score-card interlocucao">
-                                    <h3>Interlocução <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia o comportamento da equipe de Controle Interno ao longo do trabalho. Leve em conta o profissionalismo, o respeito e a atitude colaborativa demonstrados durante o processo."></i></h3>
-                                    <div id="interlocucao" class="metric-value">0</div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
-                                    </div>
-                                    <i class="fa fa-exchange card-icon"></i>
-                                </div>
-                                <div class="score-card reuniao">
-                                    <h3>Reunião <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a condução da reunião final da equipe de Controle Interno. Considere se a reunião foi clara, direta e se os tópicos foram abordados de maneira simples e objetiva, facilitando o fechamento do processo."></i></h3>
-                                    <div id="reuniao" class="metric-value">0</div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
-                                    </div>
-                                    <i class="fa fa-users card-icon"></i>
-                                </div>
-                                <div class="score-card relatorio">
-                                    <h3>Relatório <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a qualidade do relatório entregue ao final do trabalho da equipe de Controle Interno. Considere se o documento foi redigido de forma clara, com informações consistentes e objetivas, facilitando o entendimento das conclusões e recomendações."></i></h3>
-                                    <div id="relatorio" class="metric-value">0</div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
-                                    </div>
-                                    <i class="fa fa-file-text card-icon"></i>
-                                </div>
-                                <div class="score-card pos-trabalho">
-                                    <h3>Pós-Trabalho <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia o suporte recebido após a conclusão do trabalho da equipe de Controle Interno. Considere se houve disponibilidade para responder dúvidas, se a comunicação foi eficaz e se o atendimento foi prestativo e ágil no período pós-trabalho."></i></h3>
-                                    <div id="pos_trabalho" class="metric-value">0</div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
-                                    </div>
-                                    <i class="fa fa-briefcase card-icon"></i>
-                                </div>
-                                <!-- Novo card para Importância do Processo -->
-                                <div class="score-card importancia">
-                                    <h3>Importância <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a percepção sobre a contribuição das atividades da equipe de Controle Interno para melhorar o processo avaliado. Considere se o trabalho ajudou a identificar oportunidades de melhoria e contribuiu para o fortalecimento dos controles internos."></i></h3>
-                                    <div id="importancia" class="metric-value">0</div>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 0%"></div>
-                                    </div>
-                                    <i class="fa fa-star card-icon"></i>
+                              <div id="avaliacoes-content" class="tab-loader-container">
+                                <div class="tab-loader">
+                                  <i class="fas fa-spinner fa-spin"></i> Carregando avaliações...
                                 </div>
                               </div>
                             </div>
                             
                             <!--- Aba de Gráficos --->
                             <div class="tab-pane fade" id="graficos" role="tabpanel" aria-labelledby="graficos-tab">
-                              <div class="row">
-                                <!--- Invertendo a ordem e ajustando larguras --->
-                                <div class="col-md-4">
-                                  <div class="card">
-                                    <div class="card-header">
-                                      <h5 class="card-title">Distribuição por Categoria</h5>
-                                    </div>
-                                    <div class="card-body">
-                                      <canvas id="graficoMedia" height="300"></canvas>
-                                    </div>
-                                  </div>
+                              <div id="graficos-content" class="tab-loader-container">
+                                <div class="tab-loader">
+                                  <i class="fas fa-spinner fa-spin"></i> Carregando gráficos...
                                 </div>
-                                <div class="col-md-8">
-                                  <div class="card">
-                                    <div class="card-header">
-                                      <h5 class="card-title">Evolução das Avaliações</h5>
-                                    </div>
-                                    <div class="card-body">
-                                      <canvas id="graficoEvolucao" height="300"></canvas>
-                                    </div>
-                                  </div>
-                                </div>
-                                <!--- Mais gráficos conforme necessário --->
                               </div>
                             </div>
                             
-                            <!--- Aba de Nuvem de Palavras - Adicionando indicador de carregamento --->
+                            <!--- Aba de Nuvem de Palavras --->
                             <div class="tab-pane fade" id="nuvem-palavras" role="tabpanel" aria-labelledby="nuvem-palavras-tab">
-                              <!-- Card explicativo sobre a importância da nuvem de palavras -->
-                              <div class="card mb-4">
-                                <div class="card-body">
-                                  
-                                  <p>Este recurso analisa todas as observações textuais deixadas nas pesquisas de satisfação, permitindo identificar tendências, preocupações e temas comuns mencionados pelos respondentes. O tamanho de cada palavra reflete sua frequência nas observações, oferecendo uma visão rápida dos principais assuntos abordados.</p>
-                                  <p class="mb-0 text-muted"><small>Clique em uma palavra para ver detalhes sobre sua frequência e relevância no contexto das avaliações.</small></p>
-                                </div>
-                              </div>
-                              
-                              <div class="card">
-                                <div class="card-header">
-                                  <h5 class="card-title">Palavras mais frequentes nas observações das pesquisas</h5>
-                                </div>
-                                <div class="card-body">
-                                  <!-- Adicionar filtros da nuvem de palavras -->
-                                  <div class="row mb-3">
-                                    <div class="col-md-8">
-                                      <div class="form-row align-items-center">
-                                        <div class="col-auto">
-                                          <label class="mr-2">Frequência mínima:</label>
-                                          <input type="number" class="form-control form-control-sm" id="minFreq" value="2" min="1" max="100">
-                                        </div>
-                                        <div class="col-auto">
-                                          <label class="mr-2">Máximo de palavras:</label>
-                                          <input type="number" class="form-control form-control-sm" id="maxWords" value="100" min="10" max="300">
-                                        </div>
-                                        <div class="col-auto">
-                                          <button id="atualizarNuvem" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-sync-alt mr-1"></i> Atualizar Nuvem
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div class="word-cloud-container position-relative">
-                                    <div id="loadingCloud" style="display: none;">
-                                      <i class="fas fa-spinner fa-spin mr-2"></i> Carregando...
-                                    </div>
-                                    <div id="wordCloud"></div>
-                                  </div>
-                                  <div class="palavra-info mt-3">
-                                    <h5 class="palavra-selecionada"></h5>
-                                    <p class="palavra-contexto"></p>
-                                  </div>
-                                  <!-- Área de detalhes da palavra selecionada - reformatada -->
-                                  <div class="card mt-3 palavra-info" style="display: none;">
-                                    <div class="card-header py-2">
-                                      <h5 class="mb-0" id="palavraTitulo">Detalhes da Palavra</h5>
-                                    </div>
-                                    <div class="card-body py-2">
-                                      <div class="row">
-                                        <div class="col-md-6">
-                                          <p class="mb-1"><strong>Palavra:</strong> <span id="palavraTexto"></span></p>
-                                        </div>
-                                        <div class="col-md-3">
-                                          <p class="mb-1"><strong>Frequência:</strong> <span id="palavraFreq"></span></p>
-                                        </div>
-                                        <div class="col-md-3">
-                                          <p class="mb-1"><strong>Relevância:</strong> <span id="palavraRelevancia"></span>%</p>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
+                              <div id="nuvem-palavras-content" class="tab-loader-container">
+                                <div class="tab-loader">
+                                  <i class="fas fa-spinner fa-spin"></i> Carregando nuvem de palavras...
                                 </div>
                               </div>
                             </div>
                             
                             <!--- Aba de Listagem de Pesquisas --->
                             <div class="tab-pane fade" id="listagem" role="tabpanel" aria-labelledby="listagem-tab">
-                              <div class="table-responsive">
-                                <table class="table table-hover" id="tabelaPesquisas">
-                                  <thead>
-                                    <tr>
-                                      <th>ID</th>
-                                      <th>Processo</th>
-                                      <th>Órgão Respondente</th>
-                                      <th>Órgão de Origem</th>
-                                      <th>Data</th>
-                                      <th>Comunicação</th>
-                                      <th>Interlocução</th>
-                                      <th>Reunião</th>
-                                      <th>Relatório</th>
-                                      <th>Pós-Trabalho</th>
-                                      <th>Importância</th>
-                                      <th>Pontualidade</th>
-                                      <th>Média</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    <!--- Dados da tabela serão carregados dinamicamente --->
-                                  </tbody>
-                                </table>
+                              <div id="listagem-content" class="tab-loader-container">
+                                <div class="tab-loader">
+                                  <i class="fas fa-spinner fa-spin"></i> Carregando listagem...
+                                </div>
                               </div>
                             </div>
                             
@@ -352,18 +223,32 @@
             </div>
 
         </div>
-            <cfinclude template="includes/pc_footer.cfm">
+        <cfinclude template="includes/pc_footer.cfm">
     </div>
     <cfinclude template="includes/pc_sidebar.cfm">
+
+    <!-- Modal de carregamento -->
+    <div class="modal fade" id="modalOverlay" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-body text-center p-4">
+            <div class="spinner-border text-primary mb-3" role="status">
+              <span class="sr-only">Carregando...</span>
+            </div>
+            <p class="mb-0">Carregando dados do dashboard...</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script src="plugins/chart.js/Chart.min.js"></script>
     <script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
     <script src="plugins/jqcloud/jqcloud.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Remover esta linha que causa o erro (Chart.js v2.x usa um método diferente)
-            // Chart.register(ChartDataLabels);
-            
+            // Registrar o plugin globalmente
+        window.ChartDataLabels = ChartDataLabels;
+        Chart.plugins.unregister(ChartDataLabels);  // Primeiro desregistramos para evitar duplicação
             // Inicializar tooltips com configurações avançadas
             $('[data-toggle="tooltip"]').tooltip({
                 container: 'body',
@@ -372,28 +257,16 @@
                 template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
             });
             
-            var tabela = $('#tabelaPesquisas').DataTable();
-            var graficoMedia, graficoEvolucao;
             var anos = [];
             var orgaos = [];
             var currentYear = new Date().getFullYear();
             
-            // Obter cores das variáveis CSS para uso no JavaScript
-            var coresCategorias = {
-                comunicacao: getComputedStyle(document.documentElement).getPropertyValue('--cor-comunicacao').trim(),
-                interlocucao: getComputedStyle(document.documentElement).getPropertyValue('--cor-interlocucao').trim(),
-                reuniao: getComputedStyle(document.documentElement).getPropertyValue('--cor-reuniao').trim(),
-                relatorio: getComputedStyle(document.documentElement).getPropertyValue('--cor-relatorio').trim(),
-                postrabalho: getComputedStyle(document.documentElement).getPropertyValue('--cor-pos-trabalho').trim(),
-                importancia: getComputedStyle(document.documentElement).getPropertyValue('--cor-importancia').trim()
-            };
-        
             // Preencher array com os anos da query rsAnoDashboard
             <cfoutput query="rsAnoDashboard">
                 anos.push(parseInt("#rsAnoDashboard.ano#", 10));
             </cfoutput>
             if (anos.indexOf(currentYear) === -1) { anos.push(currentYear); }
-            anos = anos.sort(function(a, b){ return a - b; }); // Modificado para ordem crescente
+            anos = anos.sort(function(a, b){ return a - b; });
             
             // Preencher array com os órgãos da query rsOrgaosOrigem
             <cfoutput query="rsOrgaosOrigem">
@@ -450,288 +323,166 @@
             });
             
             // Ativar o botão "Todos" para órgãos inicialmente
-            $(`input[name="${radioMcu}"][value="Todos"]`).parent().addClass('active');
+            $(`input[name='opcaoMcu'][value='Todos']`).parent().addClass('active');
         
             var anoSelecionado = currentYear;
             var mcuSelecionado = "Todos";
-        
-            // Garantir que novos elementos também tenham tooltips
-            function reiniciarTooltips() {
-                $('[data-toggle="tooltip"]').tooltip('dispose').tooltip({
-                    container: 'body',
-                    html: true
-                });
-            }
-            
-            function renderGraficoMedia(medias) {
-                var ctx = document.getElementById('graficoMedia').getContext('2d');
-                if (graficoMedia) { graficoMedia.destroy(); }
-                
-                // Cores definidas para cada categoria igual às do score card
-                var cores = [
-                    coresCategorias.comunicacao, // Comunicação
-                    coresCategorias.interlocucao, // Interlocução
-                    coresCategorias.reuniao, // Reunião
-                    coresCategorias.relatorio, // Relatório
-                    coresCategorias.postrabalho,  // Pós-Trabalho
-                    coresCategorias.importancia  // Importância
-                ];
-                
-                // Configuração para Chart.js v2.x com plugin datalabels
-                graficoMedia = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Comunicação','Interlocução','Reunião','Relatório','Pós-Trabalho','Importância'],
-                        datasets: [{
-                            label: 'Média',
-                            data: medias,
-                            backgroundColor: cores,
-                            barPercentage: 0.5,
-                            categoryPercentage: 0.8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        legend: {
-                            display: false
-                        },
-                        layout: {
-                            padding: {
-                                left: 10,
-                                right: 10,
-                                top: 30,
-                                bottom: 10
-                            }
-                        },
-                        scales: {
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero: true,
-                                    max: 10
-                                }
-                            }]
-                        },
-                        // Configuração atualizada do plugin datalabels para garantir exibição
-                        plugins: {
-                            datalabels: {
-                                display: true,
-                                color: '#000',
-                                anchor: 'end',
-                                align: 'top',
-                                offset: -2,
-                                backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                                borderRadius: 4,
-                                borderWidth: 1,
-                                borderColor: '#888',
-                                padding: {
-                                    top: 3,
-                                    right: 5,
-                                    bottom: 3,
-                                    left: 5
-                                },
-                                font: {
-                                    size: 12,
-                                    weight: 'bold'
-                                },
-                                formatter: function(value) {
-                                    return value.toFixed(1);
-                                },
-                                // Adicionar estas propriedades para forçar a exibição
-                                clamp: true,
-                                clip: false
-                            }
-                        },
-                        // Configuração alternativa para o ChartJS v2.x
-                        tooltips: {
-                            enabled: true,
-                            mode: 'index',
-                            intersect: false
-                        },
-                        animation: {
-                            duration: 500,
-                            onComplete: function() {
-                                // Garantir que os labels sejam exibidos após a animação
-                                var ctx = this.chart.ctx;
-                                ctx.font = Chart.helpers.fontString(12, 'bold', Chart.defaults.global.defaultFontFamily);
-                                ctx.fillStyle = '#000';
-                                ctx.textAlign = 'center';
-                                ctx.textBaseline = 'bottom';
-                                
-                                this.data.datasets.forEach(function(dataset, i) {
-                                    var meta = this.controller.getDatasetMeta(i);
-                                    meta.data.forEach(function(bar, index) {
-                                        var data = dataset.data[index];
-                                        // Desenhar o valor acima de cada barra
-                                        ctx.fillText(data.toFixed(1), bar._model.x, bar._model.y - 5);
-                                    });
-                                }, this);
-                            }
-                        }
-                    },
-                    plugins: [{
-                        beforeDraw: function() {
-                            // Essa função vazia ajuda a garantir que o plugin seja carregado
-                        },
-                        afterDraw: function(chart) {
-                            // Backup para garantir a exibição dos labels no caso do plugin datalabels falhar
-                            if (!window.Chart.defaults.global.plugins.datalabels) {
-                                var ctx = chart.ctx;
-                                chart.data.datasets.forEach(function(dataset, i) {
-                                    var meta = chart.getDatasetMeta(i);
-                                    if (!meta.hidden) {
-                                        meta.data.forEach(function(element, index) {
-                                            ctx.fillStyle = '#000';
-                                            var fontSize = 12;
-                                            var fontStyle = 'bold';
-                                            var fontFamily = Chart.defaults.global.defaultFontFamily;
-                                            ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
-                                            
-                                            var dataString = dataset.data[index].toFixed(1);
-                                            
-                                            // Desenhar um fundo branco para o texto
-                                            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                                            var textWidth = ctx.measureText(dataString).width;
-                                            ctx.fillRect(
-                                                element._model.x - textWidth/2 - 5, 
-                                                element._model.y - 25, 
-                                                textWidth + 10, 
-                                                20
-                                            );
-                                            
-                                            // Desenhar o texto
-                                            ctx.fillStyle = '#000';
-                                            ctx.textAlign = 'center';
-                                            ctx.textBaseline = 'middle';
-                                            ctx.fillText(dataString, element._model.x, element._model.y - 15);
-                                        });
-                                    }
-                                });
-                            }
-                        }
-                    }]
-                });
-            }
-        
-            function renderGraficoEvolucao(evolucao) {
-                var ctx = document.getElementById('graficoEvolucao').getContext('2d');
-                if (graficoEvolucao) { 
-                    graficoEvolucao.destroy(); 
-                }
 
-                // Se não houver dados, criar gráfico vazio
-                if (!evolucao || !Array.isArray(evolucao) || evolucao.length === 0) {
-                    graficoEvolucao = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: [],
-                            datasets: [{
-                                label: 'Média Mensal',
-                                data: [],
-                                borderColor: coresCategorias.comunicacao,
-                                backgroundColor: 'rgba(23, 162, 184, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            legend: { 
-                                display: true,
-                                position: 'top'
-                            },
-                            scales: {
-                                yAxes: [{
-                                    ticks: {
-                                        beginAtZero: true,
-                                        max: 10
+            // Função helper para scroll adaptado ao AdminLTE
+            window.scrollToElement = function(targetElement, offset) {
+                var $scrollContainer = $('.content-wrapper');
+                var targetPosition = $(targetElement).offset().top;
+                var scrollPosition = targetPosition - $scrollContainer.offset().top + $scrollContainer.scrollTop() - (offset || 70);
+                
+                $scrollContainer.animate({
+                    scrollTop: scrollPosition
+                }, 500);
+            }
+
+            // Variável para controlar se os componentes já foram carregados
+            var componentesCarregados = {
+                avaliacoes: false,
+                graficos: false,
+                nuvemPalavras: false,
+                listagem: false
+            };
+
+            // Função para carregar os componentes via AJAX
+            function carregarComponente(componente) {
+                var targetId, targetUrl;
+                
+                switch(componente) {
+                    case 'avaliacoes':
+                        targetId = "#avaliacoes-content";
+                        targetUrl = "includes/pc_dashbord_pesquisa/pc_dashboard_avaliacoes.cfm";
+                        break;
+                    case 'graficos':
+                        targetId = "#graficos-content";
+                        targetUrl = "includes/pc_dashbord_pesquisa/pc_dashboard_graficos.cfm";
+                        break;
+                    case 'nuvemPalavras':
+                        targetId = "#nuvem-palavras-content";
+                        targetUrl = "includes/pc_dashbord_pesquisa/pc_dashboard_nuvem_palavras.cfm";
+                        break;
+                    case 'listagem':
+                        targetId = "#listagem-content";
+                        targetUrl = "includes/pc_dashbord_pesquisa/pc_dashboard_listagem.cfm";
+                        break;
+                    default:
+                        return;
+                }
+                
+                if (!componentesCarregados[componente]) {
+                    $.ajax({
+                        url: targetUrl,
+                        type: "GET",
+                        success: function(data) {
+                            $(targetId).html(data);
+                            componentesCarregados[componente] = true;
+                            
+                            // Inicializar o componente após o carregamento
+                            switch(componente) {
+                                case 'avaliacoes':
+                                    // Atualiza os cards de avaliação
+                                    $.ajax({
+                                        url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
+                                        method: 'GET',
+                                        data: { 
+                                            ano: anoSelecionado,
+                                            mcuOrigem: mcuSelecionado 
+                                        },
+                                        dataType: 'json',
+                                        success: function(resultado) {
+                                            if (resultado && window.atualizarCardsAvaliacao) {
+                                                window.atualizarCardsAvaliacao(resultado);
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 'graficos':
+                                    // Atualiza os gráficos
+                                    $.ajax({
+                                        url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
+                                        method: 'GET',
+                                        data: { 
+                                            ano: anoSelecionado,
+                                            mcuOrigem: mcuSelecionado 
+                                        },
+                                        dataType: 'json',
+                                        success: function(resultado) {
+                                            if (resultado && window.atualizarGraficos) {
+                                                window.atualizarGraficos(resultado);
+                                            }
+                                        }
+                                    });
+                                    break;
+                                case 'nuvemPalavras':
+                                    // Carrega a nuvem de palavras
+                                    if (typeof window.carregarNuvemPalavras === 'function') {
+                                        setTimeout(function() {
+                                            window.carregarNuvemPalavras();
+                                        }, 300);
                                     }
-                                }]
-                            },
-                            layout: {
-                                padding: {
-                                    left: 10,
-                                    right: 10,
-                                    top: 10,
-                                    bottom: 10
-                                }
+                                    break;
+                                case 'listagem':
+                                    // Carrega a tabela de pesquisas
+                                    if (typeof window.carregarDadosTabela === 'function') {
+                                        window.carregarDadosTabela(anoSelecionado, mcuSelecionado);
+                                    }
+                                    break;
                             }
+                        },
+                        error: function() {
+                            $(targetId).html('<div class="alert alert-danger">Erro ao carregar o componente. Por favor, tente novamente.</div>');
                         }
                     });
-                    return;
-                }
-
-                // Formata os dados para exibição
-                var labels = evolucao.map(function(item) {
-                    var dataParts = item.mes.split('-');
-                    var data = new Date(dataParts[0], parseInt(dataParts[1]) - 1);
-                    return data.toLocaleString('pt-BR', { month: 'short', year: 'numeric' });
-                });
-
-                var dados = evolucao.map(function(item) {
-                    return Number(item.media) || 0;
-                });
-
-                // Resto do código do gráfico
-                graficoEvolucao = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Média Mensal',
-                            data: dados,
-                            borderColor: coresCategorias.comunicacao,
-                            backgroundColor: 'rgba(23, 162, 184, 0.1)',
-                            borderWidth: 2,
-                            fill: true,
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        legend: {
-                            display: true,
-                            position: 'top'
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            callbacks: {
-                                label: function(context) {
-                                    return 'Média: ' + context.parsed.y.toFixed(2);
-                                }
-                            }
-                        },
-                        scales: {
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero: true,
-                                    max: 10,
-                                    stepSize: 2,
-                                    callback: function(value) {
-                                        return value.toFixed(1);
+                } else {
+                    // Se o componente já foi carregado, apenas atualiza os dados
+                    switch(componente) {
+                        case 'avaliacoes':
+                            $.ajax({
+                                url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
+                                method: 'GET',
+                                data: { 
+                                    ano: anoSelecionado,
+                                    mcuOrigem: mcuSelecionado 
+                                },
+                                dataType: 'json',
+                                success: function(resultado) {
+                                    if (resultado && window.atualizarCardsAvaliacao) {
+                                        window.atualizarCardsAvaliacao(resultado);
                                     }
                                 }
-                            }],
-                            xAxes: [{
-                                gridLines: {
-                                    display: false
+                            });
+                            break;
+                        case 'graficos':
+                            $.ajax({
+                                url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
+                                method: 'GET',
+                                data: { 
+                                    ano: anoSelecionado,
+                                    mcuOrigem: mcuSelecionado 
+                                },
+                                dataType: 'json',
+                                success: function(resultado) {
+                                    if (resultado && window.atualizarGraficos) {
+                                        window.atualizarGraficos(resultado);
+                                    }
                                 }
-                            }]
-                        },
-                        layout: {
-                            padding: {
-                                left: 10,
-                                right: 10,
-                                top: 10,
-                                bottom: 10
+                            });
+                            break;
+                        case 'nuvemPalavras':
+                            if (typeof window.carregarNuvemPalavras === 'function') {
+                                window.carregarNuvemPalavras();
                             }
-                        }
+                            break;
+                        case 'listagem':
+                            if (typeof window.carregarDadosTabela === 'function') {
+                                window.carregarDadosTabela(anoSelecionado, mcuSelecionado);
+                            }
+                            break;
                     }
-                });
+                }
             }
         
             function atualizarCards(resultado) {
@@ -742,16 +493,13 @@
                 
                 // Lógica corrigida do índice de respostas
                 if (parseInt(resultado.totalProcessos) === 0) {
-                    // Não há processos para essa origem
                     $("#indiceRespostas").text("Processos não localizados").addClass('texto-menor');
                     $(".formula-text").hide();
                 } else if (parseInt(resultado.total) === 0) {
-                    // Há processos, mas não há pesquisas respondidas (0%)
                     $("#indiceRespostas").text("0%").removeClass('texto-menor');
                     $("#formulaDetalhes").text(`Cálculo: (0 / ${parseInt(resultado.totalProcessos)}) × 100 = 0%`);
                     $(".formula-text").show();
                 } else {
-                    // Há processos e pesquisas respondidas
                     const totalRespondidas = parseInt(resultado.total) || 0;
                     const totalProcessos = parseInt(resultado.totalProcessos) || 0;
                     const indice = ((totalRespondidas / totalProcessos) * 100).toFixed(1);
@@ -762,93 +510,75 @@
                     );
                     $(".formula-text").show();
                 }
-
-                // Atualizar cards individuais 
-                const cards = [
-                    {id: 'comunicacao', valor: resultado.comunicacao},
-                    {id: 'interlocucao', valor: resultado.interlocucao}, 
-                    {id: 'reuniao', valor: resultado.reuniao},
-                    {id: 'relatorio', valor: resultado.relatorio},
-                    {id: 'pos_trabalho', valor: resultado.pos_trabalho},
-                    {id: 'importancia', valor: resultado.importancia},
-                    {id: 'pontualidade', valor: resultado.pontualidadePercentual}
-                ];
-
-                cards.forEach(card => {
-                    const valor = parseFloat(card.valor) || 0;
-                    const el = $(`#${card.id}`);
+                
+                // Atualizar componentes ativos
+                if ($("#avaliacoes").hasClass('active') && window.atualizarCardsAvaliacao) {
+                    window.atualizarCardsAvaliacao(resultado);
+                }
+                
+                if ($("#graficos").hasClass('active') && window.atualizarGraficos) {
+                    window.atualizarGraficos(resultado);
+                }
+            }
+        
+            // Função melhorada para garantir o fechamento do modal
+            function fecharModalComSeguranca() {
+                try {
+                    // Primeiro tenta fechar o modal de maneira convencional
+                    $('#modalOverlay').modal('hide');
                     
-                    if (card.id === 'pontualidade') {
-                        el.text(`${valor.toFixed(1)}%`);
-                        el.closest('.score-card').find('.progress-fill').css('width', `${valor}%`);
-                    } else {
-                        el.text(`${valor.toFixed(1)}`);
-                        el.closest('.score-card').find('.progress-fill').css('width', `${(valor * 10)}%`);
-                    }
-                });
+                    // Espera um pouco e então verifica se o modal realmente fechou
+                    setTimeout(function() {
+                        // Se o modal ainda estiver visível ou com classes modal-open
+                        if ($('#modalOverlay').is(':visible') || $('body').hasClass('modal-open')) {
+                          
+                            // Remove manualmente as classes e elementos do modal
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open');
+                            $('body').css('padding-right', '');
+                            $('#modalOverlay').removeClass('show');
+                            $('#modalOverlay').css('display', 'none');
+                        }
+                    }, 500);
+                } catch (e) {
+                    console.error("Erro ao fechar modal:", e);
+                    
+                    // Última tentativa para forçar o fechamento
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open');
+                    $('#modalOverlay').hide();
+                }
             }
         
             function carregarDashboard(anoFiltro, mcuFiltro) {
-                // Mostrar modal de carregamento com timeout de segurança
-                $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
-                $('#modalOverlay').modal('show');
+                // Mostrar modal de carregamento
+                try {
+                    $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
+                    $('#modalOverlay').modal('show');
+                } catch (e) {
+                    console.error("Erro ao mostrar modal:", e);
+                }
                 
                 // Configurar um timeout de segurança para fechar o modal após 30 segundos
-                // caso algo dê errado com as requisições
                 var timeoutSeguranca = setTimeout(function() {
-                    $('#modalOverlay').modal('hide');
-                    console.warn("Modal fechado por timeout de segurança");
+                    fecharModalComSeguranca();
                 }, 30000);
                 
-                var tabela = configurarDataTable();
-                // Primeiro carrega os dados das pesquisas
-                $.ajax({
-                    url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getPesquisas&returnformat=json',
-                    method: 'GET',
-                    data: { 
-                        ano: anoFiltro,
-                        mcuOrigem: mcuFiltro 
-                    },
-                    dataType: 'json',
-                    success: function(data) {
-                        if (data && data.DATA) {
-                            tabela.clear();
-                            data.DATA.forEach(function(row) {
-                                var media = ((parseFloat(row[4]) + parseFloat(row[5]) + 
-                                            parseFloat(row[6]) + parseFloat(row[7]) + 
-                                            parseFloat(row[8]) + parseFloat(row[9])) / 6).toFixed(1);
-                                
-                                var pontualidade = row[10] == 1 ? "Sim" : "Não"; // Convertendo 1/0 para Sim/Não
-                                
-                                tabela.row.add([
-                                    row[0],   // ID
-                                    row[2],   // Processo
-                                    row[3],   // órgao que respondeu
-                                    row[13],  // órgão origem (corrigido do índice 11 para 13)
-                                    row[12],  // Data/Hora
-                                    row[4],   // Comunicação
-                                    row[5],   // Interlocução
-                                    row[6],   // Reunião
-                                    row[7],   // Relatório
-                                    row[8],   // Pós-Trabalho
-                                    row[9],   // Importância do Processo
-                                    pontualidade, // Pontualidade como Sim/Não
-                                    media     // Média
-                                ]);
-                            });
-                            tabela.draw();
-                        }
-                        // Verificar se todas as requisições terminaram
-                        checkLoadingComplete();
-                    },
-                    error: function() {
-                        // Fechar modal explicitamente em caso de erro
-                        closeModalSafely();
-                        console.error("Erro ao carregar pesquisas");
+                // Contador para controlar conclusão das requisições
+                var requestsCount = 0;
+                var totalRequests = 1; // Inicializa com 1 para a requisição principal
+                
+                // Função para verificar se todas as requisições terminaram
+                function checkAllRequestsComplete() {
+                    requestsCount++;
+                    if (requestsCount >= totalRequests) {
+                        // Todas as requisições terminaram, podemos fechar o modal
+                        clearTimeout(timeoutSeguranca);
+                        fecharModalComSeguranca();
                     }
-                });
-
-                // Depois carrega as estatísticas
+                }
+                
+                // Carregar estatísticas para atualizar os cards principais
                 $.ajax({
                     url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
                     method: 'GET',
@@ -861,368 +591,60 @@
                         if (resultado) {
                             // Atualiza totalizadores e cards
                             atualizarCards(resultado);
-                            
-                            // Atualiza gráfico de médias
-                            if (resultado.medias && Array.isArray(resultado.medias)) {
-                                renderGraficoMedia(resultado.medias);
-                            }
-
-                            // Atualiza gráfico evolução 
-                            if (resultado.evolucaoTemporal && Array.isArray(resultado.evolucaoTemporal)) {
-                                renderGraficoEvolucao(resultado.evolucaoTemporal);
-                            }
-                            
-                            // Reiniciar tooltips após atualizar o conteúdo
-                            setTimeout(reiniciarTooltips, 500);
                         }
-                        // Verificar se todas as requisições terminaram
-                        checkLoadingComplete();
+                        // Marca esta requisição como concluída
+                        checkAllRequestsComplete();
                     },
                     error: function(xhr, status, error) {
                         console.error("Erro ao carregar estatísticas:", error);
-                        // Fechar modal explicitamente em caso de erro
-                        closeModalSafely();
+                        // Mesmo com erro, marca como concluída
+                        checkAllRequestsComplete();
                     }
                 });
                 
-                // Função melhorada para fechar o modal com segurança
-                function closeModalSafely() {
-                    clearTimeout(timeoutSeguranca); // Limpar o timeout de segurança
-                    
-                    try {
-                        // Tenta diferentes métodos para garantir que o modal feche
-                        $('#modalOverlay').modal('hide');
-                        
-                        // Caso acima falhe, tenta remover classes e backdrop manualmente
-                        setTimeout(function() {
-                            $('.modal-backdrop').remove();
-                            $('body').removeClass('modal-open');
-                            $('#modalOverlay').removeClass('show');
-                            $('#modalOverlay').hide();
-                        }, 300);
-                    } catch (e) {
-                        console.error("Erro ao fechar modal:", e);
-                    }
-                }
-                
-                // Contador para verificar quando todas as requisições terminaram
-                var requestsCompleted = 0;
-                function checkLoadingComplete() {
-                    requestsCompleted++;
-                    if (requestsCompleted >= 2) { // 2 requisições: pesquisas e estatísticas
-                        // Pequeno delay para garantir que os dados foram renderizados
-                        setTimeout(function() {
-                            closeModalSafely();
-                        }, 500);
-                        requestsCompleted = 0; // resetar contador
-                    }
+                // Atualizar o componente atual
+                if ($("#avaliacoes").hasClass('active')) {
+                    carregarComponente('avaliacoes');
+                } else if ($("#graficos").hasClass('active')) {
+                    carregarComponente('graficos');
+                } else if ($("#nuvem-palavras").hasClass('active')) {
+                    carregarComponente('nuvemPalavras');
+                } else if ($("#listagem").hasClass('active')) {
+                    carregarComponente('listagem');
                 }
             }
-        
+            
+            // Carregar o componente inicial (Avaliações)
+            carregarComponente('avaliacoes');
+            
+            // Carregar o dashboard inicial
             carregarDashboard(anoSelecionado, mcuSelecionado);
             
             // Handler para mudança de ano
             $("input[name='opcaoAno']").change(function() {
                 anoSelecionado = $(this).val();
                 carregarDashboard(anoSelecionado, mcuSelecionado);
+                
+                // Disparar evento global de mudança de filtro
+                $(document).trigger('filtroAlterado', {
+                    tipo: 'ano',
+                    valor: anoSelecionado
+                });
             });
             
             // Handler para mudança de órgão
             $("input[name='opcaoMcu']").change(function() {
                 mcuSelecionado = $(this).val();
                 carregarDashboard(anoSelecionado, mcuSelecionado);
-            });
-
-            // Função helper para scroll adaptado ao AdminLTE
-            function scrollToElement(targetElement, offset) {
-                // No AdminLTE, o .content-wrapper é o elemento que controla o scroll
-                var $scrollContainer = $('.content-wrapper');
-                var targetPosition = $(targetElement).offset().top;
                 
-                // Ajuste para posição relativa dentro do content-wrapper
-                var scrollPosition = targetPosition - $scrollContainer.offset().top + $scrollContainer.scrollTop() - (offset || 70);
-                
-                // Animação de scroll
-                $scrollContainer.animate({
-                    scrollTop: scrollPosition
-                }, 500);
-            }
-
-            // Script para nuvem de palavras - função corrigida
-            let palavrasData;
-            let maxFrequency = 0;
-            
-            // Função para carregar dados da nuvem de palavras - modificada para evitar problemas com o modal
-            window.carregarNuvemPalavras = function(mostrarModal = false) { // Alterado o padrão para false
-                // Obter o ano e o mcu selecionados
-                const ano = $("input[name='opcaoAno']:checked").val();
-                const mcuOrigem = $("input[name='opcaoMcu']:checked").val();
-                const minFreq = $("#minFreq").val() || 1;
-                const maxWords = $("#maxWords").val() || 100;
-                
-                // Verificar se a aba está ativa antes de renderizar
-                if (!$("#nuvem-palavras").hasClass('active') && !$("#nuvem-palavras").hasClass('show')) {
-                    console.log("Aba da nuvem não está ativa, carregamento adiado");
-                    return; // Não carrega se a aba não estiver visível
-                }
-                
-                $("#wordCloud").empty();
-                
-                // Sempre mostrar o indicador de carregamento interno
-                $("#loadingCloud").show();
-                
-                $("#palavraInfo").hide();
-                
-                // Mostrar modal apenas se solicitado explicitamente (não mostrar na troca de aba)
-                if (mostrarModal) {
-                    try {
-                        $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
-                        $('#modalOverlay').modal('show');
-                    } catch (e) {
-                        console.error("Erro ao mostrar modal:", e);
-                    }
-                }
-                
-                // Configurar timeout de segurança apenas se o modal for mostrado
-                var nuvemTimeout = mostrarModal ? setTimeout(function() {
-                    try {
-                        $('#modalOverlay').modal('hide');
-                        $('.modal-backdrop').remove();
-                        $('body').removeClass('modal-open');
-                    } catch (e) {
-                        console.error("Erro ao fechar modal por timeout:", e);
-                    }
-                }, 30000) : null;
-                
-                // Verificações e chamada AJAX
-                if (!ano) {
-                    $("#wordCloud").html('<div class="alert alert-warning">Por favor, selecione um ano para visualizar a nuvem de palavras.</div>');
-                    $("#loadingCloud").hide();
-                    return;
-                }
-                
-                // Garantir que o container tenha dimensões
-                const containerWidth = $("#wordCloud").parent().width();
-                if (!containerWidth) {
-                    console.log("Container sem largura definida, tentando novamente em 500ms");
-                    setTimeout(window.carregarNuvemPalavras, 500);
-                    return;
-                }
-                
-                $.ajax({
-                    url: "cfc/pc_cfcPesquisasDashboard.cfc?method=getWordCloud&returnformat=json",
-                    type: "GET",
-                    dataType: "json",
-                    data: {
-                        ano: ano,
-                        mcuOrigem: mcuOrigem,
-                        minFreq: minFreq,
-                        maxWords: maxWords
-                    },
-                    success: function(response) {
-                        // Fechar modal de forma segura apenas se ele foi mostrado
-                        if (mostrarModal) {
-                            clearTimeout(nuvemTimeout);
-                            try {
-                                $('#modalOverlay').modal('hide');
-                                setTimeout(function() {
-                                    $('.modal-backdrop').remove();
-                                    $('body').removeClass('modal-open');
-                                }, 300);
-                            } catch (e) {
-                                console.error("Erro ao fechar modal após sucesso:", e);
-                            }
-                        }
-                        
-                        // Verificar se a resposta é válida
-                        if (!response || typeof response !== 'object') {
-                            $("#wordCloud").html('<div class="alert alert-warning">Resposta inválida do servidor.</div>');
-                            $("#loadingCloud").hide();
-                            return;
-                        }
-                        
-                        palavrasData = response;
-                        
-                        if (!Array.isArray(palavrasData) || palavrasData.length === 0) {
-                            $("#wordCloud").html('<div class="alert alert-info">Nenhuma palavra encontrada para os critérios selecionados.</div>');
-                            $("#loadingCloud").hide();
-                            return;
-                        }
-                        
-                        // Encontrar a maior frequência para cálculos de relevância
-                        maxFrequency = Math.max(...palavrasData.map(p => p.weight || 0));
-                        
-                        // Definir esquema de cores baseado no peso das palavras
-                        const getWordColor = function(weight) {
-                            // Calcular percentual em relação ao peso máximo
-                            const percentage = weight / maxFrequency;
-                            
-                            // Esquema de cores do mais frequente para o menos frequente
-                            if (percentage > 0.8) return "#FF5733"; // Vermelho para palavras muito frequentes
-                            if (percentage > 0.6) return "#FFA500"; // Laranja
-                            if (percentage > 0.4) return "#33A8FF"; // Azul
-                            if (percentage > 0.2) return "#4CAF50"; // Verde
-                            return "#9C27B0";                       // Roxo para palavras menos frequentes
-                        };
-                        
-                        // Garantir que os dados estejam no formato esperado pelo jQCloud
-                        const dadosFormatados = palavrasData.map(function(item) {
-                            const weight = parseFloat(item.weight) || 1;
-                            return {
-                                text: item.text || "",
-                                weight: weight,
-                                color: getWordColor(weight),
-                                html: { 
-                                    title: `${item.text} (${item.weight})`,
-                                    'data-weight': weight 
-                                }
-                            };
-                        });
-                        
-                        // Inicializar nuvem de palavras
-                        try {
-                            $("#wordCloud").jQCloud('destroy');
-                        } catch(e) { /* Ignora se não existir */ }
-                        
-                        $("#wordCloud").jQCloud(dadosFormatados, {
-                            width: $("#wordCloud").parent().width(),
-                            height: 400,
-                            delay: 50,
-                            shape: 'elliptic',
-                            colors: ["#9C27B0", "#4CAF50", "#33A8FF", "#FFA500", "#FF5733"],
-                            afterCloudRender: function() {
-                                // Adicionar eventos de clique às palavras
-                                $(".jqcloud-word").click(function() {
-                                    const texto = $(this).text();
-                                    const palavra = palavrasData.find(function(p) { return p.text === texto; });
-                                    
-                                    if (palavra) {
-                                        const relevancia = ((palavra.weight / maxFrequency) * 100).toFixed(1);
-                                        
-                                        $("#palavraTexto").text(palavra.text);
-                                        $("#palavraTitulo").text("Detalhes da Palavra: " + palavra.text);
-                                        $("#palavraFreq").text(palavra.weight);
-                                        $("#palavraRelevancia").text(relevancia);
-                                        
-                                        // Mostrar o card de detalhes da palavra e então scroll
-                                        $(".card.palavra-info").fadeIn(400, function() {
-                                            // Usar a função helper para scroll
-                                            scrollToElement(".card.palavra-info", 100);
-                                        });
-                                    }
-                                });
-                                
-                                $("#loadingCloud").hide();
-                            }
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        // Fechar modal de forma segura apenas se ele foi mostrado
-                        if (mostrarModal) {
-                            clearTimeout(nuvemTimeout);
-                            try {
-                                $('#modalOverlay').modal('hide');
-                                setTimeout(function() {
-                                    $('.modal-backdrop').remove();
-                                    $('body').removeClass('modal-open');
-                                }, 300);
-                            } catch (e) {
-                                console.error("Erro ao fechar modal após erro:", e);
-                            }
-                        }
-                        
-                        console.error("Erro ao carregar dados da nuvem:", error);
-                        console.log("Status:", status);
-                        console.log("Resposta:", xhr.responseText);
-                        $("#wordCloud").html(`<div class="alert alert-danger">
-                            <strong>Erro ao carregar a nuvem de palavras.</strong><br>
-                            Detalhes: ${error || "Sem detalhes disponíveis"}<br>
-                            Por favor, verifique o console para mais informações.
-                        </div>`);
-                        $("#loadingCloud").hide();
-                    }
+                // Disparar evento global de mudança de filtro
+                $(document).trigger('filtroAlterado', {
+                    tipo: 'mcu',
+                    valor: mcuSelecionado
                 });
-            };
-            
-            // Eventos para carregar a nuvem de palavras
-            
-            // Evento do botão atualizar nuvem - não usa mais o modal
-            $("#atualizarNuvem").click(function() {
-                carregarNuvemPalavras(false); // Não mostra o modal, apenas o indicador interno de carregamento
             });
-            
-            // Evento de mudança de ano ou mcu - recarregar nuvem
-            $("input[name='opcaoAno'], input[name='opcaoMcu']").change(function() {
-                setTimeout(function() {
-                    if ($("#nuvem-palavras").hasClass('active') || $("#nuvem-palavras").hasClass('show')) {
-                        window.carregarNuvemPalavras();
-                    }
-                }, 500);
-            });
-            
-            // Responsividade - redimensionar a nuvem quando a janela mudar de tamanho
-            $(window).resize(function() {
-                if (palavrasData && palavrasData.length > 0) {
-                    try {
-                        $("#wordCloud").jQCloud('destroy');
-                    } catch(e) { /* Ignora se não existir */ }
-                    
-                    // Recalcular dados com cores ao redimensionar
-                    const dadosFormatados = palavrasData.map(function(item) {
-                        const weight = parseFloat(item.weight) || 1;
-                        // Recalcular cor baseada no peso
-                        const percentage = weight / maxFrequency;
-                        let color = "#9C27B0";
-                        if (percentage > 0.8) color = "#FF5733";
-                        else if (percentage > 0.6) color = "#FFA500";
-                        else if (percentage > 0.4) color = "#33A8FF";
-                        else if (percentage > 0.2) color = "#4CAF50";
-                        
-                        return {
-                            text: item.text || "",
-                            weight: weight,
-                            color: color,
-                            html: { 
-                                title: `${item.text} (${item.weight})`,
-                                'data-weight': weight 
-                            }
-                        };
-                    });
-                    
-                    $("#wordCloud").jQCloud(dadosFormatados, {
-                        width: $("#wordCloud").parent().width(),
-                        height: 400,
-                        colors: ["#9C27B0", "#4CAF50", "#33A8FF", "#FFA500", "#FF5733"],
-                        afterCloudRender: function() {
-                            // Re-adicionar eventos de clique após redimensionamento
-                            $(".jqcloud-word").click(function() {
-                                const texto = $(this).text();
-                                const palavra = palavrasData.find(function(p) { return p.text === texto; });
-                                
-                                if (palavra) {
-                                    const relevancia = ((palavra.weight / maxFrequency) * 100).toFixed(1);
-                                    
-                                    $("#palavraTexto").text(palavra.text);
-                                    $("#palavraTitulo").text("Detalhes da Palavra: " + palavra.text);
-                                    $("#palavraFreq").text(palavra.weight);
-                                    $("#palavraRelevancia").text(relevancia);
-                                    
-                                    // Mostrar o card de detalhes da palavra e então scroll
-                                    $(".card.palavra-info").fadeIn(400, function() {
-                                        // Usar a função helper para scroll
-                                        scrollToElement(".card.palavra-info", 100);
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        
-            /**
-            * Script para gerenciar as abas do Dashboard de Pesquisas
-            */
-            // Inicializar as abas
+
+            // Script para gerenciar as abas do Dashboard de Pesquisas
             $('.nav-dashboard-tabs .nav-link:first').tab('show');
             
             // Manipular clique nas abas
@@ -1238,77 +660,26 @@
                 // Aguardar um momento para a aba ser mostrada antes de rolar
                 setTimeout(function() {
                     // Usar a função helper para scroll
-                    scrollToElement('.tabs-container', 70);
+                    window.scrollToElement('.tabs-container', 70);
                     
-                    // Resto do processamento para a aba específica
+                    // Obter ID da aba para carregar componente correspondente
                     const tabId = $this.attr('href');
                     
-                    // A partir daqui, o código existente processa as ações específicas para cada aba
-                    if (tabId === '#graficos') {
-                        // Forçar um redimensionamento para garantir que os gráficos sejam renderizados corretamente
+                    if (tabId === '#avaliacoes') {
+                        carregarComponente('avaliacoes');
+                    } else if (tabId === '#graficos') {
+                        carregarComponente('graficos');
+                        // Forçar redimensionamento para layout correto
                         setTimeout(function() {
                             $(window).trigger('resize');
-                            
-                            // Se houver funções específicas para atualizar os gráficos, chame-as aqui
-                            if (typeof window.renderGraficoMedia === 'function' && typeof window.renderGraficoEvolucao === 'function') {
-                                // Carregar os dados novamente se necessário
-                                const anoSelecionado = $("input[name='opcaoAno']:checked").val();
-                                const mcuSelecionado = $("input[name='opcaoMcu']:checked").val();
-                                
-                                $.ajax({
-                                    url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
-                                    method: 'GET',
-                                    data: { 
-                                        ano: anoSelecionado,
-                                        mcuOrigem: mcuSelecionado 
-                                    },
-                                    dataType: 'json',
-                                    success: function(resultado) {
-                                        if (resultado) {
-                                            // Recarregar os gráficos com os dados atualizados
-                                            if (resultado.medias && Array.isArray(resultado.medias)) {
-                                                window.renderGraficoMedia(resultado.medias);
-                                            }
-                                            if (resultado.evolucaoTemporal && Array.isArray(resultado.evolucaoTemporal)) {
-                                                window.renderGraficoEvolucao(resultado.evolucaoTemporal);
-                                            }
-                                        }
-                                    }
-                                });
-                            }
                         }, 200);
-                    }
-                    
-                    // Atualizar nuvem de palavras se estiver na aba correspondente - não usa o modal
-                    if (tabId === '#nuvem-palavras') {
-                        // Esconder detalhes da palavra ao mudar para a aba
-                        $(".card.palavra-info").hide();
-                        
-                        // Esperar que a aba esteja visível antes de carregar a nuvem
-                        setTimeout(function() {
-                            if (typeof window.carregarNuvemPalavras === 'function') {
-                                window.carregarNuvemPalavras(false); // Não mostrar modal durante troca de aba
-                            } else {
-                                console.warn("Função carregarNuvemPalavras não encontrada");
-                            }
-                        }, 300);
-                    }
-                    
-                    // Atualizar tabela de listagem quando abrir a aba
-                    if (tabId === '#listagem') {
-                        if ($.fn.DataTable.isDataTable('#tabelaPesquisas')) {
-                            $('#tabelaPesquisas').DataTable().columns.adjust().draw();
-                        }
+                    } else if (tabId === '#nuvem-palavras') {
+                        carregarComponente('nuvemPalavras');
+                    } else if (tabId === '#listagem') {
+                        carregarComponente('listagem');
                     }
                 }, 300);
             });
-            
-            // Verificar se a aba da nuvem já está ativa no carregamento inicial
-            if ($('#nuvem-palavras-tab').hasClass('active') && typeof window.carregarNuvemPalavras === 'function') {
-                setTimeout(function() {
-                    window.carregarNuvemPalavras(false); // Não mostrar modal no carregamento inicial
-                }, 500);
-            }
             
             // Controles de navegação das abas
             $('.tab-prev').on('click', function() {
@@ -1348,49 +719,6 @@
 
         });
 
-        function configurarDataTable() {
-            var currentDate = new Date()
-			var day = currentDate.getDate()
-			var month = currentDate.getMonth() + 1
-			var year = currentDate.getFullYear()
-			var d = day + "-" + month + "-" + year;
-            return $('#tabelaPesquisas').DataTable({
-                destroy: true,
-                processing: true,
-                serverSide: false,
-                responsive: true,
-                pageLength: 5, // Alterado de 10 para 5 registros por página
-                dom: 
-                    "<'row d-flex align-items-center'<'col-auto'B><'col-auto'f><'col-auto'p>>" + // Removido dtsp-verticalContainer e P
-                    "<'row'<'col-12'i>>" + // Informações logo abaixo dos botões
-                    "<'row'<'col-12'tr>>",  // Tabela com todos os dados
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
-                        title : 'SNCI_Pesquisas_Respondidas_' + d,
-                        className: 'btExcel',
-                    }
-                ],
-                columnDefs: [
-                    { className: "text-center", targets: [5, 6, 7, 8, 9, 10, 11, 12] } // Ajustado para incluir todas as colunas numéricas
-                ],
-                language: {
-                    url: "plugins/datatables/traducao.json"
-                },
-                initComplete: function() {
-                    tableInitialized = true;
-                    
-                    // Ajustar colunas após inicialização para garantir o layout correto
-                    $(window).on('resize', function() {
-                        if (tableInitialized) {
-                            // Corrigindo a variável table para tabela
-                            $('#tabelaPesquisas').DataTable().columns.adjust().draw();
-                        }
-                    });
-                }
-            });
-        }
     </script>
 </body>
 </html>
