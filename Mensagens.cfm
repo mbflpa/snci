@@ -12,59 +12,57 @@
 
 <cfset auxdt = dateformat(now(),"YYYYMMDD")>
 <cfquery name="rsDia" datasource="#dsn_inspecao#">
-  SELECT MSG_Realizado, MSG_Status FROM Mensagem WHERE MSG_Codigo = 1
+	SELECT MSG_Realizado, MSG_Status FROM Mensagem WHERE MSG_Codigo = 1
 </cfquery>
 <cfset auxdiacol = rsDia.MSG_Realizado>
 <cfset auxdiacol = left(auxdiacol,4) & '-' & mid(auxdiacol,5,2) & '-' & right(auxdiacol,2)>
 <cfset dtlimit = CreateDate(year(auxdiacol),month(auxdiacol),day(auxdiacol))> 
 
 <cfif rsDia.MSG_Status is 'A'>
-		 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Sr(a) USUARIO(a), AGUARDE! EM POUCOS MINUTOS SERÁ LIBERADO O ACESSO, SNCI EM MANUTENÇÃO">
+	<cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Sr(a) USUARIO(a), AGUARDE! EM POUCOS MINUTOS SERÁ LIBERADO O ACESSO, SNCI EM MANUTENÇÃO">
 </cfif>  
 	
- <cfset auxsite = trim(ucase(cgi.server_name))>
+<cfset auxsite = trim(ucase(cgi.server_name))>
 <!--- Rotina já rodou neste dia? --->
-  <cfif (rsDia.MSG_Realizado eq auxdt)>
-	  <!--- Sim! Rotina já rodou. --->
-	  <cfif FIND("INTRANETSISTEMASPE", "#auxsite#")>
-			<cflocation url="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">
-	  <cfelseif FIND("DESENVOLVIMENTOPE", "#auxsite#")>
-		<cfquery datasource="#dsn_inspecao#">
+<cfif (rsDia.MSG_Realizado eq auxdt)>
+	<!--- Sim! Rotina já rodou. --->
+	<cfif FIND("INTRANETSISTEMASPE", "#auxsite#")>
+		<cflocation url="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">
+	<cfelseif FIND("DESENVOLVIMENTOPE", "#auxsite#")>
+	<cfquery datasource="#dsn_inspecao#">
 		UPDATE Mensagem SET MSG_Realizado = '#auxdt#', MSG_Status = 'D' WHERE MSG_Codigo = 1
-		</cfquery>	  
-			<cflocation url="http://desenvolvimentope/snci/rotinas_inspecao.cfm">
-	  <cfelseif FIND("HOMOLOGACAOPE", "#auxsite#")>
-		<cfquery datasource="#dsn_inspecao#">
+	</cfquery>	  
+		<cflocation url="http://desenvolvimentope/snci/rotinas_inspecao.cfm">
+	<cfelseif FIND("HOMOLOGACAOPE", "#auxsite#")>
+	<cfquery datasource="#dsn_inspecao#">
 		UPDATE Mensagem SET MSG_Realizado = '#auxdt#', MSG_Status = 'D' WHERE MSG_Codigo = 1
-		</cfquery>	  
-			<cflocation url="http://homologacaope/snci/rotinas_inspecao.cfm">  
-	  <cfelse>
-			<!--- Provocar erro --->
-			<cfset AAA = AAA>
-	  </cfif> 
- </cfif>   
-  
-  <!--- Atualiza o campo com a data corrente da realizacao --->
+	</cfquery>	  
+		<cflocation url="http://homologacaope/snci/rotinas_inspecao.cfm">  
+	<cfelse>
+		<!--- Provocar erro --->
+		<cfset AAA = AAA>
+	</cfif> 
+</cfif>   
+<!--- Atualiza o campo com a data corrente da realizacao --->
+<cfquery datasource="#dsn_inspecao#">
+	UPDATE Mensagem SET MSG_Realizado = '#auxdt#', MSG_Status = 'A' WHERE MSG_Codigo = 1
+</cfquery>
 
- <cfquery datasource="#dsn_inspecao#">
-  UPDATE Mensagem SET MSG_Realizado = '#auxdt#', MSG_Status = 'A' WHERE MSG_Codigo = 1
- </cfquery>
- 
-  <!--- Não rodar em desenvolvimento ou Homologação --->
-   <cfif FIND("DESENVOLVIMENTOPE", "#auxsite#")>
-		<cfquery datasource="#dsn_inspecao#">
+<!--- Não rodar em desenvolvimento ou Homologação --->
+<cfif FIND("DESENVOLVIMENTOPE", "#auxsite#")>
+	<cfquery datasource="#dsn_inspecao#">
 		UPDATE Mensagem SET MSG_Realizado = '#auxdt#', MSG_Status = 'D' WHERE MSG_Codigo = 1
-		</cfquery>
-		 <cflocation url="http://desenvolvimentope/snci/rotinas_inspecao.cfm"> 
-  <cfelseif FIND("HOMOLOGACAOPE", "#auxsite#")>
-  		<cfquery datasource="#dsn_inspecao#">
+	</cfquery>
+	<cflocation url="http://desenvolvimentope/snci/rotinas_inspecao.cfm"> 
+<cfelseif FIND("HOMOLOGACAOPE", "#auxsite#")>
+	<cfquery datasource="#dsn_inspecao#">
 		UPDATE Mensagem SET MSG_Realizado = '#auxdt#', MSG_Status = 'D' WHERE MSG_Codigo = 1
-		</cfquery>
-		 <cflocation url="http://homologacaope/snci/rotinas_inspecao.cfm">  
-  </cfif>     
+	</cfquery>
+	<cflocation url="http://homologacaope/snci/rotinas_inspecao.cfm">  
+</cfif>     
 
 <!---Cria uma instância do componente Dao--->
-	<cfobject component = "CFC/Dao" name = "dao">
+<cfobject component = "CFC/Dao" name = "dao">
 <!---  --->
 <cfset rotinaSN = 'S'>
 <cfset dtatual = CreateDate(year(now()),month(now()),day(now()))>
@@ -131,6 +129,47 @@
 </cfif>
 
 <cfloop condition="rotina lte 33">   
+	<cfif rotina eq 1>
+	    <cfset auxano = year(now())>
+	    <!--- Prover ajustes na tabela Andamento para todos os status --->
+		<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
+		<cfquery name="rsEncerrar" datasource="#dsn_inspecao#">
+			SELECT Und_Descricao,Pos_Parecer, Pos_ClassificacaoPonto, RIP_Falta, Pos_Situacao_Resp, INP_DTConcluirRevisao, INP_DTConcluirRevisao, DATEDIFF(d,INP_DTConcluirRevisao,GETDATE()), Pos_Unidade,Pos_Inspecao,Pos_NumGrupo,Pos_NumItem
+			FROM ((Inspecao INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) INNER JOIN ParecerUnidade ON (RIP_Unidade = Pos_Unidade) AND (RIP_NumInspecao = Pos_Inspecao) AND (RIP_NumGrupo = Pos_NumGrupo) AND (RIP_NumItem = Pos_NumItem)) INNER JOIN Unidades ON Pos_Unidade = Und_Codigo
+			WHERE (Und_TipoUnidade<>12) AND (Pos_Situacao_Resp In (2,4,5,8,15,16,19,23)) AND ((Pos_ClassificacaoPonto='MEDIANO' AND RIP_Falta > 1000 AND RIP_Falta < 120000) OR (Pos_ClassificacaoPonto='GRAVE' AND RIP_Falta < 120000)) 
+			and (DATEDIFF(d,INP_DTConcluirRevisao,GETDATE()) >= 360)
+			ORDER BY Pos_ClassificacaoPonto, RIP_Falta DESC
+		</cfquery>
+		<cfset startTime = CreateTime(0,0,0)> 
+		<cfset endTime = CreateTime(0,0,45)> 
+		<cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
+		</cfloop>		
+		<cfset msg = 'Conforme novos critérios definidos por meio da Nota Técnica N.º 51741855/2024, SEI 53180.028789/2022-72, encerra-se o acompanhamento da regularização da não conformidade registrada nesse item de avaliação após decorrido o prazo de 360 dias.' & CHR(13) & CHR(13) & 'Tal decisão não exime os órgãos responsáveis da adoção de ações para regularização da situação registrada pelo Controle Interno, inclusive quanto ao recolhimento aos cofres da Empresa dos valores devidos, se for o caso.'>
+		<cfset pos_aux = trim(rsEncerrar.Pos_Parecer) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM')  & '> ' & 'Opinião do Controle Interno' & CHR(13) & CHR(13) & 'À(O) ' & #rsEncerrar.Und_Descricao# & CHR(13) & CHR(13) & msg & CHR(13) & CHR(13) & 'Situação: ENCERRADO' & CHR(13) & CHR(13) &  'Responsável: DCINT/SUGOV/DIGOE ' & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+		<cfoutput query="rsEncerrar">
+			<cfquery datasource="#dsn_inspecao#">
+				UPDATE ParecerUnidade SET Pos_Situacao_Resp = 29
+				, Pos_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
+				, Pos_DtPrev_Solucao = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))# 
+				, Pos_DtUltAtu = CONVERT(char, GETDATE(), 120)
+				, Pos_Situacao = 'EC'
+				, Pos_Parecer = '#pos_aux#'
+				, Pos_Sit_Resp_Antes = #rsEncerrar.Pos_Situacao_Resp#
+				WHERE Pos_Unidade='#rsEncerrar.Pos_Unidade#' AND Pos_Inspecao='#rsEncerrar.Pos_Inspecao#' AND Pos_NumGrupo=#rsEncerrar.Pos_NumGrupo# AND Pos_NumItem=#rsEncerrar.Pos_NumItem#
+			</cfquery> 
+			<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM')  & '> ' & 'Opinião do Controle Interno' & CHR(13) & CHR(13) & 'À(O) ' & #rsEncerrar.Und_Descricao# & CHR(13) & CHR(13) & msg & CHR(13) & CHR(13) & 'Situação: ENCERRADO' & CHR(13) & CHR(13) &  'Responsável: DCINT/SUGOV/DIGOE ' & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+			<cfset hhmmssdc = timeFormat(now(), "HH:MM:ssl")>
+			<cfset hhmmssdc = Replace(hhmmssdc,':','',"All")>
+			<cfset hhmmssdc = Replace(hhmmssdc,'.','',"All")> 
+			<cfif len(hhmmssdc) lt 9>
+				<cfset hhmmssdc = hhmmssdc & '0'>
+			</cfif>
+			<cfquery datasource="#dsn_inspecao#">
+				insert into Andamento (And_NumInspecao,And_Unidade,And_NumGrupo,And_NumItem,And_DtPosic,And_username,And_Situacao_Resp,And_Area,And_NomeArea,And_HrPosic,And_Parecer) 
+				values ('#rsEncerrar.Pos_Inspecao#','#rsEncerrar.Pos_Unidade#','#rsEncerrar.Pos_NumGrupo#','#rsEncerrar.Pos_NumItem#',#createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#,'Rotina_Automatica',29,'#rsEncerrar.Pos_Unidade#','#rsEncerrar.Und_Descricao#','#hhmmssdc#','#and_obs#')
+			</cfquery> 
+		</cfoutput>
+	</cfif>
 	<cfif rotina eq 1>
 	    <cfset auxano = year(now())>
 	    <!--- Prover ajustes na tabela Andamento para todos os status --->

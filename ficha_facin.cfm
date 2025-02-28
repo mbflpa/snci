@@ -112,14 +112,14 @@
     <cfquery datasource="#dsn_inspecao#" name="rsDevol">
         SELECT RIP_NumInspecao, Count(RIP_NumInspecao) AS totdevol
         FROM Resultado_Inspecao
-        WHERE (RIP_Recomendacao_Inspetor is not null and RIP_Matricula_Reanalise is not null) 
+        WHERE (RIP_Recomendacao_Inspetor is not null) 
         GROUP BY RIP_NumInspecao
         HAVING RIP_NumInspecao = convert(varchar,'#form.numinsp#')
     </cfquery>
     <cfquery datasource="#dsn_inspecao#" name="rsOrtog">
         SELECT RIP_NumInspecao
         FROM Resultado_Inspecao
-        WHERE RIP_NumInspecao = convert(varchar,'#form.numinsp#') and RIP_Recomendacao_Inspetor is null and RIP_Matricula_Reanalise is null and RIP_Correcao_Revisor = '1'
+        WHERE RIP_NumInspecao = convert(varchar,'#form.numinsp#') and RIP_Recomendacao_Inspetor is null and RIP_Correcao_Revisor = '1'
     </cfquery>    
 
     <cfquery datasource="#dsn_inspecao#" name="rsExisteFacin">

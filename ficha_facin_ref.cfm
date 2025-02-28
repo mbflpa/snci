@@ -24,7 +24,7 @@
 			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
 			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
 			left JOIN UN_Ficha_Facin_Avaliador ON (RIP_Unidade = FACA_Unidade) AND (RIP_NumInspecao = FACA_Avaliacao) and (RIP_NumGrupo=FACA_grupo) and (RIP_NumItem=FACA_Item)
-			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and ((RIP_Recomendacao_Inspetor is not null and RIP_Matricula_Reanalise is not null) or RIP_Correcao_Revisor = '1') and FACA_Avaliacao is null and INP_DTConcluirRevisao is not null
+			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and (RIP_Recomendacao_Inspetor is not null or RIP_Correcao_Revisor = '1') and FACA_Avaliacao is null and INP_DTConcluirRevisao is not null
 			<cfif grpacesso eq 'INSPETORES'>
 				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
 			</cfif>
@@ -64,7 +64,7 @@
 			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
 			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
 			INNER JOIN Usuarios ON INP_RevisorLogin = Usu_Login
-			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and ((RIP_Recomendacao_Inspetor is not null and RIP_Matricula_Reanalise is not null) or RIP_Correcao_Revisor = '1') and INP_DTConcluirRevisao is not null
+			WHERE RIP_NumInspecao = convert(varchar,'#url.numinsp#') and (RIP_Recomendacao_Inspetor is not null or RIP_Correcao_Revisor = '1') and INP_DTConcluirRevisao is not null
 			<cfif grpacesso eq 'INSPETORES'>
 				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
 			</cfif>
@@ -290,8 +290,8 @@
 		<cfoutput query="rsBase">
 			<cfset reanalise = 'Não'>
 			<cfset correcao = 'Não'>
-			<cfif trim(rsBase.RIP_Recomendacao_Inspetor) neq '' and trim(rsBase.RIP_Matricula_Reanalise neq '')><cfset reanalise = 'Sim'></cfif>
-			<cfif trim(rsBase.RIP_Recomendacao_Inspetor) eq '' and trim(rsBase.RIP_Matricula_Reanalise eq '' and rsBase.RIP_Correcao_Revisor eq '1')><cfset correcao = 'Sim'></cfif>
+			<cfif trim(rsBase.RIP_Recomendacao_Inspetor) neq ''><cfset reanalise = 'Sim'></cfif>
+			<cfif trim(rsBase.RIP_Recomendacao_Inspetor) eq '' and rsBase.RIP_Correcao_Revisor eq '1'><cfset correcao = 'Sim'></cfif>
 			<cfif trim(rsBase.RIP_DtUltAtu_Revisor) neq ''>
 				<cfset h1 = DateDiff("h",rsBase.RIP_Data_Avaliador,rsBase.RIP_DtUltAtu_Revisor)>
 			<cfelse>
