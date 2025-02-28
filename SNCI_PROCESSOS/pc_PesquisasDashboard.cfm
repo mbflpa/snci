@@ -789,6 +789,17 @@
             }
         
             function carregarDashboard(anoFiltro, mcuFiltro) {
+                // Mostrar modal de carregamento com timeout de segurança
+                $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
+                $('#modalOverlay').modal('show');
+                
+                // Configurar um timeout de segurança para fechar o modal após 30 segundos
+                // caso algo dê errado com as requisições
+                var timeoutSeguranca = setTimeout(function() {
+                    $('#modalOverlay').modal('hide');
+                    console.warn("Modal fechado por timeout de segurança");
+                }, 30000);
+                
                 var tabela = configurarDataTable();
                 // Primeiro carrega os dados das pesquisas
                 $.ajax({
@@ -827,6 +838,13 @@
                             });
                             tabela.draw();
                         }
+                        // Verificar se todas as requisições terminaram
+                        checkLoadingComplete();
+                    },
+                    error: function() {
+                        // Fechar modal explicitamente em caso de erro
+                        closeModalSafely();
+                        console.error("Erro ao carregar pesquisas");
                     }
                 });
 
@@ -857,11 +875,48 @@
                             // Reiniciar tooltips após atualizar o conteúdo
                             setTimeout(reiniciarTooltips, 500);
                         }
+                        // Verificar se todas as requisições terminaram
+                        checkLoadingComplete();
                     },
                     error: function(xhr, status, error) {
                         console.error("Erro ao carregar estatísticas:", error);
+                        // Fechar modal explicitamente em caso de erro
+                        closeModalSafely();
                     }
                 });
+                
+                // Função melhorada para fechar o modal com segurança
+                function closeModalSafely() {
+                    clearTimeout(timeoutSeguranca); // Limpar o timeout de segurança
+                    
+                    try {
+                        // Tenta diferentes métodos para garantir que o modal feche
+                        $('#modalOverlay').modal('hide');
+                        
+                        // Caso acima falhe, tenta remover classes e backdrop manualmente
+                        setTimeout(function() {
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open');
+                            $('#modalOverlay').removeClass('show');
+                            $('#modalOverlay').hide();
+                        }, 300);
+                    } catch (e) {
+                        console.error("Erro ao fechar modal:", e);
+                    }
+                }
+                
+                // Contador para verificar quando todas as requisições terminaram
+                var requestsCompleted = 0;
+                function checkLoadingComplete() {
+                    requestsCompleted++;
+                    if (requestsCompleted >= 2) { // 2 requisições: pesquisas e estatísticas
+                        // Pequeno delay para garantir que os dados foram renderizados
+                        setTimeout(function() {
+                            closeModalSafely();
+                        }, 500);
+                        requestsCompleted = 0; // resetar contador
+                    }
+                }
             }
         
             carregarDashboard(anoSelecionado, mcuSelecionado);
@@ -897,8 +952,8 @@
             let palavrasData;
             let maxFrequency = 0;
             
-            // Função para carregar dados da nuvem de palavras
-            window.carregarNuvemPalavras = function() {
+            // Função para carregar dados da nuvem de palavras - modificada para evitar problemas com o modal
+            window.carregarNuvemPalavras = function(mostrarModal = false) { // Alterado o padrão para false
                 // Obter o ano e o mcu selecionados
                 const ano = $("input[name='opcaoAno']:checked").val();
                 const mcuOrigem = $("input[name='opcaoMcu']:checked").val();
@@ -912,8 +967,32 @@
                 }
                 
                 $("#wordCloud").empty();
+                
+                // Sempre mostrar o indicador de carregamento interno
                 $("#loadingCloud").show();
+                
                 $("#palavraInfo").hide();
+                
+                // Mostrar modal apenas se solicitado explicitamente (não mostrar na troca de aba)
+                if (mostrarModal) {
+                    try {
+                        $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
+                        $('#modalOverlay').modal('show');
+                    } catch (e) {
+                        console.error("Erro ao mostrar modal:", e);
+                    }
+                }
+                
+                // Configurar timeout de segurança apenas se o modal for mostrado
+                var nuvemTimeout = mostrarModal ? setTimeout(function() {
+                    try {
+                        $('#modalOverlay').modal('hide');
+                        $('.modal-backdrop').remove();
+                        $('body').removeClass('modal-open');
+                    } catch (e) {
+                        console.error("Erro ao fechar modal por timeout:", e);
+                    }
+                }, 30000) : null;
                 
                 // Verificações e chamada AJAX
                 if (!ano) {
@@ -941,6 +1020,20 @@
                         maxWords: maxWords
                     },
                     success: function(response) {
+                        // Fechar modal de forma segura apenas se ele foi mostrado
+                        if (mostrarModal) {
+                            clearTimeout(nuvemTimeout);
+                            try {
+                                $('#modalOverlay').modal('hide');
+                                setTimeout(function() {
+                                    $('.modal-backdrop').remove();
+                                    $('body').removeClass('modal-open');
+                                }, 300);
+                            } catch (e) {
+                                console.error("Erro ao fechar modal após sucesso:", e);
+                            }
+                        }
+                        
                         // Verificar se a resposta é válida
                         if (!response || typeof response !== 'object') {
                             $("#wordCloud").html('<div class="alert alert-warning">Resposta inválida do servidor.</div>');
@@ -1024,6 +1117,20 @@
                         });
                     },
                     error: function(xhr, status, error) {
+                        // Fechar modal de forma segura apenas se ele foi mostrado
+                        if (mostrarModal) {
+                            clearTimeout(nuvemTimeout);
+                            try {
+                                $('#modalOverlay').modal('hide');
+                                setTimeout(function() {
+                                    $('.modal-backdrop').remove();
+                                    $('body').removeClass('modal-open');
+                                }, 300);
+                            } catch (e) {
+                                console.error("Erro ao fechar modal após erro:", e);
+                            }
+                        }
+                        
                         console.error("Erro ao carregar dados da nuvem:", error);
                         console.log("Status:", status);
                         console.log("Resposta:", xhr.responseText);
@@ -1039,9 +1146,9 @@
             
             // Eventos para carregar a nuvem de palavras
             
-            // Evento do botão atualizar nuvem
+            // Evento do botão atualizar nuvem - não usa mais o modal
             $("#atualizarNuvem").click(function() {
-                carregarNuvemPalavras();
+                carregarNuvemPalavras(false); // Não mostra o modal, apenas o indicador interno de carregamento
             });
             
             // Evento de mudança de ano ou mcu - recarregar nuvem
@@ -1172,7 +1279,7 @@
                         }, 200);
                     }
                     
-                    // Atualizar nuvem de palavras se estiver na aba correspondente
+                    // Atualizar nuvem de palavras se estiver na aba correspondente - não usa o modal
                     if (tabId === '#nuvem-palavras') {
                         // Esconder detalhes da palavra ao mudar para a aba
                         $(".card.palavra-info").hide();
@@ -1180,7 +1287,7 @@
                         // Esperar que a aba esteja visível antes de carregar a nuvem
                         setTimeout(function() {
                             if (typeof window.carregarNuvemPalavras === 'function') {
-                                window.carregarNuvemPalavras();
+                                window.carregarNuvemPalavras(false); // Não mostrar modal durante troca de aba
                             } else {
                                 console.warn("Função carregarNuvemPalavras não encontrada");
                             }
@@ -1198,7 +1305,9 @@
             
             // Verificar se a aba da nuvem já está ativa no carregamento inicial
             if ($('#nuvem-palavras-tab').hasClass('active') && typeof window.carregarNuvemPalavras === 'function') {
-                setTimeout(window.carregarNuvemPalavras, 500);
+                setTimeout(function() {
+                    window.carregarNuvemPalavras(false); // Não mostrar modal no carregamento inicial
+                }, 500);
             }
             
             // Controles de navegação das abas
