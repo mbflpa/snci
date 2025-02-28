@@ -3,13 +3,13 @@
 
 <div class="card">
   <div class="card-header">
-    <h5 class="card-title">Palavras mais frequentes nas observações das pesquisas</h5>
+    <h5 class="card-title">Palavras mais frequentes nas observações das Pesquisas</h5>
   </div>
   <div class="card-body">
     <!-- Card explicativo sobre a importância da nuvem de palavras -->
     <div class="card mb-4 border-left border-primary" style="border-left-width: 4px !important; border-left-color: #4e73df !important;border-radius: 8px!important;">
       <div class="card-body">
-        <p>Este recurso analisa todas as observações textuais deixadas nas pesquisas de satisfação, permitindo identificar tendências, preocupações e temas comuns mencionados pelos respondentes. O tamanho de cada palavra reflete sua frequência nas observações, oferecendo uma visão rápida dos principais assuntos abordados.</p>
+        <p>Este recurso analisa todas as observações textuais deixadas nas pesquisas, permitindo identificar tendências, preocupações e temas comuns mencionados pelos respondentes. O tamanho de cada palavra reflete sua frequência nas observações, oferecendo uma visão rápida dos principais assuntos abordados.</p>
         <p class="mb-0 text-muted"><small>Passe o mouse sobre uma palavra para ver detalhes sobre sua frequência e relevância.</small></p>
       </div>
     </div>
@@ -69,7 +69,7 @@ $(document).ready(function() {
     }
     
     // Função para carregar dados da nuvem de palavras
-    window.carregarNuvemPalavras = function(mostrarModal = false) {
+    window.carregarNuvemPalavras = function() {
         // Evitar múltiplas chamadas simultâneas
         if (carregandoNuvem) {
             return;
@@ -106,17 +106,10 @@ $(document).ready(function() {
         if (!containerWidth) {
             setTimeout(function() {
                 carregandoNuvem = false;
-                window.carregarNuvemPalavras(mostrarModal);
+                window.carregarNuvemPalavras();
             }, 500);
             return;
         }
-        
-        
-        // Configurar timeout de segurança apenas se o modal for mostrado
-        var nuvemTimeout = mostrarModal ? setTimeout(function() {
-            fecharModalComSeguranca();
-            carregandoNuvem = false;
-        }, 30000) : null;
         
         $.ajax({
             url: "cfc/pc_cfcPesquisasDashboard.cfc?method=getWordCloud&returnformat=json",
@@ -129,12 +122,6 @@ $(document).ready(function() {
                 maxWords: maxWords
             },
             success: function(response) {
-                // Fechar modal de forma segura apenas se ele foi mostrado
-                if (mostrarModal) {
-                    clearTimeout(nuvemTimeout);
-                    fecharModalComSeguranca();
-                }
-                
                 carregandoNuvem = false;
 
                 // Verificar se a resposta é válida
@@ -210,12 +197,6 @@ $(document).ready(function() {
                 });
             },
             error: function(xhr, status, error) {
-                // Fechar modal de forma segura apenas se ele foi mostrado
-                if (mostrarModal) {
-                    clearTimeout(nuvemTimeout);
-                    fecharModalComSeguranca();
-                }
-                
                 carregandoNuvem = false;
                 
                 console.error("Erro ao carregar dados da nuvem:", error);
@@ -231,7 +212,7 @@ $(document).ready(function() {
     
     // Evento do botão atualizar nuvem
     $("#atualizarNuvem").click(function() {
-        carregarNuvemPalavras(true); // Com modal para indicar o carregamento
+        carregarNuvemPalavras();
     });
     
     // Adicionar ouvintes globais para atualizações nos filtros
