@@ -1,13 +1,13 @@
 <cfcomponent>
     <cffunction name="getPesquisas" access="remote" returntype="string" returnformat="json">
         <cfargument name="ano" type="string" required="true">
-        
+        <cfargument name="mcuOrigem" type="string" required="true">
         <cfquery name="qPesquisas" datasource="#application.dsn_processos#">
             SELECT 
                 pc_pesq_id,
                 pc_usu_matricula,
-                pc_processo_id,
-                CONCAT(pc_orgaos.pc_org_sigla,' (',pc_orgaos.pc_org_mcu,')') as orgaoResposta,
+                pc_pesquisas.pc_processo_id,
+                CONCAT(orgaoResp.pc_org_sigla,' (',orgaoResp.pc_org_mcu,')') as orgaoResposta,
                 pc_pesq_comunicacao,
                 pc_pesq_interlocucao,
                 pc_pesq_reuniao_encerramento,
@@ -16,13 +16,20 @@
                 pc_pesq_importancia_processo,
                 pc_pesq_pontualidade, 
                 pc_pesq_observacao,
-                FORMAT(pc_pesq_data_hora, 'dd/MM/yyyy') as pc_pesq_data_hora
+                FORMAT(pc_pesq_data_hora, 'dd/MM/yyyy') as pc_pesq_data_hora,
+                CONCAT(orgaoOrigem.pc_org_sigla,' (',orgaoOrigem.pc_org_mcu,')') as orgaoOrigem
             FROM pc_pesquisas
-            INNER JOIN pc_orgaos ON pc_pesquisas.pc_org_mcu = pc_orgaos.pc_org_mcu
+            INNER JOIN pc_orgaos as orgaoResp ON pc_pesquisas.pc_org_mcu = orgaoResp.pc_org_mcu
+            INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
+            INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
+
             <cfif arguments.ano NEQ "Todos">
-                WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                WHERE RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
-            ORDER BY pc_processo_id
+            <cfif arguments.mcuOrigem NEQ "Todos">
+                AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+            </cfif>
+            ORDER BY pc_pesquisas.pc_processo_id
         </cfquery>
         
         <cfreturn serializeJSON(qPesquisas)>
@@ -30,6 +37,7 @@
 
     <cffunction name="getEstatisticas" access="remote" returntype="struct" output="false">
         <cfargument name="ano" type="string" required="true">
+        <cfargument name="mcuOrigem" type="string" required="true">
         
         <cfset var retorno = structNew()>
         <cfset var qryPesquisas = "">
@@ -46,8 +54,12 @@
                 COALESCE(CAST(AVG(CAST(pc_pesq_importancia_processo AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_importancia,
                 COALESCE(CAST(AVG(CAST(pc_pesq_pontualidade AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_pontualidade
             FROM pc_pesquisas 
+            INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
             <cfif arguments.ano NEQ "Todos">
-            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                WHERE RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif arguments.mcuOrigem NEQ "Todos">
+                AND pc_org_mcu = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
             </cfif>
         </cfquery>
     
@@ -57,8 +69,12 @@
                 AVG((pc_pesq_comunicacao + pc_pesq_interlocucao + pc_pesq_reuniao_encerramento + 
                      pc_pesq_relatorio + pc_pesq_pos_trabalho + pc_pesq_importancia_processo) / 6.0) as media_geral
             FROM pc_pesquisas 
+            INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
             <cfif arguments.ano NEQ "Todos">
-            WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                WHERE RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif arguments.mcuOrigem NEQ "Todos">
+                AND pc_org_mcu = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
             </cfif>
             GROUP BY FORMAT(pc_pesq_data_hora, 'yyyy-MM')
             ORDER BY mes
@@ -84,7 +100,13 @@
         <cfquery name="rsQtdRespondidas" datasource="#application.dsn_processos#">
             SELECT COUNT(*) as total_respondidas
             FROM pc_pesquisas
-            WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+            INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
+            <cfif arguments.ano NEQ "Todos">
+                WHERE RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif arguments.mcuOrigem NEQ "Todos">
+                AND pc_org_mcu = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+            </cfif>
         </cfquery>
         
         <!--- Obter quantidade total de processos --->
@@ -93,8 +115,12 @@
             FROM (
                 SELECT DISTINCT pc_processos.pc_processo_id as processos_id
                 FROM pc_processos 
+                INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
                 <cfif arguments.ano NEQ "Todos">
-                WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                </cfif>
+                <cfif arguments.mcuOrigem NEQ "Todos">
+                    AND pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                 </cfif>
 
                 UNION
@@ -107,8 +133,12 @@
                         ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
                     INNER JOIN pc_processos 
                         ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                   
                     <cfif arguments.ano NEQ "Todos">
-                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                        WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                    </cfif>
+                    <cfif arguments.mcuOrigem NEQ "Todos">
+                        AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                     </cfif>
 
                     UNION
@@ -120,7 +150,10 @@
                     INNER JOIN pc_processos 
                         ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
                     <cfif arguments.ano NEQ "Todos">
-                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                        WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                    </cfif>
+                    <cfif arguments.mcuOrigem NEQ "Todos">
+                        AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                     </cfif>
                 ) AS subquery
             ) AS unificado
@@ -154,6 +187,7 @@
 
     <cffunction name="getQuantidadeProcessosSemPesquisa" access="remote" returntype="numeric" output="false">
         <cfargument name="ano" type="string" required="true">
+        <cfargument name="mcuOrigem" type="string" required="true">
         <cfquery name="rsProcSemPesquisa" datasource="#application.dsn_processos#" timeout="120">
             SELECT COUNT(DISTINCT processos_id) as total_sem_pesquisa 
             FROM (
@@ -164,18 +198,21 @@
                 INNER JOIN pc_processos 
                     ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
                 <cfif arguments.ano NEQ "Todos">
-                WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
-                AND pc_processos.pc_processo_id NOT IN 
-                (
-                    SELECT pc_processo_id 
-                    FROM pc_pesquisas    
+                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                    AND pc_processos.pc_processo_id NOT IN 
+                    (
+                        SELECT pc_processo_id 
+                        FROM pc_pesquisas    
+                    )
+                    <cfelse>
+                    WHERE pc_processos.pc_processo_id NOT IN 
+                    (
+                        SELECT pc_processo_id 
+                        FROM pc_pesquisas    
                 )
-                <cfelse>
-                WHERE pc_processos.pc_processo_id NOT IN 
-                (
-                    SELECT pc_processo_id 
-                    FROM pc_pesquisas    
-                )
+                </cfif>
+                <cfif arguments.mcuOrigem NEQ "Todos">
+                    AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                 </cfif>
 
                 UNION
@@ -187,18 +224,21 @@
                 INNER JOIN pc_processos 
                     ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
                 <cfif arguments.ano NEQ "Todos">
-                WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
-                AND pc_processos.pc_processo_id NOT IN 
-                (
-                    SELECT pc_processo_id 
-                    FROM pc_pesquisas 
-                )
-                <cfelse>
-                WHERE pc_processos.pc_processo_id NOT IN 
-                (
-                    SELECT pc_processo_id 
-                    FROM pc_pesquisas 
-                )
+                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                    AND pc_processos.pc_processo_id NOT IN 
+                    (
+                        SELECT pc_processo_id 
+                        FROM pc_pesquisas 
+                    )
+                    <cfelse>
+                    WHERE pc_processos.pc_processo_id NOT IN 
+                    (
+                        SELECT pc_processo_id 
+                        FROM pc_pesquisas 
+                    )
+                </cfif>
+                <cfif arguments.mcuOrigem NEQ "Todos">
+                    AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                 </cfif>
             ) AS unificado
         </cfquery>
