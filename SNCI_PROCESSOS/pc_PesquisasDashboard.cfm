@@ -1,6 +1,14 @@
+<cfprocessingdirective pageencoding = "utf-8">	
 <cfquery name="rsAnoDashboard" datasource="#application.dsn_processos#">
     SELECT DISTINCT RIGHT(pc_processo_id, 4) AS ano FROM pc_pesquisas ORDER BY ano DESC
 </cfquery>
+<cfquery name="rsOrgaosOrigem" datasource="#application.dsn_processos#">
+    SELECT pc_org_mcu, pc_org_sigla
+    FROM pc_orgaos 
+    WHERE pc_org_status = 'O'
+    ORDER BY pc_org_sigla
+</cfquery>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -13,6 +21,14 @@
     <style>
         #tabelaPesquisas th {
             font-size: smaller; /* Reduz o tamanho da fonte dos cabeçalhos */
+        }
+        
+        /* Estilo para os containers de filtro lado a lado */
+        .filtros-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 1.5rem;
         }
     </style>
    
@@ -35,14 +51,21 @@
 
                 <section class="content">
                     <div class="container-fluid">
-                        <!-- Filtro por ano com texto descritivo -->
-                        <div class="row mb-4">
-                            <div class="col-md-12">
-                                <div class="filtro-ano-container">
-                                    <div class="filtro-ano-label">Processos de:</div>
-                                    <div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons">
-                                        <!-- Botões gerados via JS -->
-                                    </div>
+                        <!-- Filtros agrupados em um container -->
+                        <div class="filtros-container">
+                            <!-- Filtro por ano -->
+                            <div class="filtro-ano-container">
+                                <div class="filtro-ano-label">Processos de:</div>
+                                <div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons">
+                                    <!-- Botões gerados via JS -->
+                                </div>
+                            </div>
+                            
+                            <!-- Novo filtro por órgão -->
+                            <div class="filtro-ano-container">
+                                <div class="filtro-ano-label">Órgão de origem:</div>
+                                <div id="opcoesMcu" class="btn-group btn-group-toggle" data-toggle="buttons">
+                                    <!-- Botões gerados via JS -->
                                 </div>
                             </div>
                         </div>
@@ -67,10 +90,10 @@
                                         <p>Índice de Respostas</p>
                                     </div>
                                     <div class="icon">
-                                        <i class="fas fa-chart-line"></i>
+                                        <i class="fas fa-percent"></i>
                                     </div>
                                     <p class="formula-text">
-                                        Fórmula: (Total Respondidas / Total Processos) × 100<br>
+                                        Fórmula: (Total Resp. / Total Proc. Acomp. ou Finaliz.) × 100<br>
                                         <span id="formulaDetalhes"></span>
                                     </p>
                                 </div>
@@ -301,6 +324,7 @@
                                             <th>ID</th>
                                             <th>Processo</th>
                                             <th>Órgão (MCU)</th>
+                                            <th>Órgão Origem</th>
                                             <th>Data Resp.</th>
                                             <th>Comunicação</th>
                                             <th>Interlocução</th>
@@ -342,6 +366,7 @@
             var tabela = $('#tabelaPesquisas').DataTable();
             var graficoMedia, graficoEvolucao;
             var anos = [];
+            var orgaos = [];
             var currentYear = new Date().getFullYear();
             
             // Obter cores das variáveis CSS para uso no JavaScript
@@ -360,7 +385,19 @@
             </cfoutput>
             if (anos.indexOf(currentYear) === -1) { anos.push(currentYear); }
             anos = anos.sort(function(a, b){ return a - b; }); // Modificado para ordem crescente
+            
+            // Preencher array com os órgãos da query rsOrgaosOrigem
+            <cfoutput query="rsOrgaosOrigem">
+                var sigla = "#rsOrgaosOrigem.pc_org_sigla#";
+                var mcu = "#rsOrgaosOrigem.pc_org_mcu#";
+                var ultimaParte = sigla.includes('/') ? sigla.split('/').pop() : sigla;
+                orgaos.push({
+                    mcu: mcu,
+                    sigla: ultimaParte
+                });
+            </cfoutput>
         
+            // Configuração do filtro de anos
             var radioName = "opcaoAno";
             $("#opcoesAno").empty();
             
@@ -384,8 +421,30 @@
             if (currentYear) {
                 $(`input[name="${radioName}"][value="${currentYear}"]`).parent().addClass('active');
             }
+            
+            // Configuração do filtro de órgãos
+            var radioMcu = "opcaoMcu";
+            $("#opcoesMcu").empty();
+            
+            // Adicionar botão "Todos" para os órgãos
+            var btnTodosMcu = `<label class="btn btn-outline-secondary btn-todos">
+                            <input type="radio" name="${radioMcu}" checked autocomplete="off" value="Todos"/> Todos
+                       </label>`;
+            $("#opcoesMcu").append(btnTodosMcu);
+            
+            // Adicionar botões para cada órgão
+            orgaos.forEach(function(orgao) {
+                var btn = `<label class="btn btn-outline-info" style="margin-left:2px;">
+                                <input type="radio" name="${radioMcu}" autocomplete="off" value="${orgao.mcu}"/> ${orgao.sigla}
+                           </label>`;
+                $("#opcoesMcu").append(btn);
+            });
+            
+            // Ativar o botão "Todos" para órgãos inicialmente
+            $(`input[name="${radioMcu}"][value="Todos"]`).parent().addClass('active');
         
             var anoSelecionado = currentYear;
+            var mcuSelecionado = "Todos";
         
             // Garantir que novos elementos também tenham tooltips
             function reiniciarTooltips() {
@@ -589,11 +648,18 @@
                 $("#mediaGeral").text(resultado.mediaGeral || '0');
                 $("#mediaGeralPontualidade").text((resultado.pontualidadePercentual || '0') + "%");
                 
-                // Modificar lógica do índice de respostas
-                if (parseInt(resultado.total) === 0 || parseInt(resultado.totalProcessos) === 0) {
-                    $("#indiceRespostas").text("Não há pesquisas respondidas").addClass('texto-menor');
+                // Lógica corrigida do índice de respostas
+                if (parseInt(resultado.totalProcessos) === 0) {
+                    // Não há processos para essa origem
+                    $("#indiceRespostas").text("Processos não localizados").addClass('texto-menor');
                     $(".formula-text").hide();
+                } else if (parseInt(resultado.total) === 0) {
+                    // Há processos, mas não há pesquisas respondidas (0%)
+                    $("#indiceRespostas").text("0%").removeClass('texto-menor');
+                    $("#formulaDetalhes").text(`Cálculo: (0 / ${parseInt(resultado.totalProcessos)}) × 100 = 0%`);
+                    $(".formula-text").show();
                 } else {
+                    // Há processos e pesquisas respondidas
                     const totalRespondidas = parseInt(resultado.total) || 0;
                     const totalProcessos = parseInt(resultado.totalProcessos) || 0;
                     const indice = ((totalRespondidas / totalProcessos) * 100).toFixed(1);
@@ -630,13 +696,16 @@
                 });
             }
         
-            function carregarDashboard(anoFiltro) {
+            function carregarDashboard(anoFiltro, mcuFiltro) {
                 var tabela = configurarDataTable();
                 // Primeiro carrega os dados das pesquisas
                 $.ajax({
                     url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getPesquisas&returnformat=json',
                     method: 'GET',
-                    data: { ano: anoFiltro },
+                    data: { 
+                        ano: anoFiltro,
+                        mcuOrigem: mcuFiltro 
+                    },
                     dataType: 'json',
                     success: function(data) {
                         if (data && data.DATA) {
@@ -652,6 +721,7 @@
                                     row[0],   // ID
                                     row[2],   // Processo
                                     row[3],   // órgao que respondeu
+                                    row[13],  // órgão origem (corrigido do índice 11 para 13)
                                     row[12],  // Data/Hora
                                     row[4],   // Comunicação
                                     row[5],   // Interlocução
@@ -660,7 +730,7 @@
                                     row[8],   // Pós-Trabalho
                                     row[9],   // Importância do Processo
                                     pontualidade, // Pontualidade como Sim/Não
-                                    media     // Média - última coluna, agora é índice 11
+                                    media     // Média
                                 ]);
                             });
                             tabela.draw();
@@ -672,7 +742,10 @@
                 $.ajax({
                     url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
                     method: 'GET',
-                    data: { ano: anoFiltro },
+                    data: { 
+                        ano: anoFiltro,
+                        mcuOrigem: mcuFiltro 
+                    },
                     dataType: 'json',
                     success: function(resultado) {
                         if (resultado) {
@@ -699,10 +772,18 @@
                 });
             }
         
-            carregarDashboard(anoSelecionado);
+            carregarDashboard(anoSelecionado, mcuSelecionado);
+            
+            // Handler para mudança de ano
             $("input[name='opcaoAno']").change(function() {
-                var novoAno = $(this).val();
-                carregarDashboard(novoAno);
+                anoSelecionado = $(this).val();
+                carregarDashboard(anoSelecionado, mcuSelecionado);
+            });
+            
+            // Handler para mudança de órgão
+            $("input[name='opcaoMcu']").change(function() {
+                mcuSelecionado = $(this).val();
+                carregarDashboard(anoSelecionado, mcuSelecionado);
             });
 
             // Script para nuvem de palavras
@@ -711,8 +792,9 @@
             
             // Função para carregar dados da nuvem de palavras
             function carregarNuvemPalavras() {
-                // Obter o ano selecionado dos botões de rádio em vez de um elemento que não existe
+                // Obter o ano e o mcu selecionados
                 const ano = $("input[name='opcaoAno']:checked").val();
+                const mcuOrigem = $("input[name='opcaoMcu']:checked").val();
                 const minFreq = $("#minFreq").val();
                 const maxWords = $("#maxWords").val();
                 
@@ -720,14 +802,12 @@
                 $("#loadingCloud").show();
                 $("#palavraInfo").hide();
                 
-                // Chamada AJAX para o CFC com verificação se o ano está definido
+                // Verificações e chamada AJAX
                 if (!ano) {
                     $("#wordCloud").html('<div class="alert alert-warning">Por favor, selecione um ano para visualizar a nuvem de palavras.</div>');
                     $("#loadingCloud").hide();
                     return;
                 }
-                
-               
                 
                 $.ajax({
                     url: "cfc/pc_cfcPesquisasDashboard.cfc?method=getWordCloud&returnformat=json",
@@ -735,11 +815,11 @@
                     dataType: "json",
                     data: {
                         ano: ano,
+                        mcuOrigem: mcuOrigem,
                         minFreq: minFreq,
                         maxWords: maxWords
                     },
                     success: function(response) {
-                                             
                         // Verificar se a resposta é válida
                         if (!response || typeof response !== 'object') {
                             $("#wordCloud").html('<div class="alert alert-warning">Resposta inválida do servidor.</div>');
@@ -842,9 +922,8 @@
                 carregarNuvemPalavras();
             });
             
-            // Evento de mudança de ano - recarregar nuvem
-            // Modificado para usar o seletor correto
-            $("input[name='opcaoAno']").change(function() {
+            // Evento de mudança de ano ou mcu - recarregar nuvem
+            $("input[name='opcaoAno'], input[name='opcaoMcu']").change(function() {
                 setTimeout(function() {
                     carregarNuvemPalavras();
                 }, 500);
@@ -918,7 +997,7 @@
                     url: "plugins/datatables/traducao.json"
                 },
                 columnDefs: [
-                    { className: "text-center", targets: [4, 5, 6, 7, 8, 9, 10, 11] }
+                    { className: "text-center", targets: [4, 5, 6, 7, 8, 9, 10, 11, 12] }
                 ]
             });
         }

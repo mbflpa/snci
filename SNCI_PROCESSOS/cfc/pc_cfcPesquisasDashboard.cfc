@@ -1,4 +1,5 @@
 <cfcomponent>
+    <cfprocessingdirective pageencoding = "utf-8">	
     <cffunction name="getPesquisas" access="remote" returntype="string" returnformat="json">
         <cfargument name="ano" type="string" required="true">
         <cfargument name="mcuOrigem" type="string" required="true">
@@ -22,9 +23,9 @@
             INNER JOIN pc_orgaos as orgaoResp ON pc_pesquisas.pc_org_mcu = orgaoResp.pc_org_mcu
             INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
             INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
-
+            WHERE orgaoOrigem.pc_org_status ='O'
             <cfif arguments.ano NEQ "Todos">
-                WHERE RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                AND RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
             <cfif arguments.mcuOrigem NEQ "Todos">
                 AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
@@ -55,11 +56,13 @@
                 COALESCE(CAST(AVG(CAST(pc_pesq_pontualidade AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_pontualidade
             FROM pc_pesquisas 
             INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
+            INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
+            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5) 
             <cfif arguments.ano NEQ "Todos">
-                WHERE RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                AND RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
             <cfif arguments.mcuOrigem NEQ "Todos">
-                AND pc_org_mcu = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
             </cfif>
         </cfquery>
     
@@ -70,11 +73,13 @@
                      pc_pesq_relatorio + pc_pesq_pos_trabalho + pc_pesq_importancia_processo) / 6.0) as media_geral
             FROM pc_pesquisas 
             INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
+            INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
+            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5)
             <cfif arguments.ano NEQ "Todos">
-                WHERE RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                AND RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
             <cfif arguments.mcuOrigem NEQ "Todos">
-                AND pc_org_mcu = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
             </cfif>
             GROUP BY FORMAT(pc_pesq_data_hora, 'yyyy-MM')
             ORDER BY mes
@@ -101,62 +106,55 @@
             SELECT COUNT(*) as total_respondidas
             FROM pc_pesquisas
             INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
+            INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
+            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5)
             <cfif arguments.ano NEQ "Todos">
-                WHERE RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                AND RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
             <cfif arguments.mcuOrigem NEQ "Todos">
-                AND pc_org_mcu = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
             </cfif>
         </cfquery>
         
-        <!--- Obter quantidade total de processos --->
+        <!--- Obter quantidade total de processos - Consulta corrigida --->
         <cfquery name="qryTotalProcessos" datasource="#application.dsn_processos#">
-            SELECT COUNT(DISTINCT processos_id) as total_processos
-            FROM (
-                SELECT DISTINCT pc_processos.pc_processo_id as processos_id
-                FROM pc_processos 
-                INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
+            WITH ProcessosUnicos AS (
+                -- Primeira parte: Processos com orientações
+                SELECT DISTINCT proc1.pc_processo_id
+                FROM pc_avaliacao_orientacoes orient
+                INNER JOIN pc_avaliacoes aval1
+                    ON orient.pc_aval_orientacao_num_aval = aval1.pc_aval_id
+                INNER JOIN pc_processos proc1
+                    ON aval1.pc_aval_processo = proc1.pc_processo_id
+                INNER JOIN pc_orgaos as orgaoOrigem1 ON proc1.pc_num_orgao_origem = orgaoOrigem1.pc_org_mcu
+                WHERE orgaoOrigem1.pc_org_status = 'O'AND proc1.pc_num_status IN(4,5)
                 <cfif arguments.ano NEQ "Todos">
-                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                    AND RIGHT(proc1.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
                 </cfif>
                 <cfif arguments.mcuOrigem NEQ "Todos">
-                    AND pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                    AND proc1.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                 </cfif>
 
                 UNION
 
-                SELECT DISTINCT processos_id
-                FROM (
-                    SELECT DISTINCT pc_processos.pc_processo_id as processos_id
-                    FROM pc_avaliacao_orientacoes
-                    INNER JOIN pc_avaliacoes 
-                        ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
-                    INNER JOIN pc_processos 
-                        ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
-                   
-                    <cfif arguments.ano NEQ "Todos">
-                        WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-                    </cfif>
-                    <cfif arguments.mcuOrigem NEQ "Todos">
-                        AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
-                    </cfif>
-
-                    UNION
-
-                    SELECT DISTINCT pc_processos.pc_processo_id
-                    FROM pc_avaliacao_melhorias
-                    INNER JOIN pc_avaliacoes 
-                        ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
-                    INNER JOIN pc_processos 
-                        ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
-                    <cfif arguments.ano NEQ "Todos">
-                        WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-                    </cfif>
-                    <cfif arguments.mcuOrigem NEQ "Todos">
-                        AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
-                    </cfif>
-                ) AS subquery
-            ) AS unificado
+                -- Segunda parte: Processos com melhorias
+                SELECT DISTINCT proc2.pc_processo_id
+                FROM pc_avaliacao_melhorias melh
+                INNER JOIN pc_avaliacoes aval2
+                    ON melh.pc_aval_melhoria_num_aval = aval2.pc_aval_id
+                INNER JOIN pc_processos proc2
+                    ON aval2.pc_aval_processo = proc2.pc_processo_id
+                INNER JOIN pc_orgaos as orgaoOrigem2 ON proc2.pc_num_orgao_origem = orgaoOrigem2.pc_org_mcu
+                WHERE orgaoOrigem2.pc_org_status = 'O'AND proc2.pc_num_status IN(4,5)
+                <cfif arguments.ano NEQ "Todos">
+                    AND RIGHT(proc2.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                </cfif>
+                <cfif arguments.mcuOrigem NEQ "Todos">
+                    AND proc2.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                </cfif>
+            )
+            SELECT COUNT(DISTINCT pc_processo_id) as total_processos
+            FROM ProcessosUnicos
         </cfquery>
 
         <!--- Montar estrutura de retorno --->
@@ -191,56 +189,48 @@
         <cfquery name="rsProcSemPesquisa" datasource="#application.dsn_processos#" timeout="120">
             SELECT COUNT(DISTINCT processos_id) as total_sem_pesquisa 
             FROM (
-                SELECT DISTINCT pc_processos.pc_processo_id as processos_id
-                FROM pc_avaliacao_orientacoes
-                INNER JOIN pc_avaliacoes 
-                    ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
-                INNER JOIN pc_processos 
-                    ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                -- Processos com orientações sem pesquisa
+                SELECT proc1.pc_processo_id as processos_id
+                FROM pc_avaliacao_orientacoes orient
+                INNER JOIN pc_avaliacoes aval1 
+                    ON orient.pc_aval_orientacao_num_aval = aval1.pc_aval_id
+                INNER JOIN pc_processos proc1
+                    ON aval1.pc_aval_processo = proc1.pc_processo_id
+                INNER JOIN pc_orgaos as orgaoOrigem1 ON proc1.pc_num_orgao_origem = orgaoOrigem1.pc_org_mcu
+                WHERE orgaoOrigem1.pc_org_status ='O' AND proc1.pc_num_status IN(4,5) AND proc1.pc_processo_id NOT IN 
+                    (
+                        SELECT pc_processo_id 
+                        FROM pc_pesquisas    
+                    )    
                 <cfif arguments.ano NEQ "Todos">
-                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
-                    AND pc_processos.pc_processo_id NOT IN 
-                    (
-                        SELECT pc_processo_id 
-                        FROM pc_pesquisas    
-                    )
-                    <cfelse>
-                    WHERE pc_processos.pc_processo_id NOT IN 
-                    (
-                        SELECT pc_processo_id 
-                        FROM pc_pesquisas    
-                )
+                    AND RIGHT(proc1.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
                 </cfif>
                 <cfif arguments.mcuOrigem NEQ "Todos">
-                    AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                    AND proc1.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                 </cfif>
 
                 UNION
 
-                SELECT DISTINCT pc_processos.pc_processo_id
-                FROM pc_avaliacao_melhorias
-                INNER JOIN pc_avaliacoes 
-                    ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
-                INNER JOIN pc_processos 
-                    ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                -- Processos com melhorias sem pesquisa
+                SELECT proc2.pc_processo_id
+                FROM pc_avaliacao_melhorias melh
+                INNER JOIN pc_avaliacoes aval2
+                    ON melh.pc_aval_melhoria_num_aval = aval2.pc_aval_id
+                INNER JOIN pc_processos proc2
+                    ON aval2.pc_aval_processo = proc2.pc_processo_id
+                INNER JOIN pc_orgaos as orgaoOrigem2 ON proc2.pc_num_orgao_origem = orgaoOrigem2.pc_org_mcu
+                WHERE orgaoOrigem2.pc_org_status ='O' AND proc2.pc_num_status IN(4,5) AND proc2.pc_processo_id NOT IN  
+                    (
+                        SELECT pc_processo_id 
+                        FROM pc_pesquisas 
+                    )
                 <cfif arguments.ano NEQ "Todos">
-                    WHERE RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
-                    AND pc_processos.pc_processo_id NOT IN 
-                    (
-                        SELECT pc_processo_id 
-                        FROM pc_pesquisas 
-                    )
-                    <cfelse>
-                    WHERE pc_processos.pc_processo_id NOT IN 
-                    (
-                        SELECT pc_processo_id 
-                        FROM pc_pesquisas 
-                    )
+                    AND RIGHT(proc2.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">                  
                 </cfif>
                 <cfif arguments.mcuOrigem NEQ "Todos">
-                    AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                    AND proc2.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                 </cfif>
-            ) AS unificado
+            ) AS processos_sem_pesquisa
         </cfquery>
 
         <cfreturn rsProcSemPesquisa.total_sem_pesquisa>
@@ -257,22 +247,27 @@
 
     <cffunction name="getWordCloud" access="remote" returntype="string" returnformat="json" hint="Retorna a nuvem de palavras das observações das pesquisas">
         <cfargument name="ano" type="string" required="true">
+        <cfargument name="mcuOrigem" type="string" required="true">
         <cfargument name="minFreq" type="numeric" required="false" default="2">
         <cfargument name="maxWords" type="numeric" required="false" default="100">
         
-        <cfset var stopWords = "a,à,ao,aos,aquela,aquelas,aquele,aqueles,aquilo,as,às,até,com,como,da,das,de,dela,delas,dele,deles,depois,do,dos,e,é,ela,elas,ele,eles,em,entre,era,eram,éramos,essa,essas,esse,esses,esta,está,estamos,estão,estas,estava,estavam,este,esteja,estejam,estejamos,estes,esteve,estive,estivemos,estiver,estivera,estiveram,estiverem,estivermos,estou,eu,foi,fomos,for,fora,foram,fôramos,forem,formos,fosse,fossem,fôssemos,fui,há,haja,hajam,hajamos,hão,havemos,havia,hei,houve,houvemos,houver,houvera,houverá,houveram,houvéramos,houverão,houverei,houverem,houveremos,houveriam,houveríamos,houvermos,houvesse,houvessem,houvéssemos,isso,isto,já,lhe,lhes,mais,mas,me,mesmo,meu,meus,minha,minhas,muito,na,não,nas,nem,nenhum,nessa,nessas,nesta,nestas,no,nos,nós,nossa,nossas,nosso,nossos,num,numa,o,os,ou,para,pela,pelas,pelo,pelos,por,qual,quando,que,quem,são,se,seja,sejam,sejamos,sem,será,serão,serei,seremos,seria,seriam,seríamos,seu,seus,só,somos,sou,sua,suas,também,te,tem,tém,temos,tenha,tenham,tenhamos,tenho,terá,terão,terei,teremos,teria,teriam,teríamos,teu,teus,teve,tinha,tinham,tínhamos,tive,tivemos,tiver,tivera,tiveram,tivéramos,tiverem,tivermos,tivesse,tivessem,tivéssemos,toda,todas,todo,todos,tu,tua,tuas,um,uma,você,vocês,vos">
+        <cfset var stopWords = "a,à,ao,aos,aquela,aquelas,aquele,aqueles,aquilo,as,às,até,com,como,da,das,de,dela,delas,dele,deles,depois,do,dos,e,é,ela,elas,ele,eles,em,entre,era,eram,éramos,essa,essas,esse,esses,esta,está,estamos,estão,estas,estava,estavam,este,esteja,estejam,estejamos,estes,esteve,estive,estivemos,estiver,estivera,estiveram,estiverem,estivermos,estou,eu,foi,fomos,for,fora,foram,fôramos,forem,formos,fosse,fossem,fôssemos,fui,há,haja,hajam,hajamos,hão,havemos,havia,hei,houve,houvemos,houver,houvera,houveram,houvéramos,houverão,houverei,houverem,houveremos,houveriam,houveríamos,houvermos,houvesse,houvessem,houvéssemos,isso,isto,já,lhe,lhes,mais,mas,me,mesmo,meu,meus,minha,minhas,muito,na,não,nas,nem,nenhum,nessa,nessas,nesta,nestas,no,nos,nós,nossa,nossas,nosso,nossos,num,numa,o,os,ou,para,pela,pelas,pelo,pelos,por,qual,quando,que,quem,são,se,seja,sejam,sejamos,sem,será,serão,serei,seremos,seria,seriam,seríamos,seu,seus,só,somos,sou,sua,suas,também,te,tem,tém,temos,tenha,tenham,tenhamos,tenho,terá,terão,terei,teremos,teria,teriam,teríamos,teu,teus,teve,tinha,tinham,tínhamos,tive,tivemos,tiver,tivera,tiveram,tivéramos,tiverem,tivermos,tivesse,tivessem,tivéssemos,toda,todas,todo,todos,tu,tua,tuas,um,uma,você,vocês,vos">
         
-        <!--- Corrigida a consulta para não usar TRIM diretamente na coluna TEXT --->
+        <!--- Consulta completamente reformulada para evitar problemas de alias --->
         <cfquery name="qObservacoes" datasource="#application.dsn_processos#">
             SELECT pc_pesq_observacao
-            FROM pc_pesquisas
+            FROM pc_pesquisas 
+            WHERE pc_pesq_observacao IS NOT NULL
+            AND DATALENGTH(pc_pesq_observacao) > 0
             <cfif arguments.ano NEQ "Todos">
-                WHERE RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-                AND pc_pesq_observacao IS NOT NULL
-                AND DATALENGTH(pc_pesq_observacao) > 0
-            <cfelse>
-                WHERE pc_pesq_observacao IS NOT NULL
-                AND DATALENGTH(pc_pesq_observacao) > 0
+                AND RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif arguments.mcuOrigem NEQ "Todos">
+                AND pc_processo_id IN (
+                    SELECT pc_processo_id 
+                    FROM pc_processos
+                    WHERE pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                )
             </cfif>
         </cfquery>
         
