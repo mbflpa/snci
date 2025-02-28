@@ -627,3 +627,480 @@ td {
   background-color: #495057 !important;
   border-color: #343a40 !important;
 }
+
+/* Estilos para o sistema de abas moderno */
+.nav-dashboard-tabs {
+  display: flex;
+  border-bottom: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  flex-wrap: nowrap;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  position: relative;
+  background: #fff;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.nav-dashboard-tabs::-webkit-scrollbar {
+  height: 3px;
+}
+
+.nav-dashboard-tabs::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.nav-dashboard-tabs .nav-item {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.nav-dashboard-tabs .nav-link {
+  border: none;
+  color: #6c757d;
+  font-weight: 500;
+  padding: 1.2rem 1.8rem;
+  position: relative;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  border-radius: 0;
+}
+
+.nav-dashboard-tabs .nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: transparent;
+  transform: scaleX(0.7);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.nav-dashboard-tabs .nav-link:hover {
+  color: #212529;
+}
+
+.nav-dashboard-tabs .nav-link.active {
+  color: var(--cor-bg-primary);
+  background: transparent;
+  border: none;
+}
+
+.nav-dashboard-tabs .nav-link.active::after {
+  background-color: var(--cor-bg-primary);
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.dashboard-tab-content {
+  background-color: #fff;
+  border-radius: 0 0 8px 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  min-height: 400px;
+  margin-bottom: 2rem;
+}
+
+.dashboard-tab-content > .tab-pane {
+  animation: fadeEffect 0.5s;
+}
+
+@keyframes fadeEffect {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ajustar o espaço para os ícones nas abas sem os indicadores */
+.nav-dashboard-tabs .nav-link i {
+  margin-right: 10px; /* Aumentado ligeiramente para compensar a remoção dos indicadores */
+  font-size: 1.1rem; /* Aumentado ligeiramente para melhor visibilidade */
+  vertical-align: text-bottom;
+  transition: transform 0.2s ease;
+}
+
+/* Ícones nas abas */
+.nav-dashboard-tabs .nav-link i {
+  margin-right: 8px;
+  font-size: 1rem;
+  vertical-align: text-bottom;
+  transition: transform 0.2s ease;
+}
+
+.nav-dashboard-tabs .nav-link:hover i,
+.nav-dashboard-tabs .nav-link.active i {
+  transform: scale(1.2);
+}
+
+/* Contador nas abas */
+.item-count {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  margin-left: 6px;
+  color: #6c757d;
+}
+
+.nav-link.active .item-count {
+  background: rgba(0, 123, 255, 0.1);
+  color: var(--cor-bg-primary);
+}
+
+/* Controles de navegação para telas menores */
+.tabs-controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: none;
+  z-index: 10;
+}
+
+@media (max-width: 768px) {
+  .tabs-controls {
+    display: flex;
+  }
+
+  .nav-dashboard-tabs {
+    padding-right: 70px;
+  }
+
+  .nav-dashboard-tabs .nav-link {
+    padding: 1rem 1.2rem;
+    font-size: 0.85rem;
+  }
+}
+
+.tab-control {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin: 5px;
+  transition: all 0.2s ease;
+}
+
+.tab-control:hover {
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  color: var(--cor-bg-primary);
+}
+
+/* Ajustes específicos para o conteúdo das abas */
+.tab-pane .score-cards {
+  grid-template-columns: repeat(
+    3,
+    1fr
+  ) !important; /* Forçar 3 cards por linha na aba de avaliações */
+  gap: 1rem;
+}
+
+@media (max-width: 991px) {
+  .tab-pane .score-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .tab-pane .score-cards {
+    grid-template-columns: repeat(1, 1fr) !important;
+  }
+}
+
+/* Remover qualquer estilo item-count que não queremos mais */
+.item-count {
+  display: none !important;
+}
+
+/* Ajustes para os gráficos nas abas */
+.tab-pane .card-body canvas {
+  height: 300px !important; /* Altura fixa para os gráficos */
+  width: 100% !iant;
+}
+
+/* Garantir que os cards de gráficos tenham altura adequada */
+.tab-pane .card {
+  height: 100%;
+  margin-bottom: 1.5rem;
+}
+
+/* Ajuste especial para evitar sobreposições na exibição da tabela */
+#listagem .table-responsive {
+  margin-top: 0 !important;
+}
+
+/* Melhorar a visualização da tabela dentro da aba */
+#listagem .table {
+  margin-bottom: 0;
+}
+
+/* Separador entre os primeiros cards e as abas */
+.dashboard-divider {
+  margin: 1.5rem 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0)
+  );
+}
+
+/* Ajustes para garantir que o container da nuvem de palavras tenha dimensões adequadas */
+.word-cloud-container {
+  min-height: 400px !important;
+  min-width: 300px !important;
+}
+
+/* Garantir que as abas tenham altura mínima adequada, mesmo quando ocultas */
+.tab-pane {
+  min-height: 200px;
+}
+
+/* Correção para tabs do Bootstrap que podem interferir na renderização */
+.tab-content > .tab-pane.active {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Melhorar a visibilidade das palavras na nuvem */
+.jqcloud-word {
+  text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* Indicador de carregamento para a nuvem */
+#loadingCloud {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.8);
+  padding: 15px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 5;
+}
+
+/* Estilos para os controles de filtro da nuvem de palavras */
+#nuvem-palavras .form-control-sm {
+  width: 70px;
+  text-align: center;
+  display: inline-block;
+}
+
+#nuvem-palavras .form-row {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+#nuvem-palavras label {
+  margin-bottom: 0;
+  font-weight: 500;
+  color: #495057;
+}
+
+#atualizarNuvem {
+  transition: all 0.3s ease;
+}
+
+#atualizarNuvem:hover {
+  transform: scale(1.05);
+}
+
+#atualizarNuvem .fa-sync-alt {
+  transition: transform 0.3s ease;
+}
+
+#atualizarNuvem:hover .fa-sync-alt {
+  transform: rotate(180deg);
+}
+
+/* Estilo adicional para a exibição de detalhes das palavras */
+.palavra-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+  border-left: 4px solid var(--cor-interlocucao);
+}
+
+.palavra-selecionada {
+  margin: 0;
+  color: var(--cor-interlocucao);
+}
+
+/* Estilo para o card explicativo da nuvem de palavras */
+#nuvem-palavras .card-title.text-primary {
+  color: var(--cor-bg-primary) !important;
+  display: flex;
+  align-items: center;
+}
+
+#nuvem-palavras .card-title i {
+  margin-right: 10px;
+}
+
+#nuvem-palavras .card.mb-4 {
+  background-color: #f8fcff;
+  border-left: 4px solid var(--cor-bg-primary);
+}
+
+#nuvem-palavras .card.mb-4 .card-body {
+  padding: 1.25rem;
+}
+
+#nuvem-palavras .text-muted {
+  font-style: italic;
+}
+
+/* Melhorar o layout da tabela na aba listagem */
+#tabelaPesquisas {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+#tabelaPesquisas thead th {
+  white-space: nowrap;
+  vertical-align: middle;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  z-index: 10;
+}
+
+#tabelaPesquisas td {
+  vertical-align: middle;
+}
+
+/* Estilos aprimorados para a área de detalhes da palavra na nuvem */
+.palavra-info {
+  border-left: 4px solid var(--cor-interlocucao);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.palavra-info .card-header {
+  background-color: rgba(111, 66, 193, 0.05);
+  border-bottom: 1px solid rgba(111, 66, 193, 0.2);
+}
+
+.palavra-info #palavraTitulo {
+  color: var(--cor-interlocucao);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.palavra-info .card-body {
+  background-color: #fff;
+}
+
+.palavra-info p strong {
+  color: #495057;
+}
+
+.palavra-info #palavraTexto {
+  font-weight: 600;
+  color: var(--cor-interlocucao);
+}
+
+.palavra-info #palavraFreq,
+.palavra-info #palavraRelevancia {
+  font-weight: 600;
+}
+
+/* Ajustes para a tabela de dados na aba listagem */
+#tabelaPesquisas {
+  width: 100% !important;
+  font-size: 0.85rem;
+}
+
+#tabelaPesquisas thead th {
+  white-space: nowrap;
+  font-weight: 600;
+  vertical-align: middle;
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 0.75rem;
+}
+
+#tabelaPesquisas td {
+  vertical-align: middle;
+  padding: 0.5rem 0.75rem;
+}
+
+/* Destacar a coluna de média */
+#tabelaPesquisas td:last-child,
+#tabelaPesquisas th:last-child {
+  background-color: rgba(0, 123, 255, 0.05);
+  font-weight: 600;
+}
+
+/* Melhorar o status de carregamento da tabela */
+.dataTables_processing {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: var(--cor-bg-primary) !important;
+  border: none !important;
+  border-radius: 4px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Melhorar o card explicativo na nuvem de palavras */
+#nuvem-palavras .card.mb-4 {
+  background-color: #f8fcff;
+  border-left: 4px solid var(--cor-bg-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+#nuvem-palavras .card.mb-4 .card-body {
+  padding: 1.25rem;
+}
+
+#nuvem-palavras .card-title.text-primary {
+  color: var(--cor-bg-primary) !important;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+#nuvem-palavras .text-muted {
+  font-style: italic;
+  margin-top: 0.75rem;
+}
+
+/* Garantir que a nuvem de palavras esteja claramente visível */
+.jqcloud {
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+
+.jqcloud-word {
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.jqcloud-word:hover {
+  transform: scale(1.15);
+  z-index: 100;
+}
