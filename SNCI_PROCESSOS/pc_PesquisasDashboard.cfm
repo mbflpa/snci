@@ -1,13 +1,26 @@
 <cfprocessingdirective pageencoding = "utf-8">	
 <cfquery name="rsAnoDashboard" datasource="#application.dsn_processos#">
-    SELECT DISTINCT RIGHT(pc_processo_id, 4) AS ano FROM pc_pesquisas ORDER BY ano DESC
+    SELECT DISTINCT RIGHT(pc_processo_id, 4) AS ano FROM pc_processos 
+    WHERE pc_num_status IN(4,5) and RIGHT(pc_processo_id, 4) >= '#application.anoPesquisaOpiniao#'
+    <cfif application.rsUsuarioParametros.pc_usu_perfil eq 8>
+        AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+    </cfif>
+    ORDER BY ano 
 </cfquery>
 <cfquery name="rsOrgaosOrigem" datasource="#application.dsn_processos#">
     SELECT pc_org_mcu, pc_org_sigla
     FROM pc_orgaos 
     WHERE pc_org_status = 'O'
+    <cfif application.rsUsuarioParametros.pc_usu_perfil eq 8>
+        AND pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#'
+    </cfif>
     ORDER BY pc_org_sigla
 </cfquery>
+
+<cfset mostrarFiltroOrgao = application.rsUsuarioParametros.pc_usu_perfil neq 8>
+<cfif NOT mostrarFiltroOrgao AND rsOrgaosOrigem.recordCount GT 0>
+    <cfset orgaoOrigemSelecionado = rsOrgaosOrigem.pc_org_mcu>
+</cfif>
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -78,13 +91,15 @@
                                 </div>
                             </div>
                             
-                            <!-- Novo filtro por órgão -->
-                            <div class="filtro-ano-container">
-                                <div class="filtro-ano-label">Órgão de origem:</div>
-                                <div id="opcoesMcu" class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <!-- Botões gerados via JS -->
+                            <!-- Filtro por órgão - exibido conforme perfil do usuário -->
+                            <cfif mostrarFiltroOrgao>
+                                <div class="filtro-ano-container">
+                                    <div class="filtro-ano-label">Órgão de origem:</div>
+                                    <div id="opcoesMcu" class="btn-group btn-group-toggle" data-toggle="buttons">
+                                        <!-- Botões gerados via JS -->
+                                    </div>
                                 </div>
-                            </div>
+                            </cfif>
                         </div>
 
                         <!-- Cards de métricas -->
@@ -227,8 +242,8 @@
     </div>
     <cfinclude template="includes/pc_sidebar.cfm">
 
-    <!-- Modal de carregamento -->
-    <div class="modal fade" id="modalOverlay" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Modal de carregamento - Corrigido para acessibilidade -->
+    <div class="modal fade" id="modalOverlay" tabindex="-1" role="dialog" aria-hidden="true" aria-labelledby="modalOverlayLabel">
       <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
         <div class="modal-content">
           <div class="modal-body text-center p-4">
@@ -247,8 +262,9 @@
     <script>
         $(document).ready(function() {
             // Registrar o plugin globalmente
-        window.ChartDataLabels = ChartDataLabels;
-        Chart.plugins.unregister(ChartDataLabels);  // Primeiro desregistramos para evitar duplicação
+            window.ChartDataLabels = ChartDataLabels;
+            Chart.plugins.unregister(ChartDataLabels);  // Primeiro desregistramos para evitar duplicação
+            
             // Inicializar tooltips com configurações avançadas
             $('[data-toggle="tooltip"]').tooltip({
                 container: 'body',
@@ -265,8 +281,34 @@
             <cfoutput query="rsAnoDashboard">
                 anos.push(parseInt("#rsAnoDashboard.ano#", 10));
             </cfoutput>
-            if (anos.indexOf(currentYear) === -1) { anos.push(currentYear); }
-            anos = anos.sort(function(a, b){ return a - b; });
+            
+            // Ordena os anos em ordem crescente
+            anos = anos.sort(function(a, b){ return a - b; }); // Ordem crescente
+            
+            // Configuração do filtro de anos
+            var radioName = "opcaoAno";
+            $("#opcoesAno").empty();
+            
+            // Adicionar botão "Todos" antes dos anos específicos
+            var btnTodos = `<label class="btn btn-outline-secondary btn-todos">
+                            <input type="radio" name="${radioName}" autocomplete="off" value="Todos"/> Todos
+                       </label>`;
+            $("#opcoesAno").append(btnTodos);
+            
+            // Defina o ano selecionado como o último ano (mais recente) da consulta
+            var anoSelecionado = anos.length > 0 ? anos[anos.length - 1] : (currentYear - 1);
+            
+            anos.forEach(function(val) {
+                var btnClass = "btn-outline-primary";
+                var checked = (val === anoSelecionado) ? 'checked' : '';
+                var btn = `<label class="btn ${btnClass}" style="margin-left:2px;">
+                                <input type="radio" name="${radioName}" ${checked} autocomplete="off" value="${val}"/> ${val}
+                           </label>`;
+                $("#opcoesAno").append(btn);
+            });
+
+            // Ativar o botão do ano selecionado
+            $(`input[name="${radioName}"][value="${anoSelecionado}"]`).parent().addClass('active');
             
             // Preencher array com os órgãos da query rsOrgaosOrigem
             <cfoutput query="rsOrgaosOrigem">
@@ -279,55 +321,37 @@
                 });
             </cfoutput>
         
-            // Configuração do filtro de anos
-            var radioName = "opcaoAno";
-            $("#opcoesAno").empty();
-            
-            // Adicionar botão "Todos" antes dos anos específicos
-            var btnTodos = `<label class="btn btn-outline-secondary btn-todos">
-                            <input type="radio" name="${radioName}" autocomplete="off" value="Todos"/> Todos
-                       </label>`;
-            $("#opcoesAno").append(btnTodos);
-            
-            anos.forEach(function(val) {
-                var isCurrent = (val === currentYear);
-                var btnClass = "btn-outline-primary";
-                var checked = isCurrent ? 'checked' : '';
-                var btn = `<label class="btn ${btnClass}" style="margin-left:2px;">
-                                <input type="radio" name="${radioName}" ${checked} autocomplete="off" value="${val}"/> ${val}
+            // Configuração do filtro de órgãos - somente se o perfil permitir
+            <cfif mostrarFiltroOrgao>
+                var radioMcu = "opcaoMcu";
+                $("#opcoesMcu").empty();
+                
+                // Adicionar botão "Todos" para os órgãos
+                var btnTodosMcu = `<label class="btn btn-outline-secondary btn-todos">
+                                <input type="radio" name="${radioMcu}" checked autocomplete="off" value="Todos"/> Todos
                            </label>`;
-                $("#opcoesAno").append(btn);
-            });
-
-            // Ativar o botão do ano atual após a geração
-            if (currentYear) {
-                $(`input[name="${radioName}"][value="${currentYear}"]`).parent().addClass('active');
-            }
+                $("#opcoesMcu").append(btnTodosMcu);
+                
+                // Adicionar botões para cada órgão
+                orgaos.forEach(function(orgao) {
+                    var btn = `<label class="btn btn-outline-info" style="margin-left:2px;">
+                                    <input type="radio" name="${radioMcu}" autocomplete="off" value="${orgao.mcu}"/> ${orgao.sigla}
+                               </label>`;
+                    $("#opcoesMcu").append(btn);
+                });
+                
+                // Ativar o botão "Todos" para órgãos inicialmente
+                $(`input[name='opcaoMcu'][value='Todos']`).parent().addClass('active');
+                
+                var mcuSelecionado = "Todos";
+            <cfelse>
+                // Se o usuário tem perfil 8, define o MCU diretamente
+                var mcuSelecionado = "<cfoutput>#orgaoOrigemSelecionado#</cfoutput>";
+            </cfif>
             
-            // Configuração do filtro de órgãos
-            var radioMcu = "opcaoMcu";
-            $("#opcoesMcu").empty();
-            
-            // Adicionar botão "Todos" para os órgãos
-            var btnTodosMcu = `<label class="btn btn-outline-secondary btn-todos">
-                            <input type="radio" name="${radioMcu}" checked autocomplete="off" value="Todos"/> Todos
-                       </label>`;
-            $("#opcoesMcu").append(btnTodosMcu);
-            
-            // Adicionar botões para cada órgão
-            orgaos.forEach(function(orgao) {
-                var btn = `<label class="btn btn-outline-info" style="margin-left:2px;">
-                                <input type="radio" name="${radioMcu}" autocomplete="off" value="${orgao.mcu}"/> ${orgao.sigla}
-                           </label>`;
-                $("#opcoesMcu").append(btn);
-            });
-            
-            // Ativar o botão "Todos" para órgãos inicialmente
-            $(`input[name='opcaoMcu'][value='Todos']`).parent().addClass('active');
+            // Tornar a variável mcuSelecionado disponível globalmente
+            window.mcuSelecionado = mcuSelecionado;
         
-            var anoSelecionado = currentYear;
-            var mcuSelecionado = "Todos";
-
             // Função helper para scroll adaptado ao AdminLTE
             window.scrollToElement = function(targetElement, offset) {
                 var $scrollContainer = $('.content-wrapper');
@@ -337,7 +361,7 @@
                 $scrollContainer.animate({
                     scrollTop: scrollPosition
                 }, 500);
-            }
+            };
 
             // Variável para controlar se os componentes já foram carregados
             var componentesCarregados = {
@@ -420,7 +444,7 @@
                                     // Carrega a nuvem de palavras
                                     if (typeof window.carregarNuvemPalavras === 'function') {
                                         setTimeout(function() {
-                                            window.carregarNuvemPalavras();
+                                            window.carregarNuvemPalavras(anoSelecionado, mcuSelecionado);
                                         }, 300);
                                     }
                                     break;
@@ -473,7 +497,7 @@
                             break;
                         case 'nuvemPalavras':
                             if (typeof window.carregarNuvemPalavras === 'function') {
-                                window.carregarNuvemPalavras();
+                                window.carregarNuvemPalavras(anoSelecionado, mcuSelecionado);
                             }
                             break;
                         case 'listagem':
@@ -524,6 +548,9 @@
             // Função melhorada para garantir o fechamento do modal
             function fecharModalComSeguranca() {
                 try {
+                    // Mover o foco para um elemento externo para evitar o problema de acessibilidade
+                    document.querySelector('.content-header h1').focus();
+                    
                     // Primeiro tenta fechar o modal de maneira convencional
                     $('#modalOverlay').modal('hide');
                     
@@ -531,13 +558,15 @@
                     setTimeout(function() {
                         // Se o modal ainda estiver visível ou com classes modal-open
                         if ($('#modalOverlay').is(':visible') || $('body').hasClass('modal-open')) {
-                          
                             // Remove manualmente as classes e elementos do modal
                             $('.modal-backdrop').remove();
                             $('body').removeClass('modal-open');
                             $('body').css('padding-right', '');
                             $('#modalOverlay').removeClass('show');
                             $('#modalOverlay').css('display', 'none');
+                            
+                            // Remover aria-hidden explicitamente para evitar o problema de acessibilidade
+                            $('#modalOverlay').removeAttr('aria-hidden');
                         }
                     }, 500);
                 } catch (e) {
@@ -547,10 +576,21 @@
                     $('.modal-backdrop').remove();
                     $('body').removeClass('modal-open');
                     $('#modalOverlay').hide();
+                    $('#modalOverlay').removeAttr('aria-hidden');
+                    
+                    // Garantir que o foco vá para um elemento acessível
+                    document.querySelector('.content-header h1').focus();
                 }
             }
         
             function carregarDashboard(anoFiltro, mcuFiltro) {
+                // Certificar que mcuFiltro não é undefined ou null
+                if (mcuFiltro === undefined || mcuFiltro === null) {
+                    console.warn("mcuFiltro não definido em carregarDashboard, usando valor padrão", mcuSelecionado);
+                    mcuFiltro = mcuSelecionado;
+                }
+
+                              
                 // Mostrar modal de carregamento
                 try {
                     $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
@@ -612,6 +652,9 @@
                 } else if ($("#listagem").hasClass('active')) {
                     carregarComponente('listagem');
                 }
+                
+                // Atualizar a variável global
+                window.mcuSelecionado = mcuFiltro;
             }
             
             // Carregar o componente inicial (Avaliações)
@@ -632,17 +675,19 @@
                 });
             });
             
-            // Handler para mudança de órgão
-            $("input[name='opcaoMcu']").change(function() {
-                mcuSelecionado = $(this).val();
-                carregarDashboard(anoSelecionado, mcuSelecionado);
-                
-                // Disparar evento global de mudança de filtro
-                $(document).trigger('filtroAlterado', {
-                    tipo: 'mcu',
-                    valor: mcuSelecionado
+            <cfif mostrarFiltroOrgao>
+                // Handler para mudança de órgão (apenas se o filtro estiver visível)
+                $("input[name='opcaoMcu']").change(function() {
+                    mcuSelecionado = $(this).val();
+                    carregarDashboard(anoSelecionado, mcuSelecionado);
+                    
+                    // Disparar evento global de mudança de filtro
+                    $(document).trigger('filtroAlterado', {
+                        tipo: 'mcu',
+                        valor: mcuSelecionado
+                    });
                 });
-            });
+            </cfif>
 
             // Script para gerenciar as abas do Dashboard de Pesquisas
             $('.nav-dashboard-tabs .nav-link:first').tab('show');
@@ -710,15 +755,13 @@
                     const hasOverflow = tabsContainer.scrollWidth > tabsContainer.clientWidth;
                     
                     if (hasOverflow) {
-                        $('.tabs-controls').show(); // Corrigido o seletor (removido o ponto extra)
+                        $('.tabs-controls').show();
                     } else {
-                        $('.tabs-controls').hide(); // Corrigido o seletor (removido o ponto extra)
+                        $('.tabs-controls').hide();
                     }
                 }
             }
-
         });
-
     </script>
 </body>
 </html>

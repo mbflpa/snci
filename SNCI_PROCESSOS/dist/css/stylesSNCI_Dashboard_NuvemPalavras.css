@@ -93,3 +93,49 @@
     align-self: flex-end;
   }
 }
+
+/* Estilos específicos para a nuvem de palavras */
+
+/* Estilos para garantir a mesma altura dos cards */
+.card-same-height {
+  height: 100%;
+}
+
+.card-body-flex {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+}
+
+/* Estilos para a área da nuvem */
+#nuvem {
+  position: relative;
+}
+
+.jqcloud {
+  font-family: "Helvetica", "Arial", sans-serif;
+}
+
+.jqcloud-word {
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.jqcloud-word:hover {
+  transform: scale(1.2);
+  opacity: 0.9;
+}
+
+/* Estilos para controles da nuvem */
+#minFreqSlider,
+#maxWordsSlider {
+  cursor: pointer;
+}
+
+/* Estilos para mensagens de loading e erros */
+#nuvem .text-center {
+  padding: 2rem;
+}

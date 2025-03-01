@@ -1,280 +1,251 @@
 <cfprocessingdirective pageencoding = "utf-8">
 <link rel="stylesheet" href="dist/css/stylesSNCI_Dashboard_NuvemPalavras.css">
 
-<div class="card">
-  <div class="card-header">
-    <h5 class="card-title">Palavras mais frequentes nas observações das Pesquisas</h5>
+<!-- Conteúdo da aba Nuvem de Palavras -->
+<div class="row">
+  <!-- Card explicativo -->
+  <div class="col-md-3 d-flex">
+    <div class="card mb-3 card-same-height w-100">
+      <div class="card-header">
+        <h5 class="card-title">Sobre a Nuvem de Palavras</h5>
+      </div>
+      <div class="card-body card-body-flex">
+        <div class="flex-grow-1">
+          <p style="text-align: justify;">A nuvem de palavras é uma representação visual das palavras mais frequentes encontradas nas observações das pesquisas.</p>
+          <p style="text-align: justify;">Palavras maiores indicam termos que aparecem com mais frequência. Este recurso ajuda a identificar rapidamente os temas mais recorrentes nas observações.</p>
+        </div>
+        <!-- Controles para ajustar a nuvem de palavras -->
+        <div class="mt-auto">
+          <div class="form-group">
+            <label for="minFreqSlider">Frequência Mínima: <span id="minFreqValue">2</span></label>
+            <input type="range" class="custom-range" id="minFreqSlider" min="1" max="10" value="2">
+            <small class="form-text text-muted">Exibe apenas palavras que aparecem pelo menos esta quantidade de vezes.</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="maxWordsSlider">Quantidade de Palavras: <span id="maxWordsValue">100</span></label>
+            <input type="range" class="custom-range" id="maxWordsSlider" min="20" max="200" value="100">
+            <small class="form-text text-muted">Limita o número máximo de palavras exibidas.</small>
+          </div>
+          
+          <button id="atualizarNuvem" class="btn btn-primary btn-block">
+            <i class="fas fa-sync-alt mr-2"></i> Atualizar Nuvem
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="card-body">
-    <!-- Card explicativo sobre a importância da nuvem de palavras -->
-    <div class="card mb-4 border-left border-primary" style="border-left-width: 4px !important; border-left-color: #4e73df !important;border-radius: 8px!important;">
+  
+  <!-- Nuvem de palavras -->
+  <div class="col-md-9 d-flex">
+    <div class="card card-same-height w-100">
+      <div class="card-header">
+        <h5 class="card-title">Termos Mais Frequentes nas Observações</h5>
+      </div>
       <div class="card-body">
-        <p>Este recurso analisa todas as observações textuais deixadas nas pesquisas, permitindo identificar tendências, preocupações e temas comuns mencionados pelos respondentes. O tamanho de cada palavra reflete sua frequência nas observações, oferecendo uma visão rápida dos principais assuntos abordados.</p>
-        <p class="mb-0 text-muted"><small>Passe o mouse sobre uma palavra para ver detalhes sobre sua frequência e relevância.</small></p>
+        <div id="nuvem" style="height: 400px;"></div>
       </div>
+     
     </div>
-    
-    <!-- Filtros da nuvem de palavras - Reorganizados em linha única -->
-    <div class="controls-container d-flex align-items-center flex-wrap mb-3">
-      <div class="control-group d-flex align-items-center mr-2">
-        <label class="mb-0 mr-2">Frequência mínima:</label>
-        <input type="number" class="form-control form-control-sm" id="minFreq" value="2" min="1" max="100">
-      </div>
-      <div class="control-group d-flex align-items-center mr-2">
-        <label class="mb-0 mr-2">Máximo de palavras:</label>
-        <input type="number" class="form-control form-control-sm" id="maxWords" value="100" min="10" max="300">
-      </div>
-      <button id="atualizarNuvem" class="btn btn-primary btn-sm">
-        <i class="fas fa-sync-alt mr-1"></i> Atualizar Nuvem
-      </button>
-    </div>
-    
-    <div class="word-cloud-container position-relative">
-      <div id="loadingCloud" style="display: none;">
-        <i class="fas fa-spinner fa-spin mr-2"></i> Carregando...
-      </div>
-      <div id="wordCloud"></div>
-    </div>
-    
-    <!-- Removido: div palavra-info e card de detalhes da palavra -->
   </div>
 </div>
 
 <script>
 $(document).ready(function() {
-    let palavrasData;
-    let maxFrequency = 0;
-    let carregandoNuvem = false; // Flag para evitar chamadas simultâneas
+    // Variáveis de configuração
+    var minFreq = 2;
+    var maxWords = 100;
     
-    // Função melhorada para fechar o modal de forma segura
-    function fecharModalComSeguranca() {
-        try {
-            $('#modalOverlay').modal('hide');
-            
-            setTimeout(function() {
-                if ($('#modalOverlay').is(':visible') || $('body').hasClass('modal-open')) {
-                    $('.modal-backdrop').remove();
-                    $('body').removeClass('modal-open');
-                    $('body').css('padding-right', '');
-                    $('#modalOverlay').removeClass('show');
-                    $('#modalOverlay').css('display', 'none');
+    // Atualizar valores exibidos nos labels dos sliders
+    $('#minFreqSlider').on('input', function() {
+        minFreq = parseInt($(this).val());
+        $('#minFreqValue').text(minFreq);
+    });
+    
+    $('#maxWordsSlider').on('input', function() {
+        maxWords = parseInt($(this).val());
+        $('#maxWordsValue').text(maxWords);
+    });
+    
+    // Botão para atualizar a nuvem
+    $('#atualizarNuvem').click(function() {
+        const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
+        window.carregarNuvemPalavras(anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
+    });
+
+    // Função para carregar e renderizar a nuvem de palavras
+    window.carregarNuvemPalavras = function(anoFiltro, mcuFiltro, minFreq = 2, maxWords = 100) {
+        // Se não recebeu os parâmetros, tenta obtê-los
+        if (!anoFiltro) {
+            anoFiltro = $("input[name='opcaoAno']:checked").val() || 'Todos';
+        }
+        
+        // CORRIGIDO: Obter mcuFiltro de maneira robusta
+        if (!mcuFiltro) {
+            try {
+                // Usar a variável global do arquivo principal
+                mcuFiltro = window.mcuSelecionado;
+                
+                // Se não estiver disponível globalmente, tenta obter do input
+                if (!mcuFiltro) {
+                    mcuFiltro = $("input[name='opcaoMcu']:checked").val() || 'Todos';
                 }
-            }, 500);
-        } catch (e) {
-            console.error("Erro ao fechar modal:", e);
-            $('.modal-backdrop').remove();
-            $('body').removeClass('modal-open');
-            $('#modalOverlay').hide();
-        }
-    }
-    
-    // Função para carregar dados da nuvem de palavras
-    window.carregarNuvemPalavras = function() {
-        // Evitar múltiplas chamadas simultâneas
-        if (carregandoNuvem) {
-            return;
+                
+                // Última verificação
+                if (!mcuFiltro) {
+                    mcuFiltro = 'Todos';
+                    console.warn("mcuFiltro não definido em carregarNuvemPalavras, usando 'Todos'");
+                }
+            } catch (e) {
+                console.error("Erro ao obter mcuSelecionado em nuvem de palavras:", e);
+                mcuFiltro = 'Todos';
+            }
         }
         
-        carregandoNuvem = true;
-        
-        // Obter o ano e o mcu selecionados
-        const ano = $("input[name='opcaoAno']:checked").val();
-        const mcuOrigem = $("input[name='opcaoMcu']:checked").val();
-        const minFreq = $("#minFreq").val() || 1;
-        const maxWords = $("#maxWords").val() || 100;
-        
-          
-        // Verificar se a aba está ativa
-        if (!$("#nuvem-palavras").hasClass('active') && !$("#nuvem-palavras").hasClass('show')) {
-            carregandoNuvem = false;
-            return;
+         // CORRIGIDO: Limpar qualquer instância anterior de jQCloud
+        if ($("#nuvem").data('jqcloud')) {
+            $("#nuvem").jQCloud('destroy');
         }
+
+        // Mostrar loader enquanto carrega
+        $("#nuvem").html('<div class="text-center p-5"><i class="fas fa-spinner fa-spin fa-3x"></i><p class="mt-3">Gerando nuvem de palavras...</p></div>');
         
-        $("#wordCloud").empty();
-        $("#loadingCloud").show();
-        
-        // Verificações
-        if (!ano) {
-            $("#wordCloud").html('<div class="alert alert-warning">Por favor, selecione um ano para visualizar a nuvem de palavras.</div>');
-            $("#loadingCloud").hide();
-            carregandoNuvem = false;
-            return;
-        }
-        
-        // Garantir que o container tenha dimensões
-        const containerWidth = $("#wordCloud").parent().width();
-        if (!containerWidth) {
-            setTimeout(function() {
-                carregandoNuvem = false;
-                window.carregarNuvemPalavras();
-            }, 500);
-            return;
-        }
-        
+        // CORREÇÃO PRINCIPAL: Usar o método getWordCloud em vez de getNuvemPalavras
         $.ajax({
-            url: "cfc/pc_cfcPesquisasDashboard.cfc?method=getWordCloud&returnformat=json",
-            type: "GET",
-            dataType: "json",
-            data: {
-                ano: ano,
-                mcuOrigem: mcuOrigem,
+            url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getWordCloud&returnformat=json',
+            method: 'GET',
+            data: { 
+                ano: anoFiltro,
+                mcuOrigem: mcuFiltro,
                 minFreq: minFreq,
                 maxWords: maxWords
             },
-            success: function(response) {
-                carregandoNuvem = false;
-
-                // Verificar se a resposta é válida
-                if (!response || typeof response !== 'object') {
-                    $("#wordCloud").html('<div class="alert alert-warning">Resposta inválida do servidor.</div>');
-                    $("#loadingCloud").hide();
-                    return;
-                }
+            dataType: 'json',
+            success: function(data) {
                 
-                palavrasData = response;
+                // CORRIGIDO: Limpar o conteúdo antes de renderizar a nuvem
+                $("#nuvem").empty();
                 
-                if (!Array.isArray(palavrasData) || palavrasData.length === 0) {
-                    $("#wordCloud").html('<div class="alert alert-info">Nenhuma palavra encontrada para os critérios selecionados.</div>');
-                    $("#loadingCloud").hide();
-                    return;
-                }
-                
-                // Encontrar a maior frequência para cálculos de relevância
-                maxFrequency = Math.max(...palavrasData.map(p => p.weight || 0));
-                
-                // Definir esquema de cores baseado no peso das palavras
-                const getWordColor = function(weight) {
-                    // Calcular percentual em relação ao peso máximo
-                    const percentage = weight / maxFrequency;
-                    
-                    // Esquema de cores do mais frequente para o menos frequente
-                    if (percentage > 0.8) return "#FF5733"; // Vermelho para palavras muito frequentes
-                    if (percentage > 0.6) return "#FFA500"; // Laranja
-                    if (percentage > 0.4) return "#33A8FF"; // Azul
-                    if (percentage > 0.2) return "#4CAF50"; // Verde
-                    return "#9C27B0";                       // Roxo para palavras menos frequentes
-                };
-                
-                // Garantir que os dados estejam no formato esperado pelo jQCloud
-                const dadosFormatados = palavrasData.map(function(item) {
-                    const weight = parseFloat(item.weight) || 1;
-                    const relevancia = ((weight / maxFrequency) * 100).toFixed(1);
-                    
-                    return {
-                        text: item.text || "",
-                        weight: weight,
-                        color: getWordColor(weight),
-                        html: { 
-                            'data-toggle': 'popover',
-                            'data-content': `Frequência: ${weight} | Relevância: ${relevancia}%`,
-                            'data-placement': 'top',
-                            'data-trigger': 'hover',
-                            'data-container': 'body'
-                        }
-                    };
-                });
-                
-                // Inicializar nuvem de palavras
-                try {
-                    $("#wordCloud").jQCloud('destroy');
-                } catch(e) { /* Ignora se não existir */ }
-                
-                $("#wordCloud").jQCloud(dadosFormatados, {
-                    width: $("#wordCloud").parent().width(),
-                    height: 300,
-                    delay: 50,
-                    shape: 'elliptic',
-                    colors: ["#9C27B0", "#4CAF50", "#33A8FF", "#FFA500", "#FF5733"],
-                    afterCloudRender: function() {
-                        // Inicializar popovers para todas as palavras
-                        $(".jqcloud-word").popover({
-                            html: true,
-                            container: 'body'
+                if (data && data.length > 0) {
+                    // Usar setTimeout para dar tempo ao DOM de atualizar
+                    setTimeout(function() {
+                        $("#nuvem").jQCloud(data, {
+                            width: $("#nuvem").width(),
+                            height: 400,
+                            autoResize: true,
+                            delay: 50,
+                            shape: 'rectangular',
+                            colors: ["#17a2b8", "#28a745", "#ffc107", "#fd7e14", "#20c997", "#6f42c1", "#e83e8c"],
+                            // Adicionar o evento afterCloudRender para configurar popovers
+                            afterCloudRender: function() {
+                                // Remover popovers antigos
+                                $('.jqcloud-word[data-toggle="popover"]').popover('dispose');
+                                
+                                // Configurar popovers em cada palavra
+                                $('.jqcloud-word').each(function() {
+                                    var word = $(this);
+                                    var wordText = word.text();
+                                    var wordObj = data.find(function(item) {
+                                        return item.text === wordText;
+                                    });
+                                    
+                                    if (wordObj) {
+                                        var frequency = wordObj.weight || 0;
+                                        
+                                        // Verificar diferentes possíveis propriedades para relevância
+                                        var relevancia = wordObj.relevancia || 
+                                                        wordObj.RELEVANCIA || 
+                                                        wordObj.relevance || 
+                                                        wordObj.RELEVANCE || 
+                                                        wordObj.tfidf || 
+                                                        wordObj.TFIDF || '';
+                                        
+                                        // Se nenhuma propriedade de relevância for encontrada, calcular com base no peso normalizado
+                                        if (!relevancia) {
+                                            // Encontrar peso máximo para normalização
+                                            var maxWeight = Math.max.apply(Math, data.map(function(item) { return item.weight; }));
+                                            // Calcular relevância como porcentagem do peso máximo, com 2 casas decimais
+                                            relevancia = ((wordObj.weight / maxWeight) * 100).toFixed(2) + '%';
+                                        }
+                                        
+                                        word.attr('data-toggle', 'popover');
+                                        word.attr('data-placement', 'top');
+                                        word.attr('data-trigger', 'hover');
+                                        word.attr('title', wordText);
+                                        word.attr('data-content', 'Frequência: ' + frequency + '<br>Relevância: ' + relevancia);
+                                        word.attr('data-html', 'true');
+                                    }
+                                });
+                                
+                                // Inicializar popovers
+                                $('[data-toggle="popover"]').popover();
+                            }
                         });
-                        
-                        $("#loadingCloud").hide();
-                    }
-                });
+                    }, 100);
+                } else {
+                    $("#nuvem").html('<div class="text-center p-5"><i class="fas fa-comment-slash fa-3x"></i><p class="mt-3">Não foram encontradas observações para gerar a nuvem de palavras.</p></div>');
+                }
             },
             error: function(xhr, status, error) {
-                carregandoNuvem = false;
-                
-                console.error("Erro ao carregar dados da nuvem:", error);
-                $("#wordCloud").html(`<div class="alert alert-danger">
-                    <strong>Erro ao carregar a nuvem de palavras.</strong><br>
-                    Detalhes: ${error || "Sem detalhes disponíveis"}<br>
-                    Por favor, verifique o console para mais informações.
-                </div>`);
-                $("#loadingCloud").hide();
+                console.error("Erro ao carregar nuvem de palavras:", error);
+                $("#nuvem").html('<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-danger"></i><p class="mt-3 text-danger">Erro ao carregar dados da nuvem de palavras.</p></div>');
             }
         });
     };
     
-    // Evento do botão atualizar nuvem
-    $("#atualizarNuvem").click(function() {
-        carregarNuvemPalavras();
-    });
-    
-    // Adicionar ouvintes globais para atualizações nos filtros
-    $(document).on('change', "input[name='opcaoAno'], input[name='opcaoMcu']", function() {
-        // Verificar se a aba da nuvem está visível antes de atualizar
-        if ($("#nuvem-palavras").hasClass('active') || $("#nuvem-palavras").hasClass('show')) {
-            setTimeout(function() {
-                carregarNuvemPalavras(false);
-            }, 100);
-        }
-    });
-    
     // Inicializar a nuvem quando o componente for carregado
     setTimeout(function() {
-        if ($("#nuvem-palavras").hasClass('active') || $("#nuvem-palavras").hasClass('show')) {
-            carregarNuvemPalavras(false);
-        }
+        window.carregarNuvemPalavras(null, null, minFreq, maxWords);
     }, 500);
     
-    // Responsividade - redimensionar a nuvem quando a janela mudar de tamanho
-    $(window).resize(function() {
-        if (palavrasData && palavrasData.length > 0) {
-            try {
-                $("#wordCloud").jQCloud('destroy');
-            } catch(e) { /* Ignora se não existir */ }
-            
-            // Recalcular dados com cores
-            const dadosFormatados = palavrasData.map(function(item) {
-                const weight = parseFloat(item.weight) || 1;
-                const percentage = weight / maxFrequency;
-                const relevancia = (percentage * 100).toFixed(1);
-                let color = "#9C27B0";
-                
-                if (percentage > 0.8) color = "#FF5733";
-                else if (percentage > 0.6) color = "#FFA500";
-                else if (percentage > 0.4) color = "#33A8FF";
-                else if (percentage > 0.2) color = "#4CAF50";
-                
-                return {
-                    text: item.text || "",
-                    weight: weight,
-                    color: color,
-                    html: { 
-                        'data-toggle': 'popover',
-                        'data-content': `Frequência: ${weight} | Relevância: ${relevancia}%`,
-                        'data-placement': 'top',
-                        'data-trigger': 'hover',
-                        'data-container': 'body'
+    // Adicionar ouvintes para eventos de filtro
+    $(document).on('filtroAlterado', function(event, dados) {
+        if ($("#nuvem-palavras").hasClass('active') || $("#nuvem-palavras").hasClass('show')) {
+            const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
+            // Usar a variável global diretamente quando possível
+            window.carregarNuvemPalavras(anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
+        }
+    });
+    
+    // Ajustar tamanho da nuvem quando a janela for redimensionada - CORRIGIDO
+    $(window).on('resize', function() {
+        // Verificar se a aba de nuvem de palavras está ativa/visível
+        if ($("#nuvem-palavras").hasClass('active') || $("#nuvem-palavras").hasClass('show')) {
+            // Verificar se o elemento nuvem existe e se tem dados jQCloud associados
+            if ($("#nuvem").length && $("#nuvem").data('jqcloud')) {
+                try {
+                    $("#nuvem").jQCloud('update');
+                    
+                    // Reativar popovers após atualização da nuvem
+                    setTimeout(function() {
+                        $('[data-toggle="popover"]').popover();
+                    }, 200);
+                } catch (e) {
+                    console.error("Erro ao atualizar nuvem de palavras:", e);
+                }
+            }
+        }
+    });
+    
+    // Desregistrar a atualização da nuvem quando a aba for fechada
+    $('#dashboardTabs a[data-toggle="tab"]').on('hide.bs.tab', function(e) {
+        if ($(e.target).attr('href') === '#nuvem-palavras') {
+            // Se estamos saindo da aba de nuvem de palavras
+            $(window).off('resize.nuvemPalavras');
+        }
+    });
+    
+    // Registrar novo listener específico quando a aba for aberta
+    $('#dashboardTabs a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+        if ($(e.target).attr('href') === '#nuvem-palavras') {
+            // Se estamos entrando na aba de nuvem de palavras
+            $(window).on('resize.nuvemPalavras', function() {
+                if ($("#nuvem").length && $("#nuvem").data('jqcloud')) {
+                    try {
+                        $("#nuvem").jQCloud('update');
+                    } catch (e) {
+                        console.error("Erro ao atualizar nuvem de palavras:", e);
                     }
-                };
-            });
-            
-            $("#wordCloud").jQCloud(dadosFormatados, {
-                width: $("#wordCloud").parent().width(),
-                height: 300,
-                colors: ["#9C27B0", "#4CAF50", "#33A8FF", "#FFA500", "#FF5733"],
-                afterCloudRender: function() {
-                    // Inicializar popovers
-                    $(".jqcloud-word").popover({
-                        html: true,
-                        container: 'body'
-                    });
                 }
             });
         }

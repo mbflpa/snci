@@ -23,7 +23,7 @@
             INNER JOIN pc_orgaos as orgaoResp ON pc_pesquisas.pc_org_mcu = orgaoResp.pc_org_mcu
             INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
             INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
-            WHERE orgaoOrigem.pc_org_status ='O'
+            WHERE orgaoOrigem.pc_org_status ='O' and RIGHT(pc_pesquisas.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
             <cfif arguments.ano NEQ "Todos">
                 AND RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
@@ -57,7 +57,7 @@
             FROM pc_pesquisas 
             INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
             INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
-            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5) 
+            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5) and RIGHT(pc_pesquisas.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
             <cfif arguments.ano NEQ "Todos">
                 AND RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
@@ -74,7 +74,7 @@
             FROM pc_pesquisas 
             INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
             INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
-            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5)
+            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5) and RIGHT(pc_pesquisas.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
             <cfif arguments.ano NEQ "Todos">
                 AND RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
@@ -107,7 +107,7 @@
             FROM pc_pesquisas
             INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
             INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
-            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5)
+            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5) and RIGHT(pc_pesquisas.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
             <cfif arguments.ano NEQ "Todos">
                 AND RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
@@ -127,7 +127,7 @@
                 INNER JOIN pc_processos proc1
                     ON aval1.pc_aval_processo = proc1.pc_processo_id
                 INNER JOIN pc_orgaos as orgaoOrigem1 ON proc1.pc_num_orgao_origem = orgaoOrigem1.pc_org_mcu
-                WHERE orgaoOrigem1.pc_org_status = 'O'AND proc1.pc_num_status IN(4,5)
+                WHERE orgaoOrigem1.pc_org_status = 'O'AND proc1.pc_num_status IN(4,5) and RIGHT(proc1.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
                 <cfif arguments.ano NEQ "Todos">
                     AND RIGHT(proc1.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
                 </cfif>
@@ -145,7 +145,7 @@
                 INNER JOIN pc_processos proc2
                     ON aval2.pc_aval_processo = proc2.pc_processo_id
                 INNER JOIN pc_orgaos as orgaoOrigem2 ON proc2.pc_num_orgao_origem = orgaoOrigem2.pc_org_mcu
-                WHERE orgaoOrigem2.pc_org_status = 'O'AND proc2.pc_num_status IN(4,5)
+                WHERE orgaoOrigem2.pc_org_status = 'O'AND proc2.pc_num_status IN(4,5) and RIGHT(proc2.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
                 <cfif arguments.ano NEQ "Todos">
                     AND RIGHT(proc2.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
                 </cfif>
@@ -197,7 +197,7 @@
                 INNER JOIN pc_processos proc1
                     ON aval1.pc_aval_processo = proc1.pc_processo_id
                 INNER JOIN pc_orgaos as orgaoOrigem1 ON proc1.pc_num_orgao_origem = orgaoOrigem1.pc_org_mcu
-                WHERE orgaoOrigem1.pc_org_status ='O' AND proc1.pc_num_status IN(4,5) AND proc1.pc_processo_id NOT IN 
+                WHERE orgaoOrigem1.pc_org_status ='O' AND proc1.pc_num_status IN(4,5) and RIGHT(proc1.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer"> AND proc1.pc_processo_id NOT IN 
                     (
                         SELECT pc_processo_id 
                         FROM pc_pesquisas    
@@ -219,7 +219,7 @@
                 INNER JOIN pc_processos proc2
                     ON aval2.pc_aval_processo = proc2.pc_processo_id
                 INNER JOIN pc_orgaos as orgaoOrigem2 ON proc2.pc_num_orgao_origem = orgaoOrigem2.pc_org_mcu
-                WHERE orgaoOrigem2.pc_org_status ='O' AND proc2.pc_num_status IN(4,5) AND proc2.pc_processo_id NOT IN  
+                WHERE orgaoOrigem2.pc_org_status ='O' AND proc2.pc_num_status IN(4,5) and RIGHT(proc2.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer"> AND proc2.pc_processo_id NOT IN  
                     (
                         SELECT pc_processo_id 
                         FROM pc_pesquisas 
@@ -258,7 +258,7 @@
             SELECT pc_pesq_observacao
             FROM pc_pesquisas 
             WHERE pc_pesq_observacao IS NOT NULL
-            AND DATALENGTH(pc_pesq_observacao) > 0
+            AND DATALENGTH(pc_pesq_observacao) > 0 and RIGHT(pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
             <cfif arguments.ano NEQ "Todos">
                 AND RIGHT(pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
             </cfif>
