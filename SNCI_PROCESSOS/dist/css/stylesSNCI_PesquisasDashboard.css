@@ -263,7 +263,10 @@ body {
 .nav-dashboard-tabs .nav-link i {
   margin-right: 8px;
   font-size: 1rem;
-  vertical-align: text-bottom;
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  top: -2px;
   transition: transform 0.2s ease;
 }
 
