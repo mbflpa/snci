@@ -7,81 +7,45 @@
 		<html lang="pt-br">
 			<head>
 				<style>
-					/* Classes que podem ser substituídas pelo Bootstrap 4 */
+					/* Mantendo apenas os estilos personalizados que não existem no Bootstrap */
 					
-					/*
-					.card-controle - pode usar .card .shadow-sm .mb-3
-					Mantida pela animação de hover personalizada
-					*/
-					.card-controle {
-						border-radius: 8px;
-						box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+					/* Efeito de elevação no hover - não existe no Bootstrap */
+					.card-hover {
 						transition: all 0.3s ease;
-						overflow: hidden;
-						margin-bottom: 15px;
-						background-color: #f9f9f9;
 					}
 					
-					/* Efeito hover não tem equivalente no Bootstrap */
-					.card-controle:hover {
-						box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+					.card-hover:hover {
+						box-shadow: 0 8px 16px rgba(0,0,0,0.15) !important;
 						transform: translateY(-5px);
 					}
 					
-					/* Pode usar .card-header .bg-primary .text-white .d-flex .align-items-center */
-					/* Mantida pelo gradient personalizado */
-					.card-header-controle {
-						padding: 12px 15px;
-						display: flex;
-						align-items: center;
+					/* Gradiente personalizado para o cabeçalho */
+					.bg-gradient-primary {
 						background: linear-gradient(135deg, #2475b3, #3498db);
-						color: #fff;
 						border-bottom: 3px solid #1a5480;
-						position: relative;
 					}
 					
-					/* Pode usar .mr-2 e personalizar só o tamanho */
-					.card-header-controle i {
-						margin-right: 10px;
-						font-size: 18px;
-					}
-					
-					/* Posicionamento específico - manter personalizado */
-					.card-tools {
-						position: absolute;
-						right: 10px;
-						top: 50%;
-						transform: translateY(-50%);
-						display: flex;
-						align-items: center;
-					}
-					
-					/* Pode usar .d-flex .align-items-center .justify-content-center */
-					.card-tools .btn-card {
-						display: flex;
-						align-items: center;
-						justify-content: center;
+					/* Estilo para ícones nos botões de ação */
+					.btn-icon {
 						cursor: pointer;
 						transition: all 0.2s;
-						margin-left: 30px;
 					}
 					
-					/* Estilização específica de ícones - manter */
-					.card-tools .btn-excluir i {
-						color: #fff; /* Ícone branco */
-						opacity: 0.8; /* Um pouco transparente */
+					.btn-icon-excluir {
+						color: #fff;
+						opacity: 0.8;
 					}
 					
-					.card-tools .btn-excluir:hover i {
-						color: #e74c3c; /* Fica vermelho ao passar o mouse */
+					.btn-icon-excluir:hover {
+						color: #e74c3c;
 						opacity: 1;
 					}
 					
-					.card-tools .btn-editar i {
-						color: #fff; /* Ícone branco conforme solicitado */
+					.btn-icon-editar {
+						color: #fff;
 					}
 					
-					.card-tools .btn-editar:hover i {
+					.btn-icon-editar:hover {
 						opacity: 0.9;
 					}
 					
@@ -89,80 +53,24 @@
 						transform: scale(1.2);
 					}
 					
-					.card-body-controle {
-						padding: 20px; /* Aumentado o padding */
-						position: relative;
-						min-height: 100px;
-						background-color: #f9f9f9; /* Fundo sutilmente diferente */
-					}
-					
-					.card-info {
-						position: relative;
-						z-index: 2;
-					}
-					
-					.card-info p {
-						margin-bottom: 12px; /* Aumentado o espaço entre linhas */
-						color: #444;
-						padding-left: 5px;
-						border-left: 3px solid #3498db; /* Borda lateral para melhor organização visual */
-						padding-bottom: 3px;
-					}
-					
-					.card-info p:last-child {
-						margin-bottom: 0; /* Remover margem do último parágrafo */
-					}
-					
-					.card-info span.destaque {
+					/* Estilo para os textos destacados */
+					.destaque {
 						font-weight: 600;
 						color: #2475b3;
-						display: inline-block; /* Para permitir padding sem quebra de linha */
+						display: inline-block;
 						padding: 0 5px;
-						background-color: rgba(52, 152, 219, 0.05); /* Fundo sutil no texto destacado */
+						background-color: rgba(52, 152, 219, 0.05);
 						border-radius: 3px;
 					}
 					
-					/* Grid layout pode usar .row e .col-* do Bootstrap */
-					.grid-container {
-						display: grid;
-						grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-						grid-gap: 20px;
+					/* Campo de busca personalizado - borda arredondada */
+					.search-rounded {
+						border-radius: 20px !important;
+						padding-right: 40px !important;
 					}
 					
-					@media (max-width: 768px) {
-						.grid-container {
-							grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-						}
-					}
-					
-					/* Campo de busca pode usar .form-control do Bootstrap */
-					.search-container {
-						margin-bottom: 10px;
-						position: relative;
-						max-width: 400px;
-						margin-left: 0;
-						margin-right: 0;
-						padding-left: 0;
-					}
-					
-					.search-container input {
-						/* Pode usar .form-control e apenas personalizar o padding */
-						width: 100%;
-						padding: 8px 40px 8px 12px;
-						border-radius: 20px;
-						border: 1px solid #ddd;
-						box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-						font-size: 14px;
-						transition: all 0.3s;
-					}
-					
-					.search-container input:focus {
-						border-color: #3498db;
-						box-shadow: 0 2px 10px rgba(52, 152, 219, 0.2);
-						outline: none;
-					}
-					
-					.search-container i {
+					/* Posicionamento do ícone de pesquisa */
+					.search-icon-position {
 						position: absolute;
 						right: 12px;
 						top: 50%;
@@ -171,22 +79,18 @@
 						font-size: 16px;
 					}
 					
-					.no-results {
-						grid-column: 1 / -1;
-						padding: 20px;
-						text-align: center;
-						background-color: #f8f9fa;
-						border-radius: 8px;
-						color: #666;
+					/* Borda lateral nos itens da lista */
+					.border-left-info {
+						border-left: 3px solid #3498db;
+						padding-left: 5px;
 					}
 				</style>
 			</head>
 			<body>
-				<!-- Aqui poderia usar classes do Bootstrap como .container, .card, etc. -->
-				<div class="card-body" style="border-radius: 8px; box-shadow: 0 0 5px rgba(255, 212, 0, 0.3); border: solid 2px #ffD400;">
-						<div class="search-container">
-							<input type="text" id="cardSearch" placeholder="Buscar menus, páginas..." autocomplete="off">
-							<i class="fas fa-search"></i>
+				<div class="card shadow-sm" style="border-radius: 8px; border: solid 2px #ffD400;">
+						<div class="position-relative mb-3" style="max-width: 400px;margin-left: 7px;margin-top: 7px;">
+							<input type="text" id="cardSearch" class="form-control search-rounded" placeholder="Buscar menus, páginas..." autocomplete="off">
+							<i class="fas fa-search search-icon-position"></i>
 						</div>
 
 						<cfquery name="rsControleCards" datasource="#application.dsn_processos#">
@@ -196,7 +100,7 @@
 							</cfif>
 						</cfquery>	
 						
-						<div class="grid-container" id="cardsContainer">
+						<div class="row mx-0" id="cardsContainer">
 							<cfloop query="rsControleCards">
 								<cfset grupo= ''>
 								<cfset subgrupo= ''>
@@ -215,37 +119,36 @@
 								</cfif>
 								
 								<cfoutput>
-								<div class="card-controle">
-									<div class="card-header-controle">
-										<i class="fas #iconeMenu#"></i>
-										<strong>#pc_controle_acesso_nomeMenu#</strong>
+								<div class="col-sm-6 col-md-4 col-lg-3 mb-3 card-filterable">
+									<div class="card shadow-sm card-hover bg-light h-100">
+										<div class="card-header azul_claro_correios_backgroundColor text-white d-flex align-items-center position-relative" style="padding: 0.5rem 1rem;">
+											<i class="fas #iconeMenu# mr-2"></i>
+											<strong>#pc_controle_acesso_nomeMenu#</strong>
+											
+											<div class="position-absolute" style="right:10px; top:50%; transform:translateY(-50%); display:flex;">
+												<div class="btn-icon btn-icon-editar ml-3" onclick="javascript:controleEditar(#pc_controle_acesso_id#,'#pc_controle_acesso_nomeMenu#','#pc_controle_acesso_pagina#','#pc_controle_acesso_perfis#','#pc_controle_acesso_grupoMenu#','#pc_controle_acesso_subgrupoMenu#','#pc_controle_acesso_grupo_icone#','#pc_controle_acesso_subgrupo_icone#','#pc_controle_acesso_menu_icone#','#pc_controle_acesso_ordem#','#pc_controle_acesso_rapido_nome#')" data-toggle="tooltip" title="Editar">
+													<i class="fas fa-edit grow-icon"></i>
+												</div>
+												<div class="btn-icon btn-icon-excluir ml-3" onclick="javascript:controleExcluir(#pc_controle_acesso_id#)" data-toggle="tooltip" title="Excluir">
+													<i class="fas fa-trash-alt grow-icon"></i>
+												</div>
+											</div>
+										</div>
 										
-										<!-- Adicionado card-tools com os botões de ação -->
-										<div class="card-tools">
-											<div class="btn-card btn-editar" onclick="javascript:controleEditar(#pc_controle_acesso_id#,'#pc_controle_acesso_nomeMenu#','#pc_controle_acesso_pagina#','#pc_controle_acesso_perfis#','#pc_controle_acesso_grupoMenu#','#pc_controle_acesso_subgrupoMenu#','#pc_controle_acesso_grupo_icone#','#pc_controle_acesso_subgrupo_icone#','#pc_controle_acesso_menu_icone#','#pc_controle_acesso_ordem#','#pc_controle_acesso_rapido_nome#')" data-toggle="tooltip" title="Editar">
-												<i class="fas fa-edit grow-icon"></i>
-											</div>
-											<div class="btn-card btn-excluir" onclick="javascript:controleExcluir(#pc_controle_acesso_id#)" data-toggle="tooltip" title="Excluir">
-												<i class="fas fa-trash-alt grow-icon"></i>
-											</div>
+										<div class="card-body">
+											<p class="border-left-info mb-2"><strong>Menu:</strong> <span class="destaque">#link##pc_controle_acesso_nomeMenu#</span></p>
+											<p class="border-left-info mb-0"><strong>Página:</strong> <span class="destaque">#pc_controle_acesso_pagina#</span></p>
 										</div>
 									</div>
-									
-									<div class="card-body-controle">
-										<div class="card-info">
-											<p><strong>Menu:</strong> <span class="destaque">#link##pc_controle_acesso_nomeMenu#</span></p>
-											<p><strong>Página:</strong> <span class="destaque">#pc_controle_acesso_pagina#</span></p>
-										</div>
-									</div>
-									
-									<!-- Footer removido pois os botões foram movidos para o header -->
 								</div>
 								</cfoutput>
 							</cfloop>
-							<div class="no-results" style="display: none;">
-								<i class="fas fa-search" style="font-size: 30px; opacity: 0.5; margin-bottom: 10px;"></i>
-								<h4>Nenhum resultado encontrado</h4>
-								<p>Tente buscar com outros termos</p>
+							<div class="col-12 d-none" id="no-results">
+								<div class="text-center p-4 bg-light rounded">
+									<i class="fas fa-search mb-2" style="font-size: 30px; opacity: 0.5;"></i>
+									<h4>Nenhum resultado encontrado</h4>
+									<p>Tente buscar com outros termos</p>
+								</div>
 							</div>
 						</div>
 				</div>
@@ -256,22 +159,20 @@
 					// Inicializar tooltips do Bootstrap
 					$('[data-toggle="tooltip"]').tooltip();
 					
-					// Removido o código de animação de hover relacionado aos ícones internos
-					
-					// Configurar campo de busca - versão corrigida
+					// Configurar campo de busca - versão corrigida e com escopo limitado
 					$('#cardSearch').on('input', function() {
 						const searchValue = $(this).val().toLowerCase().trim();
 						let hasResults = false;
 						
 						// Se o campo de busca estiver vazio, mostre todos os cards
 						if (searchValue === '') {
-							$('.card-controle').show();
-							$('.no-results').hide();
+							$('#cardsContainer .card-filterable').show();
+							$('#no-results').addClass('d-none');
 							return;
 						}
 						
-						$('.card-controle').each(function() {
-							// Busca no conteúdo completo do card, não apenas nos atributos data-*
+						$('#cardsContainer .card-filterable').each(function() {
+							// Busca no conteúdo completo do card
 							const cardText = $(this).text().toLowerCase();
 							
 							if (cardText.indexOf(searchValue) > -1) {
@@ -284,9 +185,9 @@
 						
 						// Mostrar mensagem se não houver resultados
 						if (hasResults) {
-							$('.no-results').hide();
+							$('#no-results').addClass('d-none');
 						} else {
-							$('.no-results').show();
+							$('#no-results').removeClass('d-none');
 						}
 					});
 					

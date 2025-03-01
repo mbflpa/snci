@@ -295,7 +295,14 @@
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label for="controleNomeGrupo" >Descrição do Grupo:</label>
-											<input id="controleNomeGrupo"  required=""  name="controleNomeGrupo" type="text" class="form-control "  inputmode="text" placeholder="Informe o nome do Grupo...">
+											<select id="controleNomeGrupo" required="" name="controleNomeGrupo" class="form-control select2-allow-new">
+												<option value="" selected></option>
+												<cfoutput query="rsMenuGrupos">
+													<cfif len(trim(pc_controle_acesso_grupoMenu)) GT 0>
+														<option value="#pc_controle_acesso_grupoMenu#">#pc_controle_acesso_grupoMenu#</option>
+													</cfif>
+												</cfoutput>
+											</select>
 										</div>
 									</div>
 
@@ -319,7 +326,14 @@
 									<div class="col-sm-6 ">
 										<div class="form-group">
 											<label for="controleNomeSubgrupo" >Descrição do Subgrupo:</label>
-											<input id="controleNomeSubgrupo"  required="false" name="controleNomeSubgrupo" type="text" class="form-control "  inputmode="text" placeholder="Informe o nome do Subgrupo...">
+											<select id="controleNomeSubgrupo" required="false" name="controleNomeSubgrupo" class="form-control select2-allow-new">
+												<option value="" selected></option>
+												<cfoutput query="rsMenuSubGrupos">
+													<cfif len(trim(pc_controle_acesso_subgrupoMenu)) GT 0>
+														<option value="#pc_controle_acesso_subgrupoMenu#">#pc_controle_acesso_subgrupoMenu#</option>
+													</cfif>
+												</cfoutput>
+											</select>
 										</div>
 									</div>
 
@@ -399,30 +413,8 @@
 						</div><!--fim card card-primary -->
 					</form><!-- fim formcadLinkAcesso -->
 
-					<form id="formControleAcesso" name="formControleAcesso" format="html"  >
-						<!--acordion-->
-						<div id="accordionControleAcesso" >
-						
-							<!--xxxxxxxxxxxxxxx ACCORDION CADASTRADOS XXXXXXXX-->
-							<div class="card card-success" >
-								<div class="card-header" style="background-color: #ffD400;">
-									<h4 class="card-title ">
-										<a class="d-block" data-toggle="collapse" href="#collapseTwo" style="color:#00416B;font-size:16px;font-weight: bold;"> 
-											<i class="fas fa-file-alt" style="margin-right:10px"> </i>Páginas
-										</a>
-									</h4>
-								</div>
-								<div id="collapseTwo" class="" data-parent="#accordion" >							
-									<div id="cardsLinks"></div>
-								</div> <!--fim collapseTwo -->
+					<div id="cardsLinks"></div>
 
-							</div><!--fim card card-success -->
-							<!--xxxxxxxxxxxxxxx fim ACCORDION CADASTRADOS XXXXXXXX-->
-
-						</div><!--fim acordion -->
-						
-					</form><!-- fim formControleAcesso -->	
-						
 				</div><!-- fim card-body -->	
 				
 			</div>
@@ -464,6 +456,21 @@
 		placeholder: 'Selecione...',
 		allowClear: true
 		
+      });
+
+      // Configure os selects que permitem novos valores
+      $('.select2-allow-new').select2({
+        theme: 'bootstrap4',
+        placeholder: 'Selecione ou digite um novo valor...',
+        allowClear: true,
+        tags: true,
+        createTag: function (params) {
+          return {
+            id: params.term,
+            text: params.term,
+            newTag: true
+          }
+        }
       });
 
 	  function iformat(icon) {
@@ -752,8 +759,19 @@
  			$('#controleId').val(controleId);
 			$('#controleNomeLink').val(controleNomeLink);
 			$('#controlePagina').val(controlePagina).trigger('change');
-			$('#controleNomeGrupo').val(controleNomeGrupo);
-			$('#controleNomeSubgrupo').val(controleNomeSubgrupo);
+			// Para os selects com tags, precisamos verificar se o valor já existe, senão adicioná-lo
+			if ($('#controleNomeGrupo option[value="'+controleNomeGrupo+'"]').length === 0 && controleNomeGrupo !== '') {
+				var newOption = new Option(controleNomeGrupo, controleNomeGrupo, true, true);
+				$('#controleNomeGrupo').append(newOption);
+			}
+			$('#controleNomeGrupo').val(controleNomeGrupo).trigger('change');
+			
+			if ($('#controleNomeSubgrupo option[value="'+controleNomeSubgrupo+'"]').length === 0 && controleNomeSubgrupo !== '') {
+				var newOption = new Option(controleNomeSubgrupo, controleNomeSubgrupo, true, true);
+				$('#controleNomeSubgrupo').append(newOption);
+			}
+			$('#controleNomeSubgrupo').val(controleNomeSubgrupo).trigger('change');
+			
 			$('#iconesGrupo').val(iconesGrupo).trigger('change');
 			$('#iconesSubgrupo').val(iconesSubgrupo).trigger('change');
 			$('#iconesLink').val(iconesLink).trigger('change');
