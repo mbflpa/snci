@@ -123,6 +123,23 @@ $(document).ready(function() {
             // Atualizar o rodapé
             $(tabela.column(colIndex).footer()).html(media);
         });
+        
+        // Tratamento especial para a coluna Pontualidade (índice 12)
+        // Calcular porcentagem de "Sim"
+        var totalRegistros = numRows;
+        var totalSim = 0;
+        
+        tabela.column(12).data().each(function(valor) {
+            if (valor === "Sim") {
+                totalSim++;
+            }
+        });
+        
+        // Calcular percentual
+        var percentualSim = totalRegistros > 0 ? ((totalSim / totalRegistros) * 100).toFixed(1) : 0;
+        
+        // Atualizar o rodapé da coluna Pontualidade
+        $(tabela.column(12).footer()).html(percentualSim + "%");
     }
     
     // Função para configurar a instância do DataTable com callback
