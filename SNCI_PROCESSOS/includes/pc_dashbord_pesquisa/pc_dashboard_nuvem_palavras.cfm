@@ -13,6 +13,7 @@
         <div class="flex-grow-1">
           <p style="text-align: justify;">A nuvem de palavras é uma representação visual das palavras mais frequentes encontradas nas observações das pesquisas.</p>
           <p style="text-align: justify;">Palavras maiores indicam termos que aparecem com mais frequência. Este recurso ajuda a identificar rapidamente os temas mais recorrentes nas observações.</p>
+          <p style="text-align: justify;">Posicionando o cursor sobre uma palavra, você pode ver a frequência com que ela aparece e a relevância em relação às demais.</p>  
         </div>
         <!-- Controles para ajustar a nuvem de palavras -->
         <div class="mt-auto">
