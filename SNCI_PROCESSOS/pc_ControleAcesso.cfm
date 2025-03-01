@@ -1,5 +1,39 @@
 <cfprocessingdirective pageencoding = "utf-8">
+  
+<!--- Nova função para listar páginas .cfm recursivamente --->
+<cffunction name="listarPaginasCFM" returntype="array" output="false">
+    <cfargument name="diretorio" type="string" required="true">
+    <cfargument name="resultados" type="array" default="#arrayNew(1)#">
+    <cfargument name="pastaBase" type="string" default="">
+    
+    <cfif arguments.pastaBase EQ "">
+        <cfset arguments.pastaBase = arguments.diretorio>
+    </cfif>
+    
+    <cfdirectory action="list" directory="#arguments.diretorio#" name="listaArquivos" recurse="false">
+    
+    <cfloop query="listaArquivos">
+        <cfset caminhoCompleto = directory & "/" & name>
+        <cfset caminhoRelativo = replace(caminhoCompleto, arguments.pastaBase, "", "one")>
+        <cfset caminhoRelativo = replace(caminhoRelativo, "\", "/", "all")>
+        <cfif left(caminhoRelativo, 1) EQ "/">
+            <cfset caminhoRelativo = right(caminhoRelativo, len(caminhoRelativo)-1)>
+        </cfif>
+        
+        <cfif type EQ "Dir">
+            <cfset arguments.resultados = listarPaginasCFM(caminhoCompleto, arguments.resultados, arguments.pastaBase)>
+        <cfelseif type EQ "File" AND right(name, 4) EQ ".cfm">
+            <cfset arrayAppend(arguments.resultados, caminhoRelativo)>
+        </cfif>
+    </cfloop>
+    
+    <cfreturn arguments.resultados>
+</cffunction>
 
+<!--- Obter lista de todas as páginas .cfm --->
+<cfset diretorioBase = expandPath(".")>
+<cfset listaArquivosCFM = listarPaginasCFM(diretorioBase)>
+<cfset arraySort(listaArquivosCFM, "textnocase")>
 
 <cfquery name="rsMenuGrupos" datasource="#application.dsn_processos#">
 	SELECT DISTINCT pc_controle_acesso.pc_controle_acesso_grupoMenu FROM pc_controle_acesso
@@ -44,7 +78,153 @@
 		<link rel="stylesheet" href="plugins/select2/css/select2.min.css">
 		<link rel="stylesheet" href="plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css"> 
 <style>
+/* Estilos para o seletor de ícones */
+.icon-selector-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 9999;
+    display: none;
+}
 
+.icon-selector-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow: auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.icon-search-box {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.icon-item:hover {
+    background-color: #f0f7ff;
+    border-color: #99c2ff;
+}
+
+.icon-item.selected {
+    background-color: #e6f0ff;
+    border-color: #007bff;
+}
+
+.icon-item i {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.icon-name {
+    font-size: 10px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.icon-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.icon-selector-title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.icon-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.select-icon-preview {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.select-icon-preview i {
+    margin-right: 5px;
+}
+
+.icon-hidden-select {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    display: none !important;
+}
+
+.icon-selector-trigger {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background-color: white;
+    width: 100%;
+    position: relative;
+    height: 38px;
+}
+
+.icon-selector-trigger::after {
+    content: '';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 6px solid #888;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+}
 </style>
 
 </head>
@@ -173,9 +353,17 @@
 									<div class="col-sm-6">
 										<div class="form-group">
 											<label for="controlePagina" >Página:</label>
-											<input id="controlePagina"  required="true"  name="controlePagina" type="text" class="form-control "  inputmode="text" placeholder="Informe o nome da página...">
+											<select id="controlePagina" required="true" name="controlePagina" class="form-control">
+												<option value="" selected disabled>Selecione a página...</option>
+												<cfloop array="#listaArquivosCFM#" index="pagina">
+													<cfoutput>
+														<option value="#pagina#">#pagina#</option>
+													</cfoutput>
+												</cfloop>
+											</select>
 										</div>
 									</div>
+									
 									<div class="col-sm-6">
 										<div class="form-group">
 											<cfset listOrdem="1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20">
@@ -250,7 +438,22 @@
 	<!-- ./wrapper -->
 	<cfinclude template="includes/pc_sidebar.cfm">
 
-
+    <!-- Modal Seletor de Ícones -->
+    <div id="iconSelectorModal" class="icon-selector-modal">
+        <div class="icon-selector-container">
+            <div class="icon-selector-header">
+                <div class="icon-selector-title">Selecione um ícone</div>
+                <button id="closeIconSelector" class="icon-close-btn">&times;</button>
+            </div>
+            <input type="text" id="iconSearchBox" class="icon-search-box" placeholder="Pesquisar ícones...">
+            <div id="iconGrid" class="icon-grid">
+                <!-- Os ícones serão inseridos aqui dinamicamente -->
+            </div>
+            <div class="icon-selector-footer">
+                <button id="cancelIconSelection" class="icon-selector-btn icon-cancel-btn">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
 	<script language="JavaScript">
 
@@ -283,11 +486,129 @@
           
 		
 		$(document).ready(function(){
-			mostraCads()
+			mostraCads();
 			
+			// Setup do seletor de ícones
+			setupIconSelector('#iconesLink');
+			setupIconSelector('#iconesGrupo');
+			setupIconSelector('#iconesSubgrupo');
 		});	
 
-		
+		// Lista de ícones para o grid
+		<cfset jsIconList = JSStringFormat(listIcon)>
+		<cfoutput>
+        var iconList = "#jsIconList#".split(',');
+		</cfoutput>
+        var currentIconSelector = null;
+        var selectedIcon = null;
+        
+        function setupIconSelector(selectorId) {
+            // Esconder o select original
+            $(selectorId).addClass('icon-hidden-select');
+            
+            // Remover select2 para garantir que ele não fique visível
+            $(selectorId).select2('destroy');
+            
+            // Criar o trigger personalizado
+            var triggerHtml = '<div class="icon-selector-trigger" data-target="' + selectorId + '">';
+            triggerHtml += '<i class="fa ' + ($(selectorId).val() || '') + '"></i>';
+            triggerHtml += '<span>' + ($(selectorId).val() ? $(selectorId).val() : 'Selecione um ícone...') + '</span>';
+            triggerHtml += '</div>';
+            
+            // Remover qualquer trigger anterior antes de adicionar um novo
+            $('.icon-selector-trigger[data-target="' + selectorId + '"]').remove();
+            $(selectorId).after(triggerHtml);
+            
+            // Adicionar evento de clique no trigger
+            $('.icon-selector-trigger[data-target="' + selectorId + '"]').on('click', function() {
+                currentIconSelector = selectorId;
+                selectedIcon = $(selectorId).val();
+                openIconSelector();
+            });
+            
+            // Atualizar trigger quando o valor do select mudar
+            $(selectorId).on('change', function() {
+                var iconValue = $(this).val();
+                var trigger = $('.icon-selector-trigger[data-target="' + selectorId + '"]');
+                
+                trigger.find('i').attr('class', 'fa ' + (iconValue || ''));
+                trigger.find('span').text(iconValue ? iconValue : 'Selecione um ícone...');
+            });
+        }
+        
+        function openIconSelector() {
+            // Preencher o grid com os ícones
+            var gridHtml = '';
+            iconList.forEach(function(icon) {
+                var isSelected = icon === selectedIcon ? 'selected' : '';
+                gridHtml += '<div class="icon-item ' + isSelected + '" data-icon="' + icon + '">';
+                gridHtml += '<i class="fa ' + icon + '"></i>';
+                gridHtml += '<div class="icon-name">' + icon + '</div>';
+                gridHtml += '</div>';
+            });
+            
+            $('#iconGrid').html(gridHtml);
+            
+            // Exibir o modal
+            $('#iconSelectorModal').css('display', 'block');
+            
+            // Evento de clique nos ícones
+            $('.icon-item').on('click', function() {
+                // Selecionar o ícone e fechar imediatamente
+                selectedIcon = $(this).data('icon');
+                
+                // Atualizar o valor do select e fechar o seletor
+                if (currentIconSelector) {
+                    $(currentIconSelector).val(selectedIcon).trigger('change');
+                    $('#iconSelectorModal').css('display', 'none');
+                }
+            });
+            
+            // Focar na caixa de pesquisa
+            $('#iconSearchBox').val('').focus();
+        }
+        
+        // Inicializar eventos para o seletor de ícones
+        $(document).ready(function() {
+            // Pesquisa de ícones
+            $('#iconSearchBox').on('input', function() {
+                var searchTerm = $(this).val().toLowerCase();
+                
+                $('.icon-item').each(function() {
+                    var iconName = $(this).data('icon').toLowerCase();
+                    if (iconName.indexOf(searchTerm) > -1) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+            
+            // Fechar o seletor de ícones quando clicar fora do grid
+            $(document).on('mousedown', function(e) {
+                var container = $(".icon-selector-container");
+                
+                // Fechar se o clique for fora do container e o modal estiver visível
+                if (!container.is(e.target) && container.has(e.target).length === 0 && $('#iconSelectorModal').is(':visible')) {
+                    $('#iconSelectorModal').css('display', 'none');
+                }
+            });
+            
+            // Fechar o seletor de ícones com os botões
+            $('#closeIconSelector, #cancelIconSelection').on('click', function() {
+                $('#iconSelectorModal').css('display', 'none');
+            });
+            
+            // Remover o botão "Selecionar" já que agora selecionamos diretamente ao clicar
+            $('#confirmIconSelection').remove();
+            
+            // Fechar com ESC
+            $(document).on('keydown', function(e) {
+                if (e.key === 'Escape' && $('#iconSelectorModal').is(':visible')) {
+                    $('#iconSelectorModal').css('display', 'none');
+                }
+            });
+        });
 
 		function mostraCads(){
 			$('#modalOverlay').modal('show');
@@ -369,7 +690,7 @@
 						mostraCads()	
 						$('#controleId').val(null);
 						$('#controleNomeLink').val(null);
-						$('#controlePagina').val(null);
+						$('#controlePagina').val(null).trigger('change');
 						$('#perfisAutorizados').val(null).trigger('change');
 						$('#controleNomeGrupo').val(null);
 						$('#controleNomeSubgrupo').val(null);
@@ -408,7 +729,7 @@
 				$('#cadastroLinks').CardWidget('collapse')
 				$('#controleId').val(null);
 				$('#controleNomeLink').val(null);
-				$('#controlePagina').val(null);
+				$('#controlePagina').val(null).trigger('change');
 				$('#perfisAutorizados').val(null).trigger('change');
 				$('#controleNomeGrupo').val(null);
 				$('#controleNomeSubgrupo').val(null);
@@ -430,7 +751,7 @@
 
  			$('#controleId').val(controleId);
 			$('#controleNomeLink').val(controleNomeLink);
-			$('#controlePagina').val(controlePagina);
+			$('#controlePagina').val(controlePagina).trigger('change');
 			$('#controleNomeGrupo').val(controleNomeGrupo);
 			$('#controleNomeSubgrupo').val(controleNomeSubgrupo);
 			$('#iconesGrupo').val(iconesGrupo).trigger('change');
@@ -485,18 +806,6 @@
 			$('#modalOverlay').delay(1000).hide(0, function() {
 				$('#modalOverlay').modal('hide');
 			});
-
-
 		}
-
-	
-
-
-		
-		
-		
-			
-		
 	</script>
-
 </html>
