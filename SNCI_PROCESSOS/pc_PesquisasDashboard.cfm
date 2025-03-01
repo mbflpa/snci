@@ -26,7 +26,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard de Pesquisas</title>
+    <title>Dashboard Pesquisas de Opinião</title>
     <link rel="stylesheet" href="plugins/jqcloud/jqcloud.min.css">
     <link rel="stylesheet" href="dist/css/stylesSNCI_PesquisasDashboard.css">
     
@@ -76,7 +76,7 @@
             <!-- Área que será exportada para PDF -->
             <div id="dashboard-content">
                 <section class="content-header">
-                    <h1>Dashboard de Pesquisas</h1>
+                    <h1>Dashboard Pesquisas de Opinião</h1>
                 </section>
 
                 <section class="content">

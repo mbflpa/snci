@@ -16,7 +16,7 @@
   <div class="col-md-8">
     <div class="card">
       <div class="card-header">
-        <h5 class="card-title">Evolução das Avaliações</h5>
+        <h5 class="card-title">Evolução das Notas</h5>
       </div>
       <div class="card-body">
         <canvas id="graficoEvolucao" height="300"></canvas>

@@ -1,11 +1,38 @@
 <cfprocessingdirective pageencoding = "utf-8">
 <link rel="stylesheet" href="dist/css/stylesSNCI_Dashboard_Listagem.css">
 
+<!-- Estilos para os detalhes da linha com FontAwesome em vez de imagens -->
+<style>
+    td.details-control {
+        text-align: center;
+        cursor: pointer;
+        width: 30px;
+    }
+    td.details-control:before {
+        content: '\f055'; /* FontAwesome ícone de mais (+) */
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #007bff;
+        font-size: 1.2em;
+    }
+    tr.shown td.details-control:before {
+        content: '\f056'; /* FontAwesome ícone de menos (-) */
+        color: #dc3545;
+    }
+    .observacao-detalhes {
+        padding: 10px;
+        margin: 10px;
+        background-color: #f8f9fa;
+        border-left: 3px solid #007bff;
+    }
+</style>
+
 <!-- Conteúdo da aba Listagem de Pesquisas -->
 <div class="table-responsive">
   <table class="table table-hover" id="tabelaPesquisas">
     <thead>
       <tr>
+        <th></th>
         <th>ID</th>
         <th>Processo</th>
         <th>Órgão Respondente</th>
@@ -19,6 +46,7 @@
         <th>Importância</th>
         <th>Pontualidade</th>
         <th>Média</th>
+        <th>Observação</th>
       </tr>
     </thead>
     <tbody>
@@ -33,6 +61,17 @@ $(document).ready(function() {
     var tableInitialized = false;
     var tabelaInstance = null;
     var tabelaEmProcesso = false; // Variável para controlar se uma operação está em andamento
+    
+    // Função para formatar os detalhes da linha
+    function formatarDetalhes(d) {
+        // d é o objeto de dados para esta linha
+        // O índice 14 contém a observação
+        var observacao = d[14] || 'Nenhuma observação disponível';
+        
+        return '<div class="observacao-detalhes">' +
+               '<strong>Observação:</strong><br>' + observacao +
+               '</div>';
+    }
     
     // Função para configurar a instância do DataTable com callback
     function configurarDataTable(callback) {
@@ -72,6 +111,7 @@ $(document).ready(function() {
                     
                     // Recriar a estrutura da tabela para evitar problemas de DOM
                     $('#tabelaPesquisas').html('<thead><tr>' +
+                        '<th></th>' +
                         '<th>ID</th>' +
                         '<th>Processo</th>' +
                         '<th>Órgão Respondente</th>' +
@@ -85,12 +125,14 @@ $(document).ready(function() {
                         '<th>Importância</th>' +
                         '<th>Pontualidade</th>' +
                         '<th>Média</th>' +
+                        '<th>Observação</th>' +
                         '</tr></thead><tbody></tbody>');
                 }
             } catch (destroyError) {
                 console.error("Erro ao destruir tabela existente:", destroyError);
                 // Se houver erro ao destruir, tente recuperar o elemento
                 $('#tabelaPesquisas').empty().html('<thead><tr>' +
+                    '<th></th>' +
                     '<th>ID</th>' +
                     '<th>Processo</th>' +
                     '<th>Órgão Respondente</th>' +
@@ -104,6 +146,7 @@ $(document).ready(function() {
                     '<th>Importância</th>' +
                     '<th>Pontualidade</th>' +
                     '<th>Média</th>' +
+                    '<th>Observação</th>' +
                     '</tr></thead><tbody></tbody>');
             }
             
@@ -124,10 +167,33 @@ $(document).ready(function() {
                             text: '<i class="fas fa-file-excel fa-2x grow-icon" style="margin-right:30px"></i>',
                             title: 'SNCI_Pesquisas_Respondidas_' + d,
                             className: 'btExcel',
+                            exportOptions: {
+                                columns: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+                            },
+                            customize: function(xlsx) {
+                                var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                                // Garantir que o cabeçalho da coluna Observação esteja correto
+                                $('row:first c:eq(13)', sheet).attr('t', 'inlineStr')
+                                    .find('is t').text('Observação');
+                            }
                         }
                     ],
                     columnDefs: [
-                        { className: "text-center", targets: [5, 6, 7, 8, 9, 10, 11, 12] }
+                        { 
+                            targets: 0,
+                            className: 'details-control',
+                            orderable: false,
+                            data: null,
+                            defaultContent: ''
+                        },
+                        // Definir a coluna de observação como invisível na tabela, mas disponível para exportação
+                        { 
+                            targets: 14, 
+                            visible: false,
+                            searchable: false,
+                            name: 'Observação'
+                        },
+                        { className: "text-center", targets: [6, 7, 8, 9, 10, 11, 12, 13] }
                     ],
                     language: {
                         url: "plugins/datatables/traducao.json"
@@ -144,6 +210,22 @@ $(document).ready(function() {
                                 } catch(e) {
                                     console.warn("Erro ao ajustar colunas:", e);
                                 }
+                            }
+                        });
+                        
+                        // Adicionar evento de clique para mostrar/esconder detalhes
+                        $('#tabelaPesquisas tbody').on('click', 'td.details-control', function () {
+                            var tr = $(this).closest('tr');
+                            var row = tabelaInstance.row(tr);
+                            
+                            if (row.child.isShown()) {
+                                // Já está aberto - feche
+                                row.child.hide();
+                                tr.removeClass('shown');
+                            } else {
+                                // Abrir esta linha
+                                row.child(formatarDetalhes(row.data())).show();
+                                tr.addClass('shown');
                             }
                         });
                         
@@ -232,6 +314,7 @@ $(document).ready(function() {
                                     var pontualidade = row[10] == 1 ? "Sim" : "Não";
                                     
                                     tabela.row.add([
+                                        "",       // Coluna de controle para expandir/contrair
                                         row[0],   // ID
                                         row[2],   // Processo
                                         row[3],   // órgao que respondeu
@@ -244,7 +327,8 @@ $(document).ready(function() {
                                         row[8],   // Pós-Trabalho
                                         row[9],   // Importância do Processo
                                         pontualidade, // Pontualidade como Sim/Não
-                                        media     // Média
+                                        media,     // Média
+                                        row[11]    // Observação (não exibida na tabela, apenas nos detalhes)
                                     ]);
                                 });
                                 
@@ -268,7 +352,7 @@ $(document).ready(function() {
                             tabela.clear().draw();
                             // Aqui apenas atualiza o conteúdo do tbody, preservando o thead
                             $('#tabelaPesquisas tbody').html(
-                                '<tr><td colspan="13" class="text-center">' +
+                                '<tr><td colspan="14" class="text-center">' +
                                 '<i class="fas fa-info-circle mr-2"></i>' +
                                 'Nenhum dado encontrado para os filtros selecionados</td></tr>'
                             );
@@ -276,7 +360,7 @@ $(document).ready(function() {
                     } catch (processError) {
                         console.error("Erro ao processar dados:", processError);
                         $('#tabelaPesquisas tbody').html(
-                            '<tr><td colspan="13" class="text-center text-danger">' +
+                            '<tr><td colspan="14" class="text-center text-danger">' +
                             '<i class="fas fa-exclamation-triangle mr-2"></i>' +
                             'Erro ao processar dados: ' + processError.message + '</td></tr>'
                         );
@@ -293,7 +377,7 @@ $(document).ready(function() {
                     
                     // Mostrar mensagem de erro na tabela
                     $('#tabelaPesquisas tbody').html(
-                        '<tr><td colspan="13" class="text-center text-danger">' +
+                        '<tr><td colspan="14" class="text-center text-danger">' +
                         '<i class="fas fa-exclamation-triangle mr-2"></i>' +
                         'Erro ao carregar dados: ' + error + '</td></tr>'
                     );
