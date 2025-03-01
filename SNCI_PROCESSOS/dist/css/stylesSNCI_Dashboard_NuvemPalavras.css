@@ -139,3 +139,151 @@
 #nuvem .text-center {
   padding: 2rem;
 }
+
+/* Estilos para a nuvem de palavras interativa */
+
+.nuvem-palavras-container {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+}
+
+#nuvem-palavras {
+  width: 100%;
+  height: 400px;
+}
+
+/* Estilos para indicador de carregamento */
+.loader-nuvem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  font-size: 3rem;
+  color: #6c757d;
+}
+
+/* Tornar as palavras clicáveis com cursor pointer */
+.jqcloud span {
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.jqcloud span:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+/* Estilo para mensagem de sem dados */
+.sem-dados-nuvem {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  color: #6c757d;
+}
+
+/* Estilos para os cards de observações */
+.card-observacao {
+  transition: all 0.3s ease;
+  border: none;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.card-observacao:hover {
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-3px);
+}
+
+.card-observacao .card-header {
+  border-bottom: none;
+  padding: 0.75rem 1.25rem;
+}
+
+.observacao-texto {
+  font-size: 0.95rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+}
+
+/* Estilo para destacar a palavra encontrada */
+.palavra-destacada {
+  background-color: rgba(255, 230, 0, 0.4);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: bold;
+  color: #000;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Botão de fechar resultados */
+#fechar-resultados {
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+#fechar-resultados:hover {
+  opacity: 1;
+}
+
+/* Estilização do card de resultados */
+.card-results {
+  border: none;
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+}
+
+.card-results .card-header {
+  border-bottom: none;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+/* Conteúdo scrollável dentro do card */
+.card-scrollable-content {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  background-color: #fff;
+}
+
+/* Botão de fechar resultados */
+#fechar-resultados {
+  cursor: pointer;
+  opacity: 0.8;
+  transition: all 0.2s;
+}
+
+#fechar-resultados:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* Botão voltar ao topo */
+#voltar-ao-topo {
+  transition: all 0.2s ease;
+}
+
+#voltar-ao-topo:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Adaptar a altura para telas menores */
+@media (max-width: 768px) {
+  #nuvem-palavras,
+  .nuvem-palavras-container {
+    height: 300px;
+  }
+
+  .observacao-texto {
+    max-height: 150px;
+  }
+}

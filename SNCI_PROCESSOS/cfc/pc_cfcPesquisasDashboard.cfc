@@ -350,5 +350,50 @@
             </cfloop>
         </cfloop>
     </cffunction>
+
+    <cffunction name="getObservacoesByPalavra" access="remote" returntype="string" returnformat="json">
+        <cfargument name="palavra" type="string" required="true">
+        <cfargument name="ano" type="string" required="true">
+        <cfargument name="mcuOrigem" type="string" required="true">
+        
+        <cfquery name="qObservacoesPalavra" datasource="#application.dsn_processos#">
+            SELECT 
+                pesq.pc_processo_id,
+                orgaoResp.pc_org_sigla as orgao_respondente,
+                orgaoResp.pc_org_mcu as orgao_mcu,
+                orgaoOrigem.pc_org_sigla as orgao_origem,
+                orgaoOrigem.pc_org_mcu as origem_mcu,
+                pesq.pc_pesq_observacao
+            FROM pc_pesquisas pesq
+            INNER JOIN pc_processos p ON pesq.pc_processo_id = p.pc_processo_id
+            INNER JOIN pc_orgaos orgaoResp ON pesq.pc_org_mcu = orgaoResp.pc_org_mcu
+            INNER JOIN pc_orgaos orgaoOrigem ON p.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
+            WHERE pesq.pc_pesq_observacao IS NOT NULL
+            AND DATALENGTH(pesq.pc_pesq_observacao) > 0
+            AND orgaoOrigem.pc_org_status = 'O'
+            AND pesq.pc_pesq_observacao LIKE <cfqueryparam value="%#arguments.palavra#%" cfsqltype="cf_sql_varchar">
+            AND RIGHT(p.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
+            <cfif arguments.ano NEQ "Todos">
+                AND RIGHT(p.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif arguments.mcuOrigem NEQ "Todos">
+                AND p.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+            </cfif>
+            ORDER BY p.pc_processo_id
+        </cfquery>
+        
+        <cfset var resultado = []>
+        <cfloop query="qObservacoesPalavra">
+            <cfset arrayAppend(resultado, {
+                "processo_id": pc_processo_id,
+                "orgao_respondente": orgao_respondente,
+                "orgao_mcu": orgao_mcu,
+                "orgao_origem": orgao_origem & " (" & origem_mcu & ")",
+                "observacao": pc_pesq_observacao
+            })>
+        </cfloop>
+        
+        <cfreturn serializeJSON(resultado)>
+    </cffunction>
     
 </cfcomponent>

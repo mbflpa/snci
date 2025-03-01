@@ -13,7 +13,8 @@
         <div class="flex-grow-1">
           <p style="text-align: justify;">A nuvem de palavras é uma representação visual das palavras mais frequentes encontradas nas observações das pesquisas.</p>
           <p style="text-align: justify;">Palavras maiores indicam termos que aparecem com mais frequência. Este recurso ajuda a identificar rapidamente os temas mais recorrentes nas observações.</p>
-          <p style="text-align: justify;">Posicionando o cursor sobre uma palavra, você pode ver a frequência com que ela aparece e a relevância em relação às demais.</p>  
+          <p style="text-align: justify;">Posicionando o cursor sobre uma palavra, você pode ver a frequência com que ela aparece e a relevância em relação às demais.</p>
+          <p style="text-align: justify;">Clique em uma palavra para ver todas as observações que contêm aquele termo.</p>  
         </div>
         <!-- Controles para ajustar a nuvem de palavras -->
         <div class="mt-auto">
@@ -47,6 +48,31 @@
         <div id="nuvem" style="height: 400px;"></div>
       </div>
      
+    </div>
+  </div>
+</div>
+
+<!-- Container para os resultados de palavra (inicialmente oculto) -->
+<div id="resultados-palavra" class="mt-4" style="display: none;">
+  <div class="card card-results">
+    <div class="card-header bg-gradient-primary text-white">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="card-title m-0">
+          <i class="fas fa-search mr-2"></i>Observações contendo: 
+          <span id="palavra-selecionada" class="badge badge-light text-primary"></span>
+        </h5>
+        <button type="button" class="close text-white" id="fechar-resultados" aria-label="Fechar resultados">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    </div>
+    <div class="card-body bg-light">
+      <div id="cards-container" class="row">
+        <!-- Cards serão inseridos aqui via JS -->
+      </div>
+    </div>
+    <div class="card-footer bg-white">
+      <span id="contador-resultados" class="text-muted"></span>
     </div>
   </div>
 </div>
@@ -111,6 +137,9 @@ $(document).ready(function() {
         // Mostrar loader enquanto carrega
         $("#nuvem").html('<div class="text-center p-5"><i class="fas fa-spinner fa-spin fa-3x"></i><p class="mt-3">Gerando nuvem de palavras...</p></div>');
         
+        // Ocultar resultados anteriores quando atualizar a nuvem
+        $("#resultados-palavra").hide();
+        
         // CORREÇÃO PRINCIPAL: Usar o método getWordCloud em vez de getNuvemPalavras
         $.ajax({
             url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getWordCloud&returnformat=json',
@@ -137,12 +166,12 @@ $(document).ready(function() {
                             delay: 50,
                             shape: 'rectangular',
                             colors: ["#17a2b8", "#28a745", "#ffc107", "#fd7e14", "#20c997", "#6f42c1", "#e83e8c"],
-                            // Adicionar o evento afterCloudRender para configurar popovers
+                            // Adicionar o evento afterCloudRender para configurar popovers e click handlers
                             afterCloudRender: function() {
                                 // Remover popovers antigos
                                 $('.jqcloud-word[data-toggle="popover"]').popover('dispose');
                                 
-                                // Configurar popovers em cada palavra
+                                // Configurar popovers e click handlers em cada palavra
                                 $('.jqcloud-word').each(function() {
                                     var word = $(this);
                                     var wordText = word.text();
@@ -175,6 +204,14 @@ $(document).ready(function() {
                                         word.attr('title', wordText);
                                         word.attr('data-content', 'Frequência: ' + frequency + '<br>Relevância: ' + relevancia);
                                         word.attr('data-html', 'true');
+                                        
+                                        // Adicionar manipulador de clique para cada palavra
+                                        word.on('click', function() {
+                                            var palavraClicada = $(this).text();
+                                            // Capturar a cor da palavra para usar no header dos cards
+                                            var corPalavra = $(this).css('color');
+                                            buscarObservacoesPorPalavra(palavraClicada, anoFiltro, mcuFiltro, corPalavra);
+                                        });
                                     }
                                 });
                                 
@@ -193,6 +230,212 @@ $(document).ready(function() {
             }
         });
     };
+    
+    // Função para buscar observações que contêm a palavra clicada
+    function buscarObservacoesPorPalavra(palavra, ano, mcu, corPalavra) {
+        // Mostrar o card de resultados com indicador de carregamento
+        $("#resultados-palavra").show();
+        $("#cards-container").html('<div class="col-12 text-center p-5"><div class="spinner-grow text-primary" role="status"><span class="sr-only">Carregando...</span></div><p class="mt-3">Carregando observações...</p></div>');
+        $("#palavra-selecionada").text(palavra);
+        
+        // Atualizar a cor do header do card de resultados principal para combinar com a palavra
+        if (corPalavra) {
+            // Converter a cor RGB para hexadecimal para usar como valor do gradiente
+            var hexColor = rgbToHex(corPalavra);
+            var darkerColor = adjustColor(hexColor, -30); // Versão mais escura da cor
+            
+            // Invertido o gradiente para que a cor mais forte fique à esquerda
+            $(".card-results .card-header").css('background', 'linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ')');
+            // Ajustar a cor do texto do badge para combinar com a cor principal
+            $("#palavra-selecionada").css('color', hexColor);
+        }
+        
+        $.ajax({
+            url: 'cfc/pc_cfcPesquisasDashboard.cfc',
+            method: 'GET',
+            data: {
+                method: 'getObservacoesByPalavra',
+                palavra: palavra,
+                ano: ano,
+                mcuOrigem: mcu,
+                returnformat: 'json'
+            },
+            success: function(response) {
+                var data = JSON.parse(response);
+                $("#cards-container").empty();
+                
+                if (data && data.length > 0) {
+                    // Atualizar contador de resultados
+                    $("#contador-resultados").text(data.length + ' observação(ões) encontrada(s)');
+                    
+                    // Criar um card para cada observação
+                    data.forEach(function(item, index) {
+                        var observacaoComDestaque = destacarPalavra(item.observacao, palavra);
+                        var processoId = item.processo_id;
+                        var orgaoRespondente = item.orgao_respondente;
+                        var orgaoOrigem = item.orgao_origem || "Não informado";
+                        
+                        var card = criarCardObservacao(processoId, orgaoRespondente, orgaoOrigem, observacaoComDestaque, index, corPalavra);
+                        $("#cards-container").append(card);
+                    });
+                    
+                    // Inicializar os tooltips para os novos elementos
+                    $('[data-toggle="tooltip"]').tooltip();
+                    
+                    // Rolar até os resultados usando a função global específica do site
+                    // Esta é a função corrigida que deve funcionar com a estrutura do site
+                    if (typeof window.scrollToElement === 'function') {
+                        setTimeout(function() {
+                            window.scrollToElement('#resultados-palavra', 70);
+                        }, 200);
+                    } else {
+                        // Fallback para scroll normal se a função global não existir
+                        setTimeout(function() {
+                            $('.content-wrapper').animate({
+                                scrollTop: $('.content-wrapper').scrollTop() + $("#resultados-palavra").position().top - 70
+                            }, 800);
+                        }, 200);
+                    }
+                } else {
+                    $("#cards-container").html(
+                        '<div class="col-12">' +
+                            '<div class="alert alert-warning">' +
+                                '<i class="fas fa-exclamation-circle mr-2"></i>' +
+                                'Nenhuma observação encontrada com a palavra "<strong>' + palavra + '</strong>".' +
+                            '</div>' +
+                        '</div>'
+                    );
+                    $("#contador-resultados").text('0 observações encontradas');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Erro ao buscar observações:", error);
+                $("#cards-container").html('<div class="col-12"><div class="alert alert-danger"><i class="fas fa-exclamation-triangle mr-2"></i>Erro ao buscar observações.</div></div>');
+                $("#contador-resultados").text('Ocorreu um erro na consulta');
+            }
+        });
+    }
+    
+    // Função para destacar a palavra na observação
+    function destacarPalavra(texto, palavra) {
+        if (!texto) return '';
+        
+        // Criar regex que faz match com a palavra preservando case-insensitivity
+        var regex = new RegExp('(\\b' + escapeRegExp(palavra) + '\\b)', 'gi');
+        return texto.replace(regex, '<strong class="palavra-destacada">$1</strong>');
+    }
+    
+    // Função auxiliar para escapar caracteres especiais em regex
+    function escapeRegExp(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+    
+    // Função para criar um card de observação com design aprimorado usando a cor da palavra
+    function criarCardObservacao(processoId, orgaoRespondente, orgaoOrigem, observacao, index, corPalavra) {
+        // Usar a cor da palavra ou escolher cores alternadas se não for fornecida
+        var styleHeader = '';
+        var badgeClass = '';
+        
+        if (corPalavra) {
+            // Converter a cor RGB para hexadecimal para usar como valor do gradiente
+            var hexColor = rgbToHex(corPalavra);
+            var darkerColor = adjustColor(hexColor, -30); // Versão mais escura da cor
+            
+            // Invertido o gradiente para que a cor mais forte fique à esquerda
+            styleHeader = 'style="background: linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ');"';
+            badgeClass = 'style="color: ' + hexColor + ';"';
+        } else {
+            // Fallback para as cores pré-definidas se não tiver a cor da palavra
+            var headerClasses = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
+            var currentClass = headerClasses[index % headerClasses.length];
+            styleHeader = 'class="' + currentClass + '"';
+            badgeClass = 'class="text-' + currentClass.replace('bg-', '') + '"';
+        }
+        
+        return $('<div class="col-md-6 mb-4">' +
+            '<div class="card card-observacao h-100 shadow-sm">' +
+                '<div class="card-header text-white py-2" ' + styleHeader + '>' +
+                    '<div class="d-flex justify-content-between align-items-center">' +
+                        '<h5 class="card-title mb-0">' +
+                            '<i class="fas fa-file-alt mr-2"></i>Processo: ' + processoId +
+                        '</h5>' +
+                        '<span class="badge badge-light" ' + badgeClass + ' data-toggle="tooltip" title="Número sequencial">#' + (index+1) + '</span>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="card-body bg-white" style="padding:0.5rem">' +
+                    '<div class="row mb-3" style="margin-bottom:0!important;">' +
+                        '<div class="col-md-6">' +
+                            '<div class="d-flex align-items-center mb-2">' +
+                                '<i class="fas fa-building text-muted mr-2"></i>' +
+                                '<div>' +
+                                    '<strong class="d-block">Órgão Respondente:</strong>' +
+                                    '<span class="text-primary">' + orgaoRespondente + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="col-md-6">' +
+                            '<div class="d-flex align-items-center">' +
+                                '<i class="fas fa-map-marker-alt text-muted mr-2"></i>' +
+                                '<div>' +
+                                    '<strong class="d-block">Órgão de Origem:</strong>' +
+                                    '<span class="text-primary">' + orgaoOrigem + '</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<hr class="my-2">' +
+                    '<div class="observacao-texto card-scrollable-content p-2" style="padding:0!important">' + observacao + '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>');
+    }
+    
+    // Função auxiliar para converter RGB para HEX
+    function rgbToHex(rgb) {
+        // Se já for hex, retornar
+        if (rgb.startsWith('#')) {
+            return rgb;
+        }
+        
+        // Extrair valores R, G, B da string "rgb(r, g, b)"
+        var rgbArr = rgb.match(/\d+/g);
+        if (!rgbArr || rgbArr.length !== 3) {
+            return '#007bff'; // Fallback para cor padrão
+        }
+        
+        var r = parseInt(rgbArr[0]);
+        var g = parseInt(rgbArr[1]);
+        var b = parseInt(rgbArr[2]);
+        
+        return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    
+    // Função para ajustar a cor (torná-la mais clara ou escura)
+    function adjustColor(hex, percent) {
+        // Remove o # se presente
+        hex = hex.replace('#', '');
+        
+        // Converte para RGB
+        var r = parseInt(hex.substring(0, 2), 16);
+        var g = parseInt(hex.substring(2, 4), 16);
+        var b = parseInt(hex.substring(4, 6), 16);
+        
+        // Ajusta os valores (limita entre 0 e 255)
+        r = Math.max(0, Math.min(255, Math.round(r * (100 + percent) / 100)));
+        g = Math.max(0, Math.min(255, Math.round(g * (100 + percent) / 100)));
+        b = Math.max(0, Math.min(255, Math.round(b * (100 + percent) / 100)));
+        
+        // Converte de volta para hex
+        return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    
+    // Manipulador de evento para o botão fechar resultados
+    $("#fechar-resultados").on('click', function() {
+        $("#resultados-palavra").hide();
+        $("#cards-container").empty();
+        $("#palavra-selecionada").text('');
+        $("#contador-resultados").text('');
+    });
     
     // Inicializar a nuvem quando o componente for carregado
     setTimeout(function() {
