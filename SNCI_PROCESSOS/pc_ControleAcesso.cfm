@@ -1,4 +1,3 @@
-
 <cfprocessingdirective pageencoding = "utf-8">
 
 
@@ -103,7 +102,7 @@
 												<option selected="" disabled="" value=""></option>
 												<cfloop list="#listIcon#" index="i" >
 													<cfoutput>
-														<option value="#i#" data-icon="#i#"> <span style="margin-left:5px">#i#</span></option>
+														<option value="#i#" data-icon="#i#">#i#</option>
 													</cfoutput>
 												</cfloop>
 											</select>	
@@ -127,7 +126,7 @@
 												<option selected=""  value=""></option>
 												<cfloop list="#listIcon#" index="i" >
 													<cfoutput>
-														<option value="#i#" data-icon="#i#"> <span style="margin-left:5px">#i#</span></option>
+														<option value="#i#" data-icon="#i#">#i#</option>
 													</cfoutput>
 												</cfloop>
 											</select>	
@@ -151,7 +150,7 @@
 												<option selected="" value=""></option>
 												<cfloop list="#listIcon#" index="i" >
 													<cfoutput>
-														<option value="#i#" data-icon="#i#"> <span style="margin-left:5px">#i#</span></option>
+														<option value="#i#" data-icon="#i#">#i#</option>
 													</cfoutput>
 												</cfloop>
 											</select>	
@@ -185,7 +184,7 @@
 												<option selected="" value=""></option>
 												<cfloop list="#listOrdem#" index="i" >
 													<cfoutput>
-														<option value="#i#" data-icon="#i#"> <span style="margin-left:5px">#i#</span></option>
+														<option value="#i#" data-icon="#i#">#i#</option>
 													</cfoutput>
 												</cfloop>
 											</select>	</div>
@@ -294,7 +293,7 @@
 			$('#modalOverlay').modal('show');
 			$.ajax({
 				type: "post",
-				url: "cfc/pc_cfcPaginasApoio.cfc",
+				url: "cfc/pc_cfcControleAcesso.cfc",
 				data:{
 					method:"cardsLinks"
 				},
@@ -348,7 +347,7 @@
 				$('#modalOverlay').modal('show');
 					$.ajax({
 						type: "POST",
-						url:"cfc/pc_cfcPaginasApoio.cfc",
+						url:"cfc/pc_cfcControleAcesso.cfc",
 						data:{
 							method: "cadLink",
 							pc_controle_acesso_id: $('#controleId').val(),
@@ -460,7 +459,7 @@
 				$('#modalOverlay').modal('show');
 				$.ajax({
 					type: "post",
-					url: "cfc/pc_cfcPaginasApoio.cfc",
+					url: "cfc/pc_cfcControleAcesso.cfc",
 					data:{
 						method:"delLink",
 						pc_controle_acesso_id: controleId
