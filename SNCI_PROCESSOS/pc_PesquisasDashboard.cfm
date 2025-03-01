@@ -161,7 +161,7 @@
                           <ul class="nav nav-dashboard-tabs" id="dashboardTabs" role="tablist">
                             <li class="nav-item">
                               <a class="nav-link active" id="avaliacoes-tab" data-toggle="tab" href="#avaliacoes" role="tab" aria-controls="avaliacoes" aria-selected="true">
-                                <i class="fas fa-star"></i>Avaliações (Média das Notas por Pergunta)
+                                <i class="fas fa-star"></i>Média das Notas por Categoria
                               </a>
                             </li>
                             <li class="nav-item">

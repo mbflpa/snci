@@ -184,7 +184,7 @@ $(document).ready(function() {
                         });
                     }, 100);
                 } else {
-                    $("#nuvem").html('<div class="text-center p-5"><i class="fas fa-comment-slash fa-3x"></i><p class="mt-3">Não foram encontradas observações para gerar a nuvem de palavras.</p></div>');
+                    $("#nuvem").html('<div class="text-center p-5"><i class="fas fa-comment-slash fa-3x"></i><p class="mt-3">Não foram encontradas observações para gerar a nuvem de palavras ou não aparece devido a <strong>Frequência Mínima</strong> (diminua a Frequência Mínima, ao lado, e clique em "Atualizar Nuvem").</p></div>');
                 }
             },
             error: function(xhr, status, error) {
