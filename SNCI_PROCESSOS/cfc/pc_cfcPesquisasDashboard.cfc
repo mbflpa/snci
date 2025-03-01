@@ -47,13 +47,13 @@
         <cfquery name="qryPesquisas" datasource="#application.dsn_processos#">
             SELECT 
                 COUNT(*) as total_pesquisas,
-                COALESCE(CAST(AVG(CAST(pc_pesq_comunicacao AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_comunicacao,
-                COALESCE(CAST(AVG(CAST(pc_pesq_interlocucao AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_interlocucao,
-                COALESCE(CAST(AVG(CAST(pc_pesq_reuniao_encerramento AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_reuniao,
-                COALESCE(CAST(AVG(CAST(pc_pesq_relatorio AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_relatorio,
-                COALESCE(CAST(AVG(CAST(pc_pesq_pos_trabalho AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_pos_trabalho,
-                COALESCE(CAST(AVG(CAST(pc_pesq_importancia_processo AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_importancia,
-                COALESCE(CAST(AVG(CAST(pc_pesq_pontualidade AS DECIMAL(10,2))) AS DECIMAL(10,2)), 0) as media_pontualidade
+                COALESCE(CAST(AVG(CAST(pc_pesq_comunicacao AS DECIMAL(10,3))) AS DECIMAL(10,3)), 0) as media_comunicacao,
+                COALESCE(CAST(AVG(CAST(pc_pesq_interlocucao AS DECIMAL(10,3))) AS DECIMAL(10,3)), 0) as media_interlocucao,
+                COALESCE(CAST(AVG(CAST(pc_pesq_reuniao_encerramento AS DECIMAL(10,3))) AS DECIMAL(10,3)), 0) as media_reuniao,
+                COALESCE(CAST(AVG(CAST(pc_pesq_relatorio AS DECIMAL(10,3))) AS DECIMAL(10,3)), 0) as media_relatorio,
+                COALESCE(CAST(AVG(CAST(pc_pesq_pos_trabalho AS DECIMAL(10,3))) AS DECIMAL(10,3)), 0) as media_pos_trabalho,
+                COALESCE(CAST(AVG(CAST(pc_pesq_importancia_processo AS DECIMAL(10,3))) AS DECIMAL(10,3)), 0) as media_importancia,
+                COALESCE(CAST(AVG(CAST(pc_pesq_pontualidade AS DECIMAL(10,3))) AS DECIMAL(10,3)), 0) as media_pontualidade
             FROM pc_pesquisas 
             INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
             INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
@@ -85,20 +85,24 @@
             ORDER BY mes
         </cfquery>
     
-        <cfset mediaGeral = (
-            val(qryPesquisas.media_comunicacao) +
-            val(qryPesquisas.media_interlocucao) +
-            val(qryPesquisas.media_reuniao) +
-            val(qryPesquisas.media_relatorio) +
-            val(qryPesquisas.media_pos_trabalho) +
-            val(qryPesquisas.media_importancia)
-        ) / 6>
+        <!--- Aplicando arredondamento em todas as médias usando ROUND(valor*10)/10 --->
+        <cfset media_comunicacao = ROUND(val(qryPesquisas.media_comunicacao)*10)/10>
+        <cfset media_interlocucao = ROUND(val(qryPesquisas.media_interlocucao)*10)/10>
+        <cfset media_reuniao = ROUND(val(qryPesquisas.media_reuniao)*10)/10>
+        <cfset media_relatorio = ROUND(val(qryPesquisas.media_relatorio)*10)/10>
+        <cfset media_pos_trabalho = ROUND(val(qryPesquisas.media_pos_trabalho)*10)/10>
+        <cfset media_importancia = ROUND(val(qryPesquisas.media_importancia)*10)/10>
+        
+        <cfset mediaGeral = (media_comunicacao + media_interlocucao + media_reuniao + 
+                             media_relatorio + media_pos_trabalho + media_importancia) / 6>
+        <cfset mediaGeral = ROUND(mediaGeral*10)/10>
     
         <cfset var evolucaoArray = []>
         <cfloop query="qryEvolucao">
+            <cfset media_arredondada = ROUND(val(media_geral)*10)/10>
             <cfset arrayAppend(evolucaoArray, {
                 "mes": mes,
-                "media": NumberFormat(media_geral, "999.99")
+                "media": NumberFormat(media_arredondada, "999.9")
             })>
         </cfloop>
     
@@ -158,24 +162,27 @@
         </cfquery>
 
         <!--- Montar estrutura de retorno --->
+        <!--- Usando a mesma técnica ROUND(x*10)/10 do arquivo pc_cfcIndicadores_gerarDados.cfc --->
+        <cfset pontualidade = val(qryPesquisas.media_pontualidade) * 100>
+
         <cfset retorno = {
             "total": qryPesquisas.total_pesquisas,
             "totalProcessos": qryTotalProcessos.total_processos,
-            "comunicacao": NumberFormat(qryPesquisas.media_comunicacao, "999.9"),
-            "interlocucao": NumberFormat(qryPesquisas.media_interlocucao, "999.9"),
-            "reuniao": NumberFormat(qryPesquisas.media_reuniao, "999.9"), 
-            "relatorio": NumberFormat(qryPesquisas.media_relatorio, "999.9"),
-            "pos_trabalho": NumberFormat(qryPesquisas.media_pos_trabalho, "999.9"),
-            "importancia": NumberFormat(qryPesquisas.media_importancia, "999.9"),
-            "pontualidadePercentual": NumberFormat(qryPesquisas.media_pontualidade * 100, "999.9"),
+            "comunicacao": NumberFormat(media_comunicacao, "999.9"),
+            "interlocucao": NumberFormat(media_interlocucao, "999.9"),
+            "reuniao": NumberFormat(media_reuniao, "999.9"), 
+            "relatorio": NumberFormat(media_relatorio, "999.9"),
+            "pos_trabalho": NumberFormat(media_pos_trabalho, "999.9"),
+            "importancia": NumberFormat(media_importancia, "999.9"),
+            "pontualidadePercentual": NumberFormat(pontualidade, "999.9"),
             "mediaGeral": NumberFormat(mediaGeral, "999.9"),
             "medias": [
-                val(qryPesquisas.media_comunicacao),
-                val(qryPesquisas.media_interlocucao),
-                val(qryPesquisas.media_reuniao),
-                val(qryPesquisas.media_relatorio),
-                val(qryPesquisas.media_pos_trabalho),
-                val(qryPesquisas.media_importancia)
+                media_comunicacao,
+                media_interlocucao,
+                media_reuniao,
+                media_relatorio,
+                media_pos_trabalho,
+                media_importancia
             ],
             "evolucaoTemporal": evolucaoArray
         }>
@@ -305,9 +312,11 @@
         <cfset var tempArray = []>
         <cfloop collection="#palavras#" item="palavra">
             <cfif palavras[palavra] GTE arguments.minFreq>
+                <!--- Aplicando arredondamento no peso --->
+                <cfset peso = ROUND(palavras[palavra]*10)/10>
                 <cfset arrayAppend(tempArray, {
                     "text": palavra,
-                    "weight": palavras[palavra]
+                    "weight": peso
                 })>
             </cfif>
         </cfloop>
