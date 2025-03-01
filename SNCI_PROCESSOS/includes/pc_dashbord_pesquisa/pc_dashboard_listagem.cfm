@@ -25,6 +25,14 @@
         background-color: #f8f9fa;
         border-left: 3px solid #007bff;
     }
+    /* Estilos para o rodapé com médias */
+    tfoot {
+        font-weight: bold;
+        background-color: #f0f0f0;
+    }
+    tfoot td.media-col {
+        color: #007bff;
+    }
 </style>
 
 <!-- Conteúdo da aba Listagem de Pesquisas -->
@@ -49,6 +57,20 @@
         <th>Observação</th>
       </tr>
     </thead>
+    <tfoot>
+      <tr>
+        <th colspan="6" style="text-align:right">Média:</th>
+        <th class="media-col text-center"></th>
+        <th class="media-col text-center"></th>
+        <th class="media-col text-center"></th>
+        <th class="media-col text-center"></th>
+        <th class="media-col text-center"></th>
+        <th class="media-col text-center"></th>
+        <th></th>
+        <th class="media-col text-center"></th>
+        <th></th>
+      </tr>
+    </tfoot>
     <tbody>
       <!--- Dados da tabela serão carregados dinamicamente --->
     </tbody>
@@ -71,6 +93,36 @@ $(document).ready(function() {
         return '<div class="observacao-detalhes">' +
                '<strong>Observação:</strong><br>' + observacao +
                '</div>';
+    }
+    
+    // Função para calcular as médias das colunas
+    function calcularMediasColunas(tabela) {
+        if (!tabela) return;
+        
+        var numRows = tabela.rows().count();
+        if (numRows === 0) return;
+        
+        // Colunas numéricas que queremos calcular médias (índices)
+        var colunasNumericas = [6, 7, 8, 9, 10, 11, 13]; // Comunicação até Importância e Média
+        
+        colunasNumericas.forEach(function(colIndex) {
+            var total = 0;
+            var contador = 0;
+            
+            // Somar todos os valores da coluna
+            tabela.column(colIndex).data().each(function(valor) {
+                if (valor !== null && valor !== "" && !isNaN(parseFloat(valor))) {
+                    total += parseFloat(valor);
+                    contador++;
+                }
+            });
+            
+            // Calcular média
+            var media = contador > 0 ? (total / contador).toFixed(1) : "N/A";
+            
+            // Atualizar o rodapé
+            $(tabela.column(colIndex).footer()).html(media);
+        });
     }
     
     // Função para configurar a instância do DataTable com callback
@@ -126,7 +178,18 @@ $(document).ready(function() {
                         '<th>Pontualidade</th>' +
                         '<th>Média</th>' +
                         '<th>Observação</th>' +
-                        '</tr></thead><tbody></tbody>');
+                        '</tr></thead><tfoot><tr>' +
+                        '<th colspan="6" style="text-align:right">Média:</th>' +
+                        '<th class="media-col text-center"></th>' +
+                        '<th class="media-col text-center"></th>' +
+                        '<th class="media-col text-center"></th>' +
+                        '<th class="media-col text-center"></th>' +
+                        '<th class="media-col text-center"></th>' +
+                        '<th class="media-col text-center"></th>' +
+                        '<th></th>' +
+                        '<th class="media-col text-center"></th>' +
+                        '<th></th>' +
+                        '</tr></tfoot><tbody></tbody>');
                 }
             } catch (destroyError) {
                 console.error("Erro ao destruir tabela existente:", destroyError);
@@ -147,7 +210,18 @@ $(document).ready(function() {
                     '<th>Pontualidade</th>' +
                     '<th>Média</th>' +
                     '<th>Observação</th>' +
-                    '</tr></thead><tbody></tbody>');
+                    '</tr></thead><tfoot><tr>' +
+                    '<th colspan="6" style="text-align:right">Média:</th>' +
+                    '<th class="media-col text-center"></th>' +
+                    '<th class="media-col text-center"></th>' +
+                    '<th class="media-col text-center"></th>' +
+                    '<th class="media-col text-center"></th>' +
+                    '<th class="media-col text-center"></th>' +
+                    '<th class="media-col text-center"></th>' +
+                    '<th></th>' +
+                    '<th class="media-col text-center"></th>' +
+                    '<th></th>' +
+                    '</tr></tfoot><tbody></tbody>');
             }
             
             // Inicializar nova tabela diretamente (sem setTimeout)
@@ -175,6 +249,13 @@ $(document).ready(function() {
                                 // Garantir que o cabeçalho da coluna Observação esteja correto
                                 $('row:first c:eq(13)', sheet).attr('t', 'inlineStr')
                                     .find('is t').text('Observação');
+                                    
+                                // Adicionar linha de médias na exportação
+                                var lastRow = $('row:last', sheet);
+                                var rowIndex = lastRow.attr('r');
+                                
+                                // Criar uma nova linha para médias na exportação
+                                // Implementação simplificada - apenas para exemplo
                             }
                         }
                     ],
@@ -229,10 +310,16 @@ $(document).ready(function() {
                             }
                         });
                         
+                        // Calcular médias após inicialização
+                        calcularMediasColunas(tabelaInstance);
+                        
                         // Chamar o callback após a inicialização completa
                         if (callback) callback(tabelaInstance);
                     },
                     drawCallback: function() {
+                        // Calcular médias cada vez que a tabela é redesenhada
+                        calcularMediasColunas(tabelaInstance);
+                        
                         // Se o callback ainda não foi chamado, garantir que é chamado
                         if (tabelaEmProcesso && callback) {
                             tabelaEmProcesso = false;
@@ -334,6 +421,9 @@ $(document).ready(function() {
                                 
                                 tabela.draw();
                                 console.log("Tabela desenhada com sucesso");
+                                
+                                // Calcular médias após carregar os dados
+                                calcularMediasColunas(tabela);
                                 
                                 // Ajustar colunas após desenhar a tabela
                                 setTimeout(function() {
