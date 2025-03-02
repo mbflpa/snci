@@ -246,6 +246,9 @@ $(document).ready(function() {
     
     // Função para buscar observações que contêm a palavra clicada
     function buscarObservacoesPorPalavra(palavra, ano, mcu, corPalavra) {
+        // Mostrar o modal de overlay enquanto carrega os dados
+        $('#modalOverlay').modal('show');
+        
         // Mostrar o card de resultados com indicador de carregamento
         $("#resultados-palavra").show();
         $("#cards-container").html('<div class="col-12 text-center p-5"><div class="spinner-grow text-primary" role="status"><span class="sr-only">Carregando...</span></div><p class="mt-3">Carregando observações...</p></div>');
@@ -294,6 +297,7 @@ $(document).ready(function() {
                         );
                         $("#contador-resultados").text('Ocorreu um erro na consulta');
                         $("#contador-parenteses").text('');
+                        $('#modalOverlay').modal('hide'); // Esconder o overlay em caso de erro
                         return;
                     }
                     
@@ -327,13 +331,20 @@ $(document).ready(function() {
                         if (typeof window.scrollToElement === 'function') {
                             setTimeout(function() {
                                 window.scrollToElement('#resultados-palavra', 70);
+                                // Esconder o overlay após o scroll ser concluído
+                                setTimeout(function() {
+                                    $('#modalOverlay').modal('hide');
+                                }, 300);
                             }, 200);
                         } else {
                             // Fallback para scroll normal se a função global não existir
                             setTimeout(function() {
                                 $('.content-wrapper').animate({
                                     scrollTop: $('.content-wrapper').scrollTop() + $("#resultados-palavra").position().top - 70
-                                }, 800);
+                                }, 800, function() {
+                                    // Esconder o overlay quando a animação terminar
+                                    $('#modalOverlay').modal('hide');
+                                });
                             }, 200);
                         }
                     } else {
@@ -347,6 +358,8 @@ $(document).ready(function() {
                         );
                         $("#contador-resultados").text('0 observações');
                         $("#contador-parenteses").text('(0 observações encontradas)');
+                        // Esconder o overlay já que não há resultados
+                        $('#modalOverlay').modal('hide');
                     }
                 } catch (e) {
                     console.error("Erro ao processar resposta:", e);
@@ -358,6 +371,8 @@ $(document).ready(function() {
                             '</div>' +
                         '</div>'
                     );
+                    // Esconder o overlay em caso de erro
+                    $('#modalOverlay').modal('hide');
                 }
             },
             error: function(xhr, status, error) {
@@ -365,6 +380,8 @@ $(document).ready(function() {
                 $("#cards-container").html('<div class="col-12"><div class="alert alert-danger"><i class="fas fa-exclamation-triangle mr-2"></i>Erro ao buscar observações: ' + error + '</div></div>');
                 $("#contador-resultados").text('Ocorreu um erro na consulta');
                 $("#contador-parenteses").text('');
+                // Esconder o overlay em caso de erro na requisição
+                $('#modalOverlay').modal('hide');
             }
         });
     }
