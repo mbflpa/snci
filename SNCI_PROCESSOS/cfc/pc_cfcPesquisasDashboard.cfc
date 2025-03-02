@@ -396,16 +396,19 @@
         <cfreturn serializeJSON(resultado)>
     </cffunction>
     
-    <!--- Nova função para busca de palavras exatas --->
+    <!--- Função para busca de palavras exatas - ABORDAGEM COMPLETAMENTE NOVA --->
     <cffunction name="getObservacoesByPalavraExata" access="remote" returntype="string" returnformat="json">
         <cfargument name="palavra" type="string" required="true">
         <cfargument name="ano" type="string" required="true">
         <cfargument name="mcuOrigem" type="string" required="true">
         
+        <cfset var palavraBusca = trim(arguments.palavra)>
         <cfset var resultado = []>
         
+        <cflog file="nuvem_palavras" text="Nova tentativa de busca para: '#palavraBusca#', ano: #arguments.ano#, mcu: #arguments.mcuOrigem#">
+        
         <cftry>
-            <!--- Use CONTAINS com a palavra para pesquisa por texto completo - solução recomendada pelo SQL Server --->
+            <!--- ETAPA 1: Consulta SQL simples para obter um conjunto mais amplo de observações --->
             <cfquery name="qryObservacoes" datasource="#application.dsn_processos#">
                 SELECT 
                     pesq.pc_processo_id,
@@ -421,7 +424,7 @@
                 WHERE pesq.pc_pesq_observacao IS NOT NULL
                 AND DATALENGTH(pesq.pc_pesq_observacao) > 0
                 AND orgaoOrigem.pc_org_status = 'O'
-                AND pesq.pc_pesq_observacao LIKE '%' + <cfqueryparam value="#arguments.palavra#" cfsqltype="cf_sql_varchar"> + '%' COLLATE SQL_Latin1_General_CP1_CI_AI
+                AND pesq.pc_pesq_observacao LIKE <cfqueryparam value="%#palavraBusca#%" cfsqltype="cf_sql_varchar">
                 AND RIGHT(p.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
                 <cfif arguments.ano NEQ "Todos">
                     AND RIGHT(p.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
@@ -432,66 +435,60 @@
                 ORDER BY p.pc_processo_id
             </cfquery>
             
+            <cflog file="nuvem_palavras" text="Consulta inicial retornou #qryObservacoes.recordCount# resultados">
+            
+            <!--- ETAPA 2: Filtrar no lado do ColdFusion para palavras exatas e remover plurais --->
             <cfloop query="qryObservacoes">
-                <cfset arrayAppend(resultado, {
-                    "processo_id": pc_processo_id,
-                    "orgao_respondente": orgao_respondente,
-                    "orgao_mcu": orgao_mcu,
-                    "orgao_origem": orgao_origem & " (" & origem_mcu & ")",
-                    "observacao": pc_pesq_observacao
-                })>
-            </cfloop>
-            
-            <cfreturn serializeJSON(resultado)>
-            
-        <cfcatch type="any">
-            <cflog file="nuvem_palavras_error" text="Erro ao buscar observações exatas: #cfcatch.message# #cfcatch.detail#">
-            
-            <!--- Plano B: Usar LIKE padrão se a abordagem com COLLATE falhar --->
-            <cftry>
-                <cfquery name="qryObservacoesBackup" datasource="#application.dsn_processos#">
-                    SELECT 
-                        pesq.pc_processo_id,
-                        orgaoResp.pc_org_sigla as orgao_respondente,
-                        orgaoResp.pc_org_mcu as orgao_mcu,
-                        orgaoOrigem.pc_org_sigla as orgao_origem,
-                        orgaoOrigem.pc_org_mcu as origem_mcu,
-                        pesq.pc_pesq_observacao
-                    FROM pc_pesquisas pesq
-                    INNER JOIN pc_processos p ON pesq.pc_processo_id = p.pc_processo_id
-                    INNER JOIN pc_orgaos orgaoResp ON pesq.pc_org_mcu = orgaoResp.pc_org_mcu
-                    INNER JOIN pc_orgaos orgaoOrigem ON p.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
-                    WHERE pesq.pc_pesq_observacao IS NOT NULL
-                    AND DATALENGTH(pesq.pc_pesq_observacao) > 0
-                    AND orgaoOrigem.pc_org_status = 'O'
-                    AND pesq.pc_pesq_observacao LIKE <cfqueryparam value="%#arguments.palavra#%" cfsqltype="cf_sql_varchar">
-                    AND RIGHT(p.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
-                    <cfif arguments.ano NEQ "Todos">
-                        AND RIGHT(p.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
-                    </cfif>
-                    <cfif arguments.mcuOrigem NEQ "Todos">
-                        AND p.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
-                    </cfif>
-                    ORDER BY p.pc_processo_id
-                </cfquery>
+                <cfset var observacao = pc_pesq_observacao>
+                <cfset var incluirObservacao = false>
                 
-                <cfloop query="qryObservacoesBackup">
+                <!--- 
+                    Verificar se a observação contém a palavra exata usando regex:
+                    \b = limite de palavra (início/fim)
+                    Adiciona captura para possíveis pontuações no final
+                --->
+                <cfset var matchPattern = "\b#palavraBusca#(?:\b|[.,;:!?)]|\s)">
+                <cfset var matches = REMatchNoCase(matchPattern, observacao)>
+                
+                <!--- 
+                    Verificar se não é um plural ou outra palavra que contém a palavra buscada
+                    como prefixo (por exemplo, "equipe" vs "equipes")
+                --->
+                <cfif arrayLen(matches) GT 0>
+                    <cfset incluirObservacao = true>
+                    
+                    <!--- Verificar se os matches são realmente a palavra exata e não palavras plurais --->
+                    <cfloop array="#matches#" index="match">
+                        <cfset match = REReplace(match, "[.,;:!?)]$", "", "ALL")> <!--- Remover pontuação no final --->
+                        <cfset match = trim(match)> <!--- Remover espaços --->
+                        
+                        <!--- Verificar se o match não é um plural ("palavra" + "s" ou "es") --->
+                        <cfif match EQ "#palavraBusca#s" OR match EQ "#palavraBusca#es">
+                            <cfset incluirObservacao = false>
+                            <cfbreak>
+                        </cfif>
+                    </cfloop>
+                </cfif>
+                
+                <!--- Se a observação passou nos testes, inclui no resultado --->
+                <cfif incluirObservacao>
                     <cfset arrayAppend(resultado, {
                         "processo_id": pc_processo_id,
                         "orgao_respondente": orgao_respondente,
                         "orgao_mcu": orgao_mcu,
                         "orgao_origem": orgao_origem & " (" & origem_mcu & ")",
-                        "observacao": pc_pesq_observacao
+                        "observacao": observacao
                     })>
-                </cfloop>
-                
-                <cfreturn serializeJSON(resultado)>
-                
-            <cfcatch>
-                <cflog file="nuvem_palavras_error" text="Erro no plano B ao buscar observações: #cfcatch.message# #cfcatch.detail#">
-                <cfreturn serializeJSON([])>
-            </cfcatch>
-            </cftry>
+                </cfif>
+            </cfloop>
+            
+            <cflog file="nuvem_palavras" text="Após filtro, retornando #arrayLen(resultado)# resultados">
+            <cfreturn serializeJSON(resultado)>
+            
+        <cfcatch type="any">
+            <cflog file="nuvem_palavras_error" text="ERRO na busca: #cfcatch.message# - #cfcatch.detail#">
+            <cflog file="nuvem_palavras_error" text="Linha: #cfcatch.tagContext[1].line# em #cfcatch.tagContext[1].template#">
+            <cfreturn serializeJSON([])>
         </cfcatch>
         </cftry>
     </cffunction>
