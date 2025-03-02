@@ -55,11 +55,12 @@
 <!-- Container para os resultados de palavra (inicialmente oculto) -->
 <div id="resultados-palavra" class="mt-4" style="display: none;">
   <div class="card card-results">
-    <div class="card-header bg-gradient-primary text-white">
+    <div class="card-header navbar_correios_backgroundColor text-white">
       <div class="d-flex justify-content-between align-items-center">
         <h5 class="card-title m-0">
           <i class="fas fa-search mr-2"></i>Observações contendo: 
           <span id="palavra-selecionada" class="badge badge-light text-primary"></span>
+          <span id="contador-parenteses" class="ml-2"></span>
         </h5>
         <button type="button" class="close text-white" id="fechar-resultados" aria-label="Fechar resultados">
           <span aria-hidden="true">&times;</span>
@@ -262,79 +263,128 @@ $(document).ready(function() {
             $("#palavra-selecionada").css('color', hexColor);
         }
         
+        // MODIFICAÇÃO AQUI - Usar getObservacoesByPalavraExata em vez de getObservacoesByPalavra
         $.ajax({
             url: 'cfc/pc_cfcPesquisasDashboard.cfc',
             method: 'GET',
             data: {
-                method: 'getObservacoesByPalavra',
+                method: 'getObservacoesByPalavraExata', // Nova função
                 palavra: palavra,
                 ano: ano,
                 mcuOrigem: mcu,
                 returnformat: 'json'
             },
             success: function(response) {
-                var data = JSON.parse(response);
-                $("#cards-container").empty();
-                
-                if (data && data.length > 0) {
-                    // Atualizar contador de resultados
-                    $("#contador-resultados").text(data.length + ' observação(ões) encontrada(s)');
+                try {
+                    var data = JSON.parse(response);
                     
-                    // Criar um card para cada observação
-                    data.forEach(function(item, index) {
-                        var observacaoComDestaque = destacarPalavra(item.observacao, palavra);
-                        var processoId = item.processo_id;
-                        var orgaoRespondente = item.orgao_respondente;
-                        var orgaoOrigem = item.orgao_origem || "Não informado";
-                        
-                        var card = criarCardObservacao(processoId, orgaoRespondente, orgaoOrigem, observacaoComDestaque, index, corPalavra);
-                        $("#cards-container").append(card);
-                    });
+                    // Novo formato de verificação de erro - procura por um item com tipo = "erro"
+                    var erro = data.find(function(item) { return item && item.tipo === "erro"; });
                     
-                    // Inicializar os tooltips para os novos elementos
-                    $('[data-toggle="tooltip"]').tooltip();
-                    
-                    // Rolar até os resultados usando a função global específica do site
-                    // Esta é a função corrigida que deve funcionar com a estrutura do site
-                    if (typeof window.scrollToElement === 'function') {
-                        setTimeout(function() {
-                            window.scrollToElement('#resultados-palavra', 70);
-                        }, 200);
-                    } else {
-                        // Fallback para scroll normal se a função global não existir
-                        setTimeout(function() {
-                            $('.content-wrapper').animate({
-                                scrollTop: $('.content-wrapper').scrollTop() + $("#resultados-palavra").position().top - 70
-                            }, 800);
-                        }, 200);
+                    if (erro) {
+                        console.error("Erro na API:", erro);
+                        $("#cards-container").html(
+                            '<div class="col-12">' +
+                                '<div class="alert alert-danger">' +
+                                    '<i class="fas fa-exclamation-triangle mr-2"></i>' +
+                                    'Erro ao buscar observações: ' + erro.mensagem +
+                                    '<br><small>' + erro.detalhe + '</small>' +
+                                '</div>' +
+                            '</div>'
+                        );
+                        $("#contador-resultados").text('Ocorreu um erro na consulta');
+                        $("#contador-parenteses").text('');
+                        return;
                     }
-                } else {
+                    
+                    $("#cards-container").empty();
+                    
+                    if (data && data.length > 0) {
+                        // Texto para o contador (singular ou plural)
+                        var textoContador = data.length + (data.length === 1 ? ' observação encontrada' : ' observações encontradas');
+                        
+                        // Atualizar contadores
+                        $("#contador-resultados").text(textoContador);
+                        $("#contador-parenteses").text('(' + textoContador + ')');
+                        
+                        // Criar um card para cada observação
+                        data.forEach(function(item, index) {
+                            // Passa a cor da palavra para destacarPalavra
+                            var observacaoComDestaque = destacarPalavra(item.observacao, palavra, corPalavra);
+                            var processoId = item.processo_id;
+                            var orgaoRespondente = item.orgao_respondente;
+                            var orgaoOrigem = item.orgao_origem || "Não informado";
+                            
+                            var card = criarCardObservacao(processoId, orgaoRespondente, orgaoOrigem, observacaoComDestaque, index, corPalavra);
+                            $("#cards-container").append(card);
+                        });
+                        
+                        // Inicializar os tooltips para os novos elementos
+                        $('[data-toggle="tooltip"]').tooltip();
+                        
+                        // Rolar até os resultados usando a função global específica do site
+                        // Esta é a função corrigida que deve funcionar com a estrutura do site
+                        if (typeof window.scrollToElement === 'function') {
+                            setTimeout(function() {
+                                window.scrollToElement('#resultados-palavra', 70);
+                            }, 200);
+                        } else {
+                            // Fallback para scroll normal se a função global não existir
+                            setTimeout(function() {
+                                $('.content-wrapper').animate({
+                                    scrollTop: $('.content-wrapper').scrollTop() + $("#resultados-palavra").position().top - 70
+                                }, 800);
+                            }, 200);
+                        }
+                    } else {
+                        $("#cards-container").html(
+                            '<div class="col-12">' +
+                                '<div class="alert alert-warning">' +
+                                    '<i class="fas fa-exclamation-circle mr-2"></i>' +
+                                    'Nenhuma observação encontrada com a palavra "<strong>' + palavra + '</strong>".' +
+                                '</div>' +
+                            '</div>'
+                        );
+                        $("#contador-resultados").text('0 observações');
+                        $("#contador-parenteses").text('(0 observações encontradas)');
+                    }
+                } catch (e) {
+                    console.error("Erro ao processar resposta:", e);
                     $("#cards-container").html(
                         '<div class="col-12">' +
-                            '<div class="alert alert-warning">' +
-                                '<i class="fas fa-exclamation-circle mr-2"></i>' +
-                                'Nenhuma observação encontrada com a palavra "<strong>' + palavra + '</strong>".' +
+                            '<div class="alert alert-danger">' +
+                                '<i class="fas fa-exclamation-triangle mr-2"></i>' +
+                                'Erro ao processar a resposta. Detalhes: ' + e.message +
                             '</div>' +
                         '</div>'
                     );
-                    $("#contador-resultados").text('0 observações encontradas');
                 }
             },
             error: function(xhr, status, error) {
                 console.error("Erro ao buscar observações:", error);
-                $("#cards-container").html('<div class="col-12"><div class="alert alert-danger"><i class="fas fa-exclamation-triangle mr-2"></i>Erro ao buscar observações.</div></div>');
+                $("#cards-container").html('<div class="col-12"><div class="alert alert-danger"><i class="fas fa-exclamation-triangle mr-2"></i>Erro ao buscar observações: ' + error + '</div></div>');
                 $("#contador-resultados").text('Ocorreu um erro na consulta');
+                $("#contador-parenteses").text('');
             }
         });
     }
     
     // Função para destacar a palavra na observação
-    function destacarPalavra(texto, palavra) {
+    function destacarPalavra(texto, palavra, corPalavra) {
         if (!texto) return '';
         
-        // Criar regex que faz match com a palavra preservando case-insensitivity
-        var regex = new RegExp('(\\b' + escapeRegExp(palavra) + '\\b)', 'gi');
-        return texto.replace(regex, '<strong class="palavra-destacada">$1</strong>');
+        // Converter a cor para hexadecimal se for fornecida
+        var hexColor = corPalavra ? rgbToHex(corPalavra) : '#007bff';
+        
+        // Escapar a palavra para uso seguro na expressão regular
+        var palavraEscapada = escapeRegExp(palavra);
+        
+        // Criar regex que faz match com a palavra, considerando pontuações e case-insensitive
+        // Busca a palavra com limite no início (\b ou espaço) e permitindo pontuação no final
+        var regex = new RegExp('((?:\\b|\\s)' + palavraEscapada + '(?:\\b|[.,;:!?)]))', 'gi');
+        
+        // Aplicar a cor junto com o negrito para correspondências
+        return texto.replace(regex, '<strong class="palavra-destacada" style="color:' + hexColor + ';">$1</strong>');
     }
     
     // Função auxiliar para escapar caracteres especiais em regex
@@ -380,7 +430,7 @@ $(document).ready(function() {
                             '<div class="d-flex align-items-center mb-2">' +
                                 '<i class="fas fa-building text-muted mr-2"></i>' +
                                 '<div>' +
-                                    '<strong class="d-block">Órgão Respondente:</strong>' +
+                                    '<span class="d-block">Órgão Respondente:</span>' +
                                     '<span class="text-primary">' + orgaoRespondente + '</span>' +
                                 '</div>' +
                             '</div>' +
@@ -389,14 +439,14 @@ $(document).ready(function() {
                             '<div class="d-flex align-items-center">' +
                                 '<i class="fas fa-map-marker-alt text-muted mr-2"></i>' +
                                 '<div>' +
-                                    '<strong class="d-block">Órgão de Origem:</strong>' +
+                                    '<span class="d-block">Órgão de Origem:</span>' +
                                     '<span class="text-primary">' + orgaoOrigem + '</span>' +
                                 '</div>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
                     '<hr class="my-2">' +
-                    '<div class="observacao-texto card-scrollable-content p-2" style="padding:0!important">' + observacao + '</div>' +
+                    '<div class="observacao-texto card-scrollable-content p-2" style="padding:2!important">' + observacao + '</div>' +
                 '</div>' +
             '</div>' +
         '</div>');
@@ -447,6 +497,7 @@ $(document).ready(function() {
         $("#cards-container").empty();
         $("#palavra-selecionada").text('');
         $("#contador-resultados").text('');
+        $("#contador-parenteses").text('');
     });
     
     // Inicializar a nuvem quando o componente for carregado
