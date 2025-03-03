@@ -63,6 +63,39 @@
             margin-bottom: 10px;
             display: block;
         }
+        
+        /* Novos estilos para expansão correta do conteúdo das abas */
+        .dashboard-tab-content {
+            min-height: 300px;
+            height: auto !important;
+            overflow: visible !important;
+            width: 100%;
+        }
+        
+        .dashboard-tab-content .tab-pane {
+            height: auto !important;
+            overflow: visible !important;
+            display: none;
+        }
+        
+        .dashboard-tab-content .tab-pane.active {
+            display: block;
+        }
+        
+        .tab-content > .tab-pane {
+            padding: 15px 0;
+        }
+        
+        /* Garantir que o contêiner principal não restrinja a altura */
+        .tabs-container {
+            height: auto !important;
+            overflow: visible !important;
+        }
+        
+        .tab-loader-container {
+            min-height: 200px;
+            height: auto !important;
+        }
     </style>
 </head>
 <!-- Estrutura padrão do projeto -->
@@ -761,6 +794,35 @@
                     }
                 }
             }
+        });
+    </script>
+    
+    <!-- Script para o botão de voltar ao topo -->
+    <script>
+        $(document).ready(function() {
+            // Controle do botão de voltar ao topo
+            var $scrollTopBtn = $('#scrollTopBtn');
+            var $contentWrapper = $('.content-wrapper');
+            
+            // Inicialmente esconde o botão
+            $scrollTopBtn.hide();
+            
+            // Mostra/esconde o botão baseado na posição de rolagem
+            $contentWrapper.scroll(function() {
+                if ($contentWrapper.scrollTop() > 300) {
+                    $scrollTopBtn.fadeIn();
+                } else {
+                    $scrollTopBtn.fadeOut();
+                }
+            });
+            
+            // Ação de clique para rolar para o topo
+            $scrollTopBtn.click(function() {
+                $contentWrapper.animate({
+                    scrollTop: 0
+                }, 800);
+                return false;
+            });
         });
     </script>
 </body>
