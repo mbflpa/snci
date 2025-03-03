@@ -198,9 +198,14 @@
   transform: translateY(-3px);
 }
 
-.card-observacao .card-header {
-  border-bottom: none;
-  padding: 0.75rem 1.25rem;
+/* Regras reforçadas para garantir texto branco */
+.card-observacao .card-header,
+.card-observacao .card-header *,
+.card-observacao .card-header .card-title,
+.card-observacao .card-header h5,
+.card-observacao .card-header span,
+.card-observacao .card-header i {
+  color: #ffffff !important;
 }
 
 .observacao-texto {
@@ -210,16 +215,25 @@
   padding: 0.5rem;
   background-color: #f8f9fa;
   border-radius: 0.25rem;
+  text-align: justify; /* Adicionado texto justificado */
 }
 
 /* Estilo para destacar a palavra encontrada */
 .palavra-destacada {
-  background-color: rgba(255, 230, 0, 0.4);
-  padding: 2px 4px;
+  padding: 2px!important;
+  border-radius: 3px!important;
+  border: 1px solid gray!important;
+  font-weight: bold!important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1)!important;
+}
+
+/* Estilo para o badge da palavra selecionada - simplificado para permitir sobrescrita */
+#palavra-selecionada {
+  padding: 2px 6px;
   border-radius: 3px;
   font-weight: bold;
-  color: #000;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  /* Estilos de cor serão aplicados via JavaScript */
 }
 
 /* Botão de fechar resultados */
@@ -239,19 +253,18 @@
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
 }
 
+.card-results .card-header,
+.card-results .card-header *,
+.card-results .card-header h5,
+.card-results .card-header .card-title,
+.card-results .card-header i,
+.card-results .card-header span,
+.card-results .card-header button {
+  color: #ffffff !important;
+}
+
 .card-results .card-header {
   border-bottom: none;
-}
-
-.bg-gradient-primary {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-}
-
-/* Conteúdo scrollável dentro do card */
-.card-scrollable-content {
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 0.25rem;
-  background-color: #fff;
 }
 
 /* Botão de fechar resultados */

@@ -55,7 +55,7 @@
 <!-- Container para os resultados de palavra (inicialmente oculto) -->
 <div id="resultados-palavra" class="mt-4" style="display: none;">
   <div class="card card-results">
-    <div class="card-header navbar_correios_backgroundColor text-white">
+    <div class="card-header navbar_correios_backgroundColor text-white" >
       <div class="d-flex justify-content-between align-items-center">
         <h5 class="card-title m-0">
           <i class="fas fa-search mr-2"></i>Observações contendo: 
@@ -246,8 +246,12 @@ $(document).ready(function() {
     
     // Função para buscar observações que contêm a palavra clicada
     function buscarObservacoesPorPalavra(palavra, ano, mcu, corPalavra) {
-        // Mostrar o modal de overlay enquanto carrega os dados
-        $('#modalOverlay').modal('show');
+        // Armazenar a cor da palavra para uso posterior
+        window.ultimaCorPalavra = corPalavra;
+        
+        // Mostrar indicador de carregamento sem usar modal
+        var loadingIndicator = $('<div class="overlay-loading position-fixed w-100 h-100" style="top:0;left:0;background:rgba(255,255,255,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;"><div class="text-center"><div class="spinner-grow text-primary" role="status"><span class="sr-only">Carregando...</span></div><p class="mt-3">Carregando observações...</p></div></div>');
+        $('body').append(loadingIndicator);
         
         // Mostrar o card de resultados com indicador de carregamento
         $("#resultados-palavra").show();
@@ -262,8 +266,29 @@ $(document).ready(function() {
             
             // Invertido o gradiente para que a cor mais forte fique à esquerda
             $(".card-results .card-header").css('background', 'linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ')');
-            // Ajustar a cor do texto do badge para combinar com a cor principal
-            $("#palavra-selecionada").css('color', hexColor);
+            
+            // SOLUÇÃO ROBUSTA: Aplicar a cor ao texto do badge usando todas as técnicas disponíveis
+            
+            // 1. Remover qualquer classe existente que possa interferir
+            $("#palavra-selecionada").removeClass("text-primary").removeClass("badge-light");
+            
+            // 2. Aplicar estilos inline usando elemento DOM diretamente
+            document.getElementById("palavra-selecionada").style.color = hexColor;
+            document.getElementById("palavra-selecionada").style.backgroundColor = "#ffffff";
+            document.getElementById("palavra-selecionada").style.border = "1px solid " + hexColor;
+            
+            // 3. Adicionar !important via jQuery attr para maior especificidade
+            $("#palavra-selecionada").attr('style', 'color: ' + hexColor + ' !important; background-color: #ffffff !important; border: 1px solid ' + hexColor + ' !important;');
+            
+            // 4. Adicionar classe customizada e definir variável CSS
+            $("<style>")
+                .prop("type", "text/css")
+                .html("#palavra-selecionada.custom-badge-" + Date.now() + " { color: " + hexColor + " !important; background-color: #ffffff !important; border: 1px solid " + hexColor + " !important; }")
+                .appendTo("head");
+                
+            $("#palavra-selecionada").addClass("custom-badge-" + Date.now());
+            
+            console.log("Cor aplicada ao badge:", hexColor);
         }
         
         // MODIFICAÇÃO AQUI - Usar getObservacoesByPalavraExata em vez de getObservacoesByPalavra
@@ -297,7 +322,8 @@ $(document).ready(function() {
                         );
                         $("#contador-resultados").text('Ocorreu um erro na consulta');
                         $("#contador-parenteses").text('');
-                        $('#modalOverlay').modal('hide'); // Esconder o overlay em caso de erro
+                        // Remover o indicador de carregamento
+                        $('.overlay-loading').remove();
                         return;
                     }
                     
@@ -331,9 +357,9 @@ $(document).ready(function() {
                         if (typeof window.scrollToElement === 'function') {
                             setTimeout(function() {
                                 window.scrollToElement('#resultados-palavra', 70);
-                                // Esconder o overlay após o scroll ser concluído
+                                // Remover o indicador de carregamento após o scroll
                                 setTimeout(function() {
-                                    $('#modalOverlay').modal('hide');
+                                    $('.overlay-loading').remove();
                                 }, 300);
                             }, 200);
                         } else {
@@ -342,8 +368,8 @@ $(document).ready(function() {
                                 $('.content-wrapper').animate({
                                     scrollTop: $('.content-wrapper').scrollTop() + $("#resultados-palavra").position().top - 70
                                 }, 800, function() {
-                                    // Esconder o overlay quando a animação terminar
-                                    $('#modalOverlay').modal('hide');
+                                    // Remover o indicador de carregamento quando a animação terminar
+                                    $('.overlay-loading').remove();
                                 });
                             }, 200);
                         }
@@ -358,8 +384,8 @@ $(document).ready(function() {
                         );
                         $("#contador-resultados").text('0 observações');
                         $("#contador-parenteses").text('(0 observações encontradas)');
-                        // Esconder o overlay já que não há resultados
-                        $('#modalOverlay').modal('hide');
+                        // Remover o indicador de carregamento
+                        $('.overlay-loading').remove();
                     }
                 } catch (e) {
                     console.error("Erro ao processar resposta:", e);
@@ -371,8 +397,8 @@ $(document).ready(function() {
                             '</div>' +
                         '</div>'
                     );
-                    // Esconder o overlay em caso de erro
-                    $('#modalOverlay').modal('hide');
+                    // Remover o indicador de carregamento
+                    $('.overlay-loading').remove();
                 }
             },
             error: function(xhr, status, error) {
@@ -380,8 +406,8 @@ $(document).ready(function() {
                 $("#cards-container").html('<div class="col-12"><div class="alert alert-danger"><i class="fas fa-exclamation-triangle mr-2"></i>Erro ao buscar observações: ' + error + '</div></div>');
                 $("#contador-resultados").text('Ocorreu um erro na consulta');
                 $("#contador-parenteses").text('');
-                // Esconder o overlay em caso de erro na requisição
-                $('#modalOverlay').modal('hide');
+                // Remover o indicador de carregamento
+                $('.overlay-loading').remove();
             }
         });
     }
@@ -396,9 +422,9 @@ $(document).ready(function() {
         // Escapar a palavra para uso seguro na expressão regular
         var palavraEscapada = escapeRegExp(palavra);
         
-        // Criar regex que faz match com a palavra, considerando pontuações e case-insensitive
-        // Busca a palavra com limite no início (\b ou espaço) e permitindo pontuação no final
-        var regex = new RegExp('((?:\\b|\\s)' + palavraEscapada + '(?:\\b|[.,;:!?)]))', 'gi');
+        // Criar regex que faz match somente com a palavra exata, sem incluir espaços
+        // Usa limites de palavra (\b) para garantir palavras completas
+        var regex = new RegExp('\\b(' + palavraEscapada + ')\\b', 'gi');
         
         // Aplicar a cor junto com o negrito para correspondências
         return texto.replace(regex, '<strong class="palavra-destacada" style="color:' + hexColor + ';">$1</strong>');
@@ -420,23 +446,35 @@ $(document).ready(function() {
             var hexColor = rgbToHex(corPalavra);
             var darkerColor = adjustColor(hexColor, -30); // Versão mais escura da cor
             
-            // Invertido o gradiente para que a cor mais forte fique à esquerda
-            styleHeader = 'style="background: linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ');"';
-            badgeClass = 'style="color: ' + hexColor + ';"';
+            // Adicionar cor branca explicitamente no estilo inline para o texto
+            styleHeader = 'style="background: linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + '); color: #ffffff !important;"';
+            
+            // SOLUÇÃO ROBUSTA: Garantir que o badge do número sequencial mantenha a cor
+            badgeClass = 'class="badge-numero-sequencial-' + index + '" style="color: ' + hexColor + ' !important; background-color: #ffffff !important; border: 1px solid ' + hexColor + ' !important;"';
+            
+            // Adicionar um estilo CSS dinâmico para o badge com alta especificidade
+            var styleId = "style-badge-" + Date.now() + "-" + index;
+            $("<style id='" + styleId + "'>")
+                .prop("type", "text/css")
+                .html(".badge-numero-sequencial-" + index + " { color: " + hexColor + " !important; background-color: #ffffff !important; border: 1px solid " + hexColor + " !important; }")
+                .appendTo("head");
         } else {
             // Fallback para as cores pré-definidas se não tiver a cor da palavra
             var headerClasses = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
             var currentClass = headerClasses[index % headerClasses.length];
-            styleHeader = 'class="' + currentClass + '"';
-            badgeClass = 'class="text-' + currentClass.replace('bg-', '') + '"';
+            styleHeader = 'class="' + currentClass + '" style="color: #ffffff !important;"';
+            
+            // Usar a classe do Bootstrap correspondente com estilo adicional inline para garantir
+            var colorClass = "text-" + currentClass.replace('bg-', '');
+            badgeClass = 'class="badge-light ' + colorClass + '" style="color: inherit !important; font-weight: bold !important;"';
         }
         
         return $('<div class="col-md-6 mb-4">' +
             '<div class="card card-observacao h-100 shadow-sm">' +
                 '<div class="card-header text-white py-2" ' + styleHeader + '>' +
-                    '<div class="d-flex justify-content-between align-items-center">' +
-                        '<h5 class="card-title mb-0">' +
-                            '<i class="fas fa-file-alt mr-2"></i>Processo: ' + processoId +
+                    '<div class="d-flex justify-content-between align-items-center" style="color: #ffffff !important;">' +
+                        '<h5 class="card-title mb-0" style="color: #ffffff !important;">' +
+                            '<i class="fas fa-file-alt mr-2" style="color: #ffffff !important;"></i>Processo: ' + processoId +
                         '</h5>' +
                         '<span class="badge badge-light" ' + badgeClass + ' data-toggle="tooltip" title="Número sequencial">#' + (index+1) + '</span>' +
                     '</div>' +
@@ -463,7 +501,7 @@ $(document).ready(function() {
                         '</div>' +
                     '</div>' +
                     '<hr class="my-2">' +
-                    '<div class="observacao-texto card-scrollable-content p-2" style="padding:2!important">' + observacao + '</div>' +
+                    '<div class="observacao-texto card-scrollable-content p-2" style="padding:2px !important; text-align: justify !important;">' + observacao + '</div>' +
                 '</div>' +
             '</div>' +
         '</div>');
@@ -580,6 +618,49 @@ $(document).ready(function() {
                     }
                 }
             });
+            
+            // Restaurar cores e estilos quando voltar para a aba
+            // Forçar a cor do texto para branco no card-header principal
+            $(".card-results .card-header").addClass("text-white");
+            $(".card-results .card-header, .card-results .card-header *, .card-results .card-header h5, .card-results .card-header i, .card-results .card-header .card-title, .card-results .card-header span").css("color", "#ffffff !important");
+            
+            // Reforçar estilo inline para o botão de fechar
+            $("#fechar-resultados").css("color", "#ffffff !important");
+            
+            // Se houver uma palavra selecionada anteriormente e ainda estiver visível, restaurar a formatação
+            if ($("#resultados-palavra").is(":visible") && $("#palavra-selecionada").text().trim() !== '') {
+                var palavraSelecionada = $("#palavra-selecionada").text();
+                
+                // Restaurar a cor do header se tivermos a última cor usada
+                if (window.ultimaCorPalavra) {
+                    var hexColor = rgbToHex(window.ultimaCorPalavra);
+                    var darkerColor = adjustColor(hexColor, -30);
+                    
+                    // Aplicar o gradiente novamente
+                    $(".card-results .card-header").css('background', 'linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ')');
+                    
+                    // SOLUÇÃO ROBUSTA: Aplicar a mesma abordagem para restaurar a formatação
+                    
+                    // 1. Remover qualquer classe existente que possa interferir
+                    $("#palavra-selecionada").removeClass("text-primary").removeClass("badge-light");
+                    
+                    // 2. Aplicar estilos inline usando elemento DOM diretamente
+                    document.getElementById("palavra-selecionada").style.color = hexColor;
+                    document.getElementById("palavra-selecionada").style.backgroundColor = "#ffffff";
+                    document.getElementById("palavra-selecionada").style.border = "1px solid " + hexColor;
+                    
+                    // 3. Adicionar !important via jQuery attr para maior especificidade
+                    $("#palavra-selecionada").attr('style', 'color: ' + hexColor + ' !important; background-color: #ffffff !important; border: 1px solid ' + hexColor + ' !important;');
+                    
+                    // 4. Adicionar classe customizada e definir variável CSS
+                    $("<style>")
+                        .prop("type", "text/css")
+                        .html("#palavra-selecionada.custom-badge-" + Date.now() + " { color: " + hexColor + " !important; background-color: #ffffff !important; border: 1px solid " + hexColor + " !important; }")
+                        .appendTo("head");
+                        
+                    $("#palavra-selecionada").addClass("custom-badge-" + Date.now());
+                }
+            }
         }
     });
 });
