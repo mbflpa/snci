@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="dist/css/stylesSNCI_Dashboard_Graficos.css">
 
 <!-- Conteúdo da aba Gráficos - Layout reorganizado -->
-<div class="row mb-12" style="justify-content: space-around;">
+<div class="row mb-12" style="justify-content: space-around;margin-bottom:20px">
   <!-- Gráfico de média por categoria -->
   <div class="col-md-4">
     <div class="card h-100">
@@ -15,12 +15,12 @@
     </div>
   </div>
 
-  <!-- Gráfico de rosca NPS -->
-  <div class="col-md-4">
+  <!-- Gráfico de rosca NPS - Layout atualizado -->
+  <div class="col-md-3">
     <div class="card h-100">
       <div class="card-header">
         <h5 class="card-title">Distribuição NPS
-          <!-- Substitui tooltip por popover com HTML rico -->
+          <!-- Simplificamos o popover para ser mais limpo -->
           <span class="nps-info-icon" data-toggle="popover" data-html="true" data-placement="top" 
                 title="<span class='popover-title-custom'>Classificação do NPS</span>" 
                 data-content="
@@ -47,8 +47,9 @@
         </h5>
       </div>
       <div class="card-body">
-        <div class="nps-chart-wrapper">
-          <div class="nps-chart-container">
+        <!-- Container atualizado para ter dimensões fixas semelhantes ao exemplo -->
+        <div class="nps-chart-wrapper" style="height: 240px;">
+          <div class="nps-chart-container" style="width: 328px; height: 240px; margin: 0 auto; position: relative;">
             <canvas id="npsDonutChart"></canvas>
             <div class="nps-chart-center">
               <span class="nps-value" id="npsValorDisplay">0</span>
@@ -56,19 +57,19 @@
             </div>
           </div>
         </div>
-        <!-- Legenda movida para fora da nps-chart-wrapper -->
-        <div class="nps-legenda-fixa">
+        <!-- Legenda movida para baixo como no exemplo -->
+        <div class="nps-legenda-fixa" style="display: flex; justify-content: center; margin-top: 10px;">
           <div class="legenda-item legenda-promotores">
-            <div class="legenda-cor"></div>
-            <div class="legenda-texto">Promotores: 9-10</div>
+            <div class="legenda-cor" style="background-color: #10b981;"></div>
+            <div class="legenda-texto">Promotores</div>
           </div>
           <div class="legenda-item legenda-neutros">
-            <div class="legenda-cor"></div>
-            <div class="legenda-texto">Neutros: 7-8</div>
+            <div class="legenda-cor" style="background-color: #fbbf24;"></div>
+            <div class="legenda-texto">Neutros</div>
           </div>
           <div class="legenda-item legenda-detratores">
-            <div class="legenda-cor"></div>
-            <div class="legenda-texto">Detratores: 1-6</div>
+            <div class="legenda-cor" style="background-color: #ef4444;"></div>
+            <div class="legenda-texto">Detratores</div>
           </div>
         </div>
       </div>
@@ -90,7 +91,7 @@
   </div>
 </div>
 
-<!--- Script para gerar e configurar o gráfico NPS - Corrigindo problemas de legendas sobrepostas --->
+<!--- Script para gerar e configurar o gráfico NPS - Atualizado para layout moderno --->
 <script>
 window.updateNPSChart = function(npsData) {
     console.log('Atualizando gráfico NPS com dados:', npsData);
@@ -106,21 +107,21 @@ window.updateNPSChart = function(npsData) {
     // Atualizar o valor do NPS no centro
     document.getElementById('npsValorDisplay').textContent = npsValor;
     
-    // Configurar as cores com opacidade para o gráfico
+    // Configurar cores modernas como no exemplo fornecido
     const chartColors = {
-        promotores: 'rgba(75, 192, 75, 0.8)',
-        neutros: 'rgba(255, 193, 7, 0.8)',
-        detratores: 'rgba(255, 87, 87, 0.8)'
+        promotores: '#10b981', // Verde moderno
+        neutros: '#fbbf24',    // Âmbar moderno
+        detratores: '#ef4444'  // Vermelho moderno
     };
     
     // Garantir que temos dados para mostrar no gráfico
     const hasData = total > 0;
     
-    // MODIFICAÇÃO: Filtrar valores zero antes de criar o gráfico
+    // Filtrar valores zero antes de criar o gráfico
     const valores = [promotores, neutros, detratores];
     const labels = ['Promotores', 'Neutros', 'Detratores'];
     const bgColors = [chartColors.promotores, chartColors.neutros, chartColors.detratores];
-    const borderColors = ['rgba(75, 192, 75, 1)', 'rgba(255, 193, 7, 1)', 'rgba(255, 87, 87, 1)'];
+    const borderColors = ['#ffffff', '#ffffff', '#ffffff']; // Bordas brancas como no exemplo
     
     // Arrays filtrados sem valores zero
     const valoresFiltrados = [];
@@ -155,9 +156,9 @@ window.updateNPSChart = function(npsData) {
     }
     
     // Calcular porcentagens para mostrar nas legendas COM UMA CASA DECIMAL
-    const percentPromotores = total > 0 ? ((promotores / total) * 100).toFixed(1) : 0.0;
-    const percentNeutros = total > 0 ? ((neutros / total) * 100).toFixed(1) : 0.0;
-    const percentDetratores = total > 0 ? ((detratores / total) * 100).toFixed(1) : 0.0;
+    const percentPromotores = total > 0 ? ((promotores / total) * 100).toFixed(1) : 0;
+    const percentNeutros = total > 0 ? ((neutros / total) * 100).toFixed(1) : 0;
+    const percentDetratores = total > 0 ? ((detratores / total) * 100).toFixed(1) : 0;
     
     // Configurar os dados para o gráfico com valores filtrados
     const data = {
@@ -182,7 +183,7 @@ window.updateNPSChart = function(npsData) {
         }
     }
     
-    // Plugin personalizado para adicionar rótulos dentro do gráfico
+    // Plugin personalizado para adicionar rótulos dentro do gráfico - simplificado para estilo moderno
     const doughnutLabelsPlugin = {
         id: 'doughnutLabels',
         afterDraw: function(chart) {
@@ -194,10 +195,11 @@ window.updateNPSChart = function(npsData) {
             const centerX = (chartArea.left + chartArea.right) / 2;
             const centerY = (chartArea.top + chartArea.bottom) / 2;
             
-            // Configuração para desenhar textos - COR PRETA para melhor visualização
+            // Configuração para desenhar textos - apenas o percentual como no exemplo
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.font = 'bold 15px Arial'; // Fonte maior e negrito para melhor legibilidade
+            ctx.font = 'bold 12px Arial'; // Fonte menor como no exemplo
+            ctx.fillStyle = '#000'; // Texto branco como no exemplo
             
             // Para cada segmento do donut
             chart.data.datasets.forEach((dataset, datasetIndex) => {
@@ -208,13 +210,10 @@ window.updateNPSChart = function(npsData) {
                     const model = element._model || element;
                     const rotation = model.startAngle + (model.endAngle - model.startAngle) / 2;
                     
-                    // CORREÇÃO 2: AFASTAR AS LEGENDAS DO CENTRO
-                    const radius = model.outerRadius * 0.9; // Aumentado para melhor espaçamento
+                    // Posicionar como no exemplo (mais ao meio da seção)
+                    const radius = model.innerRadius + (model.outerRadius - model.innerRadius) * 0.6;
                     const x = centerX + Math.cos(rotation) * radius;
                     const y = centerY + Math.sin(rotation) * radius;
-                    
-                    // Valores para mostrar
-                    const value = dataset.data[index];
                     
                     // Pular a visualização de valores dummy (usado quando não tem dados)
                     if (!hasData) return;
@@ -222,52 +221,32 @@ window.updateNPSChart = function(npsData) {
                     // Obter a label correspondente ao índice
                     const label = chart.data.labels[index];
                     
-                    // Determinar qual valor original e porcentagem mostrar
-                    let originalValue, percent;
+                    // Determinar qual porcentagem mostrar (apenas o % como no exemplo)
+                    let percent;
                     
                     if (label === 'Promotores') {
-                        originalValue = promotores;
                         percent = percentPromotores;
                     } else if (label === 'Neutros') {
-                        originalValue = neutros;
                         percent = percentNeutros;
                     } else {
-                        originalValue = detratores;
                         percent = percentDetratores;
                     }
                     
-                    // Desenhar fundo branco semi-transparente para garantir legibilidade
-                    ctx.save();
-                    ctx.globalAlpha = 0.8; // Aumentado para melhor contraste
-                    ctx.fillStyle = "white";
-                    const textWidth = ctx.measureText(`${originalValue} (${percent}%)`).width;
-                    ctx.fillRect(x - textWidth/2 - 4, y - 11, textWidth + 8, 22);
-                    ctx.restore();
-                    
-                    // Desenhar o texto (valor + percentual) COM COR PRETA
-                    ctx.fillStyle = 'black'; // Garantindo texto preto
-                    ctx.fillText(`${originalValue} (${percent}%)`, x, y);
+                    // Desenhar apenas o percentual como no exemplo
+                    ctx.fillText(`${percent}%`, x, y);
                 });
             });
         }
     };
     
-    // SOLUÇÃO DEFINITIVA PARA O GRÁFICO OVAL: Forçar aspecto quadrado e desabilitar comportamento responsivo problemático
+    // CONFIGURAÇÃO para layout s
     const options = {
-        responsive: false,
+        responsive: true,
         maintainAspectRatio: true,
-        aspectRatio: 1,
-        cutoutPercentage: 70,
+        aspectRatio: 1.4, // Proporção 
+        cutoutPercentage: 70,  // Buraco no meio 
         legend: {
-            display: false
-        },
-        layout: {
-            padding: {
-                top: 20,
-                bottom: 20,
-                left: 20,
-                right: 20
-            }
+            display: false 
         },
         tooltips: {
             enabled: true,
@@ -275,7 +254,7 @@ window.updateNPSChart = function(npsData) {
                 label: function(tooltipItem, data) {
                     const label = data.labels[tooltipItem.index];
                     const value = data.datasets[0].data[tooltipItem.index];
-                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0.0;
+                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
                     return `${label}: ${value} (${percentage}%)`;
                 }
             }
@@ -286,56 +265,29 @@ window.updateNPSChart = function(npsData) {
         }
     };
     
-    // CORREÇÃO 3: LIMPAR COMPLETAMENTE O ELEMENTO CANVAS ANTES DE RECRIAR O GRÁFICO
-    // Verificar se o gráfico já existe e destruí-lo
-    if (window.npsChart) {
-        window.npsChart.destroy();
-        window.npsChart = null;
-    }
-    
-    // Obter o container e canvas
+    // Remover canvas antigo e criar um novo
     const container = document.querySelector('.nps-chart-container');
-    const canvas = document.getElementById('npsDonutChart');
-    
-    if (!canvas || !container) {
-        console.error('Elementos necessários não encontrados!');
-        return;
-    }
-    
-    // CORREÇÃO 4: CRIAR UM NOVO CANVAS PARA EVITAR PROBLEMAS DE SOBREPOSIÇÃO
-    // Remover o canvas antigo e criar um novo
     const oldCanvas = document.getElementById('npsDonutChart');
     const newCanvas = document.createElement('canvas');
     newCanvas.id = 'npsDonutChart';
-    newCanvas.style.display = 'block';
-    newCanvas.style.margin = '0 auto';
     
     if (oldCanvas && oldCanvas.parentNode) {
         oldCanvas.parentNode.replaceChild(newCanvas, oldCanvas);
     }
     
-    // IMPORTANTE: Configurar tamanho explícito e exato para o canvas
-    const tamanho = 360; // Tamanho fixo em pixels
+    // Configurar o canvas com dimensões exatas como no exemplo
+    newCanvas.width = 328;
+    newCanvas.height = 240;
     
-    // Redimensionar o container com tamanho fixo
-    container.style.width = tamanho + 'px';
-    container.style.height = tamanho + 'px';
-    
-    // Configurar o canvas com dimensões exatas
-    newCanvas.width = tamanho;
-    newCanvas.height = tamanho;
-    newCanvas.style.width = tamanho + 'px';
-    newCanvas.style.height = tamanho + 'px';
-    
-    // Criar o gráfico usando as configurações fixas
+    // Criar o gráfico usando as configurações atualizadas
     const ctx = newCanvas.getContext('2d');
     
-    // Registrar plugin para Chart.js v2.x
+    // Registrar plugin para Chart.js
     if (Chart.pluginService && typeof Chart.pluginService.register === 'function') {
         Chart.pluginService.register(doughnutLabelsPlugin);
     }
     
-    // Criar o gráfico (agora com tamanhos fixos e não-responsivo)
+    // Criar o gráfico
     window.npsChart = new Chart(ctx, {
         type: 'doughnut',
         data: data,

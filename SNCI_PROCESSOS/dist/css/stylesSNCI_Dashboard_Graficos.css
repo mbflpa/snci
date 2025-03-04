@@ -392,7 +392,7 @@ canvas#npsDonutChart {
 /* Estilos para popover do NPS */
 .nps-popover .popover-title-custom {
   font-weight: bold;
-  color: #333;
+  color: white !important;
 }
 
 .nps-info-item .color-dot {
@@ -428,4 +428,135 @@ canvas#npsDonutChart {
   .nps-value {
     font-size: 1.6rem; /* Menor ainda para telas muito pequenas */
   }
+}
+
+/* Estilos para o gráfico NPS */
+.nps-chart-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.nps-chart-container {
+  position: relative;
+}
+
+.nps-chart-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.nps-value {
+  font-size: 28px;
+  font-weight: bold;
+  display: block;
+}
+
+.nps-label {
+  font-size: 14px;
+  color: #777;
+  display: block;
+}
+
+.text-success {
+  color: #10b981;
+}
+
+.text-warning {
+  color: #fbbf24;
+}
+
+.text-danger {
+  color: #ef4444;
+}
+
+/* Estilos para legenda fixa abaixo do gráfico */
+.nps-legenda-fixa {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.legenda-item {
+  display: flex;
+  align-items: center;
+  margin: 0 5px;
+}
+
+.legenda-cor {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.legenda-promotores .legenda-cor {
+  background-color: #10b981;
+}
+
+.legenda-neutros .legenda-cor {
+  background-color: #fbbf24;
+}
+
+.legenda-detratores .legenda-cor {
+  background-color: #ef4444;
+}
+
+.legenda-texto {
+  font-size: 12px;
+  color: #555;
+}
+
+/* Estilos para o popover de informações */
+.nps-info-icon {
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.nps-popover {
+  max-width: 300px;
+}
+
+.popover-title-custom {
+  font-weight: bold;
+}
+
+.nps-info-content {
+  padding: 5px;
+}
+
+.nps-info-item {
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.promotores-info .color-dot {
+  background-color: #10b981;
+}
+
+.neutros-info .color-dot {
+  background-color: #fbbf24;
+}
+
+.detratores-info .color-dot {
+  background-color: #ef4444;
+}
+
+.nps-formula {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 12px;
 }
