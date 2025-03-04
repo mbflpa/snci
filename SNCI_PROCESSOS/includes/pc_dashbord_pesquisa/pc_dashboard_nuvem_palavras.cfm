@@ -4,8 +4,8 @@
 <!-- Conteúdo da aba Nuvem de Palavras -->
 <div class="row">
   <!-- Card explicativo -->
-  <div class="col-md-3 d-flex">
-    <div class="card mb-3 card-same-height w-100">
+  <div class="col-md-4 d-flex">
+    <div class="card mb-4 card-same-height w-100">
       <div class="card-header">
         <h5 class="card-title">Sobre a Nuvem de Palavras</h5>
       </div>
@@ -72,7 +72,7 @@
   </div>
   
   <!-- Nuvem de palavras -->
-  <div class="col-md-9 d-flex">
+  <div class="col-md-8 d-flex">
     <div class="card card-same-height w-100">
       <div class="card-header">
         <h5 class="card-title">Termos Mais Frequentes nas Observações</h5>
