@@ -493,4 +493,87 @@
         </cftry>
     </cffunction>
     
+    <!--- Nova função para buscar observações com múltiplas palavras (corrigida) --->
+    <cffunction name="getObservacoesByMultiPalavras" access="remote" returntype="string" returnformat="json">
+        <cfargument name="palavras" type="string" required="true">
+        <cfargument name="ano" type="string" required="true">
+        <cfargument name="mcuOrigem" type="string" required="true">
+        
+        <cftry>
+            <!--- Desserializar o array de palavras JSON --->
+            <cfset var arrayPalavras = deserializeJSON(arguments.palavras)>
+            
+            <cflog file="nuvem_palavras" text="Buscando observações com palavras: #arrayToList(arrayPalavras, ', ')#">
+            
+            <cfif not isArray(arrayPalavras) OR arrayLen(arrayPalavras) EQ 0>
+                <cfset var resultado = [{
+                    "tipo": "erro",
+                    "mensagem": "Lista de palavras inválida",
+                    "detalhe": "A lista de palavras não está no formato esperado ou está vazia."
+                }]>
+                <cfreturn serializeJSON(resultado)>
+            </cfif>
+            
+            <!--- Construção da consulta SQL corrigida - usando CAST para converter o campo TEXT --->
+            <cfquery name="qObservacoesBase" datasource="#application.dsn_processos#">
+                SELECT 
+                    pesq.pc_processo_id,
+                    orgaoResp.pc_org_sigla as orgao_respondente,
+                    orgaoResp.pc_org_mcu as orgao_mcu,
+                    orgaoOrigem.pc_org_sigla as orgao_origem,
+                    orgaoOrigem.pc_org_mcu as origem_mcu,
+                    pesq.pc_pesq_observacao
+                FROM pc_pesquisas pesq
+                INNER JOIN pc_processos p ON pesq.pc_processo_id = p.pc_processo_id
+                INNER JOIN pc_orgaos orgaoResp ON pesq.pc_org_mcu = orgaoResp.pc_org_mcu
+                INNER JOIN pc_orgaos orgaoOrigem ON p.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
+                WHERE pesq.pc_pesq_observacao IS NOT NULL
+                AND DATALENGTH(pesq.pc_pesq_observacao) > 0
+                AND orgaoOrigem.pc_org_status = 'O'
+                AND RIGHT(p.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
+                <cfif arguments.ano NEQ "Todos">
+                    AND RIGHT(p.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+                </cfif>
+                <cfif arguments.mcuOrigem NEQ "Todos">
+                    AND p.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                </cfif>
+                <!--- Adicionar condições LIKE para cada palavra com CAST para varchar(max) --->
+                <cfloop array="#arrayPalavras#" index="palavra">
+                    AND CAST(pesq.pc_pesq_observacao AS VARCHAR(MAX)) LIKE <cfqueryparam value="%#LCase(trim(palavra))#%" cfsqltype="cf_sql_varchar">
+                </cfloop>
+                ORDER BY p.pc_processo_id
+            </cfquery>
+            
+            <cflog file="nuvem_palavras" text="Consulta SQL retornou #qObservacoesBase.recordCount# observações para múltiplas palavras">
+            
+            <!--- Construir array de resultados --->
+            <cfset var resultado = []>
+            
+            <cfloop query="qObservacoesBase">
+                <cfset arrayAppend(resultado, {
+                    "processo_id": pc_processo_id,
+                    "orgao_respondente": orgao_respondente,
+                    "orgao_mcu": orgao_mcu,
+                    "orgao_origem": orgao_origem & " (" & origem_mcu & ")",
+                    "observacao": pc_pesq_observacao
+                })>
+            </cfloop>
+            
+            <cflog file="nuvem_palavras" text="Retornando #arrayLen(resultado)# resultados para múltiplas palavras">
+            <cfreturn serializeJSON(resultado)>
+            
+        <cfcatch type="any">
+            <cflog file="nuvem_palavras_error" text="ERRO na busca múltipla: #cfcatch.message# - #cfcatch.detail#">
+            <cflog file="nuvem_palavras_error" text="Linha: #cfcatch.tagContext[1].line# em #cfcatch.tagContext[1].template#">
+            
+            <cfset var resultado = [{
+                "tipo": "erro",
+                "mensagem": "Erro ao processar a busca com múltiplas palavras",
+                "detalhe": cfcatch.message & (IsDefined("cfcatch.detail") ? " - " & cfcatch.detail : "")
+            }]>
+            <cfreturn serializeJSON(resultado)>
+        </cfcatch>
+        </cftry>
+    </cffunction>
+    
 </cfcomponent>

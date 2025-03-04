@@ -18,6 +18,39 @@
         </div>
         <!-- Controles para ajustar a nuvem de palavras -->
         <div class="mt-auto">
+          <!-- Novo: Toggle para modo de seleção múltipla -->
+          <div class="form-group">
+            <div class="custom-control custom-switch">
+              <input type="checkbox" class="custom-control-input" id="modoPesquisaMultipla">
+              <label class="custom-control-label" for="modoPesquisaMultipla">Modo de Seleção Múltipla</label>
+              <small class="form-text text-muted">Ative para selecionar várias palavras e buscar observações que contêm todas elas.</small>
+            </div>
+          </div>
+          <!-- Novo: Área para palavras selecionadas (visível apenas quando o modo está ativo) -->
+          <div id="areaSelecaoPalavras" style="display:none;">
+            <div class="card mb-2">
+              <div class="card-header py-2 bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6 class="m-0">Palavras Selecionadas</h6>
+                  <div>
+                    <button id="limparSelecao" class="btn btn-sm btn-outline-secondary mr-1" title="Limpar seleção" disabled>
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button id="pesquisarPalavras" class="btn btn-sm btn-primary" title="Pesquisar observações" disabled>
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body p-2">
+                <div id="palavrasSelecionadas" class="d-flex flex-wrap"></div>
+                <div id="semPalavras" class="text-muted small">
+                  <i class="fas fa-info-circle mr-1"></i> Clique nas palavras da nuvem para adicioná-las à seleção
+                </div>
+              </div>
+            </div>
+          </div>
+          
           <div class="form-group">
             <label for="minFreqSlider">Frequência Mínima: <span id="minFreqValue">2</span></label>
             <input type="range" class="custom-range" id="minFreqSlider" min="1" max="10" value="2">
@@ -83,6 +116,10 @@ $(document).ready(function() {
     // Variáveis de configuração
     var minFreq = 2;
     var maxWords = 100;
+    // Novo: Variável para controlar modo de seleção múltipla
+    var modoPesquisaMultipla = false;
+    // Novo: Array para armazenar as palavras selecionadas
+    var palavrasSelecionadas = [];
     // Armazenar dados da nuvem para reuso
     window.cloudData = null;
     // Armazenar opções de configuração da nuvem para reuso
@@ -105,6 +142,86 @@ $(document).ready(function() {
         maxWords = parseInt($(this).val());
         $('#maxWordsValue').text(maxWords);
     });
+    
+    // Novo: Toggle para o modo de seleção múltipla
+    $('#modoPesquisaMultipla').change(function() {
+        modoPesquisaMultipla = $(this).prop('checked');
+        
+        if (modoPesquisaMultipla) {
+            $('#areaSelecaoPalavras').slideDown(200);
+        } else {
+            $('#areaSelecaoPalavras').slideUp(200);
+            // Limpar seleção ao desativar o modo
+            limparPalavrasSelecionadas();
+        }
+    });
+    
+    // Novo: Função para limpar palavras selecionadas
+    function limparPalavrasSelecionadas() {
+        palavrasSelecionadas = [];
+        atualizarExibicaoPalavrasSelecionadas();
+    }
+    
+    // Novo: Botão para limpar seleção
+    $('#limparSelecao').click(function() {
+        limparPalavrasSelecionadas();
+    });
+    
+    // Novo: Botão para pesquisar com as palavras selecionadas
+    $('#pesquisarPalavras').click(function() {
+        if (palavrasSelecionadas.length > 0) {
+            const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
+            buscarObservacoesPorPalavrasMultiplas(palavrasSelecionadas, anoSelecionado, window.mcuSelecionado);
+        }
+    });
+    
+    // Novo: Função para atualizar a exibição das palavras selecionadas
+    function atualizarExibicaoPalavrasSelecionadas() {
+        var $container = $('#palavrasSelecionadas');
+        $container.empty();
+        
+        if (palavrasSelecionadas.length === 0) {
+            $('#semPalavras').show();
+            $('#limparSelecao').prop('disabled', true);
+            $('#pesquisarPalavras').prop('disabled', true);
+            return;
+        }
+        
+        $('#semPalavras').hide();
+        $('#limparSelecao').prop('disabled', false);
+        $('#pesquisarPalavras').prop('disabled', false);
+        
+        // Criar badges para cada palavra selecionada
+        palavrasSelecionadas.forEach(function(palavra, index) {
+            var palavraObj = window.cloudData.find(function(item) {
+                return item.text === palavra;
+            });
+            
+            var corPalavra = '#007bff'; // Cor padrão
+            if (palavraObj && palavraObj.color) {
+                corPalavra = palavraObj.color;
+            }
+            
+            var hexColor = rgbToHex(corPalavra);
+            
+            var $badge = $('<span class="badge mr-2 mb-1" style="background-color: ' + hexColor + '; color: #fff; padding: 0.4em 0.6em;">' + 
+                palavra + 
+                '<button type="button" class="close ml-1" data-index="' + index + '" style="text-shadow: none; color: #fff; font-size: 0.8rem; opacity: 0.7;">' +
+                '<span aria-hidden="true">&times;</span>' +
+                '</button>' +
+                '</span>');
+            
+            $container.append($badge);
+        });
+        
+        // Adicionar handler para remover palavras
+        $container.find('.close').click(function(e) {
+            e.stopPropagation();
+            var index = $(this).data('index');
+            palavrasSelecionadas.splice(index, 1);
+            atualizarExibicaoPalavrasSelecionadas();
+        });
+    }
     
     // Botão para atualizar a nuvem
     $('#atualizarNuvem').click(function() {
@@ -151,6 +268,9 @@ $(document).ready(function() {
         
         // Ocultar resultados anteriores quando atualizar a nuvem
         $("#resultados-palavra").hide();
+        
+        // Limpar palavras selecionadas ao recarregar a nuvem
+        limparPalavrasSelecionadas();
         
         // CORREÇÃO PRINCIPAL: Usar o método getWordCloud em vez de getNuvemPalavras
         $.ajax({
@@ -208,6 +328,9 @@ $(document).ready(function() {
                                         relevancia = ((wordObj.weight / maxWeight) * 100).toFixed(2) + '%';
                                     }
                                     
+                                    // Armazenar a cor da palavra no objeto para uso posterior
+                                    wordObj.color = $(word).css('color');
+                                    
                                     word.attr('data-toggle', 'popover');
                                     word.attr('data-placement', 'top');
                                     word.attr('data-trigger', 'hover');
@@ -215,18 +338,42 @@ $(document).ready(function() {
                                     word.attr('data-content', 'Frequência: ' + frequency + '<br>Relevância: ' + relevancia);
                                     word.attr('data-html', 'true');
                                     
-                                    // Adicionar manipulador de clique para cada palavra
+                                    // Novo: Modificar comportamento de clique conforme modo selecionado
                                     word.on('click', function() {
                                         var palavraClicada = $(this).text();
-                                        // Capturar a cor da palavra para usar no header dos cards
                                         var corPalavra = $(this).css('color');
-                                        buscarObservacoesPorPalavra(palavraClicada, anoFiltro, mcuFiltro, corPalavra);
+                                        
+                                        if (modoPesquisaMultipla) {
+                                            // Verificar se a palavra já está selecionada
+                                            var indexPalavra = palavrasSelecionadas.indexOf(palavraClicada);
+                                            
+                                            if (indexPalavra === -1) {
+                                                // Adicionar à seleção
+                                                palavrasSelecionadas.push(palavraClicada);
+                                            } else {
+                                                // Remover da seleção
+                                                palavrasSelecionadas.splice(indexPalavra, 1);
+                                            }
+                                            
+                                            atualizarExibicaoPalavrasSelecionadas();
+                                            
+                                            // Destacar visualmente as palavras selecionadas
+                                            atualizarDestaquePalavras();
+                                        } else {
+                                            // Comportamento original - busca imediata
+                                            buscarObservacoesPorPalavra(palavraClicada, anoFiltro, mcuFiltro, corPalavra);
+                                        }
                                     });
                                 }
                             });
                             
                             // Inicializar popovers
                             $('[data-toggle="popover"]').popover();
+                            
+                            // Destacar palavras já selecionadas (após mudança de filtro)
+                            if (modoPesquisaMultipla && palavrasSelecionadas.length > 0) {
+                                atualizarDestaquePalavras();
+                            }
                         };
                         
                         $("#nuvem").jQCloud(data, window.cloudOptions);
@@ -243,6 +390,182 @@ $(document).ready(function() {
             }
         });
     };
+    
+    // Novo: Função para atualizar o destaque visual das palavras selecionadas
+    function atualizarDestaquePalavras() {
+        // Remover destaque de todas as palavras
+        $('.jqcloud-word').removeClass('palavra-selecionada').css('box-shadow', 'none');
+        
+        // Adicionar destaque às palavras selecionadas
+        if (palavrasSelecionadas.length > 0) {
+            $('.jqcloud-word').each(function() {
+                var wordText = $(this).text();
+                if (palavrasSelecionadas.includes(wordText)) {
+                    $(this).addClass('palavra-selecionada').css({
+                        'box-shadow': '0 0 5px rgba(0,0,0,0.5)',
+                        'border-radius': '3px',
+                        'padding': '2px'
+                    });
+                }
+            });
+        }
+    }
+    
+    // Novo: Função para buscar observações com múltiplas palavras
+    function buscarObservacoesPorPalavrasMultiplas(palavras, ano, mcu) {
+        if (!palavras || palavras.length === 0) return;
+        
+        // Armazenar a cor da primeira palavra para uso posterior
+        var corPalavra = '';
+        var palavraObj = window.cloudData && window.cloudData.find(function(item) {
+            return item.text === palavras[0];
+        });
+        
+        if (palavraObj && palavraObj.color) {
+            corPalavra = palavraObj.color;
+            window.ultimaCorPalavra = corPalavra;
+        }
+        
+        // Mostrar indicador de carregamento
+        var loadingIndicator = $('<div class="overlay-loading position-fixed w-100 h-100" style="top:0;left:0;background:rgba(255,255,255,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;"><div class="text-center"><div class="spinner-grow text-primary" role="status"><span class="sr-only">Carregando...</span></div><p class="mt-3">Carregando observações...</p></div></div>');
+        $('body').append(loadingIndicator);
+        
+        // Mostrar o card de resultados com indicador de carregamento
+        $("#resultados-palavra").show();
+        $("#cards-container").html('<div class="col-12 text-center p-5"><div class="spinner-grow text-primary" role="status"><span class="sr-only">Carregando...</span></div><p class="mt-3">Carregando observações...</p></div>');
+        
+        // CORRIGIDO: Exibir as palavras selecionadas no título do card de resultados com contraste adequado
+        var hexColor = corPalavra ? rgbToHex(corPalavra) : '#007bff';
+        var badgesHTML = '';
+        
+        // Criar um badge para cada palavra com estilo inline forte
+        palavras.forEach(function(palavra, index) {
+            if (index > 0) {
+                badgesHTML += ', ';
+            }
+            badgesHTML += '<span class="badge badge-palavra-selecionada" style="display:inline-block; background-color: #ffffff !important; color: ' + hexColor + ' !important; border: 2px solid ' + hexColor + ' !important; font-weight: bold !important; margin: 0 2px; padding: 3px 6px !important; border-radius: 3px !important;">' + palavra + '</span>';
+        });
+        
+        // Usar classe wrapper para maior isolamento
+        $("#palavra-selecionada").html('<span class="palavras-selecionadas-wrapper" style="color: inherit !important;">' + badgesHTML + '</span>');
+        
+        // Atualizar a cor do header do card de resultados principal
+        if (corPalavra) {
+            var hexColor = rgbToHex(corPalavra);
+            var darkerColor = adjustColor(hexColor, -30);
+            
+            $(".card-results .card-header").css('background', 'linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ')');
+        }
+        
+        // Chamar API para buscar observações com múltiplas palavras
+        $.ajax({
+            url: 'cfc/pc_cfcPesquisasDashboard.cfc',
+            method: 'GET',
+            data: {
+                method: 'getObservacoesByMultiPalavras',
+                palavras: JSON.stringify(palavras),
+                ano: ano,
+                mcuOrigem: mcu,
+                returnformat: 'json'
+            },
+            success: function(response) {
+                try {
+                    var data = JSON.parse(response);
+                    
+                    // Verificar se há erro
+                    var erro = data.find(function(item) { return item && item.tipo === "erro"; });
+                    
+                    if (erro) {
+                        console.error("Erro na API:", erro);
+                        $("#cards-container").html(
+                            '<div class="col-12">' +
+                                '<div class="alert alert-danger">' +
+                                    '<i class="fas fa-exclamation-triangle mr-2"></i>' +
+                                    'Erro ao buscar observações: ' + erro.mensagem +
+                                    '<br><small>' + erro.detalhe + '</small>' +
+                                '</div>' +
+                            '</div>'
+                        );
+                        $("#contador-resultados").text('Ocorreu um erro na consulta');
+                        $("#contador-parenteses").text('');
+                        
+                        // Rolar até os resultados mesmo com erro
+                        scrollToResultados();
+                        return;
+                    }
+                    
+                    $("#cards-container").empty();
+                    
+                    if (data && data.length > 0) {
+                        // Texto para o contador
+                        var textoContador = data.length + (data.length === 1 ? ' observação encontrada' : ' observações encontradas');
+                        
+                        // Atualizar contadores
+                        $("#contador-resultados").text(textoContador);
+                        $("#contador-parenteses").text('(' + textoContador + ')');
+                        
+                        // Criar um card para cada observação
+                        data.forEach(function(item, index) {
+                            // Destacar todas as palavras selecionadas no texto
+                            var observacaoComDestaque = item.observacao;
+                            palavras.forEach(function(palavra) {
+                                observacaoComDestaque = destacarPalavra(observacaoComDestaque, palavra, corPalavra);
+                            });
+                            
+                            var processoId = item.processo_id;
+                            var orgaoRespondente = item.orgao_respondente;
+                            var orgaoOrigem = item.orgao_origem || "Não informado";
+                            
+                            var card = criarCardObservacao(processoId, orgaoRespondente, orgaoOrigem, observacaoComDestaque, index, corPalavra);
+                            $("#cards-container").append(card);
+                        });
+                        
+                        // Inicializar os tooltips
+                        $('[data-toggle="tooltip"]').tooltip();
+                    } else {
+                        $("#cards-container").html(
+                            '<div class="col-12">' +
+                                '<div class="alert alert-warning">' +
+                                    '<i class="fas fa-exclamation-circle mr-2"></i>' +
+                                    'Nenhuma observação encontrada contendo todas as palavras selecionadas.' +
+                                '</div>' +
+                            '</div>'
+                        );
+                        $("#contador-resultados").text('0 observações');
+                        $("#contador-parenteses").text('(0 observações encontradas)');
+                    }
+                    
+                    // ALTERADO: Mover a rolagem para fora do bloco condicional para sempre rolar
+                    scrollToResultados();
+                    
+                } catch (e) {
+                    console.error("Erro ao processar resposta:", e);
+                    $("#cards-container").html(
+                        '<div class="col-12">' +
+                            '<div class="alert alert-danger">' +
+                                '<i class="fas fa-exclamation-triangle mr-2"></i>' +
+                                'Erro ao processar a resposta. Detalhes: ' + e.message +
+                            '</div>' +
+                        '</div>'
+                    );
+                    $('.overlay-loading').remove();
+                    
+                    // Rolar até os resultados mesmo com erro
+                    scrollToResultados();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Erro ao buscar observações:", error);
+                $("#cards-container").html('<div class="col-12"><div class="alert alert-danger"><i class="fas fa-exclamation-triangle mr-2"></i>Erro ao buscar observações: ' + error + '</div></div>');
+                $("#contador-resultados").text('Ocorreu um erro na consulta');
+                $("#contador-parenteses").text('');
+                $('.overlay-loading').remove();
+                
+                // Rolar até os resultados mesmo com erro
+                scrollToResultados();
+            }
+        });
+    }
     
     // Função para buscar observações que contêm a palavra clicada
     function buscarObservacoesPorPalavra(palavra, ano, mcu, corPalavra) {
@@ -324,6 +647,9 @@ $(document).ready(function() {
                         $("#contador-parenteses").text('');
                         // Remover o indicador de carregamento
                         $('.overlay-loading').remove();
+                        
+                        // Rolar até os resultados mesmo com erro
+                        scrollToResultados();
                         return;
                     }
                     
@@ -351,28 +677,6 @@ $(document).ready(function() {
                         
                         // Inicializar os tooltips para os novos elementos
                         $('[data-toggle="tooltip"]').tooltip();
-                        
-                        // Rolar até os resultados usando a função global específica do site
-                        // Esta é a função corrigida que deve funcionar com a estrutura do site
-                        if (typeof window.scrollToElement === 'function') {
-                            setTimeout(function() {
-                                window.scrollToElement('#resultados-palavra', 70);
-                                // Remover o indicador de carregamento após o scroll
-                                setTimeout(function() {
-                                    $('.overlay-loading').remove();
-                                }, 300);
-                            }, 200);
-                        } else {
-                            // Fallback para scroll normal se a função global não existir
-                            setTimeout(function() {
-                                $('.content-wrapper').animate({
-                                    scrollTop: $('.content-wrapper').scrollTop() + $("#resultados-palavra").position().top - 70
-                                }, 800, function() {
-                                    // Remover o indicador de carregamento quando a animação terminar
-                                    $('.overlay-loading').remove();
-                                });
-                            }, 200);
-                        }
                     } else {
                         $("#cards-container").html(
                             '<div class="col-12">' +
@@ -387,6 +691,10 @@ $(document).ready(function() {
                         // Remover o indicador de carregamento
                         $('.overlay-loading').remove();
                     }
+                    
+                    // ALTERADO: Mover a rolagem para fora do bloco condicional para sempre rolar
+                    scrollToResultados();
+                    
                 } catch (e) {
                     console.error("Erro ao processar resposta:", e);
                     $("#cards-container").html(
@@ -399,6 +707,9 @@ $(document).ready(function() {
                     );
                     // Remover o indicador de carregamento
                     $('.overlay-loading').remove();
+                    
+                    // Rolar até os resultados mesmo com erro
+                    scrollToResultados();
                 }
             },
             error: function(xhr, status, error) {
@@ -408,6 +719,9 @@ $(document).ready(function() {
                 $("#contador-parenteses").text('');
                 // Remover o indicador de carregamento
                 $('.overlay-loading').remove();
+                
+                // Rolar até os resultados mesmo com erro
+                scrollToResultados();
             }
         });
     }
@@ -664,4 +978,29 @@ $(document).ready(function() {
         }
     });
 });
+
+// NOVO: Função auxiliar para rolar até os resultados
+function scrollToResultados() {
+    // Usar a função global específica do site se disponível
+    if (typeof window.scrollToElement === 'function') {
+        setTimeout(function() {
+            window.scrollToElement('#resultados-palavra', 70);
+            // Remover o indicador de carregamento após o scroll
+            setTimeout(function() {
+                $('.overlay-loading').remove();
+            }, 300);
+        }, 200);
+    } else {
+        // Fallback para scroll normal se a função global não existir
+        setTimeout(function() {
+            $('.content-wrapper').animate({
+                scrollTop: $('.content-wrapper').scrollTop() + $("#resultados-palavra").position().top - 70
+            }, 800, function() {
+                // Remover o indicador de carregamento quando a animação terminar
+                $('.overlay-loading').remove();
+            });
+        }, 200);
+    }
+}
 </script>
+``` 
