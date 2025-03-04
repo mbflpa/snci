@@ -155,6 +155,19 @@ $(document).ready(function() {
             $('#areaSelecaoPalavras').slideUp(200);
             // Limpar seleção ao desativar o modo
             limparPalavrasSelecionadas();
+            // Garantir que o destaque visual seja removido imediatamente
+            $('.jqcloud-word').removeClass('palavra-selecionada').css({
+                'box-shadow': 'none',
+                'border-radius': '0',
+                'padding': '0'
+            });
+            
+            // Ocultar resultados ao desativar o modo de seleção múltipla
+            $("#resultados-palavra").hide();
+            $("#cards-container").empty();
+            $("#palavra-selecionada").text('');
+            $("#contador-resultados").text('');
+            $("#contador-parenteses").text('');
         }
     });
     
@@ -163,6 +176,14 @@ $(document).ready(function() {
         palavrasSelecionadas = [];
         coresPalavrasSelecionadas = {}; // Limpar também as cores armazenadas
         atualizarExibicaoPalavrasSelecionadas();
+        atualizarDestaquePalavras(); // Adicionar chamada para atualizar destaque visual
+        
+        // Ocultar também a div de resultados quando limpar a seleção
+        $("#resultados-palavra").hide();
+        $("#cards-container").empty();
+        $("#palavra-selecionada").text('');
+        $("#contador-resultados").text('');
+        $("#contador-parenteses").text('');
     }
     
     // Novo: Botão para limpar seleção

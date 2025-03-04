@@ -175,26 +175,29 @@
                                 </div>
                             </div>
                             <div class="col-lg-3 col-md-6 col-12">
-                                <!-- Card do NPS com ícone de informação - Movido para após a média geral -->
+                                <!-- Card do NPS com estrutura melhorada -->
                                 <div class="small-box bg-purple">  
                                     <div class="inner">
-                                        <h3 id="npsValorContainer">0 <span id="npsClassificacao" class="text-small" >(-)</span></h3>
+                                        <div class="nps-value-container" style="display: flex; align-items: center;">
+                                            <h3 id="npsValorContainer" style="margin-right: 10px; margin-bottom: 0;">0</h3>
+                                            <div id="npsClassificacao" class="nps-classification-badge" style="display: inline-block; padding: 3px 10px; border-radius: 12px; font-weight: 600; font-size: 14px;">(-)</div>
+                                        </div>
                                         <p>
                                             Net Promoter Score (NPS)
                                             <i class="fas fa-info-circle ml-1 nps-info-icon" 
                                                data-toggle="popover" 
-                                               data-placement="top" 
+                                               data-placement="auto" 
                                                data-trigger="hover" 
-                                               title="O que é o NPS?" 
-                                               data-content="O NPS (Net Promoter Score) mede a satisfação e lealdade dos clientes em uma escala de -100 a +100. É calculado pela fórmula: (% Promotores - % Detratores). Os clientes são classificados como: Promotores (notas 9-10), Neutros (notas 7-8) e Detratores (notas 0-6). Classificação: Ruim (menor que 0), Regular (0 a 50), Bom (50 a 70), Excelente (acima de 70)."></i>
+                                               title="<i class='fas fa-chart-line mr-2'></i>O que é o NPS?" 
+                                               data-content="<div class='text-justify'><p>O <strong>Net Promoter Score (NPS)</strong> mede a satisfação e lealdade dos clientes em uma escala de -100 a +100.</p><p><strong>Cálculo:</strong> (% Promotores - % Detratores)</p><p><strong>Classificação dos clientes:</strong><br>• <span class='badge badge-success'>Promotores</span>: notas 9-10<br>• <span class='badge badge-warning'>Neutros</span>: notas 7-8<br>• <span class='badge badge-danger'>Detratores</span>: notas 0-6</p><p><strong>Interpretação:</strong><br>• <span class='text-danger'>Ruim</span>: menor que 0<br>• <span class='text-warning'>Regular</span>: 0 a 50<br>• <span class='text-info'>Bom</span>: 50 a 70<br>• <span class='text-success'>Excelente</span>: acima de 70</p></div>"></i>
+                                        </p>
+                                        <p id="npsDetalhes" class="formula-text">
+                                            Promotores: 0 | Neutros: 0 | Detratores: 0
                                         </p>
                                     </div>
-                                    <div class="icon">
-                                        <i class="fas fa-chart-line"></i>
+                                    <div class="icon" id="npsIcon">
+                                        <i class="fas fa-meh"></i>
                                     </div>
-                                    <p class="formula-text" style="display: block;">
-                                        <span id="npsDetalhes">Promotores: 0 | Neutros: 0 | Detratores: 0</span>
-                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -332,12 +335,15 @@
                 template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
             });
             
-            // Inicializar popovers para ícones de informação
+            // Inicializar popovers para ícones de informação com configurações aprimoradas para funcionar com zoom
             $('[data-toggle="popover"]').popover({
                 container: 'body',
                 html: true,
                 trigger: 'hover',
-                template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header"></div><div class="popover-body"></div></div>'
+                boundary: 'window',
+                fallbackPlacement: ['left', 'right', 'bottom', 'top'],
+                template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header"></div><div class="popover-body"></div></div>',
+                sanitize: false
             });
             
             // Função para classificar o NPS baseado no valor atualizado com nova escala
@@ -637,17 +643,45 @@
                     // Classificar o NPS
                     const classificacao = classificarNPS(npsValor);
                     
-                    // Atualiza o valor do NPS e coloca a classificação entre parênteses
-                    $("#npsValorContainer").html(
-                        npsValor + ' <span id="npsClassificacao" style="font-size:20px; margin-left:5px" class="' + classificacao.classe + '">(' + classificacao.texto + ')</span>'
-                    );
+                    // Atualiza o valor do NPS
+                    $("#npsValorContainer").text(npsValor);
                     
-                    // Atualizar detalhes do NPS
+                    // Atualiza a classificação com o novo elemento badge, aplicando estilos inline
+                    $("#npsClassificacao")
+                        .text(classificacao.texto)
+                        .removeClass()
+                        .addClass('nps-classification-badge')
+                        .css({
+                            'display': 'inline-block',
+                            'padding': '3px 10px',
+                            'border-radius': '12px',
+                            'font-weight': '600',
+                            'font-size': '14px'
+                        });
+                        
+                    // Aplicar cores baseadas na classificação
+                    if (classificacao.classe === "nps-excelente") {
+                        $("#npsClassificacao").css('background-color', '#28a745').css('color', 'white');
+                        // Atualiza o ícone para um sorriso amplo
+                        $("#npsIcon i").removeClass().addClass('fas fa-grin-stars');
+                    } else if (classificacao.classe === "nps-bom") {
+                        $("#npsClassificacao").css('background-color', '#17a2b8').css('color', 'white');
+                        // Atualiza o ícone para um sorriso
+                        $("#npsIcon i").removeClass().addClass('fas fa-smile');
+                    } else if (classificacao.classe === "nps-regular") {
+                        $("#npsClassificacao").css('background-color', '#ffc107').css('color', '#343a40');
+                        // Atualiza o ícone para um rosto neutro
+                        $("#npsIcon i").removeClass().addClass('fas fa-meh');
+                    } else {
+                        $("#npsClassificacao").css('background-color', '#dc3545').css('color', 'white');
+                        // Atualiza o ícone para um rosto triste
+                        $("#npsIcon i").removeClass().addClass('fas fa-frown');
+                    }
+                    
+                    // Atualizar detalhes do NPS com formato simplificado
                     if (resultado.npsDetalhes) {
-                        const { promotores, neutros, detratores, total } = resultado.npsDetalhes;
-                        $("#npsDetalhes").html(
-                            `Promotores: ${promotores} | Neutros: ${neutros} | Detratores: ${detratores}`
-                        );
+                        const { promotores, neutros, detratores } = resultado.npsDetalhes;
+                        $("#npsDetalhes").text(`Promotores: ${promotores} | Neutros: ${neutros} | Detratores: ${detratores}`);
                     }
                 }
                 

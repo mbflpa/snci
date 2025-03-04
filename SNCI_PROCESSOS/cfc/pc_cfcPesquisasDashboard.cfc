@@ -543,7 +543,7 @@
         </cftry>
     </cffunction>
     
-    <!--- Nova função para buscar observações com múltiplas palavras (corrigida) --->
+    <!--- Nova função para buscar observações com múltiplas palavras (corrigida para busca exata) --->
     <cffunction name="getObservacoesByMultiPalavras" access="remote" returntype="string" returnformat="json">
         <cfargument name="palavras" type="string" required="true">
         <cfargument name="ano" type="string" required="true">
@@ -553,7 +553,7 @@
             <!--- Desserializar o array de palavras JSON --->
             <cfset var arrayPalavras = deserializeJSON(arguments.palavras)>
             
-            <cflog file="nuvem_palavras" text="Buscando observações com palavras: #arrayToList(arrayPalavras, ', ')#">
+            <cflog file="nuvem_palavras" text="Buscando observações com palavras exatas: #arrayToList(arrayPalavras, ', ')#">
             
             <cfif not isArray(arrayPalavras) OR arrayLen(arrayPalavras) EQ 0>
                 <cfset var resultado = [{
@@ -564,7 +564,7 @@
                 <cfreturn serializeJSON(resultado)>
             </cfif>
             
-            <!--- Construção da consulta SQL corrigida - usando CAST para converter o campo TEXT --->
+            <!--- Construção da consulta SQL inicial - apenas para pré-filtrar --->
             <cfquery name="qObservacoesBase" datasource="#application.dsn_processos#">
                 SELECT 
                     pesq.pc_processo_id,
@@ -594,22 +594,59 @@
                 ORDER BY p.pc_processo_id
             </cfquery>
             
-            <cflog file="nuvem_palavras" text="Consulta SQL retornou #qObservacoesBase.recordCount# observações para múltiplas palavras">
+            <cflog file="nuvem_palavras" text="Consulta SQL inicial retornou #qObservacoesBase.recordCount# observações para múltiplas palavras">
             
-            <!--- Construir array de resultados --->
+            <!--- Construir array de resultados após aplicar filtro de palavras exatas --->
             <cfset var resultado = []>
             
             <cfloop query="qObservacoesBase">
-                <cfset arrayAppend(resultado, {
-                    "processo_id": pc_processo_id,
-                    "orgao_respondente": orgao_respondente,
-                    "orgao_mcu": orgao_mcu,
-                    "orgao_origem": orgao_origem & " (" & origem_mcu & ")",
-                    "observacao": pc_pesq_observacao
-                })>
+                <cfset var observacao = pc_pesq_observacao>
+                <cfset var incluirObservacao = true>
+                
+                <!--- Verificar cada palavra do array se aparece exatamente --->
+                <cfloop array="#arrayPalavras#" index="palavra">
+                    <cfset var palavraBusca = trim(palavra)>
+                    <cfset var matchPattern = "\b#palavraBusca#(?:\b|[.,;:!?)]|\s)">
+                    <cfset var matches = REMatchNoCase(matchPattern, observacao)>
+                    
+                    <cfset var palavraEncontradaExata = false>
+                    
+                    <!--- Verificar se os matches são realmente a palavra exata e não palavras plurais --->
+                    <cfif arrayLen(matches) GT 0>
+                        <cfset palavraEncontradaExata = true>
+                        
+                        <cfloop array="#matches#" index="match">
+                            <cfset match = REReplace(match, "[.,;:!?)]$", "", "ALL")> <!--- Remover pontuação no final --->
+                            <cfset match = trim(match)> <!--- Remover espaços --->
+                            
+                            <!--- Verificar se o match não é um plural ou derivado --->
+                            <cfif match NEQ palavraBusca> 
+                                <cfset palavraEncontradaExata = false>
+                                <cfbreak>
+                            </cfif>
+                        </cfloop>
+                    </cfif>
+                    
+                    <!--- Se qualquer palavra não for encontrada na forma exata, rejeita a observação --->
+                    <cfif NOT palavraEncontradaExata>
+                        <cfset incluirObservacao = false>
+                        <cfbreak>
+                    </cfif>
+                </cfloop>
+                
+                <!--- Incluir a observação apenas se todas as palavras foram encontradas na forma exata --->
+                <cfif incluirObservacao>
+                    <cfset arrayAppend(resultado, {
+                        "processo_id": pc_processo_id,
+                        "orgao_respondente": orgao_respondente,
+                        "orgao_mcu": orgao_mcu,
+                        "orgao_origem": orgao_origem & " (" & origem_mcu & ")",
+                        "observacao": observacao
+                    })>
+                </cfif>
             </cfloop>
             
-            <cflog file="nuvem_palavras" text="Retornando #arrayLen(resultado)# resultados para múltiplas palavras">
+            <cflog file="nuvem_palavras" text="Após filtro exato, retornando #arrayLen(resultado)# resultados para múltiplas palavras">
             <cfreturn serializeJSON(resultado)>
             
         <cfcatch type="any">
