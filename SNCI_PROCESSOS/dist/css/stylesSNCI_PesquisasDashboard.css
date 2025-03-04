@@ -25,7 +25,7 @@
   --cor-bg-primary: #007bff;
   --cor-bg-success: #28a745;
   --cor-bg-warning: #ffc107;
-  --cor-bg-purple: #6c39bf; /* Nova cor para o card NPS */
+  --cor-azul-navy: #3f6791;
 }
 
 /* Estilos básicos do layout principal */
@@ -65,8 +65,9 @@ body {
 .bg-warning {
   background-color: var(--cor-bg-warning) !important;
 }
-.bg-purple {
-  background-color: var(--cor-bg-purple) !important;
+.bg-azul-navy {
+  background-color: var(--cor-azul-navy) !important;
+  color:#fff;
 }
 
 /* Filtro de anos com rótulo */
@@ -474,7 +475,7 @@ body.modal-closed {
 }
 
 .popover-header {
-  background-color: var(--cor-bg-purple);
+  background-color: var(--cor-azul-navy);
   color: white;
   font-weight: 500;
 }

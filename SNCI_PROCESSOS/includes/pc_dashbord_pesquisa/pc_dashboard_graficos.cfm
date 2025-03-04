@@ -1,7 +1,7 @@
 <cfprocessingdirective pageencoding = "utf-8">
 <link rel="stylesheet" href="dist/css/stylesSNCI_Dashboard_Graficos.css">
 
-<!-- Conteúdo da aba Gráficos - Layout reorganizado -->
+<!-- Conteúdo da aba Gráficos - Layout reorganizado com altura igual -->
 <div class="row mb-12" style="justify-content: space-around;margin-bottom:20px">
   <!-- Gráfico de média por categoria -->
   <div class="col-md-4">
@@ -9,8 +9,10 @@
       <div class="card-header">
         <h5 class="card-title">Média por Categoria</h5>
       </div>
-      <div class="card-body">
-        <canvas id="graficoMedia" height="300"></canvas>
+      <div class="card-body d-flex flex-column">
+        <div class="flex-grow-1">
+          <canvas id="graficoMedia"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -46,9 +48,9 @@
           </span>
         </h5>
       </div>
-      <div class="card-body">
+      <div class="card-body d-flex flex-column">
         <!-- Container atualizado para ter dimensões fixas semelhantes ao exemplo -->
-        <div class="nps-chart-wrapper" style="height: 240px;">
+        <div class="nps-chart-wrapper flex-grow-1">
           <div class="nps-chart-container" style="width: 328px; height: 240px; margin: 0 auto; position: relative;">
             <canvas id="npsDonutChart"></canvas>
             <div class="nps-chart-center">
@@ -57,20 +59,33 @@
             </div>
           </div>
         </div>
-        <!-- Legenda movida para baixo como no exemplo -->
+        <!-- Legenda movida para baixo como no exemplo - MODIFICADA para incluir quantidade -->
         <div class="nps-legenda-fixa" style="display: flex; justify-content: center; margin-top: 10px;">
           <div class="legenda-item legenda-promotores">
             <div class="legenda-cor" style="background-color: #10b981;"></div>
-            <div class="legenda-texto">Promotores</div>
+            <div class="legenda-texto">Promotores <span id="qtdPromotores">(0)</span></div>
           </div>
           <div class="legenda-item legenda-neutros">
             <div class="legenda-cor" style="background-color: #fbbf24;"></div>
-            <div class="legenda-texto">Neutros</div>
+            <div class="legenda-texto">Neutros <span id="qtdNeutros">(0)</span></div>
           </div>
           <div class="legenda-item legenda-detratores">
             <div class="legenda-cor" style="background-color: #ef4444;"></div>
-            <div class="legenda-texto">Detratores</div>
+            <div class="legenda-texto">Detratores <span id="qtdDetratores">(0)</span></div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+   <!-- Gráfico de evolução ocupando toda a largura -->
+  <div class="col-5">
+    <div class="card h-100">
+      <div class="card-header">
+        <h5 class="card-title">Evolução das Notas</h5>
+      </div>
+      <div class="card-body d-flex flex-column">
+        <div class="flex-grow-1">
+          <canvas id="graficoEvolucao"></canvas>
         </div>
       </div>
     </div>
@@ -78,17 +93,7 @@
 </div>
 
 <div class="row">
-  <!-- Gráfico de evolução ocupando toda a largura -->
-  <div class="col-12">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="card-title">Evolução das Notas</h5>
-      </div>
-      <div class="card-body">
-        <canvas id="graficoEvolucao" height="300"></canvas>
-      </div>
-    </div>
-  </div>
+ 
 </div>
 
 <!--- Script para gerar e configurar o gráfico NPS - Atualizado para layout moderno --->
@@ -106,6 +111,11 @@ window.updateNPSChart = function(npsData) {
     
     // Atualizar o valor do NPS no centro
     document.getElementById('npsValorDisplay').textContent = npsValor;
+    
+    // Atualizar as quantidades nas legendas
+    document.getElementById('qtdPromotores').textContent = `(${promotores})`;
+    document.getElementById('qtdNeutros').textContent = `(${neutros})`;
+    document.getElementById('qtdDetratores').textContent = `(${detratores})`;
     
     // Configurar cores modernas como no exemplo fornecido
     const chartColors = {
@@ -135,6 +145,11 @@ window.updateNPSChart = function(npsData) {
         labelsFiltrados.push('Promotores', 'Neutros', 'Detratores');
         bgColorsFiltrados.push(...bgColors);
         borderColorsFiltrados.push(...borderColors);
+        
+        // Também limpar as quantidades nas legendas quando não há dados
+        document.getElementById('qtdPromotores').textContent = '(0)';
+        document.getElementById('qtdNeutros').textContent = '(0)';
+        document.getElementById('qtdDetratores').textContent = '(0)';
     } else {
         // Filtrar os valores zero
         for (let i = 0; i < valores.length; i++) {
@@ -198,7 +213,7 @@ window.updateNPSChart = function(npsData) {
             // Configuração para desenhar textos - apenas o percentual como no exemplo
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.font = 'bold 12px Arial'; // Fonte menor como no exemplo
+            ctx.font = '12px Arial'; // Fonte menor como no exemplo
             ctx.fillStyle = '#000'; // Texto branco como no exemplo
             
             // Para cada segmento do donut
@@ -211,7 +226,7 @@ window.updateNPSChart = function(npsData) {
                     const rotation = model.startAngle + (model.endAngle - model.startAngle) / 2;
                     
                     // Posicionar como no exemplo (mais ao meio da seção)
-                    const radius = model.innerRadius + (model.outerRadius - model.innerRadius) * 0.6;
+                    const radius = model.innerRadius + (model.outerRadius - model.innerRadius) * 0.4;
                     const x = centerX + Math.cos(rotation) * radius;
                     const y = centerY + Math.sin(rotation) * radius;
                     

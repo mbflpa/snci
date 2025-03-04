@@ -176,7 +176,7 @@
                             </div>
                             <div class="col-lg-3 col-md-6 col-12">
                                 <!-- Card do NPS com estrutura melhorada -->
-                                <div class="small-box bg-purple">  
+                                <div class="small-box bg-azul-navy">  
                                     <div class="inner">
                                         <div class="nps-value-container" style="display: flex; align-items: center;">
                                             <h3 id="npsValorContainer" style="margin-right: 10px; margin-bottom: 0;">0</h3>
