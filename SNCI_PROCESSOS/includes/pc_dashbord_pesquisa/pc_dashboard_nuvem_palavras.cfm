@@ -10,12 +10,12 @@
         <h5 class="card-title">Sobre a Nuvem de Palavras</h5>
       </div>
       <div class="card-body card-body-flex">
-        <div class="flex-grow-1">
-          <p style="text-align: justify;">A nuvem de palavras é uma representação visual das palavras mais frequentes encontradas nas observações das pesquisas.</p>
-          <p style="text-align: justify;">Palavras maiores indicam termos que aparecem com mais frequência. Este recurso ajuda a identificar rapidamente os temas mais recorrentes nas observações.</p>
-          <p style="text-align: justify;">Posicionando o cursor sobre uma palavra, você pode ver a frequência com que ela aparece e a relevância em relação às demais.</p>
-          <p style="text-align: justify;">Clique em uma palavra para ver todas as observações que contêm aquele termo.</p>  
-        </div>
+        <lu >
+          <li style="text-align: justify;margin-bottom:0.2rem!important">A nuvem de palavras é uma representação visual das palavras mais frequentes encontradas nas observações das pesquisas;</li>
+          <li style="text-align: justify;margin-bottom:0.2rem!important">Palavras maiores indicam termos que aparecem com mais frequência. Este recurso ajuda a identificar rapidamente os temas mais recorrentes nas observações;</li>
+          <li style="text-align: justify;margin-bottom:0.2rem!important">Posicionando o cursor sobre uma palavra, você pode ver a frequência com que ela aparece e a relevância em relação às demais;</li>
+          <li style="text-align: justify;margin-bottom:0!important">Clique em uma palavra para ver todas as observações que contêm aquele termo.</li>  
+        </lu>
         <!-- Controles para ajustar a nuvem de palavras -->
         <div class="mt-auto">
           <!-- Novo: Toggle para modo de seleção múltipla -->
