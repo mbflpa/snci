@@ -135,9 +135,9 @@
                             </cfif>
                         </div>
 
-                        <!-- Cards de métricas -->
+                        <!-- Cards de métricas - Reorganizados com NPS após Média Geral -->
                         <div class="row">
-                            <div class="col-lg-3 col-6">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <div class="small-box bg-info">
                                     <div class="inner">
                                         <h3 id="totalPesquisas">0</h3>
@@ -148,7 +148,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-6">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <div class="small-box bg-primary">
                                     <div class="inner">
                                         <h3 id="indiceRespostas">0%</h3>
@@ -163,7 +163,7 @@
                                     </p>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-6">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <div class="small-box bg-success">  
                                     <div class="inner">
                                         <h3 id="mediaGeral">0</h3>
@@ -174,7 +174,34 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-lg-3 col-6">
+                            <div class="col-lg-3 col-md-6 col-12">
+                                <!-- Card do NPS com ícone de informação - Movido para após a média geral -->
+                                <div class="small-box bg-purple">  
+                                    <div class="inner">
+                                        <h3 id="npsValorContainer">0 <span id="npsClassificacao" class="text-small" >(-)</span></h3>
+                                        <p>
+                                            Net Promoter Score (NPS)
+                                            <i class="fas fa-info-circle ml-1 nps-info-icon" 
+                                               data-toggle="popover" 
+                                               data-placement="top" 
+                                               data-trigger="hover" 
+                                               title="O que é o NPS?" 
+                                               data-content="O NPS (Net Promoter Score) mede a satisfação e lealdade dos clientes em uma escala de -100 a +100. É calculado pela fórmula: (% Promotores - % Detratores). Os clientes são classificados como: Promotores (notas 9-10), Neutros (notas 7-8) e Detratores (notas 0-6). Classificação: Ruim (menor que 0), Regular (0 a 50), Bom (50 a 70), Excelente (acima de 70)."></i>
+                                        </p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-chart-line"></i>
+                                    </div>
+                                    <p class="formula-text" style="display: block;">
+                                        <span id="npsDetalhes">Promotores: 0 | Neutros: 0 | Detratores: 0</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Card Pontualidade movido para o final -->
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 col-12">
                                 <div class="small-box bg-warning">
                                     <div class="inner">
                                         <h3 id="mediaGeralPontualidade">0</h3>
@@ -187,7 +214,6 @@
                             </div>
                         </div>
 
-                      
                         <!--- Sistema de abas --->
                         <div class="tabs-container">
                           <!--- Navegação das abas --->
@@ -298,13 +324,49 @@
             window.ChartDataLabels = ChartDataLabels;
             Chart.plugins.unregister(ChartDataLabels);  // Primeiro desregistramos para evitar duplicação
             
-            // Inicializar tooltips com configurações avançadas
+            // Inicializar tooltips e popovers com configurações avançadas
             $('[data-toggle="tooltip"]').tooltip({
                 container: 'body',
                 html: true,
                 delay: {show: 100, hide: 100},
                 template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
             });
+            
+            // Inicializar popovers para ícones de informação
+            $('[data-toggle="popover"]').popover({
+                container: 'body',
+                html: true,
+                trigger: 'hover',
+                template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header"></div><div class="popover-body"></div></div>'
+            });
+            
+            // Função para classificar o NPS baseado no valor atualizado com nova escala
+            function classificarNPS(valor) {
+                // Converter para número para garantir comparação correta
+                const nps = parseFloat(valor);
+                
+                if (nps > 70) {
+                    return {
+                        texto: "Excelente",
+                        classe: "nps-excelente"
+                    };
+                } else if (nps >= 50) {
+                    return {
+                        texto: "Bom",
+                        classe: "nps-bom"
+                    };
+                } else if (nps >= 0) {
+                    return {
+                        texto: "Regular",
+                        classe: "nps-regular"
+                    };
+                } else {
+                    return {
+                        texto: "Ruim",
+                        classe: "nps-ruim"
+                    };
+                }
+            }
             
             var anos = [];
             var orgaos = [];
@@ -566,6 +628,27 @@
                         `Cálculo: (${totalRespondidas} / ${totalProcessos}) × 100 = ${indice}%`
                     );
                     $(".formula-text").show();
+                }
+                
+                // Atualizar o NPS se disponível
+                if (resultado.nps !== undefined) {
+                    const npsValor = resultado.nps;
+                    
+                    // Classificar o NPS
+                    const classificacao = classificarNPS(npsValor);
+                    
+                    // Atualiza o valor do NPS e coloca a classificação entre parênteses
+                    $("#npsValorContainer").html(
+                        npsValor + ' <span id="npsClassificacao" style="font-size:20px; margin-left:5px" class="' + classificacao.classe + '">(' + classificacao.texto + ')</span>'
+                    );
+                    
+                    // Atualizar detalhes do NPS
+                    if (resultado.npsDetalhes) {
+                        const { promotores, neutros, detratores, total } = resultado.npsDetalhes;
+                        $("#npsDetalhes").html(
+                            `Promotores: ${promotores} | Neutros: ${neutros} | Detratores: ${detratores}`
+                        );
+                    }
                 }
                 
                 // Atualizar componentes ativos

@@ -161,6 +161,49 @@
             FROM ProcessosUnicos
         </cfquery>
 
+        <!--- Cálculo do NPS - Nova consulta separada para obter contagem de promotores, neutros e detratores --->
+        <cfquery name="qryNPS" datasource="#application.dsn_processos#">
+            SELECT 
+                SUM(CASE WHEN 
+                    (pc_pesq_comunicacao + pc_pesq_interlocucao + pc_pesq_reuniao_encerramento + 
+                     pc_pesq_relatorio + pc_pesq_pos_trabalho + pc_pesq_importancia_processo) / 6.0 >= 9.0 
+                    THEN 1 ELSE 0 END) as promotores,
+                    
+                SUM(CASE WHEN 
+                    (pc_pesq_comunicacao + pc_pesq_interlocucao + pc_pesq_reuniao_encerramento + 
+                     pc_pesq_relatorio + pc_pesq_pos_trabalho + pc_pesq_importancia_processo) / 6.0 >= 7.0 
+                     AND (pc_pesq_comunicacao + pc_pesq_interlocucao + pc_pesq_reuniao_encerramento + 
+                     pc_pesq_relatorio + pc_pesq_pos_trabalho + pc_pesq_importancia_processo) / 6.0 < 9.0
+                    THEN 1 ELSE 0 END) as neutros,
+                    
+                SUM(CASE WHEN 
+                    (pc_pesq_comunicacao + pc_pesq_interlocucao + pc_pesq_reuniao_encerramento + 
+                     pc_pesq_relatorio + pc_pesq_pos_trabalho + pc_pesq_importancia_processo) / 6.0 < 7.0 
+                    THEN 1 ELSE 0 END) as detratores,
+                    
+                COUNT(*) as total_nps
+            FROM pc_pesquisas 
+            INNER JOIN pc_processos ON pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
+            INNER JOIN pc_orgaos as orgaoOrigem ON pc_processos.pc_num_orgao_origem = orgaoOrigem.pc_org_mcu
+            WHERE orgaoOrigem.pc_org_status ='O' AND pc_processos.pc_num_status IN(4,5) and RIGHT(pc_pesquisas.pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
+            <cfif arguments.ano NEQ "Todos">
+                AND RIGHT(pc_pesquisas.pc_processo_id, 4) = <cfqueryparam value="#arguments.ano#" cfsqltype="cf_sql_integer">
+            </cfif>
+            <cfif arguments.mcuOrigem NEQ "Todos">
+                AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+            </cfif>
+        </cfquery>
+    
+        <!--- Calcular o NPS (% promotores - % detratores) --->
+        <cfset var totalNPS = val(qryNPS.total_nps)>
+        <cfset var npsValor = 0>
+        
+        <cfif totalNPS GT 0>
+            <cfset var percentualPromotores = (val(qryNPS.promotores) / totalNPS) * 100>
+            <cfset var percentualDetratores = (val(qryNPS.detratores) / totalNPS) * 100>
+            <cfset npsValor = ROUND((percentualPromotores - percentualDetratores) * 10) / 10>
+        </cfif>
+
         <!--- Montar estrutura de retorno --->
         <!--- Usando a mesma técnica ROUND(x*10)/10 do arquivo pc_cfcIndicadores_gerarDados.cfc --->
         <cfset pontualidade = val(qryPesquisas.media_pontualidade) * 100>
@@ -176,6 +219,13 @@
             "importancia": NumberFormat(media_importancia, "999.9"),
             "pontualidadePercentual": NumberFormat(pontualidade, "999.9"),
             "mediaGeral": NumberFormat(mediaGeral, "999.9"),
+            "nps": npsValor,
+            "npsDetalhes": {
+                "promotores": val(qryNPS.promotores),
+                "neutros": val(qryNPS.neutros),
+                "detratores": val(qryNPS.detratores),
+                "total": totalNPS
+            },
             "medias": [
                 media_comunicacao,
                 media_interlocucao,

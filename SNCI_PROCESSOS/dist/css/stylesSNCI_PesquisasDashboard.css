@@ -8,6 +8,7 @@
   --cor-pos-trabalho: #28a745;
   --cor-importancia: #fd7e14;
   --cor-pontualidade: #ffc107;
+  --cor-nps: #6c39bf; /* Nova cor para o NPS */
 
   /* Cores secundárias para gradientes */
   --cor-comunicacao-gradiente: #138496;
@@ -17,12 +18,14 @@
   --cor-pos-trabalho-gradiente: #218838;
   --cor-importancia-gradiente: #e67a0d;
   --cor-pontualidade-gradiente: #e0a800;
+  --cor-nps-gradiente: #512da8; /* Nova cor gradiente para o NPS */
 
   /* Cores de fundo para cards principais */
   --cor-bg-info: #17a2b8;
   --cor-bg-primary: #007bff;
   --cor-bg-success: #28a745;
   --cor-bg-warning: #ffc107;
+  --cor-bg-purple: #6c39bf; /* Nova cor para o card NPS */
 }
 
 /* Estilos básicos do layout principal */
@@ -61,6 +64,9 @@ body {
 }
 .bg-warning {
   background-color: var(--cor-bg-warning) !important;
+}
+.bg-purple {
+  background-color: var(--cor-bg-purple) !important;
 }
 
 /* Filtro de anos com rótulo */
@@ -357,4 +363,74 @@ body.modal-closed {
 
 .no-modal-backdrop {
   background: none !important;
+}
+
+/* Estilos específicos para o card de NPS */
+.nps-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.7rem;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Estilo para a classificação dentro do valor do NPS */
+#npsClassificacao {
+  font-size: 0.5rem; /* Reduzido para 0.5rem */
+  font-weight: normal;
+  opacity: 0.85;
+  vertical-align: middle;
+  padding-left: 3px;
+}
+
+.nps-tooltip {
+  font-size: 0.7rem;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Ícone de informação do NPS */
+.nps-info-icon {
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.nps-info-icon:hover {
+  opacity: 1;
+}
+
+/* Popover para informações do NPS */
+.popover {
+  max-width: 300px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.popover-header {
+  background-color: var(--cor-bg-purple);
+  color: white;
+  font-weight: 500;
+}
+
+.popover-body {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Escala de cores do NPS */
+.nps-excelente {
+  color: #28a745;
+}
+.nps-bom {
+  color: #17a2b8;
+}
+.nps-regular {
+  color: #ffc107;
+}
+.nps-ruim {
+  color: #dc3545;
 }

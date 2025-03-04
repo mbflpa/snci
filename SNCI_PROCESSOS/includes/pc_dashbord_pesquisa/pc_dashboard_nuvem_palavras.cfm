@@ -120,6 +120,8 @@ $(document).ready(function() {
     var modoPesquisaMultipla = false;
     // Novo: Array para armazenar as palavras selecionadas
     var palavrasSelecionadas = [];
+    // Novo: Objeto para armazenar as cores das palavras selecionadas
+    var coresPalavrasSelecionadas = {};
     // Armazenar dados da nuvem para reuso
     window.cloudData = null;
     // Armazenar opções de configuração da nuvem para reuso
@@ -159,6 +161,7 @@ $(document).ready(function() {
     // Novo: Função para limpar palavras selecionadas
     function limparPalavrasSelecionadas() {
         palavrasSelecionadas = [];
+        coresPalavrasSelecionadas = {}; // Limpar também as cores armazenadas
         atualizarExibicaoPalavrasSelecionadas();
     }
     
@@ -193,14 +196,7 @@ $(document).ready(function() {
         
         // Criar badges para cada palavra selecionada
         palavrasSelecionadas.forEach(function(palavra, index) {
-            var palavraObj = window.cloudData.find(function(item) {
-                return item.text === palavra;
-            });
-            
-            var corPalavra = '#007bff'; // Cor padrão
-            if (palavraObj && palavraObj.color) {
-                corPalavra = palavraObj.color;
-            }
+            var corPalavra = coresPalavrasSelecionadas[palavra] || '#007bff'; // Usar cor armazenada ou padrão
             
             var hexColor = rgbToHex(corPalavra);
             
@@ -218,8 +214,11 @@ $(document).ready(function() {
         $container.find('.close').click(function(e) {
             e.stopPropagation();
             var index = $(this).data('index');
+            var palavraRemovida = palavrasSelecionadas[index];
             palavrasSelecionadas.splice(index, 1);
+            delete coresPalavrasSelecionadas[palavraRemovida]; // Remover a cor armazenada
             atualizarExibicaoPalavrasSelecionadas();
+            atualizarDestaquePalavras(); // Atualizar destaque visual após remoção
         });
     }
     
@@ -269,8 +268,10 @@ $(document).ready(function() {
         // Ocultar resultados anteriores quando atualizar a nuvem
         $("#resultados-palavra").hide();
         
-        // Limpar palavras selecionadas ao recarregar a nuvem
-        limparPalavrasSelecionadas();
+        // CORREÇÃO: Só limpar palavras selecionadas quando NÃO estiver no modo de seleção múltipla
+        if (!modoPesquisaMultipla) {
+            limparPalavrasSelecionadas();
+        }
         
         // CORREÇÃO PRINCIPAL: Usar o método getWordCloud em vez de getNuvemPalavras
         $.ajax({
@@ -331,6 +332,16 @@ $(document).ready(function() {
                                     // Armazenar a cor da palavra no objeto para uso posterior
                                     wordObj.color = $(word).css('color');
                                     
+                                    // CORREÇÃO: Se a palavra já foi selecionada anteriormente, restaurar sua cor armazenada
+                                    if (modoPesquisaMultipla && palavrasSelecionadas.includes(wordText) && coresPalavrasSelecionadas[wordText]) {
+                                        // Não substituir a cor armazenada
+                                    } else {
+                                        // Armazenar a nova cor se essa palavra estiver selecionada
+                                        if (palavrasSelecionadas.includes(wordText)) {
+                                            coresPalavrasSelecionadas[wordText] = wordObj.color;
+                                        }
+                                    }
+                                    
                                     word.attr('data-toggle', 'popover');
                                     word.attr('data-placement', 'top');
                                     word.attr('data-trigger', 'hover');
@@ -350,9 +361,13 @@ $(document).ready(function() {
                                             if (indexPalavra === -1) {
                                                 // Adicionar à seleção
                                                 palavrasSelecionadas.push(palavraClicada);
+                                                // CORREÇÃO: Armazenar também a cor
+                                                coresPalavrasSelecionadas[palavraClicada] = corPalavra;
                                             } else {
                                                 // Remover da seleção
                                                 palavrasSelecionadas.splice(indexPalavra, 1);
+                                                // CORREÇÃO: Remover também a cor armazenada
+                                                delete coresPalavrasSelecionadas[palavraClicada];
                                             }
                                             
                                             atualizarExibicaoPalavrasSelecionadas();
@@ -401,8 +416,11 @@ $(document).ready(function() {
             $('.jqcloud-word').each(function() {
                 var wordText = $(this).text();
                 if (palavrasSelecionadas.includes(wordText)) {
+                    var cor = coresPalavrasSelecionadas[wordText] || $(this).css('color');
+                    var hexColor = rgbToHex(cor);
+                    
                     $(this).addClass('palavra-selecionada').css({
-                        'box-shadow': '0 0 5px rgba(0,0,0,0.5)',
+                        'box-shadow': '0 0 5px ' + hexColor,
                         'border-radius': '3px',
                         'padding': '2px'
                     });
@@ -423,6 +441,10 @@ $(document).ready(function() {
         
         if (palavraObj && palavraObj.color) {
             corPalavra = palavraObj.color;
+            window.ultimaCorPalavra = corPalavra;
+        } else if (coresPalavrasSelecionadas[palavras[0]]) {
+            // CORREÇÃO: Tentar usar a cor armazenada se disponível
+            corPalavra = coresPalavrasSelecionadas[palavras[0]];
             window.ultimaCorPalavra = corPalavra;
         }
         
@@ -1003,4 +1025,3 @@ function scrollToResultados() {
     }
 }
 </script>
-``` 
