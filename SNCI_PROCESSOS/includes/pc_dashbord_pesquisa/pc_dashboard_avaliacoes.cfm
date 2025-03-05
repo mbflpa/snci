@@ -1,7 +1,7 @@
 <cfprocessingdirective pageencoding = "utf-8">
 <link rel="stylesheet" href="dist/css/stylesSNCI_Dashboard_Avaliacoes.css">
 
-<!-- Conteúdo da aba Avaliações -->
+<!-- Conteúdo do card de Avaliações -->
 <div class="score-cards">
   <div class="score-card comunicacao">
       <h3>Comunicação <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a clareza, frequência e qualidade das interações com a equipe de Controle Interno. Considere se a equipe de Controle Interno foi acessível, transparente e eficaz ao transmitir informações sobre a condução dos trabalhos."></i></h3>

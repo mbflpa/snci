@@ -7,38 +7,21 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-  padding: 12px 20px;
-  border-top-left-radius: 8px !important;
-  border-top-right-radius: 8px !important;
-}
-
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 0;
-  color: #495057;
-}
-
-.card-body {
-  padding: 20px;
-  position: relative;
-  overflow: visible !important;
+/* Espaçamentos específicos para o layout dos gráficos */
+.row.mb-12 {
+  justify-content: space-around;
+  margin-bottom: 20px;
 }
 
 /* Responsividade para gráficos */
 @media (max-width: 992px) {
   .row .col-md-4,
-  .row .col-md-8 {
+  .row .col-md-8,
+  .row .col-md-3,
+  .row .col-5 {
     flex: 0 0 100%;
     max-width: 100%;
+    margin-bottom: 20px;
   }
 
   canvas {
@@ -69,24 +52,24 @@
   width: 100%;
   height: auto;
   padding: 0;
-  margin-bottom: 0px; /* Reduzido para aproximar a legenda */
-  position: relative; /* Garante posicionamento correto */
+  margin-bottom: 0px;
+  position: relative;
 }
 
 .nps-chart-container {
   position: relative;
   width: 300px;
   height: 300px;
-  margin: 0 auto !important; /* Forçando centralização */
+  margin: 0 auto !important;
   box-sizing: content-box !important;
   min-width: 300px !important;
   min-height: 300px !important;
-  display: flex; /* Use flexbox para centralizar o canvas */
-  justify-content: center; /* Centraliza horizontalmente */
-  align-items: center; /* Centraliza verticalmente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Centro do gráfico donut - CORREÇÃO DE CENTRALIZAÇÃO PRECISA */
+/* Centro do gráfico donut */
 .nps-chart-center {
   position: absolute;
   top: 50%;
@@ -102,7 +85,6 @@
   height: 70px !important;
   margin: 0 !important;
   padding: 0 !important;
-  /* Garantir centralização no Safari/Chrome/Firefox */
   box-sizing: border-box !important;
   transform-origin: center center !important;
 }
@@ -113,256 +95,14 @@
   display: block;
   line-height: 1;
   margin: 0 !important;
-  padding: 0 !important; /* Garantir que não haja padding */
+  padding: 0 !important;
 }
 
 .nps-label {
-  font-size: 0.9rem; /* Reduzido ligeiramente */
+  font-size: 0.9rem;
   color: #6c757d;
-  margin-top: 2px !important; /* Reduzido para melhorar centralização */
+  margin-top: 2px !important;
   padding: 0 !important;
-}
-
-/* Estilos para o popover personalizado - ampliado */
-.nps-popover {
-  max-width: 300px !important;
-  width: 350px !important;
-}
-
-.popover-header {
-  background-color: #495057 !important;
-  color: white !important;
-  border-bottom: none;
-  padding: 10px 12px;
-  font-weight: 600;
-}
-
-.popover-body {
-  padding: 12px;
-}
-
-.popover-title-custom {
-  font-weight: 600;
-  color: white;
-}
-
-.nps-info-content {
-  padding: 8px;
-  font-size: 0.95rem;
-}
-
-.nps-info-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-  padding: 3px 0;
-}
-
-.color-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-/* Estilos para o popover personalizado */
-.nps-popover {
-  max-width: 300px;
-}
-
-.popover-title-custom {
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.nps-info-content {
-  padding: 5px;
-  font-size: 0.9rem;
-}
-
-.nps-info-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-  padding: 2px 0;
-}
-
-.color-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-right: 8px;
-}
-
-.promotores-info .color-dot {
-  background-color: rgba(75, 192, 75, 1);
-}
-
-.neutros-info .color-dot {
-  background-color: rgba(255, 193, 7, 1);
-}
-
-.detratores-info .color-dot {
-  background-color: rgba(255, 87, 87, 1);
-}
-
-.nps-formula {
-  margin-top: 8px;
-  text-align: center;
-  font-size: 0.9rem;
-  padding: 5px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-}
-
-.nps-info-icon {
-  cursor: help;
-  margin-left: 5px;
-  font-size: 0.9rem;
-}
-
-/* Códigos de cores para texto NPS */
-.text-success {
-  color: #28a745 !important;
-}
-
-.text-warning {
-  color: #ffc107 !important;
-}
-
-.text-danger {
-  color: #dc3545 !important;
-}
-
-/* Garantir que o canvas do gráfico seja perfeitamente centralizado */
-#npsDonutChart {
-  width: 300px !important;
-  height: 300px !important; /* Adicionado explicitamente para garantir dimensões corretas */
-  display: block !important;
-  box-sizing: border-box !important;
-  margin: 0 auto !important; /* Centralização horizontal */
-  padding: 0 !important;
-}
-
-/* Sobreescrever qualquer estilo que possa afetar as dimensões do canvas */
-canvas#npsDonutChart {
-  aspect-ratio: 1/1 !important;
-  object-fit: contain !important;
-  border-radius: 0 !important;
-  border: none !important;
-  outline: none !important;
-}
-
-/* Ajustar responsividade para tamanhos específicos */
-@media (max-width: 992px) {
-  .row .col-md-6 {
-    margin-bottom: 20px;
-  }
-
-  .nps-chart-container,
-  #npsDonutChart,
-  canvas#npsDonutChart {
-    width: 320px !important;
-    height: 320px !important;
-    min-width: 320px !important;
-    min-height: 320px !important;
-  }
-
-  #graficoMedia,
-  #graficoEvolucao {
-    height: 250px !important;
-  }
-
-  .nps-chart-center {
-    /* Os valores !important da classe principal já controlam este tamanho */
-  }
-
-  #npsDonutChart {
-    width: 340px !important;
-    height: 340px !important;
-  }
-}
-
-@media (max-width: 768px) {
-  .nps-chart-container,
-  #npsDonutChart,
-  canvas#npsDonutChart {
-    width: 280px !important;
-    height: 280px !important;
-    min-width: 280px !important;
-    min-height: 280px !important;
-  }
-
-  .nps-chart-center {
-    width: 60px !important; /* Ainda menor para telas menores */
-    height: 60px !important;
-  }
-
-  .nps-value {
-    font-size: 1.8rem; /* Ajustado para o espaço reduzido */
-  }
-
-  .nps-label {
-    font-size: 0.8rem;
-  }
-
-  .nps-legend {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .legend-item {
-    margin: 5px 0;
-  }
-
-  #npsDonutChart {
-    width: 300px !important;
-    height: 300px !important;
-  }
-}
-
-/* Remover conflitos de estilo */
-#graficoEvolucao {
-  height: 300px !important;
-}
-
-/* Remover duplicatas */
-.h-100 {
-  height: 100% !important;
-}
-
-/* Remover todos os estilos relacionados a legendas externas */
-.nps-legend,
-.legend-item,
-.color-box,
-.legend-text,
-.legend-count {
-  display: none !important;
-}
-
-/* Estilos unificados para legendas - POSICIONAMENTO CORRIGIDO */
-.nps-legenda-fixa {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  margin-top: 8px; /* Ajustado para ficar mais próximo mas não sobreposto */
-  width: 100%;
-  font-size: 0.75rem;
-  position: relative; /* Permite melhor controle de posicionamento */
-}
-
-.legenda-item {
-  display: flex;
-  align-items: center;
-  margin: 0 8px;
-}
-
-.legenda-cor {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  margin-right: 4px;
 }
 
 /* Cores para as categorias NPS */
@@ -378,100 +118,14 @@ canvas#npsDonutChart {
   background-color: rgba(255, 87, 87, 0.8);
 }
 
-.legenda-texto {
-  font-size: 0.75rem;
-  color: #333;
-}
-
-/* Estilos para o tooltip e popover */
-.tooltip-inner {
-  max-width: 250px;
-  text-align: left !important;
-}
-
-/* Estilos para popover do NPS */
-.nps-popover .popover-title-custom {
-  font-weight: bold;
-  color: white !important;
-}
-
-.nps-info-item .color-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-right: 5px;
-}
-
-.nps-formula {
-  margin-top: 5px;
-  font-size: 0.9rem;
-  text-align: center;
-  padding-top: 5px;
-}
-
-/* Responsividade */
-@media (max-width: 576px) {
-  .nps-legenda-fixa {
-    flex-direction: column;
-    padding: 8px 0;
-  }
-
-  .legenda-item {
-    margin: 3px 0;
-  }
-
-  .nps-chart-container {
-    width: 250px;
-    height: 250px;
-  }
-
-  .nps-value {
-    font-size: 1.6rem; /* Menor ainda para telas muito pequenas */
-  }
-}
-
-/* Estilos para o gráfico NPS */
-.nps-chart-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-.nps-chart-container {
-  position: relative;
-}
-
-.nps-chart-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.nps-value {
-  font-size: 28px;
-  font-weight: bold;
-  display: block;
-}
-
-.nps-label {
-  font-size: 14px;
-  color: #777;
-  display: block;
-}
-
-.text-success {
-  color: #10b981;
-}
-
-.text-warning {
-  color: #fbbf24;
-}
-
-.text-danger {
-  color: #ef4444;
+/* Garantir que o canvas do gráfico seja perfeitamente centralizado */
+#npsDonutChart {
+  width: 300px !important;
+  height: 300px !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
 }
 
 /* Estilos para legenda fixa abaixo do gráfico */
@@ -495,68 +149,42 @@ canvas#npsDonutChart {
   margin-right: 5px;
 }
 
-.legenda-promotores .legenda-cor {
-  background-color: #10b981;
-}
-
-.legenda-neutros .legenda-cor {
-  background-color: #fbbf24;
-}
-
-.legenda-detratores .legenda-cor {
-  background-color: #ef4444;
-}
-
 .legenda-texto {
   font-size: 12px;
   color: #555;
 }
 
-/* Estilos para o popover de informações */
-.nps-info-icon {
-  cursor: pointer;
-  margin-left: 5px;
+/* Ajustar responsividade para tamanhos específicos */
+@media (max-width: 768px) {
+  .nps-chart-container,
+  #npsDonutChart,
+  canvas#npsDonutChart {
+    width: 280px !important;
+    height: 280px !important;
+    min-width: 280px !important;
+    min-height: 280px !important;
+  }
+
+  .nps-chart-center {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .nps-value {
+    font-size: 1.8rem;
+  }
+
+  .nps-label {
+    font-size: 0.8rem;
+  }
+
+  #graficoMedia,
+  #graficoEvolucao {
+    height: 250px !important;
+  }
 }
 
-.nps-popover {
-  max-width: 300px;
-}
-
-.popover-title-custom {
-  font-weight: bold;
-}
-
-.nps-info-content {
-  padding: 5px;
-}
-
-.nps-info-item {
-  margin-bottom: 5px;
-  display: flex;
-  align-items: center;
-}
-
-.color-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 5px;
-}
-
-.promotores-info .color-dot {
-  background-color: #10b981;
-}
-
-.neutros-info .color-dot {
-  background-color: #fbbf24;
-}
-
-.detratores-info .color-dot {
-  background-color: #ef4444;
-}
-
-.nps-formula {
-  margin-top: 8px;
-  text-align: center;
-  font-size: 12px;
+/* Remover conflitos de estilo */
+#graficoEvolucao {
+  height: 300px !important;
 }

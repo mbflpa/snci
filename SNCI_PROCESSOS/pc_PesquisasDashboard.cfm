@@ -217,22 +217,45 @@
                             </div>
                         </div>
 
+                        <!--- Card novo para Média das Notas por Categoria --->
+                        <div class="card mb-4" id="card-avaliacoes">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-star mr-2"></i>Média das Notas por Categoria
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="avaliacoes-content" class="tab-loader-container">
+                                    <div class="tab-loader">
+                                      <i class="fas fa-spinner fa-spin"></i> Carregando avaliações...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--- Card para Gráficos --->
+                        <div class="card mb-4" id="card-graficos">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-chart-line mr-2"></i>Gráficos
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="graficos-content" class="tab-loader-container">
+                                    <div class="tab-loader">
+                                      <i class="fas fa-spinner fa-spin"></i> Carregando gráficos...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!--- Sistema de abas --->
                         <div class="tabs-container">
                           <!--- Navegação das abas --->
                           <ul class="nav nav-dashboard-tabs" id="dashboardTabs" role="tablist">
+                            <!--- Removida a aba de gráficos também --->
                             <li class="nav-item">
-                              <a class="nav-link active" id="avaliacoes-tab" data-toggle="tab" href="#avaliacoes" role="tab" aria-controls="avaliacoes" aria-selected="true">
-                                <i class="fas fa-star"></i>Média das Notas por Categoria
-                              </a>
-                            </li>
-                            <li class="nav-item">
-                              <a class="nav-link" id="graficos-tab" data-toggle="tab" href="#graficos" role="tab" aria-controls="graficos" aria-selected="false">
-                                <i class="fas fa-chart-line"></i>Gráficos
-                              </a>
-                            </li>
-                            <li class="nav-item">
-                              <a class="nav-link" id="nuvem-palavras-tab" data-toggle="tab" href="#nuvem-palavras" role="tab" aria-controls="nuvem-palavras" aria-selected="false">
+                              <a class="nav-link active" id="nuvem-palavras-tab" data-toggle="tab" href="#nuvem-palavras" role="tab" aria-controls="nuvem-palavras" aria-selected="true">
                                 <i class="fas fa-cloud"></i>Nuvem de Palavras
                               </a>
                             </li>
@@ -256,26 +279,8 @@
                           <!--- Conteúdo das abas - Modificado para carregar via AJAX --->
                           <div class="tab-content dashboard-tab-content" id="dashboardTabsContent">
                             
-                            <!--- Aba de Avaliações --->
-                            <div class="tab-pane fade show active" id="avaliacoes" role="tabpanel" aria-labelledby="avaliacoes-tab">
-                              <div id="avaliacoes-content" class="tab-loader-container">
-                                <div class="tab-loader">
-                                  <i class="fas fa-spinner fa-spin"></i> Carregando avaliações...
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <!--- Aba de Gráficos --->
-                            <div class="tab-pane fade" id="graficos" role="tabpanel" aria-labelledby="graficos-tab">
-                              <div id="graficos-content" class="tab-loader-container">
-                                <div class="tab-loader">
-                                  <i class="fas fa-spinner fa-spin"></i> Carregando gráficos...
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <!--- Aba de Nuvem de Palavras --->
-                            <div class="tab-pane fade" id="nuvem-palavras" role="tabpanel" aria-labelledby="nuvem-palavras-tab">
+                            <!--- Aba de Nuvem de Palavras (agora é a primeira aba) --->
+                            <div class="tab-pane fade show active" id="nuvem-palavras" role="tabpanel" aria-labelledby="nuvem-palavras-tab">
                               <div id="nuvem-palavras-content" class="tab-loader-container">
                                 <div class="tab-loader">
                                   <i class="fas fa-spinner fa-spin"></i> Carregando nuvem de palavras...
@@ -686,11 +691,12 @@
                 }
                 
                 // Atualizar componentes ativos
-                if ($("#avaliacoes").hasClass('active') && window.atualizarCardsAvaliacao) {
+                // Sempre atualiza o componente de avaliações e gráficos pois agora são cards fixos
+                if (window.atualizarCardsAvaliacao) {
                     window.atualizarCardsAvaliacao(resultado);
                 }
                 
-                if ($("#graficos").hasClass('active') && window.atualizarGraficos) {
+                if (window.atualizarGraficos) {
                     window.atualizarGraficos(resultado);
                 }
             }
@@ -793,11 +799,16 @@
                 });
                 
                 // Atualizar o componente atual
-                if ($("#avaliacoes").hasClass('active')) {
+                // Sempre carrega o componente de avaliações
+                if (!componentesCarregados['avaliacoes']) {
                     carregarComponente('avaliacoes');
-                } else if ($("#graficos").hasClass('active')) {
+                }
+                
+                if (!componentesCarregados['graficos']) {
                     carregarComponente('graficos');
-                } else if ($("#nuvem-palavras").hasClass('active')) {
+                }
+                
+                if ($("#nuvem-palavras").hasClass('active')) {
                     carregarComponente('nuvemPalavras');
                 } else if ($("#listagem").hasClass('active')) {
                     carregarComponente('listagem');
@@ -807,10 +818,13 @@
                 window.mcuSelecionado = mcuFiltro;
             }
             
-            // Carregar o componente inicial (Avaliações)
+            // Carregar o card de avaliações diretamente (fora do sistema de abas)
             carregarComponente('avaliacoes');
             
-            // Carregar o dashboard inicial
+            // Também carregar o card de gráficos diretamente
+            carregarComponente('graficos');
+            
+            // Carregar o dashboard inicial com o card de avaliações
             carregarDashboard(anoSelecionado, mcuSelecionado);
             
             // Handler para mudança de ano
@@ -860,15 +874,7 @@
                     // Obter ID da aba para carregar componente correspondente
                     const tabId = $this.attr('href');
                     
-                    if (tabId === '#avaliacoes') {
-                        carregarComponente('avaliacoes');
-                    } else if (tabId === '#graficos') {
-                        carregarComponente('graficos');
-                        // Forçar redimensionamento para layout correto
-                        setTimeout(function() {
-                            $(window).trigger('resize');
-                        }, 200);
-                    } else if (tabId === '#nuvem-palavras') {
+                    if (tabId === '#nuvem-palavras') {
                         carregarComponente('nuvemPalavras');
                     } else if (tabId === '#listagem') {
                         carregarComponente('listagem');
