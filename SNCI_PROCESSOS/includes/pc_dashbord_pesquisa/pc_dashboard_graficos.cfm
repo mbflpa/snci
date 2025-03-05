@@ -38,7 +38,7 @@
                   </div>
                   <div class='nps-info-item detratores-info'>
                     <div class='color-dot'></div>
-                    <strong>Detratores:</strong> Notas 0-6
+                    <strong>Detratores:</strong> Notas 1-6
                   </div>
                   <hr>
                   <div class='nps-formula'>
