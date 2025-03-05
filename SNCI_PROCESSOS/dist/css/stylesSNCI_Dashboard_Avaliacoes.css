@@ -25,11 +25,11 @@
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 12px 15px; /* Padding reduzido de 20px para 15px horizontal e 12px vertical */
+  padding: 8px 12px; /* Padding reduzido para tornar o card mais compacto */
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   border-left: 4px solid #e9ecef;
-  min-height: 120px; /* Altura mínima para manter o alinhamento entre os cards */
+  min-height: 90px; /* Altura mínima reduzida de 120px para 90px */
   display: flex;
   flex-direction: column;
 }
@@ -41,8 +41,8 @@
 
 /* Estilos para o título do card - reduzido espaçamento */
 .score-card h3 {
-  font-size: 1.1rem; /* Ligeiramente menor para economizar espaço */
-  margin-bottom: 2px; /* Reduzido de 5px para 2px */
+  font-size: 1rem; /* Reduzido de 1.1rem para 1rem */
+  margin-bottom: 0; /* Reduzido de 2px para 0 */
   font-weight: 600;
   color: #333; /* Cor padrão, será sobrescrita pelas classes específicas */
   transition: color 0.3s ease;
@@ -54,24 +54,24 @@
   display: flex;
   justify-content: space-between; /* Espaça os elementos - valor à esquerda, ícone à direita */
   align-items: center; /* Alinha verticalmente no centro */
-  margin: 5px 0;
+  margin: 3px 0; /* Reduzido de 5px para 3px */
 }
 
-/* Estilo do valor numérico - reduzido espaçamento */
+/* Estilo do valor numérico - reduzido tamanho */
 .score-card .metric-value {
-  font-size: 2.3rem; /* Ligeiramente menor para economizar espaço */
+  font-size: 1.8rem; /* Reduzido de 2.3rem para 1.8rem */
   font-weight: 700;
   margin: 0; /* Removido margin aqui pois já está no container */
   color: #333; /* Cor padrão, será sobrescrita pelas classes específicas */
   transition: color 0.3s ease;
 }
 
-/* Estilos da barra de progresso - mantido igual mas com menos margem */
+/* Estilos da barra de progresso - com menos margem */
 .score-card .progress-bar {
-  height: 6px; /* Reduzido de 8px para 6px */
+  height: 5px; /* Reduzido de 6px para 5px */
   background-color: #e9ecef;
   border-radius: 4px;
-  margin-top: 5px; /* Reduzido de 10px para 5px */
+  margin-top: 3px; /* Reduzido de 5px para 3px */
   overflow: hidden;
 }
 
@@ -81,12 +81,12 @@
   transition: width 0.6s ease;
 }
 
-/* Estilo do ícone - aumentado tamanho significativamente */
+/* Estilo do ícone - reduzido tamanho */
 .score-card .card-icon {
   position: static; /* Não mais posicionado absolutamente */
   opacity: 0.5; /* Aumentada a opacidade para melhor visibilidade */
-  font-size: 40px; /* Aumentado ainda mais o tamanho */
-  margin-left: 10px; /* Espaço entre o valor e o ícone */
+  font-size: 30px; /* Reduzido de 40px para 30px */
+  margin-left: 8px; /* Reduzido de 10px para 8px */
   transition: all 0.3s ease;
 }
 
