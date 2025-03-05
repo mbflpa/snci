@@ -4,64 +4,87 @@
 <!-- Conteúdo do card de Avaliações -->
 <div class="score-cards">
   <div class="score-card comunicacao">
-      <h3>Comunicação <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a clareza, frequência e qualidade das interações com a equipe de Controle Interno. Considere se a equipe de Controle Interno foi acessível, transparente e eficaz ao transmitir informações sobre a condução dos trabalhos."></i></h3>
-      <div class="value-icon-container">
-          <div id="comunicacao" class="metric-value">0</div>
+      <i class="fas fa-info-circle info-icon" data-toggle="tooltip" data-placement="top" title="Avalia a clareza, frequência e qualidade das interações com a equipe de Controle Interno. Considere se a equipe de Controle Interno foi acessível, transparente e eficaz ao transmitir informações sobre a condução dos trabalhos."></i>
+      <div class="card-header score-header" style="padding: 0 !important;">
           <i class="fas fa-comments fa-lg card-icon"></i>
+          <h3>Comunicação</h3>
       </div>
-      <div class="progress-bar">
-          <div class="progress-fill" style="width: 0%"></div>
+      <div class="donut-container">
+        <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
+          <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
+          <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#17a2b8" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
+        </svg>
+        <div id="comunicacao" class="metric-value">0</div>
       </div>
   </div>
   <div class="score-card interlocucao">
-      <h3>Interlocução <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia o comportamento da equipe de Controle Interno ao longo do trabalho. Leve em conta o profissionalismo, o respeito e a atitude colaborativa demonstrados durante o processo."></i></h3>
-      <div class="value-icon-container">
-          <div id="interlocucao" class="metric-value">0</div>
-          <i class="fa fa-exchange card-icon"></i>
+      <i class="fas fa-info-circle info-icon" data-toggle="tooltip" data-placement="top" title="Avalia o comportamento da equipe de Controle Interno ao longo do trabalho. Leve em conta o profissionalismo, o respeito e a atitude colaborativa demonstrados durante o processo."></i>
+      <div class="card-header score-header" style="padding: 0 !important;">
+          <i class="fa fa-exchange fa-lg card-icon"></i>
+          <h3>Interlocução</h3>
       </div>
-      <div class="progress-bar">
-          <div class="progress-fill" style="width: 0%"></div>
+      <div class="donut-container">
+        <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
+          <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
+          <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#6f42c1" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
+        </svg>
+        <div id="interlocucao" class="metric-value">0</div>
       </div>
   </div>
   <div class="score-card reuniao">
-      <h3>Reunião <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a condução da reunião final da equipe de Controle Interno. Considere se a reunião foi clara, direta e se os tópicos foram abordados de maneira simples e objetiva, facilitando o fechamento do processo."></i></h3>
-      <div class="value-icon-container">
-          <div id="reuniao" class="metric-value">0</div>
-          <i class="fa fa-users card-icon"></i>
+      <i class="fas fa-info-circle info-icon" data-toggle="tooltip" data-placement="top" title="Avalia a condução da reunião final da equipe de Controle Interno. Considere se a reunião foi clara, direta e se os tópicos foram abordados de maneira simples e objetiva, facilitando o fechamento do processo."></i>
+      <div class="card-header score-header" style="padding: 0 !important;">
+          <i class="fa fa-users fa-lg card-icon"></i>
+          <h3>Reunião</h3>
       </div>
-      <div class="progress-bar">
-          <div class="progress-fill" style="width: 0%"></div>
+      <div class="donut-container">
+        <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
+          <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
+          <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#dc3545" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
+        </svg>
+        <div id="reuniao" class="metric-value">0</div>
       </div>
   </div>
   <div class="score-card relatorio">
-      <h3>Relatório <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a qualidade do relatório entregue ao final do trabalho da equipe de Controle Interno. Considere se o documento foi redigido de forma clara, com informações consistentes e objetivas, facilitando o entendimento das conclusões e recomendações."></i></h3>
-      <div class="value-icon-container">
-          <div id="relatorio" class="metric-value">0</div>
-          <i class="fa fa-file-text card-icon"></i>
+      <i class="fas fa-info-circle info-icon" data-toggle="tooltip" data-placement="top" title="Avalia a qualidade do relatório entregue ao final do trabalho da equipe de Controle Interno. Considere se o documento foi redigido de forma clara, com informações consistentes e objetivas, facilitando o entendimento das conclusões e recomendações."></i>
+      <div class="card-header score-header" style="padding: 0 !important;">
+          <i class="fa fa-file-text fa-lg card-icon"></i>
+          <h3>Relatório</h3>
       </div>
-      <div class="progress-bar">
-          <div class="progress-fill" style="width: 0%"></div>
+      <div class="donut-container">
+        <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
+          <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
+          <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#007bff" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
+        </svg>
+        <div id="relatorio" class="metric-value">0</div>
       </div>
   </div>
   <div class="score-card pos-trabalho">
-      <h3>Pós-Trabalho <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia o suporte recebido após a conclusão do trabalho da equipe de Controle Interno. Considere se houve disponibilidade para responder dúvidas, se a comunicação foi eficaz e se o atendimento foi prestativo e ágil no período pós-trabalho."></i></h3>
-      <div class="value-icon-container">
-          <div id="pos_trabalho" class="metric-value">0</div>
-          <i class="fa fa-briefcase card-icon"></i>
+      <i class="fas fa-info-circle info-icon" data-toggle="tooltip" data-placement="top" title="Avalia o suporte recebido após a conclusão do trabalho da equipe de Controle Interno. Considere se houve disponibilidade para responder dúvidas, se a comunicação foi eficaz e se o atendimento foi prestativo e ágil no período pós-trabalho."></i>
+      <div class="card-header score-header" style="padding: 0 !important;">
+          <i class="fa fa-briefcase fa-lg card-icon"></i>
+          <h3>Pós-Trabalho</h3>
       </div>
-      <div class="progress-bar">
-          <div class="progress-fill" style="width: 0%"></div>
+      <div class="donut-container">
+        <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
+          <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
+          <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#28a745" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
+        </svg>
+        <div id="pos_trabalho" class="metric-value">0</div>
       </div>
   </div>
-  <!-- Card para Importância do Processo -->
   <div class="score-card importancia">
-      <h3>Importância <i class="fas fa-info-circle tooltip-icon" data-toggle="tooltip" data-placement="top" title="Avalia a percepção sobre a contribuição das atividades da equipe de Controle Interno para melhorar o processo avaliado. Considere se o trabalho ajudou a identificar oportunidades de melhoria e contribuiu para o fortalecimento dos controles internos."></i></h3>
-      <div class="value-icon-container">
-          <div id="importancia" class="metric-value">0</div>
-          <i class="fa fa-star card-icon"></i>
+      <i class="fas fa-info-circle info-icon" data-toggle="tooltip" data-placement="top" title="Avalia a percepção sobre a contribuição das atividades da equipe de Controle Interno para melhorar o processo avaliado. Considere se o trabalho ajudou a identificar oportunidades de melhoria e contribuiu para o fortalecimento dos controles internos."></i>
+      <div class="card-header score-header" style="padding: 0 !important;">
+          <i class="fa fa-star fa-lg card-icon"></i>
+          <h3>Importância</h3>
       </div>
-      <div class="progress-bar">
-          <div class="progress-fill" style="width: 0%"></div>
+      <div class="donut-container">
+        <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
+          <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
+          <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#fd7e14" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
+        </svg>
+        <div id="importancia" class="metric-value">0</div>
       </div>
   </div>
 </div>
@@ -84,6 +107,26 @@ $(document).ready(function() {
             const progress = Math.min((timestamp - startTimestamp) / duration, 1);
             const currentValue = start + progress * (end - start);
             el.textContent = parseFloat(currentValue.toFixed(1));
+            
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+    
+    // Função para animar os donuts
+    function animateDonut(el, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const currentValue = start + progress * (end - start);
+            
+            // Atualiza o valor percentual do donut (0-100)
+            const percentage = currentValue * 10; // Converte nota 0-10 para porcentagem 0-100
+            const dashArray = `${percentage} ${100 - percentage}`;
+            el.setAttribute('stroke-dasharray', dashArray);
             
             if (progress < 1) {
                 window.requestAnimationFrame(step);
@@ -119,11 +162,12 @@ $(document).ready(function() {
             const el = document.getElementById(card.id);
             const previousValue = window.previousValues[card.id];
             
-            // Animar o número de previousValue até valor
+            // Animar o número
             animateNumberValue(el, previousValue, valor, 1000); // 1000ms = 1 segundo de animação
             
-            // Atualizar a barra de progresso
-            $(el).closest('.score-card').find('.progress-fill').css('width', `${(valor * 10)}%`);
+            // Animar o donut
+            const donutSegment = $(el).closest('.score-card').find('.donut-segment')[0];
+            animateDonut(donutSegment, previousValue, valor, 1000);
             
             // Atualizar o valor anterior para a próxima animação
             window.previousValues[card.id] = valor;

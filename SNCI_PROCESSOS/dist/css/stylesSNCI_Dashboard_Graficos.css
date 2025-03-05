@@ -97,7 +97,7 @@
   line-height: 1;
   margin: 0 !important;
   padding: 0 !important;
-  color: #000000 !important; /* Definindo explicitamente a cor como preta */
+  color: gray !important; /* Definindo explicitamente a cor como preta */
 }
 
 .nps-label {
