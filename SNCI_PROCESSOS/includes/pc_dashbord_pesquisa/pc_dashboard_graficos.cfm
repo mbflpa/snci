@@ -317,16 +317,10 @@ window.updateNPSChart = function(npsData) {
         options: options
     });
     
-    // Adicionar classe específica ao valor do NPS com base no resultado
+    // Modificado: Remover classes de cor e deixar apenas a classe nps-value
     const npsValueElement = document.getElementById('npsValorDisplay');
     npsValueElement.className = 'nps-value';
-    if (npsValor >= 50) {
-        npsValueElement.classList.add('text-success');
-    } else if (npsValor >= 0) {
-        npsValueElement.classList.add('text-warning');
-    } else {
-        npsValueElement.classList.add('text-danger');
-    }
+    // Removidas as condições que adicionavam classes de cor
     
     // Se não há dados, mostrar uma mensagem
     if (!hasData) {
