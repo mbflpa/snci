@@ -71,14 +71,15 @@
     </div>
   </div>
   
-  <!-- Nuvem de palavras -->
+  <!-- Nuvem de palavras - Container com ID modificado para evitar problemas -->
   <div class="col-md-8 d-flex">
     <div class="card card-same-height w-100">
       <div class="card-header">
         <h5 class="card-title">Termos Mais Frequentes nas Observações</h5>
       </div>
       <div class="card-body">
-        <div id="nuvem" style="height: 400px;"></div>
+        <!-- ID alterado de "nuvem" para "nuvem-container" para evitar conflitos -->
+        <div id="nuvem-container" style="height: 400px;"></div>
       </div>
      
     </div>
@@ -124,9 +125,13 @@ $(document).ready(function() {
     var coresPalavrasSelecionadas = {};
     // Armazenar dados da nuvem para reuso
     window.cloudData = null;
+    
+    // CORREÇÃO: Adicionar flag para controlar se a nuvem está sendo renderizada
+    window.isRenderingCloud = false;
+    
     // Armazenar opções de configuração da nuvem para reuso
     window.cloudOptions = {
-        width: $("#nuvem").width(),
+        width: $("#nuvem-container").width(),
         height: 400,
         autoResize: true,
         delay: 50,
@@ -251,12 +256,21 @@ $(document).ready(function() {
 
     // Função para carregar e renderizar a nuvem de palavras
     window.carregarNuvemPalavras = function(anoFiltro, mcuFiltro, minFreq = 2, maxWords = 100) {
+        // Se já estiver renderizando, saia para evitar chamadas simultâneas
+        if (window.isRenderingCloud) {
+            console.log("Já existe uma renderização em andamento, ignorando nova chamada");
+            return;
+        }
+        
+        // Marcar que está em processo de renderização
+        window.isRenderingCloud = true;
+        
         // Se não recebeu os parâmetros, tenta obtê-los
         if (!anoFiltro) {
             anoFiltro = $("input[name='opcaoAno']:checked").val() || 'Todos';
         }
         
-        // CORRIGIDO: Obter mcuFiltro de maneira robusta
+        // Obter mcuFiltro de maneira robusta
         if (!mcuFiltro) {
             try {
                 // Usar a variável global do arquivo principal
@@ -278,18 +292,34 @@ $(document).ready(function() {
             }
         }
         
-         // CORRIGIDO: Limpar qualquer instância anterior de jQCloud
-        if ($("#nuvem").data('jqcloud')) {
-            $("#nuvem").jQCloud('destroy');
+         // MELHORADO: Destruir completamente qualquer instância anterior de jQCloud
+        try {
+            if ($("#nuvem-container").data('jqcloud')) {
+                $("#nuvem-container").jQCloud('destroy');
+            }
+            
+            // Remover o elemento canvas diretamente para garantir limpeza total
+            $("#nuvem-container").empty();
+            $("#nuvem-container").removeData('jqcloud');
+            
+            // Remover qualquer resíduo de estilos ou atributos
+            $("#nuvem-container").removeAttr('style').css({
+                'height': '400px',
+                'position': 'relative'
+            });
+        } catch (e) {
+            console.warn("Erro ao limpar nuvem anterior:", e);
+            // Garantir que o container esteja limpo mesmo se houver erro
+            $("#nuvem-container").empty();
         }
 
         // Mostrar loader enquanto carrega
-        $("#nuvem").html('<div class="text-center p-5"><i class="fas fa-spinner fa-spin fa-3x"></i><p class="mt-3">Gerando nuvem de palavras...</p></div>');
+        $("#nuvem-container").html('<div class="text-center p-5"><i class="fas fa-spinner fa-spin fa-3x"></i><p class="mt-3">Gerando nuvem de palavras...</p></div>');
         
         // Ocultar resultados anteriores quando atualizar a nuvem
         $("#resultados-palavra").hide();
         
-        // CORREÇÃO: Só limpar palavras selecionadas quando NÃO estiver no modo de seleção múltipla
+        // Só limpar palavras selecionadas quando não estiver no modo de seleção múltipla
         if (!modoPesquisaMultipla) {
             limparPalavrasSelecionadas();
         }
@@ -309,120 +339,134 @@ $(document).ready(function() {
                 // Armazenar dados globalmente para uso no resize
                 window.cloudData = data;
                 
-                // CORRIGIDO: Limpar o conteúdo antes de renderizar a nuvem
-                $("#nuvem").empty();
+                // Limpar o conteúdo
+                $("#nuvem-container").empty();
                 
                 if (data && data.length > 0) {
-                    // Usar setTimeout para dar tempo ao DOM de atualizar
+                    // MELHORADO: Usar setTimeout para dar um intervalo maior ao DOM
                     setTimeout(function() {
-                        // Atualizar as opções com o width atual (pode ter mudado)
-                        window.cloudOptions.width = $("#nuvem").width();
-                        
-                        // Adicionar o handler de afterCloudRender nas opções
-                        window.cloudOptions.afterCloudRender = function() {
-                            // Remover popovers antigos
-                            $('.jqcloud-word[data-toggle="popover"]').popover('dispose');
+                        try {
+                            // Atualizar as opções com o width atual
+                            window.cloudOptions.width = $("#nuvem-container").width();
                             
-                            // Configurar popovers e click handlers em cada palavra
-                            $('.jqcloud-word').each(function() {
-                                var word = $(this);
-                                var wordText = word.text();
-                                var wordObj = data.find(function(item) {
-                                    return item.text === wordText;
+                            // CORRIGIDO: Garantir que a altura seja explícita
+                            window.cloudOptions.height = 400;
+                            
+                            // Adicionar o handler de afterCloudRender nas opções
+                            window.cloudOptions.afterCloudRender = function() {
+                                // Remover popovers antigos
+                                $('.jqcloud-word[data-toggle="popover"]').popover('dispose');
+                                
+                                // Configurar popovers e click handlers em cada palavra
+                                $('.jqcloud-word').each(function() {
+                                    var word = $(this);
+                                    var wordText = word.text();
+                                    var wordObj = data.find(function(item) {
+                                        return item.text === wordText;
+                                    });
+                                    
+                                    if (wordObj) {
+                                        var frequency = wordObj.weight || 0;
+                                        
+                                        // Verificar diferentes possíveis propriedades para relevância
+                                        var relevancia = wordObj.relevancia || 
+                                                        wordObj.RELEVANCIA || 
+                                                        wordObj.relevance || 
+                                                        wordObj.RELEVANCE || 
+                                                        wordObj.tfidf || 
+                                                        wordObj.TFIDF || '';
+                                        
+                                        // Se nenhuma propriedade de relevância for encontrada, calcular com base no peso normalizado
+                                        if (!relevancia) {
+                                            // Encontrar peso máximo para normalização
+                                            var maxWeight = Math.max.apply(Math, data.map(function(item) { return item.weight; }));
+                                            // Calcular relevância como porcentagem do peso máximo, com 2 casas decimais
+                                            relevancia = ((wordObj.weight / maxWeight) * 100).toFixed(2) + '%';
+                                        }
+                                        
+                                        // Armazenar a cor da palavra no objeto para uso posterior
+                                        wordObj.color = $(word).css('color');
+                                        
+                                        // CORREÇÃO: Se a palavra já foi selecionada anteriormente, restaurar sua cor armazenada
+                                        if (modoPesquisaMultipla && palavrasSelecionadas.includes(wordText) && coresPalavrasSelecionadas[wordText]) {
+                                            // Não substituir a cor armazenada
+                                        } else {
+                                            // Armazenar a nova cor se essa palavra estiver selecionada
+                                            if (palavrasSelecionadas.includes(wordText)) {
+                                                coresPalavrasSelecionadas[wordText] = wordObj.color;
+                                            }
+                                        }
+                                        
+                                        word.attr('data-toggle', 'popover');
+                                        word.attr('data-placement', 'top');
+                                        word.attr('data-trigger', 'hover');
+                                        word.attr('title', wordText);
+                                        word.attr('data-content', 'Frequência: ' + frequency + '<br>Relevância: ' + relevancia);
+                                        word.attr('data-html', 'true');
+                                        
+                                        // Novo: Modificar comportamento de clique conforme modo selecionado
+                                        word.on('click', function() {
+                                            var palavraClicada = $(this).text();
+                                            var corPalavra = $(this).css('color');
+                                            
+                                            if (modoPesquisaMultipla) {
+                                                // Verificar se a palavra já está selecionada
+                                                var indexPalavra = palavrasSelecionadas.indexOf(palavraClicada);
+                                                
+                                                if (indexPalavra === -1) {
+                                                    // Adicionar à seleção
+                                                    palavrasSelecionadas.push(palavraClicada);
+                                                    // CORREÇÃO: Armazenar também a cor
+                                                    coresPalavrasSelecionadas[palavraClicada] = corPalavra;
+                                                } else {
+                                                    // Remover da seleção
+                                                    palavrasSelecionadas.splice(indexPalavra, 1);
+                                                    // CORREÇÃO: Remover também a cor armazenada
+                                                    delete coresPalavrasSelecionadas[palavraClicada];
+                                                }
+                                                
+                                                atualizarExibicaoPalavrasSelecionadas();
+                                                
+                                                // Destacar visualmente as palavras selecionadas
+                                                atualizarDestaquePalavras();
+                                            } else {
+                                                // Comportamento original - busca imediata
+                                                buscarObservacoesPorPalavra(palavraClicada, anoFiltro, mcuFiltro, corPalavra);
+                                            }
+                                        });
+                                    }
                                 });
                                 
-                                if (wordObj) {
-                                    var frequency = wordObj.weight || 0;
-                                    
-                                    // Verificar diferentes possíveis propriedades para relevância
-                                    var relevancia = wordObj.relevancia || 
-                                                    wordObj.RELEVANCIA || 
-                                                    wordObj.relevance || 
-                                                    wordObj.RELEVANCE || 
-                                                    wordObj.tfidf || 
-                                                    wordObj.TFIDF || '';
-                                    
-                                    // Se nenhuma propriedade de relevância for encontrada, calcular com base no peso normalizado
-                                    if (!relevancia) {
-                                        // Encontrar peso máximo para normalização
-                                        var maxWeight = Math.max.apply(Math, data.map(function(item) { return item.weight; }));
-                                        // Calcular relevância como porcentagem do peso máximo, com 2 casas decimais
-                                        relevancia = ((wordObj.weight / maxWeight) * 100).toFixed(2) + '%';
-                                    }
-                                    
-                                    // Armazenar a cor da palavra no objeto para uso posterior
-                                    wordObj.color = $(word).css('color');
-                                    
-                                    // CORREÇÃO: Se a palavra já foi selecionada anteriormente, restaurar sua cor armazenada
-                                    if (modoPesquisaMultipla && palavrasSelecionadas.includes(wordText) && coresPalavrasSelecionadas[wordText]) {
-                                        // Não substituir a cor armazenada
-                                    } else {
-                                        // Armazenar a nova cor se essa palavra estiver selecionada
-                                        if (palavrasSelecionadas.includes(wordText)) {
-                                            coresPalavrasSelecionadas[wordText] = wordObj.color;
-                                        }
-                                    }
-                                    
-                                    word.attr('data-toggle', 'popover');
-                                    word.attr('data-placement', 'top');
-                                    word.attr('data-trigger', 'hover');
-                                    word.attr('title', wordText);
-                                    word.attr('data-content', 'Frequência: ' + frequency + '<br>Relevância: ' + relevancia);
-                                    word.attr('data-html', 'true');
-                                    
-                                    // Novo: Modificar comportamento de clique conforme modo selecionado
-                                    word.on('click', function() {
-                                        var palavraClicada = $(this).text();
-                                        var corPalavra = $(this).css('color');
-                                        
-                                        if (modoPesquisaMultipla) {
-                                            // Verificar se a palavra já está selecionada
-                                            var indexPalavra = palavrasSelecionadas.indexOf(palavraClicada);
-                                            
-                                            if (indexPalavra === -1) {
-                                                // Adicionar à seleção
-                                                palavrasSelecionadas.push(palavraClicada);
-                                                // CORREÇÃO: Armazenar também a cor
-                                                coresPalavrasSelecionadas[palavraClicada] = corPalavra;
-                                            } else {
-                                                // Remover da seleção
-                                                palavrasSelecionadas.splice(indexPalavra, 1);
-                                                // CORREÇÃO: Remover também a cor armazenada
-                                                delete coresPalavrasSelecionadas[palavraClicada];
-                                            }
-                                            
-                                            atualizarExibicaoPalavrasSelecionadas();
-                                            
-                                            // Destacar visualmente as palavras selecionadas
-                                            atualizarDestaquePalavras();
-                                        } else {
-                                            // Comportamento original - busca imediata
-                                            buscarObservacoesPorPalavra(palavraClicada, anoFiltro, mcuFiltro, corPalavra);
-                                        }
-                                    });
+                                // Inicializar popovers
+                                $('[data-toggle="popover"]').popover();
+                                
+                                // Destacar palavras já selecionadas (após mudança de filtro)
+                                if (modoPesquisaMultipla && palavrasSelecionadas.length > 0) {
+                                    atualizarDestaquePalavras();
                                 }
-                            });
+                                
+                                // Finalizar o flag de renderização
+                                window.isRenderingCloud = false;
+                            };
                             
-                            // Inicializar popovers
-                            $('[data-toggle="popover"]').popover();
-                            
-                            // Destacar palavras já selecionadas (após mudança de filtro)
-                            if (modoPesquisaMultipla && palavrasSelecionadas.length > 0) {
-                                atualizarDestaquePalavras();
-                            }
-                        };
-                        
-                        $("#nuvem").jQCloud(data, window.cloudOptions);
-                    }, 100);
+                            $("#nuvem-container").jQCloud(data, window.cloudOptions);
+                        } catch (e) {
+                            console.error("Erro ao renderizar nuvem:", e);
+                            $("#nuvem-container").html('<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-danger"></i><p class="mt-3 text-danger">Erro ao renderizar nuvem de palavras. Tente atualizar a página.</p></div>');
+                            window.isRenderingCloud = false;
+                        }
+                    }, 300); // Aumentado para 300ms para garantir que o DOM esteja pronto
                 } else {
                     window.cloudData = null;
-                    $("#nuvem").html('<div class="text-center p-5"><i class="fas fa-comment-slash fa-3x"></i><p class="mt-3">Não foram encontradas observações para gerar a nuvem de palavras ou não aparece devido a <strong>Frequência Mínima</strong> (diminua a Frequência Mínima, ao lado, e clique em "Atualizar Nuvem").</p></div>');
+                    $("#nuvem-container").html('<div class="text-center p-5"><i class="fas fa-comment-slash fa-3x"></i><p class="mt-3">Não foram encontradas observações para gerar a nuvem de palavras ou não aparece devido a <strong>Frequência Mínima</strong> (diminua a Frequência Mínima, ao lado, e clique em "Atualizar Nuvem").</p></div>');
+                    window.isRenderingCloud = false;
                 }
             },
             error: function(xhr, status, error) {
                 console.error("Erro ao carregar nuvem de palavras:", error);
                 window.cloudData = null;
-                $("#nuvem").html('<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-danger"></i><p class="mt-3 text-danger">Erro ao carregar dados da nuvem de palavras.</p></div>');
+                $("#nuvem-container").html('<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-danger"></i><p class="mt-3 text-danger">Erro ao carregar dados da nuvem de palavras.</p></div>');
+                window.isRenderingCloud = false;
             }
         });
     };
@@ -926,30 +970,43 @@ $(document).ready(function() {
         }
     });
     
-    // Ajustar tamanho da nuvem quando a janela for redimensionada - CORRIGIDO
+    // MELHORADO: Ajustar tamanho da nuvem quando a janela for redimensionada
     $(window).on('resize', function() {
         // Verificar se a aba de nuvem de palavras está ativa/visível
         if ($("#nuvem-palavras").hasClass('active') || $("#nuvem-palavras").hasClass('show')) {
-            if ($("#nuvem").length && window.cloudData && window.cloudData.length > 0) {
-                try {
-                    // Destruir a instância atual
-                    if ($("#nuvem").data('jqcloud')) {
-                        $("#nuvem").jQCloud('destroy');
+            if ($("#nuvem-container").length && window.cloudData && window.cloudData.length > 0) {
+                // Não recriar se já estiver renderizando
+                if (window.isRenderingCloud) return;
+                
+                // Debounce do resize para não executar múltiplas vezes
+                clearTimeout(window.resizeTimeout);
+                window.resizeTimeout = setTimeout(function() {
+                    try {
+                        // Destruir a instância atual
+                        if ($("#nuvem-container").data('jqcloud')) {
+                            $("#nuvem-container").jQCloud('destroy');
+                        }
+                        
+                        // Limpar o container
+                        $("#nuvem-container").empty();
+                        
+                        // Atualizar a largura nas opções
+                        window.cloudOptions.width = $("#nuvem-container").width();
+                        
+                        // Recriar a nuvem com os dados armazenados
+                        window.isRenderingCloud = true;
+                        $("#nuvem-container").jQCloud(window.cloudData, window.cloudOptions);
+                        
+                        // Reativar popovers após atualização da nuvem
+                        setTimeout(function() {
+                            $('[data-toggle="popover"]').popover();
+                            window.isRenderingCloud = false;
+                        }, 200);
+                    } catch (e) {
+                        console.error("Erro ao atualizar nuvem de palavras:", e);
+                        window.isRenderingCloud = false;
                     }
-                    
-                    // Atualizar a largura nas opções
-                    window.cloudOptions.width = $("#nuvem").width();
-                    
-                    // Recriar a nuvem com os dados armazenados
-                    $("#nuvem").jQCloud(window.cloudData, window.cloudOptions);
-                    
-                    // Reativar popovers após atualização da nuvem
-                    setTimeout(function() {
-                        $('[data-toggle="popover"]').popover();
-                    }, 200);
-                } catch (e) {
-                    console.error("Erro ao atualizar nuvem de palavras:", e);
-                }
+                }, 300);
             }
         }
     });
@@ -967,9 +1024,9 @@ $(document).ready(function() {
         if ($(e.target).attr('href') === '#nuvem-palavras') {
             // Se estamos entrando na aba de nuvem de palavras
             $(window).on('resize.nuvemPalavras', function() {
-                if ($("#nuvem").length && $("#nuvem").data('jqcloud')) {
+                if ($("#nuvem-container").length && $("#nuvem-container").data('jqcloud')) {
                     try {
-                        $("#nuvem").jQCloud('update');
+                        $("#nuvem-container").jQCloud('update');
                     } catch (e) {
                         console.error("Erro ao atualizar nuvem de palavras:", e);
                     }

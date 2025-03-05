@@ -44,29 +44,30 @@
   max-height: 300px !important;
 }
 
-/* Estilos revisados para o gráfico de rosca NPS - CORREÇÃO DE CENTRALIZAÇÃO */
+/* Estilos revisados para o gráfico de rosca NPS - CORREÇÃO DE CENTRALIZAÇÃO E FORMA */
 .nps-chart-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: auto;
+  height: 100%;
   padding: 0;
-  margin-bottom: 0px;
+  margin: 0;
   position: relative;
+  min-height: 240px;
 }
 
 .nps-chart-container {
   position: relative;
-  width: 300px;
-  height: 300px;
-  margin: 0 auto !important;
+  width: 100%;
+  max-width: 240px;
+  margin: auto !important;
+  padding: 0;
   box-sizing: content-box !important;
-  min-width: 300px !important;
-  min-height: 300px !important;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 /* Centro do gráfico donut */
@@ -81,8 +82,8 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 70px !important;
-  height: 70px !important;
+  width: 80px !important;
+  height: 80px !important;
   margin: 0 !important;
   padding: 0 !important;
   box-sizing: border-box !important;
@@ -118,14 +119,26 @@
   background-color: rgba(255, 87, 87, 0.8);
 }
 
-/* Garantir que o canvas do gráfico seja perfeitamente centralizado */
+/* Garantir que o canvas do gráfico seja perfeitamente circular */
 #npsDonutChart {
-  width: 300px !important;
-  height: 300px !important;
+  width: 100% !important;
+  height: 100% !important;
   display: block !important;
   box-sizing: border-box !important;
   margin: 0 auto !important;
   padding: 0 !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Estilos adicionais para garantir que o gráfico donut permaneça circular */
+.chart-square-container {
+  width: 100%;
+  height: 0;
+  padding-bottom: 100%;
+  position: relative;
+  margin: auto;
 }
 
 /* Estilos para legenda fixa abaixo do gráfico */
@@ -187,4 +200,90 @@
 /* Remover conflitos de estilo */
 #graficoEvolucao {
   height: 300px !important;
+}
+
+/* Estilos para melhorar a aparência dos tooltip nos gráficos */
+.chartjs-tooltip {
+  opacity: 0;
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  transform: translate(-50%, 0);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+/* Ajuste para resolução de problemas com dimensões para o gráfico de barras */
+.flex-grow-1 canvas {
+  width: 100% !important;
+  max-height: 300px;
+}
+
+/* Otimizar exibição em telas pequenas e médias */
+@media (max-width: 992px) and (min-width: 769px) {
+  .nps-chart-container {
+    max-width: 200px !important;
+  }
+
+  .nps-value {
+    font-size: 1.8rem;
+  }
+
+  .nps-chart-center {
+    width: 60px !important;
+    height: 60px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .nps-chart-container {
+    max-width: 180px !important;
+  }
+
+  .nps-legenda-fixa {
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* Reduzir o tamanho do gráfico de evolução em telas muito pequenas */
+  #graficoEvolucao {
+    height: 250px !important;
+  }
+}
+
+/* Garantir que popovers do gráfico NPS apareçam sobre outros elementos */
+.nps-popover {
+  z-index: 1060;
+}
+
+/* Estilos adicionais para os títulos de gráficos */
+.card-header h5.card-title {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+
+.card-header h5.card-title i {
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+/* Adicionar um pouco de espaço ao redor dos gráficos */
+.card-body.d-flex.flex-column {
+  padding: 15px;
+}
+
+/* Ajustes específicos para o gráfico de média por categoria */
+#graficoMedia {
+  max-height: 300px !important;
+}
+
+/* Afastando o ícone explicativo do título */
+.nps-info-icon {
+  margin-left: 8px !important;
 }

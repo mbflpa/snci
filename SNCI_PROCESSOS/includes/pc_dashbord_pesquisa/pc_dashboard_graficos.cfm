@@ -17,12 +17,13 @@
     </div>
   </div>
 
-  <!-- Gráfico de rosca NPS - Layout atualizado -->
+  <!-- Gráfico de rosca NPS - Layout atualizado para centralizar corretamente -->
   <div class="col-md-3">
     <div class="card h-100">
       <div class="card-header">
-        <h5 class="card-title">Distribuição NPS
-          <!-- Simplificamos o popover para ser mais limpo -->
+        <h5 class="card-title">
+          Distribuição NPS
+          <!-- Ícone explicativo com margin-left aumentada -->
           <span class="nps-info-icon" data-toggle="popover" data-html="true" data-placement="top" 
                 title="<span class='popover-title-custom'>Classificação do NPS</span>" 
                 data-content="
@@ -49,18 +50,22 @@
         </h5>
       </div>
       <div class="card-body d-flex flex-column">
-        <!-- Container atualizado para ter dimensões fixas semelhantes ao exemplo -->
-        <div class="nps-chart-wrapper flex-grow-1">
-          <div class="nps-chart-container" style="width: 328px; height: 240px; margin: 0 auto; position: relative;">
-            <canvas id="npsDonutChart"></canvas>
-            <div class="nps-chart-center">
-              <span class="nps-value" id="npsValorDisplay">0</span>
-              <span class="nps-label">NPS</span>
+        <!-- Container com estrutura ajustada para centralização perfeita -->
+        <div class="nps-chart-wrapper">
+          <div class="nps-chart-container">
+            <!-- Div com proporção fixa para garantir um círculo perfeito -->
+            <div class="chart-square-container">
+              <canvas id="npsDonutChart"></canvas>
+              <!-- Valor do NPS no centro do gráfico -->
+              <div class="nps-chart-center">
+                <span class="nps-value" id="npsValorDisplay">0</span>
+                <span class="nps-label">NPS</span>
+              </div>
             </div>
           </div>
         </div>
-        <!-- Legenda movida para baixo como no exemplo - MODIFICADA para incluir quantidade -->
-        <div class="nps-legenda-fixa" style="display: flex; justify-content: center; margin-top: 10px;">
+        <!-- Legenda abaixo do gráfico -->
+        <div class="nps-legenda-fixa">
           <div class="legenda-item legenda-promotores">
             <div class="legenda-cor" style="background-color: #10b981;"></div>
             <div class="legenda-texto">Promotores <span id="qtdPromotores">(0)</span></div>
@@ -96,7 +101,7 @@
  
 </div>
 
-<!--- Script para gerar e configurar o gráfico NPS - Atualizado para layout moderno --->
+<!--- Script para gerar e configurar o gráfico NPS - Atualizado para melhor centralização --->
 <script>
 window.updateNPSChart = function(npsData) {
     console.log('Atualizando gráfico NPS com dados:', npsData);
@@ -254,12 +259,12 @@ window.updateNPSChart = function(npsData) {
         }
     };
     
-    // CONFIGURAÇÃO para layout s
+    // CONFIGURAÇÃO para layout
     const options = {
         responsive: true,
         maintainAspectRatio: true,
-        aspectRatio: 1.4, // Proporção 
-        cutoutPercentage: 70,  // Buraco no meio 
+        aspectRatio: 1, // Mantém o gráfico circular
+        cutoutPercentage: 70,  // Tamanho do buraco no meio
         legend: {
             display: false 
         },
@@ -281,18 +286,21 @@ window.updateNPSChart = function(npsData) {
     };
     
     // Remover canvas antigo e criar um novo
-    const container = document.querySelector('.nps-chart-container');
+    const container = document.querySelector('.chart-square-container');
     const oldCanvas = document.getElementById('npsDonutChart');
     const newCanvas = document.createElement('canvas');
     newCanvas.id = 'npsDonutChart';
+    newCanvas.style.position = 'absolute';
+    newCanvas.style.top = '0';
+    newCanvas.style.left = '0';
+    newCanvas.style.width = '100%';
+    newCanvas.style.height = '100%';
     
     if (oldCanvas && oldCanvas.parentNode) {
         oldCanvas.parentNode.replaceChild(newCanvas, oldCanvas);
+    } else if (container) {
+        container.appendChild(newCanvas);
     }
-    
-    // Configurar o canvas com dimensões exatas como no exemplo
-    newCanvas.width = 328;
-    newCanvas.height = 240;
     
     // Criar o gráfico usando as configurações atualizadas
     const ctx = newCanvas.getContext('2d');
@@ -562,7 +570,17 @@ $(document).ready(function() {
         if (graficoMedia) graficoMedia.resize();
         if (graficoEvolucao) graficoEvolucao.resize();
         if (window.npsChart && typeof window.npsChart.resize === 'function') {
-            window.npsChart.resize();
+            // Adicionar um pequeno atraso para garantir o redimensionamento correto
+            setTimeout(function() {
+                window.npsChart.resize();
+                
+                // Verificar se os elementos centrais estão bem posicionados após o resize
+                const centerElement = document.querySelector('.nps-chart-center');
+                if (centerElement) {
+                    centerElement.style.top = '50%';
+                    centerElement.style.left = '50%';
+                }
+            }, 100);
         }
     });
     
