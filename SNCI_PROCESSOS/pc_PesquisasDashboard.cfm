@@ -349,6 +349,37 @@
                 sanitize: false
             });
             
+            // Função para animação dos números
+            function animateNumberValue(el, start, end, duration, isPercentage = false) {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const currentValue = start + progress * (end - start);
+                    
+                    // Formatar o valor atual com 1 casa decimal ou como percentual
+                    if (isPercentage) {
+                        el.textContent = parseFloat(currentValue.toFixed(1)) + "%";
+                    } else {
+                        el.textContent = parseFloat(currentValue.toFixed(1));
+                    }
+                    
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+            
+            // Armazenar valores anteriores para permitir animação
+            window.previousCardValues = {
+                totalPesquisas: 0,
+                indiceRespostas: 0,
+                mediaGeral: 0,
+                npsValor: 0,
+                pontualidade: 0
+            };
+            
             // Função para classificar o NPS baseado no valor atualizado com nova escala
             function classificarNPS(valor) {
                 // Converter para número para garantir comparação correta
@@ -614,25 +645,48 @@
             }
         
             function atualizarCards(resultado) {
-                // Atualizar totalizadores principais
-                $("#totalPesquisas").text(resultado.total || '0');
-                $("#mediaGeral").text(resultado.mediaGeral || '0');
-                $("#mediaGeralPontualidade").text((resultado.pontualidadePercentual || '0') + "%");
+                // Valores atuais para animação
+                const totalPesquisas = parseInt(resultado.total) || 0;
+                const mediaGeral = parseFloat(resultado.mediaGeral) || 0;
+                const pontualidade = parseFloat(resultado.pontualidadePercentual) || 0;
+                const npsValor = parseFloat(resultado.nps) || 0;
                 
-                // Lógica corrigida do índice de respostas
+                // Animar o total de pesquisas
+                const elTotalPesquisas = document.getElementById("totalPesquisas");
+                animateNumberValue(elTotalPesquisas, window.previousCardValues.totalPesquisas, totalPesquisas, 1000);
+                window.previousCardValues.totalPesquisas = totalPesquisas;
+                
+                // Animar média geral
+                const elMediaGeral = document.getElementById("mediaGeral");
+                animateNumberValue(elMediaGeral, window.previousCardValues.mediaGeral, mediaGeral, 1000);
+                window.previousCardValues.mediaGeral = mediaGeral;
+                
+                // Animar pontualidade
+                const elPontualidade = document.getElementById("mediaGeralPontualidade");
+                animateNumberValue(elPontualidade, window.previousCardValues.pontualidade, pontualidade, 1000, true);
+                window.previousCardValues.pontualidade = pontualidade;
+                
+                // Lógica do índice de respostas
                 if (parseInt(resultado.totalProcessos) === 0) {
                     $("#indiceRespostas").text("Processos não localizados").addClass('texto-menor');
                     $(".formula-text").hide();
                 } else if (parseInt(resultado.total) === 0) {
+                    // Reset para zero sem animação quando não há pesquisas
                     $("#indiceRespostas").text("0%").removeClass('texto-menor');
                     $("#formulaDetalhes").text(`(0 / ${parseInt(resultado.totalProcessos)}) × 100 = 0%`);
                     $(".formula-text").show();
+                    window.previousCardValues.indiceRespostas = 0;
                 } else {
                     const totalRespondidas = parseInt(resultado.total) || 0;
                     const totalProcessos = parseInt(resultado.totalProcessos) || 0;
                     const indice = ((totalRespondidas / totalProcessos) * 100).toFixed(1);
                     
-                    $("#indiceRespostas").text(indice + "%").removeClass('texto-menor');
+                    // Animar índice de respostas
+                    const elIndiceRespostas = document.getElementById("indiceRespostas");
+                    animateNumberValue(elIndiceRespostas, window.previousCardValues.indiceRespostas, parseFloat(indice), 1000, true);
+                    window.previousCardValues.indiceRespostas = parseFloat(indice);
+                    
+                    $("#indiceRespostas").removeClass('texto-menor');
                     $("#formulaDetalhes").text(
                         `(${totalRespondidas} / ${totalProcessos}) × 100 = ${indice}%`
                     );
@@ -641,13 +695,13 @@
                 
                 // Atualizar o NPS se disponível
                 if (resultado.nps !== undefined) {
-                    const npsValor = resultado.nps;
+                    // Animar valor do NPS
+                    const elNPS = document.getElementById("npsValorContainer");
+                    animateNumberValue(elNPS, window.previousCardValues.npsValor, npsValor, 1000);
+                    window.previousCardValues.npsValor = npsValor;
                     
                     // Classificar o NPS
                     const classificacao = classificarNPS(npsValor);
-                    
-                    // Atualiza o valor do NPS
-                    $("#npsValorContainer").text(npsValor);
                     
                     // Atualiza a classificação com o novo elemento badge, aplicando estilos inline
                     $("#npsClassificacao")

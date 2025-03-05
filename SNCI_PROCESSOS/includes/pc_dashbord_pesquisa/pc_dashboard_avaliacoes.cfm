@@ -76,6 +76,32 @@ $(document).ready(function() {
         template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
     });
     
+    // Função para animação dos números
+    function animateNumberValue(el, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const currentValue = start + progress * (end - start);
+            el.textContent = parseFloat(currentValue.toFixed(1));
+            
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+    
+    // Armazenar valores anteriores para permitir animação
+    window.previousValues = {
+        comunicacao: 0,
+        interlocucao: 0,
+        reuniao: 0,
+        relatorio: 0,
+        pos_trabalho: 0,
+        importancia: 0
+    };
+    
     // Função para atualizar os cards de avaliação
     window.atualizarCardsAvaliacao = function(dados) {
         // Atualizar cards individuais 
@@ -90,10 +116,17 @@ $(document).ready(function() {
 
         cards.forEach(card => {
             const valor = parseFloat(card.valor) || 0;
-            const el = $(`#${card.id}`);
+            const el = document.getElementById(card.id);
+            const previousValue = window.previousValues[card.id];
             
-            el.text(`${valor.toFixed(1)}`);
-            el.closest('.score-card').find('.progress-fill').css('width', `${(valor * 10)}%`);
+            // Animar o número de previousValue até valor
+            animateNumberValue(el, previousValue, valor, 1000); // 1000ms = 1 segundo de animação
+            
+            // Atualizar a barra de progresso
+            $(el).closest('.score-card').find('.progress-fill').css('width', `${(valor * 10)}%`);
+            
+            // Atualizar o valor anterior para a próxima animação
+            window.previousValues[card.id] = valor;
         });
     };
 });
