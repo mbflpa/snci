@@ -1,0 +1,240 @@
+/* Estilos específicos para os cards de métricas do dashboard */
+:root {
+  /* Cores de fundo para cards principais */
+  --cor-bg-info: #17a2b8;
+  --cor-bg-primary: #007bff;
+  --cor-bg-success: #28a745;
+  --cor-bg-warning: #ffc107;
+  --cor-azul-navy: #3f6791;
+}
+
+/* Cores dos cards principais usando variáveis */
+.bg-info {
+  background-color: var(--cor-bg-info) !important;
+}
+.bg-primary {
+  background-color: var(--cor-bg-primary) !important;
+}
+.bg-success {
+  background-color: var(--cor-bg-success) !important;
+}
+.bg-warning {
+  background-color: var(--cor-bg-warning) !important;
+}
+.bg-azul-navy {
+  background-color: var(--cor-azul-navy) !important;
+  color: #fff;
+}
+
+/* Ajuste para manter altura consistente do card */
+.small-box .inner {
+  min-height: 90px; /* Reduzindo a altura mínima */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.small-box .inner h3 {
+  min-height: 32px; /* Reduzindo a altura mínima */
+  display: flex;
+  align-items: center;
+  font-size: 1.6rem; /* Reduzindo um pouco o tamanho da fonte */
+  margin-bottom: 5px;
+}
+
+/* Estilo para o texto de 'não há pesquisas' */
+.small-box .inner h3.texto-menor {
+  font-size: 1.2rem;
+}
+
+.formula-text {
+  font-size: 0.6rem !important;
+  color: rgba(255, 255, 255, 0.7);
+  position: absolute;
+  bottom: 5px;
+  left: 10px;
+  right: 10px;
+  margin: 0;
+  line-height: 1.1;
+  display: none;
+}
+
+.small-box {
+  position: relative;
+  overflow: visible;
+  margin-bottom: 2px !important;
+  height: 100%;
+}
+
+/* Ajustes para ícones ficarem menores e mais acima */
+.small-box .icon {
+  top: 5px; /* Posiciona o ícone mais acima */
+  right: 10px;
+  font-size: 60px; /* Reduz o tamanho do ícone */
+  color: rgba(255, 255, 255, 0.3); /* Mantém a transparência */
+}
+
+.small-box p {
+  font-size: 0.9rem; /* Reduz o tamanho da descrição */
+}
+.icon > i.fas,
+.small-box .icon > i.ion {
+  font-size: 50px !important;
+  top: 8px !important;
+  right: 8px !important;
+}
+
+/* Estilos específicos para o card NPS */
+.nps-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.7rem;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nps-value-container {
+  display: flex !important;
+  align-items: center !important;
+  flex-direction: row !important;
+  margin-bottom: 3px !important;
+  width: 100% !important;
+  gap: 5px !important;
+  margin-bottom: 0 !important;
+  margin-top: 5px !important;
+}
+
+/* Corrigir altura do título para alinhar com o badge */
+.small-box .inner h3#npsValorContainer {
+  margin-bottom: 0 !important;
+  margin-right: 10px !important;
+  min-height: auto !important;
+}
+
+.nps-classification-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-left: 5px !important;
+  padding: 2px 5px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  font-size: 10px !important;
+  height: 18px !important;
+  height: auto !important;
+  line-height: 1 !important;
+  padding: 2px 4px !important;
+}
+
+/* Garantir que as classes de cor apliquem background e não apenas color */
+.nps-excelente {
+  background-color: #28a745 !important;
+  color: white !important;
+}
+
+.nps-bom {
+  background-color: #17a2b8 !important;
+  color: white !important;
+}
+
+.nps-regular {
+  background-color: #ffc107 !important;
+  color: #343a40 !important;
+}
+
+.nps-ruim {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+/* Estilo para a classificação dentro do valor do NPS */
+#npsClassificacao {
+  font-size: 0.5rem; /* Reduzido para 0.5rem */
+  font-weight: normal;
+  opacity: 0.85;
+  vertical-align: middle;
+  padding-left: 3px;
+}
+
+.nps-tooltip {
+  font-size: 0.7rem;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Ícone de informação do NPS */
+.nps-info-icon {
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  position: relative;
+  z-index: 2;
+}
+
+/* Ajustes específicos para o card NPS */
+.small-box.bg-azul-navy {
+  display: flex;
+  flex-direction: column;
+}
+
+.small-box.bg-azul-navy .inner {
+  padding-top: 5px;
+  padding-bottom: 10px;
+  min-height: unset;
+}
+
+.small-box.bg-azul-navy .inner h3 {
+  margin-top: 0;
+  min-height: unset;
+}
+
+.small-box.bg-azul-navy p.formula-text {
+  font-size: 0.55rem !important;
+  margin: 0 !important;
+  line-height: 1.1 !important;
+  position: relative !important;
+  display: block !important;
+  padding-top: 2px !important;
+}
+
+.small-box.bg-azul-navy .icon {
+  top: 0px;
+}
+
+/* Estilo para o card de métricas completo */
+#card-metricas {
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  border: none;
+}
+
+#card-metricas .card-header {
+  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 1rem 1.5rem;
+}
+
+#card-metricas .card-title {
+  margin-bottom: 0;
+  font-size: 1.1rem;
+  color: #495057;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+#card-metricas .card-title i {
+  margin-right: 0.5rem;
+  color: var(--cor-bg-primary);
+}
+
+#card-metricas .card-body {
+  padding: 1.5rem;
+}
