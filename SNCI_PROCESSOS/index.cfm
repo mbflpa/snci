@@ -33,7 +33,9 @@
                        
                     </div>
                     
-                    <div id="menuRapidoDiv" ></div>    
+                    <div id="menuRapidoDiv">
+                        <cfinclude template="includes/pc_menuRapido.cfm">
+                    </div>    
 
                     <cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'N'>     
                         <div  id="alertasOAdiv"></div>
@@ -76,7 +78,9 @@
         $(window).on('load', function() {
             
             
-            menuRapido();
+            // A função menuRapido() não é mais necessária pois o conteúdo já está incluído na página
+            // menuRapido();
+            
             // Verifica o valor de 'ci' e exibe os alertas apropriados
             if (ci === 'N') {
                 mostraAlertasOrgaoAvaliado();
@@ -266,6 +270,7 @@
             })//fim fail
         }
 
+        /*
         function menuRapido(){
             $.ajax({
                 type: "post",
@@ -291,6 +296,7 @@
                 });
             })//fim fail
         }
+        */
 
         
     </script>
