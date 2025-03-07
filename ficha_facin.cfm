@@ -631,7 +631,7 @@
             </div>
             <!---<cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
             <cfset percent = numberFormat(percent,'___.00')> --->
-            <label>&nbsp;Resultado: &nbsp;<div id="meta1_percqggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta1_percqggitens#%</div></label>
+            <label>&nbsp;Resultado: &nbsp;<div id="meta1_percqggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 5rem;">#numberFormat(form.meta1_percqggitens,'___.00')#%</div></label>
         </div>
     </cfloop>  
  
@@ -668,7 +668,7 @@
             </div>
   <!---          <cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
             <cfset percent = numberFormat(percent,'___.00')> --->
-            <label>&nbsp;Resultado: &nbsp;<div id="meta2_percqggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta2_percqggitens#%</div></label>
+            <label>&nbsp;Resultado: &nbsp;<div id="meta2_percqggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 5rem;">#numberFormat(form.meta2_percqggitens,'___.00')#%</div></label>
         </div>
     </cfloop>  
     <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Meta 3</strong> - Liberar 100% das Avaliações de Controle para revisão dentro do prazo estabelecido pela SGCIN/PE. (Liberar para revisão no prazo)</label>

@@ -1,5 +1,6 @@
 <cfprocessingdirective pageEncoding ="utf-8"/> 
 <cfparam name = "numinsp" default = ''> 
+<cfset msg=''>
 <!---
 <cfparam name = "grpitem" default = ''> 
 <cfparam name = "acao" default = ''> 
@@ -15,9 +16,30 @@
 </cfquery>
 <cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
 <cfoutput>
+	<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) neq 10>
+		<cfset msg='Nº de Avaliação Inválido!'>
+	</cfif>
 	<!--- ================= --->
 	<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
 		<cfset somenteavaliarmeta3='N'>		
+		<cfquery datasource="#dsn_inspecao#" name="rsInsp">
+			SELECT INP_DTConcluirRevisao
+			FROM Inspecao
+			WHERE INP_NumInspecao='#url.numinsp#'
+		</cfquery>
+		<cfif trim(rsInsp.INP_DTConcluirRevisao) eq ''>
+			<cfset msg='Nº avaliação inexistente ou em fase de revisão!'>
+		</cfif>
+		<cfif grpacesso eq 'INSPETORES' and msg eq ''>
+			<cfquery datasource="#dsn_inspecao#" name="rsInspetor">
+				SELECT IPT_NumInspecao
+				FROM Inspetor_Inspecao
+				WHERE IPT_NumInspecao='#url.numinsp#' AND IPT_MatricInspetor='#qAcesso.Usu_Matricula#'
+			</cfquery>
+			<cfif rsInspetor.recordcount lte 0>
+				<cfset msg='Inspetor(a), você não participou desta avaliação!'>
+			</cfif>
+		</cfif>
 		<cfquery datasource="#dsn_inspecao#" name="rsIncluir">
 			SELECT  RIP_NumGrupo,RIP_NumItem,Fun_Nome
 			FROM Resultado_Inspecao 
@@ -89,6 +111,7 @@
 			INNER JOIN Usuarios ON FAC_Matricula = Usu_Matricula
 			WHERE FAC_Avaliacao = convert(varchar,'#url.numinsp#') 
 		</cfquery>
+		
 		<!---
 			<cfquery datasource="#dsn_inspecao#" name="rsFacin">
 			select FAC_DtConcluirFacin,Usu_Apelido
@@ -202,32 +225,38 @@
 		<tr>
 			<td>
 				<select name="grpitem" id="grpitem" class="form-select">
-					<cfoutput query="rsIncluir">
-						<cfset grpitm = RIP_NumGrupo & ',' & RIP_NumItem>
-						<cfset nomegrpitm = RIP_NumGrupo & '_' & RIP_NumItem & ' - ' & trim(Fun_Nome)>
-						<option value="#grpitm#">#nomegrpitm#</option>
-					</cfoutput>
+					<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
+						<cfoutput query="rsIncluir">
+							<cfset grpitm = RIP_NumGrupo & ',' & RIP_NumItem>
+							<cfset nomegrpitm = RIP_NumGrupo & '_' & RIP_NumItem & ' - ' & trim(Fun_Nome)>
+							<option value="#grpitm#">#nomegrpitm#</option>
+						</cfoutput>
+					</cfif>
 				</select>
 			</td>
 			<td></td>
 			<td>
 				<select name="grpitem2" id="grpitem2" class="form-select">
-					<cfoutput query="rsalter">
-						<cfset grpitm = RIP_NumGrupo & ',' & RIP_NumItem>
-						<cfset nomegrpitm = RIP_NumGrupo & '_' & RIP_NumItem& ' - ' & trim(Fun_Nome)>
-						<option value="#grpitm#">#nomegrpitm#</option>
-					</cfoutput>
+					<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
+						<cfoutput query="rsalter">
+							<cfset grpitm = RIP_NumGrupo & ',' & RIP_NumItem>
+							<cfset nomegrpitm = RIP_NumGrupo & '_' & RIP_NumItem& ' - ' & trim(Fun_Nome)>
+							<option value="#grpitm#">#nomegrpitm#</option>
+						</cfoutput>
+					</cfif>
 				</select>
 			</td>
 		</tr>	
 			  
 <cfset btninc = ''>
 <cfset btnalt = ''>
-<cfif rsIncluir.recordcount lte 0>
-	<cfset btninc = 'disabled'>
-</cfif>
-<cfif rsalter.recordcount lte 0>
-	<cfset btnalt = 'disabled'>
+<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
+	<cfif rsIncluir.recordcount lte 0>
+		<cfset btninc = 'disabled'>
+	</cfif>
+	<cfif rsalter.recordcount lte 0>
+		<cfset btnalt = 'disabled'>
+	</cfif>
 </cfif>
 <tr>
 	<td></td>
@@ -270,7 +299,9 @@
 	</a> 
   </div>
   <div class="row"><br><br><br><br></div>
-  <cfif (isDefined("acao") and (rsIncluir.recordcount gt 0 or rsalter.recordcount gt 0 or somenteavaliarmeta3 eq 'S'))>
+  
+  <cfif (isDefined("acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10 and (rsIncluir.recordcount gt 0 or rsalter.recordcount gt 0 or somenteavaliarmeta3 eq 'S'))>
+	<div class="row">&nbsp;&nbsp;&nbsp;Qtd. de Itens:&nbsp;<cfoutput>#rsBase.recordcount#</cfoutput></div>
 	<div id="tab">
 	<table width="1400" class="table table-bordered table-striped table-hover table-active" style="background:#FFF">
 		<thead style="background:#CCC" align="center">
@@ -326,7 +357,9 @@
 	</div>	
  </cfif>
   <input type="hidden" id="acao" name="acao" value="">
-  <cfif isDefined("url.acao")>
+  <input type="hidden" id="msg" name="msg" value="<cfoutput>#msg#</cfoutput>">
+  
+  <cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
 		<cfoutput>
 			<input type="hidden" id="unid" name="unid" value="#rsalter.RIP_Unidade#">
 			<input type="hidden" id="aval" name="aval" value="#url.numinsp#">
@@ -338,15 +371,15 @@
 		</cfoutput>
 	</cfif>	
   </form>
-	<cfif isDefined("url.acao")>
-		<form name="formx" method="post" action="ficha_facin.cfm" target="_self">
-			<input type="hidden" id="numinsp" name="numinsp" value="">
-			<input type="hidden" id="grpitem" name="grpitem" value="">
-			<input type="hidden" id="acao" name="acao" value="">
-			<input type="hidden" id="somenteavaliarmeta3" name="somenteavaliarmeta3" value="<cfoutput>#somenteavaliarmeta3#</cfoutput>">
-			<input type="hidden" id="salvarsn" name="salvarsn" value="S">
-		</form>
-	</cfif>
+<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
+	<form name="formx" method="post" action="ficha_facin.cfm" target="_self">
+		<input type="hidden" id="numinsp" name="numinsp" value="">
+		<input type="hidden" id="grpitem" name="grpitem" value="">
+		<input type="hidden" id="acao" name="acao" value="">
+		<input type="hidden" id="somenteavaliarmeta3" name="somenteavaliarmeta3" value="<cfoutput>#somenteavaliarmeta3#</cfoutput>">
+		<input type="hidden" id="salvarsn" name="salvarsn" value="S">
+	</form>
+</cfif>
 </body>
 <script src="public/jquery-3.7.1.min.js"></script>
 <script type="text/javascript" src="public/axios.min.js"></script>
@@ -367,12 +400,52 @@
 	}
 	//================
 	function aviso() {
-		//alert($('#grpitem').val())
 		$('div#aviso').hide()
-		if($('#concfacin').val() != '' && $('#concfacin').val() != undefined && $('#concfacin').val() != null){
-			$('#aviso').html('Conclusão da FACIN realizada em: '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+		//alert($('#msg').val())
+		//alert($('#acao').val())
+		if($('#msg').val() != '') {
+			$('#aviso').html($('#msg').val())
 			$('#aviso').show(500)
-		}
+		} 
+		//if($('#msg').val() == '' && $('#acao').val()=='buscar') {
+		if($('#msg').val() == '') {
+			//alert('aqui linha 410')
+			if($('#grpacesso').val() == 'INSPETORES' && $('#concfacin').val() == '') {
+				let prots = '<option value=""></option>'
+				$('#grpitem2').html(prots)
+				$('#aviso').html('Inspetor(a), FACIN não concluída pelo gestor!')
+				$('#tab').hide()
+				$('#aviso').show(500)
+			}
+			if($('#matr').val() == $('#facmatricula').val() && $('#facmatricula').val() != '') {
+				$('#salvarsn').val('S')
+				if($('#grpacesso').val() == 'GESTORES' && $('#concfacin').val() == '' && ($('#grpitem').val() == '' || $('#grpitem').val() == null) && $('#grpitem2').val() != null) {
+					$('#aviso').show(500)
+				}else{
+					if ($('#acao').val()=='buscar'){
+						$('#aviso').html('FACIN está em fase de conclusão por '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+						$('#aviso').show(500)
+					}
+				}
+				
+				
+				if($('#concfacin').val() != '' && $('#concfacin').val() != undefined && $('#concfacin').val() != null){
+					$('#salvarsn').val('N')
+					$('#aviso').html('Conclusão da FACIN realizada em '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+					$('#aviso').show(500)
+				}
+				
+			}		
+			if($('#matr').val() != $('#facmatricula').val() && $('#facmatricula').val() != '') {
+				$('#salvarsn').val('N')
+				$('#aviso').html('FACIN está em fase de conclusão por '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+				if($('#concfacin').val() != '' && $('#concfacin').val() != undefined && $('#concfacin').val() != null){
+					$('#aviso').html('Conclusão da FACIN realizada em '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+				}
+				$('#aviso').show(500)
+			}
+		}		
+
 
 		if($('#grpitem').val() == '' && $('#grpitem2').val() == '') {
 			$('#aviso').html('Nº avaliação inexistente ou está na fase de Revisão!')
@@ -381,30 +454,12 @@
 		if($('#somenteavaliarmeta3').val() == 'S' && $('#grpitem2').val() != null) {
 			let prots = '<option value=""></option>';
             $('#grpitem').html(prots);
-			//$("#grpitem").attr('disabled', true);
+			$("#grpitem").attr('disabled', true);
 			$("#inc").attr('disabled', true);
 			if($('#concfacin').val() == ''){
 				$('#aviso').show(500)
 			}
 		} 
-		if($('#grpacesso').val() == 'GESTORES' && $('#concfacin').val() == '' && ($('#grpitem').val() == '' || $('#grpitem').val() == null) && $('#grpitem2').val() != null) {
-			$('#aviso').show(500)
-		}
-		if($('#grpacesso').val() == 'INSPETORES' && $('#concfacin').val() == '') {
-			let prots = '<option value=""></option>'
-			$('#grpitem2').html(prots)
-			$('#aviso').html('Nº avaliação inexistente ou FACIN não concluída pelo Revisor!')
-			$('#tab').hide()
-			$('#aviso').show(500)
-		}
-		if($('#matr').val() != $('#facmatricula').val() && $('#facmatricula').val() != '') {
-			$('#salvarsn').val('N')
-			$('#aviso').html('FACIN está em fase de conclusão por: '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
-			if($('#concfacin').val() != '' && $('#concfacin').val() != undefined && $('#concfacin').val() != null){
-				$('#aviso').html('Conclusão da FACIN realizada em: '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
-			}
-			$('#aviso').show(500)
-		}
    	}
 
 	function concluir(){
@@ -428,9 +483,10 @@
 			var vlr_fin = data.data.length
 			let dados = data.data.substring(vlr_ini,vlr_fin);
 			$("#aviso").html(dados);
-			//$("#msgmacproc").show(500);
+			$("#msgmacproc").show(500);
         })
       }
+
 	//Validação de campos vazios em formulario
 	function valida_form() {
 		var numinsp = document.form1.numinsp.value;
@@ -449,6 +505,7 @@
 			}
 			document.formx.submit();
 		}	  
-	}	  
+	}	
+
 </script>
 </html>
