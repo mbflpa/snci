@@ -283,6 +283,7 @@
   max-height: 90vh; /* Altura máxima relativa à viewport */
   overflow-y: auto;
   font-size: 12px; /* Fonte menor para melhor legibilidade */
+  pointer-events: none; /* Ignora eventos de mouse para que o mouseout do ícone funcione */
 }
 
 .snci-nps-modal-header {
