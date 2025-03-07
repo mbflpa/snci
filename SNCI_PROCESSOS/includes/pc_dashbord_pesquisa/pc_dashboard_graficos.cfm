@@ -104,7 +104,7 @@
 <!--- Script para gerar e configurar o gráfico NPS - Atualizado para melhor centralização --->
 <script>
 window.updateNPSChart = function(npsData) {
-    console.log('Atualizando gráfico NPS com dados:', npsData);
+
     
     if (!npsData || !npsData.npsDetalhes) {
         console.error('Dados NPS inválidos ou incompletos');
@@ -198,7 +198,7 @@ window.updateNPSChart = function(npsData) {
         for (let i = Chart.pluginService._plugins.length - 1; i >= 0; i--) {
             if (Chart.pluginService._plugins[i].id === 'doughnutLabels') {
                 Chart.pluginService._plugins.splice(i, 1);
-                console.log('Plugin doughnutLabels removido para evitar duplicação');
+
             }
         }
     }
@@ -534,7 +534,7 @@ $(document).ready(function() {
                 // Adicionar checagem extra para certificar que a função existe
                 if (typeof window.updateNPSChart === 'function') {
                     window.updateNPSChart(resultado);
-                    console.log("Dados NPS processados com sucesso");
+
                 } else {
                     console.error("Função updateNPSChart não disponível. Definindo dados para inicialização posterior.");
                     // Armazenar dados para tentativa futura
@@ -591,7 +591,7 @@ $(document).ready(function() {
     // Verificar se Chart.js está disponível e configurar exemplo
     if (typeof Chart !== 'undefined') {
         // Tentar inicializar com dados dummy para testar renderização
-        console.log('Tentando inicializar gráfico NPS com dados de exemplo');
+
         try {
             setTimeout(() => {
                 // Verificar se o gráfico já foi inicializado por dados reais

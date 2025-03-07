@@ -263,7 +263,7 @@
 			function createMonthRadioButtons(selectedYear) {
 				 // Verifica se o ano selecionado existe no objeto anosMeses
 				 if (!anosMeses[selectedYear]) {
-					console.log('Ano não encontrado:', selectedYear);
+
 					return; // Retorna se o ano não existir
 				}
 
@@ -271,7 +271,7 @@
 				const monthRange = anosMeses[selectedYear];
 				
 				if (!monthRange || !monthRange.length) {
-					console.log('Nenhum mês encontrado para o ano:', selectedYear);
+
 					$('#opcoesMes').html(''); // Limpa os botões se não houver meses
 					return;
 				}

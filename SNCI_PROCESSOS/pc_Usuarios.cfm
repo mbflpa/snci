@@ -593,7 +593,7 @@
 							pc_usu_matricula: usuarioMatricula
 						},
 						success: function(response) {
-							console.log(response);	
+	
 							if (response=="true") {
 								$('#tabUsuariosCad').DataTable().searchPanes.clearSelections();
 								atualizarTabela();

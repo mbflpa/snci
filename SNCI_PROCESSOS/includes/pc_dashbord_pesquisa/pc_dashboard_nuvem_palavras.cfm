@@ -258,7 +258,7 @@ $(document).ready(function() {
     window.carregarNuvemPalavras = function(anoFiltro, mcuFiltro, minFreq = 2, maxWords = 100) {
         // Se já estiver renderizando, saia para evitar chamadas simultâneas
         if (window.isRenderingCloud) {
-            console.log("Já existe uma renderização em andamento, ignorando nova chamada");
+
             return;
         }
         
@@ -698,7 +698,7 @@ $(document).ready(function() {
                 
             $("#palavra-selecionada").addClass("custom-badge-" + Date.now());
             
-            console.log("Cor aplicada ao badge:", hexColor);
+
         }
         
         // MODIFICAÇÃO AQUI - Usar getObservacoesByPalavraExata em vez de getObservacoesByPalavra

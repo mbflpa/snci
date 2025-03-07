@@ -113,7 +113,7 @@
                 const previousMonth = now.getMonth() === 0 ? 12 : now.getMonth(); // Janeiro (0) vira dezembro (12)
                 const previousYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
 
-                console.log("Gerar dados para indicadores do mês anterior: " + previousMonth + "/" + previousYear);
+     
                 // Executa a função para gerar os dados para os indicadores
                 $.ajax({//AJAX PARA CONSULTAR OS INDICADORES
                     type: "post",
@@ -171,7 +171,7 @@
                 },
                 async: true,
                 success: function(result) {
-                console.log("Dados para indicadores gerados com sucesso! "+previousMonth+"/"+previousYear);
+
                 },
                         
                 error: function(xhr, ajaxOptions, thrownError) {

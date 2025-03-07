@@ -146,7 +146,7 @@ $(document).ready(function() {
     function configurarDataTable(callback) {
         // Se já estiver processando, aguarde
         if (tabelaEmProcesso) {
-            console.log("Operação de tabela já em andamento, aguardando...");
+
             if (callback) callback(null);
             return;
         }
@@ -358,17 +358,17 @@ $(document).ready(function() {
     
     // Função para carregar os dados da tabela - com callback para garantir a inicialização
     window.carregarDadosTabela = function(anoFiltro, mcuFiltro) {
-        console.log("Carregando dados para tabela:", anoFiltro, mcuFiltro);
+
         
         // Verificar se a aba está ativa
         if (!$("#listagem").hasClass('active') && !$("#listagem").hasClass('show')) {
-            console.log("Aba de listagem não está ativa. Operação cancelada.");
+
             return;
         }
         
         // Se já estiver processando, evite chamadas repetidas
         if (tabelaEmProcesso) {
-            console.log("Operação de tabela já em andamento, ignorando nova solicitação");
+
             return;
         }
         
@@ -395,12 +395,12 @@ $(document).ready(function() {
                 dataType: 'json',
                 success: function(data) {
                     try {
-                        console.log("Dados recebidos:", data);
+
                         
                         // Verificar se a tabela ainda existe e se a aba está ativa
                         if (!$.fn.dataTable.isDataTable('#tabelaPesquisas') || 
                             (!$("#listagem").hasClass('active') && !$("#listagem").hasClass('show'))) {
-                            console.log("A tabela foi destruída ou a aba não está mais ativa");
+
                             tabelaEmProcesso = false;
                             return;
                         }
@@ -437,7 +437,7 @@ $(document).ready(function() {
                                 });
                                 
                                 tabela.draw();
-                                console.log("Tabela desenhada com sucesso");
+
                                 
                                 // Calcular médias após carregar os dados
                                 calcularMediasColunas(tabela);
@@ -516,7 +516,7 @@ $(document).ready(function() {
                 tabelaEmProcesso = false;
             }
         } else {
-            console.log("Aba de listagem não está ativa. Inicialização adiada.");
+
         }
     }, 800); // Aumentado para 800ms para garantir que o DOM esteja completamente carregado
     
@@ -558,7 +558,7 @@ $(document).ready(function() {
                 if (!tabelaEmProcesso) {
                     window.carregarDadosTabela(anoSelecionado, mcuFiltro);
                 } else {
-                    console.log("Operação de tabela em andamento, aguardando conclusão...");
+
                 }
             }
         }, 250); // Espera 250ms para evitar múltiplas chamadas
