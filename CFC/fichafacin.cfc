@@ -149,14 +149,14 @@
 					,FACA_Meta1_AE_Docu = '#form.meta1_aedocm#'
 					,FACA_Meta1_AE_Class = '#form.meta1_aeclas#'
 					,FACA_Meta1_AE_Orient = '#form.meta1_orient#'
-					,FACA_Meta1_Pontos = #FACAMETA1PONTOS#
+					,FACA_Meta1_Pontos = #meta1_pto_obtida#
 					,FACA_Meta2_AR_Falta = '#form.meta2_arfalt#'
 					,FACA_Meta2_AR_Troca = '#form.meta2_artroc#'
 					,FACA_Meta2_AR_Nomen = '#form.meta2_arnomc#'
 					,FACA_Meta2_AR_Ordem = '#form.meta2_arorde#'
 					,FACA_Meta2_AR_Prazo = '#form.meta2_arpraz#'
 					,FACA_Consideracao = '#form.considerargestor#'
-					,FACA_Meta2_Pontos = #FACAMETA2PONTOS#
+					,FACA_Meta2_Pontos = #meta2_pto_obtida#
 					,FACA_DtAlter = CONVERT(char, GETDATE(), 120)
 					WHERE 
 					FACA_Unidade = '#FACUNIDADE#' AND 

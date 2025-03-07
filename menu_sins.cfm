@@ -348,7 +348,7 @@
           <tr>
             <td>&nbsp;</td>
           </tr>
-          <cfif AtivFacin eq 'A,I' OR AtivFacin eq 'A,I,R'>
+          <cfif AtivFacin eq 'A,F' OR AtivFacin eq 'A,F,R'>
             <tr>
                 <td><img src="smallArrow.gif" width="16" height="5" /></td>
                 <td width="94%"><a href="index.cfm?opcao=permissao28">Avaliar FACIN</a></td>
@@ -357,7 +357,7 @@
               <td>&nbsp;</td>
             </tr>
           </cfif>
-          <cfif AtivFacin eq 'A,I,R' OR AtivFacin eq 'A,R,D' OR AtivFacin eq 'A,R,C'>
+          <cfif AtivFacin eq 'A,F,R' OR AtivFacin eq 'A,R,D' OR AtivFacin eq 'A,R,C'>
             <tr>
                 <td><img src="smallArrow.gif" width="16" height="5" /></td>
                 <td width="94%"><a href="index.cfm?opcao=permissao30">Avaliar Resultados</a></td>
