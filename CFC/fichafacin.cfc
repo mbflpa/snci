@@ -5,14 +5,15 @@
         <cfreturn this>
     </cffunction>
 	<cffunction name="salvarPosic"   access="remote" hint="salva a manifestação de qualquer usuário">
-		<!---
+	<!---
 		<cfdump var=#form#>
 		<cfset gil = gil>		
-		--->	
+	--->			
 
 		<cfset form.acaofac = 'INC'>
 		<cfset form.acaofaca = 'INC'>
 		<cfset form.acaoffi = 'INC'>
+	
 		<cfquery datasource="#dsnSNCI#" name="rsexistegestor">
 			select FAC_Avaliacao 
 			from UN_Ficha_Facin 
@@ -43,7 +44,7 @@
 		<cfif rsexisteFFI.recordcount gt 0>
 			<cfset form.acaoffi = 'ALT'>
 		</cfif>
-		<cfif grpacesso neq 'INSPETORES'>
+		<cfif form.grpacesso neq 'INSPETORES'>
 			<cfif form.acaofac eq 'INC'>
 				<!--- inserir UN_Ficha_Facin --->
 				<cfquery datasource="#dsnSNCI#">
@@ -75,10 +76,9 @@
 			FROM Resultado_Inspecao
 			WHERE RIP_NumInspecao= '#form.FACAVALIACAO#' and 
 			RIP_NumGrupo = #form.grp# and RIP_NumItem = #form.itm#
-			<cfif grpacesso eq 'INSPETORES'>
+			<cfif form.grpacesso eq 'INSPETORES'>
 				AND RIP_MatricAvaliador = '#form.FACMATRICULA#'
 			</cfif>
-			ORDER BY RIP_MatricAvaliador, RIP_NumGrupo, RIP_NumItem
 		</cfquery>
 				
 		<!--- <cfdump var="#form#">  --->
@@ -129,7 +129,7 @@
 		
 
 		<!--- inserção na tabela Un_Ficha_FAcin_avaliador --->
-		<cfif grpacesso neq 'INSPETORES'>
+		<cfif form.grpacesso neq 'INSPETORES'>
 			<cfif form.acaofaca eq 'INC'>
 				<cfquery datasource="#dsnSNCI#">
 					insert into UN_Ficha_Facin_Avaliador (FACA_Unidade,FACA_Avaliacao,FACA_Matricula,FACA_Avaliador,FACA_Grupo,FACA_Item,FACA_Meta1_AT_OrtoGram,FACA_Meta1_AT_CCCP,FACA_Meta1_AE_Tecn,FACA_Meta1_AE_Prob,FACA_Meta1_AE_Valor,FACA_Meta1_AE_Cosq,FACA_Meta1_AE_Norma,FACA_Meta1_AE_Docu,FACA_Meta1_AE_Class,FACA_Meta1_AE_Orient,FACA_Meta1_Pontos,FACA_Meta2_AR_Falta,FACA_Meta2_AR_Troca,FACA_Meta2_AR_Nomen,FACA_Meta2_AR_Ordem,FACA_Meta2_AR_Prazo,FACA_Meta2_Pontos,FACA_Consideracao,FACA_DtCriar,FACA_DtAlter)
@@ -200,11 +200,10 @@
 					,FACA_DtAlter = CONVERT(char, GETDATE(), 120)
 				WHERE 
 					FACA_Avaliacao = '#FACAVALIACAO#' and 
-					FACA_Matricula = '#FACMATRICULA#' and
 					FACA_Avaliador = '#RIP_MatricAvaliador#' and
 					FACA_Grupo=#rsSalva.RIP_NumGrupo# and 
 					FACA_Item=#rsSalva.RIP_NumItem#	
-			</cfquery>		
+			</cfquery>	
 		</cfif>
 		</cfoutput>
 
