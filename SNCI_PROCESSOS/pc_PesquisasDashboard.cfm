@@ -118,7 +118,7 @@
                         <div class="filtros-container">
                             <!-- Filtro por ano -->
                             <div class="filtro-ano-container">
-                                <div class="filtro-ano-label">Ano do Processo:</div>
+                                <div class="filtro-ano-label">Ano dos Processos:</div>
                                 <div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons">
                                     <!-- Botões gerados via JS -->
                                 </div>
