@@ -61,12 +61,7 @@
                         </div>
                         <p style="top: 10px;position: relative;">
                             NPS
-                            <i class="fas fa-info-circle ml-1 nps-info-icon" 
-                               data-toggle="popover" 
-                               data-placement="auto" 
-                               data-trigger="hover" 
-                               title="<i class='fas fa-chart-line mr-2'></i>O que é o NPS?" 
-                               data-content="<div class='text-justify'><p>O <strong>Net Promoter Score (NPS)</strong> mede a satisfação e percepção dos órgãos avaliados quanto aos trabalhos realizados, em uma escala de -100 a +100.</p><p><strong>NPS = </strong> %Promotores-%Detratores</p><p><strong>Classificação dos respondentes:</strong><br>• <span class='badge badge-success'>Promotores</span>: notas 9-10<br>• <span class='badge badge-warning'>Neutros</span>: notas 7-8<br>• <span class='badge badge-danger'>Detratores</span>: notas 1-6</p><p><strong>Interpretação:</strong><br>• <span class='text-danger'>Ruim</span>: menor que 0<br>• <span class='text-warning'>Regular</span>: 0 a 50<br>• <span class='text-info'>Bom</span>: 50 a 70<br>• <span class='text-success'>Excelente</span>: acima de 70</p></div>"></i>
+                            <i class="fas fa-info-circle ml-1 nps-info-icon" id="npsInfoIcon"></i>
                         </p>
                         <p id="npsDetalhes" class="formula-text" style="left:0px;top:6px;position: relative;">
                             Promotores: 0 | Neutros: 0 | Detratores: 0
@@ -92,6 +87,40 @@
     </div>
 </div>
 
+<!-- Modal personalizado para NPS que se comporta como popover -->
+<div id="npsInfoModal" class="snci-nps-modal ">
+    <div class="snci-nps-modal-header navbar_correios_backgroundColor">
+        <i class='fas fa-chart-line mr-2'></i>O que é o NPS?
+    </div>
+    <div class="snci-nps-modal-body">
+        <div class='text-justify'>
+            <p>O <strong>Net Promoter Score (NPS)</strong> mede a satisfação e percepção dos órgãos avaliados quanto aos trabalhos realizados, em uma escala de -100 a +100.</p>
+            <p><strong>NPS = </strong> % Promotores - % Detratores</p>
+            <p><strong>Classificação dos respondentes:</strong></p>
+            <div class="nps-category-box">
+                <h5><span class='badge badge-success'>Promotores ( notas 9-10 )</span></h5>
+                <p>São órgãos avaliados que consideram o processo de avaliação do controle interno como altamente positivo e eficaz. Reconhecem o valor agregado pela avaliação, destacando a qualidade do trabalho, a transparência e a contribuição para a melhoria dos processos internos. Estes órgãos tendem a incorporar prontamente as recomendações e a valorizar a parceria com o controle interno.</p>
+            </div>
+            <div class="nps-category-box">
+                <h5><span class='badge badge-warning'>Neutros ( notas 7-8 )</span></h5>
+                <p>São órgãos avaliados que consideram o processo de avaliação satisfatório, mas identificam aspectos a serem aprimorados. Reconhecem a importância do trabalho do controle interno, porém, não percebem valor extraordinário agregado às suas operações. Tendem a adotar parcialmente as recomendações e podem apresentar resistência moderada durante os processos de avaliação.</p>
+            </div>
+            <div class="nps-category-box">
+                <h5><span class='badge badge-danger'>Detratores ( notas 1-6 )</span></h5>
+                <p>São órgãos avaliados que demonstram insatisfação com o processo de avaliação conduzido pelo controle interno dos Correios. Podem considerar as avaliações como burocráticas, punitivas ou desconectadas da realidade operacional. Representam oportunidades críticas para o aprimoramento da metodologia de avaliação, comunicação e abordagem do órgão de controle interno, sinalizando necessidade de revisão nos procedimentos adotados.</p>
+            </div>
+            <p><strong>Interpretação:</strong></p>
+            <ul>
+                <li><span class='text-danger'>Ruim</span>: menor que 0</li>
+                <li><span class='text-warning'>Regular</span>: 0 a 50</li>
+                <li><span class='text-info'>Bom</span>: 50 a 70</li>
+                <li><span class='text-success'>Excelente</span>: acima de 70</li>
+            </ul>
+        </div>
+    </div>
+   
+</div>
+
 <script>
 $(document).ready(function() {
     // Verificar se o script já foi carregado para evitar duplicidade
@@ -105,16 +134,87 @@ $(document).ready(function() {
             delay: {show: 100, hide: 100},
             template: '<div class="tooltip" role="tooltip"><div class="arrow"></div><div class="tooltip-inner"></div></div>'
         });
+
+        // Implementar comportamento de popover para o modal personalizado do NPS
+        let hoverTimeout;
         
-        // Inicializar popovers para ícones de informação
-        $('[data-toggle="popover"]').popover({
-            container: 'body',
-            html: true,
-            trigger: 'hover',
-            boundary: 'window',
-            fallbackPlacement: ['left', 'right', 'bottom', 'top'],
-            template: '<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-header"></div><div class="popover-body"></div></div>',
-            sanitize: false
+        $("#npsInfoIcon").on('mouseenter', function(e) {
+            clearTimeout(hoverTimeout);
+            
+            const $icon = $(this);
+            const $modal = $("#npsInfoModal");
+            
+            // Certificar-se que o modal está visível para calcular sua altura real
+            $modal.css({
+                'visibility': 'hidden',
+                'display': 'block',
+                'position': 'fixed',  // Temporariamente fixar para medição
+                'top': 0,
+                'left': 0
+            });
+            
+            // Capturar as dimensões após o modal estar visível para medições corretas
+            const modalWidth = $modal.outerWidth();
+            const modalHeight = $modal.outerHeight();
+            
+            // Restaurar a invisibilidade para posicionar corretamente
+            $modal.css({
+                'display': 'none',
+                'visibility': 'visible',
+                'position': 'absolute'
+            });
+            
+            // Posicionar o modal próximo ao ícone
+            const iconPos = $icon.offset();
+            const iconWidth = $icon.outerWidth();
+            const iconHeight = $icon.outerHeight();
+            
+            // Definir posição fixa vertical de 80px como solicitado
+            const windowScrollTop = $(window).scrollTop();
+            
+            // Posicionamento absoluto com top fixo de 80px + scrollTop
+            $modal.css({
+                'top': windowScrollTop,  // Margem top fixa de 80px + scroll da página
+                'left': iconPos.left - modalWidth - 15,
+                'z-index': 9999 // Garantir que fique acima de tudo
+            }).fadeIn(200);
+            
+            // Calcular a posição da seta para apontar para o ícone
+            const arrowTop = iconPos.top - (windowScrollTop) + (iconHeight / 2);
+            
+            // Posicionar a seta do modal à direita apontando para o ícone
+            $modal.find('.snci-nps-modal-arrow').css({
+                'top': Math.max(10, Math.min(arrowTop, modalHeight - 15)), // Garantir que a seta fique dentro do modal
+                'left': modalWidth - 5
+            }).removeClass('snci-nps-modal-arrow-left').addClass('snci-nps-modal-arrow-right');
+            
+            // Ajustar posição se estiver fora da tela (à esquerda)
+            if (iconPos.left - modalWidth - 15 < 0) {
+                // Posicionar à direita do ícone se não couber à esquerda
+                $modal.css({
+                    'left': iconPos.left + iconWidth + 15
+                });
+                
+                // Reajustar a seta para apontar para o ícone a partir da esquerda
+                $modal.find('.snci-nps-modal-arrow')
+                    .css({
+                        'top': Math.max(10, Math.min(arrowTop, modalHeight - 15)),
+                        'left': -5
+                    })
+                    .removeClass('snci-nps-modal-arrow-right')
+                    .addClass('snci-nps-modal-arrow-left');
+            }
+        }).on('mouseleave', function() {
+            hoverTimeout = setTimeout(function() {
+                $("#npsInfoModal").fadeOut(200);
+            }, 300);
+        });
+        
+        // Evitar que o modal desapareça quando o mouse estiver sobre ele
+        $("#npsInfoModal").on('mouseenter', function() {
+            clearTimeout(hoverTimeout);
+        }).on('mouseleave', function() {
+            $(this).fadeOut(200);
         });
         
         // Função para animação dos números
