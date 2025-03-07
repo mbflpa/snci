@@ -274,7 +274,7 @@
 .snci-nps-modal {
   display: none;
   position: absolute;
-  width: 650px; /* Modal mais largo para acomodar o texto mais extenso */
+  width: 750px; /* Modal mais largo para acomodar o texto mais extenso */
   background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 6px;
