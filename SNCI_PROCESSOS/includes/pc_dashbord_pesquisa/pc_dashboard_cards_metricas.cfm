@@ -103,7 +103,7 @@
             </div>
             <div class="nps-category-box">
                 <h5><span class='badge badge-warning'>Neutros ( notas 7-8 )</span></h5>
-                <p>São órgãos avaliados que consideram o processo de avaliação satisfatório, mas identificam aspectos a serem aprimorados. Reconhecem a importância do trabalho do controle interno, porém, não percebem valor extraordinário agregado às suas operações. Tendem a adotar parcialmente as recomendações e podem apresentar resistência moderada durante os processos de avaliação.</p>
+                <p>São órgãos avaliados que consideram o processo de avaliação satisfatório, mas identificam aspectos a serem aprimorados. Reconhecem a importância do trabalho do controle interno, porém, não percebem valor extraordinário agregado às suas operações. Tendem a adotar parcialmente as recomendações e podem apresentar resistência moderada durante os processos de avaliação e acompanhamento.</p>
             </div>
             <div class="nps-category-box">
                 <h5><span class='badge badge-danger'>Detratores ( notas 1-6 )</span></h5>
