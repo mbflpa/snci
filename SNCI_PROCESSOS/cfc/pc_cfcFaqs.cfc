@@ -1825,7 +1825,8 @@
 			SELECT 
 				f.*, 
 				u.pc_usu_nome, 
-				t.pc_faq_tipo_nome 
+				t.pc_faq_tipo_nome,
+				t.pc_faq_tipo_cor
 			FROM pc_faqs f
 			INNER JOIN pc_usuarios u ON u.pc_usu_matricula = f.pc_faq_matricula_atualiz
 			LEFT JOIN pc_faq_tipos t ON t.pc_faq_tipo_id = f.pc_faq_tipo
@@ -1837,196 +1838,344 @@
 			</cfif>
 		</cfquery>
 
+        <style>
+            /* Estilos para a tabela de FAQs */
+            .faq-table {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 0 15px rgba(0,0,0,.05);
+            }
+            
+            .faq-table thead th {
+                background: var(--azul_claro_correios);
+                color: white;
+                padding: 12px 15px;
+                font-weight: 500;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.5px;
+                border: none;
+            }
+            
+            .faq-table tbody tr {
+                transition: all 0.3s ease;
+            }
+            
+            .faq-table tbody tr:hover {
+                background-color: rgba(0, 131, 202, 0.04) !important;
+                transform: translateY(-1px);
+            }
+            
+            .faq-table td {
+                padding: 12px 15px;
+                vertical-align: middle;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            
+            .faq-actions {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .faq-action-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                transition: transform 0.2s;
+                color: var(--azul_claro_correios);
+            }
+            
+            .faq-action-btn:hover {
+                transform: scale(1.2);
+            }
+            
+            .faq-action-btn.delete {
+                color: #dc3545;
+            }
+            
+            .faq-badge {
+                display: inline-block;
+                padding: 3px 10px;
+                border-radius: 30px;
+                font-size: 11px;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+            
+            .faq-badge.active {
+                background-color: #28a745;
+                color: white;
+            }
+            
+            .faq-badge.inactive {
+                background-color: #dc3545;
+                color: white;
+            }
+            
+            .faq-type-dot {
+                display: inline-block;
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                margin-right: 8px;
+            }
+            
+            .faq-title {
+                display: flex;
+                align-items: center;
+                font-weight: 500;
+            }
+            
+            .faq-title span {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 400px;
+            }
+            
+            /* Estilo para DataTables */
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current, 
+            .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+                background: var(--azul_claro_correios) !important;
+                color: white !important;
+                border: none;
+                border-radius: 4px;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+                background: rgba(0, 131, 202, 0.1) !important;
+                color: var(--azul_claro_correios) !important;
+                border: none;
+            }
+            
+            .dataTables_wrapper .dataTables_filter input {
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 6px 10px;
+                margin-left: 10px;
+            }
+            
+            .dataTables_wrapper .dataTables_length select {
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 5px;
+                margin: 0 5px;
+            }
+            
+            .faq-content-type {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .faq-content-icon {
+                font-size: 16px;
+            }
+            
+            .faq-desativado {
+                color: #6c757d;
+                font-style: italic;
+            }
+            
+            /* Responsividade */
+            @media (max-width: 768px) {
+                .faq-table thead {
+                    display: none;
+                }
+                
+                .faq-table tr {
+                    display: block;
+                    margin-bottom: 15px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                }
+                
+                .faq-table td {
+                    display: block;
+                    text-align: right;
+                    position: relative;
+                    padding-left: 50%;
+                }
+                
+                .faq-table td:before {
+                    content: attr(data-label);
+                    position: absolute;
+                    left: 15px;
+                    font-weight: bold;
+                    text-align: left;
+                }
+                
+                .faq-actions {
+                    justify-content: flex-end;
+                }
+            }
+
+            /* Ajuste específico para as colunas */
+            .faq-table th.col-acoes,
+            .faq-table td.col-acoes {
+                width: 10% !important;
+                min-width: 100px;
+            }
+            
+            .faq-table th.col-id,
+            .faq-table td.col-id {
+                width: 8% !important;
+                min-width: 70px;
+            }
+            
+            .faq-table th.col-titulo,
+            .faq-table td.col-titulo {
+                width: 55% !important; /* Aumentado de 45% para 55% */
+            }
+            
+            .faq-table th.col-tipo,
+            .faq-table td.col-tipo {
+                width: 12% !important; /* Reduzido de 17% para 12% */
+            }
+            
+            .faq-table th.col-conteudo,
+            .faq-table td.col-conteudo {
+                width: 15% !important;
+            }
+            
+            /* Garantir que títulos longos não quebrem o layout */
+            .faq-title span {
+                max-width: 100%;
+                display: inline-block;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+            
+            @media (max-width: 992px) {
+                .faq-title span {
+                    max-width: 400px;
+                }
+            }
+            
+            @media (max-width: 768px) {
+                .faq-title span {
+                    max-width: 300px;
+                }
+            }
+        </style>
 	
-			<div class="row" >
-				<div class="col-12">
-					<div class="card">
-						<!-- /.card-header -->
-						<div class="card-body">
-							<table id="tabFaq" class="table  table-hover table-striped">
-								<thead  class="table_thead_backgroundColor">
-									<tr style="font-size:12px!important">
-										<th align="center">Controles</th>
-										<th>ID</th>
-										<th>Título</th>
-										<th>Tipo</th>
-										<th>Conteúdo</th>
-									</tr>
-								</thead>
-								
-								<tbody>
-									<cfloop query="rsFaqs"> 
-										<cfset titulo_codificado = urlEncodedFormat(pc_faq_titulo)>
-										<cfoutput>
-											<tr style="font-size:12px;<cfif #pc_faq_status# eq 'D'>color:red</cfif>" >
-												<td style="vertical-align: middle;">
-													<div style="display:flex;justify-content:space-around;">
-														<i  class="fas fa-trash-alt efeito-grow"   style="cursor: pointer;font-size:20px" onclick="javascript:excluirFaq(<cfoutput>#pc_faq_id#</cfoutput>);"    title="Excluir" ></i>
-														<i class="fas fa-edit efeito-grow"   style="cursor: pointer;font-size:20px;margin-left:20px"  onclick="javascript:mostraFormEditFaq(<cfoutput>#pc_faq_id#,'#titulo_codificado#'</cfoutput>);"    title="Editar"></i>									
-													</div>
-												</td>
-												<td style="vertical-align: middle;width:30px">#pc_faq_id#</td>
-												<td style="vertical-align: middle;">#pc_faq_titulo#</td>
-												<td style="vertical-align: middle;">#pc_faq_tipo_nome#</td>
-												<td style="vertical-align: middle;">
-													<cfif len(trim(pc_faq_texto)) GT 0>
-														Texto
-													<cfelseif len(trim(pc_faq_anexo_nome)) GT 0>
-														Arquivo
-													<cfelse>
-														-
-													</cfif>
-												</td>
-											</tr>
-										</cfoutput>
-									</cfloop>	
-								</tbody>
-							</table>
-						</div>
-
-						
-						<!-- /.card-body -->
-					</div>
-					<!-- /.card -->
-				</div>
-				<!-- /.col -->
-			</div>
-			<!-- /.row -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <table id="tabFaq" class="table faq-table">
+                            <thead>
+                                <tr>
+                                    <th class="col-acoes">Ações</th>
+                                    <th class="col-id">ID</th>
+                                    <th class="col-titulo">Título</th>
+                                    <th class="col-tipo">Tipo</th>
+                                    <th class="col-conteudo">Conteúdo</th>
+                                </tr>
+                            </thead>
+                            
+                            <tbody>
+                                <cfloop query="rsFaqs"> 
+                                    <cfset titulo_codificado = urlEncodedFormat(pc_faq_titulo)>
+                                    <cfoutput>
+                                        <tr class="<cfif pc_faq_status eq 'D'>faq-desativado</cfif>">
+                                            <td class="col-acoes" data-label="Ações">
+                                                <div class="faq-actions">
+                                                    <button type="button" class="faq-action-btn delete" onclick="excluirFaq(#pc_faq_id#);" title="Excluir">
+                                                        <i class="fas fa-trash-alt fa-lg"></i>
+                                                    </button>
+                                                    <button type="button" class="faq-action-btn" onclick="mostraFormEditFaq(#pc_faq_id#,'#titulo_codificado#');" title="Editar">
+                                                        <i class="fas fa-edit fa-lg"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                            <td class="col-id" data-label="ID">
+                                                <strong>##</strong>#pc_faq_id#
+                                                <cfif pc_faq_status eq 'D'>
+                                                    <span class="faq-badge inactive">Inativo</span>
+                                                <cfelse>
+                                                    <span class="faq-badge active">Ativo</span>
+                                                </cfif>
+                                            </td>
+                                            <td class="col-titulo" data-label="Título">
+                                                <div class="faq-title">
+                                                    <div class="faq-type-dot" style="background-color: #pc_faq_tipo_cor#"></div>
+                                                    <span title="#pc_faq_titulo#">#pc_faq_titulo#</span>
+                                                </div>
+                                            </td>
+                                            <td class="col-tipo" data-label="Tipo">#pc_faq_tipo_nome#</td>
+                                            <td class="col-conteudo" data-label="Conteúdo">
+                                                <div class="faq-content-type">
+                                                    <cfif len(trim(pc_faq_texto)) GT 0>
+                                                        <i class="fas fa-file-alt faq-content-icon text-primary"></i>
+                                                        <span>Texto</span>
+                                                    <cfelseif len(trim(pc_faq_anexo_nome)) GT 0>
+                                                        <i class="fas fa-file-pdf faq-content-icon text-danger"></i>
+                                                        <span>PDF</span>
+                                                    <cfelse>
+                                                        <i class="fas fa-minus faq-content-icon text-secondary"></i>
+                                                        <span>-</span>
+                                                    </cfif>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </cfoutput>
+                                </cfloop>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
 		
-		<script language="JavaScript">	
-
-			$(function () {
-				$("#tabFaq").DataTable({
-					columnDefs: [
-						{ "orderable": false, "targets": 0 }//impede que a primeira coluna seja ordenada
-					],
-					order: [[ 1, "desc" ]],//ordena a segunda coluna como crescente
-					destroy: true,
-					ordering: false,
-					stateSave: false,
-					autoWidth: true,
-					pageLength: 5,
-					lengthMenu: [
-						[5, 10, 25, 50, -1],
-						[5, 10, 25, 50, 'Todos']
-					],
-					buttons: [{
-						extend: 'excel',
-						text: '<i class="fas fa-file-excel fa-2x grow-icon" ></i>',
-						className: 'btExcel',
-					}],
-					language: {
-						url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
-					}
-				})
-					
-			});
-			
-			function mostraFormEditFaq(faqId,tit){
-				event.preventDefault()
-				event.stopPropagation()
-				var titulo =decodeURIComponent(tit);
-
-				$('#modalOverlay').modal('show')
-				setTimeout(function() {
-					$.ajax({
-						type: "post",
-						url: "cfc/pc_cfcFaqs.cfc",
-						data:{
-							method: "formCadFaq",
-							pc_faq_id:faqId
-						},
-						async: false
-					})//fim ajax
-					.done(function(result) {
-						$('#formCadFaqDiv').html(result)
-						$('#faqTitulo').val(titulo)
-						$('#cabecalhoAccordion').text("Editar a informação ID " + faqId + ': ' + titulo)
-						$("#btSalvarDiv").attr("hidden",false)
-						$("#faqStatus").attr("hidden",false)
-						
-						// Nova verificação com delay: se faqTexto for vazio ou "null", ativa envio de arquivo
-						if (!$('#faqTexto').val() || $('#faqTexto').val().trim() === "" || $('#faqTexto').val().trim().toLowerCase() === "null") {
-							setTimeout(function(){
-								$('input[name="envioFaq"][value="arquivo"]').prop("checked", true).trigger("change");
-							}, 100);
-						}
-
-						$('#cadastroFaq').CardWidget('expand')
-						$('html, body').animate({ scrollTop: ($('#formCadFaqDiv').offset().top-80)} , 1000);
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-					})//fim done
-					.fail(function(xhr, ajaxOptions, thrownError) {
-						$('#modalOverlay').delay(1000).hide(0, function() {
-							$('#modalOverlay').modal('hide');
-						});
-						$('#modal-danger').modal('show')
-						$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-						$('#modal-danger').find('.modal-body').text(thrownError)
-
-					});//fim fail
-					}, 500);
-       		}
-
-			function excluirFaq(faqId) {				
-				event.preventDefault()
-				event.stopPropagation()
-				var mensagem = "Deseja excluir este FAQ?";
-				swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem),
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-					if (result.isConfirmed) {
-						$('#modalOverlay').modal('show')
-						setTimeout(function() {
-							$.ajax({
-								type: "GET",
-								url: "cfc/pc_cfcFaqs.cfc",
-								data:{
-									method: "delFaq",
-									pc_faq_id: faqId
-								},
-							async: false
-
-							})//fim ajax
-							.done(function(result) {
-								// Remove o ID do FAQ do localStorage
-								let readFaqs = JSON.parse(localStorage.getItem('readFaqs') || '[]');
-								readFaqs = readFaqs.filter(id => id !== faqId.toString());
-								localStorage.setItem('readFaqs', JSON.stringify(readFaqs));
-								mostraFormCadFaq()
-								mostraTabFaq()	
-								$('#modalOverlay').delay(1000).hide(0, function() {
-									$('#modalOverlay').modal('hide');
-									toastr.success('Operação realizada com sucesso!');
-								});
-								
-							})//fim done
-							.fail(function(xhr, ajaxOptions, thrownError) {
-							
-								$('#modalOverlay').delay(1000).hide(0, function() {
-									$('#modalOverlay').modal('hide');
-									var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
-												+ '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
-									const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
-									
-									swalWithBootstrapButtons.fire(
-										{...erroSistema}
-									)
-								});
-								
-							})//fim fail
-						}, 500);
-					}		
-				});	
-			}
-			
-		</script>
- 	</cffunction>
+        <script language="JavaScript">
+            $(function () {
+                $("#tabFaq").DataTable({
+                    columnDefs: [
+                        { "orderable": false, "targets": 0 }
+                    ],
+                    order: [[ 1, "desc" ]],
+                    destroy: true,
+                    responsive: true,
+                    stateSave: false,
+                    autoWidth: false,
+                    pageLength: 10,
+                    lengthMenu: [
+                        [5, 10, 25, 50, -1],
+                        [5, 10, 25, 50, 'Todos']
+                    ],
+                    buttons: [{
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel fa-2x"></i>',
+                        className: 'btExcel',
+                    }],
+                    language: {
+                        url: "../SNCI_PROCESSOS/plugins/datatables/traducao.json"
+                    },
+                    drawCallback: function() {
+                        // Adiciona animação de hover aos botões após o DataTable ser desenhado
+                        $('.faq-action-btn').hover(
+                            function() { $(this).addClass('animated pulse'); },
+                            function() { $(this).removeClass('animated pulse'); }
+                        );
+                    }
+                });
+                
+                // Adiciona tooltip aos botões de ação
+                $('[title]').tooltip({
+                    placement: 'top',
+                    trigger: 'hover'
+                });
+            });
+            
+            // ...existing code...
+        </script>
+    </cffunction>
 
 
 	<cffunction name="delFaq"   access="remote" returntype="boolean">
