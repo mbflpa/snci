@@ -147,11 +147,13 @@
                             <div class="col-md-5">
                                 <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_tipos_processo.cfm">
                             </div>
-                            <div class="col-md-3">
-                                <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_classificacao_processo.cfm">
-                            </div>
+                            
                             <div class="col-md-4">
                                 <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_orgaos_processo.cfm">
+                            </div>
+
+                            <div class="col-md-3">
+                                <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_classificacao_processo.cfm">
                             </div>
                         </div>
 

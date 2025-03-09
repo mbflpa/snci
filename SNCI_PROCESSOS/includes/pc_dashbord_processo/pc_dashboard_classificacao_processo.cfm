@@ -55,6 +55,7 @@
         margin-right: 0.8rem;
         flex-shrink: 0;
         font-weight: 600;
+        position: static; /* Remover posicionamento absoluto */
     }
     .classificacao-info {
         flex: 1 1 auto;
@@ -138,6 +139,7 @@
     
     .classificacao-item {
         padding: 1rem;
+        align-items: center;
         margin-bottom: 1rem;
         border-radius: 8px;
         background-color: #f8f9fa;
@@ -184,13 +186,12 @@
     }
     
     .classificacao-badge {
-        position: absolute;
-        top: 0.5rem;
-        right: 0.5rem;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        border-radius: 20px;
+        position: static;
+        top: auto;
+        right: auto;
+        padding: 0;
+        font-size: 1.1rem;
+        border-radius: 50%;
     }
     
     /* Cores por classificação */
@@ -208,6 +209,38 @@
     
     .classificacao-baixa .classificacao-progress-bar {
         background-color: #6c757d;
+    }
+
+    .classificacao-grafico-barra {
+        height: 6px;
+        background: #f1f1f1;
+        border-radius: 3px;
+        margin-top: 0.25rem;
+        overflow: hidden;
+    }
+    
+    .classificacao-grafico-progresso {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #6f42c1, #e83e8c);
+    }
+    
+    /* Remove a classe progress padrão do Bootstrap que estava sendo usada */
+    .progress {
+        display: none;
+    }
+    
+    /* Estilizar cores para top 3 classificações */
+    .classificacao-item:nth-child(1) .classificacao-grafico-progresso {
+        background: linear-gradient(90deg, #6f42c1, #e83e8c);
+    }
+    
+    .classificacao-item:nth-child(2) .classificacao-grafico-progresso {
+        background: linear-gradient(90deg, #fd7e14, #ffc107);
+    }
+    
+    .classificacao-item:nth-child(3) .classificacao-grafico-progresso {
+        background: linear-gradient(90deg, #20c997, #17a2b8);
     }
 </style>
 
@@ -245,6 +278,7 @@ $(document).ready(function() {
                 const corIndex = index % coresClassificacao.length;
                 const corClassificacao = coresClassificacao[corIndex];
                 
+                // Modificado para posicionar o badge à esquerda, similar ao componente de tipos de processos
                 htmlClassificacao += `
                 <div class="classificacao-item">
                     <div class="classificacao-badge" style="background-color: ${corClassificacao}; color: white;">
@@ -256,9 +290,8 @@ $(document).ready(function() {
                             <div class="classificacao-quantidade">${classificacao.quantidade}</div>
                             <div class="classificacao-percentual">${percentual}% dos processos</div>
                         </div>
-                        <div class="progress classificacao-progress">
-                            <div class="progress-bar" role="progressbar" style="width: ${percentual}%; background-color: ${corClassificacao}" 
-                                aria-valuenow="${percentual}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="classificacao-grafico-barra">
+                            <div class="classificacao-grafico-progresso" style="width: ${percentual}%; background: linear-gradient(90deg, ${corClassificacao}, ${corClassificacao}CC);"></div>
                         </div>
                     </div>
                 </div>`;

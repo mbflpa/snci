@@ -30,6 +30,7 @@
     
     .tipo-item {
         display: flex;
+        align-items: center;
         margin-bottom: 0.75rem;
         padding: 0.75rem;
         border-radius: 6px;
@@ -92,10 +93,33 @@
         white-space: nowrap;
     }
     .progress {
+        display: none;
+    }
+    .tipo-grafico-barra {
         height: 6px;
-        margin-bottom: 0.25rem;
+        background: #f1f1f1;
         border-radius: 3px;
-        background-color: rgba(0,0,0,0.05);
+        margin-top: 0.25rem;
+        overflow: hidden;
+    }
+    
+    .tipo-grafico-progresso {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #007bff, #00c6ff);
+    }
+    
+    /* Estilizar cores para top 3 tipos */
+    .tipo-item:nth-child(1) .tipo-grafico-progresso {
+        background: linear-gradient(90deg, #fd7e14, #ffc107);
+    }
+    
+    .tipo-item:nth-child(2) .tipo-grafico-progresso {
+        background: linear-gradient(90deg, #6f42c1, #e83e8c);
+    }
+    
+    .tipo-item:nth-child(3) .tipo-grafico-progresso {
+        background: linear-gradient(90deg, #20c997, #17a2b8);
     }
     
     /* Estilos para quando não há dados */
@@ -131,11 +155,7 @@
         }
     }
 
-    /* Estilos específicos para tipos de processos */
-    .tipos-processo-container {
-        padding: 1rem;
-    }
-    
+       
     .tipo-processo-item {
         display: flex;
         align-items: center;
@@ -290,9 +310,8 @@ $(document).ready(function() {
                             <div class="tipo-quantidade">${quantidadeTipo}</div>
                             <div class="tipo-percentual">${percentual}% dos processos</div>
                         </div>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: ${percentual}%; background-color: ${corTipo}" 
-                                aria-valuenow="${percentual}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="tipo-grafico-barra">
+                            <div class="tipo-grafico-progresso" style="width: ${percentual}%; background: linear-gradient(90deg, ${corTipo}, ${corTipo}CC);"></div>
                         </div>
                     </div>
                 </div>`;

@@ -301,8 +301,8 @@ $(document).ready(function() {
                             }
                         },
                         title: {
-                            display: true,
-                            text: 'Quantidade de Processos',
+                            display: false, // Removendo o título do eixo Y
+                            text: '',
                             font: {
                                 size: 14,
                                 weight: 'bold'
@@ -321,8 +321,8 @@ $(document).ready(function() {
                             }
                         },
                         title: {
-                            display: true,
-                            text: 'Ano',
+                            display: false, // Removendo o título do eixo X
+                            text: '',
                             font: {
                                 size: 14,
                                 weight: 'bold'
@@ -333,7 +333,7 @@ $(document).ready(function() {
                 },
                 plugins: {
                     legend: {
-                        display: false
+                        display: false // Já estava desativado, mantendo assim
                     },
                     tooltip: {
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -382,13 +382,8 @@ $(document).ready(function() {
             }]
         });
         
-        // Adicionar legenda manual
-        $('#evolucaoLegend').html(`
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #007bff"></div>
-                <span>Total de Processos por Ano</span>
-            </div>
-        `);
+        // Remover a legenda manual totalmente
+        $('#evolucaoLegend').html('');
     }
     
     // Função para criar ou atualizar o gráfico de classificações
@@ -459,7 +454,32 @@ $(document).ready(function() {
                 cutout: '60%',
                 plugins: {
                     legend: {
-                        display: false
+                        display: true, // Ativando a exibição da legenda
+                        position: 'top', // Posicionando a legenda no topo
+                        labels: {
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    return data.labels.map(function(label, i) {
+                                        const meta = chart.getDatasetMeta(0);
+                                        const style = meta.controller.getStyle(i);
+                                        
+                                        return {
+                                            text: label + ' (' + data.datasets[0].data[i] + ')',
+                                            fillStyle: style.backgroundColor,
+                                            strokeStyle: style.borderColor,
+                                            lineWidth: style.borderWidth,
+                                            hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            },
+                            boxWidth: 10,
+                            fontSize: 11,
+                            padding: 10
+                        }
                     },
                     tooltip: {
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -487,18 +507,8 @@ $(document).ready(function() {
             }
         });
         
-        // Adicionar legenda manual
-        let legendaHtml = '';
-        visibleLabels.forEach((label, index) => {
-            legendaHtml += `
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: ${visibleCores[index]}"></div>
-                    <span>${label} (${visibleQuantidades[index]})</span>
-                </div>
-            `;
-        });
-        
-        $('#classificacaoLegend').html(legendaHtml);
+        // Remover a legenda manual já que agora usamos a legenda do Chart.js
+        $('#classificacaoLegend').html('');
     }
     
     // Função principal para atualizar os gráficos com novos dados

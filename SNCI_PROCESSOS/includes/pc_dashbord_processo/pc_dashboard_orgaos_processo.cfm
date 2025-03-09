@@ -23,27 +23,34 @@
         display: flex;
         align-items: center;
         padding: 0.75rem; /* Reduzir padding para economizar espaço */
-        border-radius: 8px;
+        border-radius: 6px;
         margin-bottom: 0.75rem; /* Reduzir espaçamento para caber mais itens */
-        background-color: #fff;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        background-color: rgba(0,0,0,0.03);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         transition: all 0.2s ease;
         width: 100%;       /* Garantir largura completa */
         min-width: 0;      /* Permitir que encolha se necessário */
         box-sizing: border-box;
+        border-left: 4px solid #20c997; /* Cor diferente dos outros componentes */
     }
     .orgao-card:hover {
-        transform: translateX(5px);
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        border-left: 3px solid #007bff;
+        background-color: rgba(0,0,0,0.05);
+        transform: translateX(3px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.12);
     }
     .orgao-posicao {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #007bff;
-        width: 30px; /* Menor largura */
-        text-align: center;
-        margin-right: 0.75rem; /* Menor margem */
+        width: 36px;
+        height: 36px;
+        min-width: 36px; /* Garante tamanho mínimo */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        border-radius: 50%;
+        margin-right: 0.8rem;
+        flex-shrink: 0;
+        font-weight: 600;
+        color: white;
     }
     .orgao-info {
         flex-grow: 1;
@@ -51,32 +58,41 @@
         overflow: hidden;  /* Ocultar conteúdo que não couber */
     }
     .orgao-sigla {
-        font-weight: 600;
+        font-weight: 500;
         margin-bottom: 0.25rem;
-        font-size: 1rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 0.85rem;
+        color: #333;
     }
     .orgao-mcu {
-        font-size: 0.8rem;
-        color: #6c757d;
+        font-size: 0.75rem;
+        color: #777;
+        margin-bottom: 0.5rem;
     }
     .orgao-quantidade {
-        font-size: 1.2rem;
+        font-size: 1rem;
         font-weight: 600;
-        color: #28a745;
-        margin-left: 1rem;
+        color: #111;
+        margin-right: 1rem;
+    }
+    .orgao-percentual {
+        font-size: 0.75rem;
+        color: #777;
         white-space: nowrap;
     }
     .orgao-badge {
-        display: inline-block;
         font-size: 0.75rem;
+        color: #007bff;
+        background-color: rgba(0, 123, 255, 0.1);
         border-radius: 30px;
         padding: 0.25rem 0.75rem;
         margin-left: 0.5rem;
-        background-color: rgba(0, 123, 255, 0.1);
-        color: #007bff;
+    }
+    .orgao-metricas {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.4rem;
+        flex-wrap: wrap;
     }
     .orgao-grafico-barra {
         height: 6px;
@@ -87,14 +103,14 @@
     }
     .orgao-grafico-progresso {
         height: 100%;
-        background: linear-gradient(90deg, #007bff, #00c6ff);
+        background: linear-gradient(90deg, #20c997, #17a2b8);
         border-radius: 3px;
     }
     .sem-dados {
         text-align: center;
-        padding: 2rem;
+        padding: 20px;
         background-color: #f8f9fa;
-        border-radius: 8px;
+        border-radius: 6px;
         color: #6c757d;
         font-size: 1.1rem;
     }
@@ -104,24 +120,18 @@
         opacity: 0.5;
         display: block;
     }
-    /* Estilizar barras para top 3 */
-    .orgao-card:nth-child(1) .orgao-grafico-progresso {
-        background: linear-gradient(90deg, #fd7e14, #ffc107);
+    /* Removendo as regras específicas para o top 3 */
+    .orgao-card:nth-child(1) .orgao-posicao,
+    .orgao-card:nth-child(2) .orgao-posicao,
+    .orgao-card:nth-child(3) .orgao-posicao,
+    .orgao-card:nth-child(n+4) .orgao-posicao {
+        background-color: initial; /* Removendo as cores específicas */
     }
-    .orgao-card:nth-child(1) .orgao-posicao {
-        color: #fd7e14;
-    }
-    .orgao-card:nth-child(2) .orgao-grafico-progresso {
-        background: linear-gradient(90deg, #6f42c1, #e83e8c);
-    }
-    .orgao-card:nth-child(2) .orgao-posicao {
-        color: #6f42c1;
-    }
+    
+    .orgao-card:nth-child(1) .orgao-grafico-progresso,
+    .orgao-card:nth-child(2) .orgao-grafico-progresso,
     .orgao-card:nth-child(3) .orgao-grafico-progresso {
-        background: linear-gradient(90deg, #20c997, #17a2b8);
-    }
-    .orgao-card:nth-child(3) .orgao-posicao {
-        color: #20c997;
+        background: initial; /* Removendo os gradientes específicos */
     }
     /* Responsividade para telas menores */
     @media (max-width: 768px) {
@@ -130,64 +140,25 @@
         }
         
         .orgao-posicao {
-            font-size: 1.25rem;
-            width: 25px;
-            margin-right: 0.5rem;
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            font-size: 0.9rem;
+            margin-right: 0.6rem;
         }
         
         .orgao-sigla {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
         
         .orgao-quantidade {
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
     }
-    /* Estilos adicionais para órgãos - complementando os já existentes */
-    .orgaos-controls {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1.5rem;
-    }
-    
-    .orgaos-filter {
-        display: flex;
-        gap: 0.5rem;
-    }
-    
-    .orgaos-filter-btn {
-        padding: 0.25rem 0.75rem;
-        font-size: 0.8rem;
-        border-radius: 5px;
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        color: #495057;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    
-    .orgaos-filter-btn:hover,
-    .orgaos-filter-btn.active {
-        background-color: #007bff;
-        color: #fff;
-        border-color: #007bff;
-    }
-    
-    .orgao-details {
-        margin-top: 0.5rem;
-        font-size: 0.8rem;
-        color: #6c757d;
-    }
-    
-    .orgao-details-item {
-        display: inline-flex;
-        align-items: center;
-        margin-right: 1rem;
-    }
-    
-    .orgao-details-item i {
-        margin-right: 0.25rem;
+    @media (max-width: 576px) {
+        .orgao-badge {
+            display: none; /* Esconder badge em telas muito pequenas */
+        }
     }
     
     /* Animações para os cards de órgãos */
@@ -200,19 +171,6 @@
         animation: slideInRight 0.3s forwards;
         animation-delay: calc(0.05s * var(--animOrder, 0));
         opacity: 0;
-    }
-    
-    /* Responsividade adicional */
-    @media (max-width: 576px) {
-        .orgaos-controls {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.75rem;
-        }
-        
-        .orgao-badge {
-            display: none; /* Esconder badge em telas muito pequenas */
-        }
     }
 </style>
 
@@ -246,6 +204,19 @@ if (typeof window.atualizarDadosComponentes === 'undefined') {
 }
 
 $(document).ready(function() {
+    // Cores para os diferentes órgãos, mesma paleta usada em Tipos de Processos
+    const coresOrgaos = [
+        '#007bff', // azul
+        '#6f42c1', // roxo
+        '#e83e8c', // rosa
+        '#fd7e14', // laranja
+        '#20c997', // verde-água
+        '#17a2b8', // ciano
+        '#28a745', // verde
+        '#ffc107', // amarelo
+        '#dc3545'  // vermelho
+    ];
+
     // Definir a função de atualização
     window.atualizarViewOrgaos = function(dados) {
         // Remove indicador de carregamento
@@ -291,29 +262,42 @@ $(document).ready(function() {
             orgaosExibidos = orgaosOrdenados.slice(0, 10);
         }
         
-        // Encontrar o maior valor para calcular percentuais
+        // Calcular o total de processos somando as quantidades de todos os órgãos exibidos
+        const totalProcessos = orgaosExibidos.reduce((sum, orgao) => sum + parseInt(orgao.quantidade || 0), 0);
+        
+        // Encontrar o maior valor para calcular o tamanho da barra de progresso (estético)
         const maxQuantidade = orgaosExibidos.length > 0 ? orgaosExibidos[0].quantidade : 0;
         
         // Construir o HTML para cada órgão
         let html = '';
         
         orgaosExibidos.forEach((orgao, index) => {
-            // Calcular percentual para a barra de progresso
-            const percentual = maxQuantidade > 0 ? (orgao.quantidade / maxQuantidade) * 100 : 0;
+            // Calcular percentual baseado no total de processos (cálculo correto)
+            const percentual = totalProcessos > 0 ? (orgao.quantidade / totalProcessos) * 100 : 0;
             
+            // Calcular a largura da barra com base no valor máximo (apenas para visual)
+            const larguraBarra = maxQuantidade > 0 ? (orgao.quantidade / maxQuantidade) * 100 : 0;
+            
+            // Usar cores alternadas para os órgãos, seguindo o mesmo padrão do componente de tipos
+            const corIndex = index % coresOrgaos.length;
+            const corOrgao = coresOrgaos[corIndex];
+            
+            // Novo formato com cor personalizada para cada item
             html += `
             <div class="orgao-card" style="--animOrder: ${index}">
-                <div class="orgao-posicao">${index + 1}</div>
+                <div class="orgao-posicao" style="background-color: ${corOrgao};">${index + 1}</div>
                 <div class="orgao-info">
-                    <div class="d-flex align-items-center">
-                        <div class="orgao-sigla">${orgao.sigla}</div>
-                        <div class="orgao-badge">${orgao.mcu}</div>
+                    <div class="orgao-sigla">${orgao.sigla}
+                        <span class="orgao-badge">${orgao.mcu}</span>
+                    </div>
+                    <div class="orgao-metricas">
+                        <div class="orgao-quantidade">${orgao.quantidade}</div>
+                        <div class="orgao-percentual">${percentual.toFixed(1)}% do total</div>
                     </div>
                     <div class="orgao-grafico-barra">
-                        <div class="orgao-grafico-progresso" style="width: ${percentual}%"></div>
+                        <div class="orgao-grafico-progresso" style="width: ${larguraBarra}%; background: linear-gradient(90deg, ${corOrgao}, ${corOrgao}CC);"></div>
                     </div>
                 </div>
-                <div class="orgao-quantidade">${orgao.quantidade}</div>
             </div>
             `;
         });
