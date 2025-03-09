@@ -136,6 +136,81 @@
         border-radius: 6px;
         color: #6c757d;
     }
+
+    /* Estilos específicos para a distribuição de status */
+    .distribuicao-status-container {
+        padding: 1rem 0.5rem;
+    }
+    
+    .status-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #495057;
+    }
+    
+    .status-progress-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    .status-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+    }
+    
+    .status-label-text {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .status-label-value {
+        font-weight: 700;
+        font-size: 0.9rem;
+    }
+    
+    .status-progress {
+        height: 10px;
+        border-radius: 5px;
+        background-color: #e9ecef;
+        overflow: hidden;
+    }
+    
+    .status-progress-bar {
+        height: 100%;
+        border-radius: 5px;
+        transition: width 1s ease;
+    }
+    
+    /* Classes de cores para status específicos */
+    .status-andamento {
+        background-color: #007bff;
+    }
+    
+    .status-concluido {
+        background-color: #28a745;
+    }
+    
+    .status-pendente {
+        background-color: #fd7e14;
+    }
+    
+    .status-cancelado {
+        background-color: #dc3545;
+    }
+    
+    .status-outro {
+        background-color: #6c757d;
+    }
+    
+    /* Animação para barras de progresso */
+    @keyframes progressAnimation {
+        0% { width: 0; }
+    }
+    
+    .status-progress-bar {
+        animation: progressAnimation 1.5s ease-in-out;
+    }
 </style>
 
 <script>

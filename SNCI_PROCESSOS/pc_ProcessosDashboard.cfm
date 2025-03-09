@@ -141,40 +141,20 @@
                         <!-- Incluir componentes diretos sem cards adicionais -->
                         <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_cards_metricas_processo.cfm">
                         <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_distribuicao_status.cfm">
-                        <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_tipos_processo.cfm">
-                        <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_classificacao_processo.cfm">
-
-                        <!--- Card para Gráficos --->
-                        <div class="card mb-4" id="card-graficos">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-chart-line mr-2"></i>Gráficos
-                                </h3>
+                        
+                        <!-- Estrutura de grid para colocar tipos de processo e classificação lado a lado -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_tipos_processo.cfm">
                             </div>
-                            <div class="card-body">
-                                <div id="graficos-content" class="tab-loader-container">
-                                    <div class="tab-loader">
-                                      <i class="fas fa-spinner fa-spin"></i> Carregando gráficos...
-                                    </div>
-                                </div>
+                            <div class="col-md-6">
+                                <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_classificacao_processo.cfm">
                             </div>
                         </div>
 
-                        <!--- Card para Órgãos Avaliados --->
-                        <div class="card mb-4" id="card-orgaos">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-building mr-2"></i><span id="orgaos-avaliados-titulo">Top 10 Órgãos Avaliados</span>
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div id="orgaos-content" class="tab-loader-container">
-                                    <div class="tab-loader">
-                                      <i class="fas fa-spinner fa-spin"></i> Carregando informações dos órgãos...
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <!-- Incluir componentes de gráficos e órgãos avaliados diretamente -->
+                        <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_graficos_processo.cfm">
+                        <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_orgaos_processo.cfm">
 
                     </div>
                 </section>
@@ -400,41 +380,14 @@
 
             // Função para carregar os componentes via AJAX
             function carregarComponente(componente) {
-                var targetId, targetUrl;
+                // Como os componentes já são incluídos diretamente via cfinclude,
+                // precisamos marcar explicitamente que estão carregados
+                componentesCarregados[componente] = true;
                 
-                switch(componente) {
-                    case 'graficos':
-                        targetId = "#graficos-content";
-                        targetUrl = "includes/pc_dashbord_processo/pc_dashboard_graficos_processo.cfm";
-                        break;
-                    case 'orgaosView':
-                        targetId = "#orgaos-content";
-                        targetUrl = "includes/pc_dashbord_processo/pc_dashboard_orgaos_processo.cfm";
-                        break;
-                    default:
-                        return;
-                }
-                
-                if (!componentesCarregados[componente]) {
-                    $.ajax({
-                        url: targetUrl,
-                        type: "GET",
-                        success: function(data) {
-                            $(targetId).html(data);
-                            componentesCarregados[componente] = true;
-                            
-                            // Verifica se todos os componentes foram carregados
-                            if (componentesCarregados.graficos && 
-                                componentesCarregados.orgaosView) {
-                                // Agora que todos os componentes estão carregados, carrega os dados
-                                atualizarDados();
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            $(targetId).html('<div class="alert alert-danger">Erro ao carregar o componente: ' + error + '</div>');
-                            console.error("Erro ao carregar componente:", componente, error);
-                        }
-                    });
+                // Verificar se todos os componentes estão carregados
+                if (componentesCarregados.graficos && componentesCarregados.orgaosView) {
+                    // Se ambos estiverem carregados, podemos atualizar os dados
+                    atualizarDados();
                 }
             }
         
@@ -469,7 +422,7 @@
                     }
                 });
             }
-
+        
             function carregarDadosDetalhados() {
                 $.ajax({
                     url: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
@@ -561,7 +514,7 @@
                     console.error("Erro ao fechar modal:", e);
                     
                     // Última tentativa para forçar o fechamento
-                    $('.modal-backdrop').remove();
+                    $('.modal-backdrop').remove(); 
                     $('body').removeClass('modal-open');
                     $('#modalOverlay').hide();
                 }
@@ -594,7 +547,7 @@
                 // Não fechamos o modal aqui - será fechado após o carregamento dos dados
                 // O timeout de segurança permanece como fallback
             }
-            
+        
             // Carregar o dashboard inicial
             carregarDashboard();
             
@@ -620,6 +573,11 @@
                 window.statusSelecionado = statusSelecionado;
                 carregarDashboard();
             });
+
+            // Após o ready do documento, disparar manualmente o carregamento dos componentes
+            setTimeout(function() {
+                carregarDashboard();
+            }, 500);
         });
     </script>
 </body>

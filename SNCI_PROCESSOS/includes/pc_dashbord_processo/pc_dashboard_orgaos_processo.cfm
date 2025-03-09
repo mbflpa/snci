@@ -143,20 +143,117 @@
             font-size: 1rem;
         }
     }
+    /* Estilos adicionais para órgãos - complementando os já existentes */
+    .orgaos-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .orgaos-filter {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .orgaos-filter-btn {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.8rem;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .orgaos-filter-btn:hover,
+    .orgaos-filter-btn.active {
+        background-color: #007bff;
+        color: #fff;
+        border-color: #007bff;
+    }
+    
+    .orgao-details {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .orgao-details-item {
+        display: inline-flex;
+        align-items: center;
+        margin-right: 1rem;
+    }
+    
+    .orgao-details-item i {
+        margin-right: 0.25rem;
+    }
+    
+    /* Animações para os cards de órgãos */
+    @keyframes slideInRight {
+        0% { transform: translateX(30px); opacity: 0; }
+        100% { transform: translateX(0); opacity: 1; }
+    }
+    
+    .orgao-card {
+        animation: slideInRight 0.3s forwards;
+        animation-delay: calc(0.05s * var(--animOrder, 0));
+        opacity: 0;
+    }
+    
+    /* Responsividade adicional */
+    @media (max-width: 576px) {
+        .orgaos-controls {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        
+        .orgao-badge {
+            display: none; /* Esconder badge em telas muito pequenas */
+        }
+    }
 </style>
 
-<!-- Conteúdo dos órgãos mais avaliados -->
-<div id="orgaos-mais-avaliados-container" class="orgao-container">
-    <!-- Conteúdo será preenchido dinamicamente pelo JavaScript -->
-    <div class="alert alert-info">
-        <i class="fas fa-spinner fa-spin mr-2"></i> Carregando dados dos órgãos avaliados...
+<!--- Card para Órgãos Avaliados --->
+<div class="card mb-4" id="card-orgaos">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-building mr-2"></i><span id="orgaos-avaliados-titulo">Top 10 Órgãos Avaliados</span>
+        </h3>
+    </div>
+    <div class="card-body">
+        <div id="orgaos-content">
+            <div class="tab-loader">
+              <i class="fas fa-spinner fa-spin"></i> Carregando informações dos órgãos...
+            </div>
+            
+            <!--- Conteúdo específico do componente de órgãos --->
+            <div id="orgaos-container" style="display: none;">
+                <div id="orgaos-mais-avaliados-container" class="orgao-container">
+                    <!-- Conteúdo gerado dinamicamente pelo JavaScript -->
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
+// Verificar se a variável global já existe para evitar redefinição
+if (typeof window.atualizarDadosComponentes === 'undefined') {
+    window.atualizarDadosComponentes = [];
+}
+
 $(document).ready(function() {
-    // Função para atualizar a visualização dos órgãos avaliados
+    // Definir a função de atualização
     window.atualizarViewOrgaos = function(dados) {
+        // Remove indicador de carregamento
+        $("#orgaos-content .tab-loader").hide();
+        
+        // Mostra o container de órgãos
+        $("#orgaos-container").show();
+        
         // Atualizar o título baseado no ano selecionado
         const anoSelecionado = window.anoSelecionado || "Todos";
         const anoInicial = window.anoInicial || "";
@@ -183,6 +280,8 @@ $(document).ready(function() {
             return;
         }
         
+        console.log("Visualização de órgãos atualizada com dados:", dados);
+        
         // Ordenar os órgãos por quantidade (decrescente)
         const orgaosOrdenados = dados.orgaosMaisAvaliados.sort((a, b) => b.quantidade - a.quantidade);
         
@@ -203,7 +302,7 @@ $(document).ready(function() {
             const percentual = maxQuantidade > 0 ? (orgao.quantidade / maxQuantidade) * 100 : 0;
             
             html += `
-            <div class="orgao-card">
+            <div class="orgao-card" style="--animOrder: ${index}">
                 <div class="orgao-posicao">${index + 1}</div>
                 <div class="orgao-info">
                     <div class="d-flex align-items-center">
@@ -222,5 +321,24 @@ $(document).ready(function() {
         // Atualizar o conteúdo no container
         $('#orgaos-mais-avaliados-container').html(html);
     };
+
+    // Registrar a função de atualização no array global
+    if (Array.isArray(window.atualizarDadosComponentes) &&
+        !window.atualizarDadosComponentes.includes(window.atualizarViewOrgaos)) {
+        window.atualizarDadosComponentes.push(window.atualizarViewOrgaos);
+    }
+    
+    // Informar ao script principal que este componente está carregado
+    if (typeof window.componentesCarregados !== 'undefined') {
+        window.componentesCarregados.orgaosView = true;
+        
+        // Verificar se o outro componente também está carregado
+        if (window.componentesCarregados.graficos) {
+            // Chamar a atualização de dados se ambos estiverem carregados
+            if (typeof window.atualizarDados === 'function') {
+                window.atualizarDados();
+            }
+        }
+    }
 });
 </script>

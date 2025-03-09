@@ -130,6 +130,85 @@
             font-size: 0.9rem;
         }
     }
+
+    /* Estilos específicos para classificação de processos */
+    .classificacao-container {
+        padding: 1rem;
+    }
+    
+    .classificacao-item {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.2s ease;
+    }
+    
+    .classificacao-item:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        background-color: #fff;
+    }
+    
+    .classificacao-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+    
+    .classificacao-title {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #495057;
+    }
+    
+    .classificacao-count {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #007bff;
+    }
+    
+    .classificacao-progress {
+        height: 8px;
+        background-color: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .classificacao-progress-bar {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.8s ease;
+    }
+    
+    .classificacao-badge {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 20px;
+    }
+    
+    /* Cores por classificação */
+    .classificacao-normal .classificacao-progress-bar {
+        background-color: #17a2b8;
+    }
+    
+    .classificacao-urgente .classificacao-progress-bar {
+        background-color: #fd7e14;
+    }
+    
+    .classificacao-prioritario .classificacao-progress-bar {
+        background-color: #dc3545;
+    }
+    
+    .classificacao-baixa .classificacao-progress-bar {
+        background-color: #6c757d;
+    }
 </style>
 
 <script>

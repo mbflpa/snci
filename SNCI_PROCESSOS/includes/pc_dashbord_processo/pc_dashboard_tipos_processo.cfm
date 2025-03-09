@@ -130,6 +130,76 @@
             font-size: 0.9rem;
         }
     }
+
+    /* Estilos específicos para tipos de processos */
+    .tipos-processo-container {
+        padding: 1rem;
+    }
+    
+    .tipo-processo-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        background-color: #f8f9fa;
+    }
+    
+    .tipo-processo-item:hover {
+        background-color: #f1f3f5;
+        transform: translateX(5px);
+    }
+    
+    .tipo-processo-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    .tipo-processo-info {
+        flex-grow: 1;
+    }
+    
+    .tipo-processo-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .tipo-processo-count {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .tipo-processo-percent {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-left: 1rem;
+    }
+    
+    /* Cores para diferentes tipos de processo */
+    .tipo-inspeção .tipo-processo-icon {
+        background-color: #007bff;
+    }
+    
+    .tipo-auditoria .tipo-processo-icon {
+        background-color: #fd7e14;
+    }
+    
+    .tipo-sindicância .tipo-processo-icon {
+        background-color: #dc3545;
+    }
+    
+    .tipo-acompanhamento .tipo-processo-icon {
+        background-color: #28a745;
+    }
 </style>
 
 <script>

@@ -64,34 +64,127 @@
         margin-bottom: 1rem;
         opacity: 0.5;
     }
+    /* Estilos adicionais para os gráficos - complementando os já existentes */
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .chart-header-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .chart-tooltip {
+        position: absolute;
+        background: rgba(0,0,0,0.8);
+        color: #fff;
+        padding: 10px;
+        border-radius: 5px;
+        pointer-events: none;
+        z-index: 10;
+        font-size: 14px;
+        transform: translate(-50%, -100%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .chart-tooltip.active {
+        opacity: 1;
+    }
+    
+    /* Estilos para seleção/filtragem nos gráficos */
+    .chart-filters {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .chart-filter-btn {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.8rem;
+        border-radius: 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .chart-filter-btn:hover, 
+    .chart-filter-btn.active {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #fff;
+    }
+    
+    /* Responsividade adicional */
+    @media (max-width: 768px) {
+        .graficos-row {
+            min-height: auto;
+        }
+        
+        .chart-container {
+            height: 250px;
+        }
+    }
 </style>
 
-<div class="row graficos-row">
-    <div class="col-md-6">
-        <div class="chart-card">
-            <h5 class="chart-title">
-                <i class="fas fa-chart-line"></i>Evolução Anual de Processos
-            </h5>
-            <div class="chart-container">
-                <canvas id="evolucaoChart"></canvas>
-            </div>
-            <div id="evolucaoLegend" class="chart-legend"></div>
-        </div>
+<!--- Card para Gráficos --->
+<div class="card mb-4" id="card-graficos">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-chart-line mr-2"></i>Gráficos
+        </h3>
     </div>
-    <div class="col-md-6">
-        <div class="chart-card">
-            <h5 class="chart-title">
-                <i class="fas fa-chart-pie"></i>Distribuição por Classificação de Processos
-            </h5>
-            <div class="chart-container">
-                <canvas id="classificacaoChart"></canvas>
+    <div class="card-body">
+        <div id="graficos-content">
+            <div class="tab-loader">
+                <i class="fas fa-spinner fa-spin"></i> Carregando gráficos...
             </div>
-            <div id="classificacaoLegend" class="chart-legend"></div>
+            
+            <!--- Conteúdo específico do componente de gráficos --->
+            <div id="graficos-container" class="row" style="display: none;">
+                <div class="col-md-12">
+                    <div class="row graficos-row">
+                        <div class="col-md-6">
+                            <div class="chart-card">
+                                <h5 class="chart-title">
+                                    <i class="fas fa-chart-line"></i>Evolução Anual de Processos
+                                </h5>
+                                <div class="chart-container">
+                                    <canvas id="evolucaoChart"></canvas>
+                                </div>
+                                <div id="evolucaoLegend" class="chart-legend"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-card">
+                                <h5 class="chart-title">
+                                    <i class="fas fa-chart-pie"></i>Distribuição por Classificação de Processos
+                                </h5>
+                                <div class="chart-container">
+                                    <canvas id="classificacaoChart"></canvas>
+                                </div>
+                                <div id="classificacaoLegend" class="chart-legend"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+// Verificar se a variável global já existe para evitar redefinição
+if (typeof window.atualizarDadosComponentes === 'undefined') {
+    window.atualizarDadosComponentes = [];
+}
+
 $(document).ready(function() {
     // Variáveis para armazenar as instâncias dos gráficos
     var evolucaoChart = null;
@@ -410,11 +503,38 @@ $(document).ready(function() {
     
     // Função principal para atualizar os gráficos com novos dados
     window.atualizarGraficos = function(dados) {
+        // Remove indicador de carregamento
+        $("#graficos-content .tab-loader").hide();
+        
+        // Mostra o container de gráficos
+        $("#graficos-container").show();
+        
         if (!dados) return;
+        
+        console.log("Gráficos atualizados com dados:", dados);
         
         // Renderizar ou atualizar os gráficos
         renderEvolucaoChart(dados.evolucaoMensal);
         renderClassificacaoChart(dados.distribuicaoClassificacao, dados.totalProcessos);
     };
+    
+    // Registrar a função de atualização no array global
+    if (Array.isArray(window.atualizarDadosComponentes) && 
+        !window.atualizarDadosComponentes.includes(window.atualizarGraficos)) {
+        window.atualizarDadosComponentes.push(window.atualizarGraficos);
+    }
+    
+    // Informar ao script principal que este componente está carregado
+    if (typeof window.componentesCarregados !== 'undefined') {
+        window.componentesCarregados.graficos = true;
+        
+        // Verificar se o outro componente também está carregado
+        if (window.componentesCarregados.orgaosView) {
+            // Chamar a atualização de dados se ambos estiverem carregados
+            if (typeof window.atualizarDados === 'function') {
+                window.atualizarDados();
+            }
+        }
+    }
 });
 </script>
