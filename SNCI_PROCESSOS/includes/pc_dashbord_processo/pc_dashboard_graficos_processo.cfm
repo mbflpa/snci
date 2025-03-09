@@ -250,7 +250,7 @@ $(document).ready(function() {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: '', // Removendo o texto do label para não aparecer na legenda
+                    label: 'Quantidade de Processos', 
                     data: quantidades,
                     backgroundColor: function(context) {
                         const chart = context.chart;
@@ -274,9 +274,9 @@ $(document).ready(function() {
                 maintainAspectRatio: false,
                 layout: {
                     padding: {
-                        top: 40, // Padding maior para acomodar os valores
+                        top: 40,
                         right: 20,
-                        bottom: 10,
+                        bottom: 40, // Aumentado para acomodar a legenda inferior
                         left: 10
                     }
                 },
@@ -312,28 +312,30 @@ $(document).ready(function() {
                         }
                     }
                 },
-                plugins: {
-                    legend: {
-                        display: false // Desativando a legenda
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        titleFont: {
-                            size: 14,
-                            weight: 'bold'
+                // Em Chart.js v2.9.4, a legenda está no nível raiz das opções, não em plugins
+                legend: {
+                    display: true,
+                    position: 'bottom', // Posicionando a legenda na parte inferior
+                    labels: {
+                        boxWidth: 15,
+                        fontSize: 12, // Em v2.9.4 é fontSize, não font.size
+                        padding: 15
+                    }
+                },
+                // Em Chart.js v2.9.4, tooltips é separado, não está dentro de plugins
+                tooltips: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleFontSize: 14, // Em v2.9.4 é titleFontSize, não titleFont.size
+                    titleFontStyle: 'bold',
+                    bodyFontSize: 13, // Em v2.9.4 é bodyFontSize, não bodyFont.size
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            return 'Ano ' + tooltipItems[0].label;
                         },
-                        bodyFont: {
-                            size: 13
-                        },
-                        padding: 12,
-                        displayColors: false,
-                        callbacks: {
-                            title: function(tooltipItems) {
-                                return 'Ano ' + tooltipItems[0].label;
-                            },
-                            label: function(context) {
-                                return 'Total de Processos: ' + context.raw;
-                            }
+                        label: function(context) {
+                            return 'Total de Processos: ' + context.raw;
                         }
                     }
                 },
@@ -371,11 +373,11 @@ $(document).ready(function() {
                 }
             }]
         });
-        
+      
         // Não precisamos mais desta linha pois removemos a div de legenda do HTML
         // $('#evolucaoLegend').html('');
     }
-    
+  
     // Função para criar ou atualizar o gráfico de classificações
     function renderClassificacaoChart(dados, total) {
         const ctx = document.getElementById('classificacaoChart').getContext('2d');
