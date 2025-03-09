@@ -155,8 +155,23 @@
 
 <script>
 $(document).ready(function() {
-    // Função para atualizar a visualização dos órgãos mais avaliados
+    // Função para atualizar a visualização dos órgãos avaliados
     window.atualizarViewOrgaos = function(dados) {
+        // Atualizar o título baseado no ano selecionado
+        const anoSelecionado = window.anoSelecionado || "Todos";
+        const anoInicial = window.anoInicial || "";
+        const anoFinal = window.anoFinal || "";
+        
+        if (anoSelecionado === "Todos") {
+            if (anoInicial && anoFinal) {
+                $('#orgaos-avaliados-titulo').text(`Top 10 Órgãos Avaliados ( ${anoInicial} - ${anoFinal} )`);
+            } else {
+                $('#orgaos-avaliados-titulo').text("Top 10 Órgãos Avaliados");
+            }
+        } else {
+            $('#orgaos-avaliados-titulo').text("Órgãos Avaliados de " + anoSelecionado);
+        }
+
         if (!dados || !dados.orgaosMaisAvaliados || dados.orgaosMaisAvaliados.length === 0) {
             // Se não houver dados, mostrar mensagem
             $('#orgaos-mais-avaliados-container').html(`
@@ -168,18 +183,22 @@ $(document).ready(function() {
             return;
         }
         
-        // Ordenar os órgãos por quantidade (decrescente) e limitar aos top 10
-        const orgaosOrdenados = dados.orgaosMaisAvaliados
-            .sort((a, b) => b.quantidade - a.quantidade)
-            .slice(0, 10);
+        // Ordenar os órgãos por quantidade (decrescente)
+        const orgaosOrdenados = dados.orgaosMaisAvaliados.sort((a, b) => b.quantidade - a.quantidade);
+        
+        // Verificar se o ano selecionado é "Todos" para aplicar limite
+        let orgaosExibidos = orgaosOrdenados;
+        if (anoSelecionado === "Todos" && orgaosOrdenados.length > 10) {
+            orgaosExibidos = orgaosOrdenados.slice(0, 10);
+        }
         
         // Encontrar o maior valor para calcular percentuais
-        const maxQuantidade = orgaosOrdenados.length > 0 ? orgaosOrdenados[0].quantidade : 0;
+        const maxQuantidade = orgaosExibidos.length > 0 ? orgaosExibidos[0].quantidade : 0;
         
         // Construir o HTML para cada órgão
         let html = '';
         
-        orgaosOrdenados.forEach((orgao, index) => {
+        orgaosExibidos.forEach((orgao, index) => {
             // Calcular percentual para a barra de progresso
             const percentual = maxQuantidade > 0 ? (orgao.quantidade / maxQuantidade) * 100 : 0;
             

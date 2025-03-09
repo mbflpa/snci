@@ -163,9 +163,10 @@
             ORDER BY quantidade DESC
         </cfquery>
 
-        <!--- Consulta para órgãos mais avaliados --->
+        <!--- Consulta para órgãos mais avaliados - Removido o TOP 10 fixo --->
         <cfquery name="qryOrgaosMaisAvaliados" datasource="#application.dsn_processos#">
-            SELECT TOP 10
+            SELECT
+                <cfif arguments.ano EQ "Todos">TOP 10</cfif>
                 o.pc_org_sigla,
                 o.pc_org_mcu,
                 COUNT(p.pc_processo_id) as quantidade

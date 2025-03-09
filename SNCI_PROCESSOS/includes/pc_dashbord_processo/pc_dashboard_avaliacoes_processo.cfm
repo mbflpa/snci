@@ -212,7 +212,7 @@
 <div class="row distribuicao-tipos-container">
     <div class="col-md-6">
         <h5 class="icon-title">
-            <i class="fas fa-clipboard-list"></i>Top 10 Tipos de Processos
+            <i class="fas fa-clipboard-list"></i><span id="tipos-processo-titulo">Top 10 Tipos de Processos</span>
         </h5>
         <div id="tipos-container">
             <!-- Tipos de processos serão inseridos aqui via JavaScript -->
@@ -262,7 +262,22 @@ $(document).ready(function() {
     // Função para atualizar a visualização de status
     window.atualizarViewStatus = function(dados) {
         if (!dados) return;
-        console.log("DADOS DOS TIPOS DE PROCESSOS:" + dados.distribuicaoTipos);
+        
+        // Atualizar o título dos tipos de processos com base no ano selecionado
+        const anoSelecionado = window.anoSelecionado || "Todos";
+        const anoInicial = window.anoInicial || "";
+        const anoFinal = window.anoFinal || "";
+        
+        if (anoSelecionado === "Todos") {
+            if (anoInicial && anoFinal) {
+                $('#tipos-processo-titulo').text(`Top 10 Tipos de Processos ( ${anoInicial} - ${anoFinal} )`);
+            } else {
+                $('#tipos-processo-titulo').text("Top 10 Tipos de Processos");
+            }
+        } else {
+            $('#tipos-processo-titulo').text("Tipos de Processos de " + anoSelecionado);
+        }
+        
         // Atualizar cards de status, passando o status selecionado
         atualizarCardsStatus(dados.distribuicaoStatus);
         
@@ -367,16 +382,21 @@ $(document).ready(function() {
             return;
         }
         
-        // Ordenar por quantidade e limitar aos top 10
+        // Ordenar por quantidade (decrescente)
         tiposData.sort((a, b) => b.quantidade - a.quantidade);
-        const top10Tipos = tiposData.slice(0, 10);
+        
+        // Verificar se o ano selecionado é "Todos" para limitar a 10 itens
+        const anoSelecionado = window.anoSelecionado || "Todos";
+        let tiposExibidos = tiposData;
+        if (anoSelecionado === "Todos") {
+            tiposExibidos = tiposData.slice(0, 10); // Limitar aos 10 primeiros apenas quando for "Todos"
+        }
         
         let htmlTipos = '';
         
-        top10Tipos.forEach(function(tipo, index) {
+        tiposExibidos.forEach(function(tipo, index) {
             // Usar a descrição que já vem formatada corretamente do servidor
             let tipoDescricao = tipo.descricao;
-            
             
             const percentual = totalProcessos > 0 ? ((tipo.quantidade / totalProcessos) * 100).toFixed(1) : 0;
             const corIndex = index % coresTipos.length;
