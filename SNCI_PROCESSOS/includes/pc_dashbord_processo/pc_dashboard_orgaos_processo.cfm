@@ -244,7 +244,7 @@ $(document).ready(function() {
                 $('#orgaos-avaliados-titulo').text("Top 10 Órgãos Avaliados");
             }
         } else {
-            $('#orgaos-avaliados-titulo').text("Órgãos Avaliados de " + anoSelecionado);
+            $('#orgaos-avaliados-titulo').text("Órgãos Avaliados em " + anoSelecionado);
         }
 
         if (!dados || !dados.orgaosMaisAvaliados || dados.orgaosMaisAvaliados.length === 0) {

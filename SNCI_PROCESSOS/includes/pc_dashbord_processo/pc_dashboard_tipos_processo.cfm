@@ -261,7 +261,7 @@ $(document).ready(function() {
                     novoTitulo = `Top 10 Tipos de Processos ( ${anoInicial} - ${anoFinal} )`;
                 }
             } else {
-                novoTitulo = `Tipos de Processos de ${anoSelecionado}`;
+                novoTitulo = `Tipos de Processos em ${anoSelecionado}`;
             }
             
             $('.tipos-processo-titulo').text(novoTitulo);
