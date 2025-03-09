@@ -138,79 +138,11 @@
                             </div>
                         </div>
 
-                        <!-- Incluir o componente de cards de métricas -->
+                        <!-- Incluir componentes diretos sem cards adicionais -->
                         <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_cards_metricas_processo.cfm">
-
-                        <!--- Card para Distribuição de Processos por Status --->
-                        <div class="card mb-4" id="card-status-distribuicao">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-chart-pie mr-2"></i>Distribuição de Processos por Status
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div id="status-container" class="tab-loader-container">
-                                    <div class="tab-loader">
-                                      <i class="fas fa-spinner fa-spin"></i> Carregando distribuição por status...
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!--- Cards para Tipos de Processos e Classificação lado a lado --->
-                        <div class="row">
-                            <!--- Card para Top 10 Tipos de Processos --->
-                            <div class="col-md-6">
-                                <div class="card mb-4" id="card-tipos">
-                                    <div class="card-header">
-                                        <h3 class="card-title">
-                                            <i class="fas fa-clipboard-list mr-2"></i><span id="tipos-processo-titulo">Top 10 Tipos de Processos</span>
-                                        </h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="tipos-container" class="tab-loader-container">
-                                            <div class="tab-loader">
-                                              <i class="fas fa-spinner fa-spin"></i> Carregando tipos de processos...
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!--- Card para Classificação de Processos --->
-                            <div class="col-md-6">
-                                <div class="card mb-4" id="card-classificacao">
-                                    <div class="card-header">
-                                        <h3 class="card-title">
-                                            <i class="fas fa-tag mr-2"></i>Classificação de Processos
-                                        </h3>
-                                    </div>
-                                    <div class="card-body">
-                                        <div id="classificacao-container" class="tab-loader-container">
-                                            <div class="tab-loader">
-                                              <i class="fas fa-spinner fa-spin"></i> Carregando classificações...
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!--- Card para Distribuição por Status --->
-                        <div class="card mb-4" id="card-status">
-                            <div class="card-header">
-                                <h3 class="card-title">
-                                    <i class="fas fa-tasks mr-2"></i>Distribuição por Status
-                                </h3>
-                            </div>
-                            <div class="card-body">
-                                <div id="status-content" class="tab-loader-container">
-                                    <div class="tab-loader">
-                                      <i class="fas fa-spinner fa-spin"></i> Carregando distribuição por status...
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_distribuicao_status.cfm">
+                        <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_tipos_processo.cfm">
+                        <cfinclude template="includes/pc_dashbord_processo/pc_dashboard_classificacao_processo.cfm">
 
                         <!--- Card para Gráficos --->
                         <div class="card mb-4" id="card-graficos">
@@ -270,6 +202,9 @@
     <script src="plugins/chart.js/Chart.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Inicializar o array global para armazenar callbacks de componentes
+            window.atualizarDadosComponentes = [];
+            
             // Inicializar tooltips e popovers com configurações avançadas
             $('[data-toggle="tooltip"]').tooltip({
                 container: 'body',
@@ -456,10 +391,6 @@
 
             // Variável para controlar se os componentes já foram carregados
             var componentesCarregados = {
-                statusContainer: false,
-                statusView: false,
-                tiposContainer: false,
-                classContainer: false,
                 graficos: false,
                 orgaosView: false
             };
@@ -472,22 +403,6 @@
                 var targetId, targetUrl;
                 
                 switch(componente) {
-                    case 'statusContainer':
-                        targetId = "#status-container";
-                        targetUrl = "includes/pc_dashbord_processo/pc_dashboard_status_cards.cfm";
-                        break;
-                    case 'statusView':
-                        targetId = "#status-content";
-                        targetUrl = "includes/pc_dashbord_processo/pc_dashboard_avaliacoes_processo.cfm";
-                        break;
-                    case 'tiposContainer':
-                        targetId = "#tipos-container";
-                        targetUrl = "includes/pc_dashbord_processo/pc_dashboard_tipos_processo.cfm";
-                        break;
-                    case 'classContainer':
-                        targetId = "#classificacao-container";
-                        targetUrl = "includes/pc_dashbord_processo/pc_dashboard_classificacao_processo.cfm";
-                        break;
                     case 'graficos':
                         targetId = "#graficos-content";
                         targetUrl = "includes/pc_dashbord_processo/pc_dashboard_graficos_processo.cfm";
@@ -509,11 +424,7 @@
                             componentesCarregados[componente] = true;
                             
                             // Verifica se todos os componentes foram carregados
-                            if (componentesCarregados.statusContainer && 
-                                componentesCarregados.statusView &&
-                                componentesCarregados.tiposContainer &&
-                                componentesCarregados.classContainer &&
-                                componentesCarregados.graficos && 
+                            if (componentesCarregados.graficos && 
                                 componentesCarregados.orgaosView) {
                                 // Agora que todos os componentes estão carregados, carrega os dados
                                 atualizarDados();
@@ -573,22 +484,36 @@
                         console.log("Dados detalhados recebidos com sucesso:", resultado);
                         dadosCarregados = true;
                         
-                        // Atualizar componentes de status
-                        if (componentesCarregados.statusContainer && typeof window.atualizarStatusCards === 'function') {
-                            window.atualizarStatusCards(resultado.distribuicaoStatus);
+                        // Armazenar os dados atuais globalmente para que os componentes possam acessá-los
+                        window.dadosAtuais = resultado;
+                        
+                        // Atualizar os métricos gerais
+                        if (typeof window.atualizarCardsProcMet === 'function') {
+                            window.atualizarCardsProcMet(resultado);
                         }
                         
-                        if (componentesCarregados.statusView && typeof window.atualizarViewStatus === 'function') {
-                            window.atualizarViewStatus(resultado);
+                        // Atualizar o componente de distribuição de status
+                        if (typeof window.atualizarDistribuicaoStatus === 'function') {
+                            window.atualizarDistribuicaoStatus(resultado.distribuicaoStatus);
                         }
                         
-                        // Atualizar componentes de tipos e classificação
-                        if (componentesCarregados.tiposContainer && typeof window.atualizarTiposProcessos === 'function') {
-                            window.atualizarTiposProcessos(resultado.distribuicaoTipos, resultado.totalProcessos);
+                        // Atualizar o componente de tipos de processos
+                        if (typeof window.atualizarTiposProcesso === 'function') {
+                            window.atualizarTiposProcesso(resultado.distribuicaoTipos, resultado.totalProcessos);
                         }
                         
-                        if (componentesCarregados.classContainer && typeof window.atualizarClassificacaoProcessos === 'function') {
-                            window.atualizarClassificacaoProcessos(resultado.distribuicaoClassificacao, resultado.totalProcessos);
+                        // Atualizar o componente de classificação de processos
+                        if (typeof window.atualizarClassificacaoProcesso === 'function') {
+                            window.atualizarClassificacaoProcesso(resultado.distribuicaoClassificacao, resultado.totalProcessos);
+                        }
+                        
+                        // Chamar todas as funções de atualização registradas
+                        if (Array.isArray(window.atualizarDadosComponentes)) {
+                            window.atualizarDadosComponentes.forEach(function(atualizarFn) {
+                                if (typeof atualizarFn === 'function') {
+                                    atualizarFn(resultado);
+                                }
+                            });
                         }
                         
                         // Atualizar gráficos e órgãos avaliados
@@ -659,18 +584,10 @@
                 
                 // Resetar o estado de carregamento
                 dadosCarregados = false;
-                componentesCarregados.statusContainer = false;
-                componentesCarregados.statusView = false;
-                componentesCarregados.tiposContainer = false;
-                componentesCarregados.classContainer = false;
                 componentesCarregados.graficos = false;
                 componentesCarregados.orgaosView = false;
                 
                 // Carregar os componentes - a função atualizarDados será chamada quando todos estiverem prontos
-                carregarComponente('statusContainer');
-                carregarComponente('statusView');
-                carregarComponente('tiposContainer');
-                carregarComponente('classContainer');
                 carregarComponente('graficos');
                 carregarComponente('orgaosView');
                 
