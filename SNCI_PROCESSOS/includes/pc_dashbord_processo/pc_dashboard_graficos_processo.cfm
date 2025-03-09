@@ -250,14 +250,8 @@ $(document).ready(function() {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Processos por Ano',
+                    label: '', // Removendo o texto do label para não aparecer na legenda
                     data: quantidades,
-                    backgroundColor: 'rgba(0, 123, 255, 0.7)',
-                    borderColor: '#007bff',
-                    borderWidth: 1,
-                    barPercentage: 0.7,
-                    categoryPercentage: 0.8,
-                    // Adicionar gradiente
                     backgroundColor: function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
@@ -269,11 +263,10 @@ $(document).ready(function() {
                         gradient.addColorStop(1, 'rgba(0, 123, 255, 0.9)');
                         return gradient;
                     },
-                    // Adicionar sombra
-                    shadowColor: 'rgba(0, 0, 0, 0.1)',
-                    shadowBlur: 10,
-                    shadowOffsetX: 0,
-                    shadowOffsetY: 5
+                    borderColor: '#007bff',
+                    borderWidth: 1,
+                    barPercentage: 0.7,
+                    categoryPercentage: 0.8
                 }]
             },
             options: {
@@ -281,7 +274,7 @@ $(document).ready(function() {
                 maintainAspectRatio: false,
                 layout: {
                     padding: {
-                        top: 20,
+                        top: 40, // Padding maior para acomodar os valores
                         right: 20,
                         bottom: 10,
                         left: 10
@@ -301,13 +294,7 @@ $(document).ready(function() {
                             }
                         },
                         title: {
-                            display: false, // Removendo o título do eixo Y
-                            text: '',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            },
-                            padding: {top: 10, bottom: 10}
+                            display: false
                         }
                     },
                     x: {
@@ -321,19 +308,13 @@ $(document).ready(function() {
                             }
                         },
                         title: {
-                            display: false, // Removendo o título do eixo X
-                            text: '',
-                            font: {
-                                size: 14,
-                                weight: 'bold'
-                            },
-                            padding: {top: 10, bottom: 10}
+                            display: false
                         }
                     }
                 },
                 plugins: {
                     legend: {
-                        display: false // Já estava desativado, mantendo assim
+                        display: false // Desativando a legenda
                     },
                     tooltip: {
                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
@@ -362,19 +343,28 @@ $(document).ready(function() {
                 }
             },
             plugins: [{
-                // Adicionar labels com valores acima das barras
-                id: 'chartLabels',
-                afterDatasetsDraw(chart) {
-                    const {ctx, data, scales} = chart;
-                    chart.data.datasets.forEach((dataset, datasetIndex) => {
-                        const meta = chart.getDatasetMeta(datasetIndex);
+                id: 'datalabels',
+                afterDatasetsDraw: function(chart) {
+                    const ctx = chart.ctx;
+                    
+                    chart.data.datasets.forEach(function(dataset, i) {
+                        const meta = chart.getDatasetMeta(i);
+                        
                         if (!meta.hidden) {
-                            meta.data.forEach((element, index) => {
-                                const value = dataset.data[index];
-                                ctx.fillStyle = '#333333';
-                                ctx.font = 'bold 12px Arial';
+                            meta.data.forEach(function(element, index) {
+                                // Configuração do texto
+                                ctx.fillStyle = '#333';
+                                ctx.font = 'bold 14px Arial';
                                 ctx.textAlign = 'center';
-                                ctx.fillText(value, element.x, element.y - 10);
+                                
+                                // Obter o valor para mostrar
+                                const value = dataset.data[index];
+                                
+                                // Calcular a posição exata
+                                const position = element.tooltipPosition();
+                                
+                                // Desenhar o valor acima da barra
+                                ctx.fillText(value, position.x, position.y - 15);
                             });
                         }
                     });
@@ -382,8 +372,8 @@ $(document).ready(function() {
             }]
         });
         
-        // Remover a legenda manual totalmente
-        $('#evolucaoLegend').html('');
+        // Não precisamos mais desta linha pois removemos a div de legenda do HTML
+        // $('#evolucaoLegend').html('');
     }
     
     // Função para criar ou atualizar o gráfico de classificações
@@ -428,9 +418,15 @@ $(document).ready(function() {
             visibleCores.push('#6c757d'); // Cor cinza para "Outros"
         }
         
+        // Preparar os rótulos com quantidade e percentual
+        const formattedLabels = visibleLabels.map((label, index) => {
+            const percentage = ((visibleQuantidades[index] / total) * 100).toFixed(1);
+            return `${label} (${visibleQuantidades[index]} - ${percentage}%)`;
+        });
+        
         // Se o gráfico já existe, atualizá-lo
         if (classificacaoChart) {
-            classificacaoChart.data.labels = visibleLabels;
+            classificacaoChart.data.labels = formattedLabels;
             classificacaoChart.data.datasets[0].data = visibleQuantidades;
             classificacaoChart.update();
             return;
@@ -440,7 +436,7 @@ $(document).ready(function() {
         classificacaoChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: visibleLabels,
+                labels: formattedLabels,
                 datasets: [{
                     data: visibleQuantidades,
                     backgroundColor: visibleCores,
@@ -454,30 +450,13 @@ $(document).ready(function() {
                 cutout: '60%',
                 plugins: {
                     legend: {
-                        display: true, // Ativando a exibição da legenda
-                        position: 'top', // Posicionando a legenda no topo
+                        display: true, // Exibir a legenda para este gráfico
+                        position: 'top',
                         labels: {
-                            generateLabels: function(chart) {
-                                const data = chart.data;
-                                if (data.labels.length && data.datasets.length) {
-                                    return data.labels.map(function(label, i) {
-                                        const meta = chart.getDatasetMeta(0);
-                                        const style = meta.controller.getStyle(i);
-                                        
-                                        return {
-                                            text: label + ' (' + data.datasets[0].data[i] + ')',
-                                            fillStyle: style.backgroundColor,
-                                            strokeStyle: style.borderColor,
-                                            lineWidth: style.borderWidth,
-                                            hidden: isNaN(data.datasets[0].data[i]) || meta.data[i].hidden,
-                                            index: i
-                                        };
-                                    });
-                                }
-                                return [];
-                            },
                             boxWidth: 10,
-                            fontSize: 11,
+                            font: {
+                                size: 11
+                            },
                             padding: 10
                         }
                     },
@@ -493,9 +472,7 @@ $(document).ready(function() {
                         padding: 12,
                         callbacks: {
                             label: function(context) {
-                                const value = context.raw;
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return context.label + ': ' + value + ' (' + percentage + '%)';
+                                return context.label; // Já está formatado com valor e percentual
                             }
                         }
                     }
@@ -504,10 +481,39 @@ $(document).ready(function() {
                     animateRotate: true,
                     animateScale: true
                 }
-            }
+            },
+            plugins: [{
+                id: 'doughnutLabels',
+                afterDraw: function(chart) {
+                    const ctx = chart.ctx;
+                    const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+                    
+                    // Cálculo do centro do gráfico
+                    const width = chart.chartArea.right - chart.chartArea.left;
+                    const height = chart.chartArea.bottom - chart.chartArea.top;
+                    const centerX = chart.chartArea.left + width / 2;
+                    const centerY = chart.chartArea.top + height / 2;
+                    
+                    // Configuração para texto no centro do gráfico
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    // Texto para o total
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillStyle = '#333';
+                    ctx.fillText('Total', centerX, centerY - 15);
+                    
+                    // Valor total
+                    ctx.font = 'bold 22px Arial';
+                    ctx.fillStyle = '#007bff';
+                    ctx.fillText(total, centerX, centerY + 15);
+                    
+                    // Não desenhamos textos nas fatias
+                }
+            }]
         });
         
-        // Remover a legenda manual já que agora usamos a legenda do Chart.js
+        // Remover a legenda manual
         $('#classificacaoLegend').html('');
     }
     
