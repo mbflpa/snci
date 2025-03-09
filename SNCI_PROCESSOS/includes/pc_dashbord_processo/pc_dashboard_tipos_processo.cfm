@@ -220,6 +220,13 @@
     .tipo-acompanhamento .tipo-processo-icon {
         background-color: #28a745;
     }
+
+    /* Estilo para o label de processos */
+    .tipo-label {
+        font-size: 0.7rem;
+        color: #888;
+        font-weight: normal;
+    }
 </style>
 
 <script>
@@ -285,13 +292,13 @@ $(document).ready(function() {
             // Calcular total real somando as quantidades de todos os tipos
             const totalReal = tiposData.reduce((sum, tipo) => {
                 // Converter para número e somar
-                const quantidade = parseInt(tipo.quantidade.toString().replace(/[^0-9]/g, ''), 10) || 0;
+                const quantidade = tipo.quantidade;
                 return sum + quantidade;
             }, 0);
             
             tiposExibidos.forEach(function(tipo, index) {
                 // Garantir que a quantidade seja um número
-                const quantidadeTipo = parseInt(tipo.quantidade.toString().replace(/[^0-9]/g, ''), 10) || 0;
+                const quantidadeTipo = tipo.quantidade;
                 
                 // Calcular o percentual usando o total real
                 const percentual = totalReal > 0 ? ((quantidadeTipo / totalReal) * 100).toFixed(1) : 0;
@@ -307,7 +314,7 @@ $(document).ready(function() {
                     <div class="tipo-info">
                         <div class="tipo-descricao">${tipo.descricao}</div>
                         <div class="tipo-metricas">
-                            <div class="tipo-quantidade">${quantidadeTipo}</div>
+                            <div class="tipo-quantidade">${quantidadeTipo} <span class="tipo-label">processo(s)</span></div>
                             <div class="tipo-percentual">${percentual}% dos processos</div>
                         </div>
                         <div class="tipo-grafico-barra">

@@ -227,7 +227,7 @@
                 <cfset arrayAppend(tiposArray, {
                     "id": id,
                     "descricao": descricaoComposta,
-                    "quantidade": quantidade & " processo(s)"
+                    "quantidade": quantidade
                 })>
            
         </cfloop>

@@ -242,6 +242,13 @@
     .classificacao-item:nth-child(3) .classificacao-grafico-progresso {
         background: linear-gradient(90deg, #20c997, #17a2b8);
     }
+
+    /* Estilo para o label de processos */
+    .classificacao-label {
+        font-size: 0.7rem;
+        color: #888;
+        font-weight: normal;
+    }
 </style>
 
 <script>
@@ -287,7 +294,7 @@ $(document).ready(function() {
                     <div class="classificacao-info">
                         <div class="classificacao-descricao">${classificacao.descricao}</div>
                         <div class="classificacao-metricas">
-                            <div class="classificacao-quantidade">${classificacao.quantidade}</div>
+                            <div class="classificacao-quantidade">${classificacao.quantidade} <span class="classificacao-label">processo(s)</span></div>
                             <div class="classificacao-percentual">${percentual}% dos processos</div>
                         </div>
                         <div class="classificacao-grafico-barra">

@@ -172,6 +172,13 @@
         animation-delay: calc(0.05s * var(--animOrder, 0));
         opacity: 0;
     }
+    
+    /* Estilo para o label de processos */
+    .orgao-label {
+        font-size: 0.7rem;
+        color: #888;
+        font-weight: normal;
+    }
 </style>
 
 <!--- Card para Órgãos Avaliados --->
@@ -262,20 +269,20 @@ $(document).ready(function() {
             orgaosExibidos = orgaosOrdenados.slice(0, 10);
         }
         
-        // Calcular o total de processos somando as quantidades de todos os órgãos exibidos
-        const totalProcessos = orgaosExibidos.reduce((sum, orgao) => sum + parseInt(orgao.quantidade || 0), 0);
+        // Usar o total geral de processos fornecido pelos dados, não a soma dos órgãos exibidos
+        const totalProcessos = dados.totalProcessos || 0;
         
-        // Encontrar o maior valor para calcular o tamanho da barra de progresso (estético)
+        // Encontrar o maior valor entre os órgãos exibidos para cálculo da barra de progresso
         const maxQuantidade = orgaosExibidos.length > 0 ? orgaosExibidos[0].quantidade : 0;
         
         // Construir o HTML para cada órgão
         let html = '';
         
         orgaosExibidos.forEach((orgao, index) => {
-            // Calcular percentual baseado no total de processos (cálculo correto)
+            // Calcular percentual em relação ao total geral de processos
             const percentual = totalProcessos > 0 ? (orgao.quantidade / totalProcessos) * 100 : 0;
             
-            // Calcular a largura da barra com base no valor máximo (apenas para visual)
+            // Calcular a largura da barra apenas para visual (em relação ao máximo exibido)
             const larguraBarra = maxQuantidade > 0 ? (orgao.quantidade / maxQuantidade) * 100 : 0;
             
             // Usar cores alternadas para os órgãos, seguindo o mesmo padrão do componente de tipos
@@ -291,7 +298,7 @@ $(document).ready(function() {
                         <span class="orgao-badge">${orgao.mcu}</span>
                     </div>
                     <div class="orgao-metricas">
-                        <div class="orgao-quantidade">${orgao.quantidade}</div>
+                        <div class="orgao-quantidade">${orgao.quantidade} <span class="orgao-label">processo(s)</span></div>
                         <div class="orgao-percentual">${percentual.toFixed(1)}% do total</div>
                     </div>
                     <div class="orgao-grafico-barra">
