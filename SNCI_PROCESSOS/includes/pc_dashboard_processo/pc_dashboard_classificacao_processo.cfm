@@ -323,6 +323,25 @@ $(document).ready(function() {
         if (window.dadosAtuais && window.dadosAtuais.distribuicaoClassificacao) {
             window.atualizarClassificacaoProcesso(window.dadosAtuais.distribuicaoClassificacao, window.dadosAtuais.totalProcessos);
         }
+
+         // Inicializar o ícone de favorito para este card
+        const cardId = 'card-classificacao-processo';
+         // Caminho do componente para o ícone de favorito
+         // O caminho deve ser relativo ao diretório raiz do projeto
+         // Exemplo: 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processos.cfm'
+        const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processos.cfm';
+         // Adicionar o ícone de favorito ao cabeçalho do card
+         // Verificar se a função initFavoriteIcon está disponível
+        const componentTitle = 'Indicadores de Processos';
+        
+        // Verificar se a função initFavoriteIcon está disponível
+        if (typeof initFavoriteIcon === 'function') {
+            // Adicionar o ícone de favorito ao cabeçalho do card
+            initFavoriteIcon(cardId, componentPath, componentTitle);
+        } else {
+            console.error('A função initFavoriteIcon não está disponível. Verifique se o arquivo snciProcesso.js foi carregado corretamente.');
+        }
+
     }
 });
 </script>

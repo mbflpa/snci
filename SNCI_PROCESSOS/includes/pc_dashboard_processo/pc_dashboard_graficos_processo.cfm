@@ -554,5 +554,16 @@ $(document).ready(function() {
             }
         }
     }
+
+    // Inicializar o ícone de favorito para este card
+    const cardId = 'card-graficos';
+    const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_graficos_processo.cfm';
+    const componentTitle = 'Indicadores de Processos';
+    
+    // Verificar se a função initFavoriteIcon está disponível
+    if (typeof initFavoriteIcon === 'function') {
+        // Adicionar o ícone de favorito ao cabeçalho do card
+        initFavoriteIcon(cardId, componentPath, componentTitle);
+    }
 });
 </script>

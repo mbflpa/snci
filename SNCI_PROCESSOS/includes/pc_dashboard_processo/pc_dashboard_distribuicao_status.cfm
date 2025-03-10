@@ -303,6 +303,19 @@ $(document).ready(function() {
             
             $('#distribuicao-status-container').html(htmlStatus);
         };
+
+         // Inicializar o ícone de favorito para este card
+        const cardId = 'card-distribuicao-status';
+        const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_distribuicao_status.cfm';
+        const componentTitle = 'Indicadores de Processos';
+        
+        // Verificar se a função initFavoriteIcon está disponível
+        if (typeof initFavoriteIcon === 'function') {
+            // Adicionar o ícone de favorito ao cabeçalho do card
+            initFavoriteIcon(cardId, componentPath, componentTitle);
+        } else {
+            console.error('A função initFavoriteIcon não está disponível. Verifique se o arquivo snciProcesso.js foi carregado corretamente.');
+        }
     }
     
     // Adicionar este código para garantir que o componente seja incluído na atualização de dados

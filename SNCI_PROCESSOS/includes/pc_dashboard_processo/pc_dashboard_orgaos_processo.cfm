@@ -331,5 +331,16 @@ $(document).ready(function() {
             }
         }
     }
+
+    // Inicializar o ícone de favorito para este card
+    const cardId = 'card-orgaos';
+    const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_orgaos_processo.cfm';
+    const componentTitle = 'Órgãos Avaliados';
+    
+    // Verificar se a função initFavoriteIcon está disponível
+    if (typeof initFavoriteIcon === 'function') {
+        // Adicionar o ícone de favorito ao cabeçalho do card
+        initFavoriteIcon(cardId, componentPath, componentTitle);
+    }
 });
 </script>

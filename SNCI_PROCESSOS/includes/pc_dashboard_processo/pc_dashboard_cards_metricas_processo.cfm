@@ -150,6 +150,19 @@ $(document).ready(function() {
             window.animateNumberValue(elTotalProcessos, window.previousCardValues.totalProcessos, totalProcessos, 1000);
             window.previousCardValues.totalProcessos = totalProcessos;
         };
+        
+        // Inicializar o ícone de favorito para este card
+        const cardId = 'card-metricas-processo';
+        const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_cards_metricas_processo.cfm';
+        const componentTitle = 'Indicadores de Processos';
+        
+        // Verificar se a função initFavoriteIcon está disponível
+        if (typeof initFavoriteIcon === 'function') {
+            // Adicionar o ícone de favorito ao cabeçalho do card
+            initFavoriteIcon(cardId, componentPath, componentTitle);
+        } else {
+            console.error('A função initFavoriteIcon não está disponível. Verifique se o arquivo snciProcesso.js foi carregado corretamente.');
+        }
     }
 });
 </script>
