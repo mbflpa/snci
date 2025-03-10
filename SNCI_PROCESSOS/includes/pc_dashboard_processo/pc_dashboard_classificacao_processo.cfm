@@ -328,8 +328,8 @@ $(document).ready(function() {
         const cardId = 'card-classificacao-processo';
          // Caminho do componente para o ícone de favorito
          // O caminho deve ser relativo ao diretório raiz do projeto
-         // Exemplo: 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processos.cfm'
-        const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processos.cfm';
+         // Exemplo: 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processo.cfm'
+        const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processo.cfm';
          // Adicionar o ícone de favorito ao cabeçalho do card
          // Verificar se a função initFavoriteIcon está disponível
         const componentTitle = 'Indicadores de Processos';

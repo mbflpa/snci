@@ -450,11 +450,13 @@
                 }, 2500);
             }
 
-            // Função para identificar o tipo de componente com base no path
+            // Função para identificar o tipo de componente com base no path - REMOVIDO caso para gráficos
             function identificarTipoComponente(path) {
                 if (!path) return null;
                 
                 path = path.toLowerCase();
+                console.log("Identificando tipo de componente para path:", path);
+                
                 if (path.includes('orgaos_processo')) return "orgaos";
                 if (path.includes('cards_metricas_processo')) return "metricas";
                 if (path.includes('distribuicao_status')) return "status";
@@ -464,7 +466,7 @@
                 return null;
             }
 
-            // Função para carregar dados para os componentes - aprimorada para melhor tratamento de erros
+            // Função para carregar dados para os componentes - REMOVIDO caso para gráficos
             function carregarDadosParaComponente($widget, tipoComponente) {
                 console.log("Carregando dados para o componente:", tipoComponente, "com filtros:", {
                     ano: window.anoSelecionado,
@@ -485,7 +487,7 @@
                     },
                     dataType: 'json',
                     success: function(dados) {
-                        console.log("Dados recebidos para", tipoComponente);
+                        console.log("Dados recebidos com sucesso para componente", tipoComponente);
                         $widget.removeClass('loading-data');
                         
                         // Verificar se temos dados válidos antes de tentar atualizar o componente
@@ -524,7 +526,14 @@
                                     
                                 case "classificacao":
                                     if (typeof window.atualizarClassificacaoProcesso === 'function' && dados.distribuicaoClassificacao) {
+                                        console.log("Chamando atualizarClassificacaoProcesso com dados:", {
+                                            qtdClassificacoes: dados.distribuicaoClassificacao ? dados.distribuicaoClassificacao.length : 0,
+                                            totalProcessos: dados.totalProcessos || 0
+                                        });
                                         window.atualizarClassificacaoProcesso(dados.distribuicaoClassificacao, dados.totalProcessos);
+                                    } else {
+                                        console.error("Função atualizarClassificacaoProcesso não disponível ou dados.distribuicaoClassificacao ausente");
+                                        $widget.append('<div class="alert alert-warning mt-3">Não foi possível processar os dados de classificação</div>');
                                     }
                                     break;
                             }
@@ -534,7 +543,11 @@
                         }
                     },
                     error: function(xhr, status, error) {
-                        console.error("Erro ao carregar dados para o componente", tipoComponente, ":", error);
+                        console.error("Erro na chamada AJAX para componente", tipoComponente, ":", {
+                            status: status,
+                            error: error,
+                            responseText: xhr.responseText
+                        });
                         $widget.removeClass('loading-data');
                         $widget.append('<div class="alert alert-warning mt-3">Erro ao carregar dados: ' + error + '</div>');
                     }
@@ -596,7 +609,7 @@
 
             // Configuração do GridStack
             var grid;
-            var serializedData = localStorage.getItem('gridstack-dashboard-favoritos');
+           
             
             // Função para inicializar o GridStack
             function initGrid(items) {
@@ -719,9 +732,9 @@
                 }
             }
             
-            // Função para preencher os conteúdos dos widgets via AJAX - modificada para carregar dados estruturados
+            // Função para preencher os conteúdos dos widgets via AJAX - adicionado log detalhado
             function fillWidgetContents(items) {
-                console.log("Preenchendo conteúdos dos widgets via AJAX");
+                console.log("Preenchendo conteúdos dos widgets via AJAX para", items.length, "itens");
                 items.forEach(function(item) {
                     console.log("Carregando conteúdo para o widget:", item.id, "com path:", item.path);
                     
@@ -748,21 +761,17 @@
                             $contentWidget.find(".loader-placeholder").remove();
                             $contentWidget.html(response);
                             
-                            // Depois de carregar o componente, verificar se é o componente de órgãos e carregar os dados para ele
-                            if (item.path.toLowerCase().includes('orgaos_processo')) {
-                                carregarDadosParaComponente($contentWidget, "orgaos");
-                            } else if (item.path.toLowerCase().includes('cards_metricas_processo')) {
-                                carregarDadosParaComponente($contentWidget, "metricas");
-                            } else if (item.path.toLowerCase().includes('distribuicao_status')) {
-                                carregarDadosParaComponente($contentWidget, "status");
-                            } else if (item.path.toLowerCase().includes('tipos_processo')) {
-                                carregarDadosParaComponente($contentWidget, "tipos");
-                            } else if (item.path.toLowerCase().includes('classificacao_processo')) {
-                                carregarDadosParaComponente($contentWidget, "classificacao");
+                            // Depois de carregar o componente, verificar se é o componente de classificação e carregar os dados para ele
+                            var tipoComponente = identificarTipoComponente(item.path);
+                            console.log("Tipo de componente identificado para", item.path, ":", tipoComponente);
+                            if (tipoComponente) {
+                                carregarDadosParaComponente($contentWidget, tipoComponente);
                             }
                         },
                         error: function(xhr, status, error) {
-                            console.error("Erro ao carregar componente:", item.path, error);
+                            console.error("Erro ao carregar componente:", item.path, "Status:", status, "Erro:", error);
+                            // Registrar o conteúdo da resposta para diagnóstico
+                            console.error("Resposta:", xhr.responseText);
                             // Remover loader e mostrar mensagem de erro
                             $contentWidget.find(".loader-placeholder").remove();
                             $contentWidget.html('<div class="alert alert-danger">Erro ao carregar o componente: ' + error + '</div>');
@@ -784,7 +793,7 @@
                 }, 10000); // 10 segundos de timeout
             }
             
-            // Nova função para carregar dados para os componentes
+            // Função para carregar dados para os componentes
             function carregarDadosParaComponente($widget, tipoComponente) {
                 console.log("Carregando dados para o componente:", tipoComponente);
                 
@@ -851,30 +860,54 @@
                 $('#modalOverlay').modal('hide');
             }
             
-            // Função para configurar eventos dos botões em cada widget
+            // Função para configurar eventos dos botões em cada widget - Corrigido o comportamento do refresh
             function setupWidgetHandlers() {
                 // Remover handlers existentes para evitar duplicação
                 $('.grid-stack').off('click', '.refresh-widget');
                 $('.grid-stack').off('click', '.remove-widget');
                 
-                // Evento para o botão de atualizar widget
+                // Evento para o botão de atualizar widget - CORRIGIDO
                 $('.grid-stack').on('click', '.refresh-widget', function() {
                     var widget = $(this).closest('.grid-stack-item');
                     var widgetId = widget.attr('id');
-                    var componentId = widget.data('componentId');
-                    console.log("Atualizando widget:", widgetId, "com componente:", componentId);
+                    var path = widget.data('path');
+                    var $content = $('#content-' + widgetId);
                     
-                    // Atualizar o conteúdo do widget com base no componentId
-                    if (componentId && $(`#${componentId}`).length > 0) {
-                        var $originalContent = $(`#${componentId}`).clone();
-                        $originalContent.attr('id', ''); // Remover ID para evitar duplicatas
-                        $originalContent.show(); // Garantir que esteja visível
-                        
-                        $(`#content-${widgetId}`).html($originalContent);
-                    }
+                    console.log("Atualizando widget:", widgetId, "com path:", path);
                     
-                    // Atualizar dados
-                    carregarDashboard();
+                    // Mostrar um indicador de carregamento no widget
+                    $content.html(`
+                        <div class="loader-placeholder d-flex justify-content-center align-items-center" style="height: 100%">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Atualizando...</span>
+                            </div>
+                        </div>
+                    `);
+                    
+                    // Recarregar apenas este componente via AJAX
+                    $.ajax({
+                        url: path,
+                        method: 'GET',
+                        data: { 
+                            anoSelecionado: window.anoSelecionado,
+                            mcuSelecionado: window.mcuSelecionado
+                        },
+                        dataType: 'html',
+                        success: function(response) {
+                            console.log("Componente atualizado com sucesso:", path);
+                            $content.html(response);
+                            
+                            // Depois de recarregar o HTML, carregar os dados para este componente específico
+                            var tipoComponente = identificarTipoComponente(path);
+                            if (tipoComponente) {
+                                carregarDadosParaComponente($content, tipoComponente);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Erro ao atualizar componente:", path, error);
+                            $content.html('<div class="alert alert-danger">Erro ao atualizar: ' + error + '</div>');
+                        }
+                    });
                 });
                 
                 // Evento para o botão de remover widget
