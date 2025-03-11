@@ -64,7 +64,7 @@
         margin-bottom: 1rem;
         opacity: 0.5;
     }
-    /* Estilos adicionais para os gráficos - complementando os já existentes */
+    /* Estilos adicionais para os gráficos */
     .chart-header {
         display: flex;
         justify-content: space-between;
@@ -179,19 +179,41 @@
     </div>
 </div>
 
+<!-- Script para carregar Chart.js se não estiver disponível -->
 <script>
-// Verificar se a variável global já existe para evitar redefinição
-if (typeof window.atualizarDadosComponentes === 'undefined') {
-    window.atualizarDadosComponentes = [];
+// Função para carregar scripts de forma assíncrona
+function carregarScript(url, callback) {
+    // Verificar se o script já está carregado
+    var scripts = document.getElementsByTagName('script');
+    for (var i = 0; i < scripts.length; i++) {
+        if (scripts[i].src == url) {
+            if (callback) callback();
+            return;
+        }
+    }
+
+    // Criar o elemento script
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = url;
+    script.onload = callback;
+    script.onerror = function() {
+        console.error('Erro ao carregar: ' + url);
+    };
+    document.head.appendChild(script);
 }
 
-$(document).ready(function() {
-    // Variáveis para armazenar as instâncias dos gráficos
+// Namespace global para o componente de gráficos
+var DashboardGraficos = (function() {
+    // Variáveis privadas
     var evolucaoChart = null;
     var classificacaoChart = null;
+    var dadosGlobais = null;
+    var componenteInicializado = false;
+    var chartJsCarregado = false;
     
     // Cores para os gráficos
-    const coresPadrao = [
+    var coresPadrao = [
         '#007bff', // azul
         '#6f42c1', // roxo
         '#fd7e14', // laranja
@@ -203,7 +225,21 @@ $(document).ready(function() {
         '#dc3545'  // vermelho
     ];
     
-    // Função para criar ou atualizar o gráfico de evolução anual com visual melhorado
+    // Funções privadas
+    function verificarDependencias(callback) {
+        // Verificar se Chart.js está disponível
+        if (typeof Chart === 'undefined') {
+            console.log("Chart.js não encontrado. Carregando...");
+            carregarScript('plugins/chart.js/Chart.min.js', function() {
+                chartJsCarregado = true;
+                if (callback) callback();
+            });
+        } else {
+            chartJsCarregado = true;
+            if (callback) callback();
+        }
+    }
+    
     function renderEvolucaoChart(dados) {
         const ctx = document.getElementById('evolucaoChart').getContext('2d');
         
@@ -276,7 +312,7 @@ $(document).ready(function() {
                     padding: {
                         top: 40,
                         right: 20,
-                        bottom: 40, // Aumentado para acomodar a legenda inferior
+                        bottom: 40,
                         left: 10
                     }
                 },
@@ -315,19 +351,18 @@ $(document).ready(function() {
                 // Em Chart.js v2.9.4, a legenda está no nível raiz das opções, não em plugins
                 legend: {
                     display: true,
-                    position: 'bottom', // Posicionando a legenda na parte inferior
+                    position: 'bottom',
                     labels: {
                         boxWidth: 15,
-                        fontSize: 12, // Em v2.9.4 é fontSize, não font.size
+                        fontSize: 12,
                         padding: 15
                     }
                 },
-                // Em Chart.js v2.9.4, tooltips é separado, não está dentro de plugins
                 tooltips: {
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleFontSize: 14, // Em v2.9.4 é titleFontSize, não titleFont.size
+                    titleFontSize: 14,
                     titleFontStyle: 'bold',
-                    bodyFontSize: 13, // Em v2.9.4 é bodyFontSize, não bodyFont.size
+                    bodyFontSize: 13,
                     padding: 12,
                     displayColors: false,
                     callbacks: {
@@ -373,12 +408,8 @@ $(document).ready(function() {
                 }
             }]
         });
-      
-        // Não precisamos mais desta linha pois removemos a div de legenda do HTML
-        // $('#evolucaoLegend').html('');
     }
-  
-    // Função para criar ou atualizar o gráfico de classificações
+    
     function renderClassificacaoChart(dados, total) {
         const ctx = document.getElementById('classificacaoChart').getContext('2d');
         
@@ -452,7 +483,7 @@ $(document).ready(function() {
                 cutout: '60%',
                 plugins: {
                     legend: {
-                        display: true, // Exibir a legenda para este gráfico
+                        display: true,
                         position: 'top',
                         labels: {
                             boxWidth: 10,
@@ -474,7 +505,7 @@ $(document).ready(function() {
                         padding: 12,
                         callbacks: {
                             label: function(context) {
-                                return context.label; // Já está formatado com valor e percentual
+                                return context.label;
                             }
                         }
                     }
@@ -509,61 +540,155 @@ $(document).ready(function() {
                     ctx.font = 'bold 22px Arial';
                     ctx.fillStyle = '#007bff';
                     ctx.fillText(total, centerX, centerY + 15);
-                    
-                    // Não desenhamos textos nas fatias
                 }
             }]
         });
         
-        // Remover a legenda manual
         $('#classificacaoLegend').html('');
     }
     
-    // Função principal para atualizar os gráficos com novos dados
-    window.atualizarGraficos = function(dados) {
-        // Remove indicador de carregamento
-        $("#graficos-content .tab-loader").hide();
+    // API pública
+    return {
+        // Inicializa o componente verificando/carregando dependências
+        init: function() {
+            if (componenteInicializado) return;
+            
+            verificarDependencias(function() {
+                console.log("Componente de gráficos inicializado");
+                componenteInicializado = true;
+                
+                // Mostrar o container de gráficos e esconder o loader
+                $("#graficos-content .tab-loader").hide();
+                $("#graficos-container").show();
+                
+                // Se já temos dados, mostrar os gráficos
+                if (dadosGlobais) {
+                    DashboardGraficos.atualizarGraficos(dadosGlobais);
+                }
+                
+                // Inicializar o ícone de favorito se a função existir
+                if (typeof initFavoriteIcon === 'function') {
+                    const cardId = 'card-graficos';
+                    const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_graficos_processo.cfm';
+                    const componentTitle = 'Indicadores de Processos';
+                    initFavoriteIcon(cardId, componentPath, componentTitle);
+                }
+            });
+        },
         
-        // Mostra o container de gráficos
-        $("#graficos-container").show();
+        // Carrega dados via AJAX usando os parâmetros fornecidos
+        carregarDados: function(params) {
+            console.log("Carregando dados para gráficos");
+            
+            // Remover indicador de carregamento
+            $("#graficos-content .tab-loader").show();
+            $("#graficos-container").hide();
+            
+            // Definir parâmetros padrão se não fornecidos
+            params = params || {};
+            var ano = params.ano || window.anoSelecionado || "Todos";
+            var mcuOrigem = params.mcuOrigem || window.mcuSelecionado || "Todos";
+            var statusFiltro = params.statusFiltro || "Todos";
+            
+            // Fazer a chamada AJAX para buscar os dados
+            $.ajax({
+                url: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
+                method: 'POST',
+                data: { 
+                    ano: ano,
+                    mcuOrigem: mcuOrigem,
+                    statusFiltro: statusFiltro
+                },
+                dataType: 'json',
+                success: function(dados) {
+                    console.log("Dados recebidos para gráficos:", dados);
+                    
+                    // Atualizar os gráficos com os dados recebidos
+                    DashboardGraficos.atualizarGraficos(dados);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Erro ao carregar dados para gráficos:", error);
+                    $("#graficos-content .tab-loader").hide();
+                    $("#graficos-container").html('<div class="alert alert-danger">Erro ao carregar dados: ' + error + '</div>').show();
+                }
+            });
+        },
         
-        if (!dados) return;
-        
-        console.log("Gráficos atualizados com dados:", dados);
-        
-        // Renderizar ou atualizar os gráficos
-        renderEvolucaoChart(dados.evolucaoMensal);
-        renderClassificacaoChart(dados.distribuicaoClassificacao, dados.totalProcessos);
+        // Atualiza os gráficos com os dados fornecidos
+        atualizarGraficos: function(dados) {
+            // Armazenar os dados globalmente
+            dadosGlobais = dados;
+            
+            // Se o componente ainda não foi inicializado, inicialize-o primeiro
+            if (!componenteInicializado) {
+                this.init();
+                return;
+            }
+            
+            if (!chartJsCarregado) {
+                console.log("Chart.js ainda não carregado. Aguardando...");
+                setTimeout(function() {
+                    DashboardGraficos.atualizarGraficos(dados);
+                }, 500);
+                return;
+            }
+            
+            // Remove indicador de carregamento
+            $("#graficos-content .tab-loader").hide();
+            
+            // Mostra o container de gráficos
+            $("#graficos-container").show();
+            
+            if (!dados) return;
+            
+            console.log("Atualizando gráficos com dados:", dados);
+            
+            // Renderizar ou atualizar os gráficos
+            renderEvolucaoChart(dados.evolucaoMensal);
+            renderClassificacaoChart(dados.distribuicaoClassificacao, dados.totalProcessos);
+        }
     };
+})();
+
+// Inicializar o componente quando a página carregar
+$(document).ready(function() {
+    // Iniciar o componente
+    DashboardGraficos.init();
     
-    // Registrar a função de atualização no array global
-    if (Array.isArray(window.atualizarDadosComponentes) && 
-        !window.atualizarDadosComponentes.includes(window.atualizarGraficos)) {
-        window.atualizarDadosComponentes.push(window.atualizarGraficos);
+    // Registrar o componente para receber atualizações da página hospedeira (compatibilidade)
+    if (typeof window.atualizarDadosComponentes === 'undefined') {
+        window.atualizarDadosComponentes = [];
     }
     
-    // Informar ao script principal que este componente está carregado
+    // Adicionar a função de atualização ao array global
+    if (!window.atualizarDadosComponentes.includes(DashboardGraficos.atualizarGraficos)) {
+        window.atualizarDadosComponentes.push(DashboardGraficos.atualizarGraficos);
+    }
+    
+    // Compatibilidade com o sistema de notificação de carregamento existente
     if (typeof window.componentesCarregados !== 'undefined') {
         window.componentesCarregados.graficos = true;
         
-        // Verificar se o outro componente também está carregado
-        if (window.componentesCarregados.orgaosView) {
-            // Chamar a atualização de dados se ambos estiverem carregados
-            if (typeof window.atualizarDados === 'function') {
-                window.atualizarDados();
-            }
+        // Chamar atualização se necessário
+        if (window.componentesCarregados.orgaosView && typeof window.atualizarDados === 'function') {
+            window.atualizarDados();
         }
+    } else {
+        // Se não existe o sistema de notificação, tentar carregar dados independentemente
+        setTimeout(function() {
+            // Verificar variáveis globais primeiro
+            var params = {};
+            if (typeof window.anoSelecionado !== 'undefined') params.ano = window.anoSelecionado;
+            if (typeof window.mcuSelecionado !== 'undefined') params.mcuOrigem = window.mcuSelecionado;
+            
+            // Carregar dados se temos parâmetros
+            if (Object.keys(params).length > 0) {
+                DashboardGraficos.carregarDados(params);
+            }
+        }, 1000);
     }
-
-    // Inicializar o ícone de favorito para este card
-    const cardId = 'card-graficos';
-    const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_graficos_processo.cfm';
-    const componentTitle = 'Indicadores de Processos';
     
-    // Verificar se a função initFavoriteIcon está disponível
-    if (typeof initFavoriteIcon === 'function') {
-        // Adicionar o ícone de favorito ao cabeçalho do card
-        initFavoriteIcon(cardId, componentPath, componentTitle);
-    }
+    // Compatibilidade com interface antiga
+    window.atualizarGraficos = DashboardGraficos.atualizarGraficos;
 });
 </script>
