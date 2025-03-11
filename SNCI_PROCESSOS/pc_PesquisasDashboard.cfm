@@ -342,24 +342,24 @@
         
             // Função principal para carregar o dashboard
             function carregarDashboard() {
+                // Mostrar modal explicitamente no início do carregamento
+                mostrarModal();
+                
                 // Usar diretamente as variáveis globais definidas pelo componente de filtros
                 const anoFiltro = window.anoSelecionado || "Todos";
                 const mcuFiltro = window.mcuSelecionado || "Todos";
                 
-              
-                
-                // Mostrar modal de carregamento
-                try {
-                    $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
-                    $('#modalOverlay').modal('show');
-                } catch (e) {
-                    console.error("Erro ao mostrar modal:", e);
-                }
-                
-                // Timeout de segurança para fechar o modal após 30 segundos
+                // NOVO: Definir o timeout de segurança
                 var timeoutSeguranca = setTimeout(function() {
                     fecharModalComSeguranca();
                 }, 30000);
+                
+                // MODIFICADO: Notificar que o dashboard principal está carregando
+                window.componentesLoadingState = window.componentesLoadingState || {};
+                window.componentesLoadingState.dashboard = true;
+                document.dispatchEvent(new CustomEvent('componenteCarregando', { 
+                    detail: { componente: 'dashboard', estado: true } 
+                }));
                 
                 // Atualizar os cards principais
                 $.ajax({
@@ -409,6 +409,9 @@
                         setTimeout(function() {
                             fecharModalComSeguranca();
                         }, 1000);
+                        
+                        // IMPORTANTE: No final do AJAX success callback, mantenha o código que fecha o modal
+                        // E certifique-se de definir window.componentesLoadingState.dashboard = false;
                     },
                     error: function(xhr, status, error) {
                         console.error("Erro ao carregar estatísticas:", error);
@@ -416,6 +419,12 @@
                         
                         // Exibir mensagem de erro na interface
                         alert("Erro ao carregar dados: " + error);
+                        
+                        // MODIFICADO: Notificar mesmo em caso de erro
+                        window.componentesLoadingState.dashboard = false;
+                        document.dispatchEvent(new CustomEvent('componenteCarregando', { 
+                            detail: { componente: 'dashboard', estado: false } 
+                        }));
                     }
                 });
             }
@@ -497,6 +506,67 @@
                     }
                 }
             }
+            
+            // NOVO: Sistema de controle centralizado do modal de carregamento
+            window.componentesLoadingState = window.componentesLoadingState || {};
+            window.modalControlTimeout = null;
+            window.modalIsOpen = false; // Flag para controlar se o modal já está aberto
+            
+            // Função para verificar se algum componente está carregando
+            function algumComponenteCarregando() {
+                for (var componente in window.componentesLoadingState) {
+                    if (window.componentesLoadingState[componente] === true) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            
+            // NOVO: Função direta para mostrar o modal
+            function mostrarModal() {
+                try {
+                    window.modalIsOpen = true;
+                    $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
+                    $('#modalOverlay').modal('show');
+                    
+                    // Timeout de segurança para liberar a interface após 30 segundos
+                    clearTimeout(window.modalControlTimeout);
+                    window.modalControlTimeout = setTimeout(function() {
+                        window.modalIsOpen = false;
+                        fecharModalComSeguranca();
+                        
+                        // Resetar estados
+                        for (var comp in window.componentesLoadingState) {
+                            window.componentesLoadingState[comp] = false;
+                        }
+                    }, 10000);
+                } catch (e) {
+                    console.error("Erro ao mostrar modal:", e);
+                    window.modalIsOpen = false;
+                }
+            }
+            
+            // Função para gerenciar o modal baseado no estado dos componentes - SIMPLIFICADA
+            function gerenciarModalOverlay() {
+                if (algumComponenteCarregando()) {
+                    if (!window.modalIsOpen) {
+                        mostrarModal();
+                    }
+                } else {
+                    if (window.modalIsOpen) {
+                        clearTimeout(window.modalControlTimeout);
+                        window.modalIsOpen = false;
+                        fecharModalComSeguranca();
+                    }
+                }
+            }
+            
+            // Ouvinte para eventos de início/fim de carregamento dos componentes
+            document.addEventListener('componenteCarregando', function(e) {
+                const { componente, estado } = e.detail;
+                window.componentesLoadingState[componente] = estado;
+                gerenciarModalOverlay();
+            });
         });
     </script>
     
