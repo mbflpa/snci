@@ -108,9 +108,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 // Forçar a exibição do container para debugar
                 if ($("#graficos-container").length) {
-                    console.log("Container principal existe, mas está visível:", 
-                        $("#graficos-container").is(":visible"));
-                    
+                                        
                     // Forçar exibição para que possamos acessar elementos filhos
                     $("#graficos-container").show();
                 } else {
@@ -488,7 +486,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Mostra o container de gráficos
             $("#graficos-container").show();
             
-            console.log("Atualizando gráficos com dados:", dados);
+          
             
             // Pequeno delay para garantir que o DOM tenha sido renderizado
             setTimeout(function() {

@@ -65,9 +65,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Sobrescrever método de atualização com a função específica deste componente
         DashboardTipos.atualizar = function(dados, totalProcessosParam) {
-            console.log("[TiposProcessos] Atualizando componente de tipos. Ano selecionado:", 
-                window.anoSelecionado || "Não definido");
-            
+           
             // Verificar se há dados de tipos disponíveis
             if (!dados || !dados.distribuicaoTipos || dados.distribuicaoTipos.length === 0) {
                 $('#tipos-processo-content').html('<div class="sem-dados-tipos">Nenhum tipo de processo disponível para os filtros selecionados.</div>');
@@ -77,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function() {
             // Obter os dados de tipos de processo
             let tiposData = dados.distribuicaoTipos || [];
             
-            console.log("[TiposProcessos] Total de tipos encontrados:", tiposData.length);
+            
             
             // Ordenar por quantidade (decrescente) como no componente de classificação
             tiposData = [...tiposData].sort((a, b) => b.quantidade - a.quantidade);
@@ -88,10 +86,10 @@ document.addEventListener("DOMContentLoaded", function() {
             // Aplicar a limitação a 10 itens quando "Todos" é selecionado
             let tiposExibidos = tiposData;
             if (anoSelecionado === "Todos" && tiposData.length > 10) {
-                console.log("[TiposProcessos] Limitando a 10 itens porque o ano selecionado é:", anoSelecionado);
+                
                 tiposExibidos = tiposData.slice(0, 10);
             } else {
-                console.log("[TiposProcessos] Não limitando porque o ano selecionado é:", anoSelecionado);
+                
             }
             
             // Atualizar título do card para refletir a seleção

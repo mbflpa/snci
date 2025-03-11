@@ -234,15 +234,15 @@ $(document).ready(function() {
     
     // Handler para alteração nos filtros
     function onFiltroAlterado(tipo, valor) {
-        console.log(`Filtro alterado no componente: ${tipo} = ${valor}`);
+        
         
         // Atualizar variáveis globais
         if (tipo === 'ano') {
             window.anoSelecionado = valor;
-            console.log("window.anoSelecionado atualizado para:", window.anoSelecionado);
+            
         } else if (tipo === 'orgao') {
             window.mcuSelecionado = valor;
-            console.log("window.mcuSelecionado atualizado para:", window.mcuSelecionado);
+           
         } else if (tipo === 'status') {
             window.statusSelecionado = valor;
         }
@@ -258,7 +258,7 @@ $(document).ready(function() {
         
         // Disparar o evento
         document.dispatchEvent(evento);
-        console.log("Evento filtroAlterado disparado:", evento);
+       
     }
 
     // Configuração do filtro de anos - apenas se o filtro estiver habilitado
@@ -298,7 +298,7 @@ $(document).ready(function() {
         // Event handler
         $(`input[name="opcaoAno${componenteID}"]`).change(function() {
             const novoAno = $(this).val();
-            console.log(`Ano alterado para: ${novoAno}`);
+           
             onFiltroAlterado('ano', novoAno);
         });
     </cfif>

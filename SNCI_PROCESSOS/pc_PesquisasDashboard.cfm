@@ -346,7 +346,7 @@
                 const anoFiltro = window.anoSelecionado || "Todos";
                 const mcuFiltro = window.mcuSelecionado || "Todos";
                 
-                console.log(`carregarDashboard executando com filtros: ano=${anoFiltro}, mcu=${mcuFiltro}`);
+              
                 
                 // Mostrar modal de carregamento
                 try {
@@ -390,7 +390,7 @@
                         
                         // Atualizar apenas o componente da aba ativa
                         if ($("#nuvem-palavras").hasClass('active')) {
-                            console.log("Aba nuvem-palavras está ativa, atualizando com:", anoFiltro, mcuFiltro);
+                           
                             if (!componentesCarregados['nuvemPalavras']) {
                                 carregarComponente('nuvemPalavras');
                             } else {
@@ -423,11 +423,7 @@
             // NOVO: Escutar o evento de alteração de filtro emitido pelo componente
             document.addEventListener('filtroAlterado', function(e) {
                 const { tipo, valor } = e.detail;
-                console.log(`PesquisasDashboard: Filtro alterado: ${tipo} = ${valor}`);
-                console.log("Estado atual dos filtros:", {
-                    ano: window.anoSelecionado,
-                    mcu: window.mcuSelecionado
-                });
+              
                 
                 // Atualizar o dashboard com os novos filtros após um pequeno delay
                 // para garantir que as variáveis globais estejam corretamente atualizadas

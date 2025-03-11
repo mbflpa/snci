@@ -116,12 +116,7 @@ var DashboardComponentFactory = (function () {
     var dependenciasCarregadas = false;
     var callbacksDependencias = [];
 
-    // Log interno
-    function log(mensagem) {
-      if (config.debug) {
-        console.log(`[${config.nome}] ${mensagem}`);
-      }
-    }
+    
 
     /**
      * Verificar e carregar todas as dependências
@@ -150,7 +145,7 @@ var DashboardComponentFactory = (function () {
         return;
       }
 
-      log("Carregando dependências: " + config.dependencias.join(", "));
+     
 
       var dependenciasPendentes = config.dependencias.length;
 
@@ -158,7 +153,7 @@ var DashboardComponentFactory = (function () {
       function verificarConclusao() {
         dependenciasPendentes--;
         if (dependenciasPendentes === 0) {
-          log("Todas as dependências carregadas com sucesso");
+         
           dependenciasCarregadas = true;
 
           // Chamar todos os callbacks registrados
@@ -177,7 +172,7 @@ var DashboardComponentFactory = (function () {
         } else if (dep.toLowerCase().endsWith(".css")) {
           carregarEstilo(dep, verificarConclusao);
         } else {
-          log("Tipo de dependência desconhecido: " + dep);
+          
           verificarConclusao();
         }
       });
@@ -219,7 +214,6 @@ var DashboardComponentFactory = (function () {
           return componentAPI;
         }
 
-        log("Inicializando componente");
 
         verificarDependencias(function (err) {
           if (err) {
@@ -228,7 +222,7 @@ var DashboardComponentFactory = (function () {
           }
 
           try {
-            log("Componente inicializado com sucesso");
+           
             componenteInicializado = true;
 
             // Inicializar ícone favorito se possível
@@ -270,7 +264,7 @@ var DashboardComponentFactory = (function () {
        * @param {function} callback - Função chamada após carregar os dados
        */
       carregarDados: function (params, callback) {
-        log("Carregando dados");
+       
 
         params = params || {};
 
@@ -301,7 +295,7 @@ var DashboardComponentFactory = (function () {
           },
           dataType: "json",
           success: function (dados) {
-            log("Dados recebidos com sucesso");
+            
 
             // Armazenar dados globalmente
             dadosGlobais = dados;
@@ -315,7 +309,7 @@ var DashboardComponentFactory = (function () {
             if (callback) callback(dados);
           },
           error: function (xhr, status, error) {
-            log("Erro ao carregar dados: " + error);
+          
 
             // Se tivermos um container, mostrar mensagem de erro
             if (config.containerId) {
@@ -341,7 +335,6 @@ var DashboardComponentFactory = (function () {
        * @param {object} dados - Dados para atualizar o componente
        */
       atualizar: function (dados) {
-        log("Método 'atualizar' chamado, mas não implementado");
         return componentAPI;
       },
 
@@ -440,13 +433,7 @@ var DashboardComponentFactory = (function () {
      */
     inicializarComponenteFavorito: function (tipo, containerId, widgetId) {
       try {
-        console.log(
-          "[DashboardComponentFactory] Inicializando componente favorito:",
-          tipo,
-          "no container",
-          containerId
-        );
-
+      
         if (!tipo || !containerId) {
           console.error(
             "[DashboardComponentFactory] Tipo ou containerId não especificados"
@@ -1042,10 +1029,7 @@ var DashboardComponentFactory = (function () {
         }
         window.atualizarDadosComponentes.push(componente.atualizar);
 
-        console.log(
-          "[DashboardComponentFactory] Componente favorito inicializado com sucesso:",
-          tipo
-        );
+       
         return componente;
       } catch (error) {
         console.error(

@@ -33,7 +33,7 @@ if (typeof DashboardComponentFactory === 'undefined') {
 
 // Registrar função global imediatamente para evitar problemas de timing
 window.atualizarViewOrgaos = function(dados) {
-    console.log("[OrgaosView] Chamada direta para atualizarViewOrgaos");
+   
     if (window.DashboardOrgaos && typeof window.DashboardOrgaos.atualizar === 'function') {
         return window.DashboardOrgaos.atualizar(dados);
     } else {
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Sobrescrever método de atualização com a função específica deste componente
         DashboardOrgaos.atualizar = function(dados) {
-            console.log("[OrgaosView] Atualizando componente de órgãos");
+           
             
             try {
                 // Mostrar o container explicitamente com !important para garantir visibilidade

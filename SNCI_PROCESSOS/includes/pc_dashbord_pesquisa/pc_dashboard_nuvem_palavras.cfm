@@ -255,11 +255,11 @@ $(document).ready(function() {
 
     // Função para carregar e renderizar a nuvem de palavras - CORRIGIDA
     window.carregarNuvemPalavras = function(anoFiltro, mcuFiltro, minFreq = 2, maxWords = 100) {
-        console.log(`carregarNuvemPalavras chamada com: ano=${anoFiltro}, mcu=${mcuFiltro}, minFreq=${minFreq}, maxWords=${maxWords}`);
+      
         
         // Se já estiver renderizando, saia para evitar chamadas simultâneas
         if (window.isRenderingCloud) {
-            console.log("Renderização já em andamento, ignorando nova chamada");
+           
             return;
         }
         
@@ -270,7 +270,7 @@ $(document).ready(function() {
         if (!anoFiltro || anoFiltro === undefined) {
             try {
                 anoFiltro = window.anoSelecionado || "Todos";
-                console.log("Usando window.anoSelecionado:", anoFiltro);
+              
             } catch (e) {
                 console.warn("Erro ao obter anoSelecionado:", e);
                 anoFiltro = "Todos";
@@ -281,7 +281,7 @@ $(document).ready(function() {
         if (!mcuFiltro || mcuFiltro === undefined) {
             try {
                 mcuFiltro = window.mcuSelecionado || "Todos";
-                console.log("Usando window.mcuSelecionado:", mcuFiltro);
+             
             } catch (e) {
                 console.warn("Erro ao obter mcuSelecionado:", e);
                 mcuFiltro = "Todos";
@@ -291,7 +291,7 @@ $(document).ready(function() {
          // MELHORADO: Destruir completamente qualquer instância anterior de jQCloud
         try {
             if ($("#nuvem-container").data('jqcloud')) {
-                console.log("Destruindo instância anterior de jQCloud");
+             
                 $("#nuvem-container").jQCloud('destroy');
             }
             
@@ -333,7 +333,6 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function(data) {
-                console.log("Dados da nuvem recebidos:", data && data.length ? data.length + " palavras" : "sem dados");
                 
                 // Armazenar dados globalmente para uso no resize
                 window.cloudData = data;
@@ -446,7 +445,7 @@ $(document).ready(function() {
                                 
                                 // Finalizar o flag de renderização após conclusão
                                 window.isRenderingCloud = false;
-                                console.log("Renderização da nuvem concluída com sucesso");
+                               
                             };
                             
                             $("#nuvem-container").jQCloud(data, window.cloudOptions);
@@ -957,17 +956,15 @@ $(document).ready(function() {
     
     // Inicializar a nuvem quando o componente for carregado
     setTimeout(function() {
-        console.log("Inicializando nuvem de palavras com filtros:", window.anoSelecionado, window.mcuSelecionado);
         window.carregarNuvemPalavras(window.anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
     }, 500);
     
     // Adicionar ouvintes para eventos de filtro
     document.addEventListener('filtroAlterado', function(e) {
-        console.log("Evento filtroAlterado recebido na nuvem de palavras:", e.detail);
-        
+
         // Verificar se a aba de nuvem de palavras está visível
         if ($("#nuvem-palavras").hasClass('active') || $("#nuvem-palavras").hasClass('show') || $("#nuvem-palavras").is(':visible')) {
-            console.log("Aba de nuvem de palavras está ativa, atualizando com:", window.anoSelecionado, window.mcuSelecionado);
+
             
             // Usar diretamente as variáveis globais atualizadas pelo componente de filtro
             setTimeout(function() {

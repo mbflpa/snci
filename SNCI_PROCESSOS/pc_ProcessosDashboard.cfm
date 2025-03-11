@@ -179,14 +179,13 @@
                     },
                     dataType: 'json',
                     success: function(dados) {
-                        console.log("Dados recebidos com sucesso:", dados);
-                        
+                      
                         // Armazenar dados para uso global
                         window.dadosAtuais = dados;
                         
                         // Garantir que o componente de órgãos seja atualizado especificamente
                         if (window.atualizarViewOrgaos && typeof window.atualizarViewOrgaos === 'function') {
-                            console.log("Atualizando componente de órgãos explicitamente");
+                          
                             try {
                                 window.atualizarViewOrgaos(dados);
                             } catch(e) {
@@ -228,7 +227,7 @@
             // Escutar o evento do componente de filtros
             document.addEventListener('filtroAlterado', function(e) {
                 const { tipo, valor } = e.detail;
-                console.log(`Filtro alterado: ${tipo} = ${valor}`);
+                
                 
                 // Recarregar dados quando qualquer filtro mudar
                 carregarDados();
