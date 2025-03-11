@@ -3720,7 +3720,8 @@
 						$('#pcValorCustoFinanceiroMelhoria').hide();
 					}
 
-					if (pc_aval_melhoria_status === "P" || pc_aval_melhoria_status === "N") {
+					// Verifica se o status é "P", "N" ou não existe (vazio/nulo)
+						if (pc_aval_melhoria_status === "P" || pc_aval_melhoria_status === "N" || !pc_aval_melhoria_status){
 						$("#div_pcStatusMelhoria").prop('hidden', false);
 						// Remove todas as opções que não sejam "P" ou "N"
 						$("#pcStatusMelhoria option").each(function() {
