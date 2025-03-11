@@ -1,255 +1,22 @@
 <cfprocessingdirective pageencoding = "utf-8">
+<!-- Carregamento direto do CSS específico do componente -->
+<link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard_Classificacao.css">
 
 <!-- Card para Classificação de Processos -->
 <div class="card mb-4" id="card-classificacao-processo">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-tag mr-2"></i>Classificação de Processos
+            <i class="fas fa-tags mr-2"></i>Classificação de Processos
         </h3>
     </div>
     <div class="card-body">
         <div class="classificacao-processo-container">
-            <div id="classificacao-processo-content">
-                <div class="sem-dados-classificacao">
-                    <i class="fas fa-spinner fa-spin mr-2"></i> Carregando classificações...
-                </div>
-            </div>
+            <!-- Conteúdo gerado dinamicamente via JavaScript -->
         </div>
     </div>
 </div>
 
-<style>
-    .classificacao-processo-container {
-        width: 100%;
-    }
-    
-    /* Removido o header redundante já que agora usamos o card header */
-    .classificacao-processo-header {
-        display: none;
-    }
-    
-    .classificacao-item {
-        display: flex;
-        margin-bottom: 0.75rem;
-        padding: 0.75rem;
-        border-radius: 6px;
-        border-left: 4px solid #6f42c1; /* Cor diferente da de tipos */
-        background-color: rgba(0,0,0,0.03);
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .classificacao-item:hover {
-        background-color: rgba(0,0,0,0.05);
-        transform: translateX(3px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.12);
-    }
-    .classificacao-badge {
-        width: 36px;
-        height: 36px;
-        min-width: 36px; /* Garante tamanho mínimo */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        border-radius: 50%;
-        margin-right: 0.8rem;
-        flex-shrink: 0;
-        font-weight: 600;
-        position: static; /* Remover posicionamento absoluto */
-    }
-    .classificacao-info {
-        flex: 1 1 auto;
-        min-width: 0; /* Importante para permitir truncamento */
-        overflow: hidden;
-    }
-    .classificacao-descricao {
-        font-weight: 500;
-        font-size: 0.85rem;
-        margin-bottom: 0.5rem;
-        color: #333;
-        line-height: 1.3;
-        /* Configuração para quebra de texto adequada */
-        white-space: normal;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        hyphens: auto;
-    }
-    .classificacao-metricas {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.4rem;
-        flex-wrap: wrap; /* Permite quebra em telas pequenas */
-    }
-    .classificacao-quantidade {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #111;
-        margin-right: 1rem;
-    }
-    .classificacao-percentual {
-        font-size: 0.75rem;
-        color: #777;
-        white-space: nowrap;
-    }
-    .classificacao-progress {
-        height: 6px;
-        margin-bottom: 0.25rem;
-        border-radius: 3px;
-        background-color: rgba(0,0,0,0.05);
-    }
-    
-    /* Estilos para quando não há dados */
-    .sem-dados-classificacao {
-        text-align: center;
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 6px;
-        color: #6c757d;
-    }
-    
-    /* Responsividade para diferentes tamanhos de tela */
-    @media (max-width: 992px) {
-        .classificacao-metricas {
-            flex-direction: row;
-            justify-content: space-between;
-        }
-    }
-    
-    @media (max-width: 767px) {
-        .classificacao-badge {
-            width: 30px;
-            height: 30px;
-            min-width: 30px;
-            font-size: 0.9rem;
-            margin-right: 0.6rem;
-        }
-        .classificacao-descricao {
-            font-size: 0.8rem;
-        }
-        .classificacao-quantidade {
-            font-size: 0.9rem;
-        }
-    }
 
-    /* Estilos específicos para classificação de processos */
-    .classificacao-container {
-        padding: 1rem;
-    }
-    
-    .classificacao-item {
-        padding: 1rem;
-        align-items: center;
-        margin-bottom: 1rem;
-        border-radius: 8px;
-        background-color: #f8f9fa;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.2s ease;
-    }
-    
-    .classificacao-item:hover {
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        background-color: #fff;
-    }
-    
-    .classificacao-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-    }
-    
-    .classificacao-title {
-        font-weight: 600;
-        font-size: 1rem;
-        color: #495057;
-    }
-    
-    .classificacao-count {
-        font-weight: 700;
-        font-size: 1.1rem;
-        color: #007bff;
-    }
-    
-    .classificacao-progress {
-        height: 8px;
-        background-color: #e9ecef;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-    
-    .classificacao-progress-bar {
-        height: 100%;
-        border-radius: 4px;
-        transition: width 0.8s ease;
-    }
-    
-    .classificacao-badge {
-        position: static;
-        top: auto;
-        right: auto;
-        padding: 0;
-        font-size: 1.1rem;
-        border-radius: 50%;
-    }
-    
-    /* Cores por classificação */
-    .classificacao-normal .classificacao-progress-bar {
-        background-color: #17a2b8;
-    }
-    
-    .classificacao-urgente .classificacao-progress-bar {
-        background-color: #fd7e14;
-    }
-    
-    .classificacao-prioritario .classificacao-progress-bar {
-        background-color: #dc3545;
-    }
-    
-    .classificacao-baixa .classificacao-progress-bar {
-        background-color: #6c757d;
-    }
-
-    .classificacao-grafico-barra {
-        height: 6px;
-        background: #f1f1f1;
-        border-radius: 3px;
-        margin-top: 0.25rem;
-        overflow: hidden;
-    }
-    
-    .classificacao-grafico-progresso {
-        height: 100%;
-        border-radius: 3px;
-        background: linear-gradient(90deg, #6f42c1, #e83e8c);
-    }
-    
-    /* Remove a classe progress padrão do Bootstrap que estava sendo usada */
-    .progress {
-        display: none;
-    }
-    
-    /* Estilizar cores para top 3 classificações */
-    .classificacao-item:nth-child(1) .classificacao-grafico-progresso {
-        background: linear-gradient(90deg, #6f42c1, #e83e8c);
-    }
-    
-    .classificacao-item:nth-child(2) .classificacao-grafico-progresso {
-        background: linear-gradient(90deg, #fd7e14, #ffc107);
-    }
-    
-    .classificacao-item:nth-child(3) .classificacao-grafico-progresso {
-        background: linear-gradient(90deg, #20c997, #17a2b8);
-    }
-
-    /* Estilo para o label de processos */
-    .classificacao-label {
-        font-size: 0.7rem;
-        color: #888;
-        font-weight: normal;
-    }
-</style>
 
 <script>
 // Carregar o componente base se ainda não foi carregado
@@ -267,56 +34,53 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }, 100);
 
-    // Inicializar o componente de classificação
+    // Inicializar o componente de classificação de processos
     function initClassificacaoComponent() {
         // Criar a instância do componente
         var DashboardClassificacao = DashboardComponentFactory.criar({
             nome: 'ClassificacaoProcessos',
-            dependencias: [], // Não tem dependências externas
-            containerId: 'classificacao-processo-content',
+            dependencias: [],
+            containerId: '.classificacao-processo-container',
             cardId: 'card-classificacao-processo',
             path: 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processo.cfm',
             titulo: 'Classificação de Processos',
-            debug: false
+            debug: true
         });
         
-        // Cores para as diferentes classificações
-        const coresClassificacao = [
-            '#6f42c1', // roxo (alterado para iniciar com roxo para classificação)
-            '#007bff', // azul
-            '#e83e8c', // rosa
-            '#fd7e14', // laranja
-            '#20c997', // verde-água
-            '#17a2b8', // ciano
-            '#28a745', // verde
-            '#ffc107', // amarelo
-            '#dc3545'  // vermelho
-        ];
-        
         // Sobrescrever método de atualização com a função específica deste componente
-        DashboardClassificacao.atualizar = function(dados) {
+        DashboardClassificacao.atualizar = function(dados, totalProcessosParam) {
             if (!dados || !dados.distribuicaoClassificacao || !dados.distribuicaoClassificacao.length) {
-                $('#classificacao-processo-content').html('<div class="sem-dados-classificacao">Nenhuma classificação disponível para os filtros selecionados.</div>');
+                $('.classificacao-processo-container').html('<div class="sem-dados-classificacao">Nenhuma classificação disponível para os filtros selecionados.</div>');
                 return DashboardClassificacao;
             }
             
-            const classificacaoData = dados.distribuicaoClassificacao;
-            const totalProcessos = dados.totalProcessos || 0;
+            const coresClassificacao = [
+                '#6f42c1', '#007bff', '#e83e8c', '#fd7e14', '#20c997',
+                '#17a2b8', '#28a745', '#ffc107', '#dc3545'
+            ];
             
+            let classificacaoData = [...dados.distribuicaoClassificacao];
+            // Ordenar por quantidade (decrescente)
+            classificacaoData = classificacaoData.sort((a, b) => b.quantidade - a.quantidade);
+            
+            // Verificar se o ano selecionado é "Todos" para aplicar limite
+            const anoSelecionado = window.anoSelecionado || "Todos";
+            let classificacoesExibidas = classificacaoData;
+            if (anoSelecionado === "Todos" && classificacaoData.length > 10) {
+                classificacoesExibidas = classificacaoData.slice(0, 10);
+            }
+            
+            const totalProcessos = totalProcessosParam || dados.totalProcessos || 0;
             let htmlClassificacao = '';
             
-            classificacaoData.forEach(function(classificacao, index) {
+            classificacoesExibidas.forEach(function(classificacao, index) {
                 const percentual = totalProcessos > 0 ? ((classificacao.quantidade / totalProcessos) * 100).toFixed(1) : 0;
-                // Usar cores alternadas para as classificações
                 const corIndex = index % coresClassificacao.length;
                 const corClassificacao = coresClassificacao[corIndex];
                 
-                // Modificado para posicionar o badge à esquerda
                 htmlClassificacao += `
                 <div class="classificacao-item">
-                    <div class="classificacao-badge" style="background-color: ${corClassificacao}; color: white;">
-                        ${index + 1}
-                    </div>
+                    <div class="classificacao-badge" style="background-color: ${corClassificacao}; color: white;">${index + 1}</div>
                     <div class="classificacao-info">
                         <div class="classificacao-descricao">${classificacao.descricao}</div>
                         <div class="classificacao-metricas">
@@ -330,8 +94,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>`;
             });
             
-            $('#classificacao-processo-content').html(htmlClassificacao);
-            
+            $('.classificacao-processo-container').html(htmlClassificacao);
             return DashboardClassificacao;
         };
         
@@ -339,22 +102,19 @@ document.addEventListener("DOMContentLoaded", function() {
         DashboardClassificacao.init().registrar();
         
         // Compatibilidade com interface antiga
-        window.atualizarClassificacaoProcesso = DashboardClassificacao.atualizar;
+        window.atualizarClassificacaoProcesso = function(dados, totalProcessos) {
+            if (Array.isArray(dados)) {
+                // Formatação antiga - converter para o novo formato
+                DashboardClassificacao.atualizar({distribuicaoClassificacao: dados}, totalProcessos);
+            } else {
+                // Já está no novo formato
+                DashboardClassificacao.atualizar(dados, totalProcessos);
+            }
+        };
         
-        // Verificar se já existem dados disponíveis no momento da carga do componente
+        // Verificar se já existem dados disponíveis
         if (window.dadosAtuais && window.dadosAtuais.distribuicaoClassificacao) {
             DashboardClassificacao.atualizar(window.dadosAtuais);
-        } else {
-            // Carregar dados se necessário
-            setTimeout(function() {
-                var params = {};
-                if (typeof window.anoSelecionado !== 'undefined') params.ano = window.anoSelecionado;
-                if (typeof window.mcuSelecionado !== 'undefined') params.mcuOrigem = window.mcuSelecionado;
-                
-                if (Object.keys(params).length > 0) {
-                    DashboardClassificacao.carregarDados(params);
-                }
-            }, 1000);
         }
     }
 });

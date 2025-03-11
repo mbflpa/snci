@@ -1,0 +1,193 @@
+/* Layout para os cards de status - atualizado para grid responsiva */
+.status-card {
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  padding: 0.4rem 0.6rem; /* Reduzido de 0.5rem 0.75rem */
+  height: 100%;
+  min-height: 75px; /* Reduzido de 80px */
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+.status-card:hover {
+  transform: translateY(2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.status-card .status-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  opacity: 0.3;
+}
+.status-card .status-info {
+  flex-grow: 1;
+  margin-right: 3rem;
+}
+.status-card .status-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.1rem;
+  line-height: 1;
+}
+.status-card .status-label {
+  font-size: 0.8rem;
+  margin: 0;
+  opacity: 0.9;
+  white-space: normal;
+  line-height: 1.2;
+  max-width: 95%;
+}
+
+/* Ajuste para grid responsiva em vez de rolagem horizontal - reduzindo o gap entre os cards */
+.status-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 6px; /* Reduzido de 10px para 6px */
+  width: 100%;
+}
+
+/* Classe para cada card individual - adaptada para grid */
+.status-card-col {
+  width: 100%;
+  padding: 0; /* Remover qualquer padding */
+}
+
+/* Ajuste responsivo para telas diferentes */
+@media (min-width: 1400px) {
+  .status-cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 6px;
+  }
+}
+
+@media (max-width: 992px) {
+  .status-cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .status-cards-container {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .status-card .status-number {
+    font-size: 1.3rem;
+  }
+
+  .status-card .status-label {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .status-cards-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Remover exceções de cores para maior consistência */
+.status-card.bg-secondary .status-icon,
+.status-card.bg-warning .status-icon,
+.status-card.bg-danger .status-icon,
+.status-card.bg-info .status-icon,
+.status-card.bg-success .status-icon {
+  color: white;
+}
+
+/* Contêiner principal do componente */
+.componente-distribuicao-status {
+  width: 100%;
+}
+
+/* Estilos para quando não há dados */
+.sem-dados-status {
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  color: #6c757d;
+}
+
+/* Estilos específicos para a distribuição de status */
+.distribuicao-status-container {
+  padding: 1rem 0.5rem;
+}
+
+.status-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #495057;
+}
+
+.status-progress-container {
+  margin-bottom: 1.5rem;
+}
+
+.status-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.status-label-text {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.status-label-value {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.status-progress {
+  height: 10px;
+  border-radius: 5px;
+  background-color: #e9ecef;
+  overflow: hidden;
+}
+
+.status-progress-bar {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 1s ease;
+}
+
+/* Classes de cores para status específicos */
+.status-andamento {
+  background-color: #007bff;
+}
+
+.status-concluido {
+  background-color: #28a745;
+}
+
+.status-pendente {
+  background-color: #fd7e14;
+}
+
+.status-cancelado {
+  background-color: #dc3545;
+}
+
+.status-outro {
+  background-color: #6c757d;
+}
+
+/* Animação para barras de progresso */
+@keyframes progressAnimation {
+  0% {
+    width: 0;
+  }
+}
+
+.status-progress-bar {
+  animation: progressAnimation 1.5s ease-in-out;
+}

@@ -1,185 +1,6 @@
 <cfprocessingdirective pageencoding = "utf-8">
-<style>
-    .orgaos-heading {
-        font-size: 1.1rem;
-        margin-bottom: 1.5rem;
-        font-weight: 500;
-        color: #333;
-        display: flex;
-        align-items: center;
-    }
-    .orgaos-heading i {
-        margin-right: 0.5rem;
-        color: #007bff;
-    }
-    .orgao-container {
-        width: 100%;
-        padding-right: 0;
-        overflow: visible; /* Remover rolagem vertical */
-        height: auto; /* Altura automática */
-        max-height: none; /* Remover limite de altura */
-    }
-    .orgao-card {
-        display: flex;
-        align-items: center;
-        padding: 0.75rem; /* Reduzir padding para economizar espaço */
-        border-radius: 6px;
-        margin-bottom: 0.75rem; /* Reduzir espaçamento para caber mais itens */
-        background-color: rgba(0,0,0,0.03);
-        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-        transition: all 0.2s ease;
-        width: 100%;       /* Garantir largura completa */
-        min-width: 0;      /* Permitir que encolha se necessário */
-        box-sizing: border-box;
-        border-left: 4px solid #20c997; /* Cor diferente dos outros componentes */
-    }
-    .orgao-card:hover {
-        background-color: rgba(0,0,0,0.05);
-        transform: translateX(3px);
-        box-shadow: 0 2px 5px rgba(0,0,0,0.12);
-    }
-    .orgao-posicao {
-        width: 36px;
-        height: 36px;
-        min-width: 36px; /* Garante tamanho mínimo */
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        border-radius: 50%;
-        margin-right: 0.8rem;
-        flex-shrink: 0;
-        font-weight: 600;
-        color: white;
-    }
-    .orgao-info {
-        flex-grow: 1;
-        min-width: 0;      /* Permitir que encolha se necessário */
-        overflow: hidden;  /* Ocultar conteúdo que não couber */
-    }
-    .orgao-sigla {
-        font-weight: 500;
-        margin-bottom: 0.25rem;
-        font-size: 0.85rem;
-        color: #333;
-    }
-    .orgao-mcu {
-        font-size: 0.75rem;
-        color: #777;
-        margin-bottom: 0.5rem;
-    }
-    .orgao-quantidade {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #111;
-        margin-right: 1rem;
-    }
-    .orgao-percentual {
-        font-size: 0.75rem;
-        color: #777;
-        white-space: nowrap;
-    }
-    .orgao-badge {
-        font-size: 0.75rem;
-        color: #007bff;
-        background-color: rgba(0, 123, 255, 0.1);
-        border-radius: 30px;
-        padding: 0.25rem 0.75rem;
-        margin-left: 0.5rem;
-    }
-    .orgao-metricas {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.4rem;
-        flex-wrap: wrap;
-    }
-    .orgao-grafico-barra {
-        height: 6px;
-        background: #f1f1f1;
-        border-radius: 3px;
-        margin-top: 0.25rem;
-        overflow: hidden;
-    }
-    .orgao-grafico-progresso {
-        height: 100%;
-        background: linear-gradient(90deg, #20c997, #17a2b8);
-        border-radius: 3px;
-    }
-    .sem-dados {
-        text-align: center;
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 6px;
-        color: #6c757d;
-        font-size: 1.1rem;
-    }
-    .sem-dados i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-        display: block;
-    }
-    /* Removendo as regras específicas para o top 3 */
-    .orgao-card:nth-child(1) .orgao-posicao,
-    .orgao-card:nth-child(2) .orgao-posicao,
-    .orgao-card:nth-child(3) .orgao-posicao,
-    .orgao-card:nth-child(n+4) .orgao-posicao {
-        background-color: initial; /* Removendo as cores específicas */
-    }
-    
-    .orgao-card:nth-child(1) .orgao-grafico-progresso,
-    .orgao-card:nth-child(2) .orgao-grafico-progresso,
-    .orgao-card:nth-child(3) .orgao-grafico-progresso {
-        background: initial; /* Removendo os gradientes específicos */
-    }
-    /* Responsividade para telas menores */
-    @media (max-width: 768px) {
-        .orgao-card {
-            padding: 0.6rem;
-        }
-        
-        .orgao-posicao {
-            width: 30px;
-            height: 30px;
-            min-width: 30px;
-            font-size: 0.9rem;
-            margin-right: 0.6rem;
-        }
-        
-        .orgao-sigla {
-            font-size: 0.8rem;
-        }
-        
-        .orgao-quantidade {
-            font-size: 0.9rem;
-        }
-    }
-    @media (max-width: 576px) {
-        .orgao-badge {
-            display: none; /* Esconder badge em telas muito pequenas */
-        }
-    }
-    
-    /* Animações para os cards de órgãos */
-    @keyframes slideInRight {
-        0% { transform: translateX(30px); opacity: 0; }
-        100% { transform: translateX(0); opacity: 1; }
-    }
-    
-    .orgao-card {
-        animation: slideInRight 0.3s forwards;
-        animation-delay: calc(0.05s * var(--animOrder, 0));
-        opacity: 0;
-    }
-    
-    /* Estilo para o label de processos */
-    .orgao-label {
-        font-size: 0.7rem;
-        color: #888;
-        font-weight: normal;
-    }
-</style>
+<!-- Carregamento direto do CSS específico do componente -->
+<link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard_Orgaos.css">
 
 <!--- Card para Órgãos Avaliados --->
 <div class="card mb-4" id="card-orgaos">
@@ -195,8 +16,8 @@
             </div>
             
             <!--- Conteúdo específico do componente de órgãos --->
-            <div id="orgaos-container">
-                <div id="orgaos-mais-avaliados-container" class="orgao-container">
+            <div id="orgaos-container" style="display: block !important;">
+                <div id="orgaos-mais-avaliados-container" class="orgao-container" style="display: block !important; visibility: visible !important;">
                     <!-- Conteúdo gerado dinamicamente pelo JavaScript -->
                 </div>
             </div>
@@ -267,8 +88,9 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("[OrgaosView] Atualizando componente de órgãos");
             
             try {
-                // Mostrar o container diretamente - sem animações complexas
-                $("#orgaos-container").show();
+                // Mostrar o container explicitamente com !important para garantir visibilidade
+                $("#orgaos-container").attr("style", "display: block !important");
+                $("#orgaos-mais-avaliados-container").attr("style", "display: block !important; visibility: visible !important");
                 $("#orgaos-content .tab-loader").hide();
                 
                 // Atualizar o título baseado no ano selecionado
@@ -377,6 +199,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Notificar que o componente está carregado
                 window.componentesCarregados = window.componentesCarregados || {};
                 window.componentesCarregados.orgaosView = true;
+
+                // Após renderizar o conteúdo, certificar-se de que está visível
+                setTimeout(function() {
+                    $("#orgaos-container").attr("style", "display: block !important");
+                    $("#orgaos-mais-avaliados-container").attr("style", "display: block !important; visibility: visible !important");
+                }, 100);
                 
             } catch (error) {
                 console.error("[OrgaosView] Erro ao processar dados:", error);
@@ -415,6 +243,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
         });
+        
+        // Garantir que o container esteja visível com !important
+        $("#orgaos-container").attr("style", "display: block !important");
+        $("#orgaos-mais-avaliados-container").attr("style", "display: block !important; visibility: visible !important");
+        $("#orgaos-content .tab-loader").hide();
     }
 });
 </script>

@@ -1,217 +1,24 @@
 <cfprocessingdirective pageencoding = "utf-8">
+<!-- Carregamento direto do CSS específico do componente -->
+<link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard_Status.css">
 
 <!-- Card para Distribuição de Status -->
 <div class="card mb-4" id="card-distribuicao-status">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-chart-pie mr-2"></i>Distribuição de Processos por Status
+            <i class="fas fa-tasks mr-2"></i>Distribuição por Status
         </h3>
     </div>
     <div class="card-body">
         <div class="componente-distribuicao-status">
-            <div class="status-cards-container" id="distribuicao-status-container">
-                <!-- Cards de status serão inseridos aqui via JavaScript -->
-                <div class="sem-dados-status">
-                    <i class="fas fa-spinner fa-spin mr-2"></i> Carregando dados...
-                </div>
+            <div class="status-cards-container">
+                <!-- Conteúdo gerado dinamicamente via JavaScript -->
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    /* Layout para os cards de status - atualizado para grid responsiva */
-    .status-card {
-        transition: all 0.3s ease;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        text-align: left;
-        padding: 0.4rem 0.6rem; /* Reduzido de 0.5rem 0.75rem */
-        height: 100%;
-        min-height: 75px; /* Reduzido de 80px */
-        border-radius: 6px;
-        position: relative;
-        overflow: hidden;
-    }
-    .status-card:hover {
-        transform: translateY(2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .status-card .status-icon {
-        position: absolute;
-        right: 0.75rem;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 2rem;
-        opacity: 0.3;
-    }
-    .status-card .status-info {
-        flex-grow: 1;
-        margin-right: 3rem;
-    }
-    .status-card .status-number {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 0.1rem;
-        line-height: 1;
-    }
-    .status-card .status-label {
-        font-size: 0.8rem;
-        margin: 0;
-        opacity: 0.9;
-        white-space: normal;
-        line-height: 1.2;
-        max-width: 95%;
-    }
-    
-    /* Ajuste para grid responsiva em vez de rolagem horizontal - reduzindo o gap entre os cards */
-    .status-cards-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 6px; /* Reduzido de 10px para 6px */
-        width: 100%;
-    }
-    
-    /* Classe para cada card individual - adaptada para grid */
-    .status-card-col {
-        width: 100%;
-        padding: 0; /* Remover qualquer padding */
-    }
-    
-    /* Ajuste responsivo para telas diferentes */
-    @media (min-width: 1400px) {
-        .status-cards-container {
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
-            gap: 6px; 
-        }
-    }
-    
-    @media (max-width: 992px) {
-        .status-cards-container {
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 5px; 
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .status-cards-container {
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        }
-        
-        .status-card .status-number {
-            font-size: 1.3rem;
-        }
-        
-        .status-card .status-label {
-            font-size: 0.75rem;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .status-cards-container {
-            grid-template-columns: 1fr;
-        }
-    }
-    
-    /* Remover exceções de cores para maior consistência */
-    .status-card.bg-secondary .status-icon,
-    .status-card.bg-warning .status-icon,
-    .status-card.bg-danger .status-icon,
-    .status-card.bg-info .status-icon,
-    .status-card.bg-success .status-icon {
-        color: white;
-    }
-    
-    /* Contêiner principal do componente */
-    .componente-distribuicao-status {
-        width: 100%;
-    }
-    
-    /* Estilos para quando não há dados */
-    .sem-dados-status {
-        text-align: center;
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 6px;
-        color: #6c757d;
-    }
 
-    /* Estilos específicos para a distribuição de status */
-    .distribuicao-status-container {
-        padding: 1rem 0.5rem;
-    }
-    
-    .status-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        color: #495057;
-    }
-    
-    .status-progress-container {
-        margin-bottom: 1.5rem;
-    }
-    
-    .status-label {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 0.5rem;
-    }
-    
-    .status-label-text {
-        font-weight: 500;
-        font-size: 0.9rem;
-    }
-    
-    .status-label-value {
-        font-weight: 700;
-        font-size: 0.9rem;
-    }
-    
-    .status-progress {
-        height: 10px;
-        border-radius: 5px;
-        background-color: #e9ecef;
-        overflow: hidden;
-    }
-    
-    .status-progress-bar {
-        height: 100%;
-        border-radius: 5px;
-        transition: width 1s ease;
-    }
-    
-    /* Classes de cores para status específicos */
-    .status-andamento {
-        background-color: #007bff;
-    }
-    
-    .status-concluido {
-        background-color: #28a745;
-    }
-    
-    .status-pendente {
-        background-color: #fd7e14;
-    }
-    
-    .status-cancelado {
-        background-color: #dc3545;
-    }
-    
-    .status-outro {
-        background-color: #6c757d;
-    }
-    
-    /* Animação para barras de progresso */
-    @keyframes progressAnimation {
-        0% { width: 0; }
-    }
-    
-    .status-progress-bar {
-        animation: progressAnimation 1.5s ease-in-out;
-    }
-</style>
 
 <script>
 // Carregar o componente base se ainda não foi carregado
@@ -234,84 +41,46 @@ document.addEventListener("DOMContentLoaded", function() {
         // Criar a instância do componente
         var DashboardStatus = DashboardComponentFactory.criar({
             nome: 'DistribuicaoStatus',
-            dependencias: [], // Não tem dependências externas
-            containerId: 'distribuicao-status-container',
+            dependencias: [],
+            containerId: '.componente-distribuicao-status .status-cards-container',
             cardId: 'card-distribuicao-status',
             path: 'includes/pc_dashboard_processo/pc_dashboard_distribuicao_status.cfm',
-            titulo: 'Distribuição de Processos por Status',
-            debug: false
+            titulo: 'Distribuição por Status',
+            debug: true
         });
         
-        // Sobrescrever método de atualização com a função específica deste componente
+        // Sobrescrever método de atualização com a função específica para este componente
         DashboardStatus.atualizar = function(dados) {
             if (!dados || !dados.distribuicaoStatus || !dados.distribuicaoStatus.length) {
-                $('#distribuicao-status-container').html('<div class="sem-dados-status">Nenhum dado disponível para os filtros selecionados.</div>');
+                $(".componente-distribuicao-status .status-cards-container").html(
+                    '<div class="sem-dados-status">Nenhum dado de status disponível para os filtros selecionados.</div>'
+                );
                 return DashboardStatus;
             }
             
             var statusData = dados.distribuicaoStatus;
+            var htmlStatus = '';
             
-            // Verificar se há um filtro de status global
-            var statusSelecionado = window.statusSelecionado || "Todos";
-            
-            // Filtrar os dados se um status específico foi selecionado
-            var dadosFiltrados = statusData;
-            if (statusSelecionado !== "Todos") {
-                dadosFiltrados = statusData.filter(function(status) {
-                    return status.id === parseInt(statusSelecionado);
-                });
-                
-                if (dadosFiltrados.length === 0) {
-                    $('#distribuicao-status-container').html('<div class="sem-dados-status">Nenhum dado disponível para o status selecionado.</div>');
-                    return DashboardStatus;
-                }
-            }
-            
-            // Usar layout responsivo
-            let htmlStatus = '';
-            
-            dadosFiltrados.forEach(function(status) {
+            statusData.forEach(function(status) {
                 // Determinar o ícone com base no ID do status
-                let statusIcon = 'fas fa-question-circle';
-                let statusClass = 'bg-secondary';
+                let statusIcon = "fas fa-question-circle";
+                let statusClass = "bg-secondary";
                 
-                switch (parseInt(status.id)) {
-                    case 1: // Planejado
-                        statusIcon = 'fas fa-calendar-check';
-                        statusClass = 'bg-warning';
-                        break;
-                    case 2: // Em Andamento
-                        statusIcon = 'fas fa-tasks';
-                        statusClass = 'bg-info';
-                        break;
-                    case 3: // Em Andamento (variação)
-                        statusIcon = 'fas fa-clipboard-check';
-                        statusClass = 'bg-info';
-                        break;
-                    case 4: // Concluído
-                        statusIcon = 'fas fa-check-circle';
-                        statusClass = 'bg-success';
-                        break;
-                    case 5: // Concluído (variação)
-                        statusIcon = 'fas fa-award';
-                        statusClass = 'bg-success';
-                        break;
-                    case 6: // Cancelado
-                        statusIcon = 'fas fa-times-circle';
-                        statusClass = 'bg-danger';
-                        break;
-                    case 7: // Suspenso
-                        statusIcon = 'fas fa-pause-circle';
-                        statusClass = 'bg-secondary';
-                        break;
+                // Lógica de atribuição de ícones e classes
+                switch(parseInt(status.id)) {
+                    case 1: statusIcon = "fas fa-calendar-check"; statusClass = "bg-warning"; break;
+                    case 2: statusIcon = "fas fa-tasks"; statusClass = "bg-info"; break;
+                    case 3: statusIcon = "fas fa-clipboard-check"; statusClass = "bg-info"; break;
+                    case 4: statusIcon = "fas fa-check-circle"; statusClass = "bg-success"; break;
+                    case 5: statusIcon = "fas fa-award"; statusClass = "bg-success"; break;
+                    case 6: statusIcon = "fas fa-times-circle"; statusClass = "bg-danger"; break;
+                    case 7: statusIcon = "fas fa-pause-circle"; statusClass = "bg-secondary"; break;
                 }
                 
-                // Se há estilo específico definido no banco de dados, usar ele
                 if (status.estilo && status.estilo.trim() !== '') {
-                    statusClass = ''; // Limpar classes padrão para usar o estilo personalizado
+                    statusClass = '';
                 }
                 
-                // Card com layout responsivo - agora adaptado para grid
                 htmlStatus += `
                 <div class="status-card-col">
                     <div class="status-card ${statusClass}" style="${status.estilo || ''}">
@@ -326,8 +95,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>`;
             });
             
-            $('#distribuicao-status-container').html(htmlStatus);
-            
+            $(".componente-distribuicao-status .status-cards-container").html(htmlStatus);
             return DashboardStatus;
         };
         
@@ -340,17 +108,6 @@ document.addEventListener("DOMContentLoaded", function() {
         // Verificar se já existem dados disponíveis no momento da carga do componente
         if (window.dadosAtuais && window.dadosAtuais.distribuicaoStatus) {
             DashboardStatus.atualizar(window.dadosAtuais);
-        } else {
-            // Carregar dados se necessário
-            setTimeout(function() {
-                var params = {};
-                if (typeof window.anoSelecionado !== 'undefined') params.ano = window.anoSelecionado;
-                if (typeof window.mcuSelecionado !== 'undefined') params.mcuOrigem = window.mcuSelecionado;
-                
-                if (Object.keys(params).length > 0) {
-                    DashboardStatus.carregarDados(params);
-                }
-            }, 1000);
         }
     }
 });
