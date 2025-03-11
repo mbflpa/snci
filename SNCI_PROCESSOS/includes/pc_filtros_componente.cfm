@@ -76,22 +76,18 @@
 <style>
     ###attributes.componenteID# {
         display: flex;
-        flex-wrap: nowrap;
+        flex-wrap: wrap;
         align-items: center;
         gap: 15px;
-        background-color: ##fff;
-        padding: 10px 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1.5rem;
-        overflow-x: auto;
+        width: 100%;
+        padding: 10px 0;
+        margin-bottom: 0;
     }
     
     .filtro-container.filtro-compacto {
-        margin-bottom: 0;
+        margin-bottom: 8px;
         flex: 0 0 auto;
         white-space: nowrap;
-        min-width: auto;
     }
     
     .filtro-label {
@@ -101,33 +97,33 @@
         font-size: 0.9rem;
     }
     
-    /* Responsividade */
-    @media (max-width: 992px) {
-        ###attributes.componenteID# {
-            padding: 8px 12px;
-            gap: 10px;
-        }
-        
-        .filtro-label {
-            font-size: 0.8rem;
-            margin-right: 6px;
-        }
-        
-        .filtro-compacto .btn-group-sm .btn {
-            padding: 0.12rem 0.35rem;
-            font-size: 0.7rem;
-        }
+    .card-filtros {
+        margin-bottom: 1.5rem;
     }
     
-    @media (max-width: 576px) {
-        ###attributes.componenteID# {
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        
-        .filtro-container.filtro-compacto {
-            margin-bottom: 5px !important;
-        }
+    .card-filtros .card-header {
+        background-color: ##f8f9fa;
+        padding: 0.75rem 1.25rem;
+    }
+    
+    .card-filtros .card-header i {
+        color: ##6c757d;
+        margin-right: 0.5rem;
+    }
+    
+    .card-filtros .card-body {
+        padding: 1rem;
+        overflow-x: hidden;
+    }
+    
+    .btn-group-filtros {
+        flex-wrap: wrap;
+        display: inline-flex;
+    }
+    
+    .btn-group-filtros .btn {
+        margin: 0 2px 4px 0;
+        border-radius: 0.2rem !important;
     }
     
     .btn-group .btn.active {
@@ -140,39 +136,94 @@
         background-color: ##495057 !important;
         border-color: ##343a40 !important;
     }
+    
+    /* Responsividade */
+    @media (max-width: 992px) {
+        .filtro-label {
+            font-size: 0.85rem;
+            margin-right: 6px;
+            min-width: 40px;
+        }
+        
+        .filtro-compacto .btn-group-sm .btn {
+            padding: 0.12rem 0.35rem;
+            font-size: 0.75rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        ###attributes.componenteID# {
+            gap: 10px;
+        }
+        
+        .filtro-container.filtro-compacto {
+            margin-bottom: 10px;
+            flex: 0 0 100%;
+        }
+        
+        .btn-group-filtros {
+            max-width: 100%;
+            overflow-x: visible;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .card-filtros .card-body {
+            padding: 0.75rem;
+        }
+        
+        .filtro-container.filtro-compacto {
+            margin-bottom: 12px;
+        }
+        
+        .filtro-label {
+            margin-bottom: 5px;
+            display: block;
+        }
+    }
 </style>
 
-<!-- Container principal de filtros -->
-<div id="#attributes.componenteID#" class="filtros-container">
-    <!-- Filtro por ano -->
-    <cfif attributes.exibirAno>
-        <div class="filtro-container filtro-compacto">
-            <div class="filtro-label">Ano:</div>
-            <div id="opcoesAno#attributes.componenteID#" class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
-                <!-- Botões gerados via JS -->
-            </div>
+<!-- Card de Filtros -->
+<div class="card card-filtros">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-filter"></i> Filtros
+        </h3>
+    </div>
+    <div class="card-body">
+        <!-- Container principal de filtros -->
+        <div id="#attributes.componenteID#" class="filtros-container">
+            <!-- Filtro por ano -->
+            <cfif attributes.exibirAno>
+                <div class="filtro-container filtro-compacto">
+                    <div class="filtro-label">Ano:</div>
+                    <div id="opcoesAno#attributes.componenteID#" class="btn-group btn-group-toggle btn-group-sm btn-group-filtros" data-toggle="buttons">
+                        <!-- Botões gerados via JS -->
+                    </div>
+                </div>
+            </cfif>
+            
+            <!-- Filtro por órgão -->
+            <cfif attributes.exibirOrgao AND mostrarFiltroOrgao>
+                <div class="filtro-container filtro-compacto">
+                    <div class="filtro-label">Órgão:</div>
+                    <div id="opcoesMcu#attributes.componenteID#" class="btn-group btn-group-toggle btn-group-sm btn-group-filtros" data-toggle="buttons">
+                        <!-- Botões gerados via JS -->
+                    </div>
+                </div>
+            </cfif>
+            
+            <!-- Filtro por status -->
+            <cfif attributes.exibirStatus>
+                <div class="filtro-container filtro-compacto">
+                    <div class="filtro-label">Status:</div>
+                    <div id="opcoesStatus#attributes.componenteID#" class="btn-group btn-group-toggle btn-group-sm btn-group-filtros" data-toggle="buttons">
+                        <!-- Botões gerados via JS -->
+                    </div>
+                </div>
+            </cfif>
         </div>
-    </cfif>
-    
-    <!-- Filtro por órgão -->
-    <cfif attributes.exibirOrgao AND mostrarFiltroOrgao>
-        <div class="filtro-container filtro-compacto">
-            <div class="filtro-label">Órgão:</div>
-            <div id="opcoesMcu#attributes.componenteID#" class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
-                <!-- Botões gerados via JS -->
-            </div>
-        </div>
-    </cfif>
-    
-    <!-- Filtro por status -->
-    <cfif attributes.exibirStatus>
-        <div class="filtro-container filtro-compacto">
-            <div class="filtro-label">Status:</div>
-            <div id="opcoesStatus#attributes.componenteID#" class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
-                <!-- Botões gerados via JS -->
-            </div>
-        </div>
-    </cfif>
+    </div>
 </div>
 
 <!-- Script do componente -->
@@ -255,29 +306,24 @@ $(document).ready(function() {
         
         // Adicionar botão "Todos"
         const btnTodosMcu = `<label class="btn btn-outline-secondary btn-todos">
-                        <input type="radio" name="opcaoMcu${componenteID}" autocomplete="off" value="Todos"/> Todos
+                        <input type="radio" name="opcaoMcu${componenteID}" checked autocomplete="off" value="Todos"/> Todos
                     </label>`;
         opcoesMcuEl.append(btnTodosMcu);
         
-        // Valor selecionado
-        const mcuSelecionado = '#orgaoOrigemSelecionado#';
+        // Valor selecionado sempre começa como "Todos"
+        const mcuSelecionado = 'Todos';
         window.mcuSelecionado = mcuSelecionado;
         
         // Adicionar botões para cada órgão
         orgaos.forEach(function(orgao) {
-            const checked = (orgao.mcu === mcuSelecionado) ? 'checked' : '';
             const btn = `<label class="btn btn-outline-info" style="margin-left:2px;">
-                            <input type="radio" name="opcaoMcu${componenteID}" ${checked} autocomplete="off" value="${orgao.mcu}"/> ${orgao.sigla}
+                            <input type="radio" name="opcaoMcu${componenteID}" autocomplete="off" value="${orgao.mcu}"/> ${orgao.sigla}
                         </label>`;
             opcoesMcuEl.append(btn);
         });
         
-        // Ativar o botão selecionado ou "Todos" por padrão
-        if (mcuSelecionado === "Todos") {
-            $(`input[name="opcaoMcu${componenteID}"][value="Todos"]`).parent().addClass('active');
-        } else {
-            $(`input[name="opcaoMcu${componenteID}"][value="${mcuSelecionado}"]`).parent().addClass('active');
-        }
+        // Ativar o botão "Todos" para órgãos inicialmente
+        $(`input[name="opcaoMcu${componenteID}"][value="Todos"]`).parent().addClass('active');
         
         // Event handler
         $(`input[name="opcaoMcu${componenteID}"]`).change(function() {
@@ -297,7 +343,7 @@ $(document).ready(function() {
         
         // Adicionar botão "Todos"
         const btnTodosStatus = `<label class="btn btn-outline-secondary btn-todos">
-                            <input type="radio" name="opcaoStatus${componenteID}" autocomplete="off" value="Todos"/> Todos
+                            <input type="radio" name="opcaoStatus${componenteID}" checked autocomplete="off" value="Todos"/> Todos
                        </label>`;
         opcoesStatusEl.append(btnTodosStatus);
         
