@@ -183,7 +183,6 @@
       </div>
     </div>
 
-    <script src="plugins/chart.js/Chart.min.js"></script>
     <script>
         $(document).ready(function() {
             // Inicializar o array global para armazenar callbacks de componentes
@@ -375,7 +374,6 @@
 
             // Variável para controlar se os componentes já foram carregados
             var componentesCarregados = {
-                graficos: false,
                 orgaosView: false
             };
             
@@ -389,7 +387,7 @@
                 componentesCarregados[componente] = true;
                 
                 // Verificar se todos os componentes estão carregados
-                if (componentesCarregados.graficos && componentesCarregados.orgaosView) {
+                if (componentesCarregados.orgaosView) {
                     // Se ambos estiverem carregados, podemos atualizar os dados
                     atualizarDados();
                 }
@@ -473,13 +471,14 @@
                             });
                         }
                         
-                        // Atualizar gráficos e órgãos avaliados
-                        if (componentesCarregados.graficos && typeof window.atualizarGraficos === 'function') {
-                            window.atualizarGraficos(resultado);
-                        }
-                        
+                        // Atualizar órgãos avaliados - Simplificado para usar a nova API do componente de gráficos
                         if (componentesCarregados.orgaosView && typeof window.atualizarViewOrgaos === 'function') {
                             window.atualizarViewOrgaos(resultado);
+                        }
+                        
+                        // Usar a nova API de gráficos diretamente
+                        if (typeof DashboardGraficos !== 'undefined') {
+                            DashboardGraficos.atualizarGraficos(resultado);
                         }
                         
                         // Fechar o modal de carregamento após receber os dados
@@ -541,11 +540,9 @@
                 
                 // Resetar o estado de carregamento
                 dadosCarregados = false;
-                componentesCarregados.graficos = false;
                 componentesCarregados.orgaosView = false;
                 
                 // Carregar os componentes - a função atualizarDados será chamada quando todos estiverem prontos
-                carregarComponente('graficos');
                 carregarComponente('orgaosView');
                 
                 // Não fechamos o modal aqui - será fechado após o carregamento dos dados
