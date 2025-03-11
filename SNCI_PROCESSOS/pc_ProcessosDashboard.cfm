@@ -92,6 +92,9 @@
             }
         }
     </style>
+    
+    <!-- Carregamento do componente base -->
+    <script src="dist/js/snciDashboardComponent.js"></script>
 </head>
 <!-- Estrutura padrão do projeto -->
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -185,7 +188,7 @@
 
     <script>
         $(document).ready(function() {
-            // Inicializar o array global para armazenar callbacks de componentes
+            // Inicializar o array global para armazenar callbacks de componentes (mantido para compatibilidade)
             window.atualizarDadosComponentes = [];
             
             // Inicializar tooltips e popovers com configurações avançadas
@@ -372,126 +375,14 @@
                 }, 500);
             };
 
-            // Variável para controlar se os componentes já foram carregados
-            var componentesCarregados = {
-                orgaosView: false
-            };
+            // Estrutura simplificada para armazenar dados
+            window.dadosAtuais = null;
             
-            // Variável para sinalizar quando os dados forem carregados
-            var dadosCarregados = false;
-
-            // Função para carregar os componentes via AJAX
-            function carregarComponente(componente) {
-                // Como os componentes já são incluídos diretamente via cfinclude,
-                // precisamos marcar explicitamente que estão carregados
-                componentesCarregados[componente] = true;
-                
-                // Verificar se todos os componentes estão carregados
-                if (componentesCarregados.orgaosView) {
-                    // Se ambos estiverem carregados, podemos atualizar os dados
-                    atualizarDados();
-                }
+            // Inicializar estrutura de componentes carregados (necessária para alguns componentes)
+            if (typeof window.componentesCarregados === 'undefined') {
+                window.componentesCarregados = {};
             }
-        
-            function atualizarDados() {
-                // Primeiro carrega apenas o total de processos (mais rápido)
-                $.ajax({
-                    url: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasProcessos&returnformat=json',
-                    method: 'POST',
-                    data: { 
-                        ano: anoSelecionado,
-                        mcuOrigem: mcuSelecionado,
-                        statusFiltro: statusSelecionado
-                    },
-                    dataType: 'json',
-                    success: function(resultado) {
-                        console.log("Dados básicos recebidos com sucesso:", resultado);
-                        
-                        // Atualizar cards de métricas
-                        if (typeof window.atualizarCardsProcMet === 'function') {
-                            window.atualizarCardsProcMet(resultado);
-                        }
-                        
-                        // Agora carrega os dados detalhados para os outros componentes
-                        carregarDadosDetalhados();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Erro ao carregar estatísticas:", error);
-                        fecharModalComSeguranca();
-                        
-                        // Exibir mensagem de erro na interface
-                        $(".tab-loader-container:visible").html('<div class="alert alert-danger">Erro ao carregar dados: ' + error + '</div>');
-                    }
-                });
-            }
-        
-            function carregarDadosDetalhados() {
-                $.ajax({
-                    url: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
-                    method: 'POST',
-                    data: { 
-                        ano: anoSelecionado,
-                        mcuOrigem: mcuSelecionado,
-                        statusFiltro: statusSelecionado
-                    },
-                    dataType: 'json',
-                    success: function(resultado) {
-                        console.log("Dados detalhados recebidos com sucesso:", resultado);
-                        dadosCarregados = true;
-                        
-                        // Armazenar os dados atuais globalmente para que os componentes possam acessá-los
-                        window.dadosAtuais = resultado;
-                        
-                        // Atualizar os métricos gerais
-                        if (typeof window.atualizarCardsProcMet === 'function') {
-                            window.atualizarCardsProcMet(resultado);
-                        }
-                        
-                        // Atualizar o componente de distribuição de status
-                        if (typeof window.atualizarDistribuicaoStatus === 'function') {
-                            window.atualizarDistribuicaoStatus(resultado.distribuicaoStatus);
-                        }
-                        
-                        // Atualizar o componente de tipos de processos
-                        if (typeof window.atualizarTiposProcesso === 'function') {
-                            window.atualizarTiposProcesso(resultado.distribuicaoTipos, resultado.totalProcessos);
-                        }
-                        
-                        // Atualizar o componente de classificação de processos
-                        if (typeof window.atualizarClassificacaoProcesso === 'function') {
-                            window.atualizarClassificacaoProcesso(resultado.distribuicaoClassificacao, resultado.totalProcessos);
-                        }
-                        
-                        // Chamar todas as funções de atualização registradas
-                        if (Array.isArray(window.atualizarDadosComponentes)) {
-                            window.atualizarDadosComponentes.forEach(function(atualizarFn) {
-                                if (typeof atualizarFn === 'function') {
-                                    atualizarFn(resultado);
-                                }
-                            });
-                        }
-                        
-                        // Atualizar órgãos avaliados - Simplificado para usar a nova API do componente de gráficos
-                        if (componentesCarregados.orgaosView && typeof window.atualizarViewOrgaos === 'function') {
-                            window.atualizarViewOrgaos(resultado);
-                        }
-                        
-                        // Usar a nova API de gráficos diretamente
-                        if (typeof DashboardGraficos !== 'undefined') {
-                            DashboardGraficos.atualizarGraficos(resultado);
-                        }
-                        
-                        // Fechar o modal de carregamento após receber os dados
-                        fecharModalComSeguranca();
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Erro ao carregar estatísticas detalhadas:", error);
-                        dadosCarregados = true;
-                        fecharModalComSeguranca();
-                    }
-                });
-            }
-        
+            
             // Função melhorada para garantir o fechamento do modal
             function fecharModalComSeguranca() {
                 try {
@@ -503,9 +394,7 @@
                     
                     // Espera um pouco e então verifica se o modal realmente fechou
                     setTimeout(function() {
-                        // Se o modal ainda estiver visível ou com classes modal-open
                         if ($('#modalOverlay').is(':visible') || $('body').hasClass('modal-open')) {
-                            // Remove manualmente as classes e elementos do modal
                             $('.modal-backdrop').remove();
                             $('body').removeClass('modal-open');
                             $('body').css('padding-right', '');
@@ -523,40 +412,83 @@
                 }
             }
         
-            function carregarDashboard() {
+            // Função simplificada para carregar dados da dashboard
+            function carregarDados() {
                 // Mostrar modal de carregamento
-                try {
-                    $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
-                    $('#modalOverlay').modal('show');
-                } catch (e) {
-                    console.error("Erro ao mostrar modal:", e);
-                }
+                $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
+                $('#modalOverlay').modal('show');
                 
-                // Configurar um timeout de segurança para fechar o modal após 30 segundos
+                // Timeout de segurança para fechar o modal após 30 segundos
                 var timeoutSeguranca = setTimeout(function() {
                     console.warn("Timeout de segurança acionado após 30 segundos");
                     fecharModalComSeguranca();
                 }, 30000);
                 
-                // Resetar o estado de carregamento
-                dadosCarregados = false;
-                componentesCarregados.orgaosView = false;
-                
-                // Carregar os componentes - a função atualizarDados será chamada quando todos estiverem prontos
-                carregarComponente('orgaosView');
-                
-                // Não fechamos o modal aqui - será fechado após o carregamento dos dados
-                // O timeout de segurança permanece como fallback
+                // Fazer uma única chamada AJAX para obter todos os dados
+                $.ajax({
+                    url: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
+                    method: 'POST',
+                    data: { 
+                        ano: anoSelecionado,
+                        mcuOrigem: mcuSelecionado,
+                        statusFiltro: statusSelecionado
+                    },
+                    dataType: 'json',
+                    success: function(dados) {
+                        console.log("Dados recebidos com sucesso:", dados);
+                        
+                        // Armazenar dados para uso global
+                        window.dadosAtuais = dados;
+                        
+                        // Garantir que o componente de órgãos seja atualizado especificamente
+                        if (window.atualizarViewOrgaos && typeof window.atualizarViewOrgaos === 'function') {
+                            console.log("Atualizando componente de órgãos explicitamente");
+                            try {
+                                window.atualizarViewOrgaos(dados);
+                            } catch(e) {
+                                console.error("Erro ao atualizar componente de órgãos:", e);
+                            }
+                        }
+                        
+                        // Chamar explicitamente as funções de atualização para cada componente
+                        if (Array.isArray(window.atualizarDadosComponentes)) {
+                            window.atualizarDadosComponentes.forEach(function(callback) {
+                                if (typeof callback === 'function') {
+                                    try {
+                                        callback(dados);
+                                    } catch(e) {
+                                        console.error("Erro ao chamar função de atualização:", e);
+                                    }
+                                }
+                            });
+                        }
+                        
+                        // Limpar o timeout de segurança
+                        clearTimeout(timeoutSeguranca);
+                        
+                        // Fechar modal após um breve delay para garantir que todos os componentes foram atualizados
+                        setTimeout(function() {
+                            fecharModalComSeguranca();
+                        }, 1000);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Erro ao carregar dados:", error);
+                        fecharModalComSeguranca();
+                        
+                        // Exibir mensagem de erro na interface
+                        alert("Erro ao carregar dados: " + error);
+                    }
+                });
             }
-        
-            // Carregar o dashboard inicial
-            carregarDashboard();
+
+            // Carregar dados iniciais
+            carregarDados();
             
             // Handler para mudança de ano
             $("input[name='opcaoAno']").change(function() {
                 anoSelecionado = $(this).val();
-                window.anoSelecionado = anoSelecionado; // Atualizar a variável global
-                carregarDashboard();
+                window.anoSelecionado = anoSelecionado;
+                carregarDados();
             });
             
             <cfif mostrarFiltroOrgao>
@@ -564,7 +496,7 @@
                 $("input[name='opcaoMcu']").change(function() {
                     mcuSelecionado = $(this).val();
                     window.mcuSelecionado = mcuSelecionado;
-                    carregarDashboard();
+                    carregarDados();
                 });
             </cfif>
 
@@ -572,13 +504,8 @@
             $("input[name='opcaoStatus']").change(function() {
                 statusSelecionado = $(this).val();
                 window.statusSelecionado = statusSelecionado;
-                carregarDashboard();
+                carregarDados();
             });
-
-            // Após o ready do documento, disparar manualmente o carregamento dos componentes
-            setTimeout(function() {
-                carregarDashboard();
-            }, 500);
         });
     </script>
 </body>

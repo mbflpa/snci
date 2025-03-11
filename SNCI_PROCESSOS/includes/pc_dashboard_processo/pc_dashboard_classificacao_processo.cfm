@@ -252,10 +252,33 @@
 </style>
 
 <script>
-$(document).ready(function() {
-    // Verificar se o script já foi carregado para evitar duplicidade
-    if (typeof window.classificacaoProcessoLoaded === 'undefined') {
-        window.classificacaoProcessoLoaded = true;
+// Carregar o componente base se ainda não foi carregado
+if (typeof DashboardComponentFactory === 'undefined') {
+    document.write('<script src="dist/js/snciDashboardComponent.js"><\/script>');
+}
+
+// Definir o componente de classificação de processos usando a fábrica
+document.addEventListener("DOMContentLoaded", function() {
+    // Esperar pelo carregamento da biblioteca de componentes
+    var checkComponentLibrary = setInterval(function() {
+        if (typeof DashboardComponentFactory !== 'undefined') {
+            clearInterval(checkComponentLibrary);
+            initClassificacaoComponent();
+        }
+    }, 100);
+
+    // Inicializar o componente de classificação
+    function initClassificacaoComponent() {
+        // Criar a instância do componente
+        var DashboardClassificacao = DashboardComponentFactory.criar({
+            nome: 'ClassificacaoProcessos',
+            dependencias: [], // Não tem dependências externas
+            containerId: 'classificacao-processo-content',
+            cardId: 'card-classificacao-processo',
+            path: 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processo.cfm',
+            titulo: 'Classificação de Processos',
+            debug: false
+        });
         
         // Cores para as diferentes classificações
         const coresClassificacao = [
@@ -270,12 +293,15 @@ $(document).ready(function() {
             '#dc3545'  // vermelho
         ];
         
-        // Função para atualizar a visualização de classificações de processos
-        window.atualizarClassificacaoProcesso = function(classificacaoData, totalProcessos) {
-            if (!classificacaoData || !classificacaoData.length) {
+        // Sobrescrever método de atualização com a função específica deste componente
+        DashboardClassificacao.atualizar = function(dados) {
+            if (!dados || !dados.distribuicaoClassificacao || !dados.distribuicaoClassificacao.length) {
                 $('#classificacao-processo-content').html('<div class="sem-dados-classificacao">Nenhuma classificação disponível para os filtros selecionados.</div>');
-                return;
+                return DashboardClassificacao;
             }
+            
+            const classificacaoData = dados.distribuicaoClassificacao;
+            const totalProcessos = dados.totalProcessos || 0;
             
             let htmlClassificacao = '';
             
@@ -285,7 +311,7 @@ $(document).ready(function() {
                 const corIndex = index % coresClassificacao.length;
                 const corClassificacao = coresClassificacao[corIndex];
                 
-                // Modificado para posicionar o badge à esquerda, similar ao componente de tipos de processos
+                // Modificado para posicionar o badge à esquerda
                 htmlClassificacao += `
                 <div class="classificacao-item">
                     <div class="classificacao-badge" style="background-color: ${corClassificacao}; color: white;">
@@ -305,43 +331,31 @@ $(document).ready(function() {
             });
             
             $('#classificacao-processo-content').html(htmlClassificacao);
+            
+            return DashboardClassificacao;
         };
-
-        // Adicionar este código para garantir que o componente seja incluído na atualização de dados
-        if (typeof window.atualizarDadosComponentes !== 'function') {
-            window.atualizarDadosComponentes = [];
-        }
         
-        // Registrar este componente para ser atualizado quando os dados forem carregados
-        window.atualizarDadosComponentes.push(function(dados) {
-            if (dados && dados.distribuicaoClassificacao) {
-                window.atualizarClassificacaoProcesso(dados.distribuicaoClassificacao, dados.totalProcessos);
-            }
-        });
+        // Inicializar e registrar o componente
+        DashboardClassificacao.init().registrar();
+        
+        // Compatibilidade com interface antiga
+        window.atualizarClassificacaoProcesso = DashboardClassificacao.atualizar;
         
         // Verificar se já existem dados disponíveis no momento da carga do componente
         if (window.dadosAtuais && window.dadosAtuais.distribuicaoClassificacao) {
-            window.atualizarClassificacaoProcesso(window.dadosAtuais.distribuicaoClassificacao, window.dadosAtuais.totalProcessos);
-        }
-
-         // Inicializar o ícone de favorito para este card
-        const cardId = 'card-classificacao-processo';
-         // Caminho do componente para o ícone de favorito
-         // O caminho deve ser relativo ao diretório raiz do projeto
-         // Exemplo: 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processo.cfm'
-        const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processo.cfm';
-         // Adicionar o ícone de favorito ao cabeçalho do card
-         // Verificar se a função initFavoriteIcon está disponível
-        const componentTitle = 'Indicadores de Processos';
-        
-        // Verificar se a função initFavoriteIcon está disponível
-        if (typeof initFavoriteIcon === 'function') {
-            // Adicionar o ícone de favorito ao cabeçalho do card
-            initFavoriteIcon(cardId, componentPath, componentTitle);
+            DashboardClassificacao.atualizar(window.dadosAtuais);
         } else {
-            console.error('A função initFavoriteIcon não está disponível. Verifique se o arquivo snciProcesso.js foi carregado corretamente.');
+            // Carregar dados se necessário
+            setTimeout(function() {
+                var params = {};
+                if (typeof window.anoSelecionado !== 'undefined') params.ano = window.anoSelecionado;
+                if (typeof window.mcuSelecionado !== 'undefined') params.mcuOrigem = window.mcuSelecionado;
+                
+                if (Object.keys(params).length > 0) {
+                    DashboardClassificacao.carregarDados(params);
+                }
+            }, 1000);
         }
-
     }
 });
 </script>

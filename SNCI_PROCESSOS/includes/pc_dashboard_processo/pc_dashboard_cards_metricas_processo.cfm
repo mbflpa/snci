@@ -49,8 +49,6 @@
         color: white;
     }
     
-    
-    
     /* Cores específicas por tipo de métrica */
     .bg-primary {
         background-color: #007bff !important;
@@ -112,13 +110,36 @@
 </div>
 
 <script>
-$(document).ready(function() {
-    // Verificar se o script já foi carregado para evitar duplicidade
-    if (typeof window.cardsMetricasProcessoLoaded === 'undefined') {
-        window.cardsMetricasProcessoLoaded = true;
+// Carregar o componente base se ainda não foi carregado
+if (typeof DashboardComponentFactory === 'undefined') {
+    document.write('<script src="dist/js/snciDashboardComponent.js"><\/script>');
+}
+
+// Definir o componente de cards de métricas usando a fábrica
+document.addEventListener("DOMContentLoaded", function() {
+    // Esperar pelo carregamento da biblioteca de componentes
+    var checkComponentLibrary = setInterval(function() {
+        if (typeof DashboardComponentFactory !== 'undefined') {
+            clearInterval(checkComponentLibrary);
+            initCardsMetricasComponent();
+        }
+    }, 100);
+
+    // Inicializar o componente de cards de métricas
+    function initCardsMetricasComponent() {
+        // Criar a instância do componente
+        var DashboardMetricas = DashboardComponentFactory.criar({
+            nome: 'MetricasProcessos',
+            dependencias: [], // Não tem dependências externas
+            containerId: '',  // Não tem um container único
+            cardId: 'card-metricas-processo',
+            path: 'includes/pc_dashboard_processo/pc_dashboard_cards_metricas_processo.cfm',
+            titulo: 'Indicadores de Processos',
+            debug: false
+        });
         
         // Função para animação dos números
-        window.animateNumberValue = function(el, start, end, duration) {
+        function animateNumberValue(el, start, end, duration) {
             let startTimestamp = null;
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
@@ -134,34 +155,48 @@ $(document).ready(function() {
         }
         
         // Armazenar valores anteriores para permitir animação
-        window.previousCardValues = {
+        var previousCardValues = {
             totalProcessos: 0
         };
         
-        // Função para atualizar os cards de métricas
-        window.atualizarCardsProcMet = function(resultado) {
-            if (!resultado) return;
+        // Sobrescrever método de atualização com a função específica deste componente
+        DashboardMetricas.atualizar = function(dados) {
+            if (!dados) return DashboardMetricas;
             
             // Extrair apenas o valor total de processos
-            const totalProcessos = parseInt(resultado.totalProcessos) || 0;
+            const totalProcessos = parseInt(dados.totalProcessos) || 0;
             
             // Animar valor
             const elTotalProcessos = document.getElementById("totalProcessos");
-            window.animateNumberValue(elTotalProcessos, window.previousCardValues.totalProcessos, totalProcessos, 1000);
-            window.previousCardValues.totalProcessos = totalProcessos;
+            animateNumberValue(elTotalProcessos, previousCardValues.totalProcessos, totalProcessos, 1000);
+            previousCardValues.totalProcessos = totalProcessos;
+            
+            return DashboardMetricas;
         };
         
-        // Inicializar o ícone de favorito para este card
-        const cardId = 'card-metricas-processo';
-        const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_cards_metricas_processo.cfm';
-        const componentTitle = 'Indicadores de Processos';
+        // Disponibilizar função de animação publicamente
+        window.animateNumberValue = animateNumberValue;
         
-        // Verificar se a função initFavoriteIcon está disponível
-        if (typeof initFavoriteIcon === 'function') {
-            // Adicionar o ícone de favorito ao cabeçalho do card
-            initFavoriteIcon(cardId, componentPath, componentTitle);
+        // Inicializar e registrar o componente
+        DashboardMetricas.init().registrar();
+        
+        // Compatibilidade com interface antiga
+        window.atualizarCardsProcMet = DashboardMetricas.atualizar;
+        
+        // Verificar se já existem dados disponíveis no momento da carga do componente
+        if (window.dadosAtuais) {
+            DashboardMetricas.atualizar(window.dadosAtuais);
         } else {
-            console.error('A função initFavoriteIcon não está disponível. Verifique se o arquivo snciProcesso.js foi carregado corretamente.');
+            // Carregar dados se necessário
+            setTimeout(function() {
+                var params = {};
+                if (typeof window.anoSelecionado !== 'undefined') params.ano = window.anoSelecionado;
+                if (typeof window.mcuSelecionado !== 'undefined') params.mcuOrigem = window.mcuSelecionado;
+                
+                if (Object.keys(params).length > 0) {
+                    DashboardMetricas.carregarDados(params);
+                }
+            }, 1000);
         }
     }
 });

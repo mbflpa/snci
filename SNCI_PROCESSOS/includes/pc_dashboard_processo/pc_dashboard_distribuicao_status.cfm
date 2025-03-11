@@ -214,17 +214,42 @@
 </style>
 
 <script>
-$(document).ready(function() {
-    // Verificar se o script já foi carregado para evitar duplicidade
-    if (typeof window.distribuicaoStatusLoaded === 'undefined') {
-        window.distribuicaoStatusLoaded = true;
+// Carregar o componente base se ainda não foi carregado
+if (typeof DashboardComponentFactory === 'undefined') {
+    document.write('<script src="dist/js/snciDashboardComponent.js"><\/script>');
+}
+
+// Definir o componente de distribuição de status usando a fábrica
+document.addEventListener("DOMContentLoaded", function() {
+    // Esperar pelo carregamento da biblioteca de componentes
+    var checkComponentLibrary = setInterval(function() {
+        if (typeof DashboardComponentFactory !== 'undefined') {
+            clearInterval(checkComponentLibrary);
+            initDistribuicaoStatusComponent();
+        }
+    }, 100);
+
+    // Inicializar o componente de distribuição de status
+    function initDistribuicaoStatusComponent() {
+        // Criar a instância do componente
+        var DashboardStatus = DashboardComponentFactory.criar({
+            nome: 'DistribuicaoStatus',
+            dependencias: [], // Não tem dependências externas
+            containerId: 'distribuicao-status-container',
+            cardId: 'card-distribuicao-status',
+            path: 'includes/pc_dashboard_processo/pc_dashboard_distribuicao_status.cfm',
+            titulo: 'Distribuição de Processos por Status',
+            debug: false
+        });
         
-        // Função para atualizar os cards de status
-        window.atualizarDistribuicaoStatus = function(statusData) {
-            if (!statusData || !statusData.length) {
+        // Sobrescrever método de atualização com a função específica deste componente
+        DashboardStatus.atualizar = function(dados) {
+            if (!dados || !dados.distribuicaoStatus || !dados.distribuicaoStatus.length) {
                 $('#distribuicao-status-container').html('<div class="sem-dados-status">Nenhum dado disponível para os filtros selecionados.</div>');
-                return;
+                return DashboardStatus;
             }
+            
+            var statusData = dados.distribuicaoStatus;
             
             // Verificar se há um filtro de status global
             var statusSelecionado = window.statusSelecionado || "Todos";
@@ -238,7 +263,7 @@ $(document).ready(function() {
                 
                 if (dadosFiltrados.length === 0) {
                     $('#distribuicao-status-container').html('<div class="sem-dados-status">Nenhum dado disponível para o status selecionado.</div>');
-                    return;
+                    return DashboardStatus;
                 }
             }
             
@@ -302,37 +327,31 @@ $(document).ready(function() {
             });
             
             $('#distribuicao-status-container').html(htmlStatus);
+            
+            return DashboardStatus;
         };
-
-         // Inicializar o ícone de favorito para este card
-        const cardId = 'card-distribuicao-status';
-        const componentPath = 'includes/pc_dashboard_processo/pc_dashboard_distribuicao_status.cfm';
-        const componentTitle = 'Indicadores de Processos';
         
-        // Verificar se a função initFavoriteIcon está disponível
-        if (typeof initFavoriteIcon === 'function') {
-            // Adicionar o ícone de favorito ao cabeçalho do card
-            initFavoriteIcon(cardId, componentPath, componentTitle);
+        // Inicializar e registrar o componente
+        DashboardStatus.init().registrar();
+        
+        // Compatibilidade com interface antiga
+        window.atualizarDistribuicaoStatus = DashboardStatus.atualizar;
+        
+        // Verificar se já existem dados disponíveis no momento da carga do componente
+        if (window.dadosAtuais && window.dadosAtuais.distribuicaoStatus) {
+            DashboardStatus.atualizar(window.dadosAtuais);
         } else {
-            console.error('A função initFavoriteIcon não está disponível. Verifique se o arquivo snciProcesso.js foi carregado corretamente.');
+            // Carregar dados se necessário
+            setTimeout(function() {
+                var params = {};
+                if (typeof window.anoSelecionado !== 'undefined') params.ano = window.anoSelecionado;
+                if (typeof window.mcuSelecionado !== 'undefined') params.mcuOrigem = window.mcuSelecionado;
+                
+                if (Object.keys(params).length > 0) {
+                    DashboardStatus.carregarDados(params);
+                }
+            }, 1000);
         }
-    }
-    
-    // Adicionar este código para garantir que o componente seja incluído na atualização de dados
-    if (typeof window.atualizarDadosComponentes !== 'function') {
-        window.atualizarDadosComponentes = [];
-    }
-    
-    // Registrar este componente para ser atualizado quando os dados forem carregados
-    window.atualizarDadosComponentes.push(function(dados) {
-        if (dados && dados.distribuicaoStatus) {
-            window.atualizarDistribuicaoStatus(dados.distribuicaoStatus);
-        }
-    });
-    
-    // Verificar se já existem dados disponíveis no momento da carga do componente
-    if (window.dadosAtuais && window.dadosAtuais.distribuicaoStatus) {
-        window.atualizarDistribuicaoStatus(window.dadosAtuais.distribuicaoStatus);
     }
 });
 </script>
