@@ -5,11 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard de Favoritos</title>
-    
-    <!-- Adicionar os arquivos CSS do Bootstrap -->
-    <link rel="stylesheet" href="plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" href="dist/css/adminlte.min.css">
+
     <link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard.css">
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -58,10 +54,6 @@
     </div>
     <cfinclude template="includes/pc_sidebar.cfm">
 
-    <!-- Adicionar os scripts JavaScript necessários -->
-    <script src="plugins/jquery/jquery.min.js"></script>
-    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="dist/js/adminlte.min.js"></script>
 
     <script>
         $(document).ready(function() {

@@ -6,9 +6,6 @@
     <meta charset="UTF-8">
     <title>Dashboard de Processos</title>
     <!-- Carregamento dos estilos -->
-    <link rel="stylesheet" href="plugins/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
-    <link rel="stylesheet" href="dist/css/adminlte.min.css">
     <link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard.css">
     
     <!-- Carregamento do componente base -->
@@ -81,11 +78,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Scripts necessários -->
-    <script src="plugins/jquery/jquery.min.js"></script>
-    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="dist/js/adminlte.min.js"></script>
 
     <script>
         $(document).ready(function() {

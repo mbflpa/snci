@@ -1,26 +1,5 @@
 <cfprocessingdirective pageencoding = "utf-8">	
-<cfquery name="rsAnoDashboard" datasource="#application.dsn_processos#">
-    SELECT DISTINCT RIGHT(pc_processo_id, 4) AS ano FROM pc_processos 
-    WHERE pc_num_status IN(4,5) and RIGHT(pc_processo_id, 4) >= '#application.anoPesquisaOpiniao#'
-    <cfif application.rsUsuarioParametros.pc_usu_perfil eq 8>
-        AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-    </cfif>
-    ORDER BY ano 
-</cfquery>
-<cfquery name="rsOrgaosOrigem" datasource="#application.dsn_processos#">
-    SELECT pc_org_mcu, pc_org_sigla
-    FROM pc_orgaos 
-    WHERE pc_org_status = 'O'
-    <cfif application.rsUsuarioParametros.pc_usu_perfil eq 8>
-        AND pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-    </cfif>
-    ORDER BY pc_org_sigla
-</cfquery>
-
-<cfset mostrarFiltroOrgao = application.rsUsuarioParametros.pc_usu_perfil neq 8>
-<cfif NOT mostrarFiltroOrgao AND rsOrgaosOrigem.recordCount GT 0>
-    <cfset orgaoOrigemSelecionado = rsOrgaosOrigem.pc_org_mcu>
-</cfif>
+<!--- Removidas as consultas SQL redundantes que agora são feitas pelo componente de filtros --->
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -29,74 +8,6 @@
     <title>Dashboard Pesquisas de Opinião</title>
     <link rel="stylesheet" href="plugins/jqcloud/jqcloud.min.css">
     <link rel="stylesheet" href="dist/css/stylesSNCI_PesquisasDashboard.css">
-    
-    <style>
-        #tabelaPesquisas th {
-            font-size: smaller; /* Reduz o tamanho da fonte dos cabeçalhos */
-        }
-        
-        /* Estilo para os containers de filtro lado a lado */
-        .filtros-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 1.5rem;
-        }
-        
-        /* Estilo para loaders de componentes */
-        .tab-loader-container {
-            min-height: 200px;
-            position: relative;
-        }
-        
-        .tab-loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #6c757d;
-        }
-        
-        .tab-loader i {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-        
-        /* Novos estilos para expansão correta do conteúdo das abas */
-        .dashboard-tab-content {
-            min-height: 300px;
-            height: auto !important;
-            overflow: visible !important;
-            width: 100%;
-        }
-        
-        .dashboard-tab-content .tab-pane {
-            height: auto !important;
-            overflow: visible !important;
-            display: none;
-        }
-        
-        .dashboard-tab-content .tab-pane.active {
-            display: block;
-        }
-        
-        .tab-content > .tab-pane {
-            padding: 15px 0;
-        }
-        
-        /* Garantir que o contêiner principal não restrinja a altura */
-        .tabs-container {
-            height: auto !important;
-            overflow: visible !important;
-        }
-        
-        .tab-loader-container {
-            min-height: 200px;
-            height: auto !important;
-        }
-    </style>
 </head>
 <!-- Estrutura padrão do projeto -->
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -114,26 +25,12 @@
 
                 <section class="content">
                     <div class="container-fluid">
-                        <!-- Filtros agrupados em um container -->
-                        <div class="filtros-container">
-                            <!-- Filtro por ano -->
-                            <div class="filtro-ano-container">
-                                <div class="filtro-ano-label">Ano dos Processos:</div>
-                                <div id="opcoesAno" class="btn-group btn-group-toggle" data-toggle="buttons">
-                                    <!-- Botões gerados via JS -->
-                                </div>
-                            </div>
-                            
-                            <!-- Filtro por órgão - exibido conforme perfil do usuário -->
-                            <cfif mostrarFiltroOrgao>
-                                <div class="filtro-ano-container">
-                                    <div class="filtro-ano-label">Órgão de origem:</div>
-                                    <div id="opcoesMcu" class="btn-group btn-group-toggle" data-toggle="buttons">
-                                        <!-- Botões gerados via JS -->
-                                    </div>
-                                </div>
-                            </cfif>
-                        </div>
+                        <!-- Componente de filtros reutilizável -->
+                        <cfmodule template="includes/pc_filtros_componente.cfm"
+                            componenteID="filtros-pesquisas"
+                            exibirAno="true"
+                            exibirOrgao="true"
+                            exibirStatus="false">
 
                         <!-- Incluir o componente de cards de métricas -->
                         <cfinclude template="includes/pc_dashbord_pesquisa/pc_dashboard_cards_metricas.cfm">
@@ -251,7 +148,7 @@
         $(document).ready(function() {
             // Registrar o plugin globalmente
             window.ChartDataLabels = ChartDataLabels;
-            Chart.plugins.unregister(ChartDataLabels);  // Primeiro desregistramos para evitar duplicação
+            Chart.plugins.unregister(ChartDataLabels);
             
             // Inicializar tooltips e popovers com configurações avançadas
             $('[data-toggle="tooltip"]').tooltip({
@@ -272,85 +169,6 @@
                 sanitize: false
             });
             
-            var anos = [];
-            var orgaos = [];
-            var currentYear = new Date().getFullYear();
-            
-            // Preencher array com os anos da query rsAnoDashboard
-            <cfoutput query="rsAnoDashboard">
-                anos.push(parseInt("#rsAnoDashboard.ano#", 10));
-            </cfoutput>
-            
-            // Ordena os anos em ordem crescente
-            anos = anos.sort(function(a, b){ return a - b; });
-            
-            // Configuração do filtro de anos
-            var radioName = "opcaoAno";
-            $("#opcoesAno").empty();
-            
-            // Adicionar botão "Todos" antes dos anos específicos
-            var btnTodos = `<label class="btn btn-outline-secondary btn-todos">
-                            <input type="radio" name="${radioName}" autocomplete="off" value="Todos"/> Todos
-                       </label>`;
-            $("#opcoesAno").append(btnTodos);
-            
-            // Defina o ano selecionado como o último ano (mais recente) da consulta
-            var anoSelecionado = anos.length > 0 ? anos[anos.length - 1] : (currentYear - 1);
-            
-            anos.forEach(function(val) {
-                var btnClass = "btn-outline-primary";
-                var checked = (val === anoSelecionado) ? 'checked' : '';
-                var btn = `<label class="btn ${btnClass}" style="margin-left:2px;">
-                                <input type="radio" name="${radioName}" ${checked} autocomplete="off" value="${val}"/> ${val}
-                           </label>`;
-                $("#opcoesAno").append(btn);
-            });
-
-            // Ativar o botão do ano selecionado
-            $(`input[name="${radioName}"][value="${anoSelecionado}"]`).parent().addClass('active');
-            
-            // Preencher array com os órgãos da query rsOrgaosOrigem
-            <cfoutput query="rsOrgaosOrigem">
-                var sigla = "#rsOrgaosOrigem.pc_org_sigla#";
-                var mcu = "#rsOrgaosOrigem.pc_org_mcu#";
-                var ultimaParte = sigla.includes('/') ? sigla.split('/').pop() : sigla;
-                orgaos.push({
-                    mcu: mcu,
-                    sigla: ultimaParte
-                });
-            </cfoutput>
-        
-            // Configuração do filtro de órgãos - somente se o perfil permitir
-            <cfif mostrarFiltroOrgao>
-                var radioMcu = "opcaoMcu";
-                $("#opcoesMcu").empty();
-                
-                // Adicionar botão "Todos" para os órgãos
-                var btnTodosMcu = `<label class="btn btn-outline-secondary btn-todos">
-                                <input type="radio" name="${radioMcu}" checked autocomplete="off" value="Todos"/> Todos
-                           </label>`;
-                $("#opcoesMcu").append(btnTodosMcu);
-                
-                // Adicionar botões para cada órgão
-                orgaos.forEach(function(orgao) {
-                    var btn = `<label class="btn btn-outline-info" style="margin-left:2px;">
-                                    <input type="radio" name="${radioMcu}" autocomplete="off" value="${orgao.mcu}"/> ${orgao.sigla}
-                               </label>`;
-                    $("#opcoesMcu").append(btn);
-                });
-                
-                // Ativar o botão "Todos" para órgãos inicialmente
-                $(`input[name='opcaoMcu'][value='Todos']`).parent().addClass('active');
-                
-                var mcuSelecionado = "Todos";
-            <cfelse>
-                // Se o usuário tem perfil 8, define o MCU diretamente
-                var mcuSelecionado = "<cfoutput>#orgaoOrigemSelecionado#</cfoutput>";
-            </cfif>
-            
-            // Tornar a variável mcuSelecionado disponível globalmente
-            window.mcuSelecionado = mcuSelecionado;
-        
             // Função helper para scroll adaptado ao AdminLTE
             window.scrollToElement = function(targetElement, offset) {
                 var $scrollContainer = $('.content-wrapper');
@@ -373,6 +191,10 @@
             // Função para carregar os componentes via AJAX
             function carregarComponente(componente) {
                 var targetId, targetUrl;
+                
+                // Importante: Vamos usar as variáveis globais aqui, que são definidas pelo componente de filtro
+                const anoFiltro = window.anoSelecionado || "Todos";
+                const mcuFiltro = window.mcuSelecionado || "Todos";
                 
                 switch(componente) {
                     case 'avaliacoes':
@@ -403,57 +225,8 @@
                             $(targetId).html(data);
                             componentesCarregados[componente] = true;
                             
-                            // Inicializar o componente após o carregamento
-                            switch(componente) {
-                                case 'avaliacoes':
-                                    // Atualiza os cards de avaliação
-                                    $.ajax({
-                                        url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
-                                        method: 'GET',
-                                        data: { 
-                                            ano: anoSelecionado,
-                                            mcuOrigem: mcuSelecionado 
-                                        },
-                                        dataType: 'json',
-                                        success: function(resultado) {
-                                            if (resultado && window.atualizarCardsAvaliacao) {
-                                                window.atualizarCardsAvaliacao(resultado);
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 'graficos':
-                                    // Atualiza os gráficos
-                                    $.ajax({
-                                        url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
-                                        method: 'GET',
-                                        data: { 
-                                            ano: anoSelecionado,
-                                            mcuOrigem: mcuSelecionado 
-                                        },
-                                        dataType: 'json',
-                                        success: function(resultado) {
-                                            if (resultado && window.atualizarGraficos) {
-                                                window.atualizarGraficos(resultado);
-                                            }
-                                        }
-                                    });
-                                    break;
-                                case 'nuvemPalavras':
-                                    // Carrega a nuvem de palavras
-                                    if (typeof window.carregarNuvemPalavras === 'function') {
-                                        setTimeout(function() {
-                                            window.carregarNuvemPalavras(anoSelecionado, mcuSelecionado);
-                                        }, 300);
-                                    }
-                                    break;
-                                case 'listagem':
-                                    // Carrega a tabela de pesquisas
-                                    if (typeof window.carregarDadosTabela === 'function') {
-                                        window.carregarDadosTabela(anoSelecionado, mcuSelecionado);
-                                    }
-                                    break;
-                            }
+                            // Inicializar o componente após o carregamento com os valores atuais dos filtros
+                            atualizarComponente(componente, anoFiltro, mcuFiltro);
                         },
                         error: function() {
                             $(targetId).html('<div class="alert alert-danger">Erro ao carregar o componente. Por favor, tente novamente.</div>');
@@ -461,50 +234,55 @@
                     });
                 } else {
                     // Se o componente já foi carregado, apenas atualiza os dados
-                    switch(componente) {
-                        case 'avaliacoes':
-                            $.ajax({
-                                url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
-                                method: 'GET',
-                                data: { 
-                                    ano: anoSelecionado,
-                                    mcuOrigem: mcuSelecionado 
-                                },
-                                dataType: 'json',
-                                success: function(resultado) {
-                                    if (resultado && window.atualizarCardsAvaliacao) {
-                                        window.atualizarCardsAvaliacao(resultado);
-                                    }
+                    atualizarComponente(componente, anoFiltro, mcuFiltro);
+                }
+            }
+            
+            // Função para atualizar um componente específico
+            function atualizarComponente(componente, ano, mcu) {
+                switch(componente) {
+                    case 'avaliacoes':
+                        $.ajax({
+                            url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
+                            method: 'GET',
+                            data: { 
+                                ano: ano,
+                                mcuOrigem: mcu 
+                            },
+                            dataType: 'json',
+                            success: function(resultado) {
+                                if (resultado && window.atualizarCardsAvaliacao) {
+                                    window.atualizarCardsAvaliacao(resultado);
                                 }
-                            });
-                            break;
-                        case 'graficos':
-                            $.ajax({
-                                url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
-                                method: 'GET',
-                                data: { 
-                                    ano: anoSelecionado,
-                                    mcuOrigem: mcuSelecionado 
-                                },
-                                dataType: 'json',
-                                success: function(resultado) {
-                                    if (resultado && window.atualizarGraficos) {
-                                        window.atualizarGraficos(resultado);
-                                    }
+                            }
+                        });
+                        break;
+                    case 'graficos':
+                        $.ajax({
+                            url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
+                            method: 'GET',
+                            data: { 
+                                ano: ano,
+                                mcuOrigem: mcu 
+                            },
+                            dataType: 'json',
+                            success: function(resultado) {
+                                if (resultado && window.atualizarGraficos) {
+                                    window.atualizarGraficos(resultado);
                                 }
-                            });
-                            break;
-                        case 'nuvemPalavras':
-                            if (typeof window.carregarNuvemPalavras === 'function') {
-                                window.carregarNuvemPalavras(anoSelecionado, mcuSelecionado);
                             }
-                            break;
-                        case 'listagem':
-                            if (typeof window.carregarDadosTabela === 'function') {
-                                window.carregarDadosTabela(anoSelecionado, mcuSelecionado);
-                            }
-                            break;
-                    }
+                        });
+                        break;
+                    case 'nuvemPalavras':
+                        if (typeof window.carregarNuvemPalavras === 'function') {
+                            window.carregarNuvemPalavras(ano, mcu);
+                        }
+                        break;
+                    case 'listagem':
+                        if (typeof window.carregarDadosTabela === 'function') {
+                            window.carregarDadosTabela(ano, mcu);
+                        }
+                        break;
                 }
             }
         
@@ -562,13 +340,14 @@
                 }
             }
         
-            function carregarDashboard(anoFiltro, mcuFiltro) {
-                // Certificar que mcuFiltro não é undefined ou null
-                if (mcuFiltro === undefined || mcuFiltro === null) {
-                    console.warn("mcuFiltro não definido em carregarDashboard, usando valor padrão", mcuSelecionado);
-                    mcuFiltro = mcuSelecionado;
-                }
-                              
+            // Função principal para carregar o dashboard
+            function carregarDashboard() {
+                // Usar diretamente as variáveis globais definidas pelo componente de filtros
+                const anoFiltro = window.anoSelecionado || "Todos";
+                const mcuFiltro = window.mcuSelecionado || "Todos";
+                
+                console.log(`carregarDashboard executando com filtros: ano=${anoFiltro}, mcu=${mcuFiltro}`);
+                
                 // Mostrar modal de carregamento
                 try {
                     $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
@@ -577,26 +356,12 @@
                     console.error("Erro ao mostrar modal:", e);
                 }
                 
-                // Configurar um timeout de segurança para fechar o modal após 30 segundos
+                // Timeout de segurança para fechar o modal após 30 segundos
                 var timeoutSeguranca = setTimeout(function() {
                     fecharModalComSeguranca();
                 }, 30000);
                 
-                // Contador para controlar conclusão das requisições
-                var requestsCount = 0;
-                var totalRequests = 1; // Inicializa com 1 para a requisição principal
-                
-                // Função para verificar se todas as requisições terminaram
-                function checkAllRequestsComplete() {
-                    requestsCount++;
-                    if (requestsCount >= totalRequests) {
-                        // Todas as requisições terminaram, podemos fechar o modal
-                        clearTimeout(timeoutSeguranca);
-                        fecharModalComSeguranca();
-                    }
-                }
-                
-                // Carregar estatísticas para atualizar os cards principais
+                // Atualizar os cards principais
                 $.ajax({
                     url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getEstatisticas&returnformat=json',
                     method: 'GET',
@@ -607,77 +372,74 @@
                     dataType: 'json',
                     success: function(resultado) {
                         if (resultado) {
-                            // Atualiza totalizadores e cards
                             atualizarCards(resultado);
                         }
-                        // Marca esta requisição como concluída
-                        checkAllRequestsComplete();
+                        
+                        // Carregar ou atualizar os componentes
+                        if (!componentesCarregados['avaliacoes']) {
+                            carregarComponente('avaliacoes');
+                        } else {
+                            atualizarComponente('avaliacoes', anoFiltro, mcuFiltro);
+                        }
+                        
+                        if (!componentesCarregados['graficos']) {
+                            carregarComponente('graficos');
+                        } else {
+                            atualizarComponente('graficos', anoFiltro, mcuFiltro);
+                        }
+                        
+                        // Atualizar apenas o componente da aba ativa
+                        if ($("#nuvem-palavras").hasClass('active')) {
+                            console.log("Aba nuvem-palavras está ativa, atualizando com:", anoFiltro, mcuFiltro);
+                            if (!componentesCarregados['nuvemPalavras']) {
+                                carregarComponente('nuvemPalavras');
+                            } else {
+                                atualizarComponente('nuvemPalavras', anoFiltro, mcuFiltro);
+                            }
+                        } else if ($("#listagem").hasClass('active')) {
+                            if (!componentesCarregados['listagem']) {
+                                carregarComponente('listagem');
+                            } else {
+                                atualizarComponente('listagem', anoFiltro, mcuFiltro);
+                            }
+                        }
+                        
+                        // Limpar o timeout e fechar o modal
+                        clearTimeout(timeoutSeguranca);
+                        setTimeout(function() {
+                            fecharModalComSeguranca();
+                        }, 1000);
                     },
                     error: function(xhr, status, error) {
                         console.error("Erro ao carregar estatísticas:", error);
-                        // Mesmo com erro, marca como concluída
-                        checkAllRequestsComplete();
+                        fecharModalComSeguranca();
+                        
+                        // Exibir mensagem de erro na interface
+                        alert("Erro ao carregar dados: " + error);
                     }
                 });
-                
-                // Atualizar o componente atual
-                // Sempre carrega o componente de avaliações
-                if (!componentesCarregados['avaliacoes']) {
-                    carregarComponente('avaliacoes');
-                }
-                
-                if (!componentesCarregados['graficos']) {
-                    carregarComponente('graficos');
-                }
-                
-                if ($("#nuvem-palavras").hasClass('active')) {
-                    carregarComponente('nuvemPalavras');
-                } else if ($("#listagem").hasClass('active')) {
-                    carregarComponente('listagem');
-                }
-                
-                // Atualizar a variável global
-                window.mcuSelecionado = mcuFiltro;
             }
             
-            // Carregar o card de avaliações diretamente (fora do sistema de abas)
-            carregarComponente('avaliacoes');
-            
-            // Também carregar o card de gráficos diretamente
-            carregarComponente('graficos');
-            
-            // Carregar o dashboard inicial com o card de avaliações
-            carregarDashboard(anoSelecionado, mcuSelecionado);
-            
-            // Handler para mudança de ano
-            $("input[name='opcaoAno']").change(function() {
-                anoSelecionado = $(this).val();
-                carregarDashboard(anoSelecionado, mcuSelecionado);
-                
-                // Disparar evento global de mudança de filtro
-                $(document).trigger('filtroAlterado', {
-                    tipo: 'ano',
-                    valor: anoSelecionado
+            // NOVO: Escutar o evento de alteração de filtro emitido pelo componente
+            document.addEventListener('filtroAlterado', function(e) {
+                const { tipo, valor } = e.detail;
+                console.log(`PesquisasDashboard: Filtro alterado: ${tipo} = ${valor}`);
+                console.log("Estado atual dos filtros:", {
+                    ano: window.anoSelecionado,
+                    mcu: window.mcuSelecionado
                 });
+                
+                // Atualizar o dashboard com os novos filtros após um pequeno delay
+                // para garantir que as variáveis globais estejam corretamente atualizadas
+                setTimeout(carregarDashboard, 100);
             });
             
-            <cfif mostrarFiltroOrgao>
-                // Handler para mudança de órgão (apenas se o filtro estiver visível)
-                $("input[name='opcaoMcu']").change(function() {
-                    mcuSelecionado = $(this).val();
-                    carregarDashboard(anoSelecionado, mcuSelecionado);
-                    
-                    // Disparar evento global de mudança de filtro
-                    $(document).trigger('filtroAlterado', {
-                        tipo: 'mcu',
-                        valor: mcuSelecionado
-                    });
-                });
-            </cfif>
+            // Carregar dados iniciais após um pequeno delay para garantir que os filtros estejam inicializados
+            setTimeout(function() {
+              
+                carregarDashboard();
+            }, 500);
 
-            // Script para gerenciar as abas do Dashboard de Pesquisas
-            $('.nav-dashboard-tabs .nav-link:first').tab('show');
-            
             // Manipular clique nas abas
             $('.nav-dashboard-tabs .nav-link').on('click', function(e) {
                 e.preventDefault();

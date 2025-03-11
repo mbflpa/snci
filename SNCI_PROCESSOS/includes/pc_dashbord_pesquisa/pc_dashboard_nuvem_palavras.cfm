@@ -250,15 +250,16 @@ $(document).ready(function() {
     
     // Botão para atualizar a nuvem
     $('#atualizarNuvem').click(function() {
-        const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
-        window.carregarNuvemPalavras(anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
+        window.carregarNuvemPalavras(window.anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
     });
 
-    // Função para carregar e renderizar a nuvem de palavras
+    // Função para carregar e renderizar a nuvem de palavras - CORRIGIDA
     window.carregarNuvemPalavras = function(anoFiltro, mcuFiltro, minFreq = 2, maxWords = 100) {
+        console.log(`carregarNuvemPalavras chamada com: ano=${anoFiltro}, mcu=${mcuFiltro}, minFreq=${minFreq}, maxWords=${maxWords}`);
+        
         // Se já estiver renderizando, saia para evitar chamadas simultâneas
         if (window.isRenderingCloud) {
-
+            console.log("Renderização já em andamento, ignorando nova chamada");
             return;
         }
         
@@ -266,35 +267,31 @@ $(document).ready(function() {
         window.isRenderingCloud = true;
         
         // Se não recebeu os parâmetros, tenta obtê-los
-        if (!anoFiltro) {
-            anoFiltro = $("input[name='opcaoAno']:checked").val() || 'Todos';
+        if (!anoFiltro || anoFiltro === undefined) {
+            try {
+                anoFiltro = window.anoSelecionado || "Todos";
+                console.log("Usando window.anoSelecionado:", anoFiltro);
+            } catch (e) {
+                console.warn("Erro ao obter anoSelecionado:", e);
+                anoFiltro = "Todos";
+            }
         }
         
         // Obter mcuFiltro de maneira robusta
-        if (!mcuFiltro) {
+        if (!mcuFiltro || mcuFiltro === undefined) {
             try {
-                // Usar a variável global do arquivo principal
-                mcuFiltro = window.mcuSelecionado;
-                
-                // Se não estiver disponível globalmente, tenta obter do input
-                if (!mcuFiltro) {
-                    mcuFiltro = $("input[name='opcaoMcu']:checked").val() || 'Todos';
-                }
-                
-                // Última verificação
-                if (!mcuFiltro) {
-                    mcuFiltro = 'Todos';
-                    console.warn("mcuFiltro não definido em carregarNuvemPalavras, usando 'Todos'");
-                }
+                mcuFiltro = window.mcuSelecionado || "Todos";
+                console.log("Usando window.mcuSelecionado:", mcuFiltro);
             } catch (e) {
-                console.error("Erro ao obter mcuSelecionado em nuvem de palavras:", e);
-                mcuFiltro = 'Todos';
+                console.warn("Erro ao obter mcuSelecionado:", e);
+                mcuFiltro = "Todos";
             }
         }
         
          // MELHORADO: Destruir completamente qualquer instância anterior de jQCloud
         try {
             if ($("#nuvem-container").data('jqcloud')) {
+                console.log("Destruindo instância anterior de jQCloud");
                 $("#nuvem-container").jQCloud('destroy');
             }
             
@@ -336,6 +333,8 @@ $(document).ready(function() {
             },
             dataType: 'json',
             success: function(data) {
+                console.log("Dados da nuvem recebidos:", data && data.length ? data.length + " palavras" : "sem dados");
+                
                 // Armazenar dados globalmente para uso no resize
                 window.cloudData = data;
                 
@@ -445,8 +444,9 @@ $(document).ready(function() {
                                     atualizarDestaquePalavras();
                                 }
                                 
-                                // Finalizar o flag de renderização
+                                // Finalizar o flag de renderização após conclusão
                                 window.isRenderingCloud = false;
+                                console.log("Renderização da nuvem concluída com sucesso");
                             };
                             
                             $("#nuvem-container").jQCloud(data, window.cloudOptions);
@@ -615,8 +615,7 @@ $(document).ready(function() {
                                 '<div class="alert alert-warning">' +
                                     '<i class="fas fa-exclamation-circle mr-2"></i>' +
                                     'Nenhuma observação encontrada contendo todas as palavras selecionadas.' +
-                                '</div>' +
-                            '</div>'
+                                '</div>'
                         );
                         $("#contador-resultados").text('0 observações');
                         $("#contador-parenteses").text('(0 observações encontradas)');
@@ -958,15 +957,24 @@ $(document).ready(function() {
     
     // Inicializar a nuvem quando o componente for carregado
     setTimeout(function() {
-        window.carregarNuvemPalavras(null, null, minFreq, maxWords);
+        console.log("Inicializando nuvem de palavras com filtros:", window.anoSelecionado, window.mcuSelecionado);
+        window.carregarNuvemPalavras(window.anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
     }, 500);
     
     // Adicionar ouvintes para eventos de filtro
-    $(document).on('filtroAlterado', function(event, dados) {
-        if ($("#nuvem-palavras").hasClass('active') || $("#nuvem-palavras").hasClass('show')) {
-            const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
-            // Usar a variável global diretamente quando possível
-            window.carregarNuvemPalavras(anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
+    document.addEventListener('filtroAlterado', function(e) {
+        console.log("Evento filtroAlterado recebido na nuvem de palavras:", e.detail);
+        
+        // Verificar se a aba de nuvem de palavras está visível
+        if ($("#nuvem-palavras").hasClass('active') || $("#nuvem-palavras").hasClass('show') || $("#nuvem-palavras").is(':visible')) {
+            console.log("Aba de nuvem de palavras está ativa, atualizando com:", window.anoSelecionado, window.mcuSelecionado);
+            
+            // Usar diretamente as variáveis globais atualizadas pelo componente de filtro
+            setTimeout(function() {
+                window.carregarNuvemPalavras(window.anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
+            }, 100);
+        } else {
+            console.log("Aba de nuvem de palavras não está ativa, ignorando atualização");
         }
     });
     
