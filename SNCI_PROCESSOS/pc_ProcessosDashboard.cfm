@@ -8,7 +8,7 @@
     <!-- Carregamento dos estilos -->
     <link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard.css">
     
-    <!-- Carregamento do componente base -->
+
     <script src="dist/js/snciDashboardComponent.js"></script>
 </head>
 <!-- Estrutura padrão do projeto -->

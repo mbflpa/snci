@@ -102,6 +102,13 @@ document.addEventListener("DOMContentLoaded", function() {
         // Inicializar e registrar o componente
         DashboardClassificacao.init().registrar();
         
+        // Adicionar ícone de favorito ao card
+        if (typeof initFavoriteIcon === 'function') {
+            initFavoriteIcon('card-classificacao-processo', 
+                            'includes/pc_dashboard_processo/pc_dashboard_classificacao_processo.cfm', 
+                            'Classificação de Processos');
+        }
+        
         // Compatibilidade com interface antiga
         window.atualizarClassificacaoProcesso = function(dados, totalProcessos) {
             if (Array.isArray(dados)) {

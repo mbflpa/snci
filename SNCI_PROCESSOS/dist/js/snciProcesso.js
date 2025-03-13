@@ -2013,6 +2013,7 @@ function initFavoriteIcon(cardId, componentPath, componentTitle) {
         path: path,
         title: title,
         id: id,
+        layout: {x: 0, y: 0, w: 12, h: 2},
         timestamp: new Date().getTime(),
       });
       saveFavorites(favorites);

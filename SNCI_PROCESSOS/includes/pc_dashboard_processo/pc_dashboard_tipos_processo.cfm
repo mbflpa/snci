@@ -141,6 +141,13 @@ document.addEventListener("DOMContentLoaded", function() {
         // Inicializar e registrar o componente
         DashboardTipos.init().registrar();
         
+        // Adicionar ícone de favorito ao card
+        if (typeof initFavoriteIcon === 'function') {
+            initFavoriteIcon('card-tipos-processo', 
+                            'includes/pc_dashboard_processo/pc_dashboard_tipos_processo.cfm', 
+                            'Tipos de Processos');
+        }
+        
         // Compatibilidade com interface antiga
         window.atualizarTiposProcesso = function(dados, totalProcessos) {
             if (Array.isArray(dados)) {

@@ -103,6 +103,13 @@ document.addEventListener("DOMContentLoaded", function() {
         // Inicializar e registrar o componente
         DashboardStatus.init().registrar();
         
+        // Adicionar ícone de favorito ao card
+        if (typeof initFavoriteIcon === 'function') {
+            initFavoriteIcon('card-distribuicao-status', 
+                            'includes/pc_dashboard_processo/pc_dashboard_distribuicao_status.cfm', 
+                            'Distribuição por Status');
+        }
+        
         // Compatibilidade com interface antiga
         window.atualizarDistribuicaoStatus = DashboardStatus.atualizar;
         

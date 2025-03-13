@@ -104,6 +104,13 @@ document.addEventListener("DOMContentLoaded", function() {
         // Inicializar e registrar o componente
         DashboardMetricas.init().registrar();
         
+        // Adicionar ícone de favorito ao card
+        if (typeof initFavoriteIcon === 'function') {
+            initFavoriteIcon('card-metricas-processo', 
+                            'includes/pc_dashboard_processo/pc_dashboard_cards_metricas_processo.cfm', 
+                            'Indicadores de Processos');
+        }
+        
         // Compatibilidade com interface antiga
         window.atualizarCardsProcMet = DashboardMetricas.atualizar;
         

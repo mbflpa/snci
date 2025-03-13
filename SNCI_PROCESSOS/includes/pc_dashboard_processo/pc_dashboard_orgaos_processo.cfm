@@ -225,6 +225,13 @@ document.addEventListener("DOMContentLoaded", function() {
             // Registrar o componente
             DashboardOrgaos.registrar();
             
+            // Adicionar ícone de favorito ao card
+            if (typeof initFavoriteIcon === 'function') {
+                initFavoriteIcon('card-orgaos', 
+                                'includes/pc_dashboard_processo/pc_dashboard_orgaos_processo.cfm', 
+                                'Órgãos Avaliados');
+            }
+            
             // Carregar os dados pendentes ou disponíveis
             if (window.orgaosDadosPendentes) {
                 DashboardOrgaos.atualizar(window.orgaosDadosPendentes);

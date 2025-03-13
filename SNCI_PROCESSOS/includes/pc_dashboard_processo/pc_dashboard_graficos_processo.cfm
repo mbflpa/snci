@@ -513,6 +513,13 @@ document.addEventListener("DOMContentLoaded", function() {
         // Inicializar e registrar o componente
         DashboardGraficos.init().registrar();
         
+        // Adicionar ícone de favorito ao card
+        if (typeof initFavoriteIcon === 'function') {
+            initFavoriteIcon('card-graficos', 
+                            'includes/pc_dashboard_processo/pc_dashboard_graficos_processo.cfm', 
+                            'Gráficos de Processos');
+        }
+        
         // Compatibilidade com interface antiga
         window.DashboardGraficos = DashboardGraficos;
         window.atualizarGraficos = DashboardGraficos.atualizar;
