@@ -306,15 +306,21 @@
 		Select Rep_CodArea from Reops WHERE Rep_Codigo=#qVerificaTipo.Und_CodReop#
 	</cfquery>
 	<cfquery datasource="#dsn_inspecao#">
-			UPDATE Resultado_Inspecao SET RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
+			UPDATE Resultado_Inspecao SET 
+			  RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
 			, RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)
 		<cfif IsDefined("FORM.Melhoria") AND FORM.Melhoria NEQ "">
 			<cfset aux_mel = CHR(13) & Form.Melhoria>
+			<cfset tammel = len(trim(aux_mel))>
 			, RIP_Comentario='#aux_mel#'
 		</cfif>
 		<cfif IsDefined("FORM.recomendacao") AND FORM.recomendacao NEQ "">
 			<cfset aux_recom = CHR(13) & FORM.recomendacao>		
+			<cfset tamrec = len(trim(aux_recom))>
 			, RIP_Recomendacoes='#aux_recom#'
+		</cfif>
+		<cfif (tammel neq form.tamMelho) or (tamrec neq form.tamrecom)>
+			, RIP_Correcao_Revisor = '1'
 		</cfif>
 		WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_NumItem=#FORM.nitem#
 	</cfquery>
@@ -1316,9 +1322,10 @@ function abrirPopup(url,w,h)
 	<cfif listFind(#qResposta.Itn_ImpactarTipos#,'R')>
 	  	<cfset impactofin = 'S'>
 	    <cfset impactoemrisco = 'R'>
-	</cfif>		
+	</cfif>	
+	<cfif tipoimpacto eq 'QUANTIFICADO'>
  	<tr class="exibir">
-      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
+      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO</div></td>
       <td colspan="5" bgcolor="eeeeee">
 		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
 			<tr class="exibir"><strong>
@@ -1329,6 +1336,7 @@ function abrirPopup(url,w,h)
 		  </table>		  
 	  </td>
     </tr> 
+</cfif>			
 	 </cfoutput>
 
 	<tr>
@@ -1339,6 +1347,8 @@ function abrirPopup(url,w,h)
 		<td bgcolor="eeeeee" align="center"><span class="titulos">Orientações:</span></td>
 		<td colspan="5" bgcolor="eeeeee"><textarea name="recomendacao" cols="200" rows="12" wrap="VIRTUAL" class="form"><cfoutput>#qResposta.RIP_Recomendacoes#</cfoutput></textarea></td>
 	</tr> 
+	<input type="hidden" name="tamMelho" id="tamMelho" value="<cfoutput>#len(trim(qResposta.RIP_Comentario))#</cfoutput>">
+	<input type="hidden" name="tamrecom" id="tamrecom" value="<cfoutput>#len(trim(qResposta.RIP_Recomendacoes))#</cfoutput>">
 
     <tr bgcolor="eeeeee">
       <td colspan="5">
