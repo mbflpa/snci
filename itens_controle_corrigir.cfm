@@ -634,6 +634,9 @@ function abrirPopup(url,w,h)
         <input type="hidden" id="anexo" name="anexo" value="">
         <input type="hidden" id="vCausaProvavel" name="vCausaProvavel" value="">
         <input type="hidden" id="vCodigo" name="vCodigo" value="">
+		<cfset falta = lscurrencyformat(qResposta.RIP_Falta,'Local')>
+		<cfset sobra = lscurrencyformat(qResposta.RIP_Sobra,'Local')>
+		<cfset emrisco = lscurrencyformat(qResposta.RIP_EmRisco,'Local')>
         <input name="unid" type="hidden" id="unid" value="<cfoutput>#URL.Unid#</cfoutput>">
         <input name="ninsp" type="hidden" id="ninsp" value="<cfoutput>#URL.Ninsp#</cfoutput>">
         <input name="ngrup" type="hidden" id="ngrup" value="<cfoutput>#URL.Ngrup#</cfoutput>">
@@ -680,7 +683,42 @@ function abrirPopup(url,w,h)
       <td bgcolor="eeeeee">Item</td>
       <td colspan="4" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Nitem#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#qResposta.Itn_Descricao#</strong></cfoutput></td>
     </tr>
-	
+<cfoutput>	
+	<cfset tipoimpacto = 'NÃO QUANTIFICADO'>
+	<cfif listFind(#qResposta.Itn_PTC_Seq#,'10')>
+		<cfset tipoimpacto = 'QUANTIFICADO'>
+	</cfif>
+	<cfset impactofin = 'N'>
+	<cfset impactofalta = 'N'>
+	<cfset impactosobra = 'N'>
+	<cfset impactoemrisco = 'N'>
+	<cfif listFind(#qResposta.Itn_ImpactarTipos#,'F')>
+		  <cfset impactofin = 'S'>
+		<cfset impactofalta = 'F'>
+	</cfif>
+	<cfif listFind(#qResposta.Itn_ImpactarTipos#,'S')>
+		  <cfset impactofin = 'S'>
+		<cfset impactosobra = 'S'>
+	</cfif>	
+	<cfif listFind(#qResposta.Itn_ImpactarTipos#,'R')>
+		  <cfset impactofin = 'S'>
+		<cfset impactoemrisco = 'R'>
+	</cfif>		
+<cfif tipoimpacto eq 'QUANTIFICADO'>
+	 <tr class="exibir">
+	  <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO</div></td>
+	  <td colspan="5" bgcolor="eeeeee">
+		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			<tr class="exibir"><strong>
+				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			</tr>
+		  </table>		  
+	  </td>
+	</tr> 
+</cfif>	
+</cfoutput>		
 	<tr>
 		<td bgcolor="#eeeeee" align="center"><span class="titulos">Situação Encontrada:</span></td>
 		<td colspan="5" bgcolor="eeeeee"><textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form"><cfoutput>#qResposta.RIP_Comentario#</cfoutput></textarea></td>
@@ -689,10 +727,12 @@ function abrirPopup(url,w,h)
 		<td bgcolor="eeeeee" align="center"><span class="titulos">Orientações:</span></td>
 		<td colspan="5" bgcolor="eeeeee"><textarea name="recomendacao" cols="200" rows="12" wrap="VIRTUAL" class="form"><cfoutput>#qResposta.RIP_Recomendacoes#</cfoutput></textarea></td>
 	</tr> 
+	
 	<tr bgcolor="eeeeee">
       <td colspan="5">&nbsp;</td>
     </tr>
 <cfoutput>
+
  	
 	<tr bgcolor="eeeeee">
 		<td colspan="5" align="center">
