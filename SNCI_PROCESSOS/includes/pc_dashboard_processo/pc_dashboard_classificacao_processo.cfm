@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
             cardId: 'card-classificacao-processo',
             path: 'includes/pc_dashboard_processo/pc_dashboard_classificacao_processo.cfm',
             titulo: 'Classificação de Processos',
+            dataUrl: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
             debug: true
         });
         

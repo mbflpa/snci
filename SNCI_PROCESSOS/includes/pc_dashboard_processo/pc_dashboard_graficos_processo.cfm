@@ -92,6 +92,7 @@ document.addEventListener("DOMContentLoaded", function() {
             cardId: 'card-graficos',
             path: 'includes/pc_dashboard_processo/pc_dashboard_graficos_processo.cfm',
             titulo: 'Indicadores de Processos',
+            dataUrl: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
             notificationKey: 'graficos',
             notificationCheck: 'window.componentesCarregados && window.componentesCarregados.orgaosView',
             debug: true

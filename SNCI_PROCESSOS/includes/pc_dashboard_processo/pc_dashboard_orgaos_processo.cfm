@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function() {
             cardId: 'card-orgaos',
             path: 'includes/pc_dashboard_processo/pc_dashboard_orgaos_processo.cfm',
             titulo: 'Órgãos Avaliados',
+            dataUrl: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
             notificationKey: 'orgaosView',
             debug: true
         });

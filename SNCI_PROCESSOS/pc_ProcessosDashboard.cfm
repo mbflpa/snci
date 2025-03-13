@@ -81,6 +81,14 @@
 
     <script>
         $(document).ready(function() {
+            // Configurações globais para a dashboard
+            const CONFIG = {
+                // URL centralizada para carregamento de dados - pode ser alterada facilmente aqui
+                dataUrl: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
+                dataMethod: 'POST',
+                defaultTimeout: 30000 // 30 segundos
+            };
+            
             // Inicializar o array global para armazenar callbacks de componentes (mantido para compatibilidade)
             window.atualizarDadosComponentes = [];
             
@@ -156,7 +164,11 @@
                 }
             }
         
-            // Função simplificada para carregar dados da dashboard
+            /**
+             * Função simplificada para carregar dados da dashboard
+             * Utiliza o DashboardComponentFactory para fazer uma solicitação AJAX genérica
+             * Os dados são então distribuídos para todos os componentes registrados
+             */
             function carregarDados() {
                 // Mostrar modal de carregamento
                 $('#modalOverlay').modal({backdrop: 'static', keyboard: false});
@@ -166,32 +178,38 @@
                 var timeoutSeguranca = setTimeout(function() {
                     console.warn("Timeout de segurança acionado após 30 segundos");
                     fecharModalComSeguranca();
-                }, 30000);
+                }, CONFIG.defaultTimeout);
                 
-                // Fazer uma única chamada AJAX para obter todos os dados
-                $.ajax({
-                    url: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
-                    method: 'POST',
-                    data: { 
-                        ano: window.anoSelecionado,
-                        mcuOrigem: window.mcuSelecionado,
-                        statusFiltro: window.statusSelecionado
-                    },
-                    dataType: 'json',
-                    success: function(dados) {
-                      
+                // Preparar os parâmetros para a requisição
+                const params = { 
+                    ano: window.anoSelecionado || 'Todos',
+                    mcuOrigem: window.mcuSelecionado || 'Todos',
+                    statusFiltro: window.statusSelecionado || 'Todos'
+                };
+                
+                // Utilizar o método carregarDependencia para fazer a requisição AJAX
+                // Isso permite que usemos a infraestrutura já criada no DashboardComponentFactory
+                if (typeof DashboardComponentFactory !== 'undefined') {
+                    // Criar um componente auxiliar temporário apenas para carregar os dados
+                    const loaderComponent = DashboardComponentFactory.criar({
+                        nome: 'DashboardLoader',
+                        dataUrl: CONFIG.dataUrl,
+                        dataMethod: CONFIG.dataMethod
+                    });
+                    
+                    loaderComponent.carregarDados(params, function(error, dados) {
+                        // Limpar o timeout de segurança
+                        clearTimeout(timeoutSeguranca);
+                        
+                        if (error) {
+                            console.error("Erro ao carregar dados:", error);
+                            fecharModalComSeguranca();
+                            alert("Erro ao carregar dados: " + error);
+                            return;
+                        }
+                        
                         // Armazenar dados para uso global
                         window.dadosAtuais = dados;
-                        
-                        // Garantir que o componente de órgãos seja atualizado especificamente
-                        if (window.atualizarViewOrgaos && typeof window.atualizarViewOrgaos === 'function') {
-                          
-                            try {
-                                window.atualizarViewOrgaos(dados);
-                            } catch(e) {
-                                console.error("Erro ao atualizar componente de órgãos:", e);
-                            }
-                        }
                         
                         // Chamar explicitamente as funções de atualização para cada componente
                         if (Array.isArray(window.atualizarDadosComponentes)) {
@@ -206,28 +224,57 @@
                             });
                         }
                         
-                        // Limpar o timeout de segurança
-                        clearTimeout(timeoutSeguranca);
-                        
                         // Fechar modal após um breve delay para garantir que todos os componentes foram atualizados
                         setTimeout(function() {
                             fecharModalComSeguranca();
                         }, 1000);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Erro ao carregar dados:", error);
-                        fecharModalComSeguranca();
-                        
-                        // Exibir mensagem de erro na interface
-                        alert("Erro ao carregar dados: " + error);
-                    }
-                });
+                    });
+                } else {
+                    // Fallback para o método AJAX tradicional caso o DashboardComponentFactory não esteja disponível
+                    $.ajax({
+                        url: CONFIG.dataUrl,
+                        method: CONFIG.dataMethod,
+                        data: params,
+                        dataType: 'json',
+                        success: function(dados) {
+                            // Armazenar dados para uso global
+                            window.dadosAtuais = dados;
+                            
+                            // Chamar explicitamente as funções de atualização para cada componente
+                            if (Array.isArray(window.atualizarDadosComponentes)) {
+                                window.atualizarDadosComponentes.forEach(function(callback) {
+                                    if (typeof callback === 'function') {
+                                        try {
+                                            callback(dados);
+                                        } catch(e) {
+                                            console.error("Erro ao chamar função de atualização:", e);
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            // Limpar o timeout de segurança
+                            clearTimeout(timeoutSeguranca);
+                            
+                            // Fechar modal após um breve delay 
+                            setTimeout(function() {
+                                fecharModalComSeguranca();
+                            }, 1000);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Erro ao carregar dados:", error);
+                            fecharModalComSeguranca();
+                            
+                            // Exibir mensagem de erro na interface
+                            alert("Erro ao carregar dados: " + error);
+                        }
+                    });
+                }
             }
 
             // Escutar o evento do componente de filtros
             document.addEventListener('filtroAlterado', function(e) {
                 const { tipo, valor } = e.detail;
-                
                 
                 // Recarregar dados quando qualquer filtro mudar
                 carregarDados();

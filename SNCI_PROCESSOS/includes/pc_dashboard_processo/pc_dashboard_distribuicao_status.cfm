@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function() {
             cardId: 'card-distribuicao-status',
             path: 'includes/pc_dashboard_processo/pc_dashboard_distribuicao_status.cfm',
             titulo: 'Distribuição por Status',
+            dataUrl: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
             debug: true
         });
         

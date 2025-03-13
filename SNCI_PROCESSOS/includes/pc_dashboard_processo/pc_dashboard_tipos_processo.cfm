@@ -47,6 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
             cardId: 'card-tipos-processo',
             path: 'includes/pc_dashboard_processo/pc_dashboard_tipos_processo.cfm',
             titulo: 'Tipos de Processos',
+            dataUrl: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json',
             debug: true
         });
         

@@ -50,17 +50,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Inicializar o componente de cards de métricas
     function initCardsMetricasComponent() {
-        // Criar a instância do componente
-        var DashboardMetricas = DashboardComponentFactory.criar({
-            nome: 'MetricasProcessos',
-            dependencias: [], // Não tem dependências externas
-            containerId: '',  // Não tem um container único
-            cardId: 'card-metricas-processo',
-            path: 'includes/pc_dashboard_processo/pc_dashboard_cards_metricas_processo.cfm',
-            titulo: 'Indicadores de Processos',
-            debug: false
-        });
-        
         // Função para animação dos números
         function animateNumberValue(el, start, end, duration) {
             let startTimestamp = null;
@@ -82,7 +71,20 @@ document.addEventListener("DOMContentLoaded", function() {
             totalProcessos: 0
         };
         
-        // Sobrescrever método de atualização com a função específica deste componente
+        // Criar a instância do componente com configuração simplificada e URL configurada
+        var DashboardMetricas = DashboardComponentFactory.criar({
+            nome: 'MetricasProcessos',
+            containerId: 'totalProcessos',
+            cardId: 'card-metricas-processo',
+            path: 'includes/pc_dashboard_processo/pc_dashboard_cards_metricas_processo.cfm',
+            titulo: 'Indicadores de Processos',
+            dataUrl: 'cfc/pc_cfcProcessosDashboard.cfc?method=getEstatisticasDetalhadas&returnformat=json'
+        });
+        
+        // Disponibilizar função de animação publicamente
+        window.animateNumberValue = animateNumberValue;
+        
+        // Sobrescrever método de atualização
         DashboardMetricas.atualizar = function(dados) {
             if (!dados) return DashboardMetricas;
             
@@ -91,14 +93,13 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Animar valor
             const elTotalProcessos = document.getElementById("totalProcessos");
-            animateNumberValue(elTotalProcessos, previousCardValues.totalProcessos, totalProcessos, 1000);
-            previousCardValues.totalProcessos = totalProcessos;
+            if (elTotalProcessos) {
+                animateNumberValue(elTotalProcessos, previousCardValues.totalProcessos, totalProcessos, 1000);
+                previousCardValues.totalProcessos = totalProcessos;
+            }
             
             return DashboardMetricas;
         };
-        
-        // Disponibilizar função de animação publicamente
-        window.animateNumberValue = animateNumberValue;
         
         // Inicializar e registrar o componente
         DashboardMetricas.init().registrar();
@@ -106,20 +107,9 @@ document.addEventListener("DOMContentLoaded", function() {
         // Compatibilidade com interface antiga
         window.atualizarCardsProcMet = DashboardMetricas.atualizar;
         
-        // Verificar se já existem dados disponíveis no momento da carga do componente
+        // Verificar se já existem dados disponíveis
         if (window.dadosAtuais) {
             DashboardMetricas.atualizar(window.dadosAtuais);
-        } else {
-            // Carregar dados se necessário
-            setTimeout(function() {
-                var params = {};
-                if (typeof window.anoSelecionado !== 'undefined') params.ano = window.anoSelecionado;
-                if (typeof window.mcuSelecionado !== 'undefined') params.mcuOrigem = window.mcuSelecionado;
-                
-                if (Object.keys(params).length > 0) {
-                    DashboardMetricas.carregarDados(params);
-                }
-            }, 1000);
         }
     }
 });
