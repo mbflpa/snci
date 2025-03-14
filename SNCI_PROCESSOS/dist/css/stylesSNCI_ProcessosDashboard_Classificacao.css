@@ -1,6 +1,18 @@
+/* Estilos comuns para padronização dos cards */
+.dashboard-card-fixed {
+  height: 450px; /* Altura fixa para todos os cards */
+}
+
+.dashboard-content-scroll {
+  height: 365px; /* Altura ajustada considerando o header e margens */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .tipos-processo-container,
 .classificacao-processo-container {
   width: 100%;
+  padding-right: 5px; /* Espaço para a barra de rolagem */
 }
 
 /* Removido o header redundante já que agora usamos o card header */

@@ -3,14 +3,14 @@
 <link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard_Tipos.css">
 
 <!-- Card para Tipos de Processos -->
-<div class="card mb-4" id="card-tipos-processo">
+<div class="card mb-4 dashboard-card-fixed" id="card-tipos-processo">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-project-diagram mr-2"></i>Tipos de Processos
         </h3>
     </div>
     <div class="card-body">
-        <div class="tipos-processo-container">
+        <div class="tipos-processo-container dashboard-content-scroll">
             <div id="tipos-processo-content">
                 <div class="sem-dados-tipos">
                     <i class="fas fa-spinner fa-spin mr-2"></i> Carregando tipos de processos...

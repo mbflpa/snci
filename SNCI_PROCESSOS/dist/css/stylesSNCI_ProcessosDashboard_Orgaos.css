@@ -12,10 +12,10 @@
 }
 .orgao-container {
   width: 100%;
-  padding-right: 0;
-  overflow: visible; /* Remover rolagem vertical */
+  padding-right: 5px; /* Espaço para a barra de rolagem */
+  overflow: visible; /* Removido o overflow para usar o do container pai */
   height: auto; /* Altura automática */
-  max-height: none; /* Remover limite de altura */
+  max-height: none; /* Removido o limite de altura */
 }
 .orgao-card {
   display: flex;
@@ -182,4 +182,15 @@
   font-size: 0.7rem;
   color: #888;
   font-weight: normal;
+}
+
+/* Estilos comuns para padronização dos cards */
+.dashboard-card-fixed {
+  height: 450px; /* Altura fixa para todos os cards */
+}
+
+.dashboard-content-scroll {
+  height: 365px; /* Altura ajustada considerando o header e margens */
+  overflow-y: auto;
+  overflow-x: hidden;
 }

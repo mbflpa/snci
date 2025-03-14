@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard_Orgaos.css">
 
 <!--- Card para Órgãos Avaliados --->
-<div class="card mb-4" id="card-orgaos">
+<div class="card mb-4 dashboard-card-fixed" id="card-orgaos">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-building mr-2"></i><span id="orgaos-avaliados-titulo">Órgãos Avaliados</span>
@@ -16,7 +16,7 @@
             </div>
             
             <!--- Conteúdo específico do componente de órgãos --->
-            <div id="orgaos-container" style="display: block !important;">
+            <div id="orgaos-container" class="dashboard-content-scroll" style="display: block !important;">
                 <div id="orgaos-mais-avaliados-container" class="orgao-container" style="display: block !important; visibility: visible !important;">
                     <!-- Conteúdo gerado dinamicamente pelo JavaScript -->
                 </div>

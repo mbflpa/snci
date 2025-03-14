@@ -3,14 +3,14 @@
 <link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard_Classificacao.css">
 
 <!-- Card para Classificação de Processos -->
-<div class="card mb-4" id="card-classificacao-processo">
+<div class="card mb-4 dashboard-card-fixed" id="card-classificacao-processo">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-tags mr-2"></i>Classificação de Processos
         </h3>
     </div>
     <div class="card-body">
-        <div class="classificacao-processo-container">
+        <div class="classificacao-processo-container dashboard-content-scroll">
             <!-- Conteúdo gerado dinamicamente via JavaScript -->
         </div>
     </div>
