@@ -80,26 +80,9 @@ document.addEventListener("DOMContentLoaded", function() {
             
             // Ordenar por quantidade (decrescente) como no componente de classificação
             tiposData = [...tiposData].sort((a, b) => b.quantidade - a.quantidade);
-            
-            // Verificar se o ano selecionado é "Todos" para aplicar limite de 10 itens
-            const anoSelecionado = window.anoSelecionado || "Todos";
-            
-            // Aplicar a limitação a 10 itens quando "Todos" é selecionado
             let tiposExibidos = tiposData;
-            if (anoSelecionado === "Todos" && tiposData.length > 10) {
-                
-                tiposExibidos = tiposData.slice(0, 10);
-            } else {
-                
-            }
             
-            // Atualizar título do card para refletir a seleção
-            let cardTitle = $('#card-tipos-processo .card-title');
-            if (anoSelecionado === "Todos") {
-                cardTitle.html('<i class="fas fa-project-diagram mr-2"></i>Top 10 Tipos de Processos');
-            } else {
-                cardTitle.html('<i class="fas fa-project-diagram mr-2"></i>Tipos de Processos em ' + anoSelecionado);
-            }
+                     
             
             // Usar o total passado como parâmetro ou extrair dos dados
             const totalProcessos = totalProcessosParam || dados.totalProcessos || 0;

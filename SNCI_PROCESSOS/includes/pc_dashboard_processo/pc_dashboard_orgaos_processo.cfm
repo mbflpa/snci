@@ -6,7 +6,7 @@
 <div class="card mb-4" id="card-orgaos">
     <div class="card-header">
         <h3 class="card-title">
-            <i class="fas fa-building mr-2"></i><span id="orgaos-avaliados-titulo">Top 10 Órgãos Avaliados</span>
+            <i class="fas fa-building mr-2"></i><span id="orgaos-avaliados-titulo">Órgãos Avaliados</span>
         </h3>
     </div>
     <div class="card-body">
@@ -99,16 +99,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 const anoInicial = window.anoInicial || "";
                 const anoFinal = window.anoFinal || "";
                 
-                if (anoSelecionado === "Todos") {
-                    if (anoInicial && anoFinal) {
-                        $('#orgaos-avaliados-titulo').text(`Top 10 Órgãos Avaliados (${anoInicial} - ${anoFinal})`);
-                    } else {
-                        $('#orgaos-avaliados-titulo').text("Top 10 Órgãos Avaliados");
-                    }
-                } else {
-                    $('#orgaos-avaliados-titulo').text(`Órgãos Avaliados em ${anoSelecionado}`);
-                }
-                
                 // Se dados não é um objeto ou é null/undefined
                 if (!dados || typeof dados !== 'object') {
                     $('#orgaos-mais-avaliados-container').html(`
@@ -137,10 +127,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 
                 // Verificar se o ano selecionado é "Todos" para aplicar limite
                 let orgaosExibidos = orgaosOrdenados;
-                if (anoSelecionado === "Todos" && orgaosOrdenados.length > 10) {
-                    orgaosExibidos = orgaosOrdenados.slice(0, 10);
-                }
-                
+
                 // Usar o total geral de processos fornecido pelos dados
                 const totalProcessos = dados.totalProcessos || orgaosExibidos.reduce((sum, o) => sum + o.quantidade, 0);
                 
