@@ -3,7 +3,7 @@
 <link rel="stylesheet" href="dist/css/stylesSNCI_ProcessosDashboard_Status.css">
 
 <!-- Card para Distribuição de Status -->
-<div class="card mb-4" id="card-distribuicao-status">
+<div class="card mb-4 d-flex " id="card-distribuicao-status">
     <div class="card-header">
         <h3 class="card-title">
             <i class="fas fa-tasks mr-2"></i>Distribuição por Status

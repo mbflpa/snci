@@ -14,7 +14,7 @@
     </div>
     <div class="card-body">
         <!-- Cards de métricas em grid - Preparado para múltiplos cards -->
-        <div class="row">
+        <div class="row d-flex ">
             <!-- Card Total de Processos -->
             <div class="col-md-4 col-lg-3 mb-3">
                 <div class="small-box bg-primary card-processos-total">
