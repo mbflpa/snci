@@ -239,6 +239,18 @@
                                         </button>
                                     </div>
                                 </div>
+                                <!-- NOVO CAMPO: Ano do processo -->
+                                <div class="form-group">
+                                    <select class="form-control" id="searchYear" name="searchYear" style="max-width: 200px;">
+                                        <option value="">Selecione o ano do processo</option>
+                                        <cfset currentYear = year(now())>
+                                        <cfoutput>
+                                          <cfloop from="2019" to="#currentYear#" index="yr">
+                                            <option value="#yr#">#yr#</option>
+                                          </cfloop>
+                                        </cfoutput>
+                                    </select>
+                                </div>
                                 
                                 <!-- Opções avançadas de busca (colapsáveis) -->
                                 <div class="d-flex justify-content-between align-items-center mb-2">

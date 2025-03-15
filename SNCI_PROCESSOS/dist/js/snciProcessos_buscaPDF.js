@@ -41,6 +41,9 @@ const PdfSearchManager = {
       showHighlights: $("#showHighlights").is(":checked"),
     };
 
+    // NOVO: incluir o ano do processo, se informado
+    searchOptions.processYear = $("#searchYear").val().trim();
+
     $("#resultsCard").show();
     $("#searchLoading").show();
     $("#searchResults").empty();
@@ -179,6 +182,16 @@ const PdfSearchManager = {
 
       const doc = documents[index];
       processedCount++;
+
+      // NOVO: Se o ano do processo foi informado, verificar se o título do arquivo contém o ano.
+      if (searchOptions.processYear) {
+        // Captura os últimos 4 dígitos do segmento _PCxxxxxxxxYYYY_
+        const m = doc.fileName.match(/_PC\d+(\d{4})_/);
+        if (!m || m[1] !== searchOptions.processYear) {
+          processNextDocument(index + 1); // Pula este arquivo
+          return;
+        }
+      }
 
       // Atualizar barra de progresso
       const progress = Math.round((processedCount / totalDocuments) * 100);
@@ -434,6 +447,15 @@ const PdfSearchManager = {
 
             // Se encontrou algum termo, adiciona aos resultados
             if (found) {
+              // NOVO: se o usuário informou ano de processo, filtrar pelo ano extraído do nome do arquivo
+              if (searchOptions.processYear) {
+                // Tenta capturar os últimos 4 dígitos do segmento _PCxxxxxxxxYYYY_ no nome do arquivo
+                const m = doc.fileName.match(/_PC\d+(\d{4})_/);
+                if (!m || m[1] !== searchOptions.processYear) {
+                  processNextDocument(index + 1);
+                  return;
+                }
+              }
               this.currentSearchResults.push({
                 fileName: doc.fileName,
                 filePath: doc.filePath,
