@@ -251,6 +251,10 @@
                                         </cfoutput>
                                     </select>
                                 </div>
+                                <!-- NOVO CAMPO: Título do arquivo -->
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="searchTitle" name="searchTitle" placeholder="Texto no título do arquivo (ex.: Relatorio)">
+                                </div>
                                 
                                 <!-- Opções avançadas de busca (colapsáveis) -->
                                 <div class="d-flex justify-content-between align-items-center mb-2">

@@ -41,8 +41,9 @@ const PdfSearchManager = {
       showHighlights: $("#showHighlights").is(":checked"),
     };
 
-    // NOVO: incluir o ano do processo, se informado
+    // NOVO: incluir o ano e o texto do título, se informado
     searchOptions.processYear = $("#searchYear").val().trim();
+    searchOptions.titleSearch = $("#searchTitle").val().trim();
 
     $("#resultsCard").show();
     $("#searchLoading").show();
@@ -168,6 +169,7 @@ const PdfSearchManager = {
     let processedCount = 0;
     const totalDocuments = documents.length;
     this.currentSearchResults = [];
+    let filesRead = 0; // Contador de arquivos que passaram nos filtros
 
     $("#processingStatus").text(`Buscando em ${totalDocuments} documentos...`);
 
@@ -176,22 +178,36 @@ const PdfSearchManager = {
       if (index >= documents.length) {
         // Finaliza quando todos os documentos forem processados
         const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
-        this.displaySearchResults(searchTerms, searchTime);
+        this.displaySearchResults(searchTerms, searchTime, filesRead);
         return;
       }
 
       const doc = documents[index];
       processedCount++;
 
-      // NOVO: Se o ano do processo foi informado, verificar se o título do arquivo contém o ano.
+      // Filtrar por ano do processo, se informado
       if (searchOptions.processYear) {
-        // Captura os últimos 4 dígitos do segmento _PCxxxxxxxxYYYY_
         const m = doc.fileName.match(/_PC\d+(\d{4})_/);
         if (!m || m[1] !== searchOptions.processYear) {
           processNextDocument(index + 1); // Pula este arquivo
           return;
         }
       }
+
+      // Filtrar por texto no título, se informado (busca exata no título, ignorando case)
+      if (searchOptions.titleSearch) {
+        if (
+          doc.fileName
+            .toLowerCase()
+            .indexOf(searchOptions.titleSearch.toLowerCase()) === -1
+        ) {
+          processNextDocument(index + 1);
+          return;
+        }
+      }
+
+      // Se passou em ambos os filtros, conta este arquivo
+      filesRead++;
 
       // Atualizar barra de progresso
       const progress = Math.round((processedCount / totalDocuments) * 100);
@@ -767,14 +783,14 @@ const PdfSearchManager = {
   },
 
   // Exibir resultados de busca
-  displaySearchResults: function (searchTerms, searchTime) {
+  displaySearchResults: function (searchTerms, searchTime, filesRead) {
     $("#searchLoading").hide();
 
     // Se não há resultados
     if (this.currentSearchResults.length === 0) {
       $("#noResultsAlert").show();
       $("#searchStats").text(
-        `0 resultados encontrados em ${searchTime} segundos`
+        `0 resultados encontrados em ${searchTime} segundos. Arquivos lidos: ${filesRead}`
       );
       return;
     }
@@ -881,7 +897,7 @@ const PdfSearchManager = {
         this.currentSearchResults.length !== 1 ? "s" : ""
       } encontrado${
         this.currentSearchResults.length !== 1 ? "s" : ""
-      } em ${searchTime} segundos`
+      } em ${searchTime} segundos. Arquivos lidos: ${filesRead}`
     );
 
     // Adicionar handlers para os botões de exibir texto extraído
