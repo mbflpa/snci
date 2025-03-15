@@ -26,7 +26,7 @@ component {
             application.anoPesquisaOpiniao = 2025;
         } else if (FindNoCase("homologacaope", application.auxsite) || FindNoCase("desenvolvimentope", application.auxsite)) {
             application.diretorio_anexos = baseDir & "SNCI_TESTE\";
-            application.diretorio_avaliacoes = baseDir & "SNCI_TESTE\";
+            application.diretorio_avaliacoes =  baseDir & "SNCI_PROCESSOS_AVALIACOES\";
             application.diretorio_faqs = baseDir & "SNCI_TESTE\";
             application.anoPesquisaOpiniao = 2000;
         } else {
