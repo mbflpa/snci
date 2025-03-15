@@ -1,4 +1,3 @@
-
 <cfcomponent>
     <cfprocessingdirective pageencoding = "utf-8">
 
@@ -177,14 +176,14 @@
             }>
             
             <!--- Verificar se o diretório existe --->
-            <cfif not directoryExists(application.diretorio_avaliacoes)>
+            <cfif not directoryExists("\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES")>
                 <cfset local.result.success = false>
                 <cfset local.result.message = "Diretório de FAQs não encontrado">
                 <cfreturn serializeJSON(local.result)>
             </cfif>
             
             <!--- Listar todos os arquivos PDF no diretório --->
-            <cfdirectory action="list" directory="#application.diretorio_avaliacoes#" name="local.pdfFiles" filter="*.pdf" recurse="true">
+            <cfdirectory action="list" directory="\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES" name="local.pdfFiles" filter="*.pdf" recurse="true">
             
             <!--- Processar cada arquivo PDF --->
             <cfloop query="local.pdfFiles">
