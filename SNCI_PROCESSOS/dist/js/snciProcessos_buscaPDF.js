@@ -65,7 +65,7 @@ const PdfSearchManager = {
     } else {
       // Se o PDF.js não estiver disponível, usa sempre o servidor
       $.ajax({
-        url: "cfc/pc_cfcFaqs.cfc",
+        url: "cfc/pc_cfcBuscaPDF.cfc",
         type: "POST", // Alterado para POST que geralmente funciona melhor com ColdFusion
         data: {
           method: "listPdfDocuments",
@@ -188,7 +188,7 @@ const PdfSearchManager = {
       );
 
       // Criar URL para carregar o documento
-      const fileUrl = `cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
+      const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
         doc.filePath
       )}&nome=${encodeURIComponent(doc.fileName)}`;
 
@@ -468,7 +468,7 @@ const PdfSearchManager = {
   // Busca usando o método do servidor
   searchInServerSide: function (searchTerms, searchOptions) {
     $.ajax({
-      url: "cfc/pc_cfcFaqs.cfc",
+      url: "cfc/pc_cfcBuscaPDF.cfc",
       type: "POST",
       dataType: "json",
       data: {
@@ -517,7 +517,7 @@ const PdfSearchManager = {
           if (response.totalFound > 0) {
             // Adaptar os resultados do servidor para o formato esperado
             this.currentSearchResults = response.results.map((result) => {
-              const fileUrl = `cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
+              const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
                 result.filePath
               )}&nome=${encodeURIComponent(result.fileName)}`;
 
@@ -624,7 +624,7 @@ const PdfSearchManager = {
 
     // Buscar lista de documentos PDF primeiro
     $.ajax({
-      url: "cfc/pc_cfcFaqs.cfc",
+      url: "cfc/pc_cfcBuscaPDF.cfc",
       type: "POST",
       data: {
         method: "listPdfDocuments",
@@ -754,7 +754,7 @@ const PdfSearchManager = {
       const badgeClass = this.getRelevanceBadgeClass(relevancePercent);
 
       // URL direta para visualizar o PDF
-      const pdfUrl = `cfc/pc_cfcFaqs.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
+      const pdfUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
         result.filePath
       )}`;
 

@@ -4,7 +4,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Busca em FAQs - SNCI</title>
+    <title>Busca PDF</title>
      
     <!-- Estilos específicos para esta página -->
     <style>
@@ -369,7 +369,7 @@
       });
     </script>
     <script src="plugins/fuse/fuse.min.js"></script>
-    <script src="dist/js/snciProcessos_faqs.js"></script>
+    <script src="dist/js/snciProcessos_buscaPDF.js"></script>
     <script>
         $(document).ready(function() {
             // Toggle para exibir/ocultar opções avançadas com animação do ícone
