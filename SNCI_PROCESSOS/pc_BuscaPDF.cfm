@@ -151,6 +151,57 @@
             background-color: #0083ca;
             border-color: #0083ca;
         }
+        
+        /* Estilos para o texto extraído */
+        .extracted-text-container {
+            margin-top: 15px;
+        }
+        .extracted-text-content {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background-color: #fafafa;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 15px;
+        }
+        .extracted-text-content mark {
+            background-color: #ffeb3b;
+            padding: 2px 0;
+            border-radius: 2px;
+        }
+        .toggle-extracted-text {
+            transition: all 0.3s ease;
+        }
+        .toggle-extracted-text:hover {
+            background-color: #0083ca;
+            color: white;
+        }
+        .copy-text {
+            color: #6c757d;
+            transition: all 0.2s;
+        }
+        .copy-text:hover {
+            color: #0083ca;
+            text-decoration: none;
+        }
+        .extracted-text-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .extracted-text-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .extracted-text-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        .extracted-text-content::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -356,20 +407,22 @@
         </div>
     </div>
 <cfinclude template="includes/pc_sidebar.cfm">
-    <!-- Scripts PDF.js e Fuse.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- Carregar PDF.js como script regular (não como módulo ES6) -->
+    <script src="plugins/pdf.js/pdf.min.js"></script>
     <script>
-      // Verificar se PDF.js carregou corretamente
-      window.addEventListener('load', function() {
-        if (typeof pdfjsLib === 'undefined') {
-          console.error("PDF.js não foi carregado. Verifique a URL do script ou possíveis bloqueios de rede.");
+        // Configurar o worker do PDF.js
+        if (typeof pdfjsLib !== 'undefined') {
+            // Definir a fonte do worker manualmente
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'plugins/pdf.js/pdf.worker.min.js';
+            console.log("PDF.js carregado com sucesso.");
         } else {
-          console.log("PDF.js carregado com sucesso.");
+            console.error("PDF.js não foi carregado corretamente.");
         }
-      });
     </script>
+    
     <script src="plugins/fuse/fuse.min.js"></script>
     <script src="dist/js/snciProcessos_buscaPDF.js"></script>
+    
     <script>
         $(document).ready(function() {
             // Toggle para exibir/ocultar opções avançadas com animação do ícone
@@ -404,8 +457,7 @@
             
             // Configuração básica do PDF.js para ser usado somente para extração de texto
             if (typeof pdfjsLib !== "undefined") {
-                pdfjsLib.GlobalWorkerOptions.workerSrc =
-                    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+                console.log("PDF.js detectado e pronto para uso.");
             } else {
                 console.warn("PDF.js não foi carregado corretamente");
             }

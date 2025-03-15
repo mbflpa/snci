@@ -142,7 +142,7 @@ const PdfSearchManager = {
               "Estrutura de resposta inválida, usando busca no servidor:",
               parsedResponse
             );
-            this.searchInServerSide(searchTerms);
+            this.searchInServerSide(searchTerms, searchOptions);
           }
         },
         error: (xhr, status, error) => {
@@ -193,9 +193,11 @@ const PdfSearchManager = {
       )}&nome=${encodeURIComponent(doc.fileName)}`;
 
       try {
-        // Carregar PDF e extrair texto
+        // Carregar PDF e extrair texto usando API regular do PDF.js (não módulo)
         pdfjsLib
-          .getDocument(fileUrl)
+          .getDocument({
+            url: fileUrl,
+          })
           .promise.then((pdf) => {
             let textPromises = [];
 
@@ -441,6 +443,7 @@ const PdfSearchManager = {
                 dateLastModified: doc.dateLastModified,
                 relevanceScore: relevanceScore,
                 snippets: snippets,
+                extractedText: text, // Armazenamos o texto extraído para usar depois
               });
             }
 
@@ -620,6 +623,7 @@ const PdfSearchManager = {
 
   // Busca no lado do cliente usando PDF.js
   searchInClientSide: function (searchTerms, searchOptions) {
+    // Definir a variável startTime no escopo correto
     const startTime = performance.now();
 
     // Buscar lista de documentos PDF primeiro
@@ -729,6 +733,17 @@ const PdfSearchManager = {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   },
 
+  // Formata os snippets para exibição
+  formatSnippets: function (snippets) {
+    if (!snippets || snippets.length === 0) {
+      return '<p class="text-muted">Sem prévia disponível</p>';
+    }
+
+    return snippets
+      .map((snippet) => `<div class="snippet">${snippet}</div>`)
+      .join("");
+  },
+
   // Exibir resultados de busca
   displaySearchResults: function (searchTerms, searchTime) {
     $("#searchLoading").hide();
@@ -758,10 +773,26 @@ const PdfSearchManager = {
         result.filePath
       )}`;
 
+      // Truncar texto para preview (primeiros 5000 caracteres)
+      const truncatedText = result.extractedText
+        ? result.extractedText.length > 5000
+          ? result.extractedText.substring(0, 5000) + "..."
+          : result.extractedText
+        : "Texto não disponível";
+
+      // Destacar termos de busca no texto completo
+      const highlightedText = termsList.reduce((text, term) => {
+        if (term.length >= 3) {
+          const regex = new RegExp(`(${this.escapeRegExp(term)})`, "gi");
+          return text.replace(regex, "<mark>$1</mark>");
+        }
+        return text;
+      }, truncatedText);
+
       resultsHtml += `
         <div class="search-result" data-file-path="${
           result.filePath
-        }" data-file-url="${pdfUrl}">
+        }" data-file-url="${pdfUrl}" data-result-id="${index}">
           <div class="d-flex justify-content-between align-items-start">
             <h5>
               <a href="${pdfUrl}" target="_blank" class="view-pdf-link">
@@ -778,6 +809,31 @@ const PdfSearchManager = {
           <div class="search-snippets">
             ${this.formatSnippets(result.snippets)}
           </div>
+          
+          <!-- Botão para mostrar/ocultar texto extraído -->
+          <div class="mt-3">
+            <button class="btn btn-sm btn-outline-info toggle-extracted-text" data-result-id="${index}">
+              <i class="fas fa-file-alt mr-1"></i> Ver texto extraído
+            </button>
+          </div>
+          
+          <!-- Container para o texto extraído (inicialmente oculto) -->
+          <div class="extracted-text-container mt-2" id="extractedText-${index}" style="display: none;">
+            <div class="card">
+              <div class="card-header py-2 bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span><i class="fas fa-file-alt mr-1"></i> Conteúdo do documento</span>
+                  <button class="btn btn-sm btn-link text-muted p-0 copy-text" data-result-id="${index}">
+                    <i class="far fa-copy"></i> Copiar
+                  </button>
+                </div>
+              </div>
+              <div class="card-body extracted-text-content p-3" style="max-height: 300px; overflow-y: auto;">
+                ${highlightedText}
+              </div>
+            </div>
+          </div>
+          
           <div class="d-flex justify-content-between mt-2">
             <div>
               <span class="badge badge-light mr-1">
@@ -791,7 +847,6 @@ const PdfSearchManager = {
                 )}
               </span>
             </div>
-            <!-- Botão "Abrir" removido conforme solicitado -->
           </div>
         </div>
       `;
@@ -806,17 +861,54 @@ const PdfSearchManager = {
         this.currentSearchResults.length !== 1 ? "s" : ""
       } em ${searchTime} segundos`
     );
+
+    // Adicionar handlers para os botões de exibir texto extraído
+    this.setupExtractedTextHandlers();
   },
 
-  // Formata os snippets para exibição
-  formatSnippets: function (snippets) {
-    if (!snippets || snippets.length === 0) {
-      return '<p class="text-muted">Sem prévia disponível</p>';
-    }
+  // Configurar manipuladores para o texto extraído
+  setupExtractedTextHandlers: function () {
+    // Toggle para mostrar/ocultar texto extraído
+    $(".toggle-extracted-text").on("click", function () {
+      const resultId = $(this).data("result-id");
+      const textContainer = $(`#extractedText-${resultId}`);
 
-    return snippets
-      .map((snippet) => `<div class="snippet">${snippet}</div>`)
-      .join("");
+      if (textContainer.is(":visible")) {
+        textContainer.slideUp(200);
+        $(this).html('<i class="fas fa-file-alt mr-1"></i> Ver texto extraído');
+      } else {
+        // Fechar outros textos abertos
+        $(".extracted-text-container").slideUp(200);
+        $(".toggle-extracted-text").html(
+          '<i class="fas fa-file-alt mr-1"></i> Ver texto extraído'
+        );
+
+        // Abrir este texto
+        textContainer.slideDown(200);
+        $(this).html('<i class="fas fa-file-alt mr-1"></i> Ocultar texto');
+      }
+    });
+
+    // Copiar texto para área de transferência
+    $(".copy-text").on("click", function () {
+      const resultId = $(this).data("result-id");
+      const textContent =
+        PdfSearchManager.currentSearchResults[resultId].extractedText;
+
+      // Criar elemento temporário para copiar
+      const tempElement = document.createElement("textarea");
+      tempElement.value = textContent;
+      document.body.appendChild(tempElement);
+      tempElement.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempElement);
+
+      // Feedback ao usuário
+      $(this).html('<i class="fas fa-check"></i> Copiado!');
+      setTimeout(() => {
+        $(this).html('<i class="far fa-copy"></i> Copiar');
+      }, 2000);
+    });
   },
 
   // Retorna a classe CSS para o badge de relevância
@@ -958,12 +1050,14 @@ const PdfSearchManager = {
 
 // Inicializar o gerenciador de busca
 $(document).ready(function () {
-  // Configurar PDF.js para usar o worker correto (apenas para extração de texto)
-  if (typeof pdfjsLib !== "undefined") {
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+  // Verificar se o PDF.js foi carregado corretamente
+  if (typeof pdfjsLib === "undefined") {
+    console.error(
+      "PDF.js não foi carregado corretamente. Verifique se o script foi importado."
+    );
   } else {
-    console.warn("PDF.js não foi carregado corretamente");
+    console.log("PDF.js inicializado e pronto para uso.");
+    // Não precisamos configurar o worker aqui novamente, já foi feito no HTML
   }
 
   // Configurar manipulador de formulário
@@ -971,8 +1065,6 @@ $(document).ready(function () {
     e.preventDefault();
     PdfSearchManager.performSearch();
   });
-
-  // Removidos os manipuladores para os controles de highlight e navegação de PDF
 
   // Configurar troca de tipo de busca para habilitar/desabilitar opções
   $('input[name="searchType"]').on("change", function () {
