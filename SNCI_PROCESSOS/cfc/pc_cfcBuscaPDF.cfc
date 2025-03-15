@@ -43,15 +43,18 @@
         <cfset local.termsArray = listToArray(trim(arguments.searchTerms), " ")>
         
         <cftry>
-            <!--- Verificar se o diretório existe - ATUALIZADO PARA NOVO CAMINHO --->
-            <cfif not directoryExists("\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\")>
+            <!--- Caminho corrigido com dupla barra invertida --->
+            <cfset local.caminhoPDFs = "\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\">
+            
+            <!--- Verificar se o diretório existe --->
+            <cfif not directoryExists(local.caminhoPDFs)>
                 <cfset local.result.success = false>
-                <cfset local.result.message = "Diretório de PDFs não encontrado">
+                <cfset local.result.message = "Diretório de PDFs não encontrado: " & local.caminhoPDFs>
                 <cfreturn serializeJSON(local.result)>
             </cfif>
             
-            <!--- Listar todos os arquivos PDF no diretório - ATUALIZADO PARA NOVO CAMINHO --->
-            <cfdirectory action="list" directory="\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\" name="local.pdfFiles" filter="*.pdf" recurse="true">
+            <!--- Listar todos os arquivos PDF no diretório --->
+            <cfdirectory action="list" directory="#local.caminhoPDFs#" name="local.pdfFiles" filter="*.pdf" recurse="true">
             
             <!--- Processar cada arquivo PDF --->
             <cfloop query="local.pdfFiles">
@@ -79,7 +82,7 @@
                         <cfset local.matchResult = {
                             fileName = local.pdfFiles.name,
                             filePath = local.filePath,
-                            displayPath = replaceNoCase(local.filePath, "\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\", ""),
+                            displayPath = replaceNoCase(local.filePath, local.caminhoPDFs, ""),
                             fileSize = local.pdfFiles.size,
                             fileDate = local.pdfFiles.dateLastModified,
                             relevanceScore = local.relevanceScore,
@@ -175,21 +178,24 @@
                 documents = []
             }>
             
+            <!--- Caminho corrigido com dupla barra invertida --->
+            <cfset local.caminhoPDFs = "\\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\">
+            
             <!--- Verificar se o diretório existe --->
-            <cfif not directoryExists("\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\")>
+            <cfif not directoryExists(local.caminhoPDFs)>
                 <cfset local.result.success = false>
-                <cfset local.result.message = "Diretório de PDFs não encontrado">
+                <cfset local.result.message = "Diretório de PDFs não encontrado: " & local.caminhoPDFs>
                 <cfreturn serializeJSON(local.result)>
             </cfif>
             
             <!--- Listar todos os arquivos PDF no diretório --->
-            <cfdirectory action="list" directory="\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\" name="local.pdfFiles" filter="*.pdf" recurse="true">
+            <cfdirectory action="list" directory="#local.caminhoPDFs#" name="local.pdfFiles" filter="*.pdf" recurse="true">
             
             <!--- Processar cada arquivo PDF --->
             <cfloop query="local.pdfFiles">
                 <cfset local.filePath = local.pdfFiles.directory & "\" & local.pdfFiles.name>
                 <!--- CORREÇÃO: Usar o caminho absoluto em vez de application.diretorio_avaliacoes --->
-                <cfset local.relativePath = replaceNoCase(local.filePath, "\sac0424\SISTEMAS\SNCI\SNCI_PROCESSOS_AVALIACOES\", "")>
+                <cfset local.relativePath = replaceNoCase(local.filePath, local.caminhoPDFs, "")>
                 
                 <cfset local.document = {
                     fileName = local.pdfFiles.name,
