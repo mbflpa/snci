@@ -1,3 +1,7 @@
+// Variáveis globais para controle da busca
+let searchCanceled = false;
+let documentProcessing = false;
+
 // Gerenciador de busca em PDFs
 const PdfSearchManager = {
   currentSearchResults: [],
@@ -46,6 +50,15 @@ const PdfSearchManager = {
     searchOptions.titleSearch = $("#searchTitle").val().trim();
 
     $("#resultsCard").show();
+
+    // Rolar automaticamente para o card de resultados após iniciar a busca
+    $("html, body").animate(
+      {
+        scrollTop: $("#resultsCard").offset().top - 200,
+      },
+      "slow"
+    );
+
     $("#searchLoading").show();
     $("#searchResults").empty();
     $("#noResultsAlert").hide();
@@ -68,93 +81,7 @@ const PdfSearchManager = {
       }
     } else {
       // Se o PDF.js não estiver disponível, usa sempre o servidor
-      $.ajax({
-        url: "cfc/pc_cfcBuscaPDF.cfc",
-        type: "POST", // Alterado para POST que geralmente funciona melhor com ColdFusion
-        data: {
-          method: "listPdfDocuments",
-        },
-        dataType: "json",
-        success: (response) => {
-          console.log("Resposta recebida do servidor:", response);
-
-          // Primeiro, garantir que temos uma resposta em formato de objeto
-          let parsedResponse = response;
-
-          if (typeof parsedResponse === "string") {
-            try {
-              parsedResponse = JSON.parse(parsedResponse);
-              console.log("Convertido string em objeto JSON:", parsedResponse);
-            } catch (e) {
-              console.error(
-                "Erro ao converter resposta string para objeto:",
-                e
-              );
-              // Verificar se não é um erro de HTML
-              if (
-                typeof response === "string" &&
-                (response.includes("<html") || response.includes("<!DOCTYPE"))
-              ) {
-                console.error("Recebeu HTML em vez de JSON");
-              }
-              // Se falhar, usar o método do servidor
-              this.searchInServerSide(searchTerms);
-              return;
-            }
-          }
-
-          // ColdFusion retorna propriedades em MAIÚSCULAS, verificar ambas as versões
-          const success = parsedResponse.success || parsedResponse.SUCCESS;
-          const documents =
-            parsedResponse.documents || parsedResponse.DOCUMENTS;
-
-          // Verificar se temos um objeto válido com a estrutura esperada
-          if (
-            parsedResponse &&
-            typeof parsedResponse === "object" &&
-            success === true &&
-            Array.isArray(documents)
-          ) {
-            console.log(`Processando ${documents.length} documentos`);
-
-            // Verificar se a lista de documentos não está vazia
-            if (documents.length > 0) {
-              // Padronizar as chaves para minúsculas para processamento consistente
-              const normalizedDocuments = documents.map((doc) => {
-                return {
-                  fileName: doc.fileName || doc.FILENAME,
-                  filePath: doc.filePath || doc.FILEPATH,
-                  directory: doc.directory || doc.DIRECTORY,
-                  displayPath: doc.displayPath || doc.DISPLAYPATH,
-                  size: doc.size || doc.SIZE,
-                  dateLastModified:
-                    doc.dateLastModified || doc.DATELASTMODIFIED,
-                };
-              });
-
-              this.processDocumentsWithPdfJs(
-                normalizedDocuments,
-                searchTerms,
-                startTime
-              );
-            } else {
-              console.warn("Nenhum documento PDF encontrado no diretório");
-              this.searchInServerSide(searchTerms);
-            }
-          } else {
-            console.warn(
-              "Estrutura de resposta inválida, usando busca no servidor:",
-              parsedResponse
-            );
-            this.searchInServerSide(searchTerms, searchOptions);
-          }
-        },
-        error: (xhr, status, error) => {
-          console.error(`Erro ao buscar documentos: ${status} - ${error}`);
-          console.log("Texto da resposta:", xhr.responseText);
-          this.searchInServerSide(searchTerms);
-        },
-      });
+      this.searchInServerSide(searchTerms, searchOptions);
     }
   },
 
@@ -171,31 +98,93 @@ const PdfSearchManager = {
     this.currentSearchResults = [];
     let filesRead = 0; // Contador de arquivos que passaram nos filtros
 
+    // Reset do cancelamento de busca
+    searchCanceled = false;
+    documentProcessing = true;
+
+    // Mostrar o container de resultados em tempo real
+    $("#realTimeResults").show();
+    $("#realTimeResultsList").empty();
+
     $("#processingStatus").text(`Buscando em ${totalDocuments} documentos...`);
 
     // Função para processar um documento por vez
     const processNextDocument = (index) => {
+      // Verificar se a busca foi cancelada
+      if (searchCanceled) {
+        const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
+        $("#processingStatus").text(
+          `Busca cancelada após processar ${processedCount} documentos.`
+        );
+
+        // Remover o estado de carregamento do botão cancelar
+        $("#cancelSearch")
+          .prop("disabled", false)
+          .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
+
+        this.displaySearchResults(searchTerms, searchTime, filesRead);
+        documentProcessing = false;
+        return;
+      }
+
       if (index >= documents.length) {
         // Finaliza quando todos os documentos forem processados
         const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
+
+        // Remover o estado de carregamento do botão cancelar
+        $("#cancelSearch")
+          .prop("disabled", false)
+          .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
+
         this.displaySearchResults(searchTerms, searchTime, filesRead);
+        documentProcessing = false;
+        // Rolar automaticamente para o card de resultados
+        $("html, body").animate(
+          {
+            scrollTop: $("#resultsCard").offset().top - 200,
+          },
+          "slow"
+        );
         return;
       }
 
       const doc = documents[index];
       processedCount++;
 
+      // Atualizar UI
+      const progress = Math.round((processedCount / totalDocuments) * 100);
+      $("#processingProgress").css("width", `${progress}%`);
+      $("#processingStatus").text(
+        `Processando: ${processedCount} de ${totalDocuments} (${filesRead} relevantes)`
+      );
+
+      // Não é mais necessário chamar a função de atualização do carrossel
+      // O SVG tem animação contínua que funciona sozinha
+
+      // Pequeno efeito visual de "escaneamento" do documento
+      $(".document-item").css(
+        "transform",
+        `translateY(${index % 2 === 0 ? -5 : 5}px)`
+      );
+      setTimeout(() => {
+        $(".document-item").css("transform", "translateY(0)");
+      }, 300);
+
       // Filtrar por ano do processo, se informado
-      if (searchOptions.processYear) {
-        const m = doc.fileName.match(/_PC\d+(\d{4})_/);
-        if (!m || m[1] !== searchOptions.processYear) {
+      if (searchOptions && searchOptions.processYear) {
+        const yearMatch = doc.fileName.match(/_PC\d+(\d{4})_/);
+        if (!yearMatch || yearMatch[1] !== searchOptions.processYear) {
           processNextDocument(index + 1); // Pula este arquivo
           return;
         }
       }
 
       // Filtrar por texto no título, se informado (busca exata no título, ignorando case)
-      if (searchOptions.titleSearch) {
+      if (
+        searchOptions &&
+        searchOptions.titleSearch &&
+        searchOptions.titleSearch.trim() !== ""
+      ) {
         if (
           doc.fileName
             .toLowerCase()
@@ -208,13 +197,6 @@ const PdfSearchManager = {
 
       // Se passou em ambos os filtros, conta este arquivo
       filesRead++;
-
-      // Atualizar barra de progresso
-      const progress = Math.round((processedCount / totalDocuments) * 100);
-      $("#processingProgress").css("width", `${progress}%`);
-      $("#processingStatus").text(
-        `Processando documento ${processedCount} de ${totalDocuments}: ${doc.fileName}`
-      );
 
       // Criar URL para carregar o documento
       const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
@@ -249,240 +231,57 @@ const PdfSearchManager = {
 
             // Buscar termos no texto
             let found = false;
-            let relevanceScore = 0;
             let snippets = [];
 
-            // Aplicar estratégia de busca baseada no modo selecionado
-            if (searchOptions && searchOptions.mode === "exact") {
-              // Modo de frase exata
+            // Simplificar a lógica de busca - exibir qualquer correspondência
+            terms.forEach((term) => {
+              if (term.length >= 3) {
+                const regex = new RegExp(this.escapeRegExp(term), "gi");
+                const matches = text.match(regex);
 
-              // Normalizar texto para busca exata (remover espaços duplos, normalizar quebras de linha)
-              const normalizedText = text
-                .replace(/\s+/g, " ")
-                .toLowerCase()
-                .trim();
+                if (matches && matches.length > 0) {
+                  found = true;
 
-              // Normalizar a frase exata da mesma forma
-              const exactPhrase = terms.join(" ").toLowerCase().trim();
+                  // Criar snippet com contexto
+                  const firstIndex = text
+                    .toLowerCase()
+                    .indexOf(term.toLowerCase());
+                  if (firstIndex !== -1) {
+                    const start = Math.max(0, firstIndex - 50);
+                    const end = Math.min(
+                      text.length,
+                      firstIndex + term.length + 100
+                    );
+                    let snippet = text.substring(start, end);
 
-              // Primeiro, tenta encontrar a frase exata
-              if (normalizedText.includes(exactPhrase)) {
-                found = true;
-                relevanceScore = 10; // Alta pontuação para correspondência exata
+                    if (start > 0) snippet = "..." + snippet;
+                    if (end < text.length) snippet += "...";
 
-                // Encontrar onde a frase aparece no texto original para criar snippet
-                let snippetIndex = -1;
-
-                // Buscar mais flexivelmente no texto original para localizar a posição
-                const phraseWords = exactPhrase.split(/\s+/);
-                const phrasePattern = phraseWords
-                  .map((word) => this.escapeRegExp(word))
-                  .join("[\\s\\n\\r]*");
-                const flexRegex = new RegExp(
-                  phrasePattern,
-                  searchOptions.caseSensitive ? "g" : "gi"
-                );
-
-                const match = flexRegex.exec(text);
-                if (match) {
-                  snippetIndex = match.index;
-                }
-
-                if (snippetIndex >= 0) {
-                  // Criar snippet com contexto ao redor da frase encontrada
-                  const start = Math.max(0, snippetIndex - 80);
-                  const end = Math.min(
-                    text.length,
-                    snippetIndex + exactPhrase.length + 120
-                  );
-                  let snippet = text.substring(start, end);
-
-                  // Adicionar reticências se necessário
-                  if (start > 0) snippet = "..." + snippet;
-                  if (end < text.length) snippet += "...";
-
-                  // Destacar termos agrupados na frase
-                  phraseWords.forEach((word) => {
-                    if (word.length >= 3) {
-                      const wordRegex = new RegExp(
-                        `(${this.escapeRegExp(word)})`,
-                        "gi"
-                      );
-                      snippet = snippet.replace(wordRegex, "<mark>$1</mark>");
-                    }
-                  });
-
-                  snippets.push(snippet);
-                }
-              } else {
-                // Busca mais flexível para frase exata com tolerância a espaçamento
-                const phraseWords = exactPhrase.split(/\s+/);
-
-                // Verificar se todas as palavras da frase aparecem na mesma ordem e próximas
-                if (phraseWords.length > 1) {
-                  const phrasePattern = phraseWords
-                    .map((word) => this.escapeRegExp(word))
-                    .join("[\\s\\n\\r]{1,20}");
-                  const flexRegex = new RegExp(
-                    phrasePattern,
-                    searchOptions.caseSensitive ? "g" : "gi"
-                  );
-
-                  const matches = text.match(flexRegex);
-
-                  if (matches && matches.length > 0) {
-                    found = true;
-                    relevanceScore = 8; // Pontuação boa, mas menor que a correspondência perfeita
-
-                    // Criar snippet com o primeiro match
-                    const matchIndex = text.search(flexRegex);
-                    if (matchIndex !== -1) {
-                      const start = Math.max(0, matchIndex - 80);
-                      const matchLength = matches[0].length;
-                      const end = Math.min(
-                        text.length,
-                        matchIndex + matchLength + 120
-                      );
-
-                      let snippet = text.substring(start, end);
-
-                      // Adicionar reticências se necessário
-                      if (start > 0) snippet = "..." + snippet;
-                      if (end < text.length) snippet += "...";
-
-                      // Destacar termos na frase
-                      phraseWords.forEach((word) => {
-                        if (word.length >= 3) {
-                          const wordRegex = new RegExp(
-                            `(${this.escapeRegExp(word)})`,
-                            "gi"
-                          );
-                          snippet = snippet.replace(
-                            wordRegex,
-                            "<mark>$1</mark>"
-                          );
-                        }
-                      });
-
-                      snippets.push(snippet);
-                    }
+                    snippet = this.highlightSearchTerm(snippet, term);
+                    snippets.push(snippet);
                   }
                 }
               }
-            } else if (searchOptions && searchOptions.mode === "proximity") {
-              // Modo de palavras próximas
-              // Verificar se todos os termos ocorrem dentro de uma janela de proximidade
-              const validTerms = terms.filter((t) => t.length >= 3);
-              if (validTerms.length > 1) {
-                // Primeiro verificamos se todos os termos existem no texto
-                const allTermsPresent = validTerms.every((term) => {
-                  const flags = searchOptions.caseSensitive ? "g" : "gi";
-                  return new RegExp(this.escapeRegExp(term), flags).test(text);
-                });
+            });
 
-                if (allTermsPresent) {
-                  // Dividir o texto em janelas para análise de proximidade
-                  const words = text.split(/\s+/);
-                  const distance = searchOptions.proximityDistance || 20;
-
-                  // Verificar janelas de palavras
-                  for (let i = 0; i < words.length; i++) {
-                    const windowEnd = Math.min(i + distance, words.length);
-                    const windowText = words.slice(i, windowEnd).join(" ");
-
-                    // Verificar se todos os termos estão nesta janela
-                    const allTermsInWindow = validTerms.every((term) => {
-                      const flags = searchOptions.caseSensitive ? "g" : "gi";
-                      return new RegExp(this.escapeRegExp(term), flags).test(
-                        windowText
-                      );
-                    });
-
-                    if (allTermsInWindow) {
-                      found = true;
-                      relevanceScore += 3; // Alta pontuação para termos próximos
-
-                      // Criar snippet com esta janela
-                      let snippet = windowText;
-                      if (i > 0) snippet = "..." + snippet;
-                      if (windowEnd < words.length) snippet += "...";
-
-                      // Destacar todos os termos na janela
-                      validTerms.forEach((term) => {
-                        const flags = searchOptions.caseSensitive ? "g" : "gi";
-                        const regex = new RegExp(
-                          `(${this.escapeRegExp(term)})`,
-                          flags
-                        );
-                        snippet = snippet.replace(regex, "<mark>$1</mark>");
-                      });
-
-                      snippets.push(snippet);
-                      break; // Uma janela encontrada é suficiente para esta implementação básica
-                    }
-                  }
-                }
-              }
-            } else {
-              // Modo padrão (OR) - busca por qualquer termo
-              terms.forEach((term) => {
-                if (term.length >= 3) {
-                  const flags = searchOptions.caseSensitive ? "g" : "gi";
-                  const regex = new RegExp(this.escapeRegExp(term), flags);
-                  const matches = text.match(regex);
-
-                  if (matches && matches.length > 0) {
-                    found = true;
-                    relevanceScore += matches.length;
-
-                    // Criar snippet com contexto
-                    const firstIndex = searchOptions.caseSensitive
-                      ? text.indexOf(term)
-                      : text.toLowerCase().indexOf(term.toLowerCase());
-
-                    if (firstIndex !== -1) {
-                      const start = Math.max(0, firstIndex - 50);
-                      const end = Math.min(
-                        text.length,
-                        firstIndex + term.length + 100
-                      );
-                      let snippet = text.substring(start, end);
-
-                      // Adicionar reticências se necessário
-                      if (start > 0) snippet = "..." + snippet;
-                      if (end < text.length) snippet += "...";
-
-                      // Destacar termo
-                      snippet = this.highlightSearchTerm(snippet, term);
-                      snippets.push(snippet);
-                    }
-                  }
-                }
-              });
-            }
-
-            // Se encontrou algum termo, adiciona aos resultados
             if (found) {
-              // NOVO: se o usuário informou ano de processo, filtrar pelo ano extraído do nome do arquivo
-              if (searchOptions.processYear) {
-                // Tenta capturar os últimos 4 dígitos do segmento _PCxxxxxxxxYYYY_ no nome do arquivo
-                const m = doc.fileName.match(/_PC\d+(\d{4})_/);
-                if (!m || m[1] !== searchOptions.processYear) {
-                  processNextDocument(index + 1);
-                  return;
-                }
-              }
-              this.currentSearchResults.push({
+              // Criar objeto de resultado simplificado (sem cálculo de relevância)
+              const resultObj = {
                 fileName: doc.fileName,
                 filePath: doc.filePath,
                 fileUrl: fileUrl,
                 directory: doc.directory || "Diretório FAQ",
                 size: doc.size,
                 dateLastModified: doc.dateLastModified,
-                relevanceScore: relevanceScore,
                 snippets: snippets,
-                extractedText: text, // Armazenamos o texto extraído para usar depois
-              });
+                extractedText: text,
+              };
+
+              // Adicionar ao array de resultados
+              this.currentSearchResults.push(resultObj);
+
+              // Mostrar resultado em tempo real
+              this.addRealTimeResult(resultObj);
             }
 
             // Processar o próximo documento
@@ -493,7 +292,6 @@ const PdfSearchManager = {
               `Erro ao processar o documento ${doc.fileName}:`,
               error
             );
-            // Continua processando os outros documentos mesmo se um falhar
             processNextDocument(index + 1);
           });
       } catch (error) {
@@ -504,6 +302,42 @@ const PdfSearchManager = {
 
     // Iniciar o processamento com o primeiro documento
     processNextDocument(0);
+  },
+
+  // Método para atualizar a animação - removendo o código anterior e deixando o SVG funcionar
+  // Não é necessário atualizar o SVG manualmente pois a animação é controlada por SMIL
+  updateCarouselAnimation: function () {
+    // A animação do SVG é automática, não precisamos fazer nada aqui
+    // As animações SMIL no SVG cuidam de tudo
+  },
+
+  // Novo método para adicionar resultados em tempo real
+  addRealTimeResult: function (result) {
+    const resultItem = `
+      <div class="realtime-result-item">
+        <h6 class="mb-1">
+          <a href="${result.fileUrl}" target="_blank" class="result-link">
+            <i class="far fa-file-pdf mr-1"></i> ${result.fileName}
+          </a>
+        </h6>
+        <div class="small text-muted">
+          ${this.formatSnippets(result.snippets.slice(0, 1))}
+        </div>
+      </div>
+    `;
+
+    // Adicionar ao início da lista para mostrar os mais recentes primeiro
+    $("#realTimeResultsList").prepend(resultItem);
+
+    // Se este for o primeiro resultado encontrado, fazer scroll para a seção de resultados em tempo real
+    if (this.currentSearchResults.length === 1) {
+      $("html, body").animate(
+        {
+          scrollTop: $("#realTimeResults").offset().top - 150,
+        },
+        "slow"
+      );
+    }
   },
 
   // Busca usando o método do servidor
@@ -785,6 +619,7 @@ const PdfSearchManager = {
   // Exibir resultados de busca
   displaySearchResults: function (searchTerms, searchTime, filesRead) {
     $("#searchLoading").hide();
+    $("#realTimeResults").hide();
 
     // Se não há resultados
     if (this.currentSearchResults.length === 0) {
@@ -795,17 +630,11 @@ const PdfSearchManager = {
       return;
     }
 
-    // Construir HTML dos resultados
+    // Construir HTML dos resultados - sem mostrar relevância
     const termsList = searchTerms.split(" ").filter((term) => term.length >= 3);
     let resultsHtml = "";
 
     this.currentSearchResults.forEach((result, index) => {
-      const relevancePercent = Math.min(
-        100,
-        Math.round((result.relevanceScore / 10) * 100)
-      );
-      const badgeClass = this.getRelevanceBadgeClass(relevancePercent);
-
       // URL direta para visualizar o PDF
       const pdfUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
         result.filePath
@@ -837,7 +666,6 @@ const PdfSearchManager = {
                 <i class="far fa-file-pdf mr-2"></i>${result.fileName}
               </a>
             </h5>
-            <span class="badge badge-${badgeClass}">${relevancePercent}% relevante</span>
           </div>
           <p class="mb-1 text-muted small">
             <i class="fas fa-folder-open mr-1"></i> ${
@@ -866,7 +694,7 @@ const PdfSearchManager = {
                   </button>
                 </div>
               </div>
-              <div class="card-body extracted-text-content p-3" style="max-height: 300px; overflow-y: auto;">
+              <div class="card-body extracted-text-content " style="max-height: 300px; overflow-y: auto;">
                 ${highlightedText}
               </div>
             </div>
@@ -890,7 +718,7 @@ const PdfSearchManager = {
       `;
     });
 
-    // Exibir resultados e estatísticas
+    // Exibir resultados e estatísticas (sem menção a relevância)
     $("#searchResults").html(resultsHtml);
     $("#searchStats").text(
       `${this.currentSearchResults.length} resultado${
@@ -947,14 +775,6 @@ const PdfSearchManager = {
         $(this).html('<i class="far fa-copy"></i> Copiar');
       }, 2000);
     });
-  },
-
-  // Retorna a classe CSS para o badge de relevância
-  getRelevanceBadgeClass: function (relevancePercent) {
-    if (relevancePercent >= 80) return "success";
-    if (relevancePercent >= 50) return "primary";
-    if (relevancePercent >= 30) return "info";
-    return "secondary";
   },
 
   // Formatar tamanho do arquivo
@@ -1063,6 +883,8 @@ const PdfSearchManager = {
   searchWithTerm: function (term) {
     $("#searchTerms").val(term);
     this.performSearch(term);
+
+    // Não precisamos adicionar o scroll aqui pois já está no performSearch
   },
 
   // Atualizar a URL com os termos de busca para permitir compartilhamento
@@ -1074,14 +896,11 @@ const PdfSearchManager = {
       window.location.pathname +
       "?q=" +
       encodeURIComponent(searchTerms);
-
     window.history.pushState({ path: newUrl }, "", newUrl);
   },
 
   // Navegar pelos destaques
   navigateHighlights: function (direction) {
-    // Implementação básica para navegação entre ocorrências destacadas
-    // Em uma implementação real, isso percorreria as ocorrências no PDF
     console.log("Navegação entre destaques: direção =", direction);
   },
 };
@@ -1095,7 +914,6 @@ $(document).ready(function () {
     );
   } else {
     console.log("PDF.js inicializado e pronto para uso.");
-    // Não precisamos configurar o worker aqui novamente, já foi feito no HTML
   }
 
   // Configurar manipulador de formulário
@@ -1107,6 +925,16 @@ $(document).ready(function () {
   // Configurar troca de tipo de busca para habilitar/desabilitar opções
   $('input[name="searchType"]').on("change", function () {
     $("#fuzzyThreshold").prop("disabled", $(this).val() !== "fuzzy");
+  });
+
+  // Configurar botão de cancelamento
+  $("#cancelSearch").on("click", function () {
+    if (documentProcessing) {
+      searchCanceled = true;
+      $(this)
+        .prop("disabled", true)
+        .html('<i class="fas fa-spinner fa-spin mr-1"></i> Cancelando...');
+    }
   });
 
   // Inicializar o gerenciador

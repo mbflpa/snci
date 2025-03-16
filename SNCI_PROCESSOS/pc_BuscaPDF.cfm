@@ -129,6 +129,7 @@
         }
         .search-card .card-body {
             padding: 25px;
+            padding-top: 5px!important;
         }
         .form-control-lg {
             border-radius: 8px 0 0 8px;
@@ -201,6 +202,114 @@
         }
         .extracted-text-content::-webkit-scrollbar-thumb:hover {
             background: #a1a1a1;
+        }
+        
+        /* Estilos para o carrossel de documentos */
+        .document-scanner-container {
+            width: 100%;
+            height: 100px;
+            margin: 0!important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            opacity: 0; /* Começa invisível */
+            transform: translateX(-50px); /* Começa deslocado para a esquerda */
+            animation: slideInFromLeft 1s ease-in-out 1s forwards; /* Surge após 1 segundo */
+        }
+        
+        /* Animação de surgimento com deslizamento da esquerda para direita */
+        @keyframes slideInFromLeft {
+            from { 
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .document-scanner-svg {
+            width: 100%;
+            max-width: 490px;
+            height: auto;
+        }
+        
+        .pdf-icon-path {
+            fill: #f40f02;
+        }
+        
+        .scanner-area {
+            fill: rgba(0, 131, 202, 0.1);
+            stroke: #0083ca;
+        }
+        
+        .scan-line {
+            fill: #0083ca;
+            opacity: 0.8;
+        }
+        
+        .document {
+            fill: white;
+            stroke: #ced4da;
+        }
+        
+        /* Posicionamento dos itens do carrossel */
+        .carousel-item:nth-child(1) {
+            transform: translateX(-100%) scale(0.7);
+            opacity: 0;
+        }
+        
+        .carousel-item:nth-child(2) {
+            transform: translateX(0) scale(1);
+            opacity: 1;
+        }
+        
+        .carousel-item:nth-child(3) {
+            transform: translateX(100%) scale(0.7);
+            opacity: 0;
+        }
+        
+        /* Estilos para resultados em tempo real */
+        #realTimeResults {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            display: none;
+            margin-top: 25px;
+        }
+        
+        #realTimeResultsList {
+            padding: 10px 15px;
+        }
+        
+        .realtime-result-item {
+            padding: 10px;
+            border-left: 3px solid #0083ca;
+            margin-bottom: 10px;
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,.1);
+            transition: all 0.3s ease;
+        }
+        
+        .realtime-result-item:hover {
+            transform: translateX(3px);
+            border-left-color: #005b8e;
+            background-color: #f0f7fc;
+        }
+        
+        .realtime-result-item a.result-link {
+            color: #0083ca;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .realtime-result-item a.result-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -346,18 +455,90 @@
                             <span id="searchStats" class="badge badge-light badge-pill py-2 px-3" style="font-size: 0.9rem;"></span>
                         </div>
                         <div class="card-body">
-                            <!-- Indicador de carregamento -->
-                            <div class="text-center py-5" id="searchLoading" style="display:none;">
-                                <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                                    <span class="sr-only">Buscando...</span>
+                            <!-- Indicador de carregamento - SVG animado de documentos -->
+                            <div class="text-center " id="searchLoading" style="display:none;">
+                                <div class="document-scanner-container">
+                                    <svg class="document-scanner-svg" viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg">
+                                        <defs>
+                                            <g id="pdf-document">
+                                                <!-- Documento base com sombra suave -->
+                                                <rect x="1" y="1" width="60" height="80" rx="3" ry="3" fill="#e0e0e0" opacity="0.5"/>
+                                                <rect class="document" width="60" height="80" rx="3" ry="3" stroke-width="1" fill="white" stroke="#cccccc"/>
+                                                
+                                                <!-- Faixa vermelha no topo para o PDF -->
+                                                <rect x="0" y="0" width="60" height="15" fill="#f40f02" rx="3" ry="0"/>
+                                                <text x="30" y="11" text-anchor="middle" font-size="10" fill="white" font-weight="bold">PDF</text>
+                                                
+                                                <!-- Linhas de conteúdo simulado -->
+                                                <rect x="10" y="22" width="40" height="2" fill="#e6e6e6" rx="1" ry="1"/>
+                                                <rect x="10" y="28" width="40" height="2" fill="#e6e6e6" rx="1" ry="1"/>
+                                                <rect x="10" y="34" width="40" height="2" fill="#e6e6e6" rx="1" ry="1"/>
+                                                <rect x="10" y="40" width="40" height="2" fill="#e6e6e6" rx="1" ry="1"/>
+                                                <rect x="10" y="46" width="30" height="2" fill="#e6e6e6" rx="1" ry="1"/>
+                                                <rect x="10" y="52" width="40" height="2" fill="#e6e6e6" rx="1" ry="1"/>
+                                                <rect x="10" y="58" width="25" height="2" fill="#e6e6e6" rx="1" ry="1"/>
+                                                <rect x="10" y="64" width="35" height="2" fill="#e6e6e6" rx="1" ry="1"/>
+                                                <rect x="10" y="70" width="20" height="2" fill="#e6e6e6" rx="1" ry="1"/>
+                                            </g>
+                                            <rect id="scanLine" class="scan-line" width="56" height="3" rx="1" ry="1"/>
+                                        </defs> 
+
+                                        <!-- Área de escaneamento central -->
+                                        <rect class="scanner-area" x="220" y="35" width="70" height="90" rx="5" ry="5" stroke-dasharray="4,2"/>
+                                        
+                                        <!-- Documento com animação sequencial (mais rápida) -->
+                                        <g id="animated-document">
+                                            <use href="#pdf-document" x="0" y="40">
+                                                <!-- Animação com parada no meio para escaneamento (movimento invertido: esquerda para direita) -->
+                                                <animateTransform 
+                                                    attributeName="transform" 
+                                                    type="translate" 
+                                                    values="-100,0; 225,0; 225,0; 500,0" 
+                                                    keyTimes="0; 0.25; 0.6; 1" 
+                                                    dur="1.75s" 
+                                                    repeatCount="indefinite" 
+                                                    id="docAnimation"/>
+                                                <!-- Animação de opacidade para aparecer e desaparecer gradualmente -->
+                                                <animate 
+                                                    attributeName="opacity" 
+                                                    values="0; 1; 1; 0" 
+                                                    keyTimes="0; 0.25; 0.6; 1" 
+                                                    dur="1.75s" 
+                                                    repeatCount="indefinite" 
+                                                    id="opacityAnimation"/>
+                                            </use>
+                                            <use href="#scanLine" x="227" y="45">
+                                                <!-- Animação da linha de escaneamento (sincronizada com documento) -->
+                                                <animate 
+                                                    attributeName="y"
+                                                    values="45; 45; 115; 45" 
+                                                    keyTimes="0; 0.25; 0.6; 1" 
+                                                    dur="1.75s" 
+                                                    repeatCount="indefinite" 
+                                                    begin="docAnimation.begin"/>
+                                            </use>
+                                        </g> 
+                                    </svg>
                                 </div>
                                 <p class="mt-3 lead">Procurando nos documentos. Isso pode levar alguns instantes...</p>
+                                                
+                                <!-- Barra de progresso e status -->
                                 <div class="progress pdf-progress mx-auto" style="width:70%; height: 8px;">
                                     <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" id="processingProgress" role="progressbar" style="width: 0%"></div>
                                 </div>
-                                <small id="processingStatus" class="form-text text-muted mt-2">Preparando busca...</small>
+                                <div class="d-flex justify-content-between align-items-center mt-2 mx-auto" style="width:70%;">
+                                    <small id="processingStatus" class="form-text text-muted">Preparando busca...</small>
+                                    <button id="cancelSearch" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-times mr-1"></i> Cancelar busca
+                                    </button>
+                                </div>
+                                </div>
+                                <!-- Container para resultados em tempo real com links clicáveis -->
+                                <div id="realTimeResults" class="mt-4">
+                                    <h5 class="border-bottom pb-2">Resultados encontrados até o momento:</h5>
+                                    <div id="realTimeResultsList" class="text-left"></div>
+                                </div>
                             </div>
-                            
                             <!-- Alerta quando não há resultados -->
                             <div id="noResultsAlert" class="alert alert-warning" style="display:none;">
                                 <div class="d-flex align-items-center">
@@ -368,7 +549,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
                             <!-- Alerta de erro -->
                             <div id="errorAlert" class="alert alert-danger" style="display:none;">
                                 <div class="d-flex align-items-center">
@@ -398,15 +578,13 @@
                             </div>
                             
                             <!-- Lista de resultados -->
-                            <div class="search-results" id="searchResults"></div>
-                            
+                            <div class="search-results" id="searchResults" style="padding:0 10px 10px!important"></div>
                         </div>
                     </div>
                 </div>
             </section>
             <cfinclude template="includes/pc_footer.cfm">
         </div>
-        
     </div>
 
     <!-- Modal de carregamento -->
@@ -422,7 +600,9 @@
             </div>
         </div>
     </div>
-<cfinclude template="includes/pc_sidebar.cfm">
+    
+    <cfinclude template="includes/pc_sidebar.cfm">
+    
     <!-- Carregar PDF.js como script regular (não como módulo ES6) -->
     <script src="plugins/pdf.js/pdf.min.js"></script>
     <script>
@@ -477,8 +657,6 @@
             } else {
                 console.warn("PDF.js não foi carregado corretamente");
             }
-            
-          
         });
     </script>
 </body>

@@ -59,8 +59,8 @@
                 <cfset local.extractResult = extractPDFText(local.filePath)>
                 
                 <cfif local.extractResult.success>
-                    <cfset local.relevanceScore = 0>
-                    <cfset local.termMatches = {}>
+                    <cfset local.found = false>
+                    <cfset local.snippets = []>
                     
                     <!--- Verificar cada termo de busca --->
                     <cfloop array="#local.termsArray#" index="local.term">
@@ -68,38 +68,47 @@
                         <cfif len(local.term) GTE 3> <!--- Ignorar termos menores que 3 caracteres --->
                             <cfset local.occurrences = countOccurrences(local.extractResult.text, local.term)>
                             <cfif local.occurrences GT 0>
-                                <cfset local.termMatches[local.term] = local.occurrences>
-                                <cfset local.relevanceScore += local.occurrences>
+                                <cfset local.found = true>
+                                <!--- Criar snippet com o contexto --->
+                                <cfset local.position = findNoCase(local.term, local.extractResult.text)>
+                                <cfif local.position GT 0>
+                                    <cfset local.start = max(1, local.position - 80)>
+                                    <cfset local.end = min(len(local.extractResult.text), local.position + len(local.term) + 120)>
+                                    <cfset local.snippet = mid(local.extractResult.text, local.start, local.end - local.start)>
+                                    
+                                    <!--- Adicionar reticências se necessário --->
+                                    <cfif local.start GT 1>
+                                        <cfset local.snippet = "..." & local.snippet>
+                                    </cfif>
+                                    <cfif local.end LT len(local.extractResult.text)>
+                                        <cfset local.snippet = local.snippet & "...">
+                                    </cfif>
+                                    
+                                    <cfset arrayAppend(local.snippets, local.snippet)>
+                                </cfif>
                             </cfif>
                         </cfif>
                     </cfloop>
                     
                     <!--- Se encontrou pelo menos um termo, adiciona aos resultados --->
-                    <cfif structCount(local.termMatches) GT 0>
+                    <cfif local.found>
                         <cfset local.matchResult = {
                             fileName = local.pdfFiles.name,
                             filePath = local.filePath,
                             displayPath = replaceNoCase(local.filePath, application.diretorio_busca_pdf, ""),
                             fileSize = local.pdfFiles.size,
                             fileDate = local.pdfFiles.dateLastModified,
-                            relevanceScore = local.relevanceScore,
-                            termMatches = local.termMatches,
-                            termsFound = structCount(local.termMatches),
-                            totalTerms = arrayLen(local.termsArray)
+                            snippets = local.snippets,
+                            text = left(local.extractResult.text, 10000) <!--- Limitar para não sobrecarregar --->
                         }>
                         <cfset arrayAppend(local.result.results, local.matchResult)>
                     </cfif>
                 </cfif>
             </cfloop>
             
-            <!--- Ordenar resultados por relevância (pontuação e número de termos encontrados) --->
-            <cfif arrayLen(local.result.results) GT 0>
-                <cfset local.result.results = sortResultsByRelevance(local.result.results)>
-                <cfset local.result.totalFound = arrayLen(local.result.results)>
-                <cfset local.result.message = "Encontrados #local.result.totalFound# documentos">
-            <cfelse>
-                <cfset local.result.message = "Nenhum resultado encontrado para os termos de busca">
-            </cfif>
+            <!--- Número total de resultados encontrados --->
+            <cfset local.result.totalFound = arrayLen(local.result.results)>
+            <cfset local.result.message = "Encontrados #local.result.totalFound# documentos">
             
             <cfset local.result.searchTime = (getTickCount() - local.startTime) / 1000>
             
