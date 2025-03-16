@@ -8,11 +8,16 @@
             success = true,
             fileName = getFileFromPath(arguments.pdfFilePath),
             text = "",
+            pageCount = 0,
             error = ""
         }>
         
         <cftry>
-            <!--- Extraindo texto do PDF usando o componente nativo do ColdFusion --->
+            <!--- Extraindo informações do PDF usando o componente nativo do ColdFusion --->
+            <cfpdf action="getInfo" source="#arguments.pdfFilePath#" name="local.pdfInfo">
+            <cfset local.result.pageCount = local.pdfInfo.totalpages>
+            
+            <!--- Extraindo texto do PDF --->
             <cfpdf action="extracttext" source="#arguments.pdfFilePath#" name="local.extractedText">
             <cfset local.result.text = local.extractedText>
             
@@ -76,13 +81,11 @@
                     
                     <!--- Lógica adaptada ao modo de busca --->
                     <cfif local.searchMode EQ "exact">
-                        <!--- Busca por frase exata --->
                         <cfset local.phrase = local.searchPhrase>
                         <cfif len(local.phrase) GTE 3>
                             <cfset local.position = findNoCase(local.phrase, local.extractResult.text)>
                             <cfif local.position GT 0>
                                 <cfset local.found = true>
-                                
                                 <!--- Criar snippet com contexto --->
                                 <cfset local.start = max(1, local.position - 200)>
                                 <cfset local.end = min(len(local.extractResult.text), local.position + len(local.phrase) + 200)>
@@ -95,7 +98,6 @@
                                 <cfif local.end LT len(local.extractResult.text)>
                                     <cfset local.snippet = local.snippet & "...">
                                 </cfif>
-                                
                                 <cfset arrayAppend(local.snippets, local.snippet)>
                             </cfif>
                         </cfif>
@@ -107,14 +109,12 @@
                                 <cfset local.occurrences = countOccurrences(local.extractResult.text, local.term)>
                                 <cfif local.occurrences GT 0>
                                     <cfset local.found = true>
-                                    
                                     <!--- Criar snippet com o contexto --->
                                     <cfset local.position = findNoCase(local.term, local.extractResult.text)>
                                     <cfif local.position GT 0>
                                         <cfset local.start = max(1, local.position - 200)>
                                         <cfset local.end = min(len(local.extractResult.text), local.position + len(local.term) + 200)>
                                         <cfset local.snippet = mid(local.extractResult.text, local.start, local.end - local.start)>
-                                        
                                         <!--- Adicionar reticências se necessário --->
                                         <cfif local.start GT 1>
                                             <cfset local.snippet = "..." & local.snippet>
@@ -122,7 +122,6 @@
                                         <cfif local.end LT len(local.extractResult.text)>
                                             <cfset local.snippet = local.snippet & "...">
                                         </cfif>
-                                        
                                         <cfset arrayAppend(local.snippets, local.snippet)>
                                     </cfif>
                                 </cfif>
@@ -138,6 +137,7 @@
                             displayPath = replaceNoCase(local.filePath, application.diretorio_busca_pdf, ""),
                             fileSize = local.pdfFiles.size,
                             fileDate = local.pdfFiles.dateLastModified,
+                            pageCount = local.extractResult.pageCount,
                             snippets = local.snippets,
                             text = left(local.extractResult.text, 10000) <!--- Limitar para não sobrecarregar --->
                         }>
@@ -277,4 +277,5 @@
         <cfheader name="Content-Disposition" value="inline; filename=#arguments.nome#">
         <cfcontent type="application/pdf" file="#arguments.arquivo#" deleteFile="no">
     </cffunction>
+
 </cfcomponent>

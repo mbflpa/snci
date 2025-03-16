@@ -221,6 +221,7 @@ const PdfSearchManager = {
           })
           .promise.then((pdf) => {
             let textPromises = [];
+            const pageCount = pdf.numPages; // Armazenar o número de páginas
 
             // Extrair texto de todas as páginas
             for (let i = 1; i <= pdf.numPages; i++) {
@@ -234,10 +235,14 @@ const PdfSearchManager = {
               );
             }
 
-            return Promise.all(textPromises);
+            return Promise.all(textPromises).then((pageTexts) => ({
+              pageTexts,
+              pageCount, // Incluir o número de páginas no retorno
+            }));
           })
-          .then((pageTexts) => {
-            const text = pageTexts.join("\n");
+          .then((result) => {
+            const text = result.pageTexts.join("\n");
+            const pageCount = result.pageCount;
 
             // Buscar termos no texto
             let found = false;
@@ -316,6 +321,7 @@ const PdfSearchManager = {
                 fileUrl: fileUrl,
                 directory: doc.directory || "Diretório FAQ",
                 size: doc.size,
+                pageCount: pageCount, // Incluir o número de páginas
                 dateLastModified: doc.dateLastModified,
                 snippets: snippets,
                 extractedText: text,
@@ -816,10 +822,15 @@ const PdfSearchManager = {
                   result.dateLastModified || new Date()
                 )}
               </span>
-              <span class="badge badge-light">
+              <span class="badge badge-light mr-1">
                 <i class="fas fa-file-alt mr-1"></i> ${this.formatFileSize(
                   result.size || 0
                 )}
+              </span>
+              <span class="badge badge-light">
+                <i class="fas fa-file-pdf mr-1"></i> ${
+                  result.pageCount || "?"
+                } página${result.pageCount !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -827,14 +838,14 @@ const PdfSearchManager = {
       `;
     });
 
-    // Exibir resultados e estatísticas (sem menção a relevância)
+    // Exibir resultados e estatísticas
     $("#searchResults").html(resultsHtml);
     $("#searchStats").text(
       `${this.currentSearchResults.length} resultado${
         this.currentSearchResults.length !== 1 ? "s" : ""
       } encontrado${
         this.currentSearchResults.length !== 1 ? "s" : ""
-      } em ${searchTime} segundos. Arquivos lidos: ${filesRead}`
+      } em ${searchTime} segundos. Arquivos lidos: ${filesRead || "N/A"}`
     );
 
     // Adicionar handlers para os botões de exibir texto extraído
@@ -918,9 +929,9 @@ const PdfSearchManager = {
       const filteredSearches = recentSearches.filter(
         (term) => term.toLowerCase() !== searchTerms.toLowerCase()
       );
-      filteredSearches.unshift(searchTerms);
 
       // Manter apenas as 5 pesquisas mais recentes
+      filteredSearches.unshift(searchTerms);
       if (filteredSearches.length > 5) {
         filteredSearches.length = 5;
       }
