@@ -215,19 +215,16 @@
             overflow: hidden;
             position: relative;
             opacity: 0; /* Começa invisível */
-            transform: translateX(-50px); /* Começa deslocado para a esquerda */
-            animation: slideInFromLeft 1s ease-in-out 1s forwards; /* Surge após 1 segundo */
+            animation: fadeInContainer 0.8s ease-in-out 0.3s forwards; /* Animação de fade in */
         }
         
-        /* Animação de surgimento com deslizamento da esquerda para direita */
-        @keyframes slideInFromLeft {
+        /* Animação de surgimento apenas com fade in */
+        @keyframes fadeInContainer {
             from { 
                 opacity: 0;
-                transform: translateX(-50px);
             }
             to { 
                 opacity: 1;
-                transform: translateX(0);
             }
         }
         
@@ -483,39 +480,55 @@
                                             <rect id="scanLine" class="scan-line" width="56" height="3" rx="1" ry="1"/>
                                         </defs> 
 
-                                        <!-- Área de escaneamento central -->
-                                        <rect class="scanner-area" x="220" y="35" width="70" height="90" rx="5" ry="5" stroke-dasharray="4,2"/>
+                                        <!-- Área de escaneamento central com animação de surgimento suave -->
+                                        <rect class="scanner-area" x="220" y="35" width="70" height="90" rx="5" ry="5" stroke-dasharray="4,2" opacity="0">
+                                            <animate 
+                                                attributeName="opacity" 
+                                                from="0" to="1" 
+                                                begin="0s" dur="0.8s" 
+                                                fill="freeze"
+                                                id="scannerAppear" />
+                                        </rect>
                                         
-                                        <!-- Documento com animação sequencial (mais rápida) -->
-                                        <g id="animated-document">
+                                        <!-- Documento com animação sequencial -->
+                                        <g id="animated-document" opacity="0">
                                             <use href="#pdf-document" x="0" y="40">
-                                                <!-- Animação com parada no meio para escaneamento (movimento invertido: esquerda para direita) -->
+                                                <!-- Animação com parada no meio para escaneamento -->
                                                 <animateTransform 
                                                     attributeName="transform" 
                                                     type="translate" 
-                                                    values="-100,0; 225,0; 225,0; 500,0" 
-                                                    keyTimes="0; 0.25; 0.6; 1" 
-                                                    dur="1.75s" 
+                                                    values="-100,0; 225,0; 225,0; 600,0" 
+                                                    keyTimes="0; 0.3; 0.7; 1" 
+                                                    dur="1.5s" 
                                                     repeatCount="indefinite" 
-                                                    id="docAnimation"/>
-                                                <!-- Animação de opacidade para aparecer e desaparecer gradualmente -->
+                                                    id="docAnimation" 
+                                                    begin="indefinite" />
                                                 <animate 
                                                     attributeName="opacity" 
                                                     values="0; 1; 1; 0" 
-                                                    keyTimes="0; 0.25; 0.6; 1" 
-                                                    dur="1.75s" 
+                                                    keyTimes="0; 0.3; 0.7; 1" 
+                                                    dur="1.5s" 
                                                     repeatCount="indefinite" 
-                                                    id="opacityAnimation"/>
+                                                    id="opacityAnimation"
+                                                    begin="indefinite" />
                                             </use>
                                             <use href="#scanLine" x="227" y="45">
-                                                <!-- Animação da linha de escaneamento (sincronizada com documento) -->
                                                 <animate 
                                                     attributeName="y"
                                                     values="45; 45; 115; 45" 
-                                                    keyTimes="0; 0.25; 0.6; 1" 
-                                                    dur="1.75s" 
+                                                    keyTimes="0; 0.3; 0.7; 1" 
+                                                    dur="1.5s" 
                                                     repeatCount="indefinite" 
-                                                    begin="docAnimation.begin"/>
+                                                    begin="indefinite"
+                                                    id="scanLineAnimation"/>
+                                                <animate 
+                                                    attributeName="opacity"
+                                                    values="0; 1; 1; 0" 
+                                                    keyTimes="0; 0.3; 0.7; 1" 
+                                                    dur="1.5s" 
+                                                    repeatCount="indefinite" 
+                                                    begin="indefinite"
+                                                    id="scanLineOpacity"/>
                                             </use>
                                         </g> 
                                     </svg>
@@ -656,7 +669,49 @@
                 console.log("PDF.js detectado e pronto para uso.");
             } else {
                 console.warn("PDF.js não foi carregado corretamente");
-            }
+            } 
+            
+            // Configuração das animações SVG
+            $('#searchFaqForm').on('submit', function(e) {
+                e.preventDefault();
+                // Exibe o card de resultados e o loading
+                $('#resultsCard').show();
+                $('#searchLoading').show();
+                
+                // Inicia as animações do documento após o retângulo estar visível
+                setTimeout(function() {
+                    try {
+                        console.log("Iniciando animações SVG");
+                        
+                        // Obtém as animações do SVG que precisam ser iniciadas manualmente
+                        var docAnimation = document.getElementById('docAnimation');
+                        var opacityAnimation = document.getElementById('opacityAnimation');
+                        var scanLineAnimation = document.getElementById('scanLineAnimation');
+                        var scanLineOpacity = document.getElementById('scanLineOpacity');
+                        var animatedDoc = document.getElementById('animated-document');
+                        
+                        // Torna o grupo do documento visível
+                        if (animatedDoc) {
+                            animatedDoc.setAttribute('opacity', '1');
+                            console.log("Grupo do documento definido como visível");
+                        }
+                        
+                        // Inicia as animações
+                        if (docAnimation) {
+                            docAnimation.beginElement();
+                            console.log("Animação do documento iniciada");
+                        }
+                        
+                        if (opacityAnimation) opacityAnimation.beginElement();
+                        if (scanLineAnimation) scanLineAnimation.beginElement();
+                        if (scanLineOpacity) scanLineOpacity.beginElement();
+                    } catch (error) {
+                        console.error("Erro ao iniciar animações:", error);
+                    }
+                }, 1000);  // Delay para garantir que o retângulo tracejado já esteja visível
+                
+                // Aqui você colocaria a lógica de busca existente
+            });
         });
     </script>
 </body>
