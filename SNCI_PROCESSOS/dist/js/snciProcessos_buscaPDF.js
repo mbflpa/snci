@@ -122,7 +122,12 @@ const PdfSearchManager = {
           .prop("disabled", false)
           .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
 
-        this.displaySearchResults(searchTerms, searchTime, filesRead);
+        this.displaySearchResults(
+          searchTerms,
+          searchTime,
+          filesRead,
+          searchOptions
+        );
         documentProcessing = false;
         return;
       }
@@ -136,7 +141,12 @@ const PdfSearchManager = {
           .prop("disabled", false)
           .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
 
-        this.displaySearchResults(searchTerms, searchTime, filesRead);
+        this.displaySearchResults(
+          searchTerms,
+          searchTime,
+          filesRead,
+          searchOptions
+        );
         documentProcessing = false;
         // Rolar automaticamente para o card de resultados
         $("html, body").animate(
@@ -155,7 +165,7 @@ const PdfSearchManager = {
       const progress = Math.round((processedCount / totalDocuments) * 100);
       $("#processingProgress").css("width", `${progress}%`);
       $("#processingStatus").text(
-        `Processando: ${processedCount} de ${totalDocuments} (${filesRead} relevantes)`
+        `Processando: ${processedCount} de ${totalDocuments} (${filesRead} lido(s) até agora)`
       );
 
       // Não é mais necessário chamar a função de atualização do carrossel
@@ -233,36 +243,70 @@ const PdfSearchManager = {
             let found = false;
             let snippets = [];
 
-            // Simplificar a lógica de busca - exibir qualquer correspondência
-            terms.forEach((term) => {
-              if (term.length >= 3) {
-                const regex = new RegExp(this.escapeRegExp(term), "gi");
+            // Verificar o modo de busca e adaptar a lógica
+            if (searchOptions.mode === "exact") {
+              // Modo de frase exata: busca pela frase completa
+              const phrase = searchTerms.trim();
+              if (phrase.length >= 3) {
+                // Criar regex para buscar frase exata, case insensitive
+                const regex = new RegExp(this.escapeRegExp(phrase), "gi");
                 const matches = text.match(regex);
 
                 if (matches && matches.length > 0) {
                   found = true;
 
-                  // Criar snippet com contexto
+                  // Criar snippet com contexto para a frase completa
                   const firstIndex = text
                     .toLowerCase()
-                    .indexOf(term.toLowerCase());
+                    .indexOf(phrase.toLowerCase());
                   if (firstIndex !== -1) {
-                    const start = Math.max(0, firstIndex - 50);
+                    const start = Math.max(0, firstIndex - 200);
                     const end = Math.min(
                       text.length,
-                      firstIndex + term.length + 100
+                      firstIndex + phrase.length + 200
                     );
                     let snippet = text.substring(start, end);
 
                     if (start > 0) snippet = "..." + snippet;
                     if (end < text.length) snippet += "...";
 
-                    snippet = this.highlightSearchTerm(snippet, term);
+                    snippet = this.highlightSearchPhrase(snippet, phrase);
                     snippets.push(snippet);
                   }
                 }
               }
-            });
+            } else {
+              // Modo "OU" (padrão): busca por termos individuais
+              terms.forEach((term) => {
+                if (term.length >= 3) {
+                  const regex = new RegExp(this.escapeRegExp(term), "gi");
+                  const matches = text.match(regex);
+
+                  if (matches && matches.length > 0) {
+                    found = true;
+
+                    // Criar snippet com contexto
+                    const firstIndex = text
+                      .toLowerCase()
+                      .indexOf(term.toLowerCase());
+                    if (firstIndex !== -1) {
+                      const start = Math.max(0, firstIndex - 200);
+                      const end = Math.min(
+                        text.length,
+                        firstIndex + term.length + 200
+                      );
+                      let snippet = text.substring(start, end);
+
+                      if (start > 0) snippet = "..." + snippet;
+                      if (end < text.length) snippet += "...";
+
+                      snippet = this.highlightSearchTerm(snippet, term);
+                      snippets.push(snippet);
+                    }
+                  }
+                }
+              });
+            }
 
             if (found) {
               // Criar objeto de resultado simplificado (sem cálculo de relevância)
@@ -402,41 +446,76 @@ const PdfSearchManager = {
 
               // Usar texto extraído se disponível
               if (result.text) {
-                const contextSize = 150;
-                terms.forEach((term) => {
-                  const regex = new RegExp(this.escapeRegExp(term), "gi");
-                  let match;
+                const contextSize = 200;
 
-                  // Encontrar até 3 ocorrências do termo
-                  let count = 0;
-                  const lowerText = result.text.toLowerCase();
-                  let lastIndex = 0;
+                // Verificar o modo de busca
+                if (searchOptions.mode === "exact") {
+                  // Modo de frase exata
+                  const phrase = searchTerms.trim();
+                  if (phrase.length >= 3) {
+                    const regex = new RegExp(this.escapeRegExp(phrase), "gi");
+                    let match;
 
-                  while (
-                    count < 3 &&
-                    (match = regex.exec(result.text)) !== null
-                  ) {
-                    const start = Math.max(0, match.index - contextSize);
-                    const end = Math.min(
-                      result.text.length,
-                      match.index + term.length + contextSize
-                    );
-                    let snippet = result.text.substring(start, end);
+                    // Encontrar até 3 ocorrências da frase
+                    let count = 0;
+                    let lastIndex = 0;
 
-                    // Adicionar reticências se necessário
-                    if (start > 0) snippet = "..." + snippet;
-                    if (end < result.text.length) snippet += "...";
+                    while (
+                      count < 3 &&
+                      (match = regex.exec(result.text)) !== null
+                    ) {
+                      const start = Math.max(0, match.index - contextSize);
+                      const end = Math.min(
+                        result.text.length,
+                        match.index + phrase.length + contextSize
+                      );
+                      let snippet = result.text.substring(start, end);
 
-                    // Destacar termo
-                    snippet = this.highlightSearchTerm(snippet, term);
-                    snippets.push(snippet);
-                    count++;
+                      if (start > 0) snippet = "..." + snippet;
+                      if (end < result.text.length) snippet += "...";
 
-                    // Evitar loop infinito
-                    if (lastIndex === regex.lastIndex) break;
-                    lastIndex = regex.lastIndex;
+                      snippet = this.highlightSearchPhrase(snippet, phrase);
+                      snippets.push(snippet);
+                      count++;
+
+                      if (lastIndex === regex.lastIndex) break;
+                      lastIndex = regex.lastIndex;
+                    }
                   }
-                });
+                } else {
+                  // Modo "OU" (padrão): processa termos individuais
+                  terms.forEach((term) => {
+                    const regex = new RegExp(this.escapeRegExp(term), "gi");
+                    let match;
+
+                    // Encontrar até 3 ocorrências do termo
+                    let count = 0;
+                    const lowerText = result.text.toLowerCase();
+                    let lastIndex = 0;
+
+                    while (
+                      count < 3 &&
+                      (match = regex.exec(result.text)) !== null
+                    ) {
+                      const start = Math.max(0, match.index - contextSize);
+                      const end = Math.min(
+                        result.text.length,
+                        match.index + term.length + contextSize
+                      );
+                      let snippet = result.text.substring(start, end);
+
+                      if (start > 0) snippet = "..." + snippet;
+                      if (end < result.text.length) snippet += "...";
+
+                      snippet = this.highlightSearchTerm(snippet, term);
+                      snippets.push(snippet);
+                      count++;
+
+                      if (lastIndex === regex.lastIndex) break;
+                      lastIndex = regex.lastIndex;
+                    }
+                  });
+                }
               }
 
               return {
@@ -454,7 +533,12 @@ const PdfSearchManager = {
               };
             });
 
-            this.displaySearchResults(searchTerms, response.searchTime);
+            this.displaySearchResults(
+              searchTerms,
+              response.searchTime,
+              null,
+              searchOptions
+            );
           } else {
             $("#noResultsAlert").show();
             $("#searchStats").text(
@@ -600,6 +684,21 @@ const PdfSearchManager = {
     }
   },
 
+  // Adicionar nova função para destacar frase exata
+  highlightSearchPhrase: function (text, phrase) {
+    if (!text || !phrase) return text;
+
+    try {
+      // Escapa caracteres especiais para uso em regex
+      const escapedPhrase = this.escapeRegExp(phrase);
+      const regex = new RegExp(`(${escapedPhrase})`, "gi");
+      return text.replace(regex, "<mark>$1</mark>");
+    } catch (e) {
+      console.error("Erro ao destacar frase:", e);
+      return text;
+    }
+  },
+
   // Função auxiliar para escapar caracteres especiais em expressões regulares
   escapeRegExp: function (string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -617,7 +716,12 @@ const PdfSearchManager = {
   },
 
   // Exibir resultados de busca
-  displaySearchResults: function (searchTerms, searchTime, filesRead) {
+  displaySearchResults: function (
+    searchTerms,
+    searchTime,
+    filesRead,
+    searchOptions
+  ) {
     $("#searchLoading").hide();
     $("#realTimeResults").hide();
 
@@ -625,7 +729,9 @@ const PdfSearchManager = {
     if (this.currentSearchResults.length === 0) {
       $("#noResultsAlert").show();
       $("#searchStats").text(
-        `0 resultados encontrados em ${searchTime} segundos. Arquivos lidos: ${filesRead}`
+        `0 resultados encontrados em ${searchTime} segundos. Arquivos lidos: ${
+          filesRead || "N/A"
+        }`
       );
       return;
     }
@@ -648,13 +754,16 @@ const PdfSearchManager = {
         : "Texto não disponível";
 
       // Destacar termos de busca no texto completo
-      const highlightedText = termsList.reduce((text, term) => {
-        if (term.length >= 3) {
-          const regex = new RegExp(`(${this.escapeRegExp(term)})`, "gi");
-          return text.replace(regex, "<mark>$1</mark>");
-        }
-        return text;
-      }, truncatedText);
+      const highlightedText =
+        searchOptions && searchOptions.mode === "exact"
+          ? this.highlightSearchPhrase(truncatedText, searchTerms)
+          : termsList.reduce((text, term) => {
+              if (term.length >= 3) {
+                const regex = new RegExp(`(${this.escapeRegExp(term)})`, "gi");
+                return text.replace(regex, "<mark>$1</mark>");
+              }
+              return text;
+            }, truncatedText);
 
       resultsHtml += `
         <div class="search-result" data-file-path="${

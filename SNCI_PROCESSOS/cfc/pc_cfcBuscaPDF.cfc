@@ -27,6 +27,7 @@
 
     <cffunction name="searchInPDFs" access="remote" returntype="string" returnformat="json" output="false" hint="Busca termos nos arquivos PDFs e retorna resultados em formato JSON">
         <cfargument name="searchTerms" type="string" required="true" hint="Termos de busca separados por espaço">
+        <cfargument name="searchOptions" type="string" required="false" default="{}" hint="Opções de busca em formato JSON">
         
         <!--- Mover o cfheader para antes de qualquer processamento --->
         <cfheader name="Content-Type" value="application/json; charset=utf-8">
@@ -40,17 +41,28 @@
         }>
         
         <cfset local.startTime = getTickCount()>
-        <cfset local.termsArray = listToArray(trim(arguments.searchTerms), " ")>
+        <cfset local.options = deserializeJSON(arguments.searchOptions)>
+        
+        <!--- Determinar o modo de busca --->
+        <cfset local.searchMode = structKeyExists(local.options, "mode") ? local.options.mode : "or">
+        
+        <!--- Se for modo exato, não divide em termos --->
+        <cfif local.searchMode EQ "exact">
+            <cfset local.searchPhrase = trim(arguments.searchTerms)>
+            <cfset local.termsArray = [local.searchPhrase]>
+        <cfelse>
+            <!--- Para modo OU ou proximidade, divide em termos --->
+            <cfset local.termsArray = listToArray(trim(arguments.searchTerms), " ")>
+        </cfif>
         
         <cftry>
-            <!--- Voltar a usar application.diretorio_busca_pdf --->
+            <!--- Verificar diretório e listar PDFs --->
             <cfif not directoryExists(application.diretorio_busca_pdf)>
                 <cfset local.result.success = false>
                 <cfset local.result.message = "Diretório de PDFs não encontrado">
                 <cfreturn serializeJSON(local.result)>
             </cfif>
             
-            <!--- Listar todos os arquivos PDF no diretório --->
             <cfdirectory action="list" directory="#application.diretorio_busca_pdf#" name="local.pdfFiles" filter="*.pdf" recurse="true">
             
             <!--- Processar cada arquivo PDF --->
@@ -62,33 +74,61 @@
                     <cfset local.found = false>
                     <cfset local.snippets = []>
                     
-                    <!--- Verificar cada termo de busca --->
-                    <cfloop array="#local.termsArray#" index="local.term">
-                        <cfset local.term = lCase(trim(local.term))>
-                        <cfif len(local.term) GTE 3> <!--- Ignorar termos menores que 3 caracteres --->
-                            <cfset local.occurrences = countOccurrences(local.extractResult.text, local.term)>
-                            <cfif local.occurrences GT 0>
+                    <!--- Lógica adaptada ao modo de busca --->
+                    <cfif local.searchMode EQ "exact">
+                        <!--- Busca por frase exata --->
+                        <cfset local.phrase = local.searchPhrase>
+                        <cfif len(local.phrase) GTE 3>
+                            <cfset local.position = findNoCase(local.phrase, local.extractResult.text)>
+                            <cfif local.position GT 0>
                                 <cfset local.found = true>
-                                <!--- Criar snippet com o contexto --->
-                                <cfset local.position = findNoCase(local.term, local.extractResult.text)>
-                                <cfif local.position GT 0>
-                                    <cfset local.start = max(1, local.position - 80)>
-                                    <cfset local.end = min(len(local.extractResult.text), local.position + len(local.term) + 120)>
-                                    <cfset local.snippet = mid(local.extractResult.text, local.start, local.end - local.start)>
-                                    
-                                    <!--- Adicionar reticências se necessário --->
-                                    <cfif local.start GT 1>
-                                        <cfset local.snippet = "..." & local.snippet>
-                                    </cfif>
-                                    <cfif local.end LT len(local.extractResult.text)>
-                                        <cfset local.snippet = local.snippet & "...">
-                                    </cfif>
-                                    
-                                    <cfset arrayAppend(local.snippets, local.snippet)>
+                                
+                                <!--- Criar snippet com contexto --->
+                                <cfset local.start = max(1, local.position - 200)>
+                                <cfset local.end = min(len(local.extractResult.text), local.position + len(local.phrase) + 200)>
+                                <cfset local.snippet = mid(local.extractResult.text, local.start, local.end - local.start)>
+                                
+                                <!--- Adicionar reticências se necessário --->
+                                <cfif local.start GT 1>
+                                    <cfset local.snippet = "..." & local.snippet>
                                 </cfif>
+                                <cfif local.end LT len(local.extractResult.text)>
+                                    <cfset local.snippet = local.snippet & "...">
+                                </cfif>
+                                
+                                <cfset arrayAppend(local.snippets, local.snippet)>
                             </cfif>
                         </cfif>
-                    </cfloop>
+                    <cfelse>
+                        <!--- Busca por termos individuais (OU) --->
+                        <cfloop array="#local.termsArray#" index="local.term">
+                            <cfset local.term = lCase(trim(local.term))>
+                            <cfif len(local.term) GTE 3> <!--- Ignorar termos menores que 3 caracteres --->
+                                <cfset local.occurrences = countOccurrences(local.extractResult.text, local.term)>
+                                <cfif local.occurrences GT 0>
+                                    <cfset local.found = true>
+                                    
+                                    <!--- Criar snippet com o contexto --->
+                                    <cfset local.position = findNoCase(local.term, local.extractResult.text)>
+                                    <cfif local.position GT 0>
+                                        <cfset local.start = max(1, local.position - 200)>
+                                        <cfset local.end = min(len(local.extractResult.text), local.position + len(local.term) + 200)>
+                                        <cfset local.snippet = mid(local.extractResult.text, local.start, local.end - local.start)>
+                                        
+                                        <!--- Adicionar reticências se necessário --->
+                                        <cfif local.start GT 1>
+                                            <cfset local.snippet = "..." & local.snippet>
+                                        </cfif>
+                                        <cfif local.end LT len(local.extractResult.text)>
+                                            <cfset local.snippet = local.snippet & "...">
+                                        </cfif>
+                                        
+                                        <cfset arrayAppend(local.snippets, local.snippet)>
+                                    </cfif>
+                                </cfif>
+                            </cfif>
+                        </cfloop>
+                    </cfif>
                     
                     <!--- Se encontrou pelo menos um termo, adiciona aos resultados --->
                     <cfif local.found>
