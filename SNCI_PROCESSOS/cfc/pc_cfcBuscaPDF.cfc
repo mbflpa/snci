@@ -43,15 +43,15 @@
         <cfset local.termsArray = listToArray(trim(arguments.searchTerms), " ")>
         
         <cftry>
-            <!--- Voltar a usar application.diretorio_avaliacoes --->
-            <cfif not directoryExists(application.diretorio_avaliacoes)>
+            <!--- Voltar a usar application.diretorio_busca_pdf --->
+            <cfif not directoryExists(application.diretorio_busca_pdf)>
                 <cfset local.result.success = false>
                 <cfset local.result.message = "Diretório de PDFs não encontrado">
                 <cfreturn serializeJSON(local.result)>
             </cfif>
             
             <!--- Listar todos os arquivos PDF no diretório --->
-            <cfdirectory action="list" directory="#application.diretorio_avaliacoes#" name="local.pdfFiles" filter="*.pdf" recurse="true">
+            <cfdirectory action="list" directory="#application.diretorio_busca_pdf#" name="local.pdfFiles" filter="*.pdf" recurse="true">
             
             <!--- Processar cada arquivo PDF --->
             <cfloop query="local.pdfFiles">
@@ -79,7 +79,7 @@
                         <cfset local.matchResult = {
                             fileName = local.pdfFiles.name,
                             filePath = local.filePath,
-                            displayPath = replaceNoCase(local.filePath, application.diretorio_avaliacoes, ""),
+                            displayPath = replaceNoCase(local.filePath, application.diretorio_busca_pdf, ""),
                             fileSize = local.pdfFiles.size,
                             fileDate = local.pdfFiles.dateLastModified,
                             relevanceScore = local.relevanceScore,
@@ -175,21 +175,21 @@
                 documents = []
             }>
             
-            <!--- Voltar a usar application.diretorio_avaliacoes --->
-            <cfif not directoryExists(application.diretorio_avaliacoes)>
+            <!--- Voltar a usar application.diretorio_busca_pdf --->
+            <cfif not directoryExists(application.diretorio_busca_pdf)>
                 <cfset local.result.success = false>
                 <cfset local.result.message = "Diretório de PDFs não encontrado">
                 <cfreturn serializeJSON(local.result)>
             </cfif>
             
             <!--- Listar todos os arquivos PDF no diretório --->
-            <cfdirectory action="list" directory="#application.diretorio_avaliacoes#" name="local.pdfFiles" filter="*.pdf" recurse="true">
+            <cfdirectory action="list" directory="#application.diretorio_busca_pdf#" name="local.pdfFiles" filter="*.pdf" recurse="true">
             
             <!--- Processar cada arquivo PDF --->
             <cfloop query="local.pdfFiles">
                 <cfset local.filePath = local.pdfFiles.directory & "\" & local.pdfFiles.name>
-                <!--- Continuar usando application.diretorio_avaliacoes --->
-                <cfset local.relativePath = replaceNoCase(local.filePath, application.diretorio_avaliacoes, "")>
+                <!--- Continuar usando application.diretorio_busca_pdf --->
+                <cfset local.relativePath = replaceNoCase(local.filePath, application.diretorio_busca_pdf, "")>
                 
                 <cfset local.document = {
                     fileName = local.pdfFiles.name,

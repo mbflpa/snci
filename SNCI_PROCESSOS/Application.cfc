@@ -24,16 +24,19 @@ component {
             application.diretorio_avaliacoes = baseDir & "SNCI_PROCESSOS_AVALIACOES\";
             application.diretorio_faqs = baseDir & "SNCI_PROCESSOS_FAQS\";
             application.anoPesquisaOpiniao = 2025;
+            application.diretorio_busca_pdf = baseDir & "SNCI_PROCESSOS_AVALIACOES\";
         } else if (FindNoCase("homologacaope", application.auxsite) || FindNoCase("desenvolvimentope", application.auxsite)) {
             application.diretorio_anexos = baseDir & "SNCI_TESTE\";
             application.diretorio_avaliacoes = baseDir & "SNCI_TESTE\";
             application.diretorio_faqs = baseDir & "SNCI_TESTE\";
             application.anoPesquisaOpiniao = 2000;
+            application.diretorio_busca_pdf = baseDir & "SNCI_PROCESSOS_AVALIACOES\";
         } else {
             application.diretorio_anexos = testDir;
             application.diretorio_avaliacoes = testDir;
             application.diretorio_faqs = testDir;
             application.anoPesquisaOpiniao = 2000;
+            application.diretorio_busca_pdf = testDir;
         }
         
         return true;
