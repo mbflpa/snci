@@ -82,7 +82,6 @@
 		</cfquery>
 				
 		<!--- <cfdump var="#form#">  --->
-		<br>
 		<cfoutput query="rsSalva">
 			<!--- <cfdump var="#rsSalva#">  --->
 			<cfset grpitem = rsSalva.RIP_NumGrupo & '_' & rsSalva.RIP_NumItem>
@@ -134,7 +133,7 @@
 				<cfquery datasource="#dsnSNCI#">
 					insert into UN_Ficha_Facin_Avaliador (FACA_Unidade,FACA_Avaliacao,FACA_Matricula,FACA_Avaliador,FACA_Grupo,FACA_Item,FACA_Meta1_AT_OrtoGram,FACA_Meta1_AT_CCCP,FACA_Meta1_AE_Tecn,FACA_Meta1_AE_Prob,FACA_Meta1_AE_Valor,FACA_Meta1_AE_Cosq,FACA_Meta1_AE_Norma,FACA_Meta1_AE_Docu,FACA_Meta1_AE_Class,FACA_Meta1_AE_Orient,FACA_Meta1_Pontos,FACA_Meta2_AR_Falta,FACA_Meta2_AR_Troca,FACA_Meta2_AR_Nomen,FACA_Meta2_AR_Ordem,FACA_Meta2_AR_Prazo,FACA_Meta2_Pontos,FACA_Consideracao,FACA_DtCriar,FACA_DtAlter)
 					values
-					('#FACUNIDADE#','#FACAVALIACAO#','#FACMATRICULA#','#RIP_MatricAvaliador#',#form.facagrupo#,#form.facaitem#,'#form.meta1_atorgr#','#form.meta1_atcccp#','#form.meta1_aetecn#','#form.meta1_aeprob#','#form.meta1_aevalo#','#form.meta1_aecsqc#','#form.meta1_aenorm #','#form.meta1_aedocm#','#form.meta1_aeclas#','#form.meta1_orient#',#FACAMETA1PONTOS#,'#form.meta2_arfalt#','#form.meta2_artroc#','#form.meta2_arnomc#','#form.meta2_arorde#','#form.meta2_arpraz#',#FACAMETA2PONTOS#,'#form.considerargestor#',CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
+					('#FACUNIDADE#','#FACAVALIACAO#','#FACMATRICULA#','#RIP_MatricAvaliador#',#form.facagrupo#,#form.facaitem#,'#form.meta1_atorgr#','#form.meta1_atcccp#','#form.meta1_aetecn#','#form.meta1_aeprob#','#form.meta1_aevalo#','#form.meta1_aecsqc#','#form.meta1_aenorm #','#form.meta1_aedocm#','#form.meta1_aeclas#','#form.meta1_orient#',#meta1_pto_obtida#,'#form.meta2_arfalt#','#form.meta2_artroc#','#form.meta2_arnomc#','#form.meta2_arorde#','#form.meta2_arpraz#',#meta2_pto_obtida#,'#form.considerargestor#',CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
 				</cfquery>	
 			<cfelse>	
 				<cfquery datasource="#dsnSNCI#">
@@ -190,7 +189,79 @@
 					FFI_Matricula = '#FACMATRICULA#' and
 					FFI_Avaliador = '#RIP_MatricAvaliador#'
 				</cfquery>	
-			</cfif>			
+			</cfif>		
+			<!--- atualizar tabelas --->
+			
+			<cfquery datasource="#dsnSNCI#" name="rsfacinaval">
+				SELECT FAC_Qtd_Geral,FAC_Meta1_Peso_Item, FAC_Meta2_Peso_Item,FACA_Unidade, FACA_Avaliacao, FACA_Matricula, FACA_Avaliador, FACA_Grupo, FACA_Item, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos
+				FROM UN_Ficha_Facin INNER JOIN UN_Ficha_Facin_Avaliador ON (FAC_Matricula = FACA_Matricula) AND (FAC_Avaliacao = FACA_Avaliacao) AND (FAC_Unidade = FACA_Unidade)
+				WHERE FACA_Avaliacao = '#FACAVALIACAO#' 
+			</cfquery>
+			<cfset PesoAvaliacao = 0>
+			<cfset descontometa1 = 0>
+			<cfset descontometa2 = 0>
+			<cfset PesoAvaliacao = numberFormat((100/rsfacinaval.FAC_Qtd_Geral),'___.00')>
+			<cfset descontometa1 = numberFormat((100/rsfacinaval.FAC_Qtd_Geral)/10,'___.000')>
+			<cfset descontometa2 = numberFormat((100/rsfacinaval.FAC_Qtd_Geral)/5,'___.000')>
+			<cfset somageralmeta1 = 0>
+			<cfset somageralmeta2 = 0>
+			<cfset FACPontosRevisaoMeta1 = 0>
+			<cfset FACPercRevisaoMeta1 = 0>
+			<cfset FACPontosRevisaoMeta2 = 0>
+			<cfset FACPercRevisaoMeta2 = 0>
+			<cfloop query="rsfacinaval">
+				<cfset FACMeta1PesoItem = 0>
+				<cfset FACMeta2PesoItem = 0>
+				<cfset somameta1 = 0>
+				<cfset somameta2 = 0>
+				<!---  FACA_Meta1_Pontos, FACA_Meta2_Pontos --->
+				<cfset somameta1 = FACA_Meta1_AT_OrtoGram + FACA_Meta1_AT_CCCP + FACA_Meta1_AE_Tecn + FACA_Meta1_AE_Prob + FACA_Meta1_AE_Valor + FACA_Meta1_AE_Cosq + FACA_Meta1_AE_Norma + FACA_Meta1_AE_Docu + FACA_Meta1_AE_Class + FACA_Meta1_AE_Orient>
+			<cfif somameta1 lte 0>
+					<cfset FACMeta1PesoItem = PesoAvaliacao>
+				<cfelse>
+					<cfset FACMeta1PesoItem = numberFormat((descontometa1*10) - (somameta1*descontometa1),'___.00')>
+				</cfif>
+				<cfset somageralmeta1 = somageralmeta1 + somameta1>
+				<cfset somameta2 = FACA_Meta2_AR_Falta + FACA_Meta2_AR_Troca + FACA_Meta2_AR_Nomen + FACA_Meta2_AR_Ordem + FACA_Meta2_AR_Prazo>
+				<cfif somameta2 lte 0>
+					<cfset FACMeta2PesoItem = PesoAvaliacao>
+				<cfelse>
+					<cfset FACMeta2PesoItem = numberFormat((descontometa2*5) - (somameta2*descontometa2),'___.00')>
+				</cfif>
+				<cfset somageralmeta2 = somageralmeta2 + somameta2>
+				<cfquery datasource="#dsnSNCI#">
+					update UN_Ficha_Facin_Avaliador set FACA_Meta1_Pontos=#FACMeta1PesoItem#,FACA_Meta2_Pontos=#FACMeta2PesoItem#
+					where
+					FACA_Unidade = '#rsfacinaval.FACA_Unidade#' AND 
+					FACA_Avaliacao = '#rsfacinaval.FACA_Avaliacao#' AND 
+					FACA_Matricula='#rsfacinaval.FACA_Matricula#' AND 
+					FACA_Avaliador='#rsfacinaval.FACA_Avaliador#' and 
+					FACA_Grupo=#rsfacinaval.FACA_Grupo# and 
+					FACA_Item=#rsfacinaval.FACA_Item#	
+				</cfquery>		
+			</cfloop>
+
+			somageralmeta1: #somageralmeta1#<br>
+			somageralmeta2: #somageralmeta2#<br>
+			<cfset FACPontosRevisaoMeta1 = numberFormat((rsfacinaval.FAC_Qtd_Geral - somageralmeta1),'___.00')>
+			<cfset FACPercRevisaoMeta1 = numberFormat((FACPontosRevisaoMeta1/rsfacinaval.FAC_Qtd_Geral)*100,'___.00')>
+			<cfset FACPontosRevisaoMeta2 = numberFormat((rsfacinaval.FAC_Qtd_Geral - somageralmeta2),'___.00')>
+			<cfset FACPercRevisaoMeta2 = numberFormat((FACPontosRevisaoMeta2/rsfacinaval.FAC_Qtd_Geral)*100,'___.00')>
+		
+			<cfquery datasource="#dsnSNCI#">
+				UPDATE UN_Ficha_Facin SET 
+				FAC_Pontos_Revisao_Meta1=#FACPontosRevisaoMeta1#, 
+				FAC_Perc_Revisao_Meta1 = #FACPercRevisaoMeta1#, 
+				FAC_Pontos_Revisao_Meta2=#FACPontosRevisaoMeta2#,
+				FAC_Perc_Revisao_Meta2 = #FACPercRevisaoMeta2#
+				where 
+				FAC_Unidade = '#rsfacinaval.FACA_Unidade#' and 
+				FAC_Avaliacao = '#rsfacinaval.FACA_Avaliacao#' and 
+				FAC_Matricula='#rsfacinaval.FACA_Avaliacao#'
+			</cfquery>
+			
+			<!--- fim atualizar tabelas --->
+
 		<cfelse>
 			<!--- GRUPO DE ACESSO INSPETORES SOMENTE UPDATE--->
 			<!--- alterar UN_Ficha_Facin_Avaliador --->
@@ -291,10 +362,4 @@
 			<cfreturn rsgestao>
 		</cftransaction>
 	</cffunction>  	
-	
-
-
-
-
-
 </cfcomponent>

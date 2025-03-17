@@ -370,7 +370,7 @@
     <cfif rsFacin.FACA_Meta1_AE_Class eq 1><cfset class = 'Sim'><cfset ptodescontadometa1 = ptodescontadometa1 + ptodescmeta1></cfif>
     <cfif rsFacin.FACA_Meta1_AE_Orient eq 1><cfset orient = 'Sim'><cfset ptodescontadometa1 = ptodescontadometa1 + ptodescmeta1></cfif>    
     <cfset ptodescontadometa1 = numberFormat((ptodescontadometa1),'___.00')>
-    <cfset ptofinalmeta1 = numberFormat((ptogrpitm-ptodescmeta1),'___.00')>
+    <cfset ptofinalmeta1 = numberFormat((FACA_Meta1_Pontos),'___.00')>
     <tr>
         <td colspan="12" align="center"><strong class="exibir">Meta1 - Redigir Apontamentos</strong>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong class="exibir">Pontuação Inicial: &nbsp;&nbsp;#ptogrpitm# </strong>
@@ -425,7 +425,7 @@
     <cfif rsFacin.FACA_Meta2_AR_Ordem eq 1><cfset ordem = 'Sim'><cfset ptodescontadometa2 = ptodescontadometa2 + ptodescmeta2></cfif>
     <cfif rsFacin.FACA_Meta2_AR_Prazo eq 1><cfset prazo = 'Sim'><cfset ptodescontadometa2 = ptodescontadometa2 + ptodescmeta2></cfif>   
     <cfset ptodescontadometa2 = numberFormat((ptodescontadometa2),'___.00')> 
-    <cfset ptofinalmeta2 = numberFormat((ptogrpitm-ptodescmeta2),'___.00')>
+    <cfset ptofinalmeta2 = numberFormat((FACA_Meta2_Pontos),'___.00')>
     <tr>
         <td colspan="12" align="center">
             <strong class="exibir">Meta2 - Organizar documento no SEI</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -499,7 +499,6 @@
 </table>
 </cfoutput>
 </body>
-
 <script>
 	            
 </script>
