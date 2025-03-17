@@ -123,31 +123,81 @@
     </cfquery>    
 
     <cfquery datasource="#dsn_inspecao#" name="rsExisteFacin">
-        SELECT FAC_Qtd_Geral, FAC_Qtd_NC, FAC_Qtd_Devolvido, 
-        FAC_Pontos_Revisao_Meta1, FAC_Perc_Revisao_Meta1, FAC_Meta1_Peso_Item, FAC_Pontos_Revisao_Meta2, FAC_Perc_Revisao_Meta2, FAC_Meta2_Peso_Item, FAC_Data_Plan_Meta3, 
-        FAC_DifDia_Meta3, FAC_Perc_Meta3, FAC_DtAlter,FAC_DtConcluirFacin
-        FROM UN_Ficha_Facin
+        SELECT FAC_Qtd_Geral, FAC_Qtd_NC, FAC_Qtd_Devolvido,FAC_Pontos_Revisao_Meta1, FAC_Perc_Revisao_Meta1, FAC_Meta1_Peso_Item, FAC_Pontos_Revisao_Meta2, FAC_Perc_Revisao_Meta2, FAC_Meta2_Peso_Item, FAC_Data_Plan_Meta3, 
+        FAC_DifDia_Meta3, FAC_Perc_Meta3, FAC_DtAlter,FAC_DtConcluirFacin,FACA_Grupo,FACA_Item,FACA_Meta1_Pontos,FACA_META2_PONTOS
+        FROM UN_Ficha_Facin INNER JOIN UN_Ficha_Facin_Avaliador ON (FAC_Matricula = FACA_Matricula) AND (FAC_Avaliacao = FACA_Avaliacao) AND (FAC_Unidade = FACA_Unidade)
         WHERE FAC_Avaliacao = convert(varchar,'#form.numinsp#') 
     </cfquery>
-
+    <cfset form.ptoMeta1Atual = 0>
+    <cfset form.ptoMeta2Atual = 0>
+ 
     <cfif rsExisteFacin.recordcount lte 0>
         <cfset form.ptogeral = #rsRIP.TotalRIP#>
         <cfset form.meta1 = 100>
         <cfset form.meta2 = 100>
-        <!--- <cfset form.ptorevismeta1 = #rsRIP.TotalRIP#>
+        <cfset form.ptorevismeta1 = #rsRIP.TotalRIP#>
         <cfset form.ptorevismeta2 = #rsRIP.TotalRIP#>
-        --->
-        <cfset form.ptorevismeta1 = 100>
-        <cfset form.ptorevismeta2 = 100>
-    <cfelse>
+        <cfset form.PercMeta1ajustar = 100>
+        <cfset form.PercMeta2ajustar = 100>
+        <cfset form.PtoMeta1ajustar = #rsRIP.TotalRIP#>
+        <cfset form.PtoMeta2ajustar = #rsRIP.TotalRIP#>
+        <cfset form.meta1_tela = #rsRIP.TotalRIP#>
+        <cfset form.meta2_tela = #rsRIP.TotalRIP#>
+    <cfelse>      
         <cfset form.ptogeral = #rsExisteFacin.FAC_Qtd_Geral#>
         <cfset form.ptodev = #rsExisteFacin.FAC_Qtd_Devolvido#>
         <cfset form.meta1 = #rsExisteFacin.FAC_Perc_Revisao_Meta1#>
         <cfset form.meta2 = #rsExisteFacin.FAC_Perc_Revisao_Meta2#>
         <cfset form.ptorevismeta1 = #rsExisteFacin.FAC_Pontos_Revisao_Meta1#>
         <cfset form.ptorevismeta2 = #rsExisteFacin.FAC_Pontos_Revisao_Meta2#>
-    </cfif>
+        <cfset form.PtoMeta1ajustar = #rsExisteFacin.FAC_Pontos_Revisao_Meta1#>
+        <cfset form.PtoMeta2ajustar = #rsExisteFacin.FAC_Pontos_Revisao_Meta2#>
+        <cfset form.meta1_tela = #rsExisteFacin.FAC_Pontos_Revisao_Meta1#>
+        <cfset form.meta2_tela = #rsExisteFacin.FAC_Pontos_Revisao_Meta2#>
+        <cfset form.PercMeta1ajustar = #rsExisteFacin.FAC_Perc_Revisao_Meta1#>
+        <cfset form.PercMeta2ajustar = #rsExisteFacin.FAC_Perc_Revisao_Meta2#>
+        <cfset form.ptoMeta1Atual = #rsExisteFacin.FACA_Meta1_Pontos#>
+        <cfset form.ptoMeta2Atual = #rsExisteFacin.FACA_Meta2_Pontos#>
+        <cfset ptogrpitm = numberFormat((100/form.ptogeral),'___.00')>
+        <cfset form.PtoMeta1ajustar = numberFormat(PtoMeta1ajustar - (ptogrpitm - form.ptoMeta1Atual),'___.00')>
+        <cfset form.PercMeta1ajustar =numberFormat((form.PtoMeta1ajustar/form.ptogeral)*100,'___.00')>
+        <cfset form.PtoMeta2ajustar = numberFormat(PtoMeta2ajustar - (ptogrpitm - form.ptoMeta2Atual),'___.00')>
+        <cfset form.PercMeta2ajustar =numberFormat((form.PtoMeta2ajustar/form.ptogeral)*100,'___.00')>
+    </cfif> 
     <cfset ptogrpitm = numberFormat((100/form.ptogeral),'___.00')>
+ 
+    <cfif rsExisteFacin.recordcount eq 1 and rsExisteFacin.FACA_Grupo eq #grp#  and rsExisteFacin.FACA_Item eq #itm#>
+        <cfset form.PercMeta1ajustar = 100>
+        <cfset form.PercMeta2ajustar = 100>
+        <cfset form.PtoMeta1ajustar = #rsRIP.TotalRIP#>
+        <cfset form.PtoMeta2ajustar = #rsRIP.TotalRIP#>
+        <cfset form.meta1_tela = #rsRIP.TotalRIP#>
+        <cfset form.meta2_tela = #rsRIP.TotalRIP#>
+    </cfif>
+
+    <cfif rsExisteFacin.recordcount gt 1> 
+        <cfset form.PercMeta1ajustar = #rsExisteFacin.FAC_Perc_Revisao_Meta1#>
+        <cfset form.PercMeta2ajustar = #rsExisteFacin.FAC_Perc_Revisao_Meta2#>
+        <cfif len(rsItem.FACA_Matricula) gt 0>
+            <cfset form.ptoMeta1Atual = rsItem.FACA_Meta1_AT_OrtoGram + rsItem.FACA_Meta1_AT_CCCP + rsItem.FACA_Meta1_AE_Tecn + rsItem.FACA_Meta1_AE_Prob + rsItem.FACA_Meta1_AE_Valor + rsItem.FACA_Meta1_AE_Cosq + rsItem.FACA_Meta1_AE_Norma + rsItem.FACA_Meta1_AE_Docu + rsItem.FACA_Meta1_AE_Class + rsItem.FACA_Meta1_AE_Orient>
+            <cfset form.ptoMeta1Atual = numberFormat(rsExisteFacin.FAC_Meta1_Peso_Item * form.ptoMeta1Atual,'___.000')>
+            <cfset form.PtoMeta1ajustar = numberFormat(form.ptorevismeta1 + form.ptoMeta1Atual,'___.00')>
+            <cfset form.PercMeta1ajustar =numberFormat((form.PtoMeta1ajustar/form.ptogeral)*100,'___.00')>
+
+            <cfset form.ptoMeta2Atual = rsItem.FACA_Meta2_AR_Falta + rsItem.FACA_Meta2_AR_Troca + rsItem.FACA_Meta2_AR_Nomen + rsItem.FACA_Meta2_AR_Ordem + rsItem.FACA_Meta2_AR_Prazo>
+            <cfset form.ptoMeta2Atual = numberFormat(rsExisteFacin.FAC_Meta2_Peso_Item * form.ptoMeta1Atual,'___.000')>
+            <cfset form.PtoMeta2ajustar = numberFormat(form.ptorevismeta2 + form.ptoMeta2Atual,'___.00')>
+            <cfset form.PercMeta2ajustar =numberFormat((form.PtoMeta2ajustar/form.ptogeral)*100,'___.00')>
+        <cfelse>
+            <cfset form.ptoMeta1Atual = 0>
+            <cfset form.ptoMeta2Atual = 0>
+            <cfset form.PtoMeta1ajustar = form.meta1_tela>
+            <cfset form.PtoMeta2ajustar = form.meta2_tela>
+            <cfset form.PercMeta1ajustar =form.ptorevismeta1>
+            <cfset form.PercMeta1ajustar =form.ptorevismeta2>
+        </cfif>
+    </cfif>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -328,10 +378,10 @@
   
     <label for="" class="col-sm-6 col-form-label">&nbsp;Percentual (Meta1) <div id="meta1" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta1#%</div></label>
     <label for="" class="col-sm-6 col-form-label">&nbsp;Percentual (Meta2) <div id="meta2" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta2#%</div></label>
-<div style="display:none">
+<div style="display:none"></div>  
     <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta1" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta1#</cfoutput></div></label>
     <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta2" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta2#</cfoutput></div></label>
-</div>   
+ 
     <p class="text-center"><strong>METAS</strong></p>
 </cfoutput>
 
@@ -700,8 +750,8 @@
     <input class="btn btn-primary" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#>
     <input class="btn btn-info" type="button" onClick="window.open('ficha_facin_Ref.cfm?numinsp=#form.numinsp#&acao=buscar','_self')" value="Voltar">
 </div> 
-<cfset meta1desconto = numberFormat((ptogrpitm/10),'___.000')>
-<cfset meta2desconto = numberFormat((ptogrpitm/5),'___.000')>
+<cfset meta1desconto = numberFormat((ptogrpitm/10),'___.0000')>
+<cfset meta2desconto = numberFormat((ptogrpitm/5),'___.0000')>
 <input type="hidden" id="meta1desconto" name="meta1desconto" value="#trim(meta1desconto)#">
 <input type="hidden" id="meta2desconto" name="meta2desconto" value="#trim(meta2desconto)#">
 <input type="hidden" id="totalNC" name="totalNC" value="#rsItem.recordcount#">
@@ -724,10 +774,10 @@
         <input type="hidden" name="facqtdgeral" id="facqtdgeral" value="#form.ptogeral#">
         <input type="hidden" name="facqtdnc" id="facqtdnc" value="#rsItem.recordcount#">
         <input type="hidden" name="facqtdevolvido" id="facqtdevolvido" value="#form.ptodev#">
-        <input type="hidden" name="facpontosrevisaometa1" id="facpontosrevisaometa1" value="#form.meta1#">
-        <input type="hidden" name="facpercrevisaometa1" id="facpercrevisaometa1" value="#form.ptorevismeta1#">
-        <input type="hidden" name="facpontosrevisaometa2" id="facpontosrevisaometa2" value="#form.meta2#">
-        <input type="hidden" name="facpercrevisaometa2" id="facpercrevisaometa2" value="#form.ptorevismeta2#">
+        <input type="hidden" name="facpontosrevisaometa1" id="facpontosrevisaometa1" value="#form.ptorevismeta1#">
+        <input type="hidden" name="facpercrevisaometa1" id="facpercrevisaometa1" value="#form.meta1#">
+        <input type="hidden" name="facpontosrevisaometa2" id="facpontosrevisaometa2" value="#form.ptorevismeta2#">
+        <input type="hidden" name="facpercrevisaometa2" id="facpercrevisaometa2" value="#form.meta2#">
         <input type="hidden" name="facdataplanmeta3" id="facdataplanmeta3" value="#form.meta3_dtplanej#">
         <input type="hidden" name="facdifdiameta3" id="facdifdiameta3" value="#form.meta3_dif#">
         <input type="hidden" name="facpercmeta3" id="facpercmeta3" value="#form.meta3_percent#">
@@ -782,6 +832,12 @@
         <input type="hidden" name="db_Resultadometa1_#rsAvalia.RIP_MatricAvaliador#" id="db_Resultadometa1_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta1_percqggitens#">
         <input type="hidden" name="db_meta1" id="db_meta1" value="#form.meta1#">
         <input type="hidden" name="db_ptorevismeta1" id="db_ptorevismeta1" value="#form.ptorevismeta1#">
+        <input type="hidden" name="PercMeta1ajustar" id="PercMeta1ajustar" value="#form.PercMeta1ajustar#">
+        <input type="hidden" name="PtoMeta1ajustar" id="PtoMeta1ajustar" value="#form.PtoMeta1ajustar#">
+        <input type="hidden" name="PercMeta2ajustar" id="PercMeta2ajustar" value="#form.PercMeta2ajustar#">
+        <input type="hidden" name="PtoMeta2ajustar" id="PtoMeta2ajustar" value="#form.PtoMeta2ajustar#">
+        <input type="hidden" name="meta1_tela" id="meta1_tela" value="#form.meta1_tela#">
+        <input type="hidden" name="meta2_tela" id="meta2_tela" value="#form.meta2_tela#">
 
         <!--- meta2 --->
         <input type="hidden" name="ffimeta2qtditem_#rsAvalia.RIP_MatricAvaliador#" id="ffimeta2qtditem_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta2_qggitens#">
@@ -803,7 +859,10 @@
         </cfif>    
         <input type="hidden" name="facaavaliador" id="facaavaliador" value="#rsItem.RIP_MatricAvaliador#">
         <input type="hidden" name="facameta1pontos" id="facameta1pontos" value="#form.meta1_pto#">
+        <input type="hidden" name="facameta1pontosatual" id="facameta1pontosatual" value="#form.meta1_pto#">
+        <input type="hidden" name="dbfacameta1pontos" id="dbfacameta1pontos" value="#form.meta1_pto#">
         <input type="hidden" name="facameta2pontos" id="facameta2pontos" value="#form.meta2_pto#">
+        <input type="hidden" name="dbfacameta2pontos" id="dbfacameta2pontos" value="#form.meta2_pto#">
         <cfif FACA_Avaliacao neq ''>
             <input type="hidden" name="meta1_atorgr" class="meta1_atorgr" value="<cfoutput>#rsItem.FACA_Meta1_AT_OrtoGram#</cfoutput>">
             <input type="hidden" name="meta1_atcccp" class="meta1_atcccp" value="<cfoutput>#rsItem.FACA_Meta1_AT_CCCP#</cfoutput>">
@@ -843,7 +902,7 @@
         <input type="hidden" id="facaconsideracao" name="facaconsideracao" value="#trim(rsItem.FACA_Consideracao)#">
         <input type="hidden" name="grp" id="grp" value="#grp#">
         <input type="hidden" name="itm" id="itm" value="#itm#">
-        <input type="hidden" name="matravaliador" id="matravaliador" value="#rsItem.RIP_MatricAvaliador#">      
+        <input type="hidden" name="matravaliador" id="matravaliador" value="#rsItem.RIP_MatricAvaliador#">       
     </cfoutput>
 </form>
 </body>
@@ -856,6 +915,7 @@ $(function(e){
     //alert('Dom inicializado!');   
     $('#considerargestor').val($('#facaconsideracao').val())
     $('#considerinspetor').val($('#facaconsiderarinspetor').val())
+ 
 })
 
 //=======================================================================
@@ -883,47 +943,51 @@ $(function(e){
         document.formx.submit();  
    }
  // ================================================================  
+
     //verificar seleções meta1 e ajustar a pontuação obtida
     $('.meta1').click(function(){     
         let ptometa1 = $('#meta1_pto_obtida').val()
         let ptobtida = $('#ptobtida').val()
         let meta1desconto = $('#meta1desconto').val()  
+        //alert('meta1desconto: '+meta1desconto)
      //alert(' meta1desconto:'+meta1desconto+' ptometa1:'+ptometa1+'  ptobtida:'+ptobtida);
-    
-        let totcheckded=0
+   
+        let contarselecao=0
         $( ".meta1" ).each(function( index ) {
             auxnome = $(this).attr("id")
             if($(this).is(':checked')) {
-                totcheckded++
+                contarselecao++
                 $('.'+auxnome).val(1)
             }else{
                 $('.'+auxnome).val(0)
             }
-           // alert($('.'+auxnome).val())
+            //alert($('.'+auxnome).val())
         })
-        //alert('totcheckded:' + totcheckded)
+        //alert('contarselecao: ' + contarselecao)
+             
         //atualizar Pontuação Obtida por avaliador/Grupo_Item
         let novaptobtd = ptobtida;
-        if(totcheckded > 0){
-            novaptobtd = eval(ptobtida - (totcheckded*meta1desconto)).toFixed(2)
+        //alert('novaptobtd: '+novaptobtd)
+        if(contarselecao > 0){
+            novaptobtd = eval(ptobtida - (contarselecao*meta1desconto)).toFixed(2)
             $('#meta1_pto_obtida').val(novaptobtd)
         }else{
             $('#meta1_pto_obtida').val(novaptobtd) 
         }
-    //alert('novaptobtd: '+novaptobtd)
+    //alert('meta1_pto_obtida (novaptobtd): '+novaptobtd)
 
     // ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
         let matraval=$("#matr_avaliador_pto").val() 
         let dbptobtidameta1 = $('#db_ptobtidameta1_' + matraval).val();
         let dbResultadometa1 = $('#db_Resultadometa1_' + matraval).val();
-        if(totcheckded > 0){
+        if(contarselecao > 0){
             let pontosobtidosatual = $('#meta1_qgpto_' + matraval).html();
             let pontuacaoinicial= $('#meta1_qgptop_' + matraval).html(); 
-            let desconto = eval(totcheckded*meta1desconto).toFixed(2) 
+            let desconto = eval(contarselecao*meta1desconto).toFixed(2) 
             let novopontoobtido = eval(pontosobtidosatual - desconto).toFixed(2)
             $('#meta1_qgpto_' + matraval).html(novopontoobtido);
             $("#ffimeta1pontuacaoobtida_" + matraval).val(novopontoobtido)
-            let percmeta1 = parseFloat((novopontoobtido / pontuacaoinicial)*100).toFixed(3);
+            let percmeta1 = parseFloat((novopontoobtido / pontuacaoinicial)*100).toFixed(2);
             $('#meta1_percqggitens_' + matraval).html(percmeta1 + ' %');
             $("#ffimeta1resultado_" + matraval).val(percmeta1)
         }else{
@@ -932,29 +996,31 @@ $(function(e){
             $('#meta1_percqggitens_' + matraval).html(dbResultadometa1 + ' %');
             $("#ffimeta1resultado_" + matraval).val(dbResultadometa1)
         }
-    // FIM  ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
-    // ajustar 04.Avaliação
+        // FIM  ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
+        // ajustar 04.Avaliação
             let facqtdgeral = '';
-            let dbmeta1= ''; 
-            let dbptorevismeta1= ''; 
-            facqtdgeral = $('#facqtdgeral').val();
-            dbmeta1= $('#db_meta1').val(); 
-            dbptorevismeta1= $('#db_ptorevismeta1').val(); 
-            let novoptorevismeta1 = eval(facqtdgeral - (totcheckded*meta1desconto)).toFixed(2)
-            let percmeta1 = parseFloat((novoptorevismeta1/facqtdgeral)*100).toFixed(2);
-            
-            if(totcheckded > 0){
-                $('#ptorevismeta1').html(novoptorevismeta1);
+
+            if(contarselecao > 0){
+                facqtdgeral = $('#facqtdgeral').val();
+                meta1_tela = $('#meta1_tela').val();
+                PtoMeta1ajustar= $('#PtoMeta1ajustar').val()
+                let desconto = eval(contarselecao*meta1desconto).toFixed(2)
+                let ptorevismeta1_tela = eval(PtoMeta1ajustar - (contarselecao*meta1desconto)).toFixed(2)
+                let percmeta1 = parseFloat((ptorevismeta1_tela/facqtdgeral)*100).toFixed(2);
                 $('#meta1').html(percmeta1 + ' %');
-                $('#facpontosrevisaometa1').val(novoptorevismeta1);
+                $('#ptorevismeta1').html(ptorevismeta1_tela);
+                $('#meta1_tela').val(ptorevismeta1_tela);
+                $('#facpontosrevisaometa1').val(ptorevismeta1_tela);
+                $('#db_ptorevismeta1').val(ptorevismeta1_tela)
                 $('#facpercrevisaometa1').val(percmeta1);
             }else{
-                $('#ptorevismeta1').html(dbptorevismeta1);
-                $('#meta1').html(dbmeta1 + ' %');    
-                $('#facpontosrevisaometa1').val(dbptorevismeta1);
-                $('#facpercrevisaometa1').val(dbmeta1);    
+                $('#meta1').html($('#PercMeta1ajustar').val() + ' %');
+                $('#meta1_tela').val($('#PtoMeta1ajustar').val());
+                $('#ptorevismeta1').html($('#PtoMeta1ajustar').val());
+                $('#facpontosrevisaometa1').val($('#PtoMeta1ajustar').val());
+                $('#facpercrevisaometa1').val($('#PercMeta1ajustar').val());               
             }
-    // fim ajustar 04.Avaliação
+        // fim ajustar 04.Avaliação
     })
 
     //verificar seleções meta2 e ajustar a pontuação obtida
@@ -962,34 +1028,35 @@ $(function(e){
         let ptometa2 = $('#meta2_pto_obtida').val()
         let ptobtida = $('#ptobtida').val()
         let meta2desconto = $('#meta2desconto').val()         
-    // alert(' meta2desconto:'+meta2desconto+' ptometa2:'+ptometa2+'  ptobtida:'+ptobtida);
+     //alert(' meta2desconto:'+meta2desconto+' ptometa2:'+ptometa2+'  ptobtida:'+ptobtida);
     
-        let totcheckded=0
+        let contarselecao=0
         $( ".meta2" ).each(function( index ) {
             auxnome = $(this).attr("id")
             if($(this).is(':checked')) {
-                totcheckded++
+                contarselecao++
                 $('.'+auxnome).val(1)
             }else{
                 $('.'+auxnome).val(0)
             }
         })
         //atualizar Pontuação Obtida por avaliador/Grupo_Item
-        if(totcheckded > 0){
-            let novaptobtd = eval(ptobtida - (totcheckded*meta2desconto)).toFixed(2)
+        let novaptobtd = ptobtida;
+        if(contarselecao > 0){
+            let novaptobtd = eval(ptobtida - (contarselecao*meta2desconto)).toFixed(2)
             $('#meta2_pto_obtida').val(novaptobtd)
         }else{
-            $('#meta2_pto_obtida').val(ptobtida) 
+            $('#meta2_pto_obtida').val(novaptobtd) 
         }
-    //alert('novaptobtd: '+novaptobtd)
-    // ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
+        //alert('novaptobtd: '+novaptobtd)
+        // ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
         let matraval=$("#matr_avaliador_pto").val() 
         let dbptobtidameta2 = $('#db_ptobtidameta2_' + matraval).val();
         let dbResultadometa2 = $('#db_Resultadometa2_' + matraval).val();
-        if(totcheckded > 0){
+        if(contarselecao > 0){
             let pontosobtidosatual = $('#meta2_qgpto_' + matraval).html();
             let pontuacaoinicial= $('#meta2_qgptop_' + matraval).html(); 
-            let desconto = eval(totcheckded*meta2desconto).toFixed(2) 
+            let desconto = eval(contarselecao*meta2desconto).toFixed(2) 
             let novopontoobtido = eval(pontosobtidosatual - desconto).toFixed(2)
             $('#meta2_qgpto_' + matraval).html(novopontoobtido);
             $("#ffimeta2pontuacaoobtida_" + matraval).val(novopontoobtido)   
@@ -1002,29 +1069,30 @@ $(function(e){
                 $('#meta2_percqggitens_' + matraval).html(dbResultadometa2 + ' %');
                 $("#ffimeta2resultado_" + matraval).val(dbResultadometa2)                
             }        
-    // FIM  ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
-    // ajustar 04.Avaliação
+        // FIM  ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
+        // ajustar 04.Avaliação
         let facqtdgeral ='';
-        let dbmeta2= '';           
-        let dbptorevismeta2= '';        
-        facqtdgeral = $('#facqtdgeral').val();
-        dbmeta2= $('#db_meta2').val();           
-        dbptorevismeta2= $('#db_ptorevismeta2').val();      
 
-        let novoptorevismeta2 = eval(facqtdgeral - (totcheckded*meta2desconto)).toFixed(2)
-        let percmeta2 = parseFloat((novoptorevismeta2/facqtdgeral)*100).toFixed(2);
-        if(totcheckded > 0){
-            $('#ptorevismeta2').html(novoptorevismeta2);
+        if(contarselecao > 0){
+            facqtdgeral = $('#facqtdgeral').val(); 
+            meta2_tela = $('#meta2_tela').val();
+            PtoMeta2ajustar= $('#PtoMeta2ajustar').val()
+            let desconto = eval(contarselecao*meta2desconto).toFixed(2)
+            let ptorevismeta2_tela = eval(PtoMeta2ajustar - (contarselecao*meta2desconto)).toFixed(2)
+            let percmeta2 = parseFloat((ptorevismeta2_tela/facqtdgeral)*100).toFixed(2);
             $('#meta2').html(percmeta2 + ' %');
-            $('#facpontosrevisaometa2').val(novoptorevismeta2);
+            $('#ptorevismeta2').html(ptorevismeta2_tela);
+            $('#meta2_tela').val(ptorevismeta2_tela);
+            $('#facpontosrevisaometa2').val(ptorevismeta2_tela);
+            $('#db_ptorevismeta2').val(ptorevismeta2_tela)
             $('#facpercrevisaometa2').val(percmeta2);
         }else{
-            $('#ptorevismeta2').html(dbptorevismeta2);
-            $('#meta2').html(dbmeta2 + ' %');    
-            $('#facpontosrevisaometa2').val(dbptorevismeta2);
-            $('#facpercrevisaometa2').val(dbmeta2);                
+            $('#meta2').html($('#PercMeta2ajustar').val() + ' %');
+            $('#meta2_tela').val($('#PtoMeta2ajustar').val());
+            $('#ptorevismeta2').html($('#PtoMeta2ajustar').val());
+            $('#facpontosrevisaometa2').val($('#PtoMeta2ajustar').val());
+            $('#facpercrevisaometa2').val($('#PercMeta2ajustar').val());              
         }
-        //alert($('#facpercrevisaometa2').val())
     // fim ajustar 04.Avaliação
 })    
 //*****************************************************************
