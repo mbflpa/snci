@@ -278,6 +278,25 @@ const PdfSearchManager = {
                   }
                 }
               }
+            } else if (searchOptions.mode === "proximity") {
+              const words = searchTerms
+                .split(" ")
+                .filter((term) => term.length >= 3);
+              const proximity = parseInt(searchOptions.proximityDistance);
+
+              // Verificar proximidade entre as palavras no texto
+              found = checkProximity(text, words, proximity);
+
+              if (found) {
+                // Criar snippet com o texto destacado
+                const start = Math.max(0, text.indexOf(words[0]) - 200);
+                const end = Math.min(text.length, text.indexOf(words[0]) + 400);
+                let snippet = text.substring(start, end);
+                if (start > 0) snippet = "..." + snippet;
+                if (end < text.length) snippet += "...";
+                snippet = highlightAllSearchTerms(snippet, words);
+                snippets.push(snippet);
+              }
             } else {
               // Modo "OU" (padrão): busca por termos individuais
               terms.forEach((term) => {
@@ -724,9 +743,71 @@ const PdfSearchManager = {
     }
   },
 
+  // Função aprimorada para destacar todas as palavras pesquisadas
+  highlightAllSearchTerms: function (text, terms) {
+    if (!text || !terms || !terms.length) return text;
+
+    let highlightedText = text;
+    terms.forEach((term) => {
+      if (term.length >= 3) {
+        const regex = new RegExp(`(${escapeRegExp(term)})`, "gi");
+        highlightedText = highlightedText.replace(regex, "<mark>$1</mark>");
+      }
+    });
+    return highlightedText;
+  },
+
   // Função auxiliar para escapar caracteres especiais em expressões regulares
   escapeRegExp: function (string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  },
+
+  // Função para contar palavras em um texto
+  countWords: function (text) {
+    return text.trim().split(/\s+/).length;
+  },
+
+  // Função para verificar proximidade entre palavras
+  checkProximity: function (text, words, proximity) {
+    // Se proximidade for -1, significa "Em qualquer parte"
+    if (proximity === -1) {
+      return words.every((word) =>
+        text.toLowerCase().includes(word.toLowerCase())
+      );
+    }
+
+    // Dividir o texto em palavras
+    const textWords = text.trim().split(/\s+/);
+
+    for (let i = 0; i < textWords.length; i++) {
+      // Verificar se a primeira palavra está presente
+      if (textWords[i].toLowerCase().includes(words[0].toLowerCase())) {
+        // Verificar se todas as outras palavras estão dentro da proximidade especificada
+        let allFound = true;
+        for (let j = 1; j < words.length; j++) {
+          let found = false;
+          // Verificar nas próximas 'proximity' palavras
+          for (
+            let k = i + 1;
+            k < Math.min(i + proximity + 1, textWords.length);
+            k++
+          ) {
+            if (textWords[k].toLowerCase().includes(words[j].toLowerCase())) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            allFound = false;
+            break;
+          }
+        }
+        if (allFound) {
+          return true;
+        }
+      }
+    }
+    return false;
   },
 
   // Formata os snippets para exibição
@@ -1042,6 +1123,66 @@ const PdfSearchManager = {
     console.log("Navegação entre destaques: direção =", direction);
   },
 };
+
+// Função para verificar proximidade entre palavras
+function checkProximity(text, words, proximity) {
+  // Se proximidade for -1, significa "Em qualquer parte"
+  if (proximity === -1) {
+    return words.every((word) =>
+      text.toLowerCase().includes(word.toLowerCase())
+    );
+  }
+
+  // Dividir o texto em palavras
+  const textWords = text.trim().split(/\s+/);
+
+  for (let i = 0; i < textWords.length; i++) {
+    // Verificar se a primeira palavra está presente
+    if (textWords[i].toLowerCase().includes(words[0].toLowerCase())) {
+      // Verificar se todas as outras palavras estão dentro da proximidade especificada
+      let allFound = true;
+      for (let j = 1; j < words.length; j++) {
+        let found = false;
+        // Verificar nas próximas 'proximity' palavras
+        for (
+          let k = i + 1;
+          k < Math.min(i + proximity + 1, textWords.length);
+          k++
+        ) {
+          if (textWords[k].toLowerCase().includes(words[j].toLowerCase())) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          allFound = false;
+          break;
+        }
+      }
+      if (allFound) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Função aprimorada para destacar todas as palavras pesquisadas
+function highlightAllSearchTerms(text, terms) {
+  if (!text || !terms || !terms.length) return text;
+
+  let highlightedText = text;
+  terms.forEach((term) => {
+    if (term.length >= 3) {
+      const regex = new RegExp(
+        `(${PdfSearchManager.escapeRegExp(term)})`,
+        "gi"
+      );
+      highlightedText = highlightedText.replace(regex, "<mark>$1</mark>");
+    }
+  });
+  return highlightedText;
+}
 
 // Inicializar o gerenciador de busca
 $(document).ready(function () {

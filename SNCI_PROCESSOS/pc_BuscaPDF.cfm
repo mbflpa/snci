@@ -359,7 +359,7 @@
                                 </div>
                                 <!-- NOVO CAMPO: Título do arquivo -->
                                 <div class="form-group">
-                                    <input type="text" class="form-control" id="searchTitle" name="searchTitle" placeholder="Texto no título do arquivo (ex.: Relatorio)">
+                                    <input type="text" class="form-control" id="searchTitle" name="searchTitle" placeholder="Texto no título do arquivo (ex.: 0100012024)">
                                 </div>
                                 
                                 <!-- Opções avançadas de busca (colapsáveis) -->
@@ -401,6 +401,7 @@
                                                         <option value="20" selected>20 palavras</option>
                                                         <option value="50">50 palavras</option>
                                                         <option value="100">100 palavras</option>
+                                                        <option value="-1">Em qualquer parte</option>
                                                     </select>
                                                 </div>
                                             </div>

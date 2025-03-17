@@ -101,6 +101,30 @@
                                 <cfset arrayAppend(local.snippets, local.snippet)>
                             </cfif>
                         </cfif>
+                    <cfelseif local.searchMode EQ "proximity">
+                        <cfset local.proximity = structKeyExists(local.options, "proximityDistance") ? local.options.proximityDistance : 20>
+                        <cfset local.found = checkProximity(local.extractResult.text, local.termsArray, local.proximity)>
+                        
+                        <cfif local.found>
+                            <!--- Criar snippet com contexto --->
+                            <cfset local.firstTerm = local.termsArray[1]>
+                            <cfset local.position = findNoCase(local.firstTerm, local.extractResult.text)>
+                            <cfset local.start = max(1, local.position - 200)>
+                            <cfset local.end = min(len(local.extractResult.text), local.position + 400)>
+                            <cfset local.snippet = mid(local.extractResult.text, local.start, local.end - local.start)>
+                            
+                            <!--- Adicionar reticências se necessário --->
+                            <cfif local.start GT 1>
+                                <cfset local.snippet = "..." & local.snippet>
+                            </cfif>
+                            <cfif local.end LT len(local.extractResult.text)>
+                                <cfset local.snippet = local.snippet & "...">
+                            </cfif>
+                            
+                            <!--- Destacar todos os termos --->
+                            <cfset local.snippet = highlightAllSearchTerms(local.snippet, local.termsArray)>
+                            <cfset arrayAppend(local.snippets, local.snippet)>
+                        </cfif>
                     <cfelse>
                         <!--- Busca por termos individuais (OU) --->
                         <cfloop array="#local.termsArray#" index="local.term">
@@ -276,6 +300,82 @@
 
         <cfheader name="Content-Disposition" value="inline; filename=#arguments.nome#">
         <cfcontent type="application/pdf" file="#arguments.arquivo#" deleteFile="no">
+    </cffunction>
+
+    <cffunction name="countWords" access="public" returntype="numeric">
+        <cfargument name="text" type="string" required="true">
+        <cfset var words = ListToArray(arguments.text, " ")>
+        <cfreturn ArrayLen(words)>
+    </cffunction>
+
+    <cffunction name="checkProximity" access="private" returntype="boolean">
+        <cfargument name="text" type="string" required="true">
+        <cfargument name="terms" type="array" required="true">
+        <cfargument name="proximity" type="numeric" required="true">
+        
+        <!--- Se proximidade for -1, significa "Em qualquer parte" --->
+        <cfif arguments.proximity EQ -1>
+            <cfset local.allFound = true>
+            <cfloop array="#arguments.terms#" index="local.term">
+                <cfif NOT FindNoCase(local.term, arguments.text)>
+                    <cfset local.allFound = false>
+                    <cfbreak>
+                </cfif>
+            </cfloop>
+            <cfreturn local.allFound>
+        </cfif>
+        
+        <!--- Dividir o texto em palavras --->
+        <cfset local.textWords = ListToArray(arguments.text, " ")>
+        <cfset local.firstTerm = arguments.terms[1]>
+        
+        <cfloop from="1" to="#ArrayLen(local.textWords)#" index="i">
+            <cfif FindNoCase(local.firstTerm, local.textWords[i])>
+                <cfset local.allFound = true>
+                <cfloop from="2" to="#ArrayLen(arguments.terms)#" index="j">
+                    <cfset local.found = false>
+                    <cfset local.term = arguments.terms[j]>
+                    
+                    <cfloop from="#i+1#" to="#Min(i + arguments.proximity, ArrayLen(local.textWords))#" index="k">
+                        <cfif FindNoCase(local.term, local.textWords[k])>
+                            <cfset local.found = true>
+                            <cfbreak>
+                        </cfif>
+                    </cfloop>
+                    
+                    <cfif NOT local.found>
+                        <cfset local.allFound = false>
+                        <cfbreak>
+                    </cfif>
+                </cfloop>
+                
+                <cfif local.allFound>
+                    <cfreturn true>
+                </cfif>
+            </cfif>
+        </cfloop>
+        
+        <cfreturn false>
+    </cffunction>
+
+    <cffunction name="highlightAllSearchTerms" access="private" returntype="string">
+        <cfargument name="text" type="string" required="true">
+        <cfargument name="terms" type="array" required="true">
+        
+        <cfset local.highlightedText = arguments.text>
+        
+        <cfloop array="#arguments.terms#" index="local.term">
+            <cfif Len(local.term) GTE 3>
+                <cfset local.highlightedText = ReReplaceNoCase(
+                    local.highlightedText,
+                    "(#local.term#)",
+                    "<mark>\1</mark>",
+                    "ALL"
+                )>
+            </cfif>
+        </cfloop>
+        
+        <cfreturn local.highlightedText>
     </cffunction>
 
 </cfcomponent>
