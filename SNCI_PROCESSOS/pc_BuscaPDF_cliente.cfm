@@ -525,7 +525,7 @@
                         </div>
                         <div class="card-body">
                             <!-- Indicador de carregamento - SVG animado de documentos -->
-                            <div class="text-center" id="searchLoading" style="display:none;">
+                            <div class="text-center" id="searchLoading" style="display:none; margin-bottom: 30px;">
                                 <div class="document-scanner-container">
                                     <svg class="document-scanner-svg" viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg">
                                         <defs>
@@ -624,46 +624,49 @@
                                 </div>
                             </div>
                             
-                            <!-- Alerta quando não há resultados -->
-                            <div id="noResultsAlert" class="alert alert-warning" style="display:none;">
-                                <div class="d-flex align-items-center">
-                                    <i class="icon fas fa-exclamation-triangle fa-2x mr-3"></i>
-                                    <div>
-                                        <h5 class="mb-1">Nenhum resultado encontrado</h5>
-                                        <p class="mb-0">Tente usar termos diferentes ou mais genéricos para sua busca.</p>
+                            <!-- Adicionar clara divisão entre o carregamento e os resultados -->
+                            <div class="search-results-container">
+                                <!-- Alerta quando não há resultados -->
+                                <div id="noResultsAlert" class="alert alert-warning" style="display:none;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="icon fas fa-exclamation-triangle fa-2x mr-3"></i>
+                                        <div>
+                                            <h5 class="mb-1">Nenhum resultado encontrado</h5>
+                                            <p class="mb-0">Tente usar termos diferentes ou mais genéricos para sua busca.</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Alerta de erro -->
-                            <div id="errorAlert" class="alert alert-danger" style="display:none;">
-                                <div class="d-flex align-items-center">
-                                    <i class="icon fas fa-ban fa-2x mr-3"></i>
-                                    <div>
-                                        <h5 class="mb-1">Ocorreu um erro na busca</h5>
-                                        <p id="errorMessage" class="mb-0"></p>
+                                <!-- Alerta de erro -->
+                                <div id="errorAlert" class="alert alert-danger" style="display:none;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="icon fas fa-ban fa-2x mr-3"></i>
+                                        <div>
+                                            <h5 class="mb-1">Ocorreu um erro na busca</h5>
+                                            <p id="errorMessage" class="mb-0"></p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Controles de navegação nos resultados -->
-                            <div class="highlight-controls" id="highlightControls">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <div>
-                                        <span class="badge badge-info py-2 px-3" id="highlightStatus">0 de 0 ocorrências</span>
-                                    </div>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-outline-primary" id="prevHighlight">
-                                            <i class="fas fa-chevron-up mr-1"></i> Anterior
-                                        </button>
-                                        <button type="button" class="btn btn-outline-primary" id="nextHighlight">
-                                            Próximo <i class="fas fa-chevron-down ml-1"></i>
-                                        </button>
+                                
+                                <!-- Controles de navegação nos resultados -->
+                                <div class="highlight-controls" id="highlightControls">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <span class="badge badge-info py-2 px-3" id="highlightStatus">0 de 0 ocorrências</span>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-outline-primary" id="prevHighlight">
+                                                <i class="fas fa-chevron-up mr-1"></i> Anterior
+                                            </button>
+                                            <button type="button" class="btn btn-outline-primary" id="nextHighlight">
+                                                Próximo <i class="fas fa-chevron-down ml-1"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
+                                
+                                <!-- Lista de resultados -->
+                                <div class="search-results" id="searchResults" style="padding:0 10px 10px!important"></div>
                             </div>
-                            
-                            <!-- Lista de resultados -->
-                            <div class="search-results" id="searchResults" style="padding:0 10px 10px!important"></div>
                         </div>
                     </div>
                 </div>

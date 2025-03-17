@@ -4,6 +4,7 @@ let documentProcessing = false;
 let searchStartTime = 0;
 let totalProcessed = 0;
 let totalDocuments = 0;
+let totalFilesRead = 0; // Nova variável para contar arquivos que passaram pelos filtros
 
 // Gerenciador de busca em PDFs
 const PdfSearchManager = {
@@ -56,10 +57,11 @@ const PdfSearchManager = {
 
     $("#resultsCard").show();
 
-    // Rolar automaticamente para o card de resultados após iniciar a busca
+    // Ajustado: Rolar automaticamente para o card de resultados após iniciar a busca
+    // com offset de -80px
     $("html, body").animate(
       {
-        scrollTop: $("#resultsCard").offset().top - 200,
+        scrollTop: $("#resultsCard").offset().top - 80,
       },
       "slow"
     );
@@ -642,17 +644,18 @@ const PdfSearchManager = {
     searchStartTime = startTime;
     this.searchTerms = searchTerms;
     this.searchOptions = searchOptions;
-    
+
     // Resetar resultados
     this.currentSearchResults = [];
     searchCanceled = false;
-    documentProcessing = false;
+    documentProcessing = true; // Importante: marcar como true para o botão cancelar funcionar
     totalProcessed = 0;
     totalDocuments = 0;
-    
+    totalFilesRead = 0; // Resetar contador de arquivos lidos
+
     // Limpar área de resultados
     $("#searchResults").empty();
-    
+
     // Buscar lista de documentos PDF primeiro
     $.ajax({
       url: "cfc/pc_cfcBuscaPDF_cliente.cfc",
@@ -700,13 +703,15 @@ const PdfSearchManager = {
                 dateLastModified: doc.dateLastModified || doc.DATELASTMODIFIED,
               };
             });
-            
+
             // Atualizar contadores
             totalDocuments = normalizedDocuments.length;
-            
+
             // Atualizar status de processamento
-            $("#processingStatus").text(`Processando documentos (0 de ${totalDocuments})`);
-            
+            $("#processingStatus").text(
+              `Processando documentos (0 de ${totalDocuments})`
+            );
+
             // Iniciar processamento de documentos em lotes
             this.currentPdfQueue = [...normalizedDocuments];
             this.processDocumentsBatch();
@@ -731,54 +736,73 @@ const PdfSearchManager = {
   },
 
   // Processar documentos em lotes para melhor performance
-  processDocumentsBatch: function() {
+  processDocumentsBatch: function () {
     if (searchCanceled) {
+      console.log("Busca cancelada pelo usuário");
       this.finishSearch();
       return;
     }
-    
+
     // Verifica se ainda há documentos para processar
     if (this.currentPdfQueue.length === 0) {
       this.finishSearch();
       return;
     }
-    
+
     // Tamanho do lote - ajustar conforme necessário para performance
     const batchSize = 3;
-    
+
     // Obter o próximo lote de documentos
     const batch = this.currentPdfQueue.splice(0, batchSize);
-    
+
     // Processar documentos em paralelo
-    const promises = batch.map(doc => this.processDocument(doc));
-    
+    const promises = batch.map((doc) => this.processDocument(doc));
+
     // Quando o lote terminar, processar o próximo
     Promise.all(promises).then(() => {
+      // Limpar memória após cada lote processado
+      if (window.gc) {
+        try {
+          window.gc(); // Força coleta de lixo em navegadores que suportam
+        } catch (e) {
+          console.log("Coleta de lixo não disponível");
+        }
+      }
+
       // Atualizar progresso
-      const progress = Math.min(100, Math.round((totalProcessed / totalDocuments) * 100));
+      const progress = Math.min(
+        100,
+        Math.round((totalProcessed / totalDocuments) * 100)
+      );
       $("#processingProgress").css("width", `${progress}%`);
-      $("#processingStatus").text(`Processando documentos (${totalProcessed} de ${totalDocuments})`);
-      
+
+      // Atualizar status com informação de arquivos lidos vs processados
+      // Agora usando a variável totalFilesRead ao invés de this.currentSearchResults.length
+      $("#processingStatus").text(
+        `Processando: ${totalProcessed} de ${totalDocuments} (${totalFilesRead} arquivo(s) lido(s), ${this.currentSearchResults.length} com termos encontrados)`
+      );
+
       // Continuar com o próximo lote
       setTimeout(() => this.processDocumentsBatch(), 10);
     });
   },
 
   // Processar um único documento
-  processDocument: function(doc) {
+  processDocument: function (doc) {
     return new Promise((resolve) => {
       // Verificar se a busca foi cancelada
       if (searchCanceled) {
+        console.log("Processamento cancelado para: " + doc.fileName);
         resolve();
         return;
       }
-      
+
       // Incrementar contador
       totalProcessed++;
-      
+
       try {
         // Aplicar filtros primeiramente (ano e título)
-        
+
         // Filtrar por ano do processo, se informado
         if (this.searchOptions && this.searchOptions.processYear) {
           const yearMatch = doc.fileName.match(/_PC\d+(\d{4})_/);
@@ -787,74 +811,97 @@ const PdfSearchManager = {
             return;
           }
         }
-        
+
         // Filtrar por texto no título, se informado
-        if (this.searchOptions && this.searchOptions.titleSearch && 
-            this.searchOptions.titleSearch.trim() !== "") {
-          if (doc.fileName.toLowerCase().indexOf(
-             this.searchOptions.titleSearch.toLowerCase()) === -1) {
+        if (
+          this.searchOptions &&
+          this.searchOptions.titleSearch &&
+          this.searchOptions.titleSearch.trim() !== ""
+        ) {
+          if (
+            doc.fileName
+              .toLowerCase()
+              .indexOf(this.searchOptions.titleSearch.toLowerCase()) === -1
+          ) {
             resolve(); // Pular este documento
             return;
           }
         }
-        
+
+        // Se passou em ambos os filtros, incrementar contador de arquivos lidos
+        totalFilesRead++;
+
         // Criar URL para carregar o documento
         const fileUrl = `cfc/pc_cfcBuscaPDF_cliente.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
           doc.filePath
         )}&nome=${encodeURIComponent(doc.fileName)}`;
-        
+
         // Carregar o PDF usando PDF.js
-        pdfjsLib.getDocument({url: fileUrl}).promise.then(pdfDoc => {
-          const numPages = pdfDoc.numPages;
-          const textPromises = [];
-          
-          // Extrair texto de todas as páginas
-          for (let i = 1; i <= numPages; i++) {
-            textPromises.push(
-              pdfDoc.getPage(i)
-                .then(page => page.getTextContent({normalizeWhitespace: true}))
-                .then(content => this.processTextContent(content))
+        pdfjsLib
+          .getDocument({ url: fileUrl })
+          .promise.then((pdfDoc) => {
+            const numPages = pdfDoc.numPages;
+            const textPromises = [];
+
+            // Extrair texto de todas as páginas
+            for (let i = 1; i <= numPages; i++) {
+              textPromises.push(
+                pdfDoc
+                  .getPage(i)
+                  .then((page) =>
+                    page.getTextContent({ normalizeWhitespace: true })
+                  )
+                  .then((content) => this.processTextContent(content))
+              );
+            }
+
+            // Combinar o texto de todas as páginas
+            return Promise.all(textPromises).then((pageTexts) => {
+              return {
+                text: pageTexts.join("\n"),
+                pageCount: numPages,
+              };
+            });
+          })
+          .then((result) => {
+            // Buscar termos no texto obtido
+            const searchResult = this.searchTextForTerms(
+              result.text,
+              this.searchTerms,
+              this.searchOptions
             );
-          }
-          
-          // Combinar o texto de todas as páginas
-          return Promise.all(textPromises).then(pageTexts => {
-            return {
-              text: pageTexts.join("\n"),
-              pageCount: numPages
-            };
+
+            if (searchResult.found) {
+              // Criar objeto de resultado
+              const resultObj = {
+                fileName: doc.fileName,
+                filePath: doc.filePath,
+                fileUrl: fileUrl,
+                directory: doc.directory || "Diretório FAQ",
+                displayPath: doc.displayPath || "",
+                size: doc.size,
+                pageCount: result.pageCount,
+                dateLastModified: doc.dateLastModified,
+                snippets: searchResult.snippets,
+                extractedText: result.text,
+              };
+
+              // Adicionar ao array de resultados
+              this.currentSearchResults.push(resultObj);
+
+              // IMPORTANTE: Exibir o resultado imediatamente
+              this.displayResultCard(resultObj);
+            }
+
+            // Limpar a referência ao texto para ajudar o coletor de lixo
+            result.text = null;
+
+            resolve();
+          })
+          .catch((error) => {
+            console.error(`Erro ao processar PDF ${doc.fileName}:`, error);
+            resolve();
           });
-        }).then(result => {
-          // Buscar termos no texto obtido
-          const searchResult = this.searchTextForTerms(result.text, this.searchTerms, this.searchOptions);
-          
-          if (searchResult.found) {
-            // Criar objeto de resultado
-            const resultObj = {
-              fileName: doc.fileName,
-              filePath: doc.filePath,
-              fileUrl: fileUrl,
-              directory: doc.directory || "Diretório FAQ",
-              displayPath: doc.displayPath || "",
-              size: doc.size,
-              pageCount: result.pageCount,
-              dateLastModified: doc.dateLastModified,
-              snippets: searchResult.snippets,
-              extractedText: result.text
-            };
-            
-            // Adicionar ao array de resultados
-            this.currentSearchResults.push(resultObj);
-            
-            // IMPORTANTE: Exibir o resultado imediatamente
-            this.displayResultCard(resultObj);
-          }
-          
-          resolve();
-        }).catch(error => {
-          console.error(`Erro ao processar PDF ${doc.fileName}:`, error);
-          resolve();
-        });
       } catch (error) {
         console.error(`Erro ao processar documento ${doc.fileName}:`, error);
         resolve();
@@ -863,14 +910,14 @@ const PdfSearchManager = {
   },
 
   // Buscar termos no texto
-  searchTextForTerms: function(text, searchTerms, options) {
+  searchTextForTerms: function (text, searchTerms, options) {
     const result = {
       found: false,
-      snippets: []
+      snippets: [],
     };
-    
+
     if (!text || !searchTerms) return result;
-    
+
     // Verificar modo de busca e executar a lógica correspondente
     if (options.mode === "exact") {
       // Modo de frase exata
@@ -878,20 +925,20 @@ const PdfSearchManager = {
       if (phrase.length >= 3) {
         const regex = new RegExp(this.escapeRegExp(phrase), "gi");
         const matches = text.match(regex);
-        
+
         if (matches && matches.length > 0) {
           result.found = true;
-          
+
           // Criar snippet com contexto
           const firstIndex = text.toLowerCase().indexOf(phrase.toLowerCase());
           if (firstIndex !== -1) {
             const start = Math.max(0, firstIndex - 200);
             const end = Math.min(text.length, firstIndex + phrase.length + 200);
             let snippet = text.substring(start, end);
-            
+
             if (start > 0) snippet = "..." + snippet;
             if (end < text.length) snippet += "...";
-            
+
             snippet = this.highlightSearchPhrase(snippet, phrase);
             result.snippets.push(snippet);
           }
@@ -899,52 +946,52 @@ const PdfSearchManager = {
       }
     } else if (options.mode === "proximity") {
       // Modo de proximidade
-      const words = searchTerms.split(" ").filter(term => term.length >= 3);
+      const words = searchTerms.split(" ").filter((term) => term.length >= 3);
       const proximity = parseInt(options.proximityDistance || "20");
-      
+
       // Verificar proximidade
       result.found = checkProximity(text, words, proximity);
-      
+
       if (result.found) {
         // Criar snippet com contexto
         const firstWord = words[0];
         const firstIndex = text.toLowerCase().indexOf(firstWord.toLowerCase());
-        
+
         if (firstIndex !== -1) {
           const start = Math.max(0, firstIndex - 200);
           const end = Math.min(text.length, firstIndex + 400);
           let snippet = text.substring(start, end);
-          
+
           if (start > 0) snippet = "..." + snippet;
           if (end < text.length) snippet += "...";
-          
+
           snippet = highlightAllSearchTerms(snippet, words);
           result.snippets.push(snippet);
         }
       }
     } else {
       // Modo OR (padrão)
-      const terms = searchTerms.split(" ").filter(term => term.length >= 3);
-      
-      terms.forEach(term => {
+      const terms = searchTerms.split(" ").filter((term) => term.length >= 3);
+
+      terms.forEach((term) => {
         const regex = new RegExp(this.escapeRegExp(term), "gi");
         const matches = text.match(regex);
-        
+
         if (matches && matches.length > 0) {
           result.found = true;
-          
+
           // Adicionar snippet se ainda não temos muitos
           if (result.snippets.length < 3) {
             const firstIndex = text.toLowerCase().indexOf(term.toLowerCase());
-            
+
             if (firstIndex !== -1) {
               const start = Math.max(0, firstIndex - 200);
               const end = Math.min(text.length, firstIndex + term.length + 200);
               let snippet = text.substring(start, end);
-              
+
               if (start > 0) snippet = "..." + snippet;
               if (end < text.length) snippet += "...";
-              
+
               snippet = this.highlightSearchTerm(snippet, term);
               result.snippets.push(snippet);
             }
@@ -952,49 +999,78 @@ const PdfSearchManager = {
         }
       });
     }
-    
+
     return result;
   },
 
   // NOVO MÉTODO: Exibir card de resultado em tempo real
-  displayResultCard: function(result) {
-    // Esconder indicador de carregamento após encontrar primeiro resultado
-    if (this.currentSearchResults.length === 1) {
-      $("#searchLoading").hide();
-    }
-    
+  displayResultCard: function (result) {
+    // Removido código que esconde searchLoading no primeiro resultado
+    // if (this.currentSearchResults.length === 1) {
+    //   $("#searchLoading").hide();
+    // }
+
     // Criar HTML do card
     const cardHtml = this.createResultHTML(result);
-    
+
     // Adicionar ao início da lista de resultados com efeito de animação
     const $card = $(cardHtml).addClass("live-result");
     $("#searchResults").prepend($card);
-    
+
     // Remover classe de animação após um tempo
     setTimeout(() => {
       $card.removeClass("live-result");
     }, 1000);
-    
+
+    // Garantir que a área de resultados esteja visível
+    $("#searchResults").show();
+
+    // Se este for o primeiro resultado, fazer scroll para ele
+    if (this.currentSearchResults.length === 1) {
+      setTimeout(() => {
+        $("html, body").animate(
+          {
+            scrollTop: $card.offset().top - 80, // Ajustado para manter consistência
+          },
+          "slow"
+        );
+      }, 300); // Um pequeno delay para garantir que o elemento esteja renderizado
+    }
+
     // Adicionar handlers para o texto extraído
     this.setupExtractedTextHandlers();
+
+    // Otimização de memória: manter apenas o texto necessário para exibição
+    if (result.extractedText && result.extractedText.length > 15000) {
+      // Manter apenas os primeiros 15000 caracteres para economizar memória
+      result.extractedText = result.extractedText.substring(0, 15000) + "...";
+    }
+
+    // Forçar coleta de lixo se disponível após cada card exibido
+    this.triggerGarbageCollection();
   },
 
   // Criar HTML para um resultado
-  createResultHTML: function(result) {
+  createResultHTML: function (result) {
     // URL direta para visualizar o PDF
     const pdfUrl = result.fileUrl;
-    
+
     // Formatar o nome do arquivo se for muito longo
-    const shortFileName = result.fileName.length > 50 
-      ? result.fileName.substring(0, 47) + "..." 
-      : result.fileName;
-    
+    const shortFileName =
+      result.fileName.length > 50
+        ? result.fileName.substring(0, 47) + "..."
+        : result.fileName;
+
     // Formatar data e tamanho
     const formattedDate = this.formatDate(result.dateLastModified);
     const formattedSize = this.formatFileSize(result.size);
-    
+
     return `
-      <div class="search-result" data-file-path="${result.filePath}" data-file-url="${pdfUrl}" data-result-id="${this.currentSearchResults.length - 1}">
+      <div class="search-result" data-file-path="${
+        result.filePath
+      }" data-file-url="${pdfUrl}" data-result-id="${
+      this.currentSearchResults.length - 1
+    }">
         <div class="d-flex justify-content-between align-items-start">
           <h5>
             <a href="${pdfUrl}" target="_blank" class="view-pdf-link">
@@ -1003,7 +1079,9 @@ const PdfSearchManager = {
           </h5>
         </div>
         <p class="mb-1 text-muted small">
-          <i class="fas fa-folder-open mr-1"></i> ${result.directory || "Diretório FAQ"}
+          <i class="fas fa-folder-open mr-1"></i> ${
+            result.directory || "Diretório FAQ"
+          }
         </p>
         <div class="search-snippets">
           ${this.formatSnippets(result.snippets)}
@@ -1011,18 +1089,24 @@ const PdfSearchManager = {
         
         <!-- Botão para mostrar/ocultar texto extraído -->
         <div class="mt-3">
-          <button class="btn btn-sm btn-outline-info toggle-extracted-text" data-result-id="${this.currentSearchResults.length - 1}">
+          <button class="btn btn-sm btn-outline-info toggle-extracted-text" data-result-id="${
+            this.currentSearchResults.length - 1
+          }">
             <i class="fas fa-file-alt mr-1"></i> Ver texto extraído
           </button>
         </div>
         
         <!-- Container para o texto extraído (inicialmente oculto) -->
-        <div class="extracted-text-container mt-2" id="extractedText-${this.currentSearchResults.length - 1}" style="display: none;">
+        <div class="extracted-text-container mt-2" id="extractedText-${
+          this.currentSearchResults.length - 1
+        }" style="display: none;">
           <div class="card">
             <div class="card-header py-2 bg-light">
               <div class="d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-file-alt mr-1"></i> Conteúdo do documento</span>
-                <button class="btn btn-sm btn-link text-muted p-0 copy-text" data-result-id="${this.currentSearchResults.length - 1}">
+                <button class="btn btn-sm btn-link text-muted p-0 copy-text" data-result-id="${
+                  this.currentSearchResults.length - 1
+                }">
                   <i class="far fa-copy"></i> Copiar
                 </button>
               </div>
@@ -1042,7 +1126,9 @@ const PdfSearchManager = {
               <i class="fas fa-file-alt mr-1"></i> ${formattedSize}
             </span>
             <span class="badge badge-light">
-              <i class="fas fa-file-pdf mr-1"></i> ${result.pageCount || "?"} página${result.pageCount !== 1 ? "s" : ""}
+              <i class="fas fa-file-pdf mr-1"></i> ${
+                result.pageCount || "?"
+              } página${result.pageCount !== 1 ? "s" : ""}
             </span>
           </div>
           <div>
@@ -1056,48 +1142,70 @@ const PdfSearchManager = {
   },
 
   // Destacar termos de busca em um texto longo
-  highlightSearchTerms: function(text) {
+  highlightSearchTerms: function (text) {
     if (!text || text.length > 10000) {
       // Limitar texto se for muito longo
       text = text.substring(0, 10000) + "...";
     }
-    
+
     if (this.searchOptions.mode === "exact") {
       return this.highlightSearchPhrase(text, this.searchTerms);
     } else {
-      const terms = this.searchTerms.split(" ").filter(term => term.length >= 3);
+      const terms = this.searchTerms
+        .split(" ")
+        .filter((term) => term.length >= 3);
       let highlightedText = text;
-      
-      terms.forEach(term => {
+
+      terms.forEach((term) => {
         highlightedText = this.highlightSearchTerm(highlightedText, term);
       });
-      
+
       return highlightedText;
     }
   },
 
   // Finalizar a busca
-  finishSearch: function() {
+  finishSearch: function () {
+    // Agora escondemos a animação apenas quando a busca termina
     $("#searchLoading").hide();
-    
-    const searchTime = ((performance.now() - searchStartTime) / 1000).toFixed(2);
-    
-    if (this.currentSearchResults.length === 0) {
+
+    const searchTime = ((performance.now() - searchStartTime) / 1000).toFixed(
+      2
+    );
+    // Usar totalFilesRead em vez de this.currentSearchResults.length para arquivos lidos
+    const filesRead = totalFilesRead;
+    const filesWithMatches = this.currentSearchResults.length;
+
+    if (filesWithMatches === 0) {
       $("#noResultsAlert").show();
-      $("#searchStats").text(`0 resultados encontrados em ${searchTime} segundos. Documentos processados: ${totalProcessed} de ${totalDocuments}`);
+      $("#searchStats").text(
+        `0 resultados encontrados em ${searchTime} segundos. Processados: ${totalProcessed} de ${totalDocuments} documentos. Lidos: ${filesRead} (${
+          Math.round((filesRead / totalProcessed) * 100) || 0
+        }%)`
+      );
     } else {
       $("#searchStats").text(
-        `${this.currentSearchResults.length} resultado${
-          this.currentSearchResults.length !== 1 ? "s" : ""
+        `${filesWithMatches} resultado${
+          filesWithMatches !== 1 ? "s" : ""
         } encontrado${
-          this.currentSearchResults.length !== 1 ? "s" : ""
-        } em ${searchTime} segundos. Documentos processados: ${totalProcessed} de ${totalDocuments}`
+          filesWithMatches !== 1 ? "s" : ""
+        } em ${searchTime} segundos. Processados: ${totalProcessed} de ${totalDocuments} documentos. Lidos: ${filesRead} (${Math.round(
+          (filesRead / totalProcessed) * 100
+        )}%)`
       );
     }
-    
+
     // Resetar variáveis de controle
     searchCanceled = false;
     documentProcessing = false;
+
+    // Forçar a coleta de lixo no final da busca
+    this.triggerGarbageCollection();
+
+    // Habilitar o botão de cancelar para a próxima busca
+    $("#cancelSearch")
+      .prop("disabled", false)
+      .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
   },
 
   // Destacar termo em um texto
@@ -1200,7 +1308,6 @@ const PdfSearchManager = {
     if (!snippets || snippets.length === 0) {
       return '<p class="text-muted">Sem prévia disponível</p>';
     }
-
     return snippets
       .map((snippet) => `<div class="snippet">${snippet}</div>`)
       .join("");
@@ -1211,393 +1318,389 @@ const PdfSearchManager = {
     searchTerms,
     searchTime,
     filesRead,
-    searchOptionsdisabled", true)
-  ) {pinner fa-spin mr-1"></i> Cancelando...');
+    searchOptions
+  ) {
     $("#searchLoading").hide();
-    $("#realTimeResults").hide();/ Mostrar feedback na interface
-("#processingStatus").text("Cancelando busca...");
-    // Se não há resultados  });
+    $("#realTimeResults").hide();
+
+    // Se não há resultados
     if (this.currentSearchResults.length === 0) {
-      $("#noResultsAlert").show();dfSearchManager.init();
-      $("#searchStats").text(});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-});  PdfSearchManager.init();  });    }        .html('<i class="fas fa-spinner fa-spin mr-1"></i> Cancelando...');        .prop("disabled", true)      $(this)      searchCanceled = true;    if (documentProcessing) {  $("#cancelSearch").on("click", function () {  });    $("#fuzzyThreshold").prop("disabled", $(this).val() !== "fuzzy");  $('input[name="searchType"]').on("change", function () {  });    PdfSearchManager.performSearch();    e.preventDefault();  $("#searchFaqForm").on("submit", function (e) {  }    console.log("PDF.js inicializado e pronto para uso.");  } else {    );      "PDF.js não foi carregado corretamente. Verifique se o script foi importado."    console.error(  if (typeof pdfjsLib === "undefined") {$(document).ready(function () {// Inicializar o gerenciador de busca}  return highlightedText;  });    }      highlightedText = highlightedText.replace(regex, "<mark>$1</mark>");      );        "gi"        `(${PdfSearchManager.escapeRegExp(term)})`,      const regex = new RegExp(    if (term.length >= 3) {  terms.forEach((term) => {  let highlightedText = text;  if (!text || !terms || !terms.length) return text;function highlightAllSearchTerms(text, terms) {// Função aprimorada para destacar todas as palavras pesquisadas}  return false;  }    }      }        return true;      if (allFound) {      }        }          break;          allFound = false;        if (!found) {        }          }            break;            found = true;          if (textWords[k].toLowerCase().includes(words[j].toLowerCase())) {        ) {          k++          k < Math.min(i + proximity + 1, textWords.length);          let k = i + 1;        for (        // Verificar nas próximas 'proximity' palavras        let found = false;      for (let j = 1; j < words.length; j++) {      let allFound = true;      // Verificar se todas as outras palavras estão dentro da proximidade especificada    if (textWords[i].toLowerCase().includes(words[0].toLowerCase())) {    // Verificar se a primeira palavra está presente  for (let i = 0; i < textWords.length; i++) {  const textWords = text.trim().split(/\s+/);  // Dividir o texto em palavras  }    );      text.toLowerCase().includes(word.toLowerCase())    return words.every((word) =>  if (proximity === -1) {  // Se proximidade for -1, significa "Em qualquer parte"function checkProximity(text, words, proximity) {// Função para verificar proximidade entre palavras};  },    console.log("Navegação entre destaques: direção =", direction);  navigateHighlights: function (direction) {  // Navegar pelos destaques  },    // Não precisamos adicionar o scroll aqui pois já está no performSearch    this.performSearch(term);    $("#searchTerms").val(term);  searchWithTerm: function (term) {  // Iniciar busca com termo específico  },    window.history.pushState({ path: newUrl }, "", newUrl);      encodeURIComponent(searchTerms);      "?q=" +      window.location.pathname +      window.location.host +      "//" +      window.location.protocol +    const newUrl =  updateUrlWithSearchTerms: function (searchTerms) {  // Atualizar a URL com os termos de busca para permitir compartilhamento  },    }      toastr.error("Erro ao limpar histórico de buscas.");      console.error("Erro ao limpar buscas recentes:", e);    } catch (e) {      toastr.success("Histórico de buscas removido com sucesso!");      $("#recentSearchesContainer").empty();      localStorage.removeItem("recentFaqSearches");    try {  clearRecentSearches: function () {  // Limpar as buscas recentes  },    }      console.error("Erro ao carregar buscas recentes:", e);    } catch (e) {      container.html(html);      </div>`;        </button>          <i class="fas fa-times"></i> Limpar                onclick="PdfSearchManager.clearRecentSearches()">        <button class="btn btn-link btn-sm text-muted px-0 ml-2"       html += `      });        `;             )}')">${term}</a>               "\\'"               /'/g,             onclick="PdfSearchManager.searchWithTerm('${term.replace(          <a href="javascript:void(0)" class="badge badge-light mr-1"         html += `      recentSearches.forEach((term) => {        '<div class="mt-2"><small class="text-muted">Buscas recentes: </small>';      let html =      if (recentSearches.length === 0) return;      container.empty();      const container = $("#recentSearchesContainer");      // Limpar e atualizar container      );        localStorage.getItem("recentFaqSearches") || "[]"      const recentSearches = JSON.parse(    try {  loadRecentSearches: function () {  // Carregar e exibir buscas recentes  },    }      console.error("Erro ao salvar busca recente:", e);    } catch (e) {      this.loadRecentSearches();      // Atualizar UI      );        JSON.stringify(filteredSearches)        "recentFaqSearches",      localStorage.setItem(      }        filteredSearches.length = 5;      if (filteredSearches.length > 5) {      filteredSearches.unshift(searchTerms);      // Manter apenas as 5 pesquisas mais recentes      );        (term) => term.toLowerCase() !== searchTerms.toLowerCase()      const filteredSearches = recentSearches.filter(      );        localStorage.getItem("recentFaqSearches") || "[]"      const recentSearches = JSON.parse(    try {  saveRecentSearch: function (searchTerms) {  // Salvar buscas recentes no localStorage  },    }      return "Data desconhecida";    } catch (e) {      return date.toLocaleDateString("pt-BR");      const date = new Date(dateStr);    try {  formatDate: function (dateStr) {  // Formatar data  },    }      return (bytes / 1073741824).toFixed(1) + " GB";    } else {      return (bytes / 1048576).toFixed(1) + " MB";    } else if (bytes < 1073741824) {      return (bytes / 1024).toFixed(1) + " KB";    } else if (bytes < 1048576) {      return bytes + " bytes";    if (bytes < 1024) {  formatFileSize: function (bytes) {  // Formatar tamanho do arquivo  },    });      }, 2000);        $(this).html('<i class="far fa-copy"></i> Copiar');      setTimeout(() => {      $(this).html('<i class="fas fa-check"></i> Copiado!');      // Feedback ao usuário      document.body.removeChild(tempElement);      document.execCommand("copy");      tempElement.select();      document.body.appendChild(tempElement);      tempElement.value = textContent;      const tempElement = document.createElement("textarea");      // Criar elemento temporário para copiar        PdfSearchManager.currentSearchResults[resultId].extractedText;      const textContent =      const resultId = $(this).data("result-id");    $(".copy-text").on("click", function () {    // Copiar texto para área de transferência    });      }        $(this).html('<i class="fas fa-file-alt mr-1"></i> Ocultar texto');        textContainer.slideDown(200);        // Abrir este texto        );          '<i class="fas fa-file-alt mr-1"></i> Ver texto extraído'        $(".toggle-extracted-text").html(        $(".extracted-text-container").slideUp(200);        // Fechar outros textos abertos      } else {        $(this).html('<i class="fas fa-file-alt mr-1"></i> Ver texto extraído');        textContainer.slideUp(200);      if (textContainer.is(":visible")) {      const textContainer = $(`#extractedText-${resultId}`);      const resultId = $(this).data("result-id");    $(".toggle-extracted-text").on("click", function () {    // Toggle para mostrar/ocultar texto extraído  setupExtractedTextHandlers: function () {  // Configurar manipuladores para o texto extraído  },    this.setupExtractedTextHandlers();    // Adicionar handlers para os botões de exibir texto extraído    );      } em ${searchTime} segundos. Arquivos lidos: ${filesRead || "N/A"}`        this.currentSearchResults.length !== 1 ? "s" : ""      } encontrado${        this.currentSearchResults.length !== 1 ? "s" : ""      `${this.currentSearchResults.length} resultado${    $("#searchStats").text(    $("#searchResults").html(resultsHtml);    // Exibir resultados e estatísticas    });      `;        </div>          </div>            </div>              </span>                } página${result.pageCount !== 1 ? "s" : ""}                  result.pageCount || "?"                <i class="fas fa-file-pdf mr-1"></i> ${              <span class="badge badge-light">              </span>                )}                  result.size || 0                <i class="fas fa-file-alt mr-1"></i> ${this.formatFileSize(              <span class="badge badge-light mr-1">              </span>                )}                  result.dateLastModified || new Date()                <i class="far fa-calendar-alt mr-1"></i> ${this.formatDate(              <span class="badge badge-light mr-1">            <div>          <div class="d-flex justify-content-between mt-2">                    </div>            </div>              </div>                ${highlightedText}              <div class="card-body extracted-text-content " style="max-height: 300px; overflow-y: auto;">              </div>                </div>                  </button>                    <i class="far fa-copy"></i> Copiar                  <button class="btn btn-sm btn-link text-muted p-0 copy-text" data-result-id="${index}">                  <span><i class="fas fa-file-alt mr-1"></i> Conteúdo do documento</span>                <div class="d-flex justify-content-between align-items-center">              <div class="card-header py-2 bg-light">            <div class="card">          <div class="extracted-text-container mt-2" id="extractedText-${index}" style="display: none;">          <!-- Container para o texto extraído (inicialmente oculto) -->                    </div>            </button>              <i class="fas fa-file-alt mr-1"></i> Ver texto extraído            <button class="btn btn-sm btn-outline-info toggle-extracted-text" data-result-id="${index}">          <div class="mt-3">          <!-- Botão para mostrar/ocultar texto extraído -->                    </div>            ${this.formatSnippets(result.snippets)}          <div class="search-snippets">          </p>            }              result.directory || "Diretório FAQ"            <i class="fas fa-folder-open mr-1"></i> ${          <p class="mb-1 text-muted small">          </div>            </h5>              </a>                <i class="far fa-file-pdf mr-2"></i>${result.fileName}              <a href="${pdfUrl}" target="_blank" class="view-pdf-link">            <h5>          <div class="d-flex justify-content-between align-items-start">        }" data-file-url="${pdfUrl}" data-result-id="${index}">          result.filePath        <div class="search-result" data-file-path="${      resultsHtml += `            }, truncatedText);              return text;              }                return text.replace(regex, "<mark>$1</mark>");                const regex = new RegExp(`(${this.escapeRegExp(term)})`, "gi");              if (term.length >= 3) {          : termsList.reduce((text, term) => {          ? this.highlightSearchPhrase(truncatedText, searchTerms)        searchOptions && searchOptions.mode === "exact"      const highlightedText =      // Destacar termos de busca no texto completo        : "Texto não disponível";          : result.extractedText          ? result.extractedText.substring(0, 5000) + "..."        ? result.extractedText.length > 5000      const truncatedText = result.extractedText      // Truncar texto para preview (primeiros 5000 caracteres)      )}`;        result.filePath      const pdfUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(      // URL direta para visualizar o PDF    this.currentSearchResults.forEach((result, index) => {    let resultsHtml = "";    const termsList = searchTerms.split(" ").filter((term) => term.length >= 3);    // Construir HTML dos resultados - sem mostrar relevância    }      return;      );        }`          filesRead || "N/A"        `0 resultados encontrados em ${searchTime} segundos. Arquivos lidos: ${
+      $("#noResultsAlert").show();
+
+      // Mostrar estatísticas detalhadas, incluindo porcentagem de arquivos lidos
+      // Usar totalFilesRead para a contagem correta
+      const actualFilesRead = filesRead || totalFilesRead;
+      const percentRead =
+        totalProcessed > 0
+          ? Math.round((actualFilesRead / totalProcessed) * 100)
+          : 0;
+
+      $("#searchStats").text(
+        `0 resultados encontrados em ${searchTime} segundos. Processados: ${totalProcessed} de ${totalDocuments} documentos. Lidos: ${actualFilesRead} (${percentRead}%)`
+      );
+      return;
+    }
+
+    // Construir HTML dos resultados - sem mostrar relevância
+    const termsList = searchTerms.split(" ").filter((term) => term.length >= 3);
+    let resultsHtml = "";
+
+    // Exibir estatísticas sobre arquivos processados e lidos
+    const actualFilesRead = filesRead || totalFilesRead;
+    const resultsCount = this.currentSearchResults.length;
+    const percentRead = Math.round((actualFilesRead / totalProcessed) * 100);
+
+    // Adicionar resumo no topo da lista de resultados
+    resultsHtml += `
+      <div class="alert alert-info mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <i class="fas fa-info-circle mr-2"></i>
+            <strong>Resultados da busca:</strong> ${resultsCount} termo(s) encontrado(s) em ${actualFilesRead} arquivos lidos (${percentRead}% dos processados)
+          </div>
+          <div>
+            <span class="badge badge-primary">${
+              searchOptions.processYear
+                ? "Ano: " + searchOptions.processYear
+                : ""
+            }</span>
+            <span class="badge badge-primary">${
+              searchOptions.titleSearch
+                ? "Título: " + searchOptions.titleSearch
+                : ""
+            }</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.currentSearchResults.forEach((result, index) => {
+      // URL direta para visualizar o PDF
+      const pdfUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
+        result.filePath
+      )}&nome=${encodeURIComponent(result.fileName)}`;
+
+      // Truncar texto para preview (primeiros 5000 caracteres)
+      const truncatedText = result.extractedText
+        ? result.extractedText.length > 5000
+          ? result.extractedText.substring(0, 5000) + "..."
+          : result.extractedText
+        : "Texto não disponível";
+
+      // Destacar termos de busca no texto completo
+      const highlightedText =
+        searchOptions && searchOptions.mode === "exact"
+          ? this.highlightSearchPhrase(truncatedText, searchTerms)
+          : termsList.reduce((text, term) => {
+              if (term.length >= 3) {
+                const regex = new RegExp(`(${this.escapeRegExp(term)})`, "gi");
+                return text.replace(regex, "<mark>$1</mark>");
+              }
+              return text;
+            }, truncatedText);
+
+      resultsHtml += `
+        <div class="search-result" data-file-path="${
+          result.filePath
+        }" data-file-url="${pdfUrl}" data-result-id="${index}">
+          <div class="d-flex justify-content-between align-items-start">
+            <h5>
+              <a href="${pdfUrl}" target="_blank" class="view-pdf-link">
+                <i class="far fa-file-pdf mr-2"></i>${result.fileName}
+              </a>
+            </h5>
+          </div>
+          <p class="mb-1 text-muted small">
+            <i class="fas fa-folder-open mr-1"></i> ${
+              result.directory || "Diretório FAQ"
+            }
+          </p>
+          <div class="search-snippets">
+            ${this.formatSnippets(result.snippets)}
+          </div>
+          
+          <!-- Botão para mostrar/ocultar texto extraído -->
+          <div class="mt-3">
+            <button class="btn btn-sm btn-outline-info toggle-extracted-text" data-result-id="${index}">
+              <i class="fas fa-file-alt mr-1"></i> Ver texto extraído
+            </button>
+          </div>
+          
+          <!-- Container para o texto extraído (inicialmente oculto) -->
+          <div class="extracted-text-container mt-2" id="extractedText-${index}" style="display: none;">
+            <div class="card">
+              <div class="card-header py-2 bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span><i class="fas fa-file-alt mr-1"></i> Conteúdo do documento</span>
+                  <button class="btn btn-sm btn-link text-muted p-0 copy-text" data-result-id="${index}">
+                    <i class="far fa-copy"></i> Copiar
+                  </button>
+                </div>
+              </div>
+              <div class="card-body extracted-text-content" style="max-height: 300px; overflow-y: auto;">
+                ${highlightedText}
+              </div>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between mt-2">
+            <div>
+              <span class="badge badge-light mr-1">
+                <i class="far fa-calendar-alt mr-1"></i> ${this.formatDate(
+                  result.dateLastModified || new Date()
+                )}
+              </span>
+              <span class="badge badge-light mr-1">
+                <i class="fas fa-file-alt mr-1"></i> ${this.formatFileSize(
+                  result.size || 0
+                )}
+              </span>
+              <span class="badge badge-light">
+                <i class="fas fa-file-pdf mr-1"></i> ${
+                  result.pageCount || "?"
+                } página${result.pageCount !== 1 ? "s" : ""}
+              </span>
+            </div>
+            <div>
+              <a href="${pdfUrl}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="far fa-eye mr-1"></i> Visualizar
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    // Exibir resultados e estatísticas
+    $("#searchResults").html(resultsHtml);
+    $("#searchStats").text(
+      `${this.currentSearchResults.length} resultado${
+        this.currentSearchResults.length !== 1 ? "s" : ""
+      } encontrado${
+        this.currentSearchResults.length !== 1 ? "s" : ""
+      } em ${searchTime} segundos. Processados: ${totalProcessed} de ${totalDocuments} documentos. Lidos: ${actualFilesRead} (${percentRead}%)`
+    );
+
+    // Adicionar handlers para os botões de exibir texto extraído
+    this.setupExtractedTextHandlers();
+  },
+
+  // Atualizar a URL com os termos de busca para permitir compartilhamento
+  updateUrlWithSearchTerms: function (searchTerms) {
+    const newUrl =
+      window.location.protocol +
+      "//" +
+      window.location.host +
+      window.location.pathname +
+      "?q=" +
+      encodeURIComponent(searchTerms);
+    window.history.pushState({ path: newUrl }, "", newUrl);
+  },
+
+  // Iniciar busca com termo específico
+  searchWithTerm: function (term) {
+    $("#searchTerms").val(term);
+    this.performSearch(term);
+  },
+
+  // Navegar pelos destaques
+  navigateHighlights: function (direction) {
+    console.log("Navegação entre destaques: direção =", direction);
+  },
+
+  // Limpar as buscas recentes
+  clearRecentSearches: function () {
+    try {
+      localStorage.removeItem("recentFaqSearches");
+      $("#recentSearchesContainer").empty();
+      toastr.success("Histórico de buscas removido com sucesso!");
+    } catch (e) {
+      console.error("Erro ao limpar buscas recentes:", e);
+      toastr.error("Erro ao limpar histórico de buscas.");
+    }
+  },
+
+  // Carregar e exibir buscas recentes
+  loadRecentSearches: function () {
+    try {
+      const recentSearches = JSON.parse(
+        localStorage.getItem("recentFaqSearches") || "[]"
+      );
+      const container = $("#recentSearchesContainer");
+      // Limpar e atualizar container
+      container.empty();
+      if (recentSearches.length === 0) return;
+      let html =
+        '<div class="mt-2"><small class="text-muted">Buscas recentes: </small>';
+      recentSearches.forEach((term) => {
+        html += `
+          <a href="javascript:void(0)" class="badge badge-light mr-1" onclick="PdfSearchManager.searchWithTerm('${term.replace(
+            /'/g,
+            "\\'"
+          )}')">${term}</a>
+        `;
+      });
+      html += `
+        <button class="btn btn-link btn-sm text-muted px-0 ml-2" onclick="PdfSearchManager.clearRecentSearches()">
+          <i class="fas fa-times"></i> Limpar
+        </button>
+      </div>`;
+      container.html(html);
+    } catch (e) {
+      console.error("Erro ao carregar buscas recentes:", e);
+    }
+  },
+
+  // Salvar buscas recentes no localStorage
+  saveRecentSearch: function (searchTerms) {
+    try {
+      const recentSearches = JSON.parse(
+        localStorage.getItem("recentFaqSearches") || "[]"
+      );
+      const filteredSearches = recentSearches.filter(
+        (term) => term.toLowerCase() !== searchTerms.toLowerCase()
+      );
+      filteredSearches.unshift(searchTerms);
+      // Manter apenas as 5 pesquisas mais recentes
+      if (filteredSearches.length > 5) {
+        filteredSearches.length = 5;
+      }
+      localStorage.setItem(
+        "recentFaqSearches",
+        JSON.stringify(filteredSearches)
+      );
+      // Atualizar UI
+      this.loadRecentSearches();
+    } catch (e) {
+      console.error("Erro ao salvar busca recente:", e);
+    }
+  },
+
+  // Formatar data
+  formatDate: function (dateStr) {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("pt-BR");
+    } catch (e) {
+      return "Data desconhecida";
+    }
+  },
+
+  // Formatar tamanho do arquivo
+  formatFileSize: function (bytes) {
+    if (bytes < 1024) {
+      return bytes + " bytes";
+    } else if (bytes < 1048576) {
+      return (bytes / 1024).toFixed(1) + " KB";
+    } else if (bytes < 1073741824) {
+      return (bytes / 1048576).toFixed(1) + " MB";
+    } else {
+      return (bytes / 1073741824).toFixed(1) + " GB";
+    }
+  },
+
+  // Configurar manipuladores para o texto extraído
+  setupExtractedTextHandlers: function () {
+    // Toggle para mostrar/ocultar texto extraído
+    $(".toggle-extracted-text").on("click", function () {
+      const resultId = $(this).data("result-id");
+      const textContainer = $(`#extractedText-${resultId}`);
+      if (textContainer.is(":visible")) {
+        textContainer.slideUp(200);
+        $(this).html('<i class="fas fa-file-alt mr-1"></i> Ver texto extraído');
+      } else {
+        // Fechar outros textos abertos
+        $(".extracted-text-container").slideUp(200);
+        // Abrir este texto
+        textContainer.slideDown(200);
+        $(this).html('<i class="fas fa-file-alt mr-1"></i> Ocultar texto');
+      }
+    });
+
+    // Copiar texto para área de transferência
+    $(".copy-text").on("click", function () {
+      const resultId = $(this).data("result-id");
+      const textContent =
+        PdfSearchManager.currentSearchResults[resultId].extractedText;
+      // Criar elemento temporário para copiar
+      const tempElement = document.createElement("textarea");
+      tempElement.value = textContent;
+      document.body.appendChild(tempElement);
+      tempElement.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempElement);
+      // Feedback ao usuário
+      $(this).html('<i class="fas fa-check"></i> Copiado!');
+      setTimeout(() => {
+        $(this).html('<i class="far fa-copy"></i> Copiar');
+      }, 2000);
+    });
+  },
+
+  // NOVO MÉTODO: Força a coleta de lixo quando disponível
+  triggerGarbageCollection: function () {
+    try {
+      // Tentar forçar a coleta de lixo
+      if (window.gc) window.gc();
+      // Atualizar o indicador de uso de memória
+      if (window.performance && window.performance.memory) {
+        const memUsed = Math.round(
+          window.performance.memory.usedJSHeapSize / (1024 * 1024)
+        );
+        const memTotal = Math.round(
+          window.performance.memory.totalJSHeapSize / (1024 * 1024)
+        );
+        const memPercent = Math.round((memUsed / memTotal) * 100);
+
+        let memClass = "memory-optimal";
+        if (memPercent > 70) memClass = "memory-warning";
+        if (memPercent > 85) memClass = "memory-danger";
+
+        $("#memoryUsage")
+          .text(`Memória: ${memUsed}MB (${memPercent}%)`)
+          .removeClass("memory-optimal memory-warning memory-danger")
+          .addClass(memClass);
+      }
+    } catch (e) {
+      console.log("Não foi possível forçar a coleta de lixo");
+    }
+  },
+};
+
+$(document).ready(function () {
+  if (typeof pdfjsLib === "undefined") {
+    console.error(
+      "PDF.js não foi carregado corretamente. Verifique se o script foi importado."
+    );
+  } else {
+    console.log("PDF.js inicializado e pronto para uso.");
+  }
+
+  $("#searchFaqForm").on("submit", function (e) {
+    e.preventDefault();
+    PdfSearchManager.performSearch();
+  });
+
+  $('input[name="searchType"]').on("change", function () {
+    $("#fuzzyThreshold").prop("disabled", $(this).val() !== "fuzzy");
+  });
+
+  // Reestruturado para garantir que o clique do botão funcione corretamente
+  $("#cancelSearch")
+    .off("click")
+    .on("click", function () {
+      console.log(
+        "Botão cancelar clicado, documentProcessing =",
+        documentProcessing
+      );
+      if (!documentProcessing) return;
+      searchCanceled = true;
+      console.log("Busca cancelada, documentProcessing =", documentProcessing);
+      $(this)
+        .prop("disabled", true)
+        .html('<i class="fas fa-spinner fa-spin mr-1"></i> Cancelando...');
+      $("#processingStatus").text("Cancelando busca...");
+    });
+
+  PdfSearchManager.init();
+});
