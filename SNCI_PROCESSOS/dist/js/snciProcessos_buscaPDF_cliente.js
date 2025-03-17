@@ -6,6 +6,20 @@ let totalProcessed = 0;
 let totalDocuments = 0;
 let totalFilesRead = 0; // Nova variável para contar arquivos que passaram pelos filtros
 
+// Variável global para estatísticas de busca
+let searchStats = {
+  startTime: 0,
+  endTime: 0,
+  totalTime: 0,
+  documentsProcessed: 0,
+  documentsWithMatches: 0,
+  averageTimePerDocument: 0,
+  peakMemoryUsage: 0,
+  averageMemoryUsage: 0,
+  memoryMeasurements: [],
+  timestamp: null,
+};
+
 // Gerenciador de busca em PDFs
 const PdfSearchManager = {
   currentSearchResults: [],
@@ -15,6 +29,7 @@ const PdfSearchManager = {
   // Inicializar o gerenciador
   init: function () {
     this.loadRecentSearches();
+    this.initMemoryMonitoring();
 
     // Verificar se há termos de busca na URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -25,8 +40,56 @@ const PdfSearchManager = {
     }
   },
 
+  // Inicializar monitoramento de memória
+  initMemoryMonitoring: function () {
+    if (window.performance && window.performance.memory) {
+      // Monitorar uso de memória a cada 2 segundos
+      setInterval(() => {
+        const memUsed = Math.round(
+          window.performance.memory.usedJSHeapSize / (1024 * 1024)
+        );
+        const memTotal = Math.round(
+          window.performance.memory.totalJSHeapSize / (1024 * 1024)
+        );
+        const memPercent = Math.round((memUsed / memTotal) * 100);
+
+        // Atualizar estatísticas
+        searchStats.memoryMeasurements.push(memUsed);
+
+        // Atualizar pico de memória se necessário
+        if (memUsed > searchStats.peakMemoryUsage) {
+          searchStats.peakMemoryUsage = memUsed;
+        }
+
+        // Atualizar UI
+        let memClass = "memory-optimal";
+        if (memPercent > 70) memClass = "memory-warning";
+        if (memPercent > 85) memClass = "memory-danger";
+
+        $("#memoryUsage")
+          .text(`Memória: ${memUsed}MB (${memPercent}%)`)
+          .removeClass("memory-optimal memory-warning memory-danger")
+          .addClass(memClass);
+      }, 2000);
+    }
+  },
+
   // Realizar a busca
   performSearch: function (searchTerms) {
+    // Resetar estatísticas no início de cada busca
+    searchStats = {
+      startTime: Date.now(),
+      endTime: 0,
+      totalTime: 0,
+      documentsProcessed: 0,
+      documentsWithMatches: 0,
+      averageTimePerDocument: 0,
+      peakMemoryUsage: 0,
+      averageMemoryUsage: 0,
+      memoryMeasurements: [],
+      timestamp: new Date().toISOString(),
+    };
+
     if (!searchTerms) {
       searchTerms = $("#searchTerms").val().trim();
     }
@@ -1003,14 +1066,9 @@ const PdfSearchManager = {
     return result;
   },
 
-  // NOVO MÉTODO: Exibir card de resultado em tempo real
+  // NOVO MÉTODO: Exibir card de resultado em tempo real - MODIFICADO para remover texto extraído
   displayResultCard: function (result) {
-    // Removido código que esconde searchLoading no primeiro resultado
-    // if (this.currentSearchResults.length === 1) {
-    //   $("#searchLoading").hide();
-    // }
-
-    // Criar HTML do card
+    // Criar HTML do card - sem opção de texto extraído
     const cardHtml = this.createResultHTML(result);
 
     // Adicionar ao início da lista de resultados com efeito de animação
@@ -1030,27 +1088,18 @@ const PdfSearchManager = {
       setTimeout(() => {
         $("html, body").animate(
           {
-            scrollTop: $card.offset().top - 80, // Ajustado para manter consistência
+            scrollTop: $card.offset().top - 80,
           },
           "slow"
         );
-      }, 300); // Um pequeno delay para garantir que o elemento esteja renderizado
-    }
-
-    // Adicionar handlers para o texto extraído
-    this.setupExtractedTextHandlers();
-
-    // Otimização de memória: manter apenas o texto necessário para exibição
-    if (result.extractedText && result.extractedText.length > 15000) {
-      // Manter apenas os primeiros 15000 caracteres para economizar memória
-      result.extractedText = result.extractedText.substring(0, 15000) + "...";
+      }, 300);
     }
 
     // Forçar coleta de lixo se disponível após cada card exibido
     this.triggerGarbageCollection();
   },
 
-  // Criar HTML para um resultado
+  // Criar HTML para um resultado - MODIFICADO para remover texto extraído
   createResultHTML: function (result) {
     // URL direta para visualizar o PDF
     const pdfUrl = result.fileUrl;
@@ -1085,36 +1134,6 @@ const PdfSearchManager = {
         </p>
         <div class="search-snippets">
           ${this.formatSnippets(result.snippets)}
-        </div>
-        
-        <!-- Botão para mostrar/ocultar texto extraído -->
-        <div class="mt-3">
-          <button class="btn btn-sm btn-outline-info toggle-extracted-text" data-result-id="${
-            this.currentSearchResults.length - 1
-          }">
-            <i class="fas fa-file-alt mr-1"></i> Ver texto extraído
-          </button>
-        </div>
-        
-        <!-- Container para o texto extraído (inicialmente oculto) -->
-        <div class="extracted-text-container mt-2" id="extractedText-${
-          this.currentSearchResults.length - 1
-        }" style="display: none;">
-          <div class="card">
-            <div class="card-header py-2 bg-light">
-              <div class="d-flex justify-content-between align-items-center">
-                <span><i class="fas fa-file-alt mr-1"></i> Conteúdo do documento</span>
-                <button class="btn btn-sm btn-link text-muted p-0 copy-text" data-result-id="${
-                  this.currentSearchResults.length - 1
-                }">
-                  <i class="far fa-copy"></i> Copiar
-                </button>
-              </div>
-            </div>
-            <div class="card-body extracted-text-content" style="max-height: 300px; overflow-y: auto;">
-              ${this.highlightSearchTerms(result.extractedText)}
-            </div>
-          </div>
         </div>
         
         <div class="d-flex justify-content-between mt-2">
@@ -1172,7 +1191,6 @@ const PdfSearchManager = {
     const searchTime = ((performance.now() - searchStartTime) / 1000).toFixed(
       2
     );
-    // Usar totalFilesRead em vez de this.currentSearchResults.length para arquivos lidos
     const filesRead = totalFilesRead;
     const filesWithMatches = this.currentSearchResults.length;
 
@@ -1181,7 +1199,7 @@ const PdfSearchManager = {
       $("#searchStats").text(
         `0 resultados encontrados em ${searchTime} segundos. Processados: ${totalProcessed} de ${totalDocuments} documentos. Lidos: ${filesRead} (${
           Math.round((filesRead / totalProcessed) * 100) || 0
-        }%)`
+        }%). Uso de memória: ${searchStats.peakMemoryUsage}MB (pico)`
       );
     } else {
       $("#searchStats").text(
@@ -1191,7 +1209,7 @@ const PdfSearchManager = {
           filesWithMatches !== 1 ? "s" : ""
         } em ${searchTime} segundos. Processados: ${totalProcessed} de ${totalDocuments} documentos. Lidos: ${filesRead} (${Math.round(
           (filesRead / totalProcessed) * 100
-        )}%)`
+        )}%). Uso de memória: ${searchStats.peakMemoryUsage}MB (pico)`
       );
     }
 
@@ -1206,6 +1224,9 @@ const PdfSearchManager = {
     $("#cancelSearch")
       .prop("disabled", false)
       .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
+
+    // Salvar estatísticas
+    this.saveSearchStats();
   },
 
   // Destacar termo em um texto
@@ -1642,6 +1663,7 @@ const PdfSearchManager = {
     try {
       // Tentar forçar a coleta de lixo
       if (window.gc) window.gc();
+
       // Atualizar o indicador de uso de memória
       if (window.performance && window.performance.memory) {
         const memUsed = Math.round(
@@ -1651,6 +1673,11 @@ const PdfSearchManager = {
           window.performance.memory.totalJSHeapSize / (1024 * 1024)
         );
         const memPercent = Math.round((memUsed / memTotal) * 100);
+
+        // Atualizar pico de memória se necessário
+        if (memUsed > searchStats.peakMemoryUsage) {
+          searchStats.peakMemoryUsage = memUsed;
+        }
 
         let memClass = "memory-optimal";
         if (memPercent > 70) memClass = "memory-warning";
@@ -1663,6 +1690,81 @@ const PdfSearchManager = {
       }
     } catch (e) {
       console.log("Não foi possível forçar a coleta de lixo");
+    }
+  },
+
+  // NOVO MÉTODO: Salvar estatísticas no localStorage
+  saveSearchStats: function () {
+    try {
+      // Recuperar estatísticas anteriores
+      const existingStatsString = localStorage.getItem("pdfSearchStats_client");
+      let allStats = [];
+
+      if (existingStatsString) {
+        try {
+          allStats = JSON.parse(existingStatsString);
+          if (!Array.isArray(allStats)) {
+            allStats = [];
+          }
+        } catch (e) {
+          console.error("Erro ao analisar estatísticas existentes:", e);
+          allStats = [];
+        }
+      }
+
+      // Calcular média de uso de memória
+      let avgMemory = 0;
+      if (
+        searchStats.memoryMeasurements &&
+        searchStats.memoryMeasurements.length > 0
+      ) {
+        avgMemory =
+          searchStats.memoryMeasurements.reduce((sum, val) => sum + val, 0) /
+          searchStats.memoryMeasurements.length;
+      }
+
+      // Adicionar as novas estatísticas
+      allStats.push({
+        timestamp: new Date().toISOString(),
+        searchTerms: this.searchTerms,
+        searchOptions: {
+          mode: this.searchOptions.mode,
+          processYear: this.searchOptions.processYear,
+          titleSearch: this.searchOptions.titleSearch,
+        },
+        stats: {
+          totalTime: ((performance.now() - searchStartTime) / 1000).toFixed(2),
+          documentsProcessed: totalProcessed,
+          documentsWithMatches: this.currentSearchResults.length,
+          documentsRead: totalFilesRead,
+          averageTimePerDocument:
+            totalProcessed > 0
+              ? (
+                  (performance.now() - searchStartTime) /
+                  1000 /
+                  totalProcessed
+                ).toFixed(3)
+              : 0,
+          peakMemoryUsage: searchStats.peakMemoryUsage,
+          averageMemoryUsage: avgMemory.toFixed(1),
+          percentageWithMatches: (
+            (this.currentSearchResults.length / Math.max(1, totalFilesRead)) *
+            100
+          ).toFixed(1),
+        },
+      });
+
+      // Manter apenas as últimas 20 estatísticas
+      if (allStats.length > 20) {
+        allStats = allStats.slice(-20);
+      }
+
+      // Salvar no localStorage
+      localStorage.setItem("pdfSearchStats_client", JSON.stringify(allStats));
+
+      console.log("Estatísticas de busca salvas:", searchStats);
+    } catch (e) {
+      console.error("Erro ao salvar estatísticas:", e);
     }
   },
 };
