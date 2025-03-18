@@ -5,7 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Busca PDF</title>
-     
+         <link rel="icon" type="image/png" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">
+   
     <!-- Estilos específicos para esta página -->
     <style>
         .search-result {

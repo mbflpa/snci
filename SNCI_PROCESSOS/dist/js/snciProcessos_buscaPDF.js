@@ -2,12 +2,22 @@
 let searchCanceled = false;
 let documentProcessing = false;
 
+// Novas variáveis para estatísticas de páginas
+const pageStats = {
+  minPages: { count: Number.MAX_SAFE_INTEGER, fileName: "" },
+  maxPages: { count: 0, fileName: "" },
+  totalPages: 0,
+  documentsWithPageCount: 0,
+};
+
 // Gerenciador de busca em PDFs
 const PdfSearchManager = {
   currentSearchResults: [],
 
   // Inicializar o gerenciador
   init: function () {
+    // Resetar estatísticas de páginas
+    this.resetPageStats();
     this.loadRecentSearches();
 
     // Verificar se há termos de busca na URL
@@ -17,6 +27,14 @@ const PdfSearchManager = {
       $("#searchTerms").val(searchTerms);
       this.performSearch(searchTerms);
     }
+  },
+
+  // Nova função para resetar estatísticas de páginas
+  resetPageStats: function () {
+    pageStats.minPages = { count: Number.MAX_SAFE_INTEGER, fileName: "" };
+    pageStats.maxPages = { count: 0, fileName: "" };
+    pageStats.totalPages = 0;
+    pageStats.documentsWithPageCount = 0;
   },
 
   // Realizar a busca
@@ -93,6 +111,9 @@ const PdfSearchManager = {
     startTime,
     searchOptions
   ) {
+    // Reset estatísticas de páginas antes de iniciar nova busca
+    this.resetPageStats();
+
     const terms = searchTerms.split(" ");
     let processedCount = 0;
     const totalDocuments = documents.length;
@@ -218,6 +239,26 @@ const PdfSearchManager = {
         }).promise;
 
         const pageCount = pdf.numPages;
+
+        // Atualizar estatísticas de páginas
+        if (pageCount > 0) {
+          // Menor número de páginas
+          if (pageCount < pageStats.minPages.count) {
+            pageStats.minPages.count = pageCount;
+            pageStats.minPages.fileName = doc.fileName;
+          }
+
+          // Maior número de páginas
+          if (pageCount > pageStats.maxPages.count) {
+            pageStats.maxPages.count = pageCount;
+            pageStats.maxPages.fileName = doc.fileName;
+          }
+
+          // Somar para cálculo da média
+          pageStats.totalPages += pageCount;
+          pageStats.documentsWithPageCount++;
+        }
+
         let found = false;
         let snippets = [];
 
@@ -647,6 +688,9 @@ const PdfSearchManager = {
   },
   // Busca no lado do cliente usando PDF.js
   searchInClientSide: function (searchTerms, searchOptions) {
+    // Reset estatísticas de páginas antes de iniciar nova busca
+    this.resetPageStats();
+
     const startTime = performance.now();
     $.ajax({
       url: "cfc/pc_cfcBuscaPDF.cfc",
@@ -851,14 +895,67 @@ const PdfSearchManager = {
       );
       return;
     }
-    // Atualizar apenas as estatísticas, pois os resultados já foram inseridos
-    $("#searchStats").text(
-      `${this.currentSearchResults.length} resultado${
-        this.currentSearchResults.length !== 1 ? "s" : ""
-      } encontrado${
-        this.currentSearchResults.length !== 1 ? "s" : ""
-      } em ${searchTime} segundos. Arquivos lidos: ${filesRead || "N/A"}`
+
+    // Calcular média de páginas
+    let avgPagesText = "";
+    if (pageStats.documentsWithPageCount > 0) {
+      const avgPages = (
+        pageStats.totalPages / pageStats.documentsWithPageCount
+      ).toFixed(1);
+
+      // Preparar informações de páginas
+      let pageStatsText = "";
+
+      // Informação de páginas somente quando temos dados válidos
+      if (pageStats.minPages.count < Number.MAX_SAFE_INTEGER) {
+        pageStatsText =
+          `<br><span class="text-info">Páginas: mín ${pageStats.minPages.count}, ` +
+          `máx ${pageStats.maxPages.count}, ` +
+          `média ${avgPages}</span>`;
+      }
+
+      // Atualizar estatísticas com as novas informações
+      $("#searchStats").html(
+        `${this.currentSearchResults.length} resultado${
+          this.currentSearchResults.length !== 1 ? "s" : ""
+        } encontrado${
+          this.currentSearchResults.length !== 1 ? "s" : ""
+        } em ${searchTime} segundos. Arquivos lidos: ${
+          filesRead || "N/A"
+        }${pageStatsText}`
+      );
+    } else {
+      // Manter formato anterior se não houver dados de páginas
+      $("#searchStats").text(
+        `${this.currentSearchResults.length} resultado${
+          this.currentSearchResults.length !== 1 ? "s" : ""
+        } encontrado${
+          this.currentSearchResults.length !== 1 ? "s" : ""
+        } em ${searchTime} segundos. Arquivos lidos: ${filesRead || "N/A"}`
+      );
+    }
+  },
+
+  // Nova função para truncar nomes de arquivo muito longos
+  truncateFileName: function (fileName, maxLength) {
+    if (!fileName) return "";
+    if (fileName.length <= maxLength) return fileName;
+
+    // Truncar o meio do nome, mantendo extensão
+    const ext = fileName.split(".").pop();
+    const nameWithoutExt = fileName.substring(
+      0,
+      fileName.length - ext.length - 1
     );
+
+    if (maxLength < 10) return `${nameWithoutExt.substring(0, maxLength)}...`;
+
+    const start = nameWithoutExt.substring(0, Math.floor(maxLength / 2) - 1);
+    const end = nameWithoutExt.substring(
+      nameWithoutExt.length - Math.floor(maxLength / 2) + 1
+    );
+
+    return `${start}...${end}.${ext}`;
   },
 
   // Formatar tamanho do arquivo
