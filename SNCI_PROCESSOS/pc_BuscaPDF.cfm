@@ -5,8 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Busca PDF</title>
-         <link rel="icon" type="image/png" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">
-   
+    <link rel="icon" type="image/png" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">
+     
     <!-- Estilos específicos para esta página -->
     <style>
         .search-result {
@@ -375,6 +375,97 @@
             color: #fd7e14;
             margin-right: 5px;
         }
+
+        /* Estilos para as estatísticas detalhadas */
+        .stats-icon {
+            cursor: pointer;
+            color: #0083ca;
+            margin-left: 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .stats-icon:hover {
+            color: #005b8e;
+            transform: scale(1.1);
+        }
+        
+        .popover-stats {
+            max-width: 400px;
+            font-size: 0.9rem;
+        }
+        
+        .popover-stats .popover-header {
+            background-color: #0083ca;
+            color: white;
+            font-weight: 600;
+            border-bottom: 0;
+        }
+        
+        .popover-stats .popover-body {
+            padding: 15px;
+            color: #495057;
+        }
+        
+        .stats-table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        
+        .stats-table td {
+            padding: 6px 0;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .stats-table tr:first-child td {
+            border-top: 0;
+        }
+        
+        .stats-table td:first-child {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .stats-table td:last-child {
+            text-align: right;
+        }
+        
+        .stats-metric {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            margin-right: 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .stats-metric-primary {
+            background-color: rgba(0, 131, 202, 0.15);
+            color: #0083ca;
+        }
+        
+        .stats-metric-success {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+        
+        .stats-metric-warning {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+        }
+        
+        .stats-metric-info {
+            background-color: rgba(23, 162, 184, 0.15);
+            color: #17a2b8;
+        }
+        
+        .filename-truncated {
+            max-width: 200px;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -509,7 +600,7 @@
                         </div>
                         <div class="card-body">
                             <!-- Indicador de carregamento - SVG animado de documentos -->
-                            <div class="text-center " id="searchLoading" style="display:none;">
+                            <div class="text-center" id="searchLoading" style="display:none;">
                                 <div class="document-scanner-container">
                                     <svg class="document-scanner-svg" viewBox="0 0 500 150" xmlns="http://www.w3.org/2000/svg">
                                         <defs>
@@ -675,11 +766,14 @@
     <!-- Carregar PDF.js como script regular (não como módulo ES6) -->
     <script src="plugins/pdf.js/pdf.min.js"></script>
     <script>
+        // Suprimir warnings específicos do pdf.worker.min.js
+        window.TT = window.TT || {};
+        window.TT.noop = function() {};
+        
         // Configurar o worker do PDF.js
         if (typeof pdfjsLib !== 'undefined') {
             // Definir a fonte do worker manualmente
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'plugins/pdf.js/pdf.worker.min.js';
-            console.log("PDF.js carregado com sucesso.");
         } else {
             console.error("PDF.js não foi carregado corretamente.");
         }
@@ -710,13 +804,6 @@
                 $(this).removeClass('shadow-sm');
             });
             
-            // Configuração básica do PDF.js para ser usado somente para extração de texto
-            if (typeof pdfjsLib !== "undefined") {
-                console.log("PDF.js detectado e pronto para uso.");
-            } else {
-                console.warn("PDF.js não foi carregado corretamente");
-            } 
-            
             // Configuração das animações SVG
             $('#searchFaqForm').on('submit', function(e) {
                 e.preventDefault();
@@ -727,8 +814,6 @@
                 // Inicia as animações do documento após o retângulo estar visível
                 setTimeout(function() {
                     try {
-                        console.log("Iniciando animações SVG");
-                        
                         // Obtém as animações do SVG que precisam ser iniciadas manualmente
                         var docAnimation = document.getElementById('docAnimation');
                         var opacityAnimation = document.getElementById('opacityAnimation');
@@ -739,13 +824,11 @@
                         // Torna o grupo do documento visível
                         if (animatedDoc) {
                             animatedDoc.setAttribute('opacity', '1');
-                            console.log("Grupo do documento definido como visível");
                         }
                         
                         // Inicia as animações
                         if (docAnimation) {
                             docAnimation.beginElement();
-                            console.log("Animação do documento iniciada");
                         }
                         
                         if (opacityAnimation) opacityAnimation.beginElement();
@@ -755,10 +838,41 @@
                         console.error("Erro ao iniciar animações:", error);
                     }
                 }, 1000);  // Delay para garantir que o retângulo tracejado já esteja visível
+            });
+            
+            // SOLUÇÃO DEFINITIVA: Substituir popover por modal para estatísticas
+            $(document).off('click', '.stats-icon').on('click', '.stats-icon', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 
-                // Aqui você colocaria a lógica de busca existente
+                if (window.statsDetailsHtml) {
+                    $('#statsModalBody').html(window.statsDetailsHtml);
+                    $('#statsModal').modal('show');
+                } else {
+                    alert("Estatísticas não disponíveis no momento");
+                }
             });
         });
     </script>
+    
+    <!-- Adicionar modal para estatísticas detalhadas -->
+    <div class="modal fade" id="statsModal" tabindex="-1" role="dialog" aria-labelledby="statsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="statsModalLabel">Estatísticas Detalhadas</h5>
+            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="statsModalBody">
+            <!-- O conteúdo será inserido via JavaScript -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
 </body>
 </html>

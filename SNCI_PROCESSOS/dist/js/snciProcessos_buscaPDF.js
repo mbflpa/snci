@@ -10,14 +10,22 @@ const pageStats = {
   documentsWithPageCount: 0,
 };
 
+// Novas variáveis para estatísticas de tamanho de arquivo
+const fileStats = {
+  smallestFile: { size: Number.MAX_SAFE_INTEGER, fileName: "" },
+  largestFile: { size: 0, fileName: "" },
+  totalSize: 0,
+  filesProcessed: 0,
+};
+
 // Gerenciador de busca em PDFs
 const PdfSearchManager = {
   currentSearchResults: [],
 
   // Inicializar o gerenciador
   init: function () {
-    // Resetar estatísticas de páginas
-    this.resetPageStats();
+    // Resetar todas as estatísticas
+    this.resetStats();
     this.loadRecentSearches();
 
     // Verificar se há termos de busca na URL
@@ -27,9 +35,32 @@ const PdfSearchManager = {
       $("#searchTerms").val(searchTerms);
       this.performSearch(searchTerms);
     }
+
+    // Inicializar popovers para estatísticas detalhadas
+    $(document).on("click", ".stats-icon", function (e) {
+      e.preventDefault();
+      $(".stats-icon").not(this).popover("hide");
+      $(this).popover("toggle");
+    });
+
+    // Fechar popover ao clicar fora
+    $(document).on("click", function (e) {
+      if (
+        $(e.target).closest(".popover").length === 0 &&
+        !$(e.target).hasClass("stats-icon")
+      ) {
+        $(".stats-icon").popover("hide");
+      }
+    });
   },
 
-  // Nova função para resetar estatísticas de páginas
+  // Função para resetar todas as estatísticas
+  resetStats: function () {
+    this.resetPageStats();
+    this.resetFileStats();
+  },
+
+  // Função para resetar estatísticas de páginas
   resetPageStats: function () {
     pageStats.minPages = { count: Number.MAX_SAFE_INTEGER, fileName: "" };
     pageStats.maxPages = { count: 0, fileName: "" };
@@ -37,8 +68,19 @@ const PdfSearchManager = {
     pageStats.documentsWithPageCount = 0;
   },
 
+  // Função para resetar estatísticas de tamanho de arquivo
+  resetFileStats: function () {
+    fileStats.smallestFile = { size: Number.MAX_SAFE_INTEGER, fileName: "" };
+    fileStats.largestFile = { size: 0, fileName: "" };
+    fileStats.totalSize = 0;
+    fileStats.filesProcessed = 0;
+  },
+
   // Realizar a busca
   performSearch: function (searchTerms) {
+    // Resetar estatísticas no início de uma nova busca
+    this.resetStats();
+
     if (!searchTerms) {
       searchTerms = $("#searchTerms").val().trim();
     }
@@ -111,8 +153,8 @@ const PdfSearchManager = {
     startTime,
     searchOptions
   ) {
-    // Reset estatísticas de páginas antes de iniciar nova busca
-    this.resetPageStats();
+    // Reset estatísticas antes de iniciar nova busca
+    this.resetStats();
 
     const terms = searchTerms.split(" ");
     let processedCount = 0;
@@ -227,6 +269,25 @@ const PdfSearchManager = {
       // Se passou em ambos os filtros, conta este arquivo
       filesRead++;
 
+      // Atualizar estatísticas de tamanho de arquivo
+      if (doc.size) {
+        // Atualizar o menor arquivo
+        if (doc.size < fileStats.smallestFile.size) {
+          fileStats.smallestFile.size = doc.size;
+          fileStats.smallestFile.fileName = doc.fileName;
+        }
+
+        // Atualizar o maior arquivo
+        if (doc.size > fileStats.largestFile.size) {
+          fileStats.largestFile.size = doc.size;
+          fileStats.largestFile.fileName = doc.fileName;
+        }
+
+        // Somar para cálculo da média
+        fileStats.totalSize += doc.size;
+        fileStats.filesProcessed++;
+      }
+
       // Criar URL para carregar o documento
       const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
         doc.filePath
@@ -265,28 +326,10 @@ const PdfSearchManager = {
         // Expandir termos com sinônimos, se essa opção estiver marcada
         let expandedTerms = searchTerms;
         if (searchOptions.useSynonyms) {
-          // Obter sinônimos para os termos de busca
-          const terms = searchTerms.split(" ").filter((t) => t.length >= 3);
-          const allTerms = new Set(terms);
-
-          // Adicionar sinônimos para cada termo, respeitando case sensitivity
-          terms.forEach((term) => {
-            const synonyms = this.getSynonyms(term);
-
-            // Adicionar sinônimos com o case apropriado
-            synonyms.forEach((syn) => {
-              if (searchOptions.caseSensitive) {
-                // Se precisamos diferenciar maiúsculas/minúsculas, aplicar o mesmo case do termo original
-                allTerms.add(this.matchCase(syn, term));
-              } else {
-                // Caso contrário, adiciona normalmente
-                allTerms.add(syn);
-              }
-            });
-          });
-
-          expandedTerms = Array.from(allTerms).join(" ");
-          console.log("Termos expandidos com sinônimos:", expandedTerms);
+          expandedTerms = this.expandTermsWithSynonyms(
+            searchTerms,
+            searchOptions
+          );
         }
 
         // Processar páginas sequencialmente
@@ -700,12 +743,10 @@ const PdfSearchManager = {
       },
       dataType: "json",
       success: (response) => {
-        console.log("Resposta recebida do servidor:", response);
         let parsedResponse = response;
         if (typeof parsedResponse === "string") {
           try {
             parsedResponse = JSON.parse(parsedResponse);
-            console.log("Convertido string em objeto JSON:", parsedResponse);
           } catch (e) {
             console.error("Erro ao converter resposta string para objeto:", e);
             if (
@@ -726,7 +767,6 @@ const PdfSearchManager = {
           success === true &&
           Array.isArray(documents)
         ) {
-          console.log(`Processando ${documents.length} documentos`);
           if (documents.length > 0) {
             const normalizedDocuments = documents.map((doc) => {
               return {
@@ -745,12 +785,12 @@ const PdfSearchManager = {
               startTime
             );
           } else {
-            console.warn("Nenhum documento PDF encontrado no diretório");
+            console.error("Nenhum documento PDF encontrado no diretório");
             this.searchInServerSide(searchTerms, searchOptions);
           }
         } else {
-          console.warn(
-            "Estrutura de resposta inválida, usando busca no servidor:",
+          console.error(
+            "Estrutura de resposta inválida, usando busca no servidor",
             parsedResponse
           );
           this.searchInServerSide(searchTerms, searchOptions);
@@ -758,7 +798,7 @@ const PdfSearchManager = {
       },
       error: (xhr, status, error) => {
         console.error(`Erro ao buscar documentos: ${status} - ${error}`);
-        console.log("Texto da resposta:", xhr.responseText);
+        console.error("Texto da resposta:", xhr.responseText);
         this.searchInServerSide(searchTerms, searchOptions);
       },
     });
@@ -896,44 +936,133 @@ const PdfSearchManager = {
       return;
     }
 
-    // Calcular média de páginas
+    // Preparar estatísticas resumidas e detalhadas
+    let statsHtml = "";
+    let detailedStatsHtml = "";
+
+    // Estatísticas básicas
+    const resultCount = this.currentSearchResults.length;
+    const resultText = `${resultCount} resultado${
+      resultCount !== 1 ? "s" : ""
+    } encontrado${resultCount !== 1 ? "s" : ""} em ${searchTime} segundos`;
+
+    statsHtml = `${resultText}. Arquivos lidos: ${filesRead || "N/A"}`;
+
+    // Calcular estatísticas avançadas
     let avgPagesText = "";
+    let avgSizeText = "";
+
+    // Média de páginas
     if (pageStats.documentsWithPageCount > 0) {
       const avgPages = (
         pageStats.totalPages / pageStats.documentsWithPageCount
       ).toFixed(1);
+      avgPagesText = `<span class="stats-metric stats-metric-info">Média: ${avgPages} pág</span>`;
+    }
 
-      // Preparar informações de páginas
-      let pageStatsText = "";
+    // Média de tamanho de arquivo
+    if (fileStats.filesProcessed > 0) {
+      const avgSize = fileStats.totalSize / fileStats.filesProcessed;
+      avgSizeText = `<span class="stats-metric stats-metric-primary">Média: ${this.formatFileSize(
+        avgSize
+      )}</span>`;
+    }
 
-      // Informação de páginas somente quando temos dados válidos
+    // Adicionar métricas resumidas se disponíveis
+    if (avgPagesText || avgSizeText) {
+      statsHtml += `<br>${avgPagesText} ${avgSizeText}`;
+    }
+
+    // Preparar estatísticas detalhadas para o popover
+    detailedStatsHtml = `
+      <table class="stats-table">
+        <tr>
+          <td>Total de documentos processados:</td>
+          <td>${filesRead || 0}</td>
+        </tr>
+        <tr>
+          <td>Documentos com correspondência:</td>
+          <td>${resultCount} (${
+      filesRead ? Math.round((resultCount / filesRead) * 100) : 0
+    }%)</td>
+        </tr>`;
+
+    // Adicionar estatísticas de páginas se disponíveis
+    if (pageStats.documentsWithPageCount > 0) {
+      const avgPages = (
+        pageStats.totalPages / pageStats.documentsWithPageCount
+      ).toFixed(1);
+      detailedStatsHtml += `
+        <tr>
+          <td>Total de páginas:</td>
+          <td>${pageStats.totalPages}</td>
+        </tr>
+        <tr>
+          <td>Média de páginas por documento:</td>
+          <td>${avgPages}</td>
+        </tr>`;
+
       if (pageStats.minPages.count < Number.MAX_SAFE_INTEGER) {
-        pageStatsText =
-          `<br><span class="text-info">Páginas: mín ${pageStats.minPages.count}, ` +
-          `máx ${pageStats.maxPages.count}, ` +
-          `média ${avgPages}</span>`;
+        detailedStatsHtml += `
+          <tr>
+            <td>Menor documento:</td>
+            <td>${pageStats.minPages.count} páginas</td>
+          </tr>`;
       }
 
-      // Atualizar estatísticas com as novas informações
-      $("#searchStats").html(
-        `${this.currentSearchResults.length} resultado${
-          this.currentSearchResults.length !== 1 ? "s" : ""
-        } encontrado${
-          this.currentSearchResults.length !== 1 ? "s" : ""
-        } em ${searchTime} segundos. Arquivos lidos: ${
-          filesRead || "N/A"
-        }${pageStatsText}`
-      );
-    } else {
-      // Manter formato anterior se não houver dados de páginas
-      $("#searchStats").text(
-        `${this.currentSearchResults.length} resultado${
-          this.currentSearchResults.length !== 1 ? "s" : ""
-        } encontrado${
-          this.currentSearchResults.length !== 1 ? "s" : ""
-        } em ${searchTime} segundos. Arquivos lidos: ${filesRead || "N/A"}`
-      );
+      if (pageStats.maxPages.count > 0) {
+        detailedStatsHtml += `
+          <tr>
+            <td>Maior documento:</td>
+            <td>${pageStats.maxPages.count} páginas</td>
+          </tr>`;
+      }
     }
+
+    // Adicionar estatísticas de tamanho de arquivo se disponíveis
+    if (fileStats.filesProcessed > 0) {
+      const avgSize = fileStats.totalSize / fileStats.filesProcessed;
+      detailedStatsHtml += `
+        <tr>
+          <td>Total em tamanho:</td>
+          <td>${this.formatFileSize(fileStats.totalSize)}</td>
+        </tr>
+        <tr>
+          <td>Média de tamanho:</td>
+          <td>${this.formatFileSize(avgSize)}</td>
+        </tr>`;
+
+      if (fileStats.smallestFile.size < Number.MAX_SAFE_INTEGER) {
+        detailedStatsHtml += `
+          <tr>
+            <td>Menor arquivo:</td>
+            <td>${this.formatFileSize(fileStats.smallestFile.size)}</td>
+          </tr>`;
+      }
+
+      if (fileStats.largestFile.size > 0) {
+        detailedStatsHtml += `
+          <tr>
+            <td>Maior arquivo:</td>
+            <td>${this.formatFileSize(fileStats.largestFile.size)}</td>
+          </tr>`;
+      }
+    }
+
+    detailedStatsHtml += `
+        <tr>
+          <td>Tempo de busca:</td>
+          <td>${searchTime} segundos</td>
+        </tr>
+      </table>`;
+
+    // Armazenar o conteúdo HTML para uso posterior no modal
+    window.statsDetailsHtml = detailedStatsHtml;
+
+    // SIMPLIFICAÇÃO: Apenas adicionar um ícone sem configurar o popover
+    $("#searchStats").html(
+      `${statsHtml} <a href="#" class="stats-icon"><i class="fas fa-info-circle"></i></a>`
+    );
   },
 
   // Nova função para truncar nomes de arquivo muito longos
@@ -1270,9 +1399,6 @@ const PdfSearchManager = {
     });
 
     $.when.apply($, decisions).always(() => {
-      console.log(
-        `Distribuição: ${clientDocs.length} para client e ${serverDocs.length} para server`
-      );
       if (clientDocs.length > 0) {
         this.processDocumentsWithPdfJs(
           clientDocs,
@@ -2198,8 +2324,6 @@ $(document).ready(function () {
     ) {
       // ...existing server side code...
     };
-  } else {
-    console.log("PDF.js inicializado e pronto para uso.");
   }
 
   $("#searchFaqForm").on("submit", function (e) {
