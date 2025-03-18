@@ -168,9 +168,6 @@ const PdfSearchManager = {
         `Processando: ${processedCount} de ${totalDocuments} (${filesRead} lido(s) até agora)`
       );
 
-      // Não é mais necessário chamar a função de atualização do carrossel
-      // O SVG tem animação contínua que funciona sozinha
-
       // Pequeno efeito visual de "escaneamento" do documento
       $(".document-item").css(
         "transform",
@@ -212,7 +209,6 @@ const PdfSearchManager = {
       const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
         doc.filePath
       )}&nome=${encodeURIComponent(doc.fileName)}`;
-
       try {
         // Carregar PDF e extrair texto usando API regular do PDF.js (não módulo)
         pdfjsLib
@@ -222,7 +218,6 @@ const PdfSearchManager = {
           .promise.then((pdf) => {
             let textPromises = [];
             const pageCount = pdf.numPages; // Armazenar o número de páginas
-
             // Extrair texto de todas as páginas com melhor processamento de espaços
             for (let i = 1; i <= pdf.numPages; i++) {
               textPromises.push(
@@ -237,16 +232,14 @@ const PdfSearchManager = {
                   })
               );
             }
-
             return Promise.all(textPromises).then((pageTexts) => ({
-              pageTexts,
+              pageTexts, // Incluir o número de páginas no retorno
               pageCount, // Incluir o número de páginas no retorno
             }));
           })
           .then((result) => {
             const text = result.pageTexts.join("\n");
             const pageCount = result.pageCount;
-
             // Buscar termos no texto
             let found = false;
             let snippets = [];
@@ -283,10 +276,8 @@ const PdfSearchManager = {
                 .split(" ")
                 .filter((term) => term.length >= 3);
               const proximity = parseInt(searchOptions.proximityDistance);
-
               // Verificar proximidade entre as palavras no texto
               found = checkProximity(text, words, proximity);
-
               if (found) {
                 // Criar snippet com o texto destacado
                 const start = Math.max(0, text.indexOf(words[0]) - 200);
@@ -351,24 +342,23 @@ const PdfSearchManager = {
               `Erro ao processar o documento ${doc.fileName}:`,
               error
             );
-            processNextDocument(index + 1);
+            // Se ocorrer erro, tentar fallback no servidor
+            this.searchSingleDocumentInServer(doc, searchTerms, searchOptions);
+            setTimeout(() => processNextDocument(index + 1), 0);
           });
       } catch (error) {
         console.error(`Erro ao carregar o documento ${doc.fileName}:`, error);
         processNextDocument(index + 1);
       }
     };
-
     // Iniciar o processamento com o primeiro documento
     processNextDocument(0);
   },
-
   // Processar conteúdo de texto do PDF considerando posições
   processTextContent: function (textContent) {
     // Ordenar itens por posição vertical (y) e depois horizontal (x)
     const items = textContent.items.slice();
     const textItems = [];
-
     // Extrair informações relevantes dos itens
     items.forEach((item) => {
       textItems.push({
@@ -379,24 +369,19 @@ const PdfSearchManager = {
         height: item.height,
       });
     });
-
     // Ordenar itens primeiro por Y (linhas) e depois por X (posição na linha)
     textItems.sort((a, b) => {
       // Tolerância para considerar itens na mesma linha (geralmente 3-5 unidades)
       const yTolerance = 5;
-
       // Se estão aproximadamente na mesma linha
       if (Math.abs(a.y - b.y) < yTolerance) {
         return a.x - b.x; // Ordena da esquerda para direita
       }
-
       return b.y - a.y; // Ordena de cima para baixo (coordenadas Y são invertidas em PDF)
     });
-
     // Construir o texto final considerando a proximidade dos itens
     let lastY = null;
     let text = "";
-
     textItems.forEach((item, index) => {
       // Adicionar quebra de linha se for uma nova linha
       if (lastY !== null && Math.abs(item.y - lastY) > 5) {
@@ -405,17 +390,14 @@ const PdfSearchManager = {
         // Verificar se é preciso adicionar espaço entre palavras na mesma linha
         const lastItem = textItems[index - 1];
         const expectedSpaceWidth = lastItem.width / lastItem.str.length; // Estimativa da largura de um espaço
-
         // Se a distância entre este item e o anterior for maior que um espaço típico
         if (item.x - (lastItem.x + lastItem.width) > expectedSpaceWidth * 0.5) {
           text += " ";
         }
       }
-
       text += item.str;
       lastY = item.y;
     });
-
     // Normalizar espaços múltiplos e espaços no início/fim das linhas
     return text
       .split("\n")
@@ -424,13 +406,11 @@ const PdfSearchManager = {
       .replace(/\s+/g, " ") // Substitui sequências de espaços por um único espaço
       .trim();
   },
-
   // Método para atualizar a animação - removendo o código anterior e deixando o SVG funcionar
   updateCarouselAnimation: function () {
     // A animação do SVG é automática, não precisamos fazer nada aqui
     // As animações SMIL no SVG cuidam de tudo
   },
-
   // Novo método para adicionar resultados em tempo real
   addRealTimeResult: function (result) {
     const resultItem = `
@@ -457,7 +437,6 @@ const PdfSearchManager = {
       );
     }
   },
-
   // Busca usando o método do servidor
   searchInServerSide: function (searchTerms, searchOptions) {
     $.ajax({
@@ -629,12 +608,9 @@ const PdfSearchManager = {
       },
     });
   },
-
   // Busca no lado do cliente usando PDF.js
   searchInClientSide: function (searchTerms, searchOptions) {
-    // Definir a variável startTime no escopo correto
     const startTime = performance.now();
-    // Buscar lista de documentos PDF primeiro
     $.ajax({
       url: "cfc/pc_cfcBuscaPDF.cfc",
       type: "POST",
@@ -644,7 +620,6 @@ const PdfSearchManager = {
       dataType: "json",
       success: (response) => {
         console.log("Resposta recebida do servidor:", response);
-        // Primeiro, garantir que temos uma resposta em formato de objeto
         let parsedResponse = response;
         if (typeof parsedResponse === "string") {
           try {
@@ -652,22 +627,18 @@ const PdfSearchManager = {
             console.log("Convertido string em objeto JSON:", parsedResponse);
           } catch (e) {
             console.error("Erro ao converter resposta string para objeto:", e);
-            // Verificar se não é um erro de HTML
             if (
               typeof response === "string" &&
               (response.includes("<html") || response.includes("<!DOCTYPE"))
             ) {
               console.error("Recebeu HTML em vez de JSON");
             }
-            // Se falhar, usar o método do servidor
             this.searchInServerSide(searchTerms, searchOptions);
             return;
           }
         }
-        // ColdFusion retorna propriedades em MAIÚSCULAS, verificar ambas as versões
         const success = parsedResponse.success || parsedResponse.SUCCESS;
         const documents = parsedResponse.documents || parsedResponse.DOCUMENTS;
-        // Verificar se temos um objeto válido com a estrutura esperada
         if (
           parsedResponse &&
           typeof parsedResponse === "object" &&
@@ -675,9 +646,7 @@ const PdfSearchManager = {
           Array.isArray(documents)
         ) {
           console.log(`Processando ${documents.length} documentos`);
-          // Verificar se a lista de documentos não está vazia
           if (documents.length > 0) {
-            // Padronizar as chaves para minúsculas para processamento consistente
             const normalizedDocuments = documents.map((doc) => {
               return {
                 fileName: doc.fileName || doc.FILENAME,
@@ -688,12 +657,11 @@ const PdfSearchManager = {
                 dateLastModified: doc.dateLastModified || doc.DATELASTMODIFIED,
               };
             });
-            // Passar searchOptions para o método processDocumentsWithPdfJs
-            this.processDocumentsWithPdfJs(
+            this.distributeProcessingIntelligently(
               normalizedDocuments,
               searchTerms,
-              startTime,
-              searchOptions
+              searchOptions,
+              startTime
             );
           } else {
             console.warn("Nenhum documento PDF encontrado no diretório");
@@ -714,7 +682,6 @@ const PdfSearchManager = {
       },
     });
   },
-
   // Destacar termo em um texto
   highlightSearchTerm: function (text, term) {
     if (!text || !term) return text;
@@ -775,10 +742,8 @@ const PdfSearchManager = {
         text.toLowerCase().includes(word.toLowerCase())
       );
     }
-
     // Dividir o texto em palavras
     const textWords = text.trim().split(/\s+/);
-
     for (let i = 0; i < textWords.length; i++) {
       // Verificar se a primeira palavra está presente
       if (textWords[i].toLowerCase().includes(words[0].toLowerCase())) {
@@ -845,7 +810,6 @@ const PdfSearchManager = {
     // Construir HTML dos resultados - sem mostrar relevância
     const termsList = searchTerms.split(" ").filter((term) => term.length >= 3);
     let resultsHtml = "";
-
     this.currentSearchResults.forEach((result, index) => {
       // URL direta para visualizar o PDF
       const pdfUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
@@ -858,7 +822,6 @@ const PdfSearchManager = {
           ? result.extractedText.substring(0, 5000) + "..."
           : result.extractedText
         : "Texto não disponível";
-
       // Destacar termos de busca no texto completo
       const highlightedText =
         searchOptions && searchOptions.mode === "exact"
@@ -897,7 +860,6 @@ const PdfSearchManager = {
               <i class="fas fa-file-alt mr-1"></i> Ver texto extraído
             </button>
           </div>
-          
           <!-- Container para o texto extraído (inicialmente oculto) -->
           <div class="extracted-text-container mt-2" id="extractedText-${index}" style="display: none;">
             <div class="card">
@@ -951,7 +913,6 @@ const PdfSearchManager = {
     // Adicionar handlers para os botões de exibir texto extraído
     this.setupExtractedTextHandlers();
   },
-
   // Configurar manipuladores para o texto extraído
   setupExtractedTextHandlers: function () {
     // Toggle para mostrar/ocultar texto extraído
@@ -996,7 +957,6 @@ const PdfSearchManager = {
       }, 2000);
     });
   },
-
   // Formatar tamanho do arquivo
   formatFileSize: function (bytes) {
     if (bytes < 1024) {
@@ -1080,7 +1040,6 @@ const PdfSearchManager = {
           <i class="fas fa-times"></i> Limpar
         </button>
       </div>`;
-
       container.html(html);
     } catch (e) {
       console.error("Erro ao carregar buscas recentes:", e);
@@ -1121,6 +1080,216 @@ const PdfSearchManager = {
   // Navegar pelos destaques
   navigateHighlights: function (direction) {
     console.log("Navegação entre destaques: direção =", direction);
+  },
+
+  // Salvar estatísticas da busca
+  saveSearchStats: function () {
+    try {
+      const statsData = {
+        timestamp: new Date().toISOString(),
+        searchTerms: $("#searchTerms").val(),
+        totalTime: searchStats.totalTime,
+        averageTimePerDoc: searchStats.averageTimePerDoc,
+        documentsProcessed: searchStats.documentsProcessed,
+        documentsWithMatches: searchStats.documentsWithMatches,
+        matchRate:
+          searchStats.documentsProcessed > 0
+            ? searchStats.documentsWithMatches / searchStats.documentsProcessed
+            : 0,
+        memoryUsage: {
+          average: searchStats.memoryUsage.average,
+          peak: searchStats.memoryUsage.peak,
+        },
+      };
+      const existingStats = JSON.parse(
+        localStorage.getItem("pdfSearchStats_mixed") || "[]"
+      );
+      existingStats.push(statsData);
+      if (existingStats.length > 20) {
+        existingStats.shift();
+      }
+      localStorage.setItem(
+        "pdfSearchStats_mixed",
+        JSON.stringify(existingStats)
+      );
+    } catch (e) {
+      console.error("Erro ao salvar estatísticas:", e);
+    }
+  },
+
+  // Busca com documentos do servidor
+  searchWithServerDocuments: function (documents, searchTerms, searchOptions) {
+    if (searchCanceled) return;
+    const documentPaths = documents.map((doc) => doc.filePath);
+    $.ajax({
+      url: "cfc/pc_cfcBuscaPDF.cfc",
+      type: "POST",
+      dataType: "json",
+      data: {
+        method: "searchInSpecificPDFs",
+        filePaths: JSON.stringify(documentPaths),
+        searchTerms: searchTerms,
+        searchOptions: JSON.stringify(searchOptions),
+      },
+      success: (response) => {
+        if (searchCanceled) return;
+        let parsedResponse = this.ensureJsonResponse(response);
+        if (parsedResponse && parsedResponse.success) {
+          if (parsedResponse.results && parsedResponse.results.length > 0) {
+            parsedResponse.results.forEach((result) => {
+              const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
+                result.filePath
+              )}&nome=${encodeURIComponent(result.fileName)}`;
+              const processedResult = {
+                ...result,
+                fileUrl: fileUrl,
+                found: true,
+              };
+              this.addSearchResult(processedResult);
+            });
+          }
+          searchStats.documentsProcessed += documents.length;
+        }
+        this.checkSearchCompletion();
+      },
+      error: (xhr, status, error) => {
+        console.error("Erro na busca pelo servidor:", error);
+        searchStats.documentsProcessed += documents.length;
+        this.checkSearchCompletion();
+      },
+    });
+  },
+
+  // Busca de documento único no servidor
+  searchSingleDocumentInServer: function (doc, searchTerms, searchOptions) {
+    $.ajax({
+      url: "cfc/pc_cfcBuscaPDF.cfc",
+      type: "POST",
+      dataType: "json",
+      data: {
+        method: "searchInSpecificPDFs",
+        filePaths: JSON.stringify([doc.filePath]),
+        searchTerms: searchTerms,
+        searchOptions: JSON.stringify(searchOptions),
+      },
+      success: (response) => {
+        if (searchCanceled) return;
+        const parsedResponse = this.ensureJsonResponse(response);
+        if (
+          parsedResponse &&
+          parsedResponse.success &&
+          parsedResponse.results &&
+          parsedResponse.results.length > 0
+        ) {
+          const result = parsedResponse.results[0];
+          const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
+            result.filePath
+          )}&nome=${encodeURIComponent(result.fileName)}`;
+          const processedResult = { ...result, fileUrl: fileUrl, found: true };
+          this.addSearchResult(processedResult);
+        }
+      },
+      error: (xhr, status, error) => {
+        console.error(`Erro no fallback para ${doc.fileName}:`, error);
+      },
+    });
+  },
+
+  // Garantir resposta JSON
+  ensureJsonResponse: function (response) {
+    if (typeof response === "string") {
+      try {
+        return JSON.parse(response);
+      } catch (e) {
+        console.error("Erro ao converter resposta string para objeto:", e);
+        return null;
+      }
+    }
+    return response;
+  },
+
+  // Adicionar resultado de busca
+  addSearchResult: function (result) {
+    this.currentSearchResults.push(result);
+    this.addRealTimeResult(result);
+  },
+
+  // Verificar conclusão da busca
+  checkSearchCompletion: function () {
+    if (searchCanceled) return;
+    const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
+    this.displaySearchResults(
+      searchTerms,
+      searchTime,
+      filesRead,
+      searchOptions
+    );
+    documentProcessing = false;
+    $("html, body").animate(
+      { scrollTop: $("#resultsCard").offset().top - 200 },
+      "slow"
+    );
+  },
+
+  // Nova função: Distribuição inteligente de processamento
+  distributeProcessingIntelligently: function (
+    documents,
+    searchTerms,
+    searchOptions,
+    startTime
+  ) {
+    const clientDocs = [];
+    const serverDocs = [];
+    const decisions = [];
+
+    documents.forEach((doc) => {
+      const decision = $.ajax({
+        url: "cfc/pc_cfcBuscaPDF.cfc",
+        type: "POST",
+        dataType: "json",
+        data: {
+          method: "getPdfComplexityScore",
+          filePath: doc.filePath,
+        },
+      })
+        .then((response) => {
+          if (
+            response &&
+            response.success &&
+            response.processingRecommendation === "server"
+          ) {
+            serverDocs.push(doc);
+          } else {
+            clientDocs.push(doc);
+          }
+        })
+        .fail(() => {
+          const sizeThreshold = 3 * 1024 * 1024; // 3MB
+          if (doc.size > sizeThreshold) {
+            serverDocs.push(doc);
+          } else {
+            clientDocs.push(doc);
+          }
+        });
+      decisions.push(decision);
+    });
+
+    $.when.apply($, decisions).always(() => {
+      console.log(
+        `Distribuição: ${clientDocs.length} para client e ${serverDocs.length} para server`
+      );
+      if (clientDocs.length > 0) {
+        this.processDocumentsWithPdfJs(
+          clientDocs,
+          searchTerms,
+          startTime,
+          searchOptions
+        );
+      }
+      if (serverDocs.length > 0) {
+        this.searchWithServerDocuments(serverDocs, searchTerms, searchOptions);
+      }
+    });
   },
 };
 
@@ -1174,22 +1343,26 @@ function highlightAllSearchTerms(text, terms) {
   let highlightedText = text;
   terms.forEach((term) => {
     if (term.length >= 3) {
-      const regex = new RegExp(
-        `(${PdfSearchManager.escapeRegExp(term)})`,
-        "gi"
-      );
+      const regex = new RegExp(`(${escapeRegExp(term)})`, "gi");
       highlightedText = highlightedText.replace(regex, "<mark>$1</mark>");
     }
   });
   return highlightedText;
 }
 
-// Inicializar o gerenciador de busca
 $(document).ready(function () {
+  // Inicializar o gerenciador de busca
   if (typeof pdfjsLib === "undefined") {
     console.error(
       "PDF.js não foi carregado corretamente. Verifique se o script foi importado."
     );
+    // Forçar fallback para busca no servidor
+    PdfSearchManager.searchInServerSide = function (
+      searchTerms,
+      searchOptions
+    ) {
+      // ...existing server side code...
+    };
   } else {
     console.log("PDF.js inicializado e pronto para uso.");
   }

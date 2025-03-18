@@ -34,6 +34,9 @@
         <cfargument name="searchTerms" type="string" required="true" hint="Termos de busca separados por espaço">
         <cfargument name="searchOptions" type="string" required="false" default="{}" hint="Opções de busca em formato JSON">
         
+        <!--- Inicializar o componente para garantir que o cache existe --->
+        <cfset init()>
+        
         <!--- Mover o cfheader para antes de qualquer processamento --->
         <cfheader name="Content-Type" value="application/json; charset=utf-8">
         
@@ -42,23 +45,17 @@
             message = "",
             results = [],
             totalFound = 0,
-            searchTime = 0
+            searchTime = 0,
+            cacheStats = {
+                hits = 0,
+                misses = 0,
+                totalDocuments = 0
+            }
         }>
         
         <cfset local.startTime = getTickCount()>
         <cfset local.options = deserializeJSON(arguments.searchOptions)>
-        
-        <!--- Determinar o modo de busca --->
-        <cfset local.searchMode = structKeyExists(local.options, "mode") ? local.options.mode : "or">
-        
-        <!--- Se for modo exato, não divide em termos --->
-        <cfif local.searchMode EQ "exact">
-            <cfset local.searchPhrase = trim(arguments.searchTerms)>
-            <cfset local.termsArray = [local.searchPhrase]>
-        <cfelse>
-            <!--- Para modo OU ou proximidade, divide em termos --->
-            <cfset local.termsArray = listToArray(trim(arguments.searchTerms), " ")>
-        </cfif>
+        <cfset local.batchSize = 10> <!--- Processar 10 arquivos por lote --->
         
         <cftry>
             <!--- Verificar diretório e listar PDFs --->
@@ -70,115 +67,251 @@
             
             <cfdirectory action="list" directory="#application.diretorio_busca_pdf#" name="local.pdfFiles" filter="*.pdf" recurse="true">
             
-            <!--- Processar cada arquivo PDF --->
+            <!--- Filtrar arquivos por ano ou título se necessário --->
+            <cfset local.filteredFiles = []>
+            
             <cfloop query="local.pdfFiles">
-                <cfset local.filePath = local.pdfFiles.directory & "\" & local.pdfFiles.name>
-                <cfset local.extractResult = extractPDFText(local.filePath)>
+                <cfset local.includeFile = true>
                 
-                <cfif local.extractResult.success>
-                    <cfset local.found = false>
-                    <cfset local.snippets = []>
-                    
-                    <!--- Lógica adaptada ao modo de busca --->
-                    <cfif local.searchMode EQ "exact">
-                        <cfset local.phrase = local.searchPhrase>
-                        <cfif len(local.phrase) GTE 3>
-                            <cfset local.position = findNoCase(local.phrase, local.extractResult.text)>
-                            <cfif local.position GT 0>
-                                <cfset local.found = true>
-                                <!--- Criar snippet com contexto --->
-                                <cfset local.start = max(1, local.position - 200)>
-                                <cfset local.end = min(len(local.extractResult.text), local.position + len(local.phrase) + 200)>
-                                <cfset local.snippet = mid(local.extractResult.text, local.start, local.end - local.start)>
-                                
-                                <!--- Adicionar reticências se necessário --->
-                                <cfif local.start GT 1>
-                                    <cfset local.snippet = "..." & local.snippet>
-                                </cfif>
-                                <cfif local.end LT len(local.extractResult.text)>
-                                    <cfset local.snippet = local.snippet & "...">
-                                </cfif>
-                                <cfset arrayAppend(local.snippets, local.snippet)>
-                            </cfif>
-                        </cfif>
-                    <cfelseif local.searchMode EQ "proximity">
-                        <cfset local.proximity = structKeyExists(local.options, "proximityDistance") ? local.options.proximityDistance : 20>
-                        <cfset local.found = checkProximity(local.extractResult.text, local.termsArray, local.proximity)>
-                        
-                        <cfif local.found>
-                            <!--- Criar snippet com contexto --->
-                            <cfset local.firstTerm = local.termsArray[1]>
-                            <cfset local.position = findNoCase(local.firstTerm, local.extractResult.text)>
-                            <cfset local.start = max(1, local.position - 200)>
-                            <cfset local.end = min(len(local.extractResult.text), local.position + 400)>
-                            <cfset local.snippet = mid(local.extractResult.text, local.start, local.end - local.start)>
-                            
-                            <!--- Adicionar reticências se necessário --->
-                            <cfif local.start GT 1>
-                                <cfset local.snippet = "..." & local.snippet>
-                            </cfif>
-                            <cfif local.end LT len(local.extractResult.text)>
-                                <cfset local.snippet = local.snippet & "...">
-                            </cfif>
-                            
-                            <!--- Destacar todos os termos --->
-                            <cfset local.snippet = highlightAllSearchTerms(local.snippet, local.termsArray)>
-                            <cfset arrayAppend(local.snippets, local.snippet)>
+                <!--- Filtrar por ano do processo, se informado --->
+                <cfif structKeyExists(local.options, "processYear") AND len(local.options.processYear)>
+                    <cfset local.yearMatch = reFind("_PC\d+(\d{4})_", local.pdfFiles.name, 1, true)>
+                    <cfif arrayLen(local.yearMatch.pos) GTE 2>
+                        <cfset local.foundYear = mid(local.pdfFiles.name, local.yearMatch.pos[2], local.yearMatch.len[2])>
+                        <cfif local.foundYear NEQ local.options.processYear>
+                            <cfset local.includeFile = false>
                         </cfif>
                     <cfelse>
-                        <!--- Busca por termos individuais (OU) --->
-                        <cfloop array="#local.termsArray#" index="local.term">
-                            <cfset local.term = lCase(trim(local.term))>
-                            <cfif len(local.term) GTE 3> <!--- Ignorar termos menores que 3 caracteres --->
-                                <cfset local.occurrences = countOccurrences(local.extractResult.text, local.term)>
-                                <cfif local.occurrences GT 0>
-                                    <cfset local.found = true>
-                                    <!--- Criar snippet com o contexto --->
-                                    <cfset local.position = findNoCase(local.term, local.extractResult.text)>
-                                    <cfif local.position GT 0>
-                                        <cfset local.start = max(1, local.position - 200)>
-                                        <cfset local.end = min(len(local.extractResult.text), local.position + len(local.term) + 200)>
-                                        <cfset local.snippet = mid(local.extractResult.text, local.start, local.end - local.start)>
-                                        <!--- Adicionar reticências se necessário --->
-                                        <cfif local.start GT 1>
-                                            <cfset local.snippet = "..." & local.snippet>
-                                        </cfif>
-                                        <cfif local.end LT len(local.extractResult.text)>
-                                            <cfset local.snippet = local.snippet & "...">
-                                        </cfif>
-                                        <cfset arrayAppend(local.snippets, local.snippet)>
-                                    </cfif>
-                                </cfif>
-                            </cfif>
-                        </cfloop>
+                        <cfset local.includeFile = false>
                     </cfif>
-                    
-                    <!--- Se encontrou pelo menos um termo, adiciona aos resultados --->
-                    <cfif local.found>
-                        <cfset local.matchResult = {
-                            fileName = local.pdfFiles.name,
-                            filePath = local.filePath,
-                            displayPath = replaceNoCase(local.filePath, application.diretorio_busca_pdf, ""),
-                            fileSize = local.pdfFiles.size,
-                            fileDate = local.pdfFiles.dateLastModified,
-                            pageCount = local.extractResult.pageCount,
-                            snippets = local.snippets,
-                            text = left(local.extractResult.text, 10000) <!--- Limitar para não sobrecarregar --->
-                        }>
-                        <cfset arrayAppend(local.result.results, local.matchResult)>
+                </cfif>
+                
+                <!--- Filtrar por texto no título, se informado --->
+                <cfif local.includeFile AND structKeyExists(local.options, "titleSearch") AND len(local.options.titleSearch)>
+                    <cfif NOT FindNoCase(local.options.titleSearch, local.pdfFiles.name)>
+                        <cfset local.includeFile = false>
                     </cfif>
+                </cfif>
+                
+                <cfif local.includeFile>
+                    <cfset arrayAppend(local.filteredFiles, {
+                        name = local.pdfFiles.name,
+                        directory = local.pdfFiles.directory,
+                        size = local.pdfFiles.size,
+                        dateLastModified = local.pdfFiles.dateLastModified
+                    })>
                 </cfif>
             </cfloop>
             
-            <!--- Número total de resultados encontrados --->
-            <cfset local.result.totalFound = arrayLen(local.result.results)>
-            <cfset local.result.message = "Encontrados #local.result.totalFound# documentos">
+            <cfset local.result.cacheStats.totalDocuments = arrayLen(local.filteredFiles)>
             
+            <!--- Processar arquivos em lotes --->
+            <cfset local.totalFiles = arrayLen(local.filteredFiles)>
+            <cfset local.allResults = []>
+            
+            <cfloop from="1" to="#local.totalFiles#" index="i" step="#local.batchSize#">
+                <cfset local.endIndex = min(i + local.batchSize - 1, local.totalFiles)>
+                <cfset local.currentBatch = []>
+                
+                <!--- Criar o lote atual --->
+                <cfloop from="#i#" to="#local.endIndex#" index="j">
+                    <cfset arrayAppend(local.currentBatch, local.filteredFiles[j])>
+                </cfloop>
+                
+                <!--- Processar o lote --->
+                <cfset local.batchResults = processPDFBatch(local.currentBatch, arguments.searchTerms, local.options)>
+                <cfset local.allResults = arrayConcat(local.allResults, local.batchResults)>
+            </cfloop>
+            
+            <!--- Ordenar resultados por relevância --->
+            <cfset local.result.results = sortResultsByRelevance(local.allResults)>
+            <cfset local.result.totalFound = arrayLen(local.result.results)>
             <cfset local.result.searchTime = (getTickCount() - local.startTime) / 1000>
+            
+            <!--- Incluir estatísticas de cache --->
+            <cfif structKeyExists(application, "pdfCacheStats")>
+                <cfset local.result.cacheStats.hits = application.pdfCacheStats.hits>
+                <cfset local.result.cacheStats.misses = application.pdfCacheStats.misses>
+            </cfif>
             
             <cfcatch type="any">
                 <cfset local.result.success = false>
                 <cfset local.result.message = "Erro ao realizar a busca: #cfcatch.message#">
+            </cfcatch>
+        </cftry>
+        
+        <cfreturn serializeJSON(local.result)>
+    </cffunction>
+    
+    <cffunction name="sortResultsByRelevance" access="private" returntype="array" output="false" hint="Ordena os resultados por relevância">
+        <cfargument name="results" type="array" required="true">
+        
+        <cfscript>
+            arraySort(arguments.results, function(a, b) {
+                // Comparar por pontuação de relevância
+                if (structKeyExists(a, "relevanceScore") && structKeyExists(b, "relevanceScore")) {
+                    if (a.relevanceScore > b.relevanceScore) return -1;
+                    if (a.relevanceScore < b.relevanceScore) return 1;
+                }
+                
+                // Se não tiver relevância ou for igual, comparar pelo tamanho dos snippets
+                // Quanto mais snippets, provavelmente mais relevante
+                if (arrayLen(a.snippets) > arrayLen(b.snippets)) return -1;
+                if (arrayLen(a.snippets) < arrayLen(b.snippets)) return 1;
+                
+                return 0;
+            });
+        </cfscript>
+        
+        <cfreturn arguments.results>
+    </cffunction>
+    
+    <cffunction name="getDocumentStats" access="remote" returntype="string" returnformat="json" output="false" hint="Retorna estatísticas de uso de cache e processamento">
+        <cfset local.stats = {
+            cacheHits = application.pdfCacheStats.hits,
+            cacheMisses = application.pdfCacheStats.misses,
+            cacheTotalSaved = application.pdfCacheStats.totalSaved,
+            documentsInCache = structCount(application.pdfTextCache)
+        }>
+        
+        <cfreturn serializeJSON(local.stats)>
+    </cffunction>
+    
+    <cffunction name="clearCache" access="remote" returntype="string" returnformat="json" output="false" hint="Limpa o cache de textos extraídos">
+        <cflock scope="application" timeout="10" type="exclusive">
+            <cfset application.pdfTextCache = {}>
+            <cfset application.pdfCacheStats.hits = 0>
+            <cfset application.pdfCacheStats.misses = 0>
+            <cfset application.pdfCacheStats.totalSaved = 0>
+        </cflock>
+        
+        <cfreturn serializeJSON({success = true, message = "Cache limpo com sucesso"})>
+    </cffunction>
+
+    <!--- Implementação da distribuição inteligente de processamento --->
+    <cffunction name="getPdfComplexityScore" access="remote" returntype="string" returnformat="json" output="false" hint="Analisa a complexidade do documento para determinar onde processar">
+        <cfargument name="filePath" type="string" required="true" hint="Caminho para o arquivo PDF">
+        
+        <cfset local.result = {
+            success = true,
+            complexity = "unknown",
+            size = 0,
+            pageCount = 0,
+            processingRecommendation = "client"
+        }>
+        
+        <cftry>
+            <cfset local.fileInfo = getFileInfo(arguments.filePath)>
+            <cfset local.result.size = local.fileInfo.size>
+            
+            <!--- Obter número de páginas --->
+            <cfpdf action="getInfo" source="#arguments.filePath#" name="local.pdfInfo">
+            <cfset local.result.pageCount = local.pdfInfo.totalpages>
+            
+            <!--- Determinar complexidade baseado em tamanho e número de páginas --->
+            <cfset local.sizeThreshold = 5 * 1024 * 1024> <!--- 5 MB --->
+            <cfset local.pageThreshold = 20> <!--- 20 páginas --->
+            
+            <cfif local.result.size GT local.sizeThreshold OR local.result.pageCount GT local.pageThreshold>
+                <cfset local.result.complexity = "complex">
+                <cfset local.result.processingRecommendation = "server">
+            <cfelse>
+                <cfset local.result.complexity = "simple">
+                <cfset local.result.processingRecommendation = "client">
+            </cfif>
+            
+            <cfcatch type="any">
+                <cfset local.result.success = false>
+                <cfset local.result.message = "Erro ao analisar complexidade: #cfcatch.message#">
+            </cfcatch>
+        </cftry>
+        
+        <cfreturn serializeJSON(local.result)>
+    </cffunction>
+
+    <!--- Função para compartilhar texto extraído de PDFs entre cliente e servidor --->
+    <cffunction name="saveExtractedText" access="remote" returntype="string" returnformat="json" output="false" hint="Salva texto extraído pelo cliente no cache do servidor">
+        <cfargument name="filePath" type="string" required="true" hint="Caminho do arquivo PDF">
+        <cfargument name="text" type="string" required="true" hint="Texto extraído do PDF">
+        <cfargument name="pageCount" type="numeric" required="true" hint="Número de páginas do PDF">
+        
+        <cfset local.result = {
+            success = true,
+            message = "Texto salvo com sucesso"
+        }>
+        
+        <cftry>
+            <cfif not structKeyExists(application, "pdfTextCache")>
+                <cfset init()>
+            </cfif>
+            
+            <cfset local.fileInfo = getFileInfo(arguments.filePath)>
+            <cfset local.cacheKey = arguments.filePath>
+            
+            <cflock scope="application" timeout="5" type="exclusive">
+                <cfset application.pdfTextCache[local.cacheKey] = {
+                    text = arguments.text,
+                    pageCount = arguments.pageCount,
+                    lastModified = local.fileInfo.lastModified,
+                    fileSize = local.fileInfo.size,
+                    extractionTime = 0, <!--- Não temos esta informação quando vem do cliente --->
+                    cachedDate = now(),
+                    source = "client" <!--- Indica que veio do cliente --->
+                }>
+                
+                <!--- Atualizar estatísticas de cache --->
+                <cfset application.pdfCacheStats.totalSaved++>
+            </cflock>
+            
+            <cfcatch type="any">
+                <cfset local.result.success = false>
+                <cfset local.result.message = "Erro ao salvar texto: #cfcatch.message#">
+            </cfcatch>
+        </cftry>
+        
+        <cfreturn serializeJSON(local.result)>
+    </cffunction>
+
+    <!--- Busca em texto já extraído --->
+    <cffunction name="searchInExtractedText" access="remote" returntype="string" returnformat="json" output="false" hint="Busca termos em texto já extraído">
+        <cfargument name="filePath" type="string" required="true" hint="Caminho do arquivo PDF">
+        <cfargument name="searchTerms" type="string" required="true" hint="Termos de busca">
+        <cfargument name="searchOptions" type="string" required="false" default="{}" hint="Opções de busca em formato JSON">
+        
+        <cfset local.result = {
+            success = true,
+            fileName = getFileFromPath(arguments.filePath),
+            filePath = arguments.filePath,
+            found = false,
+            snippets = []
+        }>
+        
+        <cftry>
+            <!--- Verificar se o texto está no cache --->
+            <cfif not structKeyExists(application, "pdfTextCache") OR not structKeyExists(application.pdfTextCache, arguments.filePath)>
+                <cfset local.result.success = false>
+                <cfset local.result.message = "Texto não encontrado no cache">
+                <cfreturn serializeJSON(local.result)>
+            </cfif>
+            
+            <cfset local.options = deserializeJSON(arguments.searchOptions)>
+            <cfset local.cachedEntry = application.pdfTextCache[arguments.filePath]>
+            <cfset local.text = local.cachedEntry.text>
+            
+            <!--- Realizar busca otimizada no texto --->
+            <cfset local.searchResult = performOptimizedSearch(
+                local.text,
+                arguments.searchTerms,
+                local.options
+            )>
+            
+            <cfset local.result.found = local.searchResult.found>
+            <cfset local.result.snippets = local.searchResult.snippets>
+            <cfset local.result.relevanceScore = local.searchResult.relevanceScore>
+            
+            <cfcatch type="any">
+                <cfset local.result.success = false>
+                <cfset local.result.message = "Erro ao buscar no texto: #cfcatch.message#">
             </cfcatch>
         </cftry>
         
@@ -204,26 +337,6 @@
         </cfloop>
         
         <cfreturn local.count>
-    </cffunction>
-
-    <cffunction name="sortResultsByRelevance" access="private" returntype="array" output="false" hint="Ordena os resultados por relevância">
-        <cfargument name="results" type="array" required="true">
-        
-        <cfscript>
-            arraySort(arguments.results, function(a, b) {
-                // Primeiro compara por número de termos encontrados
-                if (a.termsFound > b.termsFound) return -1;
-                if (a.termsFound < b.termsFound) return 1;
-                
-                // Se igual, compara por pontuação de relevância
-                if (a.relevanceScore > b.relevanceScore) return -1;
-                if (a.relevanceScore < b.relevanceScore) return 1;
-                
-                return 0;
-            });
-        </cfscript>
-        
-        <cfreturn arguments.results>
     </cffunction>
 
     <cffunction name="formatFileSize" access="remote" returntype="string" output="false" hint="Formata o tamanho do arquivo para exibição">
