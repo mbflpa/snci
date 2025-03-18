@@ -308,6 +308,72 @@
         .realtime-result-item a.result-link:hover {
             text-decoration: underline;
         }
+        
+        /* Estilos aprimorados para destacar correspondências fuzzy */
+        .fuzzy-match {
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            border-left: 3px solid #17a2b8;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,.05);
+        }
+        
+        .match-info {
+            display: block;
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-style: italic;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px dotted #dee2e6;
+        }
+        
+        .match-info small {
+            color: #28a745;
+            font-weight: 500;
+            background: rgba(40, 167, 69, 0.1);
+            padding: 1px 4px;
+            border-radius: 3px;
+        }
+        
+        .fuzzy-match mark {
+            background-color: rgba(255, 193, 7, 0.4);
+            padding: 2px 3px;
+            border-radius: 3px;
+            font-weight: 500;
+            border-bottom: 1px dashed #fd7e14;
+        }
+        
+        /* Animação para destacar novos termos incluídos na busca */
+        @keyframes highlightNew {
+            from {background-color: rgba(23, 162, 184, 0.2);}
+            to {background-color: transparent;}
+        }
+        
+        .new-term {
+            animation: highlightNew 2s ease-out;
+            border-radius: 2px;
+        }
+
+        /* Estilos para destacar variações de escrita */
+        .spelling-variant-info {
+            display: block;
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-style: italic;
+            margin-bottom: 8px;
+            padding-bottom: 5px;
+            border-bottom: 1px dotted #dee2e6;
+        }
+        
+        .spelling-variant-info::before {
+            content: "\f071";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: #fd7e14;
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed" data-panel-auto-height-mode="height">
@@ -407,29 +473,17 @@
                                             </div>
                                             <div class="col-md-5">
                                                 <div class="form-group">
-                                                    <label class="font-weight-bold text-primary mb-2">Tipo de busca</label>
-                                                    <div class="custom-control custom-radio mb-2">
-                                                        <input type="radio" id="searchTypeExact" name="searchType" value="exact" class="custom-control-input" checked>
-                                                        <label class="custom-control-label" for="searchTypeExact">Busca exata</label>
-                                                        <small class="form-text text-muted">Busca por correspondência exata dos termos</small>
+                                                    <label class="font-weight-bold text-primary mb-2">Opções adicionais</label>
+                                                    <div class="custom-control custom-checkbox mb-2">
+                                                        <input type="checkbox" id="searchUseSynonyms" class="custom-control-input">
+                                                        <label class="custom-control-label" for="searchUseSynonyms">Considerar sinônimos</label>
+                                                        <small class="form-text text-muted">Inclui sinônimos dos termos buscados</small>
                                                     </div>
-                                                    <div class="custom-control custom-radio">
-                                                        <input type="radio" id="searchTypeFuzzy" name="searchType" value="fuzzy" class="custom-control-input">
-                                                        <label class="custom-control-label" for="searchTypeFuzzy">Busca aproximada</label>
-                                                        <small class="form-text text-muted">Encontra termos com grafia similar (útil para erros de digitação)</small>
+                                                    <div class="custom-control custom-checkbox mb-2">
+                                                        <input type="checkbox" id="searchUseSpellingVariants" class="custom-control-input">
+                                                        <label class="custom-control-label" for="searchUseSpellingVariants">Considerar escritas erradas</label>
+                                                        <small class="form-text text-muted">Encontra palavras mesmo com erros de digitação</small>
                                                     </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="fuzzyThreshold">Nível de aproximação</label>
-                                                    <select id="fuzzyThreshold" class="form-control" disabled>
-                                                        <option value="0.0">Muito alta</option>
-                                                        <option value="0.2" selected>Alta</option>
-                                                        <option value="0.4">Média</option>
-                                                        <option value="0.6">Baixa</option>
-                                                    </select>
-                                                    <small class="form-text text-muted">Somente para busca aproximada</small>
-                                                </div>
-                                                <div class="form-group">
                                                     <div class="custom-control custom-checkbox">
                                                         <input type="checkbox" id="searchCaseSensitive" class="custom-control-input">
                                                         <label class="custom-control-label" for="searchCaseSensitive">Diferenciar maiúsculas/minúsculas</label>
@@ -510,7 +564,7 @@
                                                     keyTimes="0; 0.3; 0.7; 1" 
                                                     dur="1.5s" 
                                                     repeatCount="indefinite" 
-                                                    id="opacityAnimation"
+                                                    id="opacityAnimation" 
                                                     begin="indefinite" />
                                             </use>
                                             <use href="#scanLine" x="227" y="45">
@@ -535,7 +589,7 @@
                                     </svg>
                                 </div>
                                 <p class="mt-3 lead">Procurando nos documentos. Isso pode levar alguns instantes...</p>
-                                                
+                                
                                 <!-- Barra de progresso e status -->
                                 <div class="progress pdf-progress mx-auto" style="width:70%; height: 8px;">
                                     <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" id="processingProgress" role="progressbar" style="width: 0%"></div>
@@ -546,12 +600,12 @@
                                         <i class="fas fa-times mr-1"></i> Cancelar busca
                                     </button>
                                 </div>
-                                </div>
-                                <!-- Container para resultados em tempo real com links clicáveis -->
-                                <div id="realTimeResults" class="mt-4">
-                                    <h5 class="border-bottom pb-2">Resultados encontrados até o momento:</h5>
-                                    <div id="realTimeResultsList" class="text-left"></div>
-                                </div>
+                            </div>
+                            
+                            <!-- Container para resultados em tempo real com links clicáveis -->
+                            <div id="realTimeResults" class="mt-4">
+                                <h5 class="border-bottom pb-2">Resultados encontrados até o momento:</h5>
+                                <div id="realTimeResultsList" class="text-left"></div>
                             </div>
                             <!-- Alerta quando não há resultados -->
                             <div id="noResultsAlert" class="alert alert-warning" style="display:none;">
@@ -590,10 +644,10 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Lista de resultados -->
-                            <div class="search-results" id="searchResults" style="padding:0 10px 10px!important"></div>
                         </div>
+                        
+                        <!-- Lista de resultados -->
+                        <div class="search-results" id="searchResults" style="padding:0 10px 10px!important"></div>
                     </div>
                 </div>
             </section>
@@ -608,7 +662,7 @@
                 <div class="modal-body text-center">
                     <div class="spinner-border text-primary mb-2" role="status">
                         <span class="sr-only">Carregando...</span>
-                    </div>
+                    </div>   
                     <p>Aguarde...</p>
                 </div>
             </div>
@@ -630,7 +684,6 @@
         }
     </script>
     
-    <script src="plugins/fuse/fuse.min.js"></script>
     <script src="dist/js/snciProcessos_buscaPDF.js"></script>
     
     <script>
@@ -646,15 +699,6 @@
                     $('#proximityOptionsGroup').slideDown(200);
                 } else {
                     $('#proximityOptionsGroup').slideUp(200);
-                }
-                
-                // Quando "Frase Exata" for selecionado, desabilitar a opção de busca aproximada
-                if ($(this).val() === 'exact') {
-                    $('#searchTypeFuzzy').prop('disabled', true);
-                    $('#searchTypeExact').prop('checked', true);
-                    $('#fuzzyThreshold').prop('disabled', true);
-                } else {
-                    $('#searchTypeFuzzy').prop('disabled', false);
                 }
             });
             

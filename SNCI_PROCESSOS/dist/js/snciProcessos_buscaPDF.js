@@ -35,14 +35,15 @@ const PdfSearchManager = {
       return;
     }
 
-    // Obter as opções de busca selecionadas
+    // Obter as opções de busca selecionadas - ATUALIZADO
     const searchOptions = {
       mode: $('input[name="searchMode"]:checked').val() || "or", // or, exact, proximity
-      type: $('input[name="searchType"]:checked').val() || "exact", // exact, fuzzy
-      fuzzyThreshold: parseFloat($("#fuzzyThreshold").val() || "0.2"),
+      // Novas opções simplificadas
+      useSynonyms: $("#searchUseSynonyms").is(":checked"),
+      useSpellingVariants: $("#searchUseSpellingVariants").is(":checked"),
       caseSensitive: $("#searchCaseSensitive").is(":checked"),
       proximityDistance: parseInt($("#proximityDistance").val() || "20"),
-      showHighlights: $("#showHighlights").is(":checked"),
+      showHighlights: true,
     };
 
     // NOVO: incluir o ano e o texto do título, se informado
@@ -220,6 +221,33 @@ const PdfSearchManager = {
         let found = false;
         let snippets = [];
 
+        // Expandir termos com sinônimos, se essa opção estiver marcada
+        let expandedTerms = searchTerms;
+        if (searchOptions.useSynonyms) {
+          // Obter sinônimos para os termos de busca
+          const terms = searchTerms.split(" ").filter((t) => t.length >= 3);
+          const allTerms = new Set(terms);
+
+          // Adicionar sinônimos para cada termo, respeitando case sensitivity
+          terms.forEach((term) => {
+            const synonyms = this.getSynonyms(term);
+
+            // Adicionar sinônimos com o case apropriado
+            synonyms.forEach((syn) => {
+              if (searchOptions.caseSensitive) {
+                // Se precisamos diferenciar maiúsculas/minúsculas, aplicar o mesmo case do termo original
+                allTerms.add(this.matchCase(syn, term));
+              } else {
+                // Caso contrário, adiciona normalmente
+                allTerms.add(syn);
+              }
+            });
+          });
+
+          expandedTerms = Array.from(allTerms).join(" ");
+          console.log("Termos expandidos com sinônimos:", expandedTerms);
+        }
+
         // Processar páginas sequencialmente
         for (let i = 1; i <= pageCount; i++) {
           // Verificar cancelamento a cada página
@@ -239,17 +267,30 @@ const PdfSearchManager = {
 
           if (searchOptions.mode === "exact") {
             // Modo de frase exata
-            pageSearchResult = this.searchExactPhrase(pageText, searchTerms);
+            pageSearchResult = this.searchExactPhrase(
+              pageText,
+              searchTerms,
+              searchOptions
+            );
           } else if (searchOptions.mode === "proximity") {
             // Modo de proximidade
             const words = searchTerms
               .split(" ")
               .filter((term) => term.length >= 3);
             const proximity = parseInt(searchOptions.proximityDistance);
-            pageSearchResult = this.searchProximity(pageText, words, proximity);
+            pageSearchResult = this.searchProximity(
+              pageText,
+              words,
+              proximity,
+              searchOptions
+            );
           } else {
             // Modo "OU" (padrão)
-            pageSearchResult = this.searchAnyTerm(pageText, searchTerms);
+            pageSearchResult = this.searchAnyTerm(
+              pageText,
+              expandedTerms,
+              searchOptions
+            );
           }
 
           // Se encontrou na página atual
@@ -679,12 +720,12 @@ const PdfSearchManager = {
     });
   },
   // Destacar termo em um texto
-  highlightSearchTerm: function (text, term) {
+  highlightSearchTerm: function (text, term, searchOptions) {
     if (!text || !term) return text;
     try {
-      // Escapa caracteres especiais para uso em regex
+      const flags = searchOptions && searchOptions.caseSensitive ? "g" : "gi";
       const escapedTerm = this.escapeRegExp(term);
-      const regex = new RegExp(`(${escapedTerm})`, "gi");
+      const regex = new RegExp(`(${escapedTerm})`, flags);
       return text.replace(regex, "<mark>$1</mark>");
     } catch (e) {
       console.error("Erro ao destacar termos:", e);
@@ -693,12 +734,12 @@ const PdfSearchManager = {
   },
 
   // Adicionar nova função para destacar frase exata
-  highlightSearchPhrase: function (text, phrase) {
+  highlightSearchPhrase: function (text, phrase, searchOptions) {
     if (!text || !phrase) return text;
     try {
-      // Escapa caracteres especiais para uso em regex
+      const flags = searchOptions && searchOptions.caseSensitive ? "g" : "gi";
       const escapedPhrase = this.escapeRegExp(phrase);
-      const regex = new RegExp(`(${escapedPhrase})`, "gi");
+      const regex = new RegExp(`(${escapedPhrase})`, flags);
       return text.replace(regex, "<mark>$1</mark>");
     } catch (e) {
       console.error("Erro ao destacar frase:", e);
@@ -707,13 +748,14 @@ const PdfSearchManager = {
   },
 
   // Função aprimorada para destacar todas as palavras pesquisadas
-  highlightAllSearchTerms: function (text, terms) {
+  highlightAllSearchTerms: function (text, terms, caseSensitive) {
     if (!text || !terms || !terms.length) return text;
 
     let highlightedText = text;
     terms.forEach((term) => {
       if (term.length >= 3) {
-        const regex = new RegExp(`(${escapeRegExp(term)})`, "gi");
+        const flags = caseSensitive ? "g" : "gi";
+        const regex = new RegExp(`(${this.escapeRegExp(term)})`, flags);
         highlightedText = highlightedText.replace(regex, "<mark>$1</mark>");
       }
     });
@@ -731,44 +773,53 @@ const PdfSearchManager = {
   },
 
   // Função para verificar proximidade entre palavras
-  checkProximity: function (text, words, proximity) {
+  checkProximity: function (text, words, proximity, caseSensitive) {
     // Se proximidade for -1, significa "Em qualquer parte"
     if (proximity === -1) {
-      return words.every((word) =>
-        text.toLowerCase().includes(word.toLowerCase())
-      );
-    }
-    // Dividir o texto em palavras
-    const textWords = text.trim().split(/\s+/);
-    for (let i = 0; i < textWords.length; i++) {
-      // Verificar se a primeira palavra está presente
-      if (textWords[i].toLowerCase().includes(words[0].toLowerCase())) {
-        // Verificar se todas as outras palavras estão dentro da proximidade especificada
-        let allFound = true;
-        for (let j = 1; j < words.length; j++) {
-          let found = false;
-          // Verificar nas próximas 'proximity' palavras
-          for (
-            let k = i + 1;
-            k < Math.min(i + proximity + 1, textWords.length);
-            k++
-          ) {
-            if (textWords[k].toLowerCase().includes(words[j].toLowerCase())) {
-              found = true;
+      return words.every((word) => {
+        return text.toLowerCase().includes(word.toLowerCase());
+      });
+    } else {
+      // Dividir o texto em palavras
+      const textWords = text.trim().split(/\s+/);
+      for (let i = 0; i < textWords.length; i++) {
+        // Verificar se a primeira palavra está presente, respeitando case sensitivity
+        if (
+          caseSensitive
+            ? textWords[i].includes(words[0])
+            : textWords[i].toLowerCase().includes(words[0].toLowerCase())
+        ) {
+          // Verificar se todas as outras palavras estão dentro da proximidade especificada
+          let allFound = true;
+          for (let j = 1; j < words.length; j++) {
+            let found = false;
+            // Verificar nas próximas 'proximity' palavras
+            for (
+              let k = i + 1;
+              k < Math.min(i + proximity + 1, textWords.length);
+              k++
+            ) {
+              if (
+                caseSensitive
+                  ? textWords[k].includes(words[j])
+                  : textWords[k].toLowerCase().includes(words[j].toLowerCase())
+              ) {
+                found = true;
+                break;
+              }
+            }
+            if (!found) {
+              allFound = false;
               break;
             }
           }
-          if (!found) {
-            allFound = false;
-            break;
+          if (allFound) {
+            return true;
           }
         }
-        if (allFound) {
-          return true;
-        }
       }
+      return false;
     }
-    return false;
   },
 
   // Formata os snippets para exibição
@@ -776,7 +827,6 @@ const PdfSearchManager = {
     if (!snippets || snippets.length === 0) {
       return '<p class="text-muted">Sem prévia disponível</p>';
     }
-
     return snippets
       .map((snippet) => `<div class="snippet">${snippet}</div>`)
       .join("");
@@ -791,7 +841,6 @@ const PdfSearchManager = {
   ) {
     $("#searchLoading").hide();
     $("#realTimeResults").hide();
-
     // Se não há resultados
     if (this.currentSearchResults.length === 0) {
       $("#noResultsAlert").show();
@@ -802,7 +851,6 @@ const PdfSearchManager = {
       );
       return;
     }
-
     // Atualizar apenas as estatísticas, pois os resultados já foram inseridos
     $("#searchStats").text(
       `${this.currentSearchResults.length} resultado${
@@ -845,18 +893,15 @@ const PdfSearchManager = {
       const filteredSearches = recentSearches.filter(
         (term) => term.toLowerCase() !== searchTerms.toLowerCase()
       );
-
       // Manter apenas as 5 pesquisas mais recentes
       filteredSearches.unshift(searchTerms);
       if (filteredSearches.length > 5) {
         filteredSearches.length = 5;
       }
-
       localStorage.setItem(
         "recentFaqSearches",
         JSON.stringify(filteredSearches)
       );
-
       // Atualizar UI
       this.loadRecentSearches();
     } catch (e) {
@@ -874,12 +919,10 @@ const PdfSearchManager = {
       // Limpar e atualizar container
       const container = $("#recentSearchesContainer");
       container.empty();
-
       if (recentSearches.length === 0) return;
 
       let html =
         '<div class="mt-2"><small class="text-muted">Buscas recentes: </small>';
-
       recentSearches.forEach((term) => {
         html += `
           <a href="javascript:void(0)" class="badge badge-light mr-1" 
@@ -889,7 +932,6 @@ const PdfSearchManager = {
              )}')">${term}</a>
         `;
       });
-
       html += `
         <button class="btn btn-link btn-sm text-muted px-0 ml-2" 
                 onclick="PdfSearchManager.clearRecentSearches()">
@@ -1148,26 +1190,89 @@ const PdfSearchManager = {
     });
   },
 
-  // Função para busca exata em texto, retorna resultado preciso para extração sequencial
-  searchExactPhrase: function (text, phrase) {
+  // Função otimizada para busca "OR", para uso com extração sequencial
+  searchAnyTerm: function (text, searchTerms, searchOptions) {
     const result = {
       found: false,
       snippets: [],
     };
+    if (!text || !searchTerms) return result;
+    const terms = searchTerms.split(" ").filter((term) => term.length >= 3);
+    if (terms.length === 0) return result;
 
+    // Se a opção de considerar escritas erradas estiver ativada
+    if (searchOptions && searchOptions.useSpellingVariants) {
+      return this.searchWithSpellingVariants(text, terms, searchOptions);
+    }
+
+    // Para cada termo, verificar se está presente no texto
+    for (const term of terms) {
+      // Aplicar caso sensitivo se configurado
+      const flags = searchOptions && searchOptions.caseSensitive ? "g" : "gi";
+
+      // Modificação: Usar expressão regular com limites de palavra (\b) para garantir
+      // que encontre apenas palavras inteiras, não substrings
+      const regex = new RegExp(`\\b${this.escapeRegExp(term)}\\b`, flags);
+
+      const matches = text.match(regex);
+
+      if (matches && matches.length > 0) {
+        result.found = true;
+
+        // Adicionar apenas um snippet para o primeiro termo encontrado (otimização)
+        // Também usar a nova expressão regular com limites de palavra para encontrar o índice
+        const searchRegex =
+          searchOptions && searchOptions.caseSensitive
+            ? new RegExp(`\\b${this.escapeRegExp(term)}\\b`, "g")
+            : new RegExp(`\\b${this.escapeRegExp(term)}\\b`, "gi");
+
+        let match = searchRegex.exec(text);
+        if (match) {
+          const firstIndex = match.index;
+          const start = Math.max(0, firstIndex - 200);
+          const end = Math.min(text.length, firstIndex + term.length + 200);
+          let snippet = text.substring(start, end);
+
+          if (start > 0) snippet = "..." + snippet;
+          if (end < text.length) snippet += "...";
+
+          snippet = this.highlightSearchTerm(snippet, term, searchOptions);
+          result.snippets.push(snippet);
+          break; // Sai do loop após encontrar o primeiro termo
+        }
+      }
+    }
+    return result;
+  },
+
+  // Função para busca exata em texto, retorna resultado preciso para extração sequencial
+  searchExactPhrase: function (text, phrase, searchOptions) {
+    const result = {
+      found: false,
+      snippets: [],
+    };
     phrase = phrase.trim();
     if (phrase.length < 3 || !text) return result;
 
     try {
+      // Aplicar caso sensitivo se configurado
+      const flags = searchOptions && searchOptions.caseSensitive ? "g" : "gi";
       const escapedPhrase = this.escapeRegExp(phrase);
-      const regex = new RegExp(escapedPhrase, "gi");
+
+      // Não use limites de palavra aqui, pois estamos procurando uma frase exata
+      const regex = new RegExp(escapedPhrase, flags);
       const matches = text.match(regex);
 
       if (matches && matches.length > 0) {
         result.found = true;
 
         // Limitar a 1 snippet por página para otimizar
-        const firstIndex = text.toLowerCase().indexOf(phrase.toLowerCase());
+        // Usar indexOf respeitando a sensibilidade de caso
+        const firstIndex =
+          searchOptions && searchOptions.caseSensitive
+            ? text.indexOf(phrase)
+            : text.toLowerCase().indexOf(phrase.toLowerCase());
+
         if (firstIndex !== -1) {
           const start = Math.max(0, firstIndex - 200);
           const end = Math.min(text.length, firstIndex + phrase.length + 200);
@@ -1176,33 +1281,38 @@ const PdfSearchManager = {
           if (start > 0) snippet = "..." + snippet;
           if (end < text.length) snippet += "...";
 
-          snippet = this.highlightSearchPhrase(snippet, phrase);
+          snippet = this.highlightSearchPhrase(snippet, phrase, searchOptions);
           result.snippets.push(snippet);
         }
       }
     } catch (e) {
       console.error("Erro ao buscar frase exata:", e);
     }
-
     return result;
   },
 
   // Função otimizada para busca de proximidade, para uso com extração sequencial
-  searchProximity: function (text, words, proximity) {
+  searchProximity: function (text, words, proximity, searchOptions) {
     const result = {
       found: false,
       snippets: [],
     };
-
     if (!words || words.length === 0 || !text) return result;
 
     // Verificar proximidade entre palavras
-    result.found = checkProximity(text, words, proximity);
-
+    result.found = this.checkProximity(
+      text,
+      words,
+      proximity,
+      searchOptions && searchOptions.caseSensitive
+    );
     if (result.found) {
       // Criar único snippet por página para otimização
       const firstWord = words[0];
-      const firstIndex = text.toLowerCase().indexOf(firstWord.toLowerCase());
+      const firstIndex =
+        searchOptions && searchOptions.caseSensitive
+          ? text.indexOf(firstWord)
+          : text.toLowerCase().indexOf(firstWord.toLowerCase());
 
       if (firstIndex !== -1) {
         const start = Math.max(0, firstIndex - 200);
@@ -1212,115 +1322,774 @@ const PdfSearchManager = {
         if (start > 0) snippet = "..." + snippet;
         if (end < text.length) snippet += "...";
 
-        snippet = highlightAllSearchTerms(snippet, words);
+        snippet = this.highlightAllSearchTerms(
+          snippet,
+          words,
+          searchOptions && searchOptions.caseSensitive
+        );
         result.snippets.push(snippet);
       }
     }
-
     return result;
   },
 
-  // Função otimizada para busca "OR", para uso com extração sequencial
-  searchAnyTerm: function (text, searchTerms) {
+  // Versão corrigida da função de busca aproximada para respeitar case sensitivity
+  searchWithSpellingVariants: function (text, terms, searchOptions) {
     const result = {
       found: false,
       snippets: [],
     };
 
-    if (!text || !searchTerms) return result;
+    if (!text || terms.length === 0) return result;
 
-    const terms = searchTerms.split(" ").filter((term) => term.length >= 3);
-    if (terms.length === 0) return result;
-
-    // Para cada termo, verificar se está presente no texto
+    // Para cada termo, verificar variações comuns de escrita
     for (const term of terms) {
-      const regex = new RegExp(this.escapeRegExp(term), "gi");
-      const matches = text.match(regex);
+      if (term.length < 3) continue;
 
-      if (matches && matches.length > 0) {
+      // Gerar variações comuns de escrita para o termo (respeitando case sensitivity)
+      const variants = this.getSpellingVariants(
+        term,
+        searchOptions.caseSensitive
+      );
+      let termFound = false;
+      let firstIndex = -1;
+      let matchedVariant = "";
+
+      // Se não precisamos diferenciar maiúsculas/minúsculas, usar toLowerCase para facilitar comparação
+      const searchText = searchOptions.caseSensitive
+        ? text
+        : text.toLowerCase();
+      const searchTerm = searchOptions.caseSensitive
+        ? term
+        : term.toLowerCase();
+
+      // Verificar o termo original primeiro
+      if (searchOptions.caseSensitive) {
+        // Busca exata respeitando maiúsculas/minúsculas
+        const regex = new RegExp(this.escapeRegExp(term), "g");
+        const matches = text.match(regex);
+
+        if (matches && matches.length > 0) {
+          termFound = true;
+          matchedVariant = term;
+          firstIndex = text.indexOf(term);
+        }
+      } else {
+        // Busca case-insensitive
+        const regex = new RegExp(this.escapeRegExp(term), "gi");
+        const matches = text.match(regex);
+
+        if (matches && matches.length > 0) {
+          termFound = true;
+          matchedVariant = matches[0]; // Usar o texto encontrado para preservar o case original no documento
+          firstIndex = text.toLowerCase().indexOf(term.toLowerCase());
+        }
+      }
+
+      // Se não encontrou o termo original, tentar variações
+      if (!termFound) {
+        for (const variant of variants) {
+          if (searchOptions.caseSensitive) {
+            // Busca exata com case sensitive
+            const regex = new RegExp(this.escapeRegExp(variant), "g");
+            const matches = text.match(regex);
+
+            if (matches && matches.length > 0) {
+              termFound = true;
+              matchedVariant = variant;
+              firstIndex = text.indexOf(variant);
+              break;
+            }
+          } else {
+            // Busca case insensitive
+            const regex = new RegExp(this.escapeRegExp(variant), "gi");
+            const matches = text.match(regex);
+
+            if (matches && matches.length > 0) {
+              termFound = true;
+              matchedVariant = matches[0]; // Preservar o case encontrado no texto
+              firstIndex = text.toLowerCase().indexOf(variant.toLowerCase());
+              break;
+            }
+          }
+        }
+      }
+
+      // Se encontrou o termo ou alguma variante
+      if (termFound && firstIndex !== -1) {
         result.found = true;
 
-        // Adicionar apenas um snippet para o primeiro termo encontrado (otimização)
-        const firstIndex = text.toLowerCase().indexOf(term.toLowerCase());
+        const start = Math.max(0, firstIndex - 200);
+        const end = Math.min(
+          text.length,
+          firstIndex + matchedVariant.length + 200
+        );
+        let snippet = text.substring(start, end);
 
-        if (firstIndex !== -1) {
-          const start = Math.max(0, firstIndex - 200);
-          const end = Math.min(text.length, firstIndex + term.length + 200);
-          let snippet = text.substring(start, end);
+        if (start > 0) snippet = "..." + snippet;
+        if (end < text.length) snippet += "...";
 
-          if (start > 0) snippet = "..." + snippet;
-          if (end < text.length) snippet += "...";
+        // Destacar o termo encontrado
+        snippet = this.highlightSearchTerm(
+          snippet,
+          matchedVariant,
+          searchOptions
+        );
 
-          snippet = this.highlightSearchTerm(snippet, term);
-          result.snippets.push(snippet);
-          break; // Sai do loop após encontrar o primeiro termo
+        // Se foi encontrada uma variante diferente do termo original, adicionar informação
+        if (matchedVariant.toLowerCase() !== term.toLowerCase()) {
+          snippet =
+            `<div class="spelling-variant-info">Termo buscado: "${term}" - Encontrado: "${matchedVariant}"</div>` +
+            snippet;
         }
+
+        result.snippets.push(snippet);
+        break; // Sai do loop após encontrar o primeiro termo
       }
     }
 
     return result;
   },
+
+  // Função modificada para gerar variações de escrita respeitando case sensitivity
+  getSpellingVariants: function (term, caseSensitive) {
+    const variants = new Set();
+    // Determinar o termo base para gerar variações
+    const baseTerm = caseSensitive ? term : term.toLowerCase();
+
+    // Gerar as variantes sempre em minúsculas para processamento interno
+    const lowerTerm = term.toLowerCase();
+
+    // Erros comuns em português
+    // 1. Troca de 's' por 'z' e vice-versa
+    if (lowerTerm.includes("s")) {
+      const variant = lowerTerm.replace(/s/g, "z");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+    if (lowerTerm.includes("z")) {
+      const variant = lowerTerm.replace(/z/g, "s");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+
+    // 2. Troca de 'ç' por 'ss' e vice-versa
+    if (lowerTerm.includes("ç")) {
+      const variant = lowerTerm.replace(/ç/g, "ss");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+    if (lowerTerm.includes("ss")) {
+      const variant = lowerTerm.replace(/ss/g, "ç");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+
+    // 3. Troca de 'x' por 'ch' e vice-versa
+    if (lowerTerm.includes("x")) {
+      const variant = lowerTerm.replace(/x/g, "ch");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+    if (lowerTerm.includes("ch")) {
+      const variant = lowerTerm.replace(/ch/g, "x");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+
+    // 4. Troca de 'g' por 'j' em algumas combinações
+    if (lowerTerm.includes("ge")) {
+      const variant = lowerTerm.replace(/ge/g, "je");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+    if (lowerTerm.includes("gi")) {
+      const variant = lowerTerm.replace(/gi/g, "ji");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+    if (lowerTerm.includes("je")) {
+      const variant = lowerTerm.replace(/je/g, "ge");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+    if (lowerTerm.includes("ji")) {
+      const variant = lowerTerm.replace(/ji/g, "gi");
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+
+    // 5. Remoção ou adição de 'h' no início
+    if (lowerTerm.startsWith("h")) {
+      const variant = lowerTerm.substring(1);
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    } else {
+      const variant = "h" + lowerTerm;
+      variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+    }
+
+    // 6. Variações de acentuação
+    const accentMap = {
+      á: "a",
+      à: "a",
+      â: "a",
+      ã: "a",
+      é: "e",
+      ê: "e",
+      í: "i",
+      ó: "o",
+      ô: "o",
+      õ: "o",
+      ú: "u",
+      ü: "u",
+    };
+
+    let noAccents = lowerTerm;
+    for (const [accented, plain] of Object.entries(accentMap)) {
+      if (lowerTerm.includes(accented)) {
+        noAccents = noAccents.replace(new RegExp(accented, "g"), plain);
+      }
+    }
+
+    if (noAccents !== lowerTerm) {
+      variants.add(caseSensitive ? this.matchCase(noAccents, term) : noAccents);
+    }
+
+    // 7. Duplicação ou remoção de letras duplas comuns
+    const doubleLetters = ["r", "s", "l", "m", "n", "p", "c", "f"];
+    for (const letter of doubleLetters) {
+      const double = letter + letter;
+      if (lowerTerm.includes(double)) {
+        const variant = lowerTerm.replace(new RegExp(double, "g"), letter);
+        variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+      } else if (lowerTerm.includes(letter)) {
+        // Verificar se não é no início ou fim da palavra
+        const pos = lowerTerm.indexOf(letter);
+        if (pos > 0 && pos < lowerTerm.length - 1) {
+          const variant =
+            lowerTerm.substring(0, pos) +
+            letter +
+            letter +
+            lowerTerm.substring(pos + 1);
+          variants.add(caseSensitive ? this.matchCase(variant, term) : variant);
+        }
+      }
+    }
+
+    return Array.from(variants);
+  },
+
+  // Nova função para fazer uma variante respeitar o mesmo padrão de maiúsculas/minúsculas do termo original
+  matchCase: function (variant, original) {
+    // Se o termo original é todo maiúsculo, retorna a variante em maiúsculo
+    if (original === original.toUpperCase()) {
+      return variant.toUpperCase();
+    }
+
+    // Se o termo original é todo minúsculo, retorna a variante em minúsculo
+    if (original === original.toLowerCase()) {
+      return variant.toLowerCase();
+    }
+
+    // Se o termo original tem a primeira letra maiúscula, faz o mesmo na variante
+    if (
+      original[0] === original[0].toUpperCase() &&
+      original.slice(1) === original.slice(1).toLowerCase()
+    ) {
+      return variant.charAt(0).toUpperCase() + variant.slice(1).toLowerCase();
+    }
+
+    // Caso contrário, tenta fazer um match caractere por caractere
+    let result = "";
+    for (let i = 0; i < variant.length; i++) {
+      // Se o índice está dentro do original, usa o mesmo case
+      if (i < original.length) {
+        const isUpper = original[i] === original[i].toUpperCase();
+        result += isUpper ? variant[i].toUpperCase() : variant[i].toLowerCase();
+      } else {
+        // Para caracteres extras, mantém o original
+        result += variant[i];
+      }
+    }
+    return result;
+  },
+
+  // Buscar sinônimos para os termos de busca
+  getSynonyms: function (term) {
+    // Dicionário simples de sinônimos em português
+    const synonymsDict = {
+      // Termos originais ampliados
+      processo: [
+        "ação",
+        "procedimento",
+        "causa",
+        "caso",
+        "autos",
+        "feito",
+        "litígio",
+        "demanda",
+        "pleito",
+        "lide",
+      ],
+      cliente: [
+        "usuário",
+        "consumidor",
+        "freguês",
+        "comprador",
+        "contratante",
+        "beneficiário",
+        "interessado",
+        "parte",
+        "assistido",
+        "constituinte",
+      ],
+      documento: [
+        "arquivo",
+        "comprovante",
+        "papel",
+        "certificado",
+        "anexo",
+        "registro",
+        "escritura",
+        "formulário",
+        "instrumento",
+        "petição",
+        "documentação",
+      ],
+      pagamento: [
+        "quitação",
+        "liquidação",
+        "remuneração",
+        "depósito",
+        "honorário",
+        "adimplemento",
+        "transferência",
+        "parcela",
+        "prestação",
+        "valor",
+        "débito",
+        "crédito",
+      ],
+      contrato: [
+        "acordo",
+        "convênio",
+        "tratado",
+        "compromisso",
+        "pacto",
+        "convenção",
+        "negócio",
+        "termo",
+        "ajuste",
+        "instrumento",
+        "escritura",
+        "avença",
+      ],
+      prazo: [
+        "período",
+        "termo",
+        "data",
+        "duração",
+        "tempo",
+        "vencimento",
+        "limite",
+        "cronograma",
+        "lapso temporal",
+        "intervalo",
+        "dilação",
+        "prorrogação",
+      ],
+      judicial: [
+        "jurídico",
+        "legal",
+        "forense",
+        "jurisdicional",
+        "processual",
+        "judicante",
+        "judiciário",
+        "judicativo",
+        "contencioso",
+        "litigioso",
+      ],
+      advogado: [
+        "defensor",
+        "procurador",
+        "causídico",
+        "representante",
+        "patrono",
+        "constituído",
+        "jurista",
+        "bacharel",
+        "profissional",
+        "consultor",
+      ],
+      serviço: [
+        "atendimento",
+        "prestação",
+        "trabalho",
+        "atividade",
+        "tarefa",
+        "função",
+        "assistência",
+        "auxílio",
+        "suporte",
+        "apoio",
+        "consultoria",
+      ],
+      recurso: [
+        "apelação",
+        "contestação",
+        "impugnação",
+        "agravo",
+        "embargos",
+        "revisão",
+        "reclamação",
+        "remédio processual",
+        "inconformismo",
+        "insurgência",
+      ],
+
+      // Novos termos relacionados a processos
+      sentença: [
+        "decisão",
+        "julgamento",
+        "veredicto",
+        "deliberação",
+        "acórdão",
+        "pronunciamento",
+        "despacho",
+        "provimento",
+        "resolução",
+      ],
+      audiência: [
+        "sessão",
+        "julgamento",
+        "encontro",
+        "debate",
+        "conferência",
+        "reunião",
+        "oitiva",
+        "conciliação",
+        "mediação",
+      ],
+      juiz: [
+        "magistrado",
+        "julgador",
+        "autoridade",
+        "entrada",
+        "recibo",
+        "comprovante",
+        "numeração",
+        "cadastro",
+        "recepção",
+      ],
+      certidão: [
+        "atestado",
+        "declaração",
+        "comprovante",
+        "documento",
+        "certificado",
+        "confirmação",
+        "prova",
+      ],
+      custas: [
+        "despesas",
+        "gastos",
+        "valores",
+        "taxas",
+        "emolumentos",
+        "dispêndios",
+        "pagamentos",
+      ],
+      relatório: [
+        "informe",
+        "parecer",
+        "exposição",
+        "relato",
+        "descrição",
+        "memorial",
+        "resumo",
+        "síntese",
+      ],
+      ofício: [
+        "comunicação",
+        "documento",
+        "correspondência",
+        "expediente",
+        "missiva",
+        "nota",
+        "informação",
+      ],
+
+      // NOVOS TERMOS - Inspeções
+      inspeção: [
+        "fiscalização",
+        "vistoria",
+        "verificação",
+        "exame",
+        "averiguação",
+        "perícia",
+        "checagem",
+        "auditoria",
+        "monitoramento",
+        "avaliação",
+      ],
+      fiscalização: [
+        "supervisão",
+        "controle",
+        "vigilância",
+        "inspeção",
+        "acompanhamento",
+        "monitoramento",
+        "verificação",
+        "conferência",
+        "vistoria",
+      ],
+      vistoria: [
+        "exame",
+        "inspeção",
+        "verificação",
+        "avaliação",
+        "checagem",
+        "visita técnica",
+        "análise presencial",
+        "perícia",
+        "conferência local",
+      ],
+
+      // NOVOS TERMOS - Auditorias
+      auditoria: [
+        "verificação",
+        "exame",
+        "análise",
+        "perícia",
+        "revisão",
+        "avaliação",
+        "controle",
+        "fiscalização",
+        "investigação",
+        "apuração",
+      ],
+      controle: [
+        "supervisão",
+        "monitoramento",
+        "acompanhamento",
+        "fiscalização",
+        "gestão",
+        "verificação",
+        "regulação",
+        "inspeção",
+        "vigilância",
+      ],
+      conformidade: [
+        "adequação",
+        "cumprimento",
+        "observância",
+        "adesão",
+        "obediência",
+        "alinhamento",
+        "regularidade",
+        "consonância",
+        "legalidade",
+        "compliance",
+      ],
+
+      // NOVOS TERMOS - Leis
+      lei: [
+        "legislação",
+        "norma",
+        "regra",
+        "regulamento",
+        "decreto",
+        "estatuto",
+        "código",
+        "dispositivo legal",
+        "preceito",
+        "disposição legal",
+      ],
+      legislação: [
+        "leis",
+        "normas",
+        "regulamentos",
+        "códigos",
+        "decretos",
+        "estatutos",
+        "ordenamento jurídico",
+        "regras",
+        "sistema legal",
+        "direito positivo",
+      ],
+      regulamento: [
+        "norma",
+        "instrução",
+        "diretriz",
+        "portaria",
+        "resolução",
+        "deliberação",
+        "regra",
+        "disposição",
+        "ordenação",
+        "estatuto",
+      ],
+      decreto: [
+        "determinação",
+        "ordem",
+        "decisão",
+        "ato",
+        "deliberação",
+        "resolução",
+        "disposição",
+        "regulamentação",
+        "ordenação",
+      ],
+
+      // NOVOS TERMOS - Órgãos Públicos
+      ministério: [
+        "pasta",
+        "órgão",
+        "secretaria",
+        "departamento",
+        "entidade governamental",
+        "instituição pública",
+        "autarquia",
+        "setor público",
+      ],
+      agência: [
+        "órgão",
+        "entidade",
+        "instituição",
+        "autarquia",
+        "departamento",
+        "repartição",
+        "setor",
+        "organismo",
+        "unidade",
+      ],
+      secretaria: [
+        "departamento",
+        "seção",
+        "diretoria",
+        "divisão",
+        "coordenadoria",
+        "assessoria",
+        "gerência",
+        "superintendência",
+      ],
+      autarquia: [
+        "entidade",
+        "órgão",
+        "instituição",
+        "organismo",
+        "repartição",
+        "departamento",
+        "agência",
+        "fundação",
+      ],
+
+      // NOVOS TERMOS - Correios do Brasil
+      correios: [
+        "ECT",
+        "empresa brasileira de correios e telégrafos",
+        "serviço postal",
+        "agência postal",
+        "serviço de encomendas",
+        "postal",
+      ],
+      correspondência: [
+        "carta",
+        "comunicação",
+        "documento",
+        "ofício",
+        "notificação",
+        "aviso",
+        "comunicado",
+        "expediente",
+        "missiva",
+        "mensagem",
+      ],
+      entrega: [
+        "remessa",
+        "envio",
+        "despacho",
+        "distribuição",
+        "expedição",
+        "transporte",
+        "transmissão",
+        "postagem",
+        "encaminhamento",
+      ],
+      postal: [
+        "carteiro",
+        "agência",
+        "serviço de correios",
+        "malote",
+        "correspondência",
+        "entrega",
+        "ECT",
+        "logística postal",
+        "mala direta",
+      ],
+
+      // NOVOS TERMOS - Específicos do contexto
+      malote: [
+        "remessa",
+        "pacote",
+        "encomenda",
+        "volume",
+        "valise",
+        "saco de documentos",
+        "bolsa",
+        "transportadora",
+        "expedição",
+      ],
+      rastreamento: [
+        "monitoramento",
+        "acompanhamento",
+        "localização",
+        "rastreio",
+        "controle",
+        "aferição",
+        "seguimento",
+        "conferência",
+      ],
+      postagem: [
+        "expedição",
+        "envio",
+        "remessa",
+        "despacho",
+        "encaminhamento",
+        "distribuição",
+        "entrega",
+        "registro",
+      ],
+      sedex: [
+        "entrega expressa",
+        "serviço expresso",
+        "entrega rápida",
+        "encomenda expressa",
+        "remessa urgente",
+        "PAC",
+        "encomenda",
+      ],
+      destinatário: [
+        "recebedor",
+        "receptor",
+        "recipiente",
+        "beneficiário",
+        "consignatário",
+        "endereçado",
+        "alvo",
+        "participante",
+      ],
+    };
+
+    // Normalizar termo para busca
+    const normalizedTerm = term.toLowerCase().trim();
+
+    // Procurar no dicionário
+    for (const [word, synonyms] of Object.entries(synonymsDict)) {
+      if (word === normalizedTerm) {
+        return synonyms;
+      }
+      if (synonyms.includes(normalizedTerm)) {
+        return [word, ...synonyms.filter((s) => s !== normalizedTerm)];
+      }
+    }
+
+    return []; // Retorna array vazio se não encontrar sinônimos
+  },
 };
 
-// Função para verificar proximidade entre palavras
-function checkProximity(text, words, proximity) {
-  // Se proximidade for -1, significa "Em qualquer parte"
-  if (proximity === -1) {
-    return words.every((word) =>
-      text.toLowerCase().includes(word.toLowerCase())
-    );
-  }
-
-  // Dividir o texto em palavras
-  const textWords = text.trim().split(/\s+/);
-
-  for (let i = 0; i < textWords.length; i++) {
-    // Verificar se a primeira palavra está presente
-    if (textWords[i].toLowerCase().includes(words[0].toLowerCase())) {
-      // Verificar se todas as outras palavras estão dentro da proximidade especificada
-      let allFound = true;
-      for (let j = 1; j < words.length; j++) {
-        let found = false;
-        // Verificar nas próximas 'proximity' palavras
-        for (
-          let k = i + 1;
-          k < Math.min(i + proximity + 1, textWords.length);
-          k++
-        ) {
-          if (textWords[k].toLowerCase().includes(words[j].toLowerCase())) {
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          allFound = false;
-          break;
-        }
-      }
-      if (allFound) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-// Função aprimorada para destacar todas as palavras pesquisadas
-function highlightAllSearchTerms(text, terms) {
-  if (!text || !terms || !terms.length) return text;
-
-  let highlightedText = text;
-  terms.forEach((term) => {
-    if (term.length >= 3) {
-      const regex = new RegExp(`(${escapeRegExp(term)})`, "gi");
-      highlightedText = highlightedText.replace(regex, "<mark>$1</mark>");
-    }
-  });
-  return highlightedText;
-}
-
 $(document).ready(function () {
-  // Inicializar o gerenciador de busca
   if (typeof pdfjsLib === "undefined") {
     console.error(
       "PDF.js não foi carregado corretamente. Verifique se o script foi importado."
@@ -1342,7 +2111,17 @@ $(document).ready(function () {
   });
 
   $('input[name="searchType"]').on("change", function () {
-    $("#fuzzyThreshold").prop("disabled", $(this).val() !== "fuzzy");
+    const searchType = $(this).val();
+    $("#fuzzyThreshold").prop("disabled", searchType !== "fuzzy");
+
+    // Se selecionar "fuzzy", mostrar dica sobre sinônimos
+    if (searchType === "fuzzy") {
+      if (!$("#fuzzy-info").length) {
+        $("#fuzzyThreshold").after(infoText);
+      }
+    } else {
+      $("#fuzzy-info").remove();
+    }
   });
 
   $("#cancelSearch").on("click", function () {
@@ -1356,3 +2135,14 @@ $(document).ready(function () {
 
   PdfSearchManager.init();
 });
+
+$("#cancelSearch").on("click", function () {
+  if (documentProcessing) {
+    searchCanceled = true;
+    $(this)
+      .prop("disabled", true)
+      .html('<i class="fas fa-spinner fa-spin mr-1"></i> Cancelando...');
+  }
+});
+
+PdfSearchManager.init();
