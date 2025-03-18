@@ -27,6 +27,7 @@ const PdfSearchManager = {
     // Resetar todas as estatísticas
     this.resetStats();
     this.loadRecentSearches();
+    this.setupFilterListeners(); // Adicionar configuração dos listeners para filtros
 
     // Verificar se há termos de busca na URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -247,49 +248,7 @@ const PdfSearchManager = {
         $(".document-item").css("transform", "translateY(0)");
       }, 300);
 
-      // Filtrar por superintendência, se informado
-      if (
-        searchOptions &&
-        searchOptions.superintendenceCode &&
-        searchOptions.superintendenceCode.trim() !== ""
-      ) {
-        // MODIFICAÇÃO: Usar RegExp para garantir compatibilidade com códigos iniciados por zero
-        const superRegex = new RegExp(
-          `_PC(${searchOptions.superintendenceCode})\\d+`,
-          "i"
-        );
-        if (!superRegex.test(doc.fileName)) {
-          processNextDocument(index + 1); // Pula este arquivo
-          return;
-        }
-      }
-
-      // Filtrar por ano do processo, se informado
-      if (searchOptions && searchOptions.processYear) {
-        const yearMatch = doc.fileName.match(/_PC\d+(\d{4})_/);
-        if (!yearMatch || yearMatch[1] !== searchOptions.processYear) {
-          processNextDocument(index + 1); // Pula este arquivo
-          return;
-        }
-      }
-
-      // Filtrar por texto no título, se informado (busca exata no título, ignorando case)
-      if (
-        searchOptions &&
-        searchOptions.titleSearch &&
-        searchOptions.titleSearch.trim() !== ""
-      ) {
-        if (
-          doc.fileName
-            .toLowerCase()
-            .indexOf(searchOptions.titleSearch.toLowerCase()) === -1
-        ) {
-          processNextDocument(index + 1);
-          return;
-        }
-      }
-
-      // Se passou em ambos os filtros, conta este arquivo
+      // Contar este arquivo como processado
       filesRead++;
 
       // Atualizar estatísticas de tamanho de arquivo
@@ -763,6 +722,10 @@ const PdfSearchManager = {
       type: "POST",
       data: {
         method: "listPdfDocuments",
+        // Enviar parâmetros de filtro para o servidor
+        superintendenceCode: searchOptions.superintendenceCode || "",
+        processYear: searchOptions.processYear || "",
+        titleSearch: searchOptions.titleSearch || "",
       },
       dataType: "json",
       success: (response) => {
@@ -784,6 +747,8 @@ const PdfSearchManager = {
         }
         const success = parsedResponse.success || parsedResponse.SUCCESS;
         const documents = parsedResponse.documents || parsedResponse.DOCUMENTS;
+
+        // Melhor validação para verificar se temos documentos válidos
         if (
           parsedResponse &&
           typeof parsedResponse === "object" &&
@@ -791,6 +756,26 @@ const PdfSearchManager = {
           Array.isArray(documents)
         ) {
           if (documents.length > 0) {
+            // Mostrar estatísticas de filtragem no console (opcional)
+            if (parsedResponse.filterStats) {
+              console.log(
+                `Filtro aplicado no servidor: ${parsedResponse.filterStats.filtered} de ${parsedResponse.filterStats.total} documentos`
+              );
+
+              // Mostrar mensagem se os filtros foram muito restritivos
+              if (
+                parsedResponse.filterStats.filtered === 0 &&
+                parsedResponse.filterStats.total > 0
+              ) {
+                $("#noResultsAlert").show();
+                $("#searchLoading").hide();
+                $("#searchStats").text(
+                  `0 resultados encontrados. Os filtros atuais são muito restritivos.`
+                );
+                return;
+              }
+            }
+
             const normalizedDocuments = documents.map((doc) => {
               return {
                 fileName: doc.fileName || doc.FILENAME,
@@ -808,8 +793,12 @@ const PdfSearchManager = {
               startTime
             );
           } else {
-            console.error("Nenhum documento PDF encontrado no diretório");
-            this.searchInServerSide(searchTerms, searchOptions);
+            // Mensagem específica quando nenhum documento atende aos filtros
+            $("#noResultsAlert").show();
+            $("#searchLoading").hide();
+            $("#searchStats").text(
+              `0 resultados encontrados. Nenhum documento corresponde aos filtros aplicados.`
+            );
           }
         } else {
           console.error(
@@ -826,6 +815,7 @@ const PdfSearchManager = {
       },
     });
   },
+
   // Destacar termo em um texto
   highlightSearchTerm: function (text, term, searchOptions) {
     if (!text || !term) return text;
@@ -2329,6 +2319,18 @@ const PdfSearchManager = {
 
     return []; // Retorna array vazio se não encontrar sinônimos
   },
+
+  // Correção única da função setupFilterListeners
+  setupFilterListeners: function () {
+    const self = this; // Preserva o contexto
+    $("#searchYear, #searchSuperintendence, #searchTitle").on(
+      "change",
+      function () {
+        // Removido: console.log("Filtro alterado:", this.id);
+        // Removido: toastr.info("Filtros atualizados.");
+      }
+    );
+  },
 };
 
 $(document).ready(function () {
@@ -2341,22 +2343,29 @@ $(document).ready(function () {
       searchTerms,
       searchOptions
     ) {
-      // ...existing server side code...
+      PdfSearchManager.performSearch();
     };
+  } else {
+    PdfSearchManager.init();
   }
 
-  $("#searchFaqForm").on("submit", function (e) {
-    e.preventDefault();
-    PdfSearchManager.performSearch();
+  $("#cancelSearch").on("click", function () {
+    if (documentProcessing) {
+      $(this)
+        .prop("disabled", true)
+        .html('<i class="fas fa-spinner fa-spin mr-1"></i> Cancelando...');
+      searchCanceled = true;
+    }
   });
 
   $('input[name="searchType"]').on("change", function () {
     const searchType = $(this).val();
     $("#fuzzyThreshold").prop("disabled", searchType !== "fuzzy");
-
-    // Se selecionar "fuzzy", mostrar dica sobre sinônimos
     if (searchType === "fuzzy") {
+      // Se selecionar "fuzzy", mostrar dica sobre sinônimos
       if (!$("#fuzzy-info").length) {
+        const infoText =
+          '<small id="fuzzy-info" class="form-text text-muted">A busca fuzzy considera sinônimos e variações de escrita.</small>';
         $("#fuzzyThreshold").after(infoText);
       }
     } else {
@@ -2364,25 +2373,8 @@ $(document).ready(function () {
     }
   });
 
-  $("#cancelSearch").on("click", function () {
-    if (documentProcessing) {
-      searchCanceled = true;
-      $(this)
-        .prop("disabled", true)
-        .html('<i class="fas fa-spinner fa-spin mr-1"></i> Cancelando...');
-    }
+  $("#searchFaqForm").on("submit", function (e) {
+    e.preventDefault();
+    PdfSearchManager.performSearch();
   });
-
-  PdfSearchManager.init();
 });
-
-$("#cancelSearch").on("click", function () {
-  if (documentProcessing) {
-    searchCanceled = true;
-    $(this)
-      .prop("disabled", true)
-      .html('<i class="fas fa-spinner fa-spin mr-1"></i> Cancelando...');
-  }
-});
-
-PdfSearchManager.init();

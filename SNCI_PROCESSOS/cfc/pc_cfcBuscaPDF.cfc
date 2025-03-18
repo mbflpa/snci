@@ -1,6 +1,25 @@
 <cfcomponent>
     <cfprocessingdirective pageencoding = "utf-8">
 
+    <!--- Nova função init() para inicializar o cache --->
+    <cffunction name="init" access="private" returntype="void" output="false" hint="Inicializa o cache de textos extraídos e estatísticas">
+        <cflock scope="application" timeout="10" type="exclusive">
+            <!--- Inicializar o cache de textos extraídos se não existir --->
+            <cfif not structKeyExists(application, "pdfTextCache")>
+                <cfset application.pdfTextCache = {}>
+            </cfif>
+            
+            <!--- Inicializar as estatísticas de cache se não existirem --->
+            <cfif not structKeyExists(application, "pdfCacheStats")>
+                <cfset application.pdfCacheStats = {
+                    hits = 0,
+                    misses = 0,
+                    totalSaved = 0
+                }>
+            </cfif>
+        </cflock>
+    </cffunction>
+
     <cffunction name="extractPDFText" access="private" returntype="struct" output="false" hint="Extrai o texto de um arquivo PDF">
         <cfargument name="pdfFilePath" type="string" required="true" hint="Caminho completo do arquivo PDF">
         
@@ -363,15 +382,33 @@
 
     <cffunction name="listPdfDocuments" access="remote" returntype="string" returnformat="json" output="false" hint="Lista todos os documentos PDF disponíveis">
         <cfargument name="superintendenceCode" type="string" required="false" default="" hint="Código da superintendência para filtrar">
+        <cfargument name="processYear" type="string" required="false" default="" hint="Ano do processo para filtrar">
+        <cfargument name="titleSearch" type="string" required="false" default="" hint="Texto no título para filtrar">
         
         <cftry>
             <cfset local.result = {
                 success = true,
                 message = "",
-                documents = []
+                documents = [],
+                filterStats = {
+                    total = 0,
+                    filtered = 0,
+                    filters = {}
+                }
             }>
             
-            <!--- Voltar a usar application.diretorio_busca_pdf --->
+            <!--- Guardar informações sobre os filtros aplicados --->
+            <cfif len(arguments.superintendenceCode)>
+                <cfset local.result.filterStats.filters["superintendence"] = arguments.superintendenceCode>
+            </cfif>
+            <cfif len(arguments.processYear)>
+                <cfset local.result.filterStats.filters["year"] = arguments.processYear>
+            </cfif>
+            <cfif len(arguments.titleSearch)>
+                <cfset local.result.filterStats.filters["title"] = arguments.titleSearch>
+            </cfif>
+            
+            <!--- Verificar diretório --->
             <cfif not directoryExists(application.diretorio_busca_pdf)>
                 <cfset local.result.success = false>
                 <cfset local.result.message = "Diretório de PDFs não encontrado">
@@ -380,6 +417,8 @@
             
             <!--- Listar todos os arquivos PDF no diretório --->
             <cfdirectory action="list" directory="#application.diretorio_busca_pdf#" name="local.pdfFiles" filter="*.pdf" recurse="true">
+            
+            <cfset local.result.filterStats.total = local.pdfFiles.recordCount>
             
             <!--- Processar cada arquivo PDF --->
             <cfloop query="local.pdfFiles">
@@ -393,9 +432,28 @@
                     </cfif>
                 </cfif>
                 
+                <!--- Filtrar por ano do processo, se informado --->
+                <cfif local.includeFile AND len(arguments.processYear)>
+                    <cfset local.yearMatch = reFind("_PC\d+(\d{4})_", local.pdfFiles.name, 1, true)>
+                    <cfif arrayLen(local.yearMatch.pos) GTE 2>
+                        <cfset local.foundYear = mid(local.pdfFiles.name, local.yearMatch.pos[2], local.yearMatch.len[2])>
+                        <cfif local.foundYear NEQ arguments.processYear>
+                            <cfset local.includeFile = false>
+                        </cfif>
+                    <cfelse>
+                        <cfset local.includeFile = false>
+                    </cfif>
+                </cfif>
+                
+                <!--- Filtrar por texto no título, se informado (busca case-insensitive) --->
+                <cfif local.includeFile AND len(arguments.titleSearch)>
+                    <cfif NOT FindNoCase(arguments.titleSearch, local.pdfFiles.name)>
+                        <cfset local.includeFile = false>
+                    </cfif>
+                </cfif>
+                
                 <cfif local.includeFile>
                     <cfset local.filePath = local.pdfFiles.directory & "\" & local.pdfFiles.name>
-                    <!--- Continuar usando application.diretorio_busca_pdf --->
                     <cfset local.relativePath = replaceNoCase(local.filePath, application.diretorio_busca_pdf, "")>
                     
                     <cfset local.document = {
@@ -411,6 +469,8 @@
                 </cfif>
             </cfloop>
             
+            <cfset local.result.filterStats.filtered = arrayLen(local.result.documents)>
+            
             <cfcatch type="any">
                 <cfset local.result = {
                     success = false,
@@ -420,7 +480,6 @@
             </cfcatch>
         </cftry>
         
-        <!--- Forçar o formato JSON correto --->
         <cfreturn serializeJSON(local.result)>
     </cffunction>
 
