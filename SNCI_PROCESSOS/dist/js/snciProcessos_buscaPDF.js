@@ -50,6 +50,13 @@ const PdfSearchManager = {
     searchOptions.titleSearch = $("#searchTitle").val().trim();
 
     $("#resultsCard").show();
+    $("#searchLoading").show();
+    $("#searchResults").empty(); // Limpar resultados anteriores
+    $("#noResultsAlert").hide();
+    $("#errorAlert").hide();
+    $("#pdfViewerContainer").hide();
+    $("#searchStats").text("");
+    $("#realTimeResults").hide(); // Ocultar o container de resultados "em tempo real"
 
     // Rolar automaticamente para o card de resultados após iniciar a busca
     $("html, body").animate(
@@ -58,13 +65,6 @@ const PdfSearchManager = {
       },
       "slow"
     );
-
-    $("#searchLoading").show();
-    $("#searchResults").empty();
-    $("#noResultsAlert").hide();
-    $("#errorAlert").hide();
-    $("#pdfViewerContainer").hide();
-    $("#searchStats").text("");
 
     this.updateUrlWithSearchTerms(searchTerms);
     this.saveRecentSearch(searchTerms);
@@ -85,7 +85,7 @@ const PdfSearchManager = {
     }
   },
 
-  // Processa os documentos PDF usando PDF.js
+  // Processa os documentos PDF usando PDF.js com extração sequencial página por página
   processDocumentsWithPdfJs: function (
     documents,
     searchTerms,
@@ -109,7 +109,7 @@ const PdfSearchManager = {
     $("#processingStatus").text(`Buscando em ${totalDocuments} documentos...`);
 
     // Função para processar um documento por vez
-    const processNextDocument = (index) => {
+    const processNextDocument = async (index) => {
       // Verificar se a busca foi cancelada
       if (searchCanceled) {
         const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
@@ -209,151 +209,100 @@ const PdfSearchManager = {
       const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
         doc.filePath
       )}&nome=${encodeURIComponent(doc.fileName)}`;
+
       try {
-        // Carregar PDF e extrair texto usando API regular do PDF.js (não módulo)
-        pdfjsLib
-          .getDocument({
-            url: fileUrl,
-          })
-          .promise.then((pdf) => {
-            let textPromises = [];
-            const pageCount = pdf.numPages; // Armazenar o número de páginas
-            // Extrair texto de todas as páginas com melhor processamento de espaços
-            for (let i = 1; i <= pdf.numPages; i++) {
-              textPromises.push(
-                pdf
-                  .getPage(i)
-                  .then((page) =>
-                    page.getTextContent({ normalizeWhitespace: true })
-                  )
-                  .then((content) => {
-                    // Algoritmo melhorado para processamento do texto considerando posições
-                    return this.processTextContent(content);
-                  })
-              );
-            }
-            return Promise.all(textPromises).then((pageTexts) => ({
-              pageTexts, // Incluir o número de páginas no retorno
-              pageCount, // Incluir o número de páginas no retorno
-            }));
-          })
-          .then((result) => {
-            const text = result.pageTexts.join("\n");
-            const pageCount = result.pageCount;
-            // Buscar termos no texto
-            let found = false;
-            let snippets = [];
-            // Verificar o modo de busca e adaptar a lógica
-            if (searchOptions.mode === "exact") {
-              // Modo de frase exata: busca pela frase completa
-              const phrase = searchTerms.trim();
-              if (phrase.length >= 3) {
-                // Criar regex para buscar frase exata, case insensitive
-                const regex = new RegExp(this.escapeRegExp(phrase), "gi");
-                const matches = text.match(regex);
-                if (matches && matches.length > 0) {
-                  found = true;
-                  // Criar snippet com contexto para a frase completa
-                  const firstIndex = text
-                    .toLowerCase()
-                    .indexOf(phrase.toLowerCase());
-                  if (firstIndex !== -1) {
-                    const start = Math.max(0, firstIndex - 200);
-                    const end = Math.min(
-                      text.length,
-                      firstIndex + phrase.length + 200
-                    );
-                    let snippet = text.substring(start, end);
-                    if (start > 0) snippet = "..." + snippet;
-                    if (end < text.length) snippet += "...";
-                    snippet = this.highlightSearchPhrase(snippet, phrase);
-                    snippets.push(snippet);
-                  }
-                }
-              }
-            } else if (searchOptions.mode === "proximity") {
-              const words = searchTerms
-                .split(" ")
-                .filter((term) => term.length >= 3);
-              const proximity = parseInt(searchOptions.proximityDistance);
-              // Verificar proximidade entre as palavras no texto
-              found = checkProximity(text, words, proximity);
-              if (found) {
-                // Criar snippet com o texto destacado
-                const start = Math.max(0, text.indexOf(words[0]) - 200);
-                const end = Math.min(text.length, text.indexOf(words[0]) + 400);
-                let snippet = text.substring(start, end);
-                if (start > 0) snippet = "..." + snippet;
-                if (end < text.length) snippet += "...";
-                snippet = highlightAllSearchTerms(snippet, words);
-                snippets.push(snippet);
-              }
-            } else {
-              // Modo "OU" (padrão): busca por termos individuais
-              terms.forEach((term) => {
-                if (term.length >= 3) {
-                  const regex = new RegExp(this.escapeRegExp(term), "gi");
-                  const matches = text.match(regex);
-                  if (matches && matches.length > 0) {
-                    found = true;
-                    // Criar snippet com contexto
-                    const firstIndex = text
-                      .toLowerCase()
-                      .indexOf(term.toLowerCase());
-                    if (firstIndex !== -1) {
-                      const start = Math.max(0, firstIndex - 200);
-                      const end = Math.min(
-                        text.length,
-                        firstIndex + term.length + 200
-                      );
-                      let snippet = text.substring(start, end);
-                      if (start > 0) snippet = "..." + snippet;
-                      if (end < text.length) snippet += "...";
-                      snippet = this.highlightSearchTerm(snippet, term);
-                      snippets.push(snippet);
-                    }
-                  }
-                }
-              });
-            }
-            if (found) {
-              // Criar objeto de resultado simplificado (sem cálculo de relevância)
-              const resultObj = {
-                fileName: doc.fileName,
-                filePath: doc.filePath,
-                fileUrl: fileUrl,
-                directory: doc.directory || "Diretório FAQ",
-                size: doc.size,
-                pageCount: pageCount, // Incluir o número de páginas
-                dateLastModified: doc.dateLastModified,
-                snippets: snippets,
-                extractedText: text,
-              };
-              // Adicionar ao array de resultados
-              this.currentSearchResults.push(resultObj);
-              // Mostrar resultado em tempo real
-              this.addRealTimeResult(resultObj);
-            }
-            // Processar o próximo documento
-            processNextDocument(index + 1);
-          })
-          .catch((error) => {
-            console.error(
-              `Erro ao processar o documento ${doc.fileName}:`,
-              error
-            );
-            // Se ocorrer erro, tentar fallback no servidor
-            this.searchSingleDocumentInServer(doc, searchTerms, searchOptions);
-            setTimeout(() => processNextDocument(index + 1), 0);
+        // Carregar PDF usando PDF.js
+        const pdf = await pdfjsLib.getDocument({
+          url: fileUrl,
+        }).promise;
+
+        const pageCount = pdf.numPages;
+        let found = false;
+        let snippets = [];
+
+        // Processar páginas sequencialmente
+        for (let i = 1; i <= pageCount; i++) {
+          // Verificar cancelamento a cada página
+          if (searchCanceled) {
+            break;
+          }
+
+          // Extrair texto da página atual
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent({
+            normalizeWhitespace: true,
           });
+          const pageText = this.processTextContent(content);
+
+          // Buscar termos na página atual conforme o modo de busca
+          let pageSearchResult;
+
+          if (searchOptions.mode === "exact") {
+            // Modo de frase exata
+            pageSearchResult = this.searchExactPhrase(pageText, searchTerms);
+          } else if (searchOptions.mode === "proximity") {
+            // Modo de proximidade
+            const words = searchTerms
+              .split(" ")
+              .filter((term) => term.length >= 3);
+            const proximity = parseInt(searchOptions.proximityDistance);
+            pageSearchResult = this.searchProximity(pageText, words, proximity);
+          } else {
+            // Modo "OU" (padrão)
+            pageSearchResult = this.searchAnyTerm(pageText, searchTerms);
+          }
+
+          // Se encontrou na página atual
+          if (pageSearchResult.found) {
+            found = true;
+            snippets.push(...pageSearchResult.snippets);
+
+            // Adicionar informação da página ao snippet
+            snippets = snippets.map(
+              (snippet) =>
+                `<div class="page-info badge badge-light mb-1">Página ${i} de ${pageCount}</div> ${snippet}`
+            );
+
+            // Parar a extração, pois já encontramos correspondência
+            break;
+          }
+        }
+
+        if (found) {
+          // Criar objeto de resultado otimizado (sem armazenar texto completo)
+          const resultObj = {
+            fileName: doc.fileName,
+            filePath: doc.filePath,
+            fileUrl: fileUrl,
+            directory: doc.directory || "Diretório PDF",
+            size: doc.size,
+            pageCount: pageCount,
+            dateLastModified: doc.dateLastModified,
+            snippets: snippets,
+            found: true,
+          };
+
+          // Adicionar ao array de resultados
+          this.currentSearchResults.push(resultObj);
+
+          // Mostrar resultado em tempo real
+          this.addRealTimeResult(resultObj);
+        }
+
+        // Processar o próximo documento
+        setTimeout(() => processNextDocument(index + 1), 0);
       } catch (error) {
-        console.error(`Erro ao carregar o documento ${doc.fileName}:`, error);
-        processNextDocument(index + 1);
+        console.error(`Erro ao processar o documento ${doc.fileName}:`, error);
+        // Se ocorrer erro, tentar fallback no servidor
+        this.searchSingleDocumentInServer(doc, searchTerms, searchOptions);
+        setTimeout(() => processNextDocument(index + 1), 0);
       }
     };
+
     // Iniciar o processamento com o primeiro documento
     processNextDocument(0);
   },
+
   // Processar conteúdo de texto do PDF considerando posições
   processTextContent: function (textContent) {
     // Ordenar itens por posição vertical (y) e depois horizontal (x)
@@ -413,25 +362,72 @@ const PdfSearchManager = {
   },
   // Novo método para adicionar resultados em tempo real
   addRealTimeResult: function (result) {
-    const resultItem = `
-      <div class="realtime-result-item">
-        <h6 class="mb-1">
-          <a href="${result.fileUrl}" target="_blank" class="result-link">
-            <i class="far fa-file-pdf mr-1"></i> ${result.fileName}
-          </a>
-        </h6>
-        <div class="small text-muted">
-          ${this.formatSnippets(result.snippets.slice(0, 1))}
+    // URL direta para visualizar o PDF
+    const pdfUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
+      result.filePath
+    )}`;
+
+    // Criar HTML no formato final do resultado
+    const resultHTML = `
+      <div class="search-result" data-file-path="${
+        result.filePath
+      }" data-file-url="${pdfUrl}" data-result-id="${
+      this.currentSearchResults.length - 1
+    }">
+        <div class="d-flex justify-content-between align-items-start">
+          <h5>
+            <a href="${pdfUrl}" target="_blank" class="view-pdf-link">
+              <i class="far fa-file-pdf mr-2"></i>${result.fileName}
+            </a>
+          </h5>
+        </div>
+        <p class="mb-1 text-muted small">
+          <i class="fas fa-folder-open mr-1"></i> ${
+            result.directory || "Diretório FAQ"
+          }
+        </p>
+        <div class="search-snippets">
+          ${this.formatSnippets(result.snippets)}
+        </div>
+        
+        <div class="d-flex justify-content-between mt-2">
+          <div>
+            <span class="badge badge-light mr-1">
+              <i class="far fa-calendar-alt mr-1"></i> ${this.formatDate(
+                result.dateLastModified || new Date()
+              )}
+            </span>
+            <span class="badge badge-light mr-1">
+              <i class="fas fa-file-alt mr-1"></i> ${this.formatFileSize(
+                result.size || 0
+              )}
+            </span>
+            <span class="badge badge-light">
+              <i class="fas fa-file-pdf mr-1"></i> ${
+                result.pageCount || "?"
+              } página${result.pageCount !== 1 ? "s" : ""}
+            </span>
+          </div>
         </div>
       </div>
     `;
-    // Adicionar ao início da lista para mostrar os mais recentes primeiro
-    $("#realTimeResultsList").prepend(resultItem);
-    // Se este for o primeiro resultado encontrado, fazer scroll para a seção de resultados em tempo real
-    if (this.currentSearchResults.length === 1) {
+
+    // Adicionar o resultado diretamente na área final de resultados
+    $("#searchResults").prepend(resultHTML);
+
+    // Atualizar estatísticas em tempo real
+    const count = this.currentSearchResults.length;
+    $("#searchStats").text(
+      `${count} resultado${count !== 1 ? "s" : ""} encontrado${
+        count !== 1 ? "s" : ""
+      } até o momento...`
+    );
+
+    // Se este for o primeiro resultado encontrado, fazer scroll
+    if (count === 1) {
       $("html, body").animate(
         {
-          scrollTop: $("#realTimeResults").offset().top - 150,
+          scrollTop: $("#searchResults").offset().top - 150,
         },
         "slow"
       );
@@ -807,101 +803,7 @@ const PdfSearchManager = {
       return;
     }
 
-    // Construir HTML dos resultados - sem mostrar relevância
-    const termsList = searchTerms.split(" ").filter((term) => term.length >= 3);
-    let resultsHtml = "";
-    this.currentSearchResults.forEach((result, index) => {
-      // URL direta para visualizar o PDF
-      const pdfUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
-        result.filePath
-      )}`;
-
-      // Truncar texto para preview (primeiros 5000 caracteres)
-      const truncatedText = result.extractedText
-        ? result.extractedText.length > 5000
-          ? result.extractedText.substring(0, 5000) + "..."
-          : result.extractedText
-        : "Texto não disponível";
-      // Destacar termos de busca no texto completo
-      const highlightedText =
-        searchOptions && searchOptions.mode === "exact"
-          ? this.highlightSearchPhrase(truncatedText, searchTerms)
-          : termsList.reduce((text, term) => {
-              if (term.length >= 3) {
-                const regex = new RegExp(`(${this.escapeRegExp(term)})`, "gi");
-                return text.replace(regex, "<mark>$1</mark>");
-              }
-              return text;
-            }, truncatedText);
-
-      resultsHtml += `
-        <div class="search-result" data-file-path="${
-          result.filePath
-        }" data-file-url="${pdfUrl}" data-result-id="${index}">
-          <div class="d-flex justify-content-between align-items-start">
-            <h5>
-              <a href="${pdfUrl}" target="_blank" class="view-pdf-link">
-                <i class="far fa-file-pdf mr-2"></i>${result.fileName}
-              </a>
-            </h5>
-          </div>
-          <p class="mb-1 text-muted small">
-            <i class="fas fa-folder-open mr-1"></i> ${
-              result.directory || "Diretório FAQ"
-            }
-          </p>
-          <div class="search-snippets">
-            ${this.formatSnippets(result.snippets)}
-          </div>
-          
-          <!-- Botão para mostrar/ocultar texto extraído -->
-          <div class="mt-3">
-            <button class="btn btn-sm btn-outline-info toggle-extracted-text" data-result-id="${index}">
-              <i class="fas fa-file-alt mr-1"></i> Ver texto extraído
-            </button>
-          </div>
-          <!-- Container para o texto extraído (inicialmente oculto) -->
-          <div class="extracted-text-container mt-2" id="extractedText-${index}" style="display: none;">
-            <div class="card">
-              <div class="card-header py-2 bg-light">
-                <div class="d-flex justify-content-between align-items-center">
-                  <span><i class="fas fa-file-alt mr-1"></i> Conteúdo do documento</span>
-                  <button class="btn btn-sm btn-link text-muted p-0 copy-text" data-result-id="${index}">
-                    <i class="far fa-copy"></i> Copiar
-                  </button>
-                </div>
-              </div>
-              <div class="card-body extracted-text-content " style="max-height: 300px; overflow-y: auto;">
-                ${highlightedText}
-              </div>
-            </div>
-          </div>
-          
-          <div class="d-flex justify-content-between mt-2">
-            <div>
-              <span class="badge badge-light mr-1">
-                <i class="far fa-calendar-alt mr-1"></i> ${this.formatDate(
-                  result.dateLastModified || new Date()
-                )}
-              </span>
-              <span class="badge badge-light mr-1">
-                <i class="fas fa-file-alt mr-1"></i> ${this.formatFileSize(
-                  result.size || 0
-                )}
-              </span>
-              <span class="badge badge-light">
-                <i class="fas fa-file-pdf mr-1"></i> ${
-                  result.pageCount || "?"
-                } página${result.pageCount !== 1 ? "s" : ""}
-              </span>
-            </div>
-          </div>
-        </div>
-      `;
-    });
-
-    // Exibir resultados e estatísticas
-    $("#searchResults").html(resultsHtml);
+    // Atualizar apenas as estatísticas, pois os resultados já foram inseridos
     $("#searchStats").text(
       `${this.currentSearchResults.length} resultado${
         this.currentSearchResults.length !== 1 ? "s" : ""
@@ -909,54 +811,8 @@ const PdfSearchManager = {
         this.currentSearchResults.length !== 1 ? "s" : ""
       } em ${searchTime} segundos. Arquivos lidos: ${filesRead || "N/A"}`
     );
-
-    // Adicionar handlers para os botões de exibir texto extraído
-    this.setupExtractedTextHandlers();
   },
-  // Configurar manipuladores para o texto extraído
-  setupExtractedTextHandlers: function () {
-    // Toggle para mostrar/ocultar texto extraído
-    $(".toggle-extracted-text").on("click", function () {
-      const resultId = $(this).data("result-id");
-      const textContainer = $(`#extractedText-${resultId}`);
 
-      if (textContainer.is(":visible")) {
-        textContainer.slideUp(200);
-        $(this).html('<i class="fas fa-file-alt mr-1"></i> Ver texto extraído');
-      } else {
-        // Fechar outros textos abertos
-        $(".extracted-text-container").slideUp(200);
-        $(".toggle-extracted-text").html(
-          '<i class="fas fa-file-alt mr-1"></i> Ver texto extraído'
-        );
-
-        // Abrir este texto
-        textContainer.slideDown(200);
-        $(this).html('<i class="fas fa-file-alt mr-1"></i> Ocultar texto');
-      }
-    });
-
-    // Copiar texto para área de transferência
-    $(".copy-text").on("click", function () {
-      const resultId = $(this).data("result-id");
-      const textContent =
-        PdfSearchManager.currentSearchResults[resultId].extractedText;
-
-      // Criar elemento temporário para copiar
-      const tempElement = document.createElement("textarea");
-      tempElement.value = textContent;
-      document.body.appendChild(tempElement);
-      tempElement.select();
-      document.execCommand("copy");
-      document.body.removeChild(tempElement);
-
-      // Feedback ao usuário
-      $(this).html('<i class="fas fa-check"></i> Copiado!');
-      setTimeout(() => {
-        $(this).html('<i class="far fa-copy"></i> Copiar');
-      }, 2000);
-    });
-  },
   // Formatar tamanho do arquivo
   formatFileSize: function (bytes) {
     if (bytes < 1024) {
@@ -1290,6 +1146,119 @@ const PdfSearchManager = {
         this.searchWithServerDocuments(serverDocs, searchTerms, searchOptions);
       }
     });
+  },
+
+  // Função para busca exata em texto, retorna resultado preciso para extração sequencial
+  searchExactPhrase: function (text, phrase) {
+    const result = {
+      found: false,
+      snippets: [],
+    };
+
+    phrase = phrase.trim();
+    if (phrase.length < 3 || !text) return result;
+
+    try {
+      const escapedPhrase = this.escapeRegExp(phrase);
+      const regex = new RegExp(escapedPhrase, "gi");
+      const matches = text.match(regex);
+
+      if (matches && matches.length > 0) {
+        result.found = true;
+
+        // Limitar a 1 snippet por página para otimizar
+        const firstIndex = text.toLowerCase().indexOf(phrase.toLowerCase());
+        if (firstIndex !== -1) {
+          const start = Math.max(0, firstIndex - 200);
+          const end = Math.min(text.length, firstIndex + phrase.length + 200);
+          let snippet = text.substring(start, end);
+
+          if (start > 0) snippet = "..." + snippet;
+          if (end < text.length) snippet += "...";
+
+          snippet = this.highlightSearchPhrase(snippet, phrase);
+          result.snippets.push(snippet);
+        }
+      }
+    } catch (e) {
+      console.error("Erro ao buscar frase exata:", e);
+    }
+
+    return result;
+  },
+
+  // Função otimizada para busca de proximidade, para uso com extração sequencial
+  searchProximity: function (text, words, proximity) {
+    const result = {
+      found: false,
+      snippets: [],
+    };
+
+    if (!words || words.length === 0 || !text) return result;
+
+    // Verificar proximidade entre palavras
+    result.found = checkProximity(text, words, proximity);
+
+    if (result.found) {
+      // Criar único snippet por página para otimização
+      const firstWord = words[0];
+      const firstIndex = text.toLowerCase().indexOf(firstWord.toLowerCase());
+
+      if (firstIndex !== -1) {
+        const start = Math.max(0, firstIndex - 200);
+        const end = Math.min(text.length, firstIndex + 400);
+        let snippet = text.substring(start, end);
+
+        if (start > 0) snippet = "..." + snippet;
+        if (end < text.length) snippet += "...";
+
+        snippet = highlightAllSearchTerms(snippet, words);
+        result.snippets.push(snippet);
+      }
+    }
+
+    return result;
+  },
+
+  // Função otimizada para busca "OR", para uso com extração sequencial
+  searchAnyTerm: function (text, searchTerms) {
+    const result = {
+      found: false,
+      snippets: [],
+    };
+
+    if (!text || !searchTerms) return result;
+
+    const terms = searchTerms.split(" ").filter((term) => term.length >= 3);
+    if (terms.length === 0) return result;
+
+    // Para cada termo, verificar se está presente no texto
+    for (const term of terms) {
+      const regex = new RegExp(this.escapeRegExp(term), "gi");
+      const matches = text.match(regex);
+
+      if (matches && matches.length > 0) {
+        result.found = true;
+
+        // Adicionar apenas um snippet para o primeiro termo encontrado (otimização)
+        const firstIndex = text.toLowerCase().indexOf(term.toLowerCase());
+
+        if (firstIndex !== -1) {
+          const start = Math.max(0, firstIndex - 200);
+          const end = Math.min(text.length, firstIndex + term.length + 200);
+          let snippet = text.substring(start, end);
+
+          if (start > 0) snippet = "..." + snippet;
+          if (end < text.length) snippet += "...";
+
+          snippet = this.highlightSearchTerm(snippet, term);
+          result.snippets.push(snippet);
+          break; // Sai do loop após encontrar o primeiro termo
+        }
+      }
+    }
+
+    return result;
   },
 };
 
