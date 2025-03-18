@@ -496,41 +496,95 @@
                             <form id="searchFaqForm">
                                 <div class="input-group input-group-lg mb-3">
                                     <input type="text" class="form-control" id="searchTerms" name="searchTerms" 
-                                           placeholder="Ex.: contrato de trabalho, atestado médico..." required>
+                                           placeholder="Separe múltiplas palavras-chave com espaço" required>
                                     <div class="input-group-append">
                                         <button type="submit" class="btn btn-primary btn-search">
                                             <i class="fas fa-search mr-1"></i> Buscar
                                         </button>
                                     </div>
                                 </div>
-                                <!-- NOVO CAMPO: Ano do processo -->
-                                <div class="form-group">
-                                    <select class="form-control" id="searchYear" name="searchYear" style="max-width: 200px;">
-                                        <option value="">Selecione o ano do processo</option>
-                                        <cfset currentYear = year(now())>
-                                        <cfoutput>
-                                          <cfloop from="2019" to="#currentYear#" index="yr">
-                                            <option value="#yr#">#yr#</option>
-                                          </cfloop>
-                                        </cfoutput>
-                                    </select>
-                                </div>
-                                <!-- NOVO CAMPO: Título do arquivo -->
-                                <div class="form-group">
-                                    <input type="text" class="form-control" id="searchTitle" name="searchTitle" placeholder="Texto no título do arquivo (ex.: 0100012024)">
+                                <!-- Filtros em uma única linha -->
+                                <div class="form-row ">
+                                    
+                                    <!-- Título da seção de filtros -->
+                                    <div class="col-auto mb-2 d-flex align-items-center mr-2">
+                                        <i class="fas fa-filter mr-1"></i>
+                                        <strong>Filtros:</strong>
+                                    </div>
+                                    <!-- CAMPO: Ano do processo -->
+                                    <div style="width: 120px;" class="mb-2 mr-3">
+                                        <select class="form-control" id="searchYear" name="searchYear">
+                                            <option value="">Ano Processos</option>
+                                            <cfset currentYear = year(now())>
+                                            <cfoutput>
+                                                <cfloop from="2019" to="#currentYear#" index="yr">
+                                                    <option value="#yr#">#yr#</option>
+                                                </cfloop>
+                                            </cfoutput>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- CAMPO: Superintendência Regional -->
+                                    <div style="width: 180px;" class="mb-2 mr-3">
+                                        <select class="form-control" id="searchSuperintendence" name="searchSuperintendence">
+                                            <option value="">Todas as SE e CS</option>
+                                            <option value="01">CS - 01</option>
+                                            <option value="03">SE/ACR - 03</option>
+                                            <option value="04">SE/AL - 04</option>
+                                            <option value="06">SE/AM - 06</option>
+                                            <option value="05">SE/AP - 05</option>
+                                            <option value="08">SE/BA - 08</option>
+                                            <option value="10">SE/BSB - 10</option>
+                                            <option value="12">SE/CE - 12</option>
+                                            <option value="14">SE/ES - 14</option>
+                                            <option value="16">SE/GO - 16</option>
+                                            <option value="18">SE/MA - 18</option>
+                                            <option value="20">SE/MG - 20</option>
+                                            <option value="22">SE/MS - 22</option>
+                                            <option value="24">SE/MT - 24</option>
+                                            <option value="28">SE/PA - 28</option>
+                                            <option value="30">SE/PB - 30</option>
+                                            <option value="32">SE/PE - 32</option>
+                                            <option value="34">SE/PI - 34</option>
+                                            <option value="36">SE/PR - 36</option>
+                                            <option value="50">SE/RJ - 50</option>
+                                            <option value="60">SE/RN - 60</option>
+                                            <option value="26">SE/RO - 26</option>
+                                            <option value="65">SE/RR - 65</option>
+                                            <option value="64">SE/RS - 64</option>
+                                            <option value="68">SE/SC - 68</option>
+                                            <option value="70">SE/SE - 70</option>
+                                            <option value="74">SE/SPI - 74</option>
+                                            <option value="72">SE/SPM - 72</option>
+                                            <option value="75">SE/TO - 75</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- CAMPO: Número do processo (apenas números, 10 dígitos) -->
+                                    <div style="width: 180px;" class="mb-2">
+                                        <div class="input-group">
+                                            
+                                            <input type="text" 
+                                                class="form-control" 
+                                                id="searchTitle" 
+                                                name="searchTitle" 
+                                                placeholder="N° Processo" 
+                                                pattern="[0-9]{10}" 
+                                                maxlength="10" 
+                                                title="Digite exatamente 10 dígitos (apenas números)">
+                                        </div>
+                                    </div>
                                 </div>
                                 
                                 <!-- Opções avançadas de busca (colapsáveis) -->
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <small class="text-muted">
-                                        <i class="far fa-lightbulb mr-1"></i> Separe múltiplas palavras-chave com espaço
-                                    </small>
+                                <div class="d-flex justify-content-between align-items-center mb-2" style="margin-top:20px;">
+                                   
                                     <a class="options-toggle text-primary" data-toggle="collapse" href="#advancedOptions">
                                         <i class="fas fa-cog mr-1"></i> Opções avançadas <i class="fas fa-chevron-down ml-1"></i>
                                     </a>
                                 </div>
                                 
-                                <div class="collapse" id="advancedOptions">
+                                <div class="collapse" id="advancedOptions" >
                                     <div class="search-options">
                                         <div class="row">
                                             <div class="col-md-7">
@@ -574,7 +628,7 @@
                                                     <div class="custom-control custom-checkbox mb-2">
                                                         <input type="checkbox" id="searchUseSpellingVariants" class="custom-control-input">
                                                         <label class="custom-control-label" for="searchUseSpellingVariants">Considerar escritas erradas</label>
-                                                        <small class="form-text text-muted">Encontra palavras mesmo com erros de digitação</small>
+                                                        <small class="form-text text-muted">Encontra palavras mesmo com erros de digitação ou parte da palavra</small>
                                                     </div>
                                                     <div class="custom-control custom-checkbox">
                                                         <input type="checkbox" id="searchCaseSensitive" class="custom-control-input">

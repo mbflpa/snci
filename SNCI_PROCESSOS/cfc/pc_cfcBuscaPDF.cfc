@@ -67,14 +67,22 @@
             
             <cfdirectory action="list" directory="#application.diretorio_busca_pdf#" name="local.pdfFiles" filter="*.pdf" recurse="true">
             
-            <!--- Filtrar arquivos por ano ou título se necessário --->
+            <!--- Filtrar arquivos por superintendência, ano ou processo se necessário --->
             <cfset local.filteredFiles = []>
             
             <cfloop query="local.pdfFiles">
                 <cfset local.includeFile = true>
                 
+                <!--- Filtrar por código de superintendência, se informado --->
+                <cfif structKeyExists(local.options, "superintendenceCode") AND len(local.options.superintendenceCode)>
+                    <cfset local.superMatch = reFind("_PC(#local.options.superintendenceCode#)\d+", local.pdfFiles.name, 1, true)>
+                    <cfif NOT (arrayLen(local.superMatch.pos) GTE 2 AND local.superMatch.len[1] GT 0)>
+                        <cfset local.includeFile = false>
+                    </cfif>
+                </cfif>
+                
                 <!--- Filtrar por ano do processo, se informado --->
-                <cfif structKeyExists(local.options, "processYear") AND len(local.options.processYear)>
+                <cfif local.includeFile AND structKeyExists(local.options, "processYear") AND len(local.options.processYear)>
                     <cfset local.yearMatch = reFind("_PC\d+(\d{4})_", local.pdfFiles.name, 1, true)>
                     <cfif arrayLen(local.yearMatch.pos) GTE 2>
                         <cfset local.foundYear = mid(local.pdfFiles.name, local.yearMatch.pos[2], local.yearMatch.len[2])>
@@ -86,7 +94,7 @@
                     </cfif>
                 </cfif>
                 
-                <!--- Filtrar por texto no título, se informado --->
+                <!--- Filtrar por processo no título, se informado --->
                 <cfif local.includeFile AND structKeyExists(local.options, "titleSearch") AND len(local.options.titleSearch)>
                     <cfif NOT FindNoCase(local.options.titleSearch, local.pdfFiles.name)>
                         <cfset local.includeFile = false>
@@ -354,6 +362,8 @@
     </cffunction>
 
     <cffunction name="listPdfDocuments" access="remote" returntype="string" returnformat="json" output="false" hint="Lista todos os documentos PDF disponíveis">
+        <cfargument name="superintendenceCode" type="string" required="false" default="" hint="Código da superintendência para filtrar">
+        
         <cftry>
             <cfset local.result = {
                 success = true,
@@ -373,20 +383,32 @@
             
             <!--- Processar cada arquivo PDF --->
             <cfloop query="local.pdfFiles">
-                <cfset local.filePath = local.pdfFiles.directory & "\" & local.pdfFiles.name>
-                <!--- Continuar usando application.diretorio_busca_pdf --->
-                <cfset local.relativePath = replaceNoCase(local.filePath, application.diretorio_busca_pdf, "")>
+                <cfset local.includeFile = true>
                 
-                <cfset local.document = {
-                    fileName = local.pdfFiles.name,
-                    filePath = local.filePath,
-                    directory = local.pdfFiles.directory,
-                    displayPath = local.relativePath,
-                    size = local.pdfFiles.size,
-                    dateLastModified = local.pdfFiles.dateLastModified
-                }>
+                <!--- Filtrar por código de superintendência, se especificado --->
+                <cfif len(arguments.superintendenceCode)>
+                    <cfset local.superMatch = reFind("_PC(#arguments.superintendenceCode#)\d+", local.pdfFiles.name, 1, true)>
+                    <cfif NOT (arrayLen(local.superMatch.pos) GTE 2 AND local.superMatch.len[1] GT 0)>
+                        <cfset local.includeFile = false>
+                    </cfif>
+                </cfif>
                 
-                <cfset arrayAppend(local.result.documents, local.document)>
+                <cfif local.includeFile>
+                    <cfset local.filePath = local.pdfFiles.directory & "\" & local.pdfFiles.name>
+                    <!--- Continuar usando application.diretorio_busca_pdf --->
+                    <cfset local.relativePath = replaceNoCase(local.filePath, application.diretorio_busca_pdf, "")>
+                    
+                    <cfset local.document = {
+                        fileName = local.pdfFiles.name,
+                        filePath = local.filePath,
+                        directory = local.pdfFiles.directory,
+                        displayPath = local.relativePath,
+                        size = local.pdfFiles.size,
+                        dateLastModified = local.pdfFiles.dateLastModified
+                    }>
+                    
+                    <cfset arrayAppend(local.result.documents, local.document)>
+                </cfif>
             </cfloop>
             
             <cfcatch type="any">
@@ -455,7 +477,7 @@
                             <cfbreak>
                         </cfif>
                     </cfloop>
-                    
+                        
                     <cfif NOT local.found>
                         <cfset local.allFound = false>
                         <cfbreak>

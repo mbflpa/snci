@@ -110,6 +110,12 @@ const PdfSearchManager = {
     searchOptions.processYear = $("#searchYear").val().trim();
     searchOptions.titleSearch = $("#searchTitle").val().trim();
 
+    // MODIFICAÇÃO: Garantir que o código da superintendência seja tratado como texto
+    // Captura o valor como string e mantém o formato original (com zeros à esquerda)
+    searchOptions.superintendenceCode = String(
+      $("#searchSuperintendence").val().trim()
+    );
+
     $("#resultsCard").show();
     $("#searchLoading").show();
     $("#searchResults").empty(); // Limpar resultados anteriores
@@ -240,6 +246,23 @@ const PdfSearchManager = {
       setTimeout(() => {
         $(".document-item").css("transform", "translateY(0)");
       }, 300);
+
+      // Filtrar por superintendência, se informado
+      if (
+        searchOptions &&
+        searchOptions.superintendenceCode &&
+        searchOptions.superintendenceCode.trim() !== ""
+      ) {
+        // MODIFICAÇÃO: Usar RegExp para garantir compatibilidade com códigos iniciados por zero
+        const superRegex = new RegExp(
+          `_PC(${searchOptions.superintendenceCode})\\d+`,
+          "i"
+        );
+        if (!superRegex.test(doc.fileName)) {
+          processNextDocument(index + 1); // Pula este arquivo
+          return;
+        }
+      }
 
       // Filtrar por ano do processo, se informado
       if (searchOptions && searchOptions.processYear) {
@@ -1590,9 +1613,8 @@ const PdfSearchManager = {
       if (searchOptions.caseSensitive) {
         // Busca exata respeitando maiúsculas/minúsculas
         const regex = new RegExp(this.escapeRegExp(term), "g");
-        const matches = text.match(regex);
 
-        if (matches && matches.length > 0) {
+        if (regex.test(text)) {
           termFound = true;
           matchedVariant = term;
           firstIndex = text.indexOf(term);
@@ -1600,11 +1622,10 @@ const PdfSearchManager = {
       } else {
         // Busca case-insensitive
         const regex = new RegExp(this.escapeRegExp(term), "gi");
-        const matches = text.match(regex);
 
-        if (matches && matches.length > 0) {
+        if (regex.test(text)) {
           termFound = true;
-          matchedVariant = matches[0]; // Usar o texto encontrado para preservar o case original no documento
+          matchedVariant = term;
           firstIndex = text.toLowerCase().indexOf(term.toLowerCase());
         }
       }
@@ -1615,9 +1636,8 @@ const PdfSearchManager = {
           if (searchOptions.caseSensitive) {
             // Busca exata com case sensitive
             const regex = new RegExp(this.escapeRegExp(variant), "g");
-            const matches = text.match(regex);
 
-            if (matches && matches.length > 0) {
+            if (regex.test(text)) {
               termFound = true;
               matchedVariant = variant;
               firstIndex = text.indexOf(variant);
@@ -1626,11 +1646,10 @@ const PdfSearchManager = {
           } else {
             // Busca case insensitive
             const regex = new RegExp(this.escapeRegExp(variant), "gi");
-            const matches = text.match(regex);
 
-            if (matches && matches.length > 0) {
+            if (regex.test(text)) {
               termFound = true;
-              matchedVariant = matches[0]; // Preservar o case encontrado no texto
+              matchedVariant = variant;
               firstIndex = text.toLowerCase().indexOf(variant.toLowerCase());
               break;
             }
