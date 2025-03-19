@@ -1546,7 +1546,6 @@
 			</cfquery>		
 
 			<cfset rot12_sdestina = rs14NR.Und_Email>
-			<!--- <cfset rot12_sdestina = #rot12_sdestina# & ';gilvanm@correios.com.br'>--->
 			<cfif findoneof("@", #trim(rot12_sdestina)#) eq 0>
 			 <cfset rot12_sdestina = "gilvanm@correios.com.br">
 			</cfif>
@@ -1622,7 +1621,6 @@
 			</cfquery>		
 
 			<cfset rot13_sdestina = rs14NR.Und_Email>
-			<!--- <cfset rot13_sdestina = #rot13_sdestina# & ';gilvanm@correios.com.br'>--->
 			<cfif findoneof("@", #trim(rot13_sdestina)#) eq 0>
 			 <cfset rot13_sdestina = "gilvanm@correios.com.br">
 			</cfif>
@@ -1699,7 +1697,6 @@
 				ORDER BY Und_CodDiretoria, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 			</cfquery>
 		    <cfset rot14_sdestina = rs15TU.Und_Email>
-			<!--- <cfset rot14_sdestina = #rot14_sdestina# & ';gilvanm@correios.com.br'>--->
 			<cfif findoneof("@", #trim(rot14_sdestina)#) eq 0>
 				 <cfset rot14_sdestina = "gilvanm@correios.com.br">
 			</cfif>
@@ -1774,7 +1771,6 @@
 				ORDER BY Und_CodDiretoria, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem
 			</cfquery>
 		    <cfset rot15_sdestina = rs18TF.Und_Email>
-			<!--- <cfset rot15_sdestina = #rot15_sdestina# & ';gilvanm@correios.com.br'>--->
 			<cfif findoneof("@", #trim(rot15_sdestina)#) eq 0>
 				 <cfset rot15_sdestina = "gilvanm@correios.com.br">
 			</cfif>
@@ -1853,7 +1849,6 @@
 			</cfquery>	 
 			<cfif rs16TS.recordcount gt 0>
              	<cfset rot16_sdestina = rs16TSGRP.Rep_Email>
-				<!--- <cfset rot16_sdestina = #rot16_sdestina# & ';gilvanm@correios.com.br'>--->
 				<cfif findoneof("@", #trim(rot16_sdestina)#) eq 0>
 					 <cfset rot16_sdestina = "gilvanm@correios.com.br">
 				</cfif>
@@ -1934,7 +1929,6 @@
 		  <cfset sdestina = "">
 		  <cfif rs19TA.recordcount gt 0>
 			 <cfset rot17_sdestina = rs19TAGRP.Ars_Email>
-			 <!--- <cfset rot17_sdestina = #rot17_sdestina# & ';gilvanm@correios.com.br'>--->
 				<cfif findoneof("@", #trim(rot17_sdestina)#) eq 0>
 					 <cfset rot17_sdestina = "gilvanm@correios.com.br">
 				</cfif>
@@ -2014,7 +2008,7 @@
 		  <cfset sdestina = "">
 		  <cfif rs23TO.recordcount gt 0>
 			 	<cfset rot18_sdestina = rs23TOGRP.Dir_Email>
-				<!--- <cfset rot18_sdestina = #rot18_sdestina# & ';gilvanm@correios.com.br'>--->
+				
 				<cfif findoneof("@", #trim(rot18_sdestina)#) eq 0>
 					 <cfset rot18_sdestina = "gilvanm@correios.com.br">
 				</cfif>
@@ -2100,7 +2094,7 @@
 				 <cfelse>
 					<cfset rot19_sdestina = #trim(rs4POGRP.Rep_Email)#>
 			 	</cfif>
-				<!--- <cfset rot19_sdestina = #rot19_sdestina# & ';gilvanm@correios.com.br'>--->
+				
 				<!---    ---> 
 			    <cfmail from="SNCI@correios.com.br" to="#rot19_sdestina#" subject="Avaliação PENDENTE DO ÓRGÃO SUBORDINADOR" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
@@ -2177,7 +2171,7 @@
 					 <cfelse>
 						<cfset rot20_sdestina = #trim(rs2PU20PF.Und_Email)#>
 					</cfif>
-					<!--- <cfset rot20_sdestina = #rot20_sdestina# & ';gilvanm@correios.com.br'>--->
+					
 					<cfset rot20_assunto = 'AVALIAÇÃO PENDENTE DA UNIDADE'>
 					<cfif rs2PU20PF.Und_TipoUnidade is 12 or rs2PU20PF.Und_TipoUnidade is 16>
 						<cfset rot20_assunto = 'AVALIAÇÃO PENDENTE DE TERCEIRIZADA'>
@@ -2257,8 +2251,7 @@
 				 <cfelse>
 					<cfset rot21_sdestina = #trim(rs5PAGRP.Ars_Email)#>
 			 	</cfif>
-				<!--- <cfset rot21_sdestina = #rot21_sdestina# & ';gilvanm@correios.com.br'>--->
-				<!---    ---> 
+				
 			    <cfmail from="SNCI@correios.com.br" to="#rot21_sdestina#" subject="Avaliação PENDENTE DA ÁREA" type="HTML">
 				 Mensagem automática. Não precisa responder!<br><br>
 				<strong>
@@ -2433,7 +2426,7 @@
 				</cfquery>
 				<cfset auxnomearea = rsGes.Ars_Sigla>
 				<cfset rot23_sdestina = rsGes.Ars_Email>
-				<!--- <cfset rot23_sdestina = #rot23_sdestina# & ';gilvanm@correios.com.br'>--->
+				
 				<cfif findoneof("@", #trim(rot23_sdestina)#) eq 0>
 					 <cfset rot23_sdestina = "gilvanm@correios.com.br">
 				</cfif>
@@ -2543,7 +2536,7 @@
 		
 					<cfset auxnomearea = rsGes.Ars_Sigla>
 					<cfset rot24_sdestina = rsGes.Ars_Email>
-					<!--- <cfset rot24_sdestina = #rot24_sdestina# & ';gilvanm@correios.com.br'>--->
+					
 					<cfif findoneof("@", #trim(rot24_sdestina)#) eq 0>
 						 <cfset rot24_sdestina = "gilvanm@correios.com.br">
 					</cfif>
@@ -2659,7 +2652,7 @@
 					<cfset auxnomearea = rsSCIA.Ars_Sigla>
 					<cfset rot25_sdestina = rsSCIA.Ars_Email>
 					<cfset rot25_sdestina = rot25_sdestina & ';' & rsSCIA.Ars_EmailCoordenador>
-					<!--- <cfset rot25_sdestina = #rot25_sdestina# & ';gilvanm@correios.com.br'>--->
+					
 					<cfif findoneof("@", #trim(rot25_sdestina)#) eq 0>
 						 <cfset rot25_sdestina = "gilvanm@correios.com.br">
 					</cfif>
@@ -2953,7 +2946,7 @@
 					<cfset auxnomearea = rsSCIA.Ars_Sigla>
 					<cfset rot27_sdestina = rsSCIA.Ars_Email>
 					<cfset rot27_sdestina = rot27_sdestina & ';' & rsSCIA.Ars_EmailCoordenador>
-					<!--- <cfset rot27_sdestina = #rot27_sdestina# & ';gilvanm@correios.com.br'>--->
+					
 					<cfif findoneof("@", #trim(rot27_sdestina)#) eq 0>
 						 <cfset rot27_sdestina = "gilvanm@correios.com.br">
 					</cfif>
@@ -3028,7 +3021,7 @@
 		
 		<cfloop query="rsAviso1">
 			<cfset rot29a_sdestina = rsAviso1.Und_Email>
-			<!--- <cfset rot29a_sdestina = #rot29a_sdestina# & ';gilvanm@correios.com.br'>--->
+			
 			<cfif findoneof("@", #trim(rot29a_sdestina)#) eq 0>
 				<cfset rot29a_sdestina = "gilvanm@correios.com.br">
 			</cfif>
@@ -3060,7 +3053,7 @@
 		</cfquery>
 		<cfloop query="rsAviso2">
 			<cfset rot29b_sdestina = rsAviso2.Und_Email>
-			<!--- <cfset rot29b_sdestina = #rot29b_sdestina# & ';gilvanm@correios.com.br'>--->
+			
 			<cfif findoneof("@", #trim(rot29b_sdestina)#) eq 0>
 				<cfset rot29b_sdestina = "gilvanm@correios.com.br">
 			</cfif>
@@ -3092,7 +3085,7 @@
 		<!--- aviso 3 e ultimo --->
 		<cfloop query="rsAviso3">
 			<cfset rot29c_sdestina = rsAviso3.Und_Email>
-			<!--- <cfset rot29c_sdestina = #rot29c_sdestina# & ';gilvanm@correios.com.br'>--->
+			
 			<cfif findoneof("@", #trim(rot29c_sdestina)#) eq 0>
 				<cfset rot29c_sdestina = "gilvanm@correios.com.br">
 			</cfif>
@@ -3605,7 +3598,7 @@
 				<cfset sdestina = "gilvanm@correios.com.br">
 			</cfif>
 
-			<cfset sdestina = #sdestina# & ';teciogomes@correios.com.br;gilvanm@correios.com.br'> 
+			
 			<cfset assunto = 'Relatório de Controle Interno - ' & #trim(rsEnvio.Und_Descricao)# & ' - Avaliação de Controle Interno ' & #rsEnvio.INP_NumInspecao#>
 			<cfquery name="rsNC" datasource="#dsn_inspecao#">
 				SELECT Pos_Inspecao
