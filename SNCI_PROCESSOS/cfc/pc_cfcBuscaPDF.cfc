@@ -397,81 +397,88 @@
                 }
             }>
             
-            <!--- Guardar informações sobre os filtros aplicados --->
-            <cfif len(arguments.superintendenceCode)>
-                <cfset local.result.filterStats.filters["superintendence"] = arguments.superintendenceCode>
-            </cfif>
-            <cfif len(arguments.processYear)>
-                <cfset local.result.filterStats.filters["year"] = arguments.processYear>
-            </cfif>
-            <cfif len(arguments.titleSearch)>
-                <cfset local.result.filterStats.filters["title"] = arguments.titleSearch>
-            </cfif>
-            
-            <!--- Verificar diretório --->
-            <cfif not directoryExists(application.diretorio_busca_pdf)>
-                <cfset local.result.success = false>
-                <cfset local.result.message = "Diretório de PDFs não encontrado">
-                <cfreturn serializeJSON(local.result)>
-            </cfif>
-            
-            <!--- Listar todos os arquivos PDF no diretório --->
-            <cfdirectory action="list" directory="#application.diretorio_busca_pdf#" name="local.pdfFiles" filter="*.pdf" recurse="true">
-            
-            <cfset local.result.filterStats.total = local.pdfFiles.recordCount>
-            
-            <!--- Processar cada arquivo PDF --->
-            <cfloop query="local.pdfFiles">
-                <cfset local.includeFile = true>
+            <!--- Realizar consulta na tabela pc_anexos usando a sintaxe tradicional --->
+            <cfquery name="local.anexosQuery" datasource="#application.dsn_processos#">
+                SELECT 
+                    pc_anexo_id,
+                    pc_anexo_caminho,
+                    pc_anexo_nome,
+                    pc_anexo_datahora,
+                    pc_anexo_processo_id
+                FROM 
+                    pc_anexos
+                WHERE 
+                    pc_anexo_avaliacaoPDF = 'S'
+                AND 
+                    pc_anexo_enviado = 1
+                AND
+                    pc_anexo_caminho LIKE <cfqueryparam value="%#application.diretorio_avaliacoes#%" cfsqltype="cf_sql_varchar">
                 
-                <!--- Filtrar por código de superintendência, se especificado --->
-                <cfif len(arguments.superintendenceCode)>
-                    <cfset local.superMatch = reFind("_PC(#arguments.superintendenceCode#)\d+", local.pdfFiles.name, 1, true)>
-                    <cfif NOT (arrayLen(local.superMatch.pos) GTE 2 AND local.superMatch.len[1] GT 0)>
-                        <cfset local.includeFile = false>
-                    </cfif>
+                <cfif len(trim(arguments.superintendenceCode))>
+                    AND LEFT(pc_anexo_processo_id, 2) = <cfqueryparam value="#arguments.superintendenceCode#" cfsqltype="cf_sql_varchar">
                 </cfif>
                 
-                <!--- Filtrar por ano do processo, se informado --->
-                <cfif local.includeFile AND len(arguments.processYear)>
-                    <cfset local.yearMatch = reFind("_PC\d+(\d{4})_", local.pdfFiles.name, 1, true)>
-                    <cfif arrayLen(local.yearMatch.pos) GTE 2>
-                        <cfset local.foundYear = mid(local.pdfFiles.name, local.yearMatch.pos[2], local.yearMatch.len[2])>
-                        <cfif local.foundYear NEQ arguments.processYear>
-                            <cfset local.includeFile = false>
-                        </cfif>
-                    <cfelse>
-                        <cfset local.includeFile = false>
-                    </cfif>
+                <cfif len(trim(arguments.processYear))>
+                    AND RIGHT(pc_anexo_processo_id, 4) = <cfqueryparam value="#arguments.processYear#" cfsqltype="cf_sql_varchar">
                 </cfif>
                 
-                <!--- Filtrar por texto no título, se informado (busca case-insensitive) --->
-                <cfif local.includeFile AND len(arguments.titleSearch)>
-                    <cfif NOT FindNoCase(arguments.titleSearch, local.pdfFiles.name)>
-                        <cfset local.includeFile = false>
-                    </cfif>
+                <cfif len(trim(arguments.titleSearch))>
+                    AND pc_anexo_processo_id = <cfqueryparam value="#arguments.titleSearch#" cfsqltype="cf_sql_varchar">
                 </cfif>
                 
-                <cfif local.includeFile>
-                    <cfset local.filePath = local.pdfFiles.directory & "\" & local.pdfFiles.name>
-                    <cfset local.relativePath = replaceNoCase(local.filePath, application.diretorio_busca_pdf, "")>
+                ORDER BY pc_anexo_datahora DESC
+            </cfquery>
+            
+            <cflog file="pdfSearch" text="Consulta SQL executada. Resultados: #local.anexosQuery.recordCount#">
+            
+            <cfset local.result.filterStats.total = local.anexosQuery.recordCount>
+            <cfset local.allDocumentsCount = local.anexosQuery.recordCount>
+            <cfset local.validDocumentsCount = 0>
+            
+            <!--- Processar cada arquivo PDF encontrado com diagnóstico detalhado --->
+            <cfloop query="local.anexosQuery">
+                <!--- Log para verificar o valor do pc_anexo_processo_id --->
+                <cflog file="pdfSearch" text="Documento #local.anexosQuery.currentRow#: pc_anexo_processo_id='#local.anexosQuery.pc_anexo_processo_id#', pc_anexo_caminho='#local.anexosQuery.pc_anexo_caminho#'">
+                
+                <!--- Verificar se o arquivo existe fisicamente antes de adicioná-lo à lista --->
+                <cfif FileExists(local.anexosQuery.pc_anexo_caminho)>
+                    <cfset local.fileInfo = GetFileInfo(local.anexosQuery.pc_anexo_caminho)>
                     
+                    <!--- Criar estrutura de documento com diagnóstico claro do número do processo --->
                     <cfset local.document = {
-                        fileName = local.pdfFiles.name,
-                        filePath = local.filePath,
-                        directory = local.pdfFiles.directory,
-                        displayPath = local.relativePath,
-                        size = local.pdfFiles.size,
-                        dateLastModified = local.pdfFiles.dateLastModified
+                        fileName = local.anexosQuery.pc_anexo_nome,
+                        filePath = local.anexosQuery.pc_anexo_caminho,
+                        directory = local.anexosQuery.pc_anexo_caminho,
+                        displayPath = local.anexosQuery.pc_anexo_processo_id,
+                        pc_anexo_processo_id = local.anexosQuery.pc_anexo_processo_id, <!--- Incluir diretamente também --->
+                        size = local.fileInfo.size,
+                        dateLastModified = local.anexosQuery.pc_anexo_datahora
                     }>
                     
+                    <!--- Registrar o documento em log para diagnóstico --->
+                    <cflog file="pdfSearch" text="Documento estruturado: #serializeJSON(local.document)#">
+                    
+                    <!--- Adicionar apenas se o arquivo existe --->
                     <cfset arrayAppend(local.result.documents, local.document)>
+                    <cfset local.validDocumentsCount = local.validDocumentsCount + 1>
+                <cfelse>
+                    <cflog file="pdfSearch" text="Arquivo não existe: #local.anexosQuery.pc_anexo_caminho#">
                 </cfif>
             </cfloop>
             
-            <cfset local.result.filterStats.filtered = arrayLen(local.result.documents)>
+            <!--- Atualizar a estatística de documentos filtrados para refletir apenas os válidos --->
+            <cfset local.result.filterStats.filtered = local.validDocumentsCount>
+            <cflog file="pdfSearch" text="Total de documentos: #local.allDocumentsCount#, Válidos: #local.validDocumentsCount#">
+            
+            <!--- Verificar se há documentos antes de tentar acessar o primeiro --->
+            <cfif arrayLen(local.result.documents) GT 0>
+                <cflog file="pdfSearch" text="Amostra do primeiro documento: #serializeJSON(local.result.documents[1])#">
+            <cfelse>
+                <cflog file="pdfSearch" text="Nenhum documento encontrado com os filtros aplicados">
+            </cfif>
             
             <cfcatch type="any">
+                <cflog file="pdfSearch" text="Erro em listPdfDocuments: #cfcatch.message# - #cfcatch.detail#" type="error">
                 <cfset local.result = {
                     success = false,
                     message = "Erro ao listar documentos: #cfcatch.message#",

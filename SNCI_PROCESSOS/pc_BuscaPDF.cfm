@@ -748,11 +748,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Container para resultados em tempo real com links clicáveis -->
-                            <div id="realTimeResults" class="mt-4">
-                                <h5 class="border-bottom pb-2">Resultados encontrados até o momento:</h5>
-                                <div id="realTimeResultsList" class="text-left"></div>
-                            </div>
                             <!-- Alerta quando não há resultados -->
                             <div id="noResultsAlert" class="alert alert-warning" style="display:none;">
                                 <div class="d-flex align-items-center">
@@ -858,40 +853,12 @@
                 $(this).removeClass('shadow-sm');
             });
             
-            // Configuração das animações SVG
+            // CORREÇÃO: Não iniciar animações no submit do formulário, mas deixar o PdfSearchManager gerenciar isso
+            // Remover a manipulação direta das animações SVG e delegar para o código de busca
             $('#searchFaqForm').on('submit', function(e) {
                 e.preventDefault();
-                // Exibe o card de resultados e o loading
-                $('#resultsCard').show();
-                $('#searchLoading').show();
-                
-                // Inicia as animações do documento após o retângulo estar visível
-                setTimeout(function() {
-                    try {
-                        // Obtém as animações do SVG que precisam ser iniciadas manualmente
-                        var docAnimation = document.getElementById('docAnimation');
-                        var opacityAnimation = document.getElementById('opacityAnimation');
-                        var scanLineAnimation = document.getElementById('scanLineAnimation');
-                        var scanLineOpacity = document.getElementById('scanLineOpacity');
-                        var animatedDoc = document.getElementById('animated-document');
-                        
-                        // Torna o grupo do documento visível
-                        if (animatedDoc) {
-                            animatedDoc.setAttribute('opacity', '1');
-                        }
-                        
-                        // Inicia as animações
-                        if (docAnimation) {
-                            docAnimation.beginElement();
-                        }
-                        
-                        if (opacityAnimation) opacityAnimation.beginElement();
-                        if (scanLineAnimation) scanLineAnimation.beginElement();
-                        if (scanLineOpacity) scanLineOpacity.beginElement();
-                    } catch (error) {
-                        console.error("Erro ao iniciar animações:", error);
-                    }
-                }, 1000);  // Delay para garantir que o retângulo tracejado já esteja visível
+                // Apenas chama performSearch sem iniciar animações diretamente
+                PdfSearchManager.performSearch();
             });
             
             // SOLUÇÃO DEFINITIVA: Substituir popover por modal para estatísticas

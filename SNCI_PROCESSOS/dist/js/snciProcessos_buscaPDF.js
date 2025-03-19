@@ -1,6 +1,10 @@
 // Variáveis globais para controle da busca
 let searchCanceled = false;
 let documentProcessing = false;
+let synonymsDict = {}; // Inicializar dicionário de sinônimos vazio
+
+// Nova variável para controlar documentos já processados
+let processedFilePaths = new Set();
 
 // Novas variáveis para estatísticas de páginas
 const pageStats = {
@@ -20,7 +24,7 @@ const fileStats = {
 
 // Gerenciador de busca em PDFs
 const PdfSearchManager = {
-  currentSearchResults: [],
+  currentSearchResults: 0, // Alterado para contador em vez de array
 
   // Inicializar o gerenciador
   init: function () {
@@ -28,6 +32,20 @@ const PdfSearchManager = {
     this.resetStats();
     this.loadRecentSearches();
     this.setupFilterListeners(); // Adicionar configuração dos listeners para filtros
+
+    // Carregar o dicionário de sinônimos do arquivo JSON
+    $.ajax({
+      url: "dist/js/synonyms.json",
+      dataType: "json",
+      async: false, // Para garantir que seja carregado antes do uso
+      success: function (data) {
+        synonymsDict = data;
+        console.log("Dicionário de sinônimos carregado com sucesso.");
+      },
+      error: function (xhr, status, error) {
+        console.error("Erro ao carregar dicionário de sinônimos:", error);
+      },
+    });
 
     // Verificar se há termos de busca na URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -81,6 +99,9 @@ const PdfSearchManager = {
   performSearch: function (searchTerms) {
     // Resetar estatísticas no início de uma nova busca
     this.resetStats();
+
+    // Limpar set de arquivos processados
+    processedFilePaths = new Set();
 
     if (!searchTerms) {
       searchTerms = $("#searchTerms").val().trim();
@@ -166,16 +187,16 @@ const PdfSearchManager = {
     const terms = searchTerms.split(" ");
     let processedCount = 0;
     const totalDocuments = documents.length;
-    this.currentSearchResults = [];
+    this.currentSearchResults = 0; // Contador em vez de array
     let filesRead = 0; // Contador de arquivos que passaram nos filtros
 
     // Reset do cancelamento de busca
     searchCanceled = false;
     documentProcessing = true;
 
-    // Mostrar o container de resultados em tempo real
-    $("#realTimeResults").show();
-    $("#realTimeResultsList").empty();
+    // Não precisamos mais mostrar container de resultados temporários
+    $("#realTimeResults").hide();
+    $("#searchResults").empty(); // Limpar resultados anteriores
 
     $("#processingStatus").text(`Buscando em ${totalDocuments} documentos...`);
 
@@ -230,6 +251,17 @@ const PdfSearchManager = {
       }
 
       const doc = documents[index];
+
+      // VERIFICAR SE O DOCUMENTO JÁ FOI PROCESSADO
+      if (processedFilePaths.has(doc.filePath)) {
+        // Pular este documento e ir para o próximo
+        setTimeout(() => processNextDocument(index + 1), 0);
+        return;
+      }
+
+      // Marcar este documento como processado
+      processedFilePaths.add(doc.filePath);
+
       processedCount++;
 
       // Atualizar UI
@@ -389,10 +421,10 @@ const PdfSearchManager = {
             found: true,
           };
 
-          // Adicionar ao array de resultados
-          this.currentSearchResults.push(resultObj);
+          // Apenas incrementar o contador ao invés de armazenar todo o objeto
+          this.currentSearchResults++;
 
-          // Mostrar resultado em tempo real
+          // Mostrar resultado diretamente no container final
           this.addRealTimeResult(resultObj);
         }
 
@@ -474,12 +506,17 @@ const PdfSearchManager = {
       result.filePath
     )}`;
 
+    // Verificar se este resultado já foi adicionado ao DOM
+    if (document.querySelector(`[data-file-path="${result.filePath}"]`)) {
+      return; // Evitar duplicação
+    }
+
     // Criar HTML no formato final do resultado
     const resultHTML = `
       <div class="search-result" data-file-path="${
         result.filePath
       }" data-file-url="${pdfUrl}" data-result-id="${
-      this.currentSearchResults.length - 1
+      this.currentSearchResults
     }">
         <div class="d-flex justify-content-between align-items-start">
           <h5>
@@ -523,7 +560,7 @@ const PdfSearchManager = {
     $("#searchResults").prepend(resultHTML);
 
     // Atualizar estatísticas em tempo real
-    const count = this.currentSearchResults.length;
+    const count = this.currentSearchResults;
     $("#searchStats").text(
       `${count} resultado${count !== 1 ? "s" : ""} encontrado${
         count !== 1 ? "s" : ""
@@ -539,6 +576,9 @@ const PdfSearchManager = {
         "slow"
       );
     }
+
+    // Depois de adicionar ao DOM, liberar o objeto da memória
+    // A variável resultObj será limpa pelo coletor de lixo
   },
   // Busca usando o método do servidor
   searchInServerSide: function (searchTerms, searchOptions) {
@@ -939,7 +979,7 @@ const PdfSearchManager = {
     $("#searchLoading").hide();
     $("#realTimeResults").hide();
     // Se não há resultados
-    if (this.currentSearchResults.length === 0) {
+    if (this.currentSearchResults === 0) {
       $("#noResultsAlert").show();
       $("#searchStats").text(
         `0 resultados encontrados em ${searchTime} segundos. Arquivos lidos: ${
@@ -954,7 +994,7 @@ const PdfSearchManager = {
     let detailedStatsHtml = "";
 
     // Estatísticas básicas
-    const resultCount = this.currentSearchResults.length;
+    const resultCount = this.currentSearchResults;
     const resultText = `${resultCount} resultado${
       resultCount !== 1 ? "s" : ""
     } encontrado${resultCount !== 1 ? "s" : ""} em ${searchTime} segundos`;
@@ -1257,7 +1297,23 @@ const PdfSearchManager = {
   // Busca com documentos do servidor
   searchWithServerDocuments: function (documents, searchTerms, searchOptions) {
     if (searchCanceled) return;
-    const documentPaths = documents.map((doc) => doc.filePath);
+
+    // Filtrar apenas documentos que ainda não foram processados
+    const unprocessedDocs = documents.filter(
+      (doc) => !processedFilePaths.has(doc.filePath)
+    );
+
+    // Se não houver documentos não processados, saia
+    if (unprocessedDocs.length === 0) {
+      this.checkSearchCompletion();
+      return;
+    }
+
+    // Marcar todos os documentos como processados antes de enviá-los
+    unprocessedDocs.forEach((doc) => processedFilePaths.add(doc.filePath));
+
+    const documentPaths = unprocessedDocs.map((doc) => doc.filePath);
+
     $.ajax({
       url: "cfc/pc_cfcBuscaPDF.cfc",
       type: "POST",
@@ -1282,16 +1338,21 @@ const PdfSearchManager = {
                 fileUrl: fileUrl,
                 found: true,
               };
-              this.addSearchResult(processedResult);
+              // Verificação extra para garantir que não haverá duplicatas
+              if (
+                !document.querySelector(`[data-file-path="${result.filePath}"]`)
+              ) {
+                this.addSearchResult(processedResult);
+              }
             });
           }
-          searchStats.documentsProcessed += documents.length;
+          searchStats.documentsProcessed += unprocessedDocs.length;
         }
         this.checkSearchCompletion();
       },
       error: (xhr, status, error) => {
         console.error("Erro na busca pelo servidor:", error);
-        searchStats.documentsProcessed += documents.length;
+        searchStats.documentsProcessed += unprocessedDocs.length;
         this.checkSearchCompletion();
       },
     });
@@ -1299,6 +1360,14 @@ const PdfSearchManager = {
 
   // Busca de documento único no servidor
   searchSingleDocumentInServer: function (doc, searchTerms, searchOptions) {
+    // Verificar se este documento já foi processado
+    if (processedFilePaths.has(doc.filePath)) {
+      return;
+    }
+
+    // Marcar como processado
+    processedFilePaths.add(doc.filePath);
+
     $.ajax({
       url: "cfc/pc_cfcBuscaPDF.cfc",
       type: "POST",
@@ -1319,11 +1388,20 @@ const PdfSearchManager = {
           parsedResponse.results.length > 0
         ) {
           const result = parsedResponse.results[0];
-          const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
-            result.filePath
-          )}&nome=${encodeURIComponent(result.fileName)}`;
-          const processedResult = { ...result, fileUrl: fileUrl, found: true };
-          this.addSearchResult(processedResult);
+          // Verificar novamente se o documento já foi adicionado à interface
+          if (
+            !document.querySelector(`[data-file-path="${result.filePath}"]`)
+          ) {
+            const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
+              result.filePath
+            )}&nome=${encodeURIComponent(result.fileName)}`;
+            const processedResult = {
+              ...result,
+              fileUrl: fileUrl,
+              found: true,
+            };
+            this.addSearchResult(processedResult);
+          }
         }
       },
       error: (xhr, status, error) => {
@@ -1347,8 +1425,10 @@ const PdfSearchManager = {
 
   // Adicionar resultado de busca
   addSearchResult: function (result) {
-    this.currentSearchResults.push(result);
-    this.addRealTimeResult(result);
+    this.currentSearchResults++; // Apenas incrementar contador
+    this.addRealTimeResult(result); // Adicionar diretamente no DOM
+
+    // O objeto result não fica armazenado em memória
   },
 
   // Verificar conclusão da busca
@@ -1838,476 +1918,10 @@ const PdfSearchManager = {
 
   // Buscar sinônimos para os termos de busca
   getSynonyms: function (term) {
-    // Dicionário simples de sinônimos em português
-    const synonymsDict = {
-      // Termos originais ampliados
-      processo: [
-        "ação",
-        "procedimento",
-        "causa",
-        "caso",
-        "autos",
-        "feito",
-        "litígio",
-        "demanda",
-        "pleito",
-        "lide",
-      ],
-      cliente: [
-        "usuário",
-        "consumidor",
-        "freguês",
-        "comprador",
-        "contratante",
-        "beneficiário",
-        "interessado",
-        "parte",
-        "assistido",
-        "constituinte",
-      ],
-      documento: [
-        "arquivo",
-        "comprovante",
-        "papel",
-        "certificado",
-        "anexo",
-        "registro",
-        "escritura",
-        "formulário",
-        "instrumento",
-        "petição",
-        "documentação",
-      ],
-      pagamento: [
-        "quitação",
-        "liquidação",
-        "remuneração",
-        "depósito",
-        "honorário",
-        "adimplemento",
-        "transferência",
-        "parcela",
-        "prestação",
-        "valor",
-        "débito",
-        "crédito",
-      ],
-      contrato: [
-        "acordo",
-        "convênio",
-        "tratado",
-        "compromisso",
-        "pacto",
-        "convenção",
-        "negócio",
-        "termo",
-        "ajuste",
-        "instrumento",
-        "escritura",
-        "avença",
-      ],
-      prazo: [
-        "período",
-        "termo",
-        "data",
-        "duração",
-        "tempo",
-        "vencimento",
-        "limite",
-        "cronograma",
-        "lapso temporal",
-        "intervalo",
-        "dilação",
-        "prorrogação",
-      ],
-      judicial: [
-        "jurídico",
-        "legal",
-        "forense",
-        "jurisdicional",
-        "processual",
-        "judicante",
-        "judiciário",
-        "judicativo",
-        "contencioso",
-        "litigioso",
-      ],
-      advogado: [
-        "defensor",
-        "procurador",
-        "causídico",
-        "representante",
-        "patrono",
-        "constituído",
-        "jurista",
-        "bacharel",
-        "profissional",
-        "consultor",
-      ],
-      serviço: [
-        "atendimento",
-        "prestação",
-        "trabalho",
-        "atividade",
-        "tarefa",
-        "função",
-        "assistência",
-        "auxílio",
-        "suporte",
-        "apoio",
-        "consultoria",
-      ],
-      recurso: [
-        "apelação",
-        "contestação",
-        "impugnação",
-        "agravo",
-        "embargos",
-        "revisão",
-        "reclamação",
-        "remédio processual",
-        "inconformismo",
-        "insurgência",
-      ],
-
-      // Novos termos relacionados a processos
-      sentença: [
-        "decisão",
-        "julgamento",
-        "veredicto",
-        "deliberação",
-        "acórdão",
-        "pronunciamento",
-        "despacho",
-        "provimento",
-        "resolução",
-      ],
-      audiência: [
-        "sessão",
-        "julgamento",
-        "encontro",
-        "debate",
-        "conferência",
-        "reunião",
-        "oitiva",
-        "conciliação",
-        "mediação",
-      ],
-      juiz: [
-        "magistrado",
-        "julgador",
-        "autoridade",
-        "entrada",
-        "recibo",
-        "comprovante",
-        "numeração",
-        "cadastro",
-        "recepção",
-      ],
-      certidão: [
-        "atestado",
-        "declaração",
-        "comprovante",
-        "documento",
-        "certificado",
-        "confirmação",
-        "prova",
-      ],
-      custas: [
-        "despesas",
-        "gastos",
-        "valores",
-        "taxas",
-        "emolumentos",
-        "dispêndios",
-        "pagamentos",
-      ],
-      relatório: [
-        "informe",
-        "parecer",
-        "exposição",
-        "relato",
-        "descrição",
-        "memorial",
-        "resumo",
-        "síntese",
-      ],
-      ofício: [
-        "comunicação",
-        "documento",
-        "correspondência",
-        "expediente",
-        "missiva",
-        "nota",
-        "informação",
-      ],
-
-      // NOVOS TERMOS - Inspeções
-      inspeção: [
-        "fiscalização",
-        "vistoria",
-        "verificação",
-        "exame",
-        "averiguação",
-        "perícia",
-        "checagem",
-        "auditoria",
-        "monitoramento",
-        "avaliação",
-      ],
-      fiscalização: [
-        "supervisão",
-        "controle",
-        "vigilância",
-        "inspeção",
-        "acompanhamento",
-        "monitoramento",
-        "verificação",
-        "conferência",
-        "vistoria",
-      ],
-      vistoria: [
-        "exame",
-        "inspeção",
-        "verificação",
-        "avaliação",
-        "checagem",
-        "visita técnica",
-        "análise presencial",
-        "perícia",
-        "conferência local",
-      ],
-
-      // NOVOS TERMOS - Auditorias
-      auditoria: [
-        "verificação",
-        "exame",
-        "análise",
-        "perícia",
-        "revisão",
-        "avaliação",
-        "controle",
-        "fiscalização",
-        "investigação",
-        "apuração",
-      ],
-      controle: [
-        "supervisão",
-        "monitoramento",
-        "acompanhamento",
-        "fiscalização",
-        "gestão",
-        "verificação",
-        "regulação",
-        "inspeção",
-        "vigilância",
-      ],
-      conformidade: [
-        "adequação",
-        "cumprimento",
-        "observância",
-        "adesão",
-        "obediência",
-        "alinhamento",
-        "regularidade",
-        "consonância",
-        "legalidade",
-        "compliance",
-      ],
-
-      // NOVOS TERMOS - Leis
-      lei: [
-        "legislação",
-        "norma",
-        "regra",
-        "regulamento",
-        "decreto",
-        "estatuto",
-        "código",
-        "dispositivo legal",
-        "preceito",
-        "disposição legal",
-      ],
-      legislação: [
-        "leis",
-        "normas",
-        "regulamentos",
-        "códigos",
-        "decretos",
-        "estatutos",
-        "ordenamento jurídico",
-        "regras",
-        "sistema legal",
-        "direito positivo",
-      ],
-      regulamento: [
-        "norma",
-        "instrução",
-        "diretriz",
-        "portaria",
-        "resolução",
-        "deliberação",
-        "regra",
-        "disposição",
-        "ordenação",
-        "estatuto",
-      ],
-      decreto: [
-        "determinação",
-        "ordem",
-        "decisão",
-        "ato",
-        "deliberação",
-        "resolução",
-        "disposição",
-        "regulamentação",
-        "ordenação",
-      ],
-
-      // NOVOS TERMOS - Órgãos Públicos
-      ministério: [
-        "pasta",
-        "órgão",
-        "secretaria",
-        "departamento",
-        "entidade governamental",
-        "instituição pública",
-        "autarquia",
-        "setor público",
-      ],
-      agência: [
-        "órgão",
-        "entidade",
-        "instituição",
-        "autarquia",
-        "departamento",
-        "repartição",
-        "setor",
-        "organismo",
-        "unidade",
-      ],
-      secretaria: [
-        "departamento",
-        "seção",
-        "diretoria",
-        "divisão",
-        "coordenadoria",
-        "assessoria",
-        "gerência",
-        "superintendência",
-      ],
-      autarquia: [
-        "entidade",
-        "órgão",
-        "instituição",
-        "organismo",
-        "repartição",
-        "departamento",
-        "agência",
-        "fundação",
-      ],
-
-      // NOVOS TERMOS - Correios do Brasil
-      correios: [
-        "ECT",
-        "empresa brasileira de correios e telégrafos",
-        "serviço postal",
-        "agência postal",
-        "serviço de encomendas",
-        "postal",
-      ],
-      correspondência: [
-        "carta",
-        "comunicação",
-        "documento",
-        "ofício",
-        "notificação",
-        "aviso",
-        "comunicado",
-        "expediente",
-        "missiva",
-        "mensagem",
-      ],
-      entrega: [
-        "remessa",
-        "envio",
-        "despacho",
-        "distribuição",
-        "expedição",
-        "transporte",
-        "transmissão",
-        "postagem",
-        "encaminhamento",
-      ],
-      postal: [
-        "carteiro",
-        "agência",
-        "serviço de correios",
-        "malote",
-        "correspondência",
-        "entrega",
-        "ECT",
-        "logística postal",
-        "mala direta",
-      ],
-
-      // NOVOS TERMOS - Específicos do contexto
-      malote: [
-        "remessa",
-        "pacote",
-        "encomenda",
-        "volume",
-        "valise",
-        "saco de documentos",
-        "bolsa",
-        "transportadora",
-        "expedição",
-      ],
-      rastreamento: [
-        "monitoramento",
-        "acompanhamento",
-        "localização",
-        "rastreio",
-        "controle",
-        "aferição",
-        "seguimento",
-        "conferência",
-      ],
-      postagem: [
-        "expedição",
-        "envio",
-        "remessa",
-        "despacho",
-        "encaminhamento",
-        "distribuição",
-        "entrega",
-        "registro",
-      ],
-      sedex: [
-        "entrega expressa",
-        "serviço expresso",
-        "entrega rápida",
-        "encomenda expressa",
-        "remessa urgente",
-        "PAC",
-        "encomenda",
-      ],
-      destinatário: [
-        "recebedor",
-        "receptor",
-        "recipiente",
-        "beneficiário",
-        "consignatário",
-        "endereçado",
-        "alvo",
-        "participante",
-      ],
-    };
-
     // Normalizar termo para busca
     const normalizedTerm = term.toLowerCase().trim();
 
-    // Procurar no dicionário
+    // Procurar no dicionário já carregado do arquivo JSON
     for (const [word, synonyms] of Object.entries(synonymsDict)) {
       if (word === normalizedTerm) {
         return synonyms;
