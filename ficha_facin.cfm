@@ -128,9 +128,10 @@
         FROM UN_Ficha_Facin INNER JOIN UN_Ficha_Facin_Avaliador ON (FAC_Matricula = FACA_Matricula) AND (FAC_Avaliacao = FACA_Avaliacao) AND (FAC_Unidade = FACA_Unidade)
         WHERE FAC_Avaliacao = convert(varchar,'#form.numinsp#') 
     </cfquery>
+  
     <cfset form.ptoMeta1Atual = 0>
     <cfset form.ptoMeta2Atual = 0>
- 
+
     <cfif rsExisteFacin.recordcount lte 0>
         <cfset form.ptogeral = #rsRIP.TotalRIP#>
         <cfset form.meta1 = 100>
@@ -183,9 +184,8 @@
             <cfset form.ptoMeta1Atual = numberFormat(rsExisteFacin.FAC_Meta1_Peso_Item * form.ptoMeta1Atual,'___.000')>
             <cfset form.PtoMeta1ajustar = numberFormat(form.ptorevismeta1 + form.ptoMeta1Atual,'___.00')>
             <cfset form.PercMeta1ajustar =numberFormat((form.PtoMeta1ajustar/form.ptogeral)*100,'___.00')>
-
             <cfset form.ptoMeta2Atual = rsItem.FACA_Meta2_AR_Falta + rsItem.FACA_Meta2_AR_Troca + rsItem.FACA_Meta2_AR_Nomen + rsItem.FACA_Meta2_AR_Ordem + rsItem.FACA_Meta2_AR_Prazo>
-            <cfset form.ptoMeta2Atual = numberFormat(rsExisteFacin.FAC_Meta2_Peso_Item * form.ptoMeta1Atual,'___.000')>
+            <cfset form.ptoMeta2Atual = numberFormat(rsExisteFacin.FAC_Meta2_Peso_Item * form.ptoMeta2Atual,'___.000')>
             <cfset form.PtoMeta2ajustar = numberFormat(form.ptorevismeta2 + form.ptoMeta2Atual,'___.00')>
             <cfset form.PercMeta2ajustar =numberFormat((form.PtoMeta2ajustar/form.ptogeral)*100,'___.00')>
         <cfelse>
@@ -193,11 +193,17 @@
             <cfset form.ptoMeta2Atual = 0>
             <cfset form.PtoMeta1ajustar = form.meta1_tela>
             <cfset form.PtoMeta2ajustar = form.meta2_tela>
-            <cfset form.PercMeta1ajustar =form.ptorevismeta1>
+  <!---          <cfset form.PercMeta1ajustar =form.ptorevismeta1>
             <cfset form.PercMeta1ajustar =form.ptorevismeta2>
+            --->
         </cfif>
     </cfif>
-
+<!---   
+    form.PercMeta1ajustar: #form.PercMeta1ajustar#<br>
+    form.PtoMeta1ajusta: #form.PtoMeta1ajustar#<br>
+    form.PercMeta2ajustar: #form.PercMeta2ajustar#<br>
+    form.PtoMeta2ajusta: #form.PtoMeta2ajustar#<br>
+--->   
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -378,10 +384,10 @@
   
     <label for="" class="col-sm-6 col-form-label">&nbsp;Percentual (Meta1) <div id="meta1" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta1#%</div></label>
     <label for="" class="col-sm-6 col-form-label">&nbsp;Percentual (Meta2) <div id="meta2" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta2#%</div></label>
-<div style="display:none"></div>  
+<div style="display:none">   
     <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta1" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta1#</cfoutput></div></label>
     <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta2" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta2#</cfoutput></div></label>
- 
+</div>
     <p class="text-center"><strong>METAS</strong></p>
 </cfoutput>
 
