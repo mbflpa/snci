@@ -135,7 +135,10 @@ const PdfSearchManager = {
     $("#resultsCard").show();
     $("#searchLoading").show();
     $("#searchResults").empty(); // Limpar resultados anteriores
-    $("#noResultsAlert").hide();
+    
+    // Remover completamente o alerta de nenhum resultado se existir
+    $("#noResultsAlert").remove();
+    
     $("#errorAlert").hide();
     $("#pdfViewerContainer").hide();
     $("#searchStats").text("");
@@ -166,6 +169,15 @@ const PdfSearchManager = {
       // Se o PDF.js não estiver disponível, usa sempre o servidor
       this.searchInServerSide(searchTerms, searchOptions);
     }
+
+    // Capturar os filtros
+    const superintendenceCode = $("#searchSuperintendence").val();
+    const processYear = $("#searchYear").val();
+    const titleSearch = $("#searchTitle").val();
+    
+    // Inicializar variáveis de resultados
+    this.results = [];
+    this.hasAppliedFilters = superintendenceCode || processYear || titleSearch;
   },
 
   // Processa os documentos PDF usando PDF.js com extração sequencial página por página
@@ -192,6 +204,9 @@ const PdfSearchManager = {
 
     // Função para processar um documento por vez
     const processNextDocument = async (index) => {
+      // Remover qualquer alerta de nenhum resultado existente
+      $("#noResultsAlert").remove();
+      
       // Verificar se a busca foi cancelada
       if (searchCanceled) {
         const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
@@ -450,6 +465,9 @@ const PdfSearchManager = {
       return; // Evitar duplicação
     }
 
+    // Sempre que adicionarmos um resultado, esconder o alerta
+    $("#noResultsAlert").hide();
+
     // Criar HTML no formato final do resultado
     const resultHTML = `
       <div class="search-result" data-file-path="${
@@ -566,6 +584,9 @@ const PdfSearchManager = {
         }
         if (response && response.success) {
           if (response.totalFound > 0) {
+            // CORRIGIDO: Explicitamente esconder o alerta de "nenhum resultado"
+            $("#noResultsAlert").hide();
+            
             // Processar cada resultado
             response.results.forEach((result) => {
               const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
@@ -777,12 +798,15 @@ const PdfSearchManager = {
               startTime
             );
           } else {
-            // Mensagem específica quando nenhum documento atende aos filtros
-            $("#noResultsAlert").show();
+            // Mesmo neste caso, não mostrar o alerta imediatamente
+            // Apenas esconder o loading e atualizar as estatísticas
             $("#searchLoading").hide();
             $("#searchStats").text(
               `0 resultados encontrados. Nenhum documento corresponde aos filtros aplicados.`
             );
+            
+            // Criar o alerta apenas no final e somente se necessário
+            this.createNoResultsAlert();
           }
         } else {
           console.error(
@@ -1373,11 +1397,54 @@ const PdfSearchManager = {
     // O objeto result não fica armazenado em memória
   },
 
+  // Criar dinamicamente o alerta de nenhum resultado
+  createNoResultsAlert: function() {
+    // Se o alerta já existe no DOM, apenas retornar
+    if ($("#noResultsAlert").length > 0) {
+      return;
+    }
+    
+    // Criar o HTML do alerta dinamicamente
+    const alertHtml = `
+      <div id="noResultsAlert" class="alert alert-warning">
+        <div class="d-flex align-items-center">
+          <i class="icon fas fa-exclamation-triangle fa-2x mr-3"></i>
+          <div>
+            <h5 class="mb-1">Nenhum resultado encontrado</h5>
+            <p class="mb-0">Tente usar termos diferentes ou mais genéricos para sua busca.</p>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Inserir o alerta antes da lista de resultados
+    // Mas depois das outras partes da interface (loading, erros, controles)
+    $(alertHtml).insertBefore("#searchResults");
+  },
+  
   // Verificar conclusão da busca
   checkSearchCompletion: function (searchTerms, searchOptions) {
     if (searchCanceled) return;
     const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
-    this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
+    
+    // Esconder o loading antes de verificar resultados
+    $("#searchLoading").hide();
+    
+    // Verificar se há resultados no DOM
+    const resultCount = $("#searchResults .search-result").length;
+    
+    // Se não houver resultados, criar e mostrar o alerta
+    if (resultCount === 0) {
+      this.createNoResultsAlert();
+      $("#searchStats").text(`0 resultados encontrados em ${searchTime} segundos`);
+    } else {
+      // Se houver resultados, remover o alerta se existir
+      $("#noResultsAlert").remove();
+      
+      // Gerar estatísticas apenas agora, no final do processamento
+      this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
+    }
+    
     documentProcessing = false;
     $("html, body").animate(
       { scrollTop: $("#resultsCard").offset().top - 200 },
@@ -1949,13 +2016,17 @@ const PdfSearchManager = {
     const resultCards = document.querySelectorAll('.search-result');
     const resultCount = resultCards.length;
 
-    // Se não houver resultados
+    // Se não houver resultados APÓS todo o processamento
     if (resultCount === 0) {
-      $("#noResultsAlert").show();
-      $("#searchStats").text(`0 resultados encontrados em ${searchTime} segundos`);
-      return;
+        // Agora é seguro mostrar o alerta de nenhum resultado
+        $("#noResultsAlert").show();
+        $("#searchStats").text(`0 resultados encontrados em ${searchTime} segundos`);
+        return;
     }
 
+    // Se temos resultados, garantir que o alerta esteja oculto
+    $("#noResultsAlert").hide();
+    
     // Coletar estatísticas dos cartões no DOM
     let totalSize = 0;
     let totalPages = 0;
@@ -2117,6 +2188,116 @@ const PdfSearchManager = {
     $("#searchStats").html(
       `${statsHtml} <a href="#" class="stats-icon"><i class="fas fa-info-circle"></i></a>`
     );
+  },
+
+  displayResults: function (results) {
+    // Ocultar indicador de carregamento
+    $("#searchLoading").hide();
+    
+    // Verificar se há resultados considerando os filtros aplicados
+    if (!results || results.length === 0) {
+      $("#noResultsAlert").show();
+      $("#searchResults").empty();
+      $("#highlightControls").hide();
+      return;
+    }
+
+    // Se chegou aqui, temos resultados - garantir que o alerta de sem resultados esteja oculto
+    $("#noResultsAlert").hide();
+    
+    // Resto do código para exibir resultados...
+    // ... existing code ...
+  },
+
+  processNextDocument: async function(index) {
+    // ... existing code ...
+    // Atualizar a interface após cada documento processado
+    if (this.results.length > 0) {
+      // Se já temos algum resultado, ocultar o alerta de "nenhum resultado"
+      $("#noResultsAlert").hide();
+    }
+    // ... existing code ...
+    
+    // Ao final do processamento, verificar novamente
+    if (index >= this.filesToProcess.length - 1) {
+      // Acabou o processamento, verificar resultados finais
+      if (this.results.length === 0) {
+        $("#noResultsAlert").show();
+      } else {
+        $("#noResultsAlert").hide();
+      }
+    }
+    // ... existing code ...
+  },
+
+  shouldIncludeFile: function(file) {
+    // ... existing code ...
+    
+    // Verificar filtros de superintendência e número do processo
+    const superintendenceCode = $("#searchSuperintendence").val();
+    const titleSearch = $("#searchTitle").val();
+    
+    if (superintendenceCode && !this.matchesSuperintendence(file, superintendenceCode)) {
+      return false;
+    }
+    
+    if (titleSearch && !this.matchesProcessNumber(file, titleSearch)) {
+      return false;
+    }
+    
+    return true;
+  },
+  
+  // Funções auxiliares para verificar se o arquivo corresponde aos filtros
+  matchesSuperintendence: function(file, code) {
+    // Tentar extrair o código de superintendência do nome do arquivo ou do caminho
+    const superMatch = file.displayPath ? 
+      file.displayPath.match(new RegExp(`_PC(${code})\\d+`)) :
+      file.fileName.match(new RegExp(`_PC(${code})\\d+`));
+    
+    return superMatch !== null;
+  },
+  
+  matchesProcessNumber: function(file, processNumber) {
+    // Verificar se o número do processo está no título ou no nome do arquivo
+    return file.pc_anexo_processo_id === processNumber || 
+           (file.fileName && file.fileName.includes(processNumber));
+  },
+
+  // Nova função para centralizar a lógica de exibição do alerta de nenhum resultado
+  checkAndDisplayNoResultsAlert: function() {
+    // Obter todos os cartões de resultados
+    const resultCards = document.querySelectorAll('.search-result');
+    const resultCount = resultCards.length;
+    
+    // Mostrar o alerta APENAS se não houver resultados
+    if (resultCount === 0 && !documentProcessing) {
+        $("#noResultsAlert").show();
+    } else {
+        $("#noResultsAlert").hide();
+    }
+  },
+
+  // Modificação na função que finaliza a busca
+  finishSearch: function() {
+    documentProcessing = false;
+    $("#searchLoading").hide();
+    
+    // Verificar se há resultados no DOM após todo o processamento
+    const resultCards = document.querySelectorAll('.search-result');
+    const resultCount = resultCards.length;
+    
+    // Mostrar o alerta somente se não houver resultados após todo o processamento
+    if (resultCount === 0) {
+        $("#noResultsAlert").show();
+    } else {
+        $("#noResultsAlert").hide();
+    }
+    
+    // Gerar as estatísticas finais
+    this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
+    
+    // ... resto do código ...
   },
 };
 

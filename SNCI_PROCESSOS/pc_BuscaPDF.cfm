@@ -748,16 +748,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Alerta quando não há resultados -->
-                            <div id="noResultsAlert" class="alert alert-warning" style="display:none;">
-                                <div class="d-flex align-items-center">
-                                    <i class="icon fas fa-exclamation-triangle fa-2x mr-3"></i>
-                                    <div>
-                                        <h5 class="mb-1">Nenhum resultado encontrado</h5>
-                                        <p class="mb-0">Tente usar termos diferentes ou mais genéricos para sua busca.</p>
-                                    </div>
-                                </div>
-                            </div>
                             <!-- Alerta de erro -->
                             <div id="errorAlert" class="alert alert-danger" style="display:none;">
                                 <div class="d-flex align-items-center">
