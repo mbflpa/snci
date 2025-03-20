@@ -1448,6 +1448,50 @@ const PdfSearchManager = {
     );
   },
 
+  // Nova função para expandir termos de busca com sinônimos
+  expandTermsWithSynonyms: function (searchTerms, searchOptions) {
+    // Verificar se a entrada é válida
+    if (!searchTerms || typeof searchTerms !== "string") {
+      return searchTerms;
+    }
+
+    // Dividir os termos de busca em palavras individuais
+    const terms = searchTerms.split(" ").filter((term) => term.length >= 3);
+
+    // Se não há termos válidos, retornar os termos originais
+    if (terms.length === 0) {
+      return searchTerms;
+    }
+
+    // Array para armazenar todos os termos expandidos
+    const expandedTermsArray = [...terms]; // Começa com os termos originais
+
+    // Para cada termo, adicionar seus sinônimos ao array
+    terms.forEach((term) => {
+      const synonyms = this.getSynonyms(term);
+
+      // Adicionar apenas sinônimos válidos e não duplicados
+      if (synonyms && synonyms.length > 0) {
+        synonyms.forEach((synonym) => {
+          // Verificar se o sinônimo já não está incluído e tem pelo menos 3 caracteres
+          if (synonym.length >= 3 && !expandedTermsArray.includes(synonym)) {
+            expandedTermsArray.push(synonym);
+          }
+        });
+      }
+    });
+
+    // Limitar o número de termos expandidos para evitar buscas muito amplas
+    // Um limite razoável para evitar sobrecarga
+    const maxTerms = 15;
+    if (expandedTermsArray.length > maxTerms) {
+      expandedTermsArray.length = maxTerms;
+    }
+
+    // Retornar os termos expandidos como uma string
+    return expandedTermsArray.join(" ");
+  },
+
   // Nova função: Distribuição inteligente de processamento
   distributeProcessingIntelligently: function (
     documents,
@@ -1921,17 +1965,31 @@ const PdfSearchManager = {
     // Normalizar termo para busca
     const normalizedTerm = term.toLowerCase().trim();
 
-    // Procurar no dicionário já carregado do arquivo JSON
+    // Array para armazenar todos os sinônimos encontrados
+    let allSynonyms = [];
+
+    // Verificar se o termo é diretamente uma chave no dicionário
+    if (synonymsDict[normalizedTerm]) {
+      allSynonyms = [...synonymsDict[normalizedTerm]];
+    }
+
+    // Busca inversa: verificar se o termo está como sinônimo em alguma outra chave
     for (const [word, synonyms] of Object.entries(synonymsDict)) {
-      if (word === normalizedTerm) {
-        return synonyms;
-      }
       if (synonyms.includes(normalizedTerm)) {
-        return [word, ...synonyms.filter((s) => s !== normalizedTerm)];
+        // Adicionar a palavra principal como sinônimo
+        allSynonyms.push(word);
+
+        // Adicionar também os outros sinônimos desta palavra
+        synonyms.forEach((synonym) => {
+          if (synonym !== normalizedTerm && !allSynonyms.includes(synonym)) {
+            allSynonyms.push(synonym);
+          }
+        });
       }
     }
 
-    return []; // Retorna array vazio se não encontrar sinônimos
+    // Remover duplicatas (caso existam)
+    return [...new Set(allSynonyms)];
   },
 
   // Correção única da função setupFilterListeners
