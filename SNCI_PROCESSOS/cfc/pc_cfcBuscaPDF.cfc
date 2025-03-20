@@ -412,7 +412,7 @@
                 AND 
                     pc_anexo_enviado = 1
                 AND
-                    pc_anexo_caminho LIKE <cfqueryparam value="%#application.diretorio_avaliacoes#%" cfsqltype="cf_sql_varchar">
+                    pc_anexo_caminho LIKE <cfqueryparam value="%#application.diretorio_busca_pdf#%" cfsqltype="cf_sql_varchar">
                 
                 <cfif len(trim(arguments.superintendenceCode))>
                     AND LEFT(pc_anexo_processo_id, 2) = <cfqueryparam value="#arguments.superintendenceCode#" cfsqltype="cf_sql_varchar">
