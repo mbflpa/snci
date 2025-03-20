@@ -134,7 +134,7 @@ const PdfSearchManager = {
 
     $("#resultsCard").show();
     $("#searchLoading").show();
-    // Inicializar animação SVG
+    // Inicializar animação SVG (versão original)
     this.updateCarouselAnimation();
     
     $("#searchResults").empty(); // Limpar resultados anteriores
@@ -216,12 +216,10 @@ const PdfSearchManager = {
         $("#processingStatus").text(
           `Busca cancelada após processar ${processedCount} documentos.`
         );
-
         // Remover o estado de carregamento do botão cancelar
         $("#cancelSearch")
           .prop("disabled", false)
           .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
-
         this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
         documentProcessing = false;
         return;
@@ -230,19 +228,13 @@ const PdfSearchManager = {
       if (index >= documents.length) {
         // Finaliza quando todos os documentos forem processados
         const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
-
-        // Remover o estado de carregamento do botão cancelar
         $("#cancelSearch")
           .prop("disabled", false)
           .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
-
         this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
         documentProcessing = false;
-        // Rolar automaticamente para o card de resultados
         $("html, body").animate(
-          {
-            scrollTop: $("#resultsCard").offset().top - 200,
-          },
+          { scrollTop: $("#resultsCard").offset().top - 200 },
           "slow"
         );
         return;
@@ -250,20 +242,17 @@ const PdfSearchManager = {
 
       const doc = documents[index];
 
-      // VERIFICAR SE O DOCUMENTO JÁ FOI PROCESSADO
+      // Se o documento já foi processado, pula para o próximo imediatamente
       if (processedFilePaths.has(doc.filePath)) {
-        // Pular este documento e ir para o próximo
-        // NÃO incrementar processedCount aqui
         setTimeout(() => processNextDocument(index + 1), 0);
         return;
       }
 
       // Marcar este documento como processado
       processedFilePaths.add(doc.filePath);
-
       processedCount++;
 
-      // Atualizar UI - Corrigido para usar documentos NÃO processados no cálculo
+      // Atualizar UI
       const progress = Math.round((processedCount / totalDocuments) * 100);
       $("#processingProgress").css("width", `${progress}%`);
       $("#processingStatus").text(
@@ -271,10 +260,7 @@ const PdfSearchManager = {
       );
 
       // Pequeno efeito visual de "escaneamento" do documento
-      $(".document-item").css(
-        "transform",
-        `translateY(${index % 2 === 0 ? -5 : 5}px)`
-      );
+      $(".document-item").css("transform", `translateY(${index % 2 === 0 ? -5 : 5}px)`);
       setTimeout(() => {
         $(".document-item").css("transform", "translateY(0)");
       }, 300);
@@ -286,87 +272,43 @@ const PdfSearchManager = {
 
       try {
         // Carregar PDF usando PDF.js
-        const pdf = await pdfjsLib.getDocument({
-          url: fileUrl,
-        }).promise;
-
+        const pdf = await pdfjsLib.getDocument({ url: fileUrl }).promise;
         const pageCount = pdf.numPages;
-
         let found = false;
         let snippets = [];
-
-        // Expandir termos com sinônimos, se essa opção estiver marcada
         let expandedTerms = searchTerms;
         if (searchOptions.useSynonyms) {
-          expandedTerms = this.expandTermsWithSynonyms(
-            searchTerms,
-            searchOptions
-          );
+          expandedTerms = this.expandTermsWithSynonyms(searchTerms, searchOptions);
         }
 
         // Processar páginas sequencialmente
         for (let i = 1; i <= pageCount; i++) {
-          // Verificar cancelamento a cada página
-          if (searchCanceled) {
-            break;
-          }
-
-          // Extrair texto da página atual
+          if (searchCanceled) break;
           const page = await pdf.getPage(i);
-          const content = await page.getTextContent({
-            normalizeWhitespace: true,
-          });
+          const content = await page.getTextContent({ normalizeWhitespace: true });
           const pageText = this.processTextContent(content);
-
-          // Buscar termos na página atual conforme o modo de busca
           let pageSearchResult;
-
           if (searchOptions.mode === "exact") {
-            // Modo de frase exata
-            pageSearchResult = this.searchExactPhrase(
-              pageText,
-              searchTerms,
-              searchOptions
-            );
+            pageSearchResult = this.searchExactPhrase(pageText, searchTerms, searchOptions);
           } else if (searchOptions.mode === "proximity") {
-            // Modo de proximidade
-            const words = searchTerms
-              .split(" ")
-              .filter((term) => term.length >= 3);
+            const words = searchTerms.split(" ").filter((term) => term.length >= 3);
             const proximity = parseInt(searchOptions.proximityDistance);
-            pageSearchResult = this.searchProximity(
-              pageText,
-              words,
-              proximity,
-              searchOptions
-            );
+            pageSearchResult = this.searchProximity(pageText, words, proximity, searchOptions);
           } else {
-            // Modo "OU" (padrão)
-            pageSearchResult = this.searchAnyTerm(
-              pageText,
-              expandedTerms,
-              searchOptions
-            );
+            pageSearchResult = this.searchAnyTerm(pageText, expandedTerms, searchOptions);
           }
-
-          // Se encontrou na página atual
           if (pageSearchResult.found) {
             found = true;
             snippets.push(...pageSearchResult.snippets);
-
-            // Adicionar informação da página ao snippet
             snippets = snippets.map(
               (snippet) =>
                 `<div class="page-info badge badge-light mb-1">Página ${i} de ${pageCount}</div> ${snippet}`
             );
-
-            // Parar a extração, pois já encontramos correspondência
             break;
           }
         }
 
         if (found) {
-          // Criar objeto de resultado otimizado (sem armazenar texto completo)
           const resultObj = {
             fileName: doc.fileName,
             filePath: doc.filePath,
@@ -378,20 +320,16 @@ const PdfSearchManager = {
             snippets: snippets,
             found: true,
           };
-
-          // Apenas incrementar o contador ao invés de armazenar todo o objeto
           this.currentSearchResults++;
-
-          // Mostrar resultado diretamente no container final
           this.addRealTimeResult(resultObj);
         }
 
-        // Processar o próximo documento
+        // Processar próximo documento imediatamente (removido delay de 5 segundos)
         setTimeout(() => processNextDocument(index + 1), 0);
       } catch (error) {
         console.error(`Erro ao processar o documento ${doc.fileName}:`, error);
-        // Se ocorrer erro, tentar fallback no servidor
         this.searchSingleDocumentInServer(doc, searchTerms, searchOptions);
+        // Processar próximo documento imediatamente em caso de erro (removido delay de 5 segundos)
         setTimeout(() => processNextDocument(index + 1), 0);
       }
     };
@@ -452,25 +390,55 @@ const PdfSearchManager = {
       .replace(/\s+/g, " ") // Substitui sequências de espaços por um único espaço
       .trim();
   },
-  // Método para atualizar a animação - removendo o código anterior e deixando o SVG funcionar
+  // Método para atualizar a animação do SVG - versão com debug
   updateCarouselAnimation: function () {
-    // Forçar reinicialização das animações SMIL no SVG
-    const svgElements = document.querySelectorAll('#searchLoading svg [begin]');
-    svgElements.forEach(element => {
-      // Pausar e reiniciar animação
-      if (element.beginElement) {
-        try {
-          element.beginElement();
-        } catch (e) {
-          console.warn("Não foi possível iniciar animação SVG via SMIL:", e);
+    const svg = document.querySelector('#searchLoading svg');
+    if (svg) {
+      // Primeiro, garantir que todos os elementos do SVG estejam visíveis
+      const allElements = svg.querySelectorAll('rect, path, g');
+      allElements.forEach(element => {
+        element.style.display = '';
+        element.style.visibility = 'visible';
+        element.style.opacity = '1';
+      });
+
+      // Agora iniciar todas as animações
+      const animations = svg.querySelectorAll('animate, animateTransform, animateMotion');
+      console.log('Animações encontradas:', animations.length); // Debug
+
+      animations.forEach((animation, index) => {
+        // Debug para verificar cada animação
+        console.log(`Animação ${index}:`, {
+          id: animation.id,
+          attributeName: animation.getAttribute('attributeName'),
+          from: animation.getAttribute('from'),
+          to: animation.getAttribute('to')
+        });
+
+        if (animation.beginElement) {
+          try {
+            // Forçar reset antes de iniciar
+            if (animation.endElement) {
+              animation.endElement();
+            }
+            
+            // Pequeno delay antes de reiniciar
+            setTimeout(() => {
+              animation.beginElement();
+            }, 50);
+          } catch (error) {
+            console.warn('Erro ao manipular animação:', error);
+          }
         }
-      }
-    });
+      });
+    }
     
-    // Alternativa para navegadores que não suportam SMIL
-    if (svgElements.length === 0 || !svgElements[0].beginElement) {
-      // Adicionar classe de animação CSS como fallback
-      $('#searchLoading svg').addClass('svg-animated');
+    // Garantir que o container esteja visível
+    const container = document.querySelector('#searchLoading');
+    if (container) {
+      container.style.display = 'block';
+      container.style.visibility = 'visible';
+      container.style.opacity = '1';
     }
   },
   // Novo método para adicionar resultados em tempo real
