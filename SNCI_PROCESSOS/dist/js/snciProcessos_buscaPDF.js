@@ -94,8 +94,8 @@ const PdfSearchManager = {
     // Resetar estatísticas no início de uma nova busca
     this.resetStats();
 
-    // Limpar set de arquivos processados
-    processedFilePaths = new Set();
+    // Limpar COMPLETAMENTE o set de arquivos processados
+    processedFilePaths.clear(); // Usar clear() em vez de new Set()
 
     if (!searchTerms) {
       searchTerms = $("#searchTerms").val().trim();
@@ -134,6 +134,9 @@ const PdfSearchManager = {
 
     $("#resultsCard").show();
     $("#searchLoading").show();
+    // Inicializar animação SVG
+    this.updateCarouselAnimation();
+    
     $("#searchResults").empty(); // Limpar resultados anteriores
     
     // Remover completamente o alerta de nenhum resultado se existir
@@ -250,6 +253,7 @@ const PdfSearchManager = {
       // VERIFICAR SE O DOCUMENTO JÁ FOI PROCESSADO
       if (processedFilePaths.has(doc.filePath)) {
         // Pular este documento e ir para o próximo
+        // NÃO incrementar processedCount aqui
         setTimeout(() => processNextDocument(index + 1), 0);
         return;
       }
@@ -259,7 +263,7 @@ const PdfSearchManager = {
 
       processedCount++;
 
-      // Atualizar UI
+      // Atualizar UI - Corrigido para usar documentos NÃO processados no cálculo
       const progress = Math.round((processedCount / totalDocuments) * 100);
       $("#processingProgress").css("width", `${progress}%`);
       $("#processingStatus").text(
@@ -450,8 +454,24 @@ const PdfSearchManager = {
   },
   // Método para atualizar a animação - removendo o código anterior e deixando o SVG funcionar
   updateCarouselAnimation: function () {
-    // A animação do SVG é automática, não precisamos fazer nada aqui
-    // As animações SMIL no SVG cuidam de tudo
+    // Forçar reinicialização das animações SMIL no SVG
+    const svgElements = document.querySelectorAll('#searchLoading svg [begin]');
+    svgElements.forEach(element => {
+      // Pausar e reiniciar animação
+      if (element.beginElement) {
+        try {
+          element.beginElement();
+        } catch (e) {
+          console.warn("Não foi possível iniciar animação SVG via SMIL:", e);
+        }
+      }
+    });
+    
+    // Alternativa para navegadores que não suportam SMIL
+    if (svgElements.length === 0 || !svgElements[0].beginElement) {
+      // Adicionar classe de animação CSS como fallback
+      $('#searchLoading svg').addClass('svg-animated');
+    }
   },
   // Novo método para adicionar resultados em tempo real
   addRealTimeResult: function (result) {
@@ -1218,8 +1238,10 @@ const PdfSearchManager = {
   // Iniciar busca com termo específico
   searchWithTerm: function (term) {
     $("#searchTerms").val(term);
+    
+    // Não limpar o set processedFilePaths quando é uma busca de termo recente
+    // Isso explica porque não ocorre o problema quando clica em buscas recentes
     this.performSearch(term);
-    // Não precisamos adicionar o scroll aqui pois já está no performSearch
   },
 
   // Navegar pelos destaques
