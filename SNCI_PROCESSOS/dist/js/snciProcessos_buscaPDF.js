@@ -75,24 +75,18 @@ const PdfSearchManager = {
 
   // Função para resetar todas as estatísticas
   resetStats: function () {
-    this.resetPageStats();
-    this.resetFileStats();
+    // Não precisamos mais fazer o acompanhamento durante o processamento
+    processedFilePaths = new Set();
   },
 
   // Função para resetar estatísticas de páginas
   resetPageStats: function () {
-    pageStats.minPages = { count: Number.MAX_SAFE_INTEGER, fileName: "" };
-    pageStats.maxPages = { count: 0, fileName: "" };
-    pageStats.totalPages = 0;
-    pageStats.documentsWithPageCount = 0;
+    // Função vazia já que vamos calcular estatísticas no final
   },
 
   // Função para resetar estatísticas de tamanho de arquivo
   resetFileStats: function () {
-    fileStats.smallestFile = { size: Number.MAX_SAFE_INTEGER, fileName: "" };
-    fileStats.largestFile = { size: 0, fileName: "" };
-    fileStats.totalSize = 0;
-    fileStats.filesProcessed = 0;
+    // Função vazia já que vamos calcular estatísticas no final
   },
 
   // Realizar a busca
@@ -181,14 +175,10 @@ const PdfSearchManager = {
     startTime,
     searchOptions
   ) {
-    // Reset estatísticas antes de iniciar nova busca
-    this.resetStats();
-
     const terms = searchTerms.split(" ");
     let processedCount = 0;
     const totalDocuments = documents.length;
     this.currentSearchResults = 0; // Contador em vez de array
-    let filesRead = 0; // Contador de arquivos que passaram nos filtros
 
     // Reset do cancelamento de busca
     searchCanceled = false;
@@ -214,12 +204,7 @@ const PdfSearchManager = {
           .prop("disabled", false)
           .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
 
-        this.displaySearchResults(
-          searchTerms,
-          searchTime,
-          filesRead,
-          searchOptions
-        );
+        this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
         documentProcessing = false;
         return;
       }
@@ -233,12 +218,7 @@ const PdfSearchManager = {
           .prop("disabled", false)
           .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
 
-        this.displaySearchResults(
-          searchTerms,
-          searchTime,
-          filesRead,
-          searchOptions
-        );
+        this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
         documentProcessing = false;
         // Rolar automaticamente para o card de resultados
         $("html, body").animate(
@@ -268,7 +248,7 @@ const PdfSearchManager = {
       const progress = Math.round((processedCount / totalDocuments) * 100);
       $("#processingProgress").css("width", `${progress}%`);
       $("#processingStatus").text(
-        `Processando: ${processedCount} de ${totalDocuments} (${filesRead} lido(s) até agora)`
+        `Processando: ${processedCount} de ${totalDocuments}`
       );
 
       // Pequeno efeito visual de "escaneamento" do documento
@@ -279,28 +259,6 @@ const PdfSearchManager = {
       setTimeout(() => {
         $(".document-item").css("transform", "translateY(0)");
       }, 300);
-
-      // Contar este arquivo como processado
-      filesRead++;
-
-      // Atualizar estatísticas de tamanho de arquivo
-      if (doc.size) {
-        // Atualizar o menor arquivo
-        if (doc.size < fileStats.smallestFile.size) {
-          fileStats.smallestFile.size = doc.size;
-          fileStats.smallestFile.fileName = doc.fileName;
-        }
-
-        // Atualizar o maior arquivo
-        if (doc.size > fileStats.largestFile.size) {
-          fileStats.largestFile.size = doc.size;
-          fileStats.largestFile.fileName = doc.fileName;
-        }
-
-        // Somar para cálculo da média
-        fileStats.totalSize += doc.size;
-        fileStats.filesProcessed++;
-      }
 
       // Criar URL para carregar o documento
       const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
@@ -314,25 +272,6 @@ const PdfSearchManager = {
         }).promise;
 
         const pageCount = pdf.numPages;
-
-        // Atualizar estatísticas de páginas
-        if (pageCount > 0) {
-          // Menor número de páginas
-          if (pageCount < pageStats.minPages.count) {
-            pageStats.minPages.count = pageCount;
-            pageStats.minPages.fileName = doc.fileName;
-          }
-
-          // Maior número de páginas
-          if (pageCount > pageStats.maxPages.count) {
-            pageStats.maxPages.count = pageCount;
-            pageStats.maxPages.fileName = doc.fileName;
-          }
-
-          // Somar para cálculo da média
-          pageStats.totalPages += pageCount;
-          pageStats.documentsWithPageCount++;
-        }
 
         let found = false;
         let snippets = [];
@@ -627,11 +566,12 @@ const PdfSearchManager = {
         }
         if (response && response.success) {
           if (response.totalFound > 0) {
-            // Adaptar os resultados do servidor para o formato esperado
-            this.currentSearchResults = response.results.map((result) => {
+            // Processar cada resultado
+            response.results.forEach((result) => {
               const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
                 result.filePath
               )}&nome=${encodeURIComponent(result.fileName)}`;
+              
               // Gerar snippets com termos destacados
               const terms = searchTerms.split(" ").filter((t) => t.length >= 3);
               let snippets = [];
@@ -697,7 +637,9 @@ const PdfSearchManager = {
                   });
                 }
               }
-              return {
+
+              // Criar objeto de resultado
+              const processedResult = {
                 fileName: result.fileName,
                 filePath: result.filePath,
                 fileUrl: fileUrl,
@@ -705,18 +647,20 @@ const PdfSearchManager = {
                 size: result.fileSize,
                 dateLastModified: result.fileDate,
                 relevanceScore: result.relevanceScore || 10,
-                snippets:
-                  snippets.length > 0
-                    ? snippets
-                    : ["<em>Texto não disponível para visualização</em>"],
+                snippets: snippets.length > 0
+                  ? snippets
+                  : ["<em>Texto não disponível para visualização</em>"],
               };
+
+              // Verificar duplicação antes de adicionar
+              if (!document.querySelector(`[data-file-path="${result.filePath}"]`)) {
+                this.currentSearchResults++;
+                this.addRealTimeResult(processedResult);
+              }
             });
-            this.displaySearchResults(
-              searchTerms,
-              response.searchTime,
-              null,
-              searchOptions
-            );
+
+            // Gerar estatísticas com base no DOM no final do processamento
+            this.generateStatsFromDOM(searchTerms, response.searchTime, searchOptions);
           } else {
             $("#noResultsAlert").show();
             $("#searchStats").text(
@@ -1305,12 +1249,14 @@ const PdfSearchManager = {
 
     // Se não houver documentos não processados, saia
     if (unprocessedDocs.length === 0) {
-      this.checkSearchCompletion();
+      this.checkSearchCompletion(searchTerms, searchOptions);
       return;
     }
 
     // Marcar todos os documentos como processados antes de enviá-los
-    unprocessedDocs.forEach((doc) => processedFilePaths.add(doc.filePath));
+    unprocessedDocs.forEach((doc) => {
+      processedFilePaths.add(doc.filePath);
+    });
 
     const documentPaths = unprocessedDocs.map((doc) => doc.filePath);
 
@@ -1339,21 +1285,17 @@ const PdfSearchManager = {
                 found: true,
               };
               // Verificação extra para garantir que não haverá duplicatas
-              if (
-                !document.querySelector(`[data-file-path="${result.filePath}"]`)
-              ) {
+              if (!document.querySelector(`[data-file-path="${result.filePath}"]`)) {
                 this.addSearchResult(processedResult);
               }
             });
           }
-          searchStats.documentsProcessed += unprocessedDocs.length;
         }
-        this.checkSearchCompletion();
+        this.checkSearchCompletion(searchTerms, searchOptions);
       },
       error: (xhr, status, error) => {
         console.error("Erro na busca pelo servidor:", error);
-        searchStats.documentsProcessed += unprocessedDocs.length;
-        this.checkSearchCompletion();
+        this.checkSearchCompletion(searchTerms, searchOptions);
       },
     });
   },
@@ -1432,15 +1374,10 @@ const PdfSearchManager = {
   },
 
   // Verificar conclusão da busca
-  checkSearchCompletion: function () {
+  checkSearchCompletion: function (searchTerms, searchOptions) {
     if (searchCanceled) return;
     const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
-    this.displaySearchResults(
-      searchTerms,
-      searchTime,
-      filesRead,
-      searchOptions
-    );
+    this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
     documentProcessing = false;
     $("html, body").animate(
       { scrollTop: $("#resultsCard").offset().top - 200 },
@@ -2001,6 +1938,184 @@ const PdfSearchManager = {
         // Removido: console.log("Filtro alterado:", this.id);
         // Removido: toastr.info("Filtros atualizados.");
       }
+    );
+  },
+
+  // NOVA FUNÇÃO: Gerar estatísticas a partir dos cartões no DOM
+  generateStatsFromDOM: function (searchTerms, searchTime, searchOptions) {
+    $("#searchLoading").hide();
+    
+    // Obter todos os cartões de resultados
+    const resultCards = document.querySelectorAll('.search-result');
+    const resultCount = resultCards.length;
+
+    // Se não houver resultados
+    if (resultCount === 0) {
+      $("#noResultsAlert").show();
+      $("#searchStats").text(`0 resultados encontrados em ${searchTime} segundos`);
+      return;
+    }
+
+    // Coletar estatísticas dos cartões no DOM
+    let totalSize = 0;
+    let totalPages = 0;
+    let smallestSize = Number.MAX_SAFE_INTEGER;
+    let smallestFileName = "";
+    let largestSize = 0;
+    let largestFileName = "";
+    let minPages = Number.MAX_SAFE_INTEGER;
+    let minPagesFileName = "";
+    let maxPages = 0;
+    let maxPagesFileName = "";
+    let documentsWithPageCount = 0;
+    
+    resultCards.forEach(card => {
+      // Obter tamanho do arquivo
+      const sizeText = card.querySelector('.badge:nth-of-type(2)').textContent;
+      const sizeMatch = sizeText.match(/(\d+(\.\d+)?)\s*(bytes|KB|MB|GB)/i);
+      
+      if (sizeMatch) {
+        let size = parseFloat(sizeMatch[1]);
+        const unit = sizeMatch[3].toUpperCase();
+        
+        // Converter para bytes
+        if (unit === 'KB') size *= 1024;
+        else if (unit === 'MB') size *= 1024 * 1024;
+        else if (unit === 'GB') size *= 1024 * 1024 * 1024;
+        
+        totalSize += size;
+        
+        if (size < smallestSize) {
+          smallestSize = size;
+          smallestFileName = card.querySelector('h5 a').textContent.trim();
+        }
+        
+        if (size > largestSize) {
+          largestSize = size;
+          largestFileName = card.querySelector('h5 a').textContent.trim();
+        }
+      }
+      
+      // Obter contagem de páginas
+      const pagesText = card.querySelector('.badge:nth-of-type(3)').textContent;
+      const pagesMatch = pagesText.match(/(\d+)/);
+      
+      if (pagesMatch) {
+        const pages = parseInt(pagesMatch[1]);
+        totalPages += pages;
+        documentsWithPageCount++;
+        
+        if (pages < minPages) {
+          minPages = pages;
+          minPagesFileName = card.querySelector('h5 a').textContent.trim();
+        }
+        
+        if (pages > maxPages) {
+          maxPages = pages;
+          maxPagesFileName = card.querySelector('h5 a').textContent.trim();
+        }
+      }
+    });
+
+    // Calcular médias
+    const avgSize = totalSize / resultCount;
+    const avgPages = documentsWithPageCount > 0 ? totalPages / documentsWithPageCount : 0;
+
+    // Preparar estatísticas resumidas
+    let statsHtml = `${resultCount} resultado${resultCount !== 1 ? 's' : ''} encontrado${resultCount !== 1 ? 's' : ''} em ${searchTime} segundos. Arquivos lidos: ${resultCount}`;
+
+    // Adicionar médias se disponíveis
+    if (avgPages > 0) {
+      statsHtml += `<br><span class="stats-metric stats-metric-info">Média: ${avgPages.toFixed(1)} pág</span>`;
+    }
+    
+    if (!isNaN(avgSize)) {
+      statsHtml += ` <span class="stats-metric stats-metric-primary">Média: ${this.formatFileSize(avgSize)}</span>`;
+    }
+
+    // Preparar estatísticas detalhadas para o popover
+    let detailedStatsHtml = `
+      <table class="stats-table">
+        <tr>
+          <td>Total de documentos processados:</td>
+          <td>${resultCount}</td>
+        </tr>
+        <tr>
+          <td>Documentos com correspondência:</td>
+          <td>${resultCount} (100%)</td>
+        </tr>`;
+
+    // Adicionar estatísticas de páginas se disponíveis
+    if (documentsWithPageCount > 0) {
+      detailedStatsHtml += `
+        <tr>
+          <td>Total de páginas:</td>
+          <td>${totalPages}</td>
+        </tr>
+        <tr>
+          <td>Média de páginas por documento:</td>
+          <td>${avgPages.toFixed(1)}</td>
+        </tr>`;
+
+      if (minPages < Number.MAX_SAFE_INTEGER) {
+        detailedStatsHtml += `
+          <tr>
+            <td>Menor documento:</td>
+            <td>${minPages} páginas</td>
+          </tr>`;
+      }
+
+      if (maxPages > 0) {
+        detailedStatsHtml += `
+          <tr>
+            <td>Maior documento:</td>
+            <td>${maxPages} páginas</td>
+          </tr>`;
+      }
+    }
+
+    // Adicionar estatísticas de tamanho de arquivo se disponíveis
+    if (totalSize > 0) {
+      detailedStatsHtml += `
+        <tr>
+          <td>Total em tamanho:</td>
+          <td>${this.formatFileSize(totalSize)}</td>
+        </tr>
+        <tr>
+          <td>Média de tamanho:</td>
+          <td>${this.formatFileSize(avgSize)}</td>
+        </tr>`;
+
+      if (smallestSize < Number.MAX_SAFE_INTEGER) {
+        detailedStatsHtml += `
+          <tr>
+            <td>Menor arquivo:</td>
+            <td>${this.formatFileSize(smallestSize)}</td>
+          </tr>`;
+      }
+
+      if (largestSize > 0) {
+        detailedStatsHtml += `
+          <tr>
+            <td>Maior arquivo:</td>
+            <td>${this.formatFileSize(largestSize)}</td>
+          </tr>`;
+      }
+    }
+
+    detailedStatsHtml += `
+        <tr>
+          <td>Tempo de busca:</td>
+          <td>${searchTime} segundos</td>
+        </tr>
+      </table>`;
+
+    // Armazenar o conteúdo HTML para uso posterior no modal
+    window.statsDetailsHtml = detailedStatsHtml;
+
+    // Exibir estatísticas básicas com ícone para mais detalhes
+    $("#searchStats").html(
+      `${statsHtml} <a href="#" class="stats-icon"><i class="fas fa-info-circle"></i></a>`
     );
   },
 };
