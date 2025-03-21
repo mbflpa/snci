@@ -136,12 +136,12 @@ const PdfSearchManager = {
     $("#searchLoading").show();
     // Inicializar animação SVG (versão original)
     this.updateCarouselAnimation();
-    
+
     $("#searchResults").empty(); // Limpar resultados anteriores
-    
+
     // Remover completamente o alerta de nenhum resultado se existir
     $("#noResultsAlert").remove();
-    
+
     $("#errorAlert").hide();
     $("#pdfViewerContainer").hide();
     $("#searchStats").text("");
@@ -177,7 +177,7 @@ const PdfSearchManager = {
     const superintendenceCode = $("#searchSuperintendence").val();
     const processYear = $("#searchYear").val();
     const titleSearch = $("#searchTitle").val();
-    
+
     // Inicializar variáveis de resultados
     this.results = [];
     this.hasAppliedFilters = superintendenceCode || processYear || titleSearch;
@@ -209,7 +209,7 @@ const PdfSearchManager = {
     const processNextDocument = async (index) => {
       // Remover qualquer alerta de nenhum resultado existente
       $("#noResultsAlert").remove();
-      
+
       // Verificar se a busca foi cancelada
       if (searchCanceled) {
         const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
@@ -260,7 +260,10 @@ const PdfSearchManager = {
       );
 
       // Pequeno efeito visual de "escaneamento" do documento
-      $(".document-item").css("transform", `translateY(${index % 2 === 0 ? -5 : 5}px)`);
+      $(".document-item").css(
+        "transform",
+        `translateY(${index % 2 === 0 ? -5 : 5}px)`
+      );
       setTimeout(() => {
         $(".document-item").css("transform", "translateY(0)");
       }, 300);
@@ -278,24 +281,44 @@ const PdfSearchManager = {
         let snippets = [];
         let expandedTerms = searchTerms;
         if (searchOptions.useSynonyms) {
-          expandedTerms = this.expandTermsWithSynonyms(searchTerms, searchOptions);
+          expandedTerms = this.expandTermsWithSynonyms(
+            searchTerms,
+            searchOptions
+          );
         }
 
         // Processar páginas sequencialmente
         for (let i = 1; i <= pageCount; i++) {
           if (searchCanceled) break;
           const page = await pdf.getPage(i);
-          const content = await page.getTextContent({ normalizeWhitespace: true });
+          const content = await page.getTextContent({
+            normalizeWhitespace: true,
+          });
           const pageText = this.processTextContent(content);
           let pageSearchResult;
           if (searchOptions.mode === "exact") {
-            pageSearchResult = this.searchExactPhrase(pageText, searchTerms, searchOptions);
+            pageSearchResult = this.searchExactPhrase(
+              pageText,
+              searchTerms,
+              searchOptions
+            );
           } else if (searchOptions.mode === "proximity") {
-            const words = searchTerms.split(" ").filter((term) => term.length >= 3);
+            const words = searchTerms
+              .split(" ")
+              .filter((term) => term.length >= 3);
             const proximity = parseInt(searchOptions.proximityDistance);
-            pageSearchResult = this.searchProximity(pageText, words, proximity, searchOptions);
+            pageSearchResult = this.searchProximity(
+              pageText,
+              words,
+              proximity,
+              searchOptions
+            );
           } else {
-            pageSearchResult = this.searchAnyTerm(pageText, expandedTerms, searchOptions);
+            pageSearchResult = this.searchAnyTerm(
+              pageText,
+              expandedTerms,
+              searchOptions
+            );
           }
           if (pageSearchResult.found) {
             found = true;
@@ -392,27 +415,29 @@ const PdfSearchManager = {
   },
   // Método para atualizar a animação do SVG - versão com debug
   updateCarouselAnimation: function () {
-    const svg = document.querySelector('#searchLoading svg');
+    const svg = document.querySelector("#searchLoading svg");
     if (svg) {
       // Primeiro, garantir que todos os elementos do SVG estejam visíveis
-      const allElements = svg.querySelectorAll('rect, path, g');
-      allElements.forEach(element => {
-        element.style.display = '';
-        element.style.visibility = 'visible';
-        element.style.opacity = '1';
+      const allElements = svg.querySelectorAll("rect, path, g");
+      allElements.forEach((element) => {
+        element.style.display = "";
+        element.style.visibility = "visible";
+        element.style.opacity = "1";
       });
 
       // Agora iniciar todas as animações
-      const animations = svg.querySelectorAll('animate, animateTransform, animateMotion');
-      console.log('Animações encontradas:', animations.length); // Debug
+      const animations = svg.querySelectorAll(
+        "animate, animateTransform, animateMotion"
+      );
+      console.log("Animações encontradas:", animations.length); // Debug
 
       animations.forEach((animation, index) => {
         // Debug para verificar cada animação
         console.log(`Animação ${index}:`, {
           id: animation.id,
-          attributeName: animation.getAttribute('attributeName'),
-          from: animation.getAttribute('from'),
-          to: animation.getAttribute('to')
+          attributeName: animation.getAttribute("attributeName"),
+          from: animation.getAttribute("from"),
+          to: animation.getAttribute("to"),
         });
 
         if (animation.beginElement) {
@@ -421,24 +446,24 @@ const PdfSearchManager = {
             if (animation.endElement) {
               animation.endElement();
             }
-            
+
             // Pequeno delay antes de reiniciar
             setTimeout(() => {
               animation.beginElement();
             }, 50);
           } catch (error) {
-            console.warn('Erro ao manipular animação:', error);
+            console.warn("Erro ao manipular animação:", error);
           }
         }
       });
     }
-    
+
     // Garantir que o container esteja visível
-    const container = document.querySelector('#searchLoading');
+    const container = document.querySelector("#searchLoading");
     if (container) {
-      container.style.display = 'block';
-      container.style.visibility = 'visible';
-      container.style.opacity = '1';
+      container.style.display = "block";
+      container.style.visibility = "visible";
+      container.style.opacity = "1";
     }
   },
   // Novo método para adicionar resultados em tempo real
@@ -574,13 +599,13 @@ const PdfSearchManager = {
           if (response.totalFound > 0) {
             // CORRIGIDO: Explicitamente esconder o alerta de "nenhum resultado"
             $("#noResultsAlert").hide();
-            
+
             // Processar cada resultado
             response.results.forEach((result) => {
               const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
                 result.filePath
               )}&nome=${encodeURIComponent(result.fileName)}`;
-              
+
               // Gerar snippets com termos destacados
               const terms = searchTerms.split(" ").filter((t) => t.length >= 3);
               let snippets = [];
@@ -656,20 +681,27 @@ const PdfSearchManager = {
                 size: result.fileSize,
                 dateLastModified: result.fileDate,
                 relevanceScore: result.relevanceScore || 10,
-                snippets: snippets.length > 0
-                  ? snippets
-                  : ["<em>Texto não disponível para visualização</em>"],
+                snippets:
+                  snippets.length > 0
+                    ? snippets
+                    : ["<em>Texto não disponível para visualização</em>"],
               };
 
               // Verificar duplicação antes de adicionar
-              if (!document.querySelector(`[data-file-path="${result.filePath}"]`)) {
+              if (
+                !document.querySelector(`[data-file-path="${result.filePath}"]`)
+              ) {
                 this.currentSearchResults++;
                 this.addRealTimeResult(processedResult);
               }
             });
 
             // Gerar estatísticas com base no DOM no final do processamento
-            this.generateStatsFromDOM(searchTerms, response.searchTime, searchOptions);
+            this.generateStatsFromDOM(
+              searchTerms,
+              response.searchTime,
+              searchOptions
+            );
           } else {
             $("#noResultsAlert").show();
             $("#searchStats").text(
@@ -792,7 +824,7 @@ const PdfSearchManager = {
             $("#searchStats").text(
               `0 resultados encontrados. Nenhum documento corresponde aos filtros aplicados.`
             );
-            
+
             // Criar o alerta apenas no final e somente se necessário
             this.createNoResultsAlert();
           }
@@ -1206,7 +1238,7 @@ const PdfSearchManager = {
   // Iniciar busca com termo específico
   searchWithTerm: function (term) {
     $("#searchTerms").val(term);
-    
+
     // Não limpar o set processedFilePaths quando é uma busca de termo recente
     // Isso explica porque não ocorre o problema quando clica em buscas recentes
     this.performSearch(term);
@@ -1299,7 +1331,9 @@ const PdfSearchManager = {
                 found: true,
               };
               // Verificação extra para garantir que não haverá duplicatas
-              if (!document.querySelector(`[data-file-path="${result.filePath}"]`)) {
+              if (
+                !document.querySelector(`[data-file-path="${result.filePath}"]`)
+              ) {
                 this.addSearchResult(processedResult);
               }
             });
@@ -1388,12 +1422,12 @@ const PdfSearchManager = {
   },
 
   // Criar dinamicamente o alerta de nenhum resultado
-  createNoResultsAlert: function() {
+  createNoResultsAlert: function () {
     // Se o alerta já existe no DOM, apenas retornar
     if ($("#noResultsAlert").length > 0) {
       return;
     }
-    
+
     // Criar o HTML do alerta dinamicamente
     const alertHtml = `
       <div id="noResultsAlert" class="alert alert-warning">
@@ -1406,35 +1440,37 @@ const PdfSearchManager = {
         </div>
       </div>
     `;
-    
+
     // Inserir o alerta antes da lista de resultados
     // Mas depois das outras partes da interface (loading, erros, controles)
     $(alertHtml).insertBefore("#searchResults");
   },
-  
+
   // Verificar conclusão da busca
   checkSearchCompletion: function (searchTerms, searchOptions) {
     if (searchCanceled) return;
     const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
-    
+
     // Esconder o loading antes de verificar resultados
     $("#searchLoading").hide();
-    
+
     // Verificar se há resultados no DOM
     const resultCount = $("#searchResults .search-result").length;
-    
+
     // Se não houver resultados, criar e mostrar o alerta
     if (resultCount === 0) {
       this.createNoResultsAlert();
-      $("#searchStats").text(`0 resultados encontrados em ${searchTime} segundos`);
+      $("#searchStats").text(
+        `0 resultados encontrados em ${searchTime} segundos`
+      );
     } else {
       // Se houver resultados, remover o alerta se existir
       $("#noResultsAlert").remove();
-      
+
       // Gerar estatísticas apenas agora, no final do processamento
       this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
     }
-    
+
     documentProcessing = false;
     $("html, body").animate(
       { scrollTop: $("#resultsCard").offset().top - 200 },
@@ -2001,22 +2037,27 @@ const PdfSearchManager = {
   // NOVA FUNÇÃO: Gerar estatísticas a partir dos cartões no DOM
   generateStatsFromDOM: function (searchTerms, searchTime, searchOptions) {
     $("#searchLoading").hide();
-    
+
     // Obter todos os cartões de resultados
-    const resultCards = document.querySelectorAll('.search-result');
+    const resultCards = document.querySelectorAll(".search-result");
     const resultCount = resultCards.length;
+
+    // CORREÇÃO: Usar o tamanho do conjunto de arquivos processados para determinar o número total lido
+    const filesProcessed = processedFilePaths.size;
 
     // Se não houver resultados APÓS todo o processamento
     if (resultCount === 0) {
-        // Agora é seguro mostrar o alerta de nenhum resultado
-        $("#noResultsAlert").show();
-        $("#searchStats").text(`0 resultados encontrados em ${searchTime} segundos`);
-        return;
+      // Agora é seguro mostrar o alerta de nenhum resultado
+      $("#noResultsAlert").show();
+      $("#searchStats").text(
+        `0 resultados encontrados em ${searchTime} segundos. Arquivos lidos: ${filesProcessed}`
+      );
+      return;
     }
 
     // Se temos resultados, garantir que o alerta esteja oculto
     $("#noResultsAlert").hide();
-    
+
     // Coletar estatísticas dos cartões no DOM
     let totalSize = 0;
     let totalPages = 0;
@@ -2029,69 +2070,79 @@ const PdfSearchManager = {
     let maxPages = 0;
     let maxPagesFileName = "";
     let documentsWithPageCount = 0;
-    
-    resultCards.forEach(card => {
+
+    resultCards.forEach((card) => {
       // Obter tamanho do arquivo
-      const sizeText = card.querySelector('.badge:nth-of-type(2)').textContent;
+      const sizeText = card.querySelector(".badge:nth-of-type(2)").textContent;
       const sizeMatch = sizeText.match(/(\d+(\.\d+)?)\s*(bytes|KB|MB|GB)/i);
-      
+
       if (sizeMatch) {
         let size = parseFloat(sizeMatch[1]);
         const unit = sizeMatch[3].toUpperCase();
-        
+
         // Converter para bytes
-        if (unit === 'KB') size *= 1024;
-        else if (unit === 'MB') size *= 1024 * 1024;
-        else if (unit === 'GB') size *= 1024 * 1024 * 1024;
-        
+        if (unit === "KB") size *= 1024;
+        else if (unit === "MB") size *= 1024 * 1024;
+        else if (unit === "GB") size *= 1024 * 1024 * 1024;
+
         totalSize += size;
-        
+
         if (size < smallestSize) {
           smallestSize = size;
-          smallestFileName = card.querySelector('h5 a').textContent.trim();
+          smallestFileName = card.querySelector("h5 a").textContent.trim();
         }
-        
+
         if (size > largestSize) {
           largestSize = size;
-          largestFileName = card.querySelector('h5 a').textContent.trim();
+          largestFileName = card.querySelector("h5 a").textContent.trim();
         }
       }
-      
+
       // Obter contagem de páginas
-      const pagesText = card.querySelector('.badge:nth-of-type(3)').textContent;
+      const pagesText = card.querySelector(".badge:nth-of-type(3)").textContent;
       const pagesMatch = pagesText.match(/(\d+)/);
-      
+
       if (pagesMatch) {
         const pages = parseInt(pagesMatch[1]);
         totalPages += pages;
         documentsWithPageCount++;
-        
+
         if (pages < minPages) {
           minPages = pages;
-          minPagesFileName = card.querySelector('h5 a').textContent.trim();
+          minPagesFileName = card.querySelector("h5 a").textContent.trim();
         }
-        
+
         if (pages > maxPages) {
           maxPages = pages;
-          maxPagesFileName = card.querySelector('h5 a').textContent.trim();
+          maxPagesFileName = card.querySelector("h5 a").textContent.trim();
         }
       }
     });
 
     // Calcular médias
     const avgSize = totalSize / resultCount;
-    const avgPages = documentsWithPageCount > 0 ? totalPages / documentsWithPageCount : 0;
+    const avgPages =
+      documentsWithPageCount > 0 ? totalPages / documentsWithPageCount : 0;
 
     // Preparar estatísticas resumidas
-    let statsHtml = `${resultCount} resultado${resultCount !== 1 ? 's' : ''} encontrado${resultCount !== 1 ? 's' : ''} em ${searchTime} segundos. Arquivos lidos: ${resultCount}`;
+    // CORREÇÃO: Usar o número correto de arquivos lidos (filesProcessed) em vez de resultCount
+    let statsHtml = `${resultCount} resultado${
+      resultCount !== 1 ? "s" : ""
+    } encontrado${
+      resultCount !== 1 ? "s" : ""
+    } em ${searchTime} segundos. Arquivos lidos: ${filesProcessed}`;
 
     // Adicionar médias se disponíveis
     if (avgPages > 0) {
-      statsHtml += `<br><span class="stats-metric stats-metric-info">Média: ${avgPages.toFixed(1)} pág</span>`;
+      statsHtml += `<br><span class="stats-metric stats-metric-info">Média: ${avgPages.toFixed(
+        1
+      )} pág</span>`;
     }
-    
+
     if (!isNaN(avgSize)) {
-      statsHtml += ` <span class="stats-metric stats-metric-primary">Média: ${this.formatFileSize(avgSize)}</span>`;
+      statsHtml += ` <span class="stats-metric stats-metric-primary">Média: ${this.formatFileSize(
+        avgSize
+      )}</span>`;
     }
 
     // Preparar estatísticas detalhadas para o popover
@@ -2099,11 +2150,13 @@ const PdfSearchManager = {
       <table class="stats-table">
         <tr>
           <td>Total de documentos processados:</td>
-          <td>${resultCount}</td>
+          <td>${filesProcessed}</td>
         </tr>
         <tr>
           <td>Documentos com correspondência:</td>
-          <td>${resultCount} (100%)</td>
+          <td>${resultCount} (${
+      filesProcessed > 0 ? Math.round((resultCount / filesProcessed) * 100) : 0
+    }%)</td>
         </tr>`;
 
     // Adicionar estatísticas de páginas se disponíveis
@@ -2183,7 +2236,7 @@ const PdfSearchManager = {
   displayResults: function (results) {
     // Ocultar indicador de carregamento
     $("#searchLoading").hide();
-    
+
     // Verificar se há resultados considerando os filtros aplicados
     if (!results || results.length === 0) {
       $("#noResultsAlert").show();
@@ -2194,12 +2247,12 @@ const PdfSearchManager = {
 
     // Se chegou aqui, temos resultados - garantir que o alerta de sem resultados esteja oculto
     $("#noResultsAlert").hide();
-    
+
     // Resto do código para exibir resultados...
     // ... existing code ...
   },
 
-  processNextDocument: async function(index) {
+  processNextDocument: async function (index) {
     // ... existing code ...
     // Atualizar a interface após cada documento processado
     if (this.results.length > 0) {
@@ -2207,7 +2260,7 @@ const PdfSearchManager = {
       $("#noResultsAlert").hide();
     }
     // ... existing code ...
-    
+
     // Ao final do processamento, verificar novamente
     if (index >= this.filesToProcess.length - 1) {
       // Acabou o processamento, verificar resultados finais
@@ -2220,73 +2273,78 @@ const PdfSearchManager = {
     // ... existing code ...
   },
 
-  shouldIncludeFile: function(file) {
+  shouldIncludeFile: function (file) {
     // ... existing code ...
-    
+
     // Verificar filtros de superintendência e número do processo
     const superintendenceCode = $("#searchSuperintendence").val();
     const titleSearch = $("#searchTitle").val();
-    
-    if (superintendenceCode && !this.matchesSuperintendence(file, superintendenceCode)) {
+
+    if (
+      superintendenceCode &&
+      !this.matchesSuperintendence(file, superintendenceCode)
+    ) {
       return false;
     }
-    
+
     if (titleSearch && !this.matchesProcessNumber(file, titleSearch)) {
       return false;
     }
-    
+
     return true;
   },
-  
+
   // Funções auxiliares para verificar se o arquivo corresponde aos filtros
-  matchesSuperintendence: function(file, code) {
+  matchesSuperintendence: function (file, code) {
     // Tentar extrair o código de superintendência do nome do arquivo ou do caminho
-    const superMatch = file.displayPath ? 
-      file.displayPath.match(new RegExp(`_PC(${code})\\d+`)) :
-      file.fileName.match(new RegExp(`_PC(${code})\\d+`));
-    
+    const superMatch = file.displayPath
+      ? file.displayPath.match(new RegExp(`_PC(${code})\\d+`))
+      : file.fileName.match(new RegExp(`_PC(${code})\\d+`));
+
     return superMatch !== null;
   },
-  
-  matchesProcessNumber: function(file, processNumber) {
+
+  matchesProcessNumber: function (file, processNumber) {
     // Verificar se o número do processo está no título ou no nome do arquivo
-    return file.pc_anexo_processo_id === processNumber || 
-           (file.fileName && file.fileName.includes(processNumber));
+    return (
+      file.pc_anexo_processo_id === processNumber ||
+      (file.fileName && file.fileName.includes(processNumber))
+    );
   },
 
   // Nova função para centralizar a lógica de exibição do alerta de nenhum resultado
-  checkAndDisplayNoResultsAlert: function() {
+  checkAndDisplayNoResultsAlert: function () {
     // Obter todos os cartões de resultados
-    const resultCards = document.querySelectorAll('.search-result');
+    const resultCards = document.querySelectorAll(".search-result");
     const resultCount = resultCards.length;
-    
+
     // Mostrar o alerta APENAS se não houver resultados
     if (resultCount === 0 && !documentProcessing) {
-        $("#noResultsAlert").show();
+      $("#noResultsAlert").show();
     } else {
-        $("#noResultsAlert").hide();
+      $("#noResultsAlert").hide();
     }
   },
 
   // Modificação na função que finaliza a busca
-  finishSearch: function() {
+  finishSearch: function () {
     documentProcessing = false;
     $("#searchLoading").hide();
-    
+
     // Verificar se há resultados no DOM após todo o processamento
-    const resultCards = document.querySelectorAll('.search-result');
+    const resultCards = document.querySelectorAll(".search-result");
     const resultCount = resultCards.length;
-    
+
     // Mostrar o alerta somente se não houver resultados após todo o processamento
     if (resultCount === 0) {
-        $("#noResultsAlert").show();
+      $("#noResultsAlert").show();
     } else {
-        $("#noResultsAlert").hide();
+      $("#noResultsAlert").hide();
     }
-    
+
     // Gerar as estatísticas finais
     this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
-    
+
     // ... resto do código ...
   },
 };
