@@ -1555,7 +1555,7 @@ const PdfSearchManager = {
           }
         })
         .fail(() => {
-          const sizeThreshold = 3 * 1024 * 1024; // 3MB
+          const sizeThreshold = 1 * 1024 * 1024; // 1MB
           if (doc.size > sizeThreshold) {
             serverDocs.push(doc);
           } else {
