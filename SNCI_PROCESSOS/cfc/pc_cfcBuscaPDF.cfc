@@ -236,8 +236,8 @@
             <cfset local.result.pageCount = local.pdfInfo.totalpages>
             
             <!--- Determinar complexidade baseado em tamanho e número de páginas --->
-            <cfset local.sizeThreshold = 5 * 1024 * 1024> <!--- 5 MB --->
-            <cfset local.pageThreshold = 20> <!--- 20 páginas --->
+            <cfset local.sizeThreshold = 1 * 1024 * 1024> <!--- 1 MB --->
+            <cfset local.pageThreshold = 5> <!--- 5 páginas --->
             
             <cfif local.result.size GT local.sizeThreshold OR local.result.pageCount GT local.pageThreshold>
                 <cfset local.result.complexity = "complex">
