@@ -1,6 +1,124 @@
 <cfprocessingdirective pageencoding = "utf-8">
 <link rel="stylesheet" href="dist/css/stylesSNCI_Dashboard_Avaliacoes.css">
 
+<!-- Primeiro, adicionar o estilo para os badges -->
+<style>
+/* Estilo para o badge de conceito */
+.conceito-badge {
+  position: absolute;
+  left: -45px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-weight: bold;
+  white-space: nowrap;
+  color: white;
+  min-width: 40px;
+  text-align: center;
+  z-index: 2; /* Garantir que fique em cima de outros elementos */
+}
+
+/* Cores para os diferentes conceitos */
+.conceito-otimo {
+  background-color: #28a745; /* verde */
+}
+
+.conceito-bom {
+  background-color: #17a2b8; /* azul */
+}
+
+.conceito-regular {
+  background-color: #ffc107; /* amarelo */
+  color: #212529;
+}
+
+.conceito-ruim {
+  background-color: #fd7e14; /* laranja */
+}
+
+.conceito-pessimo {
+  background-color: #dc3545; /* vermelho */
+}
+
+/* Ajustar posicionamento e margens */
+.donut-container {
+  position: relative;
+  margin-left: 25px; /* Aumentado para criar mais espaço entre o badge e o donut */
+}
+
+.score-cards {
+  position: relative;
+  margin-left: -5px;
+  padding-left: 0;
+}
+
+/* Ajustar os badges da legenda */
+.legenda-badge {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 3px;
+}
+
+/* Para os badges na legenda */
+.text-muted.small.px-2.py-1 {
+  /* left: -13px !important; */ /* Remover esta linha */
+}
+
+/* Container principal para centralizar visualmente */
+#avaliacoes-content {
+  padding-left: 0;
+}
+
+/* Ajuste específico para os ícones de informação */
+.info-icon {
+  margin-left: 5px;
+}
+
+/* Novo estilo para a legenda inline no título */
+.legenda-inline {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 12px;
+  font-weight: normal;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
+.legenda-badge-small {
+  position: static;
+  transform: none;
+  font-size: 9px;
+  padding: 1px 3px;
+  margin-right: 2px;
+  margin-bottom: 2px;
+  display: inline-block;
+}
+
+/* Ajuste para o header em telas pequenas */
+@media (max-width: 768px) {
+  .card-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  
+}
+
+/* Adicionar estilo para badges sem notas */
+.conceito-sem-notas {
+  background-color: #6c757d; /* cinza */
+  color: white;
+  font-size: 9px; /* Reduzindo um pouco para caber melhor */
+  left: -55px; /* Mais afastado para não sobrepor o donut */
+  min-width: 50px; /* Garantir espaço para o texto */
+}
+</style>
+
 <!-- Conteúdo do card de Avaliações -->
 <div class="score-cards">
   <div class="score-card comunicacao">
@@ -10,6 +128,7 @@
           <h3>Comunicação</h3>
       </div>
       <div class="donut-container">
+        <span class="conceito-badge" id="conceito-comunicacao"></span>
         <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
           <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
           <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#17a2b8" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
@@ -24,6 +143,7 @@
           <h3>Interlocução</h3>
       </div>
       <div class="donut-container">
+        <span class="conceito-badge" id="conceito-interlocucao"></span>
         <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
           <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
           <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#6f42c1" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
@@ -38,6 +158,7 @@
           <h3>Reunião</h3>
       </div>
       <div class="donut-container">
+        <span class="conceito-badge" id="conceito-reuniao"></span>
         <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
           <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
           <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#dc3545" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
@@ -52,6 +173,7 @@
           <h3>Relatório</h3>
       </div>
       <div class="donut-container">
+        <span class="conceito-badge" id="conceito-relatorio"></span>
         <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
           <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
           <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#007bff" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
@@ -66,6 +188,7 @@
           <h3>Pós-Trabalho</h3>
       </div>
       <div class="donut-container">
+        <span class="conceito-badge" id="conceito-pos_trabalho"></span>
         <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
           <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
           <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#28a745" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
@@ -80,6 +203,7 @@
           <h3>Importância</h3>
       </div>
       <div class="donut-container">
+        <span class="conceito-badge" id="conceito-importancia"></span>
         <svg class="donut-chart" width="60" height="60" viewBox="0 0 42 42">
           <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#e9ecef" stroke-width="3"></circle>
           <circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#fd7e14" stroke-width="3" stroke-dasharray="0 100" stroke-dashoffset="25"></circle>
@@ -135,6 +259,42 @@ $(document).ready(function() {
         window.requestAnimationFrame(step);
     }
     
+    // Função para atualizar o badge de conceito - MODIFICADA
+    function atualizarConceitoBadge(id, valor) {
+        let conceito = '';
+        let classeConceito = '';
+        
+        // Verificar se o valor é zero ou indefinido
+        if (valor === 0 || valor === null || valor === undefined || isNaN(valor)) {
+            conceito = 'Sem notas';
+            classeConceito = 'conceito-sem-notas';
+        } else if (valor >= 9) {
+            conceito = 'Ótimo';
+            classeConceito = 'conceito-otimo';
+        } else if (valor >= 7) {
+            conceito = 'Bom';
+            classeConceito = 'conceito-bom';
+        } else if (valor >= 5) {
+            conceito = 'Regular';
+            classeConceito = 'conceito-regular';
+        } else if (valor >= 3) {
+            conceito = 'Ruim';
+            classeConceito = 'conceito-ruim';
+        } else {
+            conceito = 'Péssimo';
+            classeConceito = 'conceito-pessimo';
+        }
+        
+        // Selecionar o badge correspondente
+        const $badge = $('#conceito-' + id);
+        
+        // Remover classes anteriores
+        $badge.removeClass('conceito-otimo conceito-bom conceito-regular conceito-ruim conceito-pessimo conceito-sem-notas');
+        
+        // Adicionar a nova classe e texto
+        $badge.addClass(classeConceito).text(conceito);
+    }
+    
     // Armazenar valores anteriores para permitir animação
     window.previousValues = {
         comunicacao: 0,
@@ -168,6 +328,9 @@ $(document).ready(function() {
             // Animar o donut
             const donutSegment = $(el).closest('.score-card').find('.donut-segment')[0];
             animateDonut(donutSegment, previousValue, valor, 1000);
+            
+            // Atualizar o badge de conceito com o novo valor
+            atualizarConceitoBadge(card.id, valor);
             
             // Atualizar o valor anterior para a próxima animação
             window.previousValues[card.id] = valor;

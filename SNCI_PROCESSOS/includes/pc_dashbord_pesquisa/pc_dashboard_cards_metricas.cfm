@@ -76,7 +76,7 @@
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <h3 id="mediaGeralPontualidade">0</h3>
-                        <p>Pontualidade</p>
+                        <p>Pontualidade <i class="fas fa-info-circle" data-toggle="popover" data-placement="top" title="Pontualidade" data-content="Avalia se a equipe de controle interno cumpriu os prazos estabelecidos para a condução e entrega do trabalho."></i></p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-clock"></i>

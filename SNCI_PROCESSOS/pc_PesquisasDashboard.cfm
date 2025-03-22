@@ -39,7 +39,14 @@
                         <div class="card mb-4" id="card-avaliacoes">
                             <div class="card-header">
                                 <h3 class="card-title">
-                                    <i class="fas fa-star mr-2"></i>Média das Notas por Categoria
+                                    <i class="fas fa-star mr-2"></i>Média das Notas por Categoria:
+                                    <div class="legenda-inline ml-2">
+                                        <span class="mx-1"><span class="conceito-badge conceito-otimo legenda-badge-small">Ótimo</span> 10-9</span>
+                                        <span class="mx-1"><span class="conceito-badge conceito-bom legenda-badge-small">Bom</span> 8-7</span>
+                                        <span class="mx-1"><span class="conceito-badge conceito-regular legenda-badge-small">Regular</span> 6-5</span>
+                                        <span class="mx-1"><span class="conceito-badge conceito-ruim legenda-badge-small">Ruim</span> 4-3</span>
+                                        <span class="mx-1"><span class="conceito-badge conceito-pessimo legenda-badge-small">Péssimo</span> 1-2</span>
+                                    </div>
                                 </h3>
                             </div>
                             <div class="card-body">
