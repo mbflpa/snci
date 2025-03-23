@@ -203,7 +203,8 @@ $(document).ready(function() {
     $('#pesquisarPalavras').click(function() {
         if (palavrasSelecionadas.length > 0) {
             const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
-            buscarObservacoesPorPalavrasMultiplas(palavrasSelecionadas, anoSelecionado, window.mcuSelecionado);
+            const diretoriaSelecionada = $("input[name='opcaoDiretoria']:checked").val() || "Todos";
+            buscarObservacoesPorPalavrasMultiplas(palavrasSelecionadas, anoSelecionado, window.mcuSelecionado, diretoriaSelecionada);
         }
     });
     
@@ -253,11 +254,13 @@ $(document).ready(function() {
     
     // Botão para atualizar a nuvem
     $('#atualizarNuvem').click(function() {
-        window.carregarNuvemPalavras(window.anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
+        const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
+        const diretoriaSelecionada = $("input[name='opcaoDiretoria']:checked").val() || "Todos";
+        window.carregarNuvemPalavras(anoSelecionado, window.mcuSelecionado, diretoriaSelecionada, minFreq, maxWords);
     });
 
     // Função para carregar e renderizar a nuvem de palavras - SIMPLIFICADA
-    window.carregarNuvemPalavras = function(anoFiltro, mcuFiltro, minFreq = 2, maxWords = 100) {
+    window.carregarNuvemPalavras = function(anoFiltro, mcuFiltro, diretoriaFiltro, minFreq = 2, maxWords = 100) {
         // Se já estiver renderizando, saia para evitar chamadas simultâneas
         if (window.isRenderingCloud) {
             return;
@@ -345,6 +348,7 @@ $(document).ready(function() {
             data: { 
                 ano: anoFiltro,
                 mcuOrigem: mcuFiltro,
+                diretoria: diretoriaFiltro,
                 minFreq: minFreq,
                 maxWords: maxWords
             },
@@ -445,7 +449,7 @@ $(document).ready(function() {
                                             atualizarDestaquePalavras();
                                         } else {
                                             // Comportamento original - busca imediata
-                                            buscarObservacoesPorPalavra(palavraClicada, anoFiltro, mcuFiltro, corPalavra);
+                                            buscarObservacoesPorPalavra(palavraClicada, anoFiltro, mcuFiltro, diretoriaFiltro);
                                         }
                                     });
                                 }
@@ -540,7 +544,7 @@ $(document).ready(function() {
     }
     
     // Novo: Função para buscar observações com múltiplas palavras
-    function buscarObservacoesPorPalavrasMultiplas(palavras, ano, mcu) {
+    function buscarObservacoesPorPalavrasMultiplas(palavras, ano, mcu, diretoria) {
         if (!palavras || palavras.length === 0) return;
         
         // Armazenar a cor da primeira palavra para uso posterior
@@ -598,6 +602,7 @@ $(document).ready(function() {
                 palavras: JSON.stringify(palavras),
                 ano: ano,
                 mcuOrigem: mcu,
+                diretoria: diretoria,
                 returnformat: 'json'
             },
             success: function(response) {
@@ -699,9 +704,9 @@ $(document).ready(function() {
     }
     
     // Função para buscar observações que contêm a palavra clicada
-    function buscarObservacoesPorPalavra(palavra, ano, mcu, corPalavra) {
+    function buscarObservacoesPorPalavra(palavra, ano, mcu, diretoria) {
         // Armazenar a cor da palavra para uso posterior
-        window.ultimaCorPalavra = corPalavra;
+        window.ultimaCorPalavra = diretoria;
         
         // Mostrar indicador de carregamento sem usar modal
         var loadingIndicator = $('<div class="overlay-loading position-fixed w-100 h-100" style="top:0;left:0;background:rgba(255,255,255,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;"><div class="text-center"><div class="spinner-grow text-primary" role="status"><span class="sr-only">Carregando...</span></div><p class="mt-3">Carregando observações...</p></div></div>');
@@ -713,9 +718,9 @@ $(document).ready(function() {
         $("#palavra-selecionada").text(palavra);
         
         // Atualizar a cor do header do card de resultados principal para combinar com a palavra
-        if (corPalavra) {
+        if (diretoria) {
             // Converter a cor RGB para hexadecimal para usar como valor do gradiente
-            var hexColor = rgbToHex(corPalavra);
+            var hexColor = rgbToHex(diretoria);
             var darkerColor = adjustColor(hexColor, -30); // Versão mais escura da cor
             
             // Invertido o gradiente para que a cor mais forte fique à esquerda
@@ -754,6 +759,7 @@ $(document).ready(function() {
                 palavra: palavra,
                 ano: ano,
                 mcuOrigem: mcu,
+                diretoria: diretoria,
                 returnformat: 'json'
             },
             success: function(response) {
@@ -797,12 +803,12 @@ $(document).ready(function() {
                         // Criar um card para cada observação
                         data.forEach(function(item, index) {
                             // Passa a cor da palavra para destacarPalavra
-                            var observacaoComDestaque = destacarPalavra(item.observacao, palavra, corPalavra);
+                            var observacaoComDestaque = destacarPalavra(item.observacao, palavra, diretoria);
                             var processoId = item.processo_id;
                             var orgaoRespondente = item.orgao_respondente;
                             var orgaoOrigem = item.orgao_origem || "Não informado";
                             
-                            var card = criarCardObservacao(processoId, orgaoRespondente, orgaoOrigem, observacaoComDestaque, index, corPalavra);
+                            var card = criarCardObservacao(processoId, orgaoRespondente, orgaoOrigem, observacaoComDestaque, index, diretoria);
                             $("#cards-container").append(card);
                         });
                         
@@ -1002,7 +1008,9 @@ $(document).ready(function() {
     
     // Inicializar a nuvem quando o componente for carregado
     setTimeout(function() {
-        window.carregarNuvemPalavras(window.anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
+        const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
+        const diretoriaSelecionada = $("input[name='opcaoDiretoria']:checked").val() || "Todos";
+        window.carregarNuvemPalavras(anoSelecionado, window.mcuSelecionado, diretoriaSelecionada, minFreq, maxWords);
     }, 500);
     
     // Adicionar ouvintes para eventos de filtro
@@ -1014,7 +1022,9 @@ $(document).ready(function() {
             
             // Usar diretamente as variáveis globais atualizadas pelo componente de filtro
             setTimeout(function() {
-                window.carregarNuvemPalavras(window.anoSelecionado, window.mcuSelecionado, minFreq, maxWords);
+                const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
+                const diretoriaSelecionada = $("input[name='opcaoDiretoria']:checked").val() || "Todos";
+                window.carregarNuvemPalavras(anoSelecionado, window.mcuSelecionado, diretoriaSelecionada, minFreq, maxWords);
             }, 100);
         } else {
             console.log("Aba de nuvem de palavras não está ativa, ignorando atualização");

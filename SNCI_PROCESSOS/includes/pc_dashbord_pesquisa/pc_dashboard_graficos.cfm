@@ -557,6 +557,16 @@ $(document).ready(function() {
         
         // Forçar redimensionamento dos gráficos
         $(window).trigger('resize');
+        
+        // Se existir uma área de descrição de filtros, atualizar para incluir diretoria
+        if ($("#descricao-filtros-graficos").length) {
+            let descricao = "Filtros aplicados: ";
+            descricao += "Ano: " + (window.anoSelecionado === "Todos" ? "Todos os anos" : window.anoSelecionado);
+            descricao += ", Órgão: " + (window.mcuSelecionado === "Todos" ? "Todos os órgãos" : getNomeOrgao(window.mcuSelecionado));
+            descricao += ", Diretoria: " + (window.diretoriaSelecionada === "Todos" ? "Todas as diretorias" : getNomeDiretoria(window.diretoriaSelecionada));
+            
+            $("#descricao-filtros-graficos").text(descricao);
+        }
     };
     
     // Adicionar ajuste automático dos gráficos ao redimensionar a janela

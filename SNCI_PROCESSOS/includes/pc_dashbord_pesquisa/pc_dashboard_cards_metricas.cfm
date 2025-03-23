@@ -374,6 +374,16 @@ $(document).ready(function() {
                     $("#npsDetalhes").text(`Promotores: ${promotores} | Neutros: ${neutros} | Detratores: ${detratores}`);
                 }
             }
+            
+            // Se existir uma área de descrição de filtros, atualizar para incluir diretoria
+            if ($("#descricao-filtros-cards").length) {
+                let descricao = "Filtros aplicados: ";
+                descricao += "Ano: " + (window.anoSelecionado === "Todos" ? "Todos os anos" : window.anoSelecionado);
+                descricao += ", Órgão: " + (window.mcuSelecionado === "Todos" ? "Todos os órgãos" : getNomeOrgao(window.mcuSelecionado));
+                descricao += ", Diretoria: " + (window.diretoriaSelecionada === "Todos" ? "Todas as diretorias" : getNomeDiretoria(window.diretoriaSelecionada));
+                
+                $("#descricao-filtros-cards").text(descricao);
+            }
         }
         
         // Carregar dados iniciais se possível

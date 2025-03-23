@@ -2,6 +2,7 @@
 
 <cfparam name="attributes.exibirAno" default="true" type="boolean">
 <cfparam name="attributes.exibirOrgao" default="false" type="boolean">
+<cfparam name="attributes.exibirDiretoria" default="false" type="boolean">
 <cfparam name="attributes.exibirStatus" default="false" type="boolean">
 <cfparam name="attributes.componenteID" default="filtros-dashboard-#CreateUUID()#">
 
@@ -63,12 +64,67 @@
     </cfloop>
 </cfif>
 
+<!--- Preparar dados das diretorias para JavaScript --->
+<cfif attributes.exibirDiretoria>
+    <cfquery name="rsDiretorias" datasource="#application.dsn_processos#">
+        SELECT pc_org_mcu, pc_org_sigla
+        FROM pc_orgaos
+        WHERE pc_org_mcu IN ('#Replace(application.listaDiretorias, ",", "','", "all")#')
+        ORDER BY pc_org_sigla
+    </cfquery>
+
+    <cfset diretoriasJS = "">
+    <cfloop query="rsDiretorias">
+        <cfset diretoriasJS = diretoriasJS & "diretorias.push({mcu: '" & rsDiretorias.pc_org_mcu & "', sigla: '" & 
+                             replace(rsDiretorias.pc_org_sigla, "'", "\'", "ALL") & "'.includes('/') ? '" & 
+                             replace(rsDiretorias.pc_org_sigla, "'", "\'", "ALL") & "'.split('/').pop() : '" & 
+                             replace(rsDiretorias.pc_org_sigla, "'", "\'", "ALL") & "'});">
+    </cfloop>
+</cfif>
+
 <cfif attributes.exibirStatus AND isDefined("rsStatusProcessos")>
     <cfset statusJS = "">
     <cfloop query="rsStatusProcessos">
         <cfset statusJS = statusJS & "statusList.push({id: '" & rsStatusProcessos.pc_status_id & "', descricao: '" & 
                           replace(rsStatusProcessos.pc_status_descricao, "'", "\'", "ALL") & "'});">
     </cfloop>
+</cfif>
+
+<!--- Processamento do filtro de Diretoria --->
+<cfif isDefined("form.filtro_diretoria") AND len(form.filtro_diretoria)>
+    <cfset url.filtro_diretoria = form.filtro_diretoria>
+<cfelseif NOT isDefined("url.filtro_diretoria")>
+    <cfset url.filtro_diretoria = "">
+</cfif>
+
+<!--- Adiciona a condição SQL para o filtro de Diretoria --->
+<cfif len(url.filtro_diretoria)>
+    <!--- Obtém hierarquia de órgãos subordinados à diretoria selecionada --->
+    <cfset qDiretoriaHierarquia = queryExecute(
+        "WITH OrgHierarchy AS (
+            SELECT pc_org_mcu, pc_org_mcu_subord_tec
+            FROM pc_orgaos
+            WHERE pc_org_mcu = :diretoria
+            UNION ALL
+            SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
+            FROM pc_orgaos o
+            INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+        )
+        SELECT pc_org_mcu
+        FROM OrgHierarchy",
+        {diretoria = {value=url.filtro_diretoria, cfsqltype="cf_sql_varchar"}},
+        {datasource=application.dsn_processos, timeout=120}
+    )>
+    
+    <cfset listaOrgaosDiretoria = ValueList(qDiretoriaHierarquia.pc_org_mcu)>
+    
+    <!--- Adiciona a diretoria selecionada à lista caso não esteja incluída no resultado da hierarquia --->
+    <cfif NOT ListFind(listaOrgaosDiretoria, url.filtro_diretoria)>
+        <cfset listaOrgaosDiretoria = ListAppend(listaOrgaosDiretoria, url.filtro_diretoria)>
+    </cfif>
+    
+    <!--- Adiciona a condição SQL --->
+    <cfset SQL_WHERE = SQL_WHERE & " AND pc_org_mcu IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')">
 </cfif>
 
 <cfoutput>
@@ -222,6 +278,16 @@
                     </div>
                 </div>
             </cfif>
+
+            <!-- Filtro de Diretoria -->
+            <cfif attributes.exibirDiretoria>
+                <div class="filtro-container filtro-compacto">
+                    <div class="filtro-label">Diretoria:</div>
+                    <div id="opcoesDiretoria#attributes.componenteID#" class="btn-group btn-group-toggle btn-group-sm btn-group-filtros" data-toggle="buttons">
+                        <!-- Botões gerados via JS -->
+                    </div>
+                </div>
+            </cfif>
         </div>
     </div>
 </div>
@@ -235,7 +301,6 @@ $(document).ready(function() {
     // Handler para alteração nos filtros
     function onFiltroAlterado(tipo, valor) {
         
-        
         // Atualizar variáveis globais
         if (tipo === 'ano') {
             window.anoSelecionado = valor;
@@ -245,6 +310,9 @@ $(document).ready(function() {
            
         } else if (tipo === 'status') {
             window.statusSelecionado = valor;
+            
+        } else if (tipo === 'diretoria') {
+            window.diretoriaSelecionada = valor;
         }
         
         // Disparar evento personalizado que pode ser capturado pela página
@@ -374,6 +442,47 @@ $(document).ready(function() {
         $(`input[name="opcaoStatus${componenteID}"]`).change(function() {
             const novoStatus = $(this).val();
             onFiltroAlterado('status', novoStatus);
+        });
+    </cfif>
+    
+    // Configuração do filtro de diretorias - apenas se o filtro estiver habilitado
+    <cfif attributes.exibirDiretoria>
+        let diretorias = [];
+        // Adicionar diretorias da query usando string preparada
+        #diretoriasJS#
+        
+        const opcoesDiretoriaEl = $("##opcoesDiretoria" + componenteID);
+        opcoesDiretoriaEl.empty();
+        
+        // Adicionar botão "Todos"
+        const btnTodasDiretorias = `<label class="btn btn-outline-secondary btn-todos active">
+                            <input type="radio" name="opcaoDiretoria${componenteID}" checked autocomplete="off" value="Todos"/> Todos
+                       </label>`;
+        opcoesDiretoriaEl.append(btnTodasDiretorias);
+        
+        // Valor selecionado
+        const diretoriaSelecionada = 'Todos';
+        window.diretoriaSelecionada = diretoriaSelecionada;
+        
+        // Adicionar botões para cada diretoria
+        diretorias.forEach(function(diretoria) {
+            const btn = `<label class="btn btn-outline-primary" style="margin-left:2px;">
+                            <input type="radio" name="opcaoDiretoria${componenteID}" autocomplete="off" value="${diretoria.mcu}"/> ${diretoria.sigla}
+                        </label>`;
+            opcoesDiretoriaEl.append(btn);
+        });
+        
+        // Event handler
+        $(`input[name="opcaoDiretoria${componenteID}"]`).change(function() {
+            const novaDiretoria = $(this).val();
+            onFiltroAlterado('diretoria', novaDiretoria);
+            
+            // Se estiver usando form, adicionar ao formulário
+            if ($("##filtro_diretoria").length) {
+                $("##filtro_diretoria").val(novaDiretoria);
+                // Fazer submit do form se necessário
+                // $("form").submit();
+            }
         });
     </cfif>
 });

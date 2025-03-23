@@ -121,6 +121,18 @@ component {
         );
         application.orgaosHierarquiaList = ValueList(getOrgHierarchy.pc_org_mcu);
         
+        // Consulta de diretorias
+        var getDiretoriasList = queryExecute(
+            "SELECT pc_org_mcu
+             FROM pc_orgaos
+             WHERE pc_org_descricao_tipo_orgao = 'CORREIOS SEDE - DIRECAO' 
+             AND pc_org_mcu_subord_tec = '00001003'",
+            {},
+            {datasource=application.dsn_processos}
+        );
+        
+        application.listaDiretorias = ValueList(getDiretoriasList.pc_org_mcu);
+        
         return true;
     }
 }

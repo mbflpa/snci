@@ -3,6 +3,15 @@
     <cffunction name="getPesquisas" access="remote" returntype="string" returnformat="json">
         <cfargument name="ano" type="string" required="true">
         <cfargument name="mcuOrigem" type="string" required="true">
+        <cfargument name="diretoria" type="string" required="false" default="Todos">
+        
+        <cfset var listaOrgaosDiretoria = "">
+        
+        <!--- Obter lista de órgãos subordinados à diretoria selecionada --->
+        <cfif arguments.diretoria NEQ "Todos">
+            <cfset listaOrgaosDiretoria = getOrgaosDiretoriaHierarquia(arguments.diretoria)>
+        </cfif>
+
         <cfquery name="qPesquisas" datasource="#application.dsn_processos#">
             SELECT 
                 pc_pesq_id,
@@ -30,6 +39,9 @@
             <cfif arguments.mcuOrigem NEQ "Todos">
                 AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
             </cfif>
+            <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                AND pc_pesquisas.pc_org_mcu IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
+            </cfif>
             ORDER BY pc_pesquisas.pc_processo_id
         </cfquery>
         
@@ -39,10 +51,17 @@
     <cffunction name="getEstatisticas" access="remote" returntype="struct" output="false">
         <cfargument name="ano" type="string" required="true">
         <cfargument name="mcuOrigem" type="string" required="true">
+        <cfargument name="diretoria" type="string" required="false" default="Todos">
         
         <cfset var retorno = structNew()>
         <cfset var qryPesquisas = "">
         <cfset var qryEvolucao = "">
+        <cfset var listaOrgaosDiretoria = "">
+        
+        <!--- Obter lista de órgãos subordinados à diretoria selecionada --->
+        <cfif arguments.diretoria NEQ "Todos">
+            <cfset listaOrgaosDiretoria = getOrgaosDiretoriaHierarquia(arguments.diretoria)>
+        </cfif>
         
         <cfquery name="qryPesquisas" datasource="#application.dsn_processos#">
             SELECT 
@@ -64,6 +83,9 @@
             <cfif arguments.mcuOrigem NEQ "Todos">
                 AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
             </cfif>
+            <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                AND pc_pesquisas.pc_org_mcu IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
+            </cfif>
         </cfquery>
     
         <cfquery name="qryEvolucao" datasource="#application.dsn_processos#">
@@ -80,6 +102,9 @@
             </cfif>
             <cfif arguments.mcuOrigem NEQ "Todos">
                 AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+            </cfif>
+            <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                AND pc_pesquisas.pc_org_mcu IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
             </cfif>
             GROUP BY FORMAT(pc_pesq_data_hora, 'yyyy-MM')
             ORDER BY mes
@@ -118,6 +143,9 @@
             <cfif arguments.mcuOrigem NEQ "Todos">
                 AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
             </cfif>
+            <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                AND pc_pesquisas.pc_org_mcu IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
+            </cfif>
         </cfquery>
         
         <!--- Obter quantidade total de processos - Consulta corrigida --->
@@ -138,6 +166,9 @@
                 <cfif arguments.mcuOrigem NEQ "Todos">
                     AND proc1.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                 </cfif>
+                <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                    AND orient.pc_aval_orientacao_mcu_orgaoResp IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
+                </cfif>
 
                 UNION
 
@@ -155,6 +186,10 @@
                 </cfif>
                 <cfif arguments.mcuOrigem NEQ "Todos">
                     AND proc2.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                </cfif>
+                <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                    AND (melh.pc_aval_melhoria_num_orgao IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
+                    OR melh.pc_aval_melhoria_sug_orgao_mcu IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#') )   
                 </cfif>
             )
             SELECT COUNT(DISTINCT pc_processo_id) as total_processos
@@ -191,6 +226,9 @@
             </cfif>
             <cfif arguments.mcuOrigem NEQ "Todos">
                 AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+            </cfif>
+            <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                AND pc_pesquisas.pc_org_mcu IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
             </cfif>
         </cfquery>
     
@@ -265,6 +303,9 @@
                 <cfif arguments.mcuOrigem NEQ "Todos">
                     AND proc1.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                 </cfif>
+                <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                    AND orient.pc_aval_orientacao_mcu_orgaoResp IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
+                </cfif>
 
                 UNION
 
@@ -287,6 +328,10 @@
                 <cfif arguments.mcuOrigem NEQ "Todos">
                     AND proc2.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
                 </cfif>
+                <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                    AND (melh.pc_aval_melhoria_num_orgao IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
+                    OR melh.pc_aval_melhoria_sug_orgao_mcu IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#') )   
+                </cfif>
             ) AS processos_sem_pesquisa
         </cfquery>
 
@@ -307,8 +352,16 @@
         <cfargument name="mcuOrigem" type="string" required="true">
         <cfargument name="minFreq" type="numeric" required="false" default="2">
         <cfargument name="maxWords" type="numeric" required="false" default="100">
+        <cfargument name="diretoria" type="string" required="false" default="Todos">
         
         <cfset var stopWords = "a,à,ao,aos,aquela,aquelas,aquele,aqueles,aquilo,as,às,até,com,como,da,das,de,dela,delas,dele,deles,depois,do,dos,e,é,ela,elas,ele,eles,em,entre,era,eram,éramos,essa,essas,esse,esses,esta,está,estamos,estão,estas,estava,estavam,este,esteja,estejam,estejamos,estes,esteve,estive,estivemos,estiver,estivera,estiveram,estiverem,estivermos,estou,eu,foi,fomos,for,fora,foram,fôramos,forem,formos,fosse,fossem,fôssemos,fui,há,haja,hajam,hajamos,hão,havemos,havia,hei,houve,houvemos,houver,houvera,houveram,houvéramos,houverão,houverei,houverem,houveremos,houveriam,houveríamos,houvermos,houvesse,houvessem,houvéssemos,isso,isto,já,lhe,lhes,mais,mas,me,mesmo,meu,meus,minha,minhas,muito,na,não,nas,nem,nenhum,nessa,nessas,nesta,nestas,no,nos,nós,nossa,nossas,nosso,nossos,num,numa,o,os,ou,para,pela,pelas,pelo,pelos,por,qual,quando,que,quem,são,se,seja,sejam,sejamos,sem,será,serão,serei,seremos,seria,seriam,seríamos,seu,seus,só,somos,sou,sua,suas,também,te,tem,tém,temos,tenha,tenham,tenhamos,tenho,terá,terão,terei,teremos,teria,teriam,teríamos,teu,teus,teve,tinha,tinham,tínhamos,tive,tivemos,tiver,tivera,tiveram,tivéramos,tiverem,tivermos,tivesse,tivessem,tivéssemos,toda,todas,todo,todos,tu,tua,tuas,um,uma,você,vocês,vos">
+        
+        <cfset var listaOrgaosDiretoria = "">
+        
+        <!--- Obter lista de órgãos subordinados à diretoria selecionada --->
+        <cfif arguments.diretoria NEQ "Todos">
+            <cfset listaOrgaosDiretoria = getOrgaosDiretoriaHierarquia(arguments.diretoria)>
+        </cfif>
         
         <!--- Consulta completamente reformulada para evitar problemas de alias --->
         <cfquery name="qObservacoes" datasource="#application.dsn_processos#">
@@ -324,6 +377,13 @@
                     SELECT pc_processo_id 
                     FROM pc_processos
                     WHERE pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+                )
+            </cfif>
+            <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                AND pc_processo_id IN (
+                    SELECT pc_processo_id 
+                    FROM pc_processos
+                    WHERE pc_num_orgao_origem IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
                 )
             </cfif>
         </cfquery>
@@ -405,6 +465,14 @@
         <cfargument name="palavra" type="string" required="true">
         <cfargument name="ano" type="string" required="true">
         <cfargument name="mcuOrigem" type="string" required="true">
+        <cfargument name="diretoria" type="string" required="false" default="Todos">
+        
+        <cfset var listaOrgaosDiretoria = "">
+        
+        <!--- Obter lista de órgãos subordinados à diretoria selecionada --->
+        <cfif arguments.diretoria NEQ "Todos">
+            <cfset listaOrgaosDiretoria = getOrgaosDiretoriaHierarquia(arguments.diretoria)>
+        </cfif>
         
         <cfquery name="qObservacoesPalavra" datasource="#application.dsn_processos#">
             SELECT 
@@ -428,6 +496,9 @@
             </cfif>
             <cfif arguments.mcuOrigem NEQ "Todos">
                 AND p.pc_num_orgao_origem = <cfqueryparam value="#arguments.mcuOrigem#" cfsqltype="cf_sql_varchar">
+            </cfif>
+            <cfif arguments.diretoria NEQ "Todos" AND Len(listaOrgaosDiretoria)>
+                AND p.pc_num_orgao_origem IN ('#Replace(listaOrgaosDiretoria, ",", "','", "all")#')
             </cfif>
             ORDER BY p.pc_processo_id
         </cfquery>
@@ -661,6 +732,66 @@
             <cfreturn serializeJSON(resultado)>
         </cfcatch>
         </cftry>
+    </cffunction>
+    
+    <cffunction name="getOrgaosDiretoriaHierarquia" access="remote" returntype="string" returnformat="json">
+        <cfargument name="diretoria" type="string" required="true">
+        
+        <cfif arguments.diretoria EQ "Todos">
+            <cfreturn "">
+        </cfif>
+        
+        <!--- Execute the query only once --->
+        <cfset var qDiretoriaHierarquia = queryExecute(
+            "WITH OrgHierarchy AS (
+                SELECT pc_org_mcu, pc_org_mcu_subord_tec
+                FROM pc_orgaos
+                WHERE pc_org_mcu_subord_tec = :diretoria and pc_org_controle_interno ='N'
+                UNION ALL
+                SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec
+                FROM pc_orgaos o
+                INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+            )
+            SELECT pc_org_mcu
+            FROM OrgHierarchy",
+            {diretoria = {value=arguments.diretoria, cfsqltype="cf_sql_varchar"}},
+            {datasource=application.dsn_processos, timeout=120}
+        )>
+        
+        <cfset var listaOrgaosDiretoria = ValueList(qDiretoriaHierarquia.pc_org_mcu)>
+        
+        <!--- Add the original directory if not already in the list --->
+        <cfif NOT ListFind(listaOrgaosDiretoria, arguments.diretoria)>
+            <cfset listaOrgaosDiretoria = ListAppend(listaOrgaosDiretoria, arguments.diretoria)>
+        </cfif>
+        
+        <cfreturn listaOrgaosDiretoria>
+    </cffunction>
+    
+    <cffunction name="getOrgaosMCUDetails" access="remote" returntype="array" returnformat="json">
+        <cfargument name="listaMCUs" type="string" required="true">
+        
+        <cfset var resultado = []>
+        
+        <cfif Len(arguments.listaMCUs)>
+            <cfquery name="qryOrgaosDetails" datasource="#application.dsn_processos#">
+                SELECT pc_org_mcu, pc_org_sigla, pc_org_descricao, pc_org_mcu_subord_tec
+                FROM pc_orgaos
+                WHERE pc_org_mcu IN ('#Replace(arguments.listaMCUs, ",", "','", "all")#')
+                ORDER BY pc_org_sigla
+            </cfquery>
+            
+            <cfloop query="qryOrgaosDetails">
+                <cfset arrayAppend(resultado, {
+                    "mcu": pc_org_mcu,
+                    "sigla": pc_org_sigla,
+                    "descricao": pc_org_descricao,
+                    "parent_mcu": pc_org_mcu_subord_tec
+                })>
+            </cfloop>
+        </cfif>
+        
+        <cfreturn resultado>
     </cffunction>
     
 </cfcomponent>

@@ -357,18 +357,22 @@ $(document).ready(function() {
     }
     
     // Função para carregar os dados da tabela - com callback para garantir a inicialização
-    window.carregarDadosTabela = function(anoFiltro, mcuFiltro) {
-
+    window.carregarDadosTabela = function(ano, mcu, diretoria) {
+        // Atualizar variáveis
+        anoFiltro = ano || "Todos";
+        mcuFiltro = mcu || "Todos";
+        diretoriaFiltro = diretoria || "Todos"; // Adicionar o parâmetro de diretoria
+        
+        // Mostrar loader
+        $("#tabela-pesquisas-container").html('<div class="loading-indicator"><i class="fas fa-spinner fa-spin"></i> Carregando dados...</div>');
         
         // Verificar se a aba está ativa
         if (!$("#listagem").hasClass('active') && !$("#listagem").hasClass('show')) {
-
             return;
         }
         
         // Se já estiver processando, evite chamadas repetidas
         if (tabelaEmProcesso) {
-
             return;
         }
         
@@ -378,7 +382,7 @@ $(document).ready(function() {
                 console.warn("Não foi possível inicializar a tabela. Tentando novamente em 1 segundo.");
                 setTimeout(function() {
                     if (!tabelaEmProcesso) {  // Verificar novamente para evitar chamadas simultâneas
-                        window.carregarDadosTabela(anoFiltro, mcuFiltro);
+                        window.carregarDadosTabela(ano, mcu, diretoria);
                     }
                 }, 1000);
                 return;
@@ -388,15 +392,14 @@ $(document).ready(function() {
             $.ajax({
                 url: 'cfc/pc_cfcPesquisasDashboard.cfc?method=getPesquisas&returnformat=json',
                 method: 'GET',
-                data: { 
+                data: {
                     ano: anoFiltro,
-                    mcuOrigem: mcuFiltro 
+                    mcuOrigem: mcuFiltro,
+                    diretoria: diretoriaFiltro // Adicionar o parâmetro de diretoria
                 },
                 dataType: 'json',
                 success: function(data) {
                     try {
-
-                        
                         // Verificar se a tabela ainda existe e se a aba está ativa
                         if (!$.fn.dataTable.isDataTable('#tabelaPesquisas') || 
                             (!$("#listagem").hasClass('active') && !$("#listagem").hasClass('show'))) {
@@ -510,7 +513,10 @@ $(document).ready(function() {
                     mcuFiltro = $("input[name='opcaoMcu']:checked").val() || 'Todos';
                 } 
                 
-                window.carregarDadosTabela(anoSelecionado, mcuFiltro);
+                // Verificar se a diretoria está selecionada
+                let diretoriaFiltro = $("input[name='opcaoDiretoria']:checked").val() || "Todos";
+                
+                window.carregarDadosTabela(anoSelecionado, mcuFiltro, diretoriaFiltro);
             } catch (e) {
                 console.error("Erro ao inicializar componente de listagem:", e);
                 tabelaEmProcesso = false;
@@ -554,9 +560,12 @@ $(document).ready(function() {
                     mcuFiltro = 'Todos';
                 }
                 
+                // Verificar se a diretoria está selecionada
+                let diretoriaFiltro = $("input[name='opcaoDiretoria']:checked").val() || "Todos";
+                
                 // Verificar se a operação anterior já foi concluída
                 if (!tabelaEmProcesso) {
-                    window.carregarDadosTabela(anoSelecionado, mcuFiltro);
+                    window.carregarDadosTabela(anoSelecionado, mcuFiltro, diretoriaFiltro);
                 } else {
 
                 }
@@ -570,8 +579,22 @@ $(document).ready(function() {
         if (!tableInitialized && !tabelaEmProcesso) {
             const anoSelecionado = $("input[name='opcaoAno']:checked").val() || 'Todos';
             let mcuFiltro = window.mcuSelecionado || $("input[name='opcaoMcu']:checked").val() || 'Todos';
-            window.carregarDadosTabela(anoSelecionado, mcuFiltro);
+            let diretoriaFiltro = $("input[name='opcaoDiretoria']:checked").val() || "Todos";
+            window.carregarDadosTabela(anoSelecionado, mcuFiltro, diretoriaFiltro);
         }
     });
+
+    // Adicionar variável global para armazenar a diretoria selecionada
+    let diretoriaFiltro = "Todos";
+
+    // Atualizar a descrição dos filtros para incluir a diretoria
+    function atualizarDescricaoFiltros() {
+        let descricao = "Filtros aplicados: ";
+        descricao += "Ano: " + (anoFiltro === "Todos" ? "Todos os anos" : anoFiltro);
+        descricao += ", Órgão: " + (mcuFiltro === "Todos" ? "Todos os órgãos" : getNomeOrgao(mcuFiltro));
+        descricao += ", Diretoria: " + (diretoriaFiltro === "Todos" ? "Todas as diretorias" : getNomeDiretoria(diretoriaFiltro));
+        
+        $("#filtros-aplicados").text(descricao);
+    }
 });
 </script>

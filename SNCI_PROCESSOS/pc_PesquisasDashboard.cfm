@@ -30,6 +30,7 @@
                             componenteID="filtros-pesquisas"
                             exibirAno="true"
                             exibirOrgao="true"
+                            exibirDiretoria="true"
                             exibirStatus="false">
 
                         <!-- Incluir o componente de cards de métricas -->
@@ -202,6 +203,7 @@
                 // Importante: Vamos usar as variáveis globais aqui, que são definidas pelo componente de filtro
                 const anoFiltro = window.anoSelecionado || "Todos";
                 const mcuFiltro = window.mcuSelecionado || "Todos";
+                const diretoriaFiltro = window.diretoriaSelecionada || "Todos";
                 
                 switch(componente) {
                     case 'avaliacoes':
@@ -233,7 +235,7 @@
                             componentesCarregados[componente] = true;
                             
                             // Inicializar o componente após o carregamento com os valores atuais dos filtros
-                            atualizarComponente(componente, anoFiltro, mcuFiltro);
+                            atualizarComponente(componente, anoFiltro, mcuFiltro, diretoriaFiltro);
                         },
                         error: function() {
                             $(targetId).html('<div class="alert alert-danger">Erro ao carregar o componente. Por favor, tente novamente.</div>');
@@ -241,12 +243,12 @@
                     });
                 } else {
                     // Se o componente já foi carregado, apenas atualiza os dados
-                    atualizarComponente(componente, anoFiltro, mcuFiltro);
+                    atualizarComponente(componente, anoFiltro, mcuFiltro, diretoriaFiltro);
                 }
             }
             
             // Função para atualizar um componente específico
-            function atualizarComponente(componente, ano, mcu) {
+            function atualizarComponente(componente, ano, mcu, diretoria) {
                 switch(componente) {
                     case 'avaliacoes':
                         $.ajax({
@@ -254,7 +256,8 @@
                             method: 'GET',
                             data: { 
                                 ano: ano,
-                                mcuOrigem: mcu 
+                                mcuOrigem: mcu,
+                                diretoria: diretoria
                             },
                             dataType: 'json',
                             success: function(resultado) {
@@ -270,7 +273,8 @@
                             method: 'GET',
                             data: { 
                                 ano: ano,
-                                mcuOrigem: mcu 
+                                mcuOrigem: mcu,
+                                diretoria: diretoria 
                             },
                             dataType: 'json',
                             success: function(resultado) {
@@ -282,12 +286,12 @@
                         break;
                     case 'nuvemPalavras':
                         if (typeof window.carregarNuvemPalavras === 'function') {
-                            window.carregarNuvemPalavras(ano, mcu);
+                            window.carregarNuvemPalavras(ano, mcu, diretoria);
                         }
                         break;
                     case 'listagem':
                         if (typeof window.carregarDadosTabela === 'function') {
-                            window.carregarDadosTabela(ano, mcu);
+                            window.carregarDadosTabela(ano, mcu, diretoria);
                         }
                         break;
                 }
@@ -355,6 +359,7 @@
                 // Usar diretamente as variáveis globais definidas pelo componente de filtros
                 const anoFiltro = window.anoSelecionado || "Todos";
                 const mcuFiltro = window.mcuSelecionado || "Todos";
+                const diretoriaFiltro = window.diretoriaSelecionada || "Todos";
                 
                 // NOVO: Definir o timeout de segurança
                 var timeoutSeguranca = setTimeout(function() {
@@ -374,7 +379,8 @@
                     method: 'GET',
                     data: { 
                         ano: anoFiltro,
-                        mcuOrigem: mcuFiltro 
+                        mcuOrigem: mcuFiltro,
+                        diretoria: diretoriaFiltro 
                     },
                     dataType: 'json',
                     success: function(resultado) {
@@ -386,13 +392,13 @@
                         if (!componentesCarregados['avaliacoes']) {
                             carregarComponente('avaliacoes');
                         } else {
-                            atualizarComponente('avaliacoes', anoFiltro, mcuFiltro);
+                            atualizarComponente('avaliacoes', anoFiltro, mcuFiltro, diretoriaFiltro);
                         }
                         
                         if (!componentesCarregados['graficos']) {
                             carregarComponente('graficos');
                         } else {
-                            atualizarComponente('graficos', anoFiltro, mcuFiltro);
+                            atualizarComponente('graficos', anoFiltro, mcuFiltro, diretoriaFiltro);
                         }
                         
                         // Atualizar apenas o componente da aba ativa
@@ -401,13 +407,13 @@
                             if (!componentesCarregados['nuvemPalavras']) {
                                 carregarComponente('nuvemPalavras');
                             } else {
-                                atualizarComponente('nuvemPalavras', anoFiltro, mcuFiltro);
+                                atualizarComponente('nuvemPalavras', anoFiltro, mcuFiltro, diretoriaFiltro);
                             }
                         } else if ($("#listagem").hasClass('active')) {
                             if (!componentesCarregados['listagem']) {
                                 carregarComponente('listagem');
                             } else {
-                                atualizarComponente('listagem', anoFiltro, mcuFiltro);
+                                atualizarComponente('listagem', anoFiltro, mcuFiltro, diretoriaFiltro);
                             }
                         }
                         
