@@ -19,6 +19,24 @@
 			.swal2-label{
 				text-align:justify;
 			}
+            /* Estilo para o novo filtro "Outros" */
+            .filtro-outros {
+                display: inline-flex;
+                align-items: center;
+                margin-right: 5px;
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+            .filtro-outros i {
+                cursor: pointer;
+                margin-left: 5px;
+                transition: transform 0.3s, color 0.3s;
+                font-size: 1.5rem; /* Aumentando o tamanho do ícone */
+            }
+            .filtro-outros i:hover {
+                transform: scale(1.2);
+                color: #1a73e8;
+            }
 	</style>
 </head>
 
@@ -95,6 +113,7 @@
                                 </table>
                             </div>
                            
+
                         </div>
                     </div>
                 </div>
@@ -106,11 +125,12 @@
     <cfinclude template="includes/pc_sidebar.cfm">
 
 
-   
+
     <script>
         $(document).ready(function() {
             // Variáveis de controle
             let dataTable = null;
+            let filtroOutrosAdicionado = false; // Flag para controlar se o filtro já foi adicionado
             
             // Função para mostrar modal de carregamento
             function mostrarModal() {
@@ -136,7 +156,7 @@
                         $('body').removeClass('modal-open').css('padding-right', '');
                         $('#modalOverlay').removeClass('show').css('display', 'none');
                         
-                        console.log('Modal overlay removido');
+                      
                     }, 500);
                 } catch (e) {
                     console.error('Erro ao fechar modal:', e);
@@ -166,7 +186,22 @@
             function inicializarTabela(anoSelecionado) {
                 mostrarModal();
                 
-              
+                // Verificar se o sidebar está aberto antes de reinicializar a tabela
+                const sidebarAberto = $('body').hasClass('control-sidebar-slide-open');
+                
+                // Adicionar o filtro "Outros" apenas uma vez
+                if (!filtroOutrosAdicionado) {
+                    // Criar o filtro "Outros"
+                    const $filterContainer = $('<div class="filtro-container filtro-compacto"></div>');
+                    const $othersFilter = $('<div class="filtro-outros">Outros Filros: <i class="fas fa-filter" id="btnToggleSearchPane"></i></div>');
+                    $filterContainer.append($othersFilter);
+                    
+                    // Inserir após o filtro de ano
+                    $("#filtros-pesquisas-datatable .filtro-container").first().after($filterContainer);
+                    
+                    // Marcar que o filtro foi adicionado
+                    filtroOutrosAdicionado = true;
+                }
                 
                 dataTable = $('#tabelaPesquisasDetalhada').DataTable({
                     destroy: true, // Permitir reinicialização da tabela
@@ -180,7 +215,7 @@
                             d.ano = anoSelecionado;
                         },
                         dataSrc: function(json) {
-                            console.log('Dados recebidos, fechando modal...');
+                           
                             fecharModal();
                             
                             let data = json;
@@ -321,6 +356,16 @@
                     initComplete: function() {
                         initializeSearchPanesAndSidebar(this);
                         $('#tabela-container').show();
+                        
+                        // Garantir que o painel SearchPane está inicialmente fechado
+                        // Mas se o sidebar estiver aberto, mostrar os painéis
+                        if (sidebarAberto) {
+                            $('.dtsp-panesContainer').show();
+                            $('.dtsp-searchPanes .dtsb-searchBuilder').show();
+                            $('#btnToggleSearchPane').removeClass('text-dark').addClass('text-primary');
+                        } else {
+                            $('.dtsp-panesContainer').hide();
+                        }
                     },
                     drawCallback: function(settings) {
                         fecharModal();
@@ -328,6 +373,7 @@
                    
                 });
                 
+
 
                 
             }
@@ -337,7 +383,13 @@
                 const { tipo, valor } = e.detail;
                 
                 if (tipo === 'ano') {
-                    inicializarTabela(valor);
+                    // Mostrar o modal de carregamento antes de inicializar a tabela
+                    mostrarModal();
+                    
+                    // Pequeno atraso para garantir que o modal seja exibido
+                    setTimeout(function() {
+                        inicializarTabela(valor);
+                    }, 1000);
                 }
             });
             
@@ -347,15 +399,53 @@
                 inicializarTabela(anoInicial);
             }, 500);
 
+            // Adicionar funcionalidade para o botão de filtro "Outros" usando delegação de eventos
+            $(document).on('click', '#btnToggleSearchPane', function(e) {
+                e.stopPropagation(); // Impede que o evento se propague para outros elementos
+                
+                // Em vez de verificar e usar trigger, manipular diretamente as classes para garantir consistência
+                if ($('body').hasClass('control-sidebar-slide-open')) {
+                    // Se estiver aberto, feche
+                    $('body').removeClass('control-sidebar-slide-open');
+                    $('.control-sidebar').css('right', '-350px');
+                    $('#btnToggleSearchPane').removeClass('text-primary').addClass('text-dark');
+                    
+                    // Esconder os painéis
+                    $('.dtsp-panesContainer').hide();
+                    $('.dtsp-searchPanes .dtsb-searchBuilder').hide();
+                } else {
+                    // Se estiver fechado, abra
+                    $('body').addClass('control-sidebar-slide-open');
+                    $('.control-sidebar').css('right', '0');
+                    $('#btnToggleSearchPane').removeClass('text-dark').addClass('text-primary');
+                    
+                    // Mostrar os painéis
+                    $('.dtsp-panesContainer').show();
+                    $('.dtsp-searchPanes .dtsb-searchBuilder').show();
+                }
+            });
             
+            // Modificar o handler para o botão nativo de controle do sidebar para sincronizar com nosso botão personalizado
+            $(document).on('click', '[data-widget="control-sidebar"]', function(e) {
+                // Aguardar um momento para que o AdminLTE faça sua ação padrão
+                setTimeout(function() {
+                    // Atualizar a aparência do botão para refletir o estado atual do sidebar
+                    if ($('body').hasClass('control-sidebar-slide-open')) {
+                        $('#btnToggleSearchPane').removeClass('text-dark').addClass('text-primary');
+                        $('.dtsp-panesContainer').show();
+                        $('.dtsp-searchPanes .dtsb-searchBuilder').show();
+                    } else {
+                        $('#btnToggleSearchPane').removeClass('text-primary').addClass('text-dark');
+                        $('.dtsp-panesContainer').hide();
+                        $('.dtsp-searchPanes .dtsb-searchBuilder').hide();
+                    }
+                }, 1000);
+            });
         });
       
-		$(".content-wrapper").css("height", "auto");
-
-
-
+        $(".content-wrapper").css("height", "auto");
     </script>
 
 
 </body>
-</html> 
+</html>
