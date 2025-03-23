@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SNCI</title>
     <link rel="icon" type="image/x-icon" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">	
+    <link rel="stylesheet" href="plugins/jqcloud/jqcloud.min.css">
     <link rel="stylesheet" href="dist/css/stylesSNCI_PaineisFiltro.css">   
    <style>
 			textarea {
@@ -70,6 +71,18 @@
                         exibirDiretoria="false"
                         exibirStatus="false">
                     
+                    <!-- Incluir dashboard de métricas -->
+                    <cfinclude template="includes/pc_dashboard_pesquisa_datatable/pc_dashboard_cards_metricas.cfm">
+
+                    <!-- Incluir dashboard de avaliações -->
+                    <cfinclude template="includes/pc_dashboard_pesquisa_datatable/pc_dashboard_avaliacoes.cfm">
+
+                     <!-- Incluir gráficos do dashboard -->
+                    <cfinclude template="includes/pc_dashboard_pesquisa_datatable/pc_dashboard_graficos.cfm">
+                    
+                    <!-- Incluir nuvem de palavras do dashboard -->
+                    <cfinclude template="includes/pc_dashboard_pesquisa_datatable/pc_dashboard_nuvem_palavras.cfm">
+                    
                     <!-- Card principal para a tabela -->
                     <div class="card card_border_correios"  style="width:100%;">
                         <div class="card-header card-header_backgroundColor" >
@@ -125,8 +138,13 @@
     <cfinclude template="includes/pc_sidebar.cfm">
 
 
-
+    <script src="plugins/chart.js/Chart.min.js"></script>
+    <script src="plugins/chart.js/chartjs-plugin-datalabels.min.js"></script>
+    <script src="plugins/jqcloud/jqcloud.min.js"></script>
     <script>
+        // Registrar o plugin ChartDataLabels globalmente
+        Chart.plugins.register(ChartDataLabels);
+        
         $(document).ready(function() {
             // Variáveis de controle
             let dataTable = null;
@@ -341,16 +359,6 @@
                                 if (!data) return '-';
                                 return '<div class="observacao-texto">' + data + '</div>';
                             }
-                        },
-                        {
-                            // Configurar coluna de pontualidade
-                            targets: 12,
-                            render: function(data, type, row) {
-                                if (type === 'display') {
-                                    return (data === 1 || data === true || data === '1') ? 'Sim' : 'Não';
-                                }
-                                return data;
-                            }
                         }
                     ],
                     initComplete: function() {
@@ -389,7 +397,7 @@
                     // Pequeno atraso para garantir que o modal seja exibido
                     setTimeout(function() {
                         inicializarTabela(valor);
-                    }, 1000);
+                    }, 500);
                 }
             });
             
@@ -439,7 +447,7 @@
                         $('.dtsp-panesContainer').hide();
                         $('.dtsp-searchPanes .dtsb-searchBuilder').hide();
                     }
-                }, 1000);
+                }, 500);
             });
         });
       

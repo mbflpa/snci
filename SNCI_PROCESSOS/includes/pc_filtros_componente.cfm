@@ -252,7 +252,7 @@
             <!-- Filtro por ano -->
             <cfif attributes.exibirAno>
                 <div class="filtro-container filtro-compacto">
-                    <div class="filtro-label">Ano:</div>
+                    <div class="filtro-label">Ano Processos:</div>
                     <div id="opcoesAno#attributes.componenteID#" class="btn-group btn-group-toggle btn-group-sm btn-group-filtros" data-toggle="buttons">
                         <!-- Botões gerados via JS -->
                     </div>
