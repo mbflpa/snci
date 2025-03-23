@@ -411,33 +411,26 @@
             $(document).on('click', '#btnToggleSearchPane', function(e) {
                 e.stopPropagation(); // Impede que o evento se propague para outros elementos
                 
-                // Em vez de verificar e usar trigger, manipular diretamente as classes para garantir consistência
-                if ($('body').hasClass('control-sidebar-slide-open')) {
-                    // Se estiver aberto, feche
-                    $('body').removeClass('control-sidebar-slide-open');
-                    $('.control-sidebar').css('right', '-350px');
-                    $('#btnToggleSearchPane').removeClass('text-primary').addClass('text-dark');
-                    
-                    // Esconder os painéis
-                    $('.dtsp-panesContainer').hide();
-                    $('.dtsp-searchPanes .dtsb-searchBuilder').hide();
-                } else {
-                    // Se estiver fechado, abra
-                    $('body').addClass('control-sidebar-slide-open');
-                    $('.control-sidebar').css('right', '0');
-                    $('#btnToggleSearchPane').removeClass('text-dark').addClass('text-primary');
-                    
-                    // Mostrar os painéis
-                    $('.dtsp-panesContainer').show();
-                    $('.dtsp-searchPanes .dtsb-searchBuilder').show();
-                }
+                // Em vez de manipular diretamente, use o mecanismo do AdminLTE
+                // Isto garante que o mesmo código será executado como se o botão nativo fosse clicado
+                $('[data-widget="control-sidebar"]').trigger('click');
             });
             
-            // Modificar o handler para o botão nativo de controle do sidebar para sincronizar com nosso botão personalizado
-            $(document).on('click', '[data-widget="control-sidebar"]', function(e) {
-                // Aguardar um momento para que o AdminLTE faça sua ação padrão
-                setTimeout(function() {
-                    // Atualizar a aparência do botão para refletir o estado atual do sidebar
+            // Estabelecer um único listener para eventos do sidebar do AdminLTE
+            $(document).ready(function() {
+                // Verificar inicialmente o estado
+                atualizarEstadoBotaoOutros();
+                
+                // Usar os eventos nativos do AdminLTE para o control-sidebar
+                $(document).on('expanded.lte.controlsidebar collapsed.lte.controlsidebar', function() {
+                    atualizarEstadoBotaoOutros();
+                });
+                
+                // Polling de segurança para casos onde os eventos não são disparados
+                setInterval(atualizarEstadoBotaoOutros, 500);
+                
+                // Função para atualizar o estado visual do botão de acordo com o estado real do sidebar
+                function atualizarEstadoBotaoOutros() {
                     if ($('body').hasClass('control-sidebar-slide-open')) {
                         $('#btnToggleSearchPane').removeClass('text-dark').addClass('text-primary');
                         $('.dtsp-panesContainer').show();
@@ -447,7 +440,7 @@
                         $('.dtsp-panesContainer').hide();
                         $('.dtsp-searchPanes .dtsb-searchBuilder').hide();
                     }
-                }, 500);
+                }
             });
         });
       
