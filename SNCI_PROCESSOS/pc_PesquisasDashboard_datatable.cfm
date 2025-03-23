@@ -223,7 +223,7 @@
                 
                 dataTable = $('#tabelaPesquisasDetalhada').DataTable({
                     destroy: true, // Permitir reinicialização da tabela
-                    stateSave: true,
+                    stateSave: false,
         			autoWidth: true, //largura da tabela de acordo com o conteúdo
 					pageLength: 5,
                     ajax: {

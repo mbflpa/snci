@@ -1,6 +1,34 @@
 <cfprocessingdirective pageencoding = "utf-8">
 <link rel="stylesheet" href="dist/css/stylesSNCI_Dashboard_NuvemPalavras.css">
 
+<style>
+  /* Garantir visibilidade do texto nas palavras selecionadas */
+  #palavra-selecionada-DT {
+    color: #212529 !important; /* Cor escura para garantir legibilidade */
+    background-color: #ffffff !important;
+    font-weight: bold;
+  }
+  
+  /* Estilo para o wrapper que contém as palavras selecionadas */
+  .palavras-selecionadas-wrapper {
+    color: #212529 !important;
+  }
+  
+  /* Garantir texto visível no card header */
+  .card-results .card-header {
+    color: #ffffff !important;
+  }
+  
+  /* Estilo para os badges de palavras selecionadas */
+  .badge-palavra-selecionada {
+    background-color: #ffffff !important;
+    font-weight: bold !important;
+    margin: 0 2px !important;
+    padding: 3px 6px !important;
+    border-radius: 3px !important;
+  }
+</style>
+
 <!-- Card container principal -->
 <div class="card dashboard-card mb-4">
   <div class="card-header">
@@ -293,7 +321,31 @@ $(document).ready(function() {
         
         // Botão para atualizar a nuvem
         $('#atualizarNuvemDT').click(function() {
-            window.processarNuvemPalavras(minFreq, maxWords);
+            // Garantir que não estamos já em processo de renderização
+            if (window.isRenderingCloudDT) {
+                console.log("Já existe uma renderização em andamento, aguarde...");
+                return;
+            }
+            
+            // Garantir que estamos obtendo os valores mais atuais dos sliders
+            const freqAtual = parseInt($('#minFreqSliderDT').val());
+            const maxWordsAtual = parseInt($('#maxWordsSliderDT').val());
+            
+            // Atualizar as variáveis globais
+            minFreq = freqAtual;
+            maxWords = maxWordsAtual;
+            
+            // Atualizar os textos exibidos
+            $('#minFreqValueDT').text(minFreq);
+            $('#maxWordsValueDT').text(maxWords);
+            
+            // Exibir mensagem de carregamento
+            $("#nuvem-container-DT").html('<div class="text-center p-5"><i class="fas fa-spinner fa-spin fa-3x"></i><p class="mt-3">Atualizando nuvem de palavras com novos parâmetros...</p></div>');
+            
+            // Usar a função atualizarNuvemComFiltros em vez de processarNuvemPalavras
+            setTimeout(function() {
+                atualizarNuvemComFiltros();
+            }, 100);
         });
 
         // Função principal para processar a nuvem de palavras com os dados do DataTable
@@ -556,13 +608,17 @@ $(document).ready(function() {
                 var hexColor = rgbToHex(corPalavra);
                 var darkerColor = adjustColor(hexColor, -30);
                 
-                $(".card-results .card-header").css('background', 'linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ')');
+                $(".card-results .card-header").css({
+                    'background': 'linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ')',
+                    'color': '#ffffff'
+                });
                 
-                // Aplicar cor ao badge
+                // Aplicar cor ao badge com texto escuro para garantir legibilidade
                 $("#palavra-selecionada-DT").css({
-                    'color': hexColor,
+                    'color': '#212529', // Cor escura para o texto
                     'background-color': '#ffffff',
-                    'border': '1px solid ' + hexColor
+                    'border': '1px solid ' + hexColor,
+                    'font-weight': 'bold'
                 });
             }
             
@@ -637,19 +693,21 @@ $(document).ready(function() {
             $("#resultados-palavra-DT").show();
             $("#cards-container-DT").html('<div class="col-12 text-center p-5"><div class="spinner-grow text-primary" role="status"><span class="sr-only">Carregando...</span></div><p class="mt-3">Carregando observações...</p></div>');
             
-            // Exibir as palavras selecionadas no título
+            // Exibir as palavras selecionadas no título com texto escuro
             var hexColor = rgbToHex(corPalavra);
             var badgesHTML = palavras.map(palavra => 
-                '<span class="badge badge-palavra-selecionada" style="display:inline-block; background-color: #ffffff !important; color: ' + 
-                hexColor + ' !important; border: 2px solid ' + hexColor + ' !important; font-weight: bold !important; margin: 0 2px; padding: 3px 6px !important; border-radius: 3px !important;">' + 
+                '<span class="badge badge-palavra-selecionada" style="color: ' + hexColor + ' !important; border: 2px solid ' + hexColor + ';">' + 
                 palavra + '</span>'
             ).join(', ');
             
-            $("#palavra-selecionada-DT").html('<span class="palavras-selecionadas-wrapper" style="color: inherit !important;">' + badgesHTML + '</span>');
+            $("#palavra-selecionada-DT").html('<span class="palavras-selecionadas-wrapper">' + badgesHTML + '</span>');
             
-            // Atualizar a cor do header do card de resultados
+            // Atualizar a cor do header do card de resultados com texto branco
             var darkerColor = adjustColor(hexColor, -30);
-            $(".card-results .card-header").css('background', 'linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ')');
+            $(".card-results .card-header").css({
+                'background': 'linear-gradient(135deg, ' + darkerColor + ', ' + hexColor + ')',
+                'color': '#ffffff'
+            });
             
             // Pesquisar nas observações da tabela atual
             const dataTable = $('#tabelaPesquisasDetalhada').DataTable();
@@ -841,35 +899,246 @@ $(document).ready(function() {
         
         // Inicializar a nuvem quando o componente for carregado
         setTimeout(function() {
-            window.processarNuvemPalavras(minFreq, maxWords);
+            atualizarNuvemComFiltros();
         }, 600);
         
-        // Atualizar a nuvem quando a tabela for filtrada
-        $(document).on('draw.dt', function(e, settings) {
-            if (settings.nTable.id === 'tabelaPesquisasDetalhada') {
-                window.processarNuvemPalavras(minFreq, maxWords);
+        // Atualizar a nuvem quando a SearchPane for usada
+        $(document).on('dtsp-search', function(e, table) {
+            if (table && table.table) {
+                const tableId = $(table.table().node()).attr('id');
+                if (tableId === 'tabelaPesquisasDetalhada') {
+                    console.log("SearchPane alterado, atualizando nuvem...");
+                    // Pequeno atraso para garantir que o filtro foi aplicado
+                    setTimeout(atualizarNuvemComFiltros, 100);
+                }
             }
         });
-        
-        // Ajustar a nuvem quando a janela for redimensionada
-        $(window).resize(function() {
-            if ($("#nuvem-container-DT").data('jqcloud') && window.cloudDataDT) {
-                clearTimeout(window.resizeTimeout);
-                window.resizeTimeout = setTimeout(function() {
+
+        // Atualizar quando a tabela for filtrada por busca geral
+        $(document).on('search.dt', function(e, settings) {
+            if (settings.nTable.id === 'tabelaPesquisasDetalhada') {
+                console.log("Busca realizada, atualizando nuvem...");
+                setTimeout(atualizarNuvemComFiltros, 100);
+            }
+        });
+
+        // Escutar o evento regular draw.dt para capturar todas as atualizações da tabela
+        $(document).on('draw.dt', function(e, settings) {
+            if (settings.nTable.id === 'tabelaPesquisasDetalhada') {
+                console.log("Tabela redesenhada, atualizando nuvem...");
+                // Evitar múltiplas atualizações em sequência
+                clearTimeout(window.nuvemUpdateTimeout);
+                window.nuvemUpdateTimeout = setTimeout(atualizarNuvemComFiltros, 200);
+            }
+        });
+
+        // Função para processar a nuvem de palavras com dados filtrados do DataTable
+        // Esta função processa tudo localmente sem chamar o servidor
+        function atualizarNuvemComFiltros() {
+            console.log("Atualizando nuvem com filtros"); // Para diagnóstico
+            
+            // Evitar múltiplas chamadas simultâneas
+            if (window.isRenderingCloudDT) {
+                console.log("Renderização em andamento, ignorando chamada...");
+                return;
+            }
+            
+            window.isRenderingCloudDT = true;
+            
+            try {
+                // Verificar valores atuais dos sliders para garantir consistência
+                const freqAtual = parseInt($('#minFreqSliderDT').val());
+                const maxWordsAtual = parseInt($('#maxWordsSliderDT').val());
+                
+                // Atualizar as variáveis globais se forem diferentes
+                if (minFreq !== freqAtual) minFreq = freqAtual;
+                if (maxWords !== maxWordsAtual) maxWords = maxWordsAtual;
+                
+                // Verificar se o DataTable está inicializado
+                if (!$.fn.DataTable.isDataTable('#tabelaPesquisasDetalhada')) {
+                    $("#nuvem-container-DT").html('<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-warning"></i><p class="mt-3">Tabela de dados não inicializada</p></div>');
+                    window.isRenderingCloudDT = false;
+                    return;
+                }
+                
+                // Obter a instância do DataTable
+                const dataTable = $('#tabelaPesquisasDetalhada').DataTable();
+                
+                // Obter apenas as linhas visíveis (filtradas)
+                const dados = dataTable.rows({search: 'applied'}).data().toArray();
+                
+                // Obter todas as observações das linhas filtradas
+                let todasObservacoes = dados
+                    .map(item => item.observacao)
+                    .filter(obs => obs && obs.trim() !== '' && obs !== '-')
+                    .join(' ');
+                
+                // Se não houver observações, mostrar mensagem de erro
+                if (!todasObservacoes || todasObservacoes.trim() === '') {
+                    // Destruir nuvem existente adequadamente
                     try {
                         if ($("#nuvem-container-DT").data('jqcloud')) {
                             $("#nuvem-container-DT").jQCloud('destroy');
                         }
-                        
-                        $("#nuvem-container-DT").empty();
-                        window.cloudOptionsDT.width = $("#nuvem-container-DT").width();
-                        $("#nuvem-container-DT").jQCloud(window.cloudDataDT, window.cloudOptionsDT);
                     } catch (e) {
-                        console.error("Erro ao redimensionar nuvem:", e);
+                        console.error("Erro ao destruir nuvem:", e);
                     }
-                }, 300);
+                    
+                    $("#nuvem-container-DT").empty();
+                    $("#nuvem-container-DT").html('<div class="text-center p-5"><i class="fas fa-comment-slash fa-3x"></i><p class="mt-3">Sem dados de observações para exibir</p></div>');
+                    window.isRenderingCloudDT = false;
+                    return;
+                }
+                
+                // Processar as palavras localmente
+                const palavras = processarTexto(todasObservacoes);
+                
+                // Aplicar filtros mínimos de frequência e quantidade máxima
+                const palavrasFiltradas = palavras
+                    .filter(p => p.weight >= minFreq)
+                    .slice(0, maxWords);
+                
+                if (palavrasFiltradas.length === 0) {
+                    // Destruir nuvem existente adequadamente
+                    try {
+                        if ($("#nuvem-container-DT").data('jqcloud')) {
+                            $("#nuvem-container-DT").jQCloud('destroy');
+                        }
+                    } catch (e) {
+                        console.error("Erro ao destruir nuvem:", e);
+                    }
+                    
+                    $("#nuvem-container-DT").empty();
+                    $("#nuvem-container-DT").html('<div class="text-center p-5"><i class="fas fa-info-circle fa-3x text-info"></i><p class="mt-3">Nenhuma palavra com frequência mínima de ' + minFreq + '</p></div>');
+                    window.isRenderingCloudDT = false;
+                    return;
+                }
+                
+                // Atualizar a nuvem com os dados filtrados
+                try {
+                    // Destruir a nuvem existente com tratamento de erros adequado
+                    try {
+                        if ($("#nuvem-container-DT").data('jqcloud')) {
+                            $("#nuvem-container-DT").jQCloud('destroy');
+                        }
+                    } catch (e) {
+                        console.error("Erro ao destruir nuvem:", e);
+                        // Apenas log do erro, continuar com a limpeza
+                    }
+                    
+                    // Limpar o container completamente
+                    $("#nuvem-container-DT").empty();
+                    $("#nuvem-container-DT").removeData('jqcloud');
+                    
+                    // Armazenar os dados para reuso
+                    window.cloudDataDT = palavrasFiltradas;
+                    
+                    // Atualizar as dimensões da nuvem
+                    window.cloudOptionsDT.width = $("#nuvem-container-DT").width();
+                    window.cloudOptionsDT.height = 400;
+                    
+                    // Configurar callback para reconfigurar popovers após renderização
+                    const options = {
+                        width: $("#nuvem-container-DT").width(),
+                        height: 400,
+                        autoResize: true,
+                        delay: 5,
+                        delayedMode: false,
+                        shape: 'rectangular',
+                        encodeURI: false,
+                        removeOverflowing: true,
+                        colors: ["#17a2b8", "#28a745", "#ffc107", "#fd7e14", "#20c997", "#6f42c1", "#e83e8c"],
+                        afterCloudRender: function() {
+                            // Configurar popovers e click handlers em cada palavra
+                            $('.jqcloud-word').each(function() {
+                                const word = $(this);
+                                const wordText = word.text();
+                                const wordObj = palavrasFiltradas.find(item => item.text === wordText);
+                                
+                                if (wordObj) {
+                                    const frequency = wordObj.weight || 0;
+                                    
+                                    // Armazenar a cor da palavra
+                                    wordObj.color = $(word).css('color');
+                                    
+                                    // Se a palavra já foi selecionada, restaurar sua cor
+                                    if (modoPesquisaMultipla && palavrasSelecionadas.includes(wordText)) {
+                                        if (!coresPalavrasSelecionadas[wordText]) {
+                                            coresPalavrasSelecionadas[wordText] = wordObj.color;
+                                        }
+                                    }
+                                    
+                                    // Configurar popover
+                                    word.attr('data-toggle', 'popover');
+                                    word.attr('data-placement', 'top');
+                                    word.attr('data-trigger', 'hover');
+                                    word.attr('title', wordText);
+                                    word.attr('data-content', 'Frequência: ' + frequency);
+                                    word.attr('data-html', 'true');
+                                    
+                                    // Configurar click handler
+                                    word.on('click', function() {
+                                        const palavraClicada = $(this).text();
+                                        const corPalavra = $(this).css('color');
+                                        
+                                        if (modoPesquisaMultipla) {
+                                            // Verificar se a palavra já está selecionada
+                                            const indexPalavra = palavrasSelecionadas.indexOf(palavraClicada);
+                                            
+                                            if (indexPalavra === -1) {
+                                                // Adicionar à seleção
+                                                palavrasSelecionadas.push(palavraClicada);
+                                                coresPalavrasSelecionadas[palavraClicada] = corPalavra;
+                                            } else {
+                                                // Remover da seleção
+                                                palavrasSelecionadas.splice(indexPalavra, 1);
+                                                delete coresPalavrasSelecionadas[palavraClicada];
+                                            }
+                                            
+                                            atualizarExibicaoPalavrasSelecionadas();
+                                            atualizarDestaquePalavras();
+                                        } else {
+                                            // Busca imediata de uma única palavra
+                                            buscarObservacoesPorPalavra(palavraClicada, corPalavra);
+                                        }
+                                    });
+                                }
+                            });
+                            
+                            // Inicializar popovers
+                            $('[data-toggle="popover"]').popover();
+                            
+                            // Destacar palavras já selecionadas
+                            if (modoPesquisaMultipla && palavrasSelecionadas.length > 0) {
+                                atualizarDestaquePalavras();
+                            }
+                            
+                            // IMPORTANTE: Marcar a renderização como concluída
+                            window.isRenderingCloudDT = false;
+                        }
+                    };
+                    
+                    // Renderizar a nova nuvem com opções atualizadas
+                    $("#nuvem-container-DT").jQCloud(window.cloudDataDT, options);
+                } catch (e) {
+                    console.error("Erro ao atualizar nuvem:", e);
+                    $("#nuvem-container-DT").html('<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-danger"></i><p class="mt-3">Erro ao gerar nuvem de palavras: ' + e.message + '</p></div>');
+                    window.isRenderingCloudDT = false;
+                }
+            } catch (e) {
+                console.error("Erro geral na atualização da nuvem:", e);
+                $("#nuvem-container-DT").html('<div class="text-center p-5"><i class="fas fa-exclamation-triangle fa-3x text-danger"></i><p class="mt-3">Erro inesperado: ' + e.message + '</p></div>');
+                window.isRenderingCloudDT = false; // Garantir que a flag seja reset mesmo em caso de erro
+            } finally {
+                // Segurança extra: redefinir a flag após um período
+                setTimeout(function() {
+                    if (window.isRenderingCloudDT) {
+                        console.log("Force reset isRenderingCloudDT");
+                        window.isRenderingCloudDT = false;
+                    }
+                }, 2000);
             }
-        });
+        }
     }
 });
 </script>
