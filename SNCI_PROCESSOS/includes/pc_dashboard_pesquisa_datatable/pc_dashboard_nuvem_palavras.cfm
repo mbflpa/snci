@@ -323,7 +323,7 @@ $(document).ready(function() {
         $('#atualizarNuvemDT').click(function() {
             // Garantir que não estamos já em processo de renderização
             if (window.isRenderingCloudDT) {
-                console.log("Já existe uma renderização em andamento, aguarde...");
+              
                 return;
             }
             
@@ -907,7 +907,7 @@ $(document).ready(function() {
             if (table && table.table) {
                 const tableId = $(table.table().node()).attr('id');
                 if (tableId === 'tabelaPesquisasDetalhada') {
-                    console.log("SearchPane alterado, atualizando nuvem...");
+                   
                     // Pequeno atraso para garantir que o filtro foi aplicado
                     setTimeout(atualizarNuvemComFiltros, 100);
                 }
@@ -917,7 +917,7 @@ $(document).ready(function() {
         // Atualizar quando a tabela for filtrada por busca geral
         $(document).on('search.dt', function(e, settings) {
             if (settings.nTable.id === 'tabelaPesquisasDetalhada') {
-                console.log("Busca realizada, atualizando nuvem...");
+                
                 setTimeout(atualizarNuvemComFiltros, 100);
             }
         });
@@ -925,7 +925,7 @@ $(document).ready(function() {
         // Escutar o evento regular draw.dt para capturar todas as atualizações da tabela
         $(document).on('draw.dt', function(e, settings) {
             if (settings.nTable.id === 'tabelaPesquisasDetalhada') {
-                console.log("Tabela redesenhada, atualizando nuvem...");
+                
                 // Evitar múltiplas atualizações em sequência
                 clearTimeout(window.nuvemUpdateTimeout);
                 window.nuvemUpdateTimeout = setTimeout(atualizarNuvemComFiltros, 200);
@@ -935,11 +935,11 @@ $(document).ready(function() {
         // Função para processar a nuvem de palavras com dados filtrados do DataTable
         // Esta função processa tudo localmente sem chamar o servidor
         function atualizarNuvemComFiltros() {
-            console.log("Atualizando nuvem com filtros"); // Para diagnóstico
+          
             
             // Evitar múltiplas chamadas simultâneas
             if (window.isRenderingCloudDT) {
-                console.log("Renderização em andamento, ignorando chamada...");
+                
                 return;
             }
             
@@ -1133,7 +1133,7 @@ $(document).ready(function() {
                 // Segurança extra: redefinir a flag após um período
                 setTimeout(function() {
                     if (window.isRenderingCloudDT) {
-                        console.log("Force reset isRenderingCloudDT");
+                        
                         window.isRenderingCloudDT = false;
                     }
                 }, 2000);

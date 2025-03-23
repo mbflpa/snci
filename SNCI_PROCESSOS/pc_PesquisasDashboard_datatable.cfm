@@ -38,6 +38,47 @@
                 transform: scale(1.2);
                 color: #1a73e8;
             }
+            
+            /* Estilo para a mensagem de filtro ativo */
+            .filtro-ativo-mensagem {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+                color: #721c24;
+                padding: 0.5rem 1rem;
+                border-radius: 0.25rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-top: 10px;
+                width: 100%;
+                animation: fadeIn 0.3s ease-in-out;
+            }
+            
+            #btn-limpar-filtros {
+                font-size: 0.8rem;
+                padding: 0.25rem 0.5rem;
+                transition: all 0.2s ease-in-out;
+            }
+            
+            #btn-limpar-filtros:hover {
+                transform: scale(1.05);
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @media (max-width: 768px) {
+                .filtro-ativo-mensagem {
+                    flex-direction: column;
+                    text-align: center;
+                }
+                
+                #btn-limpar-filtros {
+                    margin-top: 8px;
+                }
+            }
 	</style>
 </head>
 
@@ -217,6 +258,10 @@
                     // Inserir após o filtro de ano
                     $("#filtros-pesquisas-datatable .filtro-container").first().after($filterContainer);
                     
+                    // Adicionar a mensagem de filtro ativo (inicialmente oculta)
+                    const $mensagemFiltro = $('<div id="filtro-ativo-mensagem" class="filtro-ativo-mensagem" style="display: none;"><button id="btn-limpar-filtros" class="btn btn-sm btn-danger"><i class="fas fa-filter-circle-xmark"></i> Foram aplicados filtros nos Painéis de Pesquisa. Clique aqui para limpar. </button></div>');
+                    $("#filtros-pesquisas-datatable").append($mensagemFiltro);
+                    
                     // Marcar que o filtro foi adicionado
                     filtroOutrosAdicionado = true;
                 }
@@ -382,7 +427,39 @@
                 });
                 
 
-
+                // Detectar quando filtros do SearchPane são aplicados ou removidos
+                dataTable.on('stateLoaded search.dt', function() {
+                    atualizarEstadoFiltro();
+                });
+                
+                dataTable.on('draw.dt', function() {
+                    atualizarEstadoFiltro();
+                });
+                
+                // Inicializar o estado da mensagem de filtro
+                function atualizarEstadoFiltro() {
+                    // Verificar se há filtros aplicados verificando se o número de linhas visíveis é diferente do total
+                    var isFiltered = dataTable.rows({search: 'applied'}).data().length !== dataTable.rows().data().length;
+                    
+                    // Mostrar ou ocultar a mensagem de filtro com base no estado
+                    if (isFiltered) {
+                        $("#filtro-ativo-mensagem").fadeIn(200);
+                    } else {
+                        $("#filtro-ativo-mensagem").fadeOut(200);
+                    }
+                }
+                
+                // Botão para limpar filtros
+                $(document).on('click', '#btn-limpar-filtros', function() {
+                    // Limpar a pesquisa
+                    dataTable.search('').draw();
+                    
+                    // Limpar os filtros dos painéis de pesquisa
+                    dataTable.searchPanes.clearSelections();
+                    
+                    // Ocultar a mensagem de filtro
+                    $("#filtro-ativo-mensagem").fadeOut(200);
+                });
                 
             }
             
