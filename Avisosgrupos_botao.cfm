@@ -4,6 +4,7 @@
 		SELECT AVGR_ANO, AVGR_ID, AVGR_DT_INICIO, AVGR_DT_FINAL, AVGR_GRUPOACESSO, AVGR_AVISO, AVGR_status, AVGR_username, AVGR_TITULO
 		FROM AvisosGrupos
 		WHERE AVGR_ANO = '#form.frmx_ano#' AND AVGR_ID = #form.frmx_id#
+		ORDER BY AVGR_ANO DESC, AVGR_DT_INICIO DESC
 	</cfquery>
 </cfif>
 
@@ -137,7 +138,7 @@
 		WHERE  (AVGR_status <> 'E') and (AVGR_GRUPOACESSO ='#qUsuario.Usu_GrupoAcesso#' OR AVGR_GRUPOACESSO='GERAL' OR 
 (AVGR_GRUPOACESSO='GESTORINSPETOR' AND ('#qUsuario.Usu_GrupoAcesso#'='GESTORES' Or '#qUsuario.Usu_GrupoAcesso#'='INSPETORES'))
 OR (AVGR_GRUPOACESSO='GESTORINSPETORANALISTA' AND ('#qUsuario.Usu_GrupoAcesso#'='GESTORES' Or '#qUsuario.Usu_GrupoAcesso#'='INSPETORES' Or '#qUsuario.Usu_GrupoAcesso#'='ANALISTAS')))
-ORDER BY AVGR_ANO, AVGR_ID, AVGR_GRUPOACESSO, AVGR_DT_INICIO
+ORDER BY AVGR_ANO DESC, AVGR_DT_INICIO DESC, AVGR_ID, AVGR_GRUPOACESSO
 	</cfquery>
 	
 	  <table width="81%" border="0" align="center">

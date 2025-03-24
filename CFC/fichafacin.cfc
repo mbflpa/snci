@@ -101,9 +101,6 @@
 					<cfif nomecampo eq "FFIMETA1QTDITEM_#RIP_MatricAvaliador#">
 						<cfset FFIMETA1QTDITEM = #evaluate("form.#nomecampo#")#>
 					</cfif>
-					<cfif nomecampo eq "FFIMETA1PONTUACAOINICIAL_#RIP_MatricAvaliador#">
-						<cfset FFIMETA1PONTUACAOINICIAL = #evaluate("form.#nomecampo#")#>
-					</cfif>
 					<cfif nomecampo eq "FFIMETA1PONTUACAOOBTIDA_#RIP_MatricAvaliador#">
 						<cfset FFIMETA1PONTUACAOOBTIDA = #evaluate("form.#nomecampo#")#>
 					</cfif>
@@ -113,9 +110,6 @@
 					<!--- meta 2 --->
 					<cfif nomecampo eq "FFIMETA2QTDITEM_#RIP_MatricAvaliador#">
 						<cfset FFIMETA2QTDITEM = #evaluate("form.#nomecampo#")#>
-					</cfif>
-					<cfif nomecampo eq "FFIMETA2PONTUACAOINICIAL_#RIP_MatricAvaliador#">
-						<cfset FFIMETA2PONTUACAOINICIAL = #evaluate("form.#nomecampo#")#>
 					</cfif>
 					<cfif nomecampo eq "FFIMETA2PONTUACAOOBTIDA_#RIP_MatricAvaliador#">
 						<cfset FFIMETA2PONTUACAOOBTIDA = #evaluate("form.#nomecampo#")#>
@@ -166,21 +160,19 @@
 					FACA_Item=#rsSalva.RIP_NumItem#	
 				</cfquery>				
 			</cfif>
+		
 			<cfif form.acaoffi eq 'INC'>
 				<cfquery datasource="#dsnSNCI#">
-					insert into UN_Ficha_Facin_Individual (FFI_Avaliacao,FFI_Matricula,FFI_Avaliador,FFI_Meta1_Qtd_Item,FFI_Meta1_Pontuacao_Inicial,FFI_Meta1_Pontuacao_Obtida,FFI_Meta1_Resultado,FFI_Meta2_Qtd_Item,FFI_Meta2_Pontuacao_Inicial,FFI_Meta2_Pontuacao_Obtida,FFI_Meta2_Resultado,FFI_DtCriar,FFI_DtAlter)
+					insert into UN_Ficha_Facin_Individual (FFI_Avaliacao,FFI_Matricula,FFI_Avaliador,FFI_Qtd_Item,FFI_Meta1_Pontuacao_Obtida,FFI_Meta1_Resultado,FFI_Meta2_Pontuacao_Obtida,FFI_Meta2_Resultado,FFI_DtCriar,FFI_DtAlter)
 					values
-					('#FACAVALIACAO#','#FACMATRICULA#','#RIP_MatricAvaliador#',#FFIMETA1QTDITEM#,#FFIMETA1PONTUACAOINICIAL#,#FFIMETA1PONTUACAOOBTIDA#,#FFIMETA1RESULTADO#,#FFIMETA2QTDITEM#,#FFIMETA2PONTUACAOINICIAL#,#FFIMETA2PONTUACAOOBTIDA#,#FFIMETA2RESULTADO#,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
+					('#FACAVALIACAO#','#FACMATRICULA#','#RIP_MatricAvaliador#',#FFIMETA1QTDITEM#,#FFIMETA1PONTUACAOOBTIDA#,#FFIMETA1RESULTADO#,#FFIMETA2PONTUACAOOBTIDA#,#FFIMETA2RESULTADO#,CONVERT(char, GETDATE(), 120),CONVERT(char, GETDATE(), 120))
 				</cfquery>
 			<cfelse>
 				<cfquery datasource="#dsnSNCI#">
 					UPDATE UN_Ficha_Facin_Individual set 
-					 FFI_Meta1_Qtd_Item = #FFIMETA1QTDITEM#
-					,FFI_Meta1_Pontuacao_Inicial = #FFIMETA1PONTUACAOINICIAL#
+					 FFI_Qtd_Item = #FFIMETA1QTDITEM#
 					,FFI_Meta1_Pontuacao_Obtida = #FFIMETA1PONTUACAOOBTIDA#
 					,FFI_Meta1_Resultado = #FFIMETA1RESULTADO#
-					,FFI_Meta2_Qtd_Item = #FFIMETA2QTDITEM#
-					,FFI_Meta2_Pontuacao_Inicial = #FFIMETA2PONTUACAOINICIAL#
 					,FFI_Meta2_Pontuacao_Obtida = #FFIMETA2PONTUACAOOBTIDA#
 					,FFI_Meta2_Resultado = #FFIMETA2RESULTADO#
 					,FFI_DtAlter = CONVERT(char, GETDATE(), 120)
@@ -190,70 +182,116 @@
 					FFI_Avaliador = '#RIP_MatricAvaliador#'
 				</cfquery>	
 			</cfif>		
+
 			<!--- atualizar tabelas --->
-<!--- inicio atualização --->
+			<cfquery datasource="#dsnSNCI#" name="rsfacinaval">
+				SELECT FAC_Qtd_Geral,FAC_Meta1_Peso_Item, FAC_Meta2_Peso_Item,FACA_Unidade, FACA_Avaliacao, FACA_Matricula, FACA_Avaliador, FACA_Grupo, FACA_Item, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos
+				,FFI_Avaliador,FFI_Qtd_Item
+				FROM (UN_Ficha_Facin 
+				INNER JOIN UN_Ficha_Facin_Avaliador ON (FAC_Matricula = FACA_Matricula) AND (FAC_Avaliacao = FACA_Avaliacao) AND (FAC_Unidade = FACA_Unidade)) 
+				INNER JOIN UN_Ficha_Facin_Individual ON (FACA_Avaliador = FFI_Avaliador) AND (FACA_Matricula = FFI_Matricula) AND (FACA_Avaliacao = FFI_Avaliacao)	
+				WHERE FACA_Avaliacao='#FACAVALIACAO#'
+			</cfquery>
 
-	<cfquery datasource="#dsnSNCI#" name="rsfacinaval">
-		SELECT FAC_Qtd_Geral,FAC_Meta1_Peso_Item, FAC_Meta2_Peso_Item,FACA_Unidade, FACA_Avaliacao, FACA_Matricula, FACA_Avaliador, FACA_Grupo, FACA_Item, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos
-		FROM UN_Ficha_Facin 
-		INNER JOIN UN_Ficha_Facin_Avaliador ON (FAC_Matricula = FACA_Matricula) AND (FAC_Avaliacao = FACA_Avaliacao) AND (FAC_Unidade = FACA_Unidade)
-		WHERE FACA_Avaliacao='#FACAVALIACAO#'
-	</cfquery>
+			<cfset PesoAvaliacao = 0>
+			<cfset descontometa1 = 0>
+			<cfset descontometa2 = 0>
+			<cfset PesoAvaliacao = numberFormat((100/rsfacinaval.FAC_Qtd_Geral),'___.00')>
+			<cfset descontometa1 = numberFormat((100/rsfacinaval.FAC_Qtd_Geral)/10,'___.000')>
+			<cfset descontometa2 = numberFormat((100/rsfacinaval.FAC_Qtd_Geral)/5,'___.000')>
+			<cfset somageralmeta1 = 0>
+			<cfset somageralmeta2 = 0>
+			<cfset FACPontosRevisaoMeta1 = 0>
+			<cfset FACPercRevisaoMeta1 = 0>
+			<cfset FACPontosRevisaoMeta2 = 0>
+			<cfset FACPercRevisaoMeta2 = 0>
+	
+			<cfloop query="rsfacinaval">
+				<cfset FACMeta1PesoItem = 0>
+				<cfset FACMeta2PesoItem = 0>
+				<cfset somameta1 = 0>
+				<cfset somameta2 = 0>
 
-	<cfset PesoAvaliacao = 0>
-	<cfset descontometa1 = 0>
-	<cfset descontometa2 = 0>
-	<cfset PesoAvaliacao = numberFormat((100/rsfacinaval.FAC_Qtd_Geral),'___.00')>
-	<cfset descontometa1 = numberFormat((100/rsfacinaval.FAC_Qtd_Geral)/10,'___.000')>
-	<cfset descontometa2 = numberFormat((100/rsfacinaval.FAC_Qtd_Geral)/5,'___.000')>
-	<cfset somageralmeta1 = 0>
-	<cfset somageralmeta2 = 0>
-	<cfset FACPontosRevisaoMeta1 = 0>
-	<cfset FACPercRevisaoMeta1 = 0>
-	<cfset FACPontosRevisaoMeta2 = 0>
-	<cfset FACPercRevisaoMeta2 = 0>
+				<cfset somameta1 = FACA_Meta1_AT_OrtoGram + FACA_Meta1_AT_CCCP + FACA_Meta1_AE_Tecn + FACA_Meta1_AE_Prob + FACA_Meta1_AE_Valor + FACA_Meta1_AE_Cosq + FACA_Meta1_AE_Norma + FACA_Meta1_AE_Docu + FACA_Meta1_AE_Class + FACA_Meta1_AE_Orient>
+				<cfif somameta1 lte 0>
+					<cfset FACMeta1PesoItem = PesoAvaliacao>
+				<cfelse>
+					<cfset FACMeta1PesoItem = numberFormat((descontometa1*10) - (somameta1*descontometa1),'___.00')>
+				</cfif>
+				<cfset somageralmeta1 = somageralmeta1 + somameta1>
 
-	<cfloop query="rsfacinaval">
-		<cfset FACMeta1PesoItem = 0>
-		<cfset FACMeta2PesoItem = 0>
-		<cfset somameta1 = 0>
-		<cfset somameta2 = 0>
+				<cfset somameta2 = FACA_Meta2_AR_Falta + FACA_Meta2_AR_Troca + FACA_Meta2_AR_Nomen + FACA_Meta2_AR_Ordem + FACA_Meta2_AR_Prazo>
+				<cfif somameta2 lte 0>
+					<cfset FACMeta2PesoItem = PesoAvaliacao>
+				<cfelse>
+					<cfset FACMeta2PesoItem = numberFormat((descontometa2*5) - (somameta2*descontometa2),'___.00')>
+				</cfif>
+				<cfset somageralmeta2 = somageralmeta2 + somameta2>
+				<cfquery datasource="#dsnSNCI#">
+					update UN_Ficha_Facin_Avaliador set FACA_Meta1_Pontos=#FACMeta1PesoItem#,FACA_Meta2_Pontos=#FACMeta2PesoItem#
+					WHERE FACA_Avaliacao='#FACAVALIACAO#' and FACA_Grupo=#FACA_Grupo# and FACA_Item=#FACA_Item#
+				</cfquery>
+			</cfloop>
+			<cfset FACPontosRevisaoMeta1 = numberFormat(rsfacinaval.FAC_Qtd_Geral - (somageralmeta1*descontometa1),'___.00')>
+			<cfset FACPercRevisaoMeta1 = numberFormat((FACPontosRevisaoMeta1/rsfacinaval.FAC_Qtd_Geral)*100,'___.00')>
 
-		<cfset somameta1 = FACA_Meta1_AT_OrtoGram + FACA_Meta1_AT_CCCP + FACA_Meta1_AE_Tecn + FACA_Meta1_AE_Prob + FACA_Meta1_AE_Valor + FACA_Meta1_AE_Cosq + FACA_Meta1_AE_Norma + FACA_Meta1_AE_Docu + FACA_Meta1_AE_Class + FACA_Meta1_AE_Orient>
-		<cfif somameta1 lte 0>
-			<cfset FACMeta1PesoItem = PesoAvaliacao>
-		<cfelse>
-			<cfset FACMeta1PesoItem = numberFormat((descontometa1*10) - (somameta1*descontometa1),'___.00')>
-		</cfif>
-		<cfset somageralmeta1 = somageralmeta1 + somameta1>
+			<cfset FACPontosRevisaoMeta2 = numberFormat(rsfacinaval.FAC_Qtd_Geral - (somageralmeta2*descontometa2),'___.00')>
+			<cfset FACPercRevisaoMeta2 = numberFormat((FACPontosRevisaoMeta2/rsfacinaval.FAC_Qtd_Geral)*100,'___.00')>
 
-		<cfset somameta2 = FACA_Meta2_AR_Falta + FACA_Meta2_AR_Troca + FACA_Meta2_AR_Nomen + FACA_Meta2_AR_Ordem + FACA_Meta2_AR_Prazo>
-		<cfif somameta2 lte 0>
-			<cfset FACMeta2PesoItem = PesoAvaliacao>
-		<cfelse>
-			<cfset FACMeta2PesoItem = numberFormat((descontometa2*5) - (somameta2*descontometa2),'___.00')>
-		</cfif>
-		<cfset somageralmeta2 = somageralmeta2 + somameta2>
-		<cfquery datasource="#dsnSNCI#">
-			update UN_Ficha_Facin_Avaliador set FACA_Meta1_Pontos=#FACMeta1PesoItem#,FACA_Meta2_Pontos=#FACMeta2PesoItem#
-			WHERE FACA_Avaliacao='#FACAVALIACAO#' and FACA_Grupo=#FACA_Grupo# and FACA_Item=#FACA_Item#
-		</cfquery>
-	</cfloop>
+			<cfquery datasource="#dsnSNCI#">
+				UPDATE UN_Ficha_Facin SET FAC_Pontos_Revisao_Meta1=#FACPontosRevisaoMeta1#, 
+				FAC_Perc_Revisao_Meta1 = #FACPercRevisaoMeta1#, 
+				FAC_Pontos_Revisao_Meta2=#FACPontosRevisaoMeta2#,
+				FAC_Perc_Revisao_Meta2 = #FACPercRevisaoMeta2#
+				WHERE FAC_Avaliacao= '#FACAVALIACAO#'
+			</cfquery>
+			<cfquery name="rsmatraval" dbtype = "query">
+				SELECT distinct FACA_Avaliador
+				from rsfacinaval
+				order by FACA_Avaliador
+			</cfquery>
+			<cfloop query="rsmatraval">
+				<cfquery name="rsdescind" dbtype = "query">
+					SELECT FACA_Avaliacao,FACA_Matricula,FACA_Avaliador,FFI_Qtd_Item,FAC_Meta1_Peso_Item, FAC_Meta2_Peso_Item,FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, 
+					FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, 
+					FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo
+					from rsfacinaval
+					where FACA_Avaliador = '#rsmatraval.FACA_Avaliador#'
+				</cfquery>
+				<cfset meta1qtdfaltas = 0>
+				<cfset meta2qtdfaltas = 0>
+				<cfset meta1peso = rsdescind.FAC_Meta1_Peso_Item>
+				<cfset meta2peso = rsdescind.FAC_Meta2_Peso_Item>
+				<cfset qtdavalind = rsdescind.FFI_Qtd_Item>
+				<cfset meta1ptoaval = 0>
+				<cfset meta2ptoaval = 0>
+				<cfset meta1resultado = 0>
+				<cfset meta2resultado = 0>
+				<cfloop query="rsdescind">
+					<cfset meta1qtdfaltas = meta1qtdfaltas + rsdescind.FACA_Meta1_AT_OrtoGram + rsdescind.FACA_Meta1_AT_CCCP + rsdescind.FACA_Meta1_AE_Tecn + rsdescind.FACA_Meta1_AE_Prob + rsdescind.FACA_Meta1_AE_Valor + rsdescind.FACA_Meta1_AE_Cosq + rsdescind.FACA_Meta1_AE_Norma + rsdescind.FACA_Meta1_AE_Docu + rsdescind.FACA_Meta1_AE_Class + rsdescind.FACA_Meta1_AE_Orient>
+					<cfset meta2qtdfaltas = meta2qtdfaltas + rsdescind.FACA_Meta2_AR_Falta + rsdescind.FACA_Meta2_AR_Troca + rsdescind.FACA_Meta2_AR_Nomen + rsdescind.FACA_Meta2_AR_Ordem + rsdescind.FACA_Meta2_AR_Prazo>
+					<cfset qtdavalind = rsdescind.FFI_Qtd_Item>
+					<cfset meta1desconto = numberFormat((meta1peso * meta1qtdfaltas),'___.000')>
+					<cfset meta2desconto = numberFormat((meta2peso * meta2qtdfaltas),'___.000')>
+					<cfset meta1ptoaval = numberFormat((qtdavalind - meta1desconto),'___.00')>
+					<cfset meta2ptoaval = numberFormat((qtdavalind - meta2desconto),'___.00')>
+					<cfset meta1resultado = numberFormat((meta1ptoaval / qtdavalind)*100,'___.00')>
+					<cfset meta2resultado = numberFormat((meta2ptoaval / qtdavalind)*100,'___.00')>        
+				</cfloop>
 
-	<cfset FACPontosRevisaoMeta1 = numberFormat(rsfacinaval.FAC_Qtd_Geral - (somageralmeta1*descontometa1),'___.00')>
-    <cfset FACPercRevisaoMeta1 = numberFormat((FACPontosRevisaoMeta1/rsfacinaval.FAC_Qtd_Geral)*100,'___.00')>
+					<cfquery datasource="#dsnSNCI#">
+						UPDATE UN_Ficha_Facin_Individual set 
+						FFI_Meta1_Pontuacao_Obtida = #meta1ptoaval#
+						,FFI_Meta1_Resultado = #meta1resultado#
+						,FFI_Meta2_Pontuacao_Obtida = #meta2ptoaval#
+						,FFI_Meta2_Resultado = #meta2resultado#
+						where 
+						FFI_Avaliacao = '#rsdescind.FACA_Avaliacao#' and 
+						FFI_Matricula = '#rsdescind.FACA_Matricula#' and
+						FFI_Avaliador = '#rsmatraval.FACA_Avaliador#'
+					</cfquery>        
 
-    <cfset FACPontosRevisaoMeta2 = numberFormat(rsfacinaval.FAC_Qtd_Geral - (somageralmeta2*descontometa2),'___.00')>
-    <cfset FACPercRevisaoMeta2 = numberFormat((FACPontosRevisaoMeta2/rsfacinaval.FAC_Qtd_Geral)*100,'___.00')>
-
-    <cfquery datasource="#dsnSNCI#">
-        UPDATE UN_Ficha_Facin SET FAC_Pontos_Revisao_Meta1=#FACPontosRevisaoMeta1#, 
-        FAC_Perc_Revisao_Meta1 = #FACPercRevisaoMeta1#, 
-        FAC_Pontos_Revisao_Meta2=#FACPontosRevisaoMeta2#,
-        FAC_Perc_Revisao_Meta2 = #FACPercRevisaoMeta2#
-        WHERE FAC_Avaliacao= '#FACAVALIACAO#'
-    </cfquery>
-<!--- Fnal atualização --->					
+			</cfloop>				
 			<!--- fim atualizar tabelas --->
 
 		<cfelse>
@@ -342,7 +380,7 @@
 		<cfargument name="matr" required="true">
 		<cftransaction>
 			<cfquery name="rsgestao" datasource="DBSNCI">
-				SELECT FFI_Meta1_Qtd_Item, FFI_Meta1_Pontuacao_Inicial, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado, FFI_Meta2_Qtd_Item, FFI_Meta2_Pontuacao_Inicial, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado, FFI_Avaliacao,FAC_Qtd_Geral, FAC_Perc_Meta3,TUN_Descricao
+				SELECT FFI_Avaliacao,TUN_Descricao,FAC_Qtd_Geral,FFI_Qtd_Item,FFI_Meta1_Pontuacao_Obtida,FFI_Meta1_Resultado,FFI_Meta2_Pontuacao_Obtida,FFI_Meta2_Resultado,FAC_Perc_Meta3
 				FROM (Unidades 
 				INNER JOIN (UN_Ficha_Facin 
 				INNER JOIN UN_Ficha_Facin_Individual ON (FAC_Matricula = FFI_Matricula) AND (FAC_Avaliacao = FFI_Avaliacao)) ON Und_Codigo = FAC_Unidade) 

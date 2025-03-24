@@ -82,7 +82,10 @@
     <cfset nCont = nCont + 1>
   </cfloop>   		
 </cfif>
-
+<cfquery name="qAcesso" datasource="#dsn_inspecao#">
+	select Usu_GrupoAcesso, Usu_Matricula, Usu_Email from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+</cfquery>
+<cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
 <!---  --->
 <cfif isDefined("Form.acao")>
 	<cfquery datasource="#dsn_inspecao#" name="rsRevis">
@@ -90,7 +93,7 @@
 		FROM Inspecao
 		WHERE INP_NumInspecao='#form.ninsp#'
 	</cfquery>
-	<cfif trim(rsRevis.INP_RevisorLogin) lte 0>
+	<cfif trim(rsRevis.INP_RevisorLogin) lte 0 and grpacesso eq 'GESTORES'>
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Inspecao SET INP_RevisorLogin = '#CGI.REMOTE_USER#', INP_RevisorDTInic = CONVERT(varchar, getdate(), 120)
 			WHERE INP_Unidade = '#Unid#'and INP_NumInspecao ='#form.ninsp#'
@@ -127,9 +130,7 @@
 
 <cfset anoinsp = right(ninsp,4)>
 	
-<cfquery name="qAcesso" datasource="#dsn_inspecao#">
-	select Usu_GrupoAcesso, Usu_Matricula, Usu_Email from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
-</cfquery>
+
 
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
   SELECT DISTINCT Usu_Apelido, Usu_Lotacao, Usu_LotacaoNome, Usu_DR, Usu_Email
@@ -137,8 +138,6 @@
   WHERE Usu_Login = '#CGI.REMOTE_USER#'
   GROUP BY Usu_DR, Usu_Apelido, Usu_Lotacao, Usu_LotacaoNome, Usu_Email
 </cfquery>
-
-<cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
 
  <cfif (grpacesso neq 'GESTORES') and (grpacesso neq 'DESENVOLVEDORES') and (grpacesso neq 'GESTORMASTER') and (grpacesso neq 'INSPETORES')>
 	  <cfinclude template="aviso_sessao_encerrada.htm">

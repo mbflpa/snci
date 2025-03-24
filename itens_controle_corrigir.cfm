@@ -115,7 +115,7 @@
 		FROM Inspecao
 		WHERE INP_NumInspecao='#FORM.ninsp#'
 	</cfquery>	
-	<cfif trim(rsRevis.INP_RevisorLogin) lte 0>
+	<cfif trim(rsRevis.INP_RevisorLogin) lte 0 and grpacesso eq 'GESTORES'>
 		<cfquery datasource="#dsn_inspecao#">
 			UPDATE Inspecao SET INP_RevisorLogin = '#CGI.REMOTE_USER#', INP_RevisorDTInic = CONVERT(varchar, getdate(), 120)
 			WHERE INP_NumInspecao ='#FORM.ninsp#'
