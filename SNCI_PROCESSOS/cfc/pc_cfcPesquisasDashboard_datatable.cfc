@@ -94,7 +94,7 @@
                 pc_orgaos orgAvaliado on processo.pc_num_orgao_avaliado = orgAvaliado.pc_org_mcu
             LEFT JOIN 
                 pc_avaliacao_tipos on processo.pc_num_avaliacao_tipo = pc_aval_tipo_id
-            WHERE 1=1
+            WHERE RIGHT(processo.pc_processo_id, 4) >= <cfqueryparam cfsqltype="cf_sql_integer" value="#application.anoPesquisaOpiniao#">
                 <cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 11 and #application.rsUsuarioParametros.pc_usu_perfil# neq 16>
                     AND processo.pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
                 </cfif>
