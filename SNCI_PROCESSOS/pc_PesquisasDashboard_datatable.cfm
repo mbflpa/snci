@@ -49,7 +49,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                margin-top: 10px;
+                margin-top: -15px;
                 width: 100%;
                 animation: fadeIn 0.3s ease-in-out;
             }
