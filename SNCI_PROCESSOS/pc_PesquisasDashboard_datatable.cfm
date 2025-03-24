@@ -473,14 +473,25 @@
                 
                 // Botão para limpar filtros
                 $(document).on('click', '#btn-limpar-filtros', function() {
-                    // Limpar a pesquisa
-                    dataTable.search('').draw();
+                    // Mostrar o modal de carregamento
+                    mostrarModal();
                     
-                    // Limpar os filtros dos painéis de pesquisa
-                    dataTable.searchPanes.clearSelections();
-                    
-                    // Ocultar a mensagem de filtro
-                    $("#filtro-ativo-mensagem").fadeOut(200);
+                    // Pequeno atraso para garantir que o modal seja exibido
+                    setTimeout(function() {
+                        // Limpar a pesquisa
+                        dataTable.search('').draw();
+                        
+                        // Limpar os filtros dos painéis de pesquisa
+                        dataTable.searchPanes.clearSelections();
+                        
+                        // Ocultar a mensagem de filtro
+                        $("#filtro-ativo-mensagem").fadeOut(200);
+                        
+                        // Adicionar evento para fechar o modal quando a tabela terminar de redesenhar
+                        dataTable.one('draw.dt', function() {
+                            fecharModal();
+                        });
+                    }, 300);
                 });
                 
             }
