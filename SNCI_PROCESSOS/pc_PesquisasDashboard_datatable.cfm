@@ -24,77 +24,116 @@
             .filtro-outros {
                 display: inline-flex;
                 align-items: center;
-                margin-right: 5px;
-                font-weight: 600;
-                font-size: 0.9rem;
+                gap: 8px;
+                padding: 6px 12px;
+                background-color: #f8f9fa;
+                border-radius: 4px;
+                border: 1px solid #dee2e6;
+                transition: all 0.2s ease;
+            }
+            .filtro-outros:hover {
+                background-color: #e9ecef;
+                border-color: #ced4da;
             }
             .filtro-outros i {
                 cursor: pointer;
-                margin-left: 5px;
                 transition: transform 0.3s, color 0.3s;
-                font-size: 1.5rem; /* Aumentando o tamanho do ícone */
-            }
-            .filtro-outros i:hover {
-                transform: scale(1.2);
-                color: #1a73e8;
+                font-size: 1.2rem;
             }
             
             /* Estilo para a mensagem de filtro ativo */
             .filtro-ativo-mensagem {
-                background-color: #f8d7da;
-                border: 1px solid #f5c6cb;
-                color: #721c24;
-                padding: 0.5rem 1rem;
-                border-radius: 0.25rem;
+                background-color: #e8f4fe;
+                border: 1px solid #b8daff;
+                color: #004085;
+                padding: 8px 15px;
+                border-radius: 4px;
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                margin-top: -15px;
-                width: 100%;
-                animation: fadeIn 0.3s ease-in-out;
+                justify-content: space-between;
+                gap: 10px;
+                animation: slideDown 0.3s ease-in-out;
             }
             
             #btn-limpar-filtros {
-                font-size: 0.8rem;
-                padding: 0.25rem 0.5rem;
-                transition: all 0.2s ease-in-out;
+                font-size: 0.9rem;
+                padding: 4px 12px;
+                transition: all 0.2s ease;
+                white-space: nowrap;
+                background-color: #dc3545;
+                border-color: #dc3545;
             }
             
             #btn-limpar-filtros:hover {
-                transform: scale(1.05);
+                background-color: #c82333;
+                border-color: #bd2130;
+                transform: translateY(-1px);
             }
             
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
+            @keyframes slideDown {
+                from {
+                    transform: translateY(-10px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
             }
             
             @media (max-width: 768px) {
+                .filtro-sticky-container {
+                    padding: 8px 10px;
+                }
+                
                 .filtro-ativo-mensagem {
                     flex-direction: column;
                     text-align: center;
+                    padding: 10px;
                 }
                 
                 #btn-limpar-filtros {
-                    margin-top: 8px;
+                    width: 100%;
+                    margin-top: 5px;
+                }
+                
+                .filtro-outros {
+                    width: 100%;
+                    justify-content: center;
                 }
             }
             
             /* Estilos para fixar o componente de filtro */
             .filtro-sticky-container {
                 position: sticky;
-                top: 0;
+                top: 55px;
                 z-index: 1020;
                 background-color: #fff;
-                padding:0;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                margin-bottom: 15px;
+                padding: 10px 15px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
                 transition: all 0.3s ease;
+                border-radius: 4px;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                cursor: pointer;
             }
             
-            /* Adiciona um pouco de espaço para evitar "pulos" quando o filtro fica fixo */
-            .filtro-sticky-spacer {
-                height: 10px;
+            /* Adiciona efeito quando o container está "scrolled" */
+            .filtro-sticky-container.scrolled {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                background-color: rgba(255, 255, 255, 0.98);
+                padding: 8px 15px;
+            }
+            
+            /* Estilo para o container dos filtros */
+            .filtro-container {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 10px;
             }
 	</style>
 </head>
@@ -122,14 +161,24 @@
             <section class="content">
                 <div class="container-fluid">
                     <!-- Div container para o filtro fixo -->
-                    <div class="filtro-sticky-container">
-                        <!-- Componente de filtros reutilizável - apenas com ano -->
-                        <cfmodule template="includes/pc_filtros_componente.cfm"
-                            componenteID="filtros-pesquisas-datatable"
-                            exibirAno="true"
-                            exibirOrgao="false"
-                            exibirDiretoria="false"
-                            exibirStatus="false">
+                    <div class="filtro-sticky-container" id="btnToggleSearchPane"  title="Abrir painel de filtros">
+                        <div class="filtro-container">
+                            <div class="filtro-outros">
+                                <span>Filtros Avançados</span>
+                                <i class="fas fa-filter" ></i>
+                            </div>
+                            <div class="filtro-acoes">
+                                <!-- Aqui você pode adicionar outros controles de filtro se necessário -->
+                            </div>
+                        </div>
+                        <div id="filtro-ativo-mensagem" class="filtro-ativo-mensagem" style="display: none;">
+                            <div class="filtro-info">
+                                <!-- O conteúdo será preenchido dinamicamente via JavaScript -->
+                            </div>
+                            <button id="btn-limpar-filtros" class="btn btn-danger">
+                                <i class="fas fa-filter-circle-xmark"></i> Limpar Filtros
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="filtro-sticky-spacer"></div>
@@ -165,6 +214,7 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Processo</th>
+                                            <th>Ano</th>
                                             <th>Órgão Respondente</th>
                                             <th>Órgão de Origem</th>
                                             <th>Diretoria / CS</th>
@@ -211,7 +261,6 @@
         $(document).ready(function() {
             // Variáveis de controle
             let dataTable = null;
-            let filtroOutrosAdicionado = false; // Flag para controlar se o filtro já foi adicionado
             
             // Função para mostrar modal de carregamento
             function mostrarModal() {
@@ -269,24 +318,6 @@
                 
                 // Verificar se o sidebar está aberto antes de reinicializar a tabela
                 const sidebarAberto = $('body').hasClass('control-sidebar-slide-open');
-                
-                // Adicionar o filtro "Outros" apenas uma vez
-                if (!filtroOutrosAdicionado) {
-                    // Criar o filtro "Outros"
-                    const $filterContainer = $('<div class="filtro-container filtro-compacto"></div>');
-                    const $othersFilter = $('<div class="filtro-outros">Outros Filros: <i class="fas fa-filter" id="btnToggleSearchPane"></i></div>');
-                    $filterContainer.append($othersFilter);
-                    
-                    // Inserir após o filtro de ano
-                    $("#filtros-pesquisas-datatable .filtro-container").first().after($filterContainer);
-                    
-                    // Adicionar a mensagem de filtro ativo (inicialmente oculta)
-                    const $mensagemFiltro = $('<div id="filtro-ativo-mensagem" class="filtro-ativo-mensagem" style="display: none;"><button id="btn-limpar-filtros" class="btn btn-sm btn-danger"><i class="fas fa-filter-circle-xmark"></i> Foram aplicados filtros nos Painéis de Pesquisa. Clique aqui para limpar. </button></div>');
-                    $("#filtros-pesquisas-datatable").append($mensagemFiltro);
-                    
-                    // Marcar que o filtro foi adicionado
-                    filtroOutrosAdicionado = true;
-                }
                 
                 dataTable = $('#tabelaPesquisasDetalhada').DataTable({
                     destroy: true, // Permitir reinicialização da tabela
@@ -348,7 +379,7 @@
                     ],
                     searchPanes: {
                         cascadePanes: true,
-                        columns: [2,3,4,5,6,7],
+                        columns: [2,3,4,5,6,7,8],
                         threshold: 1,
                         layout: 'columns-1',
                         initCollapsed: true,
@@ -356,6 +387,7 @@
                     columns: [
                         { data: "id" },
                         { data: "processo" },
+                        { data: "ano" },
                         { data: "orgao_respondente" },
                         { data: "orgao_origem" },
                         { data: "diretoria_cs" },
@@ -416,10 +448,10 @@
                     columnDefs: [
                         { 
                             className: "text-center", 
-                            targets: [6, 7, 8, 9, 10, 11, 12, 13]
+                            targets: [2, 7, 8, 9, 10, 11, 12, 13,14]
                         },
                         { 
-                            targets: 14, // coluna de observações
+                            targets: 15, // coluna de observações
                             className: 'observacao-coluna',
                             width: '1000px',
                             render: function(data) {
@@ -462,24 +494,16 @@
                 function atualizarEstadoFiltro() {
                     var filtrosAtivos = [];
                     
-                    // Verificar filtro de ano
-                    var anoSelecionado = $(".filtro-ano .btn-filtro.active").text().trim();
-                    if (anoSelecionado && anoSelecionado !== "Todos") {
-                        filtrosAtivos.push(`<b>Ano:</b> ${anoSelecionado}`);
-                    }
-                    
                     // Capturar filtros do SearchPane usando o DOM
                     $('.dtsp-searchPane').each(function() {
                         var $pane = $(this);
                         var $selectedRows = $pane.find('tr.selected');
                         
                         if ($selectedRows.length > 0) {
-                            // Obter o nome do filtro do placeholder do input
                             var titulo = $pane.find('.dtsp-paneInputButton').attr('placeholder');
                             var valores = [];
                             
                             $selectedRows.each(function() {
-                                // O valor está no span com classe dtsp-name
                                 var valor = $(this).find('.dtsp-name').text().trim();
                                 if (valor) {
                                     valores.push(valor);
@@ -529,10 +553,8 @@
                 
                 // Botão para limpar filtros
                 $(document).on('click', '#btn-limpar-filtros', function() {
-                    // Mostrar modal de carregamento com um pequeno delay
                     setTimeout(function() {
-                        $('#modalOverlay').modal('show')
-                           
+                        $('#modalOverlay').modal('show');
                         
                         try {
                             // Limpar pesquisa global
@@ -540,10 +562,6 @@
                             
                             // Limpar todos os filtros do SearchPane usando a API
                             dataTable.searchPanes.clearSelections();
-                            
-                            // Limpar filtro de ano
-                            $(".filtro-ano .btn-filtro").removeClass('active');
-                            $(".filtro-ano .btn-filtro[data-valor='Todos']").addClass('active');
                             
                             // Ocultar mensagem de filtros ativos
                             $("#filtro-ativo-mensagem").fadeOut(200);
@@ -557,36 +575,17 @@
                         } catch (error) {
                             console.error('Erro ao limpar filtros:', error);
                         } finally {
-                            // Garantir que o modal seja fechado apenas após a conclusão de todas as operações
                             setTimeout(function() {
                                 $('#modalOverlay').modal('hide');
-                            }, 1000); // Aumentei o tempo para 1 segundo para garantir que o modal seja visível
+                            }, 1000);
                         }
-                    }, 100); // Delay inicial de 100ms antes de mostrar o modal
+                    }, 100);
                 });
                 
             }
             
-            // Escutar evento de alteração de filtro
-            document.addEventListener('filtroAlterado', function(e) {
-                const { tipo, valor } = e.detail;
-                
-                if (tipo === 'ano') {
-                    // Mostrar o modal de carregamento antes de inicializar a tabela
-                    mostrarModal();
-                    
-                    // Pequeno atraso para garantir que o modal seja exibido
-                    setTimeout(function() {
-                        inicializarTabela(valor);
-                    }, 500);
-                }
-            });
-            
-            // Carregar dados iniciais após um pequeno delay para garantir que os filtros estejam inicializados
-            setTimeout(function() {
-                const anoInicial = window.anoSelecionado || "Todos";
-                inicializarTabela(anoInicial);
-            }, 500);
+            // Initialize the table directly without waiting for filter component
+            inicializarTabela("Todos");
 
             // Adicionar funcionalidade para o botão de filtro "Outros" usando delegação de eventos
             $(document).on('click', '#btnToggleSearchPane', function(e) {
