@@ -460,38 +460,109 @@
                 
                 // Inicializar o estado da mensagem de filtro
                 function atualizarEstadoFiltro() {
-                    // Verificar se há filtros aplicados verificando se o número de linhas visíveis é diferente do total
-                    var isFiltered = dataTable.rows({search: 'applied'}).data().length !== dataTable.rows().data().length;
+                    var filtrosAtivos = [];
                     
-                    // Mostrar ou ocultar a mensagem de filtro com base no estado
-                    if (isFiltered) {
-                        $("#filtro-ativo-mensagem").fadeIn(200);
+                    // Verificar filtro de ano
+                    var anoSelecionado = $(".filtro-ano .btn-filtro.active").text().trim();
+                    if (anoSelecionado && anoSelecionado !== "Todos") {
+                        filtrosAtivos.push(`<b>Ano:</b> ${anoSelecionado}`);
+                    }
+                    
+                    // Capturar filtros do SearchPane usando o DOM
+                    $('.dtsp-searchPane').each(function() {
+                        var $pane = $(this);
+                        var $selectedRows = $pane.find('tr.selected');
+                        
+                        if ($selectedRows.length > 0) {
+                            // Obter o nome do filtro do placeholder do input
+                            var titulo = $pane.find('.dtsp-paneInputButton').attr('placeholder');
+                            var valores = [];
+                            
+                            $selectedRows.each(function() {
+                                // O valor está no span com classe dtsp-name
+                                var valor = $(this).find('.dtsp-name').text().trim();
+                                if (valor) {
+                                    valores.push(valor);
+                                }
+                            });
+                            
+                            if (valores.length > 0) {
+                                filtrosAtivos.push(`<b>${titulo}:</b> ${valores.join(', ')}`);
+                            }
+                        }
+                    });
+                    
+                    // Verificar pesquisa global
+                    var pesquisaGlobal = $('.dataTables_filter input').val();
+                    if (pesquisaGlobal) {
+                        filtrosAtivos.push(`<b>Pesquisa:</b> "${pesquisaGlobal}"`);
+                    }
+                    
+                    // Atualizar a mensagem de filtros
+                    if (filtrosAtivos.length > 0) {
+                        var mensagem = `
+                            <div class="d-flex align-items-center justify-content-between w-100">
+                                <div class="mr-3">
+                                    <i class="fas fa-filter mr-2"></i>
+                                    ${filtrosAtivos.join(' | ')}
+                                </div>
+                                <button id="btn-limpar-filtros" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-filter-circle-xmark"></i> Limpar Filtros
+                                </button>
+                            </div>
+                        `;
+                        $("#filtro-ativo-mensagem").html(mensagem).fadeIn(200);
                     } else {
                         $("#filtro-ativo-mensagem").fadeOut(200);
                     }
                 }
                 
+                // Atualizar os listeners para os eventos do SearchPane
+                $(document).on('click', '.dtsp-nameButton', function() {
+                    setTimeout(atualizarEstadoFiltro, 100);
+                });
+                
+                // Atualizar quando houver pesquisa global
+                $(document).on('keyup', '.dataTables_filter input', function() {
+                    setTimeout(atualizarEstadoFiltro, 100);
+                });
+                
                 // Botão para limpar filtros
                 $(document).on('click', '#btn-limpar-filtros', function() {
-                    // Mostrar o modal de carregamento
-                    mostrarModal();
-                    
-                    // Pequeno atraso para garantir que o modal seja exibido
+                    // Mostrar modal de carregamento com um pequeno delay
                     setTimeout(function() {
-                        // Limpar a pesquisa
-                        dataTable.search('').draw();
+                        $('#modalOverlay').modal('show')
+                           
                         
-                        // Limpar os filtros dos painéis de pesquisa
-                        dataTable.searchPanes.clearSelections();
-                        
-                        // Ocultar a mensagem de filtro
-                        $("#filtro-ativo-mensagem").fadeOut(200);
-                        
-                        // Adicionar evento para fechar o modal quando a tabela terminar de redesenhar
-                        dataTable.one('draw.dt', function() {
-                            fecharModal();
-                        });
-                    }, 300);
+                        try {
+                            // Limpar pesquisa global
+                            dataTable.search('').draw();
+                            
+                            // Limpar todos os filtros do SearchPane usando a API
+                            dataTable.searchPanes.clearSelections();
+                            
+                            // Limpar filtro de ano
+                            $(".filtro-ano .btn-filtro").removeClass('active');
+                            $(".filtro-ano .btn-filtro[data-valor='Todos']").addClass('active');
+                            
+                            // Ocultar mensagem de filtros ativos
+                            $("#filtro-ativo-mensagem").fadeOut(200);
+                            
+                            // Redesenhar a tabela
+                            dataTable.draw();
+                            
+                            // Forçar atualização do estado dos filtros
+                            atualizarEstadoFiltro();
+                            
+                        } catch (error) {
+                            console.error('Erro ao limpar filtros:', error);
+                        } finally {
+                            // Garantir que o modal seja fechado apenas após a conclusão de todas as operações
+                            setTimeout(function() {
+                                $('#modalOverlay').modal('hide');
+                            }, 1000); // Aumentei o tempo para 1 segundo para garantir que o modal seja visível
+                        }
+                    }, 100); // Delay inicial de 100ms antes de mostrar o modal
                 });
                 
             }
