@@ -593,8 +593,10 @@
 							pc_usu_matricula: usuarioMatricula
 						},
 						success: function(response) {
-	
-							if (response=="true") {
+	                         // Converter a resposta JSON para um valor booleano JavaScript
+            				var resultado = (response === "true" || response === true || response === "TRUE");
+            
+							if (resultado) {
 								$('#tabUsuariosCad').DataTable().searchPanes.clearSelections();
 								atualizarTabela();
 							} else {
