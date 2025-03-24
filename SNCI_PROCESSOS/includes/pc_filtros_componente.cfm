@@ -136,7 +136,7 @@
         align-items: center;
         gap: 15px;
         width: 100%;
-        padding: 10px 0;
+        padding-top: 5px;
         margin-bottom: 0;
     }
     
@@ -168,7 +168,7 @@
     }
     
     .card-filtros .card-body {
-        padding: 1rem;
+        padding: 0.5rem;
         overflow-x: hidden;
     }
     
