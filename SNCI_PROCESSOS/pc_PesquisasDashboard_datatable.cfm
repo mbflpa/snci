@@ -10,7 +10,7 @@
     <link rel="icon" type="image/x-icon" href="../SNCI_PROCESSOS/dist/img/icone_sistema_standalone_ico.png">	
     <link rel="stylesheet" href="plugins/jqcloud/jqcloud.min.css">
     <link rel="stylesheet" href="dist/css/stylesSNCI_PaineisFiltro.css">   
-   <style>
+    <style>
 			textarea {
 				text-align: justify!important;
 			}
@@ -79,6 +79,23 @@
                     margin-top: 8px;
                 }
             }
+            
+            /* Estilos para fixar o componente de filtro */
+            .filtro-sticky-container {
+                position: sticky;
+                top: 0;
+                z-index: 1020;
+                background-color: #fff;
+                padding:0;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                margin-bottom: 15px;
+                transition: all 0.3s ease;
+            }
+            
+            /* Adiciona um pouco de espaço para evitar "pulos" quando o filtro fica fixo */
+            .filtro-sticky-spacer {
+                height: 10px;
+            }
 	</style>
 </head>
 
@@ -104,13 +121,18 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <!-- Componente de filtros reutilizável - apenas com ano -->
-                    <cfmodule template="includes/pc_filtros_componente.cfm"
-                        componenteID="filtros-pesquisas-datatable"
-                        exibirAno="true"
-                        exibirOrgao="false"
-                        exibirDiretoria="false"
-                        exibirStatus="false">
+                    <!-- Div container para o filtro fixo -->
+                    <div class="filtro-sticky-container">
+                        <!-- Componente de filtros reutilizável - apenas com ano -->
+                        <cfmodule template="includes/pc_filtros_componente.cfm"
+                            componenteID="filtros-pesquisas-datatable"
+                            exibirAno="true"
+                            exibirOrgao="false"
+                            exibirDiretoria="false"
+                            exibirStatus="false">
+                    </div>
+                    
+                    <div class="filtro-sticky-spacer"></div>
                     
                     <!-- Incluir dashboard de métricas -->
                     <cfinclude template="includes/pc_dashboard_pesquisa_datatable/pc_dashboard_cards_metricas.cfm">
@@ -517,6 +539,15 @@
                         $('.dtsp-panesContainer').hide();
                         $('.dtsp-searchPanes .dtsb-searchBuilder').hide();
                     }
+                }
+            });
+
+            // Adicionar comportamento para o filtro fixo
+            $(window).on('scroll', function() {
+                if ($(window).scrollTop() > 100) {
+                    $('.filtro-sticky-container').addClass('scrolled');
+                } else {
+                    $('.filtro-sticky-container').removeClass('scrolled');
                 }
             });
         });
