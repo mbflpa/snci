@@ -346,7 +346,7 @@
   	</cffunction>
 
 
-	<cffunction name="delUsuario" access="remote"  returntype="any" returnformat="plain" hint="Exclui usuários. Disponível apenas para perfil desenvolvedores">
+	<cffunction name="delUsuario" access="remote"  returntype="boolean" returnformat="plain" hint="Exclui usuários. Disponível apenas para perfil desenvolvedores">
 		
 		<cfargument name="pc_usu_matricula" type="string" required="true"/>
 		
@@ -370,7 +370,7 @@
 			checkUserDependencies.indicador_count GT 0>
 			
 			<!--- Se existir dependências, retorna mensagem de erro --->
-			 <cfreturn "false">
+			 <cfreturn false>
 		<cfelse>
 			<!--- Se não existir dependências, realiza a exclusão --->
 			<cfquery datasource="#application.dsn_processos#">
@@ -378,7 +378,7 @@
 				WHERE pc_usu_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
 			</cfquery>
 
-		   <cfreturn "true">
+		   <cfreturn true>
 		</cfif>
 	
 	</cffunction>

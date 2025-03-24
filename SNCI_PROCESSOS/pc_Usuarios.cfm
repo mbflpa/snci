@@ -593,20 +593,39 @@
 							pc_usu_matricula: usuarioMatricula
 						},
 						success: function(response) {
-	                         // Converter a resposta JSON para um valor booleano JavaScript
-            				var resultado = (response === "true" || response === true || response === "TRUE");
-            
+							console.log("Resposta recebida:", response);
+							console.log("Tipo da resposta:", typeof response);
+							
+							// Verificação mais robusta do valor retornado
+							var resultado = false;
+							
+							// Verifica string "true" em qualquer caso
+							if (typeof response === "string" && response.toLowerCase() === "true") {
+								resultado = true;
+							}
+							// Verifica valor booleano true
+							else if (response === true) {
+								resultado = true;
+							}
+							// Verifica objeto JSON com propriedade de sucesso
+							else if (typeof response === "object" && response !== null) {
+								if (response.SUCCESS === true || response.success === true || 
+									response.SUCCESS === "true" || response.success === "true") {
+									resultado = true;
+								}
+							}
+							
 							if (resultado) {
 								$('#tabUsuariosCad').DataTable().searchPanes.clearSelections();
 								atualizarTabela();
 							} else {
 								$('#modalOverlay').delay(1000).hide(0, function() {
 									$('#modalOverlay').modal('hide');
-										Swal.fire({
+									Swal.fire({
 										title: 'Operação Cancelada',
 										html: logoSNCIsweetalert2('O usuário não pode ser excluído porque está vinculado a um ou mais registros no sistema.'),
 										icon: 'info'
-									});	
+									});
 								});
 							}
 						},
