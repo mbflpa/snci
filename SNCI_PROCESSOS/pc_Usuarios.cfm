@@ -594,25 +594,17 @@
 						},
 						success: function(response) {
 							console.log("Resposta recebida:", response);
-							console.log("Tipo da resposta:", typeof response);
 							
-							// Verificação mais robusta do valor retornado
+							// Verificação específica para o padrão de resposta observado
 							var resultado = false;
 							
-							// Verifica string "true" em qualquer caso
-							if (typeof response === "string" && response.toLowerCase() === "true") {
+							// Verifica se a resposta contém a palavra "true" (independente de espaços)
+							if (typeof response === "string" && response.trim().toLowerCase().endsWith("true")) {
 								resultado = true;
-							}
+							} 
 							// Verifica valor booleano true
 							else if (response === true) {
 								resultado = true;
-							}
-							// Verifica objeto JSON com propriedade de sucesso
-							else if (typeof response === "object" && response !== null) {
-								if (response.SUCCESS === true || response.success === true || 
-									response.SUCCESS === "true" || response.success === "true") {
-									resultado = true;
-								}
 							}
 							
 							if (resultado) {
