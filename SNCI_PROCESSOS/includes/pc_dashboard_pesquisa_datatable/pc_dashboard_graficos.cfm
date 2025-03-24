@@ -293,7 +293,7 @@ $(document).ready(function() {
             const npsValor = ((promotores / total) - (detratores / total)) * 100;
             
             // Atualizar o valor do NPS e as contagens
-            $("#npsValorDisplayDT").text(npsValor.toFixed(0));
+            $("#npsValorDisplayDT").text(npsValor.toFixed(1));
             $("#qtdPromotoresDT").text(`(${promotores})`);
             $("#qtdNeutrosDT").text(`(${neutros})`);
             $("#qtdDetratoresDT").text(`(${detratores})`);
@@ -330,7 +330,7 @@ $(document).ready(function() {
                                 const dataset = data.datasets[tooltipItem.datasetIndex];
                                 const total = dataset.data.reduce((a, b) => a + b, 0);
                                 const value = dataset.data[tooltipItem.index];
-                                const percentage = Math.round((value / total) * 100);
+                                const percentage = Math.round((value / total) * 100).toFixed(1);
                                 return `${data.labels[tooltipItem.index]}: ${value} (${percentage}%)`;
                             }
                         }
@@ -339,7 +339,7 @@ $(document).ready(function() {
                         datalabels: {
                             formatter: (value, ctx) => {
                                 const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = Math.round((value / total) * 100);
+                                const percentage = Math.round((value / total) * 100).toFixed(1);
                                 return percentage > 4 ? `${percentage}%` : '';
                             },
                             color: '#fff',
