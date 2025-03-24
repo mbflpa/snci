@@ -535,9 +535,9 @@
                                 </button>
                             </div>
                         `;
-                        $("#filtro-ativo-mensagem").html(mensagem).fadeIn(200);
+                        $("#filtro-ativo-mensagem").html(mensagem).fadeIn(100);
                     } else {
-                        $("#filtro-ativo-mensagem").fadeOut(200);
+                        $("#filtro-ativo-mensagem").fadeOut(100);
                     }
                 }
                 
@@ -552,13 +552,21 @@
                 });
                 
                 // Botão para limpar filtros
-                $(document).on('click', '#btn-limpar-filtros', function() {
+                $(document).on('click', '#btn-limpar-filtros', function(e) {
+                    // Impedir qualquer comportamento padrão
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Verificar o estado do sidebar antes de limpar filtros
+                    const sidebarAberto = $('#sidebarPaineis').css('display') === 'block';
+                   
+                    $('#modalOverlay').css('display', 'block');
+                    $('#modalOverlay').addClass('show');
+
                     setTimeout(function() {
-                        $('#modalOverlay').modal('show');
-                        
                         try {
                             // Limpar pesquisa global
-                            dataTable.search('').draw();
+                            dataTable.search('').draw(false); // Usar false para evitar eventos completos de redesenho
                             
                             // Limpar todos os filtros do SearchPane usando a API
                             dataTable.searchPanes.clearSelections();
@@ -567,7 +575,14 @@
                             $("#filtro-ativo-mensagem").fadeOut(200);
                             
                             // Redesenhar a tabela
-                            dataTable.draw();
+                            dataTable.draw(false); // Usar false para evitar eventos completos de redesenho
+                            
+                            // Forçar fechamento do sidebar se ele estava fechado antes
+                            if (!sidebarAberto) {
+                                // Forçar fechamento do sidebar diretamente no DOM
+                                $('#sidebarPaineis').css('display', 'none');
+                                $('body').removeClass('control-sidebar-slide-open');
+                            }
                             
                             // Forçar atualização do estado dos filtros
                             atualizarEstadoFiltro();
@@ -579,7 +594,7 @@
                                 $('#modalOverlay').modal('hide');
                             }, 1000);
                         }
-                    }, 100);
+                    }, 1000);
                 });
                 
             }
