@@ -9,6 +9,11 @@
         <h3 class="card-title">
             <i class="fas fa-tachometer-alt mr-2"></i>Indicadores de Desempenho
         </h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
     </div>
     <div class="card-body">
         <!-- Cards de métricas - Todos na mesma linha com 5 cards -->

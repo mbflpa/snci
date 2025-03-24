@@ -151,16 +151,19 @@
 </style>
 
 <!-- Card do Dashboard de Métricas -->
-<div class="card dashboard-card">
-  <div class="card-body">
-    <div class="dashboard-title">
-      <h5>
-        <i class="fas fa-chart-line mr-2"></i>Resumo das Avaliações
-        <span class="pesquisas-count">(<span id="total-pesquisas">0</span> pesquisas)</span>
-      </h5>
-     
+<div class="card mb-4 ">
+  <div class="card-header">
+    <h3 class="card-title">
+      <i class="fas fa-chart-line mr-2"></i>Resumo das Avaliações
+      <span class="pesquisas-count">(<span id="total-pesquisas">0</span> pesquisas)</span>
+    </h3>
+    <div class="card-tools">
+      <button type="button" class="btn btn-tool" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+      </button>
     </div>
-    
+  </div>
+  <div class="card-body">  
     <!-- Score Cards -->
     <div class="score-cards">
       <div class="score-card comunicacao">
