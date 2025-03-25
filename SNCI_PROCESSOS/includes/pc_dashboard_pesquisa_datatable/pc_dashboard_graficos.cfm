@@ -41,19 +41,23 @@
                     title="<span class='popover-title-custom'>Classificação do NPS</span>" 
                     data-content="
                     <div class='nps-info-content'>
+                      <div class='nps-info-item'>
+                        <strong>Cálculo:</strong> O NPS é baseado na média das pesquisas de opinião por órgão respondente.
+                      </div>
                       <div class='nps-info-item promotores-info'>
                         <div class='color-dot'></div>
-                        <strong>Promotores:</strong> Notas 9-10
+                        <strong>Órgãos Promotores:</strong> (nota 9,0 - 10,0)
                       </div>
                       <div class='nps-info-item neutros-info'>
                         <div class='color-dot'></div>
-                        <strong>Neutros:</strong> Notas 7-8
+                        <strong>Órgãos Neutros:</strong> (nota 7,0 - 8,9)
                       </div>
                       <div class='nps-info-item detratores-info'>
                         <div class='color-dot'></div>
-                        <strong>Detratores:</strong> Notas 1-6
+                        <strong>Órgãos Detratores:</strong> (nota 1 - 6,9)
                       </div>
                       <hr>
+                      
                       <div class='nps-formula'>
                         <strong>NPS</strong> = % Promotores - % Detratores
                       </div>
@@ -330,7 +334,7 @@ $(document).ready(function() {
                                 const dataset = data.datasets[tooltipItem.datasetIndex];
                                 const total = dataset.data.reduce((a, b) => a + b, 0);
                                 const value = dataset.data[tooltipItem.index];
-                                const percentage = Math.round((value / total) * 100).toFixed(1);
+                                const percentage = ((value / total) * 100).toFixed(1);
                                 return `${data.labels[tooltipItem.index]}: ${value} (${percentage}%)`;
                             }
                         }
@@ -339,7 +343,7 @@ $(document).ready(function() {
                         datalabels: {
                             formatter: (value, ctx) => {
                                 const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = Math.round((value / total) * 100).toFixed(1);
+                                const percentage = ((value / total) * 100).toFixed(1); // Removido Math.round para exibir com uma casa decimal
                                 return percentage > 4 ? `${percentage}%` : '';
                             },
                             color: '#fff',
@@ -602,11 +606,22 @@ $(document).ready(function() {
             
             renderGraficoMediaDT(medias);
             
-            // 2. Atualizar gráfico de NPS
-            let promotores = 0, neutros = 0, detratores = 0;
-            
+            // 2. Atualizar gráfico de NPS baseado em órgãos respondentes
+            let orgaosRespondentes = {};
+
             dados.forEach(item => {
-                // Calcular média das notas para determinar categoria NPS
+                // Verificar se o item tem o campo orgao_respondente
+                const orgao = item.orgao_respondente || 'Não informado';
+                
+                // Inicializar o objeto para este órgão se ainda não existir
+                if (!orgaosRespondentes[orgao]) {
+                    orgaosRespondentes[orgao] = {
+                        somaNotas: 0,
+                        totalNotasValidas: 0
+                    };
+                }
+                
+                // Usar a média das notas para determinar a categoria NPS
                 const notas = [
                     parseFloat(item.comunicacao) || 0,
                     parseFloat(item.interlocucao) || 0,
@@ -617,13 +632,28 @@ $(document).ready(function() {
                 ].filter(n => n > 0);
                 
                 if (notas.length > 0) {
-                    const media = notas.reduce((a, b) => a + b, 0) / notas.length;
+                    // Adicionar à soma das notas deste órgão
+                    orgaosRespondentes[orgao].somaNotas += notas.reduce((a, b) => a + b, 0);
+                    orgaosRespondentes[orgao].totalNotasValidas += notas.length;
+                }
+            });
+
+            // Contar órgãos em cada categoria
+            let promotores = 0, neutros = 0, detratores = 0;
+
+            Object.keys(orgaosRespondentes).forEach(orgao => {
+                const dadosOrgao = orgaosRespondentes[orgao];
+                
+                // Calcular a média das notas para este órgão
+                if (dadosOrgao.totalNotasValidas > 0) {
+                    const mediaOrgao = dadosOrgao.somaNotas / dadosOrgao.totalNotasValidas;
                     
-                    if (media >= 9) {
+                    // Classificar o órgão com base na média
+                    if (mediaOrgao >= 9) {
                         promotores++;
-                    } else if (media >= 7) {
+                    } else if (mediaOrgao >= 7) {
                         neutros++;
-                    } else if (media > 0) {
+                    } else if (mediaOrgao > 0) {
                         detratores++;
                     }
                 }

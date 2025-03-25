@@ -117,7 +117,6 @@
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
-                cursor: pointer;
             }
             
             /* Adiciona efeito quando o container está "scrolled" */
@@ -161,9 +160,9 @@
             <section class="content">
                 <div class="container-fluid">
                     <!-- Div container para o filtro fixo -->
-                    <div class="filtro-sticky-container" id="btnToggleSearchPane"  title="Abrir painel de filtros">
+                    <div class="filtro-sticky-container" >
                         <div class="filtro-container">
-                            <div class="filtro-outros">
+                            <div class="filtro-outros" id="btnToggleSearchPane"  title="Abrir painel de filtros" style="cursor: pointer;">
                                 <span>Filtros Avançados</span>
                                 <i class="fas fa-filter" ></i>
                             </div>

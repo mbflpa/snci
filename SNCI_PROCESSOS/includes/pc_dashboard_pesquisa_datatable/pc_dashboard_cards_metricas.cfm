@@ -99,26 +99,31 @@
     <div class="snci-nps-modal-body">
         <div class='text-justify'>
             <p>O <strong>Net Promoter Score (NPS)</strong> mede a satisfação e percepção dos órgãos avaliados quanto aos trabalhos realizados, em uma escala de -100 a +100.</p>
+            
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle mr-2"></i><strong>Regra de cálculo:</strong> O NPS é calculado com base na média das pesquisas de opinião por órgão respondente. Isso significa que cada órgão é classificado como Promotor, Neutro ou Detrator com base na média de todas as pesquisas de opinião respondidas, de acordo com os filtros selecionados.
+            </div>
+            
             <p><strong>NPS = </strong> % Promotores - % Detratores</p>
             <p><strong>Classificação dos respondentes:</strong></p>
             <div class="nps-category-box">
-                <h5><span class='badge badge-success'>Promotores ( notas 9-10 )</span></h5>
-                <p>São órgãos avaliados que consideram o processo de avaliação do controle interno como altamente positivo e eficaz. Reconhecem o valor agregado pela avaliação, destacando a qualidade do trabalho, a transparência e a contribuição para a melhoria dos processos internos. Estes órgãos tendem a incorporar prontamente as recomendações e a valorizar a parceria com o controle interno.</p>
+                <h5><span class='badge badge-success'>Promotores (nota 9,0 - 10,0)</span></h5>
+                <p>São órgãos que consideram o processo de avaliação do controle interno como altamente positivo e eficaz. Reconhecem o valor agregado pela avaliação, destacando a qualidade do trabalho, a transparência e a contribuição para a melhoria dos processos internos. Estes órgãos tendem a incorporar prontamente as recomendações e a valorizar a parceria com o controle interno.</p>
             </div>
             <div class="nps-category-box">
-                <h5><span class='badge badge-warning'>Neutros ( notas 7-8 )</span></h5>
-                <p>São órgãos avaliados que consideram o processo de avaliação satisfatório, mas identificam aspectos a serem aprimorados. Reconhecem a importância do trabalho do controle interno, porém, não percebem valor extraordinário agregado às suas operações. Tendem a adotar parcialmente as recomendações e podem apresentar resistência moderada durante os processos de avaliação e acompanhamento.</p>
+                <h5><span class='badge badge-warning'>Neutros (nota 7,0 - 8,9)</span></h5>
+                <p>São órgãos que consideram o processo de avaliação satisfatório, mas identificam aspectos a serem aprimorados. Reconhecem a importância do trabalho do controle interno, porém, não percebem valor extraordinário agregado às suas operações. Tendem a adotar parcialmente as recomendações e podem apresentar resistência moderada durante os processos de avaliação e acompanhamento.</p>
             </div>
             <div class="nps-category-box">
-                <h5><span class='badge badge-danger'>Detratores ( notas 1-6 )</span></h5>
-                <p>São órgãos avaliados que demonstram insatisfação com o processo de avaliação conduzido pelo controle interno dos Correios. Podem considerar as avaliações como burocráticas, punitivas ou desconectadas da realidade operacional. Representam oportunidades críticas para o aprimoramento da metodologia de avaliação, comunicação e abordagem do órgão de controle interno, sinalizando necessidade de revisão nos procedimentos adotados.</p>
+                <h5><span class='badge badge-danger'>Detratores (nota 1 - 6,9)</span></h5>
+                <p>São órgãos que demonstram insatisfação com o processo de avaliação conduzido pelo controle interno dos Correios. Podem considerar as avaliações como burocráticas, punitivas ou desconectadas da realidade operacional. Representam oportunidades críticas para o aprimoramento da metodologia de avaliação, comunicação e abordagem do órgão de controle interno, sinalizando necessidade de revisão nos procedimentos adotados.</p>
             </div>
             <p><strong>Interpretação:</strong></p>
             <ul>
-                <li><span class='text-danger'>Ruim</span>: menor que 0</li>
-                <li><span class='text-warning'>Regular</span>: 0 a 50</li>
-                <li><span class='text-info'>Bom</span>: 50 a 70</li>
-                <li><span class='text-success'>Excelente</span>: acima de 70</li>
+                <li><span class='text-danger'>Ruim</span>: < 0 (menor que zero)</li>
+                <li><span class='text-warning'>Regular</span>: [0 - 50) (de zero até 49,9)</li>
+                <li><span class='text-info'>Bom</span>: [50 - 70) (de 50 até 69,9)</li>
+                <li><span class='text-success'>Excelente</span>: ≥ 70 (maior ou igual a 70)</li>
             </ul>
         </div>
     </div>
@@ -259,7 +264,7 @@ $(document).ready(function() {
         function classificarNPS(valor) {
             const nps = parseFloat(valor);
             
-            if (nps > 70) {
+            if (nps >= 70) { // Alterado para >= 70 para incluir o valor exato 70 como Excelente
                 return {
                     texto: "Excelente",
                     classe: "nps-excelente"
@@ -370,10 +375,21 @@ $(document).ready(function() {
                 $(".formula-text").show();
             }
             
-            // Calcular o NPS (Net Promoter Score)
-            let promotores = 0, neutros = 0, detratores = 0;
-            
+            // Calcular o NPS (Net Promoter Score) baseado em órgãos respondentes
+            let orgaosRespondentes = {};
+
             dados.forEach(item => {
+                // Verificar se o item tem o campo orgao_respondente
+                const orgao = item.orgao_respondente || 'Não informado';
+                
+                // Inicializar o objeto para este órgão se ainda não existir
+                if (!orgaosRespondentes[orgao]) {
+                    orgaosRespondentes[orgao] = {
+                        somaNotas: 0,
+                        totalNotasValidas: 0
+                    };
+                }
+                
                 // Usar a média das notas para determinar a categoria NPS
                 const notas = [
                     parseFloat(item.comunicacao) || 0,
@@ -386,21 +402,36 @@ $(document).ready(function() {
                 
                 const notasValidas = notas.filter(nota => nota > 0);
                 if (notasValidas.length > 0) {
-                    const mediaNota = notasValidas.reduce((a, b) => a + b, 0) / notasValidas.length;
+                    // Adicionar à soma das notas deste órgão
+                    orgaosRespondentes[orgao].somaNotas += notasValidas.reduce((a, b) => a + b, 0);
+                    orgaosRespondentes[orgao].totalNotasValidas += notasValidas.length;
+                }
+            });
+
+            // Contar órgãos em cada categoria
+            let promotores = 0, neutros = 0, detratores = 0;
+
+            Object.keys(orgaosRespondentes).forEach(orgao => {
+                const dadosOrgao = orgaosRespondentes[orgao];
+                
+                // Calcular a média das notas para este órgão
+                if (dadosOrgao.totalNotasValidas > 0) {
+                    const mediaOrgao = dadosOrgao.somaNotas / dadosOrgao.totalNotasValidas;
                     
-                    if (mediaNota >= 9) {
+                    // Classificar o órgão com base na média
+                    if (mediaOrgao >= 9) {
                         promotores++;
-                    } else if (mediaNota >= 7) {
+                    } else if (mediaOrgao >= 7) {
                         neutros++;
-                    } else if (mediaNota > 0) {
+                    } else if (mediaOrgao > 0) {
                         detratores++;
                     }
                 }
             });
-            
-            const totalRespondentes = promotores + neutros + detratores;
-            const npsValor = totalRespondentes > 0 ? 
-                ((promotores / totalRespondentes) - (detratores / totalRespondentes)) * 100 : 0;
+
+            const totalOrgaosRespondentes = promotores + neutros + detratores;
+            const npsValor = totalOrgaosRespondentes > 0 ? 
+                ((promotores / totalOrgaosRespondentes) - (detratores / totalOrgaosRespondentes)) * 100 : 0;
             
             // Atualizar o NPS
             const elNPS = document.getElementById("npsValorContainerDT");
@@ -439,7 +470,7 @@ $(document).ready(function() {
             }
             
             // Atualizar detalhes do NPS
-            $("#npsDetalhesDT").text(`Promotores: ${promotores} | Neutros: ${neutros} | Detratores: ${detratores}`);
+            $("#npsDetalhesDT").text(`Órgãos Promotores: ${promotores} | Órgãos Neutros: ${neutros} | Órgãos Detratores: ${detratores}`);
         };
         
         // Inicializar os cards quando a tabela estiver pronta
