@@ -1,9 +1,4 @@
 <cfprocessingdirective pageEncoding ="utf-8">
-<cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
-    <cfinclude template="aviso_sessao_encerrada.htm">
-	  <cfabort>  
-</cfif>   
-<!---  --->
 
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
   SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena, Dir_Descricao, Usu_Matricula,Usu_AtivFacin
@@ -11,7 +6,7 @@
   WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
   order by Dir_Sigla
 </cfquery>
-<!---  --->
+
 <cfquery name="rsAnoPacin" datasource="#dsn_inspecao#">    
     SELECT PTC_Ano 
     FROM Pontuacao 
@@ -289,12 +284,12 @@
               tab +=  '<th scope="col">Tipo</th>'
               tab +=  '<th scope="col">Qtd. Geral</th>'
               tab +=  '<th scope="col">Qtd. Realizado</th>'
-              tab +=  '<th scope="col">Pto. Inicial(Meta1)</th>'
+              tab +=  '<th scope="col">Desconto(Meta1)</th>'
               tab +=  '<th scope="col">Pto. Obtida(Meta1)</th>'
-              tab +=  '<th scope="col">Result(Meta1)</th>'
-              tab +=  '<th scope="col">Pto. Inicial(Meta2)</th>'
+              tab +=  '<th scope="col">Resultado(Meta1)</th>'
+              tab +=  '<th scope="col">Desconto(Meta2)</th>'
               tab +=  '<th scope="col">Pto. Obtida(Meta2)</th>'
-              tab +=  '<th scope="col">Result(Meta2)</th>'
+              tab +=  '<th scope="col">Resultado(Meta2)</th>'
               tab +=  '<th scope="col">Perc.(Meta3)</th>'
               tab += '</tr>'
               tab += '</thead>'
@@ -304,25 +299,30 @@
               vlr_ini = (vlr_ini - 2);
               const json = JSON.parse(data.data.substring(vlr_ini,vlr_fin));
               const dados = json.DATA;
+              //FFI_Avaliacao,TUN_Descricao,FAC_Qtd_Geral,FFI_Qtd_Item,FFI_Meta1_Pontuacao_Obtida,FFI_Meta1_Resultado,FFI_Meta2_Pontuacao_Obtida,FFI_Meta2_Resultado,FAC_Perc_Meta3
               dados.map((ret) => {
                 numocor++
-                medmeta1 = medmeta1 + ret[3]
+                medmeta1 = medmeta1 + ret[5]
                 medmeta2 = medmeta2 + ret[7]
-                medmeta3 = medmeta3 + ret[10]
-                let url = 'href=ficha_facin_gestao_relat.cfm?ninsp='+ret[8]+'&matr='+matr
+                medmeta3 = medmeta3 + ret[8]
+                descmeta1 = eval(ret[3] - ret[4]).toFixed(2)
+                if(descmeta1 < 0){descmeta1=0}
+                descmeta2 = eval(ret[3] - ret[6]).toFixed(2)
+                if(descmeta2 < 0){descmeta2=0}
+                let url = 'href=ficha_facin_gestao_relat.cfm?ninsp='+ret[0]+'&matr='+matr
                 //alert(url)
                 tab += '<tr>'
-                  tab += '<td class="alert alert-primary"><a class="alert-link" '+url+' target="_blank">'+ret[8]+'</a></td>'
-                  tab += '<td>'+ret[11]+'</td>'
-                  tab += '<td>'+ret[9]+'</td>'
-                  tab += '<td>'+ret[0]+'</td>'
+                  tab += '<td class="alert alert-primary"><a class="alert-link" '+url+' target="_blank">'+ret[0]+'</a></td>'
                   tab += '<td>'+ret[1]+'</td>'
                   tab += '<td>'+ret[2]+'</td>'
                   tab += '<td>'+ret[3]+'</td>'
-                  tab += '<td>'+ret[5]+'</td>'
-                  tab += '<td>'+ret[6]+'</td>'
-                  tab += '<td>'+ret[7]+'</td>'
-                  tab += '<td>'+ret[10]+'</td>'
+                  tab += '<td>'+descmeta1+'</td>'
+                  tab += '<td>'+eval(ret[4]).toFixed(2)+'</td>'
+                  tab += '<td>'+eval(ret[5]).toFixed(2)+'</td>'
+                  tab += '<td>'+descmeta2+'</td>'
+                  tab += '<td>'+eval(ret[6]).toFixed(2)+'</td>'
+                  tab += '<td>'+eval(ret[7]).toFixed(2)+'</td>'
+                  tab += '<td>'+eval(ret[8]).toFixed(2)+'</td>'
                 tab += '</tr>'
               });
               tab += '<tr>'
@@ -332,11 +332,11 @@
                 tab += '<td></td>'
                 tab += '<td></td>'
                 tab += '<td></td>'
-                tab += '<td>'+medmeta1/numocor+'</td>'
+                tab += '<td>'+eval(medmeta1/numocor).toFixed(2)+'</td>'
                 tab += '<td></td>'
                 tab += '<td></td>'
-                tab += '<td>'+medmeta2/numocor+'</td>'
-                tab += '<td>'+medmeta3/numocor+'</td>'
+                tab += '<td>'+eval(medmeta2/numocor).toFixed(2)+'</td>'
+                tab += '<td>'+eval(medmeta3/numocor).toFixed(2)+'</td>'
               tab += '</tr>'
               tab += '</tbody>'
               tab += '</table>'              
