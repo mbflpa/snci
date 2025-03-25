@@ -29,9 +29,10 @@
     <cfset inspetorhd ='readonly'>   
     <cfset gestorhd =''>  
   </cfif>
+  
     <cfquery datasource="#dsn_inspecao#" name="rsFicha">
         SELECT Diretoria.Dir_Sigla as siglainsp, INP_NumInspecao, INP_Unidade, INP_DtInicInspecao, INP_DtFimInspecao, INP_DTConcluirAvaliacao, INP_DTConcluirRevisao, 
-        INP_Coordenador, Fun_Nome, Fun_Matric, IPT_MatricInspetor, 
+        INP_Coordenador, Fun_Nome, Fun_Matric, IPT_MatricInspetor, INP_Responsavel,
         Usuarios.Usu_LotacaoNome, Usuarios_1.Usu_Apelido as nomerevisor, Usuarios_1.Usu_LotacaoNome as lotacaorevisor, 
         Usuarios_1.Usu_Matricula as matrrevisor, Und_Descricao, Diretoria_1.Dir_Sigla, Diretoria_2.Dir_Sigla as siglaunid
         FROM (((((((Inspecao INNER JOIN 
@@ -136,6 +137,7 @@
         <cfset form.ptogeral = #rsRIP.TotalRIP#>
         <cfset form.meta1 = 100>
         <cfset form.meta2 = 100>
+        <cfset form.meta3 = 100>
         <cfset form.ptorevismeta1 = #rsRIP.TotalRIP#>
         <cfset form.ptorevismeta2 = #rsRIP.TotalRIP#>
         <cfset form.PercMeta1ajustar = 100>
@@ -149,6 +151,7 @@
         <cfset form.ptodev = #rsExisteFacin.FAC_Qtd_Devolvido#>
         <cfset form.meta1 = #rsExisteFacin.FAC_Perc_Revisao_Meta1#>
         <cfset form.meta2 = #rsExisteFacin.FAC_Perc_Revisao_Meta2#>
+        <cfset form.meta3 = #rsExisteFacin.FAC_Perc_Meta3#>
         <cfset form.ptorevismeta1 = #rsExisteFacin.FAC_Pontos_Revisao_Meta1#>
         <cfset form.ptorevismeta2 = #rsExisteFacin.FAC_Pontos_Revisao_Meta2#>
         <cfset form.PtoMeta1ajustar = #rsExisteFacin.FAC_Pontos_Revisao_Meta1#>
@@ -212,7 +215,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FICHA AVALIAÇÃO</title>
     <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">
-     <link rel="stylesheet" href="public/app.css">  
+    <link rel="stylesheet" href="public/app.css">  
 
     <script>
 
@@ -294,11 +297,111 @@
 </head>
 
 <!--- <body onload="meta2(true,1,1,85051071);colecao_meta2(85051071)"> --->
-<body onload="">
+
+<body style="background:##fff"> 
 <!--- <form name="facin" method="POST" action=""> --->
 <form name="formx" method="POST" action="cfc/fichafacin.cfc?method=salvarPosic" target="_self">
+    <!---
+    <table width="50%" align="left" class="table table-bordered">
+        <tr>
+            <td height="20" colspan="8"><div align="center"><strong class="titulo2">FICHA DE AVALIAÇÃO DE CONTROLE INTERNO - (FACIN)</strong></div></td>
+        </tr>
+        <tr>
+            <td colspan="8"><div align="left"><strong class="titulo2">01 - IDENTIFICAÇÃO</strong></div></td>
+        </tr>
+        <tr>
+            <td colspan="8"><strong class="exibir">Inspetores</strong></td>
+        </tr>
+        <cfloop query="rsFicha">
+            <tr>
+                <cfif trim(rsFicha.INP_Coordenador) eq trim(rsFicha.IPT_MatricInspetor)>
+                    <td>#rsFicha.Fun_Nome# <strong>(Coordena)</strong></td>
+                    <td>#rsFicha.IPT_MatricInspetor#</td>
+                    <td>#rsFicha.Usu_LotacaoNome#(SE-#rsFicha.siglainsp#)</td>
+                <cfelse>  
+                    <td>#rsFicha.Fun_Nome#</td>
+                    <td>#rsFicha.IPT_MatricInspetor#</td>
+                    <td>#rsFicha.Usu_LotacaoNome#(SE-#rsFicha.siglainsp#)</td>
+                </cfif>
+            </tr>          
+        </cfloop>  
+        <tr>
+            <td colspan="8"><strong class="exibir">Revisor(a)</strong></td>
+        </tr>
+        <tr>
+            <td>#rsFicha.nomerevisor#</td>
+            <td>#rsFicha.matrrevisor#</td>
+            <td>#rsFicha.lotacaorevisor#(SE-#rsFicha.Dir_Sigla#)</td>
+        </tr>           
+        <tr>
+            <td colspan="8"><strong class="exibir">02 - Processo Avaliado</strong></td>
+        </tr>
+        <tr>
+            <td>Nome da Unidade: #rsFicha.Und_Descricao#(SE/#rsFicha.siglaunid#)</td>
+            <td>Nº Avaliação: #rsFicha.INP_NumInspecao#</td> 
+            <td>Chefe: #rsFicha.INP_Responsavel#</td>
+        </tr> 
+        <tr>
+            <td colspan="8"><strong class="exibir">03 - Fases da Avaliação</strong></td>
+        </tr>
+        <tr>
+            <td colspan="1">Execução em campo</td>
+            <td colspan="1">Conclusão Avaliação</td>
+            <td colspan="1">Conclusão Revisão</td>
+            <td colspan="5">Conclusão SEI</td>
+        </tr> 
+        <cfset datarevis = dateformat(rsFicha.INP_DTConcluirRevisao,"DD/MM/YYYY")>
+        <cfif rsFicha.INP_DTConcluirRevisao eq ''>
+            <cfset datarevis = dateformat(now(),"DD/MM/YYYY")>
+        </cfif>
+        <tr>
+            <td colspan="1">Início: #dateformat(rsFicha.INP_DtInicInspecao,"DD/MM/YYYY")# Fim: #dateformat(rsFicha.INP_DtFimInspecao,"DD/MM/YYYY")#</td>
+            <td colspan="1">#dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</td>
+            <td colspan="1">#datarevis#</td>
+            <td colspan="5">#dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</td>
+        </tr> 
+        <tr>
+            <td colspan="8"><strong class="exibir">04 - Avaliação</strong></td>
+        </tr>
+        <cfset form.ptodev = 0>
+        <cfset auxpercptodev = 0>
+        <cfif rsDevol.totdevol gt 0>
+            <cfset form.ptodev = rsDevol.totdevol>
+            <cfset auxpercptodev = (form.ptodev / form.ptogeral) * 100>
+            <cfset auxpercptodev = numberFormat(auxpercptodev,'___.00')>
+        </cfif>
+        <tr>
+            <td colspan="1">Total de pontos avaliados: <div id="ptogeral" class="badge bg-primary text-wrap" style="width: 5rem;">#form.ptogeral#</div></td>
+            <td colspan="1">Total em Reanálise: <div id="ptodev" class="badge bg-primary text-wrap" style="width: 5rem;">#form.ptodev#</div></td>
+            <td colspan="1">Perc. em Reanálise: <div id="perdev" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#auxpercptodev#</cfoutput>%</div></td>
+            <td colspan="5">Total com correção de texto: <div id="ptodev" class="badge bg-primary text-wrap" style="width: 5rem;">#rsOrtog.recordcount#</div></td>
+        </tr> 
+        <input type="hidden" name="facpontosrevisaometa1" id="facpontosrevisaometa1" value="#form.ptorevismeta1#">
+        <input type="hidden" name="facpontosrevisaometa2" id="facpontosrevisaometa2" value="#form.ptorevismeta2#">
+        <tr>
+            <td colspan="2">Perc. Meta1: <div id="ptogeral" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta1#%</div></td>
+            <td colspan="3">Perc. Meta2: <div id="ptodev" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta2#%</div></td>
+            <td colspan="3">Perc. Meta3: <div id="ptodev" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta3#%</div></td>
+        </tr> 
+<!---        
+        <tr>
+            <td height="20" colspan="8"><div align="center"><strong class="titulo2">Metas</strong></div></td>
+        </tr>
+        <cfset grpitm = rsItem.Itn_NumGrupo & '_' & rsItem.Itn_NumItem>
+        <tr>
+            <td colspan="8"><div class="card"><a href="##" class="btn btn-primary">#grpitm# - #rsItem.Grp_Descricao# &nbsp;&nbsp;Avaliador(a) : #rsItem.RIP_MatricAvaliador# - #rsItem.Fun_Nome# - (#rsItem.Fun_Email#)</a></div></td>
+        </tr> 
+                    
+        <tr>
+            <td>
+            </td>
+        </tr>
+    --->        
+    </table>    
+--->    
 <div class="container">
 	<div class="row align-items-center">
+
         <span class="border border-primary">
             <p class="text-center"><strong>FICHA DE AVALIAÇÃO DE CONTROLE INTERNO - (FACIN)</strong></p>
         </span>  
@@ -367,6 +470,7 @@
     <input type="hidden" name="concaval" value="#dateformat(rsFicha.INP_DTConcluirAvaliacao,"YYYY-MM-DD")#">
     <label for="" class="col-sm-3 col-form-label">&nbsp;#datarevis#</label>
     <label for="" class="col-sm-3 col-form-label">&nbsp;#dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</label>
+
     <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>04.Avaliação</strong></label>
     <label for="" class="col-sm-3 col-form-label">&nbsp;Qtd. pontos avaliados &nbsp;<div id="ptogeral" class="badge bg-primary text-wrap" style="width: 4rem;">#form.ptogeral#</div></label>
     <!--- <cfif rsExisteFacin.recordcount lte 0> --->
@@ -388,6 +492,7 @@
     <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta1" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta1#</cfoutput></div></label>
     <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta2" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta2#</cfoutput></div></label>
 </div>
+
     <p class="text-center"><strong>METAS</strong></p>
 </cfoutput>
 
@@ -659,7 +764,7 @@
     <cfloop query="rsAvalia">
         <cfset matraval = rsAvalia.RIP_MatricAvaliador>
         <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
-            SELECT FFI_Meta1_Qtd_Item, FFI_Meta1_Pontuacao_Inicial, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado
+            SELECT FFI_Qtd_Item, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado
             FROM UN_Ficha_Facin_Individual
             WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' 
         </cfquery>
@@ -670,8 +775,8 @@
         <cfset form.meta1_percqggitens = numberFormat(percent,'___.00')>
         
         <cfif rsFacinInd.recordcount gt 0>
-            <cfset form.meta1_qggitens = #rsFacinInd.FFI_Meta1_Qtd_Item#>
-            <cfset form.meta1_qgptop = #rsFacinInd.FFI_Meta1_Pontuacao_Inicial#>
+            <cfset form.meta1_qggitens = #rsFacinInd.FFI_Qtd_Item#>
+            <cfset form.meta1_qgptop = #rsFacinInd.FFI_Qtd_Item#>
             <cfset form.meta1_qgpto = #rsFacinInd.FFI_Meta1_Pontuacao_Obtida#>
             <cfset form.meta1_percqggitens = #rsFacinInd.FFI_Meta1_Resultado#>
         </cfif>
@@ -696,7 +801,7 @@
         <cfset matraval = rsAvalia.RIP_MatricAvaliador>
         
         <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
-            SELECT FFI_Meta2_Qtd_Item, FFI_Meta2_Pontuacao_Inicial, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado
+            SELECT FFI_Qtd_Item, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado
             FROM UN_Ficha_Facin_Individual
             WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' 
         </cfquery>
@@ -708,8 +813,8 @@
         <cfset form.meta2_percqggitens = numberFormat(percent,'___.00')>
         
         <cfif rsFacinInd.recordcount gt 0>
-            <cfset form.meta2_qggitens = #rsFacinInd.FFI_Meta2_Qtd_Item#>
-            <cfset form.meta2_qgptop = #rsFacinInd.FFI_Meta2_Pontuacao_Inicial#>
+            <cfset form.meta2_qggitens = #rsFacinInd.FFI_Qtd_Item#>
+            <cfset form.meta2_qgptop = #rsFacinInd.FFI_Qtd_Item#>
             <cfset form.meta2_qgpto = #rsFacinInd.FFI_Meta2_Pontuacao_Obtida#>
             <cfset form.meta2_percqggitens = #rsFacinInd.FFI_Meta2_Resultado#>
         </cfif>        
@@ -756,8 +861,8 @@
     <input class="btn btn-primary" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#>
     <input class="btn btn-info" type="button" onClick="window.open('ficha_facin_Ref.cfm?numinsp=#form.numinsp#&acao=buscar','_self')" value="Voltar">
 </div> 
-<cfset meta1desconto = numberFormat((ptogrpitm/10),'___.0000')>
-<cfset meta2desconto = numberFormat((ptogrpitm/5),'___.0000')>
+<cfset meta1desconto = numberFormat((ptogrpitm/10),'___.000')>
+<cfset meta2desconto = numberFormat((ptogrpitm/5),'___.000')>
 <input type="hidden" id="meta1desconto" name="meta1desconto" value="#trim(meta1desconto)#">
 <input type="hidden" id="meta2desconto" name="meta2desconto" value="#trim(meta2desconto)#">
 <input type="hidden" id="totalNC" name="totalNC" value="#rsItem.recordcount#">
@@ -796,7 +901,7 @@
         
     <cfloop query="rsAvalia">
         <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
-            SELECT FFI_Meta1_Qtd_Item, FFI_Meta1_Pontuacao_Inicial, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado,FFI_Meta2_Qtd_Item, FFI_Meta2_Pontuacao_Inicial, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado
+            SELECT FFI_Qtd_Item, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado
             FROM UN_Ficha_Facin_Individual
             WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#'
         </cfquery>
@@ -815,13 +920,13 @@
         
         <cfif rsFacinInd.recordcount gt 0>
             <!--- meta1 --->
-            <cfset form.meta1_qggitens = #rsFacinInd.FFI_Meta1_Qtd_Item#>
-            <cfset form.meta1_qgptop = #rsFacinInd.FFI_Meta1_Pontuacao_Inicial#>
+            <cfset form.meta1_qggitens = #rsFacinInd.FFI_Qtd_Item#>
+            <cfset form.meta1_qgptop = #rsFacinInd.FFI_Qtd_Item#>
             <cfset form.meta1_qgpto = #rsFacinInd.FFI_Meta1_Pontuacao_Obtida#>
             <cfset form.meta1_percqggitens = #rsFacinInd.FFI_Meta1_Resultado#>
             <!--- meta2 --->
-            <cfset form.meta2_qggitens = #rsFacinInd.FFI_Meta2_Qtd_Item#>
-            <cfset form.meta2_qgptop = #rsFacinInd.FFI_Meta2_Pontuacao_Inicial#>
+            <cfset form.meta2_qggitens = #rsFacinInd.FFI_Qtd_Item#>
+            <cfset form.meta2_qgptop = #rsFacinInd.FFI_Qtd_Item#>
             <cfset form.meta2_qgpto = #rsFacinInd.FFI_Meta2_Pontuacao_Obtida#>
             <cfset form.meta2_percqggitens = #rsFacinInd.FFI_Meta2_Resultado#>
         </cfif>   
