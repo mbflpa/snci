@@ -3278,10 +3278,10 @@
 					var pc_aval_orientacao_mcu_orgaoResp = '#rsProc.pc_aval_orientacao_mcu_orgaoResp#';
 					var pc_aval_orientacao_id = '#arguments.pc_aval_orientacao_id#'; 
 					var numProcesso = "#rsProc.pc_processo_id#";
+					var orgaoAvaliado = "#rsProc.mcuAvaliado#";
 					var existePesquisa 	= '#rsVerificaExistePesquisa.existePesquisa#';
 					var anoProcesso = '#rsDadosProcessoPesquisa.anoProcesso#';
 					var anoPesquisaOpiniao = '#application.anoPesquisaOpiniao#';
-
 				</cfoutput>
 
 				var statusOrientacao = 3; //staus RESPOSTA DO ÓRGÃO SUBORDINADOR
@@ -3368,8 +3368,28 @@
 								.done(function(result) {	
 									$('#pcPosicAcomp').val('')
 									toastr.success('Envio da manifestação realizado com sucesso!');
+
+									if (pc_aval_orientacao_mcu_orgaoResp == orgaoAvaliado) {
+										isSubordinado = true;
+									} else {
+										// Consulta para verificar subordinação hierárquica
+										$.ajax({
+											type: "post",
+											url: "cfc/pc_cfcPaginasApoio.cfc",
+											data: {
+												method: "verificaHierarquiaOrgao",
+												orgaoAvaliado: orgaoAvaliado,
+												orgaoResponsavel: pc_aval_orientacao_mcu_orgaoResp
+											},
+											async: false,
+											success: function(response) {
+												isSubordinado = (response.trim() === "true");
+												console.log("Subordinado:", response);
+											}
+										});
+									}
 									
-									if(existePesquisa == 0 && anoProcesso >=anoPesquisaOpiniao){
+									if(existePesquisa == 0 && anoProcesso >=anoPesquisaOpiniao && isSubordinado){
 										$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
 											$('#modalOverlay').modal('show');
 											exibirTabela();
@@ -3976,4 +3996,6 @@
 		</cftransaction>
 		
 	</cffunction>
+
+	
 </cfcomponent>

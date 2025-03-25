@@ -1636,5 +1636,39 @@
 
 	</cffunction>
 
+	<cffunction name="verificaHierarquiaOrgao" access="remote" returntype="boolean" returnformat="plain" hint="Verifica se um órgão é hierarquicamente subordinado a outro">
+    <cfargument name="orgaoAvaliado" type="string" required="true">
+    <cfargument name="orgaoResponsavel" type="string" required="true">
+    
+    <cfset var isSubordinado = false>
+    
+    <cfquery name="qryHierarquia" datasource="#application.dsn_processos#">
+        WITH OrgHierarchy AS (
+            -- Primeiro nível: o próprio órgão
+            SELECT pc_org_mcu, pc_org_mcu_subord_tec, 0 AS level
+            FROM pc_orgaos
+            WHERE pc_org_mcu = <cfqueryparam value="#arguments.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
+            
+            UNION ALL
+            
+            -- Próximos níveis: órgãos subordinados (com limite de profundidade)
+            SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec, oh.level + 1
+            FROM pc_orgaos o
+            INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+            WHERE oh.level < 10  -- Limite de segurança para evitar loops infinitos
+        )
+        SELECT COUNT(*) AS total
+        FROM OrgHierarchy
+        WHERE pc_org_mcu = <cfqueryparam value="#arguments.orgaoResponsavel#" cfsqltype="cf_sql_varchar">
+        
+    </cfquery>
+    
+    <cfif qryHierarquia.total GT 0>
+        <cfset isSubordinado = true>
+    </cfif>
+    
+    <cfreturn isSubordinado>
+</cffunction>
+
 		
 </cfcomponent>

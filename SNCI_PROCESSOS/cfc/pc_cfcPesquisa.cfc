@@ -85,6 +85,20 @@
     
 
     <cfquery name="rsProcSemPesquisa" datasource="#application.dsn_processos#" timeout="120">
+      WITH OrgHierarchy AS (
+          -- Primeiro nível: o próprio órgão
+          SELECT pc_org_mcu, pc_org_mcu_subord_tec, 0 AS level
+          FROM pc_orgaos
+          WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+          
+          UNION ALL
+          
+          -- Próximos níveis: órgãos subordinados (com limite de profundidade)
+          SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec, oh.level + 1
+          FROM pc_orgaos o
+          INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+          WHERE oh.level < 10  -- Limite de segurança para evitar loops infinitos
+      )
       SELECT pc_processo_id FROM
       (
           SELECT DISTINCT pc_processos.pc_processo_id  
@@ -95,6 +109,14 @@
               ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
           WHERE pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
               AND RIGHT(pc_processos.pc_processo_id, 4) >= <cfqueryparam cfsqltype="cf_sql_integer" value="#application.anoPesquisaOpiniao#">
+          AND (
+                pc_processos.pc_num_orgao_avaliado = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
+                OR EXISTS (
+                    SELECT 1
+                    FROM OrgHierarchy
+                    WHERE OrgHierarchy.pc_org_mcu_subord_tec = pc_processos.pc_num_orgao_avaliado
+                )
+            )
           AND pc_processos.pc_processo_id NOT IN 
           (
               SELECT pc_processo_id 
@@ -121,6 +143,7 @@
                   <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
           )
       ) AS unificado
+     
     </cfquery>
 
 
