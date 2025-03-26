@@ -98,6 +98,9 @@
                 <cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 11 and #application.rsUsuarioParametros.pc_usu_perfil# neq 16>
                     AND processo.pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
                 </cfif>
+                <cfif arguments.ano NEQ "Todos">
+                    AND RIGHT(processo.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                </cfif>
         </cfquery>
         
         <!--- Calcular médias por pesquisa e NPS por órgão --->

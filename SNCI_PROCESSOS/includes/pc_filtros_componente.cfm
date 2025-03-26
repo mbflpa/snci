@@ -363,10 +363,16 @@ $(document).ready(function() {
         // Ativar o botão do ano selecionado
         $(`input[name="opcaoAno${componenteID}"][value="${anoSelecionado}"]`).parent().addClass('active');
         
+        // Disparar o evento inicial para notificar que já tem um ano selecionado
+        setTimeout(function() {
+            console.log('Disparando evento inicial de filtro para ano:', anoSelecionado);
+            onFiltroAlterado('ano', anoSelecionado);
+        }, 50);
+        
         // Event handler
         $(`input[name="opcaoAno${componenteID}"]`).change(function() {
             const novoAno = $(this).val();
-           
+            console.log('Filtro de ano alterado via UI para:', novoAno);
             onFiltroAlterado('ano', novoAno);
         });
     </cfif>

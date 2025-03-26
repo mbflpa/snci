@@ -213,6 +213,14 @@
                         </div>
                     </div>
                     
+                    <!-- Componente de filtro de ano -->
+                    <cfmodule template="includes/pc_filtros_componente.cfm" 
+                        exibirAno="true" 
+                        exibirOrgao="false"
+                        exibirDiretoria="false"
+                        exibirStatus="false" 
+                        componenteID="filtros-dashboard-pesquisas">
+                    
                     <div class="filtro-sticky-spacer"></div>
                     
                     <!-- Incluir dashboard de métricas -->
@@ -297,13 +305,18 @@
             
             // Função para mostrar modal de carregamento
             function mostrarModal() {
-                // Certificar-se de que o modal não está aberto antes
-                fecharModal();
-
-                // Atrasar um pouco antes de abrir para garantir que fechamento anterior foi concluído
-                setTimeout(function() {
-                    $('#modalOverlay').modal('show');
-                }, 100);
+                try {
+                    // Certificar-se de que o modal anterior foi fechado
+                    fecharModal();
+                    
+                    // Exibir o modal existente diretamente no DOM
+                    $('#modalOverlay').css('display', 'block');
+                    $('#modalOverlay').addClass('show');
+                    
+                    console.log('Modal de carregamento exibido');
+                } catch (e) {
+                    console.error('Erro ao mostrar modal:', e);
+                }
             }
             
             // Função revisada para fechar o modal
@@ -671,8 +684,34 @@
                 
             }
             
-            // Initialize the table directly without waiting for filter component
-            inicializarTabela("Todos");
+            // Aguardar o evento de DOM pronto + um pequeno timeout para garantir que o componente de filtro foi carregado
+            setTimeout(function() {
+                // Verificar se o valor do filtro de ano foi definido pelo componente de filtro
+                const anoInicial = window.anoSelecionado || "Todos";
+                console.log("Inicializando tabela com ano:", anoInicial);
+                
+                // Inicializar a tabela com o ano selecionado no filtro
+                inicializarTabela(anoInicial);
+            }, 100);
+
+            // Listener de evento para alterações no filtro
+            document.addEventListener('filtroAlterado', function(e) {
+                console.log('Evento filtroAlterado recebido:', e.detail);
+                
+                // Verificar se a alteração veio do filtro de ano
+                if (e.detail.tipo === 'ano') {
+                    console.log('Filtro de ano alterado para:', e.detail.valor);
+                    
+                    // Mostrar modal de carregamento antes de atualizar a tabela
+                    mostrarModal();
+                    
+                    // Pequeno delay para garantir que o modal está visível antes de iniciar o processamento
+                    setTimeout(function() {
+                        // Reinicializar a tabela com o novo valor de ano
+                        inicializarTabela(e.detail.valor);
+                    }, 200);
+                }
+            });
 
             // Adicionar funcionalidade para o botão de filtro "Outros" usando delegação de eventos
             $(document).on('click', '#btnToggleSearchPane', function(e) {
@@ -705,7 +744,6 @@
                     } else {
                         $('#btnToggleSearchPane').removeClass('text-primary').addClass('text-dark');
                         $('.dtsp-panesContainer').hide();
-                        $('.dtsp-searchPanes .dtsb-searchBuilder').hide();
                     }
                 }
             });
