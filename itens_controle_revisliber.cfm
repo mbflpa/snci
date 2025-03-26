@@ -188,6 +188,7 @@
   <cfif isDefined("Form.cbareaCS")><cfset Session.E01.cbareaCS = Form.cbareaCS><cfelse><cfset Session.E01.cbareaCS = ''></cfif>
   <cfif isDefined("Form.dbfrmnumsei")><cfset Session.E01.dbfrmnumsei = Form.dbfrmnumsei><cfelse><cfset Session.E01.dbfrmnumsei = ''></cfif>
   <cfif isDefined("Form.modal")><cfset Session.E01.modal = Form.modal><cfelse><cfset Session.E01.modal = ''></cfif>
+  <cfif isDefined("Form.manchete")><cfset Session.E01.manchete = Form.manchete><cfelse><cfset Session.E01.manchete = ''></cfif>
 
 <cfif Form.acao is 'Anexar'>
 	<cftry>
@@ -318,7 +319,9 @@
 			<cfset tamrec = len(trim(aux_recom))>
 			, RIP_Recomendacoes='#aux_recom#'
 		</cfif>
-		<cfif (tammel neq form.tamMelho) or (tamrec neq form.tamrecom)>
+			<cfset taman = len(trim(form.manchete))>
+			, RIP_Manchete='#form.manchete#'
+		<cfif (tammel neq form.tamMelho) or (tamrec neq form.tamrecom) or (taman neq form.tamanchete)>
 			, RIP_Correcao_Revisor = '1'
 		</cfif>
 		WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_NumItem=#FORM.nitem#
@@ -696,7 +699,7 @@
     left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidade = TNC_Unidade)
 	WHERE Pos_Unidade='#URL.unid#' AND Pos_Inspecao='#URL.ninsp#' AND Pos_NumGrupo=#URL.ngrup# AND Pos_NumItem=#URL.nitem#
 </cfquery>
-		  
+<cfparam name="form.manchete" default="#qResposta.RIP_Manchete#">		  
 <cfquery name="qInspetor" datasource="#dsn_inspecao#">
 	SELECT IPT_MatricInspetor, Fun_Nome
 	FROM Inspetor_Inspecao INNER JOIN Funcionarios ON IPT_MatricInspetor = Fun_Matric AND IPT_MatricInspetor =
@@ -1112,7 +1115,10 @@ function validarform()
 			return false;
 		}
 		//----------------------------------------------
-
+		if (document.form1.manchete.value ==''){
+			alert('Informar o campo Manchete');
+			return false;
+		}
 		if (document.form1.nci.value == 'Sim')
 		{
 			// controle de dados do N.SEI da NCI
@@ -1335,7 +1341,11 @@ function abrirPopup(url,w,h)
 		  </table>		  
 	  </td>
     </tr> 
-</cfif>			
+</cfif>	
+<tr>
+	<td bgcolor="eeeeee" align="center"><span class="titulos">Manchete:</span></td>
+	<td colspan="6" bgcolor="eeeeee"><textarea  name="manchete" id="manchete" cols="168" rows="3" wrap="VIRTUAL" class="form"><cfoutput>#form.manchete#</cfoutput></textarea></td>
+</tr>		
 	 </cfoutput>
 
 	<tr>
@@ -1348,6 +1358,7 @@ function abrirPopup(url,w,h)
 	</tr> 
 	<input type="hidden" name="tamMelho" id="tamMelho" value="<cfoutput>#len(trim(qResposta.RIP_Comentario))#</cfoutput>">
 	<input type="hidden" name="tamrecom" id="tamrecom" value="<cfoutput>#len(trim(qResposta.RIP_Recomendacoes))#</cfoutput>">
+	<input type="hidden" name="tamanchete" id="tamanchete" value="<cfoutput>#len(trim(form.manchete))#</cfoutput>">
 
     <tr bgcolor="eeeeee">
       <td colspan="5">

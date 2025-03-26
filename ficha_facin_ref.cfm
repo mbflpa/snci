@@ -378,26 +378,15 @@
 		<input type="hidden" id="acao" name="acao" value="">
 		<input type="hidden" id="somenteavaliarmeta3" name="somenteavaliarmeta3" value="<cfoutput>#somenteavaliarmeta3#</cfoutput>">
 		<input type="hidden" id="salvarsn" name="salvarsn" value="S">
+		<input type="hidden" id="grpacesso" name="grpacesso" value="<cfoutput>#grpacesso#</cfoutput>">
+		<input type="hidden" id="matrusu" name="matrusu" value="<cfoutput>#trim(qAcesso.Usu_Matricula)#</cfoutput>">
 	</form>
 </cfif>
 </body>
 <script src="public/jquery-3.7.1.min.js"></script>
 <script type="text/javascript" src="public/axios.min.js"></script>
 <script>
-	function numericos() {
-		var tecla = window.event.keyCode;
-		//permite digitar das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
-		//if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 
-			if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
-				//alert(tecla);
-			//  if () {
-				event.returnValue = false;
-			// }
-			}
-
-		//}
-	}
 	//================
 	function aviso() {
 		$('div#aviso').hide()
@@ -427,8 +416,7 @@
 						$('#aviso').show(500)
 					}
 				}
-				
-				
+								
 				if($('#concfacin').val() != '' && $('#concfacin').val() != undefined && $('#concfacin').val() != null){
 					$('#salvarsn').val('N')
 					$('#aviso').html('Conclusão da FACIN realizada em '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
@@ -506,6 +494,19 @@
 			document.formx.submit();
 		}	  
 	}	
+	function numericos() {
+		var tecla = window.event.keyCode;
+		//permite digitar das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+		//if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 
+			if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
+				//alert(tecla);
+			//  if () {
+				event.returnValue = false;
+			// }
+			}
+
+		//}
+	}
 </script>
 </html>
