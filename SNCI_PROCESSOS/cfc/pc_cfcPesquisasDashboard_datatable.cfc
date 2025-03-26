@@ -100,13 +100,54 @@
                 </cfif>
         </cfquery>
         
-        <!--- Converter para array de objetos --->
+        <!--- Calcular médias por pesquisa e NPS por órgão --->
+        <cfset mediasOrgaos = structNew()>
+        <cfset contadoresOrgaos = structNew()>
         <cfset arrResult = []>
+        
+        <!--- Primeiro loop: calcular média de cada pesquisa e agrupar por órgão --->
         <cfloop query="qPesquisas">
+            <cfset mediaPesquisa = 0>
+            <cfset countNotas = 0>
+            <cfset somaNotas = 0>
+            
+            <!--- Calcular média da pesquisa atual --->
+            <cfset notas = [
+                val(qPesquisas.pc_pesq_comunicacao),
+                val(qPesquisas.pc_pesq_interlocucao),
+                val(qPesquisas.pc_pesq_reuniao_encerramento),
+                val(qPesquisas.pc_pesq_relatorio),
+                val(qPesquisas.pc_pesq_pos_trabalho),
+                val(qPesquisas.pc_pesq_importancia_processo)
+            ]>
+            
+            <cfloop array="#notas#" index="nota">
+                <cfif nota GT 0>
+                    <cfset somaNotas += nota>
+                    <cfset countNotas++>
+                </cfif>
+            </cfloop>
+            
+            <cfif countNotas GT 0>
+                <cfset mediaPesquisa = somaNotas / countNotas>
+                
+                <!--- Agrupar médias por órgão respondente --->
+                <cfif len(trim(qPesquisas.orgao_resp_sigla))>
+                    <cfif NOT structKeyExists(mediasOrgaos, qPesquisas.orgao_resp_sigla)>
+                        <cfset mediasOrgaos[qPesquisas.orgao_resp_sigla] = 0>
+                        <cfset contadoresOrgaos[qPesquisas.orgao_resp_sigla] = 0>
+                    </cfif>
+                    <cfset mediasOrgaos[qPesquisas.orgao_resp_sigla] += mediaPesquisa>
+                    <cfset contadoresOrgaos[qPesquisas.orgao_resp_sigla]++>
+                </cfif>
+            </cfif>
+            
+            <!--- Adicionar pesquisa ao array de resultados com a média da pesquisa --->
             <cfset objPesquisa = {
                 "id" = qPesquisas.pc_pesq_id,
                 "processo" = qPesquisas.pc_processo_id,
                 "orgao_respondente" = qPesquisas.orgao_resp_sigla,
+                "orgao_respondente_mcu" = qPesquisas.pc_org_mcu,
                 "ano" = qPesquisas.ano,
                 "orgao_origem" = qPesquisas.orgao_origem_sigla,
                 "diretoria_cs" = qPesquisas.diretoria_sigla,
@@ -121,9 +162,35 @@
                 "pos_trabalho" = qPesquisas.pc_pesq_pos_trabalho,
                 "importancia" = qPesquisas.pc_pesq_importancia_processo,
                 "pontualidade" = qPesquisas.pc_pesq_pontualidade,
-                "observacao" = qPesquisas.pc_pesq_observacao
+                "observacao" = qPesquisas.pc_pesq_observacao,
+                "media_pesquisa" = round(mediaPesquisa * 10) / 10
             }>
             <cfset arrayAppend(arrResult, objPesquisa)>
+        </cfloop>
+        
+        <!--- Calcular média final para cada órgão e classificação NPS --->
+        <cfset classificacoesNPS = structNew()>
+        <cfloop collection="#mediasOrgaos#" item="orgao">
+            <cfif contadoresOrgaos[orgao] GT 0>
+                <cfset mediaFinalOrgao = mediasOrgaos[orgao] / contadoresOrgaos[orgao]>
+                
+                <cfif mediaFinalOrgao GTE 9>
+                    <cfset classificacoesNPS[orgao] = "Promotor">
+                <cfelseif mediaFinalOrgao GTE 7>
+                    <cfset classificacoesNPS[orgao] = "Neutro">
+                <cfelse>
+                    <cfset classificacoesNPS[orgao] = "Detrator">
+                </cfif>
+            </cfif>
+        </cfloop>
+        
+        <!--- Adicionar classificação NPS aos resultados --->
+        <cfloop array="#arrResult#" index="objPesquisa">
+            <cfif structKeyExists(classificacoesNPS, objPesquisa.orgao_respondente)>
+                <cfset objPesquisa["classificacao_nps"] = classificacoesNPS[objPesquisa.orgao_respondente]>
+            <cfelse>
+                <cfset objPesquisa["classificacao_nps"] = "">
+            </cfif>
         </cfloop>
         
         <cfset response = {
@@ -133,4 +200,4 @@
         <cfreturn response>
     </cffunction>
     
-</cfcomponent> 
+</cfcomponent>

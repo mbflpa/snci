@@ -305,26 +305,20 @@ $(document).ready(function() {
             window.previousCardValuesDT.totalPesquisas = totalPesquisas;
             
             // Calcular a média geral de todas as notas válidas
-            let todasNotas = [];
+            let somaMedias = 0;
+            let countMedias = 0;
+            
             dados.forEach(item => {
-                const notas = [
-                    parseFloat(item.comunicacao) || 0,
-                    parseFloat(item.interlocucao) || 0,
-                    parseFloat(item.reuniao) || 0,
-                    parseFloat(item.relatorio) || 0,
-                    parseFloat(item.pos_trabalho) || 0,
-                    parseFloat(item.importancia) || 0
-                ];
-                
-                notas.forEach(nota => {
-                    if (nota > 0) todasNotas.push(nota);
-                });
+                if (item.media_pesquisa && parseFloat(item.media_pesquisa) > 0) {
+                    somaMedias += parseFloat(item.media_pesquisa);
+                    countMedias++;
+                }
             });
             
             // Calcular média geral
             let mediaGeral = 0;
-            if (todasNotas.length > 0) {
-                mediaGeral = todasNotas.reduce((sum, nota) => sum + nota, 0) / todasNotas.length;
+            if (countMedias > 0) {
+                mediaGeral = somaMedias / countMedias;
             }
             
             // Atualizar o card de média geral
@@ -375,57 +369,27 @@ $(document).ready(function() {
                 $(".formula-text").show();
             }
             
-            // Calcular o NPS (Net Promoter Score) baseado em órgãos respondentes
-            let orgaosRespondentes = {};
-
+            // Calcular o NPS utilizando as classificações já calculadas pelo servidor
+            // Criar um Set para armazenar órgãos únicos e suas classificações
+            const orgaosUnicos = new Map();
+            
+            // Preencher o mapa com os órgãos e suas classificações mais recentes
             dados.forEach(item => {
-                // Verificar se o item tem o campo orgao_respondente
-                const orgao = item.orgao_respondente || 'Não informado';
-                
-                // Inicializar o objeto para este órgão se ainda não existir
-                if (!orgaosRespondentes[orgao]) {
-                    orgaosRespondentes[orgao] = {
-                        somaNotas: 0,
-                        totalNotasValidas: 0
-                    };
-                }
-                
-                // Usar a média das notas para determinar a categoria NPS
-                const notas = [
-                    parseFloat(item.comunicacao) || 0,
-                    parseFloat(item.interlocucao) || 0,
-                    parseFloat(item.reuniao) || 0,
-                    parseFloat(item.relatorio) || 0,
-                    parseFloat(item.pos_trabalho) || 0,
-                    parseFloat(item.importancia) || 0
-                ];
-                
-                const notasValidas = notas.filter(nota => nota > 0);
-                if (notasValidas.length > 0) {
-                    // Adicionar à soma das notas deste órgão
-                    orgaosRespondentes[orgao].somaNotas += notasValidas.reduce((a, b) => a + b, 0);
-                    orgaosRespondentes[orgao].totalNotasValidas += notasValidas.length;
+                if (item.orgao_respondente && item.classificacao_nps) {
+                    orgaosUnicos.set(item.orgao_respondente, item.classificacao_nps);
                 }
             });
-
+            
             // Contar órgãos em cada categoria
             let promotores = 0, neutros = 0, detratores = 0;
-
-            Object.keys(orgaosRespondentes).forEach(orgao => {
-                const dadosOrgao = orgaosRespondentes[orgao];
-                
-                // Calcular a média das notas para este órgão
-                if (dadosOrgao.totalNotasValidas > 0) {
-                    const mediaOrgao = dadosOrgao.somaNotas / dadosOrgao.totalNotasValidas;
-                    
-                    // Classificar o órgão com base na média
-                    if (mediaOrgao >= 9) {
-                        promotores++;
-                    } else if (mediaOrgao >= 7) {
-                        neutros++;
-                    } else if (mediaOrgao > 0) {
-                        detratores++;
-                    }
+            
+            orgaosUnicos.forEach((classificacao) => {
+                if (classificacao === 'Promotor') {
+                    promotores++;
+                } else if (classificacao === 'Neutro') {
+                    neutros++;
+                } else if (classificacao === 'Detrator') {
+                    detratores++;
                 }
             });
 

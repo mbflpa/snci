@@ -134,6 +134,39 @@
                 flex-wrap: wrap;
                 gap: 10px;
             }
+             /* Estilos para as classificações dos órgãos */
+            .classificacao-promotor {
+                background-color: #28a745;
+                color: white;
+                font-weight: bold;
+                padding: 3px 8px;
+                border-radius: 12px;
+                display: inline-block;
+            }
+            
+            .classificacao-neutro {
+                background-color: #ffc107;
+                color: #343a40;
+                font-weight: bold;
+                padding: 3px 8px;
+                border-radius: 12px;
+                display: inline-block;
+            }
+            
+            .classificacao-detrator {
+                background-color: #dc3545;
+                color: white;
+                font-weight: bold;
+                padding: 3px 8px;
+                border-radius: 12px;
+                display: inline-block;
+            }
+            /* Estilos para o popover NPS */
+            .popover .nps-info-item {
+                text-align: justify !important;
+            }
+
+          
 	</style>
 </head>
 
@@ -215,6 +248,7 @@
                                             <th>Processo</th>
                                             <th>Ano</th>
                                             <th>Órgão Respondente</th>
+                                            <th>Classificação NPS</th>
                                             <th>Órgão de Origem</th>
                                             <th>Diretoria / CS</th>
                                             <th>Órgão Avaliado</th>
@@ -309,7 +343,21 @@
                 }
             }
             
-           
+            // Função para renderizar classificação NPS com base na string recebida do servidor
+            function renderizarClassificacaoNPS(classificacao) {
+                if (!classificacao) return '-';
+                
+                switch(classificacao) {
+                    case 'Promotor':
+                        return '<span class="classificacao-promotor">Promotor</span>';
+                    case 'Neutro':
+                        return '<span class="classificacao-neutro">Neutro</span>';
+                    case 'Detrator':
+                        return '<span class="classificacao-detrator">Detrator</span>';
+                    default:
+                        return '-';
+                }
+            }
             
             // Função para inicializar a tabela DataTable com SearchPanes
             function inicializarTabela(anoSelecionado) {
@@ -330,7 +378,6 @@
                             d.ano = anoSelecionado;
                         },
                         dataSrc: function(json) {
-                           
                             fecharModal();
                             
                             let data = json;
@@ -378,7 +425,7 @@
                     ],
                     searchPanes: {
                         cascadePanes: true,
-                        columns: [2,3,4,5,6,7,8],
+                        columns: [2,3,5,6,7,8,9],
                         threshold: 1,
                         layout: 'columns-1',
                         initCollapsed: true,
@@ -388,6 +435,36 @@
                         { data: "processo" },
                         { data: "ano" },
                         { data: "orgao_respondente" },
+                        { 
+                            data: "classificacao_nps",
+                            title: 'Classificação NPS <span  data-toggle="popover" data-html="true" data-placement="right"  \
+                                    title="<span class=\'popover-title-custom\'>Classificação do NPS</span>" \
+                                    data-content="\
+                                    <div class=\'nps-info-content\'>\
+                                    <div class=\'nps-info-item\'>\
+                                        Classificação baseada na média de todas pesquisas de opinião por órgão respondente e não apenas da média de uma única pesquisa.\
+                                    </div>\
+                                        <div class=\'nps-info-item promotores-info\'>\
+                                            <div class=\'color-dot\'></div>\
+                                            <strong>Promotores:</strong> (nota média 9,0 - 10,0)\
+                                        </div>\
+                                        <div class=\'nps-info-item neutros-info\'>\
+                                            <div class=\'color-dot\'></div>\
+                                            <strong>Neutros:</strong> (nota média 7,0 - 8,9)\
+                                        </div>\
+                                        <div class=\'nps-info-item detratores-info\'>\
+                                            <div class=\'color-dot\'></div>\
+                                            <strong>Detratores:</strong> (nota média 1 - 6,9)\
+                                        </div>\
+                                    </div>">\
+                                    <i class="fas fa-info-circle text-info" style="color:#fff!important"></i>\
+                                </span>',
+                            render: function(data, type, row) {
+                                return renderizarClassificacaoNPS(data);
+                            }
+                        },
+                        { data: "orgao_respondente_mcu" },
+                        { data: "ano" },
                         { data: "orgao_origem" },
                         { data: "diretoria_cs" },
                         { data:  "orgao_avaliado" },
@@ -419,23 +496,11 @@
                             }
                         },
                         { 
-                            // Média calculada dinamicamente
-                            data: null,
-                            render: function(data, type, row) {
-                                const notas = [
-                                    parseFloat(row.comunicacao) || 0,
-                                    parseFloat(row.interlocucao) || 0,
-                                    parseFloat(row.reuniao) || 0,
-                                    parseFloat(row.relatorio) || 0,
-                                    parseFloat(row.pos_trabalho) || 0,
-                                    parseFloat(row.importancia) || 0
-                                ];
-                                
-                                const notasValidas = notas.filter(nota => nota > 0);
-                                if (notasValidas.length === 0) return '-';
-                                
-                                const media = notasValidas.reduce((a, b) => a + b, 0) / notasValidas.length;
-                                return formatarNota(media.toFixed(1));
+                            // Usar a média já calculada no servidor
+                            data: "media_pesquisa",
+                            render: function(data) {
+                                if (!data) return '-';
+                                return formatarNota(data);
                             }
                         },
                         { data: "observacao" }
@@ -447,10 +512,10 @@
                     columnDefs: [
                         { 
                             className: "text-center", 
-                            targets: [2, 7, 8, 9, 10, 11, 12, 13,14]
+                            targets: [1,2,4,8,10,11,12,13,14,15,16,17,18] // Colunas que devem ser centralizadas
                         },
                         { 
-                            targets: 15, // coluna de observações
+                            targets: 19, // coluna de observações
                             className: 'observacao-coluna',
                             width: '1000px',
                             render: function(data) {
@@ -487,6 +552,16 @@
                 
                 dataTable.on('draw.dt', function() {
                     atualizarEstadoFiltro();
+                });
+
+                // Adicionar este código após a inicialização do DataTable
+                dataTable.on('init.dt', function() {
+                    // Inicializar popovers no cabeçalho da tabela
+                    $('#tabelaPesquisasDetalhada thead [data-toggle="popover"]').popover({
+                        container: 'body',
+                        trigger: 'hover',
+                        html: true
+                    });
                 });
                 
                 // Inicializar o estado da mensagem de filtro
