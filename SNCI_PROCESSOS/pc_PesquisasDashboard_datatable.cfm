@@ -463,8 +463,6 @@
                                 return renderizarClassificacaoNPS(data);
                             }
                         },
-                        { data: "orgao_respondente_mcu" },
-                        { data: "ano" },
                         { data: "orgao_origem" },
                         { data: "diretoria_cs" },
                         { data:  "orgao_avaliado" },
