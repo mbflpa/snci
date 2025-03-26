@@ -542,6 +542,14 @@ $(document).ready(function() {
                                 max: 10,
                                 stepSize: 2
                             }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                autoSkip: true,
+                                autoSkipPadding: 5
+                            }
                         }]
                     },
                     tooltips: {
