@@ -406,7 +406,9 @@
 
 		<cfset var qPosicionamentos = getTotalPosicionamentosIniciaisCI()>
 		<cfset var qOrgaosSemUsuario = getOrgaosSemUsuarioCI()>
-		<cfset var qOrgaosSemUsuarioCount = getTotalOrgaosSemUsuarioCI()>
+		<!-- desativado temporáriamente para implantação da nova versão
+		<cfset var qOrgaosSemUsuarioCount = getTotalOrgaosSemUsuarioCI()>-->
+		<cfset var qOrgaosSemUsuarioCount = 0>
 
 		
 
@@ -440,8 +442,8 @@
 					</div>
 				</div>
 		</cfif>
-
-		<cfif #qOrgaosSemUsuarioCount# neq 0 and FindNoCase("intranetsistemaspe", application.auxsite)>
+        <!-- desativado temporáriamente para implantação da nova versão-->
+		<cfif #qOrgaosSemUsuarioCount# neq 0 and FindNoCase("intranetsistemaspeTestando", application.auxsite)>
 			<div class="row" style="margin-top:30px;">
 				<div class="col-md-12">	
 					<div class="card " style="background:transparent;box-shadow:none">
