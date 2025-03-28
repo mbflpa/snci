@@ -35,9 +35,7 @@
 		 <cfset aux_mes = 12>
 		 <cfset aux_ano = aux_ano - 1>
 	<cfelse>
-		<cfif auxdia lte 10>
-			<cfset aux_mes = (aux_mes - 1)> 
-		</cfif>
+		<cfset aux_mes = (aux_mes - 1)> 
 	</cfif>
  </cfif>
 

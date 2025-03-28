@@ -49,12 +49,12 @@ function validarform() {
       alert('Usuário(a), o mês selecionado para o ano selecionado ainda não gerado!');
       return false;
     }
-  /* 
+  
     if (eval(messelec) == eval(mesatual) && (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
-      alert('Usuário(a), o mês selecionado para o ano selecionado ainda nãonnnn gerado!');
+      alert('Usuário(a), o mês selecionado para o ano selecionado ainda não gerado!');
       return false;
     }	
-  */
+  
 	} 
 
   if (eval(frm.frmano.value) != eval(frm.frmanoatual.value) && (mesatual == 1) && (diaatual) <= 10 && (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')) {
