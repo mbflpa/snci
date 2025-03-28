@@ -305,11 +305,17 @@
 			INNER JOIN pc_orgaos ON pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp 
 			INNER JOIN pc_orgaos AS pc_orgaos2 ON pc_orgaos2.pc_org_mcu = pc_processos.pc_num_orgao_origem
 			LEFT JOIN pc_usuarios ON pc_usu_lotacao = pc_aval_orientacao_mcu_orgaoResp
-            WHERE (pc_usuarios.pc_usu_lotacao IS NULL OR pc_usuarios.pc_usu_status ='D') AND NOT pc_aval_orientacao_mcu_orgaoResp IS NULL
+			WHERE NOT EXISTS (
+				SELECT 1 
+				FROM pc_usuarios 
+				WHERE pc_usuarios.pc_usu_lotacao = pc_aval_orientacao_mcu_orgaoResp
+				AND pc_usuarios.pc_usu_status = 'A'
+			)
+			AND NOT pc_aval_orientacao_mcu_orgaoResp IS NULL
 			<cfif "#application.rsUsuarioParametros.pc_usu_perfil#" eq 3 OR "#application.rsUsuarioParametros.pc_usu_perfil#" eq 11>
 				AND pc_orientacao_status_finalizador = 'N'
 			<cfelse>
-				 AND pc_orientacao_status_finalizador = 'N' 
+				AND pc_orientacao_status_finalizador = 'N' 
 				AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
 			</cfif>
 			
@@ -317,11 +323,11 @@
 
 			SELECT DISTINCT 
 				CASE  
-					WHEN pc_aval_melhoria_sug_orgao_mcu = '' OR  pc_aval_melhoria_sug_orgao_mcu is null THEN pc_aval_melhoria_num_orgao 
+					WHEN pc_aval_melhoria_sug_orgao_mcu = '' OR pc_aval_melhoria_sug_orgao_mcu IS NULL THEN pc_aval_melhoria_num_orgao 
 					ELSE pc_aval_melhoria_sug_orgao_mcu 
 				END AS mcuOrgaoResp,
 				CASE  
-					WHEN pc_aval_melhoria_sug_orgao_mcu = ''  OR  pc_aval_melhoria_sug_orgao_mcu is null THEN pc_orgaos.pc_org_sigla 
+					WHEN pc_aval_melhoria_sug_orgao_mcu = '' OR pc_aval_melhoria_sug_orgao_mcu IS NULL THEN pc_orgaos.pc_org_sigla 
 					ELSE pc_orgaos2.pc_org_sigla 
 				END AS siglaOrgaoResp,
 				pc_orgaos3.pc_org_mcu AS mcuOrigem,
@@ -332,14 +338,21 @@
 			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao 
 			LEFT JOIN pc_orgaos AS pc_orgaos2 ON pc_orgaos2.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
 			LEFT JOIN pc_orgaos AS pc_orgaos3 ON pc_orgaos3.pc_org_mcu = pc_processos.pc_num_orgao_origem
-			LEFT JOIN pc_usuarios ON pc_usu_lotacao = pc_aval_melhoria_num_orgao
-			LEFT JOIN pc_usuarios AS pc_usuarios2 ON pc_usuarios2.pc_usu_lotacao = pc_aval_melhoria_sug_orgao_mcu
-			WHERE (pc_usuarios.pc_usu_lotacao IS NULL OR pc_usuarios.pc_usu_status ='D')
+			WHERE NOT EXISTS (
+				SELECT 1 
+				FROM pc_usuarios 
+				WHERE pc_usuarios.pc_usu_lotacao = pc_aval_melhoria_num_orgao
+				AND pc_usuarios.pc_usu_status = 'A'
+			)
+			AND NOT EXISTS (
+				SELECT 1 
+				FROM pc_usuarios 
+				WHERE pc_usuarios.pc_usu_lotacao = pc_aval_melhoria_sug_orgao_mcu
+				AND pc_usuarios.pc_usu_status = 'A'
+			)
 			<cfif "#application.rsUsuarioParametros.pc_usu_perfil#" eq 3 OR "#application.rsUsuarioParametros.pc_usu_perfil#" eq 11>
-				AND pc_usuarios2.pc_usu_lotacao IS NULL 
 				AND pc_aval_melhoria_status = 'P'
 			<cfelse>
-				AND pc_usuarios2.pc_usu_lotacao IS NULL 
 				AND pc_aval_melhoria_status = 'P' 
 				AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
 			</cfif>
