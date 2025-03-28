@@ -303,14 +303,14 @@
 			INNER JOIN pc_processos ON pc_processo_id = pc_aval_processo
 			INNER JOIN pc_orientacao_status ON pc_orientacao_status_id = pc_aval_orientacao_status
 			INNER JOIN pc_orgaos ON pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp 
-			INNER JOIN pc_orgaos AS pc_orgaos2 ON pc_orgaos2.pc_org_mcu = pc_num_orgao_origem
+			INNER JOIN pc_orgaos AS pc_orgaos2 ON pc_orgaos2.pc_org_mcu = pc_processos.pc_num_orgao_origem
 			LEFT JOIN pc_usuarios ON pc_usu_lotacao = pc_aval_orientacao_mcu_orgaoResp
             WHERE (pc_usuarios.pc_usu_lotacao IS NULL OR pc_usuarios.pc_usu_status ='D') AND NOT pc_aval_orientacao_mcu_orgaoResp IS NULL
 			<cfif "#application.rsUsuarioParametros.pc_usu_perfil#" eq 3 OR "#application.rsUsuarioParametros.pc_usu_perfil#" eq 11>
 				AND pc_orientacao_status_finalizador = 'N'
 			<cfelse>
 				 AND pc_orientacao_status_finalizador = 'N' 
-				AND pc_num_orgao_origem = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+				AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
 			</cfif>
 			
 			UNION
@@ -331,86 +331,28 @@
 			INNER JOIN pc_processos ON pc_processo_id = pc_aval_processo
 			LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao 
 			LEFT JOIN pc_orgaos AS pc_orgaos2 ON pc_orgaos2.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
-			LEFT JOIN pc_orgaos AS pc_orgaos3 ON pc_orgaos3.pc_org_mcu = pc_num_orgao_origem
+			LEFT JOIN pc_orgaos AS pc_orgaos3 ON pc_orgaos3.pc_org_mcu = pc_processos.pc_num_orgao_origem
 			LEFT JOIN pc_usuarios ON pc_usu_lotacao = pc_aval_melhoria_num_orgao
 			LEFT JOIN pc_usuarios AS pc_usuarios2 ON pc_usuarios2.pc_usu_lotacao = pc_aval_melhoria_sug_orgao_mcu
-			WHERE pc_usuarios.pc_usu_lotacao IS NULL OR pc_usuarios.pc_usu_status ='D'
+			WHERE (pc_usuarios.pc_usu_lotacao IS NULL OR pc_usuarios.pc_usu_status ='D')
 			<cfif "#application.rsUsuarioParametros.pc_usu_perfil#" eq 3 OR "#application.rsUsuarioParametros.pc_usu_perfil#" eq 11>
 				AND pc_usuarios2.pc_usu_lotacao IS NULL 
 				AND pc_aval_melhoria_status = 'P'
 			<cfelse>
 				AND pc_usuarios2.pc_usu_lotacao IS NULL 
 				AND pc_aval_melhoria_status = 'P' 
-				AND pc_orgaos3.pc_org_mcu = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
+				AND pc_processos.pc_num_orgao_origem = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
 			</cfif>
 			ORDER BY siglaOrgaoResp
 		</cfquery>
 		<cfreturn qOrgaosSemUsuario>
 	</cffunction>
 
-	<cffunction name="getTotalOrgaosSemUsuarioCI" access="public" returntype="numeric">
-		<cfset var qOrgaosSemUsuarioCount = 0>
-		<cfquery datasource="#application.dsn_processos#" name="qOrgaosSemUsuarioCount">
-			SELECT COUNT(DISTINCT mcuOrgaoResp) AS totalOrgaos
-			FROM (
-				SELECT 
-					pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp AS mcuOrgaoResp
-				FROM pc_avaliacao_orientacoes
-				INNER JOIN pc_avaliacoes ON pc_aval_id = pc_aval_orientacao_num_aval
-				INNER JOIN pc_processos ON pc_processo_id = pc_aval_processo
-				INNER JOIN pc_orientacao_status ON pc_orientacao_status_id = pc_aval_orientacao_status
-				INNER JOIN pc_orgaos ON pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp 
-				INNER JOIN pc_orgaos AS pc_orgaos2 ON pc_orgaos2.pc_org_mcu = pc_num_orgao_origem
-				LEFT JOIN pc_usuarios ON pc_usu_lotacao = pc_aval_orientacao_mcu_orgaoResp
-				<cfif "#application.rsUsuarioParametros.pc_usu_perfil#" eq 3 OR "#application.rsUsuarioParametros.pc_usu_perfil#" eq 11>
-					WHERE pc_usuarios.pc_usu_lotacao IS NULL OR pc_usuarios.pc_usu_status ='D'
-					AND pc_orientacao_status_finalizador = 'N'
-				<cfelse>
-					WHERE pc_usuarios.pc_usu_lotacao IS NULL OR pc_usuarios.pc_usu_status ='D'
-					AND pc_orientacao_status_finalizador = 'N' 
-					AND pc_num_orgao_origem = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
-				</cfif>
-				
-				UNION
-		
-				SELECT 
-					CASE  
-						WHEN pc_aval_melhoria_sug_orgao_mcu = '' THEN pc_aval_melhoria_num_orgao 
-						ELSE pc_aval_melhoria_sug_orgao_mcu 
-					END AS mcuOrgaoResp
-				FROM pc_avaliacao_melhorias
-				INNER JOIN pc_avaliacoes ON pc_aval_id = pc_aval_melhoria_num_aval
-				INNER JOIN pc_processos ON pc_processo_id = pc_aval_processo
-				LEFT JOIN pc_orgaos ON pc_org_mcu = pc_aval_melhoria_num_orgao 
-				LEFT JOIN pc_orgaos AS pc_orgaos2 ON pc_orgaos2.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
-				LEFT JOIN pc_orgaos AS pc_orgaos3 ON pc_orgaos3.pc_org_mcu = pc_num_orgao_origem
-				LEFT JOIN pc_usuarios ON pc_usu_lotacao = pc_aval_melhoria_num_orgao
-				LEFT JOIN pc_usuarios AS pc_usuarios2 ON pc_usuarios2.pc_usu_lotacao = pc_aval_melhoria_sug_orgao_mcu
-				<cfif "#application.rsUsuarioParametros.pc_usu_perfil#" eq 3 OR "#application.rsUsuarioParametros.pc_usu_perfil#" eq 11>
-					WHERE pc_usuarios.pc_usu_lotacao IS NULL OR pc_usuarios.pc_usu_status ='D'
-					AND pc_usuarios2.pc_usu_lotacao IS NULL OR pc_usuarios2.pc_usu_status ='D'
-					AND pc_aval_melhoria_status = 'P'
-				<cfelse>
-					WHERE pc_usuarios.pc_usu_lotacao IS NULL OR pc_usuarios.pc_usu_status ='D'
-					AND pc_usuarios2.pc_usu_lotacao IS NULL  OR pc_usuarios2.pc_usu_status ='D'
-					AND pc_aval_melhoria_status = 'P' 
-					AND pc_orgaos3.pc_org_mcu = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">
-				</cfif>
-			) AS subquery
-		</cfquery>
-		<cfreturn qOrgaosSemUsuarioCount.totalOrgaos[1]>
-	</cffunction>
-
-
 	<cffunction name="alertasCI"   access="remote" hint="mostra alertas para o controle interno na página index.">
 
 		<cfset var qPosicionamentos = getTotalPosicionamentosIniciaisCI()>
 		<cfset var qOrgaosSemUsuario = getOrgaosSemUsuarioCI()>
-		<!-- desativado temporáriamente para implantação da nova versão
-		<cfset var qOrgaosSemUsuarioCount = getTotalOrgaosSemUsuarioCI()>-->
-		<cfset var qOrgaosSemUsuarioCount = 0>
-
-		
+		<cfset var qOrgaosSemUsuarioCount = qOrgaosSemUsuario.RecordCount>
 
 
 		<cfif #qPosicionamentos# neq 0 >     
@@ -442,8 +384,8 @@
 					</div>
 				</div>
 		</cfif>
-        <!-- desativado temporáriamente para implantação da nova versão-->
-		<cfif #qOrgaosSemUsuarioCount# neq 0 and FindNoCase("intranetsistemaspeTestando", application.auxsite)>
+
+		<cfif #qOrgaosSemUsuarioCount# neq 0 and (FindNoCase("intranetsistemaspe", application.auxsite) OR FindNoCase("localhost", application.auxsite))>
 			<div class="row" style="margin-top:30px;">
 				<div class="col-md-12">	
 					<div class="card " style="background:transparent;box-shadow:none">
@@ -528,12 +470,12 @@
 	</cffunction>
 
 	<cffunction name="alertasOrgaosSemUsuarioCINavBar"   access="remote" hint="mostra alertas para o controle interno na página index.">
-		<cfset var qOrgaosSemUsuario = getTotalOrgaosSemUsuarioCI()>
-		
-		<cfif #qOrgaosSemUsuario# eq 1>
-			<a class="dropdown-item" href="../SNCI_PROCESSOS/./index.cfm" >Existe <strong>01</strong> órgão sem usuários cadastrados ou ativos.</a>
-		<cfelseif #qOrgaosSemUsuario# gt 1>
-			<a class="dropdown-item" href="../SNCI_PROCESSOS/./index.cfm" >Existem <cfoutput><strong>#qOrgaosSemUsuario#</strong></cfoutput> órgãos sem usuários cadastrados ou ativos.</a>
+		<cfset var qOrgaosSemUsuario = getOrgaosSemUsuarioCI()>
+		<cfset var qOrgaosSemUsuarioCount = qOrgaosSemUsuario.RecordCount>
+		<cfif #qOrgaosSemUsuarioCount# eq 1>
+			<a class="dropdown-item" >Existe <strong>01</strong> órgão sem usuários cadastrados ou ativos.</a>
+		<cfelseif #qOrgaosSemUsuarioCount# gt 1>
+			<a class="dropdown-item" >Existem <cfoutput><strong>#qOrgaosSemUsuarioCount#</strong></cfoutput> órgãos sem usuários cadastrados ou ativos.</a>
 		</cfif>
 	
 	</cffunction>
@@ -542,9 +484,10 @@
 	<cffunction name="totalAlertasCI" access="remote" returntype="struct" returnformat="json" hint="Retorna o total de alertas">
 		<cfset var total = 0>
 		<cfset var qPos = getTotalPosicionamentosIniciaisCI()>
-		<cfset var qOrgaosSemUsuario = getTotalOrgaosSemUsuarioCI()>
+		<cfset var qOrgaosSemUsuario = getOrgaosSemUsuarioCI()>
+		<cfset var qOrgaosSemUsuarioCount = qOrgaosSemUsuario.RecordCount>
 		
-		<cfset total = qPos + qOrgaosSemUsuario>
+		<cfset total = qPos + qOrgaosSemUsuarioCount>
 		
 		<cfreturn { "total": total }>
 	</cffunction>

@@ -49,9 +49,7 @@
 						<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right alertaNavBar" style="margin-top: 5px;">
 							<!-- Message Start -->
 							<div class="mensagemAlertaNavBar" id="alertasPosicionamentosIniciaisCINavBarDiv" ></div>
-							<!--Desativado temporariamente
-							<div class="mensagemAlertaNavBar" id="alertasOrgaosSemUsuarioCINavBarDiv" ></div>-->
-							<!-- Message End -->
+							<div class="mensagemAlertaNavBar" id="alertasOrgaosSemUsuarioCINavBarDiv" ></div>
 							<div class="dropdown-arrow_navbar"></div>
 						</div>
 					</li>
@@ -101,8 +99,8 @@
 						atualizaBadgeAlertas();
 					} else {
 						mostraAlertasPosicionamentosIniciaisCI();
-						//mostraAlertasOrgaosSemUsuarioCI();
-						//atualizaBadgeAlertasCI();
+						mostraAlertasOrgaosSemUsuarioCI();
+						atualizaBadgeAlertasCI();
 					}
 				</cfoutput>
 			});
