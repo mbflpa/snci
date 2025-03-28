@@ -735,7 +735,7 @@
 <title>Sistema Nacional de Controle Interno</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<script type="text/javascript" src="ckeditor\ckeditor.js"></script>
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">   
 <script src="public/bootstrap/bootstrap.bundle.min.js"></script>
 <script type="text/javascript" src="public\jquery-3.2.1.min.js"></script>
