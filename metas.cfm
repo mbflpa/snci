@@ -1,4 +1,4 @@
-<!--- #se#  === #frmano#<br> --->
+
 <cfprocessingdirective pageEncoding ="utf-8"> 
 <cfoutput>
 	<cfif frmano lte 2022>
@@ -13,11 +13,7 @@
 	select Usu_GrupoAcesso,Usu_Matricula,Usu_Coordena,Usu_DR from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
 <cfset grpacesso = ucase(Trim(qUsuario.Usu_GrupoAcesso))>
-<!---
-<cfif frmano eq year(now()) and frmmes lt 5 and grpacesso neq 'GESTORMASTER'>
-	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=Favor aguardar, tela em manutencao para o ano/mes selecionado!">
-</cfif> 
---->
+
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 
 <cfset total=0>
@@ -43,11 +39,7 @@ function listar(a,b,c){
 </script>
 </head>
 <body>
-  <!---
-  <cfoutput>
-    #frmano#,#frmmes#    
-  </cfoutput>
---->
+
 <form action="" method="post" target="_blank" name="form1">
   <cfset dtlimit = CreateDate(#frmano#,#frmmes#,1)>
   <cfset aux_mes = int(month(dtlimit))>

@@ -380,41 +380,6 @@
 				And_HrPosic='000011'
 			</cfquery>
 		</cfif>
-
-	    <!--- Verificar registro estão na Situação 11(Em Liberacao Inspecao) na tabela ParecerUnidade 		
-		<cfquery name="qEmLiberacao" datasource="#dsn_inspecao#">
-			SELECT Pos_Situacao_Resp FROM ParecerUnidade
-			WHERE Pos_Unidade='#unid#' AND 
-			Pos_Inspecao='#ninsp#' AND 
-			Pos_Situacao_Resp = 11
-		</cfquery>
-		<cfquery name="rs11SN" datasource="#dsn_inspecao#">
-				SELECT And_NumInspecao FROM Andamento
-				WHERE And_Unidade='#Form.unid#' AND And_NumInspecao='#Form.ninsp#' AND And_NumGrupo=#Form.ngrup# AND And_NumItem=#Form.nitem# 
-				AND And_Situacao_Resp = 11
-		</cfquery> 			 
-
-		<cfif qEmLiberacao.Pos_Situacao_Resp eq 11>
-			<cfif rs11SN.recordcount lte 0>
-				<cfif form.pontocentlzSN eq 'S' and FORM.nci eq 'Sim' and qVerificaTipo.Und_TipoUnidade neq 12 and qVerificaTipo.Und_TipoUnidade neq 16>
-					<cfquery datasource="#dsn_inspecao#">
-						INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-						VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 11, '000011','#qVerificaTipo.Und_CodReop#')
-					</cfquery>
-				<cfelseif form.pontocentlzSN eq 'S' and FORM.nci eq 'Sim' and (qVerificaTipo.Und_TipoUnidade eq 12 or qVerificaTipo.Und_TipoUnidade eq 16)>
-					<cfquery datasource="#dsn_inspecao#">
-						INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-						VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 11, '000011','#qVerificaArea.Rep_CodArea#')
-					</cfquery>
-				<cfelse>
-					<cfquery datasource="#dsn_inspecao#">
-						INSERT Andamento (And_NumInspecao, And_Unidade, And_NumGrupo, And_NumItem, And_DtPosic, And_username, And_Situacao_Resp, And_HrPosic, And_Area)
-						VALUES ('#Form.ninsp#', '#Form.unid#', #Form.ngrup#, #Form.nitem#, #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#, '#CGI.REMOTE_USER#', 11, '000011','#qVerificaTipo.Und_CodReop#')
-					</cfquery>
-				</cfif>
-			</cfif>
-		</cfif>
-		--->
     <cfelse>
 		<!--- trabalhar com os possiveis intencoes de passar do Status = 0-RE ou 11-EL para 19-TA ou 16-TS --->
 		<cfset auxsitresp = 19>

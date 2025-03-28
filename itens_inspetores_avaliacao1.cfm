@@ -101,9 +101,6 @@
 		</cfquery>
 	</cfif>
 
-<!--- <cfif IsDefined("FORM.submit") AND IsDefined("FORM.acao")> --->
-<!--- <cfif IsDefined("FORM.submit")> --->
-
 	<!--- 15/03/2023 --->	
 	<!--- anexar arquivo --->
 	<cfif isDefined("Form.acao") and Form.acao is 'anexar'>
@@ -162,12 +159,7 @@
 				<cfset auxfrmsobra = Replace(FORM.frmsobra,'.','','All')>
 				<cfset auxfrmsobra = Replace(auxfrmsobra,',','.','All')>
 			</cfif> 
-<!---			
-			<cfset auxpbfimor = Replace(FORM.pbfimor,'.','','All')>
-			<cfset auxpbfimor = Replace(auxpbfimor,',','.','All')>
-			<cfset auxecfmor = Replace(FORM.ecfmor,'.','','All')>
-			<cfset auxecfmor = Replace(auxecfmor,',','.','All')>	
---->
+
 			<cfset RIPReincInspecao = ''>
 			<cfset RIPReincGrupo = 0>
 			<cfset RIPReincItem = 0>
@@ -256,12 +248,7 @@
 				<cfset auxfrmemrisco = Replace(FORM.frmemrisco,'.','','All')>
 				<cfset auxfrmemrisco = Replace(auxfrmemrisco,',','.','All')>
 			</cfif> 
-<!---
-			<cfset auxpbfimor = Replace(FORM.pbfimor,'.','','All')>
-			<cfset auxpbfimor = Replace(auxpbfimor,',','.','All')>
-			<cfset auxecfmor = Replace(FORM.ecfmor,'.','','All')>
-			<cfset auxecfmor = Replace(auxecfmor,',','.','All')>	
---->			
+		
 			<cfset RIPReincInspecao = ''>
 			<cfset RIPReincGrupo = 0>
 			<cfset RIPReincItem = 0>
@@ -279,10 +266,7 @@
 				RIP_Sobra=#auxfrmsobra#,
 				RIP_EmRisco=#auxfrmemrisco#,
 				RIP_ReincInspecao = '#RIPReincInspecao#',
-<!---				
-				RIP_PotencialBeneficioFinanceiro = #auxpbfimor#,
-				RIP_EstimativaCustoFinanceiro = #auxecfmor#,
---->				
+			
 				RIP_ReincGrupo = #RIPReincGrupo#,
 				RIP_ReincItem = #RIPReincItem#,
 				RIP_UserName = '#CGI.REMOTE_USER#',
@@ -342,15 +326,7 @@
 		, RIP_Falta=#auxfrmfalta#
 		, RIP_Sobra=#auxfrmsobra#
 		, RIP_EmRisco=#auxfrmemrisco#
-<!---
-		<cfset auxpbfimor = Replace(FORM.pbfimor,'.','','All')>
-		<cfset auxpbfimor = Replace(auxpbfimor,',','.','All')>
-		<cfset auxecfmor = Replace(FORM.ecfmor,'.','','All')>
-		<cfset auxecfmor = Replace(auxecfmor,',','.','All')>	
 
-		,RIP_PotencialBeneficioFinanceiro = #auxpbfimor#
-		,RIP_EstimativaCustoFinanceiro = #auxecfmor#
---->
 		<cfif FORM.avalItem eq 'N' and IsDefined("FORM.frmreincInsp") and form.frmrsIncidencia neq 0>
 			, RIP_ReincInspecao = '#FORM.frmreincInsp#'
 			, RIP_ReincGrupo = #FORM.frmreincGrup#
@@ -1275,7 +1251,6 @@ function validarform(){
 		if (document.form1.acao.value == 'anexar'){
 				if(document.getElementById('arquivo').value==""){
 						alert('Selecione um arquivo para anexar!');
-						//document.getElementById('arquivo').focus();
 						$('#arquivo').focus()
 						document.getElementById("aguarde").style.visibility = "hidden";
 						return false;

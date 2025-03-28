@@ -3,7 +3,6 @@
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
 </cfif>  
-<!---  --->
 
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena, Dir_Descricao, Usu_Matricula
@@ -57,7 +56,9 @@ ORDER BY Andt_AnoExerc DESC
 		<cfset aux_mes = 12>
 		<cfset aux_ano = aux_ano - 1>
    <cfelse>
-   		<cfset aux_mes = (aux_mes - 1)>
+		<cfif auxdia lte 10>
+			<cfset aux_mes = (aux_mes - 1)> 
+		</cfif>
    </cfif>
 </cfif>
 
@@ -102,9 +103,11 @@ aux_ano:#aux_ano#  === aux_mes:#aux_mes#<br>
 <CFSET GIL = GIL>   
 </cfoutput>
 --->
+<!---
 <cfif (grpacesso eq 'SUPERINTENDENTE')>
 	<cfset dtlimit = "2024/12/31">
 </cfif>
+--->
 <cfoutput>
 <cfif grpacesso eq 'SUPERINTENDENTE' OR grpacesso eq 'GERENTES' OR grpacesso eq 'ORGAOSUBORDINADOR' OR grpacesso eq 'SUBORDINADORREGIONAL'>
     <cflocation url="slnc.cfm?se=#qAcesso.Usu_DR#&frmano=#year(dtlimit)#&anoexerc=#year(dtlimit)#&dtlimit=#dtlimit#&anoatual=year(now())">
@@ -136,11 +139,13 @@ function valida_form() {
 	//alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 
+/*	
 	if (eval(frm.frmano.value) == eval(frm.anoatual.value) && (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
 		alert('Usuário(a), o ano/mês selecionado ainda não disponível!');
 		frm.frmano.focus();
 		return false;
-	}		
+	}	
+*/			
 //alert(frm.anoatual.value + '  ' + frm.frmano.value + '  ' + frm.dtlimit.value);
 
 	//alert(frm.dtlimit.value);

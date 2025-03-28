@@ -375,9 +375,7 @@
                                     </label>
                                 </div>
                             </div>  
-                            <label for="selAltModalidade" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px">
-                                Modalidade
-                            </label>
+                            <label for="selAltModalidade" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px">Modalidade</label>
                             <select name="selAltModalidade" id="selAltModalidade" class="form-select" aria-label="Default select example">                                      
                                 <option selected="selected" value="">---</option>
                             </select>    
@@ -387,79 +385,6 @@
                 </div>
 
                 <div class="accordion" id="acordion-altgrpitm">
-                    <!---
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="altum">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#altprimeiro" aria-expanded="true" aria-controls="altprimeiro" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
-                                <strong>ANO / GRUPO / ITEM / MODALIDADE</strong>
-                            </button>
-                        </h2>
-                        <div id="altprimeiro" class="accordion-collapse collapse show" aria-labelledby="altum" data-bs-parent="#acordion-altgrpitm">
-                            <div class="accordion-body">
-                                <div class="row">
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Ano</label>
-                                    </div>
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Grupo</label>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select name="selAltItemAno" id="selAltItemAno" class="form-select" aria-label="Default select example">									                                                                                                                     
-                                                <option value="" selected>---</option>   
-                                                <cfloop query="rsAnoPontuacao">                                             
-                                                    <option value="<cfoutput>#rsAnoPontuacao.PTC_Ano#</cfoutput>"><cfoutput>#rsAnoPontuacao.PTC_Ano#</cfoutput></option>
-                                                </cfloop>
-                                            </select>	
-                                        </label>
-                                    </div>
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">           
-                                            <select name="selAltItemGrupo" id="selAltItemGrupo" class="form-select" aria-label="Default select example">	
-                                                <option selected="selected" value="">---</option>									
-                                            </select> 
-                                        </label>
-                                    </div>
-                                </div>   
-                                <div class="row"> 
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
-                                    </div>
-                                </div>   
-                                <div class="row">
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">Item</label>
-                                    </div>   
-                                </div>                                  
-                                <div class="row">                            
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
-                                            <select id="selAltItem" name="selAltItem" class="form-select" aria-label="Default select example">
-                                                <option selected="selected" value="">---</option>
-                                            </select>
-                                        </label>
-                                    </div>
-                                </div>   
-                                <div class="row"> 
-                                    <div class="col">
-                                        <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________
-
-                                        </label>
-                                    </div>
-                                </div>  
-                                <label for="selAltModalidade" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px">
-                                    Modalidade
-                                </label>
-                                <select name="selAltModalidade" id="selAltModalidade" class="form-select" aria-label="Default select example">                                      
-                                    <option selected="selected" value="">---</option>
-                                </select>                                                                    
-                            </div>
-                        </div>
-                    </div>
-                --->
-                    <!--- final altprimeiro --->
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="altdois">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#altsegundo" aria-expanded="false" aria-controls="altsegundo" style="background:#ccd;color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">
@@ -1114,21 +1039,41 @@
 //            }
             //Efetuar limpeza dos campos em tela
             function ajustarcampos(){
-                let txt='';
-                $('#altItemDescricao').val(txt); 
-                $('#altItemManchete').val(txt); 
-                $('#selAltItemValorDec option[value=""]').attr('selected','selected');
-                $('#selAltVisualizacao option[value=""]').attr('selected','selected');
-                $('#selAltValidObrig option[value=""]').attr('selected','selected'); 
-                CKEDITOR.instances['altItemOrientacao'].setData(txt); 
-                CKEDITOR.instances['altItemAmostra'].setData(txt);   
-                CKEDITOR.instances['altItemNorma'].setData(txt);  
-                CKEDITOR.instances['altItemPreRelato'].setData(txt);  
-                CKEDITOR.instances['altItemOrientacaoRelato'].setData(txt);  
-                         
+                let prots = '<option value="">---</option>'
+                let txt=''
+                $('#altItemDescricao').val(txt)
+                $('#altItemManchete').val(txt) 
+                $('#selAltItemValorDec option[value=""]').attr('selected','selected')
+                $('#selAltVisualizacao option[value=""]').attr('selected','selected')
+                $('#selAltValidObrig option[value=""]').attr('selected','selected')
+                CKEDITOR.instances['altItemOrientacao'].setData(txt) 
+                CKEDITOR.instances['altItemAmostra'].setData(txt)   
+                CKEDITOR.instances['altItemNorma'].setData(txt) 
+                CKEDITOR.instances['altItemPreRelato'].setData(txt)  
+                CKEDITOR.instances['altItemOrientacaoRelato'].setData(txt)  
+                $("#altclassifcontrole").html(prots) 
+                $('#altcontroletestado').val(txt)
+                $("#altcategcontrole").html(prots)
+                $("#altcategoriarisco").html(prots) 
+                $('#altcategoriariscooutros').val(txt)  
+                $("#altmacroprocesso").html(prots) 
+                $("#altprocesson1").html(prots)  
+                $('#altprocesson1naoseaplica').val(txt)         
+                $("#altprocesson2").html(prots) 
+                $("#altprocesson3").html(prots)
+                $('#altprocesson3outros').val(txt) 
+                $("#altgestordir").html(prots)
+                $("#altgestordepto").html(prots)
+                $("#altobjetivoestrategico").html(prots)
+                $("#altriscoestrategico").html(prots)
+                $("#altindicadorestrategico").html(prots)
+                $("#altcomponentecoso").html(prots)
+                $("#altprincipioscoso").html(prots)
+                exibirplanoteste('0','0')         
             }            
             // BUSCAR OS GRUPOS PELO ANO SELECIONADO  
             $('#selAltItemAno').change(function(e){
+                ajustarcampos()
                 var anogrupo = $(this).val(); 
                 //alert(anogrupo);
                 //buscar Grupos
@@ -1161,6 +1106,7 @@
             }) // FIM BUSCAR OS GRUPOS PELO ANO SELECIONADO       
             // BUSCAR OS ITENS DO GRUPO SELECIONADO
             $('#selAltItemGrupo').change(function(e){
+                ajustarcampos()
                 let ano = $('#selAltItemAno').val();
                 let grupo = $(this).val(); 
                 //buscar Grupos
@@ -1193,6 +1139,7 @@
             })  // FIM BUSCAR OS ITENS DO GRUPO SELECIONADO
             // BUSCAR AS MODALIDADES DO ITEM SELECIONADO
             $('#selAltItem').change(function(e){
+                ajustarcampos()
                 let ano = $('#selAltItemAno').val();
                 let grupo = $('#selAltItemGrupo').val();
                 let itm = $(this).val();

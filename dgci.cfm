@@ -57,8 +57,9 @@ SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<c
 	<cfelseif aux_mes is 12>	
 		<cfset dtlimit = aux_ano & "/11/30">	   				   			   
 	</cfif>
-  <!--- dia 10/02/2025 temporário --->
+  <!--- dia 10/02/2025 temporário 
   <cfset dtlimit = "2024/12/31">
+--->
 </cfif>
 <cfquery name="qSE" datasource="#dsn_inspecao#">
 	SELECT Dir_Codigo, Dir_Descricao
@@ -154,11 +155,7 @@ SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena FROM Usuarios WHERE Usu_login = (<c
   <cfset COLB = '(' & #SLNC# & ' * 0.45) + (' & #numberFormat(PRCI,999.0)# & ' * 0.55) = ' & #MetaPer# & '%'>
 </cfif>
 <!---  --->
-<!--- MES:#aux_mes# <br>
-PRCI:#rsMetas.Met_PRCI# #rsMetas.Met_PRCI# <br>
-SLNC:#SLNC# #rsMetas.Met_SLNC#<BR> 
-Result_Acum: #Result_Acum#<br>
---->
+
 </cfoutput>
 <html>
 <head>

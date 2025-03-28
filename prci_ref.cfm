@@ -4,8 +4,6 @@
 	  <cfabort> 
 </cfif>     
 
-<!---  --->
-
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 SELECT Usu_GrupoAcesso, Usu_DR, Dir_Sigla, Usu_Coordena, Dir_Descricao, Usu_Matricula 
 FROM Diretoria INNER JOIN Usuarios ON Dir_Codigo = Usu_DR 
@@ -55,14 +53,12 @@ ORDER BY Andt_AnoExerc DESC
 		<cfset aux_mes = 12>
 		<cfset aux_ano = aux_ano - 1>
    <cfelse>
-   		<cfset aux_mes = (aux_mes - 1)>
+	<cfif auxdia lte 10>
+		<cfset aux_mes = (aux_mes - 1)> 
+	</cfif>
    </cfif>
 </cfif>
 
-<!---
- <cfoutput>aux_ano:#aux_ano#  === aux_mes:#aux_mes#</cfoutput><BR> 
-<cfset gil = gil> 
---->
 <cfif aux_mes is 1>
     <cfset dtlimit = aux_ano & "/01/31">
 <cfelseif aux_mes is 2>  
@@ -98,9 +94,11 @@ dtlimit:#dtlimit#
 <cfset gil=gil>
 </cfoutput>
 --->
+<!---
 <cfif (grpacesso eq 'SUPERINTENDENTE')>
 	<cfset dtlimit = "2024/12/31">
 </cfif>
+--->
 <cfif grpacesso eq 'SUPERINTENDENTE' OR grpacesso eq 'GERENTES' OR grpacesso eq 'ORGAOSUBORDINADOR' OR grpacesso eq 'SUBORDINADORREGIONAL'>
     <cflocation url="prci.cfm?se=#qAcesso.Usu_DR#&anoexerc=#year(dtlimit)#&dtlimit=#dtlimit#&frmano=#year(dtlimit)#&anoatual=year(now())"> 
 	<!--- <cfinclude template="cabecalho.cfm"> --->
@@ -128,11 +126,13 @@ function valida_form() {
 	alert(frm.anoatual.value + '  ' + frm.frmano.value);
 	frm.dtlimit.value = frm.frmano.value + '/12/31';
 	} 	
+/*
 	if (eval(frm.frmano.value) == eval(frm.anoatual.value)&& (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
 		alert('Usuário(a), o ano/mês selecionado ainda não disponível!');
 		frm.frmano.focus();
 		return false;
   	}	
+*/
 //=========================================	
 	if (frm.mes.value=='---'){
 	  alert('Informar o Mês!');
@@ -344,10 +344,12 @@ function mudar(a){
 	  <input name="anoexerc" type="hidden" value="<cfoutput>#year(dtLimit)#</cfoutput>">
 	  <input name="anoatual" type="hidden" value="<cfoutput>#year(now())#</cfoutput>">
 	  <input name="frmUsuGrupoAcesso" type="hidden" value="<cfoutput>#grpacesso#</cfoutput>">
-<!--- <cfoutput>#dtlimit#</cfoutput><br>
+<!--- 
+<cfoutput>#dtlimit#</cfoutput><br>
 <cfoutput>#dtlimit#</cfoutput><br>
 <cfoutput>#year(dtLimit)#</cfoutput><br>
-<cfoutput>#year(now())#</cfoutput> --->	 	  
+<cfoutput>#year(now())#</cfoutput> 	 
+--->	  
 </form>
 </body>
 </html>
