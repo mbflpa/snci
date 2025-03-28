@@ -258,6 +258,7 @@ function mensagem(){
 <head>
 <title>Sistema Nacional de Controle Interno</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 <link href="css.css" rel="stylesheet" type="text/css">
 </head>
 

@@ -210,8 +210,7 @@ windowprops = "location=no,"
 window.open(page, "Popup", windowprops);
 }
 </script>
-<html>
-<head>
+
 <script>
 //permite digita�ao apenas de valores num�ricos
 function numericos() {
@@ -301,10 +300,12 @@ function validaForm(){
 	 }   
   }     
 </script>
-
+<html>
+  <head>
 <title>Sistema de Acompanhamento das Respostas das Auditorias</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 </head>
 <body onLoad="exibirArea(0);exibirData(0)">
 <cfinclude template="cabecalho.cfm">

@@ -337,7 +337,7 @@ function validaForm() {
 
 //Fun��o que abre uma p�gina em Popup
 function popupPage() {
-<cfoutput>  //p�gina chamada, seguida dos par�metros n�mero, unidade, grupo e item
+<cfoutput>  //página chamada, seguida dos par�metros n�mero, unidade, grupo e item
 var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
 </cfoutput>
 windowprops = "location=no,"
@@ -350,6 +350,7 @@ window.open(page, "Popup", windowprops);
 <head>
 <title>Sistema Nacional de Controle Interno</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 <link href="css.css" rel="stylesheet" type="text/css">
 
 

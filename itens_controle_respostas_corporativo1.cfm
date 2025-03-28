@@ -330,8 +330,7 @@ windowprops = "location=no,"
 window.open(page, "Popup", windowprops);
 }
 </script>
-<html>
-<head>
+
 <script>
 function desabilita_campos_unidade(){
   var frm = document.forms[0];
@@ -467,10 +466,12 @@ function validaForm(){
   }    
     
 </script>
-
+<html>
+<head>
 <title>Sistema de Acompanhamento das Respostas das Auditorias</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 </head>
 <body onLoad="exibirArea(0); exibirData(0);exibirOrgao(0);">
 <cfinclude template="cabecalho.cfm">

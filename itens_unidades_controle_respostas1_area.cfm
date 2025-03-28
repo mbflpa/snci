@@ -386,6 +386,7 @@
 <head>
 <title>Sistema Nacional de Controle Interno</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
 <link href="css.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
 <cfinclude template="mm_menu.js">
