@@ -184,6 +184,7 @@
     <head>
         <title>SNCI - CADASTRO DE GRUPOS E ITENS</title>
         <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+        <script type="text/javascript" src="ckeditor\ckeditor.js"></script>
         <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">     
         <style type="text/css">    
             .tituloDivCadGrupo{
