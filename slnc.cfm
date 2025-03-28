@@ -56,8 +56,9 @@
 	<cfelseif aux_mes is 12>	
 		<cfset dtlimit = aux_ano & "/11/30">	   				   			   
 	</cfif>
-	  <!--- dia 10/02/2025 temporário --->
+	  <!--- dia 10/02/2025 temporário 
 	  <cfset dtlimit = "2024/12/31">
+	--->
 </cfif>
 
 	<cfset CurrentPage=GetFileFromPath(GetTemplatePath())>

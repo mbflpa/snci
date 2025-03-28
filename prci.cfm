@@ -1,11 +1,8 @@
 <!---
-  <cfdump  var="#url#">
-  <cfoutput>
- #dtlimit#
- </cfoutput>
-<cfset gil = gil>
+<cfoutput>
+<cfdump var="#url#">
+</cfoutput>
 --->
-
 <!--- versão anterior --->
 <cfif frmano lte 2022>
 	<cflocation url="prci_2022.cfm?se=#se#&frmano=#frmano#&Submit1=Confirmar&dtlimit=#dtlimit#&dtlimitatual=#dtlimitatual#&anoexerc=#frmano#&anoatual=#anoatual#">
@@ -57,8 +54,9 @@
     <cfelseif aux_mes is 12>	
       <cfset dtlimit = aux_ano & "/11/30">	   				   			   
     </cfif>
-   <!--- dia 10/02/2025 temporário --->
+   <!--- dia 10/02/2025 temporário 
     <cfset dtlimit = "2024/12/31">
+  --->
 </cfif>
 	<cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
 <!--- 

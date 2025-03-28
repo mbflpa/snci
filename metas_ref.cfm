@@ -4,12 +4,6 @@
 	  <cfabort> 
 </cfif>   
 
-<!---  --->
-
-<!---  <cfif TRIM(qAcesso.Usu_GrupoAcesso) NEQ 'GESTORMASTER'>
-	 <cflocation url="SNCI_MENSAGEM.cfm?form.motivo=PAGINA DE INDICADORES SLNC EM MANUTENCAO ATE 12h!">
-</cfif>   --->
-
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
   SELECT Usu_GrupoAcesso 
   FROM Usuarios 
@@ -43,27 +37,33 @@ function validarform() {
 //alert(frm.frmdia.value);
 
 	//alert('frmanoselecionado ' + frm.frmano.value + ' Ano atual ' + frm.frmanoatual.value + ' Mes selecionado ' + frm.frmmes.value + ' mes atual: ' + mesatual);	
-	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value)&& (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
+	/*
+  if (eval(frm.frmano.value) == eval(frm.frmanoatual.value) && (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
     alert('Usuário(a), o ano/mês selecionado ainda não disponível!');
     return false;
   }
+  */
   if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
 	{
     if (eval(messelec) > eval(mesatual)){
       alert('Usuário(a), o mês selecionado para o ano selecionado ainda não gerado!');
       return false;
     }
+  /* 
     if (eval(messelec) == eval(mesatual) && (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')){
-      alert('Usuário(a), o mês selecionado para o ano selecionado ainda não gerado!');
+      alert('Usuário(a), o mês selecionado para o ano selecionado ainda nãonnnn gerado!');
       return false;
     }	
+  */
 	} 
+
   if (eval(frm.frmano.value) != eval(frm.frmanoatual.value) && (mesatual == 1) && (diaatual) <= 10 && (frm.frmUsuGrupoAcesso.value != 'GESTORMASTER')) {
     if (eval(messelec) == 12){
       alert('Usuário(a), o ano/mês selecionado ainda não disponível!');
       return false;
     }
   }
+ 
   let difmes = mesatual - messelec
   if ((frm.frmUsuGrupoAcesso.value != 'GESTORMASTER') && eval(frm.frmano.value) == eval(frm.frmanoatual.value) && difmes == 1 && (diaatual) <= 10) {
       alert('Usuário(a), o resultado da Meta para ano/mês selecionado será liberado a partir do 11º dia do mês corrente');

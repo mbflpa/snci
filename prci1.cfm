@@ -65,7 +65,6 @@
 <script language="javascript">
 
 function valida_form(a,b) {
-   //	alert(a + '  ' + b);
    document.frmResumo.frmse.value = a;
    document.frmResumo.frmano.value = b;   
    document.frmResumo.submit();
@@ -136,17 +135,8 @@ function valida_form(a,b) {
         <td width="4%" class="titulos"><div align="center">Item</div></td>
 <!--- 		<cfif (form.lis_ano lte 2022) and (form.lis_mes lte 2)> --->
 		<td width="5%" class="titulos">Fim Revisão</td>
-<!--- 		<cfelse>
-		<td width="5%"></td>
-		</cfif>  --->
         <td width="6%" class="titulos">Dt. Ação </td>
         <td width="17%" class="titulos"><div align="center">Tipo Ação</div></td>
- <!---       <td width="5%" class="titulos">Dt. Ref.:</td> --->
-        <!--- 		<cfif (form.lis_ano lte 2022) and (form.lis_mes lte 2)> --->
-   <!---     <td width="5%" class="titulos"><div align="center">Dias úteis </div></td> --->
-<!--- 		<cfelse>
-		<td width="5%"></td>
-		</cfif> ---> 
         <td width="7%" class="titulos"><div align="center">Prazo(DP/FP)</div></td>
       </tr>
 <cfoutput query="rsResumo">
