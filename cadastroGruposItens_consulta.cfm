@@ -156,12 +156,6 @@
     </style>
 
     <script type="text/javascript">
-$(document).on('click', 'a', function(e){ 
-    e.preventDefault(); 
-    var url = $(this).attr('href'); 
-    window.open(url, '_blank');
-});        
-  
         function mudarFiltroAno(){
             var frm = document.getElementById('formConsulta');
             frm.selModConsulta.value = '';
