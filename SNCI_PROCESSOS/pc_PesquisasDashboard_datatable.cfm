@@ -547,6 +547,9 @@
                 
                 // Inicializar o estado da mensagem de filtro
                 function atualizarEstadoFiltro() {
+                    // Não atualizar se estiver no meio de uma operação de limpeza
+                    if (window.limpandoFiltros) return;
+                    
                     var filtrosAtivos = [];
                     
                     // Capturar filtros do SearchPane usando o DOM
@@ -571,9 +574,8 @@
                         }
                     });
                     
+                    var $mensagem = $("#filtro-ativo-mensagem");
                     
-                    
-                    // Atualizar a mensagem de filtros
                     if (filtrosAtivos.length > 0) {
                         var mensagem = `
                             <div class="d-flex align-items-center justify-content-between w-100">
@@ -586,58 +588,50 @@
                                 </button>
                             </div>
                         `;
-                        $("#filtro-ativo-mensagem").html(mensagem).fadeIn(100);
-                    } else {
-                        $("#filtro-ativo-mensagem").fadeOut(100);
+                        if (!$mensagem.is(":visible")) {
+                            $mensagem.html(mensagem).show();
+                        } else {
+                            $mensagem.html(mensagem);
+                        }
+                    } else if ($mensagem.is(":visible")) {
+                        $mensagem.hide();
                     }
                 }
                 
-              
-                
                 // Botão para limpar filtros
                 $(document).on('click', '#btn-limpar-filtros', function(e) {
-                    // Impedir qualquer comportamento padrão
                     e.preventDefault();
                     e.stopPropagation();
                     
-                    // Verificar o estado do sidebar antes de limpar filtros
+                    // Definir flag para evitar atualizações durante a limpeza
+                    window.limpandoFiltros = true;
+                    
                     const sidebarAberto = $('#sidebarPaineis').css('display') === 'block';
-                   
+                    
+                    $("#filtro-ativo-mensagem").hide();
+                    
                     $('#modalOverlay').css('display', 'block');
                     $('#modalOverlay').addClass('show');
 
                     setTimeout(function() {
                         try {
-                            // Limpar pesquisa global
-                            dataTable.search('').draw(false); // Usar false para evitar eventos completos de redesenho
-                            
-                            // Limpar todos os filtros do SearchPane usando a API
+                            dataTable.search('').draw(false);
                             dataTable.searchPanes.clearSelections();
                             
-                            // Ocultar mensagem de filtros ativos
-                            $("#filtro-ativo-mensagem").fadeOut(200);
-                            
-                            // Redesenhar a tabela
-                            dataTable.draw(false); // Usar false para evitar eventos completos de redesenho
-                            
-                            // Forçar fechamento do sidebar se ele estava fechado antes
                             if (!sidebarAberto) {
-                                // Forçar fechamento do sidebar diretamente no DOM
                                 $('#sidebarPaineis').css('display', 'none');
                                 $('body').removeClass('control-sidebar-slide-open');
                             }
-                            
-                            // Forçar atualização do estado dos filtros
-                            atualizarEstadoFiltro();
-                            
                         } catch (error) {
                             console.error('Erro ao limpar filtros:', error);
                         } finally {
                             setTimeout(function() {
+                                window.limpandoFiltros = false;
                                 $('#modalOverlay').modal('hide');
-                            }, 1000);
+                                dataTable.draw(false);
+                            }, 500);
                         }
-                    }, 1000);
+                    }, 100);
                 });
                 
             }
