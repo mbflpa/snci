@@ -241,8 +241,8 @@
 
     /* Estilo para área de conteúdo customizado */
     .custom-content-area {
-        margin-top: 15px;
         width: 100%;
+        margin-top: -15px;
     }
 </style>
 

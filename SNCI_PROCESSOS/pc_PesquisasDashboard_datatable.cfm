@@ -138,7 +138,16 @@
                 text-align: justify !important;
             }
 
-          
+            /* Estilos para o filtro fixo */
+            #divFiltro {
+                position: sticky;
+                top:55px;
+                z-index: 1020;
+                background: none;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                margin-bottom: 20px;
+            }
+
 	</style>
 </head>
 
@@ -164,31 +173,23 @@
 
             <section class="content">
                 <div class="container-fluid">
-                   
-                    
-                    <!-- Componente de filtro de ano -->
-                    <cfmodule template="includes/pc_filtros_componente.cfm" 
-                        exibirAno="true" 
-                        exibirOrgao="false"
-                        exibirDiretoria="false"
-                        exibirStatus="false" 
-                        componenteID="filtros-dashboard-pesquisas"
-                        customContent= '
-                            <div id="filtro-ativo-mensagem" class="filtro-ativo-mensagem" style="display: none;">
-                                <div class="filtro-info">
-                                    <!-- O conteúdo será preenchido dinamicamente via JavaScript -->
+                    <!-- Componente de filtro de ano com posição fixa -->
+                    <div id="divFiltro" >
+                        <cfmodule template="includes/pc_filtros_componente.cfm" 
+                            exibirAno="true" 
+                            exibirOrgao="false"
+                            exibirDiretoria="false"
+                            exibirStatus="false" 
+                            componenteID="filtros-dashboard-pesquisas"
+                            customContent= '
+                                <div id="filtro-ativo-mensagem" class="filtro-ativo-mensagem" style="display: none;">
+                                </div>  
+                                <div class="filtro-outros" id="btnToggleSearchPane"  title="Abrir painel de filtros" style="cursor: pointer;">
+                                    <span>Filtros Avançados</span>
+                                    <i class="fas fa-filter" ></i>
                                 </div>
-                                <button id="btn-limpar-filtros" class="btn btn-danger">
-                                    <i class="fas fa-filter-circle-xmark"></i> Limpar Filtros
-                                </button>
-                            </div>  
-                            <div class="filtro-outros" id="btnToggleSearchPane"  title="Abrir painel de filtros" style="cursor: pointer;">
-                                <span>Filtros Avançados</span>
-                                <i class="fas fa-filter" ></i>
-                            </div>
-                        '>
-                    
-                    <div class="filtro-sticky-spacer"></div>
+                            '>
+                    </div>
                     
                     <!-- Incluir dashboard de métricas -->
                     <cfinclude template="includes/pc_dashboard_pesquisa_datatable/pc_dashboard_cards_metricas.cfm">
@@ -570,11 +571,7 @@
                         }
                     });
                     
-                    // Verificar pesquisa global
-                    var pesquisaGlobal = $('.dataTables_filter input').val();
-                    if (pesquisaGlobal) {
-                        filtrosAtivos.push(`<b>Pesquisa:</b> "${pesquisaGlobal}"`);
-                    }
+                    
                     
                     // Atualizar a mensagem de filtros
                     if (filtrosAtivos.length > 0) {
@@ -595,15 +592,7 @@
                     }
                 }
                 
-                // Atualizar os listeners para os eventos do SearchPane
-                $(document).on('click', '.dtsp-nameButton', function() {
-                    setTimeout(atualizarEstadoFiltro, 100);
-                });
-                
-                // Atualizar quando houver pesquisa global
-                $(document).on('keyup', '.dataTables_filter input', function() {
-                    setTimeout(atualizarEstadoFiltro, 100);
-                });
+              
                 
                 // Botão para limpar filtros
                 $(document).on('click', '#btn-limpar-filtros', function(e) {
