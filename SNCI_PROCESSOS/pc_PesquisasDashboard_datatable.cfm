@@ -438,7 +438,7 @@
                     ],
                     searchPanes: {
                         cascadePanes: true,
-                        columns: [2,3,5,6,7,8,9],
+                        columns: [3,5,6,7,8,9],
                         threshold: 1,
                         layout: 'columns-1',
                         initCollapsed: true,
@@ -537,17 +537,7 @@
                     ],
                     initComplete: function() {
                         initializeSearchPanesAndSidebar(this);
-                        $('#tabela-container').show();
-                        
-                        // Garantir que o painel SearchPane está inicialmente fechado
-                        // Mas se o sidebar estiver aberto, mostrar os painéis
-                        if (sidebarAberto) {
-                            $('.dtsp-panesContainer').show();
-                            $('.dtsp-searchPanes .dtsb-searchBuilder').show();
-                            $('#btnToggleSearchPane').removeClass('text-dark').addClass('text-primary');
-                        } else {
-                            $('.dtsp-panesContainer').hide();
-                        }
+                        //$('#tabela-container').show();
                     },
                     drawCallback: function(settings) {
                         fecharModal();

@@ -5,6 +5,7 @@
 <cfparam name="attributes.exibirDiretoria" default="false" type="boolean">
 <cfparam name="attributes.exibirStatus" default="false" type="boolean">
 <cfparam name="attributes.componenteID" default="filtros-dashboard-#CreateUUID()#">
+<cfparam name="attributes.customContent" default="" type="string">
 
 <!--- Buscar dados apenas quando necessário --->
 <cfif attributes.exibirAno>
@@ -237,6 +238,12 @@
             display: block;
         }
     }
+
+    /* Estilo para área de conteúdo customizado */
+    .custom-content-area {
+        margin-top: 15px;
+        width: 100%;
+    }
 </style>
 
 <!-- Card de Filtros -->
@@ -286,6 +293,13 @@
                     <div id="opcoesDiretoria#attributes.componenteID#" class="btn-group btn-group-toggle btn-group-sm btn-group-filtros" data-toggle="buttons">
                         <!-- Botões gerados via JS -->
                     </div>
+                </div>
+            </cfif>
+
+            <!-- Área para conteúdo customizado -->
+            <cfif len(trim(attributes.customContent))>
+                <div class="custom-content-area">
+                    #attributes.customContent#
                 </div>
             </cfif>
         </div>
