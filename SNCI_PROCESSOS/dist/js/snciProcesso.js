@@ -591,7 +591,13 @@ function initializeSearchPanesAndSidebar(tableSelector, alteraPlaceholder) {
   // Obter a instância da tabela DataTable
   var dataTable = $(tableSelector).DataTable();
   // Mover o container do SearchPanes para o sidebar
-  dataTable.searchPanes.container().appendTo($("#searchPanesControlSidebar"));
+  var interval = setInterval(function () {
+    var $sidebar = $("#searchPanesControlSidebar");
+    if ($sidebar.length) {
+      clearInterval(interval); // Para de verificar quando o elemento for encontrado
+      dataTable.searchPanes.container().appendTo($sidebar);
+    }
+  }, 100); // Verifica a cada 100ms
 
   // Redimensionar os painéis do SearchPanes
   dataTable.searchPanes.resizePanes();

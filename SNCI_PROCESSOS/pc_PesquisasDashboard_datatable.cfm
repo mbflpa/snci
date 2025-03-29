@@ -30,6 +30,9 @@
                 border-radius: 4px;
                 border: 1px solid #dee2e6;
                 transition: all 0.2s ease;
+                position: absolute; /* Define a posição como absoluta */
+                left: 589px;
+                top: 58px;
             }
             .filtro-outros:hover {
                 background-color: #e9ecef;
@@ -82,9 +85,7 @@
             }
             
             @media (max-width: 768px) {
-                .filtro-sticky-container {
-                    padding: 8px 10px;
-                }
+               
                 
                 .filtro-ativo-mensagem {
                     flex-direction: column;
@@ -103,37 +104,8 @@
                 }
             }
             
-            /* Estilos para fixar o componente de filtro */
-            .filtro-sticky-container {
-                position: sticky;
-                top: 55px;
-                z-index: 1020;
-                background-color: #fff;
-                padding: 10px 15px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                margin-bottom: 20px;
-                transition: all 0.3s ease;
-                border-radius: 4px;
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
             
-            /* Adiciona efeito quando o container está "scrolled" */
-            .filtro-sticky-container.scrolled {
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                background-color: rgba(255, 255, 255, 0.98);
-                padding: 8px 15px;
-            }
             
-            /* Estilo para o container dos filtros */
-            .filtro-container {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
              /* Estilos para as classificações dos órgãos */
             .classificacao-promotor {
                 background-color: #28a745;
@@ -192,26 +164,7 @@
 
             <section class="content">
                 <div class="container-fluid">
-                    <!-- Div container para o filtro fixo -->
-                    <div class="filtro-sticky-container" >
-                        <div class="filtro-container">
-                            <div class="filtro-outros" id="btnToggleSearchPane"  title="Abrir painel de filtros" style="cursor: pointer;">
-                                <span>Filtros Avançados</span>
-                                <i class="fas fa-filter" ></i>
-                            </div>
-                            <div class="filtro-acoes">
-                                <!-- Aqui você pode adicionar outros controles de filtro se necessário -->
-                            </div>
-                        </div>
-                        <div id="filtro-ativo-mensagem" class="filtro-ativo-mensagem" style="display: none;">
-                            <div class="filtro-info">
-                                <!-- O conteúdo será preenchido dinamicamente via JavaScript -->
-                            </div>
-                            <button id="btn-limpar-filtros" class="btn btn-danger">
-                                <i class="fas fa-filter-circle-xmark"></i> Limpar Filtros
-                            </button>
-                        </div>
-                    </div>
+                   
                     
                     <!-- Componente de filtro de ano -->
                     <cfmodule template="includes/pc_filtros_componente.cfm" 
@@ -219,7 +172,21 @@
                         exibirOrgao="false"
                         exibirDiretoria="false"
                         exibirStatus="false" 
-                        componenteID="filtros-dashboard-pesquisas">
+                        componenteID="filtros-dashboard-pesquisas"
+                        customContent= '
+                            <div id="filtro-ativo-mensagem" class="filtro-ativo-mensagem" style="display: none;">
+                                <div class="filtro-info">
+                                    <!-- O conteúdo será preenchido dinamicamente via JavaScript -->
+                                </div>
+                                <button id="btn-limpar-filtros" class="btn btn-danger">
+                                    <i class="fas fa-filter-circle-xmark"></i> Limpar Filtros
+                                </button>
+                            </div>  
+                            <div class="filtro-outros" id="btnToggleSearchPane"  title="Abrir painel de filtros" style="cursor: pointer;">
+                                <span>Filtros Avançados</span>
+                                <i class="fas fa-filter" ></i>
+                            </div>
+                        '>
                     
                     <div class="filtro-sticky-spacer"></div>
                     
@@ -536,8 +503,20 @@
                         }
                     ],
                     initComplete: function() {
-                        initializeSearchPanesAndSidebar(this);
-                        //$('#tabela-container').show();
+                        setTimeout(() => {
+                            if (this.api().searchPanes) {
+                                this.api().searchPanes.rebuildPane();
+                                
+                                // Expandir todos os panes
+                                this.api().searchPanes.container().find('.dtsp-collapseAll').trigger('click');
+                                
+                                // Colapsar todos os panes
+                                setTimeout(() => {
+                                    this.api().searchPanes.container().find('.dtsp-expandAll').trigger('click');
+                                }, 500); // Pequeno delay para garantir que a expansão foi concluída
+                            }
+                            initializeSearchPanesAndSidebar(this);
+                        }, 1000);
                     },
                     drawCallback: function(settings) {
                         fecharModal();
@@ -738,14 +717,7 @@
                 }
             });
 
-            // Adicionar comportamento para o filtro fixo
-            $(window).on('scroll', function() {
-                if ($(window).scrollTop() > 100) {
-                    $('.filtro-sticky-container').addClass('scrolled');
-                } else {
-                    $('.filtro-sticky-container').removeClass('scrolled');
-                }
-            });
+           
         });
       
         $(".content-wrapper").css("height", "auto");
