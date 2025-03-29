@@ -242,7 +242,6 @@
     /* Estilo para área de conteúdo customizado */
     .custom-content-area {
         width: 100%;
-        margin-top: -15px;
     }
 </style>
 
