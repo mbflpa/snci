@@ -848,7 +848,7 @@ $(document).ready(function() {
         function scrollToResultados() {
             setTimeout(function() {
                 $('html, body').animate({
-                    scrollTop: $("#resultados-palavra-DT").offset().top - 70
+                    scrollTop: $("#resultados-palavra-DT").offset().top - 180
                 }, 800, function() {
                     $('.overlay-loading').remove();
                 });
