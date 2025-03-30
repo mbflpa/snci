@@ -53,7 +53,7 @@
                 orgOrigem.pc_org_sigla AS orgao_origem_sigla,
                 processo.pc_num_orgao_avaliado,
                 orgAvaliado.pc_org_sigla AS orgao_avaliado_sigla,
-                -- Coluna da diretoria vinculada ao órgão responsável ou sua subordinação técnica se não houver diretoria
+                -- Coluna da diretoria vinculada ao órgão responsável ou Correios Sede se não houver diretoria
                 COALESCE(
                     (
                         SELECT TOP 1 dir.pc_org_sigla
@@ -64,9 +64,7 @@
                         ORDER BY h.nivel ASC
                     ),
                     (
-                        SELECT subord.pc_org_sigla
-                        FROM pc_orgaos subord
-                        WHERE subord.pc_org_mcu = orgResp.pc_org_mcu_subord_tec
+                        'cs'
                     )
                 ) AS diretoria_sigla
                 , CASE 
