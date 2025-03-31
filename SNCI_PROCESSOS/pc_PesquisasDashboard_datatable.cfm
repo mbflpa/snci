@@ -516,9 +516,9 @@
                                 this.api().searchPanes.container().find('.dtsp-collapseAll').trigger('click');
                                 
                                 // Colapsar todos os panes
-                                setTimeout(() => {
-                                    this.api().searchPanes.container().find('.dtsp-expandAll').trigger('click');
-                                }, 500); // Pequeno delay para garantir que a expansão foi concluída
+                                // setTimeout(() => {
+                                //     this.api().searchPanes.container().find('.dtsp-expandAll').trigger('click');
+                                // }, 1000); // Pequeno delay para garantir que a expansão foi concluída
                             }
                             initializeSearchPanesAndSidebar(this);
                         }, 1000);
@@ -577,9 +577,9 @@
                             }
                         }
                     });
-                    
+                   
                     var $mensagem = $("#filtro-ativo-mensagem");
-                    
+      
                     if (filtrosAtivos.length > 0) {
                         var mensagem = `
                             <div class="d-flex align-items-center justify-content-between w-100">
@@ -600,6 +600,7 @@
                     } else if ($mensagem.is(":visible")) {
                         $mensagem.hide();
                     }
+                    
                 }
                 
                 // Botão para limpar filtros
