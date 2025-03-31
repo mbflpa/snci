@@ -67,6 +67,20 @@
                         'cs'
                     )
                 ) AS diretoria_sigla
+                -- Coluna diretoriaMcu
+                ,COALESCE(
+                    (
+                        SELECT TOP 1 dir.pc_org_mcu
+                        FROM pc_orgaos dir
+                        JOIN OrgHierarchy h ON h.pc_org_mcu_subord_tec = dir.pc_org_mcu
+                        WHERE h.pc_org_mcu = p.pc_org_mcu
+                        AND dir.pc_org_mcu IN (#ListQualify(application.listaDiretorias, "'")#)
+                        ORDER BY h.nivel ASC
+                    ),
+                    (
+                        '00425282'
+                    )
+                ) AS diretoriaMcu
                 , CASE 
                     WHEN pc_avaliacao_tipos.pc_aval_tipo_macroprocessos IS NULL OR LTRIM(RTRIM(pc_avaliacao_tipos.pc_aval_tipo_macroprocessos)) = '' THEN NULL 
                     ELSE CONCAT(
@@ -151,7 +165,9 @@
                 "orgao_respondente_mcu" = qPesquisas.pc_org_mcu,
                 "ano" = qPesquisas.ano,
                 "orgao_origem" = qPesquisas.orgao_origem_sigla,
+                "orgao_origem_mcu" = qPesquisas.pc_num_orgao_origem,
                 "diretoria_cs" = qPesquisas.diretoria_sigla,
+                "diretoria_mcu" = qPesquisas.diretoriaMcu,
                 "orgao_avaliado" = qPesquisas.orgao_avaliado_sigla,
                 "tipo_demanda" = qPesquisas.tipo_demanda,
                 "tipo_processo" = qPesquisas.tipoProcesso,
@@ -200,5 +216,44 @@
         
         <cfreturn response>
     </cffunction>
+
+     <cffunction name="tabProcessosElegiveis" access="remote" returnformat="plain" output="false">
+        <cfargument name="ano" type="string" required="false" default="Todos">
+        
+
+        <!--- Consulta principal para contar processos --->
+        <cfquery name="rsProcessosAssociados" datasource="#application.dsn_processos#" timeout="120">
+            SELECT DISTINCT COUNT(*) AS total_processos FROM
+            (
+                SELECT DISTINCT pc_processos.pc_processo_id
+                FROM pc_avaliacao_orientacoes
+                INNER JOIN pc_avaliacoes 
+                    ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+                INNER JOIN pc_processos 
+                    ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                WHERE pc_processos.pc_num_status in(4,5)
+                <cfif arguments.ano NEQ "Todos">
+                    AND RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                </cfif>
+                
+
+                UNION
+
+                SELECT DISTINCT pc_processos.pc_processo_id
+                FROM pc_avaliacao_melhorias
+                INNER JOIN pc_avaliacoes 
+                    ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
+                INNER JOIN pc_processos 
+                    ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                WHERE pc_processos.pc_num_status in(4,5)
+                <cfif arguments.ano NEQ "Todos">
+                    AND RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                </cfif>
+                
+            ) AS unificado
+        </cfquery>
+        
+        <cfreturn val(rsProcessosAssociados.total_processos)>
+     </cffunction>
     
 </cfcomponent>

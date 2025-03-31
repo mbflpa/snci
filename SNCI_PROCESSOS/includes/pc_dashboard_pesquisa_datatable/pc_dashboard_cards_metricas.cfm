@@ -29,11 +29,18 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg col-md-6 col-12">
+            <div class="col-lg col-md-6 col-12" >
                 <div class="small-box bg-primary">
                     <div class="inner">
                         <h3 id="indiceRespostasDT">0%</h3>
-                        <p>Índice de Respostas</p>
+                        <p>Índice de Respostas 
+                            <i class="fas fa-info-circle" 
+                                data-toggle="popover" 
+                                data-placement="top" 
+                                title="Índice de Respostas" 
+                                data-content="<div class='text-justify'>Percentual de pesquisas respondidas em relação ao total de processos em acompanhamento ou finalizados, com orientações e/ou propostas de melhoria.<br><br>Obs.: Esta métrica não está disponível quando filtros avançados estão ativos.</div>">
+                            </i>
+                        </p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-percent"></i>
@@ -347,26 +354,52 @@ $(document).ready(function() {
             animateNumberValue(elPontualidade, window.previousCardValuesDT.pontualidade, pontualidadePercentual, 1000, true);
             window.previousCardValuesDT.pontualidade = pontualidadePercentual;
             
-            // Calcular o índice de respostas (assumindo um valor estimado de processos totais)
-            // Para este exemplo, vamos estimar que existem aproximadamente 20% mais processos que respostas
-            const estimatedTotalProcessos = Math.max(Math.round(totalPesquisas * 1.2), totalPesquisas);
-            const indiceRespostas = estimatedTotalProcessos > 0 ? 
-                (totalPesquisas / estimatedTotalProcessos) * 100 : 0;
-            
-            // Atualizar o índice de respostas
-            if (estimatedTotalProcessos === 0) {
-                $("#indiceRespostasDT").text("Pesquisas não localizadas").addClass('texto-menor');
-                $(".formula-text").hide();
+
+            // Calcular o índice de respostas
+            // Verifica se há filtros específicos ativos no SearchPane
+            const searchPanesAtivos = $('.dtsp-searchPane tr.selected').length > 0;
+
+            if (searchPanesAtivos) {
+                // Se houver filtros ativos, esconder todo o card
+                $(".col-lg.col-md-6.col-12").eq(1).hide(); // Esconde o segundo card (índice de respostas)
             } else {
-                const elIndiceRespostas = document.getElementById("indiceRespostasDT");
-                animateNumberValue(elIndiceRespostas, window.previousCardValuesDT.indiceRespostas, indiceRespostas, 1000, true);
-                window.previousCardValuesDT.indiceRespostas = indiceRespostas;
-                
-                $("#indiceRespostasDT").removeClass('texto-menor');
-                $("#formulaDetalhesDT").text(
-                    `(${totalPesquisas} / ${estimatedTotalProcessos}) × 100 = ${indiceRespostas.toFixed(1)}%`
-                );
-                $(".formula-text").show();
+                // Se não houver filtros, mostrar o card e fazer a chamada AJAX normal
+                $(".col-lg.col-md-6.col-12").eq(1).show();
+                $.ajax({
+                    url: 'cfc/pc_cfcPesquisasDashboard_datatable.cfc',
+                    type: 'POST',
+                    data: {
+                        method: 'tabProcessosElegiveis',
+                        ano: anoSelecionado
+                    },
+                    success: function(response) {
+                        let estimatedTotalProcessos = response;
+                        const indiceRespostas = estimatedTotalProcessos > 0 ? 
+                            (totalPesquisas / estimatedTotalProcessos) * 100 : 0;
+                        
+                        if (estimatedTotalProcessos === 0) {
+                            $("#indiceRespostasDT").text("Pesquisas não localizadas").addClass('texto-menor');
+                            $(".formula-text").hide();
+                        } else {
+                            const elIndiceRespostas = document.getElementById("indiceRespostasDT");
+                            animateNumberValue(elIndiceRespostas, window.previousCardValuesDT.indiceRespostas, indiceRespostas, 1000, true);
+                            window.previousCardValuesDT.indiceRespostas = indiceRespostas;
+                            
+                            $("#indiceRespostasDT").removeClass('texto-menor');
+                           
+                            $("#formulaDetalhesDT").text(
+                                `(${totalPesquisas} / ${Math.round(estimatedTotalProcessos)}) × 100 = ${indiceRespostas.toFixed(1)}%`
+                            );
+
+                            $(".formula-text").show();
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Erro ao obter total de processos:', error);
+                        $("#indiceRespostasDT").text("Erro ao calcular").addClass('texto-menor');
+                        $(".formula-text").hide();
+                    }
+                });
             }
             
             // Calcular o NPS utilizando as classificações já calculadas pelo servidor
