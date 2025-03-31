@@ -191,7 +191,9 @@
                                     <span>Filtros Avançados</span>
                                     <i class="fas fa-filter" ></i>
                                 </div>
-                            '>
+                            '
+                            limitarAnoPesquisa="true"                     
+                            >
                     </div>
                     
                     <!-- Incluir dashboard de métricas -->

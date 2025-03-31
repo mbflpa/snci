@@ -6,6 +6,7 @@
 <cfparam name="attributes.exibirStatus" default="false" type="boolean">
 <cfparam name="attributes.componenteID" default="filtros-dashboard-#CreateUUID()#">
 <cfparam name="attributes.customContent" default="" type="string">
+<cfparam name="attributes.limitarAnoPesquisa" default="false" type="boolean">
 
 <!--- Buscar dados apenas quando necessário --->
 <cfif attributes.exibirAno>
@@ -15,6 +16,11 @@
         <cfif application.rsUsuarioParametros.pc_usu_perfil eq 8>
             AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
         </cfif>
+        <cfif attributes.limitarAnoPesquisa>
+            AND RIGHT(pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
+        </cfif>
+        UNION
+        SELECT YEAR(GETDATE()) AS ano
         ORDER BY ano DESC
     </cfquery>
 </cfif>
