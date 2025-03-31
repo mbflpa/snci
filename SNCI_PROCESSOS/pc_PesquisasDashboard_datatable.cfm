@@ -285,8 +285,7 @@
                     // Exibir o modal existente diretamente no DOM
                     $('#modalOverlay').css('display', 'block');
                     $('#modalOverlay').addClass('show');
-                    
-                    console.log('Modal de carregamento exibido');
+                  
                 } catch (e) {
                     console.error('Erro ao mostrar modal:', e);
                 }
@@ -645,7 +644,7 @@
             setTimeout(function() {
                 // Verificar se o valor do filtro de ano foi definido pelo componente de filtro
                 const anoInicial = window.anoSelecionado || "Todos";
-                console.log("Inicializando tabela com ano:", anoInicial);
+             
                 
                 // Inicializar a tabela com o ano selecionado no filtro
                 inicializarTabela(anoInicial);
@@ -653,11 +652,11 @@
 
             // Listener de evento para alterações no filtro
             document.addEventListener('filtroAlterado', function(e) {
-                console.log('Evento filtroAlterado recebido:', e.detail);
+               
                 
                 // Verificar se a alteração veio do filtro de ano
                 if (e.detail.tipo === 'ano') {
-                    console.log('Filtro de ano alterado para:', e.detail.valor);
+                  
                     
                     // Mostrar modal de carregamento antes de atualizar a tabela
                     mostrarModal();
