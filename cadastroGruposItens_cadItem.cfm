@@ -1777,7 +1777,6 @@
                 frm.principioscoso.focus();
                 return false;
             }// final criticas dos novos campos
-            //=========================================================================================
 
             if (frm.selModalidade.value == '') {
 				alert('Informe a modalidade do item do Plano de Teste!');
@@ -1803,7 +1802,7 @@
                 return true;	
             }else{ return false }
         } //fim das críticas do submit     
-        //****************************************************                        
+                     
 </script>
 </body>
 </html>

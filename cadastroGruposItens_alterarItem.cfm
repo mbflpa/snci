@@ -27,6 +27,7 @@
     SELECT PTC_Seq, PTC_Valor, PTC_Descricao, PTC_Status, PTC_dtultatu, PTC_Username, PTC_Franquia 
     FROM Pontuacao WHERE PTC_Ano = '#year(now())#'
 </cfquery> 
+
 <cfif isDefined("form.acaoalt") and "#form.acaoalt#" eq 'altItem'>  
     <cfquery name="rsPta" datasource="#dsn_inspecao#">
         SELECT PTC_Seq, PTC_Valor, PTC_Descricao, PTC_Status, PTC_dtultatu, PTC_Username, PTC_Franquia 
@@ -39,23 +40,48 @@
     </cfif>
     <!--- Tipos de unidades não selecionados para o ano,modalidade,grupo e item  tabela TipoUnidade_ItemVerificacao --->
     <cfset tiposunidselec = form.tiposalt>
-    <cfquery datasource="#dsn_inspecao#">
-        DELETE FROM TipoUnidade_ItemVerificacao
-        WHERE TUI_Ano='#form.selAltItemAno#' AND 
-        TUI_Modalidade='#form.selAltModalidade#' AND 
-        TUI_GrupoItem=#form.selAltItemGrupo# AND 
-        TUI_ItemVerif=#form.selAltItem# AND 
-        TUI_TipoUnid Not In (#tiposunidselec#)
+
+    <cfquery name="rstpunidnaoselec" datasource="#dsn_inspecao#">
+        SELECT TUN_Codigo
+        FROM Tipo_Unidades
+        WHERE TUN_Codigo Not In (#tiposunidselec#)
     </cfquery>
-    <!--- Tipos de unidades não selecionados para o ano,modalidade,grupo e item  tabela Itens_Verificacao --->
-    <cfquery datasource="#dsn_inspecao#">
-        DELETE FROM Itens_Verificacao
-        WHERE Itn_Ano = '#form.selAltItemAno#' AND 
-        Itn_Modalidade = '#form.selAltModalidade#' AND 
-        Itn_NumGrupo = #form.selAltItemGrupo# AND 
-        Itn_NumItem = #form.selAltItem# and
-        Itn_TipoUnidade Not In (#tiposunidselec#) 
-    </cfquery>
+    <cfloop query="rstpunidnaoselec">
+        <cfquery name="rsexiste" datasource="#dsn_inspecao#">
+            SELECT top 1 RIP_NumInspecao
+            FROM Resultado_Inspecao 
+            INNER JOIN Unidades ON RIP_Unidade = Und_Codigo
+            INNER JOIN Inspecao ON INP_NumInspecao = RIP_NumInspecao
+            WHERE RIP_Ano = #form.selAltItemAno# and 
+                RIP_NumGrupo = #form.selAltItemGrupo# and
+                RIP_NumItem = #form.selAltItem# and 
+                INP_Modalidade = '#form.selAltModalidade#' and 
+                Und_TipoUnidade = #rstpunidnaoselec.TUN_Codigo#
+                group by RIP_NumInspecao 
+        </cfquery>  
+        <cfif  rsexiste.recordcount lte 0>
+            <!--- Tipos de unidades não selecionados para o ano,modalidade,grupo e item  tabela Itens_Verificacao --->
+            <cfquery datasource="#dsn_inspecao#">
+                DELETE FROM TipoUnidade_ItemVerificacao
+                WHERE TUI_Ano='#form.selAltItemAno#' AND 
+                TUI_Modalidade='#form.selAltModalidade#' AND 
+                TUI_GrupoItem=#form.selAltItemGrupo# AND 
+                TUI_ItemVerif=#form.selAltItem# AND 
+                TUI_TipoUnid =  #rstpunidnaoselec.TUN_Codigo#
+            </cfquery>
+                
+            <cfquery datasource="#dsn_inspecao#">
+                DELETE FROM Itens_Verificacao
+                WHERE Itn_Ano = '#form.selAltItemAno#' AND 
+                Itn_Modalidade = '#form.selAltModalidade#' AND 
+                Itn_NumGrupo = #form.selAltItemGrupo# AND 
+                Itn_NumItem = #form.selAltItem# and
+                Itn_TipoUnidade =  #rstpunidnaoselec.TUN_Codigo#
+            </cfquery>
+        </cfif>                 
+    </cfloop>                    
+
+
     //remover valores redundantes no form.altprocesson2
     <cfset strList = trim(form.altprocesson2) />
     <cfset listStruct = {} />
@@ -279,6 +305,7 @@
         //window.close()       
     </script>
 </cfif>
+
 
 <cfquery name="qTipoUnidades" datasource="#dsn_inspecao#">
     SELECT * FROM Tipo_Unidades
@@ -826,7 +853,7 @@
                                                     <div align="center">
                                                         <div align="left">
                                                             <input title="" class="alttipounid btn btn-primary" id="<cfoutput>#qTipoUnidades.TUN_Codigo#</cfoutput>" name="<cfoutput>#trim(qTipoUnidades.TUN_Descricao)#</cfoutput>" type="button" value="<cfoutput>#strnome#</cfoutput>">
-                                                        </div>
+                                                        </div> 
                                                         <p></p>
                                                     </div>	  
                                                 </td>
@@ -2055,6 +2082,11 @@
                     //alert(a + '  '+b)
                     let altArray = a.split(',')
                     let alttpunid = ''
+                    let ano = $('#selAltItemAno').val();
+                    let grupo = $('#selAltItemGrupo').val();
+                    let itm = $('#selAltItem').val();
+                    let modal = $('#selAltModalidade').val();
+                    let tpunid = 0
                     var selecionarsn = ''
                     $('.alttipounid').each(function( index ) {
                         alttpunid = $(this).attr("id");
@@ -2072,6 +2104,7 @@
                                 //alert('value: '+value)
                             }
                         })
+                                              
                         if (selecionarsn == 'S') {
                                 selecionarsn = 'S'
                                 $(this).attr("title","1");
@@ -2079,7 +2112,7 @@
                                 $(this).attr("class","alttipounid btn btn-success");
                                 $(this).css('box-shadow', '10px 10px 5px #888')
                         }
-                    }) 
+                    })
                     
                     let ponto =''
                     let altseqarray=b.split(',')
