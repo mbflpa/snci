@@ -72,10 +72,7 @@
 					<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 3 and #application.rsUsuarioParametros.pc_usu_perfil# neq 8 and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
 							AND not pc_aval_orientacao_status in (13)	
 					</cfif>
-					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (DA GPCI)--->
-					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-						AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-					</cfif>
+					
 					
 					<!---Se o perfil for 4 - 'CI - AVALIADOR (EXECUÇÃO)') --->
 					<cfif #application.rsUsuarioParametros.pc_usu_perfil# eq 4 >
