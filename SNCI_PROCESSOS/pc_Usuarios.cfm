@@ -233,8 +233,8 @@
 														</div>
 														<div class="col-sm-12 mt-2">
 															<div class="form-check">
-																<input type="checkbox" class="form-check-input" id="usuarioRecebeEmailTodasManif" name="usuarioRecebeEmailTodasManif">
-																<label class="form-check-label" for="usuarioRecebeEmailTodasManif">Recebe E-mail Todas Manifestações?</label>
+																<input type="checkbox" class="form-check-input" id="usuarioRecebeEmailSegundaManif" name="usuarioRecebeEmailSegundaManif">
+																<label class="form-check-label" for="usuarioRecebeEmailSegundaManif">Recebe E-mail Segunda Manifestação?</label>
 															</div>
 														</div>
 													</div>
@@ -502,7 +502,7 @@
 			var matricula=$("#usuarioMatricula").val().replace(/([^\d])+/gim, '');
 			var emailRequired = $('#usuarioGerente').is(':checked') || 
                        $('#usuarioRecebeEmailPrimeiraManif').is(':checked') || 
-                       $('#usuarioRecebeEmailTodasManif').is(':checked');
+                       $('#usuarioRecebeEmailSegundaManif').is(':checked');
 
 			if (!$('#usuarioNome').val() || matricula.length != 8 || !$('#usuarioLotacao').val() || !$('#usuarioPerfil').val() ){
 				//mostra mensagem de erro, se algum campo necessário nesta fase não estiver preenchido	
@@ -547,7 +547,7 @@
 								pc_usu_email: $('#usuarioEmail').val(),
 								pc_usu_gerente: $('#usuarioGerente').is(':checked'),
 								pc_usu_recebeEmail_primeiraManif: $('#usuarioRecebeEmailPrimeiraManif').is(':checked'),
-								pc_usu_recebeEmail_todasManif: $('#usuarioRecebeEmailTodasManif').is(':checked')
+								pc_usu_recebeEmail_segundaManif: $('#usuarioRecebeEmailSegundaManif').is(':checked')
 							},
 							async: false
 						})//fim ajax
@@ -563,7 +563,7 @@
 							 $('#usuarioEmail').val(null)
 							$('#usuarioGerente').prop('checked', false)
 							$('#usuarioRecebeEmailPrimeiraManif').prop('checked', false)
-							$('#usuarioRecebeEmailTodasManif').prop('checked', false)
+							$('#usuarioRecebeEmailSegundaManif').prop('checked', false)
 							$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Usuário");
 							$('#cadastroUsuarios').CardWidget('collapse')
 							atualizarTabela(); // Recarregar a tabela usando AJAX
@@ -604,7 +604,7 @@
 				$('#usuarioEmail').val(null)
 				$('#usuarioGerente').prop('checked', false)
 				$('#usuarioRecebeEmailPrimeiraManif').prop('checked', false)
-				$('#usuarioRecebeEmailTodasManif').prop('checked', false)
+				$('#usuarioRecebeEmailSegundaManif').prop('checked', false)
 				$("#usuarioStatusDiv").attr("hidden",true)
 				$('#cadastroUsuarios').CardWidget('collapse')
 				$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Usuário");

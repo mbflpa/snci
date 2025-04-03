@@ -317,13 +317,13 @@
 		<cfargument name="pc_usu_email" type="string" required="false" default=""/>
 		<cfargument name="pc_usu_gerente" type="boolean" required="false" default="false"/>
 		<cfargument name="pc_usu_recebeEmail_primeiraManif" type="boolean" required="false" default="false"/>
-		<cfargument name="pc_usu_recebeEmail_primeiraManif" type="boolean" required="false" default="false"/>
+		<cfargument name="pc_usu_recebeEmail_segundaManif" type="boolean" required="false" default="false"/>
 		
 		<cfset login = 'CORREIOSNET\' & #arguments.pc_usu_matricula#>
 
 		<cfquery datasource="#application.dsn_processos#" >
 			<cfif #arguments.usuarioEditar# eq ''>
-				INSERT pc_usuarios (pc_usu_matricula, pc_usu_Nome, pc_usu_login, pc_usu_lotacao, pc_usu_perfil, pc_usu_atualiz_datahora, pc_usu_atualiz_matricula)
+				INSERT pc_usuarios (pc_usu_matricula, pc_usu_Nome, pc_usu_login, pc_usu_lotacao, pc_usu_perfil, pc_usu_atualiz_datahora, pc_usu_atualiz_matricula, pc_usu_email, pc_usu_gerente, pc_usu_recebeEmail_primeiraManif, pc_usu_recebeEmail_segundaManif)
 				VALUES (
 					<cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
 					<cfqueryparam value="#arguments.pc_usu_Nome#" cfsqltype="cf_sql_varchar">,
