@@ -205,6 +205,43 @@
 											</div>
 										</div>
 
+										
+										<div class="col-sm-6">
+											<div class="form-group">
+												<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
+													<div class="row">
+														<div class="col-sm-12">
+															<div class="form-group">
+																<label for="usuarioEmail">E-mail:</label>
+																<input id="usuarioEmail" name="usuarioEmail" type="email" class="form-control" placeholder="Informe o e-mail...">
+																<div class="invalid-feedback">
+																	Por favor, informe um e-mail válido quando alguma opção abaixo estiver marcada.
+																</div>
+															</div>
+														</div>
+														<div class="col-sm-12 mt-3">
+															<div class="form-check">
+																<input type="checkbox" class="form-check-input" id="usuarioGerente" name="usuarioGerente">
+																<label class="form-check-label" for="usuarioGerente">É Gerente?</label>
+															</div>
+														</div>
+														<div class="col-sm-12 mt-2">
+															<div class="form-check">
+																<input type="checkbox" class="form-check-input" id="usuarioRecebeEmailPrimeiraManif" name="usuarioRecebeEmailPrimeiraManif">
+																<label class="form-check-label" for="usuarioRecebeEmailPrimeiraManif">Recebe E-mail Primeira Manifestação?</label>
+															</div>
+														</div>
+														<div class="col-sm-12 mt-2">
+															<div class="form-check">
+																<input type="checkbox" class="form-check-input" id="usuarioRecebeEmailTodasManif" name="usuarioRecebeEmailTodasManif">
+																<label class="form-check-label" for="usuarioRecebeEmailTodasManif">Recebe E-mail Todas Manifestações?</label>
+															</div>
+														</div>
+													</div>
+												</cfif>
+											</div>
+										</div>
+
 										<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
 											<div id="btSalvarDiv" >
 												<button id="btSalvar" class="btn btn-block btn-primary " >Salvar</button>
@@ -463,10 +500,19 @@
 			event.stopPropagation()
 
 			var matricula=$("#usuarioMatricula").val().replace(/([^\d])+/gim, '');
+			var emailRequired = $('#usuarioGerente').is(':checked') || 
+                       $('#usuarioRecebeEmailPrimeiraManif').is(':checked') || 
+                       $('#usuarioRecebeEmailTodasManif').is(':checked');
 
 			if (!$('#usuarioNome').val() || matricula.length != 8 || !$('#usuarioLotacao').val() || !$('#usuarioPerfil').val() ){
 				//mostra mensagem de erro, se algum campo necessário nesta fase não estiver preenchido	
 				toastr.error('Todos os campos devem ser preenchidos!');
+				return false;
+			}
+
+			if (emailRequired && !$('#usuarioEmail').val()) {
+				toastr.error('O e-mail é obrigatório quando alguma opção de notificação estiver marcada!');
+				$('#usuarioEmail').focus();
 				return false;
 			}
 
@@ -497,7 +543,11 @@
 								pc_usu_Nome: $('#usuarioNome').val().toUpperCase(),
 								pc_usu_status: $('#usuarioStatus').val(),
 								pc_usu_lotacao: $('#usuarioLotacao').val(),
-								pc_usu_perfil: $('#usuarioPerfil').val()
+								pc_usu_perfil: $('#usuarioPerfil').val(),
+								pc_usu_email: $('#usuarioEmail').val(),
+								pc_usu_gerente: $('#usuarioGerente').is(':checked'),
+								pc_usu_recebeEmail_primeiraManif: $('#usuarioRecebeEmailPrimeiraManif').is(':checked'),
+								pc_usu_recebeEmail_todasManif: $('#usuarioRecebeEmailTodasManif').is(':checked')
 							},
 							async: false
 						})//fim ajax
@@ -510,6 +560,10 @@
 							$('#usuarioStatus').val(null).trigger('change')
 							$('#usuarioLotacao').val(null).trigger('change')
 							$('#usuarioPerfil').val(null).trigger('change')
+							 $('#usuarioEmail').val(null)
+							$('#usuarioGerente').prop('checked', false)
+							$('#usuarioRecebeEmailPrimeiraManif').prop('checked', false)
+							$('#usuarioRecebeEmailTodasManif').prop('checked', false)
 							$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Usuário");
 							$('#cadastroUsuarios').CardWidget('collapse')
 							atualizarTabela(); // Recarregar a tabela usando AJAX
@@ -547,7 +601,10 @@
 				$('#usuarioStatus').val(null).trigger('change')
 				$('#usuarioLotacao').val(null).trigger('change')
 				$('#usuarioPerfil').val(null).trigger('change')
-				
+				$('#usuarioEmail').val(null)
+				$('#usuarioGerente').prop('checked', false)
+				$('#usuarioRecebeEmailPrimeiraManif').prop('checked', false)
+				$('#usuarioRecebeEmailTodasManif').prop('checked', false)
 				$("#usuarioStatusDiv").attr("hidden",true)
 				$('#cadastroUsuarios').CardWidget('collapse')
 				$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Usuário");

@@ -314,6 +314,11 @@
 		<cfargument name="pc_usu_status" type="string" required="false"  default='A'/>
 		<cfargument name="pc_usu_lotacao" type="string" required="true"/>
 		<cfargument name="pc_usu_perfil" type="numeric" required="true"/>
+		<cfargument name="pc_usu_email" type="string" required="false" default=""/>
+		<cfargument name="pc_usu_gerente" type="boolean" required="false" default="false"/>
+		<cfargument name="pc_usu_recebeEmail_primeiraManif" type="boolean" required="false" default="false"/>
+		<cfargument name="pc_usu_recebeEmail_primeiraManif" type="boolean" required="false" default="false"/>
+		
 		<cfset login = 'CORREIOSNET\' & #arguments.pc_usu_matricula#>
 
 		<cfquery datasource="#application.dsn_processos#" >
@@ -326,19 +331,24 @@
 					<cfqueryparam value="#arguments.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 					<cfqueryparam value="#arguments.pc_usu_perfil#" cfsqltype="cf_sql_integer">,
 					<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-					<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
+					<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
+					<cfqueryparam value="#arguments.pc_usu_email#" cfsqltype="cf_sql_varchar">,
+					<cfqueryparam value="#arguments.pc_usu_gerente#" cfsqltype="cf_sql_bit">,
+					<cfqueryparam value="#arguments.pc_usu_recebeEmail_primeiraManif#" cfsqltype="cf_sql_bit">,
+					<cfqueryparam value="#arguments.pc_usu_recebeEmail_segundaManif#" cfsqltype="cf_sql_bit">
 				)
-
-			
-			
-			
 			<cfelse>
 				UPDATE pc_usuarios
 				SET pc_usu_Nome = <cfqueryparam value="#arguments.pc_usu_Nome#" cfsqltype="cf_sql_varchar">,
 					pc_usu_login = <cfqueryparam value="#login#" cfsqltype="cf_sql_varchar">,
 					pc_usu_lotacao = <cfqueryparam value="#arguments.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
 					pc_usu_perfil = <cfqueryparam value="#arguments.pc_usu_perfil#" cfsqltype="cf_sql_integer">,
-					pc_usu_status = <cfqueryparam value="#arguments.pc_usu_status#" cfsqltype="cf_sql_varchar">
+					pc_usu_status = <cfqueryparam value="#arguments.pc_usu_status#" cfsqltype="cf_sql_varchar">,
+					pc_usu_email = <cfqueryparam value="#arguments.pc_usu_email#" cfsqltype="cf_sql_varchar">,
+					pc_usu_gerente = <cfqueryparam value="#arguments.pc_usu_gerente#" cfsqltype="cf_sql_bit">,
+					pc_usu_recebeEmail_primeiraManif = <cfqueryparam value="#arguments.pc_usu_recebeEmail_primeiraManif#" cfsqltype="cf_sql_bit">,
+					pc_usu_recebeEmail_segundaManif = <cfqueryparam value="#arguments.pc_usu_recebeEmail_segundaManif#" cfsqltype="cf_sql_bit">
+
 				WHERE pc_usu_matricula = <cfqueryparam value="#arguments.pc_usu_matricula#" cfsqltype="cf_sql_varchar">
 			</cfif>
 		</cfquery>
