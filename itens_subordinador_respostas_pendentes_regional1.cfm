@@ -56,7 +56,7 @@
 	</cfif>
 
 	<cfcatch type="any">
-		<cfset mensagem = 'Ocorreu um erro ao efetuar esta opera��o, o campo Arquivo est� vazio, Selecione um arquivo no formato PDF'>
+		<cfset mensagem = 'Ocorreu um erro ao efetuar esta operação, o campo Arquivo está vazio, Selecione um arquivo no formato PDF'>
 		<script>
 			alert('<cfoutput>#mensagem#</cfoutput>');
 			history.back();
@@ -84,7 +84,7 @@
 
  <cfif qAnexos.recordCount Neq 0>
 
-	<!--- Exluindo arquivo do diret�rio de Anexos --->
+	<!--- Exluindo arquivo do diretório de Anexos --->
 	<cfif FileExists(qAnexos.Ane_Caminho)>
 		<cffile action="delete" file="#qAnexos.Ane_Caminho#">
 	</cfif>
@@ -341,14 +341,14 @@ INNER JOIN Reops ON Und_CodReop = Rep_Codigo
 <link href="css.css" rel="stylesheet" type="text/css">
 <script type="text/javascript">
 function aviso(){
-alert('AVISO IMPORTANTE \n\nAo �rg�o Subordinador, caso sua resposta solucione a irregularidade de imediato, informar no campo Data de Previsão da Solução a data atual(hoje). \n\nSe for necess�rio prazo para regulariza��o, indicar data futura. \n\nAt� esta data ser� necess�rio entrar novamente no sistema SNCI para complementa��o de sua Resposta.');
+alert('AVISO IMPORTANTE \n\nAo Órgão Subordinador, caso sua resposta solucione a irregularidade de imediato, informar no campo Data de Previsão da Solução a data atual(hoje). \n\nSe for necessário prazo para regularização, indicar data futura. \n\nAté esta data será necessário entrar novamente no sistema SNCI para complementação de sua Resposta.');
 }
 
 //=============================
-//permite digita�ao apenas de valores num�ricos
+//permite digitacao apenas de valores numéricos
 function numericos() {
 var tecla = window.event.keyCode;
-//permite digita��o das teclas num�ricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
+//permite digitação das teclas numéricas (48 a 57, 96 a 105), Delete e Backspace (8 e 46), TAB (9) e ESC (27)
 //if ((tecla != 8) && (tecla != 9) && (tecla != 27) && (tecla != 46)) {
 	
 	if ((tecla != 46) && ((tecla < 48) || (tecla > 57))) {
@@ -366,7 +366,7 @@ function Mascara_Data(data)
 	{
 		case 2:
 		   if (data.value < 1 || data.value > 31) {
-		      alert('Valor para o dia inv�lido!');
+		      alert('Valor para o dia inválido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -376,7 +376,7 @@ function Mascara_Data(data)
 			}
 		case 5:
 			if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-		      alert('Valor para o M�s inv�lido!');
+		      alert('Valor para o Mês inválido!');
 			  data.value = '';
 		      event.returnValue = false;
 			  break;
@@ -428,13 +428,13 @@ if (document.form1.acao.value == 'Salvar'){
   
   if(strmanifesto == '')
 	  {
-	   alert('Caro Usu�rio, est� faltando sua An�lise no campo Manifestar-se!');
+	   alert('Caro Usuário, está faltando sua Análise no campo Manifestar-se!');
 	   return false;
 	  }
  
    if(strmanifesto.length < 100)
 	   {
-	   alert('Caro Usu�rio, Sua manisfesta��o dever� conter no m�nimo 100(cem) caracteres');
+	   alert('Caro Usuário, Sua manisfestação deverá conter no mánimo 100(cem) caracteres');
 	   return false;
 	   }
 	var dtprevdig = document.form1.cbData.value;	    
@@ -457,27 +457,27 @@ if (document.form1.acao.value == 'Salvar'){
 		 
 	 if (dt_hoje_yyyymmdd > dtprevdig_yyyymmdd)
 	 {
-	  alert("Data de Previsão da Solução � inferior a data de hoje!")
+	  alert("Data de Previsão da Solução é inferior a data de hoje!")
 	  return false;
 	 } 
  
 	 // so informar da dta de hoje()
 	 if ((And_dtposic_fut < dt_hoje_yyyymmdd) && (pos_dtPrevSoluc_atual < dt_hoje_yyyymmdd) && (dtprevdig_yyyymmdd > dt_hoje_yyyymmdd))
 	{
-    alert('Sr. Usu�rio. Voc� deve informar no campo data de Previsão da Solução a data de hoje.')
+    alert('Sr. Usuário. Você deve informar no campo data de Previsão da Solução a data de hoje.')
 	return false;
 	}
     // considerar possivel adendo de prazo ao campo Pos_DtPRevSoluc
 	if (pos_dtPrevSoluc_atual > And_dtposic_fut && dtprevdig_yyyymmdd > pos_dtPrevSoluc_atual)
 	{
-    alert('Sr. Usu�rio. Voc� deve informar no campo data de Previsão da Solução a data de hoje ou uma data igual ou inferior a data: ' + pos_dtPrevSoluc_atual.substr(6,2) + '/' + pos_dtPrevSoluc_atual.substr(4,2) + '/' + pos_dtPrevSoluc_atual.substr(0,4))
+    alert('Sr. Usuário. Você deve informar no campo data de Previsão da Solução a data de hoje ou uma data igual ou inferior a data: ' + pos_dtPrevSoluc_atual.substr(6,2) + '/' + pos_dtPrevSoluc_atual.substr(4,2) + '/' + pos_dtPrevSoluc_atual.substr(0,4))
 	return false;
 	} 
 	 // Neste status considerar o prazo m�ximo contado a partir da andamento.and_DtPosic
 	if ((dtprevdig_yyyymmdd > And_dtposic_fut) && (dt_hoje_yyyymmdd != dtprevdig_yyyymmdd) && (And_dtposic_fut > pos_dtPrevSoluc_atual))
 	{
 	// Aguardar Edimir
-    alert('Sr. Usu�rio. Voc� deve informar no campo data de Previsão da Solução a data de hoje ou uma data igual ou inferior a data: ' + And_dtposic_fut.substr(6,2) + '/' + And_dtposic_fut.substr(4,2) + '/' + And_dtposic_fut.substr(0,4))
+    alert('Sr. Usuário. Você deve informar no campo data de Previsão da Solução a data de hoje ou uma data igual ou inferior a data: ' + And_dtposic_fut.substr(6,2) + '/' + And_dtposic_fut.substr(4,2) + '/' + And_dtposic_fut.substr(0,4))
 	return false;
 	} 
 	 
@@ -493,16 +493,16 @@ if (document.form1.acao.value == 'Salvar'){
 		 {
 		  var auxdtedit = document.form1.dtdezddtrat.value;
 		  auxdtedit = auxdtedit.substring(6,8) + '/' + auxdtedit.substring(4,6) + '/' + auxdtedit.substring(0,4)
-		  alert('Para Tratamento a Data de Previsão est� menor que os 10(dez) dias �teis ou Data Previsão concedida para: ' + auxdtedit)
+		  alert('Para Tratamento a Data de Previsão está menor que os 10(dez) dias úteis ou Data Previsão concedida para: ' + auxdtedit)
 		  //dtprazo(sit);
 		  return false;
 		 }				 
 	  //===============================================================================================		 
-	  if (sit == 2 || sit == 20) {var auxcam = '\n\nPENDENTE DE UNIDADE\n\n- Essa op��o DEVOLVE o item � unidade para registro de resposta ou complementa��o'};
-	  if (sit == 7) {var auxcam = '\n\nRESPOSTA �RG�O SUBORDINADOR\n\n - Essa op��o RESPONDE o item e o encaminha para Equipe de Controle Interno da Regional (CCOP)'};
-	  if (sit == 16) {var auxcam = '\n\nTRATAMENTO �RG�O SUBORDINADOR\n\n - Essa op��o MANT�M o item ao �rg�o Subordinador para desenvolvimento de a��o que necessita de maior prazo da regulariza��o ou resposta.\n Nesse caso deve indicar o prazo necess�rio no campo Data de Previsão da Solução.\n At� essa data sua resposta dever� ser complementada'};
+	  if (sit == 2 || sit == 20) {var auxcam = '\n\nPENDENTE DE UNIDADE\n\n- Essa opção DEVOLVE o item à unidade para registro de resposta ou complementação'};
+	  if (sit == 7) {var auxcam = '\n\nRESPOSTA ÓRGÃO SUBORDINADOR\n\n - Essa opção RESPONDE o item e o encaminha para Equipe de Controle Interno da Regional (CCOP)'};
+	  if (sit == 16) {var auxcam = '\n\nTRATAMENTO ÒRGÂO SUBORDINADOR\n\n - Essa opção MANTÉM o item ao Órgão Subordinador para desenvolvimento de ação que necessita de maior prazo da regularização ou resposta.\n Nesse caso deve indicar o prazo necessário no campo Data de Previsão da Solução.\n Até essa data sua resposta deverá ser complementada'};
 	
-	 if (confirm ('            Aten��o! ' + auxcam))
+	 if (confirm ('            Atenção! ' + auxcam))
 	 {  
 	     document.form1.cbData.disabled = false;
 		 return true;
@@ -518,7 +518,7 @@ if (document.form1.acao.value == 'Salvar'){
 
 //Fun��o que abre uma p�gina em Popup
 function popupPage() {
-<cfoutput>  //p�gina chamada, seguida dos par�metros n�mero, unidade, grupo e item
+<cfoutput>  //página chamada, seguida dos parametros numero, unidade, grupo e item
 var page = "itens_unidades_controle_respostas_comentarios.cfm?numero=#ninsp#&unidade=#unid#&numgrupo=#ngrup#&numitem=#nitem#";
 </cfoutput>
 windowprops = "location=no,"
@@ -542,7 +542,7 @@ window.open(page, "Popup", windowprops);
     <form name="form1" method="post" onSubmit="return validaForm()" enctype="multipart/form-data" action="itens_subordinador_respostas_pendentes_regional1.cfm">
       <div align="right"><table width="74%" align="center">
           <tr><br>
-              <td colspan="9"><p align="center" class="titulo1"><strong> PONTO DE controle interno por �rg�o Subordinador Regional</strong>
+              <td colspan="9"><p align="center" class="titulo1"><strong> PONTO DE controle interno por Órgão Subordinador Regional</strong>
                       <input name="unid" type="hidden" id="unid" value="<cfoutput>#URL.Unid#</cfoutput>">
                       <input name="ninsp" type="hidden" id="ninsp" value="<cfoutput>#URL.Ninsp#</cfoutput>">
                       <input name="ngrup" type="hidden" id="ngrup" value="<cfoutput>#URL.Ngrup#</cfoutput>">
@@ -575,7 +575,7 @@ window.open(page, "Popup", windowprops);
             <td colspan="7" bgcolor="f7f7f7">-&nbsp;<cfoutput query="qInspetor"><strong>#qInspetor.Fun_Nome#</strong>&nbsp;<cfif qInspetor.currentrow neq qInspetor.recordcount><br>- </cfif></cfoutput></td>
           </tr>
           <tr class="exibir">
-            <td bgcolor="eeeeee">N� Relat�rio</td>
+            <td bgcolor="eeeeee">Nº Relatório</td>
             <cfset Num_Insp = Left(URL.Ninsp,2) & '.' & Mid(URL.Ninsp,3,4) & '/' & Right(URL.Ninsp,4)>
             <td colspan="8" bgcolor="f7f7f7"><cfoutput><strong>#Num_Insp#</strong></cfoutput></td>
           </tr>
@@ -604,7 +604,7 @@ window.open(page, "Popup", windowprops);
             </span></td>
 		  </tr>
 		 <tr>
-            <td bgcolor="eeeeee"><span class="exibir"><span class="titulos">Orienta��es:</span></span></td>
+            <td bgcolor="eeeeee"><span class="exibir"><span class="titulos">Orientações:</span></span></td>
             <td colspan="7"><span class="exibir">
               <textarea name="H_recom" cols="200" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea>
             </span></td>
@@ -618,7 +618,7 @@ window.open(page, "Popup", windowprops);
           </tr>
           <tr>
             <td bgcolor="eeeeee"><span class="exibir"><span class="titulos">Manifestar-se:</span></span></td>
-            <td colspan="7"><span class="exibir"><textarea name="observacao" cols="200" rows="25" nome="Observa��o" vazio="false" wrap="VIRTUAL" class="form" id="observacao"><cfoutput>#Session.E01.observacao#</cfoutput></textarea>
+            <td colspan="7"><span class="exibir"><textarea name="observacao" cols="200" rows="25" nome="Observação" vazio="false" wrap="VIRTUAL" class="form" id="observacao"><cfoutput>#Session.E01.observacao#</cfoutput></textarea>
             </span></td>
           </tr>
 		  <tr>
@@ -752,7 +752,7 @@ window.open(page, "Popup", windowprops);
 </body>
  <script>
 	<cfoutput>
-		<!---Retorna true se a data de in�cio da inspe��o for maior ou igual a 04/03/2021, data em que o editor de texto foi implantado. Isso evitar� que os textos anteriores sejam desformatados--->
+		<!---Retorna true se a data de inicio da inspe��o for maior ou igual a 04/03/2021, data em que o editor de texto foi implantado. Isso evitará que os textos anteriores sejam desformatados--->
 		<cfset CouponDate = createDate( 2021, 03, 04 ) />
 		<cfif DateDiff( "d", '#rsItem.INP_DtInicInspecao#',CouponDate ) GTE 1>
 			<cfset usarEditor = false />
@@ -762,7 +762,7 @@ window.open(page, "Popup", windowprops);
 		var usarEditor = #usarEditor#;
 	</cfoutput>
 	if(usarEditor == true){
-		//configura��es diferenciadas do editor de texto.
+		//configurações diferenciadas do editor de texto.
 		CKEDITOR.replace('Melhoria', {
 		width: 1020,
 		height: 200,

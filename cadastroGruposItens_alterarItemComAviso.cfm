@@ -371,6 +371,7 @@
     <head>
         <title>SNCI - CADASTRO DE GRUPOS E ITENS</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <script type="text/javascript" src="ckeditor/ckeditor.js"></script>
        
 
     <style type="text/css">    
