@@ -395,7 +395,9 @@
 
 	<cffunction name="getUsuariosJSON" access="remote" returntype="any" returnformat="json" output="false">
 		<cfquery name="rsCadUsuarios" datasource="#application.dsn_processos#">
-			SELECT pc_usuarios.*, pc_orgaos.*, pc_perfil_tipos.* FROM pc_usuarios 
+			SELECT pc_usuarios.*, pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_controle_interno,
+			       pc_perfil_tipos.pc_perfil_tipo_descricao, pc_perfil_tipos.pc_perfil_tipo_id	
+			 FROM pc_usuarios 
 			left JOIN pc_orgaos ON pc_org_mcu = pc_usu_lotacao
 			INNER JOIN pc_perfil_tipos on pc_perfil_tipo_id = pc_usu_perfil
 			ORDER BY pc_usuarios.pc_usu_nome
@@ -409,11 +411,16 @@
 			<cfset usuario.PC_USU_MATRICULA = rsCadUsuarios.pc_usu_matricula>
 			<cfset usuario.PC_USU_NOME = rsCadUsuarios.pc_usu_nome>
 			<cfset usuario.PC_PERFIL_TIPO_DESCRICAO = rsCadUsuarios.pc_perfil_tipo_descricao>
-			<cfset usuario.PC_ORG_SIGLA = rsCadUsuarios.pc_org_sigla>
+			<cfset usuario.PC_ORG_SIGLA = rsCadUsuarios.pc_org_sigla>  
 			<cfset usuario.PC_USU_LOGIN = rsCadUsuarios.pc_usu_login>
 			<cfset usuario.PC_USU_STATUS = rsCadUsuarios.pc_usu_status>
 			<cfset usuario.PC_USU_MCU = rsCadUsuarios.pc_usu_lotacao>
 			<cfset usuario.PC_USU_TIPO_ID = rsCadUsuarios.pc_perfil_tipo_id>
+			<cfset usuario.PC_USU_EMAIL = rsCadUsuarios.pc_usu_email>
+			<cfset usuario.PC_USU_GERENTE = rsCadUsuarios.pc_usu_gerente>
+			<cfset usuario.PC_USU_RECEBEEMAIL_PRIMEIRAMANIF = rsCadUsuarios.pc_usu_recebeEmail_primeiraManif>
+			<cfset usuario.PC_USU_RECEBEEMAIL_SEGUNDAMANIF = rsCadUsuarios.pc_usu_recebeEmail_segundaManif>
+			<cfset usuario.PC_ORG_CONTROLE_INTERNO = rsCadUsuarios.pc_org_controle_interno>
 			<cfset arrayAppend(usuarios, usuario)>
 		</cfloop>
 		
@@ -1647,38 +1654,38 @@
 	</cffunction>
 
 	<cffunction name="verificaHierarquiaOrgao" access="remote" returntype="boolean" returnformat="plain" hint="Verifica se um órgão é hierarquicamente subordinado a outro">
-    <cfargument name="orgaoAvaliado" type="string" required="true">
-    <cfargument name="orgaoResponsavel" type="string" required="true">
-    
-    <cfset var isSubordinado = false>
-    
-    <cfquery name="qryHierarquia" datasource="#application.dsn_processos#">
-        WITH OrgHierarchy AS (
-            -- Primeiro nível: o próprio órgão
-            SELECT pc_org_mcu, pc_org_mcu_subord_tec, 0 AS level
-            FROM pc_orgaos
-            WHERE pc_org_mcu = <cfqueryparam value="#arguments.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
-            
-            UNION ALL
-            
-            -- Próximos níveis: órgãos subordinados (com limite de profundidade)
-            SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec, oh.level + 1
-            FROM pc_orgaos o
-            INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
-            WHERE oh.level < 10  -- Limite de segurança para evitar loops infinitos
-        )
-        SELECT COUNT(*) AS total
-        FROM OrgHierarchy
-        WHERE pc_org_mcu = <cfqueryparam value="#arguments.orgaoResponsavel#" cfsqltype="cf_sql_varchar">
-        
-    </cfquery>
-    
-    <cfif qryHierarquia.total GT 0>
-        <cfset isSubordinado = true>
-    </cfif>
-    
-    <cfreturn isSubordinado>
-</cffunction>
+		<cfargument name="orgaoAvaliado" type="string" required="true">
+		<cfargument name="orgaoResponsavel" type="string" required="true">
+		
+		<cfset var isSubordinado = false>
+		
+		<cfquery name="qryHierarquia" datasource="#application.dsn_processos#">
+			WITH OrgHierarchy AS (
+				-- Primeiro nível: o próprio órgão
+				SELECT pc_org_mcu, pc_org_mcu_subord_tec, 0 AS level
+				FROM pc_orgaos
+				WHERE pc_org_mcu = <cfqueryparam value="#arguments.orgaoAvaliado#" cfsqltype="cf_sql_varchar">
+				
+				UNION ALL
+				
+				-- Próximos níveis: órgãos subordinados (com limite de profundidade)
+				SELECT o.pc_org_mcu, o.pc_org_mcu_subord_tec, oh.level + 1
+				FROM pc_orgaos o
+				INNER JOIN OrgHierarchy oh ON o.pc_org_mcu_subord_tec = oh.pc_org_mcu
+				WHERE oh.level < 10  -- Limite de segurança para evitar loops infinitos
+			)
+			SELECT COUNT(*) AS total
+			FROM OrgHierarchy
+			WHERE pc_org_mcu = <cfqueryparam value="#arguments.orgaoResponsavel#" cfsqltype="cf_sql_varchar">
+			
+		</cfquery>
+		
+		<cfif qryHierarquia.total GT 0>
+			<cfset isSubordinado = true>
+		</cfif>
+		
+		<cfreturn isSubordinado>
+	</cffunction>
 
 		
 </cfcomponent>

@@ -107,6 +107,26 @@
 			overflow-x: hidden!important;
 			justify-items: center;
 		}
+		fieldset{
+			border: 1px solid #ced4da!important;
+			border-radius: 8px!important;
+			padding: 20px!important;
+			margin-bottom: 10px!important;
+			background: none!important;
+			-webkit-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+			-moz-box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+			box-shadow: 7px 7px 9px 0px rgba(217,217,217,0.69);
+		}
+
+		legend {
+			font-size: 0.8rem!important;
+			color: #fff!important;
+			background-color: var(--azul_claro_correios)!important;
+			border: 1px solid #ced4da!important;
+			border-radius: 5px!important;
+			padding: 5px!important;
+			width: auto!important;
+		}
 		
 
     </style>
@@ -208,48 +228,44 @@
 										
 										<div class="col-sm-6">
 											<div class="form-group">
-												<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
-													<div class="row">
-														<div class="col-sm-12">
-															<div class="form-group">
-																<label for="usuarioEmail">E-mail:</label>
-																<input id="usuarioEmail" name="usuarioEmail" type="email" class="form-control" placeholder="Informe o e-mail...">
-																<div class="invalid-feedback">
-																	Por favor, informe um e-mail válido quando alguma opção abaixo estiver marcada.
-																</div>
-															</div>
-														</div>
-														<div class="col-sm-12 mt-3">
-															<div class="form-check">
-																<input type="checkbox" class="form-check-input" id="usuarioGerente" name="usuarioGerente">
-																<label class="form-check-label" for="usuarioGerente">É Gerente?</label>
-															</div>
-														</div>
-														<div class="col-sm-12 mt-2">
-															<div class="form-check">
-																<input type="checkbox" class="form-check-input" id="usuarioRecebeEmailPrimeiraManif" name="usuarioRecebeEmailPrimeiraManif">
-																<label class="form-check-label" for="usuarioRecebeEmailPrimeiraManif">Recebe E-mail Primeira Manifestação?</label>
-															</div>
-														</div>
-														<div class="col-sm-12 mt-2">
-															<div class="form-check">
-																<input type="checkbox" class="form-check-input" id="usuarioRecebeEmailSegundaManif" name="usuarioRecebeEmailSegundaManif">
-																<label class="form-check-label" for="usuarioRecebeEmailSegundaManif">Recebe E-mail Segunda Manifestação?</label>
+												
+												<div id="divControleInterno" class="row">
+													<div class="col-sm-12">
+														<div class="form-group">
+															<label for="usuarioEmail">E-mail:</label>
+															<input id="usuarioEmail" name="usuarioEmail" type="email" class="form-control" placeholder="Informe o e-mail...">
+															<div class="invalid-feedback">
+																Por favor, informe um e-mail válido quando alguma opção abaixo estiver marcada.
 															</div>
 														</div>
 													</div>
-												</cfif>
+													<div class="col-sm-12 mt-3">
+														<fieldset class="border p-2">
+															<legend class="w-auto float-none" style="font-size:14px;margin-bottom:0px">Opções para Notificação por E-mail</legend>
+															<div class="form-check mt-2">
+																<input type="checkbox" class="form-check-input" id="usuarioGerente" name="usuarioGerente">
+																<label class="form-check-label" for="usuarioGerente">Gerente</label>
+															</div>
+															<div class="form-check mt-2">
+																<input type="checkbox" class="form-check-input" id="usuarioRecebeEmailPrimeiraManif" name="usuarioRecebeEmailPrimeiraManif">
+																<label class="form-check-label" for="usuarioRecebeEmailPrimeiraManif">Primeira Manifestação</label>
+															</div>
+															<div class="form-check mt-2">
+																<input type="checkbox" class="form-check-input" id="usuarioRecebeEmailSegundaManif" name="usuarioRecebeEmailSegundaManif">
+																<label class="form-check-label" for="usuarioRecebeEmailSegundaManif">Segunda Manifestação</label>
+															</div>
+														</fieldset>
+													</div>
+												</div>
+												
 											</div>
 										</div>
 
 										<div style="justify-content:center; display: flex; width: 100%;margin-top:20px">
 											<div id="btSalvarDiv" >
 												<button id="btSalvar" class="btn btn-block btn-primary " >Salvar</button>
-												
-											
 											</div>
 											<div style="margin-left:100px">
-												
 												<button id="btCancelar"  class="btn btn-block btn-danger " >Cancelar</button>
 											</div>
 											
@@ -368,7 +384,13 @@
 					render: function (data) {
 						return data === 'A' ? 'Ativo' : 'Desativado';
 					}
-				}
+				},
+				{ data: 'PC_USU_EMAIL', title: 'E-mail' },
+				{ data: 'PC_USU_GERENTE', title: 'Gerente' },
+				{ data: 'PC_USU_RECEBEEMAIL_PRIMEIRAMANIF', title: 'Recebe E-mail Primeira Manif.' },
+				{ data: 'PC_USU_RECEBEEMAIL_SEGUNDAMANIF', title: 'Recebe E-mail Segunda Manif.' },
+				{ data: 'PC_ORG_CONTROLE_INTERNO', title: 'Controle Interno' },
+				
 			],
 			createdRow: function (row, data, dataIndex) {
 				// Renderizar os dados como cards
@@ -377,14 +399,14 @@
 				if (perfilUsuario === 3 || perfilUsuario === 11) {	// Se o usuário for do perfil 3 (Desenvolvedor) ou 11 - CI -MASTER ACOMPANHAMENTO
 					buttonsHtml = `
 						 <div class="card-icons">
-						 	<i class="fas fa-user-edit grow-icon edit-button" onclick="usuarioEditar('${data.PC_USU_MATRICULA}', '${data.PC_USU_NOME}', '${data.PC_USU_STATUS}', '${String(data.PC_USU_MCU)}', ${data.PC_USU_TIPO_ID}, this);" data-toggle="tooltip" title="Editar" style="cursor: pointer;z-index:100;font-size:15px;color:${data.PC_USU_STATUS === 'A' ? '#0083ca' : 'user-desativado'}"></i>
+						 	<i class="fas fa-user-edit grow-icon edit-button" onclick="usuarioEditar('${data.PC_USU_MATRICULA}', '${data.PC_USU_NOME}', '${data.PC_USU_STATUS}', '${String(data.PC_USU_MCU)}', ${data.PC_USU_TIPO_ID}, '${data.PC_USU_EMAIL}','${data.PC_USU_GERENTE}','${data.PC_USU_RECEBEEMAIL_PRIMEIRAMANIF}', '${data.PC_USU_RECEBEEMAIL_SEGUNDAMANIF}', '${data.PC_ORG_CONTROLE_INTERNO}',this);" data-toggle="tooltip" title="Editar" style="cursor: pointer;z-index:100;font-size:15px;color:${data.PC_USU_STATUS === 'A' ? '#0083ca' : 'user-desativado'}"></i>
 						
 							<i class="fas fa-trash-alt grow-icon delete-button" onclick="excluirUsuario('${data.PC_USU_MATRICULA}');" data-toggle="tooltip" title="Excluir" style="cursor: pointer;z-index:100;font-size:15px;color: ${data.PC_USU_STATUS === 'A' ? '#dc3545' : 'user-desativado'}"></i>
 						</div>`;
 				} else {
 					buttonsHtml = `
 						 <div class="card-icons">
-							<i class="fas fa-user-edit grow-icon edit-button" onclick="usuarioEditar('${data.PC_USU_MATRICULA}', '${data.PC_USU_NOME}', '${data.PC_USU_STATUS}', '${String(data.PC_USU_MCU)}', ${data.PC_USU_TIPO_ID}, this);" data-toggle="tooltip" title="Editar" style="cursor: pointer;z-index:100;font-size:15px;color:${data.PC_USU_STATUS === 'A' ? '#0083ca' : 'user-desativado'}"></i>
+							<i class="fas fa-user-edit grow-icon edit-button" onclick="usuarioEditar('${data.PC_USU_MATRICULA}', '${data.PC_USU_NOME}', '${data.PC_USU_STATUS}', '${String(data.PC_USU_MCU)}', ${data.PC_USU_TIPO_ID}, '${data.PC_USU_EMAIL}','${data.PC_USU_GERENTE}','${data.PC_USU_RECEBEEMAIL_PRIMEIRAMANIF}', '${data.PC_USU_RECEBEEMAIL_SEGUNDAMANIF}', '${data.PC_ORG_CONTROLE_INTERNO}',this);" data-toggle="tooltip" title="Editar" style="cursor: pointer;z-index:100;font-size:15px;color:${data.PC_USU_STATUS === 'A' ? '#0083ca' : 'user-desativado'}"></i>
 						</div>`;
 				}
 				const userCardHtml = `
@@ -456,6 +478,20 @@
 	
         $(function () {
 			$('[data-mask]').inputmask()//mascara de campos
+
+			// Event listener para o checkbox usuarioGerente
+			$('#usuarioGerente').on('change', function() {
+				if($(this).is(':checked')) {
+					// Se gerente marcado, desativa os outros checkboxes
+					$('#usuarioRecebeEmailPrimeiraManif, #usuarioRecebeEmailSegundaManif')
+						.prop('checked', false)
+						.prop('disabled', true);
+				} else {
+					// Se gerente desmarcado, reativa os outros checkboxes
+					$('#usuarioRecebeEmailPrimeiraManif, #usuarioRecebeEmailSegundaManif')
+						.prop('disabled', false);
+				}
+			});
 		})
 				
 		//Initialize Select2 Elements
@@ -603,14 +639,15 @@
 				$('#usuarioPerfil').val(null).trigger('change')
 				$('#usuarioEmail').val(null)
 				$('#usuarioGerente').prop('checked', false)
-				$('#usuarioRecebeEmailPrimeiraManif').prop('checked', false)
-				$('#usuarioRecebeEmailSegundaManif').prop('checked', false)
+				$('#usuarioRecebeEmailPrimeiraManif, #usuarioRecebeEmailSegundaManif')
+					.prop('disabled', false)
+					.prop('checked', false);
 				$("#usuarioStatusDiv").attr("hidden",true)
 				$('#cadastroUsuarios').CardWidget('collapse')
 				$('#cabecalhoAccordion').text("Clique aqui para cadastrar um novo Usuário");
 		})
 
-		function usuarioEditar(usuarioMatricula,usuarioNome,usuarioStatus,usuarioLotacao,usuarioPerfil,linha)  {
+		function usuarioEditar(usuarioMatricula,usuarioNome,usuarioStatus,usuarioLotacao,usuarioPerfil,usuarioEmail,usuarioGerente,usuarioRecebeEmailPrimeiraManif,usuarioRecebeEmailSegundaManif,usuarioControleInterno,linha) {
 			event.preventDefault()
 			event.stopPropagation()
 			var usuarioLotacao =  usuarioLotacao.toString().padStart(8, '0');
@@ -624,7 +661,25 @@
 			$('#usuarioLotacao').val(usuarioLotacao).trigger('change')
 			$('#usuarioPerfil').val(usuarioPerfil).trigger('change')
 			$('#usuarioStatus').val(usuarioStatus).trigger('change')
-			
+			$('#usuarioEmail').val(usuarioEmail)
+			$('#usuarioGerente').prop('checked', usuarioGerente === '1');
+			if(usuarioGerente === '1') {
+				$('#usuarioRecebeEmailPrimeiraManif, #usuarioRecebeEmailSegundaManif')
+					.prop('checked', false)
+					.prop('disabled', true);
+			} else {
+				$('#usuarioRecebeEmailPrimeiraManif, #usuarioRecebeEmailSegundaManif')
+					.prop('disabled', false)
+					.prop('checked', false);
+				$('#usuarioRecebeEmailPrimeiraManif').prop('checked', usuarioRecebeEmailPrimeiraManif === '1');
+				$('#usuarioRecebeEmailSegundaManif').prop('checked', usuarioRecebeEmailSegundaManif === '1');
+			}
+			// Verifica se o controle interno deve ser exibido ou não
+			if(usuarioControleInterno == 'S'){
+				$('#divControleInterno').show()
+			}else{
+				$('#divControleInterno').hide()
+			}
 			$("#usuarioStatusDiv").attr("hidden",false)
 			$('#cadastroUsuarios').CardWidget('expand')
 			$('html, body').animate({ scrollTop: ($('.wrapper').offset().top)-50} , 500);
