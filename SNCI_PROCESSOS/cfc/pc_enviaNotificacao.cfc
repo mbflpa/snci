@@ -34,7 +34,7 @@
 			AND pc_usuarios.pc_usu_email <> ''
 			AND pc_usuarios.pc_usu_email LIKE '%_@_%._%'
 		</cfquery>
-	
+	<cfdump var="#rsEmailAnalistas#" label="rsEmailAnalistas" abort="false">
 		<cfif rsEmailAnalistas.recordCount GT 0>
 			<cfset emailList = ValueList(rsEmailAnalistas.pc_usu_email)>
 			
