@@ -60,14 +60,11 @@
         <form class="test-form" method="post">
             <label for="numOrientacao">Número do Processo:</label>
             <input type="number" id="numOrientacao" name="numOrientacao" value="3881" required>
-            
-            <label for="numNotificacao">Número da Notificação (1 ou 2):</label>
-            <input type="number" id="numNotificacao" name="numNotificacao" min="1" max="2" value="1" required>
-            
+
             <button type="submit">Executar Teste</button>
         </form>
 
-        <cfif structKeyExists(form, "numOrientacao") AND structKeyExists(form, "numNotificacao")>
+        <cfif structKeyExists(form, "numOrientacao") >
            
            <cfquery datasource = "#application.dsn_processos#" name="qPosic">
                 SELECT count(pc_aval_posic_num_orientacao) as qposicionamentos FROM pc_avaliacao_orientacoes o

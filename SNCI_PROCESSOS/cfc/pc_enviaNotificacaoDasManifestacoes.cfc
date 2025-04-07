@@ -131,7 +131,7 @@
                             <td style="padding: 8px;">#rsOrientacao.siglaOrgaoAvaliado#</td>
                         </tr>
                     </table>
-                    <p style="text-align: justify;"><strong>Obs.:</strong> Orienta-se a tratá-los em até cinco dias corridos a partir da data do recebimento. Atentar para as substituições em períodos de férias.</p>'>
+                    <p style="text-align: justify;"><strong>Obs.:</strong> Orienta-se a tratá-lo em até cinco dias corridos a partir da data do recebimento. Atentar para as substituições em períodos de férias.</p>'>
                 
                 <cfobject component="pc_cfcPaginasApoio" name="pc_cfcPaginasApoio"/>
                 <cfinvoke component="#pc_cfcPaginasApoio#" 
