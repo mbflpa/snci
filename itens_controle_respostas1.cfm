@@ -610,19 +610,11 @@
 		<cfelse>
 			<cfoutput>
 				<!--- contar 30 dias úteis para AGF e ACC --->			
-				<cfquery name="rs14SN" datasource="#dsn_inspecao#">
-					SELECT And_DtPosic FROM Andamento
-					WHERE And_Unidade='#FORM.unid#' AND 
-					And_NumInspecao='#FORM.ninsp#' AND 
-					And_NumGrupo=#FORM.ngrup# AND 
-					And_NumItem=#FORM.nitem# AND 
-					And_Situacao_Resp in(0,11,14)
-					order by And_DtPosic desc
-				</cfquery>
-				<cfset dtnovoprazo = CreateDate(year(rs14SN.And_DtPosic),month(rs14SN.And_DtPosic),day(rs14SN.And_DtPosic))> 
+				<cfset dtnovoprazo = CreateDate(year(form.INPDTConcluirRevisao),month(form.INPDTConcluirRevisao),day(form.INPDTConcluirRevisao))> 
+				<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
 				<cfset nCont = 1>
-				<cfloop condition="nCont lte 30">
-					<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+				<cfloop condition="nCont lte 1">
+					<!---  --->
 					<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
 					<cfif vDiaSem neq 1 and vDiaSem neq 7>
 						<!--- verificar se Feriado Nacional --->
@@ -630,15 +622,17 @@
 							SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
 						</cfquery>
 						<cfif rsFeriado.recordcount gt 0>
-						<cfset nCont = nCont - 1>
+							<cfset nCont = nCont - 1>
+							<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
 						</cfif>
 					</cfif>
 					<!--- Verifica se final de semana  --->
 					<cfif vDiaSem eq 1 or vDiaSem eq 7>
 						<cfset nCont = nCont - 1>
+						<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
 					</cfif>	
 					<cfset nCont = nCont + 1>	
-				</cfloop>	
+				</cfloop> 
 			</cfoutput>		
 		</cfif>
  		<cfif form.frmResp eq 21 or form.frmResp eq 28>
@@ -666,7 +660,8 @@
 			</cfquery>				
 			<cfset posarea = #rsSCIA.Ars_Codigo#>
 			<cfset posnomearea = #rsSCIA.Ars_Sigla#>
-		</cfif>			
+		</cfif>		
+		<cfset posdtprevsoltxt = 'Data de Previsão da Solução: '>	
 		<!--- ===================== --->
 		<cfquery datasource="#dsn_inspecao#">
 		UPDATE ParecerUnidade SET
@@ -902,6 +897,7 @@
 				<cfset IDArea = #posarea#>
 				<cfset sdestina = #rsMod.Und_Email#>
 				<cfset nomedestino = #rsMod.Und_Descricao#>
+				<cfset posdtprevsoltxt = 'Data Final da Solução: '>
 			</cfcase>
 			<cfcase value=19>
 				<cfquery name="qArea2" datasource="#dsn_inspecao#">
@@ -935,6 +931,7 @@
 				<cfset Gestor = '#rsMod.Und_Descricao#'>
 				<cfset situacao = 'PENDENTE DE TERCEIRIZADA'>
 				<cfset IDArea = #posarea#>
+				<cfset posdtprevsoltxt = 'Data Final da Solução: '>
 			</cfcase>
 			<cfcase value=21>
 				, Pos_Situacao = 'RV'
@@ -1065,7 +1062,7 @@
 	<!---	 <cfset aux_obs = Replace(aux_obs,'&','','All')>
 		     <cfset aux_obs = Replace(aux_obs,'%','','All')> --->
   
-      <cfset pos_aux = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'A(O)' & '  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & #situacao# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+      <cfset pos_aux = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'A(O)' & '  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & #posdtprevsoltxt# & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & #situacao# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 	 <cfif "#Form.frmResp#" eq 25 || "#Form.frmResp#" eq 26 >
 		<cfset pos_aux = Form.H_obs & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #Trim(Encaminhamento)# & CHR(13) & CHR(13) & 'A(O)' & '  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & CHR(13) & CHR(13) & 'Situação: ' & #situacao# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'> 
 	 </cfif> 	 
@@ -1122,7 +1119,7 @@
   '#hhmmssdc#'
    ,
   <cfif IsDefined("FORM.observacao") AND FORM.observacao NEQ "">
-     <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #Trim(Encaminhamento)#  & CHR(13) & CHR(13) & 'AO (À) ' & '  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & CHR(13) & CHR(13) & 'Situação: ' & #situacao# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+     <cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #Trim(Encaminhamento)#  & CHR(13) & CHR(13) & 'AO (À) ' & '  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & #posdtprevsoltxt# & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & CHR(13) & CHR(13) & 'Situação: ' & #situacao# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 	<cfif "#Form.frmResp#" eq 25 || "#Form.frmResp#" eq 26 >
 		<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & #Trim(Encaminhamento)#  & CHR(13) & CHR(13) & 'AO (À) ' & '  ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & CHR(13) & CHR(13) & 'Situação: ' & #situacao# & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 	</cfif>	 	 
@@ -1232,6 +1229,7 @@
  Pos_Situacao_Resp, 
  INP_DtInicInspecao, 
  INP_TNCClassificacao, 
+ INP_DTConcluirRevisao,
  INP_Modalidade,
  Pos_NCISEI,
  Pos_ClassificacaoPonto, 
@@ -1331,15 +1329,11 @@ left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidad
 </cfquery>
 <cfset PrzVencSN = 'no'>
 <cfif qResposta.Itn_TipoUnidade is 12 || qResposta.Itn_TipoUnidade is 16>
-	<cfquery name="rs14AND" datasource="#dsn_inspecao#">
-		SELECT And_DtPosic FROM Andamento
-		WHERE And_Unidade='#URL.unid#' AND And_NumInspecao='#URL.ninsp#' AND And_NumGrupo=#URL.ngrup# AND And_NumItem=#URL.nitem# 
-		AND And_Situacao_Resp = 14
-	</cfquery>
-	<cfset dtnovoprazo = CreateDate(year(rs14AND.And_DtPosic),month(rs14AND.And_DtPosic),day(rs14AND.And_DtPosic))> 
+	<cfset dtnovoprazo = createodbcdate(CreateDate(year(qResposta.INP_DTConcluirRevisao),month(qResposta.INP_DTConcluirRevisao),day(qResposta.INP_DTConcluirRevisao)))> 
+	<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
 	<cfset nCont = 1>
-	<cfloop condition="nCont lte 30">
-		<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+	<cfloop condition="nCont lte 1">
+		<!---  --->
 		<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
 		<cfif vDiaSem neq 1 and vDiaSem neq 7>
 			<!--- verificar se Feriado Nacional --->
@@ -1347,16 +1341,18 @@ left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidad
 				SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
 			</cfquery>
 			<cfif rsFeriado.recordcount gt 0>
-			<cfset nCont = nCont - 1>
+				<cfset nCont = nCont - 1>
+				<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
 			</cfif>
 		</cfif>
 		<!--- Verifica se final de semana  --->
 		<cfif vDiaSem eq 1 or vDiaSem eq 7>
 			<cfset nCont = nCont - 1>
+			<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
 		</cfif>	
 		<cfset nCont = nCont + 1>	
 	</cfloop> 	
-	
+	<cfset dtposicfutagf = dtnovoprazo>
 	<cfquery name="rsPonto" datasource="#dsn_inspecao#">
 		SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto 
 		WHERE STO_Status='A'                                                                                                   
@@ -1428,8 +1424,13 @@ function dtprazo(k){
    document.form1.cbdata.value = document.form1.dtdehoje.value;
    document.form1.cbdata.disabled = true;
  }
-
-  if (k == 15 || k == 16 || k == 18 || k == 19  || k == 23 )
+ 
+ if (k == 18)
+ {
+   document.form1.cbdata.value = document.form1.dtposicfutagf.value;
+   document.form1.cbdata.disabled = false;
+ }
+  if (k == 15 || k == 16 || k == 19  || k == 23 )
  {
    document.form1.cbdata.value = document.form1.dtdezdiasfut.value;
    document.form1.cbdata.disabled = false;
@@ -3003,6 +3004,8 @@ window.open(page, "Popup", windowprops);
 	  <!--- ===================== --->	
 	<input name="frmsitatual" type="hidden" id="frmsitatual" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
 	<input name="dtdezdiasfut" type="hidden" id="dtdezdiasfut" value="<cfoutput>#DateFormat(dtposicfut,'DD/MM/YYYY')#</cfoutput>">
+	<input name="dtposicfutagf" type="hidden" id="dtposicfutagf" value="<cfoutput>#DateFormat(dtposicfutagf,'DD/MM/YYYY')#</cfoutput>">
+	
 	<input type="hidden" name="auxano" id="auxano" value="<cfoutput>#right(DateFormat(now(),'YYYY'),2)#</cfoutput>">
 	<input name="dtdezddtrat" type="hidden" id="dtdezddtrat" value="<cfoutput>#DateFormat(dtposicfut,'YYYYMMDD')#</cfoutput>">
 	<input type="hidden" name="NumSEIAtu" id="NumSEIAtu" value="<cfoutput>#trim(qResposta.Pos_SEI)#</cfoutput>">
@@ -3016,6 +3019,7 @@ window.open(page, "Popup", windowprops);
     <input type="hidden" name="auxavisosn" id="auxavisosn" value="<cfoutput>#auxavisosn#</cfoutput>">   
 	<input type="hidden" name="frmtransfer" id="frmtransfer" value="<cfoutput>#auxtransfer#</cfoutput>">
 	<input type="hidden" name="ItnPTCSeq" id="ItnPTCSeq" value="<cfoutput>#qResposta.Itn_PTC_Seq#</cfoutput>">
+	<input type="hidden" name="INPDTConcluirRevisao" id="INPDTConcluirRevisao" value="<cfoutput>#DateFormat(qResposta.INP_DTConcluirRevisao,'DD/MM/YYYY')#</cfoutput>">
  </form>
   <!--- Fim area de conteudo --->
 </table>
