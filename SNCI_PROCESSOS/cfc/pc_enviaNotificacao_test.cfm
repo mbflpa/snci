@@ -68,7 +68,7 @@
         </form>
 
         <cfif structKeyExists(form, "numOrientacao") AND structKeyExists(form, "numNotificacao")>
-            <cfset objNotificacao = createObject("component", "pc_enviaNotificacao")>
+            <cfset objNotificacao = createObject("component", "pc_enviaNotificacaoDasManifestacoes")>
             
             <cftry>
                  <!--- Converter os valores do formulário para integer --->
