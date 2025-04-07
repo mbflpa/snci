@@ -2382,13 +2382,14 @@ window.open(page, "Popup", windowprops);
 		<cfset sobra = lscurrencyformat(qResposta.RIP_Sobra,'Local')>
 		<cfset emrisco = lscurrencyformat(qResposta.RIP_EmRisco,'Local')>
  	<tr class="exibir">
-      <td bgcolor="eeeeee">IMPACTO FINANCEIRO (Valor)</td>
+      <td bgcolor="eeeeee">Potencial Valor</td>
       <td colspan="5" bgcolor="eeeeee">
 		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
 			<tr class="exibir"><strong>
-				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
-				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
-				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+				<!--- <td width="35%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbspEstimado a Recuperar (R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td> --->
+				<td width="30%" bgcolor="eeeeee"><strong>Estimado a Recuperar (R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				<td width="35%" bgcolor="eeeeee"><strong>Estimado Não Planejado/Extrapolado/Sobra (R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				<td width="35%" bgcolor="eeeeee"><strong>Estimado em Risco ou Envolvido (R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
 			</tr>
 		  </table>		  
 	  </td>
@@ -3004,7 +3005,9 @@ window.open(page, "Popup", windowprops);
 	  <!--- ===================== --->	
 	<input name="frmsitatual" type="hidden" id="frmsitatual" value="<cfoutput>#qResposta.Pos_Situacao_Resp#</cfoutput>">
 	<input name="dtdezdiasfut" type="hidden" id="dtdezdiasfut" value="<cfoutput>#DateFormat(dtposicfut,'DD/MM/YYYY')#</cfoutput>">
-	<input name="dtposicfutagf" type="hidden" id="dtposicfutagf" value="<cfoutput>#DateFormat(dtposicfutagf,'DD/MM/YYYY')#</cfoutput>">
+	<cfif qResposta.Itn_TipoUnidade is 12>
+		<input name="dtposicfutagf" type="hidden" id="dtposicfutagf" value="<cfoutput>#DateFormat(dtposicfutagf,'DD/MM/YYYY')#</cfoutput>">
+	</cfif>
 	
 	<input type="hidden" name="auxano" id="auxano" value="<cfoutput>#right(DateFormat(now(),'YYYY'),2)#</cfoutput>">
 	<input name="dtdezddtrat" type="hidden" id="dtdezddtrat" value="<cfoutput>#DateFormat(dtposicfut,'YYYYMMDD')#</cfoutput>">
