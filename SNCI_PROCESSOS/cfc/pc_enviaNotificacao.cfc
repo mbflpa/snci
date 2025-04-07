@@ -1,12 +1,15 @@
 <cfcomponent>
     <cfprocessingdirective pageencoding = "utf-8">	
     <cffunction name="enviaEmailNotificacaoAnalistas" access="remote" returntype="boolean" hint="Envia e-mail para analistas baseado no tipo de notificação">
-		<cfargument name="numProcesso" type="string" required="true">
+		<cfargument name="numOrientacao" type="numeric" required="true">
 		<cfargument name="numNotificacao" type="numeric" required="true">
 		
 		<cfquery name="rsEmailAnalistas" datasource="#application.dsn_processos#">
 			SELECT DISTINCT 
 				pc_processos.pc_processo_id,
+				pc_avaliacoes.pc_aval_numeracao,
+				o.pc_aval_orientacao_id,
+				orgaoResp.pc_org_sigla as siglaOrgaoResp,
 				pc_processos.pc_num_orgao_origem,
 				pc_processos.pc_num_orgao_avaliado,
 				pc_processos.pc_num_sei,
@@ -15,13 +18,22 @@
 				pc_avaliacao_tipos.pc_aval_tipo_descricao,
 				pc_usuarios.pc_usu_email,
 				orgaoOrigem.pc_org_sigla as siglaOrgaoOrigem,
-				orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado
+				orgaoAvaliado.pc_org_sigla as siglaOrgaoAvaliado,
+				CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						) as tipoProcesso
 			FROM pc_processos
+			INNER JOIN pc_avaliacoes on pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+			INNER JOIN pc_avaliacao_orientacoes o ON o.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
 			INNER JOIN pc_usuarios ON pc_usuarios.pc_usu_lotacao = pc_processos.pc_num_orgao_origem
+			INNER JOIN pc_orgaos as orgaoResp ON orgaoResp.pc_org_mcu = o.pc_aval_orientacao_mcu_orgaoResp
 			INNER JOIN pc_orgaos as orgaoOrigem ON orgaoOrigem.pc_org_mcu = pc_processos.pc_num_orgao_origem
 			INNER JOIN pc_orgaos as orgaoAvaliado ON orgaoAvaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
 			INNER JOIN pc_avaliacao_tipos ON pc_aval_tipo_id = pc_processos.pc_num_avaliacao_tipo
-			WHERE pc_processo_id = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
+			WHERE o.pc_aval_orientacao_id = <cfqueryparam value="#arguments.numOrientacao#" cfsqltype="cf_sql_integer">
 			AND pc_usuarios.pc_usu_status = 'A'
 			AND (
 				(pc_usuarios.pc_usu_gerente = 1 AND #arguments.numNotificacao# = 1)
@@ -37,32 +49,53 @@
 	<cfdump var="#rsEmailAnalistas#" label="rsEmailAnalistas" abort="false">
 		<cfif rsEmailAnalistas.recordCount GT 0>
 			<cfset emailList = ValueList(rsEmailAnalistas.pc_usu_email)>
-			
-			<cfset textoEmail = '<p style="text-align: justify;">Prezado(a) analista,</p>
-				<p style="text-align: justify;">Há novas respostas para análise no SNCI Processos, conforme relação a seguir:</p>
+			 <cfset sei = left(#rsEmailAnalistas.pc_num_sei#,5) & '.'& mid(#rsEmailAnalistas.pc_num_sei#,6,6) &'/'& mid(#rsEmailAnalistas.pc_num_sei#,12,4) &'-'&right(#rsEmailAnalistas.pc_num_sei#,2)>
+			 <cfif rsEmailAnalistas.pc_num_avaliacao_tipo neq 445 and rsEmailAnalistas.pc_num_avaliacao_tipo neq 2>
+				<cfif rsEmailAnalistas.pc_aval_tipo_descricao neq ''>
+					<cfset tipoProcesso = rsEmailAnalistas.pc_aval_tipo_descricao>
+				<cfelse>
+					<cfset tipoProcesso = rsEmailAnalistas.tipoProcesso>
+				</cfif>
+			<cfelse>
+				<td>#pc_aval_tipo_nao_aplica_descricao#</td>
+			</cfif>
+			<cfset textoEmail = '
+				<p style="text-align: justify;">Há nova resposta para análise no SNCI Processos, conforme informações a seguir:</p>
 				<table border="1" style="border-collapse: collapse; width: 100%; margin: 20px 0;">
 					<tr>
-						<th style="padding: 8px; background-color: ##f2f2f2;">Nº Processo SNCI</th>
+						<th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Nº Processo SNCI</th>
 						<td style="padding: 8px;">#rsEmailAnalistas.pc_processo_id#</td>
 					</tr>
 					<tr>
-						<th style="padding: 8px; background-color: ##f2f2f2;">Nº SEI</th>
-						<td style="padding: 8px;">#rsEmailAnalistas.pc_num_sei#</td>
+						<th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Nº Item</th>
+						<td style="padding: 8px;">#rsEmailAnalistas.pc_aval_numeracao#</td>
 					</tr>
 					<tr>
-						<th style="padding: 8px; background-color: ##f2f2f2;">Nº Relatório SEI</th>
+						<th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">ID Orientação</th>
+						<td style="padding: 8px;">#rsEmailAnalistas.pc_aval_orientacao_id#</td>
+					</tr>
+					<tr>
+						<th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Órgão Responsável</th>
+						<td style="padding: 8px;">#rsEmailAnalistas.siglaOrgaoResp#</td>
+					</tr>
+					<tr>
+						<th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Nº SEI</th>
+						<td style="padding: 8px;">#sei#</td>
+					</tr>
+					<tr>
+						<th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Nº Relatório SEI</th>
 						<td style="padding: 8px;">#rsEmailAnalistas.pc_num_rel_sei#</td>
 					</tr>
 					<tr>
-						<th style="padding: 8px; background-color: ##f2f2f2;">Tipo de Avaliação</th>
-						<td style="padding: 8px;">#rsEmailAnalistas.pc_aval_tipo_descricao#</td>
+						<th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Tipo de Avaliação</th>
+						<td style="padding: 8px;">#tipoProcesso#</td>
 					</tr>
 					<tr>
-						<th style="padding: 8px; background-color: ##f2f2f2;">Órgão Origem</th>
+						<th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Órgão Origem</th>
 						<td style="padding: 8px;">#rsEmailAnalistas.siglaOrgaoOrigem#</td>
 					</tr>
 					<tr>
-						<th style="padding: 8px; background-color: ##f2f2f2;">Órgão Avaliado</th>
+						<th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Órgão Avaliado</th>
 						<td style="padding: 8px;">#rsEmailAnalistas.siglaOrgaoAvaliado#</td>
 					</tr>
 				</table>

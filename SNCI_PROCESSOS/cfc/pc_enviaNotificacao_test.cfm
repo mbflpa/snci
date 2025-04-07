@@ -58,8 +58,8 @@
         <h2>Teste de Envio de E-mail para Analistas</h2>
         
         <form class="test-form" method="post">
-            <label for="numProcesso">Número do Processo:</label>
-            <input type="text" id="numProcesso" name="numProcesso" value="0100012023" required>
+            <label for="numOrientacao">Número do Processo:</label>
+            <input type="number" id="numOrientacao" name="numOrientacao" value="3881" required>
             
             <label for="numNotificacao">Número da Notificação (1 ou 2):</label>
             <input type="number" id="numNotificacao" name="numNotificacao" min="1" max="2" value="1" required>
@@ -67,18 +67,21 @@
             <button type="submit">Executar Teste</button>
         </form>
 
-        <cfif structKeyExists(form, "numProcesso") AND structKeyExists(form, "numNotificacao")>
+        <cfif structKeyExists(form, "numOrientacao") AND structKeyExists(form, "numNotificacao")>
             <cfset objNotificacao = createObject("component", "pc_enviaNotificacao")>
             
             <cftry>
+                 <!--- Converter os valores do formulário para integer --->
+                <cfset numOrientacao = Val(form.numOrientacao)>
+                <cfset numNotificacao = Val(form.numNotificacao)>
                 <cfset resultado = objNotificacao.enviaEmailNotificacaoAnalistas(
-                    numProcesso = form.numProcesso,
+                    numOrientacao = form.numOrientacao,
                     numNotificacao = form.numNotificacao
                 )>
                 
                 <div class="test-result success">
                     <h3>Teste Executado</h3>
-                    <p><strong>Número do Processo:</strong> <cfoutput>#form.numProcesso#</cfoutput></p>
+                    <p><strong>Número do Processo:</strong> <cfoutput>#form.numOrientacao#</cfoutput></p>
                     <p><strong>Tipo de Notificação:</strong> <cfoutput>#form.numNotificacao#</cfoutput></p>
                     <p><strong>Resultado:</strong> <cfoutput>#resultado#</cfoutput></p>
                 </div>
