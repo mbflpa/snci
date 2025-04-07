@@ -45,6 +45,7 @@
 	  Itn_PTC_Seq,
 	  INP_DtEncerramento,
 	  INP_TNCClassificacao, 
+	  INP_DTConcluirRevisao,
 	  Grp_Descricao,
       TNC_ClassifInicio, 
 	  TNC_ClassifAtual
@@ -85,6 +86,7 @@
 	  Itn_ImpactarTipos,
 	  Itn_PTC_Seq,
 	  INP_DtEncerramento,
+	  INP_DTConcluirRevisao,
 	  INP_TNCClassificacao, 
 	  Grp_Descricao
       TNC_ClassifInicio, 
@@ -107,7 +109,7 @@
 	<title>Sistema Nacional de Controle Interno</title>
 	<link href="CSS.css" rel="stylesheet" type="text/css">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+	<script type="text/javascript" src="ckeditor\ckeditor.js"></script>
 	</head>
 	<body>
 	<cfinclude template="cabecalho.cfm">
@@ -425,19 +427,11 @@
 	<cfelse>
 		<cfoutput>
 			<!--- contar 30 dias úteis para AGF e ACC --->			
-			<cfquery name="rs14SN" datasource="#dsn_inspecao#">
-				SELECT And_DtPosic FROM Andamento
-				WHERE And_Unidade='#FORM.unid#' AND 
-				And_NumInspecao='#FORM.ninsp#' AND 
-				And_NumGrupo=#FORM.ngrup# AND 
-				And_NumItem=#FORM.nitem# AND 
-				And_Situacao_Resp in(0,11,14)
-				order by And_DtPosic desc
-			</cfquery>
-			<cfset dtnovoprazo = CreateDate(year(rs14SN.And_DtPosic),month(rs14SN.And_DtPosic),day(rs14SN.And_DtPosic))> 
+			<cfset dtnovoprazo = CreateDate(year(rsItem.INP_DTConcluirRevisao),month(rsItem.INP_DTConcluirRevisao),day(rsItem.INP_DTConcluirRevisao))> 
+			<cfset dtnovoprazo = DateAdd( "d", 31, dtnovoprazo)>
 			<cfset nCont = 1>
-			<cfloop condition="nCont lte 30">
-				<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
+			<cfloop condition="nCont lte 1">
+				<!---  --->
 				<cfset vDiaSem = DayOfWeek(dtnovoprazo)>
 				<cfif vDiaSem neq 1 and vDiaSem neq 7>
 					<!--- verificar se Feriado Nacional --->
@@ -445,18 +439,20 @@
 						SELECT Fer_Data FROM FeriadoNacional where Fer_Data = #dtnovoprazo#
 					</cfquery>
 					<cfif rsFeriado.recordcount gt 0>
-					<cfset nCont = nCont - 1>
+						<cfset nCont = nCont - 1>
+						<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
 					</cfif>
 				</cfif>
 				<!--- Verifica se final de semana  --->
 				<cfif vDiaSem eq 1 or vDiaSem eq 7>
 					<cfset nCont = nCont - 1>
+					<cfset dtnovoprazo = DateAdd( "d", 1, dtnovoprazo)>
 				</cfif>	
 				<cfset nCont = nCont + 1>	
-			</cfloop>	
+			</cfloop> 
 		</cfoutput>		
 	</cfif>	  
-
+    <cfset posdtprevsoltxt = 'Data de Previsão da Solução: '>
 	 <cfquery datasource="#dsn_inspecao#">
 	   UPDATE ParecerUnidade SET Pos_Situacao_Resp = #FORM.frmResp#
    			  , Pos_Area = '#auxposarea#'
@@ -479,12 +475,14 @@
 			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
   			  <cfset Encaminhamento = 'Ao SGCIN'>
 			  <cfset situacao = 'RESPOSTA DA TERCEIRIZADA'>
+			  <cfset posdtprevsoltxt = 'Data Final da Solução: '>
 			</cfcase>
 			<cfcase value=18>
 			  , Pos_Situacao = 'TF'
 			  , Pos_DtPrev_Solucao = #createodbcdate(createdate(year(dtnovoprazo),month(dtnovoprazo),day(dtnovoprazo)))# 
 			  <cfset Encaminhamento = 'A UNIDADE TERCEIRIZADA'>
 			  <cfset situacao = 'TRATAMENTO DE TERCEIRIZADA'>
+			  <cfset posdtprevsoltxt = 'Data Final da Solução: '>
 			</cfcase>
 	  </cfswitch>
 	  , Pos_DtPosic = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
@@ -500,13 +498,13 @@
 		<cfset aux_obs = Replace(aux_obs,"'","","All")>
 		<cfset aux_obs = Replace(aux_obs,'*','','All')>
 		<cfset aux_obs = Replace(aux_obs,'>','','All')>
-		<cfset pos_aux = trim(Form.H_obs) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+		<cfset pos_aux = trim(Form.H_obs) & CHR(13) & CHR(13) & DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento) & CHR(13) & CHR(13) & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & #posdtprevsoltxt# & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 	  '#pos_aux#'
 	   WHERE Pos_Unidade='#FORM.unid#' AND Pos_Inspecao='#FORM.ninsp#' AND Pos_NumGrupo=#FORM.ngrup# AND Pos_NumItem=#FORM.nitem#
     </cfquery>
 
  <!--- Inserindo dados dados na tabela Andamento --->
-	<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'A(o) ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & 'Data de Previsão da Solução: ' & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
+	<cfset and_obs = DateFormat(Now(),"DD/MM/YYYY") & '-' & TimeFormat(Now(),'HH:MM') & '> ' & Trim(Encaminhamento)  & CHR(13) & CHR(13) & 'A(o) ' & #Gestor# & CHR(13) & CHR(13) & #aux_obs# & CHR(13) & CHR(13) & #posdtprevsoltxt# & #DateFormat(dtnovoprazo,"DD/MM/YYYY")# & CHR(13) & CHR(13) & 'Situação: ' & situacao & CHR(13) & CHR(13) &  'Responsável: ' & #maskcgiusu# & '\' & Trim(qUsuario.Usu_Apelido) & '\' & Trim(qUsuario.Usu_LotacaoNome) & CHR(13) & CHR(13) & '-----------------------------------------------------------------------------------------------------------------------'>
 	<cfset hhmhss = timeFormat(now(), "HH:MM:ss")>
 	<cfset hhmhss = Replace(hhmhss,':','',"All")>
 	<cfset hhmhss = Replace(hhmhss,'.','',"All")> 
@@ -936,6 +934,7 @@ function mensagem(){
   INP_DtEncerramento, 
   Grp_Descricao,
   INP_TNCCLASSIFICACAO,
+  INP_DTConcluirRevisao,
   INP_DtInicInspecao,
   TNC_ClassifInicio, 
   TNC_ClassifAtual
