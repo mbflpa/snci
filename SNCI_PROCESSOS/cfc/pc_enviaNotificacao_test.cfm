@@ -68,21 +68,32 @@
         </form>
 
         <cfif structKeyExists(form, "numOrientacao") AND structKeyExists(form, "numNotificacao")>
-            <cfset objNotificacao = createObject("component", "pc_enviaNotificacaoDasManifestacoes")>
-            
+           
+           <cfquery datasource = "#application.dsn_processos#" name="qPosic">
+                SELECT count(pc_aval_posic_num_orientacao) as qposicionamentos FROM pc_avaliacao_orientacoes o
+                 INNER JOIN pc_avaliacao_posicionamentos p on p.pc_aval_posic_num_orientacao = o.pc_aval_orientacao_id
+                 WHERE pc_aval_posic_status=3 and pc_aval_orientacao_status = 3 
+                       and o.pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#form.numOrientacao#">  
+           </cfquery> 
+                <cfset quantidadePosicionamentos = qPosic.qposicionamentos>
+                <cfif quantidadePosicionamentos LT 2>
+                    <cfset numNotificacao = 1>
+                <cfelse>
+                     <cfset numNotificacao = 2>
+                </cfif>
+             <cfset objNotificacao = createObject("component", "pc_enviaNotificacaoDasManifestacoes")>
             <cftry>
                  <!--- Converter os valores do formulário para integer --->
                 <cfset numOrientacao = Val(form.numOrientacao)>
-                <cfset numNotificacao = Val(form.numNotificacao)>
                 <cfset resultado = objNotificacao.enviaEmailNotificacaoAnalistas(
                     numOrientacao = form.numOrientacao,
-                    numNotificacao = form.numNotificacao
+                    numNotificacao = numNotificacao
                 )>
                 
                 <div class="test-result success">
                     <h3>Teste Executado</h3>
                     <p><strong>Número do Processo:</strong> <cfoutput>#form.numOrientacao#</cfoutput></p>
-                    <p><strong>Tipo de Notificação:</strong> <cfoutput>#form.numNotificacao#</cfoutput></p>
+                    <p><strong>Tipo de Notificação:</strong> <cfoutput>#numNotificacao#</cfoutput></p>
                     <p><strong>Resultado:</strong> <cfoutput>#resultado#</cfoutput></p>
                 </div>
                 
