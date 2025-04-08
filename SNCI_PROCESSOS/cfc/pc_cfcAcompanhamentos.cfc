@@ -3847,6 +3847,25 @@
 					</cfquery>
 				</cfloop>
 			</cfif>
+
+			<cfquery datasource = "#application.dsn_processos#" name="qPosic">
+                SELECT count(pc_aval_posic_num_orientacao) as qposicionamentos FROM pc_avaliacao_orientacoes o
+                 INNER JOIN pc_avaliacao_posicionamentos p on p.pc_aval_posic_num_orientacao = o.pc_aval_orientacao_id
+                 WHERE pc_aval_posic_status=3 and pc_aval_orientacao_status = 3 
+                       and o.pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">  
+           </cfquery> 
+			<cfset quantidadePosicionamentos = qPosic.qposicionamentos>
+			<cfif quantidadePosicionamentos LT 2>
+				<cfset numNotificacao = 1>
+			<cfelse>
+				<cfset numNotificacao = 2>
+			</cfif>
+			<cfset objNotificacao = createObject("component", "pc_enviaNotificacaoDasManifestacoes")>
+			<cfset resultado = objNotificacao.enviaEmailNotificacaoAnalistas(
+                    numOrientacao = #arguments.pc_aval_orientacao_id#,
+                    numNotificacao = numNotificacao
+                )>	
+
 		</cftransaction>
 
 

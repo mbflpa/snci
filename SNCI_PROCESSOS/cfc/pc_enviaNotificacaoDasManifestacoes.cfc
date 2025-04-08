@@ -92,7 +92,7 @@
                 </cfif>
 
                 <cfset textoEmail = '
-                    <p style="text-align: justify;">Há nova resposta para análise no SNCI Processos, conforme informações a seguir:</p>
+                    <p style="text-align: justify;">Há nova manifestação para análise no SNCI Processos, conforme informações a seguir:</p>
                     <table border="1" style="border-collapse: collapse; width: 100%; margin: 20px 0;">
                         <tr>
                             <th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Nº Processo SNCI</th>
@@ -140,7 +140,9 @@
                           para="#emailList#"
                           copiaPara="#emailListCC#" 
                           pronomeTratamento="Prezado(a) analista"
-                          texto="#textoEmail#"/>
+                          texto="#textoEmail#"
+                          assunto="SNCI - PROCESSOS: nova manifestação para análise."
+                          />
                           
                 <cfreturn sucessoEmail>
             <cfelse>

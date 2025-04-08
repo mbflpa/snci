@@ -841,6 +841,7 @@
         <cfargument name="copiaPara" type="string" required="false" default="">
         <cfargument name="pronomeTratamento" type="string" required="true">
         <cfargument name="texto" type="string" required="true">
+		<cfargument name="assunto" type="string" required="false" default="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO">
 
         <cfset to = "#arguments.para#">
 		<cfset cc = "">
@@ -863,7 +864,7 @@
 		    <cfif FindNoCase("localhost", application.auxsite)>
 				<cfset de="mbflpa@yahoo.com.br">
 			</cfif>
-			<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+			<cfmail from="#de#" to="#to#" cc="#cc#" subject="#arguments.assunto#" type="html" charset="utf-8">
 				<!DOCTYPE html>
 				<html lang="pt-br">
 				<head>
