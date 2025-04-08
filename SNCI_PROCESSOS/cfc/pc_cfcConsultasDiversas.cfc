@@ -331,7 +331,7 @@
 						LEFT JOIN pc_status ON pc_num_status = pc_status.pc_status_id 
 						LEFT JOIN pc_orgaos AS pc_orgaos_1 ON pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
 						LEFT JOIN pc_classificacoes ON pc_num_classificacao = pc_classificacoes.pc_class_id
-						LEFT JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
+						INNER JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
 						LEFT JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
 						LEFT JOIN  pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
@@ -615,9 +615,9 @@
 						LEFT JOIN pc_status ON pc_num_status = pc_status.pc_status_id 
 						LEFT JOIN pc_orgaos AS pc_orgaos_1 ON pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
 						LEFT JOIN pc_classificacoes ON pc_num_classificacao = pc_classificacoes.pc_class_id
-						LEFT JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
+						INNER JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
 						LEFT JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
-						LEFT JOIN  pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
+						INNER JOIN  pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
 						LEFT JOIN pc_orgaos AS pc_orgaos_resp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_resp.pc_org_mcu 
 						LEFT JOIN  pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 						LEFT JOIN  pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
@@ -898,11 +898,11 @@
 						LEFT JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id 
 						LEFT JOIN pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
 						LEFT JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
-						LEFT JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
+						INNER JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
 						LEFT JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
 						LEFT JOIN  pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
-						LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
+						INNER JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 						LEFT JOIN pc_orgaos as  pc_orgaos_melhoria on pc_orgaos_melhoria.pc_org_mcu = pc_aval_melhoria_num_orgao
 						LEFT JOIN  pc_orgaos as pc_orgaos_melhoria_sug on pc_orgaos_melhoria_sug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
 			           	LEFT JOIN pc_avaliacao_coso on pc_avaliacoes.pc_aval_coso_id = pc_avaliacao_coso.pc_aval_coso_id
