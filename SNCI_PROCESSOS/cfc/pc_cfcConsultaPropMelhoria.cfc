@@ -24,11 +24,11 @@
 					,pc_orgaos_avaliado.pc_org_mcu as orgaoAvaliadoMcu
 
 			FROM pc_avaliacao_melhorias
-			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
-			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
-			INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-			INNER JOIN pc_orgaos AS pc_orgaos_origem ON pc_orgaos_origem.pc_org_mcu = pc_num_orgao_origem
-			INNER JOIN pc_orgaos AS pc_orgaos_avaliado ON pc_orgaos_avaliado.pc_org_mcu = pc_num_orgao_avaliado
+			LEFT JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
+			LEFT JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
+			LEFT JOIN pc_processos on pc_processo_id = pc_aval_processo
+			LEFT JOIN pc_orgaos AS pc_orgaos_origem ON pc_orgaos_origem.pc_org_mcu = pc_num_orgao_origem
+			LEFT JOIN pc_orgaos AS pc_orgaos_avaliado ON pc_orgaos_avaliado.pc_org_mcu = pc_num_orgao_avaliado
 			
 			WHERE NOT pc_num_status IN (2,3) 
 			
