@@ -338,8 +338,8 @@
 						LEFT JOIN pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
 						LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
 						LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
-						INNER JOIN pc_avaliacao_coso on pc_avaliacoes.pc_aval_coso_id = pc_avaliacao_coso.pc_aval_coso_id
-						INNER JOIN pc_avaliacao_criterioReferencia on pc_avaliacoes.pc_aval_criterioRef_id = pc_avaliacao_criterioReferencia.pc_aval_criterioRef_id
+						LEFT JOIN pc_avaliacao_coso on pc_avaliacoes.pc_aval_coso_id = pc_avaliacao_coso.pc_aval_coso_id
+						LEFT JOIN pc_avaliacao_criterioReferencia on pc_avaliacoes.pc_aval_criterioRef_id = pc_avaliacao_criterioReferencia.pc_aval_criterioRef_id
 			WHERE NOT pc_num_status IN (2,3) and  right(pc_processo_id,4)>=2024
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
@@ -615,7 +615,7 @@
 						LEFT JOIN pc_status ON pc_num_status = pc_status.pc_status_id 
 						LEFT JOIN pc_orgaos AS pc_orgaos_1 ON pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
 						LEFT JOIN pc_classificacoes ON pc_num_classificacao = pc_classificacoes.pc_class_id
-						INNER JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
+						LEFT JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
 						LEFT JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
 						LEFT JOIN  pc_avaliacao_orientacoes on pc_aval_orientacao_num_aval = pc_aval_id
 						LEFT JOIN pc_orgaos AS pc_orgaos_resp ON pc_avaliacao_orientacoes.pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_resp.pc_org_mcu 
@@ -624,8 +624,8 @@
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
 					    LEFT JOIN pc_orientacao_status on pc_orientacao_status_id = pc_aval_orientacao_status
 						LEFT JOIN pc_orgaos AS pc_orgaoResp ON pc_orgaoResp.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-						INNER JOIN pc_avaliacao_coso on pc_avaliacoes.pc_aval_coso_id = pc_avaliacao_coso.pc_aval_coso_id
-						INNER JOIN pc_avaliacao_criterioReferencia on pc_avaliacoes.pc_aval_criterioRef_id = pc_avaliacao_criterioReferencia.pc_aval_criterioRef_id
+						LEFT JOIN pc_avaliacao_coso on pc_avaliacoes.pc_aval_coso_id = pc_avaliacao_coso.pc_aval_coso_id
+						LEFT JOIN pc_avaliacao_criterioReferencia on pc_avaliacoes.pc_aval_criterioRef_id = pc_avaliacao_criterioReferencia.pc_aval_criterioRef_id
 			WHERE NOT pc_num_status IN (2,3)  and pc_aval_orientacao_id is not null and  right(pc_processo_id,4)>=2024
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
@@ -893,20 +893,20 @@
 						) AS categoriasControlesMelhoriaList
 						
 			FROM        pc_processos 
-						INNER JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
-						INNER JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
-						INNER JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id 
-						INNER JOIN pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
-						INNER JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
+						LEFT JOIN pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id 
+						LEFT JOIN pc_orgaos ON pc_processos.pc_num_orgao_avaliado = pc_orgaos.pc_org_mcu 
+						LEFT JOIN pc_status ON pc_processos.pc_num_status = pc_status.pc_status_id 
+						LEFT JOIN pc_orgaos AS pc_orgaos_1 ON pc_processos.pc_num_orgao_origem = pc_orgaos_1.pc_org_mcu 
+						LEFT JOIN pc_classificacoes ON pc_processos.pc_num_classificacao = pc_classificacoes.pc_class_id
 						LEFT JOIN  pc_avaliacoes on pc_aval_processo = pc_processo_id
-						INNER JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
+						LEFT JOIN pc_avaliacao_status on pc_aval_status_id = pc_aval_status
 						LEFT JOIN  pc_usuarios ON pc_usu_matricula_coordenador = pc_usu_matricula
 						LEFT JOIN  pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
-						INNER JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
-						INNER JOIN pc_orgaos as  pc_orgaos_melhoria on pc_orgaos_melhoria.pc_org_mcu = pc_aval_melhoria_num_orgao
+						LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
+						LEFT JOIN pc_orgaos as  pc_orgaos_melhoria on pc_orgaos_melhoria.pc_org_mcu = pc_aval_melhoria_num_orgao
 						LEFT JOIN  pc_orgaos as pc_orgaos_melhoria_sug on pc_orgaos_melhoria_sug.pc_org_mcu = pc_aval_melhoria_sug_orgao_mcu
-			            INNER JOIN pc_avaliacao_coso on pc_avaliacoes.pc_aval_coso_id = pc_avaliacao_coso.pc_aval_coso_id
-						INNER JOIN pc_avaliacao_criterioReferencia on pc_avaliacoes.pc_aval_criterioRef_id = pc_avaliacao_criterioReferencia.pc_aval_criterioRef_id
+			           	LEFT JOIN pc_avaliacao_coso on pc_avaliacoes.pc_aval_coso_id = pc_avaliacao_coso.pc_aval_coso_id
+						LEFT JOIN pc_avaliacao_criterioReferencia on pc_avaliacoes.pc_aval_criterioRef_id = pc_avaliacao_criterioReferencia.pc_aval_criterioRef_id
 			WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)>=2024
 			<cfif '#arguments.ano#' neq 'TODOS'>
 					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
