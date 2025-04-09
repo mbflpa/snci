@@ -751,7 +751,7 @@
 						<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
 						<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 						<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-														<!DOCTYPE html>
+							<!DOCTYPE html>
 							<html lang="pt-br">
 							<head>
 								<meta charset="UTF-8">
@@ -759,7 +759,7 @@
 								<meta name="viewport" content="width=device-width, initial-scale=1.0">
 								<title>SNCI - Sistema Nacional de Controle Interno</title>
 							</head>
-							<body style="Margin:0; padding:0; background-color:##ffffff;">
+							<body style="Margin:0; padding:0; background-color:##ffffff;float:left;width: 600px;">
 								<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 									<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 								</cfif>
