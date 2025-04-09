@@ -1,7 +1,7 @@
 <cfprocessingdirective pageencoding = "utf-8">
 
 <!--- Incluir o CSS específico deste componente --->
-<link rel="stylesheet" href="dist/css/stylesSNCI_CardsMetricas.css">
+<link rel="stylesheet" href="dist/css/stylesSNCI_Dashboard_CardsMetricas.css">
 
 <!--- Card para Métricas Principais --->
 <div class="card mb-4" id="card-metricas-datatable">
