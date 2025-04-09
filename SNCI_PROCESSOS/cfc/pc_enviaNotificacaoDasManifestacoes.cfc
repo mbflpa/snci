@@ -41,12 +41,12 @@
 
             <!--- Query para usuários principais --->
             <cfquery name="rsUsuariosNotificacao" datasource="#application.dsn_processos#">
-                SELECT DISTINCT pc_usu_email
+                SELECT DISTINCT TRIM(pc_usu_email) as pc_usu_email
                 FROM pc_usuarios
                 WHERE pc_usu_status = 'A'
                 AND pc_usu_email IS NOT NULL 
-                AND pc_usu_email <> ''
-                AND pc_usu_email LIKE '%_@_%._%'
+                AND TRIM(pc_usu_email) <> ''
+                AND TRIM(pc_usu_email) LIKE '%_@_%._%'
                 <cfif arguments.numNotificacao EQ 1>
                     AND pc_usu_lotacao = <cfqueryparam value="#rsOrientacao.pc_num_orgao_origem#" cfsqltype="cf_sql_integer">
                     AND pc_usu_recebeEmail_primeiraManif = 1
@@ -58,12 +58,12 @@
             <!--- Query separada para gerentes (apenas para primeira notificação) --->
             <cfif arguments.numNotificacao EQ 1>
                 <cfquery name="rsGerentesNotificacao" datasource="#application.dsn_processos#">
-                    SELECT DISTINCT pc_usu_email
+                    SELECT DISTINCT TRIM(pc_usu_email) as pc_usu_email
                     FROM pc_usuarios
                     WHERE pc_usu_status = 'A'
                     AND pc_usu_email IS NOT NULL 
-                    AND pc_usu_email <> ''
-                    AND pc_usu_email LIKE '%_@_%._%'
+                    AND TRIM(pc_usu_email) <> ''
+                    AND TRIM(pc_usu_email) LIKE '%_@_%._%'
                     AND pc_usu_lotacao = <cfqueryparam value="#rsOrientacao.pc_num_orgao_origem#" cfsqltype="cf_sql_integer">
                     AND pc_usu_gerente = 1
                 </cfquery>
@@ -77,9 +77,6 @@
             <cfif rsUsuariosNotificacao.recordCount GT 0 OR len(emailListCC)>
                 <cfset emailList = ValueList(rsUsuariosNotificacao.pc_usu_email)>
                 
-                <cfdump var="#emailList#" label="Debug - Lista TO">
-                <cfdump var="#emailListCC#" label="Debug - Lista CC">
-
                 <cfset sei = left(#rsOrientacao.pc_num_sei#,5) & '.'& mid(#rsOrientacao.pc_num_sei#,6,6) &'/'& mid(#rsOrientacao.pc_num_sei#,12,4) &'-'&right(#rsOrientacao.pc_num_sei#,2)>
                 <cfif rsOrientacao.pc_num_avaliacao_tipo neq 445 and rsOrientacao.pc_num_avaliacao_tipo neq 2>
                     <cfif rsOrientacao.pc_aval_tipo_descricao neq ''>

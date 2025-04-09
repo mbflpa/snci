@@ -3854,32 +3854,21 @@
                  WHERE pc_aval_posic_status=3 and pc_aval_orientacao_status = 3 
                        and o.pc_aval_orientacao_id = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">  
            </cfquery> 
-			<!--- Debug: Mostra resultado da query --->
-<cfdump var="#qPosic#" label="Resultado Query">
 
-<cfset quantidadePosicionamentos = qPosic.qposicionamentos>
-<!--- Debug: Mostra valor calculado --->
-<cfdump var="#quantidadePosicionamentos#" label="Quantidade Posicionamentos">
+			<cfset quantidadePosicionamentos = qPosic.qposicionamentos>
 
-<cfif quantidadePosicionamentos LT 2>
-    <cfset numNotificacao = 1>
-<cfelse>
-    <cfset numNotificacao = 2>
-</cfif>
+			<cfif quantidadePosicionamentos LT 2>
+				<cfset numNotificacao = 1>
+			<cfelse>
+				<cfset numNotificacao = 2>
+			</cfif>
 
+			<cfset objNotificacao = createObject("component", "pc_enviaNotificacaoDasManifestacoes")>
+			<cfset resultado = objNotificacao.enviaEmailNotificacaoAnalistas(
+				numOrientacao = #arguments.pc_aval_orientacao_id#,
+				numNotificacao = numNotificacao
+			)>
 
-<!--- Debug: Mostra parâmetros enviados para notificação --->
-<cfdump var="#arguments.pc_aval_orientacao_id#,#numNotificacao#" 
-    label="Parâmetros Notificação">
-
-<cfset objNotificacao = createObject("component", "pc_enviaNotificacaoDasManifestacoes")>
-<cfset resultado = objNotificacao.enviaEmailNotificacaoAnalistas(
-    numOrientacao = #arguments.pc_aval_orientacao_id#,
-    numNotificacao = numNotificacao
-)>
-
-<!--- Debug: Mostra resultado da notificação --->
-<cfdump var="#resultado#" label="Resultado Notificação">	
 
 		</cftransaction>
 

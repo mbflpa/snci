@@ -845,7 +845,7 @@
 
         <cfset to = "#arguments.para#">
 		<cfset cc = "">
-		<cfif isdefined("arguments.copiaPara") and arguments.copiaPara neq "" and (arguments.copiaPara neq arguments.para)>
+		<cfif StructKeyExists(arguments, "copiaPara") and arguments.copiaPara neq "" and (arguments.copiaPara neq arguments.para)>
 			<cfset cc = "#arguments.copiaPara#">
 		</cfif> 
 
@@ -864,7 +864,7 @@
 		    <cfif FindNoCase("localhost", application.auxsite)>
 				<cfset de="mbflpa@yahoo.com.br">
 			</cfif>
-			<cfmail from="#de#" to="#to#" cc="#cc#" subject="#arguments.assunto#" type="html" charset="utf-8">
+			<cfmail from="#de#" to="#to#" cc="#cc#" subject="#arguments.assunto#" type="html" charset="utf-8" failto="#application.rsUsuarioParametros.pc_usu_email#">
 				<!DOCTYPE html>
 				<html lang="pt-br">
 				<head>
