@@ -90,7 +90,7 @@
 
                 <cfset textoEmail = '
                     <p style="text-align: justify;">Há nova manifestação para análise no SNCI Processos, conforme informações a seguir:</p>
-                    <table border="1" style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+                    <table border="1" style="border-collapse: collapse; width: 100%; margin: 20px 0;text-align: left;">
                         <tr>
                             <th style="padding: 8px; background-color: ##f2f2f2;white-space: nowrap;">Nº Processo SNCI</th>
                             <td style="padding: 8px;">#rsOrientacao.pc_processo_id#</td>
