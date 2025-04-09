@@ -871,53 +871,8 @@
 					<meta charset="UTF-8">
 					<meta http-equiv="X-UA-Compatible" content="IE=edge">
 					<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-					<style>
-						
-						
-						
-						
-						.card {
-							position: relative;
-							display: flex;
-							flex-direction: column;
-							min-width: 0;
-							word-wrap: break-word;
-							background: rgba(0, 65, 107, 1);
-							color: rgba(255, 255, 255, 1);
-							background-clip: border-box;
-							border: 0 solid rgba(0, 0, 0, 0.125);
-							border-radius: 0.25rem;
-							box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-							margin: 0 auto;
-							float: left;
-							margin-left: 10px;
-							padding: 20px;
-							max-width: 800px;
-						}
-
-						.card-header {
-							background-color: rgba(255, 255, 255, 1); 
-							color: rgba(0, 65, 107, 1); 
-							border-radius: 10px;
-							box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-							text-align: center;
-							font-size: 20px;
-						}
-
-						.rodape{
-							background-color: rgba(255, 255, 255, 1); 
-							color: rgba(0, 65, 107, 1); 
-							border-radius: 10px;
-							box-shadow: 0px 0px 10px rgba(136, 136, 136, 1); 
-							text-align: center;
-							margin-top: 20px;
-							}
-
-						
-					</style>
 				</head>
-				<body style="Margin:0; padding:0; background-color:##ffffff;">
+				<body style="Margin:0; padding:0; background-color:##ffffff;float:left;width: 600px;">
 					<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
 						<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
 					</cfif>
