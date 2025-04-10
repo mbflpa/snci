@@ -750,81 +750,37 @@
 						
 						<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
 						<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
-						<cfmail from="#de#" to="#to#" cc="#cc#" subject="SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-							<!DOCTYPE html>
-							<html lang="pt-br">
-							<head>
-								<meta charset="UTF-8">
-								<meta http-equiv="X-UA-Compatible" content="IE=edge">
-								<meta name="viewport" content="width=device-width, initial-scale=1.0">
-								<title>SNCI - Sistema Nacional de Controle Interno</title>
-							</head>
-							<body style="Margin:0; padding:0; background-color:##ffffff;float:left;width: 600px;">
-								<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-									<pre style="font-family: inherit;font-weight: 500;line-height: 1.2;">#mensagemParaTeste#</pre>
-								</cfif>
-								<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:##ffffff;">
-									<tr>
-										<td align="center" style="padding: 20px 0;">
-											<table width="600" cellpadding="0" cellspacing="0" border="0" style="border:1px solid ##0083CA; border-radius:5px; overflow:hidden;">
-												<!-- Cabeçalho do Card com Imagem -->
-												<tr>
-													<td align="center" bgcolor="##00416B" style="padding:20px; background-color:##00416B;">
-														<table width="100%" cellpadding="0" cellspacing="0" border="0">
-															<tr>
-																<td align="left" style="vertical-align: middle;text-align: center;">
-																	<h2 style="margin:0; color:##ffffff; font-family: Arial, sans-serif; font-size:20px;">
-																		SNCI - Sistema Nacional de Controle Interno<br>Módulo: Processos
-																	</h2>
-																</td>
-															</tr>
-														</table>
-													</td>
-												</tr>
-												<!-- Corpo do E-mail -->
-												<tr>
-													<td style="padding:20px; font-family: Arial, sans-serif; color:##212529; font-size:14px; line-height:1.5;">
-														<p style="margin:0 0 10px 0; text-align: justify;">#pronomeTrat#,</p>
-														
-														<cfif rsOrientacoesPendentes.recordcount eq 1>
-															<p style="text-align: justify;">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, ao qual solicitamos especial atenção.</p>
-														<cfelseif rsOrientacoesPendentes.recordcount gt 1>
-															<p style="text-align: justify;">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, aos quais solicitamos especial atenção.</p>
-														</cfif>
-									
-														<p style="text-align: justify;">Para regularizar a situação, solicitamos acessar o link abaixo, tela <strong>Acompanhamento</strong>, aba <strong>Medidas / Orientações para regularização</strong> e inserir sua resposta:</p>
-														
-														<p style="text-align:center;">
-															<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
-														</p>
-									
-														<p style="text-align: justify;">Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
-														<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</p>
-									
-														<cfif rsOrientacoesOutrosStatus.recordcount gt 1>
-															<p style="text-align: justify;">Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>
-														<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
-															<p style="text-align: justify;">Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>
-														</cfif>
-									
-														<p style="margin-top:20px; text-align: justify;">Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
-									
-													</td>
-												</tr>
-												<!-- Rodapé do Card -->
-												<tr>
-													<td bgcolor="##f2f2f2" style="padding:10px; text-align:center; font-family: Arial, sans-serif; font-size:12px; color:##212529;">
-														<p>CS/DIGOE/SUGOV/DCINT/GACE - Gerência de Avaliações de Controles Especiais</p>
-														<p>Este é um e-mail automático, por favor não responda.</p>
-													</td>
-												</tr>
-											</table>
-										</td>
-									</tr>
-								</table>
-							</body>
-							</html>
-						</cfmail>
+					    <cfset textoEmail = '<cfif rsOrientacoesPendentes.recordcount eq 1>
+												<p style="text-align: justify;">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, ao qual solicitamos especial atenção.</p>
+											<cfelseif rsOrientacoesPendentes.recordcount gt 1>
+												<p style="text-align: justify;">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, aos quais solicitamos especial atenção.</p>
+											</cfif>
+						
+											<p style="text-align: justify;">Para regularizar a situação, solicitamos acessar o link abaixo, tela <strong>Acompanhamento</strong>, aba <strong>Medidas / Orientações para regularização</strong> e inserir sua resposta:</p>
+											
+											<p style="text-align:center;">
+												<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+											</p>
+						
+											<p style="text-align: justify;">Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
+											<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</p>
+						
+											<cfif rsOrientacoesOutrosStatus.recordcount gt 1>
+												<p style="text-align: justify;">Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>
+											<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
+												<p style="text-align: justify;">Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>
+											</cfif>
+						
+											<p style="margin-top:20px; text-align: justify;">Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
+											'>
+						<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio"/>
+						<cfinvoke component="#pc_cfcPaginasApoio#" method="EnviaEmails" returnVariable="sucessoEmail" 
+									para = "#to#"
+									copiaPara = "#cc#"
+									pronomeTratamento = "#pronomeTrat#"
+									texto="#textoEmail#"
+						/>						
+
 				</cfif>		
 			</cfif>		
 
