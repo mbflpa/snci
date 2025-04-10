@@ -750,12 +750,21 @@
 						
 						<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
 						<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
-					    <cfset textoEmail = '<cfif rsOrientacoesPendentes.recordcount eq 1>
-												<p style="text-align: justify;">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, ao qual solicitamos especial atenção.</p>
-											<cfelseif rsOrientacoesPendentes.recordcount gt 1>
-												<p style="text-align: justify;">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, aos quais solicitamos especial atenção.</p>
-											</cfif>
-						
+						<cfset primeroParagrafo =''>
+						<cfset ultimoParagrafo = ''>
+						<cfif rsOrientacoesPendentes.recordcount eq 1>
+							<cfset primeroParagrafo = '<p style="text-align: justify;">Informamos que existe #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamento registrado pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, ao qual solicitamos especial atenção.</p>'>
+						<cfelseif rsOrientacoesPendentes.recordcount gt 1>
+							<cfset primeroParagrafo = '<p style="text-align: justify;">Informamos que existem #NumberFormat(rsOrientacoesPendentes.recordcount, "00")# apontamentos registrados pelo Controle Interno, status <strong>PENDENTE</strong>, com prazo de resposta expirado no Sistema SNCI - Processos, aos quais solicitamos especial atenção.</p>'>
+						</cfif>
+						<cfif rsOrientacoesOutrosStatus.recordcount gt 1>
+							<cfset ultimoParagrafo= '<p style="text-align: justify;">Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>'>
+						<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
+							<cfset ultimoParagrafo= '<p style="text-align: justify;">Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status #rsOrientacoesOutrosStatus.pc_orientacao_status_descricao# que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>'>
+						</cfif>
+
+					    <cfset textoEmail = '#primeroParagrafo#
+
 											<p style="text-align: justify;">Para regularizar a situação, solicitamos acessar o link abaixo, tela <strong>Acompanhamento</strong>, aba <strong>Medidas / Orientações para regularização</strong> e inserir sua resposta:</p>
 											
 											<p style="text-align:center;">
@@ -765,12 +774,8 @@
 											<p style="text-align: justify;">Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
 											<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO.</p>
 						
-											<cfif rsOrientacoesOutrosStatus.recordcount gt 1>
-												<p style="text-align: justify;">Na oportunidade informa-se que existem, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientações de Controle Interno com outros status que estão dentro do prazo previsto. Para esses casos orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>
-											<cfelseif rsOrientacoesOutrosStatus.recordcount eq 1>
-												<p style="text-align: justify;">Na oportunidade informa-se que existe, ainda, #NumberFormat(rsOrientacoesOutrosStatus.recordcount, "00")# orientação de Controle Interno com status "#rsOrientacoesOutrosStatus.pc_orientacao_status_descricao#" que está dentro do prazo previsto. Para esse caso orienta-se a atentar para a DATA PREVISTA PARA RESPOSTA, registrada no SNCI. Essa é a data em que se encerra o prazo para registro das manifestações no sistema SNCI, com acesso pelo mesmo link acima, conforme orientações anteriores.</p>
-											</cfif>
-						
+											#ultimoParagrafo#
+																	
 											<p style="margin-top:20px; text-align: justify;">Estamos à disposição para prestar informações adicionais a respeito do assunto, caso seja necessário.</p>
 											'>
 						<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio"/>
