@@ -191,7 +191,6 @@ const PdfSearchManager = {
     searchOptions
   ) {
     const terms = searchTerms.split(" ");
-    let processedCount = 0;
     const totalDocuments = documents.length;
     this.currentSearchResults = 0; // Contador em vez de array
 
@@ -214,7 +213,7 @@ const PdfSearchManager = {
       if (searchCanceled) {
         const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
         $("#processingStatus").text(
-          `Busca cancelada após processar ${processedCount} documentos.`
+          `Busca cancelada após processar ${index} de ${totalDocuments} documentos.`
         );
         // Remover o estado de carregamento do botão cancelar
         $("#cancelSearch")
@@ -250,13 +249,12 @@ const PdfSearchManager = {
 
       // Marcar este documento como processado
       processedFilePaths.add(doc.filePath);
-      processedCount++;
 
-      // Atualizar UI
-      const progress = Math.round((processedCount / totalDocuments) * 100);
+      // Atualizar UI com base no índice atual (garante progresso crescente)
+      const progress = Math.round(((index + 1) / totalDocuments) * 100);
       $("#processingProgress").css("width", `${progress}%`);
       $("#processingStatus").text(
-        `Processando: ${processedCount} de ${totalDocuments}`
+        `Processando: ${index + 1} de ${totalDocuments}`
       );
 
       // Pequeno efeito visual de "escaneamento" do documento
