@@ -6,6 +6,9 @@ let synonymsDict = {}; // Inicializar dicionário de sinônimos vazio
 // Nova variável para controlar documentos já processados
 let processedFilePaths = new Set();
 
+// Nova variável para o total geral de documentos da busca atual
+let totalOverallDocuments = 0; // <<<< ADICIONADO
+
 // Novas variáveis para estatísticas de páginas
 const pageStats = {
   minPages: { count: Number.MAX_SAFE_INTEGER, fileName: "" },
@@ -77,6 +80,7 @@ const PdfSearchManager = {
   resetStats: function () {
     // Não precisamos mais fazer o acompanhamento durante o processamento
     processedFilePaths = new Set();
+    totalOverallDocuments = 0; // <<<< RESETAR total geral
   },
 
   // Função para resetar estatísticas de páginas
@@ -92,7 +96,7 @@ const PdfSearchManager = {
   // Realizar a busca
   performSearch: function (searchTerms) {
     // Resetar estatísticas no início de uma nova busca
-    this.resetStats();
+    this.resetStats(); // Isso agora também reseta totalOverallDocuments
 
     // Limpar COMPLETAMENTE o set de arquivos processados
     processedFilePaths.clear(); // Usar clear() em vez de new Set()
@@ -146,6 +150,8 @@ const PdfSearchManager = {
     $("#pdfViewerContainer").hide();
     $("#searchStats").text("");
     $("#realTimeResults").hide(); // Ocultar o container de resultados "em tempo real"
+    $("#processingProgress").css("width", `0%`); // Resetar progresso visual
+    $("#processingStatus").text("Iniciando busca..."); // Resetar status
 
     // Rolar automaticamente para o card de resultados após iniciar a busca
     $("html, body").animate(
@@ -185,13 +191,13 @@ const PdfSearchManager = {
 
   // Processa os documentos PDF usando PDF.js com extração sequencial página por página
   processDocumentsWithPdfJs: function (
-    documents,
+    documents, // Continua sendo o array de documentos DO CLIENTE
     searchTerms,
     startTime,
     searchOptions
   ) {
     const terms = searchTerms.split(" ");
-    const totalDocuments = documents.length;
+    // Removido: const totalDocuments = documents.length; - Usaremos totalOverallDocuments
     this.currentSearchResults = 0; // Contador em vez de array
 
     // Reset do cancelamento de busca
@@ -202,7 +208,10 @@ const PdfSearchManager = {
     $("#realTimeResults").hide();
     $("#searchResults").empty(); // Limpar resultados anteriores
 
-    $("#processingStatus").text(`Buscando em ${totalDocuments} documentos...`);
+    // Atualização inicial do status com o total geral
+    $("#processingStatus").text(
+      `Iniciando processamento de ${totalOverallDocuments} documentos...`
+    );
 
     // Função para processar um documento por vez
     const processNextDocument = async (index) => {
@@ -213,7 +222,7 @@ const PdfSearchManager = {
       if (searchCanceled) {
         const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
         $("#processingStatus").text(
-          `Busca cancelada após processar ${index} de ${totalDocuments} documentos.`
+          `Busca cancelada após processar ${processedFilePaths.size} de ${totalOverallDocuments} documentos.` // <<<< MODIFICADO
         );
         // Remover o estado de carregamento do botão cancelar
         $("#cancelSearch")
@@ -224,40 +233,38 @@ const PdfSearchManager = {
         return;
       }
 
+      // Condição de término baseada no índice do LOTE DO CLIENTE
       if (index >= documents.length) {
-        // Finaliza quando todos os documentos forem processados
-        const searchTime = ((performance.now() - startTime) / 1000).toFixed(2);
-        $("#cancelSearch")
-          .prop("disabled", false)
-          .html('<i class="fas fa-times mr-1"></i> Cancelar busca');
-        this.generateStatsFromDOM(searchTerms, searchTime, searchOptions);
-        documentProcessing = false;
-        $("html, body").animate(
-          { scrollTop: $("#resultsCard").offset().top - 200 },
-          "slow"
-        );
+        // Não finaliza aqui necessariamente, pode haver processamento no servidor pendente
+        // A finalização agora é gerenciada por checkSearchCompletion
+        console.log("Processamento do lote cliente finalizado.");
+        // Apenas retorna, checkSearchCompletion cuidará do resto
         return;
       }
 
       const doc = documents[index];
 
-      // Se o documento já foi processado, pula para o próximo imediatamente
+      // Se o documento já foi processado (ex: por uma tentativa anterior ou pelo servidor), pula para o próximo imediatamente
       if (processedFilePaths.has(doc.filePath)) {
+        // Precisamos garantir que mesmo pulando, o próximo seja chamado
         setTimeout(() => processNextDocument(index + 1), 0);
         return;
       }
 
-      // Marcar este documento como processado
+      // Marcar este documento como processado ANTES de tentar processar
       processedFilePaths.add(doc.filePath);
 
-      // Atualizar UI com base no índice atual (garante progresso crescente)
-      const progress = Math.round(((index + 1) / totalDocuments) * 100);
+      // Atualizar UI com base no total GERAL e no tamanho do Set
+      const progress =
+        totalOverallDocuments > 0
+          ? Math.round((processedFilePaths.size / totalOverallDocuments) * 100)
+          : 0; // <<<< MODIFICADO
       $("#processingProgress").css("width", `${progress}%`);
       $("#processingStatus").text(
-        `Processando: ${index + 1} de ${totalDocuments}`
+        `Processando: ${processedFilePaths.size} de ${totalOverallDocuments}` // <<<< MODIFICADO
       );
 
-      // Pequeno efeito visual de "escaneamento" do documento
+      // Pequeno efeito visual de "escaneamento" do documento (mantido)
       $(".document-item").css(
         "transform",
         `translateY(${index % 2 === 0 ? -5 : 5}px)`
@@ -341,21 +348,21 @@ const PdfSearchManager = {
             snippets: snippets,
             found: true,
           };
-          this.currentSearchResults++;
-          this.addRealTimeResult(resultObj);
+          // Apenas adicionar ao resultado, sem incrementar o contador aqui
+          this.addSearchResult(resultObj);
         }
 
-        // Processar próximo documento imediatamente (removido delay de 5 segundos)
+        // Processar próximo documento do LOTE CLIENTE
         setTimeout(() => processNextDocument(index + 1), 0);
       } catch (error) {
         console.error(`Erro ao processar o documento ${doc.fileName}:`, error);
         this.searchSingleDocumentInServer(doc, searchTerms, searchOptions);
-        // Processar próximo documento imediatamente em caso de erro (removido delay de 5 segundos)
+        // Processar próximo documento do LOTE CLIENTE
         setTimeout(() => processNextDocument(index + 1), 0);
       }
     };
 
-    // Iniciar o processamento com o primeiro documento
+    // Iniciar o processamento com o primeiro documento DO LOTE CLIENTE
     processNextDocument(0);
   },
 
@@ -479,12 +486,15 @@ const PdfSearchManager = {
     // Sempre que adicionarmos um resultado, esconder o alerta
     $("#noResultsAlert").hide();
 
+    // Incrementar o contador GERAL de resultados encontrados
+    this.currentSearchResults++;
+
     // Criar HTML no formato final do resultado
     const resultHTML = `
       <div class="search-result" data-file-path="${
         result.filePath
       }" data-file-url="${pdfUrl}" data-result-id="${
-      this.currentSearchResults
+      this.currentSearchResults // Usa o contador geral
     }">
         <div class="d-flex justify-content-between align-items-start">
           <h5>
@@ -1348,13 +1358,21 @@ const PdfSearchManager = {
 
   // Busca de documento único no servidor
   searchSingleDocumentInServer: function (doc, searchTerms, searchOptions) {
-    // Verificar se este documento já foi processado
-    if (processedFilePaths.has(doc.filePath)) {
-      return;
+    // Verificar se este documento já foi processado (pode ter sido adicionado ao Set mas falhou no cliente)
+    // Não precisa verificar aqui porque `processNextDocument` já checa antes de chamar esta função.
+    // Apenas garantimos que está no Set se ainda não estava.
+    if (!processedFilePaths.has(doc.filePath)) {
+      processedFilePaths.add(doc.filePath);
+      // Atualizar UI se acabou de ser adicionado
+      const progress =
+        totalOverallDocuments > 0
+          ? Math.round((processedFilePaths.size / totalOverallDocuments) * 100)
+          : 0;
+      $("#processingProgress").css("width", `${progress}%`);
+      $("#processingStatus").text(
+        `Processando: ${processedFilePaths.size} de ${totalOverallDocuments}`
+      );
     }
-
-    // Marcar como processado
-    processedFilePaths.add(doc.filePath);
 
     $.ajax({
       url: "cfc/pc_cfcBuscaPDF.cfc",
@@ -1391,9 +1409,13 @@ const PdfSearchManager = {
             this.addSearchResult(processedResult);
           }
         }
+        // Verificar conclusão após fallback
+        this.checkSearchCompletion(searchTerms, searchOptions);
       },
       error: (xhr, status, error) => {
         console.error(`Erro no fallback para ${doc.fileName}:`, error);
+        // Verificar conclusão mesmo com erro no fallback
+        this.checkSearchCompletion(searchTerms, searchOptions);
       },
     });
   },
@@ -1413,7 +1435,8 @@ const PdfSearchManager = {
 
   // Adicionar resultado de busca
   addSearchResult: function (result) {
-    this.currentSearchResults++; // Apenas incrementar contador
+    // Incrementar o contador GERAL de resultados encontrados
+    this.currentSearchResults++;
     this.addRealTimeResult(result); // Adicionar diretamente no DOM
 
     // O objeto result não fica armazenado em memória
@@ -2243,7 +2266,7 @@ const PdfSearchManager = {
       return;
     }
 
-    // Se chegou aqui, temos resultados - garantir que o alerta de sem resultados esteja oculto
+    // Se chegou aqui, temos resultados - garantir que o alerta de "nenhum resultado" esteja oculto
     $("#noResultsAlert").hide();
 
     // Resto do código para exibir resultados...
