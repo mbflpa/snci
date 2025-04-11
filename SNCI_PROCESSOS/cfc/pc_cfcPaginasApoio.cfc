@@ -735,19 +735,6 @@
 							<cfset cc = "">
 						</cfif>
 
-						<cfif FindNoCase("homologacaope", application.auxsite) or FindNoCase("desenvolvimentope", application.auxsite) or FindNoCase("localhost", application.auxsite)>
-
-							<cfset mensagemParaTeste="Atenção, este é um e-mail de teste! No servidor de produção, este e-mail seria encaminhado para <strong>#to#</strong> pois é o e-mail do órgão responsável pelas orientações, com cópia para <strong>#cc#</strong> pois é o e-mail do órgão avaliado.">
-							<cfset to = "#application.rsUsuarioParametros.pc_usu_email#">
-							<cfset cc = "">
-						</cfif>
-							
-						<cfset de="SNCI@correios.com.br">
-						<cfif FindNoCase("localhost", application.auxsite)>
-							<cfset de="mbflpa@yahoo.com.br">
-						</cfif>
-					
-						
 						<cfset siglaOrgaoResponsavel = "#LTrim(RTrim(rsOrientacoesPendentes.siglaOrgaoResp))#">
 						<cfset pronomeTrat = "Senhor(a) Gestor(a) do(a) #siglaOrgaoResponsavel#">
 						<cfset primeroParagrafo =''>
