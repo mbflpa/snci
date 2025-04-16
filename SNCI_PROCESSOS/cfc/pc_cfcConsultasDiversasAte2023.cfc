@@ -40,7 +40,7 @@
 						LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 			WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)<=2023
 			<cfif '#arguments.ano#' neq 'TODOS'>
-					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#"> 
+					AND pc_processo_ano = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#"> 
 			</cfif>	
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
@@ -201,7 +201,7 @@
 						LEFT JOIN pc_avaliacao_melhorias on pc_aval_melhoria_num_aval = pc_aval_id
 			WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)<=2023
 			<cfif '#arguments.ano#' neq 'TODOS'>
-					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
+					AND pc_processo_ano = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
@@ -399,7 +399,7 @@
 						LEFT JOIN pc_orgaos AS pc_orgaoResp ON pc_orgaoResp.pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
 			WHERE NOT pc_num_status IN (2,3)  and pc_aval_orientacao_id is not null and  right(pc_processos.pc_processo_id,4)<=2023
 			<cfif '#arguments.ano#' neq 'TODOS'>
-					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
+					AND pc_processo_ano = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
@@ -600,7 +600,7 @@
 			            
 			WHERE NOT pc_num_status IN (2,3) and  right(pc_processos.pc_processo_id,4)<=2023
 			<cfif '#arguments.ano#' neq 'TODOS'>
-					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
+					AND pc_processo_ano = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->

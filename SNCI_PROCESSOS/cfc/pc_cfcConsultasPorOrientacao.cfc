@@ -53,7 +53,7 @@
 			WHERE 	 pc_processo_id IS NOT NULL  AND not pc_aval_orientacao_status in (0)
 			
 			<cfif '#arguments.ano#' neq 'TODOS'>
-					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
+					AND pc_processo_ano = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>
 			
 			

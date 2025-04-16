@@ -11,13 +11,13 @@
 <!--- Buscar dados apenas quando necessário --->
 <cfif attributes.exibirAno>
     <cfquery name="rsAnoDashboard" datasource="#application.dsn_processos#">
-        SELECT DISTINCT RIGHT(pc_processo_id, 4) AS ano FROM pc_processos 
+        SELECT DISTINCT pc_processo_ano AS ano FROM pc_processos 
         WHERE 1=1
         <cfif application.rsUsuarioParametros.pc_usu_perfil eq 8>
             AND pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'
         </cfif>
         <cfif attributes.limitarAnoPesquisa>
-            AND RIGHT(pc_processo_id, 4) >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
+            AND pc_processo_ano >= <cfqueryparam value="#application.anoPesquisaOpiniao#" cfsqltype="cf_sql_integer">
         </cfif>
         UNION
         SELECT YEAR(GETDATE()) AS ano

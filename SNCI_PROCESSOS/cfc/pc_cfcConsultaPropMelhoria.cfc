@@ -33,7 +33,7 @@
 			WHERE NOT pc_num_status IN (2,3) 
 			
 			<cfif '#arguments.ano#' neq 'TODOS'>
-					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
+					AND pc_processo_ano = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>
 			
 			

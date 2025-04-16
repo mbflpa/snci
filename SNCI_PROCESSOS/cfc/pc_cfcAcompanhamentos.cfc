@@ -1234,7 +1234,7 @@
 		<cfquery name="rsMelhoriaPosic" datasource="#application.dsn_processos#">
 			SELECT pc_avaliacao_melhorias.*, pc_processos.*,pc_avaliacoes.pc_aval_numeracao,pc_avaliacoes.pc_aval_descricao 
 			, pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_se_sigla, pc_orgaos.pc_org_mcu
-			, pc_avaliacao_tipos.pc_aval_tipo_processoN2,right(pc_processo_id,4) as ano
+			, pc_avaliacao_tipos.pc_aval_tipo_processoN2,pc_processo_ano as ano
 			FROM pc_avaliacao_melhorias
 			INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_melhoria_num_orgao
 			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_melhoria_num_aval
@@ -2909,7 +2909,7 @@
 								pc_orgaos_1.pc_org_descricao AS descOrgOrigem, pc_orgaos_1.pc_org_sigla AS siglaOrgOrigem
 								, pc_classificacoes.pc_class_descricao,  pc_orgaos.pc_org_se_sigla,  pc_orgaos.pc_org_mcu, pc_avaliacao_orientacoes.*,
 								pc_orgao_OrientacaoResp.pc_org_sigla as orgaoRespOrientacao, pc_orgao_OrientacaoResp.pc_org_mcu as mcuOrgaoRespOrientacao
-								,right(pc_processo_id,4) as ano
+								,pc_processo_ano as ano
 			FROM        pc_processos INNER JOIN
 								pc_avaliacoes on pc_processo_id =  pc_aval_processo INNER JOIN
 								pc_avaliacao_tipos ON pc_processos.pc_num_avaliacao_tipo = pc_avaliacao_tipos.pc_aval_tipo_id INNER JOIN

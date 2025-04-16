@@ -17,7 +17,7 @@
 		<cfset var aux_sei = ''>
 
 		<cfquery name="rsProcCard" datasource="#application.dsn_processos#">
-			SELECT DISTINCT pc_processos.*,pc_orgaos.pc_org_descricao,pc_orgaos.pc_org_sigla, pc_status.*,pc_avaliacao_tipos.pc_aval_tipo_descricao, right(pc_processo_id,4) as anoProcesso
+			SELECT DISTINCT pc_processos.*,pc_orgaos.pc_org_descricao,pc_orgaos.pc_org_sigla, pc_status.*,pc_avaliacao_tipos.pc_aval_tipo_descricao, pc_processo_ano as anoProcesso
 							,CONCAT(
 									'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
 									'<br>N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
@@ -35,9 +35,9 @@
                 WHERE not pc_status_id IN ('2','5') and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'	
 			</cfif>
 			<cfif arguments.ano neq 'TODOS'>
-				AND right(pc_processo_id,4) = '#arguments.ano#'
+				AND pc_processo_ano = '#arguments.ano#'
 			<cfelse>
-				AND right(pc_processo_id,4) >= 2024
+				AND pc_processo_ano >= 2024
 			</cfif>	
 			ORDER BY pc_datahora_cadastro desc 	
 		</cfquery>

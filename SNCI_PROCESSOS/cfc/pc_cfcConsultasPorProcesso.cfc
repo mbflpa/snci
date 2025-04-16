@@ -64,7 +64,7 @@
 										LEFT JOIN pc_orgaos as pc_orgaos_2 on pc_aval_orientacao_mcu_orgaoResp = pc_orgaos_2.pc_org_mcu
 							WHERE pc_processo_id is not null 
 								<cfif '#arguments.ano#' neq 'TODOS'>
-									AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
+									AND pc_processo_ano = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 								</cfif>		
 								<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 									<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->
@@ -560,7 +560,7 @@
 						LEFT JOIN pc_usuarios as pc_usuCoodNacional ON pc_usu_matricula_coordenador_nacional = pc_usuCoodNacional.pc_usu_matricula
 			WHERE pc_processo_id is not null
 			<cfif '#arguments.ano#' neq 'TODOS'>
-					AND right(pc_processo_id,4) = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
+					AND pc_processo_ano = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.ano#">
 			</cfif>	
 			<cfif #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S'>
 				<!---Se  processoEmAcompanhamento igual a true só mostra orientações de processos em acompanhamento e bloqueados, caso contrário, mostra processos finalizados--->

@@ -328,7 +328,7 @@
     <cffunction name="getAnosDisponiveis" access="remote" returntype="string" returnformat="json" hint="Retorna anos disponíveis para processos">
         <cfquery name="qryAnos" datasource="#application.dsn_processos#">
             SELECT DISTINCT 
-                RIGHT(pc_processo_id, 4) as ano
+                pc_processo_ano as ano
             FROM pc_processos 
             ORDER BY ano DESC
         </cfquery>

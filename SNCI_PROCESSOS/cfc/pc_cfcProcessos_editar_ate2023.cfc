@@ -204,9 +204,9 @@
                 WHERE not pc_status_id IN ('2','5') and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#'	
 			</cfif>
 			<cfif '#arguments.ano#' neq 'TODOS'>
-				AND right(pc_processo_id,4) = '#arguments.ano#' 
+				AND pc_processo_ano = '#arguments.ano#' 
 			<cfelse>
-				AND right(pc_processo_id,4) < 2024
+				AND pc_processo_ano < 2024
 			</cfif>	
 			ORDER BY pc_datahora_cadastro desc 	
 		</cfquery>
