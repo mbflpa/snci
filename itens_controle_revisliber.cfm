@@ -112,7 +112,8 @@
 	    <script>
            	alert("Este item foi enviado para Reanálise do Inspetor. Nenhuma outra ação poderá ser excutada.");
 	    </script>
-			<cflocation url = "GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#form.Ninsp#" addToken = "no">
+		<cfset grpitm = '###FORM.ngrup#' & '.#FORM.nitem#'>
+			<cflocation url = "GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#form.Ninsp##grpitm#" addToken = "no">
 	</cfif>
 </cfif>
  
@@ -551,8 +552,9 @@
 		<cfoutput>
 		var	pg = '#form.pg#'; 
 		var insp = '#form.Ninsp#';
+		var grpitm = '###FORM.ngrup#' + '.#FORM.nitem#';
 		</cfoutput>
-		var url = 'GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=' + insp;
+		var url = 'GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=' + insp + grpitm;
 		if( pg == 'pt'){
 			window.open(url, '_self');
 		}
@@ -1296,16 +1298,16 @@ function abrirPopup(url,w,h)
 	</cfif>	
 	<cfif tipoimpacto eq 'QUANTIFICADO'>
  	<tr class="exibir">
-      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO</div></td>
-      <td colspan="5" bgcolor="eeeeee">
-		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
-			<tr class="exibir"><strong>
-				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
-				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
-				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
-			</tr>
-		  </table>		  
-	  </td>
+		<td bgcolor="eeeeee">Potencial Valor</td>
+		<td colspan="5" bgcolor="eeeeee">
+			<table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			  <tr class="exibir"><strong>
+				  <td width="30%" bgcolor="eeeeee"><strong>Estimado a Recuperar (R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				  <td width="35%" bgcolor="eeeeee"><strong>Estimado Não Planejado/Extrapolado/Sobra (R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				  <td width="35%" bgcolor="eeeeee"><strong>Estimado em Risco ou Envolvido (R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			  </tr>
+			</table>		  
+		</td>
     </tr> 
 </cfif>	
 <tr>
