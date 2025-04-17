@@ -1428,7 +1428,7 @@ function dtprazo(k){
  if (k == 18)
  {
    document.form1.cbdata.value = document.form1.dtposicfutagf.value;
-   document.form1.cbdata.disabled = false;
+   document.form1.cbdata.disabled = true;
  }
   if (k == 15 || k == 16 || k == 19  || k == 23 )
  {

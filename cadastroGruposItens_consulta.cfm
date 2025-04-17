@@ -400,7 +400,7 @@
                                 <cfif '#modalidade#' eq ''>
                                   <cfset modalidade ='#rsModFiltro.TUI_Modalidade#'>
                                 </cfif>
-                                <div align="center" style="color:#036;width:70px;float:left;cursor:pointer" onClick="window.open('GeraRelatorio/gerador/dsp/PlanodeTeste_com_pontuacao.cfm?ano=<cfoutput>#form.selAnoConsulta#</cfoutput>&tipo=<cfoutput>#form.selTipoConsulta#</cfoutput>&mod=<cfoutput>#modalidade#</cfoutput>&grupo=<cfoutput>#form.selGrupoConsulta#</cfoutput>&sit=<cfoutput>#form.selSitConsulta#</cfoutput>&valDec=<cfoutput>#form.selValDecConsulta#</cfoutput>&comOrientacao=n,_blank')">
+                                <div align="center" style="color:#036;width:70px;float:left;cursor:pointer" onClick="window.open('GeraRelatorio/gerador/dsp/PlanodeTeste_com_pontuacao.cfm?ano=<cfoutput>#form.selAnoConsulta#</cfoutput>&tipo=<cfoutput>#form.selTipoConsulta#</cfoutput>&mod=<cfoutput>#modalidade#</cfoutput>&grupo=<cfoutput>#form.selGrupoConsulta#</cfoutput>&sit=<cfoutput>#form.selSitConsulta#</cfoutput>&valDec=<cfoutput>#form.selValDecConsulta#</cfoutput>&comOrientacao=n', '_blank'')">
                                     <div style="position:relative;top:10px">
                                         <img src="figuras/print.png" width="25"  border="0"></img>
                                     </div>
@@ -410,7 +410,7 @@
                                     </div>   
                                 </div>
 																
-                                <div align="center" style="color:#036;width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/planoDeTeste.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=n,_blank')</cfoutput>">
+                                <div align="center" style="color:#036;width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/planoDeTeste.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=n', '_blank')</cfoutput>">
                                     <div style="color:#036;position:relative;top:10px">
                                         <img src="figuras/print.png" width="25"  border="0"></img>
                                     </div>
@@ -420,7 +420,7 @@
                                     </div>   
                                 </div>
                             
-                                <div align="center" style="color:#036;width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/planoDeTeste.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=s,_blank')</cfoutput>">
+                                <div align="center" style="color:#036;width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('GeraRelatorio/gerador/dsp/planoDeTeste.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=s', '_blank')</cfoutput>">
                                     <div style="color:#036;position:relative;top:10px">
                                         <img src="figuras/print.png" width="25"  border="0"></img>
                                     </div>
@@ -429,7 +429,7 @@
                                         <span style="font-size:10px">c/Como Executar</span>
                                     </div>   
                                 </div>
-                                <div align="center" style="color:#036;width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('Gerar_planilha_relevancia.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=s,_blank')</cfoutput>">
+                                <div align="center" style="color:#036;width:60px;float:left;cursor:pointer" onClick="<cfoutput>window.open('Gerar_planilha_relevancia.cfm?ano=#form.selAnoConsulta#&tipo=#form.selTipoConsulta#&mod=#modalidade#&grupo=#form.selGrupoConsulta#&sit=#form.selSitConsulta#&valDec=#form.selValDecConsulta#&comOrientacao=s', '_blank')</cfoutput>">
                                     <div style="color:#036;position:relative;top:10px">
                                         <img src="figuras/print.png" width="25"  border="0"></img>
                                     </div>

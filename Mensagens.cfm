@@ -1306,7 +1306,7 @@
 	<cfif rotina eq 6 and rotinaSN is 'S'>
 		<cfoutput>Modulo de nº : #rotina# em execucao</cfoutput><br>
 	   <cfquery name="rs14NR_20PF" datasource="#dsn_inspecao#">
-		SELECT INP_DTConcluirAvaliacao,Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Parecer, Und_Email, 
+		SELECT INP_DTConcluirRevisao,Pos_Area, Pos_NomeArea, Pos_Unidade, Pos_Inspecao, Pos_NumGrupo, Pos_NumItem, Pos_DtPosic, Pos_DtPrev_Solucao, Pos_Situacao_Resp, Pos_Parecer, Und_Email, 
 		Und_TipoUnidade, Und_Descricao, Und_Centraliza, Rep_Email
 		FROM Unidades 
 		INNER JOIN ParecerUnidade ON Und_Codigo = Pos_Unidade 
@@ -1320,7 +1320,7 @@
 	    <!--- Opiniao da CCOP --->
 		<cfset Encaminhamento = "Opinião do Controle Interno">
 		<cfoutput query="rs14NR_20PF">
-			<cfset dt30terc = CreateDate(year(rs14NR_20PF.INP_DTConcluirAvaliacao),month(rs14NR_20PF.INP_DTConcluirAvaliacao),day(rs14NR_20PF.INP_DTConcluirAvaliacao))>
+			<cfset dt30terc = CreateDate(year(rs14NR_20PF.INP_DTConcluirRevisao),month(rs14NR_20PF.INP_DTConcluirRevisao),day(rs14NR_20PF.INP_DTConcluirRevisao))>
 			<!--- complementar os 20 dias úteis da data de liberação para compor os 30  dias úteis--->
 			<cfset dt30terc = CreateDate(year(dt30terc),month(dt30terc),day(dt30terc))>
 			<cfset nCont = 1>
