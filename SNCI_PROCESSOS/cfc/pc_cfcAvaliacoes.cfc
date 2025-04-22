@@ -2775,79 +2775,83 @@
 						</cfquery>
 					</cfif>
 
-				<cftry>		
-					<!-- Se o processo não estiver bloqueado e a modalidade não for ACOMPANHAMENTO, envia e-mail para o órgão avaliado, com cópia para os órgãos responsáveis pelas orientações do processo-->
-					<cfif rsProcessoComOrientacoes.pc_iniciarBloqueado neq 'S' and rsProcesso.pc_modalidade neq 'A'>
-							
-							<cfset to = "#LTrim(RTrim(rsProcesso.pc_org_email))#">
-							<cfset cc = "#listaEmailsOrgaos#">
-							<cfset siglaOrgaoAvaliado = "#LTrim(RTrim(rsProcesso.pc_org_sigla))#">
-							<cfset anoPacin = "#LTrim(RTrim(rsProcesso.pc_ano_pacin))#">
-							
-							<cfif #rsProcesso.pc_num_avaliacao_tipo# eq 2><!--Se o tipo de avaliação for "NÃO SE APLICA", pega a informação da coluna pc_aval_tipo_nao_aplica_descricao-->
-								<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_nao_aplica_descricao))#>
-							<cfelse>
-								<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_descricao))#>
-							</cfif>
-							<!-- se sigla do órgão avaliado começar com SE/, sem espaço antes, usa o pronome de tratamento "Senhor(a) Superintendente Estadual", caso contrárioa usa "Senhor(a) Chefe de Departamento"-->
-							<cfif left(LTrim(RTrim(siglaOrgaoAvaliado)),3) eq 'SE/'>
-								<cfset pronomeTrat = "Senhor(a) Superintendente Estadual da #siglaOrgaoAvaliado#">
-							<cfelse>
-								<cfset pronomeTrat = "Senhor(a) Chefe de Departamento do #siglaOrgaoAvaliado#">
-							</cfif>
-							<!--Se o tipo de demanda for "P" (Plano Anual de Controle Interno - PACIN), usa o texto abaixo-->
-							<cfif #rsProcesso.pc_tipo_demanda# eq "P">
-								<cfset textoEmail = '<p style="text-align: justify;">Em cumprimento ao Plano Anual de Controle Interno – PACIN #anoPacin#, que consolida o planejamento das ações a serem realizadas pelo Departamento de Controle Interno – DCINT, encaminhamos o Relatório - SEI e seus respectivos anexos, referentes à avaliação de controles no processo "#tipoAvaliacao#", para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>
-													<p style="text-align: justify;">Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.<br><br>O plano de ação deverá apresentar providências focadas nas "Situações Encontradas" registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III.</p>
-													<p style="text-align: justify;">O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>
-													<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
-													<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
-														<ul>
-															<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
-															<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
-															<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
-														</ul>
-													<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
-													<p style="text-align:center;">
-														<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
-													</p>'>
-							
-							<cfelse>
+					<cftry>		
+						<!-- Se o processo não estiver bloqueado e a modalidade não for ACOMPANHAMENTO, envia e-mail para o órgão avaliado, com cópia para os órgãos responsáveis pelas orientações do processo-->
+						<cfif rsProcessoComOrientacoes.pc_iniciarBloqueado neq 'S' and rsProcesso.pc_modalidade neq 'A'>
+								
+								<cfset to = "#LTrim(RTrim(rsProcesso.pc_org_email))#">
+								<cfset cc = "#listaEmailsOrgaos#">
+								<cfset siglaOrgaoAvaliado = "#LTrim(RTrim(rsProcesso.pc_org_sigla))#">
+								<cfset anoPacin = "#LTrim(RTrim(rsProcesso.pc_ano_pacin))#">
+								
+								<cfif #rsProcesso.pc_num_avaliacao_tipo# eq 2><!--Se o tipo de avaliação for "NÃO SE APLICA", pega a informação da coluna pc_aval_tipo_nao_aplica_descricao-->
+									<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_nao_aplica_descricao))#>
+								<cfelse>
+									<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_descricao))#>
+								</cfif>
+								<!-- se sigla do órgão avaliado começar com SE/, sem espaço antes, usa o pronome de tratamento "Senhor(a) Superintendente Estadual", caso contrárioa usa "Senhor(a) Chefe de Departamento"-->
+								<cfif left(LTrim(RTrim(siglaOrgaoAvaliado)),3) eq 'SE/'>
+									<cfset pronomeTrat = "Senhor(a) Superintendente Estadual da #siglaOrgaoAvaliado#">
+								<cfelse>
+									<cfset pronomeTrat = "Senhor(a) Chefe de Departamento do #siglaOrgaoAvaliado#">
+								</cfif>
+								<!--Se o tipo de demanda for "P" (Plano Anual de Controle Interno - PACIN), usa o texto abaixo-->
+								<cfif #rsProcesso.pc_tipo_demanda# eq "P">
+									<cfset textoEmail = '<p style="text-align: justify;">Em cumprimento ao Plano Anual de Controle Interno – PACIN #anoPacin#, que consolida o planejamento das ações a serem realizadas pelo Departamento de Controle Interno – DCINT, encaminhamos o Relatório - SEI e seus respectivos anexos, referentes à avaliação de controles no processo "#tipoAvaliacao#", para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>
+														<p style="text-align: justify;">Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.<br><br>O plano de ação deverá apresentar providências focadas nas "Situações Encontradas" registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III.</p>
+														<p style="text-align: justify;">O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>
+														<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
+														<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
+															<ul>
+																<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
+																<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
+																<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
+															</ul>
+														<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+														<p style="text-align:center;">
+															<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+														</p>'>
+								
+								<cfelse>
 
-								<cfset textoEmail = '<p style="text-align: justify;">A par de cumprimentá-lo, informa-se que o Departamento de Controle Interno (DCINT), no cumprimento de suas atribuições, realiza avaliações de controles extraordinárias, de acordo com as normas internas.</p> 
-													<p style="text-align: justify;">Nesse sentido, em consonância com o MANORG, Módulo 04, Capítulo 08, subitem 4.10, foi realizada avaliação de controle interno no processo "#tipoAvaliacao#". </p> 
-													<p style="text-align: justify;">Após a finalização dos trabalhos, encaminha-se o Relatório de Avaliação de Controles Internos e seus respectivos anexos, referentes a essa avaliação de controles, para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>  
-													<p style="text-align: justify;">Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA” apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.</p>   
-													<p style="text-align: justify;">O plano de ação deverá apresentar providências focadas nas “Situações Encontradas registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III. O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>  
-													<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
-													<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
-														<ul>
-															<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li> <br>  
-															<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li>   <br>  
-															<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li> 
-														</ul>
-													<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
-													<p style="text-align:center;">
-														<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
-													</p>'>
+									<cfset textoEmail = '<p style="text-align: justify;">A par de cumprimentá-lo, informa-se que o Departamento de Controle Interno (DCINT), no cumprimento de suas atribuições, realiza avaliações de controles extraordinárias, de acordo com as normas internas.</p> 
+														<p style="text-align: justify;">Nesse sentido, em consonância com o MANORG, Módulo 04, Capítulo 08, subitem 4.10, foi realizada avaliação de controle interno no processo "#tipoAvaliacao#". </p> 
+														<p style="text-align: justify;">Após a finalização dos trabalhos, encaminha-se o Relatório de Avaliação de Controles Internos e seus respectivos anexos, referentes a essa avaliação de controles, para conhecimento e adoção de providências nos termos constantes dos aludidos documentos.</p>  
+														<p style="text-align: justify;">Considerando os resultados das análises e ORIENTAÇÕES/PROPOSTAS DE MELHORIA” apresentadas no mencionado relatório, recomenda-se a #siglaOrgaoAvaliado# a elaboração de plano de ação, com estabelecimento de prazos e responsáveis, objetivando a implementação de melhorias no processo avaliado.</p>   
+														<p style="text-align: justify;">O plano de ação deverá apresentar providências focadas nas “Situações Encontradas registradas nos Anexos I, considerando as ORIENTAÇÕES para Regularização citadas no Anexo III. O prazo de resposta inicial para este Relatório é de 30 dias, a contar do recebimento deste.</p>  
+														<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
+														<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
+															<ul>
+																<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li> <br>  
+																<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li>   <br>  
+																<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li> 
+															</ul>
+														<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+														<p style="text-align:center;">
+															<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+														</p>'>
 
-							</cfif>
+								</cfif>
 
 
-							<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio2"/>
-							<cfinvoke component="#pc_cfcPaginasApoio2#" method="EnviaEmails" returnVariable="sucessoEmail" 
-							para = "#to#"
-							copiaPara = "#cc#"
-							pronomeTratamento = "#pronomeTrat#"
-							texto="#textoEmail#"
-							/>
-					</cfif>
-				<cfcatch type="any">
-					<cfmail from="SNCI@correios.com.br" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
-						<cfoutput>Erro rotina "validarItem" de validação e encaminhamento de orientações: #cfcatch.message#</cfoutput>
-					</cfmail>
-				</cfcatch>
-			</cftry>
+								<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoio2"/>
+								<cfinvoke component="#pc_cfcPaginasApoio2#" method="EnviaEmails" returnVariable="sucessoEmail" 
+								para = "#to#"
+								copiaPara = "#cc#"
+								pronomeTratamento = "#pronomeTrat#"
+								texto="#textoEmail#"
+								/>
+						</cfif>
+						<cfcatch type="any">
+							<cfmail from="SNCI@correios.com.br" to="#application.rsUsuarioParametros.pc_usu_email#"  subject=" ERRO -SNCI - SISTEMA NACIONAL DE CONTROLE INTERNO" type="html">
+								<cfoutput>Erro rotina "validarItem" de validação e encaminhamento de orientações: #cfcatch.message#</cfoutput>
+							</cfmail>
+						</cfcatch>
+					</cftry>
+
+
+					<!--INSERIR AQUI A CFFUNCTION QUE BAIXA AS ORIENTAÇÕES DE ACORDO COM OS VALORES DOS ITENS-->
+
 
 				</cfif><!--Fim do IF que verifica se todos os itens foram validados -->
 			</cftransaction>
@@ -7619,18 +7623,18 @@
 
 		<!--Realiza loop sobre todos os processos de rsProcessosVerificadosParaBaixa-->
 		<cfloop query="rsProcessosVerificadosParaBaixa">
-		    <!--Verifica todos os itens, não leves, em acompanhamento do processo-->
-			<cfquery name="rsItensProcesso" datasource="#application.dsn_processos#">
-				SELECT pc_aval_id, pc_aval_classificacao,pc_aval_valorTotalEnvolvido 
-				FROM pc_avaliacoes
-				WHERE pc_processo_id = #pc_processo_id# AND pc_aval_status = 6 AND pc_aval_classificacao <>'L'
-			</cfquery> 
-			<cfif rsItensProcesso.recordCount neq 0>
-				<cftransaction>	
+			<cftransaction>	
+				<!--Verifica todos os itens, não leves, em acompanhamento do processo-->
+				<cfquery name="rsItensProcesso" datasource="#application.dsn_processos#">
+					SELECT pc_aval_id, pc_aval_classificacao,pc_aval_valorTotalEnvolvido 
+					FROM pc_avaliacoes
+					WHERE pc_processo_id = #pc_processo_id# AND pc_aval_status = 6 AND pc_aval_classificacao <>'L'
+				</cfquery> 
+				<cfif rsItensProcesso.recordCount neq 0>
 					<cfloop query="rsItensProcesso">
 						<!--Verifica se o item tem orientações-->
 						<cfquery name="rsOrientacoesExistentes" datasource="#application.dsn_processos#">
-							SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes WHERE pc_aval_orientacao_num_aval = #pc_aval_id# AND pc_aval_orientacao_status = 0
+							SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes WHERE pc_aval_orientacao_num_aval = #pc_aval_id# 
 						</cfquery>
 						<!--Verifica a menor data dos posicionamentos das orientações dos itens-->
 						<cfif rsOrientacoesExistentes.recordCount neq 0>
@@ -7649,8 +7653,13 @@
 							<cfset dataParaVerificar = rsDataPM.minDataPM>
 						</cfif>
 				
-						<cfif pc_aval_classificacao eq 'M'>
+						<cfset diasDesdeData = DateDiff("d", dataParaVerificar, now())>
+						<cfif (pc_aval_classificacao eq 'M' AND (pc_aval_valorTotalEnvolvido lte 10000 OR (diasDesdeData GT 360 AND pc_aval_valorTotalEnvolvido GT 10000 and pc_aval_valorTotalEnvolvido lte 120000))) 
+								OR 
+							  (pc_aval_classificacao eq 'G' AND diasDesdeData GT 360 AND pc_aval_valorTotalEnvolvido lte 120000)>
+
 							<!--Verifica as orientações passíveis baixadas-->
+							<!--XXXXXXXXXXX ATENÇÃO! AGUARDAR RESPOSTA DE E-MAIL SOBRE QUAIS STATUS BAIXAR XXXXXXXXXXX-->
 							<cfquery name="rsOrientacoesParaBaixa" datasource="#application.dsn_processos#">
 								SELECT o.pc_aval_orientacao_id FROM pc_avaliacao_orientacoes o
 								INNER JOIN pc_orientacao_status s ON s.pc_orientacao_status_id = o.pc_aval_orientacao_status
@@ -7658,52 +7667,69 @@
 										AND s.pc_orientacao_status_finalizador = 'N'
 										AND o.pc_aval_orientacao_status NOT IN (0,1,14)
 							</cfquery>
-							
-							<!--Verifica se o valor total envolvido é menor ou igual a 10000 (dez mil) ou se a data de verificação é maior que 360 dias-->
-							<cfif pc_aval_valorTotalEnvolvido lte 10000 OR DateDiff("d", dataParaVerificar, now()) GT 360>
-								<cfquery datasource="#application.dsn_processos#">
-									UPDATE pc_avaliacoes
-									SET pc_aval_status = 7
-									WHERE pc_aval_id = #pc_aval_id#
-								</cfquery>
-								<!--Define o texto do posicionaento-->
-								<cfif pc_aval_valorTotalEnvolvido lte 10000>
-									<cfset posicionamentoPadrao =''>
-								<cfelse>
-									<cfset posicionamentoPadrao = ''>
-								</cfif>
-								<!-- Baixa as orientações-->
-								<cfloop query="rsOrientacoesParaBaixa">
-									<cfquery datasource="#application.dsn_processos#">
-										UPDATE pc_orientacoes
-										SET pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-											pc_aval_orientacao_status = 10
-										WHERE pc_aval_orientacao_id = <cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
-									</cfquery>
-									
-									<!--Insere posicionamento-->
-									<cfquery datasource="#application.dsn_processos#">
-										INSERT INTO pc_avaliacao_posicionamentos (pc_aval_posic_num_orientacao, pc_aval_posic_datahora, pc_aval_posic_login, pc_aval_posic_texto)
-										VALUES (<cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#', '#posicionamentoPadrao#')
-									</cfquery>
-								</cfloop><!--Fim loop das orientações dos itens em acompanhamento, não leves, dos processos em acompanhamento-->
-							</cfif>
-						</cfif>
 
-						
-						<cfif pc_aval_classificacao eq 'G'>	
-                            <!--FALTA CRIAR O CÓDIGO AQUI-->
+							<cfquery datasource="#application.dsn_processos#">
+								UPDATE pc_avaliacoes
+								SET pc_aval_status = 7
+								WHERE pc_aval_id = #pc_aval_id#
+							</cfquery>
+
+							<!--Define o texto do posicionaMento-->
+							<cfif pc_aval_classificacao eq 'M' AND pc_aval_valorTotalEnvolvido lte 10000>
+								<cfset posicionamentoPadrao ='
+									Considerando as diretrizes publicadas no Método de Avaliação de Controle Interno SEI nº 51741855/2024, que estabelece acompanhamento da equipe de controle interno somente "até o recebimento da comunicação aos gestores", nas avaliações em que as situação de não conformidade tenha classificação "Mediana" até o valor de R$10.000,00 (dez mil reais), esse ID passa para status "Encerrado". 
+									A conclusão do acompanhamento não obsta Ação Corretiva da área responsável pela regularização da Não Conformidade ou implementação da Orientação de Regularização.
+								'>
+							<cfelse>
+								<cfset posicionamentoPadrao ='
+									Considerando as diretrizes publicadas no Método de Avaliação de Controle Interno SEI nº 51741855/2024, que estabelece acompanhamento da equipe de controle interno "por 360 (trezentos e sessenta dias)", nas avaliações em que as situações de não conformidade tenham classificação "Mediana" com valor acima de R$10.000,00 (dez mil reais) e Menor que R$120mil ou classificação "Grave" e que não se encaixem no critério de relevância de valor R$ 120 mil - TCE. Instrução Normativa-TCU 98/2024, este ID passa para status "Encerrado". 
+									A conclusão do acompanhamento não obsta Ação Corretiva da área responsável pela regularização da Não Conformidade ou implementação da Orientação de Regularização.
+								'>
+							</cfif>
+							<!-- Baixa as orientações do item com 10 - ENCERRADO-->
+							<cfloop query="rsOrientacoesParaBaixa">
+								<cfquery datasource="#application.dsn_processos#">
+									UPDATE pc_orientacoes
+									SET pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+										pc_aval_orientacao_status = 10
+									WHERE pc_aval_orientacao_id = <cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
+								</cfquery>
+								
+								<!--Insere posicionamento-->
+								<cfquery datasource="#application.dsn_processos#">
+									INSERT INTO pc_avaliacao_posicionamentos (pc_aval_posic_num_orientacao, pc_aval_posic_datahora, pc_aval_posic_login, pc_aval_posic_texto)
+									VALUES (<cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#', '#posicionamentoPadrao#')
+								</cfquery>
+							</cfloop><!--Fim loop das orientações dos itens em acompanhamento, não leves, dos processos em acompanhamento-->
+
+							<!-- Baixa as as propostas de melhorias do item com N - Não Informado-->
+							<cfquery datasource="#application.dsn_processos#">
+								UPDATE pc_avaliacao_melhorias
+								SET pc_aval_melhoria_status = 'N'
+								WHERE pc_aval_melhoria_num_aval = #pc_aval_id# AND pc_aval_melhoria_status = 'P'
+							</cfquery>
 						</cfif>
 
 					</cfloop><!--Fim loop dos itens em acompanhamento, não leves, dos processos em acompanhamento-->
-
-
-				</cftransaction>
-			</cfif>
-			<!--Se todas as orientações de todos os itens do processo estiverem com status finalizador, finaliza o processo-->
-						<!--FALTA CRIAR O CÓDIGO AQUI-->
-
+				</cfif>
+				<!--Se todas as orientações de todos os itens do processo estiverem com status finalizador, finaliza o processo-->
+				<cfquery name="rsOrientacoesNaoFinalizadas" datasource="#application.dsn_processos#">
+					SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes o
+					INNER JOIN pc_avaliacoes a ON a.pc_aval_id = o.pc_aval_orientacao_num_aval
+					INNER JOIN pc_orientacao_status s on s.pc_orientacao_status_id= o.pc_aval_orientacao_status
+					WHERE a.pc_aval_processo = #pc_processo_id# AND s.pc_orientacao_status_finalizador = 'N'
+				</cfquery>
+				<cfif rsOrientacoesNaoFinalizadas.recordCount eq 0>
+					<cfquery datasource="#application.dsn_processos#">
+						UPDATE pc_processos
+						SET pc_num_status = 5
+						WHERE pc_processo_id = #pc_processo_id#
+					</cfquery>
+				</cfif>
+			</cftransaction>
 		</cfloop><!--Fim loop nos processos em acompanhamento-->
+
+
 
 	</cffunction>
 
