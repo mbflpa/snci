@@ -77,10 +77,6 @@
         // Espera até que o documento esteja totalmente carregado
         $(window).on('load', function() {
             
-            
-            // A função menuRapido() não é mais necessária pois o conteúdo já está incluído na página
-            // menuRapido();
-            
             // Verifica o valor de 'ci' e exibe os alertas apropriados
             if (ci === 'N') {
                 mostraAlertasOrgaoAvaliado();
@@ -97,17 +93,9 @@
 
 						 
 
-            // Função para gerar os dados para os indicadores
-            // Obtém o ano atual
-            const currentYear = new Date().getFullYear();
-            // Obtém o mês atual (adiciona 1 porque os meses começam em 0)
-            const currentMonth = new Date().getMonth() + 1;
-
-            // Executar a partir do primeiro dia do mês para gerar os dados do mês anterior
-            const firstDay = new Date(currentYear, currentMonth - 1, 1);
-
-            // Se a data de hoje for maior ou igual ao primeiro dia do mês e se o usuário for do controle interno, executa a função
-            if (new Date() >= firstDay && usuarioControleInterno == 'S') {
+           
+            // Se o usuário for do controle interno, executa a função
+            if (usuarioControleInterno == 'S') {
                 // Calcula o mês e o ano anterior
                 const now = new Date();
                 const previousMonth = now.getMonth() === 0 ? 12 : now.getMonth(); // Janeiro (0) vira dezembro (12)
@@ -158,8 +146,7 @@
 
             $(".content-wrapper").css("height", "auto");
         });
-       
-        
+               
         function gerarDados(previousMonth, previousYear){
              $.ajax({//AJAX PARA CONSULTAR OS INDICADORES
                 type: "post",
@@ -183,7 +170,6 @@
             })//fim ajax
         }
 
-        //Funçao para executar ajax assincrono do método executaRotinasEmailsCobranca do cfc pc_cfcPaginasApoio.cfc
         function executaRotinasEmailsCobranca(){
             $.ajax({
                 type: "post",
@@ -206,7 +192,6 @@
                 });
             })//fim fail
         }
-
 
         function mostraAlertasOrgaoAvaliado(){
             $.ajax({
@@ -260,33 +245,6 @@
             })//fim fail
         }
 
-        /*
-        function menuRapido(){
-            $.ajax({
-                type: "post",
-                url: "cfc/pc_cfcPaginasApoio.cfc",
-                data:{
-                    method: "dashboardMenuRapido"
-                },
-                async: false
-            })//fim ajax
-            .done(function(result) {
-                $('#menuRapidoDiv').html(result)
-            })//fim done
-            .fail(function(xhr, ajaxOptions, thrownError) {
-                $('#modalOverlay').delay(1000).hide(0, function() {
-                    $('#modalOverlay').modal('hide');
-                    var mensagem = '<p style="color:red">Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:<p>'
-                                + '<div style="background:#000;width:100%;padding:5px;color:#fff">' + thrownError + '</div>';
-                    const erroSistema = { html: logoSNCIsweetalert2(mensagem) }
-                    
-                    swalWithBootstrapButtons.fire(
-                        {...erroSistema}
-                    )
-                });
-            })//fim fail
-        }
-        */
 
         
     </script>

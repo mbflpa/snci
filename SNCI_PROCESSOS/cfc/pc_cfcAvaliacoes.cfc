@@ -7612,10 +7612,10 @@
 		<cfset posicionamentoPadrao = ''>
 
 		<cfquery name="rsProcessosVerificadosParaBaixa" datasource="#application.dsn_processos#">
-			SELECT pc_processo_id,  FROM pc_processos
+			SELECT pc_processo_id  FROM pc_processos
 			WHERE 
 			<cfif arguments.numProcesso neq "TODOS">
-				pc_aval_processo = '#arguments.numProcesso#'
+				pc_processo_id = '#arguments.numProcesso#'
 			<cfelse>
 				pc_num_status = 4
 			</cfif>
@@ -7628,7 +7628,7 @@
 				<cfquery name="rsItensProcesso" datasource="#application.dsn_processos#">
 					SELECT pc_aval_id, pc_aval_classificacao,pc_aval_valorTotalEnvolvido 
 					FROM pc_avaliacoes
-					WHERE pc_processo_id = #pc_processo_id# AND pc_aval_status = 6 AND pc_aval_classificacao <>'L'
+					WHERE pc_aval_processo = <cfqueryparam value="#pc_processo_id#" cfsqltype="cf_sql_varchar"> AND pc_aval_status = 6 AND pc_aval_classificacao <>'L'
 				</cfquery> 
 				<cfif rsItensProcesso.recordCount neq 0>
 					<cfloop query="rsItensProcesso">
@@ -7641,7 +7641,7 @@
 							<cfquery name="rsDataPosOrientacao" datasource="#application.dsn_processos#">
 								SELECT MIN(pc_aval_posic_datahora) as minDataPosic
 								FROM pc_avaliacao_posicionamentos as posic
-								INNER JOIN pc_orientacoes as o on o.pc_aval_orientacao_id = posic.pc_aval_posic_num_orientacao
+								INNER JOIN pc_avaliacao_orientacoes as o on o.pc_aval_orientacao_id = posic.pc_aval_posic_num_orientacao
 								INNER JOIN pc_avaliacoes as a on a.pc_aval_id = o.pc_aval_orientacao_num_aval
 								WHERE  a.pc_aval_id = #pc_aval_id# 
 							</cfquery>
@@ -7659,9 +7659,8 @@
 							  (pc_aval_classificacao eq 'G' AND diasDesdeData GT 360 AND pc_aval_valorTotalEnvolvido lte 120000)>
 
 							<!--Verifica as orientações passíveis baixadas-->
-							<!--XXXXXXXXXXX ATENÇÃO! AGUARDAR RESPOSTA DE E-MAIL SOBRE QUAIS STATUS BAIXAR XXXXXXXXXXX-->
 							<cfquery name="rsOrientacoesParaBaixa" datasource="#application.dsn_processos#">
-								SELECT o.pc_aval_orientacao_id FROM pc_avaliacao_orientacoes o
+								SELECT o.pc_aval_orientacao_id, o.pc_aval_orientacao_mcu_orgaoResp as orgaoResp FROM pc_avaliacao_orientacoes o
 								INNER JOIN pc_orientacao_status s ON s.pc_orientacao_status_id = o.pc_aval_orientacao_status
 								WHERE o.pc_aval_orientacao_num_aval = <cfqueryparam value="#pc_aval_id#" cfsqltype="cf_sql_integer">
 										AND s.pc_orientacao_status_finalizador = 'N'
@@ -7689,16 +7688,17 @@
 							<!-- Baixa as orientações do item com 10 - ENCERRADO-->
 							<cfloop query="rsOrientacoesParaBaixa">
 								<cfquery datasource="#application.dsn_processos#">
-									UPDATE pc_orientacoes
-									SET pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+									UPDATE pc_avaliacao_orientacoes
+									SET pc_aval_orientacao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 										pc_aval_orientacao_status = 10
 									WHERE pc_aval_orientacao_id = <cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
 								</cfquery>
 								
 								<!--Insere posicionamento-->
+								
 								<cfquery datasource="#application.dsn_processos#">
-									INSERT INTO pc_avaliacao_posicionamentos (pc_aval_posic_num_orientacao, pc_aval_posic_datahora, pc_aval_posic_login, pc_aval_posic_texto)
-									VALUES (<cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">, '#application.rsUsuarioParametros.pc_usu_login#', '#posicionamentoPadrao#')
+									INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
+									VALUES (<cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#posicionamentoPadrao#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#application.rsUsuarioParametros.pc_usu_matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', <cfqueryparam value="#orgaoResp#" cfsqltype="cf_sql_varchar">,'',10,1)
 								</cfquery>
 							</cfloop><!--Fim loop das orientações dos itens em acompanhamento, não leves, dos processos em acompanhamento-->
 
@@ -7717,13 +7717,13 @@
 					SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes o
 					INNER JOIN pc_avaliacoes a ON a.pc_aval_id = o.pc_aval_orientacao_num_aval
 					INNER JOIN pc_orientacao_status s on s.pc_orientacao_status_id= o.pc_aval_orientacao_status
-					WHERE a.pc_aval_processo = #pc_processo_id# AND s.pc_orientacao_status_finalizador = 'N'
+					WHERE a.pc_aval_processo = <cfqueryparam value="#pc_processo_id#" cfsqltype="cf_sql_varchar"> AND s.pc_orientacao_status_finalizador = 'N'
 				</cfquery>
 				<cfif rsOrientacoesNaoFinalizadas.recordCount eq 0>
 					<cfquery datasource="#application.dsn_processos#">
 						UPDATE pc_processos
 						SET pc_num_status = 5
-						WHERE pc_processo_id = #pc_processo_id#
+						WHERE pc_processo_id = <cfqueryparam value="#pc_processo_id#" cfsqltype="cf_sql_varchar">
 					</cfquery>
 				</cfif>
 			</cftransaction>
@@ -7731,6 +7731,30 @@
 
 
 
+	</cffunction>
+
+	<cffunction name="testeBaixaPorValorEnvolvido" access="remote" returntype="struct" hint="Testa a baixa por valor envolvido sem alterar dados">
+		<cfargument name="numProcesso" type="string" required="false" default="TODOS"/>
+
+		<cfset var resultado = { success = true, message = "", detalhes = "" }>
+
+		<cftry>
+			<!-- Inicia uma transação que será desfeita -->
+			<cftransaction action="begin">
+				<!-- Chama a função original -->
+				<cfset resultado.detalhes = baixaPorValorEnvolvido(arguments.numProcesso)>
+
+				<!-- Força rollback de todas as alterações feitas pela função -->
+				<cftransaction action="rollback" />
+			</cftransaction>
+
+			<cfcatch type="any">
+				<cfset resultado.success = false>
+				<cfset resultado.message = "Erro no teste: " & cfcatch.message>
+			</cfcatch>
+		</cftry>
+
+		<cfreturn resultado>
 	</cffunction>
 
 			
