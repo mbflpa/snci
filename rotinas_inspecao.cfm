@@ -16,9 +16,9 @@ status 14: #hhmmssdc#<br>
 --->
 	<cfset auxnaveg = ''>
 	<cfif find('Edg', '#cgi.HTTP_USER_AGENT#') gt 0>
-	<cfelseif  find('MSIE', '#cgi.HTTP_USER_AGENT#') gt 0>
+	<!--- <cfelseif  find('MSIE', '#cgi.HTTP_USER_AGENT#') gt 0> --->
 	<cfelse>
-		<cfset auxnaveg = 'Ao Usuário(a), O Sistema Nacional de Controle Interno - SNCI \ndeve ser utilizado com os Browser: \nMicrosoft Internet Explorer(IE) ou Microsoft EDGE\n em outro navegador algum recurso de página poderá ter o seu funcionamento inadequado!'>
+		<cfset auxnaveg = 'Ao Usuário(a), O Sistema Nacional de Controle Interno - SNCI \ndeve ser utilizado com o Navegador: Microsoft EDGE\n em outro navegador algum recurso de página poderá ter o seu funcionamento inadequado!'>
 	</cfif>
 </cfoutput>
 
