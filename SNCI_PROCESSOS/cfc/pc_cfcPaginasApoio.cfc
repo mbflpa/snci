@@ -962,21 +962,21 @@
 		<cfset currentDay = Day(currentDate)>
 
 		<!-- Rotina Diária -->
-		<cfif not rotinaJaExecutadaEmailsCobranca("rotinaDiaria", currentDate)>
+		<cfif not rotinaJaExecutadaEmailsCobranca("envioEmailcobranca_rotinaDiaria", currentDate)>
 			<cfinvoke component="pc_cfcPaginasApoio" method="rotinaDiariaOrientacoesSuspensas" returnVariable="rotinaDiariaOrientacoesSuspensas" />
-			<cfset atualizarLogExecucao("rotinaDiaria")>
+			<cfset atualizarLogExecucao("envioEmailcobranca_rotinaDiaria")>
 		</cfif>
 
 		<!-- Rotina Semanal - Executar uma vez por semana em qualquer dia útil -->
-		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("rotinaSemanal", currentDate)>
+		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("envioEmailcobranca_rotinaSemanal", currentDate)>
 			<cfinvoke component="pc_cfcPaginasApoio" method="rotinaSemanalOrientacoesPendentesSemTab" returnVariable="rotinaSemanalOrientacoesPendentes" />
-			<cfset atualizarLogExecucao("rotinaSemanal")>
+			<cfset atualizarLogExecucao("envioEmailcobranca_rotinaSemanal")>
 		</cfif>
 
 		<!-- Rotina Mensal - Executar em qualquer dia útil do mês, uma vez por mês -->
-		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("rotinaMensal", currentDate)>
+		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("envioEmailcobranca_rotinaMensal", currentDate)>
 			<cfinvoke component="pc_cfcPaginasApoio" method="rotinaMensalMelhoriasPendentes" returnVariable="rotinaMensalMelhoriasPendentes" />
-			<cfset atualizarLogExecucao("rotinaMensal")>
+			<cfset atualizarLogExecucao("envioEmailcobranca_rotinaMensal")>
 		</cfif>
 		
 	</cffunction>
@@ -989,11 +989,11 @@
 	
 		<cfquery name="verificarExecucao" datasource="#application.dsn_processos#">
 			SELECT pc_rotina_ultima_execucao 
-			FROM pc_rotinas_execucao_emails_log 
+			FROM pc_rotinas_execucao_log 
 			WHERE pc_rotina_nome = <cfqueryparam value="#arguments.rotinaNome#" cfsqltype="cf_sql_varchar">
 		</cfquery>
 	
-		<cfif arguments.rotinaNome eq "rotinaMensal">
+		<cfif arguments.rotinaNome eq "envioEmailcobranca_rotinaMensal">
 			<!-- Verificar se a rotina mensal já foi executada no mês atual -->
 			<cfif verificarExecucao.recordCount EQ 1>
 				<cfset lastExecDate = verificarExecucao.pc_rotina_ultima_execucao[1]>
@@ -1001,7 +1001,7 @@
 					<cfset resultado = true>
 				</cfif>
 			</cfif>
-		<cfelseif arguments.rotinaNome eq "rotinaSemanal">
+		<cfelseif arguments.rotinaNome eq "envioEmailcobranca_rotinaSemanal">
 			<!-- Verificar se a rotina semanal já foi executada nesta semana -->
 			<cfif verificarExecucao.recordCount EQ 1>
 				<cfset lastExecDate = verificarExecucao.pc_rotina_ultima_execucao[1]>
@@ -1025,21 +1025,21 @@
 		<!-- Verificar se a rotina já existe no log -->
 		<cfquery name="verificarExistencia" datasource="#application.dsn_processos#">
 			SELECT COUNT(*) AS total
-			FROM pc_rotinas_execucao_emails_log
+			FROM pc_rotinas_execucao_log
 			WHERE pc_rotina_nome = <cfqueryparam value="#arguments.rotinaNome#" cfsqltype="cf_sql_varchar">
 		</cfquery>
 	
 		<cfif verificarExistencia.total EQ 1>
 			<!-- Atualizar última execução se já existe -->
 			<cfquery datasource="#application.dsn_processos#">
-				UPDATE pc_rotinas_execucao_emails_log 
+				UPDATE pc_rotinas_execucao_log 
 				SET pc_rotina_ultima_execucao = <cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">
 				WHERE pc_rotina_nome = <cfqueryparam value="#arguments.rotinaNome#" cfsqltype="cf_sql_varchar">
 			</cfquery>
 		<cfelse>
 			<!-- Inserir nova entrada se não existe -->
 			<cfquery datasource="#application.dsn_processos#">
-				INSERT INTO pc_rotinas_execucao_emails_log (pc_rotina_nome, pc_rotina_ultima_execucao)
+				INSERT INTO pc_rotinas_execucao_log (pc_rotina_nome, pc_rotina_ultima_execucao)
 				VALUES (<cfqueryparam value="#arguments.rotinaNome#" cfsqltype="cf_sql_varchar">, <cfqueryparam value="#Now()#" cfsqltype="cf_sql_timestamp">)
 			</cfquery>
 		</cfif>

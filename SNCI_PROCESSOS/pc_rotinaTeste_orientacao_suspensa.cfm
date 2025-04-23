@@ -19,8 +19,8 @@
 
 <cfquery name="verificarExecucao" datasource="#application.dsn_processos#">
     SELECT pc_rotina_ultima_execucao  
-    FROM pc_rotinas_execucao_emails_log 
-    WHERE pc_rotina_nome = <cfqueryparam value="rotinaDiaria" cfsqltype="cf_sql_varchar">
+    FROM pc_rotinas_execucao_log 
+    WHERE pc_rotina_nome = <cfqueryparam value="envioEmailcobranca_rotinaDiaria" cfsqltype="cf_sql_varchar">
 </cfquery>
 
 
