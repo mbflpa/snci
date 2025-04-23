@@ -962,21 +962,21 @@
 		<cfset currentDay = Day(currentDate)>
 
 		<!-- Rotina Diária -->
-		<cfif not rotinaJaExecutadaEmailsCobranca("envioEmailcobranca_rotinaDiaria", currentDate)>
+		<cfif not rotinaJaExecutadaEmailsCobranca("envioEmailCobranca_rotinaDiaria", currentDate)>
 			<cfinvoke component="pc_cfcPaginasApoio" method="rotinaDiariaOrientacoesSuspensas" returnVariable="rotinaDiariaOrientacoesSuspensas" />
-			<cfset atualizarLogExecucao("envioEmailcobranca_rotinaDiaria")>
+			<cfset atualizarLogExecucao("envioEmailCobranca_rotinaDiaria")>
 		</cfif>
 
 		<!-- Rotina Semanal - Executar uma vez por semana em qualquer dia útil -->
-		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("envioEmailcobranca_rotinaSemanal", currentDate)>
+		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("envioEmailCobranca_rotinaSemanal", currentDate)>
 			<cfinvoke component="pc_cfcPaginasApoio" method="rotinaSemanalOrientacoesPendentesSemTab" returnVariable="rotinaSemanalOrientacoesPendentes" />
-			<cfset atualizarLogExecucao("envioEmailcobranca_rotinaSemanal")>
+			<cfset atualizarLogExecucao("envioEmailCobranca_rotinaSemanal")>
 		</cfif>
 
 		<!-- Rotina Mensal - Executar em qualquer dia útil do mês, uma vez por mês -->
-		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("envioEmailcobranca_rotinaMensal", currentDate)>
+		<cfif isBusinessDay(currentDate) AND not rotinaJaExecutadaEmailsCobranca("envioEmailCobranca_rotinaMensal", currentDate)>
 			<cfinvoke component="pc_cfcPaginasApoio" method="rotinaMensalMelhoriasPendentes" returnVariable="rotinaMensalMelhoriasPendentes" />
-			<cfset atualizarLogExecucao("envioEmailcobranca_rotinaMensal")>
+			<cfset atualizarLogExecucao("envioEmailCobranca_rotinaMensal")>
 		</cfif>
 		
 	</cffunction>
@@ -993,7 +993,7 @@
 			WHERE pc_rotina_nome = <cfqueryparam value="#arguments.rotinaNome#" cfsqltype="cf_sql_varchar">
 		</cfquery>
 	
-		<cfif arguments.rotinaNome eq "envioEmailcobranca_rotinaMensal">
+		<cfif arguments.rotinaNome eq "envioEmailCobranca_rotinaMensal">
 			<!-- Verificar se a rotina mensal já foi executada no mês atual -->
 			<cfif verificarExecucao.recordCount EQ 1>
 				<cfset lastExecDate = verificarExecucao.pc_rotina_ultima_execucao[1]>
@@ -1001,7 +1001,7 @@
 					<cfset resultado = true>
 				</cfif>
 			</cfif>
-		<cfelseif arguments.rotinaNome eq "envioEmailcobranca_rotinaSemanal">
+		<cfelseif arguments.rotinaNome eq "envioEmailCobranca_rotinaSemanal">
 			<!-- Verificar se a rotina semanal já foi executada nesta semana -->
 			<cfif verificarExecucao.recordCount EQ 1>
 				<cfset lastExecDate = verificarExecucao.pc_rotina_ultima_execucao[1]>
