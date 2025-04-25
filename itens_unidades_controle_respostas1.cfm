@@ -3,7 +3,7 @@
  	   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>   
 </cfif>         
-<!--- <cfoutput>#diretorio_anexos#</cfoutput> --->
+
  
 <cfset area = 'sins'>
 <cfset Encaminhamento = 'Ao SGCIN'>
@@ -369,7 +369,6 @@
 	<cfset auxnomearea = rsMod.Und_Descricao>	
 </cfif> 
 
-<!--- ============= --->
 <cfquery name="qSituacaoResp" datasource="#dsn_inspecao#">
   SELECT Pos_Situacao_Resp, Pos_NomeArea, Pos_Area
   FROM ParecerUnidade
@@ -1148,25 +1147,25 @@ function mensagem(){
 --->
 		
  	<tr class="exibir">
-      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
-      <td colspan="5" bgcolor="eeeeee">
-		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
-			<tr class="exibir"><strong>
-				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
-				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
-				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
-			</tr>
-		  </table>		  
-	  </td>
+		<td bgcolor="eeeeee">Potencial Valor</td>
+		<td colspan="5" bgcolor="eeeeee">
+			<table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			  <tr class="exibir"><strong>
+				  <td width="30%" bgcolor="eeeeee"><strong>Estimado a Recuperar (R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				  <td width="35%" bgcolor="eeeeee"><strong>Estimado Não Planejado/Extrapolado/Sobra (R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				  <td width="35%" bgcolor="eeeeee"><strong>Estimado em Risco ou Envolvido (R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			  </tr>
+			</table>		  
+		</td>
     </tr>	  
 	</cfoutput>
 	<tr class="exibir">
-		<td colspan="4" bgcolor="eeeeee"></td>
+		<td colspan="5" bgcolor="eeeeee"></td>
 	</tr>
 
     <tr>
 	 <td height="38" bgcolor="eeeeee" align="center"><span class="titulos">Oportunidade<br>de<br>Aprimoramento:</span></td>
-	 <td colspan="4" bgcolor="eeeeee">
+	 <td colspan="5" bgcolor="eeeeee">
 	  <cfif (qResposta.Pos_Situacao_Resp is 0) or (qResposta.Pos_Situacao_Resp is 11)>
 		 <cfset melhoria = '#strComentario#'>
 	     <textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form" readonly><cfoutput>#melhoria#</cfoutput></textarea>

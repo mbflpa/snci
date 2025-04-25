@@ -3,13 +3,11 @@
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
 </cfif>             
-
 <cfif isDefined("Form.acao")>
   <cfparam name="url.pg" default="#form.pg#"> 
 <cfelse>
   <cfparam name="url.pg" default="">
 </cfif>
-
 <cfif isDefined("Form.acao")>
 
 	<cfif "#url.pg#" neq 'pt'>
@@ -38,9 +36,7 @@
 
 </cfif>
 
-
-<cfset anoinsp = right(ninsp,4)>
-	
+<cfset anoinsp = right(ninsp,4)>	
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	select Usu_GrupoAcesso, Usu_Matricula, Usu_Email from usuarios where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
@@ -58,8 +54,6 @@
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
 </cfif>        
-
-
 
 <cfquery name="rsRelev" datasource="#dsn_inspecao#">
 	SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
@@ -145,8 +139,6 @@
 		
 	</script>
 </cfif>
-
-
 
 <cfquery name="qResponsavel" datasource="#dsn_inspecao#">
     SELECT INP_Responsavel
