@@ -644,7 +644,7 @@
 				<cfset textoEmail = '<p<cfset textoEmail =>Solicita-se atualizar as informações do andamento das ações para regularização da Orientação ID #pc_aval_orientacao_id#, no processo SNCI N° #pc_aval_processo#, considerando sua última manifestação quanto as tratativas com órgão externo. Incluir no SNCI as evidências das tratativas/ações adotadas.</p> 
 										<p>Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "MEDIDAS/ORIENTAÇÕES PARA REGULARIZAÇÃO " e inserir sua resposta:</p>
 										<p style="text-align:center;">
-											<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+											<a href="https://intranetsistemaspe.correiosnet.int/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
 										</p>'>
 							
 				<cfobject component = "pc_cfcPaginasApoio" name = "pc_cfcPaginasApoioDist"/>
@@ -755,7 +755,7 @@
 											<p style="text-align: justify;">Para regularizar a situação, solicitamos acessar o link abaixo, tela <strong>Acompanhamento</strong>, aba <strong>Medidas / Orientações para regularização</strong> e inserir sua resposta:</p>
 											
 											<p style="text-align:center;">
-												<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+												<a href="https://intranetsistemaspe.correiosnet.int/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
 											</p>
 						
 											<p style="text-align: justify;">Atentar para as ORIENTAÇÕES para Regularização citadas no Sistema para desenvolvimento de sua resposta. Ainda, orienta-se a inserir as comprovações das ações adotadas no Sistema.</p>
@@ -920,7 +920,7 @@
 				<cfset textoEmail = '<p style="text-align: justify;">Informamos que existe(m) #NumberFormat(rsMelhoriasPendentes.recordcount,"00")# Proposta(s) de Melhoria registrada(s) pelo Controle Interno, no Sistema SNCI, com status “PENDENTE”, aguardando manifestação do gestor responsável.</p> 
 									    <p style="text-align: justify;">Para regularizar a situação, solicitamos acessar o sistema por meio do link abaixo, tela "Acompanhamento", aba "Propostas de Melhoria" e inserir sua resposta:</p>
 										<p style="text-align:center;">
-											<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+											<a href="https://intranetsistemaspe.correiosnet.int/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
 										</p>
 								        <p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
 										<ul>

@@ -2820,10 +2820,11 @@
 																<li style="text-align: justify;">RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
 																<li style="text-align: justify;">TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
 															</ul>
-														<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+														<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas/Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
 														<p style="text-align:center;">
-															<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
-														</p>'>
+															<a href="https://intranetsistemaspe.correiosnet.int/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+														</p>
+														<p style="text-align: justify;">Informamos, ainda, que as Orientações com status "Encerrado" serão visualizadas na opção "Consultas/Processos Finalizados" e as Propostas de Melhoria com status "Não Informado", serão visualizadas na opção Consultas/Propostas de Melhoria, não precisam de manifestação ou resposta do gestor.</p>'>
 								
 								<cfelse>
 
@@ -2839,10 +2840,11 @@
 																<li style="text-align: justify;">RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li>   <br>  
 																<li style="text-align: justify;">TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li> 
 															</ul>
-														<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+														<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas/Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
 														<p style="text-align:center;">
-															<a href="http://intranetsistemaspe/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
-														</p>'>
+															<a href="https://intranetsistemaspe.correiosnet.int/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
+														</p>
+														<p style="text-align: justify;">Informamos, ainda, que as Orientações com status "Encerrado" serão visualizadas na opção "Consultas/Processos Finalizados" e as Propostas de Melhoria com status "Não Informado", serão visualizadas na opção Consultas/Propostas de Melhoria, não precisam de manifestação ou resposta do gestor.</p>'>
 
 								</cfif>
 
