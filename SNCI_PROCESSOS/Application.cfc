@@ -1,5 +1,6 @@
 component {
-    this.name = "conteudo";
+    this.name = "SNCI-PROCESSOS";
+    this.mappings["/cfcSNCI"] = expandPath("/snci/SNCI_PROCESSOS/cfc");
     this.sessionManagement = true;
     this.clientManagement = true;
     this.sessionTimeout = createTimeSpan(0,1,0,0);

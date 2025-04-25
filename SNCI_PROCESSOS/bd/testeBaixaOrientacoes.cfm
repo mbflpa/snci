@@ -12,13 +12,31 @@
 <body>
     <h2>Teste de Baixa por Valor Envolvido</h2>
 
+<cfset obj = new cfcSNCI.pc_cfcAvaliacoes()>
 
-    <!--- Cria uma instância do CFC --->
-<cfset obj = createObject("component", "/snci/SNCI_PROCESSOS/cfc/pc_cfcAvaliacoes")>
+<form method="post">
+    <input type="submit" name="executar" value="Executar Baixa">
+    <input type="submit" name="reverter" value="Reverter Baixa">
+</form>
 
-<!--- Chama a função de teste --->
-<cfset  resultado = obj.baixaPorValorEnvolvido('1000022019')>
+<cfif structKeyExists(form, "executar")>
+    <cfset resultado = obj.teste_baixaPorValorEnvolvido()>
+    <cfif isDefined("resultado") AND arrayLen(resultado) GT 0>
+        <cfset session.processosModificados = resultado>
+        <cfoutput>Processos modificados: #arrayToList(resultado)#</cfoutput>
+    <cfelse>
+        <cfoutput>Nenhum processo foi modificado.</cfoutput>
+    </cfif>
+</cfif>
+
+<cfif structKeyExists(form, "reverter") AND structKeyExists(session, "processosModificados")>
+    <cfset obj.reverterBaixaPorValorEnvolvido(session.processosModificados)>
+    <cfset structDelete(session, "processosModificados")>
+    <cfoutput>Alterações revertidas com sucesso!</cfoutput>
+</cfif>
 
 </body>
 </html>
 </cfoutput>
+
+
