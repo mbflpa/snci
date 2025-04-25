@@ -1,5 +1,4 @@
 <cfprocessingdirective pageEncoding ="utf-8">
-
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
@@ -63,7 +62,6 @@
 
 <cfif (Trim(qAcesso.Usu_GrupoAcesso) eq 'DESENVOLVEDORES') or (Trim(qAcesso.Usu_GrupoAcesso) eq 'GESTORES') or (Trim(qAcesso.Usu_GrupoAcesso) eq 'SUBORDINADORREGIONAL')>
 
-
 <cftry>
 
 <cfif isDefined("Form.acao") And (Form.acao is 'Anexar' Or Form.acao is 'Excluir')>
@@ -73,7 +71,6 @@
 	<cfif isDefined("Form.NumSEI")><cfset Session.E01.NumSEI = Form.NumSEI><cfelse><cfset Session.E01.NumSEI = ''></cfif>
 	<cfif isDefined("Form.h_obs")><cfset Session.E01.h_obs = Form.h_obs><cfelse><cfset Session.E01.h_obs = ''></cfif>
     <cfif isDefined("Form.opcaoBaixa")><cfset Session.E01.Pos_OpcaoBaixa = Form.opcaoBaixa><cfelse><cfset Session.E01.Pos_OpcaoBaixa = ''></cfif>
-
 
 	 <cfif Form.acao is 'Anexar'>
 		<cftry>
@@ -601,16 +598,16 @@ function Mascara_SEI(x)
 		</cfif>
 	</cfif>		
  	<tr class="exibir">
-      <td bgcolor="eeeeee"><div id="impactofin">IMPACTO FINANCEIRO (Valor)</div></td>
-      <td colspan="6" bgcolor="eeeeee">
-		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
-			<tr class="exibir"><strong>
-				<td width="40%" bgcolor="eeeeee"><strong>&nbsp;#tipoimpacto#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
-				<td width="30%" bgcolor="eeeeee"><strong>Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
-				<td width="30%" bgcolor="eeeeee"><strong>Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
-			</tr>
-		  </table>		  
-	  </td>
+		<td bgcolor="eeeeee">Potencial Valor</td>
+		<td colspan="5" bgcolor="eeeeee">
+			<table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+			  <tr class="exibir"><strong>
+				  <td width="30%" bgcolor="eeeeee"><strong>Estimado a Recuperar (R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
+				  <td width="35%" bgcolor="eeeeee"><strong>Estimado Não Planejado/Extrapolado/Sobra (R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
+				  <td width="35%" bgcolor="eeeeee"><strong>Estimado em Risco ou Envolvido (R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+			  </tr>
+			</table>		  
+		</td>
     </tr>	  
 	</cfoutput>
           <tr class="exibir">

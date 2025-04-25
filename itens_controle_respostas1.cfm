@@ -2100,7 +2100,7 @@ if (document.form1.acao.value=='Incluir_Proc'){
 		 }
 
 		//alert('Qual o valor da situacao? ' + sit);
-		 if ((sit == 15 || sit == 16 || sit == 18 || sit == 19 || sit == 23) && (dt_hoje_yyyymmdd == dtprevdig_yyyymmdd))
+		 if ((sit == 15 || sit == 16 || sit == 19 || sit == 23) && (dt_hoje_yyyymmdd == dtprevdig_yyyymmdd))
 		 {
 		  alert("Para Tratamento a Data de Previsão da Solucão deve ser maior que a do dia!")
 		  //dtprazo(sit);
@@ -2118,7 +2118,7 @@ if (document.form1.acao.value=='Incluir_Proc'){
 		}
 		
 		 //----------------------------------------------
-		 if ((sit == 15 || sit == 16 || sit == 18 || sit == 19 || sit == 23) && (dtprevdig_yyyymmdd > document.form1.Tratam_Teto_Data.value))
+		 if ((sit == 15 || sit == 16 || sit == 19 || sit == 23) && (dtprevdig_yyyymmdd > document.form1.Tratam_Teto_Data.value))
 		 {
 		  alert("Para Tratamento a Data de Previsão nao deve ser superior aos 365 dias!")
 		  //dtprazo(sit);
@@ -2126,7 +2126,7 @@ if (document.form1.acao.value=='Incluir_Proc'){
 		  return false;
 		 }		
 		 
-		 if ((sit == 15 || sit == 16 || sit == 18 || sit == 19 || sit == 23) && (dtprevdig_yyyymmdd < document.form1.dtdezddtrat.value))
+		 if ((sit == 15 || sit == 16 || sit == 19 || sit == 23) && (dtprevdig_yyyymmdd < document.form1.dtdezddtrat.value))
 		 {
 		  var auxdtedit = document.form1.dtdezddtrat.value;
 		  auxdtedit = auxdtedit.substring(6,8) + '/' + auxdtedit.substring(4,6) + '/' + auxdtedit.substring(0,4)
@@ -2138,7 +2138,7 @@ if (document.form1.acao.value=='Incluir_Proc'){
 	//=====================================
 	if (confirm ('                               Atenção!\n\n Confirma a intensão de modificar a Situação para:\n\n' + nomesitua + ' ?'))
 				{
-                    if (sit == 15 || sit == 16 || sit == 18 || sit == 19 || sit == 23) 
+                    if (sit == 15 || sit == 16 || sit == 19 || sit == 23) 
 					{
 						var auxcam = '\n\n               TRATAMENTO - (AVISO IMPORTANTE)     \n\n  Caro Colaborador(a), você informou uma nova Data de Previsão da Solucão;\n  Nos casos em que foi cedido dilatação de prazo, requisitamos que registre em sua opinião a motivação da mudança.\n\n                Confirma a nova Data de Previsão?';
 						if (confirm ('                                  Atenção! ' + auxcam))

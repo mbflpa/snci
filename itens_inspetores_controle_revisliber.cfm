@@ -1,6 +1,4 @@
 <cfprocessingdirective pageEncoding ="utf-8"> 
-<!--- <cfdump var="#form#"> <cfdump var="#session#"> --->
-<!---  <cfdump var="#url#">  --->
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
  	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>    
@@ -1057,14 +1055,14 @@ N&ordm; Relat&oacute;rio:
 		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee" >
 		  <cfif caracvlrhabilSN is 'S'>
 		  <tr bgcolor="eeeeee" class="form">
-			<td bgcolor="eeeeee">Caracteres:&nbsp;
+			<td bgcolor="eeeeee">Potencial Valor&nbsp;
 				<select name="caracvlr" id="caracvlr" class="form">
 					<option  value="QUANTIFICADO">QUANTIFICADO</option>
 				</select>                    
 			</td>
-			<td bgcolor="eeeeee">Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></td>
-			<td bgcolor="eeeeee">Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></td>
-			<td bgcolor="eeeeee">Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></td>  
+			<td bgcolor="eeeeee">Estimado a Recuperar (R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></td>
+			<td bgcolor="eeeeee">Estimado Não Planejado/Extrapolado/Sobra (R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></td>
+			<td bgcolor="eeeeee">Estimado em Risco ou Envolvido (R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" onFocus="moeda_dig(this.name)" onKeyPress="moeda_dig(this.name)" onKeyUp="moeda_edit(this.name)" onBlur="ajuste_campo(this.name)"></td>  
 		  </tr>
 		  <cfelse>
 		  		<tr class="form" bgcolor="eeeeee">
@@ -1073,9 +1071,9 @@ N&ordm; Relat&oacute;rio:
                         <option  value="NAO QUANTIFICADO">NÃO QUANTIFICADO</option>	
                       </select>                    
 					</td>
-					<td bgcolor="eeeeee">Falta(R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly="yes"></td>
-					<td bgcolor="eeeeee">Sobra(R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly="yes"></td>
-					<td bgcolor="eeeeee">Em Risco(R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly="yes"></td>
+					<td bgcolor="eeeeee">Estimado a Recuperar (R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly="yes"></td>
+					<td bgcolor="eeeeee">Estimado Não Planejado/Extrapolado/Sobra (R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly="yes"></td>
+					<td bgcolor="eeeeee">Estimado em Risco ou Envolvido (R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly="yes"></td>
 		  		</tr>
 		  </cfif>
 		  </table>	  

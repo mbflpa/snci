@@ -3,9 +3,7 @@
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
 </cfif>   
-
 <cfset houveProcSN = 'N'>
-
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	select Usu_GrupoAcesso, Usu_Matricula, Usu_Email 
 	from usuarios 
@@ -30,7 +28,6 @@
 <cfif isDefined("Form.acao") And (#Form.acao# eq 'reincidencia')>
 	<cflocation url = "itens_inspetores_reincidencia.cfm?nunid=#Form.unid#&ninsp=#Form.ninsp#&ngrup=#Form.ngrup#&nitem=#Form.nitem#&itnreincidentes=#itnreincidentes#&grpitmsql=#form.grpitmsql#"> 
 </cfif>
-
 <cfif (grpacesso eq 'INSPETORES') or (grpacesso eq 'DESENVOLVEDORES') or (grpacesso eq 'GESTORES')>
 
   <cfif isDefined("Form.acao") And (Form.acao is 'anexar' Or Form.acao is 'excluir_anexo')>
@@ -67,9 +64,6 @@
 		<cfset numncisei = "">
 		<!--- <cfif not isDefined("Form.Submit")> --->
 		<cfif isDefined("Form.Submit")>
-			
-	<!--- 	<cfelse>
-			<cfset numncisei = ""> --->
 			<cfoutput>	
 				<cfif isDefined("Form.frmnumseinci") And (#Form.frmnumseinci# neq "")>
 					<cfset numncisei = #Form.frmnumseinci#>
@@ -2121,7 +2115,7 @@ auxvlr: #auxvlr# <br>
 	    <td colspan="6" bgcolor="eeeeee"><table width="100%">
           <tr>
             <td width="333"><cfoutput><strong class="exibir">#URL.Unid#</strong> - <strong class="exibir">#rsMOd.Und_Descricao#</strong></cfoutput></td>
-            <td width="99"><span class="exibir">Respons&aacute;vel:</span></td>
+            <td width="99"><span class="exibir">Responsável:</span></td>
             <td width="571"><cfoutput><strong class="exibir">#qResponsavel.INP_Responsavel#</strong></cfoutput></td>
           </tr>
         </table></td>
