@@ -2,10 +2,6 @@
 
 <cfset CurrentPage=GetFileFromPath(GetTemplatePath())>
  <cfif isDefined("url.Ninsp") and url.Ninsp neq ''>
-<!---  <cfoutput>
-#url.pagretorno#
-</cfoutput>
- <cfset gil = gil> --->  
     <cfset form.frmano = right(url.Ninsp,4)>
    <!--- passagem de parametro num da avaliação e nome da página requisitante(url.pagretorno)--->
 	 <cfquery name="rsClas" datasource="#dsn_inspecao#">
@@ -483,9 +479,9 @@ function troca(a){
               (13-OC)</div></td>
             <td width="3%"><div align="center">Pts.<br>
               (13-OC)</div></td>
-            <td width="5%"><div align="center">Falta(R$)</div></td>
-            <td width="4%"><div align="center">Sobra(R$)</div></td>
-			<td width="5%"><div align="center">EmRisco(R$)</div></td>
+            <td width="5%"><div align="center">Estimado a Recuperar (R$)</div></td>
+            <td width="4%"><div align="center">Estimado Não Planejado/Extrapolado/Sobra (R$)</div></td>
+			<td width="5%"><div align="center">Estimado em Risco ou Envolvido (R$)</div></td>
             <td width="4%"><div align="center">Pts.Max Unidade<br></div></td>
             <td width="4%"><div align="center">Pts.Item<br>(Inicial)</div></td>
             <td width="3%"><div align="center">TNC<br>
@@ -619,7 +615,7 @@ function troca(a){
     Query = rsXLS,
 	ColumnList = 
 "TNC_Ano,TNC_Unidade,Und_Descricao,TUN_Descricao,TNC_Avaliacao,TNC_QTDC,TNC_QTDN,TNC_QTDV,TNC_QTDE,TNC_QTDCN,TNC_QTDSolucao,TNC_PTSSolucao,TNC_QTDRegularizado,TNC_PTSRegularizado,TNC_QTDImprocedente,TNC_PTSImprocedente,TNC_QTDCancelado,TNC_PTSCancelado,TNCVLRFALTA,TNCVLRSOBRA,TNCVLREMRISCO,TNC_PTSMaxUnidade,TNC_PTSUnidInicio,TNC_TNCInicio,TNC_ClassifInicio,TNC_PTSUnidAtual,TNC_TNCAtual,TNC_ClassifAtual,TNCdtultatu",
-	ColumnNames = "Ano,Código,Descrição,Tipo,Avaliação,Qtd.C,Qtd.N,Qtd.V,Qtd.E,Qtd.(C+N),Qtd.(3-SO),Pts.(3-SO),Qtd.(25-RC),Pts.(25-RC),Qtd.(12-PI),Pts.(12-PI),Qtd.(13-OC),Pts.(13-OC),Falta(R$),Sobra(R$),Em Risco(R$),Pts.MaxUnidade,Pts.Item(Inicial),TNC(Inicial),Classif(Inicial),Pts.Item(Atual),TNC(Atual),Classif(Atual),DT.Atualiz",
+	ColumnNames = "Ano,Código,Descrição,Tipo,Avaliação,Qtd.C,Qtd.N,Qtd.V,Qtd.E,Qtd.(C+N),Qtd.(3-SO),Pts.(3-SO),Qtd.(25-RC),Pts.(25-RC),Qtd.(12-PI),Pts.(12-PI),Qtd.(13-OC),Pts.(13-OC),Estimado a Recuperar (R$),Estimado Não Planejado/Extrapolado/Sobra (R$),Estimado em Risco ou Envolvido (R$),Pts.MaxUnidade,Pts.Item(Inicial),TNC(Inicial),Classif(Inicial),Pts.Item(Atual),TNC(Atual),Classif(Atual),DT.Atualiz",
 	SheetName = "CLASSIFICAÇÕES DAS UNIDADES"
     ) />
 

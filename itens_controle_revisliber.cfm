@@ -3,7 +3,6 @@
 	  <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort>  
 </cfif>             
-
 <cfif isDefined("Form.acao")>
   <cfparam name="url.pg" default="#form.pg#"> 
 <cfelse>
@@ -11,7 +10,6 @@
 </cfif>
 
 <cfif isDefined("Form.acao")>
-
 	<cfif "#url.pg#" neq 'pt'>
 		<script>
 			alert('Prezado Gestor, utilize o Papel de Trabalho para acessar esta página.');
@@ -37,7 +35,7 @@
 	</cfif>
 
 </cfif>
-<!---  --->
+
 <cfset auxdtprev = CreateDate(year(now()),month(now()), day(now()))>
 <cfif tpunid neq 12 and tpunid neq 16>
 	<!--- 10 dias úteis na data de previsão --->
