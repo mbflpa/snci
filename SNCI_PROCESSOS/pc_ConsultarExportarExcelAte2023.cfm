@@ -281,6 +281,7 @@
 				columns.push(
 					{ data: 'PC_AVAL_MELHORIA_ID', title: 'Cód. Prop. Melhoria' },
 					{ data: 'PC_AVAL_MELHORIA_DESCRICAO', title: 'Proposta de Melhoria' },
+					{ data: 'DATA_STATUS_MELHORIA', title: 'Data Status Melhoria' },
 					{ data: 'ORGAO_RESP', title: 'Órgão Responsável' },
 					{ data: 'STATUS_MELHORIA', title: 'Status da Prop. Melhoria' },
 					{ data: 'DATA_PREV', title: 'Data Prev.' },

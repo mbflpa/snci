@@ -1,4 +1,6 @@
 <cfprocessingdirective pageencoding = "utf-8">
+<cfset obj = new cfcSNCI.pc_cfcAvaliacoes()>
+<cfset resultado = obj.baixaPorValorEnvolvido()>
 
 <!DOCTYPE html>
 <html lang="pt-br">

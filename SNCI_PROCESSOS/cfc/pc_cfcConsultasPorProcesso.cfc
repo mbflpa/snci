@@ -2628,7 +2628,14 @@
 
 			<!-- Retorna informações do processo para enviar e-mail-->			
 			<cfquery datasource="#application.dsn_processos#" name="rsProcesso">
-				SELECT  pc_processos.*, pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_email,pc_avaliacao_tipos.pc_aval_tipo_descricao  FROM pc_processos
+				SELECT  pc_processos.*, pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_email,pc_avaliacao_tipos.pc_aval_tipo_descricao  
+				, CONCAT(
+						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
+						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
+						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
+						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', ''
+						) as tipoProcesso
+				FROM pc_processos
 				INNER JOIN pc_orgaos on pc_num_orgao_avaliado = pc_org_mcu
 				INNER JOIN pc_avaliacao_tipos on pc_num_avaliacao_tipo = pc_aval_tipo_id
 				WHERE pc_processo_id = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> 
@@ -2639,10 +2646,14 @@
 			<cfset siglaOrgaoAvaliado = #LTrim(RTrim(rsProcesso.pc_org_sigla))#>
 			<cfset anoPacin = "#LTrim(RTrim(rsProcesso.pc_ano_pacin))#">
 			
-			<cfif #rsProcesso.pc_num_avaliacao_tipo# eq 2><!--Se o tipo de avaliação for "NÃO SE APLICA", pega a informação da coluna pc_aval_tipo_nao_aplica_descricao-->
-				<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_nao_aplica_descricao))#>
+			<cfif rsProcesso.pc_num_avaliacao_tipo neq 445 and rsProcesso.pc_num_avaliacao_tipo neq 2>
+				<cfif rsProcesso.pc_aval_tipo_descricao neq ''>
+					<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_descricao))#>
+				<cfelse>
+					<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.tipoProcesso))#>
+				</cfif>
 			<cfelse>
-				<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_descricao))#>
+				<cfset tipoAvaliacao = #LTrim(RTrim(rsProcesso.pc_aval_tipo_nao_aplica_descricao))#>
 			</cfif>
 			<!-- se sigla do órgão avaliado começar com SE/, sem espaço antes, usa o pronome de tratamento "Senhor(a) Superintendente Estadual", caso contrárioa usa "Senhor(a) Chefe de Departamento"-->
 			<cfif left(LTrim(RTrim(siglaOrgaoAvaliado)),3) eq 'SE/'>
@@ -2658,14 +2669,15 @@
 									<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
 									<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
 										<ul>
-											<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
-											<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
-											<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
+											<li style="text-align: justify;">ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li><br>   
+											<li style="text-align: justify;">RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li> <br> 
+											<li style="text-align: justify;">TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li>  
 										</ul>
-									<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+									<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas/Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
 									<p style="text-align:center;">
 										<a href="https://intranetsistemaspe.correiosnet.int/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
-									</p>'>
+									</p>
+									<p style="text-align: justify;">Informamos, ainda, que as Orientações com status "Encerrado" serão visualizadas na opção "Consultas/Processos Finalizados" e as Propostas de Melhoria com status "Não Informado", serão visualizadas na opção Consultas/Propostas de Melhoria, não precisam de manifestação ou resposta do gestor.</p>'>
 			
 			<cfelse>
 
@@ -2677,14 +2689,15 @@
 									<p style="text-align: justify;">Ressalta-se que a implementação do plano de ação será acompanhada pelo CONTROLE INTERNO para os itens classificados como GRAVE e MEDIANO, e todas as ações implementadas deverão ser evidenciadas (documentadas) por esse gestor, com a inserção das comprovações no sistema SNCI Processos. Itens classificados como "Leve", são encaminhados para conhecimento e adoção de providências por esse gestor, porém não serão acompanhados pelo Controle Interno.</p> 
 									<p style="text-align: justify;">As Propostas de Melhoria estão cadastradas no sistema com status "PENDENTE", para que os gestores dos órgãos avaliados registrem suas manifestações, observando as opções a seguir:</p>   
 										<ul>
-											<li style="text-align: justify;>ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li> <br>  
-											<li style="text-align: justify;>RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li>   <br>  
-											<li style="text-align: justify;>TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li> 
+											<li style="text-align: justify;">ACEITA: situação em que a "Proposta de Melhoria" é aceita pelo gestor. Neste caso, deverá ser informada a data prevista de implementação;</li> <br>  
+											<li style="text-align: justify;">RECUSA: situação em que a "Proposta de Melhoria" é recusada pelo gestor, com registro da justificativa para essa ação;</li>   <br>  
+											<li style="text-align: justify;">TROCA: situação em que o gestor propõe outra ação em substituição à "Proposta de Melhoria" sugerida pelo Controle Interno. Nesse caso indicar o prazo previsto de implementação.</li> 
 										</ul>
-									<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas / Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
+									<p style="text-align: justify;">Orientamos a acessar o link abaixo, tela "Acompanhamento", aba "Medidas/Orientações para regularização" e/ou "Propostas de Melhoria"  e inserir sua resposta:</p>
 									<p style="text-align:center;">
 										<a href="https://intranetsistemaspe.correiosnet.int/snci/snci_processos/index.cfm" style="background-color:##00416B; color:##ffffff; padding:10px 20px; text-decoration:none; border-radius:5px; display:inline-block;">Acessar SNCI - Processos</a>
-									</p>'>
+									</p>
+									<p style="text-align: justify;">Informamos, ainda, que as Orientações com status "Encerrado" serão visualizadas na opção "Consultas/Processos Finalizados" e as Propostas de Melhoria com status "Não Informado", serão visualizadas na opção Consultas/Propostas de Melhoria, não precisam de manifestação ou resposta do gestor.</p>'>
 
 			</cfif>
 
@@ -2698,6 +2711,8 @@
 			texto="#textoEmail#"
 			/>
 
+			<cfset obj = new cfcSNCI.pc_cfcAvaliacoes()>
+			<cfset resultado = obj.teste_baixaPorValorEnvolvido('#arguments.numProcesso#')>
 
 		</cftransaction>
 

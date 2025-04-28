@@ -306,6 +306,7 @@
 				columns.push(
 					{ data: 'PC_AVAL_MELHORIA_ID', title: 'Cód. Prop. Melhoria' },
 					{ data: 'PC_AVAL_MELHORIA_DESCRICAO', title: 'Proposta de Melhoria' },
+					{ data: 'DATA_STATUS_MELHORIA', title: 'Data Status Melhoria' },
 					{ data: 'ORGAORESP', title: 'Órgão Responsável' },
 					{ data: 'CATEGORIASCONTROLESMELHORIALIST', title: 'Categoria do Controle Proposto' },
 					{ data: 'PC_AVAL_MELHORIA_BENEFICIO_NAO_FINANCEIRO', title: 'Benefício Não Financeiro' },

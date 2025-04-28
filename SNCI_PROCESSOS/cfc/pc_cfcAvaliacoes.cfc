@@ -2649,7 +2649,7 @@
 						'Macroprocesso:<strong> ',pc_avaliacao_tipos.pc_aval_tipo_macroprocessos,'</strong>',
 						' -> N1:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN1,'</strong>',
 						' -> N2:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN2,'</strong>',
-						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', '.'
+						' -> N3:<strong> ', pc_avaliacao_tipos.pc_aval_tipo_processoN3,'</strong>', ''
 						) as tipoProcesso
 						FROM pc_processos
 						INNER JOIN pc_orgaos on pc_num_orgao_avaliado = pc_org_mcu
@@ -2864,10 +2864,8 @@
 						</cfcatch>
 					</cftry>
 
-
-					<!--INSERIR AQUI A CFFUNCTION QUE BAIXA AS ORIENTAÇÕES DE ACORDO COM OS VALORES DOS ITENS-->
 					<cfset obj = new cfcSNCI.pc_cfcAvaliacoes()>
-					<cfset resultado = obj.teste_baixaPorValorEnvolvido('#arguments.pc_aval_processo#')>
+					<cfset resultado = obj.baixaPorValorEnvolvido('#arguments.pc_aval_processo#')>
 
 				</cfif><!--Fim do IF que verifica se todos os itens foram validados -->
 			</cftransaction>
@@ -4379,17 +4377,17 @@
 
 				$('select, textarea, input').on('change blur keyup', function() {
 					var $this = $(this);
-					// Verifica se o valor do select é vazio ou nulo
-					if ($this.val() == "" || $this.val() == null || $this.val().length === 0) {
-						// Trigger the validation for the select element
-						
-						$this.removeClass('is-valid').addClass('is-invalid');
-						$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
-						$("#formAvalOrientacaoCadastro").valid(); // This will validate the select element based on your jQuery Validate rules
-					}else{
-						$this.removeClass('is-invalid').addClass('is-valid');
-						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
-						$("#formAvalOrientacaoCadastro").valid(); // This will validate the select element based on your jQuery Validate rules
+					
+					// Só valida se já existir regra para o campo
+					if ($this.closest('form').length && $this.valid !== undefined) {
+						if ($this.val() == "" || $this.val() == null || $this.val().length === 0) {
+							$this.removeClass('is-valid').addClass('is-invalid');
+							$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+						} else {
+							$this.removeClass('is-invalid').addClass('is-valid');
+							$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						}
+						$this.valid(); // Valida apenas o campo atual!
 					}
 				});
 
@@ -7627,137 +7625,186 @@
         <cfset dataParaVerificar = now()>
 		<cfset posicionamentoPadrao = ''>
 
-		<cfquery name="rsProcessosVerificadosParaBaixa" datasource="#application.dsn_processos#">
-			SELECT pc_processo_id  FROM pc_processos
-			WHERE 
-			<cfif arguments.numProcesso neq "TODOS">
-				pc_processo_id = '#arguments.numProcesso#'
-			<cfelse>
-				pc_num_status = 4
-			</cfif>
+		<cfquery name="verificarExecucao" datasource="#application.dsn_processos#">
+			SELECT pc_rotina_ultima_execucao 
+			FROM pc_rotinas_execucao_log 
+			WHERE pc_rotina_nome = 'baixaPorValorEnvolvido'
 		</cfquery>
-
-		<!--Realiza loop sobre todos os processos de rsProcessosVerificadosParaBaixa-->
-		<cfloop query="rsProcessosVerificadosParaBaixa">
-			<cftransaction>	
-				<!--Verifica todos os itens, não leves, em acompanhamento do processo-->
-				<cfquery name="rsItensProcesso" datasource="#application.dsn_processos#">
-					SELECT pc_aval_id, pc_aval_classificacao,pc_aval_valorTotalEnvolvido 
-					FROM pc_avaliacoes
-					WHERE pc_aval_processo = <cfqueryparam value="#pc_processo_id#" cfsqltype="cf_sql_varchar"> AND pc_aval_status = 6 AND pc_aval_classificacao <>'L'
-				</cfquery> 
-				<cfif rsItensProcesso.recordCount neq 0>
-					<cfloop query="rsItensProcesso">
-						<!--Verifica se o item tem orientações-->
-						<cfquery name="rsOrientacoesExistentes" datasource="#application.dsn_processos#">
-							SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes WHERE pc_aval_orientacao_num_aval = #pc_aval_id# 
-						</cfquery>
-						<!--Verifica a menor data dos posicionamentos das orientações dos itens-->
-						<cfif rsOrientacoesExistentes.recordCount neq 0>
-							<cfquery name="rsDataPosOrientacao" datasource="#application.dsn_processos#">
-								SELECT MIN(pc_aval_posic_datahora) as minDataPosic
-								FROM pc_avaliacao_posicionamentos as posic
-								INNER JOIN pc_avaliacao_orientacoes as o on o.pc_aval_orientacao_id = posic.pc_aval_posic_num_orientacao
-								INNER JOIN pc_avaliacoes as a on a.pc_aval_id = o.pc_aval_orientacao_num_aval
-								WHERE  a.pc_aval_id = #pc_aval_id# 
-							</cfquery>
-							<cfset dataParaVerificar = rsDataPosOrientacao.minDataPosic>
-						<cfelse>
-							<cfquery name="rsDataPM" datasource="#application.dsn_processos#">
-								SELECT MIN(pc_aval_melhoria_datahora) as minDataPM FROM pc_avaliacao_melhorias as pm WHERE pm.pc_aval_melhoria_num_aval = #pc_aval_id#
-							</cfquery>
-							<cfset dataParaVerificar = rsDataPM.minDataPM>
-						</cfif>
-
-						<cfif isDate(dataParaVerificar)>
-							<cfset diasDesdeData = DateDiff("d", dataParaVerificar, now())>
-						<cfelse>
-							<cfset diasDesdeData = 0>
-						</cfif>
-
-						<cfif (pc_aval_classificacao eq 'M' AND (pc_aval_valorTotalEnvolvido lte 10000 OR (diasDesdeData GT 360 AND pc_aval_valorTotalEnvolvido GT 10000 and pc_aval_valorTotalEnvolvido lte 120000))) 
-								OR 
-							  (pc_aval_classificacao eq 'G' AND diasDesdeData GT 360 AND pc_aval_valorTotalEnvolvido lte 120000)>
-
-							<!--Verifica as orientações passíveis baixadas-->
-							<cfquery name="rsOrientacoesParaBaixa" datasource="#application.dsn_processos#">
-								SELECT o.pc_aval_orientacao_id, o.pc_aval_orientacao_mcu_orgaoResp as orgaoResp FROM pc_avaliacao_orientacoes o
-								INNER JOIN pc_orientacao_status s ON s.pc_orientacao_status_id = o.pc_aval_orientacao_status
-								WHERE o.pc_aval_orientacao_num_aval = <cfqueryparam value="#pc_aval_id#" cfsqltype="cf_sql_integer">
-										AND s.pc_orientacao_status_finalizador = 'N'
-										AND o.pc_aval_orientacao_status NOT IN (0,1,14)
-							</cfquery>
-
-							<cfquery datasource="#application.dsn_processos#">
-								UPDATE pc_avaliacoes
-								SET pc_aval_status = 7
-								WHERE pc_aval_id = #pc_aval_id#
-							</cfquery>
-
-							<!--Define o texto do posicionaMento-->
-							<cfif pc_aval_classificacao eq 'M' AND pc_aval_valorTotalEnvolvido lte 10000>
-								<cfset posicionamentoPadrao ='
-									Considerando as diretrizes publicadas no Método de Avaliação de Controle Interno SEI nº 51741855/2024, que estabelece acompanhamento da equipe de controle interno somente "até o recebimento da comunicação aos gestores", nas avaliações em que as situação de não conformidade tenha classificação "Mediana" até o valor de R$10.000,00 (dez mil reais), esse ID passa para status "Encerrado". 
-									A conclusão do acompanhamento não obsta Ação Corretiva da área responsável pela regularização da Não Conformidade ou implementação da Orientação de Regularização.
-								'>
-							<cfelse>
-								<cfset posicionamentoPadrao ='
-									Considerando as diretrizes publicadas no Método de Avaliação de Controle Interno SEI nº 51741855/2024, que estabelece acompanhamento da equipe de controle interno "por 360 (trezentos e sessenta dias)", nas avaliações em que as situações de não conformidade tenham classificação "Mediana" com valor acima de R$10.000,00 (dez mil reais) e Menor que R$120mil ou classificação "Grave" e que não se encaixem no critério de relevância de valor R$ 120 mil - TCE. Instrução Normativa-TCU 98/2024, este ID passa para status "Encerrado". 
-									A conclusão do acompanhamento não obsta Ação Corretiva da área responsável pela regularização da Não Conformidade ou implementação da Orientação de Regularização.
-								'>
-							</cfif>
-							<!-- Baixa as orientações do item com 10 - ENCERRADO-->
-							<cfloop query="rsOrientacoesParaBaixa">
-								<cfquery datasource="#application.dsn_processos#">
-									UPDATE pc_avaliacao_orientacoes
-									SET pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-										pc_aval_orientacao_status = 10
-									WHERE pc_aval_orientacao_id = <cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
+		<!--Executa a rotina se o argumento não for todos ou, se for todos, não houver registro da rotina ou se a data de última execução da rotina não for a data atual.-->
+		<cfif arguments.numProcesso neq "TODOS" OR (arguments.numProcesso eq "TODOS" AND (verificarExecucao.recordCount EQ 0 OR (verificarExecucao.recordCount EQ 1 AND DateCompare(verificarExecucao.pc_rotina_ultima_execucao, now(),"d") NEQ 0)))>
+			
+			<cfquery name="rsProcessosVerificadosParaBaixa" datasource="#application.dsn_processos#">
+				SELECT pc_processo_id  FROM pc_processos
+				WHERE 
+				<cfif arguments.numProcesso neq "TODOS">
+					pc_processo_id = '#arguments.numProcesso#'
+				<cfelse>
+					pc_num_status = 4
+				</cfif>
+			</cfquery>
+			<cftransaction action="begin">	
+				<cftry>
+					<!--Realiza loop sobre todos os processos em acompanhamento de rsProcessosVerificadosParaBaixa. Atenção! Os processos que não estão en acompanhamento significa que, ou não estão com cadastro finalizado, ou estão bloqueados ou estão finalizados. Se estiverem finalizados, não deve existir orientações para baixa.-->
+					<cfloop query="rsProcessosVerificadosParaBaixa">
+						<!--Verifica todos os itens, não leves, em acompanhamento do processo-->
+						<cfquery name="rsItensProcesso" datasource="#application.dsn_processos#">
+							SELECT pc_aval_id, pc_aval_classificacao,pc_aval_valorTotalEnvolvido 
+							FROM pc_avaliacoes
+							WHERE pc_aval_processo = <cfqueryparam value="#pc_processo_id#" cfsqltype="cf_sql_varchar"> AND pc_aval_status = 6
+							AND pc_aval_classificacao <>'L'
+						</cfquery> 
+						<cfif rsItensProcesso.recordCount neq 0>
+							<cfloop query="rsItensProcesso">
+								<!--Verifica se o item tem orientações-->
+								<cfquery name="rsOrientacoesExistentes" datasource="#application.dsn_processos#">
+									SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes WHERE pc_aval_orientacao_num_aval = #pc_aval_id# 
 								</cfquery>
-								
-								<!--Insere posicionamento-->
-								<cfif arguments.numProcesso eq "TODOS">
-									<cfset matricula = '99999999'><!--usuario Não Informado-->
+								<!--Verifica a menor data dos posicionamentos das orientações dos itens-->
+								<cfif rsOrientacoesExistentes.recordCount neq 0>
+									<cfquery name="rsDataPosOrientacao" datasource="#application.dsn_processos#">
+										SELECT MIN(pc_aval_posic_datahora) as minDataPosic
+										FROM pc_avaliacao_posicionamentos as posic
+										INNER JOIN pc_avaliacao_orientacoes as o on o.pc_aval_orientacao_id = posic.pc_aval_posic_num_orientacao
+										INNER JOIN pc_avaliacoes as a on a.pc_aval_id = o.pc_aval_orientacao_num_aval
+										WHERE  a.pc_aval_id = #pc_aval_id# 
+									</cfquery>
+									<cfset dataParaVerificar = rsDataPosOrientacao.minDataPosic>
 								<cfelse>
-									<cfset matricula = application.rsUsuarioParametros.pc_usu_matricula>
+									<cfquery name="rsDataPM" datasource="#application.dsn_processos#">
+										SELECT MIN(pc_aval_melhoria_datahora) as minDataPM FROM pc_avaliacao_melhorias as pm WHERE pm.pc_aval_melhoria_num_aval = #pc_aval_id#
+									</cfquery>
+									<cfset dataParaVerificar = rsDataPM.minDataPM>
 								</cfif>
-								<cfquery datasource="#application.dsn_processos#">
-									INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
-									VALUES (<cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#posicionamentoPadrao#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', <cfqueryparam value="#orgaoResp#" cfsqltype="cf_sql_varchar">,'',10,1)
-								</cfquery>
-							</cfloop><!--Fim loop das orientações dos itens em acompanhamento, não leves, dos processos em acompanhamento-->
 
-							<!-- Baixa as as propostas de melhorias do item com N - Não Informado-->
-							<cfquery datasource="#application.dsn_processos#">
-								UPDATE pc_avaliacao_melhorias
-								SET pc_aval_melhoria_status = 'N',
-									pc_aval_melhoria_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
-								WHERE pc_aval_melhoria_num_aval = #pc_aval_id# AND pc_aval_melhoria_status = 'P'
-							</cfquery>
+								<cfif isDate(dataParaVerificar)>
+									<cfset diasDesdeData = DateDiff("d", dataParaVerificar, now())>
+								<cfelse>
+									<cfset diasDesdeData = 0>
+								</cfif>
+
+								<cfif (pc_aval_classificacao eq 'M' AND (pc_aval_valorTotalEnvolvido lte 10000 OR (diasDesdeData GT 360 AND pc_aval_valorTotalEnvolvido GT 10000 and pc_aval_valorTotalEnvolvido lte 120000))) 
+										OR 
+									(pc_aval_classificacao eq 'G' AND diasDesdeData GT 360 AND pc_aval_valorTotalEnvolvido lte 120000)>
+
+									<!--Verifica as orientações passíveis baixadas-->
+									<cfquery name="rsOrientacoesParaBaixa" datasource="#application.dsn_processos#">
+										SELECT o.pc_aval_orientacao_id, o.pc_aval_orientacao_mcu_orgaoResp as orgaoResp FROM pc_avaliacao_orientacoes o
+										INNER JOIN pc_orientacao_status s ON s.pc_orientacao_status_id = o.pc_aval_orientacao_status
+										WHERE o.pc_aval_orientacao_num_aval = <cfqueryparam value="#pc_aval_id#" cfsqltype="cf_sql_integer">
+												AND s.pc_orientacao_status_finalizador = 'N'
+												AND o.pc_aval_orientacao_status NOT IN (0,1,14)
+									</cfquery>
+
+									<cfquery datasource="#application.dsn_processos#">
+										UPDATE pc_avaliacoes
+										SET pc_aval_status = 7
+										WHERE pc_aval_id = #pc_aval_id# and pc_aval_status = 6
+									</cfquery>
+
+									<!--Define o texto do posicionaMento-->
+									<cfif pc_aval_classificacao eq 'M' AND pc_aval_valorTotalEnvolvido lte 10000>
+										<cfset posicionamentoPadrao ='
+											Considerando as diretrizes publicadas no Método de Avaliação de Controle Interno SEI nº 51741855/2024, que estabelece acompanhamento da equipe de controle interno somente "até o recebimento da comunicação aos gestores", nas avaliações em que as situação de não conformidade tenha classificação "Mediana" até o valor de R$10.000,00 (dez mil reais), esse ID passa para status "Encerrado". 
+											A conclusão do acompanhamento não obsta Ação Corretiva da área responsável pela regularização da Não Conformidade ou implementação da Orientação de Regularização.
+										'>
+									<cfelse>
+										<cfset posicionamentoPadrao ='
+											Considerando as diretrizes publicadas no Método de Avaliação de Controle Interno SEI nº 51741855/2024, que estabelece acompanhamento da equipe de controle interno "por 360 (trezentos e sessenta dias)", nas avaliações em que as situações de não conformidade tenham classificação "Mediana" com valor acima de R$10.000,00 (dez mil reais) e Menor que R$120mil ou classificação "Grave" e que não se encaixem no critério de relevância de valor R$ 120 mil - TCE. Instrução Normativa-TCU 98/2024, este ID passa para status "Encerrado". 
+											A conclusão do acompanhamento não obsta Ação Corretiva da área responsável pela regularização da Não Conformidade ou implementação da Orientação de Regularização.
+										'>
+									</cfif>
+									<!-- Baixa as orientações do item com 10 - ENCERRADO-->
+									<cfloop query="rsOrientacoesParaBaixa">
+										<cfquery datasource="#application.dsn_processos#">
+											UPDATE pc_avaliacao_orientacoes
+											SET pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+												pc_aval_orientacao_status = 10
+											WHERE pc_aval_orientacao_id = <cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
+										</cfquery>
+										
+										<!--Insere posicionamento-->
+										<cfif arguments.numProcesso eq "TODOS">
+											<cfset matricula = '99999999'><!--usuario Não Informado-->
+										<cfelse>
+											<cfset matricula = application.rsUsuarioParametros.pc_usu_matricula>
+										</cfif>
+										<cfquery datasource="#application.dsn_processos#">
+											INSERT pc_avaliacao_posicionamentos(pc_aval_posic_num_orientacao, pc_aval_posic_texto, pc_aval_posic_datahora, pc_aval_posic_matricula, pc_aval_posic_num_orgao, pc_aval_posic_num_orgaoResp, pc_aval_posic_dataPrevistaResp, pc_aval_posic_status, pc_aval_posic_enviado)
+											VALUES (<cfqueryparam value="#pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">, <cfqueryparam value="#posicionamentoPadrao#" cfsqltype="cf_sql_varchar">,<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,'#matricula#','#application.rsUsuarioParametros.pc_usu_lotacao#', <cfqueryparam value="#orgaoResp#" cfsqltype="cf_sql_varchar">,'',10,1)
+										</cfquery>
+									</cfloop><!--Fim loop das orientações dos itens em acompanhamento, não leves, dos processos em acompanhamento-->
+
+								</cfif>
+							</cfloop><!--Fim loop dos itens em acompanhamento, não leves, dos processos em acompanhamento-->
 						</cfif>
+						<!--Se todas as orientações de todos os itens do processo estiverem com status finalizador, finaliza o processo-->
+						<cfquery name="rsOrientacoesNaoFinalizadas" datasource="#application.dsn_processos#">
+							SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes o
+							INNER JOIN pc_avaliacoes a ON a.pc_aval_id = o.pc_aval_orientacao_num_aval
+							INNER JOIN pc_orientacao_status s on s.pc_orientacao_status_id= o.pc_aval_orientacao_status
+							WHERE a.pc_aval_processo = <cfqueryparam value="#pc_processo_id#" cfsqltype="cf_sql_varchar"> AND s.pc_orientacao_status_finalizador = 'N'
+						</cfquery>
+						<cfif rsOrientacoesNaoFinalizadas.recordCount eq 0>
+							<cfquery datasource="#application.dsn_processos#">
+								UPDATE pc_processos
+								SET pc_num_status = 5,
+									pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+								WHERE pc_processo_id = <cfqueryparam value="#pc_processo_id#" cfsqltype="cf_sql_varchar"> and pc_num_status = 4
+							</cfquery>
+						</cfif>  
 
-					</cfloop><!--Fim loop dos itens em acompanhamento, não leves, dos processos em acompanhamento-->
-				</cfif>
-				<!--Se todas as orientações de todos os itens do processo estiverem com status finalizador, finaliza o processo-->
-				<cfquery name="rsOrientacoesNaoFinalizadas" datasource="#application.dsn_processos#">
-					SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes o
-					INNER JOIN pc_avaliacoes a ON a.pc_aval_id = o.pc_aval_orientacao_num_aval
-					INNER JOIN pc_orientacao_status s on s.pc_orientacao_status_id= o.pc_aval_orientacao_status
-					WHERE a.pc_aval_processo = <cfqueryparam value="#pc_processo_id#" cfsqltype="cf_sql_varchar"> AND s.pc_orientacao_status_finalizador = 'N'
-				</cfquery>
-				<cfif rsOrientacoesNaoFinalizadas.recordCount eq 0>
-					<cfquery datasource="#application.dsn_processos#">
-						UPDATE pc_processos
-						SET pc_num_status = 5,
-							pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
-						WHERE pc_processo_id = <cfqueryparam value="#pc_processo_id#" cfsqltype="cf_sql_varchar">
-					</cfquery>
-				</cfif>
+					</cfloop><!--Fim loop nos processos em acompanhamento-->
+
+                    <!--Só executar a baixa das PM se arguments.numProcesso for 'TODOS' pois, apenas aquelas com mais de 360 dias serão baixadas -->
+					<cfif arguments.numProcesso eq "TODOS">
+						<!-- Baixa as propostas de melhorias do item com N - Não Informado-->
+						<cfquery datasource="#application.dsn_processos#">
+							UPDATE m
+							SET pc_aval_melhoria_status = 'N',
+								pc_aval_melhoria_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+							FROM pc_avaliacao_melhorias m
+							INNER JOIN pc_avaliacoes a ON a.pc_aval_id = m.pc_aval_melhoria_num_aval
+							WHERE m.pc_aval_melhoria_status = 'P' 
+								AND DateDiff("d", m.pc_aval_melhoria_datahora , <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">)> 360 
+								AND a.pc_aval_valorTotalEnvolvido <=120000
+						</cfquery>
+						
+						<!--Salvar a data da execução na tabela de log-->
+						<cfif verificarExecucao.recordCount EQ 0>
+							<cfquery datasource="#application.dsn_processos#">
+								INSERT INTO pc_rotinas_execucao_log (pc_rotina_nome, pc_rotina_ultima_execucao)
+								VALUES ('baixaPorValorEnvolvido', <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">)
+							</cfquery>
+						<cfelse>
+							<cfquery datasource="#application.dsn_processos#">
+								UPDATE pc_rotinas_execucao_log
+								SET pc_rotina_ultima_execucao = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+								WHERE pc_rotina_nome = 'baixaPorValorEnvolvido'
+							</cfquery>	
+						</cfif>
+					</cfif>
+					
+					<cftransaction action="commit">	
+					<cfcatch type="any">
+						<cftransaction action="rollback">
+						
+						<!-- Log no arquivo -->
+						<cflog file="application" type="error" text="Erro: #cfcatch.message# Detalhes: #cfcatch.detail#">
+
+						<!-- Exibe na tela -->
+						<cfoutput>
+							<h2>Erro detectado</h2>
+							<p><strong>Mensagem:</strong> #cfcatch.message#</p>
+							<p><strong>Detalhes:</strong> #cfcatch.detail#</p>
+							<p><strong>StackTrace:</strong></p>
+							<cfdump var="#cfcatch.tagContext#">
+						</cfoutput>
+
+						<cfthrow message="Erro crítico: #cfcatch.message#" detail="#cfcatch.detail#">
+					</cfcatch>
+				</cftry>
 			</cftransaction>
-		</cfloop><!--Fim loop nos processos em acompanhamento-->
-
-
-
+		</cfif>
 	</cffunction>
 
 	<cffunction name="teste_baixaPorValorEnvolvido"   access="remote"  returntype="any" hint="baixa as orientações e propostas de melhoria de acordo com o total do valor envolvido nos respectivos itens">

@@ -782,7 +782,7 @@
 						,pc_usuarios.pc_usu_nome  as coordRegional
 						,pc_usuCoodNacional.pc_usu_nome  as coordNacional
 						,pc_aval_numeracao,pc_aval_descricao, pc_aval_status_descricao, pc_aval_classificacao
-						,pc_aval_melhoria_descricao, pc_aval_melhoria_status, pc_aval_melhoria_dataPrev
+						,pc_aval_melhoria_descricao, pc_aval_melhoria_status,pc_aval_melhoria_datahora, pc_aval_melhoria_dataPrev
 						,pc_orgaos_melhoria.pc_org_sigla + '(' + pc_orgaos_melhoria.pc_org_mcu + ')' as orgaoResp
 						,pc_orgaos_melhoria_sug.pc_org_sigla + '(' + pc_orgaos_melhoria_sug.pc_org_mcu + ')' as orgaoRespSug
 						,pc_aval_melhoria_sugestao, pc_aval_melhoria_naoAceita_justif
@@ -1050,6 +1050,8 @@
 				</cfdefaultcase>
 			</cfswitch>
 			<cfset proposta.STATUSMELHORIA = statusMelhoria>
+			<cfset dataStatusMelhoria = DateFormat(#rsProcTab.pc_aval_melhoria_datahora#,'DD-MM-YYYY') >
+			<cfset proposta.DATA_STATUS_MELHORIA = dataStatusMelhoria>
 			<cfset dataPrev = DateFormat(#pc_aval_melhoria_dataPrev#,'DD-MM-YYYY')>
 			<cfset proposta.DATAPREV = dataPrev>
 			<cfset proposta.PC_AVAL_MELHORIA_SUGESTAO = rsProcTab.pc_aval_melhoria_sugestao>
