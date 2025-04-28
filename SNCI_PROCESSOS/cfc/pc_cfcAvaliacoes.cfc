@@ -4371,19 +4371,20 @@
 
 				$('select, textarea, input').on('change blur keyup', function() {
 					var $this = $(this);
-					// Verifica se o valor do select é vazio ou nulo
-					if ($this.val() == "" || $this.val() == null || $this.val().length === 0) {
-						// Trigger the validation for the select element
-						
-						$this.removeClass('is-valid').addClass('is-invalid');
-						$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
-						$("#formAvalOrientacaoCadastro").valid(); // This will validate the select element based on your jQuery Validate rules
-					}else{
-						$this.removeClass('is-invalid').addClass('is-valid');
-						$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
-						$("#formAvalOrientacaoCadastro").valid(); // This will validate the select element based on your jQuery Validate rules
+					
+					// Só valida se já existir regra para o campo
+					if ($this.closest('form').length && $this.valid !== undefined) {
+						if ($this.val() == "" || $this.val() == null || $this.val().length === 0) {
+							$this.removeClass('is-valid').addClass('is-invalid');
+							$this.closest('.form-group').find('label.is-invalid').css('display', 'block');
+						} else {
+							$this.removeClass('is-invalid').addClass('is-valid');
+							$this.closest('.form-group').find('label.is-invalid').css('display', 'none');
+						}
+						$this.valid(); // Valida apenas o campo atual!
 					}
 				});
+
 
 
 
