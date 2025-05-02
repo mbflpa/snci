@@ -2657,6 +2657,7 @@
 						WHERE pc_processo_id = '#arguments.pc_aval_processo#'
 					</cfquery>
 
+
 					<!--Se não hoverem medidas/orientações para regularização no processo (ou seja, só existem propostas de melhoria ou itens leves)-->
 					<cfif  rsProcessoComOrientacoes.recordcount eq 0>   
 						<!--Finaliza o processo-->  
@@ -4390,6 +4391,7 @@
 						$this.valid(); // Valida apenas o campo atual!
 					}
 				});
+
 
 
 
