@@ -44,15 +44,12 @@
 					OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					OR pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 					OR pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
-					OR pc_aval_posic_num_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 					<cfif ListLen(application.orgaosHierarquiaList) GT 0>
 						OR pc_aval_orientacao_mcu_orgaoResp in (#application.orgaosHierarquiaList#)
 						OR pc_aval_melhoria_num_orgao in (#application.orgaosHierarquiaList#)
 						OR pc_aval_melhoria_sug_orgao_mcu in (#application.orgaosHierarquiaList#)
 						OR pc_processos.pc_num_orgao_avaliado in (#application.orgaosHierarquiaList#)
-						OR pc_aval_posic_num_orgaoResp in (#application.orgaosHierarquiaList#)
 					</cfif>
-					
 				)
 			<!---Se o perfil for 15 - 'DIRETORIA') e se o órgão do usuário tiver órgãos hierarquicamente inferiores e se a diretoria for a DIGOE --->
 			<cfif ListLen(application.orgaosHierarquiaList) GT 0 and 	application.rsUsuarioParametros.pc_usu_perfil eq 15 and application.rsUsuarioParametros.pc_usu_lotacao eq '00436685' >
