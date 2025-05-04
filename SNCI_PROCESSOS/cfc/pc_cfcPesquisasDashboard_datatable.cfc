@@ -225,26 +225,24 @@
         <cfquery name="rsProcessosAssociados" datasource="#application.dsn_processos#" timeout="120">
             SELECT DISTINCT COUNT(*) AS total_processos FROM
             (
-                SELECT DISTINCT pc_processos.pc_processo_id
-                FROM pc_avaliacao_orientacoes
-                INNER JOIN pc_avaliacoes 
-                    ON pc_avaliacao_orientacoes.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
-                INNER JOIN pc_processos 
-                    ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
-                WHERE pc_processos.pc_num_status in(4,5)
+                SELECT DISTINCT pc_processos.pc_processo_id, orgaoResp.pc_org_mcu as orgaoRespMcu
+                FROM pc_avaliacao_posicionamentos posic
+                INNER JOIN pc_orgaos orgaoResp ON posic.pc_aval_posic_num_orgaoResp = orgaoResp.pc_org_mcu
+                INNER JOIN pc_avaliacao_orientacoes o on posic.pc_aval_posic_num_orientacao = o.pc_aval_orientacao_id
+                INNER JOIN pc_avaliacoes ON o.pc_aval_orientacao_num_aval = pc_avaliacoes.pc_aval_id
+                INNER JOIN pc_processos  ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                WHERE pc_processos.pc_num_status in(4,5) AND orgaoResp.pc_org_controle_interno='N'
                 <cfif arguments.ano NEQ "Todos">
                     AND RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
                 </cfif>
                 
-
                 UNION
 
-                SELECT DISTINCT pc_processos.pc_processo_id
+                SELECT DISTINCT pc_processos.pc_processo_id, orgaoResp.pc_org_mcu as orgaoRespMcu
                 FROM pc_avaliacao_melhorias
-                INNER JOIN pc_avaliacoes 
-                    ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
-                INNER JOIN pc_processos 
-                    ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
+                INNER JOIN pc_orgaos orgaoResp on pc_avaliacao_melhorias.pc_aval_melhoria_num_orgao = orgaoResp.pc_org_mcu
+                INNER JOIN pc_avaliacoes ON pc_avaliacao_melhorias.pc_aval_melhoria_num_aval = pc_avaliacoes.pc_aval_id
+                INNER JOIN pc_processos  ON pc_avaliacoes.pc_aval_processo = pc_processos.pc_processo_id
                 WHERE pc_processos.pc_num_status in(4,5)
                 <cfif arguments.ano NEQ "Todos">
                     AND RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
