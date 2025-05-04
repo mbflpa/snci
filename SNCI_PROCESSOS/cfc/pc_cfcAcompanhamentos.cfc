@@ -3288,144 +3288,87 @@
 				if($('#pcOrientacaoStatus').val()){
 					statusOrientacao = 	$('#pcOrientacaoStatus').val()
 				}
-				if ($('#pcOrientacaoStatus').val() == 5){//se a o status escolhido for tratamento
-					swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem), 
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {	
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
-									data:{
-										method:"cadPosicOrgaoAvaliado",
-										pc_aval_orientacao_id: pc_aval_orientacao_id,
-										pc_aval_posic_texto: $('#pcPosicAcomp').val(),
-										pc_aval_orientacao_status:statusOrientacao,
-										pc_aval_orientacao_dataPrevistaResp: $('#pcDataPrevRespAcomp').val(),
-										pc_aval_orientacao_mcu_orgaoResp: pc_aval_orientacao_mcu_orgaoResp,
-										idAnexos: idAnexosString
-										
-									},
-						
-									async: false
-									
-								})//fim ajax
-								.done(function(result) {	
-									$('#pcPosicAcomp').val('')
-									
-									exibirTabela()
-									$('#informacoesItensAcompanhamentoDiv').html('')
-									$('#timelineViewAcompDiv').html('')
+				
+				swalWithBootstrapButtons.fire({//sweetalert2
+				html: logoSNCIsweetalert2(mensagem), 
+				showCancelButton: true,
+				confirmButtonText: 'Sim!',
+				cancelButtonText: 'Cancelar!'
+				}).then((result) => {
+					if (result.isConfirmed) {	
+						setTimeout(function() {
+							$.ajax({
+								type: "post",
+								url: "cfc/pc_cfcAcompanhamentos.cfc",
+								data:{
+									method:"cadPosicOrgaoAvaliado",
+									pc_aval_orientacao_id: pc_aval_orientacao_id,
+									pc_aval_posic_texto: $('#pcPosicAcomp').val(),
+									pc_aval_orientacao_status:statusOrientacao,
+									pc_aval_orientacao_mcu_orgaoResp: pc_aval_orientacao_mcu_orgaoResp,
+									idAnexos: idAnexosString
+								},
+								async: false
+								
+							})//fim ajax
+							.done(function(result) {	
+								$('#pcPosicAcomp').val('')
+								toastr.success('Envio da manifestação realizado com sucesso!');
 
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										//$('#modalOverlay').modal('hide');
-										toastr.success('Operação realizada com sucesso!');
-										
-									});			
-
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
-									$('#modalOverlay').delay(1000).hide(0, function() {
-										//$('#modalOverlay').modal('hide');
-									});	
-									$('#modal-danger').modal('show')
-									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-									$('#modal-danger').find('.modal-body').text(thrownError)
-
-								})//fim fail	
-							}, 500);
-						}
-					})
-				}else{
-					swalWithBootstrapButtons.fire({//sweetalert2
-					html: logoSNCIsweetalert2(mensagem), 
-					showCancelButton: true,
-					confirmButtonText: 'Sim!',
-					cancelButtonText: 'Cancelar!'
-					}).then((result) => {
-						if (result.isConfirmed) {	
-							
-							
-							setTimeout(function() {
-								$.ajax({
-									type: "post",
-									url: "cfc/pc_cfcAcompanhamentos.cfc",
-									data:{
-										method:"cadPosicOrgaoAvaliado",
-										pc_aval_orientacao_id: pc_aval_orientacao_id,
-										pc_aval_posic_texto: $('#pcPosicAcomp').val(),
-										pc_aval_orientacao_status:statusOrientacao,
-										pc_aval_orientacao_mcu_orgaoResp: pc_aval_orientacao_mcu_orgaoResp,
-										idAnexos: idAnexosString
-									},
-									async: false
-									
-								})//fim ajax
-								.done(function(result) {	
-									$('#pcPosicAcomp').val('')
-									toastr.success('Envio da manifestação realizado com sucesso!');
-
-									if (pc_aval_orientacao_mcu_orgaoResp == orgaoAvaliado) {
-										isSubordinado = true;
-									} else {
-										// Consulta para verificar subordinação hierárquica
-										$.ajax({
-											type: "post",
-											url: "cfc/pc_cfcPaginasApoio.cfc",
-											data: {
-												method: "verificaHierarquiaOrgao",
-												orgaoAvaliado: orgaoAvaliado,
-												orgaoResponsavel: pc_aval_orientacao_mcu_orgaoResp
-											},
-											async: false,
-											success: function(response) {
-												isSubordinado = (response.trim() === "true");
-												console.log("Subordinado:", response);
-											}
-										});
-									}
-									
-									if(existePesquisa == 0 && anoProcesso >=anoPesquisaOpiniao && isSubordinado){
-										$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
-											$('#modalOverlay').modal('show');
-											exibirTabela();
-											$('#informacoesItensAcompanhamentoDiv').html('');
-											$('#timelineViewAcompDiv').html('');
-											$('#modalOverlay').delay(1000).hide(0, function() {
-												$('#modalOverlay').modal('hide');
-												$('.modal-backdrop').remove(); // Remove o backdrop
-												$('body').removeClass('modal-open'); // Remove a classe que impede o scroll
-											});
-										});	
-									}else{
+								if (pc_aval_orientacao_mcu_orgaoResp == orgaoAvaliado) {
+									isSubordinado = true;
+								} else {
+									// Consulta para verificar subordinação hierárquica
+									$.ajax({
+										type: "post",
+										url: "cfc/pc_cfcPaginasApoio.cfc",
+										data: {
+											method: "verificaHierarquiaOrgao",
+											orgaoAvaliado: orgaoAvaliado,
+											orgaoResponsavel: pc_aval_orientacao_mcu_orgaoResp
+										},
+										async: false,
+										success: function(response) {
+											isSubordinado = (response.trim() === "true");
+											console.log("Subordinado:", response);
+										}
+									});
+								}
+								
+								if(existePesquisa == 0 && anoProcesso >=anoPesquisaOpiniao && isSubordinado){
+									$('#avaliacaoModal').modal('show').on('hidden.bs.modal', function () {
+										$('#modalOverlay').modal('show');
 										exibirTabela();
 										$('#informacoesItensAcompanhamentoDiv').html('');
 										$('#timelineViewAcompDiv').html('');
 										$('#modalOverlay').delay(1000).hide(0, function() {
 											$('#modalOverlay').modal('hide');
+											$('.modal-backdrop').remove(); // Remove o backdrop
+											$('body').removeClass('modal-open'); // Remove a classe que impede o scroll
 										});
-									}
-
-								})//fim done
-								.fail(function(xhr, ajaxOptions, thrownError) {
+									});	
+								}else{
+									exibirTabela();
+									$('#informacoesItensAcompanhamentoDiv').html('');
+									$('#timelineViewAcompDiv').html('');
 									$('#modalOverlay').delay(1000).hide(0, function() {
 										$('#modalOverlay').modal('hide');
-									});	
-									$('#modal-danger').modal('show')
-									$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
-									$('#modal-danger').find('.modal-body').text(thrownError)
+									});
+								}
 
-								});//fim fail
-							}, 500);
-						}
-					})
-				}
+							})//fim done
+							.fail(function(xhr, ajaxOptions, thrownError) {
+								$('#modalOverlay').delay(1000).hide(0, function() {
+									$('#modalOverlay').modal('hide');
+								});	
+								$('#modal-danger').modal('show')
+								$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+								$('#modal-danger').find('.modal-body').text(thrownError)
 
-				
+							});//fim fail
+						}, 500);
+					}
+				})
 			});
 
 			function mostraTabAnexosOrientacoes(){
@@ -3761,7 +3704,7 @@
 
 
 
-	<cffunction name="cadPosicOrgaoAvaliado"   access="remote" hint="cadastra a manifestação do avaliador do controle interno">
+	<cffunction name="cadPosicOrgaoAvaliado"   access="remote" hint="cadastra a manifestação do órgão avaliado">
 		<cfargument name="pc_aval_orientacao_id" type="numeric" required="true" />
 		<cfargument name="pc_aval_posic_texto" type="string" required="true" />
 		<cfargument name="pc_aval_orientacao_status" type="numeric" required="false" default="3" />
