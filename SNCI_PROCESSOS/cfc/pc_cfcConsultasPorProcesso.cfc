@@ -98,7 +98,8 @@
 									<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
 										AND (
 												pc_aval_orientacao_mcu_orgaoResp = '#application.rsUsuarioParametros.pc_usu_lotacao#' 
-												
+												OR pc_aval_melhoria_num_orgao =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
+												OR pc_aval_melhoria_sug_orgao_mcu =  '#application.rsUsuarioParametros.pc_usu_lotacao#' 
 												OR pc_processos.pc_num_orgao_avaliado = '#application.rsUsuarioParametros.pc_usu_lotacao#'
 												<cfif ListLen(application.orgaosHierarquiaList) GT 0>
 													OR pc_aval_orientacao_mcu_orgaoResp in (#application.orgaosHierarquiaList#)
