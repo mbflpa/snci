@@ -38,7 +38,7 @@
                                 data-toggle="popover" 
                                 data-placement="top" 
                                 title="Índice de Respostas" 
-                                data-content="<div class='text-justify'>Percentual de pesquisas respondidas em relação ao total de processos em acompanhamento ou finalizados, com orientações e/ou propostas de melhoria.<br><br>Obs.: Esta métrica não está disponível quando filtros avançados estão ativos.</div>">
+                                data-content="<div class='text-justify'>Percentual de pesquisas respondidas em relação ao total de respostas esperadas por processos em acompanhamento ou finalizados, com orientações e/ou propostas de melhoria.<br><br>Obs.: Esta métrica não está disponível quando filtros avançados estão ativos.</div>">
                             </i>
                         </p>
                     </div>
