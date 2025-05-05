@@ -4,18 +4,18 @@
 	select Usu_DR, Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena from usuarios 
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
-
+<cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
 <cfquery name="rsChecklistFiltrado" datasource="#dsn_inspecao#">
-    SELECT TUI_Modalidade,TUI_TipoUnid,TUI_Ativo, TUI_Ano, TUI_GRUPOITEM, TUI_ITEMVERIF, TUN_Descricao, Grp_Descricao, Itn_Descricao, Itn_Orientacao, Itn_ValorDeclarado, Itn_Amostra, Itn_Norma, Itn_Pontuacao, Itn_Classificacao, Itn_PTC_Seq, Itn_Ano, Itn_PreRelato, Itn_Situacao,Itn_Manchete
+    SELECT Itn_DtUltAtu,TUI_Modalidade,TUI_TipoUnid,TUI_Ativo, TUI_Ano, TUI_GRUPOITEM, TUI_ITEMVERIF, TUN_Descricao, Grp_Descricao, Itn_Descricao, Itn_Orientacao, Itn_ValorDeclarado, Itn_Amostra, Itn_Norma, Itn_Pontuacao, Itn_Classificacao, Itn_PTC_Seq, Itn_Ano, Itn_PreRelato, Itn_Situacao,Itn_Manchete
     FROM TipoUnidade_ItemVerificacao 
     INNER JOIN Grupos_Verificacao ON Grp_Codigo = TUI_GrupoItem AND Grp_Ano = TUI_Ano 
     INNER JOIN Itens_Verificacao ON (TUI_Modalidade = Itn_Modalidade) and (TUI_TipoUnid = Itn_TipoUnidade) and Itn_NumItem = TUI_ItemVerif AND Itn_NumGrupo = TUI_GrupoItem AND Itn_Ano = TUI_Ano
     INNER JOIN Tipo_Unidades ON TUN_Codigo = TUI_TipoUnid
     WHERE TUI_Modalidade = '#url.frmmodal#' 
-	<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) eq 'INSPETORES' or #url.frmtpano# eq year(now())>
-	and Itn_Situacao = 'A'
-	</cfif>
-	and Itn_Ano = '#url.frmtpano#' and TUI_TipoUnid = #url.frmtipo#
+    <cfif #grpacesso# eq 'INSPETORES' and #url.frmtpano# eq year(now())>
+      and Itn_Situacao = 'A'
+    </cfif>
+	  and Itn_Ano = '#url.frmtpano#' and TUI_TipoUnid = #url.frmtipo#
     ORDER BY TUI_GRUPOITEM, TUI_ITEMVERIF, TUN_Descricao  
 </cfquery>
    
@@ -60,12 +60,12 @@
 <cfabort>  
 </cfif> 
         
-        <form id="formPlanoTeste"  name="formPlanoTeste" >
-          <div class="noprint" align="left" ><button type="button" onClick="printpr(document.main_body);">Imprimir</button>&nbsp;<input type="button" value="FECHAR" onclick="window.close()";>
+        <form id="formPlanoTeste"  name="formPlanoTeste">
+          <div class="noprint" align="left" ><button type="button" onClick="window.print();">Imprimir</button>&nbsp;<input type="button" value="FECHAR" onclick="window.close()";>
           </div>
 
 		  
-              <table width="75%" border="0" cellspacing="4" widtd="100%">
+              <table width="75%" border="0" cellspacing="4">
                 <thead>
                   <tr >
                     <td colspan="8" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center" ><img src="GeraRelatorio/geral/img/logoCorreios.gif" alt="Logo ECT"  width="207" height="56" style="" /></div></td>
@@ -118,28 +118,31 @@
 					  </strong></div>					   </td>
                     </tr>
 					<cfif Itn_Situacao eq 'A'>
-						<cfset auxsitudesc = 'ATIVA'>
+						<cfset auxsitudesc = 'ATIVADO'>
 					<cfelse>
-						<cfset auxsitudesc = 'DESATIVADA'>
+						<cfset auxsitudesc = 'DESATIVADO'>
 					</cfif>
-					<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>					
-                    <tr>
-                      <td><strong>Relev&acirc;ncia:</strong></td>
-                      <td width="18%"><div align="right"><strong>Pontuação:</strong></div></td>
-                      <td width="14%"><div align="left"><strong>#Itn_Pontuacao#</strong></div></td>
-                      <td width="11%"><div align="right"><strong>Classificação:</strong></div></td>
-                      <td width="15%"><strong>&nbsp;#Itn_Classificacao#</strong></td>
-					<cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) neq 'INSPETORES'>					  
-                      <td width="16%"><div align="right"><strong>Situação do Ponto:</strong></div></td>
-                      <td width="11%"><div align="left"><strong>#auxsitudesc#</strong></div></td>
-					</cfif>					  
-                    </tr>
-					</cfif>       
+          <tr>
+            <cfif grpacesso eq 'GESTORMASTER'>					
+                        <td><strong>Relevância</strong></td>
+                        <td><div align="left"><strong>Pontuação:</strong></div></td>
+                        <td><div align="left"><strong>#Itn_Pontuacao#</strong></div></td>
+                        <td><div align="right"><strong>Classificação:</strong></div></td>
+                        <td><strong>&nbsp;#Itn_Classificacao#</strong></td>
+                <cfif grpacesso neq 'INSPETORES'>					  
+                        <td><div align="right"><strong>Situação do Ponto:</strong></div></td>
+                        <td><div align="left"><strong>#auxsitudesc#</strong> em: #DateTimeFormat(Itn_DtUltAtu,"dd-mm-yyyy HH:NN")#</div></td>
+                </cfif>					        
+            </cfif>
+            <cfif grpacesso neq 'GESTORMASTER'>
+              <td><div align="left"><strong>Situação do Ponto:  #auxsitudesc#</strong> em: #DateTimeFormat(Itn_DtUltAtu,"dd-mm-yyyy HH:NN")#</div></td>
+            </cfif>
+          </tr>       
 			<cfif '#url.frmacao#' eq 'S'>
               <tr>
                 <td colspan="10" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>Manchete: #Itn_Manchete#</strong></div></td>
               </tr>        
-					      <cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) eq 'GESTORMASTER'>
+					      <cfif grpacesso eq 'GESTORMASTER'>
                       <tr>
                         <td colspan="10"><div align="left"><strong>Composição da Pontuação</strong></div></td>
                       </tr>
@@ -205,15 +208,21 @@
                   <!---<tfoot>
                     <tr><td><div class="noprint" align="CENTER"><button type="button" onClick="window.print();">Imprimir</button></div></td></tr>
                     <tr><td><div class="divFooter" align="right" style="position:relative;left:0px;font-size:12px;float:left">SNCI - Sistema Nacional de Controle Interno</div>
-                    <div class="divFooter" align="right" style="position:relative;right:0px;font-size:12px">Data/Hora de Emiss�o:<cfoutput>#DateFormat(Now(),"DD/MM/YYYY")#</cfoutput> - <cfoutput>#TimeFormat(Now(),'HH:MM')#</cfoutput></div></td></tr>
+                    <div class="divFooter" align="right" style="position:relative;right:0px;font-size:12px">Data/Hora de Emissão:<cfoutput>#DateFormat(Now(),"DD/MM/YYYY")#</cfoutput> - <cfoutput>#TimeFormat(Now(),'HH:MM')#</cfoutput></div></td></tr>
                 </tfoot>--->
                 </tr>
               </table>
             </div>
     </form>
+    <!---
         <footer>
             <div class="noprint" align="CENTER"><button type="button" onClick="window.print();">Imprimir</button></div>
         </footer>
+--->        
+        <tfoot>
+                    <tr><td><div class="noprint" align="CENTER"><button type="button" onClick="window.print();">Imprimir</button></div></td></tr>
+                    <tr><td><div class="divFooter" align="right" style="position:relative;left:0px;font-size:12px;float:left">SNCI - Sistema Nacional de Controle Interno  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Data/Hora de Emissão:<cfoutput>#DateTimeFormat(now(),"dd-mm-yyyy HH:NN")#</cfoutput>)</div>
+        </tfoot>
     </body>
     
 

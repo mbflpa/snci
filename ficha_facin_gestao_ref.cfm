@@ -37,150 +37,120 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">  
  <link href="css.css" rel="stylesheet" type="text/css">
+ <style>
+ .table {
+  width: 100%;
+  border-collapse: collapse;
+  }
+  td {
+    font-size: 12px;
+  }
+
+  th {
+    font-size: 12px;
+  }
+</style>
 </head>
 <br>
 <body>
 
 <!--- <cfinclude template="cabecalho.cfm"> --->
-<tr>
-   <td colspan="6" align="center">&nbsp;</td>
-</tr>
 
-<!--- �rea de conte�do   --->
-	<form action="Pacin_Unidades_Avaliacao.cfm" method="post" target="_blank" name="frmObjeto" onSubmit="return validarform()">
-	  <table width="30%" align="center">
-       
-        <tr>
-          <td colspan="5" align="center" class="titulo2"><div class="row" align="center"><strong>FICHA DE AVALIAÇÃO (FACIN) - RESULTADOS</strong></div></td>
-        </tr>
-		    <tr>
-          <td colspan="5" align="center" class="titulo1">&nbsp;</td>
-        </tr>
-        <tr>
-          <td colspan="5" align="center">&nbsp;</td>
-        </tr>
 
-        <tr>
-          <td width="2%"></td>
-          <td colspan="4"><strong>
-          </strong><strong><span class="exibir">
-          </span></strong></td>
-        </tr> 
-        <cfset cont = 0>		  
-        <tr>
-            <td>&nbsp;</td>
-            <td class="exibir"><strong>Exercício &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
-            <td colspan="2">
-                <select name="frmano" id="frmano" class="form-select">
-                    <cfloop query="rsAnoPacin">                                             
-                        <option value="<cfoutput>#rsAnoPacin.PTC_Ano#</cfoutput>"><cfoutput>#rsAnoPacin.PTC_Ano#</cfoutput></option>
-                    </cfloop>
-                </select>
-            </td>
-        </tr>
-        <tr><td>&nbsp;</td></tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td class="exibir"><strong>Período&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
-          <td>         
-            <div class="row" align="left">
-              <div class="col" align="center">
-                Início
-              </div>
-            </div>        
-          </td>
-          <td>            
-            <div class="row" align="left">
-              <div class="col" align="center">
-                Final
-              </div>
-            </div>  
-          </td>
-        </tr> 
-        <tr>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-          <td>
-            <div class="row" align="left">
-              <div class="col" align="left">
-                <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA">
-              </div>
-            </div>
-          </td>
-          <td>
-            <div class="row" align="left">
-              <div class="col" align="left">
-                <input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA">
-              </div>
-            </div>
-          </td>
-        </tr> 
-        <tr>
-          <td>&nbsp;</td>
-        </tr>  
-        <tr>
-          <td>&nbsp;</td>
-          <td width="39%" class="exibir"><strong>Superintendência: </strong></td>
-          <td width="59%" colspan="2">
-          <cfif auxse eq 'D'>	
-                  <select name="frmse" id="frmse" class="form-select">
-                        <option value="" selected>---</option>
-                        <option value="<cfoutput>#qAcesso.Usu_DR#</cfoutput>"><cfoutput>#qAcesso.Dir_Sigla#</cfoutput></option>
-                  </select>	
-          <cfelse>
-                <cfset auxcord = trim(qAcesso.Usu_Coordena)>
-                <cfquery name="rsSE" datasource="#dsn_inspecao#">
-                  SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where dir_codigo in(#auxcord#)
-                </cfquery>
-                <select name="frmse" id="frmse" class="form-select">
-                  <option value="" selected>---</option>
-                  <cfoutput query="rsSE">
-                        <option value="#rsSE.Dir_Codigo#">#Ucase(trim(rsSE.Dir_Sigla))#</option>
-                  </cfoutput>
-                </select>    
-          </cfif>	
-          <br>		
-          </td>
-        </tr>              
-        <tr>
-          <td>&nbsp;</td>
-          <td class="exibir"><strong>Inspetores&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
-          <td colspan="2">
-              <select name="frminspetores" id="frminspetores" class="form-select">                                          
-                      <option value="">---</option>
-              </select>
-          </td>
-        </tr> 
-        <tr><td>&nbsp;</td></tr>
-        <tr>
-          <td>&nbsp;</td>
-          <td class="exibir"><strong>Avaliações&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: </strong></td>
-          <td colspan="2">
-              <select name="frmavaliacao" id="frmavaliacao" class="form-select">                                          
-                  <option value="">---</option>
-              </select>
-          </td>
-        </tr>  
-        <tr><td>&nbsp;</td></tr>  
-        <tr><td>&nbsp;</td></tr>             
-        <tr> 
-          <td>&nbsp;</td>
-            <td colspan="3">
-              <div  class="row" align="center">
-           <!---     <input name="Submit1" type="submit" class="btn btn-primary" id="Submit1" value="Confirmar"> --->
-              </div></td>
+<!--- area de conteudo   --->
+<table width="50%" align="left">
+  <tr>
+    <td>
+
+    <table class="table table-bordered" width="100%">
+	<form action="ficha_facin_gestao_ref.cfm" method="post" target="_blank" name="frmObjeto" onSubmit="return validarform()">
+
+        <tbody>
+          <tr>
+            <td colspan="5" align="center" class="titulo2"><div class="row"><strong>FICHA DE AVALIAÇÃO (FACIN) - RESULTADOS</strong></div></td>
           </tr>
           <tr>
-          <td>&nbsp;</td>
-          <td colspan="3">&nbsp;</td>
+            <th scope="row">Exercício</th>
+            <td align="left" colspan="1">
+              <select name="frmano" id="frmano" class="form-select">
+                  <cfloop query="rsAnoPacin">                                             
+                      <option value="<cfoutput>#rsAnoPacin.PTC_Ano#</cfoutput>"><cfoutput>#rsAnoPacin.PTC_Ano#</cfoutput></option>
+                  </cfloop>
+              </select>
+          </td>
           </tr>
+          <tr>
+            <th scope="row" colspan="2">Período</th>
+          </tr>
+          <tr>
+            <th scope="row">Início</th>
+            <td  colspan="1">
+              <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Final</th>
+            <td colspan="1"><input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA"></td>
+
+          </tr>
+          <tr>
+            <th scope="row">Superintendência</th>
+            <td colspan="1">
+            <cfif auxse eq 'D'>	
+              <select name="frmse" id="frmse" class="form-select">
+                    <option value="" selected>---</option>
+                    <option value="<cfoutput>#qAcesso.Usu_DR#</cfoutput>"><cfoutput>#qAcesso.Dir_Sigla#</cfoutput></option>
+              </select>	
+            <cfelse>
+              <cfset auxcord = trim(qAcesso.Usu_Coordena)>
+              <cfquery name="rsSE" datasource="#dsn_inspecao#">
+                SELECT Dir_Codigo, Dir_Sigla FROM Diretoria where dir_codigo in(#auxcord#)
+              </cfquery>
+              <select name="frmse" id="frmse" class="form-select">
+                <option value="" selected>---</option>
+                <cfoutput query="rsSE">
+                      <option value="#rsSE.Dir_Codigo#">#Ucase(trim(rsSE.Dir_Sigla))#</option>
+                </cfoutput>
+              </select>    
+            </cfif>	
+            </td>
+
+          </tr>
+          <tr>
+            <th scope="row">Inspetores</th>
+            <td colspan="1">
+              <select name="frminspetores" id="frminspetores" class="form-select">                                          
+                <option value="">---</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Avaliações</th>
+            <td colspan="1">
+              <select name="frmavaliacao" id="frmavaliacao" class="form-select">                                          
+                <option value="">---</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
       </table>
+
+<!--- 	  <input name="grupoacesso" type="hidden" value="<cfoutput>#qAcesso.Usu_GrupoAcesso#</cfoutput>">
+	  <input name="usucoordena" type="hidden" value="<cfoutput>#qAcesso.Usu_Coordena#</cfoutput>"> --->
+	</form>          
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td>
       <!---  style="display:none;" --->
 	    <div id='table'>
       </div>
-<!--- 	  <input name="grupoacesso" type="hidden" value="<cfoutput>#qAcesso.Usu_GrupoAcesso#</cfoutput>">
-	  <input name="usucoordena" type="hidden" value="<cfoutput>#qAcesso.Usu_Coordena#</cfoutput>"> --->
-	</form>
+    </td>
+  </tr>
+</table>        
+
+
 </body>
 <script src="public/jquery-3.7.1.min.js"></script>
 <script type="text/javascript" src="public/axios.min.js"></script>
@@ -230,7 +200,7 @@
             let dtinic = $('#dtinic').val() 
             dtinic += ' 23:59:59.000'
             let dtfinal = $('#dtfinal').val()
-            dtfinal += ' 23:59:59.000'
+            dtfinal += ' 23:59:59.999'
             let ano = $('#frmano').val(); 
             let frmse = $('#frmse').val(); 
             let matr = $(this).val(); 
@@ -280,17 +250,17 @@
               let tab = '<table class="table table-bordered border-primary">'
               tab += '<thead>'
               tab += '<tr>'
-              tab +=  '<th scope="col">Nº Avaliação</th>'
+              tab +=  '<th scope="col">Clique no Nº Avaliação</th>'
               tab +=  '<th scope="col">Tipo</th>'
-              tab +=  '<th scope="col">Qtd. Geral</th>'
-              tab +=  '<th scope="col">Qtd. Realizado</th>'
+              tab +=  '<th scope="col">Qtd. Avaliação</th>'
+              tab +=  '<th scope="col">Qtd. Avaliado</th>'
               tab +=  '<th scope="col">Desconto(Meta1)</th>'
-              tab +=  '<th scope="col">Pto. Obtida(Meta1)</th>'
+              tab +=  '<th scope="col">Pontos Individual(Meta1)</th>'
               tab +=  '<th scope="col">Resultado(Meta1)</th>'
               tab +=  '<th scope="col">Desconto(Meta2)</th>'
-              tab +=  '<th scope="col">Pto. Obtida(Meta2)</th>'
+              tab +=  '<th scope="col">Pontos Individual(Meta2)</th>'
               tab +=  '<th scope="col">Resultado(Meta2)</th>'
-              tab +=  '<th scope="col">Perc.(Meta3)</th>'
+              tab +=  '<th scope="col">Resultado(Meta3)</th>'
               tab += '</tr>'
               tab += '</thead>'
               tab += '<tbody>'
