@@ -122,61 +122,61 @@
 <!--- controle das transações em tela --->
 <!--- Valida itens individuais (todos os Não VERIFICADO e os Não EXECUTA em que o campo Itn_ValidacaoObrigatoria for igual a 1 ) --->
 <cfif isDefined("form.acao") and '#form.acao#' is 'validarItem'>
-<cfoutput>
-	  <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
-    <cfif listfind('#qryPapelTrabalho.Itn_PTC_Seq#','10')>
-      <cfset RIPCaractvlr = 'QUANTIFICADO'>
-    </cfif>	
-    <cfquery datasource="#dsn_inspecao#">
-      UPDATE Resultado_Inspecao SET 
-      RIP_Recomendacao = 'V'
-      , RIP_Caractvlr = '#RIPCaractvlr#'
-      , RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
-      , RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)
-      WHERE RIP_Unidade = '#qryPapelTrabalho.RIP_Unidade#' and RIP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
-      and RIP_NumGrupo ='#form.grupo#' and RIP_NumItem='#form.item#'
-    </cfquery>
-    <cfif trim(qryPapelTrabalho.INP_RevisorLogin) lte 0>
+  <cfoutput>
+      <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
+      <cfif listfind('#qryPapelTrabalho.Itn_PTC_Seq#','10')>
+        <cfset RIPCaractvlr = 'QUANTIFICADO'>
+      </cfif>	
       <cfquery datasource="#dsn_inspecao#">
-        UPDATE Inspecao SET INP_RevisorLogin = '#CGI.REMOTE_USER#', INP_RevisorDTInic = CONVERT(varchar, getdate(), 120)
-        WHERE INP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'and INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
+        UPDATE Resultado_Inspecao SET 
+        RIP_Recomendacao = 'V'
+        , RIP_Caractvlr = '#RIPCaractvlr#'
+        , RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
+        , RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)
+        WHERE RIP_Unidade = '#qryPapelTrabalho.RIP_Unidade#' and RIP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
+        and RIP_NumGrupo ='#form.grupo#' and RIP_NumItem='#form.item#'
       </cfquery>
-    </cfif>
-    <!--- Atualizar dados na tela --->
-    <cfinvoke component="#vRelatorio#.GeraRelatorio.gerador.ctrl.controller"
-	    method="geraPapelTrabalho" returnvariable="qryPapelTrabalho">
-    </cfinvoke>
-</cfoutput>    
+      <cfif trim(qryPapelTrabalho.INP_RevisorLogin) lte 0>
+        <cfquery datasource="#dsn_inspecao#">
+          UPDATE Inspecao SET INP_RevisorLogin = '#CGI.REMOTE_USER#', INP_RevisorDTInic = CONVERT(varchar, getdate(), 120)
+          WHERE INP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'and INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
+        </cfquery>
+      </cfif>
+      <!--- Atualizar dados na tela 
+      <cfinvoke component="#vRelatorio#.GeraRelatorio.gerador.ctrl.controller"
+        method="geraPapelTrabalho" returnvariable="qryPapelTrabalho">
+      </cfinvoke>--->
+  </cfoutput>    
 </cfif>
 
   <!--- Concluir Revisão para todos os grupos/itens com Não Conformidades - NC --->
   <cfif isDefined("form.acao") and '#form.acao#' is 'ConcluirRevisaoSemNC'>
-  <cfoutput>
-  	  <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
-	  <cfif listfind('#qryPapelTrabalho.Itn_PTC_Seq#','10')>
-		  <cfset RIPCaractvlr = 'QUANTIFICADO'>
-	  </cfif>	
-      <cfquery datasource="#dsn_inspecao#">
-          UPDATE Resultado_Inspecao SET 
-          RIP_Recomendacao = 'V'
-          , RIP_Caractvlr = '#RIPCaractvlr#'
-          , RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
-          , RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)           
-          WHERE RIP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and RIP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
-      </cfquery>
-      <cfquery datasource="#dsn_inspecao#">
-          UPDATE Inspecao SET INP_Situacao = 'CO'
-          , INP_UserName = '#CGI.REMOTE_USER#'
-          , INP_DTUltAtu = CONVERT(varchar, getdate(), 120)
-          , INP_DTConcluirRevisao = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
-          WHERE INP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
-      </cfquery>
-      <cfquery datasource="#dsn_inspecao#">
-          UPDATE ProcessoParecerUnidade SET Pro_Situacao = 'EN', Pro_DtEncerr = convert(varchar, getdate(), 102), Pro_userName = '#CGI.REMOTE_USER#', Pro_dtultatu = CONVERT(DATETIME, getdate(), 103)
-          WHERE Pro_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and Pro_Inspecao ='#qryPapelTrabalho.INP_NumInspecao#'
-      </cfquery>
-      <cflocation url="../../../Pacin_ClassificacaoUnidades.cfm?&pagretorno=GeraRelatorio/gerador/dsp/papeltrabalho.cfm&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#">    
-</cfoutput>      
+    <cfoutput>
+        <cfset RIPCaractvlr = 'NAO QUANTIFICADO'>
+      <cfif listfind('#qryPapelTrabalho.Itn_PTC_Seq#','10')>
+        <cfset RIPCaractvlr = 'QUANTIFICADO'>
+      </cfif>	
+        <cfquery datasource="#dsn_inspecao#">
+            UPDATE Resultado_Inspecao SET 
+            RIP_Recomendacao = 'V'
+            , RIP_Caractvlr = '#RIPCaractvlr#'
+            , RIP_UserName_Revisor = '#CGI.REMOTE_USER#'
+            , RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)           
+            WHERE RIP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and RIP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
+        </cfquery>
+        <cfquery datasource="#dsn_inspecao#">
+            UPDATE Inspecao SET INP_Situacao = 'CO'
+            , INP_UserName = '#CGI.REMOTE_USER#'
+            , INP_DTUltAtu = CONVERT(varchar, getdate(), 120)
+            , INP_DTConcluirRevisao = #createodbcdate(CreateDate(Year(Now()),Month(Now()),Day(Now())))#
+            WHERE INP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
+        </cfquery>
+        <cfquery datasource="#dsn_inspecao#">
+            UPDATE ProcessoParecerUnidade SET Pro_Situacao = 'EN', Pro_DtEncerr = convert(varchar, getdate(), 102), Pro_userName = '#CGI.REMOTE_USER#', Pro_dtultatu = CONVERT(DATETIME, getdate(), 103)
+            WHERE Pro_Unidade = '#qryPapelTrabalho.RIP_Unidade#'	and Pro_Inspecao ='#qryPapelTrabalho.INP_NumInspecao#'
+        </cfquery>
+        <cflocation url="../../../Pacin_ClassificacaoUnidades.cfm?&pagretorno=GeraRelatorio/gerador/dsp/papeltrabalho.cfm&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#">    
+    </cfoutput>      
   </cfif>
 <!--- inicio liberar avaliação para o gestor da unidade --->
 <!---Verifica se esta inspeção possui algum item Em Revisao --->	
@@ -348,7 +348,7 @@
               And_HrPosic='000014'
             </cfquery>            
           </cfif>
-      </cfloop>     
+      </cfloop>    
       <cflocation url="../../../Pacin_ClassificacaoUnidades.cfm?&pagretorno=GeraRelatorio/gerador/dsp/papeltrabalho.cfm&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#">             
 	    <!--- </cfif>  --->
       <!---Fim do prcesso de liberação da avaliação--->
@@ -404,13 +404,6 @@
 <cfif structKeyExists(url,'pg') and '#url.pg#' eq 'controle' and "#rsItemEmReanalise.recordcount#" neq 0>
     <meta http-equiv="refresh" content="60">
 </cfif>
-
-<style type="text/css">
-<!--
-.style2 {font-size: 14}
--->
-</style>
-
   <script language="javascript" >
    
     //captura a posição do scroll (usado nos botoes que chamam outras páginas)
@@ -561,6 +554,7 @@
 <cfset qtdvalidar = 0>
 
 <body id="main_body" style="background:#fff" onload="avisorevisor()">
+
 <div id="aguarde" name="aguarde" align="center"  style="width:100%;height:200%;top:0px;left:0px; background:transparent;
 filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F86b2ff,endColorstr=#7F86b2ff);
 z-index:1000;visibility:hidden;position:absolute;" >		
@@ -581,11 +575,14 @@ z-index:1000;visibility:hidden;position:absolute;" >
       <table border="0" widtd="100%">
         <cfif qryPapelTrabalho.recordcount is 0>
         <tr>
-          <td  valign="baseline" bordercolor="999999" bgcolor="" class="red_titulo"><div align="center"><span class="style2">Caro colaborador n&atilde;o h&aacute; registros para Avaliação solicitada</span></div></td>
+          <td  valign="baseline" bordercolor="999999" bgcolor="" class="red_titulo"><div align="center"><span class="style2">Caro colaborador não há registros para Avaliação solicitada</span></div></td>
         </tr>
       </table>
         <cfabort>
         </cfif>
+          <tr class="noprint">
+            <th colspan="5" valign="top" bordercolor="999999" bgcolor="" scope="row"><input type="button" class="botao" onClick="window.close()" value="Fechar"></th>
+          </tr> 
         <tr>
           <td widtd="22%" rowspan="2"><div align="left"></div></td>
         </tr>
@@ -593,6 +590,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
           <tr>
             <td colspan="4" valign="top" bordercolor="999999" bgcolor="" scope="row"></td>
           </tr>
+
           <tr>
             <td colspan="2" rowspan="2" valign="top" bordercolor="999999" bgcolor="" scope="row"><span class="labelcell"><img src="../../geral/img/logoCorreios.gif" alt="Logo ECT" width="148" height="33" align="left" /></span></td>
             <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center"><span class="style2">DEPARTAMENTO DE CONTROLE INTERNO</span></div></td>
@@ -681,6 +679,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
           <tr>
             <td colspan="10" valign="top" bordercolor="999999" bgcolor="CCCCCC" scope="row"><div align="left">&nbsp;</div></td>
           </tr>
+             
           <cfset numGrav = 0>
           <cfset muitoGrav = 0>
           <cfset CP = 0>
@@ -692,12 +691,11 @@ z-index:1000;visibility:hidden;position:absolute;" >
 						<cfquery dbtype="query" name="rsLink">
 							SELECT GRP_CODIGO, ITN_NUMITEM FROM qryPapelTrabalho order by GRP_CODIGO, ITN_NUMITEM
 						</cfquery>
-            <div class="noprint" align="center" style="background:##5d5e63">
-						<cfloop query="rsLink"> 
-              <a href="##GI#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#">[#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#]&nbsp;</a>
-<!---            <button onClick="location.href='##GI#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#'" type="button">#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#</button> --->
-            </cfloop>
-          </div>  
+            <div class="grpitmlinks noprint" align="left" style="background:black;">
+                  <cfloop query="rsLink"> 
+                    <a href="##GI#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#" id="GI#rsLink.GRP_CODIGO##rsLink.ITN_NUMITEM#">[#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#]&nbsp;</a> 
+                  </cfloop>
+            </div>  
         </cfoutput>
           <cfoutput query="qryPapelTrabalho" group="Grp_Codigo">
             <tr>
@@ -714,8 +712,8 @@ z-index:1000;visibility:hidden;position:absolute;" >
               <tr>
                 <td valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
                 <!---   ID para �ncora     --->
-				<cfset grp = Grp_Codigo>
-				<cfset Ite = Itn_NumItem>
+                <cfset grp = Grp_Codigo>
+                <cfset Ite = Itn_NumItem>
                 <th valign="top" bordercolor="999999" bgcolor="" scope="row"><div id="#Grp_Codigo#.#Itn_NumItem#" align="left">Item: #grp#.#ite#</div></th>
                 <td colspan="7" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"><strong>#Itn_Descricao#</strong></div><a name="GI#Grp_Codigo#.#Itn_NumItem#"></td>
               </tr>
@@ -833,7 +831,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                       <cfif '#TRIM(RIP_Recomendacao)#' eq 'S'>
                         <div ><span style="font-family:arial;background:red;padding:2px;color:##fff">EM REANÁLISE PELO INSPETOR</span></div>
                         <div class="noprint" align="center" style="margin-top:10px;float: left;"> <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?cancelar=s&pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#',800,600)">
-                          <div><img alt="Cancelar ReanáLISE do item" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
+                          <div><img alt="Cancelar Reanálise do item" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">Cancelar Reanálise</div>
                         </a> </div>
                       </cfif>
@@ -909,15 +907,15 @@ z-index:1000;visibility:hidden;position:absolute;" >
                             <!---                                       <cfset M = M> --->
                             <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenção! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
                                          window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self');}">
-                            </a>
-                        <cfelse> 
-                            
+                            </a>   
                         </cfif>
+                        
                           <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenção! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
                                          window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self');}"><a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self')">
                           <div ><img  alt="Revisar" src="../../../figuras/revisar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">Revisar</div>
                           </a> </a></div>
+                          
                           <cfset qtdrevisar = qtdrevisar + 1>
                         </cfif>
                     </cfif>  
@@ -1134,16 +1132,29 @@ z-index:1000;visibility:hidden;position:absolute;" >
     <cfif qryPapelTrabalho.INP_DTConcluirRevisao neq ''>         
           <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:690px">
             <tr class="noprint">
-              <th colspan="5" valign="top" bordercolor="999999" bgcolor="" scope="row"><button type="button" onClick=" window.print();">Imprimir</button></th>
+              <th colspan="5" valign="top" bordercolor="999999" bgcolor="" scope="row"><button type="button" onClick="window.print();">Imprimir</button></th>
             </tr>
           </div>            
     </cfif>
           <tr>
             <td colspan="5" valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
           </tr>
+          <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:690px">
+            <th colspan="5" valign="top" bordercolor="999999" bgcolor="" scope="row"><strong><input type="button" class="botao" onClick="window.close()" value="Fechar"></strong></th>
+          </tr> 
     </table>	
     <input type="hidden" id="acao" name="acao" value="">    
     <input type="hidden" id="id" name="id" value="<cfoutput>#qryPapelTrabalho.INP_NumInspecao#</cfoutput>"> 
   </form>
+  <form name="formvalidar" method="get">
+    <input type="hidden" id="pg" name="pg" value="controle">
+    <input type="hidden" id="id" name="id" value="">
+  </form>
 </body>
+<script>
+ function irpara(a){
+  alert('aqui 1168')
+   window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.idNinsp=1800052025+a','_self')>
+ }
+</script>
 </html>

@@ -15,20 +15,16 @@
 </cfloop>  
 
 <cfoutput>
-    <cfquery name="qAcesso" datasource="#dsn_inspecao#">
-        select Usu_Matricula,Usu_GrupoAcesso 
-        from usuarios 
-        where Usu_login = '#cgi.REMOTE_USER#'
-    </cfquery>
-    <cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
- 
-  <cfif grpacesso eq 'INSPETORES'>
-    <cfset inspetorhd =''>   
-    <cfset gestorhd ='readonly'>  
-  <cfelse>
-    <cfset inspetorhd ='readonly'>   
-    <cfset gestorhd =''>  
-  </cfif>
+
+    <cfset grpacesso = #form.grpacesso#>
+    
+    <cfif grpacesso eq 'INSPETORES'>
+        <cfset inspetorhd =''>   
+        <cfset gestorhd ='readonly'>  
+    <cfelse>
+        <cfset inspetorhd ='readonly'>   
+        <cfset gestorhd =''>  
+    </cfif>
   
     <cfquery datasource="#dsn_inspecao#" name="rsFicha">
         SELECT Diretoria.Dir_Sigla as siglainsp, INP_NumInspecao, INP_Unidade, INP_DtInicInspecao, INP_DtFimInspecao, INP_DTConcluirAvaliacao, INP_DTConcluirRevisao, 
@@ -46,61 +42,9 @@
         INNER JOIN Diretoria AS Diretoria_2 ON Und_CodDiretoria = Diretoria_2.Dir_Codigo
         WHERE INP_NumInspecao = convert(varchar,'#form.numinsp#') 
     </cfquery>
-
- <cfif form.acao eq 'inc'>
-    <cfif grpacesso neq 'INSPETORES'>
-        <cfquery datasource="#dsn_inspecao#" name="rsItem">
-            SELECT RIP_Resposta, Itn_NumGrupo, Itn_NumItem, Itn_Descricao, Grp_Descricao, RIP_MatricAvaliador, Fun_Nome, Fun_Email, FACA_Matricula, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, 
-            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao,FACA_Consideracao_Inspetor
-            FROM Unidades 
-            INNER JOIN ((Inspecao 
-            INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
-            INNER JOIN Itens_Verificacao ON (INP_Modalidade = Itn_Modalidade) AND (RIP_NumItem = Itn_NumItem) AND (RIP_NumGrupo = Itn_NumGrupo)) ON (Und_TipoUnidade = Itn_TipoUnidade) AND (Und_Codigo = RIP_Unidade)
-            INNER JOIN Grupos_Verificacao ON (Itn_NumGrupo = Grp_Codigo) AND (Itn_Ano = Grp_Ano)
-            INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
-            left JOIN UN_Ficha_Facin_Avaliador ON (RIP_NumInspecao = FACA_Avaliacao) AND (RIP_Unidade = FACA_Unidade) AND (RIP_MatricAvaliador = FACA_Avaliador) AND (Itn_NumGrupo = FACA_Grupo) AND (Itn_NumItem = FACA_Item)
-            WHERE convert(char, RIP_Ano) = Itn_Ano AND INP_NumInspecao = convert(varchar,'#form.numinsp#') 
-            AND RIP_Resposta <> 'A' and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm#
-        </cfquery>
-    <cfelse>   
-        <cfquery datasource="#dsn_inspecao#" name="rsItem">
-            SELECT RIP_Resposta, Itn_NumGrupo, Itn_NumItem, Itn_Descricao, Grp_Descricao, RIP_MatricAvaliador, Fun_Nome, Fun_Email, FACA_Matricula, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, 
-            FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao,FACA_Consideracao_Inspetor
-            FROM Unidades 
-            INNER JOIN ((Inspecao 
-            INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
-            INNER JOIN Itens_Verificacao ON (INP_Modalidade = Itn_Modalidade) AND (RIP_NumItem = Itn_NumItem) AND (RIP_NumGrupo = Itn_NumGrupo)) ON (Und_TipoUnidade = Itn_TipoUnidade) AND (Und_Codigo = RIP_Unidade)
-            INNER JOIN Grupos_Verificacao ON (Itn_NumGrupo = Grp_Codigo) AND (Itn_Ano = Grp_Ano)
-            INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
-            INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_NumInspecao = FACA_Avaliacao) AND (RIP_Unidade = FACA_Unidade) AND (RIP_MatricAvaliador = FACA_Avaliador) AND (Itn_NumGrupo = FACA_Grupo) AND (Itn_NumItem = FACA_Item)
-            WHERE convert(char, RIP_Ano) = Itn_Ano AND INP_NumInspecao = convert(varchar,'#form.numinsp#') 
-            AND RIP_Resposta <> 'A' and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm# 
-        </cfquery>      
-    </cfif>
-<cfelse>
-    <cfquery datasource="#dsn_inspecao#" name="rsItem">
-        SELECT RIP_Resposta, Itn_NumGrupo, Itn_NumItem, Itn_Descricao, Grp_Descricao, RIP_MatricAvaliador, Fun_Nome, Fun_Email, FACA_Matricula, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, 
-		FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos,FACA_Avaliacao,FACA_Consideracao,FACA_Consideracao_Inspetor
-        FROM Unidades 
-        INNER JOIN ((Inspecao 
-        INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
-        INNER JOIN Itens_Verificacao ON (INP_Modalidade = Itn_Modalidade) AND (RIP_NumItem = Itn_NumItem) AND (RIP_NumGrupo = Itn_NumGrupo)) ON (Und_TipoUnidade = Itn_TipoUnidade) AND (Und_Codigo = RIP_Unidade)
-        INNER JOIN Grupos_Verificacao ON (Itn_NumGrupo = Grp_Codigo) AND (Itn_Ano = Grp_Ano)
-        INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
-        INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_NumInspecao = FACA_Avaliacao) AND (RIP_Unidade = FACA_Unidade) AND (RIP_MatricAvaliador = FACA_Avaliador) AND (Itn_NumGrupo = FACA_Grupo) AND (Itn_NumItem = FACA_Item)
-        WHERE convert(char, RIP_Ano) = Itn_Ano AND INP_NumInspecao = convert(varchar,'#form.numinsp#') 
-        AND RIP_Resposta <> 'A' and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm# 
-    </cfquery>    
-</cfif>    
-   <cfquery datasource="#dsn_inspecao#" name="rsRIP">
-        SELECT RIP_NumInspecao, Count(RIP_NumInspecao) AS TotalRIP
-        FROM Resultado_Inspecao
-        GROUP BY RIP_NumInspecao
-        HAVING RIP_NumInspecao=convert(varchar,'#form.numinsp#')
-    </cfquery>
     
-    <cfquery datasource="#dsn_inspecao#" name="rsAvalia">
-        SELECT RIP_MatricAvaliador, Fun_Nome, Count(RIP_MatricAvaliador) AS totaval
+    <cfquery datasource="#dsn_inspecao#" name="rsRIP">
+        SELECT RIP_MatricAvaliador, Fun_Nome, Count(RIP_MatricAvaliador) AS totavalind
         FROM Resultado_Inspecao 
         INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
         GROUP BY RIP_NumInspecao, RIP_MatricAvaliador, Fun_Nome
@@ -109,105 +53,200 @@
             AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
         </cfif>
     </cfquery>
-
-    <cfquery datasource="#dsn_inspecao#" name="rsDevol">
-        SELECT RIP_NumInspecao, Count(RIP_NumInspecao) AS totdevol
-        FROM Resultado_Inspecao
-        WHERE (RIP_Recomendacao_Inspetor is not null) 
-        GROUP BY RIP_NumInspecao
-        HAVING RIP_NumInspecao = convert(varchar,'#form.numinsp#')
+    <cfquery datasource="#dsn_inspecao#" name="rsFAC">
+        SELECT FAC_Unidade,FAC_Avaliacao,FAC_MatriculaGestor,FAC_Data_SEI,FAC_Qtd_Avaliacao,FAC_Qtd_Correcaotexto,FAC_Qtd_Reanalise,FAC_Perc_Reanalise,FAC_Pontos_Revisao_Meta1,
+        FAC_Resultado_Meta1,FAC_Peso_Meta1,FAC_Pontos_Revisao_Meta2,FAC_Resultado_Meta2,FAC_Peso_Meta2,FAC_Data_Plan_Meta3,FAC_DifDia_Meta3,FAC_Resultado_Meta3,FAC_DtConcluirFacin_Gestor,FAC_DtAlter
+        FROM UN_Ficha_Facin
+        where FAC_Avaliacao = '#form.numinsp#' 
+    </cfquery>     
+    <cfif form.acao eq 'inc'>
+        <cfif grpacesso neq 'INSPETORES'>
+            <cfquery datasource="#dsn_inspecao#" name="rsItem">
+                SELECT RIP_Recomendacao_Inspetor,RIP_Critica_Inspetor,RIP_Unidade,RIP_MatricAvaliador,FACA_Meta1_Pontos,FACA_META2_PONTOS,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Grp_Descricao,Fun_Nome,Fun_Email,FACA_MatriculaGestor,FACA_Meta1_AT_OrtoGram,FACA_Meta1_AT_CCCP,FACA_Meta1_AE_Tecn,FACA_Meta1_AE_Prob,FACA_Meta1_AE_Valor,FACA_Meta1_AE_Cosq,FACA_Meta1_AE_Norma,FACA_Meta1_AE_Docu,FACA_Meta1_AE_Class,FACA_Meta1_AE_Orient,FACA_Meta1_Pontos,FACA_Meta2_AR_Falta,FACA_Meta2_AR_Troca,FACA_Meta2_AR_Nomen,FACA_Meta2_AR_Ordem,FACA_Meta2_AR_Prazo,FACA_Meta2_Pontos,FACA_Avaliacao,FACA_ConsideracaoGestor,FACA_ConsideracaoInspetor
+                FROM ((((((Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo) 
+                INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
+                INNER JOIN (Itens_Verificacao 
+                INNER JOIN Grupos_Verificacao ON (Itn_NumGrupo = Grp_Codigo) AND (Itn_Ano = Grp_Ano)) ON (RIP_NumGrupo = Itn_NumGrupo) AND (RIP_NumItem = Itn_NumItem) AND (Und_TipoUnidade = Itn_TipoUnidade) AND (INP_Modalidade = Itn_Modalidade)) 
+                INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric) 
+                LEFT JOIN UN_Ficha_Facin_Avaliador ON (RIP_MatricAvaliador = FACA_MatriculaInspetor) AND (RIP_NumItem = FACA_Item) AND (RIP_NumGrupo = FACA_Grupo) AND (RIP_NumInspecao = FACA_Avaliacao) AND (RIP_Unidade = FACA_Unidade)))
+                WHERE convert(char, RIP_Ano) = Itn_Ano AND INP_NumInspecao = convert(varchar,'#form.numinsp#') 
+                and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm#
+            </cfquery>
+        <cfelse>   
+            <cfquery datasource="#dsn_inspecao#" name="rsItem">
+                SELECT RIP_Recomendacao_Inspetor,RIP_Critica_Inspetor,RIP_Unidade,RIP_MatricAvaliador,FACA_Meta1_Pontos,FACA_META2_PONTOS,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Grp_Descricao,Fun_Nome,Fun_Email,FACA_MatriculaGestor,FACA_Meta1_AT_OrtoGram,FACA_Meta1_AT_CCCP,FACA_Meta1_AE_Tecn,FACA_Meta1_AE_Prob,FACA_Meta1_AE_Valor,FACA_Meta1_AE_Cosq,FACA_Meta1_AE_Norma,FACA_Meta1_AE_Docu,FACA_Meta1_AE_Class,FACA_Meta1_AE_Orient,FACA_Meta1_Pontos,FACA_Meta2_AR_Falta,FACA_Meta2_AR_Troca,FACA_Meta2_AR_Nomen,FACA_Meta2_AR_Ordem,FACA_Meta2_AR_Prazo,FACA_Meta2_Pontos,FACA_Avaliacao,FACA_ConsideracaoGestor,FACA_ConsideracaoInspetor
+                FROM ((((((Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo) 
+                INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
+                INNER JOIN (Itens_Verificacao 
+                INNER JOIN Grupos_Verificacao ON (Itn_NumGrupo = Grp_Codigo) AND (Itn_Ano = Grp_Ano)) ON (RIP_NumGrupo = Itn_NumGrupo) AND (RIP_NumItem = Itn_NumItem) AND (Und_TipoUnidade = Itn_TipoUnidade) AND (INP_Modalidade = Itn_Modalidade)) 
+                INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric) 
+                INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_MatricAvaliador = FACA_MatriculaInspetor) AND (RIP_NumItem = FACA_Item) AND (RIP_NumGrupo = FACA_Grupo) AND (RIP_NumInspecao = FACA_Avaliacao) AND (RIP_Unidade = FACA_Unidade)))
+                WHERE convert(char, RIP_Ano) = Itn_Ano AND INP_NumInspecao = convert(varchar,'#form.numinsp#') 
+                and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm# 
+            </cfquery>      
+        </cfif>
+    <cfelse>
+        <cfquery datasource="#dsn_inspecao#" name="rsItem">
+            SELECT RIP_Recomendacao_Inspetor,RIP_Critica_Inspetor,RIP_Unidade,RIP_MatricAvaliador,FACA_Meta1_Pontos,FACA_META2_PONTOS,Itn_NumGrupo,Itn_NumItem,Itn_Descricao,Grp_Descricao,Fun_Nome,Fun_Email,FACA_MatriculaGestor,FACA_Meta1_AT_OrtoGram,FACA_Meta1_AT_CCCP,FACA_Meta1_AE_Tecn,FACA_Meta1_AE_Prob,FACA_Meta1_AE_Valor,FACA_Meta1_AE_Cosq,FACA_Meta1_AE_Norma,FACA_Meta1_AE_Docu,FACA_Meta1_AE_Class,FACA_Meta1_AE_Orient,FACA_Meta1_Pontos,FACA_Meta2_AR_Falta,FACA_Meta2_AR_Troca,FACA_Meta2_AR_Nomen,FACA_Meta2_AR_Ordem,FACA_Meta2_AR_Prazo,FACA_Meta2_Pontos,FACA_Avaliacao,FACA_ConsideracaoGestor,FACA_ConsideracaoInspetor
+            FROM ((((((Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo) 
+            INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
+            INNER JOIN (Itens_Verificacao 
+            INNER JOIN Grupos_Verificacao ON (Itn_NumGrupo = Grp_Codigo) AND (Itn_Ano = Grp_Ano)) ON (RIP_NumGrupo = Itn_NumGrupo) AND (RIP_NumItem = Itn_NumItem) AND (Und_TipoUnidade = Itn_TipoUnidade) AND (INP_Modalidade = Itn_Modalidade)) 
+            INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric) 
+            INNER JOIN UN_Ficha_Facin_Avaliador ON (RIP_MatricAvaliador = FACA_MatriculaInspetor) AND (RIP_NumItem = FACA_Item) AND (RIP_NumGrupo = FACA_Grupo) AND (RIP_NumInspecao = FACA_Avaliacao) AND (RIP_Unidade = FACA_Unidade)))
+            WHERE INP_NumInspecao = convert(varchar,'#form.numinsp#') 
+            and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm# 
+        </cfquery>    
+    </cfif>    
+    <cfquery datasource="#dsn_inspecao#" name="rsFacind">
+        SELECT FFI_Avaliacao,FFI_MatriculaGestor,FFI_MatriculaInspetor,FFI_Qtd_Item,FFI_Meta1_Peso,FFI_Meta1_Pontuacao_Obtida,FFI_Meta1_Resultado,FFI_Meta2_Peso,FFI_Meta2_Pontuacao_Obtida,FFI_Meta2_Resultado,FFI_DtConcluirFacin_Inspetor
+        FROM UN_Ficha_Facin_Individual
+        WHERE FFI_Avaliacao='#form.numinsp#' AND FFI_MatriculaInspetor='#rsItem.RIP_MatricAvaliador#'
     </cfquery>
-    <cfquery datasource="#dsn_inspecao#" name="rsOrtog">
-        SELECT RIP_NumInspecao
+    <cfif rsFacind.recordcount lte 0>
+        <cfset form.ffiqtditem = rsRIP.totavalind>
+        <cfset form.ffimeta1peso = numberFormat((100/form.ffiqtditem)/10,'___.000')>
+        <cfset form.ffimeta2peso = numberFormat((100/form.ffiqtditem)/5,'___.000')>
+        <cfset form.ffimeta1pontuacaobtida = numberFormat(form.ffiqtditem,'___.00')>
+        <cfset form.ffimeta2pontuacaobtida = numberFormat(form.ffiqtditem,'___.00')>  
+        <cfset form.ffimeta1resultado = 100.00>
+        <cfset form.ffimeta2resultado = 100.00>  
+    <cfelse>
+        <cfset form.ffiqtditem = rsFacind.FFI_Qtd_Item>
+        <cfset form.ffimeta1peso = numberFormat(rsFacind.FFI_Meta1_Peso,'___.000')>
+        <cfset form.ffimeta2peso = numberFormat(rsFacind.FFI_Meta2_Peso,'___.000')>
+        <cfset form.ffimeta1pontuacaobtida = numberFormat(rsFacind.FFI_Meta1_Pontuacao_Obtida,'___.00')>
+        <cfset form.ffimeta2pontuacaobtida = numberFormat(rsFacind.FFI_Meta2_Pontuacao_Obtida,'___.00')>
+        <cfset form.ffimeta1resultado = numberFormat(rsFacind.FFI_Meta1_Resultado,'___.00')>
+        <cfset form.ffimeta2resultado = numberFormat(rsFacind.FFI_Meta2_Resultado,'___.00')>        
+    </cfif>    
+    <cfset form.meta1cobrarconsideracaogestorsn = 'N'>
+    <cfset form.meta2cobrarconsideracaogestorsn = 'N'>
+    <cfif rsFAC.recordcount lte 0>
+        <cfquery datasource="#dsn_inspecao#" name="rstotalgeral">
+            SELECT RIP_NumInspecao
+            FROM Resultado_Inspecao 
+            where RIP_NumInspecao = convert(varchar,'#form.numinsp#')
+        </cfquery>
+        <cfset form.facqtdavaliacao = rstotalgeral.recordcount>
+        <cfset form.dbfacresultadometa1 = form.facqtdavaliacao>
+        <cfset form.dbfacresultadometa2 = form.facqtdavaliacao>
+        <cfset form.facpesometa1 = numberFormat((100/form.facqtdavaliacao)/10,'___.000')>
+        <cfset form.facpesometa2 = numberFormat((100/form.facqtdavaliacao)/5,'___.000')>
+        <cfset form.facpontosrevisaometa1 = numberFormat(form.facqtdavaliacao,'___.00')>
+        <cfset form.facpontosrevisaometa2 = numberFormat(form.facqtdavaliacao,'___.00')>
+        <cfset form.facresultadometa1 = 100.00>
+        <cfset form.facresultadometa2 = 100.00>
+        <cfset form.facresultadometa3 = 100.00>
+        <cfset form.facdataplanmeta3 = ''>
+        <cfset form.facdifdiameta3 = 0>
+        <cfset form.facpercreanalise = 0>
+    <cfelse>
+        <cfset form.facqtdavaliacao = rsFAC.FAC_Qtd_Avaliacao>
+        <cfset form.facpesometa1 = numberFormat(rsFAC.FAC_Peso_Meta1,'___.000')>
+        <cfset form.facameta2pontos = numberFormat(rsItem.FACA_Meta2_Pontos,'___.00')>
+        <cfset form.facpesometa2 = numberFormat(rsFAC.FAC_Peso_Meta2,'___.000')>
+        <cfset form.facpontosrevisaometa1 = numberFormat(rsFAC.FAC_Pontos_Revisao_Meta1,'___.00')>
+        <cfset form.facpontosrevisaometa2 = numberFormat(rsFAC.FAC_Pontos_Revisao_Meta2,'___.00')>
+        <cfset form.facresultadometa1 = numberFormat(rsFAC.FAC_Resultado_Meta1,'___.00')>
+        <cfset form.facresultadometa2 = numberFormat(rsFAC.FAC_Resultado_Meta2,'___.00')>
+        <cfset form.dbfacresultadometa1 = numberFormat(rsFAC.FAC_Resultado_Meta1,'___.00')>
+        <cfset form.dbfacresultadometa2 = numberFormat(rsFAC.FAC_Resultado_Meta2,'___.00')>
+        <cfset form.facresultadometa3 = numberFormat(rsFAC.FAC_Resultado_Meta3,'___.00')>
+        <cfset form.facdataplanmeta3 = rsFAC.FAC_data_plan_meta3>
+        <cfset form.facpercreanalise = rsFAC.FAC_Perc_Reanalise>
+        <cfset form.facdifdiameta3 =  numberFormat(rsFAC.FAC_difdia_meta3)>
+    </cfif>
+    <cfif rsItem.FACA_Avaliacao eq ''>      
+        <cfset meta1atortogram = 0>
+        <cfset meta1atcccp = 0>
+        <cfset meta1aetecn = 0>
+        <cfset meta1aeprob = 0>
+        <cfset meta1aevalor = 0>
+        <cfset meta1aecosq = 0>
+        <cfset meta1aenorma = 0>
+        <cfset meta1aedocu = 0>
+        <cfset meta1aeclass = 0>
+        <cfset meta1aeorient = 0>
+        <cfset meta2aefalta = 0>
+        <cfset meta2artroca = 0>
+        <cfset meta2arnomen = 0>
+        <cfset meta2arordem = 0>
+        <cfset meta2arprazo = 0>
+        <cfset form.dbvlrperdasgrpitmmeta1 = 0>
+        <cfset form.dbvlrperdasgrpitmmeta2 = 0>
+        <cfset form.dbvlrperdasgrpitmmeta1ind = 0>
+        <cfset form.dbvlrperdasgrpitmmeta2ind = 0>
+        <cfset form.facameta1pontos = numberFormat(100/rsRIP.totavalind,'___.00')> 
+        <cfset form.facameta2pontos = numberFormat(100/rsRIP.totavalind,'___.00')>   
+    <cfelse>
+        <cfset meta1atortogram = rsItem.FACA_Meta1_AT_OrtoGram>
+        <cfset meta1atcccp = rsItem.FACA_Meta1_AT_CCCP>
+        <cfset meta1aetecn = rsItem.FACA_Meta1_AE_Tecn>
+        <cfset meta1aeprob = rsItem.FACA_Meta1_AE_Prob>
+        <cfset meta1aevalor = rsItem.FACA_Meta1_AE_Valor>
+        <cfset meta1aecosq = rsItem.FACA_Meta1_AE_Cosq>
+        <cfset meta1aenorma = rsItem.FACA_Meta1_AE_Norma>
+        <cfset meta1aedocu = rsItem.FACA_Meta1_AE_Docu>
+        <cfset meta1aeclass = rsItem.FACA_Meta1_AE_Class>
+        <cfset meta1aeorient = rsItem.FACA_Meta1_AE_Orient>
+        <cfset form.facameta1pontos = numberFormat(rsItem.FACA_Meta1_Pontos,'___.00')>
+        <cfset meta2aefalta = rsItem.FACA_Meta2_AR_Falta>
+        <cfset meta2artroca = rsItem.FACA_Meta2_AR_Troca>
+        <cfset meta2arnomen = rsItem.FACA_Meta2_AR_Nomen>
+        <cfset meta2arordem = rsItem.FACA_Meta2_AR_Ordem>
+        <cfset meta2arprazo = rsItem.FACA_Meta2_AR_Prazo>
+        <cfset form.facameta2pontos = numberFormat(rsItem.FACA_Meta2_Pontos,'___.00')>
+        <cfset form.dbvlrperdasgrpitmmeta1 = rsItem.FACA_Meta1_AT_OrtoGram + rsItem.FACA_Meta1_AT_CCCP + rsItem.FACA_Meta1_AE_Tecn + rsItem.FACA_Meta1_AE_Prob + rsItem.FACA_Meta1_AE_Valor + rsItem.FACA_Meta1_AE_Cosq + rsItem.FACA_Meta1_AE_Norma + rsItem.FACA_Meta1_AE_Docu + rsItem.FACA_Meta1_AE_Class + rsItem.FACA_Meta1_AE_Orient>
+        <cfset form.dbvlrperdasgrpitmmeta1ind = numberFormat(form.dbvlrperdasgrpitmmeta1 * form.ffimeta1peso,'___.000')>
+        <cfset form.dbvlrperdasgrpitmmeta1 = numberFormat(form.dbvlrperdasgrpitmmeta1 * form.facpesometa1,'___.000')>
+        <cfif form.dbvlrperdasgrpitmmeta1 gt 0 >
+            <cfset form.meta1cobrarconsideracaogestorsn = 'S'>
+        </cfif>
+        <cfset form.dbvlrperdasgrpitmmeta2 = rsItem.FACA_Meta2_AR_Falta + rsItem.FACA_Meta2_AR_Troca + rsItem.FACA_Meta2_AR_Nomen + rsItem.FACA_Meta2_AR_Ordem + rsItem.FACA_Meta2_AR_Prazo>       
+        <cfset form.dbvlrperdasgrpitmmeta2ind = numberFormat(form.dbvlrperdasgrpitmmeta2 * form.ffimeta2peso,'___.000')>
+        <cfset form.dbvlrperdasgrpitmmeta2 = numberFormat(form.dbvlrperdasgrpitmmeta2 * form.facpesometa2,'___.000')>
+        <cfif form.dbvlrperdasgrpitmmeta2 gt 0 >
+            <cfset form.meta2cobrarconsideracaogestorsn = 'S'>
+        </cfif>
+    </cfif>
+
+    <cfset form.facatipo = 'Correção de texto'>
+    <cfset form.reanalisesn = 'N'>
+    <cfquery datasource="#dsn_inspecao#" name="rsReanAval">
+        SELECT RIP_NumInspecao, RIP_MatricAvaliador,RIP_NumGrupo,RIP_NumItem
+        FROM Resultado_Inspecao
+        WHERE (RIP_Recomendacao_Inspetor is not null) and RIP_NumInspecao = convert(varchar,'#form.numinsp#')
+    </cfquery>
+    <cfquery name="rsReanInsp" dbtype = "query">
+        SELECT RIP_MatricAvaliador,RIP_NumGrupo,RIP_NumItem
+        from rsReanAval
+        where RIP_MatricAvaliador = '#rsItem.RIP_MatricAvaliador#'
+    </cfquery>
+    <cfset form.reanalise = 0>
+    <cfset form.percreanalise = 0>
+    <cfif rsReanAval.recordcount gt 0>
+        <cfset form.reanalise = rsReanAval.recordcount>
+        <cfset form.percreanalise = (form.reanalise / form.facqtdavaliacao) * 100>
+        <cfset form.percreanalise = numberFormat(form.percreanalise,'___.00')>
+        <cfloop query="rsReanInsp">
+            <cfif rsReanInsp.RIP_NumGrupo eq #grp# and rsReanInsp.RIP_NumItem eq #itm#>
+                <cfset form.facatipo = 'Com Reanálise'>
+                <cfset form.reanalisesn = 'S'>
+            </cfif>
+        </cfloop>
+    </cfif>
+    <cfquery datasource="#dsn_inspecao#" name="rsOrtogaval">
+        SELECT RIP_NumInspecao, RIP_MatricAvaliador
         FROM Resultado_Inspecao
         WHERE RIP_NumInspecao = convert(varchar,'#form.numinsp#') and RIP_Recomendacao_Inspetor is null and RIP_Correcao_Revisor = '1'
     </cfquery>    
-
-    <cfquery datasource="#dsn_inspecao#" name="rsExisteFacin">
-        SELECT FAC_Qtd_Geral, FAC_Qtd_NC, FAC_Qtd_Devolvido,FAC_Pontos_Revisao_Meta1, FAC_Perc_Revisao_Meta1, FAC_Meta1_Peso_Item, FAC_Pontos_Revisao_Meta2, FAC_Perc_Revisao_Meta2, FAC_Meta2_Peso_Item, FAC_Data_Plan_Meta3, 
-        FAC_DifDia_Meta3, FAC_Perc_Meta3, FAC_DtAlter,FAC_DtConcluirFacin,FACA_Grupo,FACA_Item,FACA_Meta1_Pontos,FACA_META2_PONTOS
-        FROM UN_Ficha_Facin INNER JOIN UN_Ficha_Facin_Avaliador ON (FAC_Matricula = FACA_Matricula) AND (FAC_Avaliacao = FACA_Avaliacao) AND (FAC_Unidade = FACA_Unidade)
-        WHERE FAC_Avaliacao = convert(varchar,'#form.numinsp#') 
+    <cfquery name="rsOrtogInsp" dbtype = "query">
+        SELECT RIP_MatricAvaliador
+        from rsOrtogaval
+        where RIP_MatricAvaliador = '#rsItem.RIP_MatricAvaliador#'
     </cfquery>
-  
-    <cfset form.ptoMeta1Atual = 0>
-    <cfset form.ptoMeta2Atual = 0>
-
-    <cfif rsExisteFacin.recordcount lte 0>
-        <cfset form.ptogeral = #rsRIP.TotalRIP#>
-        <cfset form.meta1 = 100>
-        <cfset form.meta2 = 100>
-        <cfset form.meta3 = 100>
-        <cfset form.ptorevismeta1 = #rsRIP.TotalRIP#>
-        <cfset form.ptorevismeta2 = #rsRIP.TotalRIP#>
-        <cfset form.PercMeta1ajustar = 100>
-        <cfset form.PercMeta2ajustar = 100>
-        <cfset form.PtoMeta1ajustar = #rsRIP.TotalRIP#>
-        <cfset form.PtoMeta2ajustar = #rsRIP.TotalRIP#>
-        <cfset form.meta1_tela = #rsRIP.TotalRIP#>
-        <cfset form.meta2_tela = #rsRIP.TotalRIP#>
-    <cfelse>      
-        <cfset form.ptogeral = #rsExisteFacin.FAC_Qtd_Geral#>
-        <cfset form.ptodev = #rsExisteFacin.FAC_Qtd_Devolvido#>
-        <cfset form.meta1 = #rsExisteFacin.FAC_Perc_Revisao_Meta1#>
-        <cfset form.meta2 = #rsExisteFacin.FAC_Perc_Revisao_Meta2#>
-        <cfset form.meta3 = #rsExisteFacin.FAC_Perc_Meta3#>
-        <cfset form.ptorevismeta1 = #rsExisteFacin.FAC_Pontos_Revisao_Meta1#>
-        <cfset form.ptorevismeta2 = #rsExisteFacin.FAC_Pontos_Revisao_Meta2#>
-        <cfset form.PtoMeta1ajustar = #rsExisteFacin.FAC_Pontos_Revisao_Meta1#>
-        <cfset form.PtoMeta2ajustar = #rsExisteFacin.FAC_Pontos_Revisao_Meta2#>
-        <cfset form.meta1_tela = #rsExisteFacin.FAC_Pontos_Revisao_Meta1#>
-        <cfset form.meta2_tela = #rsExisteFacin.FAC_Pontos_Revisao_Meta2#>
-        <cfset form.PercMeta1ajustar = #rsExisteFacin.FAC_Perc_Revisao_Meta1#>
-        <cfset form.PercMeta2ajustar = #rsExisteFacin.FAC_Perc_Revisao_Meta2#>
-        <cfset form.ptoMeta1Atual = #rsExisteFacin.FACA_Meta1_Pontos#>
-        <cfset form.ptoMeta2Atual = #rsExisteFacin.FACA_Meta2_Pontos#>
-        <cfset ptogrpitm = numberFormat((100/form.ptogeral),'___.00')>
-        <cfset form.PtoMeta1ajustar = numberFormat(PtoMeta1ajustar - (ptogrpitm - form.ptoMeta1Atual),'___.00')>
-        <cfset form.PercMeta1ajustar =numberFormat((form.PtoMeta1ajustar/form.ptogeral)*100,'___.00')>
-        <cfset form.PtoMeta2ajustar = numberFormat(PtoMeta2ajustar - (ptogrpitm - form.ptoMeta2Atual),'___.00')>
-        <cfset form.PercMeta2ajustar =numberFormat((form.PtoMeta2ajustar/form.ptogeral)*100,'___.00')>
-    </cfif> 
-    <cfset ptogrpitm = numberFormat((100/form.ptogeral),'___.00')>
- 
-    <cfif rsExisteFacin.recordcount eq 1 and rsExisteFacin.FACA_Grupo eq #grp#  and rsExisteFacin.FACA_Item eq #itm#>
-        <cfset form.PercMeta1ajustar = 100>
-        <cfset form.PercMeta2ajustar = 100>
-        <cfset form.PtoMeta1ajustar = #rsRIP.TotalRIP#>
-        <cfset form.PtoMeta2ajustar = #rsRIP.TotalRIP#>
-        <cfset form.meta1_tela = #rsRIP.TotalRIP#>
-        <cfset form.meta2_tela = #rsRIP.TotalRIP#>
-    </cfif>
-
-    <cfif rsExisteFacin.recordcount gt 1> 
-        <cfset form.PercMeta1ajustar = #rsExisteFacin.FAC_Perc_Revisao_Meta1#>
-        <cfset form.PercMeta2ajustar = #rsExisteFacin.FAC_Perc_Revisao_Meta2#>
-        <cfif len(rsItem.FACA_Matricula) gt 0>
-            <cfset form.ptoMeta1Atual = rsItem.FACA_Meta1_AT_OrtoGram + rsItem.FACA_Meta1_AT_CCCP + rsItem.FACA_Meta1_AE_Tecn + rsItem.FACA_Meta1_AE_Prob + rsItem.FACA_Meta1_AE_Valor + rsItem.FACA_Meta1_AE_Cosq + rsItem.FACA_Meta1_AE_Norma + rsItem.FACA_Meta1_AE_Docu + rsItem.FACA_Meta1_AE_Class + rsItem.FACA_Meta1_AE_Orient>
-            <cfset form.ptoMeta1Atual = numberFormat(rsExisteFacin.FAC_Meta1_Peso_Item * form.ptoMeta1Atual,'___.000')>
-            <cfset form.PtoMeta1ajustar = numberFormat(form.ptorevismeta1 + form.ptoMeta1Atual,'___.00')>
-            <cfset form.PercMeta1ajustar =numberFormat((form.PtoMeta1ajustar/form.ptogeral)*100,'___.00')>
-            <cfset form.ptoMeta2Atual = rsItem.FACA_Meta2_AR_Falta + rsItem.FACA_Meta2_AR_Troca + rsItem.FACA_Meta2_AR_Nomen + rsItem.FACA_Meta2_AR_Ordem + rsItem.FACA_Meta2_AR_Prazo>
-            <cfset form.ptoMeta2Atual = numberFormat(rsExisteFacin.FAC_Meta2_Peso_Item * form.ptoMeta2Atual,'___.000')>
-            <cfset form.PtoMeta2ajustar = numberFormat(form.ptorevismeta2 + form.ptoMeta2Atual,'___.00')>
-            <cfset form.PercMeta2ajustar =numberFormat((form.PtoMeta2ajustar/form.ptogeral)*100,'___.00')>
-        <cfelse>
-            <cfset form.ptoMeta1Atual = 0>
-            <cfset form.ptoMeta2Atual = 0>
-            <cfset form.PtoMeta1ajustar = form.meta1_tela>
-            <cfset form.PtoMeta2ajustar = form.meta2_tela>
-  <!---          <cfset form.PercMeta1ajustar =form.ptorevismeta1>
-            <cfset form.PercMeta1ajustar =form.ptorevismeta2>
-            --->
-        </cfif>
-    </cfif>
-<!---   
-    form.PercMeta1ajustar: #form.PercMeta1ajustar#<br>
-    form.PtoMeta1ajusta: #form.PtoMeta1ajustar#<br>
-    form.PercMeta2ajustar: #form.PercMeta2ajustar#<br>
-    form.PtoMeta2ajusta: #form.PtoMeta2ajustar#<br>
---->   
-<!DOCTYPE html>
+</cfoutput>        
 <html lang="pt-BR">
 
 <head>
@@ -215,99 +254,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FICHA AVALIAÇÃO</title>
     <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="public/app.css">  
-
-    <script>
-
-        //===========  
-        const second = 1000;
-        const minute = second * 60;
-        const hour = minute * 60;
-        const day = hour * 24;
-
-        function meta3(a,b){
-            //alert(a + '' + b)
-          //  alert(document.formx.concaval.value);
-          if (a.length == 10){
-            let date_realizado = new Date(a);
-            let date_planejado = new Date(b);
-            var percent=100;
-            //alert(date_ini + '   ' + date_end);
-            let diff = date_planejado.getTime() - date_realizado.getTime();
-            diff = Math.floor(diff / day);
-            //alert(diff);
-           if(diff < 0){
-                //diff = 0;
-                //document.formx.meta3_dtplanej.value = a;
-            }
-            
-            if(diff < 0){
-               // alert('linha 168')
-               if(diff == -1) {percent = 60}  
-               if(diff == -2) {percent = 40}
-               if(diff <= -3) {percent = 0;}
-            }else{
-                if(diff > 0) {percent = 110;}
-            }
-//alert(percent)
-            document.getElementById('meta3_dif').innerText = diff;
-            document.getElementById('meta3_percent').innerText = percent + '%';
-            document.formx.facdataplanmeta3.value = b;
-            document.formx.facdifdiameta3.value = diff;
-            document.formx.facpercmeta3.value = percent;
-            }
-        
-        }        
-        //===========
-        function numericos(){
-            var tecla = window.event.keyCode;
-            if ((tecla != 46) && ((tecla < 48) || (tecla > 57))){
-                event.returnValue = false; 
-            }
-        }
-        //================ 
-        function Mascara_Data(data){
-	        switch (data.value.length)
-	        {
-                case 2:
-                if (data.value < 1 || data.value > 31) {
-                    //alert('Valor para o dia inválido!');
-                    data.value = '';
-                    event.returnValue = false;
-                    break;
-                    } else {
-                    data.value += "/";
-                        break;
-                    }
-                case 5:
-                if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
-               // alert('Valor para o Mês inválido!');
-                data.value = '';
-                event.returnValue = false;
-                break;
-                } else {
-                data.value += "/";
-                    break;
-                }
-	        }
-        }	
-  
-</script>
-
+    <!--- <link rel="stylesheet" href="public/app.css">   --->
 </head>
 
 <!--- <body onload="meta2(true,1,1,85051071);colecao_meta2(85051071)"> --->
 
 <body style="background:##fff"> 
+<table width="98%" align="center">
+    <tr><td>
 <!--- <form name="facin" method="POST" action=""> --->
-<form name="formx" method="POST" action="cfc/fichafacin.cfc?method=salvarPosic" target="_self">
-    <!---
-    <table width="50%" align="left" class="table table-bordered">
+    <form name="formx" method="POST" action="cfc/fichafacin.cfc?method=salvarPosic" target="_self">
+<cfoutput>
+    <!--- ---> 
+    <table width="100%" align="center" class="table table-bordered">
         <tr>
             <td height="20" colspan="8"><div align="center"><strong class="titulo2">FICHA DE AVALIAÇÃO DE CONTROLE INTERNO - (FACIN)</strong></div></td>
         </tr>
         <tr>
-            <td colspan="8"><div align="left"><strong class="titulo2">01 - IDENTIFICAÇÃO</strong></div></td>
+            <td colspan="8"><div align="left"><strong class="titulo2">01 - Identificação</strong></div></td>
         </tr>
         <tr>
             <td colspan="8"><strong class="exibir">Inspetores</strong></td>
@@ -315,13 +279,13 @@
         <cfloop query="rsFicha">
             <tr>
                 <cfif trim(rsFicha.INP_Coordenador) eq trim(rsFicha.IPT_MatricInspetor)>
-                    <td>#rsFicha.Fun_Nome# <strong>(Coordena)</strong></td>
+                    <td >#rsFicha.Fun_Nome# <strong>(Coordenador(a))</strong></td>
                     <td>#rsFicha.IPT_MatricInspetor#</td>
-                    <td>#rsFicha.Usu_LotacaoNome#(SE-#rsFicha.siglainsp#)</td>
+                    <td colspan="6">#rsFicha.Usu_LotacaoNome#(SE-#rsFicha.siglainsp#)</td>
                 <cfelse>  
-                    <td>#rsFicha.Fun_Nome#</td>
+                    <td >#rsFicha.Fun_Nome#</td>
                     <td>#rsFicha.IPT_MatricInspetor#</td>
-                    <td>#rsFicha.Usu_LotacaoNome#(SE-#rsFicha.siglainsp#)</td>
+                    <td colspan="6">#rsFicha.Usu_LotacaoNome#(SE-#rsFicha.siglainsp#)</td>
                 </cfif>
             </tr>          
         </cfloop>  
@@ -329,884 +293,627 @@
             <td colspan="8"><strong class="exibir">Revisor(a)</strong></td>
         </tr>
         <tr>
-            <td>#rsFicha.nomerevisor#</td>
+            <td >#rsFicha.nomerevisor#</td>
             <td>#rsFicha.matrrevisor#</td>
-            <td>#rsFicha.lotacaorevisor#(SE-#rsFicha.Dir_Sigla#)</td>
+            <td colspan="6">#rsFicha.lotacaorevisor#(SE-#rsFicha.Dir_Sigla#)</td>
         </tr>           
         <tr>
             <td colspan="8"><strong class="exibir">02 - Processo Avaliado</strong></td>
         </tr>
         <tr>
-            <td>Nome da Unidade: #rsFicha.Und_Descricao#(SE/#rsFicha.siglaunid#)</td>
-            <td>Nº Avaliação: #rsFicha.INP_NumInspecao#</td> 
-            <td>Chefe: #rsFicha.INP_Responsavel#</td>
+            <td >Nome da Unidade: #rsFicha.Und_Descricao#(SE/#rsFicha.siglaunid#)</td>
+            <td colspan="7" align="left">Nº Avaliação: #rsFicha.INP_NumInspecao#</td> 
+            <!--- <td colspan="5">Chefe: #rsFicha.INP_Responsavel#</td> --->
         </tr> 
         <tr>
             <td colspan="8"><strong class="exibir">03 - Fases da Avaliação</strong></td>
         </tr>
-        <tr>
-            <td colspan="1">Execução em campo</td>
-            <td colspan="1">Conclusão Avaliação</td>
-            <td colspan="1">Conclusão Revisão</td>
-            <td colspan="5">Conclusão SEI</td>
-        </tr> 
         <cfset datarevis = dateformat(rsFicha.INP_DTConcluirRevisao,"DD/MM/YYYY")>
         <cfif rsFicha.INP_DTConcluirRevisao eq ''>
             <cfset datarevis = dateformat(now(),"DD/MM/YYYY")>
         </cfif>
         <tr>
-            <td colspan="1">Início: #dateformat(rsFicha.INP_DtInicInspecao,"DD/MM/YYYY")# Fim: #dateformat(rsFicha.INP_DtFimInspecao,"DD/MM/YYYY")#</td>
-            <td colspan="1">#dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</td>
-            <td colspan="1">#datarevis#</td>
-            <td colspan="5">#dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</td>
+            <td colspan="1" >Execução em campo: Início: #dateformat(rsFicha.INP_DtInicInspecao,"DD/MM/YYYY")# Fim: #dateformat(rsFicha.INP_DtFimInspecao,"DD/MM/YYYY")#</td>
+            <td colspan="1">Conclusão Avaliação: #dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</td>
+            <td colspan="6">Conclusão Revisão: #datarevis#</td>
+            <!--- <td colspan="5">Conclusão SEI: #dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</td> --->
         </tr> 
         <tr>
             <td colspan="8"><strong class="exibir">04 - Avaliação</strong></td>
         </tr>
-        <cfset form.ptodev = 0>
-        <cfset auxpercptodev = 0>
-        <cfif rsDevol.totdevol gt 0>
-            <cfset form.ptodev = rsDevol.totdevol>
-            <cfset auxpercptodev = (form.ptodev / form.ptogeral) * 100>
-            <cfset auxpercptodev = numberFormat(auxpercptodev,'___.00')>
-        </cfif>
         <tr>
-            <td colspan="1">Total de pontos avaliados: <div id="ptogeral" class="badge bg-primary text-wrap" style="width: 5rem;">#form.ptogeral#</div></td>
-            <td colspan="1">Total em Reanálise: <div id="ptodev" class="badge bg-primary text-wrap" style="width: 5rem;">#form.ptodev#</div></td>
-            <td colspan="1">Perc. em Reanálise: <div id="perdev" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#auxpercptodev#</cfoutput>%</div></td>
-            <td colspan="5">Total com correção de texto: <div id="ptodev" class="badge bg-primary text-wrap" style="width: 5rem;">#rsOrtog.recordcount#</div></td>
+            <td colspan="2" align="center"><div class="btn btn-outline-primary disabled">Pontos Avaliados:</div>&nbsp;&nbsp;<div id="ptogeral" class="btn btn-primary">#form.facqtdavaliacao#</div></td>
+            <td colspan="1" align="center"><div class="btn btn-outline-primary disabled">Com Reanálise:</div>&nbsp;&nbsp; <div id="totreanalise" class="btn btn-primary">#form.reanalise#</div></td>
+            <!--- <td colspan="1">Percentual (Reanálise): <div id="percreanalise" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.percreanalise#</cfoutput>%</div></td> --->
+            <td colspan="5" align="center"><div class="btn btn-outline-primary disabled">Com correção de texto:</div>&nbsp;&nbsp; <div id="totcorectexto" class="btn btn-primary">#rsOrtogaval.recordcount#</div></td>
         </tr> 
-        <input type="hidden" name="facpontosrevisaometa1" id="facpontosrevisaometa1" value="#form.ptorevismeta1#">
-        <input type="hidden" name="facpontosrevisaometa2" id="facpontosrevisaometa2" value="#form.ptorevismeta2#">
+        
+<!---
         <tr>
-            <td colspan="2">Perc. Meta1: <div id="ptogeral" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta1#%</div></td>
-            <td colspan="3">Perc. Meta2: <div id="ptodev" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta2#%</div></td>
-            <td colspan="3">Perc. Meta3: <div id="ptodev" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta3#%</div></td>
-        </tr> 
-<!---        
-        <tr>
-            <td height="20" colspan="8"><div align="center"><strong class="titulo2">Metas</strong></div></td>
-        </tr>
-        <cfset grpitm = rsItem.Itn_NumGrupo & '_' & rsItem.Itn_NumItem>
-        <tr>
-            <td colspan="8"><div class="card"><a href="##" class="btn btn-primary">#grpitm# - #rsItem.Grp_Descricao# &nbsp;&nbsp;Avaliador(a) : #rsItem.RIP_MatricAvaliador# - #rsItem.Fun_Nome# - (#rsItem.Fun_Email#)</a></div></td>
-        </tr> 
-                    
-        <tr>
-            <td>
+            <td colspan="8">
+                <table align="center" class="table table-bordered">
+                    <tr colspan="8">
+                        <td colspan="2" align="center">Resultado (Meta1): <div id="meta1resultadoaval" class="btn btn-primary"><strong>#form.facresultadometa1#</strong>%</div></td>                                                                       
+                        <td colspan="3" align="center">Resultado (Meta2): <div id="meta2resultadoaval" class="btn btn-primary"><strong>#form.facresultadometa2#</strong>%</div></td>
+                        <td colspan="3" align="center">Resultado (Meta3): <div id="meta3resultadoaval" class="btn btn-primary"><strong>#form.facresultadometa3#</strong>%</div></td>
+                    </tr>
+                </table>
             </td>
         </tr>
-    --->        
-    </table>    
---->    
-<div class="container">
-	<div class="row align-items-center">
-
-        <span class="border border-primary">
-            <p class="text-center"><strong>FICHA DE AVALIAÇÃO DE CONTROLE INTERNO - (FACIN)</strong></p>
-        </span>  
-                
-        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>01-Identificação</strong></label>
-        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Inspetores</strong></label>
-    
-
-        <div class="col-sm-5">
-            <cfloop query="rsFicha">
-                <p class="text-start">
-                <cfif trim(rsFicha.INP_Coordenador) eq trim(rsFicha.IPT_MatricInspetor)>
-                    <label for="" class="">&nbsp;#rsFicha.Fun_Nome# <strong>(coordenador(a))</strong></label>
-                <cfelse>  
-                    <label for="" class="">&nbsp;#rsFicha.Fun_Nome#</label>              
-                </cfif>
-                </p>            
-            </cfloop>    
-        </div>
-        <div class="col-sm-2">
-            <cfloop query="rsFicha">
-                <p>&nbsp;#rsFicha.IPT_MatricInspetor#</p>
-            </cfloop>  
-        </div>
-        <div class="col-sm-5">
-            <cfloop query="rsFicha">
-            <p>
-                #rsFicha.Usu_LotacaoNome#(SE-#rsFicha.siglainsp#)    
-            </p>           
-            </cfloop>  
-        </div>
-
-
-    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Revisor(a)</strong></label>
-
-        <div class="col-sm-5">
-            #rsFicha.nomerevisor#        
-        </div>
-        <div class="col-sm-1">
-            #rsFicha.matrrevisor#                 
-        </div>
-        <div class="col-sm-6">
-                #rsFicha.lotacaorevisor#(SE-#rsFicha.Dir_Sigla#)              
-        </div>
-
-    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>02.Processo Avaliado</strong></label>
-
-        <div class="col-sm-6">
-            Unidade: #rsFicha.Und_Descricao#(SE/#rsFicha.siglaunid#)
-        </div>
-        <div class="col-sm-6">
-            Nº Avaliação: #rsFicha.INP_NumInspecao#                
-        </div>
-
-    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>03.Período das fases da Avaliação de Controle Interno</strong></label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Execução em campo</label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Conclusão Avaliação</label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Conclusão Revisão</label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Conclusão SEI</label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Início: #dateformat(rsFicha.INP_DtInicInspecao,"DD/MM/YYYY")# Fim: #dateformat(rsFicha.INP_DtFimInspecao,"DD/MM/YYYY")#</label>
-    <label id="concluiraval" for="" class="col-sm-3 col-form-label">#dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</label>
-    <cfset datarevis = dateformat(rsFicha.INP_DTConcluirRevisao,"DD/MM/YYYY")>
-    <cfif rsFicha.INP_DTConcluirRevisao eq ''>
-        <cfset datarevis = dateformat(now(),"DD/MM/YYYY")>
-    </cfif>
-    <input type="hidden" name="concaval" value="#dateformat(rsFicha.INP_DTConcluirAvaliacao,"YYYY-MM-DD")#">
-    <label for="" class="col-sm-3 col-form-label">&nbsp;#datarevis#</label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;#dateformat(rsFicha.INP_DTConcluirAvaliacao,"DD/MM/YYYY")#</label>
-
-    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>04.Avaliação</strong></label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Qtd. pontos avaliados &nbsp;<div id="ptogeral" class="badge bg-primary text-wrap" style="width: 4rem;">#form.ptogeral#</div></label>
-    <!--- <cfif rsExisteFacin.recordcount lte 0> --->
-        <cfset form.ptodev = 0>
-        <cfset auxpercptodev = 0>
-        <cfif rsDevol.totdevol gt 0>
-            <cfset form.ptodev = rsDevol.totdevol>
-            <cfset auxpercptodev = (form.ptodev / form.ptogeral) * 100>
-            <cfset auxpercptodev = numberFormat(auxpercptodev,'___.00')>
-        </cfif>
-    <!--- </cfif>     --->
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Qtd. pontos com Reanálise &nbsp;<div id="ptodev" class="badge bg-primary text-wrap" style="width: 3rem;">#form.ptodev#</div></label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Percentual com Reanálise&nbsp;<div id="perdev" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#auxpercptodev#</cfoutput>%</div></label>
-    <label for="" class="col-sm-3 col-form-label">&nbsp;Qtd. Correção texto &nbsp;<div id="ptodev" class="badge bg-primary text-wrap" style="width: 3rem;">#rsOrtog.recordcount#</div></label>
-  
-    <label for="" class="col-sm-6 col-form-label">&nbsp;Percentual (Meta1) <div id="meta1" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta1#%</div></label>
-    <label for="" class="col-sm-6 col-form-label">&nbsp;Percentual (Meta2) <div id="meta2" class="badge bg-primary text-wrap" style="width: 5rem;">#form.meta2#%</div></label>
-<div style="display:none">   
-    <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta1" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta1#</cfoutput></div></label>
-    <label for="" class="col-sm-6 col-form-label"><div id="ptorevismeta2" class="badge bg-primary text-wrap" style="width: 5rem;"><cfoutput>#form.ptorevismeta2#</cfoutput></div></label>
-</div>
-
-    <p class="text-center"><strong>METAS</strong></p>
-</cfoutput>
-
-<div class="accordion" id="acordiongrupoitem">
-  <cfset ordem = 0>
-  <cfloop query="rsItem">
-    <cfset ordem = ordem + 1>
-    <cfset linha = 'A_' & rsItem.Itn_NumGrupo & '_' & rsItem.Itn_NumItem>
-    <cfset grpitm = rsItem.Itn_NumGrupo & '_' & rsItem.Itn_NumItem>
-    
-  <div class="accordion-item">
-    <h2 class="accordion-header" id="headingOne">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#<cfoutput>#linha#</cfoutput>" aria-expanded="true" aria-controls="<cfoutput>#linha#</cfoutput>">
-        <cfoutput>
-            #grpitm# - #rsItem.Grp_Descricao# &nbsp;&nbsp;Avaliador(a) : #rsItem.RIP_MatricAvaliador# - #rsItem.Fun_Nome# - #rsItem.Fun_Email# 
-        </cfoutput>
-      </button>
-    </h2>
-    <div id="<cfoutput>#linha#</cfoutput>" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#acordiongrupoitem">
-      <div class="accordion-body">
-        <cfoutput>#rsItem.Itn_Descricao#</cfoutput>
-      </div>
-
-      <table class="table">
-        <tbody>
-            <!--- Aspectos Textuais --->
-            <tr>
-                <td align="center">
-                    <strong>Meta 1: Redigir Apontamentos no SNCI</strong>
-                </td>
-            </tr>
-            <cfset form.meta1_pto = #ptogrpitm#>
-            <cfif rsItem.FACA_Avaliacao neq ''><cfset form.meta1_pto = #rsItem.FACA_Meta1_Pontos#></cfif>            
-            <tr>
-                <tr>
-                    <td>Pontuação Obtida por Grupo/Item</td>
-                    <td>
-                        <div class="badge bg-primary text-wrap" style="width: 5rem;">
-                            <input class="form-control" type="text" id="meta1_pto_obtida" name="meta1_pto_obtida" value="<cfoutput>#form.meta1_pto#</cfoutput>" readonly>
-                        </div>
-                    </td>
-                </tr>
-            </tr>
-            <tr>
-                <td align="center">
-                    <strong>Aspectos Textuais</strong>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AT_OrtoGram eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>   
-            <tr>
-                <td>Ortografia e Gramática</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_atorgr" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AT_CCCP eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>              
-            <tr>
-                <td>Clareza/Concisão e/ou Coerência/Precisão</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_atcccp" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <!--- Redigir apontamentos no SNCI --->
-
-            <tr>
-                <td align="Center"><strong>Aspectos Estruturais</strong></td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AE_Tecn eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>               
-            <tr>
-                <td>Técnica</td>
-                <td>
-                    <div class="form-check form-switch">
-                         <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_aetecn" value="<cfoutput>#auxvlr#</cfoutput>"> 
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AE_Prob eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>              
-            <tr>
-                <td>Problema</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_aeprob" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AE_Valor eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>                 
-            <tr>
-                <td>Valor</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_aevalo" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AE_Cosq eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>              
-            <tr>
-                <td>Consequências</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_aecsqc" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AE_Norma eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>              
-            <tr>
-                <td>Normativo</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_aenorm" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AE_Docu eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>                
-            <tr>
-                <td>Documentos</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_aedocm" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AE_Class eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>                
-            <tr>
-                <td>Classificação</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_aeclas" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta1_AE_Orient eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>               
-            <tr>
-                <td>Orientação</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta1" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta1_orient" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <!--- FIM Redigir apontamentos no SNCI ---> 
-            <!--- Meta 2: Organizar documentos no SEI --->
-            <tr>
-                <td align="center">
-                    <strong>Meta 2: Organizar Documentos no SEI</strong>
-                </td>
-            </tr>
-            <cfset form.meta2_pto = #ptogrpitm#>
-            <cfif rsItem.FACA_Avaliacao neq ''><cfset form.meta2_pto = #rsItem.FACA_Meta2_Pontos#></cfif>                
-            <tr>
-                <td>Pontuação Obtida por Grupo/Item </td>
-                <td>
-                    <div class="badge bg-primary text-wrap" style="width: 5rem;">
-                        <input class="form-control" type="text" id="meta2_pto_obtida" name="meta2_pto_obtida" value="<cfoutput>#form.meta2_pto#</cfoutput>" readonly>
-                    </div>
-                </td>
-            </tr> 
-            <tr>
-                <td align="center">
-                    <strong>Arquivo</strong>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta2_AR_Falta eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>  
-            <tr>
-                <td>Falta</td>
-                <td>
-                    <div class="form-check form-switch">                                                                                                                                                                             
-                        <input class="form-check-input meta2" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta2_arfalt" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta2_AR_Troca eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>             
-            <tr>
-                <td>Troca</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta2" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta2_artroc" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta2_AR_Nomen eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>               
-            <tr>
-                <td>Nomenclatura</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta2" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta2_arnomc" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta2_AR_Ordem eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>                
-            <tr>
-                <td>Ordem</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta2" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta2_arorde" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>
-            <cfset auxchck = ''>
-            <cfset auxvlr = 0>
-            <cfif rsItem.FACA_Meta2_AR_Prazo eq 1 and rsItem.FACA_Matricula eq qAcesso.Usu_Matricula><cfset auxchck = 'checked'><cfset auxvlr = 1></cfif>                  
-            <tr>
-                <td>Prazo</td>
-                <td>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input meta2" <cfoutput>#auxchck#</cfoutput> type="checkbox" role="switch" id="meta2_arpraz" value="<cfoutput>#auxvlr#</cfoutput>">
-                    </div>
-                </td>
-            </tr>     
-            <!--- FIM Meta 2: Organizar documentos no SEI --->
-        </tbody>
-      </table>
-      <div class="row align-items-center">
-        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Considerações do Item - REVISOR(A)</strong></label>
-        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerargestor" id="considerargestor" class="form-control" placeholder="Consideração para Grupo/Item" <cfoutput>#gestorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_Consideracao)#</cfoutput></textarea>	        
-      </div>  
-      <div class="row align-items-center">
-        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Considerações do Item - INSPETOR(A)</strong></label>
-        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerinspetor" id="considerinspetor" class="form-control" placeholder="Consideração para Grupo/Item" <cfoutput>#inspetorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_Consideracao_Inspetor)#</cfoutput></textarea>	        
-      </div>            
-    </div>     
-</cfloop> 
-</div>
-
-</div>
-</div> 
-
-<cfoutput>
-<!---    
-    <div class="row align-items-center">
-        <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>05-Considerações Gerais</strong></label>
-        <textarea cols="94" rows="5" wrap="VIRTUAL" name="considerar" id="considerar" class="form-control" placeholder="Considerações para Avaliação"><cfoutput>#trim(rsItem.FACA_Consideracao_Inspetor)#</cfoutput></textarea>	        
-    </div>      
---->    
-    <div class="row align-items-center">
-    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>05-Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):</strong></label>
-    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Meta 1</strong> - INSP - Redigir 100% dos apontamentos relativos às Não Conformidades (NC) identificadas, conforme critérios definidos pela SGCIN/PE. (Redigir apontamentos)</label>
-    <cfloop query="rsAvalia">
-        <cfset matraval = rsAvalia.RIP_MatricAvaliador>
-        <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
-            SELECT FFI_Qtd_Item, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado
-            FROM UN_Ficha_Facin_Individual
-            WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' 
-        </cfquery>
-        <cfset form.meta1_qggitens = #rsAvalia.totaval#>
-        <cfset form.meta1_qgptop = (rsAvalia.totaval * ptogrpitm)>
-        <cfset form.meta1_qgpto = (rsAvalia.totaval * ptogrpitm)>
-        <cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
-        <cfset form.meta1_percqggitens = numberFormat(percent,'___.00')>
-        
-        <cfif rsFacinInd.recordcount gt 0>
-            <cfset form.meta1_qggitens = #rsFacinInd.FFI_Qtd_Item#>
-            <cfset form.meta1_qgptop = #rsFacinInd.FFI_Qtd_Item#>
-            <cfset form.meta1_qgpto = #rsFacinInd.FFI_Meta1_Pontuacao_Obtida#>
-            <cfset form.meta1_percqggitens = #rsFacinInd.FFI_Meta1_Resultado#>
-        </cfif>
-        
-        <div class="col-sm-7">
-            <label for="" class="">&nbsp;#rsAvalia.Fun_Nome#</label>  
-        </div>
-        <div class="col-sm-5">
-            <label>&nbsp;Qtd. Item Avaliado: &nbsp;<div id="meta1_qggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta1_qggitens#</div></label>
-            <div style="display:none">
-                <label>&nbsp;Pontuação Inicial:&nbsp;<div id="meta1_qgptop_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta1_qgptop#</div></label>
-                <label>&nbsp;Pontuação Obtida:&nbsp;<div id="meta1_qgpto_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta1_qgpto#</div></label>
-            </div>
-            <!---<cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
-            <cfset percent = numberFormat(percent,'___.00')> --->
-            <label>&nbsp;Resultado: &nbsp;<div id="meta1_percqggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 5rem;">#numberFormat(form.meta1_percqggitens,'___.00')#%</div></label>
-        </div>
-    </cfloop>  
- 
-    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Meta 2</strong>- INSP - Organizar 100% dos documentos gerados nas Avaliações de Controles realizadas, providenciado o arquivamento conforme critérios estabelecidos pela SGCIN/PE.  (Organizar documentos no SEI)</label>
-    <cfloop query="rsAvalia">
-        <cfset matraval = rsAvalia.RIP_MatricAvaliador>
-        
-        <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
-            SELECT FFI_Qtd_Item, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado
-            FROM UN_Ficha_Facin_Individual
-            WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#' 
-        </cfquery>
-
-        <cfset form.meta2_qggitens = #rsAvalia.totaval#>
-        <cfset form.meta2_qgptop = (rsAvalia.totaval * ptogrpitm)>
-        <cfset form.meta2_qgpto = (rsAvalia.totaval * ptogrpitm)>
-        <cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
-        <cfset form.meta2_percqggitens = numberFormat(percent,'___.00')>
-        
-        <cfif rsFacinInd.recordcount gt 0>
-            <cfset form.meta2_qggitens = #rsFacinInd.FFI_Qtd_Item#>
-            <cfset form.meta2_qgptop = #rsFacinInd.FFI_Qtd_Item#>
-            <cfset form.meta2_qgpto = #rsFacinInd.FFI_Meta2_Pontuacao_Obtida#>
-            <cfset form.meta2_percqggitens = #rsFacinInd.FFI_Meta2_Resultado#>
-        </cfif>        
-        <div class="col-sm-7">
-            <label for="" class="">&nbsp;#rsAvalia.Fun_Nome#</label>         
-        </div>
-        <div class="col-sm-5">
-            <label>&nbsp;Qtd. Item Avaliado: &nbsp;<div id="meta2_qggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta2_qggitens#</div></label>
-            <div style="display:none">
-            <label>&nbsp;Pontuação Inicial:&nbsp;<div id="meta2_qgptop_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta2_qgptop#</div></label>            
-            <label>&nbsp;Pontuação Obtida:&nbsp;<div id="meta2_qgpto_#matraval#" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta2_qgpto#</div></label>
-            </div>
-  <!---          <cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
-            <cfset percent = numberFormat(percent,'___.00')> --->
-            <label>&nbsp;Resultado: &nbsp;<div id="meta2_percqggitens_#matraval#" class="badge bg-primary text-wrap" style="width: 5rem;">#numberFormat(form.meta2_percqggitens,'___.00')#%</div></label>
-        </div>
-    </cfloop>  
-    <label for="" class="col-sm-12 col-form-label">&nbsp;<strong>Meta 3</strong> - Liberar 100% das Avaliações de Controle para revisão dentro do prazo estabelecido pela SGCIN/PE. (Liberar para revisão no prazo)</label>
-    <label for="" class="col-sm-4 col-form-label">&nbsp;Data Transmissão Planejada:</label>
-    <label for="" class="col-sm-4 col-form-label">&nbsp;Diferença(dia)</label>
-    <label for="" class="col-sm-4 col-form-label">&nbsp;Percentual</label>
-    <cfset form.meta3_dtplanej = ''>
-    <cfset form.meta3_dif = 0>
-    <cfset form.meta3_percent = 100>
-    <cfif rsExisteFacin.recordcount gt 0>
-        <cfset form.meta3_dtplanej = #rsExisteFacin.fac_data_plan_meta3#>
-        <cfset form.meta3_dif = #int(rsExisteFacin.fac_difdia_meta3)#>
-        <cfset form.meta3_percent = #rsExisteFacin.fac_perc_meta3#>
-    </cfif>
-    <label for="" class="col-sm-4 col-form-label"><input class="form-control" id="meta3_dtplanej" name="meta3_dtplanej" type="date" value="#form.meta3_dtplanej#" onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" onblur="meta3(document.formx.concaval.value,this.value)" size="14" maxlength="10" placeholder="DD/MM/AAAA" #gestorhd#></label>
-    <label for="" class="col-sm-4 col-form-label"><div id="meta3_dif" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta3_dif#</div></label>
-    <label for="" class="col-sm-4 col-form-label"><div id="meta3_percent" class="badge bg-primary text-wrap" style="width: 4rem;">#form.meta3_percent#%</div></label>
-    <cfset auxcompl = 'Salvar Facin Grupo Acesso: ' & #grpacesso#>
-    <cfif rsExisteFacin.recordcount gt 0>
-        <cfset auxcompl = 'Salvar Facin (Grupo Acesso: ' & #grpacesso# & '    últ. atualiz.: ' & dateformat(rsExisteFacin.FAC_DtAlter,"DD/MM/YYYY") & ' ' & timeformat(rsExisteFacin.FAC_DtAlter,"HH:MM:SS") & ')'>
-    </cfif>
-    <cfset habsn = ''>
-    <cfif rsExisteFacin.FAC_DtConcluirFacin neq '' and grpacesso eq 'GESTORES'>
-        <cfset habsn = 'disabled'>
-    </cfif>
-    <cfif form.salvarsn eq 'N'>
-        <cfset habsn = 'disabled'>
-    </cfif>
-    <input class="btn btn-primary" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#>
-    <input class="btn btn-info" type="button" onClick="window.open('ficha_facin_Ref.cfm?numinsp=#form.numinsp#&acao=buscar','_self')" value="Voltar">
-</div> 
-<cfset meta1desconto = numberFormat((ptogrpitm/10),'___.000')>
-<cfset meta2desconto = numberFormat((ptogrpitm/5),'___.000')>
-<input type="hidden" id="meta1desconto" name="meta1desconto" value="#trim(meta1desconto)#">
-<input type="hidden" id="meta2desconto" name="meta2desconto" value="#trim(meta2desconto)#">
-<input type="hidden" id="totalNC" name="totalNC" value="#rsItem.recordcount#">
-<input type="hidden" id="ptobtida" name="ptobtida" value="#ptogrpitm#">
-<input type="hidden" id="matr_avaliador_pto" name="matr_avaliador_pto" value="#rsItem.RIP_MatricAvaliador#">
-</cfoutput>    
-
-</div>
-
-<!--- </form> --->
-
-<!--- <form name="formx" method="POST" action="cfc/fichafacin.cfc?method=salvarPosic" target="_self"> --->
-    <cfoutput>
-        <input type="hidden" name="facunidade" id="facunidade" value="#rsFicha.INP_Unidade#">
-        <input type="hidden" name="facavaliacao" id="facavaliacao" value="#form.numinsp#">
-        <input type="hidden" name="facmatricula" id="facmatricula" value="#trim(qAcesso.Usu_Matricula)#">
-        <input type="hidden" name="facano" id="facano" value="#right(form.numinsp,4)#">
-        <input type="hidden" name="facRevisor" id="facRevisor" value="#trim(rsFicha.matrrevisor)#">
-        <input type="hidden" name="facdatasei" id="facdatasei" value="#dateformat(rsFicha.INP_DTConcluirAvaliacao,"YYYY-MM-DD")#">
-        <input type="hidden" name="facqtdgeral" id="facqtdgeral" value="#form.ptogeral#">
-        <input type="hidden" name="facqtdnc" id="facqtdnc" value="#rsItem.recordcount#">
-        <input type="hidden" name="facqtdevolvido" id="facqtdevolvido" value="#form.ptodev#">
-        <input type="hidden" name="facpontosrevisaometa1" id="facpontosrevisaometa1" value="#form.ptorevismeta1#">
-        <input type="hidden" name="facpercrevisaometa1" id="facpercrevisaometa1" value="#form.meta1#">
-        <input type="hidden" name="facpontosrevisaometa2" id="facpontosrevisaometa2" value="#form.ptorevismeta2#">
-        <input type="hidden" name="facpercrevisaometa2" id="facpercrevisaometa2" value="#form.meta2#">
-        <input type="hidden" name="facdataplanmeta3" id="facdataplanmeta3" value="#form.meta3_dtplanej#">
-        <input type="hidden" name="facdifdiameta3" id="facdifdiameta3" value="#form.meta3_dif#">
-        <input type="hidden" name="facpercmeta3" id="facpercmeta3" value="#form.meta3_percent#">
-        <input type="hidden" name="facmeta1pesoitem" id="facmeta1pesoitem" value="#trim(meta1desconto)#">
-        <input type="hidden" name="facmeta2pesoitem" id="facmeta2pesoitem" value="#trim(meta2desconto)#">
-        <input type="hidden" name="facagrupo" id="facagrupo" value="#grp#">
-        <input type="hidden" name="facaitem" id="facaitem" value="#itm#">
-        <input type="hidden" id="somenteavaliarmeta3" name="somenteavaliarmeta3" value="#form.somenteavaliarmeta3#">
-             
-        
-    <cfloop query="rsAvalia">
-        <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
-            SELECT FFI_Qtd_Item, FFI_Meta1_Pontuacao_Obtida, FFI_Meta1_Resultado, FFI_Meta2_Pontuacao_Obtida, FFI_Meta2_Resultado
-            FROM UN_Ficha_Facin_Individual
-            WHERE FFI_Avaliacao=convert(varchar,'#form.numinsp#') AND FFI_Avaliador='#rsAvalia.RIP_MatricAvaliador#'
-        </cfquery>
-        <!--- meta1 --->
-        <cfset form.meta1_qggitens = #rsAvalia.totaval#>
-        <cfset form.meta1_qgptop = (rsAvalia.totaval * ptogrpitm)>
-        <cfset form.meta1_qgpto = (rsAvalia.totaval * ptogrpitm)>
-        <cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
-        <cfset form.meta1_percqggitens = numberFormat(percent,'___.00')>
-        <!--- meta2 --->
-        <cfset form.meta2_qggitens = #rsAvalia.totaval#>
-        <cfset form.meta2_qgptop = (rsAvalia.totaval * ptogrpitm)>
-        <cfset form.meta2_qgpto = (rsAvalia.totaval * ptogrpitm)>
-        <cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
-        <cfset form.meta2_percqggitens = numberFormat(percent,'___.00')>
-        
-        <cfif rsFacinInd.recordcount gt 0>
-            <!--- meta1 --->
-            <cfset form.meta1_qggitens = #rsFacinInd.FFI_Qtd_Item#>
-            <cfset form.meta1_qgptop = #rsFacinInd.FFI_Qtd_Item#>
-            <cfset form.meta1_qgpto = #rsFacinInd.FFI_Meta1_Pontuacao_Obtida#>
-            <cfset form.meta1_percqggitens = #rsFacinInd.FFI_Meta1_Resultado#>
-            <!--- meta2 --->
-            <cfset form.meta2_qggitens = #rsFacinInd.FFI_Qtd_Item#>
-            <cfset form.meta2_qgptop = #rsFacinInd.FFI_Qtd_Item#>
-            <cfset form.meta2_qgpto = #rsFacinInd.FFI_Meta2_Pontuacao_Obtida#>
-            <cfset form.meta2_percqggitens = #rsFacinInd.FFI_Meta2_Resultado#>
-        </cfif>   
-<!---   
-        <cfset percent = ((rsAvalia.totaval * ptogrpitm) / (rsAvalia.totaval * ptogrpitm)) * 100>
-        <cfset percent = numberFormat(percent,'___.00')> 
---->
-        <!--- meta1 --->
-        <input type="hidden" name="ffimeta1qtditem_#rsAvalia.RIP_MatricAvaliador#" id="ffimeta1qtditem_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta1_qggitens#">
-        <input type="hidden" name="ffimeta1pontuacaoinicial_#rsAvalia.RIP_MatricAvaliador#" id="ffimeta1pontuacaoinicial_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta1_qgptop#">
-        <input type="hidden" name="ffimeta1pontuacaoobtida_#rsAvalia.RIP_MatricAvaliador#" id="ffimeta1pontuacaoobtida_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta1_qgpto#">
-        <input type="hidden" name="ffimeta1resultado_#rsAvalia.RIP_MatricAvaliador#" id="ffimeta1resultado_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta1_percqggitens#">
-        <input type="hidden" name="db_ptobtidameta1_#rsAvalia.RIP_MatricAvaliador#" id="db_ptobtidameta1_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta1_qgpto#">
-        <input type="hidden" name="db_Resultadometa1_#rsAvalia.RIP_MatricAvaliador#" id="db_Resultadometa1_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta1_percqggitens#">
-        <input type="hidden" name="db_meta1" id="db_meta1" value="#form.meta1#">
-        <input type="hidden" name="db_ptorevismeta1" id="db_ptorevismeta1" value="#form.ptorevismeta1#">
-        <input type="hidden" name="PercMeta1ajustar" id="PercMeta1ajustar" value="#form.PercMeta1ajustar#">
-        <input type="hidden" name="PtoMeta1ajustar" id="PtoMeta1ajustar" value="#form.PtoMeta1ajustar#">
-        <input type="hidden" name="PercMeta2ajustar" id="PercMeta2ajustar" value="#form.PercMeta2ajustar#">
-        <input type="hidden" name="PtoMeta2ajustar" id="PtoMeta2ajustar" value="#form.PtoMeta2ajustar#">
-        <input type="hidden" name="meta1_tela" id="meta1_tela" value="#form.meta1_tela#">
-        <input type="hidden" name="meta2_tela" id="meta2_tela" value="#form.meta2_tela#">
-
-        <!--- meta2 --->
-        <input type="hidden" name="ffimeta2qtditem_#rsAvalia.RIP_MatricAvaliador#" id="ffimeta2qtditem_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta2_qggitens#">
-        <input type="hidden" name="ffimeta2pontuacaoinicial_#rsAvalia.RIP_MatricAvaliador#" id="ffimeta2pontuacaoinicial_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta2_qgptop#">
-        <input type="hidden" name="ffimeta2pontuacaoobtida_#rsAvalia.RIP_MatricAvaliador#" id="ffimeta2pontuacaoobtida_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta2_qgpto#">
-        <input type="hidden" name="ffimeta2resultado_#rsAvalia.RIP_MatricAvaliador#" id="ffimeta2resultado_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta2_percqggitens#">
-        <input type="hidden" name="db_ptobtidameta2_#rsAvalia.RIP_MatricAvaliador#" id="db_ptobtidameta2_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta2_qgpto#">
-        <input type="hidden" name="db_Resultadometa2_#rsAvalia.RIP_MatricAvaliador#" id="db_Resultadometa2_#rsAvalia.RIP_MatricAvaliador#" value="#form.meta2_percqggitens#">
-        <input type="hidden" name="db_meta2" id="db_meta2" value="#form.meta2#">
-        <input type="hidden" name="db_ptorevismeta2" id="db_ptorevismeta2" value="#form.ptorevismeta2#">
-    </cfloop>  
-    <cfloop query="rsItem">
+    --->
+        <tr>
+            <td colspan="8"><strong class="exibir">05 - Individualização do resultado das metas por inspetor</strong></td>
+        </tr>
         <cfset grpitm = rsItem.Itn_NumGrupo & '_' & rsItem.Itn_NumItem>
-        <cfset form.meta1_pto = #ptogrpitm#>
-        <cfset form.meta2_pto = #ptogrpitm#>
-        <cfif rsItem.FACA_Avaliacao neq ''>
-            <cfset form.meta1_pto = #FACA_Meta1_Pontos#>
-            <cfset form.meta2_pto = #FACA_Meta2_Pontos#>
-        </cfif>    
-        <input type="hidden" name="facaavaliador" id="facaavaliador" value="#rsItem.RIP_MatricAvaliador#">
-        <input type="hidden" name="facameta1pontos" id="facameta1pontos" value="#form.meta1_pto#">
-        <input type="hidden" name="facameta1pontosatual" id="facameta1pontosatual" value="#form.meta1_pto#">
-        <input type="hidden" name="dbfacameta1pontos" id="dbfacameta1pontos" value="#form.meta1_pto#">
-        <input type="hidden" name="facameta2pontos" id="facameta2pontos" value="#form.meta2_pto#">
-        <input type="hidden" name="dbfacameta2pontos" id="dbfacameta2pontos" value="#form.meta2_pto#">
-        <cfif FACA_Avaliacao neq ''>
-            <input type="hidden" name="meta1_atorgr" class="meta1_atorgr" value="<cfoutput>#rsItem.FACA_Meta1_AT_OrtoGram#</cfoutput>">
-            <input type="hidden" name="meta1_atcccp" class="meta1_atcccp" value="<cfoutput>#rsItem.FACA_Meta1_AT_CCCP#</cfoutput>">
-            <input type="hidden" name="meta1_aetecn" class="meta1_aetecn" value="<cfoutput>#rsItem.FACA_Meta1_AE_Tecn#</cfoutput>"> 
-            <input type="hidden" name="meta1_aeprob" class="meta1_aeprob" value="<cfoutput>#rsItem.FACA_Meta1_AE_Prob#</cfoutput>">
-            <input type="hidden" name="meta1_aevalo" class="meta1_aevalo" value="<cfoutput>#rsItem.FACA_Meta1_AE_Valor#</cfoutput>">
-            <input type="hidden" name="meta1_aecsqc" class="meta1_aecsqc" value="<cfoutput>#rsItem.FACA_Meta1_AE_Cosq#</cfoutput>">
-            <input type="hidden" name="meta1_aenorm" class="meta1_aenorm" value="<cfoutput>#rsItem.FACA_Meta1_AE_Norma#</cfoutput>">
-            <input type="hidden" name="meta1_aedocm" class="meta1_aedocm" value="<cfoutput>#rsItem.FACA_Meta1_AE_Docu#</cfoutput>">
-            <input type="hidden" name="meta1_aeclas" class="meta1_aeclas" value="<cfoutput>#rsItem.FACA_Meta1_AE_Class#</cfoutput>">
-            <input type="hidden" name="meta1_orient" class="meta1_orient" value="<cfoutput>#rsItem.FACA_Meta1_AE_Orient#</cfoutput>">
-            <input type="hidden" name="meta2_arfalt" class="meta2_arfalt" value="<cfoutput>#rsItem.FACA_Meta2_AR_Falta#</cfoutput>">
-            <input type="hidden" name="meta2_artroc" class="meta2_artroc" value="<cfoutput>#rsItem.FACA_Meta2_AR_Troca#</cfoutput>">
-            <input type="hidden" name="meta2_arnomc" class="meta2_arnomc" value="<cfoutput>#rsItem.FACA_Meta2_AR_Nomen#</cfoutput>">
-            <input type="hidden" name="meta2_arorde" class="meta2_arorde" value="<cfoutput>#rsItem.FACA_Meta2_AR_Ordem#</cfoutput>">
-            <input type="hidden" name="meta2_arpraz" class="meta2_arpraz" value="<cfoutput>#rsItem.FACA_Meta2_AR_Prazo#</cfoutput>">  
-        <cfelse>
-            <input type="hidden" name="meta1_atorgr" class="meta1_atorgr" value="0">
-            <input type="hidden" name="meta1_atcccp" class="meta1_atcccp" value="0">
-            <input type="hidden" name="meta1_aetecn" class="meta1_aetecn" value="0"> 
-            <input type="hidden" name="meta1_aeprob" class="meta1_aeprob" value="0">
-            <input type="hidden" name="meta1_aevalo" class="meta1_aevalo" value="0">
-            <input type="hidden" name="meta1_aecsqc" class="meta1_aecsqc" value="0">
-            <input type="hidden" name="meta1_aenorm" class="meta1_aenorm" value="0">
-            <input type="hidden" name="meta1_aedocm" class="meta1_aedocm" value="0">
-            <input type="hidden" name="meta1_aeclas" class="meta1_aeclas" value="0">
-            <input type="hidden" name="meta1_orient" class="meta1_orient" value="0">
-            <input type="hidden" name="meta2_arfalt" class="meta2_arfalt" value="0">
-            <input type="hidden" name="meta2_artroc" class="meta2_artroc" value="0">
-            <input type="hidden" name="meta2_arnomc" class="meta2_arnomc" value="0">
-            <input type="hidden" name="meta2_arorde" class="meta2_arorde" value="0">
-            <input type="hidden" name="meta2_arpraz" class="meta2_arpraz" value="0">              
-        </cfif>        
-    </cfloop>
-        <input type="hidden" id="grpacesso" name="grpacesso" value="#grpacesso#">
-        <input type="hidden" id="facaconsiderarinspetor" name="facaconsiderarinspetor" value="#trim(rsItem.FACA_Consideracao_Inspetor)#">
-        <input type="hidden" id="facaconsideracao" name="facaconsideracao" value="#trim(rsItem.FACA_Consideracao)#">
-        <input type="hidden" name="grp" id="grp" value="#grp#">
-        <input type="hidden" name="itm" id="itm" value="#itm#">
-        <input type="hidden" name="matravaliador" id="matravaliador" value="#rsItem.RIP_MatricAvaliador#">       
-    </cfoutput>
-</form>
-</body>
+        <tr>
+            <td colspan="8"><div class="card"><a href="##" class="btn btn-info disabled"><strong>#grpitm# - #rsItem.Grp_Descricao# &nbsp;&nbsp;Avaliador(a) : #rsItem.RIP_MatricAvaliador# - #rsItem.Fun_Nome# - (#rsItem.Fun_Email#)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Tipo Facin :  &nbsp;&nbsp;#form.facatipo#)</strong></a></div></td>
+        </tr>         
+        <tr>
+            <td colspan="2" align="center"><div class="btn btn-outline-primary disabled">Qtd. Item Avaliado por Inspetor:</div>&nbsp;&nbsp;&nbsp;<div id="meta1qtdind" class="btn btn-primary"><strong>#form.ffiqtditem#</strong></div></td>
+            <td colspan="1" align="center"><div class="btn btn-outline-primary disabled">Com Reanálise:</div>&nbsp;&nbsp;<div id="totreaninsp" class="btn btn-primary">#rsReanInsp.recordcount#</div></td>
+            <td colspan="5" align="center"><div class="btn btn-outline-primary disabled">Com correção de texto:</div>&nbsp;&nbsp; <div id="totcorectextoinsp" class="btn btn-primary">#rsOrtogInsp.recordcount#</div></td>
+        </tr>
+        
+        <tr>
+            <td colspan="6"><div class="btn btn-warning disabled">Meta 1 - INSP - Redigir 100% dos apontamentos relativos às Não Conformidades (NC) identificadas, conforme critérios definidos pela SGCIN. (Redigir apontamentos)</div></td>
+            <td colspan="1" align="center"><div class="btn btn-outline-primary disabled">Ptos. Obtidos:</div>&nbsp;&nbsp;<div id="ffimeta1pontuacaobtidatela" class="btn btn-primary"><strong>#form.ffimeta1pontuacaobtida#</strong></div></td>
+            <td colspan="1" align="left"><div class="btn btn-outline-primary disabled">Resultado Ind. (Meta1):</div>&nbsp;&nbsp;<div id="resultadoindmeta1" class="btn btn-primary"><strong>#form.ffimeta1resultado#%</strong></div></td>  
+        </tr>
 
+        <tr>
+            <td colspan="6"><div class="btn btn-warning disabled">Meta 2- INSP - Organizar 100% dos documentos gerados nas Avaliações de Controles realizadas, providenciado o arquivamento conforme critérios estabelecidos pela SGCIN.  (Organizar documentos no SEI)</div></td>
+            <td colspan="1" align="center"><div class="btn btn-outline-primary disabled">Ptos. Obtidos:</div>&nbsp;&nbsp;<div id="ffimeta2pontuacaobtidatela" class="btn btn-primary"><strong>#form.ffimeta2pontuacaobtida#</strong></div></td> 
+            <td colspan="1" align="left"><div class="btn btn-outline-primary disabled">Resultado Ind. (Meta2):</div>&nbsp;&nbsp;<div id="resultadoindmeta2" class="btn btn-primary"><strong>#form.ffimeta2resultado#%</strong></div></td>  
+        </tr>    
+              
+<!---
+        <tr>
+            <td colspan="8"><div align="center"><strong class="titulo2">Área de registros das Metas pelo gestor(a)</strong></div></td>
+        </tr>
+    --->         
+        <tr>
+            <td colspan="8" align="center"><div class="btn btn-primary disabled"><strong class="titulo2">Meta 1: Redigir Apontamentos no SNCI</strong></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="btn btn-outline-primary disabled">Pontuação:</div>&nbsp;&nbsp;<div id="facameta1pontostela" class="btn btn-primary"><strong>#form.facameta1pontos#</strong></div></td>
+        </tr>  
+
+        <tr>
+        <td colspan="8">
+            <table align="center" class="table table-bordered">
+                <tr colspan="10">
+                    <td colspan="3" align="center"><div class="btn btn-primary btn-sm disabled">Aspectos textuais</div></td>
+                    <td colspan="9" align="center"><div class="btn btn-primary btn-sm disabled">Aspectos estruturais</div></td>                                                                              
+                </tr>              
+                <tr colspan="10">
+                    <td colspan="1"><div class="card"><a class="btnmeta1" id="ortogram" title="#meta1atortogram#">Ortografia e Gramática</a></div></td>
+                    <td colspan="2"><div class="card"><a class="btnmeta1" id="clcocopr" title="#meta1atcccp#">Clareza/Concisão e/ou Coerência/Precisão</a></div></td>
+                    <td colspan="2"><div class="card"><a class="btnmeta1" id="tecn" title="#meta1aetecn#">Técnica</a></div></td>
+                    <td colspan="1"><div class="card"><a class="btnmeta1" id="probl" title="#meta1aeprob#">Problema</a></div></td>
+                    <td colspan="1"><div class="card"><a class="btnmeta1" id="valor" title="#meta1aevalor#">Valor</a></div></td>   
+                    <td colspan="1"><div class="card"><a class="btnmeta1" id="conseq" title="#meta1aecosq#">Consequências</a></div></td>
+                    <td colspan="1"><div class="card"><a class="btnmeta1" id="normat" title="#meta1aenorma#">Normativo</a></div></td>
+                    <td colspan="1"><div class="card"><a class="btnmeta1" id="docum" title="#meta1aedocu#">Documentos</a></div></td>
+                    <td colspan="1"><div class="card"><a class="btnmeta1" id="classif" title="#meta1aeclass#">Classificação</a></div></td>
+                    <td colspan="1"><div class="card"><a class="btnmeta1" id="orient" title="#meta1aeorient#">Orientação</a></div></td>                                                                                
+                </tr>
+            </table>
+        </td>
+        </tr>
+        <tr>
+            <td colspan="8" align="center"><div class="btn btn-info disabled"><strong class="titulo2">Meta 2: Organizar Documentos no SEI</strong></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="btn btn-outline-primary disabled">Pontuação:</div>&nbsp;&nbsp;<div id="facameta2pontostela" class="btn btn-primary"><strong>#form.facameta2pontos#</strong></div></td>
+        </tr> 
+        <tr>
+
+        <td colspan="8">
+            <table align="center" class="table table-bordered">
+                <tr colspan="5">
+                    <td colspan="10" align="center"><div class="btn btn-primary btn-sm disabled">Arquivo</div></td>                                                                            
+                </tr>
+                <tr colspan="10">
+                    <td colspan="2"><div class="card"><a class="btnmeta2" id="falta" title="#meta2aefalta#">Falta</a></div></td>
+                    <td colspan="2"><div class="card"><a class="btnmeta2" id="troca" title="#meta2artroca#">Troca</a></div></td>
+                    <td colspan="2"><div class="card"><a class="btnmeta2" id="nomen" title="#meta2arnomen#">Nomenclatura</a></div></td>
+                    <td colspan="2"><div class="card"><a class="btnmeta2" id="ordem" title="#meta2arordem#">Ordem</a></div></td>
+                    <td colspan="2"><div class="card"><a class="btnmeta2" id="prazo" title="#meta2arprazo#">Prazo</a></div></td>                                                                           
+                </tr>
+            </table>
+        </td>
+        </tr>
+        <tr>
+            <td colspan="8">
+                <table align="center" class="table table-bordered">
+                    <tr colspan="5">
+                        <td colspan="8" align="center"><div class="btn btn-primary btn-sm disabled">Considerações</div></td>                                                                            
+                    </tr>
+                    <tr colspan="8">
+                        <td colspan="4"><div class="card"><a href="##" class="btn btn-outline-primary disabled"><strong>REVISOR(A)</strong></a></div></td>
+                        <td colspan="4"><div class="card"><a href="##" class="btn btn-outline-primary disabled"><strong>INSPETOR(A)</strong></a></div></td>                                                                      
+                    </tr>
+                    <cfif form.reanalisesn eq 'S'>
+                        <tr colspan="8">
+                            <td colspan="4"><textarea cols="85" rows="6" wrap="VIRTUAL" name="riprecomendacaoinspetor" id="riprecomendacaoinspetor" class="form-control" disabled><cfoutput>#trim(rsItem.RIP_Recomendacao_Inspetor)#</cfoutput></textarea></td>
+                            <td colspan="4"><textarea cols="85" rows="6" wrap="VIRTUAL" name="ripcriticainspetor" id="ripcriticainspetor" class="form-control" disabled><cfoutput>#trim(rsItem.RIP_Critica_Inspetor)#</cfoutput></textarea></td>
+                        </tr>
+                    </cfif>
+                    <tr colspan="8">
+                        <td colspan="4"><textarea cols="85" rows="3" wrap="VIRTUAL" name="considerargestor" id="considerargestor" class="form-control" placeholder="xxxxxxxxx" <cfoutput>#gestorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_ConsideracaoGestor)#</cfoutput></textarea></td>
+                        <td colspan="4"><textarea cols="85" rows="3" wrap="VIRTUAL" name="considerinspetor" id="considerinspetor" class="form-control" placeholder="xxxxxxxxx" <cfoutput>#inspetorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_ConsideracaoInspetor)#</cfoutput></textarea></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="8" align="center"><div class="btn btn-info disabled"><strong>Meta 3 - Liberar 100% das Avaliações de Controle para revisão dentro do prazo estabelecido pela SGCIN. (Liberar para revisão no prazo)</strong></div></td>
+        </tr> 
+        <tr>
+            <td colspan="1"><div class="btn btn-outline-primary disabled">Data Transmissão Planejada</div></td>
+            <td colspan="3"><div class="btn btn-outline-primary disabled">Diferença(dia)</div></td> 
+            <td colspan="4"><div class="btn btn-outline-primary disabled">Percentual</div></td>
+        </tr> 
+        <tr>
+            <td colspan="1"><input class="form-control" id="facdataplanmeta3" name="facdataplanmeta3" type="date" value="#form.facdataplanmeta3#" onKeyPress="numericos()" onKeyDown="Mascara_Data(this)" onblur="meta3(document.formx.concaval.value,this.value)" size="14" maxlength="10" placeholder="DD/MM/AAAA" #gestorhd#></td>
+            <td colspan="3"><div id="meta3dif" class="btn btn-primary disabled">#form.facdifdiameta3#</div></td> 
+            <td colspan="4"><div id="meta3resultado" class="btn btn-primary disabled">#form.facresultadometa3#%</div></td>
+        </tr>         
+        
+
+        <tr><td colspan="8"></td></tr>
+        <cfset habilitarmeta1meta2SN = 'S'>
+        <cfset auxcompl = 'Salvar Facin Grupo Acesso: ' & #grpacesso#>
+        <cfif rsFAC.FAC_Qtd_Avaliacao neq ''>
+            <cfset auxcompl = 'Salvar Facin (Grupo Acesso: ' & #grpacesso# & '    últ. atualiz.: ' & dateformat(rsFAC.FAC_DtAlter,"DD/MM/YYYY") & ' ' & timeformat(rsFAC.FAC_DtAlter,"HH:MM:SS") & ')'>
+        </cfif>
+        <cfset habsn = ''>
+        <cfif rsFAC.FAC_DtConcluirFacin_Gestor neq '' and grpacesso eq 'GESTORES'>
+            <cfset habsn = 'disabled'>
+            <cfset habilitarmeta1meta2SN = 'N'>
+        </cfif>
+        <cfif rsFacind.FFI_DtConcluirFacin_Inspetor neq '' and grpacesso eq 'INSPETORES'>
+            <cfset habsn = 'disabled'>
+            <cfset habilitarmeta1meta2SN = 'N'>
+        </cfif>
+        <cfif form.salvarsn eq 'N'>
+            <cfset habsn = 'disabled'> 
+            <cfset habilitarmeta1meta2SN = 'N'>
+        </cfif>
+        
+        <tr><td colspan="8" align="center"><input class="btn btn-warning btn-lg" type="button" onclick="validarform()" value="<cfoutput>#auxcompl#</cfoutput>" #habsn#></td></tr>
+        <tr><td colspan="8" align="center"><input class="btn btn-info" type="button" onClick="window.open('ficha_facin_Ref.cfm?numinsp=#form.numinsp#&acao=buscar','_self')" value="Voltar"></td></tr>            
+    </table>    
+</cfoutput>
+<!--- campos de controle para o cfc --->  
+<cfoutput>
+    <!--- chaves das tabelas UN_Ficha_FACIN e UN_Ficha_Facin_Avaliador e UN_Ficha_Facin_Individual --->
+    <input type="hidden" name="idunidade" id="idunidade" value="#rsItem.RIP_Unidade#">  
+    <input type="hidden" name="idavaliacao" id="idavaliacao" value="#form.numinsp#"> 
+    <input type="hidden" name="idmatrgestor" id="idmatrgestor" value="#form.matrusu#"> 
+    <input type="hidden" name="idmatrinspetor" id="idmatrinspetor" value="#rsItem.RIP_MatricAvaliador#"> 
+    <input type="hidden" name="grpacesso" id="grpacesso" value="#grpacesso#"> 
+    <input type="hidden" name="idgrupo" id="idgrupo" value="#grp#"> 
+    <input type="hidden" name="iditem" id="iditem" value="#itm#"> 
+    <!--- campos tabela UN_Ficha_FACIN  --->
+    <input type="hidden" name="facdatasei" id="facdatasei" value="#dateformat(rsFicha.INP_DTConcluirAvaliacao,"YYYY-MM-DD")#">   
+    <input type="hidden" name="facqtdavaliacao" id="facqtdavaliacao" value="#form.facqtdavaliacao#">
+    <input type="hidden" name="facqtdcorrecaotexto" id="facqtdcorrecaotexto" value="#rsOrtogaval.recordcount#"> 
+    <input type="hidden" name="facqtdreanalise" id="facqtdreanalise" value="#form.reanalise#"> 
+    <input type="hidden" name="facpercreanalise" id="facpercreanalise" value="#form.percreanalise#"> 
+    <input type="hidden" name="facpontosrevisaometa1" id="facpontosrevisaometa1" value="#form.facpontosrevisaometa1#">
+    <input type="hidden" name="facresultadometa1" id="facresultadometa1" value="#form.facresultadometa1#">
+    <input type="hidden" name="facpesometa1" id="facpesometa1" value="#form.facpesometa1#">  
+    <input type="hidden" name="facpontosrevisaometa2" id="facpontosrevisaometa2" value="#form.facpontosrevisaometa2#">
+    <input type="hidden" name="facresultadometa2" id="facresultadometa2" value="#form.facresultadometa2#">
+    <input type="hidden" name="facpesometa2" id="facpesometa2" value="#form.facpesometa2#"> 
+    <input type="hidden" name="facdifdiameta3" id="facdifdiameta3" value="#form.facdifdiameta3#">    
+    <input type="hidden" name="facresultadometa3" id="facresultadometa3" value="#form.facresultadometa3#">
+
+    <!--- campos tabela UN_Ficha_Facin_Avaliador  --->
+    <input type="hidden" name="meta1atorgr" id="meta1atorgr" value="">
+    <input type="hidden" name="meta1atcccp" id="meta1atcccp" value="">
+    <input type="hidden" name="meta1aetecn" id="meta1aetecn" value="">
+    <input type="hidden" name="meta1aeprob" id="meta1aeprob" value="">
+    <input type="hidden" name="meta1aevalo" id="meta1aevalo" value="">
+    <input type="hidden" name="meta1aecsqc" id="meta1aecsqc" value="">
+    <input type="hidden" name="meta1aenorm" id="meta1aenorm" value="">
+    <input type="hidden" name="meta1aedocm" id="meta1aedocm" value="">
+    <input type="hidden" name="meta1aeclas" id="meta1aeclas" value="">
+    <input type="hidden" name="meta1orient" id="meta1orient" value="">
+    <input type="hidden" name="facameta1pontos" id="facameta1pontos" value="#form.facameta1pontos#">  
+    <input type="hidden" name="meta2arfalt" id="meta2arfalt" value="">
+    <input type="hidden" name="meta2artroc" id="meta2artroc" value="">
+    <input type="hidden" name="meta2arnomc" id="meta2arnomc" value="">
+    <input type="hidden" name="meta2arorde" id="meta2arorde" value="">
+    <input type="hidden" name="meta2arpraz" id="meta2arpraz" value="">
+    <input type="hidden" name="facameta2pontos" id="facameta2pontos" value="#form.facameta2pontos#"> 
+    <input type="hidden" id="facaconsideracaogestor" name="facaconsideracaogestor" value="#trim(rsItem.FACA_ConsideracaoGestor)#">
+    <input type="hidden" id="facaconsideracaoinspetor" name="facaconsideracaoinspetor" value="#trim(rsItem.FACA_ConsideracaoInspetor)#">
+    <input type="hidden" id="facatipo" name="facatipo" value="#form.facatipo#">
+    <!--- campos tabela UN_Ficha_Facin_Individual  --->
+    <input type="hidden" name="ffiqtditem" id="ffiqtditem" value="#form.ffiqtditem#">
+    <input type="hidden" name="ffimeta1peso" id="ffimeta1peso" value="#form.ffimeta1peso#">
+    <input type="hidden" name="ffimeta1pontuacaobtida" id="ffimeta1pontuacaobtida" value="#form.ffimeta1pontuacaobtida#">
+    <input type="hidden" name="ffimeta1resultado" id="ffimeta1resultado" value="#form.ffimeta1resultado#">
+    <input type="hidden" name="ffimeta2peso" id="ffimeta2peso" value="#form.ffimeta2peso#">
+    <input type="hidden" name="ffimeta2pontuacaobtida" id="ffimeta2pontuacaobtida" value="#form.ffimeta2pontuacaobtida#">
+    <input type="hidden" name="ffimeta2resultado" id="ffimeta2resultado" value="#form.ffimeta2resultado#">  
+    <!--- controles  --->
+    <input type="hidden" name="dbvlrperdasgrpitmmeta1" id="dbvlrperdasgrpitmmeta1" value="#form.dbvlrperdasgrpitmmeta1#">
+    <input type="hidden" name="dbvlrperdasgrpitmmeta2" id="dbvlrperdasgrpitmmeta2" value="#form.dbvlrperdasgrpitmmeta2#">
+    <input type="hidden" name="dbvlrperdasgrpitmmeta1ind" id="dbvlrperdasgrpitmmeta1ind" value="#form.dbvlrperdasgrpitmmeta1ind#">
+    <input type="hidden" name="dbvlrperdasgrpitmmeta2ind" id="dbvlrperdasgrpitmmeta2ind" value="#form.dbvlrperdasgrpitmmeta2ind#">
+    <input type="hidden" name="dbfacpontosrevisaometa1" id="dbfacpontosrevisaometa1" value="#form.facpontosrevisaometa1#">
+    <input type="hidden" name="telafacpontosrevisaometa1" id="telafacpontosrevisaometa1" value="#form.facpontosrevisaometa1#">
+    <input type="hidden" name="dbfacresultadometa1" id="dbfacresultadometa1" value="#form.dbfacresultadometa1#">
+    <input type="hidden" name="dbfacpontosrevisaometa2" id="dbfacpontosrevisaometa2" value="#form.facpontosrevisaometa2#">
+    <input type="hidden" name="dbfacresultadometa2" id="dbfacresultadometa2" value="#form.dbfacresultadometa2#">
+    <input type="hidden" name="dbffimeta1pontuacaobtida" id="dbffimeta1pontuacaobtida" value="#form.ffimeta1pontuacaobtida#">
+    <input type="hidden" name="dbffimeta2pontuacaobtida" id="dbffimeta2pontuacaobtida" value="#form.ffimeta2pontuacaobtida#">
+    <input type="hidden" id="meta1cobrarconsideracaogestorsn" name="meta1cobrarconsideracaogestorsn" value="#form.meta1cobrarconsideracaogestorsn#">
+    <input type="hidden" id="meta2cobrarconsideracaogestorsn" name="meta2cobrarconsideracaogestorsn" value="#form.meta2cobrarconsideracaogestorsn#">
+    <input type="hidden" id="somenteavaliarmeta3" name="somenteavaliarmeta3" value="#form.somenteavaliarmeta3#">
+    <input type="hidden" id="habilitarmeta1meta2SN" name="habilitarmeta1meta2SN" value="#habilitarmeta1meta2SN#">
+    <input type="hidden" name="concaval" id="concaval" value="#dateformat(rsFicha.INP_DTConcluirAvaliacao,"YYYY-MM-DD")#">
+    <input type="hidden" name="reanalisesn" id="reanalisesn" value="#form.reanalisesn#">
+    
+    <!---    
+    <br>form.facqtdavaliacao: #form.facqtdavaliacao#
+    <br>form.facpesometa1: #form.facpesometa1#
+    <br>form.dbfacpontosrevisaometa1: #form.facpontosrevisaometa1#
+    <br>form.dbvlrperdasgrpitmmeta1: #form.dbvlrperdasgrpitmmeta1#
+    <br>form.facpesometa2: #form.facpesometa2#
+    <br>form.dbfacpontosrevisaometa2: #form.facpontosrevisaometa2#
+    <br>form.dbvlrperdasgrpitmmeta2: #form.dbvlrperdasgrpitmmeta2#
+    <br>form.ffiqtditem: #form.ffiqtditem#
+    <br>form.ffimeta1pontuacaobtida: #form.ffimeta1pontuacaobtida#
+    <br>form.ffimeta2pontuacaobtida: #form.ffimeta2pontuacaobtida#
+    --->
+</cfoutput>    
+</form>
+</td></tr>
+</table>  
+</body>
 
 <script src="public/bootstrap/bootstrap.bundle.min.js"></script>
 <script src="public/jquery-3.7.1.min.js"></script>
 <script>
-$(function(e){
-    //alert('Dom inicializado!');   
-    $('#considerargestor').val($('#facaconsideracao').val())
-    $('#considerinspetor').val($('#facaconsiderarinspetor').val())
- 
-})
-
-//=======================================================================
-   function validarform(){
-        if (document.formx.meta3_dtplanej.value==''){
+    // abertura de tela
+    $(function(e){
+     //alert('Dom inicializado!');   
+        $('#considerargestor').val($('#facaconsideracaogestor').val())
+        $('#considerinspetor').val($('#facaconsideracaoinspetor').val())
+        // Ajustar a cor dos cards da meta1
+        $( ".btnmeta1" ).each(function( index ) {
+            tit = $(this).attr("title")
+            if (tit == 1) {
+                $(this).attr("class","btnmeta1 btn btn-danger");
+                $(this).css('box-shadow', '5px 5px 3px #888')
+            }else{
+                $(this).attr("class","btnmeta1 btn btn-outline-primary");
+            }
+        })
+        // Ajustar a cor dos cards da meta2
+        $( ".btnmeta2" ).each(function( index ) {
+            tit = $(this).attr("title")
+            if (tit == 1) {
+                $(this).attr("class","btnmeta2 btn btn-danger");
+                $(this).css('box-shadow', '5px 5px 3px #888')
+            }else{
+                $(this).attr("class","btnmeta2 btn btn-outline-primary");
+            }
+        })
+    })
+    
+    //===========================================
+    function validarform(){
+        //alert('aqui linha 462')
+        if (document.formx.facdataplanmeta3.value==''){
             alert("Falta informar o campo: Data Transmissão Planejada!");
-            document.formx.meta3_dtplanej.focus();
+            document.formx.facdataplanmeta3.focus();
             return false;
         }
 
-        if ($('#considerinspetor').val() == '' && $('#grpacesso').val()=='INSPETORES'){
+        if ($('#considerinspetor').val() == '' && ($('#meta1cobrarconsideracaogestorsn').val() == 'S' || $('#meta2cobrarconsideracaogestorsn').val() == 'S') && $('#grpacesso').val()=='INSPETORES'){
             alert("Falta informar as suas considerações do Item selecionado!");
-            $('.accordion-button').trigger('click');
             $('#considerinspetor').focus();
             return false;
         } 
-       
-        if ($('#considerargestor').val() == '' && $('#somenteavaliarmeta3').val() == 'N' && $('#grpacesso').val()=='GESTORES'){
+        
+        if ($('#considerargestor').val() == '' && ($('#meta1cobrarconsideracaogestorsn').val() == 'S' || $('#meta2cobrarconsideracaogestorsn').val() == 'S') && $('#grpacesso').val()=='GESTORES'){
             alert("Falta informar as suas considerações do Item selecionado!");
-            $('.accordion-button').trigger('click');
             $('#considerargestor').focus();
             return false;
         }   
-                 
+        // preparar campos para o submit
+        //meta1
+        $('#meta1atorgr').val(0)
+        $('#meta1atcccp').val(0)
+        $('#meta1aetecn').val(0)
+        $('#meta1aeprob').val(0)
+        $('#meta1aevalo').val(0)  
+        $('#meta1aecsqc').val(0)
+        $('#meta1aenorm').val(0)
+        $('#meta1aedocm').val(0)
+        $('#meta1aeclas').val(0)
+        $('#meta1orient').val(0)      
+        $( ".btnmeta1" ).each(function( index ) {
+            var id = $(this).attr("id")
+            var tit = $(this).attr("title")
+            if (id == 'ortogram' && tit == 1) {$('#meta1atorgr').val(1)}
+            if (id == 'clcocopr' && tit == 1) {$('#meta1atcccp').val(1)}
+            if (id == 'tecn' && tit == 1) {$('#meta1aetecn').val(1)}
+            if (id == 'probl' && tit == 1) {$('#meta1aeprob').val(1)}
+            if (id == 'valor' && tit == 1) {$('#meta1aevalo').val(1)}
+            if (id == 'conseq' && tit == 1) {$('#meta1aecsqc').val(1)}
+            if (id == 'normat' && tit == 1) {$('#meta1aenorm').val(1)}
+            if (id == 'docum' && tit == 1) {$('#meta1aedocm').val(1)}
+            if (id == 'classif' && tit == 1) {$('#meta1aeclas').val(1)}
+            if (id == 'orient' && tit == 1) {$('#meta1orient').val(1)}
+        })  
+        //Meta2                                                       
+        $('#meta2arfalt').val(0)
+        $('#meta2artroc').val(0)
+        $('#meta2arnomc').val(0)
+        $('#meta2arorde').val(0)
+        $('#meta2arpraz').val(0)
+
+        $( ".btnmeta2" ).each(function( index ) {
+            var id = $(this).attr("id")
+            var tit = $(this).attr("title")
+            if (id == 'falta' && tit == 1) {$('#meta2arfalt').val(1)}
+            if (id == 'troca' && tit == 1) {$('#meta2artroc').val(1)}
+            if (id == 'nomen' && tit == 1) {$('#meta2arnomc').val(1)}
+            if (id == 'ordem' && tit == 1) {$('#meta2arorde').val(1)}
+            if (id == 'prazo' && tit == 1) {$('#meta2arpraz').val(1)}
+        })         
         document.formx.submit();  
-   }
- // ================================================================  
+    }
 
-    //verificar seleções meta1 e ajustar a pontuação obtida
-    $('.meta1').click(function(){     
-        let ptometa1 = $('#meta1_pto_obtida').val()
-        let ptobtida = $('#ptobtida').val()
-        let meta1desconto = $('#meta1desconto').val()  
-        //alert('meta1desconto: '+meta1desconto)
-     //alert(' meta1desconto:'+meta1desconto+' ptometa1:'+ptometa1+'  ptobtida:'+ptobtida);
-   
-        let contarselecao=0
-        $( ".meta1" ).each(function( index ) {
-            auxnome = $(this).attr("id")
-            if($(this).is(':checked')) {
-                contarselecao++
-                $('.'+auxnome).val(1)
-            }else{
-                $('.'+auxnome).val(0)
-            }
-            //alert($('.'+auxnome).val())
-        })
-        //alert('contarselecao: ' + contarselecao)
-             
-        //atualizar Pontuação Obtida por avaliador/Grupo_Item
-        let novaptobtd = ptobtida;
-        //alert('novaptobtd: '+novaptobtd)
-        if(contarselecao > 0){
-            novaptobtd = eval(ptobtida - (contarselecao*meta1desconto)).toFixed(2)
-            $('#meta1_pto_obtida').val(novaptobtd)
+    // Ajustar card selecionado meta1
+    $('.btnmeta1').click(function(){   
+        if ($('#habilitarmeta1meta2SN').val() == 'N' || $('#reanalisesn').val() == 'N'){return false}
+        if ($('#grpacesso').val() == 'INSPETORES'){return false}
+        tit = $(this).attr("title")
+        //alert(tit)
+        if (tit == 1) {
+            $(this).attr("title","0");
+            $(this).attr("class","btnmeta1 btn btn-outline-primary");
+            $(this).css('box-shadow', '5px 5px 3px #fff')
         }else{
-            $('#meta1_pto_obtida').val(novaptobtd) 
+            $(this).attr("title","1");
+            $(this).attr("class","btnmeta1 btn btn-danger");
+            $(this).css('box-shadow', '5px 5px 3px #888')
         }
-    //alert('meta1_pto_obtida (novaptobtd): '+novaptobtd)
-
-    // ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
-        let matraval=$("#matr_avaliador_pto").val() 
-        let dbptobtidameta1 = $('#db_ptobtidameta1_' + matraval).val();
-        let dbResultadometa1 = $('#db_Resultadometa1_' + matraval).val();
-        if(contarselecao > 0){
-            let pontosobtidosatual = $('#meta1_qgpto_' + matraval).html();
-            let pontuacaoinicial= $('#meta1_qgptop_' + matraval).html(); 
-            let desconto = eval(contarselecao*meta1desconto).toFixed(2) 
-            let novopontoobtido = eval(pontosobtidosatual - desconto).toFixed(2)
-            $('#meta1_qgpto_' + matraval).html(novopontoobtido);
-            $("#ffimeta1pontuacaoobtida_" + matraval).val(novopontoobtido)
-            let percmeta1 = parseFloat((novopontoobtido / pontuacaoinicial)*100).toFixed(2);
-            $('#meta1_percqggitens_' + matraval).html(percmeta1 + ' %');
-            $("#ffimeta1resultado_" + matraval).val(percmeta1)
-        }else{
-            $('#meta1_qgpto_' + matraval).html(dbptobtidameta1);
-            $("#ffimeta1pontuacaoobtida_" + matraval).val(dbptobtidameta1)
-            $('#meta1_percqggitens_' + matraval).html(dbResultadometa1 + ' %');
-            $("#ffimeta1resultado_" + matraval).val(dbResultadometa1)
-        }
-        // FIM  ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
-        // ajustar 04.Avaliação
-            let facqtdgeral = '';
-
-            if(contarselecao > 0){
-                facqtdgeral = $('#facqtdgeral').val();
-                meta1_tela = $('#meta1_tela').val();
-                PtoMeta1ajustar= $('#PtoMeta1ajustar').val()
-                let desconto = eval(contarselecao*meta1desconto).toFixed(2)
-                let ptorevismeta1_tela = eval(PtoMeta1ajustar - (contarselecao*meta1desconto)).toFixed(2)
-                let percmeta1 = parseFloat((ptorevismeta1_tela/facqtdgeral)*100).toFixed(2);
-                $('#meta1').html(percmeta1 + ' %');
-                $('#ptorevismeta1').html(ptorevismeta1_tela);
-                $('#meta1_tela').val(ptorevismeta1_tela);
-                $('#facpontosrevisaometa1').val(ptorevismeta1_tela);
-                $('#db_ptorevismeta1').val(ptorevismeta1_tela)
-                $('#facpercrevisaometa1').val(percmeta1);
-            }else{
-                $('#meta1').html($('#PercMeta1ajustar').val() + ' %');
-                $('#meta1_tela').val($('#PtoMeta1ajustar').val());
-                $('#ptorevismeta1').html($('#PtoMeta1ajustar').val());
-                $('#facpontosrevisaometa1').val($('#PtoMeta1ajustar').val());
-                $('#facpercrevisaometa1').val($('#PercMeta1ajustar').val());               
-            }
-        // fim ajustar 04.Avaliação
+        // chamar função para ajustes de campos e tela
+        Meta1ajustarcampos()
     })
-
-    //verificar seleções meta2 e ajustar a pontuação obtida
-    $('.meta2').click(function(){     
-        let ptometa2 = $('#meta2_pto_obtida').val()
-        let ptobtida = $('#ptobtida').val()
-        let meta2desconto = $('#meta2desconto').val()         
-     //alert(' meta2desconto:'+meta2desconto+' ptometa2:'+ptometa2+'  ptobtida:'+ptobtida);
-    
-        let contarselecao=0
-        $( ".meta2" ).each(function( index ) {
-            auxnome = $(this).attr("id")
-            if($(this).is(':checked')) {
-                contarselecao++
-                $('.'+auxnome).val(1)
-            }else{
-                $('.'+auxnome).val(0)
+    // ajustes de dados para compor a meta1 da avaliacao e do inspetor no individual
+    function Meta1ajustarcampos(){
+        let meta1contselecao=0
+        $( ".btnmeta1" ).each(function( index ) {
+            tit = $(this).attr("title")
+            if (tit == 1) {
+                meta1contselecao++
             }
         })
-        //atualizar Pontuação Obtida por avaliador/Grupo_Item
-        let novaptobtd = ptobtida;
-        if(contarselecao > 0){
-            let novaptobtd = eval(ptobtida - (contarselecao*meta2desconto)).toFixed(2)
-            $('#meta2_pto_obtida').val(novaptobtd)
-        }else{
-            $('#meta2_pto_obtida').val(novaptobtd) 
-        }
-        //alert('novaptobtd: '+novaptobtd)
-        // ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
-        let matraval=$("#matr_avaliador_pto").val() 
-        let dbptobtidameta2 = $('#db_ptobtidameta2_' + matraval).val();
-        let dbResultadometa2 = $('#db_Resultadometa2_' + matraval).val();
-        if(contarselecao > 0){
-            let pontosobtidosatual = $('#meta2_qgpto_' + matraval).html();
-            let pontuacaoinicial= $('#meta2_qgptop_' + matraval).html(); 
-            let desconto = eval(contarselecao*meta2desconto).toFixed(2) 
-            let novopontoobtido = eval(pontosobtidosatual - desconto).toFixed(2)
-            $('#meta2_qgpto_' + matraval).html(novopontoobtido);
-            $("#ffimeta2pontuacaoobtida_" + matraval).val(novopontoobtido)   
-            let percmeta2 = parseFloat((novopontoobtido / pontuacaoinicial)*100).toFixed(2);
-            $('#meta2_percqggitens_' + matraval).html(percmeta2 + ' %');
-            $("#ffimeta2resultado_" + matraval).val(percmeta2)
-        }else{
-                $('#meta2_qgpto_' + matraval).html(dbptobtidameta2);
-                $("#ffimeta2pontuacaoobtida_" + matraval).val(dbptobtidameta2)
-                $('#meta2_percqggitens_' + matraval).html(dbResultadometa2 + ' %');
-                $("#ffimeta2resultado_" + matraval).val(dbResultadometa2)                
-            }        
-        // FIM  ajustar 09.Individualização do resultado das metas por inspetor (a ser preenchido pela equipe de inspetores):
-        // ajustar 04.Avaliação
-        let facqtdgeral ='';
+        $('#meta1cobrarconsideracaogestorsn').val('N')
+        let facqtdavaliacao = $('#facqtdavaliacao').val()
+        let ffiqtditem = $('#ffiqtditem').val()
+        let dbfacpontosrevisaometa1 = $('#dbfacpontosrevisaometa1').val()
+        let dbvlrperdasgrpitmmeta1 = $('#dbvlrperdasgrpitmmeta1').val()
+        let facpesometa1 = $('#facpesometa1').val()
+        let ffimeta1peso = $('#ffimeta1peso').val()
+        //alert('ffimeta1peso: '+ffimeta1peso)
+        let dbvlrperdasgrpitmmeta1ind = $('#dbvlrperdasgrpitmmeta1ind').val()
+        let dbffimeta1pontuacaobtida = $('#dbffimeta1pontuacaobtida').val()
+        let vlrperdasmeta1aval = (eval(meta1contselecao) * eval(facpesometa1)).toFixed(2)
+        let vlrperdasmeta1ind = (eval(meta1contselecao) * eval(ffimeta1peso)).toFixed(2)
+        let pontuacao = eval(ffimeta1peso*10).toFixed(2)
 
-        if(contarselecao > 0){
-            facqtdgeral = $('#facqtdgeral').val(); 
-            meta2_tela = $('#meta2_tela').val();
-            PtoMeta2ajustar= $('#PtoMeta2ajustar').val()
-            let desconto = eval(contarselecao*meta2desconto).toFixed(2)
-            let ptorevismeta2_tela = eval(PtoMeta2ajustar - (contarselecao*meta2desconto)).toFixed(2)
-            let percmeta2 = parseFloat((ptorevismeta2_tela/facqtdgeral)*100).toFixed(2);
-            $('#meta2').html(percmeta2 + ' %');
-            $('#ptorevismeta2').html(ptorevismeta2_tela);
-            $('#meta2_tela').val(ptorevismeta2_tela);
-            $('#facpontosrevisaometa2').val(ptorevismeta2_tela);
-            $('#db_ptorevismeta2').val(ptorevismeta2_tela)
-            $('#facpercrevisaometa2').val(percmeta2);
+        if (meta1contselecao > 0){
+            // variáveis de críticas do form
+            $('#meta1cobrarconsideracaogestorsn').val('S')
+            //=============================================
+            // Mostra o campo pontuação atualizado em tela e para salvar em db
+            pontuacao = (eval(pontuacao) - eval(meta1contselecao*ffimeta1peso)).toFixed(2)
+            if(eval(pontuacao) <= 0) {pontuacao = '0.00'}
+            $('#facameta1pontostela').html('<strong>'+pontuacao+'</strong>')
+            $('#facameta1pontos').val(pontuacao)
+            //===============================================================================
+            // Mostra o resultado (Meta1) ref. a avaliação em tela e para salvar em db
+            let facpontosrevisaometa1 = (eval(dbfacpontosrevisaometa1) + eval(dbvlrperdasgrpitmmeta1) - eval(vlrperdasmeta1aval)).toFixed(2)
+            $('#facpontosrevisaometa1').val(facpontosrevisaometa1)
+            let meta1resultadoaval = (eval(facpontosrevisaometa1) / eval(facqtdavaliacao)*100).toFixed(2)
+            $('#facresultadometa1').val(meta1resultadoaval)
+            $('#meta1resultadoaval').html('<strong>'+meta1resultadoaval+'%</strong>')
+            //===============================================================================
+            // Mostra o resultado (Meta1_Individual) ref. a avaliação em tela e para salvar em db
+            let ffimeta1pontuacaobtida = (eval(dbffimeta1pontuacaobtida) + eval(dbvlrperdasgrpitmmeta1ind) - eval(vlrperdasmeta1ind)).toFixed(2)
+            $('#ffimeta1pontuacaobtida').val(ffimeta1pontuacaobtida)
+            $('#ffimeta1pontuacaobtidatela').html('<strong>'+ffimeta1pontuacaobtida+'</strong>')
+            let resultadoindmeta1 = eval((ffimeta1pontuacaobtida / ffiqtditem)*100).toFixed(2)
+            $('#resultadoindmeta1').html('<strong>'+resultadoindmeta1+'%</strong>')
+            $('#ffimeta1resultado').val(resultadoindmeta1)
         }else{
-            $('#meta2').html($('#PercMeta2ajustar').val() + ' %');
-            $('#meta2_tela').val($('#PtoMeta2ajustar').val());
-            $('#ptorevismeta2').html($('#PtoMeta2ajustar').val());
-            $('#facpontosrevisaometa2').val($('#PtoMeta2ajustar').val());
-            $('#facpercrevisaometa2').val($('#PercMeta2ajustar').val());              
+            // Mostra o campo pontuação atualizado em tela e para salvar em db
+            if(eval(pontuacao) <= 0) {pontuacao = '0.00'}
+            $('#facameta1pontostela').html('<strong>'+pontuacao+'</strong>')
+            $('#facameta1pontos').val(pontuacao)
+            //===============================================================================
+            // Mostra o resultado (Meta1) ref. a avaliação em tela e para salvar em db
+            let facpontosrevisaometa1 = (eval(dbfacpontosrevisaometa1) + eval(dbvlrperdasgrpitmmeta1)).toFixed(2)
+            $('#facpontosrevisaometa1').val(facpontosrevisaometa1)
+            let meta1resultadoaval = (eval(facpontosrevisaometa1) / eval(facqtdavaliacao)*100).toFixed(2)
+            $('#facresultadometa1').val(meta1resultadoaval)
+            $('#meta1resultadoaval').html('<strong>'+meta1resultadoaval+'%</strong>')
+            //===============================================================================
+            // Mostra o resultado (Meta1_Individual) ref. a avaliação em tela e para salvar em db
+            let ffimeta1pontuacaobtida = (eval(dbffimeta1pontuacaobtida) + eval(dbvlrperdasgrpitmmeta1ind) - eval(vlrperdasmeta1ind)).toFixed(2)
+            $('#ffimeta1pontuacaobtida').val(ffimeta1pontuacaobtida)
+            $('#ffimeta1pontuacaobtidatela').html('<strong>'+ffimeta1pontuacaobtida+'</strong>')
+            let resultadoindmeta1 = eval((ffimeta1pontuacaobtida / ffiqtditem)*100).toFixed(2)
+            $('#resultadoindmeta1').html('<strong>'+resultadoindmeta1+'%</strong>')
+            $('#ffimeta1resultado').val(resultadoindmeta1)
+        }                  
+    }
+
+    // Ajustar card selecionado meta2
+    $('.btnmeta2').click(function(){   
+        if ($('#habilitarmeta1meta2SN').val() == 'N' || $('#reanalisesn').val() == 'N'){return false}
+        if ($('#grpacesso').val() == 'INSPETORES'){return false}
+        tit = $(this).attr("title")
+        if (tit == 1) {
+            $(this).attr("title","0");
+            $(this).attr("class","btnmeta2 btn btn-outline-primary");
+            $(this).css('box-shadow', '5px 5px 3px #fff')
+        }else{
+            $(this).attr("title","1");
+            $(this).attr("class","btnmeta2 btn btn-danger");
+            $(this).css('box-shadow', '5px 5px 3px #888')
         }
-    // fim ajustar 04.Avaliação
-})    
-//*****************************************************************
+        // chamar função para ajustes de campos e tela
+        Meta2ajustarcampos()
+    })
+    
+    // ajustes de dados para compor a meta2 da avaliacao e do inspetor no individual
+    function Meta2ajustarcampos(){
+        let meta2contselecao=0
+        $( ".btnmeta2" ).each(function( index ) {
+            tit = $(this).attr("title")
+            if (tit == 1) {
+                meta2contselecao++
+            }
+        })
+        $('#meta2cobrarconsideracaogestorsn').val('N')
+        let facqtdavaliacao = $('#facqtdavaliacao').val()
+        let ffiqtditem = $('#ffiqtditem').val()
+        let dbfacpontosrevisaometa2 = $('#dbfacpontosrevisaometa2').val()
+        let dbvlrperdasgrpitmmeta2 = $('#dbvlrperdasgrpitmmeta2').val()
+        let facpesometa2 = $('#facpesometa2').val()
+        //alert('facpesometa2: '+facpesometa2)
+        let ffimeta2peso = $('#ffimeta2peso').val()
+        //alert('ffimeta2peso: '+ffimeta2peso)
+        let dbvlrperdasgrpitmmeta2ind = $('#dbvlrperdasgrpitmmeta2ind').val()
+        //alert('dbvlrperdasgrpitmmeta2ind: '+dbvlrperdasgrpitmmeta2ind)
+        let dbffimeta2pontuacaobtida = $('#dbffimeta2pontuacaobtida').val()
+        let vlrperdasmeta2aval  = (eval(meta2contselecao) * eval(facpesometa2)).toFixed(2)
+        let vlrperdasmeta2ind = (eval(meta2contselecao) * eval(ffimeta2peso)).toFixed(2)
+        //alert('vlrperdasmeta2ind: '+vlrperdasmeta2ind)
+        let pontuacao = eval(ffimeta2peso*5).toFixed(2)
+
+        if (meta2contselecao > 0){
+            // variáveis de críticas do form
+            $('#meta2cobrarconsideracaogestorsn').val('S')
+            //=============================================
+            // Mostra o campo pontuação atualizado em tela e para salvar em db
+            pontuacao = (eval(pontuacao) - eval(meta2contselecao*ffimeta2peso)).toFixed(2)
+            if(eval(pontuacao) <= 0) {pontuacao = '0.00'}
+            $('#facameta2pontostela').html('<strong>'+pontuacao+'</strong>')
+            $('#facameta2pontos').val(pontuacao)
+            //===============================================================================
+            // Mostra o resultado (Meta2) ref. a avaliação em tela e para salvar em db
+            let facpontosrevisaometa2 = (eval(dbfacpontosrevisaometa2) + eval(dbvlrperdasgrpitmmeta2) - eval(vlrperdasmeta2aval )).toFixed(2)
+            $('#facpontosrevisaometa2').val(facpontosrevisaometa2)
+            let meta2resultadoaval = (eval(facpontosrevisaometa2) / eval(facqtdavaliacao)*100).toFixed(2)
+            $('#facresultadometa2').val(meta2resultadoaval)
+            $('#meta2resultadoaval').html('<strong>'+meta2resultadoaval+'%</strong>')
+            //===============================================================================
+            // Mostra o resultado (Meta1_Individual) ref. a avaliação em tela e para salvar em db
+            let ffimeta2pontuacaobtida = (eval(dbffimeta2pontuacaobtida) + eval((dbvlrperdasgrpitmmeta2ind) ) - eval(vlrperdasmeta2ind)).toFixed(2)
+            $('#ffimeta2pontuacaobtida').val(ffimeta2pontuacaobtida)
+            $('#ffimeta2pontuacaobtidatela').html('<strong>'+ffimeta2pontuacaobtida+'</strong>')
+            let resultadoindmeta2 = eval((ffimeta2pontuacaobtida / ffiqtditem)*100).toFixed(2)
+            $('#resultadoindmeta2').html('<strong>'+resultadoindmeta2+'%</strong>')
+            $('#ffimeta2resultado').val(resultadoindmeta2)
+        }else{
+            // Mostra o campo pontuação atualizado em tela e para salvar em db
+            if(eval(pontuacao) <= 0) {pontuacao = '0.00'}
+            $('#facameta2pontostela').html('<strong>'+pontuacao+'</strong>')
+            $('#facameta2pontos').val(pontuacao)
+            //===============================================================================
+            // Mostra o resultado (Meta2) ref. a avaliação em tela e para salvar em db
+            let facpontosrevisaometa2 = (eval(dbfacpontosrevisaometa2) + eval(dbvlrperdasgrpitmmeta2)).toFixed(2)
+            $('#facpontosrevisaometa2').val(facpontosrevisaometa2)
+            let meta2resultadoaval = (eval(facpontosrevisaometa2) / eval(facqtdavaliacao)*100).toFixed(2)
+            $('#facresultadometa2').val(meta2resultadoaval)
+            $('#meta2resultadoaval').html('<strong>'+meta2resultadoaval+'%</strong>')
+            //===============================================================================
+            // Mostra o resultado (Meta1_Individual) ref. a avaliação em tela e para salvar em db
+            let ffimeta2pontuacaobtida = (eval(dbffimeta2pontuacaobtida) + eval(dbvlrperdasgrpitmmeta2ind) - eval(vlrperdasmeta2ind)).toFixed(2)
+            $('#ffimeta2pontuacaobtida').val(ffimeta2pontuacaobtida)
+            $('#ffimeta2pontuacaobtidatela').html('<strong>'+ffimeta2pontuacaobtida+'</strong>')
+            let resultadoindmeta2 = eval((ffimeta2pontuacaobtida / ffiqtditem)*100).toFixed(2)
+            $('#resultadoindmeta2').html('<strong>'+resultadoindmeta2+'%</strong>')
+            $('#ffimeta2resultado').val(resultadoindmeta2)
+        }        
+    }
+ //===========  
+    const second = 1000;
+    const minute = second * 60;
+    const hour = minute * 60;
+    const day = hour * 24;
+
+    function meta3(a,b){
+        //alert(a + '' + b)
+        if (a.length == 10){
+        let date_realizado = new Date(a);
+        let date_planejado = new Date(b);
+        var percent=100;
+        //alert(date_ini + '   ' + date_end);
+        let diff = date_planejado.getTime() - date_realizado.getTime();
+        diff = Math.floor(diff / day);
+        //alert(diff);
+        if(diff < 0){
+            //diff = 0;
+            //document.formx.facdataplanmeta3.value = a;
+        }
+        
+        if(diff < 0){
+            // alert('linha 168')
+            if(diff == -1) {percent = 60}  
+            if(diff == -2) {percent = 40}
+            if(diff <= -3) {percent = 0;}
+        }else{
+            if(diff > 0) {percent = 110;}
+        }
+        //alert(percent)
+        $('#meta3dif').html('<strong>'+diff+'</strong>')
+        $('#meta3resultado').html('<strong>'+percent+'</strong>')
+        $('#facdataplanmeta3').val(b)
+        $('#facdifdiameta3').val(diff)
+        $('#facresultadometa3').val(percent)
+        }
+    }        
+    //===========
+    function numericos(){
+        var tecla = window.event.keyCode;
+        if ((tecla != 46) && ((tecla < 48) || (tecla > 57))){
+            event.returnValue = false; 
+        }
+    }
+    //================ 
+    function Mascara_Data(data){
+        switch (data.value.length)
+        {
+            case 2:
+            if (data.value < 1 || data.value > 31) {
+                //alert('Valor para o dia inválido!');
+                data.value = '';
+                event.returnValue = false;
+                break;
+                } else {
+                data.value += "/";
+                    break;
+                }
+            case 5:
+            if (data.value.substring(3,5) < 1 || data.value.substring(3,5) > 12) {
+            // alert('Valor para o Mês inválido!');
+            data.value = '';
+            event.returnValue = false;
+            break;
+            } else {
+            data.value += "/";
+                break;
+            }
+        }
+    }   
 </script>
      
 </html>

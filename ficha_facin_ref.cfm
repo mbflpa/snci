@@ -15,6 +15,8 @@
 	where Usu_login = '#cgi.REMOTE_USER#'
 </cfquery>
 <cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
+<cfset faltaconcluirfacininspetorSN = 'N'>
+<cfset facininspetorconcluidaSN = 'N'>
 <cfoutput>
 	<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) neq 10>
 		<cfset msg='Nº de Avaliação Inválido!'>
@@ -50,11 +52,11 @@
 			<cfif grpacesso eq 'INSPETORES'>
 				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
 			</cfif>
-			order by RIP_NumGrupo, RIP_NumItem
+			order by RIP_NumGrupo,RIP_NumItem
 		</cfquery>	
 
 		<cfquery datasource="#dsn_inspecao#" name="rsalter">
-			SELECT RIP_Unidade, RIP_NumGrupo,RIP_NumItem,Fun_Nome
+			SELECT RIP_Unidade,RIP_NumGrupo,RIP_NumItem,Fun_Nome
 			FROM Resultado_Inspecao 
 			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
 			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
@@ -63,7 +65,7 @@
 			<cfif grpacesso eq 'INSPETORES'>
 				AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
 			</cfif>
-			order by RIP_NumGrupo, RIP_NumItem
+			order by RIP_NumGrupo,RIP_NumItem
 		</cfquery>
 		<cfif rsIncluir.recordcount lte 0 and rsalter.recordcount lte 0>
 			<cfquery datasource="#dsn_inspecao#" name="rsIncluir">
@@ -76,12 +78,12 @@
 				<cfif grpacesso eq 'INSPETORES'>
 					AND RIP_MatricAvaliador = '#qAcesso.Usu_Matricula#'
 				</cfif>
-				order by RIP_NumGrupo, RIP_NumItem
+				order by RIP_NumGrupo,RIP_NumItem
 			</cfquery>	
 			
 		</cfif>
 		<cfquery datasource="#dsn_inspecao#" name="rsBase">
-			SELECT RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_MatricAvaliador, RIP_Recomendacao_Inspetor, RIP_Data_Avaliador, RIP_Matricula_Reanalise, RIP_Correcao_Revisor, RIP_DtUltAtu_Revisor, RIP_UserName_Revisor,Fun_Nome,Usu_Apelido,INP_DTConcluirAvaliacao,INP_DTConcluirRevisao
+			SELECT RIP_NumInspecao,RIP_NumGrupo,RIP_NumItem,RIP_Resposta,RIP_MatricAvaliador,RIP_Recomendacao_Inspetor,RIP_Data_Avaliador,RIP_Matricula_Reanalise,RIP_Correcao_Revisor,RIP_DtUltAtu_Revisor,RIP_UserName_Revisor,Fun_Nome,Usu_Apelido,INP_DTConcluirAvaliacao,INP_DTConcluirRevisao
 			FROM Resultado_Inspecao 
 			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
 			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
@@ -93,7 +95,7 @@
 		</cfquery>
 		<cfif rsBase.recordcount lte 0>
 			<cfquery datasource="#dsn_inspecao#" name="rsBase">
-				SELECT top 1 RIP_NumInspecao, RIP_NumGrupo, RIP_NumItem, RIP_Resposta, RIP_MatricAvaliador, RIP_Recomendacao_Inspetor, RIP_Data_Avaliador, RIP_Matricula_Reanalise, RIP_Correcao_Revisor, RIP_DtUltAtu_Revisor, RIP_UserName_Revisor,Fun_Nome,Usu_Apelido,INP_DTConcluirAvaliacao,INP_DTConcluirRevisao
+				SELECT top 1 RIP_NumInspecao,RIP_NumGrupo,RIP_NumItem,RIP_Resposta,RIP_MatricAvaliador,RIP_Recomendacao_Inspetor,RIP_Data_Avaliador,RIP_Matricula_Reanalise,RIP_Correcao_Revisor,RIP_DtUltAtu_Revisor,RIP_UserName_Revisor,Fun_Nome,Usu_Apelido,INP_DTConcluirAvaliacao,INP_DTConcluirRevisao
 				FROM Resultado_Inspecao 
 				INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
 				INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
@@ -106,24 +108,43 @@
 		</cfif>
 		<cfif rsBase.recordcount eq 1><cfset somenteavaliarmeta3='S'></cfif>
 		<cfquery datasource="#dsn_inspecao#" name="rsFacin">
-			select FAC_DtConcluirFacin,Usu_Apelido,FAC_Matricula
-			from UN_Ficha_Facin 
-			INNER JOIN Usuarios ON FAC_Matricula = Usu_Matricula
-			WHERE FAC_Avaliacao = convert(varchar,'#url.numinsp#') 
+			SELECT top 1 FAC_MatriculaGestor,Usu_Apelido,FAC_DtConcluirFacin_Gestor,FFI_MatriculaInspetor,Fun_Nome,FFI_DtConcluirFacin_Inspetor
+			FROM ((UN_Ficha_Facin INNER JOIN Usuarios ON FAC_MatriculaGestor = Usu_Matricula) INNER JOIN UN_Ficha_Facin_Individual ON (FAC_MatriculaGestor = FFI_MatriculaGestor) AND (FAC_Avaliacao = FFI_Avaliacao)) 
+			INNER JOIN Funcionarios ON FFI_MatriculaInspetor = Fun_Matric
+			WHERE FAC_Avaliacao= convert(varchar,'#url.numinsp#')
+			<cfif grpacesso eq 'INSPETORES'>
+					AND FFI_MatriculaInspetor = '#qAcesso.Usu_Matricula#'
+			</cfif>
 		</cfquery>
-		
-		<!---
-			<cfquery datasource="#dsn_inspecao#" name="rsFacin">
-			select FAC_DtConcluirFacin,Usu_Apelido
-			from UN_Ficha_Facin 
-			INNER JOIN Usuarios ON FAC_Matricula = Usu_Matricula
-			WHERE FAC_Avaliacao = convert(varchar,'#url.numinsp#') and
-			FAC_Matricula = '#qAcesso.Usu_Matricula#'
-		</cfquery>
-		--->
+		<cfif grpacesso eq 'INSPETORES'>		
+			<cfquery datasource="#dsn_inspecao#" name="rscrinsp">
+				SELECT FACA_ConsideracaoInspetor,FACA_Avaliacao,FACA_MatriculaInspetor,FFI_DtConcluirFacin_Inspetor,FACA_ConsideracaoInspetor,FACA_Meta1_AT_OrtoGram,FACA_Meta1_AT_CCCP,FACA_Meta1_AE_Tecn,FACA_Meta1_AE_Prob,FACA_Meta1_AE_Valor,FACA_Meta1_AE_Cosq,FACA_Meta1_AE_Norma,FACA_Meta1_AE_Docu,FACA_Meta1_AE_Class,FACA_Meta1_AE_Orient,FACA_Meta2_AR_Falta,FACA_Meta2_AR_Troca,FACA_Meta2_AR_Nomen,FACA_Meta2_AR_Ordem,FACA_Meta2_AR_Prazo
+				FROM UN_Ficha_Facin_Avaliador 
+				INNER JOIN UN_Ficha_Facin_Individual ON (FACA_MatriculaInspetor = FFI_MatriculaInspetor) AND (FACA_MatriculaGestor = FFI_MatriculaGestor) AND (FACA_Avaliacao = FFI_Avaliacao)
+				WHERE FACA_Avaliacao = convert(varchar,'#url.numinsp#')  
+				<cfif grpacesso eq 'INSPETORES'>
+						AND FFI_MatriculaInspetor = '#qAcesso.Usu_Matricula#'
+				</cfif>
+			</cfquery>
+			<cfloop query="rscrinsp">
+				<cfset somarmeta1 = rscrinsp.FACA_Meta1_AT_OrtoGram + rscrinsp.FACA_Meta1_AT_CCCP + rscrinsp.FACA_Meta1_AE_Tecn + rscrinsp.FACA_Meta1_AE_Prob + rscrinsp.FACA_Meta1_AE_Valor + rscrinsp.FACA_Meta1_AE_Cosq + rscrinsp.FACA_Meta1_AE_Norma + rscrinsp.FACA_Meta1_AE_Docu + rscrinsp.FACA_Meta1_AE_Class + rscrinsp.FACA_Meta1_AE_Orient>
+				<cfset somarmeta2 = rscrinsp.FACA_Meta2_AR_Falta + rscrinsp.FACA_Meta2_AR_Troca + rscrinsp.FACA_Meta2_AR_Nomen + rscrinsp.FACA_Meta2_AR_Ordem + rscrinsp.FACA_Meta2_AR_Prazo>       
+				<cfif (somarmeta1 gt 0 or somarmeta2 gt 0) and FACA_ConsideracaoInspetor eq ''>
+					<cfset faltaconcluirfacininspetorSN = 'S'>
+				</cfif>
+				<cfif rscrinsp.FFI_DtConcluirFacin_Inspetor neq ''>
+					<cfset facininspetorconcluidaSN = 'S'>
+				</cfif>
+			</cfloop>			
+		</cfif>
 	</cfif>
-
-
+	<!---	
+	<br>faltaconcluirfacininspetorSN: #faltaconcluirfacininspetorSN#
+	<br>facininspetorconcluidaSN: #facininspetorconcluidaSN#
+	<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
+	<br>concfacingestor: #trim(dateformat(rsFacin.FAC_DtConcluirFacin_Gestor,"dd-mm-yyyy"))#
+	</cfif>
+	--->	
 	<!--- =================== --->
 </cfoutput>
 
@@ -133,33 +154,45 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">
 <link href="css.css" rel="stylesheet" type="text/css">
+<style>
+	.table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+    td {
+		font-size: 11px;
+	}
 
+	th {
+		font-size: 12px;
+	}
+</style>
 </head>
 <body onLoad="aviso();form1.dtinic.focus()"><br>
 <cfif grpacesso eq 'INSPETORES'>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<table width="95%" border="0">
 	      <cfinclude template="cabecalho.cfm"> 
 		</table>
-		<table width="100%" height="30%" border="0" align="center" cellpadding="0" cellspacing="0">
+		<table width="85%" border="0" align="left">
 	<tr valign="top">
 	<td width="25%">
 	 <!--- <cfinclude template="menu_sins.cfm"> --->
 	</td>
-	<td align="center" valign="top">
+	<td>
 	<br><br><br>
 </cfif> 
 <cfif grpacesso neq 'INSPETORES'>
 	<cfif isDefined("url.acao") and url.acao eq 'buscar'>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<table width="95%" border="0">
 	      <cfinclude template="cabecalho.cfm"> 
 		</table>
-		<table width="100%" height="30%" border="0" align="center" cellpadding="0" cellspacing="0">
+		<table width="95%" border="0" align="left">
 	<tr valign="top">
 	<td width="25%">
 	 <cfinclude template="menu_sins.cfm">
 	</td>
 	<td align="center" valign="top">
-	<br><br><br>
+	<br>
 	</cfif> 
 </cfif> 
 <div class="row" align="center">
@@ -168,15 +201,14 @@
 	</div>
 </div>
 <br>
-
 <form name="form1" id="form1" method="get" onSubmit="return valida_form()" action="ficha_facin_ref.cfm" target="_self">
-  <table width="800" align="center">
-	<tr align="center">
-		<td>
+  <table align="center">
+	<tr>
+		<td colspan="3">
 			<span class="exibir"><strong>Nº Avaliação:</strong></span>
 		</td>
 	</tr>
-    <tr align="center">
+    <tr>
       <td>
 		<input id="numinsp" name="numinsp" type="text" vazio="false" size="14" maxlength="10" class="form-control" onKeyPress="numericos()" value="<cfoutput>#numinsp#</cfoutput>" onChange="if (this != '') {document.form1.acao.value = 'buscar'; document.form1.submit()};">
 	  </td>
@@ -202,7 +234,7 @@
 			<td colspan="3" class="exibir" align="center"><strong>Grupo/Item</strong></td>
 		</tr>
 		<tr>
-			<td colspan="3" class="exibir"></td>
+			<td colspan="3" class="exibir"><hr></td>
 		</tr>
 		<tr>
 			<td colspan="3" class="exibir"></td>
@@ -268,9 +300,9 @@
 	<td></td>
 </tr>
 		<tr>
-			<td><input name="inc" id="inc" type="button" class="btn btn-primary" value="Incluir (FACIN)" onClick="document.form1.acao.value = 'inc';document.formx.grpitem.value = document.form1.grpitem.value;valida_form();" <cfoutput>#btninc#</cfoutput>></td>
+			<td><input name="inc" id="inc" type="button" class="btn btn-primary" value="Incluir Grupo/Item" onClick="document.form1.acao.value = 'inc';document.formx.grpitem.value = document.form1.grpitem.value;valida_form();" <cfoutput>#btninc#</cfoutput>></td>
 			<td></td>
-			<td><input name="alt" id="alt" type="button" class="btn btn-warning" value="Alterar (FACIN)" onClick="document.form1.acao.value = 'alt';document.formx.grpitem.value = document.form1.grpitem2.value;valida_form();" <cfoutput>#btnalt#</cfoutput>></td>
+			<td><input name="alt" id="alt" type="button" class="btn btn-warning" value="Alterar Grupo/Item" onClick="document.form1.acao.value = 'alt';document.formx.grpitem.value = document.form1.grpitem2.value;valida_form();" <cfoutput>#btnalt#</cfoutput>></td>
 		</tr>
 	</cfif>
 	<tr>
@@ -297,13 +329,19 @@
 	<a style="cursor:pointer;" onClick="if(confirm('Confirma conclusão da FACIN?')){concluir();}">
 	<div style="color:darkred;position:relative;font-size:25px">Confirmar conclusão da FACIN</div>
 	</a> 
-  </div>
-  <div class="row"><br><br><br><br></div>
+ </div>
+ <div class="row"><br><br><br></div>
+ <div id="avisoinsp" class="noprint" align="center" style="margin-top:10px;float: left;margin-left:620px">
+	<a style="cursor:pointer;" onClick="if(confirm('Confirma conclusão das considerações (FACIN)?')){concluir();}">
+	<div style="color:darkred;position:relative;font-size:25px">Inspetor(a), confirmar conclusão das considerações (FACIN)</div>
+	</a> 
+ </div>
+ <div class="row"><br><br><br><br></div>
   
   <cfif (isDefined("acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10 and (rsIncluir.recordcount gt 0 or rsalter.recordcount gt 0 or somenteavaliarmeta3 eq 'S'))>
-	<div class="row">&nbsp;&nbsp;&nbsp;Qtd. de Itens:&nbsp;<cfoutput>#rsBase.recordcount#</cfoutput></div>
 	<div id="tab">
-	<table width="1400" class="table table-bordered table-striped table-hover table-active" style="background:#FFF">
+	<div class="row">&nbsp;&nbsp;&nbsp;Qtd. de Itens:&nbsp;<cfoutput>#rsBase.recordcount#</cfoutput></div>
+	<table width="95%" class="table table-bordered table-striped table-hover table-active" style="background:#FFF">
 		<thead style="background:#CCC" align="center">
 			<th>Grupo</th>
 			<th>Item</th>
@@ -313,10 +351,10 @@
 			<th>Últ. Ação do Inspetor(a)</th>
 			<th>Últ. Ação do Revisor(a)</th>
 			<th>Dif. Ações Tempo(h)</th>
-			<th>Com Reanálise?</th>
-			<th>Com Correção de texto?</th>			
+			<th>Reanálise?</th>
+			<th>Correção de texto?</th>			
 			<th>Conclusão Revisão: (<cfoutput>#dateformat(rsBase.INP_DTConcluirRevisao,"dd/mm/yyyy")#</cfoutput>)-Tempo(h)</th>
-			<th>Revisor</th>
+			<th>Revisor(a)</th>
 		</thead>
 		<cfoutput query="rsBase">
 			<cfset reanalise = 'Não'>
@@ -324,13 +362,13 @@
 			<cfif trim(rsBase.RIP_Recomendacao_Inspetor) neq ''><cfset reanalise = 'Sim'></cfif>
 			<cfif trim(rsBase.RIP_Recomendacao_Inspetor) eq '' and rsBase.RIP_Correcao_Revisor eq '1'><cfset correcao = 'Sim'></cfif>
 			<cfif trim(rsBase.RIP_DtUltAtu_Revisor) neq ''>
-				<cfset h1 = DateDiff("h",rsBase.RIP_Data_Avaliador,rsBase.RIP_DtUltAtu_Revisor)>
+				<cfset tpditp = DateDiff("h",rsBase.RIP_Data_Avaliador,rsBase.RIP_DtUltAtu_Revisor)>
 			<cfelse>
-				<cfset h1 = 0>
+				<cfset tpditp = 0>
 			</cfif>
 			
-			<cfset h2 = DateDiff("h",rsBase.RIP_Data_Avaliador,rsBase.INP_DTConcluirAvaliacao)>
-			<cfset h3 = DateDiff("h",rsBase.INP_DTConcluirAvaliacao,rsBase.INP_DTConcluirRevisao)>
+			<cfset tpaval = DateDiff("h",rsBase.RIP_Data_Avaliador,rsBase.INP_DTConcluirAvaliacao)>
+			<cfset tprev = DateDiff("h",rsBase.INP_DTConcluirAvaliacao,rsBase.INP_DTConcluirRevisao)>
 			<cfset ripresposta =  rsBase.RIP_Resposta>
 			<cfif ripresposta eq 'C'><cfset ripresposta =  'Conforme'></cfif>
 			<cfif ripresposta eq 'N'><cfset ripresposta =  'Não Conforme'></cfif>
@@ -342,13 +380,13 @@
 					<td>#rsBase.RIP_NumItem#</td>
 					<td>#ripresposta#</td>
 					<td>#rsBase.Fun_Nome#</td>
-					<th>#h2#</th>
+					<th>#tpaval#</th>
 					<td>#rsBase.RIP_Data_Avaliador#</td>
 					<td>#rsBase.RIP_DtUltAtu_Revisor#</td>
-					<td>#h1#</td>
+					<td>#tpditp#</td>
 					<td>#reanalise#</td>
 					<td>#correcao#</td>				
-					<th>#h3#</th>
+					<th>#tprev#</th>
 					<td>#rsBase.Usu_Apelido#</td>
 				</tr>
 			</tbody>
@@ -364,9 +402,14 @@
 			<input type="hidden" id="unid" name="unid" value="#rsalter.RIP_Unidade#">
 			<input type="hidden" id="aval" name="aval" value="#url.numinsp#">
 			<input type="hidden" id="matr" name="matr" value="#trim(qAcesso.Usu_Matricula)#">
-			<input type="hidden" id="facmatricula" name="facmatricula" value="#trim(rsFacin.FAC_Matricula)#">
-			<input type="hidden" id="concfacin" name="concfacin" value="#trim(dateformat(rsFacin.FAC_DtConcluirFacin,"dd-mm-yyyy"))#">
-			<input type="hidden" id="concfacinnome" name="concfacinnome" value="#rsFacin.Usu_Apelido#">
+			<input type="hidden" id="facmatriculagestor" name="facmatriculagestor" value="#trim(rsFacin.FAC_MatriculaGestor)#">
+			<input type="hidden" id="concfacingestor" name="concfacingestor" value="#trim(DateTimeFormat(rsFacin.FAC_DtConcluirFacin_Gestor,"dd-mm-yyyy HH:NN:SS"))#">
+			<input type="hidden" id="concfacingestornome" name="concfacingestornome" value="#rsFacin.Usu_Apelido#">
+			<input type="hidden" id="matrinspetor" name="matrinspetor" value="#qAcesso.Usu_Matricula#">
+			<input type="hidden" id="concfacininspetor" name="concfacininspetor" value="#trim(DateTimeFormat(rsFacin.FFI_DtConcluirFacin_Inspetor,"dd-mm-yyyy HH:NN:SS"))#">
+			<input type="hidden" id="concfacininspetornome" name="concfacininspetornome" value="#rsFacin.Fun_Nome#">
+			<input type="hidden" id="faltaconcluirfacininspetorSN" name="faltaconcluirfacininspetorSN" value="#faltaconcluirfacininspetorSN#">
+			<input type="hidden" id="facininspetorconcluidaSN" name="facininspetorconcluidaSN" value="#facininspetorconcluidaSN#">
 			<input type="hidden" id="grpacesso" name="grpacesso" value="#grpacesso#">
 		</cfoutput>
 	</cfif>	
@@ -389,52 +432,71 @@
 
 	//================
 	function aviso() {
-		$('div#aviso').hide()
+		$('#aviso').hide()
+		$('#avisoinsp').hide()
 		//alert($('#msg').val())
 		//alert($('#acao').val())
 		if($('#msg').val() != '') {
 			$('#aviso').html($('#msg').val())
 			$('#aviso').show(500)
+			$('#avisoinsp').hide()
 		} 
 		//if($('#msg').val() == '' && $('#acao').val()=='buscar') {
 		if($('#msg').val() == '') {
 			//alert('aqui linha 410')
-			if($('#grpacesso').val() == 'INSPETORES' && $('#concfacin').val() == '') {
+			if($('#grpacesso').val() == 'INSPETORES' && $('#concfacingestor').val() == '') {
 				let prots = '<option value=""></option>'
 				$('#grpitem2').html(prots)
 				$('#aviso').html('Inspetor(a), FACIN não concluída pelo gestor!')
 				$('#tab').hide()
 				$('#aviso').show(500)
+				$('#avisoinsp').hide()
 			}
-			if($('#matr').val() == $('#facmatricula').val() && $('#facmatricula').val() != '') {
+			if($('#matr').val() == $('#facmatriculagestor').val() && $('#facmatriculagestor').val() != '') {
 				$('#salvarsn').val('S')
-				if($('#grpacesso').val() == 'GESTORES' && $('#concfacin').val() == '' && ($('#grpitem').val() == '' || $('#grpitem').val() == null) && $('#grpitem2').val() != null) {
+				if($('#grpacesso').val() == 'GESTORES' && $('#concfacingestor').val() == '' && ($('#grpitem').val() == '' || $('#grpitem').val() == null) && $('#grpitem2').val() != null) {
 					$('#aviso').show(500)
 				}else{
 					if ($('#acao').val()=='buscar'){
-						$('#aviso').html('FACIN está em fase de conclusão por '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+						$('#aviso').html('FACIN está em fase de conclusão por '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val())
 						$('#aviso').show(500)
 					}
 				}
 								
-				if($('#concfacin').val() != '' && $('#concfacin').val() != undefined && $('#concfacin').val() != null){
+				if($('#concfacingestor').val() != '' && $('#concfacingestor').val() != undefined && $('#concfacingestor').val() != null){
 					$('#salvarsn').val('N')
-					$('#aviso').html('Conclusão da FACIN realizada em '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+					var texto2 = ''
+					var texto1 = 'Conclusão da FACIN realizada em '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val()
+					if($('#grpacesso').val() == 'GESTORES'){$("#alt").val('Consultar Grupo/Item')}
+					if($('#facininspetorconcluidaSN').val() == 'S'){ 
+						texto2 = 'Conclusão das considerações (FACIN) realizada em '+$('#concfacininspetor').val()+' Inspetor(a): '+$('#concfacininspetornome').val()
+					}
+					$('#aviso').html(texto1 + '<br>' + texto2)
 					$('#aviso').show(500)
 				}
 				
 			}		
-			if($('#matr').val() != $('#facmatricula').val() && $('#facmatricula').val() != '') {
+			if($('#matr').val() != $('#facmatriculagestor').val() && $('#facmatriculagestor').val() != '') {
 				$('#salvarsn').val('N')
-				$('#aviso').html('FACIN está em fase de conclusão por '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
-				if($('#concfacin').val() != '' && $('#concfacin').val() != undefined && $('#concfacin').val() != null){
-					$('#aviso').html('Conclusão da FACIN realizada em '+$('#concfacin').val()+' Gestor(a): '+$('#concfacinnome').val())
+				var texto2 = ''
+				$('#aviso').html('FACIN está em fase de conclusão por '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val())
+				$("#inc").val('Consultar Grupo/Item')
+				$("#alt").val('Consultar Grupo/Item')
+				if($('#concfacingestor').val() != '' && $('#concfacingestor').val() != undefined && $('#concfacingestor').val() != null){
+					var texto1 = 'Conclusão da FACIN realizada em '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val()
+					if($('#concfacininspetor').val() != '' && $('#concfacininspetor').val() != undefined && $('#concfacininspetor').val() != null){ 
+						texto2 = 'Conclusão das considerações (FACIN) realizada em '+$('#concfacininspetor').val()+' Inspetor(a): '+$('#concfacininspetornome').val()
+						$("#alt").val('Consultar Grupo/Item')
+					}
+					$('#aviso').html(texto1 + '<br>' + texto2)
 				}
 				$('#aviso').show(500)
 			}
+			if($('#grpacesso').val() == 'INSPETORES' && $('#faltaconcluirfacininspetorSN').val() == 'N' && $('#facininspetorconcluidaSN').val() == 'N') {		
+				$('#avisoinsp').show(500)
+			}
+			if($('#grpacesso').val() == 'INSPETORES' && $('#concfacingestor').val() == '') {$('#avisoinsp').hide()}
 		}		
-
-
 		if($('#grpitem').val() == '' && $('#grpitem2').val() == '') {
 			$('#aviso').html('Nº avaliação inexistente ou está na fase de Revisão!')
 			$('#aviso').show(500)
@@ -444,7 +506,7 @@
             $('#grpitem').html(prots);
 			$("#grpitem").attr('disabled', true);
 			$("#inc").attr('disabled', true);
-			if($('#concfacin').val() == ''){
+			if($('#concfacingestor').val() == ''){
 				$('#aviso').show(500)
 			}
 		} 
@@ -456,22 +518,29 @@
 		unid = unid.toString()
 		let aval = $('#aval').val()
 		aval = aval.toString()
-		let matr = $('#matr').val()
-		matr = matr.toString()
+		let matrgestor = $('#facmatriculagestor').val()
+		matrgestor = matrgestor.toString()
+		let matrinspetor = $('#matrinspetor').val()
+		matrinspetor = matrinspetor.toString()
+		let grpacesso = $('#grpacesso').val()
 		axios.get("CFC/fichafacin.cfc",{
 			params: {
 			method: "finalizarfacin",
 			unid: unid,
 			aval: aval,
-			matr: matr
+			matrgestor: matrgestor,
+			matrinspetor: matrinspetor,
+			grpacesso: grpacesso
 			}
 		})
 		.then(data =>{
 			var vlr_ini = data.data.indexOf("<string>");
 			var vlr_fin = data.data.length
 			let dados = data.data.substring(vlr_ini,vlr_fin);
+			$('#avisoinsp').hide()
 			$("#aviso").html(dados);
 			$("#msgmacproc").show(500);
+			$("#alt").val('Consultar Grupo/Item');
         })
       }
 
