@@ -142,10 +142,18 @@
           WHERE INP_Unidade = '#qryPapelTrabalho.RIP_Unidade#'and INP_NumInspecao ='#qryPapelTrabalho.INP_NumInspecao#'
         </cfquery>
       </cfif>
-      <!--- Atualizar dados na tela 
+      <!--- Atualizar dados na tela --->
       <cfinvoke component="#vRelatorio#.GeraRelatorio.gerador.ctrl.controller"
         method="geraPapelTrabalho" returnvariable="qryPapelTrabalho">
-      </cfinvoke>--->
+      </cfinvoke>
+      <script>
+          <cfoutput>
+            var insp = '#qryPapelTrabalho.INP_NumInspecao#';
+            var grpitm = '###form.grupo#' + '.#FORM.item#';
+          </cfoutput>
+          var url = 'papeltrabalho.cfm?pg=controle&Form.id=' + insp + grpitm;
+          window.open(url, '_self');
+      </script>
   </cfoutput>    
 </cfif>
 
@@ -688,6 +696,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
             <cfdump  var="#qryPapelTrabalho#">
             <cfabort>
             --->
+          
 						<cfquery dbtype="query" name="rsLink">
 							SELECT GRP_CODIGO, ITN_NUMITEM FROM qryPapelTrabalho order by GRP_CODIGO, ITN_NUMITEM
 						</cfquery>
@@ -696,6 +705,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                     <a href="##GI#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#" id="GI#rsLink.GRP_CODIGO##rsLink.ITN_NUMITEM#">[#rsLink.GRP_CODIGO#.#rsLink.ITN_NUMITEM#]&nbsp;</a> 
                   </cfloop>
             </div>  
+         
         </cfoutput>
           <cfoutput query="qryPapelTrabalho" group="Grp_Codigo">
             <tr>
@@ -830,7 +840,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                       <span class="noprint" style="background:###TRIM(qSituAcao.STO_Cor)#;padding:2px;color:##fff">
                       <cfif '#TRIM(RIP_Recomendacao)#' eq 'S'>
                         <div ><span style="font-family:arial;background:red;padding:2px;color:##fff">EM REANÁLISE PELO INSPETOR</span></div>
-                        <div class="noprint" align="center" style="margin-top:10px;float: left;"> <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?cancelar=s&pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#',800,600)">
+                        <div class="noprint" align="center" style="margin-top:10px;float: left;"> <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?cancelar=s&pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#',600,650)">
                           <div><img alt="Cancelar Reanálise do item" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">Cancelar Reanálise</div>
                         </a> </div>
@@ -872,7 +882,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                 <cfif ('#qSituacao.Pos_Situacao_Resp#' eq 0 or '#qSituacao.Pos_Situacao_Resp#' eq 11 or '#qSituacao.recordcount#' eq 0 or '#rsVerifValidados.recordcount#' neq 0 or '#rsSemNC.itemNC#' eq 0 or rsQuatEmRevisao.recordcount neq 0) and  '#TRIM(RIP_Recomendacao)#' neq 'S' and  ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES') and #trim(RIP_MatricAvaliador)# neq '' and structKeyExists(url,'pg') and '#url.pg#' eq 'controle'  >
                     <cfif '#rsInspecaoNaoFinalizada.recordcount#' neq 0 or '#rsVerifValidados.recordcount#' neq 0 or '#rsSemNC.itemNC#' eq 0 or rsQuatEmRevisao.recordcount neq 0>
                         <div class="noprint" align="center" style="margin-top:10px;float: left;"> 
-                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&tpunid=#qryPapelTrabalho.TUN_Codigo#&modal=#qryPapelTrabalho.INP_Modalidade#',800,600)">
+                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&tpunid=#qryPapelTrabalho.TUN_Codigo#&modal=#qryPapelTrabalho.INP_Modalidade#',600,650)">
                           <div><img alt="Enviar p/ Reanálise do Inspetor ou Validar Reanálise" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">
                             <cfif '#TRIM(RIP_Recomendacao)#' eq 'R'>

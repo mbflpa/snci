@@ -63,39 +63,37 @@
 <cfif (grpacesso eq 'GESTORES') or (grpacesso eq 'DESENVOLVEDORES') or (grpacesso eq 'GESTORMASTER') or (grpacesso eq 'INSPETORES')>
 <!---  <cftry>  --->
   <cfif isDefined("Form.acao") And (Form.acao is 'alter_reincidencia' Or Form.acao is 'alter_valores' Or Form.acao is 'Anexar' Or Form.acao is 'Excluir_Anexo')>
-
-  <cfif isDefined("Form.abertura")><cfset Session.E01.abertura = Form.abertura><cfelse><cfset Session.E01.abertura = 'Não'></cfif>
-  <cfif isDefined("Form.processo")><cfset Session.E01.processo = Form.proc_se & Form.proc_num & Form.proc_ano><cfelse><cfset Session.E01.processo = ''></cfif>
-  <cfif isDefined("Form.causaprovavel")><cfset Session.E01.causaprovavel = Form.causaprovavel><cfelse><cfset Session.E01.causaprovavel = ''></cfif>
-  <cfif isDefined("Form.cbarea")><cfset Session.E01.cbarea = Form.cbarea><cfelse><cfset Session.E01.cbarea = ''></cfif>
-  <cfif isDefined("Form.cbdata")><cfset Session.E01.cbdata = Form.cbdata><cfelse><cfset Session.E01.cbdata = ''></cfif>
-  <cfif isDefined("Form.cbunid")><cfset Session.E01.cbunid = Form.cbunid><cfelse><cfset Session.E01.cbunid = ''></cfif>
-  <cfif isDefined("Form.frmresp")><cfset Session.E01.frmresp = Form.frmresp><cfelse><cfset Session.E01.frmresp = ''></cfif>
-  <cfif isDefined("Form.cborgao")><cfset Session.E01.cborgao = Form.cborgao><cfelse><cfset Session.E01.cborgao = ''></cfif>
-  <cfif isDefined("Form.cktipo")><cfset Session.E01.cktipo = Form.cktipo><cfelse><cfset Session.E01.cktipo = ''></cfif>
-  <cfif isDefined("Form.dtfinal")><cfset Session.E01.dtfinal = Form.dtfinal><cfelse><cfset Session.E01.dtfinal = ''></cfif>
-  <cfif isDefined("Form.dtinicio")><cfset Session.E01.dtinicio = Form.dtinicio><cfelse><cfset Session.E01.dtinicio = ''></cfif>
-  <cfif isDefined("Form.hreop")><cfset Session.E01.hreop = Form.hreop><cfelse><cfset Session.E01.hreop = ''></cfif>
-  <cfif isDefined("Form.hunidade")><cfset Session.E01.hunidade = Form.hunidade><cfelse><cfset Session.E01.hunidade = ''></cfif>
-  <cfif isDefined("Form.h_obs")><cfset Session.E01.h_obs = Form.h_obs><cfelse><cfset Session.E01.h_obs = ''></cfif>
-  <cfif isDefined("Form.melhoria")><cfset Session.E01.melhoria = Form.melhoria><cfelse><cfset Session.E01.melhoria = ''></cfif>
-  <cfif isDefined("Form.ngrup")><cfset Session.E01.ngrup = Form.ngrup><cfelse><cfset Session.E01.ngrup = ''></cfif>
-  <cfif isDefined("Form.ninsp")><cfset Session.E01.ninsp = Form.ninsp><cfelse><cfset Session.E01.ninsp = ''></cfif>
-  <cfif isDefined("Form.nitem")><cfset Session.E01.nitem = Form.nitem><cfelse><cfset Session.E01.nitem = ''></cfif>
-  <cfif isDefined("Form.frmmotivo")><cfset Session.E01.frmmotivo = Form.frmmotivo><cfelse><cfset Session.E01.frmmotivo = ''></cfif>
-  <cfif isDefined("Form.cbdata")><cfset Session.E01.cbdata = Form.cbdata><cfelse><cfset Session.E01.cbdata = ''></cfif>
-  <cfif isDefined("Form.observacao")><cfset Session.E01.observacao = Form.observacao><cfelse><cfset Session.E01.observacao = ''></cfif>
-  <cfif isDefined("Form.recomendacao")><cfset Session.E01.recomendacao = Form.recomendacao><cfelse><cfset Session.E01.recomendacao = ''></cfif>
-  <cfif isDefined("Form.reop")><cfset Session.E01.reop = Form.reop><cfelse><cfset Session.E01.reop = ''></cfif>
-  <cfif isDefined("Form.unid")><cfset Session.E01.unid = Form.unid><cfelse><cfset Session.E01.unid = ''></cfif>
-  <cfif isDefined("Form.modalidade")><cfset Session.E01.modalidade = Form.modalidade><cfelse><cfset Session.E01.modalidade = ''></cfif>
-  <cfif isDefined("Form.valor")><cfset Session.E01.valor = Form.valor><cfelse><cfset Session.E01.valor = ''></cfif>
-  <cfif isDefined("Form.SE")><cfset Session.E01.SE = Form.SE><cfelse><cfset Session.E01.SE = ''></cfif>
-  <cfif isDefined("Form.VLRecuperado")><cfset Session.E01.VLRecuperado = Form.VLRecuperado><cfelse><cfset Session.E01.VLRecuperado = ''></cfif>
-  <cfif isDefined("Form.cbareaCS")><cfset Session.E01.cbareaCS = Form.cbareaCS><cfelse><cfset Session.E01.cbareaCS = ''></cfif>
-  <cfif isDefined("Form.dbfrmnumsei")><cfset Session.E01.dbfrmnumsei = Form.dbfrmnumsei><cfelse><cfset Session.E01.dbfrmnumsei = ''></cfif>
-  <cfif isDefined("Form.modal")><cfset Session.E01.modal = Form.modal><cfelse><cfset Session.E01.modal = ''></cfif>
-
+	<cfif isDefined("Form.abertura")><cfset Session.E01.abertura = Form.abertura><cfelse><cfset Session.E01.abertura = 'Não'></cfif>
+	<cfif isDefined("Form.processo")><cfset Session.E01.processo = Form.proc_se & Form.proc_num & Form.proc_ano><cfelse><cfset Session.E01.processo = ''></cfif>
+	<cfif isDefined("Form.causaprovavel")><cfset Session.E01.causaprovavel = Form.causaprovavel><cfelse><cfset Session.E01.causaprovavel = ''></cfif>
+	<cfif isDefined("Form.cbarea")><cfset Session.E01.cbarea = Form.cbarea><cfelse><cfset Session.E01.cbarea = ''></cfif>
+	<cfif isDefined("Form.cbdata")><cfset Session.E01.cbdata = Form.cbdata><cfelse><cfset Session.E01.cbdata = ''></cfif>
+	<cfif isDefined("Form.cbunid")><cfset Session.E01.cbunid = Form.cbunid><cfelse><cfset Session.E01.cbunid = ''></cfif>
+	<cfif isDefined("Form.frmresp")><cfset Session.E01.frmresp = Form.frmresp><cfelse><cfset Session.E01.frmresp = ''></cfif>
+	<cfif isDefined("Form.cborgao")><cfset Session.E01.cborgao = Form.cborgao><cfelse><cfset Session.E01.cborgao = ''></cfif>
+	<cfif isDefined("Form.cktipo")><cfset Session.E01.cktipo = Form.cktipo><cfelse><cfset Session.E01.cktipo = ''></cfif>
+	<cfif isDefined("Form.dtfinal")><cfset Session.E01.dtfinal = Form.dtfinal><cfelse><cfset Session.E01.dtfinal = ''></cfif>
+	<cfif isDefined("Form.dtinicio")><cfset Session.E01.dtinicio = Form.dtinicio><cfelse><cfset Session.E01.dtinicio = ''></cfif>
+	<cfif isDefined("Form.hreop")><cfset Session.E01.hreop = Form.hreop><cfelse><cfset Session.E01.hreop = ''></cfif>
+	<cfif isDefined("Form.hunidade")><cfset Session.E01.hunidade = Form.hunidade><cfelse><cfset Session.E01.hunidade = ''></cfif>
+	<cfif isDefined("Form.h_obs")><cfset Session.E01.h_obs = Form.h_obs><cfelse><cfset Session.E01.h_obs = ''></cfif>
+	<cfif isDefined("Form.melhoria")><cfset Session.E01.melhoria = Form.melhoria><cfelse><cfset Session.E01.melhoria = ''></cfif>
+	<cfif isDefined("Form.ngrup")><cfset Session.E01.ngrup = Form.ngrup><cfelse><cfset Session.E01.ngrup = ''></cfif>
+	<cfif isDefined("Form.ninsp")><cfset Session.E01.ninsp = Form.ninsp><cfelse><cfset Session.E01.ninsp = ''></cfif>
+	<cfif isDefined("Form.nitem")><cfset Session.E01.nitem = Form.nitem><cfelse><cfset Session.E01.nitem = ''></cfif>
+	<cfif isDefined("Form.frmmotivo")><cfset Session.E01.frmmotivo = Form.frmmotivo><cfelse><cfset Session.E01.frmmotivo = ''></cfif>
+	<cfif isDefined("Form.cbdata")><cfset Session.E01.cbdata = Form.cbdata><cfelse><cfset Session.E01.cbdata = ''></cfif>
+	<cfif isDefined("Form.observacao")><cfset Session.E01.observacao = Form.observacao><cfelse><cfset Session.E01.observacao = ''></cfif>
+	<cfif isDefined("Form.recomendacao")><cfset Session.E01.recomendacao = Form.recomendacao><cfelse><cfset Session.E01.recomendacao = ''></cfif>
+	<cfif isDefined("Form.reop")><cfset Session.E01.reop = Form.reop><cfelse><cfset Session.E01.reop = ''></cfif>
+	<cfif isDefined("Form.unid")><cfset Session.E01.unid = Form.unid><cfelse><cfset Session.E01.unid = ''></cfif>
+	<cfif isDefined("Form.modalidade")><cfset Session.E01.modalidade = Form.modalidade><cfelse><cfset Session.E01.modalidade = ''></cfif>
+	<cfif isDefined("Form.valor")><cfset Session.E01.valor = Form.valor><cfelse><cfset Session.E01.valor = ''></cfif>
+	<cfif isDefined("Form.SE")><cfset Session.E01.SE = Form.SE><cfelse><cfset Session.E01.SE = ''></cfif>
+	<cfif isDefined("Form.VLRecuperado")><cfset Session.E01.VLRecuperado = Form.VLRecuperado><cfelse><cfset Session.E01.VLRecuperado = ''></cfif>
+	<cfif isDefined("Form.cbareaCS")><cfset Session.E01.cbareaCS = Form.cbareaCS><cfelse><cfset Session.E01.cbareaCS = ''></cfif>
+	<cfif isDefined("Form.dbfrmnumsei")><cfset Session.E01.dbfrmnumsei = Form.dbfrmnumsei><cfelse><cfset Session.E01.dbfrmnumsei = ''></cfif>
+	<cfif isDefined("Form.modal")><cfset Session.E01.modal = Form.modal><cfelse><cfset Session.E01.modal = ''></cfif>
 </cfif>
 
  <cfquery name="qUnidade" datasource="#dsn_inspecao#">
@@ -116,28 +114,12 @@
 		</cfquery>
 	</cfif>
 	<cfset aux_mel = CHR(13) & Form.Melhoria>
-	<cfset aux_recom = CHR(13) & FORM.recomendacao>	
 	<cfquery datasource="#dsn_inspecao#">
-		UPDATE Resultado_Inspecao SET RIP_Comentario='#aux_mel#',RIP_Recomendacoes='#aux_recom#', RIP_Correcao_Revisor = '1'
+		UPDATE Resultado_Inspecao SET RIP_Comentario='#aux_mel#',RIP_Correcao_Revisor = '1'
 		WHERE RIP_Unidade='#FORM.unid#' AND RIP_NumInspecao='#FORM.ninsp#' AND RIP_NumGrupo=#FORM.ngrup# AND RIP_NumItem=#FORM.nitem#
 	</cfquery>
-
-	<cfif isDefined("Session.E01")>
-		<cfset StructClear(Session.E01)>
-	</cfif>
-
-	<script>
-		<cfoutput>
-		var	pg = '#form.pg#'; 
-		var insp = '#form.Ninsp#';
-		var grpitm = '###FORM.ngrup#' + '.#FORM.nitem#';
-		</cfoutput>
-		var url = 'GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=' + insp + grpitm;
-		if( pg == 'pt'){
-			window.open(url, '_self');
-		}
-		
-	</script>
+	<cfset grpitm = '###FORM.ngrup#' & '.#FORM.nitem#'>
+	<cflocation url = "GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#form.Ninsp##grpitm#" addToken = "no">
 </cfif>
 
 <cfquery name="qResponsavel" datasource="#dsn_inspecao#">
@@ -554,10 +536,9 @@ function validarform()
 // ==== critica do botao corrigir ===
     if (document.form1.acao.value == 'corrigir')
 	{
+		document.form1.recomendacao.disabled = false;
 		var melhor = document.form1.Melhoria.value;
 		melhor = melhor.replace(/\s/g, '');
-		var recomed = document.form1.recomendacao.value;
-		recomed = recomed.replace(/\s/g, '');
 		if (melhor.length < 100)
 		{
 			alert('Gestor(a), os campos: Situação Encontrada deve conter no mínimo 100(cem) caracteres!');
@@ -606,23 +587,23 @@ function abrirPopup(url,w,h)
 							
 <table width="70%"  align="center" bordercolor="f7f7f7">
   <tr>
-    <td height="20" colspan="5" bgcolor="eeeeee"><div align="center"><strong class="titulo2"><cfoutput>#qResposta.Dir_Descricao#</cfoutput></strong></div></td>
+    <td height="20" colspan="3" bgcolor="eeeeee"><div align="center"><strong class="titulo2"><cfoutput>#qResposta.Dir_Descricao#</cfoutput></strong></div></td>
   </tr>
   <tr bgcolor="eeeeee">
-    <td height="20" colspan="5">&nbsp;</td>
+    <td height="20" colspan="3">&nbsp;</td>
   </tr>
   <tr bgcolor="eeeeee">
-    <td height="10" colspan="5"><div align="center"><strong class="titulo1">CONTROLE DAS MANIFESTAÇÕES</strong></div></td>
+    <td height="10" colspan="3"><div align="center"><strong class="titulo1">CONTROLE DAS MANIFESTAÇÕES</strong></div></td>
   </tr>
   <tr bgcolor="eeeeee">
-    <td height="20" colspan="5">&nbsp;</td>
+    <td height="20" colspan="3">&nbsp;</td>
   </tr>
   <form name="form1" method="post" onSubmit="return validarform()" enctype="multipart/form-data" action="itens_controle_corrigir.cfm">
   <cfoutput>
 		<input type="hidden" name="sfrmTipoUnidade" id="sfrmTipoUnidade" value="#qResposta.Itn_TipoUnidade#">
 	</cfoutput>
     <tr bgcolor="eeeeee">
-      <td colspan="5"><p class="titulo1">
+      <td colspan="3"><p class="titulo1">
 	    <input type="hidden" id="pg" name="pg" value="<cfoutput>#URL.pg#</cfoutput>"> 
         <input type="hidden" id="acao" name="acao" value="">
         <input type="hidden" id="anexo" name="anexo" value="">
@@ -652,8 +633,8 @@ function abrirPopup(url,w,h)
     </tr>
 	  <tr>
       <td width="95" bgcolor="eeeeee" class="exibir">Unidade</td>
-      <td width="324" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Unid#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#rsMOd.Und_Descricao#</strong></cfoutput></td>
-      <td colspan="3" bgcolor="eeeeee"><span class="exibir">Responsável</span>&nbsp;&nbsp;<cfoutput><strong class="exibir">#qResponsavel.INP_Responsavel#</strong></cfoutput></td>
+      <td bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Unid#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#rsMOd.Und_Descricao#</strong></cfoutput></td>
+      <td colspan="1" bgcolor="eeeeee"><span class="exibir">Responsável</span>&nbsp;&nbsp;<cfoutput><strong class="exibir">#qResponsavel.INP_Responsavel#</strong></cfoutput></td>
       </tr>
    <tr class="exibir">
             <cfif qInspetor.RecordCount lt 2>
@@ -662,20 +643,20 @@ function abrirPopup(url,w,h)
               <td bgcolor="eeeeee">Inspetores</td>
             </cfif>
             <cfset Num_Insp = Left(URL.Ninsp,2) & '.' & Mid(URL.Ninsp,3,4) & '/' & Right(URL.Ninsp,4)>
-            <td colspan="4" bgcolor="eeeeee">-&nbsp;<cfoutput query="qInspetor"><strong class="exibir">#qInspetor.Fun_Nome#</strong>&nbsp;<cfif qInspetor.currentrow neq qInspetor.recordcount><br>-&nbsp;</cfif></cfoutput></td>
+            <td colspan="3" bgcolor="eeeeee">-&nbsp;<cfoutput query="qInspetor"><strong class="exibir">#qInspetor.Fun_Nome#</strong>&nbsp;<cfif qInspetor.currentrow neq qInspetor.recordcount><br>-&nbsp;</cfif></cfoutput></td>
       </tr>
     <tr class="exibir">
       <td bgcolor="eeeeee">N° Relatório</td>
-      <td colspan="4" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In&iacute;cio Inspe&ccedil;&atilde;o &nbsp;<strong class="exibir"><cfoutput>#DateFormat(qResposta.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>
+      <td colspan="3" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ninsp#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;In&iacute;cio Inspe&ccedil;&atilde;o &nbsp;<strong class="exibir"><cfoutput>#DateFormat(qResposta.INP_DtInicInspecao,"dd/mm/yyyy")#</cfoutput></strong></td>
       </tr>
     <tr class="exibir">
       <td bgcolor="eeeeee">Grupo</td>
-      <td colspan="4" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ngrup#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#qResposta.Grp_Descricao#</strong></cfoutput></td>
+      <td colspan="3" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Ngrup#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#qResposta.Grp_Descricao#</strong></cfoutput></td>
     </tr>
 
     <tr class="exibir">
       <td bgcolor="eeeeee">Item</td>
-      <td colspan="4" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Nitem#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#qResposta.Itn_Descricao#</strong></cfoutput></td>
+      <td colspan="3" bgcolor="eeeeee"><cfoutput><strong class="exibir">#URL.Nitem#</strong></cfoutput>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<cfoutput><strong class="exibir">#qResposta.Itn_Descricao#</strong></cfoutput></td>
     </tr>
 <cfoutput>	
 	<cfset tipoimpacto = 'NÃO QUANTIFICADO'>
@@ -701,12 +682,17 @@ function abrirPopup(url,w,h)
 <cfif tipoimpacto eq 'QUANTIFICADO'>
 	 <tr class="exibir">
 	  <td bgcolor="eeeeee"><div id="impactofin">Potencial Valor</div></td>
-	  <td colspan="5" bgcolor="eeeeee">
-		<table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
+	  <td colspan="3" bgcolor="eeeeee">
+		<table width="95%" border="0" cellspacing="0" bgcolor="eeeeee">
 			<tr class="exibir"><strong>
-				<td width="30%" bgcolor="eeeeee"><strong>Estimado a Recuperar (R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
-				<td width="35%" bgcolor="eeeeee"><strong>Estimado Não Planejado/Extrapolado/Sobra (R$):&nbsp;<input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></strong></td>
-				<td width="35%" bgcolor="eeeeee"><strong>Estimado em Risco ou Envolvido (R$):&nbsp;<input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></strong></td>
+				<td width="30%" bgcolor="eeeeee"><strong>Estimado a Recuperar (R$):&nbsp;</strong></td>
+				<td width="35%" bgcolor="eeeeee"><strong>Estimado Não Planejado/Extrapolado/Sobra (R$):</strong></td>
+				<td width="35%" bgcolor="eeeeee"><strong>Estimado em Risco ou Envolvido (R$):</strong></td>
+			</tr>
+			<tr class="exibir"><strong>
+				<td width="30%" bgcolor="eeeeee"><input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></td>
+				<td width="35%" bgcolor="eeeeee"><input name="frmsobra" type="text" class="form" value="#sobra#" size="22" maxlength="17" readonly></td>
+				<td width="35%" bgcolor="eeeeee"><input name="frmemrisco" type="text" class="form" value="#emrisco#" size="22" maxlength="17" readonly></td>
 			</tr>
 		  </table>		  
 	  </td>
@@ -715,22 +701,23 @@ function abrirPopup(url,w,h)
 </cfoutput>		
 	<tr>
 		<td bgcolor="#eeeeee" align="center"><span class="titulos">Situação Encontrada:</span></td>
-		<td colspan="5" bgcolor="eeeeee"><textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form"><cfoutput>#qResposta.RIP_Comentario#</cfoutput></textarea></td>
+		<td colspan="3" bgcolor="eeeeee"><textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form"><cfoutput>#qResposta.RIP_Comentario#</cfoutput></textarea></td>
 	</tr>
+
 	<tr>
 		<td bgcolor="eeeeee" align="center"><span class="titulos">Orientações:</span></td>
-		<td colspan="5" bgcolor="eeeeee"><textarea name="recomendacao" cols="200" rows="12" wrap="VIRTUAL" class="form"><cfoutput>#qResposta.RIP_Recomendacoes#</cfoutput></textarea></td>
+		<td colspan="3" bgcolor="eeeeee"><textarea name="recomendacao" cols="200" rows="12" wrap="VIRTUAL" class="form" disabled><cfoutput>#qResposta.RIP_Recomendacoes#</cfoutput></textarea></td>
 	</tr> 
-	
+
 	<tr bgcolor="eeeeee">
-      <td colspan="5">&nbsp;</td>
+      <td colspan="3">&nbsp;</td>
     </tr>
 <cfoutput>
 
  	
 	<tr bgcolor="eeeeee">
-		<td colspan="5" align="center">
-			<input name="button" type="button" class="botao" onClick="history.back();" value="Voltar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<td colspan="3" align="center">
+			<input name="button" type="button" class="botao" onClick="voltar();" value="Voltar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<input name="Submit" type="Submit" class="botao" value="Confirmar Correção Texto" onClick="document.form1.acao.value='corrigir';">
 		</td>
 	</tr>
@@ -775,6 +762,15 @@ function abrirPopup(url,w,h)
 				['HorizontalRule','SpecialChar', '-','TextColor', 'BGColor','Maximize','Table'  ]
 			]
 		});
+
+		function voltar() {
+			<cfoutput>
+				var insp = '#URL.Ninsp#';
+				var grpitm = '###URL.Ngrup#' + '.#URL.Nitem#';
+			</cfoutput>
+			var url = 'GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=' + insp + grpitm;
+			window.open(url, '_self');
+		}
 	
 </script>
 

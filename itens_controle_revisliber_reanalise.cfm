@@ -3,7 +3,6 @@
 	<cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
 </cfif>   
-
 <cfquery name="qAcesso" datasource="#dsn_inspecao#">
 	select Usu_DR, RTRIM(LTRIM(Usu_GrupoAcesso)) AS Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido, Usu_Coordena, Usu_LotacaoNome
 	from usuarios 
@@ -88,21 +87,12 @@
             , RIP_DtUltAtu_Revisor = CONVERT(char, GETDATE(), 120)  			
 		WHERE RIP_NumInspecao = '#URL.Ninsp#' and RIP_NumGrupo ='#url.Ngrup#' and RIP_NumItem ='#url.Nitem#'
 	</cfquery>
-		
+				
 	<script>
 		<cfoutput>
-			var	pg = '#URL.pg#';
+			var	pg = '#url.pg#';
 		</cfoutput>
-		if( pg == 'pt'){
-			window.opener.location.reload();
-		}
-		<cfoutput>	
-		<!---
-			<cfif qInspecaoLiberada.recordCount neq 0 or qVerifEmReanalise.recordCount neq 0>
-				alert("Reanálise cancelada!");
-			</cfif>
-		--->
-		</cfoutput>
+		window.opener.location.reload();
 		window.close(); 
 	</script>
 </cfif>
@@ -154,17 +144,9 @@
 
 	<script>
 		<cfoutput>
-			var	pg = '#URL.pg#';
-			
+			var	pg = '#url.pg#';
 		</cfoutput>
-			if( pg == 'pt'){
-			window.opener.location.reload();
-		}
-		<cfoutput>	
-			<cfif qInspecaoLiberada.recordCount neq 0 or qVerifEmReanalise.recordCount neq 0>
-				alert("Reanálise validada!");
-			</cfif>
-		</cfoutput>
+		window.opener.location.reload();
 		window.close(); 
 	</script>
 </cfif>

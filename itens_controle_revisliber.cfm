@@ -548,15 +548,14 @@
 
 	<script>
 		<cfoutput>
-		var	pg = '#form.pg#'; 
-		var insp = '#form.Ninsp#';
-		var grpitm = '###FORM.ngrup#' + '.#FORM.nitem#';
+			var	pg = '#form.pg#'; 
+			var insp = '#form.Ninsp#';
+			var grpitm = '###FORM.ngrup#' + '.#FORM.nitem#';
 		</cfoutput>
 		var url = 'GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=' + insp + grpitm;
-		if( pg == 'pt'){
+		//if( pg == 'pt'){
 			window.open(url, '_self');
-		}
-		
+		//}
 	</script>
 </cfif>
 
@@ -1426,7 +1425,7 @@ function abrirPopup(url,w,h)
  	
 	<tr bgcolor="eeeeee">
 		<td colspan="5" align="center">
-			<input name="button" type="button" class="botao" onClick="history.back();" value="Voltar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input name="button" type="button" class="botao" onClick="voltar();" value="Voltar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			<cfif (resp is 0) or (resp is 11)>
 				<input name="Submit" type="Submit" class="botao" value="Salvar" onClick="document.form1.frmcbarea.disabled=false; document.form1.acao.value='Salvar';">
 			<cfelse>
@@ -1488,7 +1487,14 @@ function abrirPopup(url,w,h)
 				['HorizontalRule','SpecialChar', '-','TextColor', 'BGColor','Maximize','Table'  ]
 			]
 		});
-	
+		function voltar() {
+			<cfoutput>
+				var insp = '#url.Ninsp#';
+				var grpitm = '###url.Ngrup#' + '.#url.Nitem#';
+			</cfoutput>
+			var url = 'GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=' + insp + grpitm;
+			window.open(url, '_self');
+		}	
 </script>
 
 </body>
