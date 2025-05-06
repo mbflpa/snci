@@ -56,7 +56,7 @@
 		</cfquery>	
 
 		<cfquery datasource="#dsn_inspecao#" name="rsalter">
-			SELECT RIP_Unidade,RIP_NumGrupo,RIP_NumItem,Fun_Nome
+			SELECT RIP_Unidade,RIP_NumGrupo,RIP_NumItem,Fun_Nome,FACA_ConsideracaoInspetor
 			FROM Resultado_Inspecao 
 			INNER JOIN Inspecao ON (RIP_Unidade = INP_Unidade) AND (RIP_NumInspecao = INP_NumInspecao) 
 			INNER JOIN Funcionarios ON RIP_MatricAvaliador = Fun_Matric
@@ -271,9 +271,13 @@
 				<select name="grpitem2" id="grpitem2" class="form-select">
 					<cfif isDefined("url.acao") And (url.acao is 'buscar') and len(trim(url.numinsp)) eq 10>
 						<cfoutput query="rsalter">
+							<cfset auxtxt = ''>
+							<cfif len(trim(FACA_ConsideracaoInspetor)) gt 0 and grpacesso eq 'INSPETORES'>
+								<cfset auxtxt = ' - (realizado)'>
+							</cfif>
 							<cfset grpitm = RIP_NumGrupo & ',' & RIP_NumItem>
 							<cfset nomegrpitm = RIP_NumGrupo & '_' & RIP_NumItem& ' - ' & trim(Fun_Nome)>
-							<option value="#grpitm#">#nomegrpitm#</option>
+							<option value="#grpitm#">#nomegrpitm##auxtxt#</option>
 						</cfoutput>
 					</cfif>
 				</select>
