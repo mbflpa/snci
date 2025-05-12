@@ -651,7 +651,7 @@ alert("Data Previs�o da Solu��o Informada ultrapassa a anteriormente solic
 	if(usarEditor == true){
 		//configura��es diferenciadas do editor de texto.
 		CKEDITOR.replace('Melhoria', {
-		width: 1020,
+		width: 1200,
 		height: 200,
 		toolbar:[
 		{ name: 'document', items: ['Preview', 'Print', '-' ] },
@@ -670,7 +670,7 @@ alert("Data Previs�o da Solu��o Informada ultrapassa a anteriormente solic
 		});
 
 		CKEDITOR.replace('H_recom', {
-		width: 1020,
+		width: 1200,
 		height: 100,
 		toolbar:[
 		{ name: 'document', items: ['Preview', 'Print', '-' ] },

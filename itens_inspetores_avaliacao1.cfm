@@ -2273,28 +2273,28 @@ auxvlr: #auxvlr# <br>
 </cfif>
 <tr>
 	<td bgcolor="eeeeee" align="center"><span class="titulos">Manchete:</span></td>
-	<td colspan="6" bgcolor="eeeeee"><textarea  name="manchete" id="manchete" cols="168" rows="3" wrap="VIRTUAL" class="form"><cfoutput>#form.manchete#</cfoutput></textarea></td>
+	<td colspan="6" bgcolor="eeeeee"><textarea  name="manchete" id="manchete" cols="192" rows="3" wrap="VIRTUAL" class="form"><cfoutput>#form.manchete#</cfoutput></textarea></td>
 </tr>
 <tr>
 	<td bgcolor="#eeeeee" align="center"><span class="titulos">Situação Encontrada:</span></td>
-	<td colspan="6" bgcolor="eeeeee"><textarea name="melhoria" id="melhoria" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.melhoria#</cfoutput></textarea></td>
+	<td colspan="6" bgcolor="eeeeee"><textarea name="melhoria" id="melhoria" style="background:#fff;display:none!important;" cols="240" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.melhoria#</cfoutput></textarea></td>
 </tr>
 
-<textarea  hidden name="ripcomentariojustif" id="ripcomentariojustif" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#auxjustificativa#</cfoutput></textarea>
-<textarea  hidden name="ripcomentario" id="ripcomentario" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL"><cfoutput>#trim(rsItem.RIP_Comentario)#</cfoutput></textarea>
-<textarea  hidden name="itnprerelato" id="itnprerelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.Itn_PreRelato)#<strong>Ref. Normativa: </strong>#trim(rsItem.Itn_Norma)#</cfoutput></textarea>
+<textarea  hidden name="ripcomentariojustif" id="ripcomentariojustif" style="background:#fff;display:none!important;" cols="300" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#auxjustificativa#</cfoutput></textarea>
+<textarea  hidden name="ripcomentario" id="ripcomentario" style="background:#fff;display:none!important;" cols="300" rows="25" wrap="VIRTUAL"><cfoutput>#trim(rsItem.RIP_Comentario)#</cfoutput></textarea>
+<textarea  hidden name="itnprerelato" id="itnprerelato" style="background:#fff;display:none!important;" cols="300" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.Itn_PreRelato)#<strong>Ref. Normativa: </strong>#trim(rsItem.Itn_Norma)#</cfoutput></textarea>
 <!---
-<textarea  hidden name="itnprerelato" id="itnprerelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.Itn_PreRelato)#<strong>Ref. Normativa: </strong>#trim(rsItem.Itn_Norma)#<p><strong>Possíveis Consequências da Situação Encontrada:</strong></p></cfoutput></textarea>
+<textarea  hidden name="itnprerelato" id="itnprerelato" style="background:#fff;display:none!important;" cols="300" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#trim(rsItem.Itn_PreRelato)#<strong>Ref. Normativa: </strong>#trim(rsItem.Itn_Norma)#<p><strong>Possíveis Consequências da Situação Encontrada:</strong></p></cfoutput></textarea>
 --->
-<textarea  hidden name="frmanexoscomentario" id="frmanexoscomentario" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#Form.melhoria#</cfoutput></textarea>
+<textarea  hidden name="frmanexoscomentario" id="frmanexoscomentario" style="background:#fff;display:none!important;" cols="300" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#Form.melhoria#</cfoutput></textarea>
 	 
 <tr>
 	<td bgcolor="eeeeee" align="center"><span class="titulos">Orientações:</span></td>
-	<td colspan="6" bgcolor="eeeeee"><textarea  name="recomendacoes" id="recomendacoes" style="background:#fff;" cols="200" rows="7" wrap="VIRTUAL" class="form"><cfoutput>#form.recomendacoes#</cfoutput></textarea></td>
+	<td colspan="6" bgcolor="eeeeee"><textarea  name="recomendacoes" id="recomendacoes" style="background:#fff;" cols="300" rows="7" wrap="VIRTUAL" class="form"><cfoutput>#form.recomendacoes#</cfoutput></textarea></td>
 </tr>
-<textarea  hidden name="riprecomendacoes" id="riprecomendacoes" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea>
-<textarea  hidden name="itnorientacaorelato" id="itnorientacaorelato" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.Itn_OrientacaoRelato#</cfoutput></textarea>
-<textarea  hidden name="frmanexosrecomendacoes" id="frmanexosrecomendacoes" style="background:#fff;display:none!important;" cols="200" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.recomendacoes#</cfoutput></textarea>
+<textarea  hidden name="riprecomendacoes" id="riprecomendacoes" style="background:#fff;display:none!important;" cols="300" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.RIP_Recomendacoes#</cfoutput></textarea>
+<textarea  hidden name="itnorientacaorelato" id="itnorientacaorelato" style="background:#fff;display:none!important;" cols="300" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#rsItem.Itn_OrientacaoRelato#</cfoutput></textarea>
+<textarea  hidden name="frmanexosrecomendacoes" id="frmanexosrecomendacoes" style="background:#fff;display:none!important;" cols="300" rows="25" wrap="VIRTUAL" class="form"><cfoutput>#form.recomendacoes#</cfoutput></textarea>
 <!---
 <cfset editpbfimor = trim(Replace(NumberFormat(rsItem.RIP_PotencialBeneficioFinanceiro,999.00),'.',',','All'))> 
 <cfset editecfmor = trim(Replace(NumberFormat(rsItem.RIP_EstimativaCustoFinanceiro,999.00),'.',',','All'))> 
@@ -2509,7 +2509,7 @@ $('#cd_frmsobra').click(function(){
  
 CKEDITOR.replace('melhoria', {
       // Define the toolbar groups as it is a more accessible solution.
-	  width: '1020',
+	  width: '1160',
 		height: 350,
 		removePlugins: 'scayt',
         disableNativeSpellChecker: false,
@@ -2528,7 +2528,7 @@ CKEDITOR.replace('melhoria', {
     });
 
 	CKEDITOR.replace('recomendacoes', {
-		width: '1020',
+		width: '1160',
 		height: 100,
 		removePlugins: 'scayt',
         disableNativeSpellChecker: false,

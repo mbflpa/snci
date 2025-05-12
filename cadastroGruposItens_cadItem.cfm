@@ -416,7 +416,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>                                        
                                 </div>  
@@ -434,7 +434,7 @@
                                     </div>
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
                                 </div>  
@@ -505,7 +505,7 @@
                                         </div>
                                         <div class="row"> 
                                             <div class="col">
-                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                             </div>
                                         </div>                                            
                                     </div>   
@@ -536,7 +536,7 @@
                                     </div>
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
                                 </div>                             
@@ -574,7 +574,7 @@
                                     </div>
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
                                 </div> 
@@ -634,7 +634,7 @@
                                     </select>
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
                                     <p></p>
@@ -643,7 +643,7 @@
                                     </label>
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
                                     <p></p>
@@ -836,27 +836,34 @@
                 ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
                 ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
             ]
-
         });
 
         CKEDITOR.replace('cadItemAmostra', {
         width: '100%',
         height: 50,
-        toolbar: [	
-            [ 'Preview', 'Paste','PasteText', 'RemoveFormat',  '-', 'Undo', 'Redo','-', 'Bold', 'Italic', '-', 'SelectAll','-','NumberedList', 'BulvaredList','SpecialChar','-'],
-            '/',
-            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-','TextColor','Maximize','Table']
-        ]				
+        toolbar: [
+                ['Preview', 'Print', '-' ],
+                [ 'Cut', 'Copy', 'Paste','PasteText', 'RemoveFormat',  '-', 'Undo', 'Redo', '-','Find','-','SelectAll'],
+                [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript' ],
+                [ 'NumberedList', 'BulvaredList', '-',  'Blockquote','-','Outdent', 'Indent', '-'],
+                '/',
+                ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
+                ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
+            ]				
         });
 
         CKEDITOR.replace('cadItemNorma', {
         width: '100%',
         height: 50,
-        toolbar: [	
-            [ 'Preview', 'Paste', 'PasteText', 'RemoveFormat',  '-', 'Undo', 'Redo','-', 'Bold', 'Italic', '-', 'SelectAll','-','NumberedList', 'BulvaredList','SpecialChar','-'],
-            '/',
-            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-','TextColor','Maximize', 'Table' ]
-        ]	
+        toolbar: [
+                ['Preview', 'Print', '-' ],
+                [ 'Cut', 'Copy', 'Paste','PasteText', 'RemoveFormat',  '-', 'Undo', 'Redo', '-','Find','-','SelectAll'],
+                [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript' ],
+                [ 'NumberedList', 'BulvaredList', '-',  'Blockquote','-','Outdent', 'Indent', '-'],
+                '/',
+                ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
+                ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
+            ]
         });
        $(function(e){
         //alert('Dom inicializado!');        

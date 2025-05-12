@@ -26,7 +26,7 @@
                                              ALTERAR ITENS /<br>PLANO DE TESTE,
                                              ATIVAR ITENS /<br>PLANO DE TESTE"
                            listaPaginaInclude="cadastroGruposItens_consulta.cfm,cadastroGruposItens_replicar.cfm,cadastroGruposItens_cadGrupo.cfm,cadastroGruposItens_cadItem.cfm,cadastroGruposItens_alterarGrupo.cfm,cadastroGruposItens_alterarItem.cfm,cadastroGruposItens_ativarDesativar.cfm"
-                           largura ="860"
+                           largura ="1390"
                            titulo="CADASTRO DE GRUPOS E ITENS (PLANO DE TESTE)">
                            
             </div>

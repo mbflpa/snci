@@ -1,4 +1,4 @@
-<cfprocessingdirective pageEncoding ="utf-8"/> 
+<cfprocessingdirective pageEncoding ="utf-8"/>  
 <cfif (not isDefined("Session.vPermissao")) OR (Session.vPermissao eq 'False')>
   <cfinclude template="aviso_sessao_encerrada.htm">
 	  <cfabort> 
@@ -8,7 +8,7 @@
 	select Usu_DR, Usu_GrupoAcesso, Usu_Matricula, Usu_Email, Usu_Apelido,Usu_Coordena from usuarios 
 	where Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
 </cfquery>
-
+<cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
 <cfquery name="rsAno" datasource="#dsn_inspecao#">
 SELECT Grp_Ano
 FROM Grupos_Verificacao
@@ -21,6 +21,9 @@ ORDER BY Grp_Ano DESC
 SELECT DISTINCT TUI_TipoUnid, TUN_Descricao, TUI_Modalidade
 FROM Tipo_Unidades INNER JOIN TipoUnidade_ItemVerificacao ON TUN_Codigo = TUI_TipoUnid
 where tui_Ano = year(getdate())
+<cfif grpacesso eq 'inspetores'>
+  and TUI_Ativo = 1
+</cfif>
 ORDER BY TUN_Descricao
 </cfquery> 
 
@@ -35,7 +38,7 @@ ORDER BY TUN_Descricao
 function valida_acao(a) {
 //alert(a);
 //return false;
-var   grpacesso = '<cfoutput>#ucase(trim(qAcesso.Usu_GrupoAcesso))#</cfoutput>';
+var grpacesso = '<cfoutput>#grpacesso#</cfoutput>';
 if (a=='S' && (grpacesso=='GESTORES' || grpacesso=='ANALISTAS' || grpacesso=='INSPETORES')){
 alert('Atenção!\n\nPrezado usuário, o plano de testes analático é pra utilização restrita do controle interno.\n\nNão deverá ser divulgado/disponibilizado aos demais órgãos dos correios');
 }
@@ -59,7 +62,7 @@ frm.frmacao.value=a;
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- �rea de conte�do   --->
+<!--- area de conteudo   --->
 <form name="frm1" method="get" action="rel_itensverificacao.cfm" target="_blank">
   <table width="31%" align="center" bordercolor="#000000">
         <tr>
@@ -87,7 +90,8 @@ frm.frmacao.value=a;
               <cfoutput query="rsTipo">
               <option value="#TUI_TipoUnid#">#TUN_Descricao#</option>
             </cfoutput>
-          </select>          </td>
+          </select>          
+          </td>
         </tr>
         <tr>
           <td></td>
@@ -101,14 +105,13 @@ frm.frmacao.value=a;
           <td class="exibir"><strong>Ano:</strong></td>
           <td colspan="3" class="exibir">
 		    <select name="frmtpano" class="form" id="frmtpano">
-		  <cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) neq 'INSPETORES'>
+		  <cfif grpacesso neq 'INSPETORES'>
 			 <cfoutput query="rsAno"> 
 				  <option value="#Grp_Ano#">#Grp_Ano#</option>
 			</cfoutput> 
 		  <cfelse>
 			<cfoutput>
-		<!--- 	<option value="#rsAno.Grp_Ano#">#rsAno.Grp_Ano#</option>--->
-			<option value="#year(now())#">#year(now())#</option>
+			  <option value="#year(now())#">#year(now())#</option>
 			</cfoutput> 
 		  </cfif>
             </select></td>
@@ -118,29 +121,33 @@ frm.frmacao.value=a;
           <td><div align="center"></div></td>
           <td class="exibir"><div align="left"><strong>Modalidade:</strong>&nbsp;&nbsp;&nbsp;
                 <cfquery name="rsModal" datasource="#dsn_inspecao#">
-                SELECT distinct TUI_Modalidade  
-                FROM TipoUnidade_ItemVerificacao 
-                where tui_Ano = year(getdate())
+                  SELECT distinct TUI_Modalidade  
+                  FROM TipoUnidade_ItemVerificacao 
+                  where tui_Ano = year(getdate())
+                  <cfif grpacesso eq 'inspetores'>
+                    and TUI_Ativo = 1
+                  </cfif>                  
                 </cfquery>
           </div></td>
-          <td colspan="2" class="exibir"><select name="frmmodal" class="form" id="frmmodal">
-            <cfif ucase(trim(qAcesso.Usu_GrupoAcesso)) neq 'INSPETORES'>
-              <option value="0">Presencial</option>
-              <option value="1">A Dist&acirc;ncia</option>
-              <option value="2">Mista</option>
+          <td colspan="2" class="exibir">
+            <select name="frmmodal" class="form" id="frmmodal">
+              <cfif grpacesso neq 'INSPETORES'>
+                  <option value="0">Presencial</option>
+                  <option value="1">A Distância</option>
+                  <option value="2">Mista</option>
               <cfelse>
-              <cfoutput query="rsModal">
-                <cfif rsModal.TUI_Modalidade is 0>
-                  <cfset auxnome = 'Presencial'>
+                <cfoutput query="rsModal">
+                  <cfif rsModal.TUI_Modalidade is 0>
+                      <cfset auxnome = 'Presencial'>
                   <cfelseif rsModal.TUI_Modalidade is 0>
-                  <cfset auxnome = 'A Dist&acirc;ncia'>
+                    <cfset auxnome = 'A Distância'>
                   <cfelse>
-                  <cfset auxnome = 'Mista'>
-                </cfif>
-                <option value="#rsModal.TUI_Modalidade#">#auxnome#</option>
-              </cfoutput>
-            </cfif>
-          </select>
+                    <cfset auxnome = 'Mista'>
+                  </cfif>
+                  <option value="#rsModal.TUI_Modalidade#">#auxnome#</option>
+                </cfoutput>
+              </cfif>
+            </select>
           <label></label>          </td>
         </tr>
         <tr>
@@ -161,7 +168,7 @@ frm.frmacao.value=a;
 
               <td width="8"><div align="center"></div></td>
               <td width="199"><div align="center">
-                <input name="como" type="submit" class="botao" id="como" value="Plano de Testes Analítico" onClick="valida_acao('S');">
+                <input name="como" type="submit" class="botao" id="como" value="Plano de Testes Anal&iacute;tico" onClick="valida_acao('S');">
               </div></td>
               <td width="6"><div align="center"><span class="exibir">
                 <input name="frmacao" type="hidden" id="frmacao" size="1" maxlength="1">
@@ -169,7 +176,7 @@ frm.frmacao.value=a;
               <td width="160">
                 
                 <div align="center">
-                  <input name="sem" type="submit" class="botao" id="sem" value="Plano de Testes Sintético" onClick="valida_acao('C')">
+                  <input name="sem" type="submit" class="botao" id="sem" value="Plano de Testes Sint&eacute;tico" onClick="valida_acao('C')">
                 </div></td>
             </tr>
           </table>

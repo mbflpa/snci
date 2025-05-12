@@ -348,7 +348,7 @@
                         </button>
                     </h2>
                     <div id="altprimeiro"  aria-labelledby="altum" >
-                        <div >
+                        <div>
                             <div class="row">
                                 <div class="col">
                                     <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px;">Ano</label>
@@ -378,7 +378,7 @@
                             </div>   
                             <div class="row"> 
                                 <div class="col">
-                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________</label>
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                 </div>
                             </div>   
                             <div class="row">
@@ -397,9 +397,7 @@
                             </div>   
                             <div class="row"> 
                                 <div class="col">
-                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________
-
-                                    </label>
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                 </div>
                             </div>  
                             <label for="selAltModalidade" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px">Modalidade</label>
@@ -589,6 +587,10 @@
                                 <div class="row">
                                     <div class="col">
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">CATEGORIA DO CONTROLE</label>
+                                    </div>
+                                </div>   
+                                <div class="row">
+                                    <div class="col">
                                         <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">            
                                             <select id="altcategcontrole" name="altcategcontrole" multiple="multiple" class="form-select" aria-label="Default select example">
                                             </select>  
@@ -596,7 +598,7 @@
                                     </div>
                                     <div class="row">
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                             <p></p>
                                         </div>
                                     </div>                                        
@@ -617,7 +619,7 @@
                                     </div>  
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
                                 </div>  
@@ -630,7 +632,7 @@
                                     </div>    
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>  
                                     <p></p>                               
@@ -700,7 +702,7 @@
                                         </div>
                                         <div class="row"> 
                                             <div class="col">
-                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                             </div>
                                         </div>                                            
                                     </div>   
@@ -731,8 +733,7 @@
                                     </div>                                                                        
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________
-                                            </label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
                                 </div>                             
@@ -773,7 +774,7 @@
                                     </div>
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
                                 </div> 
@@ -827,7 +828,7 @@
                                     </label>
                                     <div class="row"> 
                                         <div class="col">
-                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">___________________________________________________________________________________________________________________________</label>
+                                            <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_______________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                         </div>
                                     </div>
                                     <table width="95%" border="0" class="exibir">
@@ -864,7 +865,7 @@
                                     <div id="propriasalt">
                                         <div class="row"> 
                                             <div class="col">
-                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________</label>
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_______________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                             </div>
                                         </div>                                     
                                         <div class="row"> 
@@ -886,8 +887,7 @@
                                         <div id="totalDivAlt">
                                             <div class="row"> 
                                                 <div class="col">
-                                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________
-                                                    </label>
+                                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_______________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                                 </div>                                    
                                                 <div class="col">
                                                     <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;"><strong>TOTAL:</strong></label>
@@ -900,8 +900,7 @@
                                     <div id="franquiaalt">
                                         <div class="row"> 
                                             <div class="col">
-                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________
-                                                </label>
+                                                <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_______________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                             </div>
                                         </div>                                    
                                         <div class="row"> 
@@ -924,7 +923,7 @@
                                         <div id="totalDivAltAGF">
                                             <div class="row"> 
                                                 <div class="col">
-                                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_____________________________________________________________________________________________________________________</label>
+                                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">_______________________________________________________________________________________________________________________________________________________________________________________________________________</label>
                                                 </div>                                    
                                                 <div class="col">
                                                     <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;"><strong>TOTAL:</strong></label>                                              
@@ -1044,11 +1043,15 @@
                 CKEDITOR.replace('altItemAmostra', {
                 width: '100%',
                 height: 50,
-                toolbar: [	
-                    [ 'Preview', 'Paste','PasteText', 'RemoveFormat',  '-', 'Undo', 'Redo','-', 'Bold', 'Italic', '-', 'SelectAll','-','NumberedList', 'BulvaredList','SpecialChar','-'],
-                    '/',
-                    ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-','TextColor','Maximize','Table']
-                ]				
+                toolbar: [
+                        ['Preview', 'Print', '-' ],
+                        [ 'Cut', 'Copy', 'Paste','PasteText', 'RemoveFormat',  '-', 'Undo', 'Redo', '-','Find','-','SelectAll'],
+                        [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript' ],
+                        [ 'NumberedList', 'BulvaredList', '-',  'Blockquote','-','Outdent', 'Indent', '-'], 
+                        '/',               
+                        ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
+                        ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
+                    ]				
                 });
 //            }
 
@@ -1057,11 +1060,15 @@
                 CKEDITOR.replace('altItemNorma', {
                 width: '100%',
                 height: 50,
-                toolbar: [	
-                    [ 'Preview', 'Paste', 'PasteText', 'RemoveFormat',  '-', 'Undo', 'Redo','-', 'Bold', 'Italic', '-', 'SelectAll','-','NumberedList', 'BulvaredList','SpecialChar','-'],
-                    '/',
-                    ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-','TextColor','Maximize', 'Table' ]
-                ]	
+                toolbar: [
+                        ['Preview', 'Print', '-' ],
+                        [ 'Cut', 'Copy', 'Paste','PasteText', 'RemoveFormat',  '-', 'Undo', 'Redo', '-','Find','-','SelectAll'],
+                        [ 'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript' ],
+                        [ 'NumberedList', 'BulvaredList', '-',  'Blockquote','-','Outdent', 'Indent', '-'], 
+                        '/',               
+                        ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock','-'], 
+                        ['HorizontalRule','SpecialChar', '-', 'Styles', 'Font','FontSize','TextColor', 'BGColor','Maximize','Table'  ]
+                    ]
                 });
 //            }
             //Efetuar limpeza dos campos em tela

@@ -37,7 +37,14 @@
     <cfset se= '#trim(qAcesso.Usu_DR)#'>
 </cfif>
   
-  <cfif isdefined('url.acao')>				
+  <cfif isdefined('url.acao')>		
+	<cfif '#url.acao#' eq 'assumirevisao'>
+		<cfquery datasource="#dsn_inspecao#">
+			update Inspecao set INP_RevisorLogin = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+			WHERE INP_NumInspecao = '#url.numInspecao#'
+		</cfquery>
+	</cfif>
+
 	<cfif '#url.acao#' eq 'excNumInsp'>
 		<cfquery datasource="#dsn_inspecao#">
 			DELETE FROM Inspetor_Inspecao WHERE IPT_NumInspecao=rtrim(ltrim(convert(varchar,'#url.numInspecao#'))) and
@@ -844,21 +851,21 @@ tbody {
 				INNER JOIN Unidades ON Und_Codigo = INP_Unidade
 				INNER JOIN Diretoria ON  Dir_Codigo = Und_CodDiretoria
 				WHERE  Und_CodDiretoria in(#se#)  and INP_Situacao ='NA' and NIP_Situacao = 'A' and INP_AvaliacaoAtiva is NUll
-				ORDER BY Dir_Sigla, Und_Descricao, INP_NumInspecao
+				ORDER BY INP_NumInspecao,INP_DtInicInspecao
 </cfquery>
 <cfquery datasource="#dsn_inspecao#" name="rsInspecao">
-				SELECT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_Coordenador, INP_DtInicInspecao, INP_DtFimInspecao, INP_Unidade, INP_Modalidade,INP_RevisorLogin,NIP_NumInspecao, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_Sigla  
+				SELECT distinct INP_DTConcluirAvaliacao, INP_NumInspecao, INP_Coordenador, INP_DtInicInspecao, INP_DtFimInspecao, INP_Unidade, INP_Modalidade,INP_RevisorLogin,NIP_NumInspecao, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_Sigla  
 				FROM  Inspecao
 				INNER JOIN Numera_Inspecao ON INP_NumInspecao = NIP_NumInspecao
 				INNER JOIN Unidades ON Und_Codigo = INP_Unidade
 				INNER JOIN Diretoria ON  Dir_Codigo = Und_CodDiretoria
 				WHERE  Und_CodDiretoria in(#se#)  and INP_Situacao ='NA' and NIP_Situacao = 'A' and INP_AvaliacaoAtiva = 'S'
-				ORDER BY Dir_Sigla, Und_Descricao, INP_NumInspecao
+				ORDER BY INP_NumInspecao,INP_DtInicInspecao
 </cfquery>
 
 <!---Inspeções NA = não avaliadas, ER = em reavaliação, RA =reavaliado, CO = concluída--->
 <cfquery datasource="#dsn_inspecao#" name="rsEmRevisao">
-				SELECT DISTINCT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'comNC' as tipo FROM  Inspecao
+				SELECT distinct INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'comNC' as tipo FROM  Inspecao
 				LEFT JOIN ParecerUnidade ON Pos_Inspecao = INP_NumInspecao
 				LEFT JOIN ProcessoParecerUnidade ON Pro_Inspecao = INP_NumInspecao
 				LEFT JOIN Unidades ON Und_Codigo = INP_Unidade
@@ -866,11 +873,11 @@ tbody {
 				WHERE  Und_CodDiretoria in(#se#)  
 				and right(INP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
 				and (POS_SITUACAO_RESP in(0,11) or rtrim(INP_Situacao) ='ER' or rtrim(INP_Situacao) ='RA')  
-				ORDER BY Dir_Sigla, Und_Descricao, INP_NumInspecao
+				ORDER BY INP_NumInspecao, INP_DtEncerramento
 </cfquery>
 
 <cfquery datasource="#dsn_inspecao#" name="rsFinalizadasSemNC" >
-			SELECT DISTINCT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade
+			SELECT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade
 				, LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao, 'semNC' as tipo FROM  Inspecao
 			LEFT JOIN ParecerUnidade ON Pos_Inspecao = INP_NumInspecao 
 			LEFT JOIN ProcessoParecerUnidade ON Pro_Inspecao = INP_NumInspecao
@@ -880,11 +887,11 @@ tbody {
 			and POS_SITUACAO_RESP IS NULL 
 			and INP_Situacao = 'CO'
 			and right(INP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
-			ORDER BY Dir_Sigla, Und_Descricao, INP_NumInspecao
+			ORDER BY INP_NumInspecao
 </cfquery>
 
 <cfquery datasource="#dsn_inspecao#" name="rsFinalizadasSemNCencerrado" >
-			SELECT DISTINCT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade,INP_RevisorLogin,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao 
+			SELECT INP_DTConcluirAvaliacao, INP_NumInspecao, INP_DtFimInspecao, INP_Unidade,INP_Coordenador, INP_DtEncerramento,INP_DtUltAtu,INP_Modalidade,INP_RevisorLogin,LTRIM(RTRIM(Und_Descricao)) AS Und_Descricao, Und_Codigo, Dir_sigla, Pro_Situacao 
 			FROM  Inspecao
 			LEFT JOIN ParecerUnidade ON Pos_Inspecao = INP_NumInspecao 
 			LEFT JOIN ProcessoParecerUnidade ON Pro_Inspecao = INP_NumInspecao
@@ -895,7 +902,7 @@ tbody {
 			and INP_Situacao = 'CO'
 			and Pro_Situacao = 'EN'
 			and right(INP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
-			ORDER BY Dir_Sigla, Und_Descricao, INP_NumInspecao
+			ORDER BY INP_NumInspecao
 </cfquery>
 
 <cfquery dbtype="query" name="rsEmRevisaoFinalizadasSemNC" >
@@ -919,7 +926,7 @@ tbody {
 	LEFT JOIN Unidades ON Und_Codigo = NIP_Unidade
 	LEFT JOIN Diretoria ON  Dir_Codigo = Und_CodDiretoria
 	WHERE  Und_CodDiretoria in(#se#) and NIP_Situacao = 'E' and right(NIP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
-	ORDER BY Dir_Sigla, Und_Descricao  
+	ORDER BY NIP_NumInspecao  
 </cfquery>
 <h1 id="titulo" style="font-size:14px;width:720px;"><STRONG>AVALIAÇÕES</STRONG></h1>
 
@@ -1583,8 +1590,16 @@ tbody {
 									<td width="20%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
 										<div align="left">#UsuApelido#</div>
 									</td>
-									<td width="25%" onClick="capturaPosicaoScroll();window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank');">
-										<div align="left">#revisor#</div>
+
+									<td width="25%" onClick="if (confirm ('                       Atenção! \n\nConfirma Assumir a Revisão?')) {window.open('cadastro_inspecao.cfm?numInspecao=#rsInspCaInsp.INP_NumInspecao#&Unid=#rsInspCaInsp.INP_Unidade#&acao=assumirevisao','_self')}">
+										<div align="left">
+											<cfif revisor eq 'SEM REVISOR(A)'>
+												<button name="assumirrevisao" type="button" class="botao">Assumir Revisão?</button>
+												 <!--- <a href="##">Assumir Revisão?</a>	--->												
+											<cfelse>
+												<div align="left">#revisor#</div>
+											</cfif>
+										</div>	
 									</td>
 									<td width="5%" height="25px">
 										<!--- <div align="center"><a  onclick="abrirFormInspetores('#rsInspCaInsp.INP_NumInspecao#',#rsInspCaInsp.INP_Coordenador#)" href="##0"><img src="figuras/usuario.png" alt="Clique para visualizar os inspetores desta Avaliação" width="20" height="20" border="0" ></img></a></div> --->
@@ -1600,7 +1615,7 @@ tbody {
 											&RIPMatricAvaliador=N
 											&telaretorno=cadastro_inspecao.cfm
 											##formCad"><img src="figuras/usuario.png" alt="Clique para cadastrar/visualizar inspetores" width="20" height="20" border="0" ></a>													
-											</div>										
+										</div>										
 									</td>
 							</tr>
 						
