@@ -243,7 +243,7 @@ order by RIP_NumInspecao desc
 <title>Sistema Nacional de Controle Interno</title>
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<script type="text/javascript" src="ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="ckeditor\ckeditor.js"></script>
 
 <script type="text/javascript">
 <cfinclude template="mm_menu.js">
@@ -657,7 +657,7 @@ if (c == 'N' && frm.frminspreincidente.value <= b){
 
 <script>
 CKEDITOR.replace('Melhoria', {
-		width: '1020',
+		width: '1200',
 		height: 200,
 		removePlugins: 'scayt',
         disableNativeSpellChecker: false,
@@ -676,7 +676,7 @@ CKEDITOR.replace('Melhoria', {
     });
 
 CKEDITOR.replace('Melhoria2', {
-		width: '1020',
+		width: '1200',
 		height: 200,
 		removePlugins: 'scayt',
         disableNativeSpellChecker: false,

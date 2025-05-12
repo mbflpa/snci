@@ -77,6 +77,7 @@
   <cfif isDefined("Form.dbfrmnumsei")><cfset Session.E01.dbfrmnumsei = Form.dbfrmnumsei><cfelse><cfset Session.E01.dbfrmnumsei = ''></cfif>
   <cfif isDefined("Form.posarea")><cfset Session.E01.posarea = Form.posarea><cfelse><cfset Session.E01.posarea = ''></cfif>
 
+
 	<cfset maskcgiusu = ucase(trim(CGI.REMOTE_USER))>
 	<cfif left(maskcgiusu,8) eq 'EXTRANET'>
 		<cfset maskcgiusu = left(maskcgiusu,9) & '***' &  mid(maskcgiusu,13,8)>
@@ -1186,6 +1187,7 @@
  RIP_ReincGrupo, 
  RIP_ReincItem, 
  Dir_Descricao, 
+ RIP_Manchete,
  Dir_Codigo, 
  Pos_Processo, 
  Pos_Tipo_Processo, 
@@ -1329,7 +1331,7 @@ left JOIN TNC_Classificacao ON (RIP_NumInspecao = TNC_Avaliacao) AND (RIP_Unidad
 	</cfloop> 	
 	
 	<cfquery name="rsPonto" datasource="#dsn_inspecao#">
-			  SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo not in (1,2,4,3,5,6,7,8,11,14,15,17,18,19,20,22,23,24,27,29,30)	                                                                                                   
+			  SELECT STO_Codigo, STO_Descricao FROM Situacao_Ponto WHERE STO_Status='A' AND STO_Codigo not in (1,2,4,3,5,6,7,8,11,14,15,17,18,19,20,21,22,23,24,27,29,30)	                                                                                                   
 			  <cfif dateformat(#dtnovoprazo#,"YYYYMMDD") lt dateformat(now(),"YYYYMMDD")>
 				  AND STO_Codigo <> 20 
 			  </cfif>
@@ -2325,7 +2327,7 @@ window.open(page, "Popup", windowprops);
 		<cfset emrisco = lscurrencyformat(qResposta.RIP_EmRisco,'Local')>
 		<tr class="exibir">
       <td bgcolor="eeeeee">Potencial Valor</td>
-      <td colspan="5" bgcolor="eeeeee">
+      <td colspan="6" bgcolor="eeeeee">
 		  <table width="100%" border="0" cellspacing="0" bgcolor="eeeeee">
 			<tr class="exibir"><strong>
 				<td width="30%" bgcolor="eeeeee"><strong>Estimado a Recuperar (R$):&nbsp;<input name="frmfalta" type="text" class="form" value="#falta#" size="22" maxlength="17" readonly></strong></td>
@@ -2335,16 +2337,21 @@ window.open(page, "Popup", windowprops);
 		  </table>		  
 	  </td>
     </tr> 
+	<tr bgcolor="eeeeee">
+         <td align="center"><span class="titulos">Manchete:</span></td>
+        <td colspan="6"><textarea name="manchete" cols="200" rows="2" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.RIP_Manchete#</cfoutput></textarea></td>
+    </tr>
+
     </cfoutput>
 	 <cfset melhoria = replace('#qResposta.RIP_Comentario#','; ' ,';','all')>
 		<tr bgcolor="eeeeee">
          <td align="center"><span class="titulos">Situação Encontrada:</span></td>
-        <td colspan="5"><textarea name="Melhoria" cols="200" rows="20" wrap="VIRTUAL" class="form" readonly><cfoutput>#melhoria#</cfoutput></textarea></td>
+        <td colspan="6"><textarea name="Melhoria" cols="280" rows="20" wrap="VIRTUAL" class="form" readonly><cfoutput>#melhoria#</cfoutput></textarea></td>
       </tr>
  
  <!---  </cfif> --->
     <tr>
-      <td colspan="5">
+      <td colspan="6">
 		  <cfif numncisei eq "">
 			  <cfif trim(qResposta.Pos_NCISEI) eq "" and trim(qResposta.Pos_NCISEI) eq "">
 				<cfset numncisei = "">
@@ -2356,21 +2363,18 @@ window.open(page, "Popup", windowprops);
 		    </cfif>
         </cfif>
 	      <input type="hidden" name="nseincirel" id="nseincirel" value="<cfoutput>#numncisei#</cfoutput>">
-	<tr>
-      <td colspan="5">&nbsp;</td>
-    </tr>
-    
+
     <tr>
       <td bgcolor="eeeeee" align="center"><span class="titulos">Orientações:</span></td>
-      <td colspan="5" bgcolor="eeeeee"><textarea name="recomendacao" cols="200" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.RIP_Recomendacoes#</cfoutput></textarea></td>
+      <td colspan="6" bgcolor="eeeeee"><textarea name="recomendacao" cols="280" rows="12" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.RIP_Recomendacoes#</cfoutput></textarea></td>
     </tr>
 
     <tr>
-      <td valign="middle" bgcolor="eeeeee" align="center"><p><span class="titulos">Histórico:</span> <span class="titulos">Manifestações e Plano de Ação/Análise do Controle Interno</span><span class="titulos">:</span></p>
+      <td valign="middle" bgcolor="eeeeee" align="center"><p><span class="titulos">Histórico</span> <span class="titulos">Manifestações e Plano de Ação/Análise do Controle Interno</span><span class="titulos">:</span></p>
         <p>
           <input name="extrato" type="button" class="botao" id="extrato" onClick="window.open('Exibir_Texto_Parecer.cfm?frmUnid=<cfoutput>#unid#</cfoutput>&frmNumInsp=<cfoutput>#ninsp#</cfoutput>&frmGrupo=<cfoutput>#ngrup#</cfoutput>&frmItem=<cfoutput>#nitem#</cfoutput>','_blank')" value="+ Detalhes" />
       </td>
-      <td colspan="5" bgcolor="eeeeee"><textarea name="H_obs" cols="200" value="#Session.E01.h_obs#" rows="40" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.Pos_parecer#</cfoutput></textarea></td>
+      <td colspan="6" bgcolor="eeeeee"><textarea name="H_obs" cols="200" value="#Session.E01.h_obs#" rows="40" wrap="VIRTUAL" class="form" readonly><cfoutput>#qResposta.Pos_parecer#</cfoutput></textarea></td>
     </tr>
     <!--- ==============INICIO PROCESSO DISCIPLINAR======================= --->
     <cfset aux_usudr = left(URL.Unid,2)>
@@ -2983,7 +2987,7 @@ window.open(page, "Popup", windowprops);
 	if(usarEditor == true){
 		//configurações diferenciadas do editor de texto.
 		CKEDITOR.replace('Melhoria', {
-		width: 1020,
+		width: 1200,
 		height: 200,
 		toolbar:[
 		{ name: 'document', items: ['Preview', 'Print', '-' ] },
@@ -3002,7 +3006,7 @@ window.open(page, "Popup", windowprops);
 		});
 
 		CKEDITOR.replace('recomendacao', {
-		width: 1020,
+		width: 1200,
 		height: 100,
 		toolbar:[
 		{ name: 'document', items: ['Preview', 'Print', '-' ] },

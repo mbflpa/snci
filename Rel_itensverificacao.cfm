@@ -29,6 +29,9 @@
       
         <style type="text/css">
             html {margin:1cm 1cm;}
+            @media print {
+              .noprint { display: none; }
+            }
         </style>
 
         <script language="javascript">
@@ -49,6 +52,7 @@
                 WebBrowser1.outerHTML = "";
            
             }
+           
         </script>
 
     
@@ -61,30 +65,31 @@
 </cfif> 
         
         <form id="formPlanoTeste"  name="formPlanoTeste">
-          <div class="noprint" align="left" ><button type="button" onClick="window.print();">Imprimir</button>&nbsp;<input type="button" value="FECHAR" onclick="window.close()";>
-          </div>
+          <div class="noprint" align="left" ><input type="button" value="FECHAR" onclick="window.close()";>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" onClick="window.print();">Imprimir</button></div>
+          <br>
+          <div class="divFooter" align="right" style="position:relative;left:0px;font-size:16px;float:left">SNCI - Sistema Nacional de Controle Interno  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(data/hora de emissão:<cfoutput>#DateTimeFormat(now(),"dd-mm-yyyy HH:NN")#</cfoutput>)</div>
 
 		  
-              <table width="75%" border="0" cellspacing="4">
+              <table width="65%" border="0" cellspacing="4">
                 <thead>
-                  <tr >
-                    <td colspan="8" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center" ><img src="GeraRelatorio/geral/img/logoCorreios.gif" alt="Logo ECT"  width="207" height="56" style="" /></div></td>
+                  <tr>
+                    <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center" ><img src="GeraRelatorio/geral/img/logoCorreios.gif" alt="Logo ECT"  width="207" height="56" style="" /></div></td>
                   </tr>
                   <tr >
-                    <td colspan="8" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center" style=""><span class="style2" style="color:#053c5e;font-size:14px;"><strong>DEPARTAMENTO DE CONTROLE INTERNO</strong></span></div></td>
+                    <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center" style=""><span class="style2" style="color:#053c5e;font-size:14px;"><strong>DEPARTAMENTO DE CONTROLE INTERNO</strong></span></div></td>
                   </tr>
                   <tr>
-                    <td colspan="8" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center"> <span class="style2"  style="color:#053c5e;font-size:14px"><strong>PLANO DE TESTES</strong></span></div></td>
+                    <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="center"> <span class="style2"  style="color:#053c5e;font-size:14px"><strong>PLANO DE TESTES</strong></span></div></td>
                   </tr>
                   <tr>
-                    <td width="15%"  valign="top" bordercolor="999999" bgcolor="" scope="row"></td>
+                    <td colspan="3"  valign="top" bordercolor="999999" bgcolor="" scope="row"></td>
                   </tr>
                 </thead>
                 <tr>
-                  <td colspan="8" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"> <span class="style2"  style="color:#053c5e;">Tipo de unidade: <cfoutput><strong>#rsChecklistFiltrado.TUN_Descricao#</strong></cfoutput></span> </div></td>
+                  <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"> <span class="style2"  style="color:#053c5e;">Tipo de unidade: <cfoutput><strong>#rsChecklistFiltrado.TUN_Descricao#</strong></cfoutput></span> </div></td>
                 </tr>
                 <tr>
-                  <td colspan="8" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"> <span class="style2"  style="color:#053c5e;">Modalidade: <cfoutput><strong>
+                  <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"> <span class="style2"  style="color:#053c5e;">Modalidade: <cfoutput><strong>
                     <cfif #url.frmmodal# eq 0>
                       PRESENCIAL
                         <cfelseif #url.frmmodal# eq 1>
@@ -97,18 +102,18 @@
                   </strong></cfoutput></span> </div></td>
                 </tr>
                 <tr >
-                  <td colspan="8" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"> <span class="style2"  style="color:#053c5e">Ano: <cfoutput><strong>#rsChecklistFiltrado.TUI_Ano#</strong></cfoutput></span> </div></td>
+                  <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row"><div align="left"> <span class="style2"  style="color:#053c5e">Ano: <cfoutput><strong>#rsChecklistFiltrado.TUI_Ano#</strong></cfoutput></span> </div></td>
                 </tr>
                 <tr>
-                  <td  valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
+                  <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
                 </tr>
                 <cfoutput query="rsChecklistFiltrado" group="TUI_GRUPOITEM">
                   <tr>
-                    <td colspan="10" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>GRUPO: #TUI_GRUPOITEM# #Grp_Descricao#</strong></div></td>
+                    <td colspan="3" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>GRUPO: #TUI_GRUPOITEM# #Grp_Descricao#</strong></div></td>
                   </tr>
                 <cfoutput> 
                     <tr>
-					<td colspan="10" valign="top" bordercolor="999999" bgcolor="" scope="row">
+					<td colspan=3" valign="top" bordercolor="999999" bgcolor="" scope="row">
 					<div style="text-align: justify;"><strong>
 <!---                       <cfif '#url.frmacao#' eq 'S'> --->
                         Item: #TUI_GRUPOITEM#.#TUI_ITEMVERIF#  #Itn_Descricao#
@@ -124,27 +129,19 @@
 					</cfif>
           <tr>
             <cfif grpacesso eq 'GESTORMASTER'>					
-                        <td><strong>Relevância</strong></td>
-                        <td><div align="left"><strong>Pontuação:</strong></div></td>
-                        <td><div align="left"><strong>#Itn_Pontuacao#</strong></div></td>
-                        <td><div align="right"><strong>Classificação:</strong></div></td>
-                        <td><strong>&nbsp;#Itn_Classificacao#</strong></td>
-                <cfif grpacesso neq 'INSPETORES'>					  
-                        <td><div align="right"><strong>Situação do Ponto:</strong></div></td>
-                        <td><div align="left"><strong>#auxsitudesc#</strong> em: #DateTimeFormat(Itn_DtUltAtu,"dd-mm-yyyy HH:NN")#</div></td>
-                </cfif>					        
+                <td colspan="3"><strong>Relevância</strong>&nbsp;&nbsp;&nbsp;&nbsp;<strong>Pontuação:</strong>&nbsp;#Itn_Pontuacao#&nbsp;&nbsp;&nbsp;<strong>Classificação:</strong>&nbsp;#Itn_Classificacao# &nbsp;&nbsp;&nbsp;<strong>Situação do Ponto:</strong>&nbsp;#auxsitudesc#&nbsp;em:&nbsp;#DateTimeFormat(Itn_DtUltAtu,"dd-mm-yyyy HH:NN")#</td>		     
             </cfif>
             <cfif grpacesso neq 'GESTORMASTER'>
-              <td><div align="left"><strong>Situação do Ponto:  #auxsitudesc#</strong> em: #DateTimeFormat(Itn_DtUltAtu,"dd-mm-yyyy HH:NN")#</div></td>
+              <td colspan="3"><div align="left"><strong>Situação do Ponto:</strong>&nbsp;#auxsitudesc#&nbsp;em:&nbsp;#DateTimeFormat(Itn_DtUltAtu,"dd-mm-yyyy HH:NN")#</div></td>
             </cfif>
           </tr>       
 			<cfif '#url.frmacao#' eq 'S'>
               <tr>
-                <td colspan="10" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>Manchete: #Itn_Manchete#</strong></div></td>
+                <td colspan="3" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>Manchete: #Itn_Manchete#</strong></div></td>
               </tr>        
 					      <cfif grpacesso eq 'GESTORMASTER'>
                       <tr>
-                        <td colspan="10"><div align="left"><strong>Composição da Pontuação</strong></div></td>
+                        <td colspan="3" align="left"><div><strong>Composição da Pontuação</strong></div></td>
                       </tr>
                       <cfset itnptcseq = trim(Itn_PTC_Seq)>
                       <cfif len(itnptcseq) lte 0>
@@ -156,15 +153,15 @@
                         WHERE PTC_Ano=#Itn_Ano# and PTC_Seq In (#itnptcseq#)
                       </cfquery>
                       <tr>
-                        <td><div align="center"><strong>ID</strong></div></td>
-                        <td><div align="center"><strong>Peso</strong></div></td>
-                        <td colspan="5" ><strong>Descrição</strong></td>
+                        <td align="left" width="3"><div><strong>ID</strong></div></td>
+                        <td align="left" width="3"><div><strong>Peso</strong></div></td>
+                        <td align="left"><div><strong>Descrição</strong></div></td>
                       </tr>
                       <cfloop query="rsComp">
                         <tr>
-                          <td><div align="center">#rsComp.PTC_Seq#</div></td>
-                          <td><div align="center">#rsComp.PTC_Valor#</div></td>
-                          <td colspan="5" >#rsComp.PTC_Descricao#</td>
+                          <td align="left" width="3"><div>#rsComp.PTC_Seq#</div></td>
+                          <td align="left" width="3"><div>#rsComp.PTC_Valor#</div></td>
+                          <td align="left" style="font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">#rsComp.PTC_Descricao#</td>
                         </tr>
                       </cfloop>
 					  
@@ -173,26 +170,26 @@
                       ","<BR>" ,"All")>
                       <cfset ItnPreRelato = Replace(ItnPreRelato,"-----------------------------------------------------------------------------------------------------------------------","<BR>-----------------------------------------------------------------------------------------------------------------------<BR>" ,"All")>
                       <tr>
-                        <td colspan="7"><div align="left"><strong>Pré-Relato</strong></div></td>
+                        <td colspan="3"><div align="left"><strong>Pré-Relato</strong></div></td>
                       </tr>
                       <tr>
-                        <td colspan="7">#ItnPreRelato#</td>
+                        <td colspan="3">#ItnPreRelato#</td>
                       </tr>
 					      </cfif>					  
                       <tr>
                         <td  valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
                       </tr>
                       <tr>
-                        <td colspan="10" valign="top" bordercolor="999999" bgcolor="" scope="row"><div style="text-align: justify;"><strong><u><i>Como Verificar / Procedimentos Adotados: </i></u></strong>#Itn_Orientacao#</div></td>
+                        <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row"><div style="text-align: justify;"><strong><u><i>Como Verificar / Procedimentos Adotados: </i></u></strong>#Itn_Orientacao#</div></td>
                       </tr>
                       <tr>
                         <td  valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</td>
                       </tr>
                       <tr>
-                        <td colspan="10" valign="top" bordercolor="999999" bgcolor="" scope="row"><div style="text-align: justify;"><strong><u><i>Amostra: </i></u></strong>#Itn_Amostra#</div></td>
+                        <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row"><div style="text-align: justify;"><strong><u><i>Amostra: </i></u></strong>#Itn_Amostra#</div></td>
                       </tr>
                       <tr>
-                        <td colspan="10" valign="top" bordercolor="999999" bgcolor="" scope="row"><div style="text-align: justify;"><strong><u><i>Norma: </i></u></strong>#Itn_Norma#</div></td>
+                        <td colspan="3" valign="top" bordercolor="999999" bgcolor="" scope="row"><div style="text-align: justify;"><strong><u><i>Norma: </i></u></strong>#Itn_Norma#</div></td>
                       </tr>
     </cfif>
 					
@@ -201,7 +198,7 @@
                     </tr>
                  </cfoutput> 
                   <tr>
-                    <td  colspan="12" valign="top" bordercolor="999999" bgcolor=""  scope="row">&nbsp;</td>
+                    <td  colspan="3" valign="top" bordercolor="999999" bgcolor=""  scope="row">&nbsp;</td>
                   </tr>
                 </cfoutput>
                 <tr>
@@ -220,9 +217,10 @@
         </footer>
 --->        
         <tfoot>
-                    <tr><td><div class="noprint" align="CENTER"><button type="button" onClick="window.print();">Imprimir</button></div></td></tr>
-                    <tr><td><div class="divFooter" align="right" style="position:relative;left:0px;font-size:12px;float:left">SNCI - Sistema Nacional de Controle Interno  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Data/Hora de Emissão:<cfoutput>#DateTimeFormat(now(),"dd-mm-yyyy HH:NN")#</cfoutput>)</div>
+                    <tr><td><div class="noprint" align="left" ><input type="button" value="FECHAR" onclick="window.close()";>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" onClick="window.print();">Imprimir</button></div></td></tr>
+                    <tr><td><div class="divFooter" align="right" style="position:relative;left:0px;font-size:16px;float:left">SNCI - Sistema Nacional de Controle Interno  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(data/hora de emissão:<cfoutput>#DateTimeFormat(now(),"dd-mm-yyyy HH:NN")#</cfoutput>)</div>
         </tfoot>
+
     </body>
     
 

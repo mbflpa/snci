@@ -729,7 +729,7 @@ function abrirPopup(url,w,h)
 <script>
 	
 		CKEDITOR.replace('Melhoria', {
-			width: '1020',
+			width: '1200',
 			height: 200,
 			removePlugins: 'scayt',
 			disableNativeSpellChecker: false,
@@ -748,7 +748,7 @@ function abrirPopup(url,w,h)
 		});
 
 		CKEDITOR.replace('recomendacao', {
-			width: '1020',
+			width: '1200',
 			height: 200,
 			removePlugins: 'scayt',
 			disableNativeSpellChecker: false,

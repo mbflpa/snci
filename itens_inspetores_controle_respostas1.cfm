@@ -2847,7 +2847,7 @@ window.open(page, "Popup", windowprops);
 	if(usarEditor == true){
 		//configura&ccedil;&otilde;es diferenciadas do editor de texto.
 		CKEDITOR.replace('Melhoria', {
-		width: 1020,
+		width: 1200,
 		height: 200,
 		toolbar:[
 		{ name: 'document', items: ['Preview', 'Print', '-' ] },
@@ -2866,7 +2866,7 @@ window.open(page, "Popup", windowprops);
 		});
 
 		CKEDITOR.replace('recomendacao', {
-		width: 1020,
+		width: 1200,
 		height: 100,
 		toolbar:[
 		{ name: 'document', items: ['Preview', 'Print', '-' ] },

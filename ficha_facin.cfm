@@ -97,7 +97,16 @@
             WHERE INP_NumInspecao = convert(varchar,'#form.numinsp#') 
             and Itn_NumGrupo=#grp#  and Itn_NumItem = #itm# 
         </cfquery>    
-    </cfif>    
+    </cfif>
+    <cfset form.prazo = '0'>
+    <cfquery datasource="#dsn_inspecao#" name="rsPrazo">
+        SELECT FACA_Meta2_AR_Prazo
+        FROM UN_Ficha_Facin_Avaliador 
+        WHERE FACA_Meta2_AR_Prazo = '1' AND FACA_Avaliacao = convert(varchar,'#form.numinsp#') 
+    </cfquery>    
+    <cfif rsPrazo.recordcount gt 0>
+        <cfset form.prazo = '1'>
+    </cfif>
     <cfquery datasource="#dsn_inspecao#" name="rsFacind">
         SELECT FFI_Avaliacao,FFI_MatriculaGestor,FFI_MatriculaInspetor,FFI_Qtd_Item,FFI_Meta1_Peso,FFI_Meta1_Pontuacao_Obtida,FFI_Meta1_Resultado,FFI_Meta2_Peso,FFI_Meta2_Pontuacao_Obtida,FFI_Meta2_Resultado,FFI_DtConcluirFacin_Inspetor
         FROM UN_Ficha_Facin_Individual
@@ -259,7 +268,7 @@
 
 <!--- <body onload="meta2(true,1,1,85051071);colecao_meta2(85051071)"> --->
 
-<body style="background:##fff"> 
+<body style="background:##fff" onload=""> 
 <table width="98%" align="center">
     <tr><td>
 <!--- <form name="facin" method="POST" action=""> --->
@@ -408,7 +417,7 @@
                     <td colspan="10" align="center"><div class="btn btn-primary btn-sm disabled">Arquivo</div></td>                                                                            
                 </tr>
                 <tr colspan="10">
-                    <td colspan="2"><div class="card"><a class="btnmeta2" id="falta" title="#meta2aefalta#">Falta</a></div></td>
+                    <td colspan="2"><div class="card"><a class="btnmeta2" id="falta" title="#meta2aefalta#">Falta/Sobra</a></div></td>
                     <td colspan="2"><div class="card"><a class="btnmeta2" id="troca" title="#meta2artroca#">Troca</a></div></td>
                     <td colspan="2"><div class="card"><a class="btnmeta2" id="nomen" title="#meta2arnomen#">Nomenclatura</a></div></td>
                     <td colspan="2"><div class="card"><a class="btnmeta2" id="ordem" title="#meta2arordem#">Ordem</a></div></td>
@@ -552,7 +561,8 @@
     <input type="hidden" id="habilitarmeta1meta2SN" name="habilitarmeta1meta2SN" value="#habilitarmeta1meta2SN#">
     <input type="hidden" name="concaval" id="concaval" value="#dateformat(rsFicha.INP_DTConcluirAvaliacao,"YYYY-MM-DD")#">
     <input type="hidden" name="reanalisesn" id="reanalisesn" value="#form.reanalisesn#">
-    
+    <input type="hidden" name="formprazo" id="formprazo" value="#form.prazo#">
+
     <!---    
     <br>form.facqtdavaliacao: #form.facqtdavaliacao#
     <br>form.facpesometa1: #form.facpesometa1#
@@ -576,7 +586,8 @@
 <script>
     // abertura de tela
     $(function(e){
-     //alert('Dom inicializado!');   
+        //alert('Dom inicializado!'); 
+        //alert('prazo: '+$('#prazo').val())  
         $('#considerargestor').val($('#facaconsideracaogestor').val())
         $('#considerinspetor').val($('#facaconsideracaoinspetor').val())
         // Ajustar a cor dos cards da meta1
@@ -599,6 +610,12 @@
                 $(this).attr("class","btnmeta2 btn btn-outline-primary");
             }
         })
+        let formprazo = $('#formprazo').val()
+        if (formprazo == '1') {
+           // alert('Aqui linha 615')
+            $('#prazo').trigger("click");
+        }
+        
     })
     
     //===========================================
