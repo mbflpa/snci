@@ -737,7 +737,7 @@
                                 <p class="mt-3 lead">Procurando nos documentos. Isso pode levar alguns instantes...</p>
                                 
                                 <!-- Barra de progresso e status -->
-                                <div class="progress pdf-progress mx-auto" style="width:70%; height: 8px;">
+                                <div class="progress pdf-progress mx-auto" style="width:70%; height: 16px;">
                                     <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" id="processingProgress" role="progressbar" style="width: 0%"></div>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mt-2 mx-auto" style="width:70%;">
