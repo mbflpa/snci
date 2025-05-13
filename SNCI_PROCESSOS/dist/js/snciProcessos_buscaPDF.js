@@ -193,31 +193,32 @@ const PdfSearchManager = {
     const terms = searchTerms.split(" ");
     // Definir variáveis de progresso apenas uma vez
     let processedCount = 0;
-    const totalDocuments = documents.length;
+    const totalDocumentsForThisRun = documents.length; // Renomeado e usado localmente
     this.currentSearchResults = 0; // Contador em vez de array
 
     // Reset do cancelamento de busca
     searchCanceled = false;
     documentProcessing = true;
 
-    // Salvar o total de documentos em uma propriedade fixa para referência
-    this.totalDocumentsToProcess = totalDocuments;
+    // REMOVIDO: A linha abaixo causava o conflito entre buscas concorrentes.
+    // this.totalDocumentsToProcess = totalDocumentsForThisRun; 
 
     // Função para atualizar a barra de progresso
     const updateProgressBar = () => {
-      // Usar sempre o valor salvo de totalDocumentsToProcess
-      const percent = Math.round((processedCount / this.totalDocumentsToProcess) * 100);
+      // Usar a variável local 'totalDocumentsForThisRun' para esta execução específica
+      const percent = Math.round((processedCount / totalDocumentsForThisRun) * 100);
       $("#processingProgress")
         .css("width", percent + "%")
         .attr("aria-valuenow", percent)
-        .text(`${processedCount} de ${this.totalDocumentsToProcess} arquivos processados (${percent}%)`);
+        .text(`${processedCount} de ${totalDocumentsForThisRun} arquivos processados (${percent}%)`);
     };
 
     // Não precisamos mais mostrar container de resultados temporários
     $("#realTimeResults").hide();
     $("#searchResults").empty(); // Limpar resultados anteriores
 
-    $("#processingStatus").text(`Buscando em ${totalDocuments} documentos...`);
+    // Usa a variável local 'totalDocumentsForThisRun'
+    $("#processingStatus").text(`Buscando em ${totalDocumentsForThisRun} documentos...`);
 
     // Função para processar um documento por vez
     const processNextDocument = async (index) => {
@@ -266,10 +267,10 @@ const PdfSearchManager = {
       processedFilePaths.add(doc.filePath);
       processedCount++;
 
-      // Atualizar barra de progresso usando sempre o total fixo
+      // Atualizar barra de progresso usando o total desta execução específica
       updateProgressBar();
       $("#processingStatus").text(
-        `Processando: ${processedCount} de ${this.totalDocumentsToProcess}`
+        `Processando: ${processedCount} de ${totalDocumentsForThisRun}` // Usa a variável local 'totalDocumentsForThisRun'
       );
 
       // Pequeno efeito visual de "escaneamento" do documento
