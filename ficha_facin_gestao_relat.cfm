@@ -112,7 +112,7 @@
             INNER JOIN Diretoria ON Usu_DR = Dir_Codigo) 
             INNER JOIN Funcionarios ON FACA_MatriculaInspetor = Fun_Matric) 
             INNER JOIN Grupos_Verificacao ON FACA_Grupo = Grp_Codigo) ON (FACA_Item = Itn_NumItem) AND (INP_Modalidade = Itn_Modalidade) AND (Und_TipoUnidade = Itn_TipoUnidade) and (convert(char(4),RIP_Ano) = Grp_Ano) AND (Itn_Ano = Grp_Ano) AND (Itn_NumGrupo = Grp_Codigo)
-            WHERE RIP_NumInspecao='#URL.ninsp#' and FACA_MatriculaInspetor = '#url.matr#'
+            WHERE RIP_NumInspecao='#URL.ninsp#' and FACA_MatriculaInspetor = '#url.matrinsp#'
             order by RIP_NumGrupo, RIP_NumItem
     </cfquery>
 
@@ -137,7 +137,7 @@
 <cfquery datasource="#dsn_inspecao#" name="rsFacinInd">
     SELECT FFI_Qtd_Item,FFI_Meta1_Pontuacao_Obtida,FFI_Meta1_Resultado,FFI_Meta2_Pontuacao_Obtida,FFI_Meta2_Resultado,FFI_DtConcluirFacin_Inspetor
     FROM UN_Ficha_Facin_Individual
-    WHERE FFI_Avaliacao='#URL.ninsp#' AND FFI_MatriculaInspetor='#url.matr#' 
+    WHERE FFI_Avaliacao='#URL.ninsp#' AND FFI_MatriculaInspetor='#url.matrinsp#' 
 </cfquery>
 
 <cfquery name="rsRevisor" datasource="#dsn_inspecao#">
@@ -226,16 +226,26 @@
 <link href="CSS.css" rel="stylesheet" type="text/css">
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">
+    <style>
+        .quebra {
+            background:#beb7b7;
+        }
+        .quebra2 {
+            background:#fff9f9;
+        }
+        .quebra3 {
+            background:#ebdeded6;
+        }    
+    </style>
 </head>
 
 <body style="background:#fff"> 
 <cfoutput>
  <cfinclude template="cabecalho.cfm">
-<table width="75%"  align="left" class="table table-bordered">
+<table width="100%" align="center" class="table table-bordered table-hover">
   <tr>
-   <td colspan="1" align="center"><input type="button" class="botao" onClick="window.close()" value="Fechar"></td>
+    <td align="center"><input type="button" class="botao" onClick="window.close()" value="Fechar"></td>
     <td colspan="16"><div align="center"><strong class="titulo2">Avaliar Resultados Geral - (FACIN)</strong></div></td>
-    <td colspan="1" align="center"><input type="button" class="botao" onClick="window.close()" value="Fechar"></td>
   </tr>
   <cfif rsFacin.INP_Modalidade is 0>
     <cfset INPModalidade = 'PRESENCIAL'>
@@ -246,12 +256,13 @@
 </cfif>	
 
 	
-	<tr>
-      <td width="95" class="exibir"><strong>Unidade</strong></td>
+	<tr class="quebra">
+      <td colspan="1" class="exibir"><strong>Unidade</strong></td>
       <td colspan="2"><strong class="exibir">#rsFacin.Und_Descricao#</strong></td>
-      <td colspan="16"><strong class="exibir">Gerente unidade:&nbsp;#rsFacin.INP_Responsavel#</strong></td>
+      <td colspan="14"><strong class="exibir">Gerente unidade:&nbsp;#rsFacin.INP_Responsavel#</strong></td>
     </tr>
-    <tr>
+    
+    <tr class="quebra">
         <td colspan="1" align="center"><strong class="exibir">Nº Avaliação</strong></td>
         <td colspan="1" align="center"><strong class="exibir">Modalidade</strong></td>
         <td colspan="1" align="center"><strong class="exibir">Qtd. Geral</strong></td>
@@ -266,35 +277,36 @@
         <td colspan="2" align="center"><strong class="exibir">Pto Obtidos / Resultado Meta2</strong></td>
         <td colspan="1" align="center"><strong class="exibir">Data Planejada</strong></td>
         <td colspan="1" align="center"><strong class="exibir">Dif. (dias)</strong></td>
-        <td colspan="2" align="center"><strong class="exibir">Resultado Meta3</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">Resultado Meta3</strong></td>
     </tr> 
     
     <tr>
-        <td colspan="1" align="center"><strong class="exibir">#URL.Ninsp#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#INPModalidade#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#rsfac.FAC_Qtd_Avaliacao#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#rsfac.FAC_Qtd_Reanalise#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#percreanalise#%</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#RSFac.FAC_Qtd_Correcaotexto#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#totalC#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#totalN#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#totalE#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#totalV#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Pontos_Revisao_Meta1,'___.00')#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta1,'___.00')#%</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Pontos_Revisao_Meta2,'___.00')#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta2,'___.00')#%</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#dateformat(rsfac.fac_data_plan_meta3,"DD/MM/YYYY")#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">#int(rsfac.fac_difdia_meta3)#</strong></td>
-        <td colspan="2" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta3,'___.00')#%</strong></td>
-    </tr> 
-    <tr class="exibir"><td colspan="18"><hr></td></tr>    
-    <td colspan="8"><strong class="exibir">Inspetores</strong></td>
-    <td colspan="2" align="center"><strong class="exibir">Qtd. de Item Avaliado</strong></td>
-    <td colspan="2" align="center"><strong class="exibir">Meta1(Ptos. Obtidos)</strong></td>
-    <td colspan="2" align="center"><strong class="exibir">Meta1(Individual)</strong></td>
-    <td colspan="2" align="center"><strong class="exibir">Meta2(Ptos. Obtidos)</strong></td>
-    <td colspan="2" align="center"><strong class="exibir">Meta2(Individual)</strong></td>
+        <td align="center"><strong class="exibir">#URL.Ninsp#</strong></td>
+        <td align="center"><strong class="exibir">#INPModalidade#</strong></td>
+        <td align="center"><strong class="exibir">#rsfac.FAC_Qtd_Avaliacao#</strong></td>
+        <td align="center"><strong class="exibir">#rsfac.FAC_Qtd_Reanalise#</strong></td>
+        <td align="center"><strong class="exibir">#percreanalise#%</strong></td>
+        <td align="center"><strong class="exibir">#RSFac.FAC_Qtd_Correcaotexto#</strong></td>
+        <td align="center"><strong class="exibir">#totalC#</strong></td>
+        <td align="center"><strong class="exibir">#totalN#</strong></td>
+        <td align="center"><strong class="exibir">#totalE#</strong></td>
+        <td align="center"><strong class="exibir">#totalV#</strong></td>
+        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Pontos_Revisao_Meta1,'___.00')#</strong></td>
+        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta1,'___.00')#%</strong></td>
+        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Pontos_Revisao_Meta2,'___.00')#</strong></td>
+        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta2,'___.00')#%</strong></td>
+        <td align="center"><strong class="exibir">#dateformat(rsfac.fac_data_plan_meta3,"DD/MM/YYYY")#</strong></td>
+        <td align="center"><strong class="exibir">#int(rsfac.fac_difdia_meta3)#</strong></td>
+        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta3,'___.00')#%</strong></td>
+    </tr>  
+    <tr class="quebra">
+        <td colspan="8"><strong class="exibir">Inspetores(as)</strong></td>
+        <td colspan="2" align="center"><strong class="exibir">Qtd. de Item Avaliado</strong></td>
+        <td colspan="2" align="center"><strong class="exibir">Meta1(Ptos. Obtidos)</strong></td>
+        <td colspan="2" align="center"><strong class="exibir">Meta1(Individual)</strong></td>
+        <td colspan="2" align="center"><strong class="exibir">Meta2(Ptos. Obtidos)</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">Meta2(Individual)</strong></td>
+    </tr>
     <cfset Num_Insp = Left(URL.Ninsp,2) & '.' & Mid(URL.Ninsp,3,4) & '/' & Right(URL.Ninsp,4)>   
     <cfset col = 'Inspetores'>
     <cfloop query="qInspetor">
@@ -310,88 +322,87 @@
             <td colspan="2" align="center"><strong class="exibir">#numberFormat(qInspetor.FFI_Meta1_Pontuacao_Obtida,'___.00')#</strong></td>
             <td colspan="2" align="center"><strong class="exibir">#numberFormat(qInspetor.FFI_Meta1_Resultado,'___.00')#%</strong></td>
             <td colspan="2" align="center"><strong class="exibir">#numberFormat(qInspetor.FFI_Meta2_Pontuacao_Obtida,'___.00')#</strong></td>
-            <td colspan="2" align="center"><strong class="exibir">#numberFormat(qInspetor.FFI_Meta2_Resultado,'___.00')#%</strong></td>
+            <td colspan="1" align="center"><strong class="exibir">#numberFormat(qInspetor.FFI_Meta2_Resultado,'___.00')#%</strong></td>
         </tr>
         <cfset col = ''>
     </cfloop>
-    <tr class="exibir" colspan="17">
-        <td colspan="3" align="center">
+    <tr class="exibir quebra3">
+        <td colspan="2" align="center">
             <strong class="exibir">Pré-Inspeção</strong>
         </td>
-        <td align="center">
+        <td colspan="2" align="center">
             <strong class="exibir">Início Desloc.</strong>
         </td>
-        <td align="center">
+        <td colspan="1" align="center">
             <strong class="exibir">Fim Desloc.</strong>
         </td>
-        <td align="center">
+        <td colspan="1" align="center">
             <strong class="exibir">Horas Desloc.</strong>
         </td>
-        <td>
+        <td colspan="1" align="center">
             <strong class="exibir">Início Avaliação</strong>
         </td>
-        <td align="center">
+        <td colspan="1" align="center">
             <strong class="exibir">Fim Avaliação</strong>
         </td>
-        <td align="center">
+        <td colspan="1" align="center">
             <strong class="exibir">Horas Avaliação</strong>
         </td>
-        <td align="center">
+        <td colspan="2" align="center">
             <strong class="exibir">Início Avaliação</strong>
         </td>
-        <td align="center">
+        <td colspan="2" align="center">
             <strong class="exibir">Última Avaliação</strong>
         </td>
-        <td align="center">
+        <td colspan="1" align="center">
             <strong class="exibir">Conclusão Avaliação</strong>
         </td>
-        <td align="center">
+        <td colspan="1" align="center">
             <strong class="exibir">Houve Reanálise?</strong>
         </td>
-        <td colspan="5"  align="center">
+        <td colspan="2"  align="center">
             <strong class="exibir">Última Reanálise</strong>
         </td>
     </tr>
-    <tr class="exibir"  colspan="16">
-        <td colspan="3" class="exibir" align="center">
+    <tr class="exibir">
+        <td colspan="2" align="center">
             <strong>#qInspetor.INP_HrsPreInspecao# horas</strong>
         </td>
-        <td class="exibir" align="center">
+        <td colspan="2" align="center">
             <strong>#dateformat(qInspetor.INP_DtInicDeslocamento,"dd-mm-yyyy")#</strong>
         </td>
-        <td class="exibir" align="center">
+        <td colspan="1" align="center">
             <strong>#dateformat(qInspetor.INP_DtFimDeslocamento,"dd-mm-yyyy")#</strong>
         </td>
-        <td class="exibir" align="center">
+        <td colspan="1" align="center">
             <strong>#qInspetor.INP_HrsDeslocamento#</strong>
         </td>
-        <td class="exibir" align="center">
+        <td colspan="1" align="center">
             <strong>#dateformat(qInspetor.INP_DtInicInspecao,"dd-mm-yyyy")#</strong>
         </td>
-        <td class="exibir" align="center">
+        <td colspan="1" align="center">
             <strong>#dateformat(qInspetor.INP_DtFimInspecao,"dd-mm-yyyy")#</strong>
         </td>  
-        <td class="exibir" align="center">
+        <td colspan="1" align="center">
             <strong>#qInspetor.INP_HrsInspecao#</strong>
         </td>
-        <td class="exibir" align="center">
+        <td colspan="2" align="center">
             <strong>#DateTimeFormat(rsPrimAval.RIP_Data_Avaliador,"dd-mm-yyyy HH:NN:SS")#</strong>
         </td>
-        <td class="exibir" align="center">
+        <td colspan="2" align="center">
             <strong>#DateTimeFormat(rsUlttraninsp.RIP_Data_Avaliador,"dd-mm-yyyy HH:NN:SS")#</strong>
         </td>  
-        <td class="exibir" align="center">
+        <td colspan="1" align="center">
             <strong>#dateformat(qInspetor.INP_DTConcluirAvaliacao,"dd-mm-yyyy")#</strong>
         </td>  
-        <td class="exibir" align="center">
+        <td colspan="1" align="center">
             <strong>#comreanalise#</strong>
         </td>  
-        <td colspan="5" class="exibir" align="center">
+        <td colspan="2" align="center">
             <strong>#DateTimeFormat(rsUltreanalise.RIP_DtUltAtu,"dd-mm-yyyy HH:NN:SS")#</strong>
         </td>                    
     </tr>
     
-    <tr class="exibir"><td colspan="18"><hr></td></tr> 
     <cfset dt02dduteis = CreateDate(year(rsFacin.INP_RevisorDTInic),month(rsFacin.INP_RevisorDTInic),day(rsFacin.INP_RevisorDTInic))>
 	<cfset nCont = 1>
 	<cfloop condition="nCont lte 2">
@@ -416,44 +427,50 @@
     <cfif comreanalise eq 'Sim'>
         <!--- <cfset dthhprevrevisor = DateFormat(dt02dduteis,"dd-mm-yyyy") & ' ' & DateTimeFormat(rsUltReanaliseRevisor.RIP_DtUltAtu_Revisor,"HH:NN:SS")> --->
     </cfif>
-
-    <tr>
+    <tr class="quebra">
         <td colspan="7" class="exibir" align="left"><strong>Revisor(a)</strong></td>
-        <td colspan="1" class="exibir" align="center"><strong><strong class="exibir">Início Revisão</strong></td>
-        <td colspan="1" class="exibir" align="center"><strong><strong class="exibir">Previsão Conclusão</td>
+        <td colspan="2" class="exibir" align="center"><strong><strong class="exibir">Início Revisão</strong></td>
+        <td colspan="2" class="exibir" align="center"><strong><strong class="exibir">Previsão Conclusão</td>
         <td colspan="1" class="exibir" align="center"><strong><strong class="exibir">Última Reanálise:&nbsp;</strong></td>
         <td colspan="1" class="exibir" align="center"><strong>Conclusão Revisão</td>
         <td colspan="1" class="exibir" align="center"><strong>Início FACIN</td>
-        <td colspan="6" class="exibir" align="center"><strong>Final FACIN</strong></td>
+        <td colspan="3" class="exibir" align="center"><strong>Final FACIN</strong></td>
     </tr>  
     <tr>
         <td colspan="7" class="exibir" align="left"><strong>#rsFacin.Usu_Apelido# - #rsFacin.Usu_LotacaoNome# - (SE-#trim(rsRevisor.Dir_Sigla)#)</strong></td>
-        <td colspan="1" class="exibir" align="center"><strong><strong class="exibir">#DateTimeFormat(rsFacin.INP_RevisorDTInic,"dd-mm-yyyy HH:NN:SS")#</strong></td>
-        <td colspan="1" class="exibir" align="center"><strong><strong class="exibir">#dthhprevrevisor#</strong></td>
+        <td colspan="2" class="exibir" align="center"><strong><strong class="exibir">#DateTimeFormat(rsFacin.INP_RevisorDTInic,"dd-mm-yyyy HH:NN:SS")#</strong></td>
+        <td colspan="2" class="exibir" align="center"><strong><strong class="exibir">#dthhprevrevisor#</strong></td>
         <td colspan="1" class="exibir" align="center"><strong>#DateTimeFormat(rsUltReanaliseRevisor.RIP_DtUltAtu_Revisor,"dd-mm-yyyy HH:NN:SS")#</strong></td>
         <td colspan="1" class="exibir" align="center"><strong>#dateformat(rsFacin.INP_DTConcluirRevisao,"dd-mm-yyyy")#</strong></td>
         <td colspan="1" class="exibir" align="center"><strong>#DateTimeFormat(rsfac.FAC_DtCriar,"dd-mm-yyyy HH:NN:SS")#</strong></td>
-        <td colspan="6" class="exibir" align="center"><strong>#DateTimeFormat(rsfac.FAC_DtAlter,"dd-mm-yyyy HH:NN:SS")#</strong></td>
+        <td colspan="3" class="exibir" align="center"><strong>#DateTimeFormat(rsfac.FAC_DtAlter,"dd-mm-yyyy HH:NN:SS")#</strong></td>
     </tr>  
-    <tr class="exibir"><td colspan="18"><hr></td></tr> 
-    <tr>
-        <td width="95" class="exibir"><strong>Inspetor(a)</strong></td>
-        <td colspan="5"><strong class="exibir">#rsFacin.Fun_Nome#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">Qtd. Avaliado:&nbsp;&nbsp;#rsFacinInd.FFI_Qtd_Item#</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">Meta1(Pontos Obtidos):&nbsp;&nbsp;&nbsp;#numberFormat(rsFacinInd.FFI_Meta1_Pontuacao_Obtida,'___.00')#</strong></td>
-        <td colspan="2" align="center"><strong class="exibir">Meta1(Individual):&nbsp;&nbsp;&nbsp;#numberFormat(rsFacinInd.FFI_Meta1_Resultado,'___.00')#%</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">Meta2(Pontos Obtidos):&nbsp;&nbsp;&nbsp;#numberFormat(rsFacinInd.FFI_Meta2_Pontuacao_Obtida,'___.00')#</strong></td>
-        <td colspan="2" align="center"><strong class="exibir">Meta2(Individual):&nbsp;&nbsp;&nbsp;#numberFormat(rsFacinInd.FFI_Meta2_Resultado,'___.00')#%</strong></td>
-        <td colspan="5" align="center">
-            <strong class="exibir">Conclusão das considerações (FACIN):&nbsp;&nbsp;&nbsp;#DateTimeFormat(rsFacinInd.FFI_DtConcluirFacin_Inspetor,"dd-mm-yyyy HH:NN:SS")#</strong>
-        </td>   
+    <tr class="quebra">
+        <td colspan="6" class="exibir"><strong>Inspetor(a)</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">Qtd. Avaliado</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">Meta1(Pontos Obtidos)</strong></td>
+        <td colspan="2" align="center"><strong class="exibir">Meta1(Individual)</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">Meta2(Pontos Obtidos)</strong></td>
+        <td colspan="2" align="center"><strong class="exibir">Meta2(Individual)</strong></td>
+        <td colspan="4" align="center"><strong class="exibir">Conclusão das considerações (FACIN)</strong></td>   
     </tr>
+    <tr>
+        <td colspan="6"><strong class="exibir">#rsFacin.Fun_Nome#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#rsFacinInd.FFI_Qtd_Item#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsFacinInd.FFI_Meta1_Pontuacao_Obtida,'___.00')#</strong></td>
+        <td colspan="2" align="center"><strong class="exibir">#numberFormat(rsFacinInd.FFI_Meta1_Resultado,'___.00')#%</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsFacinInd.FFI_Meta2_Pontuacao_Obtida,'___.00')#</strong></td>
+        <td colspan="2" align="center"><strong class="exibir">#numberFormat(rsFacinInd.FFI_Meta2_Resultado,'___.00')#%</strong></td>
+        <td colspan="4" align="center"><strong class="exibir">#DateTimeFormat(rsFacinInd.FFI_DtConcluirFacin_Inspetor,"dd-mm-yyyy HH:NN:SS")#</strong></td>   
+    </tr>
+<!---    
 </table>
 
-<table width="75%"  align="left" class="table table-bordered">
+<table width="75%"  align="left" class="table table-bordered table-hover">
+--->
+
 <cfloop query="rsFacin">
-<tr class="exibir"><td colspan="18"><hr></td></tr> 
-    <tr>
+    <tr class="quebra">
         <td colspan="6">
             <strong class="exibir">Grupo</strong>&nbsp;&nbsp;
         </td>
@@ -503,8 +520,8 @@
     <cfif rsFacin.FACA_Meta1_AE_Orient eq 1><cfset orient = 'Sim'><cfset ptodescontadometa1 = ptodescontadometa1 + ptodescmeta1ind></cfif>    
     <cfset ptodescontadometa1 = numberFormat((ptodescontadometa1),'___.00')>
     <cfset ptofinalmeta1 = numberFormat((FACA_Meta1_Pontos),'___.00')>
-    <tr>
-        <td colspan="18" align="center"><strong class="exibir">Meta1 - Redigir Apontamentos</strong>
+    <tr class="quebra3">
+        <td colspan="17" align="center"><strong class="exibir">Meta1 - Redigir Apontamentos</strong>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong class="exibir">Pontuação Inicial: &nbsp;&nbsp;#ptogrpitmind# </strong>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong class="exibir">Valor Desconto: &nbsp;&nbsp;#ptodescmeta1ind# </strong>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong class="exibir">Valor Descontado: &nbsp;&nbsp;(-#ptodescontadometa1#) </strong>
@@ -515,7 +532,7 @@
         <td colspan="5" align="center"><strong class="exibir">Aspectos Textuais</strong></td>
         <td colspan="13" align="center"><strong class="exibir">Aspectos Estruturais</strong></td>
     </tr>
-    <tr>
+    <tr class="quebra3">
         <td align="center" colspan="3"><strong class="exibir">Ortografia e Gramática</strong></td>
         <td align="center" colspan="2"><strong class="exibir">Clareza/Concisão e/ou Coerência/Precisão</strong></td>
         <td align="center" colspan="1"><strong class="exibir">Técnica</strong></td>
@@ -540,7 +557,7 @@
         <td align="center" colspan="2"><strong class="exibir">#class#</strong></td>
         <td align="center" colspan="2"><strong class="exibir">#orient#</strong></td>
     </tr>    
-    <tr class="exibir"><td>&nbsp;</td></tr>
+
     <cfset ptodescmeta2 = numberFormat((ptogrpitmind/5),'___.00')>
     <cfset ptodescontadometa2 = 0>
     <cfset falta = 'Não'>
@@ -555,8 +572,9 @@
     <cfif rsFacin.FACA_Meta2_AR_Prazo eq 1><cfset prazo = 'Sim'><cfset ptodescontadometa2 = ptodescontadometa2 + ptodescmeta2></cfif>   
     <cfset ptodescontadometa2 = numberFormat((ptodescontadometa2),'___.00')> 
     <cfset ptofinalmeta2 = numberFormat((FACA_Meta2_Pontos),'___.00')>
-    <tr>
-        <td colspan="18" align="center">
+    <tr class="quebra2"><td colspan="17"></td></tr> 
+    <tr class="quebra3">
+        <td colspan="17" align="center">
             <strong class="exibir">Meta2 - Organizar documento no SEI</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong class="exibir">Pontuação Inicial: &nbsp;&nbsp;#ptogrpitmind# </strong>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong class="exibir">Valor Desconto: &nbsp;&nbsp;#ptodescmeta2# </strong>
@@ -565,9 +583,9 @@
         </td>
     </tr> 
     <tr>
-        <td colspan="18" align="center"><strong class="exibir">Arquivo</strong></td>
+        <td colspan="17" align="center"><strong class="exibir">Arquivo</strong></td>
     </tr>
-    <tr>
+    <tr class="quebra3">
         <td align="center" colspan="3"><strong class="exibir">Falta</strong></td>
         <td align="center" colspan="3"><strong class="exibir">Troca</strong></td>
         <td align="center" colspan="6"><strong class="exibir">Nomenclatura</strong></td>
@@ -575,17 +593,16 @@
         <td align="center" colspan="3"><strong class="exibir">Prazo</strong></td>
     </tr> 
 
-    <tr colspan="18">
+    <tr>
         <td align="center" colspan="3"><strong class="exibir">#falta#</strong></td>
         <td align="center" colspan="3"><strong class="exibir">#troca#</strong></td>
         <td align="center" colspan="6"><strong class="exibir">#nomen#</strong></td>
         <td align="center" colspan="3"><strong class="exibir">#ordem#</strong></td>
         <td align="center" colspan="3"><strong class="exibir">#prazo#</strong></td>
     </tr>   
-
+    <tr class="quebra2"><td colspan="17"></td></tr> 
     <cfif rsFacin.Faca_Tipo eq 'Com Reanálise'>
-        <tr class="exibir"><td>&nbsp;</td></tr>
-        <tr>
+        <tr class="quebra3">
             <td colspan="9">
                 <strong class="exibir">Recomendado pelo(a) Revisor(a)</strong>
             </td>
@@ -595,35 +612,33 @@
         </tr>
         <tr>
             <td colspan="9">
-                <textarea name="" cols="160" rows="8" wrap="VIRTUAL" class="form" readonly>#rsFacin.RIP_Recomendacao_Inspetor#</textarea>
+                <textarea name="" cols="145" rows="8" wrap="VIRTUAL" class="form" readonly>#rsFacin.RIP_Recomendacao_Inspetor#</textarea>
             </td>
             <td colspan="9">
-                <textarea name="" cols="160" rows="8" wrap="VIRTUAL" class="form" readonly>#rsFacin.RIP_Critica_Inspetor#</textarea>
+                <textarea name="" cols="145" rows="8" wrap="VIRTUAL" class="form" readonly>#rsFacin.RIP_Critica_Inspetor#</textarea>
             </td>
         </tr> 
     </cfif>
 
-    <tr class="exibir"><td>&nbsp;</td></tr>
-    <tr>
+    <tr class="quebra3">
         <td colspan="9">
-            <strong class="exibir">Consideração Revisor</strong>
+            <strong class="exibir">Consideração Revisor(a)</strong>
         </td>
         <td colspan="9">
-            <strong class="exibir">Consideração Inspetor</strong>
+            <strong class="exibir">Consideração Inspetor(a)</strong>
         </td>
     </tr>
     <tr>
         <td colspan="9">
-            <textarea name="" cols="160" rows="5" wrap="VIRTUAL" class="form" readonly>#rsFacin.FACA_ConsideracaoGestor#</textarea>
+            <textarea name="" cols="145" rows="5" wrap="VIRTUAL" class="form" readonly>#rsFacin.FACA_ConsideracaoGestor#</textarea>
         </td>
         <td colspan="9">
-            <textarea name="" cols="160" rows="5" wrap="VIRTUAL" class="form" readonly>#rsFacin.FACA_ConsideracaoInspetor#</textarea>
+            <textarea name="" cols="145" rows="5" wrap="VIRTUAL" class="form" readonly>#rsFacin.FACA_ConsideracaoInspetor#</textarea>
         </td>
     </tr> 
-  
 </cfloop> 
     <tr>
-        <td colspan="16" align="center"><input type="button" class="botao" onClick="window.close()" value="Fechar"></td>
+        <td colspan="17" align="center"><input type="button" class="botao" onClick="window.close()" value="Fechar"></td>
     </tr>   
 <!---
     <tr>
