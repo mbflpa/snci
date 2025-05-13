@@ -3572,16 +3572,12 @@
 					
 					</cfquery>
 
-					
-
-
 					<cfquery datasource = "#application.dsn_processos#" >
 						UPDATE 	pc_avaliacao_orientacoes
 						SET 
 							pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
 							pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 							pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
-							pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#rsOrgaoResp.orgaoResp#" cfsqltype="cf_sql_varchar">,
 							pc_aval_orientacao_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
 						WHERE 
 							pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
