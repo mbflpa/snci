@@ -3502,7 +3502,7 @@
 					DELETE FROM pc_avaliacao_posicionamentos 
 					WHERE pc_aval_posic_num_orientacao = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#"> and pc_aval_posic_enviado = 0
 				</cfquery>
-
+               
 				<cfquery datasource = "#application.dsn_processos#" name="rsOrgao">
 					SELECT 	pc_orgaos.* FROM pc_orgaos WHERE pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#arguments.pc_aval_orientacao_mcu_orgaoResp#">
 				</cfquery>
@@ -3545,6 +3545,14 @@
 
 				<cfelse>
 
+ 					<cfquery datasource = "#application.dsn_processos#" name="rsOrgaoResp">
+						SELECT TOP 1 pc_aval_posic_num_orgaoResp as orgaoResp
+						FROM pc_avaliacao_posicionamentos
+						WHERE pc_aval_posic_num_orientacao=<cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.pc_aval_orientacao_id#">
+						ORDER BY pc_aval_posic_id DESC
+					</cfquery>
+
+					
 					<cfset textoPosic = "#arguments.pc_aval_posic_texto#">
 
 					<cfquery datasource = "#application.dsn_processos#" name="rsCadPosic">
@@ -3554,7 +3562,7 @@
 							<cfqueryparam value="#textoPosic#" cfsqltype="cf_sql_varchar">,
 							<cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_matricula#" cfsqltype="cf_sql_varchar">,
-							<cfqueryparam value="#application.rsUsuarioParametros.pc_usu_lotacao#" cfsqltype="cf_sql_varchar">,
+							<cfqueryparam value="#rsOrgaoResp.orgaoResp#" cfsqltype="cf_sql_varchar">,
 							<cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
 							<cfqueryparam value="1" cfsqltype="cf_sql_integer">,
 							<cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
@@ -3564,13 +3572,16 @@
 					
 					</cfquery>
 
+					
+
+
 					<cfquery datasource = "#application.dsn_processos#" >
 						UPDATE 	pc_avaliacao_orientacoes
 						SET 
 							pc_aval_orientacao_status = <cfqueryparam value="#arguments.pc_aval_orientacao_status#" cfsqltype="cf_sql_varchar">,
 							pc_aval_orientacao_status_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 							pc_aval_orientacao_atualiz_login = <cfqueryparam value="#application.rsUsuarioParametros.pc_usu_login#" cfsqltype="cf_sql_varchar">,
-							pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#arguments.pc_aval_orientacao_mcu_orgaoResp#" cfsqltype="cf_sql_varchar">,
+							pc_aval_orientacao_mcu_orgaoResp = <cfqueryparam value="#rsOrgaoResp.orgaoResp#" cfsqltype="cf_sql_varchar">,
 							pc_aval_orientacao_numProcJudicial = <cfqueryparam value="#arguments.pc_aval_orientacao_numProcJudicial#" cfsqltype="cf_sql_varchar">
 						WHERE 
 							pc_aval_orientacao_id = <cfqueryparam value="#arguments.pc_aval_orientacao_id#" cfsqltype="cf_sql_integer">
