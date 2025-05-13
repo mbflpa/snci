@@ -230,16 +230,26 @@
       })//fim buscar avaliações   
       //preencher tabela
       $('#frmavaliacao').change(function(e){ 
-        $("#table").hide(500)
-        if($(this).val() != ''){    
+        $("#table").hide(500) 
+        if($(this).val() != ''){   
+            let ano = $('#frmano').val(); 
+            let dtinic = $('#dtinic').val() 
+            dtinic += ' 23:59:59.000'
+            let dtfinal = $('#dtfinal').val()
+            dtfinal += ' 23:59:59.999'
+            let frmse = $('#frmse').val(); 
+            let matrinsp = $('#frminspetores').val(); 
             let aval = $(this).val()
-            let matr = $('#frminspetores').val(); 
             //alert(ano + ' ' + frmse + ' ' + matr)
             axios.get("CFC/fichafacin.cfc",{
                 params: {
                     method: "gestao",
-                    aval: aval,
-                    matr: matr
+                    ano: ano,
+                    dtinic: dtinic,
+                    dtfinal: dtfinal,
+                    codse: frmse,
+                    matrinsp: matrinsp,
+                    aval: aval 
                 }
             })
             .then(data =>{
@@ -279,7 +289,7 @@
                 if(descmeta1 < 0){descmeta1=0}
                 descmeta2 = eval(ret[3] - ret[6]).toFixed(2)
                 if(descmeta2 < 0){descmeta2=0}
-                let url = 'href=ficha_facin_gestao_relat.cfm?ninsp='+ret[0]+'&matr='+matr
+                let url = 'href=ficha_facin_gestao_relat.cfm?ninsp='+ret[0]+'&matrinsp='+matrinsp
                 //alert(url)
                 tab += '<tr>'
                   tab += '<td class="alert alert-primary"><a class="alert-link" '+url+' target="_blank">'+ret[0]+'</a></td>'
@@ -314,7 +324,7 @@
               $("#table").show(500)
             })  
         }
-      })//fim preencher tabela            
+      })//fim preencher tabela               
       //Limpar os selects bases   
       $('#frmano').change(function() {
         $("#frmse").val("").change();

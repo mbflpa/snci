@@ -421,7 +421,11 @@
                     <td colspan="2"><div class="card"><a class="btnmeta2" id="troca" title="#meta2artroca#">Troca</a></div></td>
                     <td colspan="2"><div class="card"><a class="btnmeta2" id="nomen" title="#meta2arnomen#">Nomenclatura</a></div></td>
                     <td colspan="2"><div class="card"><a class="btnmeta2" id="ordem" title="#meta2arordem#">Ordem</a></div></td>
-                    <td colspan="2"><div class="card"><a class="btnmeta2" id="prazo" title="#meta2arprazo#">Prazo</a></div></td>                                                                           
+                    <cfif form.reanalisesn eq 'S'>
+                        <td colspan="2"><div class="card"><a class="btnmeta2" id="prazo" title="#meta2arprazo#">Prazo</a></div></td> 
+                    <cfelse>                 
+                        <td colspan="2"><div class="card"><a class="btnmeta2" id="prazo" title="0">Prazo</a></div></td>   
+                    </cfif>                                                                                               
                 </tr>
             </table>
         </td>
@@ -611,8 +615,9 @@
             }
         })
         let formprazo = $('#formprazo').val()
-        if (formprazo == '1') {
-           // alert('Aqui linha 615')
+        let db_prazo = $('#prazo').val()
+        if (formprazo == 1 && db_prazo != 1) {
+            //alert('Aqui linha 615 '+formprazo+' db_prazo: '+db_prazo)
             $('#prazo').trigger("click");
         }
         
@@ -627,14 +632,14 @@
             return false;
         }
 
-        if ($('#considerinspetor').val() == '' && ($('#meta1cobrarconsideracaogestorsn').val() == 'S' || $('#meta2cobrarconsideracaogestorsn').val() == 'S') && $('#grpacesso').val()=='INSPETORES'){
-            alert("Falta informar as suas considerações do Item selecionado!");
+        if ($('#reanalisesn').val() == 'S' && $('#considerinspetor').val() == '' && ($('#meta1cobrarconsideracaogestorsn').val() == 'S' || $('#meta2cobrarconsideracaogestorsn').val() == 'S') && $('#grpacesso').val()=='INSPETORES'){
+            alert("Inspetor(a), falta informar as suas considerações do Item selecionado!");
             $('#considerinspetor').focus();
             return false;
         } 
         
-        if ($('#considerargestor').val() == '' && ($('#meta1cobrarconsideracaogestorsn').val() == 'S' || $('#meta2cobrarconsideracaogestorsn').val() == 'S') && $('#grpacesso').val()=='GESTORES'){
-            alert("Falta informar as suas considerações do Item selecionado!");
+        if ($('#reanalisesn').val() == 'S' && $('#considerargestor').val() == '' && ($('#meta1cobrarconsideracaogestorsn').val() == 'S' || $('#meta2cobrarconsideracaogestorsn').val() == 'S') && $('#grpacesso').val()=='GESTORES'){
+            alert("Revisor(a), falta informar as suas considerações do Item selecionado!");
             $('#considerargestor').focus();
             return false;
         }   

@@ -139,7 +139,7 @@
 					FFI_MatriculaInspetor = '#form.idmatrinspetor#'
 				</cfquery>	
 			</cfif>	
-			<cfif form.meta2arpraz eq 1>
+			<cfif form.facatipo eq 'Com Reanálise'>
 				<cfquery datasource="#dsnSNCI#">
 					UPDATE UN_Ficha_Facin_Avaliador set 
 					FACA_Meta2_AR_Prazo = '#form.meta2arpraz#'
@@ -147,7 +147,7 @@
 					FACA_Unidade = '#form.idunidade#' AND 
 					FACA_Avaliacao = '#form.idavaliacao#'  
 				</cfquery>				
-			</cfif>
+			</cfif> 
 			<!--- inicio atualização --->
 			<cfquery datasource="#dsnSNCI#" name="rsfacinaval">
 				SELECT FAC_Qtd_Avaliacao,FAC_Peso_Meta1, FAC_Peso_Meta2,FACA_Unidade, FACA_Avaliacao, FACA_MatriculaGestor, FACA_MatriculaInspetor, FACA_Grupo, FACA_Item, FACA_Meta1_AT_OrtoGram, FACA_Meta1_AT_CCCP, FACA_Meta1_AE_Tecn, FACA_Meta1_AE_Prob, FACA_Meta1_AE_Valor, FACA_Meta1_AE_Cosq, FACA_Meta1_AE_Norma, FACA_Meta1_AE_Docu, FACA_Meta1_AE_Class, FACA_Meta1_AE_Orient, FACA_Meta1_Pontos, FACA_Meta2_AR_Falta, FACA_Meta2_AR_Troca, FACA_Meta2_AR_Nomen, FACA_Meta2_AR_Ordem, FACA_Meta2_AR_Prazo, FACA_Meta2_Pontos
@@ -298,7 +298,7 @@
 				FROM UN_Ficha_Facin 
 				INNER JOIN Unidades ON FAC_Unidade = Und_Codigo
 				INNER JOIN UN_Ficha_Facin_Individual ON (FAC_MatriculaGestor = FFI_MatriculaGestor) AND (FAC_Avaliacao = FFI_Avaliacao)
-				WHERE FFI_MatriculaInspetor='#matr#' AND FFI_Avaliacao Like '%#ano#' and FAC_DtConcluirFacin_Gestor between '#dtinic#' and '#dtfinal#'
+				WHERE FFI_MatriculaInspetor='#matr#' AND FFI_Avaliacao Like '#codse#%' AND FFI_Avaliacao Like '%#ano#' and FAC_DtConcluirFacin_Gestor between '#dtinic#' and '#dtfinal#'
 				and FFI_DtConcluirFacin_Inspetor is not null
 				ORDER BY Und_Descricao
             </cfquery>
@@ -322,6 +322,30 @@
 							FAC_Avaliacao ='#aval#' AND 
 							FAC_MatriculaGestor = '#matrgestor#'
 					</cfquery> 
+					<!--- Avisar aos inspetores da conclusão da FACIN --->
+					<cfquery name="rsEnvio" datasource="DBSNCI">
+						SELECT Fun_Nome,Fun_Email,Und_Descricao
+						FROM Funcionarios INNER JOIN Inspetor_Inspecao ON Fun_Matric = IPT_MatricInspetor 
+						INNER JOIN Unidades ON IPT_CodUnidade = Und_Codigo
+						WHERE IPT_NumInspecao='#aval#'
+					</cfquery>
+					<cfset sdestina = ''>
+					<cfloop query="rsEnvio">
+						<cfset sdestina = #sdestina# & ';' & #rsEnvio.Fun_Email#>
+					</cfloop>
+					<cfmail from="SNCI@correios.com.br" to="#sdestina#" subject="FACIN - Concluída" type="HTML">
+							Mensagem automática. Não precisa responder!<br><br>
+							<strong>
+							&nbsp;&nbsp;&nbsp;Comunicamos que o revisor concluiu a FACIN da avaliação: #aval# - #rsEnvio.Und_Descricao#<br><br>
+
+							&nbsp;&nbsp;&nbsp;Assim, solicitamos registrar, as suas considerações no Sistema SNCI.<br><br>
+
+							&nbsp;&nbsp;&nbsp;Para registro de suas considerações acesse o SNCI (endereço: http://intranetsistemaspe/snci/rotinas_inspecao.cfm) clicando no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Sistema Nacional de Controle Interno - SNCI</a><br><br>
+								<br>
+							&nbsp;&nbsp;&nbsp;Desde já agradecemos a sua atenção.
+							</strong>
+					</cfmail>
+					<!--- Fim -   Avisar aos inspetores da conclusão da FACIN --->					
 					<cfset ret = 'Confirmar conclusão da FACIN - realizada com sucesso!'> 
 				<cfelse>
 					<cfquery datasource="DBSNCI">
@@ -331,9 +355,8 @@
 						WHERE FFI_Avaliacao ='#aval#' AND 
 						FFI_MatriculaGestor = '#matrgestor#' AND
 						FFI_MatriculaInspetor = '#matrinspetor#'
-				</cfquery> 
-
-				<cfset ret = 'Confirmar conclusão das considerações (FACIN) - realizada com sucesso!'> 
+					</cfquery> 
+					<cfset ret = 'Conclusão das considerações (FACIN) - realizada com sucesso!'> 
 				</cfif>					
 				<cfcatch type="any">
 					<cfset ret = 'Conclusão da FACIN - Falhou!'>  
@@ -343,8 +366,12 @@
 	</cffunction>	
 	<!--- Este método inspetores por ano e cod_se --->
 	<cffunction  name="gestao" access="remote" ReturnFormat="json" returntype="any">
+		<cfargument name="ano" required="true">
+		<cfargument name="dtinic" required="true">
+		<cfargument name="dtfinal" required="true">
+		<cfargument name="codse" required="true">
+		<cfargument name="matrinsp" required="true">
 		<cfargument name="aval" required="true">
-		<cfargument name="matr" required="true">
 		<cftransaction>
 			<cfquery name="rsgestao" datasource="DBSNCI">
 				SELECT FFI_Avaliacao,TUN_Descricao,FAC_Qtd_Avaliacao,FFI_Qtd_Item,FFI_Meta1_Pontuacao_Obtida,FFI_Meta1_Resultado,FFI_Meta2_Pontuacao_Obtida,FFI_Meta2_Resultado,FAC_Resultado_Meta3
@@ -352,7 +379,11 @@
 				INNER JOIN (UN_Ficha_Facin 
 				INNER JOIN UN_Ficha_Facin_Individual ON (FAC_MatriculaGestor = FFI_MatriculaGestor) AND (FAC_Avaliacao = FFI_Avaliacao)) ON Und_Codigo = FAC_Unidade) 
 				INNER JOIN Tipo_Unidades ON Und_TipoUnidade = TUN_Codigo
-				WHERE FFI_MatriculaInspetor='#matr#' and FFI_DtConcluirFacin_Inspetor is not null
+				WHERE FFI_Avaliacao Like '%#ano#' and 
+				FFI_Avaliacao Like '#codse#%' AND 
+				FFI_MatriculaInspetor='#matrinsp#' and 
+				FFI_DtConcluirFacin_Inspetor is not null and 
+				FAC_DtConcluirFacin_Gestor between '#dtinic#' and '#dtfinal#'
 				<cfif aval neq 't'>
 					and FFI_Avaliacao='#aval#'
 				</cfif>
@@ -360,5 +391,5 @@
 			</cfquery>
 			<cfreturn rsgestao>
 		</cftransaction>
-	</cffunction>  	
+	</cffunction>  	  	
 </cfcomponent>
