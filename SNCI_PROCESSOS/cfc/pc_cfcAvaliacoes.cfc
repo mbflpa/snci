@@ -952,7 +952,46 @@
 					// Oculta todos os elementos com a classe step-trigger, exceto aquele com o ID infoInicial-trigger
 					$('.step-trigger').not('#aval_testeControle-trigger').hide();
 
-					
+					// Lógica para o pcTipoClassificacao e pcNumSituacaoEncontrada
+					const pcTipoClassificacaoSelect = $('#pcTipoClassificacao');
+					const pcNumSituacaoEncontradaInput = $('#pcNumSituacaoEncontrada');
+			
+					if (pcTipoClassificacaoSelect.length > 0 && pcNumSituacaoEncontradaInput.length > 0) {
+						$('#pcTipoClassificacao, #pcNumSituacaoEncontrada').on('change', function() {
+							let currentValue = pcNumSituacaoEncontradaInput.val();
+							if (currentValue === null || currentValue === undefined) {
+								currentValue = "";
+							} else {
+								currentValue = String(currentValue);
+							}
+							const valueNoSpaces = currentValue.replace(/\s+/g, ''); // remove todos os espaços
+							if (pcTipoClassificacaoSelect.val() === 'L') {
+								if (!valueNoSpaces.startsWith('II.') && !currentValue.startsWith('II .') && !currentValue.startsWith('I I .')) {
+									pcNumSituacaoEncontradaInput.val('II.' + currentValue.trim()); // trim() para remover espaços extras antes de concatenar
+									Swal.fire({
+										title: 'Atenção!',
+										html: logoSNCIsweetalert2('O prefixo "II." foi adicionado automaticamente ao Número do Item devido à sua Classificação ser Leve.'),
+										icon: 'info',
+										confirmButtonText: 'Ok'
+										
+									});
+								}
+							} else {
+								if (valueNoSpaces.startsWith('II.')) {
+									// Remove o prefixo "II." considerando variações
+									const cleanedValue = currentValue.replace(/^\s*I\s*I\s*\.\s*/i, '').trim();
+									pcNumSituacaoEncontradaInput.val(cleanedValue);
+
+									Swal.fire({
+										title: 'Atenção!',
+										html: logoSNCIsweetalert2('O prefixo "II." foi removido do Número do Item pois a Classificação não é Leve.'),
+										icon: 'info',
+										confirmButtonText: 'Ok'
+									});
+								}
+							}
+						});
+					}
 					
 					
 					// Oculta todos os elementos com a classe step-trigger, exceto aquele com o ID aval_testeControle-trigger
