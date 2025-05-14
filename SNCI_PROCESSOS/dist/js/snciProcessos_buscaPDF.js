@@ -191,7 +191,6 @@ const PdfSearchManager = {
     searchOptions
   ) {
     const terms = searchTerms.split(" ");
-    // Definir variáveis de progresso apenas uma vez
     let processedCount = 0;
     const totalDocuments = documents.length;
     this.currentSearchResults = 0; // Contador em vez de array
@@ -199,19 +198,6 @@ const PdfSearchManager = {
     // Reset do cancelamento de busca
     searchCanceled = false;
     documentProcessing = true;
-
-    // Salvar o total de documentos em uma propriedade fixa para referência
-    this.totalDocumentsToProcess = totalDocuments;
-
-    // Função para atualizar a barra de progresso
-    const updateProgressBar = () => {
-      // Usar sempre o valor salvo de totalDocumentsToProcess
-      const percent = Math.round((processedCount / this.totalDocumentsToProcess) * 100);
-      $("#processingProgress")
-        .css("width", percent + "%")
-        .attr("aria-valuenow", percent)
-        .text(`${processedCount} de ${this.totalDocumentsToProcess} arquivos processados (${percent}%)`);
-    };
 
     // Não precisamos mais mostrar container de resultados temporários
     $("#realTimeResults").hide();
@@ -266,10 +252,11 @@ const PdfSearchManager = {
       processedFilePaths.add(doc.filePath);
       processedCount++;
 
-      // Atualizar barra de progresso usando sempre o total fixo
-      updateProgressBar();
+      // Atualizar UI
+      const progress = Math.round((processedCount / totalDocuments) * 100);
+      $("#processingProgress").css("width", `${progress}%`);
       $("#processingStatus").text(
-        `Processando: ${processedCount} de ${this.totalDocumentsToProcess}`
+        `Processando: ${processedCount} de ${totalDocuments}`
       );
 
       // Pequeno efeito visual de "escaneamento" do documento
@@ -370,8 +357,7 @@ const PdfSearchManager = {
       }
     };
 
-    // Iniciar processamento
-    updateProgressBar();
+    // Iniciar o processamento com o primeiro documento
     processNextDocument(0);
   },
 
