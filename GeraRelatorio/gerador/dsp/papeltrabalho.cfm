@@ -265,23 +265,21 @@
             <cfset impactosn = 'S'>
           </cfif>
           <!--- <cfset pontua = ItnPontuacao> --->
-          <cfset fator = 0>
+          <cfset fator = 1>
           <cfif impactosn eq 'S'>
-            <cfset somafaltasobrarisco = rs11.RIP_Falta + rs11.RIP_Sobra + rs11.RIP_EmRisco>
-            <cfset somafaltasobrarisco = numberformat(#somafaltasobrarisco#,9999999999.99)>
-            <cfif somafaltasobrarisco gte 0>
+            <cfset somafaltasobra = rs11.RIP_Falta>
+            <cfif (rs11.Pos_NumItem eq 1 and (rs11.Pos_NumGrupo eq 53 or rs11.Pos_NumGrupo eq 72 or rs11.Pos_NumGrupo eq 214 or rs11.Pos_NumGrupo eq 284))>
+					      <cfset somafaltasobra = somafaltasobra + rs11.RIP_Sobra>
+				    </cfif>
+            <cfif somafaltasobra gt 0>
               <cfloop query="rsRelev">
-                <cfset fxini = numberformat(rsRelev.VLR_FaixaInicial,9999999999.99)>
-                <cfset fxfim = numberformat(rsRelev.VLR_FaixaFinal,9999999999.99)>
-                <cfif fxini eq 0.00 and somafaltasobrarisco lte fxfim and fator eq 0>
+                  <cfif rsRelev.VLR_FaixaInicial is 0 and rsRelev.VLR_FaixaFinal lte somafaltasobra>
                   <cfset fator = rsRelev.VLR_Fator>
-                </cfif>
-                <cfif (fxini neq 0.00 and fxfim neq 0.00) and (somafaltasobrarisco gt fxini and somafaltasobrarisco lte fxfim) and fator eq 0>
-                  <cfset fator = rsRelev.VLR_Fator>
-                </cfif>					
-                <cfif fxfim eq 0.00 and somafaltasobrarisco gte fxini and fator eq 0>
-                  <cfset fator = rsRelev.VLR_Fator> 
-                </cfif>
+                  <cfelseif rsRelev.VLR_FaixaInicial neq 0 and VLR_FaixaFinal neq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial and somafaltasobra lte rsRelev.VLR_FaixaFinal>
+                  <cfset fator = rsRelev.VLR_Fator>									
+                  <cfelseif VLR_FaixaFinal eq 0 and somafaltasobra gt rsRelev.VLR_FaixaInicial>
+                  <cfset fator = rsRelev.VLR_Fator> 								
+                  </cfif>
               </cfloop>
             </cfif>	
           </cfif>	

@@ -18,7 +18,7 @@ ORDER BY Grp_Ano DESC
 </cfquery> 
 
 <cfquery name="rsTipo" datasource="#dsn_inspecao#">
-SELECT DISTINCT TUI_TipoUnid, TUN_Descricao, TUI_Modalidade
+SELECT DISTINCT TUI_TipoUnid, TUN_Descricao
 FROM Tipo_Unidades INNER JOIN TipoUnidade_ItemVerificacao ON TUN_Codigo = TUI_TipoUnid
 where tui_Ano = year(getdate())
 <cfif grpacesso eq 'inspetores'>
