@@ -1591,7 +1591,7 @@ tbody {
 										<div align="left">#UsuApelido#</div>
 									</td>
 
-									<td width="25%" onClick="if (confirm ('                       Atenção! \n\nConfirma Assumir a Revisão?')) {window.open('cadastro_inspecao.cfm?numInspecao=#rsInspCaInsp.INP_NumInspecao#&Unid=#rsInspCaInsp.INP_Unidade#&acao=assumirevisao','_self')}">
+									<td width="25%" onClick="capturaPosicaoScroll();if('#revisor#' != 'SEM REVISOR(A)'){window.open('GeraRelatorio/gerador/dsp/papeltrabalho.cfm?pg=controle&Form.id=#INP_NumInspecao#','_blank')} else {if (confirm ('                       Atenção! \n\nConfirma Assumir a Revisão?')) {window.open('cadastro_inspecao.cfm?numInspecao=#rsInspCaInsp.INP_NumInspecao#&Unid=#rsInspCaInsp.INP_Unidade#&acao=assumirevisao','_self')}}">
 										<div align="left">
 											<cfif revisor eq 'SEM REVISOR(A)'>
 												<button name="assumirrevisao" type="button" class="botao">Assumir Revisão?</button>
