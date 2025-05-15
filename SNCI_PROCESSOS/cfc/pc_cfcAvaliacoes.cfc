@@ -958,6 +958,10 @@
 			
 					if (pcTipoClassificacaoSelect.length > 0 && pcNumSituacaoEncontradaInput.length > 0) {
 						$('#pcTipoClassificacao, #pcNumSituacaoEncontrada').on('change', function() {
+							// Verifica se a aba está ativa/visível
+							if (!$('#aval_item-trigger').is(':visible')) {
+								return; // Não executa se a aba não estiver ativa
+							}
 							let currentValue = pcNumSituacaoEncontradaInput.val();
 							if (currentValue === null || currentValue === undefined) {
 								currentValue = "";
