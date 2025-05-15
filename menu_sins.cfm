@@ -135,6 +135,10 @@
 			<td><img src="smallArrow.gif" width="16" height="5" /></td>
 			<td><a href="index.cfm?opcao=inspecao16">Relatório Análise de Manifestação</a></td>
 		  </tr>
+		   <tr>
+			<td><img src="smallArrow.gif" width="16" height="5" /></td>
+			<td><a href="index.cfm?opcao=inspecao23">Relatório Análise de Revisão</a></td>
+		  </tr>      
 	  </cfif>      
 <!--- 	  <tr>
         <td><img src="smallArrow.gif" width="16" height="5" /></td>
