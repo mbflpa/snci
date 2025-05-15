@@ -223,7 +223,6 @@
 	Pos_Area, 
 	Pos_NomeArea, 
 	Pos_DtPrev_Solucao, 
-	Pos_ClassificacaoPonto,
 	STO_Codigo, 
 	STO_Sigla, 
 	STO_Cor, 

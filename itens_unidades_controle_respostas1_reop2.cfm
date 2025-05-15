@@ -736,7 +736,7 @@ window.open(page, "Popup", windowprops);
 	<cfset sobra = lscurrencyformat(rsItem.RIP_Sobra,'Local')>
 	<cfset emrisco = lscurrencyformat(rsItem.RIP_EmRisco,'Local')>
 	<cfset fator = 0>
-	<cfset somafaltasobrarisco = (rsItem.RIP_Falta + rsItem.RIP_Sobra + rsItem.RIP_EmRisco)>	   
+	<cfset somafaltasobrarisco = (rsItem.RIP_Falta)>	   
 	<cfset encerrarSN = 'N'>
 	<cfif reincSN neq 'S' and rsItem.Und_TipoUnidade neq 12 and rsItem.Und_TipoUnidade neq 16>
 		<cfif impactofin eq 'N'>

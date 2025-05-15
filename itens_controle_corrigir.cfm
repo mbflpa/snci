@@ -55,11 +55,6 @@
 	  <cfabort>  
 </cfif>        
 
-<cfquery name="rsRelev" datasource="#dsn_inspecao#">
-	SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
-	FROM ValorRelevancia
-	WHERE VLR_Ano = '#right(ninsp,4)#'
-</cfquery>
 <cfif (grpacesso eq 'GESTORES') or (grpacesso eq 'DESENVOLVEDORES') or (grpacesso eq 'GESTORMASTER') or (grpacesso eq 'INSPETORES')>
 <!---  <cftry>  --->
   <cfif isDefined("Form.acao") And (Form.acao is 'alter_reincidencia' Or Form.acao is 'alter_valores' Or Form.acao is 'Anexar' Or Form.acao is 'Excluir_Anexo')>
