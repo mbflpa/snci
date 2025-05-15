@@ -127,7 +127,10 @@
 	  		<!--- <cfinclude template="itens_BI_Gestao_respostas_ref.cfm"> --->
 			<cfinclude template="Itens_Analise_Manifestacao_ref.cfm">
 	  	</cfcase>
-		
+		<cfcase value="inspecao23">
+	  		<!--- <cfinclude template="itens_BI_Gestao_respostas_ref.cfm"> --->
+			<cfinclude template="Revisor_analise_ref.cfm">
+	  	</cfcase>		
 		<cfcase value="inspecao18">
 	  		<cfinclude template="itens_controle_revisliber_ref.cfm">
 	  	</cfcase>
