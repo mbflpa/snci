@@ -1135,6 +1135,52 @@
 					});
 
 
+					// Lógica para o pcTipoClassificacao e pcNumSituacaoEncontrada
+					const pcTipoClassificacaoSelect = $('#pcTipoClassificacao');
+					const pcNumSituacaoEncontradaInput = $('#pcNumSituacaoEncontrada');
+			
+					if (pcTipoClassificacaoSelect.length > 0 && pcNumSituacaoEncontradaInput.length > 0) {
+						$('#pcTipoClassificacao, #pcNumSituacaoEncontrada').on('change', function() {
+							// Verifica se a aba está ativa/visível
+							if (!$('#aval_item-trigger').is(':visible')) {
+								return; // Não executa se a aba não estiver ativa
+							}
+							let currentValue = pcNumSituacaoEncontradaInput.val();
+							if (currentValue === null || currentValue === undefined) {
+								currentValue = "";
+							} else {
+								currentValue = String(currentValue);
+							}
+							const valueNoSpaces = currentValue.replace(/\s+/g, ''); // remove todos os espaços
+							if (pcTipoClassificacaoSelect.val() === 'L') {
+								if (!valueNoSpaces.startsWith('II.') && !currentValue.startsWith('II .') && !currentValue.startsWith('I I .')) {
+									pcNumSituacaoEncontradaInput.val('II.' + currentValue.trim()); // trim() para remover espaços extras antes de concatenar
+									Swal.fire({
+										title: 'Atenção!',
+										html: logoSNCIsweetalert2('O prefixo "II." foi adicionado automaticamente ao Número do Item devido à sua Classificação ser Leve.'),
+										icon: 'info',
+										confirmButtonText: 'Ok'
+										
+									});
+								}
+							} else {
+								if (valueNoSpaces.startsWith('II.')) {
+									// Remove o prefixo "II." considerando variações
+									const cleanedValue = currentValue.replace(/^\s*I\s*I\s*\.\s*/i, '').trim();
+									pcNumSituacaoEncontradaInput.val(cleanedValue);
+
+									Swal.fire({
+										title: 'Atenção!',
+										html: logoSNCIsweetalert2('O prefixo "II." foi removido do Número do Item pois a Classificação não é Leve.'),
+										icon: 'info',
+										confirmButtonText: 'Ok'
+									});
+								}
+							}
+						});
+					}
+
+
 					//Initialize Select2 Elements
 					// as exceções são os selects que não devem ser inicializados com o select2 e que estão em todas as páginas que utilizam este componente.
 					$('select').not('[name="tabProcCards_length"], [name="tabAvaliacoes_length"]').select2({
