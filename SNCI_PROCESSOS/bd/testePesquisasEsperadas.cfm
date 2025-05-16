@@ -34,7 +34,5 @@
         ) AS unificado
         order by  pc_processo_id, orgaoRespSigla
     </cfquery>
-
-
     <cfdump var="#rsProcessosAssociados#" format="html" />
 </cfif>
