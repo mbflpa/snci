@@ -354,7 +354,7 @@
                                     <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px;">Ano</label>
                                 </div>
                                 <div class="col">
-                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px;">Grupo</label>
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px;">Modalidade</label>
                                 </div>
                             </div>
                             <div class="row">
@@ -369,13 +369,32 @@
                                     </label>
                                 </div>
                                 <div class="col">
-                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">           
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:12px;">
+                                        <select name="selAltModalidade" id="selAltModalidade" class="form-select" aria-label="Default select example">                                      
+                                            <option selected="selected" value="">---</option>
+                                        </select>     
+                                    </label>                                  
+                                </div>
+                            </div>   
+                            <div class="row"> 
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________________</label>
+                                </div>
+                            </div>   
+                            <div class="row">
+                                <div class="col">
+                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px;">Grupo</label>
+                                </div>   
+                            </div>                                  
+                            <div class="row">                            
+                                <div class="col">
+                                     <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">           
                                         <select name="selAltItemGrupo" id="selAltItemGrupo" class="form-select" aria-label="Default select example">	
                                             <option selected="selected" value="">---</option>									
                                         </select> 
                                     </label>
                                 </div>
-                            </div>   
+                            </div>                              
                             <div class="row"> 
                                 <div class="col">
                                     <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________________</label>
@@ -394,17 +413,8 @@
                                         </select>
                                     </label>
                                 </div>
-                            </div>   
-                            <div class="row"> 
-                                <div class="col">
-                                    <label style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:10px;">____________________________________________________________________________________________________________________________________________________________________________________________________________________</label>
-                                </div>
-                            </div>  
-                            <label for="selAltModalidade" style="color:#009;font-family:Verdana, Arial, Helvetica, sans-serif;font-size:16px">Modalidade</label>
-                            <select name="selAltModalidade" id="selAltModalidade" class="form-select" aria-label="Default select example">                                      
-                                <option selected="selected" value="">---</option>
-                            </select>    
-                            <br>                                                                
+                            </div> 
+                            <br>                                                               
                         </div>
                     </div>
                 </div>
@@ -418,7 +428,7 @@
                         </h2>
                         <div id="altsegundo" class="accordion-collapse collapse" aria-labelledby="altdois" data-bs-parent="#acordion-altgrpitm">
                             <div class="accordion-body">
-                                <textarea  name="altItemDescricao"  id="altItemDescricao" cols="94" rows="2" wrap="VIRTUAL" class="form-control"></textarea>		
+                                <textarea  name="altItemDescricao"  id="altItemDescricao" cols="84" rows="2" wrap="VIRTUAL" class="form-control"></textarea>		
                             </div>
                         </div>
                     </div>
@@ -431,7 +441,7 @@
                         </h2>
                         <div id="altterceiro" class="accordion-collapse collapse" aria-labelledby="alttres" data-bs-parent="#acordion-altgrpitm">
                             <div class="accordion-body">
-                                <textarea  name="altItemManchete"  id="altItemManchete" cols="94" rows="2" wrap="VIRTUAL" class="form-control"></textarea>		            
+                                <textarea  name="altItemManchete"  id="altItemManchete" cols="84" rows="2" wrap="VIRTUAL" class="form-control"></textarea>		            
                             </div>
                         </div>
                     </div>
@@ -1105,23 +1115,24 @@
                 $("#altprincipioscoso").html(prots)
                 exibirplanoteste('0','0')         
             }            
-            // BUSCAR OS GRUPOS PELO ANO SELECIONADO  
-            $('#selAltItemAno').change(function(e){
+            // BUSCAR OS GRUPOS PELO ANO E MODALIDADE SELECIONADOS
+            $('#selAltModalidade').change(function(e){
                 ajustarcampos()
-                var anogrupo = $(this).val(); 
+                let anogrupo = $('#selAltItemAno').val()
+                let modalgrupo = $(this).val()
                 //alert(anogrupo);
                 //buscar Grupos
                 axios.get("CFC/grupoitem.cfc",{
                     params: {
                     method: "gruposverificacao",
-                    anogrupo: anogrupo
+                    anogrupo: anogrupo,
+                    modalgrupo: modalgrupo
                 }
                 })
                 .then(data =>{
                     let prots = '<option value="">---</option>';
                     $('#selAltItemGrupo').html(prots);
                     $('#selAltItem').html(prots);
-                    $('#selAltModalidade').html(prots);
                     //console.log(data.data)
                     //console.log(data.data.indexOf("COLUMNS"));
                     var vlr_ini = data.data.indexOf("COLUMNS");
@@ -1141,20 +1152,21 @@
             // BUSCAR OS ITENS DO GRUPO SELECIONADO
             $('#selAltItemGrupo').change(function(e){
                 ajustarcampos()
-                let ano = $('#selAltItemAno').val();
+                let ano = $('#selAltItemAno').val()
+                let modal = $('#selAltModalidade').val()
                 let grupo = $(this).val(); 
                 //buscar Grupos
                 axios.get("CFC/grupoitem.cfc",{
                     params: {
                     method: "itensverificacao",
                     ano: ano,
+                    modal: modal,
                     grupo: grupo
                 }
                 })
                 .then(data =>{
                     let prots = '<option value="">---</option>';
                     $('#selAltItem').html(prots);
-                    $('#selAltModalidade').html(prots);
                     //console.log(data.data)
                     //console.log(data.data.indexOf("COLUMNS"));
                     var vlr_ini = data.data.indexOf("COLUMNS");
@@ -1171,26 +1183,21 @@
                     $('#selAltItem').html(prots);
                 })
             })  // FIM BUSCAR OS ITENS DO GRUPO SELECIONADO
-            // BUSCAR AS MODALIDADES DO ITEM SELECIONADO
-            $('#selAltItem').change(function(e){
+            // BUSCAR AS MODALIDADES DO ANO SELECIONADO
+            $('#selAltItemAno').change(function(e){
                 ajustarcampos()
-                let ano = $('#selAltItemAno').val();
-                let grupo = $('#selAltItemGrupo').val();
-                let itm = $(this).val();
-                // alert(tpunid)
-                // alert(grupo);
-                //buscar Grupos
+                let prots = '<option value="">---</option>';
+                $('#selAltModalidade').html(prots);
+                $('#selAltItemGrupo').html(prots);
+                $('#selAltItem').html(prots);
+                let ano = $(this).val();
                 axios.get("CFC/grupoitem.cfc",{
                     params: {
                     method: "modalidade",
-                    ano: ano,
-                    grupo: grupo,
-                    itm: itm
+                    ano: ano
                 }
                 })
                 .then(data =>{
-                    let prots = '<option value="">---</option>';
-                    $('#selAltModalidade').html(prots);
                     //console.log(data.data)
                     //console.log(data.data.indexOf("COLUMNS"));
                     var vlr_ini = data.data.indexOf("COLUMNS");
@@ -1207,14 +1214,15 @@
                 })
             })  // FIM BUSCAR AS MODALIDADES DO ITEM SELECIONADO   
             // BUSCAR dados para alteração com o evento selAltModalidade.change() 
-            $('#selAltModalidade').change(function(e){
+            $('#selAltItem').change(function(e){
                 let ano = $('#selAltItemAno').val();
+                let modal = $('#selAltModalidade').val();
                 let grupo = $('#selAltItemGrupo').val();
-                let itm = $('#selAltItem').val();
-                let modal = $(this).val();
+                let itm = $(this).val();
+                ajustarcampos()
                 if (modal == '') {
-                    ajustarcampos()
-                    return false
+                 //   ajustarcampos()
+                //    return false
                 }
                 let resultado = 0
                 //Verificar item se está em uso na tabela ResultadoInspecao

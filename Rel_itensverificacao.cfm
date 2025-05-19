@@ -137,8 +137,11 @@
           </tr>       
 			<cfif '#url.frmacao#' eq 'S'>
               <tr>
-                <td colspan="3" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="justify" style="background:F5F5F5;color:##053c5e;"><strong>Manchete: #Itn_Manchete#</strong></div></td>
-              </tr>        
+                <td colspan="3" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left" style="background:F5F5F5;color:##053c5e;"><strong>Manchete:</strong></div></td>
+              </tr>     
+              <tr>
+                <td colspan="3" valign="top" bordercolor="999999" bgcolor="F5F5F5" scope="row"><div align="left" style="background:F5F5F5;color:##053c5e;"><strong>#Itn_Manchete#</strong></div></td>
+              </tr>    
 					      <cfif grpacesso eq 'GESTORMASTER'>
                       <tr>
                         <td colspan="3" align="left"><div><strong>Composição da Pontuação</strong></div></td>
