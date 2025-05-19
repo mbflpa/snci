@@ -58,8 +58,6 @@
     <!--- Este método retorna Modalidade --->
     <cffunction  name="modalidade" access="remote" ReturnFormat="json" returntype="any">
         <cfargument name="ano" required="true">
-        <cfargument name="grupo" required="true">
-        <cfargument name="itm" required="true">       
         <cftransaction>
             <cfquery name="rsModalidade" datasource="DBSNCI">
                 SELECT TUI_Modalidade,
@@ -71,9 +69,7 @@
                 FROM Itens_Verificacao 
                 INNER JOIN TipoUnidade_ItemVerificacao ON TUI_GrupoItem = Itn_NumGrupo and 
                 TUI_ItemVerif = Itn_NumItem AND TUI_Ano = Itn_Ano
-                WHERE TUI_Ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> and 
-                Itn_NumGrupo = <cfqueryparam value="#grupo#" cfsqltype="cf_sql_integer"> and
-                Itn_NumItem = <cfqueryparam value="#itm#" cfsqltype="cf_sql_integer"> 
+                WHERE TUI_Ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> 
                 group by TUI_Modalidade
                 order by TUI_Modalidade
             </cfquery>
@@ -83,12 +79,14 @@
     <!--- Este método retorna itens --->
     <cffunction  name="itensverificacao" access="remote" ReturnFormat="json" returntype="any">
         <cfargument name="ano" required="true">
+        <cfargument name="modal" required="true">
         <cfargument name="grupo" required="true">
         <cftransaction>
            <cfquery name="rsitmverif" datasource="DBSNCI">
             SELECT Itn_NumItem, trim(Itn_Descricao)
             FROM Itens_Verificacao
             WHERE Itn_Ano = <cfqueryparam value="#ano#" cfsqltype="cf_sql_char"> and 
+            Itn_Modalidade=<cfqueryparam value="#modal#" cfsqltype="cf_sql_char"> and
             Itn_NumGrupo = <cfqueryparam value="#grupo#" cfsqltype="cf_sql_integer"> 
             group by Itn_NumItem,Itn_Descricao
             order by Itn_NumItem,Itn_Descricao
@@ -99,11 +97,13 @@
     <!--- Este método retorna grupos --->
     <cffunction  name="gruposverificacao" access="remote" ReturnFormat="json" returntype="any">
         <cfargument name="anogrupo" required="true">
+        <cfargument name="modalgrupo" required="true">
         <cftransaction>
            <cfquery name="rsgrpverif" datasource="DBSNCI">
                 SELECT Grp_Codigo,trim(Grp_Descricao),Grp_Ano,Itn_Ano
                 FROM Grupos_Verificacao 
                 left JOIN Itens_Verificacao ON (Grp_Ano = Itn_Ano) AND (Grp_Codigo = Itn_NumGrupo)
+                WHERE Itn_Modalidade = <cfqueryparam value="#modalgrupo#" cfsqltype="cf_sql_char">
                 GROUP BY Grp_Ano,Grp_Codigo, Grp_Descricao,Itn_Ano
                 HAVING Grp_Ano=<cfqueryparam value="#anogrupo#" cfsqltype="cf_sql_char">
                 ORDER BY Grp_Codigo, Grp_Descricao
