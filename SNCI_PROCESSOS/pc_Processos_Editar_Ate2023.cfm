@@ -132,7 +132,7 @@
                                                         <cfif '#application.rsUsuarioParametros.pc_usu_lotacao#' eq '00437407'>
 															<option value="E">ENTREGA DO RELATÓRIO</option>
 														<cfelse>
-															<option value="A">ACOMPANHAMENTO</option>
+															<!--<option value="A">ACOMPANHAMENTO</option>-->
 															<option value="E">ENTREGA DO RELATÓRIO</option>
 														</cfif>
 													    <!--<option value="N">NORMAL</option>-->
