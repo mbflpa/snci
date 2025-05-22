@@ -43,7 +43,7 @@
                         <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro neq ''>                                 
                             <pre class="font-weight-light azul_claro_correios_textColor" style="font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro#</pre>
                         <cfelse>
-                            <p style="margin-left:20px;">Não se aplica.</p>
+                            <pre class="font-weight-light azul_claro_correios_textColor" style="font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">Não se aplica.</pre>
                         </cfif>
                     </fieldset>
                 
