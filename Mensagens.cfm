@@ -3676,7 +3676,7 @@
 						&nbsp;&nbsp;&nbsp;Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a><br><br>
 
 						&nbsp;&nbsp;&nbsp;Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação, <br>
-						&nbsp;&nbsp;&nbsp;desde que esteja dentro do prazo de 30 dias úteis a contar da entrega do Relatório. <br><br>   
+						&nbsp;&nbsp;&nbsp;Desde que esteja dentro do prazo de 30 dias corridos a contar da entrega do Relatório. <br><br>   
 
 						&nbsp;&nbsp;&nbsp;Após esse prazo, a situação será direcionada diretamente para área gestora do Contrato de Terceirizadas para adoção das ações previstas em contrato. <br><br>                      
 
@@ -3708,7 +3708,7 @@
 					& 'O não cumprimento ensejará em perda de prazo.' & CHR(13) & CHR(13) 
 					& 'Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: Relatório de Controle Interno.' & CHR(13) & CHR(13) 
 					& 'Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação.' & CHR(13) 
-					& 'Desde que esteja dentro do prazo de 30 dias úteis a contar da entrega do Relatório.' & CHR(13) & CHR(13) 
+					& 'Desde que esteja dentro do prazo de 30 dias corridos a contar da entrega do Relatório.' & CHR(13) & CHR(13) 
 					& 'Após esse prazo, a situação será direcionada diretamente para área gestora do Contrato de Terceirizadas para adoção das ações previstas em contrato.' & CHR(13) & CHR(13) 
 					& 'Em caso de dúvidas, entrar em contato com a Equipe de Controle Interno localizada na SE, por meio do endereço eletrônico:' & CHR(13) & CHR(13) 
 					& 'Unidade : ' & #rsEnvio.INP_Unidade# & '-' & #rsEnvio.Und_Descricao# & CHR(13) 

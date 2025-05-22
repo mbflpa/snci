@@ -223,8 +223,9 @@
 <html>
 <head>
 <title>Sistema Nacional de Controle Interno</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="CSS.css" rel="stylesheet" type="text/css">
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">
     <style>
         .quebra {
@@ -258,12 +259,12 @@
 	
 	<tr class="quebra">
       <td colspan="1" class="exibir"><strong>Unidade</strong></td>
-      <td colspan="2"><strong class="exibir">#rsFacin.Und_Descricao#</strong></td>
-      <td colspan="14"><strong class="exibir">Gerente unidade:&nbsp;#rsFacin.INP_Responsavel#</strong></td>
+      <td colspan="4"><strong class="exibir">#rsFacin.Und_Descricao#</strong></td>
+      <td colspan="12"><strong class="exibir">Gerente unidade:&nbsp;#rsFacin.INP_Responsavel#</strong></td>
     </tr>
     
     <tr class="quebra">
-        <td colspan="1" align="center"><strong class="exibir">Nº Avaliação</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">Avaliação</strong></td>
         <td colspan="1" align="center"><strong class="exibir">Modalidade</strong></td>
         <td colspan="1" align="center"><strong class="exibir">Qtd. Geral</strong></td>
         <td colspan="1" align="center"><strong class="exibir">Com Reanálise</strong></td>
@@ -276,28 +277,28 @@
         <td colspan="2" align="center"><strong class="exibir">Pto Obtidos / Resultado Meta1</strong></td>
         <td colspan="2" align="center"><strong class="exibir">Pto Obtidos / Resultado Meta2</strong></td>
         <td colspan="1" align="center"><strong class="exibir">Data Planejada</strong></td>
-        <td colspan="1" align="center"><strong class="exibir">Dif. (dias)</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">Dif.(dias)</strong></td>
         <td colspan="1" align="center"><strong class="exibir">Resultado Meta3</strong></td>
     </tr> 
     
     <tr>
-        <td align="center"><strong class="exibir">#URL.Ninsp#</strong></td>
-        <td align="center"><strong class="exibir">#INPModalidade#</strong></td>
-        <td align="center"><strong class="exibir">#rsfac.FAC_Qtd_Avaliacao#</strong></td>
-        <td align="center"><strong class="exibir">#rsfac.FAC_Qtd_Reanalise#</strong></td>
-        <td align="center"><strong class="exibir">#percreanalise#%</strong></td>
-        <td align="center"><strong class="exibir">#RSFac.FAC_Qtd_Correcaotexto#</strong></td>
-        <td align="center"><strong class="exibir">#totalC#</strong></td>
-        <td align="center"><strong class="exibir">#totalN#</strong></td>
-        <td align="center"><strong class="exibir">#totalE#</strong></td>
-        <td align="center"><strong class="exibir">#totalV#</strong></td>
-        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Pontos_Revisao_Meta1,'___.00')#</strong></td>
-        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta1,'___.00')#%</strong></td>
-        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Pontos_Revisao_Meta2,'___.00')#</strong></td>
-        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta2,'___.00')#%</strong></td>
-        <td align="center"><strong class="exibir">#dateformat(rsfac.fac_data_plan_meta3,"DD/MM/YYYY")#</strong></td>
-        <td align="center"><strong class="exibir">#int(rsfac.fac_difdia_meta3)#</strong></td>
-        <td align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta3,'___.00')#%</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#URL.Ninsp#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#INPModalidade#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#rsfac.FAC_Qtd_Avaliacao#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#rsfac.FAC_Qtd_Reanalise#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#percreanalise#%</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#RSFac.FAC_Qtd_Correcaotexto#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#totalC#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#totalN#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#totalE#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#totalV#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Pontos_Revisao_Meta1,'___.00')#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta1,'___.00')#%</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Pontos_Revisao_Meta2,'___.00')#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta2,'___.00')#%</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#dateformat(rsfac.fac_data_plan_meta3,"DD/MM/YYYY")#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#int(rsfac.fac_difdia_meta3)#</strong></td>
+        <td colspan="1" align="center"><strong class="exibir">#numberFormat(rsfac.FAC_Resultado_Meta3,'___.00')#%</strong></td>
     </tr>  
     <tr class="quebra">
         <td colspan="8"><strong class="exibir">Inspetores(as)</strong></td>
@@ -340,13 +341,13 @@
             <strong class="exibir">Horas Desloc.</strong>
         </td>
         <td colspan="1" align="center">
-            <strong class="exibir">Início Avaliação</strong>
+            <strong class="exibir">Início Inspeção</strong>
         </td>
         <td colspan="1" align="center">
-            <strong class="exibir">Fim Avaliação</strong>
+            <strong class="exibir">Fim Inspeção</strong>
         </td>
         <td colspan="1" align="center">
-            <strong class="exibir">Horas Avaliação</strong>
+            <strong class="exibir">Horas Inspeção</strong>
         </td>
         <td colspan="2" align="center">
             <strong class="exibir">Início Avaliação</strong>
@@ -358,7 +359,7 @@
             <strong class="exibir">Conclusão Avaliação</strong>
         </td>
         <td colspan="1" align="center">
-            <strong class="exibir">Houve Reanálise?</strong>
+            <strong class="exibir">Reanálise?</strong>
         </td>
         <td colspan="2"  align="center">
             <strong class="exibir">Última Reanálise</strong>
