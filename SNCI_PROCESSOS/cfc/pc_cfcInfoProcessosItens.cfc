@@ -39,8 +39,12 @@
             <cfif #ano# gte 2024 and rsCategoriaControle.recordcount gt 0> 
                 
                     <fieldset style="padding:0px!important;min-height: 90px;">
-                        <legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>                                         
-                        <pre class="font-weight-light azul_claro_correios_textColor" style="font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro#</pre>
+                        <legend style="margin-left:20px">Benefício Não Financeiro da Medida/Orientação para Regularização:</legend>    
+                        <cfif rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro neq ''>                                 
+                            <pre class="font-weight-light azul_claro_correios_textColor" style="font-style: italic;max-height: 100px; overflow-y: auto;margin-bottom:10px">#rsAvalOrentacao.pc_aval_orientacao_beneficioNaoFinanceiro#</pre>
+                        <cfelse>
+                            <p style="margin-left:20px;">Não se aplica.</p>
+                        </cfif>
                     </fieldset>
                 
 
