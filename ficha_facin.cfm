@@ -312,7 +312,6 @@
         <tr>
             <td >Nome da Unidade: #rsFicha.Und_Descricao#(SE/#rsFicha.siglaunid#)</td>
             <td colspan="7" align="left">Nº Avaliação: #rsFicha.INP_NumInspecao#</td> 
-            <!--- <td colspan="5">Chefe: #rsFicha.INP_Responsavel#</td> --->
         </tr> 
         <tr>
             <td colspan="8"><strong class="exibir">03 - Fases da Avaliação</strong></td>
@@ -351,7 +350,7 @@
         </tr>
     --->
         <tr>
-            <td colspan="8"><strong class="exibir">05 - Individualização do resultado das metas por inspetor</strong></td>
+            <td colspan="8"><strong class="exibir">05 - Individualização do resultado das metas por inspetor(a)</strong></td>
         </tr>
         <cfset grpitm = rsItem.Itn_NumGrupo & '_' & rsItem.Itn_NumItem>
         <tr>
@@ -449,6 +448,9 @@
                     <tr colspan="8">
                         <td colspan="4"><textarea cols="85" rows="3" wrap="VIRTUAL" name="considerargestor" id="considerargestor" class="form-control" placeholder="xxxxxxxxx" <cfoutput>#gestorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_ConsideracaoGestor)#</cfoutput></textarea></td>
                         <td colspan="4"><textarea cols="85" rows="3" wrap="VIRTUAL" name="considerinspetor" id="considerinspetor" class="form-control" placeholder="xxxxxxxxx" <cfoutput>#inspetorhd#</cfoutput>><cfoutput>#trim(rsItem.FACA_ConsideracaoInspetor)#</cfoutput></textarea></td>
+                    </tr>
+                    <tr>
+                        <td colspan="8"><div class="btn btn-warning disabled"><strong>Reanálises: devem ser inseridas as informações complementares.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>Correções: inserir o texto original escrito pelo Inspetor(a) e abaixo o texto com a correção.</strong></div></td>
                     </tr>
                 </table>
             </td>
