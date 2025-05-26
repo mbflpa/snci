@@ -165,13 +165,9 @@ const PdfSearchManager = {
         this.searchInClientSide(searchTerms, searchOptions);
       } catch (error) {
         console.error("Erro ao tentar busca no cliente:", error);
-        // Se falhar, tenta o método do servidor como fallback
-        this.searchInServerSide(searchTerms, searchOptions);
+        
       }
-    } else {
-      // Se o PDF.js não estiver disponível, usa sempre o servidor
-      this.searchInServerSide(searchTerms, searchOptions);
-    }
+    } 
 
     // Capturar os filtros
     const superintendenceCode = $("#searchSuperintendence").val();
@@ -551,191 +547,191 @@ const PdfSearchManager = {
     // A variável resultObj será limpa pelo coletor de lixo
   },
   // Busca usando o método do servidor
-  searchInServerSide: function (searchTerms, searchOptions) {
-    $.ajax({
-      url: "cfc/pc_cfcBuscaPDF.cfc",
-      type: "POST",
-      dataType: "json",
-      data: {
-        method: "searchInPDFs",
-        searchTerms: searchTerms,
-        searchOptions: JSON.stringify(searchOptions),
-      },
-      success: (response) => {
-        $("#searchLoading").hide();
-        // Melhorar o tratamento de respostas não-JSON
-        if (typeof response === "string") {
-          try {
-            // Tentar converter string para JSON
-            response = JSON.parse(response);
-          } catch (e) {
-            // Se falhar, verificar se é resposta HTML de erro
-            if (response.includes("<html>") || response.includes("<!DOCTYPE")) {
-              console.error(
-                "Recebeu HTML em vez de JSON:",
-                response.substring(0, 200)
-              );
-              $("#errorMessage").text(
-                "O servidor retornou uma página HTML em vez de JSON. Verifique os logs do servidor."
-              );
-              $("#errorAlert").show();
-              return;
-            }
-          }
-        }
-        // Verificar se a resposta é string (possível WDDX) e tentar extrair JSON
-        if (typeof response === "string" && response.includes("wddxPacket")) {
-          try {
-            // Extrair o JSON dentro do WDDX
-            const jsonMatch = response.match(/<string>(\{.*?\})<\/string>/s);
-            if (jsonMatch && jsonMatch[1]) {
-              response = JSON.parse(jsonMatch[1]);
-            }
-          } catch (e) {
-            console.error("Erro ao processar resposta WDDX:", e);
-          }
-        }
-        if (response && response.success) {
-          if (response.totalFound > 0) {
-            // CORRIGIDO: Explicitamente esconder o alerta de "nenhum resultado"
-            $("#noResultsAlert").hide();
+  // searchInServerSide: function (searchTerms, searchOptions) {
+  //   $.ajax({
+  //     url: "cfc/pc_cfcBuscaPDF.cfc",
+  //     type: "POST",
+  //     dataType: "json",
+  //     data: {
+  //       method: "searchInPDFs",
+  //       searchTerms: searchTerms,
+  //       searchOptions: JSON.stringify(searchOptions),
+  //     },
+  //     success: (response) => {
+  //       $("#searchLoading").hide();
+  //       // Melhorar o tratamento de respostas não-JSON
+  //       if (typeof response === "string") {
+  //         try {
+  //           // Tentar converter string para JSON
+  //           response = JSON.parse(response);
+  //         } catch (e) {
+  //           // Se falhar, verificar se é resposta HTML de erro
+  //           if (response.includes("<html>") || response.includes("<!DOCTYPE")) {
+  //             console.error(
+  //               "Recebeu HTML em vez de JSON:",
+  //               response.substring(0, 200)
+  //             );
+  //             $("#errorMessage").text(
+  //               "O servidor retornou uma página HTML em vez de JSON. Verifique os logs do servidor."
+  //             );
+  //             $("#errorAlert").show();
+  //             return;
+  //           }
+  //         }
+  //       }
+  //       // Verificar se a resposta é string (possível WDDX) e tentar extrair JSON
+  //       if (typeof response === "string" && response.includes("wddxPacket")) {
+  //         try {
+  //           // Extrair o JSON dentro do WDDX
+  //           const jsonMatch = response.match(/<string>(\{.*?\})<\/string>/s);
+  //           if (jsonMatch && jsonMatch[1]) {
+  //             response = JSON.parse(jsonMatch[1]);
+  //           }
+  //         } catch (e) {
+  //           console.error("Erro ao processar resposta WDDX:", e);
+  //         }
+  //       }
+  //       if (response && response.success) {
+  //         if (response.totalFound > 0) {
+  //           // CORRIGIDO: Explicitamente esconder o alerta de "nenhum resultado"
+  //           $("#noResultsAlert").hide();
 
-            // Processar cada resultado
-            response.results.forEach((result) => {
-              const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
-                result.filePath
-              )}&nome=${encodeURIComponent(result.fileName)}`;
+  //           // Processar cada resultado
+  //           response.results.forEach((result) => {
+  //             const fileUrl = `cfc/pc_cfcBuscaPDF.cfc?method=exibePdfInline&arquivo=${encodeURIComponent(
+  //               result.filePath
+  //             )}&nome=${encodeURIComponent(result.fileName)}`;
 
-              // Gerar snippets com termos destacados
-              const terms = searchTerms.split(" ").filter((t) => t.length >= 3);
-              let snippets = [];
-              // Usar texto extraído se disponível
-              if (result.text) {
-                const contextSize = 200;
-                // Verificar o modo de busca
-                if (searchOptions.mode === "exact") {
-                  // Modo de frase exata
-                  const phrase = searchTerms.trim();
-                  if (phrase.length >= 3) {
-                    const regex = new RegExp(this.escapeRegExp(phrase), "gi");
-                    let match;
-                    // Encontrar até 3 ocorrências da frase
-                    let count = 0;
-                    let lastIndex = 0;
-                    while (
-                      count < 3 &&
-                      (match = regex.exec(result.text)) !== null
-                    ) {
-                      const start = Math.max(0, match.index - contextSize);
-                      const end = Math.min(
-                        result.text.length,
-                        match.index + phrase.length + contextSize
-                      );
-                      let snippet = result.text.substring(start, end);
-                      if (start > 0) snippet = "..." + snippet;
-                      if (end < result.text.length) snippet += "...";
-                      snippet = this.highlightSearchPhrase(snippet, phrase);
-                      snippets.push(snippet);
-                      count++;
-                      if (lastIndex === regex.lastIndex) break;
-                      lastIndex = regex.lastIndex;
-                    }
-                  }
-                } else {
-                  // Modo "OU" (padrão): processa termos individuais
-                  terms.forEach((term) => {
-                    const regex = new RegExp(this.escapeRegExp(term), "gi");
-                    let match;
-                    // Encontrar até 3 ocorrências do termo
-                    let count = 0;
-                    const lowerText = result.text.toLowerCase();
-                    let lastIndex = 0;
-                    while (
-                      count < 3 &&
-                      (match = regex.exec(result.text)) !== null
-                    ) {
-                      const start = Math.max(0, match.index - contextSize);
-                      const end = Math.min(
-                        result.text.length,
-                        match.index + term.length + contextSize
-                      );
-                      let snippet = result.text.substring(start, end);
-                      if (start > 0) snippet = "..." + snippet;
-                      if (end < result.text.length) snippet += "...";
-                      snippet = this.highlightSearchTerm(snippet, term);
-                      snippets.push(snippet);
-                      count++;
-                      if (lastIndex === regex.lastIndex) break;
-                      lastIndex = regex.lastIndex;
-                    }
-                  });
-                }
-              }
+  //             // Gerar snippets com termos destacados
+  //             const terms = searchTerms.split(" ").filter((t) => t.length >= 3);
+  //             let snippets = [];
+  //             // Usar texto extraído se disponível
+  //             if (result.text) {
+  //               const contextSize = 200;
+  //               // Verificar o modo de busca
+  //               if (searchOptions.mode === "exact") {
+  //                 // Modo de frase exata
+  //                 const phrase = searchTerms.trim();
+  //                 if (phrase.length >= 3) {
+  //                   const regex = new RegExp(this.escapeRegExp(phrase), "gi");
+  //                   let match;
+  //                   // Encontrar até 3 ocorrências da frase
+  //                   let count = 0;
+  //                   let lastIndex = 0;
+  //                   while (
+  //                     count < 3 &&
+  //                     (match = regex.exec(result.text)) !== null
+  //                   ) {
+  //                     const start = Math.max(0, match.index - contextSize);
+  //                     const end = Math.min(
+  //                       result.text.length,
+  //                       match.index + phrase.length + contextSize
+  //                     );
+  //                     let snippet = result.text.substring(start, end);
+  //                     if (start > 0) snippet = "..." + snippet;
+  //                     if (end < result.text.length) snippet += "...";
+  //                     snippet = this.highlightSearchPhrase(snippet, phrase);
+  //                     snippets.push(snippet);
+  //                     count++;
+  //                     if (lastIndex === regex.lastIndex) break;
+  //                     lastIndex = regex.lastIndex;
+  //                   }
+  //                 }
+  //               } else {
+  //                 // Modo "OU" (padrão): processa termos individuais
+  //                 terms.forEach((term) => {
+  //                   const regex = new RegExp(this.escapeRegExp(term), "gi");
+  //                   let match;
+  //                   // Encontrar até 3 ocorrências do termo
+  //                   let count = 0;
+  //                   const lowerText = result.text.toLowerCase();
+  //                   let lastIndex = 0;
+  //                   while (
+  //                     count < 3 &&
+  //                     (match = regex.exec(result.text)) !== null
+  //                   ) {
+  //                     const start = Math.max(0, match.index - contextSize);
+  //                     const end = Math.min(
+  //                       result.text.length,
+  //                       match.index + term.length + contextSize
+  //                     );
+  //                     let snippet = result.text.substring(start, end);
+  //                     if (start > 0) snippet = "..." + snippet;
+  //                     if (end < result.text.length) snippet += "...";
+  //                     snippet = this.highlightSearchTerm(snippet, term);
+  //                     snippets.push(snippet);
+  //                     count++;
+  //                     if (lastIndex === regex.lastIndex) break;
+  //                     lastIndex = regex.lastIndex;
+  //                   }
+  //                 });
+  //               }
+  //             }
 
-              // Criar objeto de resultado
-              const processedResult = {
-                fileName: result.fileName,
-                filePath: result.filePath,
-                fileUrl: fileUrl,
-                directory: result.displayPath,
-                size: result.fileSize,
-                dateLastModified: result.fileDate,
-                relevanceScore: result.relevanceScore || 10,
-                snippets:
-                  snippets.length > 0
-                    ? snippets
-                    : ["<em>Texto não disponível para visualização</em>"],
-              };
+  //             // Criar objeto de resultado
+  //             const processedResult = {
+  //               fileName: result.fileName,
+  //               filePath: result.filePath,
+  //               fileUrl: fileUrl,
+  //               directory: result.displayPath,
+  //               size: result.fileSize,
+  //               dateLastModified: result.fileDate,
+  //               relevanceScore: result.relevanceScore || 10,
+  //               snippets:
+  //                 snippets.length > 0
+  //                   ? snippets
+  //                   : ["<em>Texto não disponível para visualização</em>"],
+  //             };
 
-              // Verificar duplicação antes de adicionar
-              if (
-                !document.querySelector(`[data-file-path="${result.filePath}"]`)
-              ) {
-                this.currentSearchResults++;
-                this.addRealTimeResult(processedResult);
-              }
-            });
+  //             // Verificar duplicação antes de adicionar
+  //             if (
+  //               !document.querySelector(`[data-file-path="${result.filePath}"]`)
+  //             ) {
+  //               this.currentSearchResults++;
+  //               this.addRealTimeResult(processedResult);
+  //             }
+  //           });
 
-            // Gerar estatísticas com base no DOM no final do processamento
-            this.generateStatsFromDOM(
-              searchTerms,
-              response.searchTime,
-              searchOptions
-            );
-          } else {
-            $("#noResultsAlert").show();
-            $("#searchStats").text(
-              `0 resultados encontrados em ${response.searchTime} segundos`
-            );
-          }
-        } else {
-          $("#errorMessage").text(
-            response.message || "Erro desconhecido na busca"
-          );
-          $("#errorAlert").show();
-        }
-      },
-      error: (xhr, status, error) => {
-        $("#searchLoading").hide();
-        // Exibir informações mais detalhadas sobre o erro
-        console.error("Detalhes do erro:", xhr.responseText);
-        let errorMessage = "Erro ao realizar a busca. ";
-        if (xhr.status === 0) {
-          errorMessage += "Problemas de conexão de rede.";
-        } else if (xhr.status === 404) {
-          errorMessage += "Serviço de busca não encontrado.";
-        } else if (xhr.status === 500) {
-          errorMessage += "Erro interno no servidor.";
-        } else {
-          errorMessage += `Código: ${xhr.status}, Mensagem: ${
-            error || "Desconhecido"
-          }`;
-        }
-        $("#errorMessage").text(errorMessage);
-        $("#errorAlert").show();
-      },
-    });
-  },
+  //           // Gerar estatísticas com base no DOM no final do processamento
+  //           this.generateStatsFromDOM(
+  //             searchTerms,
+  //             response.searchTime,
+  //             searchOptions
+  //           );
+  //         } else {
+  //           $("#noResultsAlert").show();
+  //           $("#searchStats").text(
+  //             `0 resultados encontrados em ${response.searchTime} segundos`
+  //           );
+  //         }
+  //       } else {
+  //         $("#errorMessage").text(
+  //           response.message || "Erro desconhecido na busca"
+  //         );
+  //         $("#errorAlert").show();
+  //       }
+  //     },
+  //     error: (xhr, status, error) => {
+  //       $("#searchLoading").hide();
+  //       // Exibir informações mais detalhadas sobre o erro
+  //       console.error("Detalhes do erro:", xhr.responseText);
+  //       let errorMessage = "Erro ao realizar a busca. ";
+  //       if (xhr.status === 0) {
+  //         errorMessage += "Problemas de conexão de rede.";
+  //       } else if (xhr.status === 404) {
+  //         errorMessage += "Serviço de busca não encontrado.";
+  //       } else if (xhr.status === 500) {
+  //         errorMessage += "Erro interno no servidor.";
+  //       } else {
+  //         errorMessage += `Código: ${xhr.status}, Mensagem: ${
+  //           error || "Desconhecido"
+  //         }`;
+  //       }
+  //       $("#errorMessage").text(errorMessage);
+  //       $("#errorAlert").show();
+  //     },
+  //   });
+  // },
   // Busca no lado do cliente usando PDF.js
   searchInClientSide: function (searchTerms, searchOptions) {
     // Reset estatísticas de páginas antes de iniciar nova busca
@@ -766,7 +762,7 @@ const PdfSearchManager = {
             ) {
               console.error("Recebeu HTML em vez de JSON");
             }
-            this.searchInServerSide(searchTerms, searchOptions);
+            //this.searchInServerSide(searchTerms, searchOptions);
             return;
           }
         }
@@ -833,13 +829,13 @@ const PdfSearchManager = {
             "Estrutura de resposta inválida, usando busca no servidor",
             parsedResponse
           );
-          this.searchInServerSide(searchTerms, searchOptions);
+         // this.searchInServerSide(searchTerms, searchOptions);
         }
       },
       error: (xhr, status, error) => {
         console.error(`Erro ao buscar documentos: ${status} - ${error}`);
         console.error("Texto da resposta:", xhr.responseText);
-        this.searchInServerSide(searchTerms, searchOptions);
+        //this.searchInServerSide(searchTerms, searchOptions);
       },
     });
   },
@@ -2354,13 +2350,13 @@ $(document).ready(function () {
     console.error(
       "PDF.js não foi carregado corretamente. Verifique se o script foi importado."
     );
-    // Forçar fallback para busca no servidor
-    PdfSearchManager.searchInServerSide = function (
-      searchTerms,
-      searchOptions
-    ) {
-      PdfSearchManager.performSearch();
-    };
+    // // Forçar fallback para busca no servidor
+    // PdfSearchManager.searchInServerSide = function (
+    //   searchTerms,
+    //   searchOptions
+    // ) {
+    //   PdfSearchManager.performSearch();
+    // };
   } else {
     PdfSearchManager.init();
   }
