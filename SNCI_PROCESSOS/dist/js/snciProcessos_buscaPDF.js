@@ -2248,26 +2248,7 @@ const PdfSearchManager = {
     // ... existing code ...
   },
 
-  processNextDocument: async function (index) {
-    // ... existing code ...
-    // Atualizar a interface após cada documento processado
-    if (this.results.length > 0) {
-      // Se já temos algum resultado, ocultar o alerta de "nenhum resultado"
-      $("#noResultsAlert").hide();
-    }
-    // ... existing code ...
-
-    // Ao final do processamento, verificar novamente
-    if (index >= this.filesToProcess.length - 1) {
-      // Acabou o processamento, verificar resultados finais
-      if (this.results.length === 0) {
-        $("#noResultsAlert").show();
-      } else {
-        $("#noResultsAlert").hide();
-      }
-    }
-    // ... existing code ...
-  },
+ 
 
   shouldIncludeFile: function (file) {
     // ... existing code ...
