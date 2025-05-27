@@ -1,5 +1,5 @@
 <cfprocessingdirective pageEncoding ="utf-8"/> 
-<cfparam name = "numinsp" default = ''> 
+<cfparam name = "url.numinsp" default = ''> 
 <cfset msg=''>
 <!---
 <cfparam name = "grpitem" default = ''> 
@@ -15,6 +15,17 @@
 	where Usu_login = '#cgi.REMOTE_USER#'
 </cfquery>
 <cfset grpacesso = ucase(Trim(qAcesso.Usu_GrupoAcesso))>
+<cfif grpacesso eq 'INSPETORES'>
+	<cfquery name="rsAval" datasource="#dsn_inspecao#">
+		SELECT FFI_Avaliacao,Und_Descricao
+		FROM UN_Ficha_Facin 
+		INNER JOIN UN_Ficha_Facin_Individual ON (FAC_MatriculaGestor = FFI_MatriculaGestor) AND (FAC_Avaliacao = FFI_Avaliacao)
+		INNER JOIN Unidades ON FAC_Unidade = Und_Codigo
+		WHERE (FAC_DtConcluirFacin_Gestor Is Not Null) AND (FFI_DtConcluirFacin_Inspetor Is Null)  AND (FFI_MatriculaInspetor = '#qAcesso.Usu_Matricula#')
+		order by FFI_Avaliacao
+	</cfquery>		
+</cfif>
+
 <cfset faltaconcluirfacininspetorSN = 'N'>
 <cfset facininspetorconcluidaSN = 'N'>
 <cfoutput>
@@ -109,11 +120,13 @@
 		<cfif rsBase.recordcount eq 1><cfset somenteavaliarmeta3='S'></cfif>
 		<cfquery datasource="#dsn_inspecao#" name="rsFacin">
 			SELECT top 1 FAC_MatriculaGestor,Usu_Apelido,FAC_DtConcluirFacin_Gestor,FFI_MatriculaInspetor,Fun_Nome,FFI_DtConcluirFacin_Inspetor
-			FROM ((UN_Ficha_Facin INNER JOIN Usuarios ON FAC_MatriculaGestor = Usu_Matricula) INNER JOIN UN_Ficha_Facin_Individual ON (FAC_MatriculaGestor = FFI_MatriculaGestor) AND (FAC_Avaliacao = FFI_Avaliacao)) 
+			FROM ((UN_Ficha_Facin 
+			INNER JOIN Usuarios ON FAC_MatriculaGestor = Usu_Matricula) 
+			INNER JOIN UN_Ficha_Facin_Individual ON (FAC_MatriculaGestor = FFI_MatriculaGestor) AND (FAC_Avaliacao = FFI_Avaliacao)) 
 			INNER JOIN Funcionarios ON FFI_MatriculaInspetor = Fun_Matric
 			WHERE FAC_Avaliacao= convert(varchar,'#url.numinsp#')
 			<cfif grpacesso eq 'INSPETORES'>
-					AND FFI_MatriculaInspetor = '#qAcesso.Usu_Matricula#'
+					AND FFI_MatriculaInspetor = '#qAcesso.Usu_Matricula#' 
 			</cfif>
 		</cfquery>
 		<cfif grpacesso eq 'INSPETORES'>		
@@ -151,7 +164,8 @@
 <html>
 <head>
 <title>Sistema de Acompanhamento das Respostas das Inspeções</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">
 <link href="css.css" rel="stylesheet" type="text/css">
 <style>
@@ -166,6 +180,28 @@
 	th {
 		font-size: 12px;
 	}
+	
+label {
+	padding: 0.2em;
+	background-color:#DCDCDC;
+	height: 30px;
+	border: 1px solid #666;
+	border-radius: 10px;
+	font: bold 75%/1.4 sans-serif; 
+	vertical-align: middle;
+  	text-align: center;
+}
+.exibir{
+	padding: 0.2em;
+	background-color:#DCDCDC;
+	height: 20px;
+	border: 1px solid #666;
+	border-radius: 10px;
+	font: bold 95%/1.4 sans-serif; 
+	vertical-align: middle;
+  	text-align: center;
+}
+
 </style>
 </head>
 <body onLoad="aviso();form1.dtinic.focus()"><br>
@@ -205,18 +241,38 @@
   <table align="center">
 	<tr>
 		<td colspan="3">
-			<span class="exibir"><strong>Nº Avaliação:</strong></span>
+			<label class="exibir"><span><strong>Nº Avaliação:</strong></span></label>
 		</td>
 	</tr>
-    <tr>
-      <td>
-		<input id="numinsp" name="numinsp" type="text" vazio="false" size="14" maxlength="10" class="form-control" onKeyPress="numericos()" value="<cfoutput>#numinsp#</cfoutput>" onChange="if (this != '') {document.form1.acao.value = 'buscar'; document.form1.submit()};">
-	  </td>
-	  <td>
-		&nbsp;&nbsp;&nbsp;&nbsp;<input name="buscar" type="button" class="btn btn-info" value="Buscar Grupo/Item" align="center">
-	 </td>
-    </tr>
-
+	<cfif grpacesso eq 'INSPETORES'>
+	<cfoutput>
+		<tr>
+			<td>
+				<select name="numinsp" id="numinsp" class="form-select" onChange="document.form1.acao.value = 'buscar'; document.form1.submit();">
+					<option value="">---</option>
+					<cfif rsAval.recordcount gt 0>
+						<cfloop query="rsAval">                                             
+							<option value="#rsAval.FFI_Avaliacao#" <cfif #rsAval.FFI_Avaliacao# eq #url.numinsp#>selected</cfif>>#rsAval.FFI_Avaliacao# - #rsAval.Und_Descricao#</option>
+						</cfloop>
+					<cfelse>
+						<td>
+							&nbsp;&nbsp;&nbsp;&nbsp;<input name="buscar" type="button" class="btn btn-warning disabled" value="FACIN concluída ou não liberada pelo gestor(a)!" align="center">
+						</td>
+					</cfif>
+				</select>			
+			</td>
+		</tr>	
+	</cfoutput>		
+	<cfelse>
+		<tr>
+		<td>
+			<input id="numinsp" name="numinsp" type="text" vazio="false" size="14" maxlength="10" class="form-control" onKeyPress="numericos()" value="<cfoutput>#numinsp#</cfoutput>" onChange="if (this.value != '') {document.form1.acao.value = 'buscar'; document.form1.submit()};">
+		</td>
+		<td>
+			&nbsp;&nbsp;&nbsp;&nbsp;<input name="buscar" type="button" class="btn btn-info" value="Buscar Grupo/Item" align="center">
+		</td>
+		</tr>
+	</cfif>	
 	<tr>
 
 	</tr>
@@ -231,19 +287,19 @@
 			<td colspan="3"><hr></td>
 		</tr>
 		<tr>
-			<td colspan="3" class="exibir" align="center"><strong>Grupo/Item</strong></td>
+			<td colspan="3" align="center"><label class="exibir"><strong>Grupo/Item</strong></label></td>
 		</tr>
 		<tr>
-			<td colspan="3" class="exibir"><hr></td>
+			<td colspan="3"><hr></td>
 		</tr>
 		<tr>
-			<td colspan="3" class="exibir"></td>
+			<td colspan="3"></td>
 		</tr>
 
 		<tr>
-			<td class="exibir" align="center"><strong>Incluir</strong></td>
+			<td align="center"><label class="exibir"><strong>Incluir</strong></label></td>
 			<td></td>
-			<td class="exibir" align="center"><strong>Alterar</strong></td>
+			<td align="center"><label class="exibir"><strong>Alterar</strong></label></td>
 		</tr>
 		<tr>
 			<td colspan="3"><hr></td>
@@ -441,7 +497,7 @@
 		//alert($('#msg').val())
 		//alert($('#acao').val())
 		if($('#msg').val() != '') {
-			$('#aviso').html($('#msg').val())
+			$('#aviso').html('<h5>&nbsp;'+$('#msg').val()+'&nbsp;</h5>')
 			$('#aviso').show(500)
 			$('#avisoinsp').hide()
 		} 
@@ -451,7 +507,7 @@
 			if($('#grpacesso').val() == 'INSPETORES' && $('#concfacingestor').val() == '') {
 				let prots = '<option value=""></option>'
 				$('#grpitem2').html(prots)
-				$('#aviso').html('Inspetor(a), FACIN não concluída pelo gestor!')
+				$('#aviso').html('<h5>&nbsp;Inspetor(a), FACIN não concluída pelo gestor&nbsp;&nbsp; <br> &nbsp;ou não houve item direcionado à você!&nbsp;</h5>')
 				$('#tab').hide()
 				$('#aviso').show(500)
 				$('#avisoinsp').hide()
@@ -462,7 +518,7 @@
 					$('#aviso').show(500)
 				}else{
 					if ($('#acao').val()=='buscar'){
-						$('#aviso').html('FACIN está em fase de conclusão por '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val())
+						$('#aviso').html('<h5>&nbsp;FACIN está em fase de conclusão por '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val()+'&nbsp;</h5>')
 						$('#aviso').show(500)
 					}
 				}
@@ -470,10 +526,10 @@
 				if($('#concfacingestor').val() != '' && $('#concfacingestor').val() != undefined && $('#concfacingestor').val() != null){
 					$('#salvarsn').val('N')
 					var texto2 = ''
-					var texto1 = 'Conclusão da FACIN realizada em '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val()
+					var texto1 = '<h5>&nbsp;Conclusão da FACIN realizada em '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val()+'&nbsp;</h5>'
 					if($('#grpacesso').val() == 'GESTORES'){$("#alt").val('Consultar Grupo/Item')}
 					if($('#facininspetorconcluidaSN').val() == 'S'){ 
-						texto2 = 'Conclusão das considerações (FACIN) realizada em '+$('#concfacininspetor').val()+' Inspetor(a): '+$('#concfacininspetornome').val()
+						texto2 = '<h5>&nbsp;Conclusão das considerações (FACIN) realizada em '+$('#concfacininspetor').val()+' Inspetor(a): '+$('#concfacininspetornome').val()+'&nbsp;</h5>'
 					}
 					$('#aviso').html(texto1 + '<br>' + texto2)
 					$('#aviso').show(500)
@@ -483,13 +539,13 @@
 			if($('#matr').val() != $('#facmatriculagestor').val() && $('#facmatriculagestor').val() != '') {
 				$('#salvarsn').val('N')
 				var texto2 = ''
-				$('#aviso').html('FACIN está em fase de conclusão por '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val())
+				$('#aviso').html('<h5>&nbsp;FACIN está em fase de conclusão por '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val()+'&nbsp;</h5>')
 				$("#inc").val('Consultar Grupo/Item')
 				$("#alt").val('Consultar Grupo/Item')
 				if($('#concfacingestor').val() != '' && $('#concfacingestor').val() != undefined && $('#concfacingestor').val() != null){
-					var texto1 = 'Conclusão da FACIN realizada em '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val()
+					var texto1 = '<h5>&nbsp;Conclusão da FACIN realizada em '+$('#concfacingestor').val()+' Gestor(a): '+$('#concfacingestornome').val()+'&nbsp;</h5>'
 					if($('#concfacininspetor').val() != '' && $('#concfacininspetor').val() != undefined && $('#concfacininspetor').val() != null){ 
-						texto2 = 'Conclusão das considerações (FACIN) realizada em '+$('#concfacininspetor').val()+' Inspetor(a): '+$('#concfacininspetornome').val()
+						texto2 = '<h5>&nbsp;Conclusão das considerações (FACIN) realizada em '+$('#concfacininspetor').val()+' Inspetor(a): '+$('#concfacininspetornome').val()+'&nbsp;</h5>'
 						$("#alt").val('Consultar Grupo/Item')
 					}
 					$('#aviso').html(texto1 + '<br>' + texto2)
@@ -502,7 +558,7 @@
 			if($('#grpacesso').val() == 'INSPETORES' && $('#concfacingestor').val() == '') {$('#avisoinsp').hide()}
 		}		
 		if($('#grpitem').val() == '' && $('#grpitem2').val() == '') {
-			$('#aviso').html('Nº avaliação inexistente ou está na fase de Revisão!')
+			$('#aviso').html('<h5>&nbsp;Nº avaliação inexistente ou está na fase de Revisão!&nbsp;</h5>')
 			$('#aviso').show(500)
 		} 	
 		if($('#somenteavaliarmeta3').val() == 'S' && $('#grpitem2').val() != null) {

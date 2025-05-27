@@ -34,7 +34,8 @@
 <html>
 <head>
 <title>Sistema Nacional de Controle Interno</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="public/bootstrap/bootstrap.min.css">  
  <link href="css.css" rel="stylesheet" type="text/css">
  <style>
@@ -49,6 +50,7 @@
   th {
     font-size: 12px;
   }
+
 </style>
 </head>
 <br>
@@ -257,7 +259,7 @@
               let medmeta1 = 0
               let medmeta2 = 0
               let medmeta3 = 0
-              let tab = '<table class="table table-bordered border-primary">'
+              let tab = '<table class="table table-bordered table-hover border-primary">'
               tab += '<thead>'
               tab += '<tr>'
               tab +=  '<th scope="col">Clique no Nº Avaliação</th>'
