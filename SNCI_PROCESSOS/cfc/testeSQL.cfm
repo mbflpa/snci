@@ -1,4 +1,10 @@
-<cfprocessingdirective pageencoding="utf-8">	
+<cfprocessingdirective pageencoding="utf-8">
+
+<cfquery name="rsEditaLog" datasource="#application.dsn_processos#" timeout="120">	
+  UPDATE pc_rotinas_execucao_log
+  SET pc_rotina_ultima_execucao = '2025-05-06 08:18:21.833'
+  WHERE pc_rotina_nome = 'baixaPorValorEnvolvido'
+</cfquery>
 
  <cfquery name="rsDelete" datasource="#application.dsn_processos#" timeout="120">
     WITH UltimosRegistros AS (
@@ -128,3 +134,11 @@
         SELECT pc_aval_processo FROM Processos
     );
 </cfquery>
+
+<!--Propostas de Melhoria-->
+<cfquery name="atualizaPM" datasource="#application.dsn_processos#" timeout="120">
+    UPDATE pc_avaliacao_melhorias
+    SET pc_aval_melhoria_status = 'P'
+    WHERE pc_aval_melhoria_id IN (5111,4831,4832,4833,4618,3617,3618,3619,3620,3621,3622,3623,3624,3616,3598,3559,3557,3558,3538,3539)
+</cfquery>
+    
