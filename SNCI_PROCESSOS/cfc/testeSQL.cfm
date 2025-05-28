@@ -139,6 +139,7 @@
 <cfquery name="atualizaPM" datasource="#application.dsn_processos#" timeout="120">
     UPDATE pc_avaliacao_melhorias
     SET pc_aval_melhoria_status = 'P'
+        ,pc_aval_melhoria_datahora = '2024-06-05'
     WHERE pc_aval_melhoria_id IN (5111,4831,4832,4833,4618,3617,3618,3619,3620,3621,3622,3623,3624,3616,3598,3559,3557,3558,3538,3539)
 </cfquery>
     
