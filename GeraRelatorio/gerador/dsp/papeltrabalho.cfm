@@ -838,7 +838,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                       <span class="noprint" style="background:###TRIM(qSituAcao.STO_Cor)#;padding:2px;color:##fff">
                       <cfif '#TRIM(RIP_Recomendacao)#' eq 'S'>
                         <div ><span style="font-family:arial;background:red;padding:2px;color:##fff">EM REANÁLISE PELO INSPETOR</span></div>
-                        <div class="noprint" align="center" style="margin-top:10px;float: left;"> <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?cancelar=s&pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#',600,650)">
+                        <div class="noprint" align="center" style="margin-top:10px;float: left;"> <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?cancelar=s&pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#',660,650)">
                           <div><img alt="Cancelar Reanálise do item" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">Cancelar Reanálise</div>
                         </a> </div>
@@ -880,7 +880,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                 <cfif ('#qSituacao.Pos_Situacao_Resp#' eq 0 or '#qSituacao.Pos_Situacao_Resp#' eq 11 or '#qSituacao.recordcount#' eq 0 or '#rsVerifValidados.recordcount#' neq 0 or '#rsSemNC.itemNC#' eq 0 or rsQuatEmRevisao.recordcount neq 0) and  '#TRIM(RIP_Recomendacao)#' neq 'S' and  ('#grpacesso#' eq 'GESTORES' or '#grpacesso#' eq 'DESENVOLVEDORES') and #trim(RIP_MatricAvaliador)# neq '' and structKeyExists(url,'pg') and '#url.pg#' eq 'controle'  >
                     <cfif '#rsInspecaoNaoFinalizada.recordcount#' neq 0 or '#rsVerifValidados.recordcount#' neq 0 or '#rsSemNC.itemNC#' eq 0 or rsQuatEmRevisao.recordcount neq 0>
                         <div class="noprint" align="center" style="margin-top:10px;float: left;"> 
-                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&tpunid=#qryPapelTrabalho.TUN_Codigo#&modal=#qryPapelTrabalho.INP_Modalidade#',600,650)">
+                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();abrirPopup('../../../itens_controle_revisliber_reanalise.cfm?pg=pt&ninsp=#qryPapelTrabalho.INP_NumInspecao#&unid=#qryPapelTrabalho.RIP_Unidade#&ngrup=#qryPapelTrabalho.Grp_Codigo#&nitem=#qryPapelTrabalho.Itn_NumItem#&tpunid=#qryPapelTrabalho.TUN_Codigo#&modal=#qryPapelTrabalho.INP_Modalidade#',660,650)">
                           <div><img alt="Enviar p/ Reanálise do Inspetor ou Validar Reanálise" src="../../../figuras/reavaliar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">
                             <cfif '#TRIM(RIP_Recomendacao)#' eq 'R'>

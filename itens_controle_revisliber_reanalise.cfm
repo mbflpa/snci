@@ -67,7 +67,7 @@
 	<cfquery datasource="#dsn_inspecao#" name="qVerifEmReanalise">
 		SELECT RIP_Resposta, RIP_Recomendacao, RIP_Recomendacao_Inspetor, RIP_Critica_Inspetor 
 		FROM Resultado_Inspecao 
-		WHERE (RIP_Recomendacao='S' OR RIP_Recomendacao='R') and RIP_NumInspecao='#ninsp#'  
+		WHERE (RIP_Recomendacao='S' OR RIP_Recomendacao='R') and RIP_NumInspecao='#URL.Ninsp#' and RIP_NumGrupo ='#url.Ngrup#' and RIP_NumItem ='#url.Nitem#'
 	</cfquery>
 
 	<cfif qVerifEmReanalise.recordCount eq 0>
