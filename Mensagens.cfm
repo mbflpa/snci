@@ -3620,6 +3620,9 @@
 						&nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório. <br>
 						&nbsp;&nbsp;&nbsp;O não cumprimento ensejará em perda de prazo.<br><br>
 
+						&nbsp;&nbsp;&nbsp;Ao Usuário(a), O Sistema Nacional de Controle Interno - SNCI   deve ser utilizado com o Navegador: Microsoft EDGE <br>
+						&nbsp;&nbsp;&nbsp;em outro navegador algum recurso de página poderá ter o seu funcionamento inadequado!<br><br>
+						
 						&nbsp;&nbsp;&nbsp;Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a><br><br>
 
 						&nbsp;&nbsp;&nbsp;Atentar para as orientações deste e-mail para registro de sua manifestação no SNCI. Respostas incompletas serão devolvidas para complementação. <br><br>
@@ -3672,6 +3675,9 @@
 
 						&nbsp;&nbsp;&nbsp;Registrar a resposta no Sistema Nacional de Controle Interno - SNCI  num prazo de dez (10) dias úteis, contados a partir da data de entrega do Relatório. <br>
 						&nbsp;&nbsp;&nbsp;O não cumprimento ensejará em perda de prazo.<br><br>
+
+						&nbsp;&nbsp;&nbsp;Ao Usuário(a), O Sistema Nacional de Controle Interno - SNCI   deve ser utilizado com o Navegador: Microsoft EDGE <br>
+						&nbsp;&nbsp;&nbsp;em outro navegador algum recurso de página poderá ter o seu funcionamento inadequado!<br><br>
 
 						&nbsp;&nbsp;&nbsp;Acesse o SNCI endereço: (http://intranetsistemaspe/snci/rotinas_inspecao.cfm) ou clique no link: <a href="http://intranetsistemaspe/snci/rotinas_inspecao.cfm">Relatório de Controle Interno.</a><br><br>
 
