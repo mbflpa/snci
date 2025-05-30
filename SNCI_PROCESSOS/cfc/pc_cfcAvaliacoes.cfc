@@ -7806,7 +7806,8 @@
 						<cfquery datasource="#application.dsn_processos#">
 							UPDATE m
 							SET pc_aval_melhoria_status = 'N',
-								pc_aval_melhoria_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
+								pc_aval_melhoria_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+								pc_aval_melhoria_descricao = pc_aval_melhoria_descricao + CHAR(13) + CHAR(10) + CONVERT(VARCHAR, GETDATE(), 103) + ': Baixado considerando os critérios da NT 51741855/2024 aplicados às OR'
 							FROM pc_avaliacao_melhorias m
 							INNER JOIN pc_avaliacoes a ON a.pc_aval_id = m.pc_aval_melhoria_num_aval
 							WHERE m.pc_aval_melhoria_status = 'P' 
