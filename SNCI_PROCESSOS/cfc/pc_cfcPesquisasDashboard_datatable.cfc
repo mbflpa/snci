@@ -234,6 +234,8 @@
                 WHERE pc_processos.pc_num_status in(4,5) AND orgaoResp.pc_org_controle_interno='N'
                 <cfif arguments.ano NEQ "Todos">
                     AND RIGHT(pc_processos.pc_processo_id, 4) = <cfqueryparam cfsqltype="cf_sql_integer" value="#arguments.ano#">
+                <cfelse>
+                    AND RIGHT(pc_processos.pc_processo_id, 4) >= <cfqueryparam cfsqltype="cf_sql_integer" value="#application.anoPesquisaOpiniao#">
                 </cfif>
                 
                 UNION
