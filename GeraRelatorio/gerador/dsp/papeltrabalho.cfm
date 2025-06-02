@@ -29,7 +29,17 @@
     WHERE  Pos_Unidade ='#qryPapelTrabalho.RIP_Unidade#' and Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#'
     ORDER BY Pos_Situacao_Resp, Pos_NumGrupo, Pos_NumItem
 </cfquery>
-
+<cfset fezavalSN = "N">
+<cfquery name="qInspetores" datasource="#dsn_inspecao#">
+  SELECT Fun_Matric, Fun_Nome from Inspetor_Inspecao 
+  INNER JOIN Funcionarios ON Fun_Matric = IPT_MatricInspetor 
+  WHERE IPT_NumInspecao = '#qryPapelTrabalho.INP_NumInspecao#' ORDER BY Fun_Nome
+</cfquery>
+<cfloop query= "qInspetores">
+  <cfif qAcesso.Usu_Matricula eq qInspetores.Fun_Matric>
+      <cfset fezavalSN = "S">
+  </cfif>
+</cfloop>  
 <cfquery name="rsRelev" datasource="#dsn_inspecao#">
 	SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
 	FROM ValorRelevancia
@@ -454,7 +464,6 @@
 
 
     function abrirPopup(url, w, h) {
-
       var newW = w + 100;
       var newH = h + 100;
       var left = (screen.width - newW) / 2;
@@ -465,7 +474,6 @@
       //posiciona o popup no centro da tela
       newwindow.moveTo(left, top);
       newwindow.focus();
-
     }
 
     //para botao voltar ao topo
@@ -919,21 +927,22 @@ z-index:1000;visibility:hidden;position:absolute;" >
                         </cfif>
                         
                           <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenção! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
-                                         window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self');}"><a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self')">
+                                         window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self');}">
+                                         <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('../../../itens_controle_revisliber.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self')">
                           <div ><img  alt="Revisar" src="../../../figuras/revisar.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">Revisar</div>
-                          </a> </a></div>
+                          </a></a></div>
                           
                           <cfset qtdrevisar = qtdrevisar + 1>
                         </cfif>
                     </cfif>  
-                    <cfif RIP_Resposta eq 'C' or RIP_Resposta eq 'V'>
+                    <cfif (RIP_Resposta eq 'C' or RIP_Resposta eq 'V') and grpacesso eq "GESTORES" and qryPapelTrabalho.INP_DTConcluirRevisao eq ''>
                         <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:60px" >
-                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();if(window.confirm('Atenção! Após a revisão deste item, esta Avaliação será liberada e não será possível revisar outros itens.\n\nClique em OK se todos os itens CONFORME e NÃO EXECUTA já tiverem sido revisados, caso contrário, clique em Cancelar e realize a revisão dos itens.')){
-                                         window.open('../../../itens_controle_corrigir.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self');}"><a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('../../../itens_controle_corrigir.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self')">
-                          <div ><img  alt="Corrigir" src="../../../figuras/Corrigir.png" width="25"   border="0" /></div>
+                          <a style="cursor:pointer;"  onclick="capturaPosicaoScroll();window.open('../../../itens_controle_corrigir.cfm?pg=pt&Unid=#qryPapelTrabalho.RIP_Unidade#&Ninsp=#qryPapelTrabalho.INP_NumInspecao#&Ngrup=#qryPapelTrabalho.Grp_Codigo#&Nitem=#qryPapelTrabalho.Itn_NumItem#&situacao=#qSituAcao.Pos_Situacao_Resp#&vlrdec=#qryPapelTrabalho.Itn_ValorDeclarado#&modal=#qryPapelTrabalho.INP_Modalidade#&tpunid=#qryPapelTrabalho.TUN_Codigo#','_self')">
+                          <div><img  alt="Corrigir" src="../../../figuras/Corrigir.png" width="25"   border="0" /></div>
                           <div style="color:darkred;position:relative;font-size:12px">Corrigir</div>
-                          </a> </a></div>
+                          </a>
+                        </div>
                     </cfif>                     
                   
                     </td>
@@ -1059,7 +1068,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
       </cfoutput>
 	  </table>  
  
-        <cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0 and exibirSN eq 'S' and '#rsSemNC.itemNC#' neq 0>
+        <cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0 and exibirSN eq 'S' and '#rsSemNC.itemNC#' neq 0 and #fezavalSN# eq 'S'>
           <br>
             <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:620px">
                 <a style="cursor:pointer;"  onclick="if(confirm('Confirma Concluir Revisão e Liberar Avaliação para Gestor(a) da Unidade?')){document.formPT.acao.value='ConcluirRevisaoComNC';document.formPT.submit();}">
@@ -1098,25 +1107,21 @@ z-index:1000;visibility:hidden;position:absolute;" >
           <tr>
             <th colspan="2" valign="top" bordercolor="999999" bgcolor="" scope="row">&nbsp;</th>
           </tr>
-          <cfquery name="qInspetores" datasource="#dsn_inspecao#">
-            SELECT Fun_Matric, Fun_Nome from Inspetor_Inspecao INNER JOIN Funcionarios ON Fun_Matric = IPT_MatricInspetor WHERE IPT_NumInspecao = '#qryPapelTrabalho.INP_NumInspecao#' ORDER BY Fun_Nome
-          </cfquery>
           <cfoutput query= "qInspetores">
             <tr>
               <td valign="top" bordercolor="999999" bgcolor="">&nbsp;</td>
-			  <!--- <cfset exibmatr = (Left(Fun_Matric,1) & '.' & Mid(Fun_Matric,2,3) & '.' & Mid(Fun_Matric,5,3) & '-' & Right(Fun_Matric,1)) & "   " & Fun_Nome> --->
-			  <cfset exibmatr = (Left(Fun_Matric,1) & '.' & Mid(Fun_Matric,2,3) & '.***-' & Right(Fun_Matric,1)) & "   " & Fun_Nome>
-			  <cfif '#mat#' eq '#Fun_Matric#'>
-				<cfset exibmatr = exibmatr & "(COORDENADOR)">
-			  </cfif>
-			  
+                <cfset exibmatr = (Left(Fun_Matric,1) & '.' & Mid(Fun_Matric,2,3) & '.***-' & Right(Fun_Matric,1)) & "   " & Fun_Nome>
+                <cfif '#mat#' eq '#Fun_Matric#'>
+                  <cfset exibmatr = exibmatr & "(COORDENADOR)">
+                </cfif>
               <th colspan="4" valign="top" bordercolor="999999" bgcolor="">
-			  <table width="100%" border="0">
-                <tr>
-                  <td width="51%">#exibmatr#</td>
-                  <td width="49%">-------------------------------------------------------------------</td>
-                </tr>
-              </table>                   </th>
+			          <table width="100%" border="0">
+                  <tr>
+                    <td width="51%">#exibmatr#</td>
+                    <td width="49%">-------------------------------------------------------------------</td>
+                  </tr>
+                </table>                   
+              </th>
             </tr>
           </cfoutput>
           <tr>
