@@ -29,17 +29,11 @@
     WHERE  Pos_Unidade ='#qryPapelTrabalho.RIP_Unidade#' and Pos_Inspecao='#qryPapelTrabalho.INP_NumInspecao#'
     ORDER BY Pos_Situacao_Resp, Pos_NumGrupo, Pos_NumItem
 </cfquery>
-<cfset fezavalSN = "N">
 <cfquery name="qInspetores" datasource="#dsn_inspecao#">
   SELECT Fun_Matric, Fun_Nome from Inspetor_Inspecao 
   INNER JOIN Funcionarios ON Fun_Matric = IPT_MatricInspetor 
   WHERE IPT_NumInspecao = '#qryPapelTrabalho.INP_NumInspecao#' ORDER BY Fun_Nome
 </cfquery>
-<cfloop query= "qInspetores">
-  <cfif qAcesso.Usu_Matricula eq qInspetores.Fun_Matric>
-      <cfset fezavalSN = "S">
-  </cfif>
-</cfloop>  
 <cfquery name="rsRelev" datasource="#dsn_inspecao#">
 	SELECT VLR_Fator, VLR_FaixaInicial, VLR_FaixaFinal
 	FROM ValorRelevancia
@@ -574,7 +568,7 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#7F86b2ff,endCol
 z-index:1000;visibility:hidden;position:absolute;" >		
 		 <img id="imgAguarde" name="imgAguarde" src="figuras/aguarde.png" width="100px"  border="0" style="position:absolute;"></img>
 </div>
-<cfset exibirSN = 'S'>
+  <cfset exibirSN = 'S'>
   <form id="formPT"  name="formPT" method="post">
       <input type="hidden" id="grupo" name="grupo" value="">
       <input type="hidden" id="item" name="item" value="">
@@ -1067,8 +1061,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
         </tr>
       </cfoutput>
 	  </table>  
- 
-        <cfif qInspecaoLiberada.recordCount eq 0 and qVerifEmReanalise.recordCount eq 0 and qVerifValidados.recordCount eq 0 and exibirSN eq 'S' and '#rsSemNC.itemNC#' neq 0 and #fezavalSN# eq 'S'>
+        <cfif qInspecaoLiberada.recordCount lte 0 and qVerifEmReanalise.recordCount lte 0 and qVerifValidados.recordCount eq 0 and exibirSN eq 'S' and '#rsSemNC.itemNC#' neq 0 and '#grpacesso#' eq 'GESTORES'>
           <br>
             <div class="noprint" align="center" style="margin-top:10px;float: left;margin-left:620px">
                 <a style="cursor:pointer;"  onclick="if(confirm('Confirma Concluir Revisão e Liberar Avaliação para Gestor(a) da Unidade?')){document.formPT.acao.value='ConcluirRevisaoComNC';document.formPT.submit();}">
@@ -1078,7 +1071,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
                 </div>      
           <br><br><br><br>          
         </cfif>    
-        <cfif ('#semNCvalidado#' is false) and ('#emReavaliacaoReavaliado#' eq 0) and ('#rsSemNC.itemNC#' eq 0)>
+        <cfif ('#semNCvalidado#' is false) and ('#emReavaliacaoReavaliado#' eq 0) and ('#rsSemNC.itemNC#' eq 0) AND ('#grpacesso#' eq 'GESTORES')>
           <!---
                 <div align="center">
             <input name="submit" type="submit" type="button" class="botao" onClick="if(confirm('Deseja validar esta Avaliação sem itens NÃO CONFORME?\n\nTodos os itens foram analisados?')){document.formPT.acao.value = 'ConcluirRevisaoSemNC';}" value="Validar Avaliação sem Itens Não Conforme">
