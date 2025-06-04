@@ -43,6 +43,8 @@
 	SELECT RIP_Recomendacao_Inspetor, RIP_Critica_Inspetor, RIP_Recomendacao FROM Resultado_Inspecao
 	WHERE RIP_NumInspecao = '#URL.Ninsp#' AND RIP_Recomendacao = 'R'
 </cfquery>
+
+
 <cfif isDefined("Form.acao") and (grpacesso eq 'GESTORES')>
 	<cfquery datasource="#dsn_inspecao#" name="rsRevis">
 		SELECT INP_RevisorLogin
@@ -98,7 +100,38 @@
 </cfif>
 
 <cfif isDefined("Form.acao") and "#form.acao#" eq 'validar'>
-
+	<!--- Update na tabela ParecerUnidade --->
+	<cfquery datasource="#dsn_inspecao#">
+		UPDATE ParecerUnidade 
+		SET 
+		Pos_Situacao = 'RE'
+		, Pos_Situacao_Resp = 0
+		, pos_dtultatu = CONVERT(varchar, getdate(), 120)
+		, pos_username = '#CGI.REMOTE_USER#'
+		WHERE 
+		Pos_Inspecao = '#FORM.Ninsp#' AND 
+		Pos_NumGrupo = #FORM.Ngrup# AND 
+		Pos_NumItem = #FORM.Nitem#
+	</cfquery>
+	<cfquery datasource="#dsn_inspecao#">
+		DELETE 
+		FROM Andamento
+		WHERE And_NumInspecao='#FORM.Ninsp#' AND 
+		And_NumGrupo = #FORM.Ngrup# AND 
+		And_NumItem = #FORM.Nitem# AND 
+		And_Situacao_Resp = 11
+	</cfquery>
+	<cfquery datasource="#dsn_inspecao#">
+		UPDATE Andamento
+		SET
+		And_DtPosic = CONVERT(char, GETDATE(), 102) 
+		, And_username = '#CGI.REMOTE_USER#'
+		FROM Andamento
+		WHERE And_NumInspecao='#FORM.Ninsp#' AND 
+		And_NumGrupo = #FORM.Ngrup# AND 
+		And_NumItem = #FORM.Nitem# AND 
+		And_Situacao_Resp = 0
+	</cfquery>	
 	<cfquery datasource="#dsn_inspecao#" name="rsVerificaItem">
 		SELECT  RIP_Resposta, RIP_Unidade, RIP_NCISEI FROM Resultado_Inspecao 
 		WHERE RIP_NumInspecao='#FORM.Ninsp#' And RIP_NumGrupo = '#FORM.Ngrup#' and RIP_NumItem ='#FORM.Nitem#' 
@@ -182,7 +215,7 @@
 			</cfquery>
 			<cfif #grpacesso# eq 'GESTORES' or #grpacesso# eq 'DESENVOLVEDORES'>
 				<!--- Update na tabela Inspecao com sigla  NA = não avaliada, ER = em reavaliação, RA = reavaliada, CO = concluída--->
-			<cfquery datasource="#dsn_inspecao#">
+			    <cfquery datasource="#dsn_inspecao#">
 					UPDATE Inspecao set INP_Situacao ='ER',INP_DtEncerramento =  CONVERT(char, GETDATE(), 102), INP_DtUltAtu =  CONVERT(char, GETDATE(), 120), INP_UserName ='#CGI.REMOTE_USER#'
 					WHERE INP_NumInspecao = '#URL.Ninsp#' 
 				</cfquery>
@@ -251,7 +284,6 @@
 </cfif>
 
 <cfif isDefined("Form.acao") and "#form.acao#" eq 'respSemAlteracao'>	
-
 		<cfset maskcgiusu = ucase(trim(CGI.REMOTE_USER))>
 		<cfif left(maskcgiusu,8) eq 'EXTRANET'>
 			<cfset maskcgiusu = left(maskcgiusu,9) & '***' &  mid(maskcgiusu,13,8)>
