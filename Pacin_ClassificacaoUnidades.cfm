@@ -9,7 +9,7 @@
 		FROM Inspecao 
 		INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)
 		INNER JOIN Unidades ON (INP_Unidade = Und_Codigo)
-		WHERE RIP_NumInspecao = '#url.Ninsp#'
+		WHERE RIP_NumInspecao = '#url.Ninsp#' and INP_DTConcluirRevisao is not null
 	</cfquery>
 <cfelse>
 
@@ -19,7 +19,7 @@
 	FROM Inspecao 
 	INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)
 	INNER JOIN Unidades ON (INP_Unidade = Und_Codigo)
-	WHERE Right(RIP_NumInspecao,4)= '#form.frmano#' and INP_Situacao = 'CO'
+	WHERE Right(RIP_NumInspecao,4)= '#form.frmano#' and INP_DTConcluirRevisao is not null
 	<cfif form.se neq 'Todos'>
 		and Und_CodDiretoria = '#form.se#' 
 	</cfif>
@@ -32,13 +32,6 @@
 <cfset endTime = CreateTime(0,0,55)> 
 <cfloop from="#startTime#" to="#endTime#" index="i" step="#CreateTimeSpan(0,0,0,1)#"> 
 </cfloop>
-<!--- <cfquery name="rsClas" datasource="#dsn_inspecao#">
-	SELECT distinct RIP_Unidade, RIP_NumInspecao
-	FROM Inspecao 
-	INNER JOIN Resultado_Inspecao ON (INP_NumInspecao = RIP_NumInspecao) AND (INP_Unidade = RIP_Unidade)
-	INNER JOIN Unidades ON (INP_Unidade = Und_Codigo)
-	WHERE RIP_NumInspecao = '6000332022' 
-</cfquery>   --->  
 </cfif>
 <cfquery name="qUsuario" datasource="#dsn_inspecao#">
   SELECT Usu_DR, Usu_Matricula, Usu_Coordena FROM Usuarios WHERE Usu_Login = '#CGI.REMOTE_USER#'
@@ -310,7 +303,6 @@
 		<cflocation url="#url.pagretorno#?pg=controle&Form.id=#url.Ninsp#&Unid=#Unid#&Ninsp=#Ninsp#&Ngrup=#Ngrup#&Nitem=#Nitem#&DtInic=#DtInic#&dtFim=#dtFim#&ckTipo=#ckTipo#&reop=#reop#&vlrdec=#vlrdec#&situacao=#situacao#&posarea=&modal=">	
 	</cfif>
 </cfif>
-
 <!--- =================================== --->	
 <cfif form.se neq 'Todos'>
 	<cfquery name="qAcesso" datasource="#dsn_inspecao#">
@@ -387,8 +379,7 @@ function troca(a){
 </script>
 	</head>
 
-<body onLoad="onsubmit="mensagem()">
-
+<body>
 
 <cfinclude template="cabecalho.cfm">
 	    <span class="exibir"><strong>
