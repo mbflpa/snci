@@ -64,7 +64,7 @@
 		INNER JOIN Resultado_Inspecao ON (INP_Unidade = RIP_Unidade) AND (INP_NumInspecao = RIP_NumInspecao)) 
 		INNER JOIN Itens_Verificacao ON (convert(char(4),RIP_Ano) = Itn_Ano) AND (RIP_NumGrupo = Itn_NumGrupo) AND (RIP_NumItem = Itn_NumItem) AND (Und_TipoUnidade = Itn_TipoUnidade)) 
 		LEFT JOIN ParecerUnidade ON (RIP_Unidade = Pos_Unidade) AND (RIP_NumInspecao = Pos_Inspecao) AND (RIP_NumGrupo = Pos_NumGrupo) AND (RIP_NumItem = Pos_NumItem)
-		WHERE Itn_Ano='#form.frmano#' AND INP_NumInspecao='#rsClas.RIP_NumInspecao#'
+		WHERE Itn_Ano='#form.frmano#' AND INP_NumInspecao='#rsClas.RIP_NumInspecao#' and INP_DTConcluirRevisao is not null
 	</cfquery> 
 	<cfset startTime = CreateTime(0,0,0)> 
 	<cfset endTime = CreateTime(0,0,55)> 

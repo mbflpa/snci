@@ -19,15 +19,6 @@ SELECT Usu_GrupoAcesso, Usu_DR, Usu_Coordena, Usu_Matricula FROM Usuarios WHERE 
 	ORDER BY TUN_Descricao
 </cfquery>
 
-<cfset auxanoatu = year(now())>
-<cfquery name="rsAno" datasource="#dsn_inspecao#">
-SELECT Andt_AnoExerc
-FROM Andamento_Temp
-GROUP BY Andt_AnoExerc
-HAVING Andt_AnoExerc  < '#auxanoatu#'
-ORDER BY Andt_AnoExerc DESC
-</cfquery>
-<!--- =========================== --->
 
 <html>
 <head>
@@ -37,27 +28,26 @@ ORDER BY Andt_AnoExerc DESC
 <script language="javascript">
 
 function validarform() {
-//alert('aqui....');
+	//alert('aqui....');
     var frm = document.forms[0];
 	var messelec = frm.frmmes.value;
 	var mesatual = frm.frmmesatual.value;
-//alert(frm.frmUsuGrupoAcesso.value);
-//alert(frm.frmdia.value);
+	//alert(frm.frmUsuGrupoAcesso.value);
+	//alert(frm.frmdia.value);
 
 	//alert('frmanoselecionado ' + frm.frmano.value + ' Ano atual ' + frm.frmanoatual.value + ' Mes selecionado ' + frm.frmmes.value + ' mes atual: ' + mesatual);	
 	if (eval(frm.frmano.value) == eval(frm.frmanoatual.value))
 	{
-	if (eval(messelec) >= eval(mesatual)){
-	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
-	return false;
-	}
+		if (eval(messelec) >= eval(mesatual)){
+			alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
+			return false;
+		}
 
-    if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmdia.value <= 10){
-	alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
-	return false;
-	}	
+		if (eval(messelec) == eval(mesatual - 1) && frm.frmUsuGrupoAcesso.value != 'GESTORMASTER' && frm.frmdia.value <= 10){
+			alert('Gestor(a), o mês selecionado para o ano selecionado ainda não gerado!');
+			return false;
+		}	
 	} 
-
 
 //return false;
 }
@@ -72,10 +62,9 @@ function validarform() {
    <td colspan="6" align="center">&nbsp;</td>
 </tr>
 
-<!--- �rea de conte�do   --->
+<!--- área de conteúdo   --->
 	<form action="Pacin_ClassificacaoUnidades.cfm" method="post" target="_blank" name="frmObjeto" onSubmit="return validarform()">
 	  <table width="38%" align="center">
-       
         <tr>
           <td colspan="5" align="center" class="titulo2"><p>CLASSIFICAÇÃO DAS UNIDADES POR EXERCÍCIO</p>
           </td>
@@ -98,7 +87,7 @@ function validarform() {
           </span></strong></td>
         </tr>
 
- <cfif (grpacesso eq 'GESTORMASTER' or grpacesso eq 'GOVERNANCA')>
+ 		<cfif (grpacesso eq 'GESTORMASTER' or grpacesso eq 'GOVERNANCA')>
 			<cfquery name="qSE" datasource="#dsn_inspecao#">
 				SELECT Dir_Codigo, Dir_Sigla FROM Diretoria WHERE Dir_Codigo <> '01'
 			</cfquery>
@@ -106,7 +95,6 @@ function validarform() {
 		     <td width="2%">&nbsp;</td>
              <td width="39%" class="exibir"><strong>Superintendência : </strong></td>
 			 <td colspan="3">
-			   
 		       <div align="left">
 			       <select name="se" id="se" class="form">
 			         <option selected="selected" value="Todos">Todos</option>
@@ -217,12 +205,13 @@ function validarform() {
             <td>&nbsp;</td>
             <td width="39%" class="exibir"><strong>Tipo de Unidade &nbsp;&nbsp; : </strong></td>
             <td colspan="2">
-			<select name="frmtipounid" class="exibir" id="frmtipounid">
-			          <option value="Todas">Todas</option>
-    			  <cfoutput query="rstpunid">
-                      <option value="#TUN_Codigo#">#trim(TUN_Descricao)#</option>  
-                  </cfoutput>
-            </select>			</td>
+				<select name="frmtipounid" class="exibir" id="frmtipounid">
+						<option value="Todas">Todas</option>
+					<cfoutput query="rstpunid">
+						<option value="#TUN_Codigo#">#trim(TUN_Descricao)#</option>  
+					</cfoutput>
+				</select>
+			</td>
           </tr>
 		  <cfset cont = year(now())>		  
           <tr>
@@ -253,7 +242,6 @@ function validarform() {
 	  <input name="grupoacesso" type="hidden" value="<cfoutput>#grpacesso#</cfoutput>">
   	  <input name="usucoordena" type="hidden" value="<cfoutput>#ucase(trim(qAcesso.Usu_Coordena))#</cfoutput>">
   	  <input name="usumatricula" type="hidden" value="<cfoutput>#ucase(trim(qAcesso.Usu_Matricula))#</cfoutput>">	  
-	  
 	</form>
 </body>
 </html>
