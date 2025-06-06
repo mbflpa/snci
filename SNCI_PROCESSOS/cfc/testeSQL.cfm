@@ -2,15 +2,11 @@
 <cftransaction >
  
 
-  <cfquery name="deleteAnexos" datasource="#application.dsn_processos#" timeout="120">
-    DELETE FROM pc_anexos
-    WHERE pc_anexo_processo_id = '0100212024'
+  <cfquery name="updateAvaliacoes" datasource="#application.dsn_processos#" timeout="120">
+    UPDATE pc_processos
+    SET pc_data_finalizado ='2025-01-30'
+    WHERE pc_processo_id = '0100042025' 
   </cfquery>
 
-  <cfquery datasource="#application.dsn_processos#" >
-    UPDATE      pc_processos
-    SET        
-          pc_data_finalizado = pc_alteracao_datahora
-    WHERE pc_num_status = 5 and pc_data_finalizado is null
-  </cfquery>
+
 </cftransaction>
