@@ -2708,6 +2708,7 @@
 							UPDATE      pc_processos
 							SET         pc_num_status = 5,
 										pc_alteracao_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+										pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">
 										pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#',
 										pc_iniciarBloqueado = 'N'
 							WHERE       (pc_processo_id = '#arguments.pc_aval_processo#')
@@ -7807,7 +7808,7 @@
 							UPDATE m
 							SET pc_aval_melhoria_status = 'N',
 								pc_aval_melhoria_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-								pc_aval_melhoria_descricao = pc_aval_melhoria_descricao + CHAR(13) + CHAR(10) + CONVERT(VARCHAR, GETDATE(), 103) + ': Baixado considerando os critérios da NT 51741855/2024 aplicados às OR'
+								pc_aval_melhoria_descricao = pc_aval_melhoria_descricao + CHAR(13) + CHAR(10) + CONVERT(VARCHAR, GETDATE(), 103) + ': Baixado considerando os critérios da NT 51741855/2024 aplicados às OR'
 							FROM pc_avaliacao_melhorias m
 							INNER JOIN pc_avaliacoes a ON a.pc_aval_id = m.pc_aval_melhoria_num_aval
 							WHERE m.pc_aval_melhoria_status = 'P' 
