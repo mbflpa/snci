@@ -102,6 +102,7 @@
                                     WHERE pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
                                     AND pc_pesquisas.pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
                                 )
+               AND pc_processos.pc_num_status in(4,5)
 
           UNION
 
@@ -117,6 +118,7 @@
                                 WHERE pc_pesquisas.pc_processo_id = pc_processos.pc_processo_id
                                 AND pc_pesquisas.pc_org_mcu = <cfqueryparam cfsqltype="cf_sql_varchar" value="#application.rsUsuarioParametros.pc_usu_lotacao#">
                             )
+              AND pc_processos.pc_num_status in(4,5)
           UNION
 
           SELECT DISTINCT pc_processos.pc_processo_id
