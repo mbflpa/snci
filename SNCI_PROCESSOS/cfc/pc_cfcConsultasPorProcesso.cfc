@@ -233,14 +233,18 @@
 															</cfquery>
 
 															
-																<div style="position: relative;display: inline-block;">
-																	<div style="position: absolute;bottom:22px;left: 0;z-index: 1">
+																<div style="position: relative; display: inline-block;">
+																	<div style="position: absolute; bottom:37px; z-index: 1; width: 270px;">
 																		<cfif #pc_num_status# eq 6 and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
-																			<i id="btDesbloquear" onclick="<cfoutput>javascript:desbloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-unlock grow-icon" style="color: #fff; cursor:pointer; margin-left: 2px;margin-bottom:14px" title="Desbloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Desbloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+																			<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;padding-left:5px;padding-right:5px;">
+																				<i id="btDesbloquear" onclick="<cfoutput>javascript:desbloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-unlock grow-icon" style="color: #fff; cursor:pointer;" title="Desbloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Desbloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+																				<i id="btFinalizaBloqueado" onclick="javascript:finalizaBloqueado(<cfoutput>'#rsProcCard.pc_processo_id#'</cfoutput>)" class="fas fa-shield-alt grow-icon" style="color: #fff; cursor:pointer;" title="Finalizar Processo mantendo o Bloqueio" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Finalizar c/ Bloqueio o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+																			</div>
 																		<cfelse>
-																		<!--O botão bloquear só será visível para os processos com orientações, orientações sem posicionamento do órgão avaliado e propostas de melhoria sem o status Pendente-->
-																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComOrientações.recordcount neq 0 AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0  and #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
-																				<i id="btBloquear" onclick="<cfoutput>javascript:bloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-lock grow-icon" style="color: #cd0316; cursor:pointer; margin-left: 2px;margin-bottom:14px" title="Bloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Bloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+																			<cfif pc_num_status eq 4 AND pc_modalidade eq "E" AND rsProcComOrientações.recordcount neq 0 AND rsProcComPosicOrgAvaliado.recordcount eq 0 AND rsProcComPropMelhoriaAvaliada.recordcount eq 0 and #application.rsUsuarioParametros.pc_org_controle_interno# eq 'S' and #application.rsUsuarioParametros.pc_usu_perfil# neq 13>
+																				<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;padding-left:5px;padding-right:5px;">
+																					<i id="btBloquear" onclick="<cfoutput>javascript:bloquearProcesso('#pc_processo_id#','#siglaOrgAvaliado#');</cfoutput>" class="fas fa-lock grow-icon" style="color: #cd0316; cursor:pointer;" title="Bloquear Processo" data-toggle="popover" data-trigger="hover" data-placement="bottom" data-content="Bloquear o Processo Nº <cfoutput>#pc_processo_id#</cfoutput>."></i>
+																				</div>
 																			</cfif>
 																		</cfif>
 																	</div>
@@ -517,6 +521,74 @@
 						}
 					})
 					
+				}
+
+				function finalizaBloqueado(numProcesso){
+					var mensagem = "Deseja finalizar o processo N° <strong >" + numProcesso + "</strong> mantendo o bloqueio? <br><div style='background-color:#dc3545;color:#fff;text-align:justify;border-radius:0.8rem;padding:15px;'><span style='display: block;font-weight: bold;font-size: 20px;text-align: center;'>ATENÇÃO!</span>Este Processo receberá o status 'FINALIZADO C/ BLOQUEIO' e só poderá ser visualizado pelos órgãos do Controle Interno. Todas as Propostas de Melhoria, caso existam, receberão status 'NÃO INFORMADO'</div>"
+					swalWithBootstrapButtons.fire({//sweetalert2
+					html: logoSNCIsweetalert2(mensagem),
+					showCancelButton: true,
+					confirmButtonText: 'Sim!',
+					cancelButtonText: 'Cancelar!'
+					}).then((result) => {
+						if (result.isConfirmed) {
+							$('#modalOverlay').modal('show')	
+							setTimeout(function() {
+								$.ajax({
+									type: "post",
+									url: "cfc/pc_cfcConsultasPorProcesso.cfc",
+									data:{
+										method: "finalizaBloqueado",
+										numProcesso: numProcesso
+									},
+									async: false,
+									success: function(result) {
+										var anoMostra = $("input[name='opcaoAno']:checked").val();
+										ocultarTabela(anoMostra)
+										var valor = result;
+										// Se vier como WDDX, extraia o valor usando regex:
+										if(typeof valor === "string" && valor.indexOf("<wddxPacket") === 0){
+											var match = valor.match(/<string>(.*?)<\/string>/);
+											if(match && match[1]){
+												valor = match[1];
+											}
+										}
+
+										if(valor == 'true'){
+											Swal.fire({
+												html: logoSNCIsweetalert2('<strong>Operação não permitida!</strong><br><div style="background-color:#dc3545;color:#fff;text-align:justify;border-radius:0.8rem;padding:15px;">Este processo possue Orientações bloqueadas. Para finalizar este  Processo, todas as Orientações bloqueadas devem ser analisadas e baixadas na tela de "Acompanhamento" pelo Órgão de Origem. Após a última Orientação ser baixada, este processo receberá, automaticamente, o status "Finalizado c/ Bloqueio" e as suas Propostas de Melhoria, caso existam, receberão o status "NÃO INFORMADO".</div>'),
+												});
+											$('#modalOverlay').delay(1000).hide(0, function() {
+												$('#modalOverlay').modal('hide');
+											});
+										} else {
+											$('#modalOverlay').delay(1000).hide(0, function() {
+												$('#modalOverlay').modal('hide');
+												toastr.success('Processo FINALIZADO com sucesso!');
+											});
+										}
+									},
+									error: function(xhr, ajaxOptions, thrownError) {
+										$('#modalOverlay').delay(1000).hide(0, function() {
+											$('#modalOverlay').modal('hide');
+										});
+										$('#modal-danger').modal('show')
+										$('#modal-danger').find('.modal-title').text('Não foi possível executar sua solicitação.\nInforme o erro abaixo ao administrador do sistema:')
+										$('#modal-danger').find('.modal-body').text(thrownError)
+									}
+								});
+							}, 500);
+						} else {
+							// Lidar com o cancelamento: fechar o modal de carregamento, exibir mensagem, etc.
+							$('#modalOverlay').modal('hide');	
+							Swal.fire({
+								title: 'Finalização <span style="color:var(--amarelo_prisma_claro_correios)">cancelada</span> pelo usuário.',
+								html: logoSNCIsweetalert2(''),
+								icon: 'info'
+							});
+						}
+					})	
+
 				}
 
 				
@@ -2713,7 +2785,7 @@
 			/>
 
 			<cfset obj = new cfcSNCI.pc_cfcAvaliacoes()>
-			<cfset resultado = obj.teste_baixaPorValorEnvolvido('#arguments.numProcesso#')>
+			<cfset resultado = obj.baixaPorValorEnvolvido('#arguments.numProcesso#')>
 
 		</cftransaction>
 
@@ -2722,5 +2794,43 @@
 		
 	</cffunction>
 
+	<cffunction name="finalizaBloqueado" access="remote" returntype="string" hint="finaliza o processo mantendoi o bloqueio. Aplica o status 8 - Finalizado c/ Bloqueio no processo">
+    <cfargument name="numProcesso" type="string" required="true"/>
+    <cfquery name="rsExistemOrientacoes" datasource="#application.dsn_processos#">
+        SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes
+        INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+        WHERE pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
+    </cfquery>
+    <cfif rsExistemOrientacoes.recordcount neq 0>
+        <cfreturn "true">
+	<cfelse>
+		<cftransaction>
+			<!-- Coloca o processo em status 8 - Finalizado com Bloqueio -->
+			<cfquery datasource="#application.dsn_processos#">
+				UPDATE pc_processos
+				SET pc_num_status = 8,
+					pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+					pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#'
+				WHERE pc_processo_id = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
+			</cfquery>
+			<!-- fim Coloca o processo em status 8 - Finalizado com Bloqueio -->
+
+			<!-- Coloca todas as propostas de melhoria com status Não Informado -->
+			<cfquery datasource="#application.dsn_processos#">
+				UPDATE pc_avaliacao_melhorias
+				SET pc_aval_melhoria_status = 'N',
+					pc_aval_melhoria_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+					pc_aval_melhoria_login = '#application.rsUsuarioParametros.pc_usu_login#'
+				WHERE pc_aval_melhoria_num_aval IN (SELECT pc_aval_id FROM pc_avaliacoes WHERE pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">)
+				
+			</cfquery>
+			<!-- fim Coloca todos os itens do processo com status 8 - Finalizado com Bloqueio -->
+			
+			<cfreturn "false">
+
+		</cftransaction>
+    </cfif>
+   
+</cffunction>	
 
 </cfcomponent>
