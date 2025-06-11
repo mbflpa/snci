@@ -71,7 +71,7 @@
 									<cfif '#arguments.processoEmAcompanhamento#' eq true>
 											AND pc_num_status in(4,6)
 									<cfelse>
-											AND pc_num_status in(5)
+											AND pc_num_status in(5,8)
 									</cfif>
 									<!---Se o perfil for 16 - 'CI - CONSULTAS', mostra todas as orientações--->
 									<cfif ListFind("16",#application.rsUsuarioParametros.pc_usu_perfil#) >
