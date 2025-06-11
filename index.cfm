@@ -239,7 +239,11 @@
 	  	</cfcase>
 		<cfcase value="permissao21">
 			  <cfinclude template="Pacin_Permuta_Avaliacao_ref.cfm">
-	  	</cfcase>	
+	  	</cfcase>
+		<cfcase value="permissao31">
+			  <cfinclude template="cadastro_inspecao_despesas_ref.cfm">
+	  	</cfcase>		
+		
 		<cfcase value="permissao22">
 			<cfinclude template="Pacin_Permuta_Avaliacao_refb.cfm">
 		</cfcase>	
