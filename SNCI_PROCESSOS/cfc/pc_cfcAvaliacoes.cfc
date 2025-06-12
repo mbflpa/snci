@@ -2709,8 +2709,7 @@
 							SET         pc_num_status = 5,
 										pc_alteracao_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 										pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-										pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#',
-										pc_iniciarBloqueado = 'N'
+										pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#'
 							WHERE       (pc_processo_id = '#arguments.pc_aval_processo#')
 						</cfquery>
 						
