@@ -84,7 +84,7 @@
 
 <!--- <cfinclude template="cabecalho.cfm"> --->
 
-
+<cfset dtpart = year(now()) & '-01-01'>
 <!--- area de conteudo   --->
 <table width="50%" align="left">
   <tr>
@@ -95,7 +95,7 @@
 
         <tbody>
           <tr>
-            <td colspan="5" align="center" class="titulo2"><div class="row"><strong>Cadastro Despesas Avaliação</strong></div></td>
+            <td colspan="5" align="center" class="titulo2"><div class="row"><strong>Gestão das Despesas Avaliação</strong></div></td>
           </tr>
           <tr>
             <th scope="row">Exercício</th>
@@ -108,17 +108,17 @@
           </td>
           </tr>
           <tr>
-            <th scope="row" colspan="2">Período</th>
+            <th scope="row" colspan="2">Período (Gestão)</th>
           </tr>
           <tr>
             <th scope="row">Início</th>
             <td  colspan="1">
-              <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA">
+              <input class="form-control" id="dtinic" name="dtinic" type="date" placeholder="DD/MM/AAAA" value="<cfoutput>#dtpart#</cfoutput>">
             </td>
           </tr>
           <tr>
             <th scope="row">Final</th>
-            <td colspan="1"><input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA"></td>
+            <td colspan="1"><input class="form-control" id="dtfinal" name="dtfinal" type="date" placeholder="DD/MM/AAAA" value="<cfoutput>#dateformat(now(),"yyyy-mm-dd")#</cfoutput>"></td>
           </tr>
           <tr>
             <th scope="row">Superintendência</th>
@@ -312,7 +312,7 @@
                   tab += '<td>'+colreal.toLocaleString('pt-br', {minimumFractionDigits: 2})+'</td>'
               tab += '</tr>'
               tab += '<tr>'
-              tab += '<td colspan="15" class="alert alert-primary"><a class="alert-link" '+urltodos+' target="_blank"><div class="btnimprimir todas" align="center" title="Imprimir esta"><h5><strong>Clique aqui para imprimir todas (Superintendência e Avaliações)</strong></h5></div></a></td>'
+              tab += '<td colspan="15" class="alert alert-primary"><a class="alert-link" '+urltodos+' target="_blank"><div class="btnimprimir todas" align="center" title="Imprimir esta"><h5><strong>Clique aqui para imprimir todas (Superintendências e Avaliações)</strong></h5></div></a></td>'
               tab += '</tr>'
               tab += '</tbody>'
               tab += '</table>'              

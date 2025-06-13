@@ -543,7 +543,10 @@ label {
 							</tr>
 							<tr>
 								<td><div><label>Valor previsto (R$)</label></div></td>
-								<td><div><input name="inpvalorprevisto" id="inpvalorprevisto" type="text" class="form-control-sm" value="#LSCurrencyFormat(rsResult.INP_ValorPrevisto, "none")#" size="22" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)"></div></td>
+								<td><div><input name="inpvalorprevisto" id="inpvalorprevisto" type="text" class="form-control-sm" value="#LSCurrencyFormat(rsResult.INP_ValorPrevisto, "none")#" size="22" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)">&nbsp;&nbsp<input type="checkbox" id="cbvlrprev" name="cbvlrprev" title="inativo">&nbsp;&nbsp<label>Não se Aplica (Valor previsto)</label></div></td>
+							</tr> 
+							<tr>
+								<td colspan="2"><div><hr></div></td>
 							</tr> 
 							<tr>
 								<td><div><label>Adicional noturno (R$)</label></div></td>
@@ -582,7 +585,7 @@ label {
 							</tr>	
 							<tr>
 								<td><div><label>Total realizado (R$)</label></div></td>
-								<td><div><input name="totrealizado" id="totrealizado" type="text" class="form-control-sm" value="" size="22" readOnly></div></td>
+								<td><div><input name="totrealizado" id="totrealizado" type="text" class="form-control-sm" value="" size="22" readOnly>&nbsp;&nbsp<input type="checkbox" id="cbrecursos" name="cbrecursos" title="inativo">&nbsp;&nbsp<label>Não se Aplica (Recursos Alocados)</label></div></td>
 							</tr>	
 							<tr>
 								<td colspan="2"><div><hr></div></td>
@@ -651,11 +654,7 @@ label {
 <script type="text/javascript" src="public/axios.min.js"></script>
 <script>
 	$(function(e){
-		//let inpvalorprevisto = $('#inpvalorprevisto').val()
-		//alert(inpvalorprevisto)
-		//$('#totrealizado').val(inpvalorprevisto.toLocaleString('pt-br', {minimumFractionDigits: 2}))
 		fazersoma()
-
 	})
 
 	function numericos() {
@@ -776,19 +775,29 @@ label {
 	// Inicial   Salvar 
 	//***************************************************
 	$('.btnsalvar').click(function(){
-
-		if ($('#inpvalorprevisto').val() =='' || $('#inpvalorprevisto').val() == '0,00')
+		if (($('#inpvalorprevisto').val() =='' || $('#inpvalorprevisto').val() == '0,00') && $("#cbvlrprev").prop("checked") == false)
 			{
 				alert('Gestor(a), informar o valor previsto')
 				$('#inpvalorprevisto').focus()
 				return false
-			}
-		if ($('#totrealizado').val() =='' || $('#totrealizado').val() == '0,00')
+		}	
+		if (($('#totrealizado').val() =='' || $('#totrealizado').val() == '0,00') && $("#cbrecursos").prop("checked") == false)
 			{
 				alert('Gestor(a), informar os recursos alocados')
 				$('#inpadinoturno').focus()
 				return false
+		}
+		
+		if($('#inpadinoturno').val() == '0,00' || $('#inpdeslocamento').val() == '0,00' || $('#inpdiarias').val() == '0,00' || $('#inppassagemarea').val() == '0,00' || $('#inpreembveicproprio').val() == '0,00' || $('#inprepousoremunerado').val() == '0,00' || $('#inpressarcirempregado').val() == '0,00' || $('#inpoutros').val() == '0,00')
+		{
+			if(confirm("Gestor(a), há recurso(s) alocado(s) com valore(s) igual '0,00'. \n\nConfirma continuar?")){		
+				//return true
 			}
+			else{
+				return false
+			}	
+		}
+
 		if(confirm("Gestor(a), Confirma salvar?")){
 			$('#acao').val('salvar')			
 			$('#form1').submit()
@@ -799,6 +808,54 @@ label {
 		}			
 		
 	})
+
+	$('#cbvlrprev').click(function(){  
+		let title = $(this).attr('title')
+		$('#inpvalorprevisto').val('0,00')
+		if(title == 'inativo'){
+			$('#cbvlrprev').attr('title','ativo')
+			$("#inpvalorprevisto").prop('readonly', true);	
+		}else{
+			$('#cbvlrprev').attr('title','inativo')
+			$("#inpvalorprevisto").prop('readonly', false)
+		}
+	})	
+
+	$('#cbrecursos').click(function(){  
+		let title = $(this).attr('title')
+		$('#inpadinoturno').val('0,00')
+		$('#inpdeslocamento').val('0,00')
+		$('#inpdiarias').val('0,00')
+		$('#inppassagemarea').val('0,00')
+		$('#inpreembveicproprio').val('0,00')
+		$('#inprepousoremunerado').val('0,00')
+		$('#inpressarcirempregado').val('0,00')
+		$('#inpoutros').val('0,00')
+		$('#totrealizado').val('0,00')
+
+		if(title == 'inativo'){
+			$('#cbrecursos').attr('title','ativo')
+			$("#inpadinoturno").prop('readonly', true)
+			$("#inpdeslocamento").prop('readonly', true)
+			$("#inpdiarias").prop('readonly', true)
+			$("#inppassagemarea").prop('readonly', true)
+			$("#inpreembveicproprio").prop('readonly', true)
+			$("#inprepousoremunerado").prop('readonly', true)
+			$("#inpressarcirempregado").prop('readonly', true)
+			$("#inpoutros").prop('readonly', true)
+		}else{
+			$('#cbrecursos').attr('title','inativo')
+			$("#inpadinoturno").prop('readonly', false)
+			$("#inpdeslocamento").prop('readonly', false)
+			$("#inpdiarias").prop('readonly', false)
+			$("#inppassagemarea").prop('readonly', false)
+			$("#inpreembveicproprio").prop('readonly', false)
+			$("#inprepousoremunerado").prop('readonly', false)
+			$("#inpressarcirempregado").prop('readonly', false)
+			$("#inpoutros").prop('readonly', false)
+		}
+	})
+
 	$('.btnfechar').click(function(){
 		window.close()
 	})

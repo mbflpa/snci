@@ -6,16 +6,13 @@
     SELECT Usu_GrupoAcesso,Usu_Coordena,Usu_Matricula
     FROM Usuarios
     WHERE Usu_login = (<cfqueryparam cfsqltype="cf_sql_varchar" value="#cgi.REMOTE_USER#">)
+    order by Usu_Matricula
 </cfquery>
 <cfset grpacesso = ucase(trim(qAcesso.Usu_GrupoAcesso))>
-<!--- Excluir arquivos anteriores ao dia atual --->
-<cfset sdata = dateformat(now(),"YYYYMMDDHH")>
-<cfset diretorio =#GetDirectoryFromPath(GetTemplatePath())#>
-<cfset slocal = #diretorio# & 'Fechamento\'>
 
 <cfquery name="rsRevisor" datasource="#dsn_inspecao#">
     SELECT 
-        INP_Unidade,INP_Responsavel,INP_Modalidade,INP_NumInspecao, Und_Descricao, format(INP_DTConcluir_Despesas,'dd-MM-yyyy HH:mm:ss') as inpdtconcluirdespesas, Usu_Apelido, INP_ValorPrevisto, INP_AdiNoturno, INP_Deslocamento, INP_Diarias, INP_PassagemArea, INP_ReembVeicProprio, INP_RepousoRemunerado, INP_RessarcirEmpregado, INP_Outros
+        INP_Unidade,INP_Responsavel,INP_Modalidade,INP_NumInspecao,Und_Descricao,format(INP_DTConcluir_Despesas,'dd-MM-yyyy HH:mm:ss') as inpdtconcluirdespesas,Usu_Apelido,INP_ValorPrevisto,INP_AdiNoturno,INP_Deslocamento,INP_Diarias,INP_PassagemArea,INP_ReembVeicProprio,INP_RepousoRemunerado,INP_RessarcirEmpregado,INP_Outros
         FROM Inspecao INNER JOIN Unidades ON INP_Unidade = Und_Codigo 
         INNER JOIN Usuarios ON INP_LoginGestor_Despesas = Usu_Login
         WHERE INP_DTConcluir_Despesas between '#dtinic#' and '#dtfinal#' and INP_DTConcluir_Despesas is not null
@@ -31,46 +28,25 @@
         </cfif>
         ORDER BY Und_CodDiretoria, INP_NumInspecao
 </cfquery>
+<!--- Criacao do arquivo CSV --->
+<cfset sdata = dateformat(now(),"YYYYMMDDHH")>
+<cfset diretorio =#GetDirectoryFromPath(GetTemplatePath())#>
+<cfset slocal = #diretorio# & 'Fechamento\'>
+<cfset sarquivo = #DateFormat(now(),"YYYYMMDDHH")# & '_' & #trim(qAcesso.Usu_Matricula)# & '.csv'>
 
-<cfset sarquivo = #DateFormat(now(),"YYYYMMDDHH")# & '_' & #trim(qAcesso.Usu_Matricula)# & '.xls'>
+<!--- Excluir arquivos anteriores ao dia atual --->
+<cfdirectory name="qList" filter="*.csv" sort="name desc" directory="#slocal#">
+<cfloop query="qList">
+	<cfif (left(name,8) lt left(sdata,8)) or (mid(name,12,8) eq trim(qAcesso.Usu_Matricula))>
+	  <cffile action="delete" file="#slocal##name#">
+	</cfif>
+</cfloop>
+<cfset cabec = ' - Período de ' & #dateformat(dtinic,"DD/MM/YYYY")# & ' até ' & #dateformat(dtfinal,"DD/MM/YYYY")#>	 
+<cffile action="write" addnewline="no" file="#slocal##sarquivo#" output=''>
+<cfset auxcab = 'RELATÓRIO RECURSOS ALOCADOS PARA AVALIAÇÃO DA UNIDADE ' & #ucase(cabec)#>
+<cffile action="Append" file="#slocal##sarquivo#" output=';;#auxcab#'>
+<cffile action="Append" file="#slocal##sarquivo#" output='Avaliação;Unidade;Nome da Unidade;Modalidade;Data Atualização;Gestor(a);Valor previsto;Adicional noturno;Deslocamento;Diárias;Passagem aérea;Reembolso veic. próprio;Repouso remunerado;Ressarcimento empregado;Outros;Realizado'>
 
-<cfdirectory name="qList" filter="*.*" sort="name desc" directory="#slocal#">
-  	<cfloop query="qList">
-		   <cfif len(name) eq 23>
-				<cfif (left(name,8) lt left(sdata,8)) or (int(mid(sdata,9,2) - mid(name,9,2)) gte 2)>
-				    <cffile action="delete" file="#slocal##name#"> 
-				</cfif>
-		  </cfif>
-	</cfloop>
-<!---    
-<cftry>
-
-<cfif Month(Now()) eq 1>
-  <cfset vANO = Year(Now()) - 1>
-<cfelse>
-  <cfset vANO = Year(Now())>
-</cfif>
-
-<cfset objPOI = CreateObject(
-    "component",
-    "Excel"
-    ).Init()
-    />
-
-<cfset data = now() - 1>
-	 <cfset objPOI.WriteSingleExcel(
-    FilePath = ExpandPath( "./Fechamento/" & #sarquivo# ),
-    Query = qAcesso,
-	ColumnList = "a,b,c",
-	ColumnNames = "Usu_GrupoAcesso,Usu_Coordena,Usu_Matricula",
-	SheetName = "Despesas_avaliacao"
-    ) />
-
-<cfcatch type="any">
-	<cfdump var="#cfcatch#">
-</cfcatch>
-</cftry> 
---->
 <html>
 <head>
 <title>Sistema Nacional de Controle Interno</title>
@@ -92,7 +68,7 @@
   <tr>
     <td align="left"><input type="button" class="botao" onClick="window.close()" value="Fechar"></td>
     <td colspan="8"><div align="center"><strong class="titulo2">Relatório Recursos alocados para Avaliação da Unidade</strong></div></td>
-    <td colspan="2"><div align="center"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/excel.jpg" width="50" height="35" border="0"></a></div></td>
+    <td colspan="2"><div align="center"><a href="Fechamento/<cfoutput>#sarquivo#</cfoutput>"><img src="icones/csv.png" width="50" height="35" border="0"></a></div></td>
   </tr>
   <cfset geralprevisto = 0>
   <cfset geralrealizado = 0>
@@ -148,7 +124,7 @@
         <td colspan="3"><strong class="exibir">#rsRevisor.INP_Unidade# - #rsRevisor.Und_Descricao#</strong></td>
         <td colspan="8"><strong class="exibir">Gerente unidade:&nbsp;#rsRevisor.INP_Responsavel#</strong></td>
         </tr>
-        
+
         <tr>
             <td colspan="1" align="center"><strong class="exibir">Nº Avaliação</strong></td>
             <td colspan="1" align="center"><strong class="exibir">Modalidade</strong></td>
@@ -172,7 +148,7 @@
             <td colspan="1" align="center"><strong class="exibir">#inpdtconcluirdespesas#</strong></td>
             <td colspan="2" align="center"><strong class="exibir">#Usu_Apelido#</strong></td>
         </tr>  
-        
+
         <tr class="exibir">
             <td colspan="1" align="center">
                 <strong class="exibir">Valor previsto</strong>
@@ -250,6 +226,7 @@
             </td>  
         </tr>
         <tr class="exibir quebra"><td colspan="10"></td></tr>
+        <cffile action="Append" file="#slocal##sarquivo#" output='#INP_NumInspecao#;#INP_Unidade#;#Und_Descricao#;#INPModalidade#;#inpdtconcluirdespesas#;#Usu_Apelido#;#LSCurrencyFormat(INP_ValorPrevisto, "none")#;#LSCurrencyFormat(INP_AdiNoturno, "none")#;#LSCurrencyFormat(INP_Deslocamento, "none")#;#LSCurrencyFormat(INP_Diarias, "none")#;#LSCurrencyFormat(INP_PassagemArea, "none")#;#LSCurrencyFormat(INP_ReembVeicProprio, "none")#;#LSCurrencyFormat(INP_RepousoRemunerado, "none")#;#LSCurrencyFormat(INP_RessarcirEmpregado, "none")#;#LSCurrencyFormat(INP_Outros, "none")#;#LSCurrencyFormat(vlrealiz, "none")#'>                
     </cfoutput> 
     <cfoutput>
         <tr>
@@ -319,6 +296,7 @@
                 <strong>#LSCurrencyFormat(geralrealizado, "none")#</strong>
             </td>  
         </tr>
+        <cffile action="Append" file="#slocal##sarquivo#" output=';;;;;Resumo Geral;#LSCurrencyFormat(geralprevisto, "none")#;#LSCurrencyFormat(geraladinoturno, "none")#;#LSCurrencyFormat(geraldeslocamento, "none")#;#LSCurrencyFormat(geraldiarias, "none")#;#LSCurrencyFormat(geralpassagemaerea, "none")#;#LSCurrencyFormat(geralreembveicproprio, "none")#;#LSCurrencyFormat(geralrepousoremunerado, "none")#;#LSCurrencyFormat(geralressarcirempregado, "none")#;#LSCurrencyFormat(geraloutros, "none")#;#LSCurrencyFormat(geralrealizado, "none")#'>                        
     </cfoutput> 
     <tr>
         <td colspan="10" align="left"><input type="button" class="botao" onClick="window.close()" value="Fechar"></td>

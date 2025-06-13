@@ -340,7 +340,7 @@ function gerarData(str) {
 	if (a == 'GERAR') {
 		var frm = document.forms[0];
 
-		if (frm.inpvalorprevisto.value == '' || frm.inpvalorprevisto.value == '0,00') {
+		if ((frm.inpvalorprevisto.value == '' || frm.inpvalorprevisto.value == '0,00') && $("#cbvlrprev").prop("checked") == false) {
 			alert('Informe o Valor previsto!');
 			frm.inpvalorprevisto.focus();
 			return false;
@@ -814,6 +814,7 @@ z-index:1000;visibility:hidden;position:absolute;" >
 					<td>
 						<label for="inpvalorprevisto" style="color:grey">Valor previsto R$: &nbsp;</label>
 						<input name="inpvalorprevisto" id="inpvalorprevisto" type="text" value="" style="text-align:left" size="18" maxlength="18" onKeyPress="numericos()" onKeyUp="moedadig(this.name)">					
+						<input type="checkbox" id="cbvlrprev" name="cbvlrprev" title="inativo"><label>Não se Aplica</label>
 					</td>					
 				</tr>
 				<br><br>
@@ -1002,7 +1003,7 @@ tbody {
 	LEFT JOIN Usuarios ON INP_RevisorLogin = Usu_Login
 	WHERE  Und_CodDiretoria in(#se#) 
 	and right(INP_NumInspecao,4) = CONVERT(VARCHAR(4),year(getdate())) 
-	and INP_DTConcluirAvaliacao IS NOT NULL 
+	and INP_DTConcluirAvaliacao is not null
 	and INP_DTConcluir_Despesas is null
 	ORDER BY Dir_sigla,INP_NumInspecao
 </cfquery>
@@ -2031,8 +2032,6 @@ tbody {
 
 
 	<script type="text/javascript">
-
-
 	    //funções que controlam as tabs
 
 		function confExc(div,mens){
@@ -2254,4 +2253,19 @@ tbody {
 </cfif>
 </body>
 <script src="public/jquery-3.7.1.min.js"></script>
+<script type="text/javascript">
+	$('#cbvlrprev').click(function(){  
+		let title = $(this).attr('title')
+		if(title == 'inativo'){
+			$('#cbvlrprev').attr('title','ativo')
+			$('#inpvalorprevisto').val('0,00')
+			$("#inpvalorprevisto").prop('readonly', true);	
+		}else{
+			$('#cbvlrprev').attr('title','inativo')
+			$('#inpvalorprevisto').val('0,00')
+			$("#inpvalorprevisto").prop('readonly', false)
+		}
+		//alert($("#cbvlrprev").prop("checked"))
+	})	
+</script>
 </html>
