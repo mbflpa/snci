@@ -2632,17 +2632,17 @@
 			
 		
 			<!-- Lista todas as medidas/orientações para regularização do processo -->
-					<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
-						SELECT  pc_avaliacao_orientacoes.*,pc_avaliacoes.*, pc_processos.pc_modalidade, pc_processos.pc_iniciarBloqueado
-						,pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_email, pc_orgao_avaliado.pc_org_email as pc_orgao_avaliado_email
-						,pc_orgao_avaliado.pc_org_sigla as pc_orgao_avaliado_sigla
-						FROM pc_avaliacao_orientacoes
-						LEFT JOIN  pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
-						INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
-						INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
-						INNER JOIN pc_orgaos as pc_orgao_avaliado on pc_orgao_avaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
-						WHERE      pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> 
-					</cfquery>
+			<cfquery datasource="#application.dsn_processos#" name="rsOrientacoes">
+				SELECT  pc_avaliacao_orientacoes.*,pc_avaliacoes.*, pc_processos.pc_modalidade, pc_processos.pc_iniciarBloqueado
+				,pc_orgaos.pc_org_sigla, pc_orgaos.pc_org_email, pc_orgao_avaliado.pc_org_email as pc_orgao_avaliado_email
+				,pc_orgao_avaliado.pc_org_sigla as pc_orgao_avaliado_sigla
+				FROM pc_avaliacao_orientacoes
+				LEFT JOIN  pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+				INNER JOIN pc_processos on pc_processo_id = pc_aval_processo
+				INNER JOIN pc_orgaos on pc_org_mcu = pc_aval_orientacao_mcu_orgaoResp
+				INNER JOIN pc_orgaos as pc_orgao_avaliado on pc_orgao_avaliado.pc_org_mcu = pc_processos.pc_num_orgao_avaliado
+				WHERE      pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar"> 
+			</cfquery>
 			<!--fim LISTA TODAS AS ORIENTAÇÕES DO PROCESSO-->
 
 			<!--Insere em uma lista a relação de e-mails dos órgãos responsáveis pelas orientações do processo-->
@@ -2795,42 +2795,42 @@
 	</cffunction>
 
 	<cffunction name="finalizaBloqueado" access="remote" returntype="string" hint="finaliza o processo mantendoi o bloqueio. Aplica o status 8 - Finalizado c/ Bloqueio no processo">
-    <cfargument name="numProcesso" type="string" required="true"/>
-    <cfquery name="rsExistemOrientacoes" datasource="#application.dsn_processos#">
-        SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes
-        INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
-        WHERE pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
-    </cfquery>
-    <cfif rsExistemOrientacoes.recordcount neq 0>
-        <cfreturn "true">
-	<cfelse>
-		<cftransaction>
-			<!-- Coloca o processo em status 8 - Finalizado com Bloqueio -->
-			<cfquery datasource="#application.dsn_processos#">
-				UPDATE pc_processos
-				SET pc_num_status = 8,
-					pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-					pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#'
-				WHERE pc_processo_id = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
-			</cfquery>
-			<!-- fim Coloca o processo em status 8 - Finalizado com Bloqueio -->
+		<cfargument name="numProcesso" type="string" required="true"/>
+		<cfquery name="rsExistemOrientacoes" datasource="#application.dsn_processos#">
+			SELECT pc_aval_orientacao_id FROM pc_avaliacao_orientacoes
+			INNER JOIN pc_avaliacoes on pc_aval_id = pc_aval_orientacao_num_aval
+			WHERE pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
+		</cfquery>
+		<cfif rsExistemOrientacoes.recordcount neq 0>
+			<cfreturn "true">
+		<cfelse>
+			<cftransaction>
+				<!-- Coloca o processo em status 8 - Finalizado com Bloqueio -->
+				<cfquery datasource="#application.dsn_processos#">
+					UPDATE pc_processos
+					SET pc_num_status = 8,
+						pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#'
+					WHERE pc_processo_id = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">
+				</cfquery>
+				<!-- fim Coloca o processo em status 8 - Finalizado com Bloqueio -->
 
-			<!-- Coloca todas as propostas de melhoria com status Não Informado -->
-			<cfquery datasource="#application.dsn_processos#">
-				UPDATE pc_avaliacao_melhorias
-				SET pc_aval_melhoria_status = 'N',
-					pc_aval_melhoria_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-					pc_aval_melhoria_login = '#application.rsUsuarioParametros.pc_usu_login#'
-				WHERE pc_aval_melhoria_num_aval IN (SELECT pc_aval_id FROM pc_avaliacoes WHERE pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">)
+				<!-- Coloca todas as propostas de melhoria com status Não Informado -->
+				<cfquery datasource="#application.dsn_processos#">
+					UPDATE pc_avaliacao_melhorias
+					SET pc_aval_melhoria_status = 'N',
+						pc_aval_melhoria_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+						pc_aval_melhoria_login = '#application.rsUsuarioParametros.pc_usu_login#'
+					WHERE pc_aval_melhoria_num_aval IN (SELECT pc_aval_id FROM pc_avaliacoes WHERE pc_aval_processo = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">)
+					
+				</cfquery>
+				<!-- fim Coloca todos os itens do processo com status 8 - Finalizado com Bloqueio -->
 				
-			</cfquery>
-			<!-- fim Coloca todos os itens do processo com status 8 - Finalizado com Bloqueio -->
-			
-			<cfreturn "false">
+				<cfreturn "false">
 
-		</cftransaction>
-    </cfif>
-   
-</cffunction>	
+			</cftransaction>
+		</cfif>
+	
+	</cffunction>	
 
 </cfcomponent>

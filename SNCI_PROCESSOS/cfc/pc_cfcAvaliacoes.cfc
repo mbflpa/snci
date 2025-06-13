@@ -2673,16 +2673,7 @@
 					</cfloop>
 
                      
-				   <!--SE O PROCESSO ESTIVER BLOQUEADO, COLOCA TODAS AS PROPOSTAS DE MELHORIA COM STATUS B (BLOQUEADO)-->
-				    <cfif rsProcessoComOrientacoes.pc_iniciarBloqueado eq 'S'>
-						<cfquery datasource="#application.dsn_processos#" >
-							UPDATE pc_avaliacao_melhorias set
-								pc_aval_melhoria_status = 'B',
-								pc_aval_melhoria_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-								pc_aval_melhoria_login = '#application.rsUsuarioParametros.pc_usu_login#'
-							WHERE pc_aval_melhoria_num_aval in (select pc_aval_id from pc_avaliacoes where pc_aval_processo = '#arguments.pc_aval_processo#')
-						</cfquery>
-					</cfif>
+				   	
 
 					<!-- Retorna informações do processo para enviar e-mail-->			
 					<cfquery datasource="#application.dsn_processos#" name="rsProcesso">
@@ -2700,17 +2691,46 @@
 						WHERE pc_processo_id = '#arguments.pc_aval_processo#'
 					</cfquery>
 
+					<!--SE O PROCESSO ESTIVER BLOQUEADO, COLOCA TODAS AS PROPOSTAS DE MELHORIA COM STATUS B (BLOQUEADO)-->
+					
+				    <cfif rsProcesso.pc_iniciarBloqueado eq 'S'>
+						<cfquery datasource="#application.dsn_processos#" >
+							UPDATE pc_avaliacao_melhorias set
+								pc_aval_melhoria_status = 'B',
+								pc_aval_melhoria_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+								pc_aval_melhoria_login = '#application.rsUsuarioParametros.pc_usu_login#'
+							WHERE pc_aval_melhoria_num_aval in (select pc_aval_id from pc_avaliacoes where pc_aval_processo = '#arguments.pc_aval_processo#')
+						</cfquery>
+					</cfif>
+
 
 					<!--Se não hoverem medidas/orientações para regularização no processo (ou seja, só existem propostas de melhoria ou itens leves)-->
 					<cfif  rsProcessoComOrientacoes.recordcount eq 0>   
 						<!--Finaliza o processo-->  
 						<cfquery datasource="#application.dsn_processos#" >
 							UPDATE      pc_processos
-							SET         pc_num_status = 5,
+							SET         <cfif rsProcesso.pc_iniciarBloqueado eq 'S'>
+							            	pc_num_status = 6,
+										<cfelse>
+											pc_num_status = 5,
+											pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+										</cfif>
 										pc_alteracao_datahora =  <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
-										pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 										pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#'
-							WHERE       (pc_processo_id = '#arguments.pc_aval_processo#')
+							WHERE       pc_processo_id = '#arguments.pc_aval_processo#'
+						</cfquery>
+
+						<!--FINALIZA TODOS OS ITENS DO PROCESSO SE O PROCESSO NÃO ESTIVER BLOQUEADO-->
+						<cfquery datasource="#application.dsn_processos#" >
+							UPDATE      pc_avaliacoes
+							SET         <cfif rsProcesso.pc_iniciarBloqueado eq 'S'>      
+											pc_aval_status=8,
+										<cfelse>
+											pc_aval_status=7,
+										</cfif>
+										pc_aval_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
+										pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#' 
+							WHERE       pc_aval_processo = '#arguments.pc_aval_processo#' 
 						</cfquery>
 						
 
@@ -2730,10 +2750,14 @@
 						</cfquery>
 						
 
-						<!--FINALIZA TODOS OS ITENS LEVES DO PROCESSO-->
+						<!--FINALIZA TODOS OS ITENS LEVES DO PROCESSO SE O PROCESSO NÃO ESTIVER BLOQUEADO-->
 						<cfquery datasource="#application.dsn_processos#" >
 							UPDATE      pc_avaliacoes
-							SET         pc_aval_status=7,
+							SET         <cfif rsProcessoComOrientacoes.pc_iniciarBloqueado eq 'S'>      
+											pc_aval_status=8,
+										<cfelse>
+											pc_aval_status=7,
+										</cfif>
 										pc_aval_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 										pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#' 
 							WHERE       pc_aval_processo = '#arguments.pc_aval_processo#' AND pc_aval_classificacao ='L'
@@ -2747,14 +2771,14 @@
 							<cfquery datasource="#application.dsn_processos#" >
 								UPDATE      pc_avaliacoes
 								SET   
-								<cfif rsProcessoComOrientacoes.pc_iniciarBloqueado eq 'S'>      
-									pc_aval_status=8,
-								<cfelse>
-									pc_aval_status=6,
-								</cfif>
+										<cfif rsProcessoComOrientacoes.pc_iniciarBloqueado eq 'S'>      
+											pc_aval_status=8,
+										<cfelse>
+											pc_aval_status=6,
+										</cfif>
 											pc_aval_atualiz_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 											pc_aval_atualiz_login = '#application.rsUsuarioParametros.pc_usu_login#' 
-								WHERE       pc_aval_id =  #pc_aval_orientacao_num_aval#
+								WHERE       pc_aval_id =  #pc_aval_orientacao_num_aval# AND pc_aval_classificacao <>'L'
 							</cfquery>
 
 
@@ -7682,7 +7706,7 @@
 				SELECT pc_processo_id  FROM pc_processos
 				WHERE 
 				<cfif arguments.numProcesso neq "TODOS">
-					pc_processo_id = '#arguments.numProcesso#'
+					pc_processo_id = '#arguments.numProcesso#' and pc_num_status <>6
 				<cfelse>
 					pc_num_status = 4
 				</cfif>
