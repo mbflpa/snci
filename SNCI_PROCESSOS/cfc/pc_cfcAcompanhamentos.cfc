@@ -69,7 +69,7 @@
 
 					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil não for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4) --->
 					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and #application.rsUsuarioParametros.pc_usu_perfil# neq 11>
-						and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_aval_orientacao_status in (13) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
+						and pc_num_orgao_origem = '#application.rsUsuarioParametros.pc_usu_lotacao#' OR (pc_aval_orientacao_status in (13,14) and pc_orgaos_2.pc_org_mcu = '#application.rsUsuarioParametros.pc_usu_lotacao#')
 					</cfif>
 					<!---Se a lotação do usuario for um orgao origem de processos (status 'O' -> letra 'o' de Origem) e o perfil for 11 - CI - MASTER ACOMPANHAMENTO (Gestor Nível 4)--->
 					<cfif '#application.rsUsuarioParametros.pc_org_status#' eq 'O' and ListFind("11",#application.rsUsuarioParametros.pc_usu_perfil#) >

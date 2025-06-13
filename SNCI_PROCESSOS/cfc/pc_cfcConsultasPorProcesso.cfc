@@ -2809,6 +2809,7 @@
 				<cfquery datasource="#application.dsn_processos#">
 					UPDATE pc_processos
 					SET pc_num_status = 8,
+					    pc_data_finalizado = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						pc_alteracao_datahora = <cfqueryparam value="#now()#" cfsqltype="cf_sql_timestamp">,
 						pc_alteracao_login = '#application.rsUsuarioParametros.pc_usu_login#'
 					WHERE pc_processo_id = <cfqueryparam value="#arguments.numProcesso#" cfsqltype="cf_sql_varchar">

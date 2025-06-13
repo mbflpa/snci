@@ -5139,9 +5139,11 @@
 											</cfif>
 										<cfelse>
 											<cfif rsProcessoComMelhorias.recordCount neq 0><!--Se o processo tiver, pelo menos, uma propostas de melhoria-->
-												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação e não existem medidas/orientações para regularização para acompanhamento em nenhum item deste processo.<br> Clique aqui para Finalizar Processo.</button>
-											<cfelse>
-												<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação e não existem medidas/orientações para regularização para acompanhamento ou propostas de melhoria em nenhum item deste processo.<br> Clique aqui para Finalizar Processo.</button>
+												<cfif rsModalidadeProcesso.pc_iniciarBloqueado eq 'S'><!--Se o processo estiver bloqueado-->
+													<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação, porém, o processo foi <span style="color: #fff;background-color: red; padding: 2px;">BLOQUEADO</span>.<br>As Propostas de Melhoria não serão encaminhadas para os órgãos reponsáveis e só serão visíveis pelos órgãos do controle interno em Consultas.<br>Clique aqui para manter o bloqueio e concluir o cadastro dos itens.</button>
+												<cfelse>
+													<button id="btEnviarParaAcompanhamento"  class="btn btn-block statusOrientacoes efeito-grow" style="background-color:green;color:#fff;"  >Este é o último item para validação e não existem medidas/orientações para regularização para acompanhamento em nenhum item deste processo.<br> Clique aqui para Finalizar Processo.</button>
+												</cfif>
 											</cfif>
 										</cfif>
 									<cfelse>

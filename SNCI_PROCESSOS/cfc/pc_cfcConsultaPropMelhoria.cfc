@@ -55,7 +55,7 @@
 				</cfif>
 
 			<cfelse>
-				AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6)
+				AND pc_aval_melhoria_status not in('B') AND  pc_num_status not in(6,8)
 				<!---Se o perfil do usuário não for 13 - GOVERNANÇA --->
 				<cfif #application.rsUsuarioParametros.pc_usu_perfil# neq 13 >
 					AND (
